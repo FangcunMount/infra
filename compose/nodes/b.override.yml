@@ -1,0 +1,69 @@
+version: '3.9'
+
+# 节点 B Override - 计算/流处理侧  
+# 服务: Kafka, QS-Evaluation
+
+services:
+  kafka:
+    environment:
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://${KAFKA_ADVERTISED:-0.0.0.0}:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_NUM_PARTITIONS=1
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
+      - KAFKA_CFG_LOG_RETENTION_MS=${KAFKA_RETENTION_MS:-86400000}
+      - KAFKA_CFG_LOG_RETENTION_BYTES=${KAFKA_RETENTION_BYTES:-64424509440}
+      - KAFKA_CFG_SEGMENT_BYTES=67108864
+      - KAFKA_CFG_MESSAGE_MAX_BYTES=1048576
+      - KAFKA_HEAP_OPTS=-Xms256m -Xmx512m
+      - TZ=${TZ:-Asia/Shanghai}
+
+  qs-evaluation:
+    environment:
+      - MYSQL_DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(${NODE_A_IP:-192.168.1.10}:3306)/qs?charset=utf8mb4&parseTime=true&loc=Local
+      - REDIS_ADDR=${NODE_A_IP:-192.168.1.10}:6379
+      - MONGO_URI=mongodb://${NODE_A_IP:-192.168.1.10}:27017/qs
+      - KAFKA_BROKERS=kafka:9092
+      - TZ=${TZ:-Asia/Shanghai}
+      - APP_PORT=8080
+      # 机器学习相关配置
+      - PYTHONUNBUFFERED=1
+      - OMP_NUM_THREADS=2
+      - MKL_NUM_THREADS=2
+
+  # 禁用节点 A 的服务
+  nginx:
+    deploy:
+      replicas: 0
+
+  mysql:
+    deploy:
+      replicas: 0
+
+  redis:
+    deploy:
+      replicas: 0
+
+  mongo:
+    deploy:
+      replicas: 0
+
+  miniblog:
+    deploy:
+      replicas: 0
+
+  qs-api:
+    deploy:
+      replicas: 0
+
+  qs-collection:
+    deploy:
+      replicas: 0
+
+  jenkins:
+    deploy:
+      replicas: 0

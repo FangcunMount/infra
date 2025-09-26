@@ -1,0 +1,96 @@
+version: '3.9'
+
+# 节点 A Override - Web/事务处理侧
+# 服务: Nginx, MySQL, Redis, MongoDB, MiniBlog, QS-API, QS-Collection, Jenkins
+
+services:
+  nginx:
+    depends_on:
+      - mysql
+      - redis
+      - mongo
+      - miniblog
+      - qs-api  
+      - qs-collection
+      - jenkins
+
+  mysql:
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: app
+      TZ: ${TZ:-Asia/Shanghai}
+    command:
+      - --innodb-buffer-pool-size=${MYSQL_INNODB_BUFFER_POOL_SIZE:-1200M}
+      - --innodb-log-file-size=128M
+      - --innodb-flush-method=O_DIRECT
+      - --max-connections=${MYSQL_MAX_CONNECTIONS:-150}
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --binlog_expire_logs_seconds=86400
+
+  redis:
+    command: >
+      redis-server /usr/local/etc/redis/redis.conf
+      --maxmemory ${REDIS_MAXMEMORY:-384mb}
+      --maxmemory-policy allkeys-lru
+
+  mongo:
+    command: ["--config", "/etc/mongod.conf", "--wiredTigerCacheSizeGB", "${MONGO_WIRED_TIGER_CACHE_SIZE_GB:-0.8}"]
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+
+  miniblog:
+    environment:
+      - DB_DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql:3306)/miniblog?charset=utf8mb4&parseTime=true&loc=Local
+      - REDIS_ADDR=redis:6379
+      - MONGO_URI=mongodb://mongo:27017/miniblog
+      - KAFKA_BROKERS=${NODE_B_IP:-192.168.1.11}:9092
+      - TZ=${TZ:-Asia/Shanghai}
+      - APP_PORT=8080
+
+  qs-api:
+    environment:
+      - MYSQL_DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql:3306)/qs?charset=utf8mb4&parseTime=true&loc=Local
+      - REDIS_ADDR=redis:6379
+      - MONGO_URI=mongodb://mongo:27017/qs
+      - KAFKA_BROKERS=${NODE_B_IP:-192.168.1.11}:9092
+      - QS_EVALUATION_URL=http://${NODE_B_IP:-192.168.1.11}:8080
+      - TZ=${TZ:-Asia/Shanghai}
+      - APP_PORT=8080
+
+  qs-collection:
+    environment:
+      - MYSQL_DSN=mysql://root:${MYSQL_ROOT_PASSWORD}@tcp(mysql:3306)/qs?charset=utf8mb4&parseTime=true&loc=Local
+      - REDIS_ADDR=redis:6379
+      - MONGO_URI=mongodb://mongo:27017/qs
+      - KAFKA_BROKERS=${NODE_B_IP:-192.168.1.11}:9092
+      - TZ=${TZ:-Asia/Shanghai}
+      - APP_PORT=8080
+
+  jenkins:
+    environment:
+      - JAVA_OPTS=-Xmx512m -Xms256m
+      - TZ=${TZ:-Asia/Shanghai}
+      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - /data/logs/jenkins:/var/log/jenkins
+
+  # 禁用节点 B 的服务
+  kafka:
+    deploy:
+      replicas: 0
+    
+  qs-evaluation:
+    deploy:
+      replicas: 0
+
+volumes:
+  jenkins-data:
+    name: jenkins-data-node-a
+    driver_opts:
+      type: none
+      o: bind
+      device: /data/jenkins

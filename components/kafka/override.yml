@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  kafka:
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+    volumes:
+      - /data/kafka:/bitnami/kafka
+      - /data/logs/kafka:/opt/bitnami/kafka/logs

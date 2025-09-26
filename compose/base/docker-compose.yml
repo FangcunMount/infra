@@ -1,0 +1,235 @@
+version: '3.9'
+
+# 基础服务定义 - 不包含端口映射和敏感配置
+# 通过 override 文件来配置节点特定的参数
+
+services:
+  nginx:
+    image: nginx:1.27
+    container_name: nginx
+    networks:
+      - frontend
+      - backend
+    restart: always
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ulimits:
+      nofile: 100000
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    networks:
+      - backend
+    restart: always
+    ulimits:
+      nofile: 100000
+    deploy:
+      resources:
+        limits:
+          memory: 1400M
+        reservations:
+          memory: 1200M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  redis:
+    image: redis:7
+    container_name: redis
+    networks:
+      - backend
+    restart: always
+    ulimits:
+      nofile: 100000
+    deploy:
+      resources:
+        limits:
+          memory: 450M
+        reservations:
+          memory: 384M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    networks:
+      - backend
+    restart: always
+    ulimits:
+      nofile: 100000
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+        reservations:
+          memory: 800M
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: kafka
+    networks:
+      - backend
+    restart: always
+    ulimits:
+      nofile: 200000
+    deploy:
+      resources:
+        limits:
+          memory: 600M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+          cpus: '0.2'
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/kafka/bin/kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 业务应用服务
+  miniblog:
+    image: ${MINIBLOG_IMAGE:-your-registry/miniblog:latest}
+    container_name: miniblog
+    networks:
+      - backend
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - mysql
+      - redis
+      - mongo
+
+  qs-api:
+    image: ${QS_API_IMAGE:-your-registry/qs-api:latest}
+    container_name: qs-api
+    networks:
+      - backend
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - mysql
+      - redis
+      - mongo
+
+  qs-collection:
+    image: ${QS_COLLECTION_IMAGE:-your-registry/qs-collection:latest}
+    container_name: qs-collection
+    networks:
+      - backend
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - mysql
+      - redis
+      - mongo
+
+  qs-evaluation:
+    image: ${QS_EVALUATION_IMAGE:-your-registry/qs-evaluation:latest}
+    container_name: qs-evaluation
+    networks:
+      - backend
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G
+          cpus: '2.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - kafka
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    user: root
+    networks:
+      - backend
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 600M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+          cpus: '0.2'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+networks:
+  frontend:
+    name: infra-frontend
+    driver: bridge
+  backend:
+    name: infra-backend
+    driver: bridge
+    internal: false
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+
+# 数据卷在组件 override 中定义，便于管理
