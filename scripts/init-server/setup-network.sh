@@ -281,25 +281,83 @@ install_mihomo_binary() {
     
     log_info "系统架构: $arch"
     
+    # 检查本地静态文件
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+    local static_dir="$script_dir/static"
+    local static_binary="$static_dir/mihomo-linux-$arch"
+    
+    log_info "检查本地静态文件..."
+    log_info "静态文件目录: $static_dir"
+    log_info "目标文件: mihomo-linux-$arch"
+    
+    # 列出 static 目录中的 mihomo 相关文件
+    if [[ -d "$static_dir" ]]; then
+        local mihomo_files
+        mihomo_files=$(ls -la "$static_dir"/mihomo* 2>/dev/null || true)
+        if [[ -n "$mihomo_files" ]]; then
+            log_info "发现的 mihomo 文件:"
+            echo "$mihomo_files" | while read -r line; do
+                echo "  $line"
+            done
+        else
+            log_info "static 目录中没有找到 mihomo 文件"
+        fi
+    else
+        log_warn "静态文件目录不存在: $static_dir"
+    fi
+    
     # 创建临时目录
     rm -rf "$temp_dir"
     mkdir -p "$temp_dir"
     cd "$temp_dir"
     
     # 优先使用本地静态文件
-    local static_binary="$(dirname "$0")/../../static/mihomo-linux-$arch"
     if [[ -f "$static_binary" ]]; then
+        log_success "✅ 找到本地静态二进制文件: $static_binary"
+        
+        # 检查文件大小
+        local file_size
+        file_size=$(stat -c%s "$static_binary" 2>/dev/null || stat -f%z "$static_binary" 2>/dev/null || echo "0")
+        log_info "文件大小: $(( file_size / 1024 / 1024 )) MB"
+        
+        # 检查文件权限
+        if [[ -x "$static_binary" ]]; then
+            log_info "文件已具有执行权限"
+        else
+            log_info "文件需要添加执行权限"
+        fi
+        
         log_info "使用本地静态二进制文件..."
         cp "$static_binary" mihomo
         chmod +x mihomo
+        
+        # 验证复制的文件
+        if [[ -f "mihomo" ]]; then
+            log_success "✅ 本地静态文件复制成功"
+        else
+            log_error "本地静态文件复制失败"
+            exit 1
+        fi
     else
+        log_warn "❌ 未找到本地静态二进制文件: $static_binary"
+        
+        # 提供详细的解决方案
+        echo
+        log_info "解决方案："
+        echo "  方案1 - 使用预下载脚本（推荐）:"
+        echo "    ./download-mihomo-binaries.sh"
+        echo
+        echo "  方案2 - 手动下载到 static 目录:"
+        echo "    mkdir -p $static_dir"
+        echo "    # 然后下载对应架构的文件到:"
+        echo "    # $static_binary"
+        echo
+        echo "  方案3 - 在线下载（需要网络连接）"
+        echo
+        
         # 从 GitHub 下载
         if [[ "$IS_INTRANET" == "true" ]]; then
-            log_error "内网环境且未找到本地二进制文件"
-            echo "请下载对应架构的 mihomo 二进制文件到："
-            echo "  $static_binary"
-            echo "或者使用以下命令预下载："
-            echo "  ./download-mihomo-binaries.sh"
+            log_error "内网环境无法在线下载，请使用方案1或方案2"
             exit 1
         fi
         
@@ -365,31 +423,46 @@ install_mihomo_binary() {
         fi
         
         chmod +x mihomo
+        
+        # 显示下载文件信息
+        if [[ -f "mihomo" ]]; then
+            local file_size=$(stat -c%s "mihomo" 2>/dev/null || stat -f%z "mihomo" 2>/dev/null || echo "0")
+            local file_size_mb=$((file_size / 1024 / 1024))
+            log_success "✅ 在线下载完成 (${file_size_mb}MB)"
+        fi
     fi
     
     # 验证二进制文件
+    log_info "验证 mihomo 二进制文件..."
     if ! ./mihomo -v >/dev/null 2>&1; then
         log_error "mihomo 二进制文件验证失败"
         exit 1
     fi
     
+    log_success "✅ mihomo 二进制文件验证通过"
+    
     # 安装到系统目录
     log_info "安装 mihomo 到 $mihomo_binary..."
     cp mihomo "$mihomo_binary"
+    chmod +x "$mihomo_binary"
     
     # 验证安装
     if "$mihomo_binary" -v >/dev/null 2>&1; then
         local version
         version=$("$mihomo_binary" -v | head -1)
-        log_success "✅ mihomo 安装成功: $version"
+        log_success "✅ mihomo 安装成功"
+        log_info "版本信息: $version"
+        log_info "安装位置: $mihomo_binary"
     else
         log_error "mihomo 安装验证失败"
         exit 1
     fi
     
     # 清理临时文件
+    log_debug "清理临时目录: $temp_dir"
     cd /
     rm -rf "$temp_dir"
+    log_debug "临时文件清理完成"
     
     log_success "mihomo 二进制文件安装完成"
 }
