@@ -294,26 +294,76 @@ install_mihomo_binary() {
         chmod +x mihomo
     else
         # 从 GitHub 下载
-        local download_url="https://github.com/MetaCubeX/mihomo/releases/latest/download/mihomo-linux-$arch-v1.18.8.gz"
-        
         if [[ "$IS_INTRANET" == "true" ]]; then
             log_error "内网环境且未找到本地二进制文件"
             echo "请下载对应架构的 mihomo 二进制文件到："
             echo "  $static_binary"
-            echo "或者从以下地址下载："
-            echo "  $download_url"
+            echo "或者使用以下命令预下载："
+            echo "  ./download-mihomo-binaries.sh"
             exit 1
         fi
         
+        log_info "获取 mihomo 最新版本..."
+        local latest_version
+        if latest_version=$(curl -s --connect-timeout 10 --max-time 20 "https://api.github.com/repos/MetaCubeX/mihomo/releases/latest" | grep '"tag_name"' | cut -d'"' -f4); then
+            log_info "最新版本: $latest_version"
+        else
+            log_warn "无法获取最新版本，使用 latest 下载链接"
+            latest_version="latest"
+        fi
+        
+        local download_url
+        if [[ "$latest_version" == "latest" ]]; then
+            # 使用 latest 重定向链接（GitHub 会自动重定向到最新版本）
+            download_url="https://github.com/MetaCubeX/mihomo/releases/latest/download/mihomo-linux-$arch.gz"
+        else
+            # 使用具体版本号
+            download_url="https://github.com/MetaCubeX/mihomo/releases/download/$latest_version/mihomo-linux-$arch-$latest_version.gz"
+        fi
+        
         log_info "从 GitHub 下载 mihomo..."
-        if ! download_file_with_fallback "$download_url" "mihomo-linux-$arch.gz"; then
+        log_info "下载地址: $download_url"
+        
+        local downloaded_filename
+        if [[ "$latest_version" == "latest" ]]; then
+            downloaded_filename="mihomo-linux-$arch.gz"
+        else
+            downloaded_filename="mihomo-linux-$arch-$latest_version.gz"
+        fi
+        
+        if ! curl -fsSL --connect-timeout 10 --max-time 60 "$download_url" -o "$downloaded_filename"; then
             log_error "mihomo 二进制文件下载失败"
+            log_info "您可以："
+            echo "  1. 检查网络连接"
+            echo "  2. 使用预下载脚本: ./download-mihomo-binaries.sh"  
+            echo "  3. 手动下载到 static 目录后重新运行"
             exit 1
         fi
         
         log_info "解压二进制文件..."
-        gunzip "mihomo-linux-$arch.gz"
-        mv "mihomo-linux-$arch" mihomo
+        if [[ -f "$downloaded_filename" ]]; then
+            gunzip "$downloaded_filename"
+            # 处理解压后的文件名
+            local extracted_name
+            if [[ "$latest_version" == "latest" ]]; then
+                extracted_name="mihomo-linux-$arch"
+            else
+                extracted_name="mihomo-linux-$arch-$latest_version"
+            fi
+            
+            if [[ -f "$extracted_name" ]]; then
+                mv "$extracted_name" mihomo
+            elif [[ -f "mihomo-linux-$arch" ]]; then
+                mv "mihomo-linux-$arch" mihomo
+            else
+                log_error "解压后的文件未找到"
+                exit 1
+            fi
+        else
+            log_error "下载的文件不存在: $downloaded_filename"
+            exit 1
+        fi
+        
         chmod +x mihomo
     fi
     
