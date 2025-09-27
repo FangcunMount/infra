@@ -242,8 +242,23 @@ setup_user_bashrc() {
     
     log_info "配置用户 '$user' 的 .bashrc 文件..."
     
-    # 创建 .bashrc 内容
-    cat > "$bashrc_file" << 'EOF'
+    # 备份原有的 .bashrc（如果存在）
+    if [[ -f "$bashrc_file" ]]; then
+        cp "$bashrc_file" "$bashrc_file.backup.$(date +%Y%m%d_%H%M%S)"
+        log_info "已备份原有 .bashrc 文件"
+    fi
+    
+    # 检查是否已经添加过自定义配置
+    local marker="# === INIT-USERS CUSTOM CONFIG ==="
+    if grep -q "$marker" "$bashrc_file" 2>/dev/null; then
+        log_warn "检测到已存在自定义配置，跳过添加"
+        return 0
+    fi
+    
+    # 追加自定义配置到 .bashrc 文件
+    cat >> "$bashrc_file" << EOF
+
+$marker
 # User specific aliases and functions
 
 alias rm='rm -i'
@@ -255,21 +270,25 @@ if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
-if [ ! -d $HOME/workspace ]; then
-    mkdir -p $HOME/workspace
+# Create workspace directory if not exists
+if [ ! -d \$HOME/workspace ]; then
+    mkdir -p \$HOME/workspace
 fi
 
 # User specific environment
 # Basic envs
 export LANG="en_US.UTF-8" # 设置系统语言为 en_US.UTF-8，避免终端出现中文乱码
-export PS1='[\u@\h \W]$ ' # 设置展示命令行提示符: 用户名@主机名 当前目录
-export WORKSPACE="$HOME/workspace" # 设置工作目录
-export PATH=$HOME/bin:$PATH # 将 $HOME/bin 目录加入到 PATH 变量中
+export PS1='[\u@\h \W]\$ ' # 设置展示命令行提示符: 用户名@主机名 当前目录
+export WORKSPACE="\$HOME/workspace" # 设置工作目录
+export PATH=\$HOME/bin:\$PATH # 将 \$HOME/bin 目录加入到 PATH 变量中
 
-# Default entry folder
-cd $WORKSPACE # 登录系统，默认进入 workspace 目录
+# Default entry folder (only if in interactive shell)
+if [[ \$- == *i* ]] && [[ -d \$WORKSPACE ]]; then
+    cd \$WORKSPACE # 登录系统，默认进入 workspace 目录
+fi
 
 # User specific aliases and functions
+# === END CUSTOM CONFIG ===
 EOF
 
     # 设置文件权限和所有者
@@ -323,8 +342,17 @@ setup_root_bashrc() {
         log_info "已备份原有 root .bashrc 文件"
     fi
     
-    # 创建 root 用户的 .bashrc 内容
-    cat > "$bashrc_file" << 'EOF'
+    # 检查是否已经添加过自定义配置
+    local marker="# === ROOT INIT-USERS CUSTOM CONFIG ==="
+    if grep -q "$marker" "$bashrc_file" 2>/dev/null; then
+        log_warn "检测到 root 已存在自定义配置，跳过添加"
+        return 0
+    fi
+    
+    # 追加自定义配置到 root .bashrc 文件
+    cat >> "$bashrc_file" << 'EOF'
+
+# === ROOT INIT-USERS CUSTOM CONFIG ===
 # Root user .bashrc configuration
 
 # User specific aliases and functions
@@ -352,8 +380,10 @@ export PS1='[\u@\h \W]# ' # 设置展示命令行提示符: 用户名@主机名 
 export WORKSPACE="/root/workspace" # 设置工作目录
 export PATH=/root/bin:$PATH # 将 /root/bin 目录加入到 PATH 变量中
 
-# Default entry folder
-cd $WORKSPACE # 登录系统，默认进入 workspace 目录
+# Default entry folder (only if in interactive shell)
+if [[ $- == *i* ]] && [[ -d $WORKSPACE ]]; then
+    cd $WORKSPACE # 登录系统，默认进入 workspace 目录
+fi
 
 # Root specific aliases and functions
 alias status='systemctl status'
@@ -372,6 +402,7 @@ if command -v docker >/dev/null 2>&1; then
     alias dlog='docker logs -f'
     alias dexec='docker exec -it'
 fi
+# === END ROOT CUSTOM CONFIG ===
 EOF
 
     # 设置文件权限
