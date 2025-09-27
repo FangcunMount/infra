@@ -68,15 +68,10 @@ cleanup_on_error() {
         systemctl stop mihomo.service 2>/dev/null || true
     fi
     
-    if docker ps -q -f name=mihomo | grep -q .; then
-        docker stop mihomo 2>/dev/null || true
-        docker rm mihomo 2>/dev/null || true
-    fi
-    
     echo
     log_warn "问题排查建议："
     echo "  1. 运行诊断工具: sudo ./scripts/diagnose-network.sh"
-    echo "  2. 检查 Docker 容器: docker ps -a | grep mihomo"
+    echo "  2. 检查 mihomo 进程: ps aux | grep mihomo"
     echo "  3. 检查配置目录: ls -la /opt/mihomo/"
     echo "  4. 检查系统日志: journalctl -u mihomo.service --no-pager"
     echo "  5. 重新运行脚本: sudo $0"
@@ -153,21 +148,7 @@ check_prerequisites() {
     local kernel_minor
     kernel_minor=$(echo "$kernel_version" | cut -d. -f2)
     
-    if [[ $kernel_major -lt 3 ]] || [[ $kernel_major -eq 3 && $kernel_minor -lt 10 ]]; then
-        log_warn "Linux 内核版本过低 ($kernel_version)，可能影响 Docker 运行"
-    fi
-    
-    # 检查 Docker 是否安装
-    if ! command -v docker >/dev/null 2>&1; then
-        log_error "Docker 未安装，请先运行 install-docker.sh"
-        exit 1
-    fi
-    
-    # 检查 Docker 服务是否运行
-    if ! systemctl is-active --quiet docker; then
-        log_error "Docker 服务未运行，请启动 Docker 服务"
-        exit 1
-    fi
+    log_info "内核版本: $kernel_version（符合要求）"
     
     log_info "使用 Ubuntu 包管理器: apt-get"
     
@@ -268,6 +249,99 @@ check_prerequisites() {
     fi
     
     log_success "环境检查通过"
+}
+
+# 安装 mihomo 二进制文件
+install_mihomo_binary() {
+    log_step "安装 mihomo 二进制文件..."
+    
+    local mihomo_dir="/usr/local/bin"
+    local mihomo_binary="$mihomo_dir/mihomo"
+    local temp_dir="/tmp/mihomo-install"
+    
+    # 检查是否已安装
+    if [[ -f "$mihomo_binary" ]] && "$mihomo_binary" -v >/dev/null 2>&1; then
+        local current_version
+        current_version=$("$mihomo_binary" -v 2>/dev/null | head -1 || echo "unknown")
+        log_success "✅ mihomo 已安装: $current_version"
+        return 0
+    fi
+    
+    # 检测系统架构
+    local arch
+    case "$(uname -m)" in
+        x86_64)  arch="amd64" ;;
+        aarch64) arch="arm64" ;;
+        armv7l)  arch="armv7" ;;
+        *)
+            log_error "不支持的系统架构: $(uname -m)"
+            exit 1
+            ;;
+    esac
+    
+    log_info "系统架构: $arch"
+    
+    # 创建临时目录
+    rm -rf "$temp_dir"
+    mkdir -p "$temp_dir"
+    cd "$temp_dir"
+    
+    # 优先使用本地静态文件
+    local static_binary="$(dirname "$0")/../../static/mihomo-linux-$arch"
+    if [[ -f "$static_binary" ]]; then
+        log_info "使用本地静态二进制文件..."
+        cp "$static_binary" mihomo
+        chmod +x mihomo
+    else
+        # 从 GitHub 下载
+        local download_url="https://github.com/MetaCubeX/mihomo/releases/latest/download/mihomo-linux-$arch-v1.18.8.gz"
+        
+        if [[ "$IS_INTRANET" == "true" ]]; then
+            log_error "内网环境且未找到本地二进制文件"
+            echo "请下载对应架构的 mihomo 二进制文件到："
+            echo "  $static_binary"
+            echo "或者从以下地址下载："
+            echo "  $download_url"
+            exit 1
+        fi
+        
+        log_info "从 GitHub 下载 mihomo..."
+        if ! download_file_with_fallback "$download_url" "mihomo-linux-$arch.gz"; then
+            log_error "mihomo 二进制文件下载失败"
+            exit 1
+        fi
+        
+        log_info "解压二进制文件..."
+        gunzip "mihomo-linux-$arch.gz"
+        mv "mihomo-linux-$arch" mihomo
+        chmod +x mihomo
+    fi
+    
+    # 验证二进制文件
+    if ! ./mihomo -v >/dev/null 2>&1; then
+        log_error "mihomo 二进制文件验证失败"
+        exit 1
+    fi
+    
+    # 安装到系统目录
+    log_info "安装 mihomo 到 $mihomo_binary..."
+    cp mihomo "$mihomo_binary"
+    
+    # 验证安装
+    if "$mihomo_binary" -v >/dev/null 2>&1; then
+        local version
+        version=$("$mihomo_binary" -v | head -1)
+        log_success "✅ mihomo 安装成功: $version"
+    else
+        log_error "mihomo 安装验证失败"
+        exit 1
+    fi
+    
+    # 清理临时文件
+    cd /
+    rm -rf "$temp_dir"
+    
+    log_success "mihomo 二进制文件安装完成"
 }
 
 # 创建配置目录
@@ -930,103 +1004,39 @@ update_subscription() {
 setup_systemd_service() {
     log_step "配置 mihomo systemd 服务..."
     
-    # 检查 Docker 镜像是否可用
-    local image_name="metacubex/mihomo:latest"
-    
-    if [[ "$IS_INTRANET" == "true" ]]; then
-        log_warn "内网环境需要预先拉取 Docker 镜像"
-        
-        # 检查镜像是否存在
-        if ! docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "metacubex/mihomo:latest"; then
-            log_error "❌ 未找到 mihomo Docker 镜像"
-            echo
-            log_info "内网环境解决方案："
-            echo "  1. 在有网络的机器上执行：docker pull metacubex/mihomo:latest"
-            echo "  2. 导出镜像：docker save metacubex/mihomo:latest > mihomo.tar"
-            echo "  3. 传输到服务器并导入：docker load < mihomo.tar"
-            echo "  4. 或使用内部镜像仓库地址替换"
-            echo
-            
-            read -p "是否使用自定义镜像地址？(y/n): " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                while true; do
-                    read -p "请输入 mihomo 镜像地址（如 registry.internal.com/mihomo:latest）: " custom_image
-                    if [[ -n "$custom_image" ]]; then
-                        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "$custom_image"; then
-                            image_name="$custom_image"
-                            log_success "✅ 使用自定义镜像: $image_name"
-                            break
-                        else
-                            log_warn "镜像 $custom_image 不存在，请检查"
-                            read -p "继续使用此镜像地址？(y/n): " -n 1 -r
-                            echo
-                            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                                image_name="$custom_image"
-                                log_warn "⚠️  强制使用镜像: $image_name（可能导致启动失败）"
-                                break
-                            fi
-                        fi
-                    else
-                        echo "镜像地址不能为空"
-                    fi
-                done
-            else
-                log_warn "请先准备好 mihomo Docker 镜像后重新运行脚本"
-                echo "暂时创建服务文件，但服务可能无法启动"
-            fi
-        else
-            log_success "✅ 找到 mihomo Docker 镜像"
-        fi
-    else
-        # 外网环境，拉取镜像
-        log_info "拉取 mihomo Docker 镜像..."
-        if ! docker pull "$image_name"; then
-            log_error "Docker 镜像拉取失败"
-            exit 1
-        fi
-        log_success "✅ 镜像拉取完成"
+    # 创建 mihomo 用户（安全考虑）
+    if ! id mihomo >/dev/null 2>&1; then
+        log_info "创建 mihomo 系统用户..."
+        useradd -r -s /bin/false -d /opt/mihomo mihomo
+        chown -R mihomo:mihomo /opt/mihomo
     fi
     
     # 创建 systemd 服务文件
     local service_file="/etc/systemd/system/mihomo.service"
     
-    cat > "$service_file" << EOF
+    cat > "$service_file" << 'EOF'
 [Unit]
 Description=Mihomo (Clash.Meta) Proxy Service
 Documentation=https://wiki.metacubex.one/
-After=network.target docker.service
-Requires=docker.service
+After=network.target
 Wants=network.target
 
 [Service]
-Type=forking
-Restart=on-failure
-RestartSec=5s
-TimeoutStartSec=0
-User=root
-Group=root
+Type=simple
+User=mihomo
+Group=mihomo
+ExecStart=/usr/local/bin/mihomo -d /opt/mihomo/config
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=5
+LimitNOFILE=1048576
 
-# 清理可能存在的旧容器
-ExecStartPre=-/usr/bin/docker stop mihomo
-ExecStartPre=-/usr/bin/docker rm mihomo
-
-# 启动容器
-ExecStart=/usr/bin/docker run -d \\
-    --name mihomo \\
-    --restart unless-stopped \\
-    --network host \\
-    -v /opt/mihomo/config:/root/.config/mihomo:ro \\
-    -v /opt/mihomo/data:/root/.config/mihomo/data:ro \\
-    ${image_name}
-
-# 停止容器
-ExecStop=/usr/bin/docker stop mihomo
-ExecStopPost=-/usr/bin/docker rm mihomo
-
-# 重启策略
-KillMode=none
-RemainAfterExit=yes
+# 安全设置
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/mihomo
+ProtectHome=true
+NoNewPrivileges=true
 
 [Install]
 WantedBy=multi-user.target
@@ -1045,36 +1055,55 @@ EOF
 start_mihomo_service() {
     log_step "启动 mihomo 服务..."
     
-    # 停止并删除现有容器（如果存在）
-    if docker ps -aq -f name=mihomo | grep -q .; then
-        log_info "停止现有 mihomo 容器..."
-        docker stop mihomo >/dev/null 2>&1 || true
-        docker rm mihomo >/dev/null 2>&1 || true
+    # 验证配置文件
+    if [[ ! -f "/opt/mihomo/config/config.yaml" ]]; then
+        log_error "配置文件不存在: /opt/mihomo/config/config.yaml"
+        exit 1
     fi
     
     # 通过 systemd 启动服务
-    log_info "通过 systemd 启动 mihomo 服务（混合端口 7890）..."
+    log_info "启动 mihomo 服务（混合端口 7890）..."
     systemctl start mihomo.service
     
     # 等待服务启动
-    sleep 8
+    sleep 5
     
     # 检查服务状态
-    if ! systemctl is-active --quiet mihomo.service; then
-        log_error "mihomo 服务启动失败"
-        systemctl status mihomo.service || true
+    if systemctl is-active --quiet mihomo.service; then
+        log_success "✅ mihomo 服务启动成功"
+        
+        # 检查端口是否监听
+        local port_check=0
+        for i in {1..10}; do
+            if netstat -tuln | grep -q ":7890 "; then
+                log_success "✅ 代理端口 7890 已监听"
+                port_check=1
+                break
+            fi
+            sleep 1
+        done
+        
+        if [[ $port_check -eq 0 ]]; then
+            log_warn "⚠️  代理端口 7890 未监听，请检查配置"
+        fi
+        
+        # 检查 API 端口
+        if netstat -tuln | grep -q ":9090 "; then
+            log_success "✅ 管理端口 9090 已监听"
+        else
+            log_warn "⚠️  管理端口 9090 未监听"
+        fi
+    else
+        log_error "❌ mihomo 服务启动失败"
+        echo
+        log_info "诊断信息："
+        echo "服务状态："
+        systemctl status mihomo.service --no-pager || true
+        echo
+        echo "服务日志："
+        journalctl -u mihomo.service --no-pager -n 10 || true
         exit 1
     fi
-    
-    # 检查容器状态
-    if ! docker ps | grep -q mihomo; then
-        log_error "mihomo 容器启动失败"
-        docker logs mihomo 2>/dev/null || true
-        systemctl status mihomo.service || true
-        exit 1
-    fi
-    
-    log_success "mihomo 服务启动成功"
 }
 
 # 配置全局系统代理
@@ -1519,6 +1548,7 @@ main() {
     
     # 执行安装步骤
     check_prerequisites
+    install_mihomo_binary
     setup_directories
     download_geodata
     create_base_config
