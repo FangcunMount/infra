@@ -305,16 +305,31 @@ EOF
         # 配置全局代理环境变量
         log_info "配置全局代理环境变量"
         cat > /etc/profile.d/mihomo-proxy.sh << 'EOF'
-# Mihomo 代理环境变量
-export http_proxy="http://127.0.0.1:7890"
-export https_proxy="http://127.0.0.1:7890"
-export all_proxy="socks5://127.0.0.1:7891"
+# Mihomo 代理环境变量配置
+# 检查 mihomo 服务是否运行，如果运行则自动启用代理
 
-proxy-on() {
+# 检查服务状态并自动设置代理
+if systemctl is-active --quiet mihomo.service 2>/dev/null; then
     export http_proxy="http://127.0.0.1:7890"
     export https_proxy="http://127.0.0.1:7890"
     export all_proxy="socks5://127.0.0.1:7891"
-    echo "🟢 代理已开启"
+    
+    # 仅在交互式登录时显示代理状态
+    if [[ $- == *i* ]] && [[ -n "$PS1" ]]; then
+        echo "🔗 Mihomo 代理已自动启用 (HTTP: 7890, SOCKS5: 7891)"
+    fi
+fi
+
+proxy-on() {
+    if systemctl is-active --quiet mihomo.service 2>/dev/null; then
+        export http_proxy="http://127.0.0.1:7890"
+        export https_proxy="http://127.0.0.1:7890"
+        export all_proxy="socks5://127.0.0.1:7891"
+        echo "🟢 代理已开启"
+    else
+        echo "❌ Mihomo 服务未运行，请先启动服务: systemctl start mihomo"
+        return 1
+    fi
 }
 
 proxy-off() {
@@ -322,8 +337,16 @@ proxy-off() {
     echo "🔴 代理已关闭"
 }
 
-# 使用别名定义 proxy-status（避免函数冲突）
-alias proxy-status='echo "Proxy Status:"; echo "  HTTP_PROXY: $http_proxy"; echo "  HTTPS_PROXY: $https_proxy"; echo "  ALL_PROXY: $all_proxy"'
+proxy-status() {
+    echo "📊 代理状态："
+    echo "  HTTP_PROXY:  ${http_proxy:-'未设置'}"
+    echo "  HTTPS_PROXY: ${https_proxy:-'未设置'}"
+    echo "  ALL_PROXY:   ${all_proxy:-'未设置'}"
+    echo "  服务状态:    $(systemctl is-active mihomo.service 2>/dev/null || echo '未运行')"
+}
+
+# 为了兼容性，也创建别名
+alias proxy-status='proxy-status'
 EOF
         chmod 644 /etc/profile.d/mihomo-proxy.sh
         
@@ -673,7 +696,8 @@ show_completion_info() {
     echo
     
     log_warn "注意事项:"
-    echo "  • 重新登录终端以应用环境变量"
+    echo "  • 所有用户登录后会自动检测并启用代理"
+    echo "  • 代理仅在 mihomo 服务运行时自动生效"
     echo "  • 如需修改配置，编辑 ${CONFIG_FILE} 后重启服务"
     echo "  • 服务已设置开机自启动"
     echo
