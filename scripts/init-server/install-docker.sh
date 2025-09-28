@@ -131,6 +131,102 @@ check_existing_docker() {
     fi
 }
 
+# 配置 Docker Hub 认证
+configure_docker_hub_auth() {
+    log_info "配置 Docker Hub 认证..."
+    echo
+    log_info "📋 Docker Hub 认证说明："
+    echo "  • Docker Hub 对匿名用户有拉取速率限制 (100次/6小时)"
+    echo "  • 认证用户可获得更高配额 (200次/6小时)"
+    echo "  • 如果您有 Docker Hub 账户，建议进行登录认证"
+    echo "  • 可以跳过此步骤，稍后手动登录"
+    echo
+    
+    read -p "是否现在配置 Docker Hub 登录认证？(y/N): " -n 1 -r
+    echo
+    
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        log_info "请输入 Docker Hub 认证信息："
+        echo
+        
+        # 获取用户名
+        read -p "Docker Hub 用户名: " docker_username
+        if [[ -z "$docker_username" ]]; then
+            log_warn "用户名为空，跳过 Docker Hub 认证配置"
+            return 0
+        fi
+        
+        # 获取密码（隐藏输入）
+        echo -n "Docker Hub 密码/Token: "
+        read -s docker_password
+        echo
+        
+        if [[ -z "$docker_password" ]]; then
+            log_warn "密码为空，跳过 Docker Hub 认证配置"
+            return 0
+        fi
+        
+        # 保存认证信息供后续使用
+        DOCKER_HUB_USERNAME="$docker_username"
+        DOCKER_HUB_PASSWORD="$docker_password"
+        DOCKER_HUB_AUTH_ENABLED=true
+        
+        log_success "✅ Docker Hub 认证信息已保存，将在 Docker 安装完成后进行登录"
+    else
+        log_info "跳过 Docker Hub 认证配置"
+        DOCKER_HUB_AUTH_ENABLED=false
+    fi
+    
+    echo
+}
+
+# 执行 Docker Hub 登录
+perform_docker_hub_login() {
+    if [[ "$DOCKER_HUB_AUTH_ENABLED" != true ]]; then
+        return 0
+    fi
+    
+    log_info "执行 Docker Hub 登录..."
+    
+    # 等待 Docker 服务完全启动
+    local retry_count=0
+    while [[ $retry_count -lt 10 ]]; do
+        if docker info >/dev/null 2>&1; then
+            break
+        fi
+        sleep 2
+        retry_count=$((retry_count + 1))
+    done
+    
+    if [[ $retry_count -eq 10 ]]; then
+        log_warn "⚠️  Docker 服务未完全启动，跳过自动登录"
+        return 0
+    fi
+    
+    # 执行 root 用户登录
+    if echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin >/dev/null 2>&1; then
+        log_success "✅ Docker Hub 登录成功 (root 用户)"
+        
+        # 为 www 用户也配置登录（如果存在）
+        if id -u www >/dev/null 2>&1; then
+            log_info "为 www 用户配置 Docker Hub 登录..."
+            if echo "$DOCKER_HUB_PASSWORD" | su - www -c "docker login -u '$DOCKER_HUB_USERNAME' --password-stdin >/dev/null 2>&1" 2>/dev/null; then
+                log_success "✅ www 用户 Docker Hub 登录成功"
+            else
+                log_warn "⚠️  www 用户 Docker Hub 登录失败，可稍后手动登录"
+                log_info "www 用户可以执行: docker login -u $DOCKER_HUB_USERNAME"
+            fi
+        fi
+    else
+        log_warn "⚠️  Docker Hub 登录失败，请检查用户名和密码"
+        log_info "您可以稍后手动执行: docker login"
+    fi
+    
+    # 清除敏感信息
+    unset DOCKER_HUB_USERNAME
+    unset DOCKER_HUB_PASSWORD
+}
+
 # 检测 VPN 网络配置
 detect_vpn_config() {
     log_info "检测 VPN 网络配置..."
@@ -277,14 +373,18 @@ install_docker_rhel() {
     log_success "Docker 软件包安装完成"
 }
 
-# 初始化 VPN 配置变量
+# 初始化配置变量
 VPN_AVAILABLE=false
 VPN_HTTP_PROXY=""
 VPN_SOCKS_PROXY=""
+DOCKER_HUB_AUTH_ENABLED=false
+DOCKER_HUB_USERNAME=""
+DOCKER_HUB_PASSWORD=""
 
 detect_os
 check_system_resources
 check_existing_docker
+configure_docker_hub_auth
 detect_vpn_config
 
 # 根据操作系统选择安装方法
@@ -665,6 +765,7 @@ verify_installation() {
 }
 
 setup_user_permissions
+perform_docker_hub_login
 verify_installation
 
 echo
@@ -733,6 +834,30 @@ if [[ -n "${current_user}" && "${current_user}" != "root" ]]; then
     fi
 fi
 
+# 显示 Docker Hub 登录状态
+echo
+log_info "🔐 Docker Hub 认证状态："
+if [[ "$DOCKER_HUB_AUTH_ENABLED" == true ]]; then
+    # 检查 root 用户登录状态
+    if docker info 2>/dev/null | grep -q "Username:" || docker system info --format '{{.RegistryConfig.IndexConfigs}}' 2>/dev/null | grep -q "docker.io"; then
+        echo "  ✅ root 用户: 已登录 Docker Hub"
+    else
+        echo "  ⚠️  root 用户: Docker Hub 登录状态未知"
+    fi
+    
+    # 检查 www 用户登录状态（如果存在）
+    if id -u www >/dev/null 2>&1; then
+        if su - www -c "docker info 2>/dev/null | grep -q 'Username:'" 2>/dev/null; then
+            echo "  ✅ www 用户: 已登录 Docker Hub"
+        else
+            echo "  ⚠️  www 用户: Docker Hub 登录状态未知"
+        fi
+    fi
+else
+    echo "  ⚠️  未配置 Docker Hub 认证"
+    echo "     建议执行: docker login"
+fi
+
 echo
 log_info "🚀 下一步操作："
 echo "  1. 验证安装: docker version && docker compose version"
@@ -773,6 +898,21 @@ echo "  • 拉取镜像会自动尝试多个镜像源"
 echo "  • 测试拉取速度: time docker pull alpine:latest"
 echo "  • 查看镜像配置: docker system info | grep -A 10 'Registry Mirrors'"
 echo "  • 手动指定镜像源: docker pull docker.m.daocloud.io/library/nginx"
+
+echo
+log_info "🔐 Docker Hub 认证："
+if [[ "$DOCKER_HUB_AUTH_ENABLED" == true ]]; then
+    echo "  • Docker Hub 认证已配置，享受更高拉取配额"
+    echo "  • 检查登录状态: docker info | grep Username"
+    echo "  • 退出登录: docker logout"
+    echo "  • 重新登录: docker login"
+else
+    echo "  • 未配置 Docker Hub 认证"
+    echo "  • 匿名用户拉取限制: 100次/6小时"
+    echo "  • 认证用户拉取限制: 200次/6小时"
+    echo "  • 建议登录: docker login"
+    echo "  • 创建账户: https://hub.docker.com"
+fi
 
 echo
 log_info "📁 重要文件位置："

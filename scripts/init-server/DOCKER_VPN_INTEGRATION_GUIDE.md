@@ -13,6 +13,7 @@
 
 ### ⚙️ Docker 配置
 - **Docker Hub 镜像加速器**: 配置多个可靠的国内镜像源提高拉取速度
+- **Docker Hub 认证**: 可选配置 Docker Hub 登录以获得更高拉取配额
 - **Docker Daemon 代理配置**: 配置 Docker daemon 使用 VPN 代理拉取镜像
 - **Systemd 服务代理**: 配置 Docker systemd 服务的代理环境变量
 - **优化配置**: 日志轮转、存储驱动、Cgroup 等标准优化
