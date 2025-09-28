@@ -478,22 +478,93 @@ fi
 
 # 用户组管理
 setup_user_permissions() {
-    local default_user="${SUDO_USER:-${LOGNAME:-}}"
-    local user_added=false
+    log_info "配置 Docker 用户权限..."
     
-    if [[ -n "${default_user}" && "${default_user}" != "root" ]]; then
-        if id -u "${default_user}" >/dev/null 2>&1; then
-            log_info "将用户 '$default_user' 添加到 docker 组..."
-            usermod -aG docker "${default_user}"
-            user_added=true
-            log_success "用户 '$default_user' 已添加到 docker 组"
-        else
-            log_warn "用户 '$default_user' 不存在，跳过 docker 组权限设置"
-        fi
+    # 设置 root 用户权限（确保 root 可以使用 Docker）
+    log_info "确保 root 用户可以使用 Docker..."
+    if groups root | grep -q docker; then
+        log_success "✅ root 用户已在 docker 组中"
     else
-        log_warn "未检测到普通用户，跳过 docker 组权限设置"
+        usermod -aG docker root
+        log_success "✅ root 用户已添加到 docker 组"
     fi
     
+    # 检查 www 用户是否存在并配置权限
+    if id -u www >/dev/null 2>&1; then
+        log_info "检测到 www 用户，配置 Docker 权限..."
+        
+        # 将 www 用户添加到 docker 组
+        if groups www | grep -q docker; then
+            log_success "✅ www 用户已在 docker 组中"
+        else
+            usermod -aG docker www
+            log_success "✅ www 用户已添加到 docker 组"
+        fi
+        
+        # 获取 www 用户的实际家目录
+        local www_home=$(getent passwd www | cut -d: -f6)
+        if [[ -n "$www_home" && -d "$www_home" ]]; then
+            # 确保家目录权限正确
+            chown www:www "$www_home"
+            chmod 755 "$www_home"
+            log_success "✅ www 用户家目录权限设置完成: $www_home"
+        else
+            log_warn "⚠️  www 用户家目录不存在或无法确定"
+        fi
+    else
+        log_info "www 用户不存在，跳过配置"
+    fi
+    
+    # 处理当前登录用户（如果不是 root）
+    local default_user="${SUDO_USER:-${LOGNAME:-}}"
+    if [[ -n "${default_user}" && "${default_user}" != "root" && "${default_user}" != "www" ]]; then
+        if id -u "${default_user}" >/dev/null 2>&1; then
+            log_info "将用户 '$default_user' 添加到 docker 组..."
+            if groups "${default_user}" | grep -q docker; then
+                log_success "✅ 用户 '$default_user' 已在 docker 组中"
+            else
+                usermod -aG docker "${default_user}"
+                log_success "✅ 用户 '$default_user' 已添加到 docker 组"
+            fi
+        else
+            log_warn "用户 '$default_user' 不存在，跳过权限设置"
+        fi
+    fi
+    
+    # 创建 Docker 相关目录并设置权限
+    log_info "设置 Docker 相关目录权限..."
+    
+    # 确保 /var/lib/docker 目录权限正确
+    if [[ -d /var/lib/docker ]]; then
+        chmod 700 /var/lib/docker
+        log_success "✅ Docker 数据目录权限设置完成"
+    fi
+    
+    # 创建用户级 Docker 配置目录
+    # 为 root 用户创建配置目录
+    local root_docker_dir="/root/.docker"
+    if [[ ! -d "$root_docker_dir" ]]; then
+        mkdir -p "$root_docker_dir"
+        chown root:root "$root_docker_dir"
+        chmod 700 "$root_docker_dir"
+        log_success "✅ root 用户 Docker 配置目录创建完成"
+    fi
+    
+    # 为 www 用户创建配置目录（如果用户存在）
+    if id -u www >/dev/null 2>&1; then
+        local www_home=$(getent passwd www | cut -d: -f6)
+        if [[ -n "$www_home" && -d "$www_home" ]]; then
+            local www_docker_dir="$www_home/.docker"
+            if [[ ! -d "$www_docker_dir" ]]; then
+                mkdir -p "$www_docker_dir"
+                chown www:www "$www_docker_dir"
+                chmod 700 "$www_docker_dir"
+                log_success "✅ www 用户 Docker 配置目录创建完成: $www_docker_dir"
+            fi
+        fi
+    fi
+    
+    log_success "✅ Docker 用户权限配置完成"
     return 0
 }
 
@@ -563,6 +634,34 @@ verify_installation() {
     if cgroup_driver=$(docker info --format "{{.CgroupDriver}}" 2>/dev/null); then
         log_success "Cgroup 驱动: $cgroup_driver"
     fi
+    
+    # 验证用户权限
+    log_info "验证用户权限配置..."
+    
+    # 测试 root 用户权限
+    if groups root | grep -q docker; then
+        log_success "✅ root 用户 Docker 权限正常"
+    else
+        log_warn "⚠️  root 用户 Docker 权限异常"
+    fi
+    
+    # 测试 www 用户权限
+    if id -u www >/dev/null 2>&1; then
+        if groups www | grep -q docker; then
+            log_success "✅ www 用户 Docker 权限正常"
+            
+            # 测试 www 用户是否能执行 Docker 命令
+            if su - www -c "docker version >/dev/null 2>&1"; then
+                log_success "✅ www 用户 Docker 命令执行正常"
+            else
+                log_warn "⚠️  www 用户 Docker 命令执行失败（可能需要重新登录）"
+            fi
+        else
+            log_warn "⚠️  www 用户 Docker 权限异常"
+        fi
+    else
+        log_warn "⚠️  www 用户不存在"
+    fi
 }
 
 setup_user_permissions
@@ -609,6 +708,32 @@ echo "  📦 包管理器: $PKG_MANAGER"
 echo "  🏃 服务状态: $(systemctl is-active docker)"
 
 echo
+log_info "👥 用户权限配置："
+echo "  ✅ root 用户: 已配置 Docker 访问权限"
+if id -u www >/dev/null 2>&1; then
+    local www_home=$(getent passwd www | cut -d: -f6)
+    if groups www 2>/dev/null | grep -q docker; then
+        echo "  ✅ www 用户: 已配置 Docker 访问权限"
+        echo "     家目录: ${www_home:-未知}"
+    else
+        echo "  ⚠️  www 用户: Docker 权限配置失败"
+        echo "     家目录: ${www_home:-未知}"
+    fi
+else
+    echo "  ⚠️  www 用户: 不存在"
+fi
+
+# 显示当前登录用户信息
+current_user="${SUDO_USER:-${LOGNAME:-$(whoami)}}"
+if [[ -n "${current_user}" && "${current_user}" != "root" ]]; then
+    if groups "${current_user}" 2>/dev/null | grep -q docker; then
+        echo "  ✅ $current_user 用户: 已配置 Docker 访问权限"
+    else
+        echo "  ⚠️  $current_user 用户: Docker 权限配置失败"
+    fi
+fi
+
+echo
 log_info "🚀 下一步操作："
 echo "  1. 验证安装: docker version && docker compose version"
 
@@ -618,10 +743,11 @@ if [[ -n "${default_user}" && "${default_user}" != "root" ]]; then
     echo "     或者运行: su - $default_user"
 fi
 
-echo "  3. 测试镜像拉取: docker pull nginx"
-echo "  4. 运行测试: docker run hello-world"
-echo "  5. 查看系统信息: docker system info"
-echo "  6. 管理 Docker: systemctl start|stop|restart docker"
+echo "  3. 切换到 www 用户测试: su - www"
+echo "  4. 测试镜像拉取: docker pull nginx"
+echo "  5. 运行测试: docker run hello-world"
+echo "  6. 查看系统信息: docker system info"
+echo "  7. 管理 Docker: systemctl start|stop|restart docker"
 
 if [[ "$VPN_AVAILABLE" == true ]]; then
     echo
