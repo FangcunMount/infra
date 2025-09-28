@@ -573,6 +573,9 @@ setup_optimal_proxy_mode() {
                 configure_manual_proxy_group "$target_group"
             fi
             
+            # 🔥 关键修复：配置"漏网之鱼"代理组
+            configure_fallback_proxy_group "$target_group"
+            
             return 0
         else
             log_warn "⚠️  代理设置可能未生效，当前: $current_proxy"
@@ -626,6 +629,98 @@ configure_manual_proxy_group() {
         fi
     else
         log_warn "⚠️  $group_name 中只有直连选项"
+    fi
+}
+
+# 🔥 关键修复：配置"漏网之鱼"代理组
+configure_fallback_proxy_group() {
+    local target_group=$1
+    
+    log_info "🔧 配置漏网之鱼代理组（关键修复）"
+    
+    # 等待API完全就绪
+    sleep 2
+    
+    # 检查是否存在"漏网之鱼"代理组
+    local fallback_groups=("漏网之鱼" "兜底分流" "Final" "Others" "FINAL" "默认" "其他")
+    local found_group=""
+    
+    for group_name in "${fallback_groups[@]}"; do
+        if curl -s "http://127.0.0.1:9090/proxies/${group_name}" 2>/dev/null | grep -q '"name"'; then
+            found_group="$group_name"
+            log_info "发现兜底代理组: $found_group"
+            break
+        fi
+    done
+    
+    if [ -z "$found_group" ]; then
+        log_warn "⚠️  未发现兜底代理组，VPN自动切换可能需要手动配置"
+        return 0
+    fi
+    
+    # 获取兜底组的当前选择和可用选项
+    local fallback_info current_selection available_options
+    fallback_info=$(curl -s "http://127.0.0.1:9090/proxies/${found_group}" 2>/dev/null)
+    current_selection=$(echo "$fallback_info" | grep -o '"now":"[^"]*"' | cut -d'"' -f4)
+    available_options=$(echo "$fallback_info" | grep -o '"all":\[[^]]*\]' | grep -o '"[^"]*"' | grep -v '"all"' | tr -d '"')
+    
+    log_info "$found_group 当前选择: $current_selection"
+    log_info "$found_group 可用选项: $(echo "$available_options" | tr '\n' ' ')"
+    
+    # 如果当前已经是非直连选项，则无需修改
+    if [[ ! "$current_selection" =~ ^(DIRECT|直连)$ ]]; then
+        log_success "✅ $found_group 已配置为 VPN 模式: $current_selection"
+        return 0
+    fi
+    
+    # 选择最佳的非直连选项
+    local best_option=""
+    
+    # 优先选择传入的目标代理组
+    if echo "$available_options" | grep -q "^$target_group$"; then
+        best_option="$target_group"
+    else
+        # 按优先级选择
+        local preferred_options=("自动选择" "Auto" "自动" "手动切换" "Manual" "手动")
+        for pref_option in "${preferred_options[@]}"; do
+            if echo "$available_options" | grep -q "^$pref_option$"; then
+                best_option="$pref_option"
+                break
+            fi
+        done
+        
+        # 如果没找到首选项，选择第一个非直连选项
+        if [ -z "$best_option" ]; then
+            for option in $available_options; do
+                if [[ ! "$option" =~ ^(DIRECT|REJECT|直连|拒绝)$ ]]; then
+                    best_option="$option"
+                    break
+                fi
+            done
+        fi
+    fi
+    
+    if [ -n "$best_option" ]; then
+        log_info "🚀 将 $found_group 切换到: $best_option"
+        if curl -X PUT -H "Content-Type: application/json" -d "{\"name\":\"$best_option\"}" "http://127.0.0.1:9090/proxies/${found_group}" >/dev/null 2>&1; then
+            
+            # 验证切换结果
+            sleep 2
+            local new_selection
+            new_selection=$(curl -s "http://127.0.0.1:9090/proxies/${found_group}" 2>/dev/null | grep -o '"now":"[^"]*"' | cut -d'"' -f4)
+            
+            if [[ "$new_selection" == "$best_option" ]]; then
+                log_success "🎉 $found_group 成功切换到 VPN 模式: $new_selection"
+                log_success "✅ Docker 容器现在将自动使用 VPN 网络！"
+            else
+                log_warn "⚠️  $found_group 切换可能未生效，当前: $new_selection"
+            fi
+        else
+            log_error "❌ 无法切换 $found_group 到: $best_option"
+        fi
+    else
+        log_warn "⚠️  $found_group 中没有可用的 VPN 选项"
+        log_info "可用选项: $(echo "$available_options" | tr '\n' ' ')"
     fi
 }
 

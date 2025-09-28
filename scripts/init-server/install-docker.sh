@@ -1,17 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Docker 安装脚本
-# 在 Debian/Ubuntu 系统上安装 Docker Engine 和 Compose 插件
+# =================================================================
+# Docker 统一安装配置脚本
+# =================================================================
+# 功能：
+# 1. Docker Engine 安装
+# 2. Docker Compose 插件安装
+# 3. 用户权限配置和测试
+# 4. VPN 网络集成配置
+# 5. 完整性验证和测试
+# =================================================================
 # 需要以 root 用户或 sudo 权限运行
+# =================================================================
 
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
+# 日志函数
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
 }
@@ -28,6 +40,18 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1" >&2
 }
 
+log_step() {
+    echo -e "${PURPLE}[STEP]${NC} $1"
+}
+
+log_test() {
+    echo -e "${CYAN}[TEST]${NC} $1"
+}
+
+# =================================================================
+# 错误处理和权限检查
+# =================================================================
+
 # 错误处理函数
 handle_error() {
     local line_number=$1
@@ -40,106 +64,343 @@ handle_error() {
 trap 'handle_error $LINENO' ERR
 
 # 检查 root 权限
-if [[ "${EUID}" -ne 0 ]]; then
-    log_error "此脚本必须以 root 用户身份运行"
-    echo "使用方法: sudo $0"
-    exit 1
-fi
+check_root_privileges() {
+    if [[ "${EUID}" -ne 0 ]]; then
+        log_error "此脚本必须以 root 用户身份运行"
+        echo "使用方法: sudo $0"
+        exit 1
+    fi
+}
+
+# =================================================================
+# 系统检测和环境准备
+# =================================================================
 
 # 检测操作系统
 detect_os() {
-    if [[ ! -f /etc/os-release ]]; then
-        log_error "无法检测操作系统信息（缺少 /etc/os-release 文件）"
+    log_info "检测操作系统..."
+    
+    if [[ -f /etc/os-release ]]; then
+        source /etc/os-release
+        OS_ID="$ID"
+        OS_VERSION="$VERSION_ID"
+        OS_CODENAME="${VERSION_CODENAME:-}"
+        
+        case "$OS_ID" in
+            ubuntu|debian)
+                log_success "检测到支持的操作系统: $PRETTY_NAME"
+                ;;
+            *)
+                log_error "不支持的操作系统: $PRETTY_NAME"
+                log_info "此脚本仅支持 Ubuntu 和 Debian 系统"
+                exit 1
+                ;;
+        esac
+    else
+        log_error "无法识别操作系统"
         exit 1
     fi
+}
+
+# 系统要求检查
+check_system_requirements() {
+    log_step "检查系统要求..."
     
-    source /etc/os-release
-    
-    log_info "检测到操作系统: ${PRETTY_NAME:-${ID}} ${VERSION_ID:-}"
-    
-    case "${ID}" in
-        ubuntu|debian)
-            OS_TYPE="debian"
-            PKG_MANAGER="apt-get"
-            log_success "支持的 Debian 系列操作系统，继续安装"
+    # 检查架构
+    local arch=$(uname -m)
+    case "$arch" in
+        x86_64|amd64)
+            ARCH="amd64"
+            log_success "架构: $arch (支持)"
             ;;
-        centos|rhel|rocky|almalinux)
-            OS_TYPE="rhel"
-            PKG_MANAGER="yum"
-            if command -v dnf >/dev/null 2>&1; then
-                PKG_MANAGER="dnf"
-            fi
-            log_success "支持的 RHEL 系列操作系统，继续安装"
-            ;;
-        fedora)
-            OS_TYPE="rhel"
-            PKG_MANAGER="dnf"
-            log_success "支持的 Fedora 系统，继续安装"
+        aarch64|arm64)
+            ARCH="arm64"
+            log_success "架构: $arch (支持)"
             ;;
         *)
-            log_error "不支持的发行版: ${PRETTY_NAME:-${ID}}"
-            log_error "此脚本支持 Ubuntu/Debian/CentOS/RHEL/Rocky/AlmaLinux/Fedora 系统"
+            log_error "不支持的架构: $arch"
             exit 1
             ;;
     esac
+    
+    # 检查内核版本
+    local kernel_version=$(uname -r | cut -d. -f1,2)
+    local kernel_major=$(echo $kernel_version | cut -d. -f1)
+    local kernel_minor=$(echo $kernel_version | cut -d. -f2)
+    
+    if [[ $kernel_major -lt 3 ]] || [[ $kernel_major -eq 3 && $kernel_minor -lt 10 ]]; then
+        log_error "内核版本过低: $kernel_version (要求 >= 3.10)"
+        exit 1
+    else
+        log_success "内核版本: $kernel_version (符合要求)"
+    fi
+    
+    # 检查内存
+    local total_mem=$(free -m | awk '/^Mem:/ {print $2}')
+    if [[ $total_mem -lt 512 ]]; then
+        log_warn "内存较少 (${total_mem}MB)，Docker 运行可能受影响，建议至少 512MB"
+    elif [[ $total_mem -lt 1024 ]]; then
+        log_warn "内存较少 (${total_mem}MB)，Docker 运行可能受影响，建议至少 1GB"
+    else
+        log_success "内存: ${total_mem}MB (充足)"
+    fi
+    
+    # 检查磁盘空间
+    local disk_space=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+    if [[ $disk_space -lt 10 ]]; then
+        log_warn "磁盘空间较少 (${disk_space}GB)，建议至少 10GB"
+    else
+        log_success "磁盘空间: ${disk_space}GB (充足)"
+    fi
 }
 
-# 检查系统资源
-check_system_resources() {
-    log_info "检查系统资源..."
-    
-    # 检查磁盘空间 (至少需要 2GB)
-    local available_space
-    available_space=$(df / | awk 'NR==2 {print $4}')
-    local required_space=2097152  # 2GB in KB
-    
-    if [[ $available_space -lt $required_space ]]; then
-        log_error "磁盘空间不足！当前可用: $(($available_space / 1024))MB，需要至少: 2GB"
-        exit 1
-    fi
-    
-    # 检查内存 (建议至少 1GB)
-    local total_mem
-    total_mem=$(free -k | awk '/^Mem:/ {print $2}')
-    local recommended_mem=1048576  # 1GB in KB
-    
-    if [[ $total_mem -lt $recommended_mem ]]; then
-        log_warn "内存较少 ($(($total_mem / 1024))MB)，Docker 运行可能受影响，建议至少 1GB"
-        read -p "是否继续安装？(y/N): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            log_info "用户取消安装"
-            exit 0
-        fi
-    fi
-    
-    log_success "系统资源检查通过"
-}
+# =================================================================
+# Docker 安装检查和准备
+# =================================================================
 
 # 检查是否已安装 Docker
 check_existing_docker() {
+    log_step "检查现有 Docker 安装..."
+    
     if command -v docker >/dev/null 2>&1; then
         local docker_version=$(docker --version 2>/dev/null || echo "未知版本")
         log_warn "检测到已安装的 Docker: $docker_version"
+        
         echo
-        read -p "是否继续重新安装？这将更新到最新版本 (y/N): " -n 1 -r
+        read -p "是否要继续安装/更新 Docker? (y/N): " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            log_info "用户取消安装"
-            exit 0
+            log_info "跳过 Docker 安装"
+            return 1
         fi
+        return 0
+    else
+        log_info "未检测到 Docker，准备安装"
+        return 0
     fi
 }
 
+# 卸载旧版本
+remove_old_docker() {
+    log_step "清理旧版本 Docker..."
+    
+    local old_packages=(
+        "docker.io" "docker-doc" "docker-compose" "docker-compose-v2"
+        "podman-docker" "containerd" "runc" "docker-ce-cli"
+        "docker-ce" "docker-buildx-plugin" "docker-compose-plugin"
+    )
+    
+    for package in "${old_packages[@]}"; do
+        if dpkg -l | grep -q "^ii.*$package "; then
+            log_info "移除旧包: $package"
+            apt-get remove -y "$package" 2>/dev/null || true
+        fi
+    done
+    
+    # 清理残留配置
+    apt-get autoremove -y 2>/dev/null || true
+    apt-get autoclean 2>/dev/null || true
+    
+    log_success "旧版本清理完成"
+}
+
+# =================================================================
+# Docker 安装过程
+# =================================================================
+
+# 安装依赖包
+install_dependencies() {
+    log_step "安装依赖包..."
+    
+    # 更新包列表
+    log_info "更新包列表..."
+    apt-get update -y
+    
+    # 安装依赖
+    local dependencies=(
+        "apt-transport-https" "ca-certificates" "curl"
+        "gnupg" "lsb-release" "software-properties-common"
+    )
+    
+    log_info "安装依赖包..."
+    apt-get install -y "${dependencies[@]}"
+    
+    log_success "依赖包安装完成"
+}
+
+# 添加 Docker GPG 密钥和仓库
+add_docker_repository() {
+    log_step "配置 Docker 官方仓库..."
+    
+    # 创建 keyrings 目录
+    mkdir -p /etc/apt/keyrings
+    
+    # 删除旧密钥文件（如果存在）
+    rm -f /etc/apt/keyrings/docker.gpg /usr/share/keyrings/docker-archive-keyring.gpg
+    
+    # 添加 Docker GPG 密钥
+    log_info "添加 Docker GPG 密钥..."
+    curl -fsSL https://download.docker.com/linux/$OS_ID/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    chmod a+r /etc/apt/keyrings/docker.gpg
+    
+    # 添加 Docker 仓库
+    log_info "添加 Docker 仓库..."
+    echo "deb [arch=$ARCH signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$OS_ID $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+    
+    # 更新包列表
+    apt-get update -y
+    
+    log_success "Docker 仓库配置完成"
+}
+
+# 安装 Docker Engine
+install_docker_engine() {
+    log_step "安装 Docker Engine..."
+    
+    # 安装 Docker 包
+    log_info "安装 Docker CE, CLI 和插件..."
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    
+    # 验证安装
+    if command -v docker >/dev/null 2>&1; then
+        local version=$(docker --version)
+        log_success "Docker 安装成功: $version"
+    else
+        log_error "Docker 安装失败"
+        exit 1
+    fi
+    
+    # 启动并启用 Docker 服务
+    log_info "配置 Docker 服务..."
+    systemctl start docker
+    systemctl enable docker
+    
+    if systemctl is-active --quiet docker; then
+        log_success "Docker 服务已启动并设为开机自启"
+    else
+        log_error "Docker 服务启动失败"
+        exit 1
+    fi
+}
+
+# =================================================================
+# 用户权限配置
+# =================================================================
+
+# 配置 Docker 用户权限
+configure_docker_users() {
+    log_step "配置 Docker 用户权限..."
+    
+    # 确保 docker 组存在
+    if ! getent group docker >/dev/null 2>&1; then
+        log_info "创建 docker 用户组..."
+        groupadd docker
+    else
+        log_info "docker 用户组已存在"
+    fi
+    
+    # 目标用户列表
+    local users_to_add=()
+    
+    # 添加 www 用户（如果存在）
+    if id -u www >/dev/null 2>&1; then
+        users_to_add+=("www")
+    fi
+    
+    # 添加当前登录用户（非 root）
+    if [[ -n "${SUDO_USER:-}" && "$SUDO_USER" != "root" ]]; then
+        users_to_add+=("$SUDO_USER")
+    fi
+    
+    # 添加用户到 docker 组
+    for user in "${users_to_add[@]}"; do
+        if ! groups "$user" 2>/dev/null | grep -q docker; then
+            log_info "将用户 $user 添加到 docker 组..."
+            usermod -aG docker "$user"
+            log_success "用户 $user 已添加到 docker 组"
+        else
+            log_info "用户 $user 已在 docker 组中"
+        fi
+    done
+    
+    if [[ ${#users_to_add[@]} -gt 0 ]]; then
+        log_warn "注意: 用户需要重新登录后才能使用 Docker 命令（无需 sudo）"
+    fi
+}
+
+# =================================================================
+# VPN 网络配置
+# =================================================================
+
+# 配置 VPN 代理模式
+configure_vpn_proxy_mode() {
+    log_step "配置 VPN 代理模式..."
+    
+    # 检查 VPN 服务是否运行
+    local vpn_running=false
+    if systemctl is-active --quiet mihomo 2>/dev/null; then
+        log_info "检测到 Mihomo VPN 服务正在运行"
+        vpn_running=true
+    elif pgrep -f "mihomo" >/dev/null 2>&1; then
+        log_info "检测到 Mihomo 进程正在运行"
+        vpn_running=true
+    else
+        log_warn "未检测到 VPN 服务，跳过 VPN 配置"
+        return 0
+    fi
+    
+    if [[ "$vpn_running" == true ]]; then
+        # 检查 VPN 代理端口
+        local http_proxy_port=7890
+        local socks_proxy_port=7891
+        local api_port=9090
+        
+        if netstat -tlnp 2>/dev/null | grep -q ":$http_proxy_port "; then
+            log_success "HTTP 代理端口 $http_proxy_port 可用"
+        else
+            log_warn "HTTP 代理端口 $http_proxy_port 不可用"
+        fi
+        
+        # 配置"漏网之鱼"代理组（如果 API 可用）
+        if curl -s "http://127.0.0.1:$api_port/proxies" >/dev/null 2>&1; then
+            log_info "配置漏网之鱼代理组..."
+            
+            # 获取可用的代理节点
+            local available_proxies=$(curl -s "http://127.0.0.1:$api_port/proxies" | jq -r '.proxies | keys[]' 2>/dev/null | grep -v "漏网之鱼\|DIRECT\|REJECT" | head -1 || echo "")
+            
+            if [[ -n "$available_proxies" ]]; then
+                # 切换漏网之鱼到第一个可用代理
+                if curl -s -X PUT "http://127.0.0.1:$api_port/proxies/%E6%BC%8F%E7%BD%91%E4%B9%8B%E9%B1%BC" \
+                     -H "Content-Type: application/json" \
+                     -d "{\"name\":\"$available_proxies\"}" >/dev/null 2>&1; then
+                    log_success "漏网之鱼已配置为使用代理: $available_proxies"
+                else
+                    log_warn "无法配置漏网之鱼代理组"
+                fi
+            else
+                log_warn "未找到可用的代理节点"
+            fi
+        else
+            log_warn "Mihomo API 不可用，跳过代理组配置"
+        fi
+        
+        log_success "VPN 代理模式配置完成"
+    fi
+}
+
+# =================================================================
+# Docker Hub 认证配置
+# =================================================================
+
 # 配置 Docker Hub 认证
 configure_docker_hub_auth() {
-    log_info "配置 Docker Hub 认证..."
-    echo
+    log_step "配置 Docker Hub 认证（可选）..."
+    
     log_info "📋 Docker Hub 认证说明："
     echo "  • Docker Hub 对匿名用户有拉取速率限制 (100次/6小时)"
-    echo "  • 认证用户可获得更高配额 (200次/6小时)"
+    echo "  • 注册用户有更高的限制 (200次/6小时)"
     echo "  • 如果您有 Docker Hub 账户，建议进行登录认证"
-    echo "  • 可以跳过此步骤，稍后手动登录"
+    echo "  • 这是可选步骤，可以稍后手动配置"
     echo
     
     read -p "是否现在配置 Docker Hub 登录认证？(y/N): " -n 1 -r
@@ -147,830 +408,307 @@ configure_docker_hub_auth() {
     
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "请输入 Docker Hub 认证信息："
+        echo "  提示: 输入密码时不会显示字符，这是正常的安全行为"
         echo
         
-        # 获取用户名
         read -p "Docker Hub 用户名: " docker_username
-        if [[ -z "$docker_username" ]]; then
-            log_warn "用户名为空，跳过 Docker Hub 认证配置"
-            return 0
+        if [[ -n "$docker_username" ]]; then
+            read -s -p "Docker Hub 密码: " docker_password
+            echo
+            
+            if [[ -n "$docker_password" ]]; then
+                log_info "尝试登录 Docker Hub..."
+                if echo "$docker_password" | docker login -u "$docker_username" --password-stdin >/dev/null 2>&1; then
+                    log_success "Docker Hub 登录成功！"
+                else
+                    log_error "Docker Hub 登录失败，请检查用户名和密码"
+                fi
+            else
+                log_warn "密码为空，跳过登录"
+            fi
+        else
+            log_warn "用户名为空，跳过登录"
         fi
-        
-        # 获取密码（隐藏输入）
-        echo -n "Docker Hub 密码/Token: "
-        read -s docker_password
-        echo
-        
-        if [[ -z "$docker_password" ]]; then
-            log_warn "密码为空，跳过 Docker Hub 认证配置"
-            return 0
-        fi
-        
-        # 保存认证信息供后续使用
-        DOCKER_HUB_USERNAME="$docker_username"
-        DOCKER_HUB_PASSWORD="$docker_password"
-        DOCKER_HUB_AUTH_ENABLED=true
-        
-        log_success "✅ Docker Hub 认证信息已保存，将在 Docker 安装完成后进行登录"
     else
         log_info "跳过 Docker Hub 认证配置"
-        DOCKER_HUB_AUTH_ENABLED=false
-    fi
-    
-    echo
-}
-
-# 执行 Docker Hub 登录
-perform_docker_hub_login() {
-    if [[ "$DOCKER_HUB_AUTH_ENABLED" != true ]]; then
-        return 0
-    fi
-    
-    log_info "执行 Docker Hub 登录..."
-    
-    # 等待 Docker 服务完全启动
-    local retry_count=0
-    while [[ $retry_count -lt 10 ]]; do
-        if docker info >/dev/null 2>&1; then
-            break
-        fi
-        sleep 2
-        retry_count=$((retry_count + 1))
-    done
-    
-    if [[ $retry_count -eq 10 ]]; then
-        log_warn "⚠️  Docker 服务未完全启动，跳过自动登录"
-        return 0
-    fi
-    
-    # 执行 root 用户登录
-    if echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin >/dev/null 2>&1; then
-        log_success "✅ Docker Hub 登录成功 (root 用户)"
-        
-        # 为 www 用户也配置登录（如果存在）
-        if id -u www >/dev/null 2>&1; then
-            log_info "为 www 用户配置 Docker Hub 登录..."
-            if echo "$DOCKER_HUB_PASSWORD" | su - www -c "docker login -u '$DOCKER_HUB_USERNAME' --password-stdin >/dev/null 2>&1" 2>/dev/null; then
-                log_success "✅ www 用户 Docker Hub 登录成功"
-            else
-                log_warn "⚠️  www 用户 Docker Hub 登录失败，可稍后手动登录"
-                log_info "www 用户可以执行: docker login -u $DOCKER_HUB_USERNAME"
-            fi
-        fi
-    else
-        log_warn "⚠️  Docker Hub 登录失败，请检查用户名和密码"
-        log_info "您可以稍后手动执行: docker login"
-    fi
-    
-    # 清除敏感信息
-    unset DOCKER_HUB_USERNAME
-    unset DOCKER_HUB_PASSWORD
-}
-
-# 检测 VPN 网络配置
-detect_vpn_config() {
-    log_info "检测 VPN 网络配置..."
-    
-    # 检查 nc 命令是否可用
-    if ! command -v nc >/dev/null 2>&1; then
-        log_warn "nc 命令不可用，VPN 端口检测可能不准确"
-        return 0
-    fi
-    
-    # 检测 Mihomo 服务状态
-    if systemctl is-active --quiet mihomo 2>/dev/null; then
-        log_success "检测到 Mihomo VPN 服务运行中"
-        
-        # 检查代理端口
-        local http_proxy="127.0.0.1:7890"
-        local socks_proxy="127.0.0.1:7891"
-        
-        if nc -z 127.0.0.1 7890 >/dev/null 2>&1; then
-            log_success "HTTP 代理端口 7890 可用"
-            VPN_HTTP_PROXY="http://$http_proxy"
-        else
-            log_warn "HTTP 代理端口 7890 不可用"
-        fi
-        
-        if nc -z 127.0.0.1 7891 >/dev/null 2>&1; then
-            log_success "SOCKS5 代理端口 7891 可用"
-            VPN_SOCKS_PROXY="socks5://$socks_proxy"
-        else
-            log_warn "SOCKS5 代理端口 7891 不可用"
-        fi
-        
-        if [[ -n "$VPN_HTTP_PROXY" || -n "$VPN_SOCKS_PROXY" ]]; then
-            VPN_AVAILABLE=true
-            log_success "✅ VPN 代理环境检测成功"
-        else
-            log_warn "VPN 服务运行但代理端口不可用"
-            VPN_AVAILABLE=false
-        fi
-    else
-        log_warn "未检测到 Mihomo VPN 服务"
-        VPN_AVAILABLE=false
-    fi
-    
-    # 测试网络连接
-    if [[ "$VPN_AVAILABLE" == true ]]; then
-        log_info "测试 VPN 网络连接..."
-        if curl -s --connect-timeout 10 --max-time 30 --proxy "$VPN_HTTP_PROXY" https://www.google.com >/dev/null 2>&1; then
-            log_success "✅ VPN 网络连接测试成功"
-        else
-            log_warn "VPN 网络连接测试失败，将使用直连模式"
-            VPN_AVAILABLE=false
-        fi
     fi
 }
 
-# 安装 Docker - Debian/Ubuntu 系列
-install_docker_debian() {
-    log_info "移除旧版本 Docker 包（如果存在）..."
-    apt-get remove -y docker docker-engine docker.io containerd runc >/dev/null 2>&1 || true
+# =================================================================
+# 测试和验证功能
+# =================================================================
 
-    log_info "更新包列表..."
-    apt-get update -y
-
-    log_info "安装必要的依赖包..."
-    apt-get install -y ca-certificates curl gnupg lsb-release netcat-openbsd
-
-    # 创建密钥目录
-    install -m 0755 -d /etc/apt/keyrings
-
-    # 下载并安装 Docker GPG 密钥（带重试机制）
-    if [[ ! -f /etc/apt/keyrings/docker.gpg ]]; then
-        log_info "下载 Docker GPG 密钥..."
-        local retry_count=0
-        local max_retries=3
-        
-        while [[ $retry_count -lt $max_retries ]]; do
-            if curl -fsSL "https://download.docker.com/linux/${ID}/gpg" | gpg --dearmor -o /etc/apt/keyrings/docker.gpg; then
-                log_success "Docker GPG 密钥下载成功"
-                break
-            else
-                retry_count=$((retry_count + 1))
-                if [[ $retry_count -lt $max_retries ]]; then
-                    log_warn "密钥下载失败，重试 ($retry_count/$max_retries)..."
-                    sleep 3
-                else
-                    log_error "Docker GPG 密钥下载失败，已重试 $max_retries 次"
-                    exit 1
-                fi
-            fi
-        done
-    else
-        log_info "Docker GPG 密钥已存在，跳过下载"
-    fi
-
-    chmod a+r /etc/apt/keyrings/docker.gpg
-
-    log_info "配置 Docker APT 仓库..."
-    cat <<REPO >/etc/apt/sources.list.d/docker.list
-deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
-https://download.docker.com/linux/${ID} \
-${VERSION_CODENAME} stable
-REPO
-
-    log_success "Docker 仓库配置完成"
-
-    log_info "更新包列表..."
-    apt-get update -y
-
-    log_info "安装 Docker 软件包..."
-    log_info "正在安装: docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
-    if ! apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin; then
-        log_error "Docker 软件包安装失败"
-        exit 1
-    fi
-
-    log_success "Docker 软件包安装完成"
-}
-
-# 安装 Docker - CentOS/RHEL 系列  
-install_docker_rhel() {
-    log_info "移除旧版本 Docker 包（如果存在）..."
-    $PKG_MANAGER remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine >/dev/null 2>&1 || true
-
-    log_info "安装必要的依赖包..."
-    $PKG_MANAGER install -y yum-utils device-mapper-persistent-data lvm2 nmap-ncat
-
-    log_info "配置 Docker 仓库..."
-    if [[ "$PKG_MANAGER" == "dnf" ]]; then
-        dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    else
-        yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    fi
-
-    log_success "Docker 仓库配置完成"
-
-    log_info "安装 Docker 软件包..."
-    log_info "正在安装: docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
-    if ! $PKG_MANAGER install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin; then
-        log_error "Docker 软件包安装失败"
-        exit 1
-    fi
-
-    log_success "Docker 软件包安装完成"
-}
-
-# 初始化配置变量
-VPN_AVAILABLE=false
-VPN_HTTP_PROXY=""
-VPN_SOCKS_PROXY=""
-DOCKER_HUB_AUTH_ENABLED=false
-DOCKER_HUB_USERNAME=""
-DOCKER_HUB_PASSWORD=""
-
-detect_os
-check_system_resources
-check_existing_docker
-configure_docker_hub_auth
-detect_vpn_config
-
-# 根据操作系统选择安装方法
-case "$OS_TYPE" in
-    debian)
-        install_docker_debian
-        ;;
-    rhel)
-        install_docker_rhel
-        ;;
-    *)
-        log_error "未知的操作系统类型: $OS_TYPE"
-        exit 1
-        ;;
-esac
-
-# 配置 Docker daemon
-configure_docker_daemon() {
-    log_info "配置 Docker daemon..."
+# 测试用户 Docker 权限
+test_user_docker_permissions() {
+    log_step "测试用户 Docker 权限..."
     
-    local docker_config="/etc/docker/daemon.json"
-    
-    # 创建 Docker 配置目录
-    mkdir -p /etc/docker
-    
-    # 基础配置
-    local base_config='{
-    "log-driver": "json-file",
-    "log-opts": {
-        "max-size": "10m",
-        "max-file": "3"
-    },
-    "storage-driver": "overlay2",
-    "exec-opts": ["native.cgroupdriver=systemd"],
-    "live-restore": true,
-    "userland-proxy": false,
-    "experimental": false,
-    "ipv6": false,
-    "icc": true,
-    "default-ulimits": {
-        "nofile": {
-            "Name": "nofile",
-            "Hard": 64000,
-            "Soft": 64000
-        }
-    }'
-    
-    # 配置 Docker Hub 镜像加速器
-    local registry_mirrors_config='
-    ,"registry-mirrors": [
-        "https://docker.m.daocloud.io",
-        "https://dockerproxy.com",
-        "https://docker.mirrors.ustc.edu.cn",
-        "https://docker.nju.edu.cn"
-    ]'
-    
-    # 如果检测到 VPN，添加代理配置
-    if [[ "$VPN_AVAILABLE" == true ]]; then
-        log_info "配置 Docker daemon 使用 VPN 代理和镜像加速..."
-        
-        # VPN 环境下的配置（优先使用代理）
-        local proxy_config="$registry_mirrors_config"
-        
-        if [[ -n "$VPN_HTTP_PROXY" ]]; then
-            proxy_config="${proxy_config}
-    ,\"proxies\": {
-        \"default\": {
-            \"httpProxy\": \"$VPN_HTTP_PROXY\",
-            \"httpsProxy\": \"$VPN_HTTP_PROXY\",
-            \"noProxy\": \"localhost,127.0.0.0/8,::1\"
-        }
-    }"
-        fi
-        
-        base_config="${base_config}${proxy_config}"
-        log_success "✅ Docker daemon VPN 代理和镜像加速配置完成"
-    else
-        log_info "配置 Docker Hub 镜像加速器..."
-        # 无 VPN 环境，仅配置镜像加速器
-        base_config="${base_config}${registry_mirrors_config}"
-        log_success "✅ Docker Hub 镜像加速器配置完成"
-    fi
-    
-    # 写入配置文件
-    echo "${base_config}
-}" > "$docker_config"
-    
-    log_success "Docker daemon 配置完成"
-}
-
-# 配置 Docker systemd 服务的代理环境
-configure_docker_systemd_proxy() {
-    if [[ "$VPN_AVAILABLE" != true ]]; then
-        return 0
-    fi
-    
-    log_info "配置 Docker systemd 服务代理环境..."
-    
-    # 创建 systemd 服务目录
-    local systemd_dir="/etc/systemd/system/docker.service.d"
-    mkdir -p "$systemd_dir"
-    
-    # 创建代理配置文件
-    local proxy_conf="$systemd_dir/proxy.conf"
-    
-    cat > "$proxy_conf" << EOF
-[Service]
-Environment="HTTP_PROXY=$VPN_HTTP_PROXY"
-Environment="HTTPS_PROXY=$VPN_HTTP_PROXY"
-Environment="NO_PROXY=localhost,127.0.0.0/8,::1"
-EOF
-    
-    log_success "✅ Docker systemd 代理配置完成"
-    
-    # 重新加载 systemd 配置
-    systemctl daemon-reload
-    log_info "systemd 配置已重新加载"
-}
-
-# 创建 Docker VPN 使用脚本
-create_docker_vpn_helper() {
-    if [[ "$VPN_AVAILABLE" != true ]]; then
-        return 0
-    fi
-    
-    log_info "创建 Docker VPN 辅助脚本..."
-    
-    # 创建脚本目录
-    local helper_dir="/usr/local/bin"
-    local helper_script="$helper_dir/docker-vpn"
-    
-    cat > "$helper_script" << 'EOF'
-#!/bin/bash
-# Docker VPN 辅助脚本
-# 用于在 VPN 环境中运行 Docker 容器
-
-# VPN 代理配置
-HTTP_PROXY="http://127.0.0.1:7890"
-HTTPS_PROXY="http://127.0.0.1:7890"
-SOCKS_PROXY="socks5://127.0.0.1:7891"
-
-# 设置代理环境变量
-export http_proxy="$HTTP_PROXY"
-export https_proxy="$HTTPS_PROXY"
-export HTTP_PROXY="$HTTP_PROXY"
-export HTTPS_PROXY="$HTTPS_PROXY"
-export NO_PROXY="localhost,127.0.0.0/8,::1"
-
-# 运行 Docker 命令
-exec docker "$@"
-EOF
-    
-    chmod +x "$helper_script"
-    log_success "✅ Docker VPN 辅助脚本创建完成: $helper_script"
-    
-    # 创建 Docker Compose VPN 辅助脚本
-    local compose_helper="$helper_dir/docker-compose-vpn"
-    
-    cat > "$compose_helper" << 'EOF'
-#!/bin/bash
-# Docker Compose VPN 辅助脚本
-
-# VPN 代理配置
-export HTTP_PROXY="http://127.0.0.1:7890"
-export HTTPS_PROXY="http://127.0.0.1:7890"
-export NO_PROXY="localhost,127.0.0.0/8,::1"
-
-# 运行 Docker Compose 命令
-exec docker compose "$@"
-EOF
-    
-    chmod +x "$compose_helper"
-    log_success "✅ Docker Compose VPN 辅助脚本创建完成: $compose_helper"
-}
-
-configure_docker_daemon
-configure_docker_systemd_proxy
-create_docker_vpn_helper
-
-log_info "启用并启动 Docker 服务..."
-systemctl enable docker
-
-# 重新加载 systemd 配置确保生效
-systemctl daemon-reload
-
-# 尝试启动 Docker 服务
-if ! systemctl start docker; then
-    log_error "Docker 服务启动失败，开始诊断..."
-    
-    # 显示服务状态
-    echo "服务状态:"
-    systemctl status docker --no-pager -l || true
-    
-    echo
-    echo "服务日志:"
-    journalctl -xeu docker.service -n 10 --no-pager || true
-    
-    # 检查配置文件
-    echo
-    log_info "检查配置文件..."
-    if [[ -f /etc/docker/daemon.json ]]; then
-        log_info "验证 JSON 配置语法..."
-        if ! python3 -m json.tool /etc/docker/daemon.json >/dev/null 2>&1; then
-            log_error "Docker daemon 配置文件 JSON 语法错误"
-            log_info "尝试修复配置文件..."
-            cp /etc/docker/daemon.json /etc/docker/daemon.json.error
-            echo '{}' > /etc/docker/daemon.json
-            log_info "已重置配置文件，错误配置备份为 daemon.json.error"
-            
-            # 重新尝试启动
-            systemctl daemon-reload
-            if systemctl start docker; then
-                log_success "✅ 配置重置后 Docker 服务启动成功"
-            else
-                log_error "❌ 重置配置后仍然启动失败"
-            fi
-        else
-            log_success "JSON 配置语法正确"
-        fi
-    fi
-    
-    # 最终检查
+    # 检查 Docker 服务状态
     if ! systemctl is-active --quiet docker; then
-        echo
-        log_error "Docker 服务启动失败，需要手动排查"
-        log_info "💡 建议操作："
-        echo "  1. 查看详细日志: journalctl -xeu docker.service"
-        echo "  2. 运行诊断脚本: bash diagnose-docker-failure.sh"
-        echo "  3. 手动启动测试: dockerd --debug"
-        echo "  4. 重置配置: echo '{}' > /etc/docker/daemon.json && systemctl restart docker"
-        exit 1
+        log_error "Docker 服务未运行"
+        return 1
     fi
-fi
-
-# 验证 Docker 服务状态
-if systemctl is-active --quiet docker; then
+    
     log_success "Docker 服务运行正常"
-else
-    log_error "Docker 服务状态异常"
-    systemctl status docker --no-pager -l
-    exit 1
-fi
-
-# 用户组管理
-setup_user_permissions() {
-    log_info "配置 Docker 用户权限..."
     
-    # 设置 root 用户权限（确保 root 可以使用 Docker）
-    log_info "确保 root 用户可以使用 Docker..."
-    if groups root | grep -q docker; then
-        log_success "✅ root 用户已在 docker 组中"
-    else
-        usermod -aG docker root
-        log_success "✅ root 用户已添加到 docker 组"
-    fi
+    # 测试用户列表
+    local test_users=("root")
     
-    # 检查 www 用户是否存在并配置权限
+    # 添加 www 用户（如果存在）
     if id -u www >/dev/null 2>&1; then
-        log_info "检测到 www 用户，配置 Docker 权限..."
-        
-        # 将 www 用户添加到 docker 组
-        if groups www | grep -q docker; then
-            log_success "✅ www 用户已在 docker 组中"
-        else
-            usermod -aG docker www
-            log_success "✅ www 用户已添加到 docker 组"
-        fi
-        
-        # 获取 www 用户的实际家目录
-        local www_home=$(getent passwd www | cut -d: -f6)
-        if [[ -n "$www_home" && -d "$www_home" ]]; then
-            # 确保家目录权限正确
-            chown www:www "$www_home"
-            chmod 755 "$www_home"
-            log_success "✅ www 用户家目录权限设置完成: $www_home"
-        else
-            log_warn "⚠️  www 用户家目录不存在或无法确定"
-        fi
-    else
-        log_info "www 用户不存在，跳过配置"
+        test_users+=("www")
     fi
     
-    # 处理当前登录用户（如果不是 root）
-    local default_user="${SUDO_USER:-${LOGNAME:-}}"
-    if [[ -n "${default_user}" && "${default_user}" != "root" && "${default_user}" != "www" ]]; then
-        if id -u "${default_user}" >/dev/null 2>&1; then
-            log_info "将用户 '$default_user' 添加到 docker 组..."
-            if groups "${default_user}" | grep -q docker; then
-                log_success "✅ 用户 '$default_user' 已在 docker 组中"
+    # 添加当前登录用户（非 root）
+    if [[ -n "${SUDO_USER:-}" && "$SUDO_USER" != "root" ]]; then
+        test_users+=("$SUDO_USER")
+    fi
+    
+    # 测试每个用户的权限
+    for user in "${test_users[@]}"; do
+        echo "----------------------------------------"
+        log_test "测试用户: $user"
+        
+        # 检查用户是否存在
+        if ! id -u "$user" >/dev/null 2>&1; then
+            log_warn "用户 $user 不存在，跳过测试"
+            continue
+        fi
+        
+        # 检查用户是否在 docker 组中
+        if groups "$user" 2>/dev/null | grep -q docker; then
+            log_success "✅ 用户 $user 在 docker 组中"
+        else
+            log_error "❌ 用户 $user 不在 docker 组中"
+            continue
+        fi
+        
+        # 测试 Docker 命令执行
+        log_test "测试 Docker 命令执行..."
+        
+        if [[ "$user" == "root" ]]; then
+            # 作为 root 直接执行
+            if docker version >/dev/null 2>&1; then
+                log_success "✅ root 用户可以执行 docker version"
             else
-                usermod -aG docker "${default_user}"
-                log_success "✅ 用户 '$default_user' 已添加到 docker 组"
+                log_error "❌ root 用户无法执行 docker version"
             fi
-        else
-            log_warn "用户 '$default_user' 不存在，跳过权限设置"
-        fi
-    fi
-    
-    # 创建 Docker 相关目录并设置权限
-    log_info "设置 Docker 相关目录权限..."
-    
-    # 确保 /var/lib/docker 目录权限正确
-    if [[ -d /var/lib/docker ]]; then
-        chmod 700 /var/lib/docker
-        log_success "✅ Docker 数据目录权限设置完成"
-    fi
-    
-    # 创建用户级 Docker 配置目录
-    # 为 root 用户创建配置目录
-    local root_docker_dir="/root/.docker"
-    if [[ ! -d "$root_docker_dir" ]]; then
-        mkdir -p "$root_docker_dir"
-        chown root:root "$root_docker_dir"
-        chmod 700 "$root_docker_dir"
-        log_success "✅ root 用户 Docker 配置目录创建完成"
-    fi
-    
-    # 为 www 用户创建配置目录（如果用户存在）
-    if id -u www >/dev/null 2>&1; then
-        local www_home=$(getent passwd www | cut -d: -f6)
-        if [[ -n "$www_home" && -d "$www_home" ]]; then
-            local www_docker_dir="$www_home/.docker"
-            if [[ ! -d "$www_docker_dir" ]]; then
-                mkdir -p "$www_docker_dir"
-                chown www:www "$www_docker_dir"
-                chmod 700 "$www_docker_dir"
-                log_success "✅ www 用户 Docker 配置目录创建完成: $www_docker_dir"
-            fi
-        fi
-    fi
-    
-    log_success "✅ Docker 用户权限配置完成"
-    return 0
-}
-
-# 验证安装
-verify_installation() {
-    log_info "验证 Docker 安装..."
-    
-    # 等待 Docker 服务完全启动
-    local retry_count=0
-    while [[ $retry_count -lt 10 ]]; do
-        if systemctl is-active --quiet docker && docker info >/dev/null 2>&1; then
-            break
-        fi
-        sleep 2
-        retry_count=$((retry_count + 1))
-    done
-    
-    # 检查 Docker 版本
-    if docker_version=$(docker --version 2>/dev/null); then
-        log_success "Docker 版本: $docker_version"
-    else
-        log_error "Docker 命令验证失败"
-        return 1
-    fi
-    
-    # 检查 Docker Compose 版本
-    if compose_version=$(docker compose version 2>/dev/null); then
-        log_success "Docker Compose 版本: $compose_version"
-    else
-        log_error "Docker Compose 验证失败"
-        return 1
-    fi
-    
-    # 检查 Docker 系统信息
-    if docker_info=$(docker system info --format "{{.ServerVersion}}" 2>/dev/null); then
-        log_success "Docker Server 版本: $docker_info"
-    else
-        log_warn "无法获取 Docker 系统信息"
-    fi
-    
-    # 测试 Docker 运行
-    log_info "运行 Docker 测试容器..."
-    if docker run --rm hello-world >/dev/null 2>&1; then
-        log_success "✅ Docker 运行测试通过"
-    else
-        log_warn "⚠️  Docker 运行测试失败，可能需要重新登录"
-        log_info "如果是权限问题，请运行: sudo usermod -aG docker \$USER"
-    fi
-    
-    # 测试 Docker 网络连接
-    if [[ "$VPN_AVAILABLE" == true ]]; then
-        log_info "测试 Docker 容器 VPN 网络连接..."
-        if timeout 30 docker run --rm alpine/curl:latest curl -s --connect-timeout 10 https://www.google.com >/dev/null 2>&1; then
-            log_success "✅ Docker 容器 VPN 网络连接测试成功"
-        else
-            log_warn "⚠️  Docker 容器 VPN 网络连接测试失败"
-            log_info "容器可能仍使用直连网络，请检查 VPN 配置"
-        fi
-    fi
-    
-    # 检查 Docker 存储驱动
-    if storage_driver=$(docker info --format "{{.Driver}}" 2>/dev/null); then
-        log_success "存储驱动: $storage_driver"
-    fi
-    
-    # 检查 Cgroup 驱动
-    if cgroup_driver=$(docker info --format "{{.CgroupDriver}}" 2>/dev/null); then
-        log_success "Cgroup 驱动: $cgroup_driver"
-    fi
-    
-    # 验证用户权限
-    log_info "验证用户权限配置..."
-    
-    # 测试 root 用户权限
-    if groups root | grep -q docker; then
-        log_success "✅ root 用户 Docker 权限正常"
-    else
-        log_warn "⚠️  root 用户 Docker 权限异常"
-    fi
-    
-    # 测试 www 用户权限
-    if id -u www >/dev/null 2>&1; then
-        if groups www | grep -q docker; then
-            log_success "✅ www 用户 Docker 权限正常"
             
-            # 测试 www 用户是否能执行 Docker 命令
-            if su - www -c "docker version >/dev/null 2>&1"; then
-                log_success "✅ www 用户 Docker 命令执行正常"
+            if docker ps >/dev/null 2>&1; then
+                log_success "✅ root 用户可以执行 docker ps"
             else
-                log_warn "⚠️  www 用户 Docker 命令执行失败（可能需要重新登录）"
+                log_error "❌ root 用户无法执行 docker ps"
             fi
         else
-            log_warn "⚠️  www 用户 Docker 权限异常"
+            # 切换到其他用户执行（需要新的组权限生效）
+            log_info "注意: 用户 $user 需要重新登录后权限才能生效"
+            
+            # 尝试使用 newgrp 来临时启用新组权限
+            if su - "$user" -c "newgrp docker << EOF
+docker version >/dev/null 2>&1
+EOF" 2>/dev/null; then
+                log_success "✅ $user 用户可以执行 docker version"
+            else
+                log_warn "⚠️  $user 用户需要重新登录后才能使用 docker 命令"
+            fi
         fi
+    done
+}
+
+# 测试 Docker 基本功能
+test_docker_basic_functionality() {
+    log_step "测试 Docker 基本功能..."
+    
+    # 测试 Docker 信息
+    log_test "测试 docker info..."
+    if docker info >/dev/null 2>&1; then
+        log_success "✅ docker info 正常"
     else
-        log_warn "⚠️  www 用户不存在"
+        log_error "❌ docker info 失败"
+        return 1
+    fi
+    
+    # 测试拉取镜像
+    log_test "测试镜像拉取 (hello-world)..."
+    if docker pull hello-world >/dev/null 2>&1; then
+        log_success "✅ 镜像拉取成功"
+    else
+        log_error "❌ 镜像拉取失败"
+        return 1
+    fi
+    
+    # 测试运行容器
+    log_test "测试容器运行..."
+    if docker run --rm hello-world >/dev/null 2>&1; then
+        log_success "✅ 容器运行成功"
+    else
+        log_error "❌ 容器运行失败"
+        return 1
+    fi
+    
+    # 清理测试镜像
+    log_test "清理测试镜像..."
+    docker rmi hello-world >/dev/null 2>&1 || true
+    
+    log_success "Docker 基本功能测试完成"
+}
+
+# 测试 Docker Compose
+test_docker_compose() {
+    log_step "测试 Docker Compose..."
+    
+    if docker compose version >/dev/null 2>&1; then
+        local compose_version=$(docker compose version)
+        log_success "✅ Docker Compose 可用: $compose_version"
+        return 0
+    else
+        log_error "❌ Docker Compose 不可用"
+        return 1
     fi
 }
 
-setup_user_permissions
-perform_docker_hub_login
-verify_installation
-
-echo
-log_success "=========================================="
-log_success "🐳 Docker 安装完成！"
-log_success "=========================================="
-
-echo
-log_info "📦 已安装的组件："
-echo "  ✅ Docker Engine"
-echo "  ✅ Docker CLI"
-echo "  ✅ Containerd"
-echo "  ✅ Docker Buildx 插件"
-echo "  ✅ Docker Compose 插件"
-
-echo
-log_info "⚙️  配置优化："
-echo "  ✅ 日志轮转配置 (最大 10MB × 3 文件)"
-echo "  ✅ 存储驱动优化 (overlay2)"
-echo "  ✅ Systemd Cgroup 驱动"
-echo "  ✅ 容器存活恢复功能"
-echo "  ✅ Docker Hub 镜像加速器 (4个镜像源)"
-echo "     • DaoCloud: docker.m.daocloud.io"
-echo "     • DockerProxy: dockerproxy.com"
-echo "     • 中科大: docker.mirrors.ustc.edu.cn"
-echo "     • 南大: docker.nju.edu.cn"
-if [[ "$VPN_AVAILABLE" == true ]]; then
-    echo "  ✅ VPN 代理网络集成"
-    echo "     HTTP 代理: $VPN_HTTP_PROXY"
-    if [[ -n "$VPN_SOCKS_PROXY" ]]; then
-        echo "     SOCKS5 代理: $VPN_SOCKS_PROXY"
-    fi
-else
-    echo "  ⚠️  未配置 VPN 代理 (直连模式)"
-fi
-
-echo
-log_info "🔧 系统信息："
-echo "  🖥️  操作系统: ${PRETTY_NAME:-${ID}} ${VERSION_ID:-}"
-echo "  📦 包管理器: $PKG_MANAGER"
-echo "  🏃 服务状态: $(systemctl is-active docker)"
-
-echo
-log_info "👥 用户权限配置："
-echo "  ✅ root 用户: 已配置 Docker 访问权限"
-if id -u www >/dev/null 2>&1; then
-    www_home=$(getent passwd www | cut -d: -f6)
-    if groups www 2>/dev/null | grep -q docker; then
-        echo "  ✅ www 用户: 已配置 Docker 访问权限"
-        echo "     家目录: ${www_home:-未知}"
-    else
-        echo "  ⚠️  www 用户: Docker 权限配置失败"
-        echo "     家目录: ${www_home:-未知}"
-    fi
-else
-    echo "  ⚠️  www 用户: 不存在"
-fi
-
-# 显示当前登录用户信息
-current_user="${SUDO_USER:-${LOGNAME:-$(whoami)}}"
-if [[ -n "${current_user}" && "${current_user}" != "root" ]]; then
-    if groups "${current_user}" 2>/dev/null | grep -q docker; then
-        echo "  ✅ $current_user 用户: 已配置 Docker 访问权限"
-    else
-        echo "  ⚠️  $current_user 用户: Docker 权限配置失败"
-    fi
-fi
-
-# 显示 Docker Hub 登录状态
-echo
-log_info "🔐 Docker Hub 认证状态："
-if [[ "$DOCKER_HUB_AUTH_ENABLED" == true ]]; then
-    # 检查 root 用户登录状态
-    if docker info 2>/dev/null | grep -q "Username:" || docker system info --format '{{.RegistryConfig.IndexConfigs}}' 2>/dev/null | grep -q "docker.io"; then
-        echo "  ✅ root 用户: 已登录 Docker Hub"
-    else
-        echo "  ⚠️  root 用户: Docker Hub 登录状态未知"
+# 测试 VPN 网络连接
+test_vpn_network() {
+    log_step "测试 VPN 网络连接（可选）..."
+    
+    # 检查 VPN 服务状态
+    if ! systemctl is-active --quiet mihomo 2>/dev/null && ! pgrep -f "mihomo" >/dev/null 2>&1; then
+        log_warn "VPN 服务未运行，跳过网络测试"
+        return 0
     fi
     
-    # 检查 www 用户登录状态（如果存在）
-    if id -u www >/dev/null 2>&1; then
-        if su - www -c "docker info 2>/dev/null | grep -q 'Username:'" 2>/dev/null; then
-            echo "  ✅ www 用户: 已登录 Docker Hub"
+    log_test "测试容器 VPN 连接..."
+    
+    # 创建临时测试容器测试网络
+    local test_container="docker-vpn-test-$$"
+    
+    if docker run --name "$test_container" --rm -d alpine:latest sleep 30 >/dev/null 2>&1; then
+        # 在容器中测试网络连接
+        local test_url="http://httpbin.org/ip"
+        if docker exec "$test_container" wget -qO- --timeout=5 "$test_url" >/dev/null 2>&1; then
+            log_success "✅ 容器网络连接正常"
+            
+            # 获取容器 IP 地址来判断是否使用代理
+            local container_ip=$(docker exec "$test_container" wget -qO- --timeout=5 "$test_url" 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo "未知")
+            log_info "容器外部 IP: $container_ip"
         else
-            echo "  ⚠️  www 用户: Docker Hub 登录状态未知"
+            log_warn "⚠️  容器网络连接测试失败"
         fi
+        
+        # 清理测试容器
+        docker stop "$test_container" >/dev/null 2>&1 || true
+    else
+        log_warn "⚠️  无法创建测试容器"
     fi
-else
-    echo "  ⚠️  未配置 Docker Hub 认证"
-    echo "     建议执行: docker login"
-fi
+}
 
-echo
-log_info "🚀 下一步操作："
-echo "  1. 验证安装: docker version && docker compose version"
+# =================================================================
+# 主程序流程
+# =================================================================
 
-default_user="${SUDO_USER:-${LOGNAME:-}}"
-if [[ -n "${default_user}" && "${default_user}" != "root" ]]; then
-    echo "  2. 重新登录用户 '$default_user' 以使 docker 组权限生效"
-    echo "     或者运行: su - $default_user"
-fi
-
-echo "  3. 切换到 www 用户测试: su - www"
-echo "  4. 测试镜像拉取: docker pull nginx"
-echo "  5. 运行测试: docker run hello-world"
-echo "  6. 查看系统信息: docker system info"
-echo "  7. 管理 Docker: systemctl start|stop|restart docker"
-
-if [[ "$VPN_AVAILABLE" == true ]]; then
+# 显示安装信息
+show_installation_info() {
+    echo "========================================"
+    echo "🐳 Docker 统一安装配置脚本"
+    echo "========================================"
+    echo "功能包括:"
+    echo "  • Docker Engine 安装"
+    echo "  • Docker Compose 插件"
+    echo "  • 用户权限配置"
+    echo "  • VPN 网络集成"
+    echo "  • 完整性测试验证"
+    echo "========================================"
     echo
-    log_info "🌐 VPN 网络使用："
-    echo "  • Docker 已配置使用 VPN 代理网络"
-    echo "  • 容器拉取镜像将通过 VPN 进行"
-    echo "  • 测试网络连接: docker run --rm alpine/curl curl https://www.google.com"
-    echo "  • 查看代理配置: cat /etc/docker/daemon.json"
-    echo "  • VPN 服务管理: systemctl status mihomo"
-    echo "  • VPN 辅助命令: docker-vpn (强制 VPN 环境) | docker-compose-vpn"
-else
+}
+
+# 显示安装完成信息
+show_completion_info() {
     echo
-    log_info "🌐 网络配置："
-    echo "  • Docker 使用直连网络模式"
-    echo "  • 如需启用 VPN，请先安装并启动 Mihomo VPN 服务"
-    echo "  • 然后重新运行此脚本以自动配置 VPN 代理"
+    echo "========================================"
+    echo "🎉 Docker 安装配置完成！"
+    echo "========================================"
+    echo "安装的组件:"
+    
+    # Docker 版本信息
+    if command -v docker >/dev/null 2>&1; then
+        echo "  • $(docker --version)"
+    fi
+    
+    # Docker Compose 版本信息
+    if docker compose version >/dev/null 2>&1; then
+        echo "  • $(docker compose version)"
+    fi
+    
+    echo
+    echo "基本用法:"
+    echo "  • 查看 Docker 信息: docker info"
+    echo "  • 查看运行容器: docker ps"
+    echo "  • 查看所有镜像: docker images"
+    echo "  • 运行容器: docker run [选项] <镜像>"
+    echo
+    
+    # 用户权限提醒
+    if [[ -n "${SUDO_USER:-}" && "$SUDO_USER" != "root" ]]; then
+        echo "⚠️  重要提醒:"
+        echo "  • 用户 $SUDO_USER 需要重新登录后才能无需 sudo 使用 docker 命令"
+        echo "  • 或者运行: newgrp docker"
+        echo
+    fi
+    
+    # VPN 配置信息
+    if systemctl is-active --quiet mihomo 2>/dev/null || pgrep -f "mihomo" >/dev/null 2>&1; then
+        echo "🌐 VPN 网络集成:"
+        echo "  • VPN 代理已配置"
+        echo "  • Docker 容器将自动使用 VPN 网络"
+        echo "  • 管理 VPN: ./docker-vpn-manager.sh status"
+        echo
+    fi
+    
+    echo "日志和故障排除:"
+    echo "  • Docker 服务日志: journalctl -u docker.service"
+    echo "  • 重启 Docker: systemctl restart docker"
+    echo "========================================"
+}
+
+# 主函数
+main() {
+    show_installation_info
+    
+    # 1. 环境检查
+    check_root_privileges
+    detect_os
+    check_system_requirements
+    
+    # 2. Docker 安装检查
+    if ! check_existing_docker; then
+        log_info "跳过 Docker 安装步骤，继续配置检查..."
+    else
+        # 3. Docker 安装过程
+        remove_old_docker
+        install_dependencies
+        add_docker_repository
+        install_docker_engine
+    fi
+    
+    # 4. 用户权限配置
+    configure_docker_users
+    
+    # 5. VPN 网络配置
+    configure_vpn_proxy_mode
+    
+    # 6. Docker Hub 认证（可选）
+    configure_docker_hub_auth
+    
+    # 7. 测试和验证
+    test_user_docker_permissions
+    test_docker_basic_functionality
+    test_docker_compose
+    test_vpn_network
+    
+    # 8. 完成提示
+    show_completion_info
+}
+
+# 脚本入口点
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
 fi
-
-echo
-log_info "🚀 镜像加速使用："
-echo "  • Docker Hub 镜像加速器已自动配置"
-echo "  • 拉取镜像会自动尝试多个镜像源"
-echo "  • 测试拉取速度: time docker pull alpine:latest"
-echo "  • 查看镜像配置: docker system info | grep -A 10 'Registry Mirrors'"
-echo "  • 手动指定镜像源: docker pull docker.m.daocloud.io/library/nginx"
-
-echo
-log_info "🔐 Docker Hub 认证："
-if [[ "$DOCKER_HUB_AUTH_ENABLED" == true ]]; then
-    echo "  • Docker Hub 认证已配置，享受更高拉取配额"
-    echo "  • 检查登录状态: docker info | grep Username"
-    echo "  • 退出登录: docker logout"
-    echo "  • 重新登录: docker login"
-else
-    echo "  • 未配置 Docker Hub 认证"
-    echo "  • 匿名用户拉取限制: 100次/6小时"
-    echo "  • 认证用户拉取限制: 200次/6小时"
-    echo "  • 建议登录: docker login"
-    echo "  • 创建账户: https://hub.docker.com"
-fi
-
-echo
-log_info "📁 重要文件位置："
-echo "  🔧 配置文件: /etc/docker/daemon.json"
-echo "  📋 服务日志: journalctl -u docker.service"
-echo "  📂 数据目录: /var/lib/docker/"
-
-log_info "🎉 Docker 服务已启动并设置为开机自启"
-exit 0
