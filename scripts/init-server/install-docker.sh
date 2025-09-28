@@ -131,6 +131,62 @@ check_existing_docker() {
     fi
 }
 
+# 检测 VPN 网络配置
+detect_vpn_config() {
+    log_info "检测 VPN 网络配置..."
+    
+    # 检查 nc 命令是否可用
+    if ! command -v nc >/dev/null 2>&1; then
+        log_warn "nc 命令不可用，VPN 端口检测可能不准确"
+        return 0
+    fi
+    
+    # 检测 Mihomo 服务状态
+    if systemctl is-active --quiet mihomo 2>/dev/null; then
+        log_success "检测到 Mihomo VPN 服务运行中"
+        
+        # 检查代理端口
+        local http_proxy="127.0.0.1:7890"
+        local socks_proxy="127.0.0.1:7891"
+        
+        if nc -z 127.0.0.1 7890 >/dev/null 2>&1; then
+            log_success "HTTP 代理端口 7890 可用"
+            VPN_HTTP_PROXY="http://$http_proxy"
+        else
+            log_warn "HTTP 代理端口 7890 不可用"
+        fi
+        
+        if nc -z 127.0.0.1 7891 >/dev/null 2>&1; then
+            log_success "SOCKS5 代理端口 7891 可用"
+            VPN_SOCKS_PROXY="socks5://$socks_proxy"
+        else
+            log_warn "SOCKS5 代理端口 7891 不可用"
+        fi
+        
+        if [[ -n "$VPN_HTTP_PROXY" || -n "$VPN_SOCKS_PROXY" ]]; then
+            VPN_AVAILABLE=true
+            log_success "✅ VPN 代理环境检测成功"
+        else
+            log_warn "VPN 服务运行但代理端口不可用"
+            VPN_AVAILABLE=false
+        fi
+    else
+        log_warn "未检测到 Mihomo VPN 服务"
+        VPN_AVAILABLE=false
+    fi
+    
+    # 测试网络连接
+    if [[ "$VPN_AVAILABLE" == true ]]; then
+        log_info "测试 VPN 网络连接..."
+        if curl -s --connect-timeout 10 --max-time 30 --proxy "$VPN_HTTP_PROXY" https://www.google.com >/dev/null 2>&1; then
+            log_success "✅ VPN 网络连接测试成功"
+        else
+            log_warn "VPN 网络连接测试失败，将使用直连模式"
+            VPN_AVAILABLE=false
+        fi
+    fi
+}
+
 # 安装 Docker - Debian/Ubuntu 系列
 install_docker_debian() {
     log_info "移除旧版本 Docker 包（如果存在）..."
@@ -244,62 +300,6 @@ case "$OS_TYPE" in
         exit 1
         ;;
 esac
-
-# 检测 VPN 网络配置
-detect_vpn_config() {
-    log_info "检测 VPN 网络配置..."
-    
-    # 检查 nc 命令是否可用
-    if ! command -v nc >/dev/null 2>&1; then
-        log_warn "nc 命令不可用，VPN 端口检测可能不准确"
-        return 0
-    fi
-    
-    # 检测 Mihomo 服务状态
-    if systemctl is-active --quiet mihomo 2>/dev/null; then
-        log_success "检测到 Mihomo VPN 服务运行中"
-        
-        # 检查代理端口
-        local http_proxy="127.0.0.1:7890"
-        local socks_proxy="127.0.0.1:7891"
-        
-        if nc -z 127.0.0.1 7890 >/dev/null 2>&1; then
-            log_success "HTTP 代理端口 7890 可用"
-            VPN_HTTP_PROXY="http://$http_proxy"
-        else
-            log_warn "HTTP 代理端口 7890 不可用"
-        fi
-        
-        if nc -z 127.0.0.1 7891 >/dev/null 2>&1; then
-            log_success "SOCKS5 代理端口 7891 可用"
-            VPN_SOCKS_PROXY="socks5://$socks_proxy"
-        else
-            log_warn "SOCKS5 代理端口 7891 不可用"
-        fi
-        
-        if [[ -n "$VPN_HTTP_PROXY" || -n "$VPN_SOCKS_PROXY" ]]; then
-            VPN_AVAILABLE=true
-            log_success "✅ VPN 代理环境检测成功"
-        else
-            log_warn "VPN 服务运行但代理端口不可用"
-            VPN_AVAILABLE=false
-        fi
-    else
-        log_warn "未检测到 Mihomo VPN 服务"
-        VPN_AVAILABLE=false
-    fi
-    
-    # 测试网络连接
-    if [[ "$VPN_AVAILABLE" == true ]]; then
-        log_info "测试 VPN 网络连接..."
-        if curl -s --connect-timeout 10 --max-time 30 --proxy "$VPN_HTTP_PROXY" https://www.google.com >/dev/null 2>&1; then
-            log_success "✅ VPN 网络连接测试成功"
-        else
-            log_warn "VPN 网络连接测试失败，将使用直连模式"
-            VPN_AVAILABLE=false
-        fi
-    fi
-}
 
 # 配置 Docker daemon
 configure_docker_daemon() {
