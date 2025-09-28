@@ -101,7 +101,7 @@ check_directories_setup() {
 }
 
 check_geodata_downloaded() {
-    [[ -f "/opt/mihomo/data/GeoSite.dat" ]] && [[ -f "/opt/mihomo/data/GeoIP.metadb" ]]
+    [[ -f "/opt/mihomo/data/geosite.dat" ]] && [[ -f "/opt/mihomo/data/geoip.metadb" ]]
 }
 
 check_base_config_created() {
@@ -664,9 +664,9 @@ create_basic_rules() {
     
     log_warn "创建基础规则配置文件..."
     
-    # 创建基础的 GeoSite.dat 替代配置
+    # 创建基础的 geosite.dat 替代配置
     cat > "$data_dir/basic-rules.yaml" << 'EOF'
-# 基础规则配置（当 GeoSite.dat 不可用时）
+# 基础规则配置（当 geosite.dat 不可用时）
 # 这些规则提供基本的分流功能
 
 # 国内常用域名
@@ -835,18 +835,18 @@ download_geodata() {
     local static_geosite=""
     local static_geoip=""
     
-    # 检查 GeoSite 文件（优先大写，然后小写）
-    if [[ -f "$static_dir/GeoSite.dat" ]]; then
-        static_geosite="$static_dir/GeoSite.dat"
-    elif [[ -f "$static_dir/geosite.dat" ]]; then
+    # 检查 GeoSite 文件（优先小写，然后大写）
+    if [[ -f "$static_dir/geosite.dat" ]]; then
         static_geosite="$static_dir/geosite.dat"
+    elif [[ -f "$static_dir/GeoSite.dat" ]]; then
+        static_geosite="$static_dir/GeoSite.dat"
     fi
     
-    # 检查 GeoIP 文件（优先大写，然后小写）
-    if [[ -f "$static_dir/GeoIP.metadb" ]]; then
-        static_geoip="$static_dir/GeoIP.metadb"
-    elif [[ -f "$static_dir/geoip.metadb" ]]; then
+    # 检查 GeoIP 文件（优先小写，然后大写）
+    if [[ -f "$static_dir/geoip.metadb" ]]; then
         static_geoip="$static_dir/geoip.metadb"
+    elif [[ -f "$static_dir/GeoIP.metadb" ]]; then
+        static_geoip="$static_dir/GeoIP.metadb"
     fi
     
     if [[ -n "$static_geosite" ]] && [[ -n "$static_geoip" ]]; then
@@ -859,7 +859,7 @@ download_geodata() {
     
     # 检查目标目录已有文件
     local has_existing_files=false
-    if [[ -f "$data_dir/GeoSite.dat" ]] && [[ -f "$data_dir/GeoIP.metadb" ]]; then
+    if [[ -f "$data_dir/geosite.dat" ]] && [[ -f "$data_dir/geoip.metadb" ]]; then
         has_existing_files=true
         log_info "✅ 目标目录已存在地理数据文件"
     fi
@@ -868,19 +868,19 @@ download_geodata() {
     if [[ "$has_static_files" == "true" ]]; then
         log_info "使用本地静态文件..."
         
-        # 复制 GeoSite.dat
-        if cp "$static_geosite" "$data_dir/GeoSite.dat" 2>/dev/null; then
-            log_success "✅ GeoSite.dat 复制成功"
+        # 复制 geosite.dat
+        if cp "$static_geosite" "$data_dir/geosite.dat" 2>/dev/null; then
+            log_success "✅ geosite.dat 复制成功"
         else
-            log_error "❌ GeoSite.dat 复制失败"
+            log_error "❌ geosite.dat 复制失败"
             download_success=false
         fi
         
-        # 复制 GeoIP.metadb  
-        if cp "$static_geoip" "$data_dir/GeoIP.metadb" 2>/dev/null; then
-            log_success "✅ GeoIP.metadb 复制成功"
+        # 复制 geoip.metadb  
+        if cp "$static_geoip" "$data_dir/geoip.metadb" 2>/dev/null; then
+            log_success "✅ geoip.metadb 复制成功"
         else
-            log_error "❌ GeoIP.metadb 复制失败"
+            log_error "❌ geoip.metadb 复制失败"
             download_success=false
         fi
         
@@ -961,20 +961,20 @@ download_geodata() {
             "https://github.com/MetaCubeX/meta-rules-dat/releases/latest/download/geoip-lite.metadb"
         )
         
-        # 下载 GeoSite.dat
-        if [[ ! -f "$data_dir/GeoSite.dat" ]]; then
-            if ! download_file_with_fallback "GeoSite.dat" "$data_dir/GeoSite.dat" "${geosite_urls[@]}"; then
-                log_error "❌ GeoSite.dat 从所有源下载失败"
+        # 下载 geosite.dat
+        if [[ ! -f "$data_dir/geosite.dat" ]]; then
+            if ! download_file_with_fallback "geosite.dat" "$data_dir/geosite.dat" "${geosite_urls[@]}"; then
+                log_error "❌ geosite.dat 从所有源下载失败"
                 download_success=false
             fi
         else
-            log_info "✅ GeoSite.dat 已存在，跳过下载"
+            log_info "✅ geosite.dat 已存在，跳过下载"
         fi
         
-        # 下载 GeoIP.metadb
-        if [[ ! -f "$data_dir/GeoIP.metadb" ]]; then
-            if ! download_file_with_fallback "GeoIP.metadb" "$data_dir/GeoIP.metadb" "${geoip_urls[@]}"; then
-                log_error "❌ GeoIP.metadb 从所有源下载失败"
+        # 下载 geoip.metadb
+        if [[ ! -f "$data_dir/geoip.metadb" ]]; then
+            if ! download_file_with_fallback "geoip.metadb" "$data_dir/geoip.metadb" "${geoip_urls[@]}"; then
+                log_error "❌ geoip.metadb 从所有源下载失败"
                 download_success=false
             fi
         else
@@ -1696,8 +1696,8 @@ geoip_urls=(
 )
 
 # 下载文件
-download_file_with_fallback "GeoSite.dat" "$DATA_DIR/GeoSite.dat" "${geosite_urls[@]}"
-download_file_with_fallback "GeoIP.metadb" "$DATA_DIR/GeoIP.metadb" "${geoip_urls[@]}"
+download_file_with_fallback "geosite.dat" "$DATA_DIR/geosite.dat" "${geosite_urls[@]}"
+download_file_with_fallback "geoip.metadb" "$DATA_DIR/geoip.metadb" "${geoip_urls[@]}"
 
 # 设置权限
 chmod 644 "$DATA_DIR"/*.dat "$DATA_DIR"/*.metadb 2>/dev/null || true
@@ -1833,7 +1833,7 @@ show_completion_info() {
     echo
     log_info "已安装的组件："
     echo "  ✅ mihomo (Clash.Meta) 代理客户端"
-    echo "  ✅ 地理位置数据文件 (GeoSite.dat, GeoIP.metadb)"
+    echo "  ✅ 地理位置数据文件 (geosite.dat, geoip.metadb)"
     echo "  ✅ systemd 服务配置 (开机自启)"
     echo "  ✅ 全局代理环境变量"
     echo "  ✅ 管理脚本和别名"
@@ -1937,7 +1937,7 @@ main() {
         echo "   - 确保代理节点配置正确"
         echo
         echo "2. 地理数据文件："
-        if [[ -f "/opt/mihomo/data/GeoSite.dat" ]] && [[ -f "/opt/mihomo/data/GeoIP.metadb" ]]; then
+        if [[ -f "/opt/mihomo/data/geosite.dat" ]] && [[ -f "/opt/mihomo/data/geoip.metadb" ]]; then
             echo "   ✅ 地理数据文件已就绪"
         else
             echo "   ⚠️  地理数据文件可能缺失，建议手动上传"
