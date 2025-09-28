@@ -374,13 +374,7 @@ configure_vpn_proxy_mode() {
   "registry-mirrors": [
     "https://docker.m.daocloud.io",
     "https://docker.nju.edu.cn"
-  ],
-  "default-runtime": "runc",
-  "runtimes": {
-    "runc": {
-      "path": "runc"
-    }
-  }
+  ]
 }'
         echo "$daemon_config" > /etc/docker/daemon.json
         log_success "Docker daemon.json 配置已创建"
@@ -654,61 +648,62 @@ test_vpn_network() {
         return 0
     fi
     
-    # 获取宿主机 IP 作为对比
-    local host_ip=$(curl -s --connect-timeout 10 http://httpbin.org/ip 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo "未知")
-    log_info "宿主机外部 IP: $host_ip"
-    
-    log_test "测试 Docker 容器 VPN 连接..."
-    
-    # 尝试使用已存在的镜像，如果没有就用alpine
-    local test_image="alpine:latest"
-    if docker images --format "table {{.Repository}}:{{.Tag}}" | grep -q "hello-world:latest"; then
-        test_image="hello-world:latest"
+    # 检查 VPN 代理端口
+    local proxy_port=7890
+    if ! netstat -tlnp 2>/dev/null | grep -q ":$proxy_port "; then
+        log_warn "VPN 代理端口 $proxy_port 不可用，跳过 VPN 测试"
+        return 0
     fi
     
-    # 创建临时测试容器
-    local test_container="docker-vpn-test-$$"
+    # 获取 Docker 网关地址
+    local docker_gateway=$(docker network inspect bridge --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null || echo "172.17.0.1")
+    log_info "Docker 网关地址: $docker_gateway"
     
-    if docker run --name "$test_container" --rm -d alpine:latest sleep 60 >/dev/null 2>&1; then
-        # 等待容器启动
-        sleep 2
-        
-        # 在容器中安装wget（如果需要）
-        docker exec "$test_container" apk add --no-cache wget >/dev/null 2>&1 || true
-        
-        # 测试容器网络连接
-        local test_url="http://httpbin.org/ip"
-        log_test "测试容器外网访问..."
-        
-        if docker exec "$test_container" wget -qO- --timeout=10 "$test_url" >/dev/null 2>&1; then
-            # 获取容器外部 IP
-            local container_ip=$(docker exec "$test_container" wget -qO- --timeout=10 "$test_url" 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo "未知")
-            
-            log_success "✅ Docker 容器网络连接正常"
-            log_info "容器外部 IP: $container_ip"
-            
-            # 判断是否使用了VPN
-            if [[ "$container_ip" != "$host_ip" && "$container_ip" != "未知" ]]; then
-                log_success "🎉 Docker 容器正在通过 VPN 访问网络！"
-            elif [[ "$container_ip" == "$host_ip" ]]; then
-                log_warn "⚠️  Docker 容器使用直连，未通过 VPN"
-                log_info "建议运行: ./docker-vpn-manager.sh enable"
-            else
-                log_warn "⚠️  无法确定 Docker 容器网络状态"
-            fi
-        else
-            log_error "❌ Docker 容器无法访问外网"
-            log_info "可能原因:"
-            log_info "  1. Docker daemon 代理配置问题"
-            log_info "  2. VPN 服务异常"
-            log_info "  3. 防火墙阻止容器网络"
-        fi
-        
-        # 清理测试容器
-        docker stop "$test_container" >/dev/null 2>&1 || true
+    log_test "测试 Docker 容器 VPN 代理连接..."
+    
+    # 测试直接连接（不使用代理）
+    log_test "1. 测试容器直接连接..."
+    local direct_ip=$(timeout 15 docker run --rm alpine/curl -s --connect-timeout 10 http://ipinfo.io/ip 2>/dev/null || echo "failed")
+    
+    if [[ "$direct_ip" != "failed" ]]; then
+        log_info "容器直接连接 IP: $direct_ip"
     else
-        log_error "❌ 无法创建 Docker 测试容器"
-        log_info "请检查 Docker 服务状态: systemctl status docker"
+        log_warn "容器直接连接失败"
+    fi
+    
+    # 测试通过代理连接
+    log_test "2. 测试容器通过 VPN 代理连接..."
+    local proxy_ip=$(timeout 15 docker run --rm alpine/curl -s --connect-timeout 10 --proxy "http://$docker_gateway:$proxy_port" http://ipinfo.io/ip 2>/dev/null || echo "failed")
+    
+    if [[ "$proxy_ip" != "failed" ]]; then
+        log_success "✅ 容器 VPN 代理连接成功"
+        log_info "容器 VPN 代理 IP: $proxy_ip"
+        
+        # 比较 IP 地址
+        if [[ "$proxy_ip" != "$direct_ip" ]]; then
+            log_success "🎉 Docker 容器可以通过 VPN 代理访问网络！"
+            log_info "代理使用示例:"
+            log_info "  # 方法 1: 环境变量（小写）"
+            log_info "  docker run --rm -e http_proxy=http://$docker_gateway:$proxy_port alpine/curl http://ipinfo.io/ip"
+            log_info "  # 方法 2: 显式代理参数"
+            log_info "  docker run --rm alpine/curl --proxy http://$docker_gateway:$proxy_port http://ipinfo.io/ip"
+        else
+            log_warn "⚠️  代理 IP 与直连 IP 相同，可能代理未生效"
+        fi
+    else
+        log_error "❌ Docker 容器无法通过 VPN 代理访问网络"
+        log_info "可能原因:"
+        log_info "  1. VPN 代理服务异常"
+        log_info "  2. Docker 网络配置问题"
+        log_info "  3. 代理端口不可访问"
+        
+        # 测试代理端口连通性
+        log_test "3. 测试代理端口连通性..."
+        if timeout 10 docker run --rm alpine sh -c "nc -zv $docker_gateway $proxy_port" 2>/dev/null; then
+            log_info "代理端口连通性正常"
+        else
+            log_error "无法连接到代理端口 $docker_gateway:$proxy_port"
+        fi
     fi
 }
 
@@ -780,8 +775,94 @@ show_completion_info() {
     echo "========================================"
 }
 
+# 显示帮助信息
+show_help() {
+    echo "Docker 统一安装配置脚本"
+    echo
+    echo "用法:"
+    echo "  $0 [选项]"
+    echo
+    echo "选项:"
+    echo "  --configure-vpn-only    仅配置 VPN 代理功能"
+    echo "  --test-vpn-only         仅测试 VPN 代理功能"
+    echo "  --help, -h              显示帮助信息"
+    echo
+    echo "示例:"
+    echo "  $0                      完整安装 Docker 和配置"
+    echo "  $0 --configure-vpn-only 仅配置 Docker VPN 代理"
+    echo "  $0 --test-vpn-only      仅测试 Docker VPN 功能"
+}
+
+# 仅配置 VPN 代理
+configure_vpn_only() {
+    echo "========================================"
+    echo "🌐 Docker VPN 代理配置"
+    echo "========================================"
+    
+    # 基础检查
+    check_root_privileges
+    
+    # 检查 Docker 是否已安装
+    if ! command -v docker >/dev/null 2>&1; then
+        log_error "Docker 未安装，请先运行完整安装脚本"
+        exit 1
+    fi
+    
+    # 配置 VPN 代理
+    configure_vpn_proxy_mode
+    
+    # 测试 VPN 功能
+    test_vpn_network
+    
+    log_success "🎉 Docker VPN 代理配置完成！"
+}
+
+# 仅测试 VPN 功能
+test_vpn_only() {
+    echo "========================================"
+    echo "🧪 Docker VPN 功能测试"
+    echo "========================================"
+    
+    # 基础检查
+    check_root_privileges
+    
+    # 检查 Docker 是否已安装
+    if ! command -v docker >/dev/null 2>&1; then
+        log_error "Docker 未安装，请先运行完整安装脚本"
+        exit 1
+    fi
+    
+    # 测试 VPN 功能
+    test_vpn_network
+}
+
 # 主函数
 main() {
+    # 解析命令行参数
+    case "${1:-}" in
+        --configure-vpn-only)
+            configure_vpn_only
+            exit 0
+            ;;
+        --test-vpn-only)
+            test_vpn_only
+            exit 0
+            ;;
+        --help|-h)
+            show_help
+            exit 0
+            ;;
+        "")
+            # 无参数，执行完整安装
+            ;;
+        *)
+            log_error "未知选项: $1"
+            echo
+            show_help
+            exit 1
+            ;;
+    esac
+    
     show_installation_info
     
     # 1. 环境检查
