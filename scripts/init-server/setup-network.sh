@@ -1042,34 +1042,54 @@ download_geodata() {
             local owner_group="root:root"
         fi
         
-        # 复制 geosite.dat
+        # mihomo 默认在配置目录查找地理文件，同时也复制到 data 目录作为备份
+        local config_dir="/opt/mihomo/config"
+        
+        # 复制 geosite.dat 到配置目录 (mihomo 默认查找位置)
+        if cp "$static_geosite" "$config_dir/geosite.dat" 2>/dev/null; then
+            chmod 644 "$config_dir/geosite.dat"
+            chown "$owner_group" "$config_dir/geosite.dat" 2>/dev/null || true
+            log_success "✅ geosite.dat 复制到配置目录成功 (来源: $(basename "$static_geosite"))"
+        else
+            log_error "❌ geosite.dat 复制到配置目录失败"
+            download_success=false
+        fi
+        
+        # 同时复制到 data 目录作为备份
         if cp "$static_geosite" "$data_dir/geosite.dat" 2>/dev/null; then
             chmod 644 "$data_dir/geosite.dat"
             chown "$owner_group" "$data_dir/geosite.dat" 2>/dev/null || true
-            log_success "✅ geosite.dat 复制成功 (来源: $(basename "$static_geosite"))"
+        fi
+        
+        # 复制 geoip.metadb 到配置目录 (mihomo 默认查找位置)
+        if cp "$static_geoip" "$config_dir/geoip.metadb" 2>/dev/null; then
+            chmod 644 "$config_dir/geoip.metadb"
+            chown "$owner_group" "$config_dir/geoip.metadb" 2>/dev/null || true
+            log_success "✅ geoip.metadb 复制到配置目录成功 (来源: $(basename "$static_geoip"))"
         else
-            log_error "❌ geosite.dat 复制失败"
+            log_error "❌ geoip.metadb 复制到配置目录失败"
             download_success=false
         fi
         
-        # 复制 geoip.metadb  
+        # 同时复制到 data 目录作为备份
         if cp "$static_geoip" "$data_dir/geoip.metadb" 2>/dev/null; then
             chmod 644 "$data_dir/geoip.metadb"
             chown "$owner_group" "$data_dir/geoip.metadb" 2>/dev/null || true
-            log_success "✅ geoip.metadb 复制成功 (来源: $(basename "$static_geoip"))"
-        else
-            log_error "❌ geoip.metadb 复制失败"
-            download_success=false
         fi
         
         if [[ "$download_success" == "true" ]]; then
-            # 验证文件大小（确保不是空文件）
-            local geosite_size=$(stat -f%z "$data_dir/geosite.dat" 2>/dev/null || stat -c%s "$data_dir/geosite.dat" 2>/dev/null || echo "0")
-            local geoip_size=$(stat -f%z "$data_dir/geoip.metadb" 2>/dev/null || stat -c%s "$data_dir/geoip.metadb" 2>/dev/null || echo "0")
+            # 验证配置目录中文件大小（确保不是空文件）
+            local config_dir="/opt/mihomo/config"
+            local geosite_size=$(stat -f%z "$config_dir/geosite.dat" 2>/dev/null || stat -c%s "$config_dir/geosite.dat" 2>/dev/null || echo "0")
+            local geoip_size=$(stat -f%z "$config_dir/geoip.metadb" 2>/dev/null || stat -c%s "$config_dir/geoip.metadb" 2>/dev/null || echo "0")
             
             if [[ "$geosite_size" -gt 1000 ]] && [[ "$geoip_size" -gt 1000 ]]; then
+                # 清理配置目录中的大写文件（如果存在）
+                rm -f "$config_dir/GeoSite.dat" "$config_dir/GeoIP.metadb" 2>/dev/null || true
+                
                 log_success "✅ 本地静态地理数据文件部署完成"
                 log_info "文件大小验证: geosite.dat ($(($geosite_size/1024))KB), geoip.metadb ($(($geoip_size/1024))KB)"
+                log_info "地理数据文件位置: $config_dir/ (主) 和 $data_dir/ (备份)"
                 return 0
             else
                 log_warn "⚠️  复制的文件大小异常，将尝试其他方案"
@@ -1531,11 +1551,37 @@ update_subscription_with_fallback() {
         log_info "已备份现有配置到: $backup_file"
     fi
     
-    # 更新配置
-    cp "$temp_config" "$config_file"
-    rm -f "$temp_config"
+    # 修改下载的配置，禁用地理数据自动更新
+    log_info "修改订阅配置以禁用地理数据自动更新..."
     
-    log_success "订阅配置更新完成"
+    # 创建临时修改后的配置
+    local modified_config="/tmp/clash_subscription_modified.yaml"
+    
+    # 禁用地理数据自动更新并设置本地路径
+    sed '/^geo-auto-update:/d; /^geo-update-interval:/d; /^geox-url:/,+4d' "$temp_config" > "$modified_config"
+    
+    # 在配置开头添加地理数据设置
+    cat > /tmp/geo_settings.yaml << 'EOF'
+# 禁用地理数据自动更新 - 使用本地文件
+geo-auto-update: false
+geox-url:
+  geoip: ""
+  geosite: ""
+  mmdb: ""
+
+EOF
+    
+    # 合并配置
+    cat /tmp/geo_settings.yaml "$modified_config" > "$config_file"
+    
+    # 清理临时文件
+    rm -f "$temp_config" "$modified_config" /tmp/geo_settings.yaml
+    
+    # 设置正确的权限
+    chmod 644 "$config_file"
+    chown mihomo:mihomo "$config_file" 2>/dev/null || true
+    
+    log_success "订阅配置更新完成 (已禁用地理数据自动更新)"
     
     # 保存订阅链接以便后续更新
     echo "$subscription_url" > "/opt/mihomo/subscription_url.txt"
@@ -2016,6 +2062,7 @@ fix_configuration_issues() {
     log_step "检查并修复配置问题..."
 
     local needs_fix=false
+    local config_dir="/opt/mihomo/config"
 
     # 检查并创建配置目录
     if [[ ! -d "/opt/mihomo" ]]; then
@@ -2024,10 +2071,29 @@ fix_configuration_issues() {
         needs_fix=true
     fi
 
+    # 清理配置目录中的重复/错误地理文件
+    if [[ -f "$config_dir/GeoSite.dat" ]] && [[ -f "$config_dir/geosite.dat" ]]; then
+        log_warn "发现大小写重复的地理文件，正在清理..."
+        rm -f "$config_dir/GeoSite.dat" "$config_dir/GeoIP.metadb" 2>/dev/null || true
+        needs_fix=true
+    fi
+
+    # 检查配置文件中的 geo-auto-update 设置
+    if [[ -f "$config_dir/config.yaml" ]] && grep -q "geo-auto-update: true" "$config_dir/config.yaml" 2>/dev/null; then
+        log_warn "配置文件启用了地理数据自动更新，正在禁用..."
+        sed -i 's/geo-auto-update: true/geo-auto-update: false/' "$config_dir/config.yaml"
+        
+        # 同时清空 geox-url 设置
+        sed -i '/^geox-url:/,+4s|https://.*||g' "$config_dir/config.yaml"
+        sed -i '/^geox-url:/,+4s|".*"|""|g' "$config_dir/config.yaml"
+        needs_fix=true
+    fi
+
     # 设置目录权限
     if [[ -d "/opt/mihomo" ]]; then
         chown -R mihomo:mihomo /opt/mihomo 2>/dev/null || true
         chmod -R 755 /opt/mihomo
+        chmod 644 /opt/mihomo/config/config.yaml 2>/dev/null || true
     fi
 
     # 检查并创建基础配置文件
