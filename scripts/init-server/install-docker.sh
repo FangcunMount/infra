@@ -374,7 +374,13 @@ configure_vpn_proxy_mode() {
   "registry-mirrors": [
     "https://docker.m.daocloud.io",
     "https://docker.nju.edu.cn"
-  ]
+  ],
+  "default-runtime": "runc",
+  "runtimes": {
+    "runc": {
+      "path": "runc"
+    }
+  }
 }'
         echo "$daemon_config" > /etc/docker/daemon.json
         log_success "Docker daemon.json 配置已创建"
