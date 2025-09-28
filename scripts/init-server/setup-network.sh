@@ -3,6 +3,7 @@ set -euo pipefail
 
 # 服务器网络环境初始化脚本
 # 配置 mihomo (Clash.Meta) VPN 客户端
+# 支持重复执行，已安装的组件将被跳过
 # 需要在 init-users.sh 执行完毕后运行
 
 # 颜色定义
@@ -90,8 +91,119 @@ cleanup_on_error() {
     echo "  - 包管理器问题: 更新软件源后重试"
 }
 
-# 设置错误陷阱
-trap 'handle_error $LINENO' ERR
+# 状态检查函数
+check_mihomo_installed() {
+    [[ -f "/usr/local/bin/mihomo" ]] && /usr/local/bin/mihomo -v >/dev/null 2>&1
+}
+
+check_directories_setup() {
+    [[ -d "/opt/mihomo" ]] && [[ -d "/opt/mihomo/config" ]] && [[ -d "/opt/mihomo/data" ]]
+}
+
+check_geodata_downloaded() {
+    [[ -f "/opt/mihomo/data/GeoSite.dat" ]] && [[ -f "/opt/mihomo/data/GeoIP.metadb" ]]
+}
+
+check_base_config_created() {
+    [[ -f "/opt/mihomo/config/config.yaml" ]]
+}
+
+check_systemd_service_setup() {
+    systemctl list-units --all --type=service | grep -q mihomo.service
+}
+
+check_mihomo_service_running() {
+    systemctl is-active --quiet mihomo.service 2>/dev/null
+}
+
+check_global_proxy_setup() {
+    [[ -f "/etc/profile.d/mihomo-proxy.sh" ]] || [[ -f "/etc/environment" ]] && grep -q "http_proxy" /etc/environment
+}
+
+check_management_scripts_created() {
+    [[ -f "/usr/local/bin/mihomo-control" ]] && [[ -f "/usr/local/bin/diagnose-network.sh" ]]
+}
+
+# 可重复执行的安装步骤
+install_mihomo_binary_repeatable() {
+    if check_mihomo_installed; then
+        log_success "✅ mihomo 二进制文件已安装，跳过安装步骤"
+        return 0
+    fi
+
+    log_step "安装 mihomo 二进制文件..."
+    install_mihomo_binary
+}
+
+setup_directories_repeatable() {
+    if check_directories_setup; then
+        log_success "✅ 配置目录已创建，跳过目录创建步骤"
+        return 0
+    fi
+
+    log_step "创建配置目录..."
+    setup_directories
+}
+
+download_geodata_repeatable() {
+    if check_geodata_downloaded; then
+        log_success "✅ 地理位置数据文件已下载，跳过下载步骤"
+        return 0
+    fi
+
+    log_step "下载地理位置数据文件..."
+    download_geodata
+}
+
+create_base_config_repeatable() {
+    if check_base_config_created; then
+        log_success "✅ 基础配置文件已创建，跳过配置步骤"
+        return 0
+    fi
+
+    log_step "创建基础配置文件..."
+    create_base_config
+}
+
+setup_systemd_service_repeatable() {
+    if check_systemd_service_setup; then
+        log_success "✅ systemd 服务已配置，跳过服务配置步骤"
+        return 0
+    fi
+
+    log_step "配置 systemd 服务..."
+    setup_systemd_service
+}
+
+start_mihomo_service_repeatable() {
+    if check_mihomo_service_running; then
+        log_success "✅ mihomo 服务正在运行，跳过启动步骤"
+        return 0
+    fi
+
+    log_step "启动 mihomo 服务..."
+    start_mihomo_service
+}
+
+setup_global_proxy_repeatable() {
+    if check_global_proxy_setup; then
+        log_success "✅ 全局代理环境变量已配置，跳过代理配置步骤"
+        return 0
+    fi
+
+    log_step "配置全局代理环境变量..."
+    setup_global_proxy
+}
+
+create_management_scripts_repeatable() {
+    if check_management_scripts_created; then
+        log_success "✅ 管理脚本已创建，跳过脚本创建步骤"
+        return 0
+    fi
+
+    log_step "创建管理脚本..."
+    create_management_scripts
+}
 
 # 检查运行环境
 check_prerequisites() {
@@ -1029,7 +1141,20 @@ validate_config() {
 }
 
 # 获取订阅链接并更新配置
-update_subscription() {
+update_subscription_repeatable() {
+    # 检查是否已有有效的配置文件
+    local config_file="/opt/mihomo/config/config.yaml"
+    if [[ -f "$config_file" ]] && validate_config "$config_file" 2>/dev/null; then
+        log_info "检测到已存在的配置文件"
+        echo
+        read -p "是否要更新 VPN 订阅配置？(y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_success "✅ 跳过订阅更新，使用现有配置"
+            return 0
+        fi
+    fi
+
     log_step "配置 VPN 订阅..."
     
     local subscription_url=""
@@ -1111,7 +1236,6 @@ update_subscription() {
     fi
     
     # 备份现有配置
-    local config_file="/opt/mihomo/config/config.yaml"
     if [[ -f "$config_file" ]]; then
         local backup_file="$config_file.backup.$(date +%Y%m%d_%H%M%S)"
         cp "$config_file" "$backup_file"
@@ -1668,6 +1792,8 @@ main() {
     echo "  • 测试网络连接"
     echo "  • 创建管理脚本"
     echo
+    log_info "注意：此脚本支持重复执行，已安装的组件将被自动跳过"
+    echo
     read -p "确认继续执行？(y/N): " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -1675,18 +1801,18 @@ main() {
         exit 0
     fi
     
-    # 执行安装步骤
+    # 执行安装步骤（可重复执行）
     check_prerequisites
-    install_mihomo_binary
-    setup_directories
-    download_geodata
-    create_base_config
-    update_subscription
-    setup_systemd_service
-    start_mihomo_service
-    setup_global_proxy
+    install_mihomo_binary_repeatable
+    setup_directories_repeatable
+    download_geodata_repeatable
+    create_base_config_repeatable
+    update_subscription_repeatable
+    setup_systemd_service_repeatable
+    start_mihomo_service_repeatable
+    setup_global_proxy_repeatable
     test_network_connectivity
-    create_management_scripts
+    create_management_scripts_repeatable
     show_completion_info
     
     log_success "网络环境初始化完成！"
