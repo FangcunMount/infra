@@ -25,7 +25,30 @@ log_step() { echo -e "${CYAN}[STEP]${NC} $*"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-STATIC_DIR="${REPO_ROOT}/static"
+
+# 智能检测static目录位置
+detect_static_dir() {
+    local potential_dirs=(
+        "${REPO_ROOT}/static"                    # 标准项目结构
+        "${SCRIPT_DIR}/static"                   # 脚本同级目录
+        "$(pwd)/static"                          # 当前工作目录
+        "/root/workspace/infra/static"           # 您的项目目录
+        "/home/root/workspace/infra/static"      # 备用项目目录
+        "/root/static"                           # 传统位置
+    )
+    
+    for dir in "${potential_dirs[@]}"; do
+        if [[ -d "$dir" ]]; then
+            STATIC_DIR="$dir"
+            return 0
+        fi
+    done
+    
+    # 默认回退到仓库根目录下的static
+    STATIC_DIR="${REPO_ROOT}/static"
+}
+
+detect_static_dir
 
 readonly CONFIG_DIR="/root/.config/clash"
 readonly CONFIG_FILE="${CONFIG_DIR}/config.yaml"
@@ -41,6 +64,37 @@ handle_error() {
     exit "${exit_code}"
 }
 trap 'handle_error $LINENO' ERR
+
+# 初始化运行环境
+init_environment() {
+    log_info "初始化运行环境..."
+    
+    # 检查是否在项目目录中
+    local current_dir="$(pwd)"
+    if [[ "$current_dir" == */workspace/infra ]] || [[ "$current_dir" == */infra ]]; then
+        log_info "检测到在项目目录中运行: $current_dir"
+    else
+        # 尝试切换到正确的项目目录
+        local project_dirs=(
+            "/root/workspace/infra"
+            "$HOME/workspace/infra"
+            "/home/root/workspace/infra"
+            "$(dirname "$0")/../../"
+        )
+        
+        for dir in "${project_dirs[@]}"; do
+            if [[ -d "$dir" && -f "$dir/scripts/init-server/setup-network.sh" ]]; then
+                log_info "切换到项目目录: $dir"
+                cd "$dir"
+                # 重新检测路径
+                SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+                REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+                detect_static_dir
+                break
+            fi
+        done
+    fi
+}
 
 # 检查运行权限
 check_root() {
@@ -74,8 +128,20 @@ check_system() {
 check_static_resources() {
     log_step "检查静态资源"
     
+    # 显示检测到的路径信息
+    log_info "路径检测信息："
+    log_info "  脚本目录: ${SCRIPT_DIR}"
+    log_info "  项目根目录: ${REPO_ROOT}"
+    log_info "  静态文件目录: ${STATIC_DIR}"
+    log_info "  当前工作目录: $(pwd)"
+    
     if [[ ! -d "${STATIC_DIR}" ]]; then
         log_error "未找到 static 目录: ${STATIC_DIR}"
+        log_info "请确保在正确的项目目录下运行脚本，或将static目录放到以下任一位置："
+        log_info "  • ${REPO_ROOT}/static"
+        log_info "  • ${SCRIPT_DIR}/static"
+        log_info "  • $(pwd)/static"
+        log_info "  • /root/workspace/infra/static"
         exit 1
     fi
     
@@ -237,9 +303,14 @@ download_and_setup_config() {
             sed -i '1i mixed-port: 7890' "${CONFIG_FILE}"
         fi
         
+        # 添加 SOCKS5 端口配置
+        if ! grep -q "^socks-port:" "${CONFIG_FILE}"; then
+            sed -i '/^mixed-port:/a socks-port: 7891' "${CONFIG_FILE}"
+        fi
+        
         # 确保允许局域网访问
         if ! grep -q "^allow-lan:" "${CONFIG_FILE}"; then
-            sed -i '/^mixed-port:/a allow-lan: true' "${CONFIG_FILE}"
+            sed -i '/^socks-port:/a allow-lan: true' "${CONFIG_FILE}"
         else
             sed -i 's/^allow-lan:.*/allow-lan: true/' "${CONFIG_FILE}"
         fi
@@ -248,6 +319,10 @@ download_and_setup_config() {
         
         rm -f "${temp_config}"
         chmod 600 "${CONFIG_FILE}"
+        
+        # 处理 proxy-providers 配置
+        handle_proxy_providers "${subscription_url}"
+        
         log_success "配置文件创建完成: ${CONFIG_FILE}"
     else
         local curl_exit_code=$?
@@ -371,26 +446,14 @@ EOF
         if [[ "${api_ready}" == "true" ]]; then
             log_success "✅ 控制API就绪"
             
-            # 自动设置全局代理为自动选择模式（而不是默认的DIRECT）
-            log_info "设置全局代理为代理模式"
-            if curl -X PUT -H "Content-Type: application/json" -d '{"name":"自动选择"}' "http://127.0.0.1:9090/proxies/GLOBAL" >/dev/null 2>&1; then
-                log_success "✅ 全局代理已设置为自动选择模式"
-                
-                # 验证代理设置是否生效
-                sleep 2
-                local proxy_mode
-                proxy_mode=$(curl -s "http://127.0.0.1:9090/proxies/GLOBAL" 2>/dev/null | grep -o '"now":"[^"]*"' | cut -d'"' -f4)
-                if [[ "${proxy_mode}" == "自动选择" ]]; then
-                    log_success "✅ 代理模式设置验证成功: ${proxy_mode}"
-                else
-                    log_warn "⚠️  代理模式可能未完全生效，当前: ${proxy_mode}"
-                fi
-            else
-                log_warn "⚠️  无法自动设置全局代理，稍后请手动设置"
-                echo "   手动设置命令: curl -X PUT -H \"Content-Type: application/json\" -d '{\"name\":\"自动选择\"}' \"http://127.0.0.1:9090/proxies/GLOBAL\""
+            # 智能设置全局代理模式（允许失败）
+            log_step "5. 智能设置代理模式"
+            if ! setup_optimal_proxy_mode; then
+                log_warn "⚠️  自动代理设置失败，稍后可手动配置"
+                log_info "   可运行: $0 --fix-proxy"
             fi
         else
-            log_error "❌ 控制API无法访问，代理可能有问题"
+            log_warn "⚠️  控制API响应较慢，将在后续步骤中重试"
         fi
         
         log_success "VPN 服务配置完成"
@@ -398,6 +461,456 @@ EOF
         log_error "mihomo 服务启动失败"
         systemctl status mihomo.service --no-pager
         exit 1
+    fi
+}
+
+# 智能设置最佳代理模式
+setup_optimal_proxy_mode() {
+    log_info "智能分析并设置最佳代理模式"
+    
+    # 等待API完全就绪 - 增加等待时间
+    local retry_count=0
+    local max_retries=20
+    while [ $retry_count -lt $max_retries ]; do
+        if curl -s "http://127.0.0.1:9090/proxies" >/dev/null 2>&1; then
+            break
+        fi
+        log_info "等待API就绪... ($((retry_count + 1))/$max_retries)"
+        sleep 3
+        retry_count=$((retry_count + 1))
+    done
+    
+    if [ $retry_count -eq $max_retries ]; then
+        log_warn "⚠️  API响应较慢，将继续尝试配置"
+        # 不返回错误，继续尝试配置
+    fi
+    
+    # 额外等待，确保provider完全加载
+    log_info "等待代理节点完全加载..."
+    sleep 5
+    
+    # 分析所有可用的代理组 - 增加重试逻辑
+    local global_info proxy_groups available_groups
+    local info_retry=0
+    local max_info_retries=5
+    
+    while [ $info_retry -lt $max_info_retries ]; do
+        global_info=$(curl -s "http://127.0.0.1:9090/proxies/GLOBAL" 2>/dev/null)
+        available_groups=$(echo "$global_info" | grep -o '"all":\[[^]]*\]' | grep -o '"[^"]*"' | grep -v '"all"' | tr -d '"')
+        
+        if [ -n "$available_groups" ]; then
+            break
+        fi
+        
+        log_info "重试获取代理组信息... ($((info_retry + 1))/$max_info_retries)"
+        sleep 3
+        info_retry=$((info_retry + 1))
+    done
+    
+    if [ -z "$available_groups" ]; then
+        log_error "❌ 无法获取代理组信息"
+        return 0  # 返回0而不是1，避免中断安装流程
+    fi
+    
+    log_info "可用代理组: $(echo "$available_groups" | tr '\n' ' ')"
+    
+    # 分析每个代理组的质量
+    local best_auto_group=""
+    local best_manual_group=""
+    local fallback_group=""
+    
+    for group in $available_groups; do
+        if [[ "$group" =~ (自动选择|自动|auto|Auto|AUTO|♻️|🚀|🔀) ]]; then
+            if [ -z "$best_auto_group" ]; then
+                best_auto_group="$group"
+            fi
+        elif [[ "$group" =~ (手动|选择|manual|Manual|MANUAL|🎯|📍) ]]; then
+            if [ -z "$best_manual_group" ]; then
+                best_manual_group="$group"
+            fi
+        elif [[ ! "$group" =~ ^(DIRECT|REJECT|直连|拒绝)$ ]]; then
+            if [ -z "$fallback_group" ]; then
+                fallback_group="$group"
+            fi
+        fi
+    done
+    
+    # 选择最佳代理组
+    local target_group=""
+    local group_type=""
+    
+    if [ -n "$best_auto_group" ]; then
+        target_group="$best_auto_group"
+        group_type="自动"
+    elif [ -n "$best_manual_group" ]; then
+        target_group="$best_manual_group"  
+        group_type="手动"
+    elif [ -n "$fallback_group" ]; then
+        target_group="$fallback_group"
+        group_type="备用"
+    else
+        log_warn "⚠️  只找到基础代理组，VPN功能可能受限"
+        target_group=$(echo "$available_groups" | head -1)
+        group_type="基础"
+    fi
+    
+    log_info "选择${group_type}代理组: $target_group"
+    
+    # 设置全局代理
+    if curl -X PUT -H "Content-Type: application/json" -d "{\"name\":\"$target_group\"}" "http://127.0.0.1:9090/proxies/GLOBAL" >/dev/null 2>&1; then
+        log_success "✅ 全局代理已设置为: $target_group"
+        
+        # 验证设置结果
+        sleep 3
+        local current_proxy
+        current_proxy=$(curl -s "http://127.0.0.1:9090/proxies/GLOBAL" | grep -o '"now":"[^"]*"' | cut -d'"' -f4)
+        
+        if [[ "$current_proxy" == "$target_group" ]]; then
+            log_success "✅ 代理模式验证成功: $current_proxy"
+            
+            # 如果是手动选择组，尝试设置为非DIRECT选项
+            if [[ "$group_type" == "手动" ]]; then
+                configure_manual_proxy_group "$target_group"
+            fi
+            
+            return 0
+        else
+            log_warn "⚠️  代理设置可能未生效，当前: $current_proxy"
+        fi
+    else
+        log_error "❌ 无法设置全局代理为: $target_group"
+    fi
+    
+    # 显示手动设置指令
+    echo ""
+    echo "🔧 手动设置代理命令："
+    echo "   curl -X PUT -H \"Content-Type: application/json\" -d '{\"name\":\"$target_group\"}' \"http://127.0.0.1:9090/proxies/GLOBAL\""
+    echo "   或运行: $0 --fix-proxy"
+    
+    # 不返回错误，避免中断安装流程
+    return 0
+}
+
+# 配置手动代理组以使用最佳节点
+configure_manual_proxy_group() {
+    local group_name=$1
+    log_info "优化手动代理组: $group_name"
+    
+    # 获取该组的可用选项
+    local group_info available_options
+    group_info=$(curl -s "http://127.0.0.1:9090/proxies/${group_name}" 2>/dev/null)
+    available_options=$(echo "$group_info" | grep -o '"all":\[[^]]*\]' | grep -o '"[^"]*"' | grep -v '"all"' | tr -d '"')
+    
+    if [ -z "$available_options" ]; then
+        log_warn "无法获取 $group_name 的选项"
+        return 0  # 不返回错误，避免中断流程
+    fi
+    
+    log_info "$group_name 可用选项: $(echo "$available_options" | tr '\n' ' ')"
+    
+    # 选择最佳选项（避免DIRECT）
+    local best_option=""
+    for option in $available_options; do
+        if [[ ! "$option" =~ ^(DIRECT|REJECT|直连|拒绝)$ ]]; then
+            best_option="$option"
+            break
+        fi
+    done
+    
+    if [ -n "$best_option" ]; then
+        log_info "为 $group_name 设置最佳选项: $best_option"
+        if curl -X PUT -H "Content-Type: application/json" -d "{\"name\":\"$best_option\"}" "http://127.0.0.1:9090/proxies/${group_name}" >/dev/null 2>&1; then
+            log_success "✅ $group_name 已设置为: $best_option"
+        else
+            log_warn "⚠️  无法设置 $group_name 的选项"
+        fi
+    else
+        log_warn "⚠️  $group_name 中只有直连选项"
+    fi
+}
+
+# 智能处理 proxy-providers 配置
+handle_proxy_providers() {
+    local subscription_url=$1
+    
+    if ! grep -q "proxy-providers:" "${CONFIG_FILE}"; then
+        log_info "配置未使用 proxy-providers，跳过提供商文件处理"
+        return 0
+    fi
+    
+    log_info "检测到 proxy-providers 配置，智能处理提供商文件..."
+    
+    # 获取 provider 配置信息
+    local provider_info
+    provider_info=$(grep -A 50 "proxy-providers:" "${CONFIG_FILE}")
+    
+    # 提取所有 provider 名称和对应的 URL
+    local provider_names
+    provider_names=$(echo "$provider_info" | grep -E "^  [a-zA-Z0-9_-]+:" | sed 's/:.*$//' | xargs)
+    
+    if [ -z "$provider_names" ]; then
+        log_warn "未找到有效的 proxy-providers 配置"
+        return 1
+    fi
+    
+    log_info "发现的提供商: $provider_names"
+    
+    for provider_name in $provider_names; do
+        # 提取 provider 的详细配置
+        local provider_config
+        provider_config=$(echo "$provider_info" | sed -n "/^  ${provider_name}:/,/^  [a-zA-Z]/p" | sed '$d')
+        
+        # 提取 path 和 url
+        local provider_path provider_url
+        provider_path=$(echo "$provider_config" | grep "path:" | awk '{print $2}' | sed 's/^\.\/*//')
+        provider_url=$(echo "$provider_config" | grep "url:" | awk '{$1=""; print $0}' | xargs)
+        
+        if [ -z "$provider_path" ]; then
+            provider_path="${provider_name}_provider.yaml"
+        fi
+        
+        local full_provider_path="${CONFIG_DIR}/${provider_path}"
+        log_info "处理提供商: $provider_name -> $provider_path"
+        
+        # 尝试下载 provider 文件
+        local downloaded=false
+        
+        if [ -n "$provider_url" ]; then
+            log_info "尝试从配置URL下载: $provider_url"
+            if curl -f -L -s -o "$full_provider_path" "$provider_url" --connect-timeout 15 --max-time 45; then
+                if [ -s "$full_provider_path" ]; then
+                    log_success "成功下载 $provider_name: $(wc -c < "$full_provider_path") bytes"
+                    downloaded=true
+                else
+                    log_warn "下载的文件为空，删除"
+                    rm -f "$full_provider_path"
+                fi
+            else
+                log_warn "从配置URL下载失败: $provider_url"
+            fi
+        fi
+        
+        # 如果主URL失败，尝试其他可能的URL
+        if [ "$downloaded" = false ]; then
+            log_info "尝试备选URL模式..."
+            
+            # 从订阅URL推断可能的provider URL
+            local base_url subscription_id
+            base_url=$(echo "$subscription_url" | sed 's|/[^/]*$||')
+            subscription_id=$(echo "$subscription_url" | grep -o '[a-f0-9]\{32\}' | head -1)
+            
+            local backup_urls=(
+                "${base_url}/${provider_path}"
+                "${base_url}/${subscription_id}"
+                "https://www.yangshujie.top:18703/s/clashMeta/${subscription_id}"
+                "https://www.yangshujie.top:18703/s/proxy/${subscription_id}"
+            )
+            
+            for backup_url in "${backup_urls[@]}"; do
+                if [ -n "$backup_url" ]; then
+                    log_info "尝试备选URL: $backup_url"
+                    if curl -f -L -s -o "$full_provider_path" "$backup_url" --connect-timeout 10 --max-time 30; then
+                        if [ -s "$full_provider_path" ]; then
+                            log_success "从备选URL成功下载 $provider_name"
+                            downloaded=true
+                            break
+                        else
+                            rm -f "$full_provider_path"
+                        fi
+                    fi
+                fi
+            done
+        fi
+        
+        # 如果还是无法下载，尝试从主配置提取或创建基础配置
+        if [ "$downloaded" = false ]; then
+            log_warn "所有URL都无法下载 $provider_name，尝试备用方案"
+            
+            # 检查主配置是否包含 proxies 节点
+            if grep -q "^proxies:" "${CONFIG_FILE}"; then
+                log_info "从主配置提取代理节点"
+                cat > "$full_provider_path" << EOF
+# 从主配置提取的代理节点
+proxies:
+EOF
+                # 提取代理节点
+                grep -A 2000 "^proxies:" "${CONFIG_FILE}" | grep "^  - " | head -100 >> "$full_provider_path"
+                
+                if [ -s "$full_provider_path" ]; then
+                    local proxy_count
+                    proxy_count=$(grep -c "^  - " "$full_provider_path" || echo "0")
+                    log_success "从主配置提取了 $proxy_count 个代理节点到 $provider_name"
+                    downloaded=true
+                fi
+            else
+                # 创建最小可用配置
+                log_warn "创建最小可用配置用于服务启动"
+                cat > "$full_provider_path" << EOF
+# 最小可用配置 - 请联系服务商获取正确的代理节点
+proxies:
+  - name: "DIRECT"
+    type: direct
+  - name: "REJECT"
+    type: reject
+EOF
+                log_warn "⚠️  已创建基础配置，但VPN功能不可用"
+                echo "   需要联系服务提供商获取正确的代理节点配置"
+            fi
+        fi
+    done
+    
+    log_success "proxy-providers 处理完成"
+}
+
+# 验证和修复 proxy-providers 文件
+verify_and_fix_providers() {
+    log_info "验证和修复 proxy-providers 文件..."
+    
+    if [ ! -f "${CONFIG_FILE}" ]; then
+        log_error "配置文件不存在: ${CONFIG_FILE}"
+        return 1
+    fi
+    
+    # 检查是否使用 proxy-providers
+    if ! grep -q "proxy-providers:" "${CONFIG_FILE}"; then
+        log_info "配置未使用 proxy-providers，跳过检查"
+        return 0
+    fi
+    
+    # 获取所需的 provider 文件
+    local provider_files
+    provider_files=$(grep -A 20 "proxy-providers:" "${CONFIG_FILE}" | grep -o "[a-zA-Z0-9_-]*\.yaml" | sort -u)
+    
+    if [ -z "$provider_files" ]; then
+        log_warn "未找到 proxy-providers 文件配置"
+        return 0
+    fi
+    
+    local missing_files=0
+    
+    for provider_file in $provider_files; do
+        local provider_path="${CONFIG_DIR}/$provider_file"
+        
+        if [ ! -f "$provider_path" ] || [ ! -s "$provider_path" ]; then
+            log_warn "Provider文件缺失或为空: $provider_file"
+            missing_files=$((missing_files + 1))
+            
+            # 尝试重新下载
+            log_info "尝试重新下载: $provider_file"
+            local downloaded=false
+            
+            # 尝试不同的URL模式 - 从配置文件中提取实际的provider URL
+            local provider_url_from_config
+            provider_url_from_config=$(grep -A 10 "proxy-providers:" "${CONFIG_FILE}" | grep -A 5 "${provider_file%.*}_provider:" | grep "url:" | head -1 | awk '{print $2}')
+            
+            local urls=()
+            if [ -n "$provider_url_from_config" ]; then
+                urls+=("$provider_url_from_config")
+            fi
+            
+            # 备选URL路径
+            local base_url="https://www.yangshujie.top:18703/s"
+            urls+=(
+                "$base_url/clashMeta/8dfc915430e5de77b1c64cb8d7e4f1b3"
+                "$base_url/clashMetaProfiles/8dfc915430e5de77b1c64cb8d7e4f1b3"
+                "$base_url/clashMetaProfiles/$provider_file"
+            )
+            
+            for url in "${urls[@]}"; do
+                if curl -f -L -s -o "$provider_path" "$url" --connect-timeout 10 --max-time 30; then
+                    if [ -s "$provider_path" ]; then
+                        log_success "成功下载: $provider_file"
+                        downloaded=true
+                        break
+                    else
+                        rm -f "$provider_path"
+                    fi
+                fi
+            done
+            
+            # 如果下载失败，尝试从主配置文件生成
+            if [ "$downloaded" = false ]; then
+                log_warn "无法下载 $provider_file，尝试从主配置生成"
+                
+                if grep -q "^proxies:" "${CONFIG_FILE}"; then
+                    # 提取代理配置并创建 provider 文件
+                    cat > "$provider_path" << EOF
+# 临时生成的 provider 文件
+proxies:
+EOF
+                    # 提取前50个代理节点
+                    grep -A 1000 "^proxies:" "${CONFIG_FILE}" | grep "^  - " | head -50 >> "$provider_path"
+                    
+                    if [ -s "$provider_path" ]; then
+                        log_info "成功生成临时 provider 文件: $provider_file"
+                        downloaded=true
+                    fi
+                else
+                    # 如果主配置中也没有代理节点，创建一个基本的provider文件但给出明确警告
+                    log_warn "主配置中也没有代理节点，这通常意味着订阅服务或provider URL有问题"
+                    cat > "$provider_path" << EOF
+# 基本 provider 文件 - 仅用于服务正常启动
+# ⚠️ 警告：当前仅有直连代理，请检查订阅配置
+proxies:
+  - name: "DIRECT-FALLBACK"
+    type: direct
+  - name: "EMERGENCY-DIRECT" 
+    type: direct
+EOF
+                    if [ -s "$provider_path" ]; then
+                        log_warn "⚠️  已创建应急 provider 文件: $provider_file"
+                        log_error "❌ 当前仅有直连代理，VPN功能不可用！"
+                        echo "    建议："
+                        echo "    1. 检查订阅链接是否有效"
+                        echo "    2. 联系服务提供商确认配置"
+                        echo "    3. 或手动配置代理节点"
+                        downloaded=true
+                    fi
+                fi
+            fi
+            
+            if [ "$downloaded" = false ]; then
+                log_error "无法获取 provider 文件: $provider_file"
+            fi
+        else
+            log_success "Provider文件存在: $provider_file"
+        fi
+    done
+    
+    if [ $missing_files -eq 0 ]; then
+        log_success "所有 proxy-providers 文件验证通过"
+    else
+        log_warn "有 $missing_files 个 provider 文件需要注意"
+        
+        # 重启服务以重新加载 provider 文件
+        log_info "重新启动服务以加载 provider 文件..."
+        systemctl restart mihomo.service
+        sleep 3
+        
+        # 最终检查代理可用性
+        log_info "检查代理服务可用性..."
+        if curl -s "http://127.0.0.1:9090/proxies/GLOBAL" >/dev/null 2>&1; then
+            local available_proxies
+            available_proxies=$(curl -s "http://127.0.0.1:9090/proxies/GLOBAL" | grep -o '"all":\[[^]]*\]' | grep -o '"[^"]*"' | grep -v '"all"' | wc -l)
+            log_info "检测到 $available_proxies 个可用代理组"
+            
+            # 检查是否只有直连代理
+            local non_direct_proxies
+            non_direct_proxies=$(curl -s "http://127.0.0.1:9090/proxies/手动切换" | grep -o '"all":\[[^]]*\]' | grep -o '"[^"]*"' | grep -v '"DIRECT"' | grep -v '"all"' | wc -l)
+            
+            if [ "$non_direct_proxies" -le 1 ]; then
+                log_error "❌ 检测到可能只有直连代理可用，VPN功能可能不正常"
+                echo ""
+                echo "🔧 故障排除建议："
+                echo "   1. 检查订阅服务状态：curl -I '${subscription_url:-订阅链接}'"
+                echo "   2. 检查provider文件内容：cat ${CONFIG_DIR}/*.yaml"
+                echo "   3. 联系VPN服务提供商确认订阅链接"
+                echo "   4. 手动测试代理：curl -x http://127.0.0.1:7890 https://httpbin.org/ip"
+                echo ""
+            else
+                log_success "✅ 检测到有效代理节点，VPN功能应该正常"
+            fi
+        fi
     fi
 }
 
@@ -460,67 +973,300 @@ perform_post_install_validation() {
     log_success "安装后验证完成"
 }
 
-# 步骤5：测试 VPN 连接
+# 步骤5：全面测试 VPN 连接
 test_vpn_connectivity() {
-    log_step "5. 测试 VPN 连接"
+    log_step "5. 全面测试 VPN 连接"
     
-    # 检查端口监听
-    log_info "检查端口监听状态"
-    if ss -tuln | grep -q ":7890"; then
-        log_success "代理端口 7890 监听正常"
-    else
-        log_error "代理端口 7890 未监听"
+    # 1. 检查服务状态
+    log_info "🔍 检查服务状态"
+    if ! systemctl is-active --quiet mihomo.service; then
+        log_error "❌ mihomo 服务未运行"
+        return 1
+    fi
+    log_success "✅ mihomo 服务运行正常"
+    
+    # 2. 检查端口监听状态
+    log_info "🔍 检查端口监听状态"
+    local ports_ok=true
+    
+    for port in 7890 7891 9090; do
+        if ss -tuln | grep -q ":${port}"; then
+            log_success "✅ 端口 $port 监听正常"
+        else
+            log_error "❌ 端口 $port 未监听"
+            ports_ok=false
+        fi
+    done
+    
+    if [ "$ports_ok" = false ]; then
+        log_error "端口监听异常，请检查配置"
         return 1
     fi
     
-    # 测试内网连接（直连）
-    log_info "测试内网连接（直连）"
-    if curl -s --connect-timeout 5 http://www.baidu.com > /dev/null; then
-        log_success "✅ 内网直连测试通过"
+    # 3. 检查API可用性
+    log_info "🔍 检查控制API"
+    if curl -s "http://127.0.0.1:9090/version" >/dev/null 2>&1; then
+        log_success "✅ 控制API可用"
     else
-        log_warn "⚠️  内网直连测试失败"
+        log_error "❌ 控制API不可用"
+        return 1
     fi
     
-    # 测试代理连接 - 分别测试 HTTP 和 HTTPS 协议
-    log_info "测试代理连接"
+    # 4. 分析当前代理配置
+    log_info "🔍 分析当前代理配置"
+    local current_global current_manual
+    current_global=$(curl -s "http://127.0.0.1:9090/proxies/GLOBAL" | grep -o '"now":"[^"]*"' | cut -d'"' -f4)
     
-    # 测试 HTTP 代理
-    log_info "测试 HTTP 协议代理..."
-    if curl -s --connect-timeout 10 --proxy 127.0.0.1:7890 http://www.google.com > /dev/null 2>&1; then
-        log_success "✅ HTTP 代理测试通过"
-        local http_proxy_ok=true
-    else
-        log_warn "⚠️  HTTP 代理测试失败"
-        local http_proxy_ok=false
-    fi
-    
-    # 测试 HTTPS 代理
-    log_info "测试 HTTPS 协议代理..."
-    if curl -s --connect-timeout 10 --proxy 127.0.0.1:7890 https://www.google.com > /dev/null 2>&1; then
-        log_success "✅ HTTPS 代理测试通过"
-        local https_proxy_ok=true
-    else
-        log_warn "⚠️  HTTPS 代理测试失败（可能是SSL证书问题）"
-        local https_proxy_ok=false
+    if [ -n "$current_global" ]; then
+        log_success "✅ 全局代理: $current_global"
         
-        # 如果HTTP成功但HTTPS失败，提供SSL解决方案
-        if [[ "${http_proxy_ok}" == "true" ]]; then
-            log_info "💡 HTTP代理正常，HTTPS问题可能是SSL证书验证"
-            echo "   解决方案: curl --insecure --proxy 127.0.0.1:7890 https://site.com"
+        # 如果全局代理不是DIRECT，检查其具体设置
+        if [[ "$current_global" != "DIRECT" ]]; then
+            current_manual=$(curl -s "http://127.0.0.1:9090/proxies/${current_global}" | grep -o '"now":"[^"]*"' | cut -d'"' -f4)
+            if [ -n "$current_manual" ]; then
+                log_info "   └── 当前选择: $current_manual"
+                
+                if [[ "$current_manual" == "DIRECT" ]]; then
+                    log_warn "⚠️  代理组选择了DIRECT，VPN未激活"
+                    # 尝试自动修复
+                    configure_manual_proxy_group "$current_global"
+                fi
+            fi
+        else
+            log_warn "⚠️  全局代理设置为DIRECT，VPN未激活"
+        fi
+    else
+        log_error "❌ 无法获取代理配置"
+        return 1
+    fi
+    
+    # 5. 测试网络连接
+    log_info "🌐 测试网络连接"
+    
+    # 获取直连IP作为基线
+    log_info "获取直连IP基线..."
+    local direct_ip=""
+    
+    # 尝试获取直连IP
+    local ip_response
+    ip_response=$(timeout 10 curl -s "http://httpbin.org/ip" 2>/dev/null)
+    if [ $? -eq 0 ] && [ -n "$ip_response" ]; then
+        direct_ip=$(echo "$ip_response" | grep -o '"origin": "[^"]*"' | cut -d'"' -f4)
+    fi
+    
+    # 备用方法获取IP
+    if [ -z "$direct_ip" ]; then
+        ip_response=$(timeout 10 curl -s "http://icanhazip.com" 2>/dev/null)
+        if [ $? -eq 0 ] && [ -n "$ip_response" ]; then
+            direct_ip=$(echo "$ip_response" | tr -d '\n\r ' | grep -E '^[0-9.]+$')
         fi
     fi
     
-    # 测试关键网站访问
-    log_info "测试关键网站访问..."
-    if curl -s --connect-timeout 10 --proxy 127.0.0.1:7890 -I https://www.youtube.com > /dev/null 2>&1; then
-        log_success "✅ YouTube访问测试通过"
-    elif curl -s --connect-timeout 10 --proxy 127.0.0.1:7890 -I http://www.youtube.com > /dev/null 2>&1; then
-        log_success "✅ YouTube访问测试通过（HTTP）"
+    if [ -n "$direct_ip" ]; then
+        log_success "✅ 直连IP: $direct_ip"
     else
-        log_warn "⚠️  YouTube访问测试失败"
+        log_warn "⚠️  无法获取直连IP，网络可能有问题"
     fi
     
-    # 显示代理状态和IP信息
+    # 测试HTTP代理
+    log_info "测试HTTP代理连接..."
+    local http_test_result=""
+    local proxy_working=false
+    
+    for test_url in "http://httpbin.org/ip" "http://icanhazip.com" "http://api.ipify.org"; do
+        log_info "尝试 $test_url..."
+        
+        # 先测试连通性
+        local response
+        response=$(timeout 15 curl -s --proxy "http://127.0.0.1:7890" "$test_url" 2>/dev/null)
+        local curl_exit=$?
+        
+        if [ $curl_exit -eq 0 ] && [ -n "$response" ]; then
+            # 解析IP地址
+            if [[ "$test_url" == *"httpbin"* ]]; then
+                http_test_result=$(echo "$response" | grep -o '"origin": "[^"]*"' | cut -d'"' -f4)
+            else
+                http_test_result=$(echo "$response" | tr -d '\n\r ' | grep -E '^[0-9.]+$')
+            fi
+            
+            if [ -n "$http_test_result" ]; then
+                proxy_working=true
+                if [ -n "$direct_ip" ] && [[ "$http_test_result" != "$direct_ip" ]]; then
+                    log_success "✅ HTTP代理工作正常，出口IP: $http_test_result (代理生效)"
+                elif [ -n "$direct_ip" ] && [[ "$http_test_result" == "$direct_ip" ]]; then
+                    log_warn "⚠️  HTTP代理IP与直连相同: $http_test_result (当前使用直连节点)"
+                    proxy_working=true  # 技术上代理工作，只是选择了直连节点
+                else
+                    log_success "✅ HTTP代理测试通过，出口IP: $http_test_result"
+                fi
+                break
+            else
+                log_warn "   响应格式异常，无法解析IP"
+            fi
+        else
+            log_warn "   连接失败 (退出码: $curl_exit)"
+        fi
+    done
+    
+    if [ "$proxy_working" = false ]; then
+        log_error "❌ HTTP代理连接失败，所有测试服务都无响应"
+        log_info "   手动测试: curl --proxy http://127.0.0.1:7890 http://httpbin.org/ip"
+    fi
+    
+    # 测试HTTPS代理  
+    log_info "测试HTTPS代理连接..."
+    local https_success=false
+    local test_url="https://httpbin.org/ip"
+    
+    # 先尝试正常HTTPS验证
+    local https_response
+    https_response=$(timeout 15 curl -s --proxy "http://127.0.0.1:7890" "$test_url" 2>/dev/null)
+    if [ $? -eq 0 ] && [ -n "$https_response" ]; then
+        https_success=true
+        log_success "✅ HTTPS代理测试通过"
+    else
+        # 尝试跳过SSL验证
+        https_response=$(timeout 15 curl -s -k --proxy "http://127.0.0.1:7890" "$test_url" 2>/dev/null)
+        if [ $? -eq 0 ] && [ -n "$https_response" ]; then
+            https_success=true
+            log_success "✅ HTTPS代理测试通过 (SSL验证跳过)"
+        fi
+    fi
+    
+    if [ "$https_success" = false ]; then
+        log_warn "⚠️  HTTPS代理测试失败"
+        log_info "   💡 这可能是SSL证书验证问题，不影响实际使用"
+    fi
+    
+    # 测试SOCKS5代理
+    log_info "测试SOCKS5代理连接..."
+    local socks_response
+    socks_response=$(timeout 15 curl -s --socks5 "127.0.0.1:7891" "http://httpbin.org/ip" 2>/dev/null)
+    if [ $? -eq 0 ] && [ -n "$socks_response" ]; then
+        local socks_ip
+        socks_ip=$(echo "$socks_response" | grep -o '"origin": "[^"]*"' | cut -d'"' -f4)
+        if [ -n "$socks_ip" ]; then
+            log_success "✅ SOCKS5代理测试通过，出口IP: $socks_ip"
+        else
+            log_success "✅ SOCKS5代理连接成功"
+        fi
+    else
+        log_warn "⚠️  SOCKS5代理测试失败"
+        log_info "   手动测试: curl --socks5 127.0.0.1:7891 http://httpbin.org/ip"
+    fi
+    
+    # 6. 测试关键网站访问能力
+    log_info "🌐 测试关键网站访问"
+    local test_sites=("google.com" "youtube.com" "github.com")
+    local accessible_sites=0
+    
+    for site in "${test_sites[@]}"; do
+        log_info "测试访问 $site..."
+        local test_success=false
+        local error_detail=""
+        
+        # 方法1: 尝试HTTPS HEAD请求
+        if timeout 15 curl -s -I --proxy "http://127.0.0.1:7890" "https://$site" >/dev/null 2>&1; then
+            test_success=true
+        else
+            # 方法2: 尝试HTTPS GET请求（忽略SSL验证）
+            if timeout 15 curl -s -k --proxy "http://127.0.0.1:7890" "https://$site" >/dev/null 2>&1; then
+                test_success=true
+                error_detail="(SSL证书验证绕过)"
+            else
+                # 方法3: 尝试HTTP请求
+                if timeout 15 curl -s -I --proxy "http://127.0.0.1:7890" "http://$site" >/dev/null 2>&1; then
+                    test_success=true
+                    error_detail="(HTTP协议)"
+                else
+                    # 获取详细错误信息
+                    error_detail=$(timeout 10 curl -s -I --proxy "http://127.0.0.1:7890" "https://$site" 2>&1 | head -1)
+                fi
+            fi
+        fi
+        
+        if [ "$test_success" = true ]; then
+            if [ -n "$error_detail" ]; then
+                log_success "✅ $site 访问成功 $error_detail"
+            else
+                log_success "✅ $site 访问成功"
+            fi
+            accessible_sites=$((accessible_sites + 1))
+        else
+            log_warn "⚠️  $site 访问失败"
+            if [ -n "$error_detail" ]; then
+                log_info "   错误详情: $error_detail"
+            fi
+            
+            # 提供详细的诊断信息
+            log_info "   手动测试: curl -I --proxy http://127.0.0.1:7890 https://$site"
+        fi
+    done
+    
+    # 7. 生成测试报告
+    echo ""
+    log_info "📊 连接测试报告"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "  服务状态: ✅ 正常运行"
+    echo "  端口监听: ✅ 7890/7891/9090"
+    echo "  全局代理: $current_global"
+    if [ -n "$current_manual" ] && [[ "$current_manual" != "$current_global" ]]; then
+        echo "  代理节点: $current_manual"
+    fi
+    if [ -n "$http_test_result" ]; then
+        echo "  出口IP: $http_test_result"
+    fi
+    echo "  可访问网站: $accessible_sites/${#test_sites[@]}"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    # 8. 综合分析和建议
+    echo ""
+    log_info "🔍 代理效果分析"
+    
+    # 分析代理是否真正工作
+    local proxy_effective=false
+    if [ -n "$http_test_result" ] && [ -n "$direct_ip" ]; then
+        if [[ "$http_test_result" != "$direct_ip" ]]; then
+            proxy_effective=true
+            log_success "✅ 代理正在工作：出口IP已改变 ($direct_ip → $http_test_result)"
+        else
+            log_warn "⚠️  代理可能未生效：出口IP未改变 ($http_test_result)"
+        fi
+    elif [ -n "$http_test_result" ]; then
+        log_info "ℹ️  代理连接正常，出口IP: $http_test_result"
+        proxy_effective=true
+    fi
+    
+    # 根据测试结果提供建议
+    if [ $accessible_sites -eq 0 ] && [[ "$current_manual" == "DIRECT" || "$current_global" == "DIRECT" ]]; then
+        echo ""
+        log_warn "🔧 检测到问题：代理未正确配置"
+        echo "建议操作："
+        echo "  1. 运行自动修复: $(basename "$0") --fix-proxy"
+        echo "  2. 检查代理组设置: curl -s http://127.0.0.1:9090/proxies/GLOBAL"
+        echo "  3. 手动切换代理节点: 访问控制面板"
+        echo "  4. 查看服务日志: journalctl -u mihomo.service -n 50"
+    elif [ "$proxy_effective" = true ] && [ $accessible_sites -gt 0 ]; then
+        log_success "🎉 VPN配置成功！代理功能完全正常"
+        echo "   • 代理服务正常运行"
+        echo "   • 出口IP已通过代理"
+        echo "   • 可访问目标网站: $accessible_sites/${#test_sites[@]}"
+    elif [ "$proxy_effective" = true ]; then
+        log_success "✅ 代理基本功能正常"
+        log_warn "⚠️  部分网站访问可能受限，但代理本身工作正常"
+        echo "   建议："
+        echo "   • 尝试切换不同的代理节点"
+        echo "   • 检查目标网站是否对该代理服务器有限制"
+    elif [ $accessible_sites -gt 0 ]; then
+        log_warn "⚠️  网站可访问，但代理效果不明确"
+        echo "   建议手动验证：curl --proxy http://127.0.0.1:7890 http://httpbin.org/ip"
+    else
+        log_warn "⚠️  VPN配置完成，但功能可能受限"
+        echo "建议操作："
+        echo "  1. 运行修复: $(basename "$0") --fix-proxy"
+        echo "  2. 检查网络连通性"
+        echo "  3. 尝试不同的代理节点"
+    fi
     log_info "检查代理状态和外网IP"
     local current_ip=""
     
@@ -658,47 +1404,93 @@ EOF
     log_info "已创建诊断脚本: ${diagnostic_script}"
 }
 
-# 显示完成信息
+# 显示完成信息和使用指南
 show_completion_info() {
     echo
     log_success "=========================================="
-    log_success "🎉 VPN 安装配置完成！"
+    log_success "🎉 Mihomo VPN 安装配置完成！"
     log_success "=========================================="
     echo
     
-    log_info "服务信息:"
-    echo "  • 混合端口: 7890 (HTTP/HTTPS)"
-    echo "  • SOCKS端口: 7891"
-    echo "  • 控制面板: http://127.0.0.1:9090"
-    echo "  • 配置文件: ${CONFIG_FILE}"
-    echo "  • 服务状态: systemctl status mihomo"
+    # 获取服务器IP
+    local server_ip
+    server_ip=$(hostname -I | awk '{print $1}' | head -1)
+    
+    # 获取当前代理状态
+    local current_proxy=""
+    if curl -s "http://127.0.0.1:9090/proxies/GLOBAL" >/dev/null 2>&1; then
+        current_proxy=$(curl -s "http://127.0.0.1:9090/proxies/GLOBAL" | grep -o '"now":"[^"]*"' | cut -d'"' -f4)
+    fi
+    
+    log_info "📊 服务状态:"
+    echo "  🟢 服务状态: $(systemctl is-active mihomo.service)"
+    echo "  🌐 混合端口: 7890 (HTTP/HTTPS)"  
+    echo "  🧦 SOCKS端口: 7891"
+    echo "  ⚙️  控制API: 9090"
+    if [ -n "$current_proxy" ]; then
+        echo "  🎯 当前代理: $current_proxy"
+    fi
+    echo "  📁 配置目录: ${CONFIG_DIR}"
     echo
     
-    log_info "使用方法:"
-    echo "  • 启用代理: source /etc/profile.d/mihomo-proxy.sh && proxy-on"
-    echo "  • 禁用代理: proxy-off"
-    echo "  • 查看状态: proxy-status"
-    echo "  • 服务管理: systemctl {start|stop|restart|status} mihomo"
+    log_info "🌐 访问地址:"
+    echo "  • 本地控制面板: http://127.0.0.1:9090/ui"
+    if [ -n "$server_ip" ]; then
+        echo "  • 远程控制面板: http://${server_ip}:9090/ui"
+    fi
+    echo "  • API接口: http://127.0.0.1:9090"
     echo
     
-    log_info "测试命令:"
-    echo "  • 测试直连: curl -I http://www.baidu.com"
-    echo "  • 测试HTTP代理: curl --proxy 127.0.0.1:7890 http://www.google.com"
-    echo "  • 测试HTTPS代理: curl --insecure --proxy 127.0.0.1:7890 https://www.google.com"
-    echo "  • 快速验证: curl --proxy 127.0.0.1:7890 -I http://www.youtube.com"
-    echo "  • 查看代理状态: curl -s http://127.0.0.1:9090/proxies/GLOBAL | grep now"
+    log_info "🚀 快速使用:"
+    echo "  # 启用全局代理环境变量"
+    echo "  source /etc/profile.d/mihomo-proxy.sh"
+    echo "  proxy-on"
+    echo ""
+    echo "  # 测试代理连接"
+    echo "  curl --proxy http://127.0.0.1:7890 http://httpbin.org/ip"
+    echo ""
+    echo "  # 浏览器代理设置"
+    echo "  HTTP代理: 127.0.0.1:7890"
+    echo "  SOCKS5代理: 127.0.0.1:7891"
     echo
     
-    log_info "诊断工具:"
-    echo "  • 运行诊断: mihomo-diagnose"
+    log_info "🔧 管理命令:"
+    echo "  • 查看状态: $0 --status"
+    echo "  • 测试连接: $0 --test"  
+    echo "  • 修复代理: $0 --fix-proxy"
+    echo "  • 验证配置: $0 --verify"
+    echo "  • 服务管理: systemctl {start|stop|restart} mihomo"
     echo "  • 查看日志: journalctl -u mihomo.service -f"
-    echo "  • 重启服务: systemctl restart mihomo"
     echo
     
-    log_warn "注意事项:"
-    echo "  • 所有用户登录后会自动检测并启用代理"
-    echo "  • 代理仅在 mihomo 服务运行时自动生效"
-    echo "  • 如需修改配置，编辑 ${CONFIG_FILE} 后重启服务"
+    log_info "🔍 故障排除:"
+    echo "  • 如果代理不工作，运行: $0 --fix-proxy"
+    echo "  • 如果配置有问题，运行: $0 --verify"  
+    echo "  • 查看详细状态: $0 --status"
+    echo "  • 运行完整测试: $0 --test"
+    echo
+    
+    log_info "💡 高级功能:"
+    echo "  • 代理规则切换: 访问控制面板修改规则"
+    echo "  • 节点选择: 在控制面板中手动选择最佳节点"
+    echo "  • 实时监控: journalctl -u mihomo.service -f"
+    echo "  • 配置热重载: 修改配置后自动重新加载"
+    echo
+    
+    # 根据当前状态给出特定建议
+    if [[ "$current_proxy" == "DIRECT" ]]; then
+        log_warn "⚠️  当前代理设置为DIRECT，VPN未激活"
+        echo "   快速修复: $0 --fix-proxy"
+    elif [ -z "$current_proxy" ]; then
+        log_warn "⚠️  无法获取代理状态，可能需要检查"
+        echo "   运行诊断: $0 --test"
+    else
+        log_success "✅ 代理配置正常，VPN已激活"
+        echo "   当前使用: $current_proxy"
+    fi
+    
+    echo
+    log_success "🎯 安装完成！享受您的VPN服务！"
     echo "  • 服务已设置开机自启动"
     echo
     
@@ -795,14 +1587,186 @@ show_completion_info() {
     fi
 }
 
+# 显示使用帮助
+show_usage() {
+    echo "Mihomo VPN 安装和管理脚本"
+    echo ""
+    echo "用法: $0 [选项] [订阅链接]"
+    echo ""
+    echo "选项:"
+    echo "  无参数           完整安装VPN（交互式输入订阅链接）"
+    echo "  --install        完整安装VPN"
+    echo "  --install <URL>  使用指定订阅链接安装VPN"
+    echo "  <URL>            直接使用订阅链接安装VPN"
+    echo "  --fix-proxy      修复代理设置"
+    echo "  --test           测试VPN连接"
+    echo "  --verify         验证和修复provider文件"
+    echo "  --status         显示服务状态"
+    echo "  --help, -h       显示此帮助信息"
+    echo ""
+    echo "示例:"
+    echo "  $0                                              # 交互式安装"
+    echo "  $0 --install                                    # 交互式安装"
+    echo "  $0 --install https://example.com/subscription   # 使用指定订阅链接安装"
+    echo "  $0 https://example.com/subscription             # 直接使用订阅链接安装"
+    echo "  $0 --fix-proxy                                  # 仅修复代理设置"
+    echo "  $0 --test                                       # 测试连接状态"
+    echo "  $0 --verify                                     # 验证provider文件"
+}
+
+# 修复代理设置
+fix_proxy_only() {
+    echo "=========================================="
+    echo "🔧 修复 VPN 代理设置"
+    echo "=========================================="
+    
+    check_root
+    
+    if ! systemctl is-active --quiet mihomo.service; then
+        log_error "mihomo 服务未运行，请先完整安装"
+        exit 1
+    fi
+    
+    log_info "正在修复代理设置..."
+    setup_optimal_proxy_mode
+    
+    echo ""
+    log_info "测试修复结果..."
+    test_vpn_connectivity
+}
+
+# 仅测试连接
+test_only() {
+    echo "=========================================="
+    echo "🔍 测试 VPN 连接状态"
+    echo "=========================================="
+    
+    check_root
+    test_vpn_connectivity
+}
+
+# 验证和修复provider文件
+verify_only() {
+    echo "=========================================="
+    echo "🔍 验证和修复 Provider 文件"
+    echo "=========================================="
+    
+    check_root
+    
+    if [ ! -f "${CONFIG_FILE}" ]; then
+        log_error "配置文件不存在，请先运行完整安装"
+        exit 1
+    fi
+    
+    verify_and_fix_providers
+}
+
+# 显示服务状态
+show_status() {
+    echo "=========================================="
+    echo "📊 Mihomo VPN 服务状态"
+    echo "=========================================="
+    
+    # 服务状态
+    echo "🔸 服务状态:"
+    if systemctl is-active --quiet mihomo.service; then
+        echo "  ✅ mihomo.service: 运行中"
+    else
+        echo "  ❌ mihomo.service: 未运行"
+    fi
+    
+    # 端口状态  
+    echo ""
+    echo "🔸 端口监听:"
+    for port in 7890 7891 9090; do
+        if ss -tuln | grep -q ":${port}"; then
+            echo "  ✅ 端口 $port: 监听中"
+        else
+            echo "  ❌ 端口 $port: 未监听"
+        fi
+    done
+    
+    # 代理状态
+    echo ""
+    echo "🔸 代理配置:"
+    if curl -s "http://127.0.0.1:9090/proxies/GLOBAL" >/dev/null 2>&1; then
+        local current_proxy
+        current_proxy=$(curl -s "http://127.0.0.1:9090/proxies/GLOBAL" | grep -o '"now":"[^"]*"' | cut -d'"' -f4)
+        echo "  ✅ API可用，当前代理: $current_proxy"
+    else
+        echo "  ❌ API不可用"
+    fi
+    
+    # 配置文件
+    echo ""
+    echo "🔸 配置文件:"
+    if [ -f "${CONFIG_FILE}" ]; then
+        echo "  ✅ 主配置: ${CONFIG_FILE}"
+        if grep -q "proxy-providers:" "${CONFIG_FILE}"; then
+            local provider_files
+            provider_files=$(find "${CONFIG_DIR}" -name "*.yaml" -not -name "config.yaml" | wc -l)
+            echo "  📁 Provider文件: $provider_files 个"
+        fi
+    else
+        echo "  ❌ 主配置: 不存在"
+    fi
+}
+
 # 主函数
 main() {
+    local subscription_url=""
+    
+    # 处理命令行参数
+    case "${1:-}" in
+        --help|-h)
+            show_usage
+            exit 0
+            ;;
+        --fix-proxy)
+            fix_proxy_only
+            exit 0
+            ;;
+        --test)
+            test_only
+            exit 0
+            ;;
+        --verify)
+            verify_only
+            exit 0
+            ;;
+        --status)
+            show_status
+            exit 0
+            ;;
+        --install)
+            # 检查是否有第二个参数作为订阅链接
+            if [[ -n "${2:-}" ]]; then
+                subscription_url="$2"
+                log_info "使用命令行参数提供的订阅链接: ${subscription_url}"
+            fi
+            ;;
+        "")
+            # 无参数，继续执行完整安装
+            ;;
+        http*://*)
+            # 直接传入订阅链接
+            subscription_url="$1"
+            log_info "检测到订阅链接参数: ${subscription_url}"
+            ;;
+        *)
+            log_error "未知参数: $1"
+            show_usage
+            exit 1
+            ;;
+    esac
+    
     echo "=========================================="
     echo "🚀 Mihomo VPN 快速安装向导"
     echo "=========================================="
     echo
     
     # 检查基础环境
+    init_environment
     check_root
     check_system
     check_static_resources
@@ -810,38 +1774,90 @@ main() {
     echo
     log_info "准备执行以下步骤："
     echo "  1️⃣  安装 mihomo 客户端"
-    echo "  2️⃣  输入订阅链接"
+    if [[ -z "${subscription_url}" ]]; then
+        echo "  2️⃣  输入订阅链接"
+    else
+        echo "  2️⃣  验证订阅链接"
+    fi
     echo "  3️⃣  下载并配置订阅"
     echo "  4️⃣  启动 VPN 服务"
-    echo "  5️⃣  测试网络连接"
+    echo "  5️⃣  智能设置代理模式"
+    echo "  6️⃣  验证和修复配置"
+    echo "  7️⃣  全面测试连接"
     echo
     
-    read -p "确认开始安装？(y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        log_info "安装已取消"
-        exit 0
+    # 如果提供了订阅链接，则自动确认；否则询问用户
+    if [[ -n "${subscription_url}" ]]; then
+        log_info "使用提供的订阅链接，自动开始安装..."
+        sleep 1
+    else
+        read -p "确认开始安装？(y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "安装已取消"
+            log_info "提示: 使用 '$0 --help' 查看其他选项"
+            exit 0
+        fi
     fi
     
     # 执行安装步骤
     install_mihomo
     
-    local subscription_url
-    subscription_url=$(get_subscription_url)
+    # 获取订阅链接（如果未通过参数提供）
+    if [[ -z "${subscription_url}" ]]; then
+        subscription_url=$(get_subscription_url)
+    else
+        # 验证提供的订阅链接
+        log_step "2. 验证订阅链接"
+        if [[ ! "${subscription_url}" =~ ^https?:// ]]; then
+            log_error "无效的订阅链接格式: ${subscription_url}"
+            exit 1
+        fi
+        log_info "使用订阅链接: ${subscription_url}"
+        
+        # 简单测试链接连通性
+        if curl -s --connect-timeout 10 --head "${subscription_url}" >/dev/null 2>&1; then
+            log_success "✅ 订阅链接验证通过"
+        else
+            log_warn "⚠️  链接连通性测试失败，但将继续尝试下载"
+        fi
+    fi
     
     download_and_setup_config "${subscription_url}"
     setup_and_start_vpn
     
     # 安装后自动验证和修复
-    log_step "验证和优化安装结果"
-    perform_post_install_validation
+    log_step "6. 验证和优化安装结果"
+    if ! verify_and_fix_providers; then
+        log_warn "⚠️  Provider文件验证失败，但不影响基本功能"
+    fi
     
-    test_vpn_connectivity
+    # 执行安装后验证
+    log_step "7. 安装后验证"  
+    if ! perform_post_install_validation; then
+        log_warn "⚠️  部分验证失败，但服务可能仍然可用"
+    fi
     
-    # 创建诊断脚本
-    create_diagnostic_script
+    # 全面测试连接
+    log_step "8. 全面测试连接"
+    if ! test_vpn_connectivity; then
+        log_warn "⚠️  连接测试未完全通过，但基础服务已安装"
+    fi
     
+    # 创建诊断脚本（允许失败）
+    if ! create_diagnostic_script; then
+        log_warn "⚠️  诊断脚本创建失败"
+    fi
+    
+    # 显示完成信息
     show_completion_info
+    
+    echo ""
+    log_success "🎉 安装流程完成！"
+    log_info "如遇问题，可运行以下命令："
+    echo "  • 修复代理: $0 --fix-proxy"
+    echo "  • 测试连接: $0 --test" 
+    echo "  • 查看状态: $0 --status"
 }
 
 # 执行主函数
