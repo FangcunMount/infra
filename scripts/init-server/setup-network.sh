@@ -33,6 +33,12 @@ log_step() {
     echo -e "${CYAN}[STEP]${NC} $1"
 }
 
+log_debug() {
+    if [[ "${DEBUG:-}" == "true" ]]; then
+        echo -e "${BLUE}[DEBUG]${NC} $1"
+    fi
+}
+
 # 错误处理函数
 handle_error() {
     local line_number=$1
