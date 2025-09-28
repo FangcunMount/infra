@@ -1195,15 +1195,26 @@ create_base_config() {
     local config_file="/opt/mihomo/config/config.yaml"
     
     cat > "$config_file" << 'EOF'
-# Mihomo (Clash.Meta) 配置文件
-# 混合端口配置
+# Mihomo (Clash.Meta) 基础配置文件
+# 注意：此配置仅提供基础框架，需要订阅更新才能获得代理节点
+
+# 基础设置
 mixed-port: 7890
 allow-lan: true
+bind-address: "*"
 mode: rule
 log-level: info
-external-controller: 127.0.0.1:9090
+ipv6: true
+external-controller: 0.0.0.0:9090
 external-ui: ui
 secret: ""
+
+# 禁用地理数据自动更新（服务器可能无法访问外网）
+geo-auto-update: false
+geox-url:
+  geoip: ""
+  geosite: ""
+  mmdb: ""
 
 # DNS 配置
 dns:
@@ -1218,7 +1229,10 @@ dns:
     - 8.8.8.8
     - 1.1.1.1
 
-# 代理组配置（将在订阅更新时覆盖）
+# 代理配置（需要订阅更新填充）
+proxies: []
+
+# 代理组配置
 proxy-groups:
   - name: "PROXY"
     type: select
@@ -1240,15 +1254,12 @@ rules:
   - IP-CIDR,172.16.0.0/12,DIRECT
   - IP-CIDR,127.0.0.0/8,DIRECT
   
-  # 国内网站直连
+  # 国内网站直连  
   - GEOSITE,cn,DIRECT
   - GEOIP,cn,DIRECT
   
-  # 其他走代理
-  - MATCH,PROXY
-
-# 代理配置（将在订阅更新时覆盖）
-proxies: []
+  # 其他走代理（但基础配置中没有代理节点，只能直连）
+  - MATCH,DIRECT
 EOF
 
     log_success "基础配置文件创建完成"
@@ -1405,6 +1416,98 @@ update_subscription_repeatable() {
     # 保存订阅链接以便后续更新
     echo "$subscription_url" > "/opt/mihomo/subscription_url.txt"
     chmod 600 "/opt/mihomo/subscription_url.txt"
+}
+
+# 订阅更新带回退机制
+update_subscription_with_fallback() {
+    local config_file="/opt/mihomo/config/config.yaml"
+    
+    # 如果已有有效配置且包含代理节点，询问是否更新
+    if [[ -f "$config_file" ]] && validate_config "$config_file" 2>/dev/null; then
+        if grep -q "proxies:" "$config_file" && ! grep -A 5 "proxies:" "$config_file" | grep -q "proxies: \[\]"; then
+            log_info "检测到已存在包含代理节点的配置文件"
+            echo
+            read -p "是否要更新 VPN 订阅配置？(y/N): " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                log_success "✅ 跳过订阅更新，使用现有配置"
+                return 0
+            fi
+        fi
+    fi
+
+    log_step "配置 VPN 订阅..."
+    
+    # 如果是内网环境，直接返回失败让基础配置处理
+    if [[ "$IS_INTRANET" == "true" ]]; then
+        log_warn "⚠️  内网环境无法直接下载订阅配置"
+        return 1
+    fi
+    
+    local subscription_url=""
+    
+    while true; do
+        echo
+        read -p "请输入 Clash 订阅链接 (留空跳过): " subscription_url
+        
+        if [[ -z "$subscription_url" ]]; then
+            log_warn "跳过订阅配置，将使用基础配置"
+            return 1
+        fi
+        
+        if [[ ! "$subscription_url" =~ ^https?:// ]]; then
+            log_warn "订阅链接格式不正确，请输入完整的 HTTP/HTTPS 链接"
+            continue
+        fi
+        
+        break
+    done
+    
+    log_info "正在下载订阅配置..."
+    
+    local temp_config="/tmp/clash_subscription.yaml"
+    
+    # 下载订阅配置
+    if ! curl -fsSL --connect-timeout 10 --max-time 30 \
+        -H "User-Agent: clash.meta" \
+        "$subscription_url" -o "$temp_config"; then
+        log_error "订阅配置下载失败，将使用基础配置"
+        rm -f "$temp_config"
+        return 1
+    fi
+    
+    # 验证下载的配置文件
+    if ! validate_config "$temp_config"; then
+        log_error "下载的订阅配置验证失败，将使用基础配置"
+        rm -f "$temp_config"
+        return 1
+    fi
+    
+    # 检查是否包含代理节点
+    if grep -A 5 "proxies:" "$temp_config" | grep -q "proxies: \[\]" || ! grep -q "proxies:" "$temp_config"; then
+        log_error "订阅配置中没有有效的代理节点，将使用基础配置"
+        rm -f "$temp_config"
+        return 1
+    fi
+    
+    # 备份现有配置
+    if [[ -f "$config_file" ]]; then
+        local backup_file="$config_file.backup.$(date +%Y%m%d_%H%M%S)"
+        cp "$config_file" "$backup_file"
+        log_info "已备份现有配置到: $backup_file"
+    fi
+    
+    # 更新配置
+    cp "$temp_config" "$config_file"
+    rm -f "$temp_config"
+    
+    log_success "订阅配置更新完成"
+    
+    # 保存订阅链接以便后续更新
+    echo "$subscription_url" > "/opt/mihomo/subscription_url.txt"
+    chmod 600 "/opt/mihomo/subscription_url.txt"
+    
+    return 0
 }
 
 # 配置 systemd 服务
@@ -2078,8 +2181,13 @@ main() {
                     install_mihomo_binary_repeatable
                     setup_directories_repeatable
                     download_geodata_repeatable
-                    create_base_config_repeatable
-                    update_subscription_repeatable
+                    
+                    # 重要：先尝试订阅配置，失败才创建基础配置
+                    if ! update_subscription_with_fallback; then
+                        log_warn "订阅配置失败，使用基础配置"
+                        create_base_config_repeatable
+                    fi
+                    
                     setup_systemd_service_repeatable
                     start_mihomo_service_repeatable
                     setup_global_proxy_repeatable
