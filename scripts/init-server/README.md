@@ -36,7 +36,7 @@ sudo ./install-docker.sh
 | `init-users.sh` | 用户创建、SSH配置、安全加固 | ①  |
 | `setup-network.sh` | mihomo代理、网络优化 | ② |
 | `install-docker.sh` | Docker安装、服务配置 | ③ |
-| `diagnose-network.sh` | 网络问题诊断工具 | 辅助 |
+| `diagnose-mihomo.sh` | mihomo代理诊断和修复 | 辅助 |
 
 ## 🔧 辅助工具
 
@@ -44,18 +44,14 @@ sudo ./install-docker.sh
 # 下载mihomo二进制文件（可选，内网环境预准备）
 ./download-mihomo-binaries.sh
 
-# 网络问题诊断
-sudo ./diagnose-network.sh
-
-# Docker网络修复（如需要）
-sudo ./fix-docker-network.sh
+# mihomo代理诊断和修复
+sudo ./diagnose-mihomo.sh
 ```
 
 ## 📚 详细文档
 
-- `SERVER_INITIALIZATION_FLOW.md` - 完整流程说明
-- `NEW_INSTALLATION_FLOW.md` - 重构详情
-- `UBUNTU_OPTIMIZATION_REPORT.md` - 优化报告
+- `README-config-fix.md` - 配置修复功能说明
+- `README-repeatable.md` - 可重复执行改造说明
 
 ## ⏱️ 预计时间
 

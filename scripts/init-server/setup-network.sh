@@ -1720,6 +1720,109 @@ EOF
     log_success "管理脚本创建完成"
 }
 
+# 修复配置问题
+fix_configuration_issues() {
+    log_step "检查并修复配置问题..."
+
+    local needs_fix=false
+
+    # 检查并创建配置目录
+    if [[ ! -d "/opt/mihomo" ]]; then
+        log_warn "配置目录不存在，正在创建..."
+        mkdir -p /opt/mihomo/config /opt/mihomo/data
+        needs_fix=true
+    fi
+
+    # 设置目录权限
+    if [[ -d "/opt/mihomo" ]]; then
+        chown -R mihomo:mihomo /opt/mihomo 2>/dev/null || true
+        chmod -R 755 /opt/mihomo
+    fi
+
+    # 检查并创建基础配置文件
+    if [[ ! -f "/opt/mihomo/config/config.yaml" ]]; then
+        log_warn "配置文件不存在，正在创建基础配置..."
+        create_basic_config_fallback
+        needs_fix=true
+    fi
+
+    # 检查并创建全局代理脚本
+    if [[ ! -f "/etc/profile.d/mihomo-proxy.sh" ]]; then
+        log_warn "全局代理脚本不存在，正在创建..."
+        create_global_proxy_script
+        needs_fix=true
+    fi
+
+    # 如果有修复操作，重新加载服务
+    if [[ "$needs_fix" == "true" ]]; then
+        log_info "重新加载 systemd 配置..."
+        systemctl daemon-reload 2>/dev/null || true
+
+        if systemctl is-active --quiet mihomo.service 2>/dev/null; then
+            log_info "重启 mihomo 服务以应用配置..."
+            systemctl restart mihomo.service 2>/dev/null || true
+            sleep 2
+        fi
+
+        log_success "配置问题修复完成"
+    else
+        log_success "所有配置正常，无需修复"
+    fi
+}
+
+# 创建基础配置（降级方案）
+create_basic_config_fallback() {
+    cat > /opt/mihomo/config/config.yaml << 'EOF'
+# Mihomo 基础配置文件
+mixed-port: 7890
+allow-lan: true
+bind-address: "*"
+mode: rule
+log-level: info
+ipv6: true
+
+# DNS 配置
+dns:
+  enable: true
+  listen: 0.0.0.0:53
+  default-nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+
+# 代理配置（需要根据实际情况修改）
+proxies: []
+
+# 规则配置
+rules:
+  - MATCH,DIRECT
+EOF
+    log_info "基础配置文件已创建: /opt/mihomo/config/config.yaml"
+}
+
+# 创建全局代理脚本
+create_global_proxy_script() {
+    cat > /etc/profile.d/mihomo-proxy.sh << 'EOF'
+#!/bin/bash
+# Mihomo 全局代理环境变量
+
+export http_proxy="http://127.0.0.1:7890"
+export https_proxy="http://127.0.0.1:7890"
+export ftp_proxy="http://127.0.0.1:7890"
+export no_proxy="localhost,127.0.0.1,::1"
+
+# Docker 代理
+export HTTP_PROXY="http://127.0.0.1:7890"
+export HTTPS_PROXY="http://127.0.0.1:7890"
+EOF
+    chmod +x /etc/profile.d/mihomo-proxy.sh
+    log_info "全局代理脚本已创建: /etc/profile.d/mihomo-proxy.sh"
+}
+
 # 显示完成信息
 show_completion_info() {
     echo
@@ -1734,6 +1837,7 @@ show_completion_info() {
     echo "  ✅ systemd 服务配置 (开机自启)"
     echo "  ✅ 全局代理环境变量"
     echo "  ✅ 管理脚本和别名"
+    echo "  ✅ 自动配置修复和验证"
     
     echo
     log_info "服务信息："
@@ -1791,8 +1895,9 @@ main() {
     echo "  • 配置全局代理环境变量"
     echo "  • 测试网络连接"
     echo "  • 创建管理脚本"
+    echo "  • 自动检测并修复配置问题"
     echo
-    log_info "注意：此脚本支持重复执行，已安装的组件将被自动跳过"
+    log_info "注意：此脚本支持重复执行，已安装的组件将被自动跳过，配置问题将被自动修复"
     echo
     read -p "确认继续执行？(y/N): " -n 1 -r
     echo
@@ -1813,6 +1918,10 @@ main() {
     setup_global_proxy_repeatable
     test_network_connectivity
     create_management_scripts_repeatable
+
+    # 修复任何配置问题
+    fix_configuration_issues
+
     show_completion_info
     
     log_success "网络环境初始化完成！"
