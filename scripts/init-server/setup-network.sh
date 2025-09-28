@@ -726,6 +726,13 @@ ipv6: false
 external-controller: 0.0.0.0:9090
 external-ui: dashboard
 
+# 禁用地理数据自动更新（服务器无法访问外网）
+geo-auto-update: false
+geox-url:
+  geoip: ""
+  geosite: ""
+  mmdb: ""
+
 # DNS 配置
 dns:
   enable: true
@@ -824,6 +831,7 @@ download_geodata() {
     log_step "处理地理位置数据文件..."
     
     local data_dir="/opt/mihomo/data"
+    mkdir -p "$data_dir"
     local download_success=true
     
     # 获取脚本所在目录（从 scripts/init-server/ 到项目根目录）
@@ -1781,6 +1789,13 @@ mode: rule
 log-level: info
 ipv6: true
 
+# 禁用地理数据自动更新
+geo-auto-update: false
+geox-url:
+  geoip: ""
+  geosite: ""
+  mmdb: ""
+
 # DNS 配置
 dns:
   enable: true
@@ -1812,12 +1827,14 @@ create_global_proxy_script() {
 
 export http_proxy="http://127.0.0.1:7890"
 export https_proxy="http://127.0.0.1:7890"
+export all_proxy="socks5://127.0.0.1:7890"
 export ftp_proxy="http://127.0.0.1:7890"
 export no_proxy="localhost,127.0.0.1,::1"
 
 # Docker 代理
 export HTTP_PROXY="http://127.0.0.1:7890"
 export HTTPS_PROXY="http://127.0.0.1:7890"
+export ALL_PROXY="socks5://127.0.0.1:7890"
 EOF
     chmod +x /etc/profile.d/mihomo-proxy.sh
     log_info "全局代理脚本已创建: /etc/profile.d/mihomo-proxy.sh"
