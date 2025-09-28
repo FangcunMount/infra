@@ -1006,9 +1006,21 @@ download_geodata() {
     if [[ -n "$static_geosite" ]] && [[ -n "$static_geoip" ]]; then
         has_static_files=true
         log_success "✅ 发现本地静态地理数据文件"
-        log_info "静态文件位置: $static_dir"
-        log_info "  GeoSite: $(basename "$static_geosite")"
-        log_info "  GeoIP: $(basename "$static_geoip")"
+        log_info "静态文件目录: $static_dir"
+        log_info "  📄 GeoSite: $(basename "$static_geosite") ($(stat -f%z "$static_geosite" 2>/dev/null || stat -c%s "$static_geosite" 2>/dev/null || echo "unknown") bytes)"
+        log_info "  📄 GeoIP: $(basename "$static_geoip") ($(stat -f%z "$static_geoip" 2>/dev/null || stat -c%s "$static_geoip" 2>/dev/null || echo "unknown") bytes)"
+    else
+        log_warn "⚠️  本地静态文件不完整或不存在"
+        if [[ -n "$static_geosite" ]]; then
+            log_info "  ✅ 找到: $(basename "$static_geosite")"
+        else
+            log_info "  ❌ 缺失: geosite.dat 或 GeoSite.dat"
+        fi
+        if [[ -n "$static_geoip" ]]; then
+            log_info "  ✅ 找到: $(basename "$static_geoip")"
+        else
+            log_info "  ❌ 缺失: geoip.metadb 或 GeoIP.metadb"
+        fi
     fi
     
     # 检查目标目录已有文件
@@ -1022,9 +1034,19 @@ download_geodata() {
     if [[ "$has_static_files" == "true" ]]; then
         log_info "使用本地静态文件..."
         
+        # 设置正确的权限和所有者
+        local mihomo_user="mihomo"
+        if id "$mihomo_user" &>/dev/null; then
+            local owner_group="$mihomo_user:$mihomo_user"
+        else
+            local owner_group="root:root"
+        fi
+        
         # 复制 geosite.dat
         if cp "$static_geosite" "$data_dir/geosite.dat" 2>/dev/null; then
-            log_success "✅ geosite.dat 复制成功"
+            chmod 644 "$data_dir/geosite.dat"
+            chown "$owner_group" "$data_dir/geosite.dat" 2>/dev/null || true
+            log_success "✅ geosite.dat 复制成功 (来源: $(basename "$static_geosite"))"
         else
             log_error "❌ geosite.dat 复制失败"
             download_success=false
@@ -1032,15 +1054,27 @@ download_geodata() {
         
         # 复制 geoip.metadb  
         if cp "$static_geoip" "$data_dir/geoip.metadb" 2>/dev/null; then
-            log_success "✅ geoip.metadb 复制成功"
+            chmod 644 "$data_dir/geoip.metadb"
+            chown "$owner_group" "$data_dir/geoip.metadb" 2>/dev/null || true
+            log_success "✅ geoip.metadb 复制成功 (来源: $(basename "$static_geoip"))"
         else
             log_error "❌ geoip.metadb 复制失败"
             download_success=false
         fi
         
         if [[ "$download_success" == "true" ]]; then
-            log_success "✅ 本地静态地理数据文件部署完成"
-            return 0
+            # 验证文件大小（确保不是空文件）
+            local geosite_size=$(stat -f%z "$data_dir/geosite.dat" 2>/dev/null || stat -c%s "$data_dir/geosite.dat" 2>/dev/null || echo "0")
+            local geoip_size=$(stat -f%z "$data_dir/geoip.metadb" 2>/dev/null || stat -c%s "$data_dir/geoip.metadb" 2>/dev/null || echo "0")
+            
+            if [[ "$geosite_size" -gt 1000 ]] && [[ "$geoip_size" -gt 1000 ]]; then
+                log_success "✅ 本地静态地理数据文件部署完成"
+                log_info "文件大小验证: geosite.dat ($(($geosite_size/1024))KB), geoip.metadb ($(($geoip_size/1024))KB)"
+                return 0
+            else
+                log_warn "⚠️  复制的文件大小异常，将尝试其他方案"
+                download_success=false
+            fi
         fi
     fi
     
