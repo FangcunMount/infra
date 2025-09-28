@@ -711,7 +711,7 @@ echo
 log_info "👥 用户权限配置："
 echo "  ✅ root 用户: 已配置 Docker 访问权限"
 if id -u www >/dev/null 2>&1; then
-    local www_home=$(getent passwd www | cut -d: -f6)
+    www_home=$(getent passwd www | cut -d: -f6)
     if groups www 2>/dev/null | grep -q docker; then
         echo "  ✅ www 用户: 已配置 Docker 访问权限"
         echo "     家目录: ${www_home:-未知}"
