@@ -6,6 +6,12 @@ set -euo pipefail
 # 支持初始化和卸载操作
 # 需要在 init-users.sh 执行完毕后运行
 
+# 配置路径 (使用传统 Clash 路径，兼容最佳实践)
+CLASH_CONFIG_DIR="/root/.config/clash"
+CLASH_CONFIG_FILE="${CLASH_CONFIG_DIR}/config.yaml"
+MIHOMO_DATA_DIR="/opt/mihomo/data"
+MIHOMO_CONFIG_DIR="/opt/mihomo/config"  # 保持向后兼容
+
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -251,7 +257,7 @@ check_geodata_downloaded() {
 }
 
 check_base_config_created() {
-    [[ -f "/opt/mihomo/config/config.yaml" ]]
+    [[ -f "${CLASH_CONFIG_FILE}" ]]
 }
 
 check_systemd_service_setup() {
@@ -263,7 +269,7 @@ check_mihomo_service_running() {
 }
 
 check_global_proxy_setup() {
-    [[ -f "/etc/profile.d/mihomo-proxy.sh" ]] || [[ -f "/etc/environment" ]] && grep -q "http_proxy" /etc/environment
+    [[ -f "/etc/profile.d/mihomo-proxy.sh" ]] || ( [[ -f "/etc/environment" ]] && grep -q "http_proxy" /etc/environment )
 }
 
 check_management_scripts_created() {
@@ -851,7 +857,7 @@ EOF
 
 # 为内网环境创建基础配置
 create_basic_config_intranet() {
-    local config_file="/opt/mihomo/config/config.yaml"
+    local config_file="${CLASH_CONFIG_FILE}"
     
     log_info "为内网环境创建基础配置..."
     
@@ -859,11 +865,8 @@ create_basic_config_intranet() {
 # Mihomo (Clash.Meta) 基础配置 - 内网环境
 # 此配置适用于无外网订阅链接的内网环境
 
-# 基础设置
-port: 7890
-socks-port: 7891
-redir-port: 7892
-mixed-port: 7893
+# 基础设置 - 统一使用混合端口避免端口冲突
+mixed-port: 7890
 allow-lan: true
 bind-address: '*'
 mode: rule
@@ -894,24 +897,14 @@ dns:
     - https://1.1.1.1/dns-query
     - https://dns.google/dns-query
 
-# 代理节点（需要手动配置）
-proxies:
-  # 示例节点配置 - 请根据实际情况修改
-  - name: "本地代理"
-    type: http
-    server: 127.0.0.1
-    port: 8080
-    # username: user
-    # password: pass
-  
-  # 添加更多代理节点...
+# 代理节点（内网环境需要手动配置真实节点）
+proxies: []
 
 # 代理组
 proxy-groups:
   - name: "🚀 节点选择"
     type: select
     proxies:
-      - "本地代理"
       - DIRECT
   
   - name: "🌍 国外网站"
@@ -967,9 +960,21 @@ rules:
 EOF
     
     log_success "基础内网配置已创建: $config_file"
-    log_warn "⚠️  请根据实际网络环境修改代理节点配置"
-    echo "   编辑文件: $config_file"
-    echo "   在 proxies 部分添加您的代理服务器信息"
+    echo
+    log_warn "🚨 重要提示：当前配置无代理节点，所有流量将直连！"
+    echo "   要启用代理功能，必须手动配置代理节点："
+    echo "   1. 编辑文件: $config_file"
+    echo "   2. 在 proxies: [] 部分添加您的代理服务器"
+    echo "   3. 重启服务: systemctl restart mihomo"
+    echo
+    echo "   示例节点配置："
+    echo "   proxies:"
+    echo "     - name: \"我的代理\""
+    echo "     - type: vmess"
+    echo "     - server: your-proxy-server.com"
+    echo "     - port: 443"
+    echo "     - uuid: your-uuid-here"
+    echo "     - cipher: auto"
 }
 
 # 下载必要的数据文件
@@ -1042,46 +1047,42 @@ download_geodata() {
             local owner_group="root:root"
         fi
         
-        # mihomo 默认在配置目录查找地理文件，同时也复制到 data 目录作为备份
-        local config_dir="/opt/mihomo/config"
+        # mihomo 默认在配置目录查找地理文件，使用新的 Clash 配置路径
+        mkdir -p "${CLASH_CONFIG_DIR}"
+        mkdir -p "${MIHOMO_CONFIG_DIR}"  # 兼容旧路径
         
-        # 复制 geosite.dat 到配置目录 (mihomo 默认查找位置)
-        if cp "$static_geosite" "$config_dir/geosite.dat" 2>/dev/null; then
-            chmod 644 "$config_dir/geosite.dat"
-            chown "$owner_group" "$config_dir/geosite.dat" 2>/dev/null || true
-            log_success "✅ geosite.dat 复制到配置目录成功 (来源: $(basename "$static_geosite"))"
+        # 复制 geosite.dat 到主配置目录 (Clash 标准路径)
+        if cp "$static_geosite" "${CLASH_CONFIG_DIR}/geosite.dat" 2>/dev/null; then
+            chmod 644 "${CLASH_CONFIG_DIR}/geosite.dat"
+            log_success "✅ geosite.dat 复制到 Clash 配置目录成功 (来源: $(basename "$static_geosite"))"
         else
-            log_error "❌ geosite.dat 复制到配置目录失败"
+            log_error "❌ geosite.dat 复制到 Clash 配置目录失败"
             download_success=false
         fi
         
-        # 同时复制到 data 目录作为备份
-        if cp "$static_geosite" "$data_dir/geosite.dat" 2>/dev/null; then
-            chmod 644 "$data_dir/geosite.dat"
-            chown "$owner_group" "$data_dir/geosite.dat" 2>/dev/null || true
-        fi
+        # 同时复制到兼容路径和 data 目录作为备份
+        cp "$static_geosite" "${MIHOMO_CONFIG_DIR}/geosite.dat" 2>/dev/null || true
+        cp "$static_geosite" "$data_dir/geosite.dat" 2>/dev/null || true
+        chmod 644 "${MIHOMO_CONFIG_DIR}/geosite.dat" "$data_dir/geosite.dat" 2>/dev/null || true
         
-        # 复制 geoip.metadb 到配置目录 (mihomo 默认查找位置)
-        if cp "$static_geoip" "$config_dir/geoip.metadb" 2>/dev/null; then
-            chmod 644 "$config_dir/geoip.metadb"
-            chown "$owner_group" "$config_dir/geoip.metadb" 2>/dev/null || true
-            log_success "✅ geoip.metadb 复制到配置目录成功 (来源: $(basename "$static_geoip"))"
+        # 复制 geoip.metadb 到主配置目录 (Clash 标准路径)
+        if cp "$static_geoip" "${CLASH_CONFIG_DIR}/geoip.metadb" 2>/dev/null; then
+            chmod 644 "${CLASH_CONFIG_DIR}/geoip.metadb"
+            log_success "✅ geoip.metadb 复制到 Clash 配置目录成功 (来源: $(basename "$static_geoip"))"
         else
-            log_error "❌ geoip.metadb 复制到配置目录失败"
+            log_error "❌ geoip.metadb 复制到 Clash 配置目录失败"
             download_success=false
         fi
         
-        # 同时复制到 data 目录作为备份
-        if cp "$static_geoip" "$data_dir/geoip.metadb" 2>/dev/null; then
-            chmod 644 "$data_dir/geoip.metadb"
-            chown "$owner_group" "$data_dir/geoip.metadb" 2>/dev/null || true
-        fi
+        # 同时复制到兼容路径和 data 目录作为备份
+        cp "$static_geoip" "${MIHOMO_CONFIG_DIR}/geoip.metadb" 2>/dev/null || true
+        cp "$static_geoip" "$data_dir/geoip.metadb" 2>/dev/null || true
+        chmod 644 "${MIHOMO_CONFIG_DIR}/geoip.metadb" "$data_dir/geoip.metadb" 2>/dev/null || true
         
         if [[ "$download_success" == "true" ]]; then
             # 验证配置目录中文件大小（确保不是空文件）
-            local config_dir="/opt/mihomo/config"
-            local geosite_size=$(stat -f%z "$config_dir/geosite.dat" 2>/dev/null || stat -c%s "$config_dir/geosite.dat" 2>/dev/null || echo "0")
-            local geoip_size=$(stat -f%z "$config_dir/geoip.metadb" 2>/dev/null || stat -c%s "$config_dir/geoip.metadb" 2>/dev/null || echo "0")
+            local geosite_size=$(stat -f%z "${CLASH_CONFIG_DIR}/geosite.dat" 2>/dev/null || stat -c%s "${CLASH_CONFIG_DIR}/geosite.dat" 2>/dev/null || echo "0")
+            local geoip_size=$(stat -f%z "${CLASH_CONFIG_DIR}/geoip.metadb" 2>/dev/null || stat -c%s "${CLASH_CONFIG_DIR}/geoip.metadb" 2>/dev/null || echo "0")
             
             if [[ "$geosite_size" -gt 1000 ]] && [[ "$geoip_size" -gt 1000 ]]; then
                 # 清理配置目录中的大写文件（如果存在）
@@ -1246,7 +1247,7 @@ download_geodata() {
 create_base_config() {
     log_step "创建基础配置文件..."
     
-    local config_file="/opt/mihomo/config/config.yaml"
+    local config_file="${CLASH_CONFIG_FILE}"
     
     cat > "$config_file" << 'EOF'
 # Mihomo (Clash.Meta) 基础配置文件
@@ -1317,6 +1318,7 @@ rules:
 EOF
 
     log_success "基础配置文件创建完成"
+    log_warn "⚠️  当前配置无代理节点，需要通过订阅更新或手动添加节点才能启用代理功能"
 }
 
 # 验证配置文件
@@ -1362,7 +1364,7 @@ validate_config() {
 # 获取订阅链接并更新配置
 update_subscription_repeatable() {
     # 检查是否已有有效的配置文件
-    local config_file="/opt/mihomo/config/config.yaml"
+    local config_file="${CLASH_CONFIG_FILE}"
     if [[ -f "$config_file" ]] && validate_config "$config_file" 2>/dev/null; then
         log_info "检测到已存在的配置文件"
         echo
@@ -1413,8 +1415,8 @@ update_subscription_repeatable() {
                     log_info "手动配置步骤："
                     echo "  1. 在有网络的设备上访问: $subscription_url"
                     echo "  2. 保存配置文件为 clash_config.yaml"
-                    echo "  3. 上传到服务器 /opt/mihomo/config/config.yaml"
-                    echo "  4. 设置权限: chmod 644 /opt/mihomo/config/config.yaml"
+                    echo "  3. 上传到服务器 ${CLASH_CONFIG_FILE}"
+                    echo "  4. 设置权限: chmod 644 ${CLASH_CONFIG_FILE}"
                     echo "  5. 重新运行脚本或跳过此步骤"
                     read -p "按 Enter 键继续..."
                     return 0
@@ -1468,13 +1470,13 @@ update_subscription_repeatable() {
     log_success "订阅配置更新完成"
     
     # 保存订阅链接以便后续更新
-    echo "$subscription_url" > "/opt/mihomo/subscription_url.txt"
-    chmod 600 "/opt/mihomo/subscription_url.txt"
+    echo "$subscription_url" > "${CLASH_CONFIG_DIR}/subscription_url.txt"
+    chmod 600 "${CLASH_CONFIG_DIR}/subscription_url.txt"
 }
 
 # 订阅更新带回退机制
 update_subscription_with_fallback() {
-    local config_file="/opt/mihomo/config/config.yaml"
+    local config_file="${CLASH_CONFIG_FILE}"
     
     # 如果已有有效配置且包含代理节点，询问是否更新
     if [[ -f "$config_file" ]] && validate_config "$config_file" 2>/dev/null; then
@@ -1584,8 +1586,8 @@ EOF
     log_success "订阅配置更新完成 (已禁用地理数据自动更新)"
     
     # 保存订阅链接以便后续更新
-    echo "$subscription_url" > "/opt/mihomo/subscription_url.txt"
-    chmod 600 "/opt/mihomo/subscription_url.txt"
+    echo "$subscription_url" > "${CLASH_CONFIG_DIR}/subscription_url.txt"
+    chmod 600 "${CLASH_CONFIG_DIR}/subscription_url.txt"
     
     return 0
 }
@@ -1594,14 +1596,15 @@ EOF
 setup_systemd_service() {
     log_step "配置 mihomo systemd 服务..."
     
-    # 创建 mihomo 用户（安全考虑）
-    if ! id mihomo >/dev/null 2>&1; then
-        log_info "创建 mihomo 系统用户..."
-        useradd -r -s /bin/false -d /opt/mihomo mihomo
-        chown -R mihomo:mihomo /opt/mihomo
-    fi
+    # 创建传统的 clash 配置目录（按文章最佳实践）
+    local clash_config_dir="/root/.config/clash"
+    mkdir -p "$clash_config_dir"
+    log_info "使用传统 Clash 配置路径: $clash_config_dir"
     
-    # 创建 systemd 服务文件
+    # 确保配置目录存在（向后兼容）
+    mkdir -p "${MIHOMO_CONFIG_DIR}" "${MIHOMO_DATA_DIR}"
+    
+    # 创建 systemd 服务文件（使用 root 用户，参考文章最佳实践）
     local service_file="/etc/systemd/system/mihomo.service"
     
     cat > "$service_file" << 'EOF'
@@ -1613,20 +1616,12 @@ Wants=network.target
 
 [Service]
 Type=simple
-User=mihomo
-Group=mihomo
-ExecStart=/usr/local/bin/mihomo -d /opt/mihomo/config
+User=root
+ExecStart=/usr/local/bin/mihomo -d /root/.config/clash
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 RestartSec=5
 LimitNOFILE=1048576
-
-# 安全设置
-PrivateTmp=true
-ProtectSystem=strict
-ReadWritePaths=/opt/mihomo
-ProtectHome=true
-NoNewPrivileges=true
 
 [Install]
 WantedBy=multi-user.target
@@ -1646,8 +1641,8 @@ start_mihomo_service() {
     log_step "启动 mihomo 服务..."
     
     # 验证配置文件
-    if [[ ! -f "/opt/mihomo/config/config.yaml" ]]; then
-        log_error "配置文件不存在: /opt/mihomo/config/config.yaml"
+    if [[ ! -f "${CLASH_CONFIG_FILE}" ]]; then
+        log_error "配置文件不存在: ${CLASH_CONFIG_FILE}"
         exit 1
     fi
     
@@ -1839,12 +1834,17 @@ create_management_scripts() {
 #!/bin/bash
 # 更新 mihomo 订阅配置
 
-if [[ ! -f /opt/mihomo/subscription_url.txt ]]; then
+if [[ ! -f "${CLASH_CONFIG_DIR}/subscription_url.txt" ]] && [[ ! -f "/opt/mihomo/subscription_url.txt" ]]; then
     echo "❌ 错误: 未找到订阅链接文件"
     exit 1
 fi
 
-subscription_url=$(cat /opt/mihomo/subscription_url.txt)
+# 优先使用新路径，兼容旧路径
+if [[ -f "${CLASH_CONFIG_DIR}/subscription_url.txt" ]]; then
+    subscription_url=$(cat "${CLASH_CONFIG_DIR}/subscription_url.txt")
+else
+    subscription_url=$(cat /opt/mihomo/subscription_url.txt)
+fi
 echo "🔄 正在更新订阅配置..."
 
 # 下载新配置
@@ -1860,10 +1860,12 @@ if curl -fsSL --connect-timeout 10 --max-time 30 \
     fi
     
     # 备份现有配置
-    cp /opt/mihomo/config/config.yaml "/opt/mihomo/config/config.yaml.backup.$(date +%Y%m%d_%H%M%S)"
+    if [[ -f "${CLASH_CONFIG_FILE}" ]]; then
+        cp "${CLASH_CONFIG_FILE}" "${CLASH_CONFIG_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+    fi
     
     # 更新配置
-    cp /tmp/new_config.yaml /opt/mihomo/config/config.yaml
+    cp /tmp/new_config.yaml "${CLASH_CONFIG_FILE}"
     rm -f /tmp/new_config.yaml
     
     # 通过 systemd 重启服务
@@ -2062,12 +2064,11 @@ fix_configuration_issues() {
     log_step "检查并修复配置问题..."
 
     local needs_fix=false
-    local config_dir="/opt/mihomo/config"
 
     # 检查并创建配置目录
-    if [[ ! -d "/opt/mihomo" ]]; then
+    if [[ ! -d "${CLASH_CONFIG_DIR}" ]] || [[ ! -d "/opt/mihomo" ]]; then
         log_warn "配置目录不存在，正在创建..."
-        mkdir -p /opt/mihomo/config /opt/mihomo/data
+        mkdir -p "${CLASH_CONFIG_DIR}" "${MIHOMO_CONFIG_DIR}" "${MIHOMO_DATA_DIR}"
         needs_fix=true
     fi
 
@@ -2079,13 +2080,13 @@ fix_configuration_issues() {
     fi
 
     # 检查配置文件中的 geo-auto-update 设置
-    if [[ -f "$config_dir/config.yaml" ]] && grep -q "geo-auto-update: true" "$config_dir/config.yaml" 2>/dev/null; then
+    if [[ -f "${CLASH_CONFIG_FILE}" ]] && grep -q "geo-auto-update: true" "${CLASH_CONFIG_FILE}" 2>/dev/null; then
         log_warn "配置文件启用了地理数据自动更新，正在禁用..."
-        sed -i 's/geo-auto-update: true/geo-auto-update: false/' "$config_dir/config.yaml"
+        sed -i 's/geo-auto-update: true/geo-auto-update: false/' "${CLASH_CONFIG_FILE}"
         
         # 同时清空 geox-url 设置
-        sed -i '/^geox-url:/,+4s|https://.*||g' "$config_dir/config.yaml"
-        sed -i '/^geox-url:/,+4s|".*"|""|g' "$config_dir/config.yaml"
+        sed -i '/^geox-url:/,+4s|https://.*||g' "${CLASH_CONFIG_FILE}"
+        sed -i '/^geox-url:/,+4s|".*"|""|g' "${CLASH_CONFIG_FILE}"
         needs_fix=true
     fi
 
@@ -2093,11 +2094,11 @@ fix_configuration_issues() {
     if [[ -d "/opt/mihomo" ]]; then
         chown -R mihomo:mihomo /opt/mihomo 2>/dev/null || true
         chmod -R 755 /opt/mihomo
-        chmod 644 /opt/mihomo/config/config.yaml 2>/dev/null || true
+        chmod 644 "${CLASH_CONFIG_FILE}" 2>/dev/null || true
     fi
 
     # 检查并创建基础配置文件
-    if [[ ! -f "/opt/mihomo/config/config.yaml" ]]; then
+    if [[ ! -f "${CLASH_CONFIG_FILE}" ]]; then
         log_warn "配置文件不存在，正在创建基础配置..."
         create_basic_config_fallback
         needs_fix=true
@@ -2129,7 +2130,7 @@ fix_configuration_issues() {
 
 # 创建基础配置（降级方案）
 create_basic_config_fallback() {
-    cat > /opt/mihomo/config/config.yaml << 'EOF'
+    cat > "${CLASH_CONFIG_FILE}" << 'EOF'
 # Mihomo 基础配置文件
 mixed-port: 7890
 allow-lan: true
@@ -2165,7 +2166,8 @@ proxies: []
 rules:
   - MATCH,DIRECT
 EOF
-    log_info "基础配置文件已创建: /opt/mihomo/config/config.yaml"
+    log_info "基础配置文件已创建: ${CLASH_CONFIG_FILE}"
+    log_warn "⚠️  当前配置无代理节点，需要手动添加节点或订阅更新才能使用代理功能"
 }
 
 # 创建全局代理脚本
@@ -2209,8 +2211,8 @@ show_completion_info() {
     log_info "服务信息："
     echo "  🌐 混合端口: 7890 (HTTP/SOCKS5)"
     echo "  🎛️  控制面板: http://127.0.0.1:9090"
-    echo "  📁 配置目录: /opt/mihomo/"
-    echo "  🐳 容器名称: mihomo"
+    echo "  📁 配置目录: ${CLASH_CONFIG_DIR}"
+    echo "  � 配置文件: ${CLASH_CONFIG_FILE}"
     echo "  🔧 systemd 服务: mihomo.service"
     
     echo
@@ -2237,12 +2239,24 @@ show_completion_info() {
     echo
     log_warn "注意事项："
     echo "  1. 服务会在系统启动时自动启动"
-    echo "  2. 配置文件位置: /opt/mihomo/config/config.yaml"
+    echo "  2. 配置文件位置: ${CLASH_CONFIG_FILE}"
     echo "  3. 地理数据目录: /opt/mihomo/data/"
     echo "  4. 日志查看: mihomo-control logs"
     echo "  5. 重新登录以应用全局代理环境变量"
     echo "  6. 使用 proxy-on/proxy-off 命令控制代理状态"
     echo "  7. 地理数据更新: mihomo-update-geodata"
+    
+    echo
+    log_info "验证清单（按序执行）："
+    echo "  ✅ 1. 检查服务状态: systemctl status mihomo"
+    echo "  ✅ 2. 检查端口监听: ss -tuln | grep -E '7890|9090'"
+    echo "  ✅ 3. 加载代理环境变量: source /etc/profile.d/clash-proxy.sh"
+    echo "  ✅ 4. 查看代理状态: proxy-status"
+    echo "  ✅ 5. 测试HTTP代理: curl -I https://www.google.com"
+    echo "  ✅ 6. 测试SOCKS代理: curl --socks5 127.0.0.1:7890 https://ifconfig.me"
+    echo "  ✅ 7. 检查控制面板: curl http://127.0.0.1:9090"
+    echo
+    log_warn "如果代理测试失败，请检查配置文件中是否有有效的代理节点！"
 }
 
 # 主函数
@@ -2308,7 +2322,7 @@ main() {
                         echo "由于您处于内网环境，请注意以下事项："
                         echo
                         echo "1. 配置文件检查："
-                        echo "   - 编辑 /opt/mihomo/config/config.yaml"
+                        echo "   - 编辑 ${CLASH_CONFIG_FILE}"
                         echo "   - 确保代理节点配置正确"
                         echo
                         echo "2. 地理数据文件："
