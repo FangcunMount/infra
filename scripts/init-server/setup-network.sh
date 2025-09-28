@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 服务器网络环境初始化脚本
+# 服务器网络环境管理脚本
 # 配置 mihomo (Clash.Meta) VPN 客户端
-# 支持重复执行，已安装的组件将被跳过
+# 支持初始化和卸载操作
 # 需要在 init-users.sh 执行完毕后运行
 
 # 颜色定义
@@ -38,6 +38,152 @@ log_debug() {
     if [[ "${DEBUG:-}" == "true" ]]; then
         echo -e "${BLUE}[DEBUG]${NC} $1"
     fi
+}
+
+# 显示主菜单
+show_main_menu() {
+    echo
+    echo "=========================================="
+    echo "    服务器网络环境管理工具"
+    echo "=========================================="
+    echo
+    echo "请选择操作："
+    echo "1) 初始化网络环境 (安装并配置 VPN)"
+    echo "2) 卸载 VPN (清理所有相关组件)"
+    echo "3) 退出"
+    echo
+}
+
+# 卸载 VPN 函数
+uninstall_vpn() {
+    log_step "开始卸载 VPN 组件..."
+
+    # 确认卸载
+    echo
+    log_warn "⚠️  此操作将执行以下清理："
+    echo "  • 停止并禁用 mihomo systemd 服务"
+    echo "  • 删除 mihomo 二进制文件"
+    echo "  • 删除配置文件和数据目录"
+    echo "  • 删除地理数据文件"
+    echo "  • 清理全局代理环境变量"
+    echo "  • 删除管理脚本"
+    echo
+    read -p "确定要卸载 VPN 吗？(y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        log_info "已取消卸载操作"
+        return 0
+    fi
+
+    # 停止并禁用服务
+    if systemctl is-active --quiet mihomo.service 2>/dev/null; then
+        log_info "停止 mihomo 服务..."
+        sudo systemctl stop mihomo.service
+    fi
+
+    if systemctl is-enabled --quiet mihomo.service 2>/dev/null; then
+        log_info "禁用 mihomo 服务..."
+        sudo systemctl disable mihomo.service
+    fi
+
+    # 删除 systemd 服务文件
+    if [[ -f "/etc/systemd/system/mihomo.service" ]]; then
+        log_info "删除 systemd 服务文件..."
+        sudo rm -f /etc/systemd/system/mihomo.service
+        sudo systemctl daemon-reload
+    fi
+
+    # 删除 mihomo 用户
+    if id "mihomo" &>/dev/null; then
+        log_info "删除 mihomo 系统用户..."
+        sudo userdel mihomo 2>/dev/null || true
+    fi
+
+    # 删除二进制文件
+    if [[ -f "/usr/local/bin/mihomo" ]]; then
+        log_info "删除 mihomo 二进制文件..."
+        sudo rm -f /usr/local/bin/mihomo
+    fi
+
+    # 删除配置和数据目录
+    if [[ -d "/opt/mihomo" ]]; then
+        log_info "删除 mihomo 配置和数据目录..."
+        sudo rm -rf /opt/mihomo
+    fi
+
+    # 删除全局代理脚本
+    if [[ -f "/etc/profile.d/mihomo-proxy.sh" ]]; then
+        log_info "删除全局代理脚本..."
+        sudo rm -f /etc/profile.d/mihomo-proxy.sh
+    fi
+
+    if [[ -f "/etc/profile.d/clash-proxy.sh" ]]; then
+        log_info "删除 clash 代理脚本..."
+        sudo rm -f /etc/profile.d/clash-proxy.sh
+    fi
+
+    # 删除管理脚本
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [[ -f "$script_dir/mihomo-control" ]]; then
+        log_info "删除 mihomo-control 管理脚本..."
+        rm -f "$script_dir/mihomo-control"
+    fi
+
+    if [[ -f "$script_dir/mihomo-update" ]]; then
+        log_info "删除 mihomo-update 脚本..."
+        rm -f "$script_dir/mihomo-update"
+    fi
+
+    if [[ -f "$script_dir/mihomo-update-geodata" ]]; then
+        log_info "删除 mihomo-update-geodata 脚本..."
+        rm -f "$script_dir/mihomo-update-geodata"
+    fi
+
+    # 清理别名（如果存在）
+    local bashrc_files=("/etc/bash.bashrc" "/etc/bashrc")
+    for bashrc in "${bashrc_files[@]}"; do
+        if [[ -f "$bashrc" ]] && grep -q "mihomo-control\|proxy-on\|proxy-off" "$bashrc"; then
+            log_info "清理 $bashrc 中的别名..."
+            sudo sed -i '/mihomo-control/d; /proxy-on/d; /proxy-off/d; /proxy-status/d' "$bashrc"
+        fi
+    done
+
+    # 清理用户级别的代理设置（检查所有用户的 .bashrc）
+    log_info "清理用户级别的代理设置..."
+    for user_home in /home/* /root; do
+        if [[ -f "$user_home/.bashrc" ]] && grep -q "http_proxy.*127.0.0.1:7890\|https_proxy.*127.0.0.1:7890" "$user_home/.bashrc" 2>/dev/null; then
+            log_info "清理 $user_home/.bashrc 中的代理设置..."
+            sed -i '/http_proxy.*127\.0\.0\.1:7890/d; /https_proxy.*127\.0\.0\.1:7890/d; /all_proxy.*127\.0\.0\.1:7890/d' "$user_home/.bashrc"
+        fi
+    done
+
+    # 清理当前会话的代理环境变量
+    log_info "清理当前会话的代理环境变量..."
+    unset http_proxy https_proxy all_proxy ftp_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY FTP_PROXY 2>/dev/null || true
+
+    # 检查并清理 Docker 代理设置（如果存在）
+    if [[ -f "/etc/docker/daemon.json" ]] && grep -q "127.0.0.1:7890" /etc/docker/daemon.json; then
+        log_info "清理 Docker 代理配置..."
+        sudo sed -i '/"httpProxy": "http:\/\/127\.0\.0\.1:7890"/d; /"httpsProxy": "http:\/\/127\.0\.0\.1:7890"/d; /"allProxy": "socks5:\/\/127\.0\.0\.1:7890"/d' /etc/docker/daemon.json
+        sudo systemctl restart docker 2>/dev/null || true
+    fi
+
+    log_success "✅ VPN 卸载完成"
+    echo
+    log_info "已清理的组件："
+    echo "  ✅ mihomo systemd 服务"
+    echo "  ✅ mihomo 二进制文件"
+    echo "  ✅ 配置文件和数据目录 (/opt/mihomo/)"
+    echo "  ✅ 全局代理环境变量脚本"
+    echo "  ✅ 管理脚本和别名"
+    echo "  ✅ 用户级代理配置"
+    echo "  ✅ Docker 代理配置"
+    echo
+    log_warn "重要提醒："
+    echo "  • 服务器网络已恢复直连，不再依赖 7890 端口"
+    echo "  • 如有其他应用依赖代理，请手动重新配置"
+    echo "  • 建议重新登录终端以确保环境变量完全清理"
+    echo "  • 如果需要重新安装，请运行此脚本选择选项 1"
 }
 
 # 错误处理函数
@@ -1897,83 +2043,108 @@ show_completion_info() {
 }
 
 # 主函数
+# 主菜单循环
 main() {
-    log_info "=========================================="
-    log_info "服务器网络环境初始化脚本"
-    log_info "执行时间: $(date)"
-    log_info "=========================================="
-    
-    # 用户确认
-    echo
-    log_warn "此脚本将执行以下操作："
-    echo "  • 安装并配置 mihomo (Clash.Meta) VPN 客户端"
-    echo "  • 下载必要的地理位置数据文件"
-    echo "  • 配置 systemd 服务（开机自启）"
-    echo "  • 配置全局代理环境变量"
-    echo "  • 测试网络连接"
-    echo "  • 创建管理脚本"
-    echo "  • 自动检测并修复配置问题"
-    echo
-    log_info "注意：此脚本支持重复执行，已安装的组件将被自动跳过，配置问题将被自动修复"
-    echo
-    read -p "确认继续执行？(y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        log_info "用户取消执行"
-        exit 0
-    fi
-    
-    # 执行安装步骤（可重复执行）
-    check_prerequisites
-    install_mihomo_binary_repeatable
-    setup_directories_repeatable
-    download_geodata_repeatable
-    create_base_config_repeatable
-    update_subscription_repeatable
-    setup_systemd_service_repeatable
-    start_mihomo_service_repeatable
-    setup_global_proxy_repeatable
-    test_network_connectivity
-    create_management_scripts_repeatable
+    while true; do
+        show_main_menu
+        read -p "请选择 (1-3): " -n 1 -r choice
+        echo
+        
+        case $choice in
+            1)
+                log_info "=========================================="
+                log_info "开始初始化网络环境"
+                log_info "执行时间: $(date)"
+                log_info "=========================================="
+                
+                # 用户确认
+                echo
+                log_warn "此操作将执行以下步骤："
+                echo "  • 安装并配置 mihomo (Clash.Meta) VPN 客户端"
+                echo "  • 下载必要的地理位置数据文件"
+                echo "  • 配置 systemd 服务（开机自启）"
+                echo "  • 配置全局代理环境变量"
+                echo "  • 测试网络连接"
+                echo "  • 创建管理脚本"
+                echo "  • 自动检测并修复配置问题"
+                echo
+                log_info "注意：此脚本支持重复执行，已安装的组件将被自动跳过，配置问题将被自动修复"
+                echo
+                read -p "确认继续执行？(y/N): " -n 1 -r
+                echo
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    # 执行安装步骤（可重复执行）
+                    check_prerequisites
+                    install_mihomo_binary_repeatable
+                    setup_directories_repeatable
+                    download_geodata_repeatable
+                    create_base_config_repeatable
+                    update_subscription_repeatable
+                    setup_systemd_service_repeatable
+                    start_mihomo_service_repeatable
+                    setup_global_proxy_repeatable
+                    test_network_connectivity
+                    create_management_scripts_repeatable
 
-    # 修复任何配置问题
-    fix_configuration_issues
+                    # 修复任何配置问题
+                    fix_configuration_issues
 
-    show_completion_info
-    
-    log_success "网络环境初始化完成！"
-    
-    # 如果是内网环境，显示额外提示
-    if [[ "$IS_INTRANET" == "true" ]]; then
-        echo
-        log_warn "========= 内网环境特别提醒 ========="
-        echo "由于您处于内网环境，请注意以下事项："
-        echo
-        echo "1. 配置文件检查："
-        echo "   - 编辑 /opt/mihomo/config/config.yaml"
-        echo "   - 确保代理节点配置正确"
-        echo
-        echo "2. 地理数据文件："
-        if [[ -f "/opt/mihomo/data/geosite.dat" ]] && [[ -f "/opt/mihomo/data/geoip.metadb" ]]; then
-            echo "   ✅ 地理数据文件已就绪"
-        else
-            echo "   ⚠️  地理数据文件可能缺失，建议手动上传"
-            echo "   参考: /opt/mihomo/data/basic-rules.yaml"
-        fi
-        echo
-        echo "3. Docker 镜像："
-        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "mihomo"; then
-            echo "   ✅ mihomo Docker 镜像已就绪"
-        else
-            echo "   ⚠️  请确保 mihomo Docker 镜像可用"
-        fi
-        echo
-        echo "4. 测试与管理："
-        echo "   - 使用 mihomo-control status 检查状态"
-        echo "   - 使用 diagnose-network.sh 诊断问题"
-        echo "   - 访问 http://内网IP:9090 管理面板"
-        echo "=================================="
-    fi
+                    show_completion_info
+                    
+                    log_success "网络环境初始化完成！"
+                    
+                    # 如果是内网环境，显示额外提示
+                    if [[ "$IS_INTRANET" == "true" ]]; then
+                        echo
+                        log_warn "========= 内网环境特别提醒 ========="
+                        echo "由于您处于内网环境，请注意以下事项："
+                        echo
+                        echo "1. 配置文件检查："
+                        echo "   - 编辑 /opt/mihomo/config/config.yaml"
+                        echo "   - 确保代理节点配置正确"
+                        echo
+                        echo "2. 地理数据文件："
+                        if [[ -f "/opt/mihomo/data/geosite.dat" ]] && [[ -f "/opt/mihomo/data/geoip.metadb" ]]; then
+                            echo "   ✅ 地理数据文件已就绪"
+                        else
+                            echo "   ⚠️  地理数据文件可能缺失，建议手动上传"
+                            echo "   参考: /opt/mihomo/data/basic-rules.yaml"
+                        fi
+                        echo
+                        echo "3. Docker 镜像："
+                        if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "mihomo"; then
+                            echo "   ✅ mihomo Docker 镜像已就绪"
+                        else
+                            echo "   ⚠️  请确保 mihomo Docker 镜像可用"
+                        fi
+                        echo
+                        echo "4. 测试与管理："
+                        echo "   - 使用 mihomo-control status 检查状态"
+                        echo "   - 使用 diagnose-network.sh 诊断问题"
+                        echo "   - 访问 http://内网IP:9090 管理面板"
+                        echo "=================================="
+                    fi
+                else
+                    log_info "已取消初始化操作"
+                fi
+                echo
+                read -p "按 Enter 键返回主菜单..."
+                ;;
+            2)
+                uninstall_vpn
+                echo
+                read -p "按 Enter 键返回主菜单..."
+                ;;
+            3)
+                log_info "退出脚本"
+                exit 0
+                ;;
+            *)
+                log_error "无效选择，请输入 1、2 或 3"
+                sleep 2
+                ;;
+        esac
+    done
 }
 
 # 执行主函数
