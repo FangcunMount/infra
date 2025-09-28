@@ -359,6 +359,51 @@ configure_vpn_proxy_mode() {
             log_success "HTTP 代理端口 $http_proxy_port 可用"
         else
             log_warn "HTTP 代理端口 $http_proxy_port 不可用"
+            return 0
+        fi
+        
+        # 配置 Docker daemon 代理
+        log_info "配置 Docker daemon 代理..."
+        
+        # 创建 Docker 配置目录
+        mkdir -p /etc/docker
+        
+        # 创建或更新 daemon.json
+        local daemon_config='
+{
+  "registry-mirrors": [
+    "https://docker.m.daocloud.io",
+    "https://docker.nju.edu.cn"
+  ]
+}'
+        echo "$daemon_config" > /etc/docker/daemon.json
+        log_success "Docker daemon.json 配置已创建"
+        
+        # 配置 Docker 服务代理（systemd）
+        log_info "配置 Docker 服务代理..."
+        mkdir -p /etc/systemd/system/docker.service.d
+        
+        cat > /etc/systemd/system/docker.service.d/http-proxy.conf << EOF
+[Service]
+Environment="HTTP_PROXY=http://127.0.0.1:$http_proxy_port"
+Environment="HTTPS_PROXY=http://127.0.0.1:$http_proxy_port"
+Environment="NO_PROXY=localhost,127.0.0.1,::1"
+EOF
+        log_success "Docker 服务代理配置已创建"
+        
+        # 重新加载 systemd 配置并重启 Docker
+        log_info "重启 Docker 服务以应用代理配置..."
+        systemctl daemon-reload
+        systemctl restart docker
+        
+        # 等待 Docker 服务启动
+        sleep 3
+        
+        if systemctl is-active --quiet docker; then
+            log_success "Docker 服务重启成功"
+        else
+            log_error "Docker 服务重启失败"
+            return 1
         fi
         
         # 配置"漏网之鱼"代理组（如果 API 可用）
@@ -384,7 +429,7 @@ configure_vpn_proxy_mode() {
             log_warn "Mihomo API 不可用，跳过代理组配置"
         fi
         
-        log_success "VPN 代理模式配置完成"
+        log_success "✅ Docker 容器现在将自动使用 VPN 网络！"
     fi
 }
 
@@ -527,27 +572,54 @@ test_docker_basic_functionality() {
         return 1
     fi
     
-    # 测试拉取镜像
+    # 测试拉取镜像（增加超时和重试机制）
     log_test "测试镜像拉取 (hello-world)..."
-    if docker pull hello-world >/dev/null 2>&1; then
+    local pull_success=false
+    
+    # 尝试拉取镜像，增加超时时间
+    if timeout 60 docker pull hello-world >/dev/null 2>&1; then
         log_success "✅ 镜像拉取成功"
+        pull_success=true
     else
-        log_error "❌ 镜像拉取失败"
-        return 1
+        log_warn "⚠️  首次镜像拉取失败，检查代理配置..."
+        
+        # 显示Docker代理配置信息
+        if [[ -f /etc/systemd/system/docker.service.d/http-proxy.conf ]]; then
+            log_info "Docker代理配置已启用"
+        else
+            log_warn "Docker代理配置未找到"
+        fi
+        
+        # 再次尝试拉取
+        log_test "重试镜像拉取..."
+        if timeout 60 docker pull hello-world >/dev/null 2>&1; then
+            log_success "✅ 镜像拉取成功（重试）"
+            pull_success=true
+        else
+            log_error "❌ 镜像拉取失败"
+            log_info "提示: 可能的原因："
+            log_info "  1. 网络连接问题"
+            log_info "  2. VPN代理配置问题"
+            log_info "  3. Docker Hub访问限制"
+            log_info "解决方法: 运行 ./docker-vpn-manager.sh test 检查网络状态"
+            return 1
+        fi
     fi
     
-    # 测试运行容器
-    log_test "测试容器运行..."
-    if docker run --rm hello-world >/dev/null 2>&1; then
-        log_success "✅ 容器运行成功"
-    else
-        log_error "❌ 容器运行失败"
-        return 1
+    if [[ "$pull_success" == true ]]; then
+        # 测试运行容器
+        log_test "测试容器运行..."
+        if docker run --rm hello-world >/dev/null 2>&1; then
+            log_success "✅ 容器运行成功"
+        else
+            log_error "❌ 容器运行失败"
+            return 1
+        fi
+        
+        # 清理测试镜像
+        log_test "清理测试镜像..."
+        docker rmi hello-world >/dev/null 2>&1 || true
     fi
-    
-    # 清理测试镜像
-    log_test "清理测试镜像..."
-    docker rmi hello-world >/dev/null 2>&1 || true
     
     log_success "Docker 基本功能测试完成"
 }
@@ -568,36 +640,69 @@ test_docker_compose() {
 
 # 测试 VPN 网络连接
 test_vpn_network() {
-    log_step "测试 VPN 网络连接（可选）..."
+    log_step "测试 Docker VPN 网络连接..."
     
     # 检查 VPN 服务状态
     if ! systemctl is-active --quiet mihomo 2>/dev/null && ! pgrep -f "mihomo" >/dev/null 2>&1; then
-        log_warn "VPN 服务未运行，跳过网络测试"
+        log_warn "VPN 服务未运行，跳过 Docker VPN 网络测试"
         return 0
     fi
     
-    log_test "测试容器 VPN 连接..."
+    # 获取宿主机 IP 作为对比
+    local host_ip=$(curl -s --connect-timeout 10 http://httpbin.org/ip 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo "未知")
+    log_info "宿主机外部 IP: $host_ip"
     
-    # 创建临时测试容器测试网络
+    log_test "测试 Docker 容器 VPN 连接..."
+    
+    # 尝试使用已存在的镜像，如果没有就用alpine
+    local test_image="alpine:latest"
+    if docker images --format "table {{.Repository}}:{{.Tag}}" | grep -q "hello-world:latest"; then
+        test_image="hello-world:latest"
+    fi
+    
+    # 创建临时测试容器
     local test_container="docker-vpn-test-$$"
     
-    if docker run --name "$test_container" --rm -d alpine:latest sleep 30 >/dev/null 2>&1; then
-        # 在容器中测试网络连接
+    if docker run --name "$test_container" --rm -d alpine:latest sleep 60 >/dev/null 2>&1; then
+        # 等待容器启动
+        sleep 2
+        
+        # 在容器中安装wget（如果需要）
+        docker exec "$test_container" apk add --no-cache wget >/dev/null 2>&1 || true
+        
+        # 测试容器网络连接
         local test_url="http://httpbin.org/ip"
-        if docker exec "$test_container" wget -qO- --timeout=5 "$test_url" >/dev/null 2>&1; then
-            log_success "✅ 容器网络连接正常"
+        log_test "测试容器外网访问..."
+        
+        if docker exec "$test_container" wget -qO- --timeout=10 "$test_url" >/dev/null 2>&1; then
+            # 获取容器外部 IP
+            local container_ip=$(docker exec "$test_container" wget -qO- --timeout=10 "$test_url" 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo "未知")
             
-            # 获取容器 IP 地址来判断是否使用代理
-            local container_ip=$(docker exec "$test_container" wget -qO- --timeout=5 "$test_url" 2>/dev/null | grep -o '"origin": "[^"]*"' | cut -d'"' -f4 || echo "未知")
+            log_success "✅ Docker 容器网络连接正常"
             log_info "容器外部 IP: $container_ip"
+            
+            # 判断是否使用了VPN
+            if [[ "$container_ip" != "$host_ip" && "$container_ip" != "未知" ]]; then
+                log_success "🎉 Docker 容器正在通过 VPN 访问网络！"
+            elif [[ "$container_ip" == "$host_ip" ]]; then
+                log_warn "⚠️  Docker 容器使用直连，未通过 VPN"
+                log_info "建议运行: ./docker-vpn-manager.sh enable"
+            else
+                log_warn "⚠️  无法确定 Docker 容器网络状态"
+            fi
         else
-            log_warn "⚠️  容器网络连接测试失败"
+            log_error "❌ Docker 容器无法访问外网"
+            log_info "可能原因:"
+            log_info "  1. Docker daemon 代理配置问题"
+            log_info "  2. VPN 服务异常"
+            log_info "  3. 防火墙阻止容器网络"
         fi
         
         # 清理测试容器
         docker stop "$test_container" >/dev/null 2>&1 || true
     else
-        log_warn "⚠️  无法创建测试容器"
+        log_error "❌ 无法创建 Docker 测试容器"
+        log_info "请检查 Docker 服务状态: systemctl status docker"
     fi
 }
 

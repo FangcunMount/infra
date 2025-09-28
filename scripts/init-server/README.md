@@ -43,10 +43,11 @@ sudo ./install-docker.sh
 
 - ✅ **Docker Engine 安装** - 完整的Docker CE安装流程
 - ✅ **用户权限配置** - 自动配置docker组权限并测试  
-- ✅ **VPN网络集成** - 自动检测VPN并配置代理模式
+- ✅ **VPN网络完全集成** - 自动配置Docker daemon和systemd代理，确保容器通过VPN访问网络
 - ✅ **Docker Compose** - 安装并测试Docker Compose插件
-- ✅ **完整性验证** - 用户权限、基本功能、网络连接全面测试
+- ✅ **完整性验证** - 用户权限、基本功能、VPN网络连接全面测试
 - ✅ **Docker Hub认证** - 可选的Docker Hub登录配置
+- ✅ **智能重试机制** - 镜像拉取失败时自动重试并提供诊断信息
 
 ## 🔧 VPN 管理工具
 
