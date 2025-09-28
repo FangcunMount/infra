@@ -61,7 +61,7 @@ if [[ -f "${CONFIG_FILE}" ]]; then
     log_info "配置文件存在: ${CONFIG_FILE}"
     
     # 统计代理节点数量
-    local proxy_count=$(grep -c '^  - name:' "${CONFIG_FILE}" 2>/dev/null || echo "0")
+    proxy_count=$(grep -c '^  - name:' "${CONFIG_FILE}" 2>/dev/null || echo "0")
     log_info "代理节点数量: ${proxy_count}"
     
     # 显示前几个代理节点
