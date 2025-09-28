@@ -138,12 +138,47 @@ get_subscription_url() {
     local subscription_url=""
     while [[ -z "${subscription_url}" ]]; do
         echo
-        read -rp "请输入 Clash 订阅链接: " subscription_url
+        echo "请选择输入方式："
+        echo "1) 直接输入订阅链接"
+        echo "2) 从文件读取订阅链接"
+        read -rp "选择 (1/2): " input_method
+        
+        case "${input_method}" in
+            1|"")
+                read -rp "请输入 Clash 订阅链接: " subscription_url
+                ;;
+            2)
+                read -rp "请输入包含订阅链接的文件路径: " url_file
+                if [[ -f "${url_file}" ]]; then
+                    subscription_url=$(head -1 "${url_file}" 2>/dev/null)
+                    log_info "从文件读取链接: ${subscription_url}"
+                else
+                    log_warn "文件不存在: ${url_file}"
+                    continue
+                fi
+                ;;
+            *)
+                log_warn "无效选择，请重新选择"
+                continue
+                ;;
+        esac
+        
+        # 清理输入的 URL（移除首尾空格和换行符）
+        subscription_url=$(echo "${subscription_url}" | tr -d '\r\n' | xargs)
+        
         if [[ -z "${subscription_url}" ]]; then
             log_warn "订阅链接不能为空，请重新输入"
         elif [[ ! "${subscription_url}" =~ ^https?:// ]]; then
             log_warn "请输入有效的 HTTP/HTTPS 链接"
             subscription_url=""
+        else
+            log_info "验证链接格式: ${subscription_url}"
+            # 简单测试链接连通性
+            if curl -s --connect-timeout 10 --head "${subscription_url}" >/dev/null 2>&1; then
+                log_success "链接验证通过"
+            else
+                log_warn "链接连通性测试失败，但将继续尝试下载"
+            fi
         fi
     done
     
@@ -166,9 +201,20 @@ download_and_setup_config() {
     
     # 下载订阅配置
     log_info "正在下载订阅配置..."
+    log_info "原始链接: '${subscription_url}'"
     local temp_config="/tmp/mihomo_config.yaml"
     
-    if curl -fsSL -o "${temp_config}" "${subscription_url}"; then
+    # 清理可能的换行符或空格
+    subscription_url=$(echo "${subscription_url}" | tr -d '\r\n' | xargs)
+    log_info "清理后链接: '${subscription_url}'"
+    log_info "链接长度: ${#subscription_url}"
+    
+    # 诊断 URL
+    if [[ "${subscription_url}" =~ [[:space:]] ]]; then
+        log_warn "检测到 URL 中包含空格字符"
+    fi
+    
+    if curl -fsSL --connect-timeout 30 --max-time 60 -o "${temp_config}" "${subscription_url}"; then
         log_success "订阅配置下载成功"
         
         # 修改配置，禁用自动更新
@@ -215,8 +261,15 @@ EOF
         chmod 600 "${CONFIG_FILE}"
         log_success "配置文件创建完成: ${CONFIG_FILE}"
     else
-        log_error "订阅配置下载失败"
-        log_error "请检查网络连接或订阅链接是否正确"
+        local curl_exit_code=$?
+        log_error "订阅配置下载失败 (curl exit code: ${curl_exit_code})"
+        log_error "订阅链接: ${subscription_url}"
+        log_info "尝试手动测试: curl -v '${subscription_url}'"
+        log_error "请检查以下问题："
+        echo "  • 网络连接是否正常"
+        echo "  • 订阅链接是否有效"
+        echo "  • 是否需要代理访问"
+        echo "  • 服务器防火墙设置"
         exit 1
     fi
 }
