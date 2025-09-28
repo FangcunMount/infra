@@ -140,7 +140,7 @@ install_docker_debian() {
     apt-get update -y
 
     log_info "安装必要的依赖包..."
-    apt-get install -y ca-certificates curl gnupg lsb-release
+    apt-get install -y ca-certificates curl gnupg lsb-release netcat-openbsd
 
     # 创建密钥目录
     install -m 0755 -d /etc/apt/keyrings
@@ -200,7 +200,7 @@ install_docker_rhel() {
     $PKG_MANAGER remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine >/dev/null 2>&1 || true
 
     log_info "安装必要的依赖包..."
-    $PKG_MANAGER install -y yum-utils device-mapper-persistent-data lvm2
+    $PKG_MANAGER install -y yum-utils device-mapper-persistent-data lvm2 nmap-ncat
 
     log_info "配置 Docker 仓库..."
     if [[ "$PKG_MANAGER" == "dnf" ]]; then
@@ -221,9 +221,15 @@ install_docker_rhel() {
     log_success "Docker 软件包安装完成"
 }
 
+# 初始化 VPN 配置变量
+VPN_AVAILABLE=false
+VPN_HTTP_PROXY=""
+VPN_SOCKS_PROXY=""
+
 detect_os
 check_system_resources
 check_existing_docker
+detect_vpn_config
 
 # 根据操作系统选择安装方法
 case "$OS_TYPE" in
@@ -239,6 +245,62 @@ case "$OS_TYPE" in
         ;;
 esac
 
+# 检测 VPN 网络配置
+detect_vpn_config() {
+    log_info "检测 VPN 网络配置..."
+    
+    # 检查 nc 命令是否可用
+    if ! command -v nc >/dev/null 2>&1; then
+        log_warn "nc 命令不可用，VPN 端口检测可能不准确"
+        return 0
+    fi
+    
+    # 检测 Mihomo 服务状态
+    if systemctl is-active --quiet mihomo 2>/dev/null; then
+        log_success "检测到 Mihomo VPN 服务运行中"
+        
+        # 检查代理端口
+        local http_proxy="127.0.0.1:7890"
+        local socks_proxy="127.0.0.1:7891"
+        
+        if nc -z 127.0.0.1 7890 >/dev/null 2>&1; then
+            log_success "HTTP 代理端口 7890 可用"
+            VPN_HTTP_PROXY="http://$http_proxy"
+        else
+            log_warn "HTTP 代理端口 7890 不可用"
+        fi
+        
+        if nc -z 127.0.0.1 7891 >/dev/null 2>&1; then
+            log_success "SOCKS5 代理端口 7891 可用"
+            VPN_SOCKS_PROXY="socks5://$socks_proxy"
+        else
+            log_warn "SOCKS5 代理端口 7891 不可用"
+        fi
+        
+        if [[ -n "$VPN_HTTP_PROXY" || -n "$VPN_SOCKS_PROXY" ]]; then
+            VPN_AVAILABLE=true
+            log_success "✅ VPN 代理环境检测成功"
+        else
+            log_warn "VPN 服务运行但代理端口不可用"
+            VPN_AVAILABLE=false
+        fi
+    else
+        log_warn "未检测到 Mihomo VPN 服务"
+        VPN_AVAILABLE=false
+    fi
+    
+    # 测试网络连接
+    if [[ "$VPN_AVAILABLE" == true ]]; then
+        log_info "测试 VPN 网络连接..."
+        if curl -s --connect-timeout 10 --max-time 30 --proxy "$VPN_HTTP_PROXY" https://www.google.com >/dev/null 2>&1; then
+            log_success "✅ VPN 网络连接测试成功"
+        else
+            log_warn "VPN 网络连接测试失败，将使用直连模式"
+            VPN_AVAILABLE=false
+        fi
+    fi
+}
+
 # 配置 Docker daemon
 configure_docker_daemon() {
     log_info "配置 Docker daemon..."
@@ -248,9 +310,8 @@ configure_docker_daemon() {
     # 创建 Docker 配置目录
     mkdir -p /etc/docker
     
-    # 创建优化的 daemon 配置
-    cat > "$docker_config" << 'EOF'
-{
+    # 基础配置
+    local base_config='{
     "log-driver": "json-file",
     "log-opts": {
         "max-size": "10m",
@@ -269,17 +330,143 @@ configure_docker_daemon() {
             "Hard": 64000,
             "Soft": 64000
         }
-    }
-}
-EOF
+    }'
+    
+    # 配置 Docker Hub 镜像加速器
+    local registry_mirrors_config='
+    ,"registry-mirrors": [
+        "https://docker.m.daocloud.io",
+        "https://dockerproxy.com",
+        "https://docker.mirrors.ustc.edu.cn",
+        "https://docker.nju.edu.cn"
+    ]'
+    
+    # 如果检测到 VPN，添加代理配置
+    if [[ "$VPN_AVAILABLE" == true ]]; then
+        log_info "配置 Docker daemon 使用 VPN 代理和镜像加速..."
+        
+        # VPN 环境下的配置（优先使用代理）
+        local proxy_config="$registry_mirrors_config"
+        
+        if [[ -n "$VPN_HTTP_PROXY" ]]; then
+            proxy_config="${proxy_config}
+    ,\"proxies\": {
+        \"default\": {
+            \"httpProxy\": \"$VPN_HTTP_PROXY\",
+            \"httpsProxy\": \"$VPN_HTTP_PROXY\",
+            \"noProxy\": \"localhost,127.0.0.0/8,::1\"
+        }
+    }"
+        fi
+        
+        base_config="${base_config}${proxy_config}"
+        log_success "✅ Docker daemon VPN 代理和镜像加速配置完成"
+    else
+        log_info "配置 Docker Hub 镜像加速器..."
+        # 无 VPN 环境，仅配置镜像加速器
+        base_config="${base_config}${registry_mirrors_config}"
+        log_success "✅ Docker Hub 镜像加速器配置完成"
+    fi
+    
+    # 写入配置文件
+    echo "${base_config}
+}" > "$docker_config"
     
     log_success "Docker daemon 配置完成"
 }
 
+# 配置 Docker systemd 服务的代理环境
+configure_docker_systemd_proxy() {
+    if [[ "$VPN_AVAILABLE" != true ]]; then
+        return 0
+    fi
+    
+    log_info "配置 Docker systemd 服务代理环境..."
+    
+    # 创建 systemd 服务目录
+    local systemd_dir="/etc/systemd/system/docker.service.d"
+    mkdir -p "$systemd_dir"
+    
+    # 创建代理配置文件
+    local proxy_conf="$systemd_dir/proxy.conf"
+    
+    cat > "$proxy_conf" << EOF
+[Service]
+Environment="HTTP_PROXY=$VPN_HTTP_PROXY"
+Environment="HTTPS_PROXY=$VPN_HTTP_PROXY"
+Environment="NO_PROXY=localhost,127.0.0.0/8,::1"
+EOF
+    
+    log_success "✅ Docker systemd 代理配置完成"
+    
+    # 重新加载 systemd 配置
+    systemctl daemon-reload
+    log_info "systemd 配置已重新加载"
+}
+
+# 创建 Docker VPN 使用脚本
+create_docker_vpn_helper() {
+    if [[ "$VPN_AVAILABLE" != true ]]; then
+        return 0
+    fi
+    
+    log_info "创建 Docker VPN 辅助脚本..."
+    
+    # 创建脚本目录
+    local helper_dir="/usr/local/bin"
+    local helper_script="$helper_dir/docker-vpn"
+    
+    cat > "$helper_script" << 'EOF'
+#!/bin/bash
+# Docker VPN 辅助脚本
+# 用于在 VPN 环境中运行 Docker 容器
+
+# VPN 代理配置
+HTTP_PROXY="http://127.0.0.1:7890"
+HTTPS_PROXY="http://127.0.0.1:7890"
+SOCKS_PROXY="socks5://127.0.0.1:7891"
+
+# 设置代理环境变量
+export http_proxy="$HTTP_PROXY"
+export https_proxy="$HTTPS_PROXY"
+export HTTP_PROXY="$HTTP_PROXY"
+export HTTPS_PROXY="$HTTPS_PROXY"
+export NO_PROXY="localhost,127.0.0.0/8,::1"
+
+# 运行 Docker 命令
+exec docker "$@"
+EOF
+    
+    chmod +x "$helper_script"
+    log_success "✅ Docker VPN 辅助脚本创建完成: $helper_script"
+    
+    # 创建 Docker Compose VPN 辅助脚本
+    local compose_helper="$helper_dir/docker-compose-vpn"
+    
+    cat > "$compose_helper" << 'EOF'
+#!/bin/bash
+# Docker Compose VPN 辅助脚本
+
+# VPN 代理配置
+export HTTP_PROXY="http://127.0.0.1:7890"
+export HTTPS_PROXY="http://127.0.0.1:7890"
+export NO_PROXY="localhost,127.0.0.0/8,::1"
+
+# 运行 Docker Compose 命令
+exec docker compose "$@"
+EOF
+    
+    chmod +x "$compose_helper"
+    log_success "✅ Docker Compose VPN 辅助脚本创建完成: $compose_helper"
+}
+
 configure_docker_daemon
+configure_docker_systemd_proxy
+create_docker_vpn_helper
 
 log_info "启用并启动 Docker 服务..."
-systemctl enable --now docker
+systemctl enable docker
+systemctl start docker
 
 # 验证 Docker 服务状态
 if systemctl is-active --quiet docker; then
@@ -356,6 +543,17 @@ verify_installation() {
         log_info "如果是权限问题，请运行: sudo usermod -aG docker \$USER"
     fi
     
+    # 测试 Docker 网络连接
+    if [[ "$VPN_AVAILABLE" == true ]]; then
+        log_info "测试 Docker 容器 VPN 网络连接..."
+        if timeout 30 docker run --rm alpine/curl:latest curl -s --connect-timeout 10 https://www.google.com >/dev/null 2>&1; then
+            log_success "✅ Docker 容器 VPN 网络连接测试成功"
+        else
+            log_warn "⚠️  Docker 容器 VPN 网络连接测试失败"
+            log_info "容器可能仍使用直连网络，请检查 VPN 配置"
+        fi
+    fi
+    
     # 检查 Docker 存储驱动
     if storage_driver=$(docker info --format "{{.Driver}}" 2>/dev/null); then
         log_success "存储驱动: $storage_driver"
@@ -389,6 +587,20 @@ echo "  ✅ 日志轮转配置 (最大 10MB × 3 文件)"
 echo "  ✅ 存储驱动优化 (overlay2)"
 echo "  ✅ Systemd Cgroup 驱动"
 echo "  ✅ 容器存活恢复功能"
+echo "  ✅ Docker Hub 镜像加速器 (4个镜像源)"
+echo "     • DaoCloud: docker.m.daocloud.io"
+echo "     • DockerProxy: dockerproxy.com"
+echo "     • 中科大: docker.mirrors.ustc.edu.cn"
+echo "     • 南大: docker.nju.edu.cn"
+if [[ "$VPN_AVAILABLE" == true ]]; then
+    echo "  ✅ VPN 代理网络集成"
+    echo "     HTTP 代理: $VPN_HTTP_PROXY"
+    if [[ -n "$VPN_SOCKS_PROXY" ]]; then
+        echo "     SOCKS5 代理: $VPN_SOCKS_PROXY"
+    fi
+else
+    echo "  ⚠️  未配置 VPN 代理 (直连模式)"
+fi
 
 echo
 log_info "🔧 系统信息："
@@ -406,9 +618,35 @@ if [[ -n "${default_user}" && "${default_user}" != "root" ]]; then
     echo "     或者运行: su - $default_user"
 fi
 
-echo "  3. 运行测试: docker run hello-world"
-echo "  4. 查看系统信息: docker system info"
-echo "  5. 管理 Docker: systemctl start|stop|restart docker"
+echo "  3. 测试镜像拉取: docker pull nginx"
+echo "  4. 运行测试: docker run hello-world"
+echo "  5. 查看系统信息: docker system info"
+echo "  6. 管理 Docker: systemctl start|stop|restart docker"
+
+if [[ "$VPN_AVAILABLE" == true ]]; then
+    echo
+    log_info "🌐 VPN 网络使用："
+    echo "  • Docker 已配置使用 VPN 代理网络"
+    echo "  • 容器拉取镜像将通过 VPN 进行"
+    echo "  • 测试网络连接: docker run --rm alpine/curl curl https://www.google.com"
+    echo "  • 查看代理配置: cat /etc/docker/daemon.json"
+    echo "  • VPN 服务管理: systemctl status mihomo"
+    echo "  • VPN 辅助命令: docker-vpn (强制 VPN 环境) | docker-compose-vpn"
+else
+    echo
+    log_info "🌐 网络配置："
+    echo "  • Docker 使用直连网络模式"
+    echo "  • 如需启用 VPN，请先安装并启动 Mihomo VPN 服务"
+    echo "  • 然后重新运行此脚本以自动配置 VPN 代理"
+fi
+
+echo
+log_info "🚀 镜像加速使用："
+echo "  • Docker Hub 镜像加速器已自动配置"
+echo "  • 拉取镜像会自动尝试多个镜像源"
+echo "  • 测试拉取速度: time docker pull alpine:latest"
+echo "  • 查看镜像配置: docker system info | grep -A 10 'Registry Mirrors'"
+echo "  • 手动指定镜像源: docker pull docker.m.daocloud.io/library/nginx"
 
 echo
 log_info "📁 重要文件位置："
