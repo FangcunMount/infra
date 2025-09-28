@@ -150,9 +150,14 @@ if [[ -f /etc/docker/daemon.json ]]; then
     log_info "已备份现有配置"
 fi
 
+# 获取 Docker 网桥网关 IP
+log_info "获取 Docker 网桥网关 IP..."
+DOCKER_GATEWAY=$(docker network inspect bridge 2>/dev/null | grep '"Gateway"' | head -1 | sed 's/.*"Gateway": "\([^"]*\)".*/\1/' || echo "172.17.0.1")
+log_info "Docker 网桥网关: $DOCKER_GATEWAY"
+
 # 创建新的配置文件
 log_info "创建优化的 Docker daemon 配置..."
-cat > /etc/docker/daemon.json << 'EOF'
+cat > /etc/docker/daemon.json << EOF
 {
     "log-driver": "json-file",
     "log-opts": {
@@ -179,13 +184,7 @@ cat > /etc/docker/daemon.json << 'EOF'
         "https://docker.mirrors.ustc.edu.cn",
         "https://docker.nju.edu.cn"
     ],
-    "proxies": {
-        "default": {
-            "httpProxy": "http://127.0.0.1:7890",
-            "httpsProxy": "http://127.0.0.1:7890",
-            "noProxy": "localhost,127.0.0.0/8,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
-        }
-    }
+    "dns": ["8.8.8.8", "1.1.1.1"]
 }
 EOF
 
@@ -220,56 +219,118 @@ fi
 # 等待服务完全启动
 sleep 5
 
-log_step "7. 验证修复结果"
+log_step "7. 配置容器 VPN 代理"
+
+# 创建 Docker 代理配置脚本
+log_info "创建 Docker VPN 代理脚本..."
+cat > /usr/local/bin/docker-vpn << EOF
+#!/bin/bash
+# Docker VPN 代理封装脚本
+
+# 获取 Docker 网桥网关 IP
+DOCKER_GATEWAY=\$(docker network inspect bridge 2>/dev/null | grep '"Gateway"' | head -1 | sed 's/.*"Gateway": "\([^"]*\)".*/\1/' || echo "172.17.0.1")
+
+# 设置代理环境变量
+export HTTP_PROXY="http://\${DOCKER_GATEWAY}:7890"
+export HTTPS_PROXY="http://\${DOCKER_GATEWAY}:7890"
+export http_proxy="http://\${DOCKER_GATEWAY}:7890"
+export https_proxy="http://\${DOCKER_GATEWAY}:7890"
+export NO_PROXY="localhost,127.0.0.1,\${DOCKER_GATEWAY}"
+
+# 运行 Docker 命令
+docker "\$@"
+EOF
+
+chmod +x /usr/local/bin/docker-vpn
+log_success "✅ 创建 Docker VPN 代理脚本"
+
+# 创建 Docker Compose VPN 脚本
+cat > /usr/local/bin/docker-compose-vpn << EOF
+#!/bin/bash
+# Docker Compose VPN 代理封装脚本
+
+# 获取 Docker 网桥网关 IP
+DOCKER_GATEWAY=\$(docker network inspect bridge 2>/dev/null | grep '"Gateway"' | head -1 | sed 's/.*"Gateway": "\([^"]*\)".*/\1/' || echo "172.17.0.1")
+
+# 设置代理环境变量
+export HTTP_PROXY="http://\${DOCKER_GATEWAY}:7890"
+export HTTPS_PROXY="http://\${DOCKER_GATEWAY}:7890"
+export http_proxy="http://\${DOCKER_GATEWAY}:7890"
+export https_proxy="http://\${DOCKER_GATEWAY}:7890"
+export NO_PROXY="localhost,127.0.0.1,\${DOCKER_GATEWAY}"
+
+# 运行 Docker Compose 命令
+docker compose "\$@"
+EOF
+
+chmod +x /usr/local/bin/docker-compose-vpn
+log_success "✅ 创建 Docker Compose VPN 代理脚本"
+
+log_step "8. 验证修复结果"
 
 # 重新测试网络连接
 log_info "重新测试网络连接..."
 
-# 获取修复后的 VPN IP
-vpn_ip_new=$(timeout 30 docker run --rm alpine/curl:latest curl -s --connect-timeout 10 http://httpbin.org/ip 2>/dev/null | grep -o '"origin":"[^"]*"' | cut -d'"' -f4 || echo "failed")
+# 获取直连 IP
+direct_ip_new=$(timeout 15 docker run --rm --env HTTP_PROXY= --env HTTPS_PROXY= --env http_proxy= --env https_proxy= alpine/curl:latest curl -s --connect-timeout 10 http://httpbin.org/ip 2>/dev/null | grep -o '"origin":"[^"]*"' | cut -d'"' -f4 || echo "failed")
 
-if [[ "$vpn_ip_new" != "failed" ]]; then
-    log_info "修复后 VPN IP: $vpn_ip_new"
+# 使用 VPN 代理测试
+vpn_ip_new=$(timeout 30 docker run --rm --env HTTP_PROXY="http://${DOCKER_GATEWAY}:7890" --env HTTPS_PROXY="http://${DOCKER_GATEWAY}:7890" alpine/curl:latest curl -s --connect-timeout 10 http://httpbin.org/ip 2>/dev/null | grep -o '"origin":"[^"]*"' | cut -d'"' -f4 || echo "failed")
+
+if [[ "$direct_ip_new" != "failed" && "$vpn_ip_new" != "failed" ]]; then
+    log_info "直连 IP: $direct_ip_new"
+    log_info "VPN IP: $vpn_ip_new"
     
-    if [[ "$direct_ip" != "$vpn_ip_new" && "$direct_ip" != "failed" ]]; then
-        log_success "🎉 修复成功！Docker 容器现在使用 VPN 网络"
-        echo "  直连 IP: $direct_ip"
+    if [[ "$direct_ip_new" != "$vpn_ip_new" ]]; then
+        log_success "🎉 修复成功！Docker 容器现在可以使用 VPN 网络"
+        echo "  直连 IP: $direct_ip_new"
         echo "  VPN IP: $vpn_ip_new"
     else
-        log_warn "⚠️  IP 仍然相同，可能需要进一步排查"
+        log_warn "⚠️  IP 仍然相同，VPN 代理可能未生效"
     fi
 else
-    log_error "❌ 修复后仍无法获取 VPN IP"
+    log_error "❌ 网络测试失败"
+    log_info "直连测试: $direct_ip_new"
+    log_info "VPN 测试: $vpn_ip_new"
 fi
 
 # 测试 Google 访问
 log_info "测试 Google 访问..."
-if timeout 30 docker run --rm alpine/curl:latest curl -s --connect-timeout 10 https://www.google.com >/dev/null 2>&1; then
+if timeout 30 docker run --rm --env HTTP_PROXY="http://${DOCKER_GATEWAY}:7890" --env HTTPS_PROXY="http://${DOCKER_GATEWAY}:7890" alpine/curl:latest curl -s --connect-timeout 10 https://www.google.com >/dev/null 2>&1; then
     log_success "✅ 可以通过 VPN 访问 Google"
 else
     log_warn "⚠️  无法通过 VPN 访问 Google"
 fi
 
-log_step "8. 创建测试脚本"
+log_step "9. 创建测试脚本"
 
 # 创建便捷的测试脚本
-cat > /usr/local/bin/test-docker-vpn << 'EOF'
+cat > /usr/local/bin/test-docker-vpn << EOF
 #!/bin/bash
 echo "🔍 Docker VPN 网络测试"
 echo "========================"
+
+# 获取 Docker 网桥网关 IP
+DOCKER_GATEWAY=\$(docker network inspect bridge 2>/dev/null | grep '"Gateway"' | head -1 | sed 's/.*"Gateway": "\([^"]*\)".*/\1/' || echo "172.17.0.1")
 
 echo -n "直连 IP: "
 docker run --rm --env HTTP_PROXY= --env HTTPS_PROXY= --env http_proxy= --env https_proxy= alpine/curl:latest curl -s --connect-timeout 5 http://httpbin.org/ip 2>/dev/null | grep -o '"origin":"[^"]*"' | cut -d'"' -f4 || echo "获取失败"
 
 echo -n "VPN IP:  "
-docker run --rm alpine/curl:latest curl -s --connect-timeout 5 http://httpbin.org/ip 2>/dev/null | grep -o '"origin":"[^"]*"' | cut -d'"' -f4 || echo "获取失败"
+docker run --rm --env HTTP_PROXY="http://\${DOCKER_GATEWAY}:7890" --env HTTPS_PROXY="http://\${DOCKER_GATEWAY}:7890" alpine/curl:latest curl -s --connect-timeout 5 http://httpbin.org/ip 2>/dev/null | grep -o '"origin":"[^"]*"' | cut -d'"' -f4 || echo "获取失败"
 
 echo -n "Google 访问: "
-if docker run --rm alpine/curl:latest curl -s --connect-timeout 5 https://www.google.com >/dev/null 2>&1; then
+if docker run --rm --env HTTP_PROXY="http://\${DOCKER_GATEWAY}:7890" --env HTTPS_PROXY="http://\${DOCKER_GATEWAY}:7890" alpine/curl:latest curl -s --connect-timeout 5 https://www.google.com >/dev/null 2>&1; then
     echo "✅ 成功"
 else
     echo "❌ 失败"
 fi
+
+echo
+echo "💡 VPN 代理使用方法:"
+echo "  • 使用 VPN: docker-vpn run --rm alpine/curl curl http://httpbin.org/ip"
+echo "  • 直接连接: docker run --rm alpine/curl curl http://httpbin.org/ip"
+echo "  • VPN Compose: docker-compose-vpn up"
 EOF
 
 chmod +x /usr/local/bin/test-docker-vpn
@@ -280,19 +341,26 @@ log_success "🎉 Docker VPN 配置修复完成！"
 echo
 log_info "💡 使用建议:"
 echo "  • 快速测试: test-docker-vpn"
-echo "  • 手动测试: docker run --rm alpine/curl curl http://httpbin.org/ip"
-echo "  • 访问测试: docker run --rm alpine/curl curl https://www.google.com"
+echo "  • 使用 VPN: docker-vpn run --rm alpine/curl curl http://httpbin.org/ip"
+echo "  • 直接连接: docker run --rm alpine/curl curl http://httpbin.org/ip"
+echo "  • VPN Compose: docker-compose-vpn up"
 echo "  • 查看配置: cat /etc/docker/daemon.json"
 echo "  • 重启服务: systemctl restart docker"
 
-if [[ "$direct_ip" != "$vpn_ip_new" && "$direct_ip" != "failed" && "$vpn_ip_new" != "failed" ]]; then
+if [[ "$direct_ip_new" != "$vpn_ip_new" && "$direct_ip_new" != "failed" && "$vpn_ip_new" != "failed" ]]; then
     echo
-    log_success "✅ 配置成功！Docker 容器现在通过 VPN 网络访问互联网。"
+    log_success "✅ 配置成功！Docker 容器现在可以通过 VPN 网络访问互联网。"
+    echo
+    log_info "🔧 使用方法:"
+    echo "  • 强制使用 VPN: docker-vpn run [容器参数]"
+    echo "  • 强制直连: docker run [容器参数] (清空代理环境变量)"
+    echo "  • 测试网络: test-docker-vpn"
 else
     echo
     log_warn "⚠️  如果仍有问题，请检查："
     echo "  1. VPN 服务状态: systemctl status mihomo"
     echo "  2. 代理端口: nc -z 127.0.0.1 7890"
-    echo "  3. Docker 日志: journalctl -u docker.service"
+    echo "  3. Docker 网桥: docker network inspect bridge"
     echo "  4. 手动代理测试: curl --proxy http://127.0.0.1:7890 https://www.google.com"
+    echo "  5. 容器网络测试: docker run --rm --env HTTP_PROXY=http://172.18.0.1:7890 alpine/curl curl http://httpbin.org/ip"
 fi
