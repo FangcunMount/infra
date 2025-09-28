@@ -133,14 +133,14 @@ install_mihomo() {
 
 # 步骤2：要求用户输入订阅链接
 get_subscription_url() {
-    log_step "2. 输入订阅链接"
+    log_step "2. 输入订阅链接" >&2
     
     local subscription_url=""
     while [[ -z "${subscription_url}" ]]; do
-        echo
-        echo "请选择输入方式："
-        echo "1) 直接输入订阅链接"
-        echo "2) 从文件读取订阅链接"
+        echo >&2
+        echo "请选择输入方式：" >&2
+        echo "1) 直接输入订阅链接" >&2
+        echo "2) 从文件读取订阅链接" >&2
         read -rp "选择 (1/2): " input_method
         
         case "${input_method}" in
@@ -151,14 +151,14 @@ get_subscription_url() {
                 read -rp "请输入包含订阅链接的文件路径: " url_file
                 if [[ -f "${url_file}" ]]; then
                     subscription_url=$(head -1 "${url_file}" 2>/dev/null)
-                    log_info "从文件读取链接: ${subscription_url}"
+                    log_info "从文件读取链接: ${subscription_url}" >&2
                 else
-                    log_warn "文件不存在: ${url_file}"
+                    log_warn "文件不存在: ${url_file}" >&2
                     continue
                 fi
                 ;;
             *)
-                log_warn "无效选择，请重新选择"
+                log_warn "无效选择，请重新选择" >&2
                 continue
                 ;;
         esac
@@ -167,17 +167,17 @@ get_subscription_url() {
         subscription_url=$(echo "${subscription_url}" | tr -d '\r\n' | xargs)
         
         if [[ -z "${subscription_url}" ]]; then
-            log_warn "订阅链接不能为空，请重新输入"
+            log_warn "订阅链接不能为空，请重新输入" >&2
         elif [[ ! "${subscription_url}" =~ ^https?:// ]]; then
-            log_warn "请输入有效的 HTTP/HTTPS 链接"
+            log_warn "请输入有效的 HTTP/HTTPS 链接" >&2
             subscription_url=""
         else
-            log_info "验证链接格式: ${subscription_url}"
+            log_info "验证链接格式: ${subscription_url}" >&2
             # 简单测试链接连通性
             if curl -s --connect-timeout 10 --head "${subscription_url}" >/dev/null 2>&1; then
-                log_success "链接验证通过"
+                log_success "链接验证通过" >&2
             else
-                log_warn "链接连通性测试失败，但将继续尝试下载"
+                log_warn "链接连通性测试失败，但将继续尝试下载" >&2
             fi
         fi
     done
