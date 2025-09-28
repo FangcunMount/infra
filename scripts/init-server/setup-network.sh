@@ -1086,11 +1086,12 @@ download_geodata() {
             
             if [[ "$geosite_size" -gt 1000 ]] && [[ "$geoip_size" -gt 1000 ]]; then
                 # 清理配置目录中的大写文件（如果存在）
-                rm -f "$config_dir/GeoSite.dat" "$config_dir/GeoIP.metadb" 2>/dev/null || true
+                rm -f "${CLASH_CONFIG_DIR}/GeoSite.dat" "${CLASH_CONFIG_DIR}/GeoIP.metadb" 2>/dev/null || true
+                rm -f "${MIHOMO_CONFIG_DIR}/GeoSite.dat" "${MIHOMO_CONFIG_DIR}/GeoIP.metadb" 2>/dev/null || true
                 
                 log_success "✅ 本地静态地理数据文件部署完成"
                 log_info "文件大小验证: geosite.dat ($(($geosite_size/1024))KB), geoip.metadb ($(($geoip_size/1024))KB)"
-                log_info "地理数据文件位置: $config_dir/ (主) 和 $data_dir/ (备份)"
+                log_info "地理数据文件位置: ${CLASH_CONFIG_DIR}/ (主) 和 $data_dir/ (备份)"
                 return 0
             else
                 log_warn "⚠️  复制的文件大小异常，将尝试其他方案"
