@@ -333,13 +333,8 @@ proxy-off() {
     echo "🔴 代理已关闭"
 }
 
-proxy-status() {
-    if [[ -n "${http_proxy:-}" ]]; then
-        echo "当前代理: $http_proxy"
-    else
-        echo "代理未开启"
-    fi
-}
+# 使用别名定义 proxy-status（避免函数冲突）
+alias proxy-status='echo "Proxy Status:"; echo "  HTTP_PROXY: $http_proxy"; echo "  HTTPS_PROXY: $https_proxy"; echo "  ALL_PROXY: $all_proxy"'
 EOF
         chmod 644 /etc/profile.d/mihomo-proxy.sh
         
@@ -401,6 +396,99 @@ test_vpn_connectivity() {
     fi
 }
 
+# 创建诊断脚本
+create_diagnostic_script() {
+    local diagnostic_script="/usr/local/bin/mihomo-diagnose"
+    
+    cat > "${diagnostic_script}" << 'EOF'
+#!/bin/bash
+# Mihomo VPN 诊断脚本
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log_info() { echo -e "${BLUE}[INFO]${NC} $*"; }
+log_success() { echo -e "${GREEN}[SUCCESS]${NC} $*"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $*"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $*"; }
+
+echo "==============================================="
+echo "🔍 Mihomo VPN 诊断工具"
+echo "==============================================="
+
+# 1. 检查服务状态
+log_info "1. 检查 mihomo 服务状态"
+if systemctl is-active --quiet mihomo.service; then
+    log_success "✅ mihomo 服务运行正常"
+    systemctl status mihomo.service --no-pager -l
+else
+    log_error "❌ mihomo 服务未运行"
+    systemctl status mihomo.service --no-pager -l
+fi
+
+echo
+
+# 2. 检查端口监听
+log_info "2. 检查端口监听状态"
+if ss -tuln | grep -q ":7890"; then
+    log_success "✅ 端口 7890 监听正常"
+    ss -tuln | grep ":789"
+else
+    log_error "❌ 端口 7890 未监听"
+fi
+
+echo
+
+# 3. 检查配置文件
+log_info "3. 检查配置文件"
+config_file="/root/.config/clash/config.yaml"
+if [[ -f "${config_file}" ]]; then
+    log_success "✅ 配置文件存在"
+    echo "代理节点数量: $(grep -c '^  - name:' "${config_file}" || echo "0")"
+    echo "配置文件大小: $(du -h "${config_file}" | cut -f1)"
+else
+    log_error "❌ 配置文件不存在"
+fi
+
+echo
+
+# 4. 测试连接
+log_info "4. 测试网络连接"
+echo "直连测试:"
+if curl -s --connect-timeout 5 http://www.baidu.com >/dev/null; then
+    log_success "✅ 直连正常"
+else
+    log_error "❌ 直连失败"
+fi
+
+echo "代理测试:"
+if curl -s --connect-timeout 10 --proxy 127.0.0.1:7890 https://www.baidu.com >/dev/null; then
+    log_success "✅ 代理连接正常"
+else
+    log_warn "⚠️  代理连接失败"
+fi
+
+echo
+
+# 5. 显示最近日志
+log_info "5. 最近的服务日志 (最后 20 行)"
+journalctl -u mihomo.service --no-pager -n 20
+
+echo
+log_info "💡 故障排除建议："
+echo "  • 重启服务: systemctl restart mihomo"
+echo "  • 检查配置: cat /root/.config/clash/config.yaml"
+echo "  • 更新订阅: 重新运行安装脚本"
+echo "  • 查看完整日志: journalctl -u mihomo.service -f"
+EOF
+
+    chmod +x "${diagnostic_script}"
+    log_info "已创建诊断脚本: ${diagnostic_script}"
+}
+
 # 显示完成信息
 show_completion_info() {
     echo
@@ -430,10 +518,44 @@ show_completion_info() {
     echo "  • 查看外网IP: curl --proxy 127.0.0.1:7890 https://ifconfig.me"
     echo
     
+    log_info "诊断工具:"
+    echo "  • 运行诊断: mihomo-diagnose"
+    echo "  • 查看日志: journalctl -u mihomo.service -f"
+    echo "  • 重启服务: systemctl restart mihomo"
+    echo
+    
     log_warn "注意事项:"
     echo "  • 重新登录终端以应用环境变量"
     echo "  • 如需修改配置，编辑 ${CONFIG_FILE} 后重启服务"
     echo "  • 服务已设置开机自启动"
+    echo
+    
+    # 如果代理测试失败，提供诊断信息
+    if ! curl -s --connect-timeout 5 --proxy 127.0.0.1:7890 https://www.google.com >/dev/null 2>&1; then
+        echo
+        log_warn "🔧 代理测试失败 - 诊断和修复建议："
+        echo "1. 检查 mihomo 服务日志:"
+        echo "   journalctl -u mihomo.service --no-pager -l"
+        echo
+        echo "2. 检查配置文件中的代理节点:"
+        echo "   grep -A5 -B5 'proxies:' ${CONFIG_FILE}"
+        echo
+        echo "3. 手动测试代理连接:"
+        echo "   curl -v --proxy 127.0.0.1:7890 https://www.baidu.com"
+        echo
+        echo "4. 重启服务并重新测试:"
+        echo "   systemctl restart mihomo && sleep 3"
+        echo "   curl --proxy 127.0.0.1:7890 https://ifconfig.me"
+        echo
+        echo "5. 检查防火墙设置:"
+        echo "   ufw status"
+        echo "   iptables -L"
+        echo
+        log_info "💡 常见解决方案："
+        echo "  • 订阅节点可能失效，尝试更新订阅"
+        echo "  • 检查服务器出站网络限制"
+        echo "  • 确认订阅配置格式正确"
+    fi
 }
 
 # 主函数
@@ -473,6 +595,9 @@ main() {
     download_and_setup_config "${subscription_url}"
     setup_and_start_vpn
     test_vpn_connectivity
+    
+    # 创建诊断脚本
+    create_diagnostic_script
     
     show_completion_info
 }
