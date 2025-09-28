@@ -566,13 +566,65 @@ create_docker_vpn_helper
 
 log_info "启用并启动 Docker 服务..."
 systemctl enable docker
-systemctl start docker
+
+# 重新加载 systemd 配置确保生效
+systemctl daemon-reload
+
+# 尝试启动 Docker 服务
+if ! systemctl start docker; then
+    log_error "Docker 服务启动失败，开始诊断..."
+    
+    # 显示服务状态
+    echo "服务状态:"
+    systemctl status docker --no-pager -l || true
+    
+    echo
+    echo "服务日志:"
+    journalctl -xeu docker.service -n 10 --no-pager || true
+    
+    # 检查配置文件
+    echo
+    log_info "检查配置文件..."
+    if [[ -f /etc/docker/daemon.json ]]; then
+        log_info "验证 JSON 配置语法..."
+        if ! python3 -m json.tool /etc/docker/daemon.json >/dev/null 2>&1; then
+            log_error "Docker daemon 配置文件 JSON 语法错误"
+            log_info "尝试修复配置文件..."
+            cp /etc/docker/daemon.json /etc/docker/daemon.json.error
+            echo '{}' > /etc/docker/daemon.json
+            log_info "已重置配置文件，错误配置备份为 daemon.json.error"
+            
+            # 重新尝试启动
+            systemctl daemon-reload
+            if systemctl start docker; then
+                log_success "✅ 配置重置后 Docker 服务启动成功"
+            else
+                log_error "❌ 重置配置后仍然启动失败"
+            fi
+        else
+            log_success "JSON 配置语法正确"
+        fi
+    fi
+    
+    # 最终检查
+    if ! systemctl is-active --quiet docker; then
+        echo
+        log_error "Docker 服务启动失败，需要手动排查"
+        log_info "💡 建议操作："
+        echo "  1. 查看详细日志: journalctl -xeu docker.service"
+        echo "  2. 运行诊断脚本: bash diagnose-docker-failure.sh"
+        echo "  3. 手动启动测试: dockerd --debug"
+        echo "  4. 重置配置: echo '{}' > /etc/docker/daemon.json && systemctl restart docker"
+        exit 1
+    fi
+fi
 
 # 验证 Docker 服务状态
 if systemctl is-active --quiet docker; then
     log_success "Docker 服务运行正常"
 else
-    log_error "Docker 服务启动失败"
+    log_error "Docker 服务状态异常"
+    systemctl status docker --no-pager -l
     exit 1
 fi
 
