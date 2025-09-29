@@ -81,14 +81,14 @@ services:
       # 数据持久化
       - mongo_data:/data/db
       # 配置文件 (使用项目内配置)
-      - ./components/mongo/mongod.conf:/etc/mongod.conf:ro
+      - ./components/mongo/mongod.conf:/etc/mongo/mongod.conf:ro
       # 日志
       - app_logs:/data/log/mongodb
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
       - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
-    command: mongod --config /etc/mongod.conf
+    command: mongod --config /etc/mongo/mongod.conf
     ulimits:
       nofile: 100000
     deploy:
