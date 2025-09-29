@@ -203,11 +203,15 @@ prepare_directories() {
         "$DATA_DIR/redis"
         "$DATA_DIR/mongodb"
         "$DATA_DIR/kafka"
+        "$DATA_DIR/ssl"
+        "$DATA_DIR/apps"
         "$LOG_DIR/nginx"
         "$LOG_DIR/mysql"
         "$LOG_DIR/redis"
         "$LOG_DIR/mongodb"
         "$LOG_DIR/kafka"
+        "$LOG_DIR/ssl"
+        "$LOG_DIR/certbot"
     )
     
     for dir in "${dirs[@]}"; do
@@ -520,6 +524,17 @@ install_component() {
     # 等待服务启动（根据服务类型设置不同等待时间）
     log_info "等待服务启动..."
     case "$component" in
+        nginx)
+            log_info "Nginx 启动中，等待 10 秒..."
+            sleep 10
+            # 初始化应用配置目录
+            log_info "初始化 Nginx 应用配置目录..."
+            if [[ -f "$SCRIPT_DIR/init-apps-config.sh" ]]; then
+                bash "$SCRIPT_DIR/init-apps-config.sh"
+            else
+                log_warn "未找到应用配置初始化脚本"
+            fi
+            ;;
         mysql)
             log_info "MySQL 需要较长初始化时间，等待 30 秒..."
             sleep 30

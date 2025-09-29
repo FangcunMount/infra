@@ -54,8 +54,26 @@ help: ## 显示帮助信息
 	@echo "  3. make up               # 启动所有服务"
 	@echo "  4. make status           # 查看服务状态"
 	@echo ""
+	@echo "$(BLUE)应用配置管理:$(RESET)"
+	@echo "  make app-deploy APP=blog CONFIG=./nginx/blog.conf  # 部署应用配置"
+	@echo "  make app-remove APP=blog                           # 移除应用配置"
+	@echo "  make app-list                                      # 列出所有配置"
+	@echo "  make nginx-test                                    # 测试配置"
+	@echo "  make nginx-reload                                  # 重载配置"
+	@echo ""
+	@echo "$(BLUE)SSL 证书管理:$(RESET)"
+	@echo "  make ssl-obtain DOMAIN=blog.example.com EMAIL=admin@example.com  # 申请证书"
+	@echo "  make ssl-renew                                     # 续期所有证书"
+	@echo "  make ssl-list                                      # 列出所有证书"
+	@echo "  make ssl-config DOMAIN=blog.example.com            # 生成 SSL 配置"
+	@echo "  make ssl-setup                                     # 设置自动续期"
+	@echo ""
 	@echo "$(BLUE)环境变量:$(RESET)"
 	@echo "  ENV=dev|prod            指定环境 (默认: dev)"
+	@echo "  APP=app-name            指定应用名称"
+	@echo "  CONFIG=config-file      指定配置文件路径"
+	@echo "  DOMAIN=domain-name      指定域名"
+	@echo "  EMAIL=email-address     指定邮箱地址"
 	@echo ""
 	@echo "$(BLUE)示例:$(RESET)"
 	@echo "  make ENV=prod init       # 生产环境初始化"
@@ -269,3 +287,72 @@ config-validate: check-env ## 验证配置文件
 		echo "$(RED)❌ Docker Compose 配置无效$(RESET)"; \
 		exit 1; \
 	fi
+
+# ==============================================================================
+# 应用 Nginx 配置管理
+# ==============================================================================
+.PHONY: app-deploy app-remove app-list nginx-reload nginx-test
+
+app-deploy: ## 部署应用 nginx 配置 (使用: make app-deploy APP=blog CONFIG=./nginx/blog.conf)
+	@if [ -z "$(APP)" ] || [ -z "$(CONFIG)" ]; then \
+		echo "$(RED)错误: 请提供应用名称和配置文件$(RESET)"; \
+		echo "$(YELLOW)使用方式: make app-deploy APP=blog CONFIG=./nginx/blog.conf$(RESET)"; \
+		exit 1; \
+	fi
+	@bash scripts/utils/nginx-app-manager.sh deploy $(APP) $(CONFIG)
+
+app-remove: ## 移除应用 nginx 配置 (使用: make app-remove APP=blog)
+	@if [ -z "$(APP)" ]; then \
+		echo "$(RED)错误: 请提供应用名称$(RESET)"; \
+		echo "$(YELLOW)使用方式: make app-remove APP=blog$(RESET)"; \
+		exit 1; \
+	fi
+	@bash scripts/utils/nginx-app-manager.sh remove $(APP)
+
+app-list: ## 列出所有已部署的应用配置
+	@bash scripts/utils/nginx-app-manager.sh list
+
+nginx-reload: ## 重载 nginx 配置
+	@bash scripts/utils/nginx-app-manager.sh reload
+
+nginx-test: ## 测试 nginx 配置
+	@bash scripts/utils/nginx-app-manager.sh test
+
+# ==============================================================================
+# SSL 证书管理
+# ==============================================================================
+.PHONY: ssl-obtain ssl-renew ssl-list ssl-remove ssl-config ssl-setup
+
+ssl-obtain: ## 申请 SSL 证书 (使用: make ssl-obtain DOMAIN=blog.example.com EMAIL=admin@example.com)
+	@if [ -z "$(DOMAIN)" ]; then \
+		echo "$(RED)错误: 请提供域名$(RESET)"; \
+		echo "$(YELLOW)使用方式: make ssl-obtain DOMAIN=blog.example.com EMAIL=admin@example.com$(RESET)"; \
+		exit 1; \
+	fi
+	@bash scripts/utils/ssl-manager.sh obtain $(DOMAIN) $(EMAIL)
+
+ssl-renew: ## 续期所有 SSL 证书
+	@bash scripts/utils/ssl-manager.sh renew
+
+ssl-list: ## 列出所有 SSL 证书
+	@bash scripts/utils/ssl-manager.sh list
+
+ssl-remove: ## 删除 SSL 证书 (使用: make ssl-remove DOMAIN=blog.example.com)
+	@if [ -z "$(DOMAIN)" ]; then \
+		echo "$(RED)错误: 请提供域名$(RESET)"; \
+		echo "$(YELLOW)使用方式: make ssl-remove DOMAIN=blog.example.com$(RESET)"; \
+		exit 1; \
+	fi
+	@bash scripts/utils/ssl-manager.sh remove $(DOMAIN)
+
+ssl-config: ## 生成 SSL 配置模板 (使用: make ssl-config DOMAIN=blog.example.com)
+	@if [ -z "$(DOMAIN)" ]; then \
+		echo "$(RED)错误: 请提供域名$(RESET)"; \
+		echo "$(YELLOW)使用方式: make ssl-config DOMAIN=blog.example.com > blog-ssl.conf$(RESET)"; \
+		exit 1; \
+	fi
+	@bash scripts/utils/ssl-manager.sh config $(DOMAIN)
+
+ssl-setup: ## 设置 SSL 证书自动续期
+	@bash scripts/utils/ssl-manager.sh setup-auto
+

@@ -7,14 +7,19 @@ services:
       - frontend
       - backend
     restart: always
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
-      # Nginx 配置
-      - /data/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - /data/nginx/conf.d:/etc/nginx/conf.d:ro
-      # SSL 证书
-      - /data/nginx/ssl:/etc/nginx/ssl:ro
       # 日志
       - nginx_logs:/data/log/nginx
+      # SSL 证书目录
+      - /data/ssl:/data/ssl:ro
+      # 应用配置目录（应用项目部署时复制配置文件到此目录）
+      - /data/apps/nginx-configs:/etc/nginx/conf.d/apps:ro
+      # Let's Encrypt 验证目录
+      - /var/www/certbot:/var/www/certbot
+      # 注意：基础配置文件通过 override.yml 挂载
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s
