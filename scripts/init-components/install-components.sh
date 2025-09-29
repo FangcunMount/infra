@@ -454,8 +454,14 @@ install_component() {
         return $?
     fi
     
-    # 生成环境配置
-    generate_env_file "$component" "$env_type" "$user"
+    # 检查环境配置（如果存在则使用现有的，否则生成新的）
+    local env_file="$COMPOSE_DIR/env/${env_type}/.env"
+    if [[ -f "$env_file" ]]; then
+        log_info "使用现有环境配置: $env_file"
+    else
+        log_info "生成新的环境配置: $env_file"
+        generate_env_file "$component" "$env_type" "$user"
+    fi
     
     # 准备 Docker Compose 文件
     local compose_base="$COMPOSE_DIR/base/docker-compose.yml"
