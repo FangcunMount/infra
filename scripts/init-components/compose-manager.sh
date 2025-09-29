@@ -2,8 +2,9 @@
 set -euo pipefail
 
 # ==========================================
-# 分层 Docker Compose 管理脚本
-# 用于管理基础设施和应用服务的部署
+# 基础设施组件管理脚本
+# 用于管理已安装基础设施服务的生命周期
+# 配合 install-components.sh 使用
 # ==========================================
 
 readonly RED='\033[0;31m'
@@ -20,12 +21,41 @@ log_error() { echo -e "${RED}[ERROR]${NC} $*"; }
 log_step() { echo -e "${CYAN}[STEP]${NC} $*"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 COMPOSE_DIR="${REPO_ROOT}/compose"
 
 # 默认环境
 DEFAULT_ENV="dev"
 ENVIRONMENT="${DEFAULT_ENV}"
+
+# 确保基础设施就绪
+ensure_infrastructure() {
+    log_info "检查基础设施状态..."
+    
+    local infra_script="$SCRIPT_DIR/init-infrastructure.sh"
+    
+    # 检查基础设施脚本是否存在
+    if [[ ! -f "$infra_script" ]]; then
+        log_error "基础设施脚本不存在: $infra_script"
+        return 1
+    fi
+    
+    # 检查网络和卷是否已创建
+    if ! docker network inspect infra-frontend infra-backend >/dev/null 2>&1 || \
+       ! docker volume inspect infra_mysql_data infra_redis_data >/dev/null 2>&1; then
+        
+        log_warn "基础设施不完整，正在初始化..."
+        
+        if ! "$infra_script" create; then
+            log_error "基础设施创建失败"
+            return 1
+        fi
+        
+        log_success "基础设施初始化完成"
+    else
+        log_success "基础设施已就绪"
+    fi
+}
 
 # 基础设施组件
 INFRA_COMPONENTS=(
@@ -36,12 +66,11 @@ INFRA_COMPONENTS=(
     "cicd"      # CI/CD
 )
 
-# 应用服务
-APP_SERVICES=(
-    "miniblog"
-    "qs-api"
-    "qs-collection"
-    "qs-evaluation"
+# 基础设施管理界面服务（可选）
+MANAGEMENT_SERVICES=(
+    "kafka-ui"
+    "mongo-express"
+    "redis-commander"
 )
 
 show_usage() {
@@ -50,7 +79,7 @@ show_usage() {
 
 命令:
     infra <action> [component]  管理基础设施
-    app <action> [service]      管理应用服务
+    mgmt <action> [service]     管理基础设施管理界面
     status                      查看服务状态
     logs [service]              查看日志
     cleanup                     清理停止的容器
@@ -63,12 +92,11 @@ show_usage() {
     cicd     - CI/CD 服务 (jenkins)
     all      - 所有基础设施
 
-应用服务:
-    miniblog       - 博客应用
-    qs-api         - QS API 服务
-    qs-collection  - QS 采集服务
-    qs-evaluation  - QS 评估服务
-    all            - 所有应用
+管理界面服务:
+    kafka-ui       - Kafka 管理界面
+    mongo-express  - MongoDB 管理界面
+    redis-commander - Redis 管理界面
+    all            - 所有管理界面
 
 动作:
     up       - 启动服务
@@ -87,7 +115,7 @@ show_usage() {
 示例:
     $0 infra up all                    # 启动所有基础设施
     $0 infra up storage               # 仅启动存储服务
-    $0 app up miniblog                # 启动博客应用
+    $0 mgmt up kafka-ui               # 启动 Kafka 管理界面
     $0 -e prod infra up all           # 生产环境启动基础设施
     $0 status                         # 查看所有服务状态
     $0 logs nginx                     # 查看 nginx 日志
@@ -166,6 +194,11 @@ manage_infra() {
     
     log_step "管理基础设施: $action $component (环境: $ENVIRONMENT)"
     
+    # 检查基础设施状态
+    if [[ "$action" == "up" && "$component" != "core" ]]; then
+        ensure_infrastructure
+    fi
+    
     local compose_args
     if ! compose_args=$(build_infra_compose_args "$component"); then
         return 1
@@ -177,11 +210,30 @@ manage_infra() {
     case "$action" in
         "up")
             log_info "启动基础设施组件: $component"
-            $COMPOSE_CMD "${compose_files[@]}" up -d
+            if [[ "$component" == "core" ]]; then
+                # core 组件只创建网络和卷，不启动服务
+                log_info "创建基础网络和数据卷..."
+                $COMPOSE_CMD "${compose_files[@]}" config --volumes 2>/dev/null | while read -r volume; do
+                    if [[ -n "$volume" ]]; then
+                        docker volume create "$volume" 2>/dev/null || true
+                    fi
+                done
+                $COMPOSE_CMD "${compose_files[@]}" config --services 2>/dev/null || true
+                log_success "基础网络和卷创建完成"
+            else
+                $COMPOSE_CMD "${compose_files[@]}" up -d
+            fi
             ;;
         "down")
             log_info "停止基础设施组件: $component"
-            $COMPOSE_CMD "${compose_files[@]}" down
+            if [[ "$component" == "core" ]]; then
+                # core 组件清理网络，但保留数据卷
+                log_warn "清理网络 (保留数据卷)..."
+                docker network rm infra-frontend infra-backend 2>/dev/null || true
+                log_success "核心组件停止完成"
+            else
+                $COMPOSE_CMD "${compose_files[@]}" down
+            fi
             ;;
         "restart")
             log_info "重启基础设施组件: $component"
@@ -202,35 +254,32 @@ manage_infra() {
     esac
 }
 
-# 管理应用服务
-manage_app() {
+# 管理基础设施管理界面
+manage_management_ui() {
     local action="$1"
     local service="${2:-all}"
     
-    log_step "管理应用服务: $action $service (环境: $ENVIRONMENT)"
+    log_step "管理基础设施管理界面: $action $service (环境: $ENVIRONMENT)"
     
     if [[ "$service" == "all" ]]; then
-        for app in "${APP_SERVICES[@]}"; do
-            manage_single_app "$action" "$app"
+        for mgmt in "${MANAGEMENT_SERVICES[@]}"; do
+            manage_single_management_ui "$action" "$mgmt"
         done
     else
-        manage_single_app "$action" "$service"
+        manage_single_management_ui "$action" "$service"
     fi
 }
 
-# 管理单个应用
-manage_single_app() {
+# 管理单个管理界面服务
+manage_single_management_ui() {
     local action="$1"
     local service="$2"
     
-    local app_compose="${COMPOSE_DIR}/apps/${service}/docker-compose.yml"
-    
-    if [[ ! -f "$app_compose" ]]; then
-        log_error "应用服务 $service 的 compose 文件不存在: $app_compose"
-        return 1
-    fi
-    
-    local compose_args=("-f" "$app_compose")
+    # 管理界面服务通常在 message.yml 中定义，使用 profiles 控制
+    local compose_args=()
+    compose_args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.yml")
+    compose_args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.message.yml")
+    compose_args+=("--profile" "management")
     
     # 添加环境配置
     if [[ -f "${COMPOSE_DIR}/env/${ENVIRONMENT}/.env" ]]; then
@@ -239,27 +288,19 @@ manage_single_app() {
     
     case "$action" in
         "up")
-            log_info "启动应用服务: $service"
-            $COMPOSE_CMD "${compose_args[@]}" up -d
+            log_info "启动管理界面服务: $service"
+            $COMPOSE_CMD "${compose_args[@]}" up -d "$service"
             ;;
         "down")
-            log_info "停止应用服务: $service"
-            $COMPOSE_CMD "${compose_args[@]}" down
+            log_info "停止管理界面服务: $service"
+            $COMPOSE_CMD "${compose_args[@]}" stop "$service"
             ;;
         "restart")
-            log_info "重启应用服务: $service"
-            $COMPOSE_CMD "${compose_args[@]}" restart
-            ;;
-        "pull")
-            log_info "拉取应用镜像: $service"
-            $COMPOSE_CMD "${compose_args[@]}" pull
-            ;;
-        "build")
-            log_info "构建应用镜像: $service"
-            $COMPOSE_CMD "${compose_args[@]}" build
+            log_info "重启管理界面服务: $service"
+            $COMPOSE_CMD "${compose_args[@]}" restart "$service"
             ;;
         *)
-            log_error "未知动作: $action"
+            log_error "管理界面服务不支持动作: $action"
             return 1
             ;;
     esac
@@ -274,8 +315,8 @@ show_status() {
     docker ps --filter "label=infra.service" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null || echo "无运行的基础设施服务"
     
     echo
-    log_info "应用服务:"
-    docker ps --filter "label=app.name" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null || echo "无运行的应用服务"
+    log_info "管理界面服务:"
+    docker ps --filter "label=infra.category=management" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null || echo "无运行的管理界面服务"
     
     echo
     log_info "网络:"
@@ -348,13 +389,13 @@ main() {
                 manage_infra "$2" "${3:-all}"
                 exit $?
                 ;;
-            app)
+            mgmt)
                 if [[ $# -lt 2 ]]; then
-                    log_error "app 命令需要指定动作"
+                    log_error "mgmt 命令需要指定动作"
                     show_usage
                     exit 1
                 fi
-                manage_app "$2" "${3:-all}"
+                manage_management_ui "$2" "${3:-all}"
                 exit $?
                 ;;
             status)

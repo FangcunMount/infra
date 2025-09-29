@@ -121,7 +121,48 @@ check_prerequisites() {
         exit 1
     fi
     
+    # 检查并初始化基础设施
+    check_infrastructure
+    
     log_success "前置条件检查通过"
+}
+
+check_infrastructure() {
+    log_step "检查基础设施状态..."
+    
+    local infra_script="$SCRIPT_DIR/init-infrastructure.sh"
+    
+    # 检查基础设施脚本是否存在
+    if [[ ! -f "$infra_script" ]]; then
+        log_error "基础设施脚本不存在: $infra_script"
+        exit 1
+    fi
+    
+    # 检查网络和卷是否已创建
+    local networks_exist=false
+    local volumes_exist=false
+    
+    if docker network inspect infra-frontend infra-backend >/dev/null 2>&1; then
+        networks_exist=true
+    fi
+    
+    if docker volume inspect infra_mysql_data infra_redis_data >/dev/null 2>&1; then
+        volumes_exist=true
+    fi
+    
+    # 如果基础设施不完整，尝试创建
+    if [[ "$networks_exist" != true || "$volumes_exist" != true ]]; then
+        log_warn "基础设施不完整，正在创建网络和数据卷..."
+        
+        if ! "$infra_script" create; then
+            log_error "基础设施创建失败，请手动运行: $infra_script create"
+            exit 1
+        fi
+        
+        log_success "基础设施创建完成"
+    else
+        log_success "基础设施已就绪"
+    fi
 }
 
 check_user() {

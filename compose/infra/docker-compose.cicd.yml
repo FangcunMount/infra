@@ -1,5 +1,3 @@
-version: '3.9'
-
 # CI/CD 服务 - Jenkins
 services:
   jenkins:
@@ -54,3 +52,4 @@ networks:
 volumes:
   app_logs:
     external: true
+    name: infra_app_logs

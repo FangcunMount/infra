@@ -1,5 +1,3 @@
-version: '3.9'
-
 # 网关服务 - Nginx 反向代理
 services:
   nginx:
@@ -45,3 +43,4 @@ networks:
 volumes:
   nginx_logs:
     external: true
+    name: infra_nginx_logs
