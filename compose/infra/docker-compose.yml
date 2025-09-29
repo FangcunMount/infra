@@ -1,0 +1,56 @@
+version: '3.9'
+
+# 核心基础设施服务
+# 包含网络定义和共享资源
+
+networks:
+  frontend:
+    name: infra-frontend
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/16
+          gateway: 172.19.0.1
+    driver_opts:
+      com.docker.network.bridge.name: infra-frontend
+      com.docker.network.bridge.enable_icc: "false"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.driver.mtu: "1500"
+    labels:
+      - "network.zone=public"
+      - "network.access=external"
+  
+  backend:
+    name: infra-backend
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+    driver_opts:
+      com.docker.network.bridge.name: infra-backend
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.driver.mtu: "1500"
+    labels:
+      - "network.zone=private"
+      - "network.access=internal"
+
+# 共享卷定义
+volumes:
+  # 数据持久化卷
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  mongo_data:
+    driver: local
+  kafka_data:
+    driver: local
+  
+  # 日志卷
+  nginx_logs:
+    driver: local
+  app_logs:
+    driver: local

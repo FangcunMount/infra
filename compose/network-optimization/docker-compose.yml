@@ -1,0 +1,58 @@
+# Docker Compose 网络优化配置
+# 用于覆盖基础配置中的网络设置，实现更好的网络隔离
+
+version: '3.9'
+
+# 网络安全优化配置
+networks:
+  frontend:
+    name: infra-frontend
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/16
+          gateway: 172.19.0.1
+    driver_opts:
+      com.docker.network.bridge.name: infra-frontend
+      com.docker.network.bridge.enable_icc: "false"  # 禁用容器间通信
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.driver.mtu: "1500"
+    labels:
+      - "network.zone=public"
+      - "network.access=external"
+  
+  backend:
+    name: infra-backend
+    driver: bridge
+    # 设置为内部网络，增强安全性
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+    driver_opts:
+      com.docker.network.bridge.name: infra-backend
+      com.docker.network.bridge.enable_icc: "true"   # 允许后端服务间通信
+      com.docker.network.driver.mtu: "1500"
+    labels:
+      - "network.zone=private"
+      - "network.access=internal"
+
+# 可选：管理网络（用于监控、日志等管理工具）
+# 如果需要独立的管理网络，取消注释以下配置
+#  management:
+#    name: infra-management
+#    driver: bridge
+#    ipam:
+#      driver: default
+#      config:
+#        - subnet: 172.18.0.0/16
+#          gateway: 172.18.0.1
+#    driver_opts:
+#      com.docker.network.bridge.name: infra-management
+#      com.docker.network.bridge.enable_icc: "true"
+#    labels:
+#      - "network.zone=management"
+#      - "network.access=restricted"

@@ -1,0 +1,76 @@
+version: '3.9'
+
+# MiniBlog 应用服务
+services:
+  miniblog:
+    image: ${MINIBLOG_IMAGE:-your-registry/miniblog:latest}
+    container_name: miniblog
+    networks:
+      - backend
+    restart: always
+    volumes:
+      # 应用配置
+      - /data/apps/miniblog/config:/app/config:ro
+      # 应用日志
+      - app_logs:/app/logs
+      # 静态文件（如果需要）
+      - /data/apps/miniblog/static:/app/static
+    environment:
+      # 应用配置
+      - APP_ENV=${APP_ENV:-production}
+      - LOG_LEVEL=${MINIBLOG_LOG_LEVEL:-info}
+      
+      # 数据库配置
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=${MINIBLOG_DB_NAME:-miniblog}
+      - DB_USER=${MINIBLOG_DB_USER:-miniblog}
+      - DB_PASSWORD=${MINIBLOG_DB_PASSWORD}
+      
+      # Redis 配置
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=${MINIBLOG_REDIS_DB:-0}
+      
+      # MongoDB 配置（如果使用）
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+      - MONGO_DB=${MINIBLOG_MONGO_DB:-miniblog}
+      - MONGO_USER=${MINIBLOG_MONGO_USER}
+      - MONGO_PASSWORD=${MINIBLOG_MONGO_PASSWORD}
+    ports:
+      - "${MINIBLOG_PORT:-8001}:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      - mysql
+      - redis
+    labels:
+      - "app.name=miniblog"
+      - "app.version=${MINIBLOG_VERSION:-latest}"
+      - "app.category=blog"
+
+networks:
+  backend:
+    external: true
+    name: infra-backend
+
+volumes:
+  app_logs:
+    external: true

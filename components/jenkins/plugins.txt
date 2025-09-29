@@ -1,0 +1,118 @@
+# Jenkins 插件列表
+# 这个文件定义了 Jenkins 容器启动时自动安装的插件
+# 使用固定版本以确保稳定性和可重现性
+
+# === 核心插件 ===
+# 基础功能插件
+ant:475.vf34069fef73c
+build-timeout:1.31
+credentials-binding:681.vf91669a_32e45
+email-ext:2.103
+gradle:2.11
+ldap:703.v18c28fcb_22b_e
+mailer:472.vf7c289a_4b_420
+matrix-auth:3.2.2
+pam-auth:1.10
+pipeline-stage-view:2.34
+ssh-slaves:2.973.v0fa_8c0dea_f9f
+timestamper:1.27
+workflow-aggregator:596.v8c21c963d92d
+ws-cleanup:0.46
+
+# === 流水线插件 ===
+# Pipeline 相关插件
+pipeline-build-step:540.vb_e8849e1a_b_d8
+pipeline-github-lib:42.v0739460cda_c4
+pipeline-graph-analysis:216.vfd8b_ece330ca_
+pipeline-input-step:468.va_5db_051498a_4
+pipeline-milestone-step:119.vdfdc43fc3b_9a_
+pipeline-model-definition:2.2190.v908dc6d96a_54
+pipeline-rest-api:2.35
+pipeline-stage-step:312.v8cd10304c27a_
+pipeline-stage-tags-metadata:2.2190.v908dc6d96a_54
+
+# === 版本控制插件 ===
+# Git 和 SCM 插件
+git:5.4.1
+github:1.38.0
+github-branch-source:1811.v11d5d692353b
+gitlab-plugin:1.8.1
+subversion:1306.vf1e9e7a_da_f82
+
+# === Docker 插件 ===
+# Docker 集成插件
+docker-plugin:1.6.2
+docker-workflow:572.v950f58993843
+kubernetes:4246.v5a_12b_1fe120e
+docker-build-step:2.11
+
+# === 构建工具插件 ===
+# 常用构建工具
+maven-plugin:3.22
+gradle:2.8.1
+nodejs:1.6.1
+ant:475.vf34069fef73c
+
+# === 部署和发布插件 ===
+# 部署相关插件
+deploy:1.17
+publish-over-ssh:1.26
+ssh:2.6.1
+
+# === 通知插件 ===
+# 消息通知插件
+slack:664.vc9a_90f8b_c24a_
+email-ext:2.99
+build-monitor-plugin:1.13+build.202302240932
+
+# === 测试和质量插件 ===
+# 代码质量和测试插件
+junit:1159.v0b_396e1e07dd
+jacoco:3.3.4
+sonar:2.16.1
+cobertura:1.17
+checkstyle:5.0.0
+pmd:4.0.0-beta1
+findbugs:5.0.0
+warnings-ng:10.5.0
+
+# === 安全插件 ===
+# 安全相关插件
+matrix-auth:3.2.2
+ldap:2.12
+active-directory:2.30
+role-strategy:689.v731678c3e0eb_
+
+# === 用户界面插件 ===
+# UI 增强插件
+blueocean:1.27.2
+dashboard-view:2.491.v9c41a_993a_53d
+view-job-filters:3.2
+nested-view:1.21
+sectioned-view:1.26
+
+# === 系统管理插件 ===
+# 系统管理和监控插件
+monitoring:1.95.0
+disk-usage:0.28
+build-history-manager:1.2.2
+job-dsl:1.84
+configuration-as-code:1670.v564dc8b_982d0
+
+# === 集成插件 ===
+# 第三方服务集成
+jira:3.10.1
+confluence-publisher:2.0.2
+artifactory:3.18.4
+nexus-artifact-uploader:2.13
+
+# === 实用工具插件 ===
+# 便利工具插件
+build-name-setter:2.4.1
+build-user-vars-plugin:1.9
+environment-script:1.2.5
+envinject:2.908.vd0b_b_1c26fd61
+parameterized-trigger:2.45
+conditional-buildstep:1.4.3
+copyartifact:1.48.1
+archive-artifacts:1.4

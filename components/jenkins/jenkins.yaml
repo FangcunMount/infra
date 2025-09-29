@@ -1,0 +1,144 @@
+# Jenkins Configuration as Code (JCasC)
+# 自动配置 Jenkins 实例，避免手动设置
+
+jenkins:
+  systemMessage: "Jenkins 自动化 CI/CD 服务器\n\n由 Docker 组件安装脚本自动配置"
+  
+  # 全局安全配置
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: "DOCKER_HOST"
+            value: "unix:///var/run/docker.sock"
+          - key: "PATH"
+            value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+  # 安全配置
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "${JENKINS_ADMIN_USER:-admin}"
+          name: "管理员"
+          password: "${JENKINS_ADMIN_PASSWORD:-admin123}"
+
+  # 授权策略
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  # 代理配置
+  nodes:
+    - permanent:
+        name: "docker-agent"
+        remoteFS: "/home/jenkins/agent"
+        launcher:
+          ssh:
+            host: "localhost"
+            credentialsId: "docker-agent-key"
+
+  # 全局工具配置
+  tools:
+    git:
+      installations:
+        - name: "Default"
+          home: "/usr/bin/git"
+    
+    maven:
+      installations:
+        - name: "Maven 3.9"
+          properties:
+            - installSource:
+                installers:
+                  - maven:
+                      id: "3.9.6"
+
+    jdk:
+      installations:
+        - name: "Java 17"
+          properties:
+            - installSource:
+                installers:
+                  - adoptOpenJdkInstaller:
+                      id: "jdk-17.0.9+9"
+
+# 插件配置
+unclassified:
+  location:
+    adminAddress: "admin@localhost"
+    url: "http://localhost:8080/"
+  
+  # Docker 插件配置
+  docker-plugin:
+    dockerApi:
+      dockerHost:
+        uri: "unix:///var/run/docker.sock"
+
+  # 全局库配置
+  globalLibraries:
+    libraries:
+      - name: "shared-library"
+        defaultVersion: "main"
+        retriever:
+          modernSCM:
+            scm:
+              git:
+                remote: "https://github.com/example/jenkins-shared-library.git"
+
+# 作业配置示例
+jobs:
+  - script: |
+      folder('CI-CD') {
+        description('持续集成和持续部署作业')
+      }
+  
+  - script: |
+      pipelineJob('CI-CD/docker-build-example') {
+        description('Docker 构建示例流水线')
+        definition {
+          cps {
+            script('''
+              pipeline {
+                agent any
+                
+                stages {
+                  stage('Checkout') {
+                    steps {
+                      echo 'Checking out source code...'
+                      // git 'https://github.com/example/app.git'
+                    }
+                  }
+                  
+                  stage('Build') {
+                    steps {
+                      echo 'Building application...'
+                      // sh 'docker build -t myapp:latest .'
+                    }
+                  }
+                  
+                  stage('Test') {
+                    steps {
+                      echo 'Running tests...'
+                      // sh 'docker run --rm myapp:latest npm test'
+                    }
+                  }
+                  
+                  stage('Deploy') {
+                    steps {
+                      echo 'Deploying application...'
+                      // sh 'docker-compose up -d'
+                    }
+                  }
+                }
+                
+                post {
+                  always {
+                    echo 'Pipeline completed'
+                  }
+                }
+              }
+            ''')
+            sandbox()
+          }
+        }
+      }

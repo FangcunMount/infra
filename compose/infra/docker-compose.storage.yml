@@ -1,0 +1,122 @@
+version: '3.9'
+
+# 存储服务 - 数据库和缓存
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    networks:
+      - backend
+    restart: always
+    volumes:
+      # 数据持久化
+      - mysql_data:/var/lib/mysql
+      # 配置文件
+      - /data/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+      # 初始化脚本
+      - /data/mysql/init:/docker-entrypoint-initdb.d:ro
+      # 日志
+      - app_logs:/var/log/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-infrastructure}
+      - MYSQL_USER=${MYSQL_USER:-infra}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    ulimits:
+      nofile: 100000
+    deploy:
+      resources:
+        limits:
+          memory: 1400M
+        reservations:
+          memory: 1200M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    labels:
+      - "infra.service=database"
+      - "infra.category=storage"
+
+  redis:
+    image: redis:7
+    container_name: redis
+    networks:
+      - backend
+    restart: always
+    volumes:
+      # 数据持久化
+      - redis_data:/data
+      # 配置文件
+      - /data/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      # 日志
+      - app_logs:/var/log/redis
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ulimits:
+      nofile: 100000
+    deploy:
+      resources:
+        limits:
+          memory: 450M
+        reservations:
+          memory: 384M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "infra.service=cache"
+      - "infra.category=storage"
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    networks:
+      - backend
+    restart: always
+    volumes:
+      # 数据持久化
+      - mongo_data:/data/db
+      # 配置文件
+      - /data/mongo/mongod.conf:/etc/mongod.conf:ro
+      # 日志
+      - app_logs:/var/log/mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE:-infrastructure}
+    command: mongod --config /etc/mongod.conf
+    ulimits:
+      nofile: 100000
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+        reservations:
+          memory: 800M
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "infra.service=document-db"
+      - "infra.category=storage"
+
+networks:
+  backend:
+    external: true
+    name: infra-backend
+
+volumes:
+  mysql_data:
+    external: true
+  redis_data:
+    external: true
+  mongo_data:
+    external: true
+  app_logs:
+    external: true

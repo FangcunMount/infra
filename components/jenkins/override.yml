@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  jenkins:
+    ports:
+      - "${JENKINS_HTTP_PORT:-8080}:8080"
+      - "${JENKINS_AGENT_PORT:-50000}:50000"
+    volumes:
+      # Configuration as Code 配置文件
+      - /data/jenkins/casc_configs/jenkins.yaml:/var/jenkins_home/casc_configs/jenkins.yaml:ro
+      # 插件预安装列表
+      - /data/jenkins/jenkins_home/plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
+      # Jenkins 主目录数据持久化
+      - /data/jenkins/jenkins_home:/var/jenkins_home
+      # 日志目录
+      - /data/logs/jenkins:/var/log/jenkins
+      # Docker socket (用于 Docker 构建)
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      # Configuration as Code 配置路径
+      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
+      # Jenkins 启动选项
+      - JENKINS_OPTS=${JENKINS_OPTS:-"--httpPort=8080 --logfile=/var/log/jenkins/jenkins.log"}
+      # JVM 选项
+      - JAVA_OPTS=${JAVA_OPTS:-"-Djenkins.install.runSetupWizard=false -Xmx${JENKINS_MEMORY:-1024m} -Xms256m"}
+    # 健康检查
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/login || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    # 标签（用于服务发现）
+    labels:
+      - "app.name=jenkins"
+      - "app.version=lts"
+      - "app.component=ci-cd"

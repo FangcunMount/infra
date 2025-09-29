@@ -1,0 +1,56 @@
+version: '3.9'
+
+# CI/CD 服务 - Jenkins
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    user: root
+    networks:
+      - backend
+    restart: always
+    volumes:
+      # Jenkins 主目录
+      - /data/jenkins/jenkins_home:/var/jenkins_home
+      # Configuration as Code 配置
+      - /data/jenkins/casc_configs:/var/jenkins_home/casc_configs:ro
+      # Docker Socket (用于构建)
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # 日志
+      - app_logs:/var/log/jenkins
+    environment:
+      # Jenkins 配置
+      - JENKINS_ADMIN_USER=${JENKINS_ADMIN_USER:-admin}
+      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
+      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
+      # JVM 配置
+      - JAVA_OPTS=${JENKINS_JAVA_OPTS:--Djenkins.install.runSetupWizard=false -Xmx1024m -Xms256m}
+      - JENKINS_OPTS=${JENKINS_OPTS:-"--httpPort=8080 --logfile=/var/log/jenkins/jenkins.log"}
+      # Docker 环境
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    deploy:
+      resources:
+        limits:
+          memory: 600M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+          cpus: '0.2'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    labels:
+      - "infra.service=ci-cd"
+      - "infra.category=automation"
+
+networks:
+  backend:
+    external: true
+    name: infra-backend
+
+volumes:
+  app_logs:
+    external: true
