@@ -287,11 +287,11 @@ validate_env_file() {
     
     log_info "验证环境配置文件: $env_file"
     
-    # 检查文件是否存在
+    # 检查文件是否存在 - 如果不存在则直接退出
     if [[ ! -f "$env_file" ]]; then
-        log_error "环境配置文件不存在: $env_file"
         show_env_file_help "$env_file"
-        return 1
+        log_error "安装中止：请先按照上述说明创建环境配置文件"
+        exit 1
     fi
     
     # 根据组件检查必需的环境变量
@@ -344,35 +344,81 @@ check_env_var() {
 
 show_env_file_help() {
     local env_file="$1"
+    local env_dir="$(dirname "$env_file")"
     
     echo
-    log_warn "环境配置文件说明:"
-    log_info "请创建或修正环境配置文件: $env_file"
+    echo "========================================"
+    log_error "❌ 环境配置文件缺失"
+    echo "========================================"
+    log_error "找不到必需的环境配置文件: $env_file"
     echo
-    log_info "参考模板位置:"
-    log_info "  - 开发环境: compose/env/dev/.env"
-    log_info "  - 生产环境: compose/env/prod/.env"
+    log_warn "⚠️  此文件包含数据库密码等敏感信息，已被 .gitignore 排除在版本控制之外"
+    log_warn "⚠️  您需要手动创建或上传此文件才能继续安装"
     echo
-    log_info "必需配置示例:"
+    echo "========================================" 
+    log_info "📋 解决方案 (任选其一):"
+    echo "========================================" 
+    echo
+    log_info "方案1️⃣ : 从本地上传配置文件 (推荐)"
+    echo "  # 在本地执行以下命令:"
+    echo "  scp /local/path/to/.env root@\$(hostname -I | awk '{print \$1}'):$env_file"
+    echo
+    echo "  # 或者上传开发环境配置并修改:"
+    echo "  scp compose/env/dev/.env root@\$(hostname -I | awk '{print \$1}'):$env_file"
+    echo "  # 然后登录服务器修改数据库名称等配置"
+    echo
+    log_info "方案2️⃣ : 在服务器上直接创建"
+    echo "  # 创建配置目录:"
+    echo "  mkdir -p $env_dir"
+    echo
+    echo "  # 创建配置文件:"
+    echo "  cat > $env_file << 'EOF'"
     echo "# MySQL 配置"
-    echo "MYSQL_ROOT_PASSWORD=your_root_password"
+    echo "MYSQL_ROOT_PASSWORD=your_secure_password_here"
     echo "MYSQL_DATABASE=your_database_name"
-    echo "MYSQL_USER=your_username"
-    echo "MYSQL_PASSWORD=your_password"
-    echo
+    echo "MYSQL_USER=your_username" 
+    echo "MYSQL_PASSWORD=your_user_password_here"
+    echo "MYSQL_PORT=3306"
+    echo ""
     echo "# Redis 配置"
-    echo "REDIS_PASSWORD=your_redis_password"
-    echo
+    echo "REDIS_PASSWORD=your_redis_password_here"
+    echo "REDIS_PORT=6379"
+    echo ""
     echo "# MongoDB 配置"
     echo "MONGO_ROOT_USERNAME=your_mongo_admin"
-    echo "MONGO_ROOT_PASSWORD=your_mongo_password"
+    echo "MONGO_ROOT_PASSWORD=your_mongo_password_here"
     echo "MONGO_DATABASE=your_mongo_database"
-    echo
+    echo "MONGO_PORT=27017"
+    echo ""
     echo "# Jenkins 配置"
     echo "JENKINS_ADMIN_USER=admin"
-    echo "JENKINS_ADMIN_PASSWORD=your_jenkins_password"
+    echo "JENKINS_ADMIN_PASSWORD=your_jenkins_password_here"
+    echo "EOF"
     echo
-    log_warn "请根据您的需求设置安全的密码，不要使用默认值！"
+    echo "  # 设置安全权限:"
+    echo "  chmod 600 $env_file"
+    echo "  chown \$(whoami):\$(whoami) $env_file"
+    echo
+    log_info "方案3️⃣ : 复制现有配置模板"
+    echo "  # 如果存在其他环境的配置:"
+    echo "  cp compose/env/dev/.env $env_file  # 复制开发环境配置"
+    echo "  nano $env_file  # 编辑并修改相应参数"
+    echo
+    echo "========================================"
+    log_warn "🔐 安全提醒:"
+    echo "========================================"
+    log_warn "• 请使用强密码，不要使用示例中的默认值"
+    log_warn "• 配置文件包含敏感信息，请妥善保管"
+    log_warn "• 生产环境与开发环境请使用不同的密码"
+    log_warn "• 配置完成后，重新运行安装命令即可"
+    echo
+    echo "========================================"
+    log_info "📞 需要帮助?"
+    echo "========================================"
+    log_info "• 查看配置模板: ls compose/env/*/README.md"
+    log_info "• 检查现有配置: find compose/env -name '*.env' -type f"
+    log_info "• 重新运行安装: make install-mysql (配置文件创建后)"
+    echo "========================================"
 }
 
 # =================================================================
