@@ -15,7 +15,7 @@ services:
       # Docker Socket (用于构建)
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # 日志
-      - app_logs:/var/log/jenkins
+      - app_logs:/data/log/jenkins
     environment:
       # Jenkins 配置
       - JENKINS_ADMIN_USER=${JENKINS_ADMIN_USER:-admin}
@@ -23,7 +23,7 @@ services:
       - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
       # JVM 配置
       - JAVA_OPTS=${JENKINS_JAVA_OPTS:--Djenkins.install.runSetupWizard=false -Xmx1024m -Xms256m}
-      - JENKINS_OPTS=${JENKINS_OPTS:-"--httpPort=8080 --logfile=/var/log/jenkins/jenkins.log"}
+      - JENKINS_OPTS=${JENKINS_OPTS:-"--httpPort=8080 --logfile=/data/log/jenkins/jenkins.log"}
       # Docker 环境
       - DOCKER_HOST=unix:///var/run/docker.sock
     deploy:

@@ -1,10 +1,34 @@
-version: '3.9'
-
 services:
   mongo:
+    image: mongo:7
+    container_name: mongo
+    restart: always
     ports:
       - "${MONGO_PORT:-27017}:27017"
+    networks:
+      - backend
     volumes:
-      - ./components/mongo/mongod.conf:/etc/mongod.conf:ro
-      - /data/mongo:/data/db
-      - /data/logs/mongo:/var/log/mongo
+      # 配置文件 (使用项目内配置)
+      - ./mongod.conf:/etc/mongod.conf:ro
+      # 数据持久化 (使用基础设施卷)
+      - mongo_data:/data/db
+      # 日志 (使用基础设施卷) 
+      - app_logs:/data/log/mongodb
+    command: mongod --config /etc/mongod.conf
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+
+networks:
+  backend:
+    external: true
+    name: infra-backend
+
+volumes:
+  mongo_data:
+    external: true
+    name: infra_mongo_data
+  app_logs:
+    external: true
+    name: infra_app_logs

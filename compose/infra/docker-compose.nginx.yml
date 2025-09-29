@@ -14,7 +14,7 @@ services:
       # SSL 证书
       - /data/nginx/ssl:/etc/nginx/ssl:ro
       # 日志
-      - nginx_logs:/var/log/nginx
+      - nginx_logs:/data/log/nginx
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s

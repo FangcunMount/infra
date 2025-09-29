@@ -230,7 +230,7 @@ JENKINS_ADMIN_PASSWORD=$admin_password
 JAVA_OPTS=-Djenkins.install.runSetupWizard=false -Xmx$MEMORY -Xms256m
 
 # Jenkins 配置
-JENKINS_OPTS=--httpPort=$HTTP_PORT --logfile=/var/log/jenkins/jenkins.log
+JENKINS_OPTS=--httpPort=$HTTP_PORT --logfile=/data/log/jenkins/jenkins.log
 CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
 
 EOF

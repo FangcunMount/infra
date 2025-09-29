@@ -29,7 +29,7 @@ services:
       - /data/jenkins/jenkins_home:/var/jenkins_home
       
       # 日志目录
-      - /data/logs/jenkins:/var/log/jenkins
+      - app_logs:/data/log/jenkins
       
       # Docker socket（用于 Docker 构建）
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -40,7 +40,7 @@ services:
       - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
       
       # Jenkins 启动参数
-      - JENKINS_OPTS=--logfile=/var/log/jenkins/jenkins.log --httpPort=8080
+      - JENKINS_OPTS=--logfile=/data/log/jenkins/jenkins.log --httpPort=8080
       
       # JVM 参数
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false -Xmx${JENKINS_MEMORY:-1024m} -Xms256m

@@ -2,6 +2,9 @@ version: '3.9'
 
 services:
   jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    restart: always
     ports:
       - "${JENKINS_HTTP_PORT:-8080}:8080"
       - "${JENKINS_AGENT_PORT:-50000}:50000"
@@ -13,14 +16,14 @@ services:
       # Jenkins 主目录数据持久化
       - /data/jenkins/jenkins_home:/var/jenkins_home
       # 日志目录
-      - /data/logs/jenkins:/var/log/jenkins
+      - app_logs:/data/log/jenkins
       # Docker socket (用于 Docker 构建)
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       # Configuration as Code 配置路径
       - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
       # Jenkins 启动选项
-      - JENKINS_OPTS=${JENKINS_OPTS:-"--httpPort=8080 --logfile=/var/log/jenkins/jenkins.log"}
+      - JENKINS_OPTS=${JENKINS_OPTS:-"--httpPort=8080 --logfile=/data/log/jenkins/jenkins.log"}
       # JVM 选项
       - JAVA_OPTS=${JAVA_OPTS:-"-Djenkins.install.runSetupWizard=false -Xmx${JENKINS_MEMORY:-1024m} -Xms256m"}
     # 健康检查
@@ -35,3 +38,16 @@ services:
       - "app.name=jenkins"
       - "app.version=lts"
       - "app.component=ci-cd"
+
+networks:
+  backend:
+    external: true
+    name: infra-backend
+
+volumes:
+  jenkins_data:
+    external: true
+    name: infra_jenkins_data
+  app_logs:
+    external: true
+    name: infra_app_logs

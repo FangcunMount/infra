@@ -9,4 +9,4 @@ services:
       - ./components/nginx/conf.d:/etc/nginx/conf.d:ro
       - ./components/nginx/ssl:/etc/nginx/ssl:ro
       - ./components/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - /data/logs/nginx:/var/log/nginx
+      - nginx_logs:/data/log/nginx

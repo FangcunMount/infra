@@ -9,16 +9,14 @@ services:
     volumes:
       # 数据持久化
       - mysql_data:/var/lib/mysql
-      # 配置文件
-      - /data/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
-      # 初始化脚本
-      - /data/mysql/init:/docker-entrypoint-initdb.d:ro
+      # 配置文件 (使用项目内配置)
+      - ./components/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
       # 日志
-      - app_logs:/var/log/mysql
+      - app_logs:/data/log/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE:-infrastructure}
-      - MYSQL_USER=${MYSQL_USER:-infra}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     ulimits:
       nofile: 100000
@@ -47,11 +45,15 @@ services:
     volumes:
       # 数据持久化
       - redis_data:/data
-      # 配置文件
-      - /data/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      # 配置文件 (使用项目内配置)
+      - ./components/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
       # 日志
-      - app_logs:/var/log/redis
-    command: redis-server /usr/local/etc/redis/redis.conf
+      - app_logs:/data/log/redis
+    command: >
+      redis-server /usr/local/etc/redis/redis.conf
+      --requirepass "${REDIS_PASSWORD}"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     ulimits:
       nofile: 100000
     deploy:
@@ -61,7 +63,7 @@ services:
         reservations:
           memory: 384M
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -78,14 +80,14 @@ services:
     volumes:
       # 数据持久化
       - mongo_data:/data/db
-      # 配置文件
-      - /data/mongo/mongod.conf:/etc/mongod.conf:ro
+      # 配置文件 (使用项目内配置)
+      - ./components/mongo/mongod.conf:/etc/mongod.conf:ro
       # 日志
-      - app_logs:/var/log/mongodb
+      - app_logs:/data/log/mongodb
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-      - MONGO_INITDB_DATABASE=${MONGO_DATABASE:-infrastructure}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
     command: mongod --config /etc/mongod.conf
     ulimits:
       nofile: 100000
