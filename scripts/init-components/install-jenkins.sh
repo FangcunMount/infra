@@ -82,7 +82,7 @@ EOF
 
 # 检测 Docker Compose 命令
 detect_docker_compose() {
-    if command -v "docker compose" &>/dev/null; then
+    if docker compose version &>/dev/null; then
         echo "docker compose"
     elif command -v "docker-compose" &>/dev/null; then
         echo "docker-compose"
