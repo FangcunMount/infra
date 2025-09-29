@@ -277,128 +277,107 @@ validate_component() {
 # 环境配置生成
 # =================================================================
 
-generate_env_file() {
-    local component="$1"
-    local env_type="$2"
-    local user="$3"
-    
-    local env_file="$COMPOSE_DIR/env/${env_type}/.env"
-    local env_dir="$(dirname "$env_file")"
-    
-    # 创建环境配置目录
-    mkdir -p "$env_dir"
-    
-    log_info "生成环境配置: $env_file"
-    
-    # 基础环境变量
-    cat > "$env_file" << EOF
 # =================================================================
-# Docker 组件环境配置
-# 生成时间: $(date)
-# 组件: $component
-# 环境: $env_type
-# 用户: $user
+# 环境配置验证（不再自动生成，要求用户手动配置）
 # =================================================================
 
-# 项目配置
-COMPOSE_PROJECT_NAME=$DEFAULT_COMPOSE_PROJECT
-COMPOSE_FILE=$COMPOSE_DIR/base/docker-compose.yml
-
-# 用户配置
-INFRA_USER=$user
-PUID=$(id -u "$user" 2>/dev/null || echo "1000")
-PGID=$(id -g "$user" 2>/dev/null || echo "1000")
-
-# 网络配置
-NETWORK_FRONTEND=${DEFAULT_COMPOSE_PROJECT}_frontend
-NETWORK_BACKEND=${DEFAULT_COMPOSE_PROJECT}_backend
-
-# 数据目录
-DATA_DIR=$DATA_DIR
-LOG_DIR=$LOG_DIR
-
-EOF
-
-    # 组件特定配置
+validate_env_file() {
+    local env_file="$1"
+    local component="$2"
+    
+    log_info "验证环境配置文件: $env_file"
+    
+    # 检查文件是否存在
+    if [[ ! -f "$env_file" ]]; then
+        log_error "环境配置文件不存在: $env_file"
+        show_env_file_help "$env_file"
+        return 1
+    fi
+    
+    # 根据组件检查必需的环境变量
+    local missing_vars=()
+    
     case "$component" in
-        nginx)
-            cat >> "$env_file" << EOF
-# Nginx 配置
-NGINX_HTTP_PORT=80
-NGINX_HTTPS_PORT=443
-NGINX_VERSION=1.27
-
-EOF
-            ;;
         mysql)
-            cat >> "$env_file" << EOF
-# MySQL 配置  
-MYSQL_PORT=3306
-MYSQL_VERSION=8.0
-MYSQL_ROOT_PASSWORD=$(generate_password)
-MYSQL_DATABASE=app_db
-MYSQL_USER=app_user
-MYSQL_PASSWORD=$(generate_password)
-
-EOF
+            check_env_var "$env_file" "MYSQL_ROOT_PASSWORD" missing_vars
+            check_env_var "$env_file" "MYSQL_DATABASE" missing_vars
+            check_env_var "$env_file" "MYSQL_USER" missing_vars  
+            check_env_var "$env_file" "MYSQL_PASSWORD" missing_vars
             ;;
         redis)
-            cat >> "$env_file" << EOF
-# Redis 配置
-REDIS_PORT=6379
-REDIS_VERSION=7
-REDIS_PASSWORD=$(generate_password)
-
-EOF
+            check_env_var "$env_file" "REDIS_PASSWORD" missing_vars
             ;;
         mongo)
-            cat >> "$env_file" << EOF
-# MongoDB 配置
-MONGO_PORT=27017
-MONGO_VERSION=7
-MONGO_INITDB_ROOT_USERNAME=root
-MONGO_INITDB_ROOT_PASSWORD=$(generate_password)
-MONGO_INITDB_DATABASE=app_db
-
-EOF
-            ;;
-        kafka)
-            cat >> "$env_file" << EOF
-# Kafka 配置
-KAFKA_PORT=9092
-KAFKA_VERSION=latest
-ZOOKEEPER_PORT=2181
-
-EOF
+            check_env_var "$env_file" "MONGO_ROOT_USERNAME" missing_vars
+            check_env_var "$env_file" "MONGO_ROOT_PASSWORD" missing_vars
+            check_env_var "$env_file" "MONGO_DATABASE" missing_vars
             ;;
         jenkins)
-            cat >> "$env_file" << EOF
-# Jenkins 配置
-JENKINS_HTTP_PORT=8080
-JENKINS_AGENT_PORT=50000
-JENKINS_VERSION=lts
-JENKINS_ADMIN_USER=admin
-JENKINS_ADMIN_PASSWORD=$(generate_password)
-JENKINS_OPTS=--httpPort=8080
-CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
-JAVA_OPTS=-Xmx512m -Xms256m
-
-EOF
+            check_env_var "$env_file" "JENKINS_ADMIN_USER" missing_vars
+            check_env_var "$env_file" "JENKINS_ADMIN_PASSWORD" missing_vars
             ;;
     esac
     
-    # 设置文件权限
-    chmod 600 "$env_file"
-    if [[ "$user" != "root" ]]; then
-        chown "$user:$user" "$env_file"
+    # 如果有缺失的变量，报告错误
+    if [[ ${#missing_vars[@]} -gt 0 ]]; then
+        log_error "环境配置文件缺少必需的变量:"
+        for var in "${missing_vars[@]}"; do
+            log_error "  - $var"
+        done
+        show_env_file_help "$env_file"
+        return 1
     fi
     
-    log_success "环境配置生成完成: $env_file"
+    log_success "环境配置验证通过"
+    return 0
 }
 
-generate_password() {
-    openssl rand -base64 32 | tr -d "=+/" | cut -c1-16
+check_env_var() {
+    local env_file="$1"
+    local var_name="$2"
+    local -n missing_array="$3"
+    
+    if ! grep -q "^${var_name}=" "$env_file"; then
+        missing_array+=("$var_name")
+    fi
 }
+
+show_env_file_help() {
+    local env_file="$1"
+    
+    echo
+    log_warn "环境配置文件说明:"
+    log_info "请创建或修正环境配置文件: $env_file"
+    echo
+    log_info "参考模板位置:"
+    log_info "  - 开发环境: compose/env/dev/.env"
+    log_info "  - 生产环境: compose/env/prod/.env"
+    echo
+    log_info "必需配置示例:"
+    echo "# MySQL 配置"
+    echo "MYSQL_ROOT_PASSWORD=your_root_password"
+    echo "MYSQL_DATABASE=your_database_name"
+    echo "MYSQL_USER=your_username"
+    echo "MYSQL_PASSWORD=your_password"
+    echo
+    echo "# Redis 配置"
+    echo "REDIS_PASSWORD=your_redis_password"
+    echo
+    echo "# MongoDB 配置"
+    echo "MONGO_ROOT_USERNAME=your_mongo_admin"
+    echo "MONGO_ROOT_PASSWORD=your_mongo_password"
+    echo "MONGO_DATABASE=your_mongo_database"
+    echo
+    echo "# Jenkins 配置"
+    echo "JENKINS_ADMIN_USER=admin"
+    echo "JENKINS_ADMIN_PASSWORD=your_jenkins_password"
+    echo
+    log_warn "请根据您的需求设置安全的密码，不要使用默认值！"
+}
+
+# =================================================================
+# 组件安装函数
+# =================================================================
 
 # Jenkins 专门安装函数
 install_jenkins_component() {
@@ -454,13 +433,11 @@ install_component() {
         return $?
     fi
     
-    # 检查环境配置（如果存在则使用现有的，否则生成新的）
+    # 检查并验证环境配置文件
     local env_file="$COMPOSE_DIR/env/${env_type}/.env"
-    if [[ -f "$env_file" ]]; then
-        log_info "使用现有环境配置: $env_file"
-    else
-        log_info "生成新的环境配置: $env_file"
-        generate_env_file "$component" "$env_type" "$user"
+    if ! validate_env_file "$env_file" "$component"; then
+        log_error "环境配置验证失败，请修正配置后重试"
+        return 1
     fi
     
     # 准备 Docker Compose 文件
