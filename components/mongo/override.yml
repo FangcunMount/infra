@@ -8,13 +8,11 @@ services:
     networks:
       - backend
     volumes:
-      # 配置文件 (使用项目内配置)
-      - ./mongod.conf:/etc/mongod.conf:ro
       # 数据持久化 (使用基础设施卷)
       - mongo_data:/data/db
       # 日志 (使用基础设施卷) 
       - app_logs:/data/log/mongodb
-    command: mongod --config /etc/mongod.conf
+    command: mongod --bind_ip_all --auth
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
