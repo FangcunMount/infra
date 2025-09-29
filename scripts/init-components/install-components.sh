@@ -492,14 +492,40 @@ install_component() {
     
     # 准备 Docker Compose 文件
     local compose_base="$COMPOSE_DIR/base/docker-compose.yml"
-    local compose_override="$COMPONENTS_DIR/$component/override.yml"
+    local compose_override
     local env_file="$COMPOSE_DIR/env/${env_type}/.env"
+    local use_standalone=false
+    
+    # 对于某些组件使用专门的独立 compose 文件
+    case "$component" in
+        nginx|mysql|redis|mongo|kafka|jenkins)
+            local standalone_compose="$COMPOSE_DIR/infra/docker-compose.${component}.yml"
+            if [[ -f "$standalone_compose" ]]; then
+                use_standalone=true
+                compose_override="$standalone_compose"
+            else
+                compose_override="$COMPONENTS_DIR/$component/override.yml"
+            fi
+            ;;
+        *)
+            compose_override="$COMPONENTS_DIR/$component/override.yml"
+            ;;
+    esac
     
     # 构建 Docker Compose 命令
     local compose_cmd=(
         "docker" "compose"
-        "-f" "$compose_base"
-        "-f" "$compose_override"
+    )
+    
+    if [[ "$use_standalone" == true ]]; then
+        # 使用独立的 compose 文件
+        compose_cmd+=("-f" "$compose_override")
+    else
+        # 使用 base + override 模式
+        compose_cmd+=("-f" "$compose_base" "-f" "$compose_override")
+    fi
+    
+    compose_cmd+=(
         "--env-file" "$env_file"
         "-p" "$DEFAULT_COMPOSE_PROJECT"
     )

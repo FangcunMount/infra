@@ -11,6 +11,9 @@ services:
       - "${NGINX_HTTP_PORT:-80}:80"
       - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
+      # 基础配置文件
+      - /home/www/workspace/infra/components/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /home/www/workspace/infra/components/nginx/conf.d:/etc/nginx/conf.d:ro
       # 日志
       - nginx_logs:/data/log/nginx
       # SSL 证书目录
@@ -19,7 +22,6 @@ services:
       - /data/apps/nginx-configs:/etc/nginx/conf.d/apps:ro
       # Let's Encrypt 验证目录
       - /var/www/certbot:/var/www/certbot
-      # 注意：基础配置文件通过 override.yml 挂载
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s

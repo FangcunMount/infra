@@ -1,5 +1,3 @@
-version: '3.9'
-
 # 基础服务定义 - 不包含端口映射和敏感配置
 # 通过 override 文件来配置节点特定的参数
 
@@ -108,95 +106,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # 业务应用服务
-  miniblog:
-    image: ${MINIBLOG_IMAGE:-your-registry/miniblog:latest}
-    container_name: miniblog
-    networks:
-      - backend
-    restart: always
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 128M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    depends_on:
-      - mysql
-      - redis
-      - mongo
-
-  qs-api:
-    image: ${QS_API_IMAGE:-your-registry/qs-api:latest}
-    container_name: qs-api
-    networks:
-      - backend
-    restart: always
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 128M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    depends_on:
-      - mysql
-      - redis
-      - mongo
-
-  qs-collection:
-    image: ${QS_COLLECTION_IMAGE:-your-registry/qs-collection:latest}
-    container_name: qs-collection
-    networks:
-      - backend
-    restart: always
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 128M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    depends_on:
-      - mysql
-      - redis
-      - mongo
-
-  qs-evaluation:
-    image: ${QS_EVALUATION_IMAGE:-your-registry/qs-evaluation:latest}
-    container_name: qs-evaluation
-    networks:
-      - backend
-    restart: always
-    deploy:
-      resources:
-        limits:
-          memory: 1.5G
-          cpus: '2.0'
-        reservations:
-          memory: 512M
-          cpus: '0.5'
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    depends_on:
-      - kafka
-
   jenkins:
     image: jenkins/jenkins:lts
     container_name: jenkins
@@ -232,4 +141,26 @@ networks:
         - subnet: 172.20.0.0/16
           gateway: 172.20.0.1
 
-# 数据卷在组件 override 中定义，便于管理
+# 数据卷定义
+volumes:
+  mysql_data:
+    external: true
+    name: infra_mysql_data
+  redis_data:
+    external: true
+    name: infra_redis_data
+  mongo_data:
+    external: true
+    name: infra_mongo_data
+  kafka_data:
+    external: true
+    name: infra_kafka_data
+  jenkins_data:
+    external: true
+    name: infra_jenkins_data
+  nginx_logs:
+    external: true
+    name: infra_nginx_logs
+  app_logs:
+    external: true
+    name: infra_app_logs
