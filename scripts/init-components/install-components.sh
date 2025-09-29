@@ -218,9 +218,9 @@ prepare_directories() {
         
         # 设置目录权限
         if [[ "$user" != "root" ]]; then
-            chown "$user:$user" "$dir"
+            sudo chown "$user:$user" "$dir"
         fi
-        chmod 755 "$dir"
+        sudo chmod 755 "$dir"
     done
     
     log_success "目录结构准备完成"
