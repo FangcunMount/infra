@@ -488,9 +488,25 @@ install_component() {
         "${compose_cmd[@]}" up -d "$component"
     fi
     
-    # 等待服务启动
+    # 等待服务启动（根据服务类型设置不同等待时间）
     log_info "等待服务启动..."
-    sleep 5
+    case "$component" in
+        mysql)
+            log_info "MySQL 需要较长初始化时间，等待 30 秒..."
+            sleep 30
+            ;;
+        mongo)
+            log_info "MongoDB 需要初始化时间，等待 20 秒..."
+            sleep 20
+            ;;
+        jenkins)
+            log_info "Jenkins 需要较长启动时间，等待 60 秒..."
+            sleep 60
+            ;;
+        *)
+            sleep 10
+            ;;
+    esac
     
     # 检查服务状态
     if check_component_health "$component"; then
@@ -540,11 +556,23 @@ check_component_health() {
     
     log_info "检查 $component 服务健康状态..."
     
-    # 使用 Docker Compose 检查服务状态
-    local container_name="${DEFAULT_COMPOSE_PROJECT}-${component}-1"
+    # 检查服务状态（支持多种容器名称格式）
+    local container_patterns=("$component" "${DEFAULT_COMPOSE_PROJECT}-${component}-1" "${component}-1")
     
-    if docker ps --filter "name=$container_name" --filter "status=running" | grep -q "$container_name"; then
-        log_success "$component 容器运行正常"
+    for pattern in "${container_patterns[@]}"; do
+        if docker ps --filter "name=^${pattern}$" --filter "status=running" --format "{{.Names}}" | grep -q "^${pattern}$"; then
+            log_success "$component 容器运行正常 (容器名: $pattern)"
+            return 0
+        fi
+    done
+    
+    # 如果没有找到运行的容器，显示详细信息
+    log_warn "$component 容器可能未运行，检查详细状态..."
+    docker ps -a --filter "name=$component" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    
+    # 最后尝试简单的名称匹配
+    if docker ps --filter "status=running" --format "{{.Names}}" | grep -q "$component"; then
+        log_success "$component 容器实际在运行中"
         return 0
     else
         log_error "$component 容器未运行"
