@@ -1,5 +1,11 @@
 FROM jenkins/jenkins:lts
 
+ARG http_proxy
+ARG https_proxy
+
+ENV http_proxy=${http_proxy}
+ENV https_proxy=${https_proxy}
+
 USER root
 RUN apt-get update \
     && apt-get install -y make wget tar ca-certificates \
