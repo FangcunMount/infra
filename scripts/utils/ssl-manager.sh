@@ -168,6 +168,56 @@ list_certificates() {
     fi
 }
 
+# 导入外部证书（如阿里云证书）
+import_certificate() {
+    local domain="$1"
+    local cert_path="$2"
+    local key_path="$3"
+    
+    if [[ -z "$domain" ]] || [[ -z "$cert_path" ]] || [[ -z "$key_path" ]]; then
+        error "用法: import <domain> <cert_file> <key_file>"
+        exit 1
+    fi
+    
+    if [[ ! -f "$cert_path" ]]; then
+        error "证书文件不存在: $cert_path"
+        exit 1
+    fi
+    
+    if [[ ! -f "$key_path" ]]; then
+        error "私钥文件不存在: $key_path"
+        exit 1
+    fi
+    
+    log "导入域名 $domain 的 SSL 证书..."
+    
+    # 验证证书
+    if ! openssl x509 -in "$cert_path" -text -noout >/dev/null 2>&1; then
+        error "无效的证书文件: $cert_path"
+        exit 1
+    fi
+    
+    if ! openssl rsa -in "$key_path" -check -noout >/dev/null 2>&1; then
+        error "无效的私钥文件: $key_path"
+        exit 1
+    fi
+    
+    # 复制到标准位置
+    sudo cp "$cert_path" "$SSL_DIR/certs/${domain}.crt"
+    sudo cp "$key_path" "$SSL_DIR/private/${domain}.key"
+    
+    # 设置权限
+    sudo chown www:www "$SSL_DIR/certs/${domain}.crt" "$SSL_DIR/private/${domain}.key"
+    sudo chmod 644 "$SSL_DIR/certs/${domain}.crt"
+    sudo chmod 600 "$SSL_DIR/private/${domain}.key"
+    
+    success "证书导入成功: $domain"
+    
+    # 显示证书信息
+    local expiry=$(openssl x509 -enddate -noout -in "$SSL_DIR/certs/${domain}.crt" | cut -d= -f2)
+    log "证书到期时间: $expiry"
+}
+
 # 删除证书
 remove_certificate() {
     local domain="$1"
@@ -290,6 +340,7 @@ SSL 证书管理工具
 
 命令:
   obtain <domain> [email]     申请新的 SSL 证书
+  import <domain> <cert> <key> 导入外部证书（如阿里云证书）
   renew                       续期所有证书
   list                        列出所有证书
   remove <domain>             删除指定域名的证书
@@ -298,6 +349,7 @@ SSL 证书管理工具
   
 示例:
   $0 obtain blog.example.com admin@example.com
+  $0 import blog.example.com ./blog.crt ./blog.key
   $0 renew
   $0 list
   $0 remove blog.example.com
@@ -329,6 +381,14 @@ main() {
             fi
             check_dependencies
             obtain_certificate "$@"
+            ;;
+        "import")
+            if [[ $# -ne 3 ]]; then
+                error "请指定域名、证书文件和私钥文件"
+                error "用法: $0 import <domain> <cert_file> <key_file>"
+                exit 1
+            fi
+            import_certificate "$@"
             ;;
         "renew")
             check_dependencies

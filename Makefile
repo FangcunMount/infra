@@ -63,6 +63,7 @@ help: ## 显示帮助信息
 	@echo ""
 	@echo "$(BLUE)SSL 证书管理:$(RESET)"
 	@echo "  make ssl-obtain DOMAIN=blog.example.com EMAIL=admin@example.com  # 申请证书"
+	@echo "  make ssl-import DOMAIN=blog.example.com CERT=./blog.crt KEY=./blog.key  # 导入证书"
 	@echo "  make ssl-renew                                     # 续期所有证书"
 	@echo "  make ssl-list                                      # 列出所有证书"
 	@echo "  make ssl-config DOMAIN=blog.example.com            # 生成 SSL 配置"
@@ -73,6 +74,8 @@ help: ## 显示帮助信息
 	@echo "  APP=app-name            指定应用名称"
 	@echo "  CONFIG=config-file      指定配置文件路径"
 	@echo "  DOMAIN=domain-name      指定域名"
+	@echo "  CERT=cert-file-path     指定证书文件路径"
+	@echo "  KEY=key-file-path       指定私钥文件路径"
 	@echo "  EMAIL=email-address     指定邮箱地址"
 	@echo ""
 	@echo "$(BLUE)示例:$(RESET)"
@@ -321,7 +324,7 @@ nginx-test: ## 测试 nginx 配置
 # ==============================================================================
 # SSL 证书管理
 # ==============================================================================
-.PHONY: ssl-obtain ssl-renew ssl-list ssl-remove ssl-config ssl-setup
+.PHONY: ssl-obtain ssl-import ssl-renew ssl-list ssl-remove ssl-config ssl-setup
 
 ssl-obtain: ## 申请 SSL 证书 (使用: make ssl-obtain DOMAIN=blog.example.com EMAIL=admin@example.com)
 	@if [ -z "$(DOMAIN)" ]; then \
@@ -330,6 +333,14 @@ ssl-obtain: ## 申请 SSL 证书 (使用: make ssl-obtain DOMAIN=blog.example.co
 		exit 1; \
 	fi
 	@bash scripts/utils/ssl-manager.sh obtain $(DOMAIN) $(EMAIL)
+
+ssl-import: ## 导入外部 SSL 证书 (使用: make ssl-import DOMAIN=blog.example.com CERT=./blog.crt KEY=./blog.key)
+	@if [ -z "$(DOMAIN)" ] || [ -z "$(CERT)" ] || [ -z "$(KEY)" ]; then \
+		echo "$(RED)错误: 请提供域名、证书文件和私钥文件$(RESET)"; \
+		echo "$(YELLOW)使用方式: make ssl-import DOMAIN=blog.example.com CERT=./blog.crt KEY=./blog.key$(RESET)"; \
+		exit 1; \
+	fi
+	@bash scripts/utils/ssl-manager.sh import $(DOMAIN) $(CERT) $(KEY)
 
 ssl-renew: ## 续期所有 SSL 证书
 	@bash scripts/utils/ssl-manager.sh renew
