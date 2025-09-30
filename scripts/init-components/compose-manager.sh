@@ -250,7 +250,10 @@ manage_infra() {
             ;;
         "build")
             log_info "构建基础设施镜像: $component"
-            $COMPOSE_CMD "${compose_files[@]}" build
+            # 自动拼接代理参数
+            $COMPOSE_CMD "${compose_files[@]}" build \
+                --build-arg http_proxy="$http_proxy" \
+                --build-arg https_proxy="$https_proxy"
             ;;
         *)
             log_error "未知动作: $action"
