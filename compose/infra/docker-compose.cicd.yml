@@ -1,7 +1,10 @@
 # CI/CD 服务 - Jenkins
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: ../../components/jenkins
+      dockerfile: Dockerfile
+    image: infra/jenkins:with-make
     container_name: jenkins
     user: root
     networks:
