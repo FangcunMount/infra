@@ -1,5 +1,10 @@
 FROM jenkins/jenkins:lts
 
+# --- 构建时测试代理连通性 ---
+RUN echo "[DEBUG] 当前 http_proxy: $http_proxy" \
+    && echo "[DEBUG] 当前 https_proxy: $https_proxy" \
+    && curl -I --max-time 10 https://www.google.com || (echo '[WARN] 代理不可用或被墙，继续构建'; exit 0)
+
 ARG http_proxy
 ARG https_proxy
 
