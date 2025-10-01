@@ -174,7 +174,7 @@ restart: down up ## 重启所有服务
 build-jenkins: ## 构建 Jenkins 镜像
 	@$(INIT_SCRIPTS_DIR)/install-jenkins.sh --env $(ENV) --build
 
-.PHONY: up-nginx up-storage up-message up-cicd
+.PHONY: up-nginx up-storage up-message up-cicd down-cicd
 up-nginx: ## 启动网关服务
 	@$(COMPOSE_MANAGER) infra up nginx
 
@@ -186,6 +186,9 @@ up-message: ## 启动消息服务 (Kafka)
 
 up-cicd: ## 启动 CI/CD 服务 (Jenkins)
 	@$(COMPOSE_MANAGER) infra up cicd
+
+down-cicd: ## 停止 CI/CD 服务 (Jenkins)
+	@$(COMPOSE_MANAGER) infra down cicd
 
 # ==============================================================================
 # 状态和监控
