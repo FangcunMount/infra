@@ -15,6 +15,7 @@ ENV no_proxy=${no_proxy:-${NO_PROXY}}
 ENV HTTP_PROXY=$http_proxy
 ENV HTTPS_PROXY=$https_proxy
 ENV NO_PROXY=$no_proxy
+ENV NVM_DIR=/usr/local/nvm
 
 USER root
 RUN set -eux; \
@@ -46,7 +47,21 @@ RUN set -eux; \
         fi; \
     fi; \
     apt-get update; \
-    apt-get install -y make git curl wget unzip tar ca-certificates; \
+    apt-get install -y make git curl wget unzip tar ca-certificates build-essential python3; \
+    mkdir -p "$NVM_DIR"; \
+    curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash; \
+    bash -lc ". \"$NVM_DIR/nvm.sh\" \
+        && nvm install 20 \
+        && nvm install 12 \
+        && nvm alias default 20 \
+        && nvm use default \
+        && npm install -g npm@latest \
+        && corepack enable \
+        && default_node=\$(nvm version default) \
+        && ln -sf \"$NVM_DIR/versions/node/\$default_node/bin/node\" /usr/local/bin/node \
+        && ln -sf \"$NVM_DIR/versions/node/\$default_node/bin/npm\" /usr/local/bin/npm \
+        && ln -sf \"$NVM_DIR/versions/node/\$default_node/bin/npx\" /usr/local/bin/npx"; \
+    printf 'export NVM_DIR="%s"\n[ -s "$NVM_DIR/nvm.sh" ] && \\ \. "$NVM_DIR/nvm.sh"\n' "$NVM_DIR" >/etc/profile.d/nvm.sh; \
     rm -rf /var/lib/apt/lists/*; \
     GO_VERSION="1.22.3"; \
     wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz; \
