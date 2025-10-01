@@ -74,6 +74,12 @@ RUN set -eux; \
     wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz; \
     tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz; \
     rm go${GO_VERSION}.linux-amd64.tar.gz; \
+    MIGRATE_VERSION="v4.17.1"; \
+    CGO_ENABLED=0 /usr/local/go/bin/go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@${MIGRATE_VERSION}; \
+    GOPATH_DIR=$(/usr/local/go/bin/go env GOPATH); \
+    GOCACHE_DIR=$(/usr/local/go/bin/go env GOCACHE); \
+    install -o root -g root -m 0755 "$GOPATH_DIR/bin/migrate" /usr/local/bin/migrate; \
+    rm -rf "$GOCACHE_DIR" "$GOPATH_DIR"; \
     echo 'export PATH=$PATH:/usr/local/go/bin' >> /etc/profile.d/go.sh
 
 ENV PATH="/usr/local/go/bin:${PATH}"
