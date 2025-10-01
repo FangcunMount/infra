@@ -76,7 +76,7 @@ services:
       - jenkins-data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
-      - app_logs:/data/log/jenkins
+      - app_logs:/data/log
 
   # 禁用节点 B 的服务
   kafka:

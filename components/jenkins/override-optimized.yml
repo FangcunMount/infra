@@ -32,7 +32,7 @@ services:
       - /data/jenkins/casc_configs:/var/jenkins_home/casc_configs:ro
       - /data/jenkins/jenkins_home/plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
       - /data/jenkins/jenkins_home:/var/jenkins_home
-      - app_logs:/data/log/jenkins
+      - app_logs:/data/log
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
     extra_hosts:

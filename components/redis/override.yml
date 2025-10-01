@@ -13,7 +13,7 @@ services:
       # 数据持久化 (使用基础设施卷)  
       - redis_data:/data
       # 日志 (使用基础设施卷)
-      - app_logs:/data/log/redis
+      - app_logs:/data/log
     command: >
       redis-server /usr/local/etc/redis/redis.conf
       --requirepass "${REDIS_PASSWORD}"

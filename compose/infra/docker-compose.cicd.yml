@@ -29,7 +29,7 @@ services:
       # Docker Socket (用于构建)
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # 日志
-      - app_logs:/data/log/jenkins
+      - app_logs:/data/log
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:

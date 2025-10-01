@@ -25,7 +25,7 @@ services:
       # Jenkins 主目录数据持久化
       - /data/jenkins/jenkins_home:/var/jenkins_home
       # 日志目录
-      - app_logs:/data/log/jenkins
+      - app_logs:/data/log
       # Docker socket (用于 Docker 构建)
       - /var/run/docker.sock:/var/run/docker.sock:ro
     extra_hosts:

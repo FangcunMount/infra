@@ -12,7 +12,7 @@ services:
       # 配置文件 (使用项目内配置)
       - ./components/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
       # 日志
-      - app_logs:/data/log/mysql
+      - app_logs:/data/log
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -48,7 +48,7 @@ services:
       # 配置文件 (使用项目内配置)
       - ./components/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
       # 日志
-      - app_logs:/data/log/redis
+      - app_logs:/data/log
     command: >
       redis-server /usr/local/etc/redis/redis.conf
       --requirepass "${REDIS_PASSWORD}"
@@ -83,7 +83,7 @@ services:
       # 数据持久化
       - mongo_data:/data/db
       # 日志目录
-      - app_logs:/data/log/mongodb
+      - app_logs:/data/log
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}

@@ -13,7 +13,7 @@ services:
       # 数据持久化 (使用基础设施卷)
       - mysql_data:/var/lib/mysql
       # 日志 (使用基础设施卷)
-      - app_logs:/data/log/mysql
+      - app_logs:/data/log
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}

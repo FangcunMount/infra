@@ -25,6 +25,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 # 环境变量配置
 INFRA_DATA_ROOT="${INFRA_DATA_ROOT:-/data/infra}"
+INFRA_LOG_ROOT="${INFRA_LOG_ROOT:-/data/logs}"
 INFRA_FRONTEND_SUBNET="${INFRA_FRONTEND_SUBNET:-172.19.0.0/16}"
 INFRA_FRONTEND_GATEWAY="${INFRA_FRONTEND_GATEWAY:-172.19.0.1}"
 INFRA_BACKEND_SUBNET="${INFRA_BACKEND_SUBNET:-172.20.0.0/16}"
@@ -64,6 +65,7 @@ validate_config() {
     # 显示当前配置
     log_info "当前配置:"
     echo "  数据根目录: ${INFRA_DATA_ROOT}"
+    echo "  日志根目录: ${INFRA_LOG_ROOT}"
     echo "  前端网络: ${INFRA_FRONTEND_SUBNET} (网关: ${INFRA_FRONTEND_GATEWAY})"
     echo "  后端网络: ${INFRA_BACKEND_SUBNET} (网关: ${INFRA_BACKEND_GATEWAY})"
     echo "  网络MTU: ${INFRA_NETWORK_MTU}"
@@ -97,6 +99,7 @@ show_help() {
 
 环境变量:
   INFRA_DATA_ROOT        数据根目录 (默认: /data/infra)
+  INFRA_LOG_ROOT         日志根目录 (默认: /data/logs)
   INFRA_FRONTEND_SUBNET  前端网络子网 (默认: 172.19.0.0/16)
   INFRA_BACKEND_SUBNET   后端网络子网 (默认: 172.20.0.0/16)
   INFRA_NETWORK_MTU      网络MTU大小 (默认: 1500)
@@ -173,25 +176,31 @@ create_volumes() {
         "infra_mongo_data:${INFRA_DATA_ROOT}/mongo/data"
         "infra_kafka_data:${INFRA_DATA_ROOT}/kafka/data"
         "infra_jenkins_data:${INFRA_DATA_ROOT}/jenkins/data"
-        "infra_nginx_logs:${INFRA_DATA_ROOT}/nginx/logs"
-        "infra_app_logs:${INFRA_DATA_ROOT}/logs"
+        "infra_nginx_logs:${INFRA_LOG_ROOT}/nginx"
+        "infra_app_logs:${INFRA_LOG_ROOT}"
     )
     
     # 创建数据目录
     if [[ "$dry_run" != "true" ]]; then
         log_info "创建数据目录: ${INFRA_DATA_ROOT}"
-        sudo mkdir -p "${INFRA_DATA_ROOT}"/{mysql,redis,mongo,kafka,jenkins,nginx,logs}/{data,conf,logs} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_DATA_ROOT}"/{mysql,redis,mongo,kafka,jenkins,nginx}/{data,conf} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_LOG_ROOT}"/{mysql,redis,mongodb,nginx,jenkins,kafka} 2>/dev/null || true
         
         # 设置目录所有权，优先尝试 docker 组
         if getent group docker >/dev/null 2>&1; then
             sudo chown -R "${INFRA_USER}:${INFRA_GROUP}" "${INFRA_DATA_ROOT}" 2>/dev/null || \
             sudo chown -R "${INFRA_USER}:${INFRA_USER}" "${INFRA_DATA_ROOT}"
+            sudo chown -R "${INFRA_USER}:${INFRA_GROUP}" "${INFRA_LOG_ROOT}" 2>/dev/null || \
+            sudo chown -R "${INFRA_USER}:${INFRA_USER}" "${INFRA_LOG_ROOT}"
         else
             sudo chown -R "${INFRA_USER}:${INFRA_USER}" "${INFRA_DATA_ROOT}"
+            sudo chown -R "${INFRA_USER}:${INFRA_USER}" "${INFRA_LOG_ROOT}"
         fi
         
         sudo chmod -R 755 "${INFRA_DATA_ROOT}"
+        sudo chmod -R 755 "${INFRA_LOG_ROOT}"
         log_success "数据目录创建完成: ${INFRA_DATA_ROOT}"
+        log_success "日志目录创建完成: ${INFRA_LOG_ROOT}"
     fi
     
     for volume_def in "${volumes[@]}"; do
@@ -299,6 +308,14 @@ show_status() {
         du -sh "${INFRA_DATA_ROOT}"/* 2>/dev/null | head -10 || echo "  (目录为空)"
     else
         echo "  ❌ 数据目录 ${INFRA_DATA_ROOT} 不存在"
+    fi
+    
+    echo
+    log_info "🪵 日志目录: ${INFRA_LOG_ROOT}"
+    if [[ -d "${INFRA_LOG_ROOT}" ]]; then
+        du -sh "${INFRA_LOG_ROOT}"/* 2>/dev/null | head -10 || echo "  (目录为空)"
+    else
+        echo "  ❌ 日志目录 ${INFRA_LOG_ROOT} 不存在"
     fi
 }
 
