@@ -35,16 +35,16 @@ services:
       # Configuration as Code 配置路径
       CASC_JENKINS_CONFIG: /var/jenkins_home/casc_configs/jenkins.yaml
       # Jenkins 启动选项
-      JENKINS_OPTS: ${JENKINS_OPTS:-"--httpPort=8080 --logfile=/data/log/jenkins/jenkins.log"}
+      JENKINS_OPTS: '${JENKINS_OPTS:-"--httpPort=8080 --logfile=/data/log/jenkins/jenkins.log"}'
       # JVM 选项
-      JAVA_OPTS: ${JAVA_OPTS:-"-Djenkins.install.runSetupWizard=false -Xmx${JENKINS_MEMORY:-1024m} -Xms256m"}
+      JAVA_OPTS: '${JENKINS_JAVA_OPTS:-"-Djenkins.install.runSetupWizard=false -Xmx1536m -Xms512m"}'
       # VPN 代理配置（通过宿主机转发）
-      HTTP_PROXY: ${JENKINS_RUNTIME_HTTP_PROXY:-http://host.docker.internal:7890}
-      HTTPS_PROXY: ${JENKINS_RUNTIME_HTTPS_PROXY:-http://host.docker.internal:7890}
-      http_proxy: ${JENKINS_RUNTIME_HTTP_PROXY:-http://host.docker.internal:7890}
-      https_proxy: ${JENKINS_RUNTIME_HTTPS_PROXY:-http://host.docker.internal:7890}
-      NO_PROXY: ${JENKINS_RUNTIME_NO_PROXY:-"localhost,127.0.0.1,::1,jenkins,host.docker.internal"}
-      no_proxy: ${JENKINS_RUNTIME_NO_PROXY:-"localhost,127.0.0.1,::1,jenkins,host.docker.internal"}
+      HTTP_PROXY: '${JENKINS_RUNTIME_HTTP_PROXY:-http://host.docker.internal:7890}'
+      HTTPS_PROXY: '${JENKINS_RUNTIME_HTTPS_PROXY:-http://host.docker.internal:7890}'
+      http_proxy: '${JENKINS_RUNTIME_HTTP_PROXY:-http://host.docker.internal:7890}'
+      https_proxy: '${JENKINS_RUNTIME_HTTPS_PROXY:-http://host.docker.internal:7890}'
+      NO_PROXY: '${JENKINS_RUNTIME_NO_PROXY:-localhost,127.0.0.1,::1,jenkins,host.docker.internal}'
+      no_proxy: '${JENKINS_RUNTIME_NO_PROXY:-localhost,127.0.0.1,::1,jenkins,host.docker.internal}'
     # 健康检查
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/login || exit 1"]

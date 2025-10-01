@@ -29,7 +29,7 @@ LOG_DIR="$DATA_ROOT/logs/jenkins"
 DEFAULT_ENV="prod"
 DEFAULT_HTTP_PORT="8080"
 DEFAULT_AGENT_PORT="50000"
-DEFAULT_MEMORY="1024m"
+DEFAULT_MEMORY="2048m"
 
 # =================================================================
 # 工具函数
