@@ -23,15 +23,19 @@ RUN set -eux; \
         proxy_target="$proxy_url"; \
         proxy_clean=${proxy_target#*://}; \
         if [ "$proxy_clean" != "$proxy_target" ]; then proxy_target="$proxy_clean"; fi; \
-        if [[ "$proxy_target" == *@* ]]; then proxy_target=${proxy_target#*@}; fi; \
+        if [ "${proxy_target#*@}" != "$proxy_target" ]; then proxy_target=${proxy_target#*@}; fi; \
         proxy_host=${proxy_target%%[:/]*}; \
-        proxy_port=; \
-        if [[ "$proxy_target" == *:* ]]; then \
-            proxy_port=${proxy_target#*:}; \
-            proxy_port=${proxy_port%%/*}; \
-        fi; \
-        if [[ -z "$proxy_port" || "$proxy_port" == "$proxy_target" ]]; then proxy_port=80; fi; \
-        if [[ -z "$proxy_host" ]]; then \
+        case "$proxy_target" in \
+            *:*) \
+                proxy_port=${proxy_target#*:}; \
+                proxy_port=${proxy_port%%/*}; \
+                ;; \
+            *) \
+                proxy_port=""; \
+                ;; \
+        esac; \
+        if [ -z "$proxy_port" ] || [ "$proxy_port" = "$proxy_target" ]; then proxy_port=80; fi; \
+        if [ -z "$proxy_host" ]; then \
             echo "[WARN] 无法解析构建代理 $proxy_url，自动禁用代理"; \
             http_proxy= HTTPS_PROXY= https_proxy= HTTP_PROXY=; \
             export http_proxy https_proxy HTTP_PROXY HTTPS_PROXY; \
