@@ -35,7 +35,7 @@ services:
       # Configuration as Code 配置路径
       CASC_JENKINS_CONFIG: /var/jenkins_home/casc_configs/jenkins.yaml
       # Jenkins 启动选项
-      JENKINS_OPTS: '${JENKINS_OPTS:-"--httpPort=8080 --logfile=/data/log/jenkins/jenkins.log"}'
+      JENKINS_OPTS: '${JENKINS_OPTS:-"--logfile=/data/log/jenkins/jenkins.log"}'
       # JVM 选项
       JAVA_OPTS: '${JENKINS_JAVA_OPTS:-"-Djenkins.install.runSetupWizard=false -Xmx1536m -Xms512m"}'
       # VPN 代理配置（通过宿主机转发）

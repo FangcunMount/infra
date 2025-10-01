@@ -44,7 +44,7 @@ services:
       CASC_JENKINS_CONFIG: /var/jenkins_home/casc_configs/jenkins.yaml
 
       # Jenkins 启动参数
-      JENKINS_OPTS: '--logfile=/data/log/jenkins/jenkins.log --httpPort=8080'
+      JENKINS_OPTS: '--logfile=/data/log/jenkins/jenkins.log'
 
       # JVM 参数
       JAVA_OPTS: '${JENKINS_JAVA_OPTS:-"-Djenkins.install.runSetupWizard=false -Xmx1536m -Xms512m"}'

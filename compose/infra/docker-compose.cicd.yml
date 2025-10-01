@@ -39,7 +39,7 @@ services:
       CASC_JENKINS_CONFIG: /var/jenkins_home/casc_configs/jenkins.yaml
       # JVM 配置
       JAVA_OPTS: '${JENKINS_JAVA_OPTS:-"-Djenkins.install.runSetupWizard=false -Xmx1536m -Xms512m"}'
-      JENKINS_OPTS: '${JENKINS_OPTS:-"--httpPort=8080 --logfile=/data/log/jenkins/jenkins.log"}'
+      JENKINS_OPTS: '${JENKINS_OPTS:-"--logfile=/data/log/jenkins/jenkins.log"}'
       # VPN 代理配置（默认指向宿主机代理，可在 .env 中覆盖）
       HTTP_PROXY: '${JENKINS_RUNTIME_HTTP_PROXY:-http://host.docker.internal:7890}'
       HTTPS_PROXY: '${JENKINS_RUNTIME_HTTPS_PROXY:-http://host.docker.internal:7890}'
