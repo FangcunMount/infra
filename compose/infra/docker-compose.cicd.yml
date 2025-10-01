@@ -34,21 +34,21 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       # Jenkins 配置
-      - JENKINS_ADMIN_USER=${JENKINS_ADMIN_USER:-admin}
-      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
-      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
+      JENKINS_ADMIN_USER: ${JENKINS_ADMIN_USER:-admin}
+      JENKINS_ADMIN_PASSWORD: ${JENKINS_ADMIN_PASSWORD}
+      CASC_JENKINS_CONFIG: /var/jenkins_home/casc_configs/jenkins.yaml
       # JVM 配置
-      - JAVA_OPTS=${JENKINS_JAVA_OPTS:--Djenkins.install.runSetupWizard=false -Xmx1024m -Xms256m}
-      - JENKINS_OPTS=${JENKINS_OPTS:-"--httpPort=8080 --logfile=/data/log/jenkins/jenkins.log"}
+      JAVA_OPTS: ${JENKINS_JAVA_OPTS:--Djenkins.install.runSetupWizard=false -Xmx1024m -Xms256m}
+      JENKINS_OPTS: ${JENKINS_OPTS:-"--httpPort=8080 --logfile=/data/log/jenkins/jenkins.log"}
       # VPN 代理配置（默认指向宿主机代理，可在 .env 中覆盖）
-      - HTTP_PROXY=${HTTP_PROXY:-http://host.docker.internal:7890}
-      - HTTPS_PROXY=${HTTPS_PROXY:-http://host.docker.internal:7890}
-      - http_proxy=${http_proxy:-http://host.docker.internal:7890}
-      - https_proxy=${https_proxy:-http://host.docker.internal:7890}
-      - NO_PROXY=${NO_PROXY:-localhost,127.0.0.1,::1,jenkins}
-      - no_proxy=${no_proxy:-localhost,127.0.0.1,::1,jenkins}
+      HTTP_PROXY: ${JENKINS_RUNTIME_HTTP_PROXY:-http://host.docker.internal:7890}
+      HTTPS_PROXY: ${JENKINS_RUNTIME_HTTPS_PROXY:-http://host.docker.internal:7890}
+      http_proxy: ${JENKINS_RUNTIME_HTTP_PROXY:-http://host.docker.internal:7890}
+      https_proxy: ${JENKINS_RUNTIME_HTTPS_PROXY:-http://host.docker.internal:7890}
+      NO_PROXY: ${JENKINS_RUNTIME_NO_PROXY:-"localhost,127.0.0.1,::1,jenkins,host.docker.internal"}
+      no_proxy: ${JENKINS_RUNTIME_NO_PROXY:-"localhost,127.0.0.1,::1,jenkins,host.docker.internal"}
       # Docker 环境
-      - DOCKER_HOST=unix:///var/run/docker.sock
+      DOCKER_HOST: unix:///var/run/docker.sock
     deploy:
       resources:
         limits:

@@ -41,29 +41,29 @@ services:
     # 环境变量配置
     environment:
       # CasC 配置路径
-      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
+      CASC_JENKINS_CONFIG: /var/jenkins_home/casc_configs/jenkins.yaml
 
       # Jenkins 启动参数
-      - JENKINS_OPTS=--logfile=/data/log/jenkins/jenkins.log --httpPort=8080
+      JENKINS_OPTS: "--logfile=/data/log/jenkins/jenkins.log --httpPort=8080"
 
       # JVM 参数
-      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false -Xmx${JENKINS_MEMORY:-1024m} -Xms256m
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false -Xmx${JENKINS_MEMORY:-1024m} -Xms256m"
 
       # 安全配置
-      - JENKINS_ADMIN_USER=${JENKINS_ADMIN_USER:-admin}
-      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
+      JENKINS_ADMIN_USER: ${JENKINS_ADMIN_USER:-admin}
+      JENKINS_ADMIN_PASSWORD: ${JENKINS_ADMIN_PASSWORD}
 
       # VPN 代理配置（通过宿主机转发）
-      - HTTP_PROXY=${HTTP_PROXY:-http://host.docker.internal:7890}
-      - HTTPS_PROXY=${HTTPS_PROXY:-http://host.docker.internal:7890}
-      - http_proxy=${http_proxy:-http://host.docker.internal:7890}
-      - https_proxy=${https_proxy:-http://host.docker.internal:7890}
-      - NO_PROXY=${NO_PROXY:-localhost,127.0.0.1,::1,jenkins}
-      - no_proxy=${no_proxy:-localhost,127.0.0.1,::1,jenkins}
+      HTTP_PROXY: ${JENKINS_RUNTIME_HTTP_PROXY:-http://host.docker.internal:7890}
+      HTTPS_PROXY: ${JENKINS_RUNTIME_HTTPS_PROXY:-http://host.docker.internal:7890}
+      http_proxy: ${JENKINS_RUNTIME_HTTP_PROXY:-http://host.docker.internal:7890}
+      https_proxy: ${JENKINS_RUNTIME_HTTPS_PROXY:-http://host.docker.internal:7890}
+      NO_PROXY: ${JENKINS_RUNTIME_NO_PROXY:-"localhost,127.0.0.1,::1,jenkins,host.docker.internal"}
+      no_proxy: ${JENKINS_RUNTIME_NO_PROXY:-"localhost,127.0.0.1,::1,jenkins,host.docker.internal"}
 
       # 网络配置（用于代理后的 URL 生成）
-      - JENKINS_URL=https://jenkins.local
-      - JENKINS_ROOT_URL=https://jenkins.local
+      JENKINS_URL: https://jenkins.local
+      JENKINS_ROOT_URL: https://jenkins.local
     
     # 健康检查配置
     healthcheck:
