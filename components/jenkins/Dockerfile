@@ -47,12 +47,19 @@ RUN set -eux; \
         fi; \
     fi; \
     apt-get update; \
-    apt-get install -y make git curl wget unzip tar ca-certificates build-essential python3; \
+    apt-get install -y make git curl wget unzip tar ca-certificates build-essential python3 gnupg lsb-release; \
+    install -d -m 0755 /etc/apt/keyrings; \
+    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --batch --dearmor -o /etc/apt/keyrings/docker.gpg; \
+    chmod a+r /etc/apt/keyrings/docker.gpg; \
+    release=$(. /etc/os-release && echo "$VERSION_CODENAME"); \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $release stable" > /etc/apt/sources.list.d/docker.list; \
+    apt-get update; \
+    apt-get install -y docker-ce-cli; \
     mkdir -p "$NVM_DIR"; \
     curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash; \
     bash -lc ". \"$NVM_DIR/nvm.sh\" \
         && nvm install 20 \
-        && nvm install 12 \
+        && nvm install 14 \
         && nvm alias default 20 \
         && nvm use default \
         && npm install -g npm@latest \
