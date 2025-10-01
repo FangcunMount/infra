@@ -2,7 +2,13 @@ version: '3.9'
 
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    image: ${JENKINS_IMAGE:-infra/jenkins:with-make}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        http_proxy: ${http_proxy:-}
+        https_proxy: ${https_proxy:-}
     container_name: jenkins
     restart: always
     ports:
@@ -10,7 +16,7 @@ services:
       - "${JENKINS_AGENT_PORT:-50000}:50000"
     volumes:
       # Configuration as Code 配置文件
-      - /data/jenkins/casc_configs/jenkins.yaml:/var/jenkins_home/casc_configs/jenkins.yaml:ro
+      - /data/jenkins/casc_configs:/var/jenkins_home/casc_configs:ro
       # 插件预安装列表
       - /data/jenkins/jenkins_home/plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
       # Jenkins 主目录数据持久化

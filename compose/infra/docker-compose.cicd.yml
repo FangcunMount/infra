@@ -4,21 +4,31 @@ services:
     build:
       context: ../../components/jenkins
       dockerfile: Dockerfile
-    image: infra/jenkins:with-make
+      args:
+        http_proxy: ${http_proxy:-}
+        https_proxy: ${https_proxy:-}
+    image: ${JENKINS_IMAGE:-infra/jenkins:with-make}
     container_name: jenkins
     user: root
     networks:
       - backend
     restart: always
+    ports:
+      - "${JENKINS_HTTP_PORT:-8080}:8080"
+      - "${JENKINS_AGENT_PORT:-50000}:50000"
     volumes:
       # Jenkins 主目录
       - /data/jenkins/jenkins_home:/var/jenkins_home
       # Configuration as Code 配置
       - /data/jenkins/casc_configs:/var/jenkins_home/casc_configs:ro
+      # 插件预安装列表
+      - /data/jenkins/jenkins_home/plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
       # Docker Socket (用于构建)
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # 日志
       - app_logs:/data/log/jenkins
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       # Jenkins 配置
       - JENKINS_ADMIN_USER=${JENKINS_ADMIN_USER:-admin}
@@ -27,6 +37,13 @@ services:
       # JVM 配置
       - JAVA_OPTS=${JENKINS_JAVA_OPTS:--Djenkins.install.runSetupWizard=false -Xmx1024m -Xms256m}
       - JENKINS_OPTS=${JENKINS_OPTS:-"--httpPort=8080 --logfile=/data/log/jenkins/jenkins.log"}
+      # VPN 代理配置（默认指向宿主机代理，可在 .env 中覆盖）
+      - HTTP_PROXY=${HTTP_PROXY:-http://host.docker.internal:7890}
+      - HTTPS_PROXY=${HTTPS_PROXY:-http://host.docker.internal:7890}
+      - http_proxy=${http_proxy:-http://host.docker.internal:7890}
+      - https_proxy=${https_proxy:-http://host.docker.internal:7890}
+      - NO_PROXY=${NO_PROXY:-localhost,127.0.0.1,::1,jenkins}
+      - no_proxy=${no_proxy:-localhost,127.0.0.1,::1,jenkins}
       # Docker 环境
       - DOCKER_HOST=unix:///var/run/docker.sock
     deploy:

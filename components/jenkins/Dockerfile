@@ -13,7 +13,7 @@ ENV https_proxy=${https_proxy}
 
 USER root
 RUN apt-get update \
-    && apt-get install -y make wget tar ca-certificates \
+    && apt-get install -y make git curl wget unzip tar ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     # 安装 Go（官方二进制包，版本可按需调整）\
     && GO_VERSION="1.22.3" \

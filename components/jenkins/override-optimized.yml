@@ -5,6 +5,13 @@ version: '3.9'
 
 services:
   jenkins:
+    image: ${JENKINS_IMAGE:-infra/jenkins:with-make}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        http_proxy: ${http_proxy:-}
+        https_proxy: ${https_proxy:-}
     # 网络配置：只连接到后端网络
     networks:
       - backend
@@ -19,36 +26,38 @@ services:
     
     # 数据卷配置
     volumes:
-      # Jenkins Configuration as Code
-      - ./components/jenkins/jenkins.yaml:/var/jenkins_home/casc_configs/jenkins.yaml:ro
-      
-      # 插件预安装列表
-      - ./components/jenkins/plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
-      
-      # 数据持久化
+      - /data/jenkins/casc_configs:/var/jenkins_home/casc_configs:ro
+      - /data/jenkins/jenkins_home/plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
       - /data/jenkins/jenkins_home:/var/jenkins_home
-      
-      # 日志目录
       - app_logs:/data/log/jenkins
-      
-      # Docker socket（用于 Docker 构建）
       - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     
     # 环境变量配置
     environment:
       # CasC 配置路径
       - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs/jenkins.yaml
-      
+
       # Jenkins 启动参数
       - JENKINS_OPTS=--logfile=/data/log/jenkins/jenkins.log --httpPort=8080
-      
+
       # JVM 参数
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false -Xmx${JENKINS_MEMORY:-1024m} -Xms256m
-      
+
       # 安全配置
       - JENKINS_ADMIN_USER=${JENKINS_ADMIN_USER:-admin}
       - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
-      
+
+      # VPN 代理配置（通过宿主机转发）
+      - HTTP_PROXY=${HTTP_PROXY:-http://host.docker.internal:7890}
+      - HTTPS_PROXY=${HTTPS_PROXY:-http://host.docker.internal:7890}
+      - http_proxy=${http_proxy:-http://host.docker.internal:7890}
+      - https_proxy=${https_proxy:-http://host.docker.internal:7890}
+      - NO_PROXY=${NO_PROXY:-localhost,127.0.0.1,::1,jenkins}
+      - no_proxy=${no_proxy:-localhost,127.0.0.1,::1,jenkins}
+
       # 网络配置（用于代理后的 URL 生成）
       - JENKINS_URL=https://jenkins.local
       - JENKINS_ROOT_URL=https://jenkins.local

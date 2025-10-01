@@ -160,7 +160,7 @@ install-jenkins: init ## 安装 Jenkins
 # ==============================================================================
 # 服务管理
 # ==============================================================================
-.PHONY: up down restart
+.PHONY: up down restart build-jenkins
 up: ## 启动所有基础设施服务
 	@echo "$(BLUE)启动基础设施服务...$(RESET)"
 	@$(COMPOSE_MANAGER) infra up all
@@ -170,6 +170,9 @@ down: ## 停止所有服务
 	@$(COMPOSE_MANAGER) infra down all
 
 restart: down up ## 重启所有服务
+
+build-jenkins: ## 构建 Jenkins 镜像
+	@$(INIT_SCRIPTS_DIR)/install-jenkins.sh --env $(ENV) --build
 
 .PHONY: up-nginx up-storage up-message up-cicd
 up-nginx: ## 启动网关服务

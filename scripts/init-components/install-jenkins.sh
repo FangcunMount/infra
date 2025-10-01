@@ -19,8 +19,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # 服务配置
-SERVICE_NAME="jenkins"
-DOCKER_IMAGE="jenkins/jenkins:lts"
 
 # 目录配置
 DATA_ROOT="/data"
@@ -65,6 +63,7 @@ Jenkins 安装脚本
     --dry-run           预览模式，不实际执行
     --config-only       仅生成配置，不启动服务
     --start-only        仅启动服务，跳过配置生成
+        --build            仅构建 Jenkins 镜像
     --status            检查服务状态
     --logs              查看服务日志
     --stop              停止服务
@@ -275,21 +274,44 @@ copy_config_files() {
 # 服务管理
 # =================================================================
 
+jenkins_compose() {
+    local subcommand="$1"
+    shift
+
+    local env_file="$PROJECT_ROOT/compose/env/$ENVIRONMENT/.env"
+    if [[ ! -f "$env_file" ]]; then
+        log_error "环境配置文件不存在: $env_file"
+        return 1
+    fi
+
+    local compose_raw
+    compose_raw=$(detect_docker_compose)
+    read -r -a compose_cmd <<< "$compose_raw"
+
+    (cd "$PROJECT_ROOT" && "${compose_cmd[@]}" \
+        -f compose/infra/docker-compose.yml \
+        -f compose/infra/docker-compose.cicd.yml \
+        --env-file "$env_file" \
+        "$subcommand" "$@")
+}
+
+build_jenkins() {
+    log_info "构建 Jenkins 镜像..."
+    if jenkins_compose build jenkins; then
+        log_success "Jenkins 镜像构建完成"
+        return 0
+    else
+        log_error "Jenkins 镜像构建失败"
+        return 1
+    fi
+}
+
 start_jenkins() {
     log_info "启动 Jenkins 服务..."
-    
-    local env_file="$PROJECT_ROOT/compose/env/$ENVIRONMENT/.env"
-    local compose_cmd
-    compose_cmd=$(detect_docker_compose)
-    
-    cd "$PROJECT_ROOT"
-    
-    # 启动服务
-    $compose_cmd \
-        -f compose/base/docker-compose.yml \
-        -f components/jenkins/override.yml \
-        --env-file "$env_file" \
-        up -d jenkins
+    if ! jenkins_compose up --build -d jenkins; then
+        log_error "Jenkins 服务启动失败"
+        return 1
+    fi
     
     log_info "等待 Jenkins 启动..."
     
@@ -315,38 +337,22 @@ start_jenkins() {
 
 stop_jenkins() {
     log_info "停止 Jenkins 服务..."
-    
-    local env_file="$PROJECT_ROOT/compose/env/$ENVIRONMENT/.env"
-    local compose_cmd
-    compose_cmd=$(detect_docker_compose)
-    
-    cd "$PROJECT_ROOT"
-    
-    $compose_cmd \
-        -f compose/base/docker-compose.yml \
-        -f components/jenkins/override.yml \
-        --env-file "$env_file" \
-        down jenkins
-    
-    log_success "Jenkins 已停止"
+    if jenkins_compose down --remove-orphans; then
+        log_success "Jenkins 已停止"
+    else
+        log_error "Jenkins 停止失败"
+        return 1
+    fi
 }
 
 restart_jenkins() {
     log_info "重启 Jenkins 服务..."
-    
-    local env_file="$PROJECT_ROOT/compose/env/$ENVIRONMENT/.env"
-    local compose_cmd
-    compose_cmd=$(detect_docker_compose)
-    
-    cd "$PROJECT_ROOT"
-    
-    $compose_cmd \
-        -f compose/base/docker-compose.yml \
-        -f components/jenkins/override.yml \
-        --env-file "$env_file" \
-        restart jenkins
-    
-    log_success "Jenkins 已重启"
+    if jenkins_compose restart jenkins; then
+        log_success "Jenkins 已重启"
+    else
+        log_error "Jenkins 重启失败"
+        return 1
+    fi
 }
 
 check_status() {
@@ -379,18 +385,7 @@ check_status() {
 
 show_logs() {
     log_info "显示 Jenkins 日志..."
-    
-    local env_file="$PROJECT_ROOT/compose/env/$ENVIRONMENT/.env"
-    local compose_cmd
-    compose_cmd=$(detect_docker_compose)
-    
-    cd "$PROJECT_ROOT"
-    
-    $compose_cmd \
-        -f compose/base/docker-compose.yml \
-        -f components/jenkins/override.yml \
-        --env-file "$env_file" \
-        logs -f jenkins
+    jenkins_compose logs -f jenkins
 }
 
 # =================================================================
@@ -478,6 +473,10 @@ main() {
                 START_ONLY=true
                 shift
                 ;;
+            --build)
+                ACTION="build"
+                shift
+                ;;
             --status)
                 ACTION="status"
                 shift
@@ -507,6 +506,10 @@ main() {
     
     # 执行指定操作
     case "$ACTION" in
+        build)
+            build_jenkins
+            exit $?
+            ;;
         status)
             check_status
             exit $?
