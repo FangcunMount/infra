@@ -7,8 +7,11 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        http_proxy: ${http_proxy:-}
-        https_proxy: ${https_proxy:-}
+        http_proxy: ${JENKINS_BUILD_HTTP_PROXY:-}
+        https_proxy: ${JENKINS_BUILD_HTTPS_PROXY:-}
+        no_proxy: ${JENKINS_BUILD_NO_PROXY:-}
+      extra_hosts:
+        - "host.docker.internal:${DOCKER_HOST_GATEWAY:-host-gateway}"
     container_name: jenkins
     restart: always
     ports:
