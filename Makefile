@@ -205,8 +205,8 @@ help-all: ## 显示所有命令详情
 .PHONY: check-env check-scripts
 check-env: ## 检查环境配置
 	@if [ ! -f "$(ENV_FILE)" ]; then \
-		$(call shell_error_msg,环境文件不存在: $(ENV_FILE)); \
-		$(call shell_warning_msg,请运行: make env-init); \
+		echo "$(RED)$(BOLD)❌ 环境文件不存在: $(ENV_FILE)$(RESET)"; \
+		echo "$(YELLOW)⚠️  请运行: make env-init$(RESET)"; \
 		exit 1; \
 	fi
 	$(call success_msg,环境配置正常: $(ENV))
@@ -214,7 +214,7 @@ check-env: ## 检查环境配置
 check-scripts: ## 检查必要脚本
 	@for script in "$(INFRA_SCRIPT)" "$(INSTALL_SCRIPT)" "$(COMPOSE_MANAGER)"; do \
 		if [ ! -f "$$script" ]; then \
-			$(call shell_error_msg,脚本不存在: $$script); \
+			echo "$(RED)$(BOLD)❌ 脚本不存在: $$script$(RESET)"; \
 			exit 1; \
 		fi; \
 	done
@@ -238,7 +238,7 @@ clean-infra: ## 清理基础设施 (谨慎操作)
 	if [ "$$confirm" = "yes" ]; then \
 		$(INFRA_SCRIPT) remove; \
 	else \
-		$(call shell_warning_msg,操作已取消); \
+		echo "$(YELLOW)⚠️  操作已取消$(RESET)"; \
 	fi
 
 .PHONY: install install-nginx install-mysql install-redis install-mongo install-kafka install-nsq install-jenkins
@@ -332,10 +332,10 @@ env-init: ## 初始化环境配置文件
 		else \
 			touch "$(ENV_FILE)"; \
 		fi; \
-		$(call shell_success_msg,已创建环境配置: $(ENV_FILE)); \
-		$(call shell_warning_msg,请编辑配置文件后再继续); \
+		echo "$(GREEN)✅ 已创建环境配置: $(ENV_FILE)$(RESET)"; \
+		echo "$(YELLOW)⚠️  请编辑配置文件后再继续$(RESET)"; \
 	else \
-		$(call shell_warning_msg,环境配置已存在: $(ENV_FILE)); \
+		echo "$(YELLOW)⚠️  环境配置已存在: $(ENV_FILE)$(RESET)"; \
 	fi
 
 env-copy: ## 复制环境配置 (FROM=源 TO=目标)
@@ -363,9 +363,9 @@ config-show: env-show ## 显示配置 (别名)
 config-validate: check-env ## 验证配置文件
 	$(call info_msg,验证配置文件...)
 	@if docker compose --env-file $(ENV_FILE) config >/dev/null 2>&1; then \
-		$(call shell_success_msg,Docker Compose 配置有效); \
+		echo "$(GREEN)✅ Docker Compose 配置有效$(RESET)"; \
 	else \
-		$(call shell_error_msg,Docker Compose 配置无效); \
+		echo "$(RED)$(BOLD)❌ Docker Compose 配置无效$(RESET)"; \
 		exit 1; \
 	fi
 
@@ -732,7 +732,7 @@ logs: ## 查看所有服务日志 (SERVICE=服务名,可选)
 	@if [ -n "$(SERVICE)" ]; then \
 		docker logs -f --tail=$(LOG_LINES) $(SERVICE); \
 	else \
-		$(call shell_info_msg,显示最近所有服务日志...); \
+		echo "$(BLUE)ℹ️  显示最近所有服务日志...$(RESET)"; \
 		docker ps --format '{{.Names}}' | xargs -I {} sh -c 'echo "=== {} ===" && docker logs --tail=20 {}'; \
 	fi
 
