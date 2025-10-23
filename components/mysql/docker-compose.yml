@@ -6,7 +6,6 @@ services:
     container_name: mysql
     networks:
       - backend
-      - miniblog
     restart: always
     volumes:
       # 数据持久化
@@ -42,10 +41,7 @@ services:
 networks:
   backend:
     external: true
-    name: infra-backend
-  miniblog:
-    external: true
-    name: miniblog_net
+    name: infra-network
 
 volumes:
   mysql_data:

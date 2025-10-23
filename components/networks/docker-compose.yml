@@ -1,19 +1,20 @@
 # 共享网络定义
 # 基础设施服务内部通信网络
+# 使用 Docker Swarm Overlay 网络实现跨主机容器通信
 
 networks:
   backend:
-    name: infra-backend
-    driver: bridge
+    name: infra-network
+    driver: overlay
+    attachable: true  # 允许非 swarm 服务连接
     ipam:
       driver: default
       config:
         - subnet: 172.20.0.0/16
-          gateway: 172.20.0.1
     driver_opts:
-      com.docker.network.bridge.name: infra-backend
-      com.docker.network.bridge.enable_icc: "true"
-      com.docker.network.driver.mtu: "1500"
+      com.docker.network.driver.mtu: "1450"  # overlay 推荐 MTU
+      encrypted: "false"  # 如需加密设为 true (会影响性能)
     labels:
       - "infra.network=backend"
       - "infra.purpose=internal-services"
+      - "infra.network.type=overlay"

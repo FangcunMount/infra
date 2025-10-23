@@ -71,7 +71,7 @@ nsq_tail --topic=test_topic --channel=test_channel --lookupd-http-address=localh
 
 主要配置在 `override.yml` 中：
 
-- **网络**: 使用 `infra-backend` 网络
+- **网络**: 使用 `infra-network` 网络
 - **数据卷**: 
   - `infra_nsq_data`: NSQ 数据持久化
   - `infra_app_logs`: 日志存储

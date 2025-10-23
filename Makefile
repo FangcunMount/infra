@@ -39,6 +39,7 @@ RESET := \033[0m
 # ==============================================================================
 .DEFAULT_GOAL := help
 
+
 .PHONY: help
 help: ## 显示帮助信息
 	@echo ""
@@ -50,31 +51,48 @@ help: ## 显示帮助信息
 	@echo "  compose/env/            - 环境变量配置"
 	@echo "  scripts/                - 管理脚本"
 	@echo ""
-	@echo "$(BLUE)可用命令:$(RESET)"
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "$(BLUE)模块化命令索引:$(RESET)"
+	@echo "  ────────────────"
+	@echo "  1. 快速开始"
+	@awk 'BEGIN {FS = ":.*?## "} /^init:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*?## "} /^install:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*?## "} /^up:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*?## "} /^status:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "  ────────────────"
+	@echo "  2. 环境变量"
+	@awk 'BEGIN {FS = ":.*?## "} /^dev:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*?## "} /^prod:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*?## "} /^config-show:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*?## "} /^config-validate:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "  ────────────────"
+	@echo "  3. 用户管理"
+	@awk 'BEGIN {FS = ":.*?## "} /^user-/:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "  ────────────────"
+	@echo "  4. 网络管理"
+	@awk 'BEGIN {FS = ":.*?## "} /network-|app-network-|swarm-/:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "  ────────────────"
+	@echo "  5. SSL 证书管理"
+	@awk 'BEGIN {FS = ":.*?## "} /^ssl-/:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "  ────────────────"
+	@echo "  6. Nginx 管理"
+	@awk 'BEGIN {FS = ":.*?## "} /nginx-|app-deploy|app-remove|app-list/:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "  ────────────────"
+	@echo "  7. MySQL 管理"
+	@awk 'BEGIN {FS = ":.*?## "} /^install-mysql:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "  ────────────────"
+	@echo "  8. Redis 管理"
+	@awk 'BEGIN {FS = ":.*?## "} /^install-redis:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "  ────────────────"
+	@echo "  9. MongoDB 管理"
+	@awk 'BEGIN {FS = ":.*?## "} /^install-mongo:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "  ────────────────"
+	@echo " 10. NSQ 管理"
+	@awk 'BEGIN {FS = ":.*?## "} /nsq-|install-nsq/:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@echo "  ────────────────"
+	@echo " 11. 其他"
+	@awk 'BEGIN {FS = ":.*?## "} /backup|clean|health|logs|ps|check-env|check-scripts/:.*?## / {printf "    $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "$(BLUE)快速开始:$(RESET)"
-	@echo "  1. make init             # 初始化基础设施"
-	@echo "  2. make install          # 安装所有服务"
-	@echo "  3. make up               # 启动所有服务"
-	@echo "  4. make status           # 查看服务状态"
-	@echo ""
-	@echo "$(BLUE)应用配置管理:$(RESET)"
-	@echo "  make app-deploy APP=blog CONFIG=./nginx/blog.conf  # 部署应用配置"
-	@echo "  make app-remove APP=blog                           # 移除应用配置"
-	@echo "  make app-list                                      # 列出所有配置"
-	@echo "  make nginx-test                                    # 测试配置"
-	@echo "  make nginx-reload                                  # 重载配置"
-	@echo ""
-	@echo "$(BLUE)SSL 证书管理:$(RESET)"
-	@echo "  make ssl-obtain DOMAIN=blog.example.com EMAIL=admin@example.com  # 申请证书"
-	@echo "  make ssl-import DOMAIN=blog.example.com CERT=./blog.crt KEY=./blog.key  # 导入证书"
-	@echo "  make ssl-renew                                     # 续期所有证书"
-	@echo "  make ssl-list                                      # 列出所有证书"
-	@echo "  make ssl-config DOMAIN=blog.example.com            # 生成 SSL 配置"
-	@echo "  make ssl-setup                                     # 设置自动续期"
-	@echo ""
-	@echo "$(BLUE)环境变量:$(RESET)"
+	@echo "$(BLUE)参数说明:$(RESET)"
 	@echo "  ENV=dev|prod            指定环境 (默认: dev)"
 	@echo "  APP=app-name            指定应用名称"
 	@echo "  CONFIG=config-file      指定配置文件路径"
@@ -246,13 +264,15 @@ clean: ## 清理未使用的 Docker 资源
 	@echo "$(GREEN)✅ 清理完成$(RESET)"
 
 # ==============================================================================
-# 网络和测试
+# 网络管理
 # ==============================================================================
 .PHONY: network-test port-check
+.PHONY: app-network-create app-network-delete app-network-list app-network-inspect
+
 network-test: ## 测试网络连通性
 	@echo "$(BLUE)测试网络连通性...$(RESET)"
 	@docker network ls | grep infra || echo "$(RED)❌ infra 网络不存在$(RESET)"
-	@for net in infra-frontend infra-backend; do \
+	@for net in infra-frontend infra-network; do \
 		if docker network inspect $$net >/dev/null 2>&1; then \
 			echo "$(GREEN)✅ $$net 网络正常$(RESET)"; \
 		else \
@@ -269,6 +289,77 @@ port-check: ## 检查端口占用
 			echo "$(GREEN)✅ 端口 $$port 可用$(RESET)"; \
 		fi; \
 	done
+
+# 业务网络管理
+app-network-create: ## 创建业务网络 (使用: make app-network-create NAME=miniblog-network DRIVER=bridge)
+	@if [ -z "$(NAME)" ]; then \
+		echo "$(RED)错误: 请提供网络名称$(RESET)"; \
+		echo "$(YELLOW)使用方式: make app-network-create NAME=miniblog-network [DRIVER=bridge|overlay] [SUBNET=172.21.0.0/16]$(RESET)"; \
+		exit 1; \
+	fi
+	@DRIVER=$${DRIVER:-bridge}; \
+	CMD="bash $(NETWORK_SCRIPTS)/app-network-manager.sh create --name $(NAME) --driver $$DRIVER"; \
+	if [ -n "$(SUBNET)" ]; then CMD="$$CMD --subnet $(SUBNET)"; fi; \
+	if [ -n "$(GATEWAY)" ]; then CMD="$$CMD --gateway $(GATEWAY)"; fi; \
+	if [ "$(INTERNAL)" = "true" ]; then CMD="$$CMD --internal"; fi; \
+	if [ "$(ATTACHABLE)" = "true" ]; then CMD="$$CMD --attachable"; fi; \
+	if [ "$(ENCRYPTED)" = "true" ]; then CMD="$$CMD --encrypted"; fi; \
+	eval $$CMD
+
+app-network-delete: ## 删除业务网络 (使用: make app-network-delete NAME=miniblog-network)
+	@if [ -z "$(NAME)" ]; then \
+		echo "$(RED)错误: 请提供网络名称$(RESET)"; \
+		echo "$(YELLOW)使用方式: make app-network-delete NAME=miniblog-network$(RESET)"; \
+		exit 1; \
+	fi
+	@bash $(NETWORK_SCRIPTS)/app-network-manager.sh delete --name $(NAME)
+
+app-network-list: ## 列出所有业务网络
+	@bash $(NETWORK_SCRIPTS)/app-network-manager.sh list
+
+app-network-inspect: ## 查看网络详情 (使用: make app-network-inspect NAME=miniblog-network)
+	@if [ -z "$(NAME)" ]; then \
+		echo "$(RED)错误: 请提供网络名称$(RESET)"; \
+		echo "$(YELLOW)使用方式: make app-network-inspect NAME=miniblog-network$(RESET)"; \
+		exit 1; \
+	fi
+	@bash $(NETWORK_SCRIPTS)/app-network-manager.sh inspect --name $(NAME)
+
+# ==============================================================================
+# Docker Swarm 管理
+# ==============================================================================
+.PHONY: swarm-init swarm-join swarm-leave swarm-status swarm-nodes swarm-network
+
+swarm-init: ## 初始化 Swarm 管理节点 (使用: make swarm-init ADVERTISE_ADDR=192.168.1.100)
+	@if [ -z "$(ADVERTISE_ADDR)" ]; then \
+		echo "$(RED)错误: 请提供管理节点地址$(RESET)"; \
+		echo "$(YELLOW)使用方式: make swarm-init ADVERTISE_ADDR=192.168.1.100$(RESET)"; \
+		exit 1; \
+	fi
+	@bash $(NETWORK_SCRIPTS)/swarm-manager.sh init-manager --advertise-addr $(ADVERTISE_ADDR)
+
+swarm-join: ## 加入 Swarm 集群 (使用: make swarm-join MANAGER_IP=192.168.1.100 [NODE_TYPE=worker])
+	@if [ -z "$(MANAGER_IP)" ]; then \
+		echo "$(RED)错误: 请提供管理节点 IP$(RESET)"; \
+		echo "$(YELLOW)使用方式: make swarm-join MANAGER_IP=192.168.1.100 [NODE_TYPE=worker|manager]$(RESET)"; \
+		exit 1; \
+	fi
+	@NODE_TYPE=$${NODE_TYPE:-worker}; \
+	bash $(NETWORK_SCRIPTS)/swarm-manager.sh init-$$NODE_TYPE --manager-ip $(MANAGER_IP)
+
+swarm-leave: ## 离开 Swarm 集群
+	@echo "$(YELLOW)正在离开 Swarm 集群...$(RESET)"
+	@docker swarm leave --force || true
+	@echo "$(GREEN)✅ 已离开 Swarm 集群$(RESET)"
+
+swarm-status: ## 查看 Swarm 集群状态
+	@bash $(NETWORK_SCRIPTS)/swarm-manager.sh status
+
+swarm-nodes: ## 列出 Swarm 集群节点
+	@bash $(NETWORK_SCRIPTS)/swarm-manager.sh list-nodes
+
+swarm-network: ## 创建 Swarm overlay 网络
+	@bash $(NETWORK_SCRIPTS)/swarm-manager.sh create-network
 
 # ==============================================================================
 # 环境切换

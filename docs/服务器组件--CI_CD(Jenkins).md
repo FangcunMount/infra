@@ -38,7 +38,7 @@ sudo chown -R 1000:1000 /opt/infra/jenkins
 # 启动 Jenkins 容器
 docker run -d \
   --name jenkins \
-  --network infra-backend \
+  --network infra-network \
   --restart unless-stopped \
   -p 8080:8080 \
   -p 50000:50000 \

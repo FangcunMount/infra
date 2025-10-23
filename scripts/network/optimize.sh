@@ -186,7 +186,7 @@ apply_network_optimization() {
             log_success "✓ 后端网络已设置为内部网络"
         elif ! grep -q "internal:" "$base_compose"; then
             # 在 backend 网络配置中添加 internal: true
-            sed -i.bak '/name: infra-backend/a\    internal: true' "$base_compose"
+            sed -i.bak '/name: infra-network/a\    internal: true' "$base_compose"
             log_success "✓ 后端网络已设置为内部网络"
         else
             log_info "后端网络配置无需修改"
@@ -229,7 +229,7 @@ verify_optimization() {
     log_info "验证网络优化结果..."
     
     # 检查网络配置
-    if docker network inspect infra-backend --format '{{.Internal}}' 2>/dev/null | grep -q "true"; then
+    if docker network inspect infra-network --format '{{.Internal}}' 2>/dev/null | grep -q "true"; then
         log_success "✓ 后端网络已设置为内部网络"
     else
         log_warn "△ 后端网络内部设置需要确认"

@@ -43,7 +43,7 @@ services:
 networks:
   backend:
     external: true
-    name: infra-backend
+    name: infra-network
 
 volumes:
   nginx_logs:

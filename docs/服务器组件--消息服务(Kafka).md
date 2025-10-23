@@ -34,7 +34,7 @@
 # 启动 Zookeeper
 docker run -d \
   --name zookeeper \
-  --network infra-backend \
+  --network infra-network \
   --restart unless-stopped \
   -e ZOOKEEPER_CLIENT_PORT=2181 \
   -e ZOOKEEPER_TICK_TIME=2000 \
@@ -45,7 +45,7 @@ docker run -d \
 # 启动 Kafka
 docker run -d \
   --name kafka \
-  --network infra-backend \
+  --network infra-network \
   --restart unless-stopped \
   -e KAFKA_BROKER_ID=1 \
   -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \

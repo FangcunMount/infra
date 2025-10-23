@@ -145,7 +145,7 @@ EOF
 # 启动 MySQL 容器
 docker run -d \
   --name mysql \
-  --network infra-backend \
+  --network infra-network \
   --restart unless-stopped \
   -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
   -e MYSQL_DATABASE=infrastructure \
@@ -213,7 +213,7 @@ EOF
 # 启动 Redis 容器
 docker run -d \
   --name redis \
-  --network infra-backend \
+  --network infra-network \
   --restart unless-stopped \
   -v infra_redis_data:/data \
   -v /opt/infra/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf:ro \
@@ -278,7 +278,7 @@ EOF
 # 启动 MongoDB 容器
 docker run -d \
   --name mongo \
-  --network infra-backend \
+  --network infra-network \
   --restart unless-stopped \
   -e MONGO_INITDB_ROOT_USERNAME=admin \
   -e MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD} \

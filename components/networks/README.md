@@ -4,54 +4,113 @@
 
 此目录包含所有基础设施组件使用的共享网络定义。
 
+**🌐 现在支持 Docker Swarm Overlay 网络,实现跨主机容器通信!**
+
 ## 网络说明
 
-### infra-backend (基础设施网络)
+### infra-network (基础设施网络)
 
+- **驱动**: overlay (支持跨主机通信)
 - **用途**: 所有基础设施服务的内部通信网络
 - **子网**: 172.20.0.0/16
-- **网关**: 172.20.0.1
+- **MTU**: 1450 (overlay 推荐值)
 - **特性**:
-  - 启用容器间通信 (ICC=true)
-  - 基础设施服务（MySQL、Redis、Kafka、NSQ 等）互联
-  - 业务应用可以加入此网络访问基础设施服务
+  - ✅ 跨主机容器直接通信
+  - ✅ attachable: 允许非 swarm 服务连接
+  - ✅ 基础设施服务（MySQL、Redis、Kafka、NSQ 等）互联
+  - ✅ 业务应用可以加入此网络访问基础设施服务
+  - 🔒 可选加密传输 (encrypted: false 默认,可改为 true)
 
 ### 设计理念
 
-**为什么只有一个网络？**
+**为什么使用 Docker Swarm Overlay?**
 
-- ✅ **业务层自治**: 每个业务应用创建自己的网络（如 `miniblog-network`）
-- ✅ **跨网络访问**: 业务应用通过加入 `infra-backend` 网络来访问基础设施
-- ✅ **简化架构**: 避免不必要的网络复杂度
-- ✅ **灵活隔离**: 业务应用之间通过各自的网络自然隔离
+- ✅ **跨主机通信**: ServerA 和 ServerB 的容器可以直接通信
+- ✅ **服务发现**: 容器间通过服务名访问,自动 DNS 解析
+- ✅ **无需端口映射**: 不需要暴露服务端口到宿主机
+- ✅ **简化配置**: 不需要配置跨主机网络的复杂路由
+- ✅ **动态扩展**: 可轻松添加更多节点
 
 **网络拓扑示例：**
 
 ```
-infra-backend 网络
-├── MySQL
-├── Redis
-├── MongoDB
-├── Kafka
-├── NSQ
-└── Jenkins
+                   Docker Swarm Overlay Network
+                      (infra-network)
+                            │
+        ┌───────────────────┴───────────────────┐
+        │                                       │
+    ServerA                                 ServerB
+        │                                       │
+   ┌────┴────┐                            ┌────┴────┐
+   │ MySQL   │                            │  NSQ    │
+   │ Redis   │◄──────容器直接通信──────────►│ nsqd   │
+   │ MongoDB │                            │ lookup  │
+   └─────────┘                            └─────────┘
+        │                                       │
+   ┌────┴────┐                            ┌────┴────┐
+   │ miniblog│                            │  qsapi  │
+   │  应用   │                            │   应用   │
+   └─────────┘                            └─────────┘
+```
 
-miniblog-network 网络          qsapi-network 网络
-├── miniblog 应用              ├── qsapi 应用
-└─[加入]→ infra-backend       └─[加入]→ infra-backend
+**业务应用网络示例：**
+
+```
+ServerA:
+  miniblog-network 网络          
+  ├── miniblog 应用              
+  └─[加入]→ infra-network (访问 MySQL/Redis)
+
+ServerB:
+  qsapi-network 网络
+  ├── qsapi 应用
+  └─[加入]→ infra-network (访问 NSQ/MongoDB)
 ```
 
 ## 使用方式
 
-在启动任何组件之前，需要先创建这些网络：
+### 前提条件
+
+**必须先初始化 Docker Swarm 集群!**
 
 ```bash
-# 使用初始化脚本
+# 1. 在 ServerA (管理节点) 上初始化
+sudo ./scripts/network/swarm-manager.sh init-manager
+
+# 2. 获取加入令牌
+sudo ./scripts/network/swarm-manager.sh get-join-token
+
+# 3. 在 ServerB (工作节点) 上加入集群
+sudo ./scripts/network/swarm-manager.sh init-worker <ServerA-IP> <join-token>
+
+# 4. 验证集群状态 (在管理节点)
+sudo ./scripts/network/swarm-manager.sh status
+```
+
+### 创建网络
+
+在 Swarm 初始化完成后,创建 overlay 网络：
+
+```bash
+# 方式1: 使用初始化脚本 (推荐)
 bash scripts/components/init-infrastructure.sh create
 
-# 或手动创建
+# 方式2: 使用 Swarm 管理脚本
+sudo ./scripts/network/swarm-manager.sh create-network
+
+# 方式3: 手动创建
 cd components/networks
 docker compose up -d
+```
+
+### 验证网络
+
+```bash
+# 查看网络信息
+docker network inspect infra-network
+
+# 测试跨主机连通性
+sudo ./scripts/network/swarm-manager.sh test
 ```
 
 ## 数据卷说明

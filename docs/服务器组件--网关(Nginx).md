@@ -335,9 +335,9 @@ networks:
 
 # 后端网络（用于服务间通信）
 networks:
-  infra-backend:
+  infra-network:
     external: true
-    name: infra-backend
+    name: infra-network
 ```
 
 ### 端口配置

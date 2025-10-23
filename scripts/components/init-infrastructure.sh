@@ -47,7 +47,7 @@ validate_config() {
     fi
     
     # 检查网络子网是否冲突
-    if docker network ls --format '{{.Name}}' | grep -E '^(infra-frontend|infra-backend)$' >/dev/null; then
+    if docker network ls --format '{{.Name}}' | grep -E '^(infra-frontend|infra-network)$' >/dev/null; then
         log_warn "检测到已存在的 infra 网络，将跳过已存在的网络创建"
     fi
     
@@ -132,12 +132,12 @@ create_networks() {
   --driver bridge \\
   --subnet=${INFRA_BACKEND_SUBNET} \\
   --gateway=${INFRA_BACKEND_GATEWAY} \\
-  --opt com.docker.network.bridge.name=infra-backend \\
+  --opt com.docker.network.bridge.name=infra-network \\
   --opt com.docker.network.bridge.enable_icc=true \\
   --opt com.docker.network.driver.mtu=${INFRA_NETWORK_MTU} \\
   --label 'network.zone=private' \\
   --label 'network.access=internal' \\
-  infra-backend"
+  infra-network"
   
     if [[ "$dry_run" == "true" ]]; then
         echo "# 前端网络创建命令:"
@@ -156,10 +156,10 @@ create_networks() {
         eval "$frontend_cmd" || log_error "前端网络创建失败"
     fi
     
-    if docker network inspect infra-backend >/dev/null 2>&1; then
-        log_warn "后端网络 infra-backend 已存在"
+    if docker network inspect infra-network >/dev/null 2>&1; then
+        log_warn "后端网络 infra-network 已存在"
     else
-        log_info "创建后端网络 infra-backend..."
+        log_info "创建后端网络 infra-network..."
         eval "$backend_cmd" || log_error "后端网络创建失败"
     fi
 }
@@ -238,7 +238,7 @@ remove_infrastructure() {
     
     log_step "删除基础设施网络和卷..."
     
-    local networks=("infra-frontend" "infra-backend")
+    local networks=("infra-frontend" "infra-network")
     local volumes=("infra_mysql_data" "infra_redis_data" "infra_mongo_data" "infra_kafka_data" "infra_jenkins_data" "infra_nginx_logs" "infra_app_logs")
     
     if [[ "$dry_run" == "true" ]]; then
@@ -331,9 +331,9 @@ test_networks() {
     fi
     
     # 测试后端网络
-    if docker network inspect infra-backend >/dev/null 2>&1; then
+    if docker network inspect infra-network >/dev/null 2>&1; then
         log_info "测试后端网络连通性..."
-        docker run --rm --network infra-backend alpine ping -c 2 172.20.0.1 >/dev/null 2>&1 && \
+        docker run --rm --network infra-network alpine ping -c 2 172.20.0.1 >/dev/null 2>&1 && \
             log_success "后端网络连通性正常" || log_warn "后端网络连通性异常"
     fi
 }
