@@ -200,12 +200,12 @@ services:
   blog:
     image: miniblog:latest
     networks:
-      - infra-frontend
+      - infra-network
     volumes:
       - ./dist:/var/www/blog:ro
 
 networks:
-  infra-frontend:
+  infra-network:
     external: true
 ```
 
@@ -327,17 +327,12 @@ crontab -l
 ### Docker 网络
 
 ```yaml
-# 前端网络（用于 Web 流量）
-networks:
-  infra-frontend:
-    external: true
-    name: infra-frontend
-
-# 后端网络（用于服务间通信）
+# 统一网络（用于所有服务通信）
 networks:
   infra-network:
     external: true
     name: infra-network
+```
 ```
 
 ### 端口配置

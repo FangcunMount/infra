@@ -64,7 +64,7 @@ docker run -d \
 # 部署 Kafka UI (开发环境)
 docker run -d \
   --name kafka-ui \
-  --network infra-frontend \
+  --network infra-network \
   --restart unless-stopped \
   -p 8081:8080 \
   -e KAFKA_CLUSTERS_0_NAME=local \

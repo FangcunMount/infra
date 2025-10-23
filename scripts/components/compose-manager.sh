@@ -47,7 +47,7 @@ ensure_infrastructure() {
     fi
     
     # 检查网络和卷是否已创建
-    if ! docker network inspect infra-frontend infra-network >/dev/null 2>&1 || \
+    if ! docker network inspect infra-network >/dev/null 2>&1 || \
        ! docker volume inspect infra_mysql_data infra_redis_data >/dev/null 2>&1; then
         
         log_warn "基础设施不完整，正在初始化..."
@@ -246,7 +246,7 @@ manage_infra() {
             if [[ "$component" == "core" ]]; then
                 # core 组件清理网络，但保留数据卷
                 log_warn "清理网络 (保留数据卷)..."
-                docker network rm infra-frontend infra-network 2>/dev/null || true
+                docker network rm infra-network 2>/dev/null || true
                 log_success "核心组件停止完成"
             else
                 $COMPOSE_CMD "${compose_files[@]}" down

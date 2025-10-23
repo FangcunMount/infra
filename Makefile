@@ -564,19 +564,13 @@ jenkins-password: ## 获取 Jenkins 初始管理员密码
 .PHONY: network-init network-status network-reset
 .PHONY: swarm-init swarm-leave swarm-status port-check
 
-network-init: ## 初始化基础设施网络 (infra-frontend, infra-network)
+network-init: ## 初始化基础设施网络 (infra-network)
 	$(call info_msg,初始化基础设施网络...)
 	@$(INFRA_SCRIPT) create
 	$(call success_msg,基础设施网络创建成功)
 
 network-status: ## 查看基础设施网络状态
 	$(call info_msg,基础设施网络状态:)
-	@if docker network ls --format '{{.Name}}' | grep -q '^infra-frontend$$'; then \
-		echo "  $(GREEN)✅$(RESET) infra-frontend (前端网络)"; \
-		docker network inspect infra-frontend --format '    子网: {{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null; \
-	else \
-		echo "  $(RED)❌$(RESET) infra-frontend (未创建)"; \
-	fi
 	@if docker network ls --format '{{.Name}}' | grep -q '^infra-network$$'; then \
 		echo "  $(GREEN)✅$(RESET) infra-network (后端网络)"; \
 		docker network inspect infra-network --format '    子网: {{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null; \

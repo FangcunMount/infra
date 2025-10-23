@@ -26,8 +26,6 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 # 环境变量配置
 INFRA_DATA_ROOT="${INFRA_DATA_ROOT:-/data/infra}"
 INFRA_LOG_ROOT="${INFRA_LOG_ROOT:-/data/logs}"
-INFRA_FRONTEND_SUBNET="${INFRA_FRONTEND_SUBNET:-172.19.0.0/16}"
-INFRA_FRONTEND_GATEWAY="${INFRA_FRONTEND_GATEWAY:-172.19.0.1}"
 INFRA_BACKEND_SUBNET="${INFRA_BACKEND_SUBNET:-172.20.0.0/16}"
 INFRA_BACKEND_GATEWAY="${INFRA_BACKEND_GATEWAY:-172.20.0.1}"
 INFRA_NETWORK_MTU="${INFRA_NETWORK_MTU:-1500}"
@@ -47,18 +45,13 @@ validate_config() {
     fi
     
     # 检查网络子网是否冲突
-    if docker network ls --format '{{.Name}}' | grep -E '^(infra-frontend|infra-network)$' >/dev/null; then
-        log_warn "检测到已存在的 infra 网络，将跳过已存在的网络创建"
+    if docker network ls --format '{{.Name}}' | grep -q '^infra-network$' >/dev/null; then
+        log_warn "检测到已存在的 infra-network 网络，将跳过网络创建"
     fi
     
     # 验证子网格式
-    if ! echo "${INFRA_FRONTEND_SUBNET}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$'; then
-        log_error "前端子网格式无效: ${INFRA_FRONTEND_SUBNET}"
-        return 1
-    fi
-    
     if ! echo "${INFRA_BACKEND_SUBNET}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$'; then
-        log_error "后端子网格式无效: ${INFRA_BACKEND_SUBNET}"
+        log_error "网络子网格式无效: ${INFRA_BACKEND_SUBNET}"
         return 1
     fi
     
@@ -66,7 +59,6 @@ validate_config() {
     log_info "当前配置:"
     echo "  数据根目录: ${INFRA_DATA_ROOT}"
     echo "  日志根目录: ${INFRA_LOG_ROOT}"
-    echo "  前端网络: ${INFRA_FRONTEND_SUBNET} (网关: ${INFRA_FRONTEND_GATEWAY})"
     echo "  后端网络: ${INFRA_BACKEND_SUBNET} (网关: ${INFRA_BACKEND_GATEWAY})"
     echo "  网络MTU: ${INFRA_NETWORK_MTU}"
     echo "  用户:组: ${INFRA_USER}:${INFRA_GROUP}"
@@ -100,8 +92,8 @@ show_help() {
 环境变量:
   INFRA_DATA_ROOT        数据根目录 (默认: /data/infra)
   INFRA_LOG_ROOT         日志根目录 (默认: /data/logs)
-  INFRA_FRONTEND_SUBNET  前端网络子网 (默认: 172.19.0.0/16)
-  INFRA_BACKEND_SUBNET   后端网络子网 (默认: 172.20.0.0/16)
+  INFRA_BACKEND_SUBNET   网络子网 (默认: 172.20.0.0/16)
+  INFRA_BACKEND_GATEWAY  网络网关 (默认: 172.20.0.1)
   INFRA_NETWORK_MTU      网络MTU大小 (默认: 1500)
   INFRA_USER             数据目录所有者 (默认: $USER)
   INFRA_GROUP            数据目录组 (默认: docker)
@@ -114,20 +106,8 @@ create_networks() {
     
     log_step "创建 Docker 网络..."
     
-    # 前端网络（对外服务）
-    local frontend_cmd="docker network create \\
-  --driver bridge \\
-  --subnet=${INFRA_FRONTEND_SUBNET} \\
-  --gateway=${INFRA_FRONTEND_GATEWAY} \\
-  --opt com.docker.network.bridge.name=infra-frontend \\
-  --opt com.docker.network.bridge.enable_icc=false \\
-  --opt com.docker.network.bridge.enable_ip_masquerade=true \\
-  --opt com.docker.network.driver.mtu=${INFRA_NETWORK_MTU} \\
-  --label 'network.zone=public' \\
-  --label 'network.access=external' \\
-  infra-frontend"
-  
-    # 后端网络（内部服务）
+    # 后端网络（内部服务通信）
+    # 注意: 已移除 infra-frontend，所有服务统一使用 infra-network
     local backend_cmd="docker network create \\
   --driver bridge \\
   --subnet=${INFRA_BACKEND_SUBNET} \\
@@ -135,32 +115,22 @@ create_networks() {
   --opt com.docker.network.bridge.name=infra-network \\
   --opt com.docker.network.bridge.enable_icc=true \\
   --opt com.docker.network.driver.mtu=${INFRA_NETWORK_MTU} \\
-  --label 'network.zone=private' \\
-  --label 'network.access=internal' \\
+  --label 'infra.network=backend' \\
+  --label 'infra.purpose=service-communication' \\
   infra-network"
   
     if [[ "$dry_run" == "true" ]]; then
-        echo "# 前端网络创建命令:"
-        echo "$frontend_cmd"
-        echo
         echo "# 后端网络创建命令:"
         echo "$backend_cmd"
         return 0
     fi
     
     # 检查网络是否已存在
-    if docker network inspect infra-frontend >/dev/null 2>&1; then
-        log_warn "前端网络 infra-frontend 已存在"
-    else
-        log_info "创建前端网络 infra-frontend..."
-        eval "$frontend_cmd" || log_error "前端网络创建失败"
-    fi
-    
     if docker network inspect infra-network >/dev/null 2>&1; then
-        log_warn "后端网络 infra-network 已存在"
+        log_warn "网络 infra-network 已存在"
     else
-        log_info "创建后端网络 infra-network..."
-        eval "$backend_cmd" || log_error "后端网络创建失败"
+        log_info "创建网络 infra-network..."
+        eval "$backend_cmd" || log_error "网络创建失败"
     fi
 }
 
@@ -238,7 +208,7 @@ remove_infrastructure() {
     
     log_step "删除基础设施网络和卷..."
     
-    local networks=("infra-frontend" "infra-network")
+    local networks=("infra-network")
     local volumes=("infra_mysql_data" "infra_redis_data" "infra_mongo_data" "infra_kafka_data" "infra_jenkins_data" "infra_nginx_logs" "infra_app_logs")
     
     if [[ "$dry_run" == "true" ]]; then
@@ -323,18 +293,14 @@ show_status() {
 test_networks() {
     log_step "测试网络连通性..."
     
-    # 测试前端网络
-    if docker network inspect infra-frontend >/dev/null 2>&1; then
-        log_info "测试前端网络连通性..."
-        docker run --rm --network infra-frontend alpine ping -c 2 172.19.0.1 >/dev/null 2>&1 && \
-            log_success "前端网络连通性正常" || log_warn "前端网络连通性异常"
-    fi
-    
     # 测试后端网络
     if docker network inspect infra-network >/dev/null 2>&1; then
-        log_info "测试后端网络连通性..."
+        log_info "测试 infra-network 连通性..."
         docker run --rm --network infra-network alpine ping -c 2 172.20.0.1 >/dev/null 2>&1 && \
-            log_success "后端网络连通性正常" || log_warn "后端网络连通性异常"
+            log_success "infra-network 网络连通性正常" || log_warn "infra-network 网络连通性异常"
+    else
+        log_error "infra-network 网络不存在"
+        return 1
     fi
 }
 

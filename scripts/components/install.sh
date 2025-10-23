@@ -143,7 +143,7 @@ check_infrastructure() {
     local networks_exist=false
     local volumes_exist=false
     
-    if docker network inspect infra-frontend infra-network >/dev/null 2>&1; then
+    if docker network inspect infra-network >/dev/null 2>&1; then
         networks_exist=true
     fi
     
