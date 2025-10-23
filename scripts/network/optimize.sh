@@ -178,10 +178,7 @@ verify_optimization() {
     if curl -s -f "http://localhost/nginx-health" >/dev/null 2>&1; then
         log_success "✓ Nginx 服务可访问"
     else
-            log_warn "△ Jenkins 代理访问需要确认（可能需要配置 hosts）"
-        fi
-    else
-        log_warn "△ Nginx 服务状态需要确认"
+        log_warn "△ Nginx 服务访问测试失败"
     fi
 }
 
