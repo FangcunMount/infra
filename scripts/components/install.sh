@@ -5,7 +5,7 @@ set -euo pipefail
 # Docker 组件统一安装脚本
 # =================================================================
 # 功能：基于 components 配置安装 Docker 服务组件
-# 支持：nginx, mysql, redis, mongodb, kafka, jenkins
+# 支持：nginx, mysql, redis, mongodb, kafka, nsq, jenkins
 # 用户：www (推荐) 或 root
 # =================================================================
 
@@ -54,6 +54,7 @@ Docker 组件统一安装脚本
   redis       Redis 缓存
   mongo       MongoDB 数据库
   kafka       Apache Kafka 消息队列
+  nsq         NSQ 实时分布式消息平台
   jenkins     Jenkins CI/CD 平台
   all         安装所有组件
 
@@ -202,14 +203,16 @@ prepare_directories() {
         "$DATA_DIR/mysql"  
         "$DATA_DIR/redis"
         "$DATA_DIR/mongodb"
-        "$DATA_DIR/kafka"
+        "        "$DATA_DIR/kafka"
+        "$DATA_DIR/nsq""
         "$DATA_DIR/ssl"
         "$DATA_DIR/apps"
         "$LOG_DIR/nginx"
         "$LOG_DIR/mysql"
         "$LOG_DIR/redis"
         "$LOG_DIR/mongodb"
-        "$LOG_DIR/kafka"
+        "        "$LOG_DIR/kafka"
+        "$LOG_DIR/nsq""
         "$LOG_DIR/ssl"
         "$LOG_DIR/certbot"
     )
@@ -238,7 +241,7 @@ validate_component() {
     local component="$1"
     
     # 支持的组件列表
-    local valid_components=("nginx" "mysql" "redis" "mongo" "kafka" "jenkins" "all")
+    local valid_components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq" "jenkins" "all")
     
     if [[ "$component" == "all" ]]; then
         return 0
@@ -429,34 +432,46 @@ show_env_file_help() {
 # 组件安装函数
 # =================================================================
 
-# Jenkins 专门安装函数
+# Jenkins 安装函数（使用 compose-manager）
 install_jenkins_component() {
     local env_type="$1"
     local dry_run="$2"
     
-    log_info "使用 Jenkins 专门安装脚本..."
+    log_info "安装 Jenkins CI/CD 服务..."
     
-    local jenkins_script="$SCRIPT_DIR/install-jenkins.sh"
+    # 创建必要的目录
+    log_info "准备 Jenkins 目录..."
+    if [[ "$dry_run" != "true" ]]; then
+        sudo mkdir -p /data/jenkins
+        sudo chown -R 1000:1000 /data/jenkins
+        
+        mkdir -p "$PROJECT_ROOT/data/jenkins"
+        mkdir -p "$PROJECT_ROOT/logs/jenkins"
+    fi
     
-    if [[ ! -f "$jenkins_script" ]]; then
-        log_error "Jenkins 安装脚本不存在: $jenkins_script"
+    # 使用 compose-manager 安装
+    local compose_manager="$SCRIPT_DIR/compose-manager.sh"
+    
+    if [[ ! -f "$compose_manager" ]]; then
+        log_error "Compose 管理器不存在: $compose_manager"
         return 1
     fi
     
-    # 构建参数
-    local args=("--env" "$env_type")
-    
+    # 执行安装
     if [[ "$dry_run" == "true" ]]; then
-        args+=("--dry-run")
-    fi
-    
-    # 执行 Jenkins 安装脚本
-    if "$jenkins_script" "${args[@]}"; then
-        log_success "Jenkins 安装完成"
+        log_info "[预览模式] 将执行: $compose_manager -e $env_type infra up cicd"
         return 0
     else
-        log_error "Jenkins 安装失败"
-        return 1
+        if "$compose_manager" -e "$env_type" infra up cicd; then
+            log_success "Jenkins 安装完成"
+            log_info "Jenkins 访问地址: http://localhost:8080"
+            log_info "默认管理员用户: admin"
+            log_warn "请在首次访问时设置管理员密码"
+            return 0
+        else
+            log_error "Jenkins 安装失败"
+            return 1
+        fi
     fi
 }
 
@@ -498,7 +513,7 @@ install_component() {
     
     # 对于某些组件使用专门的独立 compose 文件
     case "$component" in
-        nginx|mysql|redis|mongo|kafka|jenkins)
+        nginx|mysql|redis|mongo|kafka|nsq|jenkins)
             local standalone_compose="$COMPOSE_DIR/infra/docker-compose.${component}.yml"
             if [[ -f "$standalone_compose" ]]; then
                 use_standalone=true
@@ -594,7 +609,7 @@ install_all_components() {
     
     log_step "安装所有组件..."
     
-    local components=("nginx" "mysql" "redis" "mongo" "kafka" "jenkins")
+    local components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq" "jenkins")
     local failed_components=()
     
     for component in "${components[@]}"; do
@@ -669,7 +684,7 @@ show_interactive_menu() {
     echo "========================================"
     echo
     
-    local components=("nginx" "mysql" "redis" "mongo" "kafka" "jenkins")
+    local components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq" "jenkins")
     local selected_components=()
     
     while true; do
@@ -696,6 +711,7 @@ show_interactive_menu() {
                 redis) echo "  $num. Redis       - 内存缓存数据库      [$status]" ;;
                 mongo) echo "  $num. MongoDB     - NoSQL 文档数据库    [$status]" ;;
                 kafka) echo "  $num. Kafka       - 分布式消息队列      [$status]" ;;
+                nsq) echo "  $num. NSQ         - 实时消息平台        [$status]" ;;
                 jenkins) echo "  $num. Jenkins     - CI/CD 持续集成平台  [$status]" ;;
             esac
         done
@@ -825,6 +841,12 @@ show_component_details() {
     echo "  • 资源: 较重，内存占用约 1GB"
     echo "  • 依赖: Zookeeper (自动安装)"
     echo
+    echo "📬 NSQ (实时消息平台)"
+    echo "  • 作用: 轻量级实时分布式消息平台"
+    echo "  • 端口: 4150/4151 (nsqd), 4160/4161 (nsqlookupd), 4171 (nsqadmin)"
+    echo "  • 资源: 轻量级，内存占用约 768MB"
+    echo "  • 依赖: 无"
+    echo
     echo "� Jenkins (CI/CD 平台)"
     echo "  • 作用: 持续集成/持续部署，代码构建和发布"
     echo "  • 端口: 8080 (Web), 50000 (Agent)"
@@ -838,8 +860,8 @@ show_component_details() {
     echo "🎯 常用组合:"
     echo "  • Web 应用: nginx + mysql + redis"
     echo "  • API 服务: nginx + mysql + redis + mongo"
-    echo "  • 微服务: nginx + mysql + redis + kafka"
-    echo "  • 全栈开发: nginx + mysql + redis + mongo + kafka + jenkins"
+    echo "  • 微服务: nginx + mysql + redis + nsq"
+    echo "  • 全栈开发: nginx + mysql + redis + mongo + kafka + nsq + jenkins"
     echo "  • CI/CD 环境: jenkins + mysql + redis (用于构建和测试)"
     echo
     read -p "按任意键返回组件选择菜单..." -n 1 -r

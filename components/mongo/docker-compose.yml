@@ -1,0 +1,53 @@
+# MongoDB 文档数据库服务
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    networks:
+      - backend
+    restart: always
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      # 数据持久化
+      - mongo_data:/data/db
+      # 配置文件（相对路径）
+      - ./mongod.conf:/etc/mongod.conf:ro
+      # 日志目录
+      - app_logs:/data/log
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+    command: mongod --config /etc/mongod.conf --auth
+    ulimits:
+      nofile: 100000
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+        reservations:
+          memory: 800M
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "infra.service=document-db"
+      - "infra.category=storage"
+
+# 使用外部网络（共享）和本地数据卷（组件独有）
+networks:
+  backend:
+    external: true
+    name: infra-backend
+
+volumes:
+  mongo_data:
+    name: infra_mongo_data
+    driver: local
+  app_logs:
+    name: infra_app_logs
+    driver: local

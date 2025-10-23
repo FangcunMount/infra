@@ -12,14 +12,19 @@ ENV_FILE := compose/env/$(ENV)/.env
 
 # 脚本路径
 SCRIPTS_DIR := scripts
-INIT_SCRIPTS_DIR := $(SCRIPTS_DIR)/init-components
-INFRA_SCRIPT := $(INIT_SCRIPTS_DIR)/init-infrastructure.sh
-INSTALL_SCRIPT := $(INIT_SCRIPTS_DIR)/install-components.sh
-COMPOSE_MANAGER := $(INIT_SCRIPTS_DIR)/compose-manager.sh
+COMPONENTS_SCRIPTS := $(SCRIPTS_DIR)/components
+SERVER_SCRIPTS := $(SCRIPTS_DIR)/server
+NETWORK_SCRIPTS := $(SCRIPTS_DIR)/network
+TOOLS_SCRIPTS := $(SCRIPTS_DIR)/tools
 
-# Compose 配置路径
-COMPOSE_DIR := compose/infra
-COMPOSE_FILES := -f $(COMPOSE_DIR)/docker-compose.yml
+# 常用脚本
+INFRA_SCRIPT := $(COMPONENTS_SCRIPTS)/init-infrastructure.sh
+INSTALL_SCRIPT := $(COMPONENTS_SCRIPTS)/install.sh
+COMPOSE_MANAGER := $(COMPONENTS_SCRIPTS)/compose-manager.sh
+
+# 组件配置路径
+COMPONENTS_DIR := components
+NETWORKS_DIR := $(COMPONENTS_DIR)/networks
 
 # 颜色定义
 RED := \033[31m
@@ -40,9 +45,9 @@ help: ## 显示帮助信息
 	@echo "$(GREEN)🐳 基础设施项目管理工具$(RESET)"
 	@echo ""
 	@echo "$(BLUE)项目结构:$(RESET)"
-	@echo "  compose/infra/          - 基础设施 Docker Compose 配置"
+	@echo "  components/             - 组件配置（自包含）"
+	@echo "  components/networks/    - 共享网络定义"
 	@echo "  compose/env/            - 环境变量配置"
-	@echo "  components/             - 服务组件配置"
 	@echo "  scripts/                - 管理脚本"
 	@echo ""
 	@echo "$(BLUE)可用命令:$(RESET)"
@@ -134,7 +139,7 @@ clean-infra: ## 清理基础设施 (谨慎操作)
 # ==============================================================================
 # 服务安装
 # ==============================================================================
-.PHONY: install install-nginx install-mysql install-redis install-mongo install-kafka install-jenkins
+.PHONY: install install-nginx install-mysql install-redis install-mongo install-kafka install-nsq install-jenkins
 install: init ## 安装所有基础设施服务
 	@echo "$(BLUE)安装所有基础设施服务...$(RESET)"
 	@$(INSTALL_SCRIPT) all
@@ -154,6 +159,9 @@ install-mongo: init ## 安装 MongoDB
 install-kafka: init ## 安装 Kafka
 	@$(INSTALL_SCRIPT) kafka
 
+install-nsq: init ## 安装 NSQ
+	@$(INSTALL_SCRIPT) nsq
+
 install-jenkins: init ## 安装 Jenkins
 	@$(INSTALL_SCRIPT) jenkins
 
@@ -171,9 +179,6 @@ down: ## 停止所有服务
 
 restart: down up ## 重启所有服务
 
-build-jenkins: ## 构建 Jenkins 镜像
-	@$(INIT_SCRIPTS_DIR)/install-jenkins.sh --env $(ENV) --build
-
 .PHONY: up-nginx up-storage up-message up-cicd down-cicd
 up-nginx: ## 启动网关服务
 	@$(COMPOSE_MANAGER) infra up nginx
@@ -181,7 +186,7 @@ up-nginx: ## 启动网关服务
 up-storage: ## 启动存储服务 (MySQL, Redis, MongoDB)
 	@$(COMPOSE_MANAGER) infra up storage
 
-up-message: ## 启动消息服务 (Kafka)
+up-message: ## 启动消息服务 (Kafka, NSQ)
 	@$(COMPOSE_MANAGER) infra up message
 
 up-cicd: ## 启动 CI/CD 服务 (Jenkins)
@@ -206,7 +211,7 @@ ifdef SERVICE
 	@$(COMPOSE_MANAGER) logs $(SERVICE)
 else
 	@echo "$(YELLOW)请指定服务名: make logs SERVICE=nginx$(RESET)"
-	@echo "$(BLUE)可用服务: nginx, mysql, redis, mongo, kafka, jenkins$(RESET)"
+	@echo "$(BLUE)可用服务: nginx, mysql, redis, mongo, kafka, nsq, jenkins$(RESET)"
 endif
 
 ps: ## 查看运行的容器
@@ -308,7 +313,7 @@ app-deploy: ## 部署应用 nginx 配置 (使用: make app-deploy APP=blog CONFI
 		echo "$(YELLOW)使用方式: make app-deploy APP=blog CONFIG=./nginx/blog.conf$(RESET)"; \
 		exit 1; \
 	fi
-	@bash scripts/utils/nginx-app-manager.sh deploy $(APP) $(CONFIG)
+	@bash $(TOOLS_SCRIPTS)/nginx-app-manager.sh deploy $(APP) $(CONFIG)
 
 app-remove: ## 移除应用 nginx 配置 (使用: make app-remove APP=blog)
 	@if [ -z "$(APP)" ]; then \
@@ -316,16 +321,16 @@ app-remove: ## 移除应用 nginx 配置 (使用: make app-remove APP=blog)
 		echo "$(YELLOW)使用方式: make app-remove APP=blog$(RESET)"; \
 		exit 1; \
 	fi
-	@bash scripts/utils/nginx-app-manager.sh remove $(APP)
+	@bash $(TOOLS_SCRIPTS)/nginx-app-manager.sh remove $(APP)
 
 app-list: ## 列出所有已部署的应用配置
-	@bash scripts/utils/nginx-app-manager.sh list
+	@bash $(TOOLS_SCRIPTS)/nginx-app-manager.sh list
 
 nginx-reload: ## 重载 nginx 配置
-	@bash scripts/utils/nginx-app-manager.sh reload
+	@bash $(TOOLS_SCRIPTS)/nginx-app-manager.sh reload
 
 nginx-test: ## 测试 nginx 配置
-	@bash scripts/utils/nginx-app-manager.sh test
+	@bash $(TOOLS_SCRIPTS)/nginx-app-manager.sh test
 
 # ==============================================================================
 # SSL 证书管理
@@ -338,7 +343,7 @@ ssl-obtain: ## 申请 SSL 证书 (使用: make ssl-obtain DOMAIN=blog.example.co
 		echo "$(YELLOW)使用方式: make ssl-obtain DOMAIN=blog.example.com EMAIL=admin@example.com$(RESET)"; \
 		exit 1; \
 	fi
-	@bash scripts/utils/ssl-manager.sh obtain $(DOMAIN) $(EMAIL)
+	@bash $(TOOLS_SCRIPTS)/ssl-manager.sh obtain $(DOMAIN) $(EMAIL)
 
 ssl-import: ## 导入外部 SSL 证书 (使用: make ssl-import DOMAIN=blog.example.com CERT=./blog.crt KEY=./blog.key)
 	@if [ -z "$(DOMAIN)" ] || [ -z "$(CERT)" ] || [ -z "$(KEY)" ]; then \
@@ -346,13 +351,13 @@ ssl-import: ## 导入外部 SSL 证书 (使用: make ssl-import DOMAIN=blog.exam
 		echo "$(YELLOW)使用方式: make ssl-import DOMAIN=blog.example.com CERT=./blog.crt KEY=./blog.key$(RESET)"; \
 		exit 1; \
 	fi
-	@bash scripts/utils/ssl-manager.sh import $(DOMAIN) $(CERT) $(KEY)
+	@bash $(TOOLS_SCRIPTS)/ssl-manager.sh import $(DOMAIN) $(CERT) $(KEY)
 
 ssl-renew: ## 续期所有 SSL 证书
-	@bash scripts/utils/ssl-manager.sh renew
+	@bash $(TOOLS_SCRIPTS)/ssl-manager.sh renew
 
 ssl-list: ## 列出所有 SSL 证书
-	@bash scripts/utils/ssl-manager.sh list
+	@bash $(TOOLS_SCRIPTS)/ssl-manager.sh list
 
 ssl-remove: ## 删除 SSL 证书 (使用: make ssl-remove DOMAIN=blog.example.com)
 	@if [ -z "$(DOMAIN)" ]; then \
@@ -360,7 +365,7 @@ ssl-remove: ## 删除 SSL 证书 (使用: make ssl-remove DOMAIN=blog.example.co
 		echo "$(YELLOW)使用方式: make ssl-remove DOMAIN=blog.example.com$(RESET)"; \
 		exit 1; \
 	fi
-	@bash scripts/utils/ssl-manager.sh remove $(DOMAIN)
+	@bash $(TOOLS_SCRIPTS)/ssl-manager.sh remove $(DOMAIN)
 
 ssl-config: ## 生成 SSL 配置模板 (使用: make ssl-config DOMAIN=blog.example.com)
 	@if [ -z "$(DOMAIN)" ]; then \
@@ -368,8 +373,98 @@ ssl-config: ## 生成 SSL 配置模板 (使用: make ssl-config DOMAIN=blog.exam
 		echo "$(YELLOW)使用方式: make ssl-config DOMAIN=blog.example.com > blog-ssl.conf$(RESET)"; \
 		exit 1; \
 	fi
-	@bash scripts/utils/ssl-manager.sh config $(DOMAIN)
+	@bash $(TOOLS_SCRIPTS)/ssl-manager.sh config $(DOMAIN)
 
 ssl-setup: ## 设置 SSL 证书自动续期
-	@bash scripts/utils/ssl-manager.sh setup-auto
+	@bash $(TOOLS_SCRIPTS)/ssl-manager.sh setup-auto
+
+# ==============================================================================
+# 消息队列管理
+# ==============================================================================
+.PHONY: kafka-topics kafka-create-topic kafka-delete-topic kafka-stats
+.PHONY: nsq-topics nsq-stats nsq-admin nsq-create-topic nsq-delete-topic nsq-empty-channel
+
+# Kafka 命令
+kafka-topics: ## 列出所有 Kafka 主题
+	@echo "$(BLUE)Kafka 主题列表:$(RESET)"
+	@docker exec kafka /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+kafka-create-topic: ## 创建 Kafka 主题 (使用: make kafka-create-topic TOPIC=my_topic PARTITIONS=3 REPLICAS=1)
+	@if [ -z "$(TOPIC)" ]; then \
+		echo "$(RED)错误: 请提供主题名称$(RESET)"; \
+		echo "$(YELLOW)使用方式: make kafka-create-topic TOPIC=my_topic PARTITIONS=3 REPLICAS=1$(RESET)"; \
+		exit 1; \
+	fi
+	@docker exec kafka /opt/bitnami/kafka/bin/kafka-topics.sh \
+		--bootstrap-server localhost:9092 \
+		--create --topic $(TOPIC) \
+		--partitions $(PARTITIONS) \
+		--replication-factor $(REPLICAS) || true
+	@echo "$(GREEN)✅ Kafka 主题 $(TOPIC) 已创建$(RESET)"
+
+kafka-delete-topic: ## 删除 Kafka 主题 (使用: make kafka-delete-topic TOPIC=my_topic)
+	@if [ -z "$(TOPIC)" ]; then \
+		echo "$(RED)错误: 请提供主题名称$(RESET)"; \
+		echo "$(YELLOW)使用方式: make kafka-delete-topic TOPIC=my_topic$(RESET)"; \
+		exit 1; \
+	fi
+	@docker exec kafka /opt/bitnami/kafka/bin/kafka-topics.sh \
+		--bootstrap-server localhost:9092 \
+		--delete --topic $(TOPIC)
+	@echo "$(GREEN)✅ Kafka 主题 $(TOPIC) 已删除$(RESET)"
+
+kafka-stats: ## 查看 Kafka 统计信息
+	@echo "$(BLUE)Kafka 统计信息:$(RESET)"
+	@docker exec kafka /opt/bitnami/kafka/bin/kafka-topics.sh \
+		--bootstrap-server localhost:9092 \
+		--describe
+
+# NSQ 命令
+nsq-topics: ## 列出所有 NSQ 主题
+	@echo "$(BLUE)NSQ 主题列表:$(RESET)"
+	@curl -s http://localhost:4161/topics | jq -r '.topics[]' 2>/dev/null || \
+		curl -s http://localhost:4161/topics
+
+nsq-stats: ## 查看 NSQ 统计信息
+	@echo "$(BLUE)NSQ 统计信息:$(RESET)"
+	@curl -s http://localhost:4151/stats?format=json | jq '.' 2>/dev/null || \
+		curl -s http://localhost:4151/stats
+
+nsq-admin: ## 打开 NSQ Admin Web 界面
+	@echo "$(BLUE)NSQ Admin Web 界面:$(RESET)"
+	@echo "http://localhost:4171"
+	@command -v open >/dev/null 2>&1 && open http://localhost:4171 || \
+		command -v xdg-open >/dev/null 2>&1 && xdg-open http://localhost:4171 || \
+		echo "$(YELLOW)请在浏览器中访问: http://localhost:4171$(RESET)"
+
+nsq-create-topic: ## 创建 NSQ 主题 (使用: make nsq-create-topic TOPIC=my_topic)
+	@if [ -z "$(TOPIC)" ]; then \
+		echo "$(RED)错误: 请提供主题名称$(RESET)"; \
+		echo "$(YELLOW)使用方式: make nsq-create-topic TOPIC=my_topic$(RESET)"; \
+		exit 1; \
+	fi
+	@curl -X POST http://localhost:4151/topic/create?topic=$(TOPIC)
+	@echo ""
+	@echo "$(GREEN)✅ NSQ 主题 $(TOPIC) 已创建$(RESET)"
+
+nsq-delete-topic: ## 删除 NSQ 主题 (使用: make nsq-delete-topic TOPIC=my_topic)
+	@if [ -z "$(TOPIC)" ]; then \
+		echo "$(RED)错误: 请提供主题名称$(RESET)"; \
+		echo "$(YELLOW)使用方式: make nsq-delete-topic TOPIC=my_topic$(RESET)"; \
+		exit 1; \
+	fi
+	@curl -X POST http://localhost:4151/topic/delete?topic=$(TOPIC)
+	@echo ""
+	@echo "$(GREEN)✅ NSQ 主题 $(TOPIC) 已删除$(RESET)"
+
+nsq-empty-channel: ## 清空 NSQ 频道消息 (使用: make nsq-empty-channel TOPIC=my_topic CHANNEL=my_channel)
+	@if [ -z "$(TOPIC)" ] || [ -z "$(CHANNEL)" ]; then \
+		echo "$(RED)错误: 请提供主题名称和频道名称$(RESET)"; \
+		echo "$(YELLOW)使用方式: make nsq-empty-channel TOPIC=my_topic CHANNEL=my_channel$(RESET)"; \
+		exit 1; \
+	fi
+	@curl -X POST http://localhost:4151/channel/empty?topic=$(TOPIC)\&channel=$(CHANNEL)
+	@echo ""
+	@echo "$(GREEN)✅ NSQ 频道 $(TOPIC)/$(CHANNEL) 已清空$(RESET)"
+
 

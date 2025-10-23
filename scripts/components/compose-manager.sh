@@ -28,6 +28,7 @@ log_step() { echo -e "${CYAN}[STEP]${NC} $*"; }
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 COMPOSE_DIR="${REPO_ROOT}/compose"
+COMPONENTS_DIR="${REPO_ROOT}/components"
 
 # 默认环境
 DEFAULT_ENV="dev"
@@ -67,7 +68,8 @@ INFRA_COMPONENTS=(
     "core"      # 网络和卷
     "nginx"     # 网关
     "storage"   # 数据库和缓存
-    "message"   # 消息队列
+    "message"   # 消息队列 (Kafka)
+    "nsq"       # 消息队列 (NSQ)
     "cicd"      # CI/CD
 )
 
@@ -94,6 +96,7 @@ show_usage() {
     nginx    - 网关服务
     storage  - 存储服务 (mysql, redis, mongo)
     message  - 消息服务 (kafka)
+    nsq      - 消息服务 (nsq)
     cicd     - CI/CD 服务 (jenkins)
     all      - 所有基础设施
 
@@ -148,30 +151,39 @@ build_infra_compose_args() {
     
     case "$component" in
         "core")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
             ;;
         "nginx")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.yml")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.nginx.yml")
+            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/nginx/docker-compose.yml")
             ;;
         "storage")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.yml")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.storage.yml")
+            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/mysql/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/redis/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/mongo/docker-compose.yml")
             ;;
         "message")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.yml")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.message.yml")
+            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/kafka/docker-compose.yml")
+            ;;
+        "nsq")
+            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/nsq/docker-compose.yml")
             ;;
         "cicd")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.yml")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.cicd.yml")
+            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/jenkins/docker-compose.yml")
             ;;
         "all")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.yml")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.nginx.yml")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.storage.yml")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.message.yml")
-            args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.cicd.yml")
+            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/nginx/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/mysql/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/redis/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/mongo/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/kafka/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/nsq/docker-compose.yml")
+            args+=("-f" "${COMPONENTS_DIR}/jenkins/docker-compose.yml")
             ;;
         *)
             log_error "未知的基础设施组件: $component"
@@ -283,10 +295,10 @@ manage_single_management_ui() {
     local action="$1"
     local service="$2"
     
-    # 管理界面服务通常在 message.yml 中定义，使用 profiles 控制
+    # 管理界面服务定义在各自组件的 docker-compose.yml 中，使用 profiles 控制
     local compose_args=()
-    compose_args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.yml")
-    compose_args+=("-f" "${COMPOSE_DIR}/infra/docker-compose.message.yml")
+    compose_args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
+    compose_args+=("-f" "${COMPONENTS_DIR}/kafka/docker-compose.yml")
     compose_args+=("--profile" "management")
     
     # 添加环境配置

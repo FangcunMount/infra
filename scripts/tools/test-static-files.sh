@@ -97,7 +97,7 @@ echo
 # 3. 测试路径检测逻辑（模拟 init-server 子目录调用）
 log_info "3. 测试子目录路径检测"
 
-# 模拟从 scripts/init-server/ 目录调用
+# 模拟从 scripts/server/ 目录调用
 cd "$PROJECT_ROOT/scripts/init-server"
 
 # 模拟 setup-network.sh 中的路径检测逻辑

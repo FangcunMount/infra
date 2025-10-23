@@ -39,7 +39,7 @@ conf.d/
 make app-deploy APP=blog CONFIG=./path/to/blog.conf
 
 # 或直接使用脚本
-bash scripts/utils/nginx-app-manager.sh deploy blog ./nginx/blog.conf
+bash scripts/tools/nginx-app-manager.sh deploy blog ./nginx/blog.conf
 ```
 
 ### 配置管理命令

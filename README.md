@@ -21,9 +21,10 @@
 ### 🏗️ 基础设施部署（推荐顺序）
 1. [🔧 网络&基础卷](docs/服务器组件--网络&基础卷.md) - Docker网络和数据卷初始化
 2. [🗄️ 存储服务](docs/服务器组件--存储服务(MySQL_Redis_MongoDB).md) - MySQL/Redis/MongoDB数据库集群
-3. [📨 消息服务](docs/服务器组件--消息服务(Kafka).md) - Kafka消息队列系统  
-4. [🔧 CI/CD服务](docs/服务器组件--CI_CD(Jenkins).md) - Jenkins持续集成平台
-5. [🌐 网关服务](docs/服务器组件--网关(Nginx).md) - Nginx反向代理和SSL终端
+3. [📨 消息服务 - Kafka](docs/服务器组件--消息服务(Kafka).md) - Kafka消息队列系统
+4. [📬 消息队列 - NSQ](docs/服务器组件--消息队列(NSQ).md) - NSQ实时分布式消息平台
+5. [🔧 CI/CD服务](docs/服务器组件--CI_CD(Jenkins).md) - Jenkins持续集成平台
+6. [🌐 网关服务](docs/服务器组件--网关(Nginx).md) - Nginx反向代理和SSL终端
 
 ### 🎯 部署策略
 **推荐部署顺序**: 网络&基础卷 → 存储服务 → 消息服务 → CI/CD → 网关服务
@@ -44,7 +45,8 @@
 | **🗄️ 数据存储** | MySQL | 3306 | 关系型数据库 | 内网 |
 | | Redis | 6379 | 内存缓存 | 内网 |
 | | MongoDB | 27017 | 文档数据库 | 内网 |
-| **📨 消息队列** | Kafka | 9092 | 分布式消息 | 内网 |
+| **📨 消息队列** | Kafka | 9092 | 大数据流处理 | 内网 |
+| | NSQ | 4150/4151 | 实时消息分发 | 内网 |
 | **🌐 网关代理** | Nginx | 80/443 | 反向代理+SSL | 公网 |
 | **🔧 CI/CD** | Jenkins | 8080 | 持续集成 | 内网 |
 
@@ -134,7 +136,8 @@
 | **MySQL** | A | 3306 | 关系型数据库 | 1GB |
 | **Redis** | A | 6379 | 缓存/会话存储 | 512MB |
 | **MongoDB** | A | 27017 | 文档数据库 | 1GB |
-| **Kafka** | B | 9092 | 消息队列 | 1GB |
+| **Kafka** | B | 9092 | 大数据流处理 | 1GB |
+| **NSQ** | B | 4150-4151, 4160-4161, 4171 | 实时消息分发 | 768MB |
 | **Zookeeper** | B | 2181 | 集群协调 | 512MB |
 
 ## 部署要求
@@ -157,10 +160,10 @@ git clone <repo-url> infra && cd infra
 
 ```bash
 # 创建 Docker 网络和数据卷
-./scripts/init-components/init-infrastructure.sh create
+./scripts/components/init-infrastructure.sh create
 
 # 检查基础设施状态
-./scripts/init-components/init-infrastructure.sh status
+./scripts/components/init-infrastructure.sh status
 ```
 
 ### 3. 配置环境变量
@@ -179,35 +182,36 @@ vim compose/env/prod/.env
 
 ```bash
 # 安装所有核心服务
-./scripts/init-components/install-components.sh all
+./scripts/components/install.sh all
 
 # 或分步安装
-./scripts/init-components/install-components.sh nginx     # 网关
-./scripts/init-components/install-components.sh mysql    # 数据库
-./scripts/init-components/install-components.sh redis    # 缓存
-./scripts/init-components/install-components.sh kafka    # 消息队列
-./scripts/init-components/install-components.sh jenkins  # CI/CD
+./scripts/components/install.sh nginx     # 网关
+./scripts/components/install.sh mysql    # 数据库
+./scripts/components/install.sh redis    # 缓存
+./scripts/components/install.sh kafka    # Kafka消息队列
+./scripts/components/install.sh nsq      # NSQ消息队列
+./scripts/components/install.sh jenkins  # CI/CD
 ```
 
 ### 5. 管理服务
 
 ```bash
 # 查看所有服务状态
-./scripts/init-components/compose-manager.sh status
+./scripts/components/compose-manager.sh status
 
 # 启动/停止服务
-./scripts/init-components/compose-manager.sh infra up all
-./scripts/init-components/compose-manager.sh infra down all
+./scripts/components/compose-manager.sh infra up all
+./scripts/components/compose-manager.sh infra down all
 
 # 查看日志
-./scripts/init-components/compose-manager.sh logs nginx
+./scripts/components/compose-manager.sh logs nginx
 ```
 
 ### 6. 验证部署
 
 ```bash
 # 检查基础设施
-./scripts/init-components/init-infrastructure.sh status
+./scripts/components/init-infrastructure.sh status
 
 # 检查服务健康状态
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
@@ -229,24 +233,94 @@ vim compose/env/prod/.env
 - `MONGO_INITDB_ROOT_PASSWORD` - MongoDB 密码
 - `NODE_A_IP` / `NODE_B_IP` - 节点 IP 地址
 
-## 项目结构
+## 📁 项目结构
 
 ```text
-├── compose/              # Docker Compose 配置
-├── components/           # 组件配置文件  
-├── scripts/             # 自动化脚本
-│   ├── init-server/     # 服务器初始化脚本
-│   │   ├── init-users.sh        # 用户环境初始化
-│   │   ├── install-docker.sh    # Docker 安装
-│   │   ├── setup-network.sh     # 网络环境配置
-│   │   ├── diagnose-network.sh  # 网络环境诊断
-│   │   └── update-static-files.sh # 静态文件更新
-│   └── deploy/          # 应用部署脚本
-├── static/              # 静态资源文件
-│   ├── geosite.dat      # 域名分流规则数据库
-│   └── geoip.metadb     # IP地理位置数据库
-├── logs/               # 日志目录
-└── Makefile            # 管理命令
+infra/
+├── components/                    # 🧩 基础设施组件（完全自包含）
+│   ├── networks/                 # 共享网络定义（唯一的共享资源）
+│   │   ├── docker-compose.yml   # 网络定义
+│   │   └── README.md
+│   ├── nginx/                    # Nginx 网关服务
+│   │   ├── docker-compose.yml   # 服务定义 + 数据卷声明
+│   │   ├── nginx.conf           # 主配置文件
+│   │   ├── conf.d/              # 配置目录
+│   │   └── README.md
+│   ├── mysql/                    # MySQL 数据库
+│   │   ├── docker-compose.yml   # 服务定义 + 数据卷声明
+│   │   ├── my.cnf
+│   │   └── README.md
+│   ├── redis/                    # Redis 缓存
+│   │   ├── docker-compose.yml   # 服务定义 + 数据卷声明
+│   │   ├── redis.conf
+│   │   └── README.md
+│   ├── mongo/                    # MongoDB 数据库
+│   │   ├── docker-compose.yml   # 服务定义 + 数据卷声明
+│   │   ├── mongod.conf
+│   │   └── README.md
+│   ├── kafka/                    # Kafka 消息队列
+│   │   ├── docker-compose.yml   # 服务定义 + 数据卷声明
+│   │   └── README.md
+│   ├── nsq/                      # NSQ 消息队列
+│   │   ├── docker-compose.yml   # 服务定义 + 数据卷声明
+│   │   ├── nsqd.conf
+│   │   ├── nsqlookupd.conf
+│   │   ├── nsqadmin.conf
+│   │   └── README.md
+│   └── jenkins/                  # Jenkins CI/CD
+│       ├── docker-compose.yml   # 服务定义 + 数据卷声明
+│       ├── Dockerfile
+│       ├── plugins.txt
+│       └── README.md
+├── compose/                       # 环境配置
+│   └── env/                      # 环境变量配置
+│       ├── dev/                  # 开发环境
+│       └── prod/                 # 生产环境
+├── scripts/                       # 🤖 自动化脚本
+│   ├── server/                   # 服务器环境管理
+│   │   ├── init-users.sh        # 用户初始化
+│   │   ├── install-docker.sh    # Docker安装
+│   │   └── initialize.sh        # 服务器初始化总控
+│   ├── network/                  # 网络管理
+│   │   ├── setup.sh             # 网络环境配置(VPN)
+│   │   ├── uninstall.sh         # 网络环境卸载
+│   │   ├── vpn-manager.sh       # VPN管理
+│   │   ├── optimize.sh          # 网络优化
+│   │   └── diagnose.sh          # 网络诊断
+│   ├── components/               # 组件管理
+│   │   ├── install.sh           # 组件安装总控
+│   │   ├── compose-manager.sh   # Compose管理工具
+│   │   ├── init-infrastructure.sh  # 基础设施初始化
+│   │   └── init-apps-config.sh  # 应用配置初始化
+│   └── tools/                    # 工具脚本
+│       ├── ssl-manager.sh       # SSL证书管理
+│       ├── nginx-app-manager.sh # Nginx应用管理
+│       ├── test-*.sh            # 各种测试脚本
+│       ├── update-static-files.sh  # 静态文件更新
+│       └── demo-env-variables.sh   # 环境变量示例
+├── docs/                          # 📖 文档
+│   ├── 服务器初始化--*.md        # 初始化文档
+│   └── 服务器组件--*.md          # 组件部署文档
+├── static/                        # 静态资源文件
+├── logs/                          # 日志目录
+└── Makefile                       # 管理命令
+```
+
+### 🎯 组件完全自包含设计
+
+每个组件目录包含该组件的**所有**配置和资源定义：
+- ✅ `docker-compose.yml` - 服务定义 + 数据卷声明
+- ✅ `*.conf` - 配置文件
+- ✅ `README.md` - 组件文档
+
+**唯一的共享资源**: `components/networks/` - 网络定义（因为多个组件需要互联）
+
+**优势**:
+- 📦 组件完全自包含，易于理解和维护
+- 🔍 配置文件路径简单（使用相对路径 `./config.conf`）
+- 💾 数据卷生命周期跟随组件（删除组件时清楚数据归属）
+- 🚀 可独立部署、测试和迁移
+- 📋 清晰的组织结构，便于团队协作
 ```
 
 ## 自动化脚本
@@ -255,19 +329,19 @@ vim compose/env/prod/.env
 
 ```bash
 # 1. 安装 Docker 环境
-sudo ./scripts/init-server/install-docker.sh
+sudo ./scripts/server/install-docker.sh
 
 # 2. 初始化用户环境
-sudo ./scripts/init-server/init-users.sh
+sudo ./scripts/server/init-users.sh
 
 # 3. 配置网络环境（VPN）- 自动使用静态文件
-sudo ./scripts/init-server/setup-network.sh
+sudo ./scripts/network/setup.sh
 
 # 4. 故障诊断（如遇问题）
-sudo ./scripts/init-server/diagnose-network.sh
+sudo ./scripts/network/diagnose.sh
 
 # 5. 更新静态文件（可选）
-./scripts/init-server/update-static-files.sh
+./scripts/tools/update-static-files.sh
 ```
 
 ## 管理命令
@@ -311,7 +385,7 @@ mihomo-update      # 更新订阅配置
 # 2. 传输整个项目到内网服务器（包含 static/ 目录）
 
 # 3. 在内网服务器上运行（脚本自动使用静态文件）
-sudo ./scripts/init-server/setup-network.sh
+sudo ./scripts/network/setup.sh
 ```
 
 #### 方案2：传统离线部署
@@ -328,7 +402,7 @@ sudo ./scripts/init-server/setup-network.sh
 docker load < mihomo.tar
 
 # 4. 运行安装脚本（自动检测内网环境）
-sudo ./scripts/init-server/setup-network.sh
+sudo ./scripts/network/setup.sh
 ```
 
 ---

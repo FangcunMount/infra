@@ -17,7 +17,7 @@ make app-deploy APP=blog CONFIG=./nginx/blog.conf
 
 # 方法2：在应用项目的部署脚本中直接操作
 cp ./nginx/blog.conf /data/apps/nginx-configs/blog.conf
-bash /path/to/infra/scripts/utils/nginx-app-manager.sh reload
+bash /path/to/infra/scripts/tools/nginx-app-manager.sh reload
 ```
 
 ## 文件命名规范

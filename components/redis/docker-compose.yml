@@ -1,0 +1,55 @@
+# Redis 缓存服务
+
+services:
+  redis:
+    image: redis:7
+    container_name: redis
+    networks:
+      - backend
+      - miniblog
+    restart: always
+    volumes:
+      # 数据持久化
+      - redis_data:/data
+      # 配置文件（相对路径）
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+      # 日志
+      - app_logs:/data/log
+    command: >
+      redis-server /usr/local/etc/redis/redis.conf
+      --requirepass "${REDIS_PASSWORD}"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ulimits:
+      nofile: 100000
+    deploy:
+      resources:
+        limits:
+          memory: 450M
+        reservations:
+          memory: 384M
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "infra.service=cache"
+      - "infra.category=storage"
+
+# 使用外部网络（共享）和本地数据卷（组件独有）
+networks:
+  backend:
+    external: true
+    name: infra-backend
+  miniblog:
+    external: true
+    name: miniblog_net
+
+volumes:
+  redis_data:
+    name: infra_redis_data
+    driver: local
+  app_logs:
+    name: infra_app_logs
+    driver: local

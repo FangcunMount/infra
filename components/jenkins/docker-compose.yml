@@ -1,8 +1,9 @@
-# CI/CD 服务 - Jenkins
+# Jenkins CI/CD 服务
+
 services:
   jenkins:
     build:
-      context: ../../components/jenkins
+      context: .
       dockerfile: Dockerfile
       args:
         http_proxy: ${JENKINS_BUILD_HTTP_PROXY:-}
@@ -21,11 +22,11 @@ services:
       - "${JENKINS_AGENT_PORT:-50000}:50000"
     volumes:
       # Jenkins 主目录
-      - /data/jenkins/jenkins_home:/var/jenkins_home
+      - jenkins_data:/var/jenkins_home
       # Configuration as Code 配置
       - /data/jenkins/casc_configs:/var/jenkins_home/casc_configs:ro
       # 插件预安装列表
-      - /data/jenkins/jenkins_home/plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
+      - ./plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
       # Docker Socket (用于构建)
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # 日志
@@ -67,12 +68,16 @@ services:
       - "infra.service=ci-cd"
       - "infra.category=automation"
 
+# 使用外部网络（共享）和本地数据卷（组件独有）
 networks:
   backend:
     external: true
     name: infra-backend
 
 volumes:
+  jenkins_data:
+    name: infra_jenkins_data
+    driver: local
   app_logs:
-    external: true
     name: infra_app_logs
+    driver: local

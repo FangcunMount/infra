@@ -83,7 +83,7 @@ init_environment() {
         )
         
         for dir in "${project_dirs[@]}"; do
-            if [[ -d "$dir" && -f "$dir/scripts/init-server/setup-network.sh" ]]; then
+            if [[ -d "$dir" && -f "$dir/scripts/network/setup.sh" ]]; then
                 log_info "切换到项目目录: $dir"
                 cd "$dir"
                 # 重新检测路径

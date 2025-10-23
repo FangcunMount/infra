@@ -1,0 +1,56 @@
+# MySQL 数据库服务
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    networks:
+      - backend
+      - miniblog
+    restart: always
+    volumes:
+      # 数据持久化
+      - mysql_data:/var/lib/mysql
+      # 配置文件（相对路径）
+      - ./my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+      # 日志
+      - app_logs:/data/log
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    ulimits:
+      nofile: 100000
+    deploy:
+      resources:
+        limits:
+          memory: 1400M
+        reservations:
+          memory: 1200M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    labels:
+      - "infra.service=database"
+      - "infra.category=storage"
+
+# 使用外部网络（共享）和本地数据卷（组件独有）
+networks:
+  backend:
+    external: true
+    name: infra-backend
+  miniblog:
+    external: true
+    name: miniblog_net
+
+volumes:
+  mysql_data:
+    name: infra_mysql_data
+    driver: local
+  app_logs:
+    name: infra_app_logs
+    driver: local
