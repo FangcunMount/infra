@@ -106,23 +106,34 @@ create_networks() {
     
     log_step "创建 Docker 网络..."
     
-    # 后端网络（内部服务通信）
-    # 注意: 已移除 infra-frontend，所有服务统一使用 infra-network
+    # 基础设施网络（跨主机服务通信）
+    # 注意: 使用 overlay 驱动支持跨服务器部署（NSQ 等分布式服务）
     local backend_cmd="docker network create \\
-  --driver bridge \\
+  --driver overlay \\
+  --attachable \\
   --subnet=${INFRA_BACKEND_SUBNET} \\
   --gateway=${INFRA_BACKEND_GATEWAY} \\
-  --opt com.docker.network.bridge.name=infra-network \\
-  --opt com.docker.network.bridge.enable_icc=true \\
+  --opt encrypted=true \\
   --opt com.docker.network.driver.mtu=${INFRA_NETWORK_MTU} \\
   --label 'infra.network=backend' \\
-  --label 'infra.purpose=service-communication' \\
+  --label 'infra.purpose=distributed-service-communication' \\
   infra-network"
   
     if [[ "$dry_run" == "true" ]]; then
-        echo "# 后端网络创建命令:"
+        echo "# 网络创建命令:"
         echo "$backend_cmd"
         return 0
+    fi
+    
+    # 检查 Docker Swarm 是否已初始化
+    if ! docker info 2>/dev/null | grep -q "Swarm: active"; then
+        log_warn "Docker Swarm 未初始化，正在初始化单节点 Swarm..."
+        docker swarm init 2>/dev/null || {
+            log_error "Swarm 初始化失败，overlay 网络需要 Swarm 模式"
+            log_info "请手动执行: docker swarm init"
+            return 1
+        }
+        log_success "Swarm 已初始化为单节点模式"
     fi
     
     # 检查网络是否已存在

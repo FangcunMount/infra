@@ -572,7 +572,7 @@ network-init: ## 初始化基础设施网络 (infra-network)
 network-status: ## 查看基础设施网络状态
 	$(call info_msg,基础设施网络状态:)
 	@if docker network ls --format '{{.Name}}' | grep -q '^infra-network$$'; then \
-		echo "  $(GREEN)✅$(RESET) infra-network (后端网络)"; \
+		echo "  $(GREEN)✅$(RESET) infra-network (overlay 分布式网络)"; \
 		docker network inspect infra-network --format '    子网: {{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null; \
 	else \
 		echo "  $(RED)❌$(RESET) infra-network (未创建)"; \
@@ -851,9 +851,9 @@ clean-all: ## 清理所有未使用的 Docker 资源 (谨慎!)
 	@read -p "确认清理? (输入 'yes' 确认): " confirm; \
 	if [ "$$confirm" = "yes" ]; then \
 		docker system prune -a -f; \
-		$(call success_msg,清理完成); \
+		echo "$(GREEN)✅ 清理完成$(RESET)"; \
 	else \
-		$(call warning_msg,操作已取消); \
+		echo "$(YELLOW)⚠️  操作已取消$(RESET)"; \
 	fi
 
 clean-volumes: ## 清理未使用的数据卷 (危险!)
@@ -861,9 +861,9 @@ clean-volumes: ## 清理未使用的数据卷 (危险!)
 	@read -p "确认删除? (输入 'yes' 确认): " confirm; \
 	if [ "$$confirm" = "yes" ]; then \
 		docker volume prune -f; \
-		$(call success_msg,数据卷清理完成); \
+		echo "$(GREEN)✅ 数据卷清理完成$(RESET)"; \
 	else \
-		$(call warning_msg,操作已取消); \
+		echo "$(YELLOW)⚠️  操作已取消$(RESET)"; \
 	fi
 
 clean-networks: ## 清理未使用的网络
