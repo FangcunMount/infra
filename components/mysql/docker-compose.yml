@@ -21,12 +21,8 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     ulimits:
       nofile: 100000
-    deploy:
-      resources:
-        limits:
-          memory: 1400M
-        reservations:
-          memory: 1200M
+    mem_limit: ${MYSQL_MEMORY_LIMIT:-1024M}
+    cpus: ${MYSQL_CPUS:-0.50}
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 30s

@@ -20,15 +20,13 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
       - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
-    command: mongod --config /etc/mongod.conf --auth
+    command: >
+      mongod --config /etc/mongod.conf --auth
+      --wiredTigerCacheSizeGB ${MONGO_WIREDTIGER_CACHE_GB:-0.9}
     ulimits:
       nofile: 100000
-    deploy:
-      resources:
-        limits:
-          memory: 1000M
-        reservations:
-          memory: 800M
+    mem_limit: ${MONGO_MEMORY_LIMIT:-1536M}
+    cpus: ${MONGO_CPUS:-0.30}
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
       interval: 30s
@@ -37,6 +35,7 @@ services:
     labels:
       - "infra.service=document-db"
       - "infra.category=storage"
+      - "infra.host=serverA"
 
 # 使用外部网络（共享）和本地数据卷（组件独有）
 networks:

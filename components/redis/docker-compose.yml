@@ -17,16 +17,16 @@ services:
     command: >
       redis-server /usr/local/etc/redis/redis.conf
       --requirepass "${REDIS_PASSWORD}"
+      --maxmemory "${REDIS_MAXMEMORY}"
+      --maxmemory-policy "${REDIS_MAXMEMORY_POLICY}"
+      --appendonly yes
+      --appendfsync everysec
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     ulimits:
       nofile: 100000
-    deploy:
-      resources:
-        limits:
-          memory: 450M
-        reservations:
-          memory: 384M
+    mem_limit: ${REDIS_MEMORY_LIMIT:-400M}
+    cpus: ${REDIS_CPUS:-0.20}
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 30s
@@ -35,6 +35,7 @@ services:
     labels:
       - "infra.service=cache"
       - "infra.category=storage"
+      - "infra.host=serverA"
 
 # 使用外部网络（共享）和本地数据卷（组件独有）
 networks:
