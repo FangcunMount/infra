@@ -3,12 +3,13 @@
 ## 概述
 
 NSQ 支持通过配置文件或命令行参数进行配置。本项目同时使用两种方式：
+
 - **配置文件**: 管理通用的、稳定的配置项
 - **命令行参数**: 管理环境相关的配置（如 IP 地址、服务发现地址等）
 
 ## 配置文件位置
 
-```
+```text
 components/nsq/
 ├── nsqd.conf           # NSQd 消息守护进程配置
 ├── nsqlookupd.conf     # NSQLookupd 服务发现配置
@@ -48,6 +49,7 @@ max-rdy-count=2500
 ### 适用场景调整
 
 **高吞吐量场景**:
+
 ```conf
 mem-queue-size=50000
 sync-every=5000
@@ -55,6 +57,7 @@ max-rdy-count=5000
 ```
 
 **低延迟场景**:
+
 ```conf
 mem-queue-size=5000
 sync-every=1000
@@ -62,6 +65,7 @@ msg-timeout=30s
 ```
 
 **大消息场景**:
+
 ```conf
 max-msg-size=10485760  # 10MB
 max-output-buffer-size=131072
@@ -82,6 +86,7 @@ max-output-buffer-size=131072
 NSQLookupd 是轻量级组件，大部分场景使用默认配置即可。
 
 如果 nsqd 节点经常掉线重连：
+
 ```conf
 inactive-producer-timeout=600s  # 增加到 10 分钟
 ```
@@ -105,6 +110,7 @@ base-path=/nsqadmin
 ```
 
 对应的 Nginx 配置：
+
 ```nginx
 location /nsqadmin/ {
     proxy_pass http://nsqadmin:4171/;
@@ -114,6 +120,7 @@ location /nsqadmin/ {
 ### 通知集成
 
 配置 Webhook 接收管理操作通知：
+
 ```conf
 notification-http-endpoint=http://your-webhook-service/nsq-notifications
 ```
@@ -121,14 +128,17 @@ notification-http-endpoint=http://your-webhook-service/nsq-notifications
 ## 配置优先级
 
 配置的优先级从高到低：
+
 1. **命令行参数** - 在 `docker-compose.yml` 的 `command` 中指定
 2. **配置文件** - 在 `.conf` 文件中指定
 3. **默认值** - NSQ 内置的默认值
 
 例如，在 `override.yml` 中：
+
 ```yaml
 command: /nsqd --config=/etc/nsq/nsqd.conf --broadcast-address=${NODE_B_IP}
 ```
+
 这里 `--broadcast-address` 会覆盖配置文件中的设置。
 
 ## 修改配置
@@ -137,6 +147,7 @@ command: /nsqd --config=/etc/nsq/nsqd.conf --broadcast-address=${NODE_B_IP}
 
 1. 编辑对应的 `.conf` 文件
 2. 重启服务：
+
 ```bash
 docker compose restart nsqd
 # 或
@@ -219,6 +230,7 @@ docker compose up nsqd
 ### 配置对比
 
 查看默认配置和当前配置的差异：
+
 ```bash
 # 查看默认配置
 docker run --rm nsqio/nsq:v1.3.0 /nsqd --help
@@ -234,6 +246,7 @@ docker exec nsqd cat /etc/nsq/nsqd.conf
 **原因**: `mem-queue-size` 太小或消费者处理太慢
 
 **解决**:
+
 ```conf
 # 增加内存队列
 mem-queue-size=50000
@@ -247,6 +260,7 @@ msg-timeout=300s
 **原因**: `mem-queue-size` 设置过大
 
 **解决**:
+
 ```conf
 # 减小内存队列，增加磁盘使用
 mem-queue-size=5000
@@ -258,6 +272,7 @@ sync-every=2000
 **原因**: 同步到磁盘不够频繁
 
 **解决**:
+
 ```conf
 # 增加同步频率
 sync-every=1000
@@ -269,6 +284,7 @@ sync-timeout=2s
 **原因**: 同步到磁盘过于频繁
 
 **解决**:
+
 ```conf
 # 减少同步频率，增加内存队列
 mem-queue-size=20000
@@ -292,6 +308,7 @@ curl http://localhost:4151/stats?format=json | jq '.topics[] | {
 ## 配置备份
 
 建议将配置文件纳入版本控制：
+
 ```bash
 git add components/nsq/*.conf
 git commit -m "Update NSQ configuration"
