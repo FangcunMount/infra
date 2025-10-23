@@ -99,7 +99,7 @@ rm -f /tmp/demo.env
 log_success "演示完成！"
 echo
 echo "========================================"
-echo "结论: compose/env 目录下的环境变量"
+echo "结论: env 目录下的环境变量"
 echo "     ❌ 不会写入 Docker 镜像"  
 echo "     ✅ 仅在容器运行时注入"
 echo "========================================"

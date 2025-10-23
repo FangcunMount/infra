@@ -270,9 +270,10 @@ validate_component() {
             return 1
         fi
         
-        local override_file="$component_dir/override.yml"
-        if [[ ! -f "$override_file" ]]; then
-            log_error "组件配置文件不存在: $override_file"
+        # 检查必须的配置文件 docker-compose.yml
+        local compose_file="$component_dir/docker-compose.yml"
+        if [[ ! -f "$compose_file" ]]; then
+            log_error "组件配置文件不存在: $compose_file"
             return 1
         fi
     fi
@@ -371,7 +372,7 @@ show_env_file_help() {
     echo "  scp /local/path/to/.env root@\$(hostname -I | awk '{print \$1}'):$env_file"
     echo
     echo "  # 或者上传开发环境配置并修改:"
-    echo "  scp compose/env/dev/.env root@\$(hostname -I | awk '{print \$1}'):$env_file"
+    echo "  scp env/dev/.env root@\$(hostname -I | awk '{print \$1}'):$env_file"
     echo "  # 然后登录服务器修改数据库名称等配置"
     echo
     log_info "方案2️⃣ : 在服务器上直接创建"
@@ -408,7 +409,7 @@ show_env_file_help() {
     echo
     log_info "方案3️⃣ : 复制现有配置模板"
     echo "  # 如果存在其他环境的配置:"
-    echo "  cp compose/env/dev/.env $env_file  # 复制开发环境配置"
+    echo "  cp env/dev/.env $env_file  # 复制开发环境配置"
     echo "  nano $env_file  # 编辑并修改相应参数"
     echo
     echo "========================================"
@@ -422,8 +423,8 @@ show_env_file_help() {
     echo "========================================"
     log_info "📞 需要帮助?"
     echo "========================================"
-    log_info "• 查看配置模板: ls compose/env/*/README.md"
-    log_info "• 检查现有配置: find compose/env -name '*.env' -type f"
+    log_info "• 查看配置模板: ls env/*/README.md"
+    log_info "• 检查现有配置: find env -name '*.env' -type f"
     log_info "• 重新运行安装: make install-mysql (配置文件创建后)"
     echo "========================================"
 }
@@ -498,49 +499,37 @@ install_component() {
         return $?
     fi
     
+    # 准备环境配置文件路径
+    local env_file="$PROJECT_ROOT/env/${env_type}/.env"
+    
     # 检查并验证环境配置文件
-    local env_file="$COMPOSE_DIR/env/${env_type}/.env"
     if ! validate_env_file "$env_file" "$component"; then
         log_error "环境配置验证失败，请修正配置后重试"
         return 1
     fi
     
-    # 准备 Docker Compose 文件
-    local compose_base="$COMPOSE_DIR/base/docker-compose.yml"
-    local compose_override
-    local env_file="$COMPOSE_DIR/env/${env_type}/.env"
-    local use_standalone=false
+    # 检查环境配置文件
+    if [[ ! -f "$env_file" ]]; then
+        log_error "环境配置文件不存在: $env_file"
+        log_info "请先运行: make env-init"
+        return 1
+    fi
     
-    # 对于某些组件使用专门的独立 compose 文件
-    case "$component" in
-        nginx|mysql|redis|mongo|kafka|nsq|jenkins)
-            local standalone_compose="$COMPOSE_DIR/infra/docker-compose.${component}.yml"
-            if [[ -f "$standalone_compose" ]]; then
-                use_standalone=true
-                compose_override="$standalone_compose"
-            else
-                compose_override="$COMPONENTS_DIR/$component/override.yml"
-            fi
-            ;;
-        *)
-            compose_override="$COMPONENTS_DIR/$component/override.yml"
-            ;;
-    esac
+    # 使用组件目录下的 docker-compose.yml
+    local compose_file="$COMPONENTS_DIR/$component/docker-compose.yml"
+    
+    # 检查组件配置文件
+    if [[ ! -f "$compose_file" ]]; then
+        log_error "组件配置文件不存在: $compose_file"
+        return 1
+    fi
+    
+    log_info "使用配置文件: $compose_file"
     
     # 构建 Docker Compose 命令
     local compose_cmd=(
         "docker" "compose"
-    )
-    
-    if [[ "$use_standalone" == true ]]; then
-        # 使用独立的 compose 文件
-        compose_cmd+=("-f" "$compose_override")
-    else
-        # 使用 base + override 模式
-        compose_cmd+=("-f" "$compose_base" "-f" "$compose_override")
-    fi
-    
-    compose_cmd+=(
+        "-f" "$compose_file"
         "--env-file" "$env_file"
         "-p" "$DEFAULT_COMPOSE_PROJECT"
     )

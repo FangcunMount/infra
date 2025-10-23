@@ -69,9 +69,8 @@ create_backup() {
     
     # 备份相关配置文件
     local files=(
-        "components/jenkins/override.yml"
+        "components/jenkins/docker-compose.yml"
         "components/nginx/conf.d"
-        "compose/base/docker-compose.yml"
     )
     
     for file in "${files[@]}"; do
@@ -118,7 +117,8 @@ check_status() {
     fi
     
     echo -e "\n=== Jenkins 端口配置 ==="
-    if grep -q "8080:8080" "$PROJECT_ROOT/components/jenkins/override.yml" 2>/dev/null; then
+    local jenkins_compose="$PROJECT_ROOT/components/jenkins/docker-compose.yml"
+    if [[ -f "$jenkins_compose" ]] && grep -q "8080:8080" "$jenkins_compose" 2>/dev/null; then
         log_warn "△ Jenkins 8080 端口直接暴露（未优化）"
     else
         log_success "✓ Jenkins 8080 端口已移除直接映射"
@@ -132,10 +132,11 @@ check_status() {
     fi
     
     echo -e "\n=== 网络安全配置 ==="
-    if grep -q "internal: true" "$PROJECT_ROOT/compose/base/docker-compose.yml" 2>/dev/null; then
+    local networks_compose="$PROJECT_ROOT/components/networks/docker-compose.yml"
+    if [[ -f "$networks_compose" ]] && grep -q "internal: true" "$networks_compose" 2>/dev/null; then
         log_success "✓ 后端网络已设置为内部网络"
     else
-        log_warn "△ 后端网络未设置为内部网络"
+        log_warn "△ 后端网络未设置为内部网络（或使用 overlay 网络）"
     fi
 }
 
@@ -143,21 +144,21 @@ check_status() {
 apply_jenkins_optimization() {
     log_info "应用 Jenkins 网络优化..."
     
-    local jenkins_override="$PROJECT_ROOT/components/jenkins/override.yml"
+    local jenkins_compose="$PROJECT_ROOT/components/jenkins/docker-compose.yml"
     local jenkins_optimized="$PROJECT_ROOT/components/jenkins/override-optimized.yml"
     
-    if [[ -f "$jenkins_optimized" ]]; then
+    # 检查是否需要优化（如果直接暴露了 8080 端口）
+    if [[ -f "$jenkins_compose" ]] && grep -q "8080:8080" "$jenkins_compose" 2>/dev/null; then
         if [[ "$DRY_RUN" == "true" ]]; then
-            log_info "预览: 将替换 Jenkins override 配置"
-            echo "  源文件: $jenkins_optimized"
-            echo "  目标文件: $jenkins_override"
+            log_info "预览: 需要移除 Jenkins 直接端口映射"
+            log_info "  建议: 仅通过 Nginx 反向代理访问"
         else
-            cp "$jenkins_optimized" "$jenkins_override"
-            log_success "✓ Jenkins 配置已优化（移除直接端口映射）"
+            log_warn "检测到 Jenkins 直接暴露 8080 端口"
+            log_info "建议: 移除直接端口映射，仅通过 Nginx 访问"
         fi
     else
-        log_error "优化配置文件不存在: $jenkins_optimized"
-        return 1
+        log_success "✓ Jenkins 端口配置已优化"
+    fi
     fi
     
     # 确保 Nginx 代理配置存在
@@ -173,23 +174,27 @@ apply_jenkins_optimization() {
 apply_network_optimization() {
     log_info "应用网络配置优化..."
     
-    local base_compose="$PROJECT_ROOT/compose/base/docker-compose.yml"
+    local networks_compose="$PROJECT_ROOT/components/networks/docker-compose.yml"
+    
+    if [[ ! -f "$networks_compose" ]]; then
+        log_warn "网络配置文件不存在: $networks_compose"
+        log_info "当前使用 overlay 网络，通过 init-infrastructure.sh 管理"
+        return 0
+    fi
     
     if [[ "$DRY_RUN" == "true" ]]; then
-        log_info "预览: 将修改网络配置"
-        echo "  文件: $base_compose"
-        echo "  修改: 设置 backend 网络为 internal: true"
+        log_info "预览: 将检查网络配置"
+        echo "  文件: $networks_compose"
+        echo "  检查: backend 网络安全设置"
     else
-        # 修改 backend 网络为内部网络
-        if grep -q "internal: false" "$base_compose"; then
-            sed -i.bak 's/internal: false/internal: true/' "$base_compose"
-            log_success "✓ 后端网络已设置为内部网络"
-        elif ! grep -q "internal:" "$base_compose"; then
-            # 在 backend 网络配置中添加 internal: true
-            sed -i.bak '/name: infra-network/a\    internal: true' "$base_compose"
-            log_success "✓ 后端网络已设置为内部网络"
+        # 检查网络配置
+        if grep -q "driver: overlay" "$networks_compose" 2>/dev/null; then
+            log_info "检测到 overlay 网络，内置加密支持"
+        elif grep -q "internal: false" "$networks_compose"; then
+            log_warn "检测到 backend 网络未设置为内部网络"
+            log_info "建议: 如果不需要外部访问，可设置 internal: true"
         else
-            log_info "后端网络配置无需修改"
+            log_success "✓ 网络配置符合安全要求"
         fi
     fi
 }

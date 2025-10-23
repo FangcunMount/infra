@@ -29,6 +29,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 COMPOSE_DIR="${REPO_ROOT}/compose"
 COMPONENTS_DIR="${REPO_ROOT}/components"
+ENV_DIR="${REPO_ROOT}/env"
 
 # 默认环境
 DEFAULT_ENV="dev"
@@ -193,12 +194,8 @@ build_infra_compose_args() {
     esac
     
     # 添加环境配置
-    if [[ -f "${COMPOSE_DIR}/env/${ENVIRONMENT}/.env" ]]; then
-        args+=("--env-file" "${COMPOSE_DIR}/env/${ENVIRONMENT}/.env")
-    fi
-    
-    if [[ -f "${COMPOSE_DIR}/env/${ENVIRONMENT}/override.yml" ]]; then
-        args+=("-f" "${COMPOSE_DIR}/env/${ENVIRONMENT}/override.yml")
+    if [[ -f "${ENV_DIR}/${ENVIRONMENT}/.env" ]]; then
+        args+=("--env-file" "${ENV_DIR}/${ENVIRONMENT}/.env")
     fi
     
     printf '%s\n' "${args[@]}"
@@ -302,8 +299,8 @@ manage_single_management_ui() {
     compose_args+=("--profile" "management")
     
     # 添加环境配置
-    if [[ -f "${COMPOSE_DIR}/env/${ENVIRONMENT}/.env" ]]; then
-        compose_args+=("--env-file" "${COMPOSE_DIR}/env/${ENVIRONMENT}/.env")
+    if [[ -f "${ENV_DIR}/${ENVIRONMENT}/.env" ]]; then
+        compose_args+=("--env-file" "${ENV_DIR}/${ENVIRONMENT}/.env")
     fi
     
     case "$action" in

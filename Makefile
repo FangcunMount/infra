@@ -8,7 +8,7 @@
 PROJECT_NAME := infra
 DEFAULT_ENV := dev
 ENV ?= $(DEFAULT_ENV)
-ENV_FILE := compose/env/$(ENV)/.env
+ENV_FILE := env/$(ENV)/.env
 
 # 脚本路径
 SCRIPTS_DIR := scripts
@@ -111,7 +111,7 @@ help: ## 显示帮助信息
 	@echo ""
 	@echo "$(BLUE)项目结构:$(RESET)"
 	@echo "  components/             - 组件配置（自包含）"
-	@echo "  compose/env/            - 环境变量配置"
+	@echo "  env/                    - 环境变量配置"
 	@echo "  scripts/                - 管理脚本"
 	@echo ""
 	@echo "$(BLUE)$(BOLD)核心命令:$(RESET)"
@@ -326,9 +326,9 @@ prod: ## 切换到生产环境
 
 env-init: ## 初始化环境配置文件
 	@if [ ! -f "$(ENV_FILE)" ]; then \
-		mkdir -p compose/env/$(ENV); \
-		if [ -f "compose/env/.env.example" ]; then \
-			cp compose/env/.env.example "$(ENV_FILE)"; \
+		mkdir -p env/$(ENV); \
+		if [ -f "env/.env.example" ]; then \
+			cp env/.env.example "$(ENV_FILE)"; \
 		else \
 			touch "$(ENV_FILE)"; \
 		fi; \
@@ -341,8 +341,8 @@ env-init: ## 初始化环境配置文件
 env-copy: ## 复制环境配置 (FROM=源 TO=目标)
 	$(call require_param,FROM,make env-copy FROM=dev TO=prod)
 	$(call require_param,TO,make env-copy FROM=dev TO=prod)
-	@mkdir -p compose/env/$(TO)
-	@cp compose/env/$(FROM)/.env compose/env/$(TO)/.env
+	@mkdir -p env/$(TO)
+	@cp env/$(FROM)/.env env/$(TO)/.env
 	$(call success_msg,已复制配置: $(FROM) -> $(TO))
 
 env-edit: ## 编辑当前环境配置

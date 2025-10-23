@@ -302,15 +302,18 @@ setup_auto_renewal() {
     
     # 创建续期脚本
     local renewal_script="/data/ssl/renew-certs.sh"
-    cat > "$renewal_script" << 'EOF'
+    cat > "$renewal_script" << EOF
 #!/bin/bash
 # SSL 证书自动续期脚本
 
-cd "$(dirname "$0")"
-/home/www/workspace/infra/scripts/tools/ssl-manager.sh renew
+SCRIPT_DIR="\$(cd "\$(dirname "\$0")" && pwd)"
+INFRA_ROOT="\$(cd "\$SCRIPT_DIR/../.." && pwd)"
+
+cd "\$INFRA_ROOT"
+"\$INFRA_ROOT/scripts/tools/ssl-manager.sh" renew
 
 # 记录续期日志
-echo "$(date): 证书续期检查完成" >> /data/log/ssl/renewal.log
+echo "\$(date): 证书续期检查完成" >> /data/log/ssl/renewal.log
 EOF
     
     sudo chmod +x "$renewal_script"
