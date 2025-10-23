@@ -2,7 +2,7 @@
 
 ## 目录结构
 
-```
+```text
 conf.d/
 ├── default.conf          # 默认兜底配置
 └── apps/                # 应用配置目录

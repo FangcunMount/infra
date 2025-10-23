@@ -2,7 +2,7 @@
 
 ## 🎯 部署架构
 
-```
+```text
 ServerA (管理节点)                    ServerB (工作节点)
 ├── Redis                            ├── NSQ (nsqlookupd, nsqd, nsqadmin)
 ├── MongoDB                          └── 业务应用
@@ -104,7 +104,8 @@ docker swarm init --advertise-addr 192.168.1.100
 ```
 
 初始化成功后会显示：
-```
+
+```text
 ✅ Swarm 集群初始化成功！
 
 管理节点 Token:
@@ -143,6 +144,7 @@ docker-compose -f docker-compose.yml up -d
 ```
 
 这会创建名为 `infra-network` 的 overlay 网络，配置：
+
 - Driver: overlay
 - Subnet: 172.20.0.0/16
 - Gateway: 172.20.0.1
@@ -261,12 +263,14 @@ docker swarm leave --force
 ### 2. 端口冲突
 
 确保两台服务器上不要部署相同端口的服务：
+
 - ServerA: MySQL(3306), Redis(6379), MongoDB(27017)
 - ServerB: NSQ(4150,4151,4160,4161,4171)
 
 ### 3. 数据持久化
 
 overlay 网络不影响数据卷，数据仍然存储在各自主机上：
+
 ```yaml
 volumes:
   mysql-data:
@@ -276,6 +280,7 @@ volumes:
 ### 4. 服务发现
 
 容器间通过**服务名**通信，而非 IP：
+
 ```bash
 # ✅ 正确
 redis://redis:6379
@@ -288,6 +293,7 @@ redis://172.20.0.10:6379
 ### 5. 高可用性
 
 生产环境建议：
+
 - 至少 3 个管理节点（保证高可用）
 - 工作节点按需扩展
 - 关键服务配置副本
@@ -306,6 +312,7 @@ make swarm-join MANAGER_IP=192.168.1.100 NODE_TYPE=manager
 **症状**: `Error response from daemon: rpc error`
 
 **解决**:
+
 ```bash
 # 1. 检查防火墙
 sudo ufw status
@@ -325,6 +332,7 @@ docker swarm join-token worker
 **症状**: `ping: bad address`
 
 **解决**:
+
 ```bash
 # 1. 确认网络存在
 docker network ls | grep infra-network
@@ -344,6 +352,7 @@ ip link show
 **症状**: ServerB 上看不到 infra-network
 
 **解决**:
+
 ```bash
 # 1. 确认节点已加入集群
 docker node ls
@@ -360,6 +369,7 @@ docker run -d --network infra-network alpine sleep 3600
 **症状**: 集群无法管理
 
 **解决**:
+
 ```bash
 # 如果有多个管理节点，会自动选举新 Leader
 docker node ls
@@ -401,6 +411,7 @@ docker node inspect <NODE-ID> --format '{{.Status.State}}'
 ### 1. 标签管理
 
 为节点打标签，便于服务调度：
+
 ```bash
 # 标记存储节点
 docker node update --label-add type=storage serverA
@@ -415,6 +426,7 @@ docker service create --constraint 'node.labels.type==storage' ...
 ### 2. 网络隔离
 
 不同环境使用不同网络：
+
 ```bash
 # 生产环境
 make app-network-create NAME=prod-network DRIVER=overlay
@@ -426,6 +438,7 @@ make app-network-create NAME=test-network DRIVER=overlay
 ### 3. 健康检查
 
 为服务配置健康检查：
+
 ```yaml
 healthcheck:
   test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
@@ -437,6 +450,7 @@ healthcheck:
 ### 4. 定期备份
 
 定期备份管理节点配置：
+
 ```bash
 # 备份 Swarm 配置
 docker swarm ca > swarm-ca.pem
@@ -447,8 +461,8 @@ docker swarm ca > swarm-ca.pem
 ## 📚 相关资源
 
 - 网络管理完整指南: `docs/网络管理/网络管理完整指南.md`
-- Swarm 官方文档: https://docs.docker.com/engine/swarm/
-- Overlay 网络文档: https://docs.docker.com/network/overlay/
+- Swarm 官方文档: <https://docs.docker.com/engine/swarm/>
+- Overlay 网络文档: <https://docs.docker.com/network/overlay/>
 
 ---
 

@@ -1,13 +1,13 @@
 # NSQ 配置文件说明
 
-## 概述
+## 1. 概述
 
 NSQ 支持通过配置文件或命令行参数进行配置。本项目同时使用两种方式：
 
 - **配置文件**: 管理通用的、稳定的配置项
 - **命令行参数**: 管理环境相关的配置（如 IP 地址、服务发现地址等）
 
-## 配置文件位置
+## 1.1 配置文件位置
 
 ```text
 components/nsq/
@@ -18,9 +18,9 @@ components/nsq/
 
 容器内挂载位置：`/etc/nsq/`
 
-## NSQd 配置 (nsqd.conf)
+## 2. NSQd 配置 (nsqd.conf)
 
-### 核心参数
+### 2.1 核心参数
 
 | 参数 | 默认值 | 说明 |
 |-----|--------|------|
@@ -30,7 +30,7 @@ components/nsq/
 | `msg-timeout` | 60s | 消息超时时间 |
 | `data-path` | /data | 数据存储路径 |
 
-### 性能调优参数
+### 2.2 性能调优参数
 
 ```conf
 # 内存队列大小（影响性能和内存占用）
@@ -46,7 +46,7 @@ sync-every=2500
 max-rdy-count=2500
 ```
 
-### 适用场景调整
+### 2.3 适用场景调整
 
 **高吞吐量场景**:
 
@@ -71,7 +71,7 @@ max-msg-size=10485760  # 10MB
 max-output-buffer-size=131072
 ```
 
-## NSQLookupd 配置 (nsqlookupd.conf)
+## 3. NSQLookupd 配置 (nsqlookupd.conf)
 
 ### 核心参数
 
@@ -81,7 +81,7 @@ max-output-buffer-size=131072
 | `inactive-producer-timeout` | 300s | 生产者不活跃超时时间 |
 | `tombstone-lifetime` | 45s | 墓碑生命周期（已删除主题/频道标记） |
 
-### 调整建议
+### 3.1 调整建议
 
 NSQLookupd 是轻量级组件，大部分场景使用默认配置即可。
 
@@ -91,9 +91,9 @@ NSQLookupd 是轻量级组件，大部分场景使用默认配置即可。
 inactive-producer-timeout=600s  # 增加到 10 分钟
 ```
 
-## NSQAdmin 配置 (nsqadmin.conf)
+## 4. NSQAdmin 配置 (nsqadmin.conf)
 
-### 核心参数
+### 4.1 核心参数
 
 | 参数 | 默认值 | 说明 |
 |-----|--------|------|
@@ -101,7 +101,7 @@ inactive-producer-timeout=600s  # 增加到 10 分钟
 | `notification-http-endpoint` | - | HTTP 通知端点 |
 | `base-path` | / | 基础 URL（反向代理时使用） |
 
-### 反向代理配置
+### 4.2 反向代理配置
 
 如果通过 Nginx 反向代理访问 NSQAdmin：
 
@@ -117,7 +117,7 @@ location /nsqadmin/ {
 }
 ```
 
-### 通知集成
+### 4.3 通知集成
 
 配置 Webhook 接收管理操作通知：
 
@@ -125,7 +125,7 @@ location /nsqadmin/ {
 notification-http-endpoint=http://your-webhook-service/nsq-notifications
 ```
 
-## 配置优先级
+## 5. 配置优先级
 
 配置的优先级从高到低：
 
@@ -141,9 +141,9 @@ command: /nsqd --config=/etc/nsq/nsqd.conf --broadcast-address=${NODE_B_IP}
 
 这里 `--broadcast-address` 会覆盖配置文件中的设置。
 
-## 修改配置
+## 6. 修改配置
 
-### 修改配置文件
+### 6.1 修改配置文件
 
 1. 编辑对应的 `.conf` 文件
 2. 重启服务：
@@ -154,7 +154,7 @@ docker compose restart nsqd
 docker restart nsqd
 ```
 
-### 查看当前配置
+### 6.2 查看当前配置
 
 ```bash
 # 查看容器内的配置文件
@@ -164,9 +164,9 @@ docker exec nsqd cat /etc/nsq/nsqd.conf
 docker logs nsqd | head -20
 ```
 
-## 配置示例
+## 7. 配置示例
 
-### 生产环境配置 (nsqd.conf)
+### 7.1 生产环境配置 (nsqd.conf)
 
 ```conf
 # 日志
@@ -197,7 +197,7 @@ snappy=true
 e2e-processing-latency-percentile=1.0,0.99,0.95
 ```
 
-### 开发环境配置 (nsqd.conf)
+### 7.2 开发环境配置 (nsqd.conf)
 
 ```conf
 # 日志
@@ -216,9 +216,9 @@ sync-every=1000
 max-rdy-count=2500
 ```
 
-## 配置验证
+## 8. 配置验证
 
-### 语法检查
+### 8.1语法检查
 
 NSQ 没有内置的配置验证工具，但可以通过启动来验证：
 
@@ -227,7 +227,7 @@ NSQ 没有内置的配置验证工具，但可以通过启动来验证：
 docker compose up nsqd
 ```
 
-### 配置对比
+### 8.2 配置对比
 
 查看默认配置和当前配置的差异：
 
@@ -239,9 +239,9 @@ docker run --rm nsqio/nsq:v1.3.0 /nsqd --help
 docker exec nsqd cat /etc/nsq/nsqd.conf
 ```
 
-## 常见配置问题
+## 9. 常见配置问题
 
-### 问题 1: 消息持续堆积
+### 9.1 问题 1: 消息持续堆积
 
 **原因**: `mem-queue-size` 太小或消费者处理太慢
 
@@ -255,7 +255,7 @@ mem-queue-size=50000
 msg-timeout=300s
 ```
 
-### 问题 2: 内存占用过高
+### 9.2 问题 2: 内存占用过高
 
 **原因**: `mem-queue-size` 设置过大
 
@@ -267,7 +267,7 @@ mem-queue-size=5000
 sync-every=2000
 ```
 
-### 问题 3: 消息丢失
+### 9.3 问题 3: 消息丢失
 
 **原因**: 同步到磁盘不够频繁
 
@@ -291,7 +291,7 @@ mem-queue-size=20000
 sync-every=5000
 ```
 
-## 监控配置效果
+## 10. 监控配置效果
 
 查看配置效果的关键指标：
 
@@ -305,7 +305,7 @@ curl http://localhost:4151/stats?format=json | jq '.topics[] | {
 }'
 ```
 
-## 配置备份
+## 11. 配置备份
 
 建议将配置文件纳入版本控制：
 
@@ -314,7 +314,7 @@ git add components/nsq/*.conf
 git commit -m "Update NSQ configuration"
 ```
 
-## 参考资料
+## 12. 参考资料
 
 - [NSQd 配置文档](https://nsq.io/components/nsqd.html)
 - [NSQLookupd 配置文档](https://nsq.io/components/nsqlookupd.html)

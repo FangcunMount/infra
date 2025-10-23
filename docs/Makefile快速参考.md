@@ -26,6 +26,7 @@ make prod                   # 切换到生产环境
 ## 🗄️ 服务管理
 
 ### MySQL
+
 ```bash
 make mysql-start/stop/restart
 make mysql-logs
@@ -34,6 +35,7 @@ make mysql-backup DB=database_name
 ```
 
 ### Redis
+
 ```bash
 make redis-start/stop/restart
 make redis-logs
@@ -42,6 +44,7 @@ make redis-info
 ```
 
 ### MongoDB
+
 ```bash
 make mongo-start/stop/restart
 make mongo-logs
@@ -49,6 +52,7 @@ make mongo-shell         # 进入 MongoDB Shell
 ```
 
 ### Kafka
+
 ```bash
 make kafka-start/stop/restart
 make kafka-topics        # 列出所有 Topics
@@ -58,12 +62,14 @@ make kafka-describe-topic TOPIC=name
 ```
 
 ### NSQ
+
 ```bash
 make nsq-start/stop/restart
 make nsq-admin           # 打开 Web UI
 ```
 
 ### Jenkins
+
 ```bash
 make jenkins-start/stop/restart
 make jenkins-password    # 获取初始密码
@@ -139,6 +145,7 @@ make shell NAME=container         # 进入容器 Shell
 ## 🎯 常用工作流
 
 ### 开发环境启动
+
 ```bash
 make dev-setup           # 配置开发环境
 make quick-start         # 启动核心服务
@@ -146,6 +153,7 @@ make status              # 检查状态
 ```
 
 ### 查看日志
+
 ```bash
 make mysql-logs          # 查看 MySQL 日志
 make redis-logs          # 查看 Redis 日志
@@ -153,6 +161,7 @@ make logs                # 查看所有服务日志
 ```
 
 ### 故障排查
+
 ```bash
 make troubleshoot        # 运行诊断
 make stats               # 查看资源使用
@@ -160,6 +169,7 @@ make test-all            # 测试连接
 ```
 
 ### 清理重置
+
 ```bash
 make down                # 停止所有服务
 make clean               # 清理容器和镜像
@@ -167,6 +177,7 @@ make reset               # 重置基础设施
 ```
 
 ### 生产部署
+
 ```bash
 make ENV=prod env-init         # 初始化生产配置
 make ENV=prod env-edit         # 编辑配置
@@ -177,13 +188,16 @@ make ENV=prod test-all         # 测试连接
 ## 💡 提示
 
 ### 环境变量
+
 ```bash
 ENV=prod make status           # 在生产环境执行命令
 LOG_LINES=500 make mysql-logs  # 查看更多日志行
 ```
 
 ### 参数传递
+
 大多数命令支持参数，例如：
+
 ```bash
 make kafka-create-topic TOPIC=my-topic PARTITIONS=3 REPLICAS=1
 make port-check PORT=8080
@@ -191,7 +205,9 @@ make backup TARGET=/backups
 ```
 
 ### 别名
+
 许多命令有简短别名：
+
 ```bash
 make net-list    == make network-list
 make prune       == make clean
@@ -199,6 +215,7 @@ make help-simple == make help
 ```
 
 ### 获取帮助
+
 ```bash
 make help              # 快速概览
 make help-all          # 详细列表
@@ -208,6 +225,7 @@ make <command>         # 不带参数会显示示例
 ## 🔍 示例场景
 
 ### 场景 1: 第一次使用
+
 ```bash
 make help                  # 了解可用命令
 make dev-setup             # 配置开发环境
@@ -216,6 +234,7 @@ make test-all              # 验证安装
 ```
 
 ### 场景 2: 添加新的 Kafka Topic
+
 ```bash
 make kafka-status          # 检查 Kafka 状态
 make kafka-topics          # 查看现有 Topics
@@ -224,6 +243,7 @@ make kafka-describe-topic TOPIC=orders
 ```
 
 ### 场景 3: 部署新应用到 Nginx
+
 ```bash
 make ssl-obtain DOMAIN=myapp.com EMAIL=admin@myapp.com
 make app-deploy APP=myapp DOMAIN=myapp.com PORT=3000 SSL=yes
@@ -232,6 +252,7 @@ make nginx-reload          # 应用配置
 ```
 
 ### 场景 4: 数据库备份
+
 ```bash
 make mysql-status          # 确认 MySQL 运行
 make mysql-backup DB=production
@@ -239,6 +260,7 @@ make backup TARGET=/mnt/backups  # 备份所有卷
 ```
 
 ### 场景 5: 服务重启
+
 ```bash
 make mysql-restart         # 重启 MySQL
 make nginx-reload          # 重载 Nginx (无停机)
