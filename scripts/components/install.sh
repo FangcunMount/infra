@@ -5,7 +5,7 @@ set -euo pipefail
 # Docker 组件统一安装脚本
 # =================================================================
 # 功能：基于 components 配置安装 Docker 服务组件
-# 支持：nginx, mysql, redis, mongodb, kafka, nsq, jenkins
+# 支持：nginx, mysql, redis, mongodb, kafka, nsq
 # 用户：www (推荐) 或 root
 # =================================================================
 
@@ -55,7 +55,6 @@ Docker 组件统一安装脚本
   mongo       MongoDB 数据库
   kafka       Apache Kafka 消息队列
   nsq         NSQ 实时分布式消息平台
-  jenkins     Jenkins CI/CD 平台
   all         安装所有组件
 
 选项:
@@ -241,7 +240,7 @@ validate_component() {
     local component="$1"
     
     # 支持的组件列表
-    local valid_components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq" "jenkins" "all")
+    local valid_components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq" "all")
     
     if [[ "$component" == "all" ]]; then
         return 0
@@ -320,10 +319,6 @@ validate_env_file() {
             check_env_var "$env_file" "MONGO_ROOT_PASSWORD" missing_vars
             check_env_var "$env_file" "MONGO_DATABASE" missing_vars
             ;;
-        jenkins)
-            check_env_var "$env_file" "JENKINS_ADMIN_USER" missing_vars
-            check_env_var "$env_file" "JENKINS_ADMIN_PASSWORD" missing_vars
-            ;;
     esac
     
     # 如果有缺失的变量，报告错误
@@ -398,9 +393,6 @@ show_env_file_help() {
     echo "MONGO_DATABASE=your_mongo_database"
     echo "MONGO_PORT=27017"
     echo ""
-    echo "# Jenkins 配置"
-    echo "JENKINS_ADMIN_USER=admin"
-    echo "JENKINS_ADMIN_PASSWORD=your_jenkins_password_here"
     echo "EOF"
     echo
     echo "  # 设置安全权限:"
@@ -427,55 +419,6 @@ show_env_file_help() {
     log_info "• 检查现有配置: find env -name '*.env' -type f"
     log_info "• 重新运行安装: make install-mysql (配置文件创建后)"
     echo "========================================"
-}
-
-# =================================================================
-# 组件安装函数
-# =================================================================
-
-# Jenkins 安装函数（使用 compose-manager）
-install_jenkins_component() {
-    local env_type="$1"
-    local dry_run="$2"
-    
-    log_info "安装 Jenkins CI/CD 服务..."
-    
-    # 创建必要的目录
-    log_info "准备 Jenkins 目录..."
-    if [[ "$dry_run" != "true" ]]; then
-        sudo mkdir -p /data/jenkins
-        sudo chown -R 1000:1000 /data/jenkins
-        
-        mkdir -p "$PROJECT_ROOT/data/jenkins"
-        mkdir -p "$PROJECT_ROOT/logs/jenkins"
-    fi
-    
-    # 使用 compose-manager 安装
-    local compose_manager="$SCRIPT_DIR/compose-manager.sh"
-    
-    if [[ ! -f "$compose_manager" ]]; then
-        log_error "Compose 管理器不存在: $compose_manager"
-        return 1
-    fi
-    
-    # 执行安装
-    if [[ "$dry_run" == "true" ]]; then
-        log_info "[预览模式] 将执行: $compose_manager -e $env_type infra up cicd"
-        return 0
-    else
-        if "$compose_manager" -e "$env_type" infra up cicd; then
-            log_success "Jenkins 安装完成"
-            log_info "Jenkins 访问地址: http://localhost:8080"
-            log_info "默认管理员用户: admin"
-            log_warn "请在首次访问时设置管理员密码"
-            return 0
-        else
-            log_error "Jenkins 安装失败"
-            return 1
-        fi
-    fi
-}
-
 # =================================================================
 # 组件安装
 # =================================================================
@@ -491,12 +434,6 @@ install_component() {
     # 验证组件
     if ! validate_component "$component"; then
         return 1
-    fi
-    
-    # Jenkins 使用专门的安装脚本
-    if [[ "$component" == "jenkins" ]]; then
-        install_jenkins_component "$env_type" "$dry_run"
-        return $?
     fi
     
     # 准备环境配置文件路径
@@ -573,10 +510,6 @@ install_component() {
             log_info "MongoDB 需要初始化时间，等待 20 秒..."
             sleep 20
             ;;
-        jenkins)
-            log_info "Jenkins 需要较长启动时间，等待 60 秒..."
-            sleep 60
-            ;;
         *)
             sleep 10
             ;;
@@ -598,7 +531,7 @@ install_all_components() {
     
     log_step "安装所有组件..."
     
-    local components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq" "jenkins")
+    local components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq")
     local failed_components=()
     
     for component in "${components[@]}"; do
@@ -673,7 +606,7 @@ show_interactive_menu() {
     echo "========================================"
     echo
     
-    local components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq" "jenkins")
+    local components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq")
     local selected_components=()
     
     while true; do
@@ -701,7 +634,6 @@ show_interactive_menu() {
                 mongo) echo "  $num. MongoDB     - NoSQL 文档数据库    [$status]" ;;
                 kafka) echo "  $num. Kafka       - 分布式消息队列      [$status]" ;;
                 nsq) echo "  $num. NSQ         - 实时消息平台        [$status]" ;;
-                jenkins) echo "  $num. Jenkins     - CI/CD 持续集成平台  [$status]" ;;
             esac
         done
         
@@ -836,22 +768,14 @@ show_component_details() {
     echo "  • 资源: 轻量级，内存占用约 768MB"
     echo "  • 依赖: 无"
     echo
-    echo "� Jenkins (CI/CD 平台)"
-    echo "  • 作用: 持续集成/持续部署，代码构建和发布"
-    echo "  • 端口: 8080 (Web), 50000 (Agent)"
-    echo "  • 资源: 中等，内存占用约 512MB"
-    echo "  • 依赖: 无 (可选择依赖 Docker 进行构建)"
-    echo "  • 特性: CasC 配置，预装插件，Docker 集成"
-    echo
-    echo "�💡 推荐安装顺序:"
-    echo "  1. Nginx → 2. MySQL → 3. Redis → 4. MongoDB → 5. Kafka → 6. Jenkins"
+    echo "💡 推荐安装顺序:"
+    echo "  1. Nginx → 2. MySQL → 3. Redis → 4. MongoDB → 5. Kafka → 6. NSQ"
     echo
     echo "🎯 常用组合:"
     echo "  • Web 应用: nginx + mysql + redis"
     echo "  • API 服务: nginx + mysql + redis + mongo"
     echo "  • 微服务: nginx + mysql + redis + nsq"
-    echo "  • 全栈开发: nginx + mysql + redis + mongo + kafka + nsq + jenkins"
-    echo "  • CI/CD 环境: jenkins + mysql + redis (用于构建和测试)"
+    echo "  • 全栈开发: nginx + mysql + redis + mongo + kafka + nsq"
     echo
     read -p "按任意键返回组件选择菜单..." -n 1 -r
     echo

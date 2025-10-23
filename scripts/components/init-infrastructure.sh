@@ -156,7 +156,6 @@ create_volumes() {
         "infra_redis_data:${INFRA_DATA_ROOT}/redis/data"
         "infra_mongo_data:${INFRA_DATA_ROOT}/mongo/data"
         "infra_kafka_data:${INFRA_DATA_ROOT}/kafka/data"
-        "infra_jenkins_data:${INFRA_DATA_ROOT}/jenkins/data"
         "infra_nginx_logs:${INFRA_LOG_ROOT}/nginx"
         "infra_app_logs:${INFRA_LOG_ROOT}"
     )
@@ -164,8 +163,8 @@ create_volumes() {
     # 创建数据目录
     if [[ "$dry_run" != "true" ]]; then
         log_info "创建数据目录: ${INFRA_DATA_ROOT}"
-        sudo mkdir -p "${INFRA_DATA_ROOT}"/{mysql,redis,mongo,kafka,jenkins,nginx}/{data,conf} 2>/dev/null || true
-        sudo mkdir -p "${INFRA_LOG_ROOT}"/{mysql,redis,mongodb,nginx,jenkins,kafka} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_DATA_ROOT}"/{mysql,redis,mongo,kafka,nginx}/{data,conf} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_LOG_ROOT}"/{mysql,redis,mongodb,nginx,kafka} 2>/dev/null || true
         
         # 设置目录所有权，优先尝试 docker 组
         if getent group docker >/dev/null 2>&1; then
@@ -220,7 +219,7 @@ remove_infrastructure() {
     log_step "删除基础设施网络和卷..."
     
     local networks=("infra-network")
-    local volumes=("infra_mysql_data" "infra_redis_data" "infra_mongo_data" "infra_kafka_data" "infra_jenkins_data" "infra_nginx_logs" "infra_app_logs")
+    local volumes=("infra_mysql_data" "infra_redis_data" "infra_mongo_data" "infra_kafka_data" "infra_nginx_logs" "infra_app_logs")
     
     if [[ "$dry_run" == "true" ]]; then
         echo "# 删除网络命令:"

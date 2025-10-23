@@ -125,7 +125,7 @@ help: ## 显示帮助信息
 	@echo "  1. 快速开始: $(CYAN)init, install, up, down, restart$(RESET)"
 	@echo "  2. 环境管理: $(CYAN)env-init, env-edit, dev, prod$(RESET)"
 	@echo "  3. 服务管理: $(CYAN)<service>-start/stop/logs/shell$(RESET)"
-	@echo "     服务: mysql, redis, mongo, kafka, nsq, jenkins"
+	@echo "     服务: mysql, redis, mongo, kafka, nsq"
 	@echo "  4. 网络管理: $(CYAN)net-create/delete/list, swarm-*$(RESET)"
 	@echo "  5. SSL 证书: $(CYAN)ssl-obtain/import/renew/list$(RESET)"
 	@echo "  6. Nginx:    $(CYAN)app-deploy/remove/list, nginx-*$(RESET)"
@@ -148,23 +148,20 @@ help-all: ## 显示所有命令详情
 		module_order[4] = "3. 服务管理 - Redis"; \
 		module_order[5] = "3. 服务管理 - MongoDB"; \
 		module_order[6] = "3. 服务管理 - Kafka"; \
-		module_order[7] = "3. 服务管理 - NSQ"; \
-		module_order[8] = "3. 服务管理 - Jenkins"; \
-		module_order[9] = "4. 网络管理"; \
-		module_order[10] = "5. SSL 证书"; \
-		module_order[11] = "6. Nginx"; \
-		module_order[12] = "7. 监控诊断"; \
-		module_order[13] = "8. 测试验证"; \
-		module_order[14] = "9. 维护清理"; \
-		module_order[15] = "10. 帮助文档"; \
-		modules["1. 快速开始"] = "^(check-env|check-scripts|init$$|init-infra|reset|clean-infra|install$$|install-nginx|install-mysql|install-redis|install-mongo|install-kafka|install-nsq|install-jenkins|up$$|down$$|restart$$|status$$|ps$$|health|quick-start|full-install|dev-setup|prod-setup)"; \
+		module_order[8] = "4. 网络管理"; \
+		module_order[9] = "5. SSL 证书"; \
+		module_order[10] = "6. Nginx"; \
+		module_order[11] = "7. 监控诊断"; \
+		module_order[12] = "8. 测试验证"; \
+		module_order[13] = "9. 维护清理"; \
+		module_order[14] = "10. 帮助文档"; \
+		modules["1. 快速开始"] = "^(check-env|check-scripts|init$$|init-infra|reset|clean-infra|install$$|install-nginx|install-mysql|install-redis|install-mongo|install-kafka|install-nsq|up$$|down$$|restart$$|status$$|ps$$|health|quick-start|full-install|dev-setup|prod-setup)"; \
 		modules["2. 环境管理"] = "^(dev$$|prod$$|env-init|env-copy|env-edit|env-show|config-show|config-validate)"; \
 		modules["3. 服务管理 - MySQL"] = "^mysql-"; \
 		modules["3. 服务管理 - Redis"] = "^redis-"; \
 		modules["3. 服务管理 - MongoDB"] = "^mongo-"; \
 		modules["3. 服务管理 - Kafka"] = "^kafka-"; \
 		modules["3. 服务管理 - NSQ"] = "^nsq-"; \
-		modules["3. 服务管理 - Jenkins"] = "^jenkins-"; \
 		modules["4. 网络管理"] = "^(network-|net-|swarm-|port-check)"; \
 		modules["5. SSL 证书"] = "^ssl-"; \
 		modules["6. Nginx"] = "^(nginx-|app-deploy|app-remove|app-list|app-enable|app-disable)"; \
@@ -241,7 +238,7 @@ clean-infra: ## 清理基础设施 (谨慎操作)
 		echo "$(YELLOW)⚠️  操作已取消$(RESET)"; \
 	fi
 
-.PHONY: install install-nginx install-mysql install-redis install-mongo install-kafka install-nsq install-jenkins
+.PHONY: install install-nginx install-mysql install-redis install-mongo install-kafka install-nsq
 install: init ## 安装所有基础设施服务
 	$(call shell_info_msg,安装所有基础设施服务...)
 	@$(INSTALL_SCRIPT) all
@@ -263,9 +260,6 @@ install-kafka: init ## 安装 Kafka
 
 install-nsq: init ## 安装 NSQ
 	@$(INSTALL_SCRIPT) nsq
-
-install-jenkins: init ## 安装 Jenkins
-	@$(INSTALL_SCRIPT) jenkins
 
 .PHONY: up down restart
 up: ## 启动所有基础设施服务
@@ -527,34 +521,6 @@ nsq-admin: ## 打开 NSQ Admin Web UI
 
 nsq-status: ## 查看 NSQ 状态
 	@docker ps --filter "name=nsq" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-
-# --- Jenkins -----------------------------------------------------------------
-.PHONY: jenkins-start jenkins-stop jenkins-restart jenkins-logs jenkins-shell jenkins-status jenkins-password
-jenkins-start: init-infra ## 启动 Jenkins
-	@$(COMPOSE_MANAGER) infra up cicd
-	$(call success_msg,Jenkins 已启动)
-	$(call shell_info_msg,Jenkins URL: http://localhost:8080)
-
-jenkins-stop: ## 停止 Jenkins
-	@$(COMPOSE_MANAGER) infra down cicd
-	$(call success_msg,Jenkins 已停止)
-
-jenkins-restart: jenkins-stop jenkins-start ## 重启 Jenkins
-
-jenkins-logs: ## 查看 Jenkins 日志
-	@docker logs -f --tail=$(LOG_LINES) jenkins 2>/dev/null || \
-		$(call shell_error_msg,Jenkins 容器不存在或未运行)
-
-jenkins-shell: ## 进入 Jenkins 容器 Shell
-	@docker exec -it jenkins bash || \
-		$(call shell_error_msg,无法连接到 Jenkins 容器)
-
-jenkins-status: ## 查看 Jenkins 状态
-	@docker ps --filter "name=jenkins" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-
-jenkins-password: ## 获取 Jenkins 初始管理员密码
-	@docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword 2>/dev/null || \
-		$(call shell_error_msg,无法获取密码，Jenkins 可能未完全启动)
 
 # ==============================================================================
 # 4. 网络管理

@@ -68,13 +68,6 @@ make nsq-start/stop/restart
 make nsq-admin           # 打开 Web UI
 ```
 
-### Jenkins
-
-```bash
-make jenkins-start/stop/restart
-make jenkins-password    # 获取初始密码
-```
-
 ## 🌐 网络管理
 
 ```bash
@@ -128,7 +121,6 @@ make test-mongo           # 测试 MongoDB
 make test-kafka           # 测试 Kafka
 make test-nsq             # 测试 NSQ
 make test-nginx           # 测试 Nginx
-make test-jenkins         # 测试 Jenkins
 ```
 
 ## 🧹 维护清理

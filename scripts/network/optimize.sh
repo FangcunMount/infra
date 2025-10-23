@@ -2,6 +2,7 @@
 
 # Docker 网络优化应用脚本
 # 将现有的 Docker 组件配置应用网络安全优化
+# 注意: Jenkins 相关功能已弃用（项目已迁移至 GitHub Actions）
 
 set -e
 
@@ -33,21 +34,19 @@ Docker 网络优化应用脚本
 选项:
     -h, --help          显示帮助信息
     -b, --backup        创建配置备份
-    --apply-jenkins     仅应用 Jenkins 网络优化
     --apply-network     仅应用网络配置优化
     --revert           回滚到优化前的配置
     --dry-run          预览模式，不实际修改文件
     --status           检查当前网络配置状态
 
 功能:
-    • 将 Jenkins 配置为通过 Nginx 代理访问
     • 设置后端网络为内部网络（增强安全性）
-    • 配置 Nginx 代理规则
+    • 配置服务间通信规则
     • 备份原有配置
 
 优化内容:
-    1. Jenkins Web 端口通过 Nginx 代理（移除直接端口映射）
-    2. 后端网络设置为 internal=true
+    1. 后端网络设置为 internal=true（仅 bridge 模式）
+    2. Overlay 网络自带加密支持
     3. 添加 Jenkins 的 Nginx 代理配置
     4. 优化网络安全设置
 
@@ -61,42 +60,18 @@ Docker 网络优化应用脚本
 EOF
 }
 
-# 创建备份
+# 创建配置备份
 create_backup() {
-    log_info "创建配置备份..."
+    log_info "创建配置文件备份..."
     
     mkdir -p "$BACKUP_DIR"
+    cp -r "$PROJECT_ROOT/components" "$BACKUP_DIR/"
+    cp -r "$PROJECT_ROOT/compose" "$BACKUP_DIR/" 2>/dev/null || true
     
-    # 备份相关配置文件
-    local files=(
-        "components/jenkins/docker-compose.yml"
-        "components/nginx/conf.d"
-    )
-    
-    for file in "${files[@]}"; do
-        local src="$PROJECT_ROOT/$file"
-        if [[ -e "$src" ]]; then
-            local dest="$BACKUP_DIR/$(dirname "$file")"
-            mkdir -p "$dest"
-            cp -r "$src" "$dest/"
-            log_info "备份: $file"
-        fi
-    done
-    
-    # 创建备份信息文件
-    cat > "$BACKUP_DIR/backup_info.txt" << EOF
-Docker 网络优化配置备份
-备份时间: $(date)
-备份目录: $BACKUP_DIR
-脚本版本: $0
-
-备份内容:
-- Jenkins Override 配置
-- Nginx 配置目录
-- Docker Compose 基础配置
-
-恢复方法:
-cd "$PROJECT_ROOT"
+    # 生成恢复脚本
+    cat > "$BACKUP_DIR/restore.sh" << 'EOF'
+#!/bin/bash
+cd "$(dirname "$0")/.."
 cp -r "$BACKUP_DIR/components" ./
 cp -r "$BACKUP_DIR/compose" ./
 EOF
@@ -116,21 +91,6 @@ check_status() {
         log_warn "△ Infra 网络未创建"
     fi
     
-    echo -e "\n=== Jenkins 端口配置 ==="
-    local jenkins_compose="$PROJECT_ROOT/components/jenkins/docker-compose.yml"
-    if [[ -f "$jenkins_compose" ]] && grep -q "8080:8080" "$jenkins_compose" 2>/dev/null; then
-        log_warn "△ Jenkins 8080 端口直接暴露（未优化）"
-    else
-        log_success "✓ Jenkins 8080 端口已移除直接映射"
-    fi
-    
-    echo -e "\n=== Nginx 代理配置 ==="
-    if [[ -f "$PROJECT_ROOT/components/nginx/conf.d/jenkins.conf" ]]; then
-        log_success "✓ Jenkins Nginx 代理配置存在"
-    else
-        log_warn "△ Jenkins Nginx 代理配置不存在"
-    fi
-    
     echo -e "\n=== 网络安全配置 ==="
     local networks_compose="$PROJECT_ROOT/components/networks/docker-compose.yml"
     if [[ -f "$networks_compose" ]] && grep -q "internal: true" "$networks_compose" 2>/dev/null; then
@@ -140,34 +100,14 @@ check_status() {
     fi
 }
 
-# 应用 Jenkins 网络优化
+
+# 应用 Jenkins 网络优化（已弃用）
+# 注意: Jenkins 功能已移除，项目已迁移至 GitHub Actions
 apply_jenkins_optimization() {
-    log_info "应用 Jenkins 网络优化..."
-    
-    local jenkins_compose="$PROJECT_ROOT/components/jenkins/docker-compose.yml"
-    local jenkins_optimized="$PROJECT_ROOT/components/jenkins/override-optimized.yml"
-    
-    # 检查是否需要优化（如果直接暴露了 8080 端口）
-    if [[ -f "$jenkins_compose" ]] && grep -q "8080:8080" "$jenkins_compose" 2>/dev/null; then
-        if [[ "$DRY_RUN" == "true" ]]; then
-            log_info "预览: 需要移除 Jenkins 直接端口映射"
-            log_info "  建议: 仅通过 Nginx 反向代理访问"
-        else
-            log_warn "检测到 Jenkins 直接暴露 8080 端口"
-            log_info "建议: 移除直接端口映射，仅通过 Nginx 访问"
-        fi
-    else
-        log_success "✓ Jenkins 端口配置已优化"
-    fi
-    fi
-    
-    # 确保 Nginx 代理配置存在
-    local jenkins_nginx_conf="$PROJECT_ROOT/components/nginx/conf.d/jenkins.conf"
-    if [[ -f "$jenkins_nginx_conf" ]]; then
-        log_success "✓ Jenkins Nginx 代理配置已存在"
-    else
-        log_warn "△ Jenkins Nginx 代理配置不存在，请检查是否已创建"
-    fi
+    log_warn "Jenkins 优化功能已弃用"
+    log_info "项目已从 Jenkins 迁移至 GitHub Actions"
+    log_info "此功能仅保留用于兼容性，不执行任何操作"
+    return 0
 }
 
 # 应用网络配置优化
@@ -202,8 +142,7 @@ apply_network_optimization() {
 # 重启相关服务
 restart_services() {
     if [[ "$DRY_RUN" == "true" ]]; then
-        log_info "预览: 将重启以下服务"
-        echo "  - Jenkins"
+        log_info "预览: 将重启 Nginx 服务"
         echo "  - Nginx"
         return 0
     fi
@@ -212,12 +151,7 @@ restart_services() {
     
     cd "$PROJECT_ROOT"
     
-    # 检查服务是否运行
-    if docker-compose ps | grep -q "jenkins"; then
-        log_info "重启 Jenkins 服务..."
-        docker-compose restart jenkins
-    fi
-    
+    # 检查并重启 Nginx 服务
     if docker-compose ps | grep -q "nginx"; then
         log_info "重新加载 Nginx 配置..."
         docker-compose exec nginx nginx -s reload 2>/dev/null || {
@@ -237,17 +171,13 @@ verify_optimization() {
     if docker network inspect infra-network --format '{{.Internal}}' 2>/dev/null | grep -q "true"; then
         log_success "✓ 后端网络已设置为内部网络"
     else
-        log_warn "△ 后端网络内部设置需要确认"
+        log_warn "△ 后端网络内部设置需要确认（可能使用 overlay 网络）"
     fi
     
-    # 检查 Jenkins 访问
+    # 检查 Nginx 访问
     if curl -s -f "http://localhost/nginx-health" >/dev/null 2>&1; then
-        log_success "✓ Nginx 代理服务可访问"
-        
-        # 测试 Jenkins 代理
-        if curl -s -k "https://jenkins.local/login" >/dev/null 2>&1; then
-            log_success "✓ Jenkins 通过 Nginx 代理可访问"
-        else
+        log_success "✓ Nginx 服务可访问"
+    else
             log_warn "△ Jenkins 代理访问需要确认（可能需要配置 hosts）"
         fi
     else
@@ -259,29 +189,26 @@ verify_optimization() {
 show_access_info() {
     cat << EOF
 
-=== 网络优化后的访问信息 ===
+=== 网络优化信息 ===
 
-Jenkins CI/CD 平台:
-  - HTTPS: https://jenkins.local (推荐)
-  - HTTP:  http://jenkins.local (自动重定向到 HTTPS)
-  - Agent: localhost:50000 (构建节点连接)
-
-配置要求:
-  1. 在 /etc/hosts 中添加: 127.0.0.1 jenkins.local
-  2. 确保 SSL 证书配置正确
-  3. 防火墙允许 443 和 50000 端口
+网络配置:
+  - 网络名称: infra-network
+  - 网络类型: overlay (分布式部署)
+  - 加密支持: 已启用
 
 安全提升:
-  ✓ Jenkins Web 界面通过 HTTPS 访问
-  ✓ 后端服务完全隔离（无法直接从外部访问）
-  ✓ SSL 终结在 Nginx 层统一处理
-  ✓ 访问日志和安全头部统一管理
+  ✓ 后端服务网络隔离
+  ✓ 服务间通信加密
+  ✓ Nginx 统一网关管理
+  ✓ 访问日志和安全头部统一处理
 
 故障排除:
   - 检查服务状态: docker-compose ps
   - 查看 Nginx 日志: docker-compose logs nginx
-  - 查看 Jenkins 日志: docker-compose logs jenkins
-  - 测试代理配置: curl -k https://jenkins.local/login
+  - 检查网络状态: make network-status
+  - 网络诊断: make port-check
+
+注意: Jenkins 相关功能已弃用，项目已迁移至 GitHub Actions
 
 EOF
 }
@@ -289,7 +216,6 @@ EOF
 # 主函数
 main() {
     local backup_first=false
-    local apply_jenkins_only=false
     local apply_network_only=false
     local show_status=false
     local revert=false
@@ -304,10 +230,6 @@ main() {
                 ;;
             -b|--backup)
                 backup_first=true
-                shift
-                ;;
-            --apply-jenkins)
-                apply_jenkins_only=true
                 shift
                 ;;
             --apply-network)
@@ -352,13 +274,10 @@ main() {
         create_backup
     fi
     
-    if [[ "$apply_jenkins_only" == true ]]; then
-        apply_jenkins_optimization
-    elif [[ "$apply_network_only" == true ]]; then
+    if [[ "$apply_network_only" == true ]]; then
         apply_network_optimization
     else
         # 完整优化
-        apply_jenkins_optimization
         apply_network_optimization
     fi
     

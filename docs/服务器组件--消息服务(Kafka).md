@@ -92,8 +92,8 @@ docker exec kafka kafka-console-consumer --bootstrap-server localhost:9092 --top
 
 消息服务部署完成后，继续部署：
 
-1. [🔧 CI/CD服务](服务器组件--CI_CD(Jenkins).md) - 部署 Jenkins 平台
-2. [🌐 网关服务](服务器组件--网关(Nginx).md) - 部署 Nginx 网关
+1. [🌐 网关服务](服务器组件--网关(Nginx).md) - 部署 Nginx 网关
+2. [📬 NSQ 消息队列](服务器组件--消息队列(NSQ).md) - 部署 NSQ 实时消息平台
 
 ---
 
