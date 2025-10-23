@@ -268,16 +268,26 @@ show_status() {
     
     echo
     log_info "🌐 Docker 网络:"
-    if docker network ls --filter "name=infra-" --format "table {{.Name}}\t{{.Driver}}\t{{.Scope}}" | grep -q infra-; then
-        docker network ls --filter "name=infra-" --format "table {{.Name}}\t{{.Driver}}\t{{.Scope}}"
+    # 检查 infra-network 是否存在
+    if docker network inspect infra-network >/dev/null 2>&1; then
+        docker network ls --format "table {{.Name}}\t{{.Driver}}\t{{.Scope}}" | grep -E "NAME|infra-network"
+        # 显示网络详情
+        echo
+        local network_subnet=$(docker network inspect infra-network --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null)
+        local network_gateway=$(docker network inspect infra-network --format '{{range .IPAM.Config}}{{.Gateway}}{{end}}' 2>/dev/null)
+        local network_driver=$(docker network inspect infra-network --format '{{.Driver}}' 2>/dev/null)
+        echo "  子网: ${network_subnet:-未设置}"
+        echo "  网关: ${network_gateway:-未设置}"
+        echo "  驱动: ${network_driver}"
     else
-        echo "  ❌ 未找到 infra 相关网络"
+        echo "  ❌ infra-network 网络不存在"
     fi
     
     echo
     log_info "💾 数据卷:"
-    if docker volume ls --filter "name=infra_" --format "table {{.Name}}\t{{.Driver}}\t{{.Mountpoint}}" | grep -q infra_; then
-        docker volume ls --filter "name=infra_" --format "table {{.Name}}\t{{.Driver}}\t{{.Mountpoint}}"
+    # 使用更可靠的方式检查数据卷
+    if docker volume ls | grep -q "infra_"; then
+        docker volume ls --format "table {{.Name}}\t{{.Driver}}\t{{.Mountpoint}}" | grep -E "VOLUME NAME|infra_"
     else
         echo "  ❌ 未找到 infra 相关数据卷"
     fi
