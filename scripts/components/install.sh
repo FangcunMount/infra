@@ -146,7 +146,7 @@ check_infrastructure() {
         networks_exist=true
     fi
     
-    if docker volume inspect infra_mysql_data infra_redis_data >/dev/null 2>&1; then
+    if docker volume inspect infra_mysql_data infra_redis_cache_data infra_redis_auth_data >/dev/null 2>&1; then
         volumes_exist=true
     fi
     

@@ -57,6 +57,7 @@ profiles:
 ```
 
 然后正常启动：
+
 ```bash
 docker-compose up -d
 ```
@@ -78,18 +79,21 @@ http://127.0.0.1:5540
 ### 2. 远程访问（需修改配置）
 
 **修改 `.env` 文件**：
+
 ```bash
 # 允许外部访问
 REDISINSIGHT_PORT=0.0.0.0:5540
 ```
 
 **重启服务**：
+
 ```bash
 docker-compose --profile management restart redisinsight
 ```
 
 **访问地址**：
-```
+
+```text
 http://<ServerA_IP>:5540
 ```
 
@@ -171,6 +175,7 @@ http://<ServerA_IP>:5540
 
 1. 进入 `CLI` 标签
 2. 执行命令:
+
    ```redis
    INFO memory
    DBSIZE
@@ -196,12 +201,14 @@ SCAN 0 MATCH expired:* COUNT 1000
 ### 1. 网络隔离
 
 **生产环境**：
+
 ```bash
 # 仅允许本机访问
 REDISINSIGHT_PORT=127.0.0.1:5540
 ```
 
 **开发环境**：
+
 ```bash
 # 允许内网访问
 REDISINSIGHT_PORT=0.0.0.0:5540
@@ -235,16 +242,19 @@ Password: readonly_password
 ### 问题 1: 无法访问 5540 端口
 
 **检查容器状态**：
+
 ```bash
 docker ps | grep redisinsight
 ```
 
 **查看日志**：
+
 ```bash
 docker logs redisinsight --tail 50
 ```
 
 **检查端口绑定**：
+
 ```bash
 netstat -tuln | grep 5540
 ```
@@ -252,12 +262,14 @@ netstat -tuln | grep 5540
 ### 问题 2: 无法连接 Redis 实例
 
 **检查网络**：
+
 ```bash
 docker exec redisinsight ping redis-cache
 docker exec redisinsight ping redis-auth
 ```
 
 **测试连接**：
+
 ```bash
 docker exec redisinsight redis-cli -h redis-cache -p 6379 -a "${REDIS_CACHE_PASSWORD}" PING
 ```
@@ -265,11 +277,13 @@ docker exec redisinsight redis-cli -h redis-cache -p 6379 -a "${REDIS_CACHE_PASS
 ### 问题 3: 内存占用过高
 
 **限制内存**：
+
 ```yaml
 mem_limit: 256M  # 已配置
 ```
 
 **重启服务**：
+
 ```bash
 docker-compose --profile management restart redisinsight
 ```
@@ -292,21 +306,21 @@ docker-compose --profile management restart redisinsight
 ```makefile
 # 启动 RedisInsight
 redis-insight-start: ## 启动 RedisInsight 管理界面
-	@cd components/redis && docker-compose --profile management up -d redisinsight
-	$(call success_msg,RedisInsight 已启动: http://localhost:5540)
+ @cd components/redis && docker-compose --profile management up -d redisinsight
+ $(call success_msg,RedisInsight 已启动: http://localhost:5540)
 
 # 停止 RedisInsight
 redis-insight-stop: ## 停止 RedisInsight
-	@docker stop redisinsight 2>/dev/null || true
-	$(call success_msg,RedisInsight 已停止)
+ @docker stop redisinsight 2>/dev/null || true
+ $(call success_msg,RedisInsight 已停止)
 
 # 查看日志
 redis-insight-logs: ## 查看 RedisInsight 日志
-	@docker logs -f --tail=50 redisinsight
+ @docker logs -f --tail=50 redisinsight
 
 # 打开浏览器
 redis-insight-open: ## 打开 RedisInsight Web UI
-	@open http://localhost:5540 || echo "请手动打开: http://localhost:5540"
+ @open http://localhost:5540 || echo "请手动打开: http://localhost:5540"
 ```
 
 ---
@@ -314,16 +328,19 @@ redis-insight-open: ## 打开 RedisInsight Web UI
 ## 最佳实践
 
 ### 开发环境
+
 - ✅ 保持启动，方便调试
 - ✅ 允许外部访问（团队共享）
 - ✅ 使用默认密码连接
 
 ### 测试环境
+
 - ✅ 按需启动
 - ✅ 仅内网访问
 - ✅ 定期清理数据
 
 ### 生产环境
+
 - ⚠️ 仅在排查问题时启动
 - ⚠️ 仅本机访问或通过 VPN
 - ⚠️ 使用只读 ACL 用户
@@ -336,17 +353,20 @@ redis-insight-open: ## 打开 RedisInsight Web UI
 如果不需要图形界面，可以使用：
 
 ### 1. redis-cli（命令行）
+
 ```bash
 make redis-cache-cli
 make redis-auth-cli
 ```
 
 ### 2. 第三方工具
+
 - **RedisDesktopManager**: 桌面客户端
 - **Medis**: macOS 客户端
 - **AnotherRedisDesktopManager**: 开源客户端
 
 ### 3. 监控系统
+
 - **Prometheus + Grafana**: 生产级监控
 - **redis_exporter**: 指标导出
 
@@ -355,12 +375,14 @@ make redis-auth-cli
 ## 总结
 
 **优势**：
+
 - 🎯 官方工具，功能全面
 - 🚀 开箱即用，无需配置
 - 📊 实时监控，直观易用
 - 🔧 内置 CLI，方便调试
 
 **注意**：
+
 - ⚠️ 生产环境谨慎使用
 - ⚠️ 注意网络安全
 - ⚠️ 定期清理数据
