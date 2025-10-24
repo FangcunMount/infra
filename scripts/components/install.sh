@@ -496,15 +496,23 @@ install_component() {
         return 0
     fi
     
-    # 切换到指定用户执行（如果不是 root）
-    if [[ "$user" != "root" && "$(id -u)" == "0" ]]; then
-        log_info "切换到用户 $user 执行安装..."
-        
-        # 使用 sudo -u 切换用户
-        sudo -u "$user" "${compose_cmd[@]}" up -d "$component"
-    else
-        # 直接执行
+    # v2.1 安全模型: 执行 docker 命令的逻辑
+    # - root 用户: 直接执行
+    # - www 用户: 仅用于容器内运行，安装时应以 root 执行
+    # - 运维人员: 应使用 sudo docker (不应走到这里)
+    
+    if [[ "$(id -u)" == "0" ]]; then
+        # 以 root 身份执行（推荐在服务器上的方式）
+        log_info "以 root 用户执行 docker compose..."
         "${compose_cmd[@]}" up -d "$component"
+    elif groups "$(whoami)" 2>/dev/null | grep -q docker; then
+        # 当前用户在 docker 组中，可以直接执行
+        log_info "以当前用户执行 docker compose..."
+        "${compose_cmd[@]}" up -d "$component"
+    else
+        # 当前用户需要 sudo 权限
+        log_info "以 sudo 权限执行 docker compose..."
+        sudo "${compose_cmd[@]}" up -d "$component"
     fi
     
     # 等待服务启动（根据服务类型设置不同等待时间）
