@@ -302,26 +302,37 @@ configure_docker_users() {
     # 目标用户列表
     local users_to_add=()
     
-    # 添加 www 用户（如果存在）
-    if id -u www >/dev/null 2>&1; then
-        users_to_add+=("www")
-    fi
+    # ❌ 安全加固: 不将 www 添加到 docker 组
+    # www 是业务进程账户,不应该有 docker 组权限 (docker 组 = root 等价权限)
+    # 业务容器通过 user: "${WWW_UID}:${WWW_GID}" 以 www 用户运行,无需 docker 组
+    # if id -u www >/dev/null 2>&1; then
+    #     users_to_add+=("www")
+    # fi
     
-    # 添加当前登录用户（非 root）
-    if [[ -n "${SUDO_USER:-}" && "$SUDO_USER" != "root" ]]; then
-        users_to_add+=("$SUDO_USER")
-    fi
+    # ❌ 安全加固: 不自动将当前用户添加到 docker 组
+    # 运维人员应通过 sudo docker 操作容器,避免获得 root 等价权限
+    # if [[ -n "${SUDO_USER:-}" && "$SUDO_USER" != "root" ]]; then
+    #     users_to_add+=("$SUDO_USER")
+    # fi
     
-    # 添加用户到 docker 组
-    for user in "${users_to_add[@]}"; do
-        if ! groups "$user" 2>/dev/null | grep -q docker; then
-            log_info "将用户 $user 添加到 docker 组..."
-            usermod -aG docker "$user"
-            log_success "用户 $user 已添加到 docker 组"
-        else
-            log_info "用户 $user 已在 docker 组中"
-        fi
-    done
+    log_warn "安全策略: 不自动将用户添加到 docker 组"
+    log_info "运维人员请使用 'sudo docker' 命令操作容器"
+    log_info "理由: docker 组成员拥有 root 等价权限,违反最小权限原则"
+    
+    # 添加用户到 docker 组（仅在数组非空时执行）
+    if [[ ${#users_to_add[@]} -gt 0 ]]; then
+        for user in "${users_to_add[@]}"; do
+            if ! groups "$user" 2>/dev/null | grep -q docker; then
+                log_info "将用户 $user 添加到 docker 组..."
+                usermod -aG docker "$user"
+                log_success "用户 $user 已添加到 docker 组"
+            else
+                log_info "用户 $user 已在 docker 组中"
+            fi
+        done
+    else
+        log_info "无用户需要添加到 docker 组（遵循安全最佳实践）"
+    fi
     
     if [[ ${#users_to_add[@]} -gt 0 ]]; then
         log_warn "注意: 用户需要重新登录后才能使用 Docker 命令（无需 sudo）"
@@ -495,18 +506,16 @@ test_user_docker_permissions() {
     
     log_success "Docker 服务运行正常"
     
-    # 测试用户列表
+    # 测试用户列表（仅测试 root，其他用户不在 docker 组）
     local test_users=("root")
     
-    # 添加 www 用户（如果存在）
-    if id -u www >/dev/null 2>&1; then
-        test_users+=("www")
-    fi
+    # ❌ 不测试 www 和其他用户的 docker 权限
+    # 原因: 按照安全策略,这些用户不应该在 docker 组中
+    # www: 仅作为容器内运行用户,不需要 docker 命令权限
+    # 运维人员: 应使用 sudo docker 而非直接 docker 命令
     
-    # 添加当前登录用户（非 root）
-    if [[ -n "${SUDO_USER:-}" && "$SUDO_USER" != "root" ]]; then
-        test_users+=("$SUDO_USER")
-    fi
+    log_info "仅测试 root 用户的 Docker 权限"
+    log_info "其他用户应使用 'sudo docker' 命令"
     
     # 测试每个用户的权限
     for user in "${test_users[@]}"; do

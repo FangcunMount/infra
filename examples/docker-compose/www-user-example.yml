@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  # 业务应用示例 - 使用 www 用户运行
+  qs-api:
+    image: ghcr.io/yourorg/qs-api:1.2.3
+    container_name: qs-api
+    
+    # ★ 重要: 使用 www 用户的 UID/GID 运行容器
+    user: "${WWW_UID}:${WWW_GID}"
+    
+    # 环境变量
+    env_file: /opt/infra/.env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=mysql://user:pass@mysql:3306/db
+      - REDIS_URL=redis://redis:6379
+    
+    # 挂载目录 (必须设置为 www:www 权限)
+    volumes:
+      # 可写数据目录
+      - /srv/apps/qs-api/data:/var/lib/qs:rw
+      - /var/log/apps:/var/log/qs:rw
+      # 只读配置目录
+      - /srv/apps/qs-api/config:/etc/qs:ro
+    
+    # 端口映射
+    ports:
+      - "3000:3000"
+    
+    # 网络
+    networks:
+      - app-network
+      - infra-network
+    
+    # 安全配置
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE  # 如果需要绑定 < 1024 端口
+    security_opt:
+      - no-new-privileges:true
+    
+    # 重启策略
+    restart: unless-stopped
+    
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # 依赖服务
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Nginx 示例 - 方案 A: 使用官方镜像默认行为 (推荐)
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: nginx
+    
+    # 不设置 user,使用官方镜像默认行为 (root 启动后降权)
+    
+    ports:
+      - "80:80"
+      - "443:443"
+    
+    volumes:
+      - /srv/apps/nginx/conf.d:/etc/nginx/conf.d:ro
+      - /srv/apps/nginx/certs:/etc/nginx/certs:ro
+      - /srv/apps/static:/usr/share/nginx/html:ro
+    
+    networks:
+      - infra-network
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx 示例 - 方案 B: 使用 www 用户 + 非特权端口
+  nginx-www:
+    image: nginx:1.27-alpine
+    container_name: nginx-www
+    
+    # 使用 www 用户运行
+    user: "${WWW_UID}:${WWW_GID}"
+    
+    # 端口映射: 宿主机 80/443 → 容器 8080/8443
+    ports:
+      - "80:8080"
+      - "443:8443"
+    
+    volumes:
+      - /srv/apps/nginx-www/conf.d:/etc/nginx/conf.d:ro
+      - /srv/apps/nginx-www/certs:/etc/nginx/certs:ro
+      - /srv/apps/static:/usr/share/nginx/html:ro
+    
+    networks:
+      - infra-network
+    
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  app-network:
+    external: true
+  infra-network:
+    external: true

@@ -1,8 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 用户初始化脚本
-# 创建用户 www 和 yangshujie，设置密码、sudo 权限，为 www 创建 SSH 密钥对，配置 .bashrc
+# 用户初始化脚本 v2.1 (安全加固版)
+# 创建三种账户类型:
+# 1. yangshujie - 运维账户 (人用,可登录,有 sudo 权限,无 docker 组)
+# 2. deploy - CI/CD 账户 (仅供 GitHub Actions 使用,不可交互登录,无 docker 组)
+# 3. www - 业务进程账户 (仅服务,不可登录,无特殊权限)
+#
+# 安全原则:
+# - yangshujie 通过 sudo 进行 docker 操作,不进入 docker 组 (避免 root 等价)
+# - deploy 禁止交互登录,仅通过受限 SSH 执行白名单命令
+# - deploy 不在服务器上生成 GitHub SSH 密钥 (密钥由 GitHub Actions 管理)
+# - www 仅作为服务进程所有者,无任何特权
+#
+# 使用方式:
+#   sudo ./init-users.sh              # 交互式创建所有账户
+#   sudo ./init-users.sh --non-interactive  # 非交互式(CI环境)
 
 # 颜色定义
 RED='\033[0;31m'
@@ -10,6 +23,10 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# 全局变量
+NON_INTERACTIVE=false
+ENV_FILE="/opt/infra/.env"
 
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -104,16 +121,45 @@ check_dependencies() {
     log_success "所有必要命令检查通过"
 }
 
-# 创建用户
+# 创建普通用户 (可登录)
 create_user() {
     local user=$1
     if id -u "$user" >/dev/null 2>&1; then
         log_warn "用户 '$user' 已存在，跳过创建"
-    else
-        log_info "创建用户 '$user'..."
-        useradd -m -s /bin/bash "$user"
-        log_success "用户 '$user' 创建成功"
+        return 0
     fi
+    
+    log_info "创建用户 '$user' (可登录)..."
+    useradd -m -s /bin/bash "$user"
+    log_success "用户 '$user' 创建成功"
+}
+
+# 创建系统服务用户 (不可登录)
+create_system_user() {
+    local user=$1
+    local home_dir=$2
+    
+    if id -u "$user" >/dev/null 2>&1; then
+        log_warn "用户 '$user' 已存在，跳过创建"
+        return 0
+    fi
+    
+    log_info "创建系统服务用户 '$user' (不可登录)..."
+    
+    # 创建系统用户,不可登录
+    useradd --system --home "$home_dir" --shell /usr/sbin/nologin --user-group "$user"
+    
+    # 创建主目录(如果不存在)
+    if [[ ! -d "$home_dir" ]]; then
+        mkdir -p "$home_dir"
+        chown "$user:$user" "$home_dir"
+        chmod 755 "$home_dir"
+    fi
+    
+    log_success "系统用户 '$user' 创建成功"
+    log_info "  UID/GID: $(id -u $user)/$(id -g $user)"
+    log_info "  主目录: $home_dir"
+    log_info "  Shell: /usr/sbin/nologin (不可登录)"
 }
 
 # 验证密码强度
@@ -178,15 +224,29 @@ add_sudo_privilege() {
     # 添加到 sudo 组
     usermod -aG sudo "$user"
     
-    # 创建 sudoers 文件（可选，允许无密码 sudo）
-    # echo "$user ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/$user"
-    
     log_success "用户 '$user' 已获得 sudo 权限"
 }
 
-# 为 www 用户创建 SSH 密钥对
+# 添加 docker 权限
+add_docker_privilege() {
+    local user=$1
+    log_info "为用户 '$user' 添加 docker 权限..."
+    
+    # 检查 docker 组是否存在
+    if ! getent group docker >/dev/null 2>&1; then
+        log_warn "docker 组不存在，将在 Docker 安装后自动添加"
+        return 0
+    fi
+    
+    # 添加到 docker 组
+    usermod -aG docker "$user"
+    
+    log_success "用户 '$user' 已获得 docker 权限"
+}
+
+# 为用户创建 SSH 密钥对
 create_ssh_keys() {
-    local user="www"
+    local user=$1
     local home_dir="/home/$user"
     local ssh_dir="$home_dir/.ssh"
     local key_path="$ssh_dir/id_ed25519"
@@ -227,11 +287,59 @@ EOF
     chmod 600 "$ssh_dir/config"
     chown "$user:$user" "$ssh_dir/config"
     
-    log_info "SSH 公钥 (请复制到 GitHub Deploy Key):"
+    log_info "SSH 公钥 (用户: $user):"
     echo "----------------------------------------"
     cat "$key_path.pub"
     echo "----------------------------------------"
     log_info "SSH 配置文件已创建: $ssh_dir/config"
+}
+
+# 配置 www 用户的业务目录
+setup_www_directories() {
+    log_info "配置 www 用户的业务目录..."
+    
+    local www_uid=$(id -u www)
+    local www_gid=$(id -g www)
+    
+    # 创建业务数据目录
+    local dirs=(
+        "/var/www"         # www 主目录
+        "/srv/apps"        # 应用部署目录
+        "/var/log/apps"    # 应用日志目录
+    )
+    
+    for dir in "${dirs[@]}"; do
+        if [[ ! -d "$dir" ]]; then
+            mkdir -p "$dir"
+        fi
+        chown -R www:www "$dir"
+        chmod 750 "$dir"
+        log_success "创建并配置目录: $dir (www:www 750)"
+    done
+    
+    # 将 UID/GID 写入环境文件
+    if [[ ! -d "$(dirname $ENV_FILE)" ]]; then
+        mkdir -p "$(dirname $ENV_FILE)"
+    fi
+    
+    # 更新或添加 WWW_UID/WWW_GID
+    if [[ -f "$ENV_FILE" ]]; then
+        # 删除旧的定义
+        sed -i '/^WWW_UID=/d' "$ENV_FILE" 2>/dev/null || true
+        sed -i '/^WWW_GID=/d' "$ENV_FILE" 2>/dev/null || true
+    fi
+    
+    cat >> "$ENV_FILE" << EOF
+
+# www 用户 UID/GID (用于 Docker 容器)
+WWW_UID=$www_uid
+WWW_GID=$www_gid
+EOF
+    
+    log_success "www 用户 UID/GID 已写入: $ENV_FILE"
+    log_info "  WWW_UID=$www_uid"
+    log_info "  WWW_GID=$www_gid"
+    log_info "在 docker-compose.yml 中使用: user: \"\${WWW_UID}:\${WWW_GID}\""
 }
 
 # 配置用户 .bashrc 文件
@@ -431,12 +539,57 @@ setup_logging() {
     log_info "日志文件: $log_file"
 }
 
+# 解析命令行参数
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --non-interactive)
+                NON_INTERACTIVE=true
+                shift
+                ;;
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            *)
+                log_error "未知参数: $1"
+                show_help
+                exit 1
+                ;;
+        esac
+    done
+}
+
+# 显示帮助信息
+show_help() {
+    cat << EOF
+用户初始化脚本 v2.0
+
+用途:
+  创建三种账户类型:
+  1. yangshujie - 运维账户 (人用,可登录,有 sudo/docker 权限)
+  2. deploy - CI/CD 账户 (自动化部署,有 docker 权限,可登录)
+  3. www - 业务进程账户 (仅服务,不可登录,无特殊权限)
+
+使用方式:
+  sudo $0              # 交互式创建所有账户
+  sudo $0 --non-interactive  # 非交互式(CI环境,使用默认密码)
+
+选项:
+  --non-interactive    非交互模式(跳过密码设置和确认)
+  -h, --help          显示此帮助信息
+EOF
+}
+
 # 主函数
 main() {
     log_info "========================================"
-    log_info "用户环境初始化脚本开始执行"
+    log_info "用户环境初始化脚本 v2.0 开始执行"
     log_info "执行时间: $(date)"
     log_info "========================================"
+    
+    # 解析参数
+    parse_args "$@"
     
     # 初始检查
     check_root
@@ -444,42 +597,99 @@ main() {
     check_dependencies
     
     # 用户确认
-    echo
-    log_warn "此脚本将执行以下操作："
-    echo "  • 设置系统默认 Shell 为 bash"
-    echo "  • 配置 root 用户 .bashrc（会备份原文件）"
-    echo "  • 创建用户 www 和 yangshujie"
-    echo "  • 为用户设置密码和 sudo 权限"
-    echo "  • 为 www 用户生成 SSH 密钥对"
-    echo "  • 配置用户 .bashrc 和工作环境"
-    echo
-    read -p "确认继续执行？(y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        log_info "用户取消执行"
-        exit 0
+    if [[ "$NON_INTERACTIVE" != true ]]; then
+        echo
+        log_warn "此脚本将执行以下操作："
+        echo "  • 设置系统默认 Shell 为 bash"
+        echo "  • 配置 root 用户 .bashrc（会备份原文件）"
+        echo
+        echo "  账户类型 1: yangshujie (运维账户)"
+        echo "    - 可登录 SSH"
+        echo "    - sudo 权限 (系统管理)"
+        echo "    - ❌ 不进入 docker 组 (避免 root 等价权限)"
+        echo "    - 使用 'sudo docker' 操作容器"
+        echo "    - 配置 .bashrc 和工作环境"
+        echo
+        echo "  账户类型 2: deploy (CI/CD 账户) - 安全加固"
+        echo "    - ❌ 禁止交互登录 (Shell: /usr/sbin/nologin)"
+        echo "    - ❌ 密码已锁定 (passwd -l)"
+        echo "    - ❌ 不进入 docker 组 (CI 不应有 root 等价权限)"
+        echo "    - ❌ 不生成 GitHub SSH 密钥 (由 GitHub Actions 管理)"
+        echo "    - 仅通过受限 SSH 执行白名单命令"
+        echo
+        echo "  账户类型 3: www (业务进程账户)"
+        echo "    - 不可登录 (Shell: /usr/sbin/nologin)"
+        echo "    - 无 sudo/docker 权限"
+        echo "    - 用于运行业务进程和容器"
+        echo "    - 创建业务目录: /var/www, /srv/apps, /var/log/apps"
+        echo "    - 导出 WWW_UID/WWW_GID 到 $ENV_FILE"
+        echo
+        read -p "确认继续执行？(y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "用户取消执行"
+            exit 0
+        fi
     fi
     
     setup_logging
     
     # 0. 设置系统默认 Shell 和配置 root
+    log_info "========================================"
+    log_info "步骤 1: 配置系统环境"
+    log_info "========================================"
     set_default_shell
     setup_root_bashrc
     
-    # 1. 创建用户
-    create_user "www"
+    # 1. 创建 yangshujie (运维账户)
+    log_info "========================================"
+    log_info "步骤 2: 创建 yangshujie (运维账户)"
+    log_info "========================================"
     create_user "yangshujie"
-    
-    # 2. 设置密码
-    set_user_password "www"
-    set_user_password "yangshujie"
-    
-    # 3. 添加 sudo 权限
-    add_sudo_privilege "www"
+    if [[ "$NON_INTERACTIVE" != true ]]; then
+        set_user_password "yangshujie"
+    else
+        log_warn "非交互模式: 跳过 yangshujie 密码设置"
+    fi
     add_sudo_privilege "yangshujie"
+    # ❌ 安全加固: 不将 yangshujie 加入 docker 组 (docker 组 = root 等价权限)
+    # yangshujie 应通过 sudo docker 命令操作容器,避免获得 root 等价权限
+    # add_docker_privilege "yangshujie"
+    setup_user_bashrc "yangshujie"
     
-    # 4. 为 www 用户创建 SSH 密钥对
-    create_ssh_keys
+    # 2. 创建 deploy (CI/CD 账户)
+    log_info "========================================"
+    log_info "步骤 3: 创建 deploy (CI/CD 账户)"
+    log_info "========================================"
+    create_user "deploy"
+    if [[ "$NON_INTERACTIVE" != true ]]; then
+        set_user_password "deploy"
+    else
+        log_warn "非交互模式: 跳过 deploy 密码设置"
+    fi
+    
+    # ❌ 安全加固: deploy 不进入 docker 组,不在服务器上生成 GitHub SSH 密钥
+    # 理由:
+    # 1. docker 组 = root 等价权限,不应给 CI 账号
+    # 2. deploy 的 SSH 密钥应由 GitHub Actions 管理,不在服务器上生成
+    # 3. deploy 应通过受限 SSH 执行白名单命令,而非直接操作 Docker
+    # add_docker_privilege "deploy"
+    # create_ssh_keys "deploy"
+    
+    # 禁止 deploy 交互登录 (CI 账号不应该有交互式 shell)
+    log_info "禁止 deploy 交互登录..."
+    usermod -s /usr/sbin/nologin deploy
+    passwd -l deploy  # 锁定密码
+    log_success "deploy 已设置为不可交互登录"
+    
+    setup_user_bashrc "deploy"
+    
+    # 3. 创建 www (系统服务账户)
+    log_info "========================================"
+    log_info "步骤 4: 创建 www (业务进程账户)"
+    log_info "========================================"
+    create_system_user "www" "/var/www"
+    setup_www_directories
     
 # 验证用户配置
 verify_user_setup() {
@@ -492,6 +702,7 @@ verify_user_setup() {
     if ! id "$user" >/dev/null 2>&1; then
         log_error "用户 '$user' 不存在"
         ((errors++))
+        return $errors
     fi
     
     # 检查用户主目录
@@ -512,14 +723,25 @@ verify_user_setup() {
         ((errors++))
     fi
     
-    # 检查 sudo 权限
-    if ! groups "$user" | grep -q sudo; then
-        log_error "用户 '$user' 没有 sudo 权限"
-        ((errors++))
+    # 检查 yangshujie 的 sudo 权限
+    if [[ "$user" == "yangshujie" ]]; then
+        if ! groups "$user" | grep -q sudo; then
+            log_error "用户 '$user' 没有 sudo 权限"
+            ((errors++))
+        fi
     fi
     
-    # 检查 SSH 密钥 (仅对 www 用户)
-    if [[ "$user" == "www" ]]; then
+    # 检查 yangshujie 和 deploy 的 docker 权限
+    if [[ "$user" == "yangshujie" ]] || [[ "$user" == "deploy" ]]; then
+        if getent group docker >/dev/null 2>&1; then
+            if ! groups "$user" | grep -q docker; then
+                log_warn "用户 '$user' 没有 docker 权限 (可能 Docker 尚未安装)"
+            fi
+        fi
+    fi
+    
+    # 检查 deploy 的 SSH 密钥
+    if [[ "$user" == "deploy" ]]; then
         if [[ ! -f "/home/$user/.ssh/id_ed25519" ]]; then
             log_error "用户 '$user' SSH 私钥不存在"
             ((errors++))
@@ -539,32 +761,147 @@ verify_user_setup() {
     return $errors
 }
 
-    # 5. 配置 .bashrc 文件
-    setup_user_bashrc "www"
-    setup_user_bashrc "yangshujie"
     
-    # 6. 验证配置
+    # 4. 验证配置
     log_info "========================================"
-    log_info "验证用户配置..."
+    log_info "步骤 5: 验证用户配置"
     log_info "========================================"
-    verify_user_setup "www"
     verify_user_setup "yangshujie"
+    verify_user_setup "deploy"
+    verify_system_user_setup "www"
     
+    # 5. 显示总结
     echo
+    log_success "========================================"
     log_success "用户环境初始化完成！"
-    log_info "完成的配置："
-    echo "  ✅ 设置系统默认 Shell 为 bash"
-    echo "  ✅ 配置 root 用户 .bashrc（已备份原文件）"
-    echo "  ✅ 创建用户 www 和 yangshujie"
-    echo "  ✅ 为用户设置密码和 sudo 权限"
-    echo "  ✅ 为 www 用户生成 SSH 密钥对"
-    echo "  ✅ 配置用户 .bashrc 和工作目录"
+    log_success "========================================"
     echo
-    log_info "下一步操作："
-    echo "  1. 将 www 用户的 SSH 公钥添加到 GitHub Deploy Key"
-    echo "  2. 使用新用户登录测试: su - www 或 su - yangshujie"
-    echo "  3. 验证 workspace 目录和环境变量是否正确"
-    echo "  4. 重新登录以应用新的 .bashrc 配置"
+    log_info "✅ 完成的配置:"
+    echo
+    echo "  系统配置:"
+    echo "    • 设置系统默认 Shell 为 bash"
+    echo "    • 配置 root 用户 .bashrc（已备份原文件）"
+    echo
+    echo "  账户 1: yangshujie (运维账户) - 安全加固版"
+    echo "    • 用户类型: 可登录用户"
+    echo "    • 权限: sudo (系统管理)"
+    echo "    • ❌ 不在 docker 组 (避免 root 等价权限)"
+    echo "    • Docker 操作: 使用 'sudo docker' 命令"
+    echo "    • 用途: 日常运维和系统管理"
+    echo "    • 登录测试: su - yangshujie"
+    echo
+    echo "  账户 2: deploy (CI/CD 账户) - 安全加固版"
+    echo "    • 用户类型: 系统用户 (禁止交互登录)"
+    echo "    • Shell: /usr/sbin/nologin"
+    echo "    • 密码: 已锁定 (passwd -l)"
+    echo "    • ❌ 不在 docker 组 (CI 不应有 root 等价权限)"
+    echo "    • ❌ 未生成 SSH 密钥 (由 GitHub Actions 管理)"
+    echo "    • 用途: 仅供 GitHub Actions 通过受限 SSH 使用"
+    echo "    • 登录测试: su - deploy (预期失败: This account is currently not available)"
+    echo
+    echo "  账户 3: www (业务进程账户)"
+    echo "    • 用户类型: 系统用户 (不可登录)"
+    echo "    • Shell: /usr/sbin/nologin"
+    echo "    • UID/GID: $(id -u www)/$(id -g www)"
+    echo "    • 业务目录: /var/www, /srv/apps, /var/log/apps"
+    echo "    • 用途: 运行业务进程和容器"
+    echo "    • 环境文件: $ENV_FILE"
+    echo
+    log_info "📝 下一步操作 (必需):"
+    echo
+    echo "  1. 🔐 配置 deploy 的受限 SSH (用于 CI/CD):"
+    echo "     # 在本地生成 SSH 密钥对"
+    echo "     ssh-keygen -t ed25519 -C \"github-actions@deploy\" -f ~/.ssh/deploy_key"
+    echo
+    echo "     # 在服务器上配置受限 SSH"
+    echo "     sudo ./scripts/server/setup-deploy-ssh.sh \"\$(cat ~/.ssh/deploy_key.pub)\""
+    echo
+    echo "     详细步骤: docs/server/github-actions-deploy.md"
+    echo
+    echo "  2. 🐳 运维人员使用 Docker:"
+    echo "     sudo docker ps                # 查看容器"
+    echo "     sudo docker compose up -d     # 启动服务"
+    echo "     make mysql-start              # Makefile 命令（内部自动使用 sudo）"
+    echo
+    echo "  3. 📦 业务容器使用 www 用户:"
+    echo "     services:"
+    echo "       app:"
+    echo "         user: \"\${WWW_UID}:\${WWW_GID}\""
+    echo "         env_file: /opt/infra/.env"
+    echo
+    echo "  4. 🔍 验证安全配置:"
+    echo "     groups yangshujie  # 预期: yangshujie sudo (无 docker)"
+    echo "     groups deploy      # 预期: deploy (无 docker)"
+    echo "     groups www         # 预期: www (无任何特权组)"
+    echo
+    log_info "⚠️  重要安全提醒:"
+    echo
+    echo "  ❌ 不要将 yangshujie 加入 docker 组 (docker 组 = root 等价权限)"
+    echo "  ✅ 使用 'sudo docker' 命令操作容器 (有审计、需密码)"
+    echo
+    echo "  ❌ 不要让 deploy 可以交互登录 (已禁用)"
+    echo "  ✅ deploy 仅通过受限 SSH + 白名单命令使用"
+    echo
+    echo "  ❌ 不要在服务器上给 deploy 生成 GitHub SSH 密钥"
+    echo "  ✅ 密钥在 GitHub Secrets 中管理，服务器只有公钥"
+    echo
+    log_info "📖 详细文档:"
+    echo
+    echo "  • 安全加固说明: docs/server/user-security-hardening.md"
+    echo "  • GitHub Actions 集成: docs/server/github-actions-deploy.md"
+    echo "  • 快速参考: docs/server/SECURITY_QUICKREF.md"
+    echo "  • www 用户指南: docs/server/www-user-guide.md"
+}
+
+# 验证系统用户配置
+verify_system_user_setup() {
+    local user=$1
+    local errors=0
+    
+    log_info "验证系统用户 '$user' 的配置..."
+    
+    # 检查用户是否存在
+    if ! id "$user" >/dev/null 2>&1; then
+        log_error "用户 '$user' 不存在"
+        ((errors++))
+    fi
+    
+    # 检查 Shell 是否为 nologin
+    local user_shell=$(getent passwd "$user" | cut -d: -f7)
+    if [[ "$user_shell" != "/usr/sbin/nologin" ]]; then
+        log_warn "用户 '$user' Shell 不是 /usr/sbin/nologin (当前: $user_shell)"
+    fi
+    
+    # 检查业务目录
+    local dirs=("/var/www" "/srv/apps" "/var/log/apps")
+    for dir in "${dirs[@]}"; do
+        if [[ ! -d "$dir" ]]; then
+            log_error "目录不存在: $dir"
+            ((errors++))
+        else
+            local owner=$(stat -c '%U:%G' "$dir" 2>/dev/null || stat -f '%Su:%Sg' "$dir" 2>/dev/null)
+            if [[ "$owner" != "$user:$user" ]]; then
+                log_warn "目录 $dir 所有者不正确 (应为 $user:$user, 当前: $owner)"
+            fi
+        fi
+    done
+    
+    # 检查环境文件
+    if [[ ! -f "$ENV_FILE" ]]; then
+        log_error "环境文件不存在: $ENV_FILE"
+        ((errors++))
+    elif ! grep -q "^WWW_UID=" "$ENV_FILE"; then
+        log_error "环境文件缺少 WWW_UID: $ENV_FILE"
+        ((errors++))
+    fi
+    
+    if [[ $errors -eq 0 ]]; then
+        log_success "系统用户 '$user' 配置验证通过"
+    else
+        log_warn "系统用户 '$user' 配置验证发现 $errors 个问题"
+    fi
+    
+    return $errors
 }
 
 # 执行主函数

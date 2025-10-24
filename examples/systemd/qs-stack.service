@@ -1,0 +1,28 @@
+[Unit]
+Description=QS Application Stack (Docker Compose)
+Documentation=https://github.com/yourorg/qs
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/srv/apps/qs
+EnvironmentFile=/opt/infra/.env
+
+# 启动
+ExecStart=/usr/bin/docker compose up -d
+
+# 停止
+ExecStop=/usr/bin/docker compose down
+
+# 重载配置
+ExecReload=/usr/bin/docker compose up -d --force-recreate
+
+# 超时时间
+TimeoutStartSec=300
+TimeoutStopSec=120
+
+[Install]
+WantedBy=multi-user.target

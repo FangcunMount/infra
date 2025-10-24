@@ -128,6 +128,7 @@ help: ## 显示帮助信息
 	@echo "  $(CYAN)troubleshoot$(RESET)         运行故障诊断"
 	@echo ""
 	@echo "$(BLUE)模块命令:$(RESET)"
+	@echo "  0. 服务器初始化: $(CYAN)server-init-users, server-install-docker$(RESET)"
 	@echo "  1. 快速开始: $(CYAN)init, install, up, down, restart$(RESET)"
 	@echo "  2. 环境管理: $(CYAN)env-init, env-edit, dev, prod$(RESET)"
 	@echo "  3. 服务管理: $(CYAN)<service>-start/stop/logs/shell$(RESET)"
@@ -148,19 +149,22 @@ help-all: ## 显示所有命令详情
 	$(call section_title,完整命令列表)
 	@awk 'BEGIN { \
 		FS = ":.*?## "; \
-		module_order[1] = "1. 快速开始"; \
-		module_order[2] = "2. 环境管理"; \
-		module_order[3] = "3. 服务管理 - MySQL"; \
-		module_order[4] = "3. 服务管理 - Redis"; \
-		module_order[5] = "3. 服务管理 - MongoDB"; \
-		module_order[6] = "3. 服务管理 - Kafka"; \
-		module_order[8] = "4. 网络管理"; \
-		module_order[9] = "5. SSL 证书"; \
-		module_order[10] = "6. Nginx"; \
-		module_order[11] = "7. 监控诊断"; \
-		module_order[12] = "8. 测试验证"; \
-		module_order[13] = "9. 维护清理"; \
-		module_order[14] = "10. 帮助文档"; \
+		module_order[1] = "0. 服务器初始化"; \
+		module_order[2] = "1. 快速开始"; \
+		module_order[3] = "2. 环境管理"; \
+		module_order[4] = "3. 服务管理 - MySQL"; \
+		module_order[5] = "3. 服务管理 - Redis"; \
+		module_order[6] = "3. 服务管理 - MongoDB"; \
+		module_order[7] = "3. 服务管理 - Kafka"; \
+		module_order[8] = "3. 服务管理 - NSQ"; \
+		module_order[9] = "4. 网络管理"; \
+		module_order[10] = "5. SSL 证书"; \
+		module_order[11] = "6. Nginx"; \
+		module_order[12] = "7. 监控诊断"; \
+		module_order[13] = "8. 测试验证"; \
+		module_order[14] = "9. 维护清理"; \
+		module_order[15] = "10. 帮助文档"; \
+		modules["0. 服务器初始化"] = "^server-"; \
 		modules["1. 快速开始"] = "^(check-env|check-scripts|init$$|init-infra|reset|clean-infra|install$$|install-nginx|install-mysql|install-redis|install-mongo|install-kafka|install-nsq|up$$|down$$|restart$$|status$$|ps$$|health|quick-start|full-install|dev-setup|prod-setup)"; \
 		modules["2. 环境管理"] = "^(dev$$|prod$$|env-init|env-copy|env-edit|env-show|config-show|config-validate)"; \
 		modules["3. 服务管理 - MySQL"] = "^mysql-"; \
@@ -223,6 +227,26 @@ check-scripts: ## 检查必要脚本
 	done
 	$(call success_msg,脚本检查通过)
 
+# ==============================================================================
+# 服务器初始化
+# ==============================================================================
+.PHONY: server-init-users server-install-docker server-setup-deploy-ssh
+server-init-users: ## 初始化服务器用户账户 (yangshujie/deploy/www)
+	@echo "$(BLUE)ℹ️  初始化服务器用户账户...$(RESET)"
+	@sudo bash $(SERVER_SCRIPTS)/init-users.sh
+
+server-install-docker: ## 安装 Docker Engine 和 Docker Compose
+	@echo "$(BLUE)ℹ️  安装 Docker...$(RESET)"
+	@sudo bash $(SERVER_SCRIPTS)/install-docker.sh
+
+server-setup-deploy-ssh: ## 配置 deploy 的受限 SSH (需要提供 CI_PUBLIC_KEY)
+	$(call require_param,CI_PUBLIC_KEY,make server-setup-deploy-ssh CI_PUBLIC_KEY="ssh-ed25519 AAA...")
+	@echo "$(BLUE)ℹ️  配置 deploy 受限 SSH...$(RESET)"
+	@sudo bash $(SERVER_SCRIPTS)/setup-deploy-ssh.sh "$(CI_PUBLIC_KEY)"
+
+# ==============================================================================
+# 基础设施初始化
+# ==============================================================================
 .PHONY: init init-infra reset clean-infra
 init: check-scripts init-infra ## 完整初始化 (网络+卷)
 	$(call success_msg,基础设施初始化完成)

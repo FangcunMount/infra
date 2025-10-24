@@ -1,0 +1,39 @@
+[Unit]
+Description=QS API Service
+Documentation=https://github.com/yourorg/qs-api
+After=network.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www
+Group=www
+WorkingDirectory=/srv/apps/qs-api
+
+# 环境变量
+Environment="NODE_ENV=production"
+Environment="PORT=3000"
+EnvironmentFile=/opt/infra/.env
+
+# 启动命令
+ExecStart=/usr/local/bin/qs-api --config /etc/qs/config.yaml
+
+# 重启策略
+Restart=on-failure
+RestartSec=5s
+StartLimitInterval=300s
+StartLimitBurst=5
+
+# 安全加固
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/var/log/apps /srv/apps/qs-api/data
+
+# 资源限制
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target
