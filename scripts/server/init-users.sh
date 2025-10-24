@@ -731,25 +731,33 @@ verify_user_setup() {
         fi
     fi
     
-    # 检查 yangshujie 和 deploy 的 docker 权限
+    # v2.1 安全模型: yangshujie 和 deploy 都不应该在 docker 组
+    # yangshujie 使用 'sudo docker', deploy 通过受限 SSH 执行白名单命令
     if [[ "$user" == "yangshujie" ]] || [[ "$user" == "deploy" ]]; then
         if getent group docker >/dev/null 2>&1; then
-            if ! groups "$user" | grep -q docker; then
-                log_warn "用户 '$user' 没有 docker 权限 (可能 Docker 尚未安装)"
+            if groups "$user" | grep -q docker; then
+                log_warn "警告: 用户 '$user' 在 docker 组 (不符合安全最佳实践)"
+                log_warn "  建议移除: sudo gpasswd -d $user docker"
             fi
         fi
     fi
     
-    # 检查 deploy 的 SSH 密钥
+    # 检查 deploy 的安全配置
     if [[ "$user" == "deploy" ]]; then
-        if [[ ! -f "/home/$user/.ssh/id_ed25519" ]]; then
-            log_error "用户 '$user' SSH 私钥不存在"
-            ((errors++))
+        # 检查是否禁止交互登录
+        deploy_shell=$(getent passwd deploy | cut -d: -f7)
+        if [[ "$deploy_shell" != "/usr/sbin/nologin" ]]; then
+            log_warn "警告: deploy 账户 Shell 应为 /usr/sbin/nologin (当前: $deploy_shell)"
         fi
-        if [[ ! -f "/home/$user/.ssh/id_ed25519.pub" ]]; then
-            log_error "用户 '$user' SSH 公钥不存在"
-            ((errors++))
+        
+        # 检查密码是否锁定
+        if passwd -S deploy 2>/dev/null | grep -q "^deploy P"; then
+            log_warn "警告: deploy 账户密码未锁定，建议执行: sudo passwd -l deploy"
         fi
+        
+        # SSH 密钥由 GitHub Actions 管理，不在服务器上生成
+        log_info "  deploy SSH 密钥由 GitHub Actions Secrets 管理"
+        log_info "  访问通过 setup-deploy-ssh.sh 配置受限 SSH"
     fi
     
     if [[ $errors -eq 0 ]]; then

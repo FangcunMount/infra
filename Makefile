@@ -230,10 +230,14 @@ check-scripts: ## 检查必要脚本
 # ==============================================================================
 # 服务器初始化
 # ==============================================================================
-.PHONY: server-init-users server-install-docker server-setup-deploy-ssh
+.PHONY: server-init-users server-install-docker server-setup-deploy-ssh server-reset-users
 server-init-users: ## 初始化服务器用户账户 (yangshujie/deploy/www)
 	@echo "$(BLUE)ℹ️  初始化服务器用户账户...$(RESET)"
 	@sudo bash $(SERVER_SCRIPTS)/init-users.sh
+
+server-reset-users: ## 重置所有服务器用户 (删除 yangshujie/deploy/www)
+	@echo "$(RED)⚠️  重置服务器用户账户...$(RESET)"
+	@sudo bash $(SERVER_SCRIPTS)/reset-users.sh
 
 server-install-docker: ## 安装 Docker Engine 和 Docker Compose
 	@echo "$(BLUE)ℹ️  安装 Docker...$(RESET)"
