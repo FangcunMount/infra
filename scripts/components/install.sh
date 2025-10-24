@@ -179,11 +179,28 @@ check_user() {
         return 1
     fi
     
-    # 检查用户是否在 docker 组中
+    # v2.1 安全模型: www 用户不应该在 docker 组中
+    # www 是业务进程账户，仅作为容器内运行用户，不需要 docker 命令权限
+    # 容器通过 user: "${WWW_UID}:${WWW_GID}" 以 www 用户身份运行
+    if [[ "$user" == "www" ]]; then
+        log_info "用户 www 是系统用户，用于容器内运行"
+        log_info "无需 docker 组权限（遵循安全最佳实践）"
+        log_success "用户 $user 权限检查通过"
+        return 0
+    fi
+    
+    # 对于其他用户（如运维人员），检查是否在 docker 组中或有 sudo 权限
     if ! groups "$user" 2>/dev/null | grep -q docker; then
-        log_error "用户 $user 不在 docker 组中"
-        log_info "请运行: sudo usermod -aG docker $user"
-        return 1
+        # 检查是否有 sudo 权限
+        if groups "$user" 2>/dev/null | grep -q sudo; then
+            log_info "用户 $user 有 sudo 权限，可使用 'sudo docker' 命令"
+            log_success "用户 $user 权限检查通过"
+            return 0
+        else
+            log_error "用户 $user 既不在 docker 组也没有 sudo 权限"
+            log_info "建议: 使用 'sudo docker' 命令或以 root 身份运行"
+            return 1
+        fi
     fi
     
     log_success "用户 $user 权限检查通过"

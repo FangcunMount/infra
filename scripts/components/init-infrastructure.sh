@@ -31,8 +31,9 @@ INFRA_BACKEND_GATEWAY="${INFRA_BACKEND_GATEWAY:-172.20.0.1}"
 INFRA_NETWORK_MTU="${INFRA_NETWORK_MTU:-1500}"
 
 # 用户配置
-INFRA_USER="${INFRA_USER:-$USER}"
-INFRA_GROUP="${INFRA_GROUP:-docker}"
+# v2.1 安全模型: 使用 www 用户和组，不使用 docker 组
+INFRA_USER="${INFRA_USER:-www}"
+INFRA_GROUP="${INFRA_GROUP:-www}"
 
 # 验证配置
 validate_config() {
@@ -169,15 +170,18 @@ create_volumes() {
         sudo mkdir -p "${INFRA_DATA_ROOT}"/redis/{cache,auth,insight}/{data,conf} 2>/dev/null || true
         sudo mkdir -p "${INFRA_LOG_ROOT}"/{mysql,mongodb,nginx,kafka} 2>/dev/null || true
         
-        # 设置目录所有权，优先尝试 docker 组
-        if getent group docker >/dev/null 2>&1; then
+        # 设置目录所有权为 www:www（v2.1 安全模型）
+        # www 用户用于容器内运行，不需要 docker 组权限
+        if id -u "${INFRA_USER}" >/dev/null 2>&1; then
             sudo chown -R "${INFRA_USER}:${INFRA_GROUP}" "${INFRA_DATA_ROOT}" 2>/dev/null || \
             sudo chown -R "${INFRA_USER}:${INFRA_USER}" "${INFRA_DATA_ROOT}"
             sudo chown -R "${INFRA_USER}:${INFRA_GROUP}" "${INFRA_LOG_ROOT}" 2>/dev/null || \
             sudo chown -R "${INFRA_USER}:${INFRA_USER}" "${INFRA_LOG_ROOT}"
+            log_info "目录所有权: ${INFRA_USER}:${INFRA_GROUP}"
         else
-            sudo chown -R "${INFRA_USER}:${INFRA_USER}" "${INFRA_DATA_ROOT}"
-            sudo chown -R "${INFRA_USER}:${INFRA_USER}" "${INFRA_LOG_ROOT}"
+            log_warn "用户 ${INFRA_USER} 不存在，使用 root 权限"
+            sudo chown -R root:root "${INFRA_DATA_ROOT}"
+            sudo chown -R root:root "${INFRA_LOG_ROOT}"
         fi
         
         sudo chmod -R 755 "${INFRA_DATA_ROOT}"
