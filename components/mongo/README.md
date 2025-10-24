@@ -28,7 +28,7 @@
 
 ### 内存分配策略
 
-```
+```text
 总内存 4GB
 ├── 系统保留     ~800MB  (20%)
 ├── Nginx        128MB   (3%)
@@ -160,6 +160,7 @@ db.createUser({
 ```
 
 **角色说明**:
+
 - `read`: 只读权限
 - `readWrite`: 读写权限（推荐业务应用使用）
 - `dbAdmin`: 数据库管理（索引、统计等）
@@ -171,6 +172,7 @@ db.createUser({
 ✅ `bindIp: 0.0.0.0` 在容器内，由 Docker 限制外部访问
 
 **如需公网访问**:
+
 1. 配置防火墙白名单（iptables/firewalld）
 2. 使用 VPN 或 Wireguard
 3. 配置 TLS/SSL 加密连接
@@ -216,6 +218,7 @@ bash scripts/components/backup-mongo.sh
 ```
 
 **备份特性**:
+
 - 使用 `mongodump --gzip` 压缩
 - 保留最近 7 天备份
 - 自动生成备份元数据
@@ -346,6 +349,7 @@ db.collection.createIndex({field: 1}, {background: true})
 ```
 
 **索引建议**:
+
 - 频繁查询的字段必须建索引
 - 复合索引遵循 ESR 原则（Equality、Sort、Range）
 - 避免过多索引（写入性能下降）
@@ -418,11 +422,13 @@ docker compose restart
 ### 5. 文档设计优化
 
 **避免**:
+
 - 超大文档（> 16MB 限制）
 - 深层嵌套（> 100 层）
 - 无界数组（持续增长的数组字段）
 
 **推荐**:
+
 - 合理的文档大小（< 1MB）
 - 适度反规范化（减少 join）
 - 使用引用代替嵌入（大对象）

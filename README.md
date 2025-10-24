@@ -20,6 +20,14 @@
 - [🌐 网络环境配置](docs/网络管理/服务器初始化--网络环境.md) - VPN代理、防火墙、网络优化
 - [🐳 Docker 安装配置](docs/服务器初始化--docker.md) - Docker环境安装和配置优化
 
+### 🔒 安全策略 ⭐ 重要
+
+- [🔐 用户权限安全加固 (v2.1)](docs/server/user-security-hardening.md) - **必读**：docker 组权限风险与修复
+- [🤖 GitHub Actions 部署指南](docs/server/github-actions-deploy.md) - deploy 账户受限 SSH 与 CI/CD 集成
+- [� www 用户使用指南](docs/server/www-user-guide.md) - 业务应用容器的用户配置
+- [📋 容器用户策略说明](docs/server/container-user-strategy.md) - 基础设施 vs 业务应用的用户区别
+- [✅ 容器用户配置检查清单](docs/operations/container-user-checklist.md) - 所有组件的用户配置审查结果
+
 ### � 网络管理 ⭐ 重要
 
 - [📖 网络管理完整指南](docs/网络管理/网络管理完整指南.md) - 业务网络创建、Makefile命令、故障排查
