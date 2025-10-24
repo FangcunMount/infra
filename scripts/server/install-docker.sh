@@ -238,19 +238,52 @@ add_docker_repository() {
     # 删除旧密钥文件（如果存在）
     rm -f /etc/apt/keyrings/docker.gpg /usr/share/keyrings/docker-archive-keyring.gpg
     
+    # 优先使用国内镜像源（适配中国大陆网络环境）
+    # 镜像源优先级: 1. 阿里云  2. 清华大学  3. Docker 官方
+    local docker_mirror_url=""
+    local docker_gpg_url=""
+    
+    log_info "检测最佳 Docker 镜像源..."
+    
+    # 尝试阿里云镜像
+    if curl -fsSL --connect-timeout 5 https://mirrors.aliyun.com/docker-ce/linux/$OS_ID/gpg >/dev/null 2>&1; then
+        docker_mirror_url="https://mirrors.aliyun.com/docker-ce"
+        docker_gpg_url="https://mirrors.aliyun.com/docker-ce/linux/$OS_ID/gpg"
+        log_info "使用阿里云镜像源 (国内优化)"
+    # 尝试清华大学镜像
+    elif curl -fsSL --connect-timeout 5 https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/$OS_ID/gpg >/dev/null 2>&1; then
+        docker_mirror_url="https://mirrors.tuna.tsinghua.edu.cn/docker-ce"
+        docker_gpg_url="https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/$OS_ID/gpg"
+        log_info "使用清华大学镜像源 (国内优化)"
+    # 使用 Docker 官方源
+    else
+        docker_mirror_url="https://download.docker.com"
+        docker_gpg_url="https://download.docker.com/linux/$OS_ID/gpg"
+        log_warn "使用 Docker 官方源 (国外网络可能较慢)"
+    fi
+    
     # 添加 Docker GPG 密钥
     log_info "添加 Docker GPG 密钥..."
-    curl -fsSL https://download.docker.com/linux/$OS_ID/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    if ! curl -fsSL "$docker_gpg_url" | gpg --dearmor -o /etc/apt/keyrings/docker.gpg; then
+        log_error "下载 GPG 密钥失败"
+        log_info "可能的原因："
+        log_info "  1. 网络连接问题（检查防火墙/代理设置）"
+        log_info "  2. 镜像源暂时不可用"
+        log_info "解决方案："
+        log_info "  1. 配置 VPN 或代理后重试"
+        log_info "  2. 手动指定镜像源: DOCKER_MIRROR=aliyun $0"
+        exit 1
+    fi
     chmod a+r /etc/apt/keyrings/docker.gpg
     
     # 添加 Docker 仓库
     log_info "添加 Docker 仓库..."
-    echo "deb [arch=$ARCH signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$OS_ID $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+    echo "deb [arch=$ARCH signed-by=/etc/apt/keyrings/docker.gpg] ${docker_mirror_url}/linux/$OS_ID $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
     
     # 更新包列表
     apt-get update -y
     
-    log_success "Docker 仓库配置完成"
+    log_success "Docker 仓库配置完成 (镜像源: $docker_mirror_url)"
 }
 
 # 安装 Docker Engine
