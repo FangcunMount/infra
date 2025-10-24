@@ -490,9 +490,38 @@ install_component() {
         "-p" "$DEFAULT_COMPOSE_PROJECT"
     )
     
+    # 确定要启动的服务名称
+    # 某些组件是多服务设计，需要启动所有服务
+    local service_names=""
+    case "$component" in
+        redis)
+            # Redis 双实例：redis-cache 和 redis-auth
+            service_names=""  # 空表示启动所有服务
+            log_info "Redis 双实例模式：将启动 redis-cache 和 redis-auth"
+            ;;
+        kafka)
+            # Kafka 多服务：kafka 和 kafka-ui
+            service_names=""  # 启动所有服务
+            log_info "Kafka 多服务模式：将启动 kafka 和 kafka-ui"
+            ;;
+        nsq)
+            # NSQ 分布式架构：nsqlookupd、nsqd、nsqadmin
+            service_names=""  # 启动所有服务
+            log_info "NSQ 分布式架构：将启动 nsqlookupd、nsqd、nsqadmin"
+            ;;
+        *)
+            # 其他组件默认使用组件名作为服务名
+            service_names="$component"
+            ;;
+    esac
+    
     if [[ "$dry_run" == true ]]; then
         log_info "预览模式 - 将要执行的命令:"
-        echo "  ${compose_cmd[*]} up -d $component"
+        if [[ -n "$service_names" ]]; then
+            echo "  ${compose_cmd[*]} up -d $service_names"
+        else
+            echo "  ${compose_cmd[*]} up -d"
+        fi
         return 0
     fi
     
@@ -504,15 +533,27 @@ install_component() {
     if [[ "$(id -u)" == "0" ]]; then
         # 以 root 身份执行（推荐在服务器上的方式）
         log_info "以 root 用户执行 docker compose..."
-        "${compose_cmd[@]}" up -d "$component"
+        if [[ -n "$service_names" ]]; then
+            "${compose_cmd[@]}" up -d $service_names
+        else
+            "${compose_cmd[@]}" up -d
+        fi
     elif groups "$(whoami)" 2>/dev/null | grep -q docker; then
         # 当前用户在 docker 组中，可以直接执行
         log_info "以当前用户执行 docker compose..."
-        "${compose_cmd[@]}" up -d "$component"
+        if [[ -n "$service_names" ]]; then
+            "${compose_cmd[@]}" up -d $service_names
+        else
+            "${compose_cmd[@]}" up -d
+        fi
     else
         # 当前用户需要 sudo 权限
         log_info "以 sudo 权限执行 docker compose..."
-        sudo "${compose_cmd[@]}" up -d "$component"
+        if [[ -n "$service_names" ]]; then
+            sudo "${compose_cmd[@]}" up -d $service_names
+        else
+            sudo "${compose_cmd[@]}" up -d
+        fi
     fi
     
     # 等待服务启动（根据服务类型设置不同等待时间）
@@ -590,7 +631,88 @@ check_component_health() {
     
     log_info "检查 $component 服务健康状态..."
     
-    # 检查服务状态（支持多种容器名称格式）
+    # 多服务组件特殊处理
+    case "$component" in
+        redis)
+            # Redis 双实例：需要检查两个容器
+            local redis_containers=("redis-cache" "redis-auth")
+            local all_running=true
+            
+            for container in "${redis_containers[@]}"; do
+                if docker ps --filter "name=^${container}$" --filter "status=running" --format "{{.Names}}" | grep -q "^${container}$"; then
+                    log_success "✅ $container 容器运行正常"
+                else
+                    log_error "❌ $container 容器未运行"
+                    all_running=false
+                fi
+            done
+            
+            if [[ "$all_running" == true ]]; then
+                log_success "Redis 双实例全部运行正常"
+                return 0
+            else
+                log_error "Redis 部分实例未运行"
+                docker ps -a --filter "name=redis" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+                return 1
+            fi
+            ;;
+            
+        kafka)
+            # Kafka 多服务：kafka 和 kafka-ui
+            local kafka_containers=("kafka" "kafka-ui")
+            local all_running=true
+            
+            for container in "${kafka_containers[@]}"; do
+                if docker ps --filter "name=${container}" --filter "status=running" --format "{{.Names}}" | grep -q "${container}"; then
+                    log_success "✅ $container 容器运行正常"
+                else
+                    log_warn "⚠️  $container 容器未运行（可能是可选服务）"
+                    # kafka-ui 是可选的，不影响整体健康状态
+                    if [[ "$container" != "kafka-ui" ]]; then
+                        all_running=false
+                    fi
+                fi
+            done
+            
+            if [[ "$all_running" == true ]]; then
+                log_success "Kafka 核心服务运行正常"
+                return 0
+            else
+                log_error "Kafka 核心服务未运行"
+                docker ps -a --filter "name=kafka" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+                return 1
+            fi
+            ;;
+            
+        nsq)
+            # NSQ 分布式架构：nsqlookupd、nsqd、nsqadmin
+            local nsq_containers=("nsqlookupd" "nsqd" "nsqadmin")
+            local all_running=true
+            
+            for container in "${nsq_containers[@]}"; do
+                if docker ps --filter "name=${container}" --filter "status=running" --format "{{.Names}}" | grep -q "${container}"; then
+                    log_success "✅ $container 容器运行正常"
+                else
+                    log_error "❌ $container 容器未运行"
+                    # nsqadmin 是可选的管理界面
+                    if [[ "$container" != "nsqadmin" ]]; then
+                        all_running=false
+                    fi
+                fi
+            done
+            
+            if [[ "$all_running" == true ]]; then
+                log_success "NSQ 核心服务运行正常"
+                return 0
+            else
+                log_error "NSQ 核心服务未运行"
+                docker ps -a --filter "name=nsq" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+                return 1
+            fi
+            ;;
+    esac
+    
+    # 其他单服务组件的健康检查（支持多种容器名称格式）
     local container_patterns=("$component" "${DEFAULT_COMPOSE_PROJECT}-${component}-1" "${component}-1")
     
     for pattern in "${container_patterns[@]}"; do
