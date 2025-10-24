@@ -276,6 +276,13 @@ interactive_switch() {
 
 # Docker VPN 测试
 docker_vpn_test() {
+    # 检查 Docker 是否安装（仅此命令需要）
+    if ! command -v docker >/dev/null 2>&1; then
+        log_error "docker-test 命令需要 Docker"
+        log_info "请先安装 Docker: make server-install-docker"
+        exit 1
+    fi
+    
     echo "========================================"
     echo "🐳 Docker VPN 专项测试"
     echo "========================================"
@@ -344,18 +351,17 @@ main() {
 # 检查依赖
 if ! command -v curl >/dev/null 2>&1; then
     log_error "需要 curl 命令"
+    log_info "安装: apt-get install -y curl (Ubuntu/Debian) 或 yum install -y curl (CentOS/RHEL)"
     exit 1
 fi
 
 if ! command -v jq >/dev/null 2>&1; then
     log_error "需要 jq 命令"
+    log_info "安装: apt-get install -y jq (Ubuntu/Debian) 或 yum install -y jq (CentOS/RHEL)"
     exit 1
 fi
 
-if ! command -v docker >/dev/null 2>&1; then
-    log_error "需要 docker 命令"
-    exit 1
-fi
+# 注意: docker 命令仅 docker-test 子命令需要，其他命令不依赖 Docker
 
 # 运行主程序
 main "$@"
