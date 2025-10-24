@@ -8,7 +8,13 @@
 PROJECT_NAME := infra
 DEFAULT_ENV := dev
 ENV ?= $(DEFAULT_ENV)
-ENV_FILE := env/$(ENV)/.env
+ENV_FILE := compose/env/$(ENV)/.env
+
+# 加载环境变量（如果文件存在）
+ifneq (,$(wildcard $(ENV_FILE)))
+    include $(ENV_FILE)
+    export
+endif
 
 # 脚本路径
 SCRIPTS_DIR := scripts
@@ -428,9 +434,9 @@ redis-info: ## 查看 Redis 信息 (双实例)
 	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning INFO stats | grep -E "evicted_keys|keyspace_hits|keyspace_misses" 2>/dev/null || true
 	@echo ""
 	@echo "$(CYAN)=== Redis Auth Info (6380) ===$(RESET)"
-	@docker exec redis-auth redis-cli -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO server | grep -E "redis_version|redis_mode|os|uptime_in_seconds" 2>/dev/null || echo "redis-auth 未运行"
-	@docker exec redis-auth redis-cli -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO memory | grep -E "used_memory_human|maxmemory_human" 2>/dev/null || true
-	@docker exec redis-auth redis-cli -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO persistence | grep -E "aof_enabled|aof_current_size" 2>/dev/null || true
+	@docker exec redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO server | grep -E "redis_version|redis_mode|os|uptime_in_seconds" 2>/dev/null || echo "redis-auth 未运行"
+	@docker exec redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO memory | grep -E "used_memory_human|maxmemory_human" 2>/dev/null || true
+	@docker exec redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO persistence | grep -E "aof_enabled|aof_current_size" 2>/dev/null || true
 
 # Cache 实例操作
 redis-cache-logs: ## 查看 Redis Cache 日志
@@ -458,7 +464,7 @@ redis-auth-cli: ## 进入 Redis Auth CLI
 		$(call shell_error_msg,无法连接到 Redis Auth)
 
 redis-auth-info: ## 查看 Redis Auth 详细信息
-	@docker exec redis-auth redis-cli -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO
+	@docker exec redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO
 
 redis-auth-shell: ## 进入 Redis Auth 容器 Shell
 	@docker exec -it redis-auth sh || \
