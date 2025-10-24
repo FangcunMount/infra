@@ -23,14 +23,19 @@ services:
       # Let's Encrypt 验证目录
       - /var/www/certbot:/var/www/certbot
     healthcheck:
-      test: ["CMD", "nginx", "-t"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1/healthz || exit 1"]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
     ulimits:
       nofile: 100000
     mem_limit: ${NGINX_MEMORY_LIMIT:-128M}
-    cpus: ${NGINX_CPUS:-0.10}
+    cpus: ${NGINX_CPUS:-0.25}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
     labels:
       - "infra.service=gateway"
       - "infra.category=network"
