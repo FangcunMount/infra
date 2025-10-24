@@ -3,6 +3,7 @@
 ## 概述
 
 Nginx 作为基础设施的 Web 网关服务，负责：
+
 - HTTP/HTTPS 反向代理
 - 静态文件服务
 - 负载均衡
@@ -27,7 +28,7 @@ Nginx 作为基础设施的 Web 网关服务，负责：
 
 ## 目录结构
 
-```
+```text
 components/nginx/
 ├── nginx.conf              # 主配置文件
 ├── override.yml           # 本地开发覆盖配置  
@@ -89,7 +90,7 @@ curl http://localhost/health
 
 1. **共享目录挂载**：
    - infra 将 `/data/apps/nginx-configs/` 挂载到 nginx 容器的 `/etc/nginx/conf.d/apps/`
-   
+
 2. **配置部署流程**：
    - 应用项目编写 nginx 配置文件
    - 使用 infra 工具将配置复制到共享目录
@@ -261,6 +262,7 @@ make app-deploy APP=api CONFIG=./nginx/api.conf
 ### SSL 证书管理流程
 
 1. **证书申请**：
+
    ```bash
    # 申请新证书
    make ssl-obtain DOMAIN=blog.example.com EMAIL=admin@example.com
@@ -270,6 +272,7 @@ make app-deploy APP=api CONFIG=./nginx/api.conf
    ```
 
 2. **证书续期**：
+
    ```bash
    # 手动续期所有证书
    make ssl-renew
@@ -279,6 +282,7 @@ make app-deploy APP=api CONFIG=./nginx/api.conf
    ```
 
 3. **证书管理**：
+
    ```bash
    # 列出所有证书
    make ssl-list
@@ -292,7 +296,7 @@ make app-deploy APP=api CONFIG=./nginx/api.conf
 
 ### SSL 证书目录结构
 
-```
+```text
 /data/ssl/
 ├── certs/                  # 证书文件
 │   ├── blog.example.com.crt
@@ -327,7 +331,6 @@ networks:
   infra-network:
     external: true
     name: infra-network
-```
 ```
 
 ### 端口配置

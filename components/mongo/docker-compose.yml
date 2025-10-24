@@ -8,27 +8,36 @@ services:
       - backend
     restart: always
     ports:
-      - "${MONGO_PORT:-27017}:27017"
+      # 仅绑定本地，避免公网暴露（远程访问需通过 SSH 隧道）
+      - "127.0.0.1:${MONGO_PORT:-27017}:27017"
     volumes:
       # 数据持久化
       - mongo_data:/data/db
       # 配置文件（相对路径）
       - ./mongod.conf:/etc/mongod.conf:ro
-      # 日志目录
-      - app_logs:/data/log
+      # 日志目录（直接挂载到 /data/log/mongodb 避免路径不存在）
+      - mongo_logs:/data/log/mongodb
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
       - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
     command: >
       mongod --config /etc/mongod.conf --auth
-      --wiredTigerCacheSizeGB ${MONGO_WIREDTIGER_CACHE_GB:-0.9}
     ulimits:
       nofile: 100000
     mem_limit: ${MONGO_MEMORY_LIMIT:-1536M}
     cpus: ${MONGO_CPUS:-0.30}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
+      test: ["CMD", "mongosh", "--quiet", 
+             "-u", "${MONGO_INITDB_ROOT_USERNAME}", 
+             "-p", "${MONGO_INITDB_ROOT_PASSWORD}", 
+             "--authenticationDatabase", "admin",
+             "--eval", "db.adminCommand({ ping: 1 })"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -47,6 +56,6 @@ volumes:
   mongo_data:
     name: infra_mongo_data
     driver: local
-  app_logs:
-    name: infra_app_logs
+  mongo_logs:
+    name: infra_mongo_logs
     driver: local

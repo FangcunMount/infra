@@ -476,27 +476,60 @@ redis-cli: redis-cache-cli ## 进入 Redis CLI (默认: cache)
 
 # --- MongoDB -----------------------------------------------------------------
 .PHONY: mongo-start mongo-stop mongo-restart mongo-logs mongo-shell mongo-status
+.PHONY: mongo-backup mongo-monitor mongo-tune mongo-init-users mongo-stats
 mongo-start: init-infra ## 启动 MongoDB
-	@$(COMPOSE_MANAGER) infra up storage
+	@cd $(COMPONENTS_DIR)/mongo && docker compose up -d
 	$(call success_msg,MongoDB 已启动)
 
 mongo-stop: ## 停止 MongoDB
-	@docker stop mongodb 2>/dev/null || true
+	@cd $(COMPONENTS_DIR)/mongo && docker compose down
 	$(call success_msg,MongoDB 已停止)
 
 mongo-restart: mongo-stop mongo-start ## 重启 MongoDB
 
 mongo-logs: ## 查看 MongoDB 日志
-	@docker logs -f --tail=$(LOG_LINES) mongodb 2>/dev/null || \
+	@docker logs -f --tail=$(LOG_LINES) mongo 2>/dev/null || \
 		$(call shell_error_msg,MongoDB 容器不存在或未运行)
 
-mongo-shell: ## 进入 MongoDB Shell
-	@docker exec -it mongodb mongosh || \
-		docker exec -it mongodb mongo || \
+mongo-shell: ## 进入 MongoDB Shell (需要认证)
+	@if [ -z "$(MONGO_INITDB_ROOT_USERNAME)" ] || [ -z "$(MONGO_INITDB_ROOT_PASSWORD)" ]; then \
+		$(call shell_error_msg,缺少 MONGO_INITDB_ROOT_USERNAME 或 MONGO_INITDB_ROOT_PASSWORD 环境变量); \
+		$(call shell_info_msg,请先运行: make env-init ENV=$(ENV)); \
+		exit 1; \
+	fi
+	@docker exec -it mongo mongosh \
+		-u "$(MONGO_INITDB_ROOT_USERNAME)" \
+		-p "$(MONGO_INITDB_ROOT_PASSWORD)" \
+		--authenticationDatabase admin || \
 		$(call shell_error_msg,无法连接到 MongoDB)
 
 mongo-status: ## 查看 MongoDB 状态
-	@docker ps --filter "name=mongodb" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+	@docker ps --filter "name=mongo" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+mongo-backup: ## 备份 MongoDB 数据
+	@bash $(COMPONENTS_SCRIPTS)/backup-mongo.sh
+
+mongo-monitor: ## 实时监控 MongoDB 性能指标
+	@bash $(COMPONENTS_SCRIPTS)/monitor-mongo.sh
+
+mongo-tune: ## 系统调优（宿主机内核参数）
+	@$(call warning_msg,此命令需要 root 权限，将在宿主机执行系统调优)
+	@bash $(SERVER_SCRIPTS)/tune-host.sh
+
+mongo-init-users: ## 创建 MongoDB 业务用户
+	@bash $(COMPONENTS_SCRIPTS)/init-mongo-users.sh
+
+mongo-stats: ## 查看 MongoDB 统计信息
+	@if [ -z "$(MONGO_INITDB_ROOT_USERNAME)" ] || [ -z "$(MONGO_INITDB_ROOT_PASSWORD)" ]; then \
+		$(call shell_error_msg,缺少认证信息); \
+		exit 1; \
+	fi
+	@docker exec mongo mongosh \
+		-u "$(MONGO_INITDB_ROOT_USERNAME)" \
+		-p "$(MONGO_INITDB_ROOT_PASSWORD)" \
+		--authenticationDatabase admin \
+		--quiet \
+		--eval "db.serverStatus()" | head -n 50
 
 # --- Kafka -------------------------------------------------------------------
 .PHONY: kafka-start kafka-stop kafka-restart kafka-logs kafka-shell kafka-status
@@ -812,9 +845,18 @@ test-redis: ## 测试 Redis 连接
 
 test-mongo: ## 测试 MongoDB 连接
 	@printf "$(BLUE)MongoDB:$(RESET)   "
-	@docker exec mongodb mongosh --eval "db.adminCommand('ping')" 2>/dev/null | grep -q ok && \
-		echo "$(GREEN)✅ 正常$(RESET)" || \
-		echo "$(RED)❌ 失败$(RESET)"
+	@if [ -z "$(MONGO_INITDB_ROOT_USERNAME)" ] || [ -z "$(MONGO_INITDB_ROOT_PASSWORD)" ]; then \
+		echo "$(YELLOW)⚠️  跳过（缺少认证信息）$(RESET)"; \
+	else \
+		docker exec mongo mongosh \
+			-u "$(MONGO_INITDB_ROOT_USERNAME)" \
+			-p "$(MONGO_INITDB_ROOT_PASSWORD)" \
+			--authenticationDatabase admin \
+			--quiet \
+			--eval "db.adminCommand('ping')" 2>/dev/null | grep -q '"ok" : 1' && \
+			echo "$(GREEN)✅ 正常$(RESET)" || \
+			echo "$(RED)❌ 失败$(RESET)"; \
+	fi
 
 test-kafka: ## 测试 Kafka 连接
 	@printf "$(BLUE)Kafka:$(RESET)     "
@@ -895,6 +937,65 @@ shell: ## 进入指定容器 Shell (NAME=容器名)
 	$(call require_param,NAME,make shell NAME=nginx)
 	@docker exec -it $(NAME) sh || docker exec -it $(NAME) bash || \
 		$(call error_msg,无法连接到容器: $(NAME))
+
+# ==============================================================================
+# 10. 快速参考
+# ==============================================================================
+.PHONY: help-mongo help-redis help-mysql
+
+help-mongo: ## MongoDB 快速参考
+	$(call section_title,MongoDB 管理命令)
+	@echo ""
+	@echo "$(BLUE)$(BOLD)🍃 基础操作:$(RESET)"
+	@echo "  $(CYAN)make mongo-start$(RESET)          启动 MongoDB"
+	@echo "  $(CYAN)make mongo-stop$(RESET)           停止 MongoDB"
+	@echo "  $(CYAN)make mongo-restart$(RESET)        重启 MongoDB"
+	@echo "  $(CYAN)make mongo-status$(RESET)         查看状态"
+	@echo "  $(CYAN)make mongo-logs$(RESET)           查看日志"
+	@echo ""
+	@echo "$(BLUE)$(BOLD)🔐 连接与管理:$(RESET)"
+	@echo "  $(CYAN)make mongo-shell$(RESET)          连接 MongoDB Shell (需要认证)"
+	@echo "  $(CYAN)make mongo-init-users$(RESET)     创建业务用户 (交互式)"
+	@echo "  $(CYAN)make mongo-stats$(RESET)          查看服务器统计信息"
+	@echo ""
+	@echo "$(BLUE)$(BOLD)📊 监控与优化:$(RESET)"
+	@echo "  $(CYAN)make mongo-monitor$(RESET)        实时监控性能指标"
+	@echo "  $(CYAN)make mongo-backup$(RESET)         备份数据库"
+	@echo "  $(CYAN)make mongo-tune$(RESET)           系统调优 (需要 root 权限)"
+	@echo ""
+	@echo "$(BLUE)$(BOLD)🧪 测试:$(RESET)"
+	@echo "  $(CYAN)make test-mongo$(RESET)           测试 MongoDB 连接"
+	@echo ""
+	@echo "$(YELLOW)$(BOLD)💡 配置说明:$(RESET)"
+	@echo "  • 容器名称: $(GREEN)mongo$(RESET)"
+	@echo "  • 端口映射: $(GREEN)127.0.0.1:27017:27017$(RESET) (仅本地)"
+	@echo "  • 资源配额: $(GREEN)1536M 内存 / 0.30 CPU$(RESET)"
+	@echo "  • WiredTiger 缓存: $(GREEN)900MB$(RESET) (60% 容器内存)"
+	@echo "  • 认证模式: $(GREEN)已启用 (--auth)$(RESET)"
+	@echo "  • 数据卷: $(GREEN)infra_mongo_data$(RESET)"
+	@echo "  • 日志卷: $(GREEN)infra_mongo_logs$(RESET)"
+	@echo ""
+	@echo "$(YELLOW)$(BOLD)📝 环境变量:$(RESET)"
+	@echo "  MONGO_INITDB_ROOT_USERNAME  - Root 用户名"
+	@echo "  MONGO_INITDB_ROOT_PASSWORD  - Root 密码"
+	@echo "  MONGO_DATABASE              - 初始数据库名"
+	@echo "  MONGO_PORT                  - 端口 (默认 27017)"
+	@echo "  MONGO_MEMORY_LIMIT          - 内存限制"
+	@echo "  MONGO_CPUS                  - CPU 配额"
+	@echo ""
+	@echo "$(YELLOW)$(BOLD)🚀 首次部署流程:$(RESET)"
+	@echo "  1. $(CYAN)make mongo-tune$(RESET)         # 宿主机系统调优 (只需一次)"
+	@echo "  2. $(CYAN)make mongo-start$(RESET)        # 启动 MongoDB"
+	@echo "  3. $(CYAN)make mongo-shell$(RESET)        # 验证 root 账户"
+	@echo "  4. $(CYAN)make mongo-init-users$(RESET)   # 创建业务用户"
+	@echo "  5. $(CYAN)make mongo-monitor$(RESET)      # 检查性能指标"
+	@echo ""
+	@echo "$(YELLOW)$(BOLD)📚 相关文档:$(RESET)"
+	@echo "  • $(CYAN)components/mongo/README.md$(RESET)        - 完整运维指南"
+	@echo "  • $(CYAN)docs/为什么需要宿主机调优.md$(RESET)      - 系统调优说明"
+	@echo "  • $(CYAN)scripts/components/backup-mongo.sh$(RESET) - 备份脚本"
+	@echo "  • $(CYAN)scripts/components/monitor-mongo.sh$(RESET) - 监控脚本"
+	@echo ""
 
 # ==============================================================================
 # 结束

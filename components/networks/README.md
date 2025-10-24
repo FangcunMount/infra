@@ -33,7 +33,7 @@
 
 **网络拓扑示例：**
 
-```
+```text
                    Docker Swarm Overlay Network
                       (infra-network)
                             │
@@ -55,7 +55,7 @@
 
 **业务应用网络示例：**
 
-```
+```text
 ServerA:
   miniblog-network 网络          
   ├── miniblog 应用              
@@ -126,6 +126,7 @@ sudo ./scripts/network/swarm-manager.sh test
 - `components/nginx/` - 声明 `infra_nginx_logs`
 
 这样设计的好处：
+
 - ✅ 组件完全自包含
 - ✅ 数据卷生命周期跟随组件
 - ✅ 易于理解和维护
