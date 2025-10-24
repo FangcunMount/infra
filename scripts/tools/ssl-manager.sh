@@ -161,10 +161,25 @@ obtain_wildcard_certificate() {
         
         success "证书申请成功: $domain + *.${domain}"
         
+        # 确保 SSL 目录存在
+        log "准备证书存储目录..."
+        sudo mkdir -p "$SSL_DIR"/{certs,private}
+        sudo chown -R www:www "$SSL_DIR" 2>/dev/null || sudo chown -R root:root "$SSL_DIR"
+        sudo chmod 755 "$SSL_DIR"
+        sudo chmod 755 "$SSL_DIR/certs"
+        sudo chmod 700 "$SSL_DIR/private"
+        
         # 复制证书到标准位置
+        log "复制证书到 $SSL_DIR..."
         sudo cp "/etc/letsencrypt/live/${domain}/fullchain.pem" "$SSL_DIR/certs/${domain}.crt"
         sudo cp "/etc/letsencrypt/live/${domain}/privkey.pem" "$SSL_DIR/private/${domain}.key"
-        sudo chown www:www "$SSL_DIR/certs/${domain}.crt" "$SSL_DIR/private/${domain}.key"
+        
+        # 设置权限
+        if id www &>/dev/null; then
+            sudo chown www:www "$SSL_DIR/certs/${domain}.crt" "$SSL_DIR/private/${domain}.key"
+        else
+            sudo chown root:root "$SSL_DIR/certs/${domain}.crt" "$SSL_DIR/private/${domain}.key"
+        fi
         sudo chmod 644 "$SSL_DIR/certs/${domain}.crt"
         sudo chmod 600 "$SSL_DIR/private/${domain}.key"
         
@@ -181,6 +196,9 @@ obtain_wildcard_certificate() {
         log "证书覆盖范围:"
         log "  ✅ $domain"
         log "  ✅ *.${domain} (所有子域名)"
+        log "证书文件:"
+        log "  📄 证书: $SSL_DIR/certs/${domain}.crt"
+        log "  🔑 私钥: $SSL_DIR/private/${domain}.key"
     else
         error "证书申请失败: $domain"
         exit 1
