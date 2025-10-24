@@ -59,10 +59,25 @@ check_dependencies() {
     # 检查 certbot-dns-aliyun 插件
     if ! python3 -c "import certbot_dns_aliyun" &> /dev/null; then
         warn "certbot-dns-aliyun 插件未安装，正在安装..."
-        sudo pip3 install certbot-dns-aliyun || {
-            error "插件安装失败，请手动安装: pip3 install certbot-dns-aliyun"
+        
+        # Ubuntu 24.04+ 需要 --break-system-packages 标志
+        if sudo pip3 install certbot-dns-aliyun --break-system-packages 2>/dev/null; then
+            success "插件安装成功"
+        elif sudo pip3 install certbot-dns-aliyun 2>/dev/null; then
+            success "插件安装成功"
+        else
+            error "插件安装失败"
+            echo
+            warn "请尝试以下方式之一："
+            echo "1. 使用 --break-system-packages 标志:"
+            echo "   sudo pip3 install certbot-dns-aliyun --break-system-packages"
+            echo
+            echo "2. 使用 pipx (推荐):"
+            echo "   sudo apt install pipx"
+            echo "   pipx install certbot-dns-aliyun"
+            echo
             exit 1
-        }
+        fi
     fi
     
     # 检查 Docker
