@@ -332,8 +332,8 @@ validate_env_file() {
             check_env_var "$env_file" "REDIS_PASSWORD" missing_vars
             ;;
         mongo)
-            check_env_var "$env_file" "MONGO_ROOT_USERNAME" missing_vars
-            check_env_var "$env_file" "MONGO_ROOT_PASSWORD" missing_vars
+            check_env_var "$env_file" "MONGO_INITDB_ROOT_USERNAME" missing_vars
+            check_env_var "$env_file" "MONGO_INITDB_ROOT_PASSWORD" missing_vars
             check_env_var "$env_file" "MONGO_DATABASE" missing_vars
             ;;
     esac
@@ -405,8 +405,8 @@ show_env_file_help() {
     echo "REDIS_PORT=6379"
     echo ""
     echo "# MongoDB 配置"
-    echo "MONGO_ROOT_USERNAME=your_mongo_admin"
-    echo "MONGO_ROOT_PASSWORD=your_mongo_password_here"
+    echo "MONGO_INITDB_ROOT_USERNAME=admin"
+    echo "MONGO_INITDB_ROOT_PASSWORD=your_mongo_password_here"
     echo "MONGO_DATABASE=your_mongo_database"
     echo "MONGO_PORT=27017"
     echo ""
