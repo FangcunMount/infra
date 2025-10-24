@@ -444,38 +444,67 @@ EOF
 setup_auto_renewal() {
     log "设置 SSL 证书自动续期..."
     
+    # 创建日志目录
+    log "创建日志目录..."
+    sudo mkdir -p /data/log/ssl /data/ssl
+    sudo chown -R root:root /data/log/ssl /data/ssl 2>/dev/null || true
+    
     # 创建续期脚本
     local renewal_script="/data/ssl/renew-certs.sh"
-    cat > "$renewal_script" << EOF
+    log "创建续期脚本: $renewal_script"
+    
+    cat > "$renewal_script" << 'EOF'
 #!/bin/bash
 # SSL 证书自动续期脚本
+# 每周一凌晨 2:00 自动运行
 
-SCRIPT_DIR="\$(cd "\$(dirname "\$0")" && pwd)"
-INFRA_ROOT="\$(cd "\$SCRIPT_DIR/../.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+INFRA_ROOT="/opt/infra"
 
-cd "\$INFRA_ROOT"
-"\$INFRA_ROOT/scripts/tools/ssl-manager.sh" renew
+# 记录开始时间
+echo "========================================" >> /data/log/ssl/renewal.log
+echo "$(date): 开始检查证书续期" >> /data/log/ssl/renewal.log
 
-# 记录续期日志
-echo "\$(date): 证书续期检查完成" >> /data/log/ssl/renewal.log
+# 执行续期
+cd "$INFRA_ROOT"
+"$INFRA_ROOT/scripts/tools/ssl-manager.sh" renew >> /data/log/ssl/renewal.log 2>&1
+
+# 记录完成时间
+echo "$(date): 证书续期检查完成" >> /data/log/ssl/renewal.log
+echo "========================================" >> /data/log/ssl/renewal.log
 EOF
     
     sudo chmod +x "$renewal_script"
-    sudo chown www:www "$renewal_script"
     
     # 添加到 crontab
-    local crontab_line="0 2 * * 1 /data/ssl/renew-certs.sh"
+    local crontab_line="0 2 * * 1 $renewal_script"
     
-    if ! crontab -l | grep -q "$renewal_script"; then
-        (crontab -l 2>/dev/null; echo "$crontab_line") | crontab -
-        success "自动续期任务已添加到 crontab"
+    log "检查现有 crontab 任务..."
+    if crontab -l 2>/dev/null | grep -q "$renewal_script"; then
+        warn "自动续期任务已存在，跳过添加"
+        log "现有任务:"
+        crontab -l 2>/dev/null | grep ssl
     else
-        success "自动续期任务已存在"
+        log "添加自动续期任务到 crontab..."
+        (crontab -l 2>/dev/null || echo "") | grep -v "^$" | cat - <(echo "$crontab_line") | crontab -
+        success "✅ 自动续期任务已添加到 crontab"
     fi
     
-    # 创建日志目录
-    sudo mkdir -p /data/log/ssl
-    sudo chown -R www:www /data/log/ssl
+    echo
+    success "🎉 自动续期配置完成！"
+    echo
+    log "配置详情:"
+    log "  📅 运行时间: 每周一凌晨 2:00"
+    log "  📜 续期脚本: $renewal_script"
+    log "  📝 日志文件: /data/log/ssl/renewal.log"
+    echo
+    log "查看当前 crontab 任务:"
+    crontab -l 2>/dev/null | grep -v "^#" | grep -v "^$" || echo "  (空)"
+    echo
+    log "💡 提示:"
+    log "  - 证书到期前 30 天会自动续期"
+    log "  - 手动测试续期: certbot renew --dry-run"
+    log "  - 查看续期日志: tail -f /data/log/ssl/renewal.log"
 }
 
 # 显示帮助
