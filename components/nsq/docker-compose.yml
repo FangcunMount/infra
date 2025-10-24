@@ -14,12 +14,15 @@ services:
     volumes:
       # 配置文件（相对路径）
       - ./nsqlookupd.conf:/etc/nsq/nsqlookupd.conf:ro
-      # 日志
-      - app_logs:/var/log/nsq
     environment:
       - TZ=${TZ:-Asia/Shanghai}
     mem_limit: ${NSQLOOKUPD_MEMORY_LIMIT:-64M}
     cpus: ${NSQLOOKUPD_CPUS:-0.10}
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "3"
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4161/ping"]
       interval: 30s
@@ -38,7 +41,7 @@ services:
     command: >
       /nsqd
       --config=/etc/nsq/nsqd.conf
-      --lookupd-tcp-address=nsqlookupd:4160
+      --lookupd-tcp-address=nsqlookupd:${NSQLOOKUPD_TCP_PORT:-4160}
       --broadcast-address=${NSQD_BROADCAST_ADDRESS:-nsqd}
     networks:
       - backend
@@ -51,15 +54,18 @@ services:
       - ./nsqd.conf:/etc/nsq/nsqd.conf:ro
       # 数据持久化
       - nsq_data:/data
-      # 日志
-      - app_logs:/var/log/nsq
     environment:
       - TZ=${TZ:-Asia/Shanghai}
     depends_on:
       nsqlookupd:
         condition: service_healthy
     mem_limit: ${NSQD_MEMORY_LIMIT:-512M}
-    cpus: ${NSQD_CPUS:-1.0}
+    cpus: ${NSQD_CPUS:-0.80}
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "3"
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4151/ping"]
       interval: 30s
@@ -82,7 +88,7 @@ services:
     networks:
       - backend
     ports:
-      - "${NSQADMIN_PORT:-4171}:4171"  # Web 管理界面
+      - "127.0.0.1:${NSQADMIN_PORT:-4171}:4171"  # Web 管理界面（仅本机访问）
     restart: always
     volumes:
       # 配置文件（相对路径）
@@ -94,6 +100,11 @@ services:
         condition: service_healthy
     mem_limit: ${NSQADMIN_MEMORY_LIMIT:-64M}
     cpus: ${NSQADMIN_CPUS:-0.10}
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4171/ping"]
       interval: 30s
@@ -115,7 +126,4 @@ networks:
 volumes:
   nsq_data:
     name: infra_nsq_data
-    driver: local
-  app_logs:
-    name: infra_app_logs
     driver: local
