@@ -133,7 +133,7 @@ help: ## 显示帮助信息
 	@echo "  2. 环境管理: $(CYAN)env-init, env-edit, dev, prod$(RESET)"
 	@echo "  3. 服务管理: $(CYAN)<service>-start/stop/logs/shell$(RESET)"
 	@echo "     服务: mysql, redis (cache+auth双实例), mongo, nsq"
-	@echo "  4. 网络管理: $(CYAN)net-create/delete/list, swarm-*$(RESET)"
+	@echo "  4. 网络管理: $(CYAN)net-create/delete/list, swarm-*, vpn-*$(RESET)"
 	@echo "  5. SSL 证书: $(CYAN)ssl-obtain/import/renew/list$(RESET)"
 	@echo "  6. Nginx:    $(CYAN)app-deploy/remove/list, nginx-*$(RESET)"
 	@echo "  7. 监控诊断: $(CYAN)stats, logs, disk-usage$(RESET)"
@@ -728,6 +728,44 @@ net-inspect: network-inspect ## 检查网络 (别名)
 
 swarm-init: ## 初始化 Docker Swarm
 	@docker swarm init
+
+# ==============================================================================
+# VPN 网络管理 (Mihomo)
+# ==============================================================================
+.PHONY: vpn-setup vpn-status vpn-test vpn-enable vpn-disable
+.PHONY: vpn-proxies vpn-switch vpn-docker-test vpn-uninstall vpn-diagnose
+
+vpn-setup: ## 安装和配置 VPN (Mihomo)
+	@echo "$(BLUE)ℹ️  安装 Mihomo VPN...$(RESET)"
+	@sudo bash $(NETWORK_SCRIPTS)/setup.sh
+
+vpn-status: ## 查看 VPN 状态
+	@bash $(NETWORK_SCRIPTS)/vpn-manager.sh status
+
+vpn-test: ## 测试 VPN 连接
+	@bash $(NETWORK_SCRIPTS)/vpn-manager.sh test
+
+vpn-enable: ## 启用 VPN 模式
+	@bash $(NETWORK_SCRIPTS)/vpn-manager.sh enable
+
+vpn-disable: ## 禁用 VPN 模式 (直连)
+	@bash $(NETWORK_SCRIPTS)/vpn-manager.sh disable
+
+vpn-proxies: ## 显示所有代理组状态
+	@bash $(NETWORK_SCRIPTS)/vpn-manager.sh proxies
+
+vpn-switch: ## 切换代理选择 (交互式)
+	@bash $(NETWORK_SCRIPTS)/vpn-manager.sh switch
+
+vpn-docker-test: ## 测试 Docker 容器 VPN 连接
+	@bash $(NETWORK_SCRIPTS)/vpn-manager.sh docker-test
+
+vpn-uninstall: ## 完全卸载 VPN
+	@echo "$(YELLOW)⚠️  这将完全卸载 Mihomo VPN$(RESET)"
+	@sudo bash $(NETWORK_SCRIPTS)/uninstall.sh
+
+vpn-diagnose: ## 网络环境诊断
+	@sudo bash $(NETWORK_SCRIPTS)/diagnose.sh
 	$(call success_msg,Swarm 集群已初始化)
 
 swarm-leave: ## 离开 Docker Swarm
