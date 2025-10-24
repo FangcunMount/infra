@@ -399,8 +399,17 @@ mysql-status: ## 查看 MySQL 状态
 
 mysql-backup: ## 备份 MySQL (DB=数据库名)
 	$(call require_param,DB,make mysql-backup DB=myapp)
-	@docker exec mysql mysqldump -u root -p$(DB) > backup-$(DB)-$(shell date +%Y%m%d-%H%M%S).sql
-	$(call success_msg,MySQL 备份完成)
+	@if [ -z "$${MYSQL_ROOT_PASSWORD}" ]; then \
+		$(call shell_error_msg,缺少 MYSQL_ROOT_PASSWORD 环境变量); \
+		exit 1; \
+	fi
+	@docker exec mysql mysqldump -u root -p"$${MYSQL_ROOT_PASSWORD}" \
+		--databases $(DB) \
+		--single-transaction \
+		--quick \
+		--lock-tables=false \
+		> backup-$(DB)-$(shell date +%Y%m%d-%H%M%S).sql
+	$(call success_msg,MySQL 备份完成: backup-$(DB)-*.sql)
 
 # --- Redis (双实例) -----------------------------------------------------------
 .PHONY: redis-start redis-stop redis-restart redis-logs redis-shell redis-cli redis-status redis-info
@@ -460,7 +469,7 @@ redis-auth-logs: ## 查看 Redis Auth 日志
 		$(call shell_error_msg,Redis Auth 容器不存在或未运行)
 
 redis-auth-cli: ## 进入 Redis Auth CLI
-	@docker exec -it redis-auth redis-cli -a "$${REDIS_AUTH_PASSWORD}" -p 6380 || \
+	@docker exec -it redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" || \
 		$(call shell_error_msg,无法连接到 Redis Auth)
 
 redis-auth-info: ## 查看 Redis Auth 详细信息
@@ -581,9 +590,14 @@ kafka-describe-topic: ## 查看 Kafka Topic 详情 (TOPIC=名称)
 
 # --- NSQ ---------------------------------------------------------------------
 .PHONY: nsq-start nsq-stop nsq-restart nsq-logs nsq-admin nsq-status
+.PHONY: nsq-shell nsq-lookupd-logs nsq-admin-logs nsq-topics nsq-stats
 nsq-start: init-infra ## 启动 NSQ
-	@$(COMPOSE_MANAGER) infra up message
-	$(call success_msg,NSQ 已启动)
+	@if [ -d "$(COMPONENTS_DIR)/nsq" ]; then \
+		cd $(COMPONENTS_DIR)/nsq && docker compose --env-file ../../compose/env/$(ENV)/env up -d; \
+		$(call success_msg,NSQ 已启动); \
+	else \
+		$(call shell_error_msg,NSQ 组件目录不存在); \
+	fi
 
 nsq-stop: ## 停止 NSQ
 	@docker stop nsqd nsqlookupd nsqadmin 2>/dev/null || true
@@ -595,14 +609,46 @@ nsq-logs: ## 查看 NSQ 日志
 	@docker logs -f --tail=$(LOG_LINES) nsqd 2>/dev/null || \
 		$(call shell_error_msg,NSQ 容器不存在或未运行)
 
-nsq-admin: ## 打开 NSQ Admin Web UI
-	$(call shell_info_msg,NSQ Admin: http://localhost:4171)
-	@which open >/dev/null 2>&1 && open http://localhost:4171 || \
-		which xdg-open >/dev/null 2>&1 && xdg-open http://localhost:4171 || \
-		echo "$(BLUE)请在浏览器中打开: http://localhost:4171$(RESET)"
+nsq-admin: ## 访问 NSQ Admin Web UI (需要 SSH 隧道)
+	@echo "$(YELLOW)⚠️  NSQAdmin 绑定到 127.0.0.1:4171（仅本机访问）$(RESET)"
+	@echo "$(BLUE)ℹ️  访问方法:$(RESET)"
+	@echo "  1. 建立 SSH 隧道: $(CYAN)ssh -L 4171:127.0.0.1:4171 user@serverB$(RESET)"
+	@echo "  2. 在本地浏览器打开: $(CYAN)http://localhost:4171$(RESET)"
+	@echo ""
+	@if docker ps --filter "name=nsqadmin" --format "{{.Status}}" | grep -q "Up"; then \
+		echo "$(GREEN)✅ NSQAdmin 正在运行$(RESET)"; \
+	else \
+		echo "$(RED)❌ NSQAdmin 未运行，请先执行: make nsq-start$(RESET)"; \
+	fi
 
 nsq-status: ## 查看 NSQ 状态
 	@docker ps --filter "name=nsq" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+nsq-shell: ## 进入 NSQd 容器 Shell
+	@docker exec -it nsqd sh || \
+		$(call shell_error_msg,无法连接到 NSQd 容器)
+
+nsq-lookupd-logs: ## 查看 NSQLookupd 日志
+	@docker logs -f --tail=$(LOG_LINES) nsqlookupd 2>/dev/null || \
+		$(call shell_error_msg,NSQLookupd 容器不存在或未运行)
+
+nsq-admin-logs: ## 查看 NSQAdmin 日志
+	@docker logs -f --tail=$(LOG_LINES) nsqadmin 2>/dev/null || \
+		$(call shell_error_msg,NSQAdmin 容器不存在或未运行)
+
+nsq-topics: ## 查看 NSQ Topics 和统计
+	@echo "$(CYAN)=== NSQ Topics ===$(RESET)"
+	@curl -s http://localhost:4151/stats?format=json 2>/dev/null | grep -o '"topic_name":"[^"]*"' | cut -d'"' -f4 || \
+		echo "$(YELLOW)无法获取 Topics（nsqd 未运行）$(RESET)"
+	@echo ""
+	@echo "$(CYAN)=== NSQ Stats (前 20 行) ===$(RESET)"
+	@curl -s http://localhost:4151/stats 2>/dev/null | head -20 || \
+		echo "$(YELLOW)无法获取统计信息$(RESET)"
+
+nsq-stats: ## 查看 NSQ 详细统计信息
+	@curl -s http://localhost:4151/stats?format=json 2>/dev/null || \
+		curl -s http://localhost:4151/stats 2>/dev/null || \
+		echo "$(RED)无法连接到 NSQd$(RESET)"
 
 # ==============================================================================
 # 4. 网络管理
@@ -793,7 +839,7 @@ troubleshoot: ## 运行故障诊断
 	@docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "unhealthy|Restarting" || echo "$(GREEN)所有容器健康$(RESET)"
 	@echo ""
 	@echo "$(BLUE)3. 检查网络连接$(RESET)"
-	@$(NETWORK_SCRIPTS)/diagnose-network.sh test || $(call shell_warning_msg,网络存在问题)
+	@$(NETWORK_SCRIPTS)/diagnose.sh test || $(call shell_warning_msg,网络存在问题)
 	@echo ""
 	@echo "$(BLUE)4. 检查磁盘空间$(RESET)"
 	@df -h | grep -E "Filesystem|/$$" || true
@@ -837,9 +883,13 @@ test-mysql: ## 测试 MySQL 连接
 		echo "$(GREEN)✅ 正常$(RESET)" || \
 		echo "$(RED)❌ 失败$(RESET)"
 
-test-redis: ## 测试 Redis 连接
-	@printf "$(BLUE)Redis:$(RESET)     "
-	@docker exec redis redis-cli ping 2>/dev/null | grep -q PONG && \
+test-redis: ## 测试 Redis 连接（双实例）
+	@printf "$(BLUE)Redis Cache (6379):$(RESET) "
+	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG && \
+		echo "$(GREEN)✅ 正常$(RESET)" || \
+		echo "$(RED)❌ 失败$(RESET)"
+	@printf "$(BLUE)Redis Auth  (6380):$(RESET) "
+	@docker exec redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG && \
 		echo "$(GREEN)✅ 正常$(RESET)" || \
 		echo "$(RED)❌ 失败$(RESET)"
 
