@@ -254,19 +254,15 @@ Defaults:deploy !requiretty
 
 # 允许的命令白名单（NOPASSWD: 无需密码）
 deploy ALL=(root) NOPASSWD: \
-    /usr/bin/docker, \
     /usr/bin/docker compose *, \
     /usr/bin/rsync, \
     /usr/bin/systemctl restart *.service, \
     /usr/bin/systemctl status *.service, \
     /usr/bin/systemctl reload *.service
 
-# 显式拒绝危险命令（即使上面允许，这里也拒绝）
-deploy ALL=(root) !NOPASSWD: \
-    /usr/bin/systemctl stop *.service, \
-    /usr/bin/systemctl disable *.service, \
-    /usr/bin/docker system prune, \
-    /usr/bin/docker rm *
+# 注意: 不单独允许 /usr/bin/docker 命令，仅允许 docker compose
+# 这样可以防止执行危险的 docker 命令，如:
+#   docker system prune, docker rm, docker rmi, docker exec 等
 EOF
 
     chmod 440 "$sudoers_file"
