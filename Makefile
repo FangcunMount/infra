@@ -134,7 +134,7 @@ help: ## 显示帮助信息
 	@echo "  3. 服务管理: $(CYAN)<service>-start/stop/logs/shell$(RESET)"
 	@echo "     服务: mysql, redis (cache+auth双实例), mongo, nsq"
 	@echo "  4. 网络管理: $(CYAN)net-create/delete/list, swarm-*, vpn-*$(RESET)"
-	@echo "  5. SSL 证书: $(CYAN)ssl-obtain/import/renew/list$(RESET)"
+	@echo "  5. SSL 证书: $(CYAN)ssl-wildcard/obtain/renew/list/setup-aliyun$(RESET)"
 	@echo "  6. Nginx:    $(CYAN)app-deploy/remove/list, nginx-*$(RESET)"
 	@echo "  7. 监控诊断: $(CYAN)stats, logs, disk-usage$(RESET)"
 	@echo "  8. 测试验证: $(CYAN)test-<service>$(RESET)"
@@ -787,9 +787,15 @@ port-check: ## 检查端口占用 (PORT=端口号)
 # ==============================================================================
 # 5. SSL 证书管理
 # ==============================================================================
-.PHONY: ssl-obtain ssl-import ssl-renew ssl-list ssl-test ssl-remove
+.PHONY: ssl-wildcard ssl-obtain ssl-import ssl-renew ssl-list ssl-remove ssl-setup-aliyun
 
-ssl-obtain: ## 申请 SSL 证书 (DOMAIN=域名 EMAIL=邮箱)
+ssl-wildcard: ## 申请通配符证书 (DOMAIN=域名 EMAIL=邮箱) - 使用阿里云 DNS API
+	$(call require_param,DOMAIN,make ssl-wildcard DOMAIN=yangshujie.com EMAIL=admin@example.com)
+	$(call require_param,EMAIL,make ssl-wildcard DOMAIN=yangshujie.com EMAIL=admin@example.com)
+	@$(TOOLS_SCRIPTS)/ssl-manager.sh wildcard $(DOMAIN) $(EMAIL)
+	$(call success_msg,通配符证书申请成功: $(DOMAIN) + *.$(DOMAIN))
+
+ssl-obtain: ## 申请单域名证书 (DOMAIN=域名 EMAIL=邮箱) - HTTP 验证
 	$(call require_param,DOMAIN,make ssl-obtain DOMAIN=example.com EMAIL=admin@example.com)
 	$(call require_param,EMAIL,make ssl-obtain DOMAIN=example.com EMAIL=admin@example.com)
 	@$(TOOLS_SCRIPTS)/ssl-manager.sh obtain $(DOMAIN) $(EMAIL)
@@ -802,22 +808,21 @@ ssl-import: ## 导入自有证书 (DOMAIN=域名 CERT=证书路径 KEY=私钥路
 	@$(TOOLS_SCRIPTS)/ssl-manager.sh import $(DOMAIN) $(CERT) $(KEY)
 	$(call success_msg,证书导入成功: $(DOMAIN))
 
-ssl-renew: ## 续期 SSL 证书 (DOMAIN=域名)
-	$(call require_param,DOMAIN,make ssl-renew DOMAIN=example.com)
-	@$(TOOLS_SCRIPTS)/ssl-manager.sh renew $(DOMAIN)
-	$(call success_msg,证书续期成功: $(DOMAIN))
+ssl-renew: ## 续期所有 SSL 证书
+	@$(TOOLS_SCRIPTS)/ssl-manager.sh renew
+	$(call success_msg,证书续期完成)
 
 ssl-list: ## 列出所有 SSL 证书
 	@$(TOOLS_SCRIPTS)/ssl-manager.sh list
-
-ssl-test: ## 测试 SSL 证书 (DOMAIN=域名)
-	$(call require_param,DOMAIN,make ssl-test DOMAIN=example.com)
-	@$(TOOLS_SCRIPTS)/ssl-manager.sh test $(DOMAIN)
 
 ssl-remove: ## 删除 SSL 证书 (DOMAIN=域名)
 	$(call require_param,DOMAIN,make ssl-remove DOMAIN=example.com)
 	@$(TOOLS_SCRIPTS)/ssl-manager.sh remove $(DOMAIN)
 	$(call success_msg,证书删除成功: $(DOMAIN))
+
+ssl-setup-aliyun: ## 设置阿里云 DNS API 凭证（交互式）
+	@$(TOOLS_SCRIPTS)/ssl-manager.sh setup-aliyun
+	$(call success_msg,阿里云凭证配置完成)
 
 # ==============================================================================
 # 6. Nginx 应用管理

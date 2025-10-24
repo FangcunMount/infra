@@ -10,6 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INFRA_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
 SSL_DIR="/data/ssl"
 NGINX_CONTAINER="nginx"
+ALIYUN_CREDENTIALS="$HOME/.secrets/aliyun.ini"
 
 # 颜色输出
 RED='\033[0;31m'
@@ -42,8 +43,26 @@ check_dependencies() {
     # 检查 certbot
     if ! command -v certbot &> /dev/null; then
         error "certbot 未安装，正在安装..."
-        sudo apt-get update
-        sudo apt-get install -y certbot python3-certbot-nginx
+        if command -v yum &> /dev/null; then
+            # CentOS/RHEL
+            sudo yum install -y certbot
+        elif command -v apt-get &> /dev/null; then
+            # Debian/Ubuntu
+            sudo apt-get update
+            sudo apt-get install -y certbot
+        else
+            error "无法确定包管理器，请手动安装 certbot"
+            exit 1
+        fi
+    fi
+    
+    # 检查 certbot-dns-aliyun 插件
+    if ! python3 -c "import certbot_dns_aliyun" &> /dev/null; then
+        warn "certbot-dns-aliyun 插件未安装，正在安装..."
+        sudo pip3 install certbot-dns-aliyun || {
+            error "插件安装失败，请手动安装: pip3 install certbot-dns-aliyun"
+            exit 1
+        }
     fi
     
     # 检查 Docker
@@ -64,12 +83,101 @@ check_dependencies() {
     success "依赖检查完成"
 }
 
-# 申请新证书
+# 检查阿里云凭证
+check_aliyun_credentials() {
+    if [[ ! -f "$ALIYUN_CREDENTIALS" ]]; then
+        error "阿里云凭证文件不存在: $ALIYUN_CREDENTIALS"
+        echo
+        warn "请按以下步骤创建阿里云 DNS API 凭证文件："
+        echo
+        echo "1. 创建凭证目录："
+        echo "   mkdir -p ~/.secrets"
+        echo
+        echo "2. 创建凭证文件："
+        echo "   cat > ~/.secrets/aliyun.ini << EOF"
+        echo "dns_aliyun_access_key = YOUR_ACCESS_KEY_ID"
+        echo "dns_aliyun_access_key_secret = YOUR_ACCESS_KEY_SECRET"
+        echo "EOF"
+        echo
+        echo "3. 设置安全权限："
+        echo "   chmod 600 ~/.secrets/aliyun.ini"
+        echo
+        echo "获取 AccessKey："
+        echo "  https://ram.console.aliyun.com/users"
+        echo "  需要授予权限: AliyunDNSFullAccess"
+        echo
+        exit 1
+    fi
+    
+    # 检查凭证文件权限
+    local perms=$(stat -c %a "$ALIYUN_CREDENTIALS" 2>/dev/null || stat -f %Lp "$ALIYUN_CREDENTIALS" 2>/dev/null)
+    if [[ "$perms" != "600" ]]; then
+        warn "凭证文件权限不安全，正在修正..."
+        chmod 600 "$ALIYUN_CREDENTIALS"
+    fi
+    
+    success "阿里云凭证检查通过"
+}
+
+# 申请通配符证书（使用阿里云 DNS API）
+obtain_wildcard_certificate() {
+    local domain="$1"
+    local email="${2:-admin@${domain}}"
+    
+    log "为域名 $domain 申请通配符 SSL 证书..."
+    log "域名范围: $domain 和 *.${domain}"
+    
+    # 检查阿里云凭证
+    check_aliyun_credentials
+    
+    # 使用 DNS 验证申请证书（无需停止 nginx）
+    if certbot certonly \
+        --dns-aliyun \
+        --dns-aliyun-credentials "$ALIYUN_CREDENTIALS" \
+        --email "$email" \
+        --agree-tos \
+        --non-interactive \
+        -d "$domain" \
+        -d "*.${domain}" \
+        --cert-name "$domain" \
+        --config-dir /etc/letsencrypt \
+        --work-dir /var/lib/letsencrypt \
+        --logs-dir /var/log/letsencrypt; then
+        
+        success "证书申请成功: $domain + *.${domain}"
+        
+        # 复制证书到标准位置
+        sudo cp "/etc/letsencrypt/live/${domain}/fullchain.pem" "$SSL_DIR/certs/${domain}.crt"
+        sudo cp "/etc/letsencrypt/live/${domain}/privkey.pem" "$SSL_DIR/private/${domain}.key"
+        sudo chown www:www "$SSL_DIR/certs/${domain}.crt" "$SSL_DIR/private/${domain}.key"
+        sudo chmod 644 "$SSL_DIR/certs/${domain}.crt"
+        sudo chmod 600 "$SSL_DIR/private/${domain}.key"
+        
+        # 重启 nginx 使证书生效
+        log "重新加载 Nginx 配置..."
+        if docker ps | grep -q "$NGINX_CONTAINER"; then
+            docker exec "$NGINX_CONTAINER" nginx -s reload || {
+                warn "Nginx 重载失败，尝试重启容器..."
+                docker restart "$NGINX_CONTAINER"
+            }
+        fi
+        
+        success "证书部署完成: $domain"
+        log "证书覆盖范围:"
+        log "  ✅ $domain"
+        log "  ✅ *.${domain} (所有子域名)"
+    else
+        error "证书申请失败: $domain"
+        exit 1
+    fi
+}
+
+# 申请新证书（单域名，HTTP 验证）
 obtain_certificate() {
     local domain="$1"
     local email="${2:-admin@${domain}}"
     
-    log "为域名 $domain 申请 SSL 证书..."
+    log "为域名 $domain 申请 SSL 证书（单域名）..."
     
     # 停止 nginx 以释放 80 端口
     if docker ps | grep -q "$NGINX_CONTAINER"; then
@@ -84,11 +192,10 @@ obtain_certificate() {
         --agree-tos \
         --non-interactive \
         --domains "$domain" \
-        --cert-path "$SSL_DIR/certs/${domain}.crt" \
-        --key-path "$SSL_DIR/private/${domain}.key" \
-        --config-dir "$SSL_DIR" \
-        --work-dir "$SSL_DIR" \
-        --logs-dir "/data/log/certbot"; then
+        --cert-name "$domain" \
+        --config-dir /etc/letsencrypt \
+        --work-dir /var/lib/letsencrypt \
+        --logs-dir /var/log/letsencrypt; then
         
         success "证书申请成功: $domain"
         
@@ -102,7 +209,7 @@ obtain_certificate() {
         # 重启 nginx
         log "重启 Nginx 容器..."
         cd "$INFRA_ROOT"
-        make restart-nginx
+        make restart-nginx || docker start "$NGINX_CONTAINER"
         
         success "证书部署完成: $domain"
     else
@@ -111,7 +218,7 @@ obtain_certificate() {
         # 重启 nginx（即使失败也要恢复服务）
         log "恢复 Nginx 容器..."
         cd "$INFRA_ROOT"
-        make restart-nginx
+        make restart-nginx || docker start "$NGINX_CONTAINER"
         
         exit 1
     fi
@@ -121,29 +228,33 @@ obtain_certificate() {
 renew_certificates() {
     log "检查和续期所有证书..."
     
-    # 停止 nginx
-    if docker ps | grep -q "$NGINX_CONTAINER"; then
-        log "临时停止 Nginx 容器..."
-        docker stop "$NGINX_CONTAINER" || true
-    fi
-    
-    # 续期所有证书
+    # DNS 验证的证书无需停止 nginx
+    # 直接续期
     if certbot renew \
-        --config-dir "$SSL_DIR" \
-        --work-dir "$SSL_DIR" \
-        --logs-dir "/data/log/certbot" \
-        --pre-hook "docker stop $NGINX_CONTAINER || true" \
-        --post-hook "cd $INFRA_ROOT && make restart-nginx"; then
+        --config-dir /etc/letsencrypt \
+        --work-dir /var/lib/letsencrypt \
+        --logs-dir /var/log/letsencrypt \
+        --post-hook "docker exec $NGINX_CONTAINER nginx -s reload || docker restart $NGINX_CONTAINER"; then
         
         success "证书续期检查完成"
+        
+        # 同步证书到 SSL 目录
+        log "同步证书到 $SSL_DIR..."
+        for cert_dir in /etc/letsencrypt/live/*/; do
+            if [[ -d "$cert_dir" ]]; then
+                local domain=$(basename "$cert_dir")
+                if [[ "$domain" != "README" ]]; then
+                    sudo cp "${cert_dir}fullchain.pem" "$SSL_DIR/certs/${domain}.crt"
+                    sudo cp "${cert_dir}privkey.pem" "$SSL_DIR/private/${domain}.key"
+                    sudo chown www:www "$SSL_DIR/certs/${domain}.crt" "$SSL_DIR/private/${domain}.key"
+                    sudo chmod 644 "$SSL_DIR/certs/${domain}.crt"
+                    sudo chmod 600 "$SSL_DIR/private/${domain}.key"
+                fi
+            fi
+        done
     else
         warn "部分证书续期可能失败，请检查日志"
     fi
-    
-    # 确保 nginx 运行
-    log "确保 Nginx 容器运行..."
-    cd "$INFRA_ROOT"
-    make restart-nginx
 }
 
 # 列出证书
@@ -342,28 +453,107 @@ SSL 证书管理工具
 用法: $0 <command> [options]
 
 命令:
-  obtain <domain> [email]     申请新的 SSL 证书
+  wildcard <domain> [email]   申请通配符证书 (*.domain + domain) - 使用阿里云 DNS API
+  obtain <domain> [email]     申请单域名证书 - 使用 HTTP 验证
   import <domain> <cert> <key> 导入外部证书（如阿里云证书）
   renew                       续期所有证书
   list                        列出所有证书
   remove <domain>             删除指定域名的证书
   config <domain>             生成 nginx SSL 配置模板
   setup-auto                  设置自动续期
+  setup-aliyun                设置阿里云 DNS API 凭证
   
 示例:
+  # 申请通配符证书（推荐）
+  $0 wildcard yangshujie.com yshujie@163.com
+  
+  # 申请单域名证书
   $0 obtain blog.example.com admin@example.com
+  
+  # 导入外部证书
   $0 import blog.example.com ./blog.crt ./blog.key
+  
+  # 续期所有证书
   $0 renew
+  
+  # 列出所有证书
   $0 list
+  
+  # 删除证书
   $0 remove blog.example.com
+  
+  # 生成 nginx 配置
   $0 config blog.example.com > /data/apps/nginx-configs/blog-ssl.conf
+  
+  # 设置自动续期
   $0 setup-auto
 
+证书类型对比:
+  通配符证书 (wildcard):
+    ✅ 覆盖主域名和所有子域名: example.com, *.example.com
+    ✅ 无需停止 nginx (DNS 验证)
+    ✅ 需要阿里云 DNS API 凭证
+    ✅ 推荐用于生产环境
+  
+  单域名证书 (obtain):
+    ✅ 仅覆盖指定域名: example.com
+    ⚠️  需要临时停止 nginx (HTTP 验证)
+    ✅ 无需额外配置
+    ✅ 适合测试或单一域名场景
+
+阿里云 DNS API 配置:
+  1. 获取 AccessKey: https://ram.console.aliyun.com/users
+  2. 授予权限: AliyunDNSFullAccess
+  3. 运行: $0 setup-aliyun
+  
 注意:
-- 证书申请需要域名已解析到当前服务器
-- 申请过程中会临时停止 nginx 服务
-- 建议在维护窗口期间进行操作
+- 通配符证书申请需要先配置阿里云 DNS API 凭证
+- 域名必须在阿里云 DNS 解析
+- 证书有效期 90 天，建议配置自动续期
 EOF
+}
+
+# 设置阿里云凭证（交互式）
+setup_aliyun_credentials() {
+    log "设置阿里云 DNS API 凭证..."
+    echo
+    
+    # 创建凭证目录
+    mkdir -p "$HOME/.secrets"
+    
+    # 交互式输入
+    echo "请输入阿里云 AccessKey 信息："
+    echo "（可从 https://ram.console.aliyun.com/users 获取）"
+    echo
+    
+    read -p "AccessKey ID: " access_key_id
+    read -sp "AccessKey Secret: " access_key_secret
+    echo
+    echo
+    
+    if [[ -z "$access_key_id" ]] || [[ -z "$access_key_secret" ]]; then
+        error "AccessKey 不能为空"
+        exit 1
+    fi
+    
+    # 创建凭证文件
+    cat > "$ALIYUN_CREDENTIALS" << EOF
+# 阿里云 DNS API 凭证
+# 用于 Let's Encrypt 通配符证书申请
+# 创建时间: $(date)
+
+dns_aliyun_access_key = ${access_key_id}
+dns_aliyun_access_key_secret = ${access_key_secret}
+EOF
+    
+    # 设置安全权限
+    chmod 600 "$ALIYUN_CREDENTIALS"
+    
+    success "阿里云凭证配置完成: $ALIYUN_CREDENTIALS"
+    log "文件权限已设置为 600（仅所有者可读写）"
+    echo
+    log "现在可以使用以下命令申请通配符证书："
+    echo "  $0 wildcard your-domain.com your-email@example.com"
 }
 
 # 主函数
@@ -377,9 +567,19 @@ main() {
     shift
     
     case "$command" in
+        "wildcard")
+            if [[ $# -lt 1 ]]; then
+                error "请指定域名"
+                echo "用法: $0 wildcard <domain> [email]"
+                exit 1
+            fi
+            check_dependencies
+            obtain_wildcard_certificate "$@"
+            ;;
         "obtain")
             if [[ $# -lt 1 ]]; then
                 error "请指定域名"
+                echo "用法: $0 obtain <domain> [email]"
                 exit 1
             fi
             check_dependencies
@@ -416,6 +616,9 @@ main() {
             ;;
         "setup-auto")
             setup_auto_renewal
+            ;;
+        "setup-aliyun")
+            setup_aliyun_credentials
             ;;
         "help"|"--help"|"-h")
             show_help
