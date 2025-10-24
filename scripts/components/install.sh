@@ -384,7 +384,7 @@ show_env_file_help() {
     echo "  scp /local/path/to/.env root@\$(hostname -I | awk '{print \$1}'):$env_file"
     echo
     echo "  # 或者上传开发环境配置并修改:"
-    echo "  scp env/dev/.env root@\$(hostname -I | awk '{print \$1}'):$env_file"
+    echo "  scp compose/env/dev/.env root@\$(hostname -I | awk '{print \$1}'):$env_file"
     echo "  # 然后登录服务器修改数据库名称等配置"
     echo
     log_info "方案2️⃣ : 在服务器上直接创建"
@@ -418,7 +418,7 @@ show_env_file_help() {
     echo
     log_info "方案3️⃣ : 复制现有配置模板"
     echo "  # 如果存在其他环境的配置:"
-    echo "  cp env/dev/.env $env_file  # 复制开发环境配置"
+    echo "  cp compose/env/dev/.env $env_file  # 复制开发环境配置"
     echo "  nano $env_file  # 编辑并修改相应参数"
     echo
     echo "========================================"
@@ -432,9 +432,9 @@ show_env_file_help() {
     echo "========================================"
     log_info "📞 需要帮助?"
     echo "========================================"
-    log_info "• 查看配置模板: ls env/*/README.md"
-    log_info "• 检查现有配置: find env -name '*.env' -type f"
-    log_info "• 重新运行安装: make install-mysql (配置文件创建后)"
+    log_info "• 查看配置模板: ls compose/env/*/README.md"
+    log_info "• 检查现有配置: find compose/env -name '*.env' -type f"
+    log_info "• 重新运行安装: make ENV=prod install (配置文件创建后)"
     echo "========================================"
 }
 
@@ -455,8 +455,8 @@ install_component() {
         return 1
     fi
     
-    # 准备环境配置文件路径
-    local env_file="$PROJECT_ROOT/env/${env_type}/.env"
+    # 准备环境配置文件路径（正确路径：compose/env/ENV/.env）
+    local env_file="$PROJECT_ROOT/compose/env/${env_type}/.env"
     
     # 检查并验证环境配置文件
     if ! validate_env_file "$env_file" "$component"; then
