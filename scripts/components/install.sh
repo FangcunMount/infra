@@ -329,7 +329,9 @@ validate_env_file() {
             check_env_var "$env_file" "MYSQL_PASSWORD" missing_vars
             ;;
         redis)
-            check_env_var "$env_file" "REDIS_PASSWORD" missing_vars
+            # Redis 双实例架构：需要两个独立的密码配置
+            check_env_var "$env_file" "REDIS_CACHE_PASSWORD" missing_vars
+            check_env_var "$env_file" "REDIS_AUTH_PASSWORD" missing_vars
             ;;
         mongo)
             check_env_var "$env_file" "MONGO_INITDB_ROOT_USERNAME" missing_vars
@@ -400,9 +402,17 @@ show_env_file_help() {
     echo "MYSQL_PASSWORD=your_user_password_here"
     echo "MYSQL_PORT=3306"
     echo ""
-    echo "# Redis 配置"
-    echo "REDIS_PASSWORD=your_redis_password_here"
-    echo "REDIS_PORT=6379"
+    echo "# Redis 配置（双实例架构）"
+    echo "# Redis Cache 实例：纯缓存，可淘汰（端口 6379）"
+    echo "REDIS_CACHE_PORT=6379"
+    echo "REDIS_CACHE_PASSWORD=your_cache_password_here"
+    echo "REDIS_CACHE_MAXMEMORY=256mb"
+    echo "REDIS_CACHE_POLICY=allkeys-lfu"
+    echo ""
+    echo "# Redis Auth 实例：认证数据，不淘汰，AOF 持久化（端口 6380）"
+    echo "REDIS_AUTH_PORT=6380"
+    echo "REDIS_AUTH_PASSWORD=your_auth_password_here"
+    echo "REDIS_AUTH_MAXMEMORY=192mb"
     echo ""
     echo "# MongoDB 配置"
     echo "MONGO_INITDB_ROOT_USERNAME=admin"
