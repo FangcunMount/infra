@@ -172,7 +172,7 @@ help-all: ## 显示所有命令详情
 		modules["3. 服务管理 - MongoDB"] = "^mongo-"; \
 		modules["3. 服务管理 - Kafka"] = "^kafka-"; \
 		modules["3. 服务管理 - NSQ"] = "^nsq-"; \
-		modules["4. 网络管理"] = "^(network-|net-|swarm-|port-check)"; \
+		modules["4. 网络管理"] = "^(network-|net-|swarm-|vpn-|port-check)"; \
 		modules["5. SSL 证书"] = "^ssl-"; \
 		modules["6. Nginx"] = "^(nginx-|app-deploy|app-remove|app-list|app-enable|app-disable)"; \
 		modules["7. 监控诊断"] = "^(stats$$|top$$|disk-usage|logs$$|troubleshoot|service-ports|diagnose)"; \
