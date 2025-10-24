@@ -1,40 +1,101 @@
-# Redis 缓存服务
+# Redis 双实例服务
+# - redis-cache: 纯缓存实例（可淘汰、不持久化）
+# - redis-auth: 认证实例（不淘汰、AOF 持久化）
 
 services:
-  redis:
+  redis-cache:
     image: redis:7
-    container_name: redis
+    container_name: redis-cache
     networks:
       - backend
-    restart: always
+    restart: unless-stopped
+    ports:
+      - "${REDIS_CACHE_PORT:-6379}:6379"
     volumes:
-      # 数据持久化
-      - redis_data:/data
-      # 配置文件（相对路径）
-      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
-      # 日志
-      - app_logs:/data/log
+      # 配置文件
+      - ./redis-cache.conf:/usr/local/etc/redis/redis-cache.conf:ro
+      # 数据目录（缓存实例无需持久化，但保留目录用于临时文件）
+      - redis_cache_data:/data
     command: >
-      redis-server /usr/local/etc/redis/redis.conf
-      --requirepass "${REDIS_PASSWORD}"
-      --maxmemory "${REDIS_MAXMEMORY}"
-      --maxmemory-policy "${REDIS_MAXMEMORY_POLICY}"
-      --appendonly yes
-      --appendfsync everysec
+      redis-server /usr/local/etc/redis/redis-cache.conf
+      --requirepass "${REDIS_CACHE_PASSWORD}"
+      --maxmemory "${REDIS_CACHE_MAXMEMORY:-256mb}"
+      --maxmemory-policy "${REDIS_CACHE_POLICY:-allkeys-lfu}"
+      --save ""
+      --appendonly no
     environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PASSWORD=${REDIS_CACHE_PASSWORD}
     ulimits:
-      nofile: 100000
-    mem_limit: ${REDIS_MEMORY_LIMIT:-400M}
-    cpus: ${REDIS_CPUS:-0.20}
+      nofile: 65535
+    sysctls:
+      net.core.somaxconn: "65535"
+    # 纯缓存：256MB 数据上限；给 1.5x 余量防止 fork/COW 抖动
+    mem_limit: ${REDIS_CACHE_MEM_LIMIT:-400m}
+    cpus: ${REDIS_CACHE_CPUS:-0.20}
+    stop_grace_period: 10s
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_CACHE_PASSWORD} -h 127.0.0.1 -p 6379 ping | grep PONG"]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "3"
     labels:
       - "infra.service=cache"
       - "infra.category=storage"
+      - "infra.instance=redis-cache"
+      - "infra.host=serverA"
+
+  redis-auth:
+    image: redis:7
+    container_name: redis-auth
+    networks:
+      - backend
+    restart: unless-stopped
+    ports:
+      - "${REDIS_AUTH_PORT:-6380}:6380"
+    volumes:
+      # 配置文件
+      - ./redis-auth.conf:/usr/local/etc/redis/redis-auth.conf:ro
+      # 数据持久化（AOF 文件）
+      - redis_auth_data:/data
+    command: >
+      redis-server /usr/local/etc/redis/redis-auth.conf
+      --requirepass "${REDIS_AUTH_PASSWORD}"
+      --maxmemory "${REDIS_AUTH_MAXMEMORY:-192mb}"
+      --maxmemory-policy noeviction
+      --save ""
+      --appendonly yes
+      --appendfsync everysec
+      --no-appendfsync-on-rewrite yes
+      --aof-use-rdb-preamble yes
+    environment:
+      - REDIS_PASSWORD=${REDIS_AUTH_PASSWORD}
+    ulimits:
+      nofile: 65535
+    sysctls:
+      net.core.somaxconn: "65535"
+    # 关键键：noeviction + AOF；128–256MB 数据，给 1.5x+ 余量
+    mem_limit: ${REDIS_AUTH_MEM_LIMIT:-350m}
+    cpus: ${REDIS_AUTH_CPUS:-0.15}
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_AUTH_PASSWORD} -h 127.0.0.1 -p 6380 ping | grep PONG"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "3"
+    labels:
+      - "infra.service=auth-store"
+      - "infra.category=storage"
+      - "infra.instance=redis-auth"
       - "infra.host=serverA"
 
 # 使用外部网络（共享）和本地数据卷（组件独有）
@@ -44,9 +105,10 @@ networks:
     name: infra-network
 
 volumes:
-  redis_data:
-    name: infra_redis_data
+  redis_cache_data:
+    name: infra_redis_cache_data
     driver: local
-  app_logs:
-    name: infra_app_logs
+  redis_auth_data:
+    name: infra_redis_auth_data
     driver: local
+

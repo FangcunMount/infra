@@ -1,0 +1,151 @@
+# 生产环境基础设施配置
+# Production Infrastructure Configuration
+
+# ===== 基本/时区 =====
+APP_ENV=production
+LOG_LEVEL=info
+DEBUG=false
+TZ=Asia/Shanghai
+
+# ===== 节点/域名（按实际填写）=====
+NODE_A_IP=47.94.204.124
+NODE_B_IP=112.126.82.123
+PRIMARY_DOMAIN=yangshujie.com
+
+# ===== 端口 / Nginx =====
+NGINX_HTTP_PORT=80
+NGINX_HTTPS_PORT=443
+NGINX_TLS_DIR=/data/nginx/tls   # 若用证书本地部署
+
+# ===== 数据根目录 / 网络 =====
+INFRA_DATA_ROOT=/data/infra
+DATA_ROOT_PATH=/data
+# 网络配置（单一网络架构）
+INFRA_BACKEND_SUBNET=172.20.0.0/16
+INFRA_BACKEND_GATEWAY=172.20.0.1
+INFRA_NETWORK_MTU=1500
+
+# ===== MySQL =====
+MYSQL_PORT=3306
+MYSQL_ROOT_PASSWORD=dE7ke5Eq2THc
+MYSQL_DATABASE=infrastructure_prod
+MYSQL_USER=infra_prod
+MYSQL_PASSWORD=Hm6EB6Q!y2xT5T
+# 附加（若compose支持）：限制缓冲池
+MYSQL_INNODB_BUFFER_POOL_SIZE=512M
+
+# ===== Redis（双实例）=====
+# Redis Cache 实例：纯缓存，可淘汰，不持久化
+REDIS_CACHE_PORT=6379
+REDIS_CACHE_PASSWORD=T2XFVfU3DCenEnL_cache
+REDIS_CACHE_MAXMEMORY=256mb
+REDIS_CACHE_POLICY=allkeys-lfu  # LFU 避免热点数据被错误淘汰
+REDIS_CACHE_MEM_LIMIT=400m      # 给 1.5x 余量防止 fork/COW 抖动
+REDIS_CACHE_CPUS=0.20
+
+# Redis Auth 实例：关键数据，不淘汰，AOF 持久化
+REDIS_AUTH_PORT=6380
+REDIS_AUTH_PASSWORD=T2XFVfU3DCenEnL_auth
+REDIS_AUTH_MAXMEMORY=192mb      # 128–256MB 视业务量调整
+REDIS_AUTH_MEM_LIMIT=350m       # AOF 重写需要额外内存
+REDIS_AUTH_CPUS=0.15
+
+# 旧版单实例配置（已废弃，保留用于兼容性）
+REDIS_PORT=${REDIS_CACHE_PORT}
+REDIS_PASSWORD=${REDIS_CACHE_PASSWORD}
+REDIS_MAXMEMORY=${REDIS_CACHE_MAXMEMORY}
+REDIS_MAXMEMORY_POLICY=${REDIS_CACHE_POLICY}
+
+# ===== MongoDB =====
+MONGO_PORT=27017
+MONGO_INITDB_ROOT_USERNAME=root
+MONGO_INITDB_ROOT_PASSWORD=pBy2xT2r3D8JU@GF
+MONGO_DATABASE=infrastructure_prod
+# WiredTiger 缓存（重点！真正控住内存）
+MONGO_WIREDTIGER_CACHE_GB=0.9  # 1.5G 容器中分配 0.9G
+
+# ===== NSQ（消息队列）=====
+NSQ_LOOKUPD_PORT=4160
+NSQ_LOOKUPD_HTTP_PORT=4161
+NSQD_TCP_PORT=4150
+NSQD_HTTP_PORT=4151
+NSQADMIN_HTTP_PORT=4171
+# NSQ 集群配置
+NSQ_BROADCAST_ADDRESS=${NODE_A_IP}
+NSQ_LOOKUPD_TCP_ADDRESSES=${NODE_A_IP}:4160,${NODE_B_IP}:4160
+
+# ===== 管理界面（生产环境建议禁用）=====
+ENABLE_MANAGEMENT_UI=false
+# 如需启用管理界面，取消下面注释并设置端口
+# KAFKA_UI_PORT=9000
+# MONGO_EXPRESS_PORT=8081
+
+# ===== Kafka（部署在 B；仅内网）=====
+# 如使用 Zookeeper：
+KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+# 监听/公告
+KAFKA_LISTENERS=INTERNAL://0.0.0.0:9092
+KAFKA_ADVERTISED_LISTENERS=INTERNAL://${NODE_B_IP}:9092
+KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT
+KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+# JVM 堆
+KAFKA_HEAP_OPTS=-Xms512m -Xmx768m
+
+# ===== 容器级内存上限（docker-compose mem_limit）=====
+# 注意：非 Swarm 模式下使用 mem_limit 而不是 deploy.resources
+# ServerA 部署：Nginx + Redis(双实例) + MongoDB + 用户应用
+NGINX_MEMORY_LIMIT=128M
+NGINX_CPUS=0.25
+
+# Redis 双实例（总计 750M 内存，0.35 CPU）
+# REDIS_CACHE_MEM_LIMIT=400m  # 已在上面定义
+# REDIS_CACHE_CPUS=0.20
+# REDIS_AUTH_MEM_LIMIT=350m
+# REDIS_AUTH_CPUS=0.15
+
+MONGO_MEMORY_LIMIT=1536M  # 1.5G
+MONGO_CPUS=0.30
+
+# ServerB 部署：NSQ + 计算密集型应用（不部署 Kafka）
+NSQ_LOOKUPD_MEMORY_LIMIT=64M
+NSQ_LOOKUPD_CPUS=0.10
+
+NSQ_NSQD_MEMORY_LIMIT=512M
+NSQ_NSQD_CPUS=1.0
+
+NSQ_NSQADMIN_MEMORY_LIMIT=64M
+NSQ_NSQADMIN_CPUS=0.10
+
+# KAFKA_MEMORY_LIMIT=1024M  # 不部署 Kafka
+# KAFKA_CPUS=1.0
+
+# 用户应用预留（ServerA）
+USER_APP_MEMORY_LIMIT=800M  # 700-900M 范围
+USER_APP_CPUS=0.50
+
+# MySQL（如果需要）
+MYSQL_MEMORY_LIMIT=1024M
+MYSQL_CPUS=0.50
+
+# ===== 安全配置 =====
+# 密钥和令牌（请根据实际情况配置）
+# JWT_SECRET=your_jwt_secret_here
+# API_KEY=your_api_key_here
+
+# ===== 备份配置 =====
+BACKUP_ENABLED=true
+BACKUP_RETENTION_DAYS=30
+BACKUP_SCHEDULE="0 2 * * *"  # 每天凌晨2点
+
+# ===== 监控配置 =====
+METRICS_ENABLED=true
+HEALTH_CHECK_ENABLED=true
+
+# ===== 时区和区域设置 =====
+TZ=Asia/Shanghai
+LANG=zh_CN.UTF-8
+
+# ===== 其他配置 =====
+# 数据持久化路径
+DATA_ROOT_PATH=/data
+LOG_ROOT_PATH=/data/logs

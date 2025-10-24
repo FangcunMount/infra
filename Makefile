@@ -115,7 +115,7 @@ help: ## 显示帮助信息
 	@echo "  scripts/                - 管理脚本"
 	@echo ""
 	@echo "$(BLUE)$(BOLD)核心命令:$(RESET)"
-	@echo "  $(CYAN)quick-start$(RESET)          快速启动开发环境 (Nginx + MySQL + Redis)"
+	@echo "  $(CYAN)quick-start$(RESET)          快速启动开发环境 (Nginx + MySQL + Redis 双实例)"
 	@echo "  $(CYAN)full-install$(RESET)         完整安装所有服务"
 	@echo "  $(CYAN)status$(RESET)               查看所有服务状态"
 	@echo "  $(CYAN)test-all$(RESET)             测试所有服务连接"
@@ -125,7 +125,7 @@ help: ## 显示帮助信息
 	@echo "  1. 快速开始: $(CYAN)init, install, up, down, restart$(RESET)"
 	@echo "  2. 环境管理: $(CYAN)env-init, env-edit, dev, prod$(RESET)"
 	@echo "  3. 服务管理: $(CYAN)<service>-start/stop/logs/shell$(RESET)"
-	@echo "     服务: mysql, redis, mongo, kafka, nsq"
+	@echo "     服务: mysql, redis (cache+auth双实例), mongo, nsq"
 	@echo "  4. 网络管理: $(CYAN)net-create/delete/list, swarm-*$(RESET)"
 	@echo "  5. SSL 证书: $(CYAN)ssl-obtain/import/renew/list$(RESET)"
 	@echo "  6. Nginx:    $(CYAN)app-deploy/remove/list, nginx-*$(RESET)"
@@ -249,7 +249,7 @@ install-nginx: init ## 安装 Nginx
 install-mysql: init ## 安装 MySQL
 	@$(INSTALL_SCRIPT) mysql
 
-install-redis: init ## 安装 Redis
+install-redis: init ## 安装 Redis (双实例: cache + auth)
 	@$(INSTALL_SCRIPT) redis
 
 install-mongo: init ## 安装 MongoDB
@@ -294,9 +294,10 @@ quick-start: init install-nginx install-mysql install-redis ## 快速启动开�
 	$(call success_msg,🚀 开发环境已就绪!)
 	@echo ""
 	$(call shell_info_msg,已启动服务:)
-	@echo "  $(GREEN)•$(RESET) Nginx  (80, 443)"
-	@echo "  $(GREEN)•$(RESET) MySQL  (3306)"
-	@echo "  $(GREEN)•$(RESET) Redis  (6379)"
+	@echo "  $(GREEN)•$(RESET) Nginx       (80, 443)"
+	@echo "  $(GREEN)•$(RESET) MySQL       (3306)"
+	@echo "  $(GREEN)•$(RESET) Redis Cache (6379) - 缓存实例"
+	@echo "  $(GREEN)•$(RESET) Redis Auth  (6380) - 认证实例"
 
 full-install: init install ## 完整安装所有服务
 
@@ -395,35 +396,77 @@ mysql-backup: ## 备份 MySQL (DB=数据库名)
 	@docker exec mysql mysqldump -u root -p$(DB) > backup-$(DB)-$(shell date +%Y%m%d-%H%M%S).sql
 	$(call success_msg,MySQL 备份完成)
 
-# --- Redis -------------------------------------------------------------------
+# --- Redis (双实例) -----------------------------------------------------------
 .PHONY: redis-start redis-stop redis-restart redis-logs redis-shell redis-cli redis-status redis-info
-redis-start: init-infra ## 启动 Redis
+.PHONY: redis-cache-logs redis-cache-cli redis-cache-info redis-cache-shell
+.PHONY: redis-auth-logs redis-auth-cli redis-auth-info redis-auth-shell
+
+redis-start: init-infra ## 启动 Redis (双实例: cache + auth)
 	@$(COMPOSE_MANAGER) infra up storage
-	$(call success_msg,Redis 已启动)
+	$(call success_msg,Redis 双实例已启动 (cache: 6379, auth: 6380))
 
-redis-stop: ## 停止 Redis
-	@docker stop redis 2>/dev/null || true
-	$(call success_msg,Redis 已停止)
+redis-stop: ## 停止 Redis (双实例)
+	@docker stop redis-cache redis-auth 2>/dev/null || true
+	$(call success_msg,Redis 双实例已停止)
 
-redis-restart: redis-stop redis-start ## 重启 Redis
+redis-restart: redis-stop redis-start ## 重启 Redis (双实例)
 
-redis-logs: ## 查看 Redis 日志
-	@docker logs -f --tail=$(LOG_LINES) redis 2>/dev/null || \
-		$(call shell_error_msg,Redis 容器不存在或未运行)
-
-redis-shell: ## 进入 Redis 容器 Shell
-	@docker exec -it redis sh || \
-		$(call shell_error_msg,无法连接到 Redis 容器)
-
-redis-cli: ## 进入 Redis CLI
-	@docker exec -it redis redis-cli || \
-		$(call shell_error_msg,无法连接到 Redis)
+redis-logs: ## 查看所有 Redis 日志
+	@echo "$(CYAN)=== Redis Cache 日志 ===$(RESET)"
+	@docker logs --tail=$(LOG_LINES) redis-cache 2>/dev/null || echo "redis-cache 未运行"
+	@echo ""
+	@echo "$(CYAN)=== Redis Auth 日志 ===$(RESET)"
+	@docker logs --tail=$(LOG_LINES) redis-auth 2>/dev/null || echo "redis-auth 未运行"
 
 redis-status: ## 查看 Redis 状态
-	@docker ps --filter "name=redis" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+	@docker ps --filter "name=redis-" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
-redis-info: ## 查看 Redis 信息
-	@docker exec redis redis-cli INFO | head -20
+redis-info: ## 查看 Redis 信息 (双实例)
+	@echo "$(CYAN)=== Redis Cache Info (6379) ===$(RESET)"
+	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning INFO server | grep -E "redis_version|redis_mode|os|uptime_in_seconds" 2>/dev/null || echo "redis-cache 未运行"
+	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning INFO memory | grep -E "used_memory_human|maxmemory_human" 2>/dev/null || true
+	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning INFO stats | grep -E "evicted_keys|keyspace_hits|keyspace_misses" 2>/dev/null || true
+	@echo ""
+	@echo "$(CYAN)=== Redis Auth Info (6380) ===$(RESET)"
+	@docker exec redis-auth redis-cli -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO server | grep -E "redis_version|redis_mode|os|uptime_in_seconds" 2>/dev/null || echo "redis-auth 未运行"
+	@docker exec redis-auth redis-cli -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO memory | grep -E "used_memory_human|maxmemory_human" 2>/dev/null || true
+	@docker exec redis-auth redis-cli -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO persistence | grep -E "aof_enabled|aof_current_size" 2>/dev/null || true
+
+# Cache 实例操作
+redis-cache-logs: ## 查看 Redis Cache 日志
+	@docker logs -f --tail=$(LOG_LINES) redis-cache 2>/dev/null || \
+		$(call shell_error_msg,Redis Cache 容器不存在或未运行)
+
+redis-cache-cli: ## 进入 Redis Cache CLI
+	@docker exec -it redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" || \
+		$(call shell_error_msg,无法连接到 Redis Cache)
+
+redis-cache-info: ## 查看 Redis Cache 详细信息
+	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning INFO
+
+redis-cache-shell: ## 进入 Redis Cache 容器 Shell
+	@docker exec -it redis-cache sh || \
+		$(call shell_error_msg,无法连接到 Redis Cache 容器)
+
+# Auth 实例操作
+redis-auth-logs: ## 查看 Redis Auth 日志
+	@docker logs -f --tail=$(LOG_LINES) redis-auth 2>/dev/null || \
+		$(call shell_error_msg,Redis Auth 容器不存在或未运行)
+
+redis-auth-cli: ## 进入 Redis Auth CLI
+	@docker exec -it redis-auth redis-cli -a "$${REDIS_AUTH_PASSWORD}" -p 6380 || \
+		$(call shell_error_msg,无法连接到 Redis Auth)
+
+redis-auth-info: ## 查看 Redis Auth 详细信息
+	@docker exec redis-auth redis-cli -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO
+
+redis-auth-shell: ## 进入 Redis Auth 容器 Shell
+	@docker exec -it redis-auth sh || \
+		$(call shell_error_msg,无法连接到 Redis Auth 容器)
+
+# 兼容旧命令（默认操作 cache 实例）
+redis-shell: redis-cache-shell ## 进入 Redis 容器 Shell (默认: cache)
+redis-cli: redis-cache-cli ## 进入 Redis CLI (默认: cache)
 
 # --- MongoDB -----------------------------------------------------------------
 .PHONY: mongo-start mongo-stop mongo-restart mongo-logs mongo-shell mongo-status
