@@ -98,6 +98,36 @@ services:
       - "infra.instance=redis-auth"
       - "infra.host=serverA"
 
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    restart: unless-stopped
+    networks:
+      - backend
+    ports:
+      - "${REDISINSIGHT_PORT:-127.0.0.1:5540}:5540"  # 仅本机访问，或改为 0.0.0.0:5540 允许外部访问
+    volumes:
+      - redisinsight_data:/data  # 使用命名卷而非本地目录
+    mem_limit: 256M  # 限制内存使用
+    cpus: 0.10
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5540/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "2"
+    labels:
+      - "infra.service=redis-insight"
+      - "infra.category=management"
+      - "infra.host=serverA"
+    profiles:
+      - management  # 可选启动，使用 docker-compose --profile management up
+
 # 使用外部网络（共享）和本地数据卷（组件独有）
 networks:
   backend:
@@ -110,5 +140,8 @@ volumes:
     driver: local
   redis_auth_data:
     name: infra_redis_auth_data
+    driver: local
+  redisinsight_data:
+    name: infra_redisinsight_data
     driver: local
 
