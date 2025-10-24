@@ -147,7 +147,7 @@ obtain_wildcard_certificate() {
     
     # 使用 DNS 验证申请证书（无需停止 nginx）
     if certbot certonly \
-        --dns-aliyun \
+        --authenticator dns-aliyun \
         --dns-aliyun-credentials "$ALIYUN_CREDENTIALS" \
         --email "$email" \
         --agree-tos \
