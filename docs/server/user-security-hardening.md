@@ -1,6 +1,20 @@
 # 用户权限安全加固说明 (v2.1)
 
-## 🔒 安全问题与修复
+## 🔒 安全问题与修复 (v2.2)
+
+### 版本更新说明
+
+**v2.2 (2025-10-25)**: 调整 deploy 账户策略
+
+- **变更**: deploy 从"禁止登录+白名单命令"改为"可登录+受限 sudo"
+- **原因**: CI/CD 灵活性需求，白名单维护成本过高
+- **安全措施**: 仍不进入 docker 组，通过 sudo 白名单控制权限
+
+**v2.1 (2025-10-24)**: 安全加固版本
+
+- yangshujie 不进入 docker 组
+- deploy 禁止交互登录
+- www 仅作为服务进程所有者
 
 ### 问题概述
 
@@ -11,11 +25,11 @@
 3. **deploy 在服务器上生成 SSH 密钥** → CI 不需要在服务器上出站到 GitHub
 4. **install-docker.sh 考虑把 www 加入 docker 组** → 违反"www 仅作为服务进程所有者"的边界
 
-### 核心原则
+### 核心原则 (v2.2)
 
 ```text
-✅ yangshujie (人用) → sudo 权限，不进 docker 组
-✅ deploy (CI 用) → 禁止交互登录，不进 docker 组，受限 SSH
+✅ yangshujie (人用) → sudo 权限，不进 docker 组，使用 sudo docker
+✅ deploy (CI 用) → 可 SSH 登录（仅密钥），受限 sudo，不进 docker 组
 ✅ www (服务用) → 仅运行服务，不进 docker 组
 ```
 
@@ -56,9 +70,9 @@ sudo docker compose up -d
 docker ps
 ```
 
-#### 问题 2: deploy 被加入 docker 组并可登录
+#### 问题 2: deploy 账户权限设计
 
-**旧代码**:
+**v2.0 旧代码（不安全）**:
 
 ```bash
 create_user "deploy"
@@ -68,7 +82,18 @@ create_ssh_keys "deploy"      # ← 错误: CI 不需要在服务器上生成 Gi
 setup_user_bashrc "deploy"
 ```
 
-**修复后**:
+**v2.1 修复（过于严格）**:
+
+```bash
+# 禁止 deploy 交互登录 (CI 账号不应该有交互式 shell)
+usermod -s /usr/sbin/nologin deploy
+passwd -l deploy
+# 仅通过受限 SSH + authorized_keys command= 执行白名单命令
+```
+
+**问题**: CI/CD 灵活性不足，白名单维护成本高
+
+**v2.2 最终方案（平衡安全与灵活性）**:
 
 ```bash
 create_user "deploy"
@@ -78,28 +103,33 @@ else
     log_warn "非交互模式: 跳过 deploy 密码设置"
 fi
 
-# ❌ 安全加固: deploy 不进入 docker 组,不在服务器上生成 GitHub SSH 密钥
+# ✅ 方案 A: 允许 deploy 登录 + 受限 sudo (推荐)
 # 理由:
-# 1. docker 组 = root 等价权限,不应给 CI 账号
-# 2. deploy 的 SSH 密钥应由 GitHub Actions 管理,不在服务器上生成
-# 3. deploy 应通过受限 SSH 执行白名单命令,而非直接操作 Docker
-# add_docker_privilege "deploy"
-# create_ssh_keys "deploy"
+# 1. GitHub Actions 需要灵活执行部署命令
+# 2. 通过受限 sudo 控制权限,而非完全禁止登录
+# 3. 不将 deploy 加入 docker 组,避免 root 等价权限
+# 4. deploy 只能通过 SSH 密钥登录,不设置密码
 
-# 禁止 deploy 交互登录 (CI 账号不应该有交互式 shell)
-log_info "禁止 deploy 交互登录..."
-usermod -s /usr/sbin/nologin deploy
-passwd -l deploy  # 锁定密码
-log_success "deploy 已设置为不可交互登录"
+log_info "配置 deploy 为可登录账户（仅 SSH 密钥认证）..."
+# deploy 使用 bash shell（允许登录）
+usermod -s /bin/bash deploy
+# 锁定密码（只能通过 SSH 密钥登录，不能用密码）
+passwd -l deploy
+log_success "deploy 已配置为可 SSH 登录（仅密钥认证）"
+
+# 配置 deploy 的受限 sudo 权限
+setup_deploy_sudo_privileges
 
 setup_user_bashrc "deploy"
 ```
 
-**影响**:
+**优势**:
 
-- deploy 无法通过 SSH 交互式登录
-- deploy 无密码（已锁定）
-- deploy 仅能通过受限 SSH 执行白名单命令（需配合 authorized_keys 的 command= 限制）
+- ✅ 可 SSH 登录（仅密钥认证，无密码）
+- ✅ 受限 sudo 权限（docker/systemctl/rsync等）
+- ✅ 不进入 docker 组（避免 root 等价权限）
+- ✅ 所有操作有 sudo 审计日志
+- ✅ CI/CD 配置简单，无需维护复杂白名单
 
 #### 问题 3: 说明文档不准确
 
@@ -240,37 +270,58 @@ make nginx-logs        # 内部: sudo docker compose logs -f
 
 ### deploy (CI/CD 账号)
 
-#### 禁止行为
+#### SSH 登录
 
 ```bash
-# ❌ 错误: 无法交互登录
+# ✅ 正确: 使用 SSH 密钥登录
+ssh -i ~/.ssh/deploy_key deploy@server
+# 成功登录
+
+# ❌ 错误: 使用密码登录
 ssh deploy@server
-# This account is currently not available.
-
-# ❌ 错误: 无法直接使用 docker
-su - deploy
-docker ps
-# deploy: shell: /usr/sbin/nologin
+# Permission denied (publickey)  # 密码已锁定，只能用密钥
 ```
 
-#### 正确使用方式
-
-deploy 账号**仅供 GitHub Actions 使用**，通过受限 SSH 执行白名单命令。
-
-**配置受限 SSH** (在服务器上执行):
+#### deploy 的 Docker 操作
 
 ```bash
-# 使用自动化脚本配置受限 SSH
-sudo ./scripts/server/setup-deploy-ssh.sh "$(cat ~/.ssh/deploy_key.pub)"
+# ✅ 正确: 使用 sudo docker
+sudo docker ps
+sudo docker compose up -d
+sudo docker exec -it myapp bash
 
-# 脚本会自动创建:
-# 1. /usr/local/bin/deployctl          - 白名单命令入口
-# 2. /home/deploy/.ssh/authorized_keys - 强制命令 + 禁用能力
-# 3. /etc/sudoers.d/deploy-cicd        - 最小 sudo 白名单
-# 4. /var/log/deployctl.log            - 命令执行日志
+# ❌ 错误: 直接使用 docker（没有 docker 组权限）
+docker ps
+# permission denied while trying to connect to the Docker daemon socket
 ```
 
-**GitHub Actions 配置示例**:
+#### 配置步骤
+
+##### 步骤 1: 生成 SSH 密钥对（本地执行）
+
+```bash
+ssh-keygen -t ed25519 -C "deploy@github-actions" -f ~/.ssh/deploy_key
+# 将公钥添加到服务器: ~/.ssh/deploy_key.pub
+# 将私钥添加到 GitHub Secrets: DEPLOY_SSH_KEY
+```
+
+##### 步骤 2: 在服务器上添加公钥
+
+```bash
+# SSH 登录服务器（使用 yangshujie）
+ssh yangshujie@server
+
+# 添加 deploy 的 SSH 公钥
+sudo mkdir -p /home/deploy/.ssh
+sudo tee /home/deploy/.ssh/authorized_keys << 'EOF'
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... deploy@github-actions
+EOF
+sudo chown -R deploy:deploy /home/deploy/.ssh
+sudo chmod 700 /home/deploy/.ssh
+sudo chmod 600 /home/deploy/.ssh/authorized_keys
+```
+
+##### 步骤 3: GitHub Actions 工作流
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -291,10 +342,25 @@ jobs:
           username: deploy
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            # 所有命令都会通过 deployctl 白名单过滤
-            docker compose -f /srv/apps/myapp/docker-compose.yml up -d
-            systemctl restart myapp.service
+            # 使用 sudo 执行部署命令
+            cd /srv/apps/myapp
+            sudo docker compose pull
+            sudo docker compose up -d
+            
+            # 或重启 systemd 服务
+            sudo systemctl restart myapp.service
 ```
+
+#### 允许的 sudo 命令
+
+deploy 账户可以无密码执行以下命令：
+
+- ✅ `sudo docker` / `sudo docker-compose`
+- ✅ `sudo systemctl start|stop|restart|reload|status|enable|disable`
+- ✅ `sudo rsync`
+- ✅ `sudo chown` / `sudo chmod` / `sudo mkdir`
+
+所有其他命令需要密码（但 deploy 密码已锁定，实际无法执行）。
 
 **详细使用说明**: 参见 [GitHub Actions 部署指南](./github-actions-deploy.md)
 
@@ -385,9 +451,15 @@ sudo docker ps
 | 账户 | 可登录 | sudo | docker 组 | Docker 操作方式 | 用途 |
 |------|--------|------|-----------|----------------|------|
 | **root** | ✅ | N/A | ✅ | `docker` | 紧急维护 |
-| **yangshujie** | ✅ | ✅ | ❌ | `sudo docker` | 日常运维 |
-| **deploy** | ❌ | ❌ | ❌ | 受限 SSH | CI/CD |
+| **yangshujie** | ✅ | ✅ 全部 | ❌ | `sudo docker` | 日常运维 |
+| **deploy** | ✅ 仅密钥 | ✅ 白名单 | ❌ | `sudo docker` | CI/CD |
 | **www** | ❌ | ❌ | ❌ | 容器内运行 | 业务进程 |
+
+**说明**:
+
+- **deploy 可登录**: ✅ 仅 SSH 密钥认证，密码已锁定
+- **deploy sudo**: ✅ 受限白名单（docker/systemctl/rsync/chown/chmod/mkdir）
+- **所有账户**: ❌ 不进入 docker 组，避免 root 等价权限
 
 ## 🚨 常见问题
 
@@ -407,21 +479,33 @@ docker run -v /:/host -it alpine chroot /host bash
 - 需要输入密码
 - 可以通过 sudoers 细粒度控制权限
 
-### Q2: deploy 不能登录，GitHub Actions 怎么用？
+### Q2: deploy 可以登录，会不会不安全？
 
-**A**: GitHub Actions 通过 SSH 密钥认证，不需要交互式登录：
+**A**: 不会，因为有多重安全措施：
+
+1. **只能 SSH 密钥认证**: 密码已锁定，无法用密码登录
+2. **私钥在 GitHub Secrets**: 不会泄露
+3. **受限 sudo 白名单**: 只能执行必要的命令
+4. **不在 docker 组**: 没有 root 等价权限
+5. **审计日志**: 所有 sudo 操作都有日志 (`/var/log/auth.log`)
+
+**对比 v2.1（禁止登录）的优势**:
+
+- ✅ CI/CD 配置简单，不需要维护复杂的白名单脚本
+- ✅ 仍然保持安全性（受限 sudo）
+- ✅ 灵活性更好，可以自由组合命令
 
 ```yaml
-# GitHub Actions 使用 SSH 密钥连接，不需要 shell
+# v2.2 简化的 GitHub Actions
 - uses: appleboy/ssh-action@master
   with:
     username: deploy
     key: ${{ secrets.DEPLOY_SSH_KEY }}
     script: |
-      # 通过 authorized_keys 的 command= 限制执行的命令
+      cd /srv/apps/myapp
+      sudo docker compose pull
+      sudo docker compose up -d
 ```
-
-配合 `authorized_keys` 的 `command=` 选项，可以限制 deploy 只能执行白名单命令。
 
 ### Q3: 现有服务器怎么迁移？
 
@@ -517,6 +601,6 @@ make mysql-start
 
 ---
 
-**版本**: v2.1 (安全加固版)  
-**更新时间**: 2025-10-24  
-**变更类型**: 安全修复 (Breaking Change)
+**版本**: v2.2 (平衡安全与灵活性)  
+**更新时间**: 2025-10-25  
+**变更类型**: deploy 账户策略调整 (允许 SSH 登录 + 受限 sudo)

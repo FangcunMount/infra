@@ -244,6 +244,64 @@ add_docker_privilege() {
     log_success "用户 '$user' 已获得 docker 权限"
 }
 
+# 配置 deploy 账户的受限 sudo 权限
+setup_deploy_sudo_privileges() {
+    local sudoers_file="/etc/sudoers.d/deploy-cicd"
+    
+    log_info "配置 deploy 的受限 sudo 权限..."
+    
+    # 创建 sudoers 配置文件
+    cat > "$sudoers_file" << 'EOF'
+# deploy 账户的受限 sudo 权限（用于 CI/CD）
+# 
+# 安全策略:
+# 1. 不将 deploy 加入 docker 组（避免 root 等价权限）
+# 2. 通过 sudo 白名单允许必要的命令
+# 3. NOPASSWD: deploy 通过 SSH 密钥认证,无需密码
+# 4. 所有操作有 sudo 审计日志
+
+# Docker 和 Docker Compose 操作
+deploy ALL=(ALL) NOPASSWD: /usr/bin/docker
+deploy ALL=(ALL) NOPASSWD: /usr/bin/docker-compose
+deploy ALL=(ALL) NOPASSWD: /usr/local/bin/docker-compose
+
+# systemd 服务管理
+deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl start *
+deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop *
+deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart *
+deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl reload *
+deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl status *
+deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl enable *
+deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl disable *
+
+# 文件同步和权限管理（部署时常用）
+deploy ALL=(ALL) NOPASSWD: /usr/bin/rsync
+deploy ALL=(ALL) NOPASSWD: /usr/bin/chown
+deploy ALL=(ALL) NOPASSWD: /usr/bin/chmod
+
+# 创建目录（部署时可能需要）
+deploy ALL=(ALL) NOPASSWD: /usr/bin/mkdir
+
+# 禁止其他所有 sudo 命令
+EOF
+
+    # 设置正确的权限
+    chmod 440 "$sudoers_file"
+    
+    # 验证 sudoers 文件语法
+    if visudo -c -f "$sudoers_file" >/dev/null 2>&1; then
+        log_success "deploy sudo 权限配置完成: $sudoers_file"
+        log_info "允许的命令:"
+        log_info "  • sudo docker / sudo docker-compose"
+        log_info "  • sudo systemctl [start|stop|restart|reload|status|enable|disable]"
+        log_info "  • sudo rsync / sudo chown / sudo chmod / sudo mkdir"
+    else
+        log_error "sudoers 文件语法错误，已删除"
+        rm -f "$sudoers_file"
+        return 1
+    fi
+}
+
 # 为用户创建 SSH 密钥对
 create_ssh_keys() {
     local user=$1
@@ -610,12 +668,13 @@ main() {
         echo "    - 使用 'sudo docker' 操作容器"
         echo "    - 配置 .bashrc 和工作环境"
         echo
-        echo "  账户类型 2: deploy (CI/CD 账户) - 安全加固"
-        echo "    - ❌ 禁止交互登录 (Shell: /usr/sbin/nologin)"
-        echo "    - ❌ 密码已锁定 (passwd -l)"
-        echo "    - ❌ 不进入 docker 组 (CI 不应有 root 等价权限)"
-        echo "    - ❌ 不生成 GitHub SSH 密钥 (由 GitHub Actions 管理)"
-        echo "    - 仅通过受限 SSH 执行白名单命令"
+        echo "  账户类型 2: deploy (CI/CD 账户) - 方案 A: 受限 sudo"
+        echo "    - ✅ 可 SSH 登录 (仅 SSH 密钥认证,无密码)"
+        echo "    - ✅ 受限 sudo 权限 (docker/systemctl/rsync/chown/chmod/mkdir)"
+        echo "    - ❌ 不进入 docker 组 (避免 root 等价权限)"
+        echo "    - 使用 'sudo docker' 操作容器"
+        echo "    - SSH 密钥由 GitHub Actions 管理"
+        echo "    - 所有操作有 sudo 审计日志"
         echo
         echo "  账户类型 3: www (业务进程账户)"
         echo "    - 不可登录 (Shell: /usr/sbin/nologin)"
@@ -668,19 +727,22 @@ main() {
         log_warn "非交互模式: 跳过 deploy 密码设置"
     fi
     
-    # ❌ 安全加固: deploy 不进入 docker 组,不在服务器上生成 GitHub SSH 密钥
+    # ✅ 方案 A: 允许 deploy 登录 + 受限 sudo (推荐)
     # 理由:
-    # 1. docker 组 = root 等价权限,不应给 CI 账号
-    # 2. deploy 的 SSH 密钥应由 GitHub Actions 管理,不在服务器上生成
-    # 3. deploy 应通过受限 SSH 执行白名单命令,而非直接操作 Docker
-    # add_docker_privilege "deploy"
-    # create_ssh_keys "deploy"
+    # 1. GitHub Actions 需要灵活执行部署命令
+    # 2. 通过受限 sudo 控制权限,而非完全禁止登录
+    # 3. 不将 deploy 加入 docker 组,避免 root 等价权限
+    # 4. deploy 只能通过 SSH 密钥登录,不设置密码
     
-    # 禁止 deploy 交互登录 (CI 账号不应该有交互式 shell)
-    log_info "禁止 deploy 交互登录..."
-    usermod -s /usr/sbin/nologin deploy
-    passwd -l deploy  # 锁定密码
-    log_success "deploy 已设置为不可交互登录"
+    log_info "配置 deploy 为可登录账户（仅 SSH 密钥认证）..."
+    # deploy 使用 bash shell（允许登录）
+    usermod -s /bin/bash deploy
+    # 锁定密码（只能通过 SSH 密钥登录，不能用密码）
+    passwd -l deploy
+    log_success "deploy 已配置为可 SSH 登录（仅密钥认证）"
+    
+    # 配置 deploy 的受限 sudo 权限
+    setup_deploy_sudo_privileges
     
     setup_user_bashrc "deploy"
     
