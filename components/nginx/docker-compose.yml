@@ -8,8 +8,9 @@ services:
       - backend
     restart: always
     ports:
-      - "${NGINX_HTTP_PORT:-80}:80"
-      - "${NGINX_HTTPS_PORT:-443}:443"
+      # 显式绑定到 0.0.0.0，避免仅绑定到回环地址 (127.0.0.1)
+      - "0.0.0.0:${NGINX_HTTP_PORT:-80}:80"
+      - "0.0.0.0:${NGINX_HTTPS_PORT:-443}:443"
     volumes:
       # 基础配置文件（相对路径）
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
