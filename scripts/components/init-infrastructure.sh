@@ -137,9 +137,18 @@ create_networks() {
         log_success "Swarm 已初始化为单节点模式"
     fi
     
+    # 检查是否为 Swarm Worker 节点
+    local is_manager=false
+    if docker info 2>/dev/null | grep -q "Is Manager: true"; then
+        is_manager=true
+    fi
+    
     # 检查网络是否已存在
     if docker network inspect infra-network >/dev/null 2>&1; then
         log_warn "网络 infra-network 已存在"
+    elif [[ "$is_manager" == "false" ]]; then
+        log_info "检测到 Swarm Worker 节点，overlay 网络将由 Manager 节点管理"
+        log_info "网络会在启动服务时自动同步到本节点"
     else
         log_info "创建网络 infra-network..."
         eval "$backend_cmd" || log_error "网络创建失败"
