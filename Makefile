@@ -278,7 +278,11 @@ install: init ## 安装所有基础设施服务
 	# 在生产环境中（ENV=prod）跳过 Kafka 和 NSQ，避免不必要的组件部署
 	@if [ "$(ENV)" = "prod" ]; then \
 		echo "$(YELLOW)⚠️  生产环境: 跳过 Kafka 和 NSQ 的安装$(RESET)"; \
-		$(INSTALL_SCRIPT) nginx mysql redis mongo; \
+		# install.sh 只接受单个组件或 'all'，因此逐个调用以避免参数解析错误
+		$(INSTALL_SCRIPT) nginx || exit $$?; \
+		$(INSTALL_SCRIPT) mysql || exit $$?; \
+		$(INSTALL_SCRIPT) redis || exit $$?; \
+		$(INSTALL_SCRIPT) mongo || exit $$?; \
 	else \
 		$(INSTALL_SCRIPT) all; \
 	fi
