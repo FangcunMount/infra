@@ -154,11 +154,20 @@ list_configs() {
 
 # 测试 nginx 配置
 test_nginx_config() {
-    if command -v docker >/dev/null 2>&1; then
-        docker exec "$NGINX_CONTAINER" nginx -t 2>/dev/null
-    else
+    if ! command -v docker >/dev/null 2>&1; then
         log_warn "Docker 不可用，跳过配置测试"
         return 0
+    fi
+
+    # 在容器内运行 nginx -t，捕获输出以便在出错时显示（便于诊断）
+    local out
+    if out=$(docker exec "$NGINX_CONTAINER" nginx -t 2>&1); then
+        log_info "✅ nginx 配置测试通过"
+        return 0
+    else
+        log_error "nginx 配置测试失败，输出如下："
+        echo "$out"
+        return 1
     fi
 }
 
