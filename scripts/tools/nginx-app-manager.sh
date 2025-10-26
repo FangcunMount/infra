@@ -57,13 +57,28 @@ deploy_config() {
         show_help
         return 1
     fi
-    
-    if [ ! -f "$config_file" ]; then
-        log_error "配置文件不存在: $config_file"
-        return 1
-    fi
-    
+    # 确保目标配置目录存在（后续可能会从该目录查找文件）
     ensure_config_dir
+
+    # 如果传入的第二个参数不是一个现有文件，尝试在常见位置查找
+    if [ ! -f "$config_file" ]; then
+        # 1) /data/apps/nginx-configs/<name>.conf
+        if [ -f "$APPS_CONFIG_DIR/${config_file}.conf" ]; then
+            config_file="$APPS_CONFIG_DIR/${config_file}.conf"
+        # 2) 当前工作目录 <name>.conf
+        elif [ -f "${PWD}/${config_file}.conf" ]; then
+            config_file="${PWD}/${config_file}.conf"
+        # 3) components/nginx/conf.d/apps/<name>.conf （仓库示例位置）
+        elif [ -f "$SCRIPT_DIR/../components/nginx/conf.d/apps/${config_file}.conf" ]; then
+            config_file="$SCRIPT_DIR/../components/nginx/conf.d/apps/${config_file}.conf"
+        # 4) components/nginx/conf.d/<name>.conf
+        elif [ -f "$SCRIPT_DIR/../components/nginx/conf.d/${config_file}.conf" ]; then
+            config_file="$SCRIPT_DIR/../components/nginx/conf.d/${config_file}.conf"
+        else
+            log_error "配置文件不存在: $config_file"
+            return 1
+        fi
+    fi
     
     local target_file="$APPS_CONFIG_DIR/${app_name}.conf"
     
