@@ -275,7 +275,13 @@ clean-infra: ## 清理基础设施 (谨慎操作)
 .PHONY: install install-nginx install-mysql install-redis install-mongo install-kafka install-nsq
 install: init ## 安装所有基础设施服务
 	$(call shell_info_msg,安装所有基础设施服务...)
-	@$(INSTALL_SCRIPT) all
+	# 在生产环境中（ENV=prod）跳过 Kafka 和 NSQ，避免不必要的组件部署
+	@if [ "$(ENV)" = "prod" ]; then \
+		echo "$(YELLOW)⚠️  生产环境: 跳过 Kafka 和 NSQ 的安装$(RESET)"; \
+		$(INSTALL_SCRIPT) nginx mysql redis mongo; \
+	else \
+		$(INSTALL_SCRIPT) all; \
+	fi
 
 install-nginx: init ## 安装 Nginx
 	@$(INSTALL_SCRIPT) nginx
