@@ -131,6 +131,35 @@ check_infrastructure() {
     log_step "检查基础设施状态..."
     
     local infra_script="$SCRIPT_DIR/init-infrastructure.sh"
+    local env_type="${INFRA_ENV_TYPE:-prod}"
+    local env_file="$PROJECT_ROOT/compose/env/${env_type}/.env"
+    
+    if [[ -f "$env_file" ]]; then
+        log_info "加载基础设施配置: $env_file"
+        while IFS='=' read -r raw_key raw_value; do
+            # 跳过空行和注释
+            [[ -z "$raw_key" ]] && continue
+            [[ "$raw_key" =~ ^[[:space:]]*$ ]] && continue
+            [[ "$raw_key" =~ ^[[:space:]]*# ]] && continue
+            
+            local key="${raw_key%%[[:space:]]*}"
+            if [[ "$key" == INFRA_* ]]; then
+                local value="${raw_value%%#*}"
+                value="${value//$'\r'/}"
+                while [[ -n "$value" && ( "${value:0:1}" == ' ' || "${value:0:1}" == $'\t' ) ]]; do
+                    value="${value:1}"
+                done
+                while [[ -n "$value" && ( "${value: -1}" == ' ' || "${value: -1}" == $'\t' ) ]]; do
+                    value="${value::-1}"
+                done
+                value="${value%\"}"
+                value="${value#\"}"
+                export "$key=$value"
+            fi
+        done < "$env_file"
+    else
+        log_warn "未找到环境配置文件 $env_file，使用默认基础设施参数"
+    fi
     
     # 检查基础设施脚本是否存在
     if [[ ! -f "$infra_script" ]]; then
@@ -179,6 +208,15 @@ check_user() {
         return 1
     fi
     
+    local kernel_name
+    kernel_name="$(uname -s 2>/dev/null)"
+    if [[ "$kernel_name" == "Darwin" ]]; then
+        log_info "检测到 macOS，Docker Desktop 不依赖 docker 组权限"
+        log_info "请确保 Docker Desktop 正在运行以执行相关命令"
+        log_success "用户 $user 权限检查通过（macOS）"
+        return 0
+    fi
+    
     # v2.1 安全模型: www 用户不应该在 docker 组中
     # www 是业务进程账户，仅作为容器内运行用户，不需要 docker 命令权限
     # 容器通过 user: "${WWW_UID}:${WWW_GID}" 以 www 用户身份运行
@@ -216,22 +254,29 @@ prepare_directories() {
         "$DATA_DIR"
         "$LOG_DIR"
         "$DATA_DIR/nginx"
-        "$DATA_DIR/mysql"  
+        "$DATA_DIR/mysql"
         "$DATA_DIR/redis"
         "$DATA_DIR/mongodb"
-        "        "$DATA_DIR/kafka"
-        "$DATA_DIR/nsq""
+        "$DATA_DIR/kafka"
+        "$DATA_DIR/nsq"
         "$DATA_DIR/ssl"
         "$DATA_DIR/apps"
         "$LOG_DIR/nginx"
         "$LOG_DIR/mysql"
         "$LOG_DIR/redis"
         "$LOG_DIR/mongodb"
-        "        "$LOG_DIR/kafka"
-        "$LOG_DIR/nsq""
+        "$LOG_DIR/kafka"
+        "$LOG_DIR/nsq"
         "$LOG_DIR/ssl"
         "$LOG_DIR/certbot"
     )
+    
+    local user_group="$user"
+    if [[ "$user" == "root" ]]; then
+        user_group="0"
+    else
+        user_group="$(id -gn "$user" 2>/dev/null || echo "$user")"
+    fi
     
     for dir in "${dirs[@]}"; do
         if [[ ! -d "$dir" ]]; then
@@ -241,7 +286,7 @@ prepare_directories() {
         
         # 设置目录权限
         if [[ "$user" != "root" ]]; then
-            sudo chown "$user:$user" "$dir"
+            sudo chown "$user:$user_group" "$dir"
         fi
         sudo chmod 755 "$dir"
     done
@@ -1004,7 +1049,22 @@ main() {
     local user="${INFRA_USER:-$DEFAULT_USER}"
     local project="${INFRA_PROJECT:-$DEFAULT_COMPOSE_PROJECT}"
     local data_dir="${INFRA_DATA_DIR:-$DATA_DIR}"
-    local env_type="prod"
+    local env_type_default="prod"
+    
+    if [[ -n "${INFRA_ENV_TYPE:-}" ]]; then
+        env_type_default="${INFRA_ENV_TYPE}"
+    elif [[ -n "${ENV_FILE:-}" ]]; then
+        local derived_env="${ENV_FILE%/.env}"
+        env_type_default="${derived_env##*/}"
+    elif [[ -n "${INFRA_ENV:-}" ]]; then
+        env_type_default="${INFRA_ENV}"
+    elif [[ -n "${ENVIRONMENT:-}" ]]; then
+        env_type_default="${ENVIRONMENT}"
+    elif [[ -n "${ENV:-}" ]]; then
+        env_type_default="${ENV}"
+    fi
+    
+    local env_type="$env_type_default"
     local dry_run=false
     local interactive=false
     
@@ -1060,6 +1120,7 @@ main() {
     DEFAULT_COMPOSE_PROJECT="$project"
     DATA_DIR="$data_dir"
     LOG_DIR="$data_dir/logs"
+    INFRA_ENV_TYPE="$env_type"
     
     # 执行前置检查
     check_prerequisites

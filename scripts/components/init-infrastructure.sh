@@ -29,6 +29,7 @@ INFRA_LOG_ROOT="${INFRA_LOG_ROOT:-/data/logs}"
 INFRA_BACKEND_SUBNET="${INFRA_BACKEND_SUBNET:-172.20.0.0/16}"
 INFRA_BACKEND_GATEWAY="${INFRA_BACKEND_GATEWAY:-172.20.0.1}"
 INFRA_NETWORK_MTU="${INFRA_NETWORK_MTU:-1500}"
+INFRA_NETWORK_DRIVER="${INFRA_NETWORK_DRIVER:-overlay}"
 
 # 用户配置
 # v2.1 安全模型: 使用 www 用户和组，不使用 docker 组
@@ -62,6 +63,7 @@ validate_config() {
     echo "  日志根目录: ${INFRA_LOG_ROOT}"
     echo "  后端网络: ${INFRA_BACKEND_SUBNET} (网关: ${INFRA_BACKEND_GATEWAY})"
     echo "  网络MTU: ${INFRA_NETWORK_MTU}"
+    echo "  网络驱动: ${INFRA_NETWORK_DRIVER}"
     echo "  用户:组: ${INFRA_USER}:${INFRA_GROUP}"
     
     return 0
@@ -96,6 +98,7 @@ show_help() {
   INFRA_BACKEND_SUBNET   网络子网 (默认: 172.20.0.0/16)
   INFRA_BACKEND_GATEWAY  网络网关 (默认: 172.20.0.1)
   INFRA_NETWORK_MTU      网络MTU大小 (默认: 1500)
+  INFRA_NETWORK_DRIVER   网络驱动 (默认: overlay)
   INFRA_USER             数据目录所有者 (默认: $USER)
   INFRA_GROUP            数据目录组 (默认: docker)
 EOF
@@ -107,9 +110,12 @@ create_networks() {
     
     log_step "创建 Docker 网络..."
     
+    local driver="${INFRA_NETWORK_DRIVER}"
+    
     # 基础设施网络（跨主机服务通信）
-    # 注意: 使用 overlay 驱动支持跨服务器部署（NSQ 等分布式服务）
-    local backend_cmd="docker network create \\
+    local backend_cmd
+    if [[ "${driver}" == "overlay" ]]; then
+        backend_cmd="docker network create \\
   --driver overlay \\
   --attachable \\
   --subnet=${INFRA_BACKEND_SUBNET} \\
@@ -119,6 +125,15 @@ create_networks() {
   --label 'infra.network=backend' \\
   --label 'infra.purpose=distributed-service-communication' \\
   infra-network"
+    else
+        backend_cmd="docker network create \\
+  --driver ${driver} \\
+  --subnet=${INFRA_BACKEND_SUBNET} \\
+  --gateway=${INFRA_BACKEND_GATEWAY} \\
+  --label 'infra.network=backend' \\
+  --label 'infra.purpose=distributed-service-communication' \\
+  infra-network"
+    fi
   
     if [[ "$dry_run" == "true" ]]; then
         echo "# 网络创建命令:"
@@ -126,27 +141,33 @@ create_networks() {
         return 0
     fi
     
-    # 检查 Docker Swarm 是否已初始化
-    if ! docker info 2>/dev/null | grep -q "Swarm: active"; then
-        log_warn "Docker Swarm 未初始化，正在初始化单节点 Swarm..."
-        docker swarm init 2>/dev/null || {
-            log_error "Swarm 初始化失败，overlay 网络需要 Swarm 模式"
-            log_info "请手动执行: docker swarm init"
-            return 1
-        }
-        log_success "Swarm 已初始化为单节点模式"
+    if [[ "${driver}" == "overlay" ]]; then
+        # 检查 Docker Swarm 是否已初始化
+        if ! docker info 2>/dev/null | grep -q "Swarm: active"; then
+            log_warn "Docker Swarm 未初始化，正在初始化单节点 Swarm..."
+            docker swarm init 2>/dev/null || {
+                log_error "Swarm 初始化失败，overlay 网络需要 Swarm 模式"
+                log_info "请手动执行: docker swarm init"
+                return 1
+            }
+            log_success "Swarm 已初始化为单节点模式"
+        fi
+    else
+        log_info "使用 ${driver} 网络驱动，无需启用 Docker Swarm"
     fi
     
     # 检查是否为 Swarm Worker 节点
     local is_manager=false
-    if docker info 2>/dev/null | grep -q "Is Manager: true"; then
-        is_manager=true
+    if [[ "${driver}" == "overlay" ]]; then
+        if docker info 2>/dev/null | grep -q "Is Manager: true"; then
+            is_manager=true
+        fi
     fi
     
     # 检查网络是否已存在
     if docker network inspect infra-network >/dev/null 2>&1; then
         log_warn "网络 infra-network 已存在"
-    elif [[ "$is_manager" == "false" ]]; then
+    elif [[ "${driver}" == "overlay" && "$is_manager" == "false" ]]; then
         log_info "检测到 Swarm Worker 节点，overlay 网络将由 Manager 节点管理"
         log_info "网络会在启动服务时自动同步到本节点"
     else
