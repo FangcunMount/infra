@@ -175,7 +175,7 @@ check_infrastructure() {
         networks_exist=true
     fi
     
-    if docker volume inspect infra_mysql_data infra_redis_cache_data infra_redis_auth_data >/dev/null 2>&1; then
+    if docker volume inspect infra_mysql_data infra_redis_cache_data infra_redis_store_data >/dev/null 2>&1; then
         volumes_exist=true
     fi
     
@@ -376,7 +376,7 @@ validate_env_file() {
         redis)
             # Redis 双实例架构：需要两个独立的密码配置
             check_env_var "$env_file" "REDIS_CACHE_PASSWORD" missing_vars
-            check_env_var "$env_file" "REDIS_AUTH_PASSWORD" missing_vars
+            check_env_var "$env_file" "REDIS_STORE_PASSWORD" missing_vars
             ;;
         mongo)
             check_env_var "$env_file" "MONGO_INITDB_ROOT_USERNAME" missing_vars
@@ -454,10 +454,10 @@ show_env_file_help() {
     echo "REDIS_CACHE_MAXMEMORY=256mb"
     echo "REDIS_CACHE_POLICY=allkeys-lfu"
     echo ""
-    echo "# Redis Auth 实例：认证数据，不淘汰，AOF 持久化（端口 6380）"
-    echo "REDIS_AUTH_PORT=6380"
-    echo "REDIS_AUTH_PASSWORD=your_auth_password_here"
-    echo "REDIS_AUTH_MAXMEMORY=192mb"
+    echo "# Redis Store 实例：存储数据，不淘汰，AOF 持久化（端口 6380）"
+    echo "REDIS_STORE_PORT=6380"
+    echo "REDIS_STORE_PASSWORD=your_store_password_here"
+    echo "REDIS_STORE_MAXMEMORY=192mb"
     echo ""
     echo "# MongoDB 配置"
     echo "MONGO_INITDB_ROOT_USERNAME=admin"
@@ -550,9 +550,9 @@ install_component() {
     local service_names=""
     case "$component" in
         redis)
-            # Redis 双实例：redis-cache 和 redis-auth
+            # Redis 双实例：redis-cache 和 redis-store
             service_names=""  # 空表示启动所有服务
-            log_info "Redis 双实例模式：将启动 redis-cache 和 redis-auth"
+            log_info "Redis 双实例模式：将启动 redis-cache 和 redis-store"
             ;;
         kafka)
             # Kafka 多服务：kafka 和 kafka-ui
@@ -690,7 +690,7 @@ check_component_health() {
     case "$component" in
         redis)
             # Redis 双实例：需要检查两个容器
-            local redis_containers=("redis-cache" "redis-auth")
+            local redis_containers=("redis-cache" "redis-store")
             local all_running=true
             
             for container in "${redis_containers[@]}"; do

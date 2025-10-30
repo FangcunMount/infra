@@ -1,6 +1,6 @@
 # Redis 双实例服务
 # - redis-cache: 纯缓存实例（可淘汰、不持久化）
-# - redis-auth: 认证实例（不淘汰、AOF 持久化）
+# - redis-store: 存储实例（不淘汰、AOF 持久化）
 
 services:
   redis-cache:
@@ -49,23 +49,23 @@ services:
       - "infra.instance=redis-cache"
       - "infra.host=serverA"
 
-  redis-auth:
+  redis-store:
     image: redis:7
-    container_name: redis-auth
+    container_name: redis-store
     networks:
       - backend
     restart: unless-stopped
     ports:
-      - "${REDIS_AUTH_PORT:-6380}:6380"
+      - "${REDIS_STORE_PORT:-6380}:6380"
     volumes:
       # 配置文件
-      - ./redis-auth.conf:/usr/local/etc/redis/redis-auth.conf:ro
+      - ./redis-store.conf:/usr/local/etc/redis/redis-store.conf:ro
       # 数据持久化（AOF 文件）
-      - redis_auth_data:/data
+      - redis_store_data:/data
     command: >
-      redis-server /usr/local/etc/redis/redis-auth.conf
-      --requirepass "${REDIS_AUTH_PASSWORD}"
-      --maxmemory "${REDIS_AUTH_MAXMEMORY:-192mb}"
+      redis-server /usr/local/etc/redis/redis-store.conf
+      --requirepass "${REDIS_STORE_PASSWORD}"
+      --maxmemory "${REDIS_STORE_MAXMEMORY:-192mb}"
       --maxmemory-policy noeviction
       --save ""
       --appendonly yes
@@ -73,17 +73,17 @@ services:
       --no-appendfsync-on-rewrite yes
       --aof-use-rdb-preamble yes
     environment:
-      - REDIS_PASSWORD=${REDIS_AUTH_PASSWORD}
+      - REDIS_PASSWORD=${REDIS_STORE_PASSWORD}
     ulimits:
       nofile: 65535
     sysctls:
       net.core.somaxconn: "65535"
     # 关键键：noeviction + AOF；128–256MB 数据，给 1.5x+ 余量
-    mem_limit: ${REDIS_AUTH_MEM_LIMIT:-350m}
-    cpus: ${REDIS_AUTH_CPUS:-0.15}
+    mem_limit: ${REDIS_STORE_MEM_LIMIT:-350m}
+    cpus: ${REDIS_STORE_CPUS:-0.15}
     stop_grace_period: 30s
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a ${REDIS_AUTH_PASSWORD} -h 127.0.0.1 -p 6380 ping | grep PONG"]
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_STORE_PASSWORD} -h 127.0.0.1 -p 6380 ping | grep PONG"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -93,40 +93,10 @@ services:
         max-size: "100m"
         max-file: "3"
     labels:
-      - "infra.service=auth-store"
+      - "infra.service=data-store"
       - "infra.category=storage"
-      - "infra.instance=redis-auth"
+      - "infra.instance=redis-store"
       - "infra.host=serverA"
-
-  redisinsight:
-    image: redis/redisinsight:latest
-    container_name: redisinsight
-    restart: unless-stopped
-    networks:
-      - backend
-    ports:
-      - "${REDISINSIGHT_PORT:-127.0.0.1:5540}:5540"  # 仅本机访问，或改为 0.0.0.0:5540 允许外部访问
-    volumes:
-      - redisinsight_data:/data  # 使用命名卷而非本地目录
-    mem_limit: 256M  # 限制内存使用
-    cpus: 0.10
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5540/api/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    logging:
-      driver: json-file
-      options:
-        max-size: "50m"
-        max-file: "2"
-    labels:
-      - "infra.service=redis-insight"
-      - "infra.category=management"
-      - "infra.host=serverA"
-    profiles:
-      - management  # 可选启动，使用 docker-compose --profile management up
 
 # 使用外部网络（共享）和本地数据卷（组件独有）
 networks:
@@ -138,8 +108,8 @@ volumes:
   redis_cache_data:
     name: infra_redis_cache_data
     driver: local
-  redis_auth_data:
-    name: infra_redis_auth_data
+  redis_store_data:
+    name: infra_redis_store_data
     driver: local
   redisinsight_data:
     name: infra_redisinsight_data

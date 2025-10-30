@@ -49,7 +49,7 @@ ensure_infrastructure() {
     
     # 检查网络和卷是否已创建
     if ! docker network inspect infra-network >/dev/null 2>&1 || \
-       ! docker volume inspect infra_mysql_data infra_redis_cache_data infra_redis_auth_data >/dev/null 2>&1; then
+       ! docker volume inspect infra_mysql_data infra_redis_cache_data infra_redis_store_data >/dev/null 2>&1; then
         
         log_warn "基础设施不完整，正在初始化..."
         

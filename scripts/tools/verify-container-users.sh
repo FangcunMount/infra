@@ -16,16 +16,13 @@ echo "======================================"
 echo ""
 
 # 定义要检查的容器
-declare -A CONTAINERS=(
+declare -A EXPECTED_USERS=(
+    ["nginx"]="www-data (UID 101)"
     ["mysql"]="mysql (UID 999)"
     ["redis-cache"]="redis (UID 999)"
-    ["redis-auth"]="redis (UID 999)"
+    ["redis-store"]="redis (UID 999)"
     ["mongo"]="mongodb (UID 999)"
-    ["nginx"]="nginx (UID 101, worker 进程)"
-    ["nsqlookupd"]="nsq"
-    ["nsqd"]="nsq"
-    ["nsqadmin"]="nsq"
-    ["kafka"]="kafka (UID 1001)"
+    ["kafka"]="appuser (UID 1000)"
 )
 
 # 统计

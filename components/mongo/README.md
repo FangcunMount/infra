@@ -32,9 +32,9 @@
 总内存 4GB
 ├── 系统保留     ~800MB  (20%)
 ├── Nginx        128MB   (3%)
-├── Redis Cache  400MB   (10%)
-├── Redis Auth   350MB   (9%)
-├── MongoDB      1536MB  (38%)
+├── Redis Cache  400MB  (10%)
+├── Redis Store  350MB   (9%)
+├── MongoDB     1536MB  (38%)
 │   ├── WiredTiger Cache  900MB  (58% of 1536MB)
 │   ├── Journal Buffer    ~100MB
 │   ├── 连接栈/Page Cache ~536MB

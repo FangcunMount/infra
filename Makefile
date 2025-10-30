@@ -132,7 +132,7 @@ help: ## 显示帮助信息
 	@echo "  1. 快速开始: $(CYAN)init, install, up, down, restart$(RESET)"
 	@echo "  2. 环境管理: $(CYAN)env-init, env-edit, dev, prod$(RESET)"
 	@echo "  3. 服务管理: $(CYAN)<service>-start/stop/logs/shell$(RESET)"
-	@echo "     服务: mysql, redis (cache+auth双实例), mongo, nsq"
+	@echo "     服务: mysql, redis (cache+store双实例), mongo, nsq"
 	@echo "  4. 网络管理: $(CYAN)net-create/delete/list, swarm-*, vpn-*$(RESET)"
 	@echo "  5. SSL 证书: $(CYAN)ssl-wildcard/obtain/renew/list/setup-aliyun$(RESET)"
 	@echo "  6. Nginx:    $(CYAN)app-deploy/remove/list, nginx-*$(RESET)"
@@ -293,7 +293,7 @@ install-nginx: init ## 安装 Nginx
 install-mysql: init ## 安装 MySQL
 	@$(INSTALL_SCRIPT) mysql
 
-install-redis: init ## 安装 Redis (双实例: cache + auth)
+install-redis: init ## 安装 Redis (双实例: cache + store)
 	@$(INSTALL_SCRIPT) redis
 
 install-mongo: init ## 安装 MongoDB
@@ -341,7 +341,7 @@ quick-start: init install-nginx install-mysql install-redis ## 快速启动开�
 	@echo "  $(GREEN)•$(RESET) Nginx       (80, 443)"
 	@echo "  $(GREEN)•$(RESET) MySQL       (3306)"
 	@echo "  $(GREEN)•$(RESET) Redis Cache (6379) - 缓存实例"
-	@echo "  $(GREEN)•$(RESET) Redis Auth  (6380) - 认证实例"
+	@echo "  $(GREEN)•$(RESET) Redis Store (6380) - 存储实例"
 
 full-install: init install ## 完整安装所有服务
 
@@ -452,14 +452,14 @@ mysql-backup: ## 备份 MySQL (DB=数据库名)
 # --- Redis (双实例) -----------------------------------------------------------
 .PHONY: redis-start redis-stop redis-restart redis-logs redis-shell redis-cli redis-status redis-info
 .PHONY: redis-cache-logs redis-cache-cli redis-cache-info redis-cache-shell
-.PHONY: redis-auth-logs redis-auth-cli redis-auth-info redis-auth-shell
+.PHONY: redis-store-logs redis-store-cli redis-store-info redis-store-shell
 
-redis-start: init-infra ## 启动 Redis (双实例: cache + auth)
+redis-start: init-infra ## 启动 Redis (双实例: cache + store)
 	@$(COMPOSE_MANAGER) infra up storage
-	$(call success_msg,Redis 双实例已启动 (cache: 6379, auth: 6380))
+	$(call success_msg,Redis 双实例已启动 (cache: 6379, store: 6380))
 
 redis-stop: ## 停止 Redis (双实例)
-	@docker stop redis-cache redis-auth 2>/dev/null || true
+	@docker stop redis-cache redis-store 2>/dev/null || true
 	$(call success_msg,Redis 双实例已停止)
 
 redis-restart: redis-stop redis-start ## 重启 Redis (双实例)
@@ -468,8 +468,8 @@ redis-logs: ## 查看所有 Redis 日志
 	@echo "$(CYAN)=== Redis Cache 日志 ===$(RESET)"
 	@docker logs --tail=$(LOG_LINES) redis-cache 2>/dev/null || echo "redis-cache 未运行"
 	@echo ""
-	@echo "$(CYAN)=== Redis Auth 日志 ===$(RESET)"
-	@docker logs --tail=$(LOG_LINES) redis-auth 2>/dev/null || echo "redis-auth 未运行"
+	@echo "$(CYAN)=== Redis Store 日志 ===$(RESET)"
+	@docker logs --tail=$(LOG_LINES) redis-store 2>/dev/null || echo "redis-store 未运行"
 
 redis-status: ## 查看 Redis 状态
 	@docker ps --filter "name=redis-" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
@@ -480,10 +480,10 @@ redis-info: ## 查看 Redis 信息 (双实例)
 	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning INFO memory | grep -E "used_memory_human|maxmemory_human" 2>/dev/null || true
 	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning INFO stats | grep -E "evicted_keys|keyspace_hits|keyspace_misses" 2>/dev/null || true
 	@echo ""
-	@echo "$(CYAN)=== Redis Auth Info (6380) ===$(RESET)"
-	@docker exec redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO server | grep -E "redis_version|redis_mode|os|uptime_in_seconds" 2>/dev/null || echo "redis-auth 未运行"
-	@docker exec redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO memory | grep -E "used_memory_human|maxmemory_human" 2>/dev/null || true
-	@docker exec redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO persistence | grep -E "aof_enabled|aof_current_size" 2>/dev/null || true
+	@echo "$(CYAN)=== Redis Store Info (6380) ===$(RESET)"
+	@docker exec redis-store redis-cli -p 6380 -a "$${REDIS_STORE_PASSWORD}" --no-auth-warning INFO server | grep -E "redis_version|redis_mode|os|uptime_in_seconds" 2>/dev/null || echo "redis-store 未运行"
+	@docker exec redis-store redis-cli -p 6380 -a "$${REDIS_STORE_PASSWORD}" --no-auth-warning INFO memory | grep -E "used_memory_human|maxmemory_human" 2>/dev/null || true
+	@docker exec redis-store redis-cli -p 6380 -a "$${REDIS_STORE_PASSWORD}" --no-auth-warning INFO persistence | grep -E "aof_enabled|aof_current_size" 2>/dev/null || true
 
 # Cache 实例操作
 redis-cache-logs: ## 查看 Redis Cache 日志
@@ -501,21 +501,21 @@ redis-cache-shell: ## 进入 Redis Cache 容器 Shell
 	@docker exec -it redis-cache sh || \
 		$(call shell_error_msg,无法连接到 Redis Cache 容器)
 
-# Auth 实例操作
-redis-auth-logs: ## 查看 Redis Auth 日志
-	@docker logs -f --tail=$(LOG_LINES) redis-auth 2>/dev/null || \
-		$(call shell_error_msg,Redis Auth 容器不存在或未运行)
+# Store 实例操作
+redis-store-logs: ## 查看 Redis Store 日志
+	@docker logs -f --tail=$(LOG_LINES) redis-store 2>/dev/null || \
+		$(call shell_error_msg,Redis Store 容器不存在或未运行)
 
-redis-auth-cli: ## 进入 Redis Auth CLI
-	@docker exec -it redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" || \
-		$(call shell_error_msg,无法连接到 Redis Auth)
+redis-store-cli: ## 进入 Redis Store CLI
+	@docker exec -it redis-store redis-cli -p 6380 -a "$${REDIS_STORE_PASSWORD}" || \
+		$(call shell_error_msg,无法连接到 Redis Store)
 
-redis-auth-info: ## 查看 Redis Auth 详细信息
-	@docker exec redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning INFO
+redis-store-info: ## 查看 Redis Store 详细信息
+	@docker exec redis-store redis-cli -p 6380 -a "$${REDIS_STORE_PASSWORD}" --no-auth-warning INFO
 
-redis-auth-shell: ## 进入 Redis Auth 容器 Shell
-	@docker exec -it redis-auth sh || \
-		$(call shell_error_msg,无法连接到 Redis Auth 容器)
+redis-store-shell: ## 进入 Redis Store 容器 Shell
+	@docker exec -it redis-store sh || \
+		$(call shell_error_msg,无法连接到 Redis Store 容器)
 
 # 兼容旧命令（默认操作 cache 实例）
 redis-shell: redis-cache-shell ## 进入 Redis 容器 Shell (默认: cache)
@@ -969,8 +969,8 @@ test-redis: ## 测试 Redis 连接（双实例）
 	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG && \
 		echo "$(GREEN)✅ 正常$(RESET)" || \
 		echo "$(RED)❌ 失败$(RESET)"
-	@printf "$(BLUE)Redis Auth  (6380):$(RESET) "
-	@docker exec redis-auth redis-cli -p 6380 -a "$${REDIS_AUTH_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG && \
+	@printf "$(BLUE)Redis Store (6380):$(RESET) "
+	@docker exec redis-store redis-cli -p 6380 -a "$${REDIS_STORE_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG && \
 		echo "$(GREEN)✅ 正常$(RESET)" || \
 		echo "$(RED)❌ 失败$(RESET)"
 
