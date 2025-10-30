@@ -19,7 +19,7 @@ services:
     command: >
       redis-server /usr/local/etc/redis/redis-cache.conf
       --requirepass "${REDIS_CACHE_PASSWORD}"
-      --maxmemory "${REDIS_CACHE_MAXMEMORY:-256mb}"
+      --maxmemory "${REDIS_CACHE_MAXMEMORY:-512mb}"
       --maxmemory-policy "${REDIS_CACHE_POLICY:-allkeys-lfu}"
       --save ""
       --appendonly no
@@ -29,8 +29,8 @@ services:
       nofile: 65535
     sysctls:
       net.core.somaxconn: "65535"
-    # 纯缓存：256MB 数据上限；给 1.5x 余量防止 fork/COW 抖动
-    mem_limit: ${REDIS_CACHE_MEM_LIMIT:-400m}
+    # 纯缓存：512MB 数据上限；给 1.5x 余量防止 fork/COW 抖动
+    mem_limit: ${REDIS_CACHE_MEM_LIMIT:-800m}
     cpus: ${REDIS_CACHE_CPUS:-0.20}
     stop_grace_period: 10s
     healthcheck:
@@ -66,12 +66,6 @@ services:
       redis-server /usr/local/etc/redis/redis-store.conf
       --requirepass "${REDIS_STORE_PASSWORD}"
       --maxmemory "${REDIS_STORE_MAXMEMORY:-192mb}"
-      --maxmemory-policy noeviction
-      --save ""
-      --appendonly yes
-      --appendfsync everysec
-      --no-appendfsync-on-rewrite yes
-      --aof-use-rdb-preamble yes
     environment:
       - REDIS_PASSWORD=${REDIS_STORE_PASSWORD}
     ulimits:

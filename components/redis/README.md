@@ -11,7 +11,7 @@
 - **端口**: 6379
 - **持久化**: 禁用（`save ""`，`appendonly no`）
 - **淘汰策略**: `allkeys-lfu`（访问频率最低的键优先淘汰）
-- **内存限制**: 256MB 数据 + 144MB 余量 = 400MB 容器
+- **内存限制**: 512MB 数据 + 288MB 余量 = 800MB 容器
 - **CPU**: 0.20 核
 - **适用场景**:
   - 会话缓存（Session）
@@ -27,7 +27,7 @@
 - ⚠️ 重启后数据丢失
 - ⚠️ 不保证数据持久性
 
-### 2. redis-auth（认证实例）
+### 2. redis-store（存储实例）
 
 **用途**：关键业务数据存储
 
@@ -54,9 +54,9 @@
 
 | 实例 | 数据内存 | 容器内存 | CPU | 余量说明 |
 |------|---------|---------|-----|---------|
-| redis-cache | 256MB | 400MB | 0.20 | 1.56x（fork/COW 余量） |
-| redis-auth | 192MB | 350MB | 0.15 | 1.82x（AOF 重写余量） |
-| **总计** | 448MB | **750MB** | **0.35** | ServerA 总内存占用 |
+| redis-cache | 512MB | 800MB | 0.20 | 1.56x（fork/COW 余量） |
+| redis-store | 192MB | 350MB | 0.15 | 1.82x（AOF 重写余量） |
+| **总计** | 704MB | **1150MB** | **0.35** | ServerA 总内存占用 |
 
 ## 环境变量配置
 
@@ -66,17 +66,17 @@
 # Redis Cache 实例
 REDIS_CACHE_PORT=6379
 REDIS_CACHE_PASSWORD=your_cache_password_here
-REDIS_CACHE_MAXMEMORY=256mb
+REDIS_CACHE_MAXMEMORY=512mb
 REDIS_CACHE_POLICY=allkeys-lfu
-REDIS_CACHE_MEM_LIMIT=400m
+REDIS_CACHE_MEM_LIMIT=800m
 REDIS_CACHE_CPUS=0.20
 
-# Redis Auth 实例
-REDIS_AUTH_PORT=6380
-REDIS_AUTH_PASSWORD=your_auth_password_here
-REDIS_AUTH_MAXMEMORY=192mb
-REDIS_AUTH_MEM_LIMIT=350m
-REDIS_AUTH_CPUS=0.15
+# Redis Store 实例
+REDIS_STORE_PORT=6380
+REDIS_STORE_PASSWORD=your_store_password_here
+REDIS_STORE_MAXMEMORY=192mb
+REDIS_STORE_MEM_LIMIT=350m
+REDIS_STORE_CPUS=0.15
 ```
 
 ## 使用方式
@@ -94,11 +94,11 @@ const cacheClient = redis.createClient({
   db: 0
 });
 
-// redis-auth（认证）
-const authClient = redis.createClient({
-  host: 'redis-auth',
+// redis-store（存储）
+const storeClient = redis.createClient({
+  host: 'redis-store',
   port: 6380,
-  password: process.env.REDIS_AUTH_PASSWORD,
+  password: process.env.REDIS_STORE_PASSWORD,
   db: 0
 });
 ```
@@ -110,11 +110,11 @@ const authClient = redis.createClient({
 await cacheClient.setex('article:hot:123', 3600, JSON.stringify(article));
 
 // 存储用户 Token（不可淘汰）
-await authClient.setex('auth:token:abc123', 7200, userId);
+await storeClient.setex('auth:token:abc123', 7200, userId);
 
 // 分布式锁（关键操作）
 const lockKey = 'lock:order:456';
-const acquired = await authClient.set(lockKey, workerId, 'NX', 'EX', 30);
+const acquired = await storeClient.set(lockKey, workerId, 'NX', 'EX', 30);
 ```
 
 ## 运维建议
@@ -125,9 +125,9 @@ const acquired = await authClient.set(lockKey, workerId, 'NX', 'EX', 30);
 
 - `evicted_keys`: 淘汰的键数量（正常现象）
 - `keyspace_hits/misses`: 缓存命中率
-- `used_memory`: 内存使用量（接近 256MB 时淘汰加速）
+- `used_memory`: 内存使用量（接近 512MB 时淘汰加速）
 
-**Auth 实例关注**:
+**Store 实例关注**:
 
 - `aof_current_size`: AOF 文件大小（定期 BGREWRITEAOF）
 - `used_memory`: 内存使用量（接近 192MB 需扩容或清理）
@@ -135,35 +135,35 @@ const acquired = await authClient.set(lockKey, workerId, 'NX', 'EX', 30);
 
 ### 2. AOF 维护
 
-Auth 实例需要定期重写 AOF：
+Store 实例需要定期重写 AOF：
 
 ```bash
 # 手动触发 AOF 重写
-docker exec redis-auth redis-cli -a ${REDIS_AUTH_PASSWORD} BGREWRITEAOF
+docker exec redis-store redis-cli -a ${REDIS_STORE_PASSWORD} BGREWRITEAOF
 
 # 查看 AOF 状态
-docker exec redis-auth redis-cli -a ${REDIS_AUTH_PASSWORD} INFO persistence
+docker exec redis-store redis-cli -a ${REDIS_STORE_PASSWORD} INFO persistence
 ```
 
 ### 3. 内存告警
 
-当 Auth 实例内存接近上限时：
+当 Store 实例内存接近上限时：
 
 ```bash
 # 查看内存占用 TOP 100
-docker exec redis-auth redis-cli -a ${REDIS_AUTH_PASSWORD} --bigkeys
+docker exec redis-store redis-cli -a ${REDIS_STORE_PASSWORD} --bigkeys
 
 # 清理过期键
-docker exec redis-auth redis-cli -a ${REDIS_AUTH_PASSWORD} --scan --pattern "expired:*" | xargs redis-cli -a ${REDIS_AUTH_PASSWORD} DEL
+docker exec redis-store redis-cli -a ${REDIS_STORE_PASSWORD} --scan --pattern "expired:*" | xargs redis-cli -a ${REDIS_STORE_PASSWORD} DEL
 ```
 
 ### 4. 备份策略
 
-Auth 实例需要定期备份 AOF 文件：
+Store 实例需要定期备份 AOF 文件：
 
 ```bash
 # 备份命令（建议每日凌晨执行）
-docker cp redis-auth:/data/appendonly.aof /backup/redis-auth-$(date +%Y%m%d).aof
+docker cp redis-store:/data/appendonly.aof /backup/redis-store-$(date +%Y%m%d).aof
 ```
 
 ## 部署命令
@@ -178,14 +178,14 @@ docker-compose ps
 
 # 查看日志
 docker-compose logs -f redis-cache
-docker-compose logs -f redis-auth
+docker-compose logs -f redis-store
 
 # 连接测试
 docker exec -it redis-cache redis-cli -a ${REDIS_CACHE_PASSWORD}
-docker exec -it redis-auth redis-cli -a ${REDIS_AUTH_PASSWORD}
+docker exec -it redis-store redis-cli -a ${REDIS_STORE_PASSWORD}
 
 # 停止服务
-docker-compose down  # 注意：cache 数据会丢失，auth 数据保留
+docker-compose down  # 注意：cache 数据会丢失，store 数据保留
 ```
 
 ## 故障排查
@@ -200,14 +200,14 @@ docker-compose down  # 注意：cache 数据会丢失，auth 数据保留
 2. 调整淘汰策略为 `volatile-lfu`（仅淘汰有 TTL 的键）
 3. 优化业务代码，减少冷数据缓存
 
-### 问题 2: Auth 实例拒绝写入
+### 问题 2: Store 实例拒绝写入
 
 **症状**: 应用报错 `OOM command not allowed`
 
 **解决**:
 
 1. 立即清理过期数据：`redis-cli DEL <expired_keys>`
-2. 扩大 `REDIS_AUTH_MAXMEMORY`（如 256mb）
+2. 扩大 `REDIS_STORE_MAXMEMORY`（如 256mb）
 3. 检查是否有内存泄漏（未设置 TTL 的键）
 
 ### 问题 3: AOF 文件过大
@@ -218,9 +218,9 @@ docker-compose down  # 注意：cache 数据会丢失，auth 数据保留
 
 ```bash
 # 执行 AOF 重写
-docker exec redis-auth redis-cli -a ${REDIS_AUTH_PASSWORD} BGREWRITEAOF
+docker exec redis-store redis-cli -a ${REDIS_STORE_PASSWORD} BGREWRITEAOF
 
-# 配置自动重写（修改 redis-auth.conf）
+# 配置自动重写（修改 redis-store.conf）
 auto-aof-rewrite-percentage 100
 auto-aof-rewrite-min-size 64mb
 ```
@@ -281,13 +281,13 @@ docker exec redis redis-cli -a ${REDIS_PASSWORD} KEYS "*" > all_keys.txt
 
 ```bash
 # 启动双实例
-docker-compose up -d redis-cache redis-auth
+docker-compose up -d redis-cache redis-store
 
 # 导入 Cache 数据（可选，缓存可重建）
-# 导入 Auth 数据（必须）
+# 导入 Store 数据（必须）
 cat auth_keys.txt | while read key; do
   docker exec redis redis-cli -a ${OLD_PASSWORD} DUMP "$key" | \
-  docker exec -i redis-auth redis-cli -a ${REDIS_AUTH_PASSWORD} RESTORE "$key" 0
+  docker exec -i redis-store redis-cli -a ${REDIS_STORE_PASSWORD} RESTORE "$key" 0
 done
 ```
 
@@ -306,12 +306,12 @@ done
 **优势**:
 
 - 🎯 **职责分离**: 缓存和持久化分离，避免相互影响
-- 🚀 **性能提升**: Cache 无 AOF 开销，Auth 不受淘汰影响
+- 🚀 **性能提升**: Cache 无 AOF 开销，Store 不受淘汰影响
 - 🔒 **数据安全**: 关键数据 noeviction + AOF 双重保障
-- 💰 **成本优化**: 总内存 750MB，比单实例 1.5GB 更经济
+- 💰 **成本优化**: 总内存 1150MB，适配 ServerA 2C4G 配置
 
 **注意事项**:
 
 - ⚠️ 应用需明确区分缓存和持久化数据
-- ⚠️ Auth 实例需定期维护 AOF 文件
+- ⚠️ Store 实例需定期维护 AOF 文件
 - ⚠️ 两个实例需要独立监控和告警
