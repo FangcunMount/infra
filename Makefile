@@ -121,15 +121,17 @@ help: ## 显示帮助信息
 	@echo "  scripts/                - 管理脚本"
 	@echo ""
 	@echo "$(BLUE)$(BOLD)核心命令:$(RESET)"
+	@echo "  $(CYAN)install$(RESET)              交互式选择并安装组件"
+	@echo "  $(CYAN)install-all-silent$(RESET)   静默安装所有组件 (自动化用)"
 	@echo "  $(CYAN)quick-start$(RESET)          快速启动开发环境 (Nginx + MySQL + Redis 双实例)"
-	@echo "  $(CYAN)full-install$(RESET)         完整安装所有服务"
+	@echo "  $(CYAN)full-install$(RESET)         完整安装 (使用交互式选择)"
 	@echo "  $(CYAN)status$(RESET)               查看所有服务状态"
 	@echo "  $(CYAN)test-all$(RESET)             测试所有服务连接"
 	@echo "  $(CYAN)troubleshoot$(RESET)         运行故障诊断"
 	@echo ""
 	@echo "$(BLUE)模块命令:$(RESET)"
 	@echo "  0. 服务器初始化: $(CYAN)server-init-users, server-install-docker$(RESET)"
-	@echo "  1. 快速开始: $(CYAN)init, install, up, down, restart$(RESET)"
+	@echo "  1. 快速开始: $(CYAN)init, install (交互式), install-all-silent, up, down$(RESET)"
 	@echo "  2. 环境管理: $(CYAN)env-init, env-edit, dev, prod$(RESET)"
 	@echo "  3. 服务管理: $(CYAN)<service>-start/stop/logs/shell$(RESET)"
 	@echo "     服务: mysql, redis (cache+store双实例), mongo, nsq"
@@ -165,7 +167,7 @@ help-all: ## 显示所有命令详情
 		module_order[14] = "9. 维护清理"; \
 		module_order[15] = "10. 帮助文档"; \
 		modules["0. 服务器初始化"] = "^server-"; \
-		modules["1. 快速开始"] = "^(check-env|check-scripts|init$$|init-infra|reset|clean-infra|install$$|install-nginx|install-mysql|install-redis|install-mongo|install-kafka|install-nsq|up$$|down$$|restart$$|status$$|ps$$|health|quick-start|full-install|dev-setup|prod-setup)"; \
+		modules["1. 快速开始"] = "^(check-env|check-scripts|init$$|init-infra|reset|clean-infra|install$$|install-all-silent|install-nginx|install-mysql|install-redis|install-mongo|install-kafka|install-nsq|up$$|down$$|restart$$|status$$|ps$$|health|quick-start|full-install|dev-setup|prod-setup)"; \
 		modules["2. 环境管理"] = "^(dev$$|prod$$|env-init|env-copy|env-edit|env-show|config-show|config-validate)"; \
 		modules["3. 服务管理 - MySQL"] = "^mysql-"; \
 		modules["3. 服务管理 - Redis"] = "^redis-"; \
@@ -274,15 +276,92 @@ clean-infra: ## 清理基础设施 (谨慎操作)
 
 .PHONY: install install-nginx install-mysql install-redis install-mongo install-kafka install-nsq
 install: init ## 安装所有基础设施服务
-	$(call shell_info_msg,安装所有基础设施服务...)
+	@echo ""
+	@echo "$(CYAN)$(BOLD)═══════════════════════════════════════════════════════════$(RESET)"
+	@echo "$(CYAN)$(BOLD)  🐳 基础设施组件安装 - 交互式选择$(RESET)"
+	@echo "$(CYAN)$(BOLD)═══════════════════════════════════════════════════════════$(RESET)"
+	@echo ""
+	@echo "$(BLUE)当前环境:$(RESET) $(YELLOW)$(ENV)$(RESET)"
+	@echo ""
+	@echo "$(BLUE)可用组件:$(RESET)"
+	@echo "  $(GREEN)1)$(RESET) Nginx       - Web 服务器 (80, 443)"
+	@echo "  $(GREEN)2)$(RESET) MySQL       - 关系型数据库 (3306)"
+	@echo "  $(GREEN)3)$(RESET) Redis       - 缓存和存储 (6379, 6380 双实例)"
+	@echo "  $(GREEN)4)$(RESET) MongoDB     - 文档数据库 (27017)"
+	@echo "  $(GREEN)5)$(RESET) Kafka       - 消息队列 (9092)"
+	@echo "  $(GREEN)6)$(RESET) NSQ         - 分布式消息平台 (4150-4171)"
+	@echo "  $(GREEN)7)$(RESET) All         - 安装所有组件"
+	@echo ""
 	@if [ "$(ENV)" = "prod" ]; then \
-		echo "$(YELLOW)⚠️  生产环境: 跳过 Kafka 和 NSQ 的安装$(RESET)"; \
-		$(INSTALL_SCRIPT) nginx || exit $$?; \
-		$(INSTALL_SCRIPT) mysql || exit $$?; \
-		$(INSTALL_SCRIPT) redis || exit $$?; \
-		$(INSTALL_SCRIPT) mongo || exit $$?; \
+		echo "$(YELLOW)💡 提示: 生产环境推荐组件: Nginx + MySQL + Redis + MongoDB$(RESET)"; \
+		echo "$(YELLOW)   (Kafka 和 NSQ 可按需选择)$(RESET)"; \
+	fi
+	@echo ""
+	@read -p "$(CYAN)请选择要安装的组件 (多选用空格分隔，如: 1 3 4): $(RESET)" choices; \
+	if [ -z "$$choices" ]; then \
+		echo "$(RED)❌ 未选择任何组件，安装已取消$(RESET)"; \
+		exit 1; \
+	fi; \
+	echo ""; \
+	selected_components=""; \
+	for choice in $$choices; do \
+		case $$choice in \
+			1) selected_components="$$selected_components nginx";; \
+			2) selected_components="$$selected_components mysql";; \
+			3) selected_components="$$selected_components redis";; \
+			4) selected_components="$$selected_components mongo";; \
+			5) selected_components="$$selected_components kafka";; \
+			6) selected_components="$$selected_components nsq";; \
+			7) selected_components="all"; break;; \
+			*) echo "$(RED)⚠️  无效选项: $$choice (已忽略)$(RESET)";; \
+		esac; \
+	done; \
+	if [ -z "$$selected_components" ]; then \
+		echo "$(RED)❌ 没有有效的组件选择，安装已取消$(RESET)"; \
+		exit 1; \
+	fi; \
+	echo "$(CYAN)$(BOLD)═══════════════════════════════════════════════════════════$(RESET)"; \
+	if [ "$$selected_components" = "all" ]; then \
+		echo "$(GREEN)✓$(RESET) 将安装: $(YELLOW)所有组件$(RESET)"; \
 	else \
+		echo "$(GREEN)✓$(RESET) 将安装: $(YELLOW)$$selected_components$(RESET)"; \
+	fi; \
+	echo "$(CYAN)$(BOLD)═══════════════════════════════════════════════════════════$(RESET)"; \
+	echo ""; \
+	read -p "$(YELLOW)确认继续安装? [Y/n]: $(RESET)" confirm; \
+	if [ "$$confirm" = "n" ] || [ "$$confirm" = "N" ]; then \
+		echo "$(YELLOW)⚠️  安装已取消$(RESET)"; \
+		exit 0; \
+	fi; \
+	echo ""; \
+	echo "$(BLUE)ℹ️  开始安装...$(RESET)"; \
+	echo ""; \
+	if [ "$$selected_components" = "all" ]; then \
 		$(INSTALL_SCRIPT) all; \
+	else \
+		failed_components=""; \
+		for component in $$selected_components; do \
+			echo "$(CYAN)───────────────────────────────────────────────────────────$(RESET)"; \
+			echo "$(BLUE)📦 正在安装: $$component$(RESET)"; \
+			echo "$(CYAN)───────────────────────────────────────────────────────────$(RESET)"; \
+			if ! $(INSTALL_SCRIPT) $$component; then \
+				echo "$(RED)❌ $$component 安装失败$(RESET)"; \
+				failed_components="$$failed_components $$component"; \
+			else \
+				echo "$(GREEN)✅ $$component 安装成功$(RESET)"; \
+			fi; \
+			echo ""; \
+		done; \
+		echo "$(CYAN)$(BOLD)═══════════════════════════════════════════════════════════$(RESET)"; \
+		echo "$(CYAN)$(BOLD)  📊 安装汇总$(RESET)"; \
+		echo "$(CYAN)$(BOLD)═══════════════════════════════════════════════════════════$(RESET)"; \
+		if [ -z "$$failed_components" ]; then \
+			echo "$(GREEN)✅ 所有组件安装成功！$(RESET)"; \
+		else \
+			echo "$(YELLOW)⚠️  部分组件安装失败:$$failed_components$(RESET)"; \
+			echo "$(BLUE)💡 提示: 可以单独重试失败的组件，例如: make install-redis$(RESET)"; \
+		fi; \
+		echo ""; \
 	fi
 
 install-nginx: init ## 安装 Nginx
@@ -329,7 +408,7 @@ health: ## 健康检查
 	$(call shell_info_msg,服务健康检查...)
 	@$(INFRA_SCRIPT) test
 
-.PHONY: quick-start full-install dev-setup prod-setup
+.PHONY: quick-start full-install dev-setup prod-setup install-all-silent
 quick-start: init install-nginx install-mysql install-redis ## 快速启动开发环境
 	@$(COMPOSE_MANAGER) infra up nginx
 	@$(COMPOSE_MANAGER) infra up storage
@@ -341,7 +420,11 @@ quick-start: init install-nginx install-mysql install-redis ## 快速启动开�
 	@echo "  $(GREEN)•$(RESET) Redis Cache (6379) - 缓存实例"
 	@echo "  $(GREEN)•$(RESET) Redis Store (6380) - 存储实例"
 
-full-install: init install ## 完整安装所有服务
+full-install: init install ## 完整安装所有服务 (使用交互式选择)
+
+install-all-silent: init ## 静默安装所有组件 (非交互，用于自动化)
+	@echo "$(BLUE)ℹ️  静默模式: 安装所有组件...$(RESET)"
+	@$(INSTALL_SCRIPT) all
 
 dev-setup: ## 配置开发环境
 	@$(MAKE) ENV=dev env-init
