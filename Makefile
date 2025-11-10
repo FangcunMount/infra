@@ -602,6 +602,40 @@ redis-store-shell: ## 进入 Redis Store 容器 Shell
 redis-shell: redis-cache-shell ## 进入 Redis 容器 Shell (默认: cache)
 redis-cli: redis-cache-cli ## 进入 Redis CLI (默认: cache)
 
+# Redis 清理和重建
+redis-clean: ## 清理 Redis 所有数据（容器、数据卷、宿主机数据）
+	@echo "$(RED)警告: 即将删除所有 Redis 数据！$(RESET)"
+	@echo "$(YELLOW)包括: 容器、数据卷、宿主机数据目录、ACL 配置文件$(RESET)"
+	@read -p "确认要继续吗？(yes/no): " confirm && [ "$$confirm" = "yes" ] || (echo "$(GREEN)操作已取消$(RESET)" && exit 1)
+	@echo "$(BLUE)正在清理 Redis...$(RESET)"
+	@cd $(COMPONENTS_DIR)/redis && bash rebuild.sh "$(COMPOSE_DIR)/env/$(ENV_TYPE)/.env" --clean-only || \
+		$(call shell_error_msg,Redis 清理失败)
+	$(call success_msg,Redis 数据已清理)
+
+redis-rebuild: ## 完全重建 Redis（清理数据 + 重新部署）
+	@echo "$(RED)警告: 即将删除所有 Redis 数据并重新部署！$(RESET)"
+	@read -p "确认要继续吗？(yes/no): " confirm && [ "$$confirm" = "yes" ] || (echo "$(GREEN)操作已取消$(RESET)" && exit 1)
+	@echo "$(BLUE)正在重建 Redis...$(RESET)"
+	@cd $(COMPONENTS_DIR)/redis && bash rebuild.sh "$(COMPOSE_DIR)/env/$(ENV_TYPE)/.env" || \
+		$(call shell_error_msg,Redis 重建失败)
+	$(call success_msg,Redis 已重建完成)
+
+redis-acl-regenerate: ## 重新生成 Redis ACL 配置文件
+	@echo "$(BLUE)正在重新生成 Redis ACL 配置...$(RESET)"
+	@cd $(COMPONENTS_DIR)/redis && bash generate-acl.sh "$(COMPOSE_DIR)/env/$(ENV_TYPE)/.env" || \
+		$(call shell_error_msg,ACL 配置生成失败)
+	@echo "$(YELLOW)提示: 需要重启 Redis 容器使配置生效: make redis-restart$(RESET)"
+	$(call success_msg,Redis ACL 配置已重新生成)
+
+redis-acl-list: ## 查看 Redis ACL 用户列表
+	@echo "$(CYAN)=== Redis Cache ACL 用户列表 ===$(RESET)"
+	@docker exec redis-cache redis-cli --user admin --pass "$${REDIS_ADMIN_PASSWORD}" ACL LIST 2>/dev/null || \
+		echo "$(RED)无法连接到 Redis Cache（请检查容器是否运行和密码是否正确）$(RESET)"
+	@echo ""
+	@echo "$(CYAN)=== Redis Store ACL 用户列表 ===$(RESET)"
+	@docker exec redis-store redis-cli -p 6380 --user admin --pass "$${REDIS_ADMIN_PASSWORD}" ACL LIST 2>/dev/null || \
+		echo "$(RED)无法连接到 Redis Store（请检查容器是否运行和密码是否正确）$(RESET)"
+
 # --- MongoDB -----------------------------------------------------------------
 .PHONY: mongo-start mongo-stop mongo-restart mongo-logs mongo-shell mongo-status
 .PHONY: mongo-backup mongo-monitor mongo-tune mongo-init-users mongo-stats
