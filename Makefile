@@ -534,6 +534,7 @@ mysql-backup: ## 备份 MySQL (DB=数据库名)
 .PHONY: redis-start redis-stop redis-restart redis-logs redis-shell redis-cli redis-status redis-info
 .PHONY: redis-cache-logs redis-cache-cli redis-cache-info redis-cache-shell
 .PHONY: redis-store-logs redis-store-cli redis-store-info redis-store-shell
+.PHONY: redis-clean redis-rebuild redis-acl-regenerate redis-acl-list
 
 redis-start: init-infra ## 启动 Redis (双实例: cache + store)
 	@$(COMPOSE_MANAGER) infra up storage
