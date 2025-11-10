@@ -1,41 +1,6 @@
-# Redis ACL 用户配置文件
-# 文档: https://redis.io/docs/management/security/acl/
-#
-# 语法: user <username> <rules...>
-# 规则示例:
-#   on          - 启用用户
-#   off         - 禁用用户
-#   >password   - 添加密码（明文，生产环境建议使用 #<hash>）
-#   allkeys     - 访问所有键
-#   ~pattern    - 只能访问匹配的键模式
-#   +@category  - 允许命令类别
-#   +command    - 允许特定命令
-#   -command    - 禁止特定命令
-#   allcommands - 允许所有命令
-#   nocommands  - 禁止所有命令
-
-# 默认用户 - 安全起见已禁用
-# 生产环境强烈建议禁用 default 用户，使用具名用户进行访问
-# 如需启用，请取消注释下面一行并设置强密码
-# user default on >${REDIS_DEFAULT_PASSWORD:-change_me_default_pass} ~* &* +@all
 user default off nopass ~* &* +@all
-
-# 管理员用户 - 完全权限
-# 用法示例: redis-cli -u redis://admin:admin_password@localhost:6379
 user admin on >${REDIS_ADMIN_PASSWORD:-change_me_admin_pass} ~* &* +@all
-
-# 应用用户 - 常规读写权限（排除危险命令）
-# 用法示例: redis-cli -u redis://app:app_password@localhost:6379
 user app on >${REDIS_APP_PASSWORD:-change_me_app_pass} ~* &* +@all -@dangerous -@admin -flushall -flushdb -keys -config -shutdown -bgsave -bgrewriteaof -save -debug -migrate -slaveof -replicaof
-
-# 只读用户 - 仅读取权限
-# 用法示例: redis-cli -u redis://readonly:readonly_password@localhost:6379
 user readonly on >${REDIS_READONLY_PASSWORD:-change_me_readonly_pass} ~* &* +@read +@connection +ping +info +auth
-
-# 缓存用户 - 适用于缓存场景（允许过期、删除等操作）
-# 用法示例: redis-cli -u redis://cache:cache_password@localhost:6379
 user cache on >${REDIS_CACHE_USER_PASSWORD:-change_me_cache_pass} ~* &* +@read +@write +@string +@hash +@list +@set +@sortedset +@connection +@transaction +del +expire +ttl +persist +unlink
-
-# 监控用户 - 仅查询状态信息
-# 用法示例: redis-cli -u redis://monitor:monitor_password@localhost:6379
 user monitor on >${REDIS_MONITOR_PASSWORD:-change_me_monitor_pass} ~* &* +@connection +ping +info +client +cluster +slowlog +latency +memory +config|get +auth
