@@ -553,6 +553,39 @@ install_component() {
             # Redis 双实例：redis-cache 和 redis-store
             service_names=""  # 空表示启动所有服务
             log_info "Redis 双实例模式：将启动 redis-cache 和 redis-store"
+            
+            # 生成 Redis ACL 用户配置文件
+            local redis_dir="$COMPONENTS_DIR/redis"
+            local acl_file="$redis_dir/users.acl"
+            local acl_script="$redis_dir/generate-acl.sh"
+            
+            log_step "准备 Redis ACL 配置文件..."
+            
+            # 如果 ACL 文件存在且是目录，先删除（Docker 误创建的）
+            if [[ -d "$acl_file" ]]; then
+                log_warn "检测到 users.acl 是目录（Docker 误创建），正在删除..."
+                rm -rf "$acl_file"
+            fi
+            
+            # 创建空的 ACL 文件（防止 Docker 创建目录）
+            if [[ ! -f "$acl_file" ]]; then
+                touch "$acl_file"
+                log_info "已创建空的 users.acl 文件"
+            fi
+            
+            # 检查生成脚本是否存在
+            if [[ -f "$acl_script" ]]; then
+                log_info "正在生成 Redis ACL 用户配置..."
+                if bash "$acl_script" "$env_file"; then
+                    log_success "Redis ACL 配置文件生成成功"
+                else
+                    log_error "Redis ACL 配置文件生成失败"
+                    return 1
+                fi
+            else
+                log_warn "未找到 ACL 生成脚本: $acl_script"
+                log_warn "将使用默认配置（不推荐生产环境）"
+            fi
             ;;
         kafka)
             # Kafka 多服务：kafka 和 kafka-ui
