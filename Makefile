@@ -639,7 +639,7 @@ redis-acl-list: ## 查看 Redis ACL 用户列表
 
 redis-test: ## 测试 Redis 功能和所有 ACL 用户
 	@echo "$(BLUE)正在测试 Redis 功能...$(RESET)"
-	@cd $(COMPONENTS_DIR)/redis && bash test-redis.sh "$(COMPOSE_DIR)/env/$(ENV_TYPE)/.env" || \
+	@cd $(COMPONENTS_DIR)/redis && bash test-redis.sh "../../compose/env/$(ENV)/.env" || \
 		$(call shell_error_msg,Redis 测试失败)
 
 # --- MongoDB -----------------------------------------------------------------
