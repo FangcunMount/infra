@@ -14,11 +14,12 @@ services:
     volumes:
       # 配置文件
       - ./redis-cache.conf:/usr/local/etc/redis/redis-cache.conf:ro
+      # ACL 用户文件
+      - ./users.acl:/etc/redis/users.acl:ro
       # 数据目录（缓存实例无需持久化，但保留目录用于临时文件）
       - redis_cache_data:/data
     command: >
       redis-server /usr/local/etc/redis/redis-cache.conf
-      --requirepass "${REDIS_CACHE_PASSWORD}"
       --maxmemory "${REDIS_CACHE_MAXMEMORY:-512mb}"
       --maxmemory-policy "${REDIS_CACHE_POLICY:-allkeys-lfu}"
       --save ""
@@ -34,7 +35,7 @@ services:
     cpus: ${REDIS_CACHE_CPUS:-0.20}
     stop_grace_period: 10s
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a ${REDIS_CACHE_PASSWORD} -h 127.0.0.1 -p 6379 ping | grep PONG"]
+      test: ["CMD-SHELL", "redis-cli -h 127.0.0.1 -p 6379 --user admin --pass ${REDIS_ADMIN_PASSWORD:-change_me_admin_pass} ping | grep PONG"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -60,11 +61,12 @@ services:
     volumes:
       # 配置文件
       - ./redis-store.conf:/usr/local/etc/redis/redis-store.conf:ro
+      # ACL 用户文件
+      - ./users.acl:/etc/redis/users.acl:ro
       # 数据持久化（AOF 文件）
       - redis_store_data:/data
     command: >
       redis-server /usr/local/etc/redis/redis-store.conf
-      --requirepass "${REDIS_STORE_PASSWORD}"
       --maxmemory "${REDIS_STORE_MAXMEMORY:-192mb}"
     environment:
       - REDIS_PASSWORD=${REDIS_STORE_PASSWORD}
@@ -77,7 +79,7 @@ services:
     cpus: ${REDIS_STORE_CPUS:-0.15}
     stop_grace_period: 30s
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a ${REDIS_STORE_PASSWORD} -h 127.0.0.1 -p 6380 ping | grep PONG"]
+      test: ["CMD-SHELL", "redis-cli -h 127.0.0.1 -p 6380 --user admin --pass ${REDIS_ADMIN_PASSWORD:-change_me_admin_pass} ping | grep PONG"]
       interval: 30s
       timeout: 5s
       retries: 3
