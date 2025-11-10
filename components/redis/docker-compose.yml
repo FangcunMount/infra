@@ -14,7 +14,7 @@ services:
     volumes:
       # 配置文件
       - ./redis-cache.conf:/usr/local/etc/redis/redis-cache.conf:ro
-      # ACL 用户文件
+      # ACL 用户文件（由 make install 生成）
       - ./users.acl:/etc/redis/users.acl:ro
       # 数据目录（缓存实例无需持久化，但保留目录用于临时文件）
       - redis_cache_data:/data
@@ -24,8 +24,6 @@ services:
       --maxmemory-policy "${REDIS_CACHE_POLICY:-allkeys-lfu}"
       --save ""
       --appendonly no
-    environment:
-      - REDIS_PASSWORD=${REDIS_CACHE_PASSWORD}
     ulimits:
       nofile: 65535
     sysctls:
@@ -61,15 +59,13 @@ services:
     volumes:
       # 配置文件
       - ./redis-store.conf:/usr/local/etc/redis/redis-store.conf:ro
-      # ACL 用户文件
+      # ACL 用户文件（由 make install 生成）
       - ./users.acl:/etc/redis/users.acl:ro
       # 数据持久化（AOF 文件）
       - redis_store_data:/data
     command: >
       redis-server /usr/local/etc/redis/redis-store.conf
       --maxmemory "${REDIS_STORE_MAXMEMORY:-192mb}"
-    environment:
-      - REDIS_PASSWORD=${REDIS_STORE_PASSWORD}
     ulimits:
       nofile: 65535
     sysctls:

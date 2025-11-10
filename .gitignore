@@ -11,6 +11,9 @@ compose/env/*/
 !compose/env/*/.env.example
 !compose/env/*/README.md
 
+# redis ACL 配置文件
+components/redis/users.acl
+
 # =====================================
 # SSL 证书和密钥文件
 # =====================================

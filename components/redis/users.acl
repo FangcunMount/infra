@@ -1,6 +1,0 @@
-user default off nopass ~* &* +@all
-user admin on >${REDIS_ADMIN_PASSWORD:-change_me_admin_pass} ~* &* +@all
-user app on >${REDIS_APP_PASSWORD:-change_me_app_pass} ~* &* +@all -@dangerous -@admin -flushall -flushdb -keys -config -shutdown -bgsave -bgrewriteaof -save -debug -migrate -slaveof -replicaof
-user readonly on >${REDIS_READONLY_PASSWORD:-change_me_readonly_pass} ~* &* +@read +@connection +ping +info +auth
-user cache on >${REDIS_CACHE_USER_PASSWORD:-change_me_cache_pass} ~* &* +@read +@write +@string +@hash +@list +@set +@sortedset +@connection +@transaction +del +expire +ttl +persist +unlink
-user monitor on >${REDIS_MONITOR_PASSWORD:-change_me_monitor_pass} ~* &* +@connection +ping +info +client +cluster +slowlog +latency +memory +config|get +auth
