@@ -116,7 +116,7 @@ fi
 
 echo ""
 echo -e "${BLUE}[步骤 5/6] 重新生成 ACL 配置${NC}"
-ENV_FILE="${1:-../../compose/env/prod/.env}"
+# ENV_FILE 已在脚本开头解析，这里不需要重新赋值
 if [[ ! -f "$ENV_FILE" ]]; then
     echo -e "${RED}✗ 环境变量文件不存在: $ENV_FILE${NC}"
     exit 1

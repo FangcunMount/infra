@@ -609,7 +609,7 @@ redis-clean: ## 清理 Redis 所有数据（容器、数据卷、宿主机数据
 	@echo "$(YELLOW)包括: 容器、数据卷、宿主机数据目录、ACL 配置文件$(RESET)"
 	@read -p "确认要继续吗？(yes/no): " confirm && [ "$$confirm" = "yes" ] || (echo "$(GREEN)操作已取消$(RESET)" && exit 1)
 	@echo "$(BLUE)正在清理 Redis...$(RESET)"
-	@cd $(COMPONENTS_DIR)/redis && bash rebuild.sh "$(COMPOSE_DIR)/env/$(ENV_TYPE)/.env" --clean-only || \
+	@cd $(COMPONENTS_DIR)/redis && bash rebuild.sh "../../compose/env/$(ENV)/.env" --clean-only || \
 		$(call shell_error_msg,Redis 清理失败)
 	$(call success_msg,Redis 数据已清理)
 
@@ -617,13 +617,13 @@ redis-rebuild: ## 完全重建 Redis（清理数据 + 重新部署）
 	@echo "$(RED)警告: 即将删除所有 Redis 数据并重新部署！$(RESET)"
 	@read -p "确认要继续吗？(yes/no): " confirm && [ "$$confirm" = "yes" ] || (echo "$(GREEN)操作已取消$(RESET)" && exit 1)
 	@echo "$(BLUE)正在重建 Redis...$(RESET)"
-	@cd $(COMPONENTS_DIR)/redis && bash rebuild.sh "$(COMPOSE_DIR)/env/$(ENV_TYPE)/.env" || \
+	@cd $(COMPONENTS_DIR)/redis && bash rebuild.sh "../../compose/env/$(ENV)/.env" || \
 		$(call shell_error_msg,Redis 重建失败)
 	$(call success_msg,Redis 已重建完成)
 
 redis-acl-regenerate: ## 重新生成 Redis ACL 配置文件
 	@echo "$(BLUE)正在重新生成 Redis ACL 配置...$(RESET)"
-	@cd $(COMPONENTS_DIR)/redis && bash generate-acl.sh "$(COMPOSE_DIR)/env/$(ENV_TYPE)/.env" || \
+	@cd $(COMPONENTS_DIR)/redis && bash generate-acl.sh "../../compose/env/$(ENV)/.env" || \
 		$(call shell_error_msg,ACL 配置生成失败)
 	@echo "$(YELLOW)提示: 需要重启 Redis 容器使配置生效: make redis-restart$(RESET)"
 	$(call success_msg,Redis ACL 配置已重新生成)
@@ -639,7 +639,7 @@ redis-acl-list: ## 查看 Redis ACL 用户列表
 
 redis-test: ## 测试 Redis 功能和所有 ACL 用户
 	@echo "$(BLUE)正在测试 Redis 功能...$(RESET)"
-	@cd $(COMPONENTS_DIR)/redis && bash test-redis.sh "../../compose/env/$(ENV)/.env" || \
+	@cd $(COMPONENTS_DIR)/redis && bash test-redis.sh "./compose/env/$(ENV)/.env" || \
 		$(call shell_error_msg,Redis 测试失败)
 
 # --- MongoDB -----------------------------------------------------------------
