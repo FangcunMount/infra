@@ -282,7 +282,7 @@ else
 fi
 
 test_start "app 用户禁止执行 KEYS (cache)"
-result=$(redis_exec "redis-cache" "6379" "app" "$APP_PASS" "KEYS *" 2>&1 || true)
+result=$(redis_exec "redis-cache" "6379" "app" "$APP_PASS" "KEYS" "test:*" 2>&1 || true)
 if echo "$result" | grep -q "NOPERM"; then
     test_pass
 else
