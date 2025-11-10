@@ -534,7 +534,7 @@ mysql-backup: ## 备份 MySQL (DB=数据库名)
 .PHONY: redis-start redis-stop redis-restart redis-logs redis-shell redis-cli redis-status redis-info
 .PHONY: redis-cache-logs redis-cache-cli redis-cache-info redis-cache-shell
 .PHONY: redis-store-logs redis-store-cli redis-store-info redis-store-shell
-.PHONY: redis-clean redis-rebuild redis-acl-regenerate redis-acl-list
+.PHONY: redis-clean redis-rebuild redis-acl-regenerate redis-acl-list redis-test
 
 redis-start: init-infra ## 启动 Redis (双实例: cache + store)
 	@$(COMPOSE_MANAGER) infra up storage
@@ -636,6 +636,11 @@ redis-acl-list: ## 查看 Redis ACL 用户列表
 	@echo "$(CYAN)=== Redis Store ACL 用户列表 ===$(RESET)"
 	@docker exec redis-store redis-cli -p 6380 --user admin --pass "$${REDIS_ADMIN_PASSWORD}" ACL LIST 2>/dev/null || \
 		echo "$(RED)无法连接到 Redis Store（请检查容器是否运行和密码是否正确）$(RESET)"
+
+redis-test: ## 测试 Redis 功能和所有 ACL 用户
+	@echo "$(BLUE)正在测试 Redis 功能...$(RESET)"
+	@cd $(COMPONENTS_DIR)/redis && bash test-redis.sh "$(COMPOSE_DIR)/env/$(ENV_TYPE)/.env" || \
+		$(call shell_error_msg,Redis 测试失败)
 
 # --- MongoDB -----------------------------------------------------------------
 .PHONY: mongo-start mongo-stop mongo-restart mongo-logs mongo-shell mongo-status
