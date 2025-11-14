@@ -29,11 +29,23 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 COMPOSE_DIR="${REPO_ROOT}/compose"
 COMPONENTS_DIR="${REPO_ROOT}/components"
-ENV_DIR="${REPO_ROOT}/env"
+ENV_DIR="${REPO_ROOT}/compose/env"
 
 # 默认环境
 DEFAULT_ENV="dev"
+ORIGINAL_ENVIRONMENT="${ENVIRONMENT:-}"
 ENVIRONMENT="${DEFAULT_ENV}"
+
+# 允许通过外部环境变量覆盖默认环境（与 Makefile 保持一致）
+if [[ -n "${INFRA_ENV_TYPE:-}" ]]; then
+    ENVIRONMENT="${INFRA_ENV_TYPE}"
+elif [[ -n "${INFRA_ENV:-}" ]]; then
+    ENVIRONMENT="${INFRA_ENV}"
+elif [[ -n "$ORIGINAL_ENVIRONMENT" ]]; then
+    ENVIRONMENT="$ORIGINAL_ENVIRONMENT"
+elif [[ -n "${ENV:-}" ]]; then
+    ENVIRONMENT="${ENV}"
+fi
 
 # 确保基础设施就绪
 ensure_infrastructure() {
@@ -61,6 +73,43 @@ ensure_infrastructure() {
         log_success "基础设施初始化完成"
     else
         log_success "基础设施已就绪"
+    fi
+}
+
+# 确保 Redis ACL 文件在启动前存在
+ensure_redis_acl() {
+    local redis_dir="${COMPONENTS_DIR}/redis"
+    local acl_file="${redis_dir}/users.acl"
+    local acl_script="${redis_dir}/generate-acl.sh"
+    local env_file="${ENV_DIR}/${ENVIRONMENT}/.env"
+
+    if [[ ! -d "$redis_dir" ]]; then
+        log_warn "Redis 组件目录不存在，跳过 ACL 文件生成"
+        return 0
+    fi
+
+    if [[ -d "$acl_file" ]]; then
+        log_warn "检测到 users.acl 是目录（Docker 可能提前创建），正在删除..."
+        rm -rf "$acl_file"
+    fi
+
+    if [[ ! -f "$acl_file" ]]; then
+        touch "$acl_file"
+        log_info "已创建空的 Redis ACL 文件"
+    fi
+
+    if [[ ! -f "$env_file" ]]; then
+        log_warn "环境配置文件不存在: $env_file，无法生成 Redis ACL"
+        log_warn "请先运行 make env-init 或指定正确的环境"
+        return 0
+    fi
+
+    if [[ -f "$acl_script" ]]; then
+        log_info "正在根据 ${ENVIRONMENT} 环境生成 Redis ACL 配置..."
+        bash "$acl_script" "$env_file"
+        log_success "Redis ACL 配置已生成"
+    else
+        log_warn "未找到 Redis ACL 生成脚本: $acl_script"
     fi
 }
 
@@ -220,6 +269,14 @@ manage_infra() {
     
     # 转换为数组
     readarray -t compose_files <<< "$compose_args"
+    local redis_compose_file="${COMPONENTS_DIR}/redis/docker-compose.yml"
+    local includes_redis=false
+    for element in "${compose_files[@]}"; do
+        if [[ "$element" == "$redis_compose_file" ]]; then
+            includes_redis=true
+            break
+        fi
+    done
     
     case "$action" in
         "up")
@@ -235,6 +292,9 @@ manage_infra() {
                 $COMPOSE_CMD "${compose_files[@]}" config --services 2>/dev/null || true
                 log_success "基础网络和卷创建完成"
             else
+                if [[ "$includes_redis" == true ]]; then
+                    ensure_redis_acl
+                fi
                 $COMPOSE_CMD "${compose_files[@]}" up -d
             fi
             ;;

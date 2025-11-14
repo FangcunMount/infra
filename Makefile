@@ -27,6 +27,7 @@ TOOLS_SCRIPTS := $(SCRIPTS_DIR)/tools
 INFRA_SCRIPT := $(COMPONENTS_SCRIPTS)/init-infrastructure.sh
 INSTALL_SCRIPT := $(COMPONENTS_SCRIPTS)/install.sh
 COMPOSE_MANAGER := $(COMPONENTS_SCRIPTS)/compose-manager.sh
+COMPOSE_MANAGER_ENV := ENV=$(ENV) ENVIRONMENT=$(ENV) INFRA_ENV=$(ENV) INFRA_ENV_TYPE=$(ENV)
 
 # 组件配置路径
 COMPONENTS_DIR := components
@@ -385,11 +386,11 @@ install-nsq: init ## 安装 NSQ
 .PHONY: up down restart
 up: ## 启动所有基础设施服务
 	$(call shell_info_msg,启动基础设施服务...)
-	@$(COMPOSE_MANAGER) infra up all
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra up all
 
 down: ## 停止所有服务
 	$(call shell_info_msg,停止基础设施服务...)
-	@$(COMPOSE_MANAGER) infra down all
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra down all
 
 restart: down up ## 重启所有服务
 
@@ -399,7 +400,7 @@ status: ## 查看基础设施和服务状态
 	@$(INFRA_SCRIPT) status
 	@echo ""
 	$(call section_title,服务状态)
-	@$(COMPOSE_MANAGER) status
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) status
 
 ps: ## 查看运行的容器
 	@docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
@@ -410,8 +411,8 @@ health: ## 健康检查
 
 .PHONY: quick-start full-install dev-setup prod-setup install-all-silent
 quick-start: init install-nginx install-mysql install-redis ## 快速启动开发环境
-	@$(COMPOSE_MANAGER) infra up nginx
-	@$(COMPOSE_MANAGER) infra up storage
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra up nginx
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra up storage
 	$(call success_msg,🚀 开发环境已就绪!)
 	@echo ""
 	$(call shell_info_msg,已启动服务:)
@@ -496,11 +497,11 @@ config-validate: check-env ## 验证配置文件
 # --- MySQL -------------------------------------------------------------------
 .PHONY: mysql-start mysql-stop mysql-restart mysql-logs mysql-shell mysql-status mysql-backup
 mysql-start: init-infra ## 启动 MySQL
-	@$(COMPOSE_MANAGER) infra up storage
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra up storage
 	$(call success_msg,MySQL 已启动)
 
 mysql-stop: ## 停止 MySQL
-	@$(COMPOSE_MANAGER) infra down storage
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra down storage
 	$(call success_msg,MySQL 已停止)
 
 mysql-restart: mysql-stop mysql-start ## 重启 MySQL
@@ -537,7 +538,7 @@ mysql-backup: ## 备份 MySQL (DB=数据库名)
 .PHONY: redis-clean redis-rebuild redis-acl-regenerate redis-acl-list redis-test
 
 redis-start: init-infra ## 启动 Redis (双实例: cache + store)
-	@$(COMPOSE_MANAGER) infra up storage
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra up storage
 	$(call success_msg,Redis 双实例已启动 (cache: 6379, store: 6380))
 
 redis-stop: ## 停止 Redis (双实例)
@@ -703,11 +704,11 @@ mongo-stats: ## 查看 MongoDB 统计信息
 .PHONY: kafka-start kafka-stop kafka-restart kafka-logs kafka-shell kafka-status
 .PHONY: kafka-topics kafka-create-topic kafka-delete-topic kafka-describe-topic
 kafka-start: init-infra ## 启动 Kafka
-	@$(COMPOSE_MANAGER) infra up message
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra up message
 	$(call success_msg,Kafka 已启动)
 
 kafka-stop: ## 停止 Kafka
-	@$(COMPOSE_MANAGER) infra down message
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra down message
 	$(call success_msg,Kafka 已停止)
 
 kafka-restart: kafka-stop kafka-start ## 重启 Kafka
@@ -962,11 +963,11 @@ ssl-setup-aliyun: ## 设置阿里云 DNS API 凭证（交互式）
 .PHONY: app-deploy app-remove app-list app-enable app-disable
 
 nginx-start: init-infra ## 启动 Nginx
-	@$(COMPOSE_MANAGER) infra up nginx
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra up nginx
 	$(call success_msg,Nginx 已启动)
 
 nginx-stop: ## 停止 Nginx
-	@$(COMPOSE_MANAGER) infra down nginx
+	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra down nginx
 	$(call success_msg,Nginx 已停止)
 
 nginx-restart: nginx-stop nginx-start ## 重启 Nginx
@@ -1252,4 +1253,3 @@ help-mongo: ## MongoDB 快速参考
 # ==============================================================================
 # 结束
 # ==============================================================================
-

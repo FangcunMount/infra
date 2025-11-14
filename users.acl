@@ -1,6 +1,0 @@
-user default off nopass ~* &* +@all
-user admin on >dev_admin_123 ~* &* +@all
-user app on >dev_app_123 ~* &* +@all -@dangerous -@admin -flushall -flushdb -keys -config -shutdown -bgsave -bgrewriteaof -save -debug -migrate -slaveof -replicaof
-user readonly on >dev_readonly_123 ~* &* +@read +@connection +ping +info +auth
-user cache on >dev_cache_user_123 ~* &* +@read +@write +@string +@hash +@list +@set +@sortedset +@connection +@transaction +del +expire +ttl +persist +unlink
-user monitor on >dev_monitor_123 ~* &* +@connection +ping +info +client +cluster +slowlog +latency +memory +config|get +auth
