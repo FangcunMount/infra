@@ -4,8 +4,12 @@
 
 set -e
 
-# 默认使用生产环境配置
+# 项目根目录中的 compose/env/<env>/.env
 ENV_FILE="${1:-../../compose/env/prod/.env}"
+
+# 确保脚本始终以脚本所在目录为基准，避免在不同 cwd 下生成到错误位置
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ACL_FILE="${SCRIPT_DIR}/users.acl"
 
 if [ ! -f "$ENV_FILE" ]; then
     echo "❌ 错误: 环境变量文件不存在: $ENV_FILE"
@@ -24,7 +28,6 @@ REDIS_CACHE_USER_PASSWORD="${REDIS_CACHE_USER_PASSWORD:-change_me_cache_pass}"
 REDIS_MONITOR_PASSWORD="${REDIS_MONITOR_PASSWORD:-change_me_monitor_pass}"
 
 # 生成 ACL 文件
-ACL_FILE="./users.acl"
 echo "🔐 生成 Redis ACL 文件: $ACL_FILE"
 
 cat > "$ACL_FILE" << EOF
