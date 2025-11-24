@@ -15,8 +15,6 @@ services:
       - mongo_data:/data/db
       # 配置文件（相对路径）
       - ./mongod.conf:/etc/mongod.conf:ro
-      # 日志目录（直接挂载到 /data/log/mongodb 避免路径不存在）
-      - mongo_logs:/data/log/mongodb
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
@@ -55,7 +53,4 @@ networks:
 volumes:
   mongo_data:
     name: infra_mongo_data
-    driver: local
-  mongo_logs:
-    name: infra_mongo_logs
     driver: local

@@ -1065,7 +1065,7 @@ diagnose: troubleshoot ## 诊断 (别名)
 # ==============================================================================
 # 8. 测试与验证
 # ==============================================================================
-.PHONY: test-all test-mysql test-redis test-mongo test-kafka test-nsq test-nginx test-jenkins
+.PHONY: test-all test-mysql test-redis test-mongo test-nsq test-nginx
 
 test-all: ## 测试所有服务连接
 	$(call section_title,测试所有服务)
@@ -1074,9 +1074,7 @@ test-all: ## 测试所有服务连接
 	@$(MAKE) test-mysql || true
 	@$(MAKE) test-redis || true
 	@$(MAKE) test-mongo || true
-	@$(MAKE) test-kafka || true
 	@$(MAKE) test-nsq || true
-	@$(MAKE) test-jenkins || true
 	@echo ""
 	$(call success_msg,测试完成)
 
@@ -1088,11 +1086,11 @@ test-mysql: ## 测试 MySQL 连接
 
 test-redis: ## 测试 Redis 连接（双实例）
 	@printf "$(BLUE)Redis Cache (6379):$(RESET) "
-	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG && \
+	@docker exec redis-cache redis-cli --user admin -a "$${REDIS_ADMIN_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG && \
 		echo "$(GREEN)✅ 正常$(RESET)" || \
 		echo "$(RED)❌ 失败$(RESET)"
 	@printf "$(BLUE)Redis Store (6380):$(RESET) "
-	@docker exec redis-store redis-cli -p 6380 -a "$${REDIS_STORE_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG && \
+	@docker exec redis-store redis-cli -p 6380 --user admin -a "$${REDIS_ADMIN_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG && \
 		echo "$(GREEN)✅ 正常$(RESET)" || \
 		echo "$(RED)❌ 失败$(RESET)"
 
@@ -1106,7 +1104,7 @@ test-mongo: ## 测试 MongoDB 连接
 			-p "$(MONGO_INITDB_ROOT_PASSWORD)" \
 			--authenticationDatabase admin \
 			--quiet \
-			--eval "db.adminCommand('ping')" 2>/dev/null | grep -q '"ok" : 1' && \
+			--eval "db.adminCommand('ping')" 2>/dev/null | grep -qE '("ok"\s*:\s*1|ok:\s*1)' && \
 			echo "$(GREEN)✅ 正常$(RESET)" || \
 			echo "$(RED)❌ 失败$(RESET)"; \
 	fi
