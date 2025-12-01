@@ -224,8 +224,9 @@ vpn-diagnose: ## 网络诊断
 	@sudo bash $(NETWORK_SCRIPTS)/diagnose.sh
 
 swarm-init: ## 初始化 Docker Swarm
-	@docker swarm init
-	$(call success_msg,Swarm 集群已初始化)
+	$(call require_param,SWARM_ADVERTISE_ADDR,make swarm-init SWARM_ADVERTISE_ADDR=172.17.0.223)
+	@docker swarm init --advertise-addr $(SWARM_ADVERTISE_ADDR)
+	$(call success_msg,Swarm 集群已初始化 (advertise-addr=$(SWARM_ADVERTISE_ADDR)))
 
 swarm-leave: ## 离开 Docker Swarm
 	@docker swarm leave --force
@@ -616,6 +617,7 @@ disk-usage: ## Docker 磁盘使用
 
 serverA-up: ## 启动 ServerA 服务栈 (Nginx + MongoDB + Redis)
 	$(call section_title,启动 ServerA (2C4G))
+	@$(MAKE) init-serverA
 	@# 确保 Redis ACL 文件存在
 	@cd $(COMPONENTS_DIR)/redis && ENV=prod bash generate-acl.sh
 	@cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d
@@ -654,6 +656,11 @@ serverA-rebuild: serverA-destroy serverA-up ## 完全重建 ServerA (销毁后�
 
 serverB-up: ## 启动 ServerB 服务栈 (NSQ)
 	$(call section_title,启动 ServerB (2C2G))
+	@if ! docker network inspect infra-network >/dev/null 2>&1; then \
+		echo "$(RED)$(BOLD)❌ 未找到 infra-network，请先在 Manager 上运行 make init-serverA$(RESET)"; \
+		exit 1; \
+	fi
+	@$(MAKE) init-serverB
 	@cd deploy/serverB && docker compose --env-file ../../compose/env/prod/serverB.env up -d
 	$(call success_msg,ServerB 服务已启动)
 
