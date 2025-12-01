@@ -606,6 +606,8 @@ disk-usage: ## Docker 磁盘使用
 
 serverA-up: ## 启动 ServerA 服务栈 (Nginx + MongoDB + Redis)
 	$(call section_title,启动 ServerA (2C4G))
+	@# 确保 Redis ACL 文件存在
+	@cd $(COMPONENTS_DIR)/redis && ENV=prod bash generate-acl.sh
 	@cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d
 	$(call success_msg,ServerA 服务已启动)
 
