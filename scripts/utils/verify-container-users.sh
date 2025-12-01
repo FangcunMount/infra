@@ -22,7 +22,9 @@ declare -A EXPECTED_USERS=(
     ["redis-cache"]="redis (UID 999)"
     ["redis-store"]="redis (UID 999)"
     ["mongo"]="mongodb (UID 999)"
-    ["kafka"]="appuser (UID 1000)"
+    ["nsqlookupd"]="nsq (UID 1000)"
+    ["nsqd"]="nsq (UID 1000)"
+    ["nsqadmin"]="nsq (UID 1000)"
 )
 
 # 统计

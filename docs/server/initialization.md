@@ -391,7 +391,7 @@ docker network create --driver overlay --attachable \
 
 1. 📦 [部署基础设施服务](../components/) - 安装 Nginx、MySQL、Redis 等
 2. 🌐 [配置网络环境](../network/management.md) - Docker Swarm、VPN 等
-3. 🔧 [使用 Makefile 管理](../makefile-reference.md) - 快速命令参考
+3. 🔧 使用 `make help` 查看所有可用命令
 
 ---
 

@@ -622,9 +622,8 @@ journalctl -u docker -f | grep -i network
 
 - [服务器架构](../server/architecture.md)
 - [网络管理指南](./management.md)
-- [Swarm部署指南](./swarm.md)
 
 ---
 
-**更新时间**: 2025-01-24  
-**文档版本**: v1.0
+**更新时间**: 2025-12-01  
+**文档版本**: v2.0

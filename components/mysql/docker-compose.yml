@@ -1,7 +1,9 @@
 # MySQL 数据库服务
+# 注意：生产环境已迁移至云 RDS，本地 MySQL 仅用于开发测试
 
 services:
   mysql:
+    profiles: ["local-dev"]  # 生产环境不启动，使用云 RDS
     image: mysql:8.0
     container_name: mysql
     networks:
@@ -34,6 +36,8 @@ services:
     labels:
       - "infra.service=database"
       - "infra.category=storage"
+      - "infra.deprecated=production"
+      - "infra.note=生产环境请使用云 RDS"
 
 # 使用外部网络（共享）和本地数据卷（组件独有）
 networks:

@@ -1,0 +1,49 @@
+# ============================================================================
+# serverB 基础设施栈 (2C2G)
+# ============================================================================
+# 服务清单：
+#   - 消息中间件：nsqlookupd、nsqd、nsqadmin
+# 依赖：
+#   - 外部网络：infra-network
+#   - 配置文件：compose/env/prod/serverB.env
+# 注意：
+#   - 业务服务（miniblog、qs-frontend等）在各自项目中配置和部署
+#   - MySQL 使用云 RDS，Redis-Store 使用云 Redis
+# ============================================================================
+
+services:
+  # ============================================================================
+  # 消息中间件 - NSQ
+  # ============================================================================
+
+  nsqlookupd:
+    extends:
+      file: ../../components/nsq/docker-compose.yml
+      service: nsqlookupd
+    env_file:
+      - ../../compose/env/prod/serverB.env
+
+  nsqd:
+    extends:
+      file: ../../components/nsq/docker-compose.yml
+      service: nsqd
+    env_file:
+      - ../../compose/env/prod/serverB.env
+
+  nsqadmin:
+    extends:
+      file: ../../components/nsq/docker-compose.yml
+      service: nsqadmin
+    env_file:
+      - ../../compose/env/prod/serverB.env
+
+networks:
+  backend:
+    external: true
+    name: infra-network
+
+# 继承自组件的卷定义
+volumes:
+  nsq_data:
+    name: infra_nsq_data
+    driver: local

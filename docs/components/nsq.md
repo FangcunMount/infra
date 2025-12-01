@@ -772,7 +772,7 @@ nsqd 重启: 通知
 
 - [服务器架构](../server/architecture.md) - ServerB角色说明
 - [网络架构](../network/architecture.md) - Overlay网络配置
-- [Makefile快速参考](../makefile-reference.md) - NSQ管理命令
+- 使用 `make help-nsq` 查看 NSQ 管理命令
 
 ## 参考资料
 

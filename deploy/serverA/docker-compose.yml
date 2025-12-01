@@ -1,0 +1,68 @@
+# ============================================================================
+# serverA 基础设施栈 (2C4G)
+# ============================================================================
+# 服务清单：
+#   - 网关：Nginx
+#   - 缓存：Redis Cache
+#   - 数据库：MongoDB
+# 依赖：
+#   - 外部网络：infra-network
+#   - 配置文件：compose/env/prod/serverA.env
+# 注意：
+#   - 业务服务（iam、qs等）在各自项目中配置和部署
+#   - MySQL 使用云 RDS，Redis-Store 使用云 Redis
+# ============================================================================
+
+services:
+  # ============================================================================
+  # 网关服务
+  # ============================================================================
+  
+  nginx:
+    extends:
+      file: ../../components/nginx/docker-compose.yml
+      service: nginx
+    env_file:
+      - ../../compose/env/prod/serverA.env
+
+  # ============================================================================
+  # 缓存服务
+  # ============================================================================
+
+  redis-cache:
+    extends:
+      file: ../../components/redis/docker-compose.yml
+      service: redis-cache
+    env_file:
+      - ../../compose/env/prod/serverA.env
+
+  # ============================================================================
+  # 数据库服务
+  # ============================================================================
+
+  mongo:
+    extends:
+      file: ../../components/mongo/docker-compose.yml
+      service: mongo
+    env_file:
+      - ../../compose/env/prod/serverA.env
+
+networks:
+  backend:
+    external: true
+    name: infra-network
+
+# 继承自组件的卷定义
+volumes:
+  nginx_logs:
+    name: infra_nginx_logs
+    driver: local
+  redis_cache_data:
+    name: infra_redis_cache
+    driver: local
+  mongo_data:
+    name: infra_mongo_data
+    driver: local
+  mongo_config:
+    name: infra_mongo_config
+    driver: local

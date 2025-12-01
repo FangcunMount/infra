@@ -18,15 +18,18 @@ nsq/
 ## 服务组件
 
 ### 1. nsqlookupd
+
 - **端口**: 4160 (TCP), 4161 (HTTP)
 - **作用**: 服务发现和拓扑信息管理
 
 ### 2. nsqd
+
 - **端口**: 4150 (TCP), 4151 (HTTP)
 - **作用**: 消息守护进程，负责消息的接收、队列和传递
 - **数据持久化**: `/data` 目录
 
 ### 3. nsqadmin
+
 - **端口**: 4171 (HTTP)
 - **作用**: Web 管理界面，用于监控和管理 NSQ 集群
 
@@ -44,7 +47,7 @@ make install-nsq
 
 ### 访问管理界面
 
-```
+```text
 http://localhost:4171
 ```
 
@@ -69,22 +72,25 @@ nsq_tail --topic=test_topic --channel=test_channel --lookupd-http-address=localh
 
 ### Docker Compose 配置
 
-主要配置在 `override.yml` 中：
+主要配置在 `docker-compose.yml` 中：
 
 - **网络**: 使用 `infra-network` 网络
-- **数据卷**: 
+- **数据卷**:
   - `infra_nsq_data`: NSQ 数据持久化
   - `infra_app_logs`: 日志存储
-- **资源限制**: 
-  - nsqd: 512M 内存，1 CPU
-  - nsqlookupd/nsqadmin: 128M 内存，0.5 CPU
+- **资源限制** (ServerB 2C2G 环境):
+  - nsqd: 384M 内存，0.20 CPU
+  - nsqlookupd: 96M 内存，0.04 CPU
+  - nsqadmin: 96M 内存，0.04 CPU
 
 ### NSQ 配置文件
 
 每个组件都有对应的配置文件，可以根据需要调整：
 
 #### nsqd.conf
+
 主要配置项：
+
 - `mem-queue-size`: 内存队列大小（默认 10000）
 - `max-msg-size`: 单条消息最大大小（默认 1MB）
 - `msg-timeout`: 消息超时时间（默认 60s）
@@ -92,18 +98,23 @@ nsq_tail --topic=test_topic --channel=test_channel --lookupd-http-address=localh
 - `sync-every`: 同步到磁盘的频率
 
 #### nsqlookupd.conf
+
 主要配置项：
+
 - `inactive-producer-timeout`: 生产者不活跃超时时间（默认 300s）
 - `tombstone-lifetime`: 墓碑生命周期（默认 45s）
 
 #### nsqadmin.conf
+
 主要配置项：
+
 - `notification-http-endpoint`: HTTP 通知端点
 - `base-path`: 基础 URL（用于反向代理）
 
 ### 自定义配置
 
 修改配置文件后重启服务：
+
 ```bash
 docker compose restart nsqd
 ```

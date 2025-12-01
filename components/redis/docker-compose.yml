@@ -28,9 +28,9 @@ services:
       nofile: 65535
     sysctls:
       net.core.somaxconn: "65535"
-    # 纯缓存：512MB 数据上限；给 1.5x 余量防止 fork/COW 抖动
-    mem_limit: ${REDIS_CACHE_MEM_LIMIT:-800m}
-    cpus: ${REDIS_CACHE_CPUS:-0.20}
+    # 纯缓存：192MB 数据上限（适配 serverA 2C4G）
+    mem_limit: ${REDIS_CACHE_MEM_LIMIT:-192m}
+    cpus: ${REDIS_CACHE_CPUS:-0.12}
     stop_grace_period: 10s
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -h 127.0.0.1 -p 6379 --user admin --pass ${REDIS_ADMIN_PASSWORD:-change_me_admin_pass} ping | grep PONG"]
@@ -49,6 +49,7 @@ services:
       - "infra.host=serverA"
 
   redis-store:
+    profiles: ["store"]  # 生产默认不启用（已迁移云 Redis-Store）
     image: redis:7
     container_name: redis-store
     networks:
@@ -106,4 +107,3 @@ volumes:
   redisinsight_data:
     name: infra_redisinsight_data
     driver: local
-

@@ -7,7 +7,8 @@
 ## 🎯 通配符证书优势
 
 ### ✅ 覆盖范围广
-```
+
+```text
 一个证书覆盖：
 ✅ yangshujie.com
 ✅ www.yangshujie.com
@@ -17,11 +18,13 @@
 ```
 
 ### ✅ 无需停止服务
+
 - 使用 DNS 验证，无需占用 80/443 端口
 - 申请和续期过程中 Nginx 可正常运行
 - 零停机时间
 
 ### ✅ 自动续期
+
 - Let's Encrypt 证书 90 天有效期
 - 自动续期，无需手动操作
 - DNS 验证方式续期也不影响服务
@@ -34,7 +37,7 @@
 
 #### 1.1 获取 AccessKey
 
-1. 登录阿里云控制台：https://ram.console.aliyun.com/users
+1. 登录阿里云控制台：<https://ram.console.aliyun.com/users>
 2. 创建 RAM 用户（推荐）或使用主账号
 3. 授予权限：`AliyunDNSFullAccess`
 4. 创建 AccessKey，记录：
@@ -43,13 +46,15 @@
 
 #### 1.2 在服务器上配置凭证
 
-**方式 1：使用交互式命令（推荐）**
+##### 方式 1：使用交互式命令（推荐）
+
 ```bash
 make ssl-setup-aliyun
 # 按提示输入 AccessKey ID 和 Secret
 ```
 
-**方式 2：手动创建凭证文件**
+##### 方式 2：手动创建凭证文件
+
 ```bash
 # 创建凭证目录
 mkdir -p ~/.secrets
@@ -92,6 +97,7 @@ openssl x509 -in /data/ssl/certs/yangshujie.com.crt -text -noout | grep -A2 "Sub
 ### 证书管理命令
 
 #### 1. 申请通配符证书
+
 ```bash
 # 申请主域名 + 通配符证书
 make ssl-wildcard DOMAIN=yangshujie.com EMAIL=yshujie@163.com
@@ -102,12 +108,14 @@ make ssl-wildcard DOMAIN=yangshujie.com EMAIL=yshujie@163.com
 ```
 
 #### 2. 申请单域名证书
+
 ```bash
 # 仅申请单个域名的证书（HTTP 验证，需要停止 Nginx）
 make ssl-obtain DOMAIN=www.yangshujie.com EMAIL=yshujie@163.com
 ```
 
 #### 3. 续期证书
+
 ```bash
 # 续期所有证书（自动检测过期时间）
 make ssl-renew
@@ -116,6 +124,7 @@ make ssl-renew
 ```
 
 #### 4. 列出所有证书
+
 ```bash
 make ssl-list
 
@@ -127,6 +136,7 @@ make ssl-list
 ```
 
 #### 5. 删除证书
+
 ```bash
 make ssl-remove DOMAIN=yangshujie.com
 ```
@@ -237,10 +247,12 @@ make restart-nginx
 ## ⚠️ 注意事项
 
 ### 1. 域名必须在阿里云 DNS 解析
+
 - 如果域名在其他服务商（如 Cloudflare、腾讯云），需要先迁移到阿里云
 - 或者为该服务商安装对应的 certbot DNS 插件
 
 ### 2. AccessKey 安全
+
 ```bash
 # 凭证文件权限必须是 600
 chmod 600 ~/.secrets/aliyun.ini
@@ -250,11 +262,13 @@ chmod 600 ~/.secrets/aliyun.ini
 ```
 
 ### 3. 证书有效期
+
 - Let's Encrypt 证书有效期：90 天
 - 建议在到期前 30 天续期
 - 配置自动续期任务，避免证书过期
 
 ### 4. 续期频率限制
+
 - 每个域名每周最多申请 50 个证书
 - 正常续期不会触发限制
 
@@ -265,11 +279,13 @@ chmod 600 ~/.secrets/aliyun.ini
 ### 问题 1：阿里云凭证文件不存在
 
 **错误信息：**
-```
+
+```text
 ❌ 阿里云凭证文件不存在: ~/.secrets/aliyun.ini
 ```
 
 **解决方案：**
+
 ```bash
 # 运行交互式配置
 make ssl-setup-aliyun
@@ -280,11 +296,13 @@ make ssl-setup-aliyun
 ### 问题 2：DNS 验证失败
 
 **错误信息：**
-```
+
+```text
 Timeout during connect (likely firewall problem)
 ```
 
 **解决方案：**
+
 ```bash
 # 检查域名是否在阿里云 DNS 解析
 # 检查 AccessKey 权限是否正确（AliyunDNSFullAccess）
@@ -294,11 +312,13 @@ Timeout during connect (likely firewall problem)
 ### 问题 3：certbot-dns-aliyun 插件未安装
 
 **错误信息：**
-```
+
+```text
 ModuleNotFoundError: No module named 'certbot_dns_aliyun'
 ```
 
 **解决方案：**
+
 ```bash
 # 安装插件
 sudo pip3 install certbot-dns-aliyun
@@ -311,6 +331,7 @@ sudo apt install python3-certbot-dns-aliyun  # Ubuntu
 ### 问题 4：证书续期失败
 
 **检查日志：**
+
 ```bash
 # 查看 certbot 日志
 sudo tail -f /var/log/letsencrypt/letsencrypt.log
@@ -323,10 +344,10 @@ certbot renew --dry-run
 
 ## 📚 相关资源
 
-- **Let's Encrypt 文档**: https://letsencrypt.org/docs/
-- **Certbot 文档**: https://certbot.eff.org/docs/
-- **阿里云 RAM 控制台**: https://ram.console.aliyun.com/
-- **阿里云 DNS 控制台**: https://dns.console.aliyun.com/
+- **Let's Encrypt 文档**: <https://letsencrypt.org/docs/>
+- **Certbot 文档**: <https://certbot.eff.org/docs/>
+- **阿里云 RAM 控制台**: <https://ram.console.aliyun.com/>
+- **阿里云 DNS 控制台**: <https://dns.console.aliyun.com/>
 
 ---
 

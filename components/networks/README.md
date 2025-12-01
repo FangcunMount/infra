@@ -17,7 +17,7 @@
 - **特性**:
   - ✅ 跨主机容器直接通信
   - ✅ attachable: 允许非 swarm 服务连接
-  - ✅ 基础设施服务（MySQL、Redis、Kafka、NSQ 等）互联
+  - ✅ 基础设施服务（MongoDB、Redis、NSQ 等）互联
   - ✅ 业务应用可以加入此网络访问基础设施服务
   - 🔒 可选加密传输 (encrypted: false 默认,可改为 true)
 
@@ -120,7 +120,6 @@ sudo ./scripts/network/swarm-manager.sh test
 - `components/mysql/` - 声明 `infra_mysql_data`
 - `components/redis/` - 声明 `infra_redis_data`
 - `components/mongo/` - 声明 `infra_mongo_data`
-- `components/kafka/` - 声明 `infra_kafka_data`
 - `components/nsq/` - 声明 `infra_nsq_data`
 - `components/jenkins/` - 声明 `infra_jenkins_data`
 - `components/nginx/` - 声明 `infra_nginx_logs`

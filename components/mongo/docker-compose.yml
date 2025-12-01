@@ -30,8 +30,9 @@ services:
       mongod --config /etc/mongod.conf --auth
     ulimits:
       nofile: 100000
-    mem_limit: ${MONGO_MEMORY_LIMIT:-1536M}
-    cpus: ${MONGO_CPUS:-0.30}
+    # 适配 serverA 2C4G 配置
+    mem_limit: ${MONGO_MEMORY_LIMIT:-1024M}
+    cpus: ${MONGO_CPUS:-0.50}
     logging:
       driver: json-file
       options:

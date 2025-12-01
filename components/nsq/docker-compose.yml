@@ -16,8 +16,9 @@ services:
       - ./nsqlookupd.conf:/etc/nsq/nsqlookupd.conf:ro
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-    mem_limit: ${NSQLOOKUPD_MEMORY_LIMIT:-64M}
-    cpus: ${NSQLOOKUPD_CPUS:-0.10}
+    # 适配 serverB 2C2G 配置
+    mem_limit: ${NSQLOOKUPD_MEMORY_LIMIT:-96M}
+    cpus: ${NSQLOOKUPD_CPUS:-0.04}
     logging:
       driver: json-file
       options:
@@ -59,8 +60,9 @@ services:
     depends_on:
       nsqlookupd:
         condition: service_healthy
-    mem_limit: ${NSQD_MEMORY_LIMIT:-512M}
-    cpus: ${NSQD_CPUS:-0.80}
+    # 适配 serverB 2C2G 配置
+    mem_limit: ${NSQD_MEMORY_LIMIT:-384M}
+    cpus: ${NSQD_CPUS:-0.20}
     logging:
       driver: json-file
       options:
@@ -98,8 +100,9 @@ services:
     depends_on:
       nsqlookupd:
         condition: service_healthy
-    mem_limit: ${NSQADMIN_MEMORY_LIMIT:-64M}
-    cpus: ${NSQADMIN_CPUS:-0.10}
+    # 适配 serverB 2C2G 配置
+    mem_limit: ${NSQADMIN_MEMORY_LIMIT:-96M}
+    cpus: ${NSQADMIN_CPUS:-0.04}
     logging:
       driver: json-file
       options:

@@ -5,7 +5,7 @@ set -euo pipefail
 # Docker 组件统一安装脚本
 # =================================================================
 # 功能：基于 components 配置安装 Docker 服务组件
-# 支持：nginx, mysql, redis, mongodb, kafka, nsq
+# 支持：nginx, mysql, redis, mongodb, nsq
 # 用户：www (推荐) 或 root
 # =================================================================
 
@@ -50,10 +50,9 @@ Docker 组件统一安装脚本
 
 组件:
   nginx       Web 服务器
-  mysql       MySQL 数据库  
+  mysql       MySQL 数据库 [开发环境]
   redis       Redis 缓存
   mongo       MongoDB 数据库
-  kafka       Apache Kafka 消息队列
   nsq         NSQ 实时分布式消息平台
   all         安装所有组件
 
@@ -257,7 +256,6 @@ prepare_directories() {
         "$DATA_DIR/mysql"
         "$DATA_DIR/redis"
         "$DATA_DIR/mongodb"
-        "$DATA_DIR/kafka"
         "$DATA_DIR/nsq"
         "$DATA_DIR/ssl"
         "$DATA_DIR/apps"
@@ -265,7 +263,6 @@ prepare_directories() {
         "$LOG_DIR/mysql"
         "$LOG_DIR/redis"
         "$LOG_DIR/mongodb"
-        "$LOG_DIR/kafka"
         "$LOG_DIR/nsq"
         "$LOG_DIR/ssl"
         "$LOG_DIR/certbot"
@@ -302,7 +299,7 @@ validate_component() {
     local component="$1"
     
     # 支持的组件列表
-    local valid_components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq" "all")
+    local valid_components=("nginx" "mysql" "redis" "mongo" "nsq" "all")
     
     if [[ "$component" == "all" ]]; then
         return 0
@@ -587,11 +584,6 @@ install_component() {
                 log_warn "将使用默认配置（不推荐生产环境）"
             fi
             ;;
-        kafka)
-            # Kafka 多服务：kafka 和 kafka-ui
-            service_names=""  # 启动所有服务
-            log_info "Kafka 多服务模式：将启动 kafka 和 kafka-ui"
-            ;;
         nsq)
             # NSQ 分布式架构：nsqlookupd、nsqd、nsqadmin
             service_names=""  # 启动所有服务
@@ -687,7 +679,7 @@ install_all_components() {
     
     log_step "安装所有组件..."
     
-    local components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq")
+    local components=("nginx" "mysql" "redis" "mongo" "nsq")
     local failed_components=()
     
     for component in "${components[@]}"; do
@@ -741,33 +733,6 @@ check_component_health() {
             else
                 log_error "Redis 部分实例未运行"
                 docker ps -a --filter "name=redis" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-                return 1
-            fi
-            ;;
-            
-        kafka)
-            # Kafka 多服务：kafka 和 kafka-ui
-            local kafka_containers=("kafka" "kafka-ui")
-            local all_running=true
-            
-            for container in "${kafka_containers[@]}"; do
-                if docker ps --filter "name=${container}" --filter "status=running" --format "{{.Names}}" | grep -q "${container}"; then
-                    log_success "✅ $container 容器运行正常"
-                else
-                    log_warn "⚠️  $container 容器未运行（可能是可选服务）"
-                    # kafka-ui 是可选的，不影响整体健康状态
-                    if [[ "$container" != "kafka-ui" ]]; then
-                        all_running=false
-                    fi
-                fi
-            done
-            
-            if [[ "$all_running" == true ]]; then
-                log_success "Kafka 核心服务运行正常"
-                return 0
-            else
-                log_error "Kafka 核心服务未运行"
-                docker ps -a --filter "name=kafka" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
                 return 1
             fi
             ;;
@@ -843,7 +808,7 @@ show_interactive_menu() {
     echo "========================================"
     echo
     
-    local components=("nginx" "mysql" "redis" "mongo" "kafka" "nsq")
+    local components=("nginx" "mysql" "redis" "mongo" "nsq")
     local selected_components=()
     
     while true; do
@@ -866,10 +831,9 @@ show_interactive_menu() {
             
             case "$component" in
                 nginx) echo "  $num. Nginx       - Web 服务器          [$status]" ;;
-                mysql) echo "  $num. MySQL       - 关系型数据库        [$status]" ;;
+                mysql) echo "  $num. MySQL       - 关系型数据库 [开发]  [$status]" ;;
                 redis) echo "  $num. Redis       - 内存缓存数据库      [$status]" ;;
                 mongo) echo "  $num. MongoDB     - NoSQL 文档数据库    [$status]" ;;
-                kafka) echo "  $num. Kafka       - 分布式消息队列      [$status]" ;;
                 nsq) echo "  $num. NSQ         - 实时消息平台        [$status]" ;;
             esac
         done
@@ -990,29 +954,23 @@ show_component_details() {
     echo "📄 MongoDB (NoSQL 数据库)"
     echo "  • 作用: 文档存储，适用于非关系型数据"
     echo "  • 端口: 27017"
-    echo "  • 资源: 中等，内存占用约 512MB"
+    echo "  • 资源: 中等，内存占用约 1GB"
     echo "  • 依赖: 无"
-    echo
-    echo "📨 Kafka (消息队列)"
-    echo "  • 作用: 分布式消息流处理平台"
-    echo "  • 端口: 9092 (Kafka), 2181 (Zookeeper)"
-    echo "  • 资源: 较重，内存占用约 1GB"
-    echo "  • 依赖: Zookeeper (自动安装)"
     echo
     echo "📬 NSQ (实时消息平台)"
     echo "  • 作用: 轻量级实时分布式消息平台"
     echo "  • 端口: 4150/4151 (nsqd), 4160/4161 (nsqlookupd), 4171 (nsqadmin)"
-    echo "  • 资源: 轻量级，内存占用约 768MB"
+    echo "  • 资源: 轻量级，内存占用约 576MB"
     echo "  • 依赖: 无"
     echo
     echo "💡 推荐安装顺序:"
-    echo "  1. Nginx → 2. MySQL → 3. Redis → 4. MongoDB → 5. Kafka → 6. NSQ"
+    echo "  1. Nginx → 2. Redis → 3. MongoDB → 4. NSQ"
+    echo "  注意: MySQL 生产环境使用云 RDS"
     echo
     echo "🎯 常用组合:"
-    echo "  • Web 应用: nginx + mysql + redis"
-    echo "  • API 服务: nginx + mysql + redis + mongo"
-    echo "  • 微服务: nginx + mysql + redis + nsq"
-    echo "  • 全栈开发: nginx + mysql + redis + mongo + kafka + nsq"
+    echo "  • Web 应用: nginx + redis + mongo"
+    echo "  • 微服务: nginx + redis + mongo + nsq"
+    echo "  • 本地开发: nginx + mysql + redis + mongo + nsq"
     echo
     read -p "按任意键返回组件选择菜单..." -n 1 -r
     echo

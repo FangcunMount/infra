@@ -41,8 +41,6 @@ make mysql-logs           # 查看日志
 
 **数据目录**: `infra_mysql_data` volume
 
-**详细文档**: [MySQL配置](./mysql.md)
-
 ### Redis
 
 **作用**: 缓存和会话存储
@@ -68,8 +66,6 @@ make redis-logs           # 查看日志
 
 **数据目录**: `infra_redis_data` volume
 
-**详细文档**: [Redis配置](./redis.md)
-
 ### MongoDB
 
 **作用**: 文档数据库
@@ -91,7 +87,7 @@ make mongo-logs           # 查看日志
 
 **数据目录**: `infra_mongo_data` volume
 
-**详细文档**: [MongoDB配置](./mongodb.md) | [快速入门](./mongodb-quickstart.md)
+**详细文档**: [快速入门](./mongodb-quickstart.md)
 
 ## Web服务 (ServerA)
 
@@ -117,8 +113,6 @@ make nginx-logs           # 查看日志
 
 - `components/nginx/nginx.conf` (主配置)
 - `components/nginx/conf.d/` (站点配置)
-
-**详细文档**: [Nginx配置](./nginx.md)
 
 ## 消息队列 (ServerB)
 
@@ -157,25 +151,6 @@ make nsq-logs             # 查看日志
 **数据目录**: `infra_nsq_data` volume
 
 **详细文档**: [NSQ配置](./nsq.md)
-
-### Kafka (可选)
-
-**作用**: 高吞吐量消息队列和流处理平台
-
-**版本**: 3.x  
-**端口**: 9092  
-**资源**: CPU 1.0核 / 内存 2GB
-
-**快速命令**:
-
-```bash
-make kafka-start          # 启动Kafka
-make kafka-stop           # 停止Kafka
-make kafka-shell          # 进入Kafka容器
-make kafka-logs           # 查看日志
-```
-
-**详细文档**: [Kafka配置](./kafka.md)
 
 ## 组件状态检查
 
@@ -466,13 +441,8 @@ msg-timeout = "60s"
 
 ### 组件详细文档
 
-- [MySQL配置](./mysql.md)
-- [Redis配置](./redis.md)
-- [MongoDB配置](./mongodb.md)
 - [MongoDB快速入门](./mongodb-quickstart.md)
 - [NSQ配置](./nsq.md)
-- [Kafka配置](./kafka.md)
-- [Nginx配置](./nginx.md)
 
 ### 架构和网络
 
@@ -480,17 +450,7 @@ msg-timeout = "60s"
 - [网络架构](../network/architecture.md)
 - [网络管理](../network/management.md)
 
-### 运维指南
-
-- [监控](../operations/monitoring.md)
-- [备份](../operations/backup.md)
-- [故障排查](../operations/troubleshooting.md)
-
-### 工具
-
-- [Makefile快速参考](../makefile-reference.md)
-
 ---
 
-**更新时间**: 2025-01-24  
-**文档版本**: v1.0
+**更新时间**: 2025-12-01  
+**文档版本**: v2.0

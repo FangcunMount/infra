@@ -118,14 +118,12 @@ INFRA_COMPONENTS=(
     "core"      # 网络和卷
     "nginx"     # 网关
     "storage"   # 数据库和缓存
-    "message"   # 消息队列 (Kafka)
     "nsq"       # 消息队列 (NSQ)
     "cicd"      # CI/CD
 )
 
 # 基础设施管理界面服务（可选）
 MANAGEMENT_SERVICES=(
-    "kafka-ui"
     "mongo-express"
     "redis-commander"
 )
@@ -145,13 +143,11 @@ show_usage() {
     core     - 核心网络和卷
     nginx    - 网关服务
     storage  - 存储服务 (mysql, redis, mongo)
-    message  - 消息服务 (kafka)
     nsq      - 消息服务 (nsq)
     cicd     - CI/CD 服务 (jenkins)
     all      - 所有基础设施
 
 管理界面服务:
-    kafka-ui       - Kafka 管理界面
     mongo-express  - MongoDB 管理界面
     redis-commander - Redis 管理界面
     all            - 所有管理界面
@@ -173,7 +169,7 @@ show_usage() {
 示例:
     $0 infra up all                    # 启动所有基础设施
     $0 infra up storage               # 仅启动存储服务
-    $0 mgmt up kafka-ui               # 启动 Kafka 管理界面
+    $0 mgmt up mongo-express          # 启动 MongoDB 管理界面
     $0 -e prod infra up all           # 生产环境启动基础设施
     $0 status                         # 查看所有服务状态
     $0 logs nginx                     # 查看 nginx 日志
@@ -213,10 +209,6 @@ build_infra_compose_args() {
             args+=("-f" "${COMPONENTS_DIR}/redis/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/mongo/docker-compose.yml")
             ;;
-        "message")
-            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
-            args+=("-f" "${COMPONENTS_DIR}/kafka/docker-compose.yml")
-            ;;
         "nsq")
             args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/nsq/docker-compose.yml")
@@ -231,7 +223,6 @@ build_infra_compose_args() {
             args+=("-f" "${COMPONENTS_DIR}/mysql/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/redis/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/mongo/docker-compose.yml")
-            args+=("-f" "${COMPONENTS_DIR}/kafka/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/nsq/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/jenkins/docker-compose.yml")
             ;;
@@ -355,7 +346,8 @@ manage_single_management_ui() {
     # 管理界面服务定义在各自组件的 docker-compose.yml 中，使用 profiles 控制
     local compose_args=()
     compose_args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
-    compose_args+=("-f" "${COMPONENTS_DIR}/kafka/docker-compose.yml")
+    compose_args+=("-f" "${COMPONENTS_DIR}/mongo/docker-compose.yml")
+    compose_args+=("-f" "${COMPONENTS_DIR}/redis/docker-compose.yml")
     compose_args+=("--profile" "management")
     
     # 添加环境配置
