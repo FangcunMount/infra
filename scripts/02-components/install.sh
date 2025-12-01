@@ -130,8 +130,17 @@ check_infrastructure() {
     log_step "检查基础设施状态..."
     
     local infra_script="$SCRIPT_DIR/init-infrastructure.sh"
-    local env_type="${INFRA_ENV_TYPE:-prod}"
-    local env_file="$PROJECT_ROOT/compose/env/${env_type}/.env"
+    local env_type="${ENV:-${INFRA_ENV_TYPE:-prod}}"
+    local env_file
+    
+    # 根据环境类型选择配置文件
+    if [[ "$env_type" == "prod" ]]; then
+        env_file="$PROJECT_ROOT/compose/env/prod/serverA.env"
+    elif [[ "$env_type" == "dev" ]]; then
+        env_file="$PROJECT_ROOT/compose/env/dev/.env"
+    else
+        env_file="$PROJECT_ROOT/compose/env/${env_type}/.env"
+    fi
     
     if [[ -f "$env_file" ]]; then
         log_info "加载基础设施配置: $env_file"
@@ -507,19 +516,27 @@ install_component() {
         return 1
     fi
     
-    # 准备环境配置文件路径（正确路径：compose/env/ENV/.env）
-    local env_file="$PROJECT_ROOT/compose/env/${env_type}/.env"
+    # 根据环境类型选择配置文件路径
+    local env_file
+    if [[ "$env_type" == "prod" ]]; then
+        # 生产环境：根据组件选择 serverA 或 serverB
+        case "$component" in
+            nsq)
+                env_file="$PROJECT_ROOT/compose/env/prod/serverB.env"
+                ;;
+            *)
+                env_file="$PROJECT_ROOT/compose/env/prod/serverA.env"
+                ;;
+        esac
+    elif [[ "$env_type" == "dev" ]]; then
+        env_file="$PROJECT_ROOT/compose/env/dev/.env"
+    else
+        env_file="$PROJECT_ROOT/compose/env/${env_type}/.env"
+    fi
     
     # 检查并验证环境配置文件
     if ! validate_env_file "$env_file" "$component"; then
         log_error "环境配置验证失败，请修正配置后重试"
-        return 1
-    fi
-    
-    # 检查环境配置文件
-    if [[ ! -f "$env_file" ]]; then
-        log_error "环境配置文件不存在: $env_file"
-        log_info "请先运行: make env-init"
         return 1
     fi
     

@@ -8,7 +8,18 @@
 PROJECT_NAME := infra
 DEFAULT_ENV := dev
 ENV ?= $(DEFAULT_ENV)
-ENV_FILE := compose/env/$(ENV)/.env
+
+# 环境配置文件路径
+# prod 环境使用 serverA.env/serverB.env，其他环境使用 .env
+ifeq ($(ENV),prod)
+    ENV_FILE_A := compose/env/prod/serverA.env
+    ENV_FILE_B := compose/env/prod/serverB.env
+    ENV_FILE := $(ENV_FILE_A)
+else
+    ENV_FILE := compose/env/$(ENV)/.env
+    ENV_FILE_A := $(ENV_FILE)
+    ENV_FILE_B := $(ENV_FILE)
+endif
 
 # 加载环境变量（如果文件存在）
 ifneq (,$(wildcard $(ENV_FILE)))

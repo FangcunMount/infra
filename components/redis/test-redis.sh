@@ -1,6 +1,11 @@
 #!/bin/bash
 # Redis 功能测试脚本
 # 测试 Redis 容器状态、ACL 用户认证、基本功能
+#
+# 用法:
+#   ./test-redis.sh                      # 使用默认 prod 环境
+#   ./test-redis.sh [env_file]           # 指定配置文件
+#   ENV=dev ./test-redis.sh              # 使用 dev 环境
 
 set -euo pipefail
 
@@ -17,8 +22,22 @@ TOTAL_TESTS=0
 PASSED_TESTS=0
 FAILED_TESTS=0
 
-# 环境变量文件
-ENV_FILE="${1:-../../compose/env/prod/.env}"
+# 确保脚本始终以脚本所在目录为基准
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# 根据 ENV 参数或命令行参数选择环境配置文件
+if [[ -n "${1:-}" ]]; then
+    ENV_FILE="$1"
+else
+    ENV="${ENV:-prod}"
+    if [[ "$ENV" == "prod" ]]; then
+        ENV_FILE="${SCRIPT_DIR}/../../compose/env/prod/serverA.env"
+    elif [[ "$ENV" == "dev" ]]; then
+        ENV_FILE="${SCRIPT_DIR}/../../compose/env/dev/.env"
+    else
+        ENV_FILE="${SCRIPT_DIR}/../../compose/env/$ENV/.env"
+    fi
+fi
 
 if [[ ! -f "$ENV_FILE" ]]; then
     echo -e "${RED}错误: 环境变量文件不存在: $ENV_FILE${NC}"

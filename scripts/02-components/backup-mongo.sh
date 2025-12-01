@@ -4,8 +4,9 @@
 # 用途：定时备份 MongoDB 数据到本地目录，结合 cron 实现自动备份
 #
 # 用法：
-#   手动执行：bash scripts/components/backup-mongo.sh
-#   定时任务：0 2 * * * /path/to/infra/scripts/components/backup-mongo.sh >> /var/log/mongo-backup.log 2>&1
+#   手动执行：bash scripts/02-components/backup-mongo.sh
+#   指定环境：ENV=dev bash scripts/02-components/backup-mongo.sh
+#   定时任务：0 2 * * * /path/to/infra/scripts/02-components/backup-mongo.sh >> /var/log/mongo-backup.log 2>&1
 #
 
 set -euo pipefail
@@ -19,7 +20,18 @@ NC='\033[0m'
 # 配置
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INFRA_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-ENV_FILE="$INFRA_ROOT/compose/env/prod/.env"
+
+# 根据 ENV 参数选择环境配置文件
+# ENV=prod (默认) -> serverA.env (MongoDB 部署在 serverA)
+# ENV=dev -> dev/.env
+ENV="${ENV:-prod}"
+if [[ "$ENV" == "prod" ]]; then
+    ENV_FILE="$INFRA_ROOT/compose/env/prod/serverA.env"
+elif [[ "$ENV" == "dev" ]]; then
+    ENV_FILE="$INFRA_ROOT/compose/env/dev/.env"
+else
+    ENV_FILE="$INFRA_ROOT/compose/env/$ENV/.env"
+fi
 
 # 备份配置
 BACKUP_ROOT="/data/backup/mongo"

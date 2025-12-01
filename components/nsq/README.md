@@ -121,11 +121,11 @@ docker compose restart nsqd
 
 ## 环境变量
 
-在 `compose/env/prod/.env` 中配置：
+在 `compose/env/prod/serverB.env` 中配置（NSQ 部署在 ServerB）：
 
 ```bash
 # Server B IP（用于 nsqd 广播地址）
-NODE_B_IP=192.168.1.20
+NODE_B_IP=172.17.0.226
 
 # 时区
 TZ=Asia/Shanghai

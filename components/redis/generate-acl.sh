@@ -1,15 +1,31 @@
 #!/bin/bash
 # 生成 Redis ACL 配置文件
-# 用法: ./generate-acl.sh [env_file]
+# 用法: 
+#   ./generate-acl.sh                    # 使用默认 prod 环境
+#   ./generate-acl.sh [env_file]         # 指定配置文件
+#   ENV=dev ./generate-acl.sh            # 使用 dev 环境
 
 set -e
 
-# 项目根目录中的 compose/env/<env>/.env
-ENV_FILE="${1:-../../compose/env/prod/.env}"
-
-# 确保脚本始终以脚本所在目录为基准，避免在不同 cwd 下生成到错误位置
+# 确保脚本始终以脚本所在目录为基准
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ACL_FILE="${SCRIPT_DIR}/users.acl"
+
+# 根据 ENV 参数或命令行参数选择环境配置文件
+if [[ -n "${1:-}" ]]; then
+    # 命令行参数优先
+    ENV_FILE="$1"
+else
+    # 根据 ENV 环境变量选择（默认 prod）
+    ENV="${ENV:-prod}"
+    if [[ "$ENV" == "prod" ]]; then
+        ENV_FILE="${SCRIPT_DIR}/../../compose/env/prod/serverA.env"
+    elif [[ "$ENV" == "dev" ]]; then
+        ENV_FILE="${SCRIPT_DIR}/../../compose/env/dev/.env"
+    else
+        ENV_FILE="${SCRIPT_DIR}/../../compose/env/$ENV/.env"
+    fi
+fi
 
 if [ ! -f "$ENV_FILE" ]; then
     echo "❌ 错误: 环境变量文件不存在: $ENV_FILE"

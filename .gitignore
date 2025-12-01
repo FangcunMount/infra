@@ -3,7 +3,8 @@
 # =====================================
 
 # 生产环境配置 (包含密码和密钥)
-compose/env/prod/.env
+compose/env/prod/serverA.env
+compose/env/prod/serverB.env
 .env
 
 # 备用环境配置
@@ -175,5 +176,6 @@ audit-*.log
 # =====================================
 
 # 如需版本化敏感配置，使用 sops + age 加密：
-# sops -e compose/env/prod/.env > compose/env/prod/.env.enc
+# sops -e compose/env/prod/serverA.env > compose/env/prod/serverA.env.enc
+# sops -e compose/env/prod/serverB.env > compose/env/prod/serverB.env.enc
 # 然后忽略 .env，保留 .env.enc

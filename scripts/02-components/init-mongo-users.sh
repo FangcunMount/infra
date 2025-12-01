@@ -19,7 +19,16 @@ NC='\033[0m' # No Color
 # 配置
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INFRA_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-ENV_FILE="$INFRA_ROOT/compose/env/prod/env"
+
+# 根据 ENV 参数选择环境配置文件
+ENV="${ENV:-prod}"
+if [[ "$ENV" == "prod" ]]; then
+    ENV_FILE="$INFRA_ROOT/compose/env/prod/serverA.env"
+elif [[ "$ENV" == "dev" ]]; then
+    ENV_FILE="$INFRA_ROOT/compose/env/dev/.env"
+else
+    ENV_FILE="$INFRA_ROOT/compose/env/$ENV/.env"
+fi
 
 echo "=========================================="
 echo "MongoDB 业务用户初始化"

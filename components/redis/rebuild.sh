@@ -1,6 +1,12 @@
 #!/bin/bash
 # Redis 完全重建脚本
 # 功能：停止容器、删除数据卷、清理宿主机数据、重新部署
+#
+# 用法:
+#   ./rebuild.sh                         # 使用默认 prod 环境
+#   ./rebuild.sh [env_file]              # 指定配置文件
+#   ENV=dev ./rebuild.sh                 # 使用 dev 环境
+#   ./rebuild.sh --clean-only            # 仅清理，不重建
 
 set -e
 
@@ -10,6 +16,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
+
+# 确保脚本始终以脚本所在目录为基准
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # 解析参数
 CLEAN_ONLY=false
@@ -29,8 +38,17 @@ for arg in "$@"; do
     esac
 done
 
-# 默认环境文件
-ENV_FILE="${ENV_FILE:-../../compose/env/prod/.env}"
+# 根据 ENV 参数选择环境配置文件
+if [[ -z "$ENV_FILE" ]]; then
+    ENV="${ENV:-prod}"
+    if [[ "$ENV" == "prod" ]]; then
+        ENV_FILE="${SCRIPT_DIR}/../../compose/env/prod/serverA.env"
+    elif [[ "$ENV" == "dev" ]]; then
+        ENV_FILE="${SCRIPT_DIR}/../../compose/env/dev/.env"
+    else
+        ENV_FILE="${SCRIPT_DIR}/../../compose/env/$ENV/.env"
+    fi
+fi
 
 echo -e "${BLUE}========================================${NC}"
 if [[ "$CLEAN_ONLY" == true ]]; then
