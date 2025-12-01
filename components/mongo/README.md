@@ -47,6 +47,48 @@
 - **远程访问**: 通过 SSH 隧道 `ssh -L 27017:localhost:27017 user@server`
 - **网络**: `infra-network` (172.20.0.0/16)
 
+### 用户与权限
+
+MongoDB 支持自动初始化创建业务用户（仅首次启动时执行）：
+
+| 用户类型 | 用户名 | 权限 | 用途 |
+|---------|--------|------|------|
+| **管理员** | `root` | `root` (所有数据库) | 数据库管理、备份恢复 |
+| **应用用户** | `app_user` | `readWrite + dbAdmin` | 业务读写、索引管理 |
+| **只读用户** | `readonly_user` | `read` | 数据查询、报表统计 |
+
+**环境变量配置** (在 `.env` 文件中):
+
+```bash
+# 管理员账户（容器自动创建）
+MONGO_INITDB_ROOT_USERNAME=root
+MONGO_INITDB_ROOT_PASSWORD=your_root_password
+
+# 业务用户（初始化脚本创建）
+MONGO_APP_USER=app_user
+MONGO_APP_PASSWORD=your_app_password
+MONGO_READONLY_USER=readonly_user
+MONGO_READONLY_PASSWORD=your_readonly_password
+```
+
+**连接字符串示例**:
+
+```bash
+# 应用连接
+mongodb://app_user:password@localhost:27017/infrastructure_dev?authSource=infrastructure_dev
+
+# 只读连接
+mongodb://readonly_user:password@localhost:27017/infrastructure_dev?authSource=infrastructure_dev
+```
+
+**手动重新初始化用户**（如需要）:
+
+```bash
+cd /path/to/infra
+source compose/env/dev/.env
+docker exec -i mongo mongosh -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin < components/mongo/init-mongo.js
+```
+
 ---
 
 ## 系统调优

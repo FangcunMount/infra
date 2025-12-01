@@ -15,10 +15,17 @@ services:
       - mongo_data:/data/db
       # 配置文件（相对路径）
       - ./mongod.conf:/etc/mongod.conf:ro
+      # 初始化脚本（仅首次启动时执行）
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
       - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+      # 业务用户配置（初始化脚本使用）
+      - MONGO_APP_USER=${MONGO_APP_USER:-app_user}
+      - MONGO_APP_PASSWORD=${MONGO_APP_PASSWORD:-dev_app_pass_123}
+      - MONGO_READONLY_USER=${MONGO_READONLY_USER:-readonly_user}
+      - MONGO_READONLY_PASSWORD=${MONGO_READONLY_PASSWORD:-dev_readonly_pass_123}
     command: >
       mongod --config /etc/mongod.conf --auth
     ulimits:
