@@ -120,7 +120,7 @@ create_networks() {
   --attachable \\
   --subnet=${INFRA_BACKEND_SUBNET} \\
   --gateway=${INFRA_BACKEND_GATEWAY} \\
-  --opt encrypted=true \\
+  --opt encrypted=false \\
   --opt com.docker.network.driver.mtu=${INFRA_NETWORK_MTU} \\
   --label 'infra.network=backend' \\
   --label 'infra.purpose=distributed-service-communication' \\
