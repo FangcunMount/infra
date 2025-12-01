@@ -43,6 +43,9 @@ services:
       service: redis-cache
     env_file:
       - ../../compose/env/prod/serverA.env
+    environment:
+      # 覆盖 LANG，Alpine 不支持 zh_CN.UTF-8
+      - LANG=C.UTF-8
     volumes:
       # 覆盖相对路径，指向正确的配置文件位置
       - ../../components/redis/redis-cache.conf:/usr/local/etc/redis/redis-cache.conf:ro
