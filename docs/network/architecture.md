@@ -2,39 +2,35 @@
 
 ## 概述
 
-本项目采用**单一 Overlay 网络**设计，支持跨服务器的分布式部署。所有基础设施服务通过统一的 Overlay 网络进行通信，实现服务发现、负载均衡和安全加密。
+本项目采用 **Docker Swarm Overlay 网络** 实现跨服务器容器通信。所有基础设施服务和业务应用通过统一的 `infra-network` 进行服务发现和通信。
 
-## 网络拓扑
+## 网络拓扑 (v2.1 双机架构)
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│                    infra-network (Overlay)                  │
-│                     172.20.0.0/16                           │
-│                                                             │
-│   ┌──────────────────┐         ┌──────────────────┐       │
-│   │    ServerA       │         │    ServerB       │       │
-│   │ 121.43.138.102   │         │ 112.126.82.123   │       │
-│   │                  │         │                  │       │
-│   │  ┌───────────┐   │         │  ┌────────────┐ │       │
-│   │  │  Nginx    │   │         │  │   nsqd     │ │       │
-│   │  └───────────┘   │         │  └────────────┘ │       │
-│   │  ┌───────────┐   │         │  ┌────────────┐ │       │
-│   │  │  MySQL    │   │         │  │ nsqlookupd │ │       │
-│   │  └───────────┘   │         │  └────────────┘ │       │
-│   │  ┌───────────┐   │         │  ┌────────────┐ │       │
-│   │  │  Redis    │   │         │  │ nsqadmin   │ │       │
-│   │  └───────────┘   │         │  └────────────┘ │       │
-│   │  ┌───────────┐   │         │                  │       │
-│   │  │ MongoDB   │   │         │                  │       │
-│   │  └───────────┘   │         │                  │       │
-│   │                  │         │                  │       │
-│   └──────────────────┘         └──────────────────┘       │
-│                                                             │
-│   [Encrypted VXLAN Tunnel - Port 4789/UDP]                │
-└─────────────────────────────────────────────────────────────┘
-         │                                    │
-         │                                    │
-    Physical Network (Internet)
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         Docker Swarm Cluster                              │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────────────┐ │
+│  │                    infra-network (overlay, attachable)               │ │
+│  │                         172.20.0.0/16                                │ │
+│  │                                                                      │ │
+│  │   ServerA (2C4G)                    ServerB (2C2G)                  │ │
+│  │   172.17.0.223                      10.0.0.22                       │ │
+│  │   ┌─────────────────────┐          ┌─────────────────────┐         │ │
+│  │   │ nginx      :80/443  │          │ nsqlookupd :4160/61 │         │ │
+│  │   │ redis-cache:6379    │◀────────▶│ nsqd       :4150/51 │         │ │
+│  │   │ mongo      :27017   │          │ nsqadmin   :4171    │         │ │
+│  │   │                     │          │                     │         │ │
+│  │   │ [业务应用可部署]    │          │ [业务应用可部署]    │         │ │
+│  │   └─────────────────────┘          └─────────────────────┘         │ │
+│  └─────────────────────────────────────────────────────────────────────┘ │
+│                                                                          │
+│                    [VXLAN Tunnel - Port 4789/UDP]                       │
+└──────────────────────────────────────────────────────────────────────────┘
+
+云服务（外部）:
+  ├── 阿里云 RDS (MySQL)
+  └── 阿里云 Redis (Redis-Store)
 ```
 
 ## 核心网络: infra-network
@@ -45,585 +41,388 @@
 |------|-----|------|
 | **网络名称** | `infra-network` | 统一的基础设施网络 |
 | **驱动类型** | `overlay` | 支持跨主机通信 |
-| **子网** | `172.20.0.0/16` | 65,534个可用IP地址 |
+| **子网** | `172.20.0.0/16` | 65,534 个可用 IP |
 | **网关** | `172.20.0.1` | 默认网关 |
-| **MTU** | `1500` | 最大传输单元 (可配置) |
-| **加密** | `enabled` | VXLAN流量加密 |
-| **可附加** | `yes` | 允许独立容器连接 |
+| **MTU** | `1450` | Overlay 推荐值 |
+| **Attachable** | `true` | 允许非 Swarm 服务连接 |
 
-### 网络标签
+### 网络定义
 
 ```yaml
-labels:
-  - infra.network=backend
-  - infra.purpose=distributed-service-communication
+# components/networks/docker-compose.yml
+networks:
+  backend:
+    name: infra-network
+    driver: overlay
+    attachable: true
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+    driver_opts:
+      com.docker.network.driver.mtu: "1450"
 ```
 
-## 为什么使用 Overlay 网络？
+## 服务发现
 
-### Overlay vs Bridge 对比
+### 服务地址表
 
-| 特性 | Bridge | Overlay |
-|------|--------|---------|
-| **跨主机通信** | ❌ 不支持 | ✅ 支持 |
-| **服务发现** | ❌ 手动配置 | ✅ 自动DNS |
-| **负载均衡** | ❌ 无 | ✅ 内置 |
-| **加密传输** | ❌ 无 | ✅ 支持 |
-| **横向扩展** | ❌ 困难 | ✅ 简单 |
-| **适用场景** | 单机部署 | 分布式部署 |
+所有服务通过 **容器名** 访问，无需记忆 IP 地址：
 
-### Overlay 网络优势
+| 服务 | 容器名 | 端口 | 位置 | 访问示例 |
+|------|--------|------|------|----------|
+| **Nginx** | `nginx` | 80/443 | ServerA | `http://nginx` |
+| **Redis Cache** | `redis-cache` | 6379 | ServerA | `redis-cache:6379` |
+| **MongoDB** | `mongo` | 27017 | ServerA | `mongo:27017` |
+| **NSQLookupd** | `nsqlookupd` | 4160/4161 | ServerB | `nsqlookupd:4161` |
+| **NSQd** | `nsqd` | 4150/4151 | ServerB | `nsqd:4150` |
+| **NSQAdmin** | `nsqadmin` | 4171 | ServerB | `nsqadmin:4171` |
 
-1. **跨主机通信**
-   - 容器可以在不同物理服务器间透明通信
-   - 无需复杂的网络配置
-   - 自动路由和转发
+### 应用配置示例
 
-2. **自动服务发现**
-   - 内置DNS服务
-   - 服务名称自动解析
-   - 动态更新服务地址
+```yaml
+# 应用环境变量配置
+environment:
+  # 缓存 (本地 Redis)
+  REDIS_HOST: redis-cache
+  REDIS_PORT: 6379
+  
+  # 数据库 (本地 MongoDB)
+  MONGO_HOST: mongo
+  MONGO_PORT: 27017
+  
+  # 消息队列 (ServerB 的 NSQ)
+  NSQ_NSQD_HOST: nsqd
+  NSQ_NSQD_PORT: 4150
+  NSQ_LOOKUPD_HOST: nsqlookupd
+  NSQ_LOOKUPD_PORT: 4161
+  
+  # 云服务 (使用公网/内网地址)
+  MYSQL_HOST: your-rds.mysql.rds.aliyuncs.com
+  REDIS_STORE_HOST: your-redis.redis.rds.aliyuncs.com
+```
 
-3. **内置负载均衡**
-   - VIP (虚拟IP) 机制
-   - 自动流量分发
-   - 故障自动转移
+---
 
-4. **安全加密**
-   - VXLAN封装
-   - AES-GCM加密
-   - 端到端安全
+## 应用部署网络配置
 
-5. **横向扩展**
-   - 轻松添加新节点
-   - 自动网络配置
-   - 无缝服务迁移
+### 快速开始
+
+业务应用只需加入 `infra-network` 即可访问所有基础设施服务。
+
+#### 1. 最简配置
+
+```yaml
+# your-app/docker-compose.yml
+services:
+  your-app:
+    image: your-app:latest
+    networks:
+      - infra-network
+
+networks:
+  infra-network:
+    external: true
+```
+
+#### 2. 完整配置示例
+
+```yaml
+# your-app/docker-compose.yml
+version: "3.8"
+
+services:
+  api:
+    image: your-api:latest
+    container_name: your-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # 基础设施服务 (通过容器名访问)
+      REDIS_HOST: redis-cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_APP_PASSWORD}
+      
+      MONGO_URI: mongodb://${MONGO_APP_USER}:${MONGO_APP_PASSWORD}@mongo:27017/${MONGO_DATABASE}
+      
+      NSQ_NSQD_ADDR: nsqd:4150
+      NSQ_LOOKUPD_ADDR: nsqlookupd:4161
+      
+      # 云服务 (使用外部地址)
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PORT: ${MYSQL_PORT}
+    networks:
+      - infra-network
+    labels:
+      - "infra.app=your-api"
+      - "infra.host=serverA"  # 或 serverB
+
+networks:
+  infra-network:
+    external: true
+```
+
+#### 3. 多服务应用
+
+```yaml
+# your-app/docker-compose.yml
+services:
+  api:
+    image: your-api:latest
+    networks:
+      - infra-network
+      - app-internal  # 应用内部网络
+    
+  worker:
+    image: your-worker:latest
+    networks:
+      - infra-network
+      - app-internal
+    
+  scheduler:
+    image: your-scheduler:latest
+    networks:
+      - app-internal  # 不需要直接访问基础设施
+
+networks:
+  infra-network:
+    external: true
+  app-internal:
+    driver: bridge  # 应用内部使用 bridge 即可
+```
+
+### 部署到不同服务器
+
+#### 部署到 ServerA
+
+```yaml
+# 适合需要低延迟访问 Redis/MongoDB 的服务
+services:
+  api:
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == serverA
+    networks:
+      - infra-network
+```
+
+#### 部署到 ServerB
+
+```yaml
+# 适合消息消费者服务
+services:
+  consumer:
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == serverB
+    networks:
+      - infra-network
+```
+
+#### 任意节点部署
+
+```yaml
+# 无状态服务可以部署到任意节点
+services:
+  stateless-api:
+    # 不指定 placement，Swarm 自动调度
+    networks:
+      - infra-network
+```
+
+### Nginx 反向代理配置
+
+将应用配置添加到 Nginx：
+
+```nginx
+# /data/apps/nginx-configs/your-app.conf
+upstream your_app {
+    server your-api:8080;  # 使用容器名
+}
+
+server {
+    listen 80;
+    server_name your-app.yangshujie.com;
+    
+    location / {
+        proxy_pass http://your_app;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+### 验证网络连通性
+
+```bash
+# 进入应用容器
+docker exec -it your-api sh
+
+# 测试 Redis 连接
+redis-cli -h redis-cache -p 6379 ping
+
+# 测试 MongoDB 连接
+mongosh --host mongo --port 27017 --eval "db.runCommand({ping:1})"
+
+# 测试 NSQ 连接
+curl http://nsqd:4151/ping
+curl http://nsqlookupd:4161/ping
+```
+
+---
 
 ## 技术实现
 
 ### VXLAN 隧道
 
-Overlay网络使用VXLAN (Virtual Extensible LAN) 技术:
+Overlay 网络使用 VXLAN (Virtual Extensible LAN) 技术实现跨主机通信：
 
 ```text
 ┌─────────────────────────────────────────────────┐
 │  Container → Docker Bridge → VXLAN → Host NIC   │
 │                                                 │
-│  [容器IP] → [172.20.x.x] → [封装] → [公网IP]   │
+│  [容器IP] → [172.20.x.x] → [封装] → [物理IP]   │
 └─────────────────────────────────────────────────┘
 ```
 
 **工作原理**:
 
 1. 容器发送数据包到网关 `172.20.0.1`
-2. Docker封装数据包为VXLAN格式
-3. 通过UDP端口4789发送到目标主机
+2. Docker 封装数据包为 VXLAN 格式
+3. 通过 UDP 端口 4789 发送到目标主机
 4. 目标主机解封装并转发到目标容器
 
-### 加密机制
+---
 
-启用加密后的数据流:
+## 端口暴露策略
 
-```text
-原始数据 → AES-GCM加密 → VXLAN封装 → UDP传输
-```
+### ServerA 端口
 
-- **算法**: AES-256-GCM
-- **性能影响**: 约5-10%的CPU开销
-- **安全级别**: 企业级加密标准
-
-## 连接的服务
-
-### 服务清单
-
-所有基础设施服务都连接到 `infra-network`:
-
-| 服务 | 位置 | 内部地址 | 说明 |
+| 服务 | 端口 | 绑定地址 | 说明 |
 |------|------|----------|------|
-| **Nginx** | ServerA | 动态分配 | Web服务器 |
-| **MySQL** | ServerA | 动态分配 | 关系型数据库 |
-| **Redis** | ServerA | 动态分配 | 缓存 |
-| **MongoDB** | ServerA | 动态分配 | 文档数据库 |
-| **nsqd** | ServerB | 动态分配 | 消息存储 |
-| **nsqlookupd** | ServerB | 动态分配 | 服务发现 |
-| **nsqadmin** | ServerB | 动态分配 | 管理界面 |
+| Nginx | 80/443 | 0.0.0.0 | 公网访问 |
+| Redis Cache | 6379 | 0.0.0.0 | 内网优先 |
+| MongoDB | 27017 | 127.0.0.1 | 仅本地 |
 
-### 服务发现示例
+### ServerB 端口
 
-容器可以通过服务名称直接访问:
+| 服务 | 端口 | 绑定地址 | 说明 |
+|------|------|----------|------|
+| NSQLookupd | 4160/4161 | 0.0.0.0 | 内网访问 |
+| NSQd | 4150/4151 | 0.0.0.0 | 内网访问 |
+| NSQAdmin | 4171 | 127.0.0.1 | 仅本地 |
 
-```bash
-# 在任何容器内
-ping mysql              # 自动解析到 MySQL 容器IP
-curl http://nsqd:4151   # 访问 NSQ HTTP API
-redis-cli -h redis      # 连接 Redis
-```
+---
 
-## 端口映射策略
+## 网络优化
 
-### 外部暴露端口 (ServerA)
+### MTU 配置
 
 ```yaml
-# 必须暴露的服务
-Nginx:
-  - "80:80"      # HTTP
-  - "443:443"    # HTTPS
-
-# 建议限制访问的服务
-MySQL:
-  - "3306:3306"  # 仅限信任IP
-Redis:
-  - "6379:6379"  # 仅限信任IP
-MongoDB:
-  - "27017:27017" # 仅限信任IP
+# Overlay 网络推荐 MTU
+driver_opts:
+  com.docker.network.driver.mtu: "1450"
 ```
 
-### 内部端口 (ServerB)
-
-```yaml
-# NSQ 不对外暴露端口
-# 所有访问通过 Overlay 网络
-nsqlookupd:
-  - 4160:4160  # TCP (内网)
-  - 4161:4161  # HTTP (内网)
-
-nsqd:
-  - 4150:4150  # TCP (内网)
-  - 4151:4151  # HTTP (内网)
-
-nsqadmin:
-  - 127.0.0.1:4171:4171  # 仅本地访问
-```
-
-## 网络性能优化
-
-### MTU 优化
-
-**默认值**: 1500 (以太网标准)
-
-**调整建议**:
-
-```bash
-# 如果跨公网通信,减小MTU避免分片
-INFRA_NETWORK_MTU=1450 make network-init
-
-# 如果内网环境,可以增大MTU提高性能
-INFRA_NETWORK_MTU=9000 make network-init  # Jumbo Frame
-```
-
-**影响**:
-
-- MTU过大 → 可能导致分片,降低性能
-- MTU过小 → 增加封装开销
-
-### 子网规划
-
-**当前配置**: `172.20.0.0/16`
-
-**容量**: 65,534个可用IP
-
-**扩展建议**:
-
-- 小型部署: `/24` (254个IP) 足够
-- 中型部署: `/20` (4,094个IP)
-- 大型部署: `/16` (65,534个IP) ✅ 当前
-
-### 网络隔离
-
-可以创建多个Overlay网络实现隔离:
-
-```yaml
-# 生产网络
-infra-network:
-  subnet: 172.20.0.0/16
-
-# 测试网络
-test-network:
-  subnet: 172.21.0.0/16
-
-# 监控网络
-monitor-network:
-  subnet: 172.22.0.0/16
-```
+- **1450**: 跨公网推荐（避免分片）
+- **1500**: 内网标准
+- **9000**: 支持 Jumbo Frame 的内网
 
 ## 前置要求
 
-### Docker Swarm
+### Docker Swarm 初始化
 
-Overlay网络依赖Docker Swarm:
+Overlay 网络依赖 Docker Swarm：
 
 ```bash
-# 初始化 Swarm (在管理节点)
-docker swarm init --advertise-addr 121.43.138.102
+# ServerA (管理节点)
+docker swarm init --advertise-addr <ServerA_IP>
 
-# 加入 Swarm (在工作节点)
-docker swarm join --token SWMTKN-xxx 121.43.138.102:2377
+# ServerB (工作节点) - 使用 init 输出的 token
+docker swarm join --token SWMTKN-xxx <ServerA_IP>:2377
+
+# 验证集群
+docker node ls
 ```
 
 ### 防火墙规则
 
-必须开放以下端口:
+必须开放以下端口：
+
+| 端口 | 协议 | 用途 |
+|------|------|------|
+| 2377 | TCP | Swarm 管理 |
+| 7946 | TCP/UDP | 节点发现 |
+| 4789 | UDP | VXLAN 数据 |
 
 ```bash
-# Swarm 管理端口
-2377/tcp   # Swarm 管理通信
-
-# Swarm 节点通信
-7946/tcp   # 容器网络发现
-7946/udp   # 容器网络发现
-
-# Overlay 网络
-4789/udp   # VXLAN 数据平面
+# 防火墙配置示例
+ufw allow 2377/tcp
+ufw allow 7946/tcp
+ufw allow 7946/udp
+ufw allow 4789/udp
 ```
 
-### 系统要求
-
-- **Linux内核**: 3.10+ (建议4.0+)
-- **Docker版本**: 17.06+ (建议19.03+)
-- **网络模块**: VXLAN内核模块已加载
-
-检查命令:
-
-```bash
-# 检查内核版本
-uname -r
-
-# 检查VXLAN模块
-lsmod | grep vxlan
-
-# 检查Docker版本
-docker version
-```
-
-## 单机部署说明
-
-即使在单机环境下,仍使用Overlay网络:
-
-**原因**:
-
-1. **环境一致性**: 开发/测试/生产环境配置相同
-2. **便于扩展**: 随时可以添加新节点
-3. **功能完整**: 享受服务发现等高级特性
-4. **避免重构**: 不需要后期修改网络配置
-
-**单机初始化**:
-
-```bash
-# 1. 初始化单节点Swarm
-docker swarm init
-
-# 2. 创建Overlay网络
-make network-init
-
-# 3. 部署服务
-make up
-```
-
-## 安全配置
-
-### 网络加密
-
-**启用加密** (推荐):
-
-```bash
-# 创建网络时启用
-docker network create \
-  --driver overlay \
-  --opt encrypted=true \
-  infra-network
-```
-
-**性能影响**:
-
-- CPU开销: 5-10%
-- 延迟增加: <1ms
-- 吞吐量: 轻微下降
-
-**适用场景**:
-
-- ✅ 跨公网通信
-- ✅ 敏感数据传输
-- ⚠️ 高性能要求场景 (权衡考虑)
-
-### 网络隔离
-
-**基本隔离**:
-
-```yaml
-# Overlay网络与宿主机网络隔离
-# 容器只能访问同网络的其他容器
-```
-
-**高级隔离**:
-
-```bash
-# 使用多个网络
-frontend-network:  # Web层
-backend-network:   # 业务层
-data-network:      # 数据层
-```
-
-### 访问控制
-
-**限制nsqadmin访问**:
-
-```yaml
-nsqadmin:
-  ports:
-    - "127.0.0.1:4171:4171"  # 只绑定本地
-```
-
-访问方式:
-
-```bash
-# 使用SSH隧道
-ssh -L 4171:localhost:4171 user@112.126.82.123
-
-# 然后访问
-http://localhost:4171
-```
-
-## 环境变量配置
-
-可通过环境变量自定义网络配置:
-
-```bash
-# 子网配置
-INFRA_BACKEND_SUBNET=172.20.0.0/16
-
-# 网关配置
-INFRA_BACKEND_GATEWAY=172.20.0.1
-
-# MTU配置
-INFRA_NETWORK_MTU=1500
-
-# 应用配置
-make network-init
-```
-
-**配置文件位置**: `compose/env/prod/env`
+---
 
 ## 故障排查
 
-### 网络无法创建
-
-**症状**: `Error response from daemon: network ... already exists`
-
-**解决**:
-
-```bash
-# 查看现有网络
-docker network ls
-
-# 删除冲突网络
-docker network rm infra-network
-
-# 重新创建
-make network-init
-```
-
 ### 服务无法通信
 
-**症状**: 容器之间无法ping通
-
-**排查步骤**:
-
 ```bash
-# 1. 检查网络状态
-make network-status
+# 检查网络状态
+docker network inspect infra-network
 
-# 2. 检查服务网络配置
+# 检查容器网络配置
 docker inspect <container> | grep -A 10 Networks
 
-# 3. 检查防火墙
-sudo ufw status
-
-# 4. 测试DNS解析
-docker exec <container> nslookup mysql
+# 测试 DNS 解析
+docker exec <container> nslookup redis-cache
 ```
 
 ### 跨主机通信失败
 
-**症状**: ServerA无法访问ServerB的服务
-
-**排查步骤**:
-
 ```bash
-# 1. 检查Swarm状态
+# 检查 Swarm 状态
 docker node ls
 
-# 2. 检查端口开放
-nc -zv <target_ip> 4789  # VXLAN端口
-nc -zv <target_ip> 7946  # 节点通信
+# 检查 VXLAN 端口
+nc -zv <target_ip> 4789
 
-# 3. 检查路由
-traceroute <target_ip>
-
-# 4. 重建网络
-make network-reset
+# 重建网络
+docker network rm infra-network
+make init
 ```
 
-### 网络性能问题
+---
 
-**症状**: 延迟高,丢包
-
-**诊断**:
+## 常用命令
 
 ```bash
-# 检查MTU
-docker network inspect infra-network | grep -i mtu
+# 初始化网络和卷
+make init
 
-# 测试延迟
-docker exec <container> ping -c 10 <target_service>
+# 查看网络状态
+docker network ls
+docker network inspect infra-network
 
-# 检查网络统计
-docker stats
-```
-
-**优化**:
-
-```bash
-# 调整MTU
-INFRA_NETWORK_MTU=1450 make network-reset
-
-# 禁用加密 (如果内网环境)
-docker network create --driver overlay infra-network
-```
-
-## 迁移说明
-
-### 从 Bridge 迁移到 Overlay
-
-如果之前使用Bridge网络:
-
-```bash
-# 1. 备份配置
-docker-compose config > backup.yml
-
-# 2. 停止所有服务
-make down
-
-# 3. 删除Bridge网络
-docker network rm <old_network>
-
-# 4. 初始化Swarm
-make swarm-init
-
-# 5. 创建Overlay网络
-make network-init
-
-# 6. 重新部署
-make up
-```
-
-### 从旧网络名迁移
-
-如果之前使用 `infra-frontend`:
-
-```bash
-# 1. 停止服务
-make down
-
-# 2. 删除旧网络
-docker network rm infra-frontend
-
-# 3. 重置基础设施
-make reset
-
-# 4. 启动服务
-make up
-```
-
-## 网络管理命令
-
-### 初始化网络
-
-```bash
-make init              # 完整初始化（网络+卷）
-make network-init      # 仅初始化网络
-```
-
-### 查看状态
-
-```bash
-make network-status    # 网络状态概览
-make network-list      # 列出所有网络
-make network-inspect   # 查看网络详情
-```
-
-### 重置网络
-
-```bash
-make network-reset     # 删除并重建网络
-```
-
-### 诊断工具
-
-```bash
-# 网络诊断
-make network-diagnose
-
-# 性能测试
-make network-test
-
-# 连通性检查
-make network-check
-```
-
-## 监控和维护
-
-### 监控指标
-
-关键指标:
-
-```yaml
-网络吞吐量: rx_bytes, tx_bytes
-网络延迟: ping, traceroute
-丢包率: packet_loss
-连接数: connections
-```
-
-### 日常维护
-
-```bash
-# 定期检查网络状态
-make network-status
+# 测试容器间连通性
+docker exec redis-cache ping mongo
 
 # 清理未使用的网络
 docker network prune
-
-# 查看网络流量
-docker stats
-
-# 检查网络日志
-journalctl -u docker -f | grep -i network
 ```
 
-### 性能基准
+---
 
-**正常指标**:
-
-```yaml
-延迟 (同主机): < 1ms
-延迟 (跨主机): < 5ms (取决于物理网络)
-丢包率: < 0.1%
-吞吐量: 接近物理网卡带宽
-```
-
-## 扩展阅读
-
-### 官方文档
-
-- [Docker Overlay Networks](https://docs.docker.com/network/overlay/)
-- [Docker Swarm Networking](https://docs.docker.com/engine/swarm/networking/)
-- [VXLAN Overview](https://docs.docker.com/network/drivers/overlay/#vxlan-encapsulation)
-
-### 相关文档
+## 相关文档
 
 - [服务器架构](../server/architecture.md)
-- [网络管理指南](./management.md)
+- [组件部署指南](../components/README.md)
 
 ---
 
 **更新时间**: 2025-12-01  
-**文档版本**: v2.0
+**文档版本**: v2.1
