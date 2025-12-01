@@ -600,8 +600,8 @@ disk-usage: ## Docker 磁盘使用
 # ==============================================================================
 # 7. 服务器部署 (双机架构)
 # ==============================================================================
-.PHONY: serverA-up serverA-down serverA-logs serverA-status
-.PHONY: serverB-up serverB-down serverB-logs serverB-status
+.PHONY: serverA-up serverA-down serverA-logs serverA-status serverA-destroy serverA-rebuild
+.PHONY: serverB-up serverB-down serverB-logs serverB-status serverB-destroy serverB-rebuild
 .PHONY: server-info validate-cloud-env
 
 serverA-up: ## 启动 ServerA 服务栈 (Nginx + MongoDB + Redis)
@@ -620,6 +620,26 @@ serverA-logs: ## 查看 ServerA 日志
 serverA-status: ## 查看 ServerA 状态
 	@docker ps --filter "label=infra.host=serverA" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
+serverA-destroy: ## 销毁 ServerA 所有容器、卷和数据 (危险!)
+	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerA 的所有数据！$(RESET)"
+	@echo "$(RED)   - 停止并删除容器: nginx, redis-cache, mongo$(RESET)"
+	@echo "$(RED)   - 删除 Docker 卷: infra_nginx_logs, infra_redis_cache, infra_mongo_data$(RESET)"
+	@echo "$(RED)   - 删除数据目录: /data/infra/*, /data/logs/*$(RESET)"
+	@echo ""
+	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
+	$(call section_title,销毁 ServerA 数据)
+	@# 停止并删除容器
+	@docker rm -f nginx redis-cache mongo 2>/dev/null || true
+	@# 删除 Docker 卷
+	@docker volume rm infra_nginx_logs infra_redis_cache infra_mongo_data infra_mongo_config 2>/dev/null || true
+	@# 删除数据目录
+	@rm -rf /data/infra/* /data/logs/* 2>/dev/null || true
+	@# 删除 Redis ACL 文件
+	@rm -f $(COMPONENTS_DIR)/redis/users.acl 2>/dev/null || true
+	$(call success_msg,ServerA 数据已销毁)
+
+serverA-rebuild: serverA-destroy serverA-up ## 完全重建 ServerA (销毁后重建)
+
 serverB-up: ## 启动 ServerB 服务栈 (NSQ)
 	$(call section_title,启动 ServerB (2C2G))
 	@cd deploy/serverB && docker compose --env-file ../../compose/env/prod/serverB.env up -d
@@ -633,6 +653,24 @@ serverB-logs: ## 查看 ServerB 日志
 
 serverB-status: ## 查看 ServerB 状态
 	@docker ps --filter "label=infra.host=serverB" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+serverB-destroy: ## 销毁 ServerB 所有容器、卷和数据 (危险!)
+	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerB 的所有数据！$(RESET)"
+	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin$(RESET)"
+	@echo "$(RED)   - 删除 Docker 卷: infra_nsq_data$(RESET)"
+	@echo "$(RED)   - 删除数据目录: /data/infra/nsq/*, /data/logs/nsq/*$(RESET)"
+	@echo ""
+	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
+	$(call section_title,销毁 ServerB 数据)
+	@# 停止并删除容器
+	@docker rm -f nsqlookupd nsqd nsqadmin 2>/dev/null || true
+	@# 删除 Docker 卷
+	@docker volume rm infra_nsq_data 2>/dev/null || true
+	@# 删除数据目录
+	@rm -rf /data/infra/nsq/* /data/logs/nsq/* 2>/dev/null || true
+	$(call success_msg,ServerB 数据已销毁)
+
+serverB-rebuild: serverB-destroy serverB-up ## 完全重建 ServerB (销毁后重建)
 
 server-info: ## 显示双机架构
 	$(call section_title,双机基础设施架构)
