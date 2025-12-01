@@ -47,6 +47,21 @@ elif [[ -n "${ENV:-}" ]]; then
     ENVIRONMENT="${ENV}"
 fi
 
+# 根据环境确定配置文件路径
+# - prod 环境: 使用 serverA.env（默认）或 serverB.env
+# - 其他环境: 使用 .env
+get_env_file() {
+    local server="${1:-A}"
+    if [[ "$ENVIRONMENT" == "prod" ]]; then
+        local server_upper="${server^^}"
+        echo "${ENV_DIR}/prod/server${server_upper}.env"
+    else
+        echo "${ENV_DIR}/${ENVIRONMENT}/.env"
+    fi
+}
+
+ENV_FILE="$(get_env_file)"
+
 # 确保基础设施就绪
 ensure_infrastructure() {
     log_info "检查基础设施状态..."
@@ -81,7 +96,7 @@ ensure_redis_acl() {
     local redis_dir="${COMPONENTS_DIR}/redis"
     local acl_file="${redis_dir}/users.acl"
     local acl_script="${redis_dir}/generate-acl.sh"
-    local env_file="${ENV_DIR}/${ENVIRONMENT}/.env"
+    local env_file="$ENV_FILE"
 
     if [[ ! -d "$redis_dir" ]]; then
         log_warn "Redis 组件目录不存在，跳过 ACL 文件生成"
@@ -234,8 +249,8 @@ build_infra_compose_args() {
     esac
     
     # 添加环境配置
-    if [[ -f "${ENV_DIR}/${ENVIRONMENT}/.env" ]]; then
-        args+=("--env-file" "${ENV_DIR}/${ENVIRONMENT}/.env")
+    if [[ -f "$ENV_FILE" ]]; then
+        args+=("--env-file" "$ENV_FILE")
     fi
     
     printf '%s\n' "${args[@]}"
@@ -351,8 +366,8 @@ manage_single_management_ui() {
     compose_args+=("--profile" "management")
     
     # 添加环境配置
-    if [[ -f "${ENV_DIR}/${ENVIRONMENT}/.env" ]]; then
-        compose_args+=("--env-file" "${ENV_DIR}/${ENVIRONMENT}/.env")
+    if [[ -f "$ENV_FILE" ]]; then
+        compose_args+=("--env-file" "$ENV_FILE")
     fi
     
     case "$action" in

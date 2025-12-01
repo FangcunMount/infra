@@ -404,22 +404,22 @@ redis-cache-shell: ## 进入 Redis Cache 容器 Shell
 redis-clean: ## 清理 Redis 数据 (危险!)
 	@echo "$(RED)警告: 即将删除所有 Redis 数据！$(RESET)"
 	@read -p "确认 (yes/no): " confirm && [ "$$confirm" = "yes" ] || exit 1
-	@cd $(COMPONENTS_DIR)/redis && bash rebuild.sh "../../compose/env/$(ENV)/.env" --clean-only
+	@cd $(COMPONENTS_DIR)/redis && ENV=$(ENV) bash rebuild.sh --clean-only
 
 redis-rebuild: ## 完全重建 Redis (清理+部署)
 	@echo "$(RED)警告: 即将删除所有 Redis 数据并重建！$(RESET)"
 	@read -p "确认 (yes/no): " confirm && [ "$$confirm" = "yes" ] || exit 1
-	@cd $(COMPONENTS_DIR)/redis && bash rebuild.sh "../../compose/env/$(ENV)/.env"
+	@cd $(COMPONENTS_DIR)/redis && ENV=$(ENV) bash rebuild.sh
 
 redis-acl-regenerate: ## 重新生成 Redis ACL 配置
-	@cd $(COMPONENTS_DIR)/redis && bash generate-acl.sh "../../compose/env/$(ENV)/.env"
+	@cd $(COMPONENTS_DIR)/redis && ENV=$(ENV) bash generate-acl.sh
 	$(call warning_msg,需要重启 Redis 使配置生效: make redis-restart)
 
 redis-acl-list: ## 查看 Redis ACL 用户列表
 	@docker exec redis-cache redis-cli --user admin --pass "$${REDIS_ADMIN_PASSWORD}" ACL LIST 2>/dev/null || echo "$(RED)无法连接$(RESET)"
 
 redis-test: ## 测试 Redis 功能
-	@cd $(COMPONENTS_DIR)/redis && bash test-redis.sh "../../compose/env/$(ENV)/.env"
+	@cd $(COMPONENTS_DIR)/redis && ENV=$(ENV) bash test-redis.sh
 
 # ==============================================================================
 # 3. 组件管理 - NSQ
@@ -428,7 +428,7 @@ redis-test: ## 测试 Redis 功能
 .PHONY: nsq-shell nsq-lookupd-logs nsq-admin-logs nsq-topics nsq-stats
 
 nsq-start: ## 启动 NSQ
-	@cd $(COMPONENTS_DIR)/nsq && docker compose --env-file ../../compose/env/$(ENV)/.env up -d
+	@cd $(COMPONENTS_DIR)/nsq && docker compose --env-file ../../$(ENV_FILE_B) up -d
 	$(call success_msg,NSQ 已启动)
 
 nsq-stop: ## 停止 NSQ
