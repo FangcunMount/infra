@@ -264,6 +264,16 @@ init: ## 初始化基础设施 (网络+卷)
 	@$(INFRA_SCRIPT) create
 	$(call success_msg,基础设施初始化完成)
 
+init-serverA: ## 仅在 ServerA 上初始化网络和卷 (manager)
+	$(call info_msg,初始化 ServerA 网络和卷...)
+	@INIT_TARGET=serverA $(INFRA_SCRIPT) create
+	$(call success_msg,ServerA 初始化完成)
+
+init-serverB: ## 在 ServerB 上初始化卷，跳过网络创建 (worker)
+	$(call info_msg,初始化 ServerB 卷，跳过网络创建...)
+	@INIT_TARGET=serverB SKIP_NETWORK=true $(INFRA_SCRIPT) create
+	$(call success_msg,ServerB 初始化完成)
+
 install: init ## 交互式安装组件
 	$(call section_title,基础设施组件安装)
 	@echo ""

@@ -30,6 +30,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 COMPOSE_DIR="${REPO_ROOT}/compose"
 COMPONENTS_DIR="${REPO_ROOT}/components"
 ENV_DIR="${REPO_ROOT}/compose/env"
+INIT_TARGET="${INIT_TARGET:-common}"  # common|serverA|serverB
 
 # 默认环境
 DEFAULT_ENV="dev"
@@ -75,17 +76,66 @@ ensure_infrastructure() {
     fi
     
     # 检查网络和卷是否已创建
-    if ! docker network inspect infra-network >/dev/null 2>&1 || \
-       ! docker volume inspect infra_mysql_data infra_redis_cache_data infra_redis_store_data >/dev/null 2>&1; then
-        
-        log_warn "基础设施不完整，正在初始化..."
-        
-        if ! "$infra_script" create; then
-            log_error "基础设施创建失败"
-            return 1
+    local network_missing=true
+    if docker network inspect infra-network >/dev/null 2>&1; then
+        network_missing=false
+    fi
+
+    # 使用 init 脚本实际创建的卷名
+    local volume_missing=false
+    local required_volumes=()
+    case "${INIT_TARGET}" in
+        serverA)
+            required_volumes=(
+                infra_redis_cache
+                infra_mongo_data
+                infra_mongo_config
+                infra_nginx_logs
+            )
+            ;;
+        serverB)
+            required_volumes=(
+                infra_nsq_data
+            )
+            ;;
+        *)
+            required_volumes=(
+                infra_redis_cache
+                infra_mongo_data
+                infra_mongo_config
+                infra_nginx_logs
+                infra_nsq_data
+            )
+            ;;
+    esac
+    for vol in "${required_volumes[@]}"; do
+        if ! docker volume inspect "$vol" >/dev/null 2>&1; then
+            volume_missing=true
+            break
         fi
-        
-        log_success "基础设施初始化完成"
+    done
+
+    local is_manager=false
+    if docker info 2>/dev/null | grep -q "Is Manager: true"; then
+        is_manager=true
+    fi
+
+    if [[ "$network_missing" == true || "$volume_missing" == true ]]; then
+        log_warn "基础设施不完整，正在初始化..."
+        if [[ "$is_manager" == true ]]; then
+            if ! "$infra_script" create; then
+                log_error "基础设施创建失败"
+                return 1
+            fi
+            log_success "基础设施初始化完成"
+        else
+            if [[ "$network_missing" == true ]]; then
+                log_error "当前节点不是 Swarm Manager，且缺少 infra-network。请在 Manager 节点执行 make init 或 ${infra_script} create 后重试。"
+                return 1
+            else
+                log_warn "当前节点不是 Swarm Manager，检测到部分卷缺失，跳过自动创建"
+            fi
+        fi
     else
         log_success "基础设施已就绪"
     fi

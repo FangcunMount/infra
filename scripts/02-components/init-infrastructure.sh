@@ -30,6 +30,8 @@ INFRA_BACKEND_SUBNET="${INFRA_BACKEND_SUBNET:-172.20.0.0/16}"
 INFRA_BACKEND_GATEWAY="${INFRA_BACKEND_GATEWAY:-172.20.0.1}"
 INFRA_NETWORK_MTU="${INFRA_NETWORK_MTU:-1500}"
 INFRA_NETWORK_DRIVER="${INFRA_NETWORK_DRIVER:-overlay}"
+SKIP_NETWORK="${SKIP_NETWORK:-false}"
+INIT_TARGET="${INIT_TARGET:-common}"  # common|serverA|serverB
 
 # 用户配置
 # v2.1 安全模型: 使用 www 用户和组，不使用 docker 组
@@ -142,34 +144,22 @@ create_networks() {
     fi
     
     if [[ "${driver}" == "overlay" ]]; then
-        # 检查 Docker Swarm 是否已初始化
+        # overlay 网络必须在已初始化的 Swarm Manager 上创建
         if ! docker info 2>/dev/null | grep -q "Swarm: active"; then
-            log_warn "Docker Swarm 未初始化，正在初始化单节点 Swarm..."
-            docker swarm init 2>/dev/null || {
-                log_error "Swarm 初始化失败，overlay 网络需要 Swarm 模式"
-                log_info "请手动执行: docker swarm init"
-                return 1
-            }
-            log_success "Swarm 已初始化为单节点模式"
+            log_error "Docker Swarm 未初始化，请先在 Manager 节点执行: docker swarm init --advertise-addr <host-ip>"
+            return 1
+        fi
+        if ! docker info 2>/dev/null | grep -q "Is Manager: true"; then
+            log_error "当前节点不是 Swarm Manager，overlay 网络需在 Manager 上创建"
+            return 1
         fi
     else
         log_info "使用 ${driver} 网络驱动，无需启用 Docker Swarm"
     fi
     
-    # 检查是否为 Swarm Worker 节点
-    local is_manager=false
-    if [[ "${driver}" == "overlay" ]]; then
-        if docker info 2>/dev/null | grep -q "Is Manager: true"; then
-            is_manager=true
-        fi
-    fi
-    
     # 检查网络是否已存在
     if docker network inspect infra-network >/dev/null 2>&1; then
         log_warn "网络 infra-network 已存在"
-    elif [[ "${driver}" == "overlay" && "$is_manager" == "false" ]]; then
-        log_info "检测到 Swarm Worker 节点，overlay 网络将由 Manager 节点管理"
-        log_info "网络会在启动服务时自动同步到本节点"
     else
         log_info "创建网络 infra-network..."
         eval "$backend_cmd" || log_error "网络创建失败"
@@ -181,19 +171,35 @@ create_volumes() {
     local dry_run=${1:-false}
     
     log_step "创建数据持久化卷..."
-    
-    # 新架构 v2.1: 仅创建本地部署需要的卷
-    # - MySQL: 使用云 RDS，不再需要本地卷
-    # - Redis-Store: 使用云 Redis，不再需要本地卷
-    # - Redis-Cache: 本地缓存实例
-    # - MongoDB: 本地文档数据库
-    # - Nginx: 本地网关
-    local volumes=(
-        "infra_redis_cache:${INFRA_DATA_ROOT}/redis/cache/data"
-        "infra_mongo_data:${INFRA_DATA_ROOT}/mongo/data"
-        "infra_mongo_config:${INFRA_DATA_ROOT}/mongo/config"
-        "infra_nginx_logs:${INFRA_LOG_ROOT}/nginx"
-    )
+    # 根据目标节点选择需要的卷
+    # - serverA: redis/mongo/nginx
+    # - serverB: nsq
+    # - common/其他: 创建全部
+    local volumes=()
+    case "${INIT_TARGET}" in
+        serverA)
+            volumes=(
+                "infra_redis_cache:${INFRA_DATA_ROOT}/redis/cache/data"
+                "infra_mongo_data:${INFRA_DATA_ROOT}/mongo/data"
+                "infra_mongo_config:${INFRA_DATA_ROOT}/mongo/config"
+                "infra_nginx_logs:${INFRA_LOG_ROOT}/nginx"
+            )
+            ;;
+        serverB)
+            volumes=(
+                "infra_nsq_data:${INFRA_DATA_ROOT}/nsq/data"
+            )
+            ;;
+        *)
+            volumes=(
+                "infra_redis_cache:${INFRA_DATA_ROOT}/redis/cache/data"
+                "infra_mongo_data:${INFRA_DATA_ROOT}/mongo/data"
+                "infra_mongo_config:${INFRA_DATA_ROOT}/mongo/config"
+                "infra_nginx_logs:${INFRA_LOG_ROOT}/nginx"
+                "infra_nsq_data:${INFRA_DATA_ROOT}/nsq/data"
+            )
+            ;;
+    esac
     
     # 创建数据目录
     if [[ "$dry_run" != "true" ]]; then
@@ -408,7 +414,11 @@ main() {
     
     case "$operation" in
         create)
-            create_networks "$dry_run"
+            if [[ "${SKIP_NETWORK}" == "true" ]]; then
+                log_warn "SKIP_NETWORK=true，跳过网络创建"
+            else
+                create_networks "$dry_run"
+            fi
             create_volumes "$dry_run"
             if [[ "$dry_run" != "true" ]]; then
                 log_success "基础设施网络和卷创建完成！"
