@@ -182,22 +182,25 @@ create_volumes() {
     
     log_step "创建数据持久化卷..."
     
+    # 新架构 v2.1: 仅创建本地部署需要的卷
+    # - MySQL: 使用云 RDS，不再需要本地卷
+    # - Redis-Store: 使用云 Redis，不再需要本地卷
+    # - Redis-Cache: 本地缓存实例
+    # - MongoDB: 本地文档数据库
+    # - Nginx: 本地网关
     local volumes=(
-        "infra_mysql_data:${INFRA_DATA_ROOT}/mysql/data"
-        "infra_redis_cache_data:${INFRA_DATA_ROOT}/redis/cache/data"
-        "infra_redis_store_data:${INFRA_DATA_ROOT}/redis/store/data"
-        "infra_redisinsight_data:${INFRA_DATA_ROOT}/redis/insight/data"
+        "infra_redis_cache:${INFRA_DATA_ROOT}/redis/cache/data"
         "infra_mongo_data:${INFRA_DATA_ROOT}/mongo/data"
+        "infra_mongo_config:${INFRA_DATA_ROOT}/mongo/config"
         "infra_nginx_logs:${INFRA_LOG_ROOT}/nginx"
-        "infra_app_logs:${INFRA_LOG_ROOT}"
     )
     
     # 创建数据目录
     if [[ "$dry_run" != "true" ]]; then
         log_info "创建数据目录: ${INFRA_DATA_ROOT}"
-        sudo mkdir -p "${INFRA_DATA_ROOT}"/{mysql,mongo,nginx}/{data,conf} 2>/dev/null || true
-        sudo mkdir -p "${INFRA_DATA_ROOT}"/redis/{cache,store,insight}/{data,conf} 2>/dev/null || true
-        sudo mkdir -p "${INFRA_LOG_ROOT}"/{mysql,mongodb,nginx} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_DATA_ROOT}"/{mongo,nginx}/{data,conf} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_DATA_ROOT}"/redis/cache/{data,conf} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_LOG_ROOT}"/{mongodb,nginx} 2>/dev/null || true
         
         # 设置目录所有权为 www:www（v2.1 安全模型）
         # www 用户用于容器内运行，不需要 docker 组权限
@@ -255,7 +258,8 @@ remove_infrastructure() {
     log_step "删除基础设施网络和卷..."
     
     local networks=("infra-network")
-    local volumes=("infra_mysql_data" "infra_redis_cache_data" "infra_redis_store_data" "infra_redisinsight_data" "infra_mongo_data" "infra_nginx_logs" "infra_app_logs")
+    # 新架构 v2.1 卷列表
+    local volumes=("infra_redis_cache" "infra_mongo_data" "infra_mongo_config" "infra_nginx_logs")
     
     if [[ "$dry_run" == "true" ]]; then
         echo "# 删除网络命令:"

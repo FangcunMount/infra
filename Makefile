@@ -623,15 +623,17 @@ serverA-status: ## 查看 ServerA 状态
 serverA-destroy: ## 销毁 ServerA 所有容器、卷和数据 (危险!)
 	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerA 的所有数据！$(RESET)"
 	@echo "$(RED)   - 停止并删除容器: nginx, redis-cache, mongo$(RESET)"
-	@echo "$(RED)   - 删除 Docker 卷: infra_nginx_logs, infra_redis_cache, infra_mongo_data$(RESET)"
+	@echo "$(RED)   - 删除所有 infra_* Docker 卷$(RESET)"
 	@echo "$(RED)   - 删除数据目录: /data/infra/*, /data/logs/*$(RESET)"
 	@echo ""
 	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
 	$(call section_title,销毁 ServerA 数据)
 	@# 停止并删除容器
 	@docker rm -f nginx redis-cache mongo 2>/dev/null || true
-	@# 删除 Docker 卷
-	@docker volume rm infra_nginx_logs infra_redis_cache infra_mongo_data infra_mongo_config 2>/dev/null || true
+	@# 删除所有 infra_ 开头的 Docker 卷
+	@docker volume ls -q | grep '^infra_' | xargs -r docker volume rm 2>/dev/null || true
+	@# 删除匿名卷（可选，谨慎）
+	@docker volume prune -f 2>/dev/null || true
 	@# 删除数据目录
 	@rm -rf /data/infra/* /data/logs/* 2>/dev/null || true
 	@# 删除 Redis ACL 文件
