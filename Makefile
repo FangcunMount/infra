@@ -141,6 +141,8 @@ help: ## 显示帮助信息
 	@echo "$(MAGENTA)4. SSL证书管理$(RESET)"
 	@echo "   $(CYAN)ssl-wildcard$(RESET)         申请通配符证书"
 	@echo "   $(CYAN)ssl-list$(RESET)             列出所有证书"
+	@echo "   $(CYAN)grpc-ca$(RESET)              生成 gRPC mTLS CA 证书"
+	@echo "   $(CYAN)grpc-server$(RESET)          生成 gRPC 服务端证书"
 	@echo ""
 	@echo "$(MAGENTA)5. Nginx应用管理$(RESET)"
 	@echo "   $(CYAN)app-deploy$(RESET)           部署应用配置"
@@ -162,7 +164,7 @@ help: ## 显示帮助信息
 .PHONY: help-all
 help-all: ## 显示所有命令
 	$(call section_title,完整命令列表)
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-26s$(RESET) %s\n", $$1, $$2}'
 	@echo ""
 
@@ -496,6 +498,7 @@ mysql-shell: ## 进入 MySQL Shell
 # 4. SSL证书管理
 # ==============================================================================
 .PHONY: ssl-wildcard ssl-obtain ssl-import ssl-renew ssl-list ssl-remove ssl-setup-aliyun
+.PHONY: grpc-ca grpc-server grpc-generate-all grpc-verify grpc-info grpc-clean
 
 ssl-wildcard: ## 申请通配符证书 (DOMAIN=域名 EMAIL=邮箱)
 	$(call require_param,DOMAIN,make ssl-wildcard DOMAIN=example.com EMAIL=admin@example.com)
@@ -523,6 +526,30 @@ ssl-remove: ## 删除证书 (DOMAIN=域名)
 
 ssl-setup-aliyun: ## 配置阿里云 DNS API
 	@$(SSL_SCRIPTS)/ssl-manager.sh setup-aliyun
+
+# gRPC mTLS 证书管理
+grpc-ca: ## 生成 gRPC Root CA 和 Intermediate CA
+	@$(SSL_SCRIPTS)/grpc-mtls.sh generate-ca
+	$(call success_msg,gRPC CA 证书生成完成)
+
+grpc-server: ## 生成 gRPC 服务端证书 (NAME=服务名 OU=组织单元 ALT_DNS=额外DNS)
+	$(call require_param,NAME,make grpc-server NAME=iam-grpc OU=IAM ALT_DNS=iam-grpc.internal.example.com)
+	@$(SSL_SCRIPTS)/grpc-mtls.sh generate-server $(NAME) $(or $(OU),IAM) $(ALT_DNS)
+	$(call success_msg,服务端证书生成完成: $(NAME))
+
+grpc-generate-all: ## 生成所有 gRPC 证书（CA + 默认服务端 + 客户端）
+	@$(SSL_SCRIPTS)/grpc-mtls.sh generate
+	$(call success_msg,所有 gRPC 证书生成完成)
+
+grpc-verify: ## 验证 gRPC 证书有效性
+	@$(SSL_SCRIPTS)/grpc-mtls.sh verify
+
+grpc-info: ## 查看 gRPC 证书信息
+	@$(SSL_SCRIPTS)/grpc-mtls.sh info
+
+grpc-clean: ## 清理 gRPC 证书
+	@$(SSL_SCRIPTS)/grpc-mtls.sh clean
+	$(call warning_msg,gRPC 证书已清理)
 
 # ==============================================================================
 # 5. Nginx应用管理
