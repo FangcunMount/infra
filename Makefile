@@ -139,8 +139,10 @@ help: ## 显示帮助信息
 	@echo "   组件: nginx, mongo, redis, nsq, mysql(dev)"
 	@echo ""
 	@echo "$(MAGENTA)4. SSL证书管理$(RESET)"
-	@echo "   $(CYAN)ssl-wildcard$(RESET)         申请通配符证书"
+	@echo "   $(CYAN)ssl-wildcard$(RESET)         申请通配符证书 (Let's Encrypt)"
 	@echo "   $(CYAN)ssl-list$(RESET)             列出所有证书"
+	@echo "   $(CYAN)ssl-dev$(RESET)              生成开发环境自签名证书"
+	@echo "   $(CYAN)ssl-dev-list$(RESET)         列出开发证书"
 	@echo "   $(CYAN)grpc-ca$(RESET)              生成 gRPC mTLS CA 证书"
 	@echo "   $(CYAN)grpc-server$(RESET)          生成 gRPC 服务端证书"
 	@echo ""
@@ -498,6 +500,7 @@ mysql-shell: ## 进入 MySQL Shell
 # 4. SSL证书管理
 # ==============================================================================
 .PHONY: ssl-wildcard ssl-obtain ssl-import ssl-renew ssl-list ssl-remove ssl-setup-aliyun
+.PHONY: ssl-dev ssl-dev-force ssl-dev-list ssl-dev-verify ssl-dev-remove
 .PHONY: grpc-ca grpc-server grpc-generate-all grpc-verify grpc-info grpc-clean
 
 ssl-wildcard: ## 申请通配符证书 (DOMAIN=域名 EMAIL=邮箱)
@@ -526,6 +529,28 @@ ssl-remove: ## 删除证书 (DOMAIN=域名)
 
 ssl-setup-aliyun: ## 配置阿里云 DNS API
 	@$(SSL_SCRIPTS)/ssl-manager.sh setup-aliyun
+
+# 开发环境 SSL 证书管理（自签名）
+ssl-dev: ## 生成开发环境自签名证书 (DOMAIN=域名，默认 localhost)
+	@$(SSL_SCRIPTS)/dev-ssl.sh generate $(or $(DOMAIN),localhost)
+	$(call success_msg,开发证书生成完成: $(or $(DOMAIN),localhost))
+
+ssl-dev-force: ## 强制重新生成开发证书 (DOMAIN=域名)
+	$(call require_param,DOMAIN,make ssl-dev-force DOMAIN=iam-apiserver)
+	@$(SSL_SCRIPTS)/dev-ssl.sh force $(DOMAIN)
+	$(call success_msg,开发证书已重新生成: $(DOMAIN))
+
+ssl-dev-list: ## 列出所有开发环境证书
+	@$(SSL_SCRIPTS)/dev-ssl.sh list
+
+ssl-dev-verify: ## 验证开发证书 (DOMAIN=域名)
+	$(call require_param,DOMAIN,make ssl-dev-verify DOMAIN=iam-apiserver)
+	@$(SSL_SCRIPTS)/dev-ssl.sh verify $(DOMAIN)
+
+ssl-dev-remove: ## 删除开发证书 (DOMAIN=域名)
+	$(call require_param,DOMAIN,make ssl-dev-remove DOMAIN=iam-apiserver)
+	@$(SSL_SCRIPTS)/dev-ssl.sh remove $(DOMAIN)
+	$(call warning_msg,开发证书已删除: $(DOMAIN))
 
 # gRPC mTLS 证书管理
 grpc-ca: ## 生成 gRPC Root CA 和 Intermediate CA
