@@ -627,8 +627,8 @@ grpc-verify: ## 验证 gRPC 证书有效性
 grpc-info: ## 查看 gRPC 证书信息
 	@$(SSL_SCRIPTS)/grpc-mtls.sh info
 
-grpc-clean: ## 清理 gRPC 证书
-	@$(SSL_SCRIPTS)/grpc-mtls.sh clean
+grpc-clean: ## 清理 gRPC 证书 (TYPE=server|client|ca NAME=服务名)
+	@$(SSL_SCRIPTS)/grpc-mtls.sh clean $(TYPE) $(NAME)
 	$(call warning_msg,gRPC 证书已清理)
 
 # ==============================================================================

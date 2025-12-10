@@ -7,6 +7,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CERT_DIR="${CERT_DIR:-${INFRA_DATA_ROOT:-/data/infra}/ssl/grpc}"
+CERT_OWNER="${CERT_OWNER:-$((id -u ubuntu >/dev/null 2>&1 && echo ubuntu) || id -un 2>/dev/null || true)}"
+CERT_GROUP="${CERT_GROUP:-$((id -u ubuntu >/dev/null 2>&1 && echo ubuntu) || id -gn 2>/dev/null || true)}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -173,7 +175,24 @@ show_cert_info() {
 }
 
 set_permissions() {
+    # keys 600, crt/fullchain 644, then chown if可用
     find "$CERT_DIR" -type f -name "*.key" -exec chmod 600 {} +
+    find "$CERT_DIR" -type f \( -name "*.crt" -o -name "*fullchain.crt" -o -name "*.pem" \) -exec chmod 644 {} +
+
+    if [[ -n "$CERT_OWNER" || -n "$CERT_GROUP" ]]; then
+        local target=""
+        if [[ -n "$CERT_OWNER" && -n "$CERT_GROUP" ]]; then
+            target="${CERT_OWNER}:${CERT_GROUP}"
+        elif [[ -n "$CERT_OWNER" ]]; then
+            target="${CERT_OWNER}"
+        else
+            target=":${CERT_GROUP}"
+        fi
+
+        if command -v chown >/dev/null 2>&1; then
+            chown -R "$target" "$CERT_DIR" 2>/dev/null || log_warn "chown 失败，可能权限不足（忽略）"
+        fi
+    fi
 }
 
 generate_ca_only() {
@@ -252,6 +271,72 @@ clean_all() {
     rm -rf "$CERT_DIR/ca" "$CERT_DIR/server" "$CERT_DIR/clients"
 }
 
+clean_ca() {
+    log_warn "删除 CA 证书: $CERT_DIR/ca"
+    rm -rf "$CERT_DIR/ca"
+}
+
+clean_server_cert() {
+    local service_name="$1"
+    local removed=0
+    for file in "$CERT_DIR/server/${service_name}.key" \
+                "$CERT_DIR/server/${service_name}.crt" \
+                "$CERT_DIR/server/${service_name}-fullchain.crt"; do
+        if [[ -f "$file" ]]; then
+            rm -f "$file"
+            log_info "删除服务端证书文件: $file"
+            removed=1
+        fi
+    done
+    if [[ $removed -eq 0 ]]; then
+        log_warn "未找到服务端证书: $service_name"
+    fi
+}
+
+clean_client_cert() {
+    local service_name="$1"
+    local removed=0
+    for file in "$CERT_DIR/clients/${service_name}.key" \
+                "$CERT_DIR/clients/${service_name}.crt"; do
+        if [[ -f "$file" ]]; then
+            rm -f "$file"
+            log_info "删除客户端证书文件: $file"
+            removed=1
+        fi
+    done
+    if [[ $removed -eq 0 ]]; then
+        log_warn "未找到客户端证书: $service_name"
+    fi
+}
+
+clean_target() {
+    local scope="${1:-all}"
+    local name="${2:-}"
+
+    case "$scope" in
+        all) clean_all ;;
+        ca) clean_ca ;;
+        server)
+            if [[ -z "$name" ]]; then
+                log_error "请提供服务端证书名称: $0 clean server <name>"
+                exit 1
+            fi
+            clean_server_cert "$name"
+            ;;
+        client)
+            if [[ -z "$name" ]]; then
+                log_error "请提供客户端证书名称: $0 clean client <name>"
+                exit 1
+            fi
+            clean_client_cert "$name"
+            ;;
+        *)
+            log_error "未知 clean 范围: $scope，可选 all|ca|server|client"
+            exit 1
+            ;;
+    esac
+}
+
 print_help() {
     cat <<EOF
 gRPC mTLS 证书生成工具
@@ -267,7 +352,7 @@ gRPC mTLS 证书生成工具
         
     generate               生成所有证书（CA + 默认服务端 + 客户端）
     force                  强制重新生成所有证书
-    clean                  删除所有证书
+    clean [scope] [name]   删除证书（scope: all|ca|server|client）
     verify                 验证证书有效性
     info                   查看证书信息
     help                   显示帮助
@@ -284,9 +369,17 @@ gRPC mTLS 证书生成工具
     # 3. 生成所有证书（一键）
     $0 generate
 
+    # 4. 按需清理证书
+    $0 clean all
+    $0 clean ca
+    $0 clean server iam-grpc
+    $0 clean client qs
+
 环境变量:
     CERT_DIR        证书输出目录，默认 ${CERT_DIR}
     INFRA_DATA_ROOT 影响 CERT_DIR 默认值
+    CERT_OWNER      证书文件 chown 用户（默认 ubuntu，如不存在则当前用户）
+    CERT_GROUP      证书文件 chown 用户组（默认 ubuntu，如不存在则当前组）
 EOF
 }
 
@@ -296,7 +389,7 @@ main() {
         generate-server) shift; generate_server_only "$@" ;;
         generate) generate_all ;;
         force) clean_all; generate_all force ;;
-        clean) clean_all ;;
+        clean) shift; clean_target "$@" ;;
         verify) verify_certificates ;;
         info)
             while IFS= read -r cert; do
