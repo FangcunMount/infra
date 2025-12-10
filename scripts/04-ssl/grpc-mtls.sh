@@ -74,8 +74,27 @@ generate_server_cert() {
     local ou="${2:-IAM}"
     local cn="${service_name}.svc"
     local alt_dns="${3:-${service_name}.internal.example.com}"
+    local cert_type="${4:-dual}"  # server, client, dual (默认双向)
     
-    log_info "生成服务端证书: $service_name"
+    # 根据证书类型设置 extendedKeyUsage
+    local extended_key_usage
+    local cert_type_desc
+    case "$cert_type" in
+        server)
+            extended_key_usage="serverAuth"
+            cert_type_desc="服务端"
+            ;;
+        client)
+            extended_key_usage="clientAuth"
+            cert_type_desc="客户端"
+            ;;
+        dual|*)
+            extended_key_usage="serverAuth, clientAuth"
+            cert_type_desc="双向(服务端+客户端)"
+            ;;
+    esac
+    
+    log_info "生成${cert_type_desc}证书: $service_name (extendedKeyUsage: $extended_key_usage)"
     openssl genrsa -out "$CERT_DIR/server/${service_name}.key" 2048
     openssl req -new \
         -key "$CERT_DIR/server/${service_name}.key" \
@@ -85,7 +104,7 @@ generate_server_cert() {
     cat > "$CERT_DIR/server/${service_name}.ext" <<EOF
 basicConstraints = CA:FALSE
 keyUsage = critical, digitalSignature, keyEncipherment
-extendedKeyUsage = serverAuth
+extendedKeyUsage = ${extended_key_usage}
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid, issuer
 subjectAltName = @alt_names
@@ -150,19 +169,24 @@ verify_certificates() {
     
     for cert in "$CERT_DIR"/server/*.crt; do
         [[ -f "$cert" ]] && [[ "$cert" != *"-fullchain.crt" ]] || continue
+        local cert_name=$(basename "$cert")
         if openssl verify -CAfile "$CERT_DIR/ca/ca-chain.crt" "$cert" >/dev/null 2>&1; then
-            log_info "✅ 服务端证书有效: $(basename "$cert")"
+            # 显示 Extended Key Usage
+            local eku=$(openssl x509 -in "$cert" -noout -text 2>/dev/null | grep -A1 "Extended Key Usage" | tail -1 | tr -d ' ')
+            log_info "✅ 证书有效: $cert_name ($eku)"
         else
-            log_error "❌ 服务端证书验证失败: $(basename "$cert")"
+            log_error "❌ 证书验证失败: $cert_name"
         fi
     done
 
     for cert in "$CERT_DIR"/clients/*.crt; do
         [[ -f "$cert" ]] || continue
+        local cert_name=$(basename "$cert")
         if openssl verify -CAfile "$CERT_DIR/ca/ca-chain.crt" "$cert" >/dev/null 2>&1; then
-            log_info "✅ 客户端证书有效: $(basename "$cert")"
+            local eku=$(openssl x509 -in "$cert" -noout -text 2>/dev/null | grep -A1 "Extended Key Usage" | tail -1 | tr -d ' ')
+            log_info "✅ 证书有效: $cert_name ($eku)"
         else
-            log_error "❌ 客户端证书验证失败: $(basename "$cert")"
+            log_error "❌ 证书验证失败: $cert_name"
         fi
     done
 }
@@ -215,11 +239,18 @@ generate_server_only() {
     local service_name="${1:-}"
     local ou="${2:-IAM}"
     local alt_dns="${3:-}"
+    local cert_type="${4:-dual}"  # server, client, dual (默认双向)
     
     if [[ -z "$service_name" ]]; then
         log_error "请指定服务名称"
-        echo "用法: $0 generate-server <service_name> [ou] [alt_dns]"
-        echo "示例: $0 generate-server iam-grpc IAM iam-grpc.internal.example.com"
+        echo "用法: $0 generate-server <service_name> [ou] [alt_dns] [cert_type]"
+        echo "      cert_type: server | client | dual (默认 dual)"
+        echo ""
+        echo "示例:"
+        echo "  $0 generate-server iam-grpc IAM iam-grpc.example.com        # 双向证书"
+        echo "  $0 generate-server iam-grpc IAM iam-grpc.example.com dual   # 双向证书"
+        echo "  $0 generate-server iam-grpc IAM iam-grpc.example.com server # 仅服务端"
+        echo "  $0 generate-server iam-grpc IAM iam-grpc.example.com client # 仅客户端"
         exit 1
     fi
     
@@ -231,8 +262,8 @@ generate_server_only() {
     fi
     
     mkdir -p "$CERT_DIR/server"
-    log_info "=== 为服务 '$service_name' 生成服务端证书 ==="
-    generate_server_cert "$service_name" "$ou" "$alt_dns"
+    log_info "=== 为服务 '$service_name' 生成证书 (类型: $cert_type) ==="
+    generate_server_cert "$service_name" "$ou" "$alt_dns" "$cert_type"
     
     if openssl verify -CAfile "$CERT_DIR/ca/ca-chain.crt" "$CERT_DIR/server/${service_name}.crt" >/dev/null 2>&1; then
         log_info "✅ 服务端证书验证成功"
@@ -255,15 +286,18 @@ generate_all() {
     fi
 
     log_info "=== 开始生成 gRPC mTLS 证书（开发/测试） ==="
+    log_info "注意: 所有证书默认使用双向模式 (serverAuth + clientAuth)"
     generate_root_ca
     generate_intermediate_ca
-    generate_server_cert "iam-grpc" "IAM" "iam-grpc.internal.example.com"
-    generate_client_cert "qs" "QS"
-    generate_client_cert "admin" "Admin"
-    generate_client_cert "ops" "Ops"
+    # 使用双向证书，每个服务的证书既可作为服务端也可作为客户端
+    generate_server_cert "iam-grpc" "IAM" "iam-grpc.internal.example.com" "dual"
+    generate_server_cert "qs" "QS" "qs.internal.example.com" "dual"
+    generate_server_cert "admin" "Admin" "admin.internal.example.com" "dual"
+    generate_server_cert "ops" "Ops" "ops.internal.example.com" "dual"
     verify_certificates
     set_permissions
     log_info "证书生成完成，路径: $CERT_DIR"
+    log_info "所有证书均支持 serverAuth + clientAuth (双向 mTLS)"
 }
 
 clean_all() {
@@ -345,35 +379,56 @@ gRPC mTLS 证书生成工具
 
 命令:
     generate-ca                生成 Root CA 和 Intermediate CA
-    generate-server <name> [ou] [alt_dns]  生成服务端证书
+    generate-server <name> [ou] [alt_dns] [cert_type]  生成证书
         <name>      服务名称（必需）
         [ou]        组织单元，默认 IAM
         [alt_dns]   额外的 DNS 名称（可选）
+        [cert_type] 证书类型: dual | server | client（默认 dual）
         
-    generate               生成所有证书（CA + 默认服务端 + 客户端）
+    generate               生成所有证书（CA + 默认双向证书）
     force                  强制重新生成所有证书
     clean [scope] [name]   删除证书（scope: all|ca|server|client）
     verify                 验证证书有效性
     info                   查看证书信息
     help                   显示帮助
 
+证书类型说明:
+    dual    双向证书，同时支持 serverAuth + clientAuth（推荐）
+            服务既可以作为 gRPC Server，也可以作为 gRPC Client
+    server  仅服务端证书，只有 serverAuth
+    client  仅客户端证书，只有 clientAuth
+
 示例:
     # 1. 生成 CA 证书
     $0 generate-ca
     
-    # 2. 为不同服务生成证书
-    $0 generate-server iam-grpc IAM iam-grpc.internal.example.com
-    $0 generate-server user-api User user-api.internal.example.com
-    $0 generate-server order-api Order
+    # 2. 为不同服务生成双向证书（推荐）
+    $0 generate-server iam-grpc IAM iam-grpc.example.com
+    $0 generate-server qs-apiserver QS qs.example.com dual
+    $0 generate-server qs-collection-server QS collect.example.com dual
     
-    # 3. 生成所有证书（一键）
+    # 3. 如需要，也可生成仅服务端/客户端证书
+    $0 generate-server pure-server IAM server.example.com server
+    $0 generate-server pure-client IAM client.example.com client
+    
+    # 4. 生成所有证书（一键，默认双向）
     $0 generate
 
-    # 4. 按需清理证书
+    # 5. 按需清理证书
     $0 clean all
     $0 clean ca
     $0 clean server iam-grpc
     $0 clean client qs
+
+mTLS 架构说明:
+    Root CA (根 CA)
+      └── Intermediate CA (中间 CA)
+           ├── 签发所有服务证书
+           └── 所有服务共享同一套 CA
+
+    使用双向证书后，每个服务的证书可同时用于:
+    - 作为 gRPC Server 接受客户端连接
+    - 作为 gRPC Client 调用其他服务
 
 环境变量:
     CERT_DIR        证书输出目录，默认 ${CERT_DIR}

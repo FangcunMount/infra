@@ -144,7 +144,7 @@ help: ## 显示帮助信息
 	@echo "   $(CYAN)ssl-dev$(RESET)              生成开发环境自签名证书"
 	@echo "   $(CYAN)ssl-dev-list$(RESET)         列出开发证书"
 	@echo "   $(CYAN)grpc-ca$(RESET)              生成 gRPC mTLS CA 证书"
-	@echo "   $(CYAN)grpc-server$(RESET)          生成 gRPC 服务端证书"
+	@echo "   $(CYAN)grpc-server$(RESET)          生成 gRPC 双向证书 (serverAuth+clientAuth)"
 	@echo ""
 	@echo "$(MAGENTA)5. Nginx应用管理$(RESET)"
 	@echo "   $(CYAN)app-deploy$(RESET)           部署应用配置"
@@ -612,12 +612,17 @@ grpc-ca: ## 生成 gRPC Root CA 和 Intermediate CA
 	@$(SSL_SCRIPTS)/grpc-mtls.sh generate-ca
 	$(call success_msg,gRPC CA 证书生成完成)
 
-grpc-server: ## 生成 gRPC 服务端证书 (NAME=服务名 OU=组织单元 ALT_DNS=额外DNS)
-	$(call require_param,NAME,make grpc-server NAME=iam-grpc OU=IAM ALT_DNS=iam-grpc.internal.example.com)
-	@$(SSL_SCRIPTS)/grpc-mtls.sh generate-server $(NAME) $(or $(OU),IAM) $(ALT_DNS)
-	$(call success_msg,服务端证书生成完成: $(NAME))
+grpc-server: ## 生成 gRPC 双向证书 (NAME=服务名 OU=组织单元 ALT_DNS=额外DNS TYPE=dual|server|client)
+	$(call require_param,NAME,make grpc-server NAME=iam-grpc OU=IAM ALT_DNS=iam-grpc.example.com)
+	@$(SSL_SCRIPTS)/grpc-mtls.sh generate-server $(NAME) $(or $(OU),IAM) $(ALT_DNS) $(or $(TYPE),dual)
+	$(call success_msg,证书生成完成: $(NAME) (类型: $(or $(TYPE),dual)))
 
-grpc-generate-all: ## 生成所有 gRPC 证书（CA + 默认服务端 + 客户端）
+grpc-dual: ## 生成 gRPC 双向证书 (简化命令，等同于 TYPE=dual)
+	$(call require_param,NAME,make grpc-dual NAME=qs-collection-server OU=QS ALT_DNS=collect.example.com)
+	@$(SSL_SCRIPTS)/grpc-mtls.sh generate-server $(NAME) $(or $(OU),IAM) $(ALT_DNS) dual
+	$(call success_msg,双向证书生成完成: $(NAME))
+
+grpc-generate-all: ## 生成所有 gRPC 证书（CA + 默认双向证书）
 	@$(SSL_SCRIPTS)/grpc-mtls.sh generate
 	$(call success_msg,所有 gRPC 证书生成完成)
 
