@@ -183,7 +183,7 @@ check_infrastructure() {
         networks_exist=true
     fi
     
-    if docker volume inspect infra_mysql_data infra_redis_cache_data infra_redis_store_data >/dev/null 2>&1; then
+    if docker volume inspect infra_mysql_data infra_redis_cache_data >/dev/null 2>&1; then
         volumes_exist=true
     fi
     
@@ -380,9 +380,11 @@ validate_env_file() {
             check_env_var "$env_file" "MYSQL_PASSWORD" missing_vars
             ;;
         redis)
-            # Redis 双实例架构：需要两个独立的密码配置
-            check_env_var "$env_file" "REDIS_CACHE_PASSWORD" missing_vars
-            check_env_var "$env_file" "REDIS_STORE_PASSWORD" missing_vars
+            # Redis 单实例：至少需要管理/应用密码
+            check_env_var "$env_file" "REDIS_ADMIN_PASSWORD" missing_vars
+            check_env_var "$env_file" "REDIS_APP_PASSWORD" missing_vars
+            check_env_var "$env_file" "REDIS_CACHE_MAXMEMORY" missing_vars
+            check_env_var "$env_file" "REDIS_CACHE_POLICY" missing_vars
             ;;
         mongo)
             check_env_var "$env_file" "MONGO_INITDB_ROOT_USERNAME" missing_vars
@@ -453,17 +455,18 @@ show_env_file_help() {
     echo "MYSQL_PASSWORD=your_user_password_here"
     echo "MYSQL_PORT=3306"
     echo ""
-    echo "# Redis 配置（双实例架构）"
-    echo "# Redis Cache 实例：纯缓存，可淘汰（端口 6379）"
+    echo "# Redis 配置（单实例）"
+    echo "# Redis 单实例：AOF 持久化，默认 volatile-lru（端口 6379）"
     echo "REDIS_CACHE_PORT=6379"
-    echo "REDIS_CACHE_PASSWORD=your_cache_password_here"
     echo "REDIS_CACHE_MAXMEMORY=256mb"
-    echo "REDIS_CACHE_POLICY=allkeys-lfu"
-    echo ""
-    echo "# Redis Store 实例：存储数据，不淘汰，AOF 持久化（端口 6380）"
-    echo "REDIS_STORE_PORT=6380"
-    echo "REDIS_STORE_PASSWORD=your_store_password_here"
-    echo "REDIS_STORE_MAXMEMORY=192mb"
+    echo "REDIS_CACHE_POLICY=volatile-lru"
+    echo "REDIS_CACHE_MEM_LIMIT=256M"
+    echo "REDIS_CACHE_CPUS=0.15"
+    echo "REDIS_ADMIN_PASSWORD=your_admin_password_here"
+    echo "REDIS_APP_PASSWORD=your_app_password_here"
+    echo "REDIS_READONLY_PASSWORD=readonly_password_here"
+    echo "REDIS_CACHE_USER_PASSWORD=cache_password_here"
+    echo "REDIS_MONITOR_PASSWORD=monitor_password_here"
     echo ""
     echo "# MongoDB 配置"
     echo "MONGO_INITDB_ROOT_USERNAME=admin"
@@ -564,9 +567,9 @@ install_component() {
     local service_names=""
     case "$component" in
         redis)
-            # Redis 双实例：redis-cache 和 redis-store
-            service_names=""  # 空表示启动所有服务
-            log_info "Redis 双实例模式：将启动 redis-cache 和 redis-store"
+            # Redis 单实例
+            service_names="redis-cache"
+            log_info "Redis 单实例模式：将启动 redis-cache"
             
             # 生成 Redis ACL 用户配置文件
             local redis_dir="$COMPONENTS_DIR/redis"
@@ -731,27 +734,14 @@ check_component_health() {
     # 多服务组件特殊处理
     case "$component" in
         redis)
-            # Redis 双实例：需要检查两个容器
-            local redis_containers=("redis-cache" "redis-store")
-            local all_running=true
-            
-            for container in "${redis_containers[@]}"; do
-                if docker ps --filter "name=^${container}$" --filter "status=running" --format "{{.Names}}" | grep -q "^${container}$"; then
-                    log_success "✅ $container 容器运行正常"
-                else
-                    log_error "❌ $container 容器未运行"
-                    all_running=false
-                fi
-            done
-            
-            if [[ "$all_running" == true ]]; then
-                log_success "Redis 双实例全部运行正常"
+            if docker ps --filter "name=^redis-cache$" --filter "status=running" --format "{{.Names}}" | grep -q "^redis-cache$"; then
+                log_success "✅ redis-cache 容器运行正常"
                 return 0
-            else
-                log_error "Redis 部分实例未运行"
-                docker ps -a --filter "name=redis" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-                return 1
             fi
+
+            log_error "Redis 容器未运行"
+            docker ps -a --filter "name=redis" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+            return 1
             ;;
             
         nsq)

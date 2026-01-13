@@ -449,12 +449,12 @@ redis-logs: ## 查看 Redis 日志
 	@docker logs -f --tail=$(LOG_LINES) redis-cache
 
 redis-cli: ## 进入 Redis CLI
-	@docker exec -it redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}"
+	@docker exec -it redis-cache redis-cli --user admin --pass "$${REDIS_ADMIN_PASSWORD}"
 
 redis-info: ## 查看 Redis 详细信息
 	@echo "$(CYAN)=== Redis Cache Info ===$(RESET)"
-	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning INFO server | grep -E "redis_version|redis_mode|uptime_in_seconds" 2>/dev/null || echo "未运行"
-	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning INFO memory | grep -E "used_memory_human|maxmemory_human" 2>/dev/null || true
+	@docker exec redis-cache redis-cli --user admin --pass "$${REDIS_ADMIN_PASSWORD}" --no-auth-warning INFO server | grep -E "redis_version|redis_mode|uptime_in_seconds" 2>/dev/null || echo "未运行"
+	@docker exec redis-cache redis-cli --user admin --pass "$${REDIS_ADMIN_PASSWORD}" --no-auth-warning INFO memory | grep -E "used_memory_human|maxmemory_human" 2>/dev/null || true
 
 redis-status: ## 查看 Redis 状态
 	@docker ps --filter "name=redis-" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
@@ -463,10 +463,10 @@ redis-cache-logs: ## 查看 Redis Cache 日志
 	@docker logs -f --tail=$(LOG_LINES) redis-cache
 
 redis-cache-cli: ## 进入 Redis Cache CLI
-	@docker exec -it redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}"
+	@docker exec -it redis-cache redis-cli --user admin --pass "$${REDIS_ADMIN_PASSWORD}"
 
 redis-cache-info: ## 查看 Redis Cache 详细信息
-	@docker exec redis-cache redis-cli -a "$${REDIS_CACHE_PASSWORD}" --no-auth-warning INFO
+	@docker exec redis-cache redis-cli --user admin --pass "$${REDIS_ADMIN_PASSWORD}" --no-auth-warning INFO
 
 redis-cache-shell: ## 进入 Redis Cache 容器 Shell
 	@docker exec -it redis-cache sh
@@ -830,7 +830,6 @@ validate-cloud-env: ## 校验云服务配置
 	@echo ""
 	@echo "$(BLUE)检查 serverA.env:$(RESET)"
 	@grep -q "^MYSQL_HOST=your-rds" compose/env/prod/serverA.env 2>/dev/null && echo "  $(RED)❌ MYSQL_HOST 未配置$(RESET)" || echo "  $(GREEN)✅ MYSQL_HOST 已配置$(RESET)"
-	@grep -q "^REDIS_STORE_HOST=your-redis" compose/env/prod/serverA.env 2>/dev/null && echo "  $(RED)❌ REDIS_STORE_HOST 未配置$(RESET)" || echo "  $(GREEN)✅ REDIS_STORE_HOST 已配置$(RESET)"
 	@echo ""
 
 # ==============================================================================

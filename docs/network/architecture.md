@@ -30,7 +30,6 @@
 
 云服务（外部）:
   ├── 阿里云 RDS (MySQL)
-  └── 阿里云 Redis (Redis-Store)
 ```
 
 ## 核心网络: infra-network
@@ -71,7 +70,7 @@ networks:
 | 服务 | 容器名 | 端口 | 位置 | 访问示例 |
 |------|--------|------|------|----------|
 | **Nginx** | `nginx` | 80/443 | ServerA | `http://nginx` |
-| **Redis Cache** | `redis-cache` | 6379 | ServerA | `redis-cache:6379` |
+| **Redis** | `redis-cache` | 6379 | ServerA | `redis-cache:6379` |
 | **MongoDB** | `mongo` | 27017 | ServerA | `mongo:27017` |
 | **NSQLookupd** | `nsqlookupd` | 4160/4161 | ServerB | `nsqlookupd:4161` |
 | **NSQd** | `nsqd` | 4150/4151 | ServerB | `nsqd:4150` |
@@ -82,7 +81,7 @@ networks:
 ```yaml
 # 应用环境变量配置
 environment:
-  # 缓存 (本地 Redis)
+  # Redis 单实例
   REDIS_HOST: redis-cache
   REDIS_PORT: 6379
   
@@ -98,7 +97,6 @@ environment:
   
   # 云服务 (使用公网/内网地址)
   MYSQL_HOST: your-rds.mysql.rds.aliyuncs.com
-  REDIS_STORE_HOST: your-redis.redis.rds.aliyuncs.com
 ```
 
 ---
@@ -147,8 +145,6 @@ services:
       
       NSQ_NSQD_ADDR: nsqd:4150
       NSQ_LOOKUPD_ADDR: nsqlookupd:4161
-      
-      # 云服务 (使用外部地址)
       MYSQL_HOST: ${MYSQL_HOST}
       MYSQL_PORT: ${MYSQL_PORT}
     networks:
@@ -303,7 +299,7 @@ Overlay 网络使用 VXLAN (Virtual Extensible LAN) 技术实现跨主机通信�
 | 服务 | 端口 | 绑定地址 | 说明 |
 |------|------|----------|------|
 | Nginx | 80/443 | 0.0.0.0 | 公网访问 |
-| Redis Cache | 6379 | 0.0.0.0 | 内网优先 |
+| Redis | 6379 | 0.0.0.0 | 内网优先 |
 | MongoDB | 27017 | 127.0.0.1 | 仅本地 |
 
 ### ServerB 端口

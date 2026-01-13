@@ -43,28 +43,23 @@ make mysql-logs           # 查看日志
 
 ### Redis
 
-**作用**: 缓存和会话存储
+**作用**: 单实例缓存/会话/状态存储（AOF 开启）
 
-**版本**: 7.2-alpine  
+**版本**: 7.x  
 **端口**: 6379  
-**资源**: CPU 0.5核 / 内存 512MB
+**资源**: CPU 0.15核 / 内存 256MB（默认，可调）
 
 **快速命令**:
 
 ```bash
-make redis-start          # 启动Redis
-make redis-stop           # 停止Redis
-make redis-cli            # 进入Redis CLI
-make redis-auth-cli       # 带认证的CLI
+make redis-start          # 启动 Redis
+make redis-stop           # 停止 Redis
+make redis-cli            # 进入 Redis CLI
 make redis-logs           # 查看日志
 ```
 
-**配置文件**:
-
-- `components/redis/redis-cache.conf` (缓存)
-- `components/redis/redis-auth.conf` (带认证)
-
-**数据目录**: `infra_redis_data` volume
+**配置文件**: `components/redis/redis-cache.conf`  
+**数据卷**: `infra_redis_cache_data`
 
 ### MongoDB
 

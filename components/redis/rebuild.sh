@@ -63,8 +63,8 @@ echo ""
 if [[ -z "$REDIS_REBUILD_CONFIRMED" ]]; then
     echo -e "${RED}警告: 此操作将删除所有 Redis 数据！${NC}"
     echo -e "${YELLOW}包括:${NC}"
-    echo "  - Redis 容器 (redis-cache, redis-store)"
-    echo "  - Docker 数据卷 (infra_redis_cache_data, infra_redis_store_data)"
+    echo "  - Redis 容器 (redis-cache)"
+    echo "  - Docker 数据卷 (infra_redis_cache_data)"
     echo "  - 宿主机数据目录 (/data/redis)"
     echo "  - ACL 配置文件 (users.acl)"
     echo ""
@@ -80,8 +80,8 @@ echo ""
 echo -e "${BLUE}[步骤 1/6] 停止并删除 Redis 容器${NC}"
 cd "$(dirname "$0")"
 if docker compose ps | grep -q redis; then
-    docker compose stop redis-cache redis-store 2>/dev/null || true
-    docker compose rm -f redis-cache redis-store 2>/dev/null || true
+    docker compose stop redis-cache 2>/dev/null || true
+    docker compose rm -f redis-cache 2>/dev/null || true
     echo -e "${GREEN}✓ 容器已停止并删除${NC}"
 else
     echo -e "${YELLOW}✓ 容器不存在，跳过${NC}"
@@ -89,7 +89,7 @@ fi
 
 echo ""
 echo -e "${BLUE}[步骤 2/6] 删除 Docker 数据卷${NC}"
-volumes=("infra_redis_cache_data" "infra_redis_store_data")
+volumes=("infra_redis_cache_data")
 for vol in "${volumes[@]}"; do
     if docker volume inspect "$vol" >/dev/null 2>&1; then
         docker volume rm "$vol"
@@ -166,7 +166,7 @@ fi
 
 echo ""
 echo -e "${BLUE}[步骤 6/6] 重新部署 Redis${NC}"
-docker compose --env-file "$ENV_FILE" up -d redis-cache redis-store
+docker compose --env-file "$ENV_FILE" up -d redis-cache
 echo -e "${GREEN}✓ Redis 容器已启动${NC}"
 
 echo ""
@@ -177,7 +177,6 @@ echo ""
 echo "验证命令:"
 echo "  docker ps | grep redis"
 echo "  docker logs redis-cache"
-echo "  docker logs redis-store"
 echo ""
 echo "测试 ACL 认证:"
 ADMIN_PASS=$(grep "^REDIS_ADMIN_PASSWORD=" "$ENV_FILE" | cut -d'=' -f2)

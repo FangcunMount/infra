@@ -20,7 +20,6 @@ declare -A EXPECTED_USERS=(
     ["nginx"]="www-data (UID 101)"
     ["mysql"]="mysql (UID 999)"
     ["redis-cache"]="redis (UID 999)"
-    ["redis-store"]="redis (UID 999)"
     ["mongo"]="mongodb (UID 999)"
     ["nsqlookupd"]="nsq (UID 1000)"
     ["nsqd"]="nsq (UID 1000)"
@@ -35,9 +34,9 @@ verified=0
 echo "检查容器状态和运行用户:"
 echo "--------------------------------------"
 
-for container in "${!CONTAINERS[@]}"; do
+for container in "${!EXPECTED_USERS[@]}"; do
     ((total++))
-    expected="${CONTAINERS[$container]}"
+    expected="${EXPECTED_USERS[$container]}"
     
     if docker ps --format '{{.Names}}' | grep -q "^${container}$"; then
         ((running++))

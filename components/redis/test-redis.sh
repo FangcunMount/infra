@@ -110,27 +110,8 @@ else
     exit 1
 fi
 
-test_start "redis-store 容器运行状态"
-if docker ps --format '{{.Names}}' | grep -q '^redis-store$'; then
-    test_pass
-else
-    test_fail "容器未运行"
-    echo -e "${RED}请先启动 Redis: make redis-start${NC}"
-    exit 1
-fi
-
 test_start "redis-cache 健康检查"
 health=$(docker inspect redis-cache --format='{{.State.Health.Status}}' 2>/dev/null || echo "none")
-if [[ "$health" == "healthy" ]]; then
-    test_pass
-elif [[ "$health" == "none" ]]; then
-    test_skip "未配置健康检查"
-else
-    test_fail "状态: $health"
-fi
-
-test_start "redis-store 健康检查"
-health=$(docker inspect redis-store --format='{{.State.Health.Status}}' 2>/dev/null || echo "none")
 if [[ "$health" == "healthy" ]]; then
     test_pass
 elif [[ "$health" == "none" ]]; then
@@ -180,14 +161,6 @@ else
     test_fail "default 用户未禁用: $result"
 fi
 
-test_start "验证 default 用户已禁用 (store)"
-result=$(redis_exec "redis-store" "6380" "" "" "PING" || true)
-if echo "$result" | grep -q "NOAUTH\|Authentication required"; then
-    test_pass
-else
-    test_fail "default 用户未禁用: $result"
-fi
-
 # ============================================
 # 4. Admin 用户测试
 # ============================================
@@ -198,14 +171,6 @@ ADMIN_PASS="${REDIS_ADMIN_PASSWORD:-change_me_admin_pass}"
 
 test_start "admin 用户认证 (cache)"
 result=$(redis_exec "redis-cache" "6379" "admin" "$ADMIN_PASS" "PING" || true)
-if echo "$result" | grep -q "PONG"; then
-    test_pass
-else
-    test_fail "认证失败: $result"
-fi
-
-test_start "admin 用户认证 (store)"
-result=$(redis_exec "redis-store" "6380" "admin" "$ADMIN_PASS" "PING" || true)
 if echo "$result" | grep -q "PONG"; then
     test_pass
 else

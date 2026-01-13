@@ -1,6 +1,5 @@
-# Redis 双实例服务
-# - redis-cache: 纯缓存实例（可淘汰、不持久化）
-# - redis-store: 存储实例（不淘汰、AOF 持久化）
+# Redis 单实例服务
+# - redis-cache: 统一的缓存/状态实例（可持久化）
 
 services:
   redis-cache:
@@ -16,21 +15,23 @@ services:
       - ./redis-cache.conf:/usr/local/etc/redis/redis-cache.conf:ro
       # ACL 用户文件（由 make install 生成）
       - ./users.acl:/etc/redis/users.acl:ro
-      # 数据目录（缓存实例无需持久化，但保留目录用于临时文件）
+      # 数据目录（AOF/RDB 均会写入此目录）
       - redis_cache_data:/data
     command: >
       redis-server /usr/local/etc/redis/redis-cache.conf
-      --maxmemory "${REDIS_CACHE_MAXMEMORY:-512mb}"
-      --maxmemory-policy "${REDIS_CACHE_POLICY:-allkeys-lfu}"
-      --save ""
-      --appendonly no
+      --maxmemory "${REDIS_CACHE_MAXMEMORY:-256mb}"
+      --maxmemory-policy "${REDIS_CACHE_POLICY:-volatile-lru}"
+      --appendonly yes
+      --appendfsync everysec
+      --save 900 1
+      --save 300 10
     ulimits:
       nofile: 65535
     sysctls:
       net.core.somaxconn: "65535"
-    # 纯缓存：192MB 数据上限（适配 serverA 2C4G）
-    mem_limit: ${REDIS_CACHE_MEM_LIMIT:-192m}
-    cpus: ${REDIS_CACHE_CPUS:-0.12}
+    # 单实例：256MB 数据上限（适配 serverA 2C4G）
+    mem_limit: ${REDIS_CACHE_MEM_LIMIT:-256m}
+    cpus: ${REDIS_CACHE_CPUS:-0.15}
     stop_grace_period: 10s
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -h 127.0.0.1 -p 6379 --user admin --pass ${REDIS_ADMIN_PASSWORD:-change_me_admin_pass} ping | grep PONG"]
@@ -43,52 +44,9 @@ services:
         max-size: "100m"
         max-file: "3"
     labels:
-      - "infra.service=cache"
+      - "infra.service=redis"
       - "infra.category=storage"
       - "infra.instance=redis-cache"
-      - "infra.host=serverA"
-
-  redis-store:
-    profiles: ["store"]  # 生产默认不启用（已迁移云 Redis-Store）
-    image: redis:7
-    container_name: redis-store
-    networks:
-      - backend
-    restart: unless-stopped
-    ports:
-      - "${REDIS_STORE_PORT:-6380}:6380"
-    volumes:
-      # 配置文件
-      - ./redis-store.conf:/usr/local/etc/redis/redis-store.conf:ro
-      # ACL 用户文件（由 make install 生成）
-      - ./users.acl:/etc/redis/users.acl:ro
-      # 数据持久化（AOF 文件）
-      - redis_store_data:/data
-    command: >
-      redis-server /usr/local/etc/redis/redis-store.conf
-      --maxmemory "${REDIS_STORE_MAXMEMORY:-192mb}"
-    ulimits:
-      nofile: 65535
-    sysctls:
-      net.core.somaxconn: "65535"
-    # 关键键：noeviction + AOF；128–256MB 数据，给 1.5x+ 余量
-    mem_limit: ${REDIS_STORE_MEM_LIMIT:-350m}
-    cpus: ${REDIS_STORE_CPUS:-0.15}
-    stop_grace_period: 30s
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli -h 127.0.0.1 -p 6380 --user admin --pass ${REDIS_ADMIN_PASSWORD:-change_me_admin_pass} ping | grep PONG"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-    logging:
-      driver: json-file
-      options:
-        max-size: "100m"
-        max-file: "3"
-    labels:
-      - "infra.service=data-store"
-      - "infra.category=storage"
-      - "infra.instance=redis-store"
       - "infra.host=serverA"
 
 # 使用外部网络（共享）和本地数据卷（组件独有）
@@ -100,9 +58,6 @@ networks:
 volumes:
   redis_cache_data:
     name: infra_redis_cache_data
-    driver: local
-  redis_store_data:
-    name: infra_redis_store_data
     driver: local
   redisinsight_data:
     name: infra_redisinsight_data
