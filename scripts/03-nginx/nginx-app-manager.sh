@@ -214,10 +214,20 @@ list_configs() {
     local count=0
     for file in "$APPS_CONFIG_DIR"/*.conf; do
         if [ -f "$file" ]; then
-            local app_name=$(basename "$file" .conf)
+            local config_name=$(basename "$file" .conf)
+            local app_name="-"
+            local upstream_name
             local file_size=$(ls -lh "$file" | awk '{print $5}')
             local mod_time=$(ls -l "$file" | awk '{print $6, $7, $8}')
-            echo "  - $app_name ($file_size, 修改时间: $mod_time)"
+
+            # 优先从 upstream 推断应用名（例如 upstream iam_backend -> iam）
+            upstream_name=$(awk '/^[[:space:]]*upstream[[:space:]]+/ {print $2; exit}' "$file" 2>/dev/null || true)
+            upstream_name="${upstream_name%;}"
+            if [[ -n "$upstream_name" ]]; then
+                app_name="${upstream_name%_backend}"
+            fi
+
+            echo "  - 配置: ${config_name} (app: ${app_name}, ${file_size}, 修改时间: ${mod_time})"
             count=$((count + 1))
         fi
     done
