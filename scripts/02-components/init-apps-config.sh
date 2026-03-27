@@ -37,7 +37,8 @@ create_apps_config_dir() {
 - 配置文件会被自动挂载到 nginx 容器的 /etc/nginx/conf.d/apps/ 目录
 
 ## 管理命令
-- 部署配置: make app-deploy APP=blog CONFIG=./nginx/blog.conf
+- 部署配置（自动生成）: make app-deploy APP=iam DOMAIN=iam.fangcunmount.cn PORT=8080 SSL=yes
+- 部署配置（blog）: make app-deploy APP=blog DOMAIN=blog.yangshujie.com PORT=8084 SSL=yes
 - 移除配置: make app-remove APP=blog  
 - 列出配置: make app-list
 - 重载配置: make nginx-reload

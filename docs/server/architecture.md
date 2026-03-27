@@ -190,9 +190,10 @@
 
 | 域名 | 目标服务 | 位置 |
 |------|---------|------|
-| `iam.yangshujie.com` | iam-apiserver | ServerA |
-| `qs.yangshujie.com` | qs-apiserver / qs-collection | ServerA |
-| `qs-admin.yangshujie.com` | qs-operating-system | ServerB |
+| `iam.fangcunmount.cn` | iam-apiserver | ServerA |
+| `qs.fangcunmount.cn` | qs-apiserver | ServerA |
+| `collect.fangcunmount.cn` | qs-collection | ServerA |
+| `operating.fangcunmount.cn` | qs-operating-system | ServerB |
 | `blog.yangshujie.com` | miniblog-frontend-blog | ServerB |
 | `blog-admin.yangshujie.com` | miniblog-frontend-admin | ServerB |
 | `nsqadmin.yangshujie.com` | nsqadmin | ServerB |

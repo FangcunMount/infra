@@ -35,18 +35,25 @@ conf.d/
 ### 应用项目部署配置
 
 ```bash
-# 在 infra 项目中执行
-make app-deploy APP=blog CONFIG=./path/to/blog.conf
+# 在 infra 项目中执行（自动生成配置）
+make app-deploy APP=iam DOMAIN=iam.fangcunmount.cn PORT=8080 SSL=yes
+make app-deploy APP=qs DOMAIN=qs.fangcunmount.cn PORT=8081
+make app-deploy APP=collect DOMAIN=collect.fangcunmount.cn PORT=8082
+make app-deploy APP=operating DOMAIN=operating.fangcunmount.cn PORT=8083
+make app-deploy APP=blog DOMAIN=blog.yangshujie.com PORT=8084 SSL=yes
 
-# 或直接使用脚本
-bash scripts/tools/nginx-app-manager.sh deploy blog ./nginx/blog.conf
+# 或直接使用脚本（部署现有配置文件）
+bash scripts/03-nginx/nginx-app-manager.sh deploy blog ./nginx/blog.conf
 ```
 
 ### 配置管理命令
 
 ```bash
-# 部署配置
-make app-deploy APP=blog CONFIG=./nginx/blog.conf
+# 部署配置（自动生成）
+make app-deploy APP=iam DOMAIN=iam.fangcunmount.cn PORT=8080 SSL=yes
+
+# 部署配置（使用已有配置文件）
+bash scripts/03-nginx/nginx-app-manager.sh deploy blog ./nginx/blog.conf
 
 # 移除配置
 make app-remove APP=blog

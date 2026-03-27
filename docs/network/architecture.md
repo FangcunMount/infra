@@ -240,7 +240,7 @@ upstream your_app {
 
 server {
     listen 80;
-    server_name your-app.yangshujie.com;
+    server_name your-app.fangcunmount.cn;
     
     location / {
         proxy_pass http://your_app;

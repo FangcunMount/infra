@@ -11,13 +11,17 @@
 ## 使用示例
 
 ```bash
-# 方法1：使用 infra 提供的管理工具（推荐）
+# 方法1：使用 infra 提供的管理工具（推荐，自动生成配置）
 cd /path/to/infra
-make app-deploy APP=blog CONFIG=./nginx/blog.conf
+make app-deploy APP=iam DOMAIN=iam.fangcunmount.cn PORT=8080 SSL=yes
+make app-deploy APP=qs DOMAIN=qs.fangcunmount.cn PORT=8081
+make app-deploy APP=collect DOMAIN=collect.fangcunmount.cn PORT=8082
+make app-deploy APP=operating DOMAIN=operating.fangcunmount.cn PORT=8083
+make app-deploy APP=blog DOMAIN=blog.yangshujie.com PORT=8084 SSL=yes
 
-# 方法2：在应用项目的部署脚本中直接操作
+# 方法2：在应用项目的部署脚本中部署现有配置文件
 cp ./nginx/blog.conf /data/apps/nginx-configs/blog.conf
-bash /path/to/infra/scripts/tools/nginx-app-manager.sh reload
+bash /path/to/infra/scripts/03-nginx/nginx-app-manager.sh reload
 ```
 
 ## 文件命名规范

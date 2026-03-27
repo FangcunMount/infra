@@ -24,7 +24,8 @@ show_help() {
     echo "应用 Nginx 配置管理工具"
     echo ""
     echo "用法:"
-    echo "  $0 deploy <app-name> <config-file>  - 部署应用配置"
+    echo "  $0 deploy <app-name> <config-file>             - 部署现有配置文件"
+    echo "  $0 deploy <app-name> <domain> <port> [ssl]    - 按域名端口自动生成并部署配置"
     echo "  $0 remove <app-name>               - 移除应用配置"
     echo "  $0 list                           - 列出所有应用配置"
     echo "  $0 reload                         - 重载 nginx 配置"
@@ -32,9 +33,73 @@ show_help() {
     echo ""
     echo "示例:"
     echo "  $0 deploy blog ./nginx/blog.conf"
+    echo "  $0 deploy iam iam.fangcunmount.cn 8080 yes"
+    echo "  $0 deploy qs qs.fangcunmount.cn 8081 no"
     echo "  $0 remove blog"
     echo "  $0 list"
     echo "  $0 reload"
+}
+
+# 生成应用配置（临时文件）
+generate_config_file() {
+    local app_name="$1"
+    local domain="$2"
+    local port="$3"
+    local ssl_enabled="${4:-no}"
+    local tmp_file
+
+    tmp_file="$(mktemp "/tmp/nginx-${app_name}-XXXXXX.conf")"
+
+    if [[ "$ssl_enabled" == "yes" || "$ssl_enabled" == "true" ]]; then
+        cat > "$tmp_file" << EOF
+upstream ${app_name}_backend {
+    server ${app_name}:${port};
+}
+
+server {
+    listen 443 ssl http2;
+    server_name ${domain};
+
+    ssl_certificate /data/ssl/certs/${domain}.crt;
+    ssl_certificate_key /data/ssl/private/${domain}.key;
+
+    location / {
+        proxy_pass http://${app_name}_backend;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+
+server {
+    listen 80;
+    server_name ${domain};
+    return 301 https://\$server_name\$request_uri;
+}
+EOF
+    else
+        cat > "$tmp_file" << EOF
+upstream ${app_name}_backend {
+    server ${app_name}:${port};
+}
+
+server {
+    listen 80;
+    server_name ${domain};
+
+    location / {
+        proxy_pass http://${app_name}_backend;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+EOF
+    fi
+
+    echo "$tmp_file"
 }
 
 # 确保配置目录存在
@@ -50,32 +115,37 @@ ensure_config_dir() {
 # 部署应用配置
 deploy_config() {
     local app_name="$1"
-    local config_file="$2"
+    local arg2="$2"
+    local arg3="${3:-}"
+    local arg4="${4:-no}"
+    local config_file=""
+    local generated_config_file=""
     
-    if [ -z "$app_name" ] || [ -z "$config_file" ]; then
-        log_error "请提供应用名称和配置文件路径"
+    if [ -z "$app_name" ] || [ -z "$arg2" ]; then
+        log_error "请提供应用名称及配置参数"
         show_help
         return 1
     fi
     # 确保目标配置目录存在（后续可能会从该目录查找文件）
     ensure_config_dir
 
-    # 如果传入的第二个参数不是一个现有文件，尝试在常见位置查找
-    if [ ! -f "$config_file" ]; then
-        # 1) /data/apps/nginx-configs/<name>.conf
+    # 模式1：deploy <app-name> <config-file>
+    if [ -f "$arg2" ]; then
+        config_file="$arg2"
+    # 模式2：deploy <app-name> <domain> <port> [ssl]
+    elif [ -n "$arg3" ]; then
+        generated_config_file="$(generate_config_file "$app_name" "$arg2" "$arg3" "$arg4")"
+        config_file="$generated_config_file"
+    else
+        # 兼容：第二个参数是配置名（不带 .conf）
+        config_file="$arg2"
         if [ -f "$APPS_CONFIG_DIR/${config_file}.conf" ]; then
             config_file="$APPS_CONFIG_DIR/${config_file}.conf"
-        # 2) 当前工作目录 <name>.conf
         elif [ -f "${PWD}/${config_file}.conf" ]; then
             config_file="${PWD}/${config_file}.conf"
-        # 3) components/nginx/conf.d/apps/<name>.conf （仓库示例位置）
-        elif [ -f "$SCRIPT_DIR/../components/nginx/conf.d/apps/${config_file}.conf" ]; then
-            config_file="$SCRIPT_DIR/../components/nginx/conf.d/apps/${config_file}.conf"
-        # 4) components/nginx/conf.d/<name>.conf
-        elif [ -f "$SCRIPT_DIR/../components/nginx/conf.d/${config_file}.conf" ]; then
-            config_file="$SCRIPT_DIR/../components/nginx/conf.d/${config_file}.conf"
         else
-            log_error "配置文件不存在: $config_file"
+            log_error "未找到配置文件，或缺少 <port> 参数: $arg2"
+            show_help
             return 1
         fi
     fi
@@ -90,6 +160,11 @@ deploy_config() {
     sudo cp "$config_file" "$target_file"
     sudo chown www:www "$target_file"
     sudo chmod 644 "$target_file"
+
+    # 清理自动生成的临时文件
+    if [ -n "$generated_config_file" ] && [ -f "$generated_config_file" ]; then
+        rm -f "$generated_config_file"
+    fi
     
     # 测试配置
     if test_nginx_config; then
@@ -191,7 +266,7 @@ reload_nginx() {
 main() {
     case "${1:-}" in
         "deploy")
-            deploy_config "$2" "$3"
+            deploy_config "$2" "$3" "$4" "$5"
             ;;
         "remove")
             remove_config "$2"
