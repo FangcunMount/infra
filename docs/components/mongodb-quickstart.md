@@ -11,7 +11,7 @@
 cd /path/to/infra
 sudo make mongo-tune
 
-# 2️⃣ 启动 MongoDB（会自动初始化单节点副本集）
+# 2️⃣ 启动 MongoDB（会自动准备 keyFile 并初始化单节点副本集）
 make mongo-start
 
 # 3️⃣ 验证容器与副本集状态
@@ -58,6 +58,7 @@ make mongo-logs           # 查看日志
 ```bash
 make mongo-shell          # 连接 Shell（自动认证）
 make mongo-stats          # 查看服务器统计
+make mongo-keyfile        # 准备/校正副本集 keyFile
 make mongo-rs-init        # 初始化/修复单节点副本集
 make test-mongo           # 测试连接
 ```
@@ -98,6 +99,8 @@ mongosh "mongodb://root:密码已URL编码@localhost:27017/admin?authSource=admi
 ```
 
 > 说明：当前 infra 中的 MongoDB 采用“单节点副本集”模式运行。它仍然只有 1 个节点，但已经具备事务能力，适合需要 Mongo 事务的业务服务。
+
+> 说明：因为当前同时启用了 `authorization` 和 `replication.replSetName`，MongoDB 启动时必须提供 `security.keyFile`。`make mongo-start` 已经会自动准备这个文件。
 
 ---
 

@@ -394,9 +394,10 @@ nginx-test: ## 测试 Nginx 配置
 # ==============================================================================
 .PHONY: mongo-start mongo-stop mongo-restart mongo-logs mongo-shell mongo-status
 .PHONY: mongo-backup mongo-monitor mongo-tune mongo-init-users mongo-stats
-.PHONY: mongo-rs-init mongo-rs-status
+.PHONY: mongo-rs-init mongo-rs-status mongo-keyfile
 
 mongo-start: ## 启动 MongoDB
+	@bash $(COMPONENTS_SCRIPTS)/prepare-mongo-keyfile.sh
 	@cd $(COMPONENTS_DIR)/mongo && docker compose up -d
 	@bash $(COMPONENTS_SCRIPTS)/init-mongo-replica-set.sh
 	$(call success_msg,MongoDB 已启动)
@@ -422,6 +423,9 @@ mongo-rs-init: ## 初始化/修复 MongoDB 单节点副本集
 
 mongo-rs-status: ## 查看 MongoDB 副本集状态
 	@docker exec mongo mongosh -u "$(MONGO_INITDB_ROOT_USERNAME)" -p "$(MONGO_INITDB_ROOT_PASSWORD)" --authenticationDatabase admin --quiet --eval "try { const hello = db.hello(); printjson({ setName: hello.setName || null, isWritablePrimary: !!hello.isWritablePrimary, secondary: !!hello.secondary, hosts: hello.hosts || [] }) } catch (e) { print(e.message); quit(1) }"
+
+mongo-keyfile: ## 准备/校正 MongoDB 副本集 keyFile
+	@bash $(COMPONENTS_SCRIPTS)/prepare-mongo-keyfile.sh
 
 mongo-backup: ## 备份 MongoDB
 	@bash $(COMPONENTS_SCRIPTS)/backup-mongo.sh
@@ -957,6 +961,7 @@ help-mongo: ## MongoDB 快速参考
 	@echo "  $(CYAN)make mongo-start$(RESET)      启动"
 	@echo "  $(CYAN)make mongo-stop$(RESET)       停止"
 	@echo "  $(CYAN)make mongo-shell$(RESET)      连接 Shell"
+	@echo "  $(CYAN)make mongo-keyfile$(RESET)    准备副本集 keyFile"
 	@echo "  $(CYAN)make mongo-rs-init$(RESET)    初始化/修复单节点副本集"
 	@echo "  $(CYAN)make mongo-rs-status$(RESET)  查看副本集状态"
 	@echo ""

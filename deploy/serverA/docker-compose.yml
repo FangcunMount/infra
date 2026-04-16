@@ -65,6 +65,7 @@ services:
     volumes:
       # 覆盖相对路径，指向正确的配置文件位置
       - mongo_data:/data/db
+      - /data/infra/mongo/config/replset.key:/etc/mongo/keyfile:ro
       - ../../components/mongo/mongod.conf:/etc/mongod.conf:ro
       - ../../components/mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
 

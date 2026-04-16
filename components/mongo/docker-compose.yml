@@ -13,6 +13,8 @@ services:
     volumes:
       # 数据持久化
       - mongo_data:/data/db
+      # 副本集内部认证 keyFile（由启动脚本在宿主机上准备）
+      - ${INFRA_DATA_ROOT:-/data/infra}/mongo/config/replset.key:/etc/mongo/keyfile:ro
       # 配置文件（相对路径）
       - ./mongod.conf:/etc/mongod.conf:ro
       # 初始化脚本（仅首次启动时执行）

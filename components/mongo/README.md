@@ -231,11 +231,13 @@ replication:
 初始化/校验副本集:
 
 ```bash
+make mongo-keyfile
 make mongo-rs-init
 make mongo-rs-status
 ```
 
 > 当前部署是“单节点副本集”，目的不是高可用，而是启用 MongoDB 事务能力，供业务系统写入文档 + outbox 等场景使用。
+> 启用 `authorization + replica set` 时必须同时提供 `security.keyFile`；仓库已通过 `make mongo-keyfile` / `make mongo-start` 自动处理。
 
 ---
 
