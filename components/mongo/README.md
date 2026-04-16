@@ -76,10 +76,10 @@ MONGO_READONLY_PASSWORD=your_readonly_password
 
 ```bash
 # 应用连接
-mongodb://app_user:password@localhost:27017/infrastructure_dev?authSource=infrastructure_dev
+mongodb://app_user:password@localhost:27017/infrastructure_dev?authSource=infrastructure_dev&replicaSet=rs0&directConnection=true
 
 # 只读连接
-mongodb://readonly_user:password@localhost:27017/infrastructure_dev?authSource=infrastructure_dev
+mongodb://readonly_user:password@localhost:27017/infrastructure_dev?authSource=infrastructure_dev&replicaSet=rs0&directConnection=true
 ```
 
 **手动重新初始化用户**（如需要）:
@@ -220,23 +220,22 @@ db.createUser({
 2. 使用 VPN 或 Wireguard
 3. 配置 TLS/SSL 加密连接
 
-### 4. 副本集安全（未来扩展）
+### 4. 单节点副本集（当前启用）
 
 ```yaml
 # mongod.conf
 replication:
   replSetName: "rs0"
-
-security:
-  keyFile: /etc/mongo/keyfile  # 节点间认证
 ```
 
-生成 keyfile:
+初始化/校验副本集:
 
 ```bash
-openssl rand -base64 756 > keyfile
-chmod 400 keyfile
+make mongo-rs-init
+make mongo-rs-status
 ```
+
+> 当前部署是“单节点副本集”，目的不是高可用，而是启用 MongoDB 事务能力，供业务系统写入文档 + outbox 等场景使用。
 
 ---
 

@@ -394,9 +394,11 @@ nginx-test: ## 测试 Nginx 配置
 # ==============================================================================
 .PHONY: mongo-start mongo-stop mongo-restart mongo-logs mongo-shell mongo-status
 .PHONY: mongo-backup mongo-monitor mongo-tune mongo-init-users mongo-stats
+.PHONY: mongo-rs-init mongo-rs-status
 
 mongo-start: ## 启动 MongoDB
 	@cd $(COMPONENTS_DIR)/mongo && docker compose up -d
+	@bash $(COMPONENTS_SCRIPTS)/init-mongo-replica-set.sh
 	$(call success_msg,MongoDB 已启动)
 
 mongo-stop: ## 停止 MongoDB
@@ -412,6 +414,14 @@ mongo-shell: ## 进入 MongoDB Shell
 
 mongo-status: ## 查看 MongoDB 状态
 	@docker ps --filter "name=mongo" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+	@echo ""
+	@$(MAKE) --no-print-directory mongo-rs-status || true
+
+mongo-rs-init: ## 初始化/修复 MongoDB 单节点副本集
+	@bash $(COMPONENTS_SCRIPTS)/init-mongo-replica-set.sh
+
+mongo-rs-status: ## 查看 MongoDB 副本集状态
+	@docker exec mongo mongosh -u "$(MONGO_INITDB_ROOT_USERNAME)" -p "$(MONGO_INITDB_ROOT_PASSWORD)" --authenticationDatabase admin --quiet --eval "try { const hello = db.hello(); printjson({ setName: hello.setName || null, isWritablePrimary: !!hello.isWritablePrimary, secondary: !!hello.secondary, hosts: hello.hosts || [] }) } catch (e) { print(e.message); quit(1) }"
 
 mongo-backup: ## 备份 MongoDB
 	@bash $(COMPONENTS_SCRIPTS)/backup-mongo.sh
@@ -687,7 +697,7 @@ test-redis: ## 测试 Redis
 
 test-mongo: ## 测试 MongoDB
 	@printf "$(BLUE)MongoDB:$(RESET) "
-	@docker exec mongo mongosh -u "$(MONGO_INITDB_ROOT_USERNAME)" -p "$(MONGO_INITDB_ROOT_PASSWORD)" --authenticationDatabase admin --quiet --eval "db.adminCommand('ping')" 2>/dev/null | grep -qE 'ok.*1' && echo "$(GREEN)✅$(RESET)" || echo "$(RED)❌$(RESET)"
+	@docker exec mongo mongosh -u "$(MONGO_INITDB_ROOT_USERNAME)" -p "$(MONGO_INITDB_ROOT_PASSWORD)" --authenticationDatabase admin --quiet --eval "const hello = db.hello(); print(hello.ok === 1 && hello.setName === 'rs0' && hello.isWritablePrimary ? 'OK' : 'FAIL')" 2>/dev/null | grep -q "OK" && echo "$(GREEN)✅$(RESET)" || echo "$(RED)❌$(RESET)"
 
 test-nsq: ## 测试 NSQ
 	@printf "$(BLUE)NSQ:$(RESET)     "
@@ -947,6 +957,8 @@ help-mongo: ## MongoDB 快速参考
 	@echo "  $(CYAN)make mongo-start$(RESET)      启动"
 	@echo "  $(CYAN)make mongo-stop$(RESET)       停止"
 	@echo "  $(CYAN)make mongo-shell$(RESET)      连接 Shell"
+	@echo "  $(CYAN)make mongo-rs-init$(RESET)    初始化/修复单节点副本集"
+	@echo "  $(CYAN)make mongo-rs-status$(RESET)  查看副本集状态"
 	@echo ""
 	@echo "$(BLUE)监控运维:$(RESET)"
 	@echo "  $(CYAN)make mongo-monitor$(RESET)    实时监控"
@@ -958,7 +970,7 @@ help-mongo: ## MongoDB 快速参考
 	@echo "  $(CYAN)make mongo-init-users$(RESET) 创建业务用户"
 	@echo ""
 	@echo "$(BLUE)配置说明:$(RESET)"
-	@echo "  容器: mongo, 端口: 27017"
+	@echo "  容器: mongo, 端口: 27017, 模式: 单节点副本集(rs0)"
 	@echo "  资源: 1024M/0.50C"
 	@echo ""
 

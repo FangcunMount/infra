@@ -11,11 +11,12 @@
 cd /path/to/infra
 sudo make mongo-tune
 
-# 2️⃣ 启动 MongoDB
+# 2️⃣ 启动 MongoDB（会自动初始化单节点副本集）
 make mongo-start
 
-# 3️⃣ 验证状态
+# 3️⃣ 验证容器与副本集状态
 make mongo-status
+make mongo-rs-status
 
 # 4️⃣ 测试连接
 make test-mongo
@@ -48,6 +49,7 @@ make mongo-start          # 启动 MongoDB
 make mongo-stop           # 停止 MongoDB
 make mongo-restart        # 重启 MongoDB
 make mongo-status         # 查看状态
+make mongo-rs-status      # 查看副本集状态
 make mongo-logs           # 查看日志
 ```
 
@@ -56,6 +58,7 @@ make mongo-logs           # 查看日志
 ```bash
 make mongo-shell          # 连接 Shell（自动认证）
 make mongo-stats          # 查看服务器统计
+make mongo-rs-init        # 初始化/修复单节点副本集
 make test-mongo           # 测试连接
 ```
 
@@ -74,14 +77,14 @@ make mongo-init-users     # 创建业务用户
 ### 应用连接
 
 ```bash
-# 标准格式
-mongodb://用户名:密码@localhost:27017/数据库名?authSource=admin
+# 标准格式（单节点副本集）
+mongodb://用户名:密码@localhost:27017/数据库名?authSource=数据库名&replicaSet=rs0&directConnection=true
 
 # Root 用户（管理）
-mongodb://root:pBy2xT2r3D8JU@GF@localhost:27017/admin?authSource=admin
+mongodb://root:密码已URL编码@localhost:27017/admin?authSource=admin&replicaSet=rs0&directConnection=true
 
 # 业务用户（应用）
-mongodb://app_user:密码@localhost:27017/infrastructure_prod?authSource=infrastructure_prod
+mongodb://app_user:密码已URL编码@localhost:27017/infrastructure_prod?authSource=infrastructure_prod&replicaSet=rs0&directConnection=true
 ```
 
 ### 远程连接（SSH 隧道）
@@ -91,8 +94,10 @@ mongodb://app_user:密码@localhost:27017/infrastructure_prod?authSource=infrast
 ssh -L 27017:localhost:27017 user@47.94.204.124
 
 # 2. 本地连接
-mongosh "mongodb://root:密码@localhost:27017/admin?authSource=admin"
+mongosh "mongodb://root:密码已URL编码@localhost:27017/admin?authSource=admin&replicaSet=rs0&directConnection=true"
 ```
+
+> 说明：当前 infra 中的 MongoDB 采用“单节点副本集”模式运行。它仍然只有 1 个节点，但已经具备事务能力，适合需要 Mongo 事务的业务服务。
 
 ---
 
@@ -173,6 +178,14 @@ make env-show ENV=prod | grep MONGO
 # 确保以下变量存在：
 # MONGO_INITDB_ROOT_USERNAME=root
 # MONGO_INITDB_ROOT_PASSWORD=xxx
+```
+
+### 1.1 事务报错 `Transaction numbers are only allowed on a replica set member or mongos`
+
+```bash
+# 说明副本集尚未初始化或状态异常
+make mongo-rs-init
+make mongo-rs-status
 ```
 
 ### 2. 容器无法启动

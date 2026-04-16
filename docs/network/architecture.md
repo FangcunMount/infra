@@ -141,7 +141,7 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_APP_PASSWORD}
       
-      MONGO_URI: mongodb://${MONGO_APP_USER}:${MONGO_APP_PASSWORD}@mongo:27017/${MONGO_DATABASE}
+      MONGO_URI: mongodb://${MONGO_APP_USER}:${MONGO_APP_PASSWORD}@mongo:27017/${MONGO_DATABASE}?authSource=${MONGO_DATABASE}&replicaSet=rs0&directConnection=true
       
       NSQ_NSQD_ADDR: nsqd:4150
       NSQ_LOOKUPD_ADDR: nsqlookupd:4161

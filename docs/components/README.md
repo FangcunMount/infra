@@ -63,7 +63,7 @@ make redis-logs           # 查看日志
 
 ### MongoDB
 
-**作用**: 文档数据库
+**作用**: 文档数据库（单节点副本集，支持事务）
 
 **版本**: 6.0  
 **端口**: 27017  
@@ -75,6 +75,7 @@ make redis-logs           # 查看日志
 make mongo-start          # 启动MongoDB
 make mongo-stop           # 停止MongoDB
 make mongo-shell          # 进入Mongo Shell
+make mongo-rs-status      # 查看副本集状态
 make mongo-logs           # 查看日志
 ```
 

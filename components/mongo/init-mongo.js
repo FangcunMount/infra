@@ -12,6 +12,8 @@ const appUser = process.env.MONGO_APP_USER || 'app_user';
 const appPassword = process.env.MONGO_APP_PASSWORD || 'dev_app_pass_123';
 const readonlyUser = process.env.MONGO_READONLY_USER || 'readonly_user';
 const readonlyPassword = process.env.MONGO_READONLY_PASSWORD || 'dev_readonly_pass_123';
+const replicaSetName = 'rs0';  // 必须与 mongod.conf 保持一致
+const replicaMemberHost = 'mongo:27017';
 
 print(`数据库: ${dbName}`);
 print(`应用用户: ${appUser}`);
@@ -65,12 +67,38 @@ db.getUsers().users.forEach(function(user) {
     print(`  - ${user.user} (角色: ${user.roles.map(r => r.role).join(', ')})`);
 });
 
+// 初始化单节点副本集（仅首次空数据目录启动时执行）
+print('');
+print('🔁 检查副本集状态...');
+
+try {
+    const status = rs.status();
+    if (status.set === replicaSetName) {
+        print(`✅ 副本集 '${replicaSetName}' 已初始化，跳过`);
+    } else {
+        print(`⚠️  检测到已初始化的副本集 '${status.set}'，与预期 '${replicaSetName}' 不一致`);
+    }
+} catch (e) {
+    if (e.codeName === 'NotYetInitialized' || e.code === 94) {
+        print(`🚀 开始初始化单节点副本集 '${replicaSetName}' ...`);
+        const result = rs.initiate({
+            _id: replicaSetName,
+            members: [
+                { _id: 0, host: replicaMemberHost }
+            ]
+        });
+        printjson(result);
+    } else {
+        print(`❌ 检查副本集状态失败: ${e.message}`);
+    }
+}
+
 print('');
 print('========================================');
 print('MongoDB 初始化完成');
 print('========================================');
 print('');
 print('📝 连接信息:');
-print(`  应用连接: mongodb://${appUser}:${appPassword}@localhost:27017/${dbName}?authSource=${dbName}`);
-print(`  只读连接: mongodb://${readonlyUser}:${readonlyPassword}@localhost:27017/${dbName}?authSource=${dbName}`);
+print(`  应用连接: mongodb://${appUser}:${appPassword}@localhost:27017/${dbName}?authSource=${dbName}&replicaSet=${replicaSetName}&directConnection=true`);
+print(`  只读连接: mongodb://${readonlyUser}:${readonlyPassword}@localhost:27017/${dbName}?authSource=${dbName}&replicaSet=${replicaSetName}&directConnection=true`);
 print('');
