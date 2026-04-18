@@ -1,0 +1,47 @@
+# Prometheus 监控服务
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: prometheus
+    networks:
+      - backend
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml.tmpl:/etc/prometheus/prometheus.yml.tmpl:ro
+      - prometheus_data:/prometheus
+    command: >
+      /bin/sh -c '
+        sed "s|\$${PROMETHEUS_SCRAPE_INTERVAL}|$${PROMETHEUS_SCRAPE_INTERVAL:-15s}|g" /etc/prometheus/prometheus.yml.tmpl > /tmp/prometheus.yml &&
+        exec /bin/prometheus
+          --config.file=/tmp/prometheus.yml
+          --storage.tsdb.path=/prometheus
+          --storage.tsdb.retention.time=$${PROMETHEUS_RETENTION_TIME:-15d}
+          --web.enable-lifecycle
+      '
+    mem_limit: ${PROMETHEUS_MEMORY_LIMIT:-512M}
+    cpus: ${PROMETHEUS_CPUS:-0.25}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:9090/-/healthy | grep -q Prometheus"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "3"
+    labels:
+      - "infra.service=prometheus"
+      - "infra.category=observability"
+      - "infra.host=serverA"
+
+networks:
+  backend:
+    external: true
+    name: infra-network
+
+volumes:
+  prometheus_data:
+    name: infra_prometheus_data
+    driver: local

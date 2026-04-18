@@ -1,0 +1,48 @@
+# Grafana 可视化服务
+
+services:
+  grafana:
+    image: grafana/grafana:11.1.4
+    container_name: grafana
+    networks:
+      - backend
+    restart: unless-stopped
+    volumes:
+      - ./provisioning:/etc/grafana/provisioning:ro
+      - ./dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SERVER_DOMAIN=${GRAFANA_DOMAIN:-grafana.fangcunmount.cn}
+      - GF_SERVER_ROOT_URL=${GRAFANA_ROOT_URL:-https://grafana.fangcunmount.cn}
+      - GF_SERVER_SERVE_FROM_SUB_PATH=false
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-change_me_grafana_admin_password}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/cache-overview.json
+    mem_limit: ${GRAFANA_MEMORY_LIMIT:-256M}
+    cpus: ${GRAFANA_CPUS:-0.25}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:3000/api/health | grep -q ok"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "3"
+    labels:
+      - "infra.service=grafana"
+      - "infra.category=observability"
+      - "infra.host=serverA"
+
+networks:
+  backend:
+    external: true
+    name: infra-network
+
+volumes:
+  grafana_data:
+    name: infra_grafana_data
+    driver: local
