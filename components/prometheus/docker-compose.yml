@@ -10,6 +10,7 @@ services:
     volumes:
       - ./prometheus.yml.tmpl:/etc/prometheus/prometheus.yml.tmpl:ro
       - prometheus_data:/prometheus
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
