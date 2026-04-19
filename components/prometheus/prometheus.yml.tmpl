@@ -19,9 +19,11 @@ scrape_configs:
       - source_labels: [__meta_docker_network_name]
         regex: infra-network
         action: keep
-      - source_labels: [__meta_docker_container_state]
-        regex: running
-        action: keep
+      - source_labels: [__meta_docker_container_label_prometheus_metrics_port]
+        target_label: __tmp_metrics_port
+      - source_labels: [__meta_docker_port_private]
+        target_label: __tmp_metrics_port
+        action: keepequal
       - source_labels: [__meta_docker_network_ip, __meta_docker_container_label_prometheus_metrics_port]
         separator: ;
         regex: (.+);(.+)
@@ -40,3 +42,5 @@ scrape_configs:
         regex: /(.+)
         replacement: $1
         target_label: instance
+      - regex: __tmp_metrics_port
+        action: labeldrop
