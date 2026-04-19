@@ -136,7 +136,7 @@ help: ## 显示帮助信息
 	@echo ""
 	@echo "$(MAGENTA)3. 组件管理$(RESET)"
 	@echo "   $(CYAN)<组件>-start/stop/logs$(RESET)  启动/停止/日志"
-	@echo "   组件: nginx, mongo, redis, nsq, mysql(dev)"
+	@echo "   组件: nginx, mongo, redis, nsq, mysql(dev), prometheus, grafana"
 	@echo ""
 	@echo "$(MAGENTA)4. SSL证书管理$(RESET)"
 	@echo "   $(CYAN)ssl-wildcard$(RESET)         申请通配符证书 (Let's Encrypt)"
@@ -188,7 +188,7 @@ help-all: ## 显示所有命令
 	@echo "$(MAGENTA)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(RESET)"
 	@echo "$(MAGENTA)3. 组件管理$(RESET)"
 	@echo "$(MAGENTA)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(RESET)"
-	@grep -hE '^(nginx-|mongo-|redis-|nsq-|mysql-).*:.*?## .*$$' $(MAKEFILE_LIST) | \
+	@grep -hE '^(nginx-|mongo-|redis-|nsq-|mysql-|prometheus-|grafana-).*:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-28s$(RESET) %s\n", $$1, $$2}'
 	@echo ""
 	@echo "$(MAGENTA)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(RESET)"
@@ -566,6 +566,52 @@ mysql-shell: ## 进入 MySQL Shell
 	@docker exec -it mysql bash
 
 # ==============================================================================
+# 3. 组件管理 - Prometheus
+# ==============================================================================
+.PHONY: prometheus-start prometheus-stop prometheus-restart prometheus-logs prometheus-status prometheus-targets
+
+prometheus-start: ## 启动 Prometheus (ServerA)
+	@cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d prometheus
+	$(call success_msg,Prometheus 已启动)
+
+prometheus-stop: ## 停止 Prometheus
+	@docker stop prometheus 2>/dev/null || true
+
+prometheus-restart: prometheus-stop prometheus-start ## 重启 Prometheus
+
+prometheus-logs: ## 查看 Prometheus 日志
+	@docker logs -f --tail=$(LOG_LINES) prometheus
+
+prometheus-status: ## 查看 Prometheus 状态
+	@docker ps --filter "name=prometheus" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+prometheus-targets: ## 查看 Prometheus 抓取目标状态
+	@docker exec prometheus wget -qO- http://127.0.0.1:9090/api/v1/targets | python3 -m json.tool
+
+# ==============================================================================
+# 3. 组件管理 - Grafana
+# ==============================================================================
+.PHONY: grafana-start grafana-stop grafana-restart grafana-logs grafana-status grafana-nginx-deploy
+
+grafana-start: ## 启动 Grafana (ServerA)
+	@cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d grafana
+	$(call success_msg,Grafana 已启动)
+
+grafana-stop: ## 停止 Grafana
+	@docker stop grafana 2>/dev/null || true
+
+grafana-restart: grafana-stop grafana-start ## 重启 Grafana
+
+grafana-logs: ## 查看 Grafana 日志
+	@docker logs -f --tail=$(LOG_LINES) grafana
+
+grafana-status: ## 查看 Grafana 状态
+	@docker ps --filter "name=grafana" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+grafana-nginx-deploy: ## 部署 Grafana Nginx 配置到 /data/apps/nginx-configs
+	@bash $(NGINX_SCRIPTS)/nginx-app-manager.sh deploy grafana components/grafana/nginx/grafana.conf
+
+# ==============================================================================
 # 4. SSL证书管理
 # ==============================================================================
 .PHONY: ssl-wildcard ssl-obtain ssl-import ssl-renew ssl-list ssl-remove ssl-setup-aliyun
@@ -741,7 +787,7 @@ disk-usage: ## Docker 磁盘使用
 .PHONY: serverB-up serverB-down serverB-logs serverB-status serverB-destroy serverB-rebuild
 .PHONY: server-info validate-cloud-env
 
-serverA-up: ## 启动 ServerA 服务栈 (Nginx + MongoDB + Redis)
+serverA-up: ## 启动 ServerA 服务栈 (Nginx + MongoDB + Redis + Prometheus + Grafana)
 	$(call section_title,启动 ServerA (2C4G))
 	@$(MAKE) init-serverA
 	@# 确保 Redis ACL 文件存在
@@ -760,14 +806,14 @@ serverA-status: ## 查看 ServerA 状态
 
 serverA-destroy: ## 销毁 ServerA 所有容器、卷和数据 (危险!)
 	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerA 的所有数据！$(RESET)"
-	@echo "$(RED)   - 停止并删除容器: nginx, redis-cache, mongo$(RESET)"
+	@echo "$(RED)   - 停止并删除容器: nginx, redis-cache, mongo, prometheus, grafana$(RESET)"
 	@echo "$(RED)   - 删除所有 infra_* Docker 卷$(RESET)"
 	@echo "$(RED)   - 删除数据目录: /data/infra/*, /data/logs/*$(RESET)"
 	@echo ""
 	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
 	$(call section_title,销毁 ServerA 数据)
 	@# 停止并删除容器
-	@docker rm -f nginx redis-cache mongo 2>/dev/null || true
+	@docker rm -f nginx redis-cache mongo prometheus grafana 2>/dev/null || true
 	@# 删除所有 infra_ 开头的 Docker 卷
 	@docker volume ls -q | grep '^infra_' | xargs -r docker volume rm 2>/dev/null || true
 	@# 删除匿名卷（可选，谨慎）
@@ -823,9 +869,9 @@ server-info: ## 显示双机架构
 	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
 	@echo "$(CYAN)│               ServerA (2C4G) - 主力业务                 │$(RESET)"
 	@echo "$(CYAN)├─────────────────────────────────────────────────────────┤$(RESET)"
-	@echo "$(CYAN)│  $(GREEN)Nginx$(RESET)        $(GREEN)Redis-Cache$(RESET)   $(GREEN)MongoDB$(RESET)               $(CYAN)│$(RESET)"
-	@echo "$(CYAN)│  $(YELLOW)80/443$(RESET)       $(YELLOW)6379$(RESET)          $(YELLOW)27017$(RESET)                 $(CYAN)│$(RESET)"
-	@echo "$(CYAN)│  $(BLUE)128M/0.25C$(RESET)   $(BLUE)192M/0.12C$(RESET)    $(BLUE)1024M/0.50C$(RESET)           $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(GREEN)Nginx$(RESET)    $(GREEN)Redis$(RESET)   $(GREEN)MongoDB$(RESET)   $(GREEN)Prometheus$(RESET)   $(GREEN)Grafana$(RESET) $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(YELLOW)80/443$(RESET)   $(YELLOW)6379$(RESET)    $(YELLOW)27017$(RESET)     $(YELLOW)9090$(RESET)        $(YELLOW)3000$(RESET)    $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(BLUE)128M/0.10C$(RESET) $(BLUE)256M/0.15C$(RESET) $(BLUE)2048M/1C$(RESET)   $(BLUE)512M/0.25C$(RESET)  $(BLUE)256M/0.25C$(RESET)$(CYAN)│$(RESET)"
 	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
 	@echo ""
 	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
