@@ -35,7 +35,7 @@ services:
     labels:
       - "infra.service=grafana"
       - "infra.category=observability"
-      - "infra.host=serverA"
+      - "infra.host=${INFRA_HOST_LABEL:-serverA}"
 
 networks:
   backend:

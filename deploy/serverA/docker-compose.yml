@@ -69,31 +69,6 @@ services:
       - ../../components/mongo/mongod.conf:/etc/mongod.conf:ro
       - ../../components/mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
 
-  # ============================================================================
-  # 观测服务
-  # ============================================================================
-
-  prometheus:
-    extends:
-      file: ../../components/prometheus/docker-compose.yml
-      service: prometheus
-    env_file:
-      - ../../compose/env/prod/serverA.env
-    volumes:
-      - ../../components/prometheus/prometheus.yml.tmpl:/etc/prometheus/prometheus.yml.tmpl:ro
-      - prometheus_data:/prometheus
-
-  grafana:
-    extends:
-      file: ../../components/grafana/docker-compose.yml
-      service: grafana
-    env_file:
-      - ../../compose/env/prod/serverA.env
-    volumes:
-      - ../../components/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ../../components/grafana/dashboards:/var/lib/grafana/dashboards:ro
-      - grafana_data:/var/lib/grafana
-
 networks:
   backend:
     external: true
@@ -112,10 +87,4 @@ volumes:
     driver: local
   mongo_config:
     name: infra_mongo_config
-    driver: local
-  prometheus_data:
-    name: infra_prometheus_data
-    driver: local
-  grafana_data:
-    name: infra_grafana_data
     driver: local

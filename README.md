@@ -26,6 +26,7 @@ make help-ssl      # SSL 证书
 | 文档 | 说明 |
 |------|------|
 | [架构设计](docs/server/architecture.md) | 双机部署规划、资源分配、云服务连接 |
+| [升降配操作手册](docs/server/scaling-runbook.md) | 服务器升配/降配时要改哪些文件、按什么顺序发 |
 | [初始化指南](docs/server/initialization.md) | 服务器用户配置、Docker 安装 |
 | [组件总览](docs/components/README.md) | MongoDB、Redis、NSQ 等组件参考 |
 | [网络架构](docs/network/architecture.md) | Overlay 网络设计 |
@@ -49,11 +50,11 @@ make help-ssl      # SSL 证书
                           │ infra-network (Overlay)
 ┌─────────────────────────┴─────────────────────────────────┐
 │                   ServerB (2C2G)                          │
-│                消息中间件 + 边缘前端                       │
+│             消息中间件 + 边缘前端 + 监控平台               │
 │  ┌───────────────────────────────────────────────────┐   │
 │  │  nsqlookupd (4160/4161) │ nsqd (4150/4151) │ admin │   │
 │  └───────────────────────────────────────────────────┘   │
-│  + miniblog-backend, miniblog-frontend-*, qs-ops         │
+│  + prometheus, grafana, miniblog-backend, qs-ops         │
 └───────────────────────────────────────────────────────────┘
                           │ VPC 内网
 ┌─────────────────────────┴─────────────────────────────────┐

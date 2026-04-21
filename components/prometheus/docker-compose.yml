@@ -31,7 +31,7 @@ services:
     labels:
       - "infra.service=prometheus"
       - "infra.category=observability"
-      - "infra.host=serverA"
+      - "infra.host=${INFRA_HOST_LABEL:-serverA}"
 
 networks:
   backend:
