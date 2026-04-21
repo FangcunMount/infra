@@ -27,6 +27,7 @@ make help-ssl      # SSL 证书
 |------|------|
 | [架构设计](docs/server/architecture.md) | 双机部署规划、资源分配、云服务连接 |
 | [升降配操作手册](docs/server/scaling-runbook.md) | 服务器升配/降配时要改哪些文件、按什么顺序发 |
+| [ServerB 监控部署指南](docs/server/serverB-monitoring-deploy-guide.md) | 在 `serverB` 上部署 `Prometheus` 和 `Grafana` |
 | [初始化指南](docs/server/initialization.md) | 服务器用户配置、Docker 安装 |
 | [组件总览](docs/components/README.md) | MongoDB、Redis、NSQ 等组件参考 |
 | [网络架构](docs/network/architecture.md) | Overlay 网络设计 |

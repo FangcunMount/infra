@@ -21,6 +21,7 @@ docs/
 ├── server/                     # 服务器配置
 │   ├── architecture.md         # 架构设计 + 资源规划
 │   ├── scaling-runbook.md      # 升降配操作手册
+│   ├── serverB-monitoring-deploy-guide.md  # ServerB 监控部署
 │   ├── initialization.md       # 初始化指南
 │   ├── www-user-guide.md       # www 用户使用指南
 │   ├── ssl-guide.md            # SSL 证书使用指南
@@ -40,6 +41,7 @@ docs/
 
 - [架构设计](./server/architecture.md) - 双机部署规划、资源分配、云服务连接
 - [升降配操作手册](./server/scaling-runbook.md) - 升配/降配时的改配置与发布顺序
+- [ServerB 监控部署指南](./server/serverB-monitoring-deploy-guide.md) - 在 `serverB` 上部署 `Prometheus` 和 `Grafana`
 - [初始化指南](./server/initialization.md) - 用户配置、Docker 安装
 
 ## 🔧 组件文档
@@ -65,6 +67,7 @@ docs/
 |---------|----------|
 | 了解整体架构 | [架构设计](./server/architecture.md) |
 | 调整服务器规格 | [升降配操作手册](./server/scaling-runbook.md) |
+| 在 serverB 部署监控 | [ServerB 监控部署指南](./server/serverB-monitoring-deploy-guide.md) |
 | 初始化新服务器 | [初始化指南](./server/initialization.md) |
 | 启动/管理 MongoDB | [MongoDB 快速入门](./components/mongodb-quickstart.md) |
 | 配置 NSQ 消息队列 | [NSQ 配置指南](./components/nsq.md) |

@@ -148,6 +148,32 @@ make nsq-logs             # 查看日志
 
 **详细文档**: [NSQ配置](./nsq.md)
 
+## 监控平台 (ServerB)
+
+### Prometheus + Grafana
+
+**作用**: 容器指标采集与可视化面板
+
+**部署位置**: `serverB`
+**Prometheus 资源**: CPU 0.10核 / 内存 256MB
+**Grafana 资源**: CPU 0.05核 / 内存 128MB
+
+**关键点**:
+
+- Prometheus 通过 Docker Service Discovery 自动发现容器
+- 被采集容器必须接入 `infra-network`
+- 被采集容器必须带 `prometheus.scrape=true` 等 labels
+- Grafana datasource 和 dashboard 通过 provisioning 预置
+
+**相关文件**:
+
+- `components/prometheus/docker-compose.yml`
+- `components/prometheus/prometheus.yml.tmpl`
+- `components/grafana/docker-compose.yml`
+- `components/grafana/provisioning/`
+
+**详细文档**: [ServerB 监控部署指南](../server/serverB-monitoring-deploy-guide.md)
+
 ## 组件状态检查
 
 ### 健康检查
