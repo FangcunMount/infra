@@ -15,7 +15,17 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
-        sed "s|\$${PROMETHEUS_SCRAPE_INTERVAL}|$${PROMETHEUS_SCRAPE_INTERVAL:-15s}|g" /etc/prometheus/prometheus.yml.tmpl > /tmp/prometheus.yml && exec /bin/prometheus --config.file=/tmp/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=$${PROMETHEUS_RETENTION_TIME:-15d} --web.enable-lifecycle
+        sed \
+          -e "s|\$${PROMETHEUS_SCRAPE_INTERVAL}|$${PROMETHEUS_SCRAPE_INTERVAL:-15s}|g" \
+          -e "s|\$${PROMETHEUS_QS_APISERVER_TARGET}|$${PROMETHEUS_QS_APISERVER_TARGET:-qs-apiserver:8080}|g" \
+          -e "s|\$${PROMETHEUS_QS_COLLECTION_TARGET}|$${PROMETHEUS_QS_COLLECTION_TARGET:-qs-collection-server:8080}|g" \
+          -e "s|\$${PROMETHEUS_QS_WORKER_TARGET}|$${PROMETHEUS_QS_WORKER_TARGET:-qs-worker:9092}|g" \
+          /etc/prometheus/prometheus.yml.tmpl > /tmp/prometheus.yml && \
+        exec /bin/prometheus \
+          --config.file=/tmp/prometheus.yml \
+          --storage.tsdb.path=/prometheus \
+          --storage.tsdb.retention.time=$${PROMETHEUS_RETENTION_TIME:-15d} \
+          --web.enable-lifecycle
     mem_limit: ${PROMETHEUS_MEMORY_LIMIT:-512M}
     cpus: ${PROMETHEUS_CPUS:-0.25}
     healthcheck:

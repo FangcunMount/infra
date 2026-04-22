@@ -55,6 +55,9 @@ INFRA_HOST_LABEL=serverB
 
 PROMETHEUS_RETENTION_TIME=7d
 PROMETHEUS_SCRAPE_INTERVAL=30s
+PROMETHEUS_QS_APISERVER_TARGET=qs-apiserver:8080
+PROMETHEUS_QS_COLLECTION_TARGET=qs-collection-server:8080
+PROMETHEUS_QS_WORKER_TARGET=qs-worker:9092
 PROMETHEUS_MEMORY_LIMIT=256M
 PROMETHEUS_CPUS=0.10
 
@@ -71,6 +74,7 @@ GRAFANA_CPUS=0.05
 - `INFRA_HOST_LABEL=serverB` 用于给容器打宿主机标签，后续排查更直观
 - `PROMETHEUS_RETENTION_TIME` 决定历史指标保留时长
 - `PROMETHEUS_SCRAPE_INTERVAL` 同时影响 `scrape_interval` 和 `evaluation_interval`
+- `PROMETHEUS_QS_APISERVER_TARGET` / `PROMETHEUS_QS_COLLECTION_TARGET` / `PROMETHEUS_QS_WORKER_TARGET` 指向 `serverA` 上通过 overlay 网络可达的 QS metrics 地址
 - `GRAFANA_ROOT_URL` 要和你最终访问 Grafana 的 URL 保持一致
 
 ## 第二步：确认编排文件
@@ -152,11 +156,26 @@ docker exec grafana wget -qO- http://127.0.0.1:3000/api/health
 
 如果 Grafana 已正常启动，首次登录后应该能直接看到已导入的 dashboard。
 
-## Prometheus 会抓哪些容器
+## Prometheus 会抓哪些目标
 
-Prometheus 不是手工写死 target，而是通过 Docker Service Discovery 自动发现。
+Prometheus 当前采用两类抓取方式：
 
-抓取条件有两个：
+1. 静态抓取 `serverA` 上的核心 QS 服务
+2. 通过 Docker Service Discovery 自动发现 `serverB` 本机容器
+
+### 1. 静态抓取的 QS 服务
+
+默认固定抓：
+
+- `qs-apiserver:8080/metrics`
+- `qs-collection-server:8080/metrics`
+- `qs-worker:9092/metrics`
+
+这两个地址通过 `serverB` 上的 Prometheus 容器经 `infra-network` 访问 `serverA` 上的业务容器。
+
+### 2. Docker 自动发现的本机容器
+
+对本机自动发现，抓取条件有两个：
 
 1. 容器要在 `infra-network`
 2. 容器要带这些 label
@@ -180,12 +199,18 @@ labels:
   - "prometheus.metrics_path=/metrics"
 ```
 
-如果某个业务服务“明明跑着，但 Prometheus 看不到”，通常就是：
+如果某个 `serverB` 本机业务服务“明明跑着，但 Prometheus 看不到”，通常就是：
 
 - 没加 `prometheus.scrape=true`
 - 没接入 `infra-network`
 - `metrics_port` 写错
 - 服务本身没有监听 `/metrics`
+
+如果 `qs-apiserver` / `qs-collection-server` / `qs-worker` 看不到，优先检查：
+
+- `infra-network` overlay 是否在 `serverA/serverB` 间正常互通
+- `serverB.env` 里的 `PROMETHEUS_QS_APISERVER_TARGET` / `PROMETHEUS_QS_COLLECTION_TARGET` / `PROMETHEUS_QS_WORKER_TARGET` 是否正确
+- `serverA` 上的目标容器是否真的监听了 `/metrics`
 
 ## 访问方式
 
