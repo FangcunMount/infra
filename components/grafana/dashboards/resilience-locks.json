@@ -1,0 +1,53 @@
+{
+  "uid": "resilience-locks",
+  "title": "QS Resilience Redis Locks",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "tags": ["qs", "resilience", "redis-lock"],
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Lock / idempotency / duplicate outcomes",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (component, scope, resource, outcome) (qs:resilience_lock:rate5m)",
+          "legendFormat": "{{component}} {{scope}} {{resource}} {{outcome}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Contention / duplicate skipped",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 5, "w": 12, "x": 0, "y": 9 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(qs:resilience_lock:rate5m{outcome=~\"lock_contention|duplicate_skipped|idempotency_hit\"})",
+          "legendFormat": "contention_or_duplicate"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Lock errors / degraded",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 5, "w": 12, "x": 12, "y": 9 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(qs:resilience_lock:rate5m{outcome=~\"lock_error|lock_degraded|degraded_open\"})",
+          "legendFormat": "lock_error_or_degraded"
+        }
+      ]
+    }
+  ]
+}

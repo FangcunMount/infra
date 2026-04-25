@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: qs-cache-governance
+  - name: qs-platform-observability
     orgId: 1
-    folder: QS Cache Governance
+    folder: QS Platform Observability
     type: file
     disableDeletion: false
     allowUiUpdates: false

@@ -1,0 +1,53 @@
+{
+  "uid": "resilience-ratelimit",
+  "title": "QS Resilience RateLimit",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "tags": ["qs", "resilience", "ratelimit"],
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Allowed / rate-limited / degraded-open",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (component, scope, resource, strategy, outcome) (qs:resilience_rate_limit:rate5m)",
+          "legendFormat": "{{component}} {{scope}} {{resource}} {{strategy}} {{outcome}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Current rate-limited rate",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 5, "w": 12, "x": 0, "y": 9 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(qs:resilience_rate_limit:rate5m{outcome=\"rate_limited\"})",
+          "legendFormat": "rate_limited"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Current degraded-open rate",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 5, "w": 12, "x": 12, "y": 9 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(qs:resilience_rate_limit:rate5m{outcome=\"degraded_open\"})",
+          "legendFormat": "degraded_open"
+        }
+      ]
+    }
+  ]
+}

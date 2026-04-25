@@ -1,0 +1,84 @@
+groups:
+  - name: qs-event-system
+    interval: 30s
+    rules:
+      - record: qs:event_publish_outcome:rate5m
+        expr: sum by (source, mode, topic, event_type, outcome) (rate(qs_event_publish_total[5m]))
+
+      - record: qs:event_outbox_outcome:rate5m
+        expr: sum by (relay, topic, event_type, outcome) (rate(qs_event_outbox_total[5m]))
+
+      - record: qs:event_consume_outcome:rate5m
+        expr: sum by (service, topic, event_type, outcome) (rate(qs_event_consume_total[5m]))
+
+      - record: qs:event_consume_duration:p95
+        expr: histogram_quantile(0.95, sum by (le, service, topic, event_type, outcome) (rate(qs_event_consume_duration_seconds_bucket[5m])))
+
+      - record: qs:event_outbox_backlog:current
+        expr: sum by (store, status) (qs_event_outbox_backlog)
+
+      - record: qs:event_outbox_oldest_age_seconds:max
+        expr: max by (store, status) (qs_event_outbox_oldest_age_seconds)
+
+      - record: qs:event_outbox_status_scrape_failures:rate5m
+        expr: sum by (store) (rate(qs_event_outbox_status_scrape_total{outcome="failure"}[5m]))
+
+      - alert: QSEventMQPublishFailures
+        expr: sum by (source, mode, topic, event_type) (rate(qs_event_publish_total{outcome="mq_failed"}[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: event
+        annotations:
+          summary: "QS event MQ publish failures detected"
+          description: "Event publish failures are occurring for {{ $labels.topic }} / {{ $labels.event_type }}."
+
+      - alert: QSEventOutboxFailedBacklog
+        expr: qs:event_outbox_backlog:current{status="failed"} > 0
+        for: 10m
+        labels:
+          severity: warning
+          subsystem: event
+        annotations:
+          summary: "QS event outbox failed backlog"
+          description: "Outbox {{ $labels.store }} has failed events waiting for retry."
+
+      - alert: QSEventOutboxOldestPendingTooOld
+        expr: qs:event_outbox_oldest_age_seconds:max{status=~"pending|failed|publishing"} > 300
+        for: 10m
+        labels:
+          severity: warning
+          subsystem: event
+        annotations:
+          summary: "QS event outbox lag is high"
+          description: "Outbox {{ $labels.store }} status {{ $labels.status }} has oldest unfinished age above 5 minutes."
+
+      - alert: QSEventOutboxStatusScrapeFailed
+        expr: qs:event_outbox_status_scrape_failures:rate5m > 0
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: event
+        annotations:
+          summary: "QS event outbox status scrape failed"
+          description: "Outbox status scrape is failing for {{ $labels.store }}."
+
+      - alert: QSEventWorkerConsumeFailures
+        expr: sum by (service, topic, event_type, outcome) (rate(qs_event_consume_total{outcome=~"nacked|nack_failed|ack_failed"}[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: event
+        annotations:
+          summary: "QS event worker consume failures detected"
+          description: "Worker {{ $labels.service }} has consume outcome {{ $labels.outcome }} for {{ $labels.topic }} / {{ $labels.event_type }}."
+
+      - alert: QSEventWorkerConsumeP95High
+        expr: qs:event_consume_duration:p95{outcome=~"acked|nacked|ack_failed|nack_failed"} > 10
+        for: 10m
+        labels:
+          severity: warning
+          subsystem: event
+        annotations:
+          summary: "QS event worker consume p95 is high"
+          description: "Worker consume p95 for {{ $labels.topic }} / {{ $labels.event_type }} is above 10 seconds."

@@ -46,6 +46,7 @@ services:
       - ../../compose/env/prod/serverB.env
     volumes:
       - ../../components/prometheus/prometheus.yml.tmpl:/etc/prometheus/prometheus.yml.tmpl:ro
+      - ../../components/prometheus/rules:/etc/prometheus/rules:ro
       - prometheus_data:/prometheus
 
   grafana:

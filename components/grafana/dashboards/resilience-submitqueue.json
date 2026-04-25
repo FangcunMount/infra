@@ -1,0 +1,53 @@
+{
+  "uid": "resilience-submitqueue",
+  "title": "QS Resilience SubmitQueue",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "tags": ["qs", "resilience", "submitqueue"],
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Queue depth",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "qs:resilience_queue_depth:current",
+          "legendFormat": "{{component}} {{scope}} {{resource}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Queue status counts",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "qs:resilience_queue_status:current",
+          "legendFormat": "{{component}} {{scope}} {{status}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Queue outcomes",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (component, scope, resource, outcome) (qs:resilience_queue:rate5m)",
+          "legendFormat": "{{component}} {{scope}} {{resource}} {{outcome}}"
+        }
+      ]
+    }
+  ]
+}

@@ -36,3 +36,33 @@
 - `PROMETHEUS_QS_WORKER_TARGET`
 - `PROMETHEUS_MEMORY_LIMIT`
 - `PROMETHEUS_CPUS`
+
+## 事件系统规则
+
+本组件挂载 `components/prometheus/rules` 到 `/etc/prometheus/rules`，当前包含：
+
+- `qs:event_publish_outcome:rate5m`
+- `qs:event_outbox_outcome:rate5m`
+- `qs:event_consume_outcome:rate5m`
+- `qs:event_consume_duration:p95`
+- `qs:event_outbox_backlog:current`
+- `qs:event_outbox_oldest_age_seconds:max`
+- `qs:event_outbox_status_scrape_failures:rate5m`
+
+事件告警只使用 bounded labels：`source/mode/topic/event_type/outcome`、`relay`、`service`、`store/status`。不要把 `event_id`、`aggregate_id`、error message 写进 label。
+
+## 高并发治理规则
+
+同一 rules 目录还包含 Resilience Plane 规则：
+
+- `qs:resilience_decision:rate5m`
+- `qs:resilience_rate_limit:rate5m`
+- `qs:resilience_queue:rate5m`
+- `qs:resilience_backpressure:rate5m`
+- `qs:resilience_lock:rate5m`
+- `qs:resilience_queue_depth:current`
+- `qs:resilience_queue_status:current`
+- `qs:resilience_backpressure_inflight:current`
+- `qs:resilience_backpressure_wait:p95`
+
+Resilience 告警覆盖 rate limit surge、SubmitQueue full/depth、backpressure timeout/wait p95、Redis lock error/degraded。规则只使用 bounded labels：`component/scope/resource/strategy/outcome/status`。不要把 request ID、user ID、lock key、error message 写进 label。

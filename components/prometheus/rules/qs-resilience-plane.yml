@@ -1,0 +1,90 @@
+groups:
+  - name: qs-resilience-plane
+    interval: 30s
+    rules:
+      - record: qs:resilience_decision:rate5m
+        expr: sum by (component, scope, resource, strategy, outcome) (rate(qs_resilience_decision_total[5m]))
+
+      - record: qs:resilience_rate_limit:rate5m
+        expr: sum by (component, scope, resource, strategy, outcome) (rate(qs_resilience_decision_total{kind="rate_limit"}[5m]))
+
+      - record: qs:resilience_queue:rate5m
+        expr: sum by (component, scope, resource, strategy, outcome) (rate(qs_resilience_decision_total{kind="queue"}[5m]))
+
+      - record: qs:resilience_backpressure:rate5m
+        expr: sum by (component, scope, resource, strategy, outcome) (rate(qs_resilience_decision_total{kind="backpressure"}[5m]))
+
+      - record: qs:resilience_lock:rate5m
+        expr: sum by (component, scope, resource, strategy, outcome) (rate(qs_resilience_decision_total{kind=~"lock|idempotency|duplicate_suppression"}[5m]))
+
+      - record: qs:resilience_queue_depth:current
+        expr: max by (component, scope, resource, strategy) (qs_resilience_queue_depth)
+
+      - record: qs:resilience_queue_status:current
+        expr: max by (component, scope, status) (qs_resilience_queue_status_total)
+
+      - record: qs:resilience_backpressure_inflight:current
+        expr: max by (component, scope, resource, strategy) (qs_resilience_backpressure_inflight)
+
+      - record: qs:resilience_backpressure_wait:p95
+        expr: histogram_quantile(0.95, sum by (le, component, scope, resource, strategy, outcome) (rate(qs_resilience_backpressure_wait_duration_seconds_bucket[5m])))
+
+      - alert: QSResilienceQueueFull
+        expr: sum by (component, scope, resource) (rate(qs_resilience_decision_total{kind="queue",outcome="queue_full"}[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: resilience
+        annotations:
+          summary: "QS SubmitQueue is full"
+          description: "Queue full outcomes are occurring for {{ $labels.component }} / {{ $labels.scope }} / {{ $labels.resource }}."
+
+      - alert: QSResilienceQueueDepthHigh
+        expr: qs:resilience_queue_depth:current > 0
+        for: 15m
+        labels:
+          severity: warning
+          subsystem: resilience
+        annotations:
+          summary: "QS SubmitQueue depth remains non-zero"
+          description: "Queue {{ $labels.component }} / {{ $labels.scope }} has pending depth for more than 15 minutes."
+
+      - alert: QSResilienceBackpressureTimeout
+        expr: sum by (component, scope, resource) (rate(qs_resilience_decision_total{kind="backpressure",outcome="backpressure_timeout"}[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: resilience
+        annotations:
+          summary: "QS backpressure timeout detected"
+          description: "Backpressure timeouts are occurring for {{ $labels.component }} dependency {{ $labels.scope }}."
+
+      - alert: QSResilienceBackpressureWaitP95High
+        expr: qs:resilience_backpressure_wait:p95{outcome="backpressure_acquired"} > 1
+        for: 10m
+        labels:
+          severity: warning
+          subsystem: resilience
+        annotations:
+          summary: "QS backpressure wait p95 is high"
+          description: "Backpressure wait p95 for {{ $labels.component }} dependency {{ $labels.scope }} is above 1 second."
+
+      - alert: QSResilienceLockErrorOrDegraded
+        expr: sum by (component, scope, resource, outcome) (rate(qs_resilience_decision_total{kind=~"lock|idempotency|duplicate_suppression",outcome=~"lock_error|lock_degraded|degraded_open"}[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: resilience
+        annotations:
+          summary: "QS Redis lock path is degraded"
+          description: "Lock-related outcome {{ $labels.outcome }} is occurring for {{ $labels.component }} / {{ $labels.scope }}."
+
+      - alert: QSResilienceRateLimitedSurge
+        expr: sum by (component, scope, resource) (rate(qs_resilience_decision_total{kind="rate_limit",outcome="rate_limited"}[5m])) > 1
+        for: 10m
+        labels:
+          severity: warning
+          subsystem: resilience
+        annotations:
+          summary: "QS rate limit surge"
+          description: "Rate limited requests are elevated for {{ $labels.component }} / {{ $labels.scope }} / {{ $labels.resource }}."

@@ -1,0 +1,53 @@
+{
+  "uid": "resilience-backpressure",
+  "title": "QS Resilience Backpressure",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "tags": ["qs", "resilience", "backpressure"],
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "In-flight",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "qs:resilience_backpressure_inflight:current",
+          "legendFormat": "{{component}} {{scope}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Wait p95",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "qs:resilience_backpressure_wait:p95",
+          "legendFormat": "{{component}} {{scope}} {{outcome}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Backpressure outcomes",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (component, scope, resource, outcome) (qs:resilience_backpressure:rate5m)",
+          "legendFormat": "{{component}} {{scope}} {{resource}} {{outcome}}"
+        }
+      ]
+    }
+  ]
+}
