@@ -21,7 +21,7 @@ scrape_configs:
 
   - job_name: qs-collection-server
     metrics_path: /metrics
-    static_configs:、
+    static_configs:
       - targets:
           - ${PROMETHEUS_QS_COLLECTION_TARGET}
 
