@@ -1,0 +1,39 @@
+# ============================================================================
+# serverD 基础设施栈 (2C4G)
+# ============================================================================
+# 服务清单：
+#   - 消息中间件：nsqlookupd、nsqd、nsqadmin
+# 依赖：
+#   - 外部网络：infra-network
+#   - 配置文件：compose/env/prod/serverD.env
+# 注意：
+#   - serverD 同时承载 qs-worker、operating，业务容器由对应项目部署
+#   - MySQL / Redis 使用云托管服务
+# ============================================================================
+
+services:
+  nsqlookupd:
+    extends:
+      file: ../../components/nsq/docker-compose.yml
+      service: nsqlookupd
+    env_file:
+      - ../../compose/env/prod/serverD.env
+
+  nsqd:
+    extends:
+      file: ../../components/nsq/docker-compose.yml
+      service: nsqd
+    env_file:
+      - ../../compose/env/prod/serverD.env
+
+  nsqadmin:
+    extends:
+      file: ../../components/nsq/docker-compose.yml
+      service: nsqadmin
+    env_file:
+      - ../../compose/env/prod/serverD.env
+
+networks:
+  backend:
+    external: true
+    name: infra-network

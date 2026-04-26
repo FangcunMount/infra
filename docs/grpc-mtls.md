@@ -13,7 +13,7 @@
 - 生成脚本：`scripts/04-ssl/grpc-mtls.sh`
 - 生成结果（默认）：
   - `.../ssl/grpc/ca/{root-ca.*,intermediate-ca.*,ca-chain.crt}`
-  - `.../ssl/grpc/server/{iam-grpc.key,iam-grpc.crt,iam-grpc-fullchain.crt}`
+  - `.../ssl/grpc/server/{iam-apiserver.key,iam-apiserver.crt,iam-apiserver-fullchain.crt}`
   - `.../ssl/grpc/clients/*.key|*.crt`
 
 ### 常用命令（开发/测试）
@@ -25,7 +25,7 @@
 make grpc-ca
 
 # 2. 为服务生成证书（需要先有 CA）
-make grpc-server NAME=iam-grpc                                    # 使用默认 OU
+make grpc-server NAME=iam-apiserver                               # 使用默认 OU
 make grpc-server NAME=user-api OU=User                            # 指定 OU
 make grpc-server NAME=order-api OU=Order ALT_DNS=order.internal.example.com  # 完整参数
 
@@ -47,7 +47,7 @@ make grpc-clean
 ```bash
 # 分步生成
 bash scripts/04-ssl/grpc-mtls.sh generate-ca
-bash scripts/04-ssl/grpc-mtls.sh generate-server iam-grpc IAM iam-grpc.internal.example.com
+bash scripts/04-ssl/grpc-mtls.sh generate-server iam-apiserver IAM iam-apiserver.internal.example.com
 
 # 一键生成所有
 bash scripts/04-ssl/grpc-mtls.sh generate
@@ -61,7 +61,7 @@ bash scripts/04-ssl/grpc-mtls.sh info
 bash scripts/04-ssl/grpc-mtls.sh clean
 
 # 更换输出目录
-CERT_DIR=/data/ssl/iam-contracts/grpc bash scripts/04-ssl/grpc-mtls.sh generate
+CERT_DIR=/data/infra/ssl/grpc bash scripts/04-ssl/grpc-mtls.sh generate
 ```
 
 ## 使用场景示例
@@ -73,7 +73,7 @@ CERT_DIR=/data/ssl/iam-contracts/grpc bash scripts/04-ssl/grpc-mtls.sh generate
 make grpc-ca
 
 # 2. 为各个服务生成证书
-make grpc-server NAME=iam-grpc OU=IAM ALT_DNS=iam-grpc.internal.example.com
+make grpc-server NAME=iam-apiserver OU=IAM ALT_DNS=iam-apiserver.internal.example.com
 make grpc-server NAME=user-api OU=User ALT_DNS=user-api.internal.example.com
 make grpc-server NAME=order-api OU=Order
 
@@ -84,7 +84,7 @@ make grpc-verify
 ### 场景二：快速开发测试
 
 ```bash
-# 一键生成所有证书（包括默认的 iam-grpc、qs、admin、ops）
+# 一键生成所有证书（包括 iam-apiserver、qs-apiserver、qs-collection-server、qs-worker）
 make grpc-generate-all
 
 # 查看生成的证书信息
@@ -103,16 +103,16 @@ make grpc-verify
 
 ## Docker Compose 挂载示例
 
-### 服务端配置（iam-grpc）
+### IAM gRPC 服务端配置
 
 ```yaml
 services:
-  iam-grpc:
-    image: your-grpc-image
+  iam-apiserver:
+    image: your-iam-image
     volumes:
       # 服务端证书（带完整链）
-      - /data/infra/ssl/grpc/server/iam-grpc-fullchain.crt:/certs/server.crt:ro
-      - /data/infra/ssl/grpc/server/iam-grpc.key:/certs/server.key:ro
+      - /data/infra/ssl/grpc/server/iam-apiserver-fullchain.crt:/certs/server.crt:ro
+      - /data/infra/ssl/grpc/server/iam-apiserver.key:/certs/server.key:ro
       # CA 证书链（用于验证客户端）
       - /data/infra/ssl/grpc/ca/ca-chain.crt:/certs/ca-chain.crt:ro
     environment:
@@ -122,23 +122,23 @@ services:
       - GRPC_SSL_REQUIRE_CLIENT_CERT=true  # 启用 mTLS
 ```
 
-### 客户端配置（qs 调用 iam-grpc）
+### 客户端配置（QS 调用 IAM gRPC）
 
 ```yaml
 services:
-  qs-api:
+  qs-apiserver:
     image: your-qs-image
     volumes:
-      # 客户端证书
-      - /data/infra/ssl/grpc/clients/qs.crt:/certs/client.crt:ro
-      - /data/infra/ssl/grpc/clients/qs.key:/certs/client.key:ro
+      # 客户端证书。当前脚本为服务生成 dual 证书，可同时用于 serverAuth/clientAuth。
+      - /data/infra/ssl/grpc/server/qs-apiserver.crt:/certs/client.crt:ro
+      - /data/infra/ssl/grpc/server/qs-apiserver.key:/certs/client.key:ro
       # CA 证书链（用于验证服务端）
       - /data/infra/ssl/grpc/ca/ca-chain.crt:/certs/ca-chain.crt:ro
     environment:
       - GRPC_CLIENT_CERT_FILE=/certs/client.crt
       - GRPC_CLIENT_KEY_FILE=/certs/client.key
       - GRPC_CLIENT_CA_FILE=/certs/ca-chain.crt
-      - IAM_GRPC_ENDPOINT=iam-grpc:50051
+      - IAM_GRPC_ENDPOINT=iam-apiserver:50051
 ```
 
 ## 证书管理
@@ -153,7 +153,7 @@ services:
 
 ```bash
 # 服务端证书到期续期（保留 CA）
-make grpc-server NAME=iam-grpc OU=IAM ALT_DNS=iam-grpc.internal.example.com
+make grpc-server NAME=iam-apiserver OU=IAM ALT_DNS=iam-apiserver.internal.example.com
 
 # CA 到期需要重新生成所有证书
 make grpc-clean
@@ -167,7 +167,7 @@ make grpc-generate-all
 make grpc-info
 
 # 或使用 openssl 命令
-openssl x509 -in /data/infra/ssl/grpc/server/iam-grpc.crt -noout -dates
+openssl x509 -in /data/infra/ssl/grpc/server/iam-apiserver.crt -noout -dates
 ```
 
 ## 生产环境建议
@@ -187,7 +187,7 @@ openssl x509 -in /data/infra/ssl/grpc/server/iam-grpc.crt -noout -dates
 ```bash
 # 直接在服务器上生成
 make grpc-ca
-make grpc-server NAME=iam-grpc
+make grpc-server NAME=iam-apiserver
 ```
 
 #### 生产环境
@@ -226,7 +226,7 @@ make grpc-server NAME=iam-grpc
 
 ```bash
 # 检查证书距离到期的天数
-openssl x509 -in /data/infra/ssl/grpc/server/iam-grpc.crt -noout -checkend $((30*86400))
+openssl x509 -in /data/infra/ssl/grpc/server/iam-apiserver.crt -noout -checkend $((30*86400))
 ```
 
 提前 30 天告警，预留充足的续期时间。

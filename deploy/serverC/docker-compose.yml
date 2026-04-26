@@ -1,0 +1,30 @@
+# ============================================================================
+# serverC 基础设施栈 (4C4G)
+# ============================================================================
+# 服务清单：
+#   - 数据库：MongoDB（单节点副本集）
+# 依赖：
+#   - 外部网络：infra-network
+#   - 配置文件：compose/env/prod/serverC.env
+# 注意：
+#   - serverC 是跨云 worker 节点，只承载 MongoDB
+#   - 容器间访问走 overlay 网络，宿主机只在 127.0.0.1 暴露 27017
+# ============================================================================
+
+services:
+  mongo:
+    extends:
+      file: ../../components/mongo/docker-compose.yml
+      service: mongo
+    env_file:
+      - ../../compose/env/prod/serverC.env
+    volumes:
+      - /data/infra/mongo/data:/data/db
+      - /data/infra/mongo/config/replset.key:/etc/mongo/keyfile:ro
+      - /data/infra/mongo/conf/mongod.conf:/etc/mongod.conf:ro
+      - /data/infra/mongo/conf/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+networks:
+  backend:
+    external: true
+    name: infra-network

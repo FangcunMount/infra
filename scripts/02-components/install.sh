@@ -522,10 +522,13 @@ install_component() {
     # 根据环境类型选择配置文件路径
     local env_file
     if [[ "$env_type" == "prod" ]]; then
-        # 生产环境：根据组件选择 serverA 或 serverB
+        # 生产环境：按当前四机拓扑选择对应的 env 文件
         case "$component" in
             nsq)
-                env_file="$PROJECT_ROOT/compose/env/prod/serverB.env"
+                env_file="$PROJECT_ROOT/compose/env/prod/serverD.env"
+                ;;
+            mongo)
+                env_file="$PROJECT_ROOT/compose/env/prod/serverC.env"
                 ;;
             *)
                 env_file="$PROJECT_ROOT/compose/env/prod/serverA.env"

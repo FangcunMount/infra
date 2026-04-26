@@ -43,8 +43,9 @@ ${BLUE}用法:${NC}
     $0 <命令> [参数]
 
 ${BLUE}命令:${NC}
-    ${CYAN}init-manager${NC}           初始化 Swarm 管理节点 (在 ServerA 执行)
-    ${CYAN}init-worker${NC}            初始化 Swarm 工作节点 (在 ServerB 执行)
+    ${CYAN}init-manager${NC}           初始化首个 Swarm 管理节点
+    ${CYAN}join-manager${NC}           将节点加入为额外的 Swarm 管理节点
+    ${CYAN}init-worker${NC}            将节点加入为 Swarm 工作节点
     ${CYAN}get-join-token${NC}         获取工作节点加入令牌
     ${CYAN}status${NC}                 查看 Swarm 集群状态
     ${CYAN}list-nodes${NC}             列出所有节点
@@ -55,14 +56,17 @@ ${BLUE}命令:${NC}
     ${CYAN}help${NC}                   显示此帮助信息
 
 ${BLUE}示例:${NC}
-    # 在 ServerA 上初始化管理节点
-    sudo $0 init-manager
+    # 在 serverA 上初始化首个管理节点
+    sudo $0 init-manager <serverA-advertise-ip> [serverA-data-ip]
 
-    # 获取加入令牌 (在 ServerA 上)
+    # 获取加入令牌 (在任一 manager 上)
     sudo $0 get-join-token
 
-    # 在 ServerB 上加入集群 (使用上面获取的令牌)
-    sudo $0 init-worker <manager-ip> <join-token>
+    # 将 serverB / serverD 加入为 manager
+    sudo $0 join-manager <serverA-ip> <manager-token> <node-advertise-ip> [node-data-ip]
+
+    # 将 serverC 加入为 worker
+    sudo $0 init-worker <serverA-ip> <worker-token> <serverC-advertise-ip> [serverC-data-ip]
 
     # 查看集群状态
     sudo $0 status
@@ -72,11 +76,14 @@ ${BLUE}示例:${NC}
 
 ${BLUE}注意事项:${NC}
     - 需要 root 权限执行
-    - 确保防火墙开放以下端口:
+    - 跨云场景务必使用固定、可信的节点互联地址
+    - 确保防火墙仅向集群成员开放以下端口:
       * TCP 2377 (集群管理)
       * TCP/UDP 7946 (节点通信)
       * UDP 4789 (overlay 网络)
-    - 建议在内网环境使用
+      * IP protocol 50 (启用 overlay 加密时需要)
+    - 首个 manager 建议使用 serverA，额外 manager 使用 serverB / serverD
+    - Mongo 所在的 serverC 保持 worker 角色，避免叠加控制面职责
 
 EOF
 }
@@ -112,6 +119,7 @@ check_firewall() {
         "7946/tcp"  # 节点通信
         "7946/udp"  # 节点通信
         "4789/udp"  # overlay 网络
+        "proto 50"  # overlay 加密 (IPSec ESP)
     )
     
     warn "请确保以下端口已开放:"
@@ -125,11 +133,32 @@ check_firewall() {
     echo "  sudo ufw allow 7946/tcp"
     echo "  sudo ufw allow 7946/udp"
     echo "  sudo ufw allow 4789/udp"
+    echo "  # 如启用 overlay 加密，确保云防火墙允许 ESP (IP protocol 50)"
     echo
+}
+
+build_swarm_addr_flags() {
+    local advertise_addr="$1"
+    local data_path_addr="$2"
+
+    if [[ -z "$advertise_addr" ]]; then
+        error "必须显式指定 advertise 地址"
+        return 1
+    fi
+
+    local flags="--advertise-addr ${advertise_addr}"
+    if [[ -n "$data_path_addr" ]]; then
+        flags="${flags} --data-path-addr ${data_path_addr}"
+    fi
+
+    echo "$flags"
 }
 
 # 初始化管理节点
 init_manager() {
+    local advertise_addr="${1:-${SWARM_ADVERTISE_ADDR:-}}"
+    local data_path_addr="${2:-${SWARM_DATA_PATH_ADDR:-}}"
+
     log "初始化 Docker Swarm 管理节点..."
     
     # 检查是否已在 swarm 中
@@ -140,22 +169,34 @@ init_manager() {
     fi
     
     check_firewall
-    
-    # 获取本机 IP (优先内网 IP)
-    local host_ip=$(hostname -I | awk '{print $1}')
-    
-    log "使用 IP 地址: $host_ip"
+
+    local addr_flags
+    if ! addr_flags=$(build_swarm_addr_flags "$advertise_addr" "$data_path_addr"); then
+        error "用法: $0 init-manager <advertise-addr> [data-path-addr]"
+        exit 1
+    fi
+
+    log "使用控制面地址: $advertise_addr"
+    if [[ -n "$data_path_addr" ]]; then
+        log "使用数据面地址: $data_path_addr"
+    else
+        log "未显式指定数据面地址，将复用 advertise 地址"
+    fi
     log "正在初始化 Swarm..."
     
-    if docker swarm init --advertise-addr "$host_ip" 2>&1; then
+    if docker swarm init ${addr_flags} 2>&1; then
         success "Swarm 管理节点初始化成功!"
         echo
         info "节点信息:"
         docker node ls
         echo
-        success "请在工作节点上执行以下命令加入集群:"
+        success "请在其他节点上执行以下命令加入集群:"
         echo
+        echo "${GREEN}=== Worker join token ===${NC}"
         docker swarm join-token worker | grep "docker swarm join"
+        echo
+        echo "${GREEN}=== Manager join token ===${NC}"
+        docker swarm join-token manager | grep "docker swarm join"
         echo
     else
         error "Swarm 初始化失败"
@@ -181,20 +222,38 @@ get_join_token() {
     echo
 }
 
-# 初始化工作节点
-init_worker() {
-    local manager_ip="$1"
-    local join_token="$2"
-    
+# 节点加入集群
+join_node() {
+    local role="$1"
+    shift
+
+    local manager_ip="${1:-}"
+    local join_token="${2:-}"
+    local advertise_addr="${3:-}"
+    local data_path_addr="${4:-}"
+    local token_label="worker"
+
+    if [[ "$role" == "manager" ]]; then
+        token_label="manager"
+    fi
+
     if [[ -z "$manager_ip" ]] || [[ -z "$join_token" ]]; then
-        error "用法: $0 init-worker <manager-ip> <join-token>"
+        error "缺少必要参数"
+        if [[ "$role" == "manager" ]]; then
+            echo "用法: $0 join-manager <manager-ip> <manager-token> <advertise-addr> [data-path-addr]"
+        else
+            echo "用法: $0 init-worker <manager-ip> <worker-token> <advertise-addr> [data-path-addr]"
+        fi
         echo
-        echo "示例:"
-        echo "  sudo $0 init-worker 192.168.1.100 SWMTKN-1-xxx"
         exit 1
     fi
-    
-    log "加入 Docker Swarm 集群..."
+
+    local addr_flags
+    if ! addr_flags=$(build_swarm_addr_flags "$advertise_addr" "$data_path_addr"); then
+        exit 1
+    fi
+
+    log "加入 Docker Swarm 集群 (${token_label})..."
     
     # 检查是否已在 swarm 中
     if docker info 2>/dev/null | grep -q "Swarm: active"; then
@@ -203,15 +262,23 @@ init_worker() {
     fi
     
     check_firewall
-    
-    if docker swarm join --token "$join_token" "${manager_ip}:2377" 2>&1; then
-        success "成功加入 Swarm 集群!"
+
+    if docker swarm join --token "$join_token" ${addr_flags} "${manager_ip}:2377" 2>&1; then
+        success "成功加入 Swarm 集群 (${token_label})!"
         echo
         docker info | grep -A 5 "Swarm:"
     else
         error "加入集群失败"
         exit 1
     fi
+}
+
+init_worker() {
+    join_node "worker" "$@"
+}
+
+join_manager() {
+    join_node "manager" "$@"
 }
 
 # 查看集群状态
@@ -256,25 +323,35 @@ create_network() {
         error "此节点不在 Swarm 集群中,请先初始化 Swarm"
         exit 1
     fi
-    
+
+    local subnet="${INFRA_BACKEND_SUBNET:-172.20.0.0/24}"
+    local mtu="${INFRA_NETWORK_MTU:-1450}"
+    local encrypted="${INFRA_NETWORK_ENCRYPTED:-true}"
+
     # 检查网络是否已存在
     if docker network ls | grep -q "infra-network"; then
         warn "网络 infra-network 已存在"
         docker network inspect infra-network | grep -E "Name|Driver|Scope|Subnet"
         return 0
     fi
-    
+
+    local network_cmd=(
+        docker network create
+        --driver overlay
+        --subnet "$subnet"
+        --attachable
+        --opt "com.docker.network.driver.mtu=${mtu}"
+        --label infra.network=backend
+        --label infra.purpose=internal-services
+        --label infra.network.type=overlay
+    )
+    if [[ "$encrypted" == "true" ]]; then
+        network_cmd+=(--opt encrypted=true)
+    fi
+    network_cmd+=(infra-network)
+
     # 创建 overlay 网络
-    if docker network create \
-        --driver overlay \
-        --subnet 172.20.0.0/16 \
-        --attachable \
-        --opt com.docker.network.driver.mtu=1450 \
-        --label infra.network=backend \
-        --label infra.purpose=internal-services \
-        --label infra.network.type=overlay \
-        infra-network; then
-        
+    if "${network_cmd[@]}"; then
         success "Overlay 网络创建成功!"
         echo
         docker network inspect infra-network | grep -E "Name|Driver|Scope|Subnet"
@@ -363,13 +440,20 @@ main() {
         init-manager)
             check_root "$@"
             check_docker
-            init_manager
+            shift
+            init_manager "$@"
             ;;
         init-worker)
             check_root "$@"
             check_docker
             shift
             init_worker "$@"
+            ;;
+        join-manager)
+            check_root "$@"
+            check_docker
+            shift
+            join_manager "$@"
             ;;
         get-join-token|join-token)
             check_root "$@"

@@ -10,21 +10,22 @@
 
 ## 🔑 配置说明
 
-### deploy 账户特性（v2.2）
+### deploy 账户特性
 
-- ✅ **可 SSH 登录**: 使用 SSH 密钥认证（密码已锁定）
-- ✅ **受限 sudo**: 可无密码执行白名单命令
+- ✅ **CI/CD SSH**: 使用 SSH 密钥认证（密码已锁定）
+- ✅ **受限 sudo**: 可无密码执行部署命令白名单
 - ❌ **不在 docker 组**: 避免 root 等价权限
 - ✅ **审计日志**: 所有 sudo 操作有日志
+- ⚠️ **不使用 deployctl 强制入口**: 当前 CI/CD 需要 `scp-action` 上传 tar 包并通过 `ssh-action` 执行多行脚本，`authorized_keys command=` 会导致部署失败
 
 ### 允许的 sudo 命令
 
 deploy 可以无密码执行：
 
 - `sudo docker` / `sudo docker-compose`
-- `sudo systemctl start|stop|restart|reload|status|enable|disable`
-- `sudo rsync`
-- `sudo chown` / `sudo chmod` / `sudo mkdir`
+- `sudo systemctl restart|reload|status`
+- `sudo rsync` / `sudo tar`
+- `sudo chown` / `sudo chmod` / `sudo mkdir` / `sudo rm`
 
 ## 🔧 GitHub Actions 配置示例
 
@@ -185,24 +186,23 @@ jobs:
 
 ## 🛡️ 安全限制说明
 
-### deploy 账户的白名单命令
+### deploy 账户的 sudo 白名单
 
 | 命令类型 | 允许的格式 | 示例 |
 |---------|----------|------|
-| **Docker Compose** | `docker compose ...` | `docker compose up -d` |
-| **systemd 服务** | `systemctl start\|stop\|restart\|status\|reload <service>` | `systemctl restart nginx.service` |
-| **日志查看** | `tail\|cat\|less\|head\|grep /var/log/...` | `tail -f /var/log/app.log` |
-| **Git 拉取** | `git pull` | `cd /srv/apps/myapp && git pull` |
-| **自定义脚本** | `/srv/deploy/*` | `/srv/deploy/deploy-app.sh` |
+| **Docker** | `sudo docker ...` | `sudo docker compose up -d` |
+| **Docker Compose** | `sudo docker-compose ...` | `sudo docker-compose ps` |
+| **文件部署** | `sudo rsync/tar/mkdir/chown/chmod/rm` | `sudo chown -R 2000:2000 /opt/qs-server` |
+| **systemd 服务** | `sudo systemctl restart\|status\|reload <service>` | `sudo systemctl restart nginx.service` |
 
 ### 禁止的操作
 
-❌ 交互式登录（Shell: `/usr/sbin/nologin`）  
-❌ 端口转发（`no-port-forwarding`）  
-❌ X11 转发（`no-X11-forwarding`）  
-❌ Agent 转发（`no-agent-forwarding`）  
-❌ 分配 TTY（`no-pty`）  
-❌ 白名单外的任何命令
+❌ 人工交互式运维登录（`deploy` 仅供 CI/CD 使用）<br>
+❌ 端口转发（`no-port-forwarding`）<br>
+❌ X11 转发（`no-X11-forwarding`）<br>
+❌ Agent 转发（`no-agent-forwarding`）<br>
+❌ 分配 TTY（`no-pty`）<br>
+❌ sudo 白名单外的提权命令
 
 ## 📝 自定义部署脚本
 
@@ -270,32 +270,20 @@ sudo chown deploy:deploy /srv/deploy/deploy-myapp.sh
 # SSH 登录到服务器（使用 yangshujie）
 ssh yangshujie@server
 
-# 查看 deployctl 执行日志
-sudo tail -f /var/log/deployctl.log
-```
-
-日志格式：
-
-```log
-2025-10-25 10:30:15 [deploy] EXEC: docker compose -f /srv/apps/myapp/docker-compose.yml up -d
-2025-10-25 10:30:15 [deploy] ALLOWED: docker compose
+# 查看 deploy SSH/sudo 审计日志
+sudo grep deploy /var/log/auth.log
 ```
 
 ### 常见错误
 
-#### 错误 1: 命令不在白名单中
+#### 错误 1: scp 或多行 ssh 脚本被拒绝
 
 ```text
-错误: 命令不在白名单中: rm
-允许的命令:
-  - docker compose ...
-  - systemctl start|stop|restart|status|reload <service>
-  - tail|cat|less|head|grep /var/log/...
-  - git pull
-  - /srv/deploy/* (自定义脚本)
+Command not allowed
+tar: command not found or forced command rejected
 ```
 
-**解决**: 将命令封装到 `/srv/deploy/` 下的脚本中
+**解决**: 检查 `/home/deploy/.ssh/authorized_keys`，不要配置 `command="/usr/local/bin/deployctl"`；重新运行 `setup-deploy-ssh.sh`。
 
 #### 错误 2: Permission denied
 
@@ -305,7 +293,7 @@ Error: docker: permission denied
 
 **原因**: deploy 没有 docker 组权限（这是正常的安全限制）
 
-**解决**: deployctl 会自动使用 `sudo docker compose`，确保命令格式正确
+**解决**: 使用 `sudo docker ...` 或配置 `/etc/sudoers.d/deploy-cicd`。
 
 #### 错误 3: sudo 密码提示
 
@@ -323,30 +311,25 @@ Error: docker: permission denied
 
 ```bash
 # 使用生成的私钥测试连接
-ssh -i ~/.ssh/deploy_key deploy@47.94.204.124
+ssh -i ~/.ssh/deploy_key deploy@47.94.204.124 "whoami"
 ```
 
 应该看到：
 
 ```text
-错误: 不允许交互式登录
-This account is currently not available.
+deploy
 ```
 
-这是正常的！deploy 不能交互登录。
+`deploy` 仅供 CI/CD 执行命令，不作为人工运维入口。人工运维请使用 `yangshujie` 登录。
 
-### 测试白名单命令
+### 测试 CI/CD 命令
 
 ```bash
 # 测试 docker compose 命令
-ssh -i ~/.ssh/deploy_key deploy@47.94.204.124 "docker compose --version"
+ssh -i ~/.ssh/deploy_key deploy@47.94.204.124 "sudo docker compose --version"
 
 # 测试 systemctl 命令
-ssh -i ~/.ssh/deploy_key deploy@47.94.204.124 "systemctl status nginx.service"
-
-# 测试被拒绝的命令
-ssh -i ~/.ssh/deploy_key deploy@47.94.204.124 "ls -la"
-# 应该看到: 错误: 命令不在白名单中: ls
+ssh -i ~/.ssh/deploy_key deploy@47.94.204.124 "sudo systemctl status nginx.service"
 ```
 
 ### 测试 GitHub Actions
@@ -371,8 +354,8 @@ jobs:
           username: deploy
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            echo "测试白名单命令..."
-            docker compose --version
+            echo "测试 CI/CD 命令..."
+            sudo docker compose --version
             echo "✅ deploy 账户配置正常！"
 ```
 
@@ -381,17 +364,17 @@ jobs:
 | 项目 | 旧版本（不安全）❌ | 新版本（安全）✅ |
 |------|-----------------|----------------|
 | **SSH 密钥位置** | 服务器上生成 | 本地/CI 生成，私钥在 GitHub Secrets |
-| **可否交互登录** | 可以 | 不可以（`/usr/sbin/nologin`） |
+| **可否交互登录** | 可以 | 不作为人工入口，SSH 禁用 PTY/转发 |
 | **密码** | 有密码 | 无密码（已锁定） |
 | **docker 组** | 在 docker 组（= root） | 不在 docker 组 |
-| **命令执行** | 无限制 | 白名单限制（deployctl） |
-| **审计日志** | 无 | 有（`/var/log/deployctl.log`） |
+| **命令执行** | 无限制 | SSH 可执行 CI/CD 脚本，sudo 受白名单限制 |
+| **审计日志** | 无 | 有（系统 auth/sudo 日志） |
 | **风险** | 高（相当于 root 权限） | 低（最小权限原则） |
 
 ## 📚 相关文档
 
 - [用户权限安全加固说明](./user-security-hardening.md)
-- deploy 账户白名单命令列表（参见上文"安全限制说明"章节）
+- deploy 账户 sudo 白名单命令列表（参见上文"安全限制说明"章节）
 - 自定义部署脚本（参见上文"自定义部署脚本"章节）
 
 ---

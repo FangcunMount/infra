@@ -22,11 +22,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INFRA_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # 根据 ENV 参数选择环境配置文件
-# ENV=prod (默认) -> serverA.env (MongoDB 部署在 serverA)
+# ENV=prod (默认) -> serverC.env (MongoDB 部署在 serverC)
 # ENV=dev -> dev/.env
 ENV="${ENV:-prod}"
 if [[ "$ENV" == "prod" ]]; then
-    ENV_FILE="$INFRA_ROOT/compose/env/prod/serverA.env"
+    ENV_FILE="$INFRA_ROOT/compose/env/prod/serverC.env"
 elif [[ "$ENV" == "dev" ]]; then
     ENV_FILE="$INFRA_ROOT/compose/env/dev/.env"
 else

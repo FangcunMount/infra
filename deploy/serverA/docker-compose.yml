@@ -1,16 +1,14 @@
 # ============================================================================
-# serverA 基础设施栈 (2C4G)
+# serverA 基础设施栈 (2C2G)
 # ============================================================================
 # 服务清单：
 #   - 网关：Nginx
-#   - 缓存：Redis（单实例）
-#   - 数据库：MongoDB
 # 依赖：
 #   - 外部网络：infra-network
 #   - 配置文件：compose/env/prod/serverA.env
 # 注意：
-#   - 业务服务（iam、qs等）在各自项目中配置和部署
-#   - MySQL 使用云 RDS
+#   - serverA 同时承载 qs-apiserver，但业务容器由对应项目部署
+#   - MySQL / Redis 使用云托管服务
 # ============================================================================
 
 services:
@@ -28,63 +26,12 @@ services:
       # 覆盖相对路径，指向正确的配置文件位置
       - ../../components/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ../../components/nginx/conf.d:/etc/nginx/conf.d:ro
-      - nginx_logs:/data/log/nginx
+      - /data/logs/nginx:/data/log/nginx
       - /data/ssl:/data/ssl:ro
       - /data/apps/nginx-configs:/etc/nginx/conf.d/apps:ro
       - /var/www/certbot:/var/www/certbot
-
-  # ============================================================================
-  # 缓存服务
-  # ============================================================================
-
-  redis-cache:
-    extends:
-      file: ../../components/redis/docker-compose.yml
-      service: redis-cache
-    env_file:
-      - ../../compose/env/prod/serverA.env
-    environment:
-      # 覆盖 LANG，Alpine 不支持 zh_CN.UTF-8
-      - LANG=C.UTF-8
-    volumes:
-      # 覆盖相对路径，指向正确的配置文件位置
-      - ../../components/redis/redis-cache.conf:/usr/local/etc/redis/redis-cache.conf:ro
-      - ../../components/redis/users.acl:/etc/redis/users.acl:ro
-      - redis_cache_data:/data
-
-  # ============================================================================
-  # 数据库服务
-  # ============================================================================
-
-  mongo:
-    extends:
-      file: ../../components/mongo/docker-compose.yml
-      service: mongo
-    env_file:
-      - ../../compose/env/prod/serverA.env
-    volumes:
-      # 覆盖相对路径，指向正确的配置文件位置
-      - mongo_data:/data/db
-      - /data/infra/mongo/config/replset.key:/etc/mongo/keyfile:ro
-      - ../../components/mongo/mongod.conf:/etc/mongod.conf:ro
-      - ../../components/mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
 
 networks:
   backend:
     external: true
     name: infra-network
-
-# 继承自组件的卷定义
-volumes:
-  nginx_logs:
-    name: infra_nginx_logs
-    driver: local
-  redis_cache_data:
-    name: infra_redis_cache
-    driver: local
-  mongo_data:
-    name: infra_mongo_data
-    driver: local
-  mongo_config:
-    name: infra_mongo_config
-    driver: local

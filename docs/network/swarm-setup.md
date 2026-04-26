@@ -1,22 +1,41 @@
-# Swarm 双机重建与排障记录
+# 四节点跨云 Swarm 初始化与排障
 
-记录本次在 serverA（172.17.0.223）/serverB（172.17.0.226）重建 Docker、初始化 Swarm、恢复 overlay 网络互通的步骤，便于下次复用。
+本文记录当前推荐的 `Swarm + attachable overlay` 基础网络层初始化方式。
 
-## 环境
+## 目标拓扑
 
-- OS: Ubuntu 24.04.3 LTS（两台）
-- 内网互通 IP：serverA 172.17.0.223，serverB 172.17.0.226
-- Docker: 29.1.1，Compose: v2.40.3
+- `serverA`：manager
+- `serverB`：manager
+- `serverD`：manager
+- `serverC`：worker
+
+说明：
+
+- `serverA/serverB` 位于云服务商 A
+- `serverC/serverD` 位于云服务商 B
+- `serverC` 运行 MongoDB，保持 `worker` 角色，避免叠加控制面
 
 ## 关键原则
 
-- Swarm 初始化时必须显式指定内网 IP：`--advertise-addr 172.17.0.223`
-- Overlay 网络只有在节点上有任务接入时才会下发；无需额外“触发”，但可以用全局服务占位验证。
-- Worker 不创建网络，只创建自身卷。网络由 Manager 创建并下发。
+1. 每个节点都要显式指定 `--advertise-addr`
+2. 跨云场景建议显式指定 `--data-path-addr`
+3. 只有 manager 节点创建 `infra-network`
+4. `infra-network` 默认启用 overlay 数据面加密
+5. Swarm 端口只能对白名单节点开放
 
-## 操作步骤
+## 必需端口
 
-### 1) 安装/重装 Docker（两台）
+四台机器之间放通：
+
+- `2377/tcp`
+- `7946/tcp`
+- `7946/udp`
+- `4789/udp`
+- `IP protocol 50 (ESP)`，当 overlay 加密启用时
+
+## 初始化步骤
+
+### 1. 安装 Docker（四台）
 
 ```bash
 sudo make server-install-docker
@@ -24,87 +43,173 @@ docker --version
 docker compose version
 ```
 
-### 2) 初始化 Swarm（仅 serverA）
+### 2. 在 serverA 初始化首个 manager
 
 ```bash
-docker swarm init --advertise-addr 172.17.0.223
-# 记录输出的 worker token
+sudo ./scripts/01-network/swarm-manager.sh init-manager <serverA-advertise-ip> [serverA-data-ip]
 ```
 
-### 3) 加入 Swarm（serverB）
+例如：
 
 ```bash
-docker swarm join --advertise-addr 172.17.0.226 172.17.0.223:2377 --token <worker-token>
+sudo ./scripts/01-network/swarm-manager.sh init-manager 10.10.0.11 10.10.0.11
 ```
 
-### 4) 创建基础网络/卷并启动 serverA 组件
-
-在 serverA：
+### 3. 获取 join token
 
 ```bash
-make init-serverA
-make serverA-up
+sudo ./scripts/01-network/swarm-manager.sh get-join-token
 ```
 
-### 5) 确认 overlay 网络下发到 serverB
+会同时输出：
 
-- 查看 Peers（serverA）：
+- worker token
+- manager token
+
+### 4. 将 serverB 加入为 manager
 
 ```bash
-docker network inspect infra-network | grep -A2 Peers
+sudo ./scripts/01-network/swarm-manager.sh join-manager <serverA-ip> <manager-token> <serverB-advertise-ip> [serverB-data-ip]
 ```
 
-期望同时有 172.17.0.223 和 172.17.0.226。
+### 5. 将 serverD 加入为 manager
 
-- 查看网络列表（serverB）：
+```bash
+sudo ./scripts/01-network/swarm-manager.sh join-manager <serverA-ip> <manager-token> <serverD-advertise-ip> [serverD-data-ip]
+```
+
+### 6. 将 serverC 加入为 worker
+
+```bash
+sudo ./scripts/01-network/swarm-manager.sh init-worker <serverA-ip> <worker-token> <serverC-advertise-ip> [serverC-data-ip]
+```
+
+### 7. 确认 manager 多数派
+
+在任一 manager 上：
+
+```bash
+docker node ls
+```
+
+预期：
+
+- `serverA/serverB/serverD` 都是 `Manager`
+- 至少 2 个 manager 处于 `Reachable` / `Leader`
+- `serverC` 为 `Ready` 的 `Worker`
+
+### 8. 创建基础网络
+
+在任一 manager 上：
+
+```bash
+sudo ./scripts/01-network/swarm-manager.sh create-network
+```
+
+或使用初始化脚本：
+
+```bash
+INFRA_BACKEND_SUBNET=172.20.0.0/24 \
+INFRA_NETWORK_MTU=1450 \
+INFRA_NETWORK_ENCRYPTED=true \
+bash ./scripts/02-components/init-infrastructure.sh create
+```
+
+### 9. 确认网络 peer
+
+```bash
+docker network inspect infra-network | grep -A4 Peers
+```
+
+应该看到 4 个节点。
+
+如果 worker 上还没看到网络，可临时创建全局服务触发网络下发：
+
+```bash
+docker service create --mode global --name net-probe --network infra-network alpine sleep 1d
+docker service rm net-probe
+```
+
+## attachable overlay 的用法
+
+当前仓库不是用 `docker stack deploy` 管业务，而是继续在每台机器上执行：
+
+```bash
+docker compose up -d
+```
+
+只要容器加入了同一个外部 `infra-network`，它们仍可以跨主机通过容器名互访。
+
+例如：
+
+- `mongo:27017`
+- `nsqd:4150`
+- `qs-apiserver:8080`
+
+## 验证命令
+
+### 节点状态
+
+```bash
+docker node ls
+docker info | grep -A10 Swarm
+```
+
+### 网络状态
 
 ```bash
 docker network ls | grep infra-network
+docker network inspect infra-network
 ```
 
-> 说明：overlay 网络按需下发，节点上有任务接入该网络时才会出现。如果需要强制铺到所有节点，可临时创建一个全局服务：
+### 跨主机探测
 
 ```bash
-docker service create --mode global --name net-test --network infra-network alpine sleep 1d
+docker run --rm --network infra-network alpine ping -c 2 mongo
+docker run --rm --network infra-network alpine ping -c 2 nsqd
 ```
 
-验证完成后删除：
+## 常见问题
+
+### 1. 某个节点 join 失败
+
+优先检查：
+
+- `advertise-addr` 是否填成了错误出口 IP
+- `2377/tcp` 是否只对白名单节点开放
+- 云防火墙 / 安全组是否同时放行 `7946/tcp+udp`、`4789/udp`
+
+### 2. `infra-network` 在 worker 上看不到
+
+先检查：
 
 ```bash
-docker service rm net-test
+docker network inspect infra-network | grep -A4 Peers
 ```
 
-### 6) 初始化 serverB 卷并启动 NSQ
+如果 peer 不全，先创建 `net-probe` 全局服务触发下发。
 
-在 serverB：
+### 3. overlay 能建但容器互访不稳定
 
-```bash
-make init-serverB
-make serverB-up
-```
+优先排查：
 
-### 7) 互通验证
+- MTU 是否需要进一步下调
+- 跨云网络是否对 UDP / ESP 有限制
+- `data-path-addr` 是否显式绑定到了错误接口
 
-- serverB → serverA：
+### 4. 单个 manager 掉线后无法管理集群
 
-```bash
-docker exec nsqd ping -c 2 redis-cache
-```
+这是旧双机或单 manager 模式常见问题。
+当前方案要求 `A/B/D` 三个 manager，就是为了避免这个点。
 
-- serverA → serverB（用自带 ping 的容器，如 nginx）：
+## 迁移建议
 
-```bash
-docker exec nginx ping -c 2 nsqd
-```
+如果你现在已经有旧双机 Swarm：
 
-## 常见排障
+1. 先在低峰期把 `serverB/serverD` 加入为 manager
+2. 再加入 `serverC` 为 worker
+3. 确认 `docker node ls` 稳定
+4. 再重建 `infra-network`
+5. 最后让 `serverC/serverD` 上的容器接入该网络
 
-- `infra-network` 在 worker 看不到：检查 `docker network inspect infra-network` 的 Peers 是否包含 worker IP；确认放通端口 2377/tcp、7946/tcp+udp、4789/udp；确保有任务挂载该网络（可用全局服务占位）。
-- 广播地址错误导致隧道不通：重建 Swarm 时务必用内网 IP 做 `--advertise-addr`。
-- 旧节点残留：`docker node rm <旧ID>` 清理 Down 节点后重新 join。
-
-## 命令参考
-
-- 查看 token：`docker swarm join-token worker`
-- 重新加入（worker）：`docker swarm leave --force && docker swarm join --advertise-addr <worker-ip> <manager-ip>:2377 --token <token>`
-- Manager 状态查看：`docker node ls`，`docker node inspect <node> --pretty | grep -E 'Addr|State|Reachability'`
+不要在跨云节点尚未稳定之前，直接把 Mongo 切到新的跨机访问路径。

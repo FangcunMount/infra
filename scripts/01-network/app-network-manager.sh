@@ -104,7 +104,7 @@ ${BLUE}推荐配置:${NC}
 ${BLUE}注意事项:${NC}
     - overlay 网络需要先初始化 Docker Swarm
     - 建议网络名称格式: <应用名>-network (如 miniblog-network)
-    - 子网不要与 infra-network (172.20.0.0/16) 冲突
+    - 子网不要与 infra-network (172.20.0.0/24) 冲突
     - 推荐子网范围: 172.21.0.0/16, 172.22.0.0/16, ...
     - 业务网络通过 external 方式加入 infra-network 访问基础设施
 

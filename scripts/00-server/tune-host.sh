@@ -10,7 +10,7 @@
 # 4. 提升文件描述符限制
 # 5. 优化 TCP 参数
 #
-# 执行：sudo bash scripts/server/tune-host.sh
+# 执行：sudo bash scripts/00-server/tune-host.sh
 #
 
 set -euo pipefail

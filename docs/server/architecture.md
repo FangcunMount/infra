@@ -2,231 +2,162 @@
 
 ## 概述
 
-本项目采用**双服务器分布式架构**，将服务按功能分布在两台 ECS 上，结合阿里云托管服务实现高可用和成本优化。
+当前生产目标拓扑为：
 
-**核心原则**：
+- `serverA 2C2G`：`nginx + qs-apiserver`
+- `serverB 2C2G`：`qs-collection-server + IAM`
+- `serverC 4C4G`：`mongodb`
+- `serverD 2C4G`：`qs-worker + operating + nsq`
+- 云托管：`MySQL`、`Redis`
 
-- 核心数据与核心业务集中在 ServerA
-- 消息中间件 + 边缘业务 + 前端站点集中在 ServerB
-- 数据库使用云托管，Redis 采用单实例自管，ECS 以计算/缓存为主
+其中：
+
+- `infra` 仓库直接维护 `serverA`、`serverC`、`serverD` 的基础设施 compose。
+- `serverB` 的业务服务由对应业务仓库维护，本仓库只维护网络约定与参考环境变量。
+- 四台机器都加入四节点跨云 Swarm，统一接入 `infra-network`。
 
 ## 架构图
 
-```text
-                         ┌─────────────────────┐
-                         │   Internet/客户端   │
-                         └──────────┬──────────┘
-                                    │ HTTPS/HTTP
-                                    ▼
-┌───────────────────────────────────────────────────────────────┐
-│                      ServerA (2C4G)                           │
-│                    主力业务 + 网关 + 存储                      │
-├───────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐   │
-│  │   Nginx     │  │   Redis     │  │      MongoDB        │   │
-│  │  80/443     │  │    6379     │  │       27017         │   │
-│  │ 128M/0.10C  │  │ 256M/0.15C  │  │    1024M/0.50C      │   │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘   │
-│                                                               │
-│  ┌─────────────┐  ┌─────────────┐  ┌───────────┐ ┌─────────┐ │
-│  │qs-apiserver │  │qs-collection│  │ qs-worker │ │iam-api  │ │
-│  │ 384M/0.25C  │  │ 256M/0.20C  │  │256M/0.15C │ │384M/0.25│ │
-│  └─────────────┘  └─────────────┘  └───────────┘ └─────────┘ │
-│                                                               │
-│                    容器合计: ~2.7GB / ~1.60C                  │
-└───────────────────────────┬───────────────────────────────────┘
-                            │
-                            │ infra-network (Overlay)
-                            │ NSQ: 4150/4160
-                            ▼
-┌───────────────────────────────────────────────────────────────┐
-│                      ServerB (2C2G)                           │
-│                   消息中间件 + 边缘前端                        │
-├───────────────────────────────────────────────────────────────┤
-│  ┌─────────────────────────────────────────────────────┐     │
-│  │                   NSQ 三件套                         │     │
-│  │  ┌───────────┐  ┌───────────┐  ┌───────────┐       │     │
-│  │  │nsqlookupd │  │   nsqd    │  │ nsqadmin  │       │     │
-│  │  │ 96M/0.04C │  │384M/0.20C │  │ 96M/0.04C │       │     │
-│  │  │4160/4161  │  │4150/4151  │  │   4171    │       │     │
-│  │  └───────────┘  └───────────┘  └───────────┘       │     │
-│  └─────────────────────────────────────────────────────┘     │
-│                                                               │
-│  ┌───────────────────┐  ┌────────────┐  ┌────────────┐       │
-│  │ miniblog-backend  │  │frontend-   │  │frontend-   │       │
-│  │    448M/0.15C     │  │admin 128M  │  │blog 128M   │       │
-│  └───────────────────┘  └────────────┘  └────────────┘       │
-│                                                               │
-│  ┌────────────────────┐                                      │
-│  │qs-operating-system │                                      │
-│  │     128M/0.04C     │                                      │
-│  └────────────────────┘                                      │
-│                                                               │
-│                    容器合计: ~1.4GB / ~0.55C                  │
-└───────────────────────────┬───────────────────────────────────┘
-                            │
-                            │ VPC 内网
-                            ▼
-┌───────────────────────────────────────────────────────────────┐
-│                      阿里云托管服务                            │
-├───────────────────────────────────────────────────────────────┤
-│  ┌─────────────────────────┐                                  │
-│  │      MySQL (RDS)        │                                  │
-│  │  - miniblog 库          │                                  │
-│  │  - qs 相关业务库         │                                  │
-│  │  - IAM 用户库           │                                  │
-│  └─────────────────────────┘                                  │
-└───────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph A["云服务商 A"]
+        serverA["serverA (2C2G)\nnginx + qs-apiserver"]
+        serverB["serverB (2C2G)\nqs-collection-server + IAM"]
+        mysql["Cloud MySQL"]
+        redis["Cloud Redis"]
+    end
+
+    subgraph B["云服务商 B"]
+        serverC["serverC (4C4G)\nMongoDB"]
+        serverD["serverD (2C4G)\nqs-worker + operating + NSQ"]
+    end
+
+    internet["Internet / Clients"] --> serverA
+    serverA --> serverB
+    serverA --> serverD
+    serverB --> serverC
+    serverD --> serverC
+    serverA --> mysql
+    serverB --> mysql
+    serverD --> mysql
+    serverA --> redis
+    serverB --> redis
+    serverD --> redis
 ```
 
-## ServerA (2C4G) - 主力业务机
+## 机器职责
 
-### 部署服务（ServerA）
+### serverA (2C2G)
 
-| 服务 | CPU 上限 | 内存上限 | 说明 |
-|------|---------|---------|------|
-| `nginx-gateway` | 0.10 | 128MB | 统一反向代理 + TLS 终止 |
-| `redis` | 0.15 | 256MB | 单实例，AOF 开启，默认 volatile-lru |
-| `mongodb` | 0.50 | 1024MB | 问卷/量表文档数据 |
-| `qs-apiserver` | 0.50 | 768MB | 问卷&量表核心 API（临时降配档） |
-| `qs-collection` | 0.25 | 384MB | 小程序/前端收集入口（收紧内部并发） |
-| `qs-worker` | 0.20 | 256MB | 单实例异步任务 Worker |
-| `iam-apiserver` | 0.25 | 384MB | 用户中心 + 认证授权（降配档） |
+职责：
 
-**资源汇总**：
+- 对外统一入口：`nginx`
+- 同机业务：`qs-apiserver`
 
-- qs 三件套合计（上限）：~0.95C / ~1.4GB（mem_limit 768m / 384m / 256m，cpus 0.5 / 0.25 / 0.20）
-- 基础组件 + IAM：~1.00C / ~1.75GB（Nginx 128M/0.10C、Redis 256M/0.15C、Mongo 1024M/0.50C、IAM 384M/0.25C）
-- 容器合计（上限）：~1.95C / ~3.2GB，可为 OS 与 page cache 预留约 0.7~0.8GB
-- 监控栈（Prometheus / Grafana）迁移到 ServerB，避免继续挤占 ServerA 的业务缓冲
+本仓库管理范围：
 
-### 目录结构（ServerA）
+- `deploy/serverA/docker-compose.yml`
+- `compose/env/prod/serverA.env`
 
-```text
-/opt/qs-server/          # 问卷服务
-├── qs-apiserver/
-├── qs-collection-server/
-└── qs-worker/
-/opt/iam/                # IAM 服务
-└── iam-apiserver/
-/data/
-├── mongodb/             # MongoDB 数据
-├── ssl/                 # SSL 证书
-└── logs/                # 日志目录
-```
+说明：
 
-## ServerB (2C2G) - 边缘/消息机
+- `qs-apiserver` 仍由 `qs-server` 仓库部署。
+- `serverA` 不再承载本地 Redis、MongoDB 或监控栈。
 
-### 部署服务（ServerB）
+### serverB (2C2G)
 
-| 服务 | CPU 上限 | 内存上限 | 说明 |
-|------|---------|---------|------|
-| `nsqd` | 0.20 | 384MB | 核心消息进程 |
-| `nsqlookupd` | 0.04 | 96MB | 路由组件 |
-| `nsqadmin` | 0.04 | 96MB | Web 控制台 |
-| `prometheus` | 0.10 | 256MB | 集中抓取容器指标（7d 保留，30s 抓取） |
-| `grafana` | 0.05 | 128MB | 监控面板 |
-| `miniblog-backend` | 0.15 | 448MB | 博客后端 |
-| `miniblog-frontend-admin` | 0.04 | 128MB | 博客管理前端 |
-| `miniblog-frontend-blog` | 0.04 | 128MB | 博客前端 |
-| `qs-operating-system` | 0.04 | 128MB | 问卷后台前端 |
+职责：
 
-**资源汇总**：
+- 同机业务：`qs-collection-server`、`IAM`
 
-- 容器合计：~0.70C / ~1.8GB
-- OS 预留：~0.2C / ~0.2GB
-- 总计：~0.90C / ~2.0GB（监控栈迁入后余量较小，保留短周期指标与轻量面板）
+本仓库管理范围：
 
-### 目录结构（ServerB）
+- `compose/env/prod/serverB.env`
+- `deploy/serverB/docker-compose.yml` 仅保留空栈说明
 
-```text
-/opt/nsq/                # NSQ 服务
-├── nsqd/
-├── nsqlookupd/
-└── nsqadmin/
-/opt/miniblog/           # Miniblog 服务
-├── backend/
-├── frontend-admin/
-└── frontend-blog/
-/opt/qs-ops/             # 问卷后台前端
-/data/
-├── nsq/                 # NSQ 数据
-└── logs/                # 日志目录
-```
+说明：
 
-## 网络通信
+- `qs-collection-server` 与 `IAM` 由对应业务仓库部署。
+- `NSQ` 已迁移到 `serverD`。
 
-### Overlay 网络 (infra-network)
+### serverC (4C4G)
 
-| 属性 | 值 |
-|------|-----|
-| 子网 | `172.20.0.0/16` |
-| 网关 | `172.20.0.1` |
-| 驱动 | overlay |
-| 加密 | enabled |
+职责：
 
-### 端口映射
+- 独占承载 `MongoDB`
 
-#### ServerA 开放端口
+本仓库管理范围：
 
-| 服务 | 端口 | 外部访问 |
-|------|------|----------|
-| Nginx | 80, 443 | ✅ 公网 |
-| Redis | 6379 | 🔒 内网 |
-| MongoDB | 27017 | 🔒 内网 |
+- `deploy/serverC/docker-compose.yml`
+- `compose/env/prod/serverC.env`
 
-#### ServerB 开放端口
+说明：
 
-| 服务 | 端口 | 外部访问 |
-|------|------|----------|
-| nsqlookupd | 4160, 4161 | �� 内网 |
-| nsqd | 4150, 4151 | 🔒 内网 |
-| nsqadmin | 4171 | 🔒 127.0.0.1 |
-| 前端服务 | 8081-8083 | 🔒 内网 |
+- `MongoDB` 对宿主机只绑定 `127.0.0.1:27017`。
+- 跨机器业务容器通过 overlay 网络访问 `mongo:27017`。
 
-> 🔒 内网 = 仅限 Overlay 网络或 VPC 内网访问
+### serverD (2C4G)
 
-## 域名路由
+职责：
 
-所有域名解析到 ServerA 公网 IP，由 Nginx 统一代理：
+- `qs-worker`
+- `operating`
+- 消息中间件：`nsqlookupd`、`nsqd`、`nsqadmin`
 
-| 域名 | 目标服务 | 位置 |
-|------|---------|------|
-| `iam.fangcunmount.cn` | iam-apiserver | ServerA |
-| `qs.fangcunmount.cn` | qs-apiserver | ServerA |
-| `collect.fangcunmount.cn` | qs-collection | ServerA |
-| `operating.fangcunmount.cn` | qs-operating-system | ServerB |
-| `blog.yangshujie.com` | miniblog-frontend-blog | ServerB |
-| `blog-admin.yangshujie.com` | miniblog-frontend-admin | ServerB |
-| `nsqadmin.yangshujie.com` | nsqadmin | ServerB |
+本仓库管理范围：
 
-## 云服务连接
+- `compose/env/prod/serverD.env`
+- `deploy/serverD/docker-compose.yml`
 
-### 云 MySQL (RDS)
+说明：
 
-```env
-MYSQL_HOST=your-rds.mysql.rds.aliyuncs.com
-MYSQL_PORT=3306
-MYSQL_USERNAME=xxx
-MYSQL_PASSWORD=xxx
-```
+- `NSQ` 由 `infra` 仓库维护。
+- `qs-worker`、`operating` 由对应业务仓库部署。
+- 业务仓库应复用本仓库约定的依赖地址：
+  - `mongo`
+  - `nsqlookupd`
+  - `nsqd`
+  - 云托管 MySQL / Redis
 
-### Redis 单实例
+## 网络与服务发现
 
-```env
-REDIS_HOST=redis-cache
-REDIS_PORT=6379
-REDIS_USERNAME=app
-REDIS_PASSWORD=${REDIS_APP_PASSWORD}
-```
+统一约定：
 
-## 相关文档
+- overlay 网络名：`infra-network`
+- MongoDB：`mongo:27017`
+- NSQ Lookupd：`nsqlookupd:4161`
+- NSQD：`nsqd:4150`
 
-- [服务器初始化](./initialization.md)
-- [网络架构](../network/architecture.md)
-- [组件文档](../components/README.md)
+外部入口：
 
----
+- 所有公网流量先到 `serverA/nginx`
+- 内部业务再通过 overlay 网络或云托管数据库访问下游依赖
 
-**更新时间**: 2025-02-18  
-**架构版本**: v2.1
+## 环境变量文件
+
+| 文件 | 用途 |
+|------|------|
+| `compose/env/prod/serverA.env` | `serverA` 的 nginx 与节点/云依赖基线 |
+| `compose/env/prod/serverB.env` | `serverB` 的业务节点与云依赖基线 |
+| `compose/env/prod/serverC.env` | `serverC` 的 MongoDB 配置 |
+| `compose/env/prod/serverD.env` | `serverD` 的 NSQ 与业务服务参考依赖地址 |
+
+## 当前仓库的边界
+
+`infra` 仓库当前只负责：
+
+- Swarm / overlay 网络
+- `nginx`
+- `NSQ`
+- `MongoDB`
+- 四台机器的环境变量基线
+
+不负责：
+
+- `qs-apiserver`
+- `qs-collection-server`
+- `qs-worker`
+- `IAM`
+- `operating`
+
+这些服务的容器部署与 CI/CD 仍在各自业务仓库中维护。

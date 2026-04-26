@@ -1,76 +1,60 @@
 # 基础设施文档导航
 
-## 🚀 快速开始
+## 快速开始
 
 ```bash
-make help              # 查看所有可用命令
-make help-mongo        # MongoDB 命令参考
-make help-redis        # Redis 命令参考
-make help-nsq          # NSQ 命令参考
-make help-vpn          # VPN 命令参考
-make help-ssl          # SSL 证书命令参考
-make service-ports     # 查看服务端口
+make help
+make server-info
+make help-mongo
+make help-nsq
 ```
 
-## 📖 文档结构
+## 文档结构
 
 ```text
 docs/
-├── INDEX.md                    # 本文档 - 导航入口
-│
-├── server/                     # 服务器配置
-│   ├── architecture.md         # 架构设计 + 资源规划
-│   ├── scaling-runbook.md      # 升降配操作手册
-│   ├── serverB-monitoring-deploy-guide.md  # ServerB 监控部署
-│   ├── initialization.md       # 初始化指南
-│   ├── www-user-guide.md       # www 用户使用指南
-│   ├── ssl-guide.md            # SSL 证书使用指南
-│   └── github-actions-deploy-guide.md  # CI/CD 部署指南
-│
-├── components/                 # 组件文档
-│   ├── README.md               # 组件总览
-│   ├── mongodb-quickstart.md   # MongoDB 快速入门
-│   └── nsq.md                  # NSQ 配置指南
-│
-└── network/                    # 网络管理
-    ├── architecture.md         # 网络架构
-    └── management.md           # 管理指南
+├── INDEX.md
+├── server/
+│   ├── architecture.md
+│   ├── iam-migration-to-serverB.md
+│   ├── mongo-migration-to-serverC.md
+│   ├── qps-capacity-planning.md
+│   ├── scaling-runbook.md
+│   ├── initialization.md
+│   ├── github-actions-deploy-guide.md
+│   ├── ssl-guide.md
+│   ├── www-user-guide.md
+│   └── serverB-monitoring-deploy-guide.md   # 历史/可选
+├── components/
+│   ├── README.md
+│   ├── mongodb-quickstart.md
+│   └── nsq.md
+└── network/
+    ├── architecture.md
+    ├── swarm-setup.md
+    └── management.md
 ```
 
-## 🖥️ 服务器架构
+## 推荐阅读顺序
 
-- [架构设计](./server/architecture.md) - 双机部署规划、资源分配、云服务连接
-- [升降配操作手册](./server/scaling-runbook.md) - 升配/降配时的改配置与发布顺序
-- [ServerB 监控部署指南](./server/serverB-monitoring-deploy-guide.md) - 在 `serverB` 上部署 `Prometheus` 和 `Grafana`
-- [初始化指南](./server/initialization.md) - 用户配置、Docker 安装
+1. [架构设计](./server/architecture.md)
+2. [网络架构](./network/architecture.md)
+3. [初始化指南](./server/initialization.md)
+4. [升降配操作手册](./server/scaling-runbook.md)
+5. [组件总览](./components/README.md)
 
-## 🔧 组件文档
-
-- [组件总览](./components/README.md) - 所有组件快速参考
-- [MongoDB 快速入门](./components/mongodb-quickstart.md)
-- [NSQ 消息队列](./components/nsq.md)
-
-## 🌐 网络管理
-
-- [网络架构](./network/architecture.md) - Overlay 网络设计
-- [网络管理指南](./network/management.md) - VPN、Swarm 配置
-
-## 🔒 安全与部署
-
-- [www 用户指南](./server/www-user-guide.md) - 业务进程账户使用
-- [CI/CD 部署指南](./server/github-actions-deploy-guide.md) - GitHub Actions 配置
-- [SSL 证书指南](./server/ssl-guide.md) - 通配符证书申请
-
-## 🎯 快速查找
+## 快速查找
 
 | 我想... | 参考文档 |
 |---------|----------|
-| 了解整体架构 | [架构设计](./server/architecture.md) |
-| 调整服务器规格 | [升降配操作手册](./server/scaling-runbook.md) |
-| 在 serverB 部署监控 | [ServerB 监控部署指南](./server/serverB-monitoring-deploy-guide.md) |
-| 初始化新服务器 | [初始化指南](./server/initialization.md) |
-| 启动/管理 MongoDB | [MongoDB 快速入门](./components/mongodb-quickstart.md) |
-| 配置 NSQ 消息队列 | [NSQ 配置指南](./components/nsq.md) |
-| 申请 SSL 证书 | [SSL 证书指南](./SSL证书申请指南-通配符证书.md) |
-| 配置 CI/CD 部署 | [CI/CD 部署指南](./server/github-actions-deploy-guide.md) |
-| 配置网络/VPN | [网络管理指南](./network/management.md) |
+| 了解四机拓扑和服务落点 | [架构设计](./server/architecture.md) |
+| 把 IAM 迁到 serverB | [IAM 迁移手册](./server/iam-migration-to-serverB.md) |
+| 把 Mongo 迁到 serverC | [Mongo 迁移手册](./server/mongo-migration-to-serverC.md) |
+| 评估 200~1000 QPS 该怎么配资源 | [QPS 容量规划报告](./server/qps-capacity-planning.md) |
+| 初始化四台机器 | [初始化指南](./server/initialization.md) |
+| 建四节点 Swarm / overlay 网络 | [Swarm 搭建](./network/swarm-setup.md) |
+| 调整 serverA / serverB / serverC 部署清单 | [升降配操作手册](./server/scaling-runbook.md) |
+| 管理 MongoDB | [MongoDB 快速入门](./components/mongodb-quickstart.md) |
+| 管理 NSQ | [NSQ 配置指南](./components/nsq.md) |
+| 查看各组件职责 | [组件总览](./components/README.md) |
+| 参考旧监控部署 | [ServerB 监控部署指南](./server/serverB-monitoring-deploy-guide.md) |

@@ -75,10 +75,10 @@ nsq_tail --topic=test_topic --channel=test_channel --lookupd-http-address=localh
 主要配置在 `docker-compose.yml` 中：
 
 - **网络**: 使用 `infra-network` 网络
-- **数据卷**:
-  - `infra_nsq_data`: NSQ 数据持久化
-  - `infra_app_logs`: 日志存储
-- **资源限制** (ServerB 2C2G 环境):
+- **数据目录**:
+  - `/data/infra/nsq/data`: NSQ 数据持久化
+  - `/data/logs/nsq`: NSQ 日志目录
+- **资源限制** (ServerD 2C4G 环境):
   - nsqd: 384M 内存，0.20 CPU
   - nsqlookupd: 96M 内存，0.04 CPU
   - nsqadmin: 96M 内存，0.04 CPU
@@ -121,11 +121,11 @@ docker compose restart nsqd
 
 ## 环境变量
 
-在 `compose/env/prod/serverB.env` 中配置（NSQ 部署在 ServerB）：
+在 `compose/env/prod/serverD.env` 中配置（NSQ 部署在 ServerD）：
 
 ```bash
-# Server B IP（用于 nsqd 广播地址）
-NODE_B_IP=172.17.0.226
+# Server D IP（用于 nsqd 广播地址）
+NODE_D_IP=172.17.0.226
 
 # 时区
 TZ=Asia/Shanghai

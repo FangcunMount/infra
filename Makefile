@@ -10,15 +10,19 @@ DEFAULT_ENV := dev
 ENV ?= $(DEFAULT_ENV)
 
 # 环境配置文件路径
-# prod 环境使用 serverA.env/serverB.env，其他环境使用 .env
+# prod 环境使用各节点 env，其他环境使用 .env
 ifeq ($(ENV),prod)
     ENV_FILE_A := compose/env/prod/serverA.env
     ENV_FILE_B := compose/env/prod/serverB.env
+    ENV_FILE_C := compose/env/prod/serverC.env
+    ENV_FILE_D := compose/env/prod/serverD.env
     ENV_FILE := $(ENV_FILE_A)
 else
     ENV_FILE := compose/env/$(ENV)/.env
     ENV_FILE_A := $(ENV_FILE)
     ENV_FILE_B := $(ENV_FILE)
+    ENV_FILE_C := $(ENV_FILE)
+    ENV_FILE_D := $(ENV_FILE)
 endif
 
 # 加载环境变量（如果文件存在）
@@ -121,7 +125,8 @@ help: ## 显示帮助信息
 	@echo "$(BLUE)$(BOLD)按 \"0→1 部署\" 顺序编排:$(RESET)"
 	@echo ""
 	@echo "$(MAGENTA)0. 服务器初始化$(RESET)"
-	@echo "   $(CYAN)server-init-users$(RESET)    创建用户账户 (yangshujie/deploy/www)"
+	@echo "   $(CYAN)server-init$(RESET)          交互式 Linux 初始化"
+	@echo "   $(CYAN)server-init-users$(RESET)    创建/维护用户账户 (root/yangshujie/deploy/www)"
 	@echo "   $(CYAN)server-install-docker$(RESET) 安装 Docker 和 Compose"
 	@echo ""
 	@echo "$(MAGENTA)1. VPN/网络配置$(RESET)"
@@ -158,7 +163,9 @@ help: ## 显示帮助信息
 	@echo "$(MAGENTA)7. 服务器部署$(RESET)"
 	@echo "   $(CYAN)serverA-up/down$(RESET)      ServerA 服务栈管理"
 	@echo "   $(CYAN)serverB-up/down$(RESET)      ServerB 服务栈管理"
-	@echo "   $(CYAN)server-info$(RESET)          显示双机架构"
+	@echo "   $(CYAN)serverC-up/down$(RESET)      ServerC 服务栈管理"
+	@echo "   $(CYAN)serverD-up/down$(RESET)      ServerD 服务栈管理"
+	@echo "   $(CYAN)server-info$(RESET)          显示当前服务器架构"
 	@echo ""
 	@echo "$(YELLOW)💡 使用 'make help-all' 查看完整命令列表$(RESET)"
 	@echo ""
@@ -221,16 +228,20 @@ help-all: ## 显示所有命令
 	@echo "$(MAGENTA)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(RESET)"
 	@echo "$(MAGENTA)7. 服务器部署管理$(RESET)"
 	@echo "$(MAGENTA)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(RESET)"
-	@grep -hE '^serverA-|^serverB-|^server-info:.*?## .*$$' $(MAKEFILE_LIST) | \
+	@grep -hE '^serverA-|^serverB-|^serverC-|^serverD-|^server-info:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-28s$(RESET) %s\n", $$1, $$2}'
 	@echo ""
 
 # ==============================================================================
 # 0. 服务器初始化
 # ==============================================================================
-.PHONY: server-init-users server-install-docker server-setup-deploy-ssh server-tune
+.PHONY: server-init server-init-users server-install-docker server-setup-deploy-ssh server-tune
 
-server-init-users: ## 初始化服务器用户账户 (yangshujie/deploy/www)
+server-init: ## 交互式 Linux 初始化 (用户/Docker/调优/deploy SSH/VPN)
+	$(call info_msg,启动交互式 Linux 初始化...)
+	@sudo bash $(SERVER_SCRIPTS)/initialize.sh
+
+server-init-users: ## 初始化服务器用户账户 (root/yangshujie/deploy/www)
 	$(call info_msg,初始化服务器用户账户...)
 	@sudo bash $(SERVER_SCRIPTS)/init-users.sh
 
@@ -250,7 +261,7 @@ server-tune: ## 优化宿主机系统参数 (MongoDB等需要)
 # 1. VPN/网络配置
 # ==============================================================================
 .PHONY: vpn-setup vpn-status vpn-test vpn-enable vpn-disable vpn-switch vpn-proxies vpn-docker-test vpn-uninstall vpn-diagnose
-.PHONY: swarm-init swarm-leave swarm-status net-list net-create net-delete net-inspect port-check
+.PHONY: swarm-init swarm-join-manager swarm-join-worker swarm-leave swarm-status net-list net-create net-delete net-inspect port-check
 
 vpn-setup: ## 安装配置 VPN (Mihomo)
 	@sudo bash $(NETWORK_SCRIPTS)/vpn-setup.sh
@@ -282,10 +293,24 @@ vpn-uninstall: ## 卸载 VPN
 vpn-diagnose: ## 网络诊断
 	@sudo bash $(NETWORK_SCRIPTS)/diagnose.sh
 
-swarm-init: ## 初始化 Docker Swarm
+swarm-init: ## 初始化首个 Docker Swarm manager
 	$(call require_param,SWARM_ADVERTISE_ADDR,make swarm-init SWARM_ADVERTISE_ADDR=172.17.0.223)
-	@docker swarm init --advertise-addr $(SWARM_ADVERTISE_ADDR)
-	$(call success_msg,Swarm 集群已初始化 (advertise-addr=$(SWARM_ADVERTISE_ADDR)))
+	@docker swarm init --advertise-addr $(SWARM_ADVERTISE_ADDR) $(if $(SWARM_DATA_PATH_ADDR),--data-path-addr $(SWARM_DATA_PATH_ADDR))
+	$(call success_msg,Swarm 集群已初始化 (advertise-addr=$(SWARM_ADVERTISE_ADDR), data-path=$(if $(SWARM_DATA_PATH_ADDR),$(SWARM_DATA_PATH_ADDR),$(SWARM_ADVERTISE_ADDR))))
+
+swarm-join-manager: ## 加入现有 Swarm 成为 manager
+	$(call require_param,SWARM_MANAGER_IP,make swarm-join-manager SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.11)
+	$(call require_param,SWARM_TOKEN,make swarm-join-manager SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.11)
+	$(call require_param,SWARM_ADVERTISE_ADDR,make swarm-join-manager SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.11)
+	@docker swarm join --token $(SWARM_TOKEN) --advertise-addr $(SWARM_ADVERTISE_ADDR) $(if $(SWARM_DATA_PATH_ADDR),--data-path-addr $(SWARM_DATA_PATH_ADDR)) $(SWARM_MANAGER_IP):2377
+	$(call success_msg,已加入 Swarm manager (advertise-addr=$(SWARM_ADVERTISE_ADDR)))
+
+swarm-join-worker: ## 加入现有 Swarm 成为 worker
+	$(call require_param,SWARM_MANAGER_IP,make swarm-join-worker SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.12)
+	$(call require_param,SWARM_TOKEN,make swarm-join-worker SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.12)
+	$(call require_param,SWARM_ADVERTISE_ADDR,make swarm-join-worker SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.12)
+	@docker swarm join --token $(SWARM_TOKEN) --advertise-addr $(SWARM_ADVERTISE_ADDR) $(if $(SWARM_DATA_PATH_ADDR),--data-path-addr $(SWARM_DATA_PATH_ADDR)) $(SWARM_MANAGER_IP):2377
+	$(call success_msg,已加入 Swarm worker (advertise-addr=$(SWARM_ADVERTISE_ADDR)))
 
 swarm-leave: ## 离开 Docker Swarm
 	@docker swarm leave --force
@@ -317,22 +342,32 @@ port-check: ## 检查端口占用 (PORT=端口号)
 # ==============================================================================
 # 2. 基础设施初始化
 # ==============================================================================
-.PHONY: init install install-all-silent up down restart status ps
+.PHONY: init init-serverA init-serverB init-serverC init-serverD install install-all-silent up down restart status ps
 
 init: ## 初始化基础设施 (网络+卷)
 	$(call info_msg,初始化基础设施网络和卷...)
 	@$(INFRA_SCRIPT) create
 	$(call success_msg,基础设施初始化完成)
 
-init-serverA: ## 仅在 ServerA 上初始化网络和卷 (manager)
+init-serverA: ## 仅在 ServerA 上初始化网络和卷 (manager, nginx 节点)
 	$(call info_msg,初始化 ServerA 网络和卷...)
 	@INIT_TARGET=serverA $(INFRA_SCRIPT) create
 	$(call success_msg,ServerA 初始化完成)
 
-init-serverB: ## 在 ServerB 上初始化卷，跳过网络创建 (worker)
-	$(call info_msg,初始化 ServerB 卷，跳过网络创建...)
+init-serverB: ## 在 ServerB 上初始化节点基线，跳过网络创建 (manager, collection+IAM 节点)
+	$(call info_msg,初始化 ServerB 节点基线，跳过网络创建...)
 	@INIT_TARGET=serverB SKIP_NETWORK=true $(INFRA_SCRIPT) create
 	$(call success_msg,ServerB 初始化完成)
+
+init-serverC: ## 在 ServerC 上初始化卷，跳过网络创建 (worker, Mongo 节点)
+	$(call info_msg,初始化 ServerC 卷，跳过网络创建...)
+	@INIT_TARGET=serverC SKIP_NETWORK=true $(INFRA_SCRIPT) create
+	$(call success_msg,ServerC 初始化完成)
+
+init-serverD: ## 在 ServerD 上初始化卷，跳过网络创建 (manager, NSQ 节点)
+	$(call info_msg,初始化 ServerD 卷，跳过网络创建...)
+	@INIT_TARGET=serverD SKIP_NETWORK=true $(INFRA_SCRIPT) create
+	$(call success_msg,ServerD 初始化完成)
 
 install: init ## 交互式安装组件
 	$(call section_title,基础设施组件安装)
@@ -398,12 +433,12 @@ nginx-test: ## 测试 Nginx 配置
 
 mongo-start: ## 启动 MongoDB
 	@bash $(COMPONENTS_SCRIPTS)/prepare-mongo-keyfile.sh
-	@cd $(COMPONENTS_DIR)/mongo && docker compose up -d
+	@cd $(COMPONENTS_DIR)/mongo && docker compose --env-file ../../$(ENV_FILE_C) up -d
 	@bash $(COMPONENTS_SCRIPTS)/init-mongo-replica-set.sh
 	$(call success_msg,MongoDB 已启动)
 
 mongo-stop: ## 停止 MongoDB
-	@cd $(COMPONENTS_DIR)/mongo && docker compose down
+	@cd $(COMPONENTS_DIR)/mongo && docker compose --env-file ../../$(ENV_FILE_C) down
 
 mongo-restart: mongo-stop mongo-start ## 重启 MongoDB
 
@@ -411,7 +446,7 @@ mongo-logs: ## 查看 MongoDB 日志
 	@docker logs -f --tail=$(LOG_LINES) mongo
 
 mongo-shell: ## 进入 MongoDB Shell
-	@docker exec -it mongo mongosh -u "$(MONGO_INITDB_ROOT_USERNAME)" -p "$(MONGO_INITDB_ROOT_PASSWORD)" --authenticationDatabase admin
+	@set -a; . $(ENV_FILE_C); set +a; docker exec -it mongo mongosh -u "$$MONGO_INITDB_ROOT_USERNAME" -p "$$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin
 
 mongo-status: ## 查看 MongoDB 状态
 	@docker ps --filter "name=mongo" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
@@ -422,7 +457,7 @@ mongo-rs-init: ## 初始化/修复 MongoDB 单节点副本集
 	@bash $(COMPONENTS_SCRIPTS)/init-mongo-replica-set.sh
 
 mongo-rs-status: ## 查看 MongoDB 副本集状态
-	@docker exec mongo mongosh -u "$(MONGO_INITDB_ROOT_USERNAME)" -p "$(MONGO_INITDB_ROOT_PASSWORD)" --authenticationDatabase admin --quiet --eval "try { const hello = db.hello(); printjson({ setName: hello.setName || null, isWritablePrimary: !!hello.isWritablePrimary, secondary: !!hello.secondary, hosts: hello.hosts || [] }) } catch (e) { print(e.message); quit(1) }"
+	@set -a; . $(ENV_FILE_C); set +a; docker exec mongo mongosh -u "$$MONGO_INITDB_ROOT_USERNAME" -p "$$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin --quiet --eval "try { const hello = db.hello(); printjson({ setName: hello.setName || null, isWritablePrimary: !!hello.isWritablePrimary, secondary: !!hello.secondary, hosts: hello.hosts || [] }) } catch (e) { print(e.message); quit(1) }"
 
 mongo-keyfile: ## 准备/校正 MongoDB 副本集 keyFile
 	@bash $(COMPONENTS_SCRIPTS)/prepare-mongo-keyfile.sh
@@ -441,7 +476,7 @@ mongo-init-users: ## 创建 MongoDB 业务用户
 	@bash $(COMPONENTS_SCRIPTS)/init-mongo-users.sh
 
 mongo-stats: ## 查看 MongoDB 统计信息
-	@docker exec mongo mongosh -u "$(MONGO_INITDB_ROOT_USERNAME)" -p "$(MONGO_INITDB_ROOT_PASSWORD)" --authenticationDatabase admin --quiet --eval "db.serverStatus()" | head -50
+	@set -a; . $(ENV_FILE_C); set +a; docker exec mongo mongosh -u "$$MONGO_INITDB_ROOT_USERNAME" -p "$$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin --quiet --eval "db.serverStatus()" | head -50
 
 # ==============================================================================
 # 3. 组件管理 - Redis
@@ -512,7 +547,7 @@ redis-test: ## 测试 Redis 功能
 .PHONY: nsq-shell nsq-lookupd-logs nsq-admin-logs nsq-topics nsq-stats
 
 nsq-start: ## 启动 NSQ
-	@cd $(COMPONENTS_DIR)/nsq && docker compose --env-file ../../$(ENV_FILE_B) up -d
+	@cd $(COMPONENTS_DIR)/nsq && docker compose --env-file ../../$(ENV_FILE_D) up -d
 	$(call success_msg,NSQ 已启动)
 
 nsq-stop: ## 停止 NSQ
@@ -544,7 +579,7 @@ nsq-stats: ## 查看 NSQ 统计信息
 
 nsq-admin: ## NSQ Admin 访问说明
 	@echo "$(YELLOW)NSQAdmin 仅本机访问:$(RESET)"
-	@echo "  1. SSH 隧道: $(CYAN)ssh -L 4171:127.0.0.1:4171 user@serverB$(RESET)"
+	@echo "  1. SSH 隧道: $(CYAN)ssh -L 4171:127.0.0.1:4171 user@serverD$(RESET)"
 	@echo "  2. 浏览器: $(CYAN)http://localhost:4171$(RESET)"
 
 # ==============================================================================
@@ -570,9 +605,9 @@ mysql-shell: ## 进入 MySQL Shell
 # ==============================================================================
 .PHONY: prometheus-start prometheus-stop prometheus-restart prometheus-logs prometheus-status prometheus-targets
 
-prometheus-start: ## 启动 Prometheus (ServerA)
-	@cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d prometheus
-	$(call success_msg,Prometheus 已启动)
+prometheus-start: ## 启动 Prometheus（当前拓扑默认未启用）
+	$(call error_msg,当前生产拓扑未在 infra 仓库维护 Prometheus，请参考 docs/server/serverB-monitoring-deploy-guide.md 自行落位)
+	@exit 1
 
 prometheus-stop: ## 停止 Prometheus
 	@docker stop prometheus 2>/dev/null || true
@@ -593,9 +628,9 @@ prometheus-targets: ## 查看 Prometheus 抓取目标状态
 # ==============================================================================
 .PHONY: grafana-start grafana-stop grafana-restart grafana-logs grafana-status grafana-nginx-deploy
 
-grafana-start: ## 启动 Grafana (ServerA)
-	@cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d grafana
-	$(call success_msg,Grafana 已启动)
+grafana-start: ## 启动 Grafana（当前拓扑默认未启用）
+	$(call error_msg,当前生产拓扑未在 infra 仓库维护 Grafana，请参考 docs/server/serverB-monitoring-deploy-guide.md 自行落位)
+	@exit 1
 
 grafana-stop: ## 停止 Grafana
 	@docker stop grafana 2>/dev/null || true
@@ -673,7 +708,7 @@ grpc-ca: ## 生成 gRPC Root CA 和 Intermediate CA
 	$(call success_msg,gRPC CA 证书生成完成)
 
 grpc-server: ## 生成 gRPC 双向证书 (NAME=服务名 OU=组织单元 ALT_DNS=额外DNS TYPE=dual|server|client)
-	$(call require_param,NAME,make grpc-server NAME=iam-grpc OU=IAM ALT_DNS=iam-grpc.example.com)
+	$(call require_param,NAME,make grpc-server NAME=iam-apiserver OU=IAM ALT_DNS=iam-apiserver.example.com)
 	@$(SSL_SCRIPTS)/grpc-mtls.sh generate-server $(NAME) $(or $(OU),IAM) $(ALT_DNS) $(or $(TYPE),dual)
 	$(call success_msg,证书生成完成: $(NAME) (类型: $(or $(TYPE),dual)))
 
@@ -733,7 +768,6 @@ app-disable: ## 禁用应用 (APP=名称)
 test-all: ## 测试所有服务
 	$(call section_title,服务连接测试)
 	@$(MAKE) test-nginx || true
-	@$(MAKE) test-redis || true
 	@$(MAKE) test-mongo || true
 	@$(MAKE) test-nsq || true
 
@@ -741,13 +775,13 @@ test-nginx: ## 测试 Nginx
 	@printf "$(BLUE)Nginx:$(RESET)   "
 	@curl -s -o /dev/null -w "%{http_code}" http://localhost 2>/dev/null | grep -q 200 && echo "$(GREEN)✅$(RESET)" || echo "$(RED)❌$(RESET)"
 
-test-redis: ## 测试 Redis
+test-redis: ## 测试本地 Redis 组件（可选）
 	@printf "$(BLUE)Redis:$(RESET)   "
 	@docker exec redis-cache redis-cli --user admin -a "$${REDIS_ADMIN_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG && echo "$(GREEN)✅$(RESET)" || echo "$(RED)❌$(RESET)"
 
 test-mongo: ## 测试 MongoDB
 	@printf "$(BLUE)MongoDB:$(RESET) "
-	@docker exec mongo mongosh -u "$(MONGO_INITDB_ROOT_USERNAME)" -p "$(MONGO_INITDB_ROOT_PASSWORD)" --authenticationDatabase admin --quiet --eval "const hello = db.hello(); print(hello.ok === 1 && hello.setName === 'rs0' && hello.isWritablePrimary ? 'OK' : 'FAIL')" 2>/dev/null | grep -q "OK" && echo "$(GREEN)✅$(RESET)" || echo "$(RED)❌$(RESET)"
+	@set -a; . $(ENV_FILE_C); set +a; docker exec mongo mongosh -u "$$MONGO_INITDB_ROOT_USERNAME" -p "$$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin --quiet --eval "const hello = db.hello(); print(hello.ok === 1 && hello.setName === 'rs0' && hello.isWritablePrimary ? 'OK' : 'FAIL')" 2>/dev/null | grep -q "OK" && echo "$(GREEN)✅$(RESET)" || echo "$(RED)❌$(RESET)"
 
 test-nsq: ## 测试 NSQ
 	@printf "$(BLUE)NSQ:$(RESET)     "
@@ -781,17 +815,17 @@ disk-usage: ## Docker 磁盘使用
 	@docker system df -v
 
 # ==============================================================================
-# 7. 服务器部署 (双机架构)
+# 7. 服务器部署
 # ==============================================================================
 .PHONY: serverA-up serverA-down serverA-logs serverA-status serverA-destroy serverA-rebuild
 .PHONY: serverB-up serverB-down serverB-logs serverB-status serverB-destroy serverB-rebuild
+.PHONY: serverC-up serverC-down serverC-logs serverC-status serverC-destroy serverC-rebuild
+.PHONY: serverD-up serverD-down serverD-logs serverD-status serverD-destroy serverD-rebuild
 .PHONY: server-info validate-cloud-env
 
-serverA-up: ## 启动 ServerA 服务栈 (Nginx + MongoDB + Redis + Prometheus + Grafana)
-	$(call section_title,启动 ServerA (2C4G))
+serverA-up: ## 启动 ServerA 服务栈 (Nginx)
+	$(call section_title,启动 ServerA (2C2G))
 	@$(MAKE) init-serverA
-	@# 确保 Redis ACL 文件存在
-	@cd $(COMPONENTS_DIR)/redis && ENV=prod bash generate-acl.sh
 	@cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d
 	$(call success_msg,ServerA 服务已启动)
 
@@ -806,83 +840,143 @@ serverA-status: ## 查看 ServerA 状态
 
 serverA-destroy: ## 销毁 ServerA 所有容器、卷和数据 (危险!)
 	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerA 的所有数据！$(RESET)"
-	@echo "$(RED)   - 停止并删除容器: nginx, redis-cache, mongo, prometheus, grafana$(RESET)"
-	@echo "$(RED)   - 删除所有 infra_* Docker 卷$(RESET)"
-	@echo "$(RED)   - 删除数据目录: /data/infra/*, /data/logs/*$(RESET)"
+	@echo "$(RED)   - 停止并删除容器: nginx$(RESET)"
+	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nginx_logs$(RESET)"
+	@echo "$(RED)   - 删除日志目录: /data/logs/nginx/*$(RESET)"
 	@echo ""
 	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
 	$(call section_title,销毁 ServerA 数据)
-	@# 停止并删除容器
-	@docker rm -f nginx redis-cache mongo prometheus grafana 2>/dev/null || true
-	@# 删除所有 infra_ 开头的 Docker 卷
-	@docker volume ls -q | grep '^infra_' | xargs -r docker volume rm 2>/dev/null || true
-	@# 删除匿名卷（可选，谨慎）
-	@docker volume prune -f 2>/dev/null || true
-	@# 删除数据目录
-	@rm -rf /data/infra/* /data/logs/* 2>/dev/null || true
-	@# 删除 Redis ACL 文件
-	@rm -f $(COMPONENTS_DIR)/redis/users.acl 2>/dev/null || true
+	@docker rm -f nginx 2>/dev/null || true
+	@docker volume rm infra_nginx_logs 2>/dev/null || true
+	@rm -rf /data/logs/nginx/* 2>/dev/null || true
 	$(call success_msg,ServerA 数据已销毁)
 
 serverA-rebuild: serverA-destroy serverA-up ## 完全重建 ServerA (销毁后重建)
 
-serverB-up: ## 启动 ServerB 服务栈 (NSQ)
+serverB-up: ## 初始化 ServerB 节点基线 (collection + IAM 由业务仓库部署)
 	$(call section_title,启动 ServerB (2C2G))
 	@if ! docker network inspect infra-network >/dev/null 2>&1; then \
 		echo "$(RED)$(BOLD)❌ 未找到 infra-network，请先在 Manager 上运行 make init-serverA$(RESET)"; \
 		exit 1; \
 	fi
 	@$(MAKE) init-serverB
-	@cd deploy/serverB && docker compose --env-file ../../compose/env/prod/serverB.env up -d
-	$(call success_msg,ServerB 服务已启动)
+	$(call warning_msg,ServerB 当前没有 infra 仓库直接维护的本地组件；qs-collection-server 与 IAM 请由业务仓库部署)
 
-serverB-down: ## 停止 ServerB 服务栈
-	@cd deploy/serverB && docker compose --env-file ../../compose/env/prod/serverB.env down
+serverB-down: ## 停止 ServerB infra 服务栈
+	$(call warning_msg,ServerB 当前没有 infra 仓库直接维护的本地组件)
 
 serverB-logs: ## 查看 ServerB 日志
-	@cd deploy/serverB && docker compose --env-file ../../compose/env/prod/serverB.env logs -f --tail=$(LOG_LINES)
+	$(call warning_msg,ServerB 当前没有 infra 仓库直接维护的本地组件日志)
 
 serverB-status: ## 查看 ServerB 状态
 	@docker ps --filter "label=infra.host=serverB" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 serverB-destroy: ## 销毁 ServerB 所有容器、卷和数据 (危险!)
-	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerB 的所有数据！$(RESET)"
-	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin$(RESET)"
-	@echo "$(RED)   - 删除 Docker 卷: infra_nsq_data$(RESET)"
-	@echo "$(RED)   - 删除数据目录: /data/infra/nsq/*, /data/logs/nsq/*$(RESET)"
-	@echo ""
-	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
-	$(call section_title,销毁 ServerB 数据)
-	@# 停止并删除容器
-	@docker rm -f nsqlookupd nsqd nsqadmin 2>/dev/null || true
-	@# 删除 Docker 卷
-	@docker volume rm infra_nsq_data 2>/dev/null || true
-	@# 删除数据目录
-	@rm -rf /data/infra/nsq/* /data/logs/nsq/* 2>/dev/null || true
-	$(call success_msg,ServerB 数据已销毁)
+	$(call warning_msg,ServerB 当前没有 infra 仓库直接维护的本地组件；不会删除业务仓库部署的 collection/IAM)
 
 serverB-rebuild: serverB-destroy serverB-up ## 完全重建 ServerB (销毁后重建)
 
-server-info: ## 显示双机架构
-	$(call section_title,双机基础设施架构)
+serverC-up: ## 启动 ServerC 服务栈 (MongoDB)
+	$(call section_title,启动 ServerC (4C4G))
+	@if ! docker network inspect infra-network >/dev/null 2>&1; then \
+		echo "$(RED)$(BOLD)❌ 未找到 infra-network，请先在 Manager 上运行 make init-serverA$(RESET)"; \
+		exit 1; \
+	fi
+	@$(MAKE) init-serverC
+	@cd deploy/serverC && docker compose --env-file ../../compose/env/prod/serverC.env up -d
+	$(call success_msg,ServerC 服务已启动)
+
+serverC-down: ## 停止 ServerC 服务栈
+	@cd deploy/serverC && docker compose --env-file ../../compose/env/prod/serverC.env down
+
+serverC-logs: ## 查看 ServerC 日志
+	@cd deploy/serverC && docker compose --env-file ../../compose/env/prod/serverC.env logs -f --tail=$(LOG_LINES)
+
+serverC-status: ## 查看 ServerC 状态
+	@docker ps --filter "label=infra.host=serverC" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+serverC-destroy: ## 销毁 ServerC 所有容器、卷和数据 (危险!)
+	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerC 的所有数据！$(RESET)"
+	@echo "$(RED)   - 停止并删除容器: mongo$(RESET)"
+	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_mongo_data$(RESET)"
+	@echo "$(RED)   - 删除数据目录: /data/infra/mongo/*$(RESET)"
+	@echo ""
+	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
+	$(call section_title,销毁 ServerC 数据)
+	@docker rm -f mongo 2>/dev/null || true
+	@docker volume rm infra_mongo_data 2>/dev/null || true
+	@rm -rf /data/infra/mongo/* 2>/dev/null || true
+	$(call success_msg,ServerC 数据已销毁)
+
+serverC-rebuild: serverC-destroy serverC-up ## 完全重建 ServerC (销毁后重建)
+
+serverD-up: ## 启动 ServerD 服务栈 (NSQ)
+	$(call section_title,启动 ServerD (2C4G))
+	@if ! docker network inspect infra-network >/dev/null 2>&1; then \
+		echo "$(RED)$(BOLD)❌ 未找到 infra-network，请先在 Manager 上运行 make init-serverA$(RESET)"; \
+		exit 1; \
+	fi
+	@$(MAKE) init-serverD
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d
+	$(call success_msg,ServerD 服务已启动)
+
+serverD-down: ## 停止 ServerD 服务栈
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env down
+
+serverD-logs: ## 查看 ServerD 日志
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env logs -f --tail=$(LOG_LINES)
+
+serverD-status: ## 查看 ServerD 状态
+	@docker ps --filter "label=infra.host=serverD" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+serverD-destroy: ## 销毁 ServerD 所有容器、卷和数据 (危险!)
+	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerD 的 NSQ 数据！$(RESET)"
+	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin$(RESET)"
+	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nsq_data$(RESET)"
+	@echo "$(RED)   - 删除数据目录: /data/infra/nsq/*, /data/logs/nsq/*$(RESET)"
+	@echo ""
+	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
+	$(call section_title,销毁 ServerD 数据)
+	@docker rm -f nsqlookupd nsqd nsqadmin 2>/dev/null || true
+	@docker volume rm infra_nsq_data 2>/dev/null || true
+	@rm -rf /data/infra/nsq/* /data/logs/nsq/* 2>/dev/null || true
+	$(call success_msg,ServerD 数据已销毁)
+
+serverD-rebuild: serverD-destroy serverD-up ## 完全重建 ServerD (销毁后重建)
+
+server-info: ## 显示当前服务器架构
+	$(call section_title,当前基础设施架构)
 	@echo ""
 	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
-	@echo "$(CYAN)│               ServerA (2C4G) - 主力业务                 │$(RESET)"
+	@echo "$(CYAN)│            ServerA (2C2G) - 网关 + qs-apiserver         │$(RESET)"
 	@echo "$(CYAN)├─────────────────────────────────────────────────────────┤$(RESET)"
-	@echo "$(CYAN)│  $(GREEN)Nginx$(RESET)    $(GREEN)Redis$(RESET)   $(GREEN)MongoDB$(RESET)   $(GREEN)Prometheus$(RESET)   $(GREEN)Grafana$(RESET) $(CYAN)│$(RESET)"
-	@echo "$(CYAN)│  $(YELLOW)80/443$(RESET)   $(YELLOW)6379$(RESET)    $(YELLOW)27017$(RESET)     $(YELLOW)9090$(RESET)        $(YELLOW)3000$(RESET)    $(CYAN)│$(RESET)"
-	@echo "$(CYAN)│  $(BLUE)128M/0.10C$(RESET) $(BLUE)256M/0.15C$(RESET) $(BLUE)2048M/1C$(RESET)   $(BLUE)512M/0.25C$(RESET)  $(BLUE)256M/0.25C$(RESET)$(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(GREEN)Nginx$(RESET) (infra 管理) + $(GREEN)qs-apiserver$(RESET) (业务仓库部署)          $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(YELLOW)80/443$(RESET)                                             $(CYAN)│$(RESET)"
 	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
 	@echo ""
 	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
-	@echo "$(CYAN)│               ServerB (2C2G) - 消息中间件               │$(RESET)"
+	@echo "$(CYAN)│          ServerB (2C2G) - collection + IAM             │$(RESET)"
 	@echo "$(CYAN)├─────────────────────────────────────────────────────────┤$(RESET)"
-	@echo "$(CYAN)│  $(GREEN)nsqlookupd$(RESET)   $(GREEN)nsqd$(RESET)          $(GREEN)nsqadmin$(RESET)              $(CYAN)│$(RESET)"
-	@echo "$(CYAN)│  $(YELLOW)4160/4161$(RESET)    $(YELLOW)4150/4151$(RESET)     $(YELLOW)4171$(RESET)                  $(CYAN)│$(RESET)"
-	@echo "$(CYAN)│  $(BLUE)96M/0.04C$(RESET)    $(BLUE)384M/0.20C$(RESET)    $(BLUE)96M/0.04C$(RESET)             $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(GREEN)qs-collection-server$(RESET) / $(GREEN)IAM$(RESET) 由业务仓库部署          $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  依赖: qs-apiserver / nsq / mongo / 云 MySQL / 云 Redis │$(RESET)"
 	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
 	@echo ""
-	@echo "$(MAGENTA)云托管:$(RESET) MySQL (阿里云 RDS) + Redis-Store (阿里云 Redis)"
+	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
+	@echo "$(CYAN)│          ServerC (4C4G) - MongoDB (跨云 worker)        │$(RESET)"
+	@echo "$(CYAN)├─────────────────────────────────────────────────────────┤$(RESET)"
+	@echo "$(CYAN)│  $(GREEN)MongoDB$(RESET) (infra 管理)                               $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(YELLOW)127.0.0.1:27017$(RESET) + overlay: $(YELLOW)mongo:27017$(RESET)          $(CYAN)│$(RESET)"
+	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
+	@echo ""
+	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
+	@echo "$(CYAN)│         ServerD (2C4G) - worker + operating + NSQ      │$(RESET)"
+	@echo "$(CYAN)├─────────────────────────────────────────────────────────┤$(RESET)"
+	@echo "$(CYAN)│  $(GREEN)nsqlookupd$(RESET) $(GREEN)nsqd$(RESET) $(GREEN)nsqadmin$(RESET) (infra 管理)                $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(YELLOW)4160/4161$(RESET) $(YELLOW)4150/4151$(RESET) $(YELLOW)4171$(RESET)                           $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  + $(GREEN)qs-worker$(RESET) / $(GREEN)operating$(RESET) 由业务仓库部署               $(CYAN)│$(RESET)"
+	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
+	@echo ""
+	@echo "$(MAGENTA)云托管:$(RESET) MySQL (云服务商 A RDS) + Redis (云服务商 A)"
 	@echo ""
 
 validate-cloud-env: ## 校验云服务配置
@@ -890,6 +984,11 @@ validate-cloud-env: ## 校验云服务配置
 	@echo ""
 	@echo "$(BLUE)检查 serverA.env:$(RESET)"
 	@grep -q "^MYSQL_HOST=your-rds" compose/env/prod/serverA.env 2>/dev/null && echo "  $(RED)❌ MYSQL_HOST 未配置$(RESET)" || echo "  $(GREEN)✅ MYSQL_HOST 已配置$(RESET)"
+	@grep -q "^REDIS_HOST=your-redis" compose/env/prod/serverA.env 2>/dev/null && echo "  $(RED)❌ REDIS_HOST 未配置$(RESET)" || echo "  $(GREEN)✅ REDIS_HOST 已配置$(RESET)"
+	@echo "$(BLUE)检查 serverD.env:$(RESET)"
+	@grep -q "^NSQD_BROADCAST_ADDRESS=.*NODE_D_IP" compose/env/prod/serverD.env 2>/dev/null && echo "  $(GREEN)✅ NSQD 广播地址指向 serverD$(RESET)" || echo "  $(YELLOW)⚠️  请确认 NSQD_BROADCAST_ADDRESS 指向 serverD 可达地址$(RESET)"
+	@echo "$(BLUE)检查 serverC.env:$(RESET)"
+	@grep -q "^MONGO_INITDB_ROOT_PASSWORD=change_me" compose/env/prod/serverC.env 2>/dev/null && echo "  $(RED)❌ MongoDB 密码仍为占位值$(RESET)" || echo "  $(GREEN)✅ MongoDB 密码已配置$(RESET)"
 	@echo ""
 
 # ==============================================================================
@@ -1022,7 +1121,8 @@ help-mongo: ## MongoDB 快速参考
 	@echo ""
 	@echo "$(BLUE)配置说明:$(RESET)"
 	@echo "  容器: mongo, 端口: 27017, 模式: 单节点副本集(rs0)"
-	@echo "  资源: 1024M/0.50C"
+	@echo "  宿主机: serverC (4C4G)"
+	@echo "  资源: 3072M/3.00C"
 	@echo ""
 
 help-nsq: ## NSQ 快速参考
@@ -1045,7 +1145,7 @@ help-nsq: ## NSQ 快速参考
 	@echo ""
 	@echo "$(BLUE)配置说明:$(RESET)"
 	@echo "  nsqlookupd: 4160/4161, nsqd: 4150/4151, admin: 4171"
-	@echo "  部署在 ServerB (2C2G)"
+	@echo "  部署在 ServerD (2C4G)"
 	@echo ""
 
 help-vpn: ## VPN 快速参考
@@ -1095,11 +1195,13 @@ help-ssl: ## SSL 证书快速参考
 
 service-ports: ## 显示所有服务端口
 	$(call section_title,服务端口映射)
-	@echo "$(CYAN)Nginx:$(RESET)     80, 443"
-	@echo "$(CYAN)MySQL:$(RESET)     3306 [开发环境]"
-	@echo "$(CYAN)Redis:$(RESET)     6379"
-	@echo "$(CYAN)MongoDB:$(RESET)   27017"
-	@echo "$(CYAN)NSQ:$(RESET)       4150, 4151, 4160, 4161, 4171"
+	@echo "$(CYAN)Nginx:$(RESET)       80, 443                [serverA]"
+	@echo "$(CYAN)MongoDB:$(RESET)     127.0.0.1:27017        [serverC 宿主机]"
+	@echo "$(CYAN)MongoDB:$(RESET)     mongo:27017            [infra-network]"
+	@echo "$(CYAN)NSQ:$(RESET)         4150, 4151, 4160, 4161 [serverD]"
+	@echo "$(CYAN)NSQAdmin:$(RESET)    127.0.0.1:4171         [serverD]"
+	@echo "$(CYAN)MySQL:$(RESET)       云托管地址             [云服务商 A]"
+	@echo "$(CYAN)Redis:$(RESET)       云托管地址             [云服务商 A]"
 	@echo ""
 
 # ==============================================================================

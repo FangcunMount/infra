@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # ==========================================
-# 基础设施网络和卷初始化脚本
-# 用于创建 Docker 网络和数据卷
+# 基础设施网络和宿主机目录初始化脚本
+# 用于创建 Docker 网络和 /data bind mount 目录
 # ==========================================
 
 readonly RED='\033[0;31m'
@@ -26,12 +26,13 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 # 环境变量配置
 INFRA_DATA_ROOT="${INFRA_DATA_ROOT:-/data/infra}"
 INFRA_LOG_ROOT="${INFRA_LOG_ROOT:-/data/logs}"
-INFRA_BACKEND_SUBNET="${INFRA_BACKEND_SUBNET:-172.20.0.0/16}"
+INFRA_BACKEND_SUBNET="${INFRA_BACKEND_SUBNET:-172.20.0.0/24}"
 INFRA_BACKEND_GATEWAY="${INFRA_BACKEND_GATEWAY:-172.20.0.1}"
-INFRA_NETWORK_MTU="${INFRA_NETWORK_MTU:-1500}"
+INFRA_NETWORK_MTU="${INFRA_NETWORK_MTU:-1450}"
 INFRA_NETWORK_DRIVER="${INFRA_NETWORK_DRIVER:-overlay}"
+INFRA_NETWORK_ENCRYPTED="${INFRA_NETWORK_ENCRYPTED:-true}"
 SKIP_NETWORK="${SKIP_NETWORK:-false}"
-INIT_TARGET="${INIT_TARGET:-common}"  # common|serverA|serverB
+INIT_TARGET="${INIT_TARGET:-common}"  # common|serverA|serverB|serverC|serverD
 
 # 用户配置
 # v2.1 安全模型: 使用 www 用户和组，不使用 docker 组
@@ -66,6 +67,7 @@ validate_config() {
     echo "  后端网络: ${INFRA_BACKEND_SUBNET} (网关: ${INFRA_BACKEND_GATEWAY})"
     echo "  网络MTU: ${INFRA_NETWORK_MTU}"
     echo "  网络驱动: ${INFRA_NETWORK_DRIVER}"
+    echo "  Overlay 加密: ${INFRA_NETWORK_ENCRYPTED}"
     echo "  用户:组: ${INFRA_USER}:${INFRA_GROUP}"
     
     return 0
@@ -73,15 +75,15 @@ validate_config() {
 
 show_help() {
     cat << EOF
-基础设施网络和卷初始化脚本
+基础设施网络和宿主机目录初始化脚本
 
 用法:
   $0 [选项] <操作>
 
 操作:
-  create     创建网络和数据卷
-  remove     删除网络和数据卷  
-  status     查看网络和卷状态
+  create     创建网络和 /data 宿主机目录
+  remove     删除网络和旧版命名卷
+  status     查看网络和目录状态
   reset      重置（删除后重新创建）
 
 选项:
@@ -97,10 +99,11 @@ show_help() {
 环境变量:
   INFRA_DATA_ROOT        数据根目录 (默认: /data/infra)
   INFRA_LOG_ROOT         日志根目录 (默认: /data/logs)
-  INFRA_BACKEND_SUBNET   网络子网 (默认: 172.20.0.0/16)
+  INFRA_BACKEND_SUBNET   网络子网 (默认: 172.20.0.0/24)
   INFRA_BACKEND_GATEWAY  网络网关 (默认: 172.20.0.1)
-  INFRA_NETWORK_MTU      网络MTU大小 (默认: 1500)
+  INFRA_NETWORK_MTU      网络MTU大小 (默认: 1450)
   INFRA_NETWORK_DRIVER   网络驱动 (默认: overlay)
+  INFRA_NETWORK_ENCRYPTED overlay 数据面加密 (默认: true)
   INFRA_USER             数据目录所有者 (默认: $USER)
   INFRA_GROUP            数据目录组 (默认: docker)
 EOF
@@ -113,6 +116,7 @@ create_networks() {
     log_step "创建 Docker 网络..."
     
     local driver="${INFRA_NETWORK_DRIVER}"
+    local encrypted="${INFRA_NETWORK_ENCRYPTED}"
     
     # 基础设施网络（跨主机服务通信）
     local backend_cmd
@@ -122,11 +126,22 @@ create_networks() {
   --attachable \\
   --subnet=${INFRA_BACKEND_SUBNET} \\
   --gateway=${INFRA_BACKEND_GATEWAY} \\
-  --opt encrypted=false \\
   --opt com.docker.network.driver.mtu=${INFRA_NETWORK_MTU} \\
   --label 'infra.network=backend' \\
   --label 'infra.purpose=distributed-service-communication' \\
   infra-network"
+        if [[ "${encrypted}" == "true" ]]; then
+            backend_cmd="docker network create \\
+  --driver overlay \\
+  --attachable \\
+  --subnet=${INFRA_BACKEND_SUBNET} \\
+  --gateway=${INFRA_BACKEND_GATEWAY} \\
+  --opt encrypted=true \\
+  --opt com.docker.network.driver.mtu=${INFRA_NETWORK_MTU} \\
+  --label 'infra.network=backend' \\
+  --label 'infra.purpose=distributed-service-communication' \\
+  infra-network"
+        fi
     else
         backend_cmd="docker network create \\
   --driver ${driver} \\
@@ -170,60 +185,97 @@ create_networks() {
 create_volumes() {
     local dry_run=${1:-false}
     
-    log_step "创建数据持久化卷..."
+    log_step "创建 host bind mount 目录..."
     # 根据目标节点选择需要的卷
-    # - serverA: redis/mongo/nginx
-    # - serverB: nsq
-    # - common/其他: 创建全部
+    # - serverA: nginx
+    # - serverB: 当前无 infra 仓库管理的本地卷
+    # - serverC: mongo
+    # - serverD: nsq
+    # - common/其他: 创建当前生产拓扑所需全部卷
     local volumes=()
     case "${INIT_TARGET}" in
         serverA)
-            volumes=(
-                "infra_redis_cache:${INFRA_DATA_ROOT}/redis/cache/data"
-                "infra_mongo_data:${INFRA_DATA_ROOT}/mongo/data"
-                "infra_mongo_config:${INFRA_DATA_ROOT}/mongo/config"
-                "infra_nginx_logs:${INFRA_LOG_ROOT}/nginx"
-            )
+            volumes=()
             ;;
         serverB)
-            volumes=(
-                "infra_nsq_data:${INFRA_DATA_ROOT}/nsq/data"
-            )
+            volumes=()
+            ;;
+        serverC)
+            volumes=()
+            ;;
+        serverD)
+            volumes=()
             ;;
         *)
-            volumes=(
-                "infra_redis_cache:${INFRA_DATA_ROOT}/redis/cache/data"
-                "infra_mongo_data:${INFRA_DATA_ROOT}/mongo/data"
-                "infra_mongo_config:${INFRA_DATA_ROOT}/mongo/config"
-                "infra_nginx_logs:${INFRA_LOG_ROOT}/nginx"
-                "infra_nsq_data:${INFRA_DATA_ROOT}/nsq/data"
-            )
+            volumes=()
             ;;
     esac
     
     # 创建数据目录
     if [[ "$dry_run" != "true" ]]; then
-        log_info "创建数据目录: ${INFRA_DATA_ROOT}"
-        sudo mkdir -p "${INFRA_DATA_ROOT}"/{mongo,nginx}/{data,conf} 2>/dev/null || true
-        sudo mkdir -p "${INFRA_DATA_ROOT}"/redis/cache/{data,conf} 2>/dev/null || true
-        sudo mkdir -p "${INFRA_LOG_ROOT}"/{mongodb,nginx} 2>/dev/null || true
-        
-        # 设置目录所有权为 www:www（v2.1 安全模型）
-        # www 用户用于容器内运行，不需要 docker 组权限
+        log_info "创建 /data 标准目录结构"
+        sudo mkdir -p /data/{apps,image,ops,ssl} 2>/dev/null || true
+        sudo mkdir -p /data/apps/nginx-configs 2>/dev/null || true
+        sudo mkdir -p /data/image/qrcode 2>/dev/null || true
+        sudo mkdir -p /data/ssl/{certs,private} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_DATA_ROOT}"/mongo/{conf,config,data} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_DATA_ROOT}"/{nginx,redis} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_DATA_ROOT}"/nsq/data 2>/dev/null || true
+        sudo mkdir -p "${INFRA_DATA_ROOT}"/ssl/grpc/{ca,clients,server} 2>/dev/null || true
+        sudo mkdir -p "${INFRA_DATA_ROOT}"/ssl/web 2>/dev/null || true
+        sudo mkdir -p "${INFRA_LOG_ROOT}"/{mongodb,nginx,nsq,qs-server,iam} 2>/dev/null || true
+
+        if [[ -f "${PROJECT_ROOT}/components/mongo/mongod.conf" ]]; then
+            sudo cp -f "${PROJECT_ROOT}/components/mongo/mongod.conf" "${INFRA_DATA_ROOT}/mongo/conf/mongod.conf"
+        fi
+        if [[ -f "${PROJECT_ROOT}/components/mongo/init-mongo.js" ]]; then
+            sudo cp -f "${PROJECT_ROOT}/components/mongo/init-mongo.js" "${INFRA_DATA_ROOT}/mongo/conf/init-mongo.js"
+        fi
+        for nsq_conf in nsqlookupd.conf nsqd.conf nsqadmin.conf; do
+            if [[ -f "${PROJECT_ROOT}/components/nsq/${nsq_conf}" ]]; then
+                sudo cp -f "${PROJECT_ROOT}/components/nsq/${nsq_conf}" "${INFRA_DATA_ROOT}/nsq/${nsq_conf}"
+            fi
+        done
+
         if id -u "${INFRA_USER}" >/dev/null 2>&1; then
-            sudo chown -R "${INFRA_USER}:${INFRA_GROUP}" "${INFRA_DATA_ROOT}" 2>/dev/null || \
-            sudo chown -R "${INFRA_USER}:${INFRA_USER}" "${INFRA_DATA_ROOT}"
-            sudo chown -R "${INFRA_USER}:${INFRA_GROUP}" "${INFRA_LOG_ROOT}" 2>/dev/null || \
-            sudo chown -R "${INFRA_USER}:${INFRA_USER}" "${INFRA_LOG_ROOT}"
+            sudo chown "${INFRA_USER}:${INFRA_GROUP}" /data 2>/dev/null || true
+            sudo chown -R "${INFRA_USER}:${INFRA_GROUP}" /data/apps /data/ssl "${INFRA_LOG_ROOT}" 2>/dev/null || \
+            sudo chown -R "${INFRA_USER}:${INFRA_USER}" /data/apps /data/ssl "${INFRA_LOG_ROOT}"
+            sudo chown -R "${INFRA_USER}:${INFRA_GROUP}" \
+                "${INFRA_DATA_ROOT}/mongo/conf" \
+                "${INFRA_DATA_ROOT}/mongo/data" \
+                "${INFRA_DATA_ROOT}/nginx" \
+                "${INFRA_DATA_ROOT}/redis" \
+                "${INFRA_DATA_ROOT}/ssl" 2>/dev/null || \
+            sudo chown -R "${INFRA_USER}:${INFRA_USER}" \
+                "${INFRA_DATA_ROOT}/mongo/conf" \
+                "${INFRA_DATA_ROOT}/mongo/data" \
+                "${INFRA_DATA_ROOT}/nginx" \
+                "${INFRA_DATA_ROOT}/redis" \
+                "${INFRA_DATA_ROOT}/ssl"
+            sudo chown "${INFRA_USER}:${INFRA_GROUP}" "${INFRA_DATA_ROOT}/mongo" "${INFRA_DATA_ROOT}/mongo/config" 2>/dev/null || \
+            sudo chown "${INFRA_USER}:${INFRA_USER}" "${INFRA_DATA_ROOT}/mongo" "${INFRA_DATA_ROOT}/mongo/config"
             log_info "目录所有权: ${INFRA_USER}:${INFRA_GROUP}"
         else
             log_warn "用户 ${INFRA_USER} 不存在，使用 root 权限"
-            sudo chown -R root:root "${INFRA_DATA_ROOT}"
-            sudo chown -R root:root "${INFRA_LOG_ROOT}"
+            sudo chown -R root:root /data/apps /data/ssl "${INFRA_DATA_ROOT}/mongo/conf" "${INFRA_DATA_ROOT}/mongo/data" "${INFRA_DATA_ROOT}/nginx" "${INFRA_DATA_ROOT}/redis" "${INFRA_DATA_ROOT}/ssl" "${INFRA_LOG_ROOT}"
         fi
-        
-        sudo chmod -R 755 "${INFRA_DATA_ROOT}"
-        sudo chmod -R 755 "${INFRA_LOG_ROOT}"
+
+        # 与现有 serverA 保持一致：image、ops、nsq 由 root 管理；NSQ 容器以 root 写入数据。
+        sudo chown -R root:root /data/image /data/ops "${INFRA_DATA_ROOT}/nsq"
+        sudo chmod 0777 /data/image
+        if id -u "${INFRA_USER}" >/dev/null 2>&1; then
+            sudo chown -R "${INFRA_USER}:${INFRA_GROUP}" /data/image/qrcode 2>/dev/null || \
+            sudo chown -R "${INFRA_USER}:${INFRA_USER}" /data/image/qrcode
+            sudo chmod 0755 /data/image/qrcode
+        fi
+        sudo find /data/apps /data/ssl "${INFRA_DATA_ROOT}" "${INFRA_LOG_ROOT}" -type d -exec chmod 0755 {} +
+        sudo chmod 0644 "${INFRA_DATA_ROOT}/mongo/conf/mongod.conf" "${INFRA_DATA_ROOT}/mongo/conf/init-mongo.js" 2>/dev/null || true
+        sudo chmod 0644 "${INFRA_DATA_ROOT}"/nsq/*.conf 2>/dev/null || true
+        if [[ -f "${INFRA_DATA_ROOT}/mongo/config/replset.key" ]]; then
+            sudo chown 999:999 "${INFRA_DATA_ROOT}/mongo/config/replset.key"
+            sudo chmod 0400 "${INFRA_DATA_ROOT}/mongo/config/replset.key"
+        fi
         log_success "数据目录创建完成: ${INFRA_DATA_ROOT}"
         log_success "日志目录创建完成: ${INFRA_LOG_ROOT}"
     fi
@@ -257,15 +309,15 @@ create_volumes() {
     done
 }
 
-# 删除网络和卷
+# 删除网络和旧版命名卷
 remove_infrastructure() {
     local dry_run=${1:-false}
     
-    log_step "删除基础设施网络和卷..."
+    log_step "删除基础设施网络和旧版命名卷..."
     
     local networks=("infra-network")
-    # 新架构 v2.1 卷列表
-    local volumes=("infra_redis_cache" "infra_mongo_data" "infra_mongo_config" "infra_nginx_logs")
+    # 当前 Compose 使用显式 host bind mount；这里仅清理历史版本可能遗留的 named volume。
+    local volumes=("infra_nginx_logs" "infra_nsq_data" "infra_mongo_data")
     
     if [[ "$dry_run" == "true" ]]; then
         echo "# 删除网络命令:"
@@ -330,12 +382,12 @@ show_status() {
     fi
     
     echo
-    log_info "💾 数据卷:"
-    # 使用更可靠的方式检查数据卷
+    log_info "💾 旧版 Docker 命名卷:"
+    # 当前生产拓扑使用 host bind mount；这里仅展示历史版本可能遗留的 infra_* 卷。
     if docker volume ls | grep -q "infra_"; then
         docker volume ls --format "table {{.Name}}\t{{.Driver}}\t{{.Mountpoint}}" | grep -E "VOLUME NAME|infra_"
     else
-        echo "  ❌ 未找到 infra 相关数据卷"
+        echo "  ✅ 未找到 infra 相关旧版命名卷"
     fi
     
     echo

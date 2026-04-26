@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # MongoDB 系统调优脚本（宿主机执行）
-# 适用于 ServerA (2C/4G) 生产环境
+# 适用于 ServerC (4C/4G) 单机 Mongo 生产环境
 #
 # 用途：
 # 1. 禁用透明大页（THP） - MongoDB WiredTiger 不推荐使用 THP
@@ -15,7 +15,7 @@
 set -euo pipefail
 
 echo "=========================================="
-echo "MongoDB 系统调优 - ServerA (2C/4G)"
+echo "MongoDB 系统调优 - ServerC (4C/4G)"
 echo "=========================================="
 
 # 检查 root 权限

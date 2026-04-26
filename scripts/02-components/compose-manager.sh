@@ -30,7 +30,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 COMPOSE_DIR="${REPO_ROOT}/compose"
 COMPONENTS_DIR="${REPO_ROOT}/components"
 ENV_DIR="${REPO_ROOT}/compose/env"
-INIT_TARGET="${INIT_TARGET:-common}"  # common|serverA|serverB
+INIT_TARGET="${INIT_TARGET:-common}"  # common|serverA|serverB|serverC|serverD
 
 # 默认环境
 DEFAULT_ENV="dev"
@@ -49,7 +49,7 @@ elif [[ -n "${ENV:-}" ]]; then
 fi
 
 # 根据环境确定配置文件路径
-# - prod 环境: 使用 serverA.env（默认）或 serverB.env
+# - prod 环境: 使用 serverA/serverB/serverC/serverD 对应 env
 # - 其他环境: 使用 .env
 get_env_file() {
     local server="${1:-A}"
@@ -81,33 +81,9 @@ ensure_infrastructure() {
         network_missing=false
     fi
 
-    # 使用 init 脚本实际创建的卷名
+    # 基础组件已改为显式 host bind mount，不再依赖 Docker named volume。
     local volume_missing=false
     local required_volumes=()
-    case "${INIT_TARGET}" in
-        serverA)
-            required_volumes=(
-                infra_redis_cache
-                infra_mongo_data
-                infra_mongo_config
-                infra_nginx_logs
-            )
-            ;;
-        serverB)
-            required_volumes=(
-                infra_nsq_data
-            )
-            ;;
-        *)
-            required_volumes=(
-                infra_redis_cache
-                infra_mongo_data
-                infra_mongo_config
-                infra_nginx_logs
-                infra_nsq_data
-            )
-            ;;
-    esac
     for vol in "${required_volumes[@]}"; do
         if ! docker volume inspect "$vol" >/dev/null 2>&1; then
             volume_missing=true

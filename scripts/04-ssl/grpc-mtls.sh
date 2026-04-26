@@ -70,7 +70,7 @@ EOF
 }
 
 generate_server_cert() {
-    local service_name="${1:-iam-grpc}"
+    local service_name="${1:-iam-apiserver}"
     local ou="${2:-IAM}"
     local cn="${service_name}.svc"
     local alt_dns="${3:-${service_name}.internal.example.com}"
@@ -247,10 +247,10 @@ generate_server_only() {
         echo "      cert_type: server | client | dual (默认 dual)"
         echo ""
         echo "示例:"
-        echo "  $0 generate-server iam-grpc IAM iam-grpc.example.com        # 双向证书"
-        echo "  $0 generate-server iam-grpc IAM iam-grpc.example.com dual   # 双向证书"
-        echo "  $0 generate-server iam-grpc IAM iam-grpc.example.com server # 仅服务端"
-        echo "  $0 generate-server iam-grpc IAM iam-grpc.example.com client # 仅客户端"
+        echo "  $0 generate-server iam-apiserver IAM iam-apiserver.example.com        # 双向证书"
+        echo "  $0 generate-server iam-apiserver IAM iam-apiserver.example.com dual   # 双向证书"
+        echo "  $0 generate-server iam-apiserver IAM iam-apiserver.example.com server # 仅服务端"
+        echo "  $0 generate-server iam-apiserver IAM iam-apiserver.example.com client # 仅客户端"
         exit 1
     fi
     
@@ -290,10 +290,10 @@ generate_all() {
     generate_root_ca
     generate_intermediate_ca
     # 使用双向证书，每个服务的证书既可作为服务端也可作为客户端
-    generate_server_cert "iam-grpc" "IAM" "iam-grpc.internal.example.com" "dual"
-    generate_server_cert "qs" "QS" "qs.internal.example.com" "dual"
-    generate_server_cert "admin" "Admin" "admin.internal.example.com" "dual"
-    generate_server_cert "ops" "Ops" "ops.internal.example.com" "dual"
+    generate_server_cert "iam-apiserver" "IAM" "iam-apiserver.internal.example.com" "dual"
+    generate_server_cert "qs-apiserver" "QS" "qs-apiserver.internal.example.com" "dual"
+    generate_server_cert "qs-collection-server" "QS" "qs-collection-server.internal.example.com" "dual"
+    generate_server_cert "qs-worker" "QS" "qs-worker.internal.example.com" "dual"
     verify_certificates
     set_permissions
     log_info "证书生成完成，路径: $CERT_DIR"
@@ -403,9 +403,9 @@ gRPC mTLS 证书生成工具
     $0 generate-ca
     
     # 2. 为不同服务生成双向证书（推荐）
-    $0 generate-server iam-grpc IAM iam-grpc.example.com
-    $0 generate-server qs-apiserver QS qs.example.com dual
-    $0 generate-server qs-collection-server QS collect.example.com dual
+    $0 generate-server iam-apiserver IAM iam-apiserver.example.com
+    $0 generate-server qs-apiserver QS qs-apiserver.example.com dual
+    $0 generate-server qs-collection-server QS qs-collection-server.example.com dual
     
     # 3. 如需要，也可生成仅服务端/客户端证书
     $0 generate-server pure-server IAM server.example.com server
@@ -417,8 +417,8 @@ gRPC mTLS 证书生成工具
     # 5. 按需清理证书
     $0 clean all
     $0 clean ca
-    $0 clean server iam-grpc
-    $0 clean client qs
+    $0 clean server iam-apiserver
+    $0 clean server qs-worker
 
 mTLS 架构说明:
     Root CA (根 CA)

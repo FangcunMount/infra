@@ -1,144 +1,142 @@
 # Infra - 基础设施即代码
 
-> 🏗️ 双服务器分布式架构的基础设施管理平台
+> 四节点跨云 Swarm 基础网络层下的基础设施管理仓库。
 
-## 🚀 快速开始
+当前目标拓扑：
+
+- `serverA 2C2G`：`nginx + qs-apiserver`
+- `serverB 2C2G`：`qs-collection-server + IAM`
+- `serverC 4C4G`：`mongodb`
+- `serverD 2C4G`：`qs-worker + operating + nsq`
+- 云托管：`MySQL`、`Redis`
+
+## 快速开始
 
 ```bash
-# 查看所有可用命令
+# 查看所有命令
 make help
 
-# 查看服务端口映射
-make service-ports
+# 每台新服务器先执行交互式 Linux 初始化
+make server-init
 
-# 各组件快速参考
-make help-mongo    # MongoDB
-make help-redis    # Redis
-make help-nsq      # NSQ
-make help-vpn      # VPN
-make help-ssl      # SSL 证书
+# 初始化四节点 Swarm 网络
+make swarm-init SWARM_ADVERTISE_ADDR=<serverA-ip> SWARM_DATA_PATH_ADDR=<serverA-ip>
+make swarm-join-manager SWARM_MANAGER_ADDR=<serverA-ip> SWARM_MANAGER_TOKEN=<token> SWARM_ADVERTISE_ADDR=<serverB-or-D-ip>
+make swarm-join-worker SWARM_MANAGER_ADDR=<serverA-ip> SWARM_WORKER_TOKEN=<token> SWARM_ADVERTISE_ADDR=<serverC-ip>
+
+# 启动 infra 仓库实际维护的机器
+make serverA-up
+make serverC-up
+make serverD-up
 ```
 
-## 📖 文档
+## 文档
 
-详细文档请参阅 **[docs/INDEX.md](docs/INDEX.md)**
+详细文档见 [docs/INDEX.md](docs/INDEX.md)。
 
 | 文档 | 说明 |
-|------|------|
-| [架构设计](docs/server/architecture.md) | 双机部署规划、资源分配、云服务连接 |
-| [升降配操作手册](docs/server/scaling-runbook.md) | 服务器升配/降配时要改哪些文件、按什么顺序发 |
-| [ServerB 监控部署指南](docs/server/serverB-monitoring-deploy-guide.md) | 在 `serverB` 上部署 `Prometheus` 和 `Grafana` |
-| [初始化指南](docs/server/initialization.md) | 服务器用户配置、Docker 安装 |
-| [组件总览](docs/components/README.md) | MongoDB、Redis、NSQ 等组件参考 |
-| [网络架构](docs/network/architecture.md) | Overlay 网络设计 |
+| ------ | ------ |
+| [架构设计](docs/server/architecture.md) | 四机拓扑、职责边界、服务依赖 |
+| [IAM 迁移手册](docs/server/iam-migration-to-serverB.md) | IAM 迁到 `serverB` 的步骤、证书与 gRPC mTLS 检查点 |
+| [Mongo 迁移手册](docs/server/mongo-migration-to-serverC.md) | Mongo 迁到 `serverC` 的切换顺序、备份恢复与业务改造点 |
+| [QPS 容量规划报告](docs/server/qps-capacity-planning.md) | `200/300/500/800/1000 QPS` 分级判断与组件资源建议 |
+| [升降配操作手册](docs/server/scaling-runbook.md) | 拓扑调整、环境变量与发布顺序 |
+| [初始化指南](docs/server/initialization.md) | 四台机器的系统初始化 |
+| [网络架构](docs/network/architecture.md) | 四节点跨云 Swarm overlay 设计 |
+| [组件总览](docs/components/README.md) | MongoDB / NSQ / Nginx 与云托管依赖 |
 | [CI/CD 部署](docs/server/github-actions-deploy-guide.md) | GitHub Actions 配置 |
 
-## 🏗️ 架构概览
+## 架构概览
 
-```text
-                    Internet
-                        │
-                        ▼
-┌───────────────────────────────────────────────────────────┐
-│                   ServerA (2C4G)                          │
-│              主力业务 + 网关 + 存储                        │
-│  ┌─────────┐ ┌─────────────┐ ┌─────────────────────────┐ │
-│  │  Nginx  │ │ Redis-Cache │ │        MongoDB          │ │
-│  │ 80/443  │ │    6379     │ │         27017           │ │
-│  └─────────┘ └─────────────┘ └─────────────────────────┘ │
-│  + qs-apiserver, qs-collection, qs-worker, iam-apiserver │
-└─────────────────────────┬─────────────────────────────────┘
-                          │ infra-network (Overlay)
-┌─────────────────────────┴─────────────────────────────────┐
-│                   ServerB (2C2G)                          │
-│             消息中间件 + 边缘前端 + 监控平台               │
-│  ┌───────────────────────────────────────────────────┐   │
-│  │  nsqlookupd (4160/4161) │ nsqd (4150/4151) │ admin │   │
-│  └───────────────────────────────────────────────────┘   │
-│  + prometheus, grafana, miniblog-backend, qs-ops         │
-└───────────────────────────────────────────────────────────┘
-                          │ VPC 内网
-┌─────────────────────────┴─────────────────────────────────┐
-│                    阿里云托管服务                          │
-│         MySQL (RDS)          │       Redis-Store          │
-└───────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    internet["Internet / Clients"] --> serverA["serverA (2C2G)\nnginx + qs-apiserver"]
+    serverA --> serverB["serverB (2C2G)\nqs-collection-server + IAM"]
+    serverA --> serverD["serverD (2C4G)\nqs-worker + operating + NSQ"]
+    serverB --> serverD
+    serverB --> serverC["serverC (4C4G)\nMongoDB"]
+    serverD --> serverC
+    serverA --> mysql["Cloud MySQL"]
+    serverB --> mysql
+    serverD --> mysql
+    serverA --> redis["Cloud Redis"]
+    serverB --> redis
+    serverD --> redis
 ```
 
-## 📁 项目结构
+说明：
+
+- `infra` 仓库直接维护的 compose 栈只有 `serverA/nginx`、`serverC/mongodb`、`serverD/nsq`。
+- `serverB` 上的 `qs-collection-server`、`IAM` 与 `serverD` 上的 `qs-worker`、`operating` 仍由各自业务仓库部署。
+- 四台机器共同加入 `infra-network`，跨机容器统一使用 overlay 网络服务发现。
+
+## 项目结构
 
 ```text
 infra/
-├── components/           # 基础设施组件
-│   ├── mongo/           # MongoDB
-│   ├── redis/           # Redis Cache
-│   ├── nsq/             # NSQ 消息队列
-│   ├── nginx/           # Nginx 网关
-│   ├── mysql/           # MySQL (仅开发环境)
-│   └── networks/        # 网络定义
-├── deploy/              # 服务器部署配置
-│   ├── serverA/         # ServerA compose
-│   └── serverB/         # ServerB compose
-├── compose/env/         # 环境变量
-│   ├── dev/             # 开发环境
-│   └── prod/            # 生产环境
-├── scripts/             # 自动化脚本
-│   ├── 00-server/       # 服务器初始化
-│   ├── 01-network/      # 网络/VPN 管理
-│   ├── 02-components/   # 组件管理
-│   ├── 03-nginx/        # Nginx 应用管理
-│   ├── 04-ssl/          # SSL 证书管理
-│   └── utils/           # 工具脚本
-├── docs/                # 文档
-├── static/              # 静态资源 (GeoIP, mihomo)
-├── examples/            # 示例配置
-└── Makefile             # 管理命令入口
+├── components/              # 基础设施组件
+│   ├── mongo/               # MongoDB
+│   ├── nsq/                 # NSQ
+│   ├── nginx/               # Nginx
+│   ├── networks/            # Swarm / overlay 网络
+│   ├── redis/               # 可选/开发用 Redis 组件
+│   └── mysql/               # 可选/开发用 MySQL 组件
+├── deploy/
+│   ├── serverA/             # serverA infra stack
+│   ├── serverB/             # serverB 业务节点说明
+│   ├── serverC/             # serverC infra stack
+│   └── serverD/             # serverD infra stack
+├── compose/env/prod/        # 四台机器的生产环境变量模板
+├── scripts/                 # 初始化 / 网络 / 组件脚本
+├── docs/                    # 架构与运维文档
+└── Makefile                 # 管理入口
 ```
 
-## 🔧 常用命令
+## 常用命令
 
-### 基础设施
+### 网络与初始化
 
 ```bash
-make init              # 初始化网络和卷
-make status            # 查看所有服务状态
+make init-serverA
+make init-serverB
+make init-serverC
+make init-serverD
+make server-info
 ```
 
-### 组件管理
+### 服务器栈
 
 ```bash
-make mongo-start       # 启动 MongoDB
-make redis-start       # 启动 Redis
-make nsq-start         # 启动 NSQ
-make nginx-start       # 启动 Nginx
+make serverA-up
+make serverC-up
+make serverD-up
+
+make serverA-logs
+make serverC-logs
+make serverD-logs
 ```
 
-### VPN 管理
+### 组件命令
 
 ```bash
-make vpn-setup         # 安装配置 VPN
-make vpn-status        # 查看状态
-make vpn-enable        # 启用 VPN
-make vpn-disable       # 禁用 (直连)
+make help-mongo
+make help-nsq
+make help-ssl
+make help-vpn
 ```
 
-### SSL 证书
+## 服务约定
 
-```bash
-make ssl-wildcard DOMAIN=example.com EMAIL=admin@example.com
-make ssl-list          # 列出证书
-make ssl-renew         # 续期证书
-```
+| 服务 | 访问方式 | 位置 |
+|------|----------|------|
+| `nginx` | `80/443` | `serverA` |
+| `nsqlookupd` | `4160/4161` | `serverD` |
+| `nsqd` | `4150/4151` | `serverD` |
+| `nsqadmin` | `127.0.0.1:4171` | `serverD` |
+| `mongo` | `127.0.0.1:27017` + overlay `mongo:27017` | `serverC` |
+| `MySQL` | 云托管地址 | 云服务商 A |
+| `Redis` | 云托管地址 | 云服务商 A |
 
-## 📋 服务端口
-
-| 服务 | 端口 | 位置 |
-|------|------|------|
-| Nginx | 80, 443 | ServerA |
-| MongoDB | 27017 | ServerA |
-| Redis | 6379 | ServerA |
-| NSQ | 4150-4171 | ServerB |
-| MySQL | 3306 | 云 RDS / 开发环境 |
-
-## 📄 License
+## License
 
 MIT

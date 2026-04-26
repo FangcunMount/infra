@@ -1,4 +1,6 @@
-# ServerB 部署 Prometheus + Grafana 指南
+# ServerB 部署 Prometheus + Grafana 指南（历史/可选）
+
+> 注意：这份文档不属于当前目标拓扑的默认方案。当前目标架构中，`serverB` 承载的是 `qs-collection-server + IAM`，NSQ 已迁移到 `serverD`，不默认部署 `Prometheus` 与 `Grafana`。保留本文件仅作为历史参考或临时监控方案。
 
 ## 目的
 
@@ -103,7 +105,7 @@ docker compose -f deploy/serverB/docker-compose.yml up -d prometheus grafana
 如果是首次部署，也可以顺手把 `nsq` 三件套一起拉起：
 
 ```bash
-docker compose -f deploy/serverB/docker-compose.yml up -d nsqlookupd nsqd nsqadmin prometheus grafana
+docker compose -f deploy/serverD/docker-compose.yml up -d nsqlookupd nsqd nsqadmin
 ```
 
 ## 第四步：验收
@@ -208,7 +210,7 @@ labels:
 
 如果 `qs-apiserver` / `qs-collection-server` / `qs-worker` 看不到，优先检查：
 
-- `infra-network` overlay 是否在 `serverA/serverB` 间正常互通
+- `infra-network` overlay 是否在当前 Swarm 节点间正常互通
 - `serverB.env` 里的 `PROMETHEUS_QS_APISERVER_TARGET` / `PROMETHEUS_QS_COLLECTION_TARGET` / `PROMETHEUS_QS_WORKER_TARGET` 是否正确
 - `serverA` 上的目标容器是否真的监听了 `/metrics`
 

@@ -10,10 +10,10 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: 172.20.0.0/24
     driver_opts:
       com.docker.network.driver.mtu: "1450"  # overlay 推荐 MTU
-      encrypted: "false"  # 如需加密设为 true (会影响性能)
+      encrypted: "true"  # 跨云场景默认启用数据面加密
     labels:
       - "infra.network=backend"
       - "infra.purpose=internal-services"

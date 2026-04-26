@@ -136,7 +136,7 @@ notification-http-endpoint=http://your-webhook-service/nsq-notifications
 例如，在 `override.yml` 中：
 
 ```yaml
-command: /nsqd --config=/etc/nsq/nsqd.conf --broadcast-address=${NODE_B_IP}
+command: /nsqd --config=/etc/nsq/nsqd.conf --broadcast-address=${NODE_D_IP}
 ```
 
 这里 `--broadcast-address` 会覆盖配置文件中的设置。

@@ -8,7 +8,7 @@
 #   - yangshujie 用户及其 home 目录
 #   - deploy 用户及其 home 目录
 #   - www 用户及其相关目录
-#   - /opt/infra/.env 中的 WWW_UID/WWW_GID 配置
+#   - /opt/infra/.env 中的运行时 UID/GID 配置
 #
 # 版本: 1.0
 # 作者: Infrastructure Team
@@ -157,16 +157,16 @@ clean_env_file() {
         return 0
     fi
     
-    log_info "从环境文件中删除 WWW_UID 和 WWW_GID..."
+    log_info "从环境文件中删除运行时 UID/GID..."
     
     # 备份原文件
     cp "$env_file" "${env_file}.backup.$(date +%Y%m%d_%H%M%S)"
     
-    # 删除 WWW_UID 和 WWW_GID 配置
-    sed -i.tmp '/^WWW_UID=/d; /^WWW_GID=/d' "$env_file"
+    # 删除运行时 UID/GID 配置
+    sed -i.tmp '/^RUNTIME_USER=/d; /^RUNTIME_GROUP=/d; /^WWW_UID=/d; /^WWW_GID=/d; /^APP_UID=/d; /^APP_GID=/d' "$env_file"
     rm -f "${env_file}.tmp"
     
-    log_success "已从 $env_file 删除 WWW_UID/WWW_GID 配置"
+    log_success "已从 $env_file 删除运行时 UID/GID 配置"
     log_info "  备份文件: ${env_file}.backup.*"
 }
 
@@ -198,7 +198,7 @@ main() {
     echo "  3. www"
     echo "     • Home 目录: /var/www"
     echo "     • 业务目录: /srv/apps, /var/log/apps (需确认)"
-    echo "     • 环境变量: WWW_UID, WWW_GID"
+    echo "     • 环境变量: RUNTIME_USER, RUNTIME_GROUP, WWW_UID, WWW_GID, APP_UID, APP_GID"
     echo
     log_warn "此操作不可逆！请确保已备份重要数据。"
     echo
@@ -242,7 +242,7 @@ main() {
     log_info "现在可以重新运行 init-users.sh 来初始化用户"
     echo
     log_info "命令示例:"
-    log_info "  sudo ./scripts/server/init-users.sh"
+    log_info "  sudo bash scripts/00-server/init-users.sh"
     log_info "  或"
     log_info "  make server-init-users"
     echo

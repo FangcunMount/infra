@@ -2,136 +2,168 @@
 
 ## 概述
 
-此目录包含所有基础设施组件使用的共享网络定义。
+`infra-network` 是基础设施组件和业务容器共用的 `Docker Swarm overlay` 网络。
 
-**🌐 现在支持 Docker Swarm Overlay 网络,实现跨主机容器通信!**
+当前目标拓扑不是旧的双机互联，而是`四节点跨云 Swarm 基础网络层`：
 
-## 网络说明
+- `serverA`：manager
+- `serverB`：manager
+- `serverD`：manager
+- `serverC`：worker
 
-### infra-network (基础设施网络)
+这层网络只解决一件事：`让加入同一 overlay 的容器在四台机器之间继续使用容器名通信`。
 
-- **驱动**: overlay (支持跨主机通信)
-- **用途**: 所有基础设施服务的内部通信网络
-- **子网**: 172.20.0.0/16
-- **MTU**: 1450 (overlay 推荐值)
-- **特性**:
-  - ✅ 跨主机容器直接通信
-  - ✅ attachable: 允许非 swarm 服务连接
-  - ✅ 基础设施服务（MongoDB、Redis、NSQ 等）互联
-  - ✅ 业务应用可以加入此网络访问基础设施服务
-  - 🔒 可选加密传输 (encrypted: false 默认,可改为 true)
+## 网络参数
 
-### 设计理念
+### infra-network
 
-**为什么使用 Docker Swarm Overlay?**
+- 驱动：`overlay`
+- 附着方式：`attachable`
+- 子网：`172.20.0.0/24`
+- MTU：`1450`
+- 数据面加密：`enabled`
 
-- ✅ **跨主机通信**: ServerA 和 ServerB 的容器可以直接通信
-- ✅ **服务发现**: 容器间通过服务名访问,自动 DNS 解析
-- ✅ **无需端口映射**: 不需要暴露服务端口到宿主机
-- ✅ **简化配置**: 不需要配置跨主机网络的复杂路由
-- ✅ **动态扩展**: 可轻松添加更多节点
+对应定义见 [docker-compose.yml](./docker-compose.yml)。
 
-**网络拓扑示例：**
+## 设计边界
 
-```text
-                   Docker Swarm Overlay Network
-                      (infra-network)
-                            │
-        ┌───────────────────┴───────────────────┐
-        │                                       │
-    ServerA                                 ServerB
-        │                                       │
-   ┌────┴────┐                            ┌────┴────┐
-   │ MySQL   │                            │  NSQ    │
-   │ Redis   │◄──────容器直接通信──────────►│ nsqd   │
-   │ MongoDB │                            │ lookup  │
-   └─────────┘                            └─────────┘
-        │                                       │
-   ┌────┴────┐                            ┌────┴────┐
-   │ miniblog│                            │  qsapi  │
-   │  应用   │                            │   应用   │
-   └─────────┘                            └─────────┘
-```
+- `infra-network` 依赖 `Swarm`，即使业务部署仍然使用 `docker compose up -d`。
+- 只有连接到 `infra-network` 的容器，才能跨主机通过容器名发现彼此。
+- 这不是 K8s，也不是完整的 Swarm service 编排。当前只是把 Swarm 用作跨主机网络层。
 
-**业务应用网络示例：**
+## 前置条件
 
-```text
-ServerA:
-  miniblog-network 网络          
-  ├── miniblog 应用              
-  └─[加入]→ infra-network (访问 MySQL/Redis)
+### 1. 节点角色
 
-ServerB:
-  qsapi-network 网络
-  ├── qsapi 应用
-  └─[加入]→ infra-network (访问 NSQ/MongoDB)
-```
+推荐固定为：
 
-## 使用方式
+- `serverA`：首个 manager
+- `serverB`：额外 manager
+- `serverD`：额外 manager
+- `serverC`：worker
 
-### 前提条件
+这样能让 `A/B` 留在云服务商 A，`D` 在云服务商 B 提供第三个 manager，多数派仍为奇数。
 
-**必须先初始化 Docker Swarm 集群!**
+### 2. 固定互联地址
+
+每台机器都要准备一组稳定的节点互联地址：
+
+- `advertise-addr`：控制面地址
+- `data-path-addr`：数据面地址
+
+如果没有独立数据网卡，`data-path-addr` 可以先和 `advertise-addr` 相同。
+
+### 3. 放通端口
+
+四台机器之间必须互通：
+
+- `2377/tcp`
+- `7946/tcp`
+- `7946/udp`
+- `4789/udp`
+- `IP protocol 50 (ESP)`，当 overlay 加密启用时
+
+这些端口只应该向`四台 Swarm 节点彼此`开放，不要直接暴露给公网。
+
+## 初始化顺序
+
+### 1. 初始化首个 manager（serverA）
 
 ```bash
-# 1. 在 ServerA (管理节点) 上初始化
-sudo ./scripts/network/swarm-manager.sh init-manager
-
-# 2. 获取加入令牌
-sudo ./scripts/network/swarm-manager.sh get-join-token
-
-# 3. 在 ServerB (工作节点) 上加入集群
-sudo ./scripts/network/swarm-manager.sh init-worker <ServerA-IP> <join-token>
-
-# 4. 验证集群状态 (在管理节点)
-sudo ./scripts/network/swarm-manager.sh status
+sudo ./scripts/01-network/swarm-manager.sh init-manager <serverA-advertise-ip> [serverA-data-ip]
 ```
 
-### 创建网络
-
-在 Swarm 初始化完成后,创建 overlay 网络：
+### 2. 获取 join token
 
 ```bash
-# 方式1: 使用初始化脚本 (推荐)
-bash scripts/components/init-infrastructure.sh create
-
-# 方式2: 使用 Swarm 管理脚本
-sudo ./scripts/network/swarm-manager.sh create-network
-
-# 方式3: 手动创建
-cd components/networks
-docker compose up -d
+sudo ./scripts/01-network/swarm-manager.sh get-join-token
 ```
 
-### 验证网络
+### 3. 将 serverB / serverD 加入为 manager
 
 ```bash
-# 查看网络信息
-docker network inspect infra-network
-
-# 测试跨主机连通性
-sudo ./scripts/network/swarm-manager.sh test
+sudo ./scripts/01-network/swarm-manager.sh join-manager <serverA-ip> <manager-token> <node-advertise-ip> [node-data-ip]
 ```
 
-## 数据卷说明
+### 4. 将 serverC 加入为 worker
 
-**数据卷已分散到各组件！** 每个组件在自己的 `docker-compose.yml` 中声明所需的数据卷：
+```bash
+sudo ./scripts/01-network/swarm-manager.sh init-worker <serverA-ip> <worker-token> <serverC-advertise-ip> [serverC-data-ip]
+```
 
-- `components/mysql/` - 声明 `infra_mysql_data`
-- `components/redis/` - 声明 `infra_redis_data`
-- `components/mongo/` - 声明 `infra_mongo_data`
-- `components/nsq/` - 声明 `infra_nsq_data`
-- `components/jenkins/` - 声明 `infra_jenkins_data`
-- `components/nginx/` - 声明 `infra_nginx_logs`
+### 5. 在任一 manager 上创建 overlay 网络
 
-这样设计的好处：
+```bash
+sudo ./scripts/01-network/swarm-manager.sh create-network
+```
 
-- ✅ 组件完全自包含
-- ✅ 数据卷生命周期跟随组件
-- ✅ 易于理解和维护
-- ✅ 组件可独立迁移
+或：
 
-## 注意事项
+```bash
+INFRA_BACKEND_SUBNET=172.20.0.0/24 \
+INFRA_NETWORK_MTU=1450 \
+INFRA_NETWORK_ENCRYPTED=true \
+bash ./scripts/02-components/init-infrastructure.sh create
+```
 
-- 网络是唯一的共享资源，在删除前请确保所有服务已停止
-- 数据卷由各组件管理，删除组件时会提示是否删除数据
+## 验证
+
+### 查看节点
+
+```bash
+docker node ls
+```
+
+预期：
+
+- `serverA/serverB/serverD` 为 `Reachable/Leader` 之一
+- `serverC` 为 `worker`
+
+### 查看网络 Peers
+
+```bash
+docker network inspect infra-network | grep -A4 Peers
+```
+
+预期应看到 4 个节点地址。
+
+### 临时全局服务铺网
+
+如果某个节点还没出现 overlay peer，可临时创建全局服务触发网络下发：
+
+```bash
+docker service create --mode global --name net-probe --network infra-network alpine sleep 1d
+docker service rm net-probe
+```
+
+### 测试跨主机名字解析
+
+在任一已接入 `infra-network` 的容器内：
+
+```bash
+docker exec <container> ping -c 2 mongo
+docker exec <container> ping -c 2 nsqd
+```
+
+## 迁移注意事项
+
+- 老文档中仍可能提到双机 `serverA/serverB`，但网络层现在以四节点拓扑为准。
+- 业务编排是否改成四机部署，是下一层工作；本目录只维护网络基座。
+- `infra-network` 的子网从 `172.20.0.0/16` 收敛到 `172.20.0.0/24`，相关信任网段配置也要同步更新。
+
+## 故障定位
+
+优先检查：
+
+1. `docker node ls` 是否仍有多数 manager `Ready`
+2. 四台机器之间是否只对白名单源开放了 Swarm 端口
+3. `docker network inspect infra-network` 的 `Peers` 是否齐全
+4. 节点初始化时是否显式使用了正确的 `advertise-addr` / `data-path-addr`
+
+## 相关文件
+
+- [components/networks/docker-compose.yml](./docker-compose.yml)
+- [scripts/01-network/swarm-manager.sh](../../scripts/01-network/swarm-manager.sh)
+- [scripts/02-components/init-infrastructure.sh](../../scripts/02-components/init-infrastructure.sh)
+- [docs/network/architecture.md](../../docs/network/architecture.md)
+- [docs/network/swarm-setup.md](../../docs/network/swarm-setup.md)

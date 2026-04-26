@@ -12,11 +12,11 @@ services:
       - "${NSQLOOKUPD_HTTP_PORT:-4161}:4161"  # HTTP 接口
     restart: always
     volumes:
-      # 配置文件（相对路径）
-      - ./nsqlookupd.conf:/etc/nsq/nsqlookupd.conf:ro
+      # 配置文件（由 init-infrastructure.sh 同步到宿主机 /data/infra/nsq）
+      - ${INFRA_DATA_ROOT:-/data/infra}/nsq/nsqlookupd.conf:/etc/nsq/nsqlookupd.conf:ro
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-    # 适配 serverB 2C2G 配置
+    # 适配 serverD 2C4G 配置
     mem_limit: ${NSQLOOKUPD_MEMORY_LIMIT:-96M}
     cpus: ${NSQLOOKUPD_CPUS:-0.04}
     logging:
@@ -34,7 +34,7 @@ services:
       - "infra.service=nsq-discovery"
       - "infra.category=messaging"
       - "infra.component=nsqlookupd"
-      - "infra.host=serverB"
+      - "infra.host=${INFRA_HOST_LABEL:-serverD}"
 
   nsqd:
     image: nsqio/nsq:v1.3.0
@@ -51,16 +51,16 @@ services:
       - "${NSQD_HTTP_PORT:-4151}:4151"  # HTTP 接口（管理和统计）
     restart: always
     volumes:
-      # 配置文件（相对路径）
-      - ./nsqd.conf:/etc/nsq/nsqd.conf:ro
+      # 配置文件（由 init-infrastructure.sh 同步到宿主机 /data/infra/nsq）
+      - ${INFRA_DATA_ROOT:-/data/infra}/nsq/nsqd.conf:/etc/nsq/nsqd.conf:ro
       # 数据持久化
-      - nsq_data:/data
+      - ${INFRA_DATA_ROOT:-/data/infra}/nsq/data:/data
     environment:
       - TZ=${TZ:-Asia/Shanghai}
     depends_on:
       nsqlookupd:
         condition: service_healthy
-    # 适配 serverB 2C2G 配置
+    # 适配 serverD 2C4G 配置
     mem_limit: ${NSQD_MEMORY_LIMIT:-384M}
     cpus: ${NSQD_CPUS:-0.20}
     logging:
@@ -78,7 +78,7 @@ services:
       - "infra.service=nsq-daemon"
       - "infra.category=messaging"
       - "infra.component=nsqd"
-      - "infra.host=serverB"
+      - "infra.host=${INFRA_HOST_LABEL:-serverD}"
 
   nsqadmin:
     image: nsqio/nsq:v1.3.0
@@ -93,14 +93,14 @@ services:
       - "127.0.0.1:${NSQADMIN_PORT:-4171}:4171"  # Web 管理界面（仅本机访问）
     restart: always
     volumes:
-      # 配置文件（相对路径）
-      - ./nsqadmin.conf:/etc/nsq/nsqadmin.conf:ro
+      # 配置文件（由 init-infrastructure.sh 同步到宿主机 /data/infra/nsq）
+      - ${INFRA_DATA_ROOT:-/data/infra}/nsq/nsqadmin.conf:/etc/nsq/nsqadmin.conf:ro
     environment:
       - TZ=${TZ:-Asia/Shanghai}
     depends_on:
       nsqlookupd:
         condition: service_healthy
-    # 适配 serverB 2C2G 配置
+    # 适配 serverD 2C4G 配置
     mem_limit: ${NSQADMIN_MEMORY_LIMIT:-96M}
     cpus: ${NSQADMIN_CPUS:-0.04}
     logging:
@@ -118,15 +118,10 @@ services:
       - "infra.service=nsq-admin"
       - "infra.category=messaging"
       - "infra.component=nsqadmin"
-      - "infra.host=serverB"
+      - "infra.host=${INFRA_HOST_LABEL:-serverD}"
 
-# 使用外部网络（共享）和本地数据卷（组件独有）
+# 使用外部网络（共享），宿主机目录显式绑定到 /data/infra/nsq
 networks:
   backend:
     external: true
     name: infra-network
-
-volumes:
-  nsq_data:
-    name: infra_nsq_data
-    driver: local

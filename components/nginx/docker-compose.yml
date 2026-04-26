@@ -16,7 +16,7 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./conf.d:/etc/nginx/conf.d:ro
       # 日志
-      - nginx_logs:/data/log/nginx
+      - ${INFRA_LOG_ROOT:-/data/logs}/nginx:/data/log/nginx
       # SSL 证书目录
       - /data/ssl:/data/ssl:ro
       # 应用配置目录（应用项目部署时复制配置文件到此目录）
@@ -40,15 +40,10 @@ services:
     labels:
       - "infra.service=gateway"
       - "infra.category=network"
-      - "infra.host=serverA"
+      - "infra.host=${INFRA_HOST_LABEL:-serverA}"
 
-# 使用外部网络（共享）和本地数据卷（组件独有）
+# 使用外部网络（共享），宿主机目录显式绑定到 /data
 networks:
   backend:
     external: true
     name: infra-network
-
-volumes:
-  nginx_logs:
-    name: infra_nginx_logs
-    driver: local

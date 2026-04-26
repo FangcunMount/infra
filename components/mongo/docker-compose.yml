@@ -8,17 +8,17 @@ services:
       - backend
     restart: always
     ports:
-      # 仅绑定本地，避免公网暴露（远程访问需通过 SSH 隧道）
+      # 仅对宿主机本地暴露；跨机器容器访问走 infra-network
       - "127.0.0.1:${MONGO_PORT:-27017}:27017"
     volumes:
       # 数据持久化
-      - mongo_data:/data/db
+      - ${INFRA_DATA_ROOT:-/data/infra}/mongo/data:/data/db
       # 副本集内部认证 keyFile（由启动脚本在宿主机上准备）
       - ${INFRA_DATA_ROOT:-/data/infra}/mongo/config/replset.key:/etc/mongo/keyfile:ro
-      # 配置文件（相对路径）
-      - ./mongod.conf:/etc/mongod.conf:ro
+      # 配置文件（由 init-infrastructure.sh 同步到宿主机 /data/infra/mongo/conf）
+      - ${INFRA_DATA_ROOT:-/data/infra}/mongo/conf/mongod.conf:/etc/mongod.conf:ro
       # 初始化脚本（仅首次启动时执行）
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ${INFRA_DATA_ROOT:-/data/infra}/mongo/conf/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
@@ -32,9 +32,9 @@ services:
       mongod --config /etc/mongod.conf --auth
     ulimits:
       nofile: 100000
-    # 适配 serverA 2C4G 配置
-    mem_limit: ${MONGO_MEMORY_LIMIT:-1024M}
-    cpus: ${MONGO_CPUS:-0.50}
+    # serverC 独占 Mongo，默认给出较高资源上限，但仍预留宿主机余量
+    mem_limit: ${MONGO_MEMORY_LIMIT:-3072M}
+    cpus: ${MONGO_CPUS:-3.00}
     logging:
       driver: json-file
       options:
@@ -52,15 +52,10 @@ services:
     labels:
       - "infra.service=document-db"
       - "infra.category=storage"
-      - "infra.host=serverA"
+      - "infra.host=${INFRA_HOST_LABEL:-serverC}"
 
-# 使用外部网络（共享）和本地数据卷（组件独有）
+# 使用外部网络（共享），宿主机目录显式绑定到 /data/infra/mongo
 networks:
   backend:
     external: true
     name: infra-network
-
-volumes:
-  mongo_data:
-    name: infra_mongo_data
-    driver: local

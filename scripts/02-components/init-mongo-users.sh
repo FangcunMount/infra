@@ -23,7 +23,7 @@ INFRA_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 # 根据 ENV 参数选择环境配置文件
 ENV="${ENV:-prod}"
 if [[ "$ENV" == "prod" ]]; then
-    ENV_FILE="$INFRA_ROOT/compose/env/prod/serverA.env"
+    ENV_FILE="$INFRA_ROOT/compose/env/prod/serverC.env"
 elif [[ "$ENV" == "dev" ]]; then
     ENV_FILE="$INFRA_ROOT/compose/env/dev/.env"
 else
