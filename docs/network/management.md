@@ -78,9 +78,11 @@ docker network inspect infra-network | grep -A4 Peers
 必要时创建全局占位服务触发网络下发：
 
 ```bash
-docker service create --mode global --name net-probe --network infra-network alpine sleep 1d
-docker service rm net-probe
+make swarm-network-probe
 ```
+
+注意：这是 Swarm overlay 的按需下发机制，不代表 worker join 失败。
+如果 `serverC` 是 worker，刚加入集群但还没有任何任务接入 `infra-network`，本机 `docker network ls` 可能暂时看不到该网络。
 
 ### 跨主机容器名解析失败
 

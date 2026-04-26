@@ -264,8 +264,7 @@ docker run --rm --network infra-network alpine ping -c 2 nsqd
 如果 worker 上还没看到网络，可临时创建全局服务触发网络下发：
 
 ```bash
-docker service create --mode global --name net-probe --network infra-network alpine sleep 1d
-docker service rm net-probe
+make swarm-network-probe
 ```
 
 ## 常见问题
@@ -281,13 +280,27 @@ docker service rm net-probe
 
 ### 2. `infra-network` 在 worker 上看不到
 
+这是 Docker Swarm overlay 网络的正常按需下发现象。
+`infra-network` 是集群级网络，但 worker 节点只有在有任务或容器接入该网络后，才一定会在本机 `docker network ls` 中看到它。
+
 先检查：
 
 ```bash
 docker network inspect infra-network | grep -A4 Peers
 ```
 
-如果 peer 不全，先创建 `net-probe` 全局服务触发下发。
+如果 peer 不全，或 worker 本地启动 `serverC-up` 时提示 `当前 worker 尚未看到 infra-network`，在任一 manager 上执行：
+
+```bash
+make swarm-network-probe
+```
+
+然后回到 worker 节点重试：
+
+```bash
+docker network ls | grep infra-network
+make serverC-up
+```
 
 ### 3. overlay 能建但容器互访不稳定
 

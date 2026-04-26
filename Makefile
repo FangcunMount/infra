@@ -105,6 +105,29 @@ define shell_info_msg
 	echo "$(BLUE)ℹ️  $(1)$(RESET)"
 endef
 
+define ensure_infra_network_visible
+	@if docker network inspect infra-network >/dev/null 2>&1; then \
+		echo "$(GREEN)✅ infra-network 已在本机可见$(RESET)"; \
+	else \
+		swarm_state=$$(docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null || echo "inactive"); \
+		control_available=$$(docker info --format '{{.Swarm.ControlAvailable}}' 2>/dev/null || echo "false"); \
+		if [ "$$swarm_state" != "active" ]; then \
+			echo "$(RED)$(BOLD)❌ 未找到 infra-network，且当前节点未加入 active Swarm$(RESET)"; \
+			echo "$(BLUE)💡 先按 docs/network/swarm-setup.md 加入集群，再启动本机服务$(RESET)"; \
+			exit 1; \
+		fi; \
+		if [ "$$control_available" = "true" ]; then \
+			echo "$(RED)$(BOLD)❌ 当前 manager 未找到 infra-network$(RESET)"; \
+			echo "$(BLUE)💡 请先在首个 manager 上执行 make init-serverA，或执行 sudo ./scripts/01-network/swarm-manager.sh create-network$(RESET)"; \
+			exit 1; \
+		fi; \
+		echo "$(RED)$(BOLD)❌ 当前 worker 尚未看到 infra-network$(RESET)"; \
+		echo "$(YELLOW)这是 Docker Swarm overlay 的按需下发现象：worker 只有在有任务/容器接入网络后，才会在本机 docker network ls 中看到它。$(RESET)"; \
+		echo "$(BLUE)💡 请在任一 manager 上执行 make swarm-network-probe，完成后回到当前节点重试。$(RESET)"; \
+		exit 1; \
+	fi
+endef
+
 define section_title
 	@echo ""
 	@echo "$(CYAN)$(BOLD)═══════════════════════════════════════════════════════════$(RESET)"
@@ -262,7 +285,7 @@ server-tune: ## 优化宿主机系统参数 (MongoDB等需要)
 # ==============================================================================
 .PHONY: vpn-setup vpn-status vpn-test vpn-enable vpn-disable vpn-switch vpn-proxies vpn-docker-test vpn-uninstall vpn-diagnose
 .PHONY: tailscale-install tailscale-up tailscale-status tailscale-ip tailscale-check tailscale-swarm-env
-.PHONY: swarm-init swarm-join-manager swarm-join-worker swarm-leave swarm-status net-list net-create net-delete net-inspect port-check
+.PHONY: swarm-init swarm-join-manager swarm-join-worker swarm-leave swarm-status swarm-network-probe net-list net-create net-delete net-inspect port-check
 
 vpn-setup: ## 安装配置 VPN (Mihomo)
 	@sudo bash $(NETWORK_SCRIPTS)/vpn-setup.sh
@@ -337,6 +360,23 @@ swarm-leave: ## 离开 Docker Swarm
 
 swarm-status: ## 查看 Swarm 状态
 	@docker node ls 2>/dev/null || echo "$(YELLOW)未加入 Swarm 集群$(RESET)"
+
+swarm-network-probe: ## 在 manager 上触发 infra-network 下发到所有节点
+	@if ! docker node ls >/dev/null 2>&1; then \
+		echo "$(RED)$(BOLD)❌ 当前节点不是 Swarm manager，请在 serverA/serverB/serverD 上执行$(RESET)"; \
+		exit 1; \
+	fi
+	@if ! docker network inspect infra-network >/dev/null 2>&1; then \
+		echo "$(RED)$(BOLD)❌ manager 上未找到 infra-network，请先执行 make init-serverA 或创建网络$(RESET)"; \
+		exit 1; \
+	fi
+	@echo "$(BLUE)ℹ️  创建 net-probe 全局服务，触发 infra-network 下发...$(RESET)"
+	@docker service rm net-probe >/dev/null 2>&1 || true
+	@docker service create --mode global --name net-probe --network infra-network alpine:3.20 sleep 1d >/dev/null
+	@sleep 8
+	@docker service ps net-probe --format "table {{.Name}}\t{{.Node}}\t{{.CurrentState}}\t{{.Error}}"
+	@docker service rm net-probe >/dev/null
+	$(call success_msg,infra-network 下发探针已完成；请在目标节点重试 docker network ls 或 make serverC-up)
 
 net-list: ## 列出所有网络
 	@docker network ls --format "table {{.Name}}\t{{.Driver}}\t{{.Scope}}"
@@ -874,10 +914,7 @@ serverA-rebuild: serverA-destroy serverA-up ## 完全重建 ServerA (销毁后�
 
 serverB-up: ## 初始化 ServerB 节点基线 (collection + IAM 由业务仓库部署)
 	$(call section_title,启动 ServerB (2C2G))
-	@if ! docker network inspect infra-network >/dev/null 2>&1; then \
-		echo "$(RED)$(BOLD)❌ 未找到 infra-network，请先在 Manager 上运行 make init-serverA$(RESET)"; \
-		exit 1; \
-	fi
+	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverB
 	$(call warning_msg,ServerB 当前没有 infra 仓库直接维护的本地组件；qs-collection-server 与 IAM 请由业务仓库部署)
 
@@ -897,10 +934,7 @@ serverB-rebuild: serverB-destroy serverB-up ## 完全重建 ServerB (销毁后�
 
 serverC-up: ## 启动 ServerC 服务栈 (MongoDB)
 	$(call section_title,启动 ServerC (4C4G))
-	@if ! docker network inspect infra-network >/dev/null 2>&1; then \
-		echo "$(RED)$(BOLD)❌ 未找到 infra-network，请先在 Manager 上运行 make init-serverA$(RESET)"; \
-		exit 1; \
-	fi
+	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverC
 	@cd deploy/serverC && docker compose --env-file ../../compose/env/prod/serverC.env up -d
 	$(call success_msg,ServerC 服务已启动)
@@ -931,10 +965,7 @@ serverC-rebuild: serverC-destroy serverC-up ## 完全重建 ServerC (销毁后�
 
 serverD-up: ## 启动 ServerD 服务栈 (NSQ)
 	$(call section_title,启动 ServerD (2C4G))
-	@if ! docker network inspect infra-network >/dev/null 2>&1; then \
-		echo "$(RED)$(BOLD)❌ 未找到 infra-network，请先在 Manager 上运行 make init-serverA$(RESET)"; \
-		exit 1; \
-	fi
+	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverD
 	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d
 	$(call success_msg,ServerD 服务已启动)
