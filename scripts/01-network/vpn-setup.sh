@@ -388,6 +388,8 @@ if systemctl is-active --quiet mihomo.service 2>/dev/null; then
     export http_proxy="http://127.0.0.1:7890"
     export https_proxy="http://127.0.0.1:7890"
     export all_proxy="socks5://127.0.0.1:7891"
+    export no_proxy="localhost,127.0.0.1,::1,100.64.0.0/10,100.100.100.100,.ts.net,*.ts.net,tailscale.com,*.tailscale.com"
+    export NO_PROXY="$no_proxy"
     
     # 仅在交互式登录时显示代理状态
     if [[ $- == *i* ]] && [[ -n "$PS1" ]]; then
@@ -400,6 +402,8 @@ proxy-on() {
         export http_proxy="http://127.0.0.1:7890"
         export https_proxy="http://127.0.0.1:7890"
         export all_proxy="socks5://127.0.0.1:7891"
+        export no_proxy="localhost,127.0.0.1,::1,100.64.0.0/10,100.100.100.100,.ts.net,*.ts.net,tailscale.com,*.tailscale.com"
+        export NO_PROXY="$no_proxy"
         echo "🟢 代理已开启"
     else
         echo "❌ Mihomo 服务未运行，请先启动服务: systemctl start mihomo"

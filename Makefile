@@ -261,6 +261,7 @@ server-tune: ## 优化宿主机系统参数 (MongoDB等需要)
 # 1. VPN/网络配置
 # ==============================================================================
 .PHONY: vpn-setup vpn-status vpn-test vpn-enable vpn-disable vpn-switch vpn-proxies vpn-docker-test vpn-uninstall vpn-diagnose
+.PHONY: tailscale-install tailscale-up tailscale-status tailscale-ip tailscale-check tailscale-swarm-env
 .PHONY: swarm-init swarm-join-manager swarm-join-worker swarm-leave swarm-status net-list net-create net-delete net-inspect port-check
 
 vpn-setup: ## 安装配置 VPN (Mihomo)
@@ -293,22 +294,40 @@ vpn-uninstall: ## 卸载 VPN
 vpn-diagnose: ## 网络诊断
 	@sudo bash $(NETWORK_SCRIPTS)/diagnose.sh
 
+tailscale-install: ## 安装 Tailscale
+	@sudo bash $(NETWORK_SCRIPTS)/tailscale-manager.sh install
+
+tailscale-up: ## 启动/登录 Tailscale (TAILSCALE_HOSTNAME=serverA TAILSCALE_AUTH_KEY=可选)
+	@sudo TAILSCALE_HOSTNAME="$(TAILSCALE_HOSTNAME)" TAILSCALE_AUTH_KEY="$(TAILSCALE_AUTH_KEY)" TAILSCALE_EXTRA_ARGS="$(TAILSCALE_EXTRA_ARGS)" bash $(NETWORK_SCRIPTS)/tailscale-manager.sh up
+
+tailscale-status: ## 查看 Tailscale 状态
+	@bash $(NETWORK_SCRIPTS)/tailscale-manager.sh status
+
+tailscale-ip: ## 输出本机 Tailscale IPv4
+	@bash $(NETWORK_SCRIPTS)/tailscale-manager.sh ip
+
+tailscale-check: ## 检查 Tailscale 与 Mihomo/Swarm underlay 冲突
+	@sudo bash $(NETWORK_SCRIPTS)/tailscale-manager.sh check
+
+tailscale-swarm-env: ## 输出当前节点 Swarm advertise/data-path 环境变量
+	@bash $(NETWORK_SCRIPTS)/tailscale-manager.sh swarm-env
+
 swarm-init: ## 初始化首个 Docker Swarm manager
-	$(call require_param,SWARM_ADVERTISE_ADDR,make swarm-init SWARM_ADVERTISE_ADDR=172.17.0.223)
+	$(call require_param,SWARM_ADVERTISE_ADDR,make swarm-init SWARM_ADVERTISE_ADDR=100.x.x.11 SWARM_DATA_PATH_ADDR=100.x.x.11)
 	@docker swarm init --advertise-addr $(SWARM_ADVERTISE_ADDR) $(if $(SWARM_DATA_PATH_ADDR),--data-path-addr $(SWARM_DATA_PATH_ADDR))
 	$(call success_msg,Swarm 集群已初始化 (advertise-addr=$(SWARM_ADVERTISE_ADDR), data-path=$(if $(SWARM_DATA_PATH_ADDR),$(SWARM_DATA_PATH_ADDR),$(SWARM_ADVERTISE_ADDR))))
 
 swarm-join-manager: ## 加入现有 Swarm 成为 manager
-	$(call require_param,SWARM_MANAGER_IP,make swarm-join-manager SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.11)
-	$(call require_param,SWARM_TOKEN,make swarm-join-manager SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.11)
-	$(call require_param,SWARM_ADVERTISE_ADDR,make swarm-join-manager SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.11)
+	$(call require_param,SWARM_MANAGER_IP,make swarm-join-manager SWARM_MANAGER_IP=100.x.x.11 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=100.x.x.12)
+	$(call require_param,SWARM_TOKEN,make swarm-join-manager SWARM_MANAGER_IP=100.x.x.11 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=100.x.x.12)
+	$(call require_param,SWARM_ADVERTISE_ADDR,make swarm-join-manager SWARM_MANAGER_IP=100.x.x.11 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=100.x.x.12)
 	@docker swarm join --token $(SWARM_TOKEN) --advertise-addr $(SWARM_ADVERTISE_ADDR) $(if $(SWARM_DATA_PATH_ADDR),--data-path-addr $(SWARM_DATA_PATH_ADDR)) $(SWARM_MANAGER_IP):2377
 	$(call success_msg,已加入 Swarm manager (advertise-addr=$(SWARM_ADVERTISE_ADDR)))
 
 swarm-join-worker: ## 加入现有 Swarm 成为 worker
-	$(call require_param,SWARM_MANAGER_IP,make swarm-join-worker SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.12)
-	$(call require_param,SWARM_TOKEN,make swarm-join-worker SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.12)
-	$(call require_param,SWARM_ADVERTISE_ADDR,make swarm-join-worker SWARM_MANAGER_IP=10.0.0.10 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=10.0.0.12)
+	$(call require_param,SWARM_MANAGER_IP,make swarm-join-worker SWARM_MANAGER_IP=100.x.x.11 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=100.x.x.13)
+	$(call require_param,SWARM_TOKEN,make swarm-join-worker SWARM_MANAGER_IP=100.x.x.11 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=100.x.x.13)
+	$(call require_param,SWARM_ADVERTISE_ADDR,make swarm-join-worker SWARM_MANAGER_IP=100.x.x.11 SWARM_TOKEN=SWMTKN-xxx SWARM_ADVERTISE_ADDR=100.x.x.13)
 	@docker swarm join --token $(SWARM_TOKEN) --advertise-addr $(SWARM_ADVERTISE_ADDR) $(if $(SWARM_DATA_PATH_ADDR),--data-path-addr $(SWARM_DATA_PATH_ADDR)) $(SWARM_MANAGER_IP):2377
 	$(call success_msg,已加入 Swarm worker (advertise-addr=$(SWARM_ADVERTISE_ADDR)))
 

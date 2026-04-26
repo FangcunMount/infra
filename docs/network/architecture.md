@@ -2,13 +2,14 @@
 
 ## 概述
 
-本项目当前采用 `Docker Swarm + attachable overlay` 作为跨主机基础网络层。
+本项目当前采用 `Tailscale underlay + Docker Swarm attachable overlay` 作为跨主机基础网络层。
 
 目标不是把所有业务切到 `docker stack`，而是：
 
 - 保留现有按机器 `docker compose up -d` 的部署方式
 - 让不同主机上的容器继续通过`容器名`互相访问
 - 在跨云场景下，为 Mongo / NSQ / 业务容器提供统一的容器网络平面
+- 通过 Tailscale 承载节点互联加密，避免云安全组无法放行 ESP/IP protocol 50 的问题
 
 ## 当前目标拓扑
 
@@ -39,7 +40,8 @@
 | 子网 | `172.20.0.0/24` |
 | 网关 | `172.20.0.1` |
 | MTU | `1450` |
-| 数据面加密 | `enabled` |
+| Docker overlay 数据面加密 | `disabled` |
+| 节点链路加密 | `Tailscale` |
 
 定义见 [components/networks/docker-compose.yml](../../components/networks/docker-compose.yml)。
 
@@ -70,7 +72,7 @@ docker stack deploy
                                Docker Swarm Cluster
 
  ┌──────────────────────────────────────────────────────────────────────────┐
- │                infra-network (overlay, attachable, encrypted)           │
+ │        infra-network (overlay, attachable; Tailscale underlay)          │
  │                          172.20.0.0/24 / MTU 1450                       │
  │                                                                          │
  │  Cloud A                                         Cloud B                 │
@@ -91,9 +93,9 @@ docker stack deploy
  Node discovery:
    - TCP/UDP 7946
 
- Overlay data plane:
-   - UDP 4789
-   - ESP (IP protocol 50) when encrypted
+ Overlay data plane over Tailscale:
+   - UDP 4789 on tailscale0
+   - no Docker ESP dependency because INFRA_NETWORK_ENCRYPTED=false
 ```
 
 ## 控制面与数据面
@@ -108,7 +110,7 @@ Docker 官方区分两类流量：
 - `--advertise-addr` 用于控制面
 - `--data-path-addr` 用于 overlay 数据面
 
-如果没有独立网卡，`data-path-addr` 可以先复用 `advertise-addr`；如果有独立跨云互联地址，优先显式区分。
+当前推荐 `advertise-addr` 和 `data-path-addr` 都使用本机 `tailscale ip -4` 输出的地址。
 
 ## 服务发现
 
@@ -133,18 +135,18 @@ Docker 官方区分两类流量：
 
 ### 端口暴露原则
 
-Swarm 端口不要对公网全开，只对白名单节点放通：
+Swarm 端口不要对公网全开。当前推荐通过 Tailscale 节点网络互通：
 
 - `2377/tcp`
 - `7946/tcp`
 - `7946/udp`
 - `4789/udp`
-- `ESP (protocol 50)`，启用 overlay 加密时
+- 不需要 `ESP (protocol 50)`，因为 Docker overlay encryption 关闭，底层由 Tailscale 加密
 
-### 为什么启用加密
+### 为什么关闭 Docker overlay 加密
 
-当前是`跨云` overlay，不再是假定同一内网边界内的双机互联。
-因此 `infra-network` 默认开启数据面加密，而不是继续沿用旧的未加密配置。
+云安全组通常只能配置 TCP/UDP/ICMP/GRE，不能稳定放行 Docker encrypted overlay 需要的 ESP/IP protocol 50。
+因此当前方案关闭 `encrypted=true`，使用 Tailscale WireGuard 隧道承担节点间加密。
 
 ## 与业务部署的关系
 

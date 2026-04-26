@@ -4,6 +4,7 @@
 
 本文只覆盖当前推荐网络模型：
 
+- `Tailscale` 负责跨云节点加密互联
 - `Docker Swarm` 负责跨主机基础网络层
 - `infra-network` 是四节点共用的 attachable overlay
 - 业务部署仍然可以继续使用 `docker compose up -d`
@@ -38,49 +39,49 @@
 
 ### 固定互联地址
 
-每个节点都要显式使用：
+每个节点都要先加入 Tailscale，并显式使用：
 
 - `advertise-addr`
 - `data-path-addr`
 
-如果没有独立数据网卡，`data-path-addr` 可先等于 `advertise-addr`。
+当前推荐两者都使用本机 `tailscale ip -4` 输出的地址。
 
 ### 防火墙白名单
 
-以下端口只对白名单 Swarm 节点开放：
+以下端口走 Tailscale 节点网络，不对公网开放：
 
 - `2377/tcp`
 - `7946/tcp`
 - `7946/udp`
 - `4789/udp`
-- `ESP (protocol 50)`，启用 overlay 加密时
+- 不需要 `ESP (protocol 50)`，因为 Docker overlay encryption 关闭，底层由 Tailscale 加密
 
 ## 常用命令
 
 ### 初始化首个 manager
 
 ```bash
-make swarm-init SWARM_ADVERTISE_ADDR=<serverA-ip> SWARM_DATA_PATH_ADDR=<serverA-data-ip>
+make swarm-init SWARM_ADVERTISE_ADDR=<serverA-ts-ip> SWARM_DATA_PATH_ADDR=<serverA-ts-ip>
 ```
 
 ### 加入额外 manager
 
 ```bash
 make swarm-join-manager \
-  SWARM_MANAGER_IP=<serverA-ip> \
+  SWARM_MANAGER_IP=<serverA-ts-ip> \
   SWARM_TOKEN=<manager-token> \
-  SWARM_ADVERTISE_ADDR=<node-ip> \
-  SWARM_DATA_PATH_ADDR=<node-data-ip>
+  SWARM_ADVERTISE_ADDR=<node-ts-ip> \
+  SWARM_DATA_PATH_ADDR=<node-ts-ip>
 ```
 
 ### 加入 worker
 
 ```bash
 make swarm-join-worker \
-  SWARM_MANAGER_IP=<serverA-ip> \
+  SWARM_MANAGER_IP=<serverA-ts-ip> \
   SWARM_TOKEN=<worker-token> \
-  SWARM_ADVERTISE_ADDR=<serverC-ip> \
-  SWARM_DATA_PATH_ADDR=<serverC-data-ip>
+  SWARM_ADVERTISE_ADDR=<serverC-ts-ip> \
+  SWARM_DATA_PATH_ADDR=<serverC-ts-ip>
 ```
 
 ### 查看状态
@@ -96,7 +97,7 @@ docker network inspect infra-network
 ```bash
 INFRA_BACKEND_SUBNET=172.20.0.0/24 \
 INFRA_NETWORK_MTU=1450 \
-INFRA_NETWORK_ENCRYPTED=true \
+INFRA_NETWORK_ENCRYPTED=false \
 make init
 ```
 
@@ -108,7 +109,7 @@ make init
 - `INFRA_BACKEND_GATEWAY=172.20.0.1`
 - `INFRA_NETWORK_MTU=1450`
 - `INFRA_NETWORK_DRIVER=overlay`
-- `INFRA_NETWORK_ENCRYPTED=true`
+- `INFRA_NETWORK_ENCRYPTED=false`
 
 ## 应用接入方式
 
@@ -210,12 +211,12 @@ docker service rm net-probe
 
 1. MTU 是否需要进一步下调
 2. `data-path-addr` 是否显式配置
-3. 是否启用了 overlay 加密
-4. 云防火墙是否对 UDP/ESP 有限制
+3. 是否误启用了 overlay 加密
+4. Mihomo TUN 是否劫持了 `100.64.0.0/10`
 
 ## 安全建议
 
-- 不要把 `4789/udp` 暴露给公网任意来源
+- 不要把 Swarm 的 `2377/7946/4789` 暴露给公网任意来源
 - manager 节点保持奇数
 - Mongo 所在节点保持 worker
 - 先验证 overlay 稳定，再迁移核心数据链路

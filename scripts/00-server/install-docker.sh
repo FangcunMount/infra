@@ -431,7 +431,7 @@ configure_vpn_proxy_mode() {
 [Service]
 Environment="HTTP_PROXY=http://127.0.0.1:$http_proxy_port"
 Environment="HTTPS_PROXY=http://127.0.0.1:$http_proxy_port"
-Environment="NO_PROXY=localhost,127.0.0.1,::1"
+Environment="NO_PROXY=localhost,127.0.0.1,::1,100.64.0.0/10,100.100.100.100,.ts.net,*.ts.net,tailscale.com,*.tailscale.com"
 EOF
         log_success "Docker 服务代理配置已创建"
         

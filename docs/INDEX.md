@@ -52,7 +52,7 @@ docs/
 | 把 Mongo 迁到 serverC | [Mongo 迁移手册](./server/mongo-migration-to-serverC.md) |
 | 评估 200~1000 QPS 该怎么配资源 | [QPS 容量规划报告](./server/qps-capacity-planning.md) |
 | 初始化四台机器 | [初始化指南](./server/initialization.md) |
-| 建四节点 Swarm / overlay 网络 | [Swarm 搭建](./network/swarm-setup.md) |
+| 建 Tailscale + 四节点 Swarm / overlay 网络 | [Swarm 搭建](./network/swarm-setup.md) |
 | 调整 serverA / serverB / serverC 部署清单 | [升降配操作手册](./server/scaling-runbook.md) |
 | 管理 MongoDB | [MongoDB 快速入门](./components/mongodb-quickstart.md) |
 | 管理 NSQ | [NSQ 配置指南](./components/nsq.md) |

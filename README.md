@@ -19,10 +19,15 @@ make help
 # 每台新服务器先执行交互式 Linux 初始化
 make server-init
 
-# 初始化四节点 Swarm 网络
-make swarm-init SWARM_ADVERTISE_ADDR=<serverA-ip> SWARM_DATA_PATH_ADDR=<serverA-ip>
-make swarm-join-manager SWARM_MANAGER_ADDR=<serverA-ip> SWARM_MANAGER_TOKEN=<token> SWARM_ADVERTISE_ADDR=<serverB-or-D-ip>
-make swarm-join-worker SWARM_MANAGER_ADDR=<serverA-ip> SWARM_WORKER_TOKEN=<token> SWARM_ADVERTISE_ADDR=<serverC-ip>
+# 每台机器先加入 Tailscale，Swarm 使用 Tailscale IP 作为节点互联地址
+make tailscale-install
+make tailscale-up TAILSCALE_HOSTNAME=serverA
+make tailscale-ip
+
+# 初始化四节点 Swarm 网络（全部 IP 使用 tailscale ip -4）
+make swarm-init SWARM_ADVERTISE_ADDR=<serverA-ts-ip> SWARM_DATA_PATH_ADDR=<serverA-ts-ip>
+make swarm-join-manager SWARM_MANAGER_IP=<serverA-ts-ip> SWARM_TOKEN=<token> SWARM_ADVERTISE_ADDR=<serverB-or-D-ts-ip> SWARM_DATA_PATH_ADDR=<serverB-or-D-ts-ip>
+make swarm-join-worker SWARM_MANAGER_IP=<serverA-ts-ip> SWARM_TOKEN=<token> SWARM_ADVERTISE_ADDR=<serverC-ts-ip> SWARM_DATA_PATH_ADDR=<serverC-ts-ip>
 
 # 启动 infra 仓库实际维护的机器
 make serverA-up
@@ -42,7 +47,7 @@ make serverD-up
 | [QPS 容量规划报告](docs/server/qps-capacity-planning.md) | `200/300/500/800/1000 QPS` 分级判断与组件资源建议 |
 | [升降配操作手册](docs/server/scaling-runbook.md) | 拓扑调整、环境变量与发布顺序 |
 | [初始化指南](docs/server/initialization.md) | 四台机器的系统初始化 |
-| [网络架构](docs/network/architecture.md) | 四节点跨云 Swarm overlay 设计 |
+| [网络架构](docs/network/architecture.md) | Tailscale underlay + 四节点 Swarm overlay 设计 |
 | [组件总览](docs/components/README.md) | MongoDB / NSQ / Nginx 与云托管依赖 |
 | [CI/CD 部署](docs/server/github-actions-deploy-guide.md) | GitHub Actions 配置 |
 
@@ -68,7 +73,7 @@ flowchart LR
 
 - `infra` 仓库直接维护的 compose 栈只有 `serverA/nginx`、`serverC/mongodb`、`serverD/nsq`。
 - `serverB` 上的 `qs-collection-server`、`IAM` 与 `serverD` 上的 `qs-worker`、`operating` 仍由各自业务仓库部署。
-- 四台机器共同加入 `infra-network`，跨机容器统一使用 overlay 网络服务发现。
+- 四台机器先加入 Tailscale，Swarm advertise/data-path 使用 Tailscale IP；业务容器共同加入 `infra-network`，跨机容器统一使用 overlay 网络服务发现。
 
 ## 项目结构
 

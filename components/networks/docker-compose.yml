@@ -13,7 +13,7 @@ networks:
         - subnet: 172.20.0.0/24
     driver_opts:
       com.docker.network.driver.mtu: "1450"  # overlay 推荐 MTU
-      encrypted: "true"  # 跨云场景默认启用数据面加密
+      # 不设置 encrypted=true；跨云加密由 Tailscale underlay 承担，避免依赖 ESP/IP protocol 50。
     labels:
       - "infra.network=backend"
       - "infra.purpose=internal-services"

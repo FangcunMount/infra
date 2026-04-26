@@ -30,7 +30,7 @@ INFRA_BACKEND_SUBNET="${INFRA_BACKEND_SUBNET:-172.20.0.0/24}"
 INFRA_BACKEND_GATEWAY="${INFRA_BACKEND_GATEWAY:-172.20.0.1}"
 INFRA_NETWORK_MTU="${INFRA_NETWORK_MTU:-1450}"
 INFRA_NETWORK_DRIVER="${INFRA_NETWORK_DRIVER:-overlay}"
-INFRA_NETWORK_ENCRYPTED="${INFRA_NETWORK_ENCRYPTED:-true}"
+INFRA_NETWORK_ENCRYPTED="${INFRA_NETWORK_ENCRYPTED:-false}"
 SKIP_NETWORK="${SKIP_NETWORK:-false}"
 INIT_TARGET="${INIT_TARGET:-common}"  # common|serverA|serverB|serverC|serverD
 
@@ -103,7 +103,7 @@ show_help() {
   INFRA_BACKEND_GATEWAY  网络网关 (默认: 172.20.0.1)
   INFRA_NETWORK_MTU      网络MTU大小 (默认: 1450)
   INFRA_NETWORK_DRIVER   网络驱动 (默认: overlay)
-  INFRA_NETWORK_ENCRYPTED overlay 数据面加密 (默认: true)
+  INFRA_NETWORK_ENCRYPTED overlay 数据面加密 (默认: false；Tailscale underlay 已加密)
   INFRA_USER             数据目录所有者 (默认: $USER)
   INFRA_GROUP            数据目录组 (默认: docker)
 EOF
@@ -141,6 +141,8 @@ create_networks() {
   --label 'infra.network=backend' \\
   --label 'infra.purpose=distributed-service-communication' \\
   infra-network"
+        else
+            log_warn "INFRA_NETWORK_ENCRYPTED=false：Docker overlay 不启用 ESP，加密由 Tailscale underlay 承担"
         fi
     else
         backend_cmd="docker network create \\

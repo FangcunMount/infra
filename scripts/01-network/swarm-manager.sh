@@ -57,16 +57,16 @@ ${BLUE}命令:${NC}
 
 ${BLUE}示例:${NC}
     # 在 serverA 上初始化首个管理节点
-    sudo $0 init-manager <serverA-advertise-ip> [serverA-data-ip]
+    sudo $0 init-manager <serverA-ts-ip> [serverA-ts-ip]
 
     # 获取加入令牌 (在任一 manager 上)
     sudo $0 get-join-token
 
-    # 将 serverB / serverD 加入为 manager
-    sudo $0 join-manager <serverA-ip> <manager-token> <node-advertise-ip> [node-data-ip]
+    # 将 serverB / serverD 加入为 manager（所有 IP 使用 tailscale ip -4）
+    sudo $0 join-manager <serverA-ts-ip> <manager-token> <node-ts-ip> [node-ts-ip]
 
-    # 将 serverC 加入为 worker
-    sudo $0 init-worker <serverA-ip> <worker-token> <serverC-advertise-ip> [serverC-data-ip]
+    # 将 serverC 加入为 worker（所有 IP 使用 tailscale ip -4）
+    sudo $0 init-worker <serverA-ts-ip> <worker-token> <serverC-ts-ip> [serverC-ts-ip]
 
     # 查看集群状态
     sudo $0 status
@@ -81,7 +81,7 @@ ${BLUE}注意事项:${NC}
       * TCP 2377 (集群管理)
       * TCP/UDP 7946 (节点通信)
       * UDP 4789 (overlay 网络)
-      * IP protocol 50 (启用 overlay 加密时需要)
+      * 默认不需要 IP protocol 50；只有 INFRA_NETWORK_ENCRYPTED=true 时才需要 ESP
     - 首个 manager 建议使用 serverA，额外 manager 使用 serverB / serverD
     - Mongo 所在的 serverC 保持 worker 角色，避免叠加控制面职责
 
@@ -114,13 +114,16 @@ check_docker() {
 check_firewall() {
     log "检查 Swarm 所需端口..."
     
+    local encrypted="${INFRA_NETWORK_ENCRYPTED:-false}"
     local required_ports=(
         "2377/tcp"  # 集群管理
         "7946/tcp"  # 节点通信
         "7946/udp"  # 节点通信
         "4789/udp"  # overlay 网络
-        "proto 50"  # overlay 加密 (IPSec ESP)
     )
+    if [[ "${encrypted}" == "true" ]]; then
+        required_ports+=("proto 50")  # overlay 加密 (IPSec ESP)
+    fi
     
     warn "请确保以下端口已开放:"
     for port in "${required_ports[@]}"; do
@@ -133,7 +136,11 @@ check_firewall() {
     echo "  sudo ufw allow 7946/tcp"
     echo "  sudo ufw allow 7946/udp"
     echo "  sudo ufw allow 4789/udp"
-    echo "  # 如启用 overlay 加密，确保云防火墙允许 ESP (IP protocol 50)"
+    if [[ "${encrypted}" == "true" ]]; then
+        echo "  # 如启用 overlay 加密，确保云防火墙允许 ESP (IP protocol 50)"
+    else
+        echo "  # 当前 INFRA_NETWORK_ENCRYPTED=false，推荐通过 Tailscale IP 承载 Swarm 节点互联"
+    fi
     echo
 }
 
@@ -326,7 +333,7 @@ create_network() {
 
     local subnet="${INFRA_BACKEND_SUBNET:-172.20.0.0/24}"
     local mtu="${INFRA_NETWORK_MTU:-1450}"
-    local encrypted="${INFRA_NETWORK_ENCRYPTED:-true}"
+    local encrypted="${INFRA_NETWORK_ENCRYPTED:-false}"
 
     # 检查网络是否已存在
     if docker network ls | grep -q "infra-network"; then
@@ -347,6 +354,8 @@ create_network() {
     )
     if [[ "$encrypted" == "true" ]]; then
         network_cmd+=(--opt encrypted=true)
+    else
+        log_info "Docker overlay 加密关闭；请确保 Swarm advertise/data-path 使用 Tailscale IP"
     fi
     network_cmd+=(infra-network)
 

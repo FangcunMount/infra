@@ -258,7 +258,11 @@ sudo systemctl enable mihomo
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 
-# 四节点 Swarm / overlay 必需端口（仅对四台节点彼此开放）
+# 四节点 Swarm / overlay 端口走 Tailscale underlay，不对公网开放。
+# 如使用 UFW 且 tailscale0 入站被拦截，可只允许 tailscale0：
+sudo ufw allow in on tailscale0
+
+# 如果你明确要在主机防火墙上细化规则，以下端口仅允许 tailscale0/四台 Tailscale IP 互通：
 sudo ufw allow 2377/tcp
 sudo ufw allow 7946/tcp
 sudo ufw allow 7946/udp
@@ -401,7 +405,7 @@ docker swarm init
 docker network rm infra-network
 docker network create --driver overlay --attachable \
   --subnet 172.20.0.0/24 --gateway 172.20.0.1 \
-  --opt encrypted=true \
+  --opt com.docker.network.driver.mtu=1450 \
   infra-network
 ```
 

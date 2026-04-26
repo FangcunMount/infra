@@ -8,7 +8,7 @@ compose/env/prod/serverB.env
 .env
 
 # 备用环境配置
-compose/env/*/
+compose/env/*/*
 !compose/env/*/.env.example
 !compose/env/*/README.md
 

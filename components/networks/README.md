@@ -21,7 +21,8 @@
 - 附着方式：`attachable`
 - 子网：`172.20.0.0/24`
 - MTU：`1450`
-- 数据面加密：`enabled`
+- Docker overlay 数据面加密：`disabled`
+- 底层节点链路加密：`Tailscale`
 
 对应定义见 [docker-compose.yml](./docker-compose.yml)。
 
@@ -46,12 +47,12 @@
 
 ### 2. 固定互联地址
 
-每台机器都要准备一组稳定的节点互联地址：
+每台机器都要先加入同一个 Tailscale tailnet，并准备一组稳定的节点互联地址：
 
 - `advertise-addr`：控制面地址
 - `data-path-addr`：数据面地址
 
-如果没有独立数据网卡，`data-path-addr` 可以先和 `advertise-addr` 相同。
+当前推荐两者都使用本机 `tailscale ip -4`，不要使用公网 IP 或 Mihomo 代理出口 IP。
 
 ### 3. 放通端口
 
@@ -61,16 +62,17 @@
 - `7946/tcp`
 - `7946/udp`
 - `4789/udp`
-- `IP protocol 50 (ESP)`，当 overlay 加密启用时
-
-这些端口只应该向`四台 Swarm 节点彼此`开放，不要直接暴露给公网。
+这些端口走 Tailscale 节点网络；云安全组不需要向公网开放 Swarm 端口。
+Docker overlay 不再启用 `encrypted=true`，因此不依赖 `IP protocol 50 (ESP)`。
 
 ## 初始化顺序
 
 ### 1. 初始化首个 manager（serverA）
 
+先在 serverA 上执行 `make tailscale-ip`，然后：
+
 ```bash
-sudo ./scripts/01-network/swarm-manager.sh init-manager <serverA-advertise-ip> [serverA-data-ip]
+sudo ./scripts/01-network/swarm-manager.sh init-manager <serverA-ts-ip> <serverA-ts-ip>
 ```
 
 ### 2. 获取 join token
@@ -82,13 +84,13 @@ sudo ./scripts/01-network/swarm-manager.sh get-join-token
 ### 3. 将 serverB / serverD 加入为 manager
 
 ```bash
-sudo ./scripts/01-network/swarm-manager.sh join-manager <serverA-ip> <manager-token> <node-advertise-ip> [node-data-ip]
+sudo ./scripts/01-network/swarm-manager.sh join-manager <serverA-ts-ip> <manager-token> <node-ts-ip> <node-ts-ip>
 ```
 
 ### 4. 将 serverC 加入为 worker
 
 ```bash
-sudo ./scripts/01-network/swarm-manager.sh init-worker <serverA-ip> <worker-token> <serverC-advertise-ip> [serverC-data-ip]
+sudo ./scripts/01-network/swarm-manager.sh init-worker <serverA-ts-ip> <worker-token> <serverC-ts-ip> <serverC-ts-ip>
 ```
 
 ### 5. 在任一 manager 上创建 overlay 网络
@@ -102,7 +104,7 @@ sudo ./scripts/01-network/swarm-manager.sh create-network
 ```bash
 INFRA_BACKEND_SUBNET=172.20.0.0/24 \
 INFRA_NETWORK_MTU=1450 \
-INFRA_NETWORK_ENCRYPTED=true \
+INFRA_NETWORK_ENCRYPTED=false \
 bash ./scripts/02-components/init-infrastructure.sh create
 ```
 
