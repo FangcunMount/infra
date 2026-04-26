@@ -441,7 +441,7 @@ docker network create --driver overlay --attachable \
 初始化完成后，可以继续：
 
 1. 📦 [部署基础设施服务](../components/) - 安装 Nginx、MySQL、Redis 等
-2. 🌐 [配置网络环境](../network/management.md) - Docker Swarm、VPN 等
+2. 🌐 [配置 Tailscale + Swarm 网络](../network/swarm-setup.md) - 按主流程建立跨云容器网络
 3. 🔧 使用 `make help` 查看所有可用命令
 
 ---

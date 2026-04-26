@@ -115,10 +115,10 @@ sudo make tailscale-check
 记录结果，例如：
 
 ```text
-serverA 100.x.x.11
-serverB 100.x.x.12
-serverC 100.x.x.13
-serverD 100.x.x.14
+serverA 100.85.122.124
+serverB 100.91.31.24
+serverC 100.70.252.103
+serverD 100.118.164.39
 ```
 
 同步更新 `compose/env/prod/*.env` 里的 `NODE_A_IP`、`NODE_B_IP`、`NODE_C_IP`、`NODE_D_IP`。

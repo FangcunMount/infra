@@ -31,8 +31,8 @@ docs/
 │   └── nsq.md
 └── network/
     ├── architecture.md
-    ├── swarm-setup.md
-    └── management.md
+    ├── swarm-setup.md      # 建网主流程
+    └── management.md       # 日常检查/排障参考
 ```
 
 ## 推荐阅读顺序

@@ -1,228 +1,98 @@
-# 网络管理指南
+# 网络管理参考
 
-## 概述
+本文不是建网操作手册。当前唯一的建网主流程是：
 
-本文只覆盖当前推荐网络模型：
+- [Tailscale + 四节点 Swarm 初始化与排障](./swarm-setup.md)
 
-- `Tailscale` 负责跨云节点加密互联
-- `Docker Swarm` 负责跨主机基础网络层
-- `infra-network` 是四节点共用的 attachable overlay
-- 业务部署仍然可以继续使用 `docker compose up -d`
+如果要从零初始化 serverA/serverB/serverC/serverD，请按 `swarm-setup.md` 执行，不要从本文复制初始化命令。
 
-## 节点角色
-
-| 节点 | 角色 | 说明 |
-|------|------|------|
-| `serverA` | manager | 首个 manager |
-| `serverB` | manager | 第二个 manager |
-| `serverD` | manager | 第三个 manager |
-| `serverC` | worker | Mongo 所在节点 |
-
-## 网络类型
-
-| 网络名称 | 类型 | 子网 | 用途 |
-|---------|------|------|------|
-| `infra-network` | overlay | `172.20.0.0/24` | 基础设施共享网络 |
-| `<app>-network` | bridge/overlay | `172.21+.0.0/24` | 业务应用专用网络 |
-
-## 核心原则
-
-### 单向依赖
+## 当前网络模型
 
 ```text
-业务应用 ──→ infra-network ──→ 基础设施服务
+Tailscale underlay
+        ↓
+Docker Swarm advertise/data-path 使用 Tailscale IP
+        ↓
+infra-network attachable overlay
 ```
 
-- 基础设施组件只接 `infra-network`
-- 业务应用接自己的业务网络，同时接 `infra-network`
-- 跨主机依赖优先通过容器名，不直接依赖宿主机 IP
+关键约束：
 
-### 固定互联地址
+- `serverA/serverB/serverD` 是 Swarm manager。
+- `serverC` 是 Swarm worker，专门承载 MongoDB。
+- `INFRA_NETWORK_ENCRYPTED=false`，Docker overlay 不启用 ESP。
+- 节点链路加密由 Tailscale 承担。
+- Mihomo 只作为应用代理，不应劫持 `100.64.0.0/10`。
 
-每个节点都要先加入 Tailscale，并显式使用：
+## 日常检查
 
-- `advertise-addr`
-- `data-path-addr`
-
-当前推荐两者都使用本机 `tailscale ip -4` 输出的地址。
-
-### 防火墙白名单
-
-以下端口走 Tailscale 节点网络，不对公网开放：
-
-- `2377/tcp`
-- `7946/tcp`
-- `7946/udp`
-- `4789/udp`
-- 不需要 `ESP (protocol 50)`，因为 Docker overlay encryption 关闭，底层由 Tailscale 加密
-
-## 常用命令
-
-### 初始化首个 manager
+### Tailscale
 
 ```bash
-make swarm-init SWARM_ADVERTISE_ADDR=<serverA-ts-ip> SWARM_DATA_PATH_ADDR=<serverA-ts-ip>
+tailscale status
+tailscale ip -4
+tailscale ping <peer-ts-ip>
+sudo make tailscale-check
 ```
 
-### 加入额外 manager
-
-```bash
-make swarm-join-manager \
-  SWARM_MANAGER_IP=<serverA-ts-ip> \
-  SWARM_TOKEN=<manager-token> \
-  SWARM_ADVERTISE_ADDR=<node-ts-ip> \
-  SWARM_DATA_PATH_ADDR=<node-ts-ip>
-```
-
-### 加入 worker
-
-```bash
-make swarm-join-worker \
-  SWARM_MANAGER_IP=<serverA-ts-ip> \
-  SWARM_TOKEN=<worker-token> \
-  SWARM_ADVERTISE_ADDR=<serverC-ts-ip> \
-  SWARM_DATA_PATH_ADDR=<serverC-ts-ip>
-```
-
-### 查看状态
-
-```bash
-make swarm-status
-docker node ls
-docker network inspect infra-network
-```
-
-### 创建基础网络
-
-```bash
-INFRA_BACKEND_SUBNET=172.20.0.0/24 \
-INFRA_NETWORK_MTU=1450 \
-INFRA_NETWORK_ENCRYPTED=false \
-make init
-```
-
-## 网络创建参数
-
-当前默认参数由 [scripts/02-components/init-infrastructure.sh](../../scripts/02-components/init-infrastructure.sh) 控制：
-
-- `INFRA_BACKEND_SUBNET=172.20.0.0/24`
-- `INFRA_BACKEND_GATEWAY=172.20.0.1`
-- `INFRA_NETWORK_MTU=1450`
-- `INFRA_NETWORK_DRIVER=overlay`
-- `INFRA_NETWORK_ENCRYPTED=false`
-
-## 应用接入方式
-
-### 单服务接入
-
-```yaml
-services:
-  your-app:
-    image: your-app:latest
-    networks:
-      - app-network
-      - infra-network
-
-networks:
-  app-network:
-    driver: bridge
-  infra-network:
-    external: true
-```
-
-### 跨主机依赖示例
-
-```yaml
-environment:
-  MONGO_HOST: mongo
-  MONGO_PORT: 27017
-  NSQ_NSQD_HOST: nsqd
-  NSQ_LOOKUPD_HOST: nsqlookupd
-```
-
-只要目标容器也接入 `infra-network`，这些名字就能跨主机解析。
-
-## 网络验证
-
-### 1. 节点层
+### Swarm
 
 ```bash
 docker node ls
 docker info | grep -A10 Swarm
 ```
 
-### 2. overlay 层
+### infra-network
 
 ```bash
 docker network ls | grep infra-network
 docker network inspect infra-network | grep -A4 Peers
 ```
 
-### 3. 容器层
+### 容器名解析
 
 ```bash
 docker run --rm --network infra-network alpine ping -c 2 mongo
 docker run --rm --network infra-network alpine ping -c 2 nsqd
 ```
 
-### 4. 监控抓取层
-
-```bash
-docker exec prometheus wget -qO- http://qs-apiserver:8080/metrics | head
-docker exec prometheus wget -qO- http://qs-worker:9092/metrics | head
-```
-
-## 常见问题
+## 常见故障定位
 
 ### 节点 join 失败
 
-先检查：
+优先检查：
 
-1. `advertise-addr` 是否正确
-2. `2377/tcp` 是否只对白名单节点放开
-3. 是否误把公网漂移 IP 当成 swarm 地址
+- `tailscale status` 是否能看到所有节点。
+- `tailscale ping <peer-ts-ip>` 是否成功。
+- `advertise-addr` / `data-path-addr` 是否使用了 `tailscale ip -4`。
+- 当前节点是否残留 `Swarm: pending`，如有先执行 `docker swarm leave --force`。
 
-### `infra-network` 没有下发到某个节点
+### infra-network 没有下发到某个节点
 
-先看：
+先看 peer：
 
 ```bash
 docker network inspect infra-network | grep -A4 Peers
 ```
 
-必要时创建全局占位服务：
+必要时创建全局占位服务触发网络下发：
 
 ```bash
 docker service create --mode global --name net-probe --network infra-network alpine sleep 1d
 docker service rm net-probe
 ```
 
-### 跨主机名字解析失败
+### 跨主机容器名解析失败
 
-通常只会是这几种原因：
+通常只会是这几类原因：
 
-1. 容器没接入 `infra-network`
-2. 目标节点 overlay 没下发成功
-3. 节点间 `7946/tcp+udp` / `4789/udp` 不通
-
-### 跨云性能抖动
-
-优先检查：
-
-1. MTU 是否需要进一步下调
-2. `data-path-addr` 是否显式配置
-3. 是否误启用了 overlay 加密
-4. Mihomo TUN 是否劫持了 `100.64.0.0/10`
-
-## 安全建议
-
-- 不要把 Swarm 的 `2377/7946/4789` 暴露给公网任意来源
-- manager 节点保持奇数
-- Mongo 所在节点保持 worker
-- 先验证 overlay 稳定，再迁移核心数据链路
+- 容器没接入 `infra-network`。
+- 目标节点 overlay peer 没下发成功。
+- Swarm 使用了公网 IP 或错误网卡 IP，而不是 Tailscale IP。
+- Mihomo TUN 劫持了 `100.64.0.0/10`。
 
 ## 相关文档
 
 - [网络架构](./architecture.md)
-- [Swarm 初始化与排障](./swarm-setup.md)
+- [Tailscale + 四节点 Swarm 初始化与排障](./swarm-setup.md)
 - [共享网络定义](../../components/networks/README.md)
