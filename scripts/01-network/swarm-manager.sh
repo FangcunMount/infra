@@ -355,7 +355,7 @@ create_network() {
     if [[ "$encrypted" == "true" ]]; then
         network_cmd+=(--opt encrypted=true)
     else
-        log_info "Docker overlay 加密关闭；请确保 Swarm advertise/data-path 使用 Tailscale IP"
+        info "Docker overlay 加密关闭；请确保 Swarm advertise/data-path 使用 Tailscale IP"
     fi
     network_cmd+=(infra-network)
 
