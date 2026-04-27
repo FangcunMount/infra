@@ -8,8 +8,8 @@ services:
       - backend
     restart: unless-stopped
     volumes:
-      - ./provisioning:/etc/grafana/provisioning:ro
-      - ./dashboards:/var/lib/grafana/dashboards:ro
+      - ${GRAFANA_PROVISIONING_PATH:-/data/infra/grafana/provisioning}:/etc/grafana/provisioning:ro
+      - ${GRAFANA_DASHBOARDS_PATH:-/data/infra/grafana/dashboards}:/var/lib/grafana/dashboards:ro
       - grafana_data:/var/lib/grafana
     environment:
       - GF_SERVER_DOMAIN=${GRAFANA_DOMAIN:-grafana.fangcunmount.cn}
@@ -20,6 +20,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_AUTH_ANONYMOUS_ENABLED=false
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/cache-overview.json
+      - PROMETHEUS_URL=${PROMETHEUS_URL:-http://prometheus:9090}
     mem_limit: ${GRAFANA_MEMORY_LIMIT:-256M}
     cpus: ${GRAFANA_CPUS:-0.25}
     healthcheck:
@@ -35,7 +36,7 @@ services:
     labels:
       - "infra.service=grafana"
       - "infra.category=observability"
-      - "infra.host=${INFRA_HOST_LABEL:-serverA}"
+      - "infra.host=${INFRA_HOST_LABEL:-serverD}"
 
 networks:
   backend:

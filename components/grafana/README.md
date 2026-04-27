@@ -1,6 +1,6 @@
 # Grafana 组件
 
-本组件通过 provisioning 自动加载 QS 缓存治理、事件系统和高并发治理看板，并依赖同网络中的 `prometheus` 数据源。
+本组件部署在 `serverD`，通过 provisioning 自动加载 QS 缓存治理、事件系统和高并发治理看板，并依赖 `PROMETHEUS_URL` 指向的 Prometheus 数据源。
 
 ## 默认域名
 
@@ -14,6 +14,33 @@
 - `GRAFANA_ADMIN_PASSWORD`
 - `GRAFANA_MEMORY_LIMIT`
 - `GRAFANA_CPUS`
+- `GRAFANA_PROVISIONING_PATH`，默认 `/data/infra/grafana/provisioning`
+- `GRAFANA_DASHBOARDS_PATH`，默认 `/data/infra/grafana/dashboards`
+- `PROMETHEUS_URL`，默认 `http://prometheus:9090`
+
+## CI/CD
+
+GitHub Actions 入口：
+
+- `.github/workflows/grafana-serverd.yml`
+
+必需 Secrets：
+
+- `SVRD_HOST`
+- `SVRD_USERNAME`
+- `SVRD_SSH_KEY`
+- `GRAFANA_ADMIN_PASSWORD`
+
+可选 Secrets / Variables：
+
+- `SVRD_SSH_PORT`
+- `SVRD_SUDO_PASSWORD`
+- `GRAFANA_DOMAIN`
+- `GRAFANA_ROOT_URL`
+- `GRAFANA_ADMIN_USER`
+- `GRAFANA_MEMORY_LIMIT`
+- `GRAFANA_CPUS`
+- `PROMETHEUS_URL`
 
 ## Nginx 接入
 

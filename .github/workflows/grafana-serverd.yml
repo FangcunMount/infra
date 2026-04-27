@@ -1,0 +1,158 @@
+name: Deploy Grafana To ServerD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "components/grafana/**"
+      - "deploy/serverD/docker-compose.yml"
+      - ".github/workflows/grafana-serverd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: infra-grafana-serverd
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Grafana
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate secrets
+        shell: bash
+        env:
+          SVRD_HOST: ${{ secrets.SVRD_HOST }}
+          SVRD_USERNAME: ${{ secrets.SVRD_USERNAME }}
+          SVRD_SSH_KEY: ${{ secrets.SVRD_SSH_KEY }}
+          GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+        run: |
+          set -Eeuo pipefail
+          missing=0
+          for name in SVRD_HOST SVRD_USERNAME SVRD_SSH_KEY GRAFANA_ADMIN_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "Missing required secret: ${name}" >&2
+              missing=1
+            fi
+          done
+          if [ "${missing}" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Package Grafana assets
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          tar -czf infra-grafana.tar.gz components/grafana
+          ls -lh infra-grafana.tar.gz
+
+      - name: Upload Grafana package
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SVRD_HOST }}
+          username: ${{ secrets.SVRD_USERNAME }}
+          key: ${{ secrets.SVRD_SSH_KEY }}
+          port: ${{ secrets.SVRD_SSH_PORT || 22 }}
+          source: infra-grafana.tar.gz
+          target: /tmp
+
+      - name: Deploy on ServerD
+        uses: appleboy/ssh-action@v1.0.0
+        env:
+          SUDO_PASSWORD: ${{ secrets.SVRD_SUDO_PASSWORD }}
+          GRAFANA_DOMAIN: ${{ secrets.GRAFANA_DOMAIN || vars.GRAFANA_DOMAIN || 'grafana.fangcunmount.cn' }}
+          GRAFANA_ROOT_URL: ${{ secrets.GRAFANA_ROOT_URL || vars.GRAFANA_ROOT_URL || 'https://grafana.fangcunmount.cn' }}
+          GRAFANA_ADMIN_USER: ${{ secrets.GRAFANA_ADMIN_USER || vars.GRAFANA_ADMIN_USER || 'admin' }}
+          GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+          GRAFANA_MEMORY_LIMIT: ${{ vars.GRAFANA_MEMORY_LIMIT || '256M' }}
+          GRAFANA_CPUS: ${{ vars.GRAFANA_CPUS || '0.25' }}
+          PROMETHEUS_URL: ${{ secrets.PROMETHEUS_URL || vars.PROMETHEUS_URL || 'http://prometheus:9090' }}
+        with:
+          host: ${{ secrets.SVRD_HOST }}
+          username: ${{ secrets.SVRD_USERNAME }}
+          key: ${{ secrets.SVRD_SSH_KEY }}
+          port: ${{ secrets.SVRD_SSH_PORT || 22 }}
+          envs: >
+            SUDO_PASSWORD,
+            GRAFANA_DOMAIN,GRAFANA_ROOT_URL,GRAFANA_ADMIN_USER,GRAFANA_ADMIN_PASSWORD,
+            GRAFANA_MEMORY_LIMIT,GRAFANA_CPUS,PROMETHEUS_URL
+          script_stop: true
+          script: |
+            set -Eeuo pipefail
+
+            if sudo -n true 2>/dev/null; then
+              SUDO="sudo"
+            else
+              if [ -z "${SUDO_PASSWORD:-}" ]; then
+                echo "sudo needs password. Provide SVRD_SUDO_PASSWORD or configure NOPASSWD." >&2
+                exit 1
+              fi
+              sudo_pw() { sudo -S "$@" <<<"$SUDO_PASSWORD"; }
+              export -f sudo_pw
+              SUDO="sudo_pw"
+              $SUDO -v || true
+            fi
+
+            PACKAGE="/tmp/infra-grafana.tar.gz"
+            DEPLOY_TMP="/tmp/infra-grafana-$$"
+            INSTALL_ROOT="/opt/infra-grafana"
+            DATA_ROOT="/data/infra/grafana"
+            ENV_FILE="${INSTALL_ROOT}/.env"
+
+            if [ ! -f "${PACKAGE}" ]; then
+              echo "Missing package: ${PACKAGE}" >&2
+              exit 1
+            fi
+
+            mkdir -p "${DEPLOY_TMP}"
+            tar -xzf "${PACKAGE}" -C "${DEPLOY_TMP}"
+
+            $SUDO mkdir -p "${INSTALL_ROOT}" "${DATA_ROOT}/provisioning" "${DATA_ROOT}/dashboards"
+            $SUDO rsync -a "${DEPLOY_TMP}/components/grafana/docker-compose.yml" "${INSTALL_ROOT}/docker-compose.yml"
+            $SUDO rsync -a --delete "${DEPLOY_TMP}/components/grafana/provisioning/" "${DATA_ROOT}/provisioning/"
+            $SUDO rsync -a --delete "${DEPLOY_TMP}/components/grafana/dashboards/" "${DATA_ROOT}/dashboards/"
+
+            LOCAL_ENV="/tmp/infra-grafana-env-$$"
+            {
+              printf 'INFRA_HOST_LABEL=serverD\n'
+              printf 'GRAFANA_DOMAIN=%s\n' "${GRAFANA_DOMAIN:-grafana.fangcunmount.cn}"
+              printf 'GRAFANA_ROOT_URL=%s\n' "${GRAFANA_ROOT_URL:-https://grafana.fangcunmount.cn}"
+              printf 'GRAFANA_ADMIN_USER=%s\n' "${GRAFANA_ADMIN_USER:-admin}"
+              printf 'GRAFANA_ADMIN_PASSWORD=%s\n' "${GRAFANA_ADMIN_PASSWORD:-change_me_grafana_admin_password}"
+              printf 'GRAFANA_MEMORY_LIMIT=%s\n' "${GRAFANA_MEMORY_LIMIT:-256M}"
+              printf 'GRAFANA_CPUS=%s\n' "${GRAFANA_CPUS:-0.25}"
+              printf 'GRAFANA_PROVISIONING_PATH=%s\n' "${DATA_ROOT}/provisioning"
+              printf 'GRAFANA_DASHBOARDS_PATH=%s\n' "${DATA_ROOT}/dashboards"
+              printf 'PROMETHEUS_URL=%s\n' "${PROMETHEUS_URL:-http://prometheus:9090}"
+            } > "${LOCAL_ENV}"
+            $SUDO rsync -a "${LOCAL_ENV}" "${ENV_FILE}"
+            rm -f "${LOCAL_ENV}"
+            $SUDO chmod 0640 "${ENV_FILE}"
+
+            if ! $SUDO docker network ls --format '{{.Name}}' | grep -w infra-network >/dev/null; then
+              echo "infra-network not found. Join ServerD to Swarm and create infra-network first." >&2
+              exit 1
+            fi
+
+            cd "${INSTALL_ROOT}"
+            $SUDO docker compose --env-file "${ENV_FILE}" -f docker-compose.yml pull grafana
+            $SUDO docker compose --env-file "${ENV_FILE}" -f docker-compose.yml up -d grafana
+
+            echo "Waiting for Grafana health..."
+            for i in $(seq 1 30); do
+              if $SUDO docker exec grafana wget -qO- http://127.0.0.1:3000/api/health | grep -q ok; then
+                echo "Grafana healthy after ${i} attempts."
+                $SUDO docker ps --filter name=grafana --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+                rm -rf "${DEPLOY_TMP}" "${PACKAGE}"
+                exit 0
+              fi
+              sleep 3
+            done
+
+            echo "Grafana health check failed." >&2
+            $SUDO docker logs --tail 200 grafana || true
+            exit 1

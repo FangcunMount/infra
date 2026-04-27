@@ -687,12 +687,15 @@ prometheus-targets: ## 查看 Prometheus 抓取目标状态
 # ==============================================================================
 .PHONY: grafana-start grafana-stop grafana-restart grafana-logs grafana-status grafana-nginx-deploy
 
-grafana-start: ## 启动 Grafana（当前拓扑默认未启用）
-	$(call error_msg,当前生产拓扑未在 infra 仓库维护 Grafana，请参考 docs/server/serverB-monitoring-deploy-guide.md 自行落位)
-	@exit 1
+grafana-start: ## 在 ServerD 启动 Grafana
+	$(call section_title,启动 Grafana (serverD))
+	$(call ensure_infra_network_visible)
+	@$(MAKE) init-serverD
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d grafana
+	$(call success_msg,Grafana 已启动)
 
 grafana-stop: ## 停止 Grafana
-	@docker stop grafana 2>/dev/null || true
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env stop grafana 2>/dev/null || docker stop grafana 2>/dev/null || true
 
 grafana-restart: grafana-stop grafana-start ## 重启 Grafana
 
@@ -963,7 +966,7 @@ serverC-destroy: ## 销毁 ServerC 所有容器、卷和数据 (危险!)
 
 serverC-rebuild: serverC-destroy serverC-up ## 完全重建 ServerC (销毁后重建)
 
-serverD-up: ## 启动 ServerD 服务栈 (NSQ)
+serverD-up: ## 启动 ServerD 服务栈 (NSQ + Grafana)
 	$(call section_title,启动 ServerD (2C4G))
 	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverD
@@ -980,16 +983,16 @@ serverD-status: ## 查看 ServerD 状态
 	@docker ps --filter "label=infra.host=serverD" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 serverD-destroy: ## 销毁 ServerD 所有容器、卷和数据 (危险!)
-	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerD 的 NSQ 数据！$(RESET)"
-	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin$(RESET)"
-	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nsq_data$(RESET)"
-	@echo "$(RED)   - 删除数据目录: /data/infra/nsq/*, /data/logs/nsq/*$(RESET)"
+	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerD 的 NSQ / Grafana 数据！$(RESET)"
+	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin, grafana$(RESET)"
+	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nsq_data, infra_grafana_data$(RESET)"
+	@echo "$(RED)   - 删除数据目录: /data/infra/nsq/*, /data/infra/grafana/*, /data/logs/nsq/*$(RESET)"
 	@echo ""
 	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
 	$(call section_title,销毁 ServerD 数据)
-	@docker rm -f nsqlookupd nsqd nsqadmin 2>/dev/null || true
-	@docker volume rm infra_nsq_data 2>/dev/null || true
-	@rm -rf /data/infra/nsq/* /data/logs/nsq/* 2>/dev/null || true
+	@docker rm -f nsqlookupd nsqd nsqadmin grafana 2>/dev/null || true
+	@docker volume rm infra_nsq_data infra_grafana_data 2>/dev/null || true
+	@rm -rf /data/infra/nsq/* /data/infra/grafana/* /data/logs/nsq/* 2>/dev/null || true
 	$(call success_msg,ServerD 数据已销毁)
 
 serverD-rebuild: serverD-destroy serverD-up ## 完全重建 ServerD (销毁后重建)
@@ -1019,11 +1022,11 @@ server-info: ## 显示当前服务器架构
 	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
 	@echo ""
 	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
-	@echo "$(CYAN)│         ServerD (2C4G) - worker + operating + NSQ      │$(RESET)"
+	@echo "$(CYAN)│   ServerD (2C4G) - worker + operating + apps + NSQ     │$(RESET)"
 	@echo "$(CYAN)├─────────────────────────────────────────────────────────┤$(RESET)"
-	@echo "$(CYAN)│  $(GREEN)nsqlookupd$(RESET) $(GREEN)nsqd$(RESET) $(GREEN)nsqadmin$(RESET) (infra 管理)                $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(GREEN)nsqlookupd$(RESET) $(GREEN)nsqd$(RESET) $(GREEN)nsqadmin$(RESET) $(GREEN)grafana$(RESET) (infra 管理)        $(CYAN)│$(RESET)"
 	@echo "$(CYAN)│  $(YELLOW)4160/4161$(RESET) $(YELLOW)4150/4151$(RESET) $(YELLOW)4171$(RESET)                           $(CYAN)│$(RESET)"
-	@echo "$(CYAN)│  + $(GREEN)qs-worker$(RESET) / $(GREEN)operating$(RESET) 由业务仓库部署               $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  + $(GREEN)qs-worker$(RESET) / $(GREEN)operating$(RESET) / $(GREEN)miniblog$(RESET) / $(GREEN)qlume$(RESET) 由业务仓库部署 │$(RESET)"
 	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
 	@echo ""
 	@echo "$(MAGENTA)云托管:$(RESET) MySQL (云服务商 A RDS) + Redis (云服务商 A)"
