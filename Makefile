@@ -423,7 +423,7 @@ init-serverC: ## 在 ServerC 上初始化卷，跳过网络创建 (worker, Mongo
 	@INIT_TARGET=serverC SKIP_NETWORK=true $(INFRA_SCRIPT) create
 	$(call success_msg,ServerC 初始化完成)
 
-init-serverD: ## 在 ServerD 上初始化卷，跳过网络创建 (manager, NSQ 节点)
+init-serverD: ## 在 ServerD 上初始化卷，跳过网络创建 (manager, NSQ + Monitoring 节点)
 	$(call info_msg,初始化 ServerD 卷，跳过网络创建...)
 	@INIT_TARGET=serverD SKIP_NETWORK=true $(INFRA_SCRIPT) create
 	$(call success_msg,ServerD 初始化完成)
@@ -664,12 +664,15 @@ mysql-shell: ## 进入 MySQL Shell
 # ==============================================================================
 .PHONY: prometheus-start prometheus-stop prometheus-restart prometheus-logs prometheus-status prometheus-targets
 
-prometheus-start: ## 启动 Prometheus（当前拓扑默认未启用）
-	$(call error_msg,当前生产拓扑未在 infra 仓库维护 Prometheus，请参考 docs/server/serverB-monitoring-deploy-guide.md 自行落位)
-	@exit 1
+prometheus-start: ## 在 ServerD 启动 Prometheus
+	$(call section_title,启动 Prometheus (serverD))
+	$(call ensure_infra_network_visible)
+	@$(MAKE) init-serverD
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d prometheus
+	$(call success_msg,Prometheus 已启动)
 
 prometheus-stop: ## 停止 Prometheus
-	@docker stop prometheus 2>/dev/null || true
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env stop prometheus 2>/dev/null || docker stop prometheus 2>/dev/null || true
 
 prometheus-restart: prometheus-stop prometheus-start ## 重启 Prometheus
 
@@ -691,7 +694,7 @@ grafana-start: ## 在 ServerD 启动 Grafana
 	$(call section_title,启动 Grafana (serverD))
 	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverD
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d grafana
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d prometheus grafana
 	$(call success_msg,Grafana 已启动)
 
 grafana-stop: ## 停止 Grafana
@@ -883,6 +886,7 @@ disk-usage: ## Docker 磁盘使用
 .PHONY: serverB-up serverB-down serverB-logs serverB-status serverB-destroy serverB-rebuild
 .PHONY: serverC-up serverC-down serverC-logs serverC-status serverC-destroy serverC-rebuild
 .PHONY: serverD-up serverD-down serverD-logs serverD-status serverD-destroy serverD-rebuild
+.PHONY: serverD-monitoring-up serverD-monitoring-down serverD-monitoring-logs serverD-monitoring-status serverD-monitoring-restart
 .PHONY: server-info validate-cloud-env
 
 serverA-up: ## 启动 ServerA 服务栈 (Nginx)
@@ -966,12 +970,30 @@ serverC-destroy: ## 销毁 ServerC 所有容器、卷和数据 (危险!)
 
 serverC-rebuild: serverC-destroy serverC-up ## 完全重建 ServerC (销毁后重建)
 
-serverD-up: ## 启动 ServerD 服务栈 (NSQ + Grafana)
+serverD-up: ## 启动 ServerD 服务栈 (NSQ + Prometheus + Grafana)
 	$(call section_title,启动 ServerD (2C4G))
 	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverD
 	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d
 	$(call success_msg,ServerD 服务已启动)
+
+serverD-monitoring-up: ## 在 ServerD 一键启动 Prometheus + Grafana
+	$(call section_title,启动 ServerD Monitoring)
+	$(call ensure_infra_network_visible)
+	@$(MAKE) init-serverD
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d prometheus grafana
+	$(call success_msg,ServerD Prometheus + Grafana 已启动)
+
+serverD-monitoring-down: ## 停止 ServerD Prometheus + Grafana
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env stop grafana prometheus
+
+serverD-monitoring-logs: ## 查看 ServerD Prometheus + Grafana 日志
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env logs -f --tail=$(LOG_LINES) prometheus grafana
+
+serverD-monitoring-status: ## 查看 ServerD Prometheus + Grafana 状态
+	@docker ps --filter "label=infra.host=serverD" --filter "label=infra.category=observability" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+serverD-monitoring-restart: serverD-monitoring-down serverD-monitoring-up ## 重启 ServerD Prometheus + Grafana
 
 serverD-down: ## 停止 ServerD 服务栈
 	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env down
@@ -983,16 +1005,16 @@ serverD-status: ## 查看 ServerD 状态
 	@docker ps --filter "label=infra.host=serverD" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 serverD-destroy: ## 销毁 ServerD 所有容器、卷和数据 (危险!)
-	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerD 的 NSQ / Grafana 数据！$(RESET)"
-	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin, grafana$(RESET)"
-	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nsq_data, infra_grafana_data$(RESET)"
-	@echo "$(RED)   - 删除数据目录: /data/infra/nsq/*, /data/infra/grafana/*, /data/logs/nsq/*$(RESET)"
+	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerD 的 NSQ / Prometheus / Grafana 数据！$(RESET)"
+	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin, prometheus, grafana$(RESET)"
+	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nsq_data, infra_prometheus_data, infra_grafana_data$(RESET)"
+	@echo "$(RED)   - 删除数据目录: /data/infra/nsq/*, /data/infra/prometheus/*, /data/infra/grafana/*, /data/logs/nsq/*$(RESET)"
 	@echo ""
 	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
 	$(call section_title,销毁 ServerD 数据)
-	@docker rm -f nsqlookupd nsqd nsqadmin grafana 2>/dev/null || true
-	@docker volume rm infra_nsq_data infra_grafana_data 2>/dev/null || true
-	@rm -rf /data/infra/nsq/* /data/infra/grafana/* /data/logs/nsq/* 2>/dev/null || true
+	@docker rm -f nsqlookupd nsqd nsqadmin prometheus grafana 2>/dev/null || true
+	@docker volume rm infra_nsq_data infra_prometheus_data infra_grafana_data 2>/dev/null || true
+	@rm -rf /data/infra/nsq/* /data/infra/prometheus/* /data/infra/grafana/* /data/logs/nsq/* 2>/dev/null || true
 	$(call success_msg,ServerD 数据已销毁)
 
 serverD-rebuild: serverD-destroy serverD-up ## 完全重建 ServerD (销毁后重建)
@@ -1022,9 +1044,9 @@ server-info: ## 显示当前服务器架构
 	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
 	@echo ""
 	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
-	@echo "$(CYAN)│   ServerD (2C4G) - worker + operating + apps + NSQ     │$(RESET)"
+	@echo "$(CYAN)│ ServerD (2C4G) - worker + operating + NSQ + monitoring │$(RESET)"
 	@echo "$(CYAN)├─────────────────────────────────────────────────────────┤$(RESET)"
-	@echo "$(CYAN)│  $(GREEN)nsqlookupd$(RESET) $(GREEN)nsqd$(RESET) $(GREEN)nsqadmin$(RESET) $(GREEN)grafana$(RESET) (infra 管理)        $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(GREEN)nsqlookupd$(RESET) $(GREEN)nsqd$(RESET) $(GREEN)nsqadmin$(RESET) $(GREEN)prometheus$(RESET) $(GREEN)grafana$(RESET) (infra 管理) │$(RESET)"
 	@echo "$(CYAN)│  $(YELLOW)4160/4161$(RESET) $(YELLOW)4150/4151$(RESET) $(YELLOW)4171$(RESET)                           $(CYAN)│$(RESET)"
 	@echo "$(CYAN)│  + $(GREEN)qs-worker$(RESET) / $(GREEN)operating$(RESET) / $(GREEN)miniblog$(RESET) / $(GREEN)qlume$(RESET) 由业务仓库部署 │$(RESET)"
 	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
@@ -1253,6 +1275,8 @@ service-ports: ## 显示所有服务端口
 	@echo "$(CYAN)MongoDB:$(RESET)     mongo:27017            [infra-network]"
 	@echo "$(CYAN)NSQ:$(RESET)         4150, 4151, 4160, 4161 [serverD]"
 	@echo "$(CYAN)NSQAdmin:$(RESET)    127.0.0.1:4171         [serverD]"
+	@echo "$(CYAN)Prometheus:$(RESET)  prometheus:9090        [serverD / infra-network]"
+	@echo "$(CYAN)Grafana:$(RESET)     grafana:3000           [serverD / infra-network]"
 	@echo "$(CYAN)MySQL:$(RESET)       云托管地址             [云服务商 A]"
 	@echo "$(CYAN)Redis:$(RESET)       云托管地址             [云服务商 A]"
 	@echo ""

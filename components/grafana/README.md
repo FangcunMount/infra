@@ -1,6 +1,6 @@
 # Grafana 组件
 
-本组件部署在 `serverD`，通过 provisioning 自动加载 QS 缓存治理、事件系统和高并发治理看板，并依赖 `PROMETHEUS_URL` 指向的 Prometheus 数据源。
+本组件部署在 `serverD`，由 `make serverD-monitoring-up` 或 `make serverD-up` 启动，通过 provisioning 自动加载 QS 缓存治理、事件系统和高并发治理看板，并依赖 `PROMETHEUS_URL` 指向的 Prometheus 数据源。
 
 ## 默认域名
 

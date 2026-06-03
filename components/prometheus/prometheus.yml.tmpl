@@ -11,8 +11,8 @@ scrape_configs:
       - targets:
           - 127.0.0.1:9090
 
-  # serverB 上的 Prometheus 只能通过本机 docker.sock 发现本机容器。
-  # qs-apiserver / qs-worker 默认部署在 serverA，需要通过 overlay 网络静态抓取。
+  # serverD 上的 Prometheus 只能通过本机 docker.sock 发现本机容器。
+  # 跨节点业务服务通过 infra-network overlay 静态抓取。
   - job_name: qs-apiserver
     metrics_path: /metrics
     static_configs:

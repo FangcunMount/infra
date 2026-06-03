@@ -1,5 +1,7 @@
 # Prometheus 组件
 
+本组件部署在 `serverD`，由 `make serverD-monitoring-up` 或 `make serverD-up` 启动。
+
 本组件采用“两段式”抓取：
 
 - 对接入 `infra-network` 的关键业务容器走 overlay 网络静态抓取
@@ -35,6 +37,8 @@
 - `PROMETHEUS_QS_WORKER_TARGET`
 - `PROMETHEUS_MEMORY_LIMIT`
 - `PROMETHEUS_CPUS`
+- `PROMETHEUS_CONFIG_TEMPLATE_PATH`，默认 `/data/infra/prometheus/prometheus.yml.tmpl`
+- `PROMETHEUS_RULES_PATH`，默认 `/data/infra/prometheus/rules`
 
 ## 事件系统规则
 

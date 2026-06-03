@@ -1,6 +1,6 @@
 # ServerB 部署 Prometheus + Grafana 指南（历史/可选）
 
-> 注意：这份文档不属于当前目标拓扑的默认方案。当前目标架构中，`serverB` 承载的是 `qs-collection-server + IAM`，NSQ 已迁移到 `serverD`，不默认部署 `Prometheus` 与 `Grafana`。保留本文件仅作为历史参考或临时监控方案。
+> 注意：这份文档不属于当前目标拓扑的默认方案。当前目标架构中，`serverB` 承载的是 `qs-collection-server + IAM`，NSQ 已迁移到 `serverD`，`Prometheus + Grafana` 默认也部署在 `serverD`。保留本文件仅作为历史参考或临时监控方案。
 
 ## 目的
 

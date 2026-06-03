@@ -57,4 +57,5 @@ docs/
 | 管理 MongoDB | [MongoDB 快速入门](./components/mongodb-quickstart.md) |
 | 管理 NSQ | [NSQ 配置指南](./components/nsq.md) |
 | 查看各组件职责 | [组件总览](./components/README.md) |
-| 参考旧监控部署 | [ServerB 监控部署指南](./server/serverB-monitoring-deploy-guide.md) |
+| 在 serverD 部署 Prometheus + Grafana | [组件总览](./components/README.md) |
+| 参考旧 serverB 监控部署 | [ServerB 监控部署指南](./server/serverB-monitoring-deploy-guide.md) |

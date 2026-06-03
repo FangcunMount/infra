@@ -192,7 +192,7 @@ create_volumes() {
     # - serverA: nginx
     # - serverB: 当前无 infra 仓库管理的本地卷
     # - serverC: mongo
-    # - serverD: nsq + grafana provisioning
+    # - serverD: nsq + prometheus config/rules + grafana provisioning
     # - common/其他: 创建当前生产拓扑所需全部卷
     local volumes=()
     case "${INIT_TARGET}" in
@@ -223,6 +223,7 @@ create_volumes() {
         sudo mkdir -p "${INFRA_DATA_ROOT}"/mongo/{conf,config,data} 2>/dev/null || true
         sudo mkdir -p "${INFRA_DATA_ROOT}"/{nginx,redis} 2>/dev/null || true
         sudo mkdir -p "${INFRA_DATA_ROOT}"/nsq/data 2>/dev/null || true
+        sudo mkdir -p "${INFRA_DATA_ROOT}"/prometheus/rules 2>/dev/null || true
         sudo mkdir -p "${INFRA_DATA_ROOT}"/grafana/{provisioning,dashboards} 2>/dev/null || true
         sudo mkdir -p "${INFRA_DATA_ROOT}"/ssl/grpc/{ca,clients,server} 2>/dev/null || true
         sudo mkdir -p "${INFRA_DATA_ROOT}"/ssl/web 2>/dev/null || true
@@ -239,6 +240,12 @@ create_volumes() {
                 sudo cp -f "${PROJECT_ROOT}/components/nsq/${nsq_conf}" "${INFRA_DATA_ROOT}/nsq/${nsq_conf}"
             fi
         done
+        if [[ -f "${PROJECT_ROOT}/components/prometheus/prometheus.yml.tmpl" ]]; then
+            sudo cp -f "${PROJECT_ROOT}/components/prometheus/prometheus.yml.tmpl" "${INFRA_DATA_ROOT}/prometheus/prometheus.yml.tmpl"
+        fi
+        if [[ -d "${PROJECT_ROOT}/components/prometheus/rules" ]]; then
+            sudo rsync -a --delete "${PROJECT_ROOT}/components/prometheus/rules/" "${INFRA_DATA_ROOT}/prometheus/rules/"
+        fi
         if [[ -d "${PROJECT_ROOT}/components/grafana/provisioning" ]]; then
             sudo rsync -a --delete "${PROJECT_ROOT}/components/grafana/provisioning/" "${INFRA_DATA_ROOT}/grafana/provisioning/"
         fi
@@ -253,6 +260,7 @@ create_volumes() {
             sudo chown -R "${INFRA_USER}:${INFRA_GROUP}" \
                 "${INFRA_DATA_ROOT}/mongo/conf" \
                 "${INFRA_DATA_ROOT}/mongo/data" \
+                "${INFRA_DATA_ROOT}/prometheus" \
                 "${INFRA_DATA_ROOT}/grafana" \
                 "${INFRA_DATA_ROOT}/nginx" \
                 "${INFRA_DATA_ROOT}/redis" \
@@ -260,6 +268,7 @@ create_volumes() {
             sudo chown -R "${INFRA_USER}:${INFRA_USER}" \
                 "${INFRA_DATA_ROOT}/mongo/conf" \
                 "${INFRA_DATA_ROOT}/mongo/data" \
+                "${INFRA_DATA_ROOT}/prometheus" \
                 "${INFRA_DATA_ROOT}/grafana" \
                 "${INFRA_DATA_ROOT}/nginx" \
                 "${INFRA_DATA_ROOT}/redis" \
@@ -269,7 +278,7 @@ create_volumes() {
             log_info "目录所有权: ${INFRA_USER}:${INFRA_GROUP}"
         else
             log_warn "用户 ${INFRA_USER} 不存在，使用 root 权限"
-            sudo chown -R root:root /data/apps /data/ssl "${INFRA_DATA_ROOT}/mongo/conf" "${INFRA_DATA_ROOT}/mongo/data" "${INFRA_DATA_ROOT}/grafana" "${INFRA_DATA_ROOT}/nginx" "${INFRA_DATA_ROOT}/redis" "${INFRA_DATA_ROOT}/ssl" "${INFRA_LOG_ROOT}"
+            sudo chown -R root:root /data/apps /data/ssl "${INFRA_DATA_ROOT}/mongo/conf" "${INFRA_DATA_ROOT}/mongo/data" "${INFRA_DATA_ROOT}/prometheus" "${INFRA_DATA_ROOT}/grafana" "${INFRA_DATA_ROOT}/nginx" "${INFRA_DATA_ROOT}/redis" "${INFRA_DATA_ROOT}/ssl" "${INFRA_LOG_ROOT}"
         fi
 
         # 与现有 serverA 保持一致：image、ops、nsq 由 root 管理；NSQ 容器以 root 写入数据。
@@ -283,6 +292,8 @@ create_volumes() {
         sudo find /data/apps /data/ssl "${INFRA_DATA_ROOT}" "${INFRA_LOG_ROOT}" -type d -exec chmod 0755 {} +
         sudo chmod 0644 "${INFRA_DATA_ROOT}/mongo/conf/mongod.conf" "${INFRA_DATA_ROOT}/mongo/conf/init-mongo.js" 2>/dev/null || true
         sudo chmod 0644 "${INFRA_DATA_ROOT}"/nsq/*.conf 2>/dev/null || true
+        sudo chmod 0644 "${INFRA_DATA_ROOT}/prometheus/prometheus.yml.tmpl" 2>/dev/null || true
+        sudo find "${INFRA_DATA_ROOT}/prometheus/rules" -type f -exec chmod 0644 {} + 2>/dev/null || true
         sudo find "${INFRA_DATA_ROOT}/grafana" -type f -exec chmod 0644 {} + 2>/dev/null || true
         if [[ -f "${INFRA_DATA_ROOT}/mongo/config/replset.key" ]]; then
             sudo chown 999:999 "${INFRA_DATA_ROOT}/mongo/config/replset.key"

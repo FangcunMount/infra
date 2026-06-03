@@ -9,8 +9,8 @@ services:
       - backend
     restart: unless-stopped
     volumes:
-      - ./prometheus.yml.tmpl:/etc/prometheus/prometheus.yml.tmpl:ro
-      - ./rules:/etc/prometheus/rules:ro
+      - ${PROMETHEUS_CONFIG_TEMPLATE_PATH:-/data/infra/prometheus/prometheus.yml.tmpl}:/etc/prometheus/prometheus.yml.tmpl:ro
+      - ${PROMETHEUS_RULES_PATH:-/data/infra/prometheus/rules}:/etc/prometheus/rules:ro
       - prometheus_data:/prometheus
       - /var/run/docker.sock:/var/run/docker.sock:ro
     entrypoint: ["/bin/sh", "-c"]
@@ -42,7 +42,7 @@ services:
     labels:
       - "infra.service=prometheus"
       - "infra.category=observability"
-      - "infra.host=${INFRA_HOST_LABEL:-serverA}"
+      - "infra.host=${INFRA_HOST_LABEL:-serverD}"
 
 networks:
   backend:
