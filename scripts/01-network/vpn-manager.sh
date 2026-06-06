@@ -310,11 +310,18 @@ format_bytes() {
     }'
 }
 
+is_proxy_group_type() {
+    case "$1" in
+        Selector|URLTest|Fallback|LoadBalance|Relay) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
 resolve_active_proxy() {
     local name="${1:-GLOBAL}"
     local info type now
 
-    for _ in 1 2 3 4 5; do
+    for _ in 1 2 3 8; do
         info=$(curl -s --connect-timeout 3 "${MIHOMO_API}/proxies/$(url_encode "$name")" 2>/dev/null || echo "")
         if [ -z "$info" ]; then
             echo "$name"
@@ -324,19 +331,16 @@ resolve_active_proxy() {
         type=$(echo "$info" | jq -r '.type // empty' 2>/dev/null)
         now=$(echo "$info" | jq -r '.now // empty' 2>/dev/null)
 
-        case "$type" in
-            Selector|URLTest|Fallback|LoadBalance)
-                if [ -z "$now" ] || [ "$now" = "null" ]; then
-                    echo "$name"
-                    return 0
-                fi
-                name="$now"
-                ;;
-            *)
+        if is_proxy_group_type "$type"; then
+            if [ -z "$now" ] || [ "$now" = "null" ]; then
                 echo "$name"
                 return 0
-                ;;
-        esac
+            fi
+            name="$now"
+        else
+            echo "$name"
+            return 0
+        fi
     done
 
     echo "$name"
@@ -354,18 +358,15 @@ get_proxy_chain() {
         type=$(echo "$info" | jq -r '.type // empty' 2>/dev/null)
         now=$(echo "$info" | jq -r '.now // empty' 2>/dev/null)
 
-        case "$type" in
-            Selector|URLTest|Fallback|LoadBalance)
-                if [ -z "$now" ] || [ "$now" = "null" ]; then
-                    break
-                fi
-                chain="${chain} → ${now}"
-                name="$now"
-                ;;
-            *)
+        if is_proxy_group_type "$type"; then
+            if [ -z "$now" ] || [ "$now" = "null" ]; then
                 break
-                ;;
-        esac
+            fi
+            chain="${chain} → ${now}"
+            name="$now"
+        else
+            break
+        fi
     done
 
     echo "$chain"
@@ -412,6 +413,31 @@ run_curl_probe() {
     curl "${curl_args[@]}" "$url" 2>/dev/null || echo "failed"
 }
 
+get_proxy_exit_ip() {
+    local url ip
+
+    for url in "https://api.ipify.org?format=json" "http://icanhazip.com" "http://httpbin.org/ip"; do
+        ip=$(curl -s --connect-timeout 8 --max-time 15 --proxy "$MIHOMO_PROXY" "$url" 2>/dev/null || echo "")
+        if [ -z "$ip" ]; then
+            continue
+        fi
+        if [[ "$url" == *"ipify"* ]]; then
+            ip=$(echo "$ip" | jq -r '.ip // empty' 2>/dev/null)
+        elif [[ "$url" == *"httpbin"* ]]; then
+            ip=$(echo "$ip" | jq -r '.origin // empty' 2>/dev/null)
+        else
+            ip=$(echo "$ip" | tr -d '\n\r ')
+        fi
+        if [ -n "$ip" ]; then
+            echo "$ip"
+            return 0
+        fi
+    done
+
+    echo ""
+    return 1
+}
+
 print_probe_result() {
     local label="$1"
     local mode="$2"
@@ -430,14 +456,53 @@ print_probe_result() {
         return 1
     fi
 
-    local speed_human size_human
+    local speed_human size_human timed_out=0
     speed_human=$(format_speed "$speed_download")
     size_human=$(format_bytes "$size_download")
+
+    if awk -v t="$time_total" -v limit="$SPEED_TIMEOUT" 'BEGIN { exit !(t >= limit - 0.5) }'; then
+        timed_out=1
+    fi
 
     echo "  ${label} (${mode})"
     echo "    下载: ${size_human} @ ${speed_human}, 总耗时 ${time_total}s"
     echo "    时序: DNS ${time_namelookup}s / TCP ${time_connect}s / TLS ${time_appconnect}s / 首字节 ${time_starttransfer}s"
+    if [ "$timed_out" -eq 1 ]; then
+        log_warn "    ⚠️  已达 ${SPEED_TIMEOUT}s 超时上限，实际带宽可能更高"
+    fi
     return 0
+}
+
+analyze_speed_ratio() {
+    local proxy_metrics="$1"
+    local direct_metrics="$2"
+
+    if [ "$proxy_metrics" = "failed" ] || [ "$direct_metrics" = "failed" ]; then
+        return 0
+    fi
+
+    local proxy_speed direct_speed
+    proxy_speed=$(awk '{print $8}' <<< "$proxy_metrics")
+    direct_speed=$(awk '{print $8}' <<< "$direct_metrics")
+
+    echo
+    echo "── 结果分析 ──"
+    awk -v p="$proxy_speed" -v d="$direct_speed" 'BEGIN {
+        if (d <= 0 || p <= 0) exit
+        ratio = p / d
+        if (ratio >= 0.85 && ratio <= 1.15) {
+            print "  代理与直连速度接近（比值 " sprintf("%.2f", ratio) "），瓶颈大概率不在 Mihomo，而是："
+            print "    · 服务器到 GitHub 的国际出口带宽本身较慢"
+            print "    · GitHub/codeload 对当前 IP 限速"
+            print "    · 测速采样触达超时上限（见上方警告）"
+        } else if (ratio < 0.85) {
+            print "  代理明显慢于直连（比值 " sprintf("%.2f", ratio) "），建议："
+            print "    · make vpn-switch 换一个节点"
+            print "    · 检查订阅节点是否过载"
+        } else {
+            print "  代理快于直连（比值 " sprintf("%.2f", ratio) "），翻墙链路工作正常"
+        }
+    }'
 }
 
 speed_test() {
@@ -460,31 +525,43 @@ speed_test() {
         return 1
     fi
 
-    local proxy_chain active_proxy proxy_ip proxy_delay
+    local proxy_chain active_proxy auto_proxy proxy_ip proxy_delay
     proxy_chain=$(get_proxy_chain "GLOBAL")
     active_proxy=$(resolve_active_proxy "GLOBAL")
+    auto_proxy=$(resolve_active_proxy "自动选择")
 
     echo
     log_info "当前代理链路: ${proxy_chain}"
+    if [ "$auto_proxy" != "$active_proxy" ] && [ "$auto_proxy" != "自动选择" ]; then
+        log_info "自动选择当前节点: ${auto_proxy}"
+    fi
     if [ "$active_proxy" = "DIRECT" ]; then
         log_warn "⚠️  当前为直连模式，测速结果不代表 VPN 节点性能"
         log_info "建议先执行: make vpn-enable"
+    elif is_proxy_group_type "$(curl -s --connect-timeout 3 "${MIHOMO_API}/proxies/$(url_encode "$active_proxy")" 2>/dev/null | jq -r '.type // empty' 2>/dev/null)"; then
+        log_warn "⚠️  当前解析到的是代理组 (${active_proxy})，非具体节点，延迟测试可能失败"
+        log_info "可执行 make vpn-proxies 查看各组实际选择"
     fi
 
-    proxy_ip=$(curl -s --connect-timeout 10 --proxy "$MIHOMO_PROXY" http://httpbin.org/ip 2>/dev/null | jq -r '.origin // empty' 2>/dev/null || echo "")
+    proxy_ip=$(get_proxy_exit_ip || true)
     if [ -n "$proxy_ip" ]; then
         log_info "代理出口 IP: ${proxy_ip}"
     else
-        log_warn "⚠️  无法获取代理出口 IP"
+        log_warn "⚠️  无法获取代理出口 IP（不影响 GitHub 测速，仅作参考）"
     fi
 
     echo
     echo "── 延迟 ──"
     proxy_delay=$(test_mihomo_delay "$active_proxy" || true)
+    if [ "$proxy_delay" = "failed" ] && [ "$auto_proxy" != "$active_proxy" ]; then
+        proxy_delay=$(test_mihomo_delay "$auto_proxy" || true)
+        active_proxy="$auto_proxy"
+    fi
     if [ "$proxy_delay" != "failed" ]; then
         log_success "✅ 节点延迟 (${active_proxy}): ${proxy_delay} ms"
     else
         log_warn "⚠️  节点延迟测试失败 (${active_proxy})"
+        log_info "可对代理组批量测延迟: curl -s \"${MIHOMO_API}/group/自动选择/delay?timeout=5000&url=${SPEED_DELAY_URL}\" | jq"
     fi
 
     local github_probe
@@ -509,9 +586,10 @@ speed_test() {
         local direct_download
         direct_download=$(run_curl_probe "direct" "$SPEED_GITHUB_URL" 1 || true)
         print_probe_result "GitHub 下载" "直连" "$direct_download" || log_warn "⚠️  直连下载失败（国内环境常见）"
+        analyze_speed_ratio "$proxy_download" "$direct_download"
     else
         echo
-        log_info "提示: 加 VPN_SPEED_COMPARE_DIRECT=1 可同时测直连基线"
+        log_info "提示: 加 VPN_SPEED_COMPARE_DIRECT=1 可同时测直连基线并自动分析瓶颈"
     fi
 
     echo
