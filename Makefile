@@ -283,7 +283,7 @@ server-tune: ## 优化宿主机系统参数 (MongoDB等需要)
 # ==============================================================================
 # 1. VPN/网络配置
 # ==============================================================================
-.PHONY: vpn-setup vpn-status vpn-test vpn-enable vpn-disable vpn-switch vpn-proxies vpn-docker-test vpn-uninstall vpn-diagnose
+.PHONY: vpn-setup vpn-status vpn-test vpn-speed vpn-enable vpn-disable vpn-switch vpn-proxies vpn-docker-test vpn-uninstall vpn-diagnose
 .PHONY: tailscale-install tailscale-up tailscale-status tailscale-ip tailscale-check tailscale-swarm-env
 .PHONY: swarm-init swarm-join-manager swarm-join-worker swarm-leave swarm-status swarm-network-probe net-list net-create net-delete net-inspect port-check
 
@@ -295,6 +295,9 @@ vpn-status: ## 查看 VPN 状态
 
 vpn-test: ## 测试 VPN 连接
 	@bash $(NETWORK_SCRIPTS)/vpn-manager.sh test
+
+vpn-speed: ## 测试 Mihomo 出站延迟与下载速度 (GitHub 等)
+	@VPN_SPEED_URL="$(VPN_SPEED_URL)" VPN_SPEED_BYTES="$(VPN_SPEED_BYTES)" VPN_SPEED_COMPARE_DIRECT="$(VPN_SPEED_COMPARE_DIRECT)" VPN_SPEED_TIMEOUT="$(VPN_SPEED_TIMEOUT)" bash $(NETWORK_SCRIPTS)/vpn-manager.sh speed
 
 vpn-enable: ## 启用 VPN 模式
 	@bash $(NETWORK_SCRIPTS)/vpn-manager.sh enable
@@ -1241,6 +1244,7 @@ help-vpn: ## VPN 快速参考
 	@echo ""
 	@echo "$(BLUE)测试诊断:$(RESET)"
 	@echo "  $(CYAN)make vpn-test$(RESET)         测试连接"
+	@echo "  $(CYAN)make vpn-speed$(RESET)        出站延迟与下载测速"
 	@echo "  $(CYAN)make vpn-docker-test$(RESET)  测试容器 VPN"
 	@echo "  $(CYAN)make vpn-diagnose$(RESET)     网络诊断"
 	@echo ""

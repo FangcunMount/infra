@@ -47,12 +47,20 @@ show_help() {
     echo "  proxies     - 显示所有代理组状态"
     echo "  switch      - 切换漏网之鱼代理选择"
     echo "  docker-test - 测试 Docker 容器 VPN 连接"
+    echo "  speed       - 测试 Mihomo 出站延迟与下载速度"
     echo "  help        - 显示此帮助信息"
     echo
     echo "示例:"
     echo "  $0 enable   # 启用 VPN"
     echo "  $0 test     # 测试连接"
+    echo "  $0 speed    # 测速 (GitHub 下载等)"
     echo "  $0 status   # 查看状态"
+    echo
+    echo "测速环境变量:"
+    echo "  VPN_SPEED_URL              自定义下载 URL"
+    echo "  VPN_SPEED_BYTES=5242880    采样下载字节数 (默认 5MB)"
+    echo "  VPN_SPEED_COMPARE_DIRECT=1 同时测直连基线"
+    echo "  VPN_SPEED_TIMEOUT=60       curl 超时秒数"
 }
 
 # 获取当前漏网之鱼代理选择
@@ -274,6 +282,241 @@ interactive_switch() {
     fi
 }
 
+# Mihomo 出站测速
+MIHOMO_PROXY="http://127.0.0.1:7890"
+SPEED_DELAY_URL="http://www.gstatic.com/generate_204"
+SPEED_GITHUB_URL="${VPN_SPEED_URL:-https://codeload.github.com/git/git/tar.gz/v2.45.0}"
+SPEED_SAMPLE_BYTES="${VPN_SPEED_BYTES:-5242880}"
+SPEED_TIMEOUT="${VPN_SPEED_TIMEOUT:-60}"
+
+url_encode() {
+    printf '%s' "$1" | jq -sRr @uri
+}
+
+format_speed() {
+    awk -v b="${1:-0}" 'BEGIN {
+        if (b >= 1048576) printf "%.2f MB/s", b / 1048576;
+        else if (b >= 1024) printf "%.2f KB/s", b / 1024;
+        else printf "%.0f B/s", b;
+    }'
+}
+
+format_bytes() {
+    awk -v b="${1:-0}" 'BEGIN {
+        if (b >= 1073741824) printf "%.2f GB", b / 1073741824;
+        else if (b >= 1048576) printf "%.2f MB", b / 1048576;
+        else if (b >= 1024) printf "%.2f KB", b / 1024;
+        else printf "%.0f B", b;
+    }'
+}
+
+resolve_active_proxy() {
+    local name="${1:-GLOBAL}"
+    local info type now
+
+    for _ in 1 2 3 4 5; do
+        info=$(curl -s --connect-timeout 3 "${MIHOMO_API}/proxies/$(url_encode "$name")" 2>/dev/null || echo "")
+        if [ -z "$info" ]; then
+            echo "$name"
+            return 0
+        fi
+
+        type=$(echo "$info" | jq -r '.type // empty' 2>/dev/null)
+        now=$(echo "$info" | jq -r '.now // empty' 2>/dev/null)
+
+        case "$type" in
+            Selector|URLTest|Fallback|LoadBalance)
+                if [ -z "$now" ] || [ "$now" = "null" ]; then
+                    echo "$name"
+                    return 0
+                fi
+                name="$now"
+                ;;
+            *)
+                echo "$name"
+                return 0
+                ;;
+        esac
+    done
+
+    echo "$name"
+}
+
+get_proxy_chain() {
+    local name="${1:-GLOBAL}"
+    local chain="$name"
+    local info type now
+
+    for _ in 1 2 3 4 5; do
+        info=$(curl -s --connect-timeout 3 "${MIHOMO_API}/proxies/$(url_encode "$name")" 2>/dev/null || echo "")
+        [ -z "$info" ] && break
+
+        type=$(echo "$info" | jq -r '.type // empty' 2>/dev/null)
+        now=$(echo "$info" | jq -r '.now // empty' 2>/dev/null)
+
+        case "$type" in
+            Selector|URLTest|Fallback|LoadBalance)
+                if [ -z "$now" ] || [ "$now" = "null" ]; then
+                    break
+                fi
+                chain="${chain} → ${now}"
+                name="$now"
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    echo "$chain"
+}
+
+test_mihomo_delay() {
+    local proxy_name="$1"
+    local encoded response delay
+
+    encoded=$(url_encode "$proxy_name")
+    response=$(curl -s --connect-timeout 3 \
+        "${MIHOMO_API}/proxies/${encoded}/delay?timeout=5000&url=${SPEED_DELAY_URL}" 2>/dev/null || echo "")
+
+    delay=$(echo "$response" | jq -r '.delay // empty' 2>/dev/null)
+    if [ -n "$delay" ] && [ "$delay" != "null" ] && [ "$delay" -ge 0 ] 2>/dev/null; then
+        echo "${delay}"
+        return 0
+    fi
+
+    echo "failed"
+    return 1
+}
+
+run_curl_probe() {
+    local use_proxy="$1"
+    local url="$2"
+    local with_range="${3:-1}"
+    local curl_args=(
+        -s -o /dev/null
+        --connect-timeout 10
+        --max-time "$SPEED_TIMEOUT"
+        -w "%{http_code} %{time_namelookup} %{time_connect} %{time_appconnect} %{time_starttransfer} %{time_total} %{size_download} %{speed_download}"
+    )
+
+    if [ "$with_range" = "1" ]; then
+        local range_end=$((SPEED_SAMPLE_BYTES - 1))
+        curl_args+=(-r "0-${range_end}")
+    fi
+
+    if [ "$use_proxy" = "proxy" ]; then
+        curl_args+=(--proxy "$MIHOMO_PROXY")
+    fi
+
+    curl "${curl_args[@]}" "$url" 2>/dev/null || echo "failed"
+}
+
+print_probe_result() {
+    local label="$1"
+    local mode="$2"
+    local metrics="$3"
+
+    if [ "$metrics" = "failed" ] || [ -z "$metrics" ]; then
+        log_warn "⚠️  ${label} (${mode}): 失败"
+        return 1
+    fi
+
+    local http_code time_namelookup time_connect time_appconnect time_starttransfer time_total size_download speed_download
+    read -r http_code time_namelookup time_connect time_appconnect time_starttransfer time_total size_download speed_download <<< "$metrics"
+
+    if [ "$http_code" != "200" ] && [ "$http_code" != "206" ]; then
+        log_warn "⚠️  ${label} (${mode}): HTTP ${http_code}"
+        return 1
+    fi
+
+    local speed_human size_human
+    speed_human=$(format_speed "$speed_download")
+    size_human=$(format_bytes "$size_download")
+
+    echo "  ${label} (${mode})"
+    echo "    下载: ${size_human} @ ${speed_human}, 总耗时 ${time_total}s"
+    echo "    时序: DNS ${time_namelookup}s / TCP ${time_connect}s / TLS ${time_appconnect}s / 首字节 ${time_starttransfer}s"
+    return 0
+}
+
+speed_test() {
+    echo "========================================"
+    echo "📊 Mihomo 出站测速"
+    echo "========================================"
+
+    if ! systemctl is-active --quiet mihomo 2>/dev/null && ! pgrep -f "mihomo" >/dev/null 2>&1; then
+        log_error "❌ Mihomo 服务未运行，请先执行: make vpn-setup 或 systemctl start mihomo"
+        return 1
+    fi
+
+    if ! nc -z 127.0.0.1 7890 >/dev/null 2>&1; then
+        log_error "❌ HTTP 代理端口 7890 不可用"
+        return 1
+    fi
+
+    if ! curl -s --connect-timeout 3 "${MIHOMO_API}/version" >/dev/null 2>&1; then
+        log_error "❌ Mihomo API (9090) 不可用"
+        return 1
+    fi
+
+    local proxy_chain active_proxy proxy_ip proxy_delay
+    proxy_chain=$(get_proxy_chain "GLOBAL")
+    active_proxy=$(resolve_active_proxy "GLOBAL")
+
+    echo
+    log_info "当前代理链路: ${proxy_chain}"
+    if [ "$active_proxy" = "DIRECT" ]; then
+        log_warn "⚠️  当前为直连模式，测速结果不代表 VPN 节点性能"
+        log_info "建议先执行: make vpn-enable"
+    fi
+
+    proxy_ip=$(curl -s --connect-timeout 10 --proxy "$MIHOMO_PROXY" http://httpbin.org/ip 2>/dev/null | jq -r '.origin // empty' 2>/dev/null || echo "")
+    if [ -n "$proxy_ip" ]; then
+        log_info "代理出口 IP: ${proxy_ip}"
+    else
+        log_warn "⚠️  无法获取代理出口 IP"
+    fi
+
+    echo
+    echo "── 延迟 ──"
+    proxy_delay=$(test_mihomo_delay "$active_proxy" || true)
+    if [ "$proxy_delay" != "failed" ]; then
+        log_success "✅ 节点延迟 (${active_proxy}): ${proxy_delay} ms"
+    else
+        log_warn "⚠️  节点延迟测试失败 (${active_proxy})"
+    fi
+
+    local github_probe
+    github_probe=$(run_curl_probe "proxy" "https://api.github.com/zen" 0 || true)
+    print_probe_result "GitHub API 连通" "代理" "$github_probe" || true
+
+    echo
+    echo "── 下载测速 (采样 $(format_bytes "$SPEED_SAMPLE_BYTES")) ──"
+    log_info "测速 URL: ${SPEED_GITHUB_URL}"
+
+    local proxy_download
+    proxy_download=$(run_curl_probe "proxy" "$SPEED_GITHUB_URL" 1 || true)
+    if print_probe_result "GitHub 下载" "代理" "$proxy_download"; then
+        log_success "✅ 代理下载测速完成"
+    else
+        log_warn "⚠️  代理下载测速失败，可尝试: VPN_SPEED_URL=<其他URL> make vpn-speed"
+    fi
+
+    if [ "${VPN_SPEED_COMPARE_DIRECT:-}" = "1" ]; then
+        echo
+        echo "── 直连对比 ──"
+        local direct_download
+        direct_download=$(run_curl_probe "direct" "$SPEED_GITHUB_URL" 1 || true)
+        print_probe_result "GitHub 下载" "直连" "$direct_download" || log_warn "⚠️  直连下载失败（国内环境常见）"
+    else
+        echo
+        log_info "提示: 加 VPN_SPEED_COMPARE_DIRECT=1 可同时测直连基线"
+    fi
+
+    echo
+}
+
 # Docker VPN 测试
 docker_vpn_test() {
     # 检查 Docker 是否安装（仅此命令需要）
@@ -335,6 +578,9 @@ main() {
             ;;
         "docker-test")
             docker_vpn_test
+            ;;
+        "speed")
+            speed_test
             ;;
         "help"|"--help"|"-h")
             show_help
