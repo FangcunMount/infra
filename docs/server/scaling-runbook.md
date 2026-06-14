@@ -10,10 +10,10 @@
 
 ## 当前拓扑
 
-- `serverA 2C2G`：`nginx + qs-apiserver`
-- `serverB 2C2G`：`qs-collection-server + IAM`
+- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server`
+- `serverB 2C2G`：`IAM`
 - `serverC 4C4G`：`mongodb`
-- `serverD 2C4G`：`qs-worker + operating + nsq`
+- `serverD 4C4G`：`qs-worker + operating + nsq + prometheus + grafana`
 - 云托管：`MySQL`、`Redis`
 
 ## 配置来源
@@ -47,8 +47,7 @@
 
 说明：
 
-- `serverA` 的 `qs-apiserver` 资源和应用并发在 `qs-server` 仓库调整。
-- `serverB` 的 `qs-collection-server` 在 `qs-server` 仓库调整。
+- `serverA` 的 `qs-apiserver`、`qs-collection-server` 资源和应用并发在 `qs-server` 仓库调整。
 - `serverD` 的 `qs-worker` 在 `qs-server` 仓库调整。
 
 ### IAM / operating 仓库
@@ -59,6 +58,7 @@
 
 说明：
 
+- `serverA` 上的 `qs-apiserver`、`qs-collection-server`
 - `serverB` 上的 `IAM`
 - `serverD` 上的 `operating`
 
@@ -95,7 +95,7 @@
 
 例如：
 
-- `serverA 2C2G -> 4C4G`
+- `serverA 4C8G -> 8C16G`
 - `serverC 4C4G -> 4C8G`
 
 先改：
@@ -148,13 +148,13 @@
 
 - `make serverA-status`
 - `curl -sf http://127.0.0.1/healthz`
-- 检查 `qs-apiserver` 是否能访问云 MySQL / Redis
+- 检查 `qs-apiserver`、`qs-collection-server` 是否能访问云 MySQL / Redis
+- 检查 `qs-collection-server` 是否能解析 `serverB/IAM`
 
 ### serverB
 
 - `make serverB-status`
-- `make nsq-stats`
-- 检查 `qs-collection-server` 与 `IAM` 是否能解析 `nsqlookupd` / `nsqd`
+- 检查 `IAM` 是否能解析 `nsqlookupd` / `nsqd`
 
 ### serverC
 
@@ -167,13 +167,13 @@
 - 检查 `qs-worker` 是否能访问 `mongo:27017`
 - 检查 `operating` 是否仍能访问云 MySQL / Redis
 
-## 当前口径（2026-04）
+## 当前口径（2026-06）
 
-- `serverA`：`2C2G`
+- `serverA`：`4C8G`
 - `serverB`：`2C2G`
 - `serverC`：`4C4G`
-- `serverD`：`2C4G`
-- `infra` 仓库直接管理：`nginx`、`NSQ`、`MongoDB`
+- `serverD`：`4C4G`
+- `infra` 仓库直接管理：`nginx`、`NSQ`、`MongoDB`、`Prometheus`、`Grafana`
 
 ## 变更原则
 

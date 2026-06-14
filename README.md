@@ -4,10 +4,10 @@
 
 当前目标拓扑：
 
-- `serverA 2C2G`：`nginx + qs-apiserver`
-- `serverB 2C2G`：`qs-collection-server + IAM`
+- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server`
+- `serverB 2C2G`：`IAM`
 - `serverC 4C4G`：`mongodb`
-- `serverD 2C4G`：`qs-worker + operating + nsq + prometheus + grafana`
+- `serverD 4C4G`：`qs-worker + operating + nsq + prometheus + grafana`
 - 云托管：`MySQL`、`Redis`
 
 ## 快速开始
@@ -55,9 +55,9 @@ make serverD-up
 
 ```mermaid
 flowchart LR
-    internet["Internet / Clients"] --> serverA["serverA (2C2G)\nnginx + qs-apiserver"]
-    serverA --> serverB["serverB (2C2G)\nqs-collection-server + IAM"]
-    serverA --> serverD["serverD (2C4G)\nqs-worker + operating + NSQ + monitoring"]
+    internet["Internet / Clients"] --> serverA["serverA (4C8G)\nnginx + qs-apiserver + qs-collection-server"]
+    serverA --> serverB["serverB (2C2G)\nIAM"]
+    serverA --> serverD["serverD (4C4G)\nqs-worker + operating + NSQ + monitoring"]
     serverB --> serverD
     serverB --> serverC["serverC (4C4G)\nMongoDB"]
     serverD --> serverC
@@ -72,7 +72,7 @@ flowchart LR
 说明：
 
 - `infra` 仓库直接维护的 compose 栈包括 `serverA/nginx`、`serverC/mongodb`、`serverD/nsq + prometheus + grafana`。
-- `serverB` 上的 `qs-collection-server`、`IAM` 与 `serverD` 上的 `qs-worker`、`operating` 仍由各自业务仓库部署。
+- `serverB` 上的 `IAM` 与 `serverD` 上的 `qs-worker`、`operating` 仍由各自业务仓库部署。
 - 四台机器先加入 Tailscale，Swarm advertise/data-path 使用 Tailscale IP；业务容器共同加入 `infra-network`，跨机容器统一使用 overlay 网络服务发现。
 
 ## 项目结构

@@ -196,10 +196,10 @@ Linux 初始化流程结束
 ================================================================================
 
 建议继续按目标机器角色执行:
-  serverA: Swarm manager, nginx + qs-apiserver
-  serverB: Swarm manager, qs-collection-server + IAM
+  serverA: Swarm manager, nginx + qs-apiserver + qs-collection-server
+  serverB: Swarm manager, IAM
   serverC: Swarm worker,  mongodb
-  serverD: Swarm manager, qs-worker + operating + nsq
+  serverD: Swarm manager, qs-worker + operating + nsq + prometheus + grafana
 
 下一步常用命令:
   make swarm-init                         # serverA 初始化 Swarm

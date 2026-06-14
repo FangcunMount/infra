@@ -14,7 +14,7 @@
 | `MySQL` | 云服务商 A | 云托管 |
 | `Redis` | 云服务商 A | 云托管 |
 | `qs-apiserver` | `serverA` | 业务仓库管理 |
-| `qs-collection-server` | `serverB` | 业务仓库管理 |
+| `qs-collection-server` | `serverA` | 业务仓库管理 |
 | `IAM` | `serverB` | 业务仓库管理 |
 | `qs-worker` | `serverD` | 业务仓库管理 |
 | `operating` | `serverD` | 业务仓库管理 |

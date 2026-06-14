@@ -4,10 +4,10 @@
 
 当前生产目标拓扑为：
 
-- `serverA 2C2G`：`nginx + qs-apiserver`
-- `serverB 2C2G`：`qs-collection-server + IAM`
+- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server`
+- `serverB 2C2G`：`IAM`
 - `serverC 4C4G`：`mongodb`
-- `serverD 2C4G`：`qs-worker + operating + nsq`
+- `serverD 4C4G`：`qs-worker + operating + nsq + prometheus + grafana`
 - 云托管：`MySQL`、`Redis`
 
 其中：
@@ -21,15 +21,15 @@
 ```mermaid
 flowchart TB
     subgraph A["云服务商 A"]
-        serverA["serverA (2C2G)\nnginx + qs-apiserver"]
-        serverB["serverB (2C2G)\nqs-collection-server + IAM"]
+        serverA["serverA (4C8G)\nnginx + qs-apiserver + qs-collection-server"]
+        serverB["serverB (2C2G)\nIAM"]
         mysql["Cloud MySQL"]
         redis["Cloud Redis"]
     end
 
     subgraph B["云服务商 B"]
         serverC["serverC (4C4G)\nMongoDB"]
-        serverD["serverD (2C4G)\nqs-worker + operating + NSQ"]
+        serverD["serverD (4C4G)\nqs-worker + operating + NSQ + monitoring"]
     end
 
     internet["Internet / Clients"] --> serverA
@@ -47,12 +47,12 @@ flowchart TB
 
 ## 机器职责
 
-### serverA (2C2G)
+### serverA (4C8G)
 
 职责：
 
 - 对外统一入口：`nginx`
-- 同机业务：`qs-apiserver`
+- 同机业务：`qs-apiserver`、`qs-collection-server`
 
 本仓库管理范围：
 
@@ -61,14 +61,14 @@ flowchart TB
 
 说明：
 
-- `qs-apiserver` 仍由 `qs-server` 仓库部署。
+- `qs-apiserver`、`qs-collection-server` 仍由 `qs-server` 仓库部署。
 - `serverA` 不再承载本地 Redis、MongoDB 或监控栈。
 
 ### serverB (2C2G)
 
 职责：
 
-- 同机业务：`qs-collection-server`、`IAM`
+- 同机业务：`IAM`
 
 本仓库管理范围：
 
@@ -77,8 +77,9 @@ flowchart TB
 
 说明：
 
-- `qs-collection-server` 与 `IAM` 由对应业务仓库部署。
-- `NSQ` 已迁移到 `serverD`。
+- `IAM` 由对应业务仓库部署。
+- `qs-collection-server` 已迁移到 `serverA`。
+- `NSQ` 在 `serverD`。
 
 ### serverC (4C4G)
 
@@ -96,13 +97,14 @@ flowchart TB
 - `MongoDB` 对宿主机只绑定 `127.0.0.1:27017`。
 - 跨机器业务容器通过 overlay 网络访问 `mongo:27017`。
 
-### serverD (2C4G)
+### serverD (4C4G)
 
 职责：
 
 - `qs-worker`
 - `operating`
 - 消息中间件：`nsqlookupd`、`nsqd`、`nsqadmin`
+- 可观测性：`prometheus`、`grafana`
 
 本仓库管理范围：
 
@@ -111,7 +113,7 @@ flowchart TB
 
 说明：
 
-- `NSQ` 由 `infra` 仓库维护。
+- `NSQ`、`Prometheus`、`Grafana` 由 `infra` 仓库维护。
 - `qs-worker`、`operating` 由对应业务仓库部署。
 - 业务仓库应复用本仓库约定的依赖地址：
   - `mongo`
@@ -150,6 +152,7 @@ flowchart TB
 - `nginx`
 - `NSQ`
 - `MongoDB`
+- `Prometheus` / `Grafana`
 - 四台机器的环境变量基线
 
 不负责：

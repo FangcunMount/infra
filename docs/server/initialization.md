@@ -26,10 +26,10 @@
 
 ### 适用服务器
 
-- **ServerA** - `2C2G` - `nginx + qs-apiserver`
-- **ServerB** - `2C2G` - `qs-collection-server + IAM`
+- **ServerA** - `4C8G` - `nginx + qs-apiserver + qs-collection-server`
+- **ServerB** - `2C2G` - `IAM`
 - **ServerC** - `4C4G` - `mongodb`
-- **ServerD** - `2C4G` - `qs-worker + operating + nsq`
+- **ServerD** - `4C4G` - `qs-worker + operating + nsq + prometheus + grafana`
 
 当前 Swarm 角色约定：
 

@@ -8,15 +8,15 @@
 
 - 公网入口仍由 `serverA/nginx` 统一承接
 - 公网 HTTPS 证书仍只放在 `serverA`
-- `IAM` 与 `qs-collection-server` 同机，`NSQ` 在 `serverD`
+- `IAM` 部署在 `serverB`，`qs-collection-server` 已迁移到 `serverA`，`NSQ` 在 `serverD`
 - 如果启用 `gRPC mTLS`，明确哪些证书需要迁、哪些不需要迁
 
 ## 当前目标拓扑
 
-- `serverA 2C2G`：`nginx + qs-apiserver`
-- `serverB 2C2G`：`qs-collection-server + IAM`
+- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server`
+- `serverB 2C2G`：`IAM`
 - `serverC 4C4G`：`mongodb`
-- `serverD 2C4G`：`qs-worker + operating + nsq`
+- `serverD 4C4G`：`qs-worker + operating + nsq + prometheus + grafana`
 
 四台机器共同加入 `infra-network`，`serverA` 仍是唯一公网入口。
 

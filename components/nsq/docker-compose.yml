@@ -16,7 +16,7 @@ services:
       - ${INFRA_DATA_ROOT:-/data/infra}/nsq/nsqlookupd.conf:/etc/nsq/nsqlookupd.conf:ro
     environment:
       - TZ=${TZ:-Asia/Shanghai}
-    # 适配 serverD 2C4G 配置
+    # 适配 serverD 4C4G 配置
     mem_limit: ${NSQLOOKUPD_MEMORY_LIMIT:-96M}
     cpus: ${NSQLOOKUPD_CPUS:-0.04}
     logging:
@@ -60,7 +60,7 @@ services:
     depends_on:
       nsqlookupd:
         condition: service_healthy
-    # 适配 serverD 2C4G 配置
+    # 适配 serverD 4C4G 配置
     mem_limit: ${NSQD_MEMORY_LIMIT:-384M}
     cpus: ${NSQD_CPUS:-0.20}
     logging:
@@ -100,7 +100,7 @@ services:
     depends_on:
       nsqlookupd:
         condition: service_healthy
-    # 适配 serverD 2C4G 配置
+    # 适配 serverD 4C4G 配置
     mem_limit: ${NSQADMIN_MEMORY_LIMIT:-96M}
     cpus: ${NSQADMIN_CPUS:-0.04}
     logging:

@@ -6,6 +6,8 @@
 
 评估当前四机拓扑在 `200 / 300 / 500 / 800 / 1000 QPS` 五个等级下的可行性，并给出每个等级对应的组件资源配置建议。
 
+> **2026-06 拓扑更新**：`serverA` 已升配至 `4C8G` 并承接 `qs-collection-server`；`serverB` 仅保留 `IAM`；`serverD` 已升配至 `4C4G`。下文分级资源表仍基于升配前的分析基线撰写，具体容器限额需结合新规格重新校准。
+
 ### 分析范围
 
 本次分析基于两部分真实配置：
@@ -33,7 +35,7 @@
 
 1. 同步主链
 
-`client -> nginx(serverA) -> qs-collection-server(serverB) -> qs-apiserver(serverA) -> MySQL/Redis/Mongo/IAM`
+`client -> nginx(serverA) -> qs-collection-server(serverA) -> qs-apiserver(serverA) -> MySQL/Redis/Mongo/IAM(serverB)`
 
 2. 异步主链
 
@@ -41,8 +43,8 @@
 
 其中最容易先成为瓶颈的是：
 
-- `serverA` 上的 `qs-apiserver`
-- `serverB` 上的 `qs-collection-server + IAM`
+- `serverA` 上的 `nginx + qs-apiserver + qs-collection-server`
+- `serverB` 上的 `IAM`
 - `serverD` 上的 `qs-worker + NSQ`
 - `serverA/serverD -> serverC` 的跨云 Mongo 访问
 
@@ -50,10 +52,10 @@
 
 当前目标拓扑：
 
-- `serverA 2C2G`：`nginx + qs-apiserver`
-- `serverB 2C2G`：`qs-collection-server + IAM`
+- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server`
+- `serverB 2C2G`：`IAM`
 - `serverC 4C4G`：`mongodb`
-- `serverD 2C4G`：`qs-worker + operating + nsq`
+- `serverD 4C4G`：`qs-worker + operating + nsq + prometheus + grafana`
 - 云托管：`MySQL`、`Redis`
 
 关键依赖方向：
@@ -97,15 +99,15 @@
 | `collection` 单实例入口并发 | 当前 `max-concurrency=40`，且代码校验 `max-concurrency cannot be greater than 100` | 红 |
 | `apiserver` 下游预算 | MySQL 连接池 `max-open-connections=100`，`mysql/mongo/iam max_inflight=100` | 黄 |
 | `worker` 异步预算 | 目标调整为 `3` 副本，单实例并发不再无限放大 | 黄 |
-| 节点资源匹配度 | `serverA/serverB` 都只有 `2C2G`，但承担前台同步链核心服务 | 红 |
+| 节点资源匹配度 | `serverA` 已升至 `4C8G` 并同机部署 `collection + apiserver`；`serverB` 仅 `IAM` | 黄 |
 | Mongo 资源独占度 | `serverC` 已独占 Mongo，且已给到 `3072M / 3C` 预算 | 绿 |
 | 跨云链路复杂度 | `apiserver/worker -> Mongo` 存在跨云 RTT 与抖动成本 | 黄 |
 | 同步尾延迟风险 | 历史事故已证明应用层尾步骤会迅速放大为 MQ 积压 | 黄 |
 
 ### 主要风险点
 
-1. `serverA 2C2G` 很容易先被 `qs-apiserver` 顶满。
-2. `serverB 2C2G` 同时承担 `collection + IAM`，是第二个热点。
+1. `serverA 4C8G` 仍可能先被 `qs-apiserver + qs-collection-server` 顶满。
+2. `serverB 2C2G` 仅承载 `IAM`，压力相对可控。
 3. `collection-server` 单实例并发上限被代码限制在 `100`，500+ QPS 时单实例思路本身就开始失效。
 4. `worker` 需要按 `3` 副本部署，否则异步链路只适合低百级混合流量。
 5. 跨云 Mongo 让高 QPS 级别对尾延迟更敏感。
@@ -203,10 +205,10 @@
 
 ### 4. 节点规格
 
-当前最紧的两个节点：
+当前最紧的节点：
 
-- `serverA 2C2G`
-- `serverB 2C2G`
+- `serverA 4C8G`（`nginx + qs-apiserver + qs-collection-server`）
+- `serverD 4C4G`（`qs-worker + NSQ + operating + monitoring`）
 
 也就是说，系统真正先撞到的不是 `serverC`，而是：
 
@@ -232,10 +234,10 @@
 
 维持当前主机规格不变：
 
-- `serverA 2C2G`
+- `serverA 4C8G`
 - `serverB 2C2G`
 - `serverC 4C4G`
-- `serverD 2C4G`
+- `serverD 4C4G`
 
 ### 组件资源建议
 
@@ -318,7 +320,7 @@
 
 ### 备注
 
-这档位里，`serverA 2C2G` 与 `serverB 2C2G` 仍然是最紧节点；`serverD` 因为 worker 3 副本 + NSQ，也需要严格限制 `operating` 的后台任务峰值。
+这档位里，`serverA 4C8G` 与 `serverD 4C4G` 仍然是最紧节点；`serverB` 仅承载 `IAM`，压力相对可控。
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## 概述
 
-当前生产目标中，NSQ 部署在 `serverD (2C4G)`，与 `qs-worker`、`operating` 同机。
+当前生产目标中，NSQ 部署在 `serverD (4C4G)`，与 `qs-worker`、`operating` 同机。
 
 包含三个组件：
 

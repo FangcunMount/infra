@@ -893,7 +893,7 @@ disk-usage: ## Docker 磁盘使用
 .PHONY: server-info validate-cloud-env
 
 serverA-up: ## 启动 ServerA 服务栈 (Nginx)
-	$(call section_title,启动 ServerA (2C2G))
+	$(call section_title,启动 ServerA (4C8G))
 	@$(MAKE) init-serverA
 	@cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d
 	$(call success_msg,ServerA 服务已启动)
@@ -974,7 +974,7 @@ serverC-destroy: ## 销毁 ServerC 所有容器、卷和数据 (危险!)
 serverC-rebuild: serverC-destroy serverC-up ## 完全重建 ServerC (销毁后重建)
 
 serverD-up: ## 启动 ServerD 服务栈 (NSQ + Prometheus + Grafana)
-	$(call section_title,启动 ServerD (2C4G))
+	$(call section_title,启动 ServerD (4C4G))
 	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverD
 	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d
@@ -1026,16 +1026,16 @@ server-info: ## 显示当前服务器架构
 	$(call section_title,当前基础设施架构)
 	@echo ""
 	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
-	@echo "$(CYAN)│            ServerA (2C2G) - 网关 + qs-apiserver         │$(RESET)"
+	@echo "$(CYAN)│     ServerA (4C8G) - 网关 + qs-apiserver + collection  │$(RESET)"
 	@echo "$(CYAN)├─────────────────────────────────────────────────────────┤$(RESET)"
-	@echo "$(CYAN)│  $(GREEN)Nginx$(RESET) (infra 管理) + $(GREEN)qs-apiserver$(RESET) (业务仓库部署)          $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(GREEN)Nginx$(RESET) (infra 管理) + $(GREEN)qs-apiserver$(RESET) / $(GREEN)qs-collection-server$(RESET) (业务仓库) │$(RESET)"
 	@echo "$(CYAN)│  $(YELLOW)80/443$(RESET)                                             $(CYAN)│$(RESET)"
 	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
 	@echo ""
 	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
-	@echo "$(CYAN)│          ServerB (2C2G) - collection + IAM             │$(RESET)"
+	@echo "$(CYAN)│               ServerB (2C2G) - IAM                       │$(RESET)"
 	@echo "$(CYAN)├─────────────────────────────────────────────────────────┤$(RESET)"
-	@echo "$(CYAN)│  $(GREEN)qs-collection-server$(RESET) / $(GREEN)IAM$(RESET) 由业务仓库部署          $(CYAN)│$(RESET)"
+	@echo "$(CYAN)│  $(GREEN)IAM$(RESET) 由业务仓库部署                               $(CYAN)│$(RESET)"
 	@echo "$(CYAN)│  依赖: qs-apiserver / nsq / mongo / 云 MySQL / 云 Redis │$(RESET)"
 	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
 	@echo ""
@@ -1047,7 +1047,7 @@ server-info: ## 显示当前服务器架构
 	@echo "$(CYAN)└─────────────────────────────────────────────────────────┘$(RESET)"
 	@echo ""
 	@echo "$(CYAN)┌─────────────────────────────────────────────────────────┐$(RESET)"
-	@echo "$(CYAN)│ ServerD (2C4G) - worker + operating + NSQ + monitoring │$(RESET)"
+	@echo "$(CYAN)│ ServerD (4C4G) - worker + operating + NSQ + monitoring │$(RESET)"
 	@echo "$(CYAN)├─────────────────────────────────────────────────────────┤$(RESET)"
 	@echo "$(CYAN)│  $(GREEN)nsqlookupd$(RESET) $(GREEN)nsqd$(RESET) $(GREEN)nsqadmin$(RESET) $(GREEN)prometheus$(RESET) $(GREEN)grafana$(RESET) (infra 管理) │$(RESET)"
 	@echo "$(CYAN)│  $(YELLOW)4160/4161$(RESET) $(YELLOW)4150/4151$(RESET) $(YELLOW)4171$(RESET)                           $(CYAN)│$(RESET)"
@@ -1223,7 +1223,7 @@ help-nsq: ## NSQ 快速参考
 	@echo ""
 	@echo "$(BLUE)配置说明:$(RESET)"
 	@echo "  nsqlookupd: 4160/4161, nsqd: 4150/4151, admin: 4171"
-	@echo "  部署在 ServerD (2C4G)"
+	@echo "  部署在 ServerD (4C4G)"
 	@echo ""
 
 help-vpn: ## VPN 快速参考

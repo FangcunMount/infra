@@ -6,17 +6,17 @@
 
 把 `MongoDB` 从旧的混部节点迁移到 `serverC (4C4G)`，同时保持：
 
-- `serverA` 只保留 `nginx + qs-apiserver`
-- `serverB` 只保留 `qs-collection-server + IAM`
+- `serverA` 保留 `nginx + qs-apiserver + qs-collection-server`
+- `serverB` 只保留 `IAM`
 - `serverD` 上的 `qs-worker + operating + nsq` 继续通过 overlay 网络访问 Mongo
 - 业务仓库统一改用 `mongo:27017`
 
 ## 当前目标拓扑
 
-- `serverA 2C2G`：`nginx + qs-apiserver`
-- `serverB 2C2G`：`qs-collection-server + IAM`
+- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server`
+- `serverB 2C2G`：`IAM`
 - `serverC 4C4G`：`mongodb`
-- `serverD 2C4G`：`qs-worker + operating + nsq`
+- `serverD 4C4G`：`qs-worker + operating + nsq + prometheus + grafana`
 - 云托管：`MySQL`、`Redis`
 
 四台机器共同加入 `infra-network`，Mongo 的目标落点只有 `serverC`。

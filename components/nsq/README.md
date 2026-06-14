@@ -78,7 +78,7 @@ nsq_tail --topic=test_topic --channel=test_channel --lookupd-http-address=localh
 - **数据目录**:
   - `/data/infra/nsq/data`: NSQ 数据持久化
   - `/data/logs/nsq`: NSQ 日志目录
-- **资源限制** (ServerD 2C4G 环境):
+- **资源限制** (ServerD 4C4G 环境):
   - nsqd: 384M 内存，0.20 CPU
   - nsqlookupd: 96M 内存，0.04 CPU
   - nsqadmin: 96M 内存，0.04 CPU

@@ -7,7 +7,8 @@
 #   - 外部网络：infra-network
 #   - 配置文件：compose/env/prod/serverB.env
 # 注意：
-#   - serverB 承载 qs-collection-server 与 IAM，但业务容器由对应项目部署
+#   - serverB 承载 IAM，但业务容器由对应项目部署
+#   - qs-collection-server 已迁移到 serverA
 #   - NSQ 已迁移到 serverD
 #   - MySQL / Redis 使用云托管服务
 # ============================================================================
