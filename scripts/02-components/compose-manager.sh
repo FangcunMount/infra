@@ -241,25 +241,20 @@ build_infra_compose_args() {
             args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
             ;;
         "nginx")
-            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/nginx/docker-compose.yml")
             ;;
         "storage")
-            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/mysql/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/redis/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/mongo/docker-compose.yml")
             ;;
         "nsq")
-            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/nsq/docker-compose.yml")
             ;;
         "cicd")
-            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/jenkins/docker-compose.yml")
             ;;
         "all")
-            args+=("-f" "${COMPONENTS_DIR}/networks/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/nginx/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/mysql/docker-compose.yml")
             args+=("-f" "${COMPONENTS_DIR}/redis/docker-compose.yml")
