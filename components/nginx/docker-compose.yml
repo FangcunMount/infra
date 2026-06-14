@@ -30,7 +30,7 @@ services:
       retries: 3
     ulimits:
       nofile: 100000
-    mem_limit: ${NGINX_MEMORY_LIMIT:-128M}
+    mem_limit: ${NGINX_MEMORY_LIMIT:-1g}
     cpus: ${NGINX_CPUS:-0.25}
     logging:
       driver: "json-file"
