@@ -165,6 +165,8 @@ help: ## 显示帮助信息
 	@echo "$(MAGENTA)3. 组件管理$(RESET)"
 	@echo "   $(CYAN)<组件>-start/stop/logs$(RESET)  启动/停止/日志"
 	@echo "   组件: nginx, mongo, redis, nsq, mysql(dev), prometheus, grafana"
+	@echo "   $(CYAN)nginx-init$(RESET)           初始化 Nginx 环境 (网络/目录)"
+	@echo "   $(CYAN)serverA-up$(RESET)           生产启动 Nginx (推荐)"
 	@echo ""
 	@echo "$(MAGENTA)4. SSL证书管理$(RESET)"
 	@echo "   $(CYAN)ssl-wildcard$(RESET)         申请通配符证书 (Let's Encrypt)"
@@ -465,9 +467,13 @@ ps: status ## 查看容器 (别名)
 # ==============================================================================
 # 3. 组件管理 - Nginx
 # ==============================================================================
-.PHONY: nginx-start nginx-stop nginx-restart nginx-logs nginx-reload nginx-test
+.PHONY: nginx-init nginx-start nginx-stop nginx-restart nginx-recreate nginx-logs nginx-reload nginx-test nginx-status
 
-nginx-start: ## 启动 Nginx
+nginx-init: ## 初始化 Nginx 运行环境 (网络/目录)
+	@$(MAKE) init-serverA ENV=$(ENV)
+	$(call success_msg,Nginx 环境已初始化)
+
+nginx-start: ## 启动 Nginx (开发/通用路径)
 	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra up nginx
 	$(call success_msg,Nginx 已启动)
 
@@ -475,6 +481,15 @@ nginx-stop: ## 停止 Nginx
 	@$(COMPOSE_MANAGER_ENV) $(COMPOSE_MANAGER) infra down nginx
 
 nginx-restart: nginx-stop nginx-start ## 重启 Nginx
+
+nginx-recreate: ## 强制删除并重建 Nginx 容器 (生产推荐)
+	$(call section_title,重建 Nginx)
+	@docker rm -f nginx 2>/dev/null || true
+	@cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d --force-recreate
+	$(call success_msg,Nginx 已重建)
+
+nginx-status: ## 查看 Nginx 状态
+	@docker ps -a --filter name=^nginx$$ --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 nginx-logs: ## 查看 Nginx 日志
 	@docker logs -f --tail=$(LOG_LINES) nginx
@@ -894,8 +909,13 @@ disk-usage: ## Docker 磁盘使用
 
 serverA-up: ## 启动 ServerA 服务栈 (Nginx)
 	$(call section_title,启动 ServerA (4C8G))
-	@$(MAKE) init-serverA
-	@cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d
+	@$(MAKE) init-serverA ENV=$(ENV)
+	@if docker ps --filter name=^nginx$$ --filter status=running -q | grep -q .; then \
+		cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d; \
+	else \
+		docker rm -f nginx 2>/dev/null || true; \
+		cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d; \
+	fi
 	$(call success_msg,ServerA 服务已启动)
 
 serverA-down: ## 停止 ServerA 服务栈
@@ -1150,7 +1170,32 @@ prod: ## 切换到生产环境
 # ==============================================================================
 # 快速参考
 # ==============================================================================
-.PHONY: help-mongo help-redis help-nsq help-vpn help-ssl service-ports
+.PHONY: help-mongo help-redis help-nsq help-nginx help-vpn help-ssl service-ports
+
+help-nginx: ## Nginx 快速参考
+	$(call section_title,Nginx 管理命令)
+	@echo ""
+	@echo "$(BLUE)生产环境 (serverA 推荐):$(RESET)"
+	@echo "  $(CYAN)make nginx-init ENV=prod$(RESET)     初始化网络/目录"
+	@echo "  $(CYAN)make serverA-up ENV=prod$(RESET)     启动 Nginx"
+	@echo "  $(CYAN)make nginx-recreate ENV=prod$(RESET) 强制重建 (容器名冲突时用)"
+	@echo ""
+	@echo "$(BLUE)日常运维:$(RESET)"
+	@echo "  $(CYAN)make nginx-status$(RESET)            查看状态"
+	@echo "  $(CYAN)make nginx-logs$(RESET)              查看日志"
+	@echo "  $(CYAN)make nginx-reload$(RESET)            重载配置"
+	@echo "  $(CYAN)make nginx-test$(RESET)              测试配置"
+	@echo "  $(CYAN)make nginx-stop$(RESET)              停止"
+	@echo ""
+	@echo "$(BLUE)应用路由:$(RESET)"
+	@echo "  $(CYAN)make app-deploy$(RESET)              部署应用 Nginx 配置"
+	@echo "  $(CYAN)make app-list$(RESET)                列出应用配置"
+	@echo ""
+	@echo "$(BLUE)说明:$(RESET)"
+	@echo "  容器名: nginx, 端口: 80/443"
+	@echo "  生产 compose: deploy/serverA/docker-compose.yml"
+	@echo "  环境变量: compose/env/prod/serverA.env"
+	@echo ""
 
 help-redis: ## Redis 快速参考
 	$(call section_title,Redis 管理命令)
