@@ -31,7 +31,7 @@ services:
     ulimits:
       nofile: 100000
     mem_limit: ${NGINX_MEMORY_LIMIT:-1g}
-    cpus: ${NGINX_CPUS:-0.25}
+    cpus: ${NGINX_CPUS:-1}
     logging:
       driver: "json-file"
       options:
