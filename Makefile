@@ -730,6 +730,32 @@ grafana-nginx-deploy: ## 部署 Grafana Nginx 配置到 /data/apps/nginx-configs
 	@bash $(NGINX_SCRIPTS)/nginx-app-manager.sh deploy grafana components/grafana/nginx/grafana.conf
 
 # ==============================================================================
+# 3b. 组件管理 - SonarQube
+# ==============================================================================
+.PHONY: sonarqube-start sonarqube-stop sonarqube-restart sonarqube-logs sonarqube-status sonarqube-nginx-deploy
+
+sonarqube-start: ## 在 ServerD 启动 SonarQube
+	$(call section_title,启动 SonarQube (serverD))
+	$(call ensure_infra_network_visible)
+	@$(MAKE) init-serverD
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d sonarqube-db sonarqube
+	$(call success_msg,SonarQube 已启动)
+
+sonarqube-stop: ## 停止 SonarQube
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env stop sonarqube sonarqube-db 2>/dev/null || true
+
+sonarqube-restart: sonarqube-stop sonarqube-start ## 重启 SonarQube
+
+sonarqube-logs: ## 查看 SonarQube 日志
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env logs -f --tail=$(LOG_LINES) sonarqube sonarqube-db
+
+sonarqube-status: ## 查看 SonarQube 状态
+	@docker ps --filter "label=infra.category=devtools" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+sonarqube-nginx-deploy: ## 部署 SonarQube Nginx 配置到 /data/apps/nginx-configs
+	@bash $(NGINX_SCRIPTS)/nginx-app-manager.sh deploy sonarqube components/sonarqube/nginx/sonarqube.conf
+
+# ==============================================================================
 # 4. SSL证书管理
 # ==============================================================================
 .PHONY: ssl-wildcard ssl-obtain ssl-import ssl-renew ssl-list ssl-remove ssl-setup-aliyun
@@ -905,6 +931,7 @@ disk-usage: ## Docker 磁盘使用
 .PHONY: serverC-up serverC-down serverC-logs serverC-status serverC-destroy serverC-rebuild
 .PHONY: serverD-up serverD-down serverD-logs serverD-status serverD-destroy serverD-rebuild
 .PHONY: serverD-monitoring-up serverD-monitoring-down serverD-monitoring-logs serverD-monitoring-status serverD-monitoring-restart
+.PHONY: serverD-sonarqube-up serverD-sonarqube-down serverD-sonarqube-logs serverD-sonarqube-status serverD-sonarqube-restart
 .PHONY: server-info validate-cloud-env
 
 serverA-up: ## 启动 ServerA 服务栈 (Nginx)
@@ -993,7 +1020,7 @@ serverC-destroy: ## 销毁 ServerC 所有容器、卷和数据 (危险!)
 
 serverC-rebuild: serverC-destroy serverC-up ## 完全重建 ServerC (销毁后重建)
 
-serverD-up: ## 启动 ServerD 服务栈 (NSQ + Prometheus + Grafana)
+serverD-up: ## 启动 ServerD 服务栈 (NSQ + Prometheus + Grafana + SonarQube)
 	$(call section_title,启动 ServerD (4C4G))
 	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverD
@@ -1018,6 +1045,24 @@ serverD-monitoring-status: ## 查看 ServerD Prometheus + Grafana 状态
 
 serverD-monitoring-restart: serverD-monitoring-down serverD-monitoring-up ## 重启 ServerD Prometheus + Grafana
 
+serverD-sonarqube-up: ## 在 ServerD 一键启动 SonarQube
+	$(call section_title,启动 ServerD SonarQube)
+	$(call ensure_infra_network_visible)
+	@$(MAKE) init-serverD
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d sonarqube-db sonarqube
+	$(call success_msg,ServerD SonarQube 已启动)
+
+serverD-sonarqube-down: ## 停止 ServerD SonarQube
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env stop sonarqube sonarqube-db
+
+serverD-sonarqube-logs: ## 查看 ServerD SonarQube 日志
+	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env logs -f --tail=$(LOG_LINES) sonarqube sonarqube-db
+
+serverD-sonarqube-status: ## 查看 ServerD SonarQube 状态
+	@docker ps --filter "label=infra.host=serverD" --filter "label=infra.category=devtools" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+serverD-sonarqube-restart: serverD-sonarqube-down serverD-sonarqube-up ## 重启 ServerD SonarQube
+
 serverD-down: ## 停止 ServerD 服务栈
 	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env down
 
@@ -1028,15 +1073,15 @@ serverD-status: ## 查看 ServerD 状态
 	@docker ps --filter "label=infra.host=serverD" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 serverD-destroy: ## 销毁 ServerD 所有容器、卷和数据 (危险!)
-	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerD 的 NSQ / Prometheus / Grafana 数据！$(RESET)"
-	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin, prometheus, grafana$(RESET)"
-	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nsq_data, infra_prometheus_data, infra_grafana_data$(RESET)"
+	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerD 的 NSQ / Prometheus / Grafana / SonarQube 数据！$(RESET)"
+	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin, prometheus, grafana, sonarqube, sonarqube-db$(RESET)"
+	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nsq_data, infra_prometheus_data, infra_grafana_data, infra_sonarqube_*$(RESET)"
 	@echo "$(RED)   - 删除数据目录: /data/infra/nsq/*, /data/infra/prometheus/*, /data/infra/grafana/*, /data/logs/nsq/*$(RESET)"
 	@echo ""
 	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
 	$(call section_title,销毁 ServerD 数据)
-	@docker rm -f nsqlookupd nsqd nsqadmin prometheus grafana 2>/dev/null || true
-	@docker volume rm infra_nsq_data infra_prometheus_data infra_grafana_data 2>/dev/null || true
+	@docker rm -f nsqlookupd nsqd nsqadmin prometheus grafana sonarqube sonarqube-db 2>/dev/null || true
+	@docker volume rm infra_nsq_data infra_prometheus_data infra_grafana_data infra_sonarqube_db_data infra_sonarqube_data infra_sonarqube_logs infra_sonarqube_extensions 2>/dev/null || true
 	@rm -rf /data/infra/nsq/* /data/infra/prometheus/* /data/infra/grafana/* /data/logs/nsq/* 2>/dev/null || true
 	$(call success_msg,ServerD 数据已销毁)
 
@@ -1326,6 +1371,7 @@ service-ports: ## 显示所有服务端口
 	@echo "$(CYAN)NSQAdmin:$(RESET)    127.0.0.1:4171         [serverD]"
 	@echo "$(CYAN)Prometheus:$(RESET)  prometheus:9090        [serverD / infra-network]"
 	@echo "$(CYAN)Grafana:$(RESET)     grafana:3000           [serverD / infra-network]"
+	@echo "$(CYAN)SonarQube:$(RESET)   sonarqube:9000         [serverD / infra-network]"
 	@echo "$(CYAN)MySQL:$(RESET)       云托管地址             [云服务商 A]"
 	@echo "$(CYAN)Redis:$(RESET)       云托管地址             [云服务商 A]"
 	@echo ""
