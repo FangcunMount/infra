@@ -17,8 +17,8 @@
 - `SONAR_DB_CPUS`
 - `SONAR_MEMORY_LIMIT`
 - `SONAR_CPUS`
-- `SONAR_WEB_JAVAOPTS`
-- `SONAR_CE_JAVAOPTS`
+
+JVM 堆参数（`-Xmx512m -Xms256m`）固定在 `components/sonarqube/docker-compose.yml`，避免 `.env` 引号被传入容器。
 
 ## 宿主机前置条件
 
