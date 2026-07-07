@@ -46,6 +46,31 @@ make sonarqube-nginx-deploy
 
 部署后请在 SonarQube 后台将 Server base URL 设置为 `SONAR_ROOT_URL`。
 
+## 升级
+
+1. 在 `components/sonarqube/docker-compose.yml` 修改 `image` 版本
+2. 在 `serverD` 拉取代码后执行：
+
+```bash
+make sonarqube-upgrade
+# 或
+make serverD-sonarqube-upgrade
+```
+
+仅备份数据库：
+
+```bash
+make sonarqube-backup
+```
+
+跳过备份（已手动备份时）：
+
+```bash
+SKIP_BACKUP=1 make sonarqube-upgrade
+```
+
+升级完成后访问 `${SONAR_ROOT_URL}/setup` 完成数据库迁移。
+
 ## 默认账号
 
 - 用户名：`admin`

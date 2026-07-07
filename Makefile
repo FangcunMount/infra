@@ -733,6 +733,7 @@ grafana-nginx-deploy: ## 部署 Grafana Nginx 配置到 /data/apps/nginx-configs
 # 3b. 组件管理 - SonarQube
 # ==============================================================================
 .PHONY: sonarqube-start sonarqube-stop sonarqube-restart sonarqube-logs sonarqube-status sonarqube-nginx-deploy
+.PHONY: sonarqube-backup sonarqube-upgrade
 
 sonarqube-start: ## 在 ServerD 启动 SonarQube
 	$(call section_title,启动 SonarQube (serverD))
@@ -754,6 +755,15 @@ sonarqube-status: ## 查看 SonarQube 状态
 
 sonarqube-nginx-deploy: ## 部署 SonarQube Nginx 配置到 /data/apps/nginx-configs
 	@bash $(NGINX_SCRIPTS)/nginx-app-manager.sh deploy sonarqube components/sonarqube/nginx/sonarqube.conf
+
+sonarqube-backup: ## 备份 SonarQube PostgreSQL 到 /data/backup/sonarqube
+	@bash $(COMPONENTS_SCRIPTS)/upgrade-sonarqube.sh --backup-only
+
+sonarqube-upgrade: ## 升级 SonarQube（备份 + pull + 重建容器；SKIP_BACKUP=1 可跳过备份）
+	$(call section_title,升级 SonarQube (serverD))
+	$(call ensure_infra_network_visible)
+	@SKIP_BACKUP=$(SKIP_BACKUP) bash $(COMPONENTS_SCRIPTS)/upgrade-sonarqube.sh
+	$(call success_msg,SonarQube 升级流程已执行，请访问 setup 页面完成数据库迁移)
 
 # ==============================================================================
 # 4. SSL证书管理
@@ -932,6 +942,7 @@ disk-usage: ## Docker 磁盘使用
 .PHONY: serverD-up serverD-down serverD-logs serverD-status serverD-destroy serverD-rebuild
 .PHONY: serverD-monitoring-up serverD-monitoring-down serverD-monitoring-logs serverD-monitoring-status serverD-monitoring-restart
 .PHONY: serverD-sonarqube-up serverD-sonarqube-down serverD-sonarqube-logs serverD-sonarqube-status serverD-sonarqube-restart
+.PHONY: serverD-sonarqube-backup serverD-sonarqube-upgrade
 .PHONY: server-info validate-cloud-env
 
 serverA-up: ## 启动 ServerA 服务栈 (Nginx)
@@ -1062,6 +1073,10 @@ serverD-sonarqube-status: ## 查看 ServerD SonarQube 状态
 	@docker ps --filter "label=infra.host=serverD" --filter "label=infra.category=devtools" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 serverD-sonarqube-restart: serverD-sonarqube-down serverD-sonarqube-up ## 重启 ServerD SonarQube
+
+serverD-sonarqube-backup: sonarqube-backup ## 备份 ServerD SonarQube 数据库
+
+serverD-sonarqube-upgrade: sonarqube-upgrade ## 升级 ServerD SonarQube（改镜像后执行）
 
 serverD-down: ## 停止 ServerD 服务栈
 	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env down
