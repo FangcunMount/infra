@@ -47,12 +47,26 @@ if [[ ! -f "$COMPOSE_FILE" ]]; then
     exit 1
 fi
 
-# shellcheck disable=SC1090
-source "$ENV_FILE"
+read_env_var() {
+    local key="$1"
+    local line value
 
-SONAR_DB_USER="${SONAR_DB_USER:-sonar}"
-SONAR_DB_NAME="${SONAR_DB_NAME:-sonar}"
-SONAR_ROOT_URL="${SONAR_ROOT_URL:-https://sonar.fangcunmount.cn}"
+    line="$(grep -E "^${key}=" "$ENV_FILE" | tail -1 || true)"
+    if [[ -z "$line" ]]; then
+        return 1
+    fi
+
+    value="${line#*=}"
+    value="${value%\"}"
+    value="${value#\"}"
+    value="${value%\'}"
+    value="${value#\'}"
+    printf '%s' "$value"
+}
+
+SONAR_DB_USER="$(read_env_var SONAR_DB_USER || echo sonar)"
+SONAR_DB_NAME="$(read_env_var SONAR_DB_NAME || echo sonar)"
+SONAR_ROOT_URL="$(read_env_var SONAR_ROOT_URL || echo https://sonar.fangcunmount.cn)"
 TARGET_IMAGE="$(awk '/^[[:space:]]*image:[[:space:]]*sonarqube:/ {print $2; exit}' "$SONAR_COMPOSE")"
 
 if [[ -z "$TARGET_IMAGE" ]]; then
