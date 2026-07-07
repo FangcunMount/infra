@@ -45,7 +45,7 @@ services:
       SONAR_JDBC_PASSWORD: ${SONAR_DB_PASSWORD}
       SONAR_WEB_JAVAOPTS: -Xmx384m -Xms256m
       SONAR_CE_JAVAOPTS: -Xmx384m -Xms256m
-      SONAR_SEARCH_JAVAOPTS: -Xmx512m -Xms256m
+      SONAR_SEARCH_JAVAOPTS: -Xmx512m -Xms512m
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_logs:/opt/sonarqube/logs
