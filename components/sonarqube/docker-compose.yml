@@ -31,7 +31,7 @@ services:
       - "infra.host=${INFRA_HOST_LABEL:-mac-mini}"
 
   sonarqube:
-    image: sonarqube:26.1.0.118079-community
+    image: sonarqube:26.7.0.124771-community
     container_name: sonarqube
     networks:
       - backend

@@ -4,7 +4,7 @@
 
 当前镜像均原生支持 Apple Silicon：
 
-- `sonarqube:26.1.0.118079-community`: `linux/arm64`
+- `sonarqube:26.7.0.124771-community`: `linux/arm64`
 - `postgres:16-alpine`: `linux/arm64`
 
 ## 默认域名
