@@ -738,7 +738,7 @@ grafana-nginx-deploy: ## 部署 Grafana Nginx 配置到 /data/apps/nginx-configs
 # 3b. 组件管理 - SonarQube
 # ==============================================================================
 .PHONY: sonarqube-start sonarqube-stop sonarqube-restart sonarqube-logs sonarqube-status sonarqube-nginx-deploy
-.PHONY: sonarqube-backup sonarqube-upgrade sonarqube-migrate-to-macmini
+.PHONY: sonarqube-backup sonarqube-upgrade
 
 sonarqube-start: ## 在 Mac mini 启动 SonarQube
 	$(call section_title,启动 SonarQube (Mac mini))
@@ -768,10 +768,6 @@ sonarqube-upgrade: ## 升级 SonarQube（备份 + pull + 重建容器；SKIP_BAC
 	@$(MAKE) init-macmini
 	@SONAR_DEPLOY_TARGET=mac-mini SKIP_BACKUP=$(SKIP_BACKUP) bash $(COMPONENTS_SCRIPTS)/upgrade-sonarqube.sh
 	$(call success_msg,SonarQube 升级流程已执行，请访问 setup 页面完成数据库迁移)
-
-sonarqube-migrate-to-macmini: ## 从 serverD 备份并迁移 SonarQube 到本机（SOURCE_SSH=deploy@host）
-	$(call section_title,迁移 SonarQube: serverD -> Mac mini)
-	@bash $(COMPONENTS_SCRIPTS)/migrate-sonarqube-to-macmini.sh
 
 # ==============================================================================
 # 4. SSL证书管理
@@ -949,8 +945,6 @@ disk-usage: ## Docker 磁盘使用
 .PHONY: serverC-up serverC-down serverC-logs serverC-status serverC-destroy serverC-rebuild
 .PHONY: serverD-up serverD-down serverD-logs serverD-status serverD-destroy serverD-rebuild
 .PHONY: serverD-monitoring-up serverD-monitoring-down serverD-monitoring-logs serverD-monitoring-status serverD-monitoring-restart
-.PHONY: serverD-sonarqube-up serverD-sonarqube-down serverD-sonarqube-logs serverD-sonarqube-status serverD-sonarqube-restart
-.PHONY: serverD-sonarqube-backup serverD-sonarqube-upgrade
 .PHONY: macmini-sonarqube-up macmini-sonarqube-down macmini-sonarqube-logs macmini-sonarqube-status
 .PHONY: macmini-sonarqube-restart macmini-sonarqube-backup macmini-sonarqube-upgrade
 .PHONY: server-info validate-cloud-env
@@ -1066,27 +1060,6 @@ serverD-monitoring-status: ## 查看 ServerD Prometheus + Grafana 状态
 
 serverD-monitoring-restart: serverD-monitoring-down serverD-monitoring-up ## 重启 ServerD Prometheus + Grafana
 
-serverD-sonarqube-up: ## 仅用于迁移回滚：启动 ServerD 旧 SonarQube 容器
-	$(call warning_msg,这是迁移后的回滚入口；正常运行请使用 macmini-sonarqube-up)
-	@docker start sonarqube-db sonarqube
-
-serverD-sonarqube-down: ## 停止 ServerD 旧 SonarQube 容器
-	@docker stop sonarqube sonarqube-db 2>/dev/null || true
-
-serverD-sonarqube-logs: ## 查看 ServerD 旧 SonarQube 日志
-	@docker logs -f --tail=$(LOG_LINES) sonarqube
-
-serverD-sonarqube-status: ## 查看 ServerD SonarQube 状态
-	@docker ps --filter "label=infra.host=serverD" --filter "label=infra.category=devtools" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-
-serverD-sonarqube-restart: serverD-sonarqube-down serverD-sonarqube-up ## 重启 ServerD SonarQube
-
-serverD-sonarqube-backup: ## 备份 ServerD 旧 SonarQube 数据库
-	@SONAR_DEPLOY_TARGET=serverD bash $(COMPONENTS_SCRIPTS)/upgrade-sonarqube.sh --backup-only
-
-serverD-sonarqube-upgrade: ## 已迁移停用
-	$(call warning_msg,SonarQube 已迁往 Mac mini；不再升级 serverD 旧实例)
-
 macmini-sonarqube-up: sonarqube-start ## 在 Mac mini 启动 SonarQube
 
 macmini-sonarqube-down: sonarqube-stop ## 停止 Mac mini SonarQube
@@ -1111,15 +1084,15 @@ serverD-status: ## 查看 ServerD 状态
 	@docker ps --filter "label=infra.host=serverD" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 serverD-destroy: ## 销毁 ServerD 所有容器、卷和数据 (危险!)
-	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerD 的 NSQ / Prometheus / Grafana / SonarQube 数据！$(RESET)"
-	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin, prometheus, grafana, sonarqube, sonarqube-db$(RESET)"
-	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nsq_data, infra_prometheus_data, infra_grafana_data, infra_sonarqube_*$(RESET)"
+	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerD 的 NSQ / Prometheus / Grafana 数据！$(RESET)"
+	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin, prometheus, grafana$(RESET)"
+	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nsq_data, infra_prometheus_data, infra_grafana_data$(RESET)"
 	@echo "$(RED)   - 删除数据目录: /data/infra/nsq/*, /data/infra/prometheus/*, /data/infra/grafana/*, /data/logs/nsq/*$(RESET)"
 	@echo ""
 	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
 	$(call section_title,销毁 ServerD 数据)
-	@docker rm -f nsqlookupd nsqd nsqadmin prometheus grafana sonarqube sonarqube-db 2>/dev/null || true
-	@docker volume rm infra_nsq_data infra_prometheus_data infra_grafana_data infra_sonarqube_db_data infra_sonarqube_data infra_sonarqube_logs infra_sonarqube_extensions 2>/dev/null || true
+	@docker rm -f nsqlookupd nsqd nsqadmin prometheus grafana 2>/dev/null || true
+	@docker volume rm infra_nsq_data infra_prometheus_data infra_grafana_data 2>/dev/null || true
 	@rm -rf /data/infra/nsq/* /data/infra/prometheus/* /data/infra/grafana/* /data/logs/nsq/* 2>/dev/null || true
 	$(call success_msg,ServerD 数据已销毁)
 

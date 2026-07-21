@@ -34,31 +34,30 @@ JVM 堆参数固定在 `components/sonarqube/docker-compose.yml`：Web/CE 为 `-
 cp compose/env/prod/mac-mini.env.example compose/env/prod/mac-mini.env
 ```
 
-`SONAR_DB_PASSWORD` 必须与迁移前 serverD 的实际值一致。
+全新部署请为 `SONAR_DB_PASSWORD` 生成独立强密码：
+
+```bash
+openssl rand -base64 32
+```
 
 启动时 `sonarqube-init` 会在 Docker Desktop Linux VM 内设置 Elasticsearch 所需的 `vm.max_map_count` 和 `fs.file-max`，无需修改 macOS 的 `sysctl`。
 
-## 从 serverD 迁移
+## 全新部署
 
 在 Mac mini 的 infra 仓库执行：
 
 ```bash
-SOURCE_SSH=deploy@82.157.204.239 make sonarqube-migrate-to-macmini
+make macmini-sonarqube-up
+make macmini-sonarqube-status
 ```
 
-若 `deploy` 用户不能免密执行 Docker，可使用有 Docker 权限的 SSH 用户，或给迁移所需 Docker 命令配置临时 `NOPASSWD`。
+等待状态为 `healthy` 后，在 Mac mini 验证：
 
-迁移流程：
+```bash
+curl -fsS http://127.0.0.1:9000/api/system/status
+```
 
-1. 停止 serverD 的 SonarQube 应用，保留 PostgreSQL 运行。
-2. 使用 `pg_dump` 生成一致性备份。
-3. 在 Mac mini 启动 ARM64 PostgreSQL 并恢复。
-4. 启动 SonarQube，等待 API 状态 `UP`。
-5. 在 serverA 部署新的 Nginx 配置，将上游切到 `100.126.200.55:9000`。
-
-迁移不会删除 serverD 的数据库容器或卷。确认稳定运行一周后再人工清理。
-
-SonarQube 的 Elasticsearch 索引卷不迁移，目标实例会根据 PostgreSQL 自动重建；自定义插件需单独核对并重新安装。
+预期返回 `"status":"UP"`。
 
 ## Nginx 接入
 
@@ -66,7 +65,7 @@ SonarQube 的 Nginx 配置模板位于：
 
 - `components/sonarqube/nginx/sonarqube.conf`
 
-迁移完成并确认 Mac mini API 已 `UP` 后，在 `serverA` 部署：
+确认 Mac mini API 已 `UP`，并在 serverA 验证 `curl http://100.126.200.55:9000/api/system/status` 可访问后，部署：
 
 ```bash
 make sonarqube-nginx-deploy
