@@ -10,6 +10,7 @@ compose/env/prod/serverB.env
 # 备用环境配置
 compose/env/*/*
 !compose/env/*/.env.example
+!compose/env/prod/mac-mini.env.example
 !compose/env/*/README.md
 
 # redis ACL 配置文件

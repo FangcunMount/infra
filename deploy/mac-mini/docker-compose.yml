@@ -1,0 +1,63 @@
+# ============================================================================
+# Mac mini 基础设施栈
+# ============================================================================
+# 当前承载：
+#   - SonarQube Community Edition
+#   - PostgreSQL（SonarQube 专用）
+#
+# 说明：
+#   - Docker Desktop 使用本地 bridge 网络 infra-network，不加入服务器 Swarm。
+#   - 9000 端口发布到宿主机，由 serverA Nginx 经 Tailscale 访问。
+#   - sonarqube-init 在 Docker Desktop Linux VM 内设置 Elasticsearch 所需 sysctl。
+# ============================================================================
+
+services:
+  sonarqube-init:
+    image: alpine:3.22
+    container_name: sonarqube-init
+    privileged: true
+    pid: host
+    network_mode: none
+    restart: "no"
+    command:
+      - sh
+      - -c
+      - |
+        sysctl -w vm.max_map_count=524288
+        sysctl -w fs.file-max=131072
+
+  sonarqube-db:
+    extends:
+      file: ../../components/sonarqube/docker-compose.yml
+      service: sonarqube-db
+
+  sonarqube:
+    extends:
+      file: ../../components/sonarqube/docker-compose.yml
+      service: sonarqube
+    ports:
+      - "${SONAR_BIND_ADDRESS:-0.0.0.0}:${SONAR_PORT:-9000}:9000"
+    depends_on:
+      sonarqube-init:
+        condition: service_completed_successfully
+      sonarqube-db:
+        condition: service_healthy
+
+networks:
+  backend:
+    external: true
+    name: infra-network
+
+volumes:
+  sonarqube_db_data:
+    name: infra_sonarqube_db_data
+    driver: local
+  sonarqube_data:
+    name: infra_sonarqube_data
+    driver: local
+  sonarqube_logs:
+    name: infra_sonarqube_logs
+    driver: local
+  sonarqube_extensions:
+    name: infra_sonarqube_extensions
+    driver: local

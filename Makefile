@@ -406,7 +406,7 @@ port-check: ## 检查端口占用 (PORT=端口号)
 # ==============================================================================
 # 2. 基础设施初始化
 # ==============================================================================
-.PHONY: init init-serverA init-serverB init-serverC init-serverD install install-all-silent up down restart status ps
+.PHONY: init init-serverA init-serverB init-serverC init-serverD init-macmini install install-all-silent up down restart status ps
 
 init: ## 初始化基础设施 (网络+卷)
 	$(call info_msg,初始化基础设施网络和卷...)
@@ -432,6 +432,11 @@ init-serverD: ## 在 ServerD 上初始化卷，跳过网络创建 (manager, NSQ 
 	$(call info_msg,初始化 ServerD 卷，跳过网络创建...)
 	@INIT_TARGET=serverD SKIP_NETWORK=true $(INFRA_SCRIPT) create
 	$(call success_msg,ServerD 初始化完成)
+
+init-macmini: ## 在 Mac mini Docker Desktop 创建本地 infra-network
+	$(call info_msg,初始化 Mac mini Docker 网络...)
+	@docker network inspect infra-network >/dev/null 2>&1 || docker network create --driver bridge infra-network >/dev/null
+	$(call success_msg,Mac mini infra-network 已就绪)
 
 install: init ## 交互式安装组件
 	$(call section_title,基础设施组件安装)
@@ -733,22 +738,21 @@ grafana-nginx-deploy: ## 部署 Grafana Nginx 配置到 /data/apps/nginx-configs
 # 3b. 组件管理 - SonarQube
 # ==============================================================================
 .PHONY: sonarqube-start sonarqube-stop sonarqube-restart sonarqube-logs sonarqube-status sonarqube-nginx-deploy
-.PHONY: sonarqube-backup sonarqube-upgrade
+.PHONY: sonarqube-backup sonarqube-upgrade sonarqube-migrate-to-macmini
 
-sonarqube-start: ## 在 ServerD 启动 SonarQube
-	$(call section_title,启动 SonarQube (serverD))
-	$(call ensure_infra_network_visible)
-	@$(MAKE) init-serverD
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d sonarqube-db sonarqube
+sonarqube-start: ## 在 Mac mini 启动 SonarQube
+	$(call section_title,启动 SonarQube (Mac mini))
+	@$(MAKE) init-macmini
+	@cd deploy/mac-mini && docker compose --env-file ../../compose/env/prod/mac-mini.env up -d sonarqube-init sonarqube-db sonarqube
 	$(call success_msg,SonarQube 已启动)
 
 sonarqube-stop: ## 停止 SonarQube
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env stop sonarqube sonarqube-db 2>/dev/null || true
+	@cd deploy/mac-mini && docker compose --env-file ../../compose/env/prod/mac-mini.env stop sonarqube sonarqube-db 2>/dev/null || true
 
 sonarqube-restart: sonarqube-stop sonarqube-start ## 重启 SonarQube
 
 sonarqube-logs: ## 查看 SonarQube 日志
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env logs -f --tail=$(LOG_LINES) sonarqube sonarqube-db
+	@cd deploy/mac-mini && docker compose --env-file ../../compose/env/prod/mac-mini.env logs -f --tail=$(LOG_LINES) sonarqube sonarqube-db
 
 sonarqube-status: ## 查看 SonarQube 状态
 	@docker ps --filter "label=infra.category=devtools" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
@@ -756,14 +760,18 @@ sonarqube-status: ## 查看 SonarQube 状态
 sonarqube-nginx-deploy: ## 部署 SonarQube Nginx 配置到 /data/apps/nginx-configs
 	@bash $(NGINX_SCRIPTS)/nginx-app-manager.sh deploy sonarqube components/sonarqube/nginx/sonarqube.conf
 
-sonarqube-backup: ## 备份 SonarQube PostgreSQL 到 /data/backup/sonarqube
-	@bash $(COMPONENTS_SCRIPTS)/upgrade-sonarqube.sh --backup-only
+sonarqube-backup: ## 在 Mac mini 备份 SonarQube PostgreSQL
+	@SONAR_DEPLOY_TARGET=mac-mini bash $(COMPONENTS_SCRIPTS)/upgrade-sonarqube.sh --backup-only
 
 sonarqube-upgrade: ## 升级 SonarQube（备份 + pull + 重建容器；SKIP_BACKUP=1 可跳过备份）
-	$(call section_title,升级 SonarQube (serverD))
-	$(call ensure_infra_network_visible)
-	@SKIP_BACKUP=$(SKIP_BACKUP) bash $(COMPONENTS_SCRIPTS)/upgrade-sonarqube.sh
+	$(call section_title,升级 SonarQube (Mac mini))
+	@$(MAKE) init-macmini
+	@SONAR_DEPLOY_TARGET=mac-mini SKIP_BACKUP=$(SKIP_BACKUP) bash $(COMPONENTS_SCRIPTS)/upgrade-sonarqube.sh
 	$(call success_msg,SonarQube 升级流程已执行，请访问 setup 页面完成数据库迁移)
+
+sonarqube-migrate-to-macmini: ## 从 serverD 备份并迁移 SonarQube 到本机（SOURCE_SSH=deploy@host）
+	$(call section_title,迁移 SonarQube: serverD -> Mac mini)
+	@bash $(COMPONENTS_SCRIPTS)/migrate-sonarqube-to-macmini.sh
 
 # ==============================================================================
 # 4. SSL证书管理
@@ -943,6 +951,8 @@ disk-usage: ## Docker 磁盘使用
 .PHONY: serverD-monitoring-up serverD-monitoring-down serverD-monitoring-logs serverD-monitoring-status serverD-monitoring-restart
 .PHONY: serverD-sonarqube-up serverD-sonarqube-down serverD-sonarqube-logs serverD-sonarqube-status serverD-sonarqube-restart
 .PHONY: serverD-sonarqube-backup serverD-sonarqube-upgrade
+.PHONY: macmini-sonarqube-up macmini-sonarqube-down macmini-sonarqube-logs macmini-sonarqube-status
+.PHONY: macmini-sonarqube-restart macmini-sonarqube-backup macmini-sonarqube-upgrade
 .PHONY: server-info validate-cloud-env
 
 serverA-up: ## 启动 ServerA 服务栈 (Nginx)
@@ -1031,7 +1041,7 @@ serverC-destroy: ## 销毁 ServerC 所有容器、卷和数据 (危险!)
 
 serverC-rebuild: serverC-destroy serverC-up ## 完全重建 ServerC (销毁后重建)
 
-serverD-up: ## 启动 ServerD 服务栈 (NSQ + Prometheus + Grafana + SonarQube)
+serverD-up: ## 启动 ServerD 服务栈 (NSQ + Prometheus + Grafana)
 	$(call section_title,启动 ServerD (4C4G))
 	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverD
@@ -1056,27 +1066,40 @@ serverD-monitoring-status: ## 查看 ServerD Prometheus + Grafana 状态
 
 serverD-monitoring-restart: serverD-monitoring-down serverD-monitoring-up ## 重启 ServerD Prometheus + Grafana
 
-serverD-sonarqube-up: ## 在 ServerD 一键启动 SonarQube
-	$(call section_title,启动 ServerD SonarQube)
-	$(call ensure_infra_network_visible)
-	@$(MAKE) init-serverD
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d sonarqube-db sonarqube
-	$(call success_msg,ServerD SonarQube 已启动)
+serverD-sonarqube-up: ## 仅用于迁移回滚：启动 ServerD 旧 SonarQube 容器
+	$(call warning_msg,这是迁移后的回滚入口；正常运行请使用 macmini-sonarqube-up)
+	@docker start sonarqube-db sonarqube
 
-serverD-sonarqube-down: ## 停止 ServerD SonarQube
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env stop sonarqube sonarqube-db
+serverD-sonarqube-down: ## 停止 ServerD 旧 SonarQube 容器
+	@docker stop sonarqube sonarqube-db 2>/dev/null || true
 
-serverD-sonarqube-logs: ## 查看 ServerD SonarQube 日志
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env logs -f --tail=$(LOG_LINES) sonarqube sonarqube-db
+serverD-sonarqube-logs: ## 查看 ServerD 旧 SonarQube 日志
+	@docker logs -f --tail=$(LOG_LINES) sonarqube
 
 serverD-sonarqube-status: ## 查看 ServerD SonarQube 状态
 	@docker ps --filter "label=infra.host=serverD" --filter "label=infra.category=devtools" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 serverD-sonarqube-restart: serverD-sonarqube-down serverD-sonarqube-up ## 重启 ServerD SonarQube
 
-serverD-sonarqube-backup: sonarqube-backup ## 备份 ServerD SonarQube 数据库
+serverD-sonarqube-backup: ## 备份 ServerD 旧 SonarQube 数据库
+	@SONAR_DEPLOY_TARGET=serverD bash $(COMPONENTS_SCRIPTS)/upgrade-sonarqube.sh --backup-only
 
-serverD-sonarqube-upgrade: sonarqube-upgrade ## 升级 ServerD SonarQube（改镜像后执行）
+serverD-sonarqube-upgrade: ## 已迁移停用
+	$(call warning_msg,SonarQube 已迁往 Mac mini；不再升级 serverD 旧实例)
+
+macmini-sonarqube-up: sonarqube-start ## 在 Mac mini 启动 SonarQube
+
+macmini-sonarqube-down: sonarqube-stop ## 停止 Mac mini SonarQube
+
+macmini-sonarqube-logs: sonarqube-logs ## 查看 Mac mini SonarQube 日志
+
+macmini-sonarqube-status: sonarqube-status ## 查看 Mac mini SonarQube 状态
+
+macmini-sonarqube-restart: sonarqube-restart ## 重启 Mac mini SonarQube
+
+macmini-sonarqube-backup: sonarqube-backup ## 备份 Mac mini SonarQube 数据库
+
+macmini-sonarqube-upgrade: sonarqube-upgrade ## 升级 Mac mini SonarQube
 
 serverD-down: ## 停止 ServerD 服务栈
 	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env down
@@ -1386,7 +1409,7 @@ service-ports: ## 显示所有服务端口
 	@echo "$(CYAN)NSQAdmin:$(RESET)    127.0.0.1:4171         [serverD]"
 	@echo "$(CYAN)Prometheus:$(RESET)  prometheus:9090        [serverD / infra-network]"
 	@echo "$(CYAN)Grafana:$(RESET)     grafana:3000           [serverD / infra-network]"
-	@echo "$(CYAN)SonarQube:$(RESET)   sonarqube:9000         [serverD / infra-network]"
+	@echo "$(CYAN)SonarQube:$(RESET)   100.126.200.55:9000    [Mac mini / Tailscale]"
 	@echo "$(CYAN)MySQL:$(RESET)       云托管地址             [云服务商 A]"
 	@echo "$(CYAN)Redis:$(RESET)       云托管地址             [云服务商 A]"
 	@echo ""

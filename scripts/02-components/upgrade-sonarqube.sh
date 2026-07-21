@@ -22,11 +22,17 @@ log_step() { echo -e "${BLUE}[STEP]${NC} $*"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INFRA_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-ENV_FILE="${ENV_FILE:-$INFRA_ROOT/compose/env/prod/serverD.env}"
-COMPOSE_DIR="$INFRA_ROOT/deploy/serverD"
+SONAR_DEPLOY_TARGET="${SONAR_DEPLOY_TARGET:-mac-mini}"
+ENV_FILE="${ENV_FILE:-$INFRA_ROOT/compose/env/prod/${SONAR_DEPLOY_TARGET}.env}"
+COMPOSE_DIR="$INFRA_ROOT/deploy/$SONAR_DEPLOY_TARGET"
 COMPOSE_FILE="$COMPOSE_DIR/docker-compose.yml"
 SONAR_COMPOSE="$INFRA_ROOT/components/sonarqube/docker-compose.yml"
-BACKUP_ROOT="${SONAR_BACKUP_ROOT:-/data/backup/sonarqube}"
+if [[ "$SONAR_DEPLOY_TARGET" == "serverD" ]]; then
+    DEFAULT_BACKUP_ROOT="/data/backup/sonarqube"
+else
+    DEFAULT_BACKUP_ROOT="$HOME/infra-backups/sonarqube"
+fi
+BACKUP_ROOT="${SONAR_BACKUP_ROOT:-$DEFAULT_BACKUP_ROOT}"
 SKIP_BACKUP="${SKIP_BACKUP:-0}"
 WAIT_TIMEOUT="${SONAR_UPGRADE_WAIT_TIMEOUT:-600}"
 BACKUP_ONLY=0
@@ -117,7 +123,7 @@ backup_database() {
 }
 
 echo "=========================================="
-echo "SonarQube 升级 - $(date '+%Y-%m-%d %H:%M:%S')"
+echo "SonarQube 升级 ($SONAR_DEPLOY_TARGET) - $(date '+%Y-%m-%d %H:%M:%S')"
 echo "=========================================="
 
 CURRENT_IMAGE="$(current_image)"
