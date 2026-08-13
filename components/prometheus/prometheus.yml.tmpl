@@ -12,7 +12,8 @@ scrape_configs:
           - 127.0.0.1:9090
 
   # serverD 上的 Prometheus 只能通过本机 docker.sock 发现本机容器。
-  # 跨节点业务服务通过 infra-network overlay 静态抓取。
+  # 跨节点单实例服务可静态抓取；多实例 collection 必须使用 DNS SD，
+  # 否则一个带轮询 DNS 的静态 target 每次只会抓到一个随机副本。
   - job_name: qs-apiserver
     metrics_path: /metrics
     static_configs:
@@ -21,16 +22,14 @@ scrape_configs:
 
   - job_name: qs-collection-server
     metrics_path: /metrics
-    static_configs:
-      - targets:
-          - ${PROMETHEUS_QS_COLLECTION_TARGET}
+    dns_sd_configs:
+      - names:
+          - ${PROMETHEUS_QS_COLLECTION_HOST}
+        type: A
+        port: ${PROMETHEUS_QS_COLLECTION_PORT}
+        refresh_interval: ${PROMETHEUS_SCRAPE_INTERVAL}
 
-  - job_name: qs-worker
-    metrics_path: /metrics
-    static_configs:
-      - targets:
-          - ${PROMETHEUS_QS_WORKER_TARGET}
-
+  # qs-worker 与 Prometheus 同在 serverD，由 Docker SD 为每个容器建立独立 target。
   - job_name: docker-observed
     docker_sd_configs:
       - host: unix:///var/run/docker.sock
