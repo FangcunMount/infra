@@ -52,6 +52,24 @@ COMPONENTS_DIR := components
 # 默认参数
 LOG_LINES := 100
 
+# 独立压测机初始化（不加入生产 Swarm）
+PERF_RUNNER_HOST ?=
+PERF_RUNNER_USER ?=
+PERF_RUNNER_SSH_PORT ?= 22
+PERF_RUNNER_SSH_IDENTITY_FILE ?=
+PERF_RUNNER_STRICT_HOST_KEY_CHECKING ?= accept-new
+PERF_WORKSPACE_ROOT ?= /opt/qs-perf
+PERF_GO_VERSION ?= 1.25.12
+PERF_K6_VERSION ?= v1.5.0
+PERF_QS_SERVER_REPO ?= https://github.com/FangcunMount/qs-server.git
+PERF_QS_SERVER_REF ?= main
+PERF_SKIP_REPO ?= false
+PERF_UPDATE_REPO ?= false
+PERF_RUN_VERIFY ?= true
+PERF_READY_URLS ?= https://collect.fangcunmount.cn/readyz https://qs.fangcunmount.cn/readyz
+PERF_SKIP_NETWORK_CHECK ?= false
+PERF_GO_SHA256 ?=
+
 # 颜色定义
 RED := \033[31m
 GREEN := \033[32m
@@ -151,6 +169,8 @@ help: ## 显示帮助信息
 	@echo "   $(CYAN)server-init$(RESET)          交互式 Linux 初始化"
 	@echo "   $(CYAN)server-init-users$(RESET)    创建/维护用户账户 (root/yangshujie/deploy/www)"
 	@echo "   $(CYAN)server-install-docker$(RESET) 安装 Docker 和 Compose"
+	@echo "   $(CYAN)perf-runner-init-remote$(RESET) 从本机一键初始化独立压测机"
+	@echo "   $(CYAN)perf-runner-check-remote$(RESET) 校验独立压测机"
 	@echo ""
 	@echo "$(MAGENTA)1. VPN/网络配置$(RESET)"
 	@echo "   $(CYAN)vpn-setup$(RESET)            安装配置 VPN (Mihomo)"
@@ -202,7 +222,7 @@ help-all: ## 显示所有命令
 	@echo "$(MAGENTA)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(RESET)"
 	@echo "$(MAGENTA)0. 服务器初始化$(RESET)"
 	@echo "$(MAGENTA)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(RESET)"
-	@grep -hE '^server-.*:.*?## .*$$' $(MAKEFILE_LIST) | \
+	@grep -hE '^(server-|perf-runner-).*:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-28s$(RESET) %s\n", $$1, $$2}'
 	@echo ""
 	@echo "$(MAGENTA)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(RESET)"
@@ -261,6 +281,7 @@ help-all: ## 显示所有命令
 # 0. 服务器初始化
 # ==============================================================================
 .PHONY: server-init server-init-users server-install-docker server-setup-deploy-ssh server-tune
+.PHONY: perf-runner-init perf-runner-check perf-runner-init-remote perf-runner-check-remote perf-runner-verify
 
 server-init: ## 交互式 Linux 初始化 (用户/Docker/调优/deploy SSH/VPN)
 	$(call info_msg,启动交互式 Linux 初始化...)
@@ -281,6 +302,78 @@ server-setup-deploy-ssh: ## 配置 deploy 受限 SSH (CI_PUBLIC_KEY=xxx)
 server-tune: ## 优化宿主机系统参数 (MongoDB等需要)
 	$(call warning_msg,优化宿主机系统参数...)
 	@sudo bash $(SERVER_SCRIPTS)/tune-host.sh
+
+perf-runner-init: ## 在当前 Linux 主机初始化独立 K6 压测环境
+	$(call info_msg,初始化当前 K6 压测机...)
+	@sudo env \
+		PERF_RUNNER_USER="$(PERF_RUNNER_USER)" \
+		PERF_WORKSPACE_ROOT="$(PERF_WORKSPACE_ROOT)" \
+		PERF_GO_VERSION="$(PERF_GO_VERSION)" \
+		PERF_K6_VERSION="$(PERF_K6_VERSION)" \
+		PERF_QS_SERVER_REPO="$(PERF_QS_SERVER_REPO)" \
+		PERF_QS_SERVER_REF="$(PERF_QS_SERVER_REF)" \
+		PERF_SKIP_REPO="$(PERF_SKIP_REPO)" \
+		PERF_UPDATE_REPO="$(PERF_UPDATE_REPO)" \
+		PERF_RUN_VERIFY="$(PERF_RUN_VERIFY)" \
+		PERF_READY_URLS="$(PERF_READY_URLS)" \
+		PERF_SKIP_NETWORK_CHECK="$(PERF_SKIP_NETWORK_CHECK)" \
+		PERF_GO_SHA256="$(PERF_GO_SHA256)" \
+		bash $(SERVER_SCRIPTS)/init-perf-runner.sh init
+
+perf-runner-check: ## 校验当前 Linux 压测机的工具、资源、代码与公网连通性
+	@env \
+		PERF_RUNNER_USER="$(PERF_RUNNER_USER)" \
+		PERF_WORKSPACE_ROOT="$(PERF_WORKSPACE_ROOT)" \
+		PERF_GO_VERSION="$(PERF_GO_VERSION)" \
+		PERF_K6_VERSION="$(PERF_K6_VERSION)" \
+		PERF_SKIP_REPO="$(PERF_SKIP_REPO)" \
+		PERF_READY_URLS="$(PERF_READY_URLS)" \
+		PERF_SKIP_NETWORK_CHECK="$(PERF_SKIP_NETWORK_CHECK)" \
+		bash $(SERVER_SCRIPTS)/init-perf-runner.sh check
+
+perf-runner-init-remote: ## 从本机一键初始化远程压测机 (PERF_RUNNER_HOST=root@IP)
+	$(call require_param,PERF_RUNNER_HOST,make perf-runner-init-remote PERF_RUNNER_HOST=root@1.2.3.4)
+	@env \
+		PERF_RUNNER_HOST="$(PERF_RUNNER_HOST)" \
+		PERF_RUNNER_SSH_PORT="$(PERF_RUNNER_SSH_PORT)" \
+		PERF_RUNNER_SSH_IDENTITY_FILE="$(PERF_RUNNER_SSH_IDENTITY_FILE)" \
+		PERF_RUNNER_STRICT_HOST_KEY_CHECKING="$(PERF_RUNNER_STRICT_HOST_KEY_CHECKING)" \
+		PERF_RUNNER_USER="$(PERF_RUNNER_USER)" \
+		PERF_WORKSPACE_ROOT="$(PERF_WORKSPACE_ROOT)" \
+		PERF_GO_VERSION="$(PERF_GO_VERSION)" \
+		PERF_K6_VERSION="$(PERF_K6_VERSION)" \
+		PERF_QS_SERVER_REPO="$(PERF_QS_SERVER_REPO)" \
+		PERF_QS_SERVER_REF="$(PERF_QS_SERVER_REF)" \
+		PERF_SKIP_REPO="$(PERF_SKIP_REPO)" \
+		PERF_UPDATE_REPO="$(PERF_UPDATE_REPO)" \
+		PERF_RUN_VERIFY="$(PERF_RUN_VERIFY)" \
+		PERF_READY_URLS="$(PERF_READY_URLS)" \
+		PERF_SKIP_NETWORK_CHECK="$(PERF_SKIP_NETWORK_CHECK)" \
+		PERF_GO_SHA256="$(PERF_GO_SHA256)" \
+		bash $(SERVER_SCRIPTS)/init-perf-runner-remote.sh init
+
+perf-runner-check-remote: ## 从本机校验远程压测机 (PERF_RUNNER_HOST=root@IP)
+	$(call require_param,PERF_RUNNER_HOST,make perf-runner-check-remote PERF_RUNNER_HOST=root@1.2.3.4)
+	@env \
+		PERF_RUNNER_HOST="$(PERF_RUNNER_HOST)" \
+		PERF_RUNNER_SSH_PORT="$(PERF_RUNNER_SSH_PORT)" \
+		PERF_RUNNER_SSH_IDENTITY_FILE="$(PERF_RUNNER_SSH_IDENTITY_FILE)" \
+		PERF_RUNNER_STRICT_HOST_KEY_CHECKING="$(PERF_RUNNER_STRICT_HOST_KEY_CHECKING)" \
+		PERF_RUNNER_USER="$(PERF_RUNNER_USER)" \
+		PERF_WORKSPACE_ROOT="$(PERF_WORKSPACE_ROOT)" \
+		PERF_GO_VERSION="$(PERF_GO_VERSION)" \
+		PERF_K6_VERSION="$(PERF_K6_VERSION)" \
+		PERF_SKIP_REPO="$(PERF_SKIP_REPO)" \
+		PERF_READY_URLS="$(PERF_READY_URLS)" \
+		PERF_SKIP_NETWORK_CHECK="$(PERF_SKIP_NETWORK_CHECK)" \
+		bash $(SERVER_SCRIPTS)/init-perf-runner-remote.sh check
+
+perf-runner-verify: ## 静态校验压测机初始化脚本与 Make 入口
+	@bash -n $(SERVER_SCRIPTS)/init-perf-runner.sh
+	@bash -n $(SERVER_SCRIPTS)/init-perf-runner-remote.sh
+	@bash $(SERVER_SCRIPTS)/init-perf-runner.sh --help >/dev/null
+	@bash $(SERVER_SCRIPTS)/init-perf-runner-remote.sh --help >/dev/null
+	$(call success_msg,压测机初始化脚本静态校验通过)
 
 # ==============================================================================
 # 1. VPN/网络配置

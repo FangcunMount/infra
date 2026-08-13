@@ -9,6 +9,7 @@
 - `serverC 4C4G`：`mongodb`
 - `serverD 4C4G`：`qs-worker + operating + nsq + prometheus + grafana`
 - 云托管：`MySQL`、`Redis`
+- 临时压测机：独立 K6 流量发生器，不加入生产 Swarm
 
 ## 快速开始
 
@@ -18,6 +19,9 @@ make help
 
 # 每台新服务器先执行交互式 Linux 初始化
 make server-init
+
+# 从 Mac 一键准备临时 K6 压测机（远端不需要预先 clone infra）
+make perf-runner-init-remote PERF_RUNNER_HOST=root@203.0.113.10
 
 # 每台机器先加入 Tailscale，Swarm 使用 Tailscale IP 作为节点互联地址
 make tailscale-install
@@ -45,6 +49,7 @@ make serverD-up
 | [IAM 迁移手册](docs/server/iam-migration-to-serverB.md) | IAM 迁到 `serverB` 的步骤、证书与 gRPC mTLS 检查点 |
 | [Mongo 迁移手册](docs/server/mongo-migration-to-serverC.md) | Mongo 迁到 `serverC` 的切换顺序、备份恢复与业务改造点 |
 | [QPS 容量规划报告](docs/server/qps-capacity-planning.md) | `200/300/500/800/1000 QPS` 分级判断与组件资源建议 |
+| [独立 K6 压测机初始化](docs/server/perf-runner.md) | 从 Mac 一条命令准备临时 Linux 压测机 |
 | [升降配操作手册](docs/server/scaling-runbook.md) | 拓扑调整、环境变量与发布顺序 |
 | [初始化指南](docs/server/initialization.md) | 四台机器的系统初始化 |
 | [网络架构](docs/network/architecture.md) | Tailscale underlay + 四节点 Swarm overlay 设计 |

@@ -19,6 +19,7 @@ docs/
 │   ├── iam-migration-to-serverB.md
 │   ├── mongo-migration-to-serverC.md
 │   ├── qps-capacity-planning.md
+│   ├── perf-runner.md
 │   ├── scaling-runbook.md
 │   ├── initialization.md
 │   ├── github-actions-deploy-guide.md
@@ -41,7 +42,8 @@ docs/
 2. [网络架构](./network/architecture.md)
 3. [初始化指南](./server/initialization.md)
 4. [升降配操作手册](./server/scaling-runbook.md)
-5. [组件总览](./components/README.md)
+5. [独立 K6 压测机初始化](./server/perf-runner.md)
+6. [组件总览](./components/README.md)
 
 ## 快速查找
 
@@ -51,6 +53,7 @@ docs/
 | 把 IAM 迁到 serverB | [IAM 迁移手册](./server/iam-migration-to-serverB.md) |
 | 把 Mongo 迁到 serverC | [Mongo 迁移手册](./server/mongo-migration-to-serverC.md) |
 | 评估 200~1000 QPS 该怎么配资源 | [QPS 容量规划报告](./server/qps-capacity-planning.md) |
+| 一键准备独立 K6 压测机 | [独立 K6 压测机初始化](./server/perf-runner.md) |
 | 初始化四台机器 | [初始化指南](./server/initialization.md) |
 | 建 Tailscale + 四节点 Swarm / overlay 网络 | [Swarm 搭建](./network/swarm-setup.md) |
 | 调整 serverA / serverB / serverC 部署清单 | [升降配操作手册](./server/scaling-runbook.md) |
