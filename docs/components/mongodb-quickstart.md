@@ -96,6 +96,17 @@ MONGO_CPUS=3.00
 | 对宿主机暴露 | `127.0.0.1:27017` |
 | overlay 访问 | `mongo:27017` |
 
+### 连接预算
+
+`serverC` 的 `maxIncomingConnections=300` 是服务端总上限，不是单个应用实例的连接池大小。当前生产预算为：
+
+- `qs-apiserver`：`maxPoolSize=64`；
+- `qs-worker`：3 个副本，每个 `maxPoolSize=32`，合计 96；
+- 应用连接总预算：160；
+- 剩余约 140 条用于 MongoDB 健康检查、Prometheus/运维检查、备份和连接恢复。
+
+连接池参数由 `qs-server` 的 `configs/apiserver.prod.yaml` 和 `configs/worker.prod.yaml` 管理。不要单独提高 `maxIncomingConnections` 或应用 `maxPoolSize`；先运行 `make mongo-monitor` 检查连接新建速率、拒绝连接和队列。
+
 ## 运维建议
 
 - 不要把 MongoDB 公网暴露到 `0.0.0.0:27017`

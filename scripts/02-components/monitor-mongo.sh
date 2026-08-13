@@ -39,6 +39,7 @@ CACHE_USAGE_THRESHOLD=85      # 缓存使用率告警阈值 (%)
 PAGE_FAULT_THRESHOLD=100      # Page fault 告警阈值（每秒增量）
 QUEUE_THRESHOLD=10            # 队列等待数告警阈值
 DIRTY_BYTES_THRESHOLD_MB=400  # 脏数据阈值 (MB)
+CONNECTION_CHURN_THRESHOLD=10 # 每秒新建连接告警阈值
 
 # 状态文件（用于增量计算）
 STATE_FILE="/tmp/mongo-monitor-state.txt"
@@ -75,6 +76,8 @@ STATS=$(docker exec mongo mongosh \
             currentConn: status.connections.current,
             availableConn: status.connections.available,
             totalCreated: status.connections.totalCreated,
+            activeConn: status.connections.active,
+            rejectedConn: status.connections.rejected,
             
             // WiredTiger 缓存
             cacheSize: status.wiredTiger.cache['bytes currently in the cache'],
@@ -129,6 +132,9 @@ VERSION=$(parse_str "version")
 UPTIME=$(parse_stat "uptime")
 CURRENT_CONN=$(parse_stat "currentConn")
 AVAILABLE_CONN=$(parse_stat "availableConn")
+TOTAL_CREATED_CONN=$(parse_stat "totalCreated")
+ACTIVE_CONN=$(parse_stat "activeConn")
+REJECTED_CONN=$(parse_stat "rejectedConn")
 CACHE_SIZE=$(parse_stat "cacheSize")
 DIRTY_BYTES=$(parse_stat "dirtyBytes")
 MAX_CACHE=$(parse_stat "maxCache")
@@ -167,6 +173,7 @@ MAX_CACHE_MB=$(echo "scale=1; $MAX_CACHE / 1024 / 1024" | bc)
 # 读取上次的状态（用于增量计算）
 PREV_TIMESTAMP=0
 PREV_PAGE_FAULTS=0
+PREV_TOTAL_CREATED_CONN=0
 if [[ -f "$STATE_FILE" ]]; then
     source "$STATE_FILE"
 fi
@@ -181,12 +188,16 @@ if [[ "$PREV_TIMESTAMP" -gt 0 ]]; then
         # 计算 Page Faults 增量（每秒）
         PAGE_FAULTS_DELTA=$((PAGE_FAULTS - PREV_PAGE_FAULTS))
         PAGE_FAULTS_PER_SEC=$(echo "scale=2; $PAGE_FAULTS_DELTA / $TIME_INTERVAL" | bc)
+        CONNECTIONS_CREATED_DELTA=$((TOTAL_CREATED_CONN - PREV_TOTAL_CREATED_CONN))
+        CONNECTIONS_CREATED_PER_SEC=$(echo "scale=2; $CONNECTIONS_CREATED_DELTA / $TIME_INTERVAL" | bc)
     else
         PAGE_FAULTS_PER_SEC="0"
+        CONNECTIONS_CREATED_PER_SEC="0"
     fi
 else
     # 首次运行，无增量数据
     PAGE_FAULTS_PER_SEC="N/A"
+    CONNECTIONS_CREATED_PER_SEC="N/A"
     TIME_INTERVAL=0
 fi
 
@@ -194,6 +205,7 @@ fi
 cat > "$STATE_FILE" << EOF
 PREV_TIMESTAMP=$CURRENT_TIMESTAMP
 PREV_PAGE_FAULTS=$PAGE_FAULTS
+PREV_TOTAL_CREATED_CONN=$TOTAL_CREATED_CONN
 EOF
 
 # 显示指标
@@ -211,6 +223,14 @@ elif (( $(echo "$CONN_USAGE_PCT > 50" | bc -l) )); then
     echo -e "${YELLOW}(${CONN_USAGE_PCT}% 注意)${NC}"
 else
     echo -e "${GREEN}(${CONN_USAGE_PCT}% ✓)${NC}"
+fi
+echo "   活跃连接: $ACTIVE_CONN"
+echo "   拒绝连接: $REJECTED_CONN"
+printf "   新建速率: %s connections/s " "$CONNECTIONS_CREATED_PER_SEC"
+if [[ "$CONNECTIONS_CREATED_PER_SEC" != "N/A" ]] && (( $(echo "$CONNECTIONS_CREATED_PER_SEC > $CONNECTION_CHURN_THRESHOLD" | bc -l) )); then
+    echo -e "${RED}(⚠️  连接抖动)${NC}"
+else
+    echo -e "${GREEN}(✓)${NC}"
 fi
 echo ""
 
@@ -306,6 +326,9 @@ if [[ "$LOCK_QUEUE" -gt "$QUEUE_THRESHOLD" ]]; then
 fi
 if (( $(echo "$CONN_USAGE_PCT > 80" | bc -l) )); then
     ALERTS+=("连接数高 (${CONN_USAGE_PCT}%)")
+fi
+if [[ "$CONNECTIONS_CREATED_PER_SEC" != "N/A" ]] && (( $(echo "$CONNECTIONS_CREATED_PER_SEC > $CONNECTION_CHURN_THRESHOLD" | bc -l) )); then
+    ALERTS+=("连接新建速率过高 (${CONNECTIONS_CREATED_PER_SEC}/秒)")
 fi
 if [[ "$PAGE_FAULTS_PER_SEC" != "N/A" ]] && (( $(echo "$PAGE_FAULTS_PER_SEC > $PAGE_FAULT_THRESHOLD" | bc -l) )); then
     ALERTS+=("缺页速率过高 (${PAGE_FAULTS_PER_SEC}/秒)")
