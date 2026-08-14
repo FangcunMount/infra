@@ -355,7 +355,7 @@ install_materials() {
         'repo_dir=\"\${workspace_root}/qs-server\"' \\
         'fix_permissions() { for file in \"\$repo_dir/tmp/perf/iam-users.json\" \"\$repo_dir/tmp/perf/qs-perf.config.json\" \"\$repo_dir/tmp/perf/tokens.json\" \"\$repo_dir/tmp/perf/apiserver-tokens.json\"; do [[ ! -e \"\$file\" ]] || chmod 0600 \"\$file\"; done; }' \\
         'trap fix_permissions EXIT' \\
-        '\"\${workspace_root}/bin/perf-prepare\"' \\
+        '\"\${workspace_root}/bin/perf-with-env\" make -C \"\$repo_dir\" perf-tokens' \\
         '\"\${workspace_root}/bin/perf-with-env\" make -C \"\$repo_dir\" perf-run PERF_RUN_ROOT=\"\${workspace_root}/runs\" \"\$@\"' >\"\$run_tmp\"
     chown \"\$runner_user:\$runner_group\" \"\$run_tmp\"
     chmod 0700 \"\$run_tmp\"

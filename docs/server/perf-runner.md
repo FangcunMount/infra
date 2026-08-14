@@ -150,7 +150,7 @@ source /etc/profile.d/qs-perf.sh
 /opt/qs-perf/bin/perf-run PLAN=baseline
 ```
 
-`perf-run` 每次都会重新获取短期 token、运行 `perf-preflight`，再把完整运行目录写到 `/opt/qs-perf/runs`。三份材料已由同步脚本写入固定路径；不要把 token、IAM 密码或文件内容放入 shell 历史、Make 参数、Git 或初始化日志。
+`perf-run` 每次都会重新获取短期 token、运行一次 `perf-preflight`，再把完整运行目录写到 `/opt/qs-perf/runs`。三份材料已由同步脚本写入固定路径；不要把 token、IAM 密码或文件内容放入 shell 历史、Make 参数、Git 或初始化日志。
 
 若只想刷新 token 和预检、不产生压力，可执行：
 

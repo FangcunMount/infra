@@ -92,5 +92,9 @@ if ! grep -Fq 'perf-tokens' "$remote_command_capture" || \
     printf '[ERROR] 远端同步没有生成一键准备与压测入口\n' >&2
     exit 1
 fi
+if grep -Fq '\"${workspace_root}/bin/perf-prepare\"' "$remote_command_capture"; then
+    printf '[ERROR] 一键压测入口会重复运行 perf-preflight\n' >&2
+    exit 1
+fi
 
 printf '[OK] 压测环境与配置同步回归通过\n'
