@@ -60,9 +60,10 @@ services:
     depends_on:
       nsqlookupd:
         condition: service_healthy
-    # 适配 serverD 4C4G 配置
-    mem_limit: ${NSQD_MEMORY_LIMIT:-384M}
-    cpus: ${NSQD_CPUS:-0.20}
+    # 压测时 nsqd 位于异步主链路，至少保留 1 CPU/512MiB，避免 CPU quota
+    # 先于宿主机实际容量成为发布超时与 Outbox 重投的人工瓶颈。
+    mem_limit: ${NSQD_MEMORY_LIMIT:-512M}
+    cpus: ${NSQD_CPUS:-1.00}
     logging:
       driver: json-file
       options:

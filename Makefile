@@ -778,12 +778,15 @@ redis-test: ## 测试 Redis 功能
 # ==============================================================================
 # 3. 组件管理 - NSQ
 # ==============================================================================
-.PHONY: nsq-start nsq-stop nsq-restart nsq-logs nsq-status nsq-admin
+.PHONY: nsq-start nsq-stop nsq-restart nsq-logs nsq-status nsq-admin nsq-policy-verify
 .PHONY: nsq-shell nsq-lookupd-logs nsq-admin-logs nsq-topics nsq-stats
 
 nsq-start: ## 启动 NSQ
 	@cd $(COMPONENTS_DIR)/nsq && docker compose --env-file ../../$(ENV_FILE_D) up -d
 	$(call success_msg,NSQ 已启动)
+
+nsq-policy-verify: ## 静态校验生产 NSQD 至少拥有 1 CPU/512MiB
+	@bash $(UTILS_SCRIPTS)/verify-nsq-resource-budget.sh
 
 nsq-stop: ## 停止 NSQ
 	@docker stop nsqd nsqlookupd nsqadmin 2>/dev/null || true
