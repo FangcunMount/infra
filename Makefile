@@ -778,7 +778,7 @@ redis-test: ## 测试 Redis 功能
 # ==============================================================================
 # 3. 组件管理 - NSQ
 # ==============================================================================
-.PHONY: nsq-start nsq-stop nsq-restart nsq-logs nsq-status nsq-admin nsq-policy-verify
+.PHONY: nsq-start nsq-stop nsq-restart nsq-recreate nsq-logs nsq-status nsq-admin nsq-policy-verify
 .PHONY: nsq-shell nsq-lookupd-logs nsq-admin-logs nsq-topics nsq-stats
 
 nsq-start: ## 启动 NSQ
@@ -787,6 +787,23 @@ nsq-start: ## 启动 NSQ
 
 nsq-policy-verify: ## 静态校验生产 NSQD 至少拥有 1 CPU/512MiB
 	@bash $(UTILS_SCRIPTS)/verify-nsq-resource-budget.sh
+
+nsq-recreate: nsq-policy-verify ## 使用 serverD 栈原地重建 NSQD，使资源约束生效
+	@existing_project="$$(docker inspect nsqd --format '{{ index .Config.Labels "com.docker.compose.project" }}' 2>/dev/null || true)"; \
+	if [ -n "$$existing_project" ] && [ "$$existing_project" != "serverd" ]; then \
+		echo "$(RED)NSQD 当前属于 Compose project '$$existing_project'，预期为 'serverd'；为避免误删容器已停止$(RESET)" >&2; \
+		echo "请先确认: docker inspect nsqd --format '{{ json .Config.Labels }}'" >&2; \
+		exit 2; \
+	fi
+	@docker compose \
+		--env-file compose/env/prod/serverD.env \
+		-f deploy/serverD/docker-compose.yml \
+		config >/dev/null
+	@docker compose \
+		--env-file compose/env/prod/serverD.env \
+		-f deploy/serverD/docker-compose.yml \
+		up -d --no-deps --force-recreate nsqd
+	$(call success_msg,NSQD 已通过 serverD Compose project 原地重建)
 
 nsq-stop: ## 停止 NSQ
 	@docker stop nsqd nsqlookupd nsqadmin 2>/dev/null || true

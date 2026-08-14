@@ -80,7 +80,7 @@ NSQD_BROADCAST_ADDRESS=${NODE_D_IP}
 - `nsqadmin` 只绑定 `127.0.0.1`
 - `NSQD_BROADCAST_ADDRESS` 应填写 `serverD` 对其他节点可达的地址
 - 业务侧配置不要写死公网 IP，优先使用 overlay 服务名
-- `nsqd` 至少保留 1 CPU/512MiB；变更后运行 `make nsq-policy-verify`，再重建 `nsqd` 容器使资源约束生效
+- `nsqd` 至少保留 1 CPU/512MiB；变更后运行 `make nsq-recreate`，它会先校验策略，并使用生产 `serverD` Compose project 原地重建容器
 
 ## 相关文档
 
