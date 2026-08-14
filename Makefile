@@ -69,6 +69,15 @@ PERF_RUN_VERIFY ?= true
 PERF_READY_URLS ?= https://collect.fangcunmount.cn/readyz https://qs.fangcunmount.cn/readyz
 PERF_SKIP_NETWORK_CHECK ?= false
 PERF_GO_SHA256 ?=
+PERF_DOWNLOAD_ATTEMPTS ?= 5
+PERF_DOWNLOAD_RETRY_DELAY_SECONDS ?= 3
+PERF_QS_SERVER_SOURCE_DIR ?=
+PERF_GO_PROXY ?=
+PERF_GO_SUMDB ?=
+PERF_RUNNER_ENV_FILE ?=
+PERF_RUNNER_IAM_USERS_FILE ?=
+PERF_RUNNER_CONFIG_FILE ?=
+PERF_RUNNER_AUTO_PREPARE ?= true
 
 # 颜色定义
 RED := \033[31m
@@ -281,7 +290,8 @@ help-all: ## 显示所有命令
 # 0. 服务器初始化
 # ==============================================================================
 .PHONY: server-init server-init-users server-install-docker server-setup-deploy-ssh server-tune
-.PHONY: perf-runner-init perf-runner-check perf-runner-init-remote perf-runner-check-remote perf-runner-verify
+.PHONY: perf-runner-init perf-runner-check perf-runner-init-remote perf-runner-check-remote
+.PHONY: perf-runner-sync-config-remote perf-runner-verify
 
 server-init: ## 交互式 Linux 初始化 (用户/Docker/调优/deploy SSH/VPN)
 	$(call info_msg,启动交互式 Linux 初始化...)
@@ -318,6 +328,10 @@ perf-runner-init: ## 在当前 Linux 主机初始化独立 K6 压测环境
 		PERF_READY_URLS="$(PERF_READY_URLS)" \
 		PERF_SKIP_NETWORK_CHECK="$(PERF_SKIP_NETWORK_CHECK)" \
 		PERF_GO_SHA256="$(PERF_GO_SHA256)" \
+		PERF_DOWNLOAD_ATTEMPTS="$(PERF_DOWNLOAD_ATTEMPTS)" \
+		PERF_DOWNLOAD_RETRY_DELAY_SECONDS="$(PERF_DOWNLOAD_RETRY_DELAY_SECONDS)" \
+		PERF_GO_PROXY="$(PERF_GO_PROXY)" \
+		PERF_GO_SUMDB="$(PERF_GO_SUMDB)" \
 		bash $(SERVER_SCRIPTS)/init-perf-runner.sh init
 
 perf-runner-check: ## 校验当前 Linux 压测机的工具、资源、代码与公网连通性
@@ -338,6 +352,7 @@ perf-runner-init-remote: ## 从本机一键初始化远程压测机 (PERF_RUNNER
 		PERF_RUNNER_SSH_PORT="$(PERF_RUNNER_SSH_PORT)" \
 		PERF_RUNNER_SSH_IDENTITY_FILE="$(PERF_RUNNER_SSH_IDENTITY_FILE)" \
 		PERF_RUNNER_STRICT_HOST_KEY_CHECKING="$(PERF_RUNNER_STRICT_HOST_KEY_CHECKING)" \
+		PERF_QS_SERVER_SOURCE_DIR="$(PERF_QS_SERVER_SOURCE_DIR)" \
 		PERF_RUNNER_USER="$(PERF_RUNNER_USER)" \
 		PERF_WORKSPACE_ROOT="$(PERF_WORKSPACE_ROOT)" \
 		PERF_GO_VERSION="$(PERF_GO_VERSION)" \
@@ -350,7 +365,25 @@ perf-runner-init-remote: ## 从本机一键初始化远程压测机 (PERF_RUNNER
 		PERF_READY_URLS="$(PERF_READY_URLS)" \
 		PERF_SKIP_NETWORK_CHECK="$(PERF_SKIP_NETWORK_CHECK)" \
 		PERF_GO_SHA256="$(PERF_GO_SHA256)" \
+		PERF_DOWNLOAD_ATTEMPTS="$(PERF_DOWNLOAD_ATTEMPTS)" \
+		PERF_DOWNLOAD_RETRY_DELAY_SECONDS="$(PERF_DOWNLOAD_RETRY_DELAY_SECONDS)" \
+		PERF_GO_PROXY="$(PERF_GO_PROXY)" \
+		PERF_GO_SUMDB="$(PERF_GO_SUMDB)" \
 		bash $(SERVER_SCRIPTS)/init-perf-runner-remote.sh init
+	@if [ -n "$(PERF_RUNNER_ENV_FILE)$(PERF_RUNNER_IAM_USERS_FILE)$(PERF_RUNNER_CONFIG_FILE)" ]; then \
+		env \
+			PERF_RUNNER_HOST="$(PERF_RUNNER_HOST)" \
+			PERF_RUNNER_SSH_PORT="$(PERF_RUNNER_SSH_PORT)" \
+			PERF_RUNNER_SSH_IDENTITY_FILE="$(PERF_RUNNER_SSH_IDENTITY_FILE)" \
+			PERF_RUNNER_STRICT_HOST_KEY_CHECKING="$(PERF_RUNNER_STRICT_HOST_KEY_CHECKING)" \
+			PERF_RUNNER_USER="$(PERF_RUNNER_USER)" \
+			PERF_WORKSPACE_ROOT="$(PERF_WORKSPACE_ROOT)" \
+			PERF_RUNNER_ENV_FILE="$(PERF_RUNNER_ENV_FILE)" \
+			PERF_RUNNER_IAM_USERS_FILE="$(PERF_RUNNER_IAM_USERS_FILE)" \
+			PERF_RUNNER_CONFIG_FILE="$(PERF_RUNNER_CONFIG_FILE)" \
+			PERF_RUNNER_AUTO_PREPARE="$(PERF_RUNNER_AUTO_PREPARE)" \
+			bash $(SERVER_SCRIPTS)/sync-perf-runner-config-remote.sh; \
+	fi
 
 perf-runner-check-remote: ## 从本机校验远程压测机 (PERF_RUNNER_HOST=root@IP)
 	$(call require_param,PERF_RUNNER_HOST,make perf-runner-check-remote PERF_RUNNER_HOST=root@1.2.3.4)
@@ -368,11 +401,35 @@ perf-runner-check-remote: ## 从本机校验远程压测机 (PERF_RUNNER_HOST=ro
 		PERF_SKIP_NETWORK_CHECK="$(PERF_SKIP_NETWORK_CHECK)" \
 		bash $(SERVER_SCRIPTS)/init-perf-runner-remote.sh check
 
+perf-runner-sync-config-remote: ## 安全同步 perf.env、iam-users.json 和 qs-perf.config.json
+	$(call require_param,PERF_RUNNER_HOST,make perf-runner-sync-config-remote PERF_RUNNER_HOST=root@1.2.3.4)
+	$(call require_param,PERF_RUNNER_ENV_FILE,PERF_RUNNER_ENV_FILE=/absolute/path/to/perf.env)
+	$(call require_param,PERF_RUNNER_IAM_USERS_FILE,PERF_RUNNER_IAM_USERS_FILE=/absolute/path/to/iam-users.json)
+	$(call require_param,PERF_RUNNER_CONFIG_FILE,PERF_RUNNER_CONFIG_FILE=/absolute/path/to/qs-perf.config.json)
+	@env \
+		PERF_RUNNER_HOST="$(PERF_RUNNER_HOST)" \
+		PERF_RUNNER_SSH_PORT="$(PERF_RUNNER_SSH_PORT)" \
+		PERF_RUNNER_SSH_IDENTITY_FILE="$(PERF_RUNNER_SSH_IDENTITY_FILE)" \
+		PERF_RUNNER_STRICT_HOST_KEY_CHECKING="$(PERF_RUNNER_STRICT_HOST_KEY_CHECKING)" \
+		PERF_RUNNER_USER="$(PERF_RUNNER_USER)" \
+		PERF_WORKSPACE_ROOT="$(PERF_WORKSPACE_ROOT)" \
+		PERF_RUNNER_ENV_FILE="$(PERF_RUNNER_ENV_FILE)" \
+		PERF_RUNNER_IAM_USERS_FILE="$(PERF_RUNNER_IAM_USERS_FILE)" \
+		PERF_RUNNER_CONFIG_FILE="$(PERF_RUNNER_CONFIG_FILE)" \
+		PERF_RUNNER_AUTO_PREPARE="$(PERF_RUNNER_AUTO_PREPARE)" \
+		bash $(SERVER_SCRIPTS)/sync-perf-runner-config-remote.sh
+
 perf-runner-verify: ## 静态校验压测机初始化脚本与 Make 入口
 	@bash -n $(SERVER_SCRIPTS)/init-perf-runner.sh
 	@bash -n $(SERVER_SCRIPTS)/init-perf-runner-remote.sh
+	@bash -n $(SERVER_SCRIPTS)/test-init-perf-runner.sh
+	@bash -n $(SERVER_SCRIPTS)/sync-perf-runner-config-remote.sh
+	@bash -n $(SERVER_SCRIPTS)/test-sync-perf-runner-config.sh
 	@bash $(SERVER_SCRIPTS)/init-perf-runner.sh --help >/dev/null
 	@bash $(SERVER_SCRIPTS)/init-perf-runner-remote.sh --help >/dev/null
+	@bash $(SERVER_SCRIPTS)/sync-perf-runner-config-remote.sh --help >/dev/null
+	@bash $(SERVER_SCRIPTS)/test-init-perf-runner.sh
+	@bash $(SERVER_SCRIPTS)/test-sync-perf-runner-config.sh
 	$(call success_msg,压测机初始化脚本静态校验通过)
 
 # ==============================================================================

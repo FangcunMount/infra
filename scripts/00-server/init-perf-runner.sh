@@ -31,8 +31,15 @@ PERF_UPDATE_REPO="${PERF_UPDATE_REPO:-false}"
 PERF_RUN_VERIFY="${PERF_RUN_VERIFY:-true}"
 PERF_SKIP_NETWORK_CHECK="${PERF_SKIP_NETWORK_CHECK:-false}"
 PERF_RUNNER_USER="${PERF_RUNNER_USER:-${SUDO_USER:-$(id -un)}}"
+PERF_DOWNLOAD_ATTEMPTS="${PERF_DOWNLOAD_ATTEMPTS:-5}"
+PERF_DOWNLOAD_RETRY_DELAY_SECONDS="${PERF_DOWNLOAD_RETRY_DELAY_SECONDS:-3}"
+PERF_QS_SERVER_ARCHIVE="${PERF_QS_SERVER_ARCHIVE:-}"
+PERF_QS_SERVER_ARCHIVE_SHA256="${PERF_QS_SERVER_ARCHIVE_SHA256:-}"
+PERF_GO_PROXY="${PERF_GO_PROXY:-}"
+PERF_GO_SUMDB="${PERF_GO_SUMDB:-}"
 RUNNER_HOME_DIR=""
 TMP_DIR=""
+REPO_STAGING_ROOT=""
 
 if [[ -t 1 ]]; then
     readonly RED=$'\033[0;31m'
@@ -72,6 +79,14 @@ usage() {
   PERF_READY_URLS           空格分隔的就绪探针 URL
   PERF_SKIP_NETWORK_CHECK   true 时跳过公网就绪探针
   PERF_GO_SHA256            可选，覆盖 Go 官方元数据中的 SHA256
+  PERF_DOWNLOAD_ATTEMPTS    下载总尝试次数，默认 5
+  PERF_DOWNLOAD_RETRY_DELAY_SECONDS
+                            下载失败后的重试间隔秒数，默认 3
+  PERF_QS_SERVER_ARCHIVE    可选，本地源码快照在远端的临时归档路径
+  PERF_QS_SERVER_ARCHIVE_SHA256
+                            源码快照 SHA256；使用归档时必须提供
+  PERF_GO_PROXY             可选，仅用于构建/验证的 GOPROXY
+  PERF_GO_SUMDB             可选，仅用于构建/验证的 GOSUMDB
 EOF
 }
 
@@ -128,6 +143,27 @@ validate_config() {
         log_error "版本格式无效: Go=$PERF_GO_VERSION, k6=$PERF_K6_VERSION"
         exit 1
     fi
+    if [[ ! "$PERF_DOWNLOAD_ATTEMPTS" =~ ^[1-9][0-9]*$ ]] || (( PERF_DOWNLOAD_ATTEMPTS > 20 )); then
+        log_error "PERF_DOWNLOAD_ATTEMPTS 必须是 1 到 20 的整数"
+        exit 1
+    fi
+    if [[ ! "$PERF_DOWNLOAD_RETRY_DELAY_SECONDS" =~ ^[0-9]+$ ]] || (( PERF_DOWNLOAD_RETRY_DELAY_SECONDS > 60 )); then
+        log_error "PERF_DOWNLOAD_RETRY_DELAY_SECONDS 必须是 0 到 60 的整数"
+        exit 1
+    fi
+    if [[ -n "$PERF_QS_SERVER_ARCHIVE" ]]; then
+        case "$PERF_QS_SERVER_ARCHIVE" in
+            /tmp/qs-perf-source.*) ;;
+            *) log_error "PERF_QS_SERVER_ARCHIVE 必须位于 /tmp/qs-perf-source.*"; exit 1 ;;
+        esac
+        if [[ ! "$PERF_QS_SERVER_ARCHIVE_SHA256" =~ ^[0-9a-fA-F]{64}$ ]]; then
+            log_error "使用源码快照时必须提供有效的 PERF_QS_SERVER_ARCHIVE_SHA256"
+            exit 1
+        fi
+    elif [[ -n "$PERF_QS_SERVER_ARCHIVE_SHA256" ]]; then
+        log_error "PERF_QS_SERVER_ARCHIVE_SHA256 不能脱离源码快照单独使用"
+        exit 1
+    fi
 }
 
 detect_arch() {
@@ -145,15 +181,15 @@ install_packages() {
         apt-get update
         apt-get install -y --no-install-recommends \
             ca-certificates coreutils curl dnsutils findutils git gzip jq make mtr-tiny \
-            procps sysstat tar util-linux xz-utils
+            nodejs procps rsync sysstat tar util-linux xz-utils
     elif command -v dnf >/dev/null 2>&1; then
         dnf install -y \
             bind-utils ca-certificates coreutils curl findutils git gzip jq make \
-            mtr procps-ng shadow-utils sysstat tar util-linux xz
+            mtr nodejs procps-ng rsync shadow-utils sysstat tar util-linux xz
     elif command -v yum >/dev/null 2>&1; then
         yum install -y \
             bind-utils ca-certificates coreutils curl findutils git gzip jq make \
-            mtr procps-ng shadow-utils sysstat tar util-linux xz
+            mtr nodejs procps-ng rsync shadow-utils sysstat tar util-linux xz
     else
         log_error "不支持的包管理器；当前支持 apt、dnf 和 yum"
         exit 1
@@ -163,9 +199,30 @@ install_packages() {
 download() {
     local url="$1"
     local output="$2"
-    curl --fail --location --silent --show-error \
-        --retry 3 --retry-delay 2 --connect-timeout 15 \
-        "$url" --output "$output"
+    local partial="${output}.part"
+    local attempt
+    local curl_status=0
+
+    rm -f -- "$partial"
+    for (( attempt = 1; attempt <= PERF_DOWNLOAD_ATTEMPTS; attempt++ )); do
+        if curl --fail --location --silent --show-error \
+            --connect-timeout 15 --max-time 600 \
+            "$url" --output "$partial"; then
+            mv -f -- "$partial" "$output"
+            return
+        else
+            curl_status=$?
+        fi
+
+        rm -f -- "$partial"
+        if (( attempt < PERF_DOWNLOAD_ATTEMPTS )); then
+            log_warn "下载失败 (curl=${curl_status}, ${attempt}/${PERF_DOWNLOAD_ATTEMPTS}): $(basename "$output")；${PERF_DOWNLOAD_RETRY_DELAY_SECONDS}s 后重试"
+            sleep "$PERF_DOWNLOAD_RETRY_DELAY_SECONDS"
+        fi
+    done
+
+    log_error "下载失败 (curl=${curl_status}, ${PERF_DOWNLOAD_ATTEMPTS}/${PERF_DOWNLOAD_ATTEMPTS}): $(basename "$output")"
+    return "$curl_status"
 }
 
 verify_sha256() {
@@ -298,6 +355,107 @@ run_as_runner() {
     fi
 }
 
+run_toolchain_as_runner() {
+    local -a toolchain_env=("PATH=/usr/local/go/bin:/usr/local/bin:${PATH}")
+    if [[ -n "$PERF_GO_PROXY" ]]; then
+        toolchain_env+=("GOPROXY=$PERF_GO_PROXY")
+    fi
+    if [[ -n "$PERF_GO_SUMDB" ]]; then
+        toolchain_env+=("GOSUMDB=$PERF_GO_SUMDB")
+    fi
+    run_as_runner env "${toolchain_env[@]}" "$@"
+}
+
+repository_checkout_is_usable() {
+    local repo_dir="$1"
+    [[ -f "$repo_dir/go.mod" ]] || return 1
+    [[ -f "$repo_dir/Makefile" ]] || return 1
+    [[ -d "$repo_dir/scripts/perf/perfctl" ]] || return 1
+    if [[ -d "$repo_dir/.git" ]] && \
+        run_as_runner git -C "$repo_dir" rev-parse --verify HEAD >/dev/null 2>&1; then
+        return
+    fi
+    [[ -f "$repo_dir/.perf-source-snapshot" ]] &&
+        grep -Eq '^[0-9a-fA-F]{64}$' "$repo_dir/.perf-source-snapshot"
+}
+
+stage_repository_archive() {
+    if [[ ! -f "$PERF_QS_SERVER_ARCHIVE" ]]; then
+        log_error "源码快照不存在: $PERF_QS_SERVER_ARCHIVE"
+        return 1
+    fi
+    if ! verify_sha256 "$PERF_QS_SERVER_ARCHIVE" "$PERF_QS_SERVER_ARCHIVE_SHA256"; then
+        log_error "源码快照 SHA256 校验失败"
+        return 1
+    fi
+    local archive_listing="${TMP_DIR}/qs-server-archive.list"
+    if ! tar -tzf "$PERF_QS_SERVER_ARCHIVE" >"$archive_listing"; then
+        log_error "无法读取源码快照目录"
+        return 1
+    fi
+    if grep -Eq '(^/|(^|/)\.\.(/|$))' "$archive_listing"; then
+        log_error "源码快照包含不安全路径"
+        return 1
+    fi
+
+    local staging_root
+    staging_root="$(mktemp -d "${PERF_WORKSPACE_ROOT}/.qs-server-source.XXXXXX")"
+    REPO_STAGING_ROOT="$staging_root"
+    local staged_repo="${staging_root}/checkout"
+    install -d -m 0755 "$staged_repo"
+    tar -xzf "$PERF_QS_SERVER_ARCHIVE" --no-same-owner --no-same-permissions \
+        -C "$staged_repo"
+    printf '%s\n' "${PERF_QS_SERVER_ARCHIVE_SHA256,,}" >"${staged_repo}/.perf-source-snapshot"
+
+    local runner_group
+    runner_group="$(id -gn "$PERF_RUNNER_USER")"
+    chown -R "$PERF_RUNNER_USER:$runner_group" "$staging_root"
+    if ! repository_checkout_is_usable "$staged_repo"; then
+        rm -rf -- "$staging_root"
+        log_error "源码快照缺少 go.mod、Makefile 或 scripts/perf/perfctl"
+        return 1
+    fi
+    STAGED_REPO_DIR="$staged_repo"
+}
+
+stage_repository_checkout() {
+    local runner_group
+    runner_group="$(id -gn "$PERF_RUNNER_USER")"
+
+    local staging_root
+    staging_root="$(mktemp -d "${PERF_WORKSPACE_ROOT}/.qs-server-clone.XXXXXX")"
+    REPO_STAGING_ROOT="$staging_root"
+    chown "$PERF_RUNNER_USER:$runner_group" "$staging_root"
+
+    local attempt
+    local staged_repo=""
+    local clone_status=0
+    for (( attempt = 1; attempt <= PERF_DOWNLOAD_ATTEMPTS; attempt++ )); do
+        staged_repo="${staging_root}/attempt-${attempt}"
+        if run_as_runner git clone --depth 1 --branch "$PERF_QS_SERVER_REF" \
+            "$PERF_QS_SERVER_REPO" "$staged_repo"; then
+            if repository_checkout_is_usable "$staged_repo"; then
+                STAGED_REPO_DIR="$staged_repo"
+                return
+            fi
+            clone_status=1
+            log_warn "clone 完成但 checkout 不完整 (${attempt}/${PERF_DOWNLOAD_ATTEMPTS})"
+        else
+            clone_status=$?
+        fi
+
+        if (( attempt < PERF_DOWNLOAD_ATTEMPTS )); then
+            log_warn "clone qs-server 失败 (${attempt}/${PERF_DOWNLOAD_ATTEMPTS})；${PERF_DOWNLOAD_RETRY_DELAY_SECONDS}s 后重试"
+            sleep "$PERF_DOWNLOAD_RETRY_DELAY_SECONDS"
+        fi
+    done
+
+    rm -rf -- "$staging_root"
+    REPO_STAGING_ROOT=""
+    log_error "clone qs-server 失败 (${PERF_DOWNLOAD_ATTEMPTS}/${PERF_DOWNLOAD_ATTEMPTS})"
+    return "$clone_status"
+}
+
 prepare_repository() {
     if is_true "$PERF_SKIP_REPO"; then
         log_warn "已跳过 qs-server clone 与工具链验证"
@@ -305,11 +463,57 @@ prepare_repository() {
     fi
 
     local repo_dir="${PERF_WORKSPACE_ROOT}/qs-server"
-    if [[ ! -d "$repo_dir/.git" ]]; then
-        log_info "clone qs-server ($PERF_QS_SERVER_REF)"
-        run_as_runner git clone --depth 1 --branch "$PERF_QS_SERVER_REF" \
-            "$PERF_QS_SERVER_REPO" "$repo_dir"
-    elif is_true "$PERF_UPDATE_REPO"; then
+    local install_source=false
+    if [[ -n "$PERF_QS_SERVER_ARCHIVE" ]]; then
+        local installed_snapshot=""
+        if [[ -f "${repo_dir}/.perf-source-snapshot" ]]; then
+            installed_snapshot="$(tr '[:upper:]' '[:lower:]' <"${repo_dir}/.perf-source-snapshot")"
+        fi
+        if [[ "$installed_snapshot" == "${PERF_QS_SERVER_ARCHIVE_SHA256,,}" ]] && \
+            repository_checkout_is_usable "$repo_dir"; then
+            log_ok "本地 qs-server 源码快照已同步"
+        else
+            log_info "安装本地 qs-server 源码快照"
+            STAGED_REPO_DIR=""
+            stage_repository_archive
+            install_source=true
+        fi
+    elif ! repository_checkout_is_usable "$repo_dir"; then
+        if [[ -e "$repo_dir" ]]; then
+            log_warn "检测到不完整的 qs-server checkout，将在成功 clone 后保留备份"
+        else
+            log_info "clone qs-server ($PERF_QS_SERVER_REF)"
+        fi
+
+        STAGED_REPO_DIR=""
+        stage_repository_checkout
+        install_source=true
+    fi
+
+    local toolchain_preverified=false
+    if is_true "$install_source"; then
+        local staging_root
+        staging_root="$(dirname "$STAGED_REPO_DIR")"
+        log_info "在临时源码目录构建 perfctl"
+        run_toolchain_as_runner /usr/local/go/bin/go -C "$STAGED_REPO_DIR" build \
+            -o "${staging_root}/perfctl" ./scripts/perf/perfctl
+        if is_true "$PERF_RUN_VERIFY"; then
+            log_info "在临时源码目录执行压测工具链回归: make perf-verify"
+            run_toolchain_as_runner make -C "$STAGED_REPO_DIR" perf-verify
+        fi
+        toolchain_preverified=true
+
+        if [[ -e "$repo_dir" ]]; then
+            local backup="${repo_dir}.previous.$(date +%Y%m%d-%H%M%S).$$"
+            mv -- "$repo_dir" "$backup"
+            log_warn "原 qs-server 目录已保留为 $backup"
+        fi
+        mv -- "$STAGED_REPO_DIR" "$repo_dir"
+        mv -f -- "${staging_root}/perfctl" "${PERF_WORKSPACE_ROOT}/bin/perfctl"
+        rm -rf -- "$staging_root"
+        REPO_STAGING_ROOT=""
+        log_ok "qs-server checkout 已准备完成"
+    elif is_true "$PERF_UPDATE_REPO" && [[ -d "$repo_dir/.git" ]]; then
         if [[ -n "$(run_as_runner git -C "$repo_dir" status --porcelain)" ]]; then
             log_warn "已有 qs-server checkout 存在未提交修改，跳过更新"
         else
@@ -317,19 +521,19 @@ prepare_repository() {
             run_as_runner git -C "$repo_dir" fetch --depth 1 origin "$PERF_QS_SERVER_REF"
             run_as_runner git -C "$repo_dir" checkout --detach FETCH_HEAD
         fi
-    else
+    elif [[ -z "$PERF_QS_SERVER_ARCHIVE" ]]; then
         log_ok "保留已有 qs-server checkout（PERF_UPDATE_REPO=false）"
     fi
 
-    log_info "构建 perfctl"
-    run_as_runner env PATH="/usr/local/go/bin:/usr/local/bin:${PATH}" \
-        /usr/local/go/bin/go -C "$repo_dir" build \
-        -o "${PERF_WORKSPACE_ROOT}/bin/perfctl" ./scripts/perf/perfctl
+    if ! is_true "$toolchain_preverified"; then
+        log_info "构建 perfctl"
+        run_toolchain_as_runner /usr/local/go/bin/go -C "$repo_dir" build \
+            -o "${PERF_WORKSPACE_ROOT}/bin/perfctl" ./scripts/perf/perfctl
 
-    if is_true "$PERF_RUN_VERIFY"; then
-        log_info "执行 qs-server 压测工具链回归: make perf-verify"
-        run_as_runner env PATH="/usr/local/go/bin:/usr/local/bin:${PATH}" \
-            make -C "$repo_dir" perf-verify
+        if is_true "$PERF_RUN_VERIFY"; then
+            log_info "执行 qs-server 压测工具链回归: make perf-verify"
+            run_toolchain_as_runner make -C "$repo_dir" perf-verify
+        fi
     fi
 }
 
@@ -372,7 +576,7 @@ check_command_versions() {
     else
         log_ok "$(k6 version | head -n 1)"
     fi
-    for command_name in curl git jq make mtr sar; do
+    for command_name in curl git jq make mtr node rsync sar; do
         if ! command -v "$command_name" >/dev/null 2>&1; then
             log_error "缺少命令: $command_name"
             failed=1
@@ -386,11 +590,16 @@ check_repository() {
         return
     fi
     local repo_dir="${PERF_WORKSPACE_ROOT}/qs-server"
-    if [[ ! -d "$repo_dir/.git" || ! -x "${PERF_WORKSPACE_ROOT}/bin/perfctl" ]]; then
+    if ! repository_checkout_is_usable "$repo_dir" || \
+        [[ ! -x "${PERF_WORKSPACE_ROOT}/bin/perfctl" ]]; then
         log_error "qs-server 或 perfctl 尚未准备完成"
         return 1
     fi
-    log_ok "qs-server=$(run_as_runner git -C "$repo_dir" rev-parse --short HEAD)"
+    if [[ -d "$repo_dir/.git" ]]; then
+        log_ok "qs-server commit=$(run_as_runner git -C "$repo_dir" rev-parse --short HEAD)"
+    else
+        log_ok "qs-server local-snapshot=$(cut -c1-12 "${repo_dir}/.perf-source-snapshot")"
+    fi
 }
 
 check_network() {
@@ -430,7 +639,14 @@ run_checks() {
         "$PERF_WORKSPACE_ROOT" "$PERF_WORKSPACE_ROOT"
     if ! is_true "$PERF_SKIP_REPO"; then
         printf '代码目录: %s/qs-server\n' "$PERF_WORKSPACE_ROOT"
-        printf '下一步: 重新登录以应用 nofile 限制，然后安全写入 token/config，再执行 make perf-preflight。\n'
+        if [[ -x "$PERF_WORKSPACE_ROOT/bin/perf-run" && \
+            -r "$PERF_WORKSPACE_ROOT/secrets/perf.env" && \
+            -r "$PERF_WORKSPACE_ROOT/qs-server/tmp/perf/iam-users.json" && \
+            -r "$PERF_WORKSPACE_ROOT/qs-server/tmp/perf/qs-perf.config.json" ]]; then
+            printf '一键压测: %s/bin/perf-run PLAN=baseline\n' "$PERF_WORKSPACE_ROOT"
+        else
+            printf '下一步: 同步三份压测材料；同步命令会刷新 token 并执行 perf-preflight。\n'
+        fi
     fi
 }
 
@@ -459,7 +675,15 @@ main() {
 
     require_root
     TMP_DIR="$(mktemp -d /tmp/qs-perf-init.XXXXXX)"
-    trap 'if [[ -n "$TMP_DIR" && "$TMP_DIR" == /tmp/qs-perf-init.* ]]; then rm -rf -- "$TMP_DIR"; fi' EXIT
+    trap '
+        if [[ -n "$TMP_DIR" && "$TMP_DIR" == /tmp/qs-perf-init.* ]]; then rm -rf -- "$TMP_DIR"; fi
+        if [[ -n "$PERF_QS_SERVER_ARCHIVE" && "$PERF_QS_SERVER_ARCHIVE" == /tmp/qs-perf-source.* ]]; then rm -f -- "$PERF_QS_SERVER_ARCHIVE"; fi
+        case "$REPO_STAGING_ROOT" in
+            "$PERF_WORKSPACE_ROOT"/.qs-server-source.*|"$PERF_WORKSPACE_ROOT"/.qs-server-clone.*)
+                rm -rf -- "$REPO_STAGING_ROOT"
+                ;;
+        esac
+    ' EXIT
 
     local arch
     arch="$(detect_arch)"
