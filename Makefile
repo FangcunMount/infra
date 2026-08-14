@@ -622,7 +622,7 @@ ps: status ## 查看容器 (别名)
 # ==============================================================================
 # 3. 组件管理 - Nginx
 # ==============================================================================
-.PHONY: nginx-init nginx-start nginx-stop nginx-restart nginx-recreate nginx-logs nginx-reload nginx-test nginx-status
+.PHONY: nginx-init nginx-start nginx-stop nginx-restart nginx-recreate nginx-logs nginx-reload nginx-test nginx-status nginx-policy-verify
 
 nginx-init: ## 初始化 Nginx 运行环境 (网络/目录)
 	@$(MAKE) init-serverA ENV=$(ENV)
@@ -655,6 +655,9 @@ nginx-reload: ## 重载 Nginx 配置
 
 nginx-test: ## 测试 Nginx 配置
 	@docker exec nginx nginx -t
+
+nginx-policy-verify: ## 静态校验全局 upstream 不会因保护性 503 摘除节点
+	@bash $(NGINX_SCRIPTS)/verify-upstream-policy.sh
 
 # ==============================================================================
 # 3. 组件管理 - MongoDB
