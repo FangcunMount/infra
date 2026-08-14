@@ -51,6 +51,23 @@ make perf-verify
 
 ## 常用命令
 
+### 0. 日常一键同步
+
+首次使用时创建只保存在本机的同步配置：
+
+```bash
+cp scripts/00-server/perf-runner-sync.mk.example .perf-runner-sync.mk
+chmod 0600 .perf-runner-sync.mk
+```
+
+填写压测机、SSH key、qs-server 与三份压测材料的绝对路径。之后源码或 K6 工具链有更新时只需：
+
+```bash
+make perf-runner-sync
+```
+
+该入口复用下方完整初始化流程：上传本地 Git tracked 源码快照、构建 `perfctl`、执行 `perf-verify`、同步三份材料、刷新 token 并运行 `perf-preflight`。它不会自动执行 `perf-run`，因此同步成功不等于已经开始压测。`.perf-runner-sync.mk` 已被 Git 忽略，不得在其中保存 IAM 密码、token 或数据库凭据。
+
 ### 1. 从 Mac 初始化远端机器
 
 ```bash
@@ -181,6 +198,7 @@ rsync -av \
 | 变量 | 默认值 | 作用 |
 |---|---:|---|
 | `PERF_WORKSPACE_ROOT` | `/opt/qs-perf` | 远端工作根目录 |
+| `PERF_RUNNER_SYNC_CONFIG` | `.perf-runner-sync.mk` | `make perf-runner-sync` 使用的本机私有 Make 配置 |
 | `PERF_GO_VERSION` | `1.25.12` | Go 固定版本 |
 | `PERF_K6_VERSION` | `v1.5.0` | k6 固定版本 |
 | `PERF_QS_SERVER_REF` | `main` | clone 的分支或 tag |

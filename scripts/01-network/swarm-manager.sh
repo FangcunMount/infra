@@ -332,7 +332,9 @@ create_network() {
     fi
 
     local subnet="${INFRA_BACKEND_SUBNET:-172.20.0.0/24}"
-    local mtu="${INFRA_NETWORK_MTU:-1450}"
+    # Swarm 数据面承载在 MTU=1280 的 tailscale0 上。overlay/VXLAN 会再消耗
+    # 约 50 字节，因此把 network driver MTU 对齐到 1280，让容器端点落在 1230。
+    local mtu="${INFRA_NETWORK_MTU:-1280}"
     local encrypted="${INFRA_NETWORK_ENCRYPTED:-false}"
 
     # 检查网络是否已存在

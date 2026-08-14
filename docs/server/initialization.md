@@ -405,7 +405,7 @@ docker swarm init
 docker network rm infra-network
 docker network create --driver overlay --attachable \
   --subnet 172.20.0.0/24 --gateway 172.20.0.1 \
-  --opt com.docker.network.driver.mtu=1450 \
+  --opt com.docker.network.driver.mtu=1280 \
   infra-network
 ```
 

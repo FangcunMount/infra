@@ -209,7 +209,7 @@ sudo ./scripts/01-network/swarm-manager.sh create-network
 
 ```bash
 INFRA_BACKEND_SUBNET=172.20.0.0/24 \
-INFRA_NETWORK_MTU=1450 \
+INFRA_NETWORK_MTU=1280 \
 INFRA_NETWORK_ENCRYPTED=false \
 bash ./scripts/02-components/init-infrastructure.sh create
 ```
@@ -306,10 +306,23 @@ make serverC-up
 
 优先排查：
 
-- MTU 是否需要从 `1450` 进一步下调到 `1400` 或 `1280`
+- `docker network inspect infra-network` 的 driver MTU 是否为 `1280`
+- 容器端点 MTU 是否约为 `1230`；如果仍为 `1400`，说明旧网络尚未重建
 - Mihomo TUN 是否劫持 `100.64.0.0/10`
 - `data-path-addr` 是否显式绑定到了错误接口
 - 是否误开了 `INFRA_NETWORK_ENCRYPTED=true` 导致重新依赖 ESP
+
+运行时可直接执行：
+
+```bash
+make network-mtu-verify \
+  MTU_VERIFY_CONTAINER=qs-apiserver \
+  MTU_VERIFY_TARGET=mongo
+```
+
+如果旧网络仍显示 `driver MTU=1450`，不要尝试原地修改。该属性只能通过
+重建 overlay 生效，而且 `infra-network` 同时承载多台主机上的业务容器；
+切换必须进入维护窗口，先保存容器 DNS aliases 和回滚参数，再断开旧端点。
 
 ### 4. 单个 manager 掉线后无法管理集群
 

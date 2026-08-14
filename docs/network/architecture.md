@@ -39,7 +39,8 @@
 | 附着方式 | `attachable` |
 | 子网 | `172.20.0.0/24` |
 | 网关 | `172.20.0.1` |
-| MTU | `1450` |
+| Tailscale underlay MTU | `1280` |
+| 容器 overlay 端点 MTU | 约 `1230` |
 | Docker overlay 数据面加密 | `disabled` |
 | 节点链路加密 | `Tailscale` |
 
@@ -73,7 +74,7 @@ docker stack deploy
 
  ┌──────────────────────────────────────────────────────────────────────────┐
  │        infra-network (overlay, attachable; Tailscale underlay)          │
- │                          172.20.0.0/24 / MTU 1450                       │
+ │                 172.20.0.0/24 / underlay 1280 / endpoint 1230         │
  │                                                                          │
  │  Cloud A                                         Cloud B                 │
  │                                                                          │

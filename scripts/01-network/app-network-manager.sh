@@ -267,7 +267,7 @@ create_network() {
     
     # overlay 特定选项
     if [[ "$driver" == "overlay" ]]; then
-        cmd+=" --opt com.docker.network.driver.mtu=1450"
+        cmd+=" --opt com.docker.network.driver.mtu=${INFRA_NETWORK_MTU:-1280}"
         if [[ "$encrypted" == "true" ]]; then
             cmd+=" --opt encrypted=true"
         fi

@@ -20,7 +20,8 @@
 - 驱动：`overlay`
 - 附着方式：`attachable`
 - 子网：`172.20.0.0/24`
-- MTU：`1450`
+- Tailscale underlay MTU：`1280`
+- 容器 overlay 端点 MTU：约 `1230`（扣除约 50 字节 VXLAN 开销）
 - Docker overlay 数据面加密：`disabled`
 - 底层节点链路加密：`Tailscale`
 
@@ -103,12 +104,38 @@ sudo ./scripts/01-network/swarm-manager.sh create-network
 
 ```bash
 INFRA_BACKEND_SUBNET=172.20.0.0/24 \
-INFRA_NETWORK_MTU=1450 \
+INFRA_NETWORK_MTU=1280 \
 INFRA_NETWORK_ENCRYPTED=false \
 bash ./scripts/02-components/init-infrastructure.sh create
 ```
 
 ## 验证
+
+先验证仓库中的 MTU 策略没有回退：
+
+```bash
+make network-mtu-policy-verify
+```
+
+在接入生产 overlay 的节点上验证实际网络。以 serverA 的 apiserver 到 Mongo 为例：
+
+```bash
+make network-mtu-verify \
+  MTU_VERIFY_CONTAINER=qs-apiserver \
+  MTU_VERIFY_TARGET=mongo
+```
+
+预期同时满足：
+
+- `infra-network` driver MTU 为 `1280`
+- `tailscale0` MTU 为 `1280`
+- 容器端点 MTU 不大于 `1230`
+- 到跨主机目标的 PMTU 不大于 `1230`
+
+`infra-network` 已存在时，初始化脚本不会原地修改 MTU。Docker overlay
+也不支持原地更新该选项，必须在维护窗口内保存容器 aliases、断开全部
+旧端点、重建同名网络并按依赖顺序重连。不要在仍有容器挂载时直接运行
+`docker network rm infra-network`。
 
 ### 查看节点
 

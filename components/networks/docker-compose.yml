@@ -12,7 +12,9 @@ networks:
       config:
         - subnet: 172.20.0.0/24
     driver_opts:
-      com.docker.network.driver.mtu: "1450"  # overlay 推荐 MTU
+      # Swarm data-path 使用 MTU=1280 的 tailscale0；Docker overlay 端点会扣除
+      # 约 50 字节 VXLAN 开销，容器内最终 MTU 约为 1230。
+      com.docker.network.driver.mtu: "1280"
       # 不设置 encrypted=true；跨云加密由 Tailscale underlay 承担，避免依赖 ESP/IP protocol 50。
     labels:
       - "infra.network=backend"

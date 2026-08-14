@@ -1,0 +1,17 @@
+# 复制为 infra 根目录下的 .perf-runner-sync.mk，并 chmod 0600。
+# 这里只保存本机路径与远端连接参数，不保存 IAM 密码、token 或数据库凭据。
+
+PERF_RUNNER_HOST := root@203.0.113.10
+PERF_RUNNER_SSH_IDENTITY_FILE := /absolute/path/to/private-key
+
+PERF_QS_SERVER_SOURCE_DIR := /absolute/path/to/qs-server
+PERF_RUNNER_ENV_FILE := /absolute/path/to/qs-server/tmp/perf/perf.env
+PERF_RUNNER_IAM_USERS_FILE := /absolute/path/to/qs-server/tmp/perf/iam-users.json
+PERF_RUNNER_CONFIG_FILE := /absolute/path/to/qs-server/tmp/perf/qs-perf.config.json
+
+# 中国大陆压测机推荐仅对 Go 构建使用镜像，仍保留模块校验。
+PERF_GO_PROXY := https://goproxy.cn,direct
+PERF_GO_SUMDB := sum.golang.google.cn
+
+# 同步后刷新 token 并运行 perf-preflight；不会发起 K6 压力流量。
+PERF_RUNNER_AUTO_PREPARE := true

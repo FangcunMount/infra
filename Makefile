@@ -51,8 +51,13 @@ COMPONENTS_DIR := components
 
 # 默认参数
 LOG_LINES := 100
+INFRA_NETWORK_MTU ?= 1280
+INFRA_OVERLAY_OVERHEAD ?= 50
 
 # 独立压测机初始化（不加入生产 Swarm）
+PERF_RUNNER_SYNC_CONFIG ?= .perf-runner-sync.mk
+-include $(PERF_RUNNER_SYNC_CONFIG)
+
 PERF_RUNNER_HOST ?=
 PERF_RUNNER_USER ?=
 PERF_RUNNER_SSH_PORT ?= 22
@@ -290,7 +295,7 @@ help-all: ## 显示所有命令
 # 0. 服务器初始化
 # ==============================================================================
 .PHONY: server-init server-init-users server-install-docker server-setup-deploy-ssh server-tune
-.PHONY: perf-runner-init perf-runner-check perf-runner-init-remote perf-runner-check-remote
+.PHONY: perf-runner-init perf-runner-check perf-runner-init-remote perf-runner-check-remote perf-runner-sync
 .PHONY: perf-runner-sync-config-remote perf-runner-verify
 
 server-init: ## 交互式 Linux 初始化 (用户/Docker/调优/deploy SSH/VPN)
@@ -385,6 +390,16 @@ perf-runner-init-remote: ## 从本机一键初始化远程压测机 (PERF_RUNNER
 			bash $(SERVER_SCRIPTS)/sync-perf-runner-config-remote.sh; \
 	fi
 
+perf-runner-sync: ## 一键同步源码、压测材料、token 并执行远端 preflight（不发起压测）
+	$(call require_param,PERF_RUNNER_HOST,在 $(PERF_RUNNER_SYNC_CONFIG) 中配置 PERF_RUNNER_HOST)
+	$(call require_param,PERF_QS_SERVER_SOURCE_DIR,在 $(PERF_RUNNER_SYNC_CONFIG) 中配置 PERF_QS_SERVER_SOURCE_DIR)
+	$(call require_param,PERF_RUNNER_ENV_FILE,在 $(PERF_RUNNER_SYNC_CONFIG) 中配置 PERF_RUNNER_ENV_FILE)
+	$(call require_param,PERF_RUNNER_IAM_USERS_FILE,在 $(PERF_RUNNER_SYNC_CONFIG) 中配置 PERF_RUNNER_IAM_USERS_FILE)
+	$(call require_param,PERF_RUNNER_CONFIG_FILE,在 $(PERF_RUNNER_SYNC_CONFIG) 中配置 PERF_RUNNER_CONFIG_FILE)
+	@$(MAKE) --no-print-directory perf-runner-init-remote \
+		PERF_RUNNER_SYNC_CONFIG="$(PERF_RUNNER_SYNC_CONFIG)"
+	$(call success_msg,压测机源码、配置、token 与 preflight 已同步完成；未发起压测)
+
 perf-runner-check-remote: ## 从本机校验远程压测机 (PERF_RUNNER_HOST=root@IP)
 	$(call require_param,PERF_RUNNER_HOST,make perf-runner-check-remote PERF_RUNNER_HOST=root@1.2.3.4)
 	@env \
@@ -430,6 +445,13 @@ perf-runner-verify: ## 静态校验压测机初始化脚本与 Make 入口
 	@bash $(SERVER_SCRIPTS)/sync-perf-runner-config-remote.sh --help >/dev/null
 	@bash $(SERVER_SCRIPTS)/test-init-perf-runner.sh
 	@bash $(SERVER_SCRIPTS)/test-sync-perf-runner-config.sh
+	@$(MAKE) --no-print-directory -n perf-runner-sync \
+		PERF_RUNNER_SYNC_CONFIG=/dev/null \
+		PERF_RUNNER_HOST=root@runner.example.test \
+		PERF_QS_SERVER_SOURCE_DIR=/tmp/qs-server \
+		PERF_RUNNER_ENV_FILE=/tmp/perf.env \
+		PERF_RUNNER_IAM_USERS_FILE=/tmp/iam-users.json \
+		PERF_RUNNER_CONFIG_FILE=/tmp/qs-perf.config.json >/dev/null
 	$(call success_msg,压测机初始化脚本静态校验通过)
 
 # ==============================================================================
@@ -532,6 +554,18 @@ swarm-network-probe: ## 在 manager 上触发 infra-network 下发到所有节�
 	@docker service ps net-probe --format "table {{.Name}}\t{{.Node}}\t{{.CurrentState}}\t{{.Error}}"
 	@docker service rm net-probe >/dev/null
 	$(call success_msg,infra-network 下发探针已完成；请在目标节点重试 docker network ls 或 make serverC-up)
+
+.PHONY: network-mtu-policy-verify network-mtu-verify
+
+network-mtu-policy-verify: ## 静态校验 Tailscale underlay 与 overlay MTU 策略
+	@bash $(NETWORK_SCRIPTS)/test-overlay-mtu-policy.sh
+
+network-mtu-verify: ## 在节点上验证 infra-network、容器端点和可选目标的实际 PMTU
+	@INFRA_NETWORK_MTU="$(INFRA_NETWORK_MTU)" \
+		INFRA_OVERLAY_OVERHEAD="$(INFRA_OVERLAY_OVERHEAD)" \
+		MTU_VERIFY_CONTAINER="$(MTU_VERIFY_CONTAINER)" \
+		MTU_VERIFY_TARGET="$(MTU_VERIFY_TARGET)" \
+		bash $(NETWORK_SCRIPTS)/verify-overlay-mtu.sh
 
 net-list: ## 列出所有网络
 	@docker network ls --format "table {{.Name}}\t{{.Driver}}\t{{.Scope}}"

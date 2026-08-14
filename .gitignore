@@ -6,6 +6,7 @@
 compose/env/prod/serverA.env
 compose/env/prod/serverB.env
 .env
+.perf-runner-sync.mk
 
 # 备用环境配置
 compose/env/*/*

@@ -23,9 +23,15 @@ make server-init
 # 从 Mac 一键准备临时 K6 压测机（远端不需要预先 clone infra）
 make perf-runner-init-remote PERF_RUNNER_HOST=root@203.0.113.10
 
+# 完成一次本机私有配置后，一键同步源码、配置、token 与 preflight
+make perf-runner-sync
+
 # 每台机器先加入 Tailscale，Swarm 使用 Tailscale IP 作为节点互联地址
 make tailscale-install
 make tailscale-up TAILSCALE_HOSTNAME=serverA
+
+# 校验 Tailscale 1280 / overlay endpoint 1230 MTU 策略
+make network-mtu-policy-verify
 make tailscale-ip
 
 # 初始化四节点 Swarm 网络（全部 IP 使用 tailscale ip -4）
