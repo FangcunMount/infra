@@ -1,0 +1,75 @@
+rule_files:
+  - ../rules/qs-data-consistency.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: high drift alerts after five minutes
+    interval: 1m
+    input_series:
+      - series: 'qs_mongo_consistency_audit_drift{severity="high",kind="generation_missing_run"}'
+        values: '1x8'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: QSMongoConsistencyHighDrift
+        exp_alerts:
+          - exp_labels:
+              kind: generation_missing_run
+              severity: critical
+              subsystem: data-consistency
+            exp_annotations:
+              summary: QS Mongo high-severity consistency drift
+              description: Mongo consistency audit found high-severity drift kind generation_missing_run. Use the read-only audit report before planning a repair.
+
+  - name: disabled audit does not alert on readiness or staleness
+    interval: 1h
+    input_series:
+      - series: 'qs_mongo_consistency_audit_enabled'
+        values: '0x32'
+      - series: 'qs_mongo_consistency_audit_ready'
+        values: '0x32'
+      - series: 'qs_mongo_consistency_audit_last_success_timestamp_seconds'
+        values: '0x32'
+    alert_rule_test:
+      - eval_time: 31h
+        alertname: QSMongoConsistencyAuditNotReady
+        exp_alerts: []
+      - eval_time: 31h
+        alertname: QSMongoConsistencyAuditStale
+        exp_alerts: []
+
+  - name: commit unknown alerts by fixed transaction boundary
+    interval: 1m
+    input_series:
+      - series: 'qs_mongo_transaction_total{boundary="interpretation_commit",outcome="commit_unknown"}'
+        values: '0 0 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: QSMongoTransactionCommitUnknown
+        exp_alerts:
+          - exp_labels:
+              boundary: interpretation_commit
+              severity: critical
+              subsystem: data-consistency
+            exp_annotations:
+              summary: QS Mongo transaction commit result is unknown
+              description: Mongo transaction boundary interpretation_commit reported an unknown final commit result.
+
+  - name: rollback ratio requires volume and duration
+    interval: 1m
+    input_series:
+      - series: 'qs_mongo_transaction_total{boundary="answersheet_submit",outcome="committed"}'
+        values: '0+5x25'
+      - series: 'qs_mongo_transaction_total{boundary="answersheet_submit",outcome="rolled_back"}'
+        values: '0+1x25'
+    alert_rule_test:
+      - eval_time: 21m
+        alertname: QSMongoTransactionRollbackRatioHigh
+        exp_alerts:
+          - exp_labels:
+              boundary: answersheet_submit
+              severity: warning
+              subsystem: data-consistency
+            exp_annotations:
+              summary: QS Mongo transaction rollback ratio is high
+              description: Mongo transaction boundary answersheet_submit rollback ratio has exceeded 1% for 10 minutes with at least 20 attempts in the rolling window.

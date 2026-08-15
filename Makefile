@@ -83,6 +83,7 @@ PERF_RUNNER_ENV_FILE ?=
 PERF_RUNNER_IAM_USERS_FILE ?=
 PERF_RUNNER_CONFIG_FILE ?=
 PERF_RUNNER_AUTO_PREPARE ?= true
+PROMETHEUS_IMAGE ?= prom/prometheus:v2.54.1
 
 # 颜色定义
 RED := \033[31m
@@ -116,6 +117,21 @@ endef
 define error_msg
 	@echo "$(RED)$(BOLD)❌ $(1)$(RESET)"
 endef
+
+prometheus-rules-verify: ## 使用 promtool 校验 Prometheus rules 并运行规则单测
+	@for rule in components/prometheus/rules/*.yml; do \
+		docker run --rm \
+			-v "$(CURDIR)/components/prometheus:/prometheus-config:ro" \
+			--entrypoint /bin/promtool \
+			$(PROMETHEUS_IMAGE) \
+			check rules "/prometheus-config/rules/$$(basename "$$rule")" || exit 1; \
+	done
+	@docker run --rm \
+		-v "$(CURDIR)/components/prometheus:/prometheus-config:ro" \
+		--entrypoint /bin/promtool \
+		$(PROMETHEUS_IMAGE) \
+		test rules /prometheus-config/tests/qs-data-consistency.test.yml
+	@echo "$(GREEN)✅ Prometheus rules 语法与数据一致性告警单测通过$(RESET)"
 
 define info_msg
 	@echo "$(BLUE)ℹ️  $(1)$(RESET)"

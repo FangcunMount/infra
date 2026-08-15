@@ -1,0 +1,106 @@
+groups:
+  - name: qs-data-consistency
+    interval: 30s
+    rules:
+      - record: qs:data_consistency_drift:current
+        expr: max by (severity, kind) (qs_mongo_consistency_audit_drift)
+
+      - record: qs:data_consistency_audit_enabled:current
+        expr: max(qs_mongo_consistency_audit_enabled)
+
+      - record: qs:data_consistency_audit_ready:current
+        expr: max(qs_mongo_consistency_audit_ready)
+
+      - record: qs:data_consistency_audit_last_success:max
+        expr: max(qs_mongo_consistency_audit_last_success_timestamp_seconds)
+
+      - record: qs:data_consistency_audit_errors:increase5m
+        expr: sum by (stage) (increase(qs_mongo_consistency_audit_errors_total[5m]))
+
+      - record: qs:data_consistency_checkpoint_cas:increase5m
+        expr: sum(increase(qs_mongo_consistency_audit_checkpoint_cas_conflicts_total[5m]))
+
+      - record: qs:mongo_transaction:attempts10m
+        expr: sum by (boundary) (increase(qs_mongo_transaction_total{outcome=~"committed|rolled_back|commit_unknown"}[10m]))
+
+      - record: qs:mongo_transaction:rollbacks10m
+        expr: sum by (boundary) (increase(qs_mongo_transaction_total{outcome="rolled_back"}[10m]))
+
+      - record: qs:mongo_transaction:rollback_ratio10m
+        expr: qs:mongo_transaction:rollbacks10m / clamp_min(qs:mongo_transaction:attempts10m, 1)
+
+      - alert: QSMongoConsistencyHighDrift
+        expr: qs:data_consistency_drift:current{severity="high"} > 0
+        for: 5m
+        labels:
+          severity: critical
+          subsystem: data-consistency
+        annotations:
+          summary: "QS Mongo high-severity consistency drift"
+          description: "Mongo consistency audit found high-severity drift kind {{ $labels.kind }}. Use the read-only audit report before planning a repair."
+
+      - alert: QSMongoConsistencyNonHighDrift
+        expr: qs:data_consistency_drift:current{severity=~"medium|low"} > 0
+        for: 15m
+        labels:
+          severity: warning
+          subsystem: data-consistency
+        annotations:
+          summary: "QS Mongo consistency drift remains non-zero"
+          description: "Mongo consistency audit drift kind {{ $labels.kind }} has remained non-zero for 15 minutes."
+
+      - alert: QSMongoConsistencyAuditStale
+        expr: qs:data_consistency_audit_enabled:current == 1 and (time() - qs:data_consistency_audit_last_success:max > 30 * 60 * 60)
+        labels:
+          severity: warning
+          subsystem: data-consistency
+        annotations:
+          summary: "QS Mongo consistency audit is stale"
+          description: "No successful full Mongo consistency audit cycle has completed in the last 30 hours."
+
+      - alert: QSMongoConsistencyAuditError
+        expr: qs:data_consistency_audit_errors:increase5m > 0
+        labels:
+          severity: warning
+          subsystem: data-consistency
+        annotations:
+          summary: "QS Mongo consistency audit error"
+          description: "Mongo consistency audit stage {{ $labels.stage }} reported an execution error."
+
+      - alert: QSMongoConsistencyCheckpointCASConflict
+        expr: qs:data_consistency_checkpoint_cas:increase5m > 0
+        labels:
+          severity: warning
+          subsystem: data-consistency
+        annotations:
+          summary: "QS Mongo consistency checkpoint CAS conflict"
+          description: "The consistency audit checkpoint was concurrently modified; verify leader lease and MySQL checkpoint ownership."
+
+      - alert: QSMongoConsistencyAuditNotReady
+        expr: qs:data_consistency_audit_enabled:current == 1 and qs:data_consistency_audit_ready:current == 0
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: data-consistency
+        annotations:
+          summary: "QS Mongo consistency audit is not ready"
+          description: "The enabled Mongo consistency audit has no ready scheduler instance."
+
+      - alert: QSMongoTransactionCommitUnknown
+        expr: sum by (boundary) (increase(qs_mongo_transaction_total{outcome="commit_unknown"}[5m])) > 0
+        labels:
+          severity: critical
+          subsystem: data-consistency
+        annotations:
+          summary: "QS Mongo transaction commit result is unknown"
+          description: "Mongo transaction boundary {{ $labels.boundary }} reported an unknown final commit result."
+
+      - alert: QSMongoTransactionRollbackRatioHigh
+        expr: qs:mongo_transaction:attempts10m >= 20 and qs:mongo_transaction:rollback_ratio10m > 0.01
+        for: 10m
+        labels:
+          severity: warning
+          subsystem: data-consistency
+        annotations:
+          summary: "QS Mongo transaction rollback ratio is high"
+          description: "Mongo transaction boundary {{ $labels.boundary }} rollback ratio has exceeded 1% for 10 minutes with at least 20 attempts in the rolling window."
