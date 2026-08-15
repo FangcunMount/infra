@@ -4,7 +4,7 @@
 
 当前目标拓扑：
 
-- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server`
+- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server + mysql-rds-proxy`
 - `serverB 2C2G`：`IAM`
 - `serverC 4C4G`：`mongodb`
 - `serverD 4C4G`：`qs-worker + operating + nsq + prometheus + grafana`

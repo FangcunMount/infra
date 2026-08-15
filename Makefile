@@ -1148,6 +1148,7 @@ disk-usage: ## Docker 磁盘使用
 # 7. 服务器部署
 # ==============================================================================
 .PHONY: serverA-up serverA-down serverA-logs serverA-status serverA-destroy serverA-rebuild
+.PHONY: mysql-rds-proxy-verify mysql-rds-proxy-recreate mysql-rds-proxy-status
 .PHONY: serverB-up serverB-down serverB-logs serverB-status serverB-destroy serverB-rebuild
 .PHONY: serverC-up serverC-down serverC-logs serverC-status serverC-destroy serverC-rebuild
 .PHONY: serverD-up serverD-down serverD-logs serverD-status serverD-destroy serverD-rebuild
@@ -1175,6 +1176,19 @@ serverA-logs: ## 查看 ServerA 日志
 
 serverA-status: ## 查看 ServerA 状态
 	@docker ps --filter "label=infra.host=serverA" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+mysql-rds-proxy-verify: ## 校验 Worker -> RDS 私网代理配置不暴露宿主机端口
+	@bash scripts/utils/verify-mysql-rds-proxy.sh
+
+mysql-rds-proxy-recreate: mysql-rds-proxy-verify ## 在 serverA 原地重建 Worker -> RDS 私网代理
+	@docker compose \
+		--env-file compose/env/prod/serverA.env \
+		-f deploy/serverA/docker-compose.yml \
+		up -d --no-deps --force-recreate mysql-rds-proxy
+	$(call success_msg,mysql-rds-proxy 已原地重建)
+
+mysql-rds-proxy-status: ## 查看 Worker -> RDS 私网代理状态
+	@docker ps --filter name='^mysql-rds-proxy$$' --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
 
 serverA-destroy: ## 销毁 ServerA 所有容器、卷和数据 (危险!)
 	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerA 的所有数据！$(RESET)"

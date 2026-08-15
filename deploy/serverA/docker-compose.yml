@@ -13,6 +13,42 @@
 
 services:
   # ============================================================================
+  # 跨云 Worker -> 阿里云 RDS 私网代理（仅 infra-network）
+  # ============================================================================
+
+  mysql-rds-proxy:
+    image: nginx:1.27
+    container_name: mysql-rds-proxy
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: "0.25"
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST:?MYSQL_HOST is required}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      PROXY_BIND_PORT: ${MYSQL_RDS_PROXY_PORT:-3306}
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
+      NGINX_ENVSUBST_FILTER: MYSQL_HOST|MYSQL_PORT|PROXY_BIND_PORT
+    volumes:
+      - ../../components/mysql-rds-proxy/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
+    expose:
+      - "3306"
+    networks:
+      backend:
+        aliases:
+          - mysql-rds-proxy
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "infra.host=serverA"
+      - "infra.category=database-proxy"
+
+  # ============================================================================
   # 网关服务
   # ============================================================================
   
