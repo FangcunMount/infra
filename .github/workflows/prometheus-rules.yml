@@ -1,0 +1,26 @@
+name: Validate Prometheus Rules
+
+on:
+  pull_request:
+    paths:
+      - "components/prometheus/**"
+      - "Makefile"
+      - ".github/workflows/prometheus-rules.yml"
+  push:
+    branches: [main]
+    paths:
+      - "components/prometheus/**"
+      - "Makefile"
+      - ".github/workflows/prometheus-rules.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  promtool:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate rules and alert tests
+        run: make prometheus-rules-verify

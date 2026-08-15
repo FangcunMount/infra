@@ -69,3 +69,15 @@
 - `qs:resilience_backpressure_wait:p95`
 
 Resilience 告警覆盖 rate limit surge、SubmitQueue full/depth、backpressure timeout/wait p95、Redis lock error/degraded。规则只使用 bounded labels：`component/scope/resource/strategy/outcome/status`。不要把 request ID、user ID、lock key、error message 写进 label。
+
+## Mongo 数据一致性规则
+
+`qs-data-consistency.yml` 覆盖只读 Mongo 一致性巡检和统一事务内核：high/medium/low drift、30 小时无成功周期、审计错误、checkpoint CAS 冲突、enabled scheduler 无 ready 实例、commit-unknown，以及至少 20 次事务时持续 10 分钟超过 1% 的 rollback 比例。
+
+规则只保留固定 `severity/kind/stage/boundary/outcome` 标签；aggregate ID、request ID 和错误文本只能出现在受限审计输出中，不能进入 Prometheus label。
+
+本地或 CI 验证：
+
+```bash
+make prometheus-rules-verify
+```
