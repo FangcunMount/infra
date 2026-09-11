@@ -1,0 +1,24 @@
+name: gRPC certificate permissions
+on:
+  pull_request:
+    paths:
+      - scripts/04-ssl/grpc-mtls.sh
+      - scripts/04-ssl/test_grpc_mtls.py
+      - .github/workflows/grpc-certificates.yml
+  push:
+    branches: [main]
+    paths:
+      - scripts/04-ssl/grpc-mtls.sh
+      - scripts/04-ssl/test_grpc_mtls.py
+      - .github/workflows/grpc-certificates.yml
+permissions:
+  contents: read
+jobs:
+  signing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell syntax
+        run: bash -n scripts/04-ssl/grpc-mtls.sh
+      - name: Verify isolated certificate issuance and renewal
+        run: python3 scripts/04-ssl/test_grpc_mtls.py
