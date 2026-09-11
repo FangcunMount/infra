@@ -101,6 +101,28 @@ make grpc-server NAME=payment-api OU=Payment ALT_DNS=payment-api.internal.exampl
 make grpc-verify
 ```
 
+### 添加 qs-ai
+
+在持有现有 Intermediate CA 签发私钥的机器上，进入 infra 仓库执行：
+
+```bash
+CERT_DIR=/data/infra/ssl/grpc \
+make grpc-server NAME=qs-ai OU=QS ALT_DNS=qs-ai-grpc TYPE=dual
+```
+
+生成 `server/qs-ai.key`、`server/qs-ai.crt`、`server/qs-ai-fullchain.crt`。
+CN 为 `qs-ai.svc`，SAN 包含 `qs-ai.svc`、`qs-ai-grpc`、`qs-ai` 和本机地址。
+单服务签发/续期只调整上述三个文件的权限和属主，不递归调整 CA、其他服务或证书目录。
+OpenSSL 仍会正常更新 CA 序列号文件；已有同名服务文件会被重新签发覆盖。
+
+私钥权限为 0600，证书为 0644。`CERT_OWNER` / `CERT_GROUP` 只影响本次三个文件；
+若直接挂载给 qs-ai 的 UID 10001 进程，应按实际部署设置对应数值属主/组，或在分发时处理。
+不要给业务容器挂载 CA 私钥或整个 PKI 目录。属主设置失败时单服务命令返回失败，不再忽略。
+新增服务不需要运行 `grpc-ca`、`grpc-generate-all` 或 `force`。
+
+回归验证：`python3 scripts/04-ssl/test_grpc_mtls.py`，使用临时 CA 和真实 OpenSSL，
+验证首次签发及续期不改变 CA/其他服务文件的权限、属主与证书内容。
+
 ## Docker Compose 挂载示例
 
 ### IAM gRPC 服务端配置

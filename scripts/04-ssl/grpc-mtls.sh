@@ -199,9 +199,19 @@ show_cert_info() {
 }
 
 set_permissions() {
-    # keys 600, crt/fullchain 644, then chown if可用
-    find "$CERT_DIR" -type f -name "*.key" -exec chmod 600 {} +
-    find "$CERT_DIR" -type f \( -name "*.crt" -o -name "*fullchain.crt" -o -name "*.pem" \) -exec chmod 644 {} +
+    # Explicit files for a single-service issue; whole-tree mode only for CA/all generation.
+    if [[ $# -gt 0 ]]; then
+        local file
+        for file in "$@"; do
+            case "$file" in
+                *.key) chmod 600 "$file" ;;
+                *) chmod 644 "$file" ;;
+            esac
+        done
+    else
+        find "$CERT_DIR" -type f -name "*.key" -exec chmod 600 {} +
+        find "$CERT_DIR" -type f \( -name "*.crt" -o -name "*fullchain.crt" -o -name "*.pem" \) -exec chmod 644 {} +
+    fi
 
     if [[ -n "$CERT_OWNER" || -n "$CERT_GROUP" ]]; then
         local target=""
@@ -214,7 +224,14 @@ set_permissions() {
         fi
 
         if command -v chown >/dev/null 2>&1; then
-            chown -R "$target" "$CERT_DIR" 2>/dev/null || log_warn "chown 失败，可能权限不足（忽略）"
+            if [[ $# -gt 0 ]]; then
+                chown "$target" "$@" 2>/dev/null || {
+                    log_error "新证书文件 chown 失败，请检查 CERT_OWNER/CERT_GROUP 和执行权限"
+                    return 1
+                }
+            else
+                chown -R "$target" "$CERT_DIR" 2>/dev/null || log_warn "chown 失败，可能权限不足（忽略）"
+            fi
         fi
     fi
 }
@@ -272,7 +289,9 @@ generate_server_only() {
         exit 1
     fi
     
-    set_permissions
+    set_permissions "$CERT_DIR/server/${service_name}.key" \
+        "$CERT_DIR/server/${service_name}.crt" \
+        "$CERT_DIR/server/${service_name}-fullchain.crt"
     log_info "服务端证书生成完成: $CERT_DIR/server/${service_name}.*"
 }
 
