@@ -1,0 +1,257 @@
+rule_files:
+- ../rules/qs-ai.yml
+evaluation_interval: 1m
+tests:
+- name: QSAIEndpointUnavailable fires and recovers
+  interval: 1m
+  input_series:
+  - series: up{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 0x3 1x3
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: QSAIEndpointUnavailable
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: QSAIEndpointUnavailable
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        instance: qs-ai-api:8000
+        severity: warning
+        subsystem: qs-ai
+      exp_annotations: &id001
+        summary: QSAIEndpointUnavailable
+        description: AI metrics endpoint is unavailable. Check API container and overlay network.
+  - eval_time: 5m
+    alertname: QSAIEndpointUnavailable
+    exp_alerts: []
+- name: QSAIDatabaseMetricsUnavailable fires and recovers
+  interval: 1m
+  input_series:
+  - series: qs_ai_database_up{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 0x3 1x3
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: QSAIDatabaseMetricsUnavailable
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: QSAIDatabaseMetricsUnavailable
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        instance: qs-ai-api:8000
+        severity: warning
+        subsystem: qs-ai
+      exp_annotations: &id002
+        summary: QSAIDatabaseMetricsUnavailable
+        description: AI database snapshot failed. Check database connectivity before interpreting backlog metrics.
+  - eval_time: 5m
+    alertname: QSAIDatabaseMetricsUnavailable
+    exp_alerts: []
+- name: QSAIReadyQueueDelayed fires and recovers
+  interval: 1m
+  input_series:
+  - series: qs_ai_oldest_ready_job_seconds{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 180x3 0x3
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: QSAIReadyQueueDelayed
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: QSAIReadyQueueDelayed
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        instance: qs-ai-api:8000
+        severity: warning
+        subsystem: qs-ai
+      exp_annotations:
+        summary: QSAIReadyQueueDelayed
+        description: An executable AI job has waited over two minutes. Check worker health and execution admission.
+  - eval_time: 5m
+    alertname: QSAIReadyQueueDelayed
+    exp_alerts: []
+- name: QSAIRecoveryDelayed fires and recovers
+  interval: 1m
+  input_series:
+  - series: qs_ai_expired_job_leases{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 1x3 0x3
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: QSAIRecoveryDelayed
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: QSAIRecoveryDelayed
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        instance: qs-ai-api:8000
+        severity: warning
+        subsystem: qs-ai
+      exp_annotations:
+        summary: QSAIRecoveryDelayed
+        description: Expired execution leases are not being recovered. Inspect worker health and fencing; do not
+          delete leases.
+  - eval_time: 5m
+    alertname: QSAIRecoveryDelayed
+    exp_alerts: []
+- name: QSAIResultDeliveryDelayed fires and recovers
+  interval: 1m
+  input_series:
+  - series: qs_ai_oldest_pending_result_seconds{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 180x3 0x3
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: QSAIResultDeliveryDelayed
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: QSAIResultDeliveryDelayed
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        instance: qs-ai-api:8000
+        severity: warning
+        subsystem: qs-ai
+      exp_annotations:
+        summary: QSAIResultDeliveryDelayed
+        description: AI results have waited over two minutes for QS acknowledgement. Check delivery process, mTLS
+          and QS availability.
+  - eval_time: 5m
+    alertname: QSAIResultDeliveryDelayed
+    exp_alerts: []
+- name: QSAIResultTimestampMissing fires and recovers
+  interval: 1m
+  input_series:
+  - series: qs_ai_pending_results_without_timestamp{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 1x3 0x3
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: QSAIResultTimestampMissing
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: QSAIResultTimestampMissing
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        instance: qs-ai-api:8000
+        severity: warning
+        subsystem: qs-ai
+      exp_annotations:
+        summary: QSAIResultTimestampMissing
+        description: Pending result events have no creation time; backlog age is incomplete. Inspect records without
+          blindly replaying.
+  - eval_time: 5m
+    alertname: QSAIResultTimestampMissing
+    exp_alerts: []
+- name: QSAIModelResultUnknown fires and recovers
+  interval: 1m
+  input_series:
+  - series: qs_ai_unresolved_model_calls{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 1x3 0x3
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: QSAIModelResultUnknown
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: QSAIModelResultUnknown
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        instance: qs-ai-api:8000
+        severity: critical
+        subsystem: qs-ai
+      exp_annotations:
+        summary: QSAIModelResultUnknown
+        description: Current model calls have an unknown result or dispatch older than five minutes. Reconcile receipts;
+          never blindly resend.
+  - eval_time: 5m
+    alertname: QSAIModelResultUnknown
+    exp_alerts: []
+- name: QSAIProviderResponseSlow fires and recovers
+  interval: 1m
+  input_series:
+  - series: qs_ai_provider_response_max_seconds_5m{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 150x3 0x3
+  - series: qs_ai_provider_response_samples_5m{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 1x6
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: QSAIProviderResponseSlow
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: QSAIProviderResponseSlow
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        instance: qs-ai-api:8000
+        severity: warning
+        subsystem: qs-ai
+      exp_annotations:
+        summary: QSAIProviderResponseSlow
+        description: A recent complete provider response exceeded two minutes. Inspect model route and provider
+          latency; this is not time to first token.
+  - eval_time: 5m
+    alertname: QSAIProviderResponseSlow
+    exp_alerts: []
+- name: QSAIParticipantCapacityRejected fires and recovers
+  interval: 1m
+  input_series:
+  - series: qs_ai_capacity_rejections_24h{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 1x3 0x3
+  alert_rule_test:
+  - eval_time: 1m
+    alertname: QSAIParticipantCapacityRejected
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: QSAIParticipantCapacityRejected
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        instance: qs-ai-api:8000
+        severity: warning
+        subsystem: qs-ai
+      exp_annotations:
+        summary: QSAIParticipantCapacityRejected
+        description: Participant requests reached daily capacity within 24 hours. Review policy and usage; do not
+          automatically raise limits.
+  - eval_time: 5m
+    alertname: QSAIParticipantCapacityRejected
+    exp_alerts: []
+- name: missing target is detected
+  interval: 1m
+  input_series: []
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: QSAIEndpointUnavailable
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        severity: warning
+        subsystem: qs-ai
+      exp_annotations: *id001
+- name: empty latency sample is not slow
+  interval: 1m
+  input_series:
+  - series: qs_ai_provider_response_max_seconds_5m{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 150x6
+  - series: qs_ai_provider_response_samples_5m{job="qs-ai",instance="qs-ai-api:8000"}
+    values: '0x6'
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: QSAIProviderResponseSlow
+    exp_alerts: []
+- name: HTTP success without metrics is unhealthy
+  interval: 1m
+  input_series:
+  - series: up{job="qs-ai",instance="qs-ai-api:8000"}
+    values: 1x6
+  alert_rule_test:
+  - eval_time: 3m
+    alertname: QSAIDatabaseMetricsUnavailable
+    exp_alerts:
+    - exp_labels:
+        job: qs-ai
+        instance: qs-ai-api:8000
+        severity: warning
+        subsystem: qs-ai
+      exp_annotations: *id002

@@ -12,6 +12,7 @@
 
 - 静态抓取：
   - `qs-apiserver:8080/metrics`
+  - `qs-ai-api:8000/metrics`（仅 overlay 内网）
 - DNS 自动发现：`qs-collection-server:8080/metrics`
 - 通过 `/var/run/docker.sock` 发现带 `prometheus.scrape=true` 标签的本机容器
 - Docker 自动发现仅抓取 `infra-network` 网络中的本机容器
@@ -81,3 +82,11 @@ Resilience 告警覆盖 rate limit surge、SubmitQueue full/depth、backpressure
 ```bash
 make prometheus-rules-verify
 ```
+
+## qs-ai 生成与回传规则
+
+`qs-ai.yml` 使用固定指标名，覆盖 API 不可达、数据库采集失败、排队超过 120 秒、租约恢复停滞、结果回传超过 120 秒、未知模型调用、结果时间戳缺失、完整模型响应超过 120 秒和日容量拒绝。条件持续两分钟才告警；未采集到数据不能当作零积压。连接数保留为观察指标，不能拿跨进程总数与单个进程池大小比较。
+
+首次部署先发布 qs-ai `/metrics`，再更新本组件的模板和规则，检查 `qs-ai` target、规则组和指标。规则单测验证等待时间、触发、恢复、抓取目标缺失和零样本；不会往生产写入假任务或伪造故障。发布时还需验证实际抓取和规则加载。告警在 Prometheus/Grafana 中可见；没有配置通知通道时不宣称完成外部通知。
+
+未知调用告警只能提示人工核对模型回执，禁止直接重发。容量拒绝告警不能自动修改业务策略。本批阈值是初始运维门槛，不是性能 SLA；qs-ai 的 `docs/operational-metrics.md` 记录每个聚合值的窗口、边界和故障处理。

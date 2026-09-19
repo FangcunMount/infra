@@ -14,6 +14,12 @@ scrape_configs:
   # serverD 上的 Prometheus 只能通过本机 docker.sock 发现本机容器。
   # 跨节点单实例服务可静态抓取；多实例 collection 必须使用 DNS SD，
   # 否则一个带轮询 DNS 的静态 target 每次只会抓到一个随机副本。
+  - job_name: qs-ai
+    metrics_path: /metrics
+    scrape_timeout: 8s
+    static_configs:
+      - targets: ["qs-ai-api:8000"]
+
   - job_name: qs-apiserver
     metrics_path: /metrics
     static_configs:

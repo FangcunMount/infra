@@ -126,12 +126,14 @@ prometheus-rules-verify: ## 使用 promtool 校验 Prometheus rules 并运行规
 			$(PROMETHEUS_IMAGE) \
 			check rules "/prometheus-config/rules/$$(basename "$$rule")" || exit 1; \
 	done
-	@docker run --rm \
-		-v "$(CURDIR)/components/prometheus:/prometheus-config:ro" \
-		--entrypoint /bin/promtool \
-		$(PROMETHEUS_IMAGE) \
-		test rules /prometheus-config/tests/qs-data-consistency.test.yml
-	@echo "$(GREEN)✅ Prometheus rules 语法与数据一致性告警单测通过$(RESET)"
+	@for suite in components/prometheus/tests/*.test.yml; do \
+		docker run --rm \
+			-v "$(CURDIR)/components/prometheus:/prometheus-config:ro" \
+			--entrypoint /bin/promtool \
+			$(PROMETHEUS_IMAGE) \
+			test rules "/prometheus-config/tests/$$(basename "$$suite")" || exit 1; \
+	done
+	@echo "$(GREEN)✅ Prometheus rules 语法与全部告警单测通过$(RESET)"
 
 define info_msg
 	@echo "$(BLUE)ℹ️  $(1)$(RESET)"
