@@ -1,0 +1,92 @@
+groups:
+- name: qs-ai
+  interval: 30s
+  rules:
+  - alert: QSAIEndpointUnavailable
+    expr: up{job="qs-ai"} == 0 or absent(up{job="qs-ai"})
+    for: 2m
+    labels:
+      severity: warning
+      subsystem: qs-ai
+    annotations:
+      summary: QSAIEndpointUnavailable
+      description: AI metrics endpoint is unavailable. Check API container and overlay network.
+  - alert: QSAIDatabaseMetricsUnavailable
+    expr: qs_ai_database_up{job="qs-ai"} == 0 or (up{job="qs-ai"} == 1 unless on(job,instance) qs_ai_database_up{job="qs-ai"})
+    for: 2m
+    labels:
+      severity: warning
+      subsystem: qs-ai
+    annotations:
+      summary: QSAIDatabaseMetricsUnavailable
+      description: AI database snapshot failed. Check database connectivity before interpreting backlog metrics.
+  - alert: QSAIReadyQueueDelayed
+    expr: qs_ai_oldest_ready_job_seconds{job="qs-ai"} > 120
+    for: 2m
+    labels:
+      severity: warning
+      subsystem: qs-ai
+    annotations:
+      summary: QSAIReadyQueueDelayed
+      description: An executable AI job has waited over two minutes. Check worker health and execution admission.
+  - alert: QSAIRecoveryDelayed
+    expr: qs_ai_expired_job_leases{job="qs-ai"} > 0
+    for: 2m
+    labels:
+      severity: warning
+      subsystem: qs-ai
+    annotations:
+      summary: QSAIRecoveryDelayed
+      description: Expired execution leases are not being recovered. Inspect worker health and fencing; do not delete
+        leases.
+  - alert: QSAIResultDeliveryDelayed
+    expr: qs_ai_oldest_pending_result_seconds{job="qs-ai"} > 120
+    for: 2m
+    labels:
+      severity: warning
+      subsystem: qs-ai
+    annotations:
+      summary: QSAIResultDeliveryDelayed
+      description: AI results have waited over two minutes for QS acknowledgement. Check delivery process, mTLS
+        and QS availability.
+  - alert: QSAIResultTimestampMissing
+    expr: qs_ai_pending_results_without_timestamp{job="qs-ai"} > 0
+    for: 2m
+    labels:
+      severity: warning
+      subsystem: qs-ai
+    annotations:
+      summary: QSAIResultTimestampMissing
+      description: Pending result events have no creation time; backlog age is incomplete. Inspect records without
+        blindly replaying.
+  - alert: QSAIModelResultUnknown
+    expr: qs_ai_unresolved_model_calls{job="qs-ai"} > 0
+    for: 2m
+    labels:
+      severity: critical
+      subsystem: qs-ai
+    annotations:
+      summary: QSAIModelResultUnknown
+      description: Current model calls have an unknown result or dispatch older than five minutes. Reconcile receipts;
+        never blindly resend.
+  - alert: QSAIProviderResponseSlow
+    expr: qs_ai_provider_response_max_seconds_5m{job="qs-ai"} > 120 and on(job,instance) qs_ai_provider_response_samples_5m{job="qs-ai"}
+      > 0
+    for: 2m
+    labels:
+      severity: warning
+      subsystem: qs-ai
+    annotations:
+      summary: QSAIProviderResponseSlow
+      description: A recent complete provider response exceeded two minutes. Inspect model route and provider latency;
+        this is not time to first token.
+  - alert: QSAIParticipantCapacityRejected
+    expr: qs_ai_capacity_rejections_24h{job="qs-ai"} > 0
+    for: 2m
+    labels:
+      severity: warning
+      subsystem: qs-ai
+    annotations:
+      summary: QSAIParticipantCapacityRejected
+      description: Participant requests reached daily capacity within 24 hours. Review policy and usage; do not
+        automatically raise limits.
