@@ -1,0 +1,110 @@
+{
+  "uid": "ai-operational-logs",
+  "title": "AI operational logs",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "run_id",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "All AI events",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=\"qs-ai\"}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Run timeline",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=\"qs-ai\"} | json | run_id=\"$run_id\""
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Delivery retries",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=\"qs-ai\"} | json | event=\"delivery.retry_scheduled\""
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "RPC failures",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=\"qs-ai\"} | json | event=\"rpc.completed\" | status!=\"OK\""
+        }
+      ]
+    }
+  ]
+}

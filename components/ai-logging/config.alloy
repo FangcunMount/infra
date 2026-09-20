@@ -1,0 +1,82 @@
+// Only approved containers and schema_version=1 events are collected.
+// Business IDs stay in JSON body; Loki labels remain low-cardinality.
+discovery.docker "ai" {
+  host             = "unix:///var/run/docker.sock"
+  refresh_interval = "10s"
+}
+
+discovery.relabel "ai" {
+  targets = discovery.docker.ai.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(qs-ai|qs-apiserver|qs-worker-runtime-[0-9]+)"
+    action        = "keep"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.+)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_infra_host"]
+    target_label  = "host"
+  }
+}
+
+loki.source.docker "ai" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.ai.output
+  forward_to = [loki.process.ai.receiver]
+}
+
+loki.process "ai" {
+  stage.json {
+    expressions = {
+      schema    = "schema_version",
+      event     = "event",
+      service   = "service",
+      component = "component",
+      level     = "level",
+    }
+    drop_malformed = true
+  }
+
+  stage.match {
+    selector = "{schema!=\"1\"}"
+    action   = "drop"
+  }
+
+  stage.labels {
+    values = {
+      service   = "service",
+      component = "component",
+      level     = "level",
+    }
+  }
+
+  stage.static_labels {
+    values = {
+      env = "production",
+    }
+  }
+
+  forward_to = [loki.write.ai.receiver]
+}
+
+loki.write "ai" {
+  endpoint {
+    url                 = sys.env("LOKI_WRITE_URL")
+    max_backoff_retries = 100
+    tls_config {
+      ca_file   = "/certs/ca-chain.crt"
+      cert_file = "/certs/collector-fullchain.crt"
+      key_file  = "/certs/collector.key"
+    }
+  }
+  wal {
+    enabled = true
+  }
+}
