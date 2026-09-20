@@ -1,6 +1,6 @@
 {
   "uid": "ai-operational-logs",
-  "title": "AI operational logs",
+  "title": "AI 链路日志",
   "schemaVersion": 39,
   "version": 1,
   "time": {
@@ -12,6 +12,24 @@
     "list": [
       {
         "name": "run_id",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "request_id",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "correlation_id",
         "type": "textbox",
         "query": "",
         "current": {
@@ -39,7 +57,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "{service=\"qs-ai\"}"
+          "expr": "{service=~\"qs-ai|qs-apiserver\"}"
         }
       ]
     },
@@ -103,6 +121,48 @@
         {
           "refId": "A",
           "expr": "{service=\"qs-ai\"} | json | event=\"rpc.completed\" | status!=\"OK\""
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "业务请求链路",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=~\"qs-ai|qs-apiserver\"} | json | request_id=\"$request_id\""
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "跨服务调用关联",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=~\"qs-ai|qs-apiserver\"} | json | correlation_id=\"$correlation_id\""
         }
       ]
     }

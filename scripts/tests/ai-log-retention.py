@@ -47,6 +47,7 @@ with tempfile.TemporaryDirectory(prefix=name) as directory:
         run('docker','stop',name)
         (temp/'loki.yaml').write_text(config.replace('retention_period: 0s','retention_period: 336h'))
         run('docker','start',name)
+        base='http://127.0.0.1:'+run('docker','port',name,'3100/tcp').split(':')[-1]
         wait(lambda:urllib.request.urlopen(base+'/ready',timeout=2).status==200)
         wait(lambda:len(chunks()) < before and query('old',old)==0 and query('current',now)==1,seconds=240)
         print('PASS: 15-day fixture expired; current fixture retained',flush=True)

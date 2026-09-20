@@ -108,3 +108,13 @@ Only leaf keys/chains and CA public chain will be mounted/transferred.
 Additional isolated replacement test passed: disk queue and file checkpoints survived
 container removal/recreation plus source-file rotation; all 16 events recovered.
 Production certificates have been staged; no collector has been activated.
+
+14-day retention isolated test passed: after first confirming both fixtures were
+queryable with retention disabled, enabled the production 336h retention duration
+with accelerated compactor intervals. Old chunk files were removed and the 15-day
+fixture disappeared while the current fixture remained queryable. This validates
+retention logic, not real-time production deletion latency (production delay 2h).
+Grafana 11.1.4 isolated organization test passed: ops admin can access datasource;
+ordinary main-org user cannot, including a forged org header; anonymous denied.
+External notification channel is not configured (user confirmed); rule loading and
+visibility are in scope, delivery notification remains an explicit follow-up.
