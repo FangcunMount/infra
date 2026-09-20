@@ -77,3 +77,30 @@ container logs. Container replacement, retention deletion, Grafana organization
 access and notifications remain pending.
 
 Source: https://github.com/grafana/alloy/blob/v1.11.2/internal/component/loki/write/write.go
+
+## Replacement collector preparation
+
+User approved replacing Alloy while retaining Loki/Grafana and restart recovery
+acceptance. Candidate: Vector 0.49.0 with file source acknowledgements and a 256 MiB
+disk sink buffer. Docker API source alone also missed events emitted during
+collector downtime and is not used in the production candidate.
+
+The source template is NOT a deployable all-container configuration. Run
+`scripts/prepare-ai-log-source.py` on each host to produce exact paths for approved
+container names; it rejects unexpected log drivers and Docker roots. Mount the
+rendered directory (not a single config file), and use `--watch-config`. The supplied
+systemd timer refreshes the source list after replacements. It does not remove logs.
+Keep source logs and buffer volumes during rollback and replacement; already
+removed/rotated-away source data cannot be recovered. This is at-least-once
+collection, not an audit ledger or exactly-once business persistence.
+
+Short isolated file-source tests passed: 20-second gateway outage + graceful
+collector restart (15 events), and SIGKILL + five-second stopped period (17 events),
+with all emitted sequence numbers recovered. The 30-minute repeat remains pending.
+Source allowlist tests: four passed. Vector binary config and Compose validation
+passed. Production activation is still gated on remaining acceptance.
+
+Production prerequisites prepared: Grafana organization `AI Operations` (id 2),
+no datasource provisioned yet; independent serverA/serverD collector client
+certificates and `ai-logs.svc` server certificate signed by the existing infra CA.
+Only leaf keys/chains and CA public chain will be mounted/transferred.

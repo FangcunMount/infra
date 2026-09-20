@@ -36,25 +36,29 @@ services:
     mem_limit: 64m
     depends_on: [loki]
     logging: *rotation
-  alloy:
+  collector:
     profiles: [collector]
-    image: grafana/alloy:v1.11.2
-    command: [run, --storage.path=/var/lib/alloy, /etc/alloy/config.alloy]
+    image: timberio/vector:0.49.0-debian
+    command: [--config, /etc/vector/rendered/vector.yaml, --watch-config]
     restart: unless-stopped
+    stop_grace_period: 60s
+    extra_hosts:
+      - "ai-logs.svc:${LOGS_GATEWAY_IP:?Set restricted gateway address}"
     environment:
-      LOKI_WRITE_URL: ${LOKI_WRITE_URL:?Set the TLS log push URL}
+      LOKI_ENDPOINT: ${LOKI_ENDPOINT:?Set the TLS gateway origin}
     volumes:
-      - ./config.alloy:/etc/alloy/config.alloy:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - alloy_data:/var/lib/alloy
+      - ${LOGS_RENDERED_CONFIG_DIR:?Set generated configuration directory}:/etc/vector/rendered:ro
+      - /var/lib/docker/containers:/logs:ro
+      - vector_data:/var/lib/vector
       - ${LOGS_CLIENT_CERT_DIR:?Set collector certificate directory}:/certs:ro
-    mem_limit: 192m
+    mem_limit: 256m
     cpus: '0.25'
     logging: *rotation
+
 networks:
   logs:
     name: ai-logs
     internal: true
 volumes:
   loki_data:
-  alloy_data:
+  vector_data:

@@ -15,6 +15,8 @@ import uuid
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--outage-seconds', type=int, default=1800)
+parser.add_argument('--collector', choices=['alloy', 'vector'], default='vector')
+parser.add_argument('--crash', action='store_true')
 args = parser.parse_args()
 assert 0 <= args.outage_seconds <= 3600
 root = pathlib.Path(__file__).resolve().parents[2] / 'components/ai-logging'
@@ -81,18 +83,40 @@ with tempfile.TemporaryDirectory(prefix=prefix) as folder:
             return False
         wait_for(rejected)
         print('PASS: no client certificate rejected', flush=True)
-        config = (root/'config.alloy').read_text()
-        config = re.sub(r'regex\s*= "/\(qs-ai[^\n]+', 'regex = "/'+prefix+'-fixture"', config, count=1)
-        (temp/'config.alloy').write_text(config)
-        alloy = start('alloy', '-e', 'LOKI_WRITE_URL=https://gateway:8443/loki/api/v1/push',
-                      '-v', '/var/run/docker.sock:/var/run/docker.sock:ro',
-                      '-v', f'{temp}:/certs:ro', '-v', f'{temp}/config.alloy:/etc/alloy/config.alloy:ro',
-                      'grafana/alloy:v1.11.2', 'run', '--storage.path=/tmp/wal', '/etc/alloy/config.alloy')
-        # Finite, non-sensitive fixture IDs make missing sequence numbers detectable.
-        # Write a literal shell file; no interpolation of credentials or host data.
-        script = 'sleep 12\nn=0\nwhile true; do\n' + "printf '{\"schema_version\":1,\"service\":\"qs-ai\",\"event\":\"smoke\",\"request_id\":\"" + prefix + "\",\"sequence\":%s}\\n' \"$n\"\n" + 'echo legacy-private-sentinel\nn=$((n+1))\nsleep 2\ndone\n'
+        if args.collector == 'alloy':
+            config = (root/'config.alloy').read_text()
+            config = re.sub(r'regex\s*= "/\(qs-ai[^\n]+', 'regex = "/'+prefix+'-fixture"', config, count=1)
+            (temp/'config.alloy').write_text(config)
+            collector = start('alloy', '-e', 'LOKI_WRITE_URL=https://gateway:8443/loki/api/v1/push',
+                          '-v', '/var/run/docker.sock:/var/run/docker.sock:ro',
+                          '-v', f'{temp}:/certs:ro', '-v', f'{temp}/config.alloy:/etc/alloy/config.alloy:ro',
+                          'grafana/alloy:v1.11.2', 'run', '--storage.path=/tmp/wal', '/etc/alloy/config.alloy')
+        else:
+            config = (root/'vector.yaml').read_text()
+            (temp/'logs'/'fixture').mkdir(parents=True)
+            (temp/'vector-data').mkdir()
+            (temp/'vector.yaml').write_text(config)
+            collector = start('vector', '-e', 'LOKI_ENDPOINT=https://gateway:8443',
+                          '-v', '/var/run/docker.sock:/var/run/docker.sock:ro',
+                          '-v', f'{temp}:/certs:ro',
+                          '-v', f'{temp}/vector.yaml:/etc/vector/vector.yaml:ro',
+                          '-v', f'{temp}/logs:/logs:ro',
+                          '-v', f'{temp}/vector-data:/var/lib/vector',
+                          'timberio/vector:0.49.0-debian', '--config', '/etc/vector/vector.yaml')
+        # Use the same event in stdout and native Docker json-file envelope.
+        event = json.dumps({'schema_version':1, 'service':'qs-ai', 'event':'smoke',
+                            'request_id':prefix, 'sequence':'SEQUENCE'})
+        event = event.replace('"SEQUENCE"', '%s')
+        lines = ['sleep 12', 'n=0', 'while true; do',
+                 "printf '"+event+"\\n' \"$n\""]
+        if args.collector == 'vector':
+            envelope = json.dumps({'log':event, 'stream':'stdout'})
+            lines.append("printf '"+envelope+"\\n' \"$n\" >> /fixture-logs/events-json.log")
+            lines.append("printf '%s\\n' '{\"log\":\"legacy-private-sentinel\"}' >> /fixture-logs/events-json.log")
+        lines.extend(['echo legacy-private-sentinel', 'n=$((n+1))', 'sleep 2', 'done'])
+        script = '\n'.join(lines)+'\n'
         (temp/'fixture.sh').write_text(script)
-        fixture = start('fixture', '--expose', '8000', '-v', f'{temp}/fixture.sh:/fixture.sh:ro',
+        fixture = start('fixture', *(['-v', f'{temp}/logs/fixture:/fixture-logs'] if args.collector == 'vector' else []), '--expose', '8000', '-v', f'{temp}/fixture.sh:/fixture.sh:ro',
                         '--entrypoint', '/bin/sh', 'grafana/alloy:v1.11.2', '/fixture.sh')
         since = str(time.time_ns()-60*10**9)
         def query():
@@ -104,7 +128,12 @@ with tempfile.TemporaryDirectory(prefix=prefix) as folder:
         print('PASS: mTLS collector push and Loki query; starting outage', flush=True)
         run('docker', 'stop', '-t', '1', gateway)
         time.sleep(args.outage_seconds / 2)
-        run('docker', 'restart', alloy)
+        if args.crash:
+            run('docker', 'kill', collector)
+            time.sleep(5)
+            run('docker', 'start', collector)
+        else:
+            run('docker', 'restart', collector)
         time.sleep(args.outage_seconds / 2)
         run('docker', 'stop', '-t', '1', fixture)
         expected = {json.loads(line)['sequence'] for line in run('docker', 'logs', fixture).splitlines() if line.startswith('{')}
@@ -115,7 +144,7 @@ with tempfile.TemporaryDirectory(prefix=prefix) as folder:
             actual = {row['sequence'] for row in query()}
             print(json.dumps({'expected_count':len(expected), 'received_count':len(actual),
                               'missing_sequences':sorted(expected-actual)}), flush=True)
-            for name in [alloy, gateway, loki]:
+            for name in [collector, gateway, loki]:
                 logs = subprocess.run(['docker', 'logs', '--tail', '40', name], text=True, capture_output=True)
                 print(name, logs.stdout, logs.stderr, flush=True)
             raise

@@ -1,0 +1,47 @@
+data_dir: /var/lib/vector
+sources:
+  docker:
+    type: file
+    include: [/logs/*/*-json.log*]
+    read_from: beginning
+    oldest_first: true
+    fingerprint:
+      strategy: device_and_inode
+    acknowledgements:
+      enabled: true
+transforms:
+  approved:
+    type: remap
+    inputs: [docker]
+    drop_on_error: true
+    drop_on_abort: true
+    source: |
+      envelope = object!(parse_json!(string!(.message)))
+      parsed, err = parse_json(string!(envelope.log))
+      if err != null { abort }
+      parsed = object!(parsed)
+      if parsed.schema_version != 1 { abort }
+      if parsed.service != "qs-ai" && parsed.service != "qs-apiserver" { abort }
+      . = parsed
+sinks:
+  loki:
+    type: loki
+    inputs: [approved]
+    endpoint: ${LOKI_ENDPOINT}
+    healthcheck:
+      enabled: false
+    encoding:
+      codec: json
+    labels:
+      env: production
+      service: '{{ service }}'
+    buffer:
+      type: disk
+      max_size: 268435488
+      when_full: block
+    tls:
+      ca_file: /certs/ca-chain.crt
+      crt_file: /certs/collector-fullchain.crt
+      key_file: /certs/collector.key
+      verify_certificate: true
+      verify_hostname: true
