@@ -34,7 +34,9 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     ids = subprocess.check_output(['docker', 'ps', '-aq'], text=True).split()
-    items = json.loads(subprocess.check_output(['docker', 'inspect', *ids], text=True)) if ids else []
+    view = '{"Name":{{json .Name}},"Id":{{json .Id}},"HostConfig":{"LogConfig":{{json .HostConfig.LogConfig}}},"LogPath":{{json .LogPath}}}'
+    raw = subprocess.check_output(['docker', 'inspect', '--format', view, *ids], text=True) if ids else ''
+    items = [json.loads(line) for line in raw.splitlines()]
     includes = paths_for(items)
     template = args.template.read_text()
     marker = 'include: [/logs/*/*-json.log*]'
