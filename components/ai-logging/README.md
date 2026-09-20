@@ -70,6 +70,7 @@ Passed in isolated Docker networks with disposable credentials:
 - 20-second outage + restart: 15/15 unique sequence IDs recovered.
 - SIGKILL + five-second stopped period: 17/17 recovered.
 - Collector replacement + source rotation: 16/16 recovered with persistent storage.
+- 30-minute outage with collector restart: all 902 unique sequence IDs recovered.
 - Non-JSON sentinel exclusion and original timestamp preservation passed separately.
 - Exact source allowlist/path/driver validation: four unit tests passed.
 - Vector binary config, Compose and three Prometheus rule trigger tests passed.
@@ -79,8 +80,8 @@ Passed in isolated Docker networks with disposable credentials:
   336h retention with accelerated compactor timing, old chunks physically removed,
   15-day fixture gone, current fixture retained. Production timing is not accelerated.
 
-30-minute outage/restart repeat is still running. Production activation and real
-cross-service troubleshooting acceptance remain pending. External notification has
+Production activation and real cross-service troubleshooting acceptance remain
+pending. External notification has
 no configured channel (user confirmed); rules/visibility are in scope, external
 notification delivery is explicitly deferred, not reported as passed.
 
