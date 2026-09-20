@@ -118,3 +118,11 @@ Grafana 11.1.4 isolated organization test passed: ops admin can access datasourc
 ordinary main-org user cannot, including a forged org header; anonymous denied.
 External notification channel is not configured (user confirmed); rule loading and
 visibility are in scope, delivery notification remains an explicit follow-up.
+
+Grafana deployment persistence: after initial storage activation, opt serverD into
+`deploy/serverD/docker-compose.ai-logging.yml` together with its base Compose file.
+For normal `make` targets (which use --env-file without explicit -f), set
+`COMPOSE_FILE=docker-compose.yml:docker-compose.ai-logging.yml` in the private
+serverD env file. Commands specifying explicit -f must also include the override.
+Initial network attachment can be applied with `docker network connect ai-logs grafana`
+without recreating Grafana. Loki is never attached to the shared backend network.
