@@ -47,3 +47,33 @@ filter -> WAL -> Loki query passed. A non-JSON legacy sentinel was not ingested.
 The experiment used a separate container allowlist and plaintext local test network;
 production mTLS configuration was not weakened. Found and fixed the ordering bug
 where schema must be promoted to a label before stage.match can filter it.
+
+## 2026-09-20 acceptance blocker
+
+Do not activate production profiles yet. A 30-minute gateway outage with an Alloy
+restart failed the complete-sequence assertion. A 20-second reproduction received
+sequences 0, 1, 6–13 but not 2–5, which were emitted before the collector restarted.
+This is not evidence of durable restart replay. mTLS rejection and normal ingestion
+passed; these do not establish restart durability.
+
+Pinned Alloy v1.11.2 source (`internal/component/loki/write/write.go`) explicitly
+leaves WAL replay as TODO. Merely enabling WAL is insufficient. Before deployment,
+resolve recovery from retained Docker source logs or use a verified durable delivery
+mechanism, then repeat the sequence test without relaxing its assertion. Docker log
+retention must be measured against the recovery window; retained local logs are not
+an unlimited archive. Do not silently trade this requirement for best-effort logs.
+
+Reproduction (disposable local Docker network, no production credentials):
+
+```sh
+python3 scripts/tests/ai-log-pipeline.py --outage-seconds 20
+# After recovery is fixed:
+python3 scripts/tests/ai-log-pipeline.py --outage-seconds 1800
+```
+
+The script removes only its own named containers/network. It intentionally fails
+when any fixture sequence is missing and prints diagnostic counts and isolated
+container logs. Container replacement, retention deletion, Grafana organization
+access and notifications remain pending.
+
+Source: https://github.com/grafana/alloy/blob/v1.11.2/internal/component/loki/write/write.go
