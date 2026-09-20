@@ -23,11 +23,15 @@ transforms:
       if parsed.schema_version != 1 { abort }
       if parsed.service != "qs-ai" && parsed.service != "qs-apiserver" { abort }
       . = parsed
+      if exists(.timestamp) {
+        .timestamp = parse_timestamp!(string!(.timestamp), format: "%+")
+      }
 sinks:
   loki:
     type: loki
     inputs: [approved]
     endpoint: ${LOKI_ENDPOINT}
+    remove_timestamp: false
     healthcheck:
       enabled: false
     encoding:

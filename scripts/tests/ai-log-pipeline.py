@@ -108,7 +108,8 @@ with tempfile.TemporaryDirectory(prefix=prefix) as folder:
             collector = start_vector()
         # Use the same event in stdout and native Docker json-file envelope.
         event = json.dumps({'schema_version':1, 'service':'qs-ai', 'event':'smoke',
-                            'request_id':prefix, 'sequence':'SEQUENCE'})
+                            'request_id':prefix, 'sequence':'SEQUENCE',
+                            'timestamp':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime())})
         event = event.replace('"SEQUENCE"', '%s')
         lines = ['sleep 12', 'n=0', 'while true; do',
                  "printf '"+event+"\\n' \"$n\""]
@@ -160,6 +161,8 @@ with tempfile.TemporaryDirectory(prefix=prefix) as folder:
                 logs = subprocess.run(['docker', 'logs', '--tail', '40', name], text=True, capture_output=True)
                 print(name, logs.stdout, logs.stderr, flush=True)
             raise
+        if args.collector == 'vector':
+            assert all('timestamp' in row for row in query())
         all_query = urllib.parse.urlencode({'query':'{service="qs-ai"}', 'start':since,
                                             'end':str(time.time_ns()), 'limit':'5000'})
         with urllib.request.urlopen(base+'/loki/api/v1/query_range?'+all_query, timeout=5) as response:
