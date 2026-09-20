@@ -17,6 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--outage-seconds', type=int, default=1800)
 parser.add_argument('--collector', choices=['alloy', 'vector'], default='vector')
 parser.add_argument('--crash', action='store_true')
+parser.add_argument('--replace', action='store_true')
 args = parser.parse_args()
 assert 0 <= args.outage_seconds <= 3600
 root = pathlib.Path(__file__).resolve().parents[2] / 'components/ai-logging'
@@ -96,13 +97,15 @@ with tempfile.TemporaryDirectory(prefix=prefix) as folder:
             (temp/'logs'/'fixture').mkdir(parents=True)
             (temp/'vector-data').mkdir()
             (temp/'vector.yaml').write_text(config)
-            collector = start('vector', '-e', 'LOKI_ENDPOINT=https://gateway:8443',
-                          '-v', '/var/run/docker.sock:/var/run/docker.sock:ro',
-                          '-v', f'{temp}:/certs:ro',
-                          '-v', f'{temp}/vector.yaml:/etc/vector/vector.yaml:ro',
-                          '-v', f'{temp}/logs:/logs:ro',
-                          '-v', f'{temp}/vector-data:/var/lib/vector',
-                          'timberio/vector:0.49.0-debian', '--config', '/etc/vector/vector.yaml')
+            def start_vector():
+                return start('vector', '-e', 'LOKI_ENDPOINT=https://gateway:8443',
+                              '-v', '/var/run/docker.sock:/var/run/docker.sock:ro',
+                              '-v', f'{temp}:/certs:ro',
+                              '-v', f'{temp}/vector.yaml:/etc/vector/vector.yaml:ro',
+                              '-v', f'{temp}/logs:/logs:ro',
+                              '-v', f'{temp}/vector-data:/var/lib/vector',
+                              'timberio/vector:0.49.0-debian', '--config', '/etc/vector/vector.yaml')
+            collector = start_vector()
         # Use the same event in stdout and native Docker json-file envelope.
         event = json.dumps({'schema_version':1, 'service':'qs-ai', 'event':'smoke',
                             'request_id':prefix, 'sequence':'SEQUENCE'})
@@ -128,7 +131,16 @@ with tempfile.TemporaryDirectory(prefix=prefix) as folder:
         print('PASS: mTLS collector push and Loki query; starting outage', flush=True)
         run('docker', 'stop', '-t', '1', gateway)
         time.sleep(args.outage_seconds / 2)
-        if args.crash:
+        if args.replace:
+            if args.collector != 'vector':
+                raise ValueError('Replacement test requires durable Vector source')
+            run('docker', 'kill', collector)
+            run('docker', 'rm', collector)
+            containers.remove(collector)
+            run('docker', 'exec', fixture, 'mv', '/fixture-logs/events-json.log', '/fixture-logs/events-json.log.1')
+            time.sleep(5)
+            collector = start_vector()
+        elif args.crash:
             run('docker', 'kill', collector)
             time.sleep(5)
             run('docker', 'start', collector)
@@ -148,6 +160,10 @@ with tempfile.TemporaryDirectory(prefix=prefix) as folder:
                 logs = subprocess.run(['docker', 'logs', '--tail', '40', name], text=True, capture_output=True)
                 print(name, logs.stdout, logs.stderr, flush=True)
             raise
+        all_query = urllib.parse.urlencode({'query':'{service="qs-ai"}', 'start':since,
+                                            'end':str(time.time_ns()), 'limit':'5000'})
+        with urllib.request.urlopen(base+'/loki/api/v1/query_range?'+all_query, timeout=5) as response:
+            assert 'legacy-private-sentinel' not in response.read().decode()
         print(json.dumps({'passed':True, 'outage_seconds':args.outage_seconds,
                           'unique_events':len(expected), 'collector_restart':True}), flush=True)
     finally:

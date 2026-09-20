@@ -104,3 +104,7 @@ Production prerequisites prepared: Grafana organization `AI Operations` (id 2),
 no datasource provisioned yet; independent serverA/serverD collector client
 certificates and `ai-logs.svc` server certificate signed by the existing infra CA.
 Only leaf keys/chains and CA public chain will be mounted/transferred.
+
+Additional isolated replacement test passed: disk queue and file checkpoints survived
+container removal/recreation plus source-file rotation; all 16 events recovered.
+Production certificates have been staged; no collector has been activated.
