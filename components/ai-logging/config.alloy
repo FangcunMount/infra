@@ -44,6 +44,10 @@ loki.process "ai" {
     drop_malformed = true
   }
 
+  stage.labels {
+    values = { schema = "schema" }
+  }
+
   stage.match {
     selector = "{schema!=\"1\"}"
     action   = "drop"

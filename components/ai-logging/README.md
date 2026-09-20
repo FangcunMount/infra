@@ -41,3 +41,9 @@ scratch directory, accepted HTTP 204 on push and returned the expected event fro
 query_range. The temporary test container was removed. This does not establish
 Alloy end-to-end ingestion, mTLS gateway readiness, Grafana access isolation or
 production deployment. Named-volume initialization now assigns UID/GID 10001.
+
+Additional isolated acceptance: Docker stdout -> Alloy Docker discovery -> schema
+filter -> WAL -> Loki query passed. A non-JSON legacy sentinel was not ingested.
+The experiment used a separate container allowlist and plaintext local test network;
+production mTLS configuration was not weakened. Found and fixed the ordering bug
+where schema must be promoted to a label before stage.match can filter it.
