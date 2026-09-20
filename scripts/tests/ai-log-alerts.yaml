@@ -1,5 +1,5 @@
 rule_files:
-  - /work/components/ai-logging/alerts.yaml
+  - /work/components/prometheus/rules/qs-ai-logging.yml
 evaluation_interval: 1m
 tests:
   - interval: 1m
