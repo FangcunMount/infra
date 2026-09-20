@@ -39,6 +39,8 @@ services:
   collector:
     profiles: [collector]
     image: timberio/vector:0.49.0-debian
+    container_name: ${LOGS_COLLECTOR_NAME:?Set host-specific collector name}
+    networks: [backend]
     command: [--config, /etc/vector/rendered/vector.yaml, --watch-config]
     restart: unless-stopped
     stop_grace_period: 60s
@@ -56,6 +58,9 @@ services:
     logging: *rotation
 
 networks:
+  backend:
+    name: infra-network
+    external: true
   logs:
     name: ai-logs
     internal: true

@@ -1,5 +1,7 @@
 data_dir: /var/lib/vector
 sources:
+  internal:
+    type: internal_metrics
   docker:
     type: file
     include: [/logs/*/*-json.log*]
@@ -27,6 +29,10 @@ transforms:
         .timestamp = parse_timestamp!(string!(.timestamp), format: "%+")
       }
 sinks:
+  metrics:
+    type: prometheus_exporter
+    inputs: [internal]
+    address: 0.0.0.0:9598
   loki:
     type: loki
     inputs: [approved]
