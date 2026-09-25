@@ -74,7 +74,7 @@ groups:
           description: "Worker {{ $labels.service }} has consume outcome {{ $labels.outcome }} for {{ $labels.topic }} / {{ $labels.event_type }}."
 
       - alert: QSBestEffortSideEffectFailure
-        expr: sum by (event_type, result) (increase(qs_worker_best_effort_side_effect_total{result=~"call_failed|response_rejected"}[5m])) > 0
+        expr: (sum by (event_type, result) (increase(qs_worker_best_effort_side_effect_total{result=~"call_failed|response_rejected"}[5m])) > 0) or (sum by (event_type, result) (increase(qs_worker_best_effort_side_effect_total{event_type=~"questionnaire.changed|assessment_model.changed",result="not_configured"}[5m])) > 0)
         labels:
           severity: warning
           subsystem: event
