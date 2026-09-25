@@ -55,6 +55,14 @@
 
 事件告警只使用 bounded labels：`source/mode/topic/event_type/outcome`、`relay`、`service`、`store/status`。不要把 `event_id`、`aggregate_id`、error message 写进 label。
 
+### M5-05 最佳努力副作用
+
+`QSBestEffortSideEffectFailure` 监测 `qs_worker_best_effort_side_effect_total{result=~"call_failed|response_rejected"}` 在最近五分钟内是否增加，按事件类型和结果分别告警。问卷／量表二维码后处理若报告 `not_configured`，同样告警：发布后应可定位这一未执行的后处理。`task.completed/expired/canceled` 三条外围通知的 `not_configured` 保留在指标和 Worker 警告日志中，因通知目标是否应配置尚需逐环境审核，暂不据此告警；切流前必须核对各环境的预期接收方。`task.opened` 主动提醒有独立的可靠意图设计。`call_succeeded` 仅表示当前外部调用未报错，不证明用户收件；`task.expired` 的 `missed_open_window` 抑制不是失败。
+
+告警处理先按 `event_type`、时间和 Worker 实例检索警告日志中的原 `event_id`，再核对问卷／模型发布状态或 MySQL Task 当前状态，并确认外部系统是否已经接受调用。问卷／量表可在运营界面验证按原 code／version 取得二维码；当前没有针对完成、过期、取消通知的专用人工重发入口。外部调用结果未知时不要直接重投 NSQ 消息或再次调用通知接口；记录事件身份、核对结论、责任人及人工动作后再处理。`qs_event_consume_total{outcome="acked"}` 只表示消息已确认，不能替代这个副作用指标。若新指标缺失，先核对 `up{job="qs-worker"}` 和 Worker `/metrics` 抓取，不能把缺失解释为零失败。
+
+本规则需随 QS 的 M5-05 Worker 指标变更共同审核；合并配置文件本身不会完成生产监控发布，实际告警触发、日志定位和人工操作仍须现场演练。
+
 ## 高并发治理规则
 
 同一 rules 目录还包含 Resilience Plane 规则：

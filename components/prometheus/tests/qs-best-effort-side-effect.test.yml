@@ -1,0 +1,53 @@
+rule_files:
+  - ../rules/qs-event-system.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: external failure alerts while broker ACK remains successful
+    interval: 1m
+    input_series:
+      - series: 'qs_worker_best_effort_side_effect_total{event_type="task.completed",result="call_failed",job="qs-worker"}'
+        values: '0 0 1 1 1 1 1 1 1 1'
+      - series: 'qs_worker_best_effort_side_effect_total{event_type="questionnaire.changed",result="response_rejected",job="qs-worker"}'
+        values: '0 0 1 1 1 1 1 1 1 1'
+      - series: 'qs_worker_best_effort_side_effect_total{event_type="task.canceled",result="call_succeeded",job="qs-worker"}'
+        values: '0 0 1 1 1 1 1 1 1 1'
+      - series: 'qs_worker_best_effort_side_effect_total{event_type="task.expired",result="not_configured",job="qs-worker"}'
+        values: '0 0 1 1 1 1 1 1 1 1'
+      - series: 'qs_worker_best_effort_side_effect_total{event_type="assessment_model.changed",result="not_configured",job="qs-worker"}'
+        values: '0 0 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: QSBestEffortSideEffectFailure
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: QSBestEffortSideEffectFailure
+        exp_alerts:
+          - exp_labels:
+              event_type: task.completed
+              result: call_failed
+              severity: warning
+              subsystem: event
+            exp_annotations:
+              summary: QS best-effort side effect failed
+              description: task.completed returned call_failed. Find event_id in Worker warning logs and verify business and downstream state before manual action; do not blindly replay an unknown external call.
+          - exp_labels:
+              event_type: questionnaire.changed
+              result: response_rejected
+              severity: warning
+              subsystem: event
+            exp_annotations:
+              summary: QS best-effort side effect failed
+              description: questionnaire.changed returned response_rejected. Find event_id in Worker warning logs and verify business and downstream state before manual action; do not blindly replay an unknown external call.
+          - exp_labels:
+              event_type: assessment_model.changed
+              result: not_configured
+              severity: warning
+              subsystem: event
+            exp_annotations:
+              summary: QS best-effort side effect failed
+              description: assessment_model.changed returned not_configured. Find event_id in Worker warning logs and verify business and downstream state before manual action; do not blindly replay an unknown external call.
+      - eval_time: 9m
+        alertname: QSBestEffortSideEffectFailure
+        exp_alerts: []
