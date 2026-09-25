@@ -73,6 +73,15 @@ groups:
           summary: "QS event worker consume failures detected"
           description: "Worker {{ $labels.service }} has consume outcome {{ $labels.outcome }} for {{ $labels.topic }} / {{ $labels.event_type }}."
 
+      - alert: QSBestEffortSideEffectFailure
+        expr: sum by (event_type, result) (increase(qs_worker_best_effort_side_effect_total{result=~"call_failed|response_rejected"}[5m])) > 0
+        labels:
+          severity: warning
+          subsystem: event
+        annotations:
+          summary: "QS best-effort side effect failed"
+          description: "{{ $labels.event_type }} returned {{ $labels.result }}. Find event_id in Worker warning logs and verify business and downstream state before manual action; do not blindly replay an unknown external call."
+
       - alert: QSEventWorkerConsumeP95High
         expr: qs:event_consume_duration:p95{outcome=~"acked|nacked|ack_failed|nack_failed"} > 10
         for: 10m
