@@ -61,4 +61,5 @@ bash scripts/03-nginx/nginx-app-manager.sh deploy grafana components/grafana/ngi
 - Resilience：`resilience-overview`、`resilience-ratelimit`、`resilience-submitqueue`、`resilience-backpressure`、`resilience-locks`
 
 Event dashboard 使用 `qs_event_*` 原始指标和 `qs:event_*` recording rules。UID 固定，供 operating 前端通过 `REACT_APP_GRAFANA_URL` 自动生成深链接。
+`event-worker` 还按事件类型和处理结果展示五条最佳努力流的五分钟副作用指标；它用于值班定位，`increase` 是区间估算，缺少时序不表示零失败。图表不包含事件 ID，需按时间和事件类型回查 Worker 日志中的原 ID，再核对外部结果后决定人工处理。该看板不配置告警接收渠道，也不表示消息已可靠送达或用户已收件。
 Resilience dashboard 使用 `qs_resilience_*` 原始指标和 `qs:resilience_*` recording rules。UID 固定，供 operating 前端通过 `REACT_APP_GRAFANA_URL` 自动生成深链接。

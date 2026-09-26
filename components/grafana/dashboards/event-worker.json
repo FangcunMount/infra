@@ -209,6 +209,58 @@
       ],
       "title": "Poison Message Rate",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Five best-effort flows only. Values are Prometheus five-minute counter estimates; a missing series is not proof of zero failures. Use the event type and time to find the original event ID in Worker warning logs, then check the external result before any manual action.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum by (event_type, result) (increase(qs_worker_best_effort_side_effect_total[5m]))",
+          "legendFormat": "{{event_type}} / {{result}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Best-Effort Side Effects (5m estimate)",
+      "type": "timeseries"
     }
   ],
   "refresh": "30s",
