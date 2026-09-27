@@ -35,6 +35,20 @@ jobs:
             -v "$RUNNER_TEMP/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro" \
             -v "$RUNNER_TEMP/alertmanager/secrets/smtp_password:/etc/alertmanager/secrets/smtp_password:ro" \
             prom/alertmanager:v0.34.1 check-config /etc/alertmanager/alertmanager.yml
+          docker run --rm --user 0:0 --entrypoint /bin/amtool \
+            -v "$RUNNER_TEMP/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro" \
+            -v "$RUNNER_TEMP/alertmanager/secrets/smtp_password:/etc/alertmanager/secrets/smtp_password:ro" \
+            prom/alertmanager:v0.34.1 config routes test \
+            --config.file=/etc/alertmanager/alertmanager.yml \
+            --verify.receivers=reliable-messaging-email \
+            alertname=QSEventOutboxQuarantined subsystem=event store=mongo-domain-events
+          docker run --rm --user 0:0 --entrypoint /bin/amtool \
+            -v "$RUNNER_TEMP/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro" \
+            -v "$RUNNER_TEMP/alertmanager/secrets/smtp_password:/etc/alertmanager/secrets/smtp_password:ro" \
+            prom/alertmanager:v0.34.1 config routes test \
+            --config.file=/etc/alertmanager/alertmanager.yml \
+            --verify.receivers=discard \
+            alertname=QSAIModelResultUnknown subsystem=qs-ai
       - name: Validate serverD Compose with alerting profile
         shell: bash
         run: |

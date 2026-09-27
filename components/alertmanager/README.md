@@ -2,6 +2,8 @@
 
 此组件默认不运行：Compose profile 为 `alerting`，Prometheus 的 `PROMETHEUS_ALERTMANAGER_ENABLED` 默认为 `false`。合并代码不会自动发送邮件。现有 Prometheus 规则仍是唯一规则源；Alertmanager 只把 `subsystem="event"` 的规则路由到邮件，其他规则保留原可见性但不在本次扩大通知范围。
 
+隔离 CI 用合成地址校验配置文件，并以 `amtool config routes test` 断言事件告警匹配邮件 receiver、非事件告警匹配默认 receiver；这只验证路由选择，不验证 SMTP 连接或收件。
+
 启用前必须明确 SMTP 服务、发件地址与认证账号，创建专用授权码文件，并指定主值守和替补。当前仅有一个个人初始收件地址，尚无发送服务和替补，故本组件不满足生产送达验收。不要把 SMTP 密码、授权码或实际收件地址提交到仓库、CI 日志或公开审核材料。
 
 在 serverD 上按审核包准备：
