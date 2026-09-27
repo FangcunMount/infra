@@ -41,6 +41,13 @@ services:
     env_file:
       - ../../compose/env/prod/serverD.env
 
+  alertmanager:
+    extends:
+      file: ../../components/alertmanager/docker-compose.yml
+      service: alertmanager
+    env_file:
+      - ../../compose/env/prod/serverD.env
+
   grafana:
     extends:
       file: ../../components/grafana/docker-compose.yml

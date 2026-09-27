@@ -1,0 +1,46 @@
+name: Validate M6 alert delivery configuration
+
+on:
+  pull_request:
+    paths:
+      - components/alertmanager/**
+      - components/prometheus/docker-compose.yml
+      - deploy/serverD/docker-compose.yml
+      - compose/env/prod/.env.example
+      - .github/workflows/alertmanager-config.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Render a synthetic email route without external delivery
+        shell: bash
+        env:
+          ALERTMANAGER_SMTP_SMARTHOST: smtp.example.invalid:587
+          ALERTMANAGER_SMTP_FROM: alerts@example.invalid
+          ALERTMANAGER_SMTP_AUTH_USERNAME: alerts@example.invalid
+          ALERTMANAGER_EMAIL_TO: ops@example.invalid
+        run: |
+          set -Eeuo pipefail
+          mkdir -p "$RUNNER_TEMP/alertmanager/secrets"
+          printf 'fixture-only\n' > "$RUNNER_TEMP/alertmanager/secrets/smtp_password"
+          python3 components/alertmanager/render-config.py "$RUNNER_TEMP/alertmanager/alertmanager.yml"
+          ! grep -Fq 'fixture-only' "$RUNNER_TEMP/alertmanager/alertmanager.yml"
+          docker run --rm --entrypoint /bin/amtool \
+            -v "$RUNNER_TEMP/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro" \
+            -v "$RUNNER_TEMP/alertmanager/secrets/smtp_password:/etc/alertmanager/secrets/smtp_password:ro" \
+            prom/alertmanager:v0.34.1 check-config /etc/alertmanager/alertmanager.yml
+      - name: Validate serverD Compose with alerting profile
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          cp compose/env/prod/.env.example compose/env/prod/serverD.env
+          trap 'rm -f compose/env/prod/serverD.env' EXIT
+          docker compose --profile alerting \
+            --env-file compose/env/prod/serverD.env \
+            -f deploy/serverD/docker-compose.yml config >/dev/null
