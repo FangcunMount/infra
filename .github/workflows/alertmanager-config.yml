@@ -31,7 +31,7 @@ jobs:
           printf 'fixture-only\n' > "$RUNNER_TEMP/alertmanager/secrets/smtp_password"
           python3 components/alertmanager/render-config.py "$RUNNER_TEMP/alertmanager/alertmanager.yml"
           ! grep -Fq 'fixture-only' "$RUNNER_TEMP/alertmanager/alertmanager.yml"
-          docker run --rm --entrypoint /bin/amtool \
+          docker run --rm --user 0:0 --entrypoint /bin/amtool \
             -v "$RUNNER_TEMP/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro" \
             -v "$RUNNER_TEMP/alertmanager/secrets/smtp_password:/etc/alertmanager/secrets/smtp_password:ro" \
             prom/alertmanager:v0.34.1 check-config /etc/alertmanager/alertmanager.yml
