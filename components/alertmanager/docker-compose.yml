@@ -1,0 +1,39 @@
+services:
+  alertmanager:
+    image: prom/alertmanager:v0.34.1
+    container_name: alertmanager
+    profiles: [alerting]
+    user: "2000:2000"
+    networks:
+      - backend
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    volumes:
+      - ${ALERTMANAGER_CONFIG_PATH:-/data/infra/alertmanager/alertmanager.yml}:/etc/alertmanager/alertmanager.yml:ro
+      - ${ALERTMANAGER_SMTP_PASSWORD_PATH:-/data/infra/alertmanager/smtp_password}:/etc/alertmanager/secrets/smtp_password:ro
+      - ${ALERTMANAGER_DATA_PATH:-/data/infra/alertmanager/data}:/alertmanager
+    mem_limit: ${ALERTMANAGER_MEMORY_LIMIT:-128M}
+    cpus: ${ALERTMANAGER_CPUS:-0.10}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:9093/-/ready | grep -q OK"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+    labels:
+      - "infra.service=alertmanager"
+      - "infra.category=observability"
+      - "infra.host=${INFRA_HOST_LABEL:-serverD}"
+
+networks:
+  backend:
+    external: true
+    name: infra-network

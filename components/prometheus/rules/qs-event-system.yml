@@ -43,8 +43,18 @@ groups:
           summary: "QS event outbox failed backlog"
           description: "Outbox {{ $labels.store }} has failed events waiting for retry."
 
+      - alert: QSEventOutboxQuarantined
+        expr: qs:event_outbox_backlog:current{status="quarantined"} > 0
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: event
+        annotations:
+          summary: "QS standard outbox has quarantined messages"
+          description: "Outbox {{ $labels.store }} has messages requiring manual classification. Check original identity and business state; do not replay automatically."
+
       - alert: QSEventOutboxOldestPendingTooOld
-        expr: qs:event_outbox_oldest_age_seconds:max{status=~"pending|failed|publishing"} > 300
+        expr: qs:event_outbox_oldest_age_seconds:max{status=~"pending|retry_wait|failed|publishing"} > 300
         for: 10m
         labels:
           severity: warning

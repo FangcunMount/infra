@@ -16,6 +16,7 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
+        set -eu
         collection_target="$${PROMETHEUS_QS_COLLECTION_TARGET:-qs-collection-server:8080}" && \
         collection_host="$${collection_target%:*}" && \
         collection_port="$${collection_target##*:}" && \
@@ -24,7 +25,14 @@ services:
           -e "s|\$${PROMETHEUS_QS_APISERVER_TARGET}|$${PROMETHEUS_QS_APISERVER_TARGET:-qs-apiserver:8080}|g" \
           -e "s|\$${PROMETHEUS_QS_COLLECTION_HOST}|$${collection_host}|g" \
           -e "s|\$${PROMETHEUS_QS_COLLECTION_PORT}|$${collection_port}|g" \
-          /etc/prometheus/prometheus.yml.tmpl > /tmp/prometheus.yml && \
+          /etc/prometheus/prometheus.yml.tmpl > /tmp/prometheus.yml
+        if [ "$${PROMETHEUS_ALERTMANAGER_ENABLED:-false}" = "true" ]; then
+          printf '%s\n' \
+            'alerting:' \
+            '  alertmanagers:' \
+            '    - static_configs:' \
+            '        - targets: ["alertmanager:9093"]' >> /tmp/prometheus.yml
+        fi
         exec /bin/prometheus \
           --config.file=/tmp/prometheus.yml \
           --storage.tsdb.path=/prometheus \
