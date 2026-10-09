@@ -1,5 +1,5 @@
 # ============================================================================
-# serverA 基础设施栈 (4C8G)
+# serverA 基础设施栈 (2C4G 资源预算)
 # ============================================================================
 # 服务清单：
 #   - 网关：Nginx
@@ -20,8 +20,8 @@ services:
     image: nginx:1.27
     container_name: mysql-rds-proxy
     restart: unless-stopped
-    mem_limit: 128m
-    cpus: "0.25"
+    mem_limit: 64m
+    cpus: "0.1"
     environment:
       MYSQL_HOST: ${MYSQL_HOST:?MYSQL_HOST is required}
       MYSQL_PORT: ${MYSQL_PORT:-3306}
@@ -44,6 +44,11 @@ services:
       start_period: 5s
     security_opt:
       - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
     labels:
       - "infra.host=serverA"
       - "infra.category=database-proxy"
@@ -56,6 +61,8 @@ services:
     extends:
       file: ../../components/nginx/docker-compose.yml
       service: nginx
+    mem_limit: 128m
+    cpus: "0.5"
     env_file:
       - ../../compose/env/prod/serverA.env
     volumes:
