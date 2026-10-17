@@ -1,4 +1,5 @@
 # Prometheus 监控服务
+# 兼容观察至少保留 max(30天, 批准观察周期+7天)；更长周期通过现有变量显式覆盖。
 
 services:
   prometheus:
@@ -28,7 +29,7 @@ services:
         exec /bin/prometheus \
           --config.file=/tmp/prometheus.yml \
           --storage.tsdb.path=/prometheus \
-          --storage.tsdb.retention.time=$${PROMETHEUS_RETENTION_TIME:-15d} \
+          --storage.tsdb.retention.time=$${PROMETHEUS_RETENTION_TIME:-30d} \
           --web.enable-lifecycle
     mem_limit: ${PROMETHEUS_MEMORY_LIMIT:-512M}
     cpus: ${PROMETHEUS_CPUS:-0.25}
