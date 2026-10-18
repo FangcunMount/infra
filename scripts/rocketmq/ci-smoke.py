@@ -110,6 +110,27 @@ def main():
                 raise RuntimeError("Python consumer did not finish ACK/drain")
         return result
 
+    def await_topic_route():
+        # A listening local Proxy is insufficient after a Broker restart: the
+        # NameServer must have received the Broker's persisted topic routes.
+        manifest = json.loads((repo / "components/rocketmq/test-routes.json").read_text())
+        topic = manifest["routes"][0]["physical_topic"]
+        deadline = time.monotonic() + 90
+        while time.monotonic() < deadline:
+            result = command(["docker", "exec", broker, "java", "-Xms32m", "-Xmx128m",
+                              "-XX:MaxDirectMemorySize=32m", "-cp",
+                              "/opt/rocketmq/conf:/opt/rocketmq/lib/*",
+                              "org.apache.rocketmq.tools.command.MQAdminStartup", "topicRoute",
+                              "-n", "nameserver:9876", "-t", topic], required=False, timeout=20)
+            try:
+                route = json.loads(result.stdout[result.stdout.index("{"):])
+                if result.returncode == 0 and route.get("brokerDatas") and route.get("queueDatas"):
+                    return
+            except (ValueError, TypeError):
+                pass
+            time.sleep(2)
+        raise RuntimeError("persisted topic route was not registered with NameServer")
+
     try:
         command(compose + ["up", "-d", "--wait", "--wait-timeout", "180"], timeout=240)
         command(["python3", str(repo / "scripts/rocketmq/provision.py"), "--container", broker,
@@ -120,6 +141,7 @@ def main():
             raise RuntimeError("negative-test principal was not provisioned")
         command(["go", "build", "-o", str(directory / "go-probe"), "./examples/rocketmq"], cwd=sdk)
         command(["uv", "sync", "--locked", "--all-extras", "--group", "dev", "--project", str(sdk / "python")])
+        await_topic_route()
         for publisher in ("go", "python"):
             identity = "ci-" + publisher + "-" + secrets.token_hex(4)
             probe(publisher, "publish", identity)
@@ -147,6 +169,7 @@ def main():
         command(["docker", "kill", "--signal", "KILL", broker])
         command(["docker", "start", broker])
         command(compose + ["up", "-d", "--wait", "--wait-timeout", "180"], timeout=240)
+        await_topic_route()
         probe("go", "consume", identity)
         cases["confirmed_message_survives_broker_kill"] = True
         began = time.monotonic()
