@@ -630,7 +630,7 @@ init-serverC: ## 在 ServerC 上初始化卷，跳过网络创建 (worker, Mongo
 	@INIT_TARGET=serverC SKIP_NETWORK=true $(INFRA_SCRIPT) create
 	$(call success_msg,ServerC 初始化完成)
 
-init-serverD: ## 在 ServerD 上初始化卷，跳过网络创建 (manager, NSQ + Monitoring 节点)
+init-serverD: ## 在 ServerD 上初始化卷，跳过网络创建 (manager, NSQ 节点)
 	$(call info_msg,初始化 ServerD 卷，跳过网络创建...)
 	@INIT_TARGET=serverD SKIP_NETWORK=true $(INFRA_SCRIPT) create
 	$(call success_msg,ServerD 初始化完成)
@@ -912,49 +912,43 @@ mysql-shell: ## 进入 MySQL Shell
 # ==============================================================================
 .PHONY: prometheus-start prometheus-stop prometheus-restart prometheus-logs prometheus-status prometheus-targets
 
-prometheus-start: ## 在 ServerD 启动 Prometheus
-	$(call section_title,启动 Prometheus (serverD))
-	$(call ensure_infra_network_visible)
-	@$(MAKE) init-serverD
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d prometheus
-	$(call success_msg,Prometheus 已启动)
+prometheus-start: ## 在旧 Mac mini 启动 Prometheus
+	@bash scripts/monitoring/manage.sh up prometheus
 
-prometheus-stop: ## 停止 Prometheus
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env stop prometheus 2>/dev/null || docker stop prometheus 2>/dev/null || true
+prometheus-stop: ## 停止旧 Mac mini Prometheus
+	@bash scripts/monitoring/manage.sh stop prometheus
 
-prometheus-restart: prometheus-stop prometheus-start ## 重启 Prometheus
+prometheus-restart: ## 重启旧 Mac mini Prometheus
+	@bash scripts/monitoring/manage.sh restart prometheus
 
-prometheus-logs: ## 查看 Prometheus 日志
-	@docker logs -f --tail=$(LOG_LINES) prometheus
+prometheus-logs: ## 查看旧 Mac mini Prometheus 日志
+	@bash scripts/monitoring/manage.sh logs --tail=$(LOG_LINES) prometheus
 
-prometheus-status: ## 查看 Prometheus 状态
-	@docker ps --filter "name=prometheus" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+prometheus-status: ## 查看旧 Mac mini Prometheus
+	@bash scripts/monitoring/manage.sh status prometheus
 
-prometheus-targets: ## 查看 Prometheus 抓取目标状态
-	@docker exec prometheus wget -qO- http://127.0.0.1:9090/api/v1/targets | python3 -m json.tool
+prometheus-targets: ## 查看全部逐实例采集目标
+	@bash scripts/monitoring/manage.sh targets
 
 # ==============================================================================
 # 3. 组件管理 - Grafana
 # ==============================================================================
 .PHONY: grafana-start grafana-stop grafana-restart grafana-logs grafana-status grafana-nginx-deploy
 
-grafana-start: ## 在 ServerD 启动 Grafana
-	$(call section_title,启动 Grafana (serverD))
-	$(call ensure_infra_network_visible)
-	@$(MAKE) init-serverD
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d prometheus grafana
-	$(call success_msg,Grafana 已启动)
+grafana-start: ## 在旧 Mac mini 启动 Grafana
+	@bash scripts/monitoring/manage.sh up grafana
 
-grafana-stop: ## 停止 Grafana
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env stop grafana 2>/dev/null || docker stop grafana 2>/dev/null || true
+grafana-stop: ## 停止旧 Mac mini Grafana
+	@bash scripts/monitoring/manage.sh stop grafana
 
-grafana-restart: grafana-stop grafana-start ## 重启 Grafana
+grafana-restart: ## 重启旧 Mac mini Grafana
+	@bash scripts/monitoring/manage.sh restart grafana
 
-grafana-logs: ## 查看 Grafana 日志
-	@docker logs -f --tail=$(LOG_LINES) grafana
+grafana-logs: ## 查看旧 Mac mini Grafana 日志
+	@bash scripts/monitoring/manage.sh logs --tail=$(LOG_LINES) grafana
 
-grafana-status: ## 查看 Grafana 状态
-	@docker ps --filter "name=grafana" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+grafana-status: ## 查看旧 Mac mini Grafana
+	@bash scripts/monitoring/manage.sh status grafana
 
 grafana-nginx-deploy: ## 部署 Grafana Nginx 配置到 /data/apps/nginx-configs
 	@bash $(NGINX_SCRIPTS)/nginx-app-manager.sh deploy grafana components/grafana/nginx/grafana.conf
@@ -1237,30 +1231,27 @@ serverC-destroy: ## 销毁 ServerC 所有容器、卷和数据 (危险!)
 
 serverC-rebuild: serverC-destroy serverC-up ## 完全重建 ServerC (销毁后重建)
 
-serverD-up: ## 启动 ServerD 服务栈 (NSQ + Prometheus + Grafana)
+serverD-up: ## 启动 ServerD 消息服务栈 (NSQ)
 	$(call section_title,启动 ServerD (4C4G))
 	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverD
 	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d
 	$(call success_msg,ServerD 服务已启动)
 
-serverD-monitoring-up: ## 在 ServerD 一键启动 Prometheus + Grafana
-	$(call section_title,启动 ServerD Monitoring)
-	$(call ensure_infra_network_visible)
-	@$(MAKE) init-serverD
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d prometheus grafana
-	$(call success_msg,ServerD Prometheus + Grafana 已启动)
+# Compatibility names fail explicitly rather than resurrect monitoring on serverD.
+serverD-monitoring-up serverD-monitoring-down serverD-monitoring-logs serverD-monitoring-status serverD-monitoring-restart:
+	@echo "Monitoring moved to the old Mac mini; use make monitoring-up/status there." >&2
+	@exit 1
 
-serverD-monitoring-down: ## 停止 ServerD Prometheus + Grafana
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env stop grafana prometheus
-
-serverD-monitoring-logs: ## 查看 ServerD Prometheus + Grafana 日志
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env logs -f --tail=$(LOG_LINES) prometheus grafana
-
-serverD-monitoring-status: ## 查看 ServerD Prometheus + Grafana 状态
-	@docker ps --filter "label=infra.host=serverD" --filter "label=infra.category=observability" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-
-serverD-monitoring-restart: serverD-monitoring-down serverD-monitoring-up ## 重启 ServerD Prometheus + Grafana
+.PHONY: monitoring-up monitoring-stop monitoring-status monitoring-discover
+monitoring-up: ## 启动旧 Mac mini 监控栈
+	@bash scripts/monitoring/manage.sh up
+monitoring-stop: ## 停止旧 Mac mini 监控栈
+	@bash scripts/monitoring/manage.sh stop
+monitoring-status: ## 查看旧 Mac mini 监控栈
+	@bash scripts/monitoring/manage.sh status
+monitoring-discover: ## 从旧 Mac mini 刷新云端逐实例采集目标
+	@bash scripts/monitoring/manage.sh discover
 
 serverD-down: ## 停止 ServerD 服务栈
 	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env down
@@ -1568,8 +1559,8 @@ service-ports: ## 显示所有服务端口
 	@echo "$(CYAN)MongoDB:$(RESET)     mongo:27017            [infra-network]"
 	@echo "$(CYAN)NSQ:$(RESET)         4150, 4151, 4160, 4161 [serverD]"
 	@echo "$(CYAN)NSQAdmin:$(RESET)    127.0.0.1:4171         [serverD]"
-	@echo "$(CYAN)Prometheus:$(RESET)  prometheus:9090        [serverD / infra-network]"
-	@echo "$(CYAN)Grafana:$(RESET)     grafana:3000           [serverD / infra-network]"
+	@echo "$(CYAN)Prometheus:$(RESET)  127.0.0.1:19090         [old Mac mini]"
+	@echo "$(CYAN)Grafana:$(RESET)     127.0.0.1:13000         [old Mac mini]"
 	@echo "$(CYAN)MySQL:$(RESET)       云托管地址             [云服务商 A]"
 	@echo "$(CYAN)Redis:$(RESET)       云托管地址             [云服务商 A]"
 	@echo ""

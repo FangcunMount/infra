@@ -3,7 +3,7 @@
 # ============================================================================
 # 服务清单：
 #   - 消息中间件：nsqlookupd、nsqd、nsqadmin
-#   - 可观测性：prometheus、grafana（含 provisioning / dashboards）
+#   - Prometheus / Grafana 已迁到旧 Mac mini，本机不运行监控采集代理。
 # 依赖：
 #   - 外部网络：infra-network
 #   - 配置文件：compose/env/prod/serverD.env
@@ -34,32 +34,7 @@ services:
     env_file:
       - ../../compose/env/prod/serverD.env
 
-  prometheus:
-    extends:
-      file: ../../components/prometheus/docker-compose.yml
-      service: prometheus
-    env_file:
-      - ../../compose/env/prod/serverD.env
-
-  grafana:
-    extends:
-      file: ../../components/grafana/docker-compose.yml
-      service: grafana
-    env_file:
-      - ../../compose/env/prod/serverD.env
-    depends_on:
-      prometheus:
-        condition: service_healthy
-
 networks:
   backend:
     external: true
     name: infra-network
-
-volumes:
-  prometheus_data:
-    name: infra_prometheus_data
-    driver: local
-  grafana_data:
-    name: infra_grafana_data
-    driver: local

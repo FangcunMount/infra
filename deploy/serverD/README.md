@@ -1,5 +1,7 @@
 # serverD 说明
 
+> 2026-10-18 起，监控运行在旧 Mac mini；当前操作以[监控部署说明](../mac-mini/README.md)为准。下文 serverD 启动命令及历史拓扑不再适用。
+
 `serverD` 承载：
 
 - `qs-worker`

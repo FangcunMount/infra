@@ -1,5 +1,7 @@
 # 组件总览
 
+> 2026-10-18 起，监控运行在旧 Mac mini；当前操作以[监控部署说明](../../deploy/mac-mini/README.md)为准。下文 serverD 启动命令及历史拓扑不再适用。
+
 本文档描述当前生产拓扑下，各基础组件部署在哪里、由哪个仓库维护。
 
 ## 当前生产落点
@@ -42,7 +44,7 @@
 - 部署清单：`deploy/serverD/docker-compose.yml`
 - 组件定义：`components/prometheus/docker-compose.yml`、`components/grafana/docker-compose.yml`
 - 环境变量：`compose/env/prod/serverD.env`
-- 一键启动：`make serverD-monitoring-up`
+- 一键启动：`make monitoring-up`
 
 ### MongoDB
 
@@ -60,8 +62,8 @@
 - MongoDB：`mongo:27017`
 - NSQ Lookupd：`nsqlookupd:4161`
 - NSQD：`nsqd:4150`
-- Prometheus：`prometheus:9090`
-- Grafana：`grafana:3000`
+- Prometheus：旧 mini `127.0.0.1:19090`
+- Grafana：旧 mini `127.0.0.1:13000`
 
 业务服务访问数据库/缓存时：
 

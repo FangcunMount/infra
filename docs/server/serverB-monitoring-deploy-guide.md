@@ -1,5 +1,7 @@
 # ServerB 部署 Prometheus + Grafana 指南（历史/可选）
 
+> 2026-10-18 起，监控运行在旧 Mac mini；当前操作以[监控部署说明](../../deploy/mac-mini/README.md)为准。下文 serverD 启动命令及历史拓扑不再适用。
+
 > 注意：这份文档不属于当前目标拓扑的默认方案。当前目标架构中，`serverB` 只承载 `IAM`，`qs-collection-server` 已迁移到 `serverA`，NSQ 与 `Prometheus + Grafana` 部署在 `serverD`。保留本文件仅作为历史参考或临时监控方案。
 
 ## 目的

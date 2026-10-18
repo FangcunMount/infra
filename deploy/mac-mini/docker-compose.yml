@@ -1,0 +1,65 @@
+services:
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: prometheus
+    restart: unless-stopped
+    user: '0:0'
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME:-30d}
+      - --storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE:-8GB}
+    ports: ['127.0.0.1:19090:9090']
+    extra_hosts:
+      - monitoring.fangcunmount.cn:100.85.122.124
+    volumes:
+      - ${MONITORING_DATA_ROOT:?set MONITORING_DATA_ROOT}/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${MONITORING_DATA_ROOT}/targets:/etc/prometheus/targets:ro
+      - ${MONITORING_DATA_ROOT}/rules:/etc/prometheus/rules:ro
+      - prometheus_data:/prometheus
+    networks: [monitoring]
+    mem_limit: 512M
+    cpus: 0.5
+    healthcheck:
+      test: [CMD-SHELL, 'wget -qO- http://127.0.0.1:9090/-/ready >/dev/null']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options: {max-size: 20m, max-file: '3'}
+
+  grafana:
+    image: grafana/grafana:11.1.4
+    container_name: grafana
+    restart: unless-stopped
+    env_file: ['${MONITORING_PRIVATE_ROOT:?set MONITORING_PRIVATE_ROOT}/grafana.env']
+    environment:
+      PROMETHEUS_URL: http://prometheus:9090
+    ports: ['127.0.0.1:13000:3000']
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ${MONITORING_DATA_ROOT}/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ${MONITORING_DATA_ROOT}/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks: [monitoring]
+    mem_limit: 256M
+    cpus: 0.5
+    healthcheck:
+      test: [CMD-SHELL, 'wget -qO- http://127.0.0.1:3000/api/health | grep -q ok']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options: {max-size: 20m, max-file: '3'}
+
+networks:
+  monitoring:
+    name: macmini-monitoring
+volumes:
+  prometheus_data:
+    name: infra_prometheus_data
+    external: true
+  grafana_data:
+    name: infra_grafana_data
+    external: true
