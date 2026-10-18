@@ -123,7 +123,11 @@ def main():
                               "org.apache.rocketmq.tools.command.MQAdminStartup", "topicRoute",
                               "-n", "nameserver:9876", "-t", topic], required=False, timeout=20)
             try:
-                route = json.loads(result.stdout[result.stdout.index("{"):])
+                # MQAdmin's FastJSON emits numeric broker IDs as unquoted keys.
+                # Normalize that specific syntax before strict JSON decoding.
+                payload = result.stdout[result.stdout.index("{\n\t\"brokerDatas\""):]
+                payload = re.sub(r'(?m)^(\s*)([0-9]+):', r'\1"\2":', payload)
+                route = json.loads(payload)
                 if result.returncode == 0 and route.get("brokerDatas") and route.get("queueDatas"):
                     return
             except (ValueError, TypeError):
