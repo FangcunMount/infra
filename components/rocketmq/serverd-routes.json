@@ -1,0 +1,184 @@
+{
+  "version": 1,
+  "routes": [
+    {
+      "topic": "iam.authz.version.v2",
+      "subscription": "iam-policy-sync.iam-serverb-1",
+      "physical_topic": "rmq_t_4156206bb85d1945031e5d182c4de088",
+      "consumer_group": "rmq_g_f00f9c4dcb99c4dee0b1a419b21d4b54"
+    },
+    {
+      "topic": "iam.authz.version.v2",
+      "subscription": "qs-authz-sync-apiserver-qs-servera-1",
+      "physical_topic": "rmq_t_4156206bb85d1945031e5d182c4de088",
+      "consumer_group": "rmq_g_c2a138a1fa898c1c0bbf7f34f17c92cf"
+    },
+    {
+      "topic": "iam.notify.sms",
+      "physical_topic": "rmq_t_42bbf95934b5f2314e147eab37b296e9"
+    },
+    {
+      "topic": "qs.survey.lifecycle",
+      "subscription": "qs-worker",
+      "physical_topic": "rmq_t_0000366511a958fd2dec3c3cfa6a1e8d",
+      "consumer_group": "rmq_g_980c094fa7a287057301bce76abdadb5"
+    },
+    {
+      "topic": "qs.evaluation.lifecycle",
+      "subscription": "qs-worker",
+      "physical_topic": "rmq_t_4bff1983aaf675672482fdd76d806e96",
+      "consumer_group": "rmq_g_b6abe5a59ae6cb4454f2a2718b863dcb"
+    },
+    {
+      "topic": "qs.plan.task",
+      "subscription": "qs-worker",
+      "physical_topic": "rmq_t_d53724f5631d71321fe06154d1d7eafe",
+      "consumer_group": "rmq_g_3be7d176a570204ab1ae554a0cf5ca69"
+    },
+    {
+      "topic": "qs.evaluation.lifecycle",
+      "subscription": "qs-apiserver-modelcatalog-hot-rank-v1",
+      "physical_topic": "rmq_t_4bff1983aaf675672482fdd76d806e96",
+      "consumer_group": "rmq_g_1521d68146175ae43f9764cfe24c5025"
+    },
+    {
+      "topic": "qs.ai.commands.v1",
+      "subscription": "qs-ai.commands.v1",
+      "physical_topic": "rmq_t_e517de6b483c735e45b55a09c2b6c153",
+      "consumer_group": "rmq_g_20979f2fcf522c5562461acdd52f5369"
+    },
+    {
+      "topic": "qs.ai.acks.v1",
+      "subscription": "qs-ai.acks.v1",
+      "physical_topic": "rmq_t_18d2ba05e6530e9ae4fbfc7163ab7ecd",
+      "consumer_group": "rmq_g_8cb784581f5066c2720b49733e567e23"
+    },
+    {
+      "topic": "qs.ai.events.v1",
+      "subscription": "qs-server.ai-events.v1",
+      "physical_topic": "rmq_t_23f88a399fbcd7febaf27e2ef42aa0fc",
+      "consumer_group": "rmq_g_6817494aafa34f1262816846f0341f23"
+    },
+    {
+      "topic": "m1.interop",
+      "subscription": "m1-go",
+      "physical_topic": "rmq_t_e03f591224481d6461d6d759dc8815c4",
+      "consumer_group": "rmq_g_04d4a0d308d15cf1c93acb7c0b2f7a55"
+    },
+    {
+      "topic": "m1.interop",
+      "subscription": "m1-python",
+      "physical_topic": "rmq_t_e03f591224481d6461d6d759dc8815c4",
+      "consumer_group": "rmq_g_c2c5bceafd9be9479badaf01623b2934"
+    },
+    {
+      "topic": "infra.rocketmq.load.v1",
+      "subscription": "infra-load",
+      "physical_topic": "rmq_t_d851347a24e205a0841c975fa981488e",
+      "consumer_group": "rmq_g_20aee8339a0e5eafae6251380422e81a"
+    }
+  ],
+  "accounts": {
+    "iam": {
+      "publish": [
+        "iam.authz.version.v2",
+        "iam.notify.sms"
+      ],
+      "subscriptions": [
+        [
+          "iam.authz.version.v2",
+          "iam-policy-sync.iam-serverb-1"
+        ]
+      ]
+    },
+    "qs-apiserver": {
+      "publish": [
+        "qs.survey.lifecycle",
+        "qs.evaluation.lifecycle",
+        "qs.plan.task",
+        "qs.ai.commands.v1",
+        "qs.ai.acks.v1"
+      ],
+      "subscriptions": [
+        [
+          "iam.authz.version.v2",
+          "qs-authz-sync-apiserver-qs-servera-1"
+        ],
+        [
+          "qs.evaluation.lifecycle",
+          "qs-apiserver-modelcatalog-hot-rank-v1"
+        ],
+        [
+          "qs.ai.events.v1",
+          "qs-server.ai-events.v1"
+        ]
+      ]
+    },
+    "qs-worker": {
+      "publish": [
+        "qs.survey.lifecycle",
+        "qs.evaluation.lifecycle",
+        "qs.plan.task"
+      ],
+      "subscriptions": [
+        [
+          "qs.survey.lifecycle",
+          "qs-worker"
+        ],
+        [
+          "qs.evaluation.lifecycle",
+          "qs-worker"
+        ],
+        [
+          "qs.plan.task",
+          "qs-worker"
+        ]
+      ]
+    },
+    "qs-ai": {
+      "publish": [
+        "qs.ai.events.v1"
+      ],
+      "subscriptions": [
+        [
+          "qs.ai.commands.v1",
+          "qs-ai.commands.v1"
+        ],
+        [
+          "qs.ai.acks.v1",
+          "qs-ai.acks.v1"
+        ]
+      ]
+    },
+    "interop": {
+      "publish": [
+        "m1.interop"
+      ],
+      "subscriptions": [
+        [
+          "m1.interop",
+          "m1-go"
+        ],
+        [
+          "m1.interop",
+          "m1-python"
+        ]
+      ]
+    },
+    "denied": {
+      "publish": [],
+      "subscriptions": []
+    },
+    "load": {
+      "publish": [
+        "infra.rocketmq.load.v1"
+      ],
+      "subscriptions": [
+        [
+          "infra.rocketmq.load.v1",
+          "infra-load"
+        ]
+      ]
+    }
+  }
+}

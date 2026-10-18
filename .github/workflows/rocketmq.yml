@@ -1,0 +1,71 @@
+name: RocketMQ Docker acceptance
+on:
+  pull_request:
+    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '.github/workflows/rocketmq.yml']
+  push:
+    branches: [main]
+    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '.github/workflows/rocketmq.yml']
+  workflow_dispatch:
+    inputs:
+      sdk_ref:
+        description: Exact SDK commit under acceptance
+        type: string
+        required: true
+        default: 18c0c38b5869b60eac5ce238c15d5e5c4048eeea
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-acceptance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  acceptance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Checkout pinned public SDK
+        uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: ${{ inputs.sdk_ref || '18c0c38b5869b60eac5ce238c15d5e5c4048eeea' }}
+          path: .sdk-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .sdk-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Validate renderer, manifest and shell entrypoints
+        run: |
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py' -v
+          bash -n scripts/rocketmq/*.sh components/rocketmq/entrypoint.sh
+          python3 -m py_compile scripts/rocketmq/*.py
+      - name: Fetch and verify official release archive
+        run: bash scripts/rocketmq/fetch-release.sh
+      - name: Build exact Docker runtime with fresh PGP proof
+        run: |
+          set -o pipefail
+          docker build --no-cache --progress=plain \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            -t rocketmq-acceptance:5.5.1 components/rocketmq 2>&1 | tee rocketmq-build.log
+      - name: Required real Broker, interoperability, ACL, persistence and shutdown tests
+        run: |
+          python3 scripts/rocketmq/ci-smoke.py --sdk "$PWD/.sdk-acceptance" \
+            --image rocketmq-acceptance:5.5.1 --build-log rocketmq-build.log \
+            --report rocketmq-m1-evidence.json
+      - name: Export verified Docker image and checksum
+        run: |
+          docker save rocketmq-acceptance:5.5.1 | gzip -1 > rocketmq-5.5.1-amd64.tar.gz
+          sha256sum rocketmq-5.5.1-amd64.tar.gz rocketmq-m1-evidence.json > rocketmq-SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: rocketmq-5.5.1-amd64-${{ github.sha }}
+          retention-days: 14
+          path: |
+            rocketmq-5.5.1-amd64.tar.gz
+            rocketmq-m1-evidence.json
+            rocketmq-SHA256SUMS
+            rocketmq-build.log
