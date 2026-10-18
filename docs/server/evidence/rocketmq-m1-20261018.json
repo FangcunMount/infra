@@ -1,0 +1,90 @@
+{
+  "format_version": 1,
+  "date": "2026-10-18",
+  "business_provider": "nsq",
+  "production_database_migration_applied": false,
+  "cross_cloud_capacity_gate": "deferred_by_user_until_cloud_colocation",
+  "purchased_serverd_egress_mbps": 5,
+  "cross_cloud_load": {
+    "acknowledged_deliveries": 144990,
+    "confirmed": 176884,
+    "invalid": 0,
+    "latency_p95_ms": 179.842359,
+    "latency_p99_ms": 242.300696,
+    "local_capacity_dropped": 3116,
+    "passed": false,
+    "payload_bytes": 1024,
+    "publish_seconds": 602.352129128,
+    "redeliveries": 0,
+    "rejected": 0,
+    "run_id": "load-6f60f4d6655e6151d214c19c-",
+    "scheduled": 180000,
+    "unique_received": 144990,
+    "unknown": 0
+  },
+  "reconciliation": {
+    "expected_remaining": 31894,
+    "invalid": 0,
+    "message_ids_sha256": "f196c37a194d42b429040d1aa3769de1e8c61dfd448b524c901f12831415389e",
+    "passed": true,
+    "phase": "reconciliation",
+    "redeliveries": 0,
+    "run_id": "load-6f60f4d6655e6151d214c19c-",
+    "unique_received": 31894
+  },
+  "serverd_local_comparison": {
+    "acknowledged_deliveries": 18000,
+    "confirmed": 18000,
+    "invalid": 0,
+    "latency_p95_ms": 5.685255,
+    "latency_p99_ms": 10.834339,
+    "local_capacity_dropped": 0,
+    "passed": true,
+    "payload_bytes": 1024,
+    "publish_seconds": 60.011434041,
+    "redeliveries": 0,
+    "rejected": 0,
+    "run_id": "load-58211f5f1dfdaa3f8b7b8565-",
+    "scheduled": 18000,
+    "unique_received": 18000,
+    "unknown": 0,
+    "wire_bytes": 1573
+  },
+  "capacity": {
+    "sample_count": 133,
+    "minimum_available_mib": 1265.2265625,
+    "container_identity_and_restart_unchanged": true,
+    "passed": true,
+    "raw_report_sha256": "757b21c14d72241a6b156f15cc3f2fbede968441d6696500865763b4d2db345c"
+  },
+  "qs_schema_read_only": {
+    "read_only": true,
+    "snapshot": {
+      "source_sha": "fab53b8e437a8b92a8a9ae7d195388791f6bf9b6",
+      "migration_resources_sha256": "f4ab8582f330188ac75e94993a8660bb3cb3eb365dc0f1b5dc7cbd6b7026c7bb",
+      "mysql_database": "qs",
+      "mongo_database": "qs",
+      "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+      "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+      "mysql_version": 103,
+      "mongo_version": 40,
+      "target_mysql_version": 104,
+      "target_mongo_version": 40
+    }
+  },
+  "ai_candidate": {
+    "source_sha": "c288eb94c09a8ac930f0ae6b03d62a09147b72fb",
+    "image_digest": "sha256:e1bd0018b614c12d827a9a1365398712b9909b13cf85758c168eeda0342aadc0",
+    "status": "build_completed",
+    "deployment_verified": false
+  },
+  "iam_candidate": {
+    "source_sha": "f5788a56dc5437fc033f93760d55181fb847c01d",
+    "ci_run": 39137898903,
+    "archive_config_digest": "sha256:0608acc27a0c826b6c565db684d617213ec2fe8b29aae5af3aebbc300bacd28b",
+    "loaded_image_id": "sha256:5cd3a2a2119d473781409a929de7cf035218b129175e6b739c5c32ca59ee2d4e",
+    "binary_sha256": "b3c953b32ebed7a0d912917707d0eccee00e4a7a9610175ae0b3f585bb3cc157",
+    "sdk_version": "v0.4.0-rocketmq.1",
+    "deployment_verified": false
+  }
+}
