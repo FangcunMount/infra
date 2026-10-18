@@ -26,8 +26,8 @@ The user confirmed serverD has 5 Mbps public bandwidth. On 2026-10-18 the user d
 | reliable-messaging | `18c0c38b5869b60eac5ce238c15d5e5c4048eeea` | Go `v0.4.0-rocketmq.1`, Python `python/v0.3.0a1` published; main CI and installed-wheel tests passed |
 | infra | `eea2ca7ae4dd8f3f4759ee3b9d45d37a260f613b` | PR16/17 merged; serverD runtime above is an earlier fixed release from PR17 |
 | IAM | `f5788a56dc5437fc033f93760d55181fb847c01d` | PR127 merged; main CI passed; image built, production deploy skipped by pause gate |
-| qs-server | `669cee2d3b2b777cf431f05e470f6bab4a6138f0` | PR402 merged; PR CI passed; main CI requires resolution before candidate promotion |
-| qs-ai | `c288eb94c09a8ac930f0ae6b03d62a09147b72fb` | PR156 merged after all14 checks passed; main CI pending |
+| qs-server | `669cee2d3b2b777cf431f05e470f6bab4a6138f0` | PR402 merged; docs squash-binding fixed by PR403; fixed source main CI awaits revalidation |
+| qs-ai | `c288eb94c09a8ac930f0ae6b03d62a09147b72fb` | PR156 merged; PR/main CI passed; build-only run39138291687 completed and deployment was skipped |
 
 Python release wheel SHA256: `b980312490a5c013ed82542478580c2bf3a72d02a299d7629bc1e81ed11e08e1`. Host adoption uses fixed published artifacts, without local SDK replacements.
 
@@ -58,3 +58,17 @@ The measured Broker egress approached the purchased5Mbps limit; the local compar
 5. Complete representative business mixed-load validation with all three original workers and24h postrestore observation. Preserve the deferred cross-cloud gate and repeat capacity validation after cloud co-location.
 
 The current healthy Broker, SDK releases and green source checks do not mean the business cutover or M1 is complete.
+
+## Preparation checkpoint after deferring cross-cloud tests
+
+Infra PR18 merged as2518b2574fc58f33bdcbab4ea1f0f40cf0e3c032. Five Broker alert rules are loaded on Mac mini, health=ok and inactive: availability, lag, native DLQ fallback, Broker write permission and storage flush backlog. Prometheus configuration and rule unit tests passed; reload did not restart the container.
+
+Four separate application roles have nonactive credentials/CA/routes staged on their intended hosts, owned by the intended UID and mode0400 within private directories. Running business configurations do not reference these files yet.
+
+IAM exact candidate from CI39137898903 is imported on serverB under the existing shared deployment lock. Its archive/config/rootfs/entrypoint were checked; the extracted binary reports the fixed SDK v0.4.0-rocketmq.1 and source f5788a56dc5437fc033f93760d55181fb847c01d. This is a separate reviewed CI build from the production registry build, and not a deployment receipt.
+
+QS read-only inspection found clean103/40 with target104/40 and bound actual database identities/resource digest. No approval was consumed and no DDL requested. New build-only workflow PR404 prepares artifacts while retaining the production pause; source/main CI and candidate promotion are still separate gates.
+
+The user has no reusable system-account login session or private credential file. Business acceptance using that account remains pending; do not infer it from structural probes or issue a replacement identity solely to make acceptance pass. Actual database protection/restore/startup materials and native-DLQ operational recovery procedures remain required before the coordinated cutover.
+
+Sanitized machine-readable evidence: [rocketmq-m1-20261018.json](evidence/rocketmq-m1-20261018.json). It preserves the failed run and independent reconciliation, local comparison, finite memory observation and read-only schema/candidate receipts. It contains no application credentials or business payloads.
