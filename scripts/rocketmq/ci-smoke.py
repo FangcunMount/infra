@@ -17,6 +17,8 @@ import time
 
 from render import render
 
+REDACT = []
+
 
 def command(args, *, env=None, cwd=None, timeout=180, required=True):
     result = subprocess.run(args, env=env, cwd=cwd, capture_output=True,
@@ -24,7 +26,10 @@ def command(args, *, env=None, cwd=None, timeout=180, required=True):
     if required and result.returncode:
         # Driver/CLI diagnostics may include credentials. Preserve categories;
         # no complete command line or stdout/stderr is emitted into CI logs.
-        raise RuntimeError(Path(str(args[0])).name + " acceptance operation failed")
+        diagnostic = (result.stdout + "\n" + result.stderr)[-6000:]
+        for secret in REDACT:
+            diagnostic = diagnostic.replace(secret, "[withheld]")
+        raise RuntimeError(Path(str(args[0])).name + " acceptance operation failed: " + diagnostic)
     return result
 
 
@@ -55,6 +60,7 @@ def main():
     config.mkdir(); data.mkdir(); (config / "tls").mkdir()
     credentials = {role: {"username": "ci-" + role, "password": secrets.token_hex(32)}
                    for role in ("admin", "inner", "interop", "denied")}
+    REDACT.extend(account["password"] for account in credentials.values())
     secret = directory / "credentials.json"
     secret.write_text(json.dumps(credentials)); secret.chmod(0o600)
     render(credentials, config, "127.0.0.1", repo / "components/rocketmq")
@@ -118,7 +124,9 @@ def main():
             identity = "ci-" + publisher + "-" + secrets.token_hex(4)
             probe(publisher, "publish", identity)
             for consumer in ("go", "python"):
+                print(publisher + "_to_" + consumer + " starting", flush=True)
                 probe(consumer, "consume", identity)
+                print(publisher + "_to_" + consumer + " passed", flush=True)
                 cases[publisher + "_to_" + consumer] = True
         for language in ("go", "python"):
             if probe(language, "publish", "forbidden", account="denied", required=False).returncode == 0:
