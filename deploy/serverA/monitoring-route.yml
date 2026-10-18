@@ -1,0 +1,19 @@
+services:
+  prometheus-route:
+    image: nginx:1.27
+    container_name: prometheus-route
+    restart: unless-stopped
+    volumes:
+      - ${MONITORING_ROUTE_CONFIG:-/opt/infra/components/monitoring/prometheus-route.conf}:/etc/nginx/nginx.conf:ro
+    networks:
+      backend:
+        aliases: [prometheus]
+    mem_limit: 32M
+    cpus: 0.1
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: '2'}
+networks:
+  backend:
+    external: true
+    name: infra-network

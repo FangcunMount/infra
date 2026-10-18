@@ -1,45 +1,23 @@
 # Prometheus 组件
 
-本组件部署在 `serverD`，由 `make serverD-monitoring-up` 或 `make serverD-up` 启动。
+> 2026-10-18 起，监控运行在旧 Mac mini；当前操作以[监控部署说明](../../deploy/mac-mini/README.md)为准。旧 Swarm 部署模板仅供回滚参考。
 
-本组件采用三类抓取：
+本组件部署在旧 Mac mini，由 `make prometheus-start` 或 `make monitoring-up` 管理。云端目标由 mini 主动发现和抓取。
 
-- 跨节点单实例 apiserver 走 overlay 网络静态抓取
-- 跨节点多实例 collection-server 走 DNS service discovery，每个 A 记录形成独立 target
-- Prometheus 所在节点上的 worker 等本机容器通过 Docker service discovery 抓取
+## 当前采集方式
 
-## 默认抓取方式
+旧 mini 每 30 秒通过固定只读 SSH 命令读取 serverA/serverD 容器元数据，生成 file service discovery；Prometheus 每 15 秒通过 serverA 的私网 Nginx 指标入口主动抓取各实例。mini 不加入 Swarm，不挂载云端 Docker socket，serverD 不运行采集代理。
 
-- 静态抓取：
-  - `qs-apiserver:8080/metrics`
-  - `qs-ai-api:8000/metrics`（仅 overlay 内网）
-- DNS 自动发现：`qs-collection-server:8080/metrics`
-- 通过 `/var/run/docker.sock` 发现带 `prometheus.scrape=true` 标签的本机容器
-- Docker 自动发现仅抓取 `infra-network` 网络中的本机容器
-- 当前默认覆盖：
-  - `qs-apiserver`（静态 target）
-  - `qs-collection-server`（DNS SD 多 target）
-  - `qs-worker`（Docker SD 每容器 target）
-  - Prometheus 所在节点上带 `prometheus.scrape=true` 的本机容器
+现有 job、instance 和 worker component 标签保持兼容。collection 和 worker 的副本变化由发现脚本反映，不能改为只抓取一个轮询地址。具体网络、凭据限制及生命周期见 [旧 mini 监控部署](../../deploy/mac-mini/README.md)。
 
-抓取依赖：
+## 数据与配置
 
-- 当前 Swarm 节点之间的 `infra-network` overlay 正常互通
-- `qs-apiserver` 能通过 `qs-apiserver:8080` 解析并访问
-- `qs-collection-server` 的 overlay DNS 必须返回全部 collection 副本地址
-- 需要本机自动发现的容器加入 `infra-network`
-- 需要本机自动发现的容器在 compose 中带有 `prometheus.*` 标签
-
-## 关键环境变量
-
-- `PROMETHEUS_RETENTION_TIME`
-- `PROMETHEUS_SCRAPE_INTERVAL`
-- `PROMETHEUS_QS_APISERVER_TARGET`
-- `PROMETHEUS_QS_COLLECTION_TARGET`，使用 `host:port` 格式，启动时拆分给 DNS SD
-- `PROMETHEUS_MEMORY_LIMIT`
-- `PROMETHEUS_CPUS`
-- `PROMETHEUS_CONFIG_TEMPLATE_PATH`，默认 `/data/infra/prometheus/prometheus.yml.tmpl`
-- `PROMETHEUS_RULES_PATH`，默认 `/data/infra/prometheus/rules`
+- 实际配置：`~/infra-monitoring/config/prometheus.yml`。
+- 逐实例发现：`~/infra-monitoring/config/targets/*.json`。
+- 规则：`~/infra-monitoring/config/rules/*.yml`。
+- 持久卷：`infra_prometheus_data`，显式 external，管理操作不自动删除。
+- `PROMETHEUS_RETENTION_TIME` 默认为 30d，`PROMETHEUS_RETENTION_SIZE` 默认为 8GB；WAL/head 需要额外磁盘空间。
+- 原 `docker-compose.yml` 和 `prometheus.yml.tmpl` 是旧 Swarm 部署及回滚参考，当前由 `deploy/mac-mini/docker-compose.yml` 加载 `components/monitoring/prometheus.yml`。
 
 ## 事件系统规则
 

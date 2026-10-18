@@ -149,8 +149,8 @@ make help-vpn
 | `nsqlookupd` | `4160/4161` | `serverD` |
 | `nsqd` | `4150/4151` | `serverD` |
 | `nsqadmin` | `127.0.0.1:4171` | `serverD` |
-| `prometheus` | `prometheus:9090` | `serverD / infra-network` |
-| `grafana` | `grafana:3000` | `serverD / infra-network` |
+| `prometheus` | `127.0.0.1:19090` | `旧 Mac mini` |
+| `grafana` | `127.0.0.1:13000` | `旧 Mac mini` |
 | `mongo` | `127.0.0.1:27017` + overlay `mongo:27017` | `serverC` |
 | `MySQL` | 云托管地址 | 云服务商 A |
 | `Redis` | 云托管地址 | 云服务商 A |
@@ -158,3 +158,5 @@ make help-vpn
 ## License
 
 MIT
+
+监控已迁至旧 Mac mini，运行、私网采集和回滚见 [监控部署说明](deploy/mac-mini/README.md)。

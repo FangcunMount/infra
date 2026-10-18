@@ -1,0 +1,28 @@
+name: Validate Mac mini monitoring
+on:
+  pull_request:
+    paths: ['components/monitoring/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
+  push:
+    branches: [main]
+    paths: ['components/monitoring/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify replica discovery and shell syntax
+        run: |
+          python3 -m unittest discover -s scripts/monitoring -p 'test_*.py' -v
+          bash -n scripts/monitoring/manage.sh
+          make -n monitoring-up monitoring-status
+      - name: Verify Prometheus config and rules
+        run: |
+          mkdir -p /tmp/monitoring-targets
+          docker run --rm --entrypoint /bin/promtool \
+            -v "$PWD/components/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
+            -v "$PWD/components/prometheus/rules:/etc/prometheus/rules:ro" \
+            -v /tmp/monitoring-targets:/etc/prometheus/targets:ro \
+            prom/prometheus:v2.54.1 check config /etc/prometheus/prometheus.yml
