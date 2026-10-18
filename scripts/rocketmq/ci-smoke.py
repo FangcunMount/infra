@@ -158,6 +158,17 @@ def main():
             if probe(language, "publish", "forbidden", account="denied", required=False).returncode == 0:
                 raise RuntimeError("unprivileged account was able to publish")
             cases[language + "_acl_denied"] = True
+        command(["go", "build", "-o", str(directory / "loadprobe"), "."],
+                cwd=repo / "scripts/rocketmq/loadprobe")
+        load_account = directory / "load-account.json"
+        load_account.write_text(json.dumps(credentials["interop"]))
+        load_account.chmod(0o600)
+        load = command([str(directory / "loadprobe"), "-endpoint", "127.0.0.1:8081",
+                        "-credentials", str(load_account), "-ca", str(ca),
+                        "-duration", "2s", "-rate", "20"], timeout=120)
+        if not json.loads(load.stdout.strip().splitlines()[-1])["passed"]:
+            raise RuntimeError("load counter/settlement smoke did not pass")
+        cases["loadprobe_smoke"] = True
         broker_config = admin("getBrokerConfig")
         if not re.search(r"flushDiskType\s*=\s*SYNC_FLUSH", broker_config):
             raise RuntimeError("synchronous flush not active")
@@ -188,6 +199,11 @@ def main():
                   "signature_verified": True, "sync_flush_verified": True,
                   "persistence_verified": True, "acl_verified": True,
                   "sdk_interop_verified": True}
+        report["component_files_sha256"] = {
+            str(path.relative_to(repo)): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted((repo / "components/rocketmq").iterdir())
+            if path.is_file() and path.name not in {"rocketmq.zip", "rocketmq.zip.asc", "KEYS"}
+        }
         # Signature evidence comes from the required Dockerfile build step;
         # production deployment still binds the exact image and source receipts.
         args.report.write_text(json.dumps(report, indent=2) + "\n")

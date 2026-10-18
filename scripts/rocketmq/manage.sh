@@ -14,6 +14,7 @@ case "$action" in
     test -s "$ROCKETMQ_ACCEPTANCE_FILE"
     python3 "$root/scripts/rocketmq/validate_receipt.py" "$ROCKETMQ_ACCEPTANCE_FILE" "$ROCKETMQ_ENV_FILE"
     "${compose[@]}" config --quiet
+    bash "$root/scripts/rocketmq/firewall.sh"
     "${compose[@]}" up -d --wait --wait-timeout 180 ;;
   stop) "${compose[@]}" stop --timeout 90 ;;
   status) "${compose[@]}" ps ;;

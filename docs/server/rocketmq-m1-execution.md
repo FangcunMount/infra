@@ -33,3 +33,11 @@ A disposable old-mini Compose stack proved Go/Python interoperability, ACL allow
 IAM has explicit provider/file options, ordinary publisher/policy subscription wiring, a pre-claim publication gate and additive migration41 for provider-aware failure audit. Existing NSQ audit is preserved. QS has ordinary publisher/subscriber/worker/authz and AI-event wiring plus candidate frozen binding support. AI has provider/file bindings, common publisher/received contracts and a pre-scan publication gate. Targeted tests passed; source uses temporary local SDK dependency overrides until fixed release artifacts exist. No host changes are released.
 
 Infra owns Docker build/configuration/provisioning, required real-Broker CI and verified image export. Code and evidence preparation continues. Production CD gates, business services, queues and databases are unchanged at this checkpoint. No formal SDK release, serverD RocketMQ deployment, NSQ pause or business cutover has occurred.
+
+## Fixed SDK and host-audit checkpoint
+
+SDK PR32 merged as18c0c38b5869b60eac5ce238c15d5e5c4048eeea. Main SDK, required database/fault integrations and Python source/installed-wheel matrices passed. Go v0.4.0-rocketmq.1 and Python python/v0.3.0a1 are published from that exact commit; the Python wheel is the verified main-CI artifact.
+
+Infra's first complete real-Broker acceptance passed10/10 with no skips, including four cross-language pairs, ACL denial, explicit synchronous flush, bounded JavaPID1, confirmed persistence afterSIGKILL and realSIGTERM (13.838s). Final additions bind component hashes, limit private Docker forwarding, scrape metrics directly from the old mini, and supply an isolated non-business SDK load probe. They require fresh final-head CI before deployment.
+
+IAM migration41/full bootstrap and durable-audit collision/rollback proofs passed on isolated MySQL8.0.46. QS migration104 adds binary transport evidence in the same transaction as its existing manual dead-letter row, preserving raw invalidUTF8 and absent application identity; its real MySQL proof passed. Host fixed dependency/preflight/CI validation continues. Production services, CD gates, queues and schemas remain unchanged. Business acceptance account:system.

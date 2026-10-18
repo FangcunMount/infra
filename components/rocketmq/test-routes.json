@@ -12,12 +12,19 @@
       "subscription": "m1-python",
       "physical_topic": "rmq_t_e03f591224481d6461d6d759dc8815c4",
       "consumer_group": "rmq_g_c2c5bceafd9be9479badaf01623b2934"
+    },
+    {
+      "topic": "infra.rocketmq.load.v1",
+      "subscription": "infra-load",
+      "physical_topic": "rmq_t_d851347a24e205a0841c975fa981488e",
+      "consumer_group": "rmq_g_20aee8339a0e5eafae6251380422e81a"
     }
   ],
   "accounts": {
     "interop": {
       "publish": [
-        "m1.interop"
+        "m1.interop",
+        "infra.rocketmq.load.v1"
       ],
       "subscriptions": [
         [
@@ -27,6 +34,10 @@
         [
           "m1.interop",
           "m1-python"
+        ],
+        [
+          "infra.rocketmq.load.v1",
+          "infra-load"
         ]
       ]
     }
