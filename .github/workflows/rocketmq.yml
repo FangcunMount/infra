@@ -11,7 +11,7 @@ on:
         description: Exact SDK commit under acceptance
         type: string
         required: true
-        default: 7dfa121b994c771b8e12f05983d710df98412ffd
+        default: 5745fabdfde2371cebf5b27886cdca9955306f47
 permissions:
   contents: read
 concurrency:
@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: ${{ inputs.sdk_ref || '7dfa121b994c771b8e12f05983d710df98412ffd' }}
+          ref: ${{ inputs.sdk_ref || '5745fabdfde2371cebf5b27886cdca9955306f47' }}
           path: .sdk-acceptance
       - uses: actions/setup-go@v6
         with:
