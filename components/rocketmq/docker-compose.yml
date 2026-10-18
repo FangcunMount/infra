@@ -1,0 +1,54 @@
+# Standalone Docker Compose project. Never attach RocketMQ management to ingress.
+name: rocketmq
+services:
+  nameserver:
+    image: ${ROCKETMQ_IMAGE:?fixed image digest or local immutable image ID required}
+    command: ["nameserver"]
+    environment:
+      JAVA_OPT_EXT: "-Xms128m -Xmx128m -Xmn64m -XX:MaxDirectMemorySize=32m -XX:ActiveProcessorCount=1"
+    mem_limit: 384m
+    cpus: 0.25
+    restart: unless-stopped
+    stop_grace_period: 30s
+    volumes:
+      - ${ROCKETMQ_DATA_ROOT:?}/nameserver-logs:/home/rocketmq/logs
+    networks: [rocketmq]
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9876"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+    logging: &logging
+      driver: json-file
+      options: {max-size: "20m", max-file: "3"}
+  broker:
+    image: ${ROCKETMQ_IMAGE:?fixed image digest or local immutable image ID required}
+    command: ["broker"]
+    environment:
+      JAVA_OPT_EXT: "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=128m -XX:ActiveProcessorCount=2 -XX:MaxMetaspaceSize=192m -Xss512k"
+    mem_limit: 1280m
+    cpus: 1.5
+    restart: unless-stopped
+    stop_grace_period: 90s
+    depends_on:
+      nameserver: {condition: service_healthy}
+    ports:
+      - "${ROCKETMQ_BIND_IP:?private tailnet or test loopback required}:${ROCKETMQ_GRPC_PORT:-8081}:8081"
+      - "${ROCKETMQ_BIND_IP:?}:${ROCKETMQ_METRICS_PORT:-5557}:5557"
+    volumes:
+      - ${ROCKETMQ_CONFIG_ROOT:?}:/etc/rocketmq:ro
+      - ${ROCKETMQ_CONFIG_ROOT:?}/tools.yml:/opt/rocketmq/conf/tools.yml:ro
+      - ${ROCKETMQ_DATA_ROOT:?}/store:/home/rocketmq/store
+      - ${ROCKETMQ_DATA_ROOT:?}/auth:/home/rocketmq/auth
+      - ${ROCKETMQ_DATA_ROOT:?}/logs:/home/rocketmq/logs
+    networks: [rocketmq]
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8081"]
+      interval: 15s
+      timeout: 3s
+      retries: 12
+      start_period: 60s
+    logging: *logging
+networks:
+  rocketmq:
+    driver: bridge

@@ -1,0 +1,17 @@
+{
+  "rocketMQClusterName": "FangcunMount",
+  "proxyName": "serverd-rocketmq",
+  "grpcServerPort": 8081,
+  "grpcWorkerLoopNum": 2,
+  "grpcThreadPoolNums": 8,
+  "grpcThreadPoolQueueCapacity": 1000,
+  "grpcMaxInboundMessageSize": 524288,
+  "authenticationEnabled": true,
+  "authorizationEnabled": true,
+  "authConfigPath": "/home/rocketmq/auth",
+  "tlsTestModeEnable": false,
+  "authenticationProvider": "org.apache.rocketmq.auth.authentication.provider.DefaultAuthenticationProvider",
+  "authenticationMetadataProvider": "org.apache.rocketmq.proxy.auth.ProxyAuthenticationMetadataProvider",
+  "authorizationProvider": "org.apache.rocketmq.auth.authorization.provider.DefaultAuthorizationProvider",
+  "authorizationMetadataProvider": "org.apache.rocketmq.proxy.auth.ProxyAuthorizationMetadataProvider"
+}

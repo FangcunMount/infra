@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "routes": [
+    {
+      "topic": "m1.interop",
+      "subscription": "m1-go",
+      "physical_topic": "rmq_t_e03f591224481d6461d6d759dc8815c4",
+      "consumer_group": "rmq_g_04d4a0d308d15cf1c93acb7c0b2f7a55"
+    },
+    {
+      "topic": "m1.interop",
+      "subscription": "m1-python",
+      "physical_topic": "rmq_t_e03f591224481d6461d6d759dc8815c4",
+      "consumer_group": "rmq_g_c2c5bceafd9be9479badaf01623b2934"
+    }
+  ],
+  "accounts": {
+    "interop": {
+      "publish": [
+        "m1.interop"
+      ],
+      "subscriptions": [
+        [
+          "m1.interop",
+          "m1-go"
+        ],
+        [
+          "m1.interop",
+          "m1-python"
+        ]
+      ]
+    }
+  }
+}
