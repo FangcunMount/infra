@@ -1,0 +1,115 @@
+rule_files:
+- ../rules/rocketmq.yml
+evaluation_interval: 1m
+tests:
+- name: persistent backlog, native fallback and disk protection are visible
+  interval: 1m
+  input_series:
+  - series: up{job="rocketmq",instance="100.118.164.39:5557"}
+    values: 1+0x20
+  - series: rocketmq_consumer_lag_latency_milliseconds{topic="test",consumer_group="test",is_system="false"}
+    values: 300001+0x20
+  - series: rocketmq_send_to_dlq_messages_total{topic="test"}
+    values: 0+1x20
+  - series: rocketmq_broker_permission{}
+    values: 4+0x20
+  - series: rocketmq_storage_flush_behind_bytes{}
+    values: 67108865+0x20
+  alert_rule_test:
+  - eval_time: 12m
+    alertname: RocketMQConsumerLag
+    exp_alerts:
+    - exp_labels:
+        topic: test
+        consumer_group: test
+        is_system: 'false'
+        severity: warning
+        subsystem: messaging
+      exp_annotations:
+        summary: RocketMQ consumer lag exceeds five minutes
+        description: Inspect the mapped topic/group and host receipts; do not change
+          providers or replay unknown business work.
+  - eval_time: 12m
+    alertname: RocketMQNativeDeadLetter
+    exp_alerts:
+    - exp_labels:
+        topic: test
+        severity: critical
+        subsystem: messaging
+      exp_annotations:
+        summary: RocketMQ native dead-letter fallback used
+        description: Preserve original wire, identity and source; reconcile host failure
+          audit and receipts before controlled recovery.
+  - eval_time: 12m
+    alertname: RocketMQBrokerWriteDisabled
+    exp_alerts:
+    - exp_labels:
+        severity: critical
+        subsystem: messaging
+      exp_annotations:
+        summary: RocketMQ Broker has no write permission
+        description: Check serverD disk space and configured disk watermark; preserve
+          retained messages and do not prune Broker storage.
+  - eval_time: 12m
+    alertname: RocketMQStorageFlushBehind
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        subsystem: messaging
+      exp_annotations:
+        summary: RocketMQ storage flush backlog exceeds 64 MiB
+        description: Inspect disk latency, free space and Broker health before changing
+          publication or resource limits.
+- name: Broker scrape outage requires two minutes and resolves
+  interval: 1m
+  input_series:
+  - series: up{job="rocketmq",instance="100.118.164.39:5557"}
+    values: 1 0 0 0 1 1
+  alert_rule_test:
+  - eval_time: 2m
+    alertname: RocketMQBrokerUnavailable
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: RocketMQBrokerUnavailable
+    exp_alerts:
+    - exp_labels:
+        job: rocketmq
+        instance: 100.118.164.39:5557
+        severity: critical
+        subsystem: messaging
+      exp_annotations:
+        summary: RocketMQ Broker metrics unavailable
+        description: Check serverD Broker health and the direct Mac mini scrape path
+          before resuming publishers.
+  - eval_time: 4m
+    alertname: RocketMQBrokerUnavailable
+    exp_alerts: []
+- name: healthy Broker does not alert
+  interval: 1m
+  input_series:
+  - series: up{job="rocketmq",instance="100.118.164.39:5557"}
+    values: 1+0x20
+  - series: rocketmq_consumer_lag_latency_milliseconds{topic="test",consumer_group="test",is_system="false"}
+    values: 0+0x20
+  - series: rocketmq_send_to_dlq_messages_total{topic="test"}
+    values: 0+0x20
+  - series: rocketmq_broker_permission{}
+    values: 6+0x20
+  - series: rocketmq_storage_flush_behind_bytes{}
+    values: 0+0x20
+  alert_rule_test:
+  - eval_time: 12m
+    alertname: RocketMQBrokerUnavailable
+    exp_alerts: []
+  - eval_time: 12m
+    alertname: RocketMQConsumerLag
+    exp_alerts: []
+  - eval_time: 12m
+    alertname: RocketMQNativeDeadLetter
+    exp_alerts: []
+  - eval_time: 12m
+    alertname: RocketMQBrokerWriteDisabled
+    exp_alerts: []
+  - eval_time: 12m
+    alertname: RocketMQStorageFlushBehind
+    exp_alerts: []

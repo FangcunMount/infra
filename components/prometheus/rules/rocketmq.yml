@@ -1,0 +1,48 @@
+groups:
+  - name: rocketmq
+    interval: 30s
+    rules:
+      - alert: RocketMQBrokerUnavailable
+        expr: up{job="rocketmq"} == 0 or absent(up{job="rocketmq"})
+        for: 2m
+        labels:
+          severity: critical
+          subsystem: messaging
+        annotations:
+          summary: RocketMQ Broker metrics unavailable
+          description: Check serverD Broker health and the direct Mac mini scrape path before resuming publishers.
+      - alert: RocketMQConsumerLag
+        expr: rocketmq_consumer_lag_latency_milliseconds{is_system="false"} > 300000
+        for: 10m
+        labels:
+          severity: warning
+          subsystem: messaging
+        annotations:
+          summary: RocketMQ consumer lag exceeds five minutes
+          description: Inspect the mapped topic/group and host receipts; do not change providers or replay unknown business work.
+      - alert: RocketMQNativeDeadLetter
+        expr: increase(rocketmq_send_to_dlq_messages_total[10m]) > 0
+        labels:
+          severity: critical
+          subsystem: messaging
+        annotations:
+          summary: RocketMQ native dead-letter fallback used
+          description: Preserve original wire, identity and source; reconcile host failure audit and receipts before controlled recovery.
+      - alert: RocketMQBrokerWriteDisabled
+        expr: (rocketmq_broker_permission % 4) < 2
+        for: 1m
+        labels:
+          severity: critical
+          subsystem: messaging
+        annotations:
+          summary: RocketMQ Broker has no write permission
+          description: Check serverD disk space and configured disk watermark; preserve retained messages and do not prune Broker storage.
+      - alert: RocketMQStorageFlushBehind
+        expr: rocketmq_storage_flush_behind_bytes > 67108864
+        for: 5m
+        labels:
+          severity: warning
+          subsystem: messaging
+        annotations:
+          summary: RocketMQ storage flush backlog exceeds 64 MiB
+          description: Inspect disk latency, free space and Broker health before changing publication or resource limits.

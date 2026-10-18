@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/hex"
@@ -36,6 +37,10 @@ func run() error {
 	caFile := flag.String("ca", "", "trusted CA file")
 	duration := flag.Duration("duration", 10*time.Minute, "load interval")
 	rate := flag.Int("rate", 300, "scheduled messages/second")
+	payloadBytes := flag.Int("payload-bytes", 1024, "decoded payload bytes")
+	wireBytes := flag.Int("wire-bytes", 0, "exact Broker body bytes; zero preserves encoded size")
+	reconcileRun := flag.String("reconcile-run", "", "consume remaining messages of an earlier owned test run")
+	remaining := flag.Int("remaining", 0, "expected remaining confirmed messages for reconciliation")
 	flag.Parse()
 	if *duration < time.Second || *duration > time.Hour || *rate < 1 || *rate > 1000 {
 		return errors.New("bounded duration/rate required")
@@ -63,7 +68,33 @@ func run() error {
 		return err
 	}
 	runID := "load-" + hex.EncodeToString(nonce[:]) + "-"
-	body := bytes.Repeat([]byte("x"), 1024)
+	if *payloadBytes < 1 || *payloadBytes > 128*1024 || *wireBytes < 0 || *wireBytes > 256*1024 {
+		return errors.New("bounded payload/wire sizes required")
+	}
+	if *reconcileRun != "" {
+		if !strings.HasPrefix(*reconcileRun, "load-") || len(*reconcileRun) != 30 || *remaining < 1 {
+			return errors.New("explicit owned run and positive remainder required")
+		}
+		runID = *reconcileRun
+	}
+	body := bytes.Repeat([]byte("x"), *payloadBytes)
+	encode := func(id string) ([]byte, error) {
+		wire, err := legacy.Encode(legacy.Envelope{UUID: id, Payload: body}, legacy.Revision2)
+		if err != nil {
+			return nil, err
+		}
+		if *wireBytes > 0 {
+			if len(wire) > *wireBytes {
+				return nil, errors.New("encoded envelope exceeds requested wire size")
+			}
+			wire = append(wire, bytes.Repeat([]byte(" "), *wireBytes-len(wire))...)
+		}
+		return wire, nil
+	}
+	example, err := encode(runID + "00000000")
+	if err != nil {
+		return err
+	}
 	var mu sync.Mutex
 	seen := map[string]bool{}
 	duplicates, invalid, acked := 0, 0, 0
@@ -81,7 +112,7 @@ func run() error {
 		if !strings.HasPrefix(m.ID, runID) {
 			return d.Ack()
 		} // same owned test route, older acceptance run
-		if !bytes.Equal(m.Payload, body) || m.PhysicalTopic != transport.PhysicalTopic(topic) {
+		if !bytes.Equal(m.Payload, body) || m.PhysicalTopic != transport.PhysicalTopic(topic) || (*wireBytes > 0 && len(m.Wire) != *wireBytes) {
 			mu.Lock()
 			invalid++
 			mu.Unlock()
@@ -102,6 +133,38 @@ func run() error {
 		return errors.New("load probe has no durable business failure owner")
 	}); err != nil {
 		return errors.New("load subscription failed")
+	}
+	if *reconcileRun != "" {
+		deadline := time.Now().Add(*duration)
+		for time.Now().Before(deadline) {
+			mu.Lock()
+			n := len(seen)
+			mu.Unlock()
+			if n >= *remaining {
+				break
+			}
+			time.Sleep(time.Second)
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		err = s.Close(ctx)
+		cancel()
+		if err != nil {
+			return errors.New("reconciliation drain failed")
+		}
+		ids := make([]string, 0, len(seen))
+		for id := range seen {
+			ids = append(ids, id)
+		}
+		sort.Strings(ids)
+		sum := sha256.Sum256([]byte(strings.Join(ids, "\n")))
+		passed := len(seen) == *remaining && invalid == 0
+		if err = json.NewEncoder(os.Stdout).Encode(map[string]any{"phase": "reconciliation", "run_id": runID, "expected_remaining": *remaining, "unique_received": len(seen), "redeliveries": duplicates, "invalid": invalid, "message_ids_sha256": hex.EncodeToString(sum[:]), "passed": passed}); err != nil {
+			return err
+		}
+		if !passed {
+			return errors.New("confirmed test messages are not fully reconciled")
+		}
+		return nil
 	}
 	p, err := rocketmq.NewPublisher(c)
 	if err != nil {
@@ -125,7 +188,7 @@ func run() error {
 			defer workers.Done()
 			for n := range jobs {
 				id := fmt.Sprintf("%s%08d", runID, n)
-				wire, e := legacy.Encode(legacy.Envelope{UUID: id, Payload: body}, legacy.Revision2)
+				wire, e := encode(id)
 				if e != nil {
 					panic(e)
 				}
@@ -193,7 +256,7 @@ func run() error {
 	}
 	p95, p99 := percentile(.95), percentile(.99)
 	passed := confirmed == total && unknown == 0 && rejected == 0 && dropped == 0 && invalid == 0 && len(seen) == total && p95 <= 500 && p99 <= 2000 && publishSeconds <= duration.Seconds()*1.05
-	report := map[string]any{"run_id": runID, "payload_bytes": len(body), "scheduled": total, "confirmed": confirmed, "unknown": unknown, "rejected": rejected, "local_capacity_dropped": dropped, "unique_received": len(seen), "acknowledged_deliveries": acked, "redeliveries": duplicates, "invalid": invalid, "publish_seconds": publishSeconds, "latency_p95_ms": p95, "latency_p99_ms": p99, "passed": passed}
+	report := map[string]any{"run_id": runID, "payload_bytes": len(body), "wire_bytes": len(example), "scheduled": total, "confirmed": confirmed, "unknown": unknown, "rejected": rejected, "local_capacity_dropped": dropped, "unique_received": len(seen), "acknowledged_deliveries": acked, "redeliveries": duplicates, "invalid": invalid, "publish_seconds": publishSeconds, "latency_p95_ms": p95, "latency_p99_ms": p99, "passed": passed}
 	if err = json.NewEncoder(os.Stdout).Encode(report); err != nil {
 		return err
 	}
