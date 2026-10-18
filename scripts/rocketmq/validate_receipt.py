@@ -2,15 +2,25 @@
 """Fail closed on untested image/deployment configuration."""
 import json
 import hashlib
+import subprocess
 import sys
 from pathlib import Path
+from saved_image import saved_config
 
 receipt = json.loads(Path(sys.argv[1]).read_text())
 values = dict(line.split("=", 1) for line in Path(sys.argv[2]).read_text().splitlines()
               if line and not line.startswith("#") and "=" in line)
 image = values["ROCKETMQ_IMAGE"]
-if image != receipt.get("image") or ("@sha256:" not in image and not image.startswith("sha256:")):
+if "@sha256:" not in image and not image.startswith("sha256:"):
     raise SystemExit("fixed image identity must match acceptance receipt")
+if image != receipt.get("image"):
+    # Classic Docker reports the config digest; containerd reports the OCI
+    # manifest digest. Verify the saved manifest/config bytes and loaded layers,
+    # without changing or relabelling the original CI acceptance receipt.
+    config = saved_config(values["ROCKETMQ_IMAGE_ARCHIVE"], image, receipt["image"])
+    actual = json.loads(subprocess.check_output(["docker", "image", "inspect", image], text=True))
+    if len(actual) != 1 or actual[0]["Id"] != image or actual[0]["RootFS"]["Layers"] != config["rootfs"]["diff_ids"]:
+        raise SystemExit("loaded image differs from the CI-proven saved image")
 if values.get("ROCKETMQ_BIND_IP") != "100.118.164.39":
     raise SystemExit("production endpoint must bind serverD tailnet address")
 for key in ("signature_verified", "sync_flush_verified", "persistence_verified", "acl_verified", "sdk_interop_verified"):

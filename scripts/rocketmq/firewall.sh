@@ -18,7 +18,7 @@ iptables-restore -w 10 --noflush <<'RULES'
 -A INFRA-ROCKETMQ -m conntrack --ctorigdstport 8081 -s 100.126.200.55 -j RETURN
 -A INFRA-ROCKETMQ -s 100.118.164.39 -j RETURN
 -A INFRA-ROCKETMQ -m conntrack --ctorigdstport 5557 -s 100.126.200.55 -j RETURN
--A INFRA-ROCKETMQ -j REJECT --reject-with tcp-reset
+-A INFRA-ROCKETMQ -p tcp -j REJECT --reject-with tcp-reset
 COMMIT
 RULES
 for port in 8081 5557; do

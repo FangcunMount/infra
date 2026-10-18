@@ -1,0 +1,19 @@
+[Unit]
+Description=Infra-managed standalone RocketMQ Docker Compose
+Requires=docker.service tailscaled.service
+After=docker.service tailscaled.service network-online.target
+Wants=network-online.target
+PartOf=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Environment=ROCKETMQ_ENV_FILE=/etc/infra/rocketmq/runtime.env
+Environment=ROCKETMQ_ACCEPTANCE_FILE=/opt/infra-rocketmq/rocketmq-m1-evidence.json
+ExecStart=/usr/bin/bash /opt/infra-rocketmq/current/scripts/rocketmq/manage.sh up
+ExecStop=/usr/bin/bash /opt/infra-rocketmq/current/scripts/rocketmq/manage.sh stop
+TimeoutStartSec=240
+TimeoutStopSec=120
+
+[Install]
+WantedBy=multi-user.target
