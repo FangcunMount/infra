@@ -10,7 +10,7 @@
 
 进度：**18/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
-### 最新核验快照（2026-10-19 13:13 +08:00）
+### 最新核验快照（2026-10-19 13:24 +08:00）
 
 本表持续维护已批准的《M2 完整实施规划：事务 SDK、双存储证明与固定预发布》，任务仍为24项。本次仅同步核验状态，不将已实现、CI运行中或待发布记为完成。
 
@@ -18,12 +18,12 @@
 | --- | --- |
 | 已完成任务 | T01–T18，18/24；M2-P 至 M2-4 已满足对应合并门禁；T17/T18 已实现并验证，相关 PR 待合并 |
 | 当前 SDK 候选 | `3bed26b7e4ee906a293bd574b59dea28d939a282`（新增 Mongo 故障宿主显式提交预算，待真实重验）；[PR43](https://github.com/FangcunMount/reliable-messaging/pull/43) 待合并 |
-| 当前 infra 验收源码 | `910b614dfdb60483009a38113ddcae3c06905914`；[PR27](https://github.com/FangcunMount/infra/pull/27) 待合并；本次记录更新在其后单独记账 |
+| 当前 infra 验收源码 | `ca7c5139e7d274bff45df1eb5262675e878f4e46`；[PR27](https://github.com/FangcunMount/infra/pull/27) 待合并；本次记录更新在其后单独记账 |
 | SDK 当前候选 3bed26b 检查 | [源码/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383794)、[真实存储适配](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383777)、[Python源码及安装包](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383932)、[既有基础设施回归](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383902) 均通过；不能替代下列 Broker 故障门禁 |
 | T17–T18 | [双 profile 公开 SDK 31项/档](https://github.com/FangcunMount/infra/actions/runs/39201819179) 均通过、0跳过；owner 拒绝、共享消费预算及全部正式入口通过；[结构化证据](evidence/rocketmq-m2-sdk-routing-e2e-20261019.json) |
-| T19 | [包级故障44项/档](https://github.com/FangcunMount/infra/actions/runs/39201819131) 失败：31项基础验收与2项MySQL提交包级故障通过后，Mongo提交前断连等待超时；T19不打勾，新候选待重验 |
-| T20 | [完整46项/档](https://github.com/FangcunMount/infra/actions/runs/39201819090) 因同一T19前置场景失败；2项真实原生超限尚未执行，T20不打勾 |
-| 普通消息及既有协议回归 | [完整Docker验收](https://github.com/FangcunMount/infra/actions/runs/39201819080) 已通过（SDK 3bf3dc8）；包含签名构建、普通消息、M2-0及公开Go入口回归，新候选仍须完整重验 |
+| T19 | [修正候选44项/档](https://github.com/FangcunMount/infra/actions/runs/39203750280) 运行中；旧Mongo提交等待失败保留于下文，未记为通过 |
+| T20 | [修正候选完整46项/档](https://github.com/FangcunMount/infra/actions/runs/39203750293) 运行中；须取得2项真实原生超限证据后再完成 |
+| 普通消息及既有协议回归 | [新候选完整Docker验收](https://github.com/FangcunMount/infra/actions/runs/39203750215) 运行中；前一候选[39201819080](https://github.com/FangcunMount/infra/actions/runs/39201819080) 通过，raw20项及公开Go19项均0跳过 |
 | T21–T24 | 文档、示例及发布后安装流程已准备；API冻结、最终合并 SHA、该 SHA 完整 CI、固定发布和下载重装均待前置门禁 |
 | 发布 / 生产 | 两语言 tag 与 GitHub 预发布均未创建；未执行生产变更，业务链路仍属 M3 范围 |
 
@@ -65,7 +65,7 @@
 | ☐ | T19 | 退出、断网、DB 提交丢回复、Broker 重启故障矩阵 | 13 项真实 packet/proxy/重启场景已接入；TCP/TLS fixture 单元/race 通过；真实矩阵待通过 |
 | ☐ | T20 | 资源上界、指标、超限告警、0600 原生超限审计导出 | 边界、分阶段计数、真实关闭指标、只读索引审计与告警封新入口已实现；native-limit 实测待通过 |
 | ☐ | T21 | 原事务示例、接入/恢复/关闭文档、API 评审 | SDK PR43 原 SQL/GORM/Mongo/SQLAlchemy 示例可编译，契约和关闭/恢复文档准备；冻结待真实矩阵通过 |
-| ☐ | T22 | 固定候选 SHA、完整 CI、wheel/sdist/摘要/receipt | 分支候选 SDK 3bed26b；Go/Python 预定版本及确定性构建准备；最终合并候选/完整 CI/receipt 待完成 |
+| ☐ | T22 | 固定候选 SHA、完整 CI、wheel/sdist/摘要/receipt | 分支候选 SDK 3bed26b；Go/Python 预定版本及确定性构建准备；显式 prepare_release.py 校验合并源码、CI状态、双档制品及故障报告并生成receipt；15项离线脚本测试通过；最终合并候选/完整CI/receipt待完成 |
 | ☐ | T23 | 两语言 tag 同一 SHA，GitHub 固定预发布 | — |
 | ☐ | T24 | 下载发布 tag/制品重新安装验收、索引与总表关闭 | infra prepare_published.py + workflow 已准备，固定 Go module、wheel/sdist 独立安装与完整验收；尚未发布或运行此门禁 |
 
