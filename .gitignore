@@ -181,3 +181,6 @@ audit-*.log
 # sops -e compose/env/prod/serverA.env > compose/env/prod/serverA.env.enc
 # sops -e compose/env/prod/serverB.env > compose/env/prod/serverB.env.enc
 # 然后忽略 .env，保留 .env.enc
+
+# Public official RDS trust bundle; database/client private keys remain ignored.
+!components/mysql-client/ca-chain.pem
