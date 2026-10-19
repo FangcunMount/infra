@@ -120,6 +120,14 @@
       "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
       "scope": "integration-tagged lint2.5.0, five maintenance package source race, integration compilation",
       "exit": 0
+    },
+    {
+      "source_sha": "733c2dc2a30074e514f3bfedfc98cd2cff642d5d",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39280693975",
+      "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39280695177",
+      "sdk_isolation_ci": "https://github.com/FangcunMount/iam/actions/runs/39280694020",
+      "image_handoff_ci": "https://github.com/FangcunMount/iam/actions/runs/39280693944",
+      "status": "success"
     }
   ],
   "failure_history": [
@@ -195,7 +203,14 @@
     "steps_started": 0,
     "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the Billing & plans section in your settings",
     "account_action_requested": true,
-    "test_pass_claim": false
+    "test_pass_claim": false,
+    "latest_observation": {
+      "infra_source_sha": "728f9e1",
+      "ci": "https://github.com/FangcunMount/infra/actions/runs/39282025800",
+      "failed_check_run": 118158047787,
+      "failed_job_steps_started": 0,
+      "annotation_confirmed": "account payments failed or spending limit; MySQL8.4 not executed; other jobs then queued"
+    }
   },
   "current_candidate_ci": {
     "ci": "https://github.com/FangcunMount/iam/actions/runs/39280693975",

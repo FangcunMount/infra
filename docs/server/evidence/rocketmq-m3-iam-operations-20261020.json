@@ -1,0 +1,76 @@
+{
+  "format_version": 1,
+  "task_ids": [
+    "T07"
+  ],
+  "status": "in_progress",
+  "complete": false,
+  "observed_at": "2026-10-19T16:32:22.316523+00:00",
+  "source_sha": "723f171a531f1410f6cc96fac7c612721b483b30",
+  "repository": "FangcunMount/iam",
+  "pr": "https://github.com/FangcunMount/iam/pull/134",
+  "pr_status": "draft; depends on PR132; not merged",
+  "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/iam-operations",
+  "implemented": [
+    "Complete immutable first-plan candidate including no-op intent and exact SDK wire; stable input vs generated artifacts separated",
+    "Host schema44 business-operation results, guarded original-root binding, single-use in-memory authority and bounded expiry fencing",
+    "Fresh read validation of canonical metadata, result hashes, exact binding and UTC audit timestamps; no constructor DDL or network",
+    "No scanning publication, business replay or automatic reacquisition of known operations"
+  ],
+  "validation": [
+    {
+      "scope": "full source race",
+      "source_sha": "723f171a531f1410f6cc96fac7c612721b483b30",
+      "counts": {
+        "pass": 1903,
+        "fail": 0,
+        "skip": 31
+      },
+      "report": "/tmp/m3-iam-t07-journal-full-source.jsonl",
+      "report_sha256": "349c6b22134ea4b9ad3ca28c102c412fd76f47797e63bba9e8e24cb15664e952",
+      "exit": 0,
+      "skip_reason": "31 existing optional environment-dependent source tests; not required native acceptance"
+    },
+    {
+      "scope": "supplemental MySQL 9.3 only; does not replace required Docker 8.0/8.4 matrix",
+      "fixture": "/var/folders/8x/l5l22n7n61q8jv7ns6bzzqkm0000gn/T/m3-iam-mysql93-tj4tw7cn",
+      "cleaned": true,
+      "server_version": "9.3.0",
+      "source_sha": "723f171a531f1410f6cc96fac7c612721b483b30",
+      "source_clean_before": true,
+      "exit": 0,
+      "tests": {
+        "pass": 27,
+        "fail": 0,
+        "skip": 0
+      },
+      "log": "/tmp/m3-iam-protocol-mysql93-20261020T002221.log",
+      "log_sha256": "cf1835d705398b0faed159f392f400c9870372dd9f8cd6a92d12d7c2570e2bc9",
+      "source_clean_after": true
+    },
+    {
+      "scope": "integration-tag lint2.5.0, docs facts/links, model/store/dbops race and integration compilation",
+      "exit": 0
+    }
+  ],
+  "failure_history": [
+    {
+      "scope": "integration-tag lint during journal development; uncommitted source",
+      "failure": "5 errcheck findings for unhandled rollback/rows close cleanup results",
+      "fix": "Explicit best-effort deferred root rollback and propagation of row-close errors",
+      "recheck": "integration lint zero issues"
+    }
+  ],
+  "remaining": [
+    "Dual SDK/business guard host assembly; shared bounded reconciliation budget and explicit durable abort resolution",
+    "Typed result capture/restore and durable no-op execution",
+    "HTTP optional idempotency key/reference, current identity/scope/original permission query and early named-command reuse",
+    "Current-source fixed MySQL matrix, actual Broker host validation, full integration regressions"
+  ],
+  "boundaries": {
+    "native_scope": "supplemental MySQL9.3; journal cases storage-only, not SDK+Broker host atomicity proof",
+    "production_changes": false,
+    "system_acceptance": false,
+    "merged": false
+  }
+}
