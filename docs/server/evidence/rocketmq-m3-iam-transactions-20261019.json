@@ -3,7 +3,7 @@
   "task_ids": [
     "T06"
   ],
-  "observed_at": "2026-10-19T15:58:59.374269+00:00",
+  "observed_at": "2026-10-19T20:26:02.104144+00:00",
   "status": "in_progress",
   "complete": false,
   "repository": "FangcunMount/iam",
@@ -128,6 +128,95 @@
       "sdk_isolation_ci": "https://github.com/FangcunMount/iam/actions/runs/39280694020",
       "image_handoff_ci": "https://github.com/FangcunMount/iam/actions/runs/39280693944",
       "status": "success"
+    },
+    {
+      "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+      "scope": "Required native host storage matrix; downloaded named-test job logs",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39281936066",
+      "matrix": [
+        {
+          "mysql": "8.0.36",
+          "job_id": 118157777313,
+          "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0,
+          "private_log": "/tmp/m3-iam-t06-8.0.36-89bdcf58-native.log",
+          "log_sha256": "28c7b0337f925dfb1c9afa91b7463c7c03f00e557b16c9da56a4ed2b1d0818b9",
+          "skipped_tests": [],
+          "failed_tests": []
+        },
+        {
+          "mysql": "8.0.44",
+          "job_id": 118157777047,
+          "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0,
+          "private_log": "/tmp/m3-iam-t06-8.0.44-89bdcf58-native.log",
+          "log_sha256": "e5e474918a88af61d252795b00a44424413b87860eecf399c9c72c829e8e5271",
+          "skipped_tests": [],
+          "failed_tests": []
+        },
+        {
+          "mysql": "8.4",
+          "job_id": 118157777619,
+          "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0,
+          "private_log": "/tmp/m3-iam-t06-8.4-89bdcf58-native.log",
+          "log_sha256": "58ea8b9d894d898d0558cb117fb80387a261613ebf5dbffd4b4c508698ee1306",
+          "skipped_tests": [],
+          "failed_tests": []
+        }
+      ],
+      "total_required_named_passes": 36,
+      "failed": 0,
+      "skipped": 0,
+      "status": "success; stored half fixtures, separate actual Broker gate"
     }
   ],
   "failure_history": [
@@ -167,7 +256,7 @@
     }
   ],
   "remaining": [
-    "Current schema43 candidate required MySQL8.0/8.4 full CI and actual released-SDK/Broker host acceptance; Actions account gate unresolved",
+    "Actual released-SDK/Broker host acceptance; private infra Actions account billing gate unresolved. Independent Mac mini Compose proof in progress.",
     "Permission protected result/idempotency protocol and durable no-op (T07)",
     "Production/system acceptance remains deferred"
   ],
@@ -213,13 +302,28 @@
     }
   },
   "current_candidate_ci": {
-    "ci": "https://github.com/FangcunMount/iam/actions/runs/39280693975",
-    "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39280695177",
-    "status": "queued when recorded; no result claimed"
+    "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+    "ci": "https://github.com/FangcunMount/iam/actions/runs/39281936066",
+    "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39281935978",
+    "sdk_isolation_ci": "https://github.com/FangcunMount/iam/actions/runs/39281936049",
+    "image_handoff_ci": "https://github.com/FangcunMount/iam/actions/runs/39281935906",
+    "status": "all success; image build does not authorize production publication"
   },
   "integration_baseline": {
     "merged_main": "403d41c2",
     "local_merge": "a3f1ea53",
     "scope": "preserved already-merged main Redis delivery changes; no new Redis production action"
+  },
+  "local_broker_attempt": {
+    "host": "mac-mini-old",
+    "infra_sha": "f86247dc99b2a294a0f4bca290831c08006c0dab",
+    "iam_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+    "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+    "broker_image": "sha256:050426c66e97d69940f3b023440f68277cd02a4b8af5717ca01cf33f09776726",
+    "mysql_version": "8.0.44",
+    "isolation": "New random rocketmq-m2 Compose project/network/loopback ports/temp schemas; existing services left running",
+    "status": "running; no pass claim",
+    "scope_limit": "Local native proof does not change GitHub Actions status or production/system acceptance",
+    "setup_failure": "First 8.0.36 pull failed before fixture startup because SSH PATH omitted Docker credential helper; private failure log retained; retry uses verified existing MySQL8.0.44 image and corrected PATH"
   }
 }
