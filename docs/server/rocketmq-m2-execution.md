@@ -25,6 +25,8 @@
 | T22 诊断重验 | [infra PR31](https://github.com/FangcunMount/infra/pull/31)，SDK仍固定c02bc98；新增每探针私有日志归属及只导出固定传输标签/摘要的有界失败诊断，28项脚本通过，不加通用重试；[31项](https://github.com/FangcunMount/infra/actions/runs/39217341161)、[46项](https://github.com/FangcunMount/infra/actions/runs/39217341090)、[48项](https://github.com/FangcunMount/infra/actions/runs/39217341117)、[完整回归](https://github.com/FangcunMount/infra/actions/runs/39217341175)原运行一档在16项后再次Start失败，仅通用Internal标签，见[诊断证据](evidence/rocketmq-m2-sdk-startup-diagnostics-20261019.json)；新增仅限未Ready失败实例的脱敏描述，源码更新后重验，原失败不计通过 |
 | T23–T24 / 生产 | 两tag和GitHub预发布尚未创建；下载重装待发布后单独验证；本批未改三宿主依赖或生产链路 |
 
+当前cbdc8bf诊断候选重验：[31项](https://github.com/FangcunMount/infra/actions/runs/39219218244)、[46项](https://github.com/FangcunMount/infra/actions/runs/39219218278)、[48项](https://github.com/FangcunMount/infra/actions/runs/39219218555)、[完整回归](https://github.com/FangcunMount/infra/actions/runs/39219218431)，SDK仍为c02bc98。原983c959运行的基础31双档已通过；完整矩阵一档失败的报告已保存，其余运行因诊断源码更新而取消，不计通过。
+
 下一步：完成T22的精确合并SHA全部CI和独立wheel/sdist安装，生成receipt/摘要后，执行T23固定发布及T24正式tag/下载制品重新安装验收。旧失败证据继续保留在下文和evidence中，不删除或计为通过。
 
 历史候选预检记录（当时）：已下载 SDK `3bf3dc8` 的双 Python profile 制品；源码与独立 wheel 各120项通过、0失败/跳过，wheel/sdist 摘要在两档一致且绑定同一源 SHA/树。见[候选预检证据](evidence/rocketmq-m2-sdk-candidate-20261019.json)。这不是最终合并候选或已发布制品的验证，不据此完成 T22/T24。另修复 T20 审计 CLI 的变量引用及 critical 告警退出码2，并保留发布安装 JSON 附件；当时11项本地脚本测试通过、真实native-limit门禁待通过；当前T20以总表已完成证据为准。
