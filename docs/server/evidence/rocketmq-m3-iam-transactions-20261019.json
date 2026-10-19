@@ -7,7 +7,7 @@
   "status": "in_progress",
   "complete": false,
   "repository": "FangcunMount/iam",
-  "source_sha": "0bd208a2bcc4730c262d96da0d1a88a7634dfefb",
+  "source_sha": "feb0369c9b6ff621ed9227346036a07dad660658",
   "pr": "https://github.com/FangcunMount/iam/pull/132",
   "pr_status": "draft; not merged",
   "implemented": [
@@ -16,7 +16,10 @@
     "Opaque host local artifact codec retains exact original Broker wire; freezes row IDs and database audit wall clock before original root",
     "Role/resource/grant/assignment and maintenance row allocation declarations; planned ORM hooks reject absent identities",
     "Bounded host planning admission and ShutdownIncomplete accounting",
-    "Optional SDK Reserve/Execute orchestration; not installed in platform or maintenance CLI yet"
+    "Optional SDK Reserve/Execute orchestration; not installed in platform or maintenance CLI yet",
+    "Platform and maintenance CLI transaction owner assembly; exact m3-1 catalog",
+    "Conditional final NORMAL SMS client only with mq provider; standard modes retained explicitly",
+    "Startup/close accounting, failed-start cleanup and retained DB pool ownership on incomplete close"
   ],
   "validation": [
     {
@@ -55,15 +58,20 @@
     }
   ],
   "remaining": [
-    "Newest candidate native frozen ORM and actual host entrypoint matrix",
-    "Platform and maintenance CLI owner lifecycle and assembly",
-    "Full bound original-transaction and real Broker acceptance before T06 completion",
-    "T07: original typed duplicate results, durable no-op and permission protected public operations API"
+    "Newest full CI and actual released-SDK/Broker host acceptance",
+    "Permission protected result/idempotency protocol and durable no-op (T07)",
+    "Production/system acceptance remains deferred"
   ],
   "boundaries": {
     "native_half_receipts": "Explicit storage fixture; not Broker E2E/fault evidence",
     "production_changes": false,
     "system_acceptance": false,
     "merged": false
-  }
+  },
+  "previous_candidates": [
+    {
+      "source_sha": "0bd208a2bcc4730c262d96da0d1a88a7634dfefb",
+      "validation_status": "full CI39270215122; native all3 MySQL and host entry fixtures; concurrency39270214607 and SDK isolation39270214851 success"
+    }
+  ]
 }

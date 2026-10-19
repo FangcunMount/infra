@@ -1,0 +1,73 @@
+name: RocketMQ IAM original host transaction
+on:
+  workflow_dispatch:
+    inputs:
+      iam_ref:
+        description: Exact IAM candidate source SHA
+        type: string
+        required: true
+        default: feb0369c9b6ff621ed9227346036a07dad660658
+  pull_request:
+    paths: ['scripts/rocketmq/ci-transactions.py', 'scripts/rocketmq/iam_acceptance.py', 'scripts/rocketmq/test_iam_acceptance.py', '.github/workflows/rocketmq-iam.yml']
+permissions:
+  contents: read
+env:
+  GOTOOLCHAIN: local
+concurrency:
+  group: rocketmq-iam-host-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  host:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: ['mysql:8.0.36', 'mysql:8.0.44', 'mysql:8.4']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: bfaae2b82ee0d1229b8c965fce472cdf5dec486f
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/iam
+          ref: ${{ inputs.iam_ref || 'feb0369c9b6ff621ed9227346036a07dad660658' }}
+          path: .iam-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: .iam-acceptance/go.mod
+          cache-dependency-path: .iam-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Verify exact candidate and source harness
+        env:
+          EXPECTED_IAM_SHA: ${{ inputs.iam_ref || 'feb0369c9b6ff621ed9227346036a07dad660658' }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_IAM_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .iam-acceptance rev-parse HEAD)" = "$EXPECTED_IAM_SHA"
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py' -v
+      - name: Build verified isolated Broker
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-iam:5.5.1 components/rocketmq
+      - name: Required actual IAM host entry and original transaction
+        env:
+          MYSQL_IMAGE: ${{ matrix.mysql }}
+        run: |
+          python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
+            --iam-host "$PWD/.iam-acceptance" --image rocketmq-iam:5.5.1 \
+            --mysql-image "$MYSQL_IMAGE" --report rocketmq-iam-host.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-iam-host-${{ strategy.job-index }}-${{ github.sha }}
+          path: rocketmq-iam-host.json
+          if-no-files-found: error
+          retention-days: 14

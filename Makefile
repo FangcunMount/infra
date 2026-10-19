@@ -1581,3 +1581,12 @@ service-ports: ## 显示所有服务端口
 .PHONY: rocketmq-validate rocketmq-up rocketmq-stop rocketmq-status rocketmq-logs
 rocketmq-validate rocketmq-up rocketmq-stop rocketmq-status rocketmq-logs:
 	@bash scripts/rocketmq/manage.sh $(@:rocketmq-%=%)
+
+.PHONY: rocketmq-iam-test
+rocketmq-iam-test: ## 隔离验证 IAM 实际事务入口；SDK_DIR/IAM_DIR/ROCKETMQ_TEST_IMAGE 必须显式提供
+	$(call require_param,SDK_DIR,make rocketmq-iam-test SDK_DIR=/path/to/fixed-sdk IAM_DIR=/path/to/fixed-iam ROCKETMQ_TEST_IMAGE=owned-image)
+	$(call require_param,IAM_DIR,make rocketmq-iam-test SDK_DIR=/path/to/fixed-sdk IAM_DIR=/path/to/fixed-iam ROCKETMQ_TEST_IMAGE=owned-image)
+	$(call require_param,ROCKETMQ_TEST_IMAGE,make rocketmq-iam-test SDK_DIR=/path/to/fixed-sdk IAM_DIR=/path/to/fixed-iam ROCKETMQ_TEST_IMAGE=owned-image)
+	python3 scripts/rocketmq/ci-transactions.py --sdk "$(SDK_DIR)" --iam-host "$(IAM_DIR)" \
+		--image "$(ROCKETMQ_TEST_IMAGE)" --mysql-image "$(or $(ROCKETMQ_TEST_MYSQL_IMAGE),mysql:8.0.36)" \
+		--report "$(or $(ROCKETMQ_IAM_REPORT),rocketmq-iam-host.json)"

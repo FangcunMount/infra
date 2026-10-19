@@ -161,6 +161,7 @@ def main():
     parser.add_argument("--mysql-image", default="mysql:8.0.36")
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
+    parser.add_argument("--iam-host", type=Path, help="exact IAM checkout; require actual host SDK/Broker acceptance in the owned fixture")
     parser.add_argument("--go-probe", type=Path)
     parser.add_argument("--sdk-api-python", action="store_true", help="also require public Python/MySQL and cross-language recovery")
     parser.add_argument("--sdk-api-go", action="store_true", help="required public Go SDK acceptance; separate from raw M2-0")
@@ -239,6 +240,10 @@ def main():
         "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
+    if args.iam_host:
+        # The host fixture explicitly creates/drops its OWN random IAM schema.
+        # This root login exists only in this private loopback Compose project.
+        spec['services']['mysql']['environment']['MYSQL_ROOT_HOST'] = '%'
     mongo_port = port()
     mongo_image = None
     if args.sdk_api_go:
@@ -560,6 +565,13 @@ def main():
             recovery.finish()
             passed(language + "_to_" + checker + "_cross_process_recovery")
 
+        if args.iam_host:
+            from iam_acceptance import run_iam_host
+            proof['iam_host'] = {}
+            run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
+                         mysql_password, ca, run, proof['iam_host'])
+            passed('iam_host_actual_sdk_original_root_and_application')
+
         # Accelerate ONLY the owned fixture. A real Unknown half must move to
         # the native discard topic; reaching an arbitrary sleep is not proof.
         sender = start("python", "send", "finite-check-limit")
@@ -701,6 +713,10 @@ def main():
                 failure = failure or "published Python acceptance imported source checkout"
                 report["failed"] = 1
                 report["failure"] = failure
+        if args.iam_host:
+            report['batch'] = 'M3-IAM-host-with-M2-0-baseline'
+            report['limits'].append('IAM host acceptance uses released SDK; base raw-client cases remain separately scoped')
+            report['iam_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/iam_acceptance.py').read_bytes()).hexdigest()
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
