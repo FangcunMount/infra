@@ -1,0 +1,56 @@
+{
+  "format_version": 1,
+  "task_ids": [
+    "T01"
+  ],
+  "observed_at": "2026-10-19T10:00:18.805887+00:00",
+  "stage": "source-baseline",
+  "repositories": {
+    "infra": {
+      "source_sha": "5ae07289d64ef44a50e79d4d387cc0d13d555cf9",
+      "branch": "codex/rocketmq-m3",
+      "path": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/infra",
+      "status": "?? docs/server/rocketmq-m3-execution.md"
+    },
+    "sdk": {
+      "source_sha": "1630aa59d87abf1c69f183be4be7c662a29cae52",
+      "branch": "codex/rocketmq-m3",
+      "path": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/sdk",
+      "status": ""
+    },
+    "iam": {
+      "source_sha": "b8e8a9e604074f9850472f2538137e342964fc0c",
+      "branch": "codex/rocketmq-m3",
+      "path": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/iam",
+      "status": ""
+    },
+    "qs-server": {
+      "source_sha": "f6ee489a88276822069612865f2decf40168afdd",
+      "branch": "codex/rocketmq-m3",
+      "path": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-server",
+      "status": ""
+    },
+    "qs-ai": {
+      "source_sha": "c288eb94c09a8ac930f0ae6b03d62a09147b72fb",
+      "branch": "codex/rocketmq-m3",
+      "path": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai",
+      "status": ""
+    }
+  },
+  "validation": {
+    "task_ids": 36,
+    "unique_task_ids": 36,
+    "milestones": 8,
+    "branches": 5,
+    "unrelated_changes": 0,
+    "diff_check_exit": 0
+  },
+  "production_changes": false,
+  "system_acceptance": false,
+  "pr": null,
+  "boundaries": [
+    "105 is an independently deployed prerequisite, not executed here",
+    "M2 stays 24/24; M3 starts independently",
+    "Production and publication remain separate records"
+  ]
+}

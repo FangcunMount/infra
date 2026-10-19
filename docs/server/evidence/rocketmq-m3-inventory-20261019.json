@@ -1,0 +1,513 @@
+{
+  "format_version": 1,
+  "task_ids": [
+    "T02"
+  ],
+  "observed_at": "2026-10-19T10:03:12.915995+00:00",
+  "stage": "source-inventory",
+  "repositories": {
+    "iam": "b8e8a9e604074f9850472f2538137e342964fc0c",
+    "qs-server": "f6ee489a88276822069612865f2decf40168afdd",
+    "qs-ai": "c288eb94c09a8ac930f0ae6b03d62a09147b72fb"
+  },
+  "catalogs": {
+    "iam": {
+      "iam.authz.version_changed.v2": "durable_outbox",
+      "iam.login_otp_sms": "best_effort"
+    },
+    "qs-server": {
+      "questionnaire.changed": "best_effort",
+      "assessment_model.changed": "best_effort",
+      "answersheet.submitted": "durable_outbox",
+      "evaluation.requested": "durable_outbox",
+      "evaluation.retry.requested": "durable_outbox",
+      "evaluation.outcome.committed": "durable_outbox",
+      "evaluation.failed": "durable_outbox",
+      "interpretation.report.generated": "durable_outbox",
+      "interpretation.report.failed": "durable_outbox",
+      "interpretation.retry.requested": "durable_outbox",
+      "task.opened": "best_effort",
+      "task.opened.reminder.requested": "durable_outbox",
+      "task.completed": "best_effort",
+      "task.expired": "best_effort",
+      "task.canceled": "best_effort"
+    }
+  },
+  "ai_kinds": {
+    "START": "start",
+    "CHANGE": "change",
+    "PARTICIPANT_RETRY": "participant_retry",
+    "EVALUATION_START": "evaluation_start",
+    "EVALUATION_CANCEL": "evaluation_cancel",
+    "COMMAND_RECEIPT": "command_receipt",
+    "INTERPRETATION_STATE": "interpretation_state",
+    "EVALUATION_STATE": "evaluation_state",
+    "EVENT_ACKNOWLEDGEMENT": "event_acknowledgement"
+  },
+  "source_references": {
+    "iam": [
+      {
+        "path": "configs/events.yaml",
+        "sha256": "c5c91a04fcdc53937a4c4b423ac080bdcbad71e23109bd42e5398ea64b4d5a18"
+      },
+      {
+        "path": "internal/apiserver/infra/mysql/uow/authz/uow.go",
+        "sha256": "331cd2fb2bf6ea67fc29715728ebb30b8c545337c99e052dba3ef9af78abc35a"
+      },
+      {
+        "path": "internal/apiserver/infra/mysql/policy/repo.go",
+        "sha256": "0a18a700b0da4e302e30e725296333028723176a8475b54c53287b305c5a1220"
+      },
+      {
+        "path": "internal/apiserver/infra/mysql/eventoutbox/standard_stager.go",
+        "sha256": "006ee872b0953f71cc92a120598e65f0fbc13d85e00cc3a1069b4f4180d206d4"
+      },
+      {
+        "path": "internal/apiserver/infra/mysql/eventoutbox/bootstrap_stager.go",
+        "sha256": "e30d3ecaf3248adc08b05ec735ffda478c3512811243adea831929f9102cd118"
+      },
+      {
+        "path": "internal/apiserver/infra/mysql/eventoutbox/maintenance_stager.go",
+        "sha256": "d4fb386df08fd551acedf1dd9e11505405379d112ff98a2509f0de3dbdfeb32d"
+      },
+      {
+        "path": "internal/apiserver/container/authz/policy_sync.go",
+        "sha256": "69f4b8e76e431209cf90f0be34aa80f0ee1327cc5638d6a6987ba95cc725e647"
+      },
+      {
+        "path": "internal/apiserver/infra/mysql/sessionrevocation/worker.go",
+        "sha256": "505100ef9552a3d5fb80c04c862db3b14aadad494aac1aeade46f9a010014c0f"
+      }
+    ],
+    "qs-server": [
+      {
+        "path": "configs/events.yaml",
+        "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8"
+      },
+      {
+        "path": "configs/worker.prod.yaml",
+        "sha256": "fee6c0371e93fad2de127403dce227704fb0a5d72a072ea0c489d9b212ff78b7"
+      },
+      {
+        "path": "configs/apiserver.prod.yaml",
+        "sha256": "3cc3763b8c71f2131b25438d56dd96c60af550e7dfe98377743a2b0ca4801611"
+      },
+      {
+        "path": "internal/apiserver/application/survey/answersheet/transactional_durable_store.go",
+        "sha256": "514d0407c3ba0b503f7c4f6a02a784d3601faf64dcf22c227fb72b413d73be2b"
+      },
+      {
+        "path": "internal/apiserver/application/evaluation/intake/transactional_outbox.go",
+        "sha256": "4cf7a5656fb073298e19f9be9385c0310b5923f090350abdc5d6ef067dba4911"
+      },
+      {
+        "path": "internal/apiserver/application/evaluation/outcome/commit/committer.go",
+        "sha256": "4b983f35fa5b5bf5e43df8488943e9b715f807b6d54e3f2f44ee0f332aeb3001"
+      },
+      {
+        "path": "internal/apiserver/application/evaluation/execute/evaluation_workflows.go",
+        "sha256": "2dcfcceb2722b43cb67a784393243a6f6bec3e33fd63b64f1ea9b2707830d37e"
+      },
+      {
+        "path": "internal/apiserver/application/evaluation/operator/retry_governance.go",
+        "sha256": "e4ea5ddc8f7122a5f2f0425cf09b48b2d2f48c95f8cbf693124a049abc4bd37f"
+      },
+      {
+        "path": "internal/apiserver/application/interpretation/automation/execution/committer.go",
+        "sha256": "f63fa4cca3fa97780aec6f735dfd1b0777b0bc543ea1a998e5654f9d9b561440"
+      },
+      {
+        "path": "internal/apiserver/application/interpretation/automation/retry_governance.go",
+        "sha256": "20ece107b42c791135efc1717e1fbd45b7db7c6f58cbc7b9b2c1feb690d6d757"
+      },
+      {
+        "path": "internal/apiserver/application/plan/task_persistence.go",
+        "sha256": "1a92ecf2bf74fadb15ce7cad31248486c7f76f686b99e919a83d648ce69cb101"
+      },
+      {
+        "path": "internal/apiserver/infra/mysql/aibridge/messaging_commands.go",
+        "sha256": "d4f817dea37a34bed4496cd92a630f407a431efde8390ec86196f3e57ff18390"
+      },
+      {
+        "path": "internal/apiserver/infra/mysql/aibridge/messaging_receiver.go",
+        "sha256": "6512c6952bf234e678956e3914934081c59d79bc09410d9d2fa5a7bc8b9cbbed"
+      },
+      {
+        "path": "internal/apiserver/infra/mysql/aibridge/messaging.go",
+        "sha256": "305d129a9f23877e94ed57e1a17ded53c1c509b31372e4ad2d8f4ba826796e0a"
+      },
+      {
+        "path": "internal/apiserver/infra/aibridge/messaging_runtime.go",
+        "sha256": "228da14b903f5d8d10e195621f1c41ca4033fdead91add15dbaa51c832e1a155"
+      },
+      {
+        "path": "internal/apiserver/infra/aibridge/rocketmq_runtime.go",
+        "sha256": "825ce0841ae447a873fed752cad4bbdb6cd11927c655ba233e951f49a90c6d3b"
+      },
+      {
+        "path": "internal/pkg/migration/migrations/mysql/000105_retire_task_entry_token.up.sql",
+        "sha256": "3f0bd769d5147b8aa7ac00fb4ebc21b0533b3c6eeb6dd0ebe9d75c18a4ebef2c"
+      },
+      {
+        "path": "internal/pkg/migration/migrations/mysql/000105_retire_task_entry_token.down.sql",
+        "sha256": "1aa5874994fcbf4b9137a12824f5845c2cfeaf3e437c668b410cdfd1c735b92b"
+      }
+    ],
+    "qs-ai": [
+      {
+        "path": "src/qs_ai/bootstrap/messaging.py",
+        "sha256": "7564b5a18151d177ba7d4353dec344255444af76e10a6bfcfb7e01d91c3576fd"
+      },
+      {
+        "path": "src/qs_ai/bootstrap/lifecycle.py",
+        "sha256": "27326c4629c3a3b5a57e75270df1c97a6e53f5db700fff62b07c8bc8f1736131"
+      },
+      {
+        "path": "src/qs_ai/infrastructure/workflow_transport/mq_receiver.py",
+        "sha256": "0379b49b22490544c31f793ac6ebda616cc3a8a68ef58a598649c27b94e7f43f"
+      },
+      {
+        "path": "src/qs_ai/infrastructure/workflow_transport/mq_relay.py",
+        "sha256": "33272bbdb4448a66507e881b13b55569c1dfdd7b00fea440242cae1a2c7f6577"
+      },
+      {
+        "path": "src/qs_ai/infrastructure/workflow_transport/state_events.py",
+        "sha256": "819d544ebb056b2e39b966d78ebace26d2c370afb97641f4526ca3414568fc4e"
+      },
+      {
+        "path": "src/qs_ai/infrastructure/workflow_transport/messaging.py",
+        "sha256": "e5e0a567bd1df79dd68a166ef9d0f6aee992e9d0b6e7510a2d669185aacb3d02"
+      },
+      {
+        "path": "src/qs_ai/infrastructure/persistence/mysql/database.py",
+        "sha256": "aa2c2c96abef6ffec45fbcd563344725fe22899493deed159c7c1e52697e993b"
+      },
+      {
+        "path": "src/qs_ai/infrastructure/persistence/mysql/execution.py",
+        "sha256": "eb0bc4c2e6079c21a456933583deef3bb61f56d7d577d59804b5719a91dd67c4"
+      },
+      {
+        "path": "src/qs_ai/maintenance/messaging_audit.py",
+        "sha256": "d64ded57f092cb06e3635d4c11f048a6c4d676734376390c2204e29765048e42"
+      },
+      {
+        "path": "src/qs_ai/maintenance/messaging_handoff.py",
+        "sha256": "4cd5f6f9a3ee32a34c1e48ea6216a57df15116a0016262c75612c4208fed74b0"
+      },
+      {
+        "path": "src/qs_ai/maintenance/legacy_results.py",
+        "sha256": "dbba324cfbcde6b5cb6dbe931d538d5e9ef5103c286bd790f4b6981c91991fa6"
+      },
+      {
+        "path": "src/qs_ai/bootstrap/observe_cutover.py",
+        "sha256": "69d46c370fad5ef7beb79cd849b88071fbf7283f30ead72f743f05488d00e694"
+      },
+      {
+        "path": "src/qs_ai/bootstrap/recover_semantic_contract.py",
+        "sha256": "93df69c43e614c4b706f73c16fb561211c6093bc72f3eba834bcef1f504c6971"
+      }
+    ]
+  },
+  "iam_version_writer_sites": [
+    {
+      "path": "internal/apiserver/application/authz/assignment/command_service.go",
+      "sites": [
+        {
+          "line": 308,
+          "call": "version, err := tx.PolicyVersions.Increment(txCtx, cmd.ChangedBy, reason)"
+        },
+        {
+          "line": 312,
+          "call": "if err := policychange.StagePolicyVersionChanged(txCtx, tx.Events, version); err != nil {"
+        },
+        {
+          "line": 339,
+          "call": "version, err := tx.PolicyVersions.Increment(txCtx, changedBy, reason)"
+        },
+        {
+          "line": 344,
+          "call": "return policychange.StagePolicyVersionChanged(txCtx, tx.Events, version)"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/authz/permissiongrant/service.go",
+      "sites": [
+        {
+          "line": 85,
+          "call": "version, err := tx.PolicyVersions.Increment(txCtx, cmd.GrantedBy, \"permission grant created\")"
+        },
+        {
+          "line": 89,
+          "call": "if err := policychange.StagePolicyVersionChanged(txCtx, tx.Events, version); err != nil {"
+        },
+        {
+          "line": 145,
+          "call": "version, err := tx.PolicyVersions.Increment(txCtx, cmd.RevokedBy, reason)"
+        },
+        {
+          "line": 149,
+          "call": "return policychange.StagePolicyVersionChanged(txCtx, tx.Events, version)"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/authz/policychange/version_event.go",
+      "sites": [
+        {
+          "line": 11,
+          "call": "func StagePolicyVersionChanged(ctx context.Context, stager event.Stager, version *policyDomain.PolicyVersion) error {"
+        },
+        {
+          "line": 18,
+          "call": "return stager.Stage(ctx, policyDomain.NewVersionChangedEvent(version.Version))"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/authz/resource/command_service.go",
+      "sites": [
+        {
+          "line": 62,
+          "call": "version, err := tx.PolicyVersions.Increment(txCtx, cmd.ChangedBy, \"authorization resource created\")"
+        },
+        {
+          "line": 66,
+          "call": "return policychange.StagePolicyVersionChanged(txCtx, tx.Events, version)"
+        },
+        {
+          "line": 114,
+          "call": "version, err := tx.PolicyVersions.Increment(txCtx, cmd.ChangedBy, \"authorization resource updated\")"
+        },
+        {
+          "line": 118,
+          "call": "if err := policychange.StagePolicyVersionChanged(txCtx, tx.Events, version); err != nil {"
+        },
+        {
+          "line": 155,
+          "call": "version, err := tx.PolicyVersions.Increment(txCtx, cmd.ChangedBy, \"authorization resource deleted\")"
+        },
+        {
+          "line": 159,
+          "call": "return policychange.StagePolicyVersionChanged(txCtx, tx.Events, version)"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/authz/role/command_service.go",
+      "sites": [
+        {
+          "line": 53,
+          "call": "version, err := tx.PolicyVersions.Increment(txCtx, cmd.ChangedBy, \"authorization role created\")"
+        },
+        {
+          "line": 57,
+          "call": "return policychange.StagePolicyVersionChanged(txCtx, tx.Events, version)"
+        },
+        {
+          "line": 94,
+          "call": "version, err := tx.PolicyVersions.Increment(txCtx, cmd.ChangedBy, \"authorization role updated\")"
+        },
+        {
+          "line": 98,
+          "call": "return policychange.StagePolicyVersionChanged(txCtx, tx.Events, version)"
+        },
+        {
+          "line": 139,
+          "call": "version, err := tx.PolicyVersions.Increment(txCtx, cmd.ChangedBy, \"authorization role deleted\")"
+        },
+        {
+          "line": 143,
+          "call": "return policychange.StagePolicyVersionChanged(txCtx, tx.Events, version)"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/domain/authz/policy/events.go",
+      "sites": [
+        {
+          "line": 19,
+          "call": "func NewVersionChangedEvent(version int64) VersionChangedEvent {"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/maintenance/accountprovision/reviewer_scope.go",
+      "sites": [
+        {
+          "line": 208,
+          "call": "v, e := policypo.NewPolicyVersionRepository(tx).Increment(txctx, \"user:10001\", \"reviewer-10002 scope repair from reference 10001\")"
+        },
+        {
+          "line": 212,
+          "call": "if e = stager.Stage(txctx, policydomain.NewVersionChangedEvent(v.Version)); e != nil {"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/maintenance/conditionretire/migrate.go",
+      "sites": [
+        {
+          "line": 246,
+          "call": "v, err := policypo.NewPolicyVersionRepository(tx).Increment(ctx, MigrationID, reason)"
+        },
+        {
+          "line": 250,
+          "call": "return stager.Stage(ctx, policydomain.NewVersionChangedEvent(v.Version))"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/maintenance/operationscatalog/tool.go",
+      "sites": [
+        {
+          "line": 198,
+          "call": "v, err := policypo.NewPolicyVersionRepository(tx).Increment(txCtx, \"user:\"+actorID, \"statistics operations read catalog\")"
+        },
+        {
+          "line": 202,
+          "call": "if err = stager.Stage(txCtx, policy.NewVersionChangedEvent(v.Version)); err != nil {"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/maintenance/rolemodel/apply.go",
+      "sites": [
+        {
+          "line": 129,
+          "call": "v, err := policypo.NewPolicyVersionRepository(tx).Increment(ctx, MigrationID, reason)"
+        },
+        {
+          "line": 133,
+          "call": "return stager.Stage(ctx, policydomain.NewVersionChangedEvent(v.Version))"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/maintenance/scopemigrate/apply.go",
+      "sites": [
+        {
+          "line": 89,
+          "call": "version, e := policypo.NewPolicyVersionRepository(tx).Increment(txCtx, \"user:\"+actor.String(), \"assignment Scope bootstrap \"+id)"
+        },
+        {
+          "line": 93,
+          "call": "if e = stager.Stage(txCtx, policydomain.NewVersionChangedEvent(version.Version)); e != nil {"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/maintenance/scopemigrate/rollback.go",
+      "sites": [
+        {
+          "line": 142,
+          "call": "version, e := policypo.NewPolicyVersionRepository(tx).Increment(txCtx, \"user:\"+actor.String(), \"assignment Scope rollback \"+id)"
+        },
+        {
+          "line": 146,
+          "call": "if e = stager.Stage(txCtx, policydomain.NewVersionChangedEvent(version.Version)); e != nil {"
+        }
+      ]
+    }
+  ],
+  "qs_stage_sites": [
+    {
+      "path": "internal/apiserver/application/evaluation/execute/evaluation_workflows.go",
+      "sites": [
+        {
+          "line": 282,
+          "call": "if err := f.eventStager.Stage(txCtx, eventsToStage...); err != nil {"
+        },
+        {
+          "line": 291,
+          "call": "return scheduled.StageAt(txCtx, retryAt, retryEvent)"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/evaluation/intake/transactional_outbox.go",
+      "sites": [
+        {
+          "line": 49,
+          "call": "return stager.Stage(txCtx, eventsToStage...)"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/evaluation/operator/retry_governance.go",
+      "sites": [
+        {
+          "line": 116,
+          "call": "return scheduled.StageAt(txCtx, at, retryEvent)"
+        },
+        {
+          "line": 118,
+          "call": "return s.events.Stage(txCtx, event.DomainEvent(retryEvent))"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/evaluation/outcome/commit/committer.go",
+      "sites": [
+        {
+          "line": 173,
+          "call": "if err := c.eventStager.Stage(txCtx, eventsToStage...); err != nil {"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/interpretation/automation/execution/committer.go",
+      "sites": [
+        {
+          "line": 232,
+          "call": "return c.scheduled.StageAt(txCtx, retryAt, retryEvent)"
+        },
+        {
+          "line": 293,
+          "call": "return c.stager.Stage(ctx, events...)"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/interpretation/automation/retry_governance.go",
+      "sites": [
+        {
+          "line": 114,
+          "call": "return scheduled.StageAt(txCtx, at, retryEvent)"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/plan/task_persistence.go",
+      "sites": [
+        {
+          "line": 49,
+          "call": "return p.openingOptions.ReminderOutbox.Stager.Stage(txCtx, staged...)"
+        }
+      ]
+    },
+    {
+      "path": "internal/apiserver/application/survey/answersheet/transactional_durable_store.go",
+      "sites": [
+        {
+          "line": 111,
+          "call": "err = s.stager.Stage(txCtx, stagedEvents...)"
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "catalog_events": 17,
+    "ai_message_kinds": 9,
+    "checked_source_files": 39,
+    "iam_version_writer_files": 12,
+    "qs_stage_files": 8,
+    "missing_sources": 0
+  },
+  "prerequisites": {
+    "qs_schema105_independent_rollout": "required; production completion not yet verified",
+    "source_change": "DROP COLUMN assessment_task.entry_token; irreversible down"
+  },
+  "runtime_status": "unknown; static inventory does not prove live subscriptions, backlog or production schema",
+  "production_changes": false
+}
