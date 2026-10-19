@@ -8,7 +8,7 @@ on:
         description: Exact candidate SDK revision
         type: string
         required: true
-        default: db76a046f063fee48dcd862734898f9b376e6f0d
+        default: 70d44fa297666d2c779721e886cad053fc635ed5
 permissions:
   contents: read
 concurrency:
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: ${{ inputs.sdk_ref || 'db76a046f063fee48dcd862734898f9b376e6f0d' }}
+          ref: ${{ inputs.sdk_ref || '70d44fa297666d2c779721e886cad053fc635ed5' }}
           path: .sdk-acceptance
       - uses: actions/setup-go@v6
         with:

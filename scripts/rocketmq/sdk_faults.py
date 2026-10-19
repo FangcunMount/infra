@@ -30,7 +30,7 @@ def run_faults(start, proxy_start, passed, sql, mongo_command, restart_broker, *
             proxy = proxy_start(storage)
             proxy.send(json.dumps({'Action':'arm','Boundary':boundary,'Method':'commit','Nth':1}))
             proxy.wait('armed')
-            mode = 'fault-local-committed' if boundary == 'after' else 'fault-local-unknown'
+            mode = 'fault-local-committed' if boundary == 'after' else 'fault-local-uncommitted'
             sender = start(language, mode, identity, storage=storage, branches=3,
                            database_proxy=proxy.address)
             sender.wait('half')

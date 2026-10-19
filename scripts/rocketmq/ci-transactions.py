@@ -138,7 +138,11 @@ def main():
     parser.add_argument("--python", default="uv")
     parser.add_argument("--sdk-faults", action="store_true", help="require actual packet commit faults and owned Broker restarts")
     parser.add_argument("--sdk-limits", action="store_true", help="require public SDK finite native check audit and admission alarm")
+    parser.add_argument("--sdk-go-probe", type=Path, help="prebuilt public SDK executable from a verified published Go module")
+    parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
     args = parser.parse_args()
+    if bool(args.installed_python) != bool(args.sdk_go_probe) or (args.installed_python and not args.sdk_api_python):
+        parser.error("published installation requires both runtimes and full cross-language acceptance")
     if args.sdk_limits and not args.sdk_faults:
         parser.error("limit proofs require the packet fault matrix first")
     if args.sdk_faults and not args.sdk_api_go:
@@ -287,11 +291,13 @@ def main():
         argv = ([str(args.go_probe or directory / "go-probe")] if language == "go" else
                 [args.python, "run", "--locked", "--project", str(sources), "python", str(sources / "probe.py")])
         if language == "sdk-go":
-            argv = [str(directory / "sdk-go-probe")]
+            argv = [str(args.sdk_go_probe or directory / "sdk-go-probe")]
         if language == "sdk-python":
             argv = [args.python, "run", "--locked", "--project", str(sdk / "python"),
                     "--extra", "rocketmq", "--extra", "nsq", "python",
                     str(sdk / "python/tests/integration/transaction_probe.py")]
+        if language == "sdk-python" and args.installed_python:
+            argv = [str(args.installed_python.resolve()), "-I", str(sdk / "python/tests/integration/transaction_probe.py")]
         argv += ["--config", str(path), "--mode", mode, "--id", identity]
         p = Probe(argv, directory, dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(trust or ca)))
         probes.append(p)
@@ -357,7 +363,8 @@ def main():
                 run(["go", "build", "-o", str(directory / "go-probe"), "./transport/rocketmq/internal/txprobe"], cwd=sdk)
         if args.sdk_api_go:
             from sdk_acceptance import assert_absent, run_go_sdk
-            run(["go", "build", "-o", str(directory / "sdk-go-probe"), "./transport/rocketmq/internal/sdkprobe"], cwd=sdk)
+            if not args.sdk_go_probe:
+                run(["go", "build", "-o", str(directory / "sdk-go-probe"), "./transport/rocketmq/internal/sdkprobe"], cwd=sdk)
             mongo_command('rs.initiate({_id:"sdk-proof",members:[{_id:0,host:"mongo:27017"}]})')
             deadline = time.monotonic() + 60
             while time.monotonic() < deadline:
@@ -378,8 +385,9 @@ def main():
             run_go_sdk(start, assert_absent, passed, sql, mongo_command, pause_mysql, wrong_ca)
             if args.sdk_api_python:
                 from sdk_acceptance import run_python_sdk
-                run([args.python, "sync", "--locked", "--project", str(sdk / "python"),
-                     "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
+                if not args.installed_python:
+                    run([args.python, "sync", "--locked", "--project", str(sdk / "python"),
+                         "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
                 run_python_sdk(start, passed, sql, pause_mysql, wrong_ca)
             from v2_acceptance import denied_owners, shared_budget
             denied_owners(start,sql,mongo_command,passed,python=args.sdk_api_python)
@@ -585,7 +593,7 @@ def main():
                                        for p in sorted(sdk_sources.rglob("*")) if p.is_file()}
         report["sdk_sha"] = run(["git", "rev-parse", "HEAD"], cwd=sdk).stdout.strip()
         report["go_version"] = run(["go", "env", "GOVERSION"], cwd=sdk).stdout.strip()
-        api_binary = directory / "sdk-go-probe"
+        api_binary = args.sdk_go_probe or directory / "sdk-go-probe"
         if args.sdk_api_go and api_binary.is_file():
             report["sdk_go_probe_sha256"] = hashlib.sha256(api_binary.read_bytes()).hexdigest()
             source_paths = [*sdk.glob("transaction/*.go"), *sdk.glob("storage/transaction/**/*.go"),
@@ -601,10 +609,14 @@ def main():
                                                for path in sorted(set(source_paths)) if path.is_file()}
             report["sdk_tracked_sources_clean"] = run(["git", "diff", "--quiet", "HEAD"], cwd=sdk, required=False).returncode == 0
         if args.sdk_api_python:
-            metadata = run([args.python, "run", "--locked", "--project", str(sdk / "python"),
-                            "--extra", "rocketmq", "--extra", "nsq", "python", "-c",
-                            "import sys,json,importlib.metadata as m; print(json.dumps({'python':sys.version.split()[0],'client':m.version('rocketmq-python-client')}))"]).stdout
+            metadata_command = ([str(args.installed_python.resolve()), "-I"] if args.installed_python else
+                [args.python,"run","--locked","--project",str(sdk / "python"),"--extra","rocketmq","--extra","nsq","python"])
+            metadata = run(metadata_command + ["-c",
+                "import sys,json,reliable_messaging as r,importlib.metadata as m; print(json.dumps({'python':sys.version.split()[0],'client':m.version('rocketmq-python-client'),'sdk_version':m.version('fangcun-reliable-messaging'),'package_file':r.__file__}))"]).stdout
             report["python_runtime"] = json.loads(metadata)
+            report["published_installation"] = bool(args.installed_python)
+            if args.installed_python and Path(report["python_runtime"]["package_file"]).resolve().is_relative_to(sdk):
+                raise RuntimeError("published Python acceptance imported source checkout")
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
