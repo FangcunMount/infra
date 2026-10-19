@@ -383,6 +383,11 @@ def main():
 
         # Accelerate ONLY the owned fixture. A real Unknown half must move to
         # the native discard topic; reaching an arbitrary sleep is not proof.
+        sender = start("python", "send", "finite-check-limit")
+        sender.wait("half")
+        # Establish a real Unknown response before exhausting the scan budget.
+        # Two scans immediately after startup can both precede checker routing.
+        sender.wait("checked", "finite-check-limit", "unknown_prepared", timeout=100)
         # This command uses a different completion marker than provisioning.
         # Its authoritative success proof is the immediately following readback.
         admin("updateBrokerConfig", "-k", "transactionCheckMax", "-v", "2")
@@ -390,9 +395,6 @@ def main():
         if discard_parameters["transactionCheckMax"] != 2:
             raise RuntimeError("finite-check test setting not effective")
         proof["discard_broker_parameters"] = discard_parameters
-        sender = start("python", "send", "finite-check-limit")
-        sender.wait("half")
-        sender.wait("checked", "finite-check-limit", "unknown_prepared")
         deadline = time.monotonic() + 100
         while time.monotonic() < deadline:
             result = run(["docker", "exec", broker, "java", "-Xms32m", "-Xmx128m",
