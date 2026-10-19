@@ -312,14 +312,17 @@ def main():
                 admin("updateTopic", "-t", topic, "-r", "1", "-w", "1", "-a", "+message.type=TRANSACTION", success=True)
                 admin("createAcl", "-s", "User:" + accounts["owner-a"]["username"], "-r", "Topic:" + topic,
                       "-a", "Pub,Sub,Get", "-d", "Allow", success=True)
-            run_go_sdk(start, assert_absent, passed, sql, mongo_command)
+            wrong_ca = directory / "sdk-wrong-ca.crt"
+            run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
+                 "-subj", "/CN=untrusted-sdk", "-keyout", str(directory / "sdk-wrong-ca.key"), "-out", str(wrong_ca)])
+            pause_mysql = lambda paused: run(["docker", "pause" if paused else "unpause", mysql])
+            run_go_sdk(start, assert_absent, passed, sql, mongo_command, pause_mysql, wrong_ca)
             if args.sdk_api_python:
                 from sdk_acceptance import run_python_sdk
                 run([args.python, "sync", "--locked", "--project", str(sdk / "python"),
                      "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
-                run_python_sdk(start, passed, sql, lambda paused: run(
-                    ["docker", "pause" if paused else "unpause", mysql]))
-            if len(cases) != (18 if args.sdk_api_python else 10):
+                run_python_sdk(start, passed, sql, pause_mysql, wrong_ca)
+            if len(cases) != (23 if args.sdk_api_python else 13):
                 raise RuntimeError("required public SDK case count differs")
             return
         run([args.python, "sync", "--locked", "--project", str(sources)], timeout=180)
