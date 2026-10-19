@@ -11,7 +11,7 @@ on:
         description: Exact SDK commit under acceptance
         type: string
         required: true
-        default: c32649518940b20447a1dae821481a2914bb814c
+        default: cb786553f3bc70345ad0f5e8711f6eb7d49844e8
 permissions:
   contents: read
 concurrency:
@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: ${{ inputs.sdk_ref || 'c32649518940b20447a1dae821481a2914bb814c' }}
+          ref: ${{ inputs.sdk_ref || 'cb786553f3bc70345ad0f5e8711f6eb7d49844e8' }}
           path: .sdk-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -55,20 +55,6 @@ jobs:
           python3 scripts/rocketmq/ci-smoke.py --sdk "$PWD/.sdk-acceptance" \
             --image rocketmq-acceptance:5.5.1 --build-log rocketmq-build.log \
             --report rocketmq-m1-evidence.json
-      - name: Export verified Docker image and checksum
-        run: |
-          docker save rocketmq-acceptance:5.5.1 | gzip -1 > rocketmq-5.5.1-amd64.tar.gz
-          sha256sum rocketmq-5.5.1-amd64.tar.gz rocketmq-m1-evidence.json > rocketmq-SHA256SUMS
-      - uses: actions/upload-artifact@v7
-        if: success()
-        with:
-          name: rocketmq-5.5.1-amd64-${{ github.sha }}
-          retention-days: 14
-          path: |
-            rocketmq-5.5.1-amd64.tar.gz
-            rocketmq-m1-evidence.json
-            rocketmq-SHA256SUMS
-            rocketmq-build.log
       - name: Required isolated transaction-client feasibility proof
         run: |
           python3 scripts/rocketmq/ci-transactions.py \
@@ -81,3 +67,18 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           path: rocketmq-m2-transactions.json
+      - name: Export verified Docker image and checksum
+        run: |
+          docker save rocketmq-acceptance:5.5.1 | gzip -1 > rocketmq-5.5.1-amd64.tar.gz
+          sha256sum rocketmq-5.5.1-amd64.tar.gz rocketmq-m1-evidence.json rocketmq-m2-transactions.json > rocketmq-SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        if: success()
+        with:
+          name: rocketmq-5.5.1-amd64-${{ github.sha }}
+          retention-days: 14
+          path: |
+            rocketmq-5.5.1-amd64.tar.gz
+            rocketmq-m1-evidence.json
+            rocketmq-m2-transactions.json
+            rocketmq-SHA256SUMS
+            rocketmq-build.log

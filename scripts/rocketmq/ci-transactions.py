@@ -425,6 +425,8 @@ def main():
                   "mysql_image": mysql_image, "clients": {"go": "5.1.4", "python": "5.1.2"},
                   "cases": cases, "passed": len(cases), "failed": int(failure is not None),
                   "skipped": 0, "failure": failure, "proof": proof,
+                  "probe_receipts": [{"pid": p.process.pid, "exit_code": p.process.returncode,
+                                      "events": p.events} for p in probes],
                   "limits": ["No production acceptance or throughput claim",
                              "Response loss injected after a real RPC, not at network packet layer",
                              "Host transaction adapters/fencing and bounded SDK queues belong to later M2 batches"],
@@ -433,6 +435,9 @@ def main():
         report["sdk_source_sha256"] = {str(p.relative_to(sdk)): hashlib.sha256(p.read_bytes()).hexdigest()
                                        for p in sorted(sdk_sources.rglob("*")) if p.is_file()}
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
+        report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                    for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
+                                              repo / "components/rocketmq/docker-compose.yml")}
         report["go_probe_sha256"] = hashlib.sha256((args.go_probe or directory / "go-probe").read_bytes()).hexdigest() if (args.go_probe or directory / "go-probe").exists() else None
         args.report.write_text(json.dumps(report, indent=2) + "\n")
 
