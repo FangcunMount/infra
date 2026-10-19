@@ -1,0 +1,13 @@
+{
+  "instance_id": "crs-3dli07u2",
+  "public_host": "bj-crs-3dli07u2.sql.tencentcdb.com",
+  "public_port": 23136,
+  "minimum_tls": "1.2",
+  "identity_verification": true,
+  "ca_file": "components/redis-client/ca-chain.pem",
+  "ca_sha256": "620fec36c5647475f0be9c51afe21d05d88ccf61cfadc578ceb069d8def97132",
+  "source": "Tencent Cloud instance SSL console, official download TencentDB-SSL-CA.zip, 2026-10-19",
+  "contains_private_key": false,
+  "capacity_mib": 256,
+  "maxmemory_policy": "noeviction"
+}
