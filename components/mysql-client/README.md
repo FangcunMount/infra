@@ -6,8 +6,9 @@ The CA reference is a full infra Git commit containing the official public RDS
 CA PEM and its SHA256/source manifest. Database credentials remain repository Secrets.
 
 `python3 scripts/mysql/ca.py install --ref <full-commit>` installs that exact CA
-at `/data/infra/ssl/mysql/ca-chain.pem`; `verify` rejects drift and invalid or
-expiring CA certificates. Each application mounts it read-only at
+at `/data/infra/ssl/mysql/ca-chain.pem`; `verify` rejects drift, malformed/non-CA PEM and bundles without a currently
+valid trust root. Official bundles may retain unrelated expired regional intermediates;
+the Go/Python TLS handshake validates the actual negotiated chain and hostname. Each application mounts it read-only at
 `/etc/qlume/mysql/ca-chain.pem`. Maintenance clients use the same pinned bytes.
 Production never falls back to a private address, proxy, insecure TLS or plaintext.
 Explicit `DISABLED` remains available for local and disposable test databases.
@@ -19,7 +20,11 @@ The cloud administrator must verify instance ownership and A/B/D egress allowlis
 then enable SSL for the public endpoint only. Do not enable global forced SSL.
 Record the database server UUID/schema heads before and after; perform no business DDL.
 
-The private `scripts/mysql/runtime.py` plan/apply/rollback tool takes one service at
+AI uses `scripts/mysql/ai_cutover.py <prepared-release>` for preflight and the same
+command with `--apply` for its locked native release/state transition. This path
+checks the unchanged schema head, runs no Alembic upgrade and prunes no images.
+
+The private `scripts/mysql/runtime.py` plan/apply/rollback tool takes one Go service at
 a time under the existing deployment lock. It preserves container configuration,
 credentials, networks and resource limits, and changes only the image, MySQL
 binding, TLS parameters and CA mount. Plan files contain secrets: keep them owned by
@@ -47,6 +52,7 @@ enabled on rollback to avoid a second database restart.
 ```sh
 python3 scripts/mysql/test_ca.py
 python3 scripts/mysql/test_runtime.py
+python3 scripts/mysql/test_ai_cutover.py
 ```
 
 This source change alone does not indicate that production cutover has completed.
