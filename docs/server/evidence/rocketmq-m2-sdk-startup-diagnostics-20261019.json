@@ -1,0 +1,70 @@
+{
+  "sdk_sha": "c02bc984f42a66da6852da2315ba7aab9e5c8610",
+  "go_version": "go1.25.12",
+  "passed": 16,
+  "failed": 1,
+  "skipped": 0,
+  "failure": "RuntimeError: probe ended before half",
+  "cleanup": {
+    "project_containers_remaining": false,
+    "compose_down_succeeded": true,
+    "probe_process_groups_drained": true,
+    "private_fixture_directory_removed": true
+  },
+  "failure_diagnostics": {
+    "clients": [
+      {
+        "bytes_examined": 350,
+        "sha256": "ec9b05f0695c931c60ab0ae0ca8bc132daf2699be984d91eaf79bcac9b4c7c3d",
+        "signals": {
+          "grpc_internal": 1
+        },
+        "pid": 25406
+      }
+    ],
+    "broker": {
+      "bytes_examined": 290419,
+      "sha256": "84af52e56d806f485049524ebcefd5b76faa17f33445841d3cffcf0b8ad0f050",
+      "signals": {
+        "stream_closed": 42,
+        "deadline": 29,
+        "grpc_internal": 1,
+        "grpc_cancelled": 19
+      }
+    }
+  },
+  "task": "T22",
+  "complete": false,
+  "run": "https://github.com/FangcunMount/infra/actions/runs/39217341117",
+  "captured_at": "2026-10-19T07:55:53.364616+00:00",
+  "failed_probe": {
+    "pid": 25406,
+    "exit_code": 1,
+    "events": [
+      {
+        "decision": "{\"CompletedResults\":0,\"HalfPreparedResults\":0,\"HalfRejectedResults\":0,\"HalfUnknownResults\":0,\"LocalCommittedResults\":0,\"LocalAbortedResults\":0,\"LocalUnknownResults\":0,\"FinalCommitResults\":0,\"FinalRollbackResults\":0,\"FinalUnknownResults\":0,\"ActiveSends\":0,\"RunningChecks\":0,\"QueuedChecks\":0,\"CheckRejected\":0,\"CheckUnknown\":0,\"CheckCommit\":0,\"CheckRollback\":0,\"InvalidChecks\":0,\"DatabaseErrors\":0,\"Reconciled\":0,\"CallbackErrors\":0,\"Ready\":false,\"Stopping\":true,\"Stopped\":true}",
+        "event": "metrics",
+        "id": "sdk-mongo-crash-committed"
+      },
+      {
+        "decision": "failed_start_drained",
+        "event": "closed",
+        "id": "sdk-mongo-crash-committed"
+      },
+      {
+        "decision": "grpc_Internal",
+        "event": "failure_code",
+        "id": ""
+      },
+      {
+        "decision": "sdk_operation_failed",
+        "event": "failed",
+        "id": ""
+      },
+      {
+        "event": "exited"
+      }
+    ]
+  },
+  "followup": "Only a drained process before Ready may export a bounded Internal description after configured credential/signature redaction. No body/wire exists before Ready. No retry added."
+}

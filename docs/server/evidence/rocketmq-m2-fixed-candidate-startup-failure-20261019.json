@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "task": "T22",
+  "complete": false,
+  "sdk_sha": "c02bc984f42a66da6852da2315ba7aab9e5c8610",
+  "captured_at": "2026-10-19T07:38:15.418199+00:00",
+  "run": "https://github.com/FangcunMount/infra/actions/runs/39213056193",
+  "profiles": [
+    {
+      "sdk_sha": "c02bc984f42a66da6852da2315ba7aab9e5c8610",
+      "go_version": "go1.25.9",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "failure": null,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "sdk_sha": "c02bc984f42a66da6852da2315ba7aab9e5c8610",
+      "go_version": "go1.25.12",
+      "passed": 31,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: probe ended before half",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "failed_probe": {
+        "pid": 26956,
+        "exit_code": 1,
+        "events": [
+          {
+            "decision": "{\"CompletedResults\":0,\"HalfPreparedResults\":0,\"HalfRejectedResults\":0,\"HalfUnknownResults\":0,\"LocalCommittedResults\":0,\"LocalAbortedResults\":0,\"LocalUnknownResults\":0,\"FinalCommitResults\":0,\"FinalRollbackResults\":0,\"FinalUnknownResults\":0,\"ActiveSends\":0,\"RunningChecks\":0,\"QueuedChecks\":0,\"CheckRejected\":0,\"CheckUnknown\":0,\"CheckCommit\":0,\"CheckRollback\":0,\"InvalidChecks\":0,\"DatabaseErrors\":0,\"Reconciled\":0,\"CallbackErrors\":0,\"Ready\":false,\"Stopping\":true,\"Stopped\":true}",
+            "event": "metrics",
+            "id": "packet-sdk-go-mysql-db-before"
+          },
+          {
+            "decision": "failed_start_drained",
+            "event": "closed",
+            "id": "packet-sdk-go-mysql-db-before"
+          },
+          {
+            "decision": "grpc_Internal",
+            "event": "failure_code",
+            "id": ""
+          },
+          {
+            "decision": "sdk_operation_failed",
+            "event": "failed",
+            "id": ""
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      }
+    }
+  ],
+  "diagnosis": "One profile passed all48; the other passed31 then returned grpc_Internal before Ready/Reserve/half in the first database fault sender. Actual SDK cleanup drained, no local business executed. Cause not available in old redacted report. No generic retry added.",
+  "followup": "Bounded allowlisted transport diagnostics, private per-probe client log ownership, fixed SDK SHA rerun; raw logs/body/credentials never exported."
+}

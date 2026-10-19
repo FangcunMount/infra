@@ -21,6 +21,7 @@ import threading
 import time
 
 from render import render
+from failure_diagnostics import summarize, startup_internal_description
 
 
 DISCARD_TOPIC = "TRANS_CHECK_MAX_TIME_TOPIC"  # TopicValidator in pinned Broker 5.5.1.
@@ -65,6 +66,10 @@ class Probe:
         self.incoming = queue.Queue()
         self.log = open(directory / ("probe-" + secrets.token_hex(5) + ".log"), "x")
         os.chmod(self.log.name, 0o600)
+        self.client_logs = directory / (Path(self.log.name).stem + "-client")
+        self.client_logs.mkdir(mode=0o700)
+        env = dict(env, **{'rocketmq.client.logRoot': str(self.client_logs),
+                          'rocketmq.client.logLevel': 'error'})
         self.process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=self.log, text=True, env=env, bufsize=1,
                                         start_new_session=True)
@@ -596,6 +601,39 @@ def main():
         failure = type(exc).__name__ + ": " + str(exc)
         raise
     finally:
+        failure_diagnostics = None
+        if failure:
+            # Only hashes and fixed labels leave the private fixture. Never
+            # publish raw client/Broker logs, message bytes or credentials.
+            try:
+                client_diagnostics = []
+                for probe in probes[-16:]:
+                    for path in list(probe.client_logs.glob('*.log'))[:1]:
+                        with path.open('rb') as stream:
+                            stream.seek(max(0, path.stat().st_size - 1048576))
+                            raw_log = stream.read(1048576)
+                            item = summarize(raw_log)
+                        probe.drain()
+                        if (any(e.get('event') == 'closed' and e.get('decision') == 'failed_start_drained'
+                                for e in probe.events)
+                                and not any(e.get('event') in ('ready', 'half', 'result') for e in probe.events)):
+                            # The public probe creates its message only AFTER
+                            # Ready. This failed process has no business wire.
+                            sensitive = [mysql_password, *[v for a in accounts.values() for v in a.values()]]
+                            description = startup_internal_description(raw_log, sensitive)
+                            if description is not None:
+                                item['startup_internal_description'] = description
+                        item['pid'] = probe.process.pid
+                        client_diagnostics.append(item)
+                broker_logs = run(['docker', 'exec', '--user', '0', broker, 'sh', '-c',
+                    'tail -c 524288 /home/rocketmq/logs/rocketmqlogs/proxy.log '
+                    '/home/rocketmq/logs/rocketmqlogs/broker.log 2>/dev/null'],
+                    required=False, timeout=20)
+                failure_diagnostics = {'clients': client_diagnostics,
+                                       'broker': summarize(broker_logs.stdout + broker_logs.stderr)}
+            except Exception:
+                # Diagnostics must never prevent the actual owned cleanup.
+                failure_diagnostics = {'capture_failed': True}
         probes_drained = True
         for p in reversed(probes):
             if not p.log.closed:
@@ -611,6 +649,7 @@ def main():
                   "mysql_image": mysql_image, "mongo_image": mongo_image, "clients": {"go": "5.1.4", "python": "5.1.2"},
                   "cases": cases, "passed": len(cases), "failed": int(failure is not None),
                   "skipped": 0, "failure": failure, "proof": proof,
+                  "failure_diagnostics": failure_diagnostics,
                   "cleanup": {"project_containers_remaining": bool(remaining), "compose_down_succeeded": True,
                               "probe_process_groups_drained": probes_drained},
                   "probe_receipts": [{"pid": p.process.pid, "exit_code": p.process.returncode,
@@ -659,6 +698,8 @@ def main():
                                               repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/sdk_faults.py", repo / "scripts/rocketmq/sdk_limits.py",
                                               repo / "scripts/rocketmq/audit_transaction_limit.py", repo / "scripts/rocketmq/routes.py",
                                               repo / "scripts/rocketmq/provision_v2.py")}
+        report['harness_sha256']['scripts/rocketmq/failure_diagnostics.py'] = hashlib.sha256(
+            (repo / 'scripts/rocketmq/failure_diagnostics.py').read_bytes()).hexdigest()
         report["go_probe_sha256"] = hashlib.sha256((args.go_probe or directory / "go-probe").read_bytes()).hexdigest() if (args.go_probe or directory / "go-probe").exists() else None
         dirty_sdk = args.sdk_api_go and not report.get("sdk_tracked_sources_clean", False)
         if dirty_sdk:

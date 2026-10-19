@@ -4,7 +4,7 @@
   "complete": true,
   "status": "reviewed_and_frozen_for_fixed_prerelease",
   "captured_at": "2026-10-19T06:16:27.525970+00:00",
-  "sdk_sha": "c02bc984f42a66da6852da2315ba7aab9e5c8610",
+  "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
   "reviewed_files_sha256": {
     "transaction/store.go": "e5712ab4eddb4a003f4a78e9b136e4680747f243b0780f80419b3fe37436708c",
     "transaction/evidence.go": "1af6428e3209d6870918221a90cd462efdcad24481e2cf1db7c3d29c5f4ed286",
@@ -51,6 +51,10 @@
     "infra": {
       "pr": 27,
       "sha": "b90817cd347045f8738811c6693f7401be9fc8f8"
+    },
+    "sdk_runtime_fix": {
+      "pr": 44,
+      "sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
     }
   },
   "protocol": {
@@ -64,5 +68,13 @@
   "complete_gate": "https://github.com/FangcunMount/infra/actions/runs/39210736275",
   "regression_gate": "https://github.com/FangcunMount/infra/actions/runs/39210736103",
   "source_tree_equal_to_reviewed_candidate": true,
-  "production_changed": false
+  "production_changed": false,
+  "previous_candidate_sha": "c02bc984f42a66da6852da2315ba7aab9e5c8610",
+  "runtime_fix": {
+    "pr": 44,
+    "merge_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+    "verified_at": "2026-10-19T08:21:29.440763+00:00",
+    "public_reviewed_files_unchanged": 12,
+    "api_schema_wire_changes": false
+  }
 }

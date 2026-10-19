@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "task": "T22",
+  "complete": false,
+  "captured_at": "2026-10-19T08:17:00.426190+00:00",
+  "failed_sdk_sha": "c02bc984f42a66da6852da2315ba7aab9e5c8610",
+  "run": "https://github.com/FangcunMount/infra/actions/runs/39219218278",
+  "passed_before_failure": 12,
+  "cleanup": {
+    "project_containers_remaining": false,
+    "compose_down_succeeded": true,
+    "probe_process_groups_drained": true,
+    "private_fixture_directory_removed": true
+  },
+  "startup_error": [
+    "grpc: error while marshaling: marshaling apache.rocketmq.v2.TelemetryCommand: size mismatch (see https://github.com/golang/protobuf/issues/1609): calculated=13, measured=20"
+  ],
+  "cause": "producerSettings.toProtobuf shared RetryPolicy with incoming applySettingsCommand mutation, changing an already captured TelemetryCommand during protobuf encoding.",
+  "deterministic_red": "TestProducerSettingsCommandOwnsRetrySnapshot fails on old c02bc98: server update mutated an already captured TelemetryCommand",
+  "fix_pr": "https://github.com/FangcunMount/reliable-messaging/pull/44",
+  "fix_sha": "895eef183603105cabda508c7cf4f0c51c3188ee",
+  "fix": "Locked retry-policy access/update, independent protobuf snapshots including nested durations, and locked request-timeout reads. No retry or business replay.",
+  "local_validation": {
+    "snapshot_concurrent_and_real_tls_race_repeats": 10,
+    "real_tls_exchanges_at_least": 2000,
+    "make_check": "passed including vet/race/docs49",
+    "make_lint": "passed, 0 issues",
+    "reproduced_driver_files": 38,
+    "public_api_reviewed_files_unchanged": 12
+  },
+  "upstream_context": "https://github.com/golang/protobuf/issues/1609",
+  "previous_candidate": "c02bc984f42a66da6852da2315ba7aab9e5c8610 superseded before publication",
+  "source_ci": "pending",
+  "tag_created": false,
+  "published": false,
+  "production_changed": false
+}
