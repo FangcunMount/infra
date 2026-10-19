@@ -11,17 +11,17 @@
 | 里程碑 | 任务 | 状态 | 完成门禁 |
 | --- | --- | --- | --- |
 | M2-0 | 既有批次 | ✅ 已完成 | 20 项真实验证，0 跳过 |
-| M2-P | T01 | 已建立；待 PR 合并 | 基线、任务及证据格式建立 |
+| M2-P | T01 | ✅ 已完成；infra PR21 合并 6fdefde | 基线、任务及证据格式建立 |
 | M2-1 | T02–T04 | ✅ 已完成 | 双语言契约及失败状态通过、PR 合并 |
 | M2-2 | T05–T09 | ✅ 已完成；SDK 合并 d7d1415 | 四种原事务适配及并发证明、PR 合并 |
 | M2-3 | T10–T13 | T10 完成；T11–T13 进行中 | Go 真 RPC、回查及关闭有界、PR 合并 |
-| M2-4 | T14–T16 | 待开始 | Python 线程/loop/取消证明、PR 合并 |
+| M2-4 | T14–T16 | 实现与单元验证已提交；真实验收待通过 | Python 线程/loop/取消证明、PR 合并 |
 | M2-5 | T17–T20 | 待开始 | 正式 SDK 故障集成 required CI 非空且 0 跳过、PR 合并 |
 | M2-6 | T21–T24 | 待开始 | 固定 tag/制品及下载重装通过 |
 
 | 完成 | ID | 任务与门禁 | 完成时间 / 源码 / 证据 / PR |
 | --- | --- | --- | --- |
-| ✅ | T01 | 执行总表、基线、任务依赖、验证命令和证据格式 | 2026-10-19 +08:00；基线如上；24 个任务 ID 检查与 git diff --check 通过；提交 952d1c7，本分支待 PR |
+| ✅ | T01 | 执行总表、基线、任务依赖、验证命令和证据格式 | 2026-10-19 +08:00；基线如上；24 个任务 ID 检查与 git diff --check 通过；提交 952d1c7；infra PR21 已合并 6fdefde |
 | ✅ | T02 | Sender/Executor/Store/Checker 契约和冻结 codec；双语言 round-trip | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；[SDK PR35](https://github.com/FangcunMount/reliable-messaging/pull/35) CI 全通过并合并为 4c098c5 |
 | ✅ | T03 | 请求/计划/执行 fence；重复请求、新执行、显式重建计划契约 | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；[SDK PR35](https://github.com/FangcunMount/reliable-messaging/pull/35) CI 全通过并合并为 4c098c5 |
 | ✅ | T04 | 三阶段结果、取消、部分准备与未知提交状态矩阵 | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；[SDK PR35](https://github.com/FangcunMount/reliable-messaging/pull/35) CI 全通过并合并为 4c098c5 |
@@ -31,12 +31,12 @@
 | ✅ | T08 | Python SQLAlchemy/MySQL guard；根事务/savepoint/AUTOCOMMIT | 2026-10-19 +08:00；SDK d1a9cf5；[真实依赖证据](evidence/rocketmq-m2-sdk-storage-20261019.json)；[PR36](https://github.com/FangcunMount/reliable-messaging/pull/36) 全部 CI 通过并合并 d7d1415 |
 | ✅ | T09 | reservation、资格、中止器；迟到提交隔离 | 2026-10-19 +08:00；SDK d1a9cf5；[真实依赖证据](evidence/rocketmq-m2-sdk-storage-20261019.json)；[PR36](https://github.com/FangcunMount/reliable-messaging/pull/36) 全部 CI 通过并合并 d7d1415 |
 | ✅ | T10 | Go driver context、回查准入、关闭；源码复现 | 2026-10-19 +08:00；SDK 1846f4d；[驱动与真 Broker 证据](evidence/rocketmq-m2-sdk-driver-20261019.json)；PR37 合并 ab7aa78 |
-| ☐ | T11 | Go Sender 多分支准备、本地执行、最终确认 | — |
-| ☐ | T12 | Go 精确 Checker；跨实例、饱和、DB 预算 | — |
-| ☐ | T13 | Go Start/准入/Close/Wait；失败清理、关闭超时 | — |
-| ☐ | T14 | Python 实例级有界 Producer；阻断上游无界队列 | — |
-| ☐ | T15 | Python Sender/Checker/宿主 loop；session 不跨线程 | — |
-| ☐ | T16 | Python 取消、真实在途记账、关闭、多客户端隔离 | — |
+| ☐ | T11 | Go Sender 多分支准备、本地执行、最终确认 | [PR38](https://github.com/FangcunMount/reliable-messaging/pull/38)；[首轮公开 SDK 真实 Broker 10/10](evidence/rocketmq-m2-sdk-go-20261019.json)；最新三分支及单调审计验收待通过 |
+| ☐ | T12 | Go 精确 Checker；跨实例、饱和、DB 预算 | 首轮 MySQL/Mongo 新实例真实回查通过；最新数据库中断/资源预算验收待通过；不以 raw probe 替代 SDK |
+| ☐ | T13 | Go Start/准入/Close/Wait；失败清理、关闭超时 | race/关闭超时计数通过；真实不受信 CA 启动清理、同进程多客户端验收待通过 |
+| ☐ | T14 | Python 实例级有界 Producer；阻断上游无界队列 | [PR39](https://github.com/FangcunMount/reliable-messaging/pull/39)，SDK d5ffba9；11 项编排/真实线程池测试、ruff、全源码 mypy 通过；完整真实依赖门禁待通过 |
+| ☐ | T15 | Python Sender/Checker/宿主 loop；session 不跨线程 | [PR39](https://github.com/FangcunMount/reliable-messaging/pull/39)，SDK d5ffba9；11 项编排/真实线程池测试、ruff、全源码 mypy 通过；完整真实依赖门禁待通过 |
+| ☐ | T16 | Python 取消、真实在途记账、关闭、多客户端隔离 | [PR39](https://github.com/FangcunMount/reliable-messaging/pull/39)，SDK d5ffba9；11 项编排/真实线程池测试、ruff、全源码 mypy 通过；完整真实依赖门禁待通过 |
 | ☐ | T17 | SDK/infra v2 路由、类型、owner ACL、共享消费预算 | — |
 | ☐ | T18 | 正式 SDK 跨语言/MySQL、Go/Mongo 真端到端 | — |
 | ☐ | T19 | 退出、断网、DB 提交丢回复、Broker 重启故障矩阵 | — |
