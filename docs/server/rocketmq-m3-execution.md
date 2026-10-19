@@ -4,7 +4,7 @@
 
 ## 当前执行快照
 
-- 进度：**4/36**；T01–T04 实现与任务必需验证完成。T05 开始；M3-P仍等待最终完整CI与PR合并，不把任务完成冒充上线。
+- 进度：**4/36**；T01–T04 实现与任务必需验证完成。T05 开始；M3-P已通过完整CI并完成四库PR合并；M3-1进行中，生产切换单独记账。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码合并：未发生 M3 合并。稳定 SDK 发布：未执行。生产部署/DDL/Topic/ACL/provider 切换：未执行。system 验收与 48 小时观察：未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
@@ -17,10 +17,10 @@ IAM、qs-server、qs-ai 最终采用 RocketMQ：可靠发布使用事务消息�
 | 仓库 | 起始 main SHA | 责任 |
 | --- | --- | --- |
 | reliable-messaging | `1630aa59d87abf1c69f183be4be7c662a29cae52` | 已有 M2 事务 SDK；预发布运行源码 bfaae2b |
-| IAM | `b8e8a9e604074f9850472f2538137e342964fc0c` | 授权事实、策略版本及订阅 |
+| IAM | main c0acb432；T05 codex/rocketmq-m3-iam | [PR130](https://github.com/FangcunMount/iam/pull/130)已合并；[最终CI](https://github.com/FangcunMount/iam/actions/runs/39255584214)/[独立并发](https://github.com/FangcunMount/iam/actions/runs/39255584248)通过 | 生产CD保持暂停，M3未切换 |
 | qs-server | `f6ee489a88276822069612865f2decf40168afdd` | MySQL/Mongo 业务事务、消费与 AI 对接 |
 | qs-ai | `c288eb94c09a8ac930f0ae6b03d62a09147b72fb` | 模型事实、状态、冻结结果及回执 |
-| infra | `5ae07289d64ef44a50e79d4d387cc0d13d555cf9` | serverD Docker Broker、资源与生产交付 |
+| infra | codex/rocketmq-m3 | [PR37](https://github.com/FangcunMount/infra/pull/37)已合并878c130；进度后续PR单列 | M3生产变更未执行 |
 
 已确认：先完成固定预发布接入验证，再发布稳定 SDK；生产只做一次协调切换，维护窗口目标 30 分钟；IAM 增加可选幂等键和操作查询，兼容旧调用。保持三个 worker 原资源及并发，不迁 Redis、不做 Broker HA 改造或跨云吞吐压测。历史 Outbox 表、NSQ 数据卷和事务证据不在本批物理删除范围。
 
@@ -91,8 +91,8 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 
 | 里程碑 | 内容 | 任务 | 状态 | 完成门禁 |
 | --- | --- | --- | --- | --- |
-| M3-P | 基线、清单与接入基础 | T01–T04 | ☐ 进行中 | 责任、迁移契约、实现验证与合并 |
-| M3-1 | IAM | T05–T08 | ☐ 待开始 | 原事务、幂等与双订阅 |
+| M3-P | 基线、清单与接入基础 | T01–T04 | ✅ 已完成 | 责任、迁移契约、实现验证与合并 |
+| M3-1 | IAM | T05–T08 | ☐ 进行中 | 原事务、幂等与双订阅 |
 | M3-2 | QS 领域及调度 | T09–T13 | ☐ 待开始 | 双存储和未来重试 |
 | M3-3 | QS↔AI | T14–T20 | ☐ 待开始 | 档案、回执、安全、模型恢复 |
 | M3-4 | 故障与运维 | T21–T25 | ☐ 待开始 | 真实故障及切换工具 |
@@ -102,11 +102,11 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 
 | 完成 | ID | 任务及验收结果 | 状态/证据 |
 | --- | --- | --- | --- |
-| ✅ | T01 | 执行总表、独立工作区、完整 SHA 基线、证据格式及 PR 台账 | 2026-10-19；实现8e5c9a9；[基线与36项/8里程碑验证](evidence/rocketmq-m3-baseline-20261019.json)；[PR37](https://github.com/FangcunMount/infra/pull/37)草稿，未合并 |
+| ✅ | T01 | 执行总表、独立工作区、完整 SHA 基线、证据格式及 PR 台账 | 2026-10-19；实现8e5c9a9；[基线与36项/8里程碑验证](evidence/rocketmq-m3-baseline-20261019.json)；[PR37](https://github.com/FangcunMount/infra/pull/37)已合并878c130 |
 | ✅ | T02 | 全部生产者/消费者/订阅/Outbox/调度/恢复清单及105前置 | 2026-10-19；[责任清单](rocketmq-m3-inventory.md)/[源码核验](evidence/rocketmq-m3-inventory-20261019.json)：17目录事件、9协议kind、39文件、IAM12版本调用文件、QS8 Stage文件；生产盘点另属T30/T32 |
-| ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；初版IAM e50686c7 / QS98645d817 / AI81db026；race63/56、AI45通过；PR130/407/158草稿；本轮合并校验见T04证据，未合并；真实依赖另属T22/T23 |
-| ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；源码PR仍待合并，QS完整剩余回归单列 |
-| ☐ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 待开始 |
+| ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；初版IAM e50686c7 / QS98645d817 / AI81db026；race63/56、AI45通过；PR130/407/158已合并；最终CI/合并见T04证据；真实依赖另属T22/T23 |
+| ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；四库PR均合并，三库最终完整CI通过；生产未切换 |
+| ☐ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 进行中；独立iam-business / codex/rocketmq-m3-iam；冻结计划、首事件复用及根事务CAS基础实现，本项尚未完成 |
 | ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 待开始 |
 | ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 待开始 |
 | ☐ | T08 | IAM 与 QS 双订阅、乱序、freshness 回归 | 待开始 |
@@ -151,7 +151,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | 幂等冻结 | 单一有效执行、输入冲突、首次ID/时间/密文/wire复用、CAS冲突 |
 | 业务 | 授权双订阅、答卷→评分→报告、提醒、自动/人工/暂停重试、AI command→receipt→state→ACK |
 | 真实故障 | half/final丢回复、DB提交前后断网、部分分支、SIGKILL、新实例回查、Broker重启 |
-| AI | invocation不增加，frozen/checkpoint/artifact/receipt及unknown原治理保持 |
+| AI | main c321a694 | [PR158](https://github.com/FangcunMount/qs-ai/pull/158)已合并；[完整CI](https://github.com/FangcunMount/qs-ai/actions/runs/39254547832)/[M7](https://github.com/FangcunMount/qs-ai/actions/runs/39254547837)通过 | 自动生产部署false，M3未切换 |
 | 生命周期 | 关闭准入、真实在途、队列/锁等待、关闭超时/重复关闭/客户端隔离 |
 | 安全 | owner/类型/ACL/查询越权拒绝，Prepared正文不可读 |
 | 兼容恢复 | 旧档案、非空记录、未来计划精确交接，unknown不重置 |
@@ -187,11 +187,11 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 
 | 对象 | 分支/制品 | PR/合并 | 发布/部署/验收 |
 | --- | --- | --- | --- |
-| infra | codex/rocketmq-m3 | [PR37](https://github.com/FangcunMount/infra/pull/37)，草稿 | M3生产变更未执行 |
+| infra | codex/rocketmq-m3 | [PR37](https://github.com/FangcunMount/infra/pull/37)已合并878c130；进度后续PR单列 | M3生产变更未执行 |
 | SDK | codex/rocketmq-m3 | 无M3变更 | 仍为M2固定预发布 |
-| IAM | codex/rocketmq-m3 / 36240da9 | [PR130](https://github.com/FangcunMount/iam/pull/130)，草稿，[同步main后CI重跑](https://github.com/FangcunMount/iam/actions/runs/39249335104) | 生产未切换 |
-| QS | codex/rocketmq-m3 / 9b7aa1542 | [PR407](https://github.com/FangcunMount/qs-server/pull/407)，草稿，[同步main后CI重跑](https://github.com/FangcunMount/qs-server/actions/runs/39249368688) | 生产未切换 |
-| AI | codex/rocketmq-m3 / 3101453 | [PR158](https://github.com/FangcunMount/qs-ai/pull/158)，草稿，[同步main后CI重跑](https://github.com/FangcunMount/qs-ai/actions/runs/39249344742) | 生产未切换 |
+| IAM | main c0acb432；T05 codex/rocketmq-m3-iam | [PR130](https://github.com/FangcunMount/iam/pull/130)已合并；[最终CI](https://github.com/FangcunMount/iam/actions/runs/39255584214)/[独立并发](https://github.com/FangcunMount/iam/actions/runs/39255584248)通过 | 生产CD保持暂停，M3未切换 |
+| QS | main9ebf2d6c | [PR407](https://github.com/FangcunMount/qs-server/pull/407)已合并；[最终CI](https://github.com/FangcunMount/qs-server/actions/runs/39255581089)通过 | 生产CD保持暂停，M3未切换 |
+| AI | main c321a694 | [PR158](https://github.com/FangcunMount/qs-ai/pull/158)已合并；[完整CI](https://github.com/FangcunMount/qs-ai/actions/runs/39254547832)/[M7](https://github.com/FangcunMount/qs-ai/actions/runs/39254547837)通过 | 自动生产部署false，M3未切换 |
 
 ### 执行记录
 
@@ -210,3 +210,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-19：T04档案验收推进：AI10687a1的两档MySQL各205项（3原生schema/archive＋119 source regression＋83原事务/交接/模型恢复），均0FAIL/ERROR/SKIP并完成wheel/sdist构建；QS c5683c7df原生M3档案/双库步骤通过，最终2936bd512仅移除lint发现的无效赋值并绑定文档，固定lint0问题、87 docs门禁通过。IAM主CI已通过，但独立并发工作流status仍拒绝正确42，已提交78b5495c精确表清单修复和拒绝测试，等待原生重跑。只读回读确认IAM/QS生产CD暂停、AI自动部署false；未改变量。全部历史失败/候选保持来源；总计仍3/36，T04等最终必需门禁后打勾。
 
 - 2026-10-19：T04完成，总进度4/36。三库schema、双库原事务、不可变档案、精确committed读取、Prepared/损坏拒绝及旧reader兼容必需验证通过；AI全3101项/每MySQL版本0跳过，IAM当头三档原生与独立并发全部通过，QS当头M3原生步骤通过。T04候选固定供最终全CI/PR合并；M3-P不提前标完成。进入T05独立工作区，仅推进IAM源码与隔离测试，不触碰生产。
+
+- 2026-10-19：M3-P完成。最终三库全部PR门禁通过，精确head合并IAM PR130→c0acb432、QS PR407→9ebf2d6c、AI PR158→c321a694、infra PR37→878c130。合并前后只读确认生产CD暂停/自动部署false，未发布稳定SDK或执行生产M3。infra同步已由其他工作流合入的MySQL TLS工具/CA，逐文件保留该main内容；不改写其交付证据。T05在独立iam-business工作区基于c0acb432继续；当前4/36，新增冻结计划/原事件复用/CAS基础与真实并发测试尚待完整任务验收。

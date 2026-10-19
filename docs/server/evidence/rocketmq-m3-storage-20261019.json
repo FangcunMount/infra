@@ -3,7 +3,7 @@
   "task_ids": [
     "T04"
   ],
-  "observed_at": "2026-10-19T13:04:11.516055+00:00",
+  "observed_at": "2026-10-19T13:15:06.719959+00:00",
   "status": "complete",
   "complete": true,
   "stage": "host-schema-immutable-archive-and-legacy-compatibility",
@@ -11,7 +11,7 @@
     "iam": {
       "source_sha": "78b5495c6ecf1073b09f43e57d7701bf661934c3",
       "head_sha": "78b5495c6ecf1073b09f43e57d7701bf661934c3",
-      "merged": false,
+      "merged": true,
       "ci": "https://github.com/FangcunMount/iam/actions/runs/39255584214",
       "ci_status": "success; all3 native schema versions; separate concurrency39255584248 success",
       "native_mysql_84": {
@@ -29,17 +29,18 @@
           "ci_status": "success including all three native MySQL schema jobs"
         }
       ],
-      "main_merged": "bf2882e9a9d915a5aefd194c1b52a2d4c2d5e853"
+      "main_merged": "bf2882e9a9d915a5aefd194c1b52a2d4c2d5e853",
+      "merge_sha": "c0acb432ae4c03978264e2c63441011b1a4b8f31"
     },
     "qs-server": {
-      "source_sha": "ffdddb36d8d31b8016f974416212a120edc0c940",
-      "head_sha": "9b7aa154241ef06dd8d27b70e3efb44f83303f44",
-      "merged": false,
-      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39249368688",
+      "source_sha": "3f47ff9f458e",
+      "head_sha": "2936bd51229f51b95308fb058b295fd3b9e88b7b",
+      "merged": true,
+      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39255581089",
       "native_ci_status": "success",
       "native_job": "https://github.com/FangcunMount/qs-server/actions/runs/39246803082/job/118040610503",
       "native_log_sha256": "832868a8ac6f9517f0274bb63823137ce2b56bad8c0ebb598385e393c7a3fbbd",
-      "ci_status": "success at post-main-sync candidate (before archive additions)",
+      "ci_status": "success; complete final candidate CI",
       "previous_candidates": [
         {
           "head_sha": "b31fa2c34492c2633597e97476f41089dfa48b06",
@@ -49,12 +50,13 @@
         }
       ],
       "main_merged": "39cb018d9077a7857d57cdb7a5f25df0ef72ac81",
-      "native_source_sha": "b31fa2c34492c2633597e97476f41089dfa48b06"
+      "native_source_sha": "b31fa2c34492c2633597e97476f41089dfa48b06",
+      "merge_sha": "9ebf2d6c5b8b7eec60efe608b73193cc614b9a2c"
     },
     "qs-ai": {
       "source_sha": "2f7991e",
       "head_sha": "10687a10f2c9bf86c781f27220dcff2f6aa4a836",
-      "merged": false,
+      "merged": true,
       "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547832",
       "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547837",
       "prior_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246774031",
@@ -86,7 +88,8 @@
       "native_source_sha": "cbc2a90",
       "prior_targeted_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789",
       "prior_targeted_status": "success including native M3 two cases and all historical receipt/model regression/build gates in both jobs",
-      "m7_status": "success at3101453; prior two native schema cases and historical receipt/model gates"
+      "m7_status": "success at3101453; prior two native schema cases and historical receipt/model gates",
+      "merge_sha": "c321a69411d1f9494de1e36f94834a974fbb15ea"
     }
   },
   "reports": {
@@ -258,7 +261,7 @@
       "python_sdk": "0.4.0a1",
       "go_sdk": "v0.5.0-rocketmq-tx.1",
       "broker": "not used by T04 installation/archive proof; actual sender/host faults remain later tasks",
-      "cleanup": "owned native schemas dropped in fixture finalizers; CI service container stop completed for AI and IAM; QS full-job cleanup pending job completion"
+      "cleanup": "owned native schema fixture cleanup and all final CI service container stop completed; no production or existing local containers changed"
     }
   },
   "migration_resources": {
@@ -288,7 +291,7 @@
   ],
   "remaining": [],
   "boundaries": [
-    "4/36; T04 checked only after schema/archive/root/retained-reader task proofs passed; milestone awaits PR merges",
+    "4/36; T04 checked only after schema/archive/root/retained-reader task proofs passed; M3-P required PRs merged; production remains separate",
     "IAM local broad regression has 18 pre-existing optional MySQL skips; not a required-native pass",
     "Go tagged native tests compile locally but have not executed a database locally",
     "No business write entry migrated, no merge/stable release/production schema/Topic/ACL/provider change",
@@ -364,7 +367,7 @@
       "source_sha": "3f47ff9f4",
       "head_sha": "2936bd51229f51b95308fb058b295fd3b9e88b7b",
       "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39255581089",
-      "status": "running/queued; prior c5683c7df native M3 archive step passed, final patch removes only redundant dead assignment; pinned lint0 issues and docs87 passed"
+      "status": "success: complete final candidate CI including required native archive and all regression gates"
     },
     "qs-ai": {
       "source_sha": "2f7991e",
@@ -408,7 +411,28 @@
     "iam.PRODUCTION_DEPLOY_PAUSED": "true",
     "qs-server.PRODUCTION_DEPLOY_PAUSED": "true",
     "qs-ai.AUTO_DEPLOY_ENABLED": "false",
-    "scope": "repository variable readback only; not production runtime/schema/business acceptance; no variable writes"
+    "scope": "repository variable readback only; not production runtime/schema/business acceptance; no variable writes",
+    "post_merge_verified": true
   },
-  "completion_boundary": "T04 implementation and task-required proofs complete. No business writer migrated. Overall milestone/merge, final CI, artifacts/stable publication, production and business acceptance remain separate."
+  "completion_boundary": "T04 and M3-P complete after validation and source merges. Stable SDK publication, business write integration, production deployment, system acceptance and48h observation remain pending their own tasks.",
+  "milestone": "M3-P complete: task validation and required source merges passed",
+  "merged_at": "2026-10-19T13:12:17Z",
+  "merge_receipts": {
+    "iam": {
+      "pr": 130,
+      "sha": "c0acb432ae4c03978264e2c63441011b1a4b8f31"
+    },
+    "qs-server": {
+      "pr": 407,
+      "sha": "9ebf2d6c5b8b7eec60efe608b73193cc614b9a2c"
+    },
+    "qs-ai": {
+      "pr": 158,
+      "sha": "c321a69411d1f9494de1e36f94834a974fbb15ea"
+    },
+    "infra": {
+      "pr": 37,
+      "sha": "878c1306208d398c8b1d36e71948d31bc60e258b"
+    }
+  }
 }
