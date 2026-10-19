@@ -48,5 +48,17 @@
   "cross_profile_assets_identical": true,
   "merged": false,
   "formally_published": false,
-  "production_changed": false
+  "production_changed": false,
+  "go_branch_preflight": {
+    "source_sha": "3bf3dc80dad889c3f51cc45e4490331b8d45d3f2",
+    "module": "github.com/FangcunMount/reliable-messaging",
+    "resolved_version": "v0.4.0-rocketmq.1.0.20261019045156-3bf3dc80dad8",
+    "sum": "h1:lL7kL6+yQjdoCngpU6CxrHlL+GyE8mXfGgNgwyYYaPI=",
+    "go_mod_sum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=",
+    "verified_source_files": 209,
+    "public_probe_build_from_module_cache": true,
+    "local_replace": false,
+    "published_tag_proof": false,
+    "note": "Initial local goproxy.cn sumdb lookup was unavailable; operation-level official GOPROXY and GOSUMDB succeeded without global configuration changes"
+  }
 }
