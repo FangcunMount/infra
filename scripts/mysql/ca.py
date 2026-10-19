@@ -18,11 +18,23 @@ def validate_ca(ca):
     certificates = re.findall(pattern, ca)
     if not certificates or re.sub(pattern, b'', ca).strip():
         raise ValueError('Only a public CA PEM chain is accepted')
+    valid_roots = 0
     for certificate in certificates:
-        result = subprocess.run(['openssl', 'x509', '-checkend', '86400', '-noout', '-text'],
+        result = subprocess.run(['openssl', 'x509', '-noout', '-text', '-subject', '-issuer',
+                                 '-nameopt', 'RFC2253'],
                                 input=certificate, capture_output=True, check=True)
         if b'CA:TRUE' not in result.stdout:
             raise ValueError('Certificate is not a CA')
+        names = dict(line.split(b'=', 1) for line in result.stdout.splitlines()
+                     if line.startswith((b'subject=', b'issuer=')))
+        if names.get(b'subject') == names.get(b'issuer'):
+            status = subprocess.run(['openssl', 'x509', '-checkend', '86400', '-noout'],
+                                    input=certificate, capture_output=True)
+            valid_roots += status.returncode == 0
+    # Official bundles retain retired regional intermediates. They are not the
+    # negotiated server chain; Go/OpenSSL still validate that chain and its dates.
+    if not valid_roots:
+        raise ValueError('CA bundle contains no valid trust root')
 
 
 def source(ref):

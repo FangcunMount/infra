@@ -1,0 +1,11 @@
+{
+  "provider": "Alibaba Cloud RDS",
+  "instance_id": "rm-2zet3fx250176qq8j",
+  "public_endpoint": "rm-2zet3fx250176qq8jko.mysql.rds.aliyuncs.com",
+  "sha256": "2dc6de20eab8451cc779001466f42b5ed05e554bbf479de6f194c35a1bfbc436",
+  "source": "RDS console > Data Security > SSL > Download CA certificate",
+  "documentation": "https://www.alibabacloud.com/help/zh/rds/apsaradb-rds-for-mysql/configure-a-cloud-certificate-to-enable-ssl-encryption",
+  "retrieved_at": "2026-10-19T10:05:28.814122+00:00",
+  "certificate_count": 81,
+  "notes": "Original official PEM bytes; includes retired regional intermediates. TLS clients validate the negotiated server chain, dates and hostname; no validation bypass."
+}
