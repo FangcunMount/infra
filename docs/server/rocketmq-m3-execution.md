@@ -4,12 +4,12 @@
 
 ## 当前执行快照
 
-- 进度：**8/36**；T01–T08 实现与任务必需验证完成。IAM T07/T08与QS T08均已合并；M3-1全部实现/必需验收及相关源码合并完成，infra PR41已通过当前全部检查并合并，生产切换单独记账。
+- 进度：**9/36**；T01–T09 实现与任务必需验证完成。T09最终源码/同包策略及本地、云端16项原生验收通过，PR411及infra PR46的当前头完整CI与合并继续单独记账；M3-2尚未完成。生产切换未执行。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T09 原事务入口[QS PR410](https://github.com/FangcunMount/qs-server/pull/410)已合并3afc76a6；装配[QS PR411](https://github.com/FangcunMount/qs-server/pull/411)本地及云端15项已通过，复核新增混合版本拒绝并扩展为16项，最终门禁继续。源码全仓race6908通过/60既有可选依赖跳过，不勾选T09，生产CD仍暂停。[本批证据](evidence/rocketmq-m3-qs-answer-20261020.json)。
+- 当前批次：T09实现与验证完成并勾选，原事务入口[QS PR410](https://github.com/FangcunMount/qs-server/pull/410)已合并3afc76a6；装配[QS PR411](https://github.com/FangcunMount/qs-server/pull/411)源码race6909通过/60既有可选依赖跳过，16项原生验收本地及云端0失败/0跳过。同包策略修复已验证；当前头完整CI与合并另记。下一项T10在独立qs-evaluation工作区推进；生产CD仍暂停。[本批证据](evidence/rocketmq-m3-qs-answer-20261020.json)。
 
 ## 1. 目标、基线和授权边界
 
@@ -111,7 +111,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 2026-10-20；89bdcf58三档MySQL每档12具名项、共36项0跳过；Mac mini隔离RocketMQ5.5.1/MySQL8.0.44完整21项0失败0跳过，含实际IAM宿主4项证明，临时资源已清理；[完整证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；[PR132](https://github.com/FangcunMount/iam/pull/132)合并7accc92c，生产未变更 |
 | ✅ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 2026-10-20；57b07bab正式Go SDKtx.2；必需三档MySQL原事务/HTTP各34项，真实Broker各21项，全部0失败/跳过；PR134合并d53c36a9；[证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
 | ✅ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 2026-10-20；IAM51405831/QS696ee314锁定正式Go SDKtx.2；三档MySQL原事务各34项、成对Broker/fanout各22项0失败/跳过，Mac mini额外22项通过；IAM PR135合并e3efa5b3、QS PR409合并2e95630b；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
-| ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 进行中；独立qs-domain工作区基线2e95630b，5个目标包race通过；原Mongo根事务/202/幂等及V1审计恢复链已核对，正在实现冻结BSON/首次wire、V2证据和原session guard，尚无真实事务验收完成声明 |
+| ☑ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 已完成实现与验证；原事务/冻结BSON与wire、V2精确读取、实际Collection/gRPC 202和503、并发原赢家、Mongo failpoint重入、ACK客户端丢弃及新实例读取16项在Mac mini和GitHub实际通过。最终源码deb46e67全仓race6909通过/60既有可选依赖跳过，同包策略与87项文档检查通过；PR410合并3afc76a6，PR411/infra46最终头CI和合并单列；不表示生产或system验收。[证据](evidence/rocketmq-m3-qs-answer-20261020.json) |
 | ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 待开始 |
 | ☐ | T11 | QS 报告生成/失败，冻结与终态恢复 | 待开始 |
 | ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 待开始 |
@@ -271,3 +271,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：T09装配批次固定QSf95ebc05、infra4c321148在Mac mini扩展至15项原生验收全部通过，0失败/0跳过/无race，专用容器/进程/目录全部清理；Survey显式选用事务Store，真实protobuf/gRPC服务经受控bufconn连接Collection application/REST，Committed精确证据返回原ID的202，Reference冲突返回503；并发同键仅原赢家执行一次，旧owner关闭后新client/runtime复用原结果。Collection到protobuf及身份为夹具端口，未冒称生产TLS/IAM/system或进程SIGKILL证明，真实包级丢回复及进程退出仍归T22/T23。全仓race6907通过/60既有可选依赖跳过；固定lint2.5零问题，87项文档自测/hygiene/facts通过；源码基线f95ebc05、后续文档head321e0989独立记录。当前准备宿主实际Go1.25.12 required云端门禁；T09未勾选，8/36，源码合并/生产分别待完成。
 
 - 2026-10-20：QS PR410当前头25项检查通过、1项API生成同步不适用，按f78987ec精确头合并main3afc76a6，生产CD合并前回读仍暂停；PR411改为main并为321e0989显式触发同头CI39337474712，避免原feature基底未触发main限定CI而漏门禁。infra最新Go1.25.12宿主11项39336176609与装配15项39337093068均在线通过，后者已下载核对0失败/0跳过及全部清理回执。复核发现V1标记若同时包含V2事务证据会进入历史接受分支；新增纯版本选择拒绝与真实HTTP503回归，源码62dfaac1/文档head528ec496，验收扩为16项后重新绑定。全仓race6908通过/60既有可选依赖跳过、固定lint2.5零问题和87项文档检查通过；最终16项本地/云端复验继续，T09仍8/36，历史15项成功不改写成新头证明。
+
+- 2026-10-20：T09实现及必需验证完成，勾选并更新9/36。最终16项原生门禁本地528ec496/infra4be8e6a及云端39338243991均0失败/0跳过/无race，已下载核对真实报告摘要18dff0cb及全部资源清理回执；当前deb46e67相对528仅增加同包回归与文档标记，生产和原生夹具源码相同，不重标旧报告SHA。原Tier1失败39337890729/job118351863412保留：Collection代码注释变更缺少同包测试，已加入“ID存在但证据Unavailable不可接受/重写”的有意义回归，同包策略对实际main基底复验通过。deb46e67全仓race6909通过/0失败/60既有可选依赖跳过，87项文档检查通过；当前头CI继续，旧321手动CI因候选被替代在排队中取消。infra PR45当前11项全成功并合并0237e589；QS PR411及infra46尚未合并，M3-2不标完成。下一项T10只读定位了评分请求、结果与失败三个原根事务，以及失败路径中的未来重试责任；独立工作区qs-evaluation开始本批，不更改生产链路。

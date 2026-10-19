@@ -2,9 +2,9 @@
   "version": 1,
   "batch": "M3-2",
   "task": "T09",
-  "status": "in_progress",
-  "completed": false,
-  "total_progress": "8/36",
+  "status": "completed_implementation_and_required_verification",
+  "completed": true,
+  "total_progress": "9/36",
   "qs_baseline": "2e95630b35c28d4840a3c13b3059d667eca49049",
   "qs_candidate": "080d4d7dc606379aabbd3e3ee8e804b551863ede",
   "qs_pr": "https://github.com/FangcunMount/qs-server/pull/410",
@@ -90,8 +90,8 @@
     "production_or_existing_service_changes": false
   },
   "remaining": [
-    "current-head required cloud native/source checks",
-    "review and separate merge tracking"
+    "current-head full cloud CI and PR411/infra46 merge tracking; task implementation and required native proof completed",
+    "production common owner lifecycle, actual process/packet failure and system acceptance remain their later M3 tasks"
   ],
   "delivery": {
     "draft_pr": true,
@@ -109,7 +109,11 @@
         "skip_scope": "generated API sync not applicable"
       }
     },
-    "module_pr": "https://github.com/FangcunMount/qs-server/pull/411"
+    "module_pr": "https://github.com/FangcunMount/qs-server/pull/411",
+    "module_merged": false,
+    "infra_46_merged": false,
+    "current_head_full_ci": "pending",
+    "milestone_m3_2": "in_progress"
   },
   "qs_review_head": "f78987ecea60ab254aabf3900d78e74b3cf53500",
   "docs_gate": {
@@ -233,8 +237,47 @@
       "report_sha256": "d7661540f9b478d6e1268eb22f77ec71e5ef415bb115a506f859341ddaa11a7a"
     },
     "native_required": {
-      "status": "pending",
-      "expected_cases": 16
+      "status": "passed",
+      "cases": 16,
+      "local_source_sha": "528ec496c621a54f0d2c82f13fed057500366e6d",
+      "local_report_sha256": "fd3aafd499722d443533fb8401c22ee2fee8f50473469c3ccfcd93edb32b391c",
+      "local_cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cloud_run": "https://github.com/FangcunMount/infra/actions/runs/39338243991",
+      "cloud_source_sha": "528ec496c621a54f0d2c82f13fed057500366e6d",
+      "cloud_passed": 16,
+      "cloud_failed": 0,
+      "cloud_skipped": 0,
+      "cloud_report_sha256": "18dff0cb71e92cee7f85d0209458ce956d21a7e1c1345275d64ed5e4fcb533bb",
+      "cloud_cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cases_passed": {
+        "closed_admission_no_business": true,
+        "collection_202_exact_root": true,
+        "collection_unknown_witness_no202": true,
+        "committed_ack_discard_exact_recovery": true,
+        "concurrent_reservation_one_execution": true,
+        "conflicting_input_rejected": true,
+        "duplicate_does_not_execute": true,
+        "full_reference_required_for_acceptance": true,
+        "half_does_not_accept_business": true,
+        "mixed_protocol_marker_rejected": true,
+        "native_callback_reentry": true,
+        "nested_preparation_rejected": true,
+        "new_instance_exact_accepted_result": true,
+        "no_new_publish_outbox": true,
+        "original_root_fact_and_witness_and_wire": true,
+        "root_abort_no_accepted_fact_or_witness": true
+      },
+      "scope": "real Mongo/RocketMQ, Survey, gRPC over owned bufconn and Collection REST; not system/production acceptance"
     },
     "docs": {
       "unit_passed": 87,
@@ -245,5 +288,39 @@
       "version": "2.5.0",
       "issues": 0
     }
+  },
+  "final_source_validation": {
+    "head": "deb46e67016eccc9b8da6edd69764de19b0ebfcb",
+    "passed": 6909,
+    "failed": 0,
+    "skipped": 60,
+    "skip_scope": "existing optional dependency tests; required native suite zero skipped",
+    "report_sha256": "069f7c5857e93761f0d8781c278d1b6bb2ae573d775709010adba55f74f07bc4",
+    "tier1_policy": "passed against actual origin/main; no policy or allowlist changes",
+    "docs": {
+      "unit_passed": 87,
+      "hygiene": true,
+      "facts": true
+    }
+  },
+  "native_to_final_head": {
+    "changed_files": [
+      "docs/document-closure.json",
+      "internal/collection-server/application/answersheet/submission_service_test.go"
+    ],
+    "production_and_native_fixture_code_identical": true,
+    "native_report_not_relabelled": true
+  },
+  "tier1_failed_attempt": {
+    "run": "https://github.com/FangcunMount/qs-server/actions/runs/39337890729",
+    "job": 118351863412,
+    "log_sha256": "d731c63ee86c68f4ccb4b47f20d298eb021b2f7a9b4484ca3f5a5e49ffd5a5a3",
+    "cause": "Collection code comment change had no same-package test diff",
+    "fix": "explicit regression prevents accepting a nonzero ID when witness read also returns Unavailable; policy unchanged"
+  },
+  "infra_base_merge": {
+    "pr": 45,
+    "merge_sha": "0237e58921f4578f202faa164b4bfd57aa9e27c4",
+    "current_head_checks_passed": 11
   }
 }
