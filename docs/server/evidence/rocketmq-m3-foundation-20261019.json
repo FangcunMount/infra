@@ -55,7 +55,7 @@
   "task_ids": [
     "T03"
   ],
-  "observed_at": "2026-10-19T10:31:26.756257+00:00",
+  "observed_at": "2026-10-19T11:33:26.434996+00:00",
   "stage": "source-foundation",
   "complete": true,
   "ci_complete": false,
@@ -70,12 +70,14 @@
     "qs-server": {
       "source_sha": "98645d817f1b677af205753f88104e954a3bfbc4",
       "pr": "https://github.com/FangcunMount/qs-server/pull/407",
-      "merged": false
+      "merged": false,
+      "documentation_head": "941a2a3c2e7f"
     },
     "qs-ai": {
       "source_sha": "81db02635e509a253f1803102f8c213d5bf00798",
       "pr": "https://github.com/FangcunMount/qs-ai/pull/158",
-      "merged": false
+      "merged": false,
+      "documentation_head": "ff16145"
     }
   },
   "python_sdk": {
@@ -88,11 +90,12 @@
   "static_validation": {
     "go_vet": "passed for both target package sets",
     "iam_docs": "hygiene and facts passed",
-    "qs_docs": "87 tests, hygiene and facts passed",
+    "qs_docs": "87 tests + hygiene/facts passed again at committed 941a2a3c2e7f, source baseline 98645d817",
     "python_ruff": "passed",
     "python_format": "4 files already formatted",
     "python_mypy": "passed for config and two bootstrap files",
-    "git_diff_check": "passed"
+    "git_diff_check": "passed",
+    "ai_docs": "75 active Markdown / 1314 local links / 0 errors; 12 docs regression tests passed at committed ff16145"
   },
   "handoff_audit": {
     "from_tag": "v0.4.0-rocketmq.1",
@@ -152,6 +155,10 @@
       },
       "source_sha": "81db02635e509a253f1803102f8c213d5bf00798",
       "result": "negative/NaN/infinite budgets rejected before sealing admission; 45 focused tests pass; ruff/type/diff checks pass"
+    },
+    {
+      "check": "first committed-head CI",
+      "result": "IAM applicable checks passed. QS 39237166930 docs source baseline rejected 98645d817; AI 39238007699 and 39238007658 source catalog rejected 81db026 before tests. Failures retained; no AI integration claimed. Reviewed prose/hash fixes pushed; reruns pending."
     }
   ],
   "boundaries": [
