@@ -246,3 +246,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：诊断矩阵39324475047三档均复现Go driver metric.go:321/338指标回写与ACK hook并发race，所有失败保留。独立SDK工作区补确定性回归：修复前3条race并失败，atomic meter pointer修复后通过，真实TLS400次ACK/连续metric-off回写通过，make check通过；待单独PR/固定Go修订制品及宿主重验，T07不勾选。T08新增IAM PR135、QS PR409；IAM source race1926通过/31既有可选跳过，QS目标85项通过，87项文档自测及facts通过。首次本地全仓源测试umask077改变既有权限夹具而失败，正常umask022复验通过，未改写该既有业务。Mac mini T08实际夹具发现writer缺声明身份resolver，修正为生产同样的ApplicationUnitOfWork(resolver)装配；当前仍未获得fanout通过证据，进度6/36。
 
 - 2026-10-20：SDK独立修复8fb6fc57创建[PR46](https://github.com/FangcunMount/reliable-messaging/pull/46)。38份Apache源码和新meter-snapshot.patch可完全复现；make check、真实TLS/race及golangci2.5.0通过，Go1.25.9/1.25.12云端源码检查已通过，PR检查/NSQ兼容与实际SDK双存储/跨语言矩阵继续运行。拟发布新的Go修订预发布v0.5.0-rocketmq-tx.2，不移动旧tag，不修改Python源码；稳定Go/Python同SHA配对仍由T27执行。[修复证据](evidence/rocketmq-m3-sdk-meter-repair-20261020.json)。
+
+- 2026-10-20：SDK PR46全部当前检查通过，按固定8fb6fc57完成合并（d06861e5）；Go1.25.9/1.25.12 make check、lint、Redis与NSQ兼容均绿。双存储及跨语言实际SDK矩阵39326382808仍在执行，Go修订tag尚未发布，宿主仍未切换依赖；M3保持6/36，源码合并/发布/宿主/生产分别记录。

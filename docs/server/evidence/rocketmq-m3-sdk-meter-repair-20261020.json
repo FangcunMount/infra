@@ -4,7 +4,7 @@
     "T07",
     "T08"
   ],
-  "status": "implemented, required SDK and real-dependency CI pending; not a stable release",
+  "status": "source merged; exact8fb PR and branch checks/NSQ compatibility all passed; required actual SDK matrix pending; tag not published",
   "source_sha": "8fb6fc57a415dc11e27fc64d71722f9675838bc3",
   "pr": "https://github.com/FangcunMount/reliable-messaging/pull/46",
   "scope": "private Apache Go5.1.4 meter pointer publication; public API/codec/wire/schema unchanged; Python source unchanged",
@@ -51,5 +51,8 @@
     "stable_pair": "M3 T27 still requires same-SHA Go/Python stable artifacts"
   },
   "production_changed": false,
-  "observed_at": "2026-10-19T21:20:52.095787+00:00"
+  "observed_at": "2026-10-19T21:26:07.768154+00:00",
+  "pr_status": "merged",
+  "merge_sha": "d06861e5b29f4e023872d0863e1f4d574ce78b34",
+  "merged_at": "2026-10-19T21:24:17Z"
 }
