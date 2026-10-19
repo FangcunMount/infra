@@ -29,6 +29,8 @@
 
 T22根因已定位：[实际脱敏错误及RED/GREEN证据](evidence/rocketmq-m2-sdk-telemetry-settings-race-20261019.json)。TelemetryCommand共享的RetryPolicy被Broker设置回调原地修改，实际protobuf编码calculated=13/measured=20；不是通用网络拒绝。SDK PR44已改为锁和独立快照，确定性旧代码失败、真实TLS及并发marshal/race连续10轮、完整make check/lint与38文件补丁复现通过。12个公开契约评审文件摘要不变，T21协议冻结仍有效；发布源码候选需换为修复合并SHA并重新执行T22完整门禁。
 
+当前修复候选bfaae2b（SDK PR44已合并）：[源码/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222098471)、[Python源码/wheel](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222109646)、[三档存储](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222116696)、[既有集成](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222098378)重新运行；infra ecbc5f8固定该SHA执行[31项](https://github.com/FangcunMount/infra/actions/runs/39222207805)、[46项](https://github.com/FangcunMount/infra/actions/runs/39222207667)、[48项](https://github.com/FangcunMount/infra/actions/runs/39222207821)、[完整回归](https://github.com/FangcunMount/infra/actions/runs/39222207962)。两语言制品将从同一新SHA重新生成，不使用旧c02bc98制品。
+
 下一步：完成T22的精确合并SHA全部CI和独立wheel/sdist安装，生成receipt/摘要后，执行T23固定发布及T24正式tag/下载制品重新安装验收。旧失败证据继续保留在下文和evidence中，不删除或计为通过。
 
 历史候选预检记录（当时）：已下载 SDK `3bf3dc8` 的双 Python profile 制品；源码与独立 wheel 各120项通过、0失败/跳过，wheel/sdist 摘要在两档一致且绑定同一源 SHA/树。见[候选预检证据](evidence/rocketmq-m2-sdk-candidate-20261019.json)。这不是最终合并候选或已发布制品的验证，不据此完成 T22/T24。另修复 T20 审计 CLI 的变量引用及 critical 告警退出码2，并保留发布安装 JSON 附件；当时11项本地脚本测试通过、真实native-limit门禁待通过；当前T20以总表已完成证据为准。
