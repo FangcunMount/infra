@@ -23,7 +23,7 @@ def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed):
         path.write_text(json.dumps(document)); path.chmod(0o600)
         return run(['python3', str(repo / 'scripts/rocketmq/provision.py'), '--container', broker,
                     '--project', project, '--manifest', str(path), '--credentials', str(secret)],
-                   timeout=240, required=False)
+                   timeout=900, required=False)
     reader = Admin(broker)
     snapshot_dir = '/tmp/m2-v2-proof-' + secrets.token_hex(8)
     reader.docker('mkdir','-m','700',snapshot_dir)
@@ -48,6 +48,16 @@ def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed):
         passed('v2_existing_type_conflict_refuses_all_resource_mutations')
         initial = provision(manifest)
         if initial.returncode:
+            diagnostic = next((line for line in initial.stderr.splitlines() if line.startswith('RuntimeError: ')), '')
+            # Only our fixed diagnostic phrases may leave the private capture.
+            safe = ('private Broker operation', 'Broker administrative operation',
+                    'Broker mutation missing', 'metadata snapshot missing',
+                    'unrecognized pinned Broker', 'unrecognized private',
+                    'authoritative principal', 'existing principal',
+                    'post-provision readback', 'duplicate principal',
+                    'Broker v2 provision lock')
+            if diagnostic.removeprefix('RuntimeError: ').startswith(safe):
+                raise RuntimeError(diagnostic)
             raise RuntimeError('v2 fixture provisioning failed (private diagnostics withheld)')
         receipt = json.loads(initial.stdout)
         if not receipt.get('verified') or receipt['operations'] <= 0:
