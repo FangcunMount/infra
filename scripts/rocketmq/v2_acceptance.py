@@ -55,7 +55,7 @@ def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed):
                     'unrecognized pinned Broker', 'unrecognized private',
                     'authoritative principal', 'existing principal',
                     'post-provision readback', 'duplicate principal',
-                    'Broker v2 provision lock')
+                    'Broker v2 provision lock', 'existing topic', 'existing subscription', 'v2 provision')
             if diagnostic.removeprefix('RuntimeError: ').startswith(safe):
                 raise RuntimeError(diagnostic)
             raise RuntimeError('v2 fixture provisioning failed (private diagnostics withheld)')
