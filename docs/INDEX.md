@@ -50,7 +50,8 @@ docs/
 | 我想... | 参考文档 |
 |---------|----------|
 | 了解四机拓扑和服务落点 | [架构设计](./server/architecture.md) |
-| 把 IAM 迁到 serverB | [IAM 迁移手册](./server/iam-migration-to-serverB.md) |
+| 查看 IAM 迁至腾讯云 serverA 的结果 | [IAM 腾讯云迁移记录](./server/iam-tencent-servera-migration.md) |
+| 参考历史 IAM 迁到 serverB 的步骤 | [历史 IAM 迁移手册](./server/iam-migration-to-serverB.md) |
 | 把 Mongo 迁到 serverC | [Mongo 迁移手册](./server/mongo-migration-to-serverC.md) |
 | 把 serverA 从阿里云迁到腾讯云 | [serverA 腾讯云迁移记录](./server/serverA-tencent-migration.md) |
 | 评估 200~1000 QPS 该怎么配资源 | [QPS 容量规划报告](./server/qps-capacity-planning.md) |

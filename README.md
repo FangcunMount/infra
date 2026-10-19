@@ -4,8 +4,8 @@
 
 当前拓扑（2026-10-19 serverA 迁入腾讯云后）：
 
-- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server ×2 + qs-ai + prometheus-route`
-- `serverB 2C2G`：`IAM + Qlume + MiniBlog + operating + mysql-rds-proxy`
+- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server ×2 + qs-ai + IAM + prometheus-route`
+- `serverB 2C2G`：`Qlume + MiniBlog + operating + mysql-rds-proxy`
 - `serverC 4C4G`：`mongodb`
 - `serverD 4C4G`：`qs-worker + NSQ + RocketMQ`
 - 旧 Mac mini：`Prometheus + Grafana`
@@ -58,7 +58,7 @@ make serverD-up
 | ------ | ------ |
 | [serverA 腾讯云迁移记录](docs/server/serverA-tencent-migration.md) | 已执行切换、运行证据和回退边界 |
 | [架构设计](docs/server/architecture.md) | 四机拓扑、职责边界、服务依赖 |
-| [IAM 迁移手册](docs/server/iam-migration-to-serverB.md) | IAM 迁到 `serverB` 的步骤、证书与 gRPC mTLS 检查点 |
+| [IAM 腾讯云迁移记录](docs/server/iam-tencent-servera-migration.md) | IAM 从 B 迁至新 A 的固定版本、验收和回退边界 |
 | [Mongo 迁移手册](docs/server/mongo-migration-to-serverC.md) | Mongo 迁到 `serverC` 的切换顺序、备份恢复与业务改造点 |
 | [QPS 容量规划报告](docs/server/qps-capacity-planning.md) | `200/300/500/800/1000 QPS` 分级判断与组件资源建议 |
 | [独立 K6 压测机初始化](docs/server/perf-runner.md) | 从 Mac 一条命令准备临时 Linux 压测机 |
@@ -72,8 +72,8 @@ make serverD-up
 
 ```mermaid
 flowchart LR
-    internet["Internet / Clients"] --> serverA["腾讯云 serverA (4C8G)<br/>Nginx + API + collection ×2 + AI"]
-    serverA --> serverB["阿里云 serverB<br/>IAM + Qlume + MiniBlog + operating"]
+    internet["Internet / Clients"] --> serverA["腾讯云 serverA (4C8G)<br/>Nginx + API + collection ×2 + AI + IAM"]
+    serverA --> serverB["阿里云 serverB<br/>Qlume + MiniBlog + operating"]
     serverA --> serverD["腾讯云 serverD<br/>worker + NSQ + RocketMQ"]
     serverA --> serverC["腾讯云 serverC<br/>MongoDB"]
     serverD --> serverC

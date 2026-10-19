@@ -1,0 +1,63 @@
+{
+  "verified_at": "2026-10-19T16:40:08.113812+08:00",
+  "scope": "IAM service host migration only; no business release or database migration",
+  "revision": "c8fc1fe61a32056368148e232e96d32763c15ba5",
+  "image_id": "sha256:592a4051a8ba2982df55d47c9b82c759f2d85f728ce4a3825fd5b083338e1945",
+  "new_host": {
+    "public_ip": "154.8.167.1",
+    "tailscale_ip": "100.74.123.45",
+    "container_id": "8198f6934ea3844aa8a13c099e9e0e5b94b3f308be42db9000c7c8d2a987ce81",
+    "compose_project": "docker",
+    "health": "healthy",
+    "restarts": 0,
+    "internal_ip": "172.20.0.201",
+    "published_ports": {},
+    "memory_limit_bytes": 1073741824,
+    "nano_cpus": 1000000000
+  },
+  "ready_components": {
+    "authn": "ok",
+    "authz": "ok",
+    "domain_event_outbox": "ok",
+    "jwks": "ok",
+    "mysql": "ok",
+    "redis": "ok",
+    "session_revocation": "ok",
+    "suggest": "ok"
+  },
+  "jwks": {
+    "before_after_identical": true,
+    "publishable_key_count": 1,
+    "canonical_sha256": "b7dbae4549ccbbed97ea30682fd4781eba00aa2c9c2636cdec17f2f32f05e664"
+  },
+  "new_A_existing_container_ids_preserved": [
+    "prometheus-route",
+    "nginx",
+    "qs-ai",
+    "qs-collection-server-2",
+    "qs-collection-server-1",
+    "qs-apiserver"
+  ],
+  "checks": {
+    "mysql": "IAM credentials authenticated SELECT 1 via mysql-rds-proxy; schema version 40 dirty=false",
+    "redis": "IAM credentials AUTH/SELECT/PING succeeded against existing instance",
+    "nsq": "existing nsqd/lookupd reachable; no provider change",
+    "mtls_grpc": "QS API client certificate: grpc.health.v1.Health/Check SERVING on iam-apiserver:9090",
+    "native_authz_policy_version_lag": 0,
+    "qs_committed_version_proof_age": "less than 10 seconds after cutover",
+    "collection": "both replicas dependency_ready and serve_ready",
+    "public_https": "IAM /health 200 and unchanged JWKS"
+  },
+  "user_business_acceptance": {
+    "confirmed_by": "user",
+    "mini_program_relogin": "passed",
+    "operating_backend_authenticated_and_permission_pages": "passed"
+  },
+  "ci_configuration": {
+    "service_deploy_and_diagnostics": "SVRA targets Tencent serverA",
+    "IAM_RUNTIME_MYSQL_HOST": "mysql-rds-proxy",
+    "database_backup_and_maintenance": "retained on serverB using inherited MYSQL_HOST private RDS endpoint",
+    "PRODUCTION_DEPLOY_PAUSED": true
+  },
+  "rollback": "old serverB IAM container stopped and retained; only one IAM process runs at a time"
+}

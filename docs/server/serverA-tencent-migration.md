@@ -9,6 +9,8 @@ MySQL、Redis 实例及数据保持原样；MySQL 私网代理迁至阿里云 se
 这份快照记录服务器、依赖和入口核验。切换后，用户已确认小程序登录、打开问卷和查看已有报告均正常；
 新增答卷提交、生成新 AI 报告等链路未纳入本次验收。
 
+后续变更：同日 IAM 已从 serverB 迁至新 A，见 [IAM 迁移记录](iam-tencent-servera-migration.md)。以下拓扑保留首次 serverA 迁移完成时的历史快照。
+
 ## 分析目标与范围
 
 通过 SSH 核对旧 A、B、C、D、Mac mini 和新 A 的实际容器、挂载、调用路径和发布脚本，
