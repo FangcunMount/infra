@@ -52,6 +52,7 @@ docs/
 | 了解四机拓扑和服务落点 | [架构设计](./server/architecture.md) |
 | 把 IAM 迁到 serverB | [IAM 迁移手册](./server/iam-migration-to-serverB.md) |
 | 把 Mongo 迁到 serverC | [Mongo 迁移手册](./server/mongo-migration-to-serverC.md) |
+| 把 serverA 从阿里云迁到腾讯云 | [serverA 腾讯云迁移记录](./server/serverA-tencent-migration.md) |
 | 评估 200~1000 QPS 该怎么配资源 | [QPS 容量规划报告](./server/qps-capacity-planning.md) |
 | 一键准备独立 K6 压测机 | [独立 K6 压测机初始化](./server/perf-runner.md) |
 | 初始化四台机器 | [初始化指南](./server/initialization.md) |

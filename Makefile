@@ -1155,13 +1155,16 @@ serverA-logs: ## 查看 ServerA 日志
 serverA-status: ## 查看 ServerA 状态
 	@docker ps --filter "label=infra.host=serverA" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
-mysql-rds-proxy-verify: ## 校验 Worker -> RDS 私网代理配置不暴露宿主机端口
-	@bash scripts/utils/verify-mysql-rds-proxy.sh
+MYSQL_RDS_PROXY_NODE ?= serverB
 
-mysql-rds-proxy-recreate: mysql-rds-proxy-verify ## 在 serverA 原地重建 Worker -> RDS 私网代理
+mysql-rds-proxy-verify: ## 校验 RDS 私网代理（默认 serverB；旧 A 回退时指定 MYSQL_RDS_PROXY_NODE=serverA）
+	@MYSQL_RDS_PROXY_NODE="$(MYSQL_RDS_PROXY_NODE)" bash scripts/utils/verify-mysql-rds-proxy.sh
+
+mysql-rds-proxy-recreate: mysql-rds-proxy-verify ## 在当前主机重建 RDS 代理，必须与 MYSQL_RDS_PROXY_NODE 指定节点一致
+	@test "$$(hostname -s | tr '[:upper:]' '[:lower:]')" = "$$(printf '%s' '$(MYSQL_RDS_PROXY_NODE)' | tr '[:upper:]' '[:lower:]')" || { echo 'Refusing proxy recreation on the wrong host'; exit 1; }
 	@docker compose \
-		--env-file compose/env/prod/serverA.env \
-		-f deploy/serverA/docker-compose.yml \
+		--env-file compose/env/prod/$(MYSQL_RDS_PROXY_NODE).env \
+		-f deploy/$(MYSQL_RDS_PROXY_NODE)/docker-compose.yml \
 		up -d --no-deps --force-recreate mysql-rds-proxy
 	$(call success_msg,mysql-rds-proxy 已原地重建)
 
@@ -1183,25 +1186,26 @@ serverA-destroy: ## 销毁 ServerA 所有容器、卷和数据 (危险!)
 
 serverA-rebuild: serverA-destroy serverA-up ## 完全重建 ServerA (销毁后重建)
 
-serverB-up: ## 初始化 ServerB 节点基线 (collection + IAM 由业务仓库部署)
+serverB-up: ## 启动 ServerB RDS 代理（业务容器由各自仓库部署）
 	$(call section_title,启动 ServerB (2C2G))
 	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverB
-	$(call warning_msg,ServerB 当前没有 infra 仓库直接维护的本地组件；qs-collection-server 与 IAM 请由业务仓库部署)
+	@cd deploy/serverB && docker compose --env-file ../../compose/env/prod/serverB.env up -d
+	$(call success_msg,ServerB RDS 代理已启动；IAM 等业务容器仍由各自仓库部署)
 
 serverB-down: ## 停止 ServerB infra 服务栈
-	$(call warning_msg,ServerB 当前没有 infra 仓库直接维护的本地组件)
+	@cd deploy/serverB && docker compose --env-file ../../compose/env/prod/serverB.env stop mysql-rds-proxy
 
 serverB-logs: ## 查看 ServerB 日志
-	$(call warning_msg,ServerB 当前没有 infra 仓库直接维护的本地组件日志)
+	@cd deploy/serverB && docker compose --env-file ../../compose/env/prod/serverB.env logs -f --tail=$(LOG_LINES) mysql-rds-proxy
 
 serverB-status: ## 查看 ServerB 状态
 	@docker ps --filter "label=infra.host=serverB" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
-serverB-destroy: ## 销毁 ServerB 所有容器、卷和数据 (危险!)
-	$(call warning_msg,ServerB 当前没有 infra 仓库直接维护的本地组件；不会删除业务仓库部署的 collection/IAM)
+serverB-destroy: ## 保留 ServerB 业务与数据（此入口不执行销毁）
+	$(call warning_msg,此入口不删除业务容器或数据；重建 RDS 代理请使用 mysql-rds-proxy-recreate)
 
-serverB-rebuild: serverB-destroy serverB-up ## 完全重建 ServerB (销毁后重建)
+serverB-rebuild: serverB-destroy serverB-up ## 确保 ServerB RDS 代理启动，不删除业务容器或数据
 
 serverC-up: ## 启动 ServerC 服务栈 (MongoDB)
 	$(call section_title,启动 ServerC (4C4G))

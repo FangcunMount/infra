@@ -1,0 +1,26 @@
+name: Validate serverA migration
+on:
+  pull_request:
+    paths: ['scripts/migration/**', 'scripts/utils/verify-mysql-rds-proxy.sh', 'scripts/04-ssl/deploy-renewed-certs.sh', 'deploy/serverA/docker-compose.yml', 'deploy/serverB/docker-compose.yml', 'examples/systemd/servera-certbot.*', 'Makefile', '.github/workflows/servera-migration.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/migration/**', 'scripts/utils/verify-mysql-rds-proxy.sh', 'scripts/04-ssl/deploy-renewed-certs.sh', 'deploy/serverA/docker-compose.yml', 'deploy/serverB/docker-compose.yml', 'examples/systemd/servera-certbot.*', 'Makefile', '.github/workflows/servera-migration.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_HOST: mysql.example.invalid
+      MYSQL_RDS_PROXY_ENV_FILE: /dev/null
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify runtime export and proxy boundaries
+        run: |
+          python3 -m unittest discover -s scripts/migration -p 'test_*.py' -v
+          bash -n scripts/utils/verify-mysql-rds-proxy.sh scripts/04-ssl/deploy-renewed-certs.sh
+          bash scripts/utils/verify-mysql-rds-proxy.sh
+          MYSQL_RDS_PROXY_NODE=serverA bash scripts/utils/verify-mysql-rds-proxy.sh
+          docker compose -f deploy/serverA/docker-compose.yml config --no-env-resolution --format json |
+            jq -e '.services["mysql-rds-proxy"] == null'

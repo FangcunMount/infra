@@ -1,0 +1,9 @@
+[Unit]
+Description=Renew serverA certificates through the existing Alibaba DNS account
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/opt/certbot/bin/certbot renew --non-interactive --quiet --deploy-hook /opt/infra/scripts/04-ssl/deploy-renewed-certs.sh

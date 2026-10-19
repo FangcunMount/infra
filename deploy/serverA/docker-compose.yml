@@ -17,6 +17,9 @@ services:
   # ============================================================================
 
   mysql-rds-proxy:
+    # Only the old Alibaba node can use this rollback profile. The Tencent
+    # serverA uses the proxy on serverB; do not create a second production alias.
+    profiles: [aliyun-rds-proxy]
     image: nginx:1.27
     container_name: mysql-rds-proxy
     restart: unless-stopped
