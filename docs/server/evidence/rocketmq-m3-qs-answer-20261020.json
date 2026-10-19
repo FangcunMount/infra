@@ -90,10 +90,8 @@
     "production_or_existing_service_changes": false
   },
   "remaining": [
-    "required native proof on final SHA",
-    "host composition and Collection/202 gates",
-    "cross-instance acceptance and concurrent reservations",
-    "current-head CI and review"
+    "current-head required cloud native/source checks",
+    "review and separate merge tracking"
   ],
   "delivery": {
     "draft_pr": true,
@@ -129,5 +127,72 @@
     "log_sha256": "9edb2fdf96535bb149a1bf822a1277f225cba9bf16b5b7c457ed096350b05dbf",
     "resolution": "host workflow uses required Go1.25.12; separate SDK dual-version jobs unchanged",
     "status": "original_failure_retained"
+  },
+  "module_batch": {
+    "status": "local_gates_passed_cloud_pending",
+    "source_sha": "f95ebc0561e52c5085a730d1f23996e39a35793e",
+    "review_head": "321e0989df8f3bc3cecd367295a624e20fc187cf",
+    "infra_harness_sha": "4c3211484d44f9bb32c2e7c4a304b365a3810802",
+    "source_tests": {
+      "passed": 6907,
+      "failed": 0,
+      "skipped": 60,
+      "skip_scope": "existing optional dependency tests only",
+      "report_sha256": "937c5e96313139988e60611ef5a8796ff17ca8b866f8e08375e2085be41412f1"
+    },
+    "native": {
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "cases": {
+        "closed_admission_no_business": true,
+        "collection_202_exact_root": true,
+        "collection_unknown_witness_no202": true,
+        "committed_ack_discard_exact_recovery": true,
+        "concurrent_reservation_one_execution": true,
+        "conflicting_input_rejected": true,
+        "duplicate_does_not_execute": true,
+        "full_reference_required_for_acceptance": true,
+        "half_does_not_accept_business": true,
+        "native_callback_reentry": true,
+        "nested_preparation_rejected": true,
+        "new_instance_exact_accepted_result": true,
+        "no_new_publish_outbox": true,
+        "original_root_fact_and_witness_and_wire": true,
+        "root_abort_no_accepted_fact_or_witness": true
+      },
+      "source_clean_after": true,
+      "sdk_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.5.0-rocketmq-tx.2",
+        "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "report_sha256": "181610626faca98b572797e32a5d9cae26f961d7b898f7678820d3879e5fcc2e",
+      "private_log_sha256": "15e18237d579cc78002cff10223698f440ac1e41ea7d45afdecf80ad25a9289c"
+    },
+    "docs": {
+      "unit_passed": 87,
+      "hygiene": true,
+      "facts": true,
+      "source_baseline": "f95ebc0561e52c5085a730d1f23996e39a35793e"
+    },
+    "lint": {
+      "version": "2.5.0",
+      "issues": 0
+    },
+    "scope_limits": [
+      "gRPC service and protobuf are real over owned bufconn; Collection mapping and identity are fixture ports",
+      "root ACK discard is client-level, not packet loss",
+      "new client/runtime verifies accepted result; actual process SIGKILL and real Broker recheck recovery remain T22/T23",
+      "production common owner lifecycle activation remains a later M3 task",
+      "not system or production acceptance"
+    ]
   }
 }
