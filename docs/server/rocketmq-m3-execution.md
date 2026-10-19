@@ -206,3 +206,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-19：交付前发现三库main已并行合入公网MySQL TLS（IAM bf2882e9 / QS39cb018d9 / AI8fc9c09）。在M3分支合并这些已提交变化，保留TLS factory/维护入口和M3元数据、当前0041校验。未改其他工作区。合并后Go定向测试、AI63项TLS/配置/消息/文档与静态/type门禁通过；三库完整CI重新触发。原候选IAM/QS全CI、AI两档M7（含原生2项及历史回执/模型回归）通过只归属其原SHA，不冒充合并后结果；最新证据与PR台账已更新。总数仍3/36，T04进行中，未合并M3到main、未部署生产。
 
 - 2026-10-19：T04第二批提交QS f008cc732 / AI9b84e89，不可变原header/body/first-wire codec、共享uint64向量、原事务档案guard、精确committed证据读取及仅身份缺失时的旧reader回落。QS3包race/架构、AI45项0失败0跳过及全库type/lint通过；新增原生档案测试仅编译/收集，本地未运行DB。同步main后的IAM/QS完整CI通过；AI完整CI暴露0041旧handoff/inventory whitelist及历史/current fixture scope失败，已限定范围修复，保留旧全库转换/备份拒绝。隔离原生/全CI正在新候选上验证，T04仍不勾选，总计3/36；没有生产DDL/业务链路切换。
+
+- 2026-10-19：T04档案验收推进：AI10687a1的两档MySQL各205项（3原生schema/archive＋119 source regression＋83原事务/交接/模型恢复），均0FAIL/ERROR/SKIP并完成wheel/sdist构建；QS c5683c7df原生M3档案/双库步骤通过，最终2936bd512仅移除lint发现的无效赋值并绑定文档，固定lint0问题、87 docs门禁通过。IAM主CI已通过，但独立并发工作流status仍拒绝正确42，已提交78b5495c精确表清单修复和拒绝测试，等待原生重跑。只读回读确认IAM/QS生产CD暂停、AI自动部署false；未改变量。全部历史失败/候选保持来源；总计仍3/36，T04等最终必需门禁后打勾。

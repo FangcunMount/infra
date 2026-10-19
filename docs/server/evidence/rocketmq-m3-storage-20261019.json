@@ -3,7 +3,7 @@
   "task_ids": [
     "T04"
   ],
-  "observed_at": "2026-10-19T12:39:37.937990+00:00",
+  "observed_at": "2026-10-19T12:57:11.647997+00:00",
   "status": "in_progress",
   "complete": false,
   "stage": "immutable-archive-and-retained-reader-validation",
@@ -144,6 +144,76 @@
         "integration": "compiled only locally; native execution delegated to required isolated CI"
       },
       "boundary": "local source/type/lint do not establish database or Broker acceptance"
+    },
+    "archive_native_ai": {
+      "8.0.36": {
+        "source_sha": "9b84e89",
+        "head_sha": "69a2c2e",
+        "tests": 3,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "ee5d266bbd68026769d7a08dcd461ded0ab521cb35beac06620701af8435d8ba",
+        "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39253535831",
+        "boundary": "installation/original-root/archive adapter proof only, not Broker or business entry acceptance"
+      },
+      "8.4": {
+        "source_sha": "9b84e89",
+        "head_sha": "69a2c2e",
+        "tests": 3,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "d09ae1f5edf14d95732d2022fd5634803dbb8da5f9f5370166bd3672c74dedf1",
+        "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39253535831",
+        "boundary": "installation/original-root/archive adapter proof only, not Broker or business entry acceptance"
+      }
+    },
+    "archive_required_ai": {
+      "8.0.36": {
+        "m7-m3-schema.xml": {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "sha256": "b970e01d8dd3eaad33beeaa2eb8b66384d24a6897be1d796436da425dbfaf598"
+        },
+        "m7-unit.xml": {
+          "tests": 119,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "sha256": "efda38efe0d65128a91a38257fd12c95dc752d9057cea667f26648083c1b0812"
+        },
+        "m7-storage.xml": {
+          "tests": 83,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "sha256": "24f237230e74ec6d2d3bcac2fc2048ed23b6aaafbfa6554fb9472d3bedca8340"
+        }
+      },
+      "8.4": {
+        "m7-m3-schema.xml": {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "sha256": "9b72a9d5126b1796247e61b3d7abb45cbb353a9d178a4a72584d69a24ef4a76d"
+        },
+        "m7-unit.xml": {
+          "tests": 119,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "sha256": "415c7e80199374454857837f941755ebf6fdc89b569309632fb69a76c3b04787"
+        },
+        "m7-storage.xml": {
+          "tests": 83,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "sha256": "7a14102e35edfd82d17b2b445cc77a0cfeffb384b72342ab75aa95ddf9fd485f"
+        }
+      }
     }
   },
   "migration_resources": {
@@ -172,8 +242,9 @@
     "Isolated native archive commit/rollback, owner, first-wire and damaged/prepared refusal proof added; not business entry acceptance"
   ],
   "remaining": [
-    "Pass new native archive proof and complete CI on exact candidates",
-    "Finish task-level archive/legacy acceptance and PR evidence before ticking T04"
+    "Pass IAM schema42 readonly-status compatibility on native full-chain workflow",
+    "Pass final complete current-head CI and archive installation task gate",
+    "Record final exact source/PR states and tick T04 only after required task validation"
   ],
   "boundaries": [
     "3/36 remains unchanged; this file does not mark T04 complete",
@@ -222,21 +293,44 @@
     {
       "check": "archive docs/source review",
       "result": "QS docs hygiene found one extra blank line and source-facts gate required two migration entrypoint reviews after native fixture expansion. Repaired scoped documentation; all87 docs tests, hygiene and facts pass on exact reviewed source f008cc732. Previous CI retained; latest c5683c7df dispatched."
+    },
+    {
+      "check": "archive native and retained maintenance regression",
+      "source_sha": "9b84e89",
+      "head_sha": "69a2c2e",
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39253535831",
+      "result": "Both native reports passed3/3 with0 failures/errors/skips. Additional M7 historical suite failed2 cases and skipped2: new inventory expected old0040; native kill trigger required separate disposable root DDL connection; schema test server was only step-local. Fixed precise assertion and supplied existing administrator fixture URLs at job scope, without changing application DB privileges or production. Required nonempty0-skip gate retained."
+    },
+    {
+      "check": "CI duplicate admission",
+      "result": "PR synchronize workflows were triggered asynchronously after explicit dispatch. Canceled only obsolete queued QS candidates and duplicate manual current-head full runs. Retained current PR full/M7/native jobs and completed failures; no tests or validation requirements removed."
+    },
+    {
+      "check": "QS current archive lint",
+      "source_sha": "f008cc732",
+      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39253906642",
+      "result": "Native M3 archive step passed. Required lint found one ineffectual found=true assignment before explicit literal return values. Deleted only that assignment in3f47ff9f4; pinned v2.5.0/go1.25.12 lint0 issues, compile and docs87/hygiene/facts pass; final current PR CI reruns."
+    },
+    {
+      "check": "IAM independent concurrency workflow",
+      "source_sha": "36240da9",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39249339448",
+      "result": "Main CI and native MySQL3-version proof passed, but separate concurrency workflow readonly database status still accepted schema38..41 after successful full migration to42. Added exact42/26-table allowlist and optional retained audit table, plus refusal cases for partial, dirty, premature and future schema. Local dbops and docs gates passed; current78b5495c PR CI reruns. Backup/restore runtime acceptance remains T25, not promoted by status."
     }
   ],
   "archive_candidates": {
     "qs-server": {
-      "source_sha": "f008cc732",
-      "head_sha": "c5683c7df",
-      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39253902742",
-      "status": "required complete CI running/queued; local87 docs gate passed"
+      "source_sha": "3f47ff9f4",
+      "head_sha": "2936bd51229f51b95308fb058b295fd3b9e88b7b",
+      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39255581089",
+      "status": "running/queued; prior c5683c7df native M3 archive step passed, final patch removes only redundant dead assignment; pinned lint0 issues and docs87 passed"
     },
     "qs-ai": {
-      "source_sha": "9b84e89",
-      "head_sha": "69a2c2e",
-      "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39253535831",
-      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39253542291",
-      "status": "queued/running"
+      "source_sha": "2f7991e",
+      "head_sha": "10687a1",
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547832",
+      "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547837",
+      "status": "required M7 success:205 cases per MySQL version, nonempty/0 failures/errors/skips; full CI still running"
     }
   },
   "migration_resources_history": [
@@ -258,5 +352,21 @@
         }
       }
     }
-  ]
+  ],
+  "protocol_schema_comparison": {
+    "sha256_normalized_template": "eb6346cccb330df2c3f7177db74fdfbf763abfa398f3a231148e991d719fb80b",
+    "matches": {
+      "iam": true,
+      "qs-server": true,
+      "qs-ai": true
+    },
+    "scope": "four unchanged SDK v1 tables only; host archives separate; whitespace/comments ignored"
+  },
+  "production_cd_controls": {
+    "observed_at": "2026-10-19T12:57:11.650701+00:00",
+    "iam.PRODUCTION_DEPLOY_PAUSED": "true",
+    "qs-server.PRODUCTION_DEPLOY_PAUSED": "true",
+    "qs-ai.AUTO_DEPLOY_ENABLED": "false",
+    "scope": "repository variable readback only; not production runtime/schema/business acceptance; no variable writes"
+  }
 }
