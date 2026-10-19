@@ -3,13 +3,13 @@
   "task_ids": [
     "T05"
   ],
-  "observed_at": "2026-10-19T14:03:27.834570+00:00",
-  "status": "in_progress",
-  "complete": false,
+  "observed_at": "2026-10-19T14:10:53.276569+00:00",
+  "status": "complete",
+  "complete": true,
   "repository": "FangcunMount/iam",
   "source_sha": "ea95cd9e62edf0e237f561c2ef3e356cbd426791",
   "pr": "https://github.com/FangcunMount/iam/pull/131",
-  "pr_status": "draft; not merged",
+  "pr_status": "merged 2026-10-19T14:09:42Z",
   "implemented": [
     "Stable command input, frozen policy version event and original first wire",
     "Fresh host read-only planner; exact cached authorization version",
@@ -52,6 +52,13 @@
     {
       "scope": "integration compilation, target vet, pinned lint v2.5.0, docs facts/links, diff check",
       "exit": 0
+    },
+    {
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39265370007",
+      "source_sha": "ea95cd9e62edf0e237f561c2ef3e356cbd426791",
+      "status": "success; full lint/test/build and three required native jobs",
+      "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39265370036",
+      "concurrency_status": "success"
     }
   ],
   "failure_history": [
@@ -76,7 +83,6 @@
     }
   ],
   "remaining": [
-    "All latest candidate fullCI and native maintenance matrix",
     "Actual Sender and original transaction guard/witness orchestration (T06)",
     "Idempotency/result lookup and public operation API (T07)",
     "Fanout/freshness acceptance (T08)"
@@ -86,5 +92,65 @@
     "production_schema_or_provider_changed": false,
     "stable_release": false,
     "business_acceptance": false
-  }
+  },
+  "merge_sha": "c2aa3635cf172f32b077120bd165be986c4d622e",
+  "native_mysql": [
+    {
+      "matrix_version": "8.0.36",
+      "source_sha": "ea95cd9e62edf0e237f561c2ef3e356cbd426791",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "test_ids": [
+        "TestM3PlannedPolicyNative",
+        "TestM3TransactionSchemaNative",
+        "TestPlannedRoleModelPreviewApplyAndCompensation",
+        "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+        "TestPlannedScopeCopiesMappingAndPreservesCompensation",
+        "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+        "TestPlannedCatalogPreviewsNoopAndRejectsDrift"
+      ],
+      "log_sha256": "c7897b1511264a414332feb827e2f8e067ae91cdf201648a5436ac12350dd922",
+      "job": "https://github.com/FangcunMount/iam/actions/runs/39265370007/job/118103438332",
+      "cleanup": "owned schemas dropped by test cleanup; job completed successfully"
+    },
+    {
+      "matrix_version": "8.0.44",
+      "source_sha": "ea95cd9e62edf0e237f561c2ef3e356cbd426791",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "test_ids": [
+        "TestM3PlannedPolicyNative",
+        "TestM3TransactionSchemaNative",
+        "TestPlannedRoleModelPreviewApplyAndCompensation",
+        "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+        "TestPlannedScopeCopiesMappingAndPreservesCompensation",
+        "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+        "TestPlannedCatalogPreviewsNoopAndRejectsDrift"
+      ],
+      "log_sha256": "0329a2b0e3ce5573b08bedbe44456305010f3f6e2bed7ffb4783a899cca086a3",
+      "job": "https://github.com/FangcunMount/iam/actions/runs/39265370007/job/118103438243",
+      "cleanup": "owned schemas dropped by test cleanup; job completed successfully"
+    },
+    {
+      "matrix_version": "8.4",
+      "source_sha": "ea95cd9e62edf0e237f561c2ef3e356cbd426791",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "test_ids": [
+        "TestM3PlannedPolicyNative",
+        "TestM3TransactionSchemaNative",
+        "TestPlannedRoleModelPreviewApplyAndCompensation",
+        "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+        "TestPlannedScopeCopiesMappingAndPreservesCompensation",
+        "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+        "TestPlannedCatalogPreviewsNoopAndRejectsDrift"
+      ],
+      "log_sha256": "c6de9d453b29e6b0a1c1d6c1f028aee6c0e5c0d818582e5bf91c182e0c999c0b",
+      "job": "https://github.com/FangcunMount/iam/actions/runs/39265370007/job/118103438324",
+      "cleanup": "owned schemas dropped by test cleanup; job completed successfully"
+    }
+  ]
 }
