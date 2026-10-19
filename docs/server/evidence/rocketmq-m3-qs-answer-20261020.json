@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "batch": "M3-2",
+  "task": "T09",
+  "status": "in_progress",
+  "completed": false,
+  "total_progress": "8/36",
+  "qs_baseline": "2e95630b35c28d4840a3c13b3059d667eca49049",
+  "qs_candidate": "080d4d7dc606379aabbd3e3ee8e804b551863ede",
+  "qs_pr": "https://github.com/FangcunMount/qs-server/pull/410",
+  "infra_harness_sha": "741c9cb",
+  "sdk_module": "v0.5.0-rocketmq-tx.2",
+  "implementation": [
+    "separate RocketMQSubmissionStore borrows original Mongo root",
+    "complete BSON, IDs, audit clocks and first wire frozen outside retryable callback",
+    "explicit V2 acceptance plus exact SDK witness; legacy V1 read remains distinct",
+    "no new publishing Outbox, no hidden constructor DDL",
+    "refuse nested preparation and complete reference mismatch"
+  ],
+  "source_regression": {
+    "sha": "d4cd66a055cef9e58d19d275beb56070e300338a",
+    "command": "go test -race -json ./...",
+    "passed": 6904,
+    "failed": 0,
+    "skipped": 60,
+    "skip_scope": "existing optional dependency tests, not required native gate",
+    "report_sha256": "db326ad47929b7983761e25ebf2fdf9d9307cf8e01a8aa1e587f6edf9a90feb8"
+  },
+  "infra_unit": {
+    "command": "python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'",
+    "passed": 42,
+    "failed": 0,
+    "skipped": 0
+  },
+  "native_required": {
+    "status": "first_batch_passed",
+    "source_sha": "080d4d7dc606379aabbd3e3ee8e804b551863ede",
+    "infra_harness_sha": "741c9cb",
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "cases": {
+      "closed_admission_no_business": true,
+      "committed_ack_discard_exact_recovery": true,
+      "conflicting_input_rejected": true,
+      "duplicate_does_not_execute": true,
+      "full_reference_required_for_acceptance": true,
+      "half_does_not_accept_business": true,
+      "native_callback_reentry": true,
+      "nested_preparation_rejected": true,
+      "no_new_publish_outbox": true,
+      "original_root_fact_and_witness_and_wire": true,
+      "root_abort_no_accepted_fact_or_witness": true
+    },
+    "sdk_module": {
+      "Path": "github.com/FangcunMount/reliable-messaging",
+      "Version": "v0.5.0-rocketmq-tx.2",
+      "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+      "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+    },
+    "image": "sha256:050426c66e97d69940f3b023440f68277cd02a4b8af5717ca01cf33f09776726",
+    "mongo_image": "sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f",
+    "mongo_version": "7.0.37",
+    "effective_broker_parameters": {
+      "transactionTimeOut": 6000,
+      "transactionCheckInterval": 5000,
+      "transactionCheckMax": 24,
+      "fileReservedTime": 48
+    },
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "race_reports": 0,
+    "source_clean_after": true,
+    "report_sha256": "5d3c78e0486a36ed8086c44220871738265385474352dbb79757c8f4c3a88817",
+    "private_log_sha256": "46f2a8c333493a562e8e1360d43b4e72a84ab36587c1178428a44e808441419a",
+    "failed_attempt_retained": "rocketmq-m3-qs-answer-first-host-failure-20261020.json",
+    "scope": "original CreateDurably host entry, not full Survey/Collection or production/system acceptance",
+    "root_ack_discard_is_client_level": true,
+    "pool_slots_field_scope": "fixture original Mongo transaction limiter, not Mongo client connection pool capacity"
+  },
+  "startup_failure": {
+    "stage": "before Compose services",
+    "cause": "owned Docker config did not expose Compose plugin",
+    "fix": "cliPluginsExtraDirs added to owned temporary Docker config only",
+    "owned_directory_cleanup_verified": true,
+    "production_or_existing_service_changes": false
+  },
+  "remaining": [
+    "required native proof on final SHA",
+    "host composition and Collection/202 gates",
+    "cross-instance acceptance and concurrent reservations",
+    "current-head CI and review"
+  ],
+  "delivery": {
+    "draft_pr": true,
+    "merged": false,
+    "stable_sdk_published": false,
+    "production_deployed": false,
+    "system_acceptance": false
+  },
+  "qs_review_head": "f78987ecea60ab254aabf3900d78e74b3cf53500",
+  "docs_gate": {
+    "source_sha": "080d4d7dc606379aabbd3e3ee8e804b551863ede",
+    "unit_tests": 87,
+    "hygiene": true,
+    "facts": true,
+    "schema_versions_unchanged": {
+      "mysql": 106,
+      "mongodb": 41
+    },
+    "followup_document_commit": "f78987ecea60ab254aabf3900d78e74b3cf53500"
+  },
+  "lint": {
+    "version": "2.5.0",
+    "package": "./internal/apiserver/infra/mongo/answersheet/...",
+    "issues": 0
+  },
+  "production_deploy_paused_readback": true
+}

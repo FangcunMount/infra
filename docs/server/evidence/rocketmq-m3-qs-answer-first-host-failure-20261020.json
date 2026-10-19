@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "batch": "M3-QS-answer-original-Mongo-host",
+  "project": "rocketmq-m2-8e815026ec1b",
+  "image": "sha256:050426c66e97d69940f3b023440f68277cd02a4b8af5717ca01cf33f09776726",
+  "mysql_image": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
+  "mongo_image": "sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f",
+  "clients": {
+    "go": "5.1.4",
+    "python": "5.1.2"
+  },
+  "passed": 0,
+  "failed": 1,
+  "skipped": 0,
+  "failure": "RuntimeError: actual QS answer host acceptance failed (private output withheld)",
+  "cleanup": {
+    "project_containers_remaining": false,
+    "compose_down_succeeded": true,
+    "probe_process_groups_drained": true,
+    "private_fixture_directory_removed": true
+  },
+  "go_version": "go1.25.12",
+  "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+  "proof": {
+    "effective_broker_parameters": {
+      "transactionTimeOut": 6000,
+      "transactionCheckInterval": 5000,
+      "transactionCheckMax": 24,
+      "fileReservedTime": 48
+    },
+    "mysql_version": "8.4.11",
+    "mongo_version": "7.0.37",
+    "qs_answer_host": {
+      "source_sha": "da3ba1966af3bc05b538f17b236652d99b151b5b",
+      "sdk_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.5.0-rocketmq-tx.2",
+        "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "provision": {
+        "version": 2,
+        "operations": 7,
+        "typed_topics": 1,
+        "principals": 2,
+        "verified": true
+      },
+      "private_output_sha256": "3808a19f53b7ecf7f3e139349738be34c5c6a31f0ec6af39fee7a0e184bf44d2",
+      "exit_code": 1,
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3AnswerSubmissionBrokerHost"
+        ],
+        "assertion_lines": [
+          307
+        ]
+      }
+    }
+  },
+  "original_report_sha256": "ec3edadc9bb632b7f471bf0eec00a65aca09de7061e0f979647a9ccd3ee3b5e6",
+  "diagnosis": "Ordered Mongo RunCommand rejects a multi-key bson.M before any failCommand reaches the server; fixture changed to bson.D. Not a successful callback-reentry proof."
+}

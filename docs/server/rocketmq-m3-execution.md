@@ -9,6 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
+- 当前批次：T09 答卷原 Mongo 事务候选位于 `qs-domain` / `codex/rocketmq-m3-qs-domain`，草稿 [QS PR410](https://github.com/FangcunMount/qs-server/pull/410)。冻结业务 BSON/首次 wire、V2 精确验收与无 Outbox 新入口已实现；Mac mini 实际 Broker/Mongo 首批11项全部通过，完整装配/202/并发/跨实例门禁尚未完成，不勾选 T09。[本批证据](evidence/rocketmq-m3-qs-answer-20261020.json)。
 
 ## 1. 目标、基线和授权边界
 
@@ -260,3 +261,7 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：infra PR41固定4369e6a的13项当前检查全部成功，包括普通消息、实际SDK、包级故障与完整事务回归；已合并d544918f。至此M3-1所属T05–T08及相关SDK/IAM/QS/infra源码门禁闭环，里程碑标完成，任务总进度8/36。进度归档采用仅文档后续PR，不移动发布tag、不重复长时源码验收。接下来按顺序进入M3-2/T09答卷原Mongo事务接入；生产准入/NSQ/账号验收边界不变。
 
 - 2026-10-20：M3-1进度归档PR44已合并234e39f1。进入T09，QS独立工作区codex/rocketmq-m3-qs-domain固定基线2e95630b；答卷应用/Mongo仓储、证据、事务运行器与Collection提交五包race窄基线通过。已确认现有202恢复依赖原幂等读取，写仓储和审计/原效果恢复仅识别V1，Mongo重入callback内仍会生成BSON_id/审计时间；新路径需在准备半消息前冻结完整业务文档及原wire、持久V2并借用原session witness，保留历史V1读取且封闭新事务事件旧Replay。M3仍8/36，无生产写入。
+
+- 2026-10-20：T09 首批候选080d4d7d提交草稿QS PR410。新增独立原Mongo事务持久化入口，原事务外冻结BSON身份/审计时钟/首份wire，V2接受结果同时核对完整Reference、冻结计划、事实及Committed witness，拒绝已有session内准备半消息；历史V1读取及旧Replay保护未改写。d4cd66a0默认源码全仓race6904通过/0失败/60既有可选依赖跳过，定向冻结与历史恢复回归通过；新增required原生Broker/Mongo夹具独立要求零跳过。第一轮Docker私有配置缺Compose插件，未启动业务，专用目录已清理；第一轮真实宿主在failpoint命令处被驱动拒绝无序bson.M，9项套件未完成且失败报告保留。已改为有序bson.D，并扩展为11项精确身份/嵌套边界验收继续复验；42项infra自测通过。T09仍进行中，总进度8/36；完整装配、202、并发及跨实例门禁待完成，生产CD回读仍暂停。
+
+- 2026-10-20：T09 Mac mini 首批实际宿主验收固定QS080d4d7d/infra741c9cb/正式SDKtx.2，RocketMQ5.5.1和Mongo7.0.37独立副本集下11项0失败/0跳过/无race，含服务端failCommand写冲突触发原WithTransaction重入、半消息不可见、业务+witness/首wire、已提交ACK客户端丢弃恢复、原根回滚、重复/冲突、完整身份与嵌套拒绝和关闭准入。报告回读实际Broker参数与镜像摘要，全部专用容器/进程/私有数据目录已清理；ACK丢弃不冒称网络丢包。固定golangci2.5.0零问题；87项文档自测、hygiene及facts通过，仅更新源码基线标记，未改写历史验收。此为原CreateDurably入口证明，不替代完整Survey/Collection、202、并发与跨实例任务门禁。T09保持进行中、总计8/36，草稿PR410与required云端矩阵继续。
