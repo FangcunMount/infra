@@ -1,7 +1,13 @@
 import json
 import unittest
+import os
+from pathlib import Path
+import signal
+import subprocess
+import sys
+import tempfile
 
-from iam_native import REQUIRED, test_counts
+from iam_native import REQUIRED, test_counts, run_test_group
 
 
 class NativeReceiptTest(unittest.TestCase):
@@ -21,6 +27,27 @@ class NativeReceiptTest(unittest.TestCase):
     def test_shell_text_or_successful_package_without_test_cannot_satisfy_gate(self):
         with self.assertRaises(RuntimeError):
             test_counts('--- PASS: TestM3PlannedPolicyNative\n{"Action":"pass","Package":"package"}')
+
+    def test_timed_out_launcher_drains_its_actual_child_before_return(self):
+        with tempfile.TemporaryDirectory() as directory:
+            pidfile = Path(directory) / 'child.pid'
+            source = ('import subprocess,time,sys; '
+                      'p=subprocess.Popen([sys.executable,"-c","import time;time.sleep(60)"]); '
+                      'open(sys.argv[1],"w").write(str(p.pid)); time.sleep(60)')
+            try:
+                with (Path(directory) / 'private.log').open('w') as stream:
+                    with self.assertRaises(subprocess.TimeoutExpired):
+                        run_test_group([sys.executable, '-c', source, str(pidfile)],
+                                       cwd=directory, env=os.environ.copy(), stream=stream, timeout=.5)
+                child = int(pidfile.read_text())
+                with self.assertRaises(ProcessLookupError):
+                    os.kill(child, 0)
+            finally:
+                if pidfile.exists():
+                    try:
+                        os.kill(int(pidfile.read_text()), signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
 
 
 if __name__ == '__main__':

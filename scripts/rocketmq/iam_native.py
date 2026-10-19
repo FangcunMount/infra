@@ -11,10 +11,12 @@ import os
 from pathlib import Path
 import re
 import secrets
+import signal
 import shutil
 import socket
 import subprocess
 import tempfile
+import time
 
 
 REQUIRED = {
@@ -61,6 +63,40 @@ def test_counts(raw):
     if counts['fail'] or counts['skip'] or not REQUIRED.issubset(passed):
         raise RuntimeError('required IAM native cases absent, failed or skipped')
     return counts, sorted(REQUIRED)
+
+
+def run_test_group(argv, *, cwd, env, stream, timeout):
+    process = subprocess.Popen(argv, cwd=cwd, env=env, stdout=stream,
+                               stderr=subprocess.STDOUT, start_new_session=True)
+    try:
+        return process.wait(timeout=timeout)
+    finally:
+        # go may own compiler/test grandchildren. Cleanup belongs to the whole
+        # new session, even if its launcher exited before a child did.
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        deadline = time.monotonic() + 3
+        while time.monotonic() < deadline:
+            process.poll()
+            try:
+                os.killpg(process.pid, 0)
+            except ProcessLookupError:
+                break
+            time.sleep(.02)
+        else:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        process.wait(timeout=5)
+        try:
+            os.killpg(process.pid, 0)
+        except ProcessLookupError:
+            pass
+        else:
+            raise RuntimeError('owned Go test process group has not drained')
 
 
 def main():
@@ -117,9 +153,10 @@ def main():
         log = args.report.with_suffix('.private.log')
         descriptor = os.open(log, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         with os.fdopen(descriptor, 'w') as stream:
-            result = subprocess.run(argv, cwd=source, env=env, stdout=stream, stderr=subprocess.STDOUT, timeout=240)
+            exit_code = run_test_group(argv, cwd=source, env=env, stream=stream, timeout=240)
+        proof['test_process_group_drained'] = True
         raw = log.read_text(); proof['private_log_sha256'] = hashlib.sha256(log.read_bytes()).hexdigest()
-        if result.returncode:
+        if exit_code:
             raise RuntimeError('required IAM native Go command failed; inspect owned0600 log')
         proof['tests'], proof['required_named_tests'] = test_counts(raw)
         proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source)
