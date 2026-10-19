@@ -1,0 +1,66 @@
+{
+  "format_version": 1,
+  "task_ids": [
+    "T08"
+  ],
+  "status": "in_progress; first real fixture failed at missing declared writer subject resolver, correction committed; SDK race repair must be consumed before final gates",
+  "complete": false,
+  "observed_at": "2026-10-19T21:17:44.728805+00:00",
+  "iam": {
+    "source_sha": "538e85787b1c45bd3c0907ec7b20bd47fba410bb",
+    "previous_tested_sha": "544289b0fbb5523836d63a22def1b0f95391a354",
+    "pr": "https://github.com/FangcunMount/iam/pull/135",
+    "source_race": {
+      "pass": 1926,
+      "fail": 0,
+      "skip": 31,
+      "skip_scope": "existing optional environment tests; not required native Broker acceptance",
+      "log": {
+        "path": "/tmp/m3-iam-t08-source-standard-umask.jsonl",
+        "sha256": "8f9b9f52e877a09b88ecd90a7f11cebf7554aa1fffd36448c8bfdc7a722b837f"
+      }
+    }
+  },
+  "qs": {
+    "source_sha": "1f999fee13c26412c383c56e7e3ac6038d619972",
+    "documentation_head": "9bfc17dde",
+    "pr": "https://github.com/FangcunMount/qs-server/pull/409",
+    "target_race": {
+      "pass": 85,
+      "fail": 0,
+      "skip": 0,
+      "log": {
+        "path": "/tmp/m3-qs-t08-source.jsonl",
+        "sha256": "eff8e043220345416c7df9fa9d858be79943b8326b12fc71a07cd309a4d77225"
+      }
+    },
+    "docs": "87 self tests plus hygiene/facts passed; closure baseline points to exact1f999fee source"
+  },
+  "infra_source_sha": "320d01180a2e0d9cc8f30f8a9dfd15b0975a8700",
+  "harness_tests": {
+    "pass": 40,
+    "fail": 0
+  },
+  "cloud_run": "https://github.com/FangcunMount/infra/actions/runs/39325194680",
+  "acceptance_scope": "two actual IAM modules with independent subscriptions and permission revocation; actual separate QS subscriber/cache/guard child; parent real primary reader port is test-only, not production gRPC or system login",
+  "failure_history": [
+    {
+      "source_sha": "544289b0fbb5523836d63a22def1b0f95391a354",
+      "location": "transaction_fanout_integration_test.go:81",
+      "scope": "Mac mini owned RocketMQ5.5.1/MySQL8.4.11 fixture",
+      "cause": "test used the platform writer without composing its explicit subject resolver; application original root correctly rejected assignment",
+      "correction": "538e8578 uses ApplicationUnitOfWork with bounded fixture UserResolver, matching production composition",
+      "cleanup": "owned containers, process groups and private fixture removed"
+    },
+    {
+      "scope": "first full IAM source wrapper",
+      "cause": "umask077 changed the existing intentionally0644 permission-test fixture to0600; normal022 rerun passed without modifying that test",
+      "log": {
+        "path": "/tmp/m3-iam-t08-source.jsonl",
+        "sha256": "93d7ed1b1a3a72e725a529198d3e9001b574d63d6de7888c50adb4cb45ec6698"
+      }
+    }
+  ],
+  "production_changed": false,
+  "system_acceptance": false
+}

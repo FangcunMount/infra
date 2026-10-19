@@ -5,7 +5,7 @@
   ],
   "status": "in_progress",
   "complete": false,
-  "observed_at": "2026-10-19T21:01:51.725869+00:00",
+  "observed_at": "2026-10-19T21:17:00.488936+00:00",
   "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
   "repository": "FangcunMount/iam",
   "pr": "https://github.com/FangcunMount/iam/pull/134",
@@ -223,6 +223,857 @@
       },
       "existing_containers_unchanged": true,
       "receipt_sha256": "94eeb32ea6ebf7f60e62ead596de50824704876fd6d691c5639df13cb20a30fa"
+    },
+    {
+      "scope": "supplemental isolated Mac mini exact98d0af8d actual Broker/MySQL8.4; does not erase cloud race failures",
+      "report_sha256": "ddbd8f9ebd15b22f7cc443a2ce3006d1f1fd2de36955d3c88852c69ff53523aa",
+      "version": 1,
+      "batch": "M3-IAM-host-with-M2-0-baseline",
+      "project": "rocketmq-m2-ac0bf2887886",
+      "image": "sha256:050426c66e97d69940f3b023440f68277cd02a4b8af5717ca01cf33f09776726",
+      "mysql_image": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
+      "mongo_image": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "cases": {
+        "go_untrusted_ca_rejected": true,
+        "go_half_invisible_then_commit_visible": true,
+        "go_rollback_invisible": true,
+        "go_new_process_real_backcheck": true,
+        "go_real_commit_response_discarded": true,
+        "go_db_failure_is_unknown": true,
+        "go_other_owner_witness_cannot_commit": true,
+        "go_wrong_owner_acl_denied": true,
+        "python_untrusted_ca_rejected": true,
+        "python_half_invisible_then_commit_visible": true,
+        "python_rollback_invisible": true,
+        "python_new_process_real_backcheck": true,
+        "python_real_commit_response_discarded": true,
+        "python_db_failure_is_unknown": true,
+        "python_other_owner_witness_cannot_commit": true,
+        "python_wrong_owner_acl_denied": true,
+        "go_to_python_cross_process_recovery": true,
+        "python_to_go_cross_process_recovery": true,
+        "iam_host_actual_sdk_original_root_and_application": true,
+        "finite_unknown_moves_to_native_discard_topic": true,
+        "exact_committed_identity_set": true
+      },
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "failure": null,
+      "proof": {
+        "effective_broker_parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "mysql_version": "8.4.11",
+        "iam_host": {
+          "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.1",
+            "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "provision": {
+            "version": 2,
+            "operations": 7,
+            "typed_topics": 1,
+            "principals": 2,
+            "verified": true
+          },
+          "private_output_sha256": "5733bcd18b180d9e2eeb49044a885deaffc3d531ccebc261426e36f170a2856b",
+          "exit_code": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "failed_tests": [],
+            "assertion_lines": [
+              353
+            ]
+          },
+          "native_receipt": {
+            "passed": 4,
+            "failed": 0,
+            "skipped": 0,
+            "half_invisible": true,
+            "commit_wire_and_witness": true,
+            "application_entry": true,
+            "rollback_hidden": true,
+            "business_result_atomic": true
+          },
+          "source_clean_after": true,
+          "scope": "real Broker, released SDK, host original transaction and application entry; not production/system acceptance"
+        },
+        "discard_broker_parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 2,
+          "fileReservedTime": 48
+        },
+        "finite_check_discard_topic": "TRANS_CHECK_MAX_TIME_TOPIC"
+      },
+      "failure_diagnostics": null,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "probe_receipts": [
+        {
+          "pid": 88692,
+          "exit_code": -15,
+          "events": [
+            {
+              "decision": "consumer",
+              "event": "ready",
+              "id": ""
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "go-commit"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "go-restart"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "go-commit"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "go-lost-commit-response"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "go-db-unavailable"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "go-db-unavailable"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "python-commit"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "python-restart"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "python-lost-commit-response"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "python-db-unavailable"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "python-db-unavailable"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "go-to-python-recovery"
+            },
+            {
+              "decision": "acknowledged",
+              "event": "received",
+              "id": "python-to-go-recovery"
+            }
+          ]
+        },
+        {
+          "pid": 88700,
+          "exit_code": 1,
+          "events": [
+            {
+              "decision": "operation_failed",
+              "event": "failed",
+              "id": ""
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88701,
+          "exit_code": 0,
+          "events": [
+            {
+              "decision": "producer",
+              "event": "ready",
+              "id": ""
+            },
+            {
+              "decision": "confirmed",
+              "event": "half",
+              "id": "go-commit"
+            },
+            {
+              "decision": "COMMITTED",
+              "event": "local",
+              "id": "go-commit"
+            },
+            {
+              "decision": "COMMITTED",
+              "event": "finalized",
+              "id": "go-commit"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88709,
+          "exit_code": 0,
+          "events": [
+            {
+              "decision": "producer",
+              "event": "ready",
+              "id": ""
+            },
+            {
+              "decision": "confirmed",
+              "event": "half",
+              "id": "go-rollback"
+            },
+            {
+              "decision": "ABORTED",
+              "event": "local",
+              "id": "go-rollback"
+            },
+            {
+              "decision": "ABORTED",
+              "event": "finalized",
+              "id": "go-rollback"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88721,
+          "exit_code": 23,
+          "events": [
+            {
+              "decision": "producer",
+              "event": "ready",
+              "id": ""
+            },
+            {
+              "decision": "confirmed",
+              "event": "half",
+              "id": "go-restart"
+            },
+            {
+              "decision": "COMMITTED",
+              "event": "local",
+              "id": "go-restart"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88722,
+          "exit_code": 0,
+          "events": [
+            {
+              "decision": "producer",
+              "event": "ready",
+              "id": ""
+            },
+            {
+              "decision": "commit",
+              "event": "checked",
+              "id": "go-commit"
+            },
+            {
+              "decision": "commit",
+              "event": "checked",
+              "id": "go-restart"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88731,
+          "exit_code": 24,
+          "events": [
+            {
+              "decision": "producer",
+              "event": "ready",
+              "id": ""
+            },
+            {
+              "decision": "confirmed",
+              "event": "half",
+              "id": "go-lost-commit-response"
+            },
+            {
+              "decision": "COMMITTED",
+              "event": "local",
+              "id": "go-lost-commit-response"
+            },
+            {
+              "decision": "response_discarded_after_real_rpc",
+              "event": "finalization_unknown",
+              "id": "go-lost-commit-response"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88733,
+          "exit_code": 0,
+          "events": [
+            {
+              "decision": "producer",
+              "event": "ready",
+              "id": ""
+            },
+            {
+              "decision": "confirmed",
+              "event": "half",
+              "id": "go-db-unavailable"
+            },
+            {
+              "decision": "unknown_database",
+              "event": "checked",
+              "id": "go-db-unavailable"
+            },
+            {
+              "decision": "COMMITTED",
+              "event": "local",
+              "id": "go-db-unavailable"
+            },
+            {
+              "decision": "COMMITTED",
+              "event": "finalized",
+              "id": "go-db-unavailable"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88751,
+          "exit_code": 0,
+          "events": [
+            {
+              "decision": "producer",
+              "event": "ready",
+              "id": ""
+            },
+            {
+              "decision": "confirmed",
+              "event": "half",
+              "id": "go-wrong-witness-owner"
+            },
+            {
+              "decision": "commit",
+              "event": "checked",
+              "id": "go-db-unavailable"
+            },
+            {
+              "decision": "unknown_missing",
+              "event": "checked",
+              "id": "go-wrong-witness-owner"
+            },
+            {
+              "decision": "ABORTED",
+              "event": "local",
+              "id": "go-wrong-witness-owner"
+            },
+            {
+              "decision": "ABORTED",
+              "event": "finalized",
+              "id": "go-wrong-witness-owner"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88758,
+          "exit_code": 1,
+          "events": [
+            {
+              "decision": "operation_failed",
+              "event": "failed",
+              "id": ""
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88759,
+          "exit_code": 1,
+          "events": [
+            {
+              "event": "failed",
+              "id": "",
+              "decision": "operation_failed"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88761,
+          "exit_code": 0,
+          "events": [
+            {
+              "event": "ready",
+              "id": "",
+              "decision": "producer"
+            },
+            {
+              "event": "half",
+              "id": "python-commit",
+              "decision": "confirmed"
+            },
+            {
+              "event": "checked",
+              "id": "go-wrong-witness-owner",
+              "decision": "rollback"
+            },
+            {
+              "event": "local",
+              "id": "python-commit",
+              "decision": "COMMITTED"
+            },
+            {
+              "event": "finalized",
+              "id": "python-commit",
+              "decision": "COMMITTED"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88770,
+          "exit_code": 0,
+          "events": [
+            {
+              "event": "ready",
+              "id": "",
+              "decision": "producer"
+            },
+            {
+              "event": "half",
+              "id": "python-rollback",
+              "decision": "confirmed"
+            },
+            {
+              "event": "local",
+              "id": "python-rollback",
+              "decision": "ABORTED"
+            },
+            {
+              "event": "finalized",
+              "id": "python-rollback",
+              "decision": "ABORTED"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88783,
+          "exit_code": 23,
+          "events": [
+            {
+              "event": "ready",
+              "id": "",
+              "decision": "producer"
+            },
+            {
+              "event": "half",
+              "id": "python-restart",
+              "decision": "confirmed"
+            },
+            {
+              "event": "local",
+              "id": "python-restart",
+              "decision": "COMMITTED"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88786,
+          "exit_code": 0,
+          "events": [
+            {
+              "event": "ready",
+              "id": "",
+              "decision": "producer"
+            },
+            {
+              "event": "checked",
+              "id": "python-restart",
+              "decision": "commit"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88795,
+          "exit_code": 24,
+          "events": [
+            {
+              "event": "ready",
+              "id": "",
+              "decision": "producer"
+            },
+            {
+              "event": "half",
+              "id": "python-lost-commit-response",
+              "decision": "confirmed"
+            },
+            {
+              "event": "local",
+              "id": "python-lost-commit-response",
+              "decision": "COMMITTED"
+            },
+            {
+              "event": "finalization_unknown",
+              "id": "python-lost-commit-response",
+              "decision": "response_discarded_after_real_rpc"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88799,
+          "exit_code": 0,
+          "events": [
+            {
+              "event": "ready",
+              "id": "",
+              "decision": "producer"
+            },
+            {
+              "event": "half",
+              "id": "python-db-unavailable",
+              "decision": "confirmed"
+            },
+            {
+              "event": "checked",
+              "id": "python-db-unavailable",
+              "decision": "unknown_database"
+            },
+            {
+              "event": "local",
+              "id": "python-db-unavailable",
+              "decision": "COMMITTED"
+            },
+            {
+              "event": "finalized",
+              "id": "python-db-unavailable",
+              "decision": "COMMITTED"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88821,
+          "exit_code": 0,
+          "events": [
+            {
+              "event": "ready",
+              "id": "",
+              "decision": "producer"
+            },
+            {
+              "event": "half",
+              "id": "python-wrong-witness-owner",
+              "decision": "confirmed"
+            },
+            {
+              "event": "checked",
+              "id": "python-db-unavailable",
+              "decision": "commit"
+            },
+            {
+              "event": "checked",
+              "id": "python-wrong-witness-owner",
+              "decision": "unknown_missing"
+            },
+            {
+              "event": "local",
+              "id": "python-wrong-witness-owner",
+              "decision": "ABORTED"
+            },
+            {
+              "event": "finalized",
+              "id": "python-wrong-witness-owner",
+              "decision": "ABORTED"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88835,
+          "exit_code": 1,
+          "events": [
+            {
+              "event": "failed",
+              "id": "",
+              "decision": "operation_failed"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88837,
+          "exit_code": 23,
+          "events": [
+            {
+              "decision": "producer",
+              "event": "ready",
+              "id": ""
+            },
+            {
+              "decision": "confirmed",
+              "event": "half",
+              "id": "go-to-python-recovery"
+            },
+            {
+              "decision": "COMMITTED",
+              "event": "local",
+              "id": "go-to-python-recovery"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88838,
+          "exit_code": 0,
+          "events": [
+            {
+              "event": "ready",
+              "id": "",
+              "decision": "producer"
+            },
+            {
+              "event": "checked",
+              "id": "go-to-python-recovery",
+              "decision": "commit"
+            },
+            {
+              "event": "checked",
+              "id": "python-wrong-witness-owner",
+              "decision": "rollback"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88846,
+          "exit_code": 23,
+          "events": [
+            {
+              "event": "ready",
+              "id": "",
+              "decision": "producer"
+            },
+            {
+              "event": "half",
+              "id": "python-to-go-recovery",
+              "decision": "confirmed"
+            },
+            {
+              "event": "local",
+              "id": "python-to-go-recovery",
+              "decision": "COMMITTED"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88849,
+          "exit_code": 0,
+          "events": [
+            {
+              "decision": "producer",
+              "event": "ready",
+              "id": ""
+            },
+            {
+              "decision": "commit",
+              "event": "checked",
+              "id": "python-to-go-recovery"
+            },
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 88985,
+          "exit_code": 143,
+          "events": [
+            {
+              "event": "ready",
+              "id": "",
+              "decision": "producer"
+            },
+            {
+              "event": "half",
+              "id": "finite-check-limit",
+              "decision": "confirmed"
+            },
+            {
+              "event": "checked",
+              "id": "finite-check-limit",
+              "decision": "unknown_prepared"
+            }
+          ]
+        }
+      ],
+      "limits": [
+        "No production acceptance or throughput claim",
+        "Raw-client feasibility only; not public SDK transaction acceptance",
+        "Response loss is client-side discard after real RPC, not packet-level loss",
+        "IAM host acceptance uses released SDK; base raw-client cases remain separately scoped"
+      ],
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "sdk_source_sha256": {
+        "transport/rocketmq/internal/driver/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "transport/rocketmq/internal/driver/UPSTREAM.json": "7a2e96d57a1ef7f7cea718fca1e9a0fcf98ca502f59c4486b131c7301a0b461b",
+        "transport/rocketmq/internal/driver/UPSTREAM.md": "b80d580c63c0c108cb40f82d9d6b06cfc71e6676fa1f62b98614fb67d4a5f3c0",
+        "transport/rocketmq/internal/driver/client.go": "5fcf31e8d9b895cb8fce3f36e1a29b008716b77cafb5427c2ab996a72d598a4b",
+        "transport/rocketmq/internal/driver/client_manager.go": "47d8110bd92821831c5f35ac18ca673eabc14cd99c2cbf4b1215dfd760677782",
+        "transport/rocketmq/internal/driver/client_manager_mock.go": "f60e472d5976e0ee2bd95edfc9103a658e6859ece93de038fedb5830c618997d",
+        "transport/rocketmq/internal/driver/client_mock.go": "06317cad9e81b3de1874f091a347f8826d2852b6972f7d21d8a66202316bf8f1",
+        "transport/rocketmq/internal/driver/client_options.go": "dfc39180a3e6e7ff73bef35e2b6c081b8b146e3ff7b28ef3243e9890802d726d",
+        "transport/rocketmq/internal/driver/config.go": "6bb496d157434ae44a5561dfb74954317498e4b1fa6f463ca98c25ae0f891dc1",
+        "transport/rocketmq/internal/driver/conn.go": "ddc881ee0346e83fb442fc0639c979d4c9d6ca3b0e4d080713d1e95259167d48",
+        "transport/rocketmq/internal/driver/conn_options.go": "04f8897abe3b8f0233c8dfc488bb83712aaf7884c0bcec89ca5343d641fafdeb",
+        "transport/rocketmq/internal/driver/consumer.go": "d00714fb983466e5125108f773193bedd46bc02abd3375b54a7dc220cd89e1e7",
+        "transport/rocketmq/internal/driver/consumer_options.go": "412726d80edae989202a3ff08fcb9637e1925562fd479dde5e0e851312ab5604",
+        "transport/rocketmq/internal/driver/consumer_service.go": "5f4a2ac1e26b45f8d890f2f14ad72201a338e3afdf9f702e6e6d1e8b22c63f7f",
+        "transport/rocketmq/internal/driver/error.go": "c431fd3f5f934efb216415d3e0238fa384b6df2c8d9377e565e269c53f78b452",
+        "transport/rocketmq/internal/driver/lite_push_consumer.go": "aab7d261fec9995afd921b1cb28f254873273a03f574685ead2ac453e3fcec0e",
+        "transport/rocketmq/internal/driver/lite_push_consumer_mock.go": "e2e2d8a92371f7b637d60c7e4f927dfa69ca872d0fb684d760b3b139ab139b2c",
+        "transport/rocketmq/internal/driver/lite_push_consumer_options.go": "4e6aaa5f42cf33f805144c3a7e9519429ceec788447eb60a44c9dcb66adcf252",
+        "transport/rocketmq/internal/driver/loadBalancer.go": "afe4e4bacec2b7e2939e606428d24e5b031ef65eb8a93beafb05682eca2cb030",
+        "transport/rocketmq/internal/driver/log.go": "7bbb7e701892676723000a50871507caa0772b1de43ac84669f8f8691f24ecf0",
+        "transport/rocketmq/internal/driver/message.go": "cd6eba5cbde4f68ef17540b7f61523a1b9da559cb4ddcbbbc4ee1351542b65c2",
+        "transport/rocketmq/internal/driver/message_id.go": "6797a1e2a89a78016c4048ce8bc97ab8bc60a55010694b982a14ce7eb0f0e5cc",
+        "transport/rocketmq/internal/driver/message_id_codec.go": "17f7407b417bd8996885bca27c4e2a00dfc8f3bb6c8e2f121f4395fe4b192404",
+        "transport/rocketmq/internal/driver/metric.go": "40f077d2aff82fee8f9159e765f9f58cc4846d07a40d97e58493e9139db34e2e",
+        "transport/rocketmq/internal/driver/name_resolver.go": "8aaa51e30fdd0cdbe358076eb749ac67cbbc51107a559d729108218498e9fe37",
+        "transport/rocketmq/internal/driver/process_queue.go": "6d51d1a8c44a6c575a2c8ad2155b12e95027872a295cd7df822761604c9ef39f",
+        "transport/rocketmq/internal/driver/producer.go": "99f7e6eac95da4b9aaa6208962b8f772deeb575ef524db3631acda2ce6a3bd97",
+        "transport/rocketmq/internal/driver/producer_options.go": "6aca132e75aae5558d3fd455e02909730b64302176f0d34be4e12ec9b2e2da57",
+        "transport/rocketmq/internal/driver/publishing_message.go": "b6c06219bae4d0fbc9e961f41d9dd56769d21053b42f6ff1f2629da7c13e3fce",
+        "transport/rocketmq/internal/driver/push_consumer.go": "6e44d25c71a71fa0a78a9daeb3be97568d83ab9404450e892eb3710e2d6d6480",
+        "transport/rocketmq/internal/driver/push_consumer_options.go": "07d936b21a433a641a51f0a17ef549b4bf0c90719e86a29f9d848d1d054a6578",
+        "transport/rocketmq/internal/driver/receive_rate_limiter.go": "7fe507eb88bc008f030e91852ca2d34b680f61add71e1ebb60c62e34cb851716",
+        "transport/rocketmq/internal/driver/rpc-options.patch": "36d11b883260db6e34239945eab069b7939da7114d975455f052b373cca5ea8b",
+        "transport/rocketmq/internal/driver/rpc_client.go": "2a3b6fbcead76c2783eec328ae2a5780ce764cf84bffbadb33c5abfa9377f326",
+        "transport/rocketmq/internal/driver/rpc_client_mock.go": "4c8c6d6af3576fe62824f9759948f5a85dde38ee5c7148c7f81e6a0d04006619",
+        "transport/rocketmq/internal/driver/rpc_client_options.go": "485f4368467c18a31344318f60d98dde43f2044d4493192857ec6f53459705d8",
+        "transport/rocketmq/internal/driver/rpc_options_test.go": "3ff0643718025721e98ad211c1dfac359f260f875ba6668be93fb15fc49604b2",
+        "transport/rocketmq/internal/driver/settings-snapshot.patch": "eb044f4b390fb2c8f6e2d7b5f7bb1ab6d778603addd955885c7338e61090f13f",
+        "transport/rocketmq/internal/driver/settings_snapshot_test.go": "5c035cb112655bf91927a6babe31e60da59da3660f6cda7a1528ab02e2d52e3b",
+        "transport/rocketmq/internal/driver/simple_consumer.go": "56956743825905af9526a955bb52d3945a2abb796713e6aa9107b25a205073a1",
+        "transport/rocketmq/internal/driver/simple_consumer_options.go": "d24c4def53f00b324eb4cea6d498d87e2127f0f65d20ce1e0c48a116aca88f72",
+        "transport/rocketmq/internal/driver/simple_thread_pool.go": "f6e3ec76238822539484d9c0c96b3761741d8adf979f6bf46616012dcf42bd64",
+        "transport/rocketmq/internal/driver/trace.go": "1a480254170cb1d09533ce00e6e696d6868189e560115d5108a28dd8efb3cdf9",
+        "transport/rocketmq/internal/driver/transaction-runtime.patch": "61affa8e1fe5d3f7b58d546c72404698846ebaff8d1eabea269b35620984d771",
+        "transport/rocketmq/internal/driver/transaction.go": "aa5efa55f0309bfd5a7eee7be390feabe29efb40949e25b71982e6fc3e750e5b",
+        "transport/rocketmq/internal/driver/transaction_bounds_test.go": "60c8011b79bfe569b525207697e5325314c81e8609dd4b2fbbc4a80de95a9f91",
+        "transport/rocketmq/internal/driver/user_agent.go": "74cb4a11296820f6a60c0d390137b40ac1670e57e56825e4cc9d3ca5d616926a",
+        "transport/rocketmq/internal/faultproxy/main.go": "1051678d433bc9d641d64e5c24d0246138adce5363a82f3a81286daaaedf67bf",
+        "transport/rocketmq/internal/faultproxy/packets.go": "645e17aca3894f30a40533dda97b7846a12475ef106cd3505dc912b05ea0701c",
+        "transport/rocketmq/internal/faultproxy/packets_test.go": "aca130340460bef6abf200b3d0c07b00d8bd828994a9342dbcae119c443f9778",
+        "transport/rocketmq/internal/faultproxy/rpc.go": "b0c252d4172d6257bb06225f1f9ff7483aa8a509c60d1d59aa4420f324e5da48",
+        "transport/rocketmq/internal/faultproxy/rpc_test.go": "bedb1508ce29330d5c015404de7077772f417ac389aa09bcc2c8261691b2acbc",
+        "transport/rocketmq/internal/sdkprobe/consumer.go": "2c1dd4b6ddc3828ba01e3fb2bccb0e1243be95929a0cafa3ede78b6574d3a4f9",
+        "transport/rocketmq/internal/sdkprobe/main.go": "2e7e032c78b514c5be5afd72b0eecf1428e550329c709a22ac05eb0a6a16a9eb",
+        "transport/rocketmq/internal/txprobe/main.go": "ea5572b786829b5c3d1e4bb827c1aa12567956545b29588b09d4f7ef299ab5e4"
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+      "go_version": "go1.25.12",
+      "iam_harness_sha256": "af4422b6f7b55c44bee5fa8d7a0c8434290ff645817fb9b94ec77454d68cf605",
+      "go_runtime_patch": "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)",
+      "harness_sha256": {
+        "scripts/rocketmq/ci-transactions.py": "f5b8b1befec0c1588ae087425b13f23b50b90ee1cd4ede0050449949bbb9bc32",
+        "scripts/rocketmq/render.py": "d2a91207804ca9f85ce15511edfbd1858a087e78141a5bd9668745d8cc72f4dc",
+        "components/rocketmq/docker-compose.yml": "d294f7310a2d499ca17d8a78e2ac42e5b291734b8f6792411863f8f8d871c4f8",
+        "scripts/rocketmq/sdk_acceptance.py": "d89cdec6947464d9293d1f3ddb9bd261af6f0ae185b1842a7d813be43bf4c0c0",
+        "scripts/rocketmq/v2_acceptance.py": "c0f0a90ceb10bca8c5af0bb3815155abe6309b5665d4c58cd112d1320ac72b66",
+        "scripts/rocketmq/sdk_faults.py": "5f6dc071f3b9f5359b021439299b630053eb8c646c37cd38dc2db77cfc3490b7",
+        "scripts/rocketmq/sdk_limits.py": "422102ce805c2985c80e60d5a0fa0dd291ac5d44f13aa7f451709a94f9d250e1",
+        "scripts/rocketmq/audit_transaction_limit.py": "aa2f8538940034c35e0baf8bbfd328cfe6840442beaf1545e31b52405e3a02e9",
+        "scripts/rocketmq/routes.py": "914e784eb4ad841d6a0ac4b1d83e41454c5269a6cb3c13796e8b3b616cf77e31",
+        "scripts/rocketmq/provision_v2.py": "dd91c82de4a8e632da708aa504f8cabe50cc85115a59f6a8ba87e642542ee31e",
+        "scripts/rocketmq/failure_diagnostics.py": "e71357ab08fee26165f0c1f74e1dc4f6e833826ced7e8aa349235c434aa84261",
+        "scripts/rocketmq/published_runtime.py": "365f38543d08911917da4d185d500fe5d78e355326b829367876bb9f98d7414a"
+      },
+      "go_probe_sha256": "9b3a899faca7bb8ea25474713f72ba4a651028cc1d20b57a21a79ab6b9b3b83e"
     }
   ],
   "failure_history": [
@@ -250,6 +1101,230 @@
       "failure": "macOS signal0 returned EPERM after group shutdown during self-test; cannot treat error or canceled launcher as completion",
       "fix": "inspect actual process states, wait for all live owned group work, fail closed on unreadable state; dead zombies are supervisor reaping responsibility",
       "verification": "37 harness tests passed and repeated group checks passed before cloud push; Mac mini8.4 exactsource34 tests passed, group drained and existing containers unchanged"
+    },
+    {
+      "scope": "cloud real IAM host matrix39324475047, exact98d0af8d; no business acceptance or production",
+      "url": "https://github.com/FangcunMount/infra/actions/runs/39324475047",
+      "result": "all3 profiles failed under -race; business receipt emitted, never counted complete",
+      "cause": "private Go driver meter.go Reset replaces clientMeter pointer without synchronizing delivery-hook reads; matches telemetry/Ack stack frames and a deterministic local race regression",
+      "receipts": [
+        {
+          "mysql": "8.0.36",
+          "host": {
+            "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+            "sdk_module": {
+              "Path": "github.com/FangcunMount/reliable-messaging",
+              "Version": "v0.5.0-rocketmq-tx.1",
+              "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+              "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+            },
+            "provision": {
+              "version": 2,
+              "operations": 7,
+              "typed_topics": 1,
+              "principals": 2,
+              "verified": true
+            },
+            "private_output_sha256": "dd9e24ccac6522167e8343c037cc18ccf35fa2bd6bee80d1b67365f433e96aff",
+            "exit_code": 1,
+            "diagnostics": {
+              "build_failed": false,
+              "test_timeout": false,
+              "race_reports": 2,
+              "race_frames": [
+                "client.go:108",
+                "client.go:165",
+                "client.go:176",
+                "client.go:323",
+                "client.go:342",
+                "client.go:383",
+                "client.go:534",
+                "client.go:538",
+                "client.go:559",
+                "client.go:569",
+                "client.go:75",
+                "client.go:763",
+                "client.go:97",
+                "metric.go:128",
+                "metric.go:278",
+                "metric.go:321",
+                "metric.go:338",
+                "simple_consumer.go:407",
+                "simple_consumer.go:449",
+                "subscriber.go:107",
+                "subscriber.go:206",
+                "subscriber.go:207",
+                "subscriber.go:240",
+                "subscriber.go:336",
+                "subscriber.go:384",
+                "testing.go:1934",
+                "testing.go:1997",
+                "transaction_broker_host_integration_test.go:167",
+                "transaction_broker_host_integration_test.go:169"
+              ],
+              "failed_tests": [
+                "TestM3ActualBrokerHost"
+              ],
+              "assertion_lines": [
+                167,
+                169,
+                353
+              ]
+            }
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "report_sha256": "754f1fe8cbedbdfb200a71e0055fe18fe3ef87f070025670f0fc10589a78dc58"
+        },
+        {
+          "mysql": "8.0.44",
+          "host": {
+            "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+            "sdk_module": {
+              "Path": "github.com/FangcunMount/reliable-messaging",
+              "Version": "v0.5.0-rocketmq-tx.1",
+              "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+              "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+            },
+            "provision": {
+              "version": 2,
+              "operations": 7,
+              "typed_topics": 1,
+              "principals": 2,
+              "verified": true
+            },
+            "private_output_sha256": "56bde5ee23b6756ed2e3dd5c600aae0902c5b221b112accbb8ed1570ab8e10a6",
+            "exit_code": 1,
+            "diagnostics": {
+              "build_failed": false,
+              "test_timeout": false,
+              "race_reports": 2,
+              "race_frames": [
+                "client.go:108",
+                "client.go:165",
+                "client.go:176",
+                "client.go:323",
+                "client.go:342",
+                "client.go:383",
+                "client.go:534",
+                "client.go:538",
+                "client.go:559",
+                "client.go:569",
+                "client.go:75",
+                "client.go:763",
+                "client.go:97",
+                "metric.go:128",
+                "metric.go:278",
+                "metric.go:321",
+                "metric.go:338",
+                "simple_consumer.go:407",
+                "simple_consumer.go:449",
+                "subscriber.go:107",
+                "subscriber.go:206",
+                "subscriber.go:207",
+                "subscriber.go:240",
+                "subscriber.go:336",
+                "subscriber.go:384",
+                "testing.go:1934",
+                "testing.go:1997",
+                "transaction_broker_host_integration_test.go:167",
+                "transaction_broker_host_integration_test.go:169"
+              ],
+              "failed_tests": [
+                "TestM3ActualBrokerHost"
+              ],
+              "assertion_lines": [
+                167,
+                169,
+                353
+              ]
+            }
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "report_sha256": "7f70bc2205a8961d1154119cb182aa498a7a608fb9a5eaa2f7e0e62b1248c5cd"
+        },
+        {
+          "mysql": "8.4.11",
+          "host": {
+            "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+            "sdk_module": {
+              "Path": "github.com/FangcunMount/reliable-messaging",
+              "Version": "v0.5.0-rocketmq-tx.1",
+              "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+              "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+            },
+            "provision": {
+              "version": 2,
+              "operations": 7,
+              "typed_topics": 1,
+              "principals": 2,
+              "verified": true
+            },
+            "private_output_sha256": "f76f4689fb7c9412680ca9dcc5bb70dc221d6fa889a3d5d0746974fc2bd45d2a",
+            "exit_code": 1,
+            "diagnostics": {
+              "build_failed": false,
+              "test_timeout": false,
+              "race_reports": 2,
+              "race_frames": [
+                "client.go:108",
+                "client.go:165",
+                "client.go:176",
+                "client.go:323",
+                "client.go:342",
+                "client.go:383",
+                "client.go:534",
+                "client.go:538",
+                "client.go:559",
+                "client.go:569",
+                "client.go:75",
+                "client.go:763",
+                "client.go:97",
+                "metric.go:128",
+                "metric.go:278",
+                "metric.go:321",
+                "metric.go:338",
+                "simple_consumer.go:407",
+                "simple_consumer.go:449",
+                "subscriber.go:107",
+                "subscriber.go:206",
+                "subscriber.go:207",
+                "subscriber.go:240",
+                "subscriber.go:336",
+                "subscriber.go:384",
+                "testing.go:1934",
+                "testing.go:1997",
+                "transaction_broker_host_integration_test.go:167",
+                "transaction_broker_host_integration_test.go:169"
+              ],
+              "failed_tests": [
+                "TestM3ActualBrokerHost"
+              ],
+              "assertion_lines": [
+                167,
+                169,
+                353
+              ]
+            }
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "report_sha256": "e024dc47302cbbc3a7c1d4806980e1971a29cb46949f62eda732a1a558e74185"
+        }
+      ]
     }
   ],
   "remaining": [

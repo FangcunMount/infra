@@ -108,8 +108,8 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；四库PR均合并，三库最终完整CI通过；生产未切换 |
 | ✅ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 2026-10-19；[完整证据](evidence/rocketmq-m3-iam-planning-20261019.json)；ea95cd9e全CI及三档MySQL每档7项0跳过、独立并发通过；[PR131](https://github.com/FangcunMount/iam/pull/131)合并c2aa3635；实际Sender装配属T06 |
 | ✅ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 2026-10-20；89bdcf58三档MySQL每档12具名项、共36项0跳过；Mac mini隔离RocketMQ5.5.1/MySQL8.0.44完整21项0失败0跳过，含实际IAM宿主4项证明，临时资源已清理；[完整证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；[PR132](https://github.com/FangcunMount/iam/pull/132)合并7accc92c，生产未变更 |
-| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 验证失败；[PR134](https://github.com/FangcunMount/iam/pull/134)固定98d0af8d源码CI全绿；infra public后required原事务/HTTP三档各34项0跳过，真实Broker8.0.36通过21项，8.0.44/8.4宿主用例失败，保留报告并排查；[分项证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
-| ☐ | T08 | IAM 与 QS 双订阅、乱序、freshness 回归 | 待开始 |
+| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 验证失败（已定位SDK指标回写race，修复中）；[PR134](https://github.com/FangcunMount/iam/pull/134)固定98d0af8d源码CI全绿；infra public后required原事务/HTTP三档各34项0跳过，真实Broker8.0.36通过21项，8.0.44/8.4宿主用例失败，保留报告并排查；[分项证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
+| ☐ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 进行中；IAM [PR135](https://github.com/FangcunMount/iam/pull/135)、QS [PR409](https://github.com/FangcunMount/qs-server/pull/409)；两实例及QS实际订阅验收已实现，源码race通过，首轮真实夹具错误已修正；SDK指标race修复与正式成对门禁待完成；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
 | ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 待开始 |
 | ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 待开始 |
 | ☐ | T11 | QS 报告生成/失败，冻结与终态恢复 | 待开始 |
@@ -242,3 +242,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：T06 PR132按精确89bdcf58源码、全绿检查及既有真实Broker证明完成合并，merge7accc92c；合并前回读PRODUCTION_DEPLOY_PAUSED=true且最新main403d41c2已在候选历史中。进度仍6/36，合并与生产独立，M3-1等待T07/T08及相应合并门禁。
 
 - 2026-10-20：infra public后39322133359真实执行，账单门禁已恢复。IAM98d0af8d完整CI、并发、SDK兼容与镜像构建通过；required MySQL8.0.36/8.0.44/8.4原事务及HTTP各34项全部通过。Broker8.0.36为21项通过，另外两档在宿主测试出现失败但已输出业务receipt；尚未定位原因，T07标验证失败且进度保持6/36。新增仅文件名/行号的race脱敏诊断，并在Mac mini固定98d0af8d/8.4临时独立项目复现；T08双实例及QS乱序通知/freshness回归已本地通过，真实fanout与任务门禁仍待完成。
+
+- 2026-10-20：诊断矩阵39324475047三档均复现Go driver metric.go:321/338指标回写与ACK hook并发race，所有失败保留。独立SDK工作区补确定性回归：修复前3条race并失败，atomic meter pointer修复后通过，真实TLS400次ACK/连续metric-off回写通过，make check通过；待单独PR/固定Go修订制品及宿主重验，T07不勾选。T08新增IAM PR135、QS PR409；IAM source race1926通过/31既有可选跳过，QS目标85项通过，87项文档自测及facts通过。首次本地全仓源测试umask077改变既有权限夹具而失败，正常umask022复验通过，未改写该既有业务。Mac mini T08实际夹具发现writer缺声明身份resolver，修正为生产同样的ApplicationUnitOfWork(resolver)装配；当前仍未获得fanout通过证据，进度6/36。
