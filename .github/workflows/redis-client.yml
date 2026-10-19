@@ -1,0 +1,27 @@
+name: Redis migration contracts
+on:
+  pull_request:
+    paths: ['scripts/redis/**', 'scripts/mysql/runtime.py', 'components/redis-client/**', '.github/workflows/redis-client.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/redis/**', 'scripts/mysql/runtime.py', 'components/redis-client/**', '.github/workflows/redis-client.yml']
+permissions:
+  contents: read
+jobs:
+  isolated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y redis-server
+      - name: Verify public CA checksum
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('.')
+          manifest=json.loads((root/'components/redis-client/manifest.json').read_text())
+          data=(root/manifest['ca_file']).read_bytes()
+          assert b'PRIVATE KEY' not in data
+          assert hashlib.sha256(data).hexdigest()==manifest['ca_sha256']
+          PY
+      - name: Test isolated Redis contracts without production credentials
+        run: python3 -m unittest discover -s scripts/redis -p 'test_*.py' -v

@@ -49,6 +49,7 @@ docs/
 
 | 我想... | 参考文档 |
 |---------|----------|
+| 准备阿里云 Redis 切到腾讯云 | [Redis 切换手册](./server/redis-tencent-cutover.md) |
 | 了解四机拓扑和服务落点 | [架构设计](./server/architecture.md) |
 | 查看 IAM 迁至腾讯云 serverA 的结果 | [IAM 腾讯云迁移记录](./server/iam-tencent-servera-migration.md) |
 | 参考历史 IAM 迁到 serverB 的步骤 | [历史 IAM 迁移手册](./server/iam-migration-to-serverB.md) |
