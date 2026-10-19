@@ -4,7 +4,7 @@
 
 ## 当前执行快照
 
-- 进度：**2/36**；T01–T02 已完成，T03 进行中。
+- 进度：**3/36**；T01–T03 实现及本地验证已完成，仓库CI待完成；T04 待开始。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码合并：未发生 M3 合并。稳定 SDK 发布：未执行。生产部署/DDL/Topic/ACL/provider 切换：未执行。system 验收与 48 小时观察：未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
@@ -104,7 +104,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | --- | --- | --- | --- |
 | ✅ | T01 | 执行总表、独立工作区、完整 SHA 基线、证据格式及 PR 台账 | 2026-10-19；实现8e5c9a9；[基线与36项/8里程碑验证](evidence/rocketmq-m3-baseline-20261019.json)；本地提交，PR待创建 |
 | ✅ | T02 | 全部生产者/消费者/订阅/Outbox/调度/恢复清单及105前置 | 2026-10-19；[责任清单](rocketmq-m3-inventory.md)/[源码核验](evidence/rocketmq-m3-inventory-20261019.json)：17目录事件、9协议kind、39文件、IAM12版本调用文件、QS8 Stage文件；生产盘点另属T30/T32 |
-| ☐ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 进行中；IAM/QS目标源码基线通过，AI目标29项通过 |
+| ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；IAM e50686c7 / QS98645d817 / AI32ec747；race63/56、AI42通过；PR130/407/158草稿、CI待完成；真实依赖另属T22/T23 |
 | ☐ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 待开始 |
 | ☐ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 待开始 |
 | ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 待开始 |
@@ -189,12 +189,13 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 | --- | --- | --- | --- |
 | infra | codex/rocketmq-m3 | 尚未提交PR | M3生产变更未执行 |
 | SDK | codex/rocketmq-m3 | 无M3变更 | 仍为M2固定预发布 |
-| IAM | codex/rocketmq-m3 | 尚未变更 | 生产未切换 |
-| QS | codex/rocketmq-m3 | 尚未变更 | 生产未切换 |
-| AI | codex/rocketmq-m3 | 尚未变更 | 生产未切换 |
+| IAM | codex/rocketmq-m3 / e50686c7 | [PR130](https://github.com/FangcunMount/iam/pull/130)，草稿，CI待完成 | 生产未切换 |
+| QS | codex/rocketmq-m3 / 98645d817 | [PR407](https://github.com/FangcunMount/qs-server/pull/407)，草稿，CI待完成 | 生产未切换 |
+| AI | codex/rocketmq-m3 / 32ec747 | [PR158](https://github.com/FangcunMount/qs-ai/pull/158)，草稿，CI待完成 | 生产未切换 |
 
 ### 执行记录
 
 - 2026-10-19：批准M3完整规划；已从各仓库origin/main建立五个独立工作区。首次状态0/36，生产前置105独立处理，尚未核验完成。
 - 2026-10-19：T01完成。提交8e5c9a9建立完整规划、五库SHA/工作区与证据格式；36个连续唯一任务、8个里程碑、5个隔离分支及diff检查通过；进度1/36，尚未合并或生产变更。
 - 2026-10-19：T02完成，进度2/36。全目录与协议kind覆盖核对、39个源码文件摘要及版本/Stage调用扫描通过；IAM维护工具的写入口已显式纳入，sessionrevocation、业务调度、AI未知调用治理继续保留。T03窄基线：IAM授权/原UOW及options通过，QS options/答卷/证据通过，AI29项通过。初次uv因PATH缺失exit127，改用已安装的绝对路径后成功；不隐去该工具失败，不据此声称真实依赖故障或生产验收已通过。
+- 2026-10-19：T03源码基础完成，进度3/36。三库固定M2预发布；显式owner/store/epoch/v2/预算与无网络、无DB查询的构造通过。宿主准入与SDK最终关闭分开，暂停保留Checker，ShutdownIncomplete继续Wait；旧Relay装配拒绝事务配置。IAM63/QS56目标race节点、AI42项均0失败0跳过，QS679回归通过，IAM96通过/1既有MySQL依赖跳过；后者不计为原事务证明。Go vet、Python lint/type和文档门禁通过；SDK失败交接重审与失败历史留证。PR130/407/158草稿已提交，合并/真实Broker验证/生产仍未完成。本机Docker未运行，不启动已有依赖；后续真实存储用隔离CI。

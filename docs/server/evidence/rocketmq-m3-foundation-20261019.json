@@ -1,0 +1,153 @@
+{
+  "reports": {
+    "iam-race-final": {
+      "sha256": "49b79ec6a100673a56e2292de174e6ccab222c5e6fae1a2e03635d3c9f6fca4a",
+      "passed": 63,
+      "failed": 0,
+      "skipped": 0,
+      "skips": []
+    },
+    "qs-race-final": {
+      "sha256": "d088c3263e3f8bd7735558f8b77ab02c4ab7b8aacb36dfa1604e52aa4fcd6708",
+      "passed": 56,
+      "failed": 0,
+      "skipped": 0,
+      "skips": []
+    },
+    "iam-regression": {
+      "sha256": "aa7943923cffb1a381c1d64c65755e0aeb277f157ad86b00a74f3af6b9302e23",
+      "passed": 96,
+      "failed": 0,
+      "skipped": 1,
+      "skips": [
+        "TestReplaceManagedAssignmentsMySQLConcurrentLinearization"
+      ]
+    },
+    "qs-regression": {
+      "sha256": "1570a572667ebbfa3b0655384b99fe629813582f43381ebb9af14d35298a2cb4",
+      "passed": 679,
+      "failed": 0,
+      "skipped": 0,
+      "skips": []
+    },
+    "ai-unit": {
+      "tests": 42,
+      "failed": 0,
+      "skipped": 0,
+      "sha256": "6c7cc522911b877904ccb17d32501700bebf6d651ad77d3ee7b271c6c4c1c287"
+    }
+  },
+  "modules": {
+    "iam": {
+      "Path": "github.com/FangcunMount/reliable-messaging",
+      "Version": "v0.5.0-rocketmq-tx.1",
+      "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+      "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+    },
+    "qs-server": {
+      "Path": "github.com/FangcunMount/reliable-messaging",
+      "Version": "v0.5.0-rocketmq-tx.1",
+      "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+      "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+    }
+  },
+  "format_version": 1,
+  "task_ids": [
+    "T03"
+  ],
+  "observed_at": "2026-10-19T10:26:04.435811+00:00",
+  "stage": "source-foundation",
+  "complete": true,
+  "ci_complete": false,
+  "production_changes": false,
+  "business_acceptance": false,
+  "repositories": {
+    "iam": {
+      "source_sha": "e50686c7c71ce372c741b3565f39ddf9c64c5db3",
+      "pr": "https://github.com/FangcunMount/iam/pull/130",
+      "merged": false
+    },
+    "qs-server": {
+      "source_sha": "98645d817f1b677af205753f88104e954a3bfbc4",
+      "pr": "https://github.com/FangcunMount/qs-server/pull/407",
+      "merged": false
+    },
+    "qs-ai": {
+      "source_sha": "32ec747c73c4176af2f73128d67272a1ab6cdc2f",
+      "pr": "https://github.com/FangcunMount/qs-ai/pull/158",
+      "merged": false
+    }
+  },
+  "python_sdk": {
+    "version": "0.4.0a1",
+    "wheel_sha256": "47c67e6037f427da4e27597ddaaac4fb4c38f8bc78c5c6aa4758618d53d05606",
+    "source": "published GitHub Release wheel, uv.lock",
+    "origin": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai/.venv/lib/python3.11/site-packages/reliable_messaging/__init__.py",
+    "isolated_import_verified": true
+  },
+  "static_validation": {
+    "go_vet": "passed for both target package sets",
+    "iam_docs": "hygiene and facts passed",
+    "qs_docs": "87 tests, hygiene and facts passed",
+    "python_ruff": "passed",
+    "python_format": "4 files already formatted",
+    "python_mypy": "passed for config and two bootstrap files",
+    "git_diff_check": "passed"
+  },
+  "handoff_audit": {
+    "from_tag": "v0.4.0-rocketmq.1",
+    "to_tag": "v0.5.0-rocketmq-tx.1",
+    "unchanged_git_trees": {
+      "transport/nsq": "0e8ff1ebefd1a225f752ece4bb9a70679834b6a9",
+      "wire/legacy": "9fd0017f6882573cd3130db7010a975ce0af7884"
+    },
+    "identical_rocketmq_source_suffixes": {
+      "handle": "68ec0c6ec4e4a7f8dfdf3a3a2a5eee1369172d0147c4b858a88b38c8a80e5855",
+      "Ack": "3d5f3604676b86f9c30bb0f40aa8de4f2b4cf5577416653c4a88800776176d63",
+      "dispatch": "c89d1bb0d4387268698d3f54c1bbd92220c5a4769e9ca7493393591366d46d0b"
+    },
+    "changed_area": "RocketMQ multi-physical route subscription selection; no terminal settlement changes",
+    "guard_preserved": "version pin and mutation test updated only after audit"
+  },
+  "commands": {
+    "iam_race": "go test -race -json ./internal/apiserver/options ./internal/apiserver/container/platform",
+    "qs_race": "go test -race -json ./internal/pkg/options ./internal/pkg/messagingruntime",
+    "iam_regression": "go test -json ./internal/apiserver/application/authz/... ./internal/apiserver/infra/mysql/uow/authz ./internal/apiserver/infra/mysql/eventoutbox ./internal/apiserver/container/...",
+    "qs_regression": "go test -json ./internal/apiserver/application/survey/answersheet ./internal/pkg/eventing/... ./internal/apiserver/infra/aibridge ./internal/worker/process",
+    "python": "uv run --frozen pytest -q tests/test_transaction_messaging.py tests/test_rocketmq_binding.py tests/test_messaging_runtime.py tests/test_config.py"
+  },
+  "history": [
+    {
+      "check": "baseline uv invocation",
+      "result": "PATH missing, exit127; corrected to existing absolute uv path"
+    },
+    {
+      "check": "Go download via default goproxy.cn",
+      "result": "stalled; only the two task-owned download processes interrupted; official proxy download succeeded without modifying global Go config"
+    },
+    {
+      "check": "IAM TDD RED",
+      "result": "new route/config tests initially failed to compile because implementation was absent; GREEN completed"
+    },
+    {
+      "check": "Python TDD RED",
+      "result": "new transaction assembly module absent at collection; GREEN completed"
+    },
+    {
+      "check": "QS docs first run",
+      "result": "SDK handoff version guard and mutation selector rejected unreviewed dependency change; source audit completed and exact pin/test updated"
+    },
+    {
+      "check": "QS docs second run",
+      "result": "cross-repository path treated as missing local file; corrected to external infra link; final87/hygiene/facts passed"
+    }
+  ],
+  "boundaries": [
+    "Only explicit assembly and source lifecycle contract tests; no actual host business transaction migrated",
+    "Legacy Relay/wire assembly rejects enabled transaction owners rather than silently using ordinary publication",
+    "One optional existing IAM MySQL regression skipped; required M3 database proof is not claimed",
+    "Local Docker daemon unavailable; no real-dependency tests executed locally",
+    "No production schema, Topic, ACL, provider, worker resources, stable SDK release or NSQ state changed",
+    "Initial write pause keeps SDK Checker; actual Broker recovery/shutdown fault proof belongs to T22/T23"
+  ]
+}
