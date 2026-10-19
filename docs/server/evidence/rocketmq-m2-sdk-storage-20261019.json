@@ -227,5 +227,6 @@
     }
   ],
   "fault_evidence_boundary": "Mongo write-conflict callback retry and real commit write-concern failpoint verified. Packet-level commit reply loss, Sender and Broker recovery remain later M2 tasks.",
-  "production_changed": false
+  "production_changed": false,
+  "merge_sha": "d7d1415362b11095b494c3e2010245d0964d74a3"
 }
