@@ -248,3 +248,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：SDK独立修复8fb6fc57创建[PR46](https://github.com/FangcunMount/reliable-messaging/pull/46)。38份Apache源码和新meter-snapshot.patch可完全复现；make check、真实TLS/race及golangci2.5.0通过，Go1.25.9/1.25.12云端源码检查已通过，PR检查/NSQ兼容与实际SDK双存储/跨语言矩阵继续运行。拟发布新的Go修订预发布v0.5.0-rocketmq-tx.2，不移动旧tag，不修改Python源码；稳定Go/Python同SHA配对仍由T27执行。[修复证据](evidence/rocketmq-m3-sdk-meter-repair-20261020.json)。
 
 - 2026-10-20：SDK PR46全部当前检查通过，按固定8fb6fc57完成合并（d06861e5）；Go1.25.9/1.25.12 make check、lint、Redis与NSQ兼容均绿。双存储及跨语言实际SDK矩阵39326382808仍在执行，Go修订tag尚未发布，宿主仍未切换依赖；M3保持6/36，源码合并/发布/宿主/生产分别记录。
+
+- 2026-10-20：SDK实际双存储及跨语言矩阵39326382808两档各31项0失败/跳过，临时容器/进程/私有目录全部清理。已发布固定Go修订预发布v0.5.0-rocketmq-tx.2，源码8fb6fc57；正式tag下载模块213份选定源码逐字节匹配，模块缓存race回归/SDK探针构建通过，六个GitHub资产重新下载摘要全部一致。Python仍为原0.4.0a1/bfaae2b，不覆盖已有版本；T27稳定配对发布尚未执行。IAM/QS开始锁定新Go模块并重验，T07/T08未打勾，生产未变更。
