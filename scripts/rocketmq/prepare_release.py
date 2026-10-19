@@ -9,9 +9,10 @@ import datetime
 import json
 from pathlib import Path
 import shutil
+import tempfile
 import xml.etree.ElementTree as ET
 
-from prepare_published import GO_TAG, PY_TAG, REPO, VERSION, digest, run, source_manifest
+from prepare_published import GO_TAG, PY_TAG, REPO, VERSION, digest, install_python_assets, run, source_manifest
 
 
 def checked_report(path, sha, count, candidate, infra):
@@ -149,14 +150,19 @@ def main():
     for asset in assets:
         shutil.copyfile(asset, output/asset.name)
     shutil.copyfile(candidate/'python/uv.lock', output/'uv.lock')
+    files = source_manifest(candidate)
+    with tempfile.TemporaryDirectory(prefix='m2-prerelease-python-') as directory:
+        installations = install_python_assets(candidate, output, Path(directory), files)
     acceptance = {'source_sha': sha, 'source_ci': source_ci,
                   'acceptance_ci': acceptance_ci, 'regression_ci': regression_ci,
+                  'candidate_python_installations': installations,
+                  'temporary_installation_environments_removed': True,
                   'full_sdk_reports': full, 'raw_protocol_reports': raw, 'go_sdk_reports': go}
     (output/'transaction-acceptance.json').write_text(json.dumps(acceptance, indent=2)+'\n')
     receipt = {'version': 1, 'source_sha': sha, 'source_tree': tree,
                'go_tag': GO_TAG, 'python_tag': PY_TAG,
                'prepared_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-               'source_files_sha256': source_manifest(candidate),
+               'source_files_sha256': files,
                'ci': {'source': source_ci, 'acceptance': acceptance_ci, 'regression': regression_ci},
                'python_profiles': {profiles[0].parent.name: results, profiles[1].parent.name: other_results},
                'assets': {p.name: digest(p) for p in sorted(output.iterdir())}}

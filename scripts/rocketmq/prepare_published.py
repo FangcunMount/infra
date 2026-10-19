@@ -71,6 +71,40 @@ def source_manifest(candidate):
     return {name:digest(candidate/name) for name in sorted(names)}
 
 
+def install_python_assets(candidate, downloads, output, source_files):
+    """Install fixed wheel/sdist and lock outside source; verify bytes and dependencies."""
+    # Derive constraints from the fixed asset dependency lock without installing
+    # the project directory. Runtime dependencies must not silently float.
+    locked_project=output/'locked-project'; locked_project.mkdir(mode=0o700)
+    shutil.copyfile(candidate/'python/pyproject.toml',locked_project/'pyproject.toml')
+    shutil.copyfile(downloads/'uv.lock',locked_project/'uv.lock')
+    constraints=output/'runtime-constraints.txt'
+    run(['uv','export','--project',str(locked_project),'--frozen','--all-extras',
+         '--all-groups','--no-emit-project','--no-hashes','--format','requirements.txt',
+         '--output-file',str(constraints)])
+    locked=tomllib.loads((downloads/'uv.lock').read_text())
+    allowed={}
+    for package in locked['package']:
+        allowed.setdefault(package['name'].lower().replace('_','-'),set()).add(package['version'])
+    packages={}
+    for kind,suffix in (('wheel','*.whl'),('sdist','*.tar.gz')):
+        matches=list(downloads.glob(suffix))
+        if len(matches)!=1:
+            raise RuntimeError('expected one fixed '+kind)
+        environment=output/kind
+        run(['uv','venv',str(environment)])
+        python=environment/'bin/python'
+        run(['uv','pip','install','--python',str(python),'--constraint',str(constraints),
+             str(matches[0])+'[nsq,rocketmq]','asyncmy'])
+        packages[kind]=verify_package(python,candidate,source_files)
+        versions=json.loads(run([str(python),'-I','-c',
+            "import json,importlib.metadata as m; print(json.dumps({d.metadata['Name'].lower().replace('_','-'):d.version for d in m.distributions()}))"]))
+        if any(version not in allowed.get(name,set()) for name,version in versions.items()):
+            raise RuntimeError('installed dependency differs from downloaded fixed lock')
+        packages[kind]['dependency_versions']=versions
+    return packages
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--candidate',type=Path,required=True)
@@ -126,35 +160,7 @@ def main():
         raise RuntimeError('published Go source proof empty or uses replace')
     binary=output/'sdk-go-probe'
     run(['go','build','-mod=readonly','-o',str(binary),'./transport/rocketmq/internal/sdkprobe'],cwd=module_dir)
-    # Derive constraints from the DOWNLOADED dependency lock without installing
-    # the project directory. Runtime dependencies must not silently float.
-    locked_project=output/'locked-project'; locked_project.mkdir(mode=0o700)
-    shutil.copyfile(candidate/'python/pyproject.toml',locked_project/'pyproject.toml')
-    shutil.copyfile(downloads/'uv.lock',locked_project/'uv.lock')
-    constraints=output/'runtime-constraints.txt'
-    run(['uv','export','--project',str(locked_project),'--frozen','--all-extras',
-         '--all-groups','--no-emit-project','--no-hashes','--format','requirements.txt',
-         '--output-file',str(constraints)])
-    locked=tomllib.loads((downloads/'uv.lock').read_text())
-    allowed={}
-    for package in locked['package']:
-        allowed.setdefault(package['name'].lower().replace('_','-'),set()).add(package['version'])
-    packages={}
-    for kind,suffix in (('wheel','*.whl'),('sdist','*.tar.gz')):
-        matches=list(downloads.glob(suffix))
-        if len(matches)!=1:
-            raise RuntimeError('expected one published '+kind)
-        environment=output/kind
-        run(['uv','venv',str(environment)])
-        python=environment/'bin/python'
-        run(['uv','pip','install','--python',str(python),'--constraint',str(constraints),
-             str(matches[0])+'[nsq,rocketmq]','asyncmy'])
-        packages[kind]=verify_package(python,candidate,source_files)
-        versions=json.loads(run([str(python),'-I','-c',
-            "import json,importlib.metadata as m; print(json.dumps({d.metadata['Name'].lower().replace('_','-'):d.version for d in m.distributions()}))"]))
-        if any(version not in allowed.get(name,set()) for name,version in versions.items()):
-            raise RuntimeError('installed dependency differs from downloaded fixed lock')
-        packages[kind]['dependency_versions']=versions
+    packages=install_python_assets(candidate,downloads,output,source_files)
     report={'source_sha':sha,'go_tag':GO_TAG,'python_tag':PY_TAG,'asset_sha256':checksums,
             'go_module':{k:module[k] for k in ('Path','Version','Sum','GoModSum')},
             'go_verified_files':checked,'go_binary':str(binary),'go_binary_sha256':digest(binary),
