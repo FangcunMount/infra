@@ -1,0 +1,423 @@
+#!/usr/bin/env python3
+"""M2-0 required, disposable upstream transaction proof; never production.
+
+Owns a random Compose project, loopback ports, principals and a fresh MySQL.
+No external endpoint, existing database or production credentials are accepted.
+Failure is failure, including missing dependencies; no skipped cases.
+"""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import queue
+import secrets
+import shutil
+import socket
+import subprocess
+import tempfile
+import threading
+import time
+
+from render import render
+
+
+PARAMETERS = {"transactionTimeOut": 6000, "transactionCheckInterval": 5000,
+              "transactionCheckMax": 24}
+
+
+def broker_parameters(output):
+    """Only allowlisted runtime values may leave the private admin capture."""
+    import re
+    result = {}
+    for name in (*PARAMETERS, "fileReservedTime"):
+        match = re.search(r"(?m)^\s*" + name + r"\s*=\s*(\d+)\s*$", output)
+        if not match:
+            raise RuntimeError("effective transaction parameter missing: " + name)
+        result[name] = int(match[1])
+    return result
+
+
+def run(argv, *, timeout=120, env=None, cwd=None, required=True, stdin=None):
+    result = subprocess.run(argv, input=stdin, capture_output=True, text=True,
+                            env=env, cwd=cwd, timeout=timeout)
+    if required and result.returncode:
+        # Admin output and driver logs can contain private credentials/DSNs.
+        raise RuntimeError(Path(str(argv[0])).name + " operation failed (private output withheld)")
+    return result
+
+
+def port():
+    with socket.socket() as listener:
+        listener.bind(("127.0.0.1", 0))
+        return listener.getsockname()[1]
+
+
+class Probe:
+    def __init__(self, argv, directory, env):
+        self.events = []
+        self.incoming = queue.Queue()
+        self.log = open(directory / ("probe-" + secrets.token_hex(5) + ".log"), "x")
+        os.chmod(self.log.name, 0o600)
+        self.process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                        stderr=self.log, text=True, env=env, bufsize=1)
+
+        def collect():
+            for line in self.process.stdout:
+                if line.startswith("TXPROBE "):
+                    try:
+                        self.incoming.put(json.loads(line[len("TXPROBE "):]))
+                    except ValueError:
+                        self.incoming.put({"event": "failed"})
+                else:
+                    self.log.write(line)
+            self.incoming.put({"event": "exited"})
+
+        self.reader = threading.Thread(target=collect, daemon=True)
+        self.reader.start()
+
+    def drain(self):
+        while True:
+            try:
+                self.events.append(self.incoming.get_nowait())
+            except queue.Empty:
+                return
+
+    def wait(self, event, identity=None, decision=None, timeout=90):
+        deadline = time.monotonic() + timeout
+        while True:
+            self.drain()
+            for item in self.events:
+                if (item.get("event") == event and (identity is None or item.get("id") == identity)
+                        and (decision is None or item.get("decision") == decision)):
+                    return item
+            if any(e.get("event") in ("failed", "exited") for e in self.events):
+                raise RuntimeError("probe ended before " + event)
+            if time.monotonic() >= deadline:
+                raise RuntimeError("probe timed out waiting for " + event + "/" + str(decision))
+            time.sleep(0.05)
+
+    def send(self, action):
+        self.process.stdin.write(action + "\n")
+        self.process.stdin.flush()
+
+    def finish(self, expected=0):
+        if self.process.wait(timeout=30) != expected:
+            raise RuntimeError("unexpected probe process status")
+        self.reader.join(timeout=2)
+        self.drain()
+
+    def close(self):
+        if self.process.poll() is None:
+            self.process.terminate()
+            try:
+                self.process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+                self.process.wait(timeout=5)
+        self.reader.join(timeout=2)
+        self.process.stdin.close()
+        self.process.stdout.close()
+        self.log.close()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--image", required=True)
+    parser.add_argument("--mysql-image", default="mysql:8.0.36")
+    parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--go-probe", type=Path)
+    parser.add_argument("--python", default="uv")
+    args = parser.parse_args()
+    repo = Path(__file__).resolve().parents[2]
+    sources = repo / "scripts/rocketmq/txprobe"
+    directory = Path(tempfile.mkdtemp(prefix="rocketmq-m2-"))
+    directory.chmod(0o700)
+    project = "rocketmq-m2-" + secrets.token_hex(6)
+    config, data = directory / "config", directory / "data"
+    config.mkdir(); data.mkdir(); (config / "tls").mkdir()
+    grpc_port, metrics_port, mysql_port = port(), port(), port()
+    while len({grpc_port, metrics_port, mysql_port}) != 3:
+        grpc_port, metrics_port, mysql_port = port(), port(), port()
+    accounts = {name: {"username": "m2-" + name, "password": secrets.token_hex(32)}
+                for name in ("admin", "inner", "owner-a", "owner-b")}
+    mysql_password = secrets.token_hex(32)
+    render(accounts, config, "127.0.0.1", repo / "components/rocketmq")
+    with (config / "broker.conf").open("a") as stream:
+        stream.write("".join(f"{key}={value}\n" for key, value in PARAMETERS.items()))
+    proxy = json.loads((config / "proxy.json").read_text())
+    proxy["grpcServerPort"] = grpc_port
+    (config / "proxy.json").write_text(json.dumps(proxy))
+    run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
+         "-subj", "/CN=rocketmq-m2-isolated", "-addext", "subjectAltName=IP:127.0.0.1,DNS:localhost",
+         "-keyout", str(config / "tls/server.key"), "-out", str(config / "tls/server.crt")])
+    ca = directory / "ca.crt"
+    shutil.copyfile(config / "tls/server.crt", ca)
+    image = run(["docker", "image", "inspect", args.image, "--format", "{{.Id}}"]).stdout.strip()
+    run(["docker", "image", "inspect", args.mysql_image], required=False)
+    if run(["docker", "image", "inspect", args.mysql_image], required=False).returncode:
+        run(["docker", "pull", args.mysql_image], timeout=300)
+    mysql_image = run(["docker", "image", "inspect", args.mysql_image, "--format", "{{.Id}}"]).stdout.strip()
+    run(["docker", "run", "--rm", "--user", "0", "--entrypoint", "bash",
+         "-v", str(config) + ":/config", "-v", str(data) + ":/data", image, "-c",
+         "mkdir -p /data/store /data/auth /data/logs /data/nameserver-logs; "
+         "chown -R 3000:3000 /data /config; chmod 750 /config /config/tls; "
+         "chmod 640 /config/broker.conf /config/proxy.json /config/tools.yml /config/tls/server.key"])
+    environment = dict(os.environ, ROCKETMQ_IMAGE=image, ROCKETMQ_BIND_IP="127.0.0.1",
+                       ROCKETMQ_GRPC_PORT=str(grpc_port), ROCKETMQ_METRICS_PORT=str(metrics_port),
+                       ROCKETMQ_DATA_ROOT=str(data), ROCKETMQ_CONFIG_ROOT=str(config))
+    spec = json.loads(run(["docker", "compose", "-f", str(repo / "components/rocketmq/docker-compose.yml"),
+                          "config", "--format", "json"], env=environment).stdout)
+    # Compose's rendered network names must not point at the ordinary stack.
+    spec.pop("name", None)
+    for network in spec["networks"].values():
+        network.pop("name", None)
+    broker_spec = spec["services"]["broker"]
+    broker_spec["ports"][0]["target"] = grpc_port
+    broker_spec["healthcheck"]["test"][-1] = f"exec 3<>/dev/tcp/127.0.0.1/{grpc_port}"
+    for service in spec["services"].values():
+        service["restart"] = "no"
+    spec["services"]["mysql"] = {
+        "image": mysql_image, "environment": {"MYSQL_ROOT_PASSWORD": mysql_password,
+        "MYSQL_DATABASE": "txprobe", "MYSQL_USER": "txprobe", "MYSQL_PASSWORD": mysql_password},
+        "ports": [f"127.0.0.1:{mysql_port}:3306"], "networks": ["rocketmq"],
+        "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
+        "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
+                        "interval": "3s", "timeout": "3s", "retries": 40}}
+    compose_file = directory / "compose.json"
+    compose_file.write_text(json.dumps(spec)); compose_file.chmod(0o600)
+    compose = ["docker", "compose", "-p", project, "-f", str(compose_file)]
+    broker, mysql = project + "-broker-1", project + "-mysql-1"
+    probes, cases, received, proof = [], {}, set(), {}
+    failure = None
+
+    def admin(operation, *params, success=False):
+        result = run(["docker", "exec", broker, "java", "-Xms32m", "-Xmx128m",
+                      "-XX:MaxDirectMemorySize=32m", "-cp", "/opt/rocketmq/conf:/opt/rocketmq/lib/*",
+                      "org.apache.rocketmq.tools.command.MQAdminStartup", operation,
+                      "-b", "127.0.0.1:10911", *params], timeout=45).stdout
+        if success and " success." not in result:
+            raise RuntimeError("admin operation missing positive completion: " + operation)
+        return result
+
+    def sql(query):
+        return run(["docker", "exec", "-i", mysql, "sh", "-c",
+                    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B txprobe'], stdin=query).stdout.strip()
+
+    def start(language, mode, identity="", owner="owner-a", topic=None):
+        account = accounts[owner]
+        path = directory / ("client-" + secrets.token_hex(5) + ".json")
+        path.write_text(json.dumps({"endpoint": f"127.0.0.1:{grpc_port}",
+            "accesskey": account["username"], "secretkey": account["password"], "ca": str(ca),
+            "topic": topic or "m2-tx-owner-a", "group": "m2-tx-consumer", "owner": owner,
+            "dsn": f"txprobe:{mysql_password}@tcp(127.0.0.1:{mysql_port})/txprobe?timeout=1s&readTimeout=1s&writeTimeout=1s",
+            "mysql_url": f"mysql+asyncmy://txprobe:{mysql_password}@127.0.0.1:{mysql_port}/txprobe"}))
+        path.chmod(0o600)
+        argv = ([str(args.go_probe or directory / "go-probe")] if language == "go" else
+                [args.python, "run", "--locked", "--project", str(sources), "python", str(sources / "probe.py")])
+        argv += ["--config", str(path), "--mode", mode, "--id", identity]
+        p = Probe(argv, directory, dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(ca)))
+        probes.append(p)
+        return p
+
+    def absent(identity, seconds=7):
+        deadline = time.monotonic() + seconds
+        while time.monotonic() < deadline:
+            consumer.drain()
+            if any(e.get("event") in ("failed", "exited") for e in consumer.events):
+                raise RuntimeError("consumer failed during invisibility assertion")
+            if any(e.get("event") == "received" and e.get("id") == identity for e in consumer.events):
+                raise RuntimeError("uncommitted or rolled-back half became visible")
+            time.sleep(.1)
+
+    def passed(name):
+        cases[name] = True
+        print("transaction acceptance passed: " + name, flush=True)
+
+    try:
+        run(compose + ["up", "-d", "--wait", "--wait-timeout", "180"], timeout=240)
+        effective = broker_parameters(admin("getBrokerConfig"))
+        if any(effective[k] != v for k, v in PARAMETERS.items()):
+            raise RuntimeError("isolated accelerated Broker parameters not effective")
+        proof["effective_broker_parameters"] = effective
+        proof["mysql_version"] = sql("SELECT VERSION();")
+        if not proof["mysql_version"].startswith("8.0."):
+            raise RuntimeError("required MySQL 8.0 fixture absent")
+        sql("CREATE TABLE witness(id VARCHAR(96) PRIMARY KEY, owner VARCHAR(32) NOT NULL, "
+            "wire_hash CHAR(64) NOT NULL, state VARCHAR(16) NOT NULL) ENGINE=InnoDB; "
+            "CREATE TABLE effects(id VARCHAR(96) PRIMARY KEY) ENGINE=InnoDB;")
+        for owner in ("owner-a", "owner-b"):
+            topic = "m2-tx-" + owner
+            admin("updateTopic", "-t", topic, "-r", "1", "-w", "1", "-a", "+message.type=TRANSACTION", success=True)
+            account = accounts[owner]
+            admin("createUser", "-u", account["username"], "-p", account["password"], "-t", "Normal", success=True)
+            admin("createAcl", "-s", "User:" + account["username"], "-r", "Topic:" + topic,
+                  "-a", "Pub,Sub,Get", "-d", "Allow", success=True)
+        admin("updateSubGroup", "-g", "m2-tx-consumer", "-r", "8", success=True)
+        admin("createAcl", "-s", "User:" + accounts["owner-a"]["username"], "-r", "Group:m2-tx-consumer",
+              "-a", "Sub,Get", "-d", "Allow", success=True)
+        if not args.go_probe:
+            run(["go", "build", "-o", str(directory / "go-probe"), "."], cwd=sources)
+        run([args.python, "sync", "--locked", "--project", str(sources)], timeout=180)
+        consumer = start("go", "consume")
+        consumer.wait("ready")
+        for language in ("go", "python"):
+            identity = language + "-commit"
+            sender = start(language, "send", identity)
+            sender.wait("half")
+            absent(identity)
+            sender.send("commit")
+            sender.wait("finalized")
+            sender.finish()
+            consumer.wait("received", identity)
+            received.add(identity)
+            passed(language + "_half_invisible_then_commit_visible")
+
+            identity = language + "-rollback"
+            sender = start(language, "send", identity)
+            sender.wait("half")
+            sender.send("rollback")
+            sender.wait("finalized")
+            sender.finish()
+            absent(identity)
+            if sql(f"SELECT COUNT(*) FROM effects WHERE id='{identity}';") != "0":
+                raise RuntimeError("rolled-back business effect exists")
+            passed(language + "_rollback_invisible")
+
+            identity = language + "-restart"
+            sender = start(language, "send", identity)
+            sender.wait("half")
+            sender.send("crash-committed")
+            sender.wait("local", identity, "COMMITTED")
+            sender.finish(expected=23)
+            # There is no producer left: commit can only come from a fresh
+            # instance, not a saved in-process Transaction or manual invocation.
+            recovery = start(language, "recover")
+            recovery.wait("ready")
+            recovery.wait("checked", identity, "commit", timeout=100)
+            consumer.wait("received", identity)
+            received.add(identity)
+            recovery.send("stop")
+            recovery.finish()
+            if sql(f"SELECT COUNT(*) FROM effects WHERE id='{identity}';") != "1":
+                raise RuntimeError("business was not committed exactly once")
+            passed(language + "_new_process_real_backcheck")
+
+            identity = language + "-lost-commit-response"
+            sender = start(language, "send", identity)
+            sender.wait("half")
+            sender.send("lost-commit-response")
+            sender.wait("finalization_unknown")
+            sender.finish(expected=24)
+            consumer.wait("received", identity)
+            received.add(identity)
+            if sql(f"SELECT COUNT(*) FROM effects WHERE id='{identity}';") != "1":
+                raise RuntimeError("lost response changed business effect count")
+            passed(language + "_real_commit_response_discarded")
+
+            identity = language + "-db-unavailable"
+            sender = start(language, "send", identity)
+            sender.wait("half")
+            run(["docker", "pause", mysql])
+            try:
+                sender.wait("checked", identity, "unknown_database", timeout=100)
+                absent(identity, seconds=2)
+            finally:
+                run(["docker", "unpause", mysql])
+            sender.send("commit")
+            sender.wait("finalized")
+            sender.finish()
+            consumer.wait("received", identity)
+            received.add(identity)
+            passed(language + "_db_failure_is_unknown")
+
+            identity = language + "-wrong-witness-owner"
+            sender = start(language, "send", identity)
+            sender.wait("half")
+            sql(f"UPDATE witness SET owner='owner-b',state='COMMITTED' WHERE id='{identity}';")
+            sender.wait("checked", identity, "unknown_missing", timeout=100)
+            absent(identity, seconds=2)
+            sql(f"UPDATE witness SET owner='owner-a',state='PREPARED' WHERE id='{identity}';")
+            sender.send("rollback")
+            sender.wait("finalized")
+            sender.finish()
+            passed(language + "_other_owner_witness_cannot_commit")
+
+            denied = start(language, "send", language + "-wrong-owner", owner="owner-b")
+            denied.finish(expected=1)
+            if any(e.get("event") == "half" for e in denied.events):
+                raise RuntimeError("wrong owner obtained a half confirmation")
+            passed(language + "_wrong_owner_acl_denied")
+
+        for language, checker in (("go", "python"), ("python", "go")):
+            identity = language + "-to-" + checker + "-recovery"
+            sender = start(language, "send", identity)
+            sender.wait("half")
+            sender.send("crash-committed")
+            sender.wait("local", identity, "COMMITTED")
+            sender.finish(expected=23)
+            recovery = start(checker, "recover")
+            recovery.wait("ready")
+            recovery.wait("checked", identity, "commit", timeout=100)
+            consumer.wait("received", identity)
+            received.add(identity)
+            recovery.send("stop")
+            recovery.finish()
+            passed(language + "_to_" + checker + "_cross_process_recovery")
+
+        # Accelerate ONLY the owned fixture. A real Unknown half must move to
+        # the native discard topic; reaching an arbitrary sleep is not proof.
+        admin("updateBrokerConfig", "-k", "transactionCheckMax", "-v", "2", success=True)
+        discard_parameters = broker_parameters(admin("getBrokerConfig"))
+        if discard_parameters["transactionCheckMax"] != 2:
+            raise RuntimeError("finite-check test setting not effective")
+        proof["discard_broker_parameters"] = discard_parameters
+        sender = start("python", "send", "finite-check-limit")
+        sender.wait("half")
+        sender.wait("checked", "finite-check-limit", "unknown_prepared")
+        deadline = time.monotonic() + 100
+        while time.monotonic() < deadline:
+            result = run(["docker", "exec", broker, "java", "-Xms32m", "-Xmx128m",
+                          "-XX:MaxDirectMemorySize=32m", "-cp", "/opt/rocketmq/conf:/opt/rocketmq/lib/*",
+                          "org.apache.rocketmq.tools.command.MQAdminStartup", "queryMsgByKey",
+                          "-n", "nameserver:9876", "-t", "TRANS_CHECK_MAXTIME_TOPIC",
+                          "-k", "finite-check-limit"], timeout=30, required=False)
+            if "@TRANS_CHECK_MAXTIME_TOPIC@K@finite-check-limit@" in result.stdout:
+                proof["finite_check_discard_topic"] = "TRANS_CHECK_MAXTIME_TOPIC"
+                break
+            time.sleep(2)
+        else:
+            raise RuntimeError("Unknown half not found in native finite-check discard topic")
+        absent("finite-check-limit", seconds=2)
+        if sql("SELECT state FROM witness WHERE id='finite-check-limit';") != "PREPARED":
+            raise RuntimeError("discard test changed local business state")
+        passed("finite_unknown_moves_to_native_discard_topic")
+
+        # All earlier cases must remain absent even after subsequent backchecks.
+        consumer.drain()
+        observed = {e["id"] for e in consumer.events if e.get("event") == "received"}
+        if observed != received:
+            raise RuntimeError("unexpected/missing committed message")
+        passed("exact_committed_identity_set")
+    except Exception as exc:
+        failure = type(exc).__name__ + ": " + str(exc)
+        raise
+    finally:
+        for p in reversed(probes):
+            p.close()
+        run(["docker", "unpause", mysql], required=False)
+        run(compose + ["down", "--volumes", "--remove-orphans", "--timeout", "30"], timeout=120)
+        report = {"version": 1, "batch": "M2-0", "project": project, "image": image,
+                  "mysql_image": mysql_image, "clients": {"go": "5.1.4", "python": "5.1.2"},
+                  "cases": cases, "passed": len(cases), "failed": int(failure is not None),
+                  "skipped": 0, "failure": failure, "proof": proof,
+                  "limits": ["No production acceptance or throughput claim",
+                             "Response loss injected after a real RPC, not at network packet layer",
+                             "Host transaction adapters/fencing and bounded SDK queues belong to later M2 batches"],
+                  "source_sha256": {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                    for p in sorted(sources.iterdir()) if p.is_file()}}
+        args.report.write_text(json.dumps(report, indent=2) + "\n")
+
+
+if __name__ == "__main__":
+    main()

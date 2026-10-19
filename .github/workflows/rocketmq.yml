@@ -20,7 +20,7 @@ concurrency:
 jobs:
   acceptance:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v6
       - name: Checkout pinned public SDK
@@ -59,7 +59,7 @@ jobs:
         run: |
           docker save rocketmq-acceptance:5.5.1 | gzip -1 > rocketmq-5.5.1-amd64.tar.gz
           sha256sum rocketmq-5.5.1-amd64.tar.gz rocketmq-m1-evidence.json > rocketmq-SHA256SUMS
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: success()
         with:
           name: rocketmq-5.5.1-amd64-${{ github.sha }}
@@ -69,3 +69,14 @@ jobs:
             rocketmq-m1-evidence.json
             rocketmq-SHA256SUMS
             rocketmq-build.log
+      - name: Required isolated transaction-client feasibility proof
+        run: |
+          python3 scripts/rocketmq/ci-transactions.py \
+            --image rocketmq-acceptance:5.5.1 --report rocketmq-m2-transactions.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-m2-transactions-${{ github.sha }}
+          retention-days: 14
+          if-no-files-found: error
+          path: rocketmq-m2-transactions.json
