@@ -44,7 +44,10 @@ def recover_after_restart(start, language, storage):
                              'commit_checks':committed,'drained':probe.close()})
             if not attempts[-1]['drained']:
                 raise RuntimeError('failed idle startup did not drain its owned process group')
-            time.sleep(1)
+            # Broker registration/route caches can remain negative beyond six
+            # one-second attempts. Spread the same bounded six idle attempts
+            # across the existing 100-second admission window.
+            time.sleep(min(15, max(0, deadline - time.monotonic())))
             continue
         return probe, {'drained_topic_not_found_attempts':attempts,
                        'commit_checks_before_ready':commits,

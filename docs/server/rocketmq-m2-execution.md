@@ -86,6 +86,8 @@ T19 失败记录：[包级故障39201819131](https://github.com/FangcunMount/inf
 
 精确回查门禁修正：[39206054502](https://github.com/FangcunMount/infra/actions/runs/39206054502) 的新增部分准备/SIGKILL场景在39项通过后失败：全局Rollback计数可能来自旧消息，不能证明当前execution已中止。旧进程组已真实退出，失败报告确认容器、私有目录及全部fixture进程组均排空。SDK 8841fdf仅在恢复探针中通过公共PreparedStore/Evidence接口透明观察真实读取，原样返回原证据/错误，不额外查库、不确认Broker；验收按当前原消息ID匹配Reference及其决定，并分别核对execution/全部witness和真实消费可见性。包括基础跨语言恢复、DB不可用、部分ACK丢失、SIGKILL、重启及原生Unknown的全部公开SDK回查场景统一采用该判据，旧全局指标仅作诊断。22项本地脚本（含排除旧Reference/全局计数误判）及探针编译、lint/格式/49篇文档检查通过；48项真实门禁待重验，T19/T20不打勾。
 
+同一48项旧运行的另一档在45项通过后，Python/MySQL重启恢复的6次1秒间隔启动均返回40402而失败，资源清理通过；未将其计通过。保留最多6次/100秒准入窗口，将空闲启动尝试间隔扩至最多15秒，覆盖重启后的注册/路由恢复；仍只接受明确40402且前一实例已经完全排空，其他错误立即失败，业务不重做。
+
 执行顺序：T01 → T02–T04 → T05–T09 → T10–T13 → T14–T16 → T17–T20 → T21–T24；不跳过前置门禁。
 
 适配矩阵：Go database/sql、GORM、Mongo；Python SQLAlchemy/MySQL。默认验证 profile：发送并发 8、分支上限 16、回查 worker 4/等待 32、DB 回查 2s、RPC 5s、lease 60s、维护每 5s 最多 100 条；宿主显式覆盖，生产预算归 M3。
