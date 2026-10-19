@@ -2,13 +2,14 @@
 
 > 四节点跨云 Swarm 基础网络层下的基础设施管理仓库。
 
-当前目标拓扑：
+当前拓扑（2026-10-19 serverA 迁入腾讯云后）：
 
-- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server + mysql-rds-proxy`
-- `serverB 2C2G`：`IAM`
+- `serverA 4C8G`：`nginx + qs-apiserver + qs-collection-server ×2 + qs-ai + prometheus-route`
+- `serverB 2C2G`：`IAM + Qlume + MiniBlog + operating + mysql-rds-proxy`
 - `serverC 4C4G`：`mongodb`
-- `serverD 4C4G`：`qs-worker + operating + nsq + prometheus + grafana`
-- 云托管：`MySQL`、`Redis`
+- `serverD 4C4G`：`qs-worker + NSQ + RocketMQ`
+- 旧 Mac mini：`Prometheus + Grafana`
+- 阿里云托管：`MySQL`、`Redis`；MySQL 经 serverB 私网代理访问
 - 临时压测机：独立 K6 流量发生器，不加入生产 Swarm
 
 ## 快速开始
@@ -39,8 +40,12 @@ make swarm-init SWARM_ADVERTISE_ADDR=<serverA-ts-ip> SWARM_DATA_PATH_ADDR=<serve
 make swarm-join-manager SWARM_MANAGER_IP=<serverA-ts-ip> SWARM_TOKEN=<token> SWARM_ADVERTISE_ADDR=<serverB-or-D-ts-ip> SWARM_DATA_PATH_ADDR=<serverB-or-D-ts-ip>
 make swarm-join-worker SWARM_MANAGER_IP=<serverA-ts-ip> SWARM_TOKEN=<token> SWARM_ADVERTISE_ADDR=<serverC-ts-ip> SWARM_DATA_PATH_ADDR=<serverC-ts-ip>
 
-# 启动 infra 仓库实际维护的机器
+# 新 A 首次建立目录后再复制生产配置；配置迁入后不要重复初始化
+make init-serverA
+
+# 在对应节点启动 infra 仓库维护的服务
 make serverA-up
+make serverB-up
 make serverC-up
 make serverD-up
 ```
@@ -51,6 +56,7 @@ make serverD-up
 
 | 文档 | 说明 |
 | ------ | ------ |
+| [serverA 腾讯云迁移记录](docs/server/serverA-tencent-migration.md) | 已执行切换、运行证据和回退边界 |
 | [架构设计](docs/server/architecture.md) | 四机拓扑、职责边界、服务依赖 |
 | [IAM 迁移手册](docs/server/iam-migration-to-serverB.md) | IAM 迁到 `serverB` 的步骤、证书与 gRPC mTLS 检查点 |
 | [Mongo 迁移手册](docs/server/mongo-migration-to-serverC.md) | Mongo 迁到 `serverC` 的切换顺序、备份恢复与业务改造点 |
@@ -66,24 +72,25 @@ make serverD-up
 
 ```mermaid
 flowchart LR
-    internet["Internet / Clients"] --> serverA["serverA (4C8G)\nnginx + qs-apiserver + qs-collection-server"]
-    serverA --> serverB["serverB (2C2G)\nIAM"]
-    serverA --> serverD["serverD (4C4G)\nqs-worker + operating + NSQ + monitoring"]
-    serverB --> serverD
-    serverB --> serverC["serverC (4C4G)\nMongoDB"]
+    internet["Internet / Clients"] --> serverA["腾讯云 serverA (4C8G)<br/>Nginx + API + collection ×2 + AI"]
+    serverA --> serverB["阿里云 serverB<br/>IAM + Qlume + MiniBlog + operating"]
+    serverA --> serverD["腾讯云 serverD<br/>worker + NSQ + RocketMQ"]
+    serverA --> serverC["腾讯云 serverC<br/>MongoDB"]
     serverD --> serverC
-    serverA --> mysql["Cloud MySQL"]
+    serverA --> proxy["serverB / mysql-rds-proxy"]
+    serverD --> proxy
+    proxy --> mysql["阿里云 RDS MySQL 私网"]
     serverB --> mysql
-    serverD --> mysql
-    serverA --> redis["Cloud Redis"]
+    serverA --> redis["阿里云 Redis"]
     serverB --> redis
     serverD --> redis
+    mini["旧 Mac mini<br/>Prometheus + Grafana"] --> serverA
 ```
 
 说明：
 
-- `infra` 仓库直接维护的 compose 栈包括 `serverA/nginx`、`serverC/mongodb`、`serverD/nsq + prometheus + grafana`。
-- `serverB` 上的 `IAM` 与 `serverD` 上的 `qs-worker`、`operating` 仍由各自业务仓库部署。
+- `infra` 维护 A 的 Nginx/监控路由、B 的 MySQL 私网代理、C 的 MongoDB、D 的消息基础设施和 mini 监控。
+- IAM、operating、Qlume、MiniBlog、QS 与 AI 等业务容器由各自业务仓库部署。
 - 四台机器先加入 Tailscale，Swarm advertise/data-path 使用 Tailscale IP；业务容器共同加入 `infra-network`，跨机容器统一使用 overlay 网络服务发现。
 
 ## 项目结构
@@ -152,8 +159,9 @@ make help-vpn
 | `prometheus` | `127.0.0.1:19090` | `旧 Mac mini` |
 | `grafana` | `127.0.0.1:13000` | `旧 Mac mini` |
 | `mongo` | `127.0.0.1:27017` + overlay `mongo:27017` | `serverC` |
-| `MySQL` | 云托管地址 | 云服务商 A |
-| `Redis` | 云托管地址 | 云服务商 A |
+| `mysql-rds-proxy` | 仅 overlay `mysql-rds-proxy:3306` | `serverB` |
+| `MySQL` | 云托管私网地址 | 阿里云 |
+| `Redis` | 原云托管地址 | 阿里云 |
 
 ## License
 

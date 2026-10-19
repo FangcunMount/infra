@@ -6,7 +6,8 @@ MySQL、Redis 实例及数据保持原样；MySQL 私网代理迁至阿里云 se
 本次使用原线上镜像，没有发布新的业务版本或执行数据库 DDL。
 
 运行证据：[迁移核验快照](evidence/servera-tencent-20261019.json)。
-这份快照证明服务器、依赖和入口的核验结果，不代替登录、提交答卷、生成报告等真实业务验收。
+这份快照记录服务器、依赖和入口核验。切换后，用户已确认小程序登录、打开问卷和查看已有报告均正常；
+新增答卷提交、生成新 AI 报告等链路未纳入本次验收。
 
 ## 分析目标与范围
 
@@ -73,7 +74,7 @@ Mac mini -> 新 A monitoring 私网入口 -> 各应用 metrics
 | 应用就绪 | API、collection 两副本、AI 就绪；D 三个 worker 就绪；AI 数据库 current/expected 均为 `0040_module_table_names` |
 | 域名/TLS | 12 个 vhost 预期状态通过，证书验证为 0；11 条有效 A 记录已切换，apex CNAME 继续指向 www |
 | 可观测性 | 7 个应用副本加 Prometheus/RocketMQ，共 9 个 scrape target 为 up；Grafana 容器 ID 与两个原数据卷未变 |
-| 真实业务验收 | 未执行带账号的登录、答卷提交、AI 生成或支付等业务操作，仍须单独验收 |
+| 真实业务验收 | 用户确认登录、打开问卷和查看已有报告正常；新增答卷提交、新 AI 报告生成和支付未验证 |
 
 导出工具六项测试覆盖 URL 凭据/参数保留、Compose 美元符号转义、固定镜像和只读 bind、
 未审查服务/volume 拒绝、tmpfs 格式。CI 同时验证代理仅内网开放，且 A 默认不会启动代理。
@@ -132,6 +133,7 @@ previous image `sha256:bf224ecc0cf5404900fa9e07de3bdd1f54543d976ec63c6669c402e58
 - D 的 RocketMQ 精确来源 allowlist 追加新 A Tailscale IP，保留旧 A 和其他规则；未切换消息 provider。
 - 新 A 保留仅监听 `127.0.0.1:27017` 的 MongoDB 运维隧道，经过 MongoDB hello 验证。
   新建独立转发 key，仅允许新 A 来源和 C 的 `127.0.0.1:27017`，不复制旧 SSH 私钥。
+- 本机 SSH 别名 `servera` 已指向新机 ubuntu，`servera-aliyun` 保留旧机 yangshujie；原 SSH 配置已备份。
 - 旧机 mihomo/云代理等主机附属工具保留在旧机；本次没有复制个人代理配置或声称所有 OS 服务均已克隆。
 
 ## 回退与退役边界
@@ -144,4 +146,4 @@ previous image `sha256:bf224ecc0cf5404900fa9e07de3bdd1f54543d976ec63c6669c402e58
 若需要整机回退，同时恢复 mini 监控来源/gateway、仓库目标和主机密钥覆盖，
 并按节点 ID 调整管理角色，确保 manager 多数派；不要在旧 A 已降级后从旧 A 执行 manager 命令。
 A 的 RDS Compose 仅作为显式 `aliyun-rds-proxy` profile 保留，默认启动不会意外恢复第二个代理。
-旧机退订、历史 DNS 清理、旧监控 key 回收及真实业务验收须另行完成。
+旧机退订、历史 DNS 清理、旧监控 key 回收，以及未覆盖业务链路的验收须另行完成。
