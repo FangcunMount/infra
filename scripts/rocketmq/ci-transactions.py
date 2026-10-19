@@ -126,11 +126,16 @@ def main():
     parser.add_argument("--image", required=True)
     parser.add_argument("--mysql-image", default="mysql:8.0.36")
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--sdk", type=Path, required=True)
     parser.add_argument("--go-probe", type=Path)
     parser.add_argument("--python", default="uv")
     args = parser.parse_args()
     repo = Path(__file__).resolve().parents[2]
     sources = repo / "scripts/rocketmq/txprobe"
+    sdk = args.sdk.resolve()
+    sdk_sources = sdk / "transport/rocketmq/internal"
+    if not (sdk_sources / "txprobe/main.go").is_file():
+        raise RuntimeError("required SDK transaction probe and reviewed RPC fix missing")
     directory = Path(tempfile.mkdtemp(prefix="rocketmq-m2-"))
     directory.chmod(0o700)
     project = "rocketmq-m2-" + secrets.token_hex(6)
@@ -204,11 +209,11 @@ def main():
         return run(["docker", "exec", "-i", mysql, "sh", "-c",
                     'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B txprobe'], stdin=query).stdout.strip()
 
-    def start(language, mode, identity="", owner="owner-a", topic=None):
+    def start(language, mode, identity="", owner="owner-a", topic=None, trust=None):
         account = accounts[owner]
         path = directory / ("client-" + secrets.token_hex(5) + ".json")
         path.write_text(json.dumps({"endpoint": f"127.0.0.1:{grpc_port}",
-            "accesskey": account["username"], "secretkey": account["password"], "ca": str(ca),
+            "accesskey": account["username"], "secretkey": account["password"], "ca": str(trust or ca),
             "topic": topic or "m2-tx-owner-a", "group": "m2-tx-consumer", "owner": owner,
             "dsn": f"txprobe:{mysql_password}@tcp(127.0.0.1:{mysql_port})/txprobe?timeout=1s&readTimeout=1s&writeTimeout=1s",
             "mysql_url": f"mysql+asyncmy://txprobe:{mysql_password}@127.0.0.1:{mysql_port}/txprobe"}))
@@ -216,7 +221,7 @@ def main():
         argv = ([str(args.go_probe or directory / "go-probe")] if language == "go" else
                 [args.python, "run", "--locked", "--project", str(sources), "python", str(sources / "probe.py")])
         argv += ["--config", str(path), "--mode", mode, "--id", identity]
-        p = Probe(argv, directory, dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(ca)))
+        p = Probe(argv, directory, dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(trust or ca)))
         probes.append(p)
         return p
 
@@ -257,11 +262,20 @@ def main():
         admin("createAcl", "-s", "User:" + accounts["owner-a"]["username"], "-r", "Group:m2-tx-consumer",
               "-a", "Sub,Get", "-d", "Allow", success=True)
         if not args.go_probe:
-            run(["go", "build", "-o", str(directory / "go-probe"), "."], cwd=sources)
+            run(["go", "build", "-o", str(directory / "go-probe"), "./transport/rocketmq/internal/txprobe"], cwd=sdk)
         run([args.python, "sync", "--locked", "--project", str(sources)], timeout=180)
         consumer = start("go", "consume")
         consumer.wait("ready")
+        wrong_ca = directory / "wrong-ca.crt"
+        run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
+             "-subj", "/CN=untrusted", "-keyout", str(directory / "wrong-ca.key"), "-out", str(wrong_ca)])
         for language in ("go", "python"):
+            untrusted = start(language, "recover", trust=wrong_ca)
+            untrusted.finish(expected=1)
+            if any(e.get("event") == "ready" for e in untrusted.events):
+                raise RuntimeError("untrusted CA reached producer readiness")
+            passed(language + "_untrusted_ca_rejected")
+
             identity = language + "-commit"
             sender = start(language, "send", identity)
             sender.wait("half")
@@ -416,6 +430,10 @@ def main():
                              "Host transaction adapters/fencing and bounded SDK queues belong to later M2 batches"],
                   "source_sha256": {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in sorted(sources.iterdir()) if p.is_file()}}
+        report["sdk_source_sha256"] = {str(p.relative_to(sdk)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                       for p in sorted(sdk_sources.rglob("*")) if p.is_file()}
+        report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
+        report["go_probe_sha256"] = hashlib.sha256((args.go_probe or directory / "go-probe").read_bytes()).hexdigest() if (args.go_probe or directory / "go-probe").exists() else None
         args.report.write_text(json.dumps(report, indent=2) + "\n")
 
 
