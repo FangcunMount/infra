@@ -132,7 +132,9 @@ M2-0不能证明宿主事务绑定、执行fence、Mongo callback重入、幂等
 
 原生超限主题使用5.5.1 [TopicValidator实际常量](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/common/src/main/java/org/apache/rocketmq/common/topic/TopicValidator.java)，不能使用DefaultTransactionalMessageCheckListener日志中少一个下划线的拼写。验收通过真实消息索引查询确认原始测试key。
 
-## 2026-10-19 交付状态
+## M2-0 历史交付状态（2026-10-19）
+
+本节记录 M2-0/早期协议交付当时的状态，供追溯；其中“尚未实现/未发布”不是后续SDK批次的当前判断。当前任务与合并/发布状态以本文开头的进度总表为准。
 
 M2-0 [完整CI](https://github.com/FangcunMount/infra/actions/runs/39184548857)通过：20项真实验证成功、0失败、0跳过。签名构建、普通消息回归、事务验证及镜像导出均成功。[结构化证据](evidence/rocketmq-m2-20261019.json)记录固定版本、有效参数和逐探针事件。测试中的RPC运行时/探针文件与SDK PR33最新head逐文件SHA256一致；后者只比验收引用多出源码复现检查。
 
