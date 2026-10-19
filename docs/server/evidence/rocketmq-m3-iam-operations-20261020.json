@@ -3,10 +3,10 @@
   "task_ids": [
     "T07"
   ],
-  "status": "in_progress",
+  "status": "in_progress; released SDK repair consumed, required cloud/native host matrix pending",
   "complete": false,
-  "observed_at": "2026-10-19T21:17:00.488936+00:00",
-  "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+  "observed_at": "2026-10-19T21:40:35.574673+00:00",
+  "source_sha": "57b07babe49666341b678af5aecb168b40511d7e",
   "repository": "FangcunMount/iam",
   "pr": "https://github.com/FangcunMount/iam/pull/134",
   "pr_status": "draft; PR132 prerequisite merged; current source pushed",
@@ -1074,6 +1074,16 @@
         "scripts/rocketmq/published_runtime.py": "365f38543d08911917da4d185d500fe5d78e355326b829367876bb9f98d7414a"
       },
       "go_probe_sha256": "9b3a899faca7bb8ea25474713f72ba4a651028cc1d20b57a21a79ab6b9b3b83e"
+    },
+    {
+      "scope": "full source after adopting released GoSDKv0.5.0-rocketmq-tx.2; old31 optional environment skips remain separate from required native acceptance",
+      "source_sha": "57b07babe49666341b678af5aecb168b40511d7e",
+      "pass": 1925,
+      "fail": 0,
+      "skip": 31,
+      "log": "/tmp/m3-iam-t07-sdk2-source.jsonl",
+      "sha256": "dd4ea3cbc6e18d9d1872b19b66ae8d0ea75910e81912a108b687c94bafad6895",
+      "docs_facts": "passed with contract revision and original active status token"
     }
   ],
   "failure_history": [

@@ -3,11 +3,11 @@
   "task_ids": [
     "T08"
   ],
-  "status": "in_progress; first real fixture failed at missing declared writer subject resolver, correction committed; SDK race repair must be consumed before final gates",
+  "status": "in_progress; fixture identity corrected and both hosts pin released SDKtx.2; actual pair matrix pending",
   "complete": false,
-  "observed_at": "2026-10-19T21:17:44.728805+00:00",
+  "observed_at": "2026-10-19T21:40:35.577255+00:00",
   "iam": {
-    "source_sha": "538e85787b1c45bd3c0907ec7b20bd47fba410bb",
+    "source_sha": "5140583179335f258c4e9bebca97c651c57b6739",
     "previous_tested_sha": "544289b0fbb5523836d63a22def1b0f95391a354",
     "pr": "https://github.com/FangcunMount/iam/pull/135",
     "source_race": {
@@ -22,8 +22,8 @@
     }
   },
   "qs": {
-    "source_sha": "1f999fee13c26412c383c56e7e3ac6038d619972",
-    "documentation_head": "9bfc17dde",
+    "source_sha": "696ee3145ad1d4ab0d5debb65abf024d6c08c761",
+    "documentation_head": "696ee3145ad1d4ab0d5debb65abf024d6c08c761",
     "pr": "https://github.com/FangcunMount/qs-server/pull/409",
     "target_race": {
       "pass": 85,
@@ -283,5 +283,7 @@
     }
   ],
   "production_changed": false,
-  "system_acceptance": false
+  "system_acceptance": false,
+  "sdk_tag": "v0.5.0-rocketmq-tx.2",
+  "terminal_handoff_review": "SDKtx.1..tx.2 changed runtimeGo onlydriver/metric.go plus its test; NSQ/legacy-wire/RocketMQsubscribermethods byte-identical. QS exact-version guard and mutation regression updated after audit, not weakened;87 doc tests/facts passed."
 }

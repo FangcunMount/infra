@@ -108,7 +108,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；四库PR均合并，三库最终完整CI通过；生产未切换 |
 | ✅ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 2026-10-19；[完整证据](evidence/rocketmq-m3-iam-planning-20261019.json)；ea95cd9e全CI及三档MySQL每档7项0跳过、独立并发通过；[PR131](https://github.com/FangcunMount/iam/pull/131)合并c2aa3635；实际Sender装配属T06 |
 | ✅ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 2026-10-20；89bdcf58三档MySQL每档12具名项、共36项0跳过；Mac mini隔离RocketMQ5.5.1/MySQL8.0.44完整21项0失败0跳过，含实际IAM宿主4项证明，临时资源已清理；[完整证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；[PR132](https://github.com/FangcunMount/iam/pull/132)合并7accc92c，生产未变更 |
-| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 验证失败（已定位SDK指标回写race，修复中）；[PR134](https://github.com/FangcunMount/iam/pull/134)固定98d0af8d源码CI全绿；infra public后required原事务/HTTP三档各34项0跳过，真实Broker8.0.36通过21项，8.0.44/8.4宿主用例失败，保留报告并排查；[分项证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
+| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 重新验证中；[PR134](https://github.com/FangcunMount/iam/pull/134)57b07bab锁定已发布Go SDK修复tx.2，全仓race1925通过/31既有可选跳过；必需三档原事务/HTTP/真实Broker门禁重跑，旧race失败历史保留；[证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
 | ☐ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 进行中；IAM [PR135](https://github.com/FangcunMount/iam/pull/135)、QS [PR409](https://github.com/FangcunMount/qs-server/pull/409)；两实例及QS实际订阅验收已实现，源码race通过，首轮真实夹具错误已修正；SDK指标race修复与正式成对门禁待完成；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
 | ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 待开始 |
 | ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 待开始 |
@@ -250,3 +250,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：SDK PR46全部当前检查通过，按固定8fb6fc57完成合并（d06861e5）；Go1.25.9/1.25.12 make check、lint、Redis与NSQ兼容均绿。双存储及跨语言实际SDK矩阵39326382808仍在执行，Go修订tag尚未发布，宿主仍未切换依赖；M3保持6/36，源码合并/发布/宿主/生产分别记录。
 
 - 2026-10-20：SDK实际双存储及跨语言矩阵39326382808两档各31项0失败/跳过，临时容器/进程/私有目录全部清理。已发布固定Go修订预发布v0.5.0-rocketmq-tx.2，源码8fb6fc57；正式tag下载模块213份选定源码逐字节匹配，模块缓存race回归/SDK探针构建通过，六个GitHub资产重新下载摘要全部一致。Python仍为原0.4.0a1/bfaae2b，不覆盖已有版本；T27稳定配对发布尚未执行。IAM/QS开始锁定新Go模块并重验，T07/T08未打勾，生产未变更。
+
+- 2026-10-20：IAM T07固定57b07bab正式模块tx.2，1925源码race通过/31既有可选跳过；T08合入同一依赖修复并修正fixture resolver，冻结IAM51405831、QS696ee314。QS SDK交接版本门禁先拒绝升级；核对tx.1..tx.2仅metric.go运行实现变化，NSQ/legacy-wire/消费结算逐字节未变后，更新精确版本白名单及漂移突变回归，87项自测和文档facts通过，保留未来版本拒绝。当前三源码均已推送草稿PR，开始以正式模块重跑原事务与实际成对门禁，仍6/36，未变更生产。

@@ -6,7 +6,7 @@ on:
         description: Exact IAM candidate source SHA
         type: string
         required: true
-        default: 98d0af8dddaadfb951d09d7c3171c336a9b6d6f2
+        default: 57b07babe49666341b678af5aecb168b40511d7e
       qs_ref:
         description: Optional exact QS source SHA for the required separate business fanout profile
         type: string
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/iam
-          ref: ${{ inputs.iam_ref || '98d0af8dddaadfb951d09d7c3171c336a9b6d6f2' }}
+          ref: ${{ inputs.iam_ref || '57b07babe49666341b678af5aecb168b40511d7e' }}
           path: .iam-acceptance
       - uses: actions/checkout@v6
         if: inputs.qs_ref != ''
@@ -56,7 +56,7 @@ jobs:
           python-version: '3.13'
       - name: Verify exact candidate and source harness
         env:
-          EXPECTED_IAM_SHA: ${{ inputs.iam_ref || '98d0af8dddaadfb951d09d7c3171c336a9b6d6f2' }}
+          EXPECTED_IAM_SHA: ${{ inputs.iam_ref || '57b07babe49666341b678af5aecb168b40511d7e' }}
           EXPECTED_QS_SHA: ${{ inputs.qs_ref }}
         run: |
           set -euo pipefail
