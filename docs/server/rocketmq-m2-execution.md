@@ -19,11 +19,11 @@
 | 已完成任务 | T01–T18，18/24；M2-P 至 M2-4 已满足对应合并门禁；T17/T18 已实现并验证，相关 PR 待合并 |
 | 当前 SDK 候选 | `3bed26b7e4ee906a293bd574b59dea28d939a282`（新增 Mongo 故障宿主显式提交预算，待真实重验）；[PR43](https://github.com/FangcunMount/reliable-messaging/pull/43) 待合并 |
 | 当前 infra 验收源码 | `910b614dfdb60483009a38113ddcae3c06905914`；[PR27](https://github.com/FangcunMount/infra/pull/27) 待合并；本次记录更新在其后单独记账 |
-| SDK 前一候选 3bf3dc8 检查 | [源码/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39201623423)、[真实存储适配](https://github.com/FangcunMount/reliable-messaging/actions/runs/39201623425)、[Python源码及安装包](https://github.com/FangcunMount/reliable-messaging/actions/runs/39201623430)、[既有基础设施回归](https://github.com/FangcunMount/reliable-messaging/actions/runs/39201623449) 均通过；不能替代下列 Broker 故障门禁 |
+| SDK 当前候选 3bed26b 检查 | [源码/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383794)、[真实存储适配](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383777)、[Python源码及安装包](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383932)、[既有基础设施回归](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383902) 均通过；不能替代下列 Broker 故障门禁 |
 | T17–T18 | [双 profile 公开 SDK 31项/档](https://github.com/FangcunMount/infra/actions/runs/39201819179) 均通过、0跳过；owner 拒绝、共享消费预算及全部正式入口通过；[结构化证据](evidence/rocketmq-m2-sdk-routing-e2e-20261019.json) |
 | T19 | [包级故障44项/档](https://github.com/FangcunMount/infra/actions/runs/39201819131) 失败：31项基础验收与2项MySQL提交包级故障通过后，Mongo提交前断连等待超时；T19不打勾，新候选待重验 |
 | T20 | [完整46项/档](https://github.com/FangcunMount/infra/actions/runs/39201819090) 因同一T19前置场景失败；2项真实原生超限尚未执行，T20不打勾 |
-| 普通消息及既有协议回归 | [完整Docker验收](https://github.com/FangcunMount/infra/actions/runs/39201819080) 运行中；保留普通消息和 M2-0 回归 |
+| 普通消息及既有协议回归 | [完整Docker验收](https://github.com/FangcunMount/infra/actions/runs/39201819080) 已通过（SDK 3bf3dc8）；包含签名构建、普通消息、M2-0及公开Go入口回归，新候选仍须完整重验 |
 | T21–T24 | 文档、示例及发布后安装流程已准备；API冻结、最终合并 SHA、该 SHA 完整 CI、固定发布和下载重装均待前置门禁 |
 | 发布 / 生产 | 两语言 tag 与 GitHub 预发布均未创建；未执行生产变更，业务链路仍属 M3 范围 |
 
