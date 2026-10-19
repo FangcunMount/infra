@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T09 答卷原 Mongo 事务候选位于 `qs-domain` / `codex/rocketmq-m3-qs-domain`，草稿 [QS PR410](https://github.com/FangcunMount/qs-server/pull/410)。冻结业务 BSON/首次 wire、V2 精确验收与无 Outbox 新入口已实现；Mac mini 实际 Broker/Mongo 首批11项全部通过，完整装配/202/并发/跨实例门禁尚未完成，不勾选 T09。[本批证据](evidence/rocketmq-m3-qs-answer-20261020.json)。
+- 当前批次：T09 原事务入口[QS PR410](https://github.com/FangcunMount/qs-server/pull/410)已合并3afc76a6；装配[QS PR411](https://github.com/FangcunMount/qs-server/pull/411)本地及云端15项已通过，复核新增混合版本拒绝并扩展为16项，最终门禁继续。源码全仓race6908通过/60既有可选依赖跳过，不勾选T09，生产CD仍暂停。[本批证据](evidence/rocketmq-m3-qs-answer-20261020.json)。
 
 ## 1. 目标、基线和授权边界
 
@@ -269,3 +269,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：infra PR45实际在线执行，QS PR410当前20项检查通过、2项继续，无失败；infra新增original-mongo-root/Go1.25.9在模块读取阶段失败。QS go.mod明确最低Go1.25.12且GOTOOLCHAIN=local，因此此宿主组合无效；将宿主工作流固定为实际1.25.12，独立SDK既有1.25.9/1.25.12矩阵保持。失败run39335160523/job118342693230与原始日志摘要保留，不把无效组合重试标绿。此为CI配置修正，业务门禁仍待当前候选完成。
 
 - 2026-10-20：T09装配批次固定QSf95ebc05、infra4c321148在Mac mini扩展至15项原生验收全部通过，0失败/0跳过/无race，专用容器/进程/目录全部清理；Survey显式选用事务Store，真实protobuf/gRPC服务经受控bufconn连接Collection application/REST，Committed精确证据返回原ID的202，Reference冲突返回503；并发同键仅原赢家执行一次，旧owner关闭后新client/runtime复用原结果。Collection到protobuf及身份为夹具端口，未冒称生产TLS/IAM/system或进程SIGKILL证明，真实包级丢回复及进程退出仍归T22/T23。全仓race6907通过/60既有可选依赖跳过；固定lint2.5零问题，87项文档自测/hygiene/facts通过；源码基线f95ebc05、后续文档head321e0989独立记录。当前准备宿主实际Go1.25.12 required云端门禁；T09未勾选，8/36，源码合并/生产分别待完成。
+
+- 2026-10-20：QS PR410当前头25项检查通过、1项API生成同步不适用，按f78987ec精确头合并main3afc76a6，生产CD合并前回读仍暂停；PR411改为main并为321e0989显式触发同头CI39337474712，避免原feature基底未触发main限定CI而漏门禁。infra最新Go1.25.12宿主11项39336176609与装配15项39337093068均在线通过，后者已下载核对0失败/0跳过及全部清理回执。复核发现V1标记若同时包含V2事务证据会进入历史接受分支；新增纯版本选择拒绝与真实HTTP503回归，源码62dfaac1/文档head528ec496，验收扩为16项后重新绑定。全仓race6908通过/60既有可选依赖跳过、固定lint2.5零问题和87项文档检查通过；最终16项本地/云端复验继续，T09仍8/36，历史15项成功不改写成新头证明。

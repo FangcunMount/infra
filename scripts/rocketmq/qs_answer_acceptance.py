@@ -17,7 +17,8 @@ CASES = frozenset((
     'native_callback_reentry', 'no_new_publish_outbox', 'closed_admission_no_business',
     'full_reference_required_for_acceptance', 'nested_preparation_rejected',
     'collection_202_exact_root', 'collection_unknown_witness_no202',
-    'concurrent_reservation_one_execution', 'new_instance_exact_accepted_result'))
+    'concurrent_reservation_one_execution', 'new_instance_exact_accepted_result',
+    'mixed_protocol_marker_rejected'))
 
 
 def answer_manifest():

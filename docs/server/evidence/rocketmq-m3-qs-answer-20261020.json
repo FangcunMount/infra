@@ -98,7 +98,18 @@
     "merged": false,
     "stable_sdk_published": false,
     "production_deployed": false,
-    "system_acceptance": false
+    "system_acceptance": false,
+    "base_entry_merged": {
+      "pr": "https://github.com/FangcunMount/qs-server/pull/410",
+      "head": "f78987ecea60ab254aabf3900d78e74b3cf53500",
+      "merge": "3afc76a6cbc23082f0fca6d29722f8d19aca4c6c",
+      "current_head_checks": {
+        "success": 25,
+        "skipped": 1,
+        "skip_scope": "generated API sync not applicable"
+      }
+    },
+    "module_pr": "https://github.com/FangcunMount/qs-server/pull/411"
   },
   "qs_review_head": "f78987ecea60ab254aabf3900d78e74b3cf53500",
   "docs_gate": {
@@ -193,6 +204,46 @@
       "new client/runtime verifies accepted result; actual process SIGKILL and real Broker recheck recovery remain T22/T23",
       "production common owner lifecycle activation remains a later M3 task",
       "not system or production acceptance"
-    ]
+    ],
+    "cloud_native": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39337093068",
+      "source_sha": "321e0989df8f3bc3cecd367295a624e20fc187cf",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "report_sha256": "3b46eee574ce52a5f0b5a557fa1e3dad8133f9c3d49d1bb9ed87404080166be1",
+      "superseded_candidate_kept": true
+    }
+  },
+  "guard_batch": {
+    "source_sha": "62dfaac14cf359ffbdbc04dd2cf3049d266c5c81",
+    "review_head": "528ec496c621a54f0d2c82f13fed057500366e6d",
+    "purpose": "mixed V1 marker/V2 witness cannot bypass precise acceptance",
+    "source_tests": {
+      "passed": 6908,
+      "failed": 0,
+      "skipped": 60,
+      "skip_scope": "existing optional dependency tests only",
+      "report_sha256": "d7661540f9b478d6e1268eb22f77ec71e5ef415bb115a506f859341ddaa11a7a"
+    },
+    "native_required": {
+      "status": "pending",
+      "expected_cases": 16
+    },
+    "docs": {
+      "unit_passed": 87,
+      "hygiene": true,
+      "facts": true
+    },
+    "lint": {
+      "version": "2.5.0",
+      "issues": 0
+    }
   }
 }

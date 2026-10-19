@@ -24,7 +24,7 @@ class QSAnswerAcceptanceTest(unittest.TestCase):
         self.assertEqual(parse_answer_receipt(output), receipt)
         for bad in ('', output + output, output.replace('true', 'false', 1), output.replace('--- PASS:', '--- SKIP:'),
                     output + '\nWARNING: DATA RACE', output.replace('TestM3AnswerSubmissionBrokerHost', 'TestSDKProbe'),
-                    output.replace('"passed": 15', '"passed": 0'), output.replace('"skipped": 0', '"skipped": 1'),
+                    output.replace('"passed": 16', '"passed": 0'), output.replace('"skipped": 0', '"skipped": 1'),
                     output.replace('actual_protobuf_service_over_bufconn', 'fake_service')):
             with self.assertRaises(RuntimeError):
                 parse_answer_receipt(bad)
