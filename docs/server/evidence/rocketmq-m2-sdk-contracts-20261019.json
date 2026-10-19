@@ -5,7 +5,7 @@
     "T03",
     "T04"
   ],
-  "sdk_sha": "4943d43",
+  "sdk_sha": "4943d43bfd1dd066ba21b5b773a5b05d259fd2bf",
   "date": "2026-10-19+08:00",
   "evidence_level": "local-contract-tests-not-storage-or-broker-proof",
   "checks": {
@@ -25,5 +25,8 @@
       "published": false
     }
   },
-  "remaining": "Original transaction adapters, authoritative CAS, Sender runtime and complete fault matrix remain unverified. No release or production change."
+  "remaining": "Original transaction adapters, authoritative CAS, Sender runtime and complete fault matrix remain unverified. No release or production change.",
+  "pr": "https://github.com/FangcunMount/reliable-messaging/pull/35",
+  "merge_sha": "4c098c5b83dea3fa38cd6ad8038dd2d8ddf9481e",
+  "ci": "all PR checks passed, including Go minimum/race/infrastructure and Python 3.11/MySQL8.0.36 + Python3.13/MySQL8.4"
 }

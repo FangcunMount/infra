@@ -4,7 +4,7 @@
 
 本节为本批次唯一进度总表。批准范围为 Go/Python 独立事务 SDK、原事务 witness、Checker、有界生命周期、双存储证明及固定预发布；不包含三宿主改造或生产变更。沿用下文 M2-0 证据，新增任务独立计数。
 
-基线：SDK `fd9c51691d785ced6e27d1ad3509fc4ac99a7b1f`；infra `44c379bedf5d37194aff1c87eccc8c8080cb3b2c`。隔离分支：SDK `codex/rocketmq-m2-sdk`；infra `codex/rocketmq-m2-sdk-tracking`。
+基线：SDK `fd9c51691d785ced6e27d1ad3509fc4ac99a7b1f`；infra `44c379bedf5d37194aff1c87eccc8c8080cb3b2c`。隔离分支：SDK 协议 `codex/rocketmq-m2-sdk`、存储续批 `codex/rocketmq-m2-storage`；infra `codex/rocketmq-m2-sdk-tracking`。
 
 进度：**4/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
@@ -12,7 +12,7 @@
 | --- | --- | --- | --- |
 | M2-0 | 既有批次 | ✅ 已完成 | 20 项真实验证，0 跳过 |
 | M2-P | T01 | 已建立；待 PR 合并 | 基线、任务及证据格式建立 |
-| M2-1 | T02–T04 | 实现/本地验证完成；待 PR/CI/合并 | 双语言契约及失败状态通过、PR 合并 |
+| M2-1 | T02–T04 | ✅ 已完成 | 双语言契约及失败状态通过、PR 合并 |
 | M2-2 | T05–T09 | 待开始 | 四种原事务适配及并发证明、PR 合并 |
 | M2-3 | T10–T13 | 待开始 | Go 真 RPC、回查及关闭有界、PR 合并 |
 | M2-4 | T14–T16 | 待开始 | Python 线程/loop/取消证明、PR 合并 |
@@ -22,9 +22,9 @@
 | 完成 | ID | 任务与门禁 | 完成时间 / 源码 / 证据 / PR |
 | --- | --- | --- | --- |
 | ✅ | T01 | 执行总表、基线、任务依赖、验证命令和证据格式 | 2026-10-19 +08:00；基线如上；24 个任务 ID 检查与 git diff --check 通过；提交 952d1c7，本分支待 PR |
-| ✅ | T02 | Sender/Executor/Store/Checker 契约和冻结 codec；双语言 round-trip | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；待 PR/CI/合并 |
-| ✅ | T03 | 请求/计划/执行 fence；重复请求、新执行、显式重建计划契约 | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；待 PR/CI/合并 |
-| ✅ | T04 | 三阶段结果、取消、部分准备与未知提交状态矩阵 | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；待 PR/CI/合并 |
+| ✅ | T02 | Sender/Executor/Store/Checker 契约和冻结 codec；双语言 round-trip | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；[SDK PR35](https://github.com/FangcunMount/reliable-messaging/pull/35) CI 全通过并合并为 4c098c5 |
+| ✅ | T03 | 请求/计划/执行 fence；重复请求、新执行、显式重建计划契约 | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；[SDK PR35](https://github.com/FangcunMount/reliable-messaging/pull/35) CI 全通过并合并为 4c098c5 |
+| ✅ | T04 | 三阶段结果、取消、部分准备与未知提交状态矩阵 | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；[SDK PR35](https://github.com/FangcunMount/reliable-messaging/pull/35) CI 全通过并合并为 4c098c5 |
 | ☐ | T05 | schema/索引/显式安装；身份比较、fence 边界、版本拒绝 | — |
 | ☐ | T06 | Go MySQL/sql、GORM 原事务 guard；真实原子性 | — |
 | ☐ | T07 | Go Mongo guard；callback 重入、写冲突、未知提交 | — |
