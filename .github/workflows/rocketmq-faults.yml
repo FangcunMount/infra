@@ -8,7 +8,7 @@ on:
         description: Exact candidate SDK revision
         type: string
         required: true
-        default: 87e769c
+        default: 87e769ce4df44fa6eccd28e147e033162b537d90
 permissions:
   contents: read
 concurrency:
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: ${{ inputs.sdk_ref || '87e769c' }}
+          ref: ${{ inputs.sdk_ref || '87e769ce4df44fa6eccd28e147e033162b537d90' }}
           path: .sdk-acceptance
       - uses: actions/setup-go@v6
         with:
