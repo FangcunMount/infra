@@ -40,6 +40,10 @@ def checked_report(path, sha, count, candidate, infra):
             if Path(name).is_absolute() or '..' in Path(name).parts or digest(root/name) != expected:
                 raise ValueError('acceptance source bytes differ from fixed candidate/harness')
     if count == 46:
+        runtime = report.get('python_runtime', {})
+        if (report.get('clients') != {'go': '5.1.4', 'python': '5.1.2'}
+                or runtime.get('client') != '5.1.2' or runtime.get('sdk_version') != VERSION):
+            raise ValueError('acceptance did not use the fixed SDK/client versions')
         limits = report.get('proof', {}).get('finite_sdk_limit', [])
         if len(limits) != 2 or any(
                 item.get('mode') != '0600' or not item.get('audit', {}).get('records')
