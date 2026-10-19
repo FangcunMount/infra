@@ -10,7 +10,7 @@ from provision_v2 import provision
 from routes import consumer_group_v2, physical_topic_v2, validate_v2
 
 
-def iam_manifest():
+def iam_manifest(fanout=False):
     topic, subscription = 'iam.authz.version.v2', 'iam-m3-native-observer'
     route = {'id': 'iam-native', 'topic': topic, 'subscription': subscription,
              'message_type': 'TRANSACTION', 'owner': 'iam.mysql', 'route_revision': 'm3-1',
@@ -21,6 +21,14 @@ def iam_manifest():
               'group_options': {'retry_queue_nums': 8},
               'accounts': {'iam-producer': {'owner': 'iam.mysql', 'publish': ['iam-native'], 'subscriptions': []},
                            'iam-observer': {'publish': [], 'subscriptions': ['iam-native']}}}
+    if fanout:
+        for role, subscription in (('iam-fanout-a', 'iam-m3-native-fanout-a'),
+                                   ('iam-fanout-b', 'iam-m3-native-fanout-b'),
+                                   ('qs-fanout', 'qs-m3-native-fanout')):
+            identifier = role + '-native'
+            result['routes'].append(dict(route, id=identifier, subscription=subscription,
+                                         consumer_group=consumer_group_v2(topic, subscription)))
+            result['accounts'][role] = {'publish': [], 'subscriptions': [identifier]}
     validate_v2(result)
     return result
 
@@ -67,7 +75,7 @@ def retain_private_host_output(path, raw):
         stream.write(raw)
 
 
-def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, require_business_result=False):
+def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, require_business_result=False, qs_source=None):
     source = source.resolve()
     if not (source / 'go.mod').is_file():
         raise RuntimeError('required exact IAM source checkout missing')
@@ -81,7 +89,7 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('IAM must use its pinned downloaded SDK without replace')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
-    manifest = iam_manifest()
+    manifest = iam_manifest(fanout=qs_source is not None)
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4),
                        'password': secrets.token_hex(32)} for role in manifest['accounts']}
     proof['provision'] = provision(broker, manifest, accounts)
@@ -105,6 +113,23 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
                 'IAM_M3_BROKER_CONFIG': str(paths['iam-producer']),
                 'IAM_M3_OBSERVER_CONFIG': str(paths['iam-observer']),
                 'rocketmq.client.logRoot': str(logs), 'rocketmq.client.logLevel': 'error'})
+    if qs_source is not None:
+        qs_source = qs_source.resolve()
+        if not (qs_source / 'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=qs_source).stdout.strip():
+            raise RuntimeError('required clean QS fanout source checkout missing')
+        qs_module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'],
+                                   cwd=qs_source, env=env).stdout)
+        if qs_module.get('Replace') or any(qs_module.get(k) != module.get(k) for k in ('Version', 'Sum', 'GoModSum')):
+            raise RuntimeError('QS and IAM must use the same fixed published SDK')
+        binary = directory / 'qs-fanout-test'
+        run(['go', 'test', '-race', '-tags=integration,rocketmq_m3', '-c', '-o', str(binary),
+             './internal/pkg/iamauth'], cwd=qs_source, env=env, timeout=240)
+        proof['qs_fanout'] = {'source_sha': run(['git', 'rev-parse', 'HEAD'], cwd=qs_source).stdout.strip(),
+                              'sdk_module': {key: qs_module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}}
+        env.update({'IAM_M3_FANOUT_REQUIRED': '1', 'IAM_M3_FANOUT_QS_BINARY': str(binary),
+                    'IAM_M3_FANOUT_A_CONFIG': str(paths['iam-fanout-a']),
+                    'IAM_M3_FANOUT_B_CONFIG': str(paths['iam-fanout-b']),
+                    'IAM_M3_FANOUT_QS_CONFIG': str(paths['qs-fanout'])})
     result = run(['go', 'test', '-race', '-tags=integration', '-count=1', '-timeout=3m', '-v',
                   './internal/pkg/migration', '-run', '^TestM3ActualBrokerHost$'],
                  cwd=source, env=env, timeout=240, required=False)
@@ -118,7 +143,24 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     if result.returncode:
         raise RuntimeError('actual IAM host acceptance failed (private output withheld)')
     proof['native_receipt'] = parse_host_receipt(result.stdout, require_business_result)
+    if qs_source is not None:
+        proof['qs_fanout']['receipt'] = parse_fanout_receipt(result.stdout)
+        proof['qs_fanout']['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=qs_source).stdout.strip()
+        if not proof['qs_fanout']['source_clean_after']:
+            raise RuntimeError('QS source changed during fanout acceptance')
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('IAM tracked source changed during native acceptance')
     proof['scope'] = 'real Broker, released SDK, host original transaction and application entry; not production/system acceptance'
+
+
+def parse_fanout_receipt(output):
+    receipts = [json.loads(line.split('M3_FANOUT_RECEIPT ', 1)[1])
+                for line in output.splitlines() if 'M3_FANOUT_RECEIPT {' in line]
+    expected = ('iam_revocation_observed', 'qs_notification_received', 'qs_both_subjects_evicted',
+                'qs_primary_proof_verified', 'qs_subscriber_drained')
+    if (len(receipts) != 1 or receipts[0].get('iam_instances') != 2
+            or receipts[0].get('failed') != 0 or receipts[0].get('skipped') != 0
+            or any(receipts[0].get(key) is not True for key in expected)):
+        raise RuntimeError('separate IAM/QS actual fanout proof absent or incomplete')
+    return receipts[0]
