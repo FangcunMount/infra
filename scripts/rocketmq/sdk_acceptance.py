@@ -4,9 +4,6 @@ import time
 
 def run_go_sdk(start, absent, passed, sql, mongo_command, pause_mysql, wrong_ca):
     for storage in ("mysql", "mongo"):
-        init = start("sdk-go", "init", storage=storage)
-        init.wait("installed")
-        init.finish()
         consumer = start("sdk-go", "consume", storage=storage)
         consumer.wait("ready")
         received, business = set(), set()

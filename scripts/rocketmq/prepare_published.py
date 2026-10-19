@@ -10,6 +10,8 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
+import tomllib
 
 REPO = 'FangcunMount/reliable-messaging'
 MODULE = 'github.com/' + REPO
@@ -20,7 +22,7 @@ VERSION = '0.4.0a1'
 
 def run(arguments, *, cwd=None):
     result = subprocess.run(arguments,cwd=cwd,capture_output=True,text=True,timeout=300,
-                            env=dict(os.environ,GOWORK="off",PYTHONPATH=""))
+                            env=dict(os.environ,GOWORK="off",GOTOOLCHAIN="local",PYTHONPATH=""))
     if result.returncode:
         raise RuntimeError('published installation command failed: '+Path(arguments[0]).name)
     return result.stdout
@@ -59,6 +61,16 @@ def verify_package(python, candidate, files):
     return {**metadata,'verified_files':count}
 
 
+def source_manifest(candidate):
+    tracked=run(['git','ls-files','-z'],cwd=candidate).split('\0')
+    names=[name for name in tracked if name and (
+        Path(name).suffix in ('.go','.sql','.json','.patch')
+        or name in ('go.mod','go.sum','python/pyproject.toml','python/uv.lock')
+        or name.startswith('python/src/reliable_messaging/')
+    )]
+    return {name:digest(candidate/name) for name in sorted(names)}
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--candidate',type=Path,required=True)
@@ -92,6 +104,8 @@ def main():
     if 'transaction-release-receipt.json' not in checksums or not set(receipt['assets'])<=checksums.keys():
         raise RuntimeError('release checksums omit required fixed assets')
     source_files=receipt['source_files_sha256']
+    if source_files != source_manifest(candidate):
+        raise RuntimeError('release source manifest is incomplete or differs from candidate')
     for name, expected in source_files.items():
         if name.startswith('/') or '..' in Path(name).parts or digest(candidate/name)!=expected:
             raise RuntimeError('candidate source bytes differ from published receipt')
@@ -103,14 +117,26 @@ def main():
     module_dir=Path(module['Dir'])
     checked=0
     for name, expected in source_files.items():
-        if name.endswith('.go') or name in ('go.mod','go.sum') or name.startswith('contracts/'):
-            if digest(module_dir/name)!=expected:
-                raise RuntimeError('published Go module source differs from candidate')
-            checked+=1
+        if digest(module_dir/name)!=expected:
+            raise RuntimeError('published Go module source differs from candidate')
+        checked+=1
     if checked < 50 or 'replace ' in (module_dir/'go.mod').read_text():
         raise RuntimeError('published Go source proof empty or uses replace')
     binary=output/'sdk-go-probe'
     run(['go','build','-mod=readonly','-o',str(binary),'./transport/rocketmq/internal/sdkprobe'],cwd=module_dir)
+    # Derive constraints from the DOWNLOADED dependency lock without installing
+    # the project directory. Runtime dependencies must not silently float.
+    locked_project=output/'locked-project'; locked_project.mkdir(mode=0o700)
+    shutil.copyfile(candidate/'python/pyproject.toml',locked_project/'pyproject.toml')
+    shutil.copyfile(downloads/'uv.lock',locked_project/'uv.lock')
+    constraints=output/'runtime-constraints.txt'
+    run(['uv','export','--project',str(locked_project),'--frozen','--all-extras',
+         '--all-groups','--no-emit-project','--no-hashes','--format','requirements.txt',
+         '--output-file',str(constraints)])
+    locked=tomllib.loads((downloads/'uv.lock').read_text())
+    allowed={}
+    for package in locked['package']:
+        allowed.setdefault(package['name'].lower().replace('_','-'),set()).add(package['version'])
     packages={}
     for kind,suffix in (('wheel','*.whl'),('sdist','*.tar.gz')):
         matches=list(downloads.glob(suffix))
@@ -119,8 +145,14 @@ def main():
         environment=output/kind
         run(['uv','venv',str(environment)])
         python=environment/'bin/python'
-        run(['uv','pip','install','--python',str(python),str(matches[0])+'[nsq,rocketmq]','asyncmy==0.2.14'])
+        run(['uv','pip','install','--python',str(python),'--constraint',str(constraints),
+             str(matches[0])+'[nsq,rocketmq]','asyncmy'])
         packages[kind]=verify_package(python,candidate,source_files)
+        versions=json.loads(run([str(python),'-I','-c',
+            "import json,importlib.metadata as m; print(json.dumps({d.metadata['Name'].lower().replace('_','-'):d.version for d in m.distributions()}))"]))
+        if any(version not in allowed.get(name,set()) for name,version in versions.items()):
+            raise RuntimeError('installed dependency differs from downloaded fixed lock')
+        packages[kind]['dependency_versions']=versions
     report={'source_sha':sha,'go_tag':GO_TAG,'python_tag':PY_TAG,'asset_sha256':checksums,
             'go_module':{k:module[k] for k in ('Path','Version','Sum','GoModSum')},
             'go_verified_files':checked,'go_binary':str(binary),'go_binary_sha256':digest(binary),

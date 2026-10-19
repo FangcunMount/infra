@@ -42,18 +42,20 @@
 | ☐ | T19 | 退出、断网、DB 提交丢回复、Broker 重启故障矩阵 | 13 项真实 packet/proxy/重启场景已接入；TCP/TLS fixture 单元/race 通过；真实矩阵待通过 |
 | ☐ | T20 | 资源上界、指标、超限告警、0600 原生超限审计导出 | 边界、分阶段计数、真实关闭指标、只读索引审计与告警封新入口已实现；native-limit 实测待通过 |
 | ☐ | T21 | 原事务示例、接入/恢复/关闭文档、API 评审 | SDK PR43 原 SQL/GORM/Mongo/SQLAlchemy 示例可编译，契约和关闭/恢复文档准备；冻结待真实矩阵通过 |
-| ☐ | T22 | 固定候选 SHA、完整 CI、wheel/sdist/摘要/receipt | 分支候选 SDK 70d44fa；Go/Python 预定版本及确定性构建准备；最终合并候选/完整 CI/receipt 待完成 |
+| ☐ | T22 | 固定候选 SHA、完整 CI、wheel/sdist/摘要/receipt | 分支候选 SDK 3bf3dc8；Go/Python 预定版本及确定性构建准备；最终合并候选/完整 CI/receipt 待完成 |
 | ☐ | T23 | 两语言 tag 同一 SHA，GitHub 固定预发布 | — |
 | ☐ | T24 | 下载发布 tag/制品重新安装验收、索引与总表关闭 | infra prepare_published.py + workflow 已准备，固定 Go module、wheel/sdist 独立安装与完整验收；尚未发布或运行此门禁 |
 
 
 本次 T11–T16 的公开 SDK 验收为 23/23、0 跳过；之后仅追加单次半消息 RPC 及回调诊断修复，已通过对应实际 TLS/编排测试和最新源码 CI。SDK Go/Python PR38/39 均已合并。infra 完整工作流曾因旧 SDK 固定引用与新增三分支探针不匹配失败；已统一固定到 SDK main `65eae5b`，精确 SHA 重跑 [公开 SDK 23 项](https://github.com/FangcunMount/infra/actions/runs/39194664066) 与[完整 Docker/普通消息/M2-0 回归](https://github.com/FangcunMount/infra/actions/runs/39194664076) 均通过，infra PR23 已合并 4b7ed57，M2-3/M2-4 里程碑关闭。原失败运行 [39193222448](https://github.com/FangcunMount/infra/actions/runs/39193222448) 保留，不作通过证据。
 
-剩余实现统一汇总到 SDK PR43 / infra PR27；旧 SDK PR40–42、infra PR24–26 关闭为被汇总，源码与失败运行保留，任务总数仍为24。当前分支候选 SDK `70d44fa297666d2c779721e886cad053fc635ed5`，尚未合并/发布，不视为最终发布 SHA。
+剩余实现统一汇总到 SDK PR43 / infra PR27；旧 SDK PR40–42、infra PR24–26 关闭为被汇总，源码与失败运行保留，任务总数仍为24。当前分支候选 SDK `3bf3dc80dad889c3f51cc45e4490331b8d45d3f2`，尚未合并/发布，不视为最终发布 SHA。
 
 T17 失败记录：[39197245044](https://github.com/FangcunMount/infra/actions/runs/39197245044) 暴露整体 provision 等待预算不足；[39198164925](https://github.com/FangcunMount/infra/actions/runs/39198164925) 创建后配置回读拒绝，定位为固定5.5.1 `updateSubGroup -q` 才是 retry queue 数，`-r` 为 retryMaxTimes。仅修正新 v2 入口，不改变生产 v1。后续汇总候选重跑保留类型/配置冲突拒绝及幂等回读。
 
 最低 Go race 的旧运行 [39198554820](https://github.com/FangcunMount/reliable-messaging/actions/runs/39198554820) 发现 observer=nil 时上游1秒休眠不响应关闭；已修正、10次真实 TLS/race 回归通过、私有补丁及38文件摘要复现通过，SDK `342c94b` 全部源码/存储/Python门禁通过。该修正包含于汇总候选，旧失败不计通过。
+
+[39199909523](https://github.com/FangcunMount/infra/actions/runs/39199909523) 通过 v2 资源/幂等回读及23项公开SDK正向场景，共27项后，在错误owner负向诊断处失败；报告确认 Compose 容器与私有fixture目录均已清理。根因为 Go 上游 startup 格式化丢失 error cause，及 Python 上游 route callback 吞掉原始状态；新候选保留结构化 RocketMQ/gRPC 拒绝错误，未将普通超时/Unavailable计作拒绝。实际TLS受控状态保留及Python真实manager实例隔离测试通过，完整Broker门禁重跑。拒绝错误门禁提前到正向长测试之前，任务仍16/24。
 
 执行顺序：T01 → T02–T04 → T05–T09 → T10–T13 → T14–T16 → T17–T20 → T21–T24；不跳过前置门禁。
 

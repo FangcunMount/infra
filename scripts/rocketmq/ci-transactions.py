@@ -378,6 +378,18 @@ def main():
                 raise RuntimeError("required Mongo version differs")
             from v2_acceptance import setup
             sdk_manifest, proof["routing_v2"] = setup(repo,sdk,broker,project,accounts,directory,admin,run,passed)
+            # Explicit HOST fixture installation precedes authorization tests;
+            # constructors and Start still never install schema. Run v2 owner
+            # negatives before the longer positive SDK/fault suites.
+            for storage in ("mysql", "mongo"):
+                initializer = start("sdk-go", "init", storage=storage)
+                initializer.wait("installed"); initializer.finish()
+            if args.sdk_api_python:
+                if not args.installed_python:
+                    run([args.python, "sync", "--locked", "--project", str(sdk / "python"),
+                         "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
+            from v2_acceptance import denied_owners, shared_budget
+            denied_owners(start,sql,mongo_command,passed,python=args.sdk_api_python)
             wrong_ca = directory / "sdk-wrong-ca.crt"
             run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
                  "-subj", "/CN=untrusted-sdk", "-keyout", str(directory / "sdk-wrong-ca.key"), "-out", str(wrong_ca)])
@@ -385,12 +397,7 @@ def main():
             run_go_sdk(start, assert_absent, passed, sql, mongo_command, pause_mysql, wrong_ca)
             if args.sdk_api_python:
                 from sdk_acceptance import run_python_sdk
-                if not args.installed_python:
-                    run([args.python, "sync", "--locked", "--project", str(sdk / "python"),
-                         "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
                 run_python_sdk(start, passed, sql, pause_mysql, wrong_ca)
-            from v2_acceptance import denied_owners, shared_budget
-            denied_owners(start,sql,mongo_command,passed,python=args.sdk_api_python)
             shared_budget(start,passed,language="sdk-go")
             if args.sdk_api_python:
                 shared_budget(start,passed,language="sdk-python")
