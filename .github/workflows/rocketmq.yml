@@ -11,7 +11,7 @@ on:
         description: Exact SDK commit under acceptance
         type: string
         required: true
-        default: cb786553f3bc70345ad0f5e8711f6eb7d49844e8
+        default: ad0320aa29f84e5fdf9c1011f7fd8d20db25a2b2
 permissions:
   contents: read
 concurrency:
@@ -20,14 +20,14 @@ concurrency:
 jobs:
   acceptance:
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v6
       - name: Checkout pinned public SDK
         uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: ${{ inputs.sdk_ref || 'cb786553f3bc70345ad0f5e8711f6eb7d49844e8' }}
+          ref: ${{ inputs.sdk_ref || 'ad0320aa29f84e5fdf9c1011f7fd8d20db25a2b2' }}
           path: .sdk-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -67,10 +67,22 @@ jobs:
           retention-days: 14
           if-no-files-found: error
           path: rocketmq-m2-transactions.json
+      - name: Required public Go SDK with original MySQL/Mongo transactions and new-instance recovery
+        run: |
+          python3 scripts/rocketmq/ci-transactions.py --sdk-api-go \
+            --sdk "$PWD/.sdk-acceptance" \
+            --image rocketmq-acceptance:5.5.1 --report rocketmq-m2-go-sdk.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-m2-go-sdk-${{ github.sha }}
+          retention-days: 14
+          if-no-files-found: error
+          path: rocketmq-m2-go-sdk.json
       - name: Export verified Docker image and checksum
         run: |
           docker save rocketmq-acceptance:5.5.1 | gzip -1 > rocketmq-5.5.1-amd64.tar.gz
-          sha256sum rocketmq-5.5.1-amd64.tar.gz rocketmq-m1-evidence.json rocketmq-m2-transactions.json > rocketmq-SHA256SUMS
+          sha256sum rocketmq-5.5.1-amd64.tar.gz rocketmq-m1-evidence.json rocketmq-m2-transactions.json rocketmq-m2-go-sdk.json > rocketmq-SHA256SUMS
       - uses: actions/upload-artifact@v7
         if: success()
         with:
@@ -80,5 +92,6 @@ jobs:
             rocketmq-5.5.1-amd64.tar.gz
             rocketmq-m1-evidence.json
             rocketmq-m2-transactions.json
+            rocketmq-m2-go-sdk.json
             rocketmq-SHA256SUMS
             rocketmq-build.log
