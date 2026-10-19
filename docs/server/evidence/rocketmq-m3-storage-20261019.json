@@ -1,0 +1,121 @@
+{
+  "format_version": 1,
+  "task_ids": [
+    "T04"
+  ],
+  "observed_at": "2026-10-19T11:51:16.490966+00:00",
+  "status": "in_progress",
+  "complete": false,
+  "stage": "schema-and-v2-reference-foundation",
+  "repositories": {
+    "iam": {
+      "source_sha": "65f1a8f4a23e944af6c01678b6ee363913558957",
+      "head_sha": "65f1a8f4a23e944af6c01678b6ee363913558957",
+      "merged": false,
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39246762992",
+      "ci_status": "success including all three native MySQL schema jobs"
+    },
+    "qs-server": {
+      "source_sha": "f0dd60467f4d696c3f3fc9d4539e7218b55ccb7b",
+      "head_sha": "b31fa2c34492c2633597e97476f41089dfa48b06",
+      "merged": false,
+      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39246803082"
+    },
+    "qs-ai": {
+      "source_sha": "6c18ee0a469c91c21f771ce3aabf74b84809d298",
+      "head_sha": "e6baa139362930af4900492d97b09427e66d428f",
+      "merged": false,
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39247556100",
+      "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39247550283",
+      "prior_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246774031",
+      "prior_m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246780022",
+      "prior_m7_status": "success for historical delivery regression; did not include new native schema test",
+      "ci_status": "running/queued; fresh exact head"
+    }
+  },
+  "reports": {
+    "iam": {
+      "sha256": "cf8597d07273e88e26624d60c3089344d223e9bcaba107b765c0d01e8b5da593",
+      "counts": {
+        "pass": 86,
+        "skip": 18
+      },
+      "stage": "local-source-race",
+      "native_database_executed": false
+    },
+    "qs": {
+      "sha256": "4d73e3986d6e5ec25631268954b42a0054b93a8b7b3a39bc2d361eb033483a8f",
+      "counts": {
+        "pass": 230
+      },
+      "stage": "local-source-race",
+      "native_database_executed": false
+    },
+    "ai": {
+      "sha256": "b5a5d76be05cb34ef5b3c0222af7a9124f7e65108e4f3d33af14eded52682bc3",
+      "tests": 58,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 1,
+      "stage": "source-and-downgrade-only",
+      "native_database_executed": false
+    },
+    "ai_runtime_fix": {
+      "sha256": "01a8ce59fc828cccc90106ec0f964ec36b66c42f72885c341c36f9444bcddcbd",
+      "passed": 86,
+      "skipped": 4,
+      "failed": 0,
+      "boundary": "four existing database-dependent control tests skipped locally; not native acceptance"
+    }
+  },
+  "migration_resources": {
+    "iam": {
+      "internal/pkg/migration/migrations/000042_transaction_messaging.up.sql": "8dc3529348a16c7185cc44970fb5e616b2fe72ea408ea673ce8e05606db26188",
+      "internal/pkg/migration/migrations/000042_transaction_messaging.down.sql": "bc7d6646853e842e2869ca1893c936a6559659c0fd31c842d5c7d49c5a1dd1ed"
+    },
+    "qs-server": {
+      "internal/pkg/migration/migrations/mongodb/000041_transaction_messaging.down.json": "8747eda1f6073b0d2f9e531f32a68399ba1aa13e90d8d5ce4768a9b3587a119b",
+      "internal/pkg/migration/migrations/mongodb/000041_transaction_messaging.up.json": "b4eace8013a3d2db2915084d71c67e3cd87bd8a09c7213937d7c692232092b6b",
+      "internal/pkg/migration/migrations/mysql/000106_transaction_messaging.down.sql": "bc7d6646853e842e2869ca1893c936a6559659c0fd31c842d5c7d49c5a1dd1ed",
+      "internal/pkg/migration/migrations/mysql/000106_transaction_messaging.up.sql": "8dc3529348a16c7185cc44970fb5e616b2fe72ea408ea673ce8e05606db26188"
+    },
+    "qs-ai": {
+      "migrations/versions/0041_transaction_messaging.py": "a3f0560d1032b4b32aca799ad7d9b818f18c72862165fb548704d1ef7b38425e"
+    }
+  },
+  "implemented": [
+    "IAM42 / QS106+Mongo41 / AI0041 host-owned separate schema v1, no inferred binding, no destructive Down",
+    "QS exact v2 transaction reference with explicit V1/V2 reader and unchanged legacy type",
+    "Native install/root-transaction/legacy-byte-preservation tests added; required jobs fail without dependencies",
+    "Manual current-head CI dispatch; prior doc-only push created no full workflows",
+    "AI runtime-only fixed0041 complete read-only schema validation; frozen0038/0039/0040 conversion API unchanged"
+  ],
+  "remaining": [
+    "Complete actual native install/compatibility CI and resolve any failures",
+    "Immutable QS/AI body archive with committed-only visibility and old-record readers",
+    "Finish task-level schema/archive/compatibility acceptance before ticking T04"
+  ],
+  "boundaries": [
+    "3/36 remains unchanged; this file does not mark T04 complete",
+    "IAM local broad regression has 18 pre-existing optional MySQL skips; not a required-native pass",
+    "Go tagged native tests compile locally but have not executed a database locally",
+    "No business write entry migrated, no merge/stable release/production schema/Topic/ACL/provider change",
+    "Existing model retry, receipt and first wire responsibilities unchanged; no host pools/worker concurrency changed"
+  ],
+  "history": [
+    {
+      "check": "QS schema inventory test",
+      "result": "Old105/40 expectation rejected new106/41; exact machine inventory and reviewed docs updated, guard retained."
+    },
+    {
+      "check": "Python missing binding test static review",
+      "result": "Broad exception rejected by ruff; pinned SDK inspected and exact BindingError asserted."
+    },
+    {
+      "check": "AI 0041 first native CI startup",
+      "source_sha": "b7f45cecfe954291924aeaed00112d5c649a8f88",
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246774031",
+      "result": "Migration and Alembic comparison passed; startup/release probe still called strict0040 layout validator, so failed before shard tests and image readiness. Added separate fixed0041 runtime validator composed with unchanged0040 base contract; legacy converter remains strict. Fresh native missing-index and old-validator refusal cases added."
+    }
+  ]
+}

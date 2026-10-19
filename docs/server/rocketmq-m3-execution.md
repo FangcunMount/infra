@@ -4,7 +4,7 @@
 
 ## 当前执行快照
 
-- 进度：**3/36**；T01–T03 实现及本地验证已完成，仓库CI重跑中（保留初次文档门禁失败）；T04 进行中。
+- 进度：**3/36**；T01–T03 实现及本地验证已完成，T04 schema/V2引用批次已提交，完整CI已手动触发（保留初次失败）；T04 进行中。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码合并：未发生 M3 合并。稳定 SDK 发布：未执行。生产部署/DDL/Topic/ACL/provider 切换：未执行。system 验收与 48 小时观察：未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
@@ -105,7 +105,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T01 | 执行总表、独立工作区、完整 SHA 基线、证据格式及 PR 台账 | 2026-10-19；实现8e5c9a9；[基线与36项/8里程碑验证](evidence/rocketmq-m3-baseline-20261019.json)；本地提交，PR待创建 |
 | ✅ | T02 | 全部生产者/消费者/订阅/Outbox/调度/恢复清单及105前置 | 2026-10-19；[责任清单](rocketmq-m3-inventory.md)/[源码核验](evidence/rocketmq-m3-inventory-20261019.json)：17目录事件、9协议kind、39文件、IAM12版本调用文件、QS8 Stage文件；生产盘点另属T30/T32 |
 | ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；IAM e50686c7 / QS98645d817 / AI81db026；race63/56、AI45通过；PR130/407/158草稿；IAM门禁通过，QS/AI文档修复后CI重跑中；真实依赖另属T22/T23 |
-| ☐ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 进行中；先验证显式schema安装及原始档案与旧Outbox隔离 |
+| ☐ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 进行中；[schema/V2引用批次与验证](evidence/rocketmq-m3-storage-20261019.json)：三库新迁移及原生测试已提交；IAM含三档MySQL全CI通过；QS CI在跑；AI首次0041探针失败已修复重跑；不可变档案/兼容读取待完成 |
 | ☐ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 待开始 |
 | ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 待开始 |
 | ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 待开始 |
