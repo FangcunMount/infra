@@ -10,7 +10,7 @@
 
 进度：**18/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
-### 最新核验快照（2026-10-19 14:09 +08:00）
+### 最新核验快照（2026-10-19 14:20 +08:00）
 
 本表持续维护已批准的《M2 完整实施规划：事务 SDK、双存储证明与固定预发布》，任务仍为24项。本次仅同步核验状态，不将已实现、CI运行中或待发布记为完成。
 
@@ -18,14 +18,16 @@
 | --- | --- |
 | 已完成任务 | T01–T18，18/24；M2-P 至 M2-4 已满足对应合并门禁；T17/T18 已实现并验证，相关 PR 待合并 |
 | 当前 SDK 候选 | `8841fdfcdd9ec25b49f845a3ed3eb825385d0c32`（精确观测当前消息的真实Checker证据读取，待48项重验）；[PR43](https://github.com/FangcunMount/reliable-messaging/pull/43) 待合并 |
-| 当前 infra 验收源码 | `ca7c5139e7d274bff45df1eb5262675e878f4e46`；[PR27](https://github.com/FangcunMount/infra/pull/27) 待合并；本次记录更新在其后单独记账 |
-| 已验候选 3bed26b 源码检查 | [源码/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383794)、[真实存储适配](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383777)、[Python源码及安装包](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383932)、[既有基础设施回归](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383902) 均通过；不能替代下列 Broker 故障门禁 |
+| 当前 infra 验收源码 | `820953d558d39943ef549ebe00b13de35dc48d02`；[PR27](https://github.com/FangcunMount/infra/pull/27) 待合并；本次记录更新在其后单独记账 |
+| 当前候选 8841fdf 源码检查 | [源码/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179044)、[真实存储适配](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179271)、[Python源码及安装包](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179114)、[既有基础设施回归](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179029) 均通过；不能替代下列 Broker 故障门禁 |
 | T17–T18 | [双 profile 公开 SDK 31项/档](https://github.com/FangcunMount/infra/actions/runs/39201819179) 均通过、0跳过；owner 拒绝、共享消费预算及全部正式入口通过；[结构化证据](evidence/rocketmq-m2-sdk-routing-e2e-20261019.json) |
 | T19 | [现有46项双档完整验收](https://github.com/FangcunMount/infra/actions/runs/39203750293) 通过；[独立44项](https://github.com/FangcunMount/infra/actions/runs/39203750280) 一档44项通过、另一档42项后重启Topic路由暂缺；补齐有界空闲启动等待及2项部分准备后SIGKILL，下一候选要求46项故障验收/48项完整验收 |
 | T20 | 已取得Go/Python真实原生超限索引、0600审计和封新准入证据（双档各2项），见[核心故障证据](evidence/rocketmq-m2-sdk-core-faults-20261019.json)；新增实际进程组排空门禁随48项矩阵重验，前置T19未完成前不打勾 |
 | 普通消息及既有协议回归 | [SDK 3bed26b 完整Docker验收](https://github.com/FangcunMount/infra/actions/runs/39203750215) 通过，raw20项/公开Go19项0跳过；197a267候选待重新绑定验收 |
 | T21–T24 | 文档、示例及发布后安装流程已准备；API冻结、最终合并 SHA、该 SHA 完整 CI、固定发布和下载重装均待前置门禁 |
 | 发布 / 生产 | 两语言 tag 与 GitHub 预发布均未创建；未执行生产变更，业务链路仍属 M3 范围 |
+
+当前精确候选运行：[31项公开SDK](https://github.com/FangcunMount/infra/actions/runs/39208349294)、[46项含故障](https://github.com/FangcunMount/infra/actions/runs/39208349372)、[48项完整矩阵](https://github.com/FangcunMount/infra/actions/runs/39208349317)及[普通消息/既有协议回归](https://github.com/FangcunMount/infra/actions/runs/39208349304)，均在运行中，不计为通过。
 
 下一步：完成 T19/T20 并通过合并门禁，随后冻结契约及执行 T21–T24。若上述运行失败，保留失败证据，修复后按新精确 SHA 重新验证；不以旧候选结果替代。
 
