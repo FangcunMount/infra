@@ -1,6 +1,6 @@
 # 腾讯云 Redis 切换准备与执行手册
 
-状态：2026-10-19，**准备完成，未切换生产**。容量按用户决定保留 256MiB，新实例保留 `noeviction`。本手册不表示已经授权停写、生产发布或旧实例退订；正式切换需安排统一停写窗口。
+状态：2026-10-19，**生产已切换到腾讯云，30 分钟技术观察通过；业务验收等待用户反馈**。容量按用户决定保留 256MiB，新实例保留 `noeviction`。用户已授权正式推送上线和切换。自动发布继续暂停，阿里云旧 Redis 保留，不包含退订授权。
 
 ## 策略比较与选择
 
@@ -22,7 +22,7 @@
 
 ## 范围与配置不变量
 
-- 源：`r-2zegjo7i4al4sh8q83pd.redis.rds.aliyuncs.com:16380`，Redis 7.0.15，现生产明文连接。
+- 源：`r-2zegjo7i4al4sh8q83pd.redis.rds.aliyuncs.com:16380`，Redis 7.0.15，迁移前生产明文连接；现已无业务连接和新增写入。
 - 目标：`crs-3dli07u2`，`bj-crs-3dli07u2.sql.tencentcdb.com:23136`，Redis 7.1.10，公网 TLS，完整 CA 和主机名校验，最低 TLS 1.2。
 - A：IAM ×1（DB0）、API ×1、collection ×2；D：worker ×3。QS 默认 DB1，profiles 保留 DB0、2—8；不统一 DB 号。
 - 不改镜像、MySQL、MongoDB、消息配置、资源限制、健康检查或业务代码；不发布当前 main 的其他功能。AI 没有直接 Redis 连接，但验收覆盖上下游。
@@ -46,8 +46,8 @@ A/D 的 `/root/redis-tencent-cutover-20261019` 为 root 私有目录：
 - `target.json`：新库凭据；A 的 `old-connection.json` 保存旧库回退凭据。
 - `plans/<容器名>/plan.json`：原 inspect、固定镜像、配置文件哈希、仅 Redis/TLS 变化的 Docker create payload。**包含生产凭据，不得进入 Git 或普通日志。**
 - A 的 `source-live-baseline.json`：实际源库备份，`consistent=false`，仅保全与预演，不可作为最终恢复输入。
-- `common-env-plan.json`：`/opt/infra/compose/env/prod/serverA.env` 或 serverD.env 的前后版本及原哈希，尚未覆盖活动文件。
-- `toolkit/`：已暂存的固定 CA 与工具，不等于已更新 `/opt/infra` 的部署入口。
+- `common-env-plan.json`：`/opt/infra/compose/env/prod/serverA.env` 或 serverD.env 的前后版本及原哈希；执行时已比对并应用到活动文件。
+- `toolkit/`：固定 CA 与工具；A 已更新审核后的 infra 来源，D 仅安装本轮 Redis 文件，保留宿主原有未提交修改。
 
 工具：`runtime.py plan/verify` 仅生成/验证计划，不停止、重建或启动容器。`data.py export/inventory/verify/clocks`、`restore` 默认 dry-run；恢复必须显式 `--apply`。`reconcile` 是写入新库后的受控反向镜像，同样默认 dry-run。`cli.py` 只允许盘点读命令并验证 TLS。`monitor.py` 仅运行指定观察窗口。
 
@@ -68,7 +68,7 @@ A/D 的 `/root/redis-tencent-cutover-20261019` 为 root 私有目录：
 
 工具路径可取 root 暂存 `toolkit/scripts/redis`；快照、fence 和连接文件均要求 0600，父目录 0700。执行操作须记录 SHA、主机、时间、计划哈希与实际结果，不记录密码、键名或值。冻结结束前任何异常均停止推进。
 
-## 组织设置清单（准备阶段不修改）
+## 组织设置清单（已应用）
 
 | 共享 Secret | 切换值 |
 | --- | --- |
@@ -79,7 +79,7 @@ A/D 的 `/root/redis-tencent-cutover-20261019` 为 root 私有目录：
 | REDIS_USE_SSL | `true` |
 | REDIS_SSL_INSECURE_SKIP_VERIFY | `false` |
 
-保留原有组织可见范围，保留 QS DB1、IAM DB0，检查仓库和 environment 无旧 endpoint 覆盖。组织管理 API 当前 403；此步骤由具备权限的管理员在切换阶段完成。不要现在把维护任务或发布配置指向仍为空的新库。自动发布暂停不能通过此迁移顺带解除。
+保留原有组织可见范围，保留 QS DB1、IAM DB0，检查仓库和 environment 无旧 endpoint 覆盖。组织管理 API 返回 403；通过已授权的组织管理页面完成更新，并由管理员完成 GitHub 再次身份验证。真实只读维护 Actions 已使用新配置通过。自动发布暂停继续保留。
 
 ## 回退分界
 
@@ -88,8 +88,17 @@ A/D 的 `/root/redis-tencent-cutover-20261019` 为 root 私有目录：
 - 已真实验证 7.0→7.1 和 7.1→7.0 的测试 DUMP/RESTORE、二进制内容与 ABSTTL，反向格式兼容目前成立；仍须以正式数据逐键核验为准。
 - IAM 消费/吊销标记、锁、去重不得当普通缓存丢弃；回退过程中保持全局冻结，失败时保留现场，不自动降级 TLS。
 
-## 验证记录与尚未完成
+## 生产执行与验收记录
 
-已完成：A/D 公网严格 TLS；四类原镜像原生 Go 客户端及连接池重连；Lua、事务、Pub/Sub；双向 DUMP/RESTORE；17 项隔离测试；七个运行计划 allowlist 与当前基线核验；源库 live 私有备份；默认 env 前后计划；目标 DB0—8 空库检查。测试只写 DB15 自有短时前缀，结束清理，业务 DB0—8 不写入。
+代码已通过检查并合并：[infra #40](https://github.com/FangcunMount/infra/pull/40)、[IAM #133](https://github.com/FangcunMount/iam/pull/133)、[QS #408](https://github.com/FangcunMount/qs-server/pull/408)。本次只替换 Redis/TLS 运行配置，七个实例沿用上表的业务镜像，不发布 main 的其他业务改动。
 
-未完成：生产全局冻结与最终数据同步、容器替换、组织 Secrets 写入、代码合并与线上入口安装、迁入数据备份恢复、切换后真实业务验收及 30 分钟观察、额外源连接归属确认、旧实例退订。当前没有更改目标容量或淘汰策略。
+- 全局停止七个写方，控制作业与 DB6 锁为零，时钟差保守上界 5ms。旧库额外两条连接 age=idle、cmd=NULL，长期未发命令；未将其认定为业务连接，也未 kill。
+- 最终冻结快照 40 键、DUMP 50,282 字节，checksum `7a4141ea2f5aea100f5462f1d77665df04ab85d50ddfd79259a43d7609d45995`。迁入后 DUMP 与绝对过期时间一致，missing/mismatch/extra 均为 0。
+- 从腾讯云冻结目标实际导出同 checksum 的逻辑备份；在隔离 Redis 7.0.15（仅 Unix socket、TCP port 0）恢复全部 40 键并验证内容和绝对过期时间。此恢复测试不表示恢复过云 RDB。
+- 腾讯云另行完成迁入后的手动云备份，2026-10-19 23:13:26，状态正常，控制台大小 591.27KB，格式 RDB-Redis 7.0。
+- 七个新实例逐项就绪，实际 TCP 连接均指向公网目标；严格 CA/主机名验证、只读 CA 挂载、原镜像、资源和非 Redis 环境一致。旧容器保留、停止、restart=no。默认 env、冻结 Compose 与组织 Secrets 已同步。
+- 首次真实维护 Actions 发现宿主公开 CA 目录受 umask 077 影响为 0700，deploy 无法读取；运行容器未受影响。只将专用公开 CA 目录修正为 0755、PEM 为 0644，并增加安装器回归覆盖。未知内容和私有祖先目录保持原权限。19 项隔离测试通过。
+- 修复后 [真实 Redis status Actions](https://github.com/FangcunMount/qs-server/actions/runs/39277559475) 成功；组织配置、宿主部署账号和 CA 验证均已实际执行。db-ops 工作流恢复 active，QS/IAM 自动生产发布仍暂停。
+- 新三个 worker 已接入原 NSQ 通道；当前未观测到新业务消息的完成计数，不能以连接成功替代实际消费验收。
+
+30 分钟观察共 61 个样本，峰值内存 12.18MiB（4.76%），OOM 与淘汰计数均为 0，旧库业务连接和新增写入为 0。观察结果以 [执行回执](evidence/redis-tencent-cutover-20261019.json) 为准。实际小程序登录、问卷读写、已有报告、AI 请求与后台权限页面的业务验收仍等待用户反馈。未配置持续云监控告警，也未退订旧 Redis；这两项不包含在本次技术切换完成声明中。后续新写入发生后回退必须使用上文冻结与反向核验流程，不能直接改回旧地址。

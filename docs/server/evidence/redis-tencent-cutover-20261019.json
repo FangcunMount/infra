@@ -1,0 +1,177 @@
+{
+  "recorded_local": "2026-10-19T23:42:16.501222+08:00",
+  "technical_cutover": "complete",
+  "business_acceptance": "pending user response",
+  "target": {
+    "instance": "crs-3dli07u2",
+    "host": "bj-crs-3dli07u2.sql.tencentcdb.com",
+    "port": 23136,
+    "tls": true,
+    "hostname_verification": true,
+    "ca_sha256": "620fec36c5647475f0be9c51afe21d05d88ccf61cfadc578ceb069d8def97132",
+    "capacity_bytes": 268435456,
+    "policy": "noeviction"
+  },
+  "frozen_transfer": {
+    "keys": 40,
+    "dump_bytes": 50282,
+    "sha256": "7a4141ea2f5aea100f5462f1d77665df04ab85d50ddfd79259a43d7609d45995",
+    "missing": 0,
+    "mismatch": 0,
+    "extra": 0
+  },
+  "logical_backup_isolated_restore": {
+    "source": "actual-Tencent-frozen-logical-backup",
+    "backup_sha256": "7a4141ea2f5aea100f5462f1d77665df04ab85d50ddfd79259a43d7609d45995",
+    "backup_keys": 40,
+    "restored": {
+      "dry_run": false,
+      "eligible": 40,
+      "expired_skipped": 0,
+      "restored": 40
+    },
+    "verification": {
+      "verified": 40,
+      "expired": 0,
+      "missing": 0,
+      "mismatch": 0,
+      "extra": 0,
+      "pass": true
+    },
+    "isolated_redis_version": "7.0.15",
+    "network": "unix socket only; TCP port 0; no production network",
+    "production_written": false
+  },
+  "cloud_rdb_backup": {
+    "instance": "crs-3dli07u2",
+    "created_local": "2026-10-19 23:13:26",
+    "size_ui": "591.27KB",
+    "format": "RDB-Redis 7.0",
+    "status": "normal",
+    "remark": "Redis迁移后备份20261019"
+  },
+  "services": [
+    {
+      "name": "iam-apiserver",
+      "id": "2e1acaa0acdb35ca3856c1c7c291f46c6c086f22b110a534748c45cf7e1b24b0",
+      "image_id": "sha256:57a47a713f336d84f6ba48fac7c0f229c38318ed16115071b20b7e7bcabdfbf5",
+      "tls": true,
+      "hostname_verification": true,
+      "ca_sha256": "620fec36c5647475f0be9c51afe21d05d88ccf61cfadc578ceb069d8def97132",
+      "database": "0",
+      "public_target_connections": 11,
+      "health": "healthy",
+      "all_other_env_and_resources_preserved": true,
+      "old_stopped_restart_disabled": true
+    },
+    {
+      "name": "qs-apiserver",
+      "id": "2fe8dc429fbc32b2f9ec9a2a2e0dd505d30c30308c72696f1262bd3d2a0b6fa3",
+      "image_id": "sha256:72c13c69cfa4ed68c9eeeba81c72bff678f02b803a7ddc3d5aac2205ae7cfbdd",
+      "tls": true,
+      "hostname_verification": true,
+      "ca_sha256": "620fec36c5647475f0be9c51afe21d05d88ccf61cfadc578ceb069d8def97132",
+      "database": "1",
+      "public_target_connections": 106,
+      "health": "healthy",
+      "all_other_env_and_resources_preserved": true,
+      "old_stopped_restart_disabled": true
+    },
+    {
+      "name": "qs-collection-server-1",
+      "id": "7a9ccb1e7e85a05755e8bf55e274387197121f467f19cb937a33d311a75167b9",
+      "image_id": "sha256:b0f51841f84e4dd798286fd1c8629303fd0b619ca351af26b26db76896f00932",
+      "tls": true,
+      "hostname_verification": true,
+      "ca_sha256": "620fec36c5647475f0be9c51afe21d05d88ccf61cfadc578ceb069d8def97132",
+      "database": "1",
+      "public_target_connections": 38,
+      "health": "healthy",
+      "all_other_env_and_resources_preserved": true,
+      "old_stopped_restart_disabled": true
+    },
+    {
+      "name": "qs-collection-server-2",
+      "id": "2d79a2f4150cd34896cd1ce5f133bb5052ca270c11e371819a7bc0663cc4a354",
+      "image_id": "sha256:b0f51841f84e4dd798286fd1c8629303fd0b619ca351af26b26db76896f00932",
+      "tls": true,
+      "hostname_verification": true,
+      "ca_sha256": "620fec36c5647475f0be9c51afe21d05d88ccf61cfadc578ceb069d8def97132",
+      "database": "1",
+      "public_target_connections": 38,
+      "health": "healthy",
+      "all_other_env_and_resources_preserved": true,
+      "old_stopped_restart_disabled": true
+    },
+    {
+      "name": "qs-worker-runtime-1",
+      "id": "5a5981cca6dc5e09cb685db33a9b5ffce9d179fd29e16c3ba3cd780d95d0b1b4",
+      "image_id": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+      "tls": true,
+      "hostname_verification": true,
+      "ca_sha256": "620fec36c5647475f0be9c51afe21d05d88ccf61cfadc578ceb069d8def97132",
+      "database": "1",
+      "public_target_connections": 18,
+      "health": "ready",
+      "all_other_env_and_resources_preserved": true,
+      "old_stopped_restart_disabled": true
+    },
+    {
+      "name": "qs-worker-runtime-2",
+      "id": "3523a3a7eaa607be9e6d503266446ecef26390281c3153e85a396ac83a175c91",
+      "image_id": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+      "tls": true,
+      "hostname_verification": true,
+      "ca_sha256": "620fec36c5647475f0be9c51afe21d05d88ccf61cfadc578ceb069d8def97132",
+      "database": "1",
+      "public_target_connections": 18,
+      "health": "ready",
+      "all_other_env_and_resources_preserved": true,
+      "old_stopped_restart_disabled": true
+    },
+    {
+      "name": "qs-worker-runtime-3",
+      "id": "67472ecba9b238600721d1b6b4edb8c889bc4e41454b4ee95112ddcd58ee66b1",
+      "image_id": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+      "tls": true,
+      "hostname_verification": true,
+      "ca_sha256": "620fec36c5647475f0be9c51afe21d05d88ccf61cfadc578ceb069d8def97132",
+      "database": "1",
+      "public_target_connections": 18,
+      "health": "ready",
+      "all_other_env_and_resources_preserved": true,
+      "old_stopped_restart_disabled": true
+    }
+  ],
+  "observation": {
+    "samples": 61,
+    "elapsed_seconds": 1800,
+    "max_used_memory": 12776456,
+    "max_ratio": 0.0476,
+    "max_oom_count": 0,
+    "max_evicted_keys": 0,
+    "all_normal": true
+  },
+  "old_source_observation": {
+    "at_ms": 1792424227630,
+    "old_business_clients": 0,
+    "old_write_call_deltas": {},
+    "pass": true
+  },
+  "maintenance_action": {
+    "url": "https://github.com/FangcunMount/qs-server/actions/runs/39277559475",
+    "conclusion": "success"
+  },
+  "source_merges": {
+    "infra": "feed196c2565880b44dd4346538ad715f7fcec34",
+    "iam": "403d41c2c75de53874ae65ee23dbd844b516fd98",
+    "qs-server": "a201b96351bbd3bdc09e7ab738921a6ec5354f1e"
+  },
+  "ca_installer_fix_pr": "https://github.com/FangcunMount/infra/pull/42",
+  "ca_installer_regression_tests": 19,
+  "automatic_production_deploy_paused": true,
+  "old_redis_retained": true,
+  "old_containers_stopped_restart_disabled": true,
+  "worker_consumer_connection": "three new worker clients per original channel; no post-cutover message completion observed",
+  "continuous_cloud_alerts": "not configured in this change"
+}
