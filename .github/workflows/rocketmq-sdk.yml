@@ -1,0 +1,51 @@
+name: RocketMQ public transaction SDK
+on:
+  pull_request:
+    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '.github/workflows/rocketmq-sdk.yml']
+  workflow_dispatch:
+    inputs:
+      sdk_ref:
+        description: Exact candidate SDK revision
+        type: string
+        required: true
+        default: a019675bf149926fa2358cbd5359db98a0d9119e
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-public-sdk-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  sdk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: ${{ inputs.sdk_ref || 'a019675bf149926fa2358cbd5359db98a0d9119e' }}
+          path: .sdk-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .sdk-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Fetch and verify official release archive
+        run: bash scripts/rocketmq/fetch-release.sh
+      - name: Build exact isolated Broker with fresh PGP proof
+        run: docker build --no-cache -t rocketmq-sdk:5.5.1 components/rocketmq
+      - name: Required public SDK MySQL, Mongo and cross-language recovery proofs
+        run: |
+          python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python \
+            --sdk "$PWD/.sdk-acceptance" --image rocketmq-sdk:5.5.1 \
+            --report rocketmq-public-sdk.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-public-sdk-${{ github.sha }}
+          path: rocketmq-public-sdk.json
+          if-no-files-found: error
+          retention-days: 14

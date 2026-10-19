@@ -130,9 +130,12 @@ def main():
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
     parser.add_argument("--go-probe", type=Path)
+    parser.add_argument("--sdk-api-python", action="store_true", help="also require public Python/MySQL and cross-language recovery")
     parser.add_argument("--sdk-api-go", action="store_true", help="required public Go SDK acceptance; separate from raw M2-0")
     parser.add_argument("--python", default="uv")
     args = parser.parse_args()
+    if args.sdk_api_python and not args.sdk_api_go:
+        parser.error("Python SDK acceptance requires the full public Go SDK matrix")
     repo = Path(__file__).resolve().parents[2]
     sources = repo / "scripts/rocketmq/txprobe"
     sdk = args.sdk.resolve()
@@ -228,7 +231,7 @@ def main():
         return run(["docker", "exec", project + "-mongo-1", "mongosh", "--quiet", "--eval", command]).stdout.strip()
 
     def start(language, mode, identity="", owner="owner-a", topic=None, trust=None, storage="mysql"):
-        if language == "sdk-go":
+        if language in ("sdk-go", "sdk-python"):
             topic = "m2-sdk-" + storage
         account = accounts[owner]
         path = directory / ("client-" + secrets.token_hex(5) + ".json")
@@ -243,6 +246,10 @@ def main():
                 [args.python, "run", "--locked", "--project", str(sources), "python", str(sources / "probe.py")])
         if language == "sdk-go":
             argv = [str(directory / "sdk-go-probe")]
+        if language == "sdk-python":
+            argv = [args.python, "run", "--locked", "--project", str(sdk / "python"),
+                    "--extra", "rocketmq", "--extra", "nsq", "python",
+                    str(sdk / "python/tests/integration/transaction_probe.py")]
         argv += ["--config", str(path), "--mode", mode, "--id", identity]
         p = Probe(argv, directory, dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(trust or ca)))
         probes.append(p)
@@ -306,7 +313,13 @@ def main():
                 admin("createAcl", "-s", "User:" + accounts["owner-a"]["username"], "-r", "Topic:" + topic,
                       "-a", "Pub,Sub,Get", "-d", "Allow", success=True)
             run_go_sdk(start, assert_absent, passed, sql, mongo_command)
-            if len(cases) != 10:
+            if args.sdk_api_python:
+                from sdk_acceptance import run_python_sdk
+                run([args.python, "sync", "--locked", "--project", str(sdk / "python"),
+                     "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
+                run_python_sdk(start, passed, sql, lambda paused: run(
+                    ["docker", "pause" if paused else "unpause", mysql]))
+            if len(cases) != (18 if args.sdk_api_python else 10):
                 raise RuntimeError("required public SDK case count differs")
             return
         run([args.python, "sync", "--locked", "--project", str(sources)], timeout=180)
@@ -472,7 +485,7 @@ def main():
                 p.close()
         run(["docker", "unpause", mysql], required=False)
         run(compose + ["down", "--volumes", "--remove-orphans", "--timeout", "30"], timeout=120)
-        report = {"version": 1, "batch": "M2-Go-SDK" if args.sdk_api_go else "M2-0", "project": project, "image": image,
+        report = {"version": 1, "batch": ("M2-Go-Python-SDK" if args.sdk_api_python else "M2-Go-SDK") if args.sdk_api_go else "M2-0", "project": project, "image": image,
                   "mysql_image": mysql_image, "mongo_image": mongo_image, "clients": {"go": "5.1.4", "python": "5.1.2"},
                   "cases": cases, "passed": len(cases), "failed": int(failure is not None),
                   "skipped": 0, "failure": failure, "proof": proof,
