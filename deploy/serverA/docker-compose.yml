@@ -1,5 +1,5 @@
 # ============================================================================
-# serverA 基础设施栈 (2C4G 资源预算)
+# serverA 基础设施栈 (腾讯云 4C8G)
 # ============================================================================
 # 服务清单：
 #   - 网关：Nginx
@@ -17,6 +17,9 @@ services:
   # ============================================================================
 
   mysql-rds-proxy:
+    # Only the old Alibaba node can use this rollback profile. The Tencent
+    # serverA uses the proxy on serverB; do not create a second production alias.
+    profiles: [aliyun-rds-proxy]
     image: nginx:1.27
     container_name: mysql-rds-proxy
     restart: unless-stopped

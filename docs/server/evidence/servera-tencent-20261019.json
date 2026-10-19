@@ -1,0 +1,302 @@
+{
+  "verified_at": "2026-10-19T14:22:19.395851+08:00",
+  "scope": "serverA host migration; fixed existing business images; no database migration or DDL",
+  "new_serverA": {
+    "containers": [
+      {
+        "name": "nginx",
+        "image_id": "sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "compose_project": "servera",
+        "memory_bytes": 134217728,
+        "nano_cpus": 500000000
+      },
+      {
+        "name": "qs-apiserver",
+        "image_id": "sha256:8b23c9574366c9671d63282caf63455730b90018357c71ca02a3073f56aa7979",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "compose_project": "servera-migrated",
+        "memory_bytes": 1073741824,
+        "nano_cpus": 2000000000
+      },
+      {
+        "name": "qs-collection-server-1",
+        "image_id": "sha256:b0f51841f84e4dd798286fd1c8629303fd0b619ca351af26b26db76896f00932",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "compose_project": "qs-collection",
+        "memory_bytes": 335544320,
+        "nano_cpus": 1000000000
+      },
+      {
+        "name": "qs-collection-server-2",
+        "image_id": "sha256:b0f51841f84e4dd798286fd1c8629303fd0b619ca351af26b26db76896f00932",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "compose_project": "qs-collection",
+        "memory_bytes": 335544320,
+        "nano_cpus": 1000000000
+      },
+      {
+        "name": "qs-ai",
+        "image_id": "sha256:e511347af54ea85d6b360f8b6cc89f02eb81f474977871739129a7cf702c2fa8",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "compose_project": "qs-ai",
+        "memory_bytes": 805306368,
+        "nano_cpus": 750000000
+      },
+      {
+        "name": "prometheus-route",
+        "image_id": "sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "compose_project": "monitoring-route",
+        "memory_bytes": 33554432,
+        "nano_cpus": 100000000
+      }
+    ],
+    "nodes": [
+      {
+        "id": "jgna7l1gjknfv1g8gjgw0huau",
+        "hostname": "serverA",
+        "status": "ready",
+        "role": "manager",
+        "manager_reachability": "reachable"
+      },
+      {
+        "id": "n7rqopks61wjms3dl37gzv16r",
+        "hostname": "serverA",
+        "status": "ready",
+        "role": "worker",
+        "manager_reachability": null
+      },
+      {
+        "id": "pnb07r0yawfr249jh4oh4e0qs",
+        "hostname": "serverB",
+        "status": "ready",
+        "role": "manager",
+        "manager_reachability": "reachable"
+      },
+      {
+        "id": "9ijjklwo0mmcxbjyi9pgh9cmk",
+        "hostname": "serverC",
+        "status": "ready",
+        "role": "worker",
+        "manager_reachability": null
+      },
+      {
+        "id": "452ldjzgn094knlbuoe1o2nt1",
+        "hostname": "serverD",
+        "status": "ready",
+        "role": "manager",
+        "manager_reachability": "reachable"
+      }
+    ],
+    "network_id": "m3tfd5h9sp5d1xmzht0ey0oql",
+    "dns": [
+      {
+        "name": "collect.fangcunmount.cn",
+        "record_id": "2031190643531585536",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      },
+      {
+        "name": "grafana.fangcunmount.cn",
+        "record_id": "2045697252198739968",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      },
+      {
+        "name": "iam.fangcunmount.cn",
+        "record_id": "2031190384671865856",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      },
+      {
+        "name": "nsqd.fangcunmount.cn",
+        "record_id": "2087734047480134656",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      },
+      {
+        "name": "operating.fangcunmount.cn",
+        "record_id": "2031190866253322240",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      },
+      {
+        "name": "qs.fangcunmount.cn",
+        "record_id": "2031190517056595968",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      },
+      {
+        "name": "worker.fangcunmount.cn",
+        "record_id": "2087733867448095744",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      },
+      {
+        "name": "www.fangcunmount.cn",
+        "record_id": "2031191043437615104",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      },
+      {
+        "name": "admin.yangshujie.com",
+        "record_id": "1926615702459390976",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      },
+      {
+        "name": "api.yangshujie.com",
+        "record_id": "1925083821977364480",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      },
+      {
+        "name": "www.yangshujie.com",
+        "record_id": "1925083742784714752",
+        "before": "47.94.204.124",
+        "after": "154.8.167.1",
+        "ttl": 600
+      }
+    ]
+  },
+  "old_serverA": {
+    "stopped_retained": [
+      "mysql-rds-proxy",
+      "qs-apiserver",
+      "qs-collection-server-1",
+      "qs-collection-server-2",
+      "qs-ai",
+      "prometheus-route"
+    ],
+    "nginx_running": true
+  },
+  "monitoring": {
+    "targets": [
+      {
+        "job": "qs-apiserver",
+        "instance": "qs-apiserver:8080",
+        "health": "up"
+      },
+      {
+        "job": "qs-worker",
+        "instance": "qs-worker-runtime-2",
+        "health": "up"
+      },
+      {
+        "job": "qs-worker",
+        "instance": "qs-worker-runtime-1",
+        "health": "up"
+      },
+      {
+        "job": "qs-collection-server",
+        "instance": "172.20.0.195:8080",
+        "health": "up"
+      },
+      {
+        "job": "qs-worker",
+        "instance": "qs-worker-runtime-3",
+        "health": "up"
+      },
+      {
+        "job": "qs-collection-server",
+        "instance": "172.20.0.196:8080",
+        "health": "up"
+      },
+      {
+        "job": "qs-ai",
+        "instance": "qs-ai-api:8000",
+        "health": "up"
+      },
+      {
+        "job": "prometheus",
+        "instance": "127.0.0.1:9090",
+        "health": "up"
+      },
+      {
+        "job": "rocketmq",
+        "instance": "100.118.164.39:5557",
+        "health": "up"
+      }
+    ],
+    "containers": [
+      {
+        "name": "prometheus",
+        "id": "7d551ead7a7c85e9a33035deac7d9ef19b5454e88fac993682fb744a7b19188b",
+        "volumes": [
+          "infra_prometheus_data"
+        ]
+      },
+      {
+        "name": "grafana",
+        "id": "43d96af0b4ccde65aed902a00a2879929486ba351210426672c456398ed90fb8",
+        "volumes": [
+          "infra_grafana_data"
+        ]
+      }
+    ]
+  },
+  "dependency_checks": {
+    "mysql": "authenticated SELECT 1 via production serverB proxy",
+    "redis": "authenticated AUTH/SELECT/PING; API eight families and collection two families ready",
+    "iam": "mTLS certificate and HTTP/2 negotiation from new host",
+    "ai_schema": {
+      "current": [
+        "0040_module_table_names"
+      ],
+      "expected": [
+        "0040_module_table_names"
+      ]
+    },
+    "collection_serving_readiness": "both replicas dependency_ready=true, serve_ready=true",
+    "worker_readiness": "three existing serverD replicas ready",
+    "mongo_operations_tunnel": "loopback 127.0.0.1:27017 MongoDB hello succeeded"
+  },
+  "https_vhosts": {
+    "qs.fangcunmount.cn/readyz": 200,
+    "collect.fangcunmount.cn/readyz": 200,
+    "iam.fangcunmount.cn/health": 200,
+    "operating.fangcunmount.cn/health": 200,
+    "www.fangcunmount.cn/": 200,
+    "fangcunmount.cn/": 301,
+    "www.yangshujie.com/": 200,
+    "admin.yangshujie.com/": 200,
+    "api.yangshujie.com/health": 200,
+    "grafana.fangcunmount.cn/api/health": 200,
+    "nsqd.fangcunmount.cn/ping": 200,
+    "worker.fangcunmount.cn/readyz": 200
+  },
+  "tls_verification": "all 12 certificate checks passed from serverD against new public IP",
+  "monitoring_access": {
+    "mini_private": 200,
+    "public_denied": 403
+  },
+  "retained_release_controls": {
+    "qs_server_PRODUCTION_DEPLOY_PAUSED": true,
+    "qs_ai_AUTO_DEPLOY_ENABLED": false
+  },
+  "business_acceptance": "not performed: authenticated login, questionnaire submission, AI/report generation require separate acceptance",
+  "old_server_retired": false
+}
