@@ -6,14 +6,14 @@
 
 基线：SDK `fd9c51691d785ced6e27d1ad3509fc4ac99a7b1f`；infra `44c379bedf5d37194aff1c87eccc8c8080cb3b2c`。隔离分支：SDK 协议 `codex/rocketmq-m2-sdk`、存储续批 `codex/rocketmq-m2-storage`；infra `codex/rocketmq-m2-sdk-tracking`。
 
-进度：**4/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
+进度：**9/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
 | 里程碑 | 任务 | 状态 | 完成门禁 |
 | --- | --- | --- | --- |
 | M2-0 | 既有批次 | ✅ 已完成 | 20 项真实验证，0 跳过 |
 | M2-P | T01 | 已建立；待 PR 合并 | 基线、任务及证据格式建立 |
 | M2-1 | T02–T04 | ✅ 已完成 | 双语言契约及失败状态通过、PR 合并 |
-| M2-2 | T05–T09 | 待开始 | 四种原事务适配及并发证明、PR 合并 |
+| M2-2 | T05–T09 | 实现及完整 CI 完成；待合并记录 | 四种原事务适配及并发证明、PR 合并 |
 | M2-3 | T10–T13 | 待开始 | Go 真 RPC、回查及关闭有界、PR 合并 |
 | M2-4 | T14–T16 | 待开始 | Python 线程/loop/取消证明、PR 合并 |
 | M2-5 | T17–T20 | 待开始 | 正式 SDK 故障集成 required CI 非空且 0 跳过、PR 合并 |
@@ -25,11 +25,11 @@
 | ✅ | T02 | Sender/Executor/Store/Checker 契约和冻结 codec；双语言 round-trip | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；[SDK PR35](https://github.com/FangcunMount/reliable-messaging/pull/35) CI 全通过并合并为 4c098c5 |
 | ✅ | T03 | 请求/计划/执行 fence；重复请求、新执行、显式重建计划契约 | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；[SDK PR35](https://github.com/FangcunMount/reliable-messaging/pull/35) CI 全通过并合并为 4c098c5 |
 | ✅ | T04 | 三阶段结果、取消、部分准备与未知提交状态矩阵 | 2026-10-19 +08:00；SDK 4943d43；[本地证据](evidence/rocketmq-m2-sdk-contracts-20261019.json)；[SDK PR35](https://github.com/FangcunMount/reliable-messaging/pull/35) CI 全通过并合并为 4c098c5 |
-| ☐ | T05 | schema/索引/显式安装；身份比较、fence 边界、版本拒绝 | — |
-| ☐ | T06 | Go MySQL/sql、GORM 原事务 guard；真实原子性 | — |
-| ☐ | T07 | Go Mongo guard；callback 重入、写冲突、未知提交 | — |
-| ☐ | T08 | Python SQLAlchemy/MySQL guard；根事务/savepoint/AUTOCOMMIT | — |
-| ☐ | T09 | reservation、资格、中止器；迟到提交隔离 | — |
+| ✅ | T05 | schema/索引/显式安装；身份比较、fence 边界、版本拒绝 | 2026-10-19 +08:00；SDK d1a9cf5；[真实依赖证据](evidence/rocketmq-m2-sdk-storage-20261019.json)；[PR36](https://github.com/FangcunMount/reliable-messaging/pull/36) 全部 CI 通过 |
+| ✅ | T06 | Go MySQL/sql、GORM 原事务 guard；真实原子性 | 2026-10-19 +08:00；SDK d1a9cf5；[真实依赖证据](evidence/rocketmq-m2-sdk-storage-20261019.json)；[PR36](https://github.com/FangcunMount/reliable-messaging/pull/36) 全部 CI 通过 |
+| ✅ | T07 | Go Mongo guard；callback 重入、写冲突、未知提交 | 2026-10-19 +08:00；SDK d1a9cf5；[真实依赖证据](evidence/rocketmq-m2-sdk-storage-20261019.json)；[PR36](https://github.com/FangcunMount/reliable-messaging/pull/36) 全部 CI 通过 |
+| ✅ | T08 | Python SQLAlchemy/MySQL guard；根事务/savepoint/AUTOCOMMIT | 2026-10-19 +08:00；SDK d1a9cf5；[真实依赖证据](evidence/rocketmq-m2-sdk-storage-20261019.json)；[PR36](https://github.com/FangcunMount/reliable-messaging/pull/36) 全部 CI 通过 |
+| ✅ | T09 | reservation、资格、中止器；迟到提交隔离 | 2026-10-19 +08:00；SDK d1a9cf5；[真实依赖证据](evidence/rocketmq-m2-sdk-storage-20261019.json)；[PR36](https://github.com/FangcunMount/reliable-messaging/pull/36) 全部 CI 通过 |
 | ☐ | T10 | Go driver context、回查准入、关闭；源码复现 | — |
 | ☐ | T11 | Go Sender 多分支准备、本地执行、最终确认 | — |
 | ☐ | T12 | Go 精确 Checker；跨实例、饱和、DB 预算 | — |
