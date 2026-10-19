@@ -3,13 +3,13 @@
   "task_ids": [
     "T06"
   ],
-  "observed_at": "2026-10-19T20:36:35.142929+00:00",
+  "observed_at": "2026-10-19T20:46:23.655900+00:00",
   "status": "completed",
   "complete": true,
   "repository": "FangcunMount/iam",
   "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
   "pr": "https://github.com/FangcunMount/iam/pull/132",
-  "pr_status": "draft; not merged",
+  "pr_status": "merged",
   "implemented": [
     "Original-root SDK guard, all prepared-half evidence, exact one frozen event and witness commit",
     "Join admitted local callbacks after canceled SDK snapshot; reject late callbacks",
@@ -317,14 +317,13 @@
     }
   ],
   "remaining": [
-    "PR132 source merge tracked separately; user chose offline implementation",
     "Production/system acceptance remains deferred to M3 production tasks"
   ],
   "boundaries": {
     "native_half_receipts": "Explicit storage fixture; not Broker E2E/fault evidence",
     "production_changes": false,
     "system_acceptance": false,
-    "merged": false
+    "merged": true
   },
   "previous_candidates": [
     {
@@ -360,7 +359,10 @@
       "failed_job_steps_started": 0,
       "annotation_confirmed": "account payments failed or spending limit; MySQL8.4 not executed; other jobs then queued"
     },
-    "user_decision": "Defer billing changes; continue offline implementation; no repeated cloud reruns"
+    "user_decision": "Defer billing changes; continue offline implementation; no repeated cloud reruns",
+    "status": "resolved after repository became PUBLIC; new cloud jobs have started",
+    "restored_run": "https://github.com/FangcunMount/infra/actions/runs/39321850663",
+    "user_decision_latest": "Repository made public; resume cloud CI after verified visibility"
   },
   "current_candidate_ci": {
     "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
@@ -387,5 +389,6 @@
     "scope_limit": "Local native proof does not change GitHub Actions status or production/system acceptance",
     "setup_failure": "First 8.0.36 pull failed before fixture startup because SSH PATH omitted Docker credential helper; private failure log retained; retry uses verified existing MySQL8.0.44 image and corrected PATH"
   },
-  "completed_at": "2026-10-19T20:36:35.142929+00:00"
+  "completed_at": "2026-10-19T20:36:35.142929+00:00",
+  "merge_sha": "7accc92cbb69e85aaff66cb5f62017e7fb030ab7"
 }
