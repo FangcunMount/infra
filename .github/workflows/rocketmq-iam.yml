@@ -6,9 +6,9 @@ on:
         description: Exact IAM candidate source SHA
         type: string
         required: true
-        default: 89bdcf5818e94d5878401c151fbe289e5eb121f4
+        default: 98d0af8dddaadfb951d09d7c3171c336a9b6d6f2
   pull_request:
-    paths: ['scripts/rocketmq/ci-transactions.py', 'scripts/rocketmq/iam_acceptance.py', 'scripts/rocketmq/test_iam_acceptance.py', '.github/workflows/rocketmq-iam.yml']
+    paths: ['scripts/rocketmq/ci-transactions.py', 'scripts/rocketmq/iam_acceptance.py', 'scripts/rocketmq/test_iam_acceptance.py', 'scripts/rocketmq/iam_native.py', 'scripts/rocketmq/test_iam_native.py', '.github/workflows/rocketmq-iam.yml']
 permissions:
   contents: read
 env:
@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/iam
-          ref: ${{ inputs.iam_ref || '89bdcf5818e94d5878401c151fbe289e5eb121f4' }}
+          ref: ${{ inputs.iam_ref || '98d0af8dddaadfb951d09d7c3171c336a9b6d6f2' }}
           path: .iam-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -46,12 +46,22 @@ jobs:
           python-version: '3.13'
       - name: Verify exact candidate and source harness
         env:
-          EXPECTED_IAM_SHA: ${{ inputs.iam_ref || '89bdcf5818e94d5878401c151fbe289e5eb121f4' }}
+          EXPECTED_IAM_SHA: ${{ inputs.iam_ref || '98d0af8dddaadfb951d09d7c3171c336a9b6d6f2' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_IAM_SHA" =~ ^[0-9a-f]{40}$ ]]
           test "$(git -C .iam-acceptance rev-parse HEAD)" = "$EXPECTED_IAM_SHA"
           python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py' -v
+
+      - name: Required original roots and HTTP on fixed native MySQL
+        env:
+          MYSQL_IMAGE: ${{ matrix.mysql }}
+        run: |
+          set -euo pipefail
+          docker pull "$MYSQL_IMAGE"
+          mkdir -m700 "$RUNNER_TEMP/iam-native-proof"
+          python3 scripts/rocketmq/iam_native.py --iam "$PWD/.iam-acceptance" \
+            --mysql-image "$MYSQL_IMAGE" --report "$RUNNER_TEMP/iam-native-proof/receipt.json"
       - name: Build verified isolated Broker
         run: |
           set -euo pipefail
@@ -62,12 +72,20 @@ jobs:
           MYSQL_IMAGE: ${{ matrix.mysql }}
         run: |
           python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
-            --iam-host "$PWD/.iam-acceptance" --image rocketmq-iam:5.5.1 \
+            --iam-host "$PWD/.iam-acceptance" --iam-operation-results --image rocketmq-iam:5.5.1 \
             --mysql-image "$MYSQL_IMAGE" --report rocketmq-iam-host.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: rocketmq-iam-host-${{ strategy.job-index }}-${{ github.sha }}
           path: rocketmq-iam-host.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: iam-native-root-${{ strategy.job-index }}-${{ github.sha }}
+          path: ${{ runner.temp }}/iam-native-proof/receipt.json
           if-no-files-found: error
           retention-days: 14

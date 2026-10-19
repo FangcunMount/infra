@@ -43,6 +43,10 @@ def broker_parameters(output):
     return result
 
 
+def mysql_fixture_supported(version, *, sdk_api_go=False, iam_host=False):
+    return version.startswith('8.0.') or ((sdk_api_go or iam_host) and version.startswith('8.4.'))
+
+
 def run(argv, *, timeout=120, env=None, cwd=None, required=True, stdin=None):
     try:
         result = subprocess.run(argv, input=stdin, capture_output=True, text=True,
@@ -381,7 +385,7 @@ def main():
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
-        if not (proof["mysql_version"].startswith("8.0.") or (args.sdk_api_go and proof["mysql_version"].startswith("8.4."))):
+        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
         if not args.sdk_api_go:
             sql("CREATE TABLE witness(id VARCHAR(96) PRIMARY KEY, owner VARCHAR(32) NOT NULL, "
