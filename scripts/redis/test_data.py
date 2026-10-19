@@ -1,4 +1,5 @@
 import unittest.mock
+import os,contextlib,io
 import unittest,tempfile,subprocess,time,json,hashlib,copy,sys
 from pathlib import Path
 from resp import Redis,RedisError
@@ -99,6 +100,26 @@ class RuntimeAllowlist(unittest.TestCase):
 
 
 class PreparationGuards(unittest.TestCase):
+ def test_unrecognized_existing_ca_keeps_directory_private(self):
+  import ca
+  with tempfile.TemporaryDirectory()as temp:
+   dest=Path(temp)/'redis'/'ca-chain.pem';dest.parent.mkdir(mode=0o700);dest.write_bytes(b'unrecognized-existing-content')
+   with unittest.mock.patch.object(ca,'DEST',dest),unittest.mock.patch('sys.argv',['ca.py','install']):
+    with self.assertRaises(ValueError):ca.main()
+   self.assertEqual(dest.parent.stat().st_mode&0o777,0o700)
+   self.assertEqual(dest.read_bytes(),b'unrecognized-existing-content')
+ def test_public_ca_install_ignores_private_umask_without_opening_other_directories(self):
+  import ca
+  with tempfile.TemporaryDirectory()as temp:
+   base=Path(temp);dest=base/'redis'/'ca-chain.pem';old_umask=os.umask(0o077)
+   try:
+    with unittest.mock.patch.object(ca,'DEST',dest),unittest.mock.patch('sys.argv',['ca.py','install']),contextlib.redirect_stdout(io.StringIO()):ca.main()
+   finally:os.umask(old_umask)
+   self.assertEqual(dest.parent.stat().st_mode&0o777,0o755);self.assertEqual(dest.stat().st_mode&0o777,0o644)
+   self.assertEqual(base.stat().st_mode&0o777,0o700)
+   dest.parent.chmod(0o700)
+   with unittest.mock.patch.object(ca,'DEST',dest),unittest.mock.patch('sys.argv',['ca.py','verify']):
+    with self.assertRaises(ValueError):ca.main()
  def test_public_target_fails_closed_without_tls_or_ca(self):
   target={'host':'bj-crs-3dli07u2.sql.tencentcdb.com','port':23136,'tls':True,'ca_file':'/public/ca.pem'}
   self.assertEqual(validate_connection(target),target)

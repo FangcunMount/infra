@@ -8,11 +8,15 @@ def main():
  if b'PRIVATE KEY'in data or hashlib.sha256(data).hexdigest()!=manifest['ca_sha256']:raise ValueError('CA source mismatch')
  if args.command=='install':
   DEST.parent.mkdir(mode=0o755,parents=True,exist_ok=True)
+  if DEST.parent.is_symlink()or any(p.name!=DEST.name for p in DEST.parent.iterdir()):raise ValueError('Dedicated public CA directory required')
   if DEST.is_symlink():raise ValueError('CA destination may not be a symlink')
   if not DEST.exists():
    with os.fdopen(os.open(DEST,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o644),'wb')as f:f.write(data);f.flush();os.fsync(f.fileno())
   if DEST.read_bytes()!=data:raise ValueError('Existing CA differs; review before replacing')
+  # mkdir mode is filtered by the deployer's umask; the host-side reader needs traversal.
+  DEST.parent.chmod(0o755)
   DEST.chmod(0o644)
+ if DEST.parent.stat().st_mode & 0o777!=0o755:raise ValueError('Public CA directory must be readable and traversable')
  if DEST.is_symlink()or hashlib.sha256(DEST.read_bytes()).hexdigest()!=manifest['ca_sha256']or DEST.stat().st_mode & 0o022:raise ValueError('Installed CA not pinned or writable by others')
  print(json.dumps({'redis_ca':'verified','sha256':manifest['ca_sha256']}))
 if __name__=='__main__':
