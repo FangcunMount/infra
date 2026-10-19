@@ -168,7 +168,7 @@ def provision(container, manifest, accounts):
                   "-w", str(expected["writeQueueNums"]), "-p", str(expected["perm"]),
                   "-a", "+message.type=" + expected["message_type"], mutation=True)
         for group in groups:
-            admin("updateSubGroup", "-g", group, "-r", str(manifest["group_options"]["retry_queue_nums"]), mutation=True)
+            admin("updateSubGroup", "-g", group, "-q", str(manifest["group_options"]["retry_queue_nums"]), mutation=True)
         for role in principals:
             account = accounts[role]
             admin("createUser", "-u", account["username"], "-p", account["password"], "-t", "Normal", mutation=True)
