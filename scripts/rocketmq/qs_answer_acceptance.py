@@ -14,7 +14,8 @@ CASES = frozenset((
     'half_does_not_accept_business', 'original_root_fact_and_witness_and_wire',
     'duplicate_does_not_execute', 'conflicting_input_rejected',
     'committed_ack_discard_exact_recovery', 'root_abort_no_accepted_fact_or_witness',
-    'native_callback_reentry', 'no_new_publish_outbox', 'closed_admission_no_business'))
+    'native_callback_reentry', 'no_new_publish_outbox', 'closed_admission_no_business',
+    'full_reference_required_for_acceptance', 'nested_preparation_rejected'))
 
 
 def answer_manifest():

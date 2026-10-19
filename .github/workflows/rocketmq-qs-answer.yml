@@ -1,0 +1,68 @@
+name: RocketMQ QS answer original Mongo transaction
+on:
+  workflow_dispatch:
+    inputs:
+      qs_ref:
+        description: Exact QS answer transaction candidate SHA
+        type: string
+        required: true
+        default: 080d4d7dc606379aabbd3e3ee8e804b551863ede
+  pull_request:
+    paths: ['scripts/rocketmq/qs_answer_acceptance.py', 'scripts/rocketmq/test_qs_answer_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-answer.yml']
+permissions:
+  contents: read
+env:
+  GOTOOLCHAIN: local
+concurrency:
+  group: rocketmq-qs-answer-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  original-mongo-root:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.25.9', '1.25.12']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: bfaae2b82ee0d1229b8c965fce472cdf5dec486f
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ inputs.qs_ref || '080d4d7dc606379aabbd3e3ee8e804b551863ede' }}
+          path: .qs-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: .qs-acceptance/go.sum
+      - name: Verify candidate and source harness
+        env:
+          EXPECTED_QS_SHA: ${{ inputs.qs_ref || '080d4d7dc606379aabbd3e3ee8e804b551863ede' }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .qs-acceptance rev-parse HEAD)" = "$EXPECTED_QS_SHA"
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+      - name: Build verified isolated Broker
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-qs-answer:5.5.1 components/rocketmq
+      - name: Required real host original Mongo and Broker
+        run: |
+          set -euo pipefail
+          python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
+            --qs-answer-host "$PWD/.qs-acceptance" --image rocketmq-qs-answer:5.5.1 \
+            --mysql-image mysql:8.0.44 --report rocketmq-qs-answer.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-qs-answer-${{ matrix.go }}-${{ github.sha }}
+          path: rocketmq-qs-answer.json
+          if-no-files-found: error
+          retention-days: 14
