@@ -10,7 +10,7 @@
 
 进度：**23/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
-### 最新核验快照（2026-10-19 16:52 +08:00）
+### 最新核验快照（2026-10-19 17:06 +08:00）
 
 | 核验项 | 当前结果 / 证据 |
 | --- | --- |
@@ -23,9 +23,9 @@
 | T22 修复后真实门禁 | infra ecbc5f8固定bfaae2b执行[31项/档](https://github.com/FangcunMount/infra/actions/runs/39222207805)、[46项/档](https://github.com/FangcunMount/infra/actions/runs/39222207667)、[48项/档](https://github.com/FangcunMount/infra/actions/runs/39222207821)、[普通消息/raw20/Go19完整回归](https://github.com/FangcunMount/infra/actions/runs/39222207962)，全部通过、0失败/跳过 |
 | T22 新制品 | 新SHA双Python档各120源码+120已安装wheel测试通过，0失败/跳过；wheel/sdist两档摘要一致，已重新下载并核对精确source/tree；固定锁下的独立wheel/sdist均安装成功、17包文件逐字节一致、依赖版本全部在锁中；临时环境已删除，6文件bundle/receipt/摘要已生成；[T22证据](evidence/rocketmq-m2-fixed-prerelease-20261019.json) |
 | 发布前根因与修复 | [实际protobuf大小不匹配及RED/GREEN证据](evidence/rocketmq-m2-sdk-telemetry-settings-race-20261019.json)：共享RetryPolicy被Broker设置回调原地修改；PR44锁+独立快照后真实TLS/并发marshal的race连续10轮通过，38文件可复现、完整check/lint通过；未增加通用重试或业务重做 |
-| T23 发布 / T24 重装 | [Go v0.5.0-rocketmq-tx.1](https://github.com/FangcunMount/reliable-messaging/releases/tag/v0.5.0-rocketmq-tx.1)、[Python python/v0.4.0a1](https://github.com/FangcunMount/reliable-messaging/releases/tag/python/v0.4.0a1)已固定发布，同一bfaae2b、各6资产服务器摘要全部一致；[发布证据](evidence/rocketmq-m2-release-publication-20261019.json)；[T24双档正式tag/制品验收](https://github.com/FangcunMount/infra/actions/runs/39225713990)运行中；本批无生产业务切换 |
+| T23 发布 / T24 重装 | [Go v0.5.0-rocketmq-tx.1](https://github.com/FangcunMount/reliable-messaging/releases/tag/v0.5.0-rocketmq-tx.1)、[Python python/v0.4.0a1](https://github.com/FangcunMount/reliable-messaging/releases/tag/python/v0.4.0a1)已固定发布，同一bfaae2b、各6资产服务器摘要全部一致；[发布证据](evidence/rocketmq-m2-release-publication-20261019.json)；[T24首次正式tag/制品验收](https://github.com/FangcunMount/infra/actions/runs/39225713990)因虚拟环境执行器路径解引用失败，T24继续未完成；本批无生产业务切换 |
 
-下一步：T22/T23已完成；完成正式tag及下载wheel/sdist的双档独立安装和48项真实矩阵，核对摘要/模块来源，更新SDK发布索引并完成T24。旧失败保留于下文及evidence，不计为通过。
+下一步：T22/T23已完成；先修复T24验收脚本的venv可执行文件解引用及失败元数据清理，29项脚本/实际venv回归已通过；[失败证据](evidence/rocketmq-m2-published-interpreter-failure-20261019.json)保留。tag与发布资产不变，修复后重新执行两档正式安装和48项矩阵，再更新SDK索引。旧失败保留于下文及evidence，不计为通过。
 
 历史候选预检记录（当时）：已下载 SDK `3bf3dc8` 的双 Python profile 制品；源码与独立 wheel 各120项通过、0失败/跳过，wheel/sdist 摘要在两档一致且绑定同一源 SHA/树。见[候选预检证据](evidence/rocketmq-m2-sdk-candidate-20261019.json)。这不是最终合并候选或已发布制品的验证，不据此完成 T22/T24。另修复 T20 审计 CLI 的变量引用及 critical 告警退出码2，并保留发布安装 JSON 附件；当时11项本地脚本测试通过、真实native-limit门禁待通过；当前T20以总表已完成证据为准。
 

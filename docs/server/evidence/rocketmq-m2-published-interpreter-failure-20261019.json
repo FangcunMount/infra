@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "task": "T24",
+  "complete": false,
+  "captured_at": "2026-10-19T09:05:24.339661+00:00",
+  "run": "https://github.com/FangcunMount/infra/actions/runs/39225713990",
+  "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+  "stage": "Published tag/module/wheel/sdist verification succeeded; installed Python behavior probe failed before Broker owner denial.",
+  "cause": "Path.resolve() dereferenced venv/bin/python to the base interpreter, losing pyvenv.cfg and installed package discovery. The same mistake affected runtime metadata query.",
+  "cleanup_evidence": "Old metadata exception occurred after owned probe closure and Compose down, but before private directory removal/report writing; do not claim complete cleanup from this failed run.",
+  "fix": "Preserve absolute executable path without resolving symlinks; metadata errors produce a failed report and allow owned private cleanup, with nonzero final status.",
+  "local_validation": {
+    "actual_symlinked_venv_prefix_regression": "passed; resolved executable runs base while preserved path runs venv",
+    "script_tests_passed": 29,
+    "failed": 0,
+    "skipped": 0
+  },
+  "tags_moved": false,
+  "assets_replaced": false,
+  "sdk_changed": false,
+  "production_changed": false
+}

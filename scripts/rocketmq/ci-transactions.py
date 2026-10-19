@@ -22,6 +22,7 @@ import time
 
 from render import render
 from failure_diagnostics import summarize, startup_internal_description
+from published_runtime import interpreter_path
 
 
 DISCARD_TOPIC = "TRANS_CHECK_MAX_TIME_TOPIC"  # TopicValidator in pinned Broker 5.5.1.
@@ -325,7 +326,7 @@ def main():
                     "--extra", "rocketmq", "--extra", "nsq", "python",
                     str(sdk / "python/tests/integration/transaction_probe.py")]
         if language == "sdk-python" and args.installed_python:
-            argv = [str(args.installed_python.resolve()), "-I", str(sdk / "python/tests/integration/transaction_probe.py")]
+            argv = [interpreter_path(args.installed_python), "-I", str(sdk / "python/tests/integration/transaction_probe.py")]
         argv += ["--config", str(path), "--mode", mode, "--id", identity]
         p = Probe(argv, directory, dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(trust or ca)))
         probes.append(p)
@@ -683,14 +684,23 @@ def main():
                                                for path in sorted(set(source_paths)) if path.is_file()}
             report["sdk_tracked_sources_clean"] = run(["git", "diff", "--quiet", "HEAD"], cwd=sdk, required=False).returncode == 0
         if args.sdk_api_python:
-            metadata_command = ([str(args.installed_python.resolve()), "-I"] if args.installed_python else
+            metadata_command = ([interpreter_path(args.installed_python), "-I"] if args.installed_python else
                 [args.python,"run","--locked","--project",str(sdk / "python"),"--extra","rocketmq","--extra","nsq","python"])
-            metadata = run(metadata_command + ["-c",
-                "import sys,json,reliable_messaging as r,importlib.metadata as m; print(json.dumps({'python':sys.version.split()[0],'client':m.version('rocketmq-python-client'),'sdk_version':m.version('fangcun-reliable-messaging'),'package_file':r.__file__}))"]).stdout
-            report["python_runtime"] = json.loads(metadata)
+            try:
+                metadata = run(metadata_command + ["-c",
+                    "import sys,json,reliable_messaging as r,importlib.metadata as m; print(json.dumps({'python':sys.version.split()[0],'client':m.version('rocketmq-python-client'),'sdk_version':m.version('fangcun-reliable-messaging'),'package_file':r.__file__}))"]).stdout
+                report["python_runtime"] = json.loads(metadata)
+            except Exception:
+                failure = failure or "Python runtime metadata unavailable"
+                report["failed"] = 1
+                report["failure"] = failure
+                report["python_runtime"] = {"unavailable": True}
             report["published_installation"] = bool(args.installed_python)
-            if args.installed_python and Path(report["python_runtime"]["package_file"]).resolve().is_relative_to(sdk):
-                raise RuntimeError("published Python acceptance imported source checkout")
+            if (args.installed_python and report["python_runtime"].get("package_file")
+                    and Path(report["python_runtime"]["package_file"]).resolve().is_relative_to(sdk)):
+                failure = failure or "published Python acceptance imported source checkout"
+                report["failed"] = 1
+                report["failure"] = failure
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
@@ -700,6 +710,8 @@ def main():
                                               repo / "scripts/rocketmq/provision_v2.py")}
         report['harness_sha256']['scripts/rocketmq/failure_diagnostics.py'] = hashlib.sha256(
             (repo / 'scripts/rocketmq/failure_diagnostics.py').read_bytes()).hexdigest()
+        report['harness_sha256']['scripts/rocketmq/published_runtime.py'] = hashlib.sha256(
+            (repo / 'scripts/rocketmq/published_runtime.py').read_bytes()).hexdigest()
         report["go_probe_sha256"] = hashlib.sha256((args.go_probe or directory / "go-probe").read_bytes()).hexdigest() if (args.go_probe or directory / "go-probe").exists() else None
         dirty_sdk = args.sdk_api_go and not report.get("sdk_tracked_sources_clean", False)
         if dirty_sdk:
@@ -724,6 +736,8 @@ def main():
         args.report.write_text(json.dumps(report, indent=2) + "\n")
         if remaining or dirty_sdk or not private_removed or not probes_drained:
             raise RuntimeError("owned cleanup or exact SDK source verification failed")
+        if report["failed"]:
+            raise RuntimeError("transaction acceptance failed; see the retained report")
 
 
 if __name__ == "__main__":
