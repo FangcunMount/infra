@@ -1581,3 +1581,19 @@ service-ports: ## 显示所有服务端口
 .PHONY: rocketmq-validate rocketmq-up rocketmq-stop rocketmq-status rocketmq-logs
 rocketmq-validate rocketmq-up rocketmq-stop rocketmq-status rocketmq-logs:
 	@bash scripts/rocketmq/manage.sh $(@:rocketmq-%=%)
+
+.PHONY: rocketmq-iam-test
+rocketmq-iam-test: ## 隔离验证 IAM 实际事务入口；SDK_DIR/IAM_DIR/ROCKETMQ_TEST_IMAGE 必须显式提供
+	$(call require_param,SDK_DIR,make rocketmq-iam-test SDK_DIR=/path/to/fixed-sdk IAM_DIR=/path/to/fixed-iam ROCKETMQ_TEST_IMAGE=owned-image)
+	$(call require_param,IAM_DIR,make rocketmq-iam-test SDK_DIR=/path/to/fixed-sdk IAM_DIR=/path/to/fixed-iam ROCKETMQ_TEST_IMAGE=owned-image)
+	$(call require_param,ROCKETMQ_TEST_IMAGE,make rocketmq-iam-test SDK_DIR=/path/to/fixed-sdk IAM_DIR=/path/to/fixed-iam ROCKETMQ_TEST_IMAGE=owned-image)
+	python3 scripts/rocketmq/ci-transactions.py --sdk "$(SDK_DIR)" --iam-host "$(IAM_DIR)" \
+		--image "$(ROCKETMQ_TEST_IMAGE)" --mysql-image "$(or $(ROCKETMQ_TEST_MYSQL_IMAGE),mysql:8.0.36)" \
+		--report "$(or $(ROCKETMQ_IAM_REPORT),rocketmq-iam-host.json)"
+
+.PHONY: rocketmq-iam-native-test
+rocketmq-iam-native-test: ## IAM 固定 MySQL 离线原事务/HTTP 验证；仅新建隔离 Docker，报告目录须0700
+	$(call require_param,IAM_DIR,make rocketmq-iam-native-test IAM_DIR=/path/to/clean-iam MYSQL_TEST_IMAGE=immutable-image IAM_NATIVE_REPORT=/private0700/receipt.json)
+	$(call require_param,MYSQL_TEST_IMAGE,MYSQL_TEST_IMAGE must name an existing fixed MySQL8.0.36/8.0.44/8.4 image)
+	$(call require_param,IAM_NATIVE_REPORT,IAM_NATIVE_REPORT must name a new file in an owned0700 directory)
+	python3 scripts/rocketmq/iam_native.py --iam "$(IAM_DIR)" --mysql-image "$(MYSQL_TEST_IMAGE)" --report "$(IAM_NATIVE_REPORT)"

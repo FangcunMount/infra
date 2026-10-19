@@ -1,0 +1,289 @@
+{
+  "format_version": 1,
+  "task_ids": [
+    "T08"
+  ],
+  "status": "in_progress; fixture identity corrected and both hosts pin released SDKtx.2; actual pair matrix pending",
+  "complete": false,
+  "observed_at": "2026-10-19T21:40:35.577255+00:00",
+  "iam": {
+    "source_sha": "5140583179335f258c4e9bebca97c651c57b6739",
+    "previous_tested_sha": "544289b0fbb5523836d63a22def1b0f95391a354",
+    "pr": "https://github.com/FangcunMount/iam/pull/135",
+    "source_race": {
+      "pass": 1926,
+      "fail": 0,
+      "skip": 31,
+      "skip_scope": "existing optional environment tests; not required native Broker acceptance",
+      "log": {
+        "path": "/tmp/m3-iam-t08-source-standard-umask.jsonl",
+        "sha256": "8f9b9f52e877a09b88ecd90a7f11cebf7554aa1fffd36448c8bfdc7a722b837f"
+      }
+    }
+  },
+  "qs": {
+    "source_sha": "696ee3145ad1d4ab0d5debb65abf024d6c08c761",
+    "documentation_head": "696ee3145ad1d4ab0d5debb65abf024d6c08c761",
+    "pr": "https://github.com/FangcunMount/qs-server/pull/409",
+    "target_race": {
+      "pass": 85,
+      "fail": 0,
+      "skip": 0,
+      "log": {
+        "path": "/tmp/m3-qs-t08-source.jsonl",
+        "sha256": "eff8e043220345416c7df9fa9d858be79943b8326b12fc71a07cd309a4d77225"
+      }
+    },
+    "docs": "87 self tests plus hygiene/facts passed; closure baseline points to exact1f999fee source"
+  },
+  "infra_source_sha": "320d01180a2e0d9cc8f30f8a9dfd15b0975a8700",
+  "harness_tests": {
+    "pass": 40,
+    "fail": 0
+  },
+  "cloud_run": "https://github.com/FangcunMount/infra/actions/runs/39325194680",
+  "acceptance_scope": "two actual IAM modules with independent subscriptions and permission revocation; actual separate QS subscriber/cache/guard child; parent real primary reader port is test-only, not production gRPC or system login",
+  "failure_history": [
+    {
+      "source_sha": "544289b0fbb5523836d63a22def1b0f95391a354",
+      "location": "transaction_fanout_integration_test.go:81",
+      "scope": "Mac mini owned RocketMQ5.5.1/MySQL8.4.11 fixture",
+      "cause": "test used the platform writer without composing its explicit subject resolver; application original root correctly rejected assignment",
+      "correction": "538e8578 uses ApplicationUnitOfWork with bounded fixture UserResolver, matching production composition",
+      "cleanup": "owned containers, process groups and private fixture removed",
+      "receipt_sha256": "fd64d1cc96c1e9d13945ca0a945ceb0a8324d472ba4b971f5f0b204af6cd10d1"
+    },
+    {
+      "scope": "first full IAM source wrapper",
+      "cause": "umask077 changed the existing intentionally0644 permission-test fixture to0600; normal022 rerun passed without modifying that test",
+      "log": {
+        "path": "/tmp/m3-iam-t08-source.jsonl",
+        "sha256": "93d7ed1b1a3a72e725a529198d3e9001b574d63d6de7888c50adb4cb45ec6698"
+      }
+    },
+    {
+      "scope": "cloud39325194680 uncorrected544289b0 fixture with prior published SDK; all3 profiles failed; not acceptance",
+      "url": "https://github.com/FangcunMount/infra/actions/runs/39325194680",
+      "receipts": [
+        {
+          "mysql": "8.0.36",
+          "failed": 1,
+          "host": {
+            "source_sha": "544289b0fbb5523836d63a22def1b0f95391a354",
+            "sdk_module": {
+              "Path": "github.com/FangcunMount/reliable-messaging",
+              "Version": "v0.5.0-rocketmq-tx.1",
+              "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+              "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+            },
+            "provision": {
+              "version": 2,
+              "operations": 19,
+              "typed_topics": 1,
+              "principals": 5,
+              "verified": true
+            },
+            "qs_fanout": {
+              "source_sha": "1f999fee13c26412c383c56e7e3ac6038d619972",
+              "sdk_module": {
+                "Path": "github.com/FangcunMount/reliable-messaging",
+                "Version": "v0.5.0-rocketmq-tx.1",
+                "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+                "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+              }
+            },
+            "private_output_sha256": "d103a855036ddb98b8509902a848c5760af7fe6ef17189692d0d6db892cf50bd",
+            "exit_code": 1,
+            "diagnostics": {
+              "build_failed": false,
+              "test_timeout": false,
+              "race_reports": 2,
+              "race_frames": [
+                "client.go:108",
+                "client.go:165",
+                "client.go:176",
+                "client.go:323",
+                "client.go:342",
+                "client.go:383",
+                "client.go:534",
+                "client.go:538",
+                "client.go:559",
+                "client.go:569",
+                "client.go:75",
+                "client.go:763",
+                "client.go:97",
+                "metric.go:128",
+                "metric.go:278",
+                "metric.go:321",
+                "metric.go:338",
+                "simple_consumer.go:407",
+                "simple_consumer.go:449",
+                "subscriber.go:107",
+                "subscriber.go:206",
+                "subscriber.go:207",
+                "subscriber.go:240",
+                "subscriber.go:336",
+                "subscriber.go:384",
+                "testing.go:1934",
+                "testing.go:1997",
+                "transaction_broker_host_integration_test.go:167",
+                "transaction_broker_host_integration_test.go:169"
+              ],
+              "failed_tests": [
+                "TestM3ActualBrokerHost"
+              ],
+              "assertion_lines": [
+                167,
+                169,
+                354
+              ]
+            }
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "sha256": "9e2ff1c809e308c95f745b353668d49f258034e9b64230f786e9220235487ac9"
+        },
+        {
+          "mysql": "8.0.44",
+          "failed": 1,
+          "host": {
+            "source_sha": "544289b0fbb5523836d63a22def1b0f95391a354",
+            "sdk_module": {
+              "Path": "github.com/FangcunMount/reliable-messaging",
+              "Version": "v0.5.0-rocketmq-tx.1",
+              "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+              "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+            },
+            "provision": {
+              "version": 2,
+              "operations": 19,
+              "typed_topics": 1,
+              "principals": 5,
+              "verified": true
+            },
+            "qs_fanout": {
+              "source_sha": "1f999fee13c26412c383c56e7e3ac6038d619972",
+              "sdk_module": {
+                "Path": "github.com/FangcunMount/reliable-messaging",
+                "Version": "v0.5.0-rocketmq-tx.1",
+                "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+                "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+              }
+            },
+            "private_output_sha256": "69c58c52d7e05ee22240e8a3b0d2ee5ab761bc12ac69cb9004c49c824ec7b2d7",
+            "exit_code": 1,
+            "diagnostics": {
+              "build_failed": false,
+              "test_timeout": false,
+              "race_reports": 2,
+              "race_frames": [
+                "client.go:108",
+                "client.go:165",
+                "client.go:176",
+                "client.go:323",
+                "client.go:342",
+                "client.go:383",
+                "client.go:534",
+                "client.go:538",
+                "client.go:559",
+                "client.go:569",
+                "client.go:75",
+                "client.go:763",
+                "client.go:97",
+                "metric.go:128",
+                "metric.go:278",
+                "metric.go:321",
+                "metric.go:338",
+                "simple_consumer.go:407",
+                "simple_consumer.go:449",
+                "subscriber.go:107",
+                "subscriber.go:206",
+                "subscriber.go:207",
+                "subscriber.go:240",
+                "subscriber.go:336",
+                "subscriber.go:384",
+                "testing.go:1934",
+                "testing.go:1997",
+                "transaction_broker_host_integration_test.go:167",
+                "transaction_broker_host_integration_test.go:169"
+              ],
+              "failed_tests": [
+                "TestM3ActualBrokerHost"
+              ],
+              "assertion_lines": [
+                167,
+                169,
+                354
+              ]
+            }
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "sha256": "38cfd8d0a08ca613707b3ac21524ba0911d0ab8a8c6eb3ae87ffcfc585dc2895"
+        },
+        {
+          "mysql": "8.4.11",
+          "failed": 1,
+          "host": {
+            "source_sha": "544289b0fbb5523836d63a22def1b0f95391a354",
+            "sdk_module": {
+              "Path": "github.com/FangcunMount/reliable-messaging",
+              "Version": "v0.5.0-rocketmq-tx.1",
+              "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+              "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+            },
+            "provision": {
+              "version": 2,
+              "operations": 19,
+              "typed_topics": 1,
+              "principals": 5,
+              "verified": true
+            },
+            "qs_fanout": {
+              "source_sha": "1f999fee13c26412c383c56e7e3ac6038d619972",
+              "sdk_module": {
+                "Path": "github.com/FangcunMount/reliable-messaging",
+                "Version": "v0.5.0-rocketmq-tx.1",
+                "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+                "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+              }
+            },
+            "private_output_sha256": "688128429c69cd64b2630318f20781d71dc08d78cc1ec4863679ffd7fdc3d5d3",
+            "exit_code": 1,
+            "diagnostics": {
+              "build_failed": false,
+              "test_timeout": false,
+              "race_reports": 0,
+              "race_frames": [],
+              "failed_tests": [
+                "TestM3ActualBrokerHost"
+              ],
+              "assertion_lines": [
+                354
+              ]
+            }
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "sha256": "1e6522cf548b9e2c7f2c9a4605431f6818f77bdcb35c7ed514957e2636069d9d"
+        }
+      ]
+    }
+  ],
+  "production_changed": false,
+  "system_acceptance": false,
+  "sdk_tag": "v0.5.0-rocketmq-tx.2",
+  "terminal_handoff_review": "SDKtx.1..tx.2 changed runtimeGo onlydriver/metric.go plus its test; NSQ/legacy-wire/RocketMQsubscribermethods byte-identical. QS exact-version guard and mutation regression updated after audit, not weakened;87 doc tests/facts passed."
+}

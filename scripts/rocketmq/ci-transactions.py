@@ -43,6 +43,10 @@ def broker_parameters(output):
     return result
 
 
+def mysql_fixture_supported(version, *, sdk_api_go=False, iam_host=False):
+    return version.startswith('8.0.') or ((sdk_api_go or iam_host) and version.startswith('8.4.'))
+
+
 def run(argv, *, timeout=120, env=None, cwd=None, required=True, stdin=None):
     try:
         result = subprocess.run(argv, input=stdin, capture_output=True, text=True,
@@ -161,6 +165,10 @@ def main():
     parser.add_argument("--mysql-image", default="mysql:8.0.36")
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
+    parser.add_argument("--iam-host", type=Path, help="exact IAM checkout; require actual host SDK/Broker acceptance in the owned fixture")
+    parser.add_argument("--iam-fanout-qs", type=Path, help="fixed clean QS source; require two IAM instances and the real QS subscriber in separate groups")
+    parser.add_argument("--iam-operation-results", action="store_true", help="also require schema44 business-result atomicity from the actual IAM owner")
+    parser.add_argument("--iam-private-log", type=Path, help="explicit owned0700 directory / new0600 local IAM log; never upload as CI artifact")
     parser.add_argument("--go-probe", type=Path)
     parser.add_argument("--sdk-api-python", action="store_true", help="also require public Python/MySQL and cross-language recovery")
     parser.add_argument("--sdk-api-go", action="store_true", help="required public Go SDK acceptance; separate from raw M2-0")
@@ -170,6 +178,8 @@ def main():
     parser.add_argument("--sdk-go-probe", type=Path, help="prebuilt public SDK executable from a verified published Go module")
     parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
     args = parser.parse_args()
+    if (args.iam_operation_results or args.iam_private_log or args.iam_fanout_qs) and not args.iam_host:
+        parser.error("IAM result/capture options require an explicit IAM host source")
     if bool(args.installed_python) != bool(args.sdk_go_probe) or (args.installed_python and not args.sdk_api_python):
         parser.error("published installation requires both runtimes and full cross-language acceptance")
     if args.sdk_limits and not args.sdk_faults:
@@ -239,6 +249,10 @@ def main():
         "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
+    if args.iam_host:
+        # The host fixture explicitly creates/drops its OWN random IAM schema.
+        # This root login exists only in this private loopback Compose project.
+        spec['services']['mysql']['environment']['MYSQL_ROOT_HOST'] = '%'
     mongo_port = port()
     mongo_image = None
     if args.sdk_api_go:
@@ -372,7 +386,7 @@ def main():
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
-        if not (proof["mysql_version"].startswith("8.0.") or (args.sdk_api_go and proof["mysql_version"].startswith("8.4."))):
+        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
         if not args.sdk_api_go:
             sql("CREATE TABLE witness(id VARCHAR(96) PRIMARY KEY, owner VARCHAR(32) NOT NULL, "
@@ -560,6 +574,15 @@ def main():
             recovery.finish()
             passed(language + "_to_" + checker + "_cross_process_recovery")
 
+        if args.iam_host:
+            from iam_acceptance import run_iam_host
+            proof['iam_host'] = {}
+            run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
+                         mysql_password, ca, run, proof['iam_host'], args.iam_private_log, args.iam_operation_results, args.iam_fanout_qs)
+            passed('iam_host_actual_sdk_original_root_and_application')
+            if args.iam_fanout_qs:
+                passed('iam_two_instances_and_qs_separate_business_subscription')
+
         # Accelerate ONLY the owned fixture. A real Unknown half must move to
         # the native discard topic; reaching an arbitrary sleep is not proof.
         sender = start("python", "send", "finite-check-limit")
@@ -701,6 +724,10 @@ def main():
                 failure = failure or "published Python acceptance imported source checkout"
                 report["failed"] = 1
                 report["failure"] = failure
+        if args.iam_host:
+            report['batch'] = 'M3-IAM-host-with-M2-0-baseline'
+            report['limits'].append('IAM host acceptance uses released SDK; base raw-client cases remain separately scoped')
+            report['iam_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/iam_acceptance.py').read_bytes()).hexdigest()
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",

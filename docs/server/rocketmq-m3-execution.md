@@ -4,9 +4,9 @@
 
 ## 当前执行快照
 
-- 进度：**5/36**；T01–T05 实现与任务必需验证完成。T05已完成并合并，T06进行中；M3-P已通过完整CI并完成四库PR合并；M3-1进行中，生产切换单独记账。
+- 进度：**6/36**；T01–T06 实现与任务必需验证完成。T05已合并，T06已完成并合并PR132；M3-P已通过完整CI并完成四库PR合并；M3-1进行中，生产切换单独记账。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
-- 源码合并：未发生 M3 合并。稳定 SDK 发布：未执行。生产部署/DDL/Topic/ACL/provider 切换：未执行。system 验收与 48 小时观察：未开始。
+- 源码合并：基础批次及 IAM T05 已合并，IAM T06 PR132 已合并，T07 PR134 仍为草稿。稳定 SDK 发布：未执行。生产部署/DDL/Topic/ACL/provider 切换：未执行。system 验收与 48 小时观察：未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
 
@@ -107,9 +107,9 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；初版IAM e50686c7 / QS98645d817 / AI81db026；race63/56、AI45通过；PR130/407/158已合并；最终CI/合并见T04证据；真实依赖另属T22/T23 |
 | ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；四库PR均合并，三库最终完整CI通过；生产未切换 |
 | ✅ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 2026-10-19；[完整证据](evidence/rocketmq-m3-iam-planning-20261019.json)；ea95cd9e全CI及三档MySQL每档7项0跳过、独立并发通过；[PR131](https://github.com/FangcunMount/iam/pull/131)合并c2aa3635；实际Sender装配属T06 |
-| ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 进行中；codex/rocketmq-m3-iam-root；原根事务执行器、半消息门禁与取消后真实回调记账，尚待完整接入和原生验证 |
-| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 待开始 |
-| ☐ | T08 | IAM 与 QS 双订阅、乱序、freshness 回归 | 待开始 |
+| ✅ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 2026-10-20；89bdcf58三档MySQL每档12具名项、共36项0跳过；Mac mini隔离RocketMQ5.5.1/MySQL8.0.44完整21项0失败0跳过，含实际IAM宿主4项证明，临时资源已清理；[完整证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；[PR132](https://github.com/FangcunMount/iam/pull/132)合并7accc92c，生产未变更 |
+| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 重新验证中；[PR134](https://github.com/FangcunMount/iam/pull/134)57b07bab锁定已发布Go SDK修复tx.2，全仓race1925通过/31既有可选跳过；必需三档原事务/HTTP/真实Broker门禁重跑，旧race失败历史保留；[证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
+| ☐ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 进行中；IAM [PR135](https://github.com/FangcunMount/iam/pull/135)、QS [PR409](https://github.com/FangcunMount/qs-server/pull/409)；两实例及QS实际订阅验收已实现，源码race通过，首轮真实夹具错误已修正；SDK指标race修复与正式成对门禁待完成；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
 | ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 待开始 |
 | ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 待开始 |
 | ☐ | T11 | QS 报告生成/失败，冻结与终态恢复 | 待开始 |
@@ -216,3 +216,39 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-19：T05持续推进，总进度4/36。冻结计划、精确权限版本、物理只读规划及根事务CAS在2fb64753完整CI/三档MySQL与独立并发通过。56012bf9增加Grant/Assignment规划、原名称身份、跨公司保留及授权后no-op；目标race69通过，3项既有可选本地MySQL跳过不计原生证明。新候选PR131 CI运行中，维护工具入口仍待实现；Sender原事务整合另属T06。全部故障/修复分候选保留，不提前勾选。
 
 - 2026-10-19：T05完成，总进度5/36。IAM ea95cd9e完整CI39265370007及独立并发39265370036通过；三档MySQL各7个具名原生用例（schema、精确CAS/物理只读、5类维护规划）0失败0跳过，保留日志摘要。PR131按精确head合并c2aa3635；合并前只读确认PRODUCTION_DEPLOY_PAUSED=true。T06转入独立分支推进原根事务/半消息证据/精确事件/witness和取消后回调记账，不提前标记业务上线。
+
+- 2026-10-19：T06推进，保持5/36。7730207d原根事务、半消息/事件门禁、回滚和单次执行在三档MySQL通过，完整CI、独立并发和SDK隔离通过；保留d7e5ce77夹具参数绑定失败。0bd208a2补冻结本地资料、原wire保留、业务/维护ID分配、原事务审计时钟和有界规划准入，177个目标source race通过，9项既有本地DB跳过不计验收；最新原生候选验证中。platform/维护CLI装配及完整业务状态仍未完成；PR132保持草稿，不打勾。
+
+- 2026-10-19：T06继续，进度5/36。0bd208a2完整CI39270215122、三档MySQL（含实际宿主应用入口和冻结ORM）、并发39270214607与SDK隔离39270214851通过。feb0369c新增platform/维护CLI显式事务目录与owner生命周期；本地race、lint、vet、docs通过。infra新增仅隔离Compose内运行的实际IAM Broker验收，生成独立账号/Topic/Group并锁源码SHA，不接受生产端点；即将由CI验证，不把存储半消息fixture冒充真实Broker。T06未勾选，源码未合并，生产无操作。
+
+- 2026-10-19：T06继续，保持5/36。feb0369c完整CI39276085368、并发39276085627及SDK隔离39276085506成功。infra dd0be29实际IAM Broker矩阵39277154976的3个job均无step启动，GitHub annotation提示账户支付失败或spending limit；不是测试执行失败或通过，不重复重跑空作业。已请求恢复Actions额度；继续本地代码/验证，不跳过原生与真实Broker门禁。
+- 2026-10-19：T06补显式宿主发布协议门禁，新增IAM迁移43（42保持不变），默认保留outbox，不自动切换。原事务共享锁约束新版旧Stager/事务写者；旧二进制仍须在T32退出。同步接入启动失败、独立退出预算、drain先封准入及事务owner readiness；本地补充MySQL9.3临时实例验证不替代固定8.0/8.4 Compose矩阵。源码基线已整合main403d41c2的既有Redis交付提交，不属于M3新增Redis操作。
+
+- 2026-10-19：T06候选固定为733c2dc2，已推送PR132并更新描述。全仓source race1898通过/0失败/31项既有环境用例跳过；425项定向source race通过/5跳过；额外隔离MySQL9.3包含完整迁移链15项通过/0跳过，绑定精确SHA、私有日志摘要及清理回执。该额外版本不能替代规定的8.0/8.4 Compose或实际Broker门禁，故保持5/36，不合并草稿、不切生产。infra真实宿主workflow已锁定新候选；账户门禁历史保留，最新CI状态分别回读。
+
+- 2026-10-19：T06最终当前候选89bdcf58补五类维护原根事务测试；额外MySQL9.3在干净源码上20项通过/0失败/0跳过并清理，integration-tag lint与五包race通过。新增required CI具名验证，保留夹具导入别名编译失败历史。Broker矩阵指向同一候选，T06仍不勾选。等待正式门禁期间在独立stacked工作区推进同一IAM批次T07；M3-2/QS仍等待IAM门禁，不扩展生产授权。
+
+- 2026-10-20：T07候选基础723f171a已推送PR134，进度保持5/36。完整source race1903通过/0失败/31既有环境跳过；额外隔离MySQL9.3干净源码27项0失败0跳过，包含8并发赢家、结果共同提交/回滚、资格不可重用、过期与在途竞争、错误绑定/损坏证据。新增IAM44，未改写42/43。Schema/模型/存储不等于公开幂等API或SDK联合装配完成，T07不勾选。
+- 2026-10-20：回读T06前候选733c2dc2完整CI39280693975及独立并发39280695177、SDK隔离39280694020、镜像交接39280693944均成功；最新89bdcf58还须单独等待完整结果。infra728f9e1的真实Broker矩阵39282025800，8.4 job118158047787无step并再次明确报告GitHub支付/额度限制，其余当时排队；历史阻塞仍未被测试通过替代。
+
+- 2026-10-20：回读89bdcf58完整CI39281936066、并发39281935978、SDK隔离39281936049、镜像交接39281935906全部通过；下载三档MySQL具名测试日志，每档12项，共36通过/0失败/0跳过，摘要归档。仍不把存储半消息fixture当作真实Broker。只读核对mac-mini-old Docker与资源后，使用f86247d infra、89bdcf58 IAM、bfaae2b SDK建立临时独立Compose验收；首次拉镜像遇非交互PATH缺credential helper，修正并选择已核对8.0.44本地镜像后在执行。现有服务保持运行；真实验收未结束，不打勾，保持5/36。
+
+- 2026-10-20：T07候选3fc8b406已推送PR134，进度5/36。新增HTTP可选键/操作引用/受保护查询、类型化结果与SDK/业务双guard装配、原事务no-op、查询真实在途关闭及总扫描预算50+50。全仓race1925通过/31既有可选跳过，API/Swagger/Gin一致、Spectral原110条基线未增加，lint/docs通过；干净候选额外MySQL9.3为29项0失败0跳过，临时数据已清理。新增HTTP+MySQL联合用例继续本地验证，不计作system或Broker验收。
+- 2026-10-20：用户明确“暂不处理，继续离线实现”，infra Actions账单门禁暂缓；此后不为账单重跑云端CI，新增源码/进度先保留本地提交。Mac mini第一轮实际Broker验收基础18项通过、IAM宿主用例失败，整轮失败且临时容器/探针/数据已清理。保留失败回执和摘要，新增固定脱敏诊断及显式0700目录/0600本地日志捕获后第二轮在执行；不以18项基础通过勾选T06。
+
+- 2026-10-20：T06实现及验证完成，打勾并更新总进度6/36。IAM89bdcf58在隔离Docker RocketMQ5.5.1/MySQL8.0.44最终21项0失败0跳过，含真实宿主半消息不可见、原根事务/wire/witness、RoleCatalog入口、回滚无消息/事实四项；报告保存镜像ID、固定客户端、实际参数、源码和清理回执。既有三档MySQL源码门禁共36项0跳过，构成独立存储与真实Broker证据；第一轮失败未删除或冒称业务缺陷已定位。PR132合并、infra云端CI、生产及system仍分别待完成，M3-1里程碑未完成。
+
+- 2026-10-20：用户将infra改为public；只读核实PUBLIC后恢复推送与云端门禁。infra57f1c98的新CI已实际运行，serverA/监控/Prometheus配置检查通过，IAM矩阵39321850663运行中；旧账单失败历史保留，不继续视作当前阻塞。当前IAM98d0af8d包含业务结果原子凭证真实Broker断言；离线fd8dd30f在8.0.36/8.0.44各34项0失败0跳过，98d0af8d在8.4.11同为34项0失败0跳过，私有临时项目及在途进程已清理、既有11容器未变。云端门禁固定同一98d0af8d并显式要求业务结果证明；T07继续待完整结果，不提前打勾。
+- 2026-10-20：T06 PR132按精确89bdcf58源码、全绿检查及既有真实Broker证明完成合并，merge7accc92c；合并前回读PRODUCTION_DEPLOY_PAUSED=true且最新main403d41c2已在候选历史中。进度仍6/36，合并与生产独立，M3-1等待T07/T08及相应合并门禁。
+
+- 2026-10-20：infra public后39322133359真实执行，账单门禁已恢复。IAM98d0af8d完整CI、并发、SDK兼容与镜像构建通过；required MySQL8.0.36/8.0.44/8.4原事务及HTTP各34项全部通过。Broker8.0.36为21项通过，另外两档在宿主测试出现失败但已输出业务receipt；尚未定位原因，T07标验证失败且进度保持6/36。新增仅文件名/行号的race脱敏诊断，并在Mac mini固定98d0af8d/8.4临时独立项目复现；T08双实例及QS乱序通知/freshness回归已本地通过，真实fanout与任务门禁仍待完成。
+
+- 2026-10-20：诊断矩阵39324475047三档均复现Go driver metric.go:321/338指标回写与ACK hook并发race，所有失败保留。独立SDK工作区补确定性回归：修复前3条race并失败，atomic meter pointer修复后通过，真实TLS400次ACK/连续metric-off回写通过，make check通过；待单独PR/固定Go修订制品及宿主重验，T07不勾选。T08新增IAM PR135、QS PR409；IAM source race1926通过/31既有可选跳过，QS目标85项通过，87项文档自测及facts通过。首次本地全仓源测试umask077改变既有权限夹具而失败，正常umask022复验通过，未改写该既有业务。Mac mini T08实际夹具发现writer缺声明身份resolver，修正为生产同样的ApplicationUnitOfWork(resolver)装配；当前仍未获得fanout通过证据，进度6/36。
+
+- 2026-10-20：SDK独立修复8fb6fc57创建[PR46](https://github.com/FangcunMount/reliable-messaging/pull/46)。38份Apache源码和新meter-snapshot.patch可完全复现；make check、真实TLS/race及golangci2.5.0通过，Go1.25.9/1.25.12云端源码检查已通过，PR检查/NSQ兼容与实际SDK双存储/跨语言矩阵继续运行。拟发布新的Go修订预发布v0.5.0-rocketmq-tx.2，不移动旧tag，不修改Python源码；稳定Go/Python同SHA配对仍由T27执行。[修复证据](evidence/rocketmq-m3-sdk-meter-repair-20261020.json)。
+
+- 2026-10-20：SDK PR46全部当前检查通过，按固定8fb6fc57完成合并（d06861e5）；Go1.25.9/1.25.12 make check、lint、Redis与NSQ兼容均绿。双存储及跨语言实际SDK矩阵39326382808仍在执行，Go修订tag尚未发布，宿主仍未切换依赖；M3保持6/36，源码合并/发布/宿主/生产分别记录。
+
+- 2026-10-20：SDK实际双存储及跨语言矩阵39326382808两档各31项0失败/跳过，临时容器/进程/私有目录全部清理。已发布固定Go修订预发布v0.5.0-rocketmq-tx.2，源码8fb6fc57；正式tag下载模块213份选定源码逐字节匹配，模块缓存race回归/SDK探针构建通过，六个GitHub资产重新下载摘要全部一致。Python仍为原0.4.0a1/bfaae2b，不覆盖已有版本；T27稳定配对发布尚未执行。IAM/QS开始锁定新Go模块并重验，T07/T08未打勾，生产未变更。
+
+- 2026-10-20：IAM T07固定57b07bab正式模块tx.2，1925源码race通过/31既有可选跳过；T08合入同一依赖修复并修正fixture resolver，冻结IAM51405831、QS696ee314。QS SDK交接版本门禁先拒绝升级；核对tx.1..tx.2仅metric.go运行实现变化，NSQ/legacy-wire/消费结算逐字节未变后，更新精确版本白名单及漂移突变回归，87项自测和文档facts通过，保留未来版本拒绝。当前三源码均已推送草稿PR，开始以正式模块重跑原事务与实际成对门禁，仍6/36，未变更生产。

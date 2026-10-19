@@ -1,0 +1,111 @@
+{
+  "format_version": 1,
+  "supports_tasks": [
+    "T07",
+    "T08"
+  ],
+  "status": "source merged and fixed Go prerelease published/installed/read back; host T07/T08 acceptance still pending",
+  "source_sha": "8fb6fc57a415dc11e27fc64d71722f9675838bc3",
+  "pr": "https://github.com/FangcunMount/reliable-messaging/pull/46",
+  "scope": "private Apache Go5.1.4 meter pointer publication; public API/codec/wire/schema unchanged; Python source unchanged",
+  "cause": "Reset holds a writer mutex while assigning clientMeter; delivery ACK hooks read that pointer without synchronization. An atomic enabled field within the object does not protect publication.",
+  "fix": "std sync/atomic.Pointer publishes immutable meter identity; reset/exporter work remains serialized and hooks do not wait behind network exporter operations",
+  "local": {
+    "before_race_reports": 3,
+    "before_named_test_failed": true,
+    "after_concurrency_regression": "passed under race",
+    "actual_TLS": "repeated Metric{On:false} settings while400 real SimpleConsumer ACK RPCs; passed under race",
+    "make_check": "passed; source hash reproduction38 exact runtime files, docs/format/vet/test/race",
+    "lint": "pinnedgolangci2.5.0 zero issues",
+    "logs": {
+      "before": {
+        "path": "/tmp/m3-sdk-meter-before.log",
+        "sha256": "d1caff659443860489fcd8e6cb47a4eca7f23e02a3e9fd69db797880e559a2ff"
+      },
+      "after": {
+        "path": "/tmp/m3-sdk-meter-after.log",
+        "sha256": "46a6dbef538f23d298105a820b1e08768829af739fca620d9737bdc2dd2e2d37"
+      },
+      "check": {
+        "path": "/tmp/m3-sdk-meter-check.log",
+        "sha256": "396fc6db9bff722a47fc6fd2980576847dadb8bbc54c293257126b04fa82a1d8"
+      },
+      "lint": {
+        "path": "/tmp/m3-sdk-meter-lint.log",
+        "sha256": "d938f212fa6e925c46a8ad8e28880253734a3ead0cd9e407b98951efba738b67"
+      }
+    }
+  },
+  "ci": {
+    "source": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39326330196",
+    "pr_source": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39326653557",
+    "NSQ_compatibility": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39326330076",
+    "required_public_SDK": "https://github.com/FangcunMount/infra/actions/runs/39326382808"
+  },
+  "release": {
+    "candidate_go_tag": "v0.5.0-rocketmq-tx.2",
+    "availability_checked": true,
+    "published": true,
+    "existing_versions_untouched": true,
+    "python": "continues fixed0.4.0a1; no Python source change or republishing",
+    "stable_pair": "M3 T27 still requires same-SHA Go/Python stable artifacts",
+    "release": "https://github.com/FangcunMount/reliable-messaging/releases/tag/v0.5.0-rocketmq-tx.2",
+    "published_at": "2026-10-19T21:33:30Z",
+    "source_sha": "8fb6fc57a415dc11e27fc64d71722f9675838bc3",
+    "go_tag": "v0.5.0-rocketmq-tx.2",
+    "is_prerelease": true,
+    "downloaded_assets_sha256": {
+      "UPSTREAM.json": "1a06cbb42ca6066c3509d0dadd858b2292b650a6a87804d2d2d2275c5ce0fb3b",
+      "go-meter-release-receipt.json": "0109f872501e9990cb85551078482d3eb4d81140e05a84d2aea098318750c863",
+      "go-sdk-acceptance-mysql-8.0.36.json": "7e4fca175bf84f286108dbe298338c01bfb0835c672437ba3cab1eee683bdba2",
+      "go-sdk-acceptance-mysql-8.4.11.json": "0889d271bd8d635c4d50440b694f36255a151a62145b7fe76d160df3263c819e",
+      "module-proof.json": "37c2bf5d0577705f887c7db286e1f67cb8736072bce168953559937015793e1c",
+      "SHA256SUMS": "dfe13bbb09e676a05bc44a114f47a084737a6aecf1df05492e76cfe3a4fb1611"
+    },
+    "all_assets_verified": true,
+    "asset_count": 6,
+    "module": {
+      "Path": "github.com/FangcunMount/reliable-messaging",
+      "Version": "v0.5.0-rocketmq-tx.2",
+      "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+      "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+    },
+    "verified_source_files": 213,
+    "module_race": "passed from downloaded tag without replace",
+    "public_sdk_matrix": [
+      {
+        "asset": "go-sdk-acceptance-mysql-8.0.36.json",
+        "sha256": "7e4fca175bf84f286108dbe298338c01bfb0835c672437ba3cab1eee683bdba2",
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0,
+        "mysql": "8.0.36",
+        "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+        "broker_image": "sha256:3bea4c382b279310fae09127617f46eabc93598b72d817b30e5df828d7a835ec",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        }
+      },
+      {
+        "asset": "go-sdk-acceptance-mysql-8.4.11.json",
+        "sha256": "0889d271bd8d635c4d50440b694f36255a151a62145b7fe76d160df3263c819e",
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0,
+        "mysql": "8.4.11",
+        "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+        "broker_image": "sha256:3480b07484fb5da03d85ac7a00af5e4b1b5790963837650c26e288ead1c85d4d",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        }
+      }
+    ]
+  },
+  "production_changed": false,
+  "observed_at": "2026-10-19T21:35:24.739434+00:00",
+  "pr_status": "merged",
+  "merge_sha": "d06861e5b29f4e023872d0863e1f4d574ce78b34",
+  "merged_at": "2026-10-19T21:24:17Z"
+}

@@ -1,0 +1,394 @@
+{
+  "format_version": 1,
+  "task_ids": [
+    "T06"
+  ],
+  "observed_at": "2026-10-19T20:46:23.655900+00:00",
+  "status": "completed",
+  "complete": true,
+  "repository": "FangcunMount/iam",
+  "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+  "pr": "https://github.com/FangcunMount/iam/pull/132",
+  "pr_status": "merged",
+  "implemented": [
+    "Original-root SDK guard, all prepared-half evidence, exact one frozen event and witness commit",
+    "Join admitted local callbacks after canceled SDK snapshot; reject late callbacks",
+    "Opaque host local artifact codec retains exact original Broker wire; freezes row IDs and database audit wall clock before original root",
+    "Role/resource/grant/assignment and maintenance row allocation declarations; planned ORM hooks reject absent identities",
+    "Bounded host planning admission and ShutdownIncomplete accounting",
+    "Platform and maintenance CLI transaction owner assembly; exact m3-1 catalog",
+    "Conditional final NORMAL SMS client only with mq provider; standard modes retained explicitly",
+    "Startup/close accounting, failed-start cleanup and retained DB pool ownership on incomplete close",
+    "Host protocol selection schema43 default remains outbox; exact owner/store/epoch/revision validation before planning and inside original root; standard writer refusal with shared row locking",
+    "Transaction process failure/shutdown handling independent of retired Outbox flag; drain admission before consumer close and separate protocol readiness",
+    "All five maintenance writers original-root SDK guard/witness acceptance, including applicable compensation, no-op reuse and explicit half rejection; required CI names verified and no skips allowed"
+  ],
+  "validation": [
+    {
+      "scope": "target source race",
+      "command": "go test -race -json application/authz, mysql adapters/authzaudit/original uow, messaging and maintenance packages",
+      "passed": 177,
+      "failed": 0,
+      "skipped": 9,
+      "skip_reason": "Existing optional local MySQL tests are not native acceptance",
+      "report": "/tmp/m3-iam-frozen-host-source.jsonl",
+      "exit": 0
+    },
+    {
+      "scope": "integration compilation, target vet, pinned lint2.5.0, docs facts/links and diff",
+      "exit": 0
+    },
+    {
+      "source_sha": "7730207dd26a0ff402038fe59c7de7ef4e4254b7",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39267957811",
+      "status": "success including original-root commit/rollback/all-half/event gates on three MySQL versions",
+      "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39267958066",
+      "sdk_isolation_ci": "https://github.com/FangcunMount/iam/actions/runs/39267958108",
+      "other_workflows_status": "success"
+    },
+    {
+      "source_sha": "feb0369c9b6ff621ed9227346036a07dad660658",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39276085368",
+      "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39276085627",
+      "sdk_isolation_ci": "https://github.com/FangcunMount/iam/actions/runs/39276085506",
+      "status": "all success; original storage/application fixture matrix, not actual Broker host proof"
+    },
+    {
+      "source_sha": "733c2dc2a30074e514f3bfedfc98cd2cff642d5d",
+      "scope": "target source race including process lifecycle and protocol selection",
+      "command": "go test -race -json authz/mysql/messaging/process/container/options/maintenance/dbops/cd packages",
+      "passed": 425,
+      "failed": 0,
+      "skipped": 5,
+      "skip_reason": "Existing optional environment-dependent local tests; not fixed native acceptance",
+      "report": "/tmp/m3-iam-protocol-final-source.jsonl",
+      "report_sha256": "807c26b6826598b10ea62de682ce035f958c996b1575c652e6ed363d642ef7fd",
+      "exit": 0
+    },
+    {
+      "source_sha": "733c2dc2a30074e514f3bfedfc98cd2cff642d5d",
+      "scope": "full repository source race",
+      "command": "go test -race -json ./...",
+      "passed": 1898,
+      "failed": 0,
+      "skipped": 31,
+      "skip_reason": "Existing optional environment-dependent local tests; not fixed native acceptance",
+      "report": "/tmp/m3-iam-protocol-full-source.jsonl",
+      "report_sha256": "c02e7ace9a91576e6e2bcd04152faadec140a786322b425eabf0b0a370efd25b",
+      "exit": 0
+    },
+    {
+      "scope": "supplemental isolated native MySQL9.3, including full migration chain; NOT required Docker8.0/8.4 or Broker proof",
+      "fixture": "/var/folders/8x/l5l22n7n61q8jv7ns6bzzqkm0000gn/T/m3-iam-mysql93-vueg_lpe",
+      "cleaned": true,
+      "server_version": "9.3.0",
+      "source_sha": "733c2dc2a30074e514f3bfedfc98cd2cff642d5d",
+      "source_clean_before": true,
+      "exit": 0,
+      "tests": {
+        "pass": 15,
+        "fail": 0,
+        "skip": 0
+      },
+      "log": "/tmp/m3-iam-protocol-mysql93-native.log",
+      "log_sha256": "f3b44fc08c7f838883ab3bd2be20464b9fd441b79c1d80ea9734ddae2d26d67b",
+      "source_clean_after": true
+    },
+    {
+      "source_sha": "733c2dc2a30074e514f3bfedfc98cd2cff642d5d",
+      "scope": "pinned lint2.5.0, docs facts/links, integration+reliable_messaging compilation, diff",
+      "exit": 0
+    },
+    {
+      "scope": "supplemental MySQL 9.3 only; does not replace required Docker 8.0/8.4 matrix",
+      "fixture": "/var/folders/8x/l5l22n7n61q8jv7ns6bzzqkm0000gn/T/m3-iam-mysql93-z8y1u3wd",
+      "cleaned": true,
+      "server_version": "9.3.0",
+      "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+      "source_clean_before": true,
+      "exit": 0,
+      "tests": {
+        "pass": 20,
+        "fail": 0,
+        "skip": 0
+      },
+      "log": "/tmp/m3-iam-protocol-mysql93-20261019T235727.log",
+      "log_sha256": "2f6386cf1c524806969dedbcefe6290d47301fc952a6338aed2dbb61de41dacc",
+      "source_clean_after": true
+    },
+    {
+      "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+      "scope": "integration-tagged lint2.5.0, five maintenance package source race, integration compilation",
+      "exit": 0
+    },
+    {
+      "source_sha": "733c2dc2a30074e514f3bfedfc98cd2cff642d5d",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39280693975",
+      "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39280695177",
+      "sdk_isolation_ci": "https://github.com/FangcunMount/iam/actions/runs/39280694020",
+      "image_handoff_ci": "https://github.com/FangcunMount/iam/actions/runs/39280693944",
+      "status": "success"
+    },
+    {
+      "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+      "scope": "Required native host storage matrix; downloaded named-test job logs",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39281936066",
+      "matrix": [
+        {
+          "mysql": "8.0.36",
+          "job_id": 118157777313,
+          "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0,
+          "private_log": "/tmp/m3-iam-t06-8.0.36-89bdcf58-native.log",
+          "log_sha256": "28c7b0337f925dfb1c9afa91b7463c7c03f00e557b16c9da56a4ed2b1d0818b9",
+          "skipped_tests": [],
+          "failed_tests": []
+        },
+        {
+          "mysql": "8.0.44",
+          "job_id": 118157777047,
+          "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0,
+          "private_log": "/tmp/m3-iam-t06-8.0.44-89bdcf58-native.log",
+          "log_sha256": "e5e474918a88af61d252795b00a44424413b87860eecf399c9c72c829e8e5271",
+          "skipped_tests": [],
+          "failed_tests": []
+        },
+        {
+          "mysql": "8.4",
+          "job_id": 118157777619,
+          "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0,
+          "private_log": "/tmp/m3-iam-t06-8.4-89bdcf58-native.log",
+          "log_sha256": "58ea8b9d894d898d0558cb117fb80387a261613ebf5dbffd4b4c508698ee1306",
+          "skipped_tests": [],
+          "failed_tests": []
+        }
+      ],
+      "total_required_named_passes": 36,
+      "failed": 0,
+      "skipped": 0,
+      "status": "success; stored half fixtures, separate actual Broker gate"
+    },
+    {
+      "scope": "Actual released SDK + IAM original host root + isolated Docker RocketMQ; not production/system acceptance",
+      "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+      "infra_sha": "08d74f4",
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+      "go_version": "go1.25.12",
+      "broker_image": "sha256:050426c66e97d69940f3b023440f68277cd02a4b8af5717ca01cf33f09776726",
+      "mysql_image": "sha256:f37951fc3753a6a22d6c7bf6978c5e5fefcf6f31814d98c582524f98eae52b21",
+      "mysql_version": "8.0.44",
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "effective_broker_parameters": {
+        "transactionTimeOut": 6000,
+        "transactionCheckInterval": 5000,
+        "transactionCheckMax": 24,
+        "fileReservedTime": 48
+      },
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "iam_host_receipt": {
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0,
+        "half_invisible": true,
+        "commit_wire_and_witness": true,
+        "application_entry": true,
+        "rollback_hidden": true
+      },
+      "iam_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.5.0-rocketmq-tx.1",
+        "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "source_clean_after": true,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "report": "/tmp/m3-iam-host-broker-pass-8.0.44.json",
+      "report_sha256": "320737d8a9a2de3a82996624ab8076a71071e499e7508b1795d7f1c12288f53c"
+    }
+  ],
+  "failure_history": [
+    {
+      "source_sha": "d7e5ce7720136774c4328655b170e73cd78f7741",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39267139636",
+      "scope": "native new root fact fixture on all3 MySQL jobs",
+      "failure": "GORM expanded []byte supplied inside INSERT VALUES(?) into multiple values; Error1136 before commitment",
+      "fix_source": "7730207dd26a0ff402038fe59c7de7ef4e4254b7",
+      "fix": "Bind operation identity as one SQL string value",
+      "verification": "39267957811 all3 native jobs pass",
+      "log_sha256": "8fb20243216065987daf6411f5049ccda5f236506350dca4a05a08822a6b73ea"
+    },
+    {
+      "scope": "supplemental isolated MySQL9.3 protocol lock fixture, uncommitted schema43 candidate",
+      "passed": 11,
+      "failed": 3,
+      "skipped": 0,
+      "failure": "Client timeout of autocommit selection UPDATE did not prove rollback; after the blocker released the server could still apply it",
+      "fix": "Use an owned transaction, server-reported lock wait timeout1205 and explicit rollback before asserting selection unchanged",
+      "recheck": {
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "server_version": "9.3.0",
+        "fixture_cleaned": true
+      },
+      "scope_limit": "Not a required 8.0/8.4 Docker matrix replacement; source not yet frozen at execution time; original failed private log was overwritten during the supplemental rerun, failure details retained here"
+    },
+    {
+      "scope": "maintenance integration fixture compilation before candidate89bdcf58",
+      "failure": "testutil import alias fixture collided with package-level fixture functions in rolemodel and scopemigrate",
+      "fix": "Use nativefixture alias",
+      "verification": "integration build/lint and exact candidate supplemental MySQL9.3 all20 pass, zero skips",
+      "failed_run_log_sha256": "9235cc5ba23c63d5dd3aba0c119df7a8a3c2e9c4f286d654af17488fe11dcfc2",
+      "source_uncommitted": true
+    },
+    {
+      "scope": "First Mac mini isolated Broker run on exact same IAM89bdcf58 source",
+      "passed_baseline_cases": 18,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "IAM host go test exit1; first private host output was not retained before owned fixture deletion, root cause unconfirmed",
+      "report_sha256": "b535515193abab5adb87d19818ff189f543acf0819c7a84c6e9e99a7a89740b1",
+      "cleanup": {
+        "containers_remaining": false,
+        "process_groups_drained": true,
+        "private_directory_removed": true
+      },
+      "recheck": "Second run with infra08d74f4 diagnostics and opt-in0600 local capture passed21 including4 actual host proofs on unchanged IAM89bdcf58; no business-defect fix claimed"
+    }
+  ],
+  "remaining": [
+    "Production/system acceptance remains deferred to M3 production tasks"
+  ],
+  "boundaries": {
+    "native_half_receipts": "Explicit storage fixture; not Broker E2E/fault evidence",
+    "production_changes": false,
+    "system_acceptance": false,
+    "merged": true
+  },
+  "previous_candidates": [
+    {
+      "source_sha": "0bd208a2bcc4730c262d96da0d1a88a7634dfefb",
+      "validation_status": "full CI39270215122; native all3 MySQL and host entry fixtures; concurrency39270214607 and SDK isolation39270214851 success"
+    },
+    {
+      "source_sha": "feb0369c9b6ff621ed9227346036a07dad660658",
+      "validation_status": "full CI39276085368 / concurrency39276085627 / SDK isolation39276085506 success; before protocol gate43"
+    },
+    {
+      "source_sha": "733c2dc2a30074e514f3bfedfc98cd2cff642d5d",
+      "validation_status": "supplemental15 native MySQL9.3 + full source race1898; required CI queued"
+    }
+  ],
+  "external_blocker": {
+    "scope": "private infra cloud CI and merge evidence; task local/native verification has now passed",
+    "infra_source_sha": "dd0be29c2e6eaa12ac989db1f88f293eee2f1269",
+    "ci": "https://github.com/FangcunMount/infra/actions/runs/39277154976",
+    "check_runs": [
+      118144417605,
+      118144417978,
+      118144418037
+    ],
+    "steps_started": 0,
+    "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the Billing & plans section in your settings",
+    "account_action_requested": true,
+    "test_pass_claim": false,
+    "latest_observation": {
+      "infra_source_sha": "728f9e1",
+      "ci": "https://github.com/FangcunMount/infra/actions/runs/39282025800",
+      "failed_check_run": 118158047787,
+      "failed_job_steps_started": 0,
+      "annotation_confirmed": "account payments failed or spending limit; MySQL8.4 not executed; other jobs then queued"
+    },
+    "user_decision": "Defer billing changes; continue offline implementation; no repeated cloud reruns",
+    "status": "resolved after repository became PUBLIC; new cloud jobs have started",
+    "restored_run": "https://github.com/FangcunMount/infra/actions/runs/39321850663",
+    "user_decision_latest": "Repository made public; resume cloud CI after verified visibility"
+  },
+  "current_candidate_ci": {
+    "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+    "ci": "https://github.com/FangcunMount/iam/actions/runs/39281936066",
+    "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39281935978",
+    "sdk_isolation_ci": "https://github.com/FangcunMount/iam/actions/runs/39281936049",
+    "image_handoff_ci": "https://github.com/FangcunMount/iam/actions/runs/39281935906",
+    "status": "all success; image build does not authorize production publication"
+  },
+  "integration_baseline": {
+    "merged_main": "403d41c2",
+    "local_merge": "a3f1ea53",
+    "scope": "preserved already-merged main Redis delivery changes; no new Redis production action"
+  },
+  "local_broker_attempt": {
+    "host": "mac-mini-old",
+    "infra_sha": "f86247dc99b2a294a0f4bca290831c08006c0dab",
+    "iam_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+    "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+    "broker_image": "sha256:050426c66e97d69940f3b023440f68277cd02a4b8af5717ca01cf33f09776726",
+    "mysql_version": "8.0.44",
+    "isolation": "New random rocketmq-m2 Compose project/network/loopback ports/temp schemas; existing services left running",
+    "status": "second run passed21/0fail/0skip, including4 actual IAM host proofs; all owned fixture resources cleaned",
+    "scope_limit": "Local native proof does not change GitHub Actions status or production/system acceptance",
+    "setup_failure": "First 8.0.36 pull failed before fixture startup because SSH PATH omitted Docker credential helper; private failure log retained; retry uses verified existing MySQL8.0.44 image and corrected PATH"
+  },
+  "completed_at": "2026-10-19T20:36:35.142929+00:00",
+  "merge_sha": "7accc92cbb69e85aaff66cb5f62017e7fb030ab7"
+}

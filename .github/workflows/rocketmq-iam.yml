@@ -1,0 +1,112 @@
+name: RocketMQ IAM original host transaction
+on:
+  workflow_dispatch:
+    inputs:
+      iam_ref:
+        description: Exact IAM candidate source SHA
+        type: string
+        required: true
+        default: 57b07babe49666341b678af5aecb168b40511d7e
+      qs_ref:
+        description: Optional exact QS source SHA for the required separate business fanout profile
+        type: string
+        required: false
+  pull_request:
+    paths: ['scripts/rocketmq/ci-transactions.py', 'scripts/rocketmq/iam_acceptance.py', 'scripts/rocketmq/test_iam_acceptance.py', 'scripts/rocketmq/iam_native.py', 'scripts/rocketmq/test_iam_native.py', '.github/workflows/rocketmq-iam.yml']
+permissions:
+  contents: read
+env:
+  GOTOOLCHAIN: local
+concurrency:
+  group: rocketmq-iam-host-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  host:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: ['mysql:8.0.36', 'mysql:8.0.44', 'mysql:8.4']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: bfaae2b82ee0d1229b8c965fce472cdf5dec486f
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/iam
+          ref: ${{ inputs.iam_ref || '57b07babe49666341b678af5aecb168b40511d7e' }}
+          path: .iam-acceptance
+      - uses: actions/checkout@v6
+        if: inputs.qs_ref != ''
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ inputs.qs_ref }}
+          path: .qs-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ inputs.qs_ref && '1.25.12' || '1.25.9' }}
+          cache-dependency-path: .iam-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Verify exact candidate and source harness
+        env:
+          EXPECTED_IAM_SHA: ${{ inputs.iam_ref || '57b07babe49666341b678af5aecb168b40511d7e' }}
+          EXPECTED_QS_SHA: ${{ inputs.qs_ref }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_IAM_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .iam-acceptance rev-parse HEAD)" = "$EXPECTED_IAM_SHA"
+          if [[ -n "$EXPECTED_QS_SHA" ]]; then
+            [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]
+            test "$(git -C .qs-acceptance rev-parse HEAD)" = "$EXPECTED_QS_SHA"
+          fi
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py' -v
+
+      - name: Required original roots and HTTP on fixed native MySQL
+        env:
+          MYSQL_IMAGE: ${{ matrix.mysql }}
+        run: |
+          set -euo pipefail
+          docker pull "$MYSQL_IMAGE"
+          mkdir -m700 "$RUNNER_TEMP/iam-native-proof"
+          python3 scripts/rocketmq/iam_native.py --iam "$PWD/.iam-acceptance" \
+            --mysql-image "$MYSQL_IMAGE" --report "$RUNNER_TEMP/iam-native-proof/receipt.json"
+      - name: Build verified isolated Broker
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-iam:5.5.1 components/rocketmq
+      - name: Required actual IAM host entry and original transaction
+        env:
+          MYSQL_IMAGE: ${{ matrix.mysql }}
+          QS_FANOUT_SHA: ${{ inputs.qs_ref }}
+        run: |
+          set -euo pipefail
+          fanout_args=()
+          if [[ -n "$QS_FANOUT_SHA" ]]; then
+            fanout_args+=(--iam-fanout-qs "$PWD/.qs-acceptance")
+          fi
+          python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
+            --iam-host "$PWD/.iam-acceptance" --iam-operation-results --image rocketmq-iam:5.5.1 \
+            --mysql-image "$MYSQL_IMAGE" --report rocketmq-iam-host.json "${fanout_args[@]}"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-iam-host-${{ strategy.job-index }}-${{ github.sha }}
+          path: rocketmq-iam-host.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: iam-native-root-${{ strategy.job-index }}-${{ github.sha }}
+          path: ${{ runner.temp }}/iam-native-proof/receipt.json
+          if-no-files-found: error
+          retention-days: 14
