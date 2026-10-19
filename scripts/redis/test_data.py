@@ -100,6 +100,14 @@ class RuntimeAllowlist(unittest.TestCase):
 
 
 class PreparationGuards(unittest.TestCase):
+ def test_unrecognized_existing_ca_keeps_directory_private(self):
+  import ca
+  with tempfile.TemporaryDirectory()as temp:
+   dest=Path(temp)/'redis'/'ca-chain.pem';dest.parent.mkdir(mode=0o700);dest.write_bytes(b'unrecognized-existing-content')
+   with unittest.mock.patch.object(ca,'DEST',dest),unittest.mock.patch('sys.argv',['ca.py','install']):
+    with self.assertRaises(ValueError):ca.main()
+   self.assertEqual(dest.parent.stat().st_mode&0o777,0o700)
+   self.assertEqual(dest.read_bytes(),b'unrecognized-existing-content')
  def test_public_ca_install_ignores_private_umask_without_opening_other_directories(self):
   import ca
   with tempfile.TemporaryDirectory()as temp:
