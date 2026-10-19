@@ -3,44 +3,64 @@
   "task_ids": [
     "T04"
   ],
-  "observed_at": "2026-10-19T12:01:12.214787+00:00",
+  "observed_at": "2026-10-19T12:06:16.500133+00:00",
   "status": "in_progress",
   "complete": false,
   "stage": "schema-and-v2-reference-foundation",
   "repositories": {
     "iam": {
-      "source_sha": "65f1a8f4a23e944af6c01678b6ee363913558957",
-      "head_sha": "65f1a8f4a23e944af6c01678b6ee363913558957",
+      "source_sha": "36240da9ac423d449ff8daa3efc028343aff0b8e",
+      "head_sha": "36240da9ac423d449ff8daa3efc028343aff0b8e",
       "merged": false,
-      "ci": "https://github.com/FangcunMount/iam/actions/runs/39246762992",
-      "ci_status": "success including all three native MySQL schema jobs",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39249335104",
+      "ci_status": "post-main-sync CI running/queued; prior candidate results remain separately attributed",
       "native_mysql_84": {
         "actual_server_version": "8.4.11",
         "image_digest": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
         "job": "https://github.com/FangcunMount/iam/actions/runs/39246762992/job/118040471389",
-        "log_sha256": "e8134a427e0d7a95f6f55454103f271b750324f9345671e0aa7c25d505585572"
-      }
+        "log_sha256": "e8134a427e0d7a95f6f55454103f271b750324f9345671e0aa7c25d505585572",
+        "source_sha": "65f1a8f4a23e944af6c01678b6ee363913558957"
+      },
+      "previous_candidates": [
+        {
+          "head_sha": "65f1a8f4a23e944af6c01678b6ee363913558957",
+          "source_sha": "65f1a8f4a23e944af6c01678b6ee363913558957",
+          "ci": "https://github.com/FangcunMount/iam/actions/runs/39246762992",
+          "ci_status": "success including all three native MySQL schema jobs"
+        }
+      ],
+      "main_merged": "bf2882e9a9d915a5aefd194c1b52a2d4c2d5e853"
     },
     "qs-server": {
-      "source_sha": "f0dd60467f4d696c3f3fc9d4539e7218b55ccb7b",
-      "head_sha": "b31fa2c34492c2633597e97476f41089dfa48b06",
+      "source_sha": "ffdddb36d8d31b8016f974416212a120edc0c940",
+      "head_sha": "9b7aa154241ef06dd8d27b70e3efb44f83303f44",
       "merged": false,
-      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39246803082",
+      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39249368688",
       "native_ci_status": "success",
       "native_job": "https://github.com/FangcunMount/qs-server/actions/runs/39246803082/job/118040610503",
       "native_log_sha256": "832868a8ac6f9517f0274bb63823137ce2b56bad8c0ebb598385e393c7a3fbbd",
-      "ci_status": "success; full CI including native schema proof and final builds"
+      "ci_status": "post-main-sync CI running/queued; prior candidate results remain separately attributed",
+      "previous_candidates": [
+        {
+          "head_sha": "b31fa2c34492c2633597e97476f41089dfa48b06",
+          "source_sha": "f0dd60467f4d696c3f3fc9d4539e7218b55ccb7b",
+          "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39246803082",
+          "ci_status": "success; full CI including native schema proof and final builds"
+        }
+      ],
+      "main_merged": "39cb018d9077a7857d57cdb7a5f25df0ef72ac81",
+      "native_source_sha": "b31fa2c34492c2633597e97476f41089dfa48b06"
     },
     "qs-ai": {
-      "source_sha": "cbc2a902330f705e38a9e94173c9d837a54ea7e7",
-      "head_sha": "cfffcc3bedd00dc409d54210b95a051b5305aa39",
+      "source_sha": "9d2ebe9c7acdad5eecacb35985e27ac82791a5cd",
+      "head_sha": "3101453746ddb20480efa2427e45b887dee98126",
       "merged": false,
-      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39248563762",
-      "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39247550283",
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39249344742",
+      "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39249339482",
       "prior_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246774031",
       "prior_m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246780022",
       "prior_m7_status": "success for historical delivery regression; did not include new native schema test",
-      "ci_status": "fresh full CI running/queued",
+      "ci_status": "post-main-sync CI running/queued; prior candidate results remain separately attributed",
       "targeted_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789",
       "history_full_ci": [
         {
@@ -53,7 +73,19 @@
       "native_jobs": [
         "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789/job/118045502191",
         "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789/job/118045502556"
-      ]
+      ],
+      "previous_candidates": [
+        {
+          "head_sha": "cfffcc3bedd00dc409d54210b95a051b5305aa39",
+          "source_sha": "cbc2a902330f705e38a9e94173c9d837a54ea7e7",
+          "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39248563762",
+          "ci_status": "fresh full CI running/queued"
+        }
+      ],
+      "main_merged": "8fc9c09bcfd14570c32cbfef6e1753ddbdfb27da",
+      "native_source_sha": "cbc2a90",
+      "prior_targeted_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789",
+      "prior_targeted_status": "success including native M3 two cases and all historical receipt/model regression/build gates in both jobs"
     }
   },
   "reports": {
@@ -89,6 +121,13 @@
       "skipped": 4,
       "failed": 0,
       "boundary": "four existing database-dependent control tests skipped locally; not native acceptance"
+    },
+    "post_main_ai": {
+      "tests": 63,
+      "failed": 0,
+      "skipped": 0,
+      "stage": "local source TLS/config/message/docs",
+      "native_database_executed": false
     }
   },
   "migration_resources": {
@@ -151,6 +190,10 @@
       "source_sha": "6771b8d",
       "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39247925710",
       "result": "Dedicated schema reflection reached runtime validation and exposed frozen conversion head reader rejecting0041. Runtime now reads exactly one0041 head directly; legacy head whitelist remains unchanged. Local78 pass/4 existing DB-dependent skips; current targeted rerun39248286789."
+    },
+    {
+      "check": "concurrent main baseline synchronization",
+      "result": "Live main advanced with public MySQL TLS merges after M3 starting baseline. Merged committed main in all three isolated branches; preserved all TLS/maintenance changes and both M3 owners/schema/runtime probe. Resolved only source import/version guards and source-review metadata conflicts. No migration number collision. Previous green CI belongs to pre-sync candidates; fresh full current-head CI dispatched. No main writes/production operations."
     }
   ]
 }
