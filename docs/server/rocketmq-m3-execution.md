@@ -9,6 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
+- 当前批次：T09 答卷原 Mongo 事务候选位于 `qs-domain` / `codex/rocketmq-m3-qs-domain`，草稿 [QS PR410](https://github.com/FangcunMount/qs-server/pull/410)。冻结业务 BSON/首次 wire、V2 精确验收与无 Outbox 新入口已实现；Mac mini 实际 Broker/Mongo 首批11项全部通过，完整装配/202/并发/跨实例门禁尚未完成，不勾选 T09。[本批证据](evidence/rocketmq-m3-qs-answer-20261020.json)。
 
 ## 1. 目标、基线和授权边界
 
@@ -93,7 +94,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | --- | --- | --- | --- | --- |
 | M3-P | 基线、清单与接入基础 | T01–T04 | ✅ 已完成 | 责任、迁移契约、实现验证与合并 |
 | M3-1 | IAM | T05–T08 | ✅ 已完成 | 原事务、幂等与双订阅 |
-| M3-2 | QS 领域及调度 | T09–T13 | ☐ 待开始 | 双存储和未来重试 |
+| M3-2 | QS 领域及调度 | T09–T13 | ☐ 进行中 | 双存储和未来重试 |
 | M3-3 | QS↔AI | T14–T20 | ☐ 待开始 | 档案、回执、安全、模型恢复 |
 | M3-4 | 故障与运维 | T21–T25 | ☐ 待开始 | 真实故障及切换工具 |
 | M3-5 | 稳定发布及候选 | T26–T29 | ☐ 待开始 | 正式制品及最终镜像演练 |
@@ -110,7 +111,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 2026-10-20；89bdcf58三档MySQL每档12具名项、共36项0跳过；Mac mini隔离RocketMQ5.5.1/MySQL8.0.44完整21项0失败0跳过，含实际IAM宿主4项证明，临时资源已清理；[完整证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；[PR132](https://github.com/FangcunMount/iam/pull/132)合并7accc92c，生产未变更 |
 | ✅ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 2026-10-20；57b07bab正式Go SDKtx.2；必需三档MySQL原事务/HTTP各34项，真实Broker各21项，全部0失败/跳过；PR134合并d53c36a9；[证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
 | ✅ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 2026-10-20；IAM51405831/QS696ee314锁定正式Go SDKtx.2；三档MySQL原事务各34项、成对Broker/fanout各22项0失败/跳过，Mac mini额外22项通过；IAM PR135合并e3efa5b3、QS PR409合并2e95630b；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
-| ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 待开始 |
+| ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 进行中；独立qs-domain工作区基线2e95630b，5个目标包race通过；原Mongo根事务/202/幂等及V1审计恢复链已核对，正在实现冻结BSON/首次wire、V2证据和原session guard，尚无真实事务验收完成声明 |
 | ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 待开始 |
 | ☐ | T11 | QS 报告生成/失败，冻结与终态恢复 | 待开始 |
 | ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 待开始 |
@@ -258,3 +259,11 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：T07/T08完成实现和必需验证，打勾并更新8/36。下载核对T07三档原事务/HTTP各34项、Broker各21项；T08三档原事务各34项、成对Broker各22项，全部0失败/跳过、无race且临时资源排空，实际模块均tx.2，源码精确匹配。PR134合并d53c36a9，PR135合并e3efa5b3，QS PR409合并2e95630b；两宿主生产CD仍暂停。SDK索引PR47合并9da9c213。infra PR41其他SDK/故障回归仍在执行，里程碑M3-1暂不标完成，不进入QS领域接入批次。QS原效果权威读取首次失败后同源码复验通过，原因仍未知并保留到T23/T25，不改写恢复保护或宣称修复。
 
 - 2026-10-20：infra PR41固定4369e6a的13项当前检查全部成功，包括普通消息、实际SDK、包级故障与完整事务回归；已合并d544918f。至此M3-1所属T05–T08及相关SDK/IAM/QS/infra源码门禁闭环，里程碑标完成，任务总进度8/36。进度归档采用仅文档后续PR，不移动发布tag、不重复长时源码验收。接下来按顺序进入M3-2/T09答卷原Mongo事务接入；生产准入/NSQ/账号验收边界不变。
+
+- 2026-10-20：M3-1进度归档PR44已合并234e39f1。进入T09，QS独立工作区codex/rocketmq-m3-qs-domain固定基线2e95630b；答卷应用/Mongo仓储、证据、事务运行器与Collection提交五包race窄基线通过。已确认现有202恢复依赖原幂等读取，写仓储和审计/原效果恢复仅识别V1，Mongo重入callback内仍会生成BSON_id/审计时间；新路径需在准备半消息前冻结完整业务文档及原wire、持久V2并借用原session witness，保留历史V1读取且封闭新事务事件旧Replay。M3仍8/36，无生产写入。
+
+- 2026-10-20：T09 首批候选080d4d7d提交草稿QS PR410。新增独立原Mongo事务持久化入口，原事务外冻结BSON身份/审计时钟/首份wire，V2接受结果同时核对完整Reference、冻结计划、事实及Committed witness，拒绝已有session内准备半消息；历史V1读取及旧Replay保护未改写。d4cd66a0默认源码全仓race6904通过/0失败/60既有可选依赖跳过，定向冻结与历史恢复回归通过；新增required原生Broker/Mongo夹具独立要求零跳过。第一轮Docker私有配置缺Compose插件，未启动业务，专用目录已清理；第一轮真实宿主在failpoint命令处被驱动拒绝无序bson.M，9项套件未完成且失败报告保留。已改为有序bson.D，并扩展为11项精确身份/嵌套边界验收继续复验；42项infra自测通过。T09仍进行中，总进度8/36；完整装配、202、并发及跨实例门禁待完成，生产CD回读仍暂停。
+
+- 2026-10-20：T09 Mac mini 首批实际宿主验收固定QS080d4d7d/infra741c9cb/正式SDKtx.2，RocketMQ5.5.1和Mongo7.0.37独立副本集下11项0失败/0跳过/无race，含服务端failCommand写冲突触发原WithTransaction重入、半消息不可见、业务+witness/首wire、已提交ACK客户端丢弃恢复、原根回滚、重复/冲突、完整身份与嵌套拒绝和关闭准入。报告回读实际Broker参数与镜像摘要，全部专用容器/进程/私有数据目录已清理；ACK丢弃不冒称网络丢包。固定golangci2.5.0零问题；87项文档自测、hygiene及facts通过，仅更新源码基线标记，未改写历史验收。此为原CreateDurably入口证明，不替代完整Survey/Collection、202、并发与跨实例任务门禁。T09保持进行中、总计8/36，草稿PR410与required云端矩阵继续。
+
+- 2026-10-20：infra PR45实际在线执行，QS PR410当前20项检查通过、2项继续，无失败；infra新增original-mongo-root/Go1.25.9在模块读取阶段失败。QS go.mod明确最低Go1.25.12且GOTOOLCHAIN=local，因此此宿主组合无效；将宿主工作流固定为实际1.25.12，独立SDK既有1.25.9/1.25.12矩阵保持。失败run39335160523/job118342693230与原始日志摘要保留，不把无效组合重试标绿。此为CI配置修正，业务门禁仍待当前候选完成。

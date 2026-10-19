@@ -166,6 +166,8 @@ def main():
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
     parser.add_argument("--iam-host", type=Path, help="exact IAM checkout; require actual host SDK/Broker acceptance in the owned fixture")
+    parser.add_argument("--qs-answer-host", type=Path, help="exact QS checkout; require answer submission with real Mongo and Broker")
+    parser.add_argument("--qs-answer-private-log", type=Path, help="new0600 local diagnostic in an owned0700 directory; never a CI artifact")
     parser.add_argument("--iam-fanout-qs", type=Path, help="fixed clean QS source; require two IAM instances and the real QS subscriber in separate groups")
     parser.add_argument("--iam-operation-results", action="store_true", help="also require schema44 business-result atomicity from the actual IAM owner")
     parser.add_argument("--iam-private-log", type=Path, help="explicit owned0700 directory / new0600 local IAM log; never upload as CI artifact")
@@ -178,6 +180,10 @@ def main():
     parser.add_argument("--sdk-go-probe", type=Path, help="prebuilt public SDK executable from a verified published Go module")
     parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
     args = parser.parse_args()
+    if args.qs_answer_private_log and not args.qs_answer_host:
+        parser.error("QS private output requires an explicit QS answer host")
+    if args.qs_answer_host and (args.iam_host or args.sdk_api_go):
+        parser.error("QS answer host is a separate required profile")
     if (args.iam_operation_results or args.iam_private_log or args.iam_fanout_qs) and not args.iam_host:
         parser.error("IAM result/capture options require an explicit IAM host source")
     if bool(args.installed_python) != bool(args.sdk_go_probe) or (args.installed_python and not args.sdk_api_python):
@@ -255,7 +261,7 @@ def main():
         spec['services']['mysql']['environment']['MYSQL_ROOT_HOST'] = '%'
     mongo_port = port()
     mongo_image = None
-    if args.sdk_api_go:
+    if args.sdk_api_go or args.qs_answer_host:
         mongo_pin = "mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f"
         run(["docker", "pull", mongo_pin], timeout=300)
         mongo_image = run(["docker", "image", "inspect", mongo_pin, "--format", "{{.Id}}"]).stdout.strip()
@@ -265,6 +271,8 @@ def main():
             "mem_limit": "512m", "cpus": 1, "tmpfs": ["/data/db", "/data/configdb"],
             "healthcheck": {"test": ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ping:1})"],
                             "interval": "3s", "timeout": "5s", "retries": 40}}
+        if args.qs_answer_host:
+            spec['services']['mongo']['command'] += ['--setParameter', 'enableTestCommands=1']
     compose_file = directory / "compose.json"
     compose_file.write_text(json.dumps(spec)); compose_file.chmod(0o600)
     compose = ["docker", "compose", "-p", project, "-f", str(compose_file)]
@@ -386,8 +394,27 @@ def main():
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
-        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host)):
+        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
+        if args.qs_answer_host:
+            mongo_command('rs.initiate({_id:"sdk-proof",members:[{_id:0,host:"mongo:27017"}]})')
+            deadline = time.monotonic() + 60
+            while time.monotonic() < deadline:
+                if mongo_command("db.hello().isWritablePrimary") == "true":
+                    break
+                time.sleep(.5)
+            else:
+                raise RuntimeError("owned Mongo primary not available")
+            proof['mongo_version'] = mongo_command('db.version()')
+            if proof['mongo_version'] != '7.0.37':
+                raise RuntimeError('required Mongo version differs')
+            from qs_answer_acceptance import run_qs_answer_host
+            proof['qs_answer_host'] = {}
+            run_qs_answer_host(args.qs_answer_host, directory, broker, project, grpc_port, mongo_port,
+                               ca, run, proof['qs_answer_host'], args.qs_answer_private_log)
+            for name in proof['qs_answer_host']['native_receipt']['cases']:
+                passed('qs_answer_' + name)
+            return
         if not args.sdk_api_go:
             sql("CREATE TABLE witness(id VARCHAR(96) PRIMARY KEY, owner VARCHAR(32) NOT NULL, "
                 "wire_hash CHAR(64) NOT NULL, state VARCHAR(16) NOT NULL) ENGINE=InnoDB; "
@@ -728,6 +755,12 @@ def main():
             report['batch'] = 'M3-IAM-host-with-M2-0-baseline'
             report['limits'].append('IAM host acceptance uses released SDK; base raw-client cases remain separately scoped')
             report['iam_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/iam_acceptance.py').read_bytes()).hexdigest()
+        if args.qs_answer_host:
+            report['batch'] = 'M3-QS-answer-original-Mongo-host'
+            report['limits'] = ['No production/system acceptance or throughput claim',
+                                'Actual host SDK and original Mongo transactions, not raw-client feasibility',
+                                'Root ACK discard is client-level; packet-loss and process-exit acceptance remain separate gates']
+            report['qs_answer_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_answer_acceptance.py').read_bytes()).hexdigest()
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
