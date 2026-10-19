@@ -21,7 +21,7 @@ import threading
 import time
 
 from render import render
-from failure_diagnostics import summarize
+from failure_diagnostics import summarize, startup_internal_description
 
 
 DISCARD_TOPIC = "TRANS_CHECK_MAX_TIME_TOPIC"  # TopicValidator in pinned Broker 5.5.1.
@@ -611,7 +611,18 @@ def main():
                     for path in list(probe.client_logs.glob('*.log'))[:1]:
                         with path.open('rb') as stream:
                             stream.seek(max(0, path.stat().st_size - 1048576))
-                            item = summarize(stream.read(1048576))
+                            raw_log = stream.read(1048576)
+                            item = summarize(raw_log)
+                        probe.drain()
+                        if (any(e.get('event') == 'closed' and e.get('decision') == 'failed_start_drained'
+                                for e in probe.events)
+                                and not any(e.get('event') in ('ready', 'half', 'result') for e in probe.events)):
+                            # The public probe creates its message only AFTER
+                            # Ready. This failed process has no business wire.
+                            sensitive = [mysql_password, *[v for a in accounts.values() for v in a.values()]]
+                            description = startup_internal_description(raw_log, sensitive)
+                            if description is not None:
+                                item['startup_internal_description'] = description
                         item['pid'] = probe.process.pid
                         client_diagnostics.append(item)
                 broker_logs = run(['docker', 'exec', '--user', '0', broker, 'sh', '-c',

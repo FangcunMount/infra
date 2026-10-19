@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from failure_diagnostics import summarize
+from failure_diagnostics import summarize, startup_internal_description
 
 
 class DiagnosticsTest(unittest.TestCase):
@@ -21,3 +21,11 @@ class DiagnosticsTest(unittest.TestCase):
         result = summarize(b'x' * 2097152)
         self.assertEqual(result['bytes_examined'], 1048576)
         self.assertEqual(result['signals'], {})
+
+    def test_startup_description_redacts_configured_credentials_signatures_and_body(self):
+        raw = 'rpc error: code = Internal desc = header invalid password=private-secret signature=' + 'a'*40
+        description = startup_internal_description(raw, ['private-secret'])
+        self.assertIn('header invalid', description)
+        self.assertNotIn('private-secret', description)
+        self.assertNotIn('a'*40, description)
+        self.assertIsNone(startup_internal_description('code = Internal desc = payload=private-wire', []))

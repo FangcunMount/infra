@@ -31,3 +31,22 @@ def summarize(raw):
     return {'bytes_examined': len(raw), 'sha256': hashlib.sha256(raw).hexdigest(),
             'signals': {key: len(re.findall(pattern, text, re.I))
                         for key, pattern in PATTERNS.items() if re.search(pattern, text, re.I)}}
+
+
+def startup_internal_description(raw, secrets):
+    """Only for a drained failure before Ready, when no business wire exists."""
+    if isinstance(raw, bytes):
+        raw = raw.decode(errors='replace')
+    match = re.search(r'code\s*=\s*Internal\s+desc\s*=\s*([^\r\n]{1,1024})', raw)
+    if not match:
+        return None
+    text = match.group(1)
+    if re.search(r'\b(?:body|payload|wire)\b', text, re.I):
+        return None
+    for secret in sorted((s for s in secrets if s), key=len, reverse=True):
+        text = text.replace(secret, '<redacted>')
+    text = re.sub(r'[A-Fa-f0-9]{16,}', '<hex>', text)
+    text = re.sub(r'eyJ[A-Za-z0-9_.-]{16,}', '<token>', text)
+    text = re.sub(r'(?i)((?:authorization|password|secret|token|credential)\s*[:=]\s*)[^,\s}\]]+',
+                  r'\1<redacted>', text)
+    return text[:512]
