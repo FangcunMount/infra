@@ -5,7 +5,7 @@
   ],
   "status": "in_progress; released SDK repair consumed, required cloud/native host matrix pending",
   "complete": false,
-  "observed_at": "2026-10-19T21:40:35.574673+00:00",
+  "observed_at": "2026-10-19T21:43:39.208770+00:00",
   "source_sha": "57b07babe49666341b678af5aecb168b40511d7e",
   "repository": "FangcunMount/iam",
   "pr": "https://github.com/FangcunMount/iam/pull/134",
@@ -1335,6 +1335,13 @@
           "report_sha256": "e024dc47302cbbc3a7c1d4806980e1971a29cb46949f62eda732a1a558e74185"
         }
       ]
+    },
+    {
+      "scope": "exact primary image build39329094438 attempt1, source57b07bab",
+      "url": "https://github.com/FangcunMount/iam/actions/runs/39329094438/job/118322426001",
+      "cause": "proxy.golang.org HTTP2 stream INTERNAL_ERROR fetching publishedtx.2 .mod during Docker go mod download; no checksum/source/compiler failure",
+      "private_log_sha256": "b032b0ad21b28373e7520db845329f18f016337af64c037befdede4a490119e4",
+      "action": "rerun only failed job on identical source; no source/proxy/security setting changed"
     }
   ],
   "remaining": [
@@ -1641,5 +1648,6 @@
         }
       }
     ]
-  }
+  },
+  "cloud_after_repair": "https://github.com/FangcunMount/infra/actions/runs/39329371609"
 }

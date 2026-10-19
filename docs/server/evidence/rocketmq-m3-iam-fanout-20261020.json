@@ -280,10 +280,75 @@
           "sha256": "1e6522cf548b9e2c7f2c9a4605431f6818f77bdcb35c7ed514957e2636069d9d"
         }
       ]
+    },
+    {
+      "scope": "QS original-effects recovery regression39329043045 attempt1, exact696ee314",
+      "url": "https://github.com/FangcunMount/qs-server/actions/runs/39329043045/job/118322245722",
+      "location": "original_effect_recovery_integration_test.go:330/357",
+      "result": "first read-only CLI authority inspection expected0 but returned1; authority rejection/unavailability; source cause not determined from retained safe output",
+      "source_audit": "tx.1..tx.2 runtime change limited to Go driver meter; originaleffect/NSQ/legacy-wire unchanged; this does not prove why the run failed",
+      "action": "one same-source failed-job reproduction; no business/recovery guards or fixtures weakened",
+      "cleanup": "owned containers and volumes none after failure",
+      "log_sha256": "524bcbb74c0034acba65def5779e0d56724e55cc86a0174a743811af043148e2",
+      "follow_up": "keep unresolved cause visible through T23/T25 compatibility/recovery gates even if later attempt succeeds"
     }
   ],
   "production_changed": false,
   "system_acceptance": false,
   "sdk_tag": "v0.5.0-rocketmq-tx.2",
-  "terminal_handoff_review": "SDKtx.1..tx.2 changed runtimeGo onlydriver/metric.go plus its test; NSQ/legacy-wire/RocketMQsubscribermethods byte-identical. QS exact-version guard and mutation regression updated after audit, not weakened;87 doc tests/facts passed."
+  "terminal_handoff_review": "SDKtx.1..tx.2 changed runtimeGo onlydriver/metric.go plus its test; NSQ/legacy-wire/RocketMQsubscribermethods byte-identical. QS exact-version guard and mutation regression updated after audit, not weakened;87 doc tests/facts passed.",
+  "local_actual_fanout": {
+    "scope": "supplemental Mac mini owned RocketMQ5.5.1/MySQL8.4.11, actual IAM and QS source with released SDKtx.2; not system/gRPC/production acceptance",
+    "infra_sha": "4369e6ab6800b69ce403839541a566236db0f2bb",
+    "report_sha256": "4cd7a9ab7c05f53dddd7289f81028bafb8a0888a59c82cbb509c4051a182c8c1",
+    "source_sha": "5140583179335f258c4e9bebca97c651c57b6739",
+    "sdk_module": {
+      "Path": "github.com/FangcunMount/reliable-messaging",
+      "Version": "v0.5.0-rocketmq-tx.2",
+      "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+      "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+    },
+    "qs_fanout": {
+      "source_sha": "696ee3145ad1d4ab0d5debb65abf024d6c08c761",
+      "sdk_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.5.0-rocketmq-tx.2",
+        "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "receipt": {
+        "iam_instances": 2,
+        "iam_revocation_observed": true,
+        "qs_notification_received": true,
+        "qs_both_subjects_evicted": true,
+        "qs_primary_proof_verified": true,
+        "qs_subscriber_drained": true,
+        "failed": 0,
+        "skipped": 0
+      },
+      "source_clean_after": true
+    },
+    "native_host": {
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "half_invisible": true,
+      "commit_wire_and_witness": true,
+      "application_entry": true,
+      "rollback_hidden": true,
+      "business_result_atomic": true
+    },
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0,
+    "broker_image": "sha256:050426c66e97d69940f3b023440f68277cd02a4b8af5717ca01cf33f09776726",
+    "mysql_image": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    }
+  },
+  "cloud_after_repair": "https://github.com/FangcunMount/infra/actions/runs/39329479386"
 }
