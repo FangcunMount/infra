@@ -8,6 +8,25 @@
 
 进度：**16/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
+### 最新核验快照（2026-10-19 13:01 +08:00）
+
+本表持续维护已批准的《M2 完整实施规划：事务 SDK、双存储证明与固定预发布》，任务仍为24项。本次仅同步核验状态，不将已实现、CI运行中或待发布记为完成。
+
+| 核验项 | 当前结果 / 证据 |
+| --- | --- |
+| 已完成任务 | T01–T16，16/24；M2-P 至 M2-4 已满足对应合并门禁 |
+| 当前 SDK 候选 | `3bf3dc80dad889c3f51cc45e4490331b8d45d3f2`；[PR43](https://github.com/FangcunMount/reliable-messaging/pull/43) 待合并 |
+| 当前 infra 验收源码 | `910b614dfdb60483009a38113ddcae3c06905914`；[PR27](https://github.com/FangcunMount/infra/pull/27) 待合并；本次记录更新在其后单独记账 |
+| SDK 当前候选检查 | [源码/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39201623423)、[真实存储适配](https://github.com/FangcunMount/reliable-messaging/actions/runs/39201623425)、[Python源码及安装包](https://github.com/FangcunMount/reliable-messaging/actions/runs/39201623430)、[既有基础设施回归](https://github.com/FangcunMount/reliable-messaging/actions/runs/39201623449) 均通过；不能替代下列 Broker 故障门禁 |
+| T17–T18 | [双 profile 公开 SDK 31项/档](https://github.com/FangcunMount/infra/actions/runs/39201819179) 运行中；owner 拒绝、共享消费预算及全部正式入口必须通过后再勾选 |
+| T19 | [包级故障44项/档](https://github.com/FangcunMount/infra/actions/runs/39201819131) 运行中，含31项基础验收与13项故障；未记录为通过 |
+| T20 | [完整46项/档](https://github.com/FangcunMount/infra/actions/runs/39201819090) 运行中，追加2项真实原生超限验证；未记录为通过 |
+| 普通消息及既有协议回归 | [完整Docker验收](https://github.com/FangcunMount/infra/actions/runs/39201819080) 运行中；保留普通消息和 M2-0 回归 |
+| T21–T24 | 文档、示例及发布后安装流程已准备；API冻结、最终合并 SHA、该 SHA 完整 CI、固定发布和下载重装均待前置门禁 |
+| 发布 / 生产 | 两语言 tag 与 GitHub 预发布均未创建；未执行生产变更，业务链路仍属 M3 范围 |
+
+下一步：先验收 T17/T18，再完成 T19/T20，随后冻结契约及执行 T21–T24。若上述运行失败，保留失败证据，修复后按新精确 SHA 重新验证；不以旧候选结果替代。
+
 | 里程碑 | 任务 | 状态 | 完成门禁 |
 | --- | --- | --- | --- |
 | M2-0 | 既有批次 | ✅ 已完成 | 20 项真实验证，0 跳过 |
@@ -37,7 +56,7 @@
 | ✅ | T14 | Python 实例级有界 Producer；阻断上游无界队列 | 2026-10-19 +08:00；SDK b9fbad4；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR39 已合并 65eae5b；infra PR23 已合并 4b7ed57 |
 | ✅ | T15 | Python Sender/Checker/宿主 loop；session 不跨线程 | 2026-10-19 +08:00；SDK b9fbad4；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR39 已合并 65eae5b；infra PR23 已合并 4b7ed57 |
 | ✅ | T16 | Python 取消、真实在途记账、关闭、多客户端隔离 | 2026-10-19 +08:00；SDK b9fbad4；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR39 已合并 65eae5b；infra PR23 已合并 4b7ed57 |
-| ☐ | T17 | SDK/infra v2 路由、类型、owner ACL、共享消费预算 | SDK 2903608；Go/Python/infra 共用规范向量、公开消费者多物理输入共享预算、provision 全量预检与拒绝既有冲突；31 项真实双 runtime/MySQL profile CI 待通过；汇总 [SDK PR43](https://github.com/FangcunMount/reliable-messaging/pull/43) / [infra PR27](https://github.com/FangcunMount/infra/pull/27) |
+| ☐ | T17 | SDK/infra v2 路由、类型、owner ACL、共享消费预算 | SDK 3bf3dc8 / infra 910b614；Go/Python/infra 共用规范向量、公开消费者多物理输入共享预算、provision 全量预检与拒绝既有冲突；[31项/档双profile真实门禁](https://github.com/FangcunMount/infra/actions/runs/39201819179) 运行中；汇总 [SDK PR43](https://github.com/FangcunMount/reliable-messaging/pull/43) / [infra PR27](https://github.com/FangcunMount/infra/pull/27) |
 | ☐ | T18 | 正式 SDK 跨语言/MySQL、Go/Mongo 真端到端 | 已接入公开 Sender/Subscriber，原 ID 与首次 wire bytes 校验；候选真实门禁待通过 |
 | ☐ | T19 | 退出、断网、DB 提交丢回复、Broker 重启故障矩阵 | 13 项真实 packet/proxy/重启场景已接入；TCP/TLS fixture 单元/race 通过；真实矩阵待通过 |
 | ☐ | T20 | 资源上界、指标、超限告警、0600 原生超限审计导出 | 边界、分阶段计数、真实关闭指标、只读索引审计与告警封新入口已实现；native-limit 实测待通过 |
