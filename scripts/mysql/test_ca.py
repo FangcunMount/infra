@@ -55,6 +55,13 @@ class CATest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 m.source(self.git('rev-parse', 'HEAD').strip())
 
+    def test_expired_trust_root_is_rejected(self):
+        expired = subprocess.check_output(['openssl', 'x509', '-in', str(self.cert),
+                    '-signkey', str(self.root/'private.key'), '-days', '-1'],
+                    stderr=subprocess.DEVNULL)
+        with self.assertRaises(ValueError):
+            m.validate_ca(expired)
+
     def test_private_keys_and_non_pem_rejected(self):
         for data in (b'', b'garbage', self.cert.read_bytes()+(self.root/'private.key').read_bytes()):
             with self.assertRaises(ValueError):

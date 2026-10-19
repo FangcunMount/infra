@@ -2,6 +2,8 @@ import copy
 import importlib.util
 from pathlib import Path
 import unittest
+from unittest.mock import patch
+from types import SimpleNamespace
 
 spec = importlib.util.spec_from_file_location('runtime', Path(__file__).with_name('runtime.py'))
 m = importlib.util.module_from_spec(spec)
@@ -46,6 +48,18 @@ class RuntimeTest(unittest.TestCase):
         env = dict(item.split('=', 1) for item in self.patch(before)['Env'])
         self.assertEqual(env['QS_AI_DATABASE_URL'], 'mysql+asyncmy://u:p%40%24%3A@example.mysql.rds.aliyuncs.com:3306/ai?charset=utf8mb4')
         self.assertEqual(env['QS_AI_DATABASE_TLS_CA_FILE'], m.CONTAINER_CA)
+
+    def test_worker_without_docker_health_uses_readiness_endpoint(self):
+        with patch.object(m, 'api', return_value={'State': {'Running': True}}), \
+             patch.object(m.subprocess, 'run', return_value=SimpleNamespace(
+                 returncode=0, stdout=b'{"status":"ready"}')) as probe:
+            m.wait_healthy('qs-worker-runtime-1')
+            self.assertIn('http://127.0.0.1:9092/readyz', probe.call_args.args[0])
+
+    def test_unknown_container_cannot_pass_on_running_state_alone(self):
+        with patch.object(m, 'api', return_value={'State': {'Running': True}}):
+            with self.assertRaises(RuntimeError):
+                m.wait_healthy('unexpected-service')
 
     def test_other_services_are_rejected(self):
         with self.assertRaises(ValueError):

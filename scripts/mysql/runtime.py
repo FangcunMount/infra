@@ -125,6 +125,15 @@ def wait_healthy(name):
             raise RuntimeError('Replacement did not become healthy')
         if state.get('Health', {}).get('Status') == 'healthy':
             return
+        if 'Health' not in state and re.fullmatch('qs-worker-runtime-[123]', name):
+            probe = subprocess.run(['docker', 'exec', name, 'wget', '-qO-', '-T', '3',
+                                    'http://127.0.0.1:9092/readyz'], capture_output=True)
+            if probe.returncode == 0:
+                snapshot = json.loads(probe.stdout)
+                if snapshot.get('status') == 'ready':
+                    return
+        elif 'Health' not in state:
+            raise RuntimeError('No recognized readiness policy for replacement')
         time.sleep(3)
     raise RuntimeError('Replacement health deadline exceeded')
 
