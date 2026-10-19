@@ -1,11 +1,36 @@
 import json
 import unittest
+import os
+import tempfile
+from pathlib import Path
 
-from iam_acceptance import iam_manifest, parse_host_receipt
+from iam_acceptance import iam_manifest, parse_host_receipt, host_failure_summary, retain_private_host_output
 from routes import permissions_v2
 
 
 class IAMAcceptanceTest(unittest.TestCase):
+    def test_failure_summary_never_exports_runtime_content(self):
+        raw = ('--- FAIL: TestM3ActualBrokerHost (1s)\n'
+               ' transaction_broker_host_integration_test.go:143: private token wire\n'
+               'panic: test timed out after3m\n[build failed]')
+        result = host_failure_summary(raw)
+        self.assertEqual(result, {'build_failed': True, 'test_timeout': True,
+                                 'failed_tests': ['TestM3ActualBrokerHost'], 'assertion_lines': [143]})
+        self.assertNotIn('private', json.dumps(result))
+
+    def test_explicit_private_capture_refuses_shared_or_existing_destination(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); root.chmod(0o700)
+            path = root / 'owned.log'
+            retain_private_host_output(path, 'private test fixture only')
+            self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+            with self.assertRaises(FileExistsError):
+                retain_private_host_output(path, 'replacement')
+            self.assertEqual(path.read_text(), 'private test fixture only')
+            root.chmod(0o755)
+            with self.assertRaises(RuntimeError):
+                retain_private_host_output(root / 'shared.log', 'private')
+            self.assertFalse((root / 'shared.log').exists())
     def test_exact_owner_type_revision_and_minimum_permissions(self):
         manifest = iam_manifest()
         route = manifest['routes'][0]

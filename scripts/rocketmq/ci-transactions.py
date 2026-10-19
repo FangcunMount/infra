@@ -162,6 +162,7 @@ def main():
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
     parser.add_argument("--iam-host", type=Path, help="exact IAM checkout; require actual host SDK/Broker acceptance in the owned fixture")
+    parser.add_argument("--iam-private-log", type=Path, help="explicit owned0700 directory / new0600 local IAM log; never upload as CI artifact")
     parser.add_argument("--go-probe", type=Path)
     parser.add_argument("--sdk-api-python", action="store_true", help="also require public Python/MySQL and cross-language recovery")
     parser.add_argument("--sdk-api-go", action="store_true", help="required public Go SDK acceptance; separate from raw M2-0")
@@ -569,7 +570,7 @@ def main():
             from iam_acceptance import run_iam_host
             proof['iam_host'] = {}
             run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
-                         mysql_password, ca, run, proof['iam_host'])
+                         mysql_password, ca, run, proof['iam_host'], args.iam_private_log)
             passed('iam_host_actual_sdk_original_root_and_application')
 
         # Accelerate ONLY the owned fixture. A real Unknown half must move to

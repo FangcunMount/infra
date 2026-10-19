@@ -38,7 +38,28 @@ def parse_host_receipt(output):
     return receipts[0]
 
 
-def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof):
+def host_failure_summary(raw):
+    # Fixed classifications only; never copy a driver error, wire or credential.
+    return {'build_failed': '[build failed]' in raw,
+            'test_timeout': 'panic: test timed out' in raw,
+            'failed_tests': sorted(set(re.findall(r'--- FAIL: (Test[A-Za-z0-9_/]+)', raw)))[:16],
+            'assertion_lines': sorted(set(int(n) for n in re.findall(r'transaction_broker_host_integration_test\.go:(\d+)', raw)))[:32]}
+
+
+def retain_private_host_output(path, raw):
+    # Explicit local diagnostic destination, never a CI artifact. Refuse shared
+    # directories, symlink/file replacement and existing output before writing.
+    path = Path(path)
+    parent = path.parent
+    info = parent.stat()
+    if parent.is_symlink() or info.st_uid != os.getuid() or info.st_mode & 0o077:
+        raise RuntimeError('private host output requires an owned0700 directory')
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(descriptor, 'w') as stream:
+        stream.write(raw)
+
+
+def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None):
     source = source.resolve()
     if not (source / 'go.mod').is_file():
         raise RuntimeError('required exact IAM source checkout missing')
@@ -83,6 +104,9 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     capture = directory / 'iam-host-private.log'; capture.write_text(raw); capture.chmod(0o600)
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
+    proof['diagnostics'] = host_failure_summary(raw)
+    if private_log is not None:
+        retain_private_host_output(private_log, raw)
     if result.returncode:
         raise RuntimeError('actual IAM host acceptance failed (private output withheld)')
     proof['native_receipt'] = parse_host_receipt(result.stdout)
