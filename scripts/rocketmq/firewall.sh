@@ -14,6 +14,7 @@ iptables-restore -w 10 --noflush <<'RULES'
 :INFRA-ROCKETMQ - [0:0]
 -F INFRA-ROCKETMQ
 -A INFRA-ROCKETMQ -m conntrack --ctorigdstport 8081 -s 100.85.122.124 -j RETURN
+-A INFRA-ROCKETMQ -m conntrack --ctorigdstport 8081 -s 100.74.123.45 -j RETURN
 -A INFRA-ROCKETMQ -m conntrack --ctorigdstport 8081 -s 100.91.31.24 -j RETURN
 -A INFRA-ROCKETMQ -m conntrack --ctorigdstport 8081 -s 100.126.200.55 -j RETURN
 -A INFRA-ROCKETMQ -s 100.118.164.39 -j RETURN

@@ -115,7 +115,7 @@ sudo make tailscale-check
 记录结果，例如：
 
 ```text
-serverA 100.85.122.124
+serverA 100.74.123.45
 serverB 100.91.31.24
 serverC 100.70.252.103
 serverD 100.118.164.39

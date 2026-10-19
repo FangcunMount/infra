@@ -51,7 +51,7 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
-          host: 47.94.204.124
+          host: 154.8.167.1
           username: deploy
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
@@ -311,7 +311,7 @@ Error: docker: permission denied
 
 ```bash
 # 使用生成的私钥测试连接
-ssh -i ~/.ssh/deploy_key deploy@47.94.204.124 "whoami"
+ssh -i ~/.ssh/deploy_key deploy@154.8.167.1 "whoami"
 ```
 
 应该看到：
@@ -326,10 +326,10 @@ deploy
 
 ```bash
 # 测试 docker compose 命令
-ssh -i ~/.ssh/deploy_key deploy@47.94.204.124 "sudo docker compose --version"
+ssh -i ~/.ssh/deploy_key deploy@154.8.167.1 "sudo docker compose --version"
 
 # 测试 systemctl 命令
-ssh -i ~/.ssh/deploy_key deploy@47.94.204.124 "sudo systemctl status nginx.service"
+ssh -i ~/.ssh/deploy_key deploy@154.8.167.1 "sudo systemctl status nginx.service"
 ```
 
 ### 测试 GitHub Actions

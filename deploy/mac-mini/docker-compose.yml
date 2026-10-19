@@ -11,7 +11,7 @@ services:
       - --storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE:-8GB}
     ports: ['127.0.0.1:19090:9090']
     extra_hosts:
-      - monitoring.fangcunmount.cn:100.85.122.124
+      - monitoring.fangcunmount.cn:${MONITORING_GATEWAY_IP:-100.74.123.45}
     volumes:
       - ${MONITORING_DATA_ROOT:?set MONITORING_DATA_ROOT}/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ${MONITORING_DATA_ROOT}/targets:/etc/prometheus/targets:ro

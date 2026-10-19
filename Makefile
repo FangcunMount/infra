@@ -1137,7 +1137,8 @@ disk-usage: ## Docker 磁盘使用
 
 serverA-up: ## 启动 ServerA 服务栈 (Nginx)
 	$(call section_title,启动 ServerA (4C8G))
-	@$(MAKE) init-serverA ENV=$(ENV)
+	@docker network inspect infra-network >/dev/null || { echo "Run make init-serverA before first startup"; exit 1; }
+	@test -d /data/apps/nginx-configs -a -d /data/ssl/certs -a -d /data/ssl/private || { echo "ServerA directories are missing; initialize the new host first"; exit 1; }
 	@if docker ps --filter name=^nginx$$ --filter status=running -q | grep -q .; then \
 		cd deploy/serverA && docker compose --env-file ../../compose/env/prod/serverA.env up -d; \
 	else \
@@ -1165,6 +1166,7 @@ mysql-rds-proxy-recreate: mysql-rds-proxy-verify ## 在当前主机重建 RDS �
 	@docker compose \
 		--env-file compose/env/prod/$(MYSQL_RDS_PROXY_NODE).env \
 		-f deploy/$(MYSQL_RDS_PROXY_NODE)/docker-compose.yml \
+		$(if $(filter serverA,$(MYSQL_RDS_PROXY_NODE)),--profile aliyun-rds-proxy,) \
 		up -d --no-deps --force-recreate mysql-rds-proxy
 	$(call success_msg,mysql-rds-proxy 已原地重建)
 
