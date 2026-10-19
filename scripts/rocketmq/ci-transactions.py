@@ -22,6 +22,8 @@ import time
 from render import render
 
 
+DISCARD_TOPIC = "TRANS_CHECK_MAX_TIME_TOPIC"  # TopicValidator in pinned Broker 5.5.1.
+
 PARAMETERS = {"transactionTimeOut": 6000, "transactionCheckInterval": 5000,
               "transactionCheckMax": 24}
 
@@ -396,10 +398,10 @@ def main():
             result = run(["docker", "exec", broker, "java", "-Xms32m", "-Xmx128m",
                           "-XX:MaxDirectMemorySize=32m", "-cp", "/opt/rocketmq/conf:/opt/rocketmq/lib/*",
                           "org.apache.rocketmq.tools.command.MQAdminStartup", "queryMsgByKey",
-                          "-n", "nameserver:9876", "-t", "TRANS_CHECK_MAXTIME_TOPIC",
+                          "-n", "nameserver:9876", "-t", DISCARD_TOPIC,
                           "-k", "finite-check-limit"], timeout=30, required=False)
-            if "@TRANS_CHECK_MAXTIME_TOPIC@K@finite-check-limit@" in result.stdout:
-                proof["finite_check_discard_topic"] = "TRANS_CHECK_MAXTIME_TOPIC"
+            if "@" + DISCARD_TOPIC + "@K@finite-check-limit@" in result.stdout:
+                proof["finite_check_discard_topic"] = DISCARD_TOPIC
                 break
             time.sleep(2)
         else:

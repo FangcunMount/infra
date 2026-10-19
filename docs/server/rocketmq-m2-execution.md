@@ -26,7 +26,7 @@ Go探针使用SDK中基于官方5.1.4的私有快照：修复连接/RPC选项透
 - 另一owner的已提交凭证不能确认此消息；另一owner的账号也不能获取此Topic的半消息确认。
 - 两种客户端均必须拒绝不受信CA；SDK另有真实TLS gRPC回归测试，验证可信CA通过、错误CA和错误主机名被拒绝、拦截器到达实际RPC。
 - 读取实际生效的事务超时、回查间隔、次数和保留时间；缺字段即失败。只导出白名单数值，不输出带凭据的完整Broker配置。
-- 在隔离Broker降低回查次数，保持Python真实Unknown，必须在原生`TRANS_CHECK_MAXTIME_TOPIC`查到此消息；只等待超时不算通过。生产参数不随测试修改。
+- 在隔离Broker降低回查次数，保持Python真实Unknown，必须在原生`TRANS_CHECK_MAX_TIME_TOPIC`查到此消息；只等待超时不算通过。生产参数不随测试修改。
 
 ## 证据与后续
 
@@ -35,3 +35,5 @@ Go探针使用SDK中基于官方5.1.4的私有快照：修复连接/RPC选项透
 报告逐项记录通过/失败、0跳过、镜像ID、客户端版本、有效参数和探针源文件摘要。CI与Mac mini验证分别记录；本地缓存镜像验证不能替代CI的新构建签名证据。
 
 M2-0不能证明宿主事务绑定、执行fence、Mongo callback重入、幂等冻结计划、有界回查队列或生产恢复窗口。这些分别属于后续M2批次。通过之前不发布高级事务API，也不迁移IAM/QS/AI或停用NSQ。
+
+原生超限主题使用5.5.1 [TopicValidator实际常量](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/common/src/main/java/org/apache/rocketmq/common/topic/TopicValidator.java)，不能使用DefaultTransactionalMessageCheckListener日志中少一个下划线的拼写。验收通过真实消息索引查询确认原始测试key。
