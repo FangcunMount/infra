@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "task": "T23",
+  "complete": true,
+  "captured_at": "2026-10-19T08:51:01.252232+00:00",
+  "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+  "releases": [
+    {
+      "tag": "v0.5.0-rocketmq-tx.1",
+      "commit": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+      "url": "https://github.com/FangcunMount/reliable-messaging/releases/tag/v0.5.0-rocketmq-tx.1",
+      "published_at": "2026-10-19T08:49:31Z",
+      "prerelease": true,
+      "assets": {
+        "fangcun_reliable_messaging-0.4.0a1-py3-none-any.whl": "sha256:47c67e6037f427da4e27597ddaaac4fb4c38f8bc78c5c6aa4758618d53d05606",
+        "fangcun_reliable_messaging-0.4.0a1.tar.gz": "sha256:a6d9e2a1931d9713136a49802eb95078f9f16ddc0f131e3bfe7999ab849f0206",
+        "SHA256SUMS": "sha256:03aa42ce9c7ea59e2c9ad25b2561c0be4411f5648489c33f5c216e3a8cc6ecb7",
+        "transaction-acceptance.json": "sha256:aed3016114e8e423ff3a63b30e8423c6ebd19e49485c3edffff8cdbee8b9a7ee",
+        "transaction-release-receipt.json": "sha256:8f7a49641dc39cbc7f0a29f32ca971d818ed0aa7542eb7e252968e25f7da9cfc",
+        "uv.lock": "sha256:3d4d70f68e5b660713cfd26df4989b12dd77b4a7970d42f4a4cc137e9e7f7cb1"
+      }
+    },
+    {
+      "tag": "python/v0.4.0a1",
+      "commit": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+      "url": "https://github.com/FangcunMount/reliable-messaging/releases/tag/python/v0.4.0a1",
+      "published_at": "2026-10-19T08:49:37Z",
+      "prerelease": true,
+      "assets": {
+        "fangcun_reliable_messaging-0.4.0a1-py3-none-any.whl": "sha256:47c67e6037f427da4e27597ddaaac4fb4c38f8bc78c5c6aa4758618d53d05606",
+        "fangcun_reliable_messaging-0.4.0a1.tar.gz": "sha256:a6d9e2a1931d9713136a49802eb95078f9f16ddc0f131e3bfe7999ab849f0206",
+        "SHA256SUMS": "sha256:03aa42ce9c7ea59e2c9ad25b2561c0be4411f5648489c33f5c216e3a8cc6ecb7",
+        "transaction-acceptance.json": "sha256:aed3016114e8e423ff3a63b30e8423c6ebd19e49485c3edffff8cdbee8b9a7ee",
+        "transaction-release-receipt.json": "sha256:8f7a49641dc39cbc7f0a29f32ca971d818ed0aa7542eb7e252968e25f7da9cfc",
+        "uv.lock": "sha256:3d4d70f68e5b660713cfd26df4989b12dd77b4a7970d42f4a4cc137e9e7f7cb1"
+      }
+    }
+  ],
+  "published_installation_verified": false,
+  "pypi_published": false,
+  "production_changed": false
+}
