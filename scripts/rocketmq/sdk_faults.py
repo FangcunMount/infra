@@ -55,7 +55,10 @@ def run_faults(start, proxy_start, passed, sql, mongo_command, restart_broker, *
                 for index in range(3):
                     observer.wait('received', f'{identity}-b{index}')
             else:
-                recovery.wait('checked', decision='rollback', timeout=100)
+                if result['local'] == 'unknown':
+                    recovery.wait('checked', decision='rollback', timeout=100)
+                elif result['local'] != 'aborted':
+                    raise RuntimeError('before-commit loss falsely reported committed')
                 for index in range(3):
                     assert_absent(observer, f'{identity}-b{index}', 1)
             stop(recovery)

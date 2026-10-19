@@ -583,7 +583,8 @@ def main():
                                       "events": p.events} for p in probes],
                   "limits": (["No production acceptance or throughput claim",
                               "Public producer/consumer SDK, original transaction stores and scoped v2 owner ACLs",
-                              "Packet-level commit faults and native-limit SDK audit remain T19-T20 gates"]
+                              ("Actual packet commit faults and native-limit audit required in this report" if args.sdk_limits else
+                               "Packet faults/native-limit audit are separate gates not claimed by this profile")]
                              if args.sdk_api_go else ["No production acceptance or throughput claim",
                               "Raw-client feasibility only; not public SDK transaction acceptance",
                               "Response loss is client-side discard after real RPC, not packet-level loss"]),
@@ -629,8 +630,24 @@ def main():
         if dirty_sdk:
             report["failed"] = 1
             report["failure"] = report["failure"] or "tracked SDK source changed during acceptance"
+        # All evidence needed for the public report is now captured. Restore
+        # ownership only under THIS random private fixture mount, then remove its
+        # credentials, TLS key, audit files, logs and Broker store. Never prune
+        # images or touch another Compose project's directories/volumes.
+        private_removed = False
+        try:
+            if directory.parent != Path(tempfile.gettempdir()) or not directory.name.startswith("rocketmq-m2-"):
+                raise RuntimeError("private fixture directory guard failed")
+            run(["docker","run","--rm","--user","0","--entrypoint","chown",
+                 "-v",str(directory)+":/owned",image,"-R",f"{os.getuid()}:{os.getgid()}","/owned"],timeout=45)
+            shutil.rmtree(directory)
+            private_removed = not directory.exists()
+        except Exception:
+            report["failed"] = 1
+            report["failure"] = report["failure"] or "private fixture cleanup failed"
+        report["cleanup"]["private_fixture_directory_removed"] = private_removed
         args.report.write_text(json.dumps(report, indent=2) + "\n")
-        if remaining or dirty_sdk:
+        if remaining or dirty_sdk or not private_removed:
             raise RuntimeError("owned cleanup or exact SDK source verification failed")
 
 
