@@ -10,7 +10,7 @@
 
 进度：**18/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
-### 最新核验快照（2026-10-19 14:34 +08:00）
+### 最新核验快照（2026-10-19 14:35 +08:00）
 
 本表持续维护已批准的《M2 完整实施规划：事务 SDK、双存储证明与固定预发布》，任务仍为24项。本次仅同步核验状态，不将已实现、CI运行中或待发布记为完成。
 
@@ -18,7 +18,7 @@
 | --- | --- |
 | 已完成任务 | T01–T18，18/24；M2-P 至 M2-4 已满足对应合并门禁；T17/T18 已实现并验证，相关 PR 待合并 |
 | 当前 SDK 候选 | `8841fdfcdd9ec25b49f845a3ed3eb825385d0c32`（精确观测当前消息的真实Checker证据读取，待48项重验）；[PR43](https://github.com/FangcunMount/reliable-messaging/pull/43) 待合并 |
-| 当前 infra 验收源码 | `820953d558d39943ef549ebe00b13de35dc48d02`；[PR27](https://github.com/FangcunMount/infra/pull/27) 待合并；本次记录更新在其后单独记账 |
+| 当前 infra 验收源码 | `85a2a6157c534cfcb3540895c2d802008d627609`（精确区分直接Rollback ACK和未决半消息回查）；[PR27](https://github.com/FangcunMount/infra/pull/27) 待合并；本次记录更新在其后单独记账 |
 | 当前候选 8841fdf 源码检查 | [源码/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179044)、[真实存储适配](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179271)、[Python源码及安装包](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179114)、[既有基础设施回归](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179029) 均通过；不能替代下列 Broker 故障门禁 |
 | T17–T18 | [双 profile 公开 SDK 31项/档](https://github.com/FangcunMount/infra/actions/runs/39201819179) 均通过、0跳过；owner 拒绝、共享消费预算及全部正式入口通过；[结构化证据](evidence/rocketmq-m2-sdk-routing-e2e-20261019.json) |
 | T19 | 当前[48项完整](https://github.com/FangcunMount/infra/actions/runs/39208349317)及[46项含故障](https://github.com/FangcunMount/infra/actions/runs/39208349372)双档各37项后，因错误要求已直接回滚分支再次回查而失败；[精确阶段证据及修正](evidence/rocketmq-m2-sdk-half-rollback-oracle-20261019.json)已保存，25项本地脚本通过，新真实门禁待重验；原46项通过仅为历史 |
@@ -28,6 +28,8 @@
 | 发布 / 生产 | 两语言 tag 与 GitHub 预发布均未创建；未执行生产变更，业务链路仍属 M3 范围 |
 
 当前精确候选：[31项公开SDK](https://github.com/FangcunMount/infra/actions/runs/39208349294)双档已通过、0失败/跳过；[46项含故障](https://github.com/FangcunMount/infra/actions/runs/39208349372)及[48项完整矩阵](https://github.com/FangcunMount/infra/actions/runs/39208349317)失败并保留证据；[普通消息/既有协议回归](https://github.com/FangcunMount/infra/actions/runs/39208349304)共享消费预算前的原事务/恢复18项通过、随后空闲Mongo生产者启动grpc_Internal失败。SDK不变，infra判据修正提交后重新执行全部真实门禁。
+
+修正候选85a2a61已提交新运行：[31项公开SDK](https://github.com/FangcunMount/infra/actions/runs/39210736101)、[46项含故障](https://github.com/FangcunMount/infra/actions/runs/39210736172)、[48项完整](https://github.com/FangcunMount/infra/actions/runs/39210736275)、[Docker完整回归](https://github.com/FangcunMount/infra/actions/runs/39210736103)。SDK仍固定8841fdf；这些运行完成前不打勾，也不以旧候选结果替代。
 
 下一步：完成 T19/T20 并通过合并门禁，随后冻结契约及执行 T21–T24。若上述运行失败，保留失败证据，修复后按新精确 SHA 重新验证；不以旧候选结果替代。
 
