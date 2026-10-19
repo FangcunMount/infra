@@ -40,8 +40,8 @@ class NativeReceiptTest(unittest.TestCase):
                         run_test_group([sys.executable, '-c', source, str(pidfile)],
                                        cwd=directory, env=os.environ.copy(), stream=stream, timeout=.5)
                 child = int(pidfile.read_text())
-                with self.assertRaises(ProcessLookupError):
-                    os.kill(child, 0)
+                state = subprocess.run(['ps', '-o', 'stat=', '-p', str(child)], capture_output=True, text=True)
+                self.assertTrue(state.returncode == 1 or state.stdout.strip().startswith('Z'))
             finally:
                 if pidfile.exists():
                     try:

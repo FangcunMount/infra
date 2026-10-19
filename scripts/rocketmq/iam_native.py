@@ -65,38 +65,50 @@ def test_counts(raw):
     return counts, sorted(REQUIRED)
 
 
+def live_test_group(group):
+    # signal0 can return EPERM for an already dead/orphaned group on macOS.
+    # Zombie processes own no running DB/RPC work; their supervisor owns reaping.
+    result = subprocess.run(['ps', '-o', 'pid=,stat=', '-g', str(group)],
+                            capture_output=True, text=True, timeout=5)
+    if result.returncode == 1 and not result.stdout.strip():
+        return False
+    if result.returncode:
+        raise RuntimeError('owned test process state unavailable')
+    states = [line.split() for line in result.stdout.splitlines() if line.strip()]
+    if any(len(row) != 2 or not row[0].isdigit() for row in states):
+        raise RuntimeError('owned test process state unreadable')
+    return any(not row[1].startswith('Z') for row in states)
+
+
 def run_test_group(argv, *, cwd, env, stream, timeout):
     process = subprocess.Popen(argv, cwd=cwd, env=env, stdout=stream,
                                stderr=subprocess.STDOUT, start_new_session=True)
     try:
         return process.wait(timeout=timeout)
     finally:
-        # go may own compiler/test grandchildren. Cleanup belongs to the whole
-        # new session, even if its launcher exited before a child did.
         try:
             os.killpg(process.pid, signal.SIGTERM)
-        except ProcessLookupError:
+        except (ProcessLookupError, PermissionError):
+            # Permission errors are not completion proof. Inspect actual live
+            # processes below and fail closed if any still owns work.
             pass
         deadline = time.monotonic() + 3
         while time.monotonic() < deadline:
             process.poll()
-            try:
-                os.killpg(process.pid, 0)
-            except ProcessLookupError:
+            if not live_test_group(process.pid):
                 break
             time.sleep(.02)
         else:
             try:
                 os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
+            except (ProcessLookupError, PermissionError):
                 pass
         process.wait(timeout=5)
-        try:
-            os.killpg(process.pid, 0)
-        except ProcessLookupError:
-            pass
-        else:
-            raise RuntimeError('owned Go test process group has not drained')
+        deadline = time.monotonic() + 2
+        while live_test_group(process.pid):
+            if time.monotonic() >= deadline:
+                raise RuntimeError('owned Go test process group has not drained')
+            time.sleep(.02)
 
 
 def main():
