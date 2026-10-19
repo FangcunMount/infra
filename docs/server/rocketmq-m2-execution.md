@@ -10,7 +10,7 @@
 
 进度：**18/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
-### 最新核验快照（2026-10-19 14:20 +08:00）
+### 最新核验快照（2026-10-19 14:31 +08:00）
 
 本表持续维护已批准的《M2 完整实施规划：事务 SDK、双存储证明与固定预发布》，任务仍为24项。本次仅同步核验状态，不将已实现、CI运行中或待发布记为完成。
 
@@ -21,13 +21,13 @@
 | 当前 infra 验收源码 | `820953d558d39943ef549ebe00b13de35dc48d02`；[PR27](https://github.com/FangcunMount/infra/pull/27) 待合并；本次记录更新在其后单独记账 |
 | 当前候选 8841fdf 源码检查 | [源码/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179044)、[真实存储适配](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179271)、[Python源码及安装包](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179114)、[既有基础设施回归](https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179029) 均通过；不能替代下列 Broker 故障门禁 |
 | T17–T18 | [双 profile 公开 SDK 31项/档](https://github.com/FangcunMount/infra/actions/runs/39201819179) 均通过、0跳过；owner 拒绝、共享消费预算及全部正式入口通过；[结构化证据](evidence/rocketmq-m2-sdk-routing-e2e-20261019.json) |
-| T19 | [现有46项双档完整验收](https://github.com/FangcunMount/infra/actions/runs/39203750293) 通过；[独立44项](https://github.com/FangcunMount/infra/actions/runs/39203750280) 一档44项通过、另一档42项后重启Topic路由暂缺；补齐有界空闲启动等待及2项部分准备后SIGKILL，下一候选要求46项故障验收/48项完整验收 |
+| T19 | 当前[48项完整](https://github.com/FangcunMount/infra/actions/runs/39208349317)及[46项含故障](https://github.com/FangcunMount/infra/actions/runs/39208349372)双档各37项后，因错误要求已直接回滚分支再次回查而失败；[精确阶段证据及修正](evidence/rocketmq-m2-sdk-half-rollback-oracle-20261019.json)已保存，25项本地脚本通过，新真实门禁待重验；原46项通过仅为历史 |
 | T20 | 已取得Go/Python真实原生超限索引、0600审计和封新准入证据（双档各2项），见[核心故障证据](evidence/rocketmq-m2-sdk-core-faults-20261019.json)；新增实际进程组排空门禁随48项矩阵重验，前置T19未完成前不打勾 |
-| 普通消息及既有协议回归 | [SDK 3bed26b 完整Docker验收](https://github.com/FangcunMount/infra/actions/runs/39203750215) 通过，raw20项/公开Go19项0跳过；197a267候选待重新绑定验收 |
+| 普通消息及既有协议回归 | [当前8841fdf Docker验收](https://github.com/FangcunMount/infra/actions/runs/39208349304)的普通消息及raw20项已通过；公开Go19项仍运行，尚不计完整回归通过 |
 | T21–T24 | 文档、示例及发布后安装流程已准备；API冻结、最终合并 SHA、该 SHA 完整 CI、固定发布和下载重装均待前置门禁 |
 | 发布 / 生产 | 两语言 tag 与 GitHub 预发布均未创建；未执行生产变更，业务链路仍属 M3 范围 |
 
-当前精确候选运行：[31项公开SDK](https://github.com/FangcunMount/infra/actions/runs/39208349294)、[46项含故障](https://github.com/FangcunMount/infra/actions/runs/39208349372)、[48项完整矩阵](https://github.com/FangcunMount/infra/actions/runs/39208349317)及[普通消息/既有协议回归](https://github.com/FangcunMount/infra/actions/runs/39208349304)，均在运行中，不计为通过。
+当前精确候选：[31项公开SDK](https://github.com/FangcunMount/infra/actions/runs/39208349294)双档已通过、0失败/跳过；[46项含故障](https://github.com/FangcunMount/infra/actions/runs/39208349372)及[48项完整矩阵](https://github.com/FangcunMount/infra/actions/runs/39208349317)失败并保留证据；[普通消息/既有协议回归](https://github.com/FangcunMount/infra/actions/runs/39208349304)仍运行。SDK不变，infra判据修正提交后重新执行真实门禁。
 
 下一步：完成 T19/T20 并通过合并门禁，随后冻结契约及执行 T21–T24。若上述运行失败，保留失败证据，修复后按新精确 SHA 重新验证；不以旧候选结果替代。
 
@@ -89,6 +89,8 @@ T19 失败记录：[包级故障39201819131](https://github.com/FangcunMount/inf
 精确回查门禁修正：[39206054502](https://github.com/FangcunMount/infra/actions/runs/39206054502) 的新增部分准备/SIGKILL场景在39项通过后失败：全局Rollback计数可能来自旧消息，不能证明当前execution已中止。旧进程组已真实退出，失败报告确认容器、私有目录及全部fixture进程组均排空。SDK 8841fdf仅在恢复探针中通过公共PreparedStore/Evidence接口透明观察真实读取，原样返回原证据/错误，不额外查库、不确认Broker；验收按当前原消息ID匹配Reference及其决定，并分别核对execution/全部witness和真实消费可见性。包括基础跨语言恢复、DB不可用、部分ACK丢失、SIGKILL、重启及原生Unknown的全部公开SDK回查场景统一采用该判据，旧全局指标仅作诊断。22项本地脚本（含排除旧Reference/全局计数误判）及探针编译、lint/格式/49篇文档检查通过；48项真实门禁待重验，T19/T20不打勾。
 
 同一48项旧运行的另一档在45项通过后，Python/MySQL重启恢复的6次1秒间隔启动均返回40402而失败，资源清理通过；未将其计通过。保留最多6次/100秒准入窗口，将空闲启动尝试间隔扩至最多15秒，覆盖重启后的注册/路由恢复；仍只接受明确40402且前一实例已经完全排空，其他错误立即失败，业务不重做。
+
+半消息丢ACK判据修正：[39208349317](https://github.com/FangcunMount/infra/actions/runs/39208349317)及[39208349372](https://github.com/FangcunMount/infra/actions/runs/39208349372)均在双档各37项通过后失败；原判据等待b0/b1同时真实回查，但结果证明b0已收到真实Rollback ACK、仅b1仍需新实例精确回查，b2从未发送。本地业务0次、三个阶段均保留、全部fixture资源清理完成。已改为严格校验三分支阶段，排除已有RollbackConfirmed的分支，仅等待实际未决半消息的精确回查，并额外核对execution及全部3个witness为Aborted；SIGKILL场景仍要求两个已准备分支全部回查。25项本地脚本通过，真实48项新门禁待重验，进度仍18/24。见[失败与修正证据](evidence/rocketmq-m2-sdk-half-rollback-oracle-20261019.json)。
 
 执行顺序：T01 → T02–T04 → T05–T09 → T10–T13 → T14–T16 → T17–T20 → T21–T24；不跳过前置门禁。
 

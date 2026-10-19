@@ -9,6 +9,29 @@ import time
 from sdk_acceptance import assert_absent, wait_reference_checks
 
 
+def partial_half_rollback_checks(result, identity):
+    """Only unresolved prepared halves need Broker checks after a graceful abort.
+
+    The first half can already have a real Rollback ACK. The second was prepared
+    at the Broker but its ACK was lost, so it must be checked by the new instance.
+    The third was never sent and must not acquire a fictitious check requirement.
+    """
+    branches = result.get('branches', [])
+    if (result.get('local') != 'not_started' or result.get('local_calls') != 0
+            or len(branches) != 3):
+        raise RuntimeError('partial half unexpectedly started business or changed branch count')
+    checks = []
+    for index, (branch, half) in enumerate(zip(branches, ('prepared', 'unknown', 'not_attempted'))):
+        message_id = f'{identity}-b{index}'
+        allowed_final = {'rollback_confirmed', 'unknown'} if index == 0 else {'not_attempted'}
+        if (branch.get('message_id') != message_id or branch.get('half') != half
+                or branch.get('final') not in allowed_final):
+            raise RuntimeError('partial half stages differ from the exact second-ACK loss boundary')
+        if index == 1 or (index == 0 and branch['final'] != 'rollback_confirmed'):
+            checks.append(message_id)
+    return checks
+
+
 def recover_after_restart(start, language, storage):
     """TCP health does not prove that all persisted owner routes are ready.
 
@@ -141,7 +164,12 @@ def run_faults(start, proxy_start, passed, sql, mongo_command, restart_broker, *
             if method == 'SendMessage':
                 if count != '0' or result['local_calls'] != 0:
                     raise RuntimeError('uncertain partial half started business')
-                wait_reference_checks(recovery, [f'{identity}-b{i}' for i in range(2)], 'rollback')
+                wait_reference_checks(recovery, partial_half_rollback_checks(result, identity), 'rollback')
+                if sql(f"SELECT state FROM rm_tx_execution WHERE operation_id='op-{identity}';") != 'aborted':
+                    raise RuntimeError('partial ACK loss lacks durable execution abort')
+                if sql("SELECT COUNT(*) FROM rm_tx_witness w JOIN rm_tx_execution e USING(execution_key) "
+                       f"WHERE e.operation_id='op-{identity}' AND w.state='aborted';") != '3':
+                    raise RuntimeError('partial ACK loss lacks all exact aborted witnesses')
                 for index in range(3):
                     assert_absent(observer, f'{identity}-b{index}', 1)
             else:
