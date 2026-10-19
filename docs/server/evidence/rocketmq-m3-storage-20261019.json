@@ -33,7 +33,7 @@
       "merge_sha": "c0acb432ae4c03978264e2c63441011b1a4b8f31"
     },
     "qs-server": {
-      "source_sha": "3f47ff9f458e",
+      "source_sha": "3f47ff9f458e7b12654328025e9a61cb50cd3dc7",
       "head_sha": "2936bd51229f51b95308fb058b295fd3b9e88b7b",
       "merged": true,
       "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39255581089",
@@ -54,7 +54,7 @@
       "merge_sha": "9ebf2d6c5b8b7eec60efe608b73193cc614b9a2c"
     },
     "qs-ai": {
-      "source_sha": "2f7991e",
+      "source_sha": "2f7991e92d9c59a1fb1ec21a6613b3e76308d8a1",
       "head_sha": "10687a10f2c9bf86c781f27220dcff2f6aa4a836",
       "merged": true,
       "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547832",
@@ -220,7 +220,7 @@
     },
     "archive_native_qs_current": {
       "head_sha": "2936bd51229f51b95308fb058b295fd3b9e88b7b",
-      "source_sha": "3f47ff9f4",
+      "source_sha": "3f47ff9f458e7b12654328025e9a61cb50cd3dc7",
       "job": "https://github.com/FangcunMount/qs-server/actions/runs/39255581089/job/118069913820",
       "step": {
         "conclusion": "success",
@@ -294,7 +294,7 @@
     "4/36; T04 checked only after schema/archive/root/retained-reader task proofs passed; M3-P required PRs merged; production remains separate",
     "IAM local broad regression has 18 pre-existing optional MySQL skips; not a required-native pass",
     "Go tagged native tests compile locally but have not executed a database locally",
-    "No business write entry migrated, no merge/stable release/production schema/Topic/ACL/provider change",
+    "No business write entry migrated, source merges recorded separately; no stable release/production schema/Topic/ACL/provider change",
     "Existing model retry, receipt and first wire responsibilities unchanged; no host pools/worker concurrency changed"
   ],
   "history": [
@@ -364,14 +364,14 @@
   ],
   "archive_candidates": {
     "qs-server": {
-      "source_sha": "3f47ff9f4",
+      "source_sha": "3f47ff9f458e7b12654328025e9a61cb50cd3dc7",
       "head_sha": "2936bd51229f51b95308fb058b295fd3b9e88b7b",
       "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39255581089",
       "status": "success: complete final candidate CI including required native archive and all regression gates"
     },
     "qs-ai": {
-      "source_sha": "2f7991e",
-      "head_sha": "10687a1",
+      "source_sha": "2f7991e92d9c59a1fb1ec21a6613b3e76308d8a1",
+      "head_sha": "10687a10f2c9bf86c781f27220dcff2f6aa4a836",
       "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547832",
       "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547837",
       "status": "required M7 and complete8-shard CI success;3101 tests exactly once per MySQL version,0 skipped"

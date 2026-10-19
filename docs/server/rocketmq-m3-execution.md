@@ -17,10 +17,10 @@ IAM、qs-server、qs-ai 最终采用 RocketMQ：可靠发布使用事务消息�
 | 仓库 | 起始 main SHA | 责任 |
 | --- | --- | --- |
 | reliable-messaging | `1630aa59d87abf1c69f183be4be7c662a29cae52` | 已有 M2 事务 SDK；预发布运行源码 bfaae2b |
-| IAM | main c0acb432；T05 codex/rocketmq-m3-iam | [PR130](https://github.com/FangcunMount/iam/pull/130)已合并；[最终CI](https://github.com/FangcunMount/iam/actions/runs/39255584214)/[独立并发](https://github.com/FangcunMount/iam/actions/runs/39255584248)通过 | 生产CD保持暂停，M3未切换 |
+| IAM | `b8e8a9e604074f9850472f2538137e342964fc0c` | 授权事实、策略版本及订阅 |
 | qs-server | `f6ee489a88276822069612865f2decf40168afdd` | MySQL/Mongo 业务事务、消费与 AI 对接 |
 | qs-ai | `c288eb94c09a8ac930f0ae6b03d62a09147b72fb` | 模型事实、状态、冻结结果及回执 |
-| infra | codex/rocketmq-m3 | [PR37](https://github.com/FangcunMount/infra/pull/37)已合并878c130；进度后续PR单列 | M3生产变更未执行 |
+| infra | `5ae07289d64ef44a50e79d4d387cc0d13d555cf9` | serverD Docker Broker、资源与生产交付 |
 
 已确认：先完成固定预发布接入验证，再发布稳定 SDK；生产只做一次协调切换，维护窗口目标 30 分钟；IAM 增加可选幂等键和操作查询，兼容旧调用。保持三个 worker 原资源及并发，不迁 Redis、不做 Broker HA 改造或跨云吞吐压测。历史 Outbox 表、NSQ 数据卷和事务证据不在本批物理删除范围。
 
