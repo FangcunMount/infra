@@ -1,0 +1,1325 @@
+{
+  "version": 1,
+  "captured_at": "2026-10-19T05:43:02.035564+00:00",
+  "tasks": [
+    "T19",
+    "T20"
+  ],
+  "completion": false,
+  "note": "Core 13 faults plus 2 native limits passed both profiles; new partial SIGKILL/process-group proof and strict restart readiness remain mandatory in the 48-case candidate.",
+  "sdk_sha": "3bed26b7e4ee906a293bd574b59dea28d939a282",
+  "infra_sha": "ca7c5139e7d274bff45df1eb5262675e878f4e46",
+  "core_ci": "https://github.com/FangcunMount/infra/actions/runs/39203750293",
+  "separate_restart_failure": {
+    "ci": "https://github.com/FangcunMount/infra/actions/runs/39203750280",
+    "go1.25.9": {
+      "passed": 44,
+      "failed": 0,
+      "skipped": 0
+    },
+    "go1.25.12": {
+      "passed": 42,
+      "failed": 1,
+      "skipped": 0,
+      "failure_code": "rocketmq_40402",
+      "stage": "new Go Mongo checker startup after Broker restart",
+      "drained_startup": true
+    }
+  },
+  "reports": [
+    {
+      "sdk_sha": "3bed26b7e4ee906a293bd574b59dea28d939a282",
+      "go_version": "go1.25.9",
+      "python_runtime": {
+        "python": "3.11.16",
+        "client": "5.1.2",
+        "sdk_version": "0.4.0a1",
+        "package_file": "/home/runner/work/infra/infra/.sdk-acceptance/python/src/reliable_messaging/__init__.py"
+      },
+      "image": "sha256:795768ef523003ddf8c4f7ec8eca61c47957d26e23303092b0a55a28ef965577",
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "cases": {
+        "v2_go_python_infra_exact_route_vectors": true,
+        "v2_existing_type_conflict_refuses_all_resource_mutations": true,
+        "v2_idempotent_typed_resources_and_minimum_owner_acls": true,
+        "v2_existing_configuration_conflict_refused": true,
+        "v2_sdk-go_wrong_owner_broker_denied_without_business": true,
+        "v2_sdk-python_wrong_owner_broker_denied_without_business": true,
+        "public_go_mysql_half_then_commit": true,
+        "public_go_mysql_half_then_rollback": true,
+        "public_go_mysql_new_instance_crash-committed": true,
+        "public_go_mysql_new_instance_crash-prepared": true,
+        "public_go_untrusted_ca_startup_really_drained": true,
+        "public_go_same_process_client_isolation": true,
+        "public_go_real_database_outage_unknown_then_recovery": true,
+        "public_go_mysql_exact_business_and_wire_set": true,
+        "public_go_mongo_half_then_commit": true,
+        "public_go_mongo_half_then_rollback": true,
+        "public_go_mongo_new_instance_crash-committed": true,
+        "public_go_mongo_new_instance_crash-prepared": true,
+        "public_go_mongo_exact_business_and_wire_set": true,
+        "public_python_half_then_commit": true,
+        "public_python_half_then_rollback": true,
+        "public_sdk-python_to_sdk-python_crash-committed": true,
+        "public_sdk-python_to_sdk-python_crash-prepared": true,
+        "public_sdk-go_to_sdk-python_crash-committed": true,
+        "public_sdk-python_to_sdk-go_crash-committed": true,
+        "public_python_real_database_outage_unknown_then_recovery": true,
+        "public_python_untrusted_ca_startup_really_drained": true,
+        "public_python_same_process_client_isolation": true,
+        "public_python_cross_language_exact_business_and_wire_set": true,
+        "v2_sdk-go_three_physical_inputs_share_two_handler_budget": true,
+        "v2_sdk-python_three_physical_inputs_share_two_handler_budget": true,
+        "public_sdk-go_mysql_real_database_commit_before_tcp_loss": true,
+        "public_sdk-go_mysql_real_database_commit_after_tcp_loss": true,
+        "public_sdk-go_mongo_real_database_commit_before_tcp_loss": true,
+        "public_sdk-go_mongo_real_database_commit_after_tcp_loss": true,
+        "public_sdk-python_mysql_real_database_commit_before_tcp_loss": true,
+        "public_sdk-python_mysql_real_database_commit_after_tcp_loss": true,
+        "public_sdk-go_sendmessage_after_real_broker_ack_tcp_loss": true,
+        "public_sdk-go_endtransaction_after_real_broker_ack_tcp_loss": true,
+        "public_sdk-python_sendmessage_after_real_broker_ack_tcp_loss": true,
+        "public_sdk-python_endtransaction_after_real_broker_ack_tcp_loss": true,
+        "public_sdk-go_mysql_producer_exit_broker_restart_new_checker": true,
+        "public_sdk-go_mongo_producer_exit_broker_restart_new_checker": true,
+        "public_sdk-python_mysql_producer_exit_broker_restart_new_checker": true,
+        "public_sdk-go_native_limit_unknown_private_audit_and_admission_alarm": true,
+        "public_sdk-python_native_limit_unknown_private_audit_and_admission_alarm": true
+      },
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "private_fixture_directory_removed": true
+      },
+      "proof": {
+        "effective_broker_parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "mysql_version": "8.0.36",
+        "mongo_version": "7.0.37",
+        "routing_v2": {
+          "route_vectors_sha256": "7f0be6a272fde5b7e923ff9bfc80bea05a4b3550b847dd97a624d1aeda862ae9",
+          "manifest_sha256": "df1f144843a438c45f9fdb70a5cb3ae870737ec473235a99a11c09a6ea6fe471",
+          "provision_receipt": {
+            "version": 2,
+            "operations": 37,
+            "typed_topics": 9,
+            "principals": 3,
+            "verified": true
+          },
+          "idempotent_operations": 0,
+          "typed_topics": {
+            "rmq2_t_b39b7358ba9f6f782035c9047d38b2bd": "TRANSACTION",
+            "rmq2_t_6ec9c30c00c7848cd09d146e22e21592": "TRANSACTION",
+            "rmq2_t_fa0ffe4b5d16a3ff90978bd4219d95d0": "NORMAL",
+            "rmq2_t_6c04f5940f12b26ce91fc228719fe25c": "TRANSACTION",
+            "rmq2_t_f61c3469d48d05a6cc9b8181cf0d53de": "TRANSACTION",
+            "rmq2_t_b4e3cbae8429d221f9ccb202a73bc3d9": "NORMAL",
+            "rmq2_t_9ae6cf8c6d2ef2a69f7f8a5b12e8cc5b": "TRANSACTION",
+            "rmq2_t_cd86744c87c55e47204eb79c12dbb5f5": "TRANSACTION",
+            "rmq2_t_3c49548d057b561ef575801a2b3c10de": "NORMAL"
+          },
+          "owner_actions": "publishers Pub/Get on their exact owner routes; observer Sub/Get only"
+        },
+        "packet_faults": [
+          {
+            "case": "packet-sdk-go-mysql-db-before",
+            "injection": {
+              "backend_ack": false,
+              "boundary": "before",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mysql"
+            },
+            "proxy": {
+              "backend_commit_acks": 0,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 1
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "017CED8D3C2AE96BC70AE7457900000000",
+                  "broker_transaction_id": "017CED8D3C2AE96BC70AE7457900000000",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-before-b0"
+                },
+                {
+                  "broker_message_id": "017CED8D3C2AE96BC70AE7457900000001",
+                  "broker_transaction_id": "017CED8D3C2AE96BC70AE7457900000001",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-before-b1"
+                },
+                {
+                  "broker_message_id": "017CED8D3C2AE96BC70AE7457900000002",
+                  "broker_transaction_id": "017CED8D3C2AE96BC70AE7457900000002",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-before-b2"
+                }
+              ],
+              "local": "unknown",
+              "local_calls": 1
+            },
+            "business_count": 0
+          },
+          {
+            "case": "packet-sdk-go-mysql-db-after",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mysql"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 1
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "017CED8D3C2AE96D940AE7458E00000000",
+                  "broker_transaction_id": "017CED8D3C2AE96D940AE7458E00000000",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-after-b0"
+                },
+                {
+                  "broker_message_id": "017CED8D3C2AE96D940AE7458E00000001",
+                  "broker_transaction_id": "017CED8D3C2AE96D940AE7458E00000001",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-after-b1"
+                },
+                {
+                  "broker_message_id": "017CED8D3C2AE96D940AE7458E00000002",
+                  "broker_transaction_id": "017CED8D3C2AE96D940AE7458E00000002",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-after-b2"
+                }
+              ],
+              "local": "committed",
+              "local_calls": 1
+            },
+            "business_count": 1
+          },
+          {
+            "case": "packet-sdk-go-mongo-db-before",
+            "injection": {
+              "backend_ack": false,
+              "boundary": "before",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mongo"
+            },
+            "proxy": {
+              "backend_commit_acks": 0,
+              "dropped": 2,
+              "event": "stats",
+              "seen": 2
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "017CED8D3C2AE96DE10AE7458F00000000",
+                  "broker_transaction_id": "017CED8D3C2AE96DE10AE7458F00000000",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-before-b0"
+                },
+                {
+                  "broker_message_id": "017CED8D3C2AE96DE10AE7458F00000001",
+                  "broker_transaction_id": "017CED8D3C2AE96DE10AE7458F00000001",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-before-b1"
+                },
+                {
+                  "broker_message_id": "017CED8D3C2AE96DE10AE7458F00000002",
+                  "broker_transaction_id": "017CED8D3C2AE96DE10AE7458F00000002",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-before-b2"
+                }
+              ],
+              "local": "unknown",
+              "local_calls": 1
+            },
+            "business_count": 0
+          },
+          {
+            "case": "packet-sdk-go-mongo-db-after",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mongo"
+            },
+            "proxy": {
+              "backend_commit_acks": 2,
+              "dropped": 2,
+              "event": "stats",
+              "seen": 2
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "017CED8D3C2AE96FD10AE745A400000000",
+                  "broker_transaction_id": "017CED8D3C2AE96FD10AE745A400000000",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-after-b0"
+                },
+                {
+                  "broker_message_id": "017CED8D3C2AE96FD10AE745A400000001",
+                  "broker_transaction_id": "017CED8D3C2AE96FD10AE745A400000001",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-after-b1"
+                },
+                {
+                  "broker_message_id": "017CED8D3C2AE96FD10AE745A400000002",
+                  "broker_transaction_id": "017CED8D3C2AE96FD10AE745A400000002",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-after-b2"
+                }
+              ],
+              "local": "committed",
+              "local_calls": 1
+            },
+            "business_count": 1
+          },
+          {
+            "case": "packet-sdk-python-mysql-db-before",
+            "injection": {
+              "backend_ack": false,
+              "boundary": "before",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mysql"
+            },
+            "proxy": {
+              "backend_commit_acks": 0,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 1
+            },
+            "local_result": {
+              "local": "unknown",
+              "local_calls": 1,
+              "branches": [
+                {
+                  "message_id": "packet-sdk-python-mysql-db-before-b0",
+                  "half": "prepared",
+                  "final": "not_attempted",
+                  "error_code": "",
+                  "broker_message_id": "01BF7AD2697041702D0AE745A700000000",
+                  "broker_transaction_id": "01BF7AD2697041702D0AE745A700000000"
+                },
+                {
+                  "message_id": "packet-sdk-python-mysql-db-before-b1",
+                  "half": "prepared",
+                  "final": "not_attempted",
+                  "error_code": "",
+                  "broker_message_id": "01BF7AD2697041702D0AE745A700000001",
+                  "broker_transaction_id": "01BF7AD2697041702D0AE745A700000001"
+                },
+                {
+                  "message_id": "packet-sdk-python-mysql-db-before-b2",
+                  "half": "prepared",
+                  "final": "not_attempted",
+                  "error_code": "",
+                  "broker_message_id": "01BF7AD2697041702D0AE745A700000002",
+                  "broker_transaction_id": "01BF7AD2697041702D0AE745A700000002"
+                }
+              ]
+            },
+            "business_count": 0
+          },
+          {
+            "case": "packet-sdk-python-mysql-db-after",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mysql"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 1
+            },
+            "local_result": {
+              "local": "committed",
+              "local_calls": 1,
+              "branches": [
+                {
+                  "message_id": "packet-sdk-python-mysql-db-after-b0",
+                  "half": "prepared",
+                  "final": "commit_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "0145E9C51A425971930AE745B500000000",
+                  "broker_transaction_id": "0145E9C51A425971930AE745B500000000"
+                },
+                {
+                  "message_id": "packet-sdk-python-mysql-db-after-b1",
+                  "half": "prepared",
+                  "final": "commit_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "0145E9C51A425971930AE745B500000001",
+                  "broker_transaction_id": "0145E9C51A425971930AE745B500000001"
+                },
+                {
+                  "message_id": "packet-sdk-python-mysql-db-after-b2",
+                  "half": "prepared",
+                  "final": "commit_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "0145E9C51A425971930AE745B500000002",
+                  "broker_transaction_id": "0145E9C51A425971930AE745B500000002"
+                }
+              ]
+            },
+            "business_count": 1
+          },
+          {
+            "case": "packet-sdk-go-sendmessage",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "rocketmq"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 2
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "017CED8D3C2AE972260AE745B600000000",
+                  "broker_transaction_id": "017CED8D3C2AE972260AE745B600000000",
+                  "error_code": "",
+                  "final": "rollback_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-sendmessage-b0"
+                },
+                {
+                  "broker_message_id": "",
+                  "broker_transaction_id": "",
+                  "error_code": "half_unknown",
+                  "final": "not_attempted",
+                  "half": "unknown",
+                  "message_id": "packet-sdk-go-sendmessage-b1"
+                },
+                {
+                  "broker_message_id": "",
+                  "broker_transaction_id": "",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "not_attempted",
+                  "message_id": "packet-sdk-go-sendmessage-b2"
+                }
+              ],
+              "local": "not_started",
+              "local_calls": 0
+            },
+            "business_count": 0
+          },
+          {
+            "case": "packet-sdk-go-endtransaction",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "rocketmq"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 3
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "017CED8D3C2AE972A60AE745BA00000000",
+                  "broker_transaction_id": "017CED8D3C2AE972A60AE745BA00000000",
+                  "error_code": "final_rpc_unknown",
+                  "final": "unknown",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-endtransaction-b0"
+                },
+                {
+                  "broker_message_id": "017CED8D3C2AE972A60AE745BA00000001",
+                  "broker_transaction_id": "017CED8D3C2AE972A60AE745BA00000001",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-endtransaction-b1"
+                },
+                {
+                  "broker_message_id": "017CED8D3C2AE972A60AE745BA00000002",
+                  "broker_transaction_id": "017CED8D3C2AE972A60AE745BA00000002",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-endtransaction-b2"
+                }
+              ],
+              "local": "committed",
+              "local_calls": 1
+            },
+            "business_count": 1
+          },
+          {
+            "case": "packet-sdk-python-sendmessage",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "rocketmq"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 2
+            },
+            "local_result": {
+              "local": "not_started",
+              "local_calls": 0,
+              "branches": [
+                {
+                  "message_id": "packet-sdk-python-sendmessage-b0",
+                  "half": "prepared",
+                  "final": "rollback_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "013D12F52BB60E731B0AE745BE00000000",
+                  "broker_transaction_id": "013D12F52BB60E731B0AE745BE00000000"
+                },
+                {
+                  "message_id": "packet-sdk-python-sendmessage-b1",
+                  "half": "unknown",
+                  "final": "not_attempted",
+                  "error_code": "half_rpc_unknown",
+                  "broker_message_id": "",
+                  "broker_transaction_id": ""
+                },
+                {
+                  "message_id": "packet-sdk-python-sendmessage-b2",
+                  "half": "not_attempted",
+                  "final": "not_attempted",
+                  "error_code": "",
+                  "broker_message_id": "",
+                  "broker_transaction_id": ""
+                }
+              ]
+            },
+            "business_count": 0
+          },
+          {
+            "case": "packet-sdk-python-endtransaction",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "rocketmq"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 3
+            },
+            "local_result": {
+              "local": "committed",
+              "local_calls": 1,
+              "branches": [
+                {
+                  "message_id": "packet-sdk-python-endtransaction-b0",
+                  "half": "prepared",
+                  "final": "unknown",
+                  "error_code": "final_rpc_unknown",
+                  "broker_message_id": "01D1A06ED6112374010AE745C600000000",
+                  "broker_transaction_id": "01D1A06ED6112374010AE745C600000000"
+                },
+                {
+                  "message_id": "packet-sdk-python-endtransaction-b1",
+                  "half": "prepared",
+                  "final": "commit_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "01D1A06ED6112374010AE745C600000001",
+                  "broker_transaction_id": "01D1A06ED6112374010AE745C600000001"
+                },
+                {
+                  "message_id": "packet-sdk-python-endtransaction-b2",
+                  "half": "prepared",
+                  "final": "commit_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "01D1A06ED6112374010AE745C600000002",
+                  "broker_transaction_id": "01D1A06ED6112374010AE745C600000002"
+                }
+              ]
+            },
+            "business_count": 1
+          }
+        ],
+        "finite_sdk_limit": [
+          {
+            "language": "sdk-go",
+            "effective_parameters": {
+              "transactionTimeOut": 6000,
+              "transactionCheckInterval": 5000,
+              "transactionCheckMax": 2,
+              "fileReservedTime": 48
+            },
+            "audit": {
+              "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+              "key_sha256": "a3f83ccdfdcc4213d12b6365307f33f55a7e093a2f8923f4003d8d9e9d32459e",
+              "records": [
+                {
+                  "broker_message_id": "017CED8D3C2AE985360AE7462300000000",
+                  "queue_id": 0,
+                  "queue_offset": 0,
+                  "commitlog_offset": 509977,
+                  "index_hour": 1792386000000
+                }
+              ],
+              "raw_admin_sha256": "03ef7dbd0ed270e56cc02d1b07545a648ef24962304835cd18213be63c484136",
+              "read_only": true,
+              "body_exported": false,
+              "truncated_possible": false,
+              "alert": "native_transaction_check_limit_reached",
+              "severity": "critical"
+            },
+            "mode": "0600",
+            "alert": "native_transaction_check_limit_reached",
+            "admission": "public Reserve refused after explicit StopAdmission",
+            "business_count": 0,
+            "local_evidence": "prepared_retained"
+          },
+          {
+            "language": "sdk-python",
+            "effective_parameters": {
+              "transactionTimeOut": 6000,
+              "transactionCheckInterval": 5000,
+              "transactionCheckMax": 2,
+              "fileReservedTime": 48
+            },
+            "audit": {
+              "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+              "key_sha256": "b59e2f109f91c07624a5d2f535a2687c3c93a5d13e5c61a10788ce7b0ff1b7c7",
+              "records": [
+                {
+                  "broker_message_id": "01394F51F6F8D48B2B0AE7465D00000000",
+                  "queue_id": 0,
+                  "queue_offset": 1,
+                  "commitlog_offset": 515436,
+                  "index_hour": 1792386000000
+                }
+              ],
+              "raw_admin_sha256": "ae0d45aa440f19a4ff9d34d904072667dae651db08f222f0b1f38d2340f11522",
+              "read_only": true,
+              "body_exported": false,
+              "truncated_possible": false,
+              "alert": "native_transaction_check_limit_reached",
+              "severity": "critical"
+            },
+            "mode": "0600",
+            "alert": "native_transaction_check_limit_reached",
+            "admission": "public Reserve refused after explicit StopAdmission",
+            "business_count": 0,
+            "local_evidence": "prepared_retained"
+          }
+        ]
+      }
+    },
+    {
+      "sdk_sha": "3bed26b7e4ee906a293bd574b59dea28d939a282",
+      "go_version": "go1.25.12",
+      "python_runtime": {
+        "python": "3.13.15",
+        "client": "5.1.2",
+        "sdk_version": "0.4.0a1",
+        "package_file": "/home/runner/work/infra/infra/.sdk-acceptance/python/src/reliable_messaging/__init__.py"
+      },
+      "image": "sha256:144bc9b5f15f7564741fa27eecf1e91684dcc117cebfc0b7199119a195d8751d",
+      "mysql_image": "sha256:efb212ddf03576a6c0b02b8d364e6a46f21e628308a719db0b0450f8817c0517",
+      "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "cases": {
+        "v2_go_python_infra_exact_route_vectors": true,
+        "v2_existing_type_conflict_refuses_all_resource_mutations": true,
+        "v2_idempotent_typed_resources_and_minimum_owner_acls": true,
+        "v2_existing_configuration_conflict_refused": true,
+        "v2_sdk-go_wrong_owner_broker_denied_without_business": true,
+        "v2_sdk-python_wrong_owner_broker_denied_without_business": true,
+        "public_go_mysql_half_then_commit": true,
+        "public_go_mysql_half_then_rollback": true,
+        "public_go_mysql_new_instance_crash-committed": true,
+        "public_go_mysql_new_instance_crash-prepared": true,
+        "public_go_untrusted_ca_startup_really_drained": true,
+        "public_go_same_process_client_isolation": true,
+        "public_go_real_database_outage_unknown_then_recovery": true,
+        "public_go_mysql_exact_business_and_wire_set": true,
+        "public_go_mongo_half_then_commit": true,
+        "public_go_mongo_half_then_rollback": true,
+        "public_go_mongo_new_instance_crash-committed": true,
+        "public_go_mongo_new_instance_crash-prepared": true,
+        "public_go_mongo_exact_business_and_wire_set": true,
+        "public_python_half_then_commit": true,
+        "public_python_half_then_rollback": true,
+        "public_sdk-python_to_sdk-python_crash-committed": true,
+        "public_sdk-python_to_sdk-python_crash-prepared": true,
+        "public_sdk-go_to_sdk-python_crash-committed": true,
+        "public_sdk-python_to_sdk-go_crash-committed": true,
+        "public_python_real_database_outage_unknown_then_recovery": true,
+        "public_python_untrusted_ca_startup_really_drained": true,
+        "public_python_same_process_client_isolation": true,
+        "public_python_cross_language_exact_business_and_wire_set": true,
+        "v2_sdk-go_three_physical_inputs_share_two_handler_budget": true,
+        "v2_sdk-python_three_physical_inputs_share_two_handler_budget": true,
+        "public_sdk-go_mysql_real_database_commit_before_tcp_loss": true,
+        "public_sdk-go_mysql_real_database_commit_after_tcp_loss": true,
+        "public_sdk-go_mongo_real_database_commit_before_tcp_loss": true,
+        "public_sdk-go_mongo_real_database_commit_after_tcp_loss": true,
+        "public_sdk-python_mysql_real_database_commit_before_tcp_loss": true,
+        "public_sdk-python_mysql_real_database_commit_after_tcp_loss": true,
+        "public_sdk-go_sendmessage_after_real_broker_ack_tcp_loss": true,
+        "public_sdk-go_endtransaction_after_real_broker_ack_tcp_loss": true,
+        "public_sdk-python_sendmessage_after_real_broker_ack_tcp_loss": true,
+        "public_sdk-python_endtransaction_after_real_broker_ack_tcp_loss": true,
+        "public_sdk-go_mysql_producer_exit_broker_restart_new_checker": true,
+        "public_sdk-go_mongo_producer_exit_broker_restart_new_checker": true,
+        "public_sdk-python_mysql_producer_exit_broker_restart_new_checker": true,
+        "public_sdk-go_native_limit_unknown_private_audit_and_admission_alarm": true,
+        "public_sdk-python_native_limit_unknown_private_audit_and_admission_alarm": true
+      },
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "private_fixture_directory_removed": true
+      },
+      "proof": {
+        "effective_broker_parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "mysql_version": "8.4.11",
+        "mongo_version": "7.0.37",
+        "routing_v2": {
+          "route_vectors_sha256": "7f0be6a272fde5b7e923ff9bfc80bea05a4b3550b847dd97a624d1aeda862ae9",
+          "manifest_sha256": "df1f144843a438c45f9fdb70a5cb3ae870737ec473235a99a11c09a6ea6fe471",
+          "provision_receipt": {
+            "version": 2,
+            "operations": 37,
+            "typed_topics": 9,
+            "principals": 3,
+            "verified": true
+          },
+          "idempotent_operations": 0,
+          "typed_topics": {
+            "rmq2_t_b39b7358ba9f6f782035c9047d38b2bd": "TRANSACTION",
+            "rmq2_t_6ec9c30c00c7848cd09d146e22e21592": "TRANSACTION",
+            "rmq2_t_fa0ffe4b5d16a3ff90978bd4219d95d0": "NORMAL",
+            "rmq2_t_6c04f5940f12b26ce91fc228719fe25c": "TRANSACTION",
+            "rmq2_t_f61c3469d48d05a6cc9b8181cf0d53de": "TRANSACTION",
+            "rmq2_t_b4e3cbae8429d221f9ccb202a73bc3d9": "NORMAL",
+            "rmq2_t_9ae6cf8c6d2ef2a69f7f8a5b12e8cc5b": "TRANSACTION",
+            "rmq2_t_cd86744c87c55e47204eb79c12dbb5f5": "TRANSACTION",
+            "rmq2_t_3c49548d057b561ef575801a2b3c10de": "NORMAL"
+          },
+          "owner_actions": "publishers Pub/Get on their exact owner routes; observer Sub/Get only"
+        },
+        "packet_faults": [
+          {
+            "case": "packet-sdk-go-mysql-db-before",
+            "injection": {
+              "backend_ack": false,
+              "boundary": "before",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mysql"
+            },
+            "proxy": {
+              "backend_commit_acks": 0,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 1
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "01000D3A8E94E470440AE7459800000000",
+                  "broker_transaction_id": "01000D3A8E94E470440AE7459800000000",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-before-b0"
+                },
+                {
+                  "broker_message_id": "01000D3A8E94E470440AE7459800000001",
+                  "broker_transaction_id": "01000D3A8E94E470440AE7459800000001",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-before-b1"
+                },
+                {
+                  "broker_message_id": "01000D3A8E94E470440AE7459800000002",
+                  "broker_transaction_id": "01000D3A8E94E470440AE7459800000002",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-before-b2"
+                }
+              ],
+              "local": "unknown",
+              "local_calls": 1
+            },
+            "business_count": 0
+          },
+          {
+            "case": "packet-sdk-go-mysql-db-after",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mysql"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 1
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "01000D3A8E94E472480AE745AF00000000",
+                  "broker_transaction_id": "01000D3A8E94E472480AE745AF00000000",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-after-b0"
+                },
+                {
+                  "broker_message_id": "01000D3A8E94E472480AE745AF00000001",
+                  "broker_transaction_id": "01000D3A8E94E472480AE745AF00000001",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-after-b1"
+                },
+                {
+                  "broker_message_id": "01000D3A8E94E472480AE745AF00000002",
+                  "broker_transaction_id": "01000D3A8E94E472480AE745AF00000002",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mysql-db-after-b2"
+                }
+              ],
+              "local": "committed",
+              "local_calls": 1
+            },
+            "business_count": 1
+          },
+          {
+            "case": "packet-sdk-go-mongo-db-before",
+            "injection": {
+              "backend_ack": false,
+              "boundary": "before",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mongo"
+            },
+            "proxy": {
+              "backend_commit_acks": 0,
+              "dropped": 2,
+              "event": "stats",
+              "seen": 2
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "01000D3A8E94E472800AE745AF00000000",
+                  "broker_transaction_id": "01000D3A8E94E472800AE745AF00000000",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-before-b0"
+                },
+                {
+                  "broker_message_id": "01000D3A8E94E472800AE745AF00000001",
+                  "broker_transaction_id": "01000D3A8E94E472800AE745AF00000001",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-before-b1"
+                },
+                {
+                  "broker_message_id": "01000D3A8E94E472800AE745AF00000002",
+                  "broker_transaction_id": "01000D3A8E94E472800AE745AF00000002",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-before-b2"
+                }
+              ],
+              "local": "unknown",
+              "local_calls": 1
+            },
+            "business_count": 0
+          },
+          {
+            "case": "packet-sdk-go-mongo-db-after",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mongo"
+            },
+            "proxy": {
+              "backend_commit_acks": 2,
+              "dropped": 2,
+              "event": "stats",
+              "seen": 2
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "01000D3A8E94E4746C0AE745C500000000",
+                  "broker_transaction_id": "01000D3A8E94E4746C0AE745C500000000",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-after-b0"
+                },
+                {
+                  "broker_message_id": "01000D3A8E94E4746C0AE745C500000001",
+                  "broker_transaction_id": "01000D3A8E94E4746C0AE745C500000001",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-after-b1"
+                },
+                {
+                  "broker_message_id": "01000D3A8E94E4746C0AE745C500000002",
+                  "broker_transaction_id": "01000D3A8E94E4746C0AE745C500000002",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-mongo-db-after-b2"
+                }
+              ],
+              "local": "committed",
+              "local_calls": 1
+            },
+            "business_count": 1
+          },
+          {
+            "case": "packet-sdk-python-mysql-db-before",
+            "injection": {
+              "backend_ack": false,
+              "boundary": "before",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mysql"
+            },
+            "proxy": {
+              "backend_commit_acks": 0,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 1
+            },
+            "local_result": {
+              "local": "unknown",
+              "local_calls": 1,
+              "branches": [
+                {
+                  "message_id": "packet-sdk-python-mysql-db-before-b0",
+                  "half": "prepared",
+                  "final": "not_attempted",
+                  "error_code": "",
+                  "broker_message_id": "01000D3A8E94E474CA0AE745C700000000",
+                  "broker_transaction_id": "01000D3A8E94E474CA0AE745C700000000"
+                },
+                {
+                  "message_id": "packet-sdk-python-mysql-db-before-b1",
+                  "half": "prepared",
+                  "final": "not_attempted",
+                  "error_code": "",
+                  "broker_message_id": "01000D3A8E94E474CA0AE745C700000001",
+                  "broker_transaction_id": "01000D3A8E94E474CA0AE745C700000001"
+                },
+                {
+                  "message_id": "packet-sdk-python-mysql-db-before-b2",
+                  "half": "prepared",
+                  "final": "not_attempted",
+                  "error_code": "",
+                  "broker_message_id": "01000D3A8E94E474CA0AE745C700000002",
+                  "broker_transaction_id": "01000D3A8E94E474CA0AE745C700000002"
+                }
+              ]
+            },
+            "business_count": 0
+          },
+          {
+            "case": "packet-sdk-python-mysql-db-after",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "mysql"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 1
+            },
+            "local_result": {
+              "local": "committed",
+              "local_calls": 1,
+              "branches": [
+                {
+                  "message_id": "packet-sdk-python-mysql-db-after-b0",
+                  "half": "prepared",
+                  "final": "commit_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "01000D3A8E94E476B70AE745DB00000000",
+                  "broker_transaction_id": "01000D3A8E94E476B70AE745DB00000000"
+                },
+                {
+                  "message_id": "packet-sdk-python-mysql-db-after-b1",
+                  "half": "prepared",
+                  "final": "commit_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "01000D3A8E94E476B70AE745DB00000001",
+                  "broker_transaction_id": "01000D3A8E94E476B70AE745DB00000001"
+                },
+                {
+                  "message_id": "packet-sdk-python-mysql-db-after-b2",
+                  "half": "prepared",
+                  "final": "commit_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "01000D3A8E94E476B70AE745DB00000002",
+                  "broker_transaction_id": "01000D3A8E94E476B70AE745DB00000002"
+                }
+              ]
+            },
+            "business_count": 1
+          },
+          {
+            "case": "packet-sdk-go-sendmessage",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "rocketmq"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 2
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "01000D3A8E94E477340AE745DE00000000",
+                  "broker_transaction_id": "01000D3A8E94E477340AE745DE00000000",
+                  "error_code": "",
+                  "final": "rollback_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-sendmessage-b0"
+                },
+                {
+                  "broker_message_id": "",
+                  "broker_transaction_id": "",
+                  "error_code": "half_unknown",
+                  "final": "not_attempted",
+                  "half": "unknown",
+                  "message_id": "packet-sdk-go-sendmessage-b1"
+                },
+                {
+                  "broker_message_id": "",
+                  "broker_transaction_id": "",
+                  "error_code": "",
+                  "final": "not_attempted",
+                  "half": "not_attempted",
+                  "message_id": "packet-sdk-go-sendmessage-b2"
+                }
+              ],
+              "local": "not_started",
+              "local_calls": 0
+            },
+            "business_count": 0
+          },
+          {
+            "case": "packet-sdk-go-endtransaction",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "rocketmq"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 3
+            },
+            "local_result": {
+              "branches": [
+                {
+                  "broker_message_id": "01000D3A8E94E478630AE745EA00000000",
+                  "broker_transaction_id": "01000D3A8E94E478630AE745EA00000000",
+                  "error_code": "final_rpc_unknown",
+                  "final": "unknown",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-endtransaction-b0"
+                },
+                {
+                  "broker_message_id": "01000D3A8E94E478630AE745EA00000001",
+                  "broker_transaction_id": "01000D3A8E94E478630AE745EA00000001",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-endtransaction-b1"
+                },
+                {
+                  "broker_message_id": "01000D3A8E94E478630AE745EA00000002",
+                  "broker_transaction_id": "01000D3A8E94E478630AE745EA00000002",
+                  "error_code": "",
+                  "final": "commit_confirmed",
+                  "half": "prepared",
+                  "message_id": "packet-sdk-go-endtransaction-b2"
+                }
+              ],
+              "local": "committed",
+              "local_calls": 1
+            },
+            "business_count": 1
+          },
+          {
+            "case": "packet-sdk-python-sendmessage",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "rocketmq"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 2
+            },
+            "local_result": {
+              "local": "not_started",
+              "local_calls": 0,
+              "branches": [
+                {
+                  "message_id": "packet-sdk-python-sendmessage-b0",
+                  "half": "prepared",
+                  "final": "rollback_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "01000D3A8E94E478B80AE745EB00000000",
+                  "broker_transaction_id": "01000D3A8E94E478B80AE745EB00000000"
+                },
+                {
+                  "message_id": "packet-sdk-python-sendmessage-b1",
+                  "half": "unknown",
+                  "final": "not_attempted",
+                  "error_code": "half_rpc_unknown",
+                  "broker_message_id": "",
+                  "broker_transaction_id": ""
+                },
+                {
+                  "message_id": "packet-sdk-python-sendmessage-b2",
+                  "half": "not_attempted",
+                  "final": "not_attempted",
+                  "error_code": "",
+                  "broker_message_id": "",
+                  "broker_transaction_id": ""
+                }
+              ]
+            },
+            "business_count": 0
+          },
+          {
+            "case": "packet-sdk-python-endtransaction",
+            "injection": {
+              "backend_ack": true,
+              "boundary": "after",
+              "dropped": 1,
+              "event": "injected",
+              "kind": "rocketmq"
+            },
+            "proxy": {
+              "backend_commit_acks": 1,
+              "dropped": 1,
+              "event": "stats",
+              "seen": 3
+            },
+            "local_result": {
+              "local": "committed",
+              "local_calls": 1,
+              "branches": [
+                {
+                  "message_id": "packet-sdk-python-endtransaction-b0",
+                  "half": "prepared",
+                  "final": "unknown",
+                  "error_code": "final_rpc_unknown",
+                  "broker_message_id": "01000D3A8E94E47A0A0AE745FA00000000",
+                  "broker_transaction_id": "01000D3A8E94E47A0A0AE745FA00000000"
+                },
+                {
+                  "message_id": "packet-sdk-python-endtransaction-b1",
+                  "half": "prepared",
+                  "final": "commit_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "01000D3A8E94E47A0A0AE745FA00000001",
+                  "broker_transaction_id": "01000D3A8E94E47A0A0AE745FA00000001"
+                },
+                {
+                  "message_id": "packet-sdk-python-endtransaction-b2",
+                  "half": "prepared",
+                  "final": "commit_confirmed",
+                  "error_code": "",
+                  "broker_message_id": "01000D3A8E94E47A0A0AE745FA00000002",
+                  "broker_transaction_id": "01000D3A8E94E47A0A0AE745FA00000002"
+                }
+              ]
+            },
+            "business_count": 1
+          }
+        ],
+        "finite_sdk_limit": [
+          {
+            "language": "sdk-go",
+            "effective_parameters": {
+              "transactionTimeOut": 6000,
+              "transactionCheckInterval": 5000,
+              "transactionCheckMax": 2,
+              "fileReservedTime": 48
+            },
+            "audit": {
+              "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+              "key_sha256": "a3f83ccdfdcc4213d12b6365307f33f55a7e093a2f8923f4003d8d9e9d32459e",
+              "records": [
+                {
+                  "broker_message_id": "01000D3A8E94E48B9D0AE7465900000000",
+                  "queue_id": 0,
+                  "queue_offset": 0,
+                  "commitlog_offset": 505166,
+                  "index_hour": 1792386000000
+                }
+              ],
+              "raw_admin_sha256": "2e6403267c1a259960b5e391c354c4ab978c2d9496fb6db84f0aba879d09c916",
+              "read_only": true,
+              "body_exported": false,
+              "truncated_possible": false,
+              "alert": "native_transaction_check_limit_reached",
+              "severity": "critical"
+            },
+            "mode": "0600",
+            "alert": "native_transaction_check_limit_reached",
+            "admission": "public Reserve refused after explicit StopAdmission",
+            "business_count": 0,
+            "local_evidence": "prepared_retained"
+          },
+          {
+            "language": "sdk-python",
+            "effective_parameters": {
+              "transactionTimeOut": 6000,
+              "transactionCheckInterval": 5000,
+              "transactionCheckMax": 2,
+              "fileReservedTime": 48
+            },
+            "audit": {
+              "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+              "key_sha256": "b59e2f109f91c07624a5d2f535a2687c3c93a5d13e5c61a10788ce7b0ff1b7c7",
+              "records": [
+                {
+                  "broker_message_id": "01000D3A8E94E4919A0AE7469300000000",
+                  "queue_id": 0,
+                  "queue_offset": 1,
+                  "commitlog_offset": 510622,
+                  "index_hour": 1792386000000
+                }
+              ],
+              "raw_admin_sha256": "acd4f3d1b92a85f98b2e6201c93c3691c9de3f2f5b78574b850b38e74a29db06",
+              "read_only": true,
+              "body_exported": false,
+              "truncated_possible": false,
+              "alert": "native_transaction_check_limit_reached",
+              "severity": "critical"
+            },
+            "mode": "0600",
+            "alert": "native_transaction_check_limit_reached",
+            "admission": "public Reserve refused after explicit StopAdmission",
+            "business_count": 0,
+            "local_evidence": "prepared_retained"
+          }
+        ]
+      }
+    }
+  ]
+}

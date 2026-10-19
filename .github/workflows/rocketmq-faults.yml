@@ -1,0 +1,63 @@
+name: RocketMQ packet transaction faults
+on:
+  pull_request:
+    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '.github/workflows/rocketmq-faults.yml']
+  workflow_dispatch:
+    inputs:
+      sdk_ref:
+        description: Exact candidate SDK revision
+        type: string
+        required: true
+        default: 8841fdfcdd9ec25b49f845a3ed3eb825385d0c32
+permissions:
+  contents: read
+env:
+  GOTOOLCHAIN: local
+concurrency:
+  group: rocketmq-packet-faults-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  sdk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - go: '1.25.9'
+            python: '3.11'
+            mysql: 'mysql:8.0.36'
+          - go: '1.25.12'
+            python: '3.13'
+            mysql: 'mysql:8.4'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: ${{ inputs.sdk_ref || '8841fdfcdd9ec25b49f845a3ed3eb825385d0c32' }}
+          path: .sdk-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: .sdk-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: ${{ matrix.python }}
+      - name: Fetch and verify official release archive
+        run: bash scripts/rocketmq/fetch-release.sh
+      - name: Build exact isolated Broker with fresh PGP proof
+        run: docker build --no-cache -t rocketmq-sdk:5.5.1 components/rocketmq
+      - name: Required public SDK MySQL, Mongo and cross-language recovery proofs
+        run: |
+          python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python --sdk-faults \
+            --sdk "$PWD/.sdk-acceptance" --image rocketmq-sdk:5.5.1 --mysql-image '${{ matrix.mysql }}' \
+            --report rocketmq-packet-faults.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-packet-faults-${{ strategy.job-index }}-${{ github.sha }}
+          path: rocketmq-packet-faults.json
+          if-no-files-found: error
+          retention-days: 14

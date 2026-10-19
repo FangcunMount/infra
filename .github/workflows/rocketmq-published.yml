@@ -1,0 +1,64 @@
+name: RocketMQ published transaction SDK
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  GOTOOLCHAIN: local
+concurrency:
+  group: rocketmq-published-sdk-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  published:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - go: '1.25.9'
+            python: '3.11'
+            mysql: 'mysql:8.0.36'
+          - go: '1.25.12'
+            python: '3.13'
+            mysql: 'mysql:8.4'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: v0.5.0-rocketmq-tx.1
+          path: .sdk-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: .sdk-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: ${{ matrix.python }}
+      - name: Verify tags, downloaded checksums, Go module, wheel and sdist installations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/rocketmq/prepare_published.py --candidate "$PWD/.sdk-acceptance" --output "$PWD/.published"
+      - name: Fetch and verify official Broker release archive
+        run: bash scripts/rocketmq/fetch-release.sh
+      - name: Build exact isolated Broker with fresh PGP proof
+        run: docker build --no-cache -t rocketmq-published:5.5.1 components/rocketmq
+      - name: Required full acceptance using published Go binary and isolated installed wheel
+        run: |
+          python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python --sdk-faults --sdk-limits \
+            --sdk "$PWD/.sdk-acceptance" --sdk-go-probe "$PWD/.published/sdk-go-probe" \
+            --installed-python "$PWD/.published/wheel/bin/python" \
+            --image rocketmq-published:5.5.1 --mysql-image '${{ matrix.mysql }}' \
+            --report rocketmq-published-sdk.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-published-${{ strategy.job-index }}-${{ github.sha }}
+          path: |
+            .published/published-installation.json
+            rocketmq-published-sdk.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14

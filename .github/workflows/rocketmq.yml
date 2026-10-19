@@ -11,9 +11,11 @@ on:
         description: Exact SDK commit under acceptance
         type: string
         required: true
-        default: 65eae5ba3d6adaaa811961878e9da24b97cb9cbe
+        default: 8841fdfcdd9ec25b49f845a3ed3eb825385d0c32
 permissions:
   contents: read
+env:
+  GOTOOLCHAIN: local
 concurrency:
   group: rocketmq-acceptance-${{ github.ref }}
   cancel-in-progress: true
@@ -27,7 +29,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: ${{ inputs.sdk_ref || '65eae5ba3d6adaaa811961878e9da24b97cb9cbe' }}
+          ref: ${{ inputs.sdk_ref || '8841fdfcdd9ec25b49f845a3ed3eb825385d0c32' }}
           path: .sdk-acceptance
       - uses: actions/setup-go@v6
         with:

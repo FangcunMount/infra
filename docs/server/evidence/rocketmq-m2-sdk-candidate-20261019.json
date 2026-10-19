@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "captured_at": "2026-10-19T05:05:39.885673+00:00",
+  "scope": "Unmerged branch candidate preflight only; does not complete T17-T24 or authorize release/production",
+  "completed_tasks": 16,
+  "total_tasks": 24,
+  "sdk_sha": "3bf3dc80dad889c3f51cc45e4490331b8d45d3f2",
+  "sdk_tree": "7b67c0177a456eb8a55081f6b501ecb60246b76c",
+  "infra_acceptance_sha": "910b614dfdb60483009a38113ddcae3c06905914",
+  "sdk_pr": "https://github.com/FangcunMount/reliable-messaging/pull/43",
+  "infra_pr": "https://github.com/FangcunMount/infra/pull/27",
+  "python_ci": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39201623430",
+  "profiles": [
+    {
+      "profile": "python-3.11-mysql-8.0.36",
+      "report": "results.xml",
+      "passed": 120,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "profile": "python-3.11-mysql-8.0.36",
+      "report": "wheel-results.xml",
+      "passed": 120,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "profile": "python-3.13-mysql-8.4",
+      "report": "results.xml",
+      "passed": 120,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "profile": "python-3.13-mysql-8.4",
+      "report": "wheel-results.xml",
+      "passed": 120,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "matching_wheel_sdist_sha256": {
+    "fangcun_reliable_messaging-0.4.0a1-py3-none-any.whl": "bf5881c6c734762ac5253230a2992a52d5725a64cff6c555c889203c38dbb184",
+    "fangcun_reliable_messaging-0.4.0a1.tar.gz": "dbafba5a191a22303c992f6202a70396f9b58fc1789ca83e2136ead8177b3bae"
+  },
+  "source_and_installed_wheel_zero_skips": true,
+  "cross_profile_assets_identical": true,
+  "merged": false,
+  "formally_published": false,
+  "production_changed": false,
+  "go_branch_preflight": {
+    "source_sha": "3bf3dc80dad889c3f51cc45e4490331b8d45d3f2",
+    "module": "github.com/FangcunMount/reliable-messaging",
+    "resolved_version": "v0.4.0-rocketmq.1.0.20261019045156-3bf3dc80dad8",
+    "sum": "h1:lL7kL6+yQjdoCngpU6CxrHlL+GyE8mXfGgNgwyYYaPI=",
+    "go_mod_sum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=",
+    "verified_source_files": 209,
+    "public_probe_build_from_module_cache": true,
+    "local_replace": false,
+    "published_tag_proof": false,
+    "note": "Initial local goproxy.cn sumdb lookup was unavailable; operation-level official GOPROXY and GOSUMDB succeeded without global configuration changes"
+  }
+}

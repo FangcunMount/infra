@@ -2,11 +2,18 @@
 import time
 
 
+def wait_reference_checks(probe, message_ids, decision, *, timeout=100, observed=()):
+    # Aggregate counters can belong to an older execution on the same Topic.
+    # Accept only the actual Checker store read for each requested fixture ID.
+    seen = {(e.get('id'), e.get('decision')) for e in observed
+            if e.get('event') == 'checked_reference'}
+    for identity in message_ids:
+        if (identity, decision) not in seen:
+            probe.wait('checked_reference', identity, decision, timeout=timeout)
+
+
 def run_go_sdk(start, absent, passed, sql, mongo_command, pause_mysql, wrong_ca):
     for storage in ("mysql", "mongo"):
-        init = start("sdk-go", "init", storage=storage)
-        init.wait("installed")
-        init.finish()
         consumer = start("sdk-go", "consume", storage=storage)
         consumer.wait("ready")
         received, business = set(), set()
@@ -43,7 +50,7 @@ def run_go_sdk(start, absent, passed, sql, mongo_command, pause_mysql, wrong_ca)
             sender.finish(expected=exit_code)  # real OS exit; no final RPC/Close
             recovery = start("sdk-go", "recover", storage=storage)
             recovery.wait("ready")  # idle instance, no Reserve or Execute
-            recovery.wait("checked", decision=decision, timeout=100)
+            wait_reference_checks(recovery, [f'{identity}-b{i}' for i in range(3)], decision)
             if decision == "commit":
                 for i in range(3):
                     message_id = identity + "-b" + str(i)
@@ -84,12 +91,12 @@ def run_go_sdk(start, absent, passed, sql, mongo_command, pause_mysql, wrong_ca)
             sender.finish(expected=23)
             pause_mysql(True)
             try:
-                recovery.wait("checked", decision="unknown", timeout=35)
+                wait_reference_checks(recovery, [f'{identity}-b{i}' for i in range(3)], 'unknown', timeout=35)
                 for i in range(3):
                     absent(consumer, identity + "-b" + str(i), .25)
             finally:
                 pause_mysql(False)
-            recovery.wait("checked", decision="commit", timeout=60)
+            wait_reference_checks(recovery, [f'{identity}-b{i}' for i in range(3)], 'commit', timeout=60)
             for i in range(3):
                 message_id = identity + "-b" + str(i)
                 consumer.wait("received", message_id)
@@ -158,7 +165,7 @@ def run_python_sdk(start, passed, sql, pause_mysql, wrong_ca):
         sender.finish(expected=status)
         recovery = start(recovery_language, "recover")
         recovery.wait("ready")
-        recovery.wait("checked", decision=decision, timeout=100)
+        wait_reference_checks(recovery, [identity], decision)
         if decision == "commit":
             consumer.wait("received", identity)
             received.add(identity)
@@ -178,11 +185,11 @@ def run_python_sdk(start, passed, sql, pause_mysql, wrong_ca):
     sender.finish(expected=23)
     pause_mysql(True)
     try:
-        recovery.wait("checked", decision="unknown", timeout=35)
+        wait_reference_checks(recovery, [identity], 'unknown', timeout=35)
         assert_absent(consumer, identity, 2)
     finally:
         pause_mysql(False)
-    recovery.wait("checked", decision="commit", timeout=60)
+    wait_reference_checks(recovery, [identity], 'commit', timeout=60)
     consumer.wait("received", identity)
     received.add(identity)
     recovery.send("stop")

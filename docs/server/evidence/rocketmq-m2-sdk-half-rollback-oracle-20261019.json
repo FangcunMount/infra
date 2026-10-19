@@ -1,0 +1,236 @@
+{
+  "version": 1,
+  "tasks": [
+    "T19",
+    "T20"
+  ],
+  "complete": false,
+  "sdk_sha": "8841fdfcdd9ec25b49f845a3ed3eb825385d0c32",
+  "infra_sha": "820953d558d39943ef549ebe00b13de35dc48d02",
+  "captured_at": "2026-10-19T06:30:11.109903+00:00",
+  "runs": [
+    {
+      "id": 39208349317,
+      "expected": 48
+    },
+    {
+      "id": 39208349372,
+      "expected": 46
+    }
+  ],
+  "reports": [
+    {
+      "report": "full-failed/rocketmq-complete-sdk-0-4e612eeedde506c0b00d28cb9417f829585a77d1",
+      "go": "go1.25.9",
+      "passed": 37,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: probe timed out waiting for checked_reference/rollback",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "exact_sender_result": {
+        "branches": [
+          {
+            "broker_message_id": "017CED8D3D4C1576510AE7524B00000000",
+            "broker_transaction_id": "017CED8D3D4C1576510AE7524B00000000",
+            "error_code": "",
+            "final": "rollback_confirmed",
+            "half": "prepared",
+            "message_id": "packet-sdk-go-sendmessage-b0"
+          },
+          {
+            "broker_message_id": "",
+            "broker_transaction_id": "",
+            "error_code": "half_unknown",
+            "final": "not_attempted",
+            "half": "unknown",
+            "message_id": "packet-sdk-go-sendmessage-b1"
+          },
+          {
+            "broker_message_id": "",
+            "broker_transaction_id": "",
+            "error_code": "",
+            "final": "not_attempted",
+            "half": "not_attempted",
+            "message_id": "packet-sdk-go-sendmessage-b2"
+          }
+        ],
+        "local": "not_started",
+        "local_calls": 0
+      },
+      "exact_recovery_checks": [
+        {
+          "decision": "rollback",
+          "event": "checked_reference",
+          "id": "packet-sdk-go-sendmessage-b1"
+        }
+      ]
+    },
+    {
+      "report": "full-failed/rocketmq-complete-sdk-1-4e612eeedde506c0b00d28cb9417f829585a77d1",
+      "go": "go1.25.12",
+      "passed": 37,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: probe timed out waiting for checked_reference/rollback",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "exact_sender_result": {
+        "branches": [
+          {
+            "broker_message_id": "017C1E52588DF177490AE7523400000000",
+            "broker_transaction_id": "017C1E52588DF177490AE7523400000000",
+            "error_code": "",
+            "final": "rollback_confirmed",
+            "half": "prepared",
+            "message_id": "packet-sdk-go-sendmessage-b0"
+          },
+          {
+            "broker_message_id": "",
+            "broker_transaction_id": "",
+            "error_code": "half_unknown",
+            "final": "not_attempted",
+            "half": "unknown",
+            "message_id": "packet-sdk-go-sendmessage-b1"
+          },
+          {
+            "broker_message_id": "",
+            "broker_transaction_id": "",
+            "error_code": "",
+            "final": "not_attempted",
+            "half": "not_attempted",
+            "message_id": "packet-sdk-go-sendmessage-b2"
+          }
+        ],
+        "local": "not_started",
+        "local_calls": 0
+      },
+      "exact_recovery_checks": [
+        {
+          "decision": "rollback",
+          "event": "checked_reference",
+          "id": "packet-sdk-go-sendmessage-b1"
+        }
+      ]
+    },
+    {
+      "report": "fault-min-failed/rocketmq-packet-faults-0-4e612eeedde506c0b00d28cb9417f829585a77d1",
+      "go": "go1.25.9",
+      "passed": 37,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: probe timed out waiting for checked_reference/rollback",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "exact_sender_result": {
+        "branches": [
+          {
+            "broker_message_id": "01000D3A32B79875040AE7523100000000",
+            "broker_transaction_id": "01000D3A32B79875040AE7523100000000",
+            "error_code": "",
+            "final": "rollback_confirmed",
+            "half": "prepared",
+            "message_id": "packet-sdk-go-sendmessage-b0"
+          },
+          {
+            "broker_message_id": "",
+            "broker_transaction_id": "",
+            "error_code": "half_unknown",
+            "final": "not_attempted",
+            "half": "unknown",
+            "message_id": "packet-sdk-go-sendmessage-b1"
+          },
+          {
+            "broker_message_id": "",
+            "broker_transaction_id": "",
+            "error_code": "",
+            "final": "not_attempted",
+            "half": "not_attempted",
+            "message_id": "packet-sdk-go-sendmessage-b2"
+          }
+        ],
+        "local": "not_started",
+        "local_calls": 0
+      },
+      "exact_recovery_checks": [
+        {
+          "decision": "rollback",
+          "event": "checked_reference",
+          "id": "packet-sdk-go-sendmessage-b1"
+        }
+      ]
+    },
+    {
+      "report": "fault-max-failed/rocketmq-packet-faults-1-4e612eeedde506c0b00d28cb9417f829585a77d1",
+      "go": "go1.25.12",
+      "passed": 37,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: probe timed out waiting for checked_reference/rollback",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "exact_sender_result": {
+        "branches": [
+          {
+            "broker_message_id": "016045BDC9836970360AE751E700000000",
+            "broker_transaction_id": "016045BDC9836970360AE751E700000000",
+            "error_code": "",
+            "final": "rollback_confirmed",
+            "half": "prepared",
+            "message_id": "packet-sdk-go-sendmessage-b0"
+          },
+          {
+            "broker_message_id": "",
+            "broker_transaction_id": "",
+            "error_code": "half_unknown",
+            "final": "not_attempted",
+            "half": "unknown",
+            "message_id": "packet-sdk-go-sendmessage-b1"
+          },
+          {
+            "broker_message_id": "",
+            "broker_transaction_id": "",
+            "error_code": "",
+            "final": "not_attempted",
+            "half": "not_attempted",
+            "message_id": "packet-sdk-go-sendmessage-b2"
+          }
+        ],
+        "local": "not_started",
+        "local_calls": 0
+      },
+      "exact_recovery_checks": [
+        {
+          "decision": "rollback",
+          "event": "checked_reference",
+          "id": "packet-sdk-go-sendmessage-b1"
+        }
+      ]
+    }
+  ],
+  "diagnosis": "First half already had real rollback_confirmed; only second half lacked its Broker ACK and required a new exact-reference check. Requiring another check for the settled first half timed out. No business executed. All owned fixture cleanup completed.",
+  "fix": "Require the exact half/final stage matrix, check every unresolved actually prepared half, and verify exact aborted execution/all branch witnesses plus no consumption. Partial SIGKILL still requires both actual prepared halves to be checked.",
+  "local_script_tests": {
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0
+  },
+  "new_real_gate": "pending",
+  "production_changed": false
+}
