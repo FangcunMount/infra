@@ -3,7 +3,7 @@
   "task_ids": [
     "T04"
   ],
-  "observed_at": "2026-10-19T11:51:16.490966+00:00",
+  "observed_at": "2026-10-19T11:59:56.732329+00:00",
   "status": "in_progress",
   "complete": false,
   "stage": "schema-and-v2-reference-foundation",
@@ -13,24 +13,47 @@
       "head_sha": "65f1a8f4a23e944af6c01678b6ee363913558957",
       "merged": false,
       "ci": "https://github.com/FangcunMount/iam/actions/runs/39246762992",
-      "ci_status": "success including all three native MySQL schema jobs"
+      "ci_status": "success including all three native MySQL schema jobs",
+      "native_mysql_84": {
+        "actual_server_version": "8.4.11",
+        "image_digest": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
+        "job": "https://github.com/FangcunMount/iam/actions/runs/39246762992/job/118040471389",
+        "log_sha256": "e8134a427e0d7a95f6f55454103f271b750324f9345671e0aa7c25d505585572"
+      }
     },
     "qs-server": {
       "source_sha": "f0dd60467f4d696c3f3fc9d4539e7218b55ccb7b",
       "head_sha": "b31fa2c34492c2633597e97476f41089dfa48b06",
       "merged": false,
-      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39246803082"
+      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39246803082",
+      "native_ci_status": "success",
+      "native_job": "https://github.com/FangcunMount/qs-server/actions/runs/39246803082/job/118040610503",
+      "native_log_sha256": "832868a8ac6f9517f0274bb63823137ce2b56bad8c0ebb598385e393c7a3fbbd",
+      "ci_status": "tests/native proof passed; final builds still running at last observation"
     },
     "qs-ai": {
-      "source_sha": "6c18ee0a469c91c21f771ce3aabf74b84809d298",
-      "head_sha": "e6baa139362930af4900492d97b09427e66d428f",
+      "source_sha": "cbc2a902330f705e38a9e94173c9d837a54ea7e7",
+      "head_sha": "cfffcc3bedd00dc409d54210b95a051b5305aa39",
       "merged": false,
-      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39247556100",
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39248563762",
       "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39247550283",
       "prior_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246774031",
       "prior_m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246780022",
       "prior_m7_status": "success for historical delivery regression; did not include new native schema test",
-      "ci_status": "running/queued; fresh exact head"
+      "ci_status": "fresh full CI running/queued",
+      "targeted_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789",
+      "history_full_ci": [
+        {
+          "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39247556100",
+          "head_sha": "e6baa13",
+          "status": "failed before tests on strict conversion head reader"
+        }
+      ],
+      "native_ci_status": "M3 schema installation/root transaction proof passed in both MySQL8.0.36 and8.4 jobs; remaining historical delivery steps running",
+      "native_jobs": [
+        "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789/job/118045502191",
+        "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789/job/118045502556"
+      ]
     }
   },
   "reports": {
@@ -91,7 +114,7 @@
     "AI runtime-only fixed0041 complete read-only schema validation; frozen0038/0039/0040 conversion API unchanged"
   ],
   "remaining": [
-    "Complete actual native install/compatibility CI and resolve any failures",
+    "Finish AI full CI and remaining build/historical regression checks; native schema installation has passed for all three hosts",
     "Immutable QS/AI body archive with committed-only visibility and old-record readers",
     "Finish task-level schema/archive/compatibility acceptance before ticking T04"
   ],
@@ -116,6 +139,18 @@
       "source_sha": "b7f45cecfe954291924aeaed00112d5c649a8f88",
       "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246774031",
       "result": "Migration and Alembic comparison passed; startup/release probe still called strict0040 layout validator, so failed before shard tests and image readiness. Added separate fixed0041 runtime validator composed with unchanged0040 base contract; legacy converter remains strict. Fresh native missing-index and old-validator refusal cases added."
+    },
+    {
+      "check": "AI isolated native inspector schema",
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39247550283",
+      "source_sha": "e6baa13",
+      "result": "Reflection used engine default mysql after USE of a new schema; test failed on system table name before invoking runtime validator. Replaced with dedicated engine pointing at the exact owned schema. Added safe static-column diagnostic for actual runtime signature drift. Current targeted rerun39247925710; full CI not repeated until this passes."
+    },
+    {
+      "check": "AI runtime head reader boundary",
+      "source_sha": "6771b8d",
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39247925710",
+      "result": "Dedicated schema reflection reached runtime validation and exposed frozen conversion head reader rejecting0041. Runtime now reads exactly one0041 head directly; legacy head whitelist remains unchanged. Local78 pass/4 existing DB-dependent skips; current targeted rerun39248286789."
     }
   ]
 }

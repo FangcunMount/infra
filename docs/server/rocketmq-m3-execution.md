@@ -102,10 +102,10 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 
 | 完成 | ID | 任务及验收结果 | 状态/证据 |
 | --- | --- | --- | --- |
-| ✅ | T01 | 执行总表、独立工作区、完整 SHA 基线、证据格式及 PR 台账 | 2026-10-19；实现8e5c9a9；[基线与36项/8里程碑验证](evidence/rocketmq-m3-baseline-20261019.json)；本地提交，PR待创建 |
+| ✅ | T01 | 执行总表、独立工作区、完整 SHA 基线、证据格式及 PR 台账 | 2026-10-19；实现8e5c9a9；[基线与36项/8里程碑验证](evidence/rocketmq-m3-baseline-20261019.json)；[PR37](https://github.com/FangcunMount/infra/pull/37)草稿，未合并 |
 | ✅ | T02 | 全部生产者/消费者/订阅/Outbox/调度/恢复清单及105前置 | 2026-10-19；[责任清单](rocketmq-m3-inventory.md)/[源码核验](evidence/rocketmq-m3-inventory-20261019.json)：17目录事件、9协议kind、39文件、IAM12版本调用文件、QS8 Stage文件；生产盘点另属T30/T32 |
-| ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；IAM e50686c7 / QS98645d817 / AI81db026；race63/56、AI45通过；PR130/407/158草稿；IAM门禁通过，QS/AI文档修复后CI重跑中；真实依赖另属T22/T23 |
-| ☐ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 进行中；[schema/V2引用批次与验证](evidence/rocketmq-m3-storage-20261019.json)：三库新迁移及原生测试已提交；IAM含三档MySQL全CI通过；QS CI在跑；AI首次0041探针失败已修复重跑；不可变档案/兼容读取待完成 |
+| ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；初版IAM e50686c7 / QS98645d817 / AI81db026；race63/56、AI45通过；PR130/407/158草稿；本轮合并校验见T04证据，未合并；真实依赖另属T22/T23 |
+| ☐ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 进行中；[schema/V2引用批次与验证](evidence/rocketmq-m3-storage-20261019.json)：三库新迁移及原生测试已提交；IAM含三档MySQL全CI通过；QS双库原生验证通过/构建收尾；AI两档MySQL原生验证通过/完整CI重跑；不可变档案/兼容读取待完成 |
 | ☐ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 待开始 |
 | ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 待开始 |
 | ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 待开始 |
@@ -189,9 +189,9 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 | --- | --- | --- | --- |
 | infra | codex/rocketmq-m3 | [PR37](https://github.com/FangcunMount/infra/pull/37)，草稿 | M3生产变更未执行 |
 | SDK | codex/rocketmq-m3 | 无M3变更 | 仍为M2固定预发布 |
-| IAM | codex/rocketmq-m3 / e50686c7 | [PR130](https://github.com/FangcunMount/iam/pull/130)，草稿，CI待完成 | 生产未切换 |
-| QS | codex/rocketmq-m3 / 98645d817 | [PR407](https://github.com/FangcunMount/qs-server/pull/407)，草稿，CI待完成 | 生产未切换 |
-| AI | codex/rocketmq-m3 / 81db026 | [PR158](https://github.com/FangcunMount/qs-ai/pull/158)，草稿，CI待完成 | 生产未切换 |
+| IAM | codex/rocketmq-m3 / 65f1a8f4 | [PR130](https://github.com/FangcunMount/iam/pull/130)，草稿，[CI通过](https://github.com/FangcunMount/iam/actions/runs/39246762992) | 生产未切换 |
+| QS | codex/rocketmq-m3 / b31fa2c34 | [PR407](https://github.com/FangcunMount/qs-server/pull/407)，草稿，[原生通过/构建中](https://github.com/FangcunMount/qs-server/actions/runs/39246803082) | 生产未切换 |
+| AI | codex/rocketmq-m3 / cfffcc3 | [PR158](https://github.com/FangcunMount/qs-ai/pull/158)，草稿，[完整CI重跑](https://github.com/FangcunMount/qs-ai/actions/runs/39248563762) | 生产未切换 |
 
 ### 执行记录
 
@@ -200,3 +200,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-19：T02完成，进度2/36。全目录与协议kind覆盖核对、39个源码文件摘要及版本/Stage调用扫描通过；IAM维护工具的写入口已显式纳入，sessionrevocation、业务调度、AI未知调用治理继续保留。T03窄基线：IAM授权/原UOW及options通过，QS options/答卷/证据通过，AI29项通过。初次uv因PATH缺失exit127，改用已安装的绝对路径后成功；不隐去该工具失败，不据此声称真实依赖故障或生产验收已通过。
 - 2026-10-19：T03源码基础完成，进度3/36。三库固定M2预发布；显式owner/store/epoch/v2/预算与无网络、无DB查询的构造通过。宿主准入与SDK最终关闭分开，暂停保留Checker，ShutdownIncomplete继续Wait；旧Relay装配拒绝事务配置。IAM63/QS56目标race节点、AI42项均0失败0跳过，QS679回归通过，IAM96通过/1既有MySQL依赖跳过；后者不计为原事务证明。Go vet、Python lint/type和文档门禁通过；SDK失败交接重审与失败历史留证。PR130/407/158草稿已提交，合并/真实Broker验证/生产仍未完成。本机Docker未运行，不启动已有依赖；后续真实存储用隔离CI。
 - 2026-10-19：T03自审补充81db026，关闭预算为负数/NaN/无穷时在封准入之前拒绝，AI最新45项0失败0跳过；初次42项证据保留历史。infra PR37建立，全部PR仍草稿，仓库CI排队/运行中，未创建稳定tag或生产变更。
+
+- 2026-10-19：T04第一批已提交三库独立schema、QS V2引用及原生安装/原事务兼容测试。IAM完整CI及MySQL8.0.36/8.0.44/8.4通过；QS离线105/40→106/41升级和双库原事务证明通过；AI修复0041探针与测试库反射、head白名单边界后，两档MySQL原生证明通过，完整CI重跑。源码验证QS230 race无跳过、AI58定向无跳过；IAM广回归18个既有可选DB用例、AI旧控制4个DB用例本地跳过，不计真实依赖通过。全部失败及修复保留于[本批证据](evidence/rocketmq-m3-storage-20261019.json)。不可变档案/兼容读取尚未完成，T04不勾选，总进度保持3/36；源码未合并，生产无操作。
