@@ -9,10 +9,16 @@ class Server:
  def __init__(self,policy='noeviction',maxmem='0'):
   self.tmp=tempfile.TemporaryDirectory();self.root=Path(self.tmp.name);self.sock=self.root/'r.sock'
   self.p=subprocess.Popen(['redis-server','--port','0','--unixsocket',str(self.sock),'--save','','--appendonly','no','--dir',str(self.root),'--maxmemory',maxmem,'--maxmemory-policy',policy],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-  for _ in range(100):
-   if self.sock.exists():break
-   time.sleep(.02)
-  self.r=Redis({'unix_socket':str(self.sock)})
+  # Busy shared runners can defer the child well beyond two seconds.
+  deadline=time.monotonic()+15
+  while not self.sock.exists() and self.p.poll()is None and time.monotonic()<deadline:time.sleep(.05)
+  try:
+   if not self.sock.exists()or self.p.poll()is not None:raise RuntimeError('Isolated Redis startup deadline exceeded')
+   self.r=Redis({'unix_socket':str(self.sock)})
+   if self.r.cmd('PING')!=b'PONG':raise RuntimeError('Isolated Redis not ready')
+  except Exception:
+   if self.p.poll()is None:self.p.terminate();self.p.wait(timeout=4)
+   self.tmp.cleanup();raise
  def close(self):
   self.r.close();self.p.terminate();self.p.wait(timeout=4);self.tmp.cleanup()
 
