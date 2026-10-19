@@ -107,5 +107,12 @@
   "observed_at": "2026-10-19T21:35:24.739434+00:00",
   "pr_status": "merged",
   "merge_sha": "d06861e5b29f4e023872d0863e1f4d574ce78b34",
-  "merged_at": "2026-10-19T21:24:17Z"
+  "merged_at": "2026-10-19T21:24:17Z",
+  "infra_host_pr": {
+    "url": "https://github.com/FangcunMount/infra/pull/41",
+    "source_sha": "4369e6ab6800b69ce403839541a566236db0f2bb",
+    "merged_sha": "d544918f39020e55a8af164f90f7b5101d61e6ba",
+    "all_current_checks": "13 success,0failure",
+    "merged_at": "2026-10-19T22:03:53Z"
+  }
 }

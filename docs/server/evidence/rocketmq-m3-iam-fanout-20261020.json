@@ -718,5 +718,12 @@
   "completed_at": "2026-10-19T21:59:06.750208+00:00",
   "open_concerns": [
     "QS original-effects authority inspection failed once in39329043045 attempt1, identical-source failed-job attempt2 passed. No source fix or root-cause claim; retain and inspect during T23/T25 before production."
-  ]
+  ],
+  "infra_host_pr": {
+    "url": "https://github.com/FangcunMount/infra/pull/41",
+    "source_sha": "4369e6ab6800b69ce403839541a566236db0f2bb",
+    "merged_sha": "d544918f39020e55a8af164f90f7b5101d61e6ba",
+    "all_current_checks": "13 success,0failure",
+    "merged_at": "2026-10-19T22:03:53Z"
+  }
 }
