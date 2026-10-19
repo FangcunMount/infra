@@ -1,0 +1,37 @@
+[
+  {
+    "service": "qs-apiserver",
+    "patch_sha": "572d3d551e71d63f83c7751505faddd9e3e812b6",
+    "business_baseline": "84d65b5b58d9037257f5da2660a6a58b2e625378",
+    "base_image_id": "sha256:8b23c9574366c9671d63282caf63455730b90018357c71ca02a3073f56aa7979",
+    "tag": "qlume-mysql-tls/qs-apiserver:572d3d551e71d63f83c7751505faddd9e3e812b6",
+    "binary_sha256": "cfdb8424936879fa85e126371dca2a8458b788f770e825e72c0f5eb53c522a11",
+    "image_id": "sha256:b83274cd9b347bebf8f422391a38f698199a820f4071c49b8baeb5b739d0bde4"
+  },
+  {
+    "service": "qs-worker",
+    "patch_sha": "572d3d551e71d63f83c7751505faddd9e3e812b6",
+    "business_baseline": "84d65b5b58d9037257f5da2660a6a58b2e625378",
+    "base_image_id": "sha256:e6d9547c5083b62fa96e25e5204d19ed6e96e06919a0f904dca20e7c7167d53a",
+    "tag": "qlume-mysql-tls/qs-worker:572d3d551e71d63f83c7751505faddd9e3e812b6",
+    "binary_sha256": "d0986e350042df7558fd4c9064d63509b711c0224a04c7e43e2a9ed84c7da0b7",
+    "image_id": "sha256:7a3369f5fccb97a16fce92f4176e61b86749b740b5ac0a8c38d079495954ca1e"
+  },
+  {
+    "service": "iam-apiserver",
+    "patch_sha": "a0fa8e04854b074f77c7a863afdd7f1c1362e583",
+    "business_baseline": "c8fc1fe61a32056368148e232e96d32763c15ba5",
+    "base_image_id": "sha256:592a4051a8ba2982df55d47c9b82c759f2d85f728ce4a3825fd5b083338e1945",
+    "tag": "qlume-mysql-tls/iam-apiserver:a0fa8e04854b074f77c7a863afdd7f1c1362e583",
+    "binary_sha256": "0ad485f0215ec7a359481b2f043157153f7d611d0a67aa0eab28532536d4a15b",
+    "image_id": "sha256:70cb614c4f21c11035ef27e446b0045484fd568ca0e562c64585e2ec2b0c1e72"
+  },
+  {
+    "service": "qs-ai",
+    "patch_sha": "67d418b66251a075b771624e82ce43d049db4f03",
+    "business_baseline": "7c71d1e95500aa20c3d82f57a7304578c8a794dd",
+    "base_image_id": "sha256:e511347af54ea85d6b360f8b6cc89f02eb81f474977871739129a7cf702c2fa8",
+    "tag": "qlume-mysql-tls/qs-ai:67d418b66251a075b771624e82ce43d049db4f03",
+    "image_id": "sha256:35902a73acfcb0d3169110a28bf1fef95bbe3c1e3a8f38666ec973a8d262fcd3"
+  }
+]

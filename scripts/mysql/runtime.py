@@ -8,6 +8,7 @@ import argparse
 import copy
 import fcntl
 import http.client
+import ipaddress
 import json
 import os
 from pathlib import Path
@@ -53,7 +54,7 @@ def save(path, value):
         os.fsync(stream.fileno())
 
 
-def payload(before, image, host, port, ref):
+def payload(before, image, host, port, ref, revision=None):
     name = before['Name'].lstrip('/')
     prefix = PREFIXES.get(name)
     if re.fullmatch('qs-worker-runtime-[123]', name):
@@ -82,6 +83,10 @@ def payload(before, image, host, port, ref):
     environment.update(changes)
     config['Env'] = [key+'='+value for key, value in environment.items()]
     config['Image'] = image
+    if revision is not None:
+        if not re.fullmatch('[0-9a-f]{40}', revision):
+            raise ValueError('Image source revision is missing')
+        config.setdefault('Labels', {})['org.opencontainers.image.revision'] = revision
     hostconfig = copy.deepcopy(before['HostConfig'])
     binds = hostconfig.setdefault('Binds', []) or []
     if any(CONTAINER_CA in item for item in binds):
@@ -97,6 +102,15 @@ def payload(before, image, host, port, ref):
         endpoints[network]['Aliases'] = [alias for alias in endpoint.get('Aliases') or []
                                           if alias not in (before['Id'], before['Id'][:12])]
     return dict(config, HostConfig=hostconfig, NetworkingConfig={'EndpointsConfig': endpoints})
+
+
+def public_endpoint(host, port):
+    if port != 3306:
+        raise ValueError('Production MySQL must use organization port 3306')
+    addresses = [ipaddress.ip_address(item[4][0]) for item in
+                 socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)]
+    if not addresses or not all(address.is_global for address in addresses):
+        raise ValueError('MySQL endpoint must resolve only to public addresses')
 
 
 def stable(container):
@@ -117,7 +131,8 @@ def wait_healthy(name):
 
 def cutover(plan, directory):
     name, old = plan['name'], plan['before']
-    expected = payload(old, plan['image'], plan['host'], plan['port'], plan['ca_ref'])
+    public_endpoint(plan['host'], plan['port'])
+    expected = payload(old, plan['image'], plan['host'], plan['port'], plan['ca_ref'], plan['revision'])
     if plan['payload'] != expected:
         raise ValueError('Migration exceeds the configuration allowlist')
     current = api('GET', '/containers/'+name+'/json')
@@ -127,7 +142,8 @@ def cutover(plan, directory):
     if not Path(CA).is_file():
         raise ValueError('CA mount is missing')
     new_image = api('GET', '/images/'+plan['payload']['Image']+'/json')
-    if new_image['Id'] != plan['payload']['Image']:
+    if (new_image['Id'] != plan['payload']['Image']
+        or new_image['Config']['Labels'].get('org.opencontainers.image.revision') != plan['revision']):
         raise ValueError('Image identity differs')
     retained = name+'-before-mysql-tls-'+str(int(time.time()))
     save(directory/'intent.json', {'name': name, 'retained': retained, 'old_id': old['Id']})
@@ -148,6 +164,7 @@ def cutover(plan, directory):
     except Exception:
         if created:
             api('POST', '/containers/'+created+'/stop?t=30')
+            api('POST', '/containers/'+created+'/update', {'RestartPolicy': {'Name': 'no'}})
             api('POST', '/containers/'+created+'/rename?name='+quote(name+'-failed-mysql-tls-'+str(int(time.time()))))
         if renamed:
             api('POST', '/containers/'+old['Id']+'/rename?name='+quote(name))
@@ -191,10 +208,14 @@ def main():
     with lockpath.open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         if args.command == 'plan':
+            public_endpoint(args.host, args.port)
             old = api('GET', '/containers/'+quote(args.name, safe='')+'/json')
-            value = {'name': args.name, 'before': old, 'ca_ref': args.ca_ref,
+            revision = api('GET', '/images/'+args.image+'/json')['Config']['Labels'].get('org.opencontainers.image.revision')
+            if not revision:
+                raise ValueError('Image has no immutable source revision')
+            value = {'revision': revision, 'name': args.name, 'before': old, 'ca_ref': args.ca_ref,
                      'image': args.image, 'host': args.host, 'port': args.port,
-                     'payload': payload(old, args.image, args.host, args.port, args.ca_ref)}
+                     'payload': payload(old, args.image, args.host, args.port, args.ca_ref, revision)}
             save(args.directory/'plan.json', value)
             print(json.dumps({'service': args.name, 'state': 'planned', 'image': args.image}))
         elif args.command == 'apply':
