@@ -1,0 +1,156 @@
+{
+  "format_version": 1,
+  "task_ids": [
+    "T05"
+  ],
+  "observed_at": "2026-10-19T14:10:53.276569+00:00",
+  "status": "complete",
+  "complete": true,
+  "repository": "FangcunMount/iam",
+  "source_sha": "ea95cd9e62edf0e237f561c2ef3e356cbd426791",
+  "pr": "https://github.com/FangcunMount/iam/pull/131",
+  "pr_status": "merged 2026-10-19T14:09:42Z",
+  "implemented": [
+    "Stable command input, frozen policy version event and original first wire",
+    "Fresh host read-only planner; exact cached authorization version",
+    "Original-root expected-version CAS",
+    "Role/resource/grant/assignment optional planning adapters; original composition unchanged",
+    "Historical revoked grant audit read; cross-company replacement/no-op/input isolation",
+    "All8 maintenance mutations declare readonly planners and original receipt/precondition rules",
+    "Maintenance failures cannot fall back; frozen event staging and version CAS shared by direct maintenance writers"
+  ],
+  "validation": [
+    {
+      "command": "go test -race -json ./internal/apiserver/application/authz/... ./internal/apiserver/infra/mysql/uow/authz ./internal/apiserver/infra/mysql/assignment ./internal/apiserver/infra/mysql/permissiongrant",
+      "passed": 69,
+      "failed": 0,
+      "skipped": 3,
+      "skip_reason": "Existing optional MySQL source tests lack local database; not native proof",
+      "report": "/tmp/m3-iam-planner-entries.jsonl",
+      "exit": 0
+    },
+    {
+      "command": "go vet on same target packages; docs facts/links; git diff --check",
+      "exit": 0
+    },
+    {
+      "source_sha": "2fb64753aaa0f13f611899f3d4ed368215eed74e",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39262054916",
+      "status": "success; all3 MySQL native versions, full lint/test/build",
+      "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39262054972",
+      "concurrency_status": "success"
+    },
+    {
+      "scope": "maintenance and policy target source race",
+      "command": "go test -race -json ./internal/apiserver/maintenance/... ./internal/apiserver/infra/mysql/policy",
+      "passed": 91,
+      "failed": 0,
+      "skipped": 6,
+      "skip_reason": "Existing optional local MySQL tests; required native job separate",
+      "exit": 0
+    },
+    {
+      "scope": "integration compilation, target vet, pinned lint v2.5.0, docs facts/links, diff check",
+      "exit": 0
+    },
+    {
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39265370007",
+      "source_sha": "ea95cd9e62edf0e237f561c2ef3e356cbd426791",
+      "status": "success; full lint/test/build and three required native jobs",
+      "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39265370036",
+      "concurrency_status": "success"
+    }
+  ],
+  "failure_history": [
+    {
+      "source": "b1646ef0",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39259070954",
+      "failure": "Native fixture reused migration-owned database pool closed by NewMigrator.Run",
+      "fix": "8e6f989b: separate migration-owned pool and verify runtime pool Ping",
+      "verification": "https://github.com/FangcunMount/iam/actions/runs/39259811625"
+    },
+    {
+      "scope": "local new Assignment fixture",
+      "failure": "Unsupported scope kind company",
+      "fix": "Use existing domain constant scope.AllStores; no domain behavior change",
+      "verification": "PlannedAssignmentEntries source race test passes"
+    },
+    {
+      "scope": "new maintenance source tests",
+      "failure": "Test helper import fixture collided with existing fixture function",
+      "fix": "Use explicit planfixture alias",
+      "verification": "All maintenance source race tests passed"
+    }
+  ],
+  "remaining": [
+    "Actual Sender and original transaction guard/witness orchestration (T06)",
+    "Idempotency/result lookup and public operation API (T07)",
+    "Fanout/freshness acceptance (T08)"
+  ],
+  "boundaries": {
+    "broker_business_entry_validation": false,
+    "production_schema_or_provider_changed": false,
+    "stable_release": false,
+    "business_acceptance": false
+  },
+  "merge_sha": "c2aa3635cf172f32b077120bd165be986c4d622e",
+  "native_mysql": [
+    {
+      "matrix_version": "8.0.36",
+      "source_sha": "ea95cd9e62edf0e237f561c2ef3e356cbd426791",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "test_ids": [
+        "TestM3PlannedPolicyNative",
+        "TestM3TransactionSchemaNative",
+        "TestPlannedRoleModelPreviewApplyAndCompensation",
+        "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+        "TestPlannedScopeCopiesMappingAndPreservesCompensation",
+        "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+        "TestPlannedCatalogPreviewsNoopAndRejectsDrift"
+      ],
+      "log_sha256": "c7897b1511264a414332feb827e2f8e067ae91cdf201648a5436ac12350dd922",
+      "job": "https://github.com/FangcunMount/iam/actions/runs/39265370007/job/118103438332",
+      "cleanup": "owned schemas dropped by test cleanup; job completed successfully"
+    },
+    {
+      "matrix_version": "8.0.44",
+      "source_sha": "ea95cd9e62edf0e237f561c2ef3e356cbd426791",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "test_ids": [
+        "TestM3PlannedPolicyNative",
+        "TestM3TransactionSchemaNative",
+        "TestPlannedRoleModelPreviewApplyAndCompensation",
+        "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+        "TestPlannedScopeCopiesMappingAndPreservesCompensation",
+        "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+        "TestPlannedCatalogPreviewsNoopAndRejectsDrift"
+      ],
+      "log_sha256": "0329a2b0e3ce5573b08bedbe44456305010f3f6e2bed7ffb4783a899cca086a3",
+      "job": "https://github.com/FangcunMount/iam/actions/runs/39265370007/job/118103438243",
+      "cleanup": "owned schemas dropped by test cleanup; job completed successfully"
+    },
+    {
+      "matrix_version": "8.4",
+      "source_sha": "ea95cd9e62edf0e237f561c2ef3e356cbd426791",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "test_ids": [
+        "TestM3PlannedPolicyNative",
+        "TestM3TransactionSchemaNative",
+        "TestPlannedRoleModelPreviewApplyAndCompensation",
+        "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+        "TestPlannedScopeCopiesMappingAndPreservesCompensation",
+        "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+        "TestPlannedCatalogPreviewsNoopAndRejectsDrift"
+      ],
+      "log_sha256": "c6de9d453b29e6b0a1c1d6c1f028aee6c0e5c0d818582e5bf91c182e0c999c0b",
+      "job": "https://github.com/FangcunMount/iam/actions/runs/39265370007/job/118103438324",
+      "cleanup": "owned schemas dropped by test cleanup; job completed successfully"
+    }
+  ]
+}
