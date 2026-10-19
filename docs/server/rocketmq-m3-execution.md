@@ -4,7 +4,7 @@
 
 ## 当前执行快照
 
-- 进度：**3/36**；T01–T03 实现及本地验证已完成，T04 schema/V2引用批次及三库最新main/TLS已同步，合并后完整CI已手动触发（保留原候选结果与全部失败）；T04 进行中。
+- 进度：**3/36**；T01–T03 实现及本地验证已完成，T04 schema/V2引用批次及三库最新main/TLS已同步，IAM/QS同步main后全CI通过；AI完整CI发现旧维护head兼容问题并修复；不可变档案新增候选已触发验证（保留全部失败）；T04 进行中。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码合并：未发生 M3 合并。稳定 SDK 发布：未执行。生产部署/DDL/Topic/ACL/provider 切换：未执行。system 验收与 48 小时观察：未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
@@ -204,3 +204,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-19：T04第一批已提交三库独立schema、QS V2引用及原生安装/原事务兼容测试。IAM完整CI及MySQL8.0.36/8.0.44/8.4通过；QS离线105/40→106/41升级和双库原事务证明通过；AI修复0041探针与测试库反射、head白名单边界后，两档MySQL原生证明通过，完整CI重跑。源码验证QS230 race无跳过、AI58定向无跳过；IAM广回归18个既有可选DB用例、AI旧控制4个DB用例本地跳过，不计真实依赖通过。全部失败及修复保留于[本批证据](evidence/rocketmq-m3-storage-20261019.json)。不可变档案/兼容读取尚未完成，T04不勾选，总进度保持3/36；源码未合并，生产无操作。
 
 - 2026-10-19：交付前发现三库main已并行合入公网MySQL TLS（IAM bf2882e9 / QS39cb018d9 / AI8fc9c09）。在M3分支合并这些已提交变化，保留TLS factory/维护入口和M3元数据、当前0041校验。未改其他工作区。合并后Go定向测试、AI63项TLS/配置/消息/文档与静态/type门禁通过；三库完整CI重新触发。原候选IAM/QS全CI、AI两档M7（含原生2项及历史回执/模型回归）通过只归属其原SHA，不冒充合并后结果；最新证据与PR台账已更新。总数仍3/36，T04进行中，未合并M3到main、未部署生产。
+
+- 2026-10-19：T04第二批提交QS f008cc732 / AI9b84e89，不可变原header/body/first-wire codec、共享uint64向量、原事务档案guard、精确committed证据读取及仅身份缺失时的旧reader回落。QS3包race/架构、AI45项0失败0跳过及全库type/lint通过；新增原生档案测试仅编译/收集，本地未运行DB。同步main后的IAM/QS完整CI通过；AI完整CI暴露0041旧handoff/inventory whitelist及历史/current fixture scope失败，已限定范围修复，保留旧全库转换/备份拒绝。隔离原生/全CI正在新候选上验证，T04仍不勾选，总计3/36；没有生产DDL/业务链路切换。

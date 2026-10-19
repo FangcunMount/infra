@@ -3,17 +3,17 @@
   "task_ids": [
     "T04"
   ],
-  "observed_at": "2026-10-19T12:06:16.500133+00:00",
+  "observed_at": "2026-10-19T12:39:37.937990+00:00",
   "status": "in_progress",
   "complete": false,
-  "stage": "schema-and-v2-reference-foundation",
+  "stage": "immutable-archive-and-retained-reader-validation",
   "repositories": {
     "iam": {
       "source_sha": "36240da9ac423d449ff8daa3efc028343aff0b8e",
       "head_sha": "36240da9ac423d449ff8daa3efc028343aff0b8e",
       "merged": false,
       "ci": "https://github.com/FangcunMount/iam/actions/runs/39249335104",
-      "ci_status": "post-main-sync CI running/queued; prior candidate results remain separately attributed",
+      "ci_status": "success at post-main-sync candidate (before archive additions)",
       "native_mysql_84": {
         "actual_server_version": "8.4.11",
         "image_digest": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
@@ -39,7 +39,7 @@
       "native_ci_status": "success",
       "native_job": "https://github.com/FangcunMount/qs-server/actions/runs/39246803082/job/118040610503",
       "native_log_sha256": "832868a8ac6f9517f0274bb63823137ce2b56bad8c0ebb598385e393c7a3fbbd",
-      "ci_status": "post-main-sync CI running/queued; prior candidate results remain separately attributed",
+      "ci_status": "success at post-main-sync candidate (before archive additions)",
       "previous_candidates": [
         {
           "head_sha": "b31fa2c34492c2633597e97476f41089dfa48b06",
@@ -60,7 +60,7 @@
       "prior_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246774031",
       "prior_m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246780022",
       "prior_m7_status": "success for historical delivery regression; did not include new native schema test",
-      "ci_status": "post-main-sync CI running/queued; prior candidate results remain separately attributed",
+      "ci_status": "failed full CI: retained handoff/inventory head whitelist and two historical fixture scope failures; preserved in history",
       "targeted_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789",
       "history_full_ci": [
         {
@@ -85,7 +85,8 @@
       "main_merged": "8fc9c09bcfd14570c32cbfef6e1753ddbdfb27da",
       "native_source_sha": "cbc2a90",
       "prior_targeted_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789",
-      "prior_targeted_status": "success including native M3 two cases and all historical receipt/model regression/build gates in both jobs"
+      "prior_targeted_status": "success including native M3 two cases and all historical receipt/model regression/build gates in both jobs",
+      "m7_status": "success at3101453; prior two native schema cases and historical receipt/model gates"
     }
   },
   "reports": {
@@ -128,6 +129,21 @@
       "skipped": 0,
       "stage": "local source TLS/config/message/docs",
       "native_database_executed": false
+    },
+    "archive_source": {
+      "ai": {
+        "tests": 45,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "697e6f0bed329201d0e5c798d40792d49beb1c404e6d5662d0bf55f2d6aef150"
+      },
+      "qs": {
+        "packages": 3,
+        "race": "pass",
+        "architecture": "pass",
+        "integration": "compiled only locally; native execution delegated to required isolated CI"
+      },
+      "boundary": "local source/type/lint do not establish database or Broker acceptance"
     }
   },
   "migration_resources": {
@@ -139,10 +155,10 @@
       "internal/pkg/migration/migrations/mongodb/000041_transaction_messaging.down.json": "8747eda1f6073b0d2f9e531f32a68399ba1aa13e90d8d5ce4768a9b3587a119b",
       "internal/pkg/migration/migrations/mongodb/000041_transaction_messaging.up.json": "b4eace8013a3d2db2915084d71c67e3cd87bd8a09c7213937d7c692232092b6b",
       "internal/pkg/migration/migrations/mysql/000106_transaction_messaging.down.sql": "bc7d6646853e842e2869ca1893c936a6559659c0fd31c842d5c7d49c5a1dd1ed",
-      "internal/pkg/migration/migrations/mysql/000106_transaction_messaging.up.sql": "8dc3529348a16c7185cc44970fb5e616b2fe72ea408ea673ce8e05606db26188"
+      "internal/pkg/migration/migrations/mysql/000106_transaction_messaging.up.sql": "2443a41eabde222d5292f4e997ca7db386945ce70e9e77d9bc896917a2e30246"
     },
     "qs-ai": {
-      "migrations/versions/0041_transaction_messaging.py": "a3f0560d1032b4b32aca799ad7d9b818f18c72862165fb548704d1ef7b38425e"
+      "migrations/versions/0041_transaction_messaging.py": "dd27c8eb56581bf9ef78b52a6d4ced763dc8aa6676587b1836ff5dce3f4312f1"
     }
   },
   "implemented": [
@@ -150,12 +166,14 @@
     "QS exact v2 transaction reference with explicit V1/V2 reader and unchanged legacy type",
     "Native install/root-transaction/legacy-byte-preservation tests added; required jobs fail without dependencies",
     "Manual current-head CI dispatch; prior doc-only push created no full workflows",
-    "AI runtime-only fixed0041 complete read-only schema validation; frozen0038/0039/0040 conversion API unchanged"
+    "AI runtime-only fixed0041 complete read-only schema validation; frozen0038/0039/0040 conversion API unchanged",
+    "Go/Python local immutable archive codec preserves original header/body/first wire including unknown protobuf fields; shared uint64 golden vector",
+    "Host original-root archive guards plus committed-only exact evidence readers; legacy fallback only when new identity absent",
+    "Isolated native archive commit/rollback, owner, first-wire and damaged/prepared refusal proof added; not business entry acceptance"
   ],
   "remaining": [
-    "Finish AI full CI and remaining build/historical regression checks; native schema installation has passed for all three hosts",
-    "Immutable QS/AI body archive with committed-only visibility and old-record readers",
-    "Finish task-level schema/archive/compatibility acceptance before ticking T04"
+    "Pass new native archive proof and complete CI on exact candidates",
+    "Finish task-level archive/legacy acceptance and PR evidence before ticking T04"
   ],
   "boundaries": [
     "3/36 remains unchanged; this file does not mark T04 complete",
@@ -194,6 +212,51 @@
     {
       "check": "concurrent main baseline synchronization",
       "result": "Live main advanced with public MySQL TLS merges after M3 starting baseline. Merged committed main in all three isolated branches; preserved all TLS/maintenance changes and both M3 owners/schema/runtime probe. Resolved only source import/version guards and source-review metadata conflicts. No migration number collision. Previous green CI belongs to pre-sync candidates; fresh full current-head CI dispatched. No main writes/production operations."
+    },
+    {
+      "check": "post-main-sync full CI regression",
+      "source_sha": "3101453746ddb20480efa2427e45b887dee98126",
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39249344742",
+      "result": "All shards exercised new0041 runtime. Retained handoff/inventory strict head reader rejected0041; conversion CLI test advanced beyond its frozen0040 contract; identity startup test still created0040. Scoped retained reader allowance and explicit historical/current fixture heads added; old complete-layout conversion/backup whitelist unchanged. Required M7 now includes complete affected handoff/inventory plus the two schema regression cases."
+    },
+    {
+      "check": "archive docs/source review",
+      "result": "QS docs hygiene found one extra blank line and source-facts gate required two migration entrypoint reviews after native fixture expansion. Repaired scoped documentation; all87 docs tests, hygiene and facts pass on exact reviewed source f008cc732. Previous CI retained; latest c5683c7df dispatched."
+    }
+  ],
+  "archive_candidates": {
+    "qs-server": {
+      "source_sha": "f008cc732",
+      "head_sha": "c5683c7df",
+      "ci": "https://github.com/FangcunMount/qs-server/actions/runs/39253902742",
+      "status": "required complete CI running/queued; local87 docs gate passed"
+    },
+    "qs-ai": {
+      "source_sha": "9b84e89",
+      "head_sha": "69a2c2e",
+      "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39253535831",
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39253542291",
+      "status": "queued/running"
+    }
+  },
+  "migration_resources_history": [
+    {
+      "reason": "unmerged/unreleased M3 candidate adds separate host archive",
+      "resources": {
+        "iam": {
+          "internal/pkg/migration/migrations/000042_transaction_messaging.up.sql": "8dc3529348a16c7185cc44970fb5e616b2fe72ea408ea673ce8e05606db26188",
+          "internal/pkg/migration/migrations/000042_transaction_messaging.down.sql": "bc7d6646853e842e2869ca1893c936a6559659c0fd31c842d5c7d49c5a1dd1ed"
+        },
+        "qs-server": {
+          "internal/pkg/migration/migrations/mongodb/000041_transaction_messaging.down.json": "8747eda1f6073b0d2f9e531f32a68399ba1aa13e90d8d5ce4768a9b3587a119b",
+          "internal/pkg/migration/migrations/mongodb/000041_transaction_messaging.up.json": "b4eace8013a3d2db2915084d71c67e3cd87bd8a09c7213937d7c692232092b6b",
+          "internal/pkg/migration/migrations/mysql/000106_transaction_messaging.down.sql": "bc7d6646853e842e2869ca1893c936a6559659c0fd31c842d5c7d49c5a1dd1ed",
+          "internal/pkg/migration/migrations/mysql/000106_transaction_messaging.up.sql": "2443a41eabde222d5292f4e997ca7db386945ce70e9e77d9bc896917a2e30246"
+        },
+        "qs-ai": {
+          "migrations/versions/0041_transaction_messaging.py": "dd27c8eb56581bf9ef78b52a6d4ced763dc8aa6676587b1836ff5dce3f4312f1"
+        }
+      }
     }
   ]
 }
