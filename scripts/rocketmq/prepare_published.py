@@ -106,6 +106,8 @@ def main():
     source_files=receipt['source_files_sha256']
     if source_files != source_manifest(candidate):
         raise RuntimeError('release source manifest is incomplete or differs from candidate')
+    if digest(downloads/'uv.lock') != source_files.get('python/uv.lock'):
+        raise RuntimeError('downloaded dependency lock differs from fixed SDK candidate')
     for name, expected in source_files.items():
         if name.startswith('/') or '..' in Path(name).parts or digest(candidate/name)!=expected:
             raise RuntimeError('candidate source bytes differ from published receipt')
