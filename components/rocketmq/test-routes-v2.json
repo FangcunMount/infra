@@ -1,0 +1,139 @@
+{
+  "version": 2,
+  "topic_options": {
+    "read_queue_nums": 1,
+    "write_queue_nums": 1,
+    "perm": 6
+  },
+  "group_options": {
+    "retry_queue_nums": 8
+  },
+  "routes": [
+    {
+      "id": "sdk-v2-mysql",
+      "topic": "sdk.logical",
+      "subscription": "sdk-mysql-observer",
+      "message_type": "TRANSACTION",
+      "owner": "iam.mysql",
+      "route_revision": "sdk-v2",
+      "physical_topic": "rmq2_t_b39b7358ba9f6f782035c9047d38b2bd",
+      "consumer_group": "rmq2_g_e820ecfb6f8ac2e554e6e4cd03f75704"
+    },
+    {
+      "id": "sdk-v2-mongo",
+      "topic": "sdk.logical",
+      "subscription": "sdk-mongo-observer",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mongo",
+      "route_revision": "sdk-v2",
+      "physical_topic": "rmq2_t_6ec9c30c00c7848cd09d146e22e21592",
+      "consumer_group": "rmq2_g_b6262ad1a6b53f2f15c9e43bcfffba18"
+    },
+    {
+      "id": "sdk-v2-normal",
+      "topic": "sdk.logical",
+      "subscription": "",
+      "message_type": "NORMAL",
+      "owner": "iam.mysql",
+      "route_revision": "sdk-v2",
+      "physical_topic": "rmq2_t_fa0ffe4b5d16a3ff90978bd4219d95d0",
+      "consumer_group": ""
+    },
+    {
+      "id": "sdk-v2-shared-go-mysql",
+      "topic": "sdk.logical",
+      "subscription": "sdk-shared-go",
+      "message_type": "TRANSACTION",
+      "owner": "iam.mysql",
+      "route_revision": "sdk-v2-shared-go",
+      "physical_topic": "rmq2_t_6c04f5940f12b26ce91fc228719fe25c",
+      "consumer_group": "rmq2_g_9a023dc3b5ac7362d455d1f20ad70a0e"
+    },
+    {
+      "id": "sdk-v2-shared-go-mongo",
+      "topic": "sdk.logical",
+      "subscription": "sdk-shared-go",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mongo",
+      "route_revision": "sdk-v2-shared-go",
+      "physical_topic": "rmq2_t_f61c3469d48d05a6cc9b8181cf0d53de",
+      "consumer_group": "rmq2_g_9a023dc3b5ac7362d455d1f20ad70a0e"
+    },
+    {
+      "id": "sdk-v2-shared-go-normal",
+      "topic": "sdk.logical",
+      "subscription": "sdk-shared-go",
+      "message_type": "NORMAL",
+      "owner": "iam.mysql",
+      "route_revision": "sdk-v2-shared-go",
+      "physical_topic": "rmq2_t_b4e3cbae8429d221f9ccb202a73bc3d9",
+      "consumer_group": "rmq2_g_9a023dc3b5ac7362d455d1f20ad70a0e"
+    },
+    {
+      "id": "sdk-v2-shared-python-mysql",
+      "topic": "sdk.logical",
+      "subscription": "sdk-shared-python",
+      "message_type": "TRANSACTION",
+      "owner": "iam.mysql",
+      "route_revision": "sdk-v2-shared-python",
+      "physical_topic": "rmq2_t_9ae6cf8c6d2ef2a69f7f8a5b12e8cc5b",
+      "consumer_group": "rmq2_g_2ddc20bba84d9aceb1f589fab73d9f3b"
+    },
+    {
+      "id": "sdk-v2-shared-python-mongo",
+      "topic": "sdk.logical",
+      "subscription": "sdk-shared-python",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mongo",
+      "route_revision": "sdk-v2-shared-python",
+      "physical_topic": "rmq2_t_cd86744c87c55e47204eb79c12dbb5f5",
+      "consumer_group": "rmq2_g_2ddc20bba84d9aceb1f589fab73d9f3b"
+    },
+    {
+      "id": "sdk-v2-shared-python-normal",
+      "topic": "sdk.logical",
+      "subscription": "sdk-shared-python",
+      "message_type": "NORMAL",
+      "owner": "iam.mysql",
+      "route_revision": "sdk-v2-shared-python",
+      "physical_topic": "rmq2_t_3c49548d057b561ef575801a2b3c10de",
+      "consumer_group": "rmq2_g_2ddc20bba84d9aceb1f589fab73d9f3b"
+    }
+  ],
+  "accounts": {
+    "owner-a": {
+      "owner": "iam.mysql",
+      "publish": [
+        "sdk-v2-mysql",
+        "sdk-v2-normal",
+        "sdk-v2-shared-go-mysql",
+        "sdk-v2-shared-go-normal",
+        "sdk-v2-shared-python-mysql",
+        "sdk-v2-shared-python-normal"
+      ],
+      "subscriptions": []
+    },
+    "owner-b": {
+      "owner": "qs.mongo",
+      "publish": [
+        "sdk-v2-mongo",
+        "sdk-v2-shared-go-mongo",
+        "sdk-v2-shared-python-mongo"
+      ],
+      "subscriptions": []
+    },
+    "observer": {
+      "publish": [],
+      "subscriptions": [
+        "sdk-v2-mysql",
+        "sdk-v2-mongo",
+        "sdk-v2-shared-go-mysql",
+        "sdk-v2-shared-go-mongo",
+        "sdk-v2-shared-go-normal",
+        "sdk-v2-shared-python-mysql",
+        "sdk-v2-shared-python-mongo",
+        "sdk-v2-shared-python-normal"
+      ]
+    }
+  }
+}

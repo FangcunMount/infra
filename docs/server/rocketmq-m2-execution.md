@@ -14,9 +14,9 @@
 | M2-P | T01 | ✅ 已完成；infra PR21 合并 6fdefde | 基线、任务及证据格式建立 |
 | M2-1 | T02–T04 | ✅ 已完成 | 双语言契约及失败状态通过、PR 合并 |
 | M2-2 | T05–T09 | ✅ 已完成；SDK 合并 d7d1415 | 四种原事务适配及并发证明、PR 合并 |
-| M2-3 | T10–T13 | 任务验证通过、SDK PR38 已合并；infra PR23 门禁待完成 | Go 真 RPC、回查及关闭有界、PR 合并 |
-| M2-4 | T14–T16 | 任务验证通过、SDK PR39 已合并；infra PR23 门禁待完成 | Python 线程/loop/取消证明、PR 合并 |
-| M2-5 | T17–T20 | 待开始 | 正式 SDK 故障集成 required CI 非空且 0 跳过、PR 合并 |
+| M2-3 | T10–T13 | ✅ 已完成；SDK PR38、infra PR23 已合并 | Go 真 RPC、回查及关闭有界、PR 合并 |
+| M2-4 | T14–T16 | ✅ 已完成；SDK PR39、infra PR23 已合并 | Python 线程/loop/取消证明、PR 合并 |
+| M2-5 | T17–T20 | T17 实现完成，31 项真实 v2 验收待通过 | 正式 SDK 故障集成 required CI 非空且 0 跳过、PR 合并 |
 | M2-6 | T21–T24 | 待开始 | 固定 tag/制品及下载重装通过 |
 
 | 完成 | ID | 任务与门禁 | 完成时间 / 源码 / 证据 / PR |
@@ -31,13 +31,13 @@
 | ✅ | T08 | Python SQLAlchemy/MySQL guard；根事务/savepoint/AUTOCOMMIT | 2026-10-19 +08:00；SDK d1a9cf5；[真实依赖证据](evidence/rocketmq-m2-sdk-storage-20261019.json)；[PR36](https://github.com/FangcunMount/reliable-messaging/pull/36) 全部 CI 通过并合并 d7d1415 |
 | ✅ | T09 | reservation、资格、中止器；迟到提交隔离 | 2026-10-19 +08:00；SDK d1a9cf5；[真实依赖证据](evidence/rocketmq-m2-sdk-storage-20261019.json)；[PR36](https://github.com/FangcunMount/reliable-messaging/pull/36) 全部 CI 通过并合并 d7d1415 |
 | ✅ | T10 | Go driver context、回查准入、关闭；源码复现 | 2026-10-19 +08:00；SDK 1846f4d；[驱动与真 Broker 证据](evidence/rocketmq-m2-sdk-driver-20261019.json)；PR37 合并 ab7aa78 |
-| ✅ | T11 | Go Sender 多分支准备、本地执行、最终确认 | 2026-10-19 +08:00；SDK c59e08a；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR38 已合并 87e0ff2；infra PR23 待门禁合并 |
-| ✅ | T12 | Go 精确 Checker；跨实例、饱和、DB 预算 | 2026-10-19 +08:00；SDK c59e08a；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR38 已合并 87e0ff2；infra PR23 待门禁合并 |
-| ✅ | T13 | Go Start/准入/Close/Wait；失败清理、关闭超时 | 2026-10-19 +08:00；SDK c59e08a；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR38 已合并 87e0ff2；infra PR23 待门禁合并 |
-| ✅ | T14 | Python 实例级有界 Producer；阻断上游无界队列 | 2026-10-19 +08:00；SDK b9fbad4；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR39 已合并 65eae5b；infra PR23 待门禁合并 |
-| ✅ | T15 | Python Sender/Checker/宿主 loop；session 不跨线程 | 2026-10-19 +08:00；SDK b9fbad4；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR39 已合并 65eae5b；infra PR23 待门禁合并 |
-| ✅ | T16 | Python 取消、真实在途记账、关闭、多客户端隔离 | 2026-10-19 +08:00；SDK b9fbad4；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR39 已合并 65eae5b；infra PR23 待门禁合并 |
-| ☐ | T17 | SDK/infra v2 路由、类型、owner ACL、共享消费预算 | — |
+| ✅ | T11 | Go Sender 多分支准备、本地执行、最终确认 | 2026-10-19 +08:00；SDK c59e08a；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR38 已合并 87e0ff2；infra PR23 已合并 4b7ed57 |
+| ✅ | T12 | Go 精确 Checker；跨实例、饱和、DB 预算 | 2026-10-19 +08:00；SDK c59e08a；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR38 已合并 87e0ff2；infra PR23 已合并 4b7ed57 |
+| ✅ | T13 | Go Start/准入/Close/Wait；失败清理、关闭超时 | 2026-10-19 +08:00；SDK c59e08a；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR38 已合并 87e0ff2；infra PR23 已合并 4b7ed57 |
+| ✅ | T14 | Python 实例级有界 Producer；阻断上游无界队列 | 2026-10-19 +08:00；SDK b9fbad4；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR39 已合并 65eae5b；infra PR23 已合并 4b7ed57 |
+| ✅ | T15 | Python Sender/Checker/宿主 loop；session 不跨线程 | 2026-10-19 +08:00；SDK b9fbad4；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR39 已合并 65eae5b；infra PR23 已合并 4b7ed57 |
+| ✅ | T16 | Python 取消、真实在途记账、关闭、多客户端隔离 | 2026-10-19 +08:00；SDK b9fbad4；[23 项真 Broker 与存储/语言 CI 证据](evidence/rocketmq-m2-sdk-senders-20261019.json)；SDK PR39 已合并 65eae5b；infra PR23 已合并 4b7ed57 |
+| ☐ | T17 | SDK/infra v2 路由、类型、owner ACL、共享消费预算 | SDK 2903608；Go/Python/infra 共用规范向量、公开消费者多物理输入共享预算、provision 全量预检与拒绝既有冲突；31 项真实双 runtime/MySQL profile CI 待通过 |
 | ☐ | T18 | 正式 SDK 跨语言/MySQL、Go/Mongo 真端到端 | — |
 | ☐ | T19 | 退出、断网、DB 提交丢回复、Broker 重启故障矩阵 | — |
 | ☐ | T20 | 资源上界、指标、超限告警、0600 原生超限审计导出 | — |
@@ -47,7 +47,7 @@
 | ☐ | T24 | 下载发布 tag/制品重新安装验收、索引与总表关闭 | — |
 
 
-本次 T11–T16 的公开 SDK 验收为 23/23、0 跳过；之后仅追加单次半消息 RPC 及回调诊断修复，已通过对应实际 TLS/编排测试和最新源码 CI。SDK Go/Python PR38/39 均已合并。infra 完整工作流曾因旧 SDK 固定引用与新增三分支探针不匹配失败；已统一固定到 SDK main `65eae5b`，需完成精确 SHA 重跑后才关闭 M2-3/M2-4 里程碑。原失败运行 [39193222448](https://github.com/FangcunMount/infra/actions/runs/39193222448) 保留，不作通过证据。
+本次 T11–T16 的公开 SDK 验收为 23/23、0 跳过；之后仅追加单次半消息 RPC 及回调诊断修复，已通过对应实际 TLS/编排测试和最新源码 CI。SDK Go/Python PR38/39 均已合并。infra 完整工作流曾因旧 SDK 固定引用与新增三分支探针不匹配失败；已统一固定到 SDK main `65eae5b`，精确 SHA 重跑 [公开 SDK 23 项](https://github.com/FangcunMount/infra/actions/runs/39194664066) 与[完整 Docker/普通消息/M2-0 回归](https://github.com/FangcunMount/infra/actions/runs/39194664076) 均通过，infra PR23 已合并 4b7ed57，M2-3/M2-4 里程碑关闭。原失败运行 [39193222448](https://github.com/FangcunMount/infra/actions/runs/39193222448) 保留，不作通过证据。
 
 执行顺序：T01 → T02–T04 → T05–T09 → T10–T13 → T14–T16 → T17–T20 → T21–T24；不跳过前置门禁。
 

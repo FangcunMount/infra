@@ -21,6 +21,10 @@ def main():
     accounts=json.loads(args.credentials.read_text())
     label=subprocess.check_output(["docker","inspect","--format",'{{index .Config.Labels "com.docker.compose.project"}}',args.container],text=True).strip()
     if label!=args.project: p.error("Compose project mismatch")
+    if manifest["version"] == 2:
+        from provision_v2 import provision
+        print(json.dumps(provision(args.container, manifest, accounts)))
+        return
     operations=0
 
     def run(operation, *params):

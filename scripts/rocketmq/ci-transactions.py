@@ -41,8 +41,11 @@ def broker_parameters(output):
 
 
 def run(argv, *, timeout=120, env=None, cwd=None, required=True, stdin=None):
-    result = subprocess.run(argv, input=stdin, capture_output=True, text=True,
-                            env=env, cwd=cwd, timeout=timeout)
+    try:
+        result = subprocess.run(argv, input=stdin, capture_output=True, text=True,
+                                env=env, cwd=cwd, timeout=timeout)
+    except (subprocess.TimeoutExpired, OSError):
+        raise RuntimeError("private acceptance operation timed out or unavailable") from None
     if required and result.returncode:
         # Admin output and driver logs can contain private credentials/DSNs.
         raise RuntimeError(Path(str(argv[0])).name + " operation failed (private output withheld)")
@@ -151,7 +154,7 @@ def main():
     while len({grpc_port, metrics_port, mysql_port}) != 3:
         grpc_port, metrics_port, mysql_port = port(), port(), port()
     accounts = {name: {"username": "m2-" + name, "password": secrets.token_hex(32)}
-                for name in ("admin", "inner", "owner-a", "owner-b")}
+                for name in ("admin", "inner", "owner-a", "owner-b", "observer")}
     mysql_password = secrets.token_hex(32)
     render(accounts, config, "127.0.0.1", repo / "components/rocketmq")
     with (config / "broker.conf").open("a") as stream:
@@ -213,6 +216,7 @@ def main():
     broker, mysql = project + "-broker-1", project + "-mysql-1"
     probes, cases, received, proof = [], {}, set(), {}
     failure = None
+    sdk_manifest = None
 
     def admin(operation, *params, success=False):
         result = run(["docker", "exec", broker, "java", "-Xms32m", "-Xmx128m",
@@ -230,16 +234,43 @@ def main():
     def mongo_command(command):
         return run(["docker", "exec", project + "-mongo-1", "mongosh", "--quiet", "--eval", command]).stdout.strip()
 
-    def start(language, mode, identity="", owner="owner-a", topic=None, trust=None, storage="mysql", branches=1):
-        if language in ("sdk-go", "sdk-python"):
-            topic = "m2-sdk-" + storage
-        account = accounts[owner]
+    def start(language, mode, identity="", owner="owner-a", topic=None, trust=None,
+              storage="mysql", branches=1, revision="sdk-v2", subscription=None, principal=None):
+        is_sdk = language in ("sdk-go", "sdk-python")
+        logical_owner, inputs, owner_routes = owner, [], []
+        group = "m2-tx-consumer"
+        if is_sdk:
+            from routes import consumer_group_v2
+            if sdk_manifest is None:
+                raise RuntimeError("required typed fixture manifest not provisioned")
+            logical_owner = "iam.mysql" if storage == "mysql" else "qs.mongo"
+            kind = "NORMAL" if mode == "normal" else "TRANSACTION"
+            matches = [r for r in sdk_manifest["routes"] if r["owner"] == logical_owner
+                       and r["route_revision"] == revision and r["message_type"] == kind]
+            if len(matches) != 1:
+                raise RuntimeError("fixture owner/type/revision route ambiguous or missing")
+            topic = topic or matches[0]["physical_topic"]
+            subscription = subscription or ("sdk-" + storage + "-observer")
+            group = consumer_group_v2("sdk.logical", subscription)
+            physical_inputs = ([r for r in sdk_manifest["routes"] if r.get("subscription") == subscription]
+                               if mode == "shared-consume" else matches)
+            inputs = [{k: v for k, v in r.items() if k != "id"} for r in physical_inputs]
+            role = principal or ("observer" if mode in ("consume", "shared-consume") else
+                                 ("owner-a" if storage == "mysql" else "owner-b"))
+            account = accounts[role]
+            owner_routes = [{"topic":r["topic"],"physical_topic":r["physical_topic"],
+                             "route_revision":r["route_revision"]} for r in sdk_manifest["routes"]
+                            if r["owner"] == logical_owner and r["message_type"] == "TRANSACTION"]
+        else:
+            account = accounts[owner]
         path = directory / ("client-" + secrets.token_hex(5) + ".json")
         path.write_text(json.dumps({"endpoint": f"127.0.0.1:{grpc_port}",
             "accesskey": account["username"], "secretkey": account["password"], "ca": str(trust or ca),
-            "topic": topic or "m2-tx-owner-a", "group": "m2-tx-consumer", "owner": owner,
-            "storage": storage, "branches": branches, "mongouri": f"mongodb://127.0.0.1:{mongo_port}/?replicaSet=sdk-proof&directConnection=true",
-            "dsn": f"txprobe:{mysql_password}@tcp(127.0.0.1:{mysql_port})/txprobe?timeout=1s&readTimeout=1s&writeTimeout=1s",
+            "topic": topic or "m2-tx-owner-a", "group": group, "owner": logical_owner,
+            "subscription": subscription or "", "inputs":inputs, "owner_routes":owner_routes,
+            "route_revision":revision, "storage": storage, "branches": branches,
+            "mongouri": f"mongodb://127.0.0.1:{mongo_port}/?replicaSet=sdk-proof&directConnection=true",
+            "dsn": f"txprobe:{mysql_password}@tcp(127.0.0.1:{mysql_port})/txprobe?timeout=1s&readTimeout=5s&writeTimeout=5s",
             "mysql_url": f"mysql+asyncmy://txprobe:{mysql_password}@127.0.0.1:{mysql_port}/txprobe"}))
         path.chmod(0o600)
         argv = ([str(args.go_probe or directory / "go-probe")] if language == "go" else
@@ -276,23 +307,24 @@ def main():
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
-        if not proof["mysql_version"].startswith("8.0."):
+        if not (proof["mysql_version"].startswith("8.0.") or (args.sdk_api_go and proof["mysql_version"].startswith("8.4."))):
             raise RuntimeError("required MySQL 8.0 fixture absent")
-        sql("CREATE TABLE witness(id VARCHAR(96) PRIMARY KEY, owner VARCHAR(32) NOT NULL, "
-            "wire_hash CHAR(64) NOT NULL, state VARCHAR(16) NOT NULL) ENGINE=InnoDB; "
-            "CREATE TABLE effects(id VARCHAR(96) PRIMARY KEY) ENGINE=InnoDB;")
-        for owner in ("owner-a", "owner-b"):
-            topic = "m2-tx-" + owner
-            admin("updateTopic", "-t", topic, "-r", "1", "-w", "1", "-a", "+message.type=TRANSACTION", success=True)
-            account = accounts[owner]
-            admin("createUser", "-u", account["username"], "-p", account["password"], "-t", "Normal", success=True)
-            admin("createAcl", "-s", "User:" + account["username"], "-r", "Topic:" + topic,
-                  "-a", "Pub,Sub,Get", "-d", "Allow", success=True)
-        admin("updateSubGroup", "-g", "m2-tx-consumer", "-r", "8", success=True)
-        admin("createAcl", "-s", "User:" + accounts["owner-a"]["username"], "-r", "Group:m2-tx-consumer",
-              "-a", "Sub,Get", "-d", "Allow", success=True)
-        if not args.go_probe:
-            run(["go", "build", "-o", str(directory / "go-probe"), "./transport/rocketmq/internal/txprobe"], cwd=sdk)
+        if not args.sdk_api_go:
+            sql("CREATE TABLE witness(id VARCHAR(96) PRIMARY KEY, owner VARCHAR(32) NOT NULL, "
+                "wire_hash CHAR(64) NOT NULL, state VARCHAR(16) NOT NULL) ENGINE=InnoDB; "
+                "CREATE TABLE effects(id VARCHAR(96) PRIMARY KEY) ENGINE=InnoDB;")
+            for owner in ("owner-a", "owner-b"):
+                topic = "m2-tx-" + owner
+                admin("updateTopic", "-t", topic, "-r", "1", "-w", "1", "-a", "+message.type=TRANSACTION", success=True)
+                account = accounts[owner]
+                admin("createUser", "-u", account["username"], "-p", account["password"], "-t", "Normal", success=True)
+                admin("createAcl", "-s", "User:" + account["username"], "-r", "Topic:" + topic,
+                      "-a", "Pub,Sub,Get", "-d", "Allow", success=True)
+            admin("updateSubGroup", "-g", "m2-tx-consumer", "-r", "8", success=True)
+            admin("createAcl", "-s", "User:" + accounts["owner-a"]["username"], "-r", "Group:m2-tx-consumer",
+                  "-a", "Sub,Get", "-d", "Allow", success=True)
+            if not args.go_probe:
+                run(["go", "build", "-o", str(directory / "go-probe"), "./transport/rocketmq/internal/txprobe"], cwd=sdk)
         if args.sdk_api_go:
             from sdk_acceptance import assert_absent, run_go_sdk
             run(["go", "build", "-o", str(directory / "sdk-go-probe"), "./transport/rocketmq/internal/sdkprobe"], cwd=sdk)
@@ -307,11 +339,8 @@ def main():
             proof["mongo_version"] = mongo_command("db.version()")
             if proof["mongo_version"] != "7.0.37":
                 raise RuntimeError("required Mongo version differs")
-            for storage in ("mysql", "mongo"):
-                topic = "m2-sdk-" + storage
-                admin("updateTopic", "-t", topic, "-r", "1", "-w", "1", "-a", "+message.type=TRANSACTION", success=True)
-                admin("createAcl", "-s", "User:" + accounts["owner-a"]["username"], "-r", "Topic:" + topic,
-                      "-a", "Pub,Sub,Get", "-d", "Allow", success=True)
+            from v2_acceptance import setup
+            sdk_manifest, proof["routing_v2"] = setup(repo,sdk,broker,project,accounts,directory,admin,run,passed)
             wrong_ca = directory / "sdk-wrong-ca.crt"
             run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
                  "-subj", "/CN=untrusted-sdk", "-keyout", str(directory / "sdk-wrong-ca.key"), "-out", str(wrong_ca)])
@@ -322,7 +351,12 @@ def main():
                 run([args.python, "sync", "--locked", "--project", str(sdk / "python"),
                      "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
                 run_python_sdk(start, passed, sql, pause_mysql, wrong_ca)
-            if len(cases) != (23 if args.sdk_api_python else 13):
+            from v2_acceptance import denied_owners, shared_budget
+            denied_owners(start,sql,mongo_command,passed,python=args.sdk_api_python)
+            shared_budget(start,passed,language="sdk-go")
+            if args.sdk_api_python:
+                shared_budget(start,passed,language="sdk-python")
+            if len(cases) != (31 if args.sdk_api_python else 19):
                 raise RuntimeError("required public SDK case count differs")
             return
         run([args.python, "sync", "--locked", "--project", str(sources)], timeout=180)
@@ -499,8 +533,8 @@ def main():
                   "probe_receipts": [{"pid": p.process.pid, "exit_code": p.process.returncode,
                                       "events": p.events} for p in probes],
                   "limits": (["No production acceptance or throughput claim",
-                              "Producer SDK and original transaction stores; observer uses pinned raw consumer",
-                              "Packet-level commit faults, native-limit SDK audit and v2 subscriber proof remain later gates"]
+                              "Public producer/consumer SDK, original transaction stores and scoped v2 owner ACLs",
+                              "Packet-level commit faults and native-limit SDK audit remain T19-T20 gates"]
                              if args.sdk_api_go else ["No production acceptance or throughput claim",
                               "Raw-client feasibility only; not public SDK transaction acceptance",
                               "Response loss is client-side discard after real RPC, not packet-level loss"]),
@@ -516,6 +550,8 @@ def main():
             source_paths = [*sdk.glob("transaction/*.go"), *sdk.glob("storage/transaction/**/*.go"),
                             *sdk.glob("storage/transaction/**/*.sql"),
                             *sdk.glob("transport/rocketmq/transaction*.go"),
+                            *sdk.glob("transport/routing*.go"), sdk / "contracts/rocketmq-routing-v2.json",
+                            sdk / "python/src/reliable_messaging/transport.py",
                             *sdk.glob("python/src/reliable_messaging/transaction*"),
                             sdk / "python/src/reliable_messaging/rocketmq_transaction.py",
                             sdk / "python/src/reliable_messaging/_rocketmq_transaction_driver.py",
@@ -531,7 +567,9 @@ def main():
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
-                                              repo / "components/rocketmq/docker-compose.yml", repo / "scripts/rocketmq/sdk_acceptance.py")}
+                                              repo / "components/rocketmq/docker-compose.yml", repo / "scripts/rocketmq/sdk_acceptance.py",
+                                              repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/routes.py",
+                                              repo / "scripts/rocketmq/provision_v2.py")}
         report["go_probe_sha256"] = hashlib.sha256((args.go_probe or directory / "go-probe").read_bytes()).hexdigest() if (args.go_probe or directory / "go-probe").exists() else None
         dirty_sdk = args.sdk_api_go and not report.get("sdk_tracked_sources_clean", False)
         if dirty_sdk:

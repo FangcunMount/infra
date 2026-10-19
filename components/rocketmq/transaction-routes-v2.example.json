@@ -1,0 +1,140 @@
+{
+  "version": 2,
+  "topic_options": {
+    "read_queue_nums": 1,
+    "write_queue_nums": 1,
+    "perm": 6
+  },
+  "group_options": {
+    "retry_queue_nums": 8
+  },
+  "routes": [
+    {
+      "id": "iam.mysql-normal",
+      "topic": "iam.mysql.events",
+      "subscription": "example-worker",
+      "message_type": "NORMAL",
+      "owner": "iam.mysql",
+      "route_revision": "m2-alpha1",
+      "physical_topic": "rmq2_t_ae702a1ef16f83c54991ab198abbc6be",
+      "consumer_group": "rmq2_g_41c14ff98f15992239688991616649f6"
+    },
+    {
+      "id": "iam.mysql-transaction",
+      "topic": "iam.mysql.events",
+      "subscription": "example-worker",
+      "message_type": "TRANSACTION",
+      "owner": "iam.mysql",
+      "route_revision": "m2-alpha1",
+      "physical_topic": "rmq2_t_2d27bd96d5d85ceb9722d3ed604ae79e",
+      "consumer_group": "rmq2_g_41c14ff98f15992239688991616649f6"
+    },
+    {
+      "id": "qs.mysql-normal",
+      "topic": "qs.mysql.events",
+      "subscription": "example-worker",
+      "message_type": "NORMAL",
+      "owner": "qs.mysql",
+      "route_revision": "m2-alpha1",
+      "physical_topic": "rmq2_t_c81c3eab52ce48eeb4648addb41cfe51",
+      "consumer_group": "rmq2_g_89e09e4b27b67b2079569a85b623312d"
+    },
+    {
+      "id": "qs.mysql-transaction",
+      "topic": "qs.mysql.events",
+      "subscription": "example-worker",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mysql",
+      "route_revision": "m2-alpha1",
+      "physical_topic": "rmq2_t_e90abed6388296f364e65a7cde408e77",
+      "consumer_group": "rmq2_g_89e09e4b27b67b2079569a85b623312d"
+    },
+    {
+      "id": "qs.mongo-normal",
+      "topic": "qs.mongo.events",
+      "subscription": "example-worker",
+      "message_type": "NORMAL",
+      "owner": "qs.mongo",
+      "route_revision": "m2-alpha1",
+      "physical_topic": "rmq2_t_2b32118eb3d8292f6ed871a9a086e3ea",
+      "consumer_group": "rmq2_g_b7220007d7e509b09c2ddd4939b1987c"
+    },
+    {
+      "id": "qs.mongo-transaction",
+      "topic": "qs.mongo.events",
+      "subscription": "example-worker",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mongo",
+      "route_revision": "m2-alpha1",
+      "physical_topic": "rmq2_t_a782b29eec0594da107ede45e50117ba",
+      "consumer_group": "rmq2_g_b7220007d7e509b09c2ddd4939b1987c"
+    },
+    {
+      "id": "ai.mysql-normal",
+      "topic": "ai.mysql.events",
+      "subscription": "example-worker",
+      "message_type": "NORMAL",
+      "owner": "ai.mysql",
+      "route_revision": "m2-alpha1",
+      "physical_topic": "rmq2_t_b46576333e68d8afc1dfbbc44edaedb6",
+      "consumer_group": "rmq2_g_7a73cfdd6aa7a34485df96514b31080b"
+    },
+    {
+      "id": "ai.mysql-transaction",
+      "topic": "ai.mysql.events",
+      "subscription": "example-worker",
+      "message_type": "TRANSACTION",
+      "owner": "ai.mysql",
+      "route_revision": "m2-alpha1",
+      "physical_topic": "rmq2_t_d2ba501834daabda548e00565465eb6d",
+      "consumer_group": "rmq2_g_7a73cfdd6aa7a34485df96514b31080b"
+    }
+  ],
+  "accounts": {
+    "iam.mysql": {
+      "owner": "iam.mysql",
+      "publish": [
+        "iam.mysql-normal",
+        "iam.mysql-transaction"
+      ],
+      "subscriptions": []
+    },
+    "qs.mysql": {
+      "owner": "qs.mysql",
+      "publish": [
+        "qs.mysql-normal",
+        "qs.mysql-transaction"
+      ],
+      "subscriptions": []
+    },
+    "qs.mongo": {
+      "owner": "qs.mongo",
+      "publish": [
+        "qs.mongo-normal",
+        "qs.mongo-transaction"
+      ],
+      "subscriptions": []
+    },
+    "ai.mysql": {
+      "owner": "ai.mysql",
+      "publish": [
+        "ai.mysql-normal",
+        "ai.mysql-transaction"
+      ],
+      "subscriptions": []
+    },
+    "example-worker": {
+      "publish": [],
+      "subscriptions": [
+        "iam.mysql-normal",
+        "iam.mysql-transaction",
+        "qs.mysql-normal",
+        "qs.mysql-transaction",
+        "qs.mongo-normal",
+        "qs.mongo-transaction",
+        "ai.mysql-normal",
+        "ai.mysql-transaction"
+      ]
+    }
+  }
+}
