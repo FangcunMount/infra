@@ -59,7 +59,7 @@ def port():
 
 
 class Probe:
-    def __init__(self, argv, directory, env):
+    def __init__(self, argv, directory, env, prefix="TXPROBE "):
         self.events = []
         self.incoming = queue.Queue()
         self.log = open(directory / ("probe-" + secrets.token_hex(5) + ".log"), "x")
@@ -69,9 +69,9 @@ class Probe:
 
         def collect():
             for line in self.process.stdout:
-                if line.startswith("TXPROBE "):
+                if line.startswith(prefix):
                     try:
-                        self.incoming.put(json.loads(line[len("TXPROBE "):]))
+                        self.incoming.put(json.loads(line[len(prefix):]))
                     except ValueError:
                         self.incoming.put({"event": "failed"})
                 else:
@@ -136,7 +136,10 @@ def main():
     parser.add_argument("--sdk-api-python", action="store_true", help="also require public Python/MySQL and cross-language recovery")
     parser.add_argument("--sdk-api-go", action="store_true", help="required public Go SDK acceptance; separate from raw M2-0")
     parser.add_argument("--python", default="uv")
+    parser.add_argument("--sdk-faults", action="store_true", help="require actual packet commit faults and owned Broker restarts")
     args = parser.parse_args()
+    if args.sdk_faults and not args.sdk_api_go:
+        parser.error("packet faults require public SDK acceptance")
     if args.sdk_api_python and not args.sdk_api_go:
         parser.error("Python SDK acceptance requires the full public Go SDK matrix")
     repo = Path(__file__).resolve().parents[2]
@@ -167,6 +170,8 @@ def main():
          "-keyout", str(config / "tls/server.key"), "-out", str(config / "tls/server.crt")])
     ca = directory / "ca.crt"
     shutil.copyfile(config / "tls/server.crt", ca)
+    fault_key = directory / "fault-server.key"
+    shutil.copyfile(config / "tls/server.key", fault_key); fault_key.chmod(0o600)
     image = run(["docker", "image", "inspect", args.image, "--format", "{{.Id}}"]).stdout.strip()
     run(["docker", "image", "inspect", args.mysql_image], required=False)
     if run(["docker", "image", "inspect", args.mysql_image], required=False).returncode:
@@ -235,7 +240,8 @@ def main():
         return run(["docker", "exec", project + "-mongo-1", "mongosh", "--quiet", "--eval", command]).stdout.strip()
 
     def start(language, mode, identity="", owner="owner-a", topic=None, trust=None,
-              storage="mysql", branches=1, revision="sdk-v2", subscription=None, principal=None):
+              storage="mysql", branches=1, revision="sdk-v2", subscription=None, principal=None,
+              database_proxy=None, mq_proxy=None):
         is_sdk = language in ("sdk-go", "sdk-python")
         logical_owner, inputs, owner_routes = owner, [], []
         group = "m2-tx-consumer"
@@ -263,15 +269,17 @@ def main():
                             if r["owner"] == logical_owner and r["message_type"] == "TRANSACTION"]
         else:
             account = accounts[owner]
+        actual_mysql_port = int(database_proxy.rsplit(":",1)[1]) if database_proxy and storage == "mysql" else mysql_port
+        actual_mongo_port = int(database_proxy.rsplit(":",1)[1]) if database_proxy and storage == "mongo" else mongo_port
         path = directory / ("client-" + secrets.token_hex(5) + ".json")
-        path.write_text(json.dumps({"endpoint": f"127.0.0.1:{grpc_port}",
+        path.write_text(json.dumps({"endpoint": mq_proxy or f"127.0.0.1:{grpc_port}",
             "accesskey": account["username"], "secretkey": account["password"], "ca": str(trust or ca),
             "topic": topic or "m2-tx-owner-a", "group": group, "owner": logical_owner,
             "subscription": subscription or "", "inputs":inputs, "owner_routes":owner_routes,
             "route_revision":revision, "storage": storage, "branches": branches,
-            "mongouri": f"mongodb://127.0.0.1:{mongo_port}/?replicaSet=sdk-proof&directConnection=true",
-            "dsn": f"txprobe:{mysql_password}@tcp(127.0.0.1:{mysql_port})/txprobe?timeout=1s&readTimeout=5s&writeTimeout=5s",
-            "mysql_url": f"mysql+asyncmy://txprobe:{mysql_password}@127.0.0.1:{mysql_port}/txprobe"}))
+            "mongouri": f"mongodb://127.0.0.1:{actual_mongo_port}/?replicaSet=sdk-proof&directConnection=true",
+            "dsn": f"txprobe:{mysql_password}@tcp(127.0.0.1:{actual_mysql_port})/txprobe?timeout=1s&readTimeout=5s&writeTimeout=5s",
+            "mysql_url": f"mysql+asyncmy://txprobe:{mysql_password}@127.0.0.1:{actual_mysql_port}/txprobe"}))
         path.chmod(0o600)
         argv = ([str(args.go_probe or directory / "go-probe")] if language == "go" else
                 [args.python, "run", "--locked", "--project", str(sources), "python", str(sources / "probe.py")])
@@ -285,6 +293,25 @@ def main():
         p = Probe(argv, directory, dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(trust or ca)))
         probes.append(p)
         return p
+
+    def proxy_start(kind):
+        endpoint = grpc_port if kind == "rocketmq" else (mysql_port if kind == "mysql" else mongo_port)
+        argv = [str(directory / "fault-proxy"), "--kind", kind,
+                "--upstream", f"127.0.0.1:{endpoint}", "--cert", str(ca), "--key", str(fault_key)]
+        proxy = Probe(argv, directory, dict(os.environ), prefix="FAULTPROXY ")
+        probes.append(proxy)
+        proxy.address = proxy.wait("ready")["address"]
+        return proxy
+
+    def restart_broker():
+        run(compose + ["restart", "broker"], timeout=90)
+        deadline = time.monotonic() + 100
+        while time.monotonic() < deadline:
+            health = run(["docker", "inspect", "--format", "{{.State.Health.Status}}", broker]).stdout.strip()
+            if health == "healthy":
+                return
+            time.sleep(.5)
+        raise RuntimeError("owned Broker did not become healthy after restart")
 
     def absent(identity, seconds=7):
         deadline = time.monotonic() + seconds
@@ -356,7 +383,14 @@ def main():
             shared_budget(start,passed,language="sdk-go")
             if args.sdk_api_python:
                 shared_budget(start,passed,language="sdk-python")
-            if len(cases) != (31 if args.sdk_api_python else 19):
+            if args.sdk_faults:
+                from sdk_faults import run_faults
+                run(["go", "build", "-o", str(directory / "fault-proxy"),
+                     "./transport/rocketmq/internal/faultproxy"], cwd=sdk)
+                proof["packet_faults"] = run_faults(start,proxy_start,passed,sql,mongo_command,
+                                                  restart_broker,python=args.sdk_api_python)
+            required_cases = (31 if args.sdk_api_python else 19) + ((13 if args.sdk_api_python else 8) if args.sdk_faults else 0)
+            if len(cases) != required_cases:
                 raise RuntimeError("required public SDK case count differs")
             return
         run([args.python, "sync", "--locked", "--project", str(sources)], timeout=180)
@@ -568,7 +602,7 @@ def main():
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
                                               repo / "components/rocketmq/docker-compose.yml", repo / "scripts/rocketmq/sdk_acceptance.py",
-                                              repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/routes.py",
+                                              repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/sdk_faults.py", repo / "scripts/rocketmq/routes.py",
                                               repo / "scripts/rocketmq/provision_v2.py")}
         report["go_probe_sha256"] = hashlib.sha256((args.go_probe or directory / "go-probe").read_bytes()).hexdigest() if (args.go_probe or directory / "go-probe").exists() else None
         dirty_sdk = args.sdk_api_go and not report.get("sdk_tracked_sources_clean", False)
