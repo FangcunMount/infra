@@ -3,13 +3,13 @@
   "task_ids": [
     "T07"
   ],
-  "status": "in_progress; released SDK repair consumed, required cloud/native host matrix pending",
-  "complete": false,
-  "observed_at": "2026-10-19T21:40:35.574673+00:00",
+  "status": "completed",
+  "complete": true,
+  "observed_at": "2026-10-19T21:43:39.208770+00:00",
   "source_sha": "57b07babe49666341b678af5aecb168b40511d7e",
   "repository": "FangcunMount/iam",
   "pr": "https://github.com/FangcunMount/iam/pull/134",
-  "pr_status": "draft; PR132 prerequisite merged; current source pushed",
+  "pr_status": "merged",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/iam-operations",
   "implemented": [
     "Complete immutable first-plan candidate including no-op intent and exact SDK wire; stable input vs generated artifacts separated",
@@ -1335,6 +1335,13 @@
           "report_sha256": "e024dc47302cbbc3a7c1d4806980e1971a29cb46949f62eda732a1a558e74185"
         }
       ]
+    },
+    {
+      "scope": "exact primary image build39329094438 attempt1, source57b07bab",
+      "url": "https://github.com/FangcunMount/iam/actions/runs/39329094438/job/118322426001",
+      "cause": "proxy.golang.org HTTP2 stream INTERNAL_ERROR fetching publishedtx.2 .mod during Docker go mod download; no checksum/source/compiler failure",
+      "private_log_sha256": "b032b0ad21b28373e7520db845329f18f016337af64c037befdede4a490119e4",
+      "action": "rerun only failed job on identical source; no source/proxy/security setting changed"
     }
   ],
   "remaining": [
@@ -1641,5 +1648,313 @@
         }
       }
     ]
+  },
+  "cloud_after_repair": "https://github.com/FangcunMount/infra/actions/runs/39329371609",
+  "required_final_matrix": {
+    "url": "https://github.com/FangcunMount/infra/actions/runs/39329371609",
+    "infra_sha": "4369e6ab6800b69ce403839541a566236db0f2bb",
+    "records": [
+      {
+        "kind": "native_original_root_HTTP",
+        "receipt": {
+          "scope": "IAM native storage/HTTP; stored half fixture, not Broker/system acceptance",
+          "source_sha": "57b07babe49666341b678af5aecb168b40511d7e",
+          "image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+          "project": "iam-m3-native-4b763e66a2e5",
+          "failed": 0,
+          "source_clean_before": true,
+          "go_version": "go version go1.25.9 linux/amd64",
+          "mysql_version": "8.0.36",
+          "test_process_group_drained": true,
+          "private_log_sha256": "cf662fef84e51682c8e717596c9c23ec6dca79646bbdc108bd58f9bfce4f915a",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          },
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "source_clean_after": true,
+          "cleanup": {
+            "owned_containers_remaining": false,
+            "private_fixture_removed": true
+          },
+          "existing_containers_unchanged": true
+        },
+        "sha256": "dcfc0cb7ba2c9856c5362c875b4088aacddeb8d4b73935c64c7ea8da341afe1b"
+      },
+      {
+        "kind": "native_original_root_HTTP",
+        "receipt": {
+          "scope": "IAM native storage/HTTP; stored half fixture, not Broker/system acceptance",
+          "source_sha": "57b07babe49666341b678af5aecb168b40511d7e",
+          "image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "project": "iam-m3-native-195052152c05",
+          "failed": 0,
+          "source_clean_before": true,
+          "go_version": "go version go1.25.9 linux/amd64",
+          "mysql_version": "8.0.44",
+          "test_process_group_drained": true,
+          "private_log_sha256": "f2b800f68228d7d64374ffd7ac4ba3e6b9d5a34ce4b78afc2fc9971b8000c054",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          },
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "source_clean_after": true,
+          "cleanup": {
+            "owned_containers_remaining": false,
+            "private_fixture_removed": true
+          },
+          "existing_containers_unchanged": true
+        },
+        "sha256": "213b49aa3da17839a664746d9d38399e5d1bec42c73f7d3fd58fbb8296ecc029"
+      },
+      {
+        "kind": "native_original_root_HTTP",
+        "receipt": {
+          "scope": "IAM native storage/HTTP; stored half fixture, not Broker/system acceptance",
+          "source_sha": "57b07babe49666341b678af5aecb168b40511d7e",
+          "image": "sha256:efb212ddf03576a6c0b02b8d364e6a46f21e628308a719db0b0450f8817c0517",
+          "project": "iam-m3-native-e23fa8f02536",
+          "failed": 0,
+          "source_clean_before": true,
+          "go_version": "go version go1.25.9 linux/amd64",
+          "mysql_version": "8.4.11",
+          "test_process_group_drained": true,
+          "private_log_sha256": "b9f4db366f194481b22b00ea19d439f87726326a61c4b6c6b6e943d59d727527",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          },
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "source_clean_after": true,
+          "cleanup": {
+            "owned_containers_remaining": false,
+            "private_fixture_removed": true
+          },
+          "existing_containers_unchanged": true
+        },
+        "sha256": "3c13f92e05daca57fed5286025bf25b621242555483a85ec87a257df831acc94"
+      },
+      {
+        "kind": "actual_Broker_host",
+        "host": {
+          "source_sha": "57b07babe49666341b678af5aecb168b40511d7e",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "provision": {
+            "version": 2,
+            "operations": 7,
+            "typed_topics": 1,
+            "principals": 2,
+            "verified": true
+          },
+          "private_output_sha256": "cb40b57e87288fac3fa3b91d8eaedc401b02db3629560ff2de76935a371f9de9",
+          "exit_code": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [],
+            "assertion_lines": [
+              353
+            ]
+          },
+          "native_receipt": {
+            "passed": 4,
+            "failed": 0,
+            "skipped": 0,
+            "half_invisible": true,
+            "commit_wire_and_witness": true,
+            "application_entry": true,
+            "rollback_hidden": true,
+            "business_result_atomic": true
+          },
+          "source_clean_after": true,
+          "scope": "real Broker, released SDK, host original transaction and application entry; not production/system acceptance"
+        },
+        "mysql": "8.0.36",
+        "broker_image": "sha256:a884bf059bad9dc0c751d00d375d76fc3c3fb2c4c29ab958b0d7b38615dca3bc",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sha256": "23fc3ba4b1977cc7071b80265ecc8d1a80edff20171d3618232beabe083bd162"
+      },
+      {
+        "kind": "actual_Broker_host",
+        "host": {
+          "source_sha": "57b07babe49666341b678af5aecb168b40511d7e",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "provision": {
+            "version": 2,
+            "operations": 7,
+            "typed_topics": 1,
+            "principals": 2,
+            "verified": true
+          },
+          "private_output_sha256": "1c0614970118bce6328cfda736bebb1773601ce6163e83b40855211e25a146d7",
+          "exit_code": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [],
+            "assertion_lines": [
+              353
+            ]
+          },
+          "native_receipt": {
+            "passed": 4,
+            "failed": 0,
+            "skipped": 0,
+            "half_invisible": true,
+            "commit_wire_and_witness": true,
+            "application_entry": true,
+            "rollback_hidden": true,
+            "business_result_atomic": true
+          },
+          "source_clean_after": true,
+          "scope": "real Broker, released SDK, host original transaction and application entry; not production/system acceptance"
+        },
+        "mysql": "8.0.44",
+        "broker_image": "sha256:ad512b8ce2c3db78e83c60f4447d0c4aec1b7529e26b5bf1ac072ebc1e57491c",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sha256": "831bedf6773ede899aaacf4f052da84d10ac5e62bf96d509d3856faef0eb91e7"
+      },
+      {
+        "kind": "actual_Broker_host",
+        "host": {
+          "source_sha": "57b07babe49666341b678af5aecb168b40511d7e",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "provision": {
+            "version": 2,
+            "operations": 7,
+            "typed_topics": 1,
+            "principals": 2,
+            "verified": true
+          },
+          "private_output_sha256": "0512c337728abe0e3cd6ff9d817d8d1cd97634bea818550ca2a04f5e037de91b",
+          "exit_code": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [],
+            "assertion_lines": [
+              353
+            ]
+          },
+          "native_receipt": {
+            "passed": 4,
+            "failed": 0,
+            "skipped": 0,
+            "half_invisible": true,
+            "commit_wire_and_witness": true,
+            "application_entry": true,
+            "rollback_hidden": true,
+            "business_result_atomic": true
+          },
+          "source_clean_after": true,
+          "scope": "real Broker, released SDK, host original transaction and application entry; not production/system acceptance"
+        },
+        "mysql": "8.4.11",
+        "broker_image": "sha256:7b0c1c4f27eafc16702c016486835d2f67fd4172261ad32eb78e0f0eb7a14de6",
+        "mysql_image": "sha256:efb212ddf03576a6c0b02b8d364e6a46f21e628308a719db0b0450f8817c0517",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sha256": "0513dc4a86c5537758e7c7a02a2fac83f28bd0026364f843aa3e124d6cf06f15"
+      }
+    ]
+  },
+  "completed_at": "2026-10-19T21:59:06.750208+00:00",
+  "merge_sha": "d53c36a9d68ef87054bea8bff615d22c07fa99c3",
+  "production_deploy_paused_readback": true,
+  "infra_host_pr": {
+    "url": "https://github.com/FangcunMount/infra/pull/41",
+    "source_sha": "4369e6ab6800b69ce403839541a566236db0f2bb",
+    "merged_sha": "d544918f39020e55a8af164f90f7b5101d61e6ba",
+    "all_current_checks": "13 success,0failure",
+    "merged_at": "2026-10-19T22:03:53Z"
   }
 }
