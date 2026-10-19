@@ -381,7 +381,9 @@ def main():
 
         # Accelerate ONLY the owned fixture. A real Unknown half must move to
         # the native discard topic; reaching an arbitrary sleep is not proof.
-        admin("updateBrokerConfig", "-k", "transactionCheckMax", "-v", "2", success=True)
+        # This command uses a different completion marker than provisioning.
+        # Its authoritative success proof is the immediately following readback.
+        admin("updateBrokerConfig", "-k", "transactionCheckMax", "-v", "2")
         discard_parameters = broker_parameters(admin("getBrokerConfig"))
         if discard_parameters["transactionCheckMax"] != 2:
             raise RuntimeError("finite-check test setting not effective")
