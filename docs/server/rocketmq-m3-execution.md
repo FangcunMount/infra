@@ -112,7 +112,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 2026-10-20；57b07bab正式Go SDKtx.2；必需三档MySQL原事务/HTTP各34项，真实Broker各21项，全部0失败/跳过；PR134合并d53c36a9；[证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
 | ✅ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 2026-10-20；IAM51405831/QS696ee314锁定正式Go SDKtx.2；三档MySQL原事务各34项、成对Broker/fanout各22项0失败/跳过，Mac mini额外22项通过；IAM PR135合并e3efa5b3、QS PR409合并2e95630b；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
 | ☑ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 已完成实现与验证；原事务/冻结BSON与wire、V2精确读取、实际Collection/gRPC 202和503、并发原赢家、Mongo failpoint重入、ACK客户端丢弃及新实例读取16项在Mac mini和GitHub实际通过。最终源码deb46e67全仓race6909通过/60既有可选依赖跳过，同包策略与87项文档检查通过；PR410合并3afc76a6，PR411/infra46最终头CI和合并单列；不表示生产或system验收。[证据](evidence/rocketmq-m3-qs-answer-20261020.json) |
-| ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 待开始 |
+| ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 进行中；独立qs-evaluation工作区991aa1e3完成首批V1/V2平面JSON兼容codec、Outcome不可变V2元数据、原MySQL事务写入约束与绑定primary的有界只读审计；5个相关包race及固定lint2.5通过。尚未接入三个业务提交器，未完成原生MySQL/Broker接入验证，不勾选 |
 | ☐ | T11 | QS 报告生成/失败，冻结与终态恢复 | 待开始 |
 | ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 待开始 |
 | ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 待开始 |
@@ -273,3 +273,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：QS PR410当前头25项检查通过、1项API生成同步不适用，按f78987ec精确头合并main3afc76a6，生产CD合并前回读仍暂停；PR411改为main并为321e0989显式触发同头CI39337474712，避免原feature基底未触发main限定CI而漏门禁。infra最新Go1.25.12宿主11项39336176609与装配15项39337093068均在线通过，后者已下载核对0失败/0跳过及全部清理回执。复核发现V1标记若同时包含V2事务证据会进入历史接受分支；新增纯版本选择拒绝与真实HTTP503回归，源码62dfaac1/文档head528ec496，验收扩为16项后重新绑定。全仓race6908通过/60既有可选依赖跳过、固定lint2.5零问题和87项文档检查通过；最终16项本地/云端复验继续，T09仍8/36，历史15项成功不改写成新头证明。
 
 - 2026-10-20：T09实现及必需验证完成，勾选并更新9/36。最终16项原生门禁本地528ec496/infra4be8e6a及云端39338243991均0失败/0跳过/无race，已下载核对真实报告摘要18dff0cb及全部资源清理回执；当前deb46e67相对528仅增加同包回归与文档标记，生产和原生夹具源码相同，不重标旧报告SHA。原Tier1失败39337890729/job118351863412保留：Collection代码注释变更缺少同包测试，已加入“ID存在但证据Unavailable不可接受/重写”的有意义回归，同包策略对实际main基底复验通过。deb46e67全仓race6909通过/0失败/60既有可选依赖跳过，87项文档检查通过；当前头CI继续，旧321手动CI因候选被替代在排队中取消。infra PR45当前11项全成功并合并0237e589；QS PR411及infra46尚未合并，M3-2不标完成。下一项T10只读定位了评分请求、结果与失败三个原根事务，以及失败路径中的未来重试责任；独立工作区qs-evaluation开始本批，不更改生产链路。
+
+- 2026-10-20：T10首个代码批次991aa1e3已本地提交，尚未发布或合并。为现有committed_event_evidence JSON列提供平面V1/V2 codec，保留原结果/report-input bytes、业务schemaVersion及历史V1语义；Outcome增加独立V2元数据，拒绝混合协议/业务绑定冲突，SQL写入要求原事务且拒绝Mongo owner。只读审计通过显式host primary binding与2秒预算读取精确witness；没有authority时为Unknown，不冒称Outbox行、published或消费者完成。evidence、Outcome domain、MySQL仓储、scheduler audit及outcome commit五包race通过，固定golangci2.5零问题；新测试最初漏检查mock pool.Close返回值已修正后复验通过。三个业务提交器、真实MySQL JSON/guard及Broker验收尚未完成，T10仍进行中，总进度9/36。
