@@ -9,40 +9,50 @@ def run_go_sdk(start, absent, passed, sql, mongo_command):
         init.finish()
         consumer = start("sdk-go", "consume", storage=storage)
         consumer.wait("ready")
-        received = set()
+        received, business = set(), set()
         for action in ("commit", "rollback"):
             identity = "sdk-" + storage + "-" + action
-            sender = start("sdk-go", "send", identity, storage=storage)
+            sender = start("sdk-go", "send", identity, storage=storage, branches=3)
             sender.wait("half")
-            absent(consumer, identity, 2)
+            for i in range(3):
+                absent(consumer, identity + "-b" + str(i), 1)
             sender.send(action)
             sender.wait("finalized", identity,
                         "committed" if action == "commit" else "aborted")
             sender.wait("closed")
             sender.finish()
             if action == "commit":
-                consumer.wait("received", identity)
-                received.add(identity)
+                for i in range(3):
+                    message_id = identity + "-b" + str(i)
+                    consumer.wait("received", message_id)
+                    received.add(message_id)
+                business.add(identity)
             else:
-                absent(consumer, identity, 3)
+                for i in range(3):
+                    absent(consumer, identity + "-b" + str(i), 1)
             passed("public_go_" + storage + "_half_then_" + action)
 
         for mode, exit_code, decision in (("crash-committed", 23, "commit"),
                                            ("crash-prepared", 22, "rollback")):
             identity = "sdk-" + storage + "-" + mode
-            sender = start("sdk-go", mode, identity, storage=storage)
+            sender = start("sdk-go", mode, identity, storage=storage, branches=3)
             sender.wait("half")
-            absent(consumer, identity, 1)
+            for i in range(3):
+                absent(consumer, identity + "-b" + str(i), .25)
             sender.send("commit")
             sender.finish(expected=exit_code)  # real OS exit; no final RPC/Close
             recovery = start("sdk-go", "recover", storage=storage)
             recovery.wait("ready")  # idle instance, no Reserve or Execute
             recovery.wait("checked", decision=decision, timeout=100)
             if decision == "commit":
-                consumer.wait("received", identity)
-                received.add(identity)
+                for i in range(3):
+                    message_id = identity + "-b" + str(i)
+                    consumer.wait("received", message_id)
+                    received.add(message_id)
+                business.add(identity)
             else:
-                absent(consumer, identity, 5)
+                for i in range(3):
+                    absent(consumer, identity + "-b" + str(i), 1)
             recovery.send("stop")
             recovery.wait("closed")
             recovery.finish()
@@ -51,7 +61,7 @@ def run_go_sdk(start, absent, passed, sql, mongo_command):
             rows = sql("SELECT id FROM sdk_business ORDER BY id;").splitlines()
         else:
             rows = mongo_command('db.getSiblingDB("sdkprobe").sdk_business.find({}, {_id:1}).sort({_id:1}).forEach(x=>print(x._id))').splitlines()
-        if set(rows) != received or len(rows) != len(received):
+        if set(rows) != business or len(rows) != len(business):
             raise RuntimeError("public SDK business effects differ from exact committed identity set")
         consumer.drain()
         observed = {e["id"] for e in consumer.events if e.get("event") == "received"}

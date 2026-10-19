@@ -230,7 +230,7 @@ def main():
     def mongo_command(command):
         return run(["docker", "exec", project + "-mongo-1", "mongosh", "--quiet", "--eval", command]).stdout.strip()
 
-    def start(language, mode, identity="", owner="owner-a", topic=None, trust=None, storage="mysql"):
+    def start(language, mode, identity="", owner="owner-a", topic=None, trust=None, storage="mysql", branches=1):
         if language in ("sdk-go", "sdk-python"):
             topic = "m2-sdk-" + storage
         account = accounts[owner]
@@ -238,7 +238,7 @@ def main():
         path.write_text(json.dumps({"endpoint": f"127.0.0.1:{grpc_port}",
             "accesskey": account["username"], "secretkey": account["password"], "ca": str(trust or ca),
             "topic": topic or "m2-tx-owner-a", "group": "m2-tx-consumer", "owner": owner,
-            "storage": storage, "mongouri": f"mongodb://127.0.0.1:{mongo_port}/?replicaSet=sdk-proof&directConnection=true",
+            "storage": storage, "branches": branches, "mongouri": f"mongodb://127.0.0.1:{mongo_port}/?replicaSet=sdk-proof&directConnection=true",
             "dsn": f"txprobe:{mysql_password}@tcp(127.0.0.1:{mysql_port})/txprobe?timeout=1s&readTimeout=1s&writeTimeout=1s",
             "mysql_url": f"mysql+asyncmy://txprobe:{mysql_password}@127.0.0.1:{mysql_port}/txprobe"}))
         path.chmod(0o600)
