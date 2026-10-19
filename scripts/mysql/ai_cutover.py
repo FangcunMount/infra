@@ -13,7 +13,7 @@ from urllib.parse import urlsplit
 ROOT = Path('/opt/qs-ai')
 CA = {'type': 'bind', 'source': '/data/infra/ssl/mysql/ca-chain.pem',
       'target': '/etc/qlume/mysql/ca-chain.pem', 'read_only': True,
-      'bind': {'create_host_path': False}}
+      'bind': {}}
 BASELINE = '7c71d1e95500aa20c3d82f57a7304578c8a794dd'
 HEADS = ['0040_module_table_names']
 
@@ -117,5 +117,8 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as error:
-        print(json.dumps({'mysql_tls_ai_cutover': 'failed', 'error_type': type(error).__name__}))
+        diagnostic = {'mysql_tls_ai_cutover': 'failed', 'error_type': type(error).__name__}
+        if type(error).__name__ in ('DeploymentError', 'ValueError'):
+            diagnostic['phase'] = str(error)
+        print(json.dumps(diagnostic))
         raise SystemExit(1) from None
