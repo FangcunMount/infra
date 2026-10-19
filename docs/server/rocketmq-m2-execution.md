@@ -10,12 +10,12 @@
 
 进度：**21/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
-### 最新核验快照（2026-10-19 16:17 +08:00）
+### 最新核验快照（2026-10-19 16:21 +08:00）
 
 | 核验项 | 当前结果 / 证据 |
 | --- | --- |
 | 已完成任务 | T01–T21，21/24；M2-P至M2-5均满足任务、验证及实现PR合并门禁；T22–T24仍待完成 |
-| 固定 SDK 候选 | 旧c02bc98在发布前因真实protobuf并发缺陷被替换；[SDK PR44](https://github.com/FangcunMount/reliable-messaging/pull/44)修复895eef1，待CI/合并后冻结新精确SHA；两tag尚未创建 |
+| 固定 SDK 候选 | `bfaae2b82ee0d1229b8c965fce472cdf5dec486f`；[SDK PR44](https://github.com/FangcunMount/reliable-messaging/pull/44)已合并，真实启动protobuf共享子消息缺陷已修复；原c02bc98在发布前被替换，两tag尚未创建 |
 | infra 合并 | `b90817cd347045f8738811c6693f7401be9fc8f8`；[PR27](https://github.com/FangcunMount/infra/pull/27)已合并；同时保留main中其他任务的serverA迁移及对应防火墙变更，未覆盖或回滚 |
 | 真实 SDK / 故障门禁 | infra85a2a61固定SDK8841fdf：[基础31项/档](https://github.com/FangcunMount/infra/actions/runs/39210736101)、[故障46项/档](https://github.com/FangcunMount/infra/actions/runs/39210736172)、[完整48项/档](https://github.com/FangcunMount/infra/actions/runs/39210736275)双档均通过，0失败/跳过；[T19证据](evidence/rocketmq-m2-sdk-packet-faults-20261019.json)、[T20证据](evidence/rocketmq-m2-sdk-limits-20261019.json) |
 | 普通消息及旧协议回归 | [完整Docker回归](https://github.com/FangcunMount/infra/actions/runs/39210736103)通过；普通消息、raw20项、公开Go19项，全部fixture资源排空 |
@@ -66,7 +66,7 @@ T22根因已定位：[实际脱敏错误及RED/GREEN证据](evidence/rocketmq-m2
 | ✅ | T18 | 正式 SDK 跨语言/MySQL、Go/Mongo 真端到端 | 2026-10-19 +08:00；SDK 3bf3dc8 / infra 910b614；[31项/档双profile门禁](https://github.com/FangcunMount/infra/actions/runs/39201819179) 通过，原ID/首次wire、跨实例/语言及真实数据库断连恢复通过；[证据](evidence/rocketmq-m2-sdk-routing-e2e-20261019.json)；SDK PR43(c02bc98) / infra PR27(b90817c)已合并 |
 | ✅ | T19 | 退出、断网、DB提交丢回复、Broker重启故障矩阵 | 2026-10-19 14:55 +08:00；SDK8841fdf / infra85a2a61；[46项/档、15项故障双档门禁](https://github.com/FangcunMount/infra/actions/runs/39210736172)通过、0跳过；[证据](evidence/rocketmq-m2-sdk-packet-faults-20261019.json)；实际精确回查、SIGKILL后完整中止、真实提交边界及进程组清理全部通过；SDK PR43(c02bc98) / infra PR27(b90817c)已合并 |
 | ✅ | T20 | 资源上界、指标、超限告警与只读审计 | 2026-10-19 14:57 +08:00；SDK8841fdf / infra85a2a61；[48项/档完整门禁](https://github.com/FangcunMount/infra/actions/runs/39210736275)双档通过、0跳过；[证据](evidence/rocketmq-m2-sdk-limits-20261019.json)；真实原生超限索引、0600审计、Unknown/Prepared保留、停止新准入及进程组排空均通过；SDK PR43(c02bc98) / infra PR27(b90817c)已合并 |
-| ✅ | T21 | 原事务示例、接入/恢复/关闭文档及API评审；冻结协议 | 2026-10-19 15:00 +08:00；固定SDK c02bc98；[API评审/12文件摘要/协议冻结证据](evidence/rocketmq-m2-sdk-api-review-20261019.json)；SDK PR43与infra PR27已合并，公开入口/双存储/原事务示例/有限恢复及关闭正文核对通过；发布仍待T22–T24 |
+| ✅ | T21 | 原事务示例、接入/恢复/关闭文档及API评审；冻结协议 | 2026-10-19 15:00 +08:00；SDK原API冻结不变，发布候选重绑bfaae2b（PR44内部修复）；[API评审/12文件摘要/协议冻结证据](evidence/rocketmq-m2-sdk-api-review-20261019.json)；SDK PR43与infra PR27已合并，公开入口/双存储/原事务示例/有限恢复及关闭正文核对通过；发布仍待T22–T24 |
 | ☐ | T22 | 固定候选 SHA、完整 CI、wheel/sdist/摘要/receipt | 分支候选 SDK 8841fdf；Go/Python 预定版本及确定性构建准备；显式 prepare_release.py 校验合并源码、CI状态、双档制品及故障报告并生成receipt；22项本地脚本测试通过；最终合并候选/完整CI/receipt待完成 |
 | ☐ | T23 | 两语言 tag 同一 SHA，GitHub 固定预发布 | — |
 | ☐ | T24 | 下载发布 tag/制品重新安装验收、索引与总表关闭 | infra prepare_published.py + workflow 已准备，固定 Go module、wheel/sdist 独立安装与完整验收；尚未发布或运行此门禁 |
