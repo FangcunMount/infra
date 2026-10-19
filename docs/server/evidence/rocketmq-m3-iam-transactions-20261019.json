@@ -1,0 +1,69 @@
+{
+  "format_version": 1,
+  "task_ids": [
+    "T06"
+  ],
+  "observed_at": "2026-10-19T14:38:52.031581+00:00",
+  "status": "in_progress",
+  "complete": false,
+  "repository": "FangcunMount/iam",
+  "source_sha": "0bd208a2bcc4730c262d96da0d1a88a7634dfefb",
+  "pr": "https://github.com/FangcunMount/iam/pull/132",
+  "pr_status": "draft; not merged",
+  "implemented": [
+    "Original-root SDK guard, all prepared-half evidence, exact one frozen event and witness commit",
+    "Join admitted local callbacks after canceled SDK snapshot; reject late callbacks",
+    "Opaque host local artifact codec retains exact original Broker wire; freezes row IDs and database audit wall clock before original root",
+    "Role/resource/grant/assignment and maintenance row allocation declarations; planned ORM hooks reject absent identities",
+    "Bounded host planning admission and ShutdownIncomplete accounting",
+    "Optional SDK Reserve/Execute orchestration; not installed in platform or maintenance CLI yet"
+  ],
+  "validation": [
+    {
+      "scope": "target source race",
+      "command": "go test -race -json application/authz, mysql adapters/authzaudit/original uow, messaging and maintenance packages",
+      "passed": 177,
+      "failed": 0,
+      "skipped": 9,
+      "skip_reason": "Existing optional local MySQL tests are not native acceptance",
+      "report": "/tmp/m3-iam-frozen-host-source.jsonl",
+      "exit": 0
+    },
+    {
+      "scope": "integration compilation, target vet, pinned lint2.5.0, docs facts/links and diff",
+      "exit": 0
+    },
+    {
+      "source_sha": "7730207dd26a0ff402038fe59c7de7ef4e4254b7",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39267957811",
+      "status": "success including original-root commit/rollback/all-half/event gates on three MySQL versions",
+      "concurrency_ci": "https://github.com/FangcunMount/iam/actions/runs/39267958066",
+      "sdk_isolation_ci": "https://github.com/FangcunMount/iam/actions/runs/39267958108",
+      "other_workflows_status": "success"
+    }
+  ],
+  "failure_history": [
+    {
+      "source_sha": "d7e5ce7720136774c4328655b170e73cd78f7741",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39267139636",
+      "scope": "native new root fact fixture on all3 MySQL jobs",
+      "failure": "GORM expanded []byte supplied inside INSERT VALUES(?) into multiple values; Error1136 before commitment",
+      "fix_source": "7730207dd26a0ff402038fe59c7de7ef4e4254b7",
+      "fix": "Bind operation identity as one SQL string value",
+      "verification": "39267957811 all3 native jobs pass",
+      "log_sha256": "8fb20243216065987daf6411f5049ccda5f236506350dca4a05a08822a6b73ea"
+    }
+  ],
+  "remaining": [
+    "Newest candidate native frozen ORM and actual host entrypoint matrix",
+    "Platform and maintenance CLI owner lifecycle and assembly",
+    "Full bound original-transaction and real Broker acceptance before T06 completion",
+    "T07: original typed duplicate results, durable no-op and permission protected public operations API"
+  ],
+  "boundaries": {
+    "native_half_receipts": "Explicit storage fixture; not Broker E2E/fault evidence",
+    "production_changes": false,
+    "system_acceptance": false,
+    "merged": false
+  }
+}

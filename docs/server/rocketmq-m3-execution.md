@@ -107,7 +107,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；初版IAM e50686c7 / QS98645d817 / AI81db026；race63/56、AI45通过；PR130/407/158已合并；最终CI/合并见T04证据；真实依赖另属T22/T23 |
 | ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；四库PR均合并，三库最终完整CI通过；生产未切换 |
 | ✅ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 2026-10-19；[完整证据](evidence/rocketmq-m3-iam-planning-20261019.json)；ea95cd9e全CI及三档MySQL每档7项0跳过、独立并发通过；[PR131](https://github.com/FangcunMount/iam/pull/131)合并c2aa3635；实际Sender装配属T06 |
-| ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 进行中；codex/rocketmq-m3-iam-root；原根事务执行器、半消息门禁与取消后真实回调记账，尚待完整接入和原生验证 |
+| ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 进行中；[PR132](https://github.com/FangcunMount/iam/pull/132)草稿/[分候选证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；7730207d全CI/三档原生/并发/SDK隔离通过；0bd208a2增加冻结ID/时钟及宿主准入，完整装配未完成 |
 | ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 待开始 |
 | ☐ | T08 | IAM 与 QS 双订阅、乱序、freshness 回归 | 待开始 |
 | ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 待开始 |
@@ -216,3 +216,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-19：T05持续推进，总进度4/36。冻结计划、精确权限版本、物理只读规划及根事务CAS在2fb64753完整CI/三档MySQL与独立并发通过。56012bf9增加Grant/Assignment规划、原名称身份、跨公司保留及授权后no-op；目标race69通过，3项既有可选本地MySQL跳过不计原生证明。新候选PR131 CI运行中，维护工具入口仍待实现；Sender原事务整合另属T06。全部故障/修复分候选保留，不提前勾选。
 
 - 2026-10-19：T05完成，总进度5/36。IAM ea95cd9e完整CI39265370007及独立并发39265370036通过；三档MySQL各7个具名原生用例（schema、精确CAS/物理只读、5类维护规划）0失败0跳过，保留日志摘要。PR131按精确head合并c2aa3635；合并前只读确认PRODUCTION_DEPLOY_PAUSED=true。T06转入独立分支推进原根事务/半消息证据/精确事件/witness和取消后回调记账，不提前标记业务上线。
+
+- 2026-10-19：T06推进，保持5/36。7730207d原根事务、半消息/事件门禁、回滚和单次执行在三档MySQL通过，完整CI、独立并发和SDK隔离通过；保留d7e5ce77夹具参数绑定失败。0bd208a2补冻结本地资料、原wire保留、业务/维护ID分配、原事务审计时钟和有界规划准入，177个目标source race通过，9项既有本地DB跳过不计验收；最新原生候选验证中。platform/维护CLI装配及完整业务状态仍未完成；PR132保持草稿，不打勾。
