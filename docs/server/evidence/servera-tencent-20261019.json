@@ -297,6 +297,19 @@
     "qs_server_PRODUCTION_DEPLOY_PAUSED": true,
     "qs_ai_AUTO_DEPLOY_ENABLED": false
   },
-  "business_acceptance": "not performed: authenticated login, questionnaire submission, AI/report generation require separate acceptance",
+  "business_acceptance": {
+    "confirmed_by": "user",
+    "confirmed_at": "2026-10-19T14:28:01.763735+08:00",
+    "passed": [
+      "mini_program_login",
+      "open_questionnaire",
+      "view_existing_report"
+    ],
+    "not_covered": [
+      "new_answer_submission",
+      "new_ai_report_generation",
+      "payment"
+    ]
+  },
   "old_server_retired": false
 }
