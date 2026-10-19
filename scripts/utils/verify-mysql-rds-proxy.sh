@@ -11,10 +11,7 @@ candidate_config=$(mktemp)
 trap 'rm -f "$candidate_config"' EXIT
 umask 077
 
-profile_args=()
-if [[ "$node" == serverA ]]; then
-  profile_args=(--profile aliyun-rds-proxy)
-fi
+profile_args=(--profile mysql-proxy-rollback)
 docker compose \
   "${profile_args[@]}" \
   --env-file "$env_file" \

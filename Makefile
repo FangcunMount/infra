@@ -1161,12 +1161,13 @@ MYSQL_RDS_PROXY_NODE ?= serverB
 mysql-rds-proxy-verify: ## 校验 RDS 私网代理（默认 serverB；旧 A 回退时指定 MYSQL_RDS_PROXY_NODE=serverA）
 	@MYSQL_RDS_PROXY_NODE="$(MYSQL_RDS_PROXY_NODE)" bash scripts/utils/verify-mysql-rds-proxy.sh
 
-mysql-rds-proxy-recreate: mysql-rds-proxy-verify ## 在当前主机重建 RDS 代理，必须与 MYSQL_RDS_PROXY_NODE 指定节点一致
+mysql-rds-proxy-recreate: mysql-rds-proxy-verify ## 受控回退：MYSQL_RDS_PROXY_ROLLBACK=1 后重建旧 RDS 代理
+	@test "$(MYSQL_RDS_PROXY_ROLLBACK)" = 1 || { echo "Set MYSQL_RDS_PROXY_ROLLBACK=1 for explicit legacy rollback"; exit 1; }
 	@test "$$(hostname -s | tr '[:upper:]' '[:lower:]')" = "$$(printf '%s' '$(MYSQL_RDS_PROXY_NODE)' | tr '[:upper:]' '[:lower:]')" || { echo 'Refusing proxy recreation on the wrong host'; exit 1; }
 	@docker compose \
 		--env-file compose/env/prod/$(MYSQL_RDS_PROXY_NODE).env \
 		-f deploy/$(MYSQL_RDS_PROXY_NODE)/docker-compose.yml \
-		$(if $(filter serverA,$(MYSQL_RDS_PROXY_NODE)),--profile aliyun-rds-proxy,) \
+		--profile mysql-proxy-rollback \
 		up -d --no-deps --force-recreate mysql-rds-proxy
 	$(call success_msg,mysql-rds-proxy 已原地重建)
 
@@ -1188,12 +1189,11 @@ serverA-destroy: ## 销毁 ServerA 所有容器、卷和数据 (危险!)
 
 serverA-rebuild: serverA-destroy serverA-up ## 完全重建 ServerA (销毁后重建)
 
-serverB-up: ## 启动 ServerB RDS 代理（业务容器由各自仓库部署）
-	$(call section_title,启动 ServerB (2C2G))
+serverB-up: ## 初始化 ServerB 基础设施；旧 MySQL 代理仅用于显式回退
+	$(call section_title,初始化 ServerB)
 	$(call ensure_infra_network_visible)
 	@$(MAKE) init-serverB
-	@cd deploy/serverB && docker compose --env-file ../../compose/env/prod/serverB.env up -d
-	$(call success_msg,ServerB RDS 代理已启动；IAM 等业务容器仍由各自仓库部署)
+	$(call success_msg,ServerB 初始化完成；生产数据库使用公网 TLS，旧代理不会自动启动)
 
 serverB-down: ## 停止 ServerB infra 服务栈
 	@cd deploy/serverB && docker compose --env-file ../../compose/env/prod/serverB.env stop mysql-rds-proxy
@@ -1207,7 +1207,7 @@ serverB-status: ## 查看 ServerB 状态
 serverB-destroy: ## 保留 ServerB 业务与数据（此入口不执行销毁）
 	$(call warning_msg,此入口不删除业务容器或数据；重建 RDS 代理请使用 mysql-rds-proxy-recreate)
 
-serverB-rebuild: serverB-destroy serverB-up ## 确保 ServerB RDS 代理启动，不删除业务容器或数据
+serverB-rebuild: serverB-destroy serverB-up ## 重新初始化 ServerB，不启动旧代理或删除业务容器与数据
 
 serverC-up: ## 启动 ServerC 服务栈 (MongoDB)
 	$(call section_title,启动 ServerC (4C4G))

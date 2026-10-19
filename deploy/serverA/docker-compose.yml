@@ -18,11 +18,11 @@ services:
 
   mysql-rds-proxy:
     # Only the old Alibaba node can use this rollback profile. The Tencent
-    # serverA uses the proxy on serverB; do not create a second production alias.
-    profiles: [aliyun-rds-proxy]
+    # production uses public MySQL TLS; this profile is only for explicit rollback.
+    profiles: [mysql-proxy-rollback]
     image: nginx:1.27
     container_name: mysql-rds-proxy
-    restart: unless-stopped
+    restart: "no"
     mem_limit: 64m
     cpus: "0.1"
     environment:
