@@ -80,6 +80,8 @@ def payload(before, image, host, port, ref, revision=None):
             netloc=url.netloc.rsplit('@', 1)[0]+'@'+host+':'+str(port)))
         changes.update(QS_AI_DATABASE_TLS_MODE='VERIFY_IDENTITY',
                        QS_AI_DATABASE_TLS_CA_FILE=CONTAINER_CA)
+    if name == 'qs-ai' and revision is not None:
+        changes['QS_AI_RELEASE_SHA'] = revision
     environment.update(changes)
     config['Env'] = [key+'='+value for key, value in environment.items()]
     config['Image'] = image
