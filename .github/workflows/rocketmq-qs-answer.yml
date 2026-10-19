@@ -6,7 +6,7 @@ on:
         description: Exact QS answer transaction candidate SHA
         type: string
         required: true
-        default: 080d4d7dc606379aabbd3e3ee8e804b551863ede
+        default: f95ebc0561e52c5085a730d1f23996e39a35793e
   pull_request:
     paths: ['scripts/rocketmq/qs_answer_acceptance.py', 'scripts/rocketmq/test_qs_answer_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-answer.yml']
 permissions:
@@ -23,7 +23,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go: ['1.25.9', '1.25.12']
+        # QS go.mod requires 1.25.12. The separate SDK workflow retains its
+        # own 1.25.9/1.25.12 compatibility matrix.
+        go: ['1.25.12']
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
@@ -34,7 +36,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: ${{ inputs.qs_ref || '080d4d7dc606379aabbd3e3ee8e804b551863ede' }}
+          ref: ${{ inputs.qs_ref || 'f95ebc0561e52c5085a730d1f23996e39a35793e' }}
           path: .qs-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -42,7 +44,7 @@ jobs:
           cache-dependency-path: .qs-acceptance/go.sum
       - name: Verify candidate and source harness
         env:
-          EXPECTED_QS_SHA: ${{ inputs.qs_ref || '080d4d7dc606379aabbd3e3ee8e804b551863ede' }}
+          EXPECTED_QS_SHA: ${{ inputs.qs_ref || 'f95ebc0561e52c5085a730d1f23996e39a35793e' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]
