@@ -18,6 +18,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify runtime export and proxy boundaries
         run: |
+          mkdir -p compose/env/prod
+          touch compose/env/prod/serverA.env compose/env/prod/serverB.env
           python3 -m unittest discover -s scripts/migration -p 'test_*.py' -v
           bash -n scripts/utils/verify-mysql-rds-proxy.sh scripts/04-ssl/deploy-renewed-certs.sh
           bash scripts/utils/verify-mysql-rds-proxy.sh
