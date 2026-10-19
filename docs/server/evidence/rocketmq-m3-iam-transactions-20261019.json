@@ -3,9 +3,9 @@
   "task_ids": [
     "T06"
   ],
-  "observed_at": "2026-10-19T20:26:02.104144+00:00",
-  "status": "in_progress",
-  "complete": false,
+  "observed_at": "2026-10-19T20:36:35.142929+00:00",
+  "status": "completed",
+  "complete": true,
   "repository": "FangcunMount/iam",
   "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
   "pr": "https://github.com/FangcunMount/iam/pull/132",
@@ -217,6 +217,53 @@
       "failed": 0,
       "skipped": 0,
       "status": "success; stored half fixtures, separate actual Broker gate"
+    },
+    {
+      "scope": "Actual released SDK + IAM original host root + isolated Docker RocketMQ; not production/system acceptance",
+      "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+      "infra_sha": "08d74f4",
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+      "go_version": "go1.25.12",
+      "broker_image": "sha256:050426c66e97d69940f3b023440f68277cd02a4b8af5717ca01cf33f09776726",
+      "mysql_image": "sha256:f37951fc3753a6a22d6c7bf6978c5e5fefcf6f31814d98c582524f98eae52b21",
+      "mysql_version": "8.0.44",
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "effective_broker_parameters": {
+        "transactionTimeOut": 6000,
+        "transactionCheckInterval": 5000,
+        "transactionCheckMax": 24,
+        "fileReservedTime": 48
+      },
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "iam_host_receipt": {
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0,
+        "half_invisible": true,
+        "commit_wire_and_witness": true,
+        "application_entry": true,
+        "rollback_hidden": true
+      },
+      "iam_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.5.0-rocketmq-tx.1",
+        "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "source_clean_after": true,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "report": "/tmp/m3-iam-host-broker-pass-8.0.44.json",
+      "report_sha256": "320737d8a9a2de3a82996624ab8076a71071e499e7508b1795d7f1c12288f53c"
     }
   ],
   "failure_history": [
@@ -253,12 +300,25 @@
       "verification": "integration build/lint and exact candidate supplemental MySQL9.3 all20 pass, zero skips",
       "failed_run_log_sha256": "9235cc5ba23c63d5dd3aba0c119df7a8a3c2e9c4f286d654af17488fe11dcfc2",
       "source_uncommitted": true
+    },
+    {
+      "scope": "First Mac mini isolated Broker run on exact same IAM89bdcf58 source",
+      "passed_baseline_cases": 18,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "IAM host go test exit1; first private host output was not retained before owned fixture deletion, root cause unconfirmed",
+      "report_sha256": "b535515193abab5adb87d19818ff189f543acf0819c7a84c6e9e99a7a89740b1",
+      "cleanup": {
+        "containers_remaining": false,
+        "process_groups_drained": true,
+        "private_directory_removed": true
+      },
+      "recheck": "Second run with infra08d74f4 diagnostics and opt-in0600 local capture passed21 including4 actual host proofs on unchanged IAM89bdcf58; no business-defect fix claimed"
     }
   ],
   "remaining": [
-    "Actual released-SDK/Broker host acceptance; private infra Actions account billing gate unresolved. Independent Mac mini Compose proof in progress.",
-    "Permission protected result/idempotency protocol and durable no-op (T07)",
-    "Production/system acceptance remains deferred"
+    "PR132 source merge tracked separately; user chose offline implementation",
+    "Production/system acceptance remains deferred to M3 production tasks"
   ],
   "boundaries": {
     "native_half_receipts": "Explicit storage fixture; not Broker E2E/fault evidence",
@@ -281,7 +341,7 @@
     }
   ],
   "external_blocker": {
-    "scope": "required actual IAM Broker host Docker matrix",
+    "scope": "private infra cloud CI and merge evidence; task local/native verification has now passed",
     "infra_source_sha": "dd0be29c2e6eaa12ac989db1f88f293eee2f1269",
     "ci": "https://github.com/FangcunMount/infra/actions/runs/39277154976",
     "check_runs": [
@@ -299,7 +359,8 @@
       "failed_check_run": 118158047787,
       "failed_job_steps_started": 0,
       "annotation_confirmed": "account payments failed or spending limit; MySQL8.4 not executed; other jobs then queued"
-    }
+    },
+    "user_decision": "Defer billing changes; continue offline implementation; no repeated cloud reruns"
   },
   "current_candidate_ci": {
     "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
@@ -322,8 +383,9 @@
     "broker_image": "sha256:050426c66e97d69940f3b023440f68277cd02a4b8af5717ca01cf33f09776726",
     "mysql_version": "8.0.44",
     "isolation": "New random rocketmq-m2 Compose project/network/loopback ports/temp schemas; existing services left running",
-    "status": "running; no pass claim",
+    "status": "second run passed21/0fail/0skip, including4 actual IAM host proofs; all owned fixture resources cleaned",
     "scope_limit": "Local native proof does not change GitHub Actions status or production/system acceptance",
     "setup_failure": "First 8.0.36 pull failed before fixture startup because SSH PATH omitted Docker credential helper; private failure log retained; retry uses verified existing MySQL8.0.44 image and corrected PATH"
-  }
+  },
+  "completed_at": "2026-10-19T20:36:35.142929+00:00"
 }

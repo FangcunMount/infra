@@ -4,7 +4,7 @@
 
 ## 当前执行快照
 
-- 进度：**5/36**；T01–T05 实现与任务必需验证完成。T05已完成并合并，T06进行中；M3-P已通过完整CI并完成四库PR合并；M3-1进行中，生产切换单独记账。
+- 进度：**6/36**；T01–T06 实现与任务必需验证完成。T05已合并，T06验证完成但PR132未合并；M3-P已通过完整CI并完成四库PR合并；M3-1进行中，生产切换单独记账。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码合并：基础批次及 IAM T05 已合并，IAM T06 PR132 仍为草稿。稳定 SDK 发布：未执行。生产部署/DDL/Topic/ACL/provider 切换：未执行。system 验收与 48 小时观察：未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
@@ -107,8 +107,8 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；初版IAM e50686c7 / QS98645d817 / AI81db026；race63/56、AI45通过；PR130/407/158已合并；最终CI/合并见T04证据；真实依赖另属T22/T23 |
 | ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；四库PR均合并，三库最终完整CI通过；生产未切换 |
 | ✅ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 2026-10-19；[完整证据](evidence/rocketmq-m3-iam-planning-20261019.json)；ea95cd9e全CI及三档MySQL每档7项0跳过、独立并发通过；[PR131](https://github.com/FangcunMount/iam/pull/131)合并c2aa3635；实际Sender装配属T06 |
-| ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 进行中；[PR132](https://github.com/FangcunMount/iam/pull/132)草稿/[分候选证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；7730207d全CI/三档原生/并发/SDK隔离通过；feb0369c已装配platform/维护CLI且完整CI通过；733c2dc2补IAM43协议门禁与进程生命周期，本地全仓race1898通过/31可选跳过、额外MySQL9.3原生15项0跳过；实际Broker矩阵因GitHub账户支付/额度限制未启动 |
-| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 进行中；[PR134](https://github.com/FangcunMount/iam/pull/134)草稿/[分项证据](evidence/rocketmq-m3-iam-operations-20261020.json)；723f171a模型/原事务存储基础，API与SDK双guard装配未完成；T06候选独立冻结，不跳过IAM批次门禁 |
+| ✅ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 2026-10-20；89bdcf58三档MySQL每档12具名项、共36项0跳过；Mac mini隔离RocketMQ5.5.1/MySQL8.0.44完整21项0失败0跳过，含实际IAM宿主4项证明，临时资源已清理；[完整证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；[PR132](https://github.com/FangcunMount/iam/pull/132)仍草稿未合并，生产未变更 |
+| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 进行中；[PR134](https://github.com/FangcunMount/iam/pull/134)候选3fc8b406已推送，后续fd8dd30f按用户选择仅本地提交；API/双guard/查询/生命周期已装配，完整source race1925项通过，干净fd8dd30f补充MySQL9.3为30项0跳过；固定Docker版本离线验证继续；[分项证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
 | ☐ | T08 | IAM 与 QS 双订阅、乱序、freshness 回归 | 待开始 |
 | ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 待开始 |
 | ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 待开始 |
@@ -235,3 +235,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 
 - 2026-10-20：T07候选3fc8b406已推送PR134，进度5/36。新增HTTP可选键/操作引用/受保护查询、类型化结果与SDK/业务双guard装配、原事务no-op、查询真实在途关闭及总扫描预算50+50。全仓race1925通过/31既有可选跳过，API/Swagger/Gin一致、Spectral原110条基线未增加，lint/docs通过；干净候选额外MySQL9.3为29项0失败0跳过，临时数据已清理。新增HTTP+MySQL联合用例继续本地验证，不计作system或Broker验收。
 - 2026-10-20：用户明确“暂不处理，继续离线实现”，infra Actions账单门禁暂缓；此后不为账单重跑云端CI，新增源码/进度先保留本地提交。Mac mini第一轮实际Broker验收基础18项通过、IAM宿主用例失败，整轮失败且临时容器/探针/数据已清理。保留失败回执和摘要，新增固定脱敏诊断及显式0700目录/0600本地日志捕获后第二轮在执行；不以18项基础通过勾选T06。
+
+- 2026-10-20：T06实现及验证完成，打勾并更新总进度6/36。IAM89bdcf58在隔离Docker RocketMQ5.5.1/MySQL8.0.44最终21项0失败0跳过，含真实宿主半消息不可见、原根事务/wire/witness、RoleCatalog入口、回滚无消息/事实四项；报告保存镜像ID、固定客户端、实际参数、源码和清理回执。既有三档MySQL源码门禁共36项0跳过，构成独立存储与真实Broker证据；第一轮失败未删除或冒称业务缺陷已定位。PR132合并、infra云端CI、生产及system仍分别待完成，M3-1里程碑未完成。
