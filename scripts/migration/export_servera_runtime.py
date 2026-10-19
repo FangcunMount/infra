@@ -148,7 +148,10 @@ def main():
     parser.add_argument("input", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--scope", choices=["servera", "iam"], default="servera")
+    parser.add_argument("--legacy-proxy-rollback", action="store_true", help="Explicitly authorize this historical proxy-based export")
     args = parser.parse_args()
+    if not args.legacy_proxy_rollback:
+        parser.error("Historical exporter requires --legacy-proxy-rollback; current production uses public MySQL TLS")
     result = export_runtime(json.loads(args.input.read_text()), args.scope)
     descriptor = os.open(args.output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(descriptor, "w") as stream:

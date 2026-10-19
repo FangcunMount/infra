@@ -2,12 +2,12 @@
 # serverB 基础设施栈 (2C2G)
 # ============================================================================
 # 服务清单：
-#   - MySQL RDS 私网代理（serverA 迁入腾讯云后仍保留 RDS 私网访问）
+#   - 旧 MySQL RDS 私网代理（仅受控回退，默认不启动）
 # 依赖：
 #   - 外部网络：infra-network
 #   - 配置文件：compose/env/prod/serverB.env
 # 注意：
-#   - serverB 承载 IAM，但业务容器由对应项目部署
+#   - IAM 已迁到 serverA；业务容器由对应项目部署
 #   - qs-collection-server 已迁移到 serverA
 #   - NSQ 已迁移到 serverD
 #   - MySQL / Redis 使用云托管服务
@@ -15,9 +15,10 @@
 
 services:
   mysql-rds-proxy:
+    profiles: [mysql-proxy-rollback]
     image: nginx:1.27
     container_name: mysql-rds-proxy
-    restart: unless-stopped
+    restart: "no"
     mem_limit: 64m
     cpus: "0.1"
     environment:
