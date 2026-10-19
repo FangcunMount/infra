@@ -1,0 +1,489 @@
+{
+  "version": 1,
+  "tasks": [
+    "T11",
+    "T12",
+    "T13"
+  ],
+  "status": "in_progress",
+  "accepted_scope": "initial single-branch public Go SDK recovery; final three-branch/budget/isolation gates pending",
+  "sdk_sha": "ad0320aa29f84e5fdf9c1011f7fd8d20db25a2b2",
+  "ci": "https://github.com/FangcunMount/infra/actions/runs/39191898260",
+  "sdk_pr": "https://github.com/FangcunMount/reliable-messaging/pull/38",
+  "report": {
+    "version": 1,
+    "batch": "M2-Go-SDK",
+    "project": "rocketmq-m2-efbff9dad51a",
+    "image": "sha256:4136c12197cc0ce1946243e15806d5f930d58807be0e687a6a40066404aaf44a",
+    "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+    "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+    "clients": {
+      "go": "5.1.4",
+      "python": "5.1.2"
+    },
+    "cases": {
+      "public_go_mysql_half_then_commit": true,
+      "public_go_mysql_half_then_rollback": true,
+      "public_go_mysql_new_instance_crash-committed": true,
+      "public_go_mysql_new_instance_crash-prepared": true,
+      "public_go_mysql_exact_business_and_wire_set": true,
+      "public_go_mongo_half_then_commit": true,
+      "public_go_mongo_half_then_rollback": true,
+      "public_go_mongo_new_instance_crash-committed": true,
+      "public_go_mongo_new_instance_crash-prepared": true,
+      "public_go_mongo_exact_business_and_wire_set": true
+    },
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "failure": null,
+    "proof": {
+      "effective_broker_parameters": {
+        "transactionTimeOut": 6000,
+        "transactionCheckInterval": 5000,
+        "transactionCheckMax": 24,
+        "fileReservedTime": 48
+      },
+      "mysql_version": "8.0.36",
+      "mongo_version": "7.0.37"
+    },
+    "probe_receipts": [
+      {
+        "pid": 17232,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "mysql",
+            "event": "installed",
+            "id": ""
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 17242,
+        "exit_code": -15,
+        "events": [
+          {
+            "decision": "observer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "exact_wire_acknowledged",
+            "event": "received",
+            "id": "sdk-mysql-commit"
+          },
+          {
+            "decision": "exact_wire_acknowledged",
+            "event": "received",
+            "id": "sdk-mysql-crash-committed"
+          }
+        ]
+      },
+      {
+        "pid": 17268,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": "sdk-mysql-commit"
+          },
+          {
+            "decision": "all_prepared",
+            "event": "half",
+            "id": "sdk-mysql-commit"
+          },
+          {
+            "decision": "committed",
+            "event": "finalized",
+            "id": "sdk-mysql-commit"
+          },
+          {
+            "decision": "drained",
+            "event": "closed",
+            "id": "sdk-mysql-commit"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 17310,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": "sdk-mysql-rollback"
+          },
+          {
+            "decision": "all_prepared",
+            "event": "half",
+            "id": "sdk-mysql-rollback"
+          },
+          {
+            "decision": "aborted",
+            "event": "finalized",
+            "id": "sdk-mysql-rollback"
+          },
+          {
+            "decision": "drained",
+            "event": "closed",
+            "id": "sdk-mysql-rollback"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 17455,
+        "exit_code": 23,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": "sdk-mysql-crash-committed"
+          },
+          {
+            "decision": "all_prepared",
+            "event": "half",
+            "id": "sdk-mysql-crash-committed"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 17463,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "commit",
+            "event": "checked",
+            "id": ""
+          },
+          {
+            "decision": "drained",
+            "event": "closed",
+            "id": ""
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 17638,
+        "exit_code": 22,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": "sdk-mysql-crash-prepared"
+          },
+          {
+            "decision": "all_prepared",
+            "event": "half",
+            "id": "sdk-mysql-crash-prepared"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 17680,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "unknown",
+            "event": "checked",
+            "id": ""
+          },
+          {
+            "decision": "rollback",
+            "event": "checked",
+            "id": ""
+          },
+          {
+            "decision": "drained",
+            "event": "closed",
+            "id": ""
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 18291,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "mongo",
+            "event": "installed",
+            "id": ""
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 18305,
+        "exit_code": -15,
+        "events": [
+          {
+            "decision": "observer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "exact_wire_acknowledged",
+            "event": "received",
+            "id": "sdk-mongo-commit"
+          },
+          {
+            "decision": "exact_wire_acknowledged",
+            "event": "received",
+            "id": "sdk-mongo-crash-committed"
+          }
+        ]
+      },
+      {
+        "pid": 18314,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": "sdk-mongo-commit"
+          },
+          {
+            "decision": "all_prepared",
+            "event": "half",
+            "id": "sdk-mongo-commit"
+          },
+          {
+            "decision": "committed",
+            "event": "finalized",
+            "id": "sdk-mongo-commit"
+          },
+          {
+            "decision": "drained",
+            "event": "closed",
+            "id": "sdk-mongo-commit"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 18347,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": "sdk-mongo-rollback"
+          },
+          {
+            "decision": "all_prepared",
+            "event": "half",
+            "id": "sdk-mongo-rollback"
+          },
+          {
+            "decision": "aborted",
+            "event": "finalized",
+            "id": "sdk-mongo-rollback"
+          },
+          {
+            "decision": "drained",
+            "event": "closed",
+            "id": "sdk-mongo-rollback"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 18452,
+        "exit_code": 23,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": "sdk-mongo-crash-committed"
+          },
+          {
+            "decision": "all_prepared",
+            "event": "half",
+            "id": "sdk-mongo-crash-committed"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 18483,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "commit",
+            "event": "checked",
+            "id": ""
+          },
+          {
+            "decision": "drained",
+            "event": "closed",
+            "id": ""
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 18718,
+        "exit_code": 22,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": "sdk-mongo-crash-prepared"
+          },
+          {
+            "decision": "all_prepared",
+            "event": "half",
+            "id": "sdk-mongo-crash-prepared"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 18728,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "public_sdk",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "unknown",
+            "event": "checked",
+            "id": ""
+          },
+          {
+            "decision": "rollback",
+            "event": "checked",
+            "id": ""
+          },
+          {
+            "decision": "drained",
+            "event": "closed",
+            "id": ""
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      }
+    ],
+    "limits": [
+      "No production acceptance or throughput claim",
+      "Response loss injected after a real RPC, not at network packet layer",
+      "Public Go SDK mode proves original transaction + idle-instance recovery; Python SDK/network-packet faults remain separate"
+    ],
+    "source_sha256": {
+      "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+      "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+      "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+    },
+    "sdk_source_sha256": {
+      "transport/rocketmq/internal/driver/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "transport/rocketmq/internal/driver/UPSTREAM.json": "ad465474c66b081d1d906619433834bccb413d866fb275c4a082046d5198ff4c",
+      "transport/rocketmq/internal/driver/UPSTREAM.md": "4b38cf24a11eab2abe6ea71cd84fbe946995dde04d5484c0be67d3a0b06a4b09",
+      "transport/rocketmq/internal/driver/client.go": "bc91af75116e553114939c383ae54cf5694ede1344bfb3381e9804ba690a3e4e",
+      "transport/rocketmq/internal/driver/client_manager.go": "47d8110bd92821831c5f35ac18ca673eabc14cd99c2cbf4b1215dfd760677782",
+      "transport/rocketmq/internal/driver/client_manager_mock.go": "f60e472d5976e0ee2bd95edfc9103a658e6859ece93de038fedb5830c618997d",
+      "transport/rocketmq/internal/driver/client_mock.go": "06317cad9e81b3de1874f091a347f8826d2852b6972f7d21d8a66202316bf8f1",
+      "transport/rocketmq/internal/driver/client_options.go": "dfc39180a3e6e7ff73bef35e2b6c081b8b146e3ff7b28ef3243e9890802d726d",
+      "transport/rocketmq/internal/driver/config.go": "6bb496d157434ae44a5561dfb74954317498e4b1fa6f463ca98c25ae0f891dc1",
+      "transport/rocketmq/internal/driver/conn.go": "ddc881ee0346e83fb442fc0639c979d4c9d6ca3b0e4d080713d1e95259167d48",
+      "transport/rocketmq/internal/driver/conn_options.go": "04f8897abe3b8f0233c8dfc488bb83712aaf7884c0bcec89ca5343d641fafdeb",
+      "transport/rocketmq/internal/driver/consumer.go": "d00714fb983466e5125108f773193bedd46bc02abd3375b54a7dc220cd89e1e7",
+      "transport/rocketmq/internal/driver/consumer_options.go": "412726d80edae989202a3ff08fcb9637e1925562fd479dde5e0e851312ab5604",
+      "transport/rocketmq/internal/driver/consumer_service.go": "5f4a2ac1e26b45f8d890f2f14ad72201a338e3afdf9f702e6e6d1e8b22c63f7f",
+      "transport/rocketmq/internal/driver/error.go": "c431fd3f5f934efb216415d3e0238fa384b6df2c8d9377e565e269c53f78b452",
+      "transport/rocketmq/internal/driver/lite_push_consumer.go": "aab7d261fec9995afd921b1cb28f254873273a03f574685ead2ac453e3fcec0e",
+      "transport/rocketmq/internal/driver/lite_push_consumer_mock.go": "e2e2d8a92371f7b637d60c7e4f927dfa69ca872d0fb684d760b3b139ab139b2c",
+      "transport/rocketmq/internal/driver/lite_push_consumer_options.go": "4e6aaa5f42cf33f805144c3a7e9519429ceec788447eb60a44c9dcb66adcf252",
+      "transport/rocketmq/internal/driver/loadBalancer.go": "afe4e4bacec2b7e2939e606428d24e5b031ef65eb8a93beafb05682eca2cb030",
+      "transport/rocketmq/internal/driver/log.go": "7bbb7e701892676723000a50871507caa0772b1de43ac84669f8f8691f24ecf0",
+      "transport/rocketmq/internal/driver/message.go": "cd6eba5cbde4f68ef17540b7f61523a1b9da559cb4ddcbbbc4ee1351542b65c2",
+      "transport/rocketmq/internal/driver/message_id.go": "6797a1e2a89a78016c4048ce8bc97ab8bc60a55010694b982a14ce7eb0f0e5cc",
+      "transport/rocketmq/internal/driver/message_id_codec.go": "17f7407b417bd8996885bca27c4e2a00dfc8f3bb6c8e2f121f4395fe4b192404",
+      "transport/rocketmq/internal/driver/metric.go": "40f077d2aff82fee8f9159e765f9f58cc4846d07a40d97e58493e9139db34e2e",
+      "transport/rocketmq/internal/driver/name_resolver.go": "8aaa51e30fdd0cdbe358076eb749ac67cbbc51107a559d729108218498e9fe37",
+      "transport/rocketmq/internal/driver/process_queue.go": "6d51d1a8c44a6c575a2c8ad2155b12e95027872a295cd7df822761604c9ef39f",
+      "transport/rocketmq/internal/driver/producer.go": "d2873e3c5f169b9980e7fe9aad1c43988a69d123fe325a0d107faf2b932f69c7",
+      "transport/rocketmq/internal/driver/producer_options.go": "3fa2e4359be26f6cabb3ae2deed3a53bb7a8d69978b61d4c463cda8893765e4c",
+      "transport/rocketmq/internal/driver/publishing_message.go": "b6c06219bae4d0fbc9e961f41d9dd56769d21053b42f6ff1f2629da7c13e3fce",
+      "transport/rocketmq/internal/driver/push_consumer.go": "6e44d25c71a71fa0a78a9daeb3be97568d83ab9404450e892eb3710e2d6d6480",
+      "transport/rocketmq/internal/driver/push_consumer_options.go": "07d936b21a433a641a51f0a17ef549b4bf0c90719e86a29f9d848d1d054a6578",
+      "transport/rocketmq/internal/driver/receive_rate_limiter.go": "7fe507eb88bc008f030e91852ca2d34b680f61add71e1ebb60c62e34cb851716",
+      "transport/rocketmq/internal/driver/rpc-options.patch": "36d11b883260db6e34239945eab069b7939da7114d975455f052b373cca5ea8b",
+      "transport/rocketmq/internal/driver/rpc_client.go": "2a3b6fbcead76c2783eec328ae2a5780ce764cf84bffbadb33c5abfa9377f326",
+      "transport/rocketmq/internal/driver/rpc_client_mock.go": "4c8c6d6af3576fe62824f9759948f5a85dde38ee5c7148c7f81e6a0d04006619",
+      "transport/rocketmq/internal/driver/rpc_client_options.go": "485f4368467c18a31344318f60d98dde43f2044d4493192857ec6f53459705d8",
+      "transport/rocketmq/internal/driver/rpc_options_test.go": "3ff0643718025721e98ad211c1dfac359f260f875ba6668be93fb15fc49604b2",
+      "transport/rocketmq/internal/driver/simple_consumer.go": "56956743825905af9526a955bb52d3945a2abb796713e6aa9107b25a205073a1",
+      "transport/rocketmq/internal/driver/simple_consumer_options.go": "d24c4def53f00b324eb4cea6d498d87e2127f0f65d20ce1e0c48a116aca88f72",
+      "transport/rocketmq/internal/driver/simple_thread_pool.go": "f6e3ec76238822539484d9c0c96b3761741d8adf979f6bf46616012dcf42bd64",
+      "transport/rocketmq/internal/driver/trace.go": "1a480254170cb1d09533ce00e6e696d6868189e560115d5108a28dd8efb3cdf9",
+      "transport/rocketmq/internal/driver/transaction-runtime.patch": "4ab7dc8a5c279e6ee0bc87edb57da09367f5f3464d80e33aa7416ff90624e1ac",
+      "transport/rocketmq/internal/driver/transaction.go": "aa5efa55f0309bfd5a7eee7be390feabe29efb40949e25b71982e6fc3e750e5b",
+      "transport/rocketmq/internal/driver/transaction_bounds_test.go": "ad748adf6038c3e2b11451cef642f6b5d8669d909a056e5a68868a2203ba9fe8",
+      "transport/rocketmq/internal/driver/user_agent.go": "74cb4a11296820f6a60c0d390137b40ac1670e57e56825e4cc9d3ca5d616926a",
+      "transport/rocketmq/internal/sdkprobe/main.go": "7e9085d1bf2275772a95495d8987db4d0f717fb91aa35a48cbc9e0190064d3c0",
+      "transport/rocketmq/internal/txprobe/main.go": "ea5572b786829b5c3d1e4bb827c1aa12567956545b29588b09d4f7ef299ab5e4"
+    },
+    "sdk_sha": "ad0320aa29f84e5fdf9c1011f7fd8d20db25a2b2",
+    "go_runtime_patch": "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)",
+    "harness_sha256": {
+      "scripts/rocketmq/ci-transactions.py": "7e0d7080ef6cf8e03923998e819c7da3ad1a2653e2f589891ddceb5834a0f074",
+      "scripts/rocketmq/render.py": "d2a91207804ca9f85ce15511edfbd1858a087e78141a5bd9668745d8cc72f4dc",
+      "components/rocketmq/docker-compose.yml": "d294f7310a2d499ca17d8a78e2ac42e5b291734b8f6792411863f8f8d871c4f8",
+      "scripts/rocketmq/sdk_acceptance.py": "65ac0986a530b765cba217dbf885b10272e314a26efdf8ff71726bb34f4e9fca"
+    },
+    "go_probe_sha256": "e3731de97a973a0aef46543370bd0532e53468733e2e83c4bf9907827b9556da"
+  }
+}

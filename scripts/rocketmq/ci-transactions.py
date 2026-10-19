@@ -130,9 +130,12 @@ def main():
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
     parser.add_argument("--go-probe", type=Path)
+    parser.add_argument("--sdk-api-python", action="store_true", help="also require public Python/MySQL and cross-language recovery")
     parser.add_argument("--sdk-api-go", action="store_true", help="required public Go SDK acceptance; separate from raw M2-0")
     parser.add_argument("--python", default="uv")
     args = parser.parse_args()
+    if args.sdk_api_python and not args.sdk_api_go:
+        parser.error("Python SDK acceptance requires the full public Go SDK matrix")
     repo = Path(__file__).resolve().parents[2]
     sources = repo / "scripts/rocketmq/txprobe"
     sdk = args.sdk.resolve()
@@ -227,15 +230,15 @@ def main():
     def mongo_command(command):
         return run(["docker", "exec", project + "-mongo-1", "mongosh", "--quiet", "--eval", command]).stdout.strip()
 
-    def start(language, mode, identity="", owner="owner-a", topic=None, trust=None, storage="mysql"):
-        if language == "sdk-go":
+    def start(language, mode, identity="", owner="owner-a", topic=None, trust=None, storage="mysql", branches=1):
+        if language in ("sdk-go", "sdk-python"):
             topic = "m2-sdk-" + storage
         account = accounts[owner]
         path = directory / ("client-" + secrets.token_hex(5) + ".json")
         path.write_text(json.dumps({"endpoint": f"127.0.0.1:{grpc_port}",
             "accesskey": account["username"], "secretkey": account["password"], "ca": str(trust or ca),
             "topic": topic or "m2-tx-owner-a", "group": "m2-tx-consumer", "owner": owner,
-            "storage": storage, "mongouri": f"mongodb://127.0.0.1:{mongo_port}/?replicaSet=sdk-proof&directConnection=true",
+            "storage": storage, "branches": branches, "mongouri": f"mongodb://127.0.0.1:{mongo_port}/?replicaSet=sdk-proof&directConnection=true",
             "dsn": f"txprobe:{mysql_password}@tcp(127.0.0.1:{mysql_port})/txprobe?timeout=1s&readTimeout=1s&writeTimeout=1s",
             "mysql_url": f"mysql+asyncmy://txprobe:{mysql_password}@127.0.0.1:{mysql_port}/txprobe"}))
         path.chmod(0o600)
@@ -243,6 +246,10 @@ def main():
                 [args.python, "run", "--locked", "--project", str(sources), "python", str(sources / "probe.py")])
         if language == "sdk-go":
             argv = [str(directory / "sdk-go-probe")]
+        if language == "sdk-python":
+            argv = [args.python, "run", "--locked", "--project", str(sdk / "python"),
+                    "--extra", "rocketmq", "--extra", "nsq", "python",
+                    str(sdk / "python/tests/integration/transaction_probe.py")]
         argv += ["--config", str(path), "--mode", mode, "--id", identity]
         p = Probe(argv, directory, dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(trust or ca)))
         probes.append(p)
@@ -305,8 +312,17 @@ def main():
                 admin("updateTopic", "-t", topic, "-r", "1", "-w", "1", "-a", "+message.type=TRANSACTION", success=True)
                 admin("createAcl", "-s", "User:" + accounts["owner-a"]["username"], "-r", "Topic:" + topic,
                       "-a", "Pub,Sub,Get", "-d", "Allow", success=True)
-            run_go_sdk(start, assert_absent, passed, sql, mongo_command)
-            if len(cases) != 10:
+            wrong_ca = directory / "sdk-wrong-ca.crt"
+            run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
+                 "-subj", "/CN=untrusted-sdk", "-keyout", str(directory / "sdk-wrong-ca.key"), "-out", str(wrong_ca)])
+            pause_mysql = lambda paused: run(["docker", "pause" if paused else "unpause", mysql])
+            run_go_sdk(start, assert_absent, passed, sql, mongo_command, pause_mysql, wrong_ca)
+            if args.sdk_api_python:
+                from sdk_acceptance import run_python_sdk
+                run([args.python, "sync", "--locked", "--project", str(sdk / "python"),
+                     "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
+                run_python_sdk(start, passed, sql, pause_mysql, wrong_ca)
+            if len(cases) != (23 if args.sdk_api_python else 13):
                 raise RuntimeError("required public SDK case count differs")
             return
         run([args.python, "sync", "--locked", "--project", str(sources)], timeout=180)
@@ -472,26 +488,58 @@ def main():
                 p.close()
         run(["docker", "unpause", mysql], required=False)
         run(compose + ["down", "--volumes", "--remove-orphans", "--timeout", "30"], timeout=120)
-        report = {"version": 1, "batch": "M2-Go-SDK" if args.sdk_api_go else "M2-0", "project": project, "image": image,
+        remaining = run(["docker", "ps", "-aq", "--filter", "label=com.docker.compose.project=" + project]).stdout.strip()
+        if remaining:
+            failure = failure or "owned Compose containers remain after cleanup"
+        report = {"version": 1, "batch": ("M2-Go-Python-SDK" if args.sdk_api_python else "M2-Go-SDK") if args.sdk_api_go else "M2-0", "project": project, "image": image,
                   "mysql_image": mysql_image, "mongo_image": mongo_image, "clients": {"go": "5.1.4", "python": "5.1.2"},
                   "cases": cases, "passed": len(cases), "failed": int(failure is not None),
                   "skipped": 0, "failure": failure, "proof": proof,
+                  "cleanup": {"project_containers_remaining": bool(remaining), "compose_down_succeeded": True},
                   "probe_receipts": [{"pid": p.process.pid, "exit_code": p.process.returncode,
                                       "events": p.events} for p in probes],
-                  "limits": ["No production acceptance or throughput claim",
-                             "Response loss injected after a real RPC, not at network packet layer",
-                             "Public Go SDK mode proves original transaction + idle-instance recovery; Python SDK/network-packet faults remain separate" if args.sdk_api_go else "Host transaction adapters/fencing and bounded SDK queues belong to later M2 batches"],
+                  "limits": (["No production acceptance or throughput claim",
+                              "Producer SDK and original transaction stores; observer uses pinned raw consumer",
+                              "Packet-level commit faults, native-limit SDK audit and v2 subscriber proof remain later gates"]
+                             if args.sdk_api_go else ["No production acceptance or throughput claim",
+                              "Raw-client feasibility only; not public SDK transaction acceptance",
+                              "Response loss is client-side discard after real RPC, not packet-level loss"]),
                   "source_sha256": {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in sorted(sources.iterdir()) if p.is_file()}}
         report["sdk_source_sha256"] = {str(p.relative_to(sdk)): hashlib.sha256(p.read_bytes()).hexdigest()
                                        for p in sorted(sdk_sources.rglob("*")) if p.is_file()}
         report["sdk_sha"] = run(["git", "rev-parse", "HEAD"], cwd=sdk).stdout.strip()
+        report["go_version"] = run(["go", "env", "GOVERSION"], cwd=sdk).stdout.strip()
+        api_binary = directory / "sdk-go-probe"
+        if args.sdk_api_go and api_binary.is_file():
+            report["sdk_go_probe_sha256"] = hashlib.sha256(api_binary.read_bytes()).hexdigest()
+            source_paths = [*sdk.glob("transaction/*.go"), *sdk.glob("storage/transaction/**/*.go"),
+                            *sdk.glob("storage/transaction/**/*.sql"),
+                            *sdk.glob("transport/rocketmq/transaction*.go"),
+                            *sdk.glob("python/src/reliable_messaging/transaction*"),
+                            sdk / "python/src/reliable_messaging/rocketmq_transaction.py",
+                            sdk / "python/src/reliable_messaging/_rocketmq_transaction_driver.py",
+                            sdk / "python/tests/integration/transaction_probe.py"]
+            report["sdk_api_source_sha256"] = {str(path.relative_to(sdk)): hashlib.sha256(path.read_bytes()).hexdigest()
+                                               for path in sorted(set(source_paths)) if path.is_file()}
+            report["sdk_tracked_sources_clean"] = run(["git", "diff", "--quiet", "HEAD"], cwd=sdk, required=False).returncode == 0
+        if args.sdk_api_python:
+            metadata = run([args.python, "run", "--locked", "--project", str(sdk / "python"),
+                            "--extra", "rocketmq", "--extra", "nsq", "python", "-c",
+                            "import sys,json,importlib.metadata as m; print(json.dumps({'python':sys.version.split()[0],'client':m.version('rocketmq-python-client')}))"]).stdout
+            report["python_runtime"] = json.loads(metadata)
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
                                               repo / "components/rocketmq/docker-compose.yml", repo / "scripts/rocketmq/sdk_acceptance.py")}
         report["go_probe_sha256"] = hashlib.sha256((args.go_probe or directory / "go-probe").read_bytes()).hexdigest() if (args.go_probe or directory / "go-probe").exists() else None
+        dirty_sdk = args.sdk_api_go and not report.get("sdk_tracked_sources_clean", False)
+        if dirty_sdk:
+            report["failed"] = 1
+            report["failure"] = report["failure"] or "tracked SDK source changed during acceptance"
         args.report.write_text(json.dumps(report, indent=2) + "\n")
+        if remaining or dirty_sdk:
+            raise RuntimeError("owned cleanup or exact SDK source verification failed")
 
 
 if __name__ == "__main__":
