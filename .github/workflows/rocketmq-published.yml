@@ -59,5 +59,6 @@ jobs:
           path: |
             .published/published-installation.json
             rocketmq-published-sdk.json
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 14

@@ -84,10 +84,10 @@ def main():
     args = parser.parse_args()
     report = export(args.container,args.project,args.key,args.output)
     print(json.dumps({'records':len(report['records']),'read_only':True,'body_exported':False,
-            'truncated_possible':len(records)==64,
-            'alert':'native_transaction_check_limit_reached' if records else None,
-            'severity':'critical' if records else None}))
+            'truncated_possible':report['truncated_possible'],
+            'alert':report['alert'],'severity':report['severity']}))
+    return 2 if report['alert'] else 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())
