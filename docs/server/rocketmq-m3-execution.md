@@ -93,7 +93,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | --- | --- | --- | --- | --- |
 | M3-P | 基线、清单与接入基础 | T01–T04 | ✅ 已完成 | 责任、迁移契约、实现验证与合并 |
 | M3-1 | IAM | T05–T08 | ✅ 已完成 | 原事务、幂等与双订阅 |
-| M3-2 | QS 领域及调度 | T09–T13 | ☐ 待开始 | 双存储和未来重试 |
+| M3-2 | QS 领域及调度 | T09–T13 | ☐ 进行中 | 双存储和未来重试 |
 | M3-3 | QS↔AI | T14–T20 | ☐ 待开始 | 档案、回执、安全、模型恢复 |
 | M3-4 | 故障与运维 | T21–T25 | ☐ 待开始 | 真实故障及切换工具 |
 | M3-5 | 稳定发布及候选 | T26–T29 | ☐ 待开始 | 正式制品及最终镜像演练 |
@@ -110,7 +110,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 2026-10-20；89bdcf58三档MySQL每档12具名项、共36项0跳过；Mac mini隔离RocketMQ5.5.1/MySQL8.0.44完整21项0失败0跳过，含实际IAM宿主4项证明，临时资源已清理；[完整证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；[PR132](https://github.com/FangcunMount/iam/pull/132)合并7accc92c，生产未变更 |
 | ✅ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 2026-10-20；57b07bab正式Go SDKtx.2；必需三档MySQL原事务/HTTP各34项，真实Broker各21项，全部0失败/跳过；PR134合并d53c36a9；[证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
 | ✅ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 2026-10-20；IAM51405831/QS696ee314锁定正式Go SDKtx.2；三档MySQL原事务各34项、成对Broker/fanout各22项0失败/跳过，Mac mini额外22项通过；IAM PR135合并e3efa5b3、QS PR409合并2e95630b；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
-| ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 待开始 |
+| ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 进行中；独立qs-domain工作区基线2e95630b，5个目标包race通过；原Mongo根事务/202/幂等及V1审计恢复链已核对，正在实现冻结BSON/首次wire、V2证据和原session guard，尚无真实事务验收完成声明 |
 | ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 待开始 |
 | ☐ | T11 | QS 报告生成/失败，冻结与终态恢复 | 待开始 |
 | ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 待开始 |
@@ -258,3 +258,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：T07/T08完成实现和必需验证，打勾并更新8/36。下载核对T07三档原事务/HTTP各34项、Broker各21项；T08三档原事务各34项、成对Broker各22项，全部0失败/跳过、无race且临时资源排空，实际模块均tx.2，源码精确匹配。PR134合并d53c36a9，PR135合并e3efa5b3，QS PR409合并2e95630b；两宿主生产CD仍暂停。SDK索引PR47合并9da9c213。infra PR41其他SDK/故障回归仍在执行，里程碑M3-1暂不标完成，不进入QS领域接入批次。QS原效果权威读取首次失败后同源码复验通过，原因仍未知并保留到T23/T25，不改写恢复保护或宣称修复。
 
 - 2026-10-20：infra PR41固定4369e6a的13项当前检查全部成功，包括普通消息、实际SDK、包级故障与完整事务回归；已合并d544918f。至此M3-1所属T05–T08及相关SDK/IAM/QS/infra源码门禁闭环，里程碑标完成，任务总进度8/36。进度归档采用仅文档后续PR，不移动发布tag、不重复长时源码验收。接下来按顺序进入M3-2/T09答卷原Mongo事务接入；生产准入/NSQ/账号验收边界不变。
+
+- 2026-10-20：M3-1进度归档PR44已合并234e39f1。进入T09，QS独立工作区codex/rocketmq-m3-qs-domain固定基线2e95630b；答卷应用/Mongo仓储、证据、事务运行器与Collection提交五包race窄基线通过。已确认现有202恢复依赖原幂等读取，写仓储和审计/原效果恢复仅识别V1，Mongo重入callback内仍会生成BSON_id/审计时间；新路径需在准备半消息前冻结完整业务文档及原wire、持久V2并借用原session witness，保留历史V1读取且封闭新事务事件旧Replay。M3仍8/36，无生产写入。
