@@ -1,6 +1,5 @@
 import json
 import unittest
-import os
 import tempfile
 from pathlib import Path
 
@@ -47,6 +46,10 @@ class IAMAcceptanceTest(unittest.TestCase):
                    'commit_wire_and_witness': True, 'application_entry': True, 'rollback_hidden': True}
         output = 'M3_HOST_RECEIPT ' + json.dumps(receipt) + '\n--- PASS: TestM3ActualBrokerHost (1.00s)\n'
         self.assertEqual(parse_host_receipt(output), receipt)
+        with self.assertRaises(RuntimeError):
+            parse_host_receipt(output, require_business_result=True)
+        with_result = output.replace('"rollback_hidden": true', '"rollback_hidden": true, "business_result_atomic": true')
+        self.assertTrue(parse_host_receipt(with_result, require_business_result=True)['business_result_atomic'])
         for altered in (output.replace('--- PASS:', '--- SKIP:'), output.replace('true', 'false', 1),
                         output.replace('TestM3ActualBrokerHost', 'TestUnrelated'), output + output):
             with self.assertRaises(RuntimeError):

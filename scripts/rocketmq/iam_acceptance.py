@@ -25,7 +25,7 @@ def iam_manifest():
     return result
 
 
-def parse_host_receipt(output):
+def parse_host_receipt(output, require_business_result=False):
     receipts = [json.loads(line.split('M3_HOST_RECEIPT ', 1)[1])
                 for line in output.splitlines() if 'M3_HOST_RECEIPT {' in line]
     if (len(receipts) != 1 or receipts[0].get('passed') != 4 or receipts[0].get('failed') != 0
@@ -35,6 +35,8 @@ def parse_host_receipt(output):
             or not re.search(r'--- PASS: TestM3ActualBrokerHost \(', output)
             or re.search(r'--- (?:SKIP|FAIL):', output)):
         raise RuntimeError('IAM native receipt is absent, failed, skipped or incomplete')
+    if require_business_result and receipts[0].get('business_result_atomic') is not True:
+        raise RuntimeError('original business operation result proof absent')
     return receipts[0]
 
 
@@ -59,7 +61,7 @@ def retain_private_host_output(path, raw):
         stream.write(raw)
 
 
-def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None):
+def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, require_business_result=False):
     source = source.resolve()
     if not (source / 'go.mod').is_file():
         raise RuntimeError('required exact IAM source checkout missing')
@@ -109,7 +111,7 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
         retain_private_host_output(private_log, raw)
     if result.returncode:
         raise RuntimeError('actual IAM host acceptance failed (private output withheld)')
-    proof['native_receipt'] = parse_host_receipt(result.stdout)
+    proof['native_receipt'] = parse_host_receipt(result.stdout, require_business_result)
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('IAM tracked source changed during native acceptance')

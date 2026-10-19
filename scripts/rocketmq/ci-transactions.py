@@ -162,6 +162,7 @@ def main():
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
     parser.add_argument("--iam-host", type=Path, help="exact IAM checkout; require actual host SDK/Broker acceptance in the owned fixture")
+    parser.add_argument("--iam-operation-results", action="store_true", help="also require schema44 business-result atomicity from the actual IAM owner")
     parser.add_argument("--iam-private-log", type=Path, help="explicit owned0700 directory / new0600 local IAM log; never upload as CI artifact")
     parser.add_argument("--go-probe", type=Path)
     parser.add_argument("--sdk-api-python", action="store_true", help="also require public Python/MySQL and cross-language recovery")
@@ -172,6 +173,8 @@ def main():
     parser.add_argument("--sdk-go-probe", type=Path, help="prebuilt public SDK executable from a verified published Go module")
     parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
     args = parser.parse_args()
+    if (args.iam_operation_results or args.iam_private_log) and not args.iam_host:
+        parser.error("IAM result/capture options require an explicit IAM host source")
     if bool(args.installed_python) != bool(args.sdk_go_probe) or (args.installed_python and not args.sdk_api_python):
         parser.error("published installation requires both runtimes and full cross-language acceptance")
     if args.sdk_limits and not args.sdk_faults:
@@ -570,7 +573,7 @@ def main():
             from iam_acceptance import run_iam_host
             proof['iam_host'] = {}
             run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
-                         mysql_password, ca, run, proof['iam_host'], args.iam_private_log)
+                         mysql_password, ca, run, proof['iam_host'], args.iam_private_log, args.iam_operation_results)
             passed('iam_host_actual_sdk_original_root_and_application')
 
         # Accelerate ONLY the owned fixture. A real Unknown half must move to
