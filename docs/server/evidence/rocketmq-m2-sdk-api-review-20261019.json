@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "task": "T21",
+  "complete": false,
+  "status": "reviewed_candidate_pending_M2_5_and_merge",
+  "captured_at": "2026-10-19T06:16:27.525970+00:00",
+  "sdk_sha": "8841fdfcdd9ec25b49f845a3ed3eb825385d0c32",
+  "reviewed_files_sha256": {
+    "transaction/store.go": "e5712ab4eddb4a003f4a78e9b136e4680747f243b0780f80419b3fe37436708c",
+    "transaction/evidence.go": "1af6428e3209d6870918221a90cd462efdcad24481e2cf1db7c3d29c5f4ed286",
+    "transport/rocketmq/transaction_sender.go": "0e71f0862835da82d92539a39aa12ee8dfe1f9c9c7b9c6bb3aa94b44149572fb",
+    "transport/rocketmq/transaction_lifecycle.go": "1df6db5740106c3fbce51dd159530ef7602f62afc422b181265b4f5237ebc1d8",
+    "storage/transaction/mysql/guard.go": "24466af54b9f12d77534517f8d9df1d4f30a9ee02ad02bc1e3e8c62ced9aae5b",
+    "storage/transaction/mongo/guard.go": "eae30fea467ec000b29c1d520b6d4b8fb3b6f8ad513bf6f5b0431d2dd6945587",
+    "python/src/reliable_messaging/transaction.py": "6809b8dc72aa1d6ecd302b4ca77dc3213a077bdfc3c059c15ba7583c91b891ff",
+    "python/src/reliable_messaging/rocketmq_transaction.py": "fe0bca9f29bf9844e1c7af9ebeb068cb2e76465e8471c8715c5ca1f858a7f3ac",
+    "python/src/reliable_messaging/transaction_mysql.py": "78e8a6eceaf6291ecd3189d1ee545077aa9dc4d4bc7659d2bf951f9f2ac76880",
+    "examples/rocketmq-transaction/host.go": "663977ce57a2410d3c6d79ee85b432d487821c77dd08fb8511f520f3332dae6d",
+    "python/examples/rocketmq_transaction.py": "1452f5b9328e668f240cd0a35ba885badd35123b2a3a2b747146c37d3d907a57",
+    "docs/02-接入指南/RocketMQ事务SDK.md": "bfa93bb9f68c8ed135bb16b3f1b0554d3f5a5ec1eb2348c942a4f57c21c60758"
+  },
+  "checks": [
+    "Independent TransactionalSender; ordinary Publisher contract retained",
+    "Reserve returns original frozen winner; duplicate has no execution token; observed State is distinct from a new call Result",
+    "BeginPrepare consumes capability once; all independent halves must be acknowledged before one local executor",
+    "Original SQL/GORM/Mongo/SQLAlchemy guards jointly commit business, execution and all branch witnesses",
+    "Fresh exact evidence, not callback nil or lease, authorizes Commit/Rollback; Unknown never authorizes business replay",
+    "Public StoreChecker/Checker and bounded Store.ReconcileOnce are present in Go and Python",
+    "Constructors inert; owner topics registered at Start; bounded pre-goroutine/thread checks and actual RPC deadlines",
+    "ShutdownIncomplete retains real owned work; Close/Wait never closes host pools or asyncio loop",
+    "v2 NORMAL/TRANSACTION physical routes and owner/revision identity; one consumer budget per logical subscription",
+    "Fixed schema/codec 1 and existing draft-v1 hash domain; no evidence GC or production DDL",
+    "Finite Broker check window documented with actual native audit and explicit host admission protection",
+    "Go v0.5.0-rocketmq-tx.1 / Python 0.4.0a1 require same merged SHA and downloaded-installation verification"
+  ],
+  "source_ci": {
+    "go": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179044",
+    "storage": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179271",
+    "python": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179114",
+    "regression": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179029"
+  },
+  "public_api_frozen": false,
+  "published": false
+}
