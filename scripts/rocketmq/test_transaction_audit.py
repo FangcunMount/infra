@@ -15,6 +15,9 @@ class AuditTest(unittest.TestCase):
         self.assertNotIn('never-export',encoded)
         self.assertNotIn('credential',encoded)
         self.assertEqual(report['records'][0]['commitlog_offset'],456)
+        self.assertEqual(report['alert'],'native_transaction_check_limit_reached')
+        self.assertEqual(report['severity'],'critical')
+        self.assertIsNone(parse_index('', 'fixture')['alert'])
         with self.assertRaises(RuntimeError):
             parse_index(raw.replace('@fixture@','@different@'),'fixture')
 

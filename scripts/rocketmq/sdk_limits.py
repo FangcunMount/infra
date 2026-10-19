@@ -35,7 +35,9 @@ def run_limits(start, passed, sql, admin, parameters, broker, project, directory
                 break
             except RuntimeError:
                 time.sleep(2)
-        if audit is None or stat.S_IMODE(path.stat().st_mode) != 0o600:
+        if (audit is None or stat.S_IMODE(path.stat().st_mode) != 0o600
+                or audit.get('alert') != 'native_transaction_check_limit_reached'
+                or audit.get('severity') != 'critical'):
             raise RuntimeError('real SDK native limit index/private audit absent')
         if sql(f"SELECT state FROM rm_tx_execution WHERE operation_id='op-{identity}';") != 'prepared':
             raise RuntimeError('finite Broker limit changed authoritative Prepared evidence')

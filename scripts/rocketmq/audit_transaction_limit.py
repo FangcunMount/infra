@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only native TX limit index export. Never reads/exports message bodies.
+"""Read-only native TX limit index export. Exports index metadata only; never exports message bodies.
 
 Use an explicitly identified infra Compose project. Never changes Broker config,
 ACL, evidence or messages. The caller decides admission/recovery separately.
@@ -34,12 +34,16 @@ def parse_index(output, key):
                         'index_hour':int(index[0])})
     return {'topic':TOPIC,'key_sha256':hashlib.sha256(key.encode()).hexdigest(),
             'records':records,'raw_admin_sha256':hashlib.sha256(output.encode()).hexdigest(),
-            'read_only':True,'body_exported':False}
+            'read_only':True,'body_exported':False,
+            'truncated_possible':len(records)==64,
+            'alert':'native_transaction_check_limit_reached' if records else None,
+            'severity':'critical' if records else None}
 
 
 def write_private(path, report):
     # Atomic create, no symlink following and no replacement of existing audit.
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    os.fchmod(fd, 0o600)
     with os.fdopen(fd, 'w') as stream:
         json.dump(report, stream, indent=2); stream.write('\n')
 
@@ -79,7 +83,10 @@ def main():
     parser.add_argument('--output',type=Path,required=True)
     args = parser.parse_args()
     report = export(args.container,args.project,args.key,args.output)
-    print(json.dumps({'records':len(report['records']),'read_only':True,'body_exported':False}))
+    print(json.dumps({'records':len(report['records']),'read_only':True,'body_exported':False,
+            'truncated_possible':len(records)==64,
+            'alert':'native_transaction_check_limit_reached' if records else None,
+            'severity':'critical' if records else None}))
 
 
 if __name__ == '__main__':
