@@ -44,6 +44,12 @@ def host_failure_summary(raw):
     # Fixed classifications only; never copy a driver error, wire or credential.
     return {'build_failed': '[build failed]' in raw,
             'test_timeout': 'panic: test timed out' in raw,
+            'race_reports': raw.count('WARNING: DATA RACE'),
+            # Only file basenames/line numbers from race detector stack frames.
+            # Never export function arguments, absolute paths or runtime values.
+            'race_frames': sorted(set(re.findall(
+                r'^\s+(?:[^\s\n]*/)?([A-Za-z0-9_.-]+\.go:\d+)(?: \+0x[0-9a-f]+)?\s*$',
+                '\n'.join(re.findall(r'WARNING: DATA RACE\n(.*?)(?=\n={8,}|\Z)', raw, re.S)), re.M)))[:64],
             'failed_tests': sorted(set(re.findall(r'--- FAIL: (Test[A-Za-z0-9_/]+)', raw)))[:16],
             'assertion_lines': sorted(set(int(n) for n in re.findall(r'transaction_broker_host_integration_test\.go:(\d+)', raw)))[:32]}
 

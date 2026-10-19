@@ -14,8 +14,23 @@ class IAMAcceptanceTest(unittest.TestCase):
                'panic: test timed out after3m\n[build failed]')
         result = host_failure_summary(raw)
         self.assertEqual(result, {'build_failed': True, 'test_timeout': True,
-                                 'failed_tests': ['TestM3ActualBrokerHost'], 'assertion_lines': [143]})
+                                 'failed_tests': ['TestM3ActualBrokerHost'], 'assertion_lines': [143],
+                                 'race_reports': 0, 'race_frames': []})
         self.assertNotIn('private', json.dumps(result))
+
+    def test_race_summary_exports_only_stack_file_and_line(self):
+        raw = ('WARNING: DATA RACE\nRead at 0x123 private wire\n'
+               'secret.Function(private-token)\n'
+               '  /private/host/client.go:19 +0x38\n'
+               'Previous write at 0x123\n'
+               '  /owned/path/subscriber.go:47 +0x29\n'
+               '==================\nsecret.go:918: private wire')
+        result = host_failure_summary(raw)
+        self.assertEqual(result['race_reports'], 1)
+        self.assertEqual(result['race_frames'], ['client.go:19', 'subscriber.go:47'])
+        exported = json.dumps(result)
+        for secret in ('private', 'token', 'secret.go', '0x123', 'Function', '/owned'):
+            self.assertNotIn(secret, exported)
 
     def test_explicit_private_capture_refuses_shared_or_existing_destination(self):
         with tempfile.TemporaryDirectory() as directory:

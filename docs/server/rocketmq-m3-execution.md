@@ -108,7 +108,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；四库PR均合并，三库最终完整CI通过；生产未切换 |
 | ✅ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 2026-10-19；[完整证据](evidence/rocketmq-m3-iam-planning-20261019.json)；ea95cd9e全CI及三档MySQL每档7项0跳过、独立并发通过；[PR131](https://github.com/FangcunMount/iam/pull/131)合并c2aa3635；实际Sender装配属T06 |
 | ✅ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 2026-10-20；89bdcf58三档MySQL每档12具名项、共36项0跳过；Mac mini隔离RocketMQ5.5.1/MySQL8.0.44完整21项0失败0跳过，含实际IAM宿主4项证明，临时资源已清理；[完整证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；[PR132](https://github.com/FangcunMount/iam/pull/132)合并7accc92c，生产未变更 |
-| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 进行中；[PR134](https://github.com/FangcunMount/iam/pull/134)候选3fc8b406已推送，后续fd8dd30f按用户选择仅本地提交；API/双guard/查询/生命周期已装配，完整source race1925项通过，干净fd8dd30f补充MySQL9.3为30项0跳过；固定Docker版本离线验证继续；[分项证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
+| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 验证失败；[PR134](https://github.com/FangcunMount/iam/pull/134)固定98d0af8d源码CI全绿；infra public后required原事务/HTTP三档各34项0跳过，真实Broker8.0.36通过21项，8.0.44/8.4宿主用例失败，保留报告并排查；[分项证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
 | ☐ | T08 | IAM 与 QS 双订阅、乱序、freshness 回归 | 待开始 |
 | ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 待开始 |
 | ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 待开始 |
@@ -240,3 +240,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 
 - 2026-10-20：用户将infra改为public；只读核实PUBLIC后恢复推送与云端门禁。infra57f1c98的新CI已实际运行，serverA/监控/Prometheus配置检查通过，IAM矩阵39321850663运行中；旧账单失败历史保留，不继续视作当前阻塞。当前IAM98d0af8d包含业务结果原子凭证真实Broker断言；离线fd8dd30f在8.0.36/8.0.44各34项0失败0跳过，98d0af8d在8.4.11同为34项0失败0跳过，私有临时项目及在途进程已清理、既有11容器未变。云端门禁固定同一98d0af8d并显式要求业务结果证明；T07继续待完整结果，不提前打勾。
 - 2026-10-20：T06 PR132按精确89bdcf58源码、全绿检查及既有真实Broker证明完成合并，merge7accc92c；合并前回读PRODUCTION_DEPLOY_PAUSED=true且最新main403d41c2已在候选历史中。进度仍6/36，合并与生产独立，M3-1等待T07/T08及相应合并门禁。
+
+- 2026-10-20：infra public后39322133359真实执行，账单门禁已恢复。IAM98d0af8d完整CI、并发、SDK兼容与镜像构建通过；required MySQL8.0.36/8.0.44/8.4原事务及HTTP各34项全部通过。Broker8.0.36为21项通过，另外两档在宿主测试出现失败但已输出业务receipt；尚未定位原因，T07标验证失败且进度保持6/36。新增仅文件名/行号的race脱敏诊断，并在Mac mini固定98d0af8d/8.4临时独立项目复现；T08双实例及QS乱序通知/freshness回归已本地通过，真实fanout与任务门禁仍待完成。

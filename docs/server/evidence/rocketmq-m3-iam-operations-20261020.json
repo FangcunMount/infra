@@ -5,7 +5,7 @@
   ],
   "status": "in_progress",
   "complete": false,
-  "observed_at": "2026-10-19T20:46:23.655900+00:00",
+  "observed_at": "2026-10-19T21:01:51.725869+00:00",
   "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
   "repository": "FangcunMount/iam",
   "pr": "https://github.com/FangcunMount/iam/pull/134",
@@ -282,5 +282,279 @@
     "iam_source": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
     "workflow": "https://github.com/FangcunMount/infra/actions/runs/39321850663",
     "status": "running after verified PUBLIC visibility; no empty-job success claim"
+  },
+  "cloud_run_39322133359": {
+    "url": "https://github.com/FangcunMount/infra/actions/runs/39322133359",
+    "infra_sha": "ee34a386dd856fc250383e4f955d4342ae2eafa1",
+    "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+    "status": "failed; all three native root/HTTP profiles pass; Broker8.0.36 pass,8.0.44/8.4 failed after host receipt; diagnosis pending",
+    "records": [
+      {
+        "kind": "required native root and HTTP",
+        "receipt": {
+          "scope": "IAM native storage/HTTP; stored half fixture, not Broker/system acceptance",
+          "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+          "image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+          "project": "iam-m3-native-de2ef27682a4",
+          "failed": 0,
+          "source_clean_before": true,
+          "go_version": "go version go1.25.9 linux/amd64",
+          "mysql_version": "8.0.36",
+          "test_process_group_drained": true,
+          "private_log_sha256": "b4019443ee1b8c9e5d226e79b3f829db8142a9267fc782d440cdde26c26c6227",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          },
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "source_clean_after": true,
+          "cleanup": {
+            "owned_containers_remaining": false,
+            "private_fixture_removed": true
+          },
+          "existing_containers_unchanged": true
+        },
+        "receipt_sha256": "0d5d34b307133524b8fa939dafbca06a4fcc5f276674ff6126f894f93fd7f022"
+      },
+      {
+        "kind": "required native root and HTTP",
+        "receipt": {
+          "scope": "IAM native storage/HTTP; stored half fixture, not Broker/system acceptance",
+          "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+          "image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "project": "iam-m3-native-5d4c11b7b0a8",
+          "failed": 0,
+          "source_clean_before": true,
+          "go_version": "go version go1.25.9 linux/amd64",
+          "mysql_version": "8.0.44",
+          "test_process_group_drained": true,
+          "private_log_sha256": "1c52ffbf4ef04384586a6f71d136fca84d87018741188b28741e4ea862852f8a",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          },
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "source_clean_after": true,
+          "cleanup": {
+            "owned_containers_remaining": false,
+            "private_fixture_removed": true
+          },
+          "existing_containers_unchanged": true
+        },
+        "receipt_sha256": "24bc01a7df6eeac862b59c59b4c3cccb970f78a6c6ce00f28e1d766a8c9969d8"
+      },
+      {
+        "kind": "required native root and HTTP",
+        "receipt": {
+          "scope": "IAM native storage/HTTP; stored half fixture, not Broker/system acceptance",
+          "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+          "image": "sha256:efb212ddf03576a6c0b02b8d364e6a46f21e628308a719db0b0450f8817c0517",
+          "project": "iam-m3-native-57e5249b93f0",
+          "failed": 0,
+          "source_clean_before": true,
+          "go_version": "go version go1.25.9 linux/amd64",
+          "mysql_version": "8.4.11",
+          "test_process_group_drained": true,
+          "private_log_sha256": "f870fbcac69cf85bb31f2b7b95b507cb4e3c6bede79c09c88c57933164eb1f26",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          },
+          "required_named_tests": [
+            "TestM3PlannedPolicyNative",
+            "TestM3TransactionMaintenanceConditionRetirement",
+            "TestM3TransactionMaintenanceOperationsCatalog",
+            "TestM3TransactionMaintenanceReviewerScope",
+            "TestM3TransactionMaintenanceRoleModel",
+            "TestM3TransactionMaintenanceScope",
+            "TestM3TransactionSchemaNative",
+            "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+            "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+            "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+            "TestPlannedRoleModelPreviewApplyAndCompensation",
+            "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+          ],
+          "source_clean_after": true,
+          "cleanup": {
+            "owned_containers_remaining": false,
+            "private_fixture_removed": true
+          },
+          "existing_containers_unchanged": true
+        },
+        "receipt_sha256": "b33b244c119a0e7c9478a1cdbbd835e4823379f14f6d371681f6dc7c207176c3"
+      },
+      {
+        "kind": "actual Broker host",
+        "receipt_sha256": "eb1edb5733276ca98ca0399b0e1a1a282d51add7a3a0fe48fa354608ca316e98",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "failure": null,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "mysql_version": "8.0.36",
+        "host": {
+          "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.1",
+            "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "provision": {
+            "version": 2,
+            "operations": 7,
+            "typed_topics": 1,
+            "principals": 2,
+            "verified": true
+          },
+          "private_output_sha256": "00cc9c5009e1406ebc31549f3fcc542a323ef92adbf3f1793e938b826481a7d4",
+          "exit_code": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "failed_tests": [],
+            "assertion_lines": [
+              353
+            ]
+          },
+          "native_receipt": {
+            "passed": 4,
+            "failed": 0,
+            "skipped": 0,
+            "half_invisible": true,
+            "commit_wire_and_witness": true,
+            "application_entry": true,
+            "rollback_hidden": true,
+            "business_result_atomic": true
+          },
+          "source_clean_after": true,
+          "scope": "real Broker, released SDK, host original transaction and application entry; not production/system acceptance"
+        }
+      },
+      {
+        "kind": "actual Broker host",
+        "receipt_sha256": "b6e02e9f9f835a12d88e9ab90c4d4135a0e936c4f2bd78dd88317213aca9ae65",
+        "passed": 18,
+        "failed": 1,
+        "skipped": 0,
+        "failure": "RuntimeError: actual IAM host acceptance failed (private output withheld)",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "mysql_version": "8.0.44",
+        "host": {
+          "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.1",
+            "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "provision": {
+            "version": 2,
+            "operations": 7,
+            "typed_topics": 1,
+            "principals": 2,
+            "verified": true
+          },
+          "private_output_sha256": "0d31df9ccf492e6c8eae7a2ba627aa1a96636fbda7872522f331800865a4cda9",
+          "exit_code": 1,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "failed_tests": [
+              "TestM3ActualBrokerHost"
+            ],
+            "assertion_lines": [
+              167,
+              169,
+              353
+            ]
+          }
+        }
+      },
+      {
+        "kind": "actual Broker host",
+        "receipt_sha256": "171b72f87e9589edf9e59e55e6b4963c501e17c9461c0e38f6dba107fc1c4f3f",
+        "passed": 18,
+        "failed": 1,
+        "skipped": 0,
+        "failure": "RuntimeError: actual IAM host acceptance failed (private output withheld)",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "mysql_version": "8.4.11",
+        "host": {
+          "source_sha": "98d0af8dddaadfb951d09d7c3171c336a9b6d6f2",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.1",
+            "Sum": "h1:/GxsZLXnqPmIbnrxWmiqjjOViXgPrUj3rkd2Yb/CPiw=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "provision": {
+            "version": 2,
+            "operations": 7,
+            "typed_topics": 1,
+            "principals": 2,
+            "verified": true
+          },
+          "private_output_sha256": "677236a34c1722dcd2961e5d5db63dddbac7a80c24172bc2b833ee85b74ce480",
+          "exit_code": 1,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "failed_tests": [
+              "TestM3ActualBrokerHost"
+            ],
+            "assertion_lines": [
+              167,
+              169,
+              353
+            ]
+          }
+        }
+      }
+    ]
   }
 }
