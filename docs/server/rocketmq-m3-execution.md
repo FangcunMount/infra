@@ -106,7 +106,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T02 | 全部生产者/消费者/订阅/Outbox/调度/恢复清单及105前置 | 2026-10-19；[责任清单](rocketmq-m3-inventory.md)/[源码核验](evidence/rocketmq-m3-inventory-20261019.json)：17目录事件、9协议kind、39文件、IAM12版本调用文件、QS8 Stage文件；生产盘点另属T30/T32 |
 | ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；初版IAM e50686c7 / QS98645d817 / AI81db026；race63/56、AI45通过；PR130/407/158已合并；最终CI/合并见T04证据；真实依赖另属T22/T23 |
 | ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；四库PR均合并，三库最终完整CI通过；生产未切换 |
-| ☐ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 进行中；独立iam-business / codex/rocketmq-m3-iam；冻结计划、首事件复用及根事务CAS基础实现，本项尚未完成 |
+| ☐ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 进行中；独立iam-business / codex/rocketmq-m3-iam；[规划源码/失败历史/CI证据](evidence/rocketmq-m3-iam-planning-20261019.json)；IAM [PR131](https://github.com/FangcunMount/iam/pull/131)草稿；2fb64753完整CI及三档原生通过，56012bf9补Grant/Assignment，维护工具及完整接入未完成 |
 | ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 待开始 |
 | ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 待开始 |
 | ☐ | T08 | IAM 与 QS 双订阅、乱序、freshness 回归 | 待开始 |
@@ -212,3 +212,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-19：T04完成，总进度4/36。三库schema、双库原事务、不可变档案、精确committed读取、Prepared/损坏拒绝及旧reader兼容必需验证通过；AI全3101项/每MySQL版本0跳过，IAM当头三档原生与独立并发全部通过，QS当头M3原生步骤通过。T04候选固定供最终全CI/PR合并；M3-P不提前标完成。进入T05独立工作区，仅推进IAM源码与隔离测试，不触碰生产。
 
 - 2026-10-19：M3-P完成。最终三库全部PR门禁通过，精确head合并IAM PR130→c0acb432、QS PR407→9ebf2d6c、AI PR158→c321a694、infra PR37→878c130。合并前后只读确认生产CD暂停/自动部署false，未发布稳定SDK或执行生产M3。infra同步已由其他工作流合入的MySQL TLS工具/CA，逐文件保留该main内容；不改写其交付证据。T05在独立iam-business工作区基于c0acb432继续；当前4/36，新增冻结计划/原事件复用/CAS基础与真实并发测试尚待完整任务验收。
+
+- 2026-10-19：T05持续推进，总进度4/36。冻结计划、精确权限版本、物理只读规划及根事务CAS在2fb64753完整CI/三档MySQL与独立并发通过。56012bf9增加Grant/Assignment规划、原名称身份、跨公司保留及授权后no-op；目标race69通过，3项既有可选本地MySQL跳过不计原生证明。新候选PR131 CI运行中，维护工具入口仍待实现；Sender原事务整合另属T06。全部故障/修复分候选保留，不提前勾选。
