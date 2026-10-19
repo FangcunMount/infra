@@ -43,7 +43,8 @@ def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed):
               '-a','+message.type=NORMAL',success=True)
         before, users = reader.metadata(snapshot_dir), reader.users()
         result = provision(conflict)
-        if result.returncode == 0 or reader.metadata(snapshot_dir) != before or reader.users() != users:
+        if (result.returncode == 0 or "existing topic type or configuration conflicts" not in result.stderr
+                or reader.metadata(snapshot_dir) != before or reader.users() != users):
             raise RuntimeError('conflicting type did not refuse every Broker resource mutation')
         passed('v2_existing_type_conflict_refuses_all_resource_mutations')
         initial = provision(manifest)
