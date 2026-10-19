@@ -3,7 +3,7 @@
   "task_ids": [
     "T04"
   ],
-  "observed_at": "2026-10-19T11:59:56.732329+00:00",
+  "observed_at": "2026-10-19T12:01:12.214787+00:00",
   "status": "in_progress",
   "complete": false,
   "stage": "schema-and-v2-reference-foundation",
@@ -29,7 +29,7 @@
       "native_ci_status": "success",
       "native_job": "https://github.com/FangcunMount/qs-server/actions/runs/39246803082/job/118040610503",
       "native_log_sha256": "832868a8ac6f9517f0274bb63823137ce2b56bad8c0ebb598385e393c7a3fbbd",
-      "ci_status": "tests/native proof passed; final builds still running at last observation"
+      "ci_status": "success; full CI including native schema proof and final builds"
     },
     "qs-ai": {
       "source_sha": "cbc2a902330f705e38a9e94173c9d837a54ea7e7",
