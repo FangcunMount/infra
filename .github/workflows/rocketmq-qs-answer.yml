@@ -23,7 +23,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go: ['1.25.9', '1.25.12']
+        # QS go.mod requires 1.25.12. The separate SDK workflow retains its
+        # own 1.25.9/1.25.12 compatibility matrix.
+        go: ['1.25.12']
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6

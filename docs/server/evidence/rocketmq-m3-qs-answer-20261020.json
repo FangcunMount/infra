@@ -119,5 +119,15 @@
     "package": "./internal/apiserver/infra/mongo/answersheet/...",
     "issues": 0
   },
-  "production_deploy_paused_readback": true
+  "production_deploy_paused_readback": true,
+  "ci_invalid_host_combination": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39335160523",
+    "job": 118342693230,
+    "go": "1.25.9",
+    "source_required_go": "1.25.12",
+    "stage": "module metadata read",
+    "log_sha256": "9edb2fdf96535bb149a1bf822a1277f225cba9bf16b5b7c457ed096350b05dbf",
+    "resolution": "host workflow uses required Go1.25.12; separate SDK dual-version jobs unchanged",
+    "status": "original_failure_retained"
+  }
 }
