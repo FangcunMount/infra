@@ -6,7 +6,7 @@ closes TCP. No exception injection stands in for the service-side fact.
 import json
 import time
 
-from sdk_acceptance import assert_absent
+from sdk_acceptance import assert_absent, wait_reference_checks
 
 
 def recover_after_restart(start, language, storage):
@@ -19,6 +19,7 @@ def recover_after_restart(start, language, storage):
     deadline = time.monotonic() + 100
     attempts = []
     commits = 0
+    reference_checks = []
     for _ in range(6):
         remaining = deadline - time.monotonic()
         if remaining <= 0:
@@ -38,6 +39,7 @@ def recover_after_restart(start, language, storage):
                 raise RuntimeError('failed readiness attempt lacks actual drained SDK counters')
             committed = metrics[-1].get('CheckCommit', metrics[-1].get('check_commit', 0))
             commits += committed
+            reference_checks.extend(e for e in probe.events if e.get('event') == 'checked_reference')
             attempts.append({'pid':probe.process.pid,'failure_codes':sorted(codes),
                              'commit_checks':committed,'drained':probe.close()})
             if not attempts[-1]['drained']:
@@ -45,7 +47,8 @@ def recover_after_restart(start, language, storage):
             time.sleep(1)
             continue
         return probe, {'drained_topic_not_found_attempts':attempts,
-                       'commit_checks_before_ready':commits}
+                       'commit_checks_before_ready':commits,
+                       'reference_checks_before_ready':reference_checks}
     raise RuntimeError('persisted owner routes did not become ready after Broker restart')
 
 
@@ -97,7 +100,7 @@ def run_faults(start, proxy_start, passed, sql, mongo_command, restart_broker, *
                     observer.wait('received', f'{identity}-b{index}')
             else:
                 if result['local'] == 'unknown':
-                    recovery.wait('checked', decision='rollback', timeout=100)
+                    wait_reference_checks(recovery, [f'{identity}-b{i}' for i in range(3)], 'rollback')
                 elif result['local'] != 'aborted':
                     raise RuntimeError('before-commit loss falsely reported committed')
                 for index in range(3):
@@ -135,7 +138,7 @@ def run_faults(start, proxy_start, passed, sql, mongo_command, restart_broker, *
             if method == 'SendMessage':
                 if count != '0' or result['local_calls'] != 0:
                     raise RuntimeError('uncertain partial half started business')
-                recovery.wait('checked', decision='rollback', timeout=100)
+                wait_reference_checks(recovery, [f'{identity}-b{i}' for i in range(2)], 'rollback')
                 for index in range(3):
                     assert_absent(observer, f'{identity}-b{index}', 1)
             else:
@@ -178,7 +181,7 @@ def run_faults(start, proxy_start, passed, sql, mongo_command, restart_broker, *
             raise RuntimeError('partial preparation started business')
         recovery = start(language, 'recover')
         recovery.wait('ready')
-        recovery.wait('checked', decision='rollback', timeout=100)
+        wait_reference_checks(recovery, [f'{identity}-b{i}' for i in range(2)], 'rollback')
         for index in range(3):
             assert_absent(observer, f'{identity}-b{index}', 1)
         if sql(f"SELECT state FROM rm_tx_execution WHERE operation_id='op-{identity}';") != 'aborted':
@@ -206,8 +209,8 @@ def run_faults(start, proxy_start, passed, sql, mongo_command, restart_broker, *
         recovery, readiness = recover_after_restart(start, language, storage)
         observer = start('sdk-go', 'consume', storage=storage)
         observer.wait('ready')
-        if not readiness['commit_checks_before_ready']:
-            recovery.wait('checked', decision='commit', timeout=100)
+        wait_reference_checks(recovery, [f'{identity}-b{i}' for i in range(3)], 'commit',
+                              observed=readiness['reference_checks_before_ready'])
         for index in range(3):
             observer.wait('received', f'{identity}-b{index}')
         if business(storage, identity) != '1':

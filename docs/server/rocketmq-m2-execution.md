@@ -10,14 +10,14 @@
 
 进度：**18/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
-### 最新核验快照（2026-10-19 13:43 +08:00）
+### 最新核验快照（2026-10-19 14:09 +08:00）
 
 本表持续维护已批准的《M2 完整实施规划：事务 SDK、双存储证明与固定预发布》，任务仍为24项。本次仅同步核验状态，不将已实现、CI运行中或待发布记为完成。
 
 | 核验项 | 当前结果 / 证据 |
 | --- | --- |
 | 已完成任务 | T01–T18，18/24；M2-P 至 M2-4 已满足对应合并门禁；T17/T18 已实现并验证，相关 PR 待合并 |
-| 当前 SDK 候选 | `197a267bce4362ee0738bcfa837ea6972e7f1fd5`（补充部分半消息SIGKILL屏障与失败启动计数，待48项真实重验）；[PR43](https://github.com/FangcunMount/reliable-messaging/pull/43) 待合并 |
+| 当前 SDK 候选 | `8841fdfcdd9ec25b49f845a3ed3eb825385d0c32`（精确观测当前消息的真实Checker证据读取，待48项重验）；[PR43](https://github.com/FangcunMount/reliable-messaging/pull/43) 待合并 |
 | 当前 infra 验收源码 | `ca7c5139e7d274bff45df1eb5262675e878f4e46`；[PR27](https://github.com/FangcunMount/infra/pull/27) 待合并；本次记录更新在其后单独记账 |
 | 已验候选 3bed26b 源码检查 | [源码/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383794)、[真实存储适配](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383777)、[Python源码及安装包](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383932)、[既有基础设施回归](https://github.com/FangcunMount/reliable-messaging/actions/runs/39203383902) 均通过；不能替代下列 Broker 故障门禁 |
 | T17–T18 | [双 profile 公开 SDK 31项/档](https://github.com/FangcunMount/infra/actions/runs/39201819179) 均通过、0跳过；owner 拒绝、共享消费预算及全部正式入口通过；[结构化证据](evidence/rocketmq-m2-sdk-routing-e2e-20261019.json) |
@@ -65,14 +65,14 @@
 | ☐ | T19 | 退出、断网、DB提交丢回复、Broker重启故障矩阵 | 15项故障：原13项核心场景已有双档通过证据；新增Go/Python第二半消息实际ACK暂扣时SIGKILL整个私有进程组，新实例恢复；真实48项矩阵待通过 |
 | ☐ | T20 | 资源上界、指标、超限告警、0600原生超限审计导出 | 原生超限已实测双档各2项成功；新增uv启动器/真实子进程共同排空门禁，本地真实进程组测试通过，完整48项待通过 |
 | ☐ | T21 | 原事务示例、接入/恢复/关闭文档、API 评审 | SDK PR43 原 SQL/GORM/Mongo/SQLAlchemy 示例可编译，契约和关闭/恢复文档准备；冻结待真实矩阵通过 |
-| ☐ | T22 | 固定候选 SHA、完整 CI、wheel/sdist/摘要/receipt | 分支候选 SDK 197a267；Go/Python 预定版本及确定性构建准备；显式 prepare_release.py 校验合并源码、CI状态、双档制品及故障报告并生成receipt；20项本地脚本测试通过；最终合并候选/完整CI/receipt待完成 |
+| ☐ | T22 | 固定候选 SHA、完整 CI、wheel/sdist/摘要/receipt | 分支候选 SDK 8841fdf；Go/Python 预定版本及确定性构建准备；显式 prepare_release.py 校验合并源码、CI状态、双档制品及故障报告并生成receipt；22项本地脚本测试通过；最终合并候选/完整CI/receipt待完成 |
 | ☐ | T23 | 两语言 tag 同一 SHA，GitHub 固定预发布 | — |
 | ☐ | T24 | 下载发布 tag/制品重新安装验收、索引与总表关闭 | infra prepare_published.py + workflow 已准备，固定 Go module、wheel/sdist 独立安装与完整验收；尚未发布或运行此门禁 |
 
 
 本次 T11–T16 的公开 SDK 验收为 23/23、0 跳过；之后仅追加单次半消息 RPC 及回调诊断修复，已通过对应实际 TLS/编排测试和最新源码 CI。SDK Go/Python PR38/39 均已合并。infra 完整工作流曾因旧 SDK 固定引用与新增三分支探针不匹配失败；已统一固定到 SDK main `65eae5b`，精确 SHA 重跑 [公开 SDK 23 项](https://github.com/FangcunMount/infra/actions/runs/39194664066) 与[完整 Docker/普通消息/M2-0 回归](https://github.com/FangcunMount/infra/actions/runs/39194664076) 均通过，infra PR23 已合并 4b7ed57，M2-3/M2-4 里程碑关闭。原失败运行 [39193222448](https://github.com/FangcunMount/infra/actions/runs/39193222448) 保留，不作通过证据。
 
-剩余实现统一汇总到 SDK PR43 / infra PR27；旧 SDK PR40–42、infra PR24–26 关闭为被汇总，源码与失败运行保留，任务总数仍为24。当前分支候选 SDK `197a267bce4362ee0738bcfa837ea6972e7f1fd5`；T17/T18已验证源码为 `3bf3dc8`。后续候选调整Mongo故障宿主提交预算，补充部分准备后真实SIGKILL及启动/进程排空证据；当前48项门禁、合并及固定发布尚未完成，不视为最终发布SHA。
+剩余实现统一汇总到 SDK PR43 / infra PR27；旧 SDK PR40–42、infra PR24–26 关闭为被汇总，源码与失败运行保留，任务总数仍为24。当前分支候选 SDK `8841fdfcdd9ec25b49f845a3ed3eb825385d0c32`；T17/T18已验证源码为 `3bf3dc8`。后续候选调整Mongo故障宿主提交预算，补充部分准备后真实SIGKILL及启动/进程排空证据；当前48项门禁、合并及固定发布尚未完成，不视为最终发布SHA。
 
 T17 失败记录：[39197245044](https://github.com/FangcunMount/infra/actions/runs/39197245044) 暴露整体 provision 等待预算不足；[39198164925](https://github.com/FangcunMount/infra/actions/runs/39198164925) 创建后配置回读拒绝，定位为固定5.5.1 `updateSubGroup -q` 才是 retry queue 数，`-r` 为 retryMaxTimes。仅修正新 v2 入口，不改变生产 v1。后续汇总候选重跑保留类型/配置冲突拒绝及幂等回读。
 
@@ -82,7 +82,9 @@ T17 失败记录：[39197245044](https://github.com/FangcunMount/infra/actions/r
 
 T19 失败记录：[包级故障39201819131](https://github.com/FangcunMount/infra/actions/runs/39201819131) 及[完整矩阵39201819090](https://github.com/FangcunMount/infra/actions/runs/39201819090) 在33项通过后，Mongo提交前TCP断连等待120秒超时；实际代理已截获原事务提交包，业务结果尚不能从超时判定。失败profile清理容器和私有目录成功。核对固定Mongo Go1.17.6源码，其WithTransaction未知提交循环使用background commit context及120秒重试窗口；仅给外层ctx加deadline不能约束该循环。新探针在故障场景由宿主显式StartTransaction/同session业务+witness/带10秒预算CommitTransaction，继续按精确持久化证据判定结果，常规callback重入验证保留。编译及49篇文档检查通过；真实重验前T19/T20继续未完成。
 
-补充故障门禁（本次任务总数仍24项）：原[46项完整矩阵](https://github.com/FangcunMount/infra/actions/runs/39203750293)双档0失败/跳过，包含真实Mongo提交前后网络故障及Go/Python各原生超限索引。另一个[44项运行](https://github.com/FangcunMount/infra/actions/runs/39203750280)在一档完成44项，另一档42项后新Go/Mongo实例Start返回结构化TOPIC_NOT_FOUND(40402)；TCP健康不代表全部Topic真实路由就绪。新增仅重建已完全排空的空闲Checker、最多6次/100秒准入窗口的40402启动等待，40300等鉴权错误不重试，不Reserve或重做业务，保留各次真实回查计数。另补Go/Python部分半消息后SIGKILL共2项，故障从13增15项，完整验收从46增48项。实测uv启动器PID与生产者子PID不同；fixture改为独立session/process group，SIGKILL与失败清理均覆盖整组，并以stdout EOF证明子进程排空。两项真实父子进程测试及严格启动/发布门禁等共20项本地脚本测试通过；SDK ACK屏障真实TLS/race重复10次及lint通过；这些不替代48项真实依赖验收。
+补充故障门禁（本次任务总数仍24项）：原[46项完整矩阵](https://github.com/FangcunMount/infra/actions/runs/39203750293)双档0失败/跳过，包含真实Mongo提交前后网络故障及Go/Python各原生超限索引。另一个[44项运行](https://github.com/FangcunMount/infra/actions/runs/39203750280)在一档完成44项，另一档42项后新Go/Mongo实例Start返回结构化TOPIC_NOT_FOUND(40402)；TCP健康不代表全部Topic真实路由就绪。新增仅重建已完全排空的空闲Checker、最多6次/100秒准入窗口的40402启动等待，40300等鉴权错误不重试，不Reserve或重做业务，保留各次真实回查计数。另补Go/Python部分半消息后SIGKILL共2项，故障从13增15项，完整验收从46增48项。实测uv启动器PID与生产者子PID不同；fixture改为独立session/process group，SIGKILL与失败清理均覆盖整组，并以stdout EOF证明子进程排空。两项真实父子进程测试及严格启动/发布门禁等共22项本地脚本测试通过；SDK ACK屏障真实TLS/race重复10次及lint通过；这些不替代48项真实依赖验收。
+
+精确回查门禁修正：[39206054502](https://github.com/FangcunMount/infra/actions/runs/39206054502) 的新增部分准备/SIGKILL场景在39项通过后失败：全局Rollback计数可能来自旧消息，不能证明当前execution已中止。旧进程组已真实退出，失败报告确认容器、私有目录及全部fixture进程组均排空。SDK 8841fdf仅在恢复探针中通过公共PreparedStore/Evidence接口透明观察真实读取，原样返回原证据/错误，不额外查库、不确认Broker；验收按当前原消息ID匹配Reference及其决定，并分别核对execution/全部witness和真实消费可见性。包括基础跨语言恢复、DB不可用、部分ACK丢失、SIGKILL、重启及原生Unknown的全部公开SDK回查场景统一采用该判据，旧全局指标仅作诊断。22项本地脚本（含排除旧Reference/全局计数误判）及探针编译、lint/格式/49篇文档检查通过；48项真实门禁待重验，T19/T20不打勾。
 
 执行顺序：T01 → T02–T04 → T05–T09 → T10–T13 → T14–T16 → T17–T20 → T21–T24；不跳过前置门禁。
 

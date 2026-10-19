@@ -3,7 +3,7 @@ import stat
 import time
 
 from audit_transaction_limit import export
-from sdk_acceptance import assert_absent
+from sdk_acceptance import assert_absent, wait_reference_checks
 
 
 def run_limits(start, passed, sql, admin, parameters, broker, project, directory, *, python):
@@ -21,7 +21,7 @@ def run_limits(start, passed, sql, admin, parameters, broker, project, directory
         checker.wait('ready')
         observer = start('sdk-go','consume')
         observer.wait('ready')
-        checker.wait('checked',decision='unknown',timeout=100)
+        wait_reference_checks(checker, [identity], 'unknown')
         admin('updateBrokerConfig','-k','transactionCheckMax','-v','2')
         effective = parameters(admin('getBrokerConfig'))
         if effective['transactionCheckMax'] != 2:
