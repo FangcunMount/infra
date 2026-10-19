@@ -182,6 +182,12 @@ def provision(container, manifest, accounts):
             raise RuntimeError("post-provision readback differs from reviewed resources")
         return {"version": 2, "operations": admin.operations, "typed_topics": len(desired_topics(manifest)),
                 "principals": len(manifest.get("accounts", {})), "verified": True}
+    except RuntimeError as error:
+        # All RuntimeError strings in this module are authored fixed diagnostics;
+        # never interpolate captured stdout, credentials or argv here.
+        raise RuntimeError("v2 provision: " + str(error)) from None
+    except Exception as error:
+        raise RuntimeError("v2 provision parser: " + type(error).__name__) from None
     finally:
         # Exactly these two generated metadata files and these owned directories.
         for filename in ("topic.json", "subscriptionGroup.json"):
