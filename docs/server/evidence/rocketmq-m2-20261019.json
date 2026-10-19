@@ -1,0 +1,831 @@
+{
+  "version": 1,
+  "date": "2026-10-19",
+  "batch": "M2-0",
+  "ci": {
+    "url": "https://github.com/FangcunMount/infra/actions/runs/39184548857",
+    "infra_tested_head": "8bd0a72e56812bd5d3a39ee73e66a49f1d30cc1a",
+    "sdk_tested_ref": "cb786553f3bc70345ad0f5e8711f6eb7d49844e8",
+    "sdk_review_head": "ab71e2ca92e7b1f26dd3b714cf48d040fb7b7e24",
+    "sdk_runtime_files_match_review_head": true,
+    "artifact_sha256": "2d1438aeef8ee8fbfa101fbb0a8bb80fd28251b01d185b0eb0f88d29a7717d05"
+  },
+  "serverd_read_only_config": {
+    "transactionTimeOut": 6000,
+    "transactionCheckInterval": 30000,
+    "transactionCheckMax": 15,
+    "fileReservedTime": 48
+  },
+  "acceptance": {
+    "version": 1,
+    "batch": "M2-0",
+    "project": "rocketmq-m2-79d55fdceb73",
+    "image": "sha256:c9bdd8a334e56d99724be89e8bf9d1e42ed594fedd231a03480d858e9e265ad0",
+    "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+    "clients": {
+      "go": "5.1.4",
+      "python": "5.1.2"
+    },
+    "cases": {
+      "go_untrusted_ca_rejected": true,
+      "go_half_invisible_then_commit_visible": true,
+      "go_rollback_invisible": true,
+      "go_new_process_real_backcheck": true,
+      "go_real_commit_response_discarded": true,
+      "go_db_failure_is_unknown": true,
+      "go_other_owner_witness_cannot_commit": true,
+      "go_wrong_owner_acl_denied": true,
+      "python_untrusted_ca_rejected": true,
+      "python_half_invisible_then_commit_visible": true,
+      "python_rollback_invisible": true,
+      "python_new_process_real_backcheck": true,
+      "python_real_commit_response_discarded": true,
+      "python_db_failure_is_unknown": true,
+      "python_other_owner_witness_cannot_commit": true,
+      "python_wrong_owner_acl_denied": true,
+      "go_to_python_cross_process_recovery": true,
+      "python_to_go_cross_process_recovery": true,
+      "finite_unknown_moves_to_native_discard_topic": true,
+      "exact_committed_identity_set": true
+    },
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0,
+    "failure": null,
+    "proof": {
+      "effective_broker_parameters": {
+        "transactionTimeOut": 6000,
+        "transactionCheckInterval": 5000,
+        "transactionCheckMax": 24,
+        "fileReservedTime": 48
+      },
+      "mysql_version": "8.0.36",
+      "discard_broker_parameters": {
+        "transactionTimeOut": 6000,
+        "transactionCheckInterval": 5000,
+        "transactionCheckMax": 2,
+        "fileReservedTime": 48
+      },
+      "finite_check_discard_topic": "TRANS_CHECK_MAX_TIME_TOPIC"
+    },
+    "probe_receipts": [
+      {
+        "pid": 9754,
+        "exit_code": -15,
+        "events": [
+          {
+            "decision": "consumer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "go-commit"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "go-commit"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "go-restart"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "go-lost-commit-response"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "go-db-unavailable"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "go-db-unavailable"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "python-commit"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "python-commit"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "python-restart"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "python-lost-commit-response"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "python-db-unavailable"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "python-db-unavailable"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "go-to-python-recovery"
+          },
+          {
+            "decision": "acknowledged",
+            "event": "received",
+            "id": "python-to-go-recovery"
+          }
+        ]
+      },
+      {
+        "pid": 9796,
+        "exit_code": 1,
+        "events": [
+          {
+            "decision": "operation_failed",
+            "event": "failed",
+            "id": ""
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 9887,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "producer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "confirmed",
+            "event": "half",
+            "id": "go-commit"
+          },
+          {
+            "decision": "COMMITTED",
+            "event": "local",
+            "id": "go-commit"
+          },
+          {
+            "decision": "COMMITTED",
+            "event": "finalized",
+            "id": "go-commit"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 9945,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "producer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "confirmed",
+            "event": "half",
+            "id": "go-rollback"
+          },
+          {
+            "decision": "ABORTED",
+            "event": "local",
+            "id": "go-rollback"
+          },
+          {
+            "decision": "ABORTED",
+            "event": "finalized",
+            "id": "go-rollback"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10082,
+        "exit_code": 23,
+        "events": [
+          {
+            "decision": "producer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "confirmed",
+            "event": "half",
+            "id": "go-restart"
+          },
+          {
+            "decision": "COMMITTED",
+            "event": "local",
+            "id": "go-restart"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10092,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "producer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "commit",
+            "event": "checked",
+            "id": "go-commit"
+          },
+          {
+            "decision": "commit",
+            "event": "checked",
+            "id": "go-restart"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10279,
+        "exit_code": 24,
+        "events": [
+          {
+            "decision": "producer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "confirmed",
+            "event": "half",
+            "id": "go-lost-commit-response"
+          },
+          {
+            "decision": "COMMITTED",
+            "event": "local",
+            "id": "go-lost-commit-response"
+          },
+          {
+            "decision": "response_discarded_after_real_rpc",
+            "event": "finalization_unknown",
+            "id": "go-lost-commit-response"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10317,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "producer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "confirmed",
+            "event": "half",
+            "id": "go-db-unavailable"
+          },
+          {
+            "decision": "unknown_database",
+            "event": "checked",
+            "id": "go-db-unavailable"
+          },
+          {
+            "decision": "COMMITTED",
+            "event": "local",
+            "id": "go-db-unavailable"
+          },
+          {
+            "decision": "COMMITTED",
+            "event": "finalized",
+            "id": "go-db-unavailable"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10431,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "producer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "confirmed",
+            "event": "half",
+            "id": "go-wrong-witness-owner"
+          },
+          {
+            "decision": "commit",
+            "event": "checked",
+            "id": "go-db-unavailable"
+          },
+          {
+            "decision": "unknown_missing",
+            "event": "checked",
+            "id": "go-wrong-witness-owner"
+          },
+          {
+            "decision": "ABORTED",
+            "event": "local",
+            "id": "go-wrong-witness-owner"
+          },
+          {
+            "decision": "ABORTED",
+            "event": "finalized",
+            "id": "go-wrong-witness-owner"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10599,
+        "exit_code": 1,
+        "events": [
+          {
+            "decision": "operation_failed",
+            "event": "failed",
+            "id": ""
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10606,
+        "exit_code": 1,
+        "events": [
+          {
+            "event": "failed",
+            "id": "",
+            "decision": "operation_failed"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10646,
+        "exit_code": 0,
+        "events": [
+          {
+            "event": "ready",
+            "id": "",
+            "decision": "producer"
+          },
+          {
+            "event": "half",
+            "id": "python-commit",
+            "decision": "confirmed"
+          },
+          {
+            "event": "checked",
+            "id": "go-wrong-witness-owner",
+            "decision": "rollback"
+          },
+          {
+            "event": "local",
+            "id": "python-commit",
+            "decision": "COMMITTED"
+          },
+          {
+            "event": "finalized",
+            "id": "python-commit",
+            "decision": "COMMITTED"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10730,
+        "exit_code": 0,
+        "events": [
+          {
+            "event": "ready",
+            "id": "",
+            "decision": "producer"
+          },
+          {
+            "event": "half",
+            "id": "python-rollback",
+            "decision": "confirmed"
+          },
+          {
+            "event": "local",
+            "id": "python-rollback",
+            "decision": "ABORTED"
+          },
+          {
+            "event": "finalized",
+            "id": "python-rollback",
+            "decision": "ABORTED"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10861,
+        "exit_code": 23,
+        "events": [
+          {
+            "event": "ready",
+            "id": "",
+            "decision": "producer"
+          },
+          {
+            "event": "half",
+            "id": "python-restart",
+            "decision": "confirmed"
+          },
+          {
+            "event": "local",
+            "id": "python-restart",
+            "decision": "COMMITTED"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 10884,
+        "exit_code": 0,
+        "events": [
+          {
+            "event": "ready",
+            "id": "",
+            "decision": "producer"
+          },
+          {
+            "event": "checked",
+            "id": "python-commit",
+            "decision": "commit"
+          },
+          {
+            "event": "checked",
+            "id": "python-restart",
+            "decision": "commit"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 11096,
+        "exit_code": 24,
+        "events": [
+          {
+            "event": "ready",
+            "id": "",
+            "decision": "producer"
+          },
+          {
+            "event": "half",
+            "id": "python-lost-commit-response",
+            "decision": "confirmed"
+          },
+          {
+            "event": "local",
+            "id": "python-lost-commit-response",
+            "decision": "COMMITTED"
+          },
+          {
+            "event": "finalization_unknown",
+            "id": "python-lost-commit-response",
+            "decision": "response_discarded_after_real_rpc"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 11148,
+        "exit_code": 0,
+        "events": [
+          {
+            "event": "ready",
+            "id": "",
+            "decision": "producer"
+          },
+          {
+            "event": "half",
+            "id": "python-db-unavailable",
+            "decision": "confirmed"
+          },
+          {
+            "event": "checked",
+            "id": "python-db-unavailable",
+            "decision": "unknown_database"
+          },
+          {
+            "event": "local",
+            "id": "python-db-unavailable",
+            "decision": "COMMITTED"
+          },
+          {
+            "event": "finalized",
+            "id": "python-db-unavailable",
+            "decision": "COMMITTED"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 11263,
+        "exit_code": 0,
+        "events": [
+          {
+            "event": "ready",
+            "id": "",
+            "decision": "producer"
+          },
+          {
+            "event": "half",
+            "id": "python-wrong-witness-owner",
+            "decision": "confirmed"
+          },
+          {
+            "event": "checked",
+            "id": "python-wrong-witness-owner",
+            "decision": "unknown_missing"
+          },
+          {
+            "event": "checked",
+            "id": "python-db-unavailable",
+            "decision": "commit"
+          },
+          {
+            "event": "local",
+            "id": "python-wrong-witness-owner",
+            "decision": "ABORTED"
+          },
+          {
+            "event": "finalized",
+            "id": "python-wrong-witness-owner",
+            "decision": "ABORTED"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 11440,
+        "exit_code": 1,
+        "events": [
+          {
+            "event": "failed",
+            "id": "",
+            "decision": "operation_failed"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 11460,
+        "exit_code": 23,
+        "events": [
+          {
+            "decision": "producer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "confirmed",
+            "event": "half",
+            "id": "go-to-python-recovery"
+          },
+          {
+            "decision": "COMMITTED",
+            "event": "local",
+            "id": "go-to-python-recovery"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 11469,
+        "exit_code": 0,
+        "events": [
+          {
+            "event": "ready",
+            "id": "",
+            "decision": "producer"
+          },
+          {
+            "event": "checked",
+            "id": "python-wrong-witness-owner",
+            "decision": "rollback"
+          },
+          {
+            "event": "checked",
+            "id": "go-to-python-recovery",
+            "decision": "commit"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 11631,
+        "exit_code": 23,
+        "events": [
+          {
+            "event": "ready",
+            "id": "",
+            "decision": "producer"
+          },
+          {
+            "event": "half",
+            "id": "python-to-go-recovery",
+            "decision": "confirmed"
+          },
+          {
+            "event": "local",
+            "id": "python-to-go-recovery",
+            "decision": "COMMITTED"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 11651,
+        "exit_code": 0,
+        "events": [
+          {
+            "decision": "producer",
+            "event": "ready",
+            "id": ""
+          },
+          {
+            "decision": "commit",
+            "event": "checked",
+            "id": "python-to-go-recovery"
+          },
+          {
+            "event": "exited"
+          }
+        ]
+      },
+      {
+        "pid": 11899,
+        "exit_code": 143,
+        "events": [
+          {
+            "event": "ready",
+            "id": "",
+            "decision": "producer"
+          },
+          {
+            "event": "half",
+            "id": "finite-check-limit",
+            "decision": "confirmed"
+          },
+          {
+            "event": "checked",
+            "id": "finite-check-limit",
+            "decision": "unknown_prepared"
+          }
+        ]
+      }
+    ],
+    "limits": [
+      "No production acceptance or throughput claim",
+      "Response loss injected after a real RPC, not at network packet layer",
+      "Host transaction adapters/fencing and bounded SDK queues belong to later M2 batches"
+    ],
+    "source_sha256": {
+      "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+      "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+      "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+    },
+    "sdk_source_sha256": {
+      "transport/rocketmq/internal/driver/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "transport/rocketmq/internal/driver/UPSTREAM.json": "bcffa5817cbed9bbd7b31fa505021192c691ef7cd36c2b3dcc66998832e438ed",
+      "transport/rocketmq/internal/driver/UPSTREAM.md": "1f4f082165ba7a150aedcebe1d83dce7443df718921ee75a2875fbc501ac2002",
+      "transport/rocketmq/internal/driver/client.go": "c30037533e05896e4564c7ee5d773ef842b16778af61d00ad78df81c2dec9f33",
+      "transport/rocketmq/internal/driver/client_manager.go": "f25a3b1f6559134d41466810394370a6de6bb74ab0fac8b1c42c39750ddde5e3",
+      "transport/rocketmq/internal/driver/client_manager_mock.go": "f60e472d5976e0ee2bd95edfc9103a658e6859ece93de038fedb5830c618997d",
+      "transport/rocketmq/internal/driver/client_mock.go": "06317cad9e81b3de1874f091a347f8826d2852b6972f7d21d8a66202316bf8f1",
+      "transport/rocketmq/internal/driver/client_options.go": "dfc39180a3e6e7ff73bef35e2b6c081b8b146e3ff7b28ef3243e9890802d726d",
+      "transport/rocketmq/internal/driver/config.go": "6bb496d157434ae44a5561dfb74954317498e4b1fa6f463ca98c25ae0f891dc1",
+      "transport/rocketmq/internal/driver/conn.go": "ddc881ee0346e83fb442fc0639c979d4c9d6ca3b0e4d080713d1e95259167d48",
+      "transport/rocketmq/internal/driver/conn_options.go": "04f8897abe3b8f0233c8dfc488bb83712aaf7884c0bcec89ca5343d641fafdeb",
+      "transport/rocketmq/internal/driver/consumer.go": "d00714fb983466e5125108f773193bedd46bc02abd3375b54a7dc220cd89e1e7",
+      "transport/rocketmq/internal/driver/consumer_options.go": "412726d80edae989202a3ff08fcb9637e1925562fd479dde5e0e851312ab5604",
+      "transport/rocketmq/internal/driver/consumer_service.go": "5f4a2ac1e26b45f8d890f2f14ad72201a338e3afdf9f702e6e6d1e8b22c63f7f",
+      "transport/rocketmq/internal/driver/error.go": "c431fd3f5f934efb216415d3e0238fa384b6df2c8d9377e565e269c53f78b452",
+      "transport/rocketmq/internal/driver/lite_push_consumer.go": "aab7d261fec9995afd921b1cb28f254873273a03f574685ead2ac453e3fcec0e",
+      "transport/rocketmq/internal/driver/lite_push_consumer_mock.go": "e2e2d8a92371f7b637d60c7e4f927dfa69ca872d0fb684d760b3b139ab139b2c",
+      "transport/rocketmq/internal/driver/lite_push_consumer_options.go": "4e6aaa5f42cf33f805144c3a7e9519429ceec788447eb60a44c9dcb66adcf252",
+      "transport/rocketmq/internal/driver/loadBalancer.go": "afe4e4bacec2b7e2939e606428d24e5b031ef65eb8a93beafb05682eca2cb030",
+      "transport/rocketmq/internal/driver/log.go": "7bbb7e701892676723000a50871507caa0772b1de43ac84669f8f8691f24ecf0",
+      "transport/rocketmq/internal/driver/message.go": "cd6eba5cbde4f68ef17540b7f61523a1b9da559cb4ddcbbbc4ee1351542b65c2",
+      "transport/rocketmq/internal/driver/message_id.go": "6797a1e2a89a78016c4048ce8bc97ab8bc60a55010694b982a14ce7eb0f0e5cc",
+      "transport/rocketmq/internal/driver/message_id_codec.go": "17f7407b417bd8996885bca27c4e2a00dfc8f3bb6c8e2f121f4395fe4b192404",
+      "transport/rocketmq/internal/driver/metric.go": "40f077d2aff82fee8f9159e765f9f58cc4846d07a40d97e58493e9139db34e2e",
+      "transport/rocketmq/internal/driver/name_resolver.go": "8aaa51e30fdd0cdbe358076eb749ac67cbbc51107a559d729108218498e9fe37",
+      "transport/rocketmq/internal/driver/process_queue.go": "6d51d1a8c44a6c575a2c8ad2155b12e95027872a295cd7df822761604c9ef39f",
+      "transport/rocketmq/internal/driver/producer.go": "cc2876d9901536d11fdadd268a89398590de615a83ec19442ea129512055c1e9",
+      "transport/rocketmq/internal/driver/producer_options.go": "3fa2e4359be26f6cabb3ae2deed3a53bb7a8d69978b61d4c463cda8893765e4c",
+      "transport/rocketmq/internal/driver/publishing_message.go": "b6c06219bae4d0fbc9e961f41d9dd56769d21053b42f6ff1f2629da7c13e3fce",
+      "transport/rocketmq/internal/driver/push_consumer.go": "6e44d25c71a71fa0a78a9daeb3be97568d83ab9404450e892eb3710e2d6d6480",
+      "transport/rocketmq/internal/driver/push_consumer_options.go": "07d936b21a433a641a51f0a17ef549b4bf0c90719e86a29f9d848d1d054a6578",
+      "transport/rocketmq/internal/driver/receive_rate_limiter.go": "7fe507eb88bc008f030e91852ca2d34b680f61add71e1ebb60c62e34cb851716",
+      "transport/rocketmq/internal/driver/rpc-options.patch": "36d11b883260db6e34239945eab069b7939da7114d975455f052b373cca5ea8b",
+      "transport/rocketmq/internal/driver/rpc_client.go": "2a3b6fbcead76c2783eec328ae2a5780ce764cf84bffbadb33c5abfa9377f326",
+      "transport/rocketmq/internal/driver/rpc_client_mock.go": "4c8c6d6af3576fe62824f9759948f5a85dde38ee5c7148c7f81e6a0d04006619",
+      "transport/rocketmq/internal/driver/rpc_client_options.go": "485f4368467c18a31344318f60d98dde43f2044d4493192857ec6f53459705d8",
+      "transport/rocketmq/internal/driver/rpc_options_test.go": "3ff0643718025721e98ad211c1dfac359f260f875ba6668be93fb15fc49604b2",
+      "transport/rocketmq/internal/driver/simple_consumer.go": "56956743825905af9526a955bb52d3945a2abb796713e6aa9107b25a205073a1",
+      "transport/rocketmq/internal/driver/simple_consumer_options.go": "d24c4def53f00b324eb4cea6d498d87e2127f0f65d20ce1e0c48a116aca88f72",
+      "transport/rocketmq/internal/driver/simple_thread_pool.go": "f6e3ec76238822539484d9c0c96b3761741d8adf979f6bf46616012dcf42bd64",
+      "transport/rocketmq/internal/driver/trace.go": "1a480254170cb1d09533ce00e6e696d6868189e560115d5108a28dd8efb3cdf9",
+      "transport/rocketmq/internal/driver/transaction.go": "0f6c02266af8f0adbdb017af25d8a3ede3e49e2dc80c6ca14ed536175ef2e905",
+      "transport/rocketmq/internal/driver/user_agent.go": "74cb4a11296820f6a60c0d390137b40ac1670e57e56825e4cc9d3ca5d616926a",
+      "transport/rocketmq/internal/txprobe/main.go": "ea5572b786829b5c3d1e4bb827c1aa12567956545b29588b09d4f7ef299ab5e4"
+    },
+    "go_runtime_patch": "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)",
+    "harness_sha256": {
+      "scripts/rocketmq/ci-transactions.py": "1cea19f5f3bff02c4d35bde0b833110981b1a626a561eefea88cd82d43685960",
+      "scripts/rocketmq/render.py": "d2a91207804ca9f85ce15511edfbd1858a087e78141a5bd9668745d8cc72f4dc",
+      "components/rocketmq/docker-compose.yml": "d294f7310a2d499ca17d8a78e2ac42e5b291734b8f6792411863f8f8d871c4f8"
+    },
+    "go_probe_sha256": "5d23638fb80ad7e8fde4fc19d26f21e696a33dcc68219fb12fe8323518b682ee"
+  },
+  "protocol_review": {
+    "pr": "https://github.com/FangcunMount/reliable-messaging/pull/34",
+    "head": "d89584b51ecdcb23aba8a2b4e20dc361e94683f4",
+    "ci": "success",
+    "source_and_installed_wheel_contract_tests": 21,
+    "public_api": "provisional",
+    "database_atomicity": "not_yet_implemented",
+    "production_cutover": false
+  },
+  "production_container_readback": {
+    "running": true,
+    "oom": false,
+    "restarts": 0,
+    "containers": [
+      "rocketmq-broker-1",
+      "rocketmq-nameserver-1",
+      "qs-worker-runtime-1",
+      "qs-worker-runtime-2",
+      "qs-worker-runtime-3",
+      "nsqd",
+      "nsqlookupd",
+      "nsqadmin"
+    ]
+  }
+}
