@@ -108,7 +108,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；四库PR均合并，三库最终完整CI通过；生产未切换 |
 | ✅ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 2026-10-19；[完整证据](evidence/rocketmq-m3-iam-planning-20261019.json)；ea95cd9e全CI及三档MySQL每档7项0跳过、独立并发通过；[PR131](https://github.com/FangcunMount/iam/pull/131)合并c2aa3635；实际Sender装配属T06 |
 | ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 进行中；[PR132](https://github.com/FangcunMount/iam/pull/132)草稿/[分候选证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；7730207d全CI/三档原生/并发/SDK隔离通过；feb0369c已装配platform/维护CLI且完整CI通过；733c2dc2补IAM43协议门禁与进程生命周期，本地全仓race1898通过/31可选跳过、额外MySQL9.3原生15项0跳过；实际Broker矩阵因GitHub账户支付/额度限制未启动 |
-| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 待开始 |
+| ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 进行中；独立stacked工作区iam-operations，T06候选保持冻结；不合并、不跳过IAM批次门禁 |
 | ☐ | T08 | IAM 与 QS 双订阅、乱序、freshness 回归 | 待开始 |
 | ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 待开始 |
 | ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 待开始 |
@@ -225,3 +225,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-19：T06补显式宿主发布协议门禁，新增IAM迁移43（42保持不变），默认保留outbox，不自动切换。原事务共享锁约束新版旧Stager/事务写者；旧二进制仍须在T32退出。同步接入启动失败、独立退出预算、drain先封准入及事务owner readiness；本地补充MySQL9.3临时实例验证不替代固定8.0/8.4 Compose矩阵。源码基线已整合main403d41c2的既有Redis交付提交，不属于M3新增Redis操作。
 
 - 2026-10-19：T06候选固定为733c2dc2，已推送PR132并更新描述。全仓source race1898通过/0失败/31项既有环境用例跳过；425项定向source race通过/5跳过；额外隔离MySQL9.3包含完整迁移链15项通过/0跳过，绑定精确SHA、私有日志摘要及清理回执。该额外版本不能替代规定的8.0/8.4 Compose或实际Broker门禁，故保持5/36，不合并草稿、不切生产。infra真实宿主workflow已锁定新候选；账户门禁历史保留，最新CI状态分别回读。
+
+- 2026-10-19：T06最终当前候选89bdcf58补五类维护原根事务测试；额外MySQL9.3在干净源码上20项通过/0失败/0跳过并清理，integration-tag lint与五包race通过。新增required CI具名验证，保留夹具导入别名编译失败历史。Broker矩阵指向同一候选，T06仍不勾选。等待正式门禁期间在独立stacked工作区推进同一IAM批次T07；M3-2/QS仍等待IAM门禁，不扩展生产授权。

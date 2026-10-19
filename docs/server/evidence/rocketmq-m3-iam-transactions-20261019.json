@@ -3,11 +3,11 @@
   "task_ids": [
     "T06"
   ],
-  "observed_at": "2026-10-19T15:49:21.567610+00:00",
+  "observed_at": "2026-10-19T15:58:59.374269+00:00",
   "status": "in_progress",
   "complete": false,
   "repository": "FangcunMount/iam",
-  "source_sha": "733c2dc2a30074e514f3bfedfc98cd2cff642d5d",
+  "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
   "pr": "https://github.com/FangcunMount/iam/pull/132",
   "pr_status": "draft; not merged",
   "implemented": [
@@ -20,7 +20,8 @@
     "Conditional final NORMAL SMS client only with mq provider; standard modes retained explicitly",
     "Startup/close accounting, failed-start cleanup and retained DB pool ownership on incomplete close",
     "Host protocol selection schema43 default remains outbox; exact owner/store/epoch/revision validation before planning and inside original root; standard writer refusal with shared row locking",
-    "Transaction process failure/shutdown handling independent of retired Outbox flag; drain admission before consumer close and separate protocol readiness"
+    "Transaction process failure/shutdown handling independent of retired Outbox flag; drain admission before consumer close and separate protocol readiness",
+    "All five maintenance writers original-root SDK guard/witness acceptance, including applicable compensation, no-op reuse and explicit half rejection; required CI names verified and no skips allowed"
   ],
   "validation": [
     {
@@ -97,6 +98,28 @@
       "source_sha": "733c2dc2a30074e514f3bfedfc98cd2cff642d5d",
       "scope": "pinned lint2.5.0, docs facts/links, integration+reliable_messaging compilation, diff",
       "exit": 0
+    },
+    {
+      "scope": "supplemental MySQL 9.3 only; does not replace required Docker 8.0/8.4 matrix",
+      "fixture": "/var/folders/8x/l5l22n7n61q8jv7ns6bzzqkm0000gn/T/m3-iam-mysql93-z8y1u3wd",
+      "cleaned": true,
+      "server_version": "9.3.0",
+      "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+      "source_clean_before": true,
+      "exit": 0,
+      "tests": {
+        "pass": 20,
+        "fail": 0,
+        "skip": 0
+      },
+      "log": "/tmp/m3-iam-protocol-mysql93-20261019T235727.log",
+      "log_sha256": "2f6386cf1c524806969dedbcefe6290d47301fc952a6338aed2dbb61de41dacc",
+      "source_clean_after": true
+    },
+    {
+      "source_sha": "89bdcf5818e94d5878401c151fbe289e5eb121f4",
+      "scope": "integration-tagged lint2.5.0, five maintenance package source race, integration compilation",
+      "exit": 0
     }
   ],
   "failure_history": [
@@ -125,6 +148,14 @@
         "fixture_cleaned": true
       },
       "scope_limit": "Not a required 8.0/8.4 Docker matrix replacement; source not yet frozen at execution time; original failed private log was overwritten during the supplemental rerun, failure details retained here"
+    },
+    {
+      "scope": "maintenance integration fixture compilation before candidate89bdcf58",
+      "failure": "testutil import alias fixture collided with package-level fixture functions in rolemodel and scopemigrate",
+      "fix": "Use nativefixture alias",
+      "verification": "integration build/lint and exact candidate supplemental MySQL9.3 all20 pass, zero skips",
+      "failed_run_log_sha256": "9235cc5ba23c63d5dd3aba0c119df7a8a3c2e9c4f286d654af17488fe11dcfc2",
+      "source_uncommitted": true
     }
   ],
   "remaining": [
@@ -146,6 +177,10 @@
     {
       "source_sha": "feb0369c9b6ff621ed9227346036a07dad660658",
       "validation_status": "full CI39276085368 / concurrency39276085627 / SDK isolation39276085506 success; before protocol gate43"
+    },
+    {
+      "source_sha": "733c2dc2a30074e514f3bfedfc98cd2cff642d5d",
+      "validation_status": "supplemental15 native MySQL9.3 + full source race1898; required CI queued"
     }
   ],
   "external_blocker": {
