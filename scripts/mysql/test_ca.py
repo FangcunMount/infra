@@ -56,9 +56,7 @@ class CATest(unittest.TestCase):
                 m.source(self.git('rev-parse', 'HEAD').strip())
 
     def test_expired_trust_root_is_rejected(self):
-        expired = subprocess.check_output(['openssl', 'x509', '-in', str(self.cert),
-                    '-signkey', str(self.root/'private.key'), '-days', '-1'],
-                    stderr=subprocess.DEVNULL)
+        expired = b'-----BEGIN CERTIFICATE-----\nMIIBTTCB9KADAgECAgEBMAoGCCqGSM49BAMCMCYxJDAiBgNVBAMMG2V4cGlyZWQg\naXNvbGF0ZWQgQ0EgZml4dHVyZTAeFw0wMDAxMDEwMDAwMDBaFw0wMDAxMDIwMDAw\nMDBaMCYxJDAiBgNVBAMMG2V4cGlyZWQgaXNvbGF0ZWQgQ0EgZml4dHVyZTBZMBMG\nByqGSM49AgEGCCqGSM49AwEHA0IABDDNQvOxTFcQMP6S91Mwz3DMHtZrBdojZVjw\nmLB7eNiX1lHCEMRg3UnlpL8sD2t5HuKlFG8Jmd2FHE5dS4lm4o6jEzARMA8GA1Ud\nEwEB/wQFMAMBAf8wCgYIKoZIzj0EAwIDSAAwRQIgKoQVkJjzvHGXOvQPinZxncVm\n4RJ3KlLsaVC7Wu8jMuUCIQCHII8hQ9NpPUymKMeFFQuK27ThfTBbjEnZdtQih/oY\nBg==\n-----END CERTIFICATE-----\n'
         with self.assertRaises(ValueError):
             m.validate_ca(expired)
 
