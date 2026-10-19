@@ -3,17 +3,17 @@
   "task_ids": [
     "T04"
   ],
-  "observed_at": "2026-10-19T12:57:11.647997+00:00",
-  "status": "in_progress",
-  "complete": false,
-  "stage": "immutable-archive-and-retained-reader-validation",
+  "observed_at": "2026-10-19T13:04:11.516055+00:00",
+  "status": "complete",
+  "complete": true,
+  "stage": "host-schema-immutable-archive-and-legacy-compatibility",
   "repositories": {
     "iam": {
-      "source_sha": "36240da9ac423d449ff8daa3efc028343aff0b8e",
-      "head_sha": "36240da9ac423d449ff8daa3efc028343aff0b8e",
+      "source_sha": "78b5495c6ecf1073b09f43e57d7701bf661934c3",
+      "head_sha": "78b5495c6ecf1073b09f43e57d7701bf661934c3",
       "merged": false,
-      "ci": "https://github.com/FangcunMount/iam/actions/runs/39249335104",
-      "ci_status": "success at post-main-sync candidate (before archive additions)",
+      "ci": "https://github.com/FangcunMount/iam/actions/runs/39255584214",
+      "ci_status": "success; all3 native schema versions; separate concurrency39255584248 success",
       "native_mysql_84": {
         "actual_server_version": "8.4.11",
         "image_digest": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
@@ -52,15 +52,15 @@
       "native_source_sha": "b31fa2c34492c2633597e97476f41089dfa48b06"
     },
     "qs-ai": {
-      "source_sha": "9d2ebe9c7acdad5eecacb35985e27ac82791a5cd",
-      "head_sha": "3101453746ddb20480efa2427e45b887dee98126",
+      "source_sha": "2f7991e",
+      "head_sha": "10687a10f2c9bf86c781f27220dcff2f6aa4a836",
       "merged": false,
-      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39249344742",
-      "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39249339482",
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547832",
+      "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547837",
       "prior_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246774031",
       "prior_m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39246780022",
       "prior_m7_status": "success for historical delivery regression; did not include new native schema test",
-      "ci_status": "failed full CI: retained handoff/inventory head whitelist and two historical fixture scope failures; preserved in history",
+      "ci_status": "success;3101 tests per MySQL version with complete collection coverage and0 skipped",
       "targeted_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39248286789",
       "history_full_ci": [
         {
@@ -214,6 +214,51 @@
           "sha256": "7a14102e35edfd82d17b2b445cc77a0cfeffb384b72342ab75aa95ddf9fd485f"
         }
       }
+    },
+    "archive_native_qs_current": {
+      "head_sha": "2936bd51229f51b95308fb058b295fd3b9e88b7b",
+      "source_sha": "3f47ff9f4",
+      "job": "https://github.com/FangcunMount/qs-server/actions/runs/39255581089/job/118069913820",
+      "step": {
+        "conclusion": "success",
+        "head_sha": "2936bd51229f51b95308fb058b295fd3b9e88b7b",
+        "status": "completed",
+        "steps": [
+          {
+            "completed_at": "2026-10-19T13:01:33Z",
+            "conclusion": "success",
+            "name": "Verify M3 transaction schema on original paired databases",
+            "started_at": "2026-10-19T13:01:24Z",
+            "status": "completed"
+          }
+        ]
+      },
+      "metadata_sha256": "8dbe1ec9a06804bc56b15c0c134c8a6edf2d17adb8fa58c27e25b07d2f209107",
+      "boundary": "required M3 installation/original-root/archive native step passed; remaining unrelated full-QS regression and PR merge tracked separately"
+    },
+    "ai_complete_coverage": {
+      "tests_per_mysql_version": 3101,
+      "mysql_versions": [
+        "8.0.36",
+        "8.4"
+      ],
+      "skipped": 0,
+      "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547832",
+      "coverage_log_sha256": "48b63a5ee0eb40a1a529cc4e122ccc4dee2d176ac563952d5a76180b37ea6f6e"
+    },
+    "archive_dependencies": {
+      "mysql_8036": {
+        "version": "8.0.36",
+        "digest": "sha256:a532724022429812ec797c285c1b540a644c15e248579c6bfdf12a8fbaab4964"
+      },
+      "mysql_84": {
+        "version": "8.4.11",
+        "digest": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70"
+      },
+      "python_sdk": "0.4.0a1",
+      "go_sdk": "v0.5.0-rocketmq-tx.1",
+      "broker": "not used by T04 installation/archive proof; actual sender/host faults remain later tasks",
+      "cleanup": "owned native schemas dropped in fixture finalizers; CI service container stop completed for AI and IAM; QS full-job cleanup pending job completion"
     }
   },
   "migration_resources": {
@@ -241,13 +286,9 @@
     "Host original-root archive guards plus committed-only exact evidence readers; legacy fallback only when new identity absent",
     "Isolated native archive commit/rollback, owner, first-wire and damaged/prepared refusal proof added; not business entry acceptance"
   ],
-  "remaining": [
-    "Pass IAM schema42 readonly-status compatibility on native full-chain workflow",
-    "Pass final complete current-head CI and archive installation task gate",
-    "Record final exact source/PR states and tick T04 only after required task validation"
-  ],
+  "remaining": [],
   "boundaries": [
-    "3/36 remains unchanged; this file does not mark T04 complete",
+    "4/36; T04 checked only after schema/archive/root/retained-reader task proofs passed; milestone awaits PR merges",
     "IAM local broad regression has 18 pre-existing optional MySQL skips; not a required-native pass",
     "Go tagged native tests compile locally but have not executed a database locally",
     "No business write entry migrated, no merge/stable release/production schema/Topic/ACL/provider change",
@@ -330,7 +371,7 @@
       "head_sha": "10687a1",
       "ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547832",
       "m7_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39254547837",
-      "status": "required M7 success:205 cases per MySQL version, nonempty/0 failures/errors/skips; full CI still running"
+      "status": "required M7 and complete8-shard CI success;3101 tests exactly once per MySQL version,0 skipped"
     }
   },
   "migration_resources_history": [
@@ -368,5 +409,6 @@
     "qs-server.PRODUCTION_DEPLOY_PAUSED": "true",
     "qs-ai.AUTO_DEPLOY_ENABLED": "false",
     "scope": "repository variable readback only; not production runtime/schema/business acceptance; no variable writes"
-  }
+  },
+  "completion_boundary": "T04 implementation and task-required proofs complete. No business writer migrated. Overall milestone/merge, final CI, artifacts/stable publication, production and business acceptance remain separate."
 }
