@@ -1,5 +1,63 @@
 # RocketMQ M2 实施与验证
 
+## M2 SDK 批次进度（2026-10-19）
+
+本节为本批次唯一进度总表。批准范围为 Go/Python 独立事务 SDK、原事务 witness、Checker、有界生命周期、双存储证明及固定预发布；不包含三宿主改造或生产变更。沿用下文 M2-0 证据，新增任务独立计数。
+
+基线：SDK `fd9c51691d785ced6e27d1ad3509fc4ac99a7b1f`；infra `44c379bedf5d37194aff1c87eccc8c8080cb3b2c`。隔离分支：SDK `codex/rocketmq-m2-sdk`；infra `codex/rocketmq-m2-sdk-tracking`。
+
+进度：**0/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
+
+| 里程碑 | 任务 | 状态 | 完成门禁 |
+| --- | --- | --- | --- |
+| M2-0 | 既有批次 | ✅ 已完成 | 20 项真实验证，0 跳过 |
+| M2-P | T01 | 进行中 | 基线、任务及证据格式建立 |
+| M2-1 | T02–T04 | 待开始；已有协议初版 | 双语言契约及失败状态通过、PR 合并 |
+| M2-2 | T05–T09 | 待开始 | 四种原事务适配及并发证明、PR 合并 |
+| M2-3 | T10–T13 | 待开始 | Go 真 RPC、回查及关闭有界、PR 合并 |
+| M2-4 | T14–T16 | 待开始 | Python 线程/loop/取消证明、PR 合并 |
+| M2-5 | T17–T20 | 待开始 | 正式 SDK 故障集成 required CI 非空且 0 跳过、PR 合并 |
+| M2-6 | T21–T24 | 待开始 | 固定 tag/制品及下载重装通过 |
+
+| 完成 | ID | 任务与门禁 | 完成时间 / 源码 / 证据 / PR |
+| --- | --- | --- | --- |
+| ☐ | T01 | 执行总表、基线、任务依赖、验证命令和证据格式 | 进行中 |
+| ☐ | T02 | Sender/Executor/Store/Checker 契约和冻结 codec；双语言 round-trip | — |
+| ☐ | T03 | 请求/计划/执行 fence；重复请求、新执行、显式重建计划契约 | — |
+| ☐ | T04 | 三阶段结果、取消、部分准备与未知提交状态矩阵 | — |
+| ☐ | T05 | schema/索引/显式安装；身份比较、fence 边界、版本拒绝 | — |
+| ☐ | T06 | Go MySQL/sql、GORM 原事务 guard；真实原子性 | — |
+| ☐ | T07 | Go Mongo guard；callback 重入、写冲突、未知提交 | — |
+| ☐ | T08 | Python SQLAlchemy/MySQL guard；根事务/savepoint/AUTOCOMMIT | — |
+| ☐ | T09 | reservation、资格、中止器；迟到提交隔离 | — |
+| ☐ | T10 | Go driver context、回查准入、关闭；源码复现 | — |
+| ☐ | T11 | Go Sender 多分支准备、本地执行、最终确认 | — |
+| ☐ | T12 | Go 精确 Checker；跨实例、饱和、DB 预算 | — |
+| ☐ | T13 | Go Start/准入/Close/Wait；失败清理、关闭超时 | — |
+| ☐ | T14 | Python 实例级有界 Producer；阻断上游无界队列 | — |
+| ☐ | T15 | Python Sender/Checker/宿主 loop；session 不跨线程 | — |
+| ☐ | T16 | Python 取消、真实在途记账、关闭、多客户端隔离 | — |
+| ☐ | T17 | SDK/infra v2 路由、类型、owner ACL、共享消费预算 | — |
+| ☐ | T18 | 正式 SDK 跨语言/MySQL、Go/Mongo 真端到端 | — |
+| ☐ | T19 | 退出、断网、DB 提交丢回复、Broker 重启故障矩阵 | — |
+| ☐ | T20 | 资源上界、指标、超限告警、0600 原生超限审计导出 | — |
+| ☐ | T21 | 原事务示例、接入/恢复/关闭文档、API 评审 | — |
+| ☐ | T22 | 固定候选 SHA、完整 CI、wheel/sdist/摘要/receipt | — |
+| ☐ | T23 | 两语言 tag 同一 SHA，GitHub 固定预发布 | — |
+| ☐ | T24 | 下载发布 tag/制品重新安装验收、索引与总表关闭 | — |
+
+执行顺序：T01 → T02–T04 → T05–T09 → T10–T13 → T14–T16 → T17–T20 → T21–T24；不跳过前置门禁。
+
+适配矩阵：Go database/sql、GORM、Mongo；Python SQLAlchemy/MySQL。默认验证 profile：发送并发 8、分支上限 16、回查 worker 4/等待 32、DB 回查 2s、RPC 5s、lease 60s、维护每 5s 最多 100 条；宿主显式覆盖，生产预算归 M3。
+
+固定依赖：Broker 5.5.1；Go 客户端 5.1.4 + 可复现补丁；Python 5.1.2；Go 1.25.9/1.25.12；Python 3.11/3.13；MySQL 8.0.36/既有 8.0.44/8.4；Mongo 固定 7.0.37 replica set。所有故障测试仅操作随机隔离项目，缺依赖失败、不 skip，不安排跨云吞吐。
+
+发布候选：Go `v0.5.0-rocketmq-tx.1`；Python `0.4.0a1` / `python/v0.4.0a1`。名称已占用则阻断，绝不覆盖。两个 tag 绑定同一经验证 SDK SHA；只发布 GitHub Release，不新增 PyPI。最终下载的 Go module/wheel/sdist 重新验收，不用 replace/editable。
+
+证据格式：任务 ID、采集时间（含时区）、SDK/infra SHA、验证命令、报告或 CI 链接、结果/失败/跳过数、依赖版本与镜像 digest、隔离项目及清理结果、PR/合并/发布状态。日志不记录业务 wire、正文或凭据；私有审计权限 0600。未决 witness 不自动 GC。
+
+待执行验证：SDK `make check`、`make lint`；Python `uv run ruff check .` / `uv run mypy` / 源码与安装 wheel pytest；真实存储与 Broker 使用 required 隔离 CI。M2-0 探针通过不能替代正式 Sender 验收。
+
 M2 先验证固定上游客户端，再冻结 SDK 事务 API。业务仍使用 NSQ；本文件不表示 M2 或 M3 已完成，也不授权普通消息的中间业务上线。
 
 ## M2-0 可重复验证入口
