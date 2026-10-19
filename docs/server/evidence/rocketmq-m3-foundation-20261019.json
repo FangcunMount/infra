@@ -31,10 +31,10 @@
       "skips": []
     },
     "ai-unit": {
-      "tests": 42,
+      "tests": 45,
       "failed": 0,
       "skipped": 0,
-      "sha256": "6c7cc522911b877904ccb17d32501700bebf6d651ad77d3ee7b271c6c4c1c287"
+      "sha256": "12d2fa421d34d7b3c6e4e63f0056f4534cea4d4e4fa066cd8b93cb935ba3eae7"
     }
   },
   "modules": {
@@ -55,7 +55,7 @@
   "task_ids": [
     "T03"
   ],
-  "observed_at": "2026-10-19T10:26:04.435811+00:00",
+  "observed_at": "2026-10-19T10:31:26.756257+00:00",
   "stage": "source-foundation",
   "complete": true,
   "ci_complete": false,
@@ -73,7 +73,7 @@
       "merged": false
     },
     "qs-ai": {
-      "source_sha": "32ec747c73c4176af2f73128d67272a1ab6cdc2f",
+      "source_sha": "81db02635e509a253f1803102f8c213d5bf00798",
       "pr": "https://github.com/FangcunMount/qs-ai/pull/158",
       "merged": false
     }
@@ -140,6 +140,18 @@
     {
       "check": "QS docs second run",
       "result": "cross-repository path treated as missing local file; corrected to external infra link; final87/hygiene/facts passed"
+    },
+    {
+      "check": "host invalid shutdown budget self-review",
+      "previous_source_sha": "32ec747c73c4176af2f73128d67272a1ab6cdc2f",
+      "previous_report": {
+        "tests": 42,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "6c7cc522911b877904ccb17d32501700bebf6d651ad77d3ee7b271c6c4c1c287"
+      },
+      "source_sha": "81db02635e509a253f1803102f8c213d5bf00798",
+      "result": "negative/NaN/infinite budgets rejected before sealing admission; 45 focused tests pass; ruff/type/diff checks pass"
     }
   ],
   "boundaries": [
