@@ -1,0 +1,48 @@
+{
+  "sdk_sha": "8841fdfcdd9ec25b49f845a3ed3eb825385d0c32",
+  "passed": 18,
+  "failed": 1,
+  "skipped": 0,
+  "failure": "RuntimeError: probe ended before half",
+  "cleanup": {
+    "project_containers_remaining": false,
+    "compose_down_succeeded": true,
+    "probe_process_groups_drained": true,
+    "private_fixture_directory_removed": true
+  },
+  "version": 1,
+  "captured_at": "2026-10-19T06:34:43.847156+00:00",
+  "run": "https://github.com/FangcunMount/infra/actions/runs/39208349304",
+  "last_probe": {
+    "pid": 35615,
+    "exit_code": 1,
+    "events": [
+      {
+        "decision": "{\"CompletedResults\":0,\"HalfPreparedResults\":0,\"HalfRejectedResults\":0,\"HalfUnknownResults\":0,\"LocalCommittedResults\":0,\"LocalAbortedResults\":0,\"LocalUnknownResults\":0,\"FinalCommitResults\":0,\"FinalRollbackResults\":0,\"FinalUnknownResults\":0,\"ActiveSends\":0,\"RunningChecks\":0,\"QueuedChecks\":0,\"CheckRejected\":0,\"CheckUnknown\":0,\"CheckCommit\":0,\"CheckRollback\":0,\"InvalidChecks\":0,\"DatabaseErrors\":0,\"Reconciled\":0,\"CallbackErrors\":0,\"Ready\":false,\"Stopping\":true,\"Stopped\":true}",
+        "event": "metrics",
+        "id": "shared-go-mongo"
+      },
+      {
+        "decision": "failed_start_drained",
+        "event": "closed",
+        "id": "shared-go-mongo"
+      },
+      {
+        "decision": "grpc_Internal",
+        "event": "failure_code",
+        "id": ""
+      },
+      {
+        "decision": "sdk_operation_failed",
+        "event": "failed",
+        "id": ""
+      },
+      {
+        "event": "exited"
+      }
+    ]
+  },
+  "diagnosis": "Unresolved grpc_Internal during shared-go-mongo startup, before Ready/Reserve/half/business. Other two 31-case profiles at the same SDK SHA passed this scenario. No automatic retry or authorization inference added; new exact-candidate regression remains required.",
+  "complete": false,
+  "production_changed": false
+}
