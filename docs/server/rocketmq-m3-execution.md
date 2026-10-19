@@ -6,7 +6,7 @@
 
 - 进度：**5/36**；T01–T05 实现与任务必需验证完成。T05已完成并合并，T06进行中；M3-P已通过完整CI并完成四库PR合并；M3-1进行中，生产切换单独记账。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
-- 源码合并：未发生 M3 合并。稳定 SDK 发布：未执行。生产部署/DDL/Topic/ACL/provider 切换：未执行。system 验收与 48 小时观察：未开始。
+- 源码合并：基础批次及 IAM T05 已合并，IAM T06 PR132 仍为草稿。稳定 SDK 发布：未执行。生产部署/DDL/Topic/ACL/provider 切换：未执行。system 验收与 48 小时观察：未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
 
@@ -107,7 +107,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T03 | 三库预发布依赖、显式配置、owner、准入、预算、生命周期基础 | 2026-10-19；[源码/依赖/审计/验证](evidence/rocketmq-m3-foundation-20261019.json)；初版IAM e50686c7 / QS98645d817 / AI81db026；race63/56、AI45通过；PR130/407/158已合并；最终CI/合并见T04证据；真实依赖另属T22/T23 |
 | ✅ | T04 | 宿主迁移、索引、档案、V2业务证据与兼容/安装边界 | 2026-10-19；[完整证据与全部失败历史](evidence/rocketmq-m3-storage-20261019.json)；IAM78b5495c三档原生+独立并发通过，QS2936bd512当头原生档案/双库步骤通过，AI10687a1两档各205定向与3101完整用例0跳过；四库PR均合并，三库最终完整CI通过；生产未切换 |
 | ✅ | T05 | IAM 所有授权写入口 planner 与精确版本/业务 CAS | 2026-10-19；[完整证据](evidence/rocketmq-m3-iam-planning-20261019.json)；ea95cd9e全CI及三档MySQL每档7项0跳过、独立并发通过；[PR131](https://github.com/FangcunMount/iam/pull/131)合并c2aa3635；实际Sender装配属T06 |
-| ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 进行中；[PR132](https://github.com/FangcunMount/iam/pull/132)草稿/[分候选证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；7730207d全CI/三档原生/并发/SDK隔离通过；0bd208a2增加冻结ID/时钟及宿主准入，完整装配未完成 |
+| ☐ | T06 | IAM 原 GORM 事务业务/版本/witness 原子提交 | 进行中；[PR132](https://github.com/FangcunMount/iam/pull/132)草稿/[分候选证据](evidence/rocketmq-m3-iam-transactions-20261019.json)；7730207d全CI/三档原生/并发/SDK隔离通过；feb0369c已装配platform/维护CLI且完整CI通过；733c2dc2补IAM43协议门禁与进程生命周期，本地全仓race1898通过/31可选跳过、额外MySQL9.3原生15项0跳过；实际Broker矩阵因GitHub账户支付/额度限制未启动 |
 | ☐ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 待开始 |
 | ☐ | T08 | IAM 与 QS 双订阅、乱序、freshness 回归 | 待开始 |
 | ☐ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 待开始 |
@@ -220,3 +220,8 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-19：T06推进，保持5/36。7730207d原根事务、半消息/事件门禁、回滚和单次执行在三档MySQL通过，完整CI、独立并发和SDK隔离通过；保留d7e5ce77夹具参数绑定失败。0bd208a2补冻结本地资料、原wire保留、业务/维护ID分配、原事务审计时钟和有界规划准入，177个目标source race通过，9项既有本地DB跳过不计验收；最新原生候选验证中。platform/维护CLI装配及完整业务状态仍未完成；PR132保持草稿，不打勾。
 
 - 2026-10-19：T06继续，进度5/36。0bd208a2完整CI39270215122、三档MySQL（含实际宿主应用入口和冻结ORM）、并发39270214607与SDK隔离39270214851通过。feb0369c新增platform/维护CLI显式事务目录与owner生命周期；本地race、lint、vet、docs通过。infra新增仅隔离Compose内运行的实际IAM Broker验收，生成独立账号/Topic/Group并锁源码SHA，不接受生产端点；即将由CI验证，不把存储半消息fixture冒充真实Broker。T06未勾选，源码未合并，生产无操作。
+
+- 2026-10-19：T06继续，保持5/36。feb0369c完整CI39276085368、并发39276085627及SDK隔离39276085506成功。infra dd0be29实际IAM Broker矩阵39277154976的3个job均无step启动，GitHub annotation提示账户支付失败或spending limit；不是测试执行失败或通过，不重复重跑空作业。已请求恢复Actions额度；继续本地代码/验证，不跳过原生与真实Broker门禁。
+- 2026-10-19：T06补显式宿主发布协议门禁，新增IAM迁移43（42保持不变），默认保留outbox，不自动切换。原事务共享锁约束新版旧Stager/事务写者；旧二进制仍须在T32退出。同步接入启动失败、独立退出预算、drain先封准入及事务owner readiness；本地补充MySQL9.3临时实例验证不替代固定8.0/8.4 Compose矩阵。源码基线已整合main403d41c2的既有Redis交付提交，不属于M3新增Redis操作。
+
+- 2026-10-19：T06候选固定为733c2dc2，已推送PR132并更新描述。全仓source race1898通过/0失败/31项既有环境用例跳过；425项定向source race通过/5跳过；额外隔离MySQL9.3包含完整迁移链15项通过/0跳过，绑定精确SHA、私有日志摘要及清理回执。该额外版本不能替代规定的8.0/8.4 Compose或实际Broker门禁，故保持5/36，不合并草稿、不切生产。infra真实宿主workflow已锁定新候选；账户门禁历史保留，最新CI状态分别回读。

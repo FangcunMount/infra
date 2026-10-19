@@ -6,7 +6,7 @@ on:
         description: Exact IAM candidate source SHA
         type: string
         required: true
-        default: feb0369c9b6ff621ed9227346036a07dad660658
+        default: 733c2dc2a30074e514f3bfedfc98cd2cff642d5d
   pull_request:
     paths: ['scripts/rocketmq/ci-transactions.py', 'scripts/rocketmq/iam_acceptance.py', 'scripts/rocketmq/test_iam_acceptance.py', '.github/workflows/rocketmq-iam.yml']
 permissions:
@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/iam
-          ref: ${{ inputs.iam_ref || 'feb0369c9b6ff621ed9227346036a07dad660658' }}
+          ref: ${{ inputs.iam_ref || '733c2dc2a30074e514f3bfedfc98cd2cff642d5d' }}
           path: .iam-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -46,7 +46,7 @@ jobs:
           python-version: '3.13'
       - name: Verify exact candidate and source harness
         env:
-          EXPECTED_IAM_SHA: ${{ inputs.iam_ref || 'feb0369c9b6ff621ed9227346036a07dad660658' }}
+          EXPECTED_IAM_SHA: ${{ inputs.iam_ref || '733c2dc2a30074e514f3bfedfc98cd2cff642d5d' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_IAM_SHA" =~ ^[0-9a-f]{40}$ ]]
