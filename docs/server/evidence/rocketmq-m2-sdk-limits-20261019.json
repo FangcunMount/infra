@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "task": "T20",
+  "complete": true,
+  "captured_at": "2026-10-19T06:57:27.918782+00:00",
+  "sdk_sha": "8841fdfcdd9ec25b49f845a3ed3eb825385d0c32",
+  "infra_sha": "85a2a6157c534cfcb3540895c2d802008d627609",
+  "run": "https://github.com/FangcunMount/infra/actions/runs/39210736275",
+  "profiles": [
+    {
+      "artifact": "rocketmq-complete-sdk-0-339878110b16e765149f9b27694d75612b0a85ce",
+      "report_sha256": "cf2532f5797b63e326608cadca78ec7331f7a186e48233bd9618e9b5d94bcc2f",
+      "go": "go1.25.9",
+      "python": {
+        "python": "3.11.16",
+        "client": "5.1.2",
+        "sdk_version": "0.4.0a1",
+        "package_file": "/home/runner/work/infra/infra/.sdk-acceptance/python/src/reliable_messaging/__init__.py"
+      },
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "images": {
+        "image": "sha256:22e70297e95830a2d31c2e7a5f4da873fc8368875ca6b9dbd3d0749e383dd2bd",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3"
+      },
+      "broker_parameters": {
+        "transactionTimeOut": 6000,
+        "transactionCheckInterval": 5000,
+        "transactionCheckMax": 24,
+        "fileReservedTime": 48
+      },
+      "native_limits": [
+        {
+          "language": "sdk-go",
+          "effective_parameters": {
+            "transactionTimeOut": 6000,
+            "transactionCheckInterval": 5000,
+            "transactionCheckMax": 2,
+            "fileReservedTime": 48
+          },
+          "audit": {
+            "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+            "key_sha256": "a3f83ccdfdcc4213d12b6365307f33f55a7e093a2f8923f4003d8d9e9d32459e",
+            "records": [
+              {
+                "broker_message_id": "0170A8A5429ED5904C0AE7588300000000",
+                "queue_id": 0,
+                "queue_offset": 0,
+                "commitlog_offset": 565561,
+                "index_hour": 1792389600000
+              }
+            ],
+            "raw_admin_sha256": "eae7e75ec1195828b7b05fb27d122f770d743effad04710b5fcb2ef0d25e986e",
+            "read_only": true,
+            "body_exported": false,
+            "truncated_possible": false,
+            "alert": "native_transaction_check_limit_reached",
+            "severity": "critical"
+          },
+          "mode": "0600",
+          "alert": "native_transaction_check_limit_reached",
+          "admission": "public Reserve refused after explicit StopAdmission",
+          "business_count": 0,
+          "local_evidence": "prepared_retained"
+        },
+        {
+          "language": "sdk-python",
+          "effective_parameters": {
+            "transactionTimeOut": 6000,
+            "transactionCheckInterval": 5000,
+            "transactionCheckMax": 2,
+            "fileReservedTime": 48
+          },
+          "audit": {
+            "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+            "key_sha256": "b59e2f109f91c07624a5d2f535a2687c3c93a5d13e5c61a10788ce7b0ff1b7c7",
+            "records": [
+              {
+                "broker_message_id": "01652E352BE74795FE0AE758BC00000000",
+                "queue_id": 0,
+                "queue_offset": 1,
+                "commitlog_offset": 571020,
+                "index_hour": 1792389600000
+              }
+            ],
+            "raw_admin_sha256": "e91ef2a91a3f5b067b08df6539bbf8133595bbfdf4fbef85b5988504e2b1380b",
+            "read_only": true,
+            "body_exported": false,
+            "truncated_possible": false,
+            "alert": "native_transaction_check_limit_reached",
+            "severity": "critical"
+          },
+          "mode": "0600",
+          "alert": "native_transaction_check_limit_reached",
+          "admission": "public Reserve refused after explicit StopAdmission",
+          "business_count": 0,
+          "local_evidence": "prepared_retained"
+        }
+      ]
+    },
+    {
+      "artifact": "rocketmq-complete-sdk-1-339878110b16e765149f9b27694d75612b0a85ce",
+      "report_sha256": "23306aec596de5d786dbb285435268e6f530013875707b0498fd34a39f850641",
+      "go": "go1.25.12",
+      "python": {
+        "python": "3.13.15",
+        "client": "5.1.2",
+        "sdk_version": "0.4.0a1",
+        "package_file": "/home/runner/work/infra/infra/.sdk-acceptance/python/src/reliable_messaging/__init__.py"
+      },
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "images": {
+        "image": "sha256:1daa8d5b48ea6f2759a2551651b6f9b6e302cb9a0478d5e4308c6f0bb9548268",
+        "mysql_image": "sha256:efb212ddf03576a6c0b02b8d364e6a46f21e628308a719db0b0450f8817c0517",
+        "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3"
+      },
+      "broker_parameters": {
+        "transactionTimeOut": 6000,
+        "transactionCheckInterval": 5000,
+        "transactionCheckMax": 24,
+        "fileReservedTime": 48
+      },
+      "native_limits": [
+        {
+          "language": "sdk-go",
+          "effective_parameters": {
+            "transactionTimeOut": 6000,
+            "transactionCheckInterval": 5000,
+            "transactionCheckMax": 2,
+            "fileReservedTime": 48
+          },
+          "audit": {
+            "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+            "key_sha256": "a3f83ccdfdcc4213d12b6365307f33f55a7e093a2f8923f4003d8d9e9d32459e",
+            "records": [
+              {
+                "broker_message_id": "01000D3A71BD2592AE0AE7588F00000000",
+                "queue_id": 0,
+                "queue_offset": 0,
+                "commitlog_offset": 606269,
+                "index_hour": 1792389600000
+              }
+            ],
+            "raw_admin_sha256": "aa07dc0471bb020543b888aa43e1b7dc282a69411f932b7d713c61e248c05065",
+            "read_only": true,
+            "body_exported": false,
+            "truncated_possible": false,
+            "alert": "native_transaction_check_limit_reached",
+            "severity": "critical"
+          },
+          "mode": "0600",
+          "alert": "native_transaction_check_limit_reached",
+          "admission": "public Reserve refused after explicit StopAdmission",
+          "business_count": 0,
+          "local_evidence": "prepared_retained"
+        },
+        {
+          "language": "sdk-python",
+          "effective_parameters": {
+            "transactionTimeOut": 6000,
+            "transactionCheckInterval": 5000,
+            "transactionCheckMax": 2,
+            "fileReservedTime": 48
+          },
+          "audit": {
+            "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+            "key_sha256": "b59e2f109f91c07624a5d2f535a2687c3c93a5d13e5c61a10788ce7b0ff1b7c7",
+            "records": [
+              {
+                "broker_message_id": "01000D3A71BD25973B0AE758B500000000",
+                "queue_id": 0,
+                "queue_offset": 1,
+                "commitlog_offset": 611725,
+                "index_hour": 1792389600000
+              }
+            ],
+            "raw_admin_sha256": "2d1ca16cd7bcd53e148697868d0097a3b445208cc36d8eda22ee95da511aa35d",
+            "read_only": true,
+            "body_exported": false,
+            "truncated_possible": false,
+            "alert": "native_transaction_check_limit_reached",
+            "severity": "critical"
+          },
+          "mode": "0600",
+          "alert": "native_transaction_check_limit_reached",
+          "admission": "public Reserve refused after explicit StopAdmission",
+          "business_count": 0,
+          "local_evidence": "prepared_retained"
+        }
+      ]
+    }
+  ],
+  "local_script_tests": {
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0
+  },
+  "source_checks": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179044",
+  "checks": [
+    "Actual native TRANS_CHECK_MAX_TIME_TOPIC index records for Go and Python",
+    "Exact current-reference Unknown; original evidence Prepared retained; business zero",
+    "Exclusive 0600 audit export with critical severity and no body export",
+    "New Reserve rejected after public StopAdmission while Checker remains alive",
+    "Actual probe process groups, containers, owned volumes and private fixture directory drained",
+    "Bounded SDK pre-dispatch tests, finite RPC/DB budgets, close counters and protocol phase observations"
+  ],
+  "merged": false,
+  "published": false,
+  "production_changed": false
+}

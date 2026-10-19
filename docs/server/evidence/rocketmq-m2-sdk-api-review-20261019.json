@@ -1,10 +1,10 @@
 {
   "version": 1,
   "task": "T21",
-  "complete": false,
-  "status": "reviewed_candidate_pending_M2_5_and_merge",
+  "complete": true,
+  "status": "reviewed_and_frozen_for_fixed_prerelease",
   "captured_at": "2026-10-19T06:16:27.525970+00:00",
-  "sdk_sha": "8841fdfcdd9ec25b49f845a3ed3eb825385d0c32",
+  "sdk_sha": "c02bc984f42a66da6852da2315ba7aab9e5c8610",
   "reviewed_files_sha256": {
     "transaction/store.go": "e5712ab4eddb4a003f4a78e9b136e4680747f243b0780f80419b3fe37436708c",
     "transaction/evidence.go": "1af6428e3209d6870918221a90cd462efdcad24481e2cf1db7c3d29c5f4ed286",
@@ -17,7 +17,7 @@
     "python/src/reliable_messaging/transaction_mysql.py": "78e8a6eceaf6291ecd3189d1ee545077aa9dc4d4bc7659d2bf951f9f2ac76880",
     "examples/rocketmq-transaction/host.go": "663977ce57a2410d3c6d79ee85b432d487821c77dd08fb8511f520f3332dae6d",
     "python/examples/rocketmq_transaction.py": "1452f5b9328e668f240cd0a35ba885badd35123b2a3a2b747146c37d3d907a57",
-    "docs/02-接入指南/RocketMQ事务SDK.md": "bfa93bb9f68c8ed135bb16b3f1b0554d3f5a5ec1eb2348c942a4f57c21c60758"
+    "docs/02-\u63a5\u5165\u6307\u5357/RocketMQ\u4e8b\u52a1SDK.md": "bfa93bb9f68c8ed135bb16b3f1b0554d3f5a5ec1eb2348c942a4f57c21c60758"
   },
   "checks": [
     "Independent TransactionalSender; ordinary Publisher contract retained",
@@ -39,6 +39,30 @@
     "python": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179114",
     "regression": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39208179029"
   },
-  "public_api_frozen": false,
-  "published": false
+  "public_api_frozen": true,
+  "published": false,
+  "completed_at": "2026-10-19T07:00:05.331463+00:00",
+  "original_reviewed_sha": "8841fdfcdd9ec25b49f845a3ed3eb825385d0c32",
+  "merge_bindings": {
+    "sdk": {
+      "pr": 43,
+      "sha": "c02bc984f42a66da6852da2315ba7aab9e5c8610"
+    },
+    "infra": {
+      "pr": 27,
+      "sha": "b90817cd347045f8738811c6693f7401be9fc8f8"
+    }
+  },
+  "protocol": {
+    "schema_version": 1,
+    "codec_version": 1,
+    "routing_version": 2,
+    "fence_max": 9223372036854775807,
+    "plan_digest_domain": "rm-tx-plan-draft-v1"
+  },
+  "fault_gate": "https://github.com/FangcunMount/infra/actions/runs/39210736172",
+  "complete_gate": "https://github.com/FangcunMount/infra/actions/runs/39210736275",
+  "regression_gate": "https://github.com/FangcunMount/infra/actions/runs/39210736103",
+  "source_tree_equal_to_reviewed_candidate": true,
+  "production_changed": false
 }
