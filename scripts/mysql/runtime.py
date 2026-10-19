@@ -115,6 +115,17 @@ def public_endpoint(host, port):
         raise ValueError('MySQL endpoint must resolve only to public addresses')
 
 
+def pinned_endpoint(host, ref):
+    if not re.fullmatch('[0-9a-f]{40}', ref or ''):
+        raise ValueError('The verified instance CA commit must be immutable')
+    repository = Path(__file__).resolve().parents[2]
+    manifest = json.loads(subprocess.check_output([
+        'git', '-c', 'safe.directory='+str(repository), '-C', str(repository),
+        'show', ref+':components/mysql-client/manifest.json']))
+    if host != manifest['public_endpoint']:
+        raise ValueError('MySQL endpoint differs from the verified instance binding')
+
+
 def stable(container):
     return {key: container[key] for key in ('Id', 'Image', 'Config', 'HostConfig')}
 
@@ -143,6 +154,7 @@ def wait_healthy(name):
 def cutover(plan, directory):
     name, old = plan['name'], plan['before']
     public_endpoint(plan['host'], plan['port'])
+    pinned_endpoint(plan['host'], plan['ca_ref'])
     expected = payload(old, plan['image'], plan['host'], plan['port'], plan['ca_ref'], plan['revision'])
     if plan['payload'] != expected:
         raise ValueError('Migration exceeds the configuration allowlist')
@@ -220,6 +232,7 @@ def main():
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         if args.command == 'plan':
             public_endpoint(args.host, args.port)
+            pinned_endpoint(args.host, args.ca_ref)
             old = api('GET', '/containers/'+quote(args.name, safe='')+'/json')
             revision = api('GET', '/images/'+args.image+'/json')['Config']['Labels'].get('org.opencontainers.image.revision')
             if not revision:

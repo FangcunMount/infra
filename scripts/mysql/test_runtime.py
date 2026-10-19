@@ -61,6 +61,18 @@ class RuntimeTest(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 m.wait_healthy('unexpected-service')
 
+    def test_endpoint_must_match_the_verified_instance_manifest(self):
+        with patch.object(m.subprocess, 'check_output', return_value=b'{"public_endpoint":"verified.example.com"}'):
+            m.pinned_endpoint('verified.example.com', 'a'*40)
+            with self.assertRaises(ValueError):
+                m.pinned_endpoint('other.example.com', 'a'*40)
+
+    def test_mutable_ca_ref_is_rejected_before_git(self):
+        with patch.object(m.subprocess, 'check_output') as read:
+            with self.assertRaises(ValueError):
+                m.pinned_endpoint('verified.example.com', 'main')
+            read.assert_not_called()
+
     def test_other_services_are_rejected(self):
         with self.assertRaises(ValueError):
             self.patch(self.before('miniblog-backend'))
