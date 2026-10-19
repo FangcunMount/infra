@@ -52,6 +52,26 @@ class ExportTest(unittest.TestCase):
         self.assertEqual(export_runtime(containers)["services"]["qs-ai"]["tmpfs"],
                          ["/tmp:rw,noexec,nosuid,size=64m"])
 
+    def test_iam_keeps_identity_secrets_and_limits_while_routing_through_proxy(self):
+        source = fixture()[0]
+        source["Name"] = "/iam-apiserver"
+        source["Config"]["Env"] = ["IAM_APISERVER_MYSQL_HOST=private-rds:3306", "SIGNING_SECRET=literal$token"]
+        source["HostConfig"].update({"Dns": ["100.100.2.136"], "Memory": 1073741824})
+        source["NetworkSettings"]["Networks"]["infra-network"]["Aliases"] = ["iam-apiserver"]
+        source["Mounts"] = [{"Type": "bind", "Source": "/data/tls/" + name,
+                              "Destination": "/etc/iam/grpc/" + name, "RW": False}
+                             for name in ["ca", "server"]]
+        with self.assertRaises(ValueError):
+            export_runtime([source])
+        service = export_runtime([source], "iam")["services"]["iam-apiserver"]
+        self.assertEqual(service["environment"], {"IAM_APISERVER_MYSQL_HOST": "mysql-rds-proxy:3306", "SIGNING_SECRET": "literal$$token"})
+        self.assertNotIn("dns", service)
+        self.assertEqual(service["mem_limit"], 1073741824)
+        self.assertEqual({m["target"] for m in service["volumes"]}, {
+            "/etc/iam/grpc/ca/ca-chain.crt", "/etc/iam/grpc/server/iam-apiserver.crt",
+            "/etc/iam/grpc/server/iam-apiserver.key"})
+        self.assertTrue(all(m["read_only"] for m in service["volumes"]))
+
     @unittest.skipUnless(shutil.which("docker"), "Docker CLI required for Compose roundtrip")
     def test_compose_accepts_export_with_literal_credentials(self):
         containers = fixture()
