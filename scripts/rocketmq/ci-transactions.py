@@ -137,7 +137,10 @@ def main():
     parser.add_argument("--sdk-api-go", action="store_true", help="required public Go SDK acceptance; separate from raw M2-0")
     parser.add_argument("--python", default="uv")
     parser.add_argument("--sdk-faults", action="store_true", help="require actual packet commit faults and owned Broker restarts")
+    parser.add_argument("--sdk-limits", action="store_true", help="require public SDK finite native check audit and admission alarm")
     args = parser.parse_args()
+    if args.sdk_limits and not args.sdk_faults:
+        parser.error("limit proofs require the packet fault matrix first")
     if args.sdk_faults and not args.sdk_api_go:
         parser.error("packet faults require public SDK acceptance")
     if args.sdk_api_python and not args.sdk_api_go:
@@ -241,7 +244,7 @@ def main():
 
     def start(language, mode, identity="", owner="owner-a", topic=None, trust=None,
               storage="mysql", branches=1, revision="sdk-v2", subscription=None, principal=None,
-              database_proxy=None, mq_proxy=None):
+              database_proxy=None, mq_proxy=None, lease_millis=15000):
         is_sdk = language in ("sdk-go", "sdk-python")
         logical_owner, inputs, owner_routes = owner, [], []
         group = "m2-tx-consumer"
@@ -276,7 +279,7 @@ def main():
             "accesskey": account["username"], "secretkey": account["password"], "ca": str(trust or ca),
             "topic": topic or "m2-tx-owner-a", "group": group, "owner": logical_owner,
             "subscription": subscription or "", "inputs":inputs, "owner_routes":owner_routes,
-            "route_revision":revision, "storage": storage, "branches": branches,
+            "route_revision":revision, "storage": storage, "branches": branches, "lease_millis":lease_millis,
             "mongouri": f"mongodb://127.0.0.1:{actual_mongo_port}/?replicaSet=sdk-proof&directConnection=true",
             "dsn": f"txprobe:{mysql_password}@tcp(127.0.0.1:{actual_mysql_port})/txprobe?timeout=1s&readTimeout=5s&writeTimeout=5s",
             "mysql_url": f"mysql+asyncmy://txprobe:{mysql_password}@127.0.0.1:{actual_mysql_port}/txprobe"}))
@@ -389,7 +392,11 @@ def main():
                      "./transport/rocketmq/internal/faultproxy"], cwd=sdk)
                 proof["packet_faults"] = run_faults(start,proxy_start,passed,sql,mongo_command,
                                                   restart_broker,python=args.sdk_api_python)
-            required_cases = (31 if args.sdk_api_python else 19) + ((13 if args.sdk_api_python else 8) if args.sdk_faults else 0)
+            if args.sdk_limits:
+                from sdk_limits import run_limits
+                proof["finite_sdk_limit"] = run_limits(start,passed,sql,admin,broker_parameters,
+                                                       broker,project,directory,python=args.sdk_api_python)
+            required_cases = (31 if args.sdk_api_python else 19) + ((13 if args.sdk_api_python else 8) if args.sdk_faults else 0) + ((2 if args.sdk_api_python else 1) if args.sdk_limits else 0)
             if len(cases) != required_cases:
                 raise RuntimeError("required public SDK case count differs")
             return
@@ -602,7 +609,8 @@ def main():
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
                                               repo / "components/rocketmq/docker-compose.yml", repo / "scripts/rocketmq/sdk_acceptance.py",
-                                              repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/sdk_faults.py", repo / "scripts/rocketmq/routes.py",
+                                              repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/sdk_faults.py", repo / "scripts/rocketmq/sdk_limits.py",
+                                              repo / "scripts/rocketmq/audit_transaction_limit.py", repo / "scripts/rocketmq/routes.py",
                                               repo / "scripts/rocketmq/provision_v2.py")}
         report["go_probe_sha256"] = hashlib.sha256((args.go_probe or directory / "go-probe").read_bytes()).hexdigest() if (args.go_probe or directory / "go-probe").exists() else None
         dirty_sdk = args.sdk_api_go and not report.get("sdk_tracked_sources_clean", False)
