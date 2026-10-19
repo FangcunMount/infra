@@ -25,7 +25,7 @@ PREFIXES = {'qs-apiserver': 'QS_APISERVER_MYSQL_', 'iam-apiserver': 'IAM_APISERV
 
 class Docker(http.client.HTTPConnection):
     def __init__(self):
-        super().__init__('localhost', timeout=260)
+        super().__init__('localhost', timeout=660)
 
     def connect(self):
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -158,7 +158,7 @@ def cutover(plan, directory):
         raise ValueError('Image identity differs')
     retained = name+'-before-mysql-tls-'+str(int(time.time()))
     save(directory/'intent.json', {'name': name, 'retained': retained, 'old_id': old['Id']})
-    api('POST', '/containers/'+old['Id']+'/stop?t=210')
+    api('POST', '/containers/'+old['Id']+'/stop?t='+str(old['Config'].get('StopTimeout') or 30))
     renamed = False
     created = None
     try:
@@ -174,7 +174,7 @@ def cutover(plan, directory):
         print(json.dumps({'service': name, 'state': 'healthy', 'image': new_image['Id']}))
     except Exception:
         if created:
-            api('POST', '/containers/'+created+'/stop?t=30')
+            api('POST', '/containers/'+created+'/stop?t='+str(old['Config'].get('StopTimeout') or 30))
             api('POST', '/containers/'+created+'/update', {'RestartPolicy': {'Name': 'no'}})
             api('POST', '/containers/'+created+'/rename?name='+quote(name+'-failed-mysql-tls-'+str(int(time.time()))))
         if renamed:
@@ -189,7 +189,7 @@ def rollback(directory):
     name = receipt['name']
     if api('GET', '/containers/'+name+'/json')['Id'] != receipt['new_id']:
         raise ValueError('Current runtime differs from this migration receipt')
-    api('POST', '/containers/'+receipt['new_id']+'/stop?t=210')
+    api('POST', '/containers/'+receipt['new_id']+'/stop?t='+str(plan['before']['Config'].get('StopTimeout') or 30))
     api('POST', '/containers/'+receipt['new_id']+'/rename?name='+quote(name+'-tls-rollback-'+str(int(time.time()))))
     api('POST', '/containers/'+receipt['new_id']+'/update', {'RestartPolicy': {'Name': 'no'}})
     api('POST', '/containers/'+receipt['old_id']+'/rename?name='+quote(name))
