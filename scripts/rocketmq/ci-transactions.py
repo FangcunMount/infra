@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import queue
 import secrets
+import signal
 import shutil
 import socket
 import subprocess
@@ -65,7 +66,8 @@ class Probe:
         self.log = open(directory / ("probe-" + secrets.token_hex(5) + ".log"), "x")
         os.chmod(self.log.name, 0o600)
         self.process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                        stderr=self.log, text=True, env=env, bufsize=1)
+                                        stderr=self.log, text=True, env=env, bufsize=1,
+                                        start_new_session=True)
 
         def collect():
             for line in self.process.stdout:
@@ -111,19 +113,40 @@ class Probe:
             raise RuntimeError("unexpected probe process status")
         self.reader.join(timeout=2)
         self.drain()
+        if self.reader.is_alive():
+            raise RuntimeError("probe child still owns stdout after launcher exited")
+
+    def signal_group(self, signum):
+        # Each fixture owns its own session. In particular uv run is a launcher,
+        # not the Python producer PID; signaling only Popen.pid can orphan it.
+        try:
+            os.killpg(self.process.pid, signum)
+        except ProcessLookupError:
+            pass
+
+    def kill_group(self):
+        if self.process.poll() is not None:
+            raise RuntimeError("producer exited before the controlled SIGKILL")
+        self.signal_group(signal.SIGKILL)
 
     def close(self):
-        if self.process.poll() is None:
-            self.process.terminate()
+        if self.process.poll() is None or self.reader.is_alive():
+            self.signal_group(signal.SIGTERM)
             try:
                 self.process.wait(timeout=10)
             except subprocess.TimeoutExpired:
-                self.process.kill()
+                self.signal_group(signal.SIGKILL)
                 self.process.wait(timeout=5)
         self.reader.join(timeout=2)
+        if self.reader.is_alive():
+            self.signal_group(signal.SIGKILL)
+            self.reader.join(timeout=2)
+        if self.reader.is_alive():
+            return False
         self.process.stdin.close()
         self.process.stdout.close()
         self.log.close()
+        return True
 
 
 def main():
@@ -411,7 +434,7 @@ def main():
                 from sdk_limits import run_limits
                 proof["finite_sdk_limit"] = run_limits(start,passed,sql,admin,broker_parameters,
                                                        broker,project,directory,python=args.sdk_api_python)
-            required_cases = (31 if args.sdk_api_python else 19) + ((13 if args.sdk_api_python else 8) if args.sdk_faults else 0) + ((2 if args.sdk_api_python else 1) if args.sdk_limits else 0)
+            required_cases = (31 if args.sdk_api_python else 19) + ((15 if args.sdk_api_python else 9) if args.sdk_faults else 0) + ((2 if args.sdk_api_python else 1) if args.sdk_limits else 0)
             if len(cases) != required_cases:
                 raise RuntimeError("required public SDK case count differs")
             return
@@ -573,9 +596,12 @@ def main():
         failure = type(exc).__name__ + ": " + str(exc)
         raise
     finally:
+        probes_drained = True
         for p in reversed(probes):
             if not p.log.closed:
-                p.close()
+                probes_drained = p.close() and probes_drained
+        if not probes_drained:
+            failure = failure or "owned probe process group did not drain"
         run(["docker", "unpause", mysql], required=False)
         run(compose + ["down", "--volumes", "--remove-orphans", "--timeout", "30"], timeout=120)
         remaining = run(["docker", "ps", "-aq", "--filter", "label=com.docker.compose.project=" + project]).stdout.strip()
@@ -585,7 +611,8 @@ def main():
                   "mysql_image": mysql_image, "mongo_image": mongo_image, "clients": {"go": "5.1.4", "python": "5.1.2"},
                   "cases": cases, "passed": len(cases), "failed": int(failure is not None),
                   "skipped": 0, "failure": failure, "proof": proof,
-                  "cleanup": {"project_containers_remaining": bool(remaining), "compose_down_succeeded": True},
+                  "cleanup": {"project_containers_remaining": bool(remaining), "compose_down_succeeded": True,
+                              "probe_process_groups_drained": probes_drained},
                   "probe_receipts": [{"pid": p.process.pid, "exit_code": p.process.returncode,
                                       "events": p.events} for p in probes],
                   "limits": (["No production acceptance or throughput claim",
@@ -654,7 +681,7 @@ def main():
             report["failure"] = report["failure"] or "private fixture cleanup failed"
         report["cleanup"]["private_fixture_directory_removed"] = private_removed
         args.report.write_text(json.dumps(report, indent=2) + "\n")
-        if remaining or dirty_sdk or not private_removed:
+        if remaining or dirty_sdk or not private_removed or not probes_drained:
             raise RuntimeError("owned cleanup or exact SDK source verification failed")
 
 

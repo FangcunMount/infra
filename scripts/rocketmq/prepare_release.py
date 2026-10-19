@@ -24,6 +24,7 @@ def checked_report(path, sha, count, candidate, infra):
         raise ValueError('acceptance report is empty, incomplete or from another SDK SHA')
     if report.get('cleanup') != {'project_containers_remaining': False,
                                  'compose_down_succeeded': True,
+                                 'probe_process_groups_drained': True,
                                  'private_fixture_directory_removed': True}:
         raise ValueError('acceptance cleanup did not finish')
     if count != 20 and report.get('sdk_tracked_sources_clean') is not True:
@@ -39,7 +40,7 @@ def checked_report(path, sha, count, candidate, infra):
         for name, expected in values.items():
             if Path(name).is_absolute() or '..' in Path(name).parts or digest(root/name) != expected:
                 raise ValueError('acceptance source bytes differ from fixed candidate/harness')
-    if count == 46:
+    if count == 48:
         runtime = report.get('python_runtime', {})
         if (report.get('clients') != {'go': '5.1.4', 'python': '5.1.2'}
                 or runtime.get('client') != '5.1.2' or runtime.get('sdk_version') != VERSION):
@@ -52,7 +53,9 @@ def checked_report(path, sha, count, candidate, infra):
                 or item.get('local_evidence') != 'prepared_retained' for item in limits):
             raise ValueError('real native-limit evidence is incomplete')
         cases_required = {'real_database_commit_': 6, 'after_real_broker_ack_tcp_loss': 4,
-                          'producer_exit_broker_restart_new_checker': 3}
+                          'producer_exit_broker_restart_new_checker': 3,
+                          'partial_half_sigkill_new_instance_rollback': 2,
+                          'native_limit_unknown_private_audit_and_admission_alarm': 2}
         if any(sum(part in name for name in cases) != needed
                for part, needed in cases_required.items()):
             raise ValueError('real database, Broker packet or restart fault cases absent')
@@ -122,7 +125,7 @@ def main():
                                 'RocketMQ complete transaction acceptance')
     regression_ci = checked_run('FangcunMount/infra', args.regression_run, 'RocketMQ Docker acceptance')
     infra = Path(__file__).resolve().parents[2]
-    full = [checked_report(p, sha, 46, candidate, infra)
+    full = [checked_report(p, sha, 48, candidate, infra)
             for p in sorted(args.reports.rglob('rocketmq-complete-sdk.json'))]
     raw = [checked_report(p, sha, 20, candidate, infra)
            for p in sorted(args.reports.rglob('rocketmq-m2-transactions.json'))]

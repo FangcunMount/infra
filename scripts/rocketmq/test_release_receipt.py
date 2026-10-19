@@ -17,20 +17,23 @@ class ReleaseGateTest(unittest.TestCase):
         self.source = self.root/'source.go'
         self.source.write_text('source fixture')
         self.sha = 'a'*40
-        cases = {f'basic_{i}': True for i in range(33)}
+        cases = {f'basic_{i}': True for i in range(31)}
         for text, count in (('real_database_commit_', 6),
                             ('after_real_broker_ack_tcp_loss', 4),
-                            ('producer_exit_broker_restart_new_checker', 3)):
+                            ('producer_exit_broker_restart_new_checker', 3),
+                            ('partial_half_sigkill_new_instance_rollback', 2),
+                            ('native_limit_unknown_private_audit_and_admission_alarm', 2)):
             cases.update({f'public_{text}{i}': True for i in range(count)})
         hashes = {'source.go': digest(self.source)}
         native = {'mode': '0600', 'audit': {'records': [1], 'severity': 'critical'},
                   'business_count': 0, 'local_evidence': 'prepared_retained'}
-        self.report = {'sdk_sha': self.sha, 'passed': 46, 'failed': 0, 'skipped': 0,
+        self.report = {'sdk_sha': self.sha, 'passed': 48, 'failed': 0, 'skipped': 0,
                        'failure': None, 'cases': cases, 'sdk_tracked_sources_clean': True,
                        'clients': {'go': '5.1.4', 'python': '5.1.2'},
                        'python_runtime': {'client': '5.1.2', 'sdk_version': '0.4.0a1'},
                        'cleanup': {'project_containers_remaining': False,
                                    'compose_down_succeeded': True,
+                                   'probe_process_groups_drained': True,
                                    'private_fixture_directory_removed': True},
                        'sdk_source_sha256': hashes, 'sdk_api_source_sha256': hashes,
                        'harness_sha256': hashes, 'source_sha256': hashes,
@@ -39,7 +42,7 @@ class ReleaseGateTest(unittest.TestCase):
     def check(self, value):
         path = self.root/'report.json'
         path.write_text(json.dumps(value))
-        return checked_report(path, self.sha, 46, self.root, self.root)
+        return checked_report(path, self.sha, 48, self.root, self.root)
 
     def test_rejects_wrong_source_partial_failed_skipped_or_dirty_acceptance(self):
         self.check(self.report)

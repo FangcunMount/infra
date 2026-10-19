@@ -4,8 +4,49 @@ The process proxy observes original witness commit or real Broker response, then
 closes TCP. No exception injection stands in for the service-side fact.
 """
 import json
+import time
 
 from sdk_acceptance import assert_absent
+
+
+def recover_after_restart(start, language, storage):
+    """TCP health does not prove that all persisted owner routes are ready.
+
+    Retry ONLY a fully drained idle Checker startup with explicit TOPIC_NOT_FOUND;
+    never reserve, prepare, invoke business or silently retry arbitrary failures.
+    A startup attempt can already handle a check, so retain its actual counters.
+    """
+    deadline = time.monotonic() + 100
+    attempts = []
+    commits = 0
+    for _ in range(6):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        probe = start(language, 'recover', storage=storage)
+        try:
+            probe.wait('ready', timeout=min(20, remaining))
+        except RuntimeError:
+            probe.finish(expected=1)
+            codes = {e.get('decision') for e in probe.events if e.get('event') == 'failure_code'}
+            if (not codes or not codes <= {'rocketmq_40402', 'half_rejected_40402'}
+                    or not any(e.get('event') == 'closed' and e.get('decision') == 'failed_start_drained'
+                               for e in probe.events)):
+                raise
+            metrics = [json.loads(e['decision']) for e in probe.events if e.get('event') == 'metrics']
+            if not metrics:
+                raise RuntimeError('failed readiness attempt lacks actual drained SDK counters')
+            committed = metrics[-1].get('CheckCommit', metrics[-1].get('check_commit', 0))
+            commits += committed
+            attempts.append({'pid':probe.process.pid,'failure_codes':sorted(codes),
+                             'commit_checks':committed,'drained':probe.close()})
+            if not attempts[-1]['drained']:
+                raise RuntimeError('failed idle startup did not drain its owned process group')
+            time.sleep(1)
+            continue
+        return probe, {'drained_topic_not_found_attempts':attempts,
+                       'commit_checks_before_ready':commits}
+    raise RuntimeError('persisted owner routes did not become ready after Broker restart')
 
 
 def run_faults(start, proxy_start, passed, sql, mongo_command, restart_broker, *, python):
@@ -110,6 +151,51 @@ def run_faults(start, proxy_start, passed, sql, mongo_command, restart_broker, *
                              'local_result':result,'business_count':int(count)})
             proxy.send(json.dumps({'Action':'stop'})); proxy.wait('closed'); proxy.finish()
             passed(f'public_{language}_{method.lower()}_after_real_broker_ack_tcp_loss')
+
+        # Freeze the second half AFTER its actual Broker ACK but BEFORE that
+        # reply can reach the producer. SIGKILL then proves recovery without
+        # the old process persisting Unknown or running graceful cleanup.
+        identity = f'packet-{language}-partial-half-sigkill'
+        proxy = proxy_start('rocketmq')
+        proxy.send(json.dumps({'Action':'arm','Boundary':'hold','Method':'SendMessage','Nth':2}))
+        proxy.wait('armed')
+        sender = start(language, 'fault-half', identity, branches=3, mq_proxy=proxy.address)
+        injection = proxy.wait('injected', timeout=90)
+        if injection.get('boundary') != 'hold' or not injection.get('backend_ack'):
+            raise RuntimeError('partial crash lacks an actually prepared second half')
+        sender.kill_group()
+        sender.finish(expected=-9)
+        if any(e.get('event') in ('half', 'result', 'closed', 'fault_observed') for e in sender.events):
+            raise RuntimeError('partial crash occurred after local execution or graceful result cleanup')
+        if sql(f"SELECT state FROM rm_tx_execution WHERE operation_id='op-{identity}';") != 'prepared':
+            raise RuntimeError('old process settled execution before partial SIGKILL')
+        def half_count(outcome):
+            return sql("SELECT COUNT(*) FROM rm_tx_witness w JOIN rm_tx_execution e USING(execution_key) "
+                       f"WHERE e.operation_id='op-{identity}' AND w.half_outcome='{outcome}';")
+        if half_count('prepared') != '1' or half_count('not_attempted') != '2':
+            raise RuntimeError('partial SIGKILL did not preserve first ACK and unrecorded remaining branches')
+        if business('mysql', identity) != '0':
+            raise RuntimeError('partial preparation started business')
+        recovery = start(language, 'recover')
+        recovery.wait('ready')
+        recovery.wait('checked', decision='rollback', timeout=100)
+        for index in range(3):
+            assert_absent(observer, f'{identity}-b{index}', 1)
+        if sql(f"SELECT state FROM rm_tx_execution WHERE operation_id='op-{identity}';") != 'aborted':
+            raise RuntimeError('new instance did not persist abort for the partial old execution')
+        if sql("SELECT COUNT(*) FROM rm_tx_witness w JOIN rm_tx_execution e USING(execution_key) "
+               f"WHERE e.operation_id='op-{identity}' AND w.state='aborted';") != '3':
+            raise RuntimeError('partial recovery did not retain all three exact aborted witnesses')
+        stop(recovery)
+        proxy.send(json.dumps({'Action':'stats'})); stats = proxy.wait('stats')
+        if stats.get('seen') != 2 or stats.get('backend_commit_acks') != 1:
+            raise RuntimeError('partial crash lacks the exact second-send barrier')
+        receipts.append({'case':identity,'injection':injection,'proxy':stats,'exit_code':-9,
+                         'recorded_half_prepared':1,'recorded_half_not_attempted':2,
+                         'before_recovery':'prepared','after_recovery':'aborted',
+                         'aborted_witnesses':3,'business_count':0})
+        proxy.send(json.dumps({'Action':'stop'})); proxy.wait('closed'); proxy.finish()
+        passed(f'public_{language}_partial_half_sigkill_new_instance_rollback')
         stop(observer)
 
     for language, storage in targets:
@@ -117,15 +203,17 @@ def run_faults(start, proxy_start, passed, sql, mongo_command, restart_broker, *
         sender = start(language, 'crash-committed', identity, storage=storage, branches=3)
         sender.wait('half'); sender.send('commit'); sender.finish(expected=23)
         restart_broker()
-        recovery = start(language, 'recover', storage=storage)
-        recovery.wait('ready')
+        recovery, readiness = recover_after_restart(start, language, storage)
         observer = start('sdk-go', 'consume', storage=storage)
         observer.wait('ready')
-        recovery.wait('checked', decision='commit', timeout=100)
+        if not readiness['commit_checks_before_ready']:
+            recovery.wait('checked', decision='commit', timeout=100)
         for index in range(3):
             observer.wait('received', f'{identity}-b{index}')
         if business(storage, identity) != '1':
             raise RuntimeError('Broker restart changed committed business fact')
         stop(recovery); stop(observer)
+        receipts.append({'case':identity,'storage':storage,'producer_exit_code':23,
+                         'readiness':readiness,'business_count':1,'public_acknowledged_branches':3})
         passed(f'public_{language}_{storage}_producer_exit_broker_restart_new_checker')
     return receipts
