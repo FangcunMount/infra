@@ -5,8 +5,8 @@
   ],
   "status": "in_progress",
   "complete": false,
-  "observed_at": "2026-10-19T16:32:22.316523+00:00",
-  "source_sha": "723f171a531f1410f6cc96fac7c612721b483b30",
+  "observed_at": "2026-10-19T20:33:04.611187+00:00",
+  "source_sha": "3fc8b406a212785628551cc3220ce7ec1ba7ceed",
   "repository": "FangcunMount/iam",
   "pr": "https://github.com/FangcunMount/iam/pull/134",
   "pr_status": "draft; depends on PR132; not merged",
@@ -15,7 +15,13 @@
     "Complete immutable first-plan candidate including no-op intent and exact SDK wire; stable input vs generated artifacts separated",
     "Host schema44 business-operation results, guarded original-root binding, single-use in-memory authority and bounded expiry fencing",
     "Fresh read validation of canonical metadata, result hashes, exact binding and UTC audit timestamps; no constructor DDL or network",
-    "No scanning publication, business replay or automatic reacquisition of known operations"
+    "No scanning publication, business replay or automatic reacquisition of known operations",
+    "Joint SDK/business guard and typed first results in the original root; durable no-op version protection; authoritative abort competes the same row",
+    "Typed role/resource/grant/assignment projections restore first ID/time/result without new execution",
+    "Optional REST Idempotency-Key, generated operation reference headers and authenticated original-principal/current-original-permissions query",
+    "Schema44 journal explicitly composed by transaction owner; permission versions read at fresh primary boundary; org claims do not open scoped service receipts",
+    "Query capacity and actual tasks joined on close; synchronous bounded business maintenance shares owner scan budget with SDK (default50+50 per5s)",
+    "All five maintenance CLI writers use public operation-result projections without copying private before/after snapshots; CLI cross-invocation keys explicitly refused"
   ],
   "validation": [
     {
@@ -51,6 +57,41 @@
     {
       "scope": "integration-tag lint2.5.0, docs facts/links, model/store/dbops race and integration compilation",
       "exit": 0
+    },
+    {
+      "source_sha": "3fc8b406a212785628551cc3220ce7ec1ba7ceed",
+      "scope": "full repository source race before freeze",
+      "counts": {
+        "pass": 1925,
+        "fail": 0,
+        "skip": 31
+      },
+      "report": "/tmp/m3-iam-t07-public-api-source.jsonl",
+      "report_sha256": "1c79b2e6720caec26fa30b8b54d152f7c48512a665882fa8f54205dd842996d2",
+      "skip_reason": "Existing optional environment source tests; not required native acceptance",
+      "exit": 0
+    },
+    {
+      "scope": "supplemental MySQL 9.3 only; does not replace required Docker 8.0/8.4 matrix",
+      "fixture": "/var/folders/8x/l5l22n7n61q8jv7ns6bzzqkm0000gn/T/m3-iam-mysql93-h3brwiti",
+      "cleaned": true,
+      "server_version": "9.3.0",
+      "source_sha": "3fc8b406a212785628551cc3220ce7ec1ba7ceed",
+      "source_clean_before": true,
+      "exit": 0,
+      "tests": {
+        "pass": 29,
+        "fail": 0,
+        "skip": 0
+      },
+      "log": "/tmp/m3-iam-protocol-mysql93-20261020T042835.log",
+      "log_sha256": "ccfa1a20511f6ac44a8eb2fc4b9939a0fe84aad4628acb58fc5e50aeab2a3a1a",
+      "source_clean_after": true
+    },
+    {
+      "source_sha": "3fc8b406a212785628551cc3220ce7ec1ba7ceed",
+      "scope": "Swagger/OpenAPI/Gin contract consistency, unchanged Spectral warning baseline110, docs facts/links, integration-tag lint2.5.0",
+      "exit": 0
     }
   ],
   "failure_history": [
@@ -59,18 +100,44 @@
       "failure": "5 errcheck findings for unhandled rollback/rows close cleanup results",
       "fix": "Explicit best-effort deferred root rollback and propagation of row-close errors",
       "recheck": "integration lint zero issues"
+    },
+    {
+      "scope": "uncommitted native HTTP integration on supplemental MySQL9.3",
+      "failure": "Expected duplicate503 after DB lock release; observed409 because previously timed-out authorized abort statement completed later",
+      "fix": "Accept a fresh authoritative Prepared/Unknown or Aborted result after lock release; assert correct response code, zero new execution and no business facts",
+      "failed_log_sha256": "8c738efb73395492ac655d61bd358ef5f9b2856b3a6044516167e3487cc2139a",
+      "recheck": "30 tests pass0fail0skip on same supplemental version, dirty source; next frozen proof required"
+    },
+    {
+      "scope": "development verification",
+      "failure": "Swagger missing dto import/operationId and one unhandled readiness rows.Close result",
+      "fix": "Use the real DTO response, explicit operationId and propagate close errors",
+      "recheck": "API validation, docs and lint pass; no warning baseline increase"
     }
   ],
   "remaining": [
-    "Dual SDK/business guard host assembly; shared bounded reconciliation budget and explicit durable abort resolution",
-    "Typed result capture/restore and durable no-op execution",
-    "HTTP optional idempotency key/reference, current identity/scope/original permission query and early named-command reuse",
-    "Current-source fixed MySQL matrix, actual Broker host validation, full integration regressions"
+    "Complete native HTTP/original-root acceptance and failure evidence on frozen source",
+    "Fixed Docker MySQL8.0/8.4 current source, actual Broker host validation and remaining IAM fanout gate",
+    "Cloud CI/merges remain separate; user selected offline implementation while infra Actions billing is deferred"
   ],
   "boundaries": {
-    "native_scope": "supplemental MySQL9.3; journal cases storage-only, not SDK+Broker host atomicity proof",
+    "native_scope": "Real MySQL root + released SDK store + stored half fixture, including journal-enabled maintenance; actual Broker separately required",
     "production_changes": false,
     "system_acceptance": false,
     "merged": false
-  }
+  },
+  "previous_candidates": [
+    {
+      "source_sha": "723f171a531f1410f6cc96fac7c612721b483b30",
+      "scope": "journal model/storage only"
+    },
+    {
+      "source_sha": "708a3489e0494915b90c88ad36b7b551b4251531",
+      "scope": "private query model and current permission capture"
+    },
+    {
+      "source_sha": "3689169d2c0b516837be2b71a478baf5d329a977",
+      "scope": "typed result codecs and joint SDK/business root coordinator"
+    }
+  ]
 }
