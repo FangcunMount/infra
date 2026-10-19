@@ -1,0 +1,46 @@
+name: Redis migration contracts
+on:
+  pull_request:
+    paths: ['scripts/redis/**', 'scripts/mysql/runtime.py', 'components/redis-client/**', '.github/workflows/redis-client.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/redis/**', 'scripts/mysql/runtime.py', 'components/redis-client/**', '.github/workflows/redis-client.yml']
+permissions:
+  contents: read
+jobs:
+  isolated:
+    runs-on:
+      group: qlume
+      labels: [self-hosted, macOS, ARM64, ops]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build a pinned temporary Redis without changing installed services
+        run: |
+          set -Eeuo pipefail
+          build_dir=$(mktemp -d "$RUNNER_TEMP/redis-contract.XXXXXX")
+          printf 'REDIS_CONTRACT_BUILD=%s\n' "$build_dir" >> "$GITHUB_ENV"
+          curl --fail --silent --show-error --location --max-time 60 https://download.redis.io/releases/redis-7.0.15.tar.gz -o "$build_dir/redis.tar.gz"
+          printf '%s  %s\n' '98066f5363504b26c34dd20fbcc3c957990d764cdf42576c836fc021073f4341' "$build_dir/redis.tar.gz" | shasum -a 256 -c -
+          tar -xzf "$build_dir/redis.tar.gz" -C "$build_dir"
+          make -C "$build_dir/redis-7.0.15" -j2 MALLOC=libc BUILD_TLS=no redis-server
+          printf '%s\n' "$build_dir/redis-7.0.15/src" >> "$GITHUB_PATH"
+      - name: Verify public CA checksum
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path('.')
+          manifest=json.loads((root/'components/redis-client/manifest.json').read_text())
+          data=(root/manifest['ca_file']).read_bytes()
+          assert b'PRIVATE KEY' not in data
+          assert hashlib.sha256(data).hexdigest()==manifest['ca_sha256']
+          PY
+      - name: Test isolated Redis contracts without production credentials
+        run: python3 -m unittest discover -s scripts/redis -p 'test_*.py' -v
+      - name: Release only the owned temporary build
+        if: always()
+        run: |
+          set -Eeuo pipefail
+          if [ -z "${REDIS_CONTRACT_BUILD:-}" ]; then exit 0; fi
+          [[ "$REDIS_CONTRACT_BUILD" == "$RUNNER_TEMP"/redis-contract.* ]] || exit 1
+          rm -rf -- "$REDIS_CONTRACT_BUILD"
