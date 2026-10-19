@@ -1,12 +1,9 @@
 {
   "version": 1,
   "task": "T24",
-  "complete": false,
+  "complete": true,
   "verification_complete": true,
-  "pending": [
-    "infra PR34 merge",
-    "SDK release index PR45 merge"
-  ],
+  "pending": [],
   "captured_at": "2026-10-19T09:29:40.924347+00:00",
   "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
   "ci": {
@@ -1817,5 +1814,14 @@
   ],
   "published_assets_unchanged": true,
   "tags_unchanged": true,
-  "production_changed": false
+  "production_changed": false,
+  "completed_at": "2026-10-19T09:37:35.614828+00:00",
+  "infra_verifier_merge": {
+    "pr": 34,
+    "sha": "5d4333df4ceacedbf00f521d9998b296dc761443"
+  },
+  "sdk_release_index_merge": {
+    "pr": 45,
+    "sha": "1630aa59d87abf1c69f183be4be7c662a29cae52"
+  }
 }

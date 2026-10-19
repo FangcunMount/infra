@@ -8,26 +8,28 @@
 
 基线：SDK `fd9c51691d785ced6e27d1ad3509fc4ac99a7b1f`；infra `44c379bedf5d37194aff1c87eccc8c8080cb3b2c`。隔离分支：SDK 协议 `codex/rocketmq-m2-sdk`、存储续批 `codex/rocketmq-m2-storage`；infra `codex/rocketmq-m2-sdk-tracking`。
 
-进度：**23/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
+进度：**24/24**。任务完成表示实现及所列验证通过；PR 合并、发布、部署独立记账。里程碑全部任务及合并门禁满足后才完成。每项任务完成立即更新本表、证据与会话；失败/阻塞保留，不删除或静默减少分母。
 
-### 最新核验快照（2026-10-19 17:06 +08:00）
+### 最新核验快照（2026-10-19 17:36 +08:00）
 
-| 核验项 | 当前结果 / 证据 |
+本批M2任务24项全部完成；源码实现、固定预发布及正式tag/下载制品重装验收分别取证，M2-P至M2-6门禁全部满足。业务接入与生产切换仍属于M3。
+
+| 核验项 | 最终结果 / 证据 |
 | --- | --- |
-| 已完成任务 | T01–T23，23/24；M2-P至M2-5的任务及实现PR合并门禁完成；T22–T24仍待完成 |
-| 固定 SDK 候选 | `bfaae2b82ee0d1229b8c965fce472cdf5dec486f`；[SDK PR43](https://github.com/FangcunMount/reliable-messaging/pull/43)及[启动快照修复PR44](https://github.com/FangcunMount/reliable-messaging/pull/44)已合并；旧c02bc98在发布前被替换；两正式预发布tag均指向bfaae2b |
-| infra | 功能PR27已合并b90817c，进度PR30已合并7607095；[诊断/新候选绑定PR31](https://github.com/FangcunMount/infra/pull/31)已通过全部门禁并合并f559f0a；其他serverA迁移变更均保留 |
-| T19 / T20 已验任务 | 原8841fdf的[46项/档故障矩阵](https://github.com/FangcunMount/infra/actions/runs/39210736172)、[48项/档完整矩阵](https://github.com/FangcunMount/infra/actions/runs/39210736275)、[完整Docker回归](https://github.com/FangcunMount/infra/actions/runs/39210736103)双档通过、0跳过；[T19证据](evidence/rocketmq-m2-sdk-packet-faults-20261019.json)、[T20证据](evidence/rocketmq-m2-sdk-limits-20261019.json)；不能替代下列修复后T22验收 |
-| T21 契约冻结 | [API评审及冻结记录](evidence/rocketmq-m2-sdk-api-review-20261019.json)；12个公开契约/适配/示例文件摘要仍一致，schema/codec=1、route v2及摘要domain不变；源候选已重绑bfaae2b |
-| T22 修复后源码CI | [Go/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222098471)、[Python源码/wheel](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222109646)、[三档存储](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222116696)、[既有集成](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222098378)全部通过，均绑定bfaae2b |
-| T22 修复后真实门禁 | infra ecbc5f8固定bfaae2b执行[31项/档](https://github.com/FangcunMount/infra/actions/runs/39222207805)、[46项/档](https://github.com/FangcunMount/infra/actions/runs/39222207667)、[48项/档](https://github.com/FangcunMount/infra/actions/runs/39222207821)、[普通消息/raw20/Go19完整回归](https://github.com/FangcunMount/infra/actions/runs/39222207962)，全部通过、0失败/跳过 |
-| T22 新制品 | 新SHA双Python档各120源码+120已安装wheel测试通过，0失败/跳过；wheel/sdist两档摘要一致，已重新下载并核对精确source/tree；固定锁下的独立wheel/sdist均安装成功、17包文件逐字节一致、依赖版本全部在锁中；临时环境已删除，6文件bundle/receipt/摘要已生成；[T22证据](evidence/rocketmq-m2-fixed-prerelease-20261019.json) |
-| 发布前根因与修复 | [实际protobuf大小不匹配及RED/GREEN证据](evidence/rocketmq-m2-sdk-telemetry-settings-race-20261019.json)：共享RetryPolicy被Broker设置回调原地修改；PR44锁+独立快照后真实TLS/并发marshal的race连续10轮通过，38文件可复现、完整check/lint通过；未增加通用重试或业务重做 |
-| T23 发布 / T24 重装 | [Go v0.5.0-rocketmq-tx.1](https://github.com/FangcunMount/reliable-messaging/releases/tag/v0.5.0-rocketmq-tx.1)、[Python python/v0.4.0a1](https://github.com/FangcunMount/reliable-messaging/releases/tag/python/v0.4.0a1)已固定发布，同一bfaae2b、各6资产服务器摘要全部一致；[发布证据](evidence/rocketmq-m2-release-publication-20261019.json)；[T24首次正式tag/制品验收](https://github.com/FangcunMount/infra/actions/runs/39225713990)因虚拟环境执行器路径解引用失败，T24继续未完成；本批无生产业务切换 |
+| 已完成任务 | T01–T24，24/24；任务/源码合并/固定发布/正式制品重装均完成，历史失败继续保留 |
+| 固定发布源码 | `bfaae2b82ee0d1229b8c965fce472cdf5dec486f`；SDK PR43及快照修复PR44已合并；旧c02bc98在发布前被替换，没有移动已发布tag |
+| 固定语言版本 | [Go v0.5.0-rocketmq-tx.1](https://github.com/FangcunMount/reliable-messaging/releases/tag/v0.5.0-rocketmq-tx.1)、[Python python/v0.4.0a1](https://github.com/FangcunMount/reliable-messaging/releases/tag/python/v0.4.0a1)均指向同一bfaae2b，均为GitHub prerelease，各6资产服务器摘要与固定bundle一致；不使用PyPI |
+| 契约与示例 | [API评审/冻结](evidence/rocketmq-m2-sdk-api-review-20261019.json)；12个公开契约/适配/示例文件摘要一致，schema/codec=1、route v2及摘要domain保留；原事务、恢复、有限回查和关闭语义已核对 |
+| 精确源码CI | [Go/race/lint](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222098471)、[Python源码/wheel](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222109646)、[三档MySQL及Mongo存储](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222116696)、[既有NSQ集成](https://github.com/FangcunMount/reliable-messaging/actions/runs/39222098378)全部通过，均绑定bfaae2b |
+| 发布前真实依赖与制品 | [48项/档](https://github.com/FangcunMount/infra/actions/runs/39222207821)、[完整Docker回归](https://github.com/FangcunMount/infra/actions/runs/39222207962)通过；双Python档各120源码+120已安装wheel通过，wheel/sdist摘要一致，独立安装及锁依赖验证通过；[T22固定receipt证据](evidence/rocketmq-m2-fixed-prerelease-20261019.json)、[T23发布/服务器摘要](evidence/rocketmq-m2-release-publication-20261019.json) |
+| 发布后正式制品 | [双档正式tag/下载制品48项](https://github.com/FangcunMount/infra/actions/runs/39227465314)全部通过，0失败/跳过；Go模块缓存211文件、wheel/sdist各17包文件与固定源码一致，依赖全部符合发布锁，无replace/editable/工作区源码导入；实际执行的二进制/包路径与安装证明一致；[完整T24证明](evidence/rocketmq-m2-published-installation-20261019.json) |
+| 资源与清理 | 两档正式制品均验证真实原生超限索引/0600只读审计、Unknown/Prepared证据保留及停止新准入；进程组、Compose容器/临时卷、私有目录全部清理；SDK回查、线程/loop与真实在途关闭有界 |
+| infra与索引合并 | 功能PR27、诊断/候选绑定PR31、venv执行与报告清理PR34均已合并；[SDK发布索引PR45](https://github.com/FangcunMount/reliable-messaging/pull/45)已合并1630aa5；[当前发布索引](https://github.com/FangcunMount/reliable-messaging/blob/main/docs/releases/README.md)已回填正式安装证明 |
+| 交付边界 | M2完成为嵌入式SDK/固定预发布及隔离验证；本批没有修改IAM、qs-server、qs-ai的业务写入链路，没有执行生产schema/Topic/ACL/provider切换或退出NSQ，没有跨云吞吐压测 |
 
-当前T24修复重验：[infra PR34](https://github.com/FangcunMount/infra/pull/34)，29项脚本与真实venv回归通过；[正式tag/下载制品双档48项验收](https://github.com/FangcunMount/infra/actions/runs/39227465314)在修复分支运行，另有[31项](https://github.com/FangcunMount/infra/actions/runs/39227464332)、[46项](https://github.com/FangcunMount/infra/actions/runs/39227464215)、[48项](https://github.com/FangcunMount/infra/actions/runs/39227464222)、[完整回归](https://github.com/FangcunMount/infra/actions/runs/39227464352)门禁。SDK/两个tag/全部已发布资产保持bfaae2b及原摘要。
+发布前后失败均保留：[半消息直接Rollback与回查判据](evidence/rocketmq-m2-sdk-half-rollback-oracle-20261019.json)、[Go Telemetry共享RetryPolicy的实际protobuf大小不匹配及RED/GREEN修复](evidence/rocketmq-m2-sdk-telemetry-settings-race-20261019.json)、[正式安装Python被错误解引用到base环境](evidence/rocketmq-m2-published-interpreter-failure-20261019.json)。修复后均按真实门禁重验；不增加通用启动重试或业务重做，不覆盖tag或发布资产。
 
-下一步：T22/T23已完成；先修复T24验收脚本的venv可执行文件解引用及失败元数据清理，29项脚本/实际venv回归已通过；[失败证据](evidence/rocketmq-m2-published-interpreter-failure-20261019.json)保留。tag与发布资产不变，修复后重新执行两档正式安装和48项矩阵，再更新SDK索引。旧失败保留于下文及evidence，不计为通过。
+后续进入M3时仍需宿主显式安装schema、绑定预算和路由/owner，完成业务验收与协调切换；M2的发布/测试不替代这些门禁。
 
 历史候选预检记录（当时）：已下载 SDK `3bf3dc8` 的双 Python profile 制品；源码与独立 wheel 各120项通过、0失败/跳过，wheel/sdist 摘要在两档一致且绑定同一源 SHA/树。见[候选预检证据](evidence/rocketmq-m2-sdk-candidate-20261019.json)。这不是最终合并候选或已发布制品的验证，不据此完成 T22/T24。另修复 T20 审计 CLI 的变量引用及 critical 告警退出码2，并保留发布安装 JSON 附件；当时11项本地脚本测试通过、真实native-limit门禁待通过；当前T20以总表已完成证据为准。
 
@@ -40,7 +42,7 @@
 | M2-3 | T10–T13 | 4/4 | ✅ 已完成；SDK PR38、infra PR23 已合并 | Go 真 RPC、回查及关闭有界、PR 合并 |
 | M2-4 | T14–T16 | 3/3 | ✅ 已完成；SDK PR39、infra PR23 已合并 | Python 线程/loop/取消证明、PR 合并 |
 | M2-5 | T17–T20 | 4/4 | ✅ 已完成；SDK PR43、infra PR27已合并 | 正式 SDK 故障集成 required CI 非空且 0 跳过、PR 合并 |
-| M2-6 | T21–T24 | 3/4 | T21–T23已完成；双tag/预发布资产已固定，T24正式tag/下载制品双档验收运行中 | 固定 tag/制品及下载重装通过 |
+| M2-6 | T21–T24 | 4/4 | ✅ 已完成；固定双tag/资产、双档正式48项与发布索引/验证代码均通过并合并 | 固定 tag/制品及下载重装通过 |
 
 | 完成 | ID | 任务与门禁 | 完成时间 / 源码 / 证据 / PR |
 | --- | --- | --- | --- |
@@ -67,7 +69,7 @@
 | ✅ | T21 | 原事务示例、接入/恢复/关闭文档及API评审；冻结协议 | 2026-10-19 15:00 +08:00；SDK原API冻结不变，发布候选重绑bfaae2b（PR44内部修复）；[API评审/12文件摘要/协议冻结证据](evidence/rocketmq-m2-sdk-api-review-20261019.json)；SDK PR43与infra PR27已合并，公开入口/双存储/原事务示例/有限恢复及关闭正文核对通过；发布仍待T22–T24 |
 | ✅ | T22 | 固定候选SHA、完整CI、wheel/sdist、摘要及receipt | 2026-10-19 16:47 +08:00；SDK bfaae2b；[固定候选证据](evidence/rocketmq-m2-fixed-prerelease-20261019.json)；源码4CI、双档48及完整回归全部成功且0跳过；独立wheel/sdist各17文件一致、锁依赖安装通过；6个bundle文件及摘要生成；SDK PR44与infra PR31已合并；尚未发布 |
 | ✅ | T23 | 固定Go/Python双tag与GitHub预发布资产 | 2026-10-19 16:51 +08:00；Go v0.5.0-rocketmq-tx.1 / Python python/v0.4.0a1均指向bfaae2b；[发布/服务器摘要证据](evidence/rocketmq-m2-release-publication-20261019.json)；各6资产SHA256全部匹配，均为prerelease；未使用PyPI、未覆盖旧版本；正式下载重装待T24 |
-| ☐ | T24 | 从正式tag/下载制品重新安装、核摘要并回填索引 | [修复后双档正式制品验收](https://github.com/FangcunMount/infra/actions/runs/39227465314)运行中；infra PR34保留venv路径及失败清理修复，SDK发布索引PR45待完整验收后更新合并；原失败保留、不覆盖tag/资产 |
+| ✅ | T24 | 从正式tag/下载制品重新安装、核摘要并回填索引 | 2026-10-19 17:36 +08:00；[正式制品双档48项](https://github.com/FangcunMount/infra/actions/runs/39227465314)通过、0失败/跳过且完全清理；[211个Go源码/17个wheel与sdist文件/锁依赖/实际执行摘要证明](evidence/rocketmq-m2-published-installation-20261019.json)；infra PR34已合并5d4333d，SDK发布索引PR45已合并1630aa5；两tag/资产未移动或替换 |
 
 
 本次 T11–T16 的公开 SDK 验收为 23/23、0 跳过；之后仅追加单次半消息 RPC 及回调诊断修复，已通过对应实际 TLS/编排测试和最新源码 CI。SDK Go/Python PR38/39 均已合并。infra 完整工作流曾因旧 SDK 固定引用与新增三分支探针不匹配失败；已统一固定到 SDK main `65eae5b`，精确 SHA 重跑 [公开 SDK 23 项](https://github.com/FangcunMount/infra/actions/runs/39194664066) 与[完整 Docker/普通消息/M2-0 回归](https://github.com/FangcunMount/infra/actions/runs/39194664076) 均通过，infra PR23 已合并 4b7ed57，M2-3/M2-4 里程碑关闭。原失败运行 [39193222448](https://github.com/FangcunMount/infra/actions/runs/39193222448) 保留，不作通过证据。
