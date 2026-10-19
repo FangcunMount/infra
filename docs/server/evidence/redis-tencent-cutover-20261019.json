@@ -1,7 +1,18 @@
 {
   "recorded_local": "2026-10-19T23:42:16.501222+08:00",
   "technical_cutover": "complete",
-  "business_acceptance": "pending user response",
+  "business_acceptance": {
+    "status": "passed",
+    "confirmed_by": "user",
+    "confirmed_local_date": "2026-10-20",
+    "scope": [
+      "小程序重新登录",
+      "问卷读取与提交",
+      "已有报告",
+      "一次 AI 请求",
+      "后台登录和权限页面"
+    ]
+  },
   "target": {
     "instance": "crs-3dli07u2",
     "host": "bj-crs-3dli07u2.sql.tencentcdb.com",
@@ -172,6 +183,13 @@
   "automatic_production_deploy_paused": true,
   "old_redis_retained": true,
   "old_containers_stopped_restart_disabled": true,
-  "worker_consumer_connection": "three new worker clients per original channel; no post-cutover message completion observed",
-  "continuous_cloud_alerts": "not configured in this change"
+  "worker_consumer_connection": "2026-10-20 follow-up: all three workers ready, three new clients per original NSQ channel; finish/requeue/inflight counts are 0, so positive consumption is not independently proven",
+  "continuous_cloud_alerts": "not configured in this change",
+  "post_merge_ci": {
+    "status": "success",
+    "runs": [
+      "https://github.com/FangcunMount/infra/actions/runs/39280052929",
+      "https://github.com/FangcunMount/infra/actions/runs/39280030869"
+    ]
+  }
 }
