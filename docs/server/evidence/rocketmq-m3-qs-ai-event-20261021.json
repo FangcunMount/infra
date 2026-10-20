@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "task": "M3-T15",
-  "status": "in_progress",
+  "status": "complete",
   "progress": {
-    "completed": 14,
+    "completed": 15,
     "total": 36,
-    "task_checked": false
+    "task_checked": true
   },
   "candidate": {
     "qs_head": "762c2db0d836cb628b4f514e313acfeba1082db9",
@@ -13,10 +13,26 @@
     "qs_pr": "https://github.com/FangcunMount/qs-server/pull/419",
     "infra_head": "3f2af604e8de6cc8efd79dfdd5900a95e46a436c",
     "infra_pr": "https://github.com/FangcunMount/infra/pull/72",
-    "source_merged": false,
-    "harness_merged": false,
+    "source_merged": true,
+    "harness_merged": true,
     "qs_fixture": "7a4c942ac98d58d8390dd81320465221645b63b0",
-    "product_code_unchanged_from": "b1776025fe5d4448469f2d9b33f4f0eff78bf72d"
+    "product_code_unchanged_from": "b1776025fe5d4448469f2d9b33f4f0eff78bf72d",
+    "source_merge": {
+      "headRefOid": "762c2db0d836cb628b4f514e313acfeba1082db9",
+      "mergeCommit": {
+        "oid": "be22b9274d1d7ab21abd3be24fb0ebde834ec78b"
+      },
+      "mergedAt": "2026-10-20T21:45:55Z",
+      "state": "MERGED"
+    },
+    "infra_merge": {
+      "headRefOid": "3f2af604e8de6cc8efd79dfdd5900a95e46a436c",
+      "mergeCommit": {
+        "oid": "db183399f21d39ae481121e893d6c73626b45a41"
+      },
+      "mergedAt": "2026-10-20T21:51:42Z",
+      "state": "MERGED"
+    }
   },
   "local_validation": {
     "source_head": "762c2db0d836cb628b4f514e313acfeba1082db9",
@@ -82,7 +98,7 @@
     }
   },
   "required_native": {
-    "status": "revalidation_in_progress",
+    "status": "passed",
     "run": "https://github.com/FangcunMount/infra/actions/runs/39500000104",
     "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
     "mysql": [
@@ -93,7 +109,122 @@
     "required_cases_per_job": 17,
     "broker": "5.5.1",
     "sdk_go": "v0.5.0-rocketmq-tx.2",
-    "report_verified": false
+    "report_verified": true,
+    "retained_pending_snapshot": {
+      "status": "revalidation_in_progress",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39500000104",
+      "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+      "mysql": [
+        "8.0.36",
+        "8.0.44",
+        "8.4.11"
+      ],
+      "required_cases_per_job": 17,
+      "broker": "5.5.1",
+      "sdk_go": "v0.5.0-rocketmq-tx.2",
+      "report_verified": false
+    },
+    "results": [
+      {
+        "mysql": "8.0.44",
+        "path": "/tmp/m3-t15-native-corrected-complete/rocketmq-qs-event-1-1.25.12-3433e1937f0886e517fb972a34ab25beaa03fbde/rocketmq-qs-event.json",
+        "sha256": "0d8e3f0891796f4176eabaf2bebcd107f3e6ad9705b8d0a5be86448d5d51ba21",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "image": "sha256:ba36efe96c10136b3c929c5ff9f3abc725a5d2a9469052263ed4e913dba8e94f",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "go_version": "go1.25.12",
+        "sdk_sha": "8fb6fc57a415dc11e27fc64d71722f9675838bc3",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "private_output_sha256": "729e006d005d28d071521363894a3f384c9eefccd500d74241a079ae423ac851",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.4.11",
+        "path": "/tmp/m3-t15-native-corrected-complete/rocketmq-qs-event-2-1.25.12-3433e1937f0886e517fb972a34ab25beaa03fbde/rocketmq-qs-event.json",
+        "sha256": "b1d50a132fbabc5238c7ff8a1c9f0b5ac8d0638c2e1059ca36e149255bfe8a19",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "image": "sha256:ed46ab32e701edc61e6608b317227e93f406cc2e3eee51cd427032b029efa9b5",
+        "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "go_version": "go1.25.12",
+        "sdk_sha": "8fb6fc57a415dc11e27fc64d71722f9675838bc3",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "private_output_sha256": "37b64a3d0f64b8c4edce79cba0bbc4d71fc629fd2261921b6f98b616d8b88238",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.0.36",
+        "path": "/tmp/m3-t15-native-corrected-complete/rocketmq-qs-event-0-1.25.12-3433e1937f0886e517fb972a34ab25beaa03fbde/rocketmq-qs-event.json",
+        "sha256": "3f40a886c290e406c4f5cbeecfb3d970d1c17f568ee745b126b7d4167649cb61",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "image": "sha256:ad576e26454a5db61ee306e42f879ba1c0aeded6135da2e3eb9275844974211d",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "go_version": "go1.25.12",
+        "sdk_sha": "8fb6fc57a415dc11e27fc64d71722f9675838bc3",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "private_output_sha256": "2088bd6bdfb63957f1e298d7c1b3287c4313f8488d837de4e6590771f9c2b77a",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ]
   },
   "retained_history": [
     {
@@ -312,5 +443,730 @@
     "Selected transaction event runtime creates no legacy command/ACK Relay; old Inbox responsibility is retained and not adopted as a new witness.",
     "Native controlled signed AI inputs and observer ACK only. Real paired AI flow, SIGKILL, packet commit faults, production and system acceptance remain later tasks.",
     "First native run failed on all three MySQL versions at fixture lines173/270, no race/skip/timeout, all own resources cleaned. Corrected only receipt correlation + one unit contract and documentation; product code byte-identical. New exact candidate must pass before merge/checkoff."
-  ]
+  ],
+  "source_review": {
+    "path": "/tmp/m3-t15-source-review.json",
+    "sha256": "4328a37a6af422984fc79a9d5853fc2b00596cc979132f3d2e6905791278fdf1",
+    "result": {
+      "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+      "scope": "T15 source boundary self-review; not native/runtime acceptance",
+      "findings": [],
+      "checked": [
+        {
+          "boundary": "complete immutable incoming event and first ACK",
+          "source": "internal/apiserver/application/aibridge/transaction_event.go",
+          "evidence": "exact input hash binds original header/body/wire; ACK plan uses unchanged v1 archive and frozen physical route, no incoming callback mutation"
+        },
+        {
+          "boundary": "one host SQL root and same pool",
+          "source": "internal/apiserver/infra/mysql/aibridge/transaction_root.go",
+          "evidence": "SDK guard first; business/ACK archive/witness precede actual root commit; real rollback plus exact persisted Abort required to return Aborted"
+        },
+        {
+          "boundary": "recovery authorization",
+          "source": "internal/apiserver/infra/mysql/aibridge/transaction_events.go",
+          "evidence": "only current authenticated delivery after exact Aborted permits Retry/Replan; unknown/Prepared never reexecute; committed duplicate uses exact first ACK"
+        },
+        {
+          "boundary": "receipt proof on original connection",
+          "source": "internal/apiserver/infra/mysql/aibridge/transaction_event_receipt.go",
+          "evidence": "no second pool slot while root holds business locks; true old absence retains original Outbox settlement"
+        },
+        {
+          "boundary": "Prepared ACK payload privacy",
+          "source": "internal/apiserver/infra/mysql/aibridge/transaction_archive.go",
+          "evidence": "new ACK branch presence forbids legacy fallback, DB server hint1s and client2s; committed body still exact witness/tenant/hash/workload guarded"
+        },
+        {
+          "boundary": "single sender and unchanged consumer budget",
+          "source": "internal/apiserver/container/modules/interpretation/ai_messaging.go",
+          "evidence": "same qs.mysql owner passed to command/events; exact ACK topic required; selected event runtime returns before legacy publisher/relay construction, original inflight1"
+        }
+      ],
+      "remaining_gates": [
+        "actual native17 matrix and current source CI before T15 checkoff/merge",
+        "T22 full process owner registration/idle Checker/lifecycle and diagnostic integration",
+        "T24 protocol metrics/admission guard/alerts",
+        "T25 legacy Inbox/ACK responsibility handoff and operational recovery",
+        "T20 paired AI flow; T23 actual process/packet faults; T33 system and T34 real48h"
+      ]
+    }
+  },
+  "source_ci": {
+    "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+    "passed": 28,
+    "inapplicable": 1,
+    "inapplicable_name": "Docs & API Generated Sync",
+    "snapshot_path": "/tmp/m3-t15-final-source-pr-checks.json",
+    "snapshot_sha256": "81622bd1e2fdd5bb3c7605ac713484ddc6cd1d289adbb8a8f28fca2a84807fbe",
+    "checks": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:28:15Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954618/job/118894620365",
+        "name": "delivery (8.0.36)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "AI bridge MySQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:35:27Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622275",
+        "name": "Run Tests",
+        "startedAt": "2026-10-20T21:25:24Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:59Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499949390/job/118894611293",
+        "name": "Analyze (go)",
+        "startedAt": "2026-10-20T21:23:28Z",
+        "status": "COMPLETED",
+        "workflowName": "CodeQL - Code Quality"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:22Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954623/job/118894619656",
+        "name": "original-mysql-root (8.0.36)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ evaluation original MySQL root"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:24:24Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954710/job/118894620839",
+        "name": "mysql-audit",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ host failure audit"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:28:10Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954618/job/118894620773",
+        "name": "delivery (8.4)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "AI bridge MySQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:19Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954623/job/118894620186",
+        "name": "original-mysql-root (8.0.44)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ evaluation original MySQL root"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:21Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954623/job/118894620017",
+        "name": "original-mysql-root (8.4.11)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ evaluation original MySQL root"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:27:59Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954618/job/118894620826",
+        "name": "images (qs-apiserver)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "AI bridge MySQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:26:57Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622282",
+        "name": "MySQL Native Metadata and Readiness",
+        "startedAt": "2026-10-20T21:24:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:28Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954618/job/118894620583",
+        "name": "images (collection-server)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "AI bridge MySQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:59Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622215",
+        "name": "MongoDB Authenticated Native Metadata",
+        "startedAt": "2026-10-20T21:24:53Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:29:03Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622423",
+        "name": "Action audit MySQL JSON lifecycle",
+        "startedAt": "2026-10-20T21:28:00Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:21Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622317",
+        "name": "AuthZ committed version two-process MySQL",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:34:19Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622398",
+        "name": "Actor Store MySQL Transactions",
+        "startedAt": "2026-10-20T21:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:32:31Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894621862",
+        "name": "Seeddata Retirement and Current Runtime E2E",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:34:42Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622438",
+        "name": "Lint Code",
+        "startedAt": "2026-10-20T21:31:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:31:30Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622488",
+        "name": "Layer Boundaries (depguard)",
+        "startedAt": "2026-10-20T21:30:35Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:31:07Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622562",
+        "name": "Deployment Contracts",
+        "startedAt": "2026-10-20T21:30:27Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:32:51Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622385",
+        "name": "Security Scan (Advisory)",
+        "startedAt": "2026-10-20T21:28:47Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:26:45Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622232",
+        "name": "Maintainability Scan (Advisory)",
+        "startedAt": "2026-10-20T21:24:26Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:32Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622281",
+        "name": "Tier 1 Test Policy",
+        "startedAt": "2026-10-20T21:25:17Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:35Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622339",
+        "name": "Docs Hygiene & Facts",
+        "startedAt": "2026-10-20T21:24:33Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:23:27Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894623802",
+        "name": "Docs & API Generated Sync",
+        "startedAt": "2026-10-20T21:23:27Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:30:45Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622357",
+        "name": "QS-03 original effect recovery after actual broker loss",
+        "startedAt": "2026-10-20T21:29:27Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:33:53Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622723",
+        "name": "QS-05/06 original business effects after actual broker loss",
+        "startedAt": "2026-10-20T21:32:33Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:38:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118900154227",
+        "name": "Build Applications (apiserver)",
+        "startedAt": "2026-10-20T21:35:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:36:02Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118900154046",
+        "name": "Build Applications (collection)",
+        "startedAt": "2026-10-20T21:35:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:36:04Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118900154068",
+        "name": "Build Applications (worker)",
+        "startedAt": "2026-10-20T21:35:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      }
+    ]
+  },
+  "shared_root_command_regression": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39502117806",
+    "harness_ref": "ee913457a9c19d229479399e037480bf36f16e7d",
+    "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+    "results": [
+      {
+        "mysql": "8.4.11",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "report_path": "/tmp/m3-t15-current-command-native/rocketmq-qs-command-2-1.25.12-ee913457a9c19d229479399e037480bf36f16e7d/rocketmq-qs-command.json",
+        "report_sha256": "a6e939ff3ea1e5894b15064c3f8b1a1b829715bad7b49531d3ba27e7fc3a7485",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "private_output_sha256": "cc5d804baa838ee82e7f17b2e85eef68e3862e4766d0dbf4db296baa2e85a284",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.0.36",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "report_path": "/tmp/m3-t15-current-command-native/rocketmq-qs-command-0-1.25.12-ee913457a9c19d229479399e037480bf36f16e7d/rocketmq-qs-command.json",
+        "report_sha256": "936a639967be8ec78006b1e5897f7610d01a372407b95e27e8c996534edb5c81",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "private_output_sha256": "104ac0f0321e039bccada47817f1ed509761644ffba6b9f27dde3a08e3548c60",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.0.44",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "report_path": "/tmp/m3-t15-current-command-native/rocketmq-qs-command-1-1.25.12-ee913457a9c19d229479399e037480bf36f16e7d/rocketmq-qs-command.json",
+        "report_sha256": "4ec043f7f911dcba9f0dba019b8dc532e1a23052358c52fba9123b3ba58127bc",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "private_output_sha256": "20eff6f19f20043a0c1af67312972b1a54ab349cf3642bfcffa8842a694be0bf",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "status": "passed"
+  },
+  "next_batch_readonly_preflight": {
+    "repository": "qs-ai",
+    "main": "c321a69411d1f9494de1e36f94834a974fbb15ea",
+    "source_worktree": "10687a10f2c9bf86c781f27220dcff2f6aa4a836",
+    "product_tree_equal_to_main": true,
+    "pure_foundation_tests": 26,
+    "failed": 0,
+    "implementation_started": false
+  },
+  "infra_ci": {
+    "source_sha": "3f2af604e8de6cc8efd79dfdd5900a95e46a436c",
+    "passed": 28,
+    "failed": 0,
+    "skipped": 0,
+    "snapshot_path": "/tmp/m3-t15-final-infra-pr-checks.json",
+    "snapshot_sha256": "42506e490dffab68fd81313f1c64a00912f0a64a8a03504ed9c01cf9c6e1d5bf",
+    "checks": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:50:56Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000121/job/118895462688",
+        "name": "acceptance",
+        "startedAt": "2026-10-20T21:31:32Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ Docker acceptance"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:34:26Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999912/job/118895284041",
+        "name": "host (mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:26:47Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ IAM original host transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:27:06Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999974/job/118894774035",
+        "name": "original-command-root (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:23:54Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI commands original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:31:27Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000104/job/118894773767",
+        "name": "original-event-root (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:27:08Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI events original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:29:25Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000542/job/118894775363",
+        "name": "original-mongo-root (1.25.12)",
+        "startedAt": "2026-10-20T21:25:17Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS answer original Mongo transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:32:55Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999938/job/118894774241",
+        "name": "original-mysql-root (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:28:48Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS evaluation original MySQL transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:31:24Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000017/job/118894773623",
+        "name": "original-dual-store-root (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:28:11Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS future retry original dual-store authorization"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:27:35Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000087/job/118894773918",
+        "name": "original-mongo-root (1.25.12)",
+        "startedAt": "2026-10-20T21:24:12Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS report original Mongo transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:35:02Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000064/job/118894822609",
+        "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:25:34Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS retry original roots and real due dispatch"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:30:25Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999995/job/118894773593",
+        "name": "original-mysql-root (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:25:20Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS task original MySQL and NORMAL fanout"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:43:25Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000118/job/118895056635",
+        "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:24:53Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ complete transaction acceptance"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:50:46Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000040/job/118895464266",
+        "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:32:53Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ packet transaction faults"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:39:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000004/job/118895308198",
+        "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:27:37Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ public transaction SDK"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:35:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999912/job/118895284620",
+        "name": "host (mysql:8.0.44)",
+        "startedAt": "2026-10-20T21:26:59Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ IAM original host transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:28:46Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999974/job/118894774333",
+        "name": "original-command-root (1.25.12, mysql:8.0.44)",
+        "startedAt": "2026-10-20T21:25:23Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI commands original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:33:22Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000104/job/118894774341",
+        "name": "original-event-root (1.25.12, mysql:8.0.44)",
+        "startedAt": "2026-10-20T21:29:05Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI events original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:30:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999938/job/118894773538",
+        "name": "original-mysql-root (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:26:01Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS evaluation original MySQL transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:34:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000017/job/118894773770",
+        "name": "original-dual-store-root (1.25.12, mysql:8.0.44)",
+        "startedAt": "2026-10-20T21:30:47Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS future retry original dual-store authorization"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:39:09Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000064/job/118894823014",
+        "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.0.44)",
+        "startedAt": "2026-10-20T21:29:46Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS retry original roots and real due dispatch"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:30:34Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999995/job/118894774110",
+        "name": "original-mysql-root (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:25:23Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS task original MySQL and NORMAL fanout"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:44:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000118/job/118895057270",
+        "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+        "startedAt": "2026-10-20T21:25:37Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ complete transaction acceptance"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:42:05Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000040/job/118895463755",
+        "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+        "startedAt": "2026-10-20T21:25:30Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ packet transaction faults"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:44:38Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000004/job/118895308928",
+        "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+        "startedAt": "2026-10-20T21:31:26Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ public transaction SDK"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:38:54Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999912/job/118895284705",
+        "name": "host (mysql:8.4)",
+        "startedAt": "2026-10-20T21:31:08Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ IAM original host transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:29:45Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999974/job/118894774411",
+        "name": "original-command-root (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:26:01Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI commands original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:32:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000104/job/118894774252",
+        "name": "original-event-root (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:27:43Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI events original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:27:42Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000017/job/118894773208",
+        "name": "original-dual-store-root (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:24:24Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS future retry original dual-store authorization"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:39:48Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000064/job/118894823247",
+        "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:30:13Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS retry original roots and real due dispatch"
+      }
+    ]
+  },
+  "completion_boundary": "source and isolated required gates merged; stable SDK release, production, paired AI, system login and actual48h remain later tasks"
 }

@@ -4,12 +4,12 @@
 
 ## 当前执行快照
 
-- 进度：**14/36**；T01–T14实现与任务必需验证完成，相关源码与infra均已合并。T14最终3dd33af4f全仓UTC race7290通过/60项既有可选依赖跳过、完整lint零问题；三档真实Broker/MySQL各15项零失败/跳过、资源清理完整。源码28项CI成功/1项API同步不适用，infra25项全部成功。生产切换未执行。
+- 进度：**15/36**；T01–T15实现与任务必需验证完成，相关源码与infra均已合并。T15完整UTC race7327通过/60项既有可选依赖跳过、完整固定lint零问题；真实Broker/MySQL三档事件各17项、同候选命令各15项均0失败/跳过、清理完整。源码CI28项成功/1项API同步不适用，infra28项全部成功。生产切换未执行。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T15最终候选762c2db0d/infra3f2af604复验中。完整本地race7327通过、固定lint零问题；首轮三档原生失败已定位并修正receipt夹具correlation，全部资源清理完整。源码PR419、infra PR72和17项三档原生39500000104门禁仍待完成。[T15进度与保留失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。不计为AI成对、system或生产验收。
+- 当前批次：T15已闭环，按序进入T16。QS PR419按精确762c2db0d合并be22b927，infra PR72按精确3f2af604合并db183399f；包含原根Inbox/投影/首次ACK/witness、真实Aborted恢复、Prepared正文保护和旧责任边界。首轮夹具失败与所有旧SHA报告保留。[T15全部证据](evidence/rocketmq-m3-qs-ai-event-20261021.json)。T16仅有只读基线，业务接入尚待执行。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -130,8 +130,8 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 2026-10-20；冻结首次入口/wire、原pending/revision CAS+witness、归属原根再校验、关闭新提醒仍保留旧执行恢复。最终f37afca0/infra c27ef043双档各15项0失败/跳过，source race7087通过/60既有可选跳过；QS PR415/416及infra54/57全部合并，最终CI分别28成功/1不适用与9成功。[全部证据/失败历史](evidence/rocketmq-m3-qs-task-20261020.json)。生产未变更 |
 | ✅ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 2026-10-21；最终7e8aba25/fd985a122全仓race7198通过/60既有可选跳过、固定lint零问题；原库三档各44项、真实Broker三档各41项均0失败/跳过/无race且清理完整。QS当前头28项CI成功/1API同步不适用，PR417合并133fc073；infra22项CI全部成功，PR61合并d4324a87。[完整证据与失败历史](evidence/rocketmq-m3-qs-retry-20261021.json)。生产未变更 |
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
-| ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 验证失败后复验中；首轮三档均因receipt夹具遗漏原command correlation被正确拒绝，清理完整；修正仅测试和文档，业务实现不变。候选762c2db0d完整race7327通过/0失败/60既有可选跳过、完整lint零问题；QS PR419/infra PR72及三档17项39500000104待通过，未合并/未勾选。[全部证据与失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json) |
-| ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 待开始 |
+| ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
+| ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 进行中；只读基线main c321a694/10687a1业务树一致，26项事务基础纯测试通过，原根/receipt内Seal/业务UUID及EventSession提交钩子已追踪；准备独立工作区实施，尚未修改业务入口 |
 | ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 待开始 |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
@@ -386,3 +386,9 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-21：T15最终候选4fed2b588b9d16c11e76304edb3d9762f1a7933f（实现b1776025f）已提交QS PR419；infra137c5465维护PR72，三档17项真实Broker/MySQL门禁39498223478运行中。独立冻结工作区完整UTC race7326通过/0失败/60既有可选依赖跳过，完整固定lint2.5零问题；相关包799通过/7既有可选跳过，87文档自测/hygiene/facts及62项infra自测通过。Prepared ACK的幂等键属于入站事件，已用有界精确分支足迹补齐其历史Payload回退保护；故意红回归及初始protobuf夹具编译失败均保留。组合integration标签lint六项既有fixture清理errcheck提示另列，不冒称整个历史集成标签lint无问题；本批新增代码lint零问题。两PR尚未合并，T15保持进行中、14/36。生产CD回读暂停true，未发布稳定SDK、未操作生产或system验收。
 
 - 2026-10-21：T15首轮真实Broker39498223478的8.0.36、8.0.44、8.4.11均在签名receipt夹具173/270断言失败：遗漏必须指向原command_id的correlation，现有契约在进入接收器原根之前正确拒绝。各档0跳过/无race/无超时，临时容器、进程组和私有目录均完整清理；三个报告、私有输出摘要和源码4fed2b588分别保留。修正7a4c942ac只改测试，增加空/错/正确correlation及冻结ACK回归；最终文档头762c2db0d业务字节与b1776025f一致。两个包298race通过/7既有可选跳过，完整7327通过/60既有可选跳过、全仓固定lint零问题，87文档门禁通过。infra3f2af604仅更新固定候选，Python源码/62项单测仍137c5465；新三档17项39500000104已启动。PR419/72仍草稿未合并，T15保持验证失败后复验中、14/36，不将失败或旧SHA门禁改标为新候选通过。
+
+- 2026-10-21：T15最终762c2db0d/infra3f2af604真实Broker39500000104三档8.0.36、8.0.44、8.4.11各17项全部通过，0失败/0跳过/无race。已下载核对精确源码、Go SDKtx.2及Sum、镜像ID、实际事务参数、私有输出摘要和完整资源清理；报告分别0d8e3f08、3f40a886、b1d50a13，原始报告不重绑定。验证了真实原根Inbox/解释与评测投影/receipt/ACK档案/witness、提交前不可见、首wire认证与复用、Prepared ACK不公开、服务端拒绝整根回滚、精确Aborted显式Retry/Replan及历史责任不伪造。签名AI输入为受控夹具，observer仅ACK，不计为完整AI producer或模型/网络提交故障/进程/system验收。原生和本地完整实现已完成，源码/infra剩余CI及合并仍待完成，T15暂不勾选、14/36；T16仅保留只读预研。
+
+- 2026-10-21：T15源码当前762c2db0d完整CI28项成功、1项API生成同步不适用；独立当前候选命令回归39502117806三档各15项均0失败/跳过/无race，已核对源码、报告与清理，确认共享SQL根抽取保留全部五类command语义。生产CD合并前回读暂停true，PR419于2026-10-20T21:45:55Z按精确head合并be22b927。infra PR72当前回归仍待最后作业，不提前勾选T15、14/36。AI下一批仅只读预研：main c321a694与10687a1业务树一致，26项基础纯测试通过，无业务入口修改；生产未变更。
+
+- 2026-10-21：T15闭环并勾选，进度15/36。源码PR419精确762c2db0d当前头28项CI成功/1项API同步不适用，已合并be22b927；infra PR72精确3f2af604当前头28项检查全部成功（含既有普通消息、SDK、双存储、跨语言和真实故障回归），已合并db183399f21d39ae481121e893d6c73626b45a41（2026-10-20T21:51:42Z）。最终事件三档各17项及当前候选命令三档各15项0失败/跳过，全部清理、原始报告SHA、失败历史及完整source gate已核对。T16开始独立AI admission/receipt接入；M3-3仍进行中，不提前标完成。生产CD在源码合并前回读暂停true，未发布稳定SDK、未执行生产DDL/provider/NSQ切换、system或48小时观察。
