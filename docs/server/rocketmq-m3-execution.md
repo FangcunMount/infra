@@ -112,7 +112,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 2026-10-20；57b07bab正式Go SDKtx.2；必需三档MySQL原事务/HTTP各34项，真实Broker各21项，全部0失败/跳过；PR134合并d53c36a9；[证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
 | ✅ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 2026-10-20；IAM51405831/QS696ee314锁定正式Go SDKtx.2；三档MySQL原事务各34项、成对Broker/fanout各22项0失败/跳过，Mac mini额外22项通过；IAM PR135合并e3efa5b3、QS PR409合并2e95630b；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
 | ☑ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 已完成实现与验证；原事务/冻结BSON与wire、V2精确读取、实际Collection/gRPC 202和503、并发原赢家、Mongo failpoint重入、ACK客户端丢弃及新实例读取16项在Mac mini和GitHub实际通过。最终源码deb46e67全仓race6909通过/60既有可选依赖跳过，同包策略与87项文档检查通过；PR410合并3afc76a6，PR411/infra46最终头CI和合并单列；不表示生产或system验收。[证据](evidence/rocketmq-m3-qs-answer-20261020.json) |
-| ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 进行中；ce2f5a124已接入三个原事务入口及共享owner模块装配，全仓race6973通过/0失败/60既有可选跳过。请求/成功真实Broker两档各6项通过；新增失败及未来重试保留职责的9项完整模块验收本地0失败/0跳过/无race，当前候选云端门禁中。原架构/夹具fanout失败保留，未改门禁；[证据](evidence/rocketmq-m3-qs-evaluation-20261020.json)。PR412/infra49未合并，暂不勾选 |
+| ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 进行中；三个原事务入口/共享owner装配完成。25501aac7完整UTC race6977通过/0失败/60既有可选跳过；与原生36aa仅两个单元测试差异。两档真实Broker各9项通过/0失败/跳过/race。[证据](evidence/rocketmq-m3-qs-evaluation-20261020.json)含失败历史；当前头CI/PR412及infra49合并待完成，不提前勾选 |
 | ☐ | T11 | QS 报告生成/失败，冻结与终态恢复 | 待开始 |
 | ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 待开始 |
 | ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 待开始 |
@@ -297,3 +297,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：T11 前置源码核对发现初始规划/T02清单的报告 owner 标记偏差：实际36aa0741f模块使用 Mongo Generation/Run/Report/CatalogProjector 及 NewMongoRunner（start/commit/retry），并非 MySQL 原事务。按已批准“借用原业务根事务、业务与witness同库提交”约束，报告生成/失败及未来报告retry dispatch修正为qs.mongo；评分仍qs.mysql。不追加存储迁移、不改四owner或36项总数，原错误保留为执行偏差记录；T11/T13未实现，不提前勾选。责任清单同步修订；[源码预核对证据](evidence/rocketmq-m3-report-preflight-20261020.json)。
 
 - 2026-10-20：真实Broker云端39410103140固定36aa0741f，MySQL8.0.36及8.4.11两档各9项全部通过，0失败/0跳过/无race，下载报告38a4799f、fb6ddb9f及完整清理回执已核对。源码全仓39410100401出现两个新增单元断言失败：time.Local与JSON恢复time.UTC表示同一时刻但结构不同，已保留日志摘要并本地TZ=UTC复现；25501aac7仅修订两个单元测试，精确比较时间点及全部非时间重试字段，新增UTC/东8/西5时区覆盖，UTC和Asia/Shanghai包race及固定lint2.5通过。生产/原生夹具/依赖源码相对36aa完全相同，不重标原生报告SHA；完整UTC源码race与当前头CI继续，T10仍未勾选。
+
+- 2026-10-20：固定候选25501aac7完整TZ=UTC全仓race6977通过、0失败、60既有可选依赖跳过，原报告77f38e01；精确diff仅两个单元测试，生产/native/依赖字节与双档9项Broker验收36aa一致。原生报告保持原SHA，不冒称新测试头已重新运行Broker。当前头源码CI及infra完整回归继续，T10未合并/未勾选。

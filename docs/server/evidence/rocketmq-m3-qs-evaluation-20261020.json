@@ -286,7 +286,7 @@
       "source": "36aa0741f05f75d2e100db2e123bb338370454fe",
       "scope": "ordinary source tests on UTC runner",
       "reason": "new tests compared time.Local versus decoded time.UTC object identity instead of exact instant; two unit assertions failed",
-      "resolution": "reproduced locally TZ=UTC, strict instant assertions and independent UTC/east/west cases added; package race passed UTC and Asia/Shanghai, fixed lint2.5 passed; full fixed-source UTC race/current CI pending",
+      "resolution": "TZ=UTC local failure reproduced first; 25501aac7 changes only two unit tests, strict instant plus full decision assertions, UTC/east/west cases; UTC/Asia package race and lint2.5 pass; full UTC race 6977 pass/0 fail/60 existing optional skips; current-head CI pending",
       "private_log_sha256": "4a99db07e3b685f3f391f0be42c2b63e6beee18f724fc2f11a9e23bb4e108093",
       "source_failure_preserved": true,
       "production_code_changed_by_fix": false
@@ -431,7 +431,7 @@
   },
   "failure_and_assembly_batch": {
     "source": "ce2f5a124e59129a68e38d7e85dca4332a2ba059",
-    "status": "implemented_native_and_current_head_ci_pending",
+    "status": "local_and_required_native_gates_passed_current_head_ci_pending",
     "implemented": [
       "frozen immediate failure and original retry authorization; all halves precede original Assessment/claimed Run/witness root",
       "future retry retains first due/id/wire in original scheduled Outbox until T13; not a future half message",
@@ -456,7 +456,7 @@
     },
     "cache_boundary": "rollback or unknown root commit does not run cache hooks; best-effort invalidation is not a durable receipt",
     "production_wiring_activated": false,
-    "candidate": "36aa0741f05f75d2e100db2e123bb338370454fe",
+    "candidate": "25501aac7d00aa0cda719980758055ed447ca7fc",
     "candidate_difference": "36aa0741f changes only cache contract documentation/verification marker relative to tested ce2f5a124; source unchanged",
     "local_native": {
       "source": "ce2f5a124e59129a68e38d7e85dca4332a2ba059",
@@ -626,6 +626,18 @@
       ]
     },
     "unit_timezone_fix_source": "25501aac7d00aa0cda719980758055ed447ca7fc",
-    "native_equivalence": "diff from native tested 36aa0741f to 25501aac7 consists only of two evaluationfailure unit test files; production/native fixture/Go dependency bytes unchanged; old receipts keep actual source"
+    "native_equivalence": "diff from native tested 36aa0741f to 25501aac7 consists only of two evaluationfailure unit test files; production/native fixture/Go dependency bytes unchanged; old receipts keep actual source",
+    "fixed_source_utc_race": {
+      "command": "TZ=UTC go test -race -json ./...",
+      "passed": 6977,
+      "failed": 0,
+      "skipped": 60,
+      "skip_scope": "existing optional dependency tests; native required jobs both nine cases with zero skips",
+      "report_sha256": "77f38e01a3993127af17720e7b1b073d835a0c53a2b802e105fefb1b6f214e9f"
+    },
+    "native_equivalence_files": [
+      "internal/apiserver/infra/mysql/evaluationfailure/commit_test.go",
+      "internal/apiserver/infra/mysql/evaluationfailure/plan_test.go"
+    ]
   }
 }
