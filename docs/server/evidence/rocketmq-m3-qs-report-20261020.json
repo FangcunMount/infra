@@ -6,7 +6,7 @@
   "total_progress": "10/36",
   "owner": "qs.mongo",
   "source": "6eb704e64c69306eeace3b9f7af3aa8b7cf32952",
-  "head": "6fe3e1522b37e2651b04018a761e1e90f1bc3e79",
+  "head": "b43538feeffa05cb408d86ed1df22868d92cd5ba",
   "branch": "codex/rocketmq-m3-qs-report",
   "source_merged": false,
   "pr": "https://github.com/FangcunMount/qs-server/pull/414",
@@ -78,9 +78,9 @@
     ]
   },
   "pending": [
-    "current-head V2 audit implementation and validation",
-    "report real Broker/Mongo acceptance (14 named cases including V2 audit)",
-    "current-head complete CI and source/infra merge"
+    "report actual Broker/Mongo acceptance (14 required cases, no skips)",
+    "full current-head source race and CI",
+    "source/infra merge and final evidence closure"
   ],
   "production": {
     "changed": false,
@@ -231,6 +231,33 @@
       "scope": "sender implementation",
       "cause": "Generation proof completion clock compared full precision to BSON milliseconds",
       "resolution": "freeze proof and terminal Generation clock at Mongo precision while retaining original wire clocks; target race passed"
+    },
+    {
+      "scope": "documentation gate",
+      "cause": "cross-repository tracker path in backticks was validated as a missing local file",
+      "resolution": "use canonical GitHub tracker link; 87 tests, hygiene and facts recheck passed"
     }
-  ]
+  ],
+  "v2_authority_audit": {
+    "source": "a702707bfb0185071b6af86e245395b7f63081b4",
+    "candidate": "b43538feeffa05cb408d86ed1df22868d92cd5ba",
+    "implemented": [
+      "read-only original owner PlanForReference resolves exact historical operation/fence/epoch without execution tokens or active-request substitution",
+      "V2 audit checks fixed primary/majority database, exact first wire and typed binding, committed execution and branch witness",
+      "V1 keeps original Outbox audit; mixed protocol is rejected and V2 is counted independently",
+      "database/configuration errors preserve checkpoint",
+      "immutable failure evidence is verified independently of later retry authorization",
+      "selected report owner is borrowed by host read-only audits"
+    ],
+    "target_race": "six target packages passed",
+    "fixed_lint_2_5": "passed",
+    "native_tag_compile": "passed; not native acceptance",
+    "docs_unit_passed": 87,
+    "docs_hygiene_and_facts": "passed",
+    "native_report_run": "https://github.com/FangcunMount/infra/actions/runs/39426436790",
+    "native_status": "queued at recording",
+    "required_cases": 14,
+    "infra_candidate": "45cd015cd96b543c2ab61de8408c75502858c76e",
+    "full_source_race": "running, not yet a passed gate"
+  }
 }
