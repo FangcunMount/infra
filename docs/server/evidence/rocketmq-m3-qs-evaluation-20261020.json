@@ -847,6 +847,9 @@
     "repair_scope": "only source baseline and cache verified ancestor; exact cache blob unchanged",
     "local_docs": "87 unit/hygiene/facts passed",
     "related_docs_ci": "passed",
-    "complete_ci_and_merge": "pending"
+    "complete_ci_and_merge": "PR413 merged after 28 successful checks/1 generated-sync not applicable; main CI 39417393541 successful",
+    "repair_commit": "c691fcfcf669a156652c1b94d7c763e12f0b167e",
+    "repair_merged_at": "2026-10-20T11:46:45Z",
+    "main_ci_after_repair": "https://github.com/FangcunMount/qs-server/actions/runs/39417393541"
   }
 }

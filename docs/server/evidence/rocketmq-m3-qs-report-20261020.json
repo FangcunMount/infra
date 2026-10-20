@@ -56,5 +56,83 @@
     "changed": false,
     "provider_switched": false,
     "system_acceptance": false
+  },
+  "shared_mongo_owner": {
+    "source": "1071d1364",
+    "candidate": "eae97334ba9e170adf17504f1c44ef3f3cfe4edf",
+    "scope": [
+      "one original database/runtime for multiple adapters",
+      "sealed original-session callback context bound to exact reference and original database",
+      "runner nil is not commit proof; SDK evidence and new authoritative boundary decide",
+      "no late SDK callback may open original runner after return"
+    ],
+    "target_race": "passed",
+    "lint_2_5": "passed",
+    "answer_native_regression": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39419280081",
+      "source": "eae97334ba9e170adf17504f1c44ef3f3cfe4edf",
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "2facef77b3932b3c3d9937ec58b87aeb1ccaa3db81d945e4d057e0378f57f0e2",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    }
+  },
+  "common_codec": {
+    "source": "ff38c15aa",
+    "candidate": "f47a1b0bdd8f81821e35e9168ea32316d3d8e5f3",
+    "scope": "extract original private artifact JSON unchanged for both owners; existing MySQL wrapper retained",
+    "evaluation_regression": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39420340015",
+      "reports": [
+        {
+          "source": "f47a1b0bdd8f81821e35e9168ea32316d3d8e5f3",
+          "mysql": "8.4.11",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "be47b056aa6622883a44465f7eceb9eb0226284b5f69a371002fdd228320aeb8",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "source": "f47a1b0bdd8f81821e35e9168ea32316d3d8e5f3",
+          "mysql": "8.0.36",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "dd5eac52da716dac3d5047dfaf0cd41d26d9db10bdc81c18f4572db4dc2b487d",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ]
+    }
+  },
+  "failed_evidence_and_explicit_schema": {
+    "source": "00e76c383",
+    "scope": [
+      "failed Run V2 evidence independent of future retry decision/Outbox reference",
+      "BSON preserves exact reference; ordinary save/create without original guarded root refused",
+      "clone preserves lease recovery count/history and original claim",
+      "inert constructors for Generation/Run/Report/Catalog; explicit lifecycle index installer",
+      "legacy template/catalog-maintenance constructors still require selected-path work"
+    ],
+    "target_race": "passed",
+    "lint_2_5": "passed",
+    "docs_unit_passed": 87,
+    "actual_report_sender_and_native": "pending"
   }
 }
