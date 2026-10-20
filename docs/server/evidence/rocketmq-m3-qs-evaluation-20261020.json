@@ -94,7 +94,7 @@
     "facts": "passed_at_37ca33120eef; later marker-only source baseline changes separately checked by current CI"
   },
   "pending": [
-    "evaluation request transaction submission and explicit module wiring",
+    "required Broker host gates, failure events/dispatch ownership and explicit module wiring",
     "failure events and preserved future retry ownership",
     "native Broker host entry acceptance and cross-instance fault matrix",
     "complete T10 current-head gates and source merge"
@@ -104,5 +104,35 @@
     "schema_or_topic_or_acl_changed": false,
     "provider_switched": false,
     "system_acceptance": false
+  },
+  "base_current_head_ci": {
+    "source": "de7db811036b5bd3f390742328ede60ca18ba189",
+    "successful_checks": 28,
+    "not_applicable_generated_sync": 1,
+    "failed_checks": 0,
+    "note": "subsequent scoring-request source uses its own CI; do not relabel this result"
+  },
+  "request_batch": {
+    "source": "d12f1b5cd3b0bd6bdcc77618510622fcc5464674",
+    "status": "implemented_target_tests_passed_required_broker_pending",
+    "infra_harness": "0dcf812",
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/49",
+    "native_run": "https://github.com/FangcunMount/infra/actions/runs/39399548063",
+    "source_scope": [
+      "original pending->submitted CAS",
+      "complete first submission plan and wire, isolated caller copy",
+      "same original primary/shared owner; no second producer",
+      "original immutable conducting/model/tenant identity retained",
+      "duplicate reads original wire/time; unknown does not mutate or fall back"
+    ],
+    "verification": {
+      "target_race": "passed",
+      "lint_2_5": "passed",
+      "broker_build_tags": "compiled_and_linted",
+      "docs_unit": 87,
+      "docs_hygiene": "passed",
+      "docs_facts": "passed"
+    },
+    "production_wiring_activated": false
   }
 }
