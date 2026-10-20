@@ -6,7 +6,7 @@ on:
         description: Exact QS AI command candidate SHA
         type: string
         required: true
-        default: 9433ab0f57828f0f8311d3d7d82a139d7739d494
+        default: 1dab47b08728fec0c37eb6d8522e5e24e89a1c65
   pull_request:
     paths: ['scripts/rocketmq/qs_command_acceptance.py', 'scripts/rocketmq/test_qs_command_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-command.yml']
 permissions:
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: ${{ inputs.qs_ref || '9433ab0f57828f0f8311d3d7d82a139d7739d494' }}
+          ref: ${{ inputs.qs_ref || '1dab47b08728fec0c37eb6d8522e5e24e89a1c65' }}
           path: .qs-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -45,7 +45,7 @@ jobs:
           cache-dependency-path: .qs-acceptance/go.sum
       - name: Verify candidate and source harness
         env:
-          EXPECTED_QS_SHA: ${{ inputs.qs_ref || '9433ab0f57828f0f8311d3d7d82a139d7739d494' }}
+          EXPECTED_QS_SHA: ${{ inputs.qs_ref || '1dab47b08728fec0c37eb6d8522e5e24e89a1c65' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]
