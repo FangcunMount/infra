@@ -1,11 +1,11 @@
 {
   "task": "T12",
-  "status": "in_progress",
-  "completed": false,
-  "total_progress": "11/36",
+  "status": "completed",
+  "completed": true,
+  "total_progress": "12/36",
   "source_baseline": "20c29ba832388f5b4df7d03f35b4f0ba57abb7fa",
-  "branch": "codex/rocketmq-m3-qs-task",
-  "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-task",
+  "branch": "codex/rocketmq-m3-qs-task-flags",
+  "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-task-flags",
   "traced": [
     "taskPersistence.saveOpened",
     "task management OpenTask and scheduler SchedulePendingTasks",
@@ -21,11 +21,11 @@
   },
   "implementation_started": true,
   "production_changed": false,
-  "source_head": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
-  "source_implementation": "1f1454a46aec7b42574fef517fb9111670591ab2",
-  "source_pr": "https://github.com/FangcunMount/qs-server/pull/415",
-  "infra_pr": "https://github.com/FangcunMount/infra/pull/54",
-  "infra_harness_sha": "56eed1b1bece4e00718482949600c0c8ef6b0a8d",
+  "source_head": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
+  "source_implementation": "8d6c05bb6fb4ec738abea25ed1b2d38425761574",
+  "source_pr": "https://github.com/FangcunMount/qs-server/pull/416",
+  "infra_pr": "https://github.com/FangcunMount/infra/pull/57",
+  "infra_harness_sha": "c27ef04316f43f97d523fdaefc5195f9a4a158bd",
   "target_race": {
     "passed": 229,
     "failed": 0,
@@ -39,6 +39,410 @@
     "skipped": 0
   },
   "native_gate": {
+    "status": "passed",
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39445253355",
+    "source_sha": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
+    "harness_sha": "c27ef04316f43f97d523fdaefc5195f9a4a158bd",
+    "passed_per_matrix": 15,
+    "failed": 0,
+    "skipped": 0,
+    "matrices": [
+      {
+        "version": "8.4.11",
+        "mysql_digest": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "broker_digest": "sha256:ca6be68d6fea7707ebe1e8bf8e3f786859921868dfcb5c5c0f56f127fc84f0ce",
+        "report_sha256": "eb5baec79eafc8f4836d1c56204e67b20051ce3fda62c38c9d0160001d76f368",
+        "report": "/tmp/m3-t12-flag-final-native/mysql84/rocketmq-qs-task.json",
+        "receipt": {
+          "cases": {
+            "closed_admission_no_business": true,
+            "constructor_no_ddl": true,
+            "first_entry_reused": true,
+            "flag_off_retains_original_execution": true,
+            "fresh_owner_recovery": true,
+            "half_invisible": true,
+            "no_new_publish_outbox": true,
+            "normal_best_effort_fanout": true,
+            "normal_rejects_transaction_event": true,
+            "normal_root_commit_boundary": true,
+            "original_task_witness_wire": true,
+            "original_write_abort_atomic": true,
+            "reminder_precision_compatible": true,
+            "root_abort_atomic": true,
+            "stale_schedule_cannot_commit": true
+          },
+          "failed": 0,
+          "passed": 15,
+          "process_exit_not_claimed": true,
+          "root": "original_mysql_gorm",
+          "skipped": 0,
+          "system_login_not_claimed": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "version": "8.0.36",
+        "mysql_digest": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "broker_digest": "sha256:64729149eda3ca0a6aabe79db0565ac34d1d1baae4a9162e7479d01f15427293",
+        "report_sha256": "601fd17e304df15026a3bc818086ceb021cb10f29e302ba082e72cda12722451",
+        "report": "/tmp/m3-t12-flag-final-native/mysql80/rocketmq-qs-task.json",
+        "receipt": {
+          "cases": {
+            "closed_admission_no_business": true,
+            "constructor_no_ddl": true,
+            "first_entry_reused": true,
+            "flag_off_retains_original_execution": true,
+            "fresh_owner_recovery": true,
+            "half_invisible": true,
+            "no_new_publish_outbox": true,
+            "normal_best_effort_fanout": true,
+            "normal_rejects_transaction_event": true,
+            "normal_root_commit_boundary": true,
+            "original_task_witness_wire": true,
+            "original_write_abort_atomic": true,
+            "reminder_precision_compatible": true,
+            "root_abort_atomic": true,
+            "stale_schedule_cannot_commit": true
+          },
+          "failed": 0,
+          "passed": 15,
+          "process_exit_not_claimed": true,
+          "root": "original_mysql_gorm",
+          "skipped": 0,
+          "system_login_not_claimed": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      }
+    ]
+  },
+  "source_full_race": {
+    "source_sha": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
+    "passed": 7087,
+    "failed": 0,
+    "optional_skipped": 60,
+    "report": "/tmp/m3-t12-f37a-full-source-race.jsonl",
+    "sha256": "9564cd111d1cd2d2daff8f994d0d3fa80a6d0be982abbdf0cc268129ceda30bb"
+  },
+  "pending_findings": [],
+  "implemented": [
+    "frozen first entry and wire with stable input hash",
+    "original pending/schedule_revision CAS and shared qs.mysql guard/witness",
+    "unknown result never falls back to legacy task Save/Outbox",
+    "operator ownership rechecked in original root after half preparation",
+    "scheduler original-primary admission",
+    "explicit NORMAL wire client and best_effort-only router; dual fanout native gate"
+  ],
+  "delivery_states": {
+    "source_merge": true,
+    "artifact_release": false,
+    "production_deploy": false,
+    "system_business_acceptance": false
+  },
+  "prior_full_source_reports": [
+    {
+      "source_sha": "2b84bd697caa9d98c7c5d9f75e2111418a8baaef",
+      "passed": 7075,
+      "failed": 0,
+      "optional_skipped": 60,
+      "sha256": "26ab26a64213b3fd541eae86be314fe321a5d14f168915f56c91a1235f541323"
+    },
+    {
+      "source_sha": "de2e3379aa47b68677ccf32eb91f007cd2219d43",
+      "passed": 7081,
+      "failed": 0,
+      "optional_skipped": 60,
+      "sha256": "e8bfb9e422e84ad9bf288cddd9dde5ce54d12527b5d0d4b2974ee762f0c77bea"
+    },
+    {
+      "source_sha": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
+      "passed": 7081,
+      "failed": 0,
+      "optional_skipped": 60,
+      "report": "/tmp/m3-t12-2626-full-source-race.jsonl",
+      "sha256": "3116a273dd83a85d7142ea8b9a1db5eb4256c5a17361829666b4d387faea0537"
+    }
+  ],
+  "clock_compatibility": {
+    "source_fix": "c0f39d422daf78471290ca6459ab2239ef44e380",
+    "red_report": "/tmp/m3-t12-clock-red.log",
+    "red": "4 of 5 boundary data points reproduce opening_changed with truncation",
+    "green": {
+      "passed": 146,
+      "failed": 0,
+      "skipped": 0,
+      "report": "/tmp/m3-t12-clock-green.jsonl"
+    },
+    "behavior": "Mirror unchanged original reminder policy: microsecond parse then millisecond rounding; first wire keeps its original precision."
+  },
+  "finding_history": [
+    "Truncation disagreed with existing reminder MySQL rounding. Reproduced before fix, corrected and tested without modifying reminder policy."
+  ],
+  "first_native": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39437289899",
+    "source_sha": "2b84bd697caa9d98c7c5d9f75e2111418a8baaef",
+    "harness_sha": "787d61e7d04680d53f9396ef20a6bae5d7653fde",
+    "mysql80": {
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "sha256": "fa92eb2313cb851964563327e22c582515035c6c40f7c774077799e17489003c"
+    },
+    "mysql84": {
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "sha256": "ae9262bea08fd368f268fd3ddb4b192f0e1399a978c208b01333f8dcc2cefc4e"
+    },
+    "all_cleanup_complete": true,
+    "does_not_cover_final_precision_and_post_write_abort_cases": true
+  },
+  "production_cd_pause_readback": true,
+  "ci_status": "Final exact heads passed and all related source/infra PRs merged. Real dual-MySQL host gate is nonempty with zero failures/skips; only default-source legacy optional tests and API-sync inapplicability remain separately recorded.",
+  "infra_pr_refresh": {
+    "old_head": "787d61e7d04680d53f9396ef20a6bae5d7653fde",
+    "remote_branch": "56eed1b1bece4e00718482949600c0c8ef6b0a8d",
+    "resolution": "PR head remained stale after push; close/reopen refreshed it. Final checks must bind 56eed1b1; the manual final native run independently binds the same exact source."
+  },
+  "source_merge": {
+    "pr": 416,
+    "sha": "f0499e603fa4f67695c57648f73a19a6dd5bf881",
+    "merged_at": "2026-10-20T15:18:14Z"
+  },
+  "source_ci": {
+    "source_sha": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
+    "success": 28,
+    "failed": 0,
+    "skipped_not_applicable": [
+      "Docs & API Generated Sync"
+    ],
+    "snapshot": "/tmp/m3-t12-qs416-final-checks.json"
+  },
+  "infra_merge": {
+    "pr": 57,
+    "sha": "7487c740ab5c9fe69583a866cfb848ae914d7ef7",
+    "merged_at": "2026-10-20T15:28:06Z"
+  },
+  "infra_ci": {
+    "source_sha": "c27ef04316f43f97d523fdaefc5195f9a4a158bd",
+    "success": 9,
+    "failed": 0,
+    "skipped": 0,
+    "snapshot": "/tmp/m3-t12-infra57-final-checks.json"
+  },
+  "reminder_flag_followup": {
+    "source_implementation": "caa769276641923afba5cd1c1b2b9eac4665bd7b",
+    "source_head": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
+    "source_pr": "https://github.com/FangcunMount/qs-server/pull/416",
+    "infra_head": "c27ef04316f43f97d523fdaefc5195f9a4a158bd",
+    "red_report": "/tmp/m3-t12-flag-off-red.log",
+    "red": "committed and unknown original executions both bypassed protocol lookup when the new reminder flag was off",
+    "target_race": {
+      "passed": 153,
+      "failed": 0,
+      "skipped": 0,
+      "report": "/tmp/m3-t12-flag-off-green.jsonl"
+    },
+    "lint": "passed pinned 2.5.0",
+    "docs": "87 selftests, hygiene and facts passed",
+    "native_cases": 15,
+    "native_status": "passed",
+    "full_source_race": {
+      "source_sha": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
+      "passed": 7087,
+      "failed": 0,
+      "optional_skipped": 60,
+      "report": "/tmp/m3-t12-f37a-full-source-race.jsonl",
+      "sha256": "9564cd111d1cd2d2daff8f994d0d3fa80a6d0be982abbdf0cc268129ceda30bb"
+    },
+    "merged": true,
+    "prior_candidate": {
+      "sha": "63595a5255a7f52fbc1941dc08982d1e29af4ac7",
+      "full_source_race": {
+        "passed": 7087,
+        "failed": 0,
+        "optional_skipped": 60,
+        "sha256": "6e1f9b630a27da8b7fbe67c193035e63170fcd646b8c9065c9f13401d7ca6ec2",
+        "report": "/tmp/m3-t12-6359-full-source-race.jsonl"
+      },
+      "native_status": "build_failed_before_business_tests"
+    },
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/57",
+    "native_run": "https://github.com/FangcunMount/infra/actions/runs/39445253355",
+    "fixture_fix": "8d6c05bb6fb4ec738abea25ed1b2d38425761574",
+    "native_compile": {
+      "source_sha": "8d6c05bb6fb4ec738abea25ed1b2d38425761574",
+      "exit_code": 0,
+      "scope": "build only, no tests run",
+      "report": "/tmp/m3-t12-flag-native-fixed-compile.log"
+    },
+    "native_lint": {
+      "exit_code": 0,
+      "version": "2.5.0",
+      "report": "/tmp/m3-t12-flag-native-fixed-lint.log"
+    },
+    "failure_history": [
+      {
+        "run": "https://github.com/FangcunMount/infra/actions/runs/39443596014",
+        "source_sha": "63595a5255a7f52fbc1941dc08982d1e29af4ac7",
+        "cause": "Native fixture incorrectly passed variadic underlying GORM UOW as nonvariadic application Runner; both matrix builds failed before business tests. The local chained-command result hid the compile failure behind successful lint. Use separate checked exit codes.",
+        "mysql80_report_sha256": "ee00526d816c5c6721d2a013f81c744ff5531f9bd208ffe21e021eda3177756c",
+        "mysql84_report_sha256": "e703ed21484f3e6063efda526d931c63260e9bf5be98a2b8dfb1fcb84a477b0d",
+        "all_cleanup_complete": true
+      }
+    ],
+    "native_matrices": [
+      {
+        "version": "8.4.11",
+        "mysql_digest": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "broker_digest": "sha256:ca6be68d6fea7707ebe1e8bf8e3f786859921868dfcb5c5c0f56f127fc84f0ce",
+        "report_sha256": "eb5baec79eafc8f4836d1c56204e67b20051ce3fda62c38c9d0160001d76f368",
+        "report": "/tmp/m3-t12-flag-final-native/mysql84/rocketmq-qs-task.json",
+        "receipt": {
+          "cases": {
+            "closed_admission_no_business": true,
+            "constructor_no_ddl": true,
+            "first_entry_reused": true,
+            "flag_off_retains_original_execution": true,
+            "fresh_owner_recovery": true,
+            "half_invisible": true,
+            "no_new_publish_outbox": true,
+            "normal_best_effort_fanout": true,
+            "normal_rejects_transaction_event": true,
+            "normal_root_commit_boundary": true,
+            "original_task_witness_wire": true,
+            "original_write_abort_atomic": true,
+            "reminder_precision_compatible": true,
+            "root_abort_atomic": true,
+            "stale_schedule_cannot_commit": true
+          },
+          "failed": 0,
+          "passed": 15,
+          "process_exit_not_claimed": true,
+          "root": "original_mysql_gorm",
+          "skipped": 0,
+          "system_login_not_claimed": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "version": "8.0.36",
+        "mysql_digest": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "broker_digest": "sha256:64729149eda3ca0a6aabe79db0565ac34d1d1baae4a9162e7479d01f15427293",
+        "report_sha256": "601fd17e304df15026a3bc818086ceb021cb10f29e302ba082e72cda12722451",
+        "report": "/tmp/m3-t12-flag-final-native/mysql80/rocketmq-qs-task.json",
+        "receipt": {
+          "cases": {
+            "closed_admission_no_business": true,
+            "constructor_no_ddl": true,
+            "first_entry_reused": true,
+            "flag_off_retains_original_execution": true,
+            "fresh_owner_recovery": true,
+            "half_invisible": true,
+            "no_new_publish_outbox": true,
+            "normal_best_effort_fanout": true,
+            "normal_rejects_transaction_event": true,
+            "normal_root_commit_boundary": true,
+            "original_task_witness_wire": true,
+            "original_write_abort_atomic": true,
+            "reminder_precision_compatible": true,
+            "root_abort_atomic": true,
+            "stale_schedule_cannot_commit": true
+          },
+          "failed": 0,
+          "passed": 15,
+          "process_exit_not_claimed": true,
+          "root": "original_mysql_gorm",
+          "skipped": 0,
+          "system_login_not_claimed": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      }
+    ],
+    "source_merge": {
+      "pr": 416,
+      "sha": "f0499e603fa4f67695c57648f73a19a6dd5bf881",
+      "merged_at": "2026-10-20T15:18:14Z"
+    },
+    "source_ci": {
+      "source_sha": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
+      "success": 28,
+      "failed": 0,
+      "skipped_not_applicable": [
+        "Docs & API Generated Sync"
+      ],
+      "snapshot": "/tmp/m3-t12-qs416-final-checks.json"
+    },
+    "infra_merge": {
+      "pr": 57,
+      "sha": "7487c740ab5c9fe69583a866cfb848ae914d7ef7",
+      "merged_at": "2026-10-20T15:28:06Z"
+    },
+    "infra_ci": {
+      "source_sha": "c27ef04316f43f97d523fdaefc5195f9a4a158bd",
+      "success": 9,
+      "failed": 0,
+      "skipped": 0,
+      "snapshot": "/tmp/m3-t12-infra57-final-checks.json"
+    }
+  },
+  "completed_at": "2026-10-20T15:28:18Z",
+  "initial_source_head": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
+  "initial_source_implementation": "1f1454a46aec7b42574fef517fb9111670591ab2",
+  "source_prs": [
+    "https://github.com/FangcunMount/qs-server/pull/415",
+    "https://github.com/FangcunMount/qs-server/pull/416"
+  ],
+  "infra_prs": [
+    "https://github.com/FangcunMount/infra/pull/54",
+    "https://github.com/FangcunMount/infra/pull/57"
+  ],
+  "initial_branch": "codex/rocketmq-m3-qs-task",
+  "initial_worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-task",
+  "original_native_gate": {
     "status": "passed",
     "run": "https://github.com/FangcunMount/infra/actions/runs/39439182533",
     "source_sha": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
@@ -137,94 +541,12 @@
       }
     ]
   },
-  "source_full_race": {
-    "source_sha": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
-    "passed": 7081,
-    "failed": 0,
-    "optional_skipped": 60,
-    "report": "/tmp/m3-t12-2626-full-source-race.jsonl",
-    "sha256": "3116a273dd83a85d7142ea8b9a1db5eb4256c5a17361829666b4d387faea0537"
-  },
-  "pending_findings": [
-    "Required follow-up: disabling new reminder intents must retain recovery of existing executions and preserve ownership/admission guard in a new ordinary opening root."
-  ],
-  "implemented": [
-    "frozen first entry and wire with stable input hash",
-    "original pending/schedule_revision CAS and shared qs.mysql guard/witness",
-    "unknown result never falls back to legacy task Save/Outbox",
-    "operator ownership rechecked in original root after half preparation",
-    "scheduler original-primary admission",
-    "explicit NORMAL wire client and best_effort-only router; dual fanout native gate"
-  ],
-  "delivery_states": {
-    "source_merge": false,
-    "artifact_release": false,
-    "production_deploy": false,
-    "system_business_acceptance": false
-  },
-  "prior_full_source_reports": [
-    {
-      "source_sha": "2b84bd697caa9d98c7c5d9f75e2111418a8baaef",
-      "passed": 7075,
-      "failed": 0,
-      "optional_skipped": 60,
-      "sha256": "26ab26a64213b3fd541eae86be314fe321a5d14f168915f56c91a1235f541323"
-    },
-    {
-      "source_sha": "de2e3379aa47b68677ccf32eb91f007cd2219d43",
-      "passed": 7081,
-      "failed": 0,
-      "optional_skipped": 60,
-      "sha256": "e8bfb9e422e84ad9bf288cddd9dde5ce54d12527b5d0d4b2974ee762f0c77bea"
-    }
-  ],
-  "clock_compatibility": {
-    "source_fix": "c0f39d422daf78471290ca6459ab2239ef44e380",
-    "red_report": "/tmp/m3-t12-clock-red.log",
-    "red": "4 of 5 boundary data points reproduce opening_changed with truncation",
-    "green": {
-      "passed": 146,
-      "failed": 0,
-      "skipped": 0,
-      "report": "/tmp/m3-t12-clock-green.jsonl"
-    },
-    "behavior": "Mirror unchanged original reminder policy: microsecond parse then millisecond rounding; first wire keeps its original precision."
-  },
-  "finding_history": [
-    "Truncation disagreed with existing reminder MySQL rounding. Reproduced before fix, corrected and tested without modifying reminder policy."
-  ],
-  "first_native": {
-    "run": "https://github.com/FangcunMount/infra/actions/runs/39437289899",
-    "source_sha": "2b84bd697caa9d98c7c5d9f75e2111418a8baaef",
-    "harness_sha": "787d61e7d04680d53f9396ef20a6bae5d7653fde",
-    "mysql80": {
-      "passed": 11,
-      "failed": 0,
-      "skipped": 0,
-      "sha256": "fa92eb2313cb851964563327e22c582515035c6c40f7c774077799e17489003c"
-    },
-    "mysql84": {
-      "passed": 11,
-      "failed": 0,
-      "skipped": 0,
-      "sha256": "ae9262bea08fd368f268fd3ddb4b192f0e1399a978c208b01333f8dcc2cefc4e"
-    },
-    "all_cleanup_complete": true,
-    "does_not_cover_final_precision_and_post_write_abort_cases": true
-  },
-  "production_cd_pause_readback": true,
-  "ci_status": "Original batches merged; required flag-off follow-up native build failure corrected, final-source CI and real rerun pending.",
-  "infra_pr_refresh": {
-    "old_head": "787d61e7d04680d53f9396ef20a6bae5d7653fde",
-    "remote_branch": "56eed1b1bece4e00718482949600c0c8ef6b0a8d",
-    "resolution": "PR head remained stale after push; close/reopen refreshed it. Final checks must bind 56eed1b1; the manual final native run independently binds the same exact source."
-  },
-  "source_merge": {
+  "initial_source_merge": {
     "pr": 415,
     "sha": "36a81acce145cd4c84e12b1252f9856518f1a6b1",
     "merged_at": "2026-10-20T14:44:14Z"
   },
-  "source_ci": {
+  "original_source_ci": {
     "sha": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
     "success": 28,
     "skipped_not_applicable": [
@@ -236,78 +558,21 @@
     "failed": 0,
     "snapshot": "/tmp/m3-t12-qs415-final-checks.json"
   },
-  "infra_merge": {
+  "initial_infra_merge": {
     "pr": 54,
     "sha": "472fbbeea6a044f84aca88680aed682ac8a7b586",
     "merged_at": "2026-10-20T14:52:29Z"
   },
-  "infra_ci": {
+  "original_infra_ci": {
     "sha": "56eed1b1bece4e00718482949600c0c8ef6b0a8d",
     "success": 16,
     "failed": 0,
     "skipped": 0,
     "snapshot": "/tmp/m3-t12-infra54-final-checks.json"
   },
-  "reminder_flag_followup": {
-    "source_implementation": "caa769276641923afba5cd1c1b2b9eac4665bd7b",
-    "source_head": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
-    "source_pr": "https://github.com/FangcunMount/qs-server/pull/416",
-    "infra_head": "c27ef04316f43f97d523fdaefc5195f9a4a158bd",
-    "red_report": "/tmp/m3-t12-flag-off-red.log",
-    "red": "committed and unknown original executions both bypassed protocol lookup when the new reminder flag was off",
-    "target_race": {
-      "passed": 153,
-      "failed": 0,
-      "skipped": 0,
-      "report": "/tmp/m3-t12-flag-off-green.jsonl"
-    },
-    "lint": "passed pinned 2.5.0",
-    "docs": "87 selftests, hygiene and facts passed",
-    "native_cases": 15,
-    "native_status": "pending",
-    "full_source_race": {
-      "source_sha": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
-      "passed": 7087,
-      "failed": 0,
-      "optional_skipped": 60,
-      "report": "/tmp/m3-t12-f37a-full-source-race.jsonl",
-      "sha256": "9564cd111d1cd2d2daff8f994d0d3fa80a6d0be982abbdf0cc268129ceda30bb"
-    },
-    "merged": false,
-    "prior_candidate": {
-      "sha": "63595a5255a7f52fbc1941dc08982d1e29af4ac7",
-      "full_source_race": {
-        "passed": 7087,
-        "failed": 0,
-        "optional_skipped": 60,
-        "sha256": "6e1f9b630a27da8b7fbe67c193035e63170fcd646b8c9065c9f13401d7ca6ec2",
-        "report": "/tmp/m3-t12-6359-full-source-race.jsonl"
-      },
-      "native_status": "build_failed_before_business_tests"
-    },
-    "infra_pr": "https://github.com/FangcunMount/infra/pull/57",
-    "native_run": "https://github.com/FangcunMount/infra/actions/runs/39445253355",
-    "fixture_fix": "8d6c05bb6fb4ec738abea25ed1b2d38425761574",
-    "native_compile": {
-      "source_sha": "8d6c05bb6fb4ec738abea25ed1b2d38425761574",
-      "exit_code": 0,
-      "scope": "build only, no tests run",
-      "report": "/tmp/m3-t12-flag-native-fixed-compile.log"
-    },
-    "native_lint": {
-      "exit_code": 0,
-      "version": "2.5.0",
-      "report": "/tmp/m3-t12-flag-native-fixed-lint.log"
-    },
-    "failure_history": [
-      {
-        "run": "https://github.com/FangcunMount/infra/actions/runs/39443596014",
-        "source_sha": "63595a5255a7f52fbc1941dc08982d1e29af4ac7",
-        "cause": "Native fixture incorrectly passed variadic underlying GORM UOW as nonvariadic application Runner; both matrix builds failed before business tests. The local chained-command result hid the compile failure behind successful lint. Use separate checked exit codes.",
-        "mysql80_report_sha256": "ee00526d816c5c6721d2a013f81c744ff5531f9bd208ffe21e021eda3177756c",
-        "mysql84_report_sha256": "e703ed21484f3e6063efda526d931c63260e9bf5be98a2b8dfb1fcb84a477b0d",
-        "all_cleanup_complete": true
-      }
-    ]
+  "merged_main_docs_facts": {
+    "source_sha": "f0499e603fa4f67695c57648f73a19a6dd5bf881",
+    "report": "/tmp/m3-t12-flag-merged-main-docs-facts.log",
+    "passed": true
   }
 }
