@@ -2,13 +2,16 @@
   "task": "M3-T14",
   "status": "in_progress",
   "completed": false,
-  "recorded_at": "2026-10-20T19:17:49.293935+00:00",
+  "recorded_at": "2026-10-20T19:32:49.374131+00:00",
   "baseline": {
     "qs_main": "133fc07367925ed5fac7af6faf3b5a534eea2b94",
     "infra_main": "7ce54046e2bb04be4b6eb32025c0853993de3187",
     "frozen_command_commit": "18e1989760a16802254f416ba95fe0e782a2365f",
     "go_sdk": "v0.5.0-rocketmq-tx.2",
-    "original_root_commit": "96f44c40b575f0730311e09fe8c0f34023ed4790"
+    "original_root_commit": "96f44c40b575f0730311e09fe8c0f34023ed4790",
+    "candidate_sha": "9433ab0f57828f0f8311d3d7d82a139d7739d494",
+    "implementation_source": "840961581eb318e63830db16004cade57d87cd13",
+    "infra_harness_sha": "34227a825ffc2704ad21fd014d1d73a4af794382"
   },
   "implemented_unmerged": [
     "stable business input excludes clock, first ciphertext and optimistic aggregate sequence",
@@ -17,7 +20,11 @@
     "original root first binds SDK execution guard then revalidates order and admission",
     "business facts, operation, sequence CAS, archive and witness share original SQL root",
     "actual callback join; commit uncertainty remains Unknown; rollback needs exact persisted abortion",
-    "explicit additive MySQL108/Mongo42 migration draft; no constructor or startup DDL"
+    "explicit additive MySQL108/Mongo42 migration draft; no constructor or startup DDL",
+    "operation/payload reads only fall back on true new identity absence; exact committed evidence and tenant/subject/aggregate required",
+    "pending and aborted operations do not masquerade as submitted business facts",
+    "explicit shared owner composition and read-only startup schema/index checks",
+    "real broker fixture covers all five original store command entrypoints; predecessor receipts are controlled fixtures, observer ACK only"
   ],
   "validation": [
     {
@@ -44,6 +51,34 @@
       "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
       "exit_code": 0,
       "issues": 0
+    },
+    {
+      "name": "command, reader, owner composition and migration focused race",
+      "source": "840961581eb318e63830db16004cade57d87cd13",
+      "report": "/tmp/m3-t14-command-wiring-race.jsonl",
+      "sha256": "49c29d9b496ba34811ba9626ec717313cc16086de356ae97b37aeece520fc53a",
+      "passed": 911,
+      "failed": 0,
+      "skipped_existing_optional": 7,
+      "native_dependency_claim": false
+    },
+    {
+      "name": "fixed scoped lint",
+      "report": "/tmp/m3-t14-command-wiring-lint.log",
+      "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
+      "exit_code": 0
+    },
+    {
+      "name": "native profile compile-only",
+      "report": "/tmp/m3-t14-command-native-compile.log",
+      "sha256": "977f92c708914f987b8fb85fd45311a168501ef309d799a500cd2cfe815f46d4",
+      "exit_code": 0
+    },
+    {
+      "name": "87 documentation checks, hygiene and facts",
+      "report": "/tmp/m3-t14-source-docs-complete.log",
+      "sha256": "01964615c4fc877442e6b97c418f5772cea609e066ff58b84cb8c6925d0018a9",
+      "exit_code": 0
     }
   ],
   "failure_history": [
@@ -54,13 +89,26 @@
       "cause": "new test fixture incorrectly used schema metadata instead of existing secure_profile metadata",
       "fix": "use unchanged protected.Profile metadata; fixed full targeted race passed",
       "production_impact": false
+    },
+    {
+      "name": "documentation migration inventory still107",
+      "report": "/tmp/m3-t14-source-docs.log",
+      "fix": "align expected migration inventory and paired count to108"
+    },
+    {
+      "name": "documentation append blank-line hygiene",
+      "report": "/tmp/m3-t14-source-docs-fixed.log",
+      "fix": "remove append seam blank line"
+    },
+    {
+      "name": "documentation machine inventory and source bindings",
+      "report": "/tmp/m3-t14-source-docs-final.log",
+      "fix": "align machine migration108 and review current source inventory bindings while preserving historical evidence; final87 checks/hygiene/facts pass"
     }
   ],
   "pending": [
-    "actual Operation and Payload compatibility readers",
-    "shared qs.mysql owner runtime assembly and startup readiness",
-    "native MySQL and RocketMQ isolated dependency validation",
-    "complete source CI and documentation gate",
+    "native MySQL8.0.36/8.0.44/8.4.11 and RocketMQ isolated dependency validation (15 mandatory cases per job)",
+    "complete source CI and final full source race/lint",
     "source and infra merge"
   ],
   "boundaries": {
@@ -70,5 +118,33 @@
     "paired_ai_acceptance_done": false,
     "task_total": 36,
     "completed_tasks": 13
+  },
+  "pull_requests": {
+    "source": {
+      "url": "https://github.com/FangcunMount/qs-server/pull/418",
+      "state": "OPEN",
+      "ci": "running"
+    },
+    "infra": {
+      "url": "https://github.com/FangcunMount/infra/pull/68",
+      "state": "OPEN",
+      "ci": "queued"
+    },
+    "first_progress": {
+      "url": "https://github.com/FangcunMount/infra/pull/67",
+      "state": "MERGED",
+      "merge_sha": "4fa9e4751e72518683e4ae3ffa881e824918f461"
+    }
+  },
+  "followups": {
+    "T15": "paired event Inbox/projection/first ACK transaction and actual AI receipt consumption",
+    "T22": "full process owner lifecycle, full topic registration, runtime diagnostic integrity/counters across archive and historical outbox",
+    "T23": "SIGKILL, packet faults and database commit acknowledgement network proof; not replaced by fixtures"
+  },
+  "infra_local_validation": {
+    "runner_unittests": 59,
+    "failed": 0,
+    "python_compile": "passed",
+    "actionlint": "passed"
   }
 }

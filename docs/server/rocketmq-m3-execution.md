@@ -129,7 +129,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 2026-10-20；qs.mongo原事务/共享owner、首次BSON与wire、Run原claim CAS、V2权威审计、只读恢复及显式无DDL装配。最终f8566a830真实Broker/Mongo14项0失败/跳过，完整race7050通过；QS PR414合并20c29ba8（28成功/1不适用），infra PR52合并7b83e264（14成功）。[证据与全部失败历史](evidence/rocketmq-m3-qs-report-20261020.json)。生产未变更 |
 | ✅ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 2026-10-20；冻结首次入口/wire、原pending/revision CAS+witness、归属原根再校验、关闭新提醒仍保留旧执行恢复。最终f37afca0/infra c27ef043双档各15项0失败/跳过，source race7087通过/60既有可选跳过；QS PR415/416及infra54/57全部合并，最终CI分别28成功/1不适用与9成功。[全部证据/失败历史](evidence/rocketmq-m3-qs-task-20261020.json)。生产未变更 |
 | ✅ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 2026-10-21；最终7e8aba25/fd985a122全仓race7198通过/60既有可选跳过、固定lint零问题；原库三档各44项、真实Broker三档各41项均0失败/跳过/无race且清理完整。QS当前头28项CI成功/1API同步不适用，PR417合并133fc073；infra22项CI全部成功，PR61合并d4324a87。[完整证据与失败历史](evidence/rocketmq-m3-qs-retry-20261021.json)。生产未变更 |
-| ☐ | T14 | QS command/档案，Operation/Payload新旧兼容 | 进行中；冻结codec18e198976、原SQL root96f44c40b；序号CAS/前序业务回执门禁与显式108/42草案已实现；400项目标race通过/7项既有可选跳过、固定lint通过，尚未完成真实依赖、Operation/Payload兼容和运行装配，不勾选。[分批证据](evidence/rocketmq-m3-qs-ai-command-20261021.json) |
+| ☐ | T14 | QS command/档案，Operation/Payload新旧兼容 | 进行中；候选9433ab0f5（实现840961581），冻结命令/原SQL根事务/序号CAS/前序receipt门禁、共享owner及新旧Operation/Payload读取已实现。911项目标race通过/7项既有可选跳过，固定lint、native profile编译及87项docs门禁通过；QS PR418和infra PR68 CI进行中，三档真实Broker/MySQL尚待通过，不勾选。[分批证据](evidence/rocketmq-m3-qs-ai-command-20261021.json) |
 | ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 待开始 |
 | ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 待开始 |
 | ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 待开始 |
