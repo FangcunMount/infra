@@ -13,7 +13,8 @@ from iam_acceptance import host_failure_summary, retain_private_host_output
 CASES = frozenset(('constructor_no_ddl', 'half_invisible', 'original_task_witness_wire',
                    'first_entry_reused', 'root_abort_atomic', 'fresh_owner_recovery',
                    'closed_admission_no_business', 'no_new_publish_outbox', 'normal_best_effort_fanout',
-                   'normal_root_commit_boundary', 'normal_rejects_transaction_event'))
+                   'normal_root_commit_boundary', 'normal_rejects_transaction_event', 'reminder_precision_compatible',
+                   'original_write_abort_atomic', 'stale_schedule_cannot_commit'))
 
 
 def task_manifest():
