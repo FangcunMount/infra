@@ -328,7 +328,7 @@
       "head": "deb46e67016eccc9b8da6edd69764de19b0ebfcb",
       "merge_sha": "733ce4d80dfeda1f7214961aaf04664765b47500",
       "merged_at": "2026-10-20T08:31:24Z",
-      "successful_checks": 26,
+      "successful_checks": 25,
       "not_applicable_generated_sync": 1
     },
     "infra_pr46": {

@@ -276,6 +276,6 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 
 - 2026-10-20：T10首个代码批次991aa1e3已本地提交，尚未发布或合并。为现有committed_event_evidence JSON列提供平面V1/V2 codec，保留原结果/report-input bytes、业务schemaVersion及历史V1语义；Outcome增加独立V2元数据，拒绝混合协议/业务绑定冲突，SQL写入要求原事务且拒绝Mongo owner。只读审计通过显式host primary binding与2秒预算读取精确witness；没有authority时为Unknown，不冒称Outbox行、published或消费者完成。evidence、Outcome domain、MySQL仓储、scheduler audit及outcome commit五包race通过，固定golangci2.5零问题；新测试最初漏检查mock pool.Close返回值已修正后复验通过。三个业务提交器、真实MySQL JSON/guard及Broker验收尚未完成，T10仍进行中，总进度9/36。
 
-- 2026-10-20：T09装配QS PR411当前头26项成功、1项API生成同步不适用，合并733ce4d80dfeda1f7214961aaf04664765b47500；infra PR46八项全部成功，合并1f2c2ad7dd5ce243a7478a7039784f79b6295c91。合并前QS生产CD回读仍为暂停。实现、原生验收、源码CI与合并分别闭环；T09保持已完成，M3-2其余任务未完成，总计9/36。
+- 2026-10-20：T09装配QS PR411当前头25项成功、1项API生成同步不适用，合并733ce4d80dfeda1f7214961aaf04664765b47500；infra PR46八项全部成功，合并1f2c2ad7dd5ce243a7478a7039784f79b6295c91。合并前QS生产CD回读仍为暂停。实现、原生验收、源码CI与合并分别闭环；T09保持已完成，M3-2其余任务未完成，总计9/36。
 
 - 2026-10-20：T10新增原MySQL提交边界及评分成功显式入口，源码37ca33120eef（文档head e5c2b853a42a），草稿[QS PR412](https://github.com/FangcunMount/qs-server/pull/412)。完整结果/report-input及原wire在事务前冻结；全部半消息后借用同一主库根事务，先guard、后Outcome/投影/Assessment/Run claim、最后witness。关闭/取消时等待已准入的真实本地callback；原根ACK或新权威读取确认提交后保留LocalCommitted/FinalUnknown。事务Unknown不再触发引擎即时计算失败/新重试授权。目标race及固定lint2.5（含原生标签）通过，87项文档自测/hygiene/facts通过；新增真实MySQL 8.0.36/8.0.44/8.4.11 required任务正在执行，其half发送器明确为夹具模拟，不冒称Broker/网络故障。评分请求、失败及未来调度交接、完整装配和跨实例冻结结果恢复尚未完成；T10仍进行中，总计9/36，无生产切换。
