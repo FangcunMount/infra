@@ -1,0 +1,195 @@
+{
+  "task": "T16",
+  "status": "in_progress",
+  "completed": false,
+  "progress": "15/36",
+  "base": "c321a69411d1f9494de1e36f94834a974fbb15ea",
+  "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-admission",
+  "branch": "codex/rocketmq-m3-ai-admission",
+  "source_pushed": false,
+  "source_merged": false,
+  "native_host_acceptance": false,
+  "production_changed": false,
+  "verification": {
+    "python": "3.13.3",
+    "sdk": "0.4.0a1 released wheel",
+    "full_unit": {
+      "passed": 2294,
+      "deselected": 859,
+      "failed": 0,
+      "scope": "not integration and not interop; deselected dependencies not native proof"
+    },
+    "targeted": {
+      "passed": 122,
+      "failed": 0
+    },
+    "mypy_source_files": 360,
+    "ruff": "passed",
+    "root_contract": {
+      "passed": 116,
+      "failed": 0,
+      "scope": "pure local ownership contracts, not actual SQL or Broker"
+    },
+    "di_correction": {
+      "passed": 150,
+      "failed": 0,
+      "mypy_source_files": 361,
+      "scope": "ordinary container/request/worker/listener and root regression"
+    },
+    "native_root": {
+      "collected": 4,
+      "executed_locally": false,
+      "ci_pending": true
+    },
+    "full_unit_after_root": "rerun in progress at b37f9734cc5c1daf40b62d32180b945d74192f49"
+  },
+  "logs": {
+    "first-full-unit": {
+      "local_path": "/tmp/m3-t16-first-full-unit.log",
+      "sha256": "66691f004ceada85296a496e5023998bcc356924e380aed95303fdf99c6b7824",
+      "mode": "0o600"
+    },
+    "first-full-ruff": {
+      "local_path": "/tmp/m3-t16-first-full-ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "mode": "0o600"
+    },
+    "inbox-identity-green": {
+      "local_path": "/tmp/m3-t16-inbox-identity-green.log",
+      "sha256": "352df6355199a3309131ab55ba9ffff6dd888fd94c5b5bb95f7d889e135f933c",
+      "mode": "0o600"
+    },
+    "inbox-identity-mypy": {
+      "local_path": "/tmp/m3-t16-inbox-identity-mypy.log",
+      "sha256": "72e284de2e30fb34eecefac429acb634bc00f8803dd7cf07c888996d96fbe24d",
+      "mode": "0o600"
+    },
+    "admission-state-link-red": {
+      "local_path": "/tmp/m3-t16-admission-state-link-red.log",
+      "sha256": "31ac6dd1d04115cb97b1c4270a1930d907892fc7c1797f99e3b2d886ef92d56c",
+      "mode": "0o600"
+    },
+    "frozen-identity-red": {
+      "local_path": "/tmp/m3-t16-frozen-identity-red.log",
+      "sha256": "f51cf0bb9c537d1e6d98e38077003cec9d92ef1e9b6d1a0e4d493c7cd33edb88",
+      "mode": "0o600"
+    },
+    "inbox-identity-red": {
+      "local_path": "/tmp/m3-t16-inbox-identity-red.log",
+      "sha256": "22db12fa3c53bf2b1ade6c5e76bd90047fca0874a63a081b3d7c34f999aca23e",
+      "mode": "0o600"
+    },
+    "job-identity-red": {
+      "local_path": "/tmp/m3-t16-job-identity-red.log",
+      "sha256": "3f19b2b0d928957951030487efbfccefa4d8f1938610f6f1d156f28078746e99",
+      "mode": "0o600"
+    },
+    "job-identity-green": {
+      "local_path": "/tmp/m3-t16-job-identity-green.log",
+      "sha256": "ac70776e94856d00802219e89cd23d1455e107fad2ed81947dac28a8f23e02c3",
+      "mode": "0o600"
+    },
+    "job-identity-mypy": {
+      "local_path": "/tmp/m3-t16-job-identity-mypy.log",
+      "sha256": "72e284de2e30fb34eecefac429acb634bc00f8803dd7cf07c888996d96fbe24d",
+      "mode": "0o600"
+    },
+    "frozen-decision-red": {
+      "local_path": "/tmp/m3-t16-frozen-decision-red.log",
+      "sha256": "b6973622ef12f8266984b5de1ce16024e61617aec20e1f1040acd60e8b715a08",
+      "mode": "0o600"
+    },
+    "frozen-decision-green": {
+      "local_path": "/tmp/m3-t16-frozen-decision-green.log",
+      "sha256": "c9d45843c3eab201fc8e8dd2fb1297330cf29552f7b2027574153d74d89cd90d",
+      "mode": "0o600"
+    },
+    "frozen-decision-first-green-attempt": {
+      "local_path": "/tmp/m3-t16-frozen-decision-first-green-attempt.log",
+      "sha256": "18ab4724edbaecaf882f43c48d047da222b91a53f8c8e2759c9ac88ad55bd4fd",
+      "mode": "0o600"
+    },
+    "admission-root-red": {
+      "local_path": "/tmp/m3-t16-admission-root-red.log",
+      "sha256": "1ed77c872158059a6ae44f8c9b4743d1b14cdfa4c3673a6fb06d46a106b54645",
+      "mode": "0o600"
+    },
+    "admission-root-final": {
+      "local_path": "/tmp/m3-t16-admission-root-final.log",
+      "sha256": "5b3e342b7919c5307d82e33311c1d8dafc22f503a6e7f05888edbea5387f5758",
+      "mode": "0o600"
+    },
+    "admission-root-mypy": {
+      "local_path": "/tmp/m3-t16-admission-root-mypy.log",
+      "sha256": "8df64684ab3ddd6d5e70a1b315c82e4bba977462a77e9d2efd25fe4d4e4e6f24",
+      "mode": "0o600"
+    },
+    "admission-root-first-green-attempt": {
+      "local_path": "/tmp/m3-t16-admission-root-first-green-attempt.log",
+      "sha256": "3a3401d49e034fddd77e68e774851719969ef6d34e90cf3b9d82821e56555cc3",
+      "mode": "0o600"
+    },
+    "native-root-collection": {
+      "local_path": "/tmp/m3-t16-native-root-collection.log",
+      "sha256": "fec554ae5867dc6dcb547ceaf0cb0b5773c8a1de63a3d72028af6a9fb3a82acc",
+      "mode": "0o600"
+    },
+    "root-full-unit": {
+      "local_path": "/tmp/m3-t16-root-full-unit.log",
+      "sha256": "d455d04cfc503048f1872dd7b6fd8994f2810199d5f1accebcb07c97ecd17c77",
+      "mode": "0o600"
+    },
+    "di-fix-targeted": {
+      "local_path": "/tmp/m3-t16-di-fix-targeted.log",
+      "sha256": "2761c9bd7056b2c106f8bbdc49a9863c3db54e7b9a5b0cd451c4e8040edbef6a",
+      "mode": "0o600"
+    },
+    "di-fix-mypy": {
+      "local_path": "/tmp/m3-t16-di-fix-mypy.log",
+      "sha256": "8df64684ab3ddd6d5e70a1b315c82e4bba977462a77e9d2efd25fe4d4e4e6f24",
+      "mode": "0o600"
+    }
+  },
+  "next": [
+    "borrow frozen job/run identities",
+    "read-only admission planning and original-root execution",
+    "actual authenticated receiver and real isolated Broker/storage verification"
+  ],
+  "previous_checkpoint": "2a225d956ba5f863a758b1fef29fa4181bc9a801",
+  "checkpoint": "b37f9734cc5c1daf40b62d32180b945d74192f49",
+  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/159",
+  "source_pr_draft": true,
+  "source_pushed_checkpoint": "1ea1a41b69892718c9e3534e95e7fcd8b6d4694b",
+  "foundation_additions": [
+    "Frozen job identity with unchanged ordinary defaults",
+    "Frozen receipt Inbox decision without legacy Outbox stage",
+    "One-call AdmissionRoot: original guard, exact result comparison, Inbox/archive/witness root ownership",
+    "Fresh bounded exact evidence after uncertain commit; actual rollback plus durable abort required",
+    "Four native HELD-root cases collected; required MySQL CI pending; not actual receiver or Broker proof"
+  ],
+  "failures": [
+    {
+      "source": "1ea1a41b69892718c9e3534e95e7fcd8b6d4694b",
+      "gate": "full pure unit",
+      "passed": 2294,
+      "failed": 32,
+      "deselected": 863,
+      "cause": "Dishka auto-provided UoW factory interpreted new optional job_id as a shared dependency",
+      "fix": "Explicit request-scoped ordinary factory provider excludes per-command frozen identity; targeted 150 passed",
+      "fixed_source": "a0759ca",
+      "retained": true
+    },
+    {
+      "gate": "first root contract attempt",
+      "failed": 2,
+      "cause": "AsyncMock side-effect lambda returned unawaited event coroutine; changed fixture event recorder to synchronous side effect",
+      "product_changed_for_fix": false
+    },
+    {
+      "gate": "receipt correlation fixture assertion",
+      "failed": 1,
+      "cause": "existing parse_body rejected invalid correlation earlier with MessagingContractError; assertion now accepts exact early contract rejection",
+      "product_changed_for_fix": false
+    }
+  ]
+}
