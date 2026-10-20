@@ -213,8 +213,8 @@
     "known_test_build_fix": "fixture initially accessed Result.Final; corrected to per-branch Result.Branches[0].Final, preserving failed report",
     "docs": "87 selftests, hygiene and facts passed at9e18668b"
   },
-  "current_source_sha": "9e18668bee8e39fd225ec55da9da30c1475f6dcf",
-  "current_candidate_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+  "current_source_sha": "37896a336849f6fc1f4df200c9db54e8c7a8a1ed",
+  "current_candidate_sha": "558898741e37d29e0454627cc2cd02bc21f154f6",
   "source_pr": "https://github.com/FangcunMount/qs-server/pull/417",
   "infra_pr": "https://github.com/FangcunMount/infra/pull/61",
   "storage_native_passed": {
@@ -286,7 +286,7 @@
     "harness_followup": "write sanitized failure receipt and remove owned pre-Compose temp directory;56 local tests passed; uncommitted"
   },
   "auto_authorization_partial": {
-    "status": "uncommitted; no claimed commit or native result",
+    "status": "committed at37896a336849f6fc1f4df200c9db54e8c7a8a1ed; not merged/deployed",
     "scope": "new V2 future schedules, legacy V1 Outbox ownership retained; actual deadline Broker fixtures and host runner in preparation",
     "target_race": {
       "passed": 199,
@@ -297,7 +297,22 @@
     },
     "tagged_native_compile": "passed, no tests run",
     "pinned_native_lint": "passed2.5.0",
-    "full_source_race": "running",
-    "failure_history": "new report compatibility test initially used synthetic qs.reports.lifecycle; corrected to canonical qs.evaluation.lifecycle; original failed log preserved"
+    "full_source_race": {
+      "passed": 7147,
+      "failed": 0,
+      "skipped": 60,
+      "timezone": "UTC",
+      "skip_scope": "existing optional source dependencies; not required native profile",
+      "report_sha256": "e0d54219f94e4be80abc4c1406b1718a5f311c5cb5a40d14c662257e630d046f"
+    },
+    "failure_history": "new report compatibility test initially used synthetic qs.reports.lifecycle; corrected to canonical qs.evaluation.lifecycle; original failed log preserved",
+    "candidate_sha": "558898741e37d29e0454627cc2cd02bc21f154f6",
+    "docs": "87 selftests, hygiene and facts passed",
+    "real_due_broker": "required three-version host gate prepared; not executed yet"
+  },
+  "image_preflight_fix": {
+    "scope": "before Compose startup; remove exact owned private directory and save sanitized0600 failure receipt",
+    "harness_tests_passed": 56,
+    "native_status": "not claimed"
   }
 }
