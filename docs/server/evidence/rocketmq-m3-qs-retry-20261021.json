@@ -308,11 +308,79 @@
     "failure_history": "new report compatibility test initially used synthetic qs.reports.lifecycle; corrected to canonical qs.evaluation.lifecycle; original failed log preserved",
     "candidate_sha": "558898741e37d29e0454627cc2cd02bc21f154f6",
     "docs": "87 selftests, hygiene and facts passed",
-    "real_due_broker": "required three-version host gate prepared; not executed yet"
+    "real_due_broker": "passed:three versions,31 host cases each,zero failure/skip/race; exact558898741 source"
   },
   "image_preflight_fix": {
     "scope": "before Compose startup; remove exact owned private directory and save sanitized0600 failure receipt",
     "harness_tests_passed": 56,
     "native_status": "not claimed"
+  },
+  "automatic_real_due_broker": {
+    "source_sha": "558898741e37d29e0454627cc2cd02bc21f154f6",
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39462312786",
+    "infra_head": "c9421d7b0fb85988613edc0c192b9c3f0bba560d",
+    "reports": [
+      {
+        "mysql_version": "8.0.36",
+        "mongo_version": "7.0.37",
+        "source_sha": "558898741e37d29e0454627cc2cd02bc21f154f6",
+        "report_sha256": "e6c991fe24cfb94c855625c562ba799392ecfe94b5f381e0cb253064ffbf14c2",
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0,
+        "private_outputs": {
+          "evaluation": "a14e9107637580afa432a4f106766279f3033512d614a23cbc8aca662a95e6da",
+          "report": "3c6d2f5b16f45c189b9b03a1de2bc783cde2ef310881ec2f1f1a89af018454a7"
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "scope": "actual original evaluation failure/report terminal roots, real future deadline and Broker dispatch; observer ACK only, no next business consumer, provider call, system, packet-loss or ownership handoff claim"
+      },
+      {
+        "mysql_version": "8.0.44",
+        "mongo_version": "7.0.37",
+        "source_sha": "558898741e37d29e0454627cc2cd02bc21f154f6",
+        "report_sha256": "9a9ec594f3ff4f3e735f117156e509fef37d145cff30dae1d54c37dd31b34071",
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0,
+        "private_outputs": {
+          "evaluation": "47a17782bc6b9a66e3a275b91c92ee54468bd057afce3c0451979255edf01c29",
+          "report": "d29bfd8aca221ab610fc763e52e4d259df531a59c57a05c5f3de616857fe76a0"
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "scope": "actual original evaluation failure/report terminal roots, real future deadline and Broker dispatch; observer ACK only, no next business consumer, provider call, system, packet-loss or ownership handoff claim"
+      },
+      {
+        "mysql_version": "8.4.11",
+        "mongo_version": "7.0.37",
+        "source_sha": "558898741e37d29e0454627cc2cd02bc21f154f6",
+        "report_sha256": "ecdc578def4d26aa685153aaed2384b645e1c3ef1bf7f1167f993c85646b52df",
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0,
+        "private_outputs": {
+          "evaluation": "3f5a88e43a09a2d1089625288b1e2cf8cdf27e2b76049586bafe521d82f77593",
+          "report": "07d11db4129ce0876f2290b744f9f39cb8d2e3ee77da0c9bcf90d57d998c89a3"
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "scope": "actual original evaluation failure/report terminal roots, real future deadline and Broker dispatch; observer ACK only, no next business consumer, provider call, system, packet-loss or ownership handoff claim"
+      }
+    ],
+    "scope": "automatic original authorization and actual deadline Broker dispatch only; manual/force/pause/explicit aborted retry/handoff/lifecycle fault gates remain open"
   }
 }
