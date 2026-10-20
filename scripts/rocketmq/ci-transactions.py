@@ -59,6 +59,32 @@ def run(argv, *, timeout=120, env=None, cwd=None, required=True, stdin=None):
     return result
 
 
+def fixture_images(broker_tag, mysql_tag, directory, project, report, command=run):
+    """Resolve images before chown/Compose; retain failures without private output."""
+    try:
+        image = command(["docker", "image", "inspect", broker_tag, "--format", "{{.Id}}"]).stdout.strip()
+        if command(["docker", "image", "inspect", mysql_tag], required=False).returncode:
+            command(["docker", "pull", mysql_tag], timeout=300)
+        mysql_image = command(["docker", "image", "inspect", mysql_tag, "--format", "{{.Id}}"]).stdout.strip()
+        return image, mysql_image
+    except Exception:
+        # This exact directory was allocated by this process; no container or
+        # permission helper has been started yet. Never remove Docker images.
+        if not directory.name.startswith("rocketmq-m2-") or not project.startswith("rocketmq-m2-"):
+            raise RuntimeError("fixture ownership missing during image preflight") from None
+        shutil.rmtree(directory)
+        report.write_text(json.dumps({
+            "version": 1, "batch": "isolated-fixture-image-preflight", "project": project,
+            "phase": "image_acquisition_before_compose", "passed": 0, "failed": 1, "skipped": 0,
+            "failure": "Docker image acquisition failed before fixture startup; private output withheld",
+            "cases": {}, "cleanup": {"compose_not_started": True,
+                "project_containers_remaining": False, "private_fixture_directory_removed": not directory.exists()},
+            "limits": ["No database, Broker, business, production or system acceptance"]
+        }, indent=2) + "\n")
+        report.chmod(0o600)
+        raise
+
+
 def port():
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
@@ -187,7 +213,10 @@ def main():
     parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
     parser.add_argument("--qs-retry-store-host", type=Path, help="exact QS checkout; original dual-store future authorization atomicity only")
     parser.add_argument("--qs-retry-store-private-log", type=Path, help="new0600 private diagnostic; never a CI artifact")
+    parser.add_argument("--qs-retry-dispatch-host", type=Path, help="exact QS candidate; real original failure/report roots and due Broker dispatch")
     args = parser.parse_args()
+    if args.qs_retry_dispatch_host and (args.iam_host or args.sdk_api_go or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host):
+        parser.error("QS retry dispatch is a separate required profile")
     if args.qs_retry_store_private_log and not args.qs_retry_store_host:
         parser.error("QS retry private output requires its storage profile")
     if args.qs_retry_store_host and (args.iam_host or args.sdk_api_go or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host):
@@ -248,11 +277,7 @@ def main():
     shutil.copyfile(config / "tls/server.crt", ca)
     fault_key = directory / "fault-server.key"
     shutil.copyfile(config / "tls/server.key", fault_key); fault_key.chmod(0o600)
-    image = run(["docker", "image", "inspect", args.image, "--format", "{{.Id}}"]).stdout.strip()
-    run(["docker", "image", "inspect", args.mysql_image], required=False)
-    if run(["docker", "image", "inspect", args.mysql_image], required=False).returncode:
-        run(["docker", "pull", args.mysql_image], timeout=300)
-    mysql_image = run(["docker", "image", "inspect", args.mysql_image, "--format", "{{.Id}}"]).stdout.strip()
+    image, mysql_image = fixture_images(args.image, args.mysql_image, directory, project, args.report)
     run(["docker", "run", "--rm", "--user", "0", "--entrypoint", "bash",
          "-v", str(config) + ":/config", "-v", str(data) + ":/data", image, "-c",
          "mkdir -p /data/store /data/auth /data/logs /data/nameserver-logs; "
@@ -279,13 +304,13 @@ def main():
         "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
-    if args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host:
+    if args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host:
         # Host profiles explicitly create/drop their OWN random schema.
         # This root login exists only in this private loopback Compose project.
         spec['services']['mysql']['environment']['MYSQL_ROOT_HOST'] = '%'
     mongo_port = port()
     mongo_image = None
-    if args.sdk_api_go or args.qs_answer_host or args.qs_report_host or args.qs_retry_store_host:
+    if args.sdk_api_go or args.qs_answer_host or args.qs_report_host or args.qs_retry_store_host or args.qs_retry_dispatch_host:
         mongo_pin = "mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f"
         run(["docker", "pull", mongo_pin], timeout=300)
         mongo_image = run(["docker", "image", "inspect", mongo_pin, "--format", "{{.Id}}"]).stdout.strip()
@@ -295,7 +320,7 @@ def main():
             "mem_limit": "512m", "cpus": 1, "tmpfs": ["/data/db", "/data/configdb"],
             "healthcheck": {"test": ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ping:1})"],
                             "interval": "3s", "timeout": "5s", "retries": 40}}
-        if args.qs_answer_host or args.qs_report_host:
+        if args.qs_answer_host or args.qs_report_host or args.qs_retry_dispatch_host:
             spec['services']['mongo']['command'] += ['--setParameter', 'enableTestCommands=1']
     compose_file = directory / "compose.json"
     compose_file.write_text(json.dumps(spec)); compose_file.chmod(0o600)
@@ -418,7 +443,7 @@ def main():
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
-        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host)):
+        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
         if args.qs_task_host:
             from qs_task_acceptance import run_qs_task_host
@@ -436,7 +461,7 @@ def main():
             for name in proof['qs_evaluation_host']['native_receipt']['cases']:
                 passed('qs_evaluation_' + name)
             return
-        if args.qs_answer_host or args.qs_report_host or args.qs_retry_store_host:
+        if args.qs_answer_host or args.qs_report_host or args.qs_retry_store_host or args.qs_retry_dispatch_host:
             mongo_command('rs.initiate({_id:"sdk-proof",members:[{_id:0,host:"mongo:27017"}]})')
             deadline = time.monotonic() + 60
             while time.monotonic() < deadline:
@@ -448,6 +473,14 @@ def main():
             proof['mongo_version'] = mongo_command('db.version()')
             if proof['mongo_version'] != '7.0.37':
                 raise RuntimeError('required Mongo version differs')
+            if args.qs_retry_dispatch_host:
+                from qs_retry_dispatch_acceptance import run_qs_retry_dispatch_host
+                proof['qs_retry_dispatch_host'] = {}
+                run_qs_retry_dispatch_host(args.qs_retry_dispatch_host, directory, broker, project, grpc_port,
+                                           mysql_port, mongo_port, mysql_password, ca, run, proof['qs_retry_dispatch_host'])
+                for name in proof['qs_retry_dispatch_host']['native_receipt']['cases']:
+                    passed('qs_retry_dispatch_' + name)
+                return
             if args.qs_retry_store_host:
                 from qs_retry_acceptance import run_qs_retry_store_host
                 proof['qs_retry_store_host'] = {}
@@ -824,6 +857,12 @@ def main():
                                 'Actual host terminal Sender and original Mongo/Broker; running claims and report body supplied by fixtures',
                                 'Root reply discard is client-level; no packet-loss, SIGKILL, model invocation or T13 handoff claim']
             report['qs_report_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_report_acceptance.py').read_bytes()).hexdigest()
+        if args.qs_retry_dispatch_host:
+            report['batch'] = 'M3-QS-retry-original-roots-and-real-due-dispatch'
+            report['limits'] = ['No production/system acceptance or throughput claim',
+                                'Actual evaluation failure/report terminal hosts and real due Broker dispatch',
+                                'Observer ACK only; no next business consumer, provider call, SIGKILL, packet-loss or ownership handoff claim']
+            report['qs_retry_dispatch_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_retry_dispatch_acceptance.py').read_bytes()).hexdigest()
         if args.qs_retry_store_host:
             report['batch'] = 'M3-QS-retry-original-dual-store-authorizations'
             report['limits'] = ['No production/system acceptance or throughput claim',

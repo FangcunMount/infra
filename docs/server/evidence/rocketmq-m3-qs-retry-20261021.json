@@ -86,7 +86,7 @@
     "infra_harness": "52 tests passed",
     "native_databases": "pending CI; not claimed"
   },
-  "scope": "T13 partial: dual-store frozen authorization and due-dispatch core/original authority guards. First native failed; corrected exact candidate awaits required dual-store storage rerun. Active write handoff, explicit aborted retries, governance, real Broker dispatch, production/system not claimed.",
+  "scope": "T13 partial: frozen first plan, dual-store original Run atomicity passed atc1e6a137; due-dispatch core source tests passed. Active V2 automatic writes, real Broker due dispatch, manual/force/pause, explicit aborted retries and handoff remain in progress; no production/system acceptance.",
   "storage_native_failure_history": [
     {
       "run": "https://github.com/FangcunMount/infra/actions/runs/39457187250",
@@ -183,7 +183,7 @@
     "cause": "new retry schedule validator and synthetic fixtures used Assessment; actual evaluation domain uses Evaluation",
     "red_regression_sha256": "b25395174ac5248ea8128508ab27f1e949f0230475ac4b3d99305b69aeaa7810",
     "green_regression_sha256": "fe82d8e55038bfbd28737056f15485a0edd457619c24ae2fa3ff56909777ab97",
-    "required_native_revalidation": "pending; no current passing native report claimed",
+    "required_native_revalidation": "passed atc1e6a137: all three MySQL versions plusMongo7.0.37,14 cases each,0fail/skip; exact receipts attached",
     "fixed_source_sha": "9e18668bee8e39fd225ec55da9da30c1475f6dcf"
   },
   "dispatch_partial_validation": {
@@ -213,8 +213,106 @@
     "known_test_build_fix": "fixture initially accessed Result.Final; corrected to per-branch Result.Branches[0].Final, preserving failed report",
     "docs": "87 selftests, hygiene and facts passed at9e18668b"
   },
-  "current_source_sha": "9e18668bee8e39fd225ec55da9da30c1475f6dcf",
-  "current_candidate_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+  "current_source_sha": "37896a336849f6fc1f4df200c9db54e8c7a8a1ed",
+  "current_candidate_sha": "558898741e37d29e0454627cc2cd02bc21f154f6",
   "source_pr": "https://github.com/FangcunMount/qs-server/pull/417",
-  "infra_pr": "https://github.com/FangcunMount/infra/pull/61"
+  "infra_pr": "https://github.com/FangcunMount/infra/pull/61",
+  "storage_native_passed": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39459759364",
+    "github_attempt": 2,
+    "source_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+    "reports": [
+      {
+        "mysql_version": "8.0.36",
+        "mongo_version": "7.0.37",
+        "source_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+        "report_sha256": "f1ef8a1fdaac3db235144a4f7c1958e4842c30eba3b7d65fac24effd9cf46419",
+        "private_output_sha256": "2f8077885a09e645ee88f62c4a2f49b2c198ad4ef9a8200f728de6802a76ed87",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "scope": "original MySQL/Mongo Run and future schedule atomicity only; no due dispatcher, Broker, system or production claim"
+      },
+      {
+        "mysql_version": "8.0.44",
+        "mongo_version": "7.0.37",
+        "source_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+        "report_sha256": "e759b31d61534ee612c6dd68aea811e9fe702cf0ab0b406e86b6a7462acf04c6",
+        "private_output_sha256": "cb4fb586f53fece9b5ff32d54115861711401e23fc3d04dd697b094074543b9c",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "scope": "original MySQL/Mongo Run and future schedule atomicity only; no due dispatcher, Broker, system or production claim"
+      },
+      {
+        "mysql_version": "8.4.11",
+        "mongo_version": "7.0.37",
+        "source_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+        "report_sha256": "f0285b84123c5b088f8d7075fdc5c2a7744750621045feb75780ac3582ddfc02",
+        "private_output_sha256": "9a1c46dda016bc794ec9eb3d59bac538f1b59fe9c2d7e509f77f72da33f38427",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "scope": "original MySQL/Mongo Run and future schedule atomicity only; no due dispatcher, Broker, system or production claim"
+      }
+    ],
+    "scope": "original Run and future plan dual-store atomicity only; no due Broker dispatch or full T13 acceptance"
+  },
+  "storage_image_preflight_failure": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39459759364/attempts/1",
+    "mysql_tag": "mysql:8.4.11",
+    "phase": "image acquisition before Compose startup",
+    "structured_report": "absent; no cleanup receipt claimed",
+    "private_log_sha256": "c1e6912a704edd6283ea32ff69c5c94601dc82799da954bfe164a00c576bc41f",
+    "rerun": "failed job only; source unchanged; passed in attempt2",
+    "harness_followup": "write sanitized failure receipt and remove owned pre-Compose temp directory;56 local tests passed; uncommitted"
+  },
+  "auto_authorization_partial": {
+    "status": "committed at37896a336849f6fc1f4df200c9db54e8c7a8a1ed; not merged/deployed",
+    "scope": "new V2 future schedules, legacy V1 Outbox ownership retained; actual deadline Broker fixtures and host runner in preparation",
+    "target_race": {
+      "passed": 199,
+      "failed": 0,
+      "skipped": 5,
+      "skip_scope": "existing optional Mongo tests",
+      "report_sha256": "e3f82cc2a38b4198d25b102d4ba4cc8198f0e4640d8812f9f4bcbc2bb2d056fc"
+    },
+    "tagged_native_compile": "passed, no tests run",
+    "pinned_native_lint": "passed2.5.0",
+    "full_source_race": {
+      "passed": 7147,
+      "failed": 0,
+      "skipped": 60,
+      "timezone": "UTC",
+      "skip_scope": "existing optional source dependencies; not required native profile",
+      "report_sha256": "e0d54219f94e4be80abc4c1406b1718a5f311c5cb5a40d14c662257e630d046f"
+    },
+    "failure_history": "new report compatibility test initially used synthetic qs.reports.lifecycle; corrected to canonical qs.evaluation.lifecycle; original failed log preserved",
+    "candidate_sha": "558898741e37d29e0454627cc2cd02bc21f154f6",
+    "docs": "87 selftests, hygiene and facts passed",
+    "real_due_broker": "required three-version host gate prepared; not executed yet"
+  },
+  "image_preflight_fix": {
+    "scope": "before Compose startup; remove exact owned private directory and save sanitized0600 failure receipt",
+    "harness_tests_passed": 56,
+    "native_status": "not claimed"
+  }
 }
