@@ -1,0 +1,18 @@
+{
+  "task": "T12",
+  "status": "in_progress",
+  "completed": false,
+  "total_progress": "11/36",
+  "source_baseline": "20c29ba832388f5b4df7d03f35b4f0ba57abb7fa",
+  "branch": "codex/rocketmq-m3-qs-task",
+  "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-task",
+  "traced": [
+    "taskPersistence.saveOpened",
+    "task management OpenTask and scheduler SchedulePendingTasks",
+    "original MySQL task pending-state/schedule_revision/open_at CAS",
+    "best_effort routing publisher and deferred plan commit publisher"
+  ],
+  "baseline_verification": "running",
+  "implementation_started": false,
+  "production_changed": false
+}
