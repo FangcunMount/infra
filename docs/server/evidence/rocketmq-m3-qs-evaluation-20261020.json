@@ -269,6 +269,47 @@
     "corrected_native_run": "https://github.com/FangcunMount/infra/actions/runs/39401207681",
     "original_write_facade_retained": "injected original CAS writer; primary-only authority reader remains separate; target race/lint passed",
     "next_native_candidate": "7ea473a750a1d5bc650a6734e3e8adcd2e002603",
-    "local_native_status": "running isolated Mac mini project using current harness f98f97f; startup against stale infra copy failed at CLI validation before Docker, retained separately"
+    "local_native_status": "passed all 6 required cases and cleanup",
+    "local_native": {
+      "source": "7ea473a750a1d5bc650a6734e3e8adcd2e002603",
+      "infra_harness": "f98f97f8d40e501227b79faee11e35a155aa5bb6",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "receipt": {
+        "broker": "actual_5.5.1",
+        "cases": {
+          "closed_admission_no_business": true,
+          "constructor_no_ddl": true,
+          "exact_frozen_result_recovery": true,
+          "half_hidden_until_original_outcome_root": true,
+          "request_cas_wire_and_witness": true,
+          "request_duplicate_first_wire": true
+        },
+        "failed": 0,
+        "passed": 6,
+        "process_exit_not_claimed": true,
+        "root": "original_mysql_gorm",
+        "skipped": 0,
+        "source_input": "deterministic_fixture_not_system_account"
+      },
+      "sdk_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.5.0-rocketmq-tx.2",
+        "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "mysql_version": "8.4.11",
+      "image": "sha256:050426c66e97d69940f3b023440f68277cd02a4b8af5717ca01cf33f09776726",
+      "report_sha256": "23ce587efcb1650d2bdb2c239ccca022b8f76b1d342045ecd602f61a3799fabf",
+      "private_output_sha256": "7f7b97ba9c61bdc4d90f446977e4219a7d13c2d191a9a98b4b88523f30870a9d",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "scope": "actual Broker and original MySQL application submission/outcome roots; closed admission proof covers new outcome finalization with preexisting fixture Run; no system/network packet/process-exit/failure/dispatch handoff proof"
+    }
   }
 }
