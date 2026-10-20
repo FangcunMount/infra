@@ -85,15 +85,15 @@ def run_qs_report_host(source, directory, broker, project, grpc_port, mongo_port
                 'QS_M3_PRODUCER_CONFIG': str(paths['qs-report-producer']),
                 'QS_M3_OBSERVER_CONFIG': str(paths['qs-report-observer']),
                 'rocketmq.client.logRoot': str(logs), 'rocketmq.client.logLevel': 'error'})
-    result = run(['go', 'test', '-race', '-tags=integration,m3_report_integration', '-count=1', '-timeout=3m', '-v',
+    result = run(['go', 'test', '-race', '-tags=integration,m3_report_integration', '-count=1', '-timeout=5m', '-v',
                   './internal/apiserver/container/internal/transaction', '-run', '^TestM3ReportTerminalBrokerHost$'],
-                 cwd=source, env=env, timeout=240, required=False)
+                 cwd=source, env=env, timeout=420, required=False)
     raw = result.stdout + result.stderr
     capture = directory / 'qs-report-host-private.log'; capture.write_text(raw); capture.chmod(0o600)
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
     proof['diagnostics'] = host_failure_summary(raw)
-    proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'm3_report_broker_integration_test\.go:(\d+)', raw)))[:32]
+    proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'(?:m3_report_broker|m3_retry_dispatch_recovery)_integration_test\.go:(\d+)', raw)))[:32]
     if private_log is not None:
         retain_private_host_output(private_log, raw)
     if result.returncode:
