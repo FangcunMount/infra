@@ -6,7 +6,7 @@
   "total_progress": "10/36",
   "owner": "qs.mongo",
   "source": "6eb704e64c69306eeace3b9f7af3aa8b7cf32952",
-  "head": "b43538feeffa05cb408d86ed1df22868d92cd5ba",
+  "head": "f8566a8303ffc7bdcc8837b78fecd64a286872cf",
   "branch": "codex/rocketmq-m3-qs-report",
   "source_merged": false,
   "pr": "https://github.com/FangcunMount/qs-server/pull/414",
@@ -43,7 +43,7 @@
   },
   "native": {
     "run": true,
-    "status": "validation_failed",
+    "status": "third_candidate_running",
     "broker_or_original_mongo_atomicity_claimed": false,
     "runs": [
       {
@@ -74,8 +74,44 @@
           "probe_process_groups_drained": true,
           "private_fixture_directory_removed": true
         }
+      },
+      {
+        "url": "https://github.com/FangcunMount/infra/actions/runs/39426436790",
+        "source": "b43538feeffa05cb408d86ed1df22868d92cd5ba",
+        "infra_source": "45cd015cd96b543c2ab61de8408c75502858c76e",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "report_sha256": "aafca0afbde28bdfab3ca6141ec05ba85e89a348eb830d3585653806740416f4",
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3ReportTerminalBrokerHost"
+          ],
+          "assertion_lines": [
+            269
+          ]
+        },
+        "cause": "duplicate recovery incorrectly required winner execution token; actual SDK intentionally redacts it from read-only Lookup",
+        "fix_source": "9737db449537e0ae534478cb6df767fd6e88a9b2",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
       }
-    ]
+    ],
+    "current": {
+      "url": "https://github.com/FangcunMount/infra/actions/runs/39428678046",
+      "source": "f8566a8303ffc7bdcc8837b78fecd64a286872cf",
+      "infra_source": "e0f2eb21f83459081c65c7be10906a9283c8a8c8",
+      "required_cases": 14,
+      "claimed_passed": false
+    }
   },
   "pending": [
     "report actual Broker/Mongo acceptance (14 required cases, no skips)",
@@ -236,6 +272,18 @@
       "scope": "documentation gate",
       "cause": "cross-repository tracker path in backticks was validated as a missing local file",
       "resolution": "use canonical GitHub tracker link; 87 tests, hygiene and facts recheck passed"
+    },
+    {
+      "scope": "current-head CI Lint Code at b435",
+      "job": "https://github.com/FangcunMount/qs-server/actions/runs/39426404864/job/118639966469",
+      "cause": "upstream golangci schema download timed out before lint execution",
+      "classification": "external network; local pinned lint passed, new head CI required"
+    },
+    {
+      "scope": "current-head real Mongo CI at b435",
+      "job": "https://github.com/FangcunMount/qs-server/actions/runs/39426404864/job/118639966349",
+      "cause": "exhaustive legacy fixture did not include the three newly added V2 drift classes",
+      "resolution": "05bc0fda71c1df69e8c3bc396689a31b6d5a960e extends fixture without removing assertions; real current-head recheck pending"
     }
   ],
   "v2_authority_audit": {
@@ -259,5 +307,34 @@
     "required_cases": 14,
     "infra_candidate": "45cd015cd96b543c2ab61de8408c75502858c76e",
     "full_source_race": "running, not yet a passed gate"
+  },
+  "full_source_race_b435": {
+    "source": "a702707bfb0185071b6af86e245395b7f63081b4",
+    "candidate": "b43538feeffa05cb408d86ed1df22868d92cd5ba",
+    "passed": 7049,
+    "failed": 0,
+    "skipped": 60,
+    "skips": "existing optional environment tests; not required report native acceptance",
+    "package_failures": 0,
+    "stderr_bytes": 0,
+    "report_sha256": "29a3e928dd88d8a497ee5c99863aecd72d1661f3731e68e33b755b61169546cb",
+    "superseded_by_readonly_recovery_fix": true
+  },
+  "readonly_recovery_fix": {
+    "source": "9737db449537e0ae534478cb6df767fd6e88a9b2",
+    "candidate": "f8566a8303ffc7bdcc8837b78fecd64a286872cf",
+    "implemented": [
+      "read-only recovery validates immutable References without requiring or recreating the winner token",
+      "compare persisted BSON bytes directly rather than rebuilding potentially reordered documents",
+      "V2 completion clocks checked across Generation, Run, Artifact and proof; real negative clock-drift fixture added"
+    ],
+    "target_race": "passed",
+    "fixed_lint_2_5": "passed",
+    "native_tag_compile": "passed; not acceptance",
+    "v2_drift_fixture_source": "05bc0fda71c1df69e8c3bc396689a31b6d5a960e",
+    "all_supported_drift_assertions": "preserved; added three malformed V2 fixtures for real Mongo classification",
+    "docs_unit_passed": 87,
+    "docs_hygiene_and_facts": "passed",
+    "current_full_source_race": "running"
   }
 }

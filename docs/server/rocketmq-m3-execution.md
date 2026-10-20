@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T11报告事务代码已新增共享qs.mongo owner、冻结Sender、精确Run claim CAS、双阶段恢复、六类无DDL构造与V2权威审计，源码候选b43538fee由[QS PR414](https://github.com/FangcunMount/qs-server/pull/414)维护。首轮原生验收因隔离manifest Topic名称不匹配失败，证据保留；[infra PR52](https://github.com/FangcunMount/infra/pull/52)已修正并固定14项第二轮验收，完整源码race/当前头CI尚在进行。T11不勾选，生产CD保持暂停。[T11证据](evidence/rocketmq-m3-qs-report-20261020.json)。
+- 当前批次：T11候选f8566a830（QS PR414）包含冻结报告Sender、原claim CAS、无DDL装配、V2权威审计及只读恢复修复。前一候选完整源码race7049通过/60既有可选跳过；首轮Topic配置、第二轮只读token要求错误及CI新漂移夹具缺失均保留失败历史并已修正。第三轮14项报告原生验收run39428678046、最终完整race及当前头CI仍在运行。T11不勾选，生产未切换。[证据](evidence/rocketmq-m3-qs-report-20261020.json)。
 
 ## 1. 目标、基线和授权边界
 
@@ -315,3 +315,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - T11继续：f54eb444f完成原claim冻结CAS及六类无DDL构造；b98f452cb新增报告成功/失败Sender、原事务和未知结果恢复，候选6fe3e1522七包race239通过/0失败/5既有Mongo跳过，固定lint与87项文档通过。QS PR414草稿维护源码。infra PR52首轮真实Docker验证在owner构造阶段因Topic配置键误作解析名而失败，报告和清理证据已保存；修正为qs.evaluation.lifecycle并增加实际V2权威审计（14项）后重验。T11未勾选，10/36。
 
 - T11补记：a702707bf完成只读V2权威审计，候选b43538fee通过定向race、固定lint、原生tag编译与87项文档门禁。完整源码race仍运行；infra候选45cd015已固定该SDK宿主源码并要求14项原生证明（含成功/失败V2审计），run 39426436790排队中。实现不等于原生验收，仍10/36。
+
+- T11修复记录：报告第二轮真实验证到重复恢复时拒绝SDK已隐藏token的只读执行；9737db449改为仅依赖精确引用/权威证据，不重建执行权限，并保留原始BSON直接比较。旧CI的新增V2类型穷尽夹具缺失由05bc0fda7补齐，原断言保留；lint失败为上游schema下载超时。最终候选f8566a830定向race、固定lint、原生tag编译与87项文档通过，第三轮原生14项及最终完整CI待结果，仍10/36。
