@@ -2,12 +2,12 @@
   "version": 1,
   "batch": "M3-2",
   "task": "T10",
-  "status": "in_progress",
-  "completed": false,
-  "total_progress": "9/36",
-  "qs_source": "de7db811036b5bd3f390742328ede60ca18ba189",
+  "status": "completed",
+  "completed": true,
+  "total_progress": "10/36",
+  "qs_source": "5a1f489bb794fbdaf31d8c10a9769408eba8a4d2",
   "qs_pr": "https://github.com/FangcunMount/qs-server/pull/412",
-  "pr_status": "draft_not_merged",
+  "pr_status": "merged",
   "sdk_module": "v0.5.0-rocketmq-tx.2",
   "implemented": [
     "flat V1/V2 immutable Outcome evidence codec and exact primary audit",
@@ -15,15 +15,19 @@
     "frozen result/report-input bytes and first wire before half preparation",
     "explicit successful evaluation transaction committer retaining Run claim CAS",
     "unknown publication does not authorize immediate calculation failure/retry",
-    "read-only exact existing-plan lookup and pre/post-claim result preflight recovery"
+    "read-only exact existing-plan lookup and pre/post-claim result preflight recovery",
+    "original pending submission CAS and first-wire recovery",
+    "immediate failure original root with exact Run identity and preserved future schedule",
+    "explicit shared-owner module assembly and cache invalidation after original commit"
   ],
   "source_race": {
-    "command": "go test -race -json ./...",
-    "passed": 6941,
+    "command": "TZ=UTC go test -race -json ./...",
+    "passed": 6977,
     "failed": 0,
     "skipped": 60,
-    "skip_scope": "existing optional dependency tests; separate native job requires zero skips",
-    "report_sha256": "6a02c17291c7aa4eb0599f1d2fd986442477268620099e8c6bdac72923ea9654"
+    "skip_scope": "existing optional dependency tests; native required jobs both nine cases with zero skips",
+    "report_sha256": "77f38e01a3993127af17720e7b1b073d835a0c53a2b802e105fefb1b6f214e9f",
+    "source": "25501aac7d00aa0cda719980758055ed447ca7fc"
   },
   "native_mysql": {
     "run": "https://github.com/FangcunMount/qs-server/actions/runs/39397037300",
@@ -286,7 +290,7 @@
       "source": "36aa0741f05f75d2e100db2e123bb338370454fe",
       "scope": "ordinary source tests on UTC runner",
       "reason": "new tests compared time.Local versus decoded time.UTC object identity instead of exact instant; two unit assertions failed",
-      "resolution": "TZ=UTC local failure reproduced first; 25501aac7 changes only two unit tests, strict instant plus full decision assertions, UTC/east/west cases; UTC/Asia package race and lint2.5 pass; full UTC race 6977 pass/0 fail/60 existing optional skips; current-head CI pending",
+      "resolution": "TZ=UTC local failure reproduced first; 25501aac7 changes only two unit tests, strict instant plus full decision assertions, UTC/east/west cases; UTC/Asia package race and lint2.5 pass; full UTC race 6977 pass/0 fail/60 existing optional skips; current-head CI pending; final 5a1f489bb complete CI 28 successful checks, 1 generated-sync not applicable, merged db9b4918",
       "private_log_sha256": "4a99db07e3b685f3f391f0be42c2b63e6beee18f724fc2f11a9e23bb4e108093",
       "source_failure_preserved": true,
       "production_code_changed_by_fix": false
@@ -296,7 +300,7 @@
       "source": "25501aac7d00aa0cda719980758055ed447ca7fc",
       "scope": "documentation source baseline marker",
       "reason": "two unit test source changes require advancing source_baseline from 13fb912e6 to exact 25501aac7",
-      "resolution": "5a1f489bb changes only source_baseline; 87 docs tests/hygiene/facts passed before commit, final current-head CI pending",
+      "resolution": "5a1f489bb updates only source_baseline; 87 docs checks/hygiene/facts and final current-head CI passed, source merged db9b4918",
       "private_log_sha256": "cb7cfb86b1d916b45a049ea3c8dca9c930d003a02d60abad5c9c769cc27c1132",
       "source_failure_preserved": true,
       "production_code_changed_by_fix": false
@@ -332,7 +336,7 @@
   },
   "request_batch": {
     "source": "d12f1b5cd3b0bd6bdcc77618510622fcc5464674",
-    "status": "implemented_target_tests_passed_required_broker_pending",
+    "status": "historical_sub_batch_subsequently_verified",
     "infra_harness": "0dcf812",
     "infra_pr": "https://github.com/FangcunMount/infra/pull/49",
     "native_run": "https://github.com/FangcunMount/infra/actions/runs/39399548063",
@@ -438,7 +442,9 @@
         "passed": 13,
         "failed": 0
       }
-    }
+    },
+    "initial_status": "implemented_target_tests_passed_required_broker_pending",
+    "historical": true
   },
   "failure_and_assembly_batch": {
     "source": "ce2f5a124e59129a68e38d7e85dca4332a2ba059",
@@ -821,5 +827,15 @@
     }
   },
   "task_status": "completed",
-  "completed_at": "2026-10-20T11:15:49Z"
+  "completed_at": "2026-10-20T11:15:49Z",
+  "base_batch_source": "de7db811036b5bd3f390742328ede60ca18ba189",
+  "base_batch_source_race": {
+    "command": "go test -race -json ./...",
+    "passed": 6941,
+    "failed": 0,
+    "skipped": 60,
+    "skip_scope": "existing optional dependency tests; separate native job requires zero skips",
+    "report_sha256": "6a02c17291c7aa4eb0599f1d2fd986442477268620099e8c6bdac72923ea9654",
+    "source": "de7db811036b5bd3f390742328ede60ca18ba189"
+  }
 }
