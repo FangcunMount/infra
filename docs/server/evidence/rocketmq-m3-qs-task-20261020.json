@@ -213,7 +213,7 @@
     "does_not_cover_final_precision_and_post_write_abort_cases": true
   },
   "production_cd_pause_readback": true,
-  "ci_status": "Original PR415/54 current-head CI all passed and merged; required reminder-flag follow-up still under validation. T12 remains incomplete.",
+  "ci_status": "Original batches merged; required flag-off follow-up native build failure corrected, final-source CI and real rerun pending.",
   "infra_pr_refresh": {
     "old_head": "787d61e7d04680d53f9396ef20a6bae5d7653fde",
     "remote_branch": "56eed1b1bece4e00718482949600c0c8ef6b0a8d",
@@ -250,9 +250,9 @@
   },
   "reminder_flag_followup": {
     "source_implementation": "caa769276641923afba5cd1c1b2b9eac4665bd7b",
-    "source_head": "63595a5255a7f52fbc1941dc08982d1e29af4ac7",
+    "source_head": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
     "source_pr": "https://github.com/FangcunMount/qs-server/pull/416",
-    "infra_head": "81b6344ae92fb54ee055e2d25507d5173d06c164",
+    "infra_head": "c27ef04316f43f97d523fdaefc5195f9a4a158bd",
     "red_report": "/tmp/m3-t12-flag-off-red.log",
     "red": "committed and unknown original executions both bypassed protocol lookup when the new reminder flag was off",
     "target_race": {
@@ -265,7 +265,49 @@
     "docs": "87 selftests, hygiene and facts passed",
     "native_cases": 15,
     "native_status": "pending",
-    "full_source_race": "running",
-    "merged": false
+    "full_source_race": {
+      "source_sha": "f37afca0844fd2671b05024fc7039a66cf7d8e80",
+      "passed": 7087,
+      "failed": 0,
+      "optional_skipped": 60,
+      "report": "/tmp/m3-t12-f37a-full-source-race.jsonl",
+      "sha256": "9564cd111d1cd2d2daff8f994d0d3fa80a6d0be982abbdf0cc268129ceda30bb"
+    },
+    "merged": false,
+    "prior_candidate": {
+      "sha": "63595a5255a7f52fbc1941dc08982d1e29af4ac7",
+      "full_source_race": {
+        "passed": 7087,
+        "failed": 0,
+        "optional_skipped": 60,
+        "sha256": "6e1f9b630a27da8b7fbe67c193035e63170fcd646b8c9065c9f13401d7ca6ec2",
+        "report": "/tmp/m3-t12-6359-full-source-race.jsonl"
+      },
+      "native_status": "build_failed_before_business_tests"
+    },
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/57",
+    "native_run": "https://github.com/FangcunMount/infra/actions/runs/39445253355",
+    "fixture_fix": "8d6c05bb6fb4ec738abea25ed1b2d38425761574",
+    "native_compile": {
+      "source_sha": "8d6c05bb6fb4ec738abea25ed1b2d38425761574",
+      "exit_code": 0,
+      "scope": "build only, no tests run",
+      "report": "/tmp/m3-t12-flag-native-fixed-compile.log"
+    },
+    "native_lint": {
+      "exit_code": 0,
+      "version": "2.5.0",
+      "report": "/tmp/m3-t12-flag-native-fixed-lint.log"
+    },
+    "failure_history": [
+      {
+        "run": "https://github.com/FangcunMount/infra/actions/runs/39443596014",
+        "source_sha": "63595a5255a7f52fbc1941dc08982d1e29af4ac7",
+        "cause": "Native fixture incorrectly passed variadic underlying GORM UOW as nonvariadic application Runner; both matrix builds failed before business tests. The local chained-command result hid the compile failure behind successful lint. Use separate checked exit codes.",
+        "mysql80_report_sha256": "ee00526d816c5c6721d2a013f81c744ff5531f9bd208ffe21e021eda3177756c",
+        "mysql84_report_sha256": "e703ed21484f3e6063efda526d931c63260e9bf5be98a2b8dfb1fcb84a477b0d",
+        "all_cleanup_complete": true
+      }
+    ]
   }
 }
