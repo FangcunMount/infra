@@ -114,7 +114,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ☑ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 已完成实现与验证；原事务/冻结BSON与wire、V2精确读取、实际Collection/gRPC 202和503、并发原赢家、Mongo failpoint重入、ACK客户端丢弃及新实例读取16项在Mac mini和GitHub实际通过。最终源码deb46e67全仓race6909通过/60既有可选依赖跳过，同包策略与87项文档检查通过；PR410合并3afc76a6，PR411/infra46最终头CI和合并单列；不表示生产或system验收。[证据](evidence/rocketmq-m3-qs-answer-20261020.json) |
 | ✅ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 2026-10-20；5a1f489bb完整CI28成功/1不适用，完整UTC race6977通过；双档原生Broker各9项0失败/跳过/race。保留Run claim、首次wire、未来原due/授权及原调度职责（T13再交接）。[证据/失败历史](evidence/rocketmq-m3-qs-evaluation-20261020.json)；PR412合并db9b4918、infra49合并a4547f83；生产未变更 |
 | ✅ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 2026-10-20；qs.mongo原事务/共享owner、首次BSON与wire、Run原claim CAS、V2权威审计、只读恢复及显式无DDL装配。最终f8566a830真实Broker/Mongo14项0失败/跳过，完整race7050通过；QS PR414合并20c29ba8（28成功/1不适用），infra PR52合并7b83e264（14成功）。[证据与全部失败历史](evidence/rocketmq-m3-qs-report-20261020.json)。生产未变更 |
-| ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 进行中；QS PR415/infra PR54已建草稿，冻结首次入口/wire、原事务CAS+witness、归属再校验及NORMAL独立入口。目标race229通过/0失败/3既有可选跳过；Docker required 11项双MySQL档待验。核对发现毫秒截断与既有提醒舍入规则不一致，修正和回归未完成；尚未勾选 |
+| ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 进行中；QS PR415/infra PR54已建草稿，冻结首次入口/wire、原事务CAS+witness、归属再校验及NORMAL独立入口。目标race229通过/0失败/3既有可选跳过；首轮双MySQL档各11项0失败/跳过，已补精度与原写入后回滚、旧revision拒绝为14项最终门禁，等待2626fd90复验；精度修正已完成，尚未勾选 |
 | ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 待开始 |
 | ☐ | T14 | QS command/档案，Operation/Payload新旧兼容 | 待开始 |
 | ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 待开始 |
@@ -323,3 +323,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - T11完成：2026-10-20T13:37:37Z，相关源码与infra均合并，最终当前头CI门禁全部通过。回表勾选T11，总进度11/36；M3-2仍需T12/T13，不提前标完成。T12开始只读追踪与基线验证，生产部署/正式SDK发布/system验收均未执行。
 
 - 2026-10-20：T12首批候选2b84bd69提交QS PR415，infra PR54固定787d61e7维护隔离11项原事务/NORMAL双fanout门禁。目标race229通过/0失败/3既有可选MySQL跳过；87项文档自测、pinned lint及50项infra单测通过。手动开放半消息在原归属事务之外，业务根内再次锁定当前归属；未知结果复用首次计划、不重新生成入口、不回退旧Outbox。完整源码race进行中，真实依赖双档排队。消费者复核发现开放时钟截断与既有MySQL舍入规则不一致，待补边界修正，T12未完成，总进度11/36；无生产变更。
+
+- 2026-10-20：T12精度问题以5个边界点先复现（4点错误抑制），c0f39d42改为与既有消费者一致的MySQL微秒解析/毫秒舍入，保持首次wire与原提醒策略。相关race146项0失败/跳过。首轮2b84bd69实际MySQL8.0.36/8.4.11+Broker各11项0失败/跳过且全部清理；不冒充最终候选证据。最终源码2626fd90全仓race7081通过/0失败/60既有可选跳过，native编译及pinned lint通过，87项docs/facts通过。infra 56eed1b1把原行写入后回滚、旧调度CAS与精度纳入14项门禁，运行39439182533待验。PR415/54尚未合并，总进度11/36，生产CD回读仍为true暂停，无生产或system验收。
