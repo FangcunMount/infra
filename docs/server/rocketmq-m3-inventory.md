@@ -15,9 +15,9 @@
 | QS evaluation.retry.requested | evaluation/execute及operator/retry_governance StageAt | qs.mysql / 到期TRANSACTION | 原授权/due/attempt/冻结事件保留，dispatcher独占交接 |
 | QS evaluation.outcome.committed | evaluation/outcome/commit/committer | qs.mysql / TRANSACTION | qs-worker → 报告；保留Outcome与原业务证据 |
 | QS evaluation.failed | evaluation/execute/evaluation_workflows | qs.mysql / TRANSACTION | 即时失败与未来重试意图不同责任 |
-| QS interpretation.report.generated | interpretation/automation/execution/committer | qs.mysql / TRANSACTION | 原Report/Generation、统计/状态投影与幂等 |
-| QS interpretation.report.failed | 同上 | qs.mysql / TRANSACTION | 失败裁决与未来重试独立保留 |
-| QS interpretation.retry.requested | automation/retry_governance及execution StageAt | qs.mysql / 到期TRANSACTION | 原RetryDecision/NextAttemptAt/attempt；不重做未知模型 |
+| QS interpretation.report.generated | interpretation/automation/execution/committer → Mongo原事务 | qs.mongo / TRANSACTION | 原Report/Generation、统计/状态投影与幂等 |
+| QS interpretation.report.failed | 同上Mongo原事务 | qs.mongo / TRANSACTION | 失败裁决与未来重试独立保留 |
+| QS interpretation.retry.requested | automation/retry_governance及execution StageAt → Mongo原事务 | qs.mongo / 到期TRANSACTION | 原RetryDecision/NextAttemptAt/attempt；不重做未知模型 |
 | QS task.opened.reminder.requested | plan/task_persistence.saveOpened | qs.mysql / TRANSACTION | 原task状态/组织/schedule revision；消费者外部提醒幂等 |
 | QS task.opened/completed/expired/canceled | Task事件 → direct best_effort | qs.mysql / NORMAL | 保留原Task与Enrollment状态语义 |
 
@@ -62,3 +62,9 @@ QS源码现有105删除assessment_task.entry_token，down明确拒绝。105独�
 新的宿主迁移、业务镜像、v2Topic/ACL和SDK稳定发布均尚未执行。切换前保持NSQ业务运行及自动业务CD暂停；新主机拓扑以infra最新迁移记录为参考，不能照抄M1过期serverB IAM落点。
 
 源代码清单覆盖目录、版本写者、Stage/StageAt、核心receiver/relay、调度及恢复入口；真实有效订阅、积压和在途业务由T30/T32的生产盘点另行证明。仅静态清单通过不会把部署或业务验收标为完成。
+
+## 执行核对修正：报告原事务 owner
+
+2026-10-20 在 T10 云端门禁期间核对 T11：初始规划和本清单曾误将报告事件标记为 qs.mysql。QS 源码36aa0741f中，`container/modules/interpretation/assemble.go` 的 Generation、Run、Report、CatalogProjector 均使用 Mongo repository，start/commit/retry runner 均为 NewMongoRunner。`application/interpretation/automation/execution/committer.go` 在该原根事务中共同写入这些事实与旧 Mongo Outbox。
+
+因此报告生成/失败及其未来 retry dispatch 使用 qs.mongo，沿用现有 Mongo 原 session 与 witness，不跨库组合成 MySQL 事务，也不迁移报告存储。四 owner 总数、任务数及原宿主资源预算不变；T11 实现/原生证明和 T13 调度交接仍需分别完成。本修正保留首次盘点偏差，不能据此提前勾选任务或推断生产已切换。

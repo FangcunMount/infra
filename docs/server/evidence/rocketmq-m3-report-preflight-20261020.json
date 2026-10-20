@@ -1,0 +1,36 @@
+{
+  "task": "M3-T11-preflight",
+  "source": "36aa0741f05f75d2e100db2e123bb338370454fe",
+  "status": "read_only_source_preflight_not_implementation",
+  "original_plan_owner": "qs.mysql",
+  "corrected_owner": "qs.mongo",
+  "reason": "Module wires Mongo Generation/Run/Report/CatalogProjector and original start/commit/retry Mongo runners; business facts and witness must share that original transaction",
+  "scope_change": "No business storage migration, additional owner, production mutation or task-count change",
+  "files": [
+    {
+      "path": "internal/apiserver/container/modules/interpretation/assemble.go",
+      "sha256": "03a0f48de8dc037699b0bf6e9cd7c2dffc056ad2dbd0b01434058086c15f9723"
+    },
+    {
+      "path": "internal/apiserver/application/interpretation/automation/execution/committer.go",
+      "sha256": "f63fa4cca3fa97780aec6f735dfd1b0777b0bc543ea1a998e5654f9d9b561440"
+    },
+    {
+      "path": "internal/apiserver/infra/mongo/interpretation/lifecycle_repo.go",
+      "sha256": "be094c3c3d454aa9d6db96f6d0aa326131aa963025c112b29f46a7a30b8784b7"
+    },
+    {
+      "path": "internal/apiserver/infra/mongo/interpretation/lifecycle_po.go",
+      "sha256": "78f27a1782719c1f5f293e3a09b94b531c2a2dd43906b09c75b0607a207dfa8a"
+    }
+  ],
+  "remaining": [
+    "frozen report/result and exact V2 evidence in original Mongo root",
+    "original-session guard and callback reentry with database-only deterministic writes",
+    "inert selected constructors and explicit schema/index installation boundary; legacy constructors currently create indexes",
+    "future retry ownership remains T13; actual checker/lifecycle/fault gates remain T22/T23"
+  ],
+  "runtime_status": "unknown",
+  "production_changed": false,
+  "system_acceptance": false
+}
