@@ -215,7 +215,10 @@ def main():
     parser.add_argument("--qs-retry-store-private-log", type=Path, help="new0600 private diagnostic; never a CI artifact")
     parser.add_argument("--qs-retry-dispatch-host", type=Path, help="exact QS candidate; real original failure/report roots and due Broker dispatch")
     parser.add_argument("--qs-command-host", type=Path, help="exact QS checkout; original SQL command root and real Broker")
+    parser.add_argument("--qs-event-host", type=Path, help="exact QS checkout; authenticated event Inbox/projection and original ACK SQL root")
     args = parser.parse_args()
+    if args.qs_event_host and (args.iam_host or args.sdk_api_go or args.sdk_api_python or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host):
+        parser.error("QS event host is a separate required profile")
     if args.qs_command_host and (args.iam_host or args.sdk_api_go or args.sdk_api_python or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host):
         parser.error("QS command host is a separate required profile")
     if args.qs_retry_dispatch_host and (args.iam_host or args.sdk_api_go or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host):
@@ -307,7 +310,7 @@ def main():
         "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
-    if args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host:
+    if args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host:
         # Host profiles explicitly create/drop their OWN random schema.
         # This root login exists only in this private loopback Compose project.
         spec['services']['mysql']['environment']['MYSQL_ROOT_HOST'] = '%'
@@ -446,8 +449,16 @@ def main():
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
-        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host)):
+        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
+        if args.qs_event_host:
+            from qs_event_acceptance import run_qs_event_host
+            proof['qs_event_host'] = {}
+            run_qs_event_host(args.qs_event_host, directory, broker, project, grpc_port, mysql_port,
+                              mysql_password, ca, run, proof['qs_event_host'])
+            for name in proof['qs_event_host']['native_receipt']['cases']:
+                passed('qs_event_' + name)
+            return
         if args.qs_command_host:
             from qs_command_acceptance import run_qs_command_host
             proof['qs_command_host'] = {}
@@ -880,6 +891,13 @@ def main():
                                 'Original MySQL/Mongo authorization and explicit legacy future ownership handoff',
                                 'No due dispatcher, Broker visibility, packet loss, SIGKILL or production handoff claim']
             report['qs_retry_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_retry_acceptance.py').read_bytes()).hexdigest()
+        if args.qs_event_host:
+            report['batch'] = 'M3-QS-AI-event-original-SQL-and-ACK-Broker'
+            report['limits'] = ['No production/system acceptance or throughput claim',
+                                'Actual authenticated QS receiver and original Inbox/projection/ACK root',
+                                'Controlled AI input, observer ACK only; no paired AI producer',
+                                'No SIGKILL or database commit network-fault claim']
+            report['qs_event_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_event_acceptance.py').read_bytes()).hexdigest()
         if args.qs_command_host:
             report['batch'] = 'M3-QS-AI-command-original-SQL-and-Broker'
             report['limits'] = ['No production/system acceptance or throughput claim',
