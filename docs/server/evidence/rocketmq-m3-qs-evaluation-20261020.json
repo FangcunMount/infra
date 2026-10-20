@@ -146,6 +146,71 @@
         }
       ],
       "resolution": "source 168a7e79 separately checks raw Wire and decoded domain Payload; rerun pending, previous run remains failed"
+    },
+    {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39401207681",
+      "scope": "actual Broker multi-assessment native fixture",
+      "source": "168a7e79cf2a03396e9a1a7df6cd66b42f36aa4e",
+      "reason": "native fixtures reused the unique source answer sheet ID; original database constraint correctly rejected the second assessment",
+      "reports": [
+        {
+          "artifact": "rocketmq-qs-evaluation-1-1.25.12-fb684c3d609bf3fa5c7478e5c10de55f73b7426a",
+          "source": "168a7e79cf2a03396e9a1a7df6cd66b42f36aa4e",
+          "mysql": "8.4.11",
+          "failure": "RuntimeError: actual QS evaluation host acceptance failed (private output withheld)",
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [
+              "TestM3EvaluationBrokerHost"
+            ],
+            "assertion_lines": [
+              186,
+              207,
+              223
+            ]
+          },
+          "private_output_sha256": "5fbbc93bb596bc698c2417fc4427363533da8eebf2fbfde31c561797278a613a",
+          "report_sha256": "a39185258b5702f65a415076313b3f17de0fbcf5a7217fa7d85e0d4c1aff6cd1",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "artifact": "rocketmq-qs-evaluation-0-1.25.12-fb684c3d609bf3fa5c7478e5c10de55f73b7426a",
+          "source": "168a7e79cf2a03396e9a1a7df6cd66b42f36aa4e",
+          "mysql": "8.0.36",
+          "failure": "RuntimeError: actual QS evaluation host acceptance failed (private output withheld)",
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [
+              "TestM3EvaluationBrokerHost"
+            ],
+            "assertion_lines": [
+              186,
+              207,
+              223
+            ]
+          },
+          "private_output_sha256": "012015260ebd8191b3325c282cab75bdb8da3783ff356d6db4678bec86a3ea31",
+          "report_sha256": "473b7a9055227b43c8021e6a4d22c6ff5907e6419651a46f3320382416b77714",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ],
+      "resolution": "756185f6 gives each assessment its own immutable source; constraint unchanged; corrected fixed candidate pending local Docker verification"
     }
   ],
   "lint": {
@@ -202,6 +267,8 @@
     "corrected_candidate": "168a7e79cf2a03396e9a1a7df6cd66b42f36aa4e",
     "corrected_infra_harness": "f98f97f8d40e501227b79faee11e35a155aa5bb6",
     "corrected_native_run": "https://github.com/FangcunMount/infra/actions/runs/39401207681",
-    "original_write_facade_retained": "injected original CAS writer; primary-only authority reader remains separate; target race/lint passed"
+    "original_write_facade_retained": "injected original CAS writer; primary-only authority reader remains separate; target race/lint passed",
+    "next_native_candidate": "7ea473a750a1d5bc650a6734e3e8adcd2e002603",
+    "local_native_status": "running isolated Mac mini project using current harness f98f97f; startup against stale infra copy failed at CLI validation before Docker, retained separately"
   }
 }
