@@ -81,6 +81,71 @@
       "resolution": "use repository-approved v7; runtime contract locally passed, current-head CI pending",
       "source_failure_preserved": true,
       "private_log_sha256": "19fc66bcd16d7ada49c584405a57d4a553210b575fb8ab7508e285eec4f875ab"
+    },
+    {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39399548063",
+      "scope": "actual Broker request wire comparison",
+      "source": "d12f1b5cd3b0bd6bdcc77618510622fcc5464674",
+      "reason": "fixture compared complete first wire against normalized Received.Payload instead of Received.Wire",
+      "reports": [
+        {
+          "artifact": "rocketmq-qs-evaluation-1-1.25.12-17fd414adf3a49994de0cf5145c6edcd9bdae627",
+          "source": "d12f1b5cd3b0bd6bdcc77618510622fcc5464674",
+          "mysql": "8.4.11",
+          "failed": 1,
+          "passed": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [
+              "TestM3EvaluationBrokerHost"
+            ],
+            "assertion_lines": [
+              165,
+              195
+            ]
+          },
+          "private_output_sha256": "bbfc68ddd01dae73c24c5a4ab6ab293e197c4391d043ec70a8336c68caaab7ae",
+          "report_sha256": "bd2745572de6a334e7fd513d4bb3b2be3f1fff95befe721c87fe7a129c948c0c",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "artifact": "rocketmq-qs-evaluation-0-1.25.12-17fd414adf3a49994de0cf5145c6edcd9bdae627",
+          "source": "d12f1b5cd3b0bd6bdcc77618510622fcc5464674",
+          "mysql": "8.0.36",
+          "failed": 1,
+          "passed": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [
+              "TestM3EvaluationBrokerHost"
+            ],
+            "assertion_lines": [
+              165,
+              195
+            ]
+          },
+          "private_output_sha256": "791599a7142071bc871a158318c7d5ba1e474b0ad5f88b523e698580e8325278",
+          "report_sha256": "ebe9ff753303e694057736ef0f42c927308869315504f1220b522f8ec267767d",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ],
+      "resolution": "source 168a7e79 separately checks raw Wire and decoded domain Payload; rerun pending, previous run remains failed"
     }
   ],
   "lint": {
@@ -133,6 +198,10 @@
       "docs_hygiene": "passed",
       "docs_facts": "passed"
     },
-    "production_wiring_activated": false
+    "production_wiring_activated": false,
+    "corrected_candidate": "168a7e79cf2a03396e9a1a7df6cd66b42f36aa4e",
+    "corrected_infra_harness": "f98f97f8d40e501227b79faee11e35a155aa5bb6",
+    "corrected_native_run": "https://github.com/FangcunMount/infra/actions/runs/39401207681",
+    "original_write_facade_retained": "injected original CAS writer; primary-only authority reader remains separate; target race/lint passed"
   }
 }
