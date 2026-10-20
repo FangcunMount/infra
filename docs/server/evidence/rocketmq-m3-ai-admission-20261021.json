@@ -1,0 +1,72 @@
+{
+  "task": "T16",
+  "status": "in_progress",
+  "completed": false,
+  "progress": "15/36",
+  "base": "c321a69411d1f9494de1e36f94834a974fbb15ea",
+  "checkpoint": "2a225d956ba5f863a758b1fef29fa4181bc9a801",
+  "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-admission",
+  "branch": "codex/rocketmq-m3-ai-admission",
+  "source_pushed": false,
+  "source_merged": false,
+  "native_host_acceptance": false,
+  "production_changed": false,
+  "verification": {
+    "python": "3.13.3",
+    "sdk": "0.4.0a1 released wheel",
+    "full_unit": {
+      "passed": 2294,
+      "deselected": 859,
+      "failed": 0,
+      "scope": "not integration and not interop; deselected dependencies not native proof"
+    },
+    "targeted": {
+      "passed": 122,
+      "failed": 0
+    },
+    "mypy_source_files": 360,
+    "ruff": "passed"
+  },
+  "logs": {
+    "first-full-unit": {
+      "local_path": "/tmp/m3-t16-first-full-unit.log",
+      "sha256": "66691f004ceada85296a496e5023998bcc356924e380aed95303fdf99c6b7824",
+      "mode": "0o600"
+    },
+    "first-full-ruff": {
+      "local_path": "/tmp/m3-t16-first-full-ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "mode": "0o600"
+    },
+    "inbox-identity-green": {
+      "local_path": "/tmp/m3-t16-inbox-identity-green.log",
+      "sha256": "352df6355199a3309131ab55ba9ffff6dd888fd94c5b5bb95f7d889e135f933c",
+      "mode": "0o600"
+    },
+    "inbox-identity-mypy": {
+      "local_path": "/tmp/m3-t16-inbox-identity-mypy.log",
+      "sha256": "72e284de2e30fb34eecefac429acb634bc00f8803dd7cf07c888996d96fbe24d",
+      "mode": "0o600"
+    },
+    "admission-state-link-red": {
+      "local_path": "/tmp/m3-t16-admission-state-link-red.log",
+      "sha256": "31ac6dd1d04115cb97b1c4270a1930d907892fc7c1797f99e3b2d886ef92d56c",
+      "mode": "0o600"
+    },
+    "frozen-identity-red": {
+      "local_path": "/tmp/m3-t16-frozen-identity-red.log",
+      "sha256": "f51cf0bb9c537d1e6d98e38077003cec9d92ef1e9b6d1a0e4d493c7cd33edb88",
+      "mode": "0o600"
+    },
+    "inbox-identity-red": {
+      "local_path": "/tmp/m3-t16-inbox-identity-red.log",
+      "sha256": "22db12fa3c53bf2b1ade6c5e76bd90047fca0874a63a081b3d7c34f999aca23e",
+      "mode": "0o600"
+    }
+  },
+  "next": [
+    "borrow frozen job/run identities",
+    "read-only admission planning and original-root execution",
+    "actual authenticated receiver and real isolated Broker/storage verification"
+  ]
+}
