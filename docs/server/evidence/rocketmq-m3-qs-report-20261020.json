@@ -6,7 +6,7 @@
   "total_progress": "10/36",
   "owner": "qs.mongo",
   "source": "6eb704e64c69306eeace3b9f7af3aa8b7cf32952",
-  "head": "d0b23a6a0892e43a3bea687af93c438ebc4fffd8",
+  "head": "da6d5c630fe2ea431b28b8c83977c59e9b358741",
   "branch": "codex/rocketmq-m3-qs-report",
   "source_merged": false,
   "pr": null,
@@ -46,11 +46,10 @@
     "broker_or_original_mongo_atomicity_claimed": false
   },
   "pending": [
-    "shared original-database Mongo owner and root guard, explicit all-topic runtime ownership",
     "frozen report success/failure Sender and exact pending-result recovery",
-    "selected constructors without DDL and explicit index installation",
+    "remaining selected template/catalog-maintenance constructors without DDL",
     "authority-aware V2 audit and old recovery boundaries",
-    "real dependency/Broker acceptance, current-head full CI and source merge"
+    "real report dependency/Broker acceptance, current-head full CI and source merge"
   ],
   "production": {
     "changed": false,
@@ -58,7 +57,7 @@
     "system_acceptance": false
   },
   "shared_mongo_owner": {
-    "source": "1071d1364",
+    "source": "1071d13641bbc2c1e7f6f9480ab314034aaaf0a9",
     "candidate": "eae97334ba9e170adf17504f1c44ef3f3cfe4edf",
     "scope": [
       "one original database/runtime for multiple adapters",
@@ -84,7 +83,7 @@
     }
   },
   "common_codec": {
-    "source": "ff38c15aa",
+    "source": "ff38c15aa2206a30dfae42818224264ffe2dabf5",
     "candidate": "f47a1b0bdd8f81821e35e9168ea32316d3d8e5f3",
     "scope": "extract original private artifact JSON unchanged for both owners; existing MySQL wrapper retained",
     "evaluation_regression": {
@@ -122,7 +121,7 @@
     }
   },
   "failed_evidence_and_explicit_schema": {
-    "source": "00e76c383",
+    "source": "00e76c383ca0f336cb4a8e51022edcbbac3088e5",
     "scope": [
       "failed Run V2 evidence independent of future retry decision/Outbox reference",
       "BSON preserves exact reference; ordinary save/create without original guarded root refused",
@@ -134,5 +133,25 @@
     "lint_2_5": "passed",
     "docs_unit_passed": 87,
     "actual_report_sender_and_native": "pending"
+  },
+  "foundation_regression": {
+    "source": "00e76c383ca0f336cb4a8e51022edcbbac3088e5",
+    "candidate": "da6d5c630fe2ea431b28b8c83977c59e9b358741",
+    "packages": 13,
+    "passed": 247,
+    "failed": 0,
+    "skipped": 8,
+    "skipped_tests": [
+      "TestReportCatalogAuditIndexesAndBatchBoundAgainstMongo",
+      "TestReportReadModelListReportsFiltersAgainstMongo",
+      "TestReportReadModelFailsClosedOnArtifactAssociationMismatchAgainstMongo",
+      "TestCurrentReportMetadataCarriesVerifiedSourceIdentityAgainstMongo",
+      "TestGenerationRepositoryRejectsStaleCASAgainstMongo",
+      "TestDurableSubmissionTransactionAgainstMongoReplicaSet",
+      "TestAnsweringStartUniqueAndImmutableAgainstMongoReplicaSet",
+      "TestScopedAnswerListAndCountAgainstMongoReplicaSet"
+    ],
+    "report_sha256": "de66a474fedde446baa18c527eb72952b20ed611181cf65c9860f7e168bc88d1",
+    "native_report_acceptance": false
   }
 }
