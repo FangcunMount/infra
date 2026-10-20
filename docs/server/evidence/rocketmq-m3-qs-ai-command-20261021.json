@@ -1,17 +1,17 @@
 {
   "task": "M3-T14",
-  "status": "in_progress",
-  "completed": false,
-  "recorded_at": "2026-10-20T19:47:37.073627+00:00",
+  "status": "complete",
+  "completed": true,
+  "recorded_at": "2026-10-20T20:39:25.404231+00:00",
   "baseline": {
     "qs_main": "133fc07367925ed5fac7af6faf3b5a534eea2b94",
     "infra_main": "7ce54046e2bb04be4b6eb32025c0853993de3187",
     "frozen_command_commit": "18e1989760a16802254f416ba95fe0e782a2365f",
     "go_sdk": "v0.5.0-rocketmq-tx.2",
     "original_root_commit": "96f44c40b575f0730311e09fe8c0f34023ed4790",
-    "candidate_sha": "949edaddfd12ea4ec8a1e1733813590cfe94584e",
-    "implementation_source": "0b044bb92a8e09e6dcb2e4d26ea3e4474e0707e0",
-    "infra_harness_sha": "049c1294fecdc60a29bc944e82b19a5ad11661c8"
+    "candidate_sha": "3dd33af4fc86d03fc80545276f18d0fef862f376",
+    "implementation_source": "199ef22def9b248fe2c8e01f0737373bf55d2267",
+    "infra_harness_sha": "3a1b0ba2e195c1404ceee3a836d6c4b611896002"
   },
   "implemented_unmerged": [
     "stable business input excludes clock, first ciphertext and optimistic aggregate sequence",
@@ -27,7 +27,10 @@
     "real broker fixture covers all five original store command entrypoints; predecessor receipts are controlled fixtures, observer ACK only",
     "a persisted Prepared/Aborted command request without an archive prohibits historical payload fallback; true double absence alone permits old reads",
     "same-key different business input retains original app.ErrConflict contract before Seal/reservation",
-    "caller original-root context is refused before new command/retry protocol or SQL reads; no second business root"
+    "caller original-root context is refused before new command/retry protocol or SQL reads; no second business root",
+    "actual Participant pending operation queries authenticate current access before planned metadata and retain original actor/testee/assessment binding",
+    "same Participant request reuses first frozen report even while intake is closed; no current report reload, new Seal or executor",
+    "committed business Original/Projection reads never accept a Prepared plan as a request"
   ],
   "validation": [
     {
@@ -109,6 +112,16 @@
       "report": "/tmp/m3-t14-original-root-context-final-race.jsonl",
       "sha256": "1af82695f2af6a3d5cd43f07ff213f41d046300dd57c2b1f8e0f67ac8a09afd7",
       "passed": 748,
+      "failed": 0,
+      "skipped_existing_optional": 7,
+      "native_dependency_claim": false
+    },
+    {
+      "name": "Participant private planned snapshot/current permission/operation and frozen-retry regressions with transport modules",
+      "source": "199ef22def9b248fe2c8e01f0737373bf55d2267",
+      "report": "/tmp/m3-t14-participant-final-green.jsonl",
+      "sha256": "5778bd35bd0caa1d794c00ba5f9c278e2d62bb585c733f8836e0ee98f6bd4807",
+      "passed": 1107,
       "failed": 0,
       "skipped_existing_optional": 7,
       "native_dependency_claim": false
@@ -238,36 +251,46 @@
       "fix_source": "c99918c6110b36e4be49fa3bde52ff8b9edbb809",
       "fix": "set explicit false fixture value and add nil/false/true presence plus immutable input-hash test; native candidate must rerun",
       "all_owned_resources_cleaned": true
+    },
+    {
+      "name": "intentional red public participant pending-operation and original frozen-request retry",
+      "report": "/tmp/m3-t14-participant-pending-red.jsonl",
+      "failed_tests": 2,
+      "intentional_red": true,
+      "fix_source": "199ef22def9b248fe2c8e01f0737373bf55d2267",
+      "fix": "current access checked before private planned metadata; verify actor/testee/assessment/report; normal business reads remain committed Original only",
+      "fixed_targeted_race_report": "/tmp/m3-t14-participant-final-green.jsonl"
     }
   ],
-  "pending": [
-    "native MySQL8.0.36/8.0.44/8.4.11 and RocketMQ isolated dependency validation (15 mandatory cases per job)",
-    "complete source CI and final full source race/lint",
-    "source and infra merge"
-  ],
+  "pending": [],
   "boundaries": {
     "production_changed": false,
     "stable_release_done": false,
     "system_acceptance_done": false,
     "paired_ai_acceptance_done": false,
     "task_total": 36,
-    "completed_tasks": 13
+    "completed_tasks": 14
   },
   "pull_requests": {
     "source": {
       "url": "https://github.com/FangcunMount/qs-server/pull/418",
-      "state": "OPEN",
-      "ci": "running"
+      "state": "MERGED",
+      "ci": "passed28_success_1_generated_API_inapplicable"
     },
     "infra": {
       "url": "https://github.com/FangcunMount/infra/pull/68",
-      "state": "OPEN",
-      "ci": "queued"
+      "state": "MERGED",
+      "ci": "passed25_success_0skip"
     },
     "first_progress": {
       "url": "https://github.com/FangcunMount/infra/pull/67",
       "state": "MERGED",
       "merge_sha": "4fa9e4751e72518683e4ae3ffa881e824918f461"
+    },
+    "first_validation_progress": {
+      "url": "https://github.com/FangcunMount/infra/pull/69",
+      "state": "MERGED",
+      "merge_sha": "6f91ed9808c0421b676cb4f5f1e30e755bf3b1f4"
     }
   },
   "followups": {
@@ -295,15 +318,457 @@
       "full_source_optional_skips": 60,
       "full_lint_issues": 0,
       "reason": "add fail-closed caller original-root context guard before command/retry reads, Seal and halves; final exact-source validation restarted"
+    },
+    {
+      "source": "949edaddfd12ea4ec8a1e1733813590cfe94584e",
+      "full_source_race_passed": 7275,
+      "full_source_optional_skips": 60,
+      "full_lint_issues": 0,
+      "source_ci_success": 28,
+      "source_ci_inapplicable_generated_api": 1,
+      "reason": "actual Participant API first required committed Original; two red tests proved Pending query and frozen same-request retry unavailable. Add separately authorized planned metadata port without exposing it as accepted business data; new actual public-entrypoint native proof required"
     }
   ],
   "final_gates": {
-    "source_sha": "949edaddfd12ea4ec8a1e1733813590cfe94584e",
-    "full_source_race": "running",
-    "full_lint": "pending after full source race",
-    "source_ci": "running",
-    "native_three_mysql_versions": "pending",
-    "source_merged": false,
-    "infra_merged": false
-  }
+    "source_sha": "3dd33af4fc86d03fc80545276f18d0fef862f376",
+    "full_source_race": {
+      "source": "3dd33af4fc86d03fc80545276f18d0fef862f376",
+      "passed": 7290,
+      "failed": 0,
+      "skipped_existing_optional": 60,
+      "report": "/tmp/m3-t14-participant-full-source-race.jsonl",
+      "sha256": "96cda593db2567900f8e0c0d25e624e5fabc48b846fffb3534c85aca62fb74f4"
+    },
+    "full_lint": {
+      "version": "golangci-lint2.5.0",
+      "issues": 0,
+      "report": "/tmp/m3-t14-participant-full-source-lint.log",
+      "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47"
+    },
+    "source_ci": "passed28_success_1_generated_API_inapplicable",
+    "native_three_mysql_versions": "passed15perversion_0failed_0skip_cleanup_complete",
+    "source_merged": true,
+    "infra_merged": true,
+    "infra_ci": "passed25_success_0skip"
+  },
+  "superseded_native_pass": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39486378487",
+    "source": "949edaddfd12ea4ec8a1e1733813590cfe94584e",
+    "infra_head": "049c1294fecdc60a29bc944e82b19a5ad11661c8",
+    "reports": [
+      {
+        "artifact": "/tmp/m3-t14-native-949/rocketmq-qs-command-0-1.25.12-4871d2b16ee8666d292159b61de293ded6e209ac/rocketmq-qs-command.json",
+        "sha256": "4fd70ba139c09097e09bc2cce7aa400cd92b694a52234efeda24b84ab9b3371d",
+        "mysql_version": "8.0.36",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "native_receipt": {
+          "cases": {
+            "aborted_duplicate_never_reexecutes": true,
+            "constructor_no_ddl": true,
+            "first_wire_authenticated_and_reused": true,
+            "fresh_adapter_exact_witness": true,
+            "half_invisible_before_root_commit": true,
+            "held_predecessor_before_half": true,
+            "missing_order_schema_refused": true,
+            "no_new_command_outbox": true,
+            "nonempty_legacy_operation_compatible": true,
+            "operation_and_payload_scoped": true,
+            "original_business_archive_witness_atomic": true,
+            "predecessor_pending_before_half": true,
+            "real_server_rejection_root_rollback": true,
+            "stable_input_conflict_before_reseal": true,
+            "workflow_and_evaluation_original_entrypoints": true
+          },
+          "database_commit_network_fault_not_claimed": true,
+          "failed": 0,
+          "paired_ai_receiver_not_claimed": true,
+          "passed": 15,
+          "process_exit_not_claimed": true,
+          "root": "original_mysql_sql",
+          "skipped": 0,
+          "system_login_not_claimed": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "/tmp/m3-t14-native-949/rocketmq-qs-command-1-1.25.12-4871d2b16ee8666d292159b61de293ded6e209ac/rocketmq-qs-command.json",
+        "sha256": "b6efa2590bbc95a6b7116caf0984a6610d47ab9b1badba1dff148deae43ded63",
+        "mysql_version": "8.0.44",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "native_receipt": {
+          "cases": {
+            "aborted_duplicate_never_reexecutes": true,
+            "constructor_no_ddl": true,
+            "first_wire_authenticated_and_reused": true,
+            "fresh_adapter_exact_witness": true,
+            "half_invisible_before_root_commit": true,
+            "held_predecessor_before_half": true,
+            "missing_order_schema_refused": true,
+            "no_new_command_outbox": true,
+            "nonempty_legacy_operation_compatible": true,
+            "operation_and_payload_scoped": true,
+            "original_business_archive_witness_atomic": true,
+            "predecessor_pending_before_half": true,
+            "real_server_rejection_root_rollback": true,
+            "stable_input_conflict_before_reseal": true,
+            "workflow_and_evaluation_original_entrypoints": true
+          },
+          "database_commit_network_fault_not_claimed": true,
+          "failed": 0,
+          "paired_ai_receiver_not_claimed": true,
+          "passed": 15,
+          "process_exit_not_claimed": true,
+          "root": "original_mysql_sql",
+          "skipped": 0,
+          "system_login_not_claimed": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "/tmp/m3-t14-native-949/rocketmq-qs-command-2-1.25.12-4871d2b16ee8666d292159b61de293ded6e209ac/rocketmq-qs-command.json",
+        "sha256": "84cf98e6fa2d3aa27950d96a13393f018a1cf79154780bc967893074dd464381",
+        "mysql_version": "8.4.11",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "native_receipt": {
+          "cases": {
+            "aborted_duplicate_never_reexecutes": true,
+            "constructor_no_ddl": true,
+            "first_wire_authenticated_and_reused": true,
+            "fresh_adapter_exact_witness": true,
+            "half_invisible_before_root_commit": true,
+            "held_predecessor_before_half": true,
+            "missing_order_schema_refused": true,
+            "no_new_command_outbox": true,
+            "nonempty_legacy_operation_compatible": true,
+            "operation_and_payload_scoped": true,
+            "original_business_archive_witness_atomic": true,
+            "predecessor_pending_before_half": true,
+            "real_server_rejection_root_rollback": true,
+            "stable_input_conflict_before_reseal": true,
+            "workflow_and_evaluation_original_entrypoints": true
+          },
+          "database_commit_network_fault_not_claimed": true,
+          "failed": 0,
+          "paired_ai_receiver_not_claimed": true,
+          "passed": 15,
+          "process_exit_not_claimed": true,
+          "root": "original_mysql_sql",
+          "skipped": 0,
+          "system_login_not_claimed": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "scope": "actual original SQL command store and real Broker, controlled receipts, observer ACK; not the later Participant planned-start public accessor proof or production/system"
+  },
+  "final_native_run": "https://github.com/FangcunMount/infra/actions/runs/39489959158",
+  "final_native": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39489959158",
+    "source_sha": "3dd33af4fc86d03fc80545276f18d0fef862f376",
+    "infra_head": "3a1b0ba2e195c1404ceee3a836d6c4b611896002",
+    "versions": [
+      "8.0.36",
+      "8.0.44",
+      "8.4.11"
+    ],
+    "reports": [
+      {
+        "artifact": "/tmp/m3-t14-native-3dd/rocketmq-qs-command-0-1.25.12-59cea8e95f10186b630f537fa054fb7a04ca5b18/rocketmq-qs-command.json",
+        "sha256": "229728cc256b0e62640954f57909ff2d286c3621ee2b037627f73c17c82346e4",
+        "mysql_version": "8.0.36",
+        "image": "sha256:0ff30023e92da49e95e110d2a687a4573869d5b232405a5e353c0415da932865",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        },
+        "effective_broker_parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "host_proof": {
+          "source_sha": "3dd33af4fc86d03fc80545276f18d0fef862f376",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "provision": {
+            "version": 2,
+            "operations": 7,
+            "typed_topics": 1,
+            "principals": 2,
+            "verified": true
+          },
+          "private_output_sha256": "c64ace43a119badee4b26843cd992125347c6eda98787e3ed637a0670b343a91",
+          "exit_code": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [],
+            "assertion_lines": [
+              353
+            ]
+          },
+          "native_receipt": {
+            "cases": {
+              "aborted_duplicate_never_reexecutes": true,
+              "constructor_no_ddl": true,
+              "first_wire_authenticated_and_reused": true,
+              "fresh_adapter_exact_witness": true,
+              "half_invisible_before_root_commit": true,
+              "held_predecessor_before_half": true,
+              "missing_order_schema_refused": true,
+              "no_new_command_outbox": true,
+              "nonempty_legacy_operation_compatible": true,
+              "operation_and_payload_scoped": true,
+              "original_business_archive_witness_atomic": true,
+              "predecessor_pending_before_half": true,
+              "real_server_rejection_root_rollback": true,
+              "stable_input_conflict_before_reseal": true,
+              "workflow_and_evaluation_original_entrypoints": true
+            },
+            "database_commit_network_fault_not_claimed": true,
+            "failed": 0,
+            "paired_ai_receiver_not_claimed": true,
+            "passed": 15,
+            "process_exit_not_claimed": true,
+            "root": "original_mysql_sql",
+            "skipped": 0,
+            "system_login_not_claimed": true
+          },
+          "source_clean_after": true,
+          "scope": "actual command entrypoints, original SQL roots and real Broker; controlled predecessor receipts, observer ACK only"
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "/tmp/m3-t14-native-3dd/rocketmq-qs-command-1-1.25.12-59cea8e95f10186b630f537fa054fb7a04ca5b18/rocketmq-qs-command.json",
+        "sha256": "941c5a4994ed8ec920f93cb36f38f1f92e061088e4bfb2a89f5c62abb2446430",
+        "mysql_version": "8.0.44",
+        "image": "sha256:af40fd5c7da3d3d17b3df0b80fcd7bf4d17fe2ac803c586151bbc6df2617d829",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        },
+        "effective_broker_parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "host_proof": {
+          "source_sha": "3dd33af4fc86d03fc80545276f18d0fef862f376",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "provision": {
+            "version": 2,
+            "operations": 7,
+            "typed_topics": 1,
+            "principals": 2,
+            "verified": true
+          },
+          "private_output_sha256": "72b21c41ac6a43e9809b97a03f2b624c3a9ff35eb29d817737586679b62f568b",
+          "exit_code": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [],
+            "assertion_lines": [
+              353
+            ]
+          },
+          "native_receipt": {
+            "cases": {
+              "aborted_duplicate_never_reexecutes": true,
+              "constructor_no_ddl": true,
+              "first_wire_authenticated_and_reused": true,
+              "fresh_adapter_exact_witness": true,
+              "half_invisible_before_root_commit": true,
+              "held_predecessor_before_half": true,
+              "missing_order_schema_refused": true,
+              "no_new_command_outbox": true,
+              "nonempty_legacy_operation_compatible": true,
+              "operation_and_payload_scoped": true,
+              "original_business_archive_witness_atomic": true,
+              "predecessor_pending_before_half": true,
+              "real_server_rejection_root_rollback": true,
+              "stable_input_conflict_before_reseal": true,
+              "workflow_and_evaluation_original_entrypoints": true
+            },
+            "database_commit_network_fault_not_claimed": true,
+            "failed": 0,
+            "paired_ai_receiver_not_claimed": true,
+            "passed": 15,
+            "process_exit_not_claimed": true,
+            "root": "original_mysql_sql",
+            "skipped": 0,
+            "system_login_not_claimed": true
+          },
+          "source_clean_after": true,
+          "scope": "actual command entrypoints, original SQL roots and real Broker; controlled predecessor receipts, observer ACK only"
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "/tmp/m3-t14-native-3dd/rocketmq-qs-command-2-1.25.12-59cea8e95f10186b630f537fa054fb7a04ca5b18/rocketmq-qs-command.json",
+        "sha256": "58c81657a3b158245e8b5ef53bfe02b2bca773f0fc63d99f362998c68c923574",
+        "mysql_version": "8.4.11",
+        "image": "sha256:8b18d67c6b6fcded1e348adca2478da8a2a35505920a1aec121aa35bd2d51dbe",
+        "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        },
+        "effective_broker_parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "host_proof": {
+          "source_sha": "3dd33af4fc86d03fc80545276f18d0fef862f376",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "provision": {
+            "version": 2,
+            "operations": 7,
+            "typed_topics": 1,
+            "principals": 2,
+            "verified": true
+          },
+          "private_output_sha256": "3ca02df110fd9746c60887d1ea212cc4d307c3beb44d023077fe15a484c7bf16",
+          "exit_code": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [],
+            "assertion_lines": [
+              353
+            ]
+          },
+          "native_receipt": {
+            "cases": {
+              "aborted_duplicate_never_reexecutes": true,
+              "constructor_no_ddl": true,
+              "first_wire_authenticated_and_reused": true,
+              "fresh_adapter_exact_witness": true,
+              "half_invisible_before_root_commit": true,
+              "held_predecessor_before_half": true,
+              "missing_order_schema_refused": true,
+              "no_new_command_outbox": true,
+              "nonempty_legacy_operation_compatible": true,
+              "operation_and_payload_scoped": true,
+              "original_business_archive_witness_atomic": true,
+              "predecessor_pending_before_half": true,
+              "real_server_rejection_root_rollback": true,
+              "stable_input_conflict_before_reseal": true,
+              "workflow_and_evaluation_original_entrypoints": true
+            },
+            "database_commit_network_fault_not_claimed": true,
+            "failed": 0,
+            "paired_ai_receiver_not_claimed": true,
+            "passed": 15,
+            "process_exit_not_claimed": true,
+            "root": "original_mysql_sql",
+            "skipped": 0,
+            "system_login_not_claimed": true
+          },
+          "source_clean_after": true,
+          "scope": "actual command entrypoints, original SQL roots and real Broker; controlled predecessor receipts, observer ACK only"
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "scope": "actual QS command storage and Participant pending/frozen-repeat entrypoints, original SQL roots and Broker; report snapshot/current access/AI receipts supplied by fixtures; observer ACK only, no paired AI/system/process-exit or production claim"
+  },
+  "source_merged": {
+    "pr": "https://github.com/FangcunMount/qs-server/pull/418",
+    "head": "3dd33af4fc86d03fc80545276f18d0fef862f376",
+    "merge_sha": "0ed41ea5cf5f53d2953150739112811836fef8e2",
+    "merged_at": "2026-10-20T20:29:02Z",
+    "production_deploy_paused_verified_before_merge": true
+  },
+  "completed_at": "2026-10-20T20:38:28Z",
+  "infra_merged": {
+    "pr": "https://github.com/FangcunMount/infra/pull/68",
+    "head": "3a1b0ba2e195c1404ceee3a836d6c4b611896002",
+    "merge_sha": "53d18bb5d2c3c7dc136a28d0cc1f60de750b27b7",
+    "merged_at": "2026-10-20T20:38:28Z",
+    "current_head_checks": 25,
+    "success": 25,
+    "failed": 0,
+    "skipped": 0,
+    "checks_snapshot_sha256": "233f9bbe3a5d9d7479827491e77dd0f379160b799bf4da5c07ca3d5304b0fcde"
+  },
+  "recorded_followups": [
+    "T15 actual incoming Inbox/projection/first ACK transactions and paired receipt consumption",
+    "T22 process-wide owner Start/Close, complete Topic registration and archive-aware runtime diagnostics",
+    "T23 real process exit and packet/database commit faults",
+    "T25 legacy responsibility/cutover/recovery tools",
+    "T26 stable API review; T30+ production prerequisites, T33 legal system login and T34 real48h observation"
+  ]
 }
