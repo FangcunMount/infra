@@ -21,11 +21,11 @@
   },
   "implementation_started": true,
   "production_changed": false,
-  "source_head": "2b84bd697caa9d98c7c5d9f75e2111418a8baaef",
-  "source_implementation": "ab43d2fbcc6b826ea0e72bef2cf2b7f37f95bef8",
+  "source_head": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
+  "source_implementation": "1f1454a46aec7b42574fef517fb9111670591ab2",
   "source_pr": "https://github.com/FangcunMount/qs-server/pull/415",
   "infra_pr": "https://github.com/FangcunMount/infra/pull/54",
-  "infra_harness_sha": "787d61e7d04680d53f9396ef20a6bae5d7653fde",
+  "infra_harness_sha": "56eed1b1bece4e00718482949600c0c8ef6b0a8d",
   "target_race": {
     "passed": 229,
     "failed": 0,
@@ -40,14 +40,21 @@
   },
   "native_gate": {
     "status": "queued",
-    "run": "https://github.com/FangcunMount/infra/actions/runs/39437289899",
-    "expected_cases": 11,
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39439182533",
+    "source_sha": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
+    "harness_sha": "56eed1b1bece4e00718482949600c0c8ef6b0a8d",
+    "expected_cases": 14,
     "required_zero_skip": true
   },
-  "source_full_race": "running",
-  "pending_findings": [
-    "New frozen opening truncates task business clocks while existing reminder eligibility mirrors MySQL microsecond/millisecond rounding. Correct and test half-millisecond boundaries before task closure."
-  ],
+  "source_full_race": {
+    "source_sha": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
+    "passed": 7081,
+    "failed": 0,
+    "optional_skipped": 60,
+    "report": "/tmp/m3-t12-2626-full-source-race.jsonl",
+    "sha256": "3116a273dd83a85d7142ea8b9a1db5eb4256c5a17361829666b4d387faea0537"
+  },
+  "pending_findings": [],
   "implemented": [
     "frozen first entry and wire with stable input hash",
     "original pending/schedule_revision CAS and shared qs.mysql guard/witness",
@@ -61,5 +68,56 @@
     "artifact_release": false,
     "production_deploy": false,
     "system_business_acceptance": false
-  }
+  },
+  "prior_full_source_reports": [
+    {
+      "source_sha": "2b84bd697caa9d98c7c5d9f75e2111418a8baaef",
+      "passed": 7075,
+      "failed": 0,
+      "optional_skipped": 60,
+      "sha256": "26ab26a64213b3fd541eae86be314fe321a5d14f168915f56c91a1235f541323"
+    },
+    {
+      "source_sha": "de2e3379aa47b68677ccf32eb91f007cd2219d43",
+      "passed": 7081,
+      "failed": 0,
+      "optional_skipped": 60,
+      "sha256": "e8bfb9e422e84ad9bf288cddd9dde5ce54d12527b5d0d4b2974ee762f0c77bea"
+    }
+  ],
+  "clock_compatibility": {
+    "source_fix": "c0f39d422daf78471290ca6459ab2239ef44e380",
+    "red_report": "/tmp/m3-t12-clock-red.log",
+    "red": "4 of 5 boundary data points reproduce opening_changed with truncation",
+    "green": {
+      "passed": 146,
+      "failed": 0,
+      "skipped": 0,
+      "report": "/tmp/m3-t12-clock-green.jsonl"
+    },
+    "behavior": "Mirror unchanged original reminder policy: microsecond parse then millisecond rounding; first wire keeps its original precision."
+  },
+  "finding_history": [
+    "Truncation disagreed with existing reminder MySQL rounding. Reproduced before fix, corrected and tested without modifying reminder policy."
+  ],
+  "first_native": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39437289899",
+    "source_sha": "2b84bd697caa9d98c7c5d9f75e2111418a8baaef",
+    "harness_sha": "787d61e7d04680d53f9396ef20a6bae5d7653fde",
+    "mysql80": {
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "sha256": "fa92eb2313cb851964563327e22c582515035c6c40f7c774077799e17489003c"
+    },
+    "mysql84": {
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "sha256": "ae9262bea08fd368f268fd3ddb4b192f0e1399a978c208b01333f8dcc2cefc4e"
+    },
+    "all_cleanup_complete": true,
+    "does_not_cover_final_precision_and_post_write_abort_cases": true
+  },
+  "production_cd_pause_readback": true
 }
