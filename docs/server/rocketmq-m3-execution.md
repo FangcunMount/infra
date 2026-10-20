@@ -130,7 +130,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 2026-10-20；冻结首次入口/wire、原pending/revision CAS+witness、归属原根再校验、关闭新提醒仍保留旧执行恢复。最终f37afca0/infra c27ef043双档各15项0失败/跳过，source race7087通过/60既有可选跳过；QS PR415/416及infra54/57全部合并，最终CI分别28成功/1不适用与9成功。[全部证据/失败历史](evidence/rocketmq-m3-qs-task-20261020.json)。生产未变更 |
 | ✅ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 2026-10-21；最终7e8aba25/fd985a122全仓race7198通过/60既有可选跳过、固定lint零问题；原库三档各44项、真实Broker三档各41项均0失败/跳过/无race且清理完整。QS当前头28项CI成功/1API同步不适用，PR417合并133fc073；infra22项CI全部成功，PR61合并d4324a87。[完整证据与失败历史](evidence/rocketmq-m3-qs-retry-20261021.json)。生产未变更 |
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
-| ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 进行中；首批源码21c139676冻结入站事件/首次ACK并借用原SQL guard，Inbox/投影/archive/witness共同提交；receipt新旧证据分流，单连接池证明无额外借用。相关race797通过/0失败/7项既有可选跳过、固定lint零问题，完整源码和真实依赖门禁仍待完成；未勾选 |
+| ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 进行中；最终4fed2b588/b1776025f全仓race7326通过/0失败/60既有可选跳过、完整lint零问题；相关799通过/7既有可选跳过，Prepared ACK正文回退红绿覆盖。QS PR419、infra PR72门禁及三档各17项真实Broker/MySQL验收运行中，未合并/未勾选。[进度与失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json) |
 | ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 待开始 |
 | ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 待开始 |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
@@ -382,3 +382,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-21：T13闭环并勾选，进度13/36，M3-2完成。最终fd985a122当前头28项CI成功、仅Docs/API同步不适用，最后真实数据库/runtime E2E完成；合并前生产CD回读true。QS PR417于2026-10-20T18:55:54Z按精确head合并133fc073，infra PR61当前头22项CI成功并已合并d4324a87。最终原库三档44项、Broker三档41项0失败/跳过，完整UTC race7198/固定lint/文档门禁及全部清理/失败历史核对完成；完整closure索引不重绑定历史报告。按序进入T14，先保留原QS→AI聚合序列/首wire及业务receipt责任，再替换发布型Outbox。未发布稳定SDK、未执行生产DDL/provider/NSQ切换或system验收。
 
 - 2026-10-21：T15首批源码21c13967651e4c5c92fa93daaca41f439d52fcd7保存于独立qs-ai-events工作区：冻结原入站wire及首次ACK身份/时间/Seal；共享qs.mysql原根guard先于Inbox/投影/ACK档案与witness；真实commit回复不明保持Unknown。新receipt借用原连接核对精确archive/witness，真实历史缺席才沿用旧Outbox结算；新事务路径不启动旧command/ACK Relay，保持订阅在途预算1。单元race797通过/0失败/7项既有可选依赖跳过，固定lint2.5零问题；infra新增脚本62项单测通过，完整race及三档真实Broker/MySQL验证尚待完成，T15不勾选、总计14/36。历史Inbox不重包装为新事务证明，原责任留待交接门禁；本批不计为AI成对、网络提交故障、system或生产验收。
+
+- 2026-10-21：T15最终候选4fed2b588b9d16c11e76304edb3d9762f1a7933f（实现b1776025f）已提交QS PR419；infra137c5465维护PR72，三档17项真实Broker/MySQL门禁39498223478运行中。独立冻结工作区完整UTC race7326通过/0失败/60既有可选依赖跳过，完整固定lint2.5零问题；相关包799通过/7既有可选跳过，87文档自测/hygiene/facts及62项infra自测通过。Prepared ACK的幂等键属于入站事件，已用有界精确分支足迹补齐其历史Payload回退保护；故意红回归及初始protobuf夹具编译失败均保留。组合integration标签lint六项既有fixture清理errcheck提示另列，不冒称整个历史集成标签lint无问题；本批新增代码lint零问题。两PR尚未合并，T15保持进行中、14/36。生产CD回读暂停true，未发布稳定SDK、未操作生产或system验收。

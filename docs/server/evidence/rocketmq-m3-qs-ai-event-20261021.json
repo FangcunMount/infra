@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "task": "M3-T15",
+  "status": "in_progress",
+  "progress": {
+    "completed": 14,
+    "total": 36,
+    "task_checked": false
+  },
+  "candidate": {
+    "qs_head": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+    "qs_implementation": "b1776025fe5d4448469f2d9b33f4f0eff78bf72d",
+    "qs_pr": "https://github.com/FangcunMount/qs-server/pull/419",
+    "infra_head": "137c5465db77a3865b819459477592e2d91766cf",
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/72",
+    "source_merged": false,
+    "harness_merged": false
+  },
+  "local_validation": {
+    "source_head": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+    "full_race": {
+      "passed": 7326,
+      "failed": 0,
+      "skipped": 60,
+      "skip_scope": "existing optional dependencies; not native required profile",
+      "path": "/tmp/m3-t15-final-full-source-race.jsonl",
+      "sha256": "b686139af29e798664d5cf603c3b12b8abd4189712ec25e388f76683b4bade2c",
+      "mode": "0o600"
+    },
+    "full_default_lint": {
+      "issues": 0,
+      "version": "2.5.0",
+      "path": "/tmp/m3-t15-final-full-source-lint.log",
+      "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
+      "mode": "0o600"
+    },
+    "target_race": {
+      "passed": 799,
+      "failed": 0,
+      "skipped": 7,
+      "path": "/tmp/m3-t15-prepared-ack-green-race.jsonl",
+      "sha256": "ba4939300107091b13526f1951619444257b89a4f8900967af885daef20ed288",
+      "mode": "0o600"
+    },
+    "native_compile": {
+      "status": "passed_compile_only",
+      "path": "/tmp/m3-t15-native-final-compile.log",
+      "sha256": "57b04e61a040f5a0145417fa80b2e3f910e2b1ba667bb4075cdf3c6a906cbd3c",
+      "mode": "0o600"
+    },
+    "native_changed_code_lint": {
+      "issues": 0,
+      "version": "2.5.0",
+      "scope": "new-from-rev=0ed41ea5cf5f53d2953150739112811836fef8e2; existing integration fixtures retain six unchecked cleanup warnings",
+      "path": "/tmp/m3-t15-final-native-changed-lint.log",
+      "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
+      "mode": "0o600"
+    },
+    "docs": {
+      "self_tests": 87,
+      "hygiene": true,
+      "facts": true,
+      "path": "/tmp/m3-t15-docs.log",
+      "sha256": "495431072055d352d58b6a1db5f23efbc9b4f36ff270c9d13419125c976add4b",
+      "mode": "0o600"
+    },
+    "infra_unit": {
+      "passed": 62,
+      "failed": 0,
+      "path": "/tmp/m3-t15-infra-unit-final.log",
+      "sha256": "1d5d6bc9cd13ec282e7796f70ef8aafd789263d048529f5d6e129305bf0ad18b",
+      "mode": "0o600"
+    }
+  },
+  "required_native": {
+    "status": "in_progress",
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39498223478",
+    "source_sha": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+    "mysql": [
+      "8.0.36",
+      "8.0.44",
+      "8.4.11"
+    ],
+    "required_cases_per_job": 17,
+    "broker": "5.5.1",
+    "sdk_go": "v0.5.0-rocketmq-tx.2",
+    "report_verified": false
+  },
+  "retained_history": [
+    {
+      "kind": "initial unit fixture used wrong protobuf type; corrected to StateEvent",
+      "path": "/tmp/m3-t15-frozen-event-race.jsonl",
+      "sha256": "af078d9d03a415ff554c50c42271b35675de8bf7da68389ba3934fc99c2d0f85",
+      "mode": "0o600"
+    },
+    {
+      "kind": "intentional red regression: Prepared ACK permitted absent-command historical fallback",
+      "path": "/tmp/m3-t15-prepared-ack-payload-red.log",
+      "sha256": "5dc4e836452f64e3b46849f4dc16672ecaaa41b0092acde61d9bcf1854e4b0a9",
+      "mode": "0o600"
+    },
+    {
+      "kind": "combined integration-tag lint reports six unchanged legacy fixture cleanup errcheck warnings; no new source diagnostics",
+      "path": "/tmp/m3-t15-native-lint.log",
+      "sha256": "37ace1b274ae664bd94f8683c3b424f44c47653f99198868e3c51c5dfa674f42",
+      "mode": "0o600"
+    }
+  ],
+  "boundaries": {
+    "production_changes": false,
+    "production_cd_last_readback": "true (paused)",
+    "stable_sdk_release": false,
+    "paired_ai_producer_acceptance": false,
+    "model_invocation_proof": false,
+    "database_commit_network_fault": false,
+    "process_exit": false,
+    "system_login": false,
+    "observation_48h": false
+  },
+  "notes": [
+    "Same original SQL root: SDK guard before Inbox/projection/first ACK archive/witness; no Seal/MQ I/O inside root.",
+    "Only exact Aborted with a current authenticated consumer delivery permits explicit Retry/Replan. Unknown never authorizes business retry.",
+    "Receipt settlement uses the same root connection; one-slot unit proof. New commands need exact archive/witness, true historical commands retain Outbox settlement.",
+    "Prepared ACK historical Payload fallback now guarded by exact owner/branch footprint, bounded by server1s and client2s.",
+    "Selected transaction event runtime creates no legacy command/ACK Relay; old Inbox responsibility is retained and not adopted as a new witness.",
+    "Native controlled signed AI inputs and observer ACK only. Real paired AI flow, SIGKILL, packet commit faults, production and system acceptance remain later tasks."
+  ]
+}
