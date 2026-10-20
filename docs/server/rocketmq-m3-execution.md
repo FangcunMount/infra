@@ -295,3 +295,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：ce2f5a124固定Mac mini隔离Broker5.5.1/MySQL8.4.11真实模块9项全部通过，0失败/0跳过/无race，原始报告b8eb3246及private输出摘要已核对、临时资源完整清理。失败验收通过Module.WorkerService进入原失败流程，证明Assessment/Run/witness原根提交、future原due/授权/wire保留，以及重复投递不增加输入调用/attempt；不冒称模型调用、SIGKILL、网络故障、system或T13调度交接。缓存契约文档未同步导致一次docs事实拒绝，现已阅读修订并验证87项自测/hygiene/facts通过；固定lint2.5零问题。最终36aa0741f相对该测试源码仅变更缓存说明与验证标记，PR412及infra49固定该候选执行当前头云端门禁，仍9/36不提前勾选，生产CD回读true。
 
 - 2026-10-20：T11 前置源码核对发现初始规划/T02清单的报告 owner 标记偏差：实际36aa0741f模块使用 Mongo Generation/Run/Report/CatalogProjector 及 NewMongoRunner（start/commit/retry），并非 MySQL 原事务。按已批准“借用原业务根事务、业务与witness同库提交”约束，报告生成/失败及未来报告retry dispatch修正为qs.mongo；评分仍qs.mysql。不追加存储迁移、不改四owner或36项总数，原错误保留为执行偏差记录；T11/T13未实现，不提前勾选。责任清单同步修订；[源码预核对证据](evidence/rocketmq-m3-report-preflight-20261020.json)。
+
+- 2026-10-20：真实Broker云端39410103140固定36aa0741f，MySQL8.0.36及8.4.11两档各9项全部通过，0失败/0跳过/无race，下载报告38a4799f、fb6ddb9f及完整清理回执已核对。源码全仓39410100401出现两个新增单元断言失败：time.Local与JSON恢复time.UTC表示同一时刻但结构不同，已保留日志摘要并本地TZ=UTC复现；25501aac7仅修订两个单元测试，精确比较时间点及全部非时间重试字段，新增UTC/东8/西5时区覆盖，UTC和Asia/Shanghai包race及固定lint2.5通过。生产/原生夹具/依赖源码相对36aa完全相同，不重标原生报告SHA；完整UTC源码race与当前头CI继续，T10仍未勾选。

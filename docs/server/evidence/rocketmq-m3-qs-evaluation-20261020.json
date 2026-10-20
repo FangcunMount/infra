@@ -280,6 +280,16 @@
         }
       ],
       "source_failure_preserved": true
+    },
+    {
+      "run": "https://github.com/FangcunMount/qs-server/actions/runs/39410100401/job/118585474803",
+      "source": "36aa0741f05f75d2e100db2e123bb338370454fe",
+      "scope": "ordinary source tests on UTC runner",
+      "reason": "new tests compared time.Local versus decoded time.UTC object identity instead of exact instant; two unit assertions failed",
+      "resolution": "reproduced locally TZ=UTC, strict instant assertions and independent UTC/east/west cases added; package race passed UTC and Asia/Shanghai, fixed lint2.5 passed; full fixed-source UTC race/current CI pending",
+      "private_log_sha256": "4a99db07e3b685f3f391f0be42c2b63e6beee18f724fc2f11a9e23bb4e108093",
+      "source_failure_preserved": true,
+      "production_code_changed_by_fix": false
     }
   ],
   "lint": {
@@ -510,6 +520,112 @@
       "unit_passed": 87,
       "hygiene": "passed",
       "facts": "passed after re-reading and updating changed cache contract; initial aligned-source-changed rejection retained"
-    }
+    },
+    "cloud_native": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39410103140",
+      "infra_source": "aff3dd3",
+      "reports": [
+        {
+          "artifact": "rocketmq-qs-evaluation-1-1.25.12-e3545edbc255708f6aa3a3bbd19f3689d2a76b30",
+          "source": "36aa0741f05f75d2e100db2e123bb338370454fe",
+          "mysql": "8.4.11",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "38a4799f126fc829f733076cfa5415f993121070aa4747412f0d1cabf4dc4354",
+          "private_output_sha256": "c08bba9c889792a6d2158689fca119ede8c0e7ac393c2dcaf635434ba7246ed4",
+          "receipt": {
+            "broker": "actual_5.5.1",
+            "cases": {
+              "closed_admission_no_business": true,
+              "constructor_no_ddl": true,
+              "exact_frozen_result_recovery": true,
+              "half_hidden_until_original_outcome_root": true,
+              "request_cas_wire_and_witness": true,
+              "request_duplicate_first_wire": true,
+              "failure_original_root_and_witness": true,
+              "failure_redelivery_no_extra_attempt_or_input_call": true,
+              "future_retry_retains_due_authorization_and_wire": true
+            },
+            "failed": 0,
+            "passed": 9,
+            "process_exit_not_claimed": true,
+            "root": "original_mysql_gorm",
+            "skipped": 0,
+            "source_input": "deterministic_fixture_not_system_account",
+            "failure_entry": {
+              "cases": {
+                "failure_original_root_and_witness": true,
+                "failure_redelivery_no_extra_attempt_or_input_call": true,
+                "future_retry_retains_due_authorization_and_wire": true
+              },
+              "failed": 0,
+              "passed": 3,
+              "process_exit_not_claimed": true,
+              "root": "original_mysql_gorm",
+              "skipped": 0,
+              "source_input": "controlled_input_failure_no_provider"
+            }
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "artifact": "rocketmq-qs-evaluation-0-1.25.12-e3545edbc255708f6aa3a3bbd19f3689d2a76b30",
+          "source": "36aa0741f05f75d2e100db2e123bb338370454fe",
+          "mysql": "8.0.36",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "fb6ddb9f88f652b4e33c1de63bed8d778a586b30b7dbc3eab699250a2297246e",
+          "private_output_sha256": "9f4b9685e7483fc271662eea13213c84d817998ee8a145617854c04ae5b02852",
+          "receipt": {
+            "broker": "actual_5.5.1",
+            "cases": {
+              "closed_admission_no_business": true,
+              "constructor_no_ddl": true,
+              "exact_frozen_result_recovery": true,
+              "half_hidden_until_original_outcome_root": true,
+              "request_cas_wire_and_witness": true,
+              "request_duplicate_first_wire": true,
+              "failure_original_root_and_witness": true,
+              "failure_redelivery_no_extra_attempt_or_input_call": true,
+              "future_retry_retains_due_authorization_and_wire": true
+            },
+            "failed": 0,
+            "passed": 9,
+            "process_exit_not_claimed": true,
+            "root": "original_mysql_gorm",
+            "skipped": 0,
+            "source_input": "deterministic_fixture_not_system_account",
+            "failure_entry": {
+              "cases": {
+                "failure_original_root_and_witness": true,
+                "failure_redelivery_no_extra_attempt_or_input_call": true,
+                "future_retry_retains_due_authorization_and_wire": true
+              },
+              "failed": 0,
+              "passed": 3,
+              "process_exit_not_claimed": true,
+              "root": "original_mysql_gorm",
+              "skipped": 0,
+              "source_input": "controlled_input_failure_no_provider"
+            }
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ]
+    },
+    "unit_timezone_fix_source": "25501aac7d00aa0cda719980758055ed447ca7fc",
+    "native_equivalence": "diff from native tested 36aa0741f to 25501aac7 consists only of two evaluationfailure unit test files; production/native fixture/Go dependency bytes unchanged; old receipts keep actual source"
   }
 }
