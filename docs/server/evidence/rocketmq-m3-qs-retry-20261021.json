@@ -55,12 +55,9 @@
     "canonical prepared QS domain wire input to shared transaction plan; no wire reconstruction"
   ],
   "remaining": [
-    "real MySQL/Mongo commit/rollback and race acceptance",
-    "original failure/manual authorization writers",
-    "due dispatcher, original SDK guard and witness",
-    "explicit aborted execution retry authorization",
-    "old future responsibility handoff and Replay/governance boundaries",
-    "full exact-source CI, PRs and merges"
+    "corrected final44-case status and handoff matrix",
+    "final41-case real Broker recovery matrix",
+    "final exact-head complete CI and source/harness merges"
   ],
   "production_changed": false,
   "business_acceptance": false,
@@ -86,7 +83,7 @@
     "infra_harness": "52 tests passed",
     "native_databases": "pending CI; not claimed"
   },
-  "scope": "T13 partial: frozen first plan, dual-store original Run atomicity passed atc1e6a137; due-dispatch core source tests passed. Active V2 automatic writes, real Broker due dispatch, manual/force/pause, explicit aborted retries and handoff remain in progress; no production/system acceptance.",
+  "scope": "T13 in progress; storage, governed roots and explicit untouched-future transfer passed in real isolated dependency matrices; explicit Broker recovery and final status-reader scope remain unverified; no production/system/provider acceptance",
   "storage_native_failure_history": [
     {
       "run": "https://github.com/FangcunMount/infra/actions/runs/39457187250",
@@ -213,8 +210,8 @@
     "known_test_build_fix": "fixture initially accessed Result.Final; corrected to per-branch Result.Branches[0].Final, preserving failed report",
     "docs": "87 selftests, hygiene and facts passed at9e18668b"
   },
-  "current_source_sha": "c6654eeb9f6c5c54806f89470126f9943912822b",
-  "current_candidate_sha": "130184912524caae0f8d5cfbf830f49ca5104620",
+  "current_source_sha": "5ed29545a4c59856e3c297cd7168add1471705ce",
+  "current_candidate_sha": "de6289e46c45cbb321b6638b93885bfebe050912",
   "source_pr": "https://github.com/FangcunMount/qs-server/pull/417",
   "infra_pr": "https://github.com/FangcunMount/infra/pull/61",
   "storage_native_passed": {
@@ -440,5 +437,661 @@
     "candidate_sha": "130184912524caae0f8d5cfbf830f49ca5104620",
     "native_gate": "prepared:15 named cases per backend/30 per matrix; pending real CI",
     "docs": "87 selftests plus hygiene/facts passed atc6654eeb9"
+  },
+  "governed_native_failure_history": [
+    {
+      "mysql": "8.0.36",
+      "source_sha": "130184912524caae0f8d5cfbf830f49ca5104620",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39469858549",
+      "report_sha256": "4e4090b361ec4c0f46b332f1c89327c94670bfb3513255dd3f133cbd0a92869c",
+      "result": "failed",
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3RetryMySQLStore"
+        ],
+        "assertion_lines": [
+          202,
+          330
+        ]
+      },
+      "private_output_sha256": "b8252d8f6a3054bbcca7ec0b0e18b855356f634472cc7c0d0aa0737d97653dd7",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "mysql": "8.0.44",
+      "source_sha": "130184912524caae0f8d5cfbf830f49ca5104620",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39469858549",
+      "report_sha256": "fa475f8df08e195f34d3abc811b881de725ba14d4f4345f923c9f2226a9f9965",
+      "result": "failed",
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3RetryMySQLStore"
+        ],
+        "assertion_lines": [
+          202,
+          330
+        ]
+      },
+      "private_output_sha256": "40368683ab515823dbe716c70be77945d45c442d2e7d4d2bf8ab422e343d88de",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "mysql": "8.4.11",
+      "source_sha": "130184912524caae0f8d5cfbf830f49ca5104620",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39469858549",
+      "report_sha256": "ca31aa3b4ecfa97564dbdf7130ae984a7eaa573308ef2d27d83c76f111b91d22",
+      "result": "failed",
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3RetryMySQLStore"
+        ],
+        "assertion_lines": [
+          202,
+          330
+        ]
+      },
+      "private_output_sha256": "edacedf7668ad780e932e4d619facaf00bda1fc7d20ee86db81dbc0064231969",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    }
+  ],
+  "governed_native_current_status": "passed on corrected3b465b52; initial fixture insert error preserved separately",
+  "explicit_dispatch_recovery_draft": {
+    "status": "sourcef33923b88 and docs3b465b52 committed, pushed; native41-case-per-version gate in progress",
+    "local_contracts": {
+      "passed": 30,
+      "failed": 0,
+      "skipped": 0,
+      "report": "/tmp/m3-t13-aborted-retry-contracts-race.jsonl",
+      "sha256": "0d056cd5484ac921a10fa4042e4a567a4d88e716ffed2ce25a0d09b5043fad29"
+    },
+    "native_compile": "passed; no tests run",
+    "pinned_scoped_lint": "passed 2.5.0",
+    "semantics": "explicit previous Aborted proof; unchanged plan and wire; new fence; retained old evidence; scan and Checker do not authorize protocol or business retries; automatic pause before reservation",
+    "full_source_race": {
+      "passed": 7166,
+      "failed": 0,
+      "skipped": 60,
+      "scope": "existing optional dependencies only; required native gate prohibits skips",
+      "report_sha256": "9d2ab8449fbbbb830b48cc245b108abae074394cc21d03e8f3b3c8b5d1282312"
+    }
+  },
+  "governed_native_passed": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39471075323",
+    "source_sha": "3b465b52c26a587f62278529a2cb87b82776eecb",
+    "reports": [
+      {
+        "mysql": "8.0.36",
+        "mongo": "7.0.37",
+        "source_sha": "3b465b52c26a587f62278529a2cb87b82776eecb",
+        "report_sha256": "30f66e19ca5bef284edbe33851cb2c15b68e0d67dfc1a91374cf9c689bdeaeab",
+        "private_output_sha256": "481a4dd3a09621a3994b4e6c2eb83366369b99eed50801438305644438d46687",
+        "cases_per_backend": 15,
+        "passed": 30,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "mysql": "8.0.44",
+        "mongo": "7.0.37",
+        "source_sha": "3b465b52c26a587f62278529a2cb87b82776eecb",
+        "report_sha256": "023381605896542f68d97ff8cf8c857c9e4281d4f6d660109cdf450a16d04a3e",
+        "private_output_sha256": "5e145b69f210650cfaeb5023a887bd6177fb7a0ff25aabdf675baf80067d2cdf",
+        "cases_per_backend": 15,
+        "passed": 30,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "mysql": "8.4.11",
+        "mongo": "7.0.37",
+        "source_sha": "3b465b52c26a587f62278529a2cb87b82776eecb",
+        "report_sha256": "9436a42f1c4f5b9b8be3d7608889d97e08d6604ca898eba8725a3eaf84f06818",
+        "private_output_sha256": "2d651135f3687acf2ea21669997bf0b491079cb65176f568401d0ea811c2aadc",
+        "cases_per_backend": 15,
+        "passed": 30,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      }
+    ],
+    "scope": "actual manual/force service entrypoints and original SQL/Mongo authorization roots; controlled root rollback and client commit-reply discard; no Broker retry, system, provider or production claim"
+  },
+  "handoff_native_passed": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39472161154",
+    "source_sha": "f5084f77e1941c6e41703b936bae5b9bb4195fab",
+    "reports": [
+      {
+        "mysql": "8.0.36",
+        "mongo": "7.0.37",
+        "source_sha": "f5084f77e1941c6e41703b936bae5b9bb4195fab",
+        "passed": 42,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "0b57adc199c6f697182aae7fa0c6cbddbeb89d4db8bbd1753675e5c56ff83558",
+        "private_output_sha256": "b65d1a0d9b5b8433d18a6b9d0f0d86b807d51c89cc5c99fef235246f4f03c486",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "mysql": "8.0.44",
+        "mongo": "7.0.37",
+        "source_sha": "f5084f77e1941c6e41703b936bae5b9bb4195fab",
+        "passed": 42,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "ce0b09bd3008b5ae02b488342dc7d3a7394229f86384da7703c877a108bd6b40",
+        "private_output_sha256": "c8473fac7066a7763694a09040a207c6a9f96ca7d6d4b0d0237caeac925b2b45",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "mysql": "8.4.11",
+        "mongo": "7.0.37",
+        "source_sha": "f5084f77e1941c6e41703b936bae5b9bb4195fab",
+        "passed": 42,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "f79bae88bbf6891f5ed16b46f65c482879428604bf20db95cb75301319088ad4",
+        "private_output_sha256": "9c148c92d87fb31e28d865ec628c3d19f3b0f887c29df7559a844b78d3c3f21f",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      }
+    ],
+    "scope": "real SQL/Mongo original-root transfer of an untouched future legacy row, rollback, first wire/deadline, duplicate, prior attempts/due refusal, old Relay and Replay refusal; no production tool or Broker delivery claim"
+  },
+  "explicit_recovery_native_failure_history": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39471083111",
+    "reports": [
+      {
+        "mysql": "8.0.36",
+        "source_sha": "3b465b52c26a587f62278529a2cb87b82776eecb",
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3FailureBrokerHost"
+          ],
+          "assertion_lines": [
+            306
+          ]
+        },
+        "report_sha256": "8a572fbc1283c7b75659ae2ed35180e60176d37b54cb90c79af711b43ffd63f2",
+        "private_output_sha256": "10f6c9f2bc52919805b6d79828cf819a7a928f1c57594d87bb4f77e720515d6b",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.0.44",
+        "source_sha": "3b465b52c26a587f62278529a2cb87b82776eecb",
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3FailureBrokerHost"
+          ],
+          "assertion_lines": [
+            306
+          ]
+        },
+        "report_sha256": "0e8ea2f8d56967fb59eec47d5e3213e5c2b14c4b1967bc0a27ccd5117b3158f5",
+        "private_output_sha256": "7faa900c1b2d3741f8353b8fe9c204b599f664cb5c04365dc4dafe00e6eec1d2",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.4.11",
+        "source_sha": "3b465b52c26a587f62278529a2cb87b82776eecb",
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3FailureBrokerHost"
+          ],
+          "assertion_lines": [
+            306
+          ]
+        },
+        "report_sha256": "7ac1463a6adac95b3b3bc173f12a725cc08fd57b23caff36c32c31d9ce89f52e",
+        "private_output_sha256": "66cdb2049b96efe438c683311bb1583db606785a4616bdaf81cbbd5515db1711",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "cause_from_source": "fixture assumed a local callback error immediately proved persisted Aborted; host correctly returned Unknown pending competing reconciliation",
+    "correction": "6d0eed9fc waits real lease then calls real protocol ReconcileOnce; history read through exact StoreChecker; separate actual SQL/Mongo build tags compiled",
+    "validation_gap": "previous synthetic m3_report_broker compile tag omitted the actual report-only helper profile; corrected to m3_report_integration; this was not a Mongo native pass",
+    "rerun": "https://github.com/FangcunMount/infra/actions/runs/39472781411",
+    "rerun_source": "5582e030892e2912be2f52aac123701630e7f672",
+    "rerun_status": "passed41perversion, exact reports recorded separately"
+  },
+  "handoff_full_source_race": {
+    "source_sha": "f5084f77e1941c6e41703b936bae5b9bb4195fab",
+    "timezone": "UTC",
+    "passed": 7197,
+    "failed": 0,
+    "skipped": 60,
+    "report_sha256": "04df9ed1bb2e10325882a64cec72996b6ccd0c8913c55686ef21685c21e7cec5",
+    "scope": "frozen independent validation checkout; existing optional dependency skips, not required native profile; does not cover later status-reader changes"
+  },
+  "task22_followups": [
+    "Bind due dispatch and explicit protocol retry policy to actual host admission, owner lifecycle and DB close order",
+    "Validate future schedule schema/binding at startup before readiness",
+    "Resume already-consumed paused RocketMQ work via the original handler and shared logical in-flight budget; do not send NORMAL to a TRANSACTION topic; retain old NSQ hold compatibility"
+  ],
+  "explicit_dispatch_recovery_native_passed": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39472781411",
+    "source_sha": "5582e030892e2912be2f52aac123701630e7f672",
+    "reports": [
+      {
+        "mysql": "8.0.36",
+        "mongo": "7.0.37",
+        "source_sha": "5582e030892e2912be2f52aac123701630e7f672",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "b218e230b7f8672c8900a77eff6e3be63a59e4c3d876fe6b198a30c8deedbcda",
+        "private_output_sha256": {
+          "evaluation": "620752bd2c8b2eca4fa7ddd4e30086412dfac5463690f7d3ed6e3c977265c141",
+          "report": "1858192fbf793c5bfca74a44860bf6048063454640a82e697fa269be209326e3"
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cases": {
+          "qs.mysql": {
+            "business_consumer_not_claimed": true,
+            "cases": {
+              "automatic_pause_before_reservation": true,
+              "explicit_retry_same_plan_new_fence": true,
+              "first_wire_and_dispatch_witness": true,
+              "no_business_attempt_or_input_repeat": true,
+              "no_half_before_real_due": true,
+              "old_aborted_evidence_retained": true,
+              "real_root_abort_witness": true,
+              "repeat_dispatch_is_empty": true,
+              "scan_does_not_retry_aborted": true
+            },
+            "failed": 0,
+            "owner": "qs.mysql",
+            "passed": 9,
+            "skipped": 0,
+            "system_login_not_claimed": true
+          },
+          "qs.mongo": {
+            "business_consumer_not_claimed": true,
+            "cases": {
+              "automatic_pause_before_reservation": true,
+              "explicit_retry_same_plan_new_fence": true,
+              "first_wire_and_dispatch_witness": true,
+              "no_business_attempt_or_input_repeat": true,
+              "no_half_before_real_due": true,
+              "old_aborted_evidence_retained": true,
+              "real_root_abort_witness": true,
+              "repeat_dispatch_is_empty": true,
+              "scan_does_not_retry_aborted": true
+            },
+            "failed": 0,
+            "owner": "qs.mongo",
+            "passed": 9,
+            "skipped": 0,
+            "system_login_not_claimed": true
+          }
+        }
+      },
+      {
+        "mysql": "8.0.44",
+        "mongo": "7.0.37",
+        "source_sha": "5582e030892e2912be2f52aac123701630e7f672",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "266820cf690b4e6d7166da38c9f975042c723da7e7b9232ad7f2264b1b4cd0a3",
+        "private_output_sha256": {
+          "evaluation": "01a4fa46d782827a50c5bfc30524a80922390c32849b5336cd4a7f5b96692481",
+          "report": "a32d72cb55c4888067156603899c3bcbd6bd8de4b6502614a1f1e50667d643db"
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cases": {
+          "qs.mysql": {
+            "business_consumer_not_claimed": true,
+            "cases": {
+              "automatic_pause_before_reservation": true,
+              "explicit_retry_same_plan_new_fence": true,
+              "first_wire_and_dispatch_witness": true,
+              "no_business_attempt_or_input_repeat": true,
+              "no_half_before_real_due": true,
+              "old_aborted_evidence_retained": true,
+              "real_root_abort_witness": true,
+              "repeat_dispatch_is_empty": true,
+              "scan_does_not_retry_aborted": true
+            },
+            "failed": 0,
+            "owner": "qs.mysql",
+            "passed": 9,
+            "skipped": 0,
+            "system_login_not_claimed": true
+          },
+          "qs.mongo": {
+            "business_consumer_not_claimed": true,
+            "cases": {
+              "automatic_pause_before_reservation": true,
+              "explicit_retry_same_plan_new_fence": true,
+              "first_wire_and_dispatch_witness": true,
+              "no_business_attempt_or_input_repeat": true,
+              "no_half_before_real_due": true,
+              "old_aborted_evidence_retained": true,
+              "real_root_abort_witness": true,
+              "repeat_dispatch_is_empty": true,
+              "scan_does_not_retry_aborted": true
+            },
+            "failed": 0,
+            "owner": "qs.mongo",
+            "passed": 9,
+            "skipped": 0,
+            "system_login_not_claimed": true
+          }
+        }
+      },
+      {
+        "mysql": "8.4.11",
+        "mongo": "7.0.37",
+        "source_sha": "5582e030892e2912be2f52aac123701630e7f672",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "f682cc4ab8524b8e146c733a420a1962c2aadd47acddc55d732c76bae7114b73",
+        "private_output_sha256": {
+          "evaluation": "57c42ef613d89cea12bfa11e2e01039f710dfe0d869a3333ec1e149faa7e093d",
+          "report": "e87df6c919b831661e20d038bb01defd8c36af6dd0d24658cd266cc04050fb92"
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cases": {
+          "qs.mysql": {
+            "business_consumer_not_claimed": true,
+            "cases": {
+              "automatic_pause_before_reservation": true,
+              "explicit_retry_same_plan_new_fence": true,
+              "first_wire_and_dispatch_witness": true,
+              "no_business_attempt_or_input_repeat": true,
+              "no_half_before_real_due": true,
+              "old_aborted_evidence_retained": true,
+              "real_root_abort_witness": true,
+              "repeat_dispatch_is_empty": true,
+              "scan_does_not_retry_aborted": true
+            },
+            "failed": 0,
+            "owner": "qs.mysql",
+            "passed": 9,
+            "skipped": 0,
+            "system_login_not_claimed": true
+          },
+          "qs.mongo": {
+            "business_consumer_not_claimed": true,
+            "cases": {
+              "automatic_pause_before_reservation": true,
+              "explicit_retry_same_plan_new_fence": true,
+              "first_wire_and_dispatch_witness": true,
+              "no_business_attempt_or_input_repeat": true,
+              "no_half_before_real_due": true,
+              "old_aborted_evidence_retained": true,
+              "real_root_abort_witness": true,
+              "repeat_dispatch_is_empty": true,
+              "scan_does_not_retry_aborted": true
+            },
+            "failed": 0,
+            "owner": "qs.mongo",
+            "passed": 9,
+            "skipped": 0,
+            "system_login_not_claimed": true
+          }
+        }
+      }
+    ],
+    "scope": "actual original evaluation/report roots, real due deadline, automatic pause, controlled root rollback followed by real lease reconciliation, explicit same-plan new fence, old Aborted witness retained; observer ACK only; no business consumer/system/SIGKILL/packet-loss/production claim"
+  },
+  "handoff_status_native_failure_history": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39473548719",
+    "reports": [
+      {
+        "mysql": "8.0.36",
+        "source_sha": "2cc8fdf90f9fc6020fd9ab138e64a81ade48f2a1",
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3RetryMongoStore",
+            "TestM3RetryMySQLStore"
+          ],
+          "assertion_lines": [
+            132,
+            204,
+            238,
+            336
+          ]
+        },
+        "report_sha256": "4641dd047764a9939b383761177f4c86018e89c6bee69b7fc2caba7a54e5d923",
+        "private_output_sha256": "3f2f1e838134038665e06ee88f8f8efa29c1d173db645d9ff8faac27903c3cf2",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.0.44",
+        "source_sha": "2cc8fdf90f9fc6020fd9ab138e64a81ade48f2a1",
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3RetryMongoStore",
+            "TestM3RetryMySQLStore"
+          ],
+          "assertion_lines": [
+            132,
+            204,
+            238,
+            336
+          ]
+        },
+        "report_sha256": "a524255f4065443d8397fb4adbe283aa1bd52dab288638a20baeade59b628bec",
+        "private_output_sha256": "eb7b81a61f31f5ba5369305a9a973682c9c101c64b7e7ebf57af019fa0bea73f",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.4.11",
+        "source_sha": "2cc8fdf90f9fc6020fd9ab138e64a81ade48f2a1",
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3RetryMongoStore",
+            "TestM3RetryMySQLStore"
+          ],
+          "assertion_lines": [
+            132,
+            204,
+            238,
+            336
+          ]
+        },
+        "report_sha256": "15e0529631ed5222863981121ca400d1cfc1db44526dedfc464980dba52a6ac5",
+        "private_output_sha256": "aaa8b2c72a7af292041856fa235e053d8106733e62a05b9d8c34f7a339049eca",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "cause": "fixture expected no status buckets; fixed SDK always returns four known buckets, including zero counts",
+    "correction_source": "5ed29545a4c59856e3c297cd7168add1471705ce",
+    "corrected_gate": "pending at final candidate; no failed task removed"
+  },
+  "final_candidate": {
+    "source_sha": "5ed29545a4c59856e3c297cd7168add1471705ce",
+    "head": "de6289e46c45cbb321b6638b93885bfebe050912",
+    "native_store_cases_per_version": 44,
+    "native_dispatch_cases_per_version": 41,
+    "native_status": "pending final exact-source matrices",
+    "ordinary_full_source_race": {
+      "head": "2cc8fdf90f9fc6020fd9ab138e64a81ade48f2a1",
+      "passed": 7197,
+      "failed": 0,
+      "skipped": 60,
+      "sha256": "014efa2fc82141efbc16d39c4395fe2ca67d9421dda4dc51c47d4e6fdd2aa10c",
+      "difference_to_final": "later changes only tagged native fixture assertions and documentation; no ordinary product code difference"
+    },
+    "ordinary_full_source_lint": "passed pinned2.5.0 at2cc8fdf90",
+    "native_fixture_compile": "passed",
+    "native_fixture_lint": "passed pinned2.5.0 after lock contention ended",
+    "docs": "87selftests plus hygiene/facts passed at5ed29545",
+    "cloud_pr_checks": "pending current final head",
+    "source_merged": false,
+    "production_deploy_paused_verified": true,
+    "release_or_deploy_or_system_acceptance": false
+  },
+  "cloud_lint_network_failure": {
+    "source_sha": "5582e030892e2912be2f52aac123701630e7f672",
+    "run": "https://github.com/FangcunMount/qs-server/actions/runs/39472690220/job/118800558700",
+    "reason": "golangci config schema download context deadline exceeded before code diagnostics",
+    "private_log_sha256": "de720221348fc3354a728d9c3de833282abbbc476910d3fd96fdcaeb81927434",
+    "handling": "no gate disabled; fresh final-head validation required"
   }
 }
