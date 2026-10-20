@@ -6,10 +6,10 @@
   "total_progress": "10/36",
   "owner": "qs.mongo",
   "source": "6eb704e64c69306eeace3b9f7af3aa8b7cf32952",
-  "head": "da6d5c630fe2ea431b28b8c83977c59e9b358741",
+  "head": "6fe3e1522b37e2651b04018a761e1e90f1bc3e79",
   "branch": "codex/rocketmq-m3-qs-report",
   "source_merged": false,
-  "pr": null,
+  "pr": "https://github.com/FangcunMount/qs-server/pull/414",
   "implemented": [
     "separate generation V2 field, original V1 remains V1",
     "strict event/identity/completion-time and mixed-protocol refusal",
@@ -42,14 +42,45 @@
     "facts": "passed after binding cache verification to unchanged merged ancestor db9b4918"
   },
   "native": {
-    "run": false,
-    "broker_or_original_mongo_atomicity_claimed": false
+    "run": true,
+    "status": "validation_failed",
+    "broker_or_original_mongo_atomicity_claimed": false,
+    "runs": [
+      {
+        "url": "https://github.com/FangcunMount/infra/actions/runs/39424653193",
+        "source": "b98f452cba42bcbbf21afaba09d9dac6f3bb637d",
+        "infra_source": "e87e8ed859af06399f7327cff46063e15d6ee38d",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "report_sha256": "9c530e324dc14c596e4b25d334857541f8551a4d9e9114c0dfbb121c8d619855",
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3ReportTerminalBrokerHost"
+          ],
+          "assertion_lines": [
+            81
+          ]
+        },
+        "cause": "isolated manifest used config key assessment-lifecycle instead of resolved topic qs.evaluation.lifecycle; owner route registration rejected before execution",
+        "fix": "manifest/test expectation corrected to resolved topic; next candidate also adds actual V2 authority audit",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ]
   },
   "pending": [
-    "frozen report success/failure Sender and exact pending-result recovery",
-    "remaining selected template/catalog-maintenance constructors without DDL",
-    "authority-aware V2 audit and old recovery boundaries",
-    "real report dependency/Broker acceptance, current-head full CI and source merge"
+    "current-head V2 audit implementation and validation",
+    "report real Broker/Mongo acceptance (14 named cases including V2 audit)",
+    "current-head complete CI and source/infra merge"
   ],
   "production": {
     "changed": false,
@@ -153,5 +184,53 @@
     ],
     "report_sha256": "de66a474fedde446baa18c527eb72952b20ed611181cf65c9860f7e168bc88d1",
     "native_report_acceptance": false
-  }
+  },
+  "terminal_claim_and_inert_stores": {
+    "source": "f54eb444f99032a60614743a9f2d80794e784715",
+    "implemented": [
+      "frozen original claim CAS: ID/generation/attempt/status/trace/start/lease/recovery count",
+      "terminal clock and witness are frozen before callback; caller mutations cannot replace bytes",
+      "base repository admission retained",
+      "all six module stores have no-DDL/no-bootstrap constructors, with explicit install entrypoint"
+    ],
+    "validation": "target race, fixed lint 2.5 and architecture checks passed"
+  },
+  "sender_first_candidate": {
+    "source": "b98f452cba42bcbbf21afaba09d9dac6f3bb637d",
+    "candidate": "6fe3e1522b37e2651b04018a761e1e90f1bc3e79",
+    "implemented": [
+      "success/failure terminal Sender, original root guard, Generation version and original Run claim CAS",
+      "first full BSON artifact, message body and wire are frozen and recovered",
+      "optional module selection borrows one original qs.mongo owner",
+      "preflight recovery before claim and builder; unresolved never grants rebuild",
+      "future retry remains original schedule/wire/due until explicit T13 handoff"
+    ],
+    "race": {
+      "pass": 239,
+      "fail": 0,
+      "skip": 5
+    },
+    "race_report_sha256": "ec723701f634a027b87d00956419bd172bc695fe42b19d61b8e33cfa6280b2c1",
+    "native_compile": "integration,m3_report_integration compiled; compile is not acceptance",
+    "lint_2_5": "passed",
+    "docs_unit_passed": 87,
+    "docs_hygiene_and_facts": "passed"
+  },
+  "failure_history": [
+    {
+      "scope": "terminal claim local regression",
+      "cause": "direct Collection update bypassed BaseRepository admission",
+      "resolution": "use original BaseRepository UpdateOne; architecture recheck passed"
+    },
+    {
+      "scope": "sender fixture",
+      "cause": "factor-scoring fixture omitted required dimensions",
+      "resolution": "valid immutable report fixture; target race passed"
+    },
+    {
+      "scope": "sender implementation",
+      "cause": "Generation proof completion clock compared full precision to BSON milliseconds",
+      "resolution": "freeze proof and terminal Generation clock at Mongo precision while retaining original wire clocks; target race passed"
+    }
+  ]
 }

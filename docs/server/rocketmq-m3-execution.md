@@ -113,7 +113,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 2026-10-20；IAM51405831/QS696ee314锁定正式Go SDKtx.2；三档MySQL原事务各34项、成对Broker/fanout各22项0失败/跳过，Mac mini额外22项通过；IAM PR135合并e3efa5b3、QS PR409合并2e95630b；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
 | ☑ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 已完成实现与验证；原事务/冻结BSON与wire、V2精确读取、实际Collection/gRPC 202和503、并发原赢家、Mongo failpoint重入、ACK客户端丢弃及新实例读取16项在Mac mini和GitHub实际通过。最终源码deb46e67全仓race6909通过/60既有可选依赖跳过，同包策略与87项文档检查通过；PR410合并3afc76a6，PR411/infra46最终头CI和合并单列；不表示生产或system验收。[证据](evidence/rocketmq-m3-qs-answer-20261020.json) |
 | ✅ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 2026-10-20；5a1f489bb完整CI28成功/1不适用，完整UTC race6977通过；双档原生Broker各9项0失败/跳过/race。保留Run claim、首次wire、未来原due/授权及原调度职责（T13再交接）。[证据/失败历史](evidence/rocketmq-m3-qs-evaluation-20261020.json)；PR412合并db9b4918、infra49合并a4547f83；生产未变更 |
-| ☐ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 进行中；qs.mongo共享owner/原事务guard、公共冻结codec、Generation/失败Run独立V2、显式schema入口已实现。da6d5c630基础13包race247通过/0失败/8既有可选依赖跳过；答卷真实回归16项、评分双档各9项均0失败/跳过。[证据](evidence/rocketmq-m3-qs-report-20261020.json)。报告Sender、恢复及原生验收未完成，不勾选 |
+| ☐ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 进行中；qs.mongo共享owner/原事务guard、公共冻结codec、Generation/失败Run独立V2、显式schema入口已实现。da6d5c630基础13包race247通过/0失败/8既有可选依赖跳过；答卷真实回归16项、评分双档各9项均0失败/跳过。[证据](evidence/rocketmq-m3-qs-report-20261020.json)。已新增Sender/恢复及显式模块路径（QS PR414草稿），7包race239通过/5既有环境跳过；报告首轮原生验收因manifest Topic错误失败，infra PR52修正并增加V2审计后重验。未完成原生/完整CI，不勾选 |
 | ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 待开始 |
 | ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 待开始 |
 | ☐ | T14 | QS command/档案，Operation/Payload新旧兼容 | 待开始 |
@@ -311,3 +311,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：T11共享原Mongo owner/封闭回调上下文1071d1364及公共冻结编码ff38c15aa已通过定向race/lint，保留原答卷构造入口并新增借用同owner入口。精确eae97334b云端答卷回归39419280081完整16项0失败/跳过，报告2facef77及资源清理核对；精确f47a1b0bd云端评分回归39420340015两档各9项0失败/跳过，报告be47b056/dd5eac52及清理核对。它们是T09/T10回归，不冒称报告链路原生验收。00e76c383增加失败Run独立V2、保留未来授权/旧调度证据、完整clone原lease恢复历史、四类核心写构造不建索引及显式安装器；目标race/lint/87项文档通过，报告Sender/终态恢复及原生验收仍待实现，T11不勾选，保持10/36。另T10文档元数据PR413以28项CI通过/1不适用合并c691fcfc，main39417393541完整CI成功；原squash后失败保留，未放宽规则。
 
 - T11基础回归补记：候选da6d5c630（源码00e76c383）13包race247通过、0失败、8项既有环境依赖跳过；逐项名称与报告摘要已入证据。先前7包5跳过与本次13包8跳过范围不同，均不作为报告原生验收。T11仍进行中，总进度10/36。
+
+- T11继续：f54eb444f完成原claim冻结CAS及六类无DDL构造；b98f452cb新增报告成功/失败Sender、原事务和未知结果恢复，候选6fe3e1522七包race239通过/0失败/5既有Mongo跳过，固定lint与87项文档通过。QS PR414草稿维护源码。infra PR52首轮真实Docker验证在owner构造阶段因Topic配置键误作解析名而失败，报告和清理证据已保存；修正为qs.evaluation.lifecycle并增加实际V2权威审计（14项）后重验。T11未勾选，10/36。
