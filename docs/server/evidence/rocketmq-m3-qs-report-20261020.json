@@ -1,0 +1,399 @@
+{
+  "version": 1,
+  "task": "T11",
+  "status": "in_progress",
+  "completed": false,
+  "total_progress": "10/36",
+  "owner": "qs.mongo",
+  "source": "05bc0fda71c1df69e8c3bc396689a31b6d5a960e",
+  "head": "f8566a8303ffc7bdcc8837b78fecd64a286872cf",
+  "branch": "codex/rocketmq-m3-qs-report",
+  "source_merged": false,
+  "pr": "https://github.com/FangcunMount/qs-server/pull/414",
+  "implemented": [
+    "separate generation V2 field, original V1 remains V1",
+    "strict event/identity/completion-time and mixed-protocol refusal",
+    "canonical transaction reference bytes survive BSON round trip with millisecond business clocks",
+    "generation create/save reject absent or inactive original session; full bound-guard integration still pending",
+    "clone preserves V2 without aliasing or Outbox promotion"
+  ],
+  "source_race": {
+    "command": "TZ=UTC go test -race -json <generation,run,report,execution,Mongo interpretation,module interpretation,architecture>",
+    "passed": 159,
+    "failed": 0,
+    "skipped": 5,
+    "skip_scope": "five existing Mongo AgainstMongo tests require QS_SERVER_TEST_MONGO_URI; these are not native acceptance",
+    "skipped_tests": [
+      "TestReportCatalogAuditIndexesAndBatchBoundAgainstMongo",
+      "TestReportReadModelListReportsFiltersAgainstMongo",
+      "TestReportReadModelFailsClosedOnArtifactAssociationMismatchAgainstMongo",
+      "TestCurrentReportMetadataCarriesVerifiedSourceIdentityAgainstMongo",
+      "TestGenerationRepositoryRejectsStaleCASAgainstMongo"
+    ],
+    "report_sha256": "270ea077b05f3625f5c32dd175701a20c9a02dd6b54a596d4c95992889d4334f",
+    "source": "6eb704e64c69306eeace3b9f7af3aa8b7cf32952",
+    "candidate": "d0b23a6a0892e43a3bea687af93c438ebc4fffd8"
+  },
+  "lint": {
+    "version": "2.5.0",
+    "target_packages": "passed"
+  },
+  "docs": {
+    "unit_passed": 87,
+    "hygiene": "passed",
+    "facts": "passed after binding cache verification to unchanged merged ancestor db9b4918"
+  },
+  "native": {
+    "run": true,
+    "status": "passed_current_candidate",
+    "broker_or_original_mongo_atomicity_claimed": true,
+    "runs": [
+      {
+        "url": "https://github.com/FangcunMount/infra/actions/runs/39424653193",
+        "source": "b98f452cba42bcbbf21afaba09d9dac6f3bb637d",
+        "infra_source": "e87e8ed859af06399f7327cff46063e15d6ee38d",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "report_sha256": "9c530e324dc14c596e4b25d334857541f8551a4d9e9114c0dfbb121c8d619855",
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3ReportTerminalBrokerHost"
+          ],
+          "assertion_lines": [
+            81
+          ]
+        },
+        "cause": "isolated manifest used config key assessment-lifecycle instead of resolved topic qs.evaluation.lifecycle; owner route registration rejected before execution",
+        "fix": "manifest/test expectation corrected to resolved topic; next candidate also adds actual V2 authority audit",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "url": "https://github.com/FangcunMount/infra/actions/runs/39426436790",
+        "source": "b43538feeffa05cb408d86ed1df22868d92cd5ba",
+        "infra_source": "45cd015cd96b543c2ab61de8408c75502858c76e",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "report_sha256": "aafca0afbde28bdfab3ca6141ec05ba85e89a348eb830d3585653806740416f4",
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3ReportTerminalBrokerHost"
+          ],
+          "assertion_lines": [
+            269
+          ]
+        },
+        "cause": "duplicate recovery incorrectly required winner execution token; actual SDK intentionally redacts it from read-only Lookup",
+        "fix_source": "9737db449537e0ae534478cb6df767fd6e88a9b2",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "current": {
+      "url": "https://github.com/FangcunMount/infra/actions/runs/39428678046",
+      "source": "f8566a8303ffc7bdcc8837b78fecd64a286872cf",
+      "infra_source": "e0f2eb21f83459081c65c7be10906a9283c8a8c8",
+      "required_cases": 14,
+      "claimed_passed": true,
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "receipt": {
+        "cases": {
+          "closed_admission_no_business": true,
+          "committed_reply_discard_recovery": true,
+          "constructor_no_ddl": true,
+          "duplicate_first_artifact": true,
+          "future_retry_preserved": true,
+          "half_invisible": true,
+          "native_callback_reentry": true,
+          "new_instance_exact_recovery": true,
+          "no_new_publish_outbox": true,
+          "original_failure_witness": true,
+          "original_success_witness_wire": true,
+          "root_abort_atomic": true,
+          "stale_claim_cannot_commit": true,
+          "v2_authority_audit": true
+        },
+        "failed": 0,
+        "host_entry": "interpretation_original_root_committer",
+        "mongo_callback_failpoint": true,
+        "passed": 14,
+        "root_ack_discard_is_client_level": true,
+        "skipped": 0,
+        "system_login_not_claimed": true
+      },
+      "sdk_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.5.0-rocketmq-tx.2",
+        "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "report_sha256": "958dca7a4fae56dfc4c0c1c5dee517a4ffd8481b55a8b15a98f523728a6f74d4",
+      "scope": [
+        "No production/system acceptance or throughput claim",
+        "Actual host terminal Sender and original Mongo/Broker; running claims and report body supplied by fixtures",
+        "Root reply discard is client-level; no packet-loss, SIGKILL, model invocation or T13 handoff claim"
+      ]
+    }
+  },
+  "pending": [
+    "full current-head CI completion",
+    "source/infra merge and final task closure; not production/system acceptance"
+  ],
+  "production": {
+    "changed": false,
+    "provider_switched": false,
+    "system_acceptance": false
+  },
+  "shared_mongo_owner": {
+    "source": "1071d13641bbc2c1e7f6f9480ab314034aaaf0a9",
+    "candidate": "eae97334ba9e170adf17504f1c44ef3f3cfe4edf",
+    "scope": [
+      "one original database/runtime for multiple adapters",
+      "sealed original-session callback context bound to exact reference and original database",
+      "runner nil is not commit proof; SDK evidence and new authoritative boundary decide",
+      "no late SDK callback may open original runner after return"
+    ],
+    "target_race": "passed",
+    "lint_2_5": "passed",
+    "answer_native_regression": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39419280081",
+      "source": "eae97334ba9e170adf17504f1c44ef3f3cfe4edf",
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "2facef77b3932b3c3d9937ec58b87aeb1ccaa3db81d945e4d057e0378f57f0e2",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    }
+  },
+  "common_codec": {
+    "source": "ff38c15aa2206a30dfae42818224264ffe2dabf5",
+    "candidate": "f47a1b0bdd8f81821e35e9168ea32316d3d8e5f3",
+    "scope": "extract original private artifact JSON unchanged for both owners; existing MySQL wrapper retained",
+    "evaluation_regression": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39420340015",
+      "reports": [
+        {
+          "source": "f47a1b0bdd8f81821e35e9168ea32316d3d8e5f3",
+          "mysql": "8.4.11",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "be47b056aa6622883a44465f7eceb9eb0226284b5f69a371002fdd228320aeb8",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "source": "f47a1b0bdd8f81821e35e9168ea32316d3d8e5f3",
+          "mysql": "8.0.36",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "dd5eac52da716dac3d5047dfaf0cd41d26d9db10bdc81c18f4572db4dc2b487d",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ]
+    }
+  },
+  "failed_evidence_and_explicit_schema": {
+    "source": "00e76c383ca0f336cb4a8e51022edcbbac3088e5",
+    "scope": [
+      "failed Run V2 evidence independent of future retry decision/Outbox reference",
+      "BSON preserves exact reference; ordinary save/create without original guarded root refused",
+      "clone preserves lease recovery count/history and original claim",
+      "inert constructors for Generation/Run/Report/Catalog; explicit lifecycle index installer",
+      "legacy template/catalog-maintenance constructors still require selected-path work"
+    ],
+    "target_race": "passed",
+    "lint_2_5": "passed",
+    "docs_unit_passed": 87,
+    "actual_report_sender_and_native": "pending"
+  },
+  "foundation_regression": {
+    "source": "00e76c383ca0f336cb4a8e51022edcbbac3088e5",
+    "candidate": "da6d5c630fe2ea431b28b8c83977c59e9b358741",
+    "packages": 13,
+    "passed": 247,
+    "failed": 0,
+    "skipped": 8,
+    "skipped_tests": [
+      "TestReportCatalogAuditIndexesAndBatchBoundAgainstMongo",
+      "TestReportReadModelListReportsFiltersAgainstMongo",
+      "TestReportReadModelFailsClosedOnArtifactAssociationMismatchAgainstMongo",
+      "TestCurrentReportMetadataCarriesVerifiedSourceIdentityAgainstMongo",
+      "TestGenerationRepositoryRejectsStaleCASAgainstMongo",
+      "TestDurableSubmissionTransactionAgainstMongoReplicaSet",
+      "TestAnsweringStartUniqueAndImmutableAgainstMongoReplicaSet",
+      "TestScopedAnswerListAndCountAgainstMongoReplicaSet"
+    ],
+    "report_sha256": "de66a474fedde446baa18c527eb72952b20ed611181cf65c9860f7e168bc88d1",
+    "native_report_acceptance": false
+  },
+  "terminal_claim_and_inert_stores": {
+    "source": "f54eb444f99032a60614743a9f2d80794e784715",
+    "implemented": [
+      "frozen original claim CAS: ID/generation/attempt/status/trace/start/lease/recovery count",
+      "terminal clock and witness are frozen before callback; caller mutations cannot replace bytes",
+      "base repository admission retained",
+      "all six module stores have no-DDL/no-bootstrap constructors, with explicit install entrypoint"
+    ],
+    "validation": "target race, fixed lint 2.5 and architecture checks passed"
+  },
+  "sender_first_candidate": {
+    "source": "b98f452cba42bcbbf21afaba09d9dac6f3bb637d",
+    "candidate": "6fe3e1522b37e2651b04018a761e1e90f1bc3e79",
+    "implemented": [
+      "success/failure terminal Sender, original root guard, Generation version and original Run claim CAS",
+      "first full BSON artifact, message body and wire are frozen and recovered",
+      "optional module selection borrows one original qs.mongo owner",
+      "preflight recovery before claim and builder; unresolved never grants rebuild",
+      "future retry remains original schedule/wire/due until explicit T13 handoff"
+    ],
+    "race": {
+      "pass": 239,
+      "fail": 0,
+      "skip": 5
+    },
+    "race_report_sha256": "ec723701f634a027b87d00956419bd172bc695fe42b19d61b8e33cfa6280b2c1",
+    "native_compile": "integration,m3_report_integration compiled; compile is not acceptance",
+    "lint_2_5": "passed",
+    "docs_unit_passed": 87,
+    "docs_hygiene_and_facts": "passed"
+  },
+  "failure_history": [
+    {
+      "scope": "terminal claim local regression",
+      "cause": "direct Collection update bypassed BaseRepository admission",
+      "resolution": "use original BaseRepository UpdateOne; architecture recheck passed"
+    },
+    {
+      "scope": "sender fixture",
+      "cause": "factor-scoring fixture omitted required dimensions",
+      "resolution": "valid immutable report fixture; target race passed"
+    },
+    {
+      "scope": "sender implementation",
+      "cause": "Generation proof completion clock compared full precision to BSON milliseconds",
+      "resolution": "freeze proof and terminal Generation clock at Mongo precision while retaining original wire clocks; target race passed"
+    },
+    {
+      "scope": "documentation gate",
+      "cause": "cross-repository tracker path in backticks was validated as a missing local file",
+      "resolution": "use canonical GitHub tracker link; 87 tests, hygiene and facts recheck passed"
+    },
+    {
+      "scope": "current-head CI Lint Code at b435",
+      "job": "https://github.com/FangcunMount/qs-server/actions/runs/39426404864/job/118639966469",
+      "cause": "upstream golangci schema download timed out before lint execution",
+      "classification": "external network; local pinned lint passed, new head CI required"
+    },
+    {
+      "scope": "current-head real Mongo CI at b435",
+      "job": "https://github.com/FangcunMount/qs-server/actions/runs/39426404864/job/118639966349",
+      "cause": "exhaustive legacy fixture did not include the three newly added V2 drift classes",
+      "resolution": "05bc0fda71c1df69e8c3bc396689a31b6d5a960e extends fixture without removing assertions; real current-head recheck pending"
+    }
+  ],
+  "v2_authority_audit": {
+    "source": "a702707bfb0185071b6af86e245395b7f63081b4",
+    "candidate": "b43538feeffa05cb408d86ed1df22868d92cd5ba",
+    "implemented": [
+      "read-only original owner PlanForReference resolves exact historical operation/fence/epoch without execution tokens or active-request substitution",
+      "V2 audit checks fixed primary/majority database, exact first wire and typed binding, committed execution and branch witness",
+      "V1 keeps original Outbox audit; mixed protocol is rejected and V2 is counted independently",
+      "database/configuration errors preserve checkpoint",
+      "immutable failure evidence is verified independently of later retry authorization",
+      "selected report owner is borrowed by host read-only audits"
+    ],
+    "target_race": "six target packages passed",
+    "fixed_lint_2_5": "passed",
+    "native_tag_compile": "passed; not native acceptance",
+    "docs_unit_passed": 87,
+    "docs_hygiene_and_facts": "passed",
+    "native_report_run": "https://github.com/FangcunMount/infra/actions/runs/39426436790",
+    "native_status": "queued at recording",
+    "required_cases": 14,
+    "infra_candidate": "45cd015cd96b543c2ab61de8408c75502858c76e",
+    "full_source_race": "running, not yet a passed gate"
+  },
+  "full_source_race_b435": {
+    "source": "a702707bfb0185071b6af86e245395b7f63081b4",
+    "candidate": "b43538feeffa05cb408d86ed1df22868d92cd5ba",
+    "passed": 7049,
+    "failed": 0,
+    "skipped": 60,
+    "skips": "existing optional environment tests; not required report native acceptance",
+    "package_failures": 0,
+    "stderr_bytes": 0,
+    "report_sha256": "29a3e928dd88d8a497ee5c99863aecd72d1661f3731e68e33b755b61169546cb",
+    "superseded_by_readonly_recovery_fix": true
+  },
+  "readonly_recovery_fix": {
+    "source": "9737db449537e0ae534478cb6df767fd6e88a9b2",
+    "candidate": "f8566a8303ffc7bdcc8837b78fecd64a286872cf",
+    "implemented": [
+      "read-only recovery validates immutable References without requiring or recreating the winner token",
+      "compare persisted BSON bytes directly rather than rebuilding potentially reordered documents",
+      "V2 completion clocks checked across Generation, Run, Artifact and proof; real negative clock-drift fixture added"
+    ],
+    "target_race": "passed",
+    "fixed_lint_2_5": "passed",
+    "native_tag_compile": "passed; not acceptance",
+    "v2_drift_fixture_source": "05bc0fda71c1df69e8c3bc396689a31b6d5a960e",
+    "all_supported_drift_assertions": "preserved; added three malformed V2 fixtures for real Mongo classification",
+    "docs_unit_passed": 87,
+    "docs_hygiene_and_facts": "passed",
+    "current_full_source_race": "passed: 7050/0 failures/60 existing optional skips"
+  },
+  "full_source_race_current": {
+    "candidate": "f8566a8303ffc7bdcc8837b78fecd64a286872cf",
+    "source": "05bc0fda71c1df69e8c3bc396689a31b6d5a960e",
+    "passed": 7050,
+    "failed": 0,
+    "skipped": 60,
+    "skips": "existing optional environment tests; not report native acceptance",
+    "package_failures": 0,
+    "stderr_bytes": 0,
+    "report_sha256": "b831710ce96cde3efc7422c038d4acb62402294e40216b8f45885c9446f20eb8"
+  },
+  "initial_source": "6eb704e64c69306eeace3b9f7af3aa8b7cf32952"
+}
