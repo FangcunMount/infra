@@ -8,8 +8,12 @@ from iam_acceptance import host_failure_summary, retain_private_host_output
 
 COMMON = frozenset(('constructor_no_ddl', 'schema_missing_rejected', 'original_root_rollback_atomic',
                     'original_root_commit_atomic', 'due_index_not_early', 'future_authorization_no_half_or_outbox'))
-CASES = {'mysql': COMMON | {'duplicate_first_wire_deadline'},
-         'mongo': COMMON | {'expired_session_rejected'}}
+GOVERNED = frozenset(('governed_manual_original_root', 'governed_force_original_root',
+                      'governed_root_rollback_atomic', 'governed_commit_reply_discard_recovered',
+                      'governed_first_plan_and_authorization_reused', 'governed_changed_input_conflict',
+                      'governed_wrong_scope_rejected', 'governed_no_outbox_or_business_attempt'))
+CASES = {'mysql': COMMON | {'duplicate_first_wire_deadline'} | GOVERNED,
+         'mongo': COMMON | {'expired_session_rejected'} | GOVERNED}
 
 
 def parse_retry_receipts(output):
@@ -62,4 +66,4 @@ def run_qs_retry_store_host(source, directory, project, mysql_port, mongo_port, 
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('QS source changed during native acceptance')
-    proof['scope'] = 'original MySQL/Mongo Run and future schedule atomicity only; no due dispatcher, Broker, system or production claim'
+    proof['scope'] = 'actual governed authorization entrypoints and original MySQL/Mongo Run/future schedule atomicity; root reply discard is client-level; no due dispatcher, Broker, model consumer, system or production claim'
