@@ -24,7 +24,7 @@ class QSTaskAcceptanceTest(unittest.TestCase):
         self.assertEqual(parse_task_receipt(output), receipt)
         for bad in ('', output + output, output.replace('true', 'false', 1), output.replace('--- PASS:', '--- SKIP:'),
                     output + '\nWARNING: DATA RACE', output.replace('TestM3TaskBrokerHost', 'TestSDKProbe'),
-                    output.replace('"passed": 14', '"passed": 0'), output.replace('"skipped": 0', '"skipped": 1'),
+                    output.replace('"passed": 15', '"passed": 0'), output.replace('"skipped": 0', '"skipped": 1'),
                     output.replace('original_mysql_gorm', 'fake_service')):
             with self.assertRaises(RuntimeError):
                 parse_task_receipt(bad)
