@@ -1,8 +1,8 @@
 {
   "task": "T13",
-  "status": "in_progress",
-  "completed": false,
-  "total_progress": "12/36",
+  "status": "completed",
+  "completed": true,
+  "total_progress": "13/36",
   "base_sha": "f0499e603fa4f67695c57648f73a19a6dd5bf881",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-retry",
   "branch": "codex/rocketmq-m3-qs-retry",
@@ -54,10 +54,7 @@
     "explicit schema/binding validation; constructors do not install resources",
     "canonical prepared QS domain wire input to shared transaction plan; no wire reconstruction"
   ],
-  "remaining": [
-    "complete final source runtime E2E and exact-head source merge",
-    "task/milestone closure ledger update"
-  ],
+  "remaining": [],
   "production_changed": false,
   "business_acceptance": false,
   "storage_source_sha": "d789337e42ee4cdc6ca6311202abec29f1ccff80",
@@ -82,7 +79,7 @@
     "infra_harness": "52 tests passed",
     "native_databases": "pending CI; not claimed"
   },
-  "scope": "T13 implementation, exact-source full race/lint, real dual-store44 and real Broker41 per version complete; infra22CI and merge complete; last source E2E and source merge pending, task remains unchecked12/36; no production/system/next-consumer acceptance",
+  "scope": "T13 source/required native verification and source/infra merges complete;13/36. Host lifecycle and paused-delivery resume are T22, operational cutover toolsT25, production/system/48h remain later tasks; no production or stable release claim",
   "storage_native_failure_history": [
     {
       "run": "https://github.com/FangcunMount/infra/actions/runs/39457187250",
@@ -1082,8 +1079,8 @@
     "native_fixture_compile": "passed",
     "native_fixture_lint": "passed pinned2.5.0 after lock contention ended",
     "docs": "87selftests plus hygiene/facts passed at5ed29545",
-    "cloud_pr_checks": "24successful,1inapplicableAPI-sync conditional,1Seeddata Retirement and Current Runtime E2E still running; no completion/merge claimed",
-    "source_merged": false,
+    "cloud_pr_checks": "complete:28successful and1inapplicable Docs/API sync conditional; all required native profiles nonempty0fail/skip",
+    "source_merged": true,
     "production_deploy_paused_verified": true,
     "release_or_deploy_or_system_acceptance": false
   },
@@ -1375,5 +1372,25 @@
     "skipped": 0,
     "merge_sha": "d4324a874204b464921c2cd86eeefe32039e85bd",
     "merged_at": "2026-10-20T18:48:26Z"
-  }
+  },
+  "completed_at": "2026-10-20T18:55:54Z",
+  "source_merged": {
+    "pr": "https://github.com/FangcunMount/qs-server/pull/417",
+    "head": "fd985a12223a52b0201501b82b72ca60624a3ba9",
+    "implementation_source": "7e8aba2534352f159d715676446a7cc8a5959e93",
+    "current_head_successful_checks": 28,
+    "inapplicable_checks": [
+      {
+        "name": "Docs & API Generated Sync",
+        "conclusion": "SKIPPED",
+        "reason": "no applicable generated API/proto changes inT13"
+      }
+    ],
+    "failed": 0,
+    "merge_sha": "133fc07367925ed5fac7af6faf3b5a534eea2b94",
+    "merged_at": "2026-10-20T18:55:54Z",
+    "checked_status_sha256": "45ed5044925a4527864619245b0ea07f593a1d4f1b815b3a319a4df0daab6b1b",
+    "production_deploy_paused_verified_before_merge": true
+  },
+  "closure_progress_pr": "pending closure-only documentation merge; task implementation and validation complete"
 }
