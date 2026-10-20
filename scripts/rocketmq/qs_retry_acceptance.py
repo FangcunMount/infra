@@ -14,7 +14,8 @@ GOVERNED = frozenset(('governed_manual_original_root', 'governed_force_original_
                       'governed_wrong_scope_rejected', 'governed_no_outbox_or_business_attempt'))
 HANDOFF = frozenset(('legacy_transfer_root_rollback_atomic', 'legacy_transfer_exact_first_wire_and_due',
                      'legacy_transfer_repeat_keeps_single_owner', 'legacy_transfer_attempted_or_due_refused',
-                     'legacy_replay_cannot_reauthorize_transferred', 'legacy_old_relay_cannot_claim_transferred'))
+                     'legacy_replay_cannot_reauthorize_transferred', 'legacy_old_relay_cannot_claim_transferred',
+                     'legacy_transferred_status_not_pending'))
 CASES = {'mysql': COMMON | {'duplicate_first_wire_deadline'} | GOVERNED | HANDOFF,
          'mongo': COMMON | {'expired_session_rejected'} | GOVERNED | HANDOFF}
 
