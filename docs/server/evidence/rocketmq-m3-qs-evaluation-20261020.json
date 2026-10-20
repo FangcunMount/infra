@@ -290,6 +290,16 @@
       "private_log_sha256": "4a99db07e3b685f3f391f0be42c2b63e6beee18f724fc2f11a9e23bb4e108093",
       "source_failure_preserved": true,
       "production_code_changed_by_fix": false
+    },
+    {
+      "run": "https://github.com/FangcunMount/qs-server/actions/runs/39411371289/job/118589678803",
+      "source": "25501aac7d00aa0cda719980758055ed447ca7fc",
+      "scope": "documentation source baseline marker",
+      "reason": "two unit test source changes require advancing source_baseline from 13fb912e6 to exact 25501aac7",
+      "resolution": "5a1f489bb changes only source_baseline; 87 docs tests/hygiene/facts passed before commit, final current-head CI pending",
+      "private_log_sha256": "cb7cfb86b1d916b45a049ea3c8dca9c930d003a02d60abad5c9c769cc27c1132",
+      "source_failure_preserved": true,
+      "production_code_changed_by_fix": false
     }
   ],
   "lint": {
@@ -456,8 +466,8 @@
     },
     "cache_boundary": "rollback or unknown root commit does not run cache hooks; best-effort invalidation is not a durable receipt",
     "production_wiring_activated": false,
-    "candidate": "25501aac7d00aa0cda719980758055ed447ca7fc",
-    "candidate_difference": "36aa0741f changes only cache contract documentation/verification marker relative to tested ce2f5a124; source unchanged",
+    "candidate": "5a1f489bb794fbdaf31d8c10a9769408eba8a4d2",
+    "candidate_difference": "relative to native-tested 36aa: two unit tests plus docs/document-closure.json only; original production and native fixture bytes unchanged",
     "local_native": {
       "source": "ce2f5a124e59129a68e38d7e85dca4332a2ba059",
       "infra_harness": "2d594a18ade202c26da3d3b6484d601e821b019c",
@@ -637,7 +647,8 @@
     },
     "native_equivalence_files": [
       "internal/apiserver/infra/mysql/evaluationfailure/commit_test.go",
-      "internal/apiserver/infra/mysql/evaluationfailure/plan_test.go"
+      "internal/apiserver/infra/mysql/evaluationfailure/plan_test.go",
+      "docs/document-closure.json"
     ]
   }
 }
