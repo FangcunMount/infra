@@ -166,6 +166,8 @@ def main():
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
     parser.add_argument("--iam-host", type=Path, help="exact IAM checkout; require actual host SDK/Broker acceptance in the owned fixture")
+    parser.add_argument("--qs-evaluation-host", type=Path, help="exact QS checkout; require real MySQL evaluation application/Broker profile")
+    parser.add_argument("--qs-evaluation-private-log", type=Path, help="new0600 diagnostic in an owned0700 directory; never a CI artifact")
     parser.add_argument("--qs-answer-host", type=Path, help="exact QS checkout; require answer submission with real Mongo and Broker")
     parser.add_argument("--qs-answer-private-log", type=Path, help="new0600 local diagnostic in an owned0700 directory; never a CI artifact")
     parser.add_argument("--iam-fanout-qs", type=Path, help="fixed clean QS source; require two IAM instances and the real QS subscriber in separate groups")
@@ -180,6 +182,10 @@ def main():
     parser.add_argument("--sdk-go-probe", type=Path, help="prebuilt public SDK executable from a verified published Go module")
     parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
     args = parser.parse_args()
+    if args.qs_evaluation_private_log and not args.qs_evaluation_host:
+        parser.error("QS evaluation private output requires its host profile")
+    if args.qs_evaluation_host and (args.iam_host or args.sdk_api_go or args.qs_answer_host):
+        parser.error("QS evaluation host is a separate required profile")
     if args.qs_answer_private_log and not args.qs_answer_host:
         parser.error("QS private output requires an explicit QS answer host")
     if args.qs_answer_host and (args.iam_host or args.sdk_api_go):
@@ -255,8 +261,8 @@ def main():
         "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
-    if args.iam_host:
-        # The host fixture explicitly creates/drops its OWN random IAM schema.
+    if args.iam_host or args.qs_evaluation_host:
+        # Host profiles explicitly create/drop their OWN random schema.
         # This root login exists only in this private loopback Compose project.
         spec['services']['mysql']['environment']['MYSQL_ROOT_HOST'] = '%'
     mongo_port = port()
@@ -394,8 +400,16 @@ def main():
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
-        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host)):
+        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
+        if args.qs_evaluation_host:
+            from qs_evaluation_acceptance import run_qs_evaluation_host
+            proof['qs_evaluation_host'] = {}
+            run_qs_evaluation_host(args.qs_evaluation_host, directory, broker, project, grpc_port, mysql_port,
+                                   mysql_password, ca, run, proof['qs_evaluation_host'], args.qs_evaluation_private_log)
+            for name in proof['qs_evaluation_host']['native_receipt']['cases']:
+                passed('qs_evaluation_' + name)
+            return
         if args.qs_answer_host:
             mongo_command('rs.initiate({_id:"sdk-proof",members:[{_id:0,host:"mongo:27017"}]})')
             deadline = time.monotonic() + 60
@@ -761,6 +775,12 @@ def main():
                                 'Actual host SDK and original Mongo transactions, not raw-client feasibility',
                                 'Root ACK discard is client-level; packet-loss and process-exit acceptance remain separate gates']
             report['qs_answer_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_answer_acceptance.py').read_bytes()).hexdigest()
+        if args.qs_evaluation_host:
+            report['batch'] = 'M3-QS-evaluation-original-MySQL-host'
+            report['limits'] = ['No production/system acceptance or throughput claim',
+                                'Actual submission/outcome application roots and original MySQL/Broker',
+                                'No packet loss, SIGKILL or future retry handoff claim']
+            report['qs_evaluation_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_evaluation_acceptance.py').read_bytes()).hexdigest()
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
