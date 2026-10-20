@@ -2,12 +2,12 @@
   "version": 1,
   "batch": "M3-2",
   "task": "T10",
-  "status": "in_progress",
-  "completed": false,
-  "total_progress": "9/36",
-  "qs_source": "de7db811036b5bd3f390742328ede60ca18ba189",
+  "status": "completed",
+  "completed": true,
+  "total_progress": "10/36",
+  "qs_source": "5a1f489bb794fbdaf31d8c10a9769408eba8a4d2",
   "qs_pr": "https://github.com/FangcunMount/qs-server/pull/412",
-  "pr_status": "draft_not_merged",
+  "pr_status": "merged",
   "sdk_module": "v0.5.0-rocketmq-tx.2",
   "implemented": [
     "flat V1/V2 immutable Outcome evidence codec and exact primary audit",
@@ -15,15 +15,19 @@
     "frozen result/report-input bytes and first wire before half preparation",
     "explicit successful evaluation transaction committer retaining Run claim CAS",
     "unknown publication does not authorize immediate calculation failure/retry",
-    "read-only exact existing-plan lookup and pre/post-claim result preflight recovery"
+    "read-only exact existing-plan lookup and pre/post-claim result preflight recovery",
+    "original pending submission CAS and first-wire recovery",
+    "immediate failure original root with exact Run identity and preserved future schedule",
+    "explicit shared-owner module assembly and cache invalidation after original commit"
   ],
   "source_race": {
-    "command": "go test -race -json ./...",
-    "passed": 6941,
+    "command": "TZ=UTC go test -race -json ./...",
+    "passed": 6977,
     "failed": 0,
     "skipped": 60,
-    "skip_scope": "existing optional dependency tests; separate native job requires zero skips",
-    "report_sha256": "6a02c17291c7aa4eb0599f1d2fd986442477268620099e8c6bdac72923ea9654"
+    "skip_scope": "existing optional dependency tests; native required jobs both nine cases with zero skips",
+    "report_sha256": "77f38e01a3993127af17720e7b1b073d835a0c53a2b802e105fefb1b6f214e9f",
+    "source": "25501aac7d00aa0cda719980758055ed447ca7fc"
   },
   "native_mysql": {
     "run": "https://github.com/FangcunMount/qs-server/actions/runs/39397037300",
@@ -280,6 +284,26 @@
         }
       ],
       "source_failure_preserved": true
+    },
+    {
+      "run": "https://github.com/FangcunMount/qs-server/actions/runs/39410100401/job/118585474803",
+      "source": "36aa0741f05f75d2e100db2e123bb338370454fe",
+      "scope": "ordinary source tests on UTC runner",
+      "reason": "new tests compared time.Local versus decoded time.UTC object identity instead of exact instant; two unit assertions failed",
+      "resolution": "TZ=UTC local failure reproduced first; 25501aac7 changes only two unit tests, strict instant plus full decision assertions, UTC/east/west cases; UTC/Asia package race and lint2.5 pass; full UTC race 6977 pass/0 fail/60 existing optional skips; current-head CI pending; final 5a1f489bb complete CI 28 successful checks, 1 generated-sync not applicable, merged db9b4918",
+      "private_log_sha256": "4a99db07e3b685f3f391f0be42c2b63e6beee18f724fc2f11a9e23bb4e108093",
+      "source_failure_preserved": true,
+      "production_code_changed_by_fix": false
+    },
+    {
+      "run": "https://github.com/FangcunMount/qs-server/actions/runs/39411371289/job/118589678803",
+      "source": "25501aac7d00aa0cda719980758055ed447ca7fc",
+      "scope": "documentation source baseline marker",
+      "reason": "two unit test source changes require advancing source_baseline from 13fb912e6 to exact 25501aac7",
+      "resolution": "5a1f489bb updates only source_baseline; 87 docs checks/hygiene/facts and final current-head CI passed, source merged db9b4918",
+      "private_log_sha256": "cb7cfb86b1d916b45a049ea3c8dca9c930d003a02d60abad5c9c769cc27c1132",
+      "source_failure_preserved": true,
+      "production_code_changed_by_fix": false
     }
   ],
   "lint": {
@@ -293,8 +317,9 @@
     "facts": "passed_at_37ca33120eef; later marker-only source baseline changes separately checked by current CI"
   },
   "pending": [
-    "current-head complete source and infra cloud nine-case/regression gates; PR412/infra49 merge",
-    "future dispatcher handoff T13, cross-instance and actual packet/process-exit host faults T22/T23"
+    "future dispatcher handoff remains T13",
+    "full owner lifecycle/cross-instance and actual network/process fault matrix remains T22/T23",
+    "production/system acceptance and 48h observation remain later gates"
   ],
   "production": {
     "deployed": false,
@@ -311,7 +336,7 @@
   },
   "request_batch": {
     "source": "d12f1b5cd3b0bd6bdcc77618510622fcc5464674",
-    "status": "implemented_target_tests_passed_required_broker_pending",
+    "status": "historical_sub_batch_subsequently_verified",
     "infra_harness": "0dcf812",
     "infra_pr": "https://github.com/FangcunMount/infra/pull/49",
     "native_run": "https://github.com/FangcunMount/infra/actions/runs/39399548063",
@@ -417,11 +442,13 @@
         "passed": 13,
         "failed": 0
       }
-    }
+    },
+    "initial_status": "implemented_target_tests_passed_required_broker_pending",
+    "historical": true
   },
   "failure_and_assembly_batch": {
     "source": "ce2f5a124e59129a68e38d7e85dca4332a2ba059",
-    "status": "implemented_native_and_current_head_ci_pending",
+    "status": "completed_source_and_harness_merged",
     "implemented": [
       "frozen immediate failure and original retry authorization; all halves precede original Assessment/claimed Run/witness root",
       "future retry retains first due/id/wire in original scheduled Outbox until T13; not a future half message",
@@ -446,8 +473,8 @@
     },
     "cache_boundary": "rollback or unknown root commit does not run cache hooks; best-effort invalidation is not a durable receipt",
     "production_wiring_activated": false,
-    "candidate": "36aa0741f05f75d2e100db2e123bb338370454fe",
-    "candidate_difference": "36aa0741f changes only cache contract documentation/verification marker relative to tested ce2f5a124; source unchanged",
+    "candidate": "5a1f489bb794fbdaf31d8c10a9769408eba8a4d2",
+    "candidate_difference": "relative to native-tested 36aa: two unit tests plus docs/document-closure.json only; original production and native fixture bytes unchanged",
     "local_native": {
       "source": "ce2f5a124e59129a68e38d7e85dca4332a2ba059",
       "infra_harness": "2d594a18ade202c26da3d3b6484d601e821b019c",
@@ -510,6 +537,305 @@
       "unit_passed": 87,
       "hygiene": "passed",
       "facts": "passed after re-reading and updating changed cache contract; initial aligned-source-changed rejection retained"
+    },
+    "cloud_native": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39410103140",
+      "infra_source": "aff3dd31f8569582870f64458674580da077983e",
+      "reports": [
+        {
+          "artifact": "rocketmq-qs-evaluation-1-1.25.12-e3545edbc255708f6aa3a3bbd19f3689d2a76b30",
+          "source": "36aa0741f05f75d2e100db2e123bb338370454fe",
+          "mysql": "8.4.11",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "38a4799f126fc829f733076cfa5415f993121070aa4747412f0d1cabf4dc4354",
+          "private_output_sha256": "c08bba9c889792a6d2158689fca119ede8c0e7ac393c2dcaf635434ba7246ed4",
+          "receipt": {
+            "broker": "actual_5.5.1",
+            "cases": {
+              "closed_admission_no_business": true,
+              "constructor_no_ddl": true,
+              "exact_frozen_result_recovery": true,
+              "half_hidden_until_original_outcome_root": true,
+              "request_cas_wire_and_witness": true,
+              "request_duplicate_first_wire": true,
+              "failure_original_root_and_witness": true,
+              "failure_redelivery_no_extra_attempt_or_input_call": true,
+              "future_retry_retains_due_authorization_and_wire": true
+            },
+            "failed": 0,
+            "passed": 9,
+            "process_exit_not_claimed": true,
+            "root": "original_mysql_gorm",
+            "skipped": 0,
+            "source_input": "deterministic_fixture_not_system_account",
+            "failure_entry": {
+              "cases": {
+                "failure_original_root_and_witness": true,
+                "failure_redelivery_no_extra_attempt_or_input_call": true,
+                "future_retry_retains_due_authorization_and_wire": true
+              },
+              "failed": 0,
+              "passed": 3,
+              "process_exit_not_claimed": true,
+              "root": "original_mysql_gorm",
+              "skipped": 0,
+              "source_input": "controlled_input_failure_no_provider"
+            }
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "artifact": "rocketmq-qs-evaluation-0-1.25.12-e3545edbc255708f6aa3a3bbd19f3689d2a76b30",
+          "source": "36aa0741f05f75d2e100db2e123bb338370454fe",
+          "mysql": "8.0.36",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "fb6ddb9f88f652b4e33c1de63bed8d778a586b30b7dbc3eab699250a2297246e",
+          "private_output_sha256": "9f4b9685e7483fc271662eea13213c84d817998ee8a145617854c04ae5b02852",
+          "receipt": {
+            "broker": "actual_5.5.1",
+            "cases": {
+              "closed_admission_no_business": true,
+              "constructor_no_ddl": true,
+              "exact_frozen_result_recovery": true,
+              "half_hidden_until_original_outcome_root": true,
+              "request_cas_wire_and_witness": true,
+              "request_duplicate_first_wire": true,
+              "failure_original_root_and_witness": true,
+              "failure_redelivery_no_extra_attempt_or_input_call": true,
+              "future_retry_retains_due_authorization_and_wire": true
+            },
+            "failed": 0,
+            "passed": 9,
+            "process_exit_not_claimed": true,
+            "root": "original_mysql_gorm",
+            "skipped": 0,
+            "source_input": "deterministic_fixture_not_system_account",
+            "failure_entry": {
+              "cases": {
+                "failure_original_root_and_witness": true,
+                "failure_redelivery_no_extra_attempt_or_input_call": true,
+                "future_retry_retains_due_authorization_and_wire": true
+              },
+              "failed": 0,
+              "passed": 3,
+              "process_exit_not_claimed": true,
+              "root": "original_mysql_gorm",
+              "skipped": 0,
+              "source_input": "controlled_input_failure_no_provider"
+            }
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ]
+    },
+    "unit_timezone_fix_source": "25501aac7d00aa0cda719980758055ed447ca7fc",
+    "native_equivalence": "diff from native tested 36aa0741f to 25501aac7 consists only of two evaluationfailure unit test files; production/native fixture/Go dependency bytes unchanged; old receipts keep actual source",
+    "fixed_source_utc_race": {
+      "command": "TZ=UTC go test -race -json ./...",
+      "passed": 6977,
+      "failed": 0,
+      "skipped": 60,
+      "skip_scope": "existing optional dependency tests; native required jobs both nine cases with zero skips",
+      "report_sha256": "77f38e01a3993127af17720e7b1b073d835a0c53a2b802e105fefb1b6f214e9f"
+    },
+    "native_equivalence_files": [
+      "internal/apiserver/infra/mysql/evaluationfailure/commit_test.go",
+      "internal/apiserver/infra/mysql/evaluationfailure/plan_test.go",
+      "docs/document-closure.json"
+    ],
+    "infra_delivery": {
+      "pr": "https://github.com/FangcunMount/infra/pull/49",
+      "head": "aff3dd31f8569582870f64458674580da077983e",
+      "successful_checks": 13,
+      "failed_checks": 0,
+      "merged_at": "2026-10-20T11:08:59Z",
+      "merge_commit": "a4547f8311d7aff7850508f706a642148e0de3b7",
+      "production_changed": false
+    },
+    "source_delivery": {
+      "pr": "https://github.com/FangcunMount/qs-server/pull/412",
+      "head": "5a1f489bb794fbdaf31d8c10a9769408eba8a4d2",
+      "successful_checks": 28,
+      "not_applicable_checks": [
+        "Docs & API Generated Sync"
+      ],
+      "failed_checks": 0,
+      "merged_at": "2026-10-20T11:15:49Z",
+      "merge_commit": "db9b4918df761db61560f681825f38f036c959d2",
+      "checks": [
+        {
+          "name": "delivery (8.0.36)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122452/job/118592187316"
+        },
+        {
+          "name": "Run Tests",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189153"
+        },
+        {
+          "name": "Analyze (go)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412117866/job/118592178043"
+        },
+        {
+          "name": "original-mysql-root (8.0.36)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122497/job/118592187535"
+        },
+        {
+          "name": "mysql-audit",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122426/job/118592186864"
+        },
+        {
+          "name": "delivery (8.4)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122452/job/118592187140"
+        },
+        {
+          "name": "original-mysql-root (8.0.44)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122497/job/118592187726"
+        },
+        {
+          "name": "original-mysql-root (8.4.11)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122497/job/118592187577"
+        },
+        {
+          "name": "images (qs-apiserver)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122452/job/118592187375"
+        },
+        {
+          "name": "MySQL Native Metadata and Readiness",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189343"
+        },
+        {
+          "name": "images (collection-server)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122452/job/118592187543"
+        },
+        {
+          "name": "MongoDB Authenticated Native Metadata",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189209"
+        },
+        {
+          "name": "Action audit MySQL JSON lifecycle",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189231"
+        },
+        {
+          "name": "AuthZ committed version two-process MySQL",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592188768"
+        },
+        {
+          "name": "Actor Store MySQL Transactions",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592190861"
+        },
+        {
+          "name": "Seeddata Retirement and Current Runtime E2E",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189186"
+        },
+        {
+          "name": "Lint Code",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189300"
+        },
+        {
+          "name": "Layer Boundaries (depguard)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189356"
+        },
+        {
+          "name": "Deployment Contracts",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189506"
+        },
+        {
+          "name": "Security Scan (Advisory)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189352"
+        },
+        {
+          "name": "Maintainability Scan (Advisory)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189199"
+        },
+        {
+          "name": "Tier 1 Test Policy",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189406"
+        },
+        {
+          "name": "Docs Hygiene & Facts",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189235"
+        },
+        {
+          "name": "Docs & API Generated Sync",
+          "conclusion": "SKIPPED",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592190923"
+        },
+        {
+          "name": "QS-03 original effect recovery after actual broker loss",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189408"
+        },
+        {
+          "name": "QS-05/06 original business effects after actual broker loss",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189360"
+        },
+        {
+          "name": "Build Applications (apiserver)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118596183153"
+        },
+        {
+          "name": "Build Applications (collection)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118596183328"
+        },
+        {
+          "name": "Build Applications (worker)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118596183212"
+        }
+      ],
+      "production_deploy_paused": true
     }
+  },
+  "task_status": "completed",
+  "completed_at": "2026-10-20T11:15:49Z",
+  "base_batch_source": "de7db811036b5bd3f390742328ede60ca18ba189",
+  "base_batch_source_race": {
+    "command": "go test -race -json ./...",
+    "passed": 6941,
+    "failed": 0,
+    "skipped": 60,
+    "skip_scope": "existing optional dependency tests; separate native job requires zero skips",
+    "report_sha256": "6a02c17291c7aa4eb0599f1d2fd986442477268620099e8c6bdac72923ea9654",
+    "source": "de7db811036b5bd3f390742328ede60ca18ba189"
   }
 }
