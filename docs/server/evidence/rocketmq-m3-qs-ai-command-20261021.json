@@ -345,7 +345,19 @@
       "report": "/tmp/m3-t14-participant-full-source-lint.log",
       "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47"
     },
-    "source_ci": "passed28_success_1_generated_API_inapplicable",
+    "source_ci": {
+      "head": "3dd33af4fc86d03fc80545276f18d0fef862f376",
+      "success": 28,
+      "failed": 0,
+      "inapplicable": [
+        {
+          "name": "Docs & API Generated Sync",
+          "state": "SKIPPED",
+          "reason": "no generated API/proto changes"
+        }
+      ],
+      "checks_snapshot_sha256": "7fb6ca178c5a89b998ede7df9e603609218d0fe70b067db10aed547f2be46794"
+    },
     "native_three_mysql_versions": "passed15perversion_0failed_0skip_cleanup_complete",
     "source_merged": true,
     "infra_merged": true,
@@ -750,7 +762,10 @@
     "head": "3dd33af4fc86d03fc80545276f18d0fef862f376",
     "merge_sha": "0ed41ea5cf5f53d2953150739112811836fef8e2",
     "merged_at": "2026-10-20T20:29:02Z",
-    "production_deploy_paused_verified_before_merge": true
+    "production_deploy_paused_verified_before_merge": true,
+    "current_head_successful_checks": 28,
+    "inapplicable_checks": 1,
+    "checks_snapshot_sha256": "7fb6ca178c5a89b998ede7df9e603609218d0fe70b067db10aed547f2be46794"
   },
   "completed_at": "2026-10-20T20:38:28Z",
   "infra_merged": {
