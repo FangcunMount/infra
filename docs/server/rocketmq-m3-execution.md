@@ -4,15 +4,15 @@
 
 ## 当前执行快照
 
-- 进度：**12/36**；T01–T12 实现与任务必需验证完成，相关源码与infra均已合并。T12最终f37afca0双MySQL档各15项0失败/跳过，QS28项CI成功/1项API同步不适用，infra9项成功；所有失败历史保留。M3-2仍进行中，生产切换未执行。
+- 进度：**13/36**；T01–T13实现与任务必需验证完成，相关源码与infra均已合并。T13最终fd985a122三档原库各44项、Broker各41项零失败/跳过，全仓race7198通过；QS28项CI成功/1项API同步不适用，infra22项全部成功。M3-2完成，生产切换未执行。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T13实现及必需原生矩阵完成，待最后源码E2E及合并。最终fd985a122三档原库各44项、真实Broker各41项全部零失败/跳过，完整UTC race7198通过，固定全仓lint零问题；infra22项CI通过并已合并d4324a87。生产未变更，T13仍不提前勾选。[T13分批证据及失败历史](evidence/rocketmq-m3-qs-retry-20261021.json)。
+- 当前批次：T13已闭环，按序进入T14准备。QS PR417按精确fd985a122合并133fc073；infra PR61按精确1332c57合并d4324a87。全部失败历史及分批报告保留；宿主循环/已消费暂停任务恢复属T22，生产/system/稳定发布尚未执行。[T13完整证据](evidence/rocketmq-m3-qs-retry-20261021.json)。
 
 
-### T13 分批验证（不新增任务，仍为12/36）
+### T13 分批验证（任务已闭环，13/36）
 
 | 子批次门禁 | 状态 | 可核验证据 |
 | --- | --- | --- |
@@ -107,7 +107,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | --- | --- | --- | --- | --- |
 | M3-P | 基线、清单与接入基础 | T01–T04 | ✅ 已完成 | 责任、迁移契约、实现验证与合并 |
 | M3-1 | IAM | T05–T08 | ✅ 已完成 | 原事务、幂等与双订阅 |
-| M3-2 | QS 领域及调度 | T09–T13 | ☐ 进行中 | 双存储和未来重试 |
+| M3-2 | QS 领域及调度 | T09–T13 | ✅ 已完成 | 双存储及未来授权/到期dispatch/责任交接验证通过，相关源码和infra已合并；生产另行切换 |
 | M3-3 | QS↔AI | T14–T20 | ☐ 待开始 | 档案、回执、安全、模型恢复 |
 | M3-4 | 故障与运维 | T21–T25 | ☐ 待开始 | 真实故障及切换工具 |
 | M3-5 | 稳定发布及候选 | T26–T29 | ☐ 待开始 | 正式制品及最终镜像演练 |
@@ -128,8 +128,8 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 2026-10-20；5a1f489bb完整CI28成功/1不适用，完整UTC race6977通过；双档原生Broker各9项0失败/跳过/race。保留Run claim、首次wire、未来原due/授权及原调度职责（T13再交接）。[证据/失败历史](evidence/rocketmq-m3-qs-evaluation-20261020.json)；PR412合并db9b4918、infra49合并a4547f83；生产未变更 |
 | ✅ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 2026-10-20；qs.mongo原事务/共享owner、首次BSON与wire、Run原claim CAS、V2权威审计、只读恢复及显式无DDL装配。最终f8566a830真实Broker/Mongo14项0失败/跳过，完整race7050通过；QS PR414合并20c29ba8（28成功/1不适用），infra PR52合并7b83e264（14成功）。[证据与全部失败历史](evidence/rocketmq-m3-qs-report-20261020.json)。生产未变更 |
 | ✅ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 2026-10-20；冻结首次入口/wire、原pending/revision CAS+witness、归属原根再校验、关闭新提醒仍保留旧执行恢复。最终f37afca0/infra c27ef043双档各15项0失败/跳过，source race7087通过/60既有可选跳过；QS PR415/416及infra54/57全部合并，最终CI分别28成功/1不适用与9成功。[全部证据/失败历史](evidence/rocketmq-m3-qs-task-20261020.json)。生产未变更 |
-| ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 实现及必需原生验证完成；最终7e8aba25/fd985a122全仓race7198通过/60既有可选跳过，固定lint零问题；原库三档各44项、真实Broker三档各41项均0失败/跳过/无race且清理完整。infra PR61当前头22项CI全部通过，已合并d4324a87；QS PR417待最后runtime E2E及精确head合并，不提前勾选。[全部分批证据与失败历史](evidence/rocketmq-m3-qs-retry-20261021.json) |
-| ☐ | T14 | QS command/档案，Operation/Payload新旧兼容 | 待开始 |
+| ✅ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 2026-10-21；最终7e8aba25/fd985a122全仓race7198通过/60既有可选跳过、固定lint零问题；原库三档各44项、真实Broker三档各41项均0失败/跳过/无race且清理完整。QS当前头28项CI成功/1API同步不适用，PR417合并133fc073；infra22项CI全部成功，PR61合并d4324a87。[完整证据与失败历史](evidence/rocketmq-m3-qs-retry-20261021.json)。生产未变更 |
+| ☐ | T14 | QS command/档案，Operation/Payload新旧兼容 | 待开发；已只读核对原StageOperation顺序分配与Relay顺序责任，接入必须保留，不把TRANSACTION当FIFO |
 | ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 待开始 |
 | ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 待开始 |
 | ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 待开始 |
@@ -378,3 +378,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-21：最终源码7e8aba25/文档头fd985a12223a52b0201501b82b72ca60624a3ba9增加业务提交前完整dispatch大小门禁，600KB授权边界红绿回归及100KB最长合法时间/版本对照通过，有效冻结编码不变。239项定向race通过/5既有可选Mongo跳过，独立精确候选完整UTC race7198通过/0失败/60既有可选依赖跳过、全仓固定lint零问题，87文档自测/facts通过。infra1332c57通过显式qs_ref验证最终源码，39475640062三档各44项零失败/跳过、清理完整；41项最终Broker恢复39475640759及完整云端CI仍运行，不勾选T13，12/36。两个本分支已被替代的旧CI39474368285/de628与39473594924/2cc8已取消，不冒称完成或替代最终门禁。
 
 - 2026-10-21：fd985a122最终真实Broker39475640759三档各41项全部通过，0失败/跳过/无race，first wire/selectedAt、真实lease竞争Aborted、新fence及旧精确witness、observer和完整清理均核对。原库最终39475640062三档各44项亦全部通过。infra1332c57的22项当前头CI全部成功，PR61已按精确head合并d4324a87（2026-10-20T18:48:26Z）；默认历史候选de628保留，最终fd985通过显式qs_ref且报告严格匹配，不能混淆其来源。源码PR417尚有Seeddata Retirement and Current Runtime E2E长流程运行，当前24成功/1API同步不适用/1运行；实现和原生验证完成不等于全部合并，T13仍12/36，不提前开始T14代码接入。生产/system/下一业务consumer、网络或进程故障及正式SDK发布均未执行。
+
+- 2026-10-21：T13闭环并勾选，进度13/36，M3-2完成。最终fd985a122当前头28项CI成功、仅Docs/API同步不适用，最后真实数据库/runtime E2E完成；合并前生产CD回读true。QS PR417于2026-10-20T18:55:54Z按精确head合并133fc073，infra PR61当前头22项CI成功并已合并d4324a87。最终原库三档44项、Broker三档41项0失败/跳过，完整UTC race7198/固定lint/文档门禁及全部清理/失败历史核对完成；完整closure索引不重绑定历史报告。按序进入T14，先保留原QS→AI聚合序列/首wire及业务receipt责任，再替换发布型Outbox。未发布稳定SDK、未执行生产DDL/provider/NSQ切换或system验收。
