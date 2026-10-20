@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "batch": "M3-2",
+  "task": "T10",
+  "status": "in_progress",
+  "completed": false,
+  "total_progress": "9/36",
+  "qs_source": "de7db811036b5bd3f390742328ede60ca18ba189",
+  "qs_pr": "https://github.com/FangcunMount/qs-server/pull/412",
+  "pr_status": "draft_not_merged",
+  "sdk_module": "v0.5.0-rocketmq-tx.2",
+  "implemented": [
+    "flat V1/V2 immutable Outcome evidence codec and exact primary audit",
+    "shared original-primary MySQL guarded event transaction boundary",
+    "frozen result/report-input bytes and first wire before half preparation",
+    "explicit successful evaluation transaction committer retaining Run claim CAS",
+    "unknown publication does not authorize immediate calculation failure/retry",
+    "read-only exact existing-plan lookup and pre/post-claim result preflight recovery"
+  ],
+  "source_race": {
+    "command": "go test -race -json ./...",
+    "passed": 6941,
+    "failed": 0,
+    "skipped": 60,
+    "skip_scope": "existing optional dependency tests; separate native job requires zero skips",
+    "report_sha256": "6a02c17291c7aa4eb0599f1d2fd986442477268620099e8c6bdac72923ea9654"
+  },
+  "native_mysql": {
+    "run": "https://github.com/FangcunMount/qs-server/actions/runs/39397037300",
+    "source": "de7db811036b5bd3f390742328ede60ca18ba189",
+    "artifacts": [
+      {
+        "artifact": "evaluation-original-root-8.0.44-3c99ce9937dd617d60f58d2c837151729db26e6d",
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "fc33fe272388e5cf4627b0e1ddec5b08dc7583f6018a4fb1a381f7451935ba59"
+      },
+      {
+        "artifact": "evaluation-original-root-8.0.36-3c99ce9937dd617d60f58d2c837151729db26e6d",
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "0955d14fda0911d80e71c3622831054bc765104cde8e904a0bd1dbd0106d6039"
+      },
+      {
+        "artifact": "evaluation-original-root-8.4.11-3c99ce9937dd617d60f58d2c837151729db26e6d",
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "80644f80fd086c0c2ef5f1e0bd37a3f7300a5871ee0a29f7495fb0d87224b8ba"
+      }
+    ],
+    "scope": "real MySQL original root/rollback, exact-key lookup and JSON column; half sender explicitly simulated, no Broker/packet/SIGKILL claim"
+  },
+  "previous_native_mysql": {
+    "run": "https://github.com/FangcunMount/qs-server/actions/runs/39396324083",
+    "source": "0e5a43ad4e8362ac31a10d12826ae17c923be01f",
+    "mysql_versions": [
+      "8.0.36",
+      "8.0.44",
+      "8.4.11"
+    ],
+    "passed_each": 5,
+    "failed_each": 0,
+    "skipped_each": 0
+  },
+  "failed_history": [
+    {
+      "run": "https://github.com/FangcunMount/qs-server/actions/runs/39395809649",
+      "scope": "native JSON read",
+      "reason": "fixture omitted frozen runtime decision kind, causing legacy read inference and business-binding rejection",
+      "resolution": "corrected fixture and reject missing runtime in V2 domain writes; all three fixed-source native jobs passed",
+      "source_failure_preserved": true,
+      "private_log_sha256": "5158ee42b7795840aaab5fc82264acf94ac35133a79c04dd1c326aa1e57859a0"
+    },
+    {
+      "run": "https://github.com/FangcunMount/qs-server/actions/runs/39396324164/job/118539846586",
+      "scope": "Deployment Contracts",
+      "reason": "new workflow used retired actions/upload-artifact@v4",
+      "resolution": "use repository-approved v7; runtime contract locally passed, current-head CI pending",
+      "source_failure_preserved": true,
+      "private_log_sha256": "19fc66bcd16d7ada49c584405a57d4a553210b575fb8ab7508e285eec4f875ab"
+    }
+  ],
+  "lint": {
+    "version": "2.5.0",
+    "target_packages_passed": true,
+    "native_build_tags_passed": true
+  },
+  "docs": {
+    "unit_passed": 87,
+    "hygiene": "passed",
+    "facts": "passed_at_37ca33120eef; later marker-only source baseline changes separately checked by current CI"
+  },
+  "pending": [
+    "evaluation request transaction submission and explicit module wiring",
+    "failure events and preserved future retry ownership",
+    "native Broker host entry acceptance and cross-instance fault matrix",
+    "complete T10 current-head gates and source merge"
+  ],
+  "production": {
+    "deployed": false,
+    "schema_or_topic_or_acl_changed": false,
+    "provider_switched": false,
+    "system_acceptance": false
+  }
+}
