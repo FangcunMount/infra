@@ -322,5 +322,21 @@
     "pr": 45,
     "merge_sha": "0237e58921f4578f202faa164b4bfd57aa9e27c4",
     "current_head_checks_passed": 11
+  },
+  "final_merges": {
+    "qs_pr411": {
+      "head": "deb46e67016eccc9b8da6edd69764de19b0ebfcb",
+      "merge_sha": "733ce4d80dfeda1f7214961aaf04664765b47500",
+      "merged_at": "2026-10-20T08:31:24Z",
+      "successful_checks": 26,
+      "not_applicable_generated_sync": 1
+    },
+    "infra_pr46": {
+      "head": "4be8e6a45d174dec6c626eaa29edb27777649ce0",
+      "merge_sha": "1f2c2ad7dd5ce243a7478a7039784f79b6295c91",
+      "merged_at": "2026-10-20T08:31:32Z",
+      "successful_checks": 8
+    },
+    "production_deploy_paused_readback": true
   }
 }

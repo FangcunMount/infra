@@ -4,12 +4,12 @@
 
 ## 当前执行快照
 
-- 进度：**9/36**；T01–T09 实现与任务必需验证完成。T09最终源码/同包策略及本地、云端16项原生验收通过，PR411及infra PR46的当前头完整CI与合并继续单独记账；M3-2尚未完成。生产切换未执行。
+- 进度：**9/36**；T01–T09 实现与任务必需验证完成。T09最终源码/同包策略及本地、云端16项原生验收通过，PR411及infra PR46的当前头完整CI通过并合并，合并记录独立保存；M3-2尚未完成。生产切换未执行。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T09实现与验证完成并勾选，原事务入口[QS PR410](https://github.com/FangcunMount/qs-server/pull/410)已合并3afc76a6；装配[QS PR411](https://github.com/FangcunMount/qs-server/pull/411)源码race6909通过/60既有可选依赖跳过，16项原生验收本地及云端0失败/0跳过。同包策略修复已验证；当前头完整CI与合并另记。下一项T10在独立qs-evaluation工作区推进；生产CD仍暂停。[本批证据](evidence/rocketmq-m3-qs-answer-20261020.json)。
+- 当前批次：T09实现与验证完成并勾选，原事务入口[QS PR410](https://github.com/FangcunMount/qs-server/pull/410)已合并3afc76a6；装配[QS PR411](https://github.com/FangcunMount/qs-server/pull/411)源码race6909通过/60既有可选依赖跳过，16项原生验收本地及云端0失败/0跳过。同包策略修复及当前头完整CI通过，PR411合并733ce4d8、infra46合并1f2c2ad7。下一项T10在独立qs-evaluation工作区推进；生产CD仍暂停。[本批证据](evidence/rocketmq-m3-qs-answer-20261020.json)。
 
 ## 1. 目标、基线和授权边界
 
@@ -275,3 +275,7 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：T09实现及必需验证完成，勾选并更新9/36。最终16项原生门禁本地528ec496/infra4be8e6a及云端39338243991均0失败/0跳过/无race，已下载核对真实报告摘要18dff0cb及全部资源清理回执；当前deb46e67相对528仅增加同包回归与文档标记，生产和原生夹具源码相同，不重标旧报告SHA。原Tier1失败39337890729/job118351863412保留：Collection代码注释变更缺少同包测试，已加入“ID存在但证据Unavailable不可接受/重写”的有意义回归，同包策略对实际main基底复验通过。deb46e67全仓race6909通过/0失败/60既有可选依赖跳过，87项文档检查通过；当前头CI继续，旧321手动CI因候选被替代在排队中取消。infra PR45当前11项全成功并合并0237e589；QS PR411及infra46尚未合并，M3-2不标完成。下一项T10只读定位了评分请求、结果与失败三个原根事务，以及失败路径中的未来重试责任；独立工作区qs-evaluation开始本批，不更改生产链路。
 
 - 2026-10-20：T10首个代码批次991aa1e3已本地提交，尚未发布或合并。为现有committed_event_evidence JSON列提供平面V1/V2 codec，保留原结果/report-input bytes、业务schemaVersion及历史V1语义；Outcome增加独立V2元数据，拒绝混合协议/业务绑定冲突，SQL写入要求原事务且拒绝Mongo owner。只读审计通过显式host primary binding与2秒预算读取精确witness；没有authority时为Unknown，不冒称Outbox行、published或消费者完成。evidence、Outcome domain、MySQL仓储、scheduler audit及outcome commit五包race通过，固定golangci2.5零问题；新测试最初漏检查mock pool.Close返回值已修正后复验通过。三个业务提交器、真实MySQL JSON/guard及Broker验收尚未完成，T10仍进行中，总进度9/36。
+
+- 2026-10-20：T09装配QS PR411当前头26项成功、1项API生成同步不适用，合并733ce4d80dfeda1f7214961aaf04664765b47500；infra PR46八项全部成功，合并1f2c2ad7dd5ce243a7478a7039784f79b6295c91。合并前QS生产CD回读仍为暂停。实现、原生验收、源码CI与合并分别闭环；T09保持已完成，M3-2其余任务未完成，总计9/36。
+
+- 2026-10-20：T10新增原MySQL提交边界及评分成功显式入口，源码37ca33120eef（文档head e5c2b853a42a），草稿[QS PR412](https://github.com/FangcunMount/qs-server/pull/412)。完整结果/report-input及原wire在事务前冻结；全部半消息后借用同一主库根事务，先guard、后Outcome/投影/Assessment/Run claim、最后witness。关闭/取消时等待已准入的真实本地callback；原根ACK或新权威读取确认提交后保留LocalCommitted/FinalUnknown。事务Unknown不再触发引擎即时计算失败/新重试授权。目标race及固定lint2.5（含原生标签）通过，87项文档自测/hygiene/facts通过；新增真实MySQL 8.0.36/8.0.44/8.4.11 required任务正在执行，其half发送器明确为夹具模拟，不冒称Broker/网络故障。评分请求、失败及未来调度交接、完整装配和跨实例冻结结果恢复尚未完成；T10仍进行中，总计9/36，无生产切换。
