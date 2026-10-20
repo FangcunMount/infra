@@ -2,16 +2,16 @@
   "task": "M3-T14",
   "status": "in_progress",
   "completed": false,
-  "recorded_at": "2026-10-20T19:32:49.374131+00:00",
+  "recorded_at": "2026-10-20T19:47:37.073627+00:00",
   "baseline": {
     "qs_main": "133fc07367925ed5fac7af6faf3b5a534eea2b94",
     "infra_main": "7ce54046e2bb04be4b6eb32025c0853993de3187",
     "frozen_command_commit": "18e1989760a16802254f416ba95fe0e782a2365f",
     "go_sdk": "v0.5.0-rocketmq-tx.2",
     "original_root_commit": "96f44c40b575f0730311e09fe8c0f34023ed4790",
-    "candidate_sha": "9433ab0f57828f0f8311d3d7d82a139d7739d494",
-    "implementation_source": "840961581eb318e63830db16004cade57d87cd13",
-    "infra_harness_sha": "34227a825ffc2704ad21fd014d1d73a4af794382"
+    "candidate_sha": "949edaddfd12ea4ec8a1e1733813590cfe94584e",
+    "implementation_source": "0b044bb92a8e09e6dcb2e4d26ea3e4474e0707e0",
+    "infra_harness_sha": "049c1294fecdc60a29bc944e82b19a5ad11661c8"
   },
   "implemented_unmerged": [
     "stable business input excludes clock, first ciphertext and optimistic aggregate sequence",
@@ -24,7 +24,10 @@
     "operation/payload reads only fall back on true new identity absence; exact committed evidence and tenant/subject/aggregate required",
     "pending and aborted operations do not masquerade as submitted business facts",
     "explicit shared owner composition and read-only startup schema/index checks",
-    "real broker fixture covers all five original store command entrypoints; predecessor receipts are controlled fixtures, observer ACK only"
+    "real broker fixture covers all five original store command entrypoints; predecessor receipts are controlled fixtures, observer ACK only",
+    "a persisted Prepared/Aborted command request without an archive prohibits historical payload fallback; true double absence alone permits old reads",
+    "same-key different business input retains original app.ErrConflict contract before Seal/reservation",
+    "caller original-root context is refused before new command/retry protocol or SQL reads; no second business root"
   ],
   "validation": [
     {
@@ -79,6 +82,36 @@
       "report": "/tmp/m3-t14-source-docs-complete.log",
       "sha256": "01964615c4fc877442e6b97c418f5772cea609e066ff58b84cb8c6925d0018a9",
       "exit_code": 0
+    },
+    {
+      "name": "prepared payload and conflict regression race",
+      "source": "7a3addaa6706a7e44cb41365f7ce7e433eabb2e1",
+      "report": "/tmp/m3-t14-candidate-fix-race.jsonl",
+      "sha256": "9eacd730d2a5f33dd8bef1958b02bffe3a7b58d76157d26e71045b8e3e09e153",
+      "passed": 746,
+      "failed": 0,
+      "skipped_existing_optional": 7,
+      "native_dependency_claim": false
+    },
+    {
+      "name": "explicit cancellation presence race",
+      "source": "c99918c6110b36e4be49fa3bde52ff8b9edbb809",
+      "report": "/tmp/m3-t14-cancel-presence-race.jsonl",
+      "sha256": "afdd60b96d26ed925a6b319faf4b52ba533a6d4125632d52124ab1e2628c6518",
+      "passed": 253,
+      "failed": 0,
+      "skipped_existing_optional": 7,
+      "native_dependency_claim": false
+    },
+    {
+      "name": "original root context gate race",
+      "source": "0b044bb92a8e09e6dcb2e4d26ea3e4474e0707e0",
+      "report": "/tmp/m3-t14-original-root-context-final-race.jsonl",
+      "sha256": "1af82695f2af6a3d5cd43f07ff213f41d046300dd57c2b1f8e0f67ac8a09afd7",
+      "passed": 748,
+      "failed": 0,
+      "skipped_existing_optional": 7,
+      "native_dependency_claim": false
     }
   ],
   "failure_history": [
@@ -104,6 +137,107 @@
       "name": "documentation machine inventory and source bindings",
       "report": "/tmp/m3-t14-source-docs-final.log",
       "fix": "align machine migration108 and review current source inventory bindings while preserving historical evidence; final87 checks/hygiene/facts pass"
+    },
+    {
+      "name": "intentional red prepared-plan payload fallback regression",
+      "report": "/tmp/m3-t14-prepared-payload-red.jsonl",
+      "intentional_red": true,
+      "fix_source": "7a3addaa6706a7e44cb41365f7ce7e433eabb2e1",
+      "fixed_targeted_race_report": "/tmp/m3-t14-candidate-fix-race.jsonl",
+      "production_impact": false
+    },
+    {
+      "name": "first native cancellation fixture missing required discard presence",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39484124252",
+      "source_sha": "9433ab0f57828f0f8311d3d7d82a139d7739d494",
+      "infra_sha": "34227a825ffc2704ad21fd014d1d73a4af794382",
+      "reports": [
+        {
+          "artifact": "/tmp/m3-t14-native-initial-all/rocketmq-qs-command-0-1.25.12-157888d09228caa1423ded5c7c9f7427306e9695/rocketmq-qs-command.json",
+          "sha256": "5be3c4727e83aa90b7f3cf352904a6a3eb5c59d7618cd6c1681494fdd9e5eac2",
+          "mysql_version": "8.0.36",
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [
+              "TestM3AICommandBrokerHost"
+            ],
+            "assertion_lines": [
+              262
+            ]
+          },
+          "private_output_sha256": "3109a0cc5d4c223c8c552da8bf04a5ce4484256146da5eb0db0a811a96853305",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "artifact": "/tmp/m3-t14-native-initial-all/rocketmq-qs-command-1-1.25.12-157888d09228caa1423ded5c7c9f7427306e9695/rocketmq-qs-command.json",
+          "sha256": "36a46c2ca7e34b8a2231520369cf1c0d625297cb9e18d93278c99ee1ddce66c2",
+          "mysql_version": "8.0.44",
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [
+              "TestM3AICommandBrokerHost"
+            ],
+            "assertion_lines": [
+              262
+            ]
+          },
+          "private_output_sha256": "a3a1cecdfcc03814a45dcceb173a1ced5dfa85fdf00f840ecabe19cb1b21d844",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "artifact": "/tmp/m3-t14-native-initial-all/rocketmq-qs-command-2-1.25.12-157888d09228caa1423ded5c7c9f7427306e9695/rocketmq-qs-command.json",
+          "sha256": "eeabb1f4720ba3711288d75cd3f8bd29c7b01c95d7db91c2bb3946f0af067bc0",
+          "mysql_version": "8.4.11",
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [
+              "TestM3AICommandBrokerHost"
+            ],
+            "assertion_lines": [
+              262
+            ]
+          },
+          "private_output_sha256": "d87819630aa1055c913a798a20171a6dbcc1c85c4e77ac1e058f2ef7fdf5661b",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ],
+      "diagnosis": "existing ParseMessagingBody rejects EVALUATION_CANCEL without explicit Discard before predecessor gate; source line262; no application contract weakened",
+      "fix_source": "c99918c6110b36e4be49fa3bde52ff8b9edbb809",
+      "fix": "set explicit false fixture value and add nil/false/true presence plus immutable input-hash test; native candidate must rerun",
+      "all_owned_resources_cleaned": true
     }
   ],
   "pending": [
@@ -146,5 +280,30 @@
     "failed": 0,
     "python_compile": "passed",
     "actionlint": "passed"
+  },
+  "superseded_candidates": [
+    {
+      "source": "9433ab0f57828f0f8311d3d7d82a139d7739d494",
+      "full_source_race_passed": 7267,
+      "full_source_optional_skips": 60,
+      "full_lint_issues": 0,
+      "reason": "new negative test exposed prepared-request historical payload fallback; preserve changed-input business conflict; native cancellation fixture omitted mandatory explicit discard"
+    },
+    {
+      "source": "1dab47b08728fec0c37eb6d8522e5e24e89a1c65",
+      "full_source_race_passed": 7274,
+      "full_source_optional_skips": 60,
+      "full_lint_issues": 0,
+      "reason": "add fail-closed caller original-root context guard before command/retry reads, Seal and halves; final exact-source validation restarted"
+    }
+  ],
+  "final_gates": {
+    "source_sha": "949edaddfd12ea4ec8a1e1733813590cfe94584e",
+    "full_source_race": "running",
+    "full_lint": "pending after full source race",
+    "source_ci": "running",
+    "native_three_mysql_versions": "pending",
+    "source_merged": false,
+    "infra_merged": false
   }
 }
