@@ -313,8 +313,9 @@
     "facts": "passed_at_37ca33120eef; later marker-only source baseline changes separately checked by current CI"
   },
   "pending": [
-    "current-head complete source and infra cloud nine-case/regression gates; PR412/infra49 merge",
-    "future dispatcher handoff T13, cross-instance and actual packet/process-exit host faults T22/T23"
+    "future dispatcher handoff remains T13",
+    "full owner lifecycle/cross-instance and actual network/process fault matrix remains T22/T23",
+    "production/system acceptance and 48h observation remain later gates"
   ],
   "production": {
     "deployed": false,
@@ -441,7 +442,7 @@
   },
   "failure_and_assembly_batch": {
     "source": "ce2f5a124e59129a68e38d7e85dca4332a2ba059",
-    "status": "local_and_required_native_gates_passed_current_head_ci_pending",
+    "status": "completed_source_and_harness_merged",
     "implemented": [
       "frozen immediate failure and original retry authorization; all halves precede original Assessment/claimed Run/witness root",
       "future retry retains first due/id/wire in original scheduled Outbox until T13; not a future half message",
@@ -658,6 +659,167 @@
       "merged_at": "2026-10-20T11:08:59Z",
       "merge_commit": "a4547f8311d7aff7850508f706a642148e0de3b7",
       "production_changed": false
+    },
+    "source_delivery": {
+      "pr": "https://github.com/FangcunMount/qs-server/pull/412",
+      "head": "5a1f489bb794fbdaf31d8c10a9769408eba8a4d2",
+      "successful_checks": 28,
+      "not_applicable_checks": [
+        "Docs & API Generated Sync"
+      ],
+      "failed_checks": 0,
+      "merged_at": "2026-10-20T11:15:49Z",
+      "merge_commit": "db9b4918df761db61560f681825f38f036c959d2",
+      "checks": [
+        {
+          "name": "delivery (8.0.36)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122452/job/118592187316"
+        },
+        {
+          "name": "Run Tests",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189153"
+        },
+        {
+          "name": "Analyze (go)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412117866/job/118592178043"
+        },
+        {
+          "name": "original-mysql-root (8.0.36)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122497/job/118592187535"
+        },
+        {
+          "name": "mysql-audit",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122426/job/118592186864"
+        },
+        {
+          "name": "delivery (8.4)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122452/job/118592187140"
+        },
+        {
+          "name": "original-mysql-root (8.0.44)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122497/job/118592187726"
+        },
+        {
+          "name": "original-mysql-root (8.4.11)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122497/job/118592187577"
+        },
+        {
+          "name": "images (qs-apiserver)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122452/job/118592187375"
+        },
+        {
+          "name": "MySQL Native Metadata and Readiness",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189343"
+        },
+        {
+          "name": "images (collection-server)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122452/job/118592187543"
+        },
+        {
+          "name": "MongoDB Authenticated Native Metadata",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189209"
+        },
+        {
+          "name": "Action audit MySQL JSON lifecycle",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189231"
+        },
+        {
+          "name": "AuthZ committed version two-process MySQL",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592188768"
+        },
+        {
+          "name": "Actor Store MySQL Transactions",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592190861"
+        },
+        {
+          "name": "Seeddata Retirement and Current Runtime E2E",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189186"
+        },
+        {
+          "name": "Lint Code",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189300"
+        },
+        {
+          "name": "Layer Boundaries (depguard)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189356"
+        },
+        {
+          "name": "Deployment Contracts",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189506"
+        },
+        {
+          "name": "Security Scan (Advisory)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189352"
+        },
+        {
+          "name": "Maintainability Scan (Advisory)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189199"
+        },
+        {
+          "name": "Tier 1 Test Policy",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189406"
+        },
+        {
+          "name": "Docs Hygiene & Facts",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189235"
+        },
+        {
+          "name": "Docs & API Generated Sync",
+          "conclusion": "SKIPPED",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592190923"
+        },
+        {
+          "name": "QS-03 original effect recovery after actual broker loss",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189408"
+        },
+        {
+          "name": "QS-05/06 original business effects after actual broker loss",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118592189360"
+        },
+        {
+          "name": "Build Applications (apiserver)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118596183153"
+        },
+        {
+          "name": "Build Applications (collection)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118596183328"
+        },
+        {
+          "name": "Build Applications (worker)",
+          "conclusion": "SUCCESS",
+          "url": "https://github.com/FangcunMount/qs-server/actions/runs/39412122844/job/118596183212"
+        }
+      ],
+      "production_deploy_paused": true
     }
-  }
+  },
+  "task_status": "completed",
+  "completed_at": "2026-10-20T11:15:49Z"
 }
