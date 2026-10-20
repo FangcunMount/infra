@@ -10,9 +10,14 @@ from routes import consumer_group_v2, physical_topic_v2, validate_v2
 from iam_acceptance import host_failure_summary, retain_private_host_output
 
 
-CASES = frozenset(('constructor_no_ddl', 'request_cas_wire_and_witness',
+EVALUATION_CASES = frozenset(('constructor_no_ddl', 'request_cas_wire_and_witness',
                    'request_duplicate_first_wire', 'half_hidden_until_original_outcome_root',
                    'closed_admission_no_business', 'exact_frozen_result_recovery'))
+FAILURE_CASES = frozenset(('failure_original_root_and_witness',
+                           'future_retry_retains_due_authorization_and_wire',
+                           'failure_redelivery_no_extra_attempt_or_input_call'))
+CASES = EVALUATION_CASES | FAILURE_CASES
+
 
 
 def evaluation_manifest():
@@ -26,6 +31,11 @@ def evaluation_manifest():
                 'group_options': {'retry_queue_nums': 8},
                 'accounts': {'qs-evaluation-producer': {'owner': 'qs.mysql', 'publish': [route['id']], 'subscriptions': []},
                              'qs-evaluation-observer': {'publish': [], 'subscriptions': [route['id']]}}}
+    failure = dict(route, id='qs-failure-native', subscription='qs-m3-failure-observer',
+                   consumer_group=consumer_group_v2(topic, 'qs-m3-failure-observer'))
+    manifest['routes'].append(failure)
+    manifest['accounts']['qs-failure-producer'] = {'owner': 'qs.mysql', 'publish': [failure['id']], 'subscriptions': []}
+    manifest['accounts']['qs-failure-observer'] = {'publish': [], 'subscriptions': [failure['id']]}
     validate_v2(manifest)
     return manifest
 
@@ -33,9 +43,9 @@ def evaluation_manifest():
 def parse_evaluation_receipt(output):
     receipts = [json.loads(line.split('M3_QS_EVALUATION_RECEIPT ', 1)[1])
                 for line in output.splitlines() if 'M3_QS_EVALUATION_RECEIPT {' in line]
-    if (len(receipts) != 1 or receipts[0].get('passed') != len(CASES)
+    if (len(receipts) != 1 or receipts[0].get('passed') != len(EVALUATION_CASES)
             or receipts[0].get('failed') != 0 or receipts[0].get('skipped') != 0
-            or set(receipts[0].get('cases', {})) != CASES
+            or set(receipts[0].get('cases', {})) != EVALUATION_CASES
             or any(value is not True for value in receipts[0]['cases'].values())
             or receipts[0].get('broker') != 'actual_5.5.1'
             or receipts[0].get('root') != 'original_mysql_gorm'
@@ -45,6 +55,28 @@ def parse_evaluation_receipt(output):
             or re.search(r'--- (?:SKIP|FAIL):|WARNING: DATA RACE', output)):
         raise RuntimeError('QS native evaluation receipt absent, incomplete, failed or skipped')
     return receipts[0]
+
+
+def parse_failure_receipt(output):
+    receipts = [json.loads(line.split('M3_QS_FAILURE_RECEIPT ', 1)[1])
+                for line in output.splitlines() if 'M3_QS_FAILURE_RECEIPT {' in line]
+    if (len(receipts) != 1 or receipts[0].get('passed') != len(FAILURE_CASES)
+            or receipts[0].get('failed') != 0 or receipts[0].get('skipped') != 0
+            or set(receipts[0].get('cases', {})) != FAILURE_CASES
+            or any(v is not True for v in receipts[0]['cases'].values())
+            or receipts[0].get('root') != 'original_mysql_gorm'
+            or receipts[0].get('source_input') != 'controlled_input_failure_no_provider'
+            or receipts[0].get('process_exit_not_claimed') is not True
+            or not re.search(r'--- PASS: TestM3FailureBrokerHost \(', output)
+            or re.search(r'--- (?:SKIP|FAIL):|WARNING: DATA RACE', output)):
+        raise RuntimeError('QS failure host receipt absent, partial, failed or skipped')
+    return receipts[0]
+
+
+def parse_host_receipt(output):
+    evaluation, failure = parse_evaluation_receipt(output), parse_failure_receipt(output)
+    return dict(evaluation, passed=len(CASES), cases=dict(evaluation['cases'], **failure['cases']),
+                failure_entry=failure)
 
 
 def run_qs_evaluation_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None):
@@ -71,8 +103,8 @@ def run_qs_evaluation_host(source, directory, broker, project, grpc_port, mysql_
                   'rocketmq': {'endpoint': f'127.0.0.1:{grpc_port}', 'credentials_file': str(credentials),
                                'ca_file': str(ca), 'routes_file': str(routes),
                                'instance_id': 'qs-m3-evaluation-fixture', 'publish_enabled': True}}
-        if role == 'qs-evaluation-producer':
-            config['rocketmq']['transactions'] = {'qs.mysql': {'store_id': 'qs-native-mysql-primary',
+        if role in ('qs-evaluation-producer', 'qs-failure-producer'):
+            config['rocketmq']['transactions'] = {'qs.mysql': {'store_id': ('qs-native-mysql-primary' if role == 'qs-evaluation-producer' else 'qs-native-mysql-failure-primary'),
                                                               'writer_epoch': 'm3-1', 'route_revision': 'm3-1'}}
         path = directory / (role + '-options.json')
         path.write_text(json.dumps(config)); path.chmod(0o600); paths[role] = path
@@ -81,24 +113,26 @@ def run_qs_evaluation_host(source, directory, broker, project, grpc_port, mysql_
                 'QS_M3_EVALUATION_DSN': f'root:{password}@tcp(127.0.0.1:{mysql_port})/?parseTime=true',
                 'QS_M3_PRODUCER_CONFIG': str(paths['qs-evaluation-producer']),
                 'QS_M3_OBSERVER_CONFIG': str(paths['qs-evaluation-observer']),
+                'QS_M3_FAILURE_PRODUCER_CONFIG': str(paths['qs-failure-producer']),
+                'QS_M3_FAILURE_OBSERVER_CONFIG': str(paths['qs-failure-observer']),
                 'rocketmq.client.logRoot': str(logs), 'rocketmq.client.logLevel': 'error'})
-    result = run(['go', 'test', '-race', '-tags=integration,m3_evaluation_broker', '-count=1', '-timeout=3m', '-v',
-                  './internal/apiserver/application/evaluation/outcome/commit', '-run', '^TestM3EvaluationBrokerHost$'],
-                 cwd=source, env=env, timeout=240, required=False)
+    result = run(['go', 'test', '-p', '1', '-race', '-tags=integration,m3_evaluation_broker', '-count=1', '-timeout=3m', '-v',
+                  './internal/apiserver/container/internal/transaction', '-run', '^TestM3(Evaluation|Failure)BrokerHost$'],
+                 cwd=source, env=env, timeout=420, required=False)
     raw = result.stdout + result.stderr
     capture = directory / 'qs-evaluation-host-private.log'; capture.write_text(raw); capture.chmod(0o600)
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
     proof['diagnostics'] = host_failure_summary(raw)
-    proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'transaction_broker_integration_test\.go:(\d+)', raw)))[:32]
+    proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'm3_evaluation(?:_failure)?_broker_integration_test\.go:(\d+)', raw)))[:32]
     if private_log is not None:
         retain_private_host_output(private_log, raw)
     if result.returncode:
         raise RuntimeError('actual QS evaluation host acceptance failed (private output withheld)')
-    proof['native_receipt'] = parse_evaluation_receipt(result.stdout)
+    proof['native_receipt'] = parse_host_receipt(result.stdout)
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('QS source changed during native acceptance')
     proof['scope'] = ('real RocketMQ and original MySQL application submission/outcome roots; '
                       'deterministic input fixture, not system/production; '
-                      'no packet loss, producer SIGKILL or future retry handoff claim')
+                      'failure engine keeps original future schedule; no provider, packet loss, SIGKILL or T13 handoff claim')
