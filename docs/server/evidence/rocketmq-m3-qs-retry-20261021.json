@@ -1392,5 +1392,10 @@
     "checked_status_sha256": "45ed5044925a4527864619245b0ea07f593a1d4f1b815b3a319a4df0daab6b1b",
     "production_deploy_paused_verified_before_merge": true
   },
-  "closure_progress_pr": "pending closure-only documentation merge; task implementation and validation complete"
+  "closure_progress_pr": {
+    "pr": "https://github.com/FangcunMount/infra/pull/66",
+    "state": "MERGED",
+    "merge_sha": "7ce54046e2bb04be4b6eb32025c0853993de3187",
+    "merged_at": "2026-10-20T18:59:27Z"
+  }
 }

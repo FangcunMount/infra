@@ -1,0 +1,74 @@
+{
+  "task": "M3-T14",
+  "status": "in_progress",
+  "completed": false,
+  "recorded_at": "2026-10-20T19:17:49.293935+00:00",
+  "baseline": {
+    "qs_main": "133fc07367925ed5fac7af6faf3b5a534eea2b94",
+    "infra_main": "7ce54046e2bb04be4b6eb32025c0853993de3187",
+    "frozen_command_commit": "18e1989760a16802254f416ba95fe0e782a2365f",
+    "go_sdk": "v0.5.0-rocketmq-tx.2",
+    "original_root_commit": "96f44c40b575f0730311e09fe8c0f34023ed4790"
+  },
+  "implemented_unmerged": [
+    "stable business input excludes clock, first ciphertext and optimistic aggregate sequence",
+    "immutable reservation winner reuses unchanged qs-ai-archive/v1 and exact first wire",
+    "planning reads previous durable admission receipt; held, pending or damaged predecessor refuses new half messages",
+    "original root first binds SDK execution guard then revalidates order and admission",
+    "business facts, operation, sequence CAS, archive and witness share original SQL root",
+    "actual callback join; commit uncertainty remains Unknown; rollback needs exact persisted abortion",
+    "explicit additive MySQL108/Mongo42 migration draft; no constructor or startup DDL"
+  ],
+  "validation": [
+    {
+      "name": "order and migration contracts",
+      "report": "/tmp/m3-t14-command-order-contracts-race.jsonl",
+      "sha256": "3edeb80f24e4636c09704010f9ff996d60a7d27b912312ca8287d51e814f615c",
+      "passed": 382,
+      "failed": 0,
+      "skipped_existing_optional": 7,
+      "native_dependency_claim": false
+    },
+    {
+      "name": "root and command focused race",
+      "report": "/tmp/m3-t14-command-root-sql-race.jsonl",
+      "sha256": "6e5e8cff4e6a22aa824a1528c4b03d2f8b49d12749d042bcbb6148f264e8acaf",
+      "passed": 400,
+      "failed": 0,
+      "skipped_existing_optional": 7,
+      "native_dependency_claim": false
+    },
+    {
+      "name": "fixed golangci-lint 2.5.0 application and MySQL aibridge packages",
+      "report": "/tmp/m3-t14-command-root-lint.log",
+      "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
+      "exit_code": 0,
+      "issues": 0
+    }
+  ],
+  "failure_history": [
+    {
+      "name": "unit wire fixture metadata mismatch",
+      "report": "/tmp/m3-t14-command-root-race.jsonl",
+      "failed": 8,
+      "cause": "new test fixture incorrectly used schema metadata instead of existing secure_profile metadata",
+      "fix": "use unchanged protected.Profile metadata; fixed full targeted race passed",
+      "production_impact": false
+    }
+  ],
+  "pending": [
+    "actual Operation and Payload compatibility readers",
+    "shared qs.mysql owner runtime assembly and startup readiness",
+    "native MySQL and RocketMQ isolated dependency validation",
+    "complete source CI and documentation gate",
+    "source and infra merge"
+  ],
+  "boundaries": {
+    "production_changed": false,
+    "stable_release_done": false,
+    "system_acceptance_done": false,
+    "paired_ai_acceptance_done": false,
+    "task_total": 36,
+    "completed_tasks": 13
+  }
+}
