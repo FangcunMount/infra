@@ -18,11 +18,13 @@ class QSAnswerAcceptanceTest(unittest.TestCase):
 
     def test_required_receipt_rejects_empty_skipped_partial_and_race(self):
         receipt = {'passed': len(CASES), 'failed': 0, 'skipped': 0, 'cases': {name: True for name in CASES},
-                   'root_ack_discard_is_client_level': True, 'mongo_callback_failpoint': True}
+                   'root_ack_discard_is_client_level': True, 'mongo_callback_failpoint': True,
+                   'upstream_rpc': 'actual_protobuf_service_over_bufconn', 'system_login_not_claimed': True}
         output = 'M3_QS_ANSWER_RECEIPT ' + json.dumps(receipt) + '\n--- PASS: TestM3AnswerSubmissionBrokerHost (1.00s)\n'
         self.assertEqual(parse_answer_receipt(output), receipt)
         for bad in ('', output + output, output.replace('true', 'false', 1), output.replace('--- PASS:', '--- SKIP:'),
                     output + '\nWARNING: DATA RACE', output.replace('TestM3AnswerSubmissionBrokerHost', 'TestSDKProbe'),
-                    output.replace('"passed": 11', '"passed": 0'), output.replace('"skipped": 0', '"skipped": 1')):
+                    output.replace('"passed": 16', '"passed": 0'), output.replace('"skipped": 0', '"skipped": 1'),
+                    output.replace('actual_protobuf_service_over_bufconn', 'fake_service')):
             with self.assertRaises(RuntimeError):
                 parse_answer_receipt(bad)

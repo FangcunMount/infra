@@ -15,7 +15,10 @@ CASES = frozenset((
     'duplicate_does_not_execute', 'conflicting_input_rejected',
     'committed_ack_discard_exact_recovery', 'root_abort_no_accepted_fact_or_witness',
     'native_callback_reentry', 'no_new_publish_outbox', 'closed_admission_no_business',
-    'full_reference_required_for_acceptance', 'nested_preparation_rejected'))
+    'full_reference_required_for_acceptance', 'nested_preparation_rejected',
+    'collection_202_exact_root', 'collection_unknown_witness_no202',
+    'concurrent_reservation_one_execution', 'new_instance_exact_accepted_result',
+    'mixed_protocol_marker_rejected'))
 
 
 def answer_manifest():
@@ -42,6 +45,8 @@ def parse_answer_receipt(output):
             or any(value is not True for value in receipts[0]['cases'].values())
             or receipts[0].get('root_ack_discard_is_client_level') is not True
             or receipts[0].get('mongo_callback_failpoint') is not True
+            or receipts[0].get('upstream_rpc') != 'actual_protobuf_service_over_bufconn'
+            or receipts[0].get('system_login_not_claimed') is not True
             or not re.search(r'--- PASS: TestM3AnswerSubmissionBrokerHost \(', output)
             or re.search(r'--- (?:SKIP|FAIL):|WARNING: DATA RACE', output)):
         raise RuntimeError('QS native answer receipt absent, incomplete, failed or skipped')
@@ -100,4 +105,6 @@ def run_qs_answer_host(source, directory, broker, project, grpc_port, mongo_port
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('QS source changed during native acceptance')
-    proof['scope'] = 'real RocketMQ and original Mongo host transactions; client ACK discard is not packet loss; not production/system acceptance'
+    proof['scope'] = ('real RocketMQ/original Mongo host, Survey wiring, Collection REST and actual protobuf service over bufconn; '
+                      'IAM identity fixture and Collection-to-protobuf mapping are test ports; '
+                      'client ACK discard is not packet loss; fresh instance is not a SIGKILL proof; not production/system acceptance')
