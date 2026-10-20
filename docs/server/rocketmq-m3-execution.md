@@ -114,7 +114,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ☑ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 已完成实现与验证；原事务/冻结BSON与wire、V2精确读取、实际Collection/gRPC 202和503、并发原赢家、Mongo failpoint重入、ACK客户端丢弃及新实例读取16项在Mac mini和GitHub实际通过。最终源码deb46e67全仓race6909通过/60既有可选依赖跳过，同包策略与87项文档检查通过；PR410合并3afc76a6，PR411/infra46最终头CI和合并单列；不表示生产或system验收。[证据](evidence/rocketmq-m3-qs-answer-20261020.json) |
 | ✅ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 2026-10-20；5a1f489bb完整CI28成功/1不适用，完整UTC race6977通过；双档原生Broker各9项0失败/跳过/race。保留Run claim、首次wire、未来原due/授权及原调度职责（T13再交接）。[证据/失败历史](evidence/rocketmq-m3-qs-evaluation-20261020.json)；PR412合并db9b4918、infra49合并a4547f83；生产未变更 |
 | ✅ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 2026-10-20；qs.mongo原事务/共享owner、首次BSON与wire、Run原claim CAS、V2权威审计、只读恢复及显式无DDL装配。最终f8566a830真实Broker/Mongo14项0失败/跳过，完整race7050通过；QS PR414合并20c29ba8（28成功/1不适用），infra PR52合并7b83e264（14成功）。[证据与全部失败历史](evidence/rocketmq-m3-qs-report-20261020.json)。生产未变更 |
-| ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 进行中；QS PR415/infra PR54已建草稿，冻结首次入口/wire、原事务CAS+witness、归属再校验及NORMAL独立入口。目标race229通过/0失败/3既有可选跳过；首轮双MySQL档各11项0失败/跳过，已补精度与原写入后回滚、旧revision拒绝为14项最终门禁，2626fd90双档各14项0失败/跳过且清理通过；等待最终头完整CI与合并，尚未勾选 |
+| ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 进行中；QS PR415已合并36a81acc，infra PR54已合并472fbbee，冻结首次入口/wire、原事务CAS+witness、归属再校验及NORMAL独立入口。目标race229通过/0失败/3既有可选跳过；首轮双MySQL档各11项0失败/跳过，已补精度与原写入后回滚、旧revision拒绝为14项最终门禁，2626fd90双档各14项0失败/跳过且清理通过；原批次完整CI通过（QS28成功/1不适用，infra16成功）；新增关闭提醒后仍恢复旧执行的必要收尾，QS PR416/15项native待验，尚未勾选 |
 | ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 待开始 |
 | ☐ | T14 | QS command/档案，Operation/Payload新旧兼容 | 待开始 |
 | ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 待开始 |
@@ -327,3 +327,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：T12精度问题以5个边界点先复现（4点错误抑制），c0f39d42改为与既有消费者一致的MySQL微秒解析/毫秒舍入，保持首次wire与原提醒策略。相关race146项0失败/跳过。首轮2b84bd69实际MySQL8.0.36/8.4.11+Broker各11项0失败/跳过且全部清理；不冒充最终候选证据。最终源码2626fd90全仓race7081通过/0失败/60既有可选跳过，native编译及pinned lint通过，87项docs/facts通过。infra 56eed1b1把原行写入后回滚、旧调度CAS与精度纳入14项门禁，运行39439182533待验。PR415/54尚未合并，总进度11/36，生产CD回读仍为true暂停，无生产或system验收。
 
 - 2026-10-20：T12最终2626fd90/infra56eed1b1的双档真实RocketMQ/MySQL各14项0失败/跳过，报告绑定SDKtx.2摘要、实际镜像digest及全部清理结果。MySQL8.0.36报告ea126c6e、8.4.11报告9cb7b37e；运行39439182533。新增original_write_abort_atomic实际原任务SQL更新后再抛受控异常，证明业务与witness共同回滚；该夹具异常不声称网络故障。PR54曾在push后仍显示旧head，关闭/重开后已刷新为56eed1b1，最终检查不得使用旧head。PR415/54转ready，完整CI/合并尚待完成，总进度11/36。
+
+- 2026-10-20：QS PR415最终2626fd90的28项CI成功/1项API同步不适用，生产CD回读暂停后合并36a81acc；合并main文档facts通过。infra PR54最终56eed1b1全部16项CI成功并合并472fbbee。收尾复核发现关闭新提醒会跳过旧执行恢复，committed/unknown两种情形已先复现；QS PR416候选63595a52把owner协议选择与新提醒开关分离，旧未知继续拒绝新入口，普通新开放保留原事务归属guard。153项目标race0失败/跳过、native编译/lint/docs通过，扩展15项真实门禁与完整源码CI待验。因此T12仍不勾选，总进度11/36；保持生产暂停。
