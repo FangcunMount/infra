@@ -4,12 +4,12 @@
 
 ## 当前执行快照
 
-- 进度：**10/36**；T01–T10 实现与任务必需验证完成。T10最终源码28项检查成功、1项API生成同步不适用；双档真实Broker各9项0失败/0跳过/无race。QS PR412及infra PR49已合并，合并记录分别保存；M3-2仍进行中。生产切换未执行。
+- 进度：**11/36**；T01–T11 实现与任务必需验证完成。T10最终源码28项检查成功、1项API生成同步不适用；双档真实Broker各9项0失败/0跳过/无race。QS PR412及infra PR49已合并，合并记录分别保存；M3-2仍进行中。生产切换未执行。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T11候选f8566a830（QS PR414）报告专用Docker14项已通过，0失败/跳过；完整源码race7050通过/0失败/60既有可选跳过。首次Topic配置、第二轮只读token要求错误及CI夹具缺失保留完整历史。当前头其余CI与相关PR合并仍待完成，T11暂不勾选；生产未切换。[证据](evidence/rocketmq-m3-qs-report-20261020.json)。
+- 当前批次：T11已闭环。QS PR414最终头28项检查成功/1项生成同步不适用，合并20c29ba8；infra PR52完整14项CI成功，合并7b83e264。报告专用Docker14项0失败/跳过，完整源码race7050通过/60既有可选跳过，全部失败历史保留。[T11证据](evidence/rocketmq-m3-qs-report-20261020.json)。下一项T12在独立qs-task工作区推进提醒事务与最终NORMAL；生产未切换。
 
 ## 1. 目标、基线和授权边界
 
@@ -113,8 +113,8 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 2026-10-20；IAM51405831/QS696ee314锁定正式Go SDKtx.2；三档MySQL原事务各34项、成对Broker/fanout各22项0失败/跳过，Mac mini额外22项通过；IAM PR135合并e3efa5b3、QS PR409合并2e95630b；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
 | ☑ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 已完成实现与验证；原事务/冻结BSON与wire、V2精确读取、实际Collection/gRPC 202和503、并发原赢家、Mongo failpoint重入、ACK客户端丢弃及新实例读取16项在Mac mini和GitHub实际通过。最终源码deb46e67全仓race6909通过/60既有可选依赖跳过，同包策略与87项文档检查通过；PR410合并3afc76a6，PR411/infra46最终头CI和合并单列；不表示生产或system验收。[证据](evidence/rocketmq-m3-qs-answer-20261020.json) |
 | ✅ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 2026-10-20；5a1f489bb完整CI28成功/1不适用，完整UTC race6977通过；双档原生Broker各9项0失败/跳过/race。保留Run claim、首次wire、未来原due/授权及原调度职责（T13再交接）。[证据/失败历史](evidence/rocketmq-m3-qs-evaluation-20261020.json)；PR412合并db9b4918、infra49合并a4547f83；生产未变更 |
-| ☐ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 进行中；qs.mongo共享owner/原事务guard、公共冻结codec、Generation/失败Run独立V2、显式schema入口已实现。da6d5c630基础13包race247通过/0失败/8既有可选依赖跳过；答卷真实回归16项、评分双档各9项均0失败/跳过。[证据](evidence/rocketmq-m3-qs-report-20261020.json)。已新增Sender/恢复及显式模块路径（QS PR414草稿），7包race239通过/5既有环境跳过；报告首轮原生验收因manifest Topic错误失败，infra PR52修正并增加V2审计后重验。未完成原生/完整CI，不勾选 |
-| ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 待开始 |
+| ✅ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 2026-10-20；qs.mongo原事务/共享owner、首次BSON与wire、Run原claim CAS、V2权威审计、只读恢复及显式无DDL装配。最终f8566a830真实Broker/Mongo14项0失败/跳过，完整race7050通过；QS PR414合并20c29ba8（28成功/1不适用），infra PR52合并7b83e264（14成功）。[证据与全部失败历史](evidence/rocketmq-m3-qs-report-20261020.json)。生产未变更 |
+| ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 进行中；独立qs-task基线20c29ba8；先验证现有Task pending/schedule revision CAS与原事务调用点，保持外部提醒幂等，固定预算；尚未勾选 |
 | ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 待开始 |
 | ☐ | T14 | QS command/档案，Operation/Payload新旧兼容 | 待开始 |
 | ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 待开始 |
@@ -319,3 +319,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - T11修复记录：报告第二轮真实验证到重复恢复时拒绝SDK已隐藏token的只读执行；9737db449改为仅依赖精确引用/权威证据，不重建执行权限，并保留原始BSON直接比较。旧CI的新增V2类型穷尽夹具缺失由05bc0fda7补齐，原断言保留；lint失败为上游schema下载超时。最终候选f8566a830定向race、固定lint、原生tag编译与87项文档通过，第三轮原生14项及最终完整CI待结果，仍10/36。
 
 - T11验证通过项：最终候选f8566a830完整源码race7050通过/0失败/60既有可选跳过；第三轮真实RocketMQ/Mongo report专用14项0失败/0跳过/无race，通过精确源码与固定Go SDKtx.2核对，Compose/进程/私有目录均已清理。覆盖首次wire、半消息、原事务成功/失败、原claim保护、客户端提交回复丢弃、真实Mongo重入、V2权威审计及新实例只读恢复。相关完整CI/合并尚未闭环，仍10/36；不表示生产或system验收。
+
+- T11完成：2026-10-20T13:37:37Z，相关源码与infra均合并，最终当前头CI门禁全部通过。回表勾选T11，总进度11/36；M3-2仍需T12/T13，不提前标完成。T12开始只读追踪与基线验证，生产部署/正式SDK发布/system验收均未执行。
