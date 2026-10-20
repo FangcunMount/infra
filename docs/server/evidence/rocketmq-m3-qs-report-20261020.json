@@ -43,8 +43,8 @@
   },
   "native": {
     "run": true,
-    "status": "third_candidate_running",
-    "broker_or_original_mongo_atomicity_claimed": false,
+    "status": "passed_current_candidate",
+    "broker_or_original_mongo_atomicity_claimed": true,
     "runs": [
       {
         "url": "https://github.com/FangcunMount/infra/actions/runs/39424653193",
@@ -110,13 +110,58 @@
       "source": "f8566a8303ffc7bdcc8837b78fecd64a286872cf",
       "infra_source": "e0f2eb21f83459081c65c7be10906a9283c8a8c8",
       "required_cases": 14,
-      "claimed_passed": false
+      "claimed_passed": true,
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "receipt": {
+        "cases": {
+          "closed_admission_no_business": true,
+          "committed_reply_discard_recovery": true,
+          "constructor_no_ddl": true,
+          "duplicate_first_artifact": true,
+          "future_retry_preserved": true,
+          "half_invisible": true,
+          "native_callback_reentry": true,
+          "new_instance_exact_recovery": true,
+          "no_new_publish_outbox": true,
+          "original_failure_witness": true,
+          "original_success_witness_wire": true,
+          "root_abort_atomic": true,
+          "stale_claim_cannot_commit": true,
+          "v2_authority_audit": true
+        },
+        "failed": 0,
+        "host_entry": "interpretation_original_root_committer",
+        "mongo_callback_failpoint": true,
+        "passed": 14,
+        "root_ack_discard_is_client_level": true,
+        "skipped": 0,
+        "system_login_not_claimed": true
+      },
+      "sdk_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.5.0-rocketmq-tx.2",
+        "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "report_sha256": "958dca7a4fae56dfc4c0c1c5dee517a4ffd8481b55a8b15a98f523728a6f74d4",
+      "scope": [
+        "No production/system acceptance or throughput claim",
+        "Actual host terminal Sender and original Mongo/Broker; running claims and report body supplied by fixtures",
+        "Root reply discard is client-level; no packet-loss, SIGKILL, model invocation or T13 handoff claim"
+      ]
     }
   },
   "pending": [
-    "report actual Broker/Mongo acceptance (14 required cases, no skips)",
-    "full current-head source race and CI",
-    "source/infra merge and final evidence closure"
+    "full current-head CI completion",
+    "source/infra merge and final task closure; not production/system acceptance"
   ],
   "production": {
     "changed": false,
@@ -335,6 +380,17 @@
     "all_supported_drift_assertions": "preserved; added three malformed V2 fixtures for real Mongo classification",
     "docs_unit_passed": 87,
     "docs_hygiene_and_facts": "passed",
-    "current_full_source_race": "running"
+    "current_full_source_race": "passed: 7050/0 failures/60 existing optional skips"
+  },
+  "full_source_race_current": {
+    "candidate": "f8566a8303ffc7bdcc8837b78fecd64a286872cf",
+    "source": "05bc0fda71c1df69e8c3bc396689a31b6d5a960e",
+    "passed": 7050,
+    "failed": 0,
+    "skipped": 60,
+    "skips": "existing optional environment tests; not report native acceptance",
+    "package_failures": 0,
+    "stderr_bytes": 0,
+    "report_sha256": "b831710ce96cde3efc7422c038d4acb62402294e40216b8f45885c9446f20eb8"
   }
 }
