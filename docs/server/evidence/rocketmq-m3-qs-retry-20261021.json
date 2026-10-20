@@ -1,0 +1,303 @@
+{
+  "task": "T13",
+  "status": "in_progress",
+  "completed": false,
+  "total_progress": "12/36",
+  "base_sha": "f0499e603fa4f67695c57648f73a19a6dd5bf881",
+  "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-retry",
+  "branch": "codex/rocketmq-m3-qs-retry",
+  "first_codec_source": "ee080e0d1eae037b9f15d1fd66df76cfe3a7fdef",
+  "first_codec_documentation_head": "3cc8f6a5d7e9adadfe4b4e408282656006f3c207",
+  "working_tree_state": "additional store/schema/prepared-wire implementation is uncommitted; no PR or CI acceptance claimed",
+  "working_tree_files_sha256": {
+    "internal/apiserver/eventing/retryschedule/plan.go": "9d1b821349826092ee67b9dfbe8630ef48c0961c5224d3678f36a4abe8effed5",
+    "internal/apiserver/eventing/retryschedule/plan_test.go": "52f886b86c8c7e8ee2efbfce193396c35d7d3120ba4dfa29ee0f8118d5c7c999",
+    "internal/apiserver/eventing/retryschedule/record.go": "8172e3732d44b92fdf3307918255dfe6e5fcc0a7bf712a089be8fa387ded5126",
+    "internal/apiserver/eventing/retryschedule/record_test.go": "d07b28c5984661d582cbb4245993d0ac4f69129bd2b30be52fc8450395e515e2",
+    "internal/apiserver/eventing/transactionplan/plan.go": "fc6caa8cec811e498a8fdb35bca1253e713fdef19ccdbf5a53d30864bb799d2a",
+    "internal/apiserver/port/eventtransaction/commit.go": "363c5c10bf92704e181ac00ad0aac7799a379d3f30f93f4d51700869fac0fa82",
+    "internal/apiserver/port/retryschedule/store.go": "2cfa2b0c5bc20c3afeb3d29277da657dddfa9508b0bd96f6e2091a5a512b998d",
+    "internal/apiserver/infra/mysql/retryschedule/store.go": "63e474ac2479cc68d5bd9fd7502fe3af2f9805c05c9005d682d30060d5e14ab2",
+    "internal/apiserver/infra/mysql/retryschedule/store_test.go": "8af7c8a3fd748d994e7c51075b021c0d91aa705ea5bdf8296ecd6276204914ec",
+    "internal/apiserver/infra/mongo/retryschedule/store.go": "a08ed0bab9452990aa5843d5d64a7f45917b6bf73181fbabf5a1981b5a5f329e",
+    "internal/apiserver/infra/mongo/retryschedule/store_test.go": "041397aca9045765bd97f50d290d35656593b72dad5011d29ea1b10165ca060c",
+    "internal/pkg/migration/migrations/mysql/000107_business_retry_schedule.up.sql": "963f729f0f91baa0c60a62090b99dd7574c0d08231d2be0939d8927ce4690ea3",
+    "internal/pkg/migration/migrations/mysql/000107_business_retry_schedule.down.sql": "efec9b8be18ab3171025f3d30ea16c2cde2a076a17ffc77758cb723fce9c4d9e",
+    "internal/pkg/migration/migrations/mongodb/000042_business_retry_schedule.up.json": "aab987b8ada106b3e4208a67b01c8dba6a0c2e6f5793fc7525936c7377bd6c10",
+    "internal/pkg/migration/migrations/mongodb/000042_business_retry_schedule.down.json": "0782c68902b449a08a4df8db815361b6bf882310f20559d304603beac7c06990"
+  },
+  "working_tree_manifest_sha256": "c76edf80e673ef3a29b469175797edff6b123f61c1a7e667b2442f2a963eb118",
+  "pure_codec_and_architecture": {
+    "passed": 65,
+    "failed": 0,
+    "skipped": 0,
+    "report": "/tmp/m3-t13-frozen-plan-race.jsonl",
+    "sha256": "c781c652da95652e6659676c653991a774c3143e9353e415fade63678d3c9784"
+  },
+  "store_and_prepared_wire_contracts": {
+    "passed": 101,
+    "failed": 0,
+    "skipped": 0,
+    "report": "/tmp/m3-t13-store-contracts-race.jsonl",
+    "scope": "unit/contracts; no real storage or business acceptance"
+  },
+  "lint": "pinned v2.5.0 stores lint passed after explicit rows/cursor-close error propagation; latest prepared-wire changes await next batch check",
+  "draft_migrations": {
+    "mysql": 107,
+    "mongodb": 42,
+    "production_applied": false
+  },
+  "implemented_draft": [
+    "immutable first wire/deadline/authorization codec",
+    "upward-rounded database due indexes",
+    "borrowed original SQL Tx parent-pool and Mongo active-session checks",
+    "explicit schema/binding validation; constructors do not install resources",
+    "canonical prepared QS domain wire input to shared transaction plan; no wire reconstruction"
+  ],
+  "remaining": [
+    "real MySQL/Mongo commit/rollback and race acceptance",
+    "original failure/manual authorization writers",
+    "due dispatcher, original SDK guard and witness",
+    "explicit aborted execution retry authorization",
+    "old future responsibility handoff and Replay/governance boundaries",
+    "full exact-source CI, PRs and merges"
+  ],
+  "production_changed": false,
+  "business_acceptance": false,
+  "storage_source_sha": "d789337e42ee4cdc6ca6311202abec29f1ccff80",
+  "storage_candidate_sha": "6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca",
+  "storage_validation": {
+    "race": {
+      "passed": 207,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "f8a3f01cc81340eba15c4cd10bb7a087051da7c2322d4069ad5383146955221c"
+    },
+    "native_build": "passed; no tests run",
+    "scoped_native_lint": "passed pinned 2.5.0",
+    "ordinary_migration_lint": "passed pinned 2.5.0",
+    "expanded_integration_lint": {
+      "result": "failed",
+      "issues": 17,
+      "scope": "pre-existing migration integration fixtures; no unrelated fixes",
+      "report_sha256": "2ed61bc1b6b2f0fc9074fd0d0ce2d1501d68695f515b8d772595bb23c5af87c4"
+    },
+    "docs": "87 selftests plus hygiene/facts passed after reviewed migration metadata update",
+    "infra_harness": "52 tests passed",
+    "native_databases": "pending CI; not claimed"
+  },
+  "scope": "T13 partial: frozen first plan, dual-store original Run atomicity passed atc1e6a137; due-dispatch core source tests passed. Active V2 automatic writes, real Broker due dispatch, manual/force/pause, explicit aborted retries and handoff remain in progress; no production/system acceptance.",
+  "storage_native_failure_history": [
+    {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39457187250",
+      "mysql_version": "8.0.36",
+      "source_sha": "6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca",
+      "report_sha256": "ff9ca62c8b9d06e7d197184b4039e295d2ca0e3fab26820f7ee070b7df4c9164",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3RetryMySQLStore"
+        ],
+        "assertion_lines": [
+          72,
+          142,
+          322
+        ]
+      },
+      "private_output_sha256": "04b455ef09d993ddab8b875ed2e19e2a527188d594946561b3268a7678166a9d",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39457187250",
+      "mysql_version": "8.0.44",
+      "source_sha": "6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca",
+      "report_sha256": "67f32bb74c9b2cb56211618b49036c7fbb6202683d90ac4d74c0328062dec15c",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3RetryMySQLStore"
+        ],
+        "assertion_lines": [
+          72,
+          142,
+          322
+        ]
+      },
+      "private_output_sha256": "8c602fa54144f0a8e4d370eb11978fa103e0768328cf927d8d32c8d2c9e4bd90",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39457187250",
+      "mysql_version": "8.4.11",
+      "source_sha": "6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca",
+      "report_sha256": "0d2326004e44c31999a2b36e1c856e4b9b97e8dd3f744949f84ed9e519aaed4b",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3RetryMySQLStore"
+        ],
+        "assertion_lines": [
+          72,
+          142,
+          322
+        ]
+      },
+      "private_output_sha256": "5dc394d39a693e96f57d2f910713eb10e17af974292d9d147f8c4aecc795fac5",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    }
+  ],
+  "aggregate_fix": {
+    "cause": "new retry schedule validator and synthetic fixtures used Assessment; actual evaluation domain uses Evaluation",
+    "red_regression_sha256": "b25395174ac5248ea8128508ab27f1e949f0230475ac4b3d99305b69aeaa7810",
+    "green_regression_sha256": "fe82d8e55038bfbd28737056f15485a0edd457619c24ae2fa3ff56909777ab97",
+    "required_native_revalidation": "passed atc1e6a137: all three MySQL versions plusMongo7.0.37,14 cases each,0fail/skip; exact receipts attached",
+    "fixed_source_sha": "9e18668bee8e39fd225ec55da9da30c1475f6dcf"
+  },
+  "dispatch_partial_validation": {
+    "new_target_race": {
+      "passed": 72,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "cd3cd4a1183c4070e9067ebc228e0fd42455572c42437150505b0cb3be17cb15"
+    },
+    "architecture_race": {
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "85e9812bd5223db1e0f492287c416047f6551d276f8e56109d6aba011b2c43f3"
+    },
+    "tagged_native_compile": "passed; no tests run",
+    "pinned_scoped_lint": "passed 2.5.0",
+    "commit_status": "committed as 9e18668bee8e39fd225ec55da9da30c1475f6dcf; not merged or deployed",
+    "full_source_race": {
+      "passed": 7144,
+      "failed": 0,
+      "skipped": 60,
+      "skip_scope": "pre-existing optional source dependencies; not required native profile",
+      "timezone": "UTC",
+      "report_sha256": "f11ff52dd8a4cfe3a6a8da0b6dd3a4dec808642db0f20c93bb396eaed35eef9f"
+    },
+    "known_test_build_fix": "fixture initially accessed Result.Final; corrected to per-branch Result.Branches[0].Final, preserving failed report",
+    "docs": "87 selftests, hygiene and facts passed at9e18668b"
+  },
+  "current_source_sha": "9e18668bee8e39fd225ec55da9da30c1475f6dcf",
+  "current_candidate_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+  "source_pr": "https://github.com/FangcunMount/qs-server/pull/417",
+  "infra_pr": "https://github.com/FangcunMount/infra/pull/61",
+  "storage_native_passed": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39459759364",
+    "github_attempt": 2,
+    "source_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+    "reports": [
+      {
+        "mysql_version": "8.0.36",
+        "mongo_version": "7.0.37",
+        "source_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+        "report_sha256": "f1ef8a1fdaac3db235144a4f7c1958e4842c30eba3b7d65fac24effd9cf46419",
+        "private_output_sha256": "2f8077885a09e645ee88f62c4a2f49b2c198ad4ef9a8200f728de6802a76ed87",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "scope": "original MySQL/Mongo Run and future schedule atomicity only; no due dispatcher, Broker, system or production claim"
+      },
+      {
+        "mysql_version": "8.0.44",
+        "mongo_version": "7.0.37",
+        "source_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+        "report_sha256": "e759b31d61534ee612c6dd68aea811e9fe702cf0ab0b406e86b6a7462acf04c6",
+        "private_output_sha256": "cb4fb586f53fece9b5ff32d54115861711401e23fc3d04dd697b094074543b9c",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "scope": "original MySQL/Mongo Run and future schedule atomicity only; no due dispatcher, Broker, system or production claim"
+      },
+      {
+        "mysql_version": "8.4.11",
+        "mongo_version": "7.0.37",
+        "source_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+        "report_sha256": "f0285b84123c5b088f8d7075fdc5c2a7744750621045feb75780ac3582ddfc02",
+        "private_output_sha256": "9a1c46dda016bc794ec9eb3d59bac538f1b59fe9c2d7e509f77f72da33f38427",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "scope": "original MySQL/Mongo Run and future schedule atomicity only; no due dispatcher, Broker, system or production claim"
+      }
+    ],
+    "scope": "original Run and future plan dual-store atomicity only; no due Broker dispatch or full T13 acceptance"
+  },
+  "storage_image_preflight_failure": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39459759364/attempts/1",
+    "mysql_tag": "mysql:8.4.11",
+    "phase": "image acquisition before Compose startup",
+    "structured_report": "absent; no cleanup receipt claimed",
+    "private_log_sha256": "c1e6912a704edd6283ea32ff69c5c94601dc82799da954bfe164a00c576bc41f",
+    "rerun": "failed job only; source unchanged; passed in attempt2",
+    "harness_followup": "write sanitized failure receipt and remove owned pre-Compose temp directory;56 local tests passed; uncommitted"
+  },
+  "auto_authorization_partial": {
+    "status": "uncommitted; no claimed commit or native result",
+    "scope": "new V2 future schedules, legacy V1 Outbox ownership retained; actual deadline Broker fixtures and host runner in preparation",
+    "target_race": {
+      "passed": 199,
+      "failed": 0,
+      "skipped": 5,
+      "skip_scope": "existing optional Mongo tests",
+      "report_sha256": "e3f82cc2a38b4198d25b102d4ba4cc8198f0e4640d8812f9f4bcbc2bb2d056fc"
+    },
+    "tagged_native_compile": "passed, no tests run",
+    "pinned_native_lint": "passed2.5.0",
+    "full_source_race": "running",
+    "failure_history": "new report compatibility test initially used synthetic qs.reports.lifecycle; corrected to canonical qs.evaluation.lifecycle; original failed log preserved"
+  }
+}
