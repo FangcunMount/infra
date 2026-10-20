@@ -82,7 +82,7 @@
     }
   },
   "required_native": {
-    "status": "revalidation_in_progress",
+    "status": "passed",
     "run": "https://github.com/FangcunMount/infra/actions/runs/39500000104",
     "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
     "mysql": [
@@ -93,7 +93,122 @@
     "required_cases_per_job": 17,
     "broker": "5.5.1",
     "sdk_go": "v0.5.0-rocketmq-tx.2",
-    "report_verified": false
+    "report_verified": true,
+    "retained_pending_snapshot": {
+      "status": "revalidation_in_progress",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39500000104",
+      "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+      "mysql": [
+        "8.0.36",
+        "8.0.44",
+        "8.4.11"
+      ],
+      "required_cases_per_job": 17,
+      "broker": "5.5.1",
+      "sdk_go": "v0.5.0-rocketmq-tx.2",
+      "report_verified": false
+    },
+    "results": [
+      {
+        "mysql": "8.0.44",
+        "path": "/tmp/m3-t15-native-corrected-complete/rocketmq-qs-event-1-1.25.12-3433e1937f0886e517fb972a34ab25beaa03fbde/rocketmq-qs-event.json",
+        "sha256": "0d8e3f0891796f4176eabaf2bebcd107f3e6ad9705b8d0a5be86448d5d51ba21",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "image": "sha256:ba36efe96c10136b3c929c5ff9f3abc725a5d2a9469052263ed4e913dba8e94f",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "go_version": "go1.25.12",
+        "sdk_sha": "8fb6fc57a415dc11e27fc64d71722f9675838bc3",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "private_output_sha256": "729e006d005d28d071521363894a3f384c9eefccd500d74241a079ae423ac851",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.4.11",
+        "path": "/tmp/m3-t15-native-corrected-complete/rocketmq-qs-event-2-1.25.12-3433e1937f0886e517fb972a34ab25beaa03fbde/rocketmq-qs-event.json",
+        "sha256": "b1d50a132fbabc5238c7ff8a1c9f0b5ac8d0638c2e1059ca36e149255bfe8a19",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "image": "sha256:ed46ab32e701edc61e6608b317227e93f406cc2e3eee51cd427032b029efa9b5",
+        "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "go_version": "go1.25.12",
+        "sdk_sha": "8fb6fc57a415dc11e27fc64d71722f9675838bc3",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "private_output_sha256": "37b64a3d0f64b8c4edce79cba0bbc4d71fc629fd2261921b6f98b616d8b88238",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.0.36",
+        "path": "/tmp/m3-t15-native-corrected-complete/rocketmq-qs-event-0-1.25.12-3433e1937f0886e517fb972a34ab25beaa03fbde/rocketmq-qs-event.json",
+        "sha256": "3f40a886c290e406c4f5cbeecfb3d970d1c17f568ee745b126b7d4167649cb61",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "image": "sha256:ad576e26454a5db61ee306e42f879ba1c0aeded6135da2e3eb9275844974211d",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "go_version": "go1.25.12",
+        "sdk_sha": "8fb6fc57a415dc11e27fc64d71722f9675838bc3",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "private_output_sha256": "2088bd6bdfb63957f1e298d7c1b3287c4313f8488d837de4e6590771f9c2b77a",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ]
   },
   "retained_history": [
     {
@@ -312,5 +427,53 @@
     "Selected transaction event runtime creates no legacy command/ACK Relay; old Inbox responsibility is retained and not adopted as a new witness.",
     "Native controlled signed AI inputs and observer ACK only. Real paired AI flow, SIGKILL, packet commit faults, production and system acceptance remain later tasks.",
     "First native run failed on all three MySQL versions at fixture lines173/270, no race/skip/timeout, all own resources cleaned. Corrected only receipt correlation + one unit contract and documentation; product code byte-identical. New exact candidate must pass before merge/checkoff."
-  ]
+  ],
+  "source_review": {
+    "path": "/tmp/m3-t15-source-review.json",
+    "sha256": "4328a37a6af422984fc79a9d5853fc2b00596cc979132f3d2e6905791278fdf1",
+    "result": {
+      "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+      "scope": "T15 source boundary self-review; not native/runtime acceptance",
+      "findings": [],
+      "checked": [
+        {
+          "boundary": "complete immutable incoming event and first ACK",
+          "source": "internal/apiserver/application/aibridge/transaction_event.go",
+          "evidence": "exact input hash binds original header/body/wire; ACK plan uses unchanged v1 archive and frozen physical route, no incoming callback mutation"
+        },
+        {
+          "boundary": "one host SQL root and same pool",
+          "source": "internal/apiserver/infra/mysql/aibridge/transaction_root.go",
+          "evidence": "SDK guard first; business/ACK archive/witness precede actual root commit; real rollback plus exact persisted Abort required to return Aborted"
+        },
+        {
+          "boundary": "recovery authorization",
+          "source": "internal/apiserver/infra/mysql/aibridge/transaction_events.go",
+          "evidence": "only current authenticated delivery after exact Aborted permits Retry/Replan; unknown/Prepared never reexecute; committed duplicate uses exact first ACK"
+        },
+        {
+          "boundary": "receipt proof on original connection",
+          "source": "internal/apiserver/infra/mysql/aibridge/transaction_event_receipt.go",
+          "evidence": "no second pool slot while root holds business locks; true old absence retains original Outbox settlement"
+        },
+        {
+          "boundary": "Prepared ACK payload privacy",
+          "source": "internal/apiserver/infra/mysql/aibridge/transaction_archive.go",
+          "evidence": "new ACK branch presence forbids legacy fallback, DB server hint1s and client2s; committed body still exact witness/tenant/hash/workload guarded"
+        },
+        {
+          "boundary": "single sender and unchanged consumer budget",
+          "source": "internal/apiserver/container/modules/interpretation/ai_messaging.go",
+          "evidence": "same qs.mysql owner passed to command/events; exact ACK topic required; selected event runtime returns before legacy publisher/relay construction, original inflight1"
+        }
+      ],
+      "remaining_gates": [
+        "actual native17 matrix and current source CI before T15 checkoff/merge",
+        "T22 full process owner registration/idle Checker/lifecycle and diagnostic integration",
+        "T24 protocol metrics/admission guard/alerts",
+        "T25 legacy Inbox/ACK responsibility handoff and operational recovery",
+        "T20 paired AI flow; T23 actual process/packet faults; T33 system and T34 real48h"
+      ]
+    }
+  }
 }
