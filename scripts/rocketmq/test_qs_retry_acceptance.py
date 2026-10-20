@@ -10,7 +10,7 @@ class QSRetryAcceptanceTest(unittest.TestCase):
         for backend in CASES:
             receipt = {'backend': backend, 'passed': len(CASES[backend]), 'failed': 0, 'skipped': 0,
                        'cases': {name: True for name in CASES[backend]},
-                       'scope': 'original_run_and_future_plan_storage_only',
+                       'scope': 'original_authorization_and_explicit_future_ownership_handoff',
                        'broker_dispatch_not_claimed': True, 'system_login_not_claimed': True}
             name = 'TestM3Retry' + ('MySQL' if backend == 'mysql' else 'Mongo') + 'Store'
             lines += ['M3_QS_RETRY_STORE_RECEIPT ' + json.dumps(receipt), '--- PASS: ' + name + ' (1.00s)']
@@ -27,7 +27,7 @@ class QSRetryAcceptanceTest(unittest.TestCase):
                     output.replace('"failed": 0', '"failed": 1'),
                     output.replace('true', 'false', 1), output.replace('--- PASS:', '--- SKIP:'),
                     output + '\nWARNING: DATA RACE', output.replace('TestM3RetryMongoStore', 'TestSDKProbe'),
-                    output.replace('original_run_and_future_plan_storage_only', 'full_business_acceptance')):
+                    output.replace('original_authorization_and_explicit_future_ownership_handoff', 'full_business_acceptance')):
             with self.subTest(bad=bad[:100]):
                 with self.assertRaises(RuntimeError):
                     parse_retry_receipts(bad)

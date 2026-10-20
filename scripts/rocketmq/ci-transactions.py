@@ -866,8 +866,8 @@ def main():
         if args.qs_retry_store_host:
             report['batch'] = 'M3-QS-retry-original-dual-store-authorizations'
             report['limits'] = ['No production/system acceptance or throughput claim',
-                                'Original MySQL/Mongo Run and future plan atomicity only',
-                                'No due dispatcher, Broker visibility, packet loss, SIGKILL or full T13 handoff claim']
+                                'Original MySQL/Mongo authorization and explicit legacy future ownership handoff',
+                                'No due dispatcher, Broker visibility, packet loss, SIGKILL or production handoff claim']
             report['qs_retry_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_retry_acceptance.py').read_bytes()).hexdigest()
         if args.qs_task_host:
             report['batch'] = 'M3-QS-task-original-MySQL-and-NORMAL'

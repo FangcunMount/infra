@@ -12,8 +12,11 @@ GOVERNED = frozenset(('governed_manual_original_root', 'governed_force_original_
                       'governed_root_rollback_atomic', 'governed_commit_reply_discard_recovered',
                       'governed_first_plan_and_authorization_reused', 'governed_changed_input_conflict',
                       'governed_wrong_scope_rejected', 'governed_no_outbox_or_business_attempt'))
-CASES = {'mysql': COMMON | {'duplicate_first_wire_deadline'} | GOVERNED,
-         'mongo': COMMON | {'expired_session_rejected'} | GOVERNED}
+HANDOFF = frozenset(('legacy_transfer_root_rollback_atomic', 'legacy_transfer_exact_first_wire_and_due',
+                     'legacy_transfer_repeat_keeps_single_owner', 'legacy_transfer_attempted_or_due_refused',
+                     'legacy_replay_cannot_reauthorize_transferred', 'legacy_old_relay_cannot_claim_transferred'))
+CASES = {'mysql': COMMON | {'duplicate_first_wire_deadline'} | GOVERNED | HANDOFF,
+         'mongo': COMMON | {'expired_session_rejected'} | GOVERNED | HANDOFF}
 
 
 def parse_retry_receipts(output):
@@ -28,7 +31,7 @@ def parse_retry_receipts(output):
         if (receipt.get('passed') != len(CASES[backend]) or receipt.get('failed') != 0
                 or receipt.get('skipped') != 0 or set(receipt.get('cases', {})) != CASES[backend]
                 or any(value is not True for value in receipt['cases'].values())
-                or receipt.get('scope') != 'original_run_and_future_plan_storage_only'
+                or receipt.get('scope') != 'original_authorization_and_explicit_future_ownership_handoff'
                 or receipt.get('broker_dispatch_not_claimed') is not True
                 or receipt.get('system_login_not_claimed') is not True
                 or not re.search(r'--- PASS: ' + name + r' \(', output)):
@@ -57,7 +60,7 @@ def run_qs_retry_store_host(source, directory, project, mysql_port, mongo_port, 
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
     proof['diagnostics'] = host_failure_summary(raw)
-    proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'm3_retry_(?:store|governance)_integration_test\.go:(\d+)', raw)))[:32]
+    proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'm3_retry_(?:store|governance|handoff)_integration_test\.go:(\d+)', raw)))[:32]
     if private_log is not None:
         retain_private_host_output(private_log, raw)
     if result.returncode:
@@ -66,4 +69,4 @@ def run_qs_retry_store_host(source, directory, project, mysql_port, mongo_port, 
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('QS source changed during native acceptance')
-    proof['scope'] = 'actual governed authorization entrypoints and original MySQL/Mongo Run/future schedule atomicity; root reply discard is client-level; no due dispatcher, Broker, model consumer, system or production claim'
+    proof['scope'] = 'actual governed authorization entrypoints, original MySQL/Mongo Run/future schedule atomicity and legacy future ownership handoff; root reply discard is client-level; no due dispatcher, Broker, model consumer, system or production claim'
