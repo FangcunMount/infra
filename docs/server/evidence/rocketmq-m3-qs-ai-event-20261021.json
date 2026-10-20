@@ -13,10 +13,18 @@
     "qs_pr": "https://github.com/FangcunMount/qs-server/pull/419",
     "infra_head": "3f2af604e8de6cc8efd79dfdd5900a95e46a436c",
     "infra_pr": "https://github.com/FangcunMount/infra/pull/72",
-    "source_merged": false,
+    "source_merged": true,
     "harness_merged": false,
     "qs_fixture": "7a4c942ac98d58d8390dd81320465221645b63b0",
-    "product_code_unchanged_from": "b1776025fe5d4448469f2d9b33f4f0eff78bf72d"
+    "product_code_unchanged_from": "b1776025fe5d4448469f2d9b33f4f0eff78bf72d",
+    "source_merge": {
+      "headRefOid": "762c2db0d836cb628b4f514e313acfeba1082db9",
+      "mergeCommit": {
+        "oid": "be22b9274d1d7ab21abd3be24fb0ebde834ec78b"
+      },
+      "mergedAt": "2026-10-20T21:45:55Z",
+      "state": "MERGED"
+    }
   },
   "local_validation": {
     "source_head": "762c2db0d836cb628b4f514e313acfeba1082db9",
@@ -475,5 +483,391 @@
         "T20 paired AI flow; T23 actual process/packet faults; T33 system and T34 real48h"
       ]
     }
+  },
+  "source_ci": {
+    "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+    "passed": 28,
+    "inapplicable": 1,
+    "inapplicable_name": "Docs & API Generated Sync",
+    "snapshot_path": "/tmp/m3-t15-final-source-pr-checks.json",
+    "snapshot_sha256": "81622bd1e2fdd5bb3c7605ac713484ddc6cd1d289adbb8a8f28fca2a84807fbe",
+    "checks": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:28:15Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954618/job/118894620365",
+        "name": "delivery (8.0.36)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "AI bridge MySQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:35:27Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622275",
+        "name": "Run Tests",
+        "startedAt": "2026-10-20T21:25:24Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:59Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499949390/job/118894611293",
+        "name": "Analyze (go)",
+        "startedAt": "2026-10-20T21:23:28Z",
+        "status": "COMPLETED",
+        "workflowName": "CodeQL - Code Quality"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:22Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954623/job/118894619656",
+        "name": "original-mysql-root (8.0.36)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ evaluation original MySQL root"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:24:24Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954710/job/118894620839",
+        "name": "mysql-audit",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ host failure audit"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:28:10Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954618/job/118894620773",
+        "name": "delivery (8.4)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "AI bridge MySQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:19Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954623/job/118894620186",
+        "name": "original-mysql-root (8.0.44)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ evaluation original MySQL root"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:21Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954623/job/118894620017",
+        "name": "original-mysql-root (8.4.11)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ evaluation original MySQL root"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:27:59Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954618/job/118894620826",
+        "name": "images (qs-apiserver)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "AI bridge MySQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:26:57Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622282",
+        "name": "MySQL Native Metadata and Readiness",
+        "startedAt": "2026-10-20T21:24:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:28Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954618/job/118894620583",
+        "name": "images (collection-server)",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "AI bridge MySQL"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:59Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622215",
+        "name": "MongoDB Authenticated Native Metadata",
+        "startedAt": "2026-10-20T21:24:53Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:29:03Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622423",
+        "name": "Action audit MySQL JSON lifecycle",
+        "startedAt": "2026-10-20T21:28:00Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:21Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622317",
+        "name": "AuthZ committed version two-process MySQL",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:34:19Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622398",
+        "name": "Actor Store MySQL Transactions",
+        "startedAt": "2026-10-20T21:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:32:31Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894621862",
+        "name": "Seeddata Retirement and Current Runtime E2E",
+        "startedAt": "2026-10-20T21:23:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:34:42Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622438",
+        "name": "Lint Code",
+        "startedAt": "2026-10-20T21:31:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:31:30Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622488",
+        "name": "Layer Boundaries (depguard)",
+        "startedAt": "2026-10-20T21:30:35Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:31:07Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622562",
+        "name": "Deployment Contracts",
+        "startedAt": "2026-10-20T21:30:27Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:32:51Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622385",
+        "name": "Security Scan (Advisory)",
+        "startedAt": "2026-10-20T21:28:47Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:26:45Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622232",
+        "name": "Maintainability Scan (Advisory)",
+        "startedAt": "2026-10-20T21:24:26Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:32Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622281",
+        "name": "Tier 1 Test Policy",
+        "startedAt": "2026-10-20T21:25:17Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:25:35Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622339",
+        "name": "Docs Hygiene & Facts",
+        "startedAt": "2026-10-20T21:24:33Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:23:27Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894623802",
+        "name": "Docs & API Generated Sync",
+        "startedAt": "2026-10-20T21:23:27Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:30:45Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622357",
+        "name": "QS-03 original effect recovery after actual broker loss",
+        "startedAt": "2026-10-20T21:29:27Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:33:53Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118894622723",
+        "name": "QS-05/06 original business effects after actual broker loss",
+        "startedAt": "2026-10-20T21:32:33Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:38:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118900154227",
+        "name": "Build Applications (apiserver)",
+        "startedAt": "2026-10-20T21:35:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:36:02Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118900154046",
+        "name": "Build Applications (collection)",
+        "startedAt": "2026-10-20T21:35:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:36:04Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/39499954696/job/118900154068",
+        "name": "Build Applications (worker)",
+        "startedAt": "2026-10-20T21:35:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      }
+    ]
+  },
+  "shared_root_command_regression": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39502117806",
+    "harness_ref": "ee913457a9c19d229479399e037480bf36f16e7d",
+    "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+    "results": [
+      {
+        "mysql": "8.4.11",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "report_path": "/tmp/m3-t15-current-command-native/rocketmq-qs-command-2-1.25.12-ee913457a9c19d229479399e037480bf36f16e7d/rocketmq-qs-command.json",
+        "report_sha256": "a6e939ff3ea1e5894b15064c3f8b1a1b829715bad7b49531d3ba27e7fc3a7485",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "private_output_sha256": "cc5d804baa838ee82e7f17b2e85eef68e3862e4766d0dbf4db296baa2e85a284",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.0.36",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "report_path": "/tmp/m3-t15-current-command-native/rocketmq-qs-command-0-1.25.12-ee913457a9c19d229479399e037480bf36f16e7d/rocketmq-qs-command.json",
+        "report_sha256": "936a639967be8ec78006b1e5897f7610d01a372407b95e27e8c996534edb5c81",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "private_output_sha256": "104ac0f0321e039bccada47817f1ed509761644ffba6b9f27dde3a08e3548c60",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "mysql": "8.0.44",
+        "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "race_reports": 0,
+        "report_path": "/tmp/m3-t15-current-command-native/rocketmq-qs-command-1-1.25.12-ee913457a9c19d229479399e037480bf36f16e7d/rocketmq-qs-command.json",
+        "report_sha256": "4ec043f7f911dcba9f0dba019b8dc532e1a23052358c52fba9123b3ba58127bc",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "private_output_sha256": "20eff6f19f20043a0c1af67312972b1a54ab349cf3642bfcffa8842a694be0bf",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "status": "passed"
+  },
+  "next_batch_readonly_preflight": {
+    "repository": "qs-ai",
+    "main": "c321a69411d1f9494de1e36f94834a974fbb15ea",
+    "source_worktree": "10687a10f2c9bf86c781f27220dcff2f6aa4a836",
+    "product_tree_equal_to_main": true,
+    "pure_foundation_tests": 26,
+    "failed": 0,
+    "implementation_started": false
   }
 }
