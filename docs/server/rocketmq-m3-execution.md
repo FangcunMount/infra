@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T15最终候选762c2db0d/infra3f2af604复验中。完整本地race7327通过、固定lint零问题；首轮三档原生失败已定位并修正receipt夹具correlation，全部资源清理完整。源码PR419、infra PR72和17项三档原生39500000104门禁仍待完成。[T15进度与保留失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。不计为AI成对、system或生产验收。
+- 当前批次：T15源码PR419已合并be22b927；当前762c2db0d完整CI28成功/1项API生成同步不适用，完整本地race7327/固定lint及两组三档原生（事件各17项、命令各15项）全部通过，清理完整。infra PR72仍等待最后回归和合并，T15暂不勾选。[全部证据及失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -130,7 +130,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 2026-10-20；冻结首次入口/wire、原pending/revision CAS+witness、归属原根再校验、关闭新提醒仍保留旧执行恢复。最终f37afca0/infra c27ef043双档各15项0失败/跳过，source race7087通过/60既有可选跳过；QS PR415/416及infra54/57全部合并，最终CI分别28成功/1不适用与9成功。[全部证据/失败历史](evidence/rocketmq-m3-qs-task-20261020.json)。生产未变更 |
 | ✅ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 2026-10-21；最终7e8aba25/fd985a122全仓race7198通过/60既有可选跳过、固定lint零问题；原库三档各44项、真实Broker三档各41项均0失败/跳过/无race且清理完整。QS当前头28项CI成功/1API同步不适用，PR417合并133fc073；infra22项CI全部成功，PR61合并d4324a87。[完整证据与失败历史](evidence/rocketmq-m3-qs-retry-20261021.json)。生产未变更 |
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
-| ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 实现与三档原生验证完成，等待完整CI及合并；762c2db0d全仓race7327通过/60既有可选跳过、完整lint零问题；最终39500000104三档各17项0失败/跳过/无race，源码/SDK/完整清理均核对。首轮夹具correlation失败保留；QS PR419/infra PR72尚未合并，暂不勾选。[全部证据](evidence/rocketmq-m3-qs-ai-event-20261021.json) |
+| ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 实现与三档原生验证完成，等待完整CI及合并；762c2db0d全仓race7327通过/60既有可选跳过、完整lint零问题；最终39500000104三档各17项0失败/跳过/无race，源码/SDK/完整清理均核对。首轮夹具correlation失败保留；QS PR419已合并be22b927；当前头CI28成功/1项不适用，同候选命令三档各15项通过；infra PR72回归/合并待完成，暂不勾选。[全部证据](evidence/rocketmq-m3-qs-ai-event-20261021.json) |
 | ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 待开始 |
 | ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 待开始 |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
