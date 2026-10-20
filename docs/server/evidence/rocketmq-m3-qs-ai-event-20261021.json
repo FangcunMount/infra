@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "task": "M3-T15",
-  "status": "in_progress",
+  "status": "complete",
   "progress": {
-    "completed": 14,
+    "completed": 15,
     "total": 36,
-    "task_checked": false
+    "task_checked": true
   },
   "candidate": {
     "qs_head": "762c2db0d836cb628b4f514e313acfeba1082db9",
@@ -14,7 +14,7 @@
     "infra_head": "3f2af604e8de6cc8efd79dfdd5900a95e46a436c",
     "infra_pr": "https://github.com/FangcunMount/infra/pull/72",
     "source_merged": true,
-    "harness_merged": false,
+    "harness_merged": true,
     "qs_fixture": "7a4c942ac98d58d8390dd81320465221645b63b0",
     "product_code_unchanged_from": "b1776025fe5d4448469f2d9b33f4f0eff78bf72d",
     "source_merge": {
@@ -23,6 +23,14 @@
         "oid": "be22b9274d1d7ab21abd3be24fb0ebde834ec78b"
       },
       "mergedAt": "2026-10-20T21:45:55Z",
+      "state": "MERGED"
+    },
+    "infra_merge": {
+      "headRefOid": "3f2af604e8de6cc8efd79dfdd5900a95e46a436c",
+      "mergeCommit": {
+        "oid": "db183399f21d39ae481121e893d6c73626b45a41"
+      },
+      "mergedAt": "2026-10-20T21:51:42Z",
       "state": "MERGED"
     }
   },
@@ -869,5 +877,296 @@
     "pure_foundation_tests": 26,
     "failed": 0,
     "implementation_started": false
-  }
+  },
+  "infra_ci": {
+    "source_sha": "3f2af604e8de6cc8efd79dfdd5900a95e46a436c",
+    "passed": 28,
+    "failed": 0,
+    "skipped": 0,
+    "snapshot_path": "/tmp/m3-t15-final-infra-pr-checks.json",
+    "snapshot_sha256": "42506e490dffab68fd81313f1c64a00912f0a64a8a03504ed9c01cf9c6e1d5bf",
+    "checks": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:50:56Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000121/job/118895462688",
+        "name": "acceptance",
+        "startedAt": "2026-10-20T21:31:32Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ Docker acceptance"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:34:26Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999912/job/118895284041",
+        "name": "host (mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:26:47Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ IAM original host transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:27:06Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999974/job/118894774035",
+        "name": "original-command-root (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:23:54Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI commands original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:31:27Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000104/job/118894773767",
+        "name": "original-event-root (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:27:08Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI events original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:29:25Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000542/job/118894775363",
+        "name": "original-mongo-root (1.25.12)",
+        "startedAt": "2026-10-20T21:25:17Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS answer original Mongo transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:32:55Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999938/job/118894774241",
+        "name": "original-mysql-root (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:28:48Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS evaluation original MySQL transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:31:24Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000017/job/118894773623",
+        "name": "original-dual-store-root (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:28:11Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS future retry original dual-store authorization"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:27:35Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000087/job/118894773918",
+        "name": "original-mongo-root (1.25.12)",
+        "startedAt": "2026-10-20T21:24:12Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS report original Mongo transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:35:02Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000064/job/118894822609",
+        "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:25:34Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS retry original roots and real due dispatch"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:30:25Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999995/job/118894773593",
+        "name": "original-mysql-root (1.25.12, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:25:20Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS task original MySQL and NORMAL fanout"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:43:25Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000118/job/118895056635",
+        "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:24:53Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ complete transaction acceptance"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:50:46Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000040/job/118895464266",
+        "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:32:53Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ packet transaction faults"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:39:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000004/job/118895308198",
+        "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+        "startedAt": "2026-10-20T21:27:37Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ public transaction SDK"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:35:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999912/job/118895284620",
+        "name": "host (mysql:8.0.44)",
+        "startedAt": "2026-10-20T21:26:59Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ IAM original host transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:28:46Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999974/job/118894774333",
+        "name": "original-command-root (1.25.12, mysql:8.0.44)",
+        "startedAt": "2026-10-20T21:25:23Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI commands original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:33:22Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000104/job/118894774341",
+        "name": "original-event-root (1.25.12, mysql:8.0.44)",
+        "startedAt": "2026-10-20T21:29:05Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI events original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:30:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999938/job/118894773538",
+        "name": "original-mysql-root (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:26:01Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS evaluation original MySQL transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:34:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000017/job/118894773770",
+        "name": "original-dual-store-root (1.25.12, mysql:8.0.44)",
+        "startedAt": "2026-10-20T21:30:47Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS future retry original dual-store authorization"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:39:09Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000064/job/118894823014",
+        "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.0.44)",
+        "startedAt": "2026-10-20T21:29:46Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS retry original roots and real due dispatch"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:30:34Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999995/job/118894774110",
+        "name": "original-mysql-root (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:25:23Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS task original MySQL and NORMAL fanout"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:44:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000118/job/118895057270",
+        "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+        "startedAt": "2026-10-20T21:25:37Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ complete transaction acceptance"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:42:05Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000040/job/118895463755",
+        "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+        "startedAt": "2026-10-20T21:25:30Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ packet transaction faults"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:44:38Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000004/job/118895308928",
+        "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+        "startedAt": "2026-10-20T21:31:26Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ public transaction SDK"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:38:54Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999912/job/118895284705",
+        "name": "host (mysql:8.4)",
+        "startedAt": "2026-10-20T21:31:08Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ IAM original host transaction"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:29:45Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39499999974/job/118894774411",
+        "name": "original-command-root (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:26:01Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI commands original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:32:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000104/job/118894774252",
+        "name": "original-event-root (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:27:43Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS AI events original SQL and Broker"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:27:42Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000017/job/118894773208",
+        "name": "original-dual-store-root (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:24:24Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS future retry original dual-store authorization"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-20T21:39:48Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/39500000064/job/118894823247",
+        "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.4.11)",
+        "startedAt": "2026-10-20T21:30:13Z",
+        "status": "COMPLETED",
+        "workflowName": "RocketMQ QS retry original roots and real due dispatch"
+      }
+    ]
+  },
+  "completion_boundary": "source and isolated required gates merged; stable SDK release, production, paired AI, system login and actual48h remain later tasks"
 }
