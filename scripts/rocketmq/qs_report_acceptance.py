@@ -15,11 +15,11 @@ CASES = frozenset((
     'duplicate_first_artifact', 'original_failure_witness', 'future_retry_preserved',
     'root_abort_atomic', 'stale_claim_cannot_commit', 'committed_reply_discard_recovery',
     'native_callback_reentry', 'no_new_publish_outbox', 'new_instance_exact_recovery',
-    'closed_admission_no_business'))
+    'closed_admission_no_business', 'v2_authority_audit'))
 
 
 def report_manifest():
-    topic, subscription = 'assessment-lifecycle', 'qs-m3-report-observer'
+    topic, subscription = 'qs.evaluation.lifecycle', 'qs-m3-report-observer'
     route = {'id': 'qs-report-native', 'topic': topic, 'subscription': subscription,
              'message_type': 'TRANSACTION', 'owner': 'qs.mongo', 'route_revision': 'm3-1',
              'physical_topic': physical_topic_v2(topic, 'TRANSACTION', 'qs.mongo', 'm3-1'),

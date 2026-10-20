@@ -10,7 +10,7 @@ class QSReportAcceptanceTest(unittest.TestCase):
         manifest = report_manifest()
         route = manifest['routes'][0]
         self.assertEqual((route['topic'], route['message_type'], route['owner'], route['route_revision']),
-                         ('assessment-lifecycle', 'TRANSACTION', 'qs.mongo', 'm3-1'))
+                         ('qs.evaluation.lifecycle', 'TRANSACTION', 'qs.mongo', 'm3-1'))
         self.assertEqual(permissions_v2(manifest, manifest['accounts']['qs-report-producer']),
                          {'Topic:' + route['physical_topic']: {'Pub', 'Get'}})
         self.assertEqual(permissions_v2(manifest, manifest['accounts']['qs-report-observer']),
@@ -24,7 +24,7 @@ class QSReportAcceptanceTest(unittest.TestCase):
         self.assertEqual(parse_report_receipt(output), receipt)
         for bad in ('', output + output, output.replace('true', 'false', 1), output.replace('--- PASS:', '--- SKIP:'),
                     output + '\nWARNING: DATA RACE', output.replace('TestM3ReportTerminalBrokerHost', 'TestSDKProbe'),
-                    output.replace('"passed": 13', '"passed": 0'), output.replace('"skipped": 0', '"skipped": 1'),
+                    output.replace('"passed": 14', '"passed": 0'), output.replace('"skipped": 0', '"skipped": 1'),
                     output.replace('interpretation_original_root_committer', 'fake_service')):
             with self.assertRaises(RuntimeError):
                 parse_report_receipt(bad)
