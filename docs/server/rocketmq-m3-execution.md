@@ -112,7 +112,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T07 | IAM 幂等键/操作查询，重复/冲突/越权/未知验证 | 2026-10-20；57b07bab正式Go SDKtx.2；必需三档MySQL原事务/HTTP各34项，真实Broker各21项，全部0失败/跳过；PR134合并d53c36a9；[证据](evidence/rocketmq-m3-iam-operations-20261020.json) |
 | ✅ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 2026-10-20；IAM51405831/QS696ee314锁定正式Go SDKtx.2；三档MySQL原事务各34项、成对Broker/fanout各22项0失败/跳过，Mac mini额外22项通过；IAM PR135合并e3efa5b3、QS PR409合并2e95630b；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
 | ☑ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 已完成实现与验证；原事务/冻结BSON与wire、V2精确读取、实际Collection/gRPC 202和503、并发原赢家、Mongo failpoint重入、ACK客户端丢弃及新实例读取16项在Mac mini和GitHub实际通过。最终源码deb46e67全仓race6909通过/60既有可选依赖跳过，同包策略与87项文档检查通过；PR410合并3afc76a6，PR411/infra46最终头CI和合并单列；不表示生产或system验收。[证据](evidence/rocketmq-m3-qs-answer-20261020.json) |
-| ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 进行中；独立qs-evaluation工作区991aa1e3完成首批V1/V2平面JSON兼容codec、Outcome不可变V2元数据、原MySQL事务写入约束与绑定primary的有界只读审计；5个相关包race及固定lint2.5通过。尚未接入三个业务提交器，未完成原生MySQL/Broker接入验证，不勾选 |
+| ☐ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 进行中；ce2f5a124已接入三个原事务入口及共享owner模块装配，全仓race6973通过/0失败/60既有可选跳过。请求/成功真实Broker两档各6项通过；新增失败及未来重试保留职责的9项完整模块验收本地0失败/0跳过/无race，当前候选云端门禁中。原架构/夹具fanout失败保留，未改门禁；[证据](evidence/rocketmq-m3-qs-evaluation-20261020.json)。PR412/infra49未合并，暂不勾选 |
 | ☐ | T11 | QS 报告生成/失败，冻结与终态恢复 | 待开始 |
 | ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 待开始 |
 | ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 待开始 |
@@ -289,3 +289,7 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：Broker第二轮39401207681请求已进入原生验证后，在生成第二个测评时被答卷唯一约束拒绝，两档失败报告/摘要及清理回执均保留。756185f6为每个测试测评提供独立答卷来源，不更改业务约束，候选7ea473a7标签构建通过，先在Mac mini固定缓存镜像/私有项目复验。Mac初次启动因infra验证副本仍指旧远端而在CLI参数校验失败，未启动Docker业务；显式拉取新公共分支并核对两源码SHA后重跑，旧日志保留，未调整任何现有服务。T10继续，仍9/36。
 
 - 2026-10-20：Mac mini固定QS7ea473a7/infra f98f97f/已发布SDKtx.2、RocketMQ5.5.1缓存镜像050426c6、MySQL8.4.11隔离项目，真实评分请求/成功原事务6项0失败/0跳过/无race。请求CAS+witness、原wire和解包正文、重复首次时间、评分根提交前半消息不可消费、已有Run上的新Outcome关闭准入保护、精确冻结结果恢复全部通过；原始报告23ce587e与客户端输出摘要已核对，容器/进程/私有数据目录清理回执完整。该证明使用确定性输入与直接应用入口，不冒称system、生产RPC、网络丢包、进程退出或失败/调度验收。源码PR412与infra PR49固定该候选继续云端重验。下一个T10子批次为失败事件与未来重试原职责；尚不打勾，仍9/36。
+
+- 2026-10-20：T10请求/成功真实Broker云端39402695692两档各6项0失败/跳过，infra72b3全13项CI通过，报告按原7ea源码记录。扩展失败事件、未来重试原授权与精确历史Run后，原生夹具从application迁入container，修正真实架构门禁失败而未增加豁免；5cb全仓race6967通过。新增显式模块装配，复用原主库/owner/写facade；缓存失效改由原根事务提交后钩子执行，提交前不调用Redis，回滚/未知根提交不跑钩子。ce2f5a124全仓race6973通过/0失败/60既有可选依赖跳过。9项首轮39407063585两档失败为独立fanout订阅收到前组夹具，报告/摘要/清理回执保留，已增加精确事件与业务ID过滤，并将失败验收改用实际Module.WorkerService；Mac隔离新一轮进行中，不冒称system或故障矩阵通过。T10尚不勾选，仍9/36，生产未变更。
+
+- 2026-10-20：ce2f5a124固定Mac mini隔离Broker5.5.1/MySQL8.4.11真实模块9项全部通过，0失败/0跳过/无race，原始报告b8eb3246及private输出摘要已核对、临时资源完整清理。失败验收通过Module.WorkerService进入原失败流程，证明Assessment/Run/witness原根提交、future原due/授权/wire保留，以及重复投递不增加输入调用/attempt；不冒称模型调用、SIGKILL、网络故障、system或T13调度交接。缓存契约文档未同步导致一次docs事实拒绝，现已阅读修订并验证87项自测/hygiene/facts通过；固定lint2.5零问题。最终36aa0741f相对该测试源码仅变更缓存说明与验证标记，PR412及infra49固定该候选执行当前头云端门禁，仍9/36不提前勾选，生产CD回读true。
