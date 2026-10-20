@@ -115,7 +115,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 2026-10-20；5a1f489bb完整CI28成功/1不适用，完整UTC race6977通过；双档原生Broker各9项0失败/跳过/race。保留Run claim、首次wire、未来原due/授权及原调度职责（T13再交接）。[证据/失败历史](evidence/rocketmq-m3-qs-evaluation-20261020.json)；PR412合并db9b4918、infra49合并a4547f83；生产未变更 |
 | ✅ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 2026-10-20；qs.mongo原事务/共享owner、首次BSON与wire、Run原claim CAS、V2权威审计、只读恢复及显式无DDL装配。最终f8566a830真实Broker/Mongo14项0失败/跳过，完整race7050通过；QS PR414合并20c29ba8（28成功/1不适用），infra PR52合并7b83e264（14成功）。[证据与全部失败历史](evidence/rocketmq-m3-qs-report-20261020.json)。生产未变更 |
 | ✅ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 2026-10-20；冻结首次入口/wire、原pending/revision CAS+witness、归属原根再校验、关闭新提醒仍保留旧执行恢复。最终f37afca0/infra c27ef043双档各15项0失败/跳过，source race7087通过/60既有可选跳过；QS PR415/416及infra54/57全部合并，最终CI分别28成功/1不适用与9成功。[全部证据/失败历史](evidence/rocketmq-m3-qs-task-20261020.json)。生产未变更 |
-| ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 进行中；基线QS f0499e60。先核对MySQL评分与Mongo报告的授权/due/attempt/首次wire及旧调度责任，再实现独立业务调度档案与到期事务dispatch；尚未实现或验收 |
+| ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 进行中；基线f0499e60，首批冻结模型+架构65项、双存储/原wire合同101项race均0失败/跳过；双存储/107/42/Prepared固定候选6ffd4d90（源码d789337e），207项race0失败/跳过，原生编译与scoped lint通过；真实双库原事务、到期dispatch、调度交接尚待实现/验收。[分批证据](evidence/rocketmq-m3-qs-retry-20261021.json) |
 | ☐ | T14 | QS command/档案，Operation/Payload新旧兼容 | 待开始 |
 | ☐ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 待开始 |
 | ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 待开始 |
@@ -335,3 +335,7 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：修正后的f37afca0/infra c27ef043在实际MySQL8.0.36和8.4.11各15项0失败/跳过，清理全部通过；报告601fd17e/eb5baec7绑定精确源码、SDK和镜像digest。新增用例经真实TaskManagementService，在关闭新提醒且无Plan/Enrollment夹具表的情况下恢复已提交执行、拒绝未知执行，证明恢复先于新业务规划。首轮构建失败与修复历史继续保留；全仓7087通过/60既有可选跳过，完整CI及合并仍待完成，T12未勾选，11/36。
 
 - 2026-10-20：T12闭环，进度12/36。最终QS f37afca0的28项CI成功（仅API生成同步不适用），PR416合并f0499e60且main docs facts通过；infra c27ef043九项CI全部成功/0跳过，PR57合并7487c740。实际双MySQL+RocketMQ各15项0失败/跳过，7087默认源码race通过/60既有可选跳过；初版PR415/54、时钟红绿回归、首轮新增夹具编译失败及更正均保留。未发布稳定SDK、未执行生产迁移或provider切换。按序进入T13，M3-2待T13完成及相关合并后才关闭。
+
+- 2026-10-21：T13首批ee080e0d冻结业务重试授权、first wire和原due，纯模型及架构65项目标race0失败/跳过。双存储初版借原SQL Tx/活跃Mongo session，拒绝错误连接/普通handle，索引时间向上取整；Prepared路径保留原wire，101项合同race0失败/跳过。存储/schema/Prepared代码尚未提交，证据保存逐文件SHA及明确scope；MySQL107/Mongo42仅源码模板，真实DB原子性及业务dispatcher门禁未通过，T13仍不勾选，12/36。Docker本机daemon未运行，后续沿用infra隔离CI，不启动或改动现有依赖与生产。
+
+- 2026-10-21：T13存储子批次d789337e/文档头6ffd4d90已推送；207项race与新增原生标签编译通过，52项infra自测通过。显式107/42加入完整版本对，混合对拒绝，构造无DDL。扩大integration lint发现迁移包17项既有问题；新增代码scoped与普通迁移包固定lint分别通过，保留失败。文档首次因两处迁移说明验证标记过期被拒绝，阅读修订后87自测及facts通过。隔离CI即将对固定源码执行两种原库Run/计划共同提交回滚；尚不声称实际DB、到期发送或旧调度交接通过，T13不勾选，总进度12/36。

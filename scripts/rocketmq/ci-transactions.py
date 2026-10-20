@@ -185,7 +185,13 @@ def main():
     parser.add_argument("--sdk-limits", action="store_true", help="require public SDK finite native check audit and admission alarm")
     parser.add_argument("--sdk-go-probe", type=Path, help="prebuilt public SDK executable from a verified published Go module")
     parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
+    parser.add_argument("--qs-retry-store-host", type=Path, help="exact QS checkout; original dual-store future authorization atomicity only")
+    parser.add_argument("--qs-retry-store-private-log", type=Path, help="new0600 private diagnostic; never a CI artifact")
     args = parser.parse_args()
+    if args.qs_retry_store_private_log and not args.qs_retry_store_host:
+        parser.error("QS retry private output requires its storage profile")
+    if args.qs_retry_store_host and (args.iam_host or args.sdk_api_go or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host):
+        parser.error("QS retry store is a separate required profile")
     if args.qs_task_private_log and not args.qs_task_host:
         parser.error("QS task private output requires its host profile")
     if args.qs_task_host and (args.iam_host or args.sdk_api_go or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host):
@@ -273,13 +279,13 @@ def main():
         "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
-    if args.iam_host or args.qs_evaluation_host or args.qs_task_host:
+    if args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host:
         # Host profiles explicitly create/drop their OWN random schema.
         # This root login exists only in this private loopback Compose project.
         spec['services']['mysql']['environment']['MYSQL_ROOT_HOST'] = '%'
     mongo_port = port()
     mongo_image = None
-    if args.sdk_api_go or args.qs_answer_host or args.qs_report_host:
+    if args.sdk_api_go or args.qs_answer_host or args.qs_report_host or args.qs_retry_store_host:
         mongo_pin = "mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f"
         run(["docker", "pull", mongo_pin], timeout=300)
         mongo_image = run(["docker", "image", "inspect", mongo_pin, "--format", "{{.Id}}"]).stdout.strip()
@@ -412,7 +418,7 @@ def main():
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
-        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host)):
+        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
         if args.qs_task_host:
             from qs_task_acceptance import run_qs_task_host
@@ -430,7 +436,7 @@ def main():
             for name in proof['qs_evaluation_host']['native_receipt']['cases']:
                 passed('qs_evaluation_' + name)
             return
-        if args.qs_answer_host or args.qs_report_host:
+        if args.qs_answer_host or args.qs_report_host or args.qs_retry_store_host:
             mongo_command('rs.initiate({_id:"sdk-proof",members:[{_id:0,host:"mongo:27017"}]})')
             deadline = time.monotonic() + 60
             while time.monotonic() < deadline:
@@ -442,6 +448,15 @@ def main():
             proof['mongo_version'] = mongo_command('db.version()')
             if proof['mongo_version'] != '7.0.37':
                 raise RuntimeError('required Mongo version differs')
+            if args.qs_retry_store_host:
+                from qs_retry_acceptance import run_qs_retry_store_host
+                proof['qs_retry_store_host'] = {}
+                run_qs_retry_store_host(args.qs_retry_store_host, directory, project, mysql_port, mongo_port,
+                                        mysql_password, run, proof['qs_retry_store_host'], args.qs_retry_store_private_log)
+                for backend, receipt in proof['qs_retry_store_host']['native_receipts'].items():
+                    for name in receipt['cases']:
+                        passed('qs_retry_store_' + backend + '_' + name)
+                return
             if args.qs_report_host:
                 from qs_report_acceptance import run_qs_report_host
                 proof['qs_report_host'] = {}
@@ -809,6 +824,12 @@ def main():
                                 'Actual host terminal Sender and original Mongo/Broker; running claims and report body supplied by fixtures',
                                 'Root reply discard is client-level; no packet-loss, SIGKILL, model invocation or T13 handoff claim']
             report['qs_report_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_report_acceptance.py').read_bytes()).hexdigest()
+        if args.qs_retry_store_host:
+            report['batch'] = 'M3-QS-retry-original-dual-store-authorizations'
+            report['limits'] = ['No production/system acceptance or throughput claim',
+                                'Original MySQL/Mongo Run and future plan atomicity only',
+                                'No due dispatcher, Broker visibility, packet loss, SIGKILL or full T13 handoff claim']
+            report['qs_retry_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_retry_acceptance.py').read_bytes()).hexdigest()
         if args.qs_task_host:
             report['batch'] = 'M3-QS-task-original-MySQL-and-NORMAL'
             report['limits'] = ['No production/system acceptance or throughput claim',

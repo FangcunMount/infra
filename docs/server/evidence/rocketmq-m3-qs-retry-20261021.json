@@ -1,0 +1,90 @@
+{
+  "task": "T13",
+  "status": "in_progress",
+  "completed": false,
+  "total_progress": "12/36",
+  "base_sha": "f0499e603fa4f67695c57648f73a19a6dd5bf881",
+  "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-retry",
+  "branch": "codex/rocketmq-m3-qs-retry",
+  "first_codec_source": "ee080e0d1eae037b9f15d1fd66df76cfe3a7fdef",
+  "first_codec_documentation_head": "3cc8f6a5d7e9adadfe4b4e408282656006f3c207",
+  "working_tree_state": "additional store/schema/prepared-wire implementation is uncommitted; no PR or CI acceptance claimed",
+  "working_tree_files_sha256": {
+    "internal/apiserver/eventing/retryschedule/plan.go": "9d1b821349826092ee67b9dfbe8630ef48c0961c5224d3678f36a4abe8effed5",
+    "internal/apiserver/eventing/retryschedule/plan_test.go": "52f886b86c8c7e8ee2efbfce193396c35d7d3120ba4dfa29ee0f8118d5c7c999",
+    "internal/apiserver/eventing/retryschedule/record.go": "8172e3732d44b92fdf3307918255dfe6e5fcc0a7bf712a089be8fa387ded5126",
+    "internal/apiserver/eventing/retryschedule/record_test.go": "d07b28c5984661d582cbb4245993d0ac4f69129bd2b30be52fc8450395e515e2",
+    "internal/apiserver/eventing/transactionplan/plan.go": "fc6caa8cec811e498a8fdb35bca1253e713fdef19ccdbf5a53d30864bb799d2a",
+    "internal/apiserver/port/eventtransaction/commit.go": "363c5c10bf92704e181ac00ad0aac7799a379d3f30f93f4d51700869fac0fa82",
+    "internal/apiserver/port/retryschedule/store.go": "2cfa2b0c5bc20c3afeb3d29277da657dddfa9508b0bd96f6e2091a5a512b998d",
+    "internal/apiserver/infra/mysql/retryschedule/store.go": "63e474ac2479cc68d5bd9fd7502fe3af2f9805c05c9005d682d30060d5e14ab2",
+    "internal/apiserver/infra/mysql/retryschedule/store_test.go": "8af7c8a3fd748d994e7c51075b021c0d91aa705ea5bdf8296ecd6276204914ec",
+    "internal/apiserver/infra/mongo/retryschedule/store.go": "a08ed0bab9452990aa5843d5d64a7f45917b6bf73181fbabf5a1981b5a5f329e",
+    "internal/apiserver/infra/mongo/retryschedule/store_test.go": "041397aca9045765bd97f50d290d35656593b72dad5011d29ea1b10165ca060c",
+    "internal/pkg/migration/migrations/mysql/000107_business_retry_schedule.up.sql": "963f729f0f91baa0c60a62090b99dd7574c0d08231d2be0939d8927ce4690ea3",
+    "internal/pkg/migration/migrations/mysql/000107_business_retry_schedule.down.sql": "efec9b8be18ab3171025f3d30ea16c2cde2a076a17ffc77758cb723fce9c4d9e",
+    "internal/pkg/migration/migrations/mongodb/000042_business_retry_schedule.up.json": "aab987b8ada106b3e4208a67b01c8dba6a0c2e6f5793fc7525936c7377bd6c10",
+    "internal/pkg/migration/migrations/mongodb/000042_business_retry_schedule.down.json": "0782c68902b449a08a4df8db815361b6bf882310f20559d304603beac7c06990"
+  },
+  "working_tree_manifest_sha256": "c76edf80e673ef3a29b469175797edff6b123f61c1a7e667b2442f2a963eb118",
+  "pure_codec_and_architecture": {
+    "passed": 65,
+    "failed": 0,
+    "skipped": 0,
+    "report": "/tmp/m3-t13-frozen-plan-race.jsonl",
+    "sha256": "c781c652da95652e6659676c653991a774c3143e9353e415fade63678d3c9784"
+  },
+  "store_and_prepared_wire_contracts": {
+    "passed": 101,
+    "failed": 0,
+    "skipped": 0,
+    "report": "/tmp/m3-t13-store-contracts-race.jsonl",
+    "scope": "unit/contracts; no real storage or business acceptance"
+  },
+  "lint": "pinned v2.5.0 stores lint passed after explicit rows/cursor-close error propagation; latest prepared-wire changes await next batch check",
+  "draft_migrations": {
+    "mysql": 107,
+    "mongodb": 42,
+    "production_applied": false
+  },
+  "implemented_draft": [
+    "immutable first wire/deadline/authorization codec",
+    "upward-rounded database due indexes",
+    "borrowed original SQL Tx parent-pool and Mongo active-session checks",
+    "explicit schema/binding validation; constructors do not install resources",
+    "canonical prepared QS domain wire input to shared transaction plan; no wire reconstruction"
+  ],
+  "remaining": [
+    "real MySQL/Mongo commit/rollback and race acceptance",
+    "original failure/manual authorization writers",
+    "due dispatcher, original SDK guard and witness",
+    "explicit aborted execution retry authorization",
+    "old future responsibility handoff and Replay/governance boundaries",
+    "full exact-source CI, PRs and merges"
+  ],
+  "production_changed": false,
+  "business_acceptance": false,
+  "storage_source_sha": "d789337e42ee4cdc6ca6311202abec29f1ccff80",
+  "storage_candidate_sha": "6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca",
+  "storage_validation": {
+    "race": {
+      "passed": 207,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "f8a3f01cc81340eba15c4cd10bb7a087051da7c2322d4069ad5383146955221c"
+    },
+    "native_build": "passed; no tests run",
+    "scoped_native_lint": "passed pinned 2.5.0",
+    "ordinary_migration_lint": "passed pinned 2.5.0",
+    "expanded_integration_lint": {
+      "result": "failed",
+      "issues": 17,
+      "scope": "pre-existing migration integration fixtures; no unrelated fixes",
+      "report_sha256": "2ed61bc1b6b2f0fc9074fd0d0ce2d1501d68695f515b8d772595bb23c5af87c4"
+    },
+    "docs": "87 selftests plus hygiene/facts passed after reviewed migration metadata update",
+    "infra_harness": "52 tests passed",
+    "native_databases": "pending CI; not claimed"
+  },
+  "scope": "T13 partial: frozen first plan and dual-store original-root storage, Prepared first-wire path; actual DB atomicity pending; no due dispatch, ownership handoff, production or system acceptance"
+}
