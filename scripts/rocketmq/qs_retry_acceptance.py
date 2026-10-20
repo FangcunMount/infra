@@ -57,7 +57,7 @@ def run_qs_retry_store_host(source, directory, project, mysql_port, mongo_port, 
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
     proof['diagnostics'] = host_failure_summary(raw)
-    proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'm3_retry_store_integration_test\.go:(\d+)', raw)))[:32]
+    proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'm3_retry_(?:store|governance)_integration_test\.go:(\d+)', raw)))[:32]
     if private_log is not None:
         retain_private_host_output(private_log, raw)
     if result.returncode:

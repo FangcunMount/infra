@@ -6,7 +6,10 @@ from qs_evaluation_acceptance import run_qs_evaluation_host
 from qs_report_acceptance import run_qs_report_host
 
 CASES = frozenset(('no_half_before_real_due', 'first_wire_and_dispatch_witness',
-                   'no_business_attempt_or_input_repeat', 'repeat_dispatch_is_empty'))
+                   'no_business_attempt_or_input_repeat', 'repeat_dispatch_is_empty',
+                   'automatic_pause_before_reservation', 'real_root_abort_witness',
+                   'scan_does_not_retry_aborted', 'explicit_retry_same_plan_new_fence',
+                   'old_aborted_evidence_retained'))
 
 
 def parse_dispatch_receipt(output, owner):
@@ -40,8 +43,8 @@ def run_qs_retry_dispatch_host(source, directory, broker, project, grpc_port, my
         cases.update({domain + '_' + name: value for name, value in proof[domain]['native_receipt']['cases'].items()})
     for owner, receipt in proof['dispatch_receipts'].items():
         cases.update({owner + '_' + name: value for name, value in receipt['cases'].items()})
-    if len(cases) != 31:
+    if len(cases) != 41:
         raise RuntimeError('paired host and due-dispatch matrix incomplete')
     proof['native_receipt'] = {'passed': len(cases), 'failed': 0, 'skipped': 0, 'cases': cases}
-    proof['scope'] = ('actual original evaluation failure/report terminal roots, real future deadline and Broker dispatch; '
+    proof['scope'] = ('actual original evaluation failure/report terminal roots, real future deadline, pause, root rollback and explicitly authorized same-plan Broker redispatch; '
                       'observer ACK only, no next business consumer, provider call, system, packet-loss or ownership handoff claim')
