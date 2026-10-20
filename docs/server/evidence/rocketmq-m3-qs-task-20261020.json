@@ -12,7 +12,54 @@
     "original MySQL task pending-state/schedule_revision/open_at CAS",
     "best_effort routing publisher and deferred plan commit publisher"
   ],
-  "baseline_verification": "running",
-  "implementation_started": false,
-  "production_changed": false
+  "baseline_verification": {
+    "passed": 200,
+    "failed": 0,
+    "optional_skipped": 3,
+    "report": "/tmp/m3-t12-baseline-race.jsonl",
+    "sha256": "a0d13db4e8712ad467ac803dd59421434dc776192e156a8708ee50dd722e5e3d"
+  },
+  "implementation_started": true,
+  "production_changed": false,
+  "source_head": "2b84bd697caa9d98c7c5d9f75e2111418a8baaef",
+  "source_implementation": "ab43d2fbcc6b826ea0e72bef2cf2b7f37f95bef8",
+  "source_pr": "https://github.com/FangcunMount/qs-server/pull/415",
+  "infra_pr": "https://github.com/FangcunMount/infra/pull/54",
+  "infra_harness_sha": "787d61e7d04680d53f9396ef20a6bae5d7653fde",
+  "target_race": {
+    "passed": 229,
+    "failed": 0,
+    "optional_skipped": 3,
+    "report": "/tmp/m3-t12-host-normal-race.jsonl",
+    "sha256": "d9e3eff237b4b99776d00c7b8a4af5fd211bdfa1b3021880abdfcf88a65decb3"
+  },
+  "offline_infra": {
+    "passed": 50,
+    "failed": 0,
+    "skipped": 0
+  },
+  "native_gate": {
+    "status": "queued",
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39437289899",
+    "expected_cases": 11,
+    "required_zero_skip": true
+  },
+  "source_full_race": "running",
+  "pending_findings": [
+    "New frozen opening truncates task business clocks while existing reminder eligibility mirrors MySQL microsecond/millisecond rounding. Correct and test half-millisecond boundaries before task closure."
+  ],
+  "implemented": [
+    "frozen first entry and wire with stable input hash",
+    "original pending/schedule_revision CAS and shared qs.mysql guard/witness",
+    "unknown result never falls back to legacy task Save/Outbox",
+    "operator ownership rechecked in original root after half preparation",
+    "scheduler original-primary admission",
+    "explicit NORMAL wire client and best_effort-only router; dual fanout native gate"
+  ],
+  "delivery_states": {
+    "source_merge": false,
+    "artifact_release": false,
+    "production_deploy": false,
+    "system_business_acceptance": false
+  }
 }
