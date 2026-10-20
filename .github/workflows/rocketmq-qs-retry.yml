@@ -6,7 +6,7 @@ on:
         description: Exact QS retry schedule candidate SHA
         type: string
         required: true
-        default: 6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca
+        default: c1e6a137f71373cf7132c9f924d808ec1b11b0af
   pull_request:
     paths: ['scripts/rocketmq/qs_retry_acceptance.py', 'scripts/rocketmq/test_qs_retry_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-retry.yml']
 permissions:
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: ${{ inputs.qs_ref || '6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca' }}
+          ref: ${{ inputs.qs_ref || 'c1e6a137f71373cf7132c9f924d808ec1b11b0af' }}
           path: .qs-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -45,7 +45,7 @@ jobs:
           cache-dependency-path: .qs-acceptance/go.sum
       - name: Verify candidate and source harness
         env:
-          EXPECTED_QS_SHA: ${{ inputs.qs_ref || '6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca' }}
+          EXPECTED_QS_SHA: ${{ inputs.qs_ref || 'c1e6a137f71373cf7132c9f924d808ec1b11b0af' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]

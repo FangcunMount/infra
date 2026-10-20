@@ -86,5 +86,135 @@
     "infra_harness": "52 tests passed",
     "native_databases": "pending CI; not claimed"
   },
-  "scope": "T13 partial: frozen first plan and dual-store original-root storage, Prepared first-wire path; actual DB atomicity pending; no due dispatch, ownership handoff, production or system acceptance"
+  "scope": "T13 partial: dual-store frozen authorization and due-dispatch core/original authority guards. First native failed; corrected exact candidate awaits required dual-store storage rerun. Active write handoff, explicit aborted retries, governance, real Broker dispatch, production/system not claimed.",
+  "storage_native_failure_history": [
+    {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39457187250",
+      "mysql_version": "8.0.36",
+      "source_sha": "6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca",
+      "report_sha256": "ff9ca62c8b9d06e7d197184b4039e295d2ca0e3fab26820f7ee070b7df4c9164",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3RetryMySQLStore"
+        ],
+        "assertion_lines": [
+          72,
+          142,
+          322
+        ]
+      },
+      "private_output_sha256": "04b455ef09d993ddab8b875ed2e19e2a527188d594946561b3268a7678166a9d",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39457187250",
+      "mysql_version": "8.0.44",
+      "source_sha": "6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca",
+      "report_sha256": "67f32bb74c9b2cb56211618b49036c7fbb6202683d90ac4d74c0328062dec15c",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3RetryMySQLStore"
+        ],
+        "assertion_lines": [
+          72,
+          142,
+          322
+        ]
+      },
+      "private_output_sha256": "8c602fa54144f0a8e4d370eb11978fa103e0768328cf927d8d32c8d2c9e4bd90",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39457187250",
+      "mysql_version": "8.4.11",
+      "source_sha": "6ffd4d90b38ae07d742fc9a2d5afba246e0c8aca",
+      "report_sha256": "0d2326004e44c31999a2b36e1c856e4b9b97e8dd3f744949f84ed9e519aaed4b",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3RetryMySQLStore"
+        ],
+        "assertion_lines": [
+          72,
+          142,
+          322
+        ]
+      },
+      "private_output_sha256": "5dc394d39a693e96f57d2f910713eb10e17af974292d9d147f8c4aecc795fac5",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    }
+  ],
+  "aggregate_fix": {
+    "cause": "new retry schedule validator and synthetic fixtures used Assessment; actual evaluation domain uses Evaluation",
+    "red_regression_sha256": "b25395174ac5248ea8128508ab27f1e949f0230475ac4b3d99305b69aeaa7810",
+    "green_regression_sha256": "fe82d8e55038bfbd28737056f15485a0edd457619c24ae2fa3ff56909777ab97",
+    "required_native_revalidation": "pending; no current passing native report claimed",
+    "fixed_source_sha": "9e18668bee8e39fd225ec55da9da30c1475f6dcf"
+  },
+  "dispatch_partial_validation": {
+    "new_target_race": {
+      "passed": 72,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "cd3cd4a1183c4070e9067ebc228e0fd42455572c42437150505b0cb3be17cb15"
+    },
+    "architecture_race": {
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "85e9812bd5223db1e0f492287c416047f6551d276f8e56109d6aba011b2c43f3"
+    },
+    "tagged_native_compile": "passed; no tests run",
+    "pinned_scoped_lint": "passed 2.5.0",
+    "commit_status": "committed as 9e18668bee8e39fd225ec55da9da30c1475f6dcf; not merged or deployed",
+    "full_source_race": {
+      "passed": 7144,
+      "failed": 0,
+      "skipped": 60,
+      "skip_scope": "pre-existing optional source dependencies; not required native profile",
+      "timezone": "UTC",
+      "report_sha256": "f11ff52dd8a4cfe3a6a8da0b6dd3a4dec808642db0f20c93bb396eaed35eef9f"
+    },
+    "known_test_build_fix": "fixture initially accessed Result.Final; corrected to per-branch Result.Branches[0].Final, preserving failed report",
+    "docs": "87 selftests, hygiene and facts passed at9e18668b"
+  },
+  "current_source_sha": "9e18668bee8e39fd225ec55da9da30c1475f6dcf",
+  "current_candidate_sha": "c1e6a137f71373cf7132c9f924d808ec1b11b0af",
+  "source_pr": "https://github.com/FangcunMount/qs-server/pull/417",
+  "infra_pr": "https://github.com/FangcunMount/infra/pull/61"
 }
