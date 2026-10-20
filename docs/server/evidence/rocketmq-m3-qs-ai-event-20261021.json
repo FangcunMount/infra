@@ -8,74 +8,83 @@
     "task_checked": false
   },
   "candidate": {
-    "qs_head": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+    "qs_head": "762c2db0d836cb628b4f514e313acfeba1082db9",
     "qs_implementation": "b1776025fe5d4448469f2d9b33f4f0eff78bf72d",
     "qs_pr": "https://github.com/FangcunMount/qs-server/pull/419",
-    "infra_head": "137c5465db77a3865b819459477592e2d91766cf",
+    "infra_head": "3f2af604e8de6cc8efd79dfdd5900a95e46a436c",
     "infra_pr": "https://github.com/FangcunMount/infra/pull/72",
     "source_merged": false,
-    "harness_merged": false
+    "harness_merged": false,
+    "qs_fixture": "7a4c942ac98d58d8390dd81320465221645b63b0",
+    "product_code_unchanged_from": "b1776025fe5d4448469f2d9b33f4f0eff78bf72d"
   },
   "local_validation": {
-    "source_head": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+    "source_head": "762c2db0d836cb628b4f514e313acfeba1082db9",
     "full_race": {
-      "passed": 7326,
+      "passed": 7327,
       "failed": 0,
       "skipped": 60,
       "skip_scope": "existing optional dependencies; not native required profile",
-      "path": "/tmp/m3-t15-final-full-source-race.jsonl",
-      "sha256": "b686139af29e798664d5cf603c3b12b8abd4189712ec25e388f76683b4bade2c",
+      "path": "/tmp/m3-t15-correlated-full-source-race.jsonl",
+      "sha256": "23da69f96786e1f2ddfb32d99733c194aa9eebd5edd4615d2ae19981a79fe5d7",
       "mode": "0o600"
     },
     "full_default_lint": {
       "issues": 0,
       "version": "2.5.0",
-      "path": "/tmp/m3-t15-final-full-source-lint.log",
+      "path": "/tmp/m3-t15-correlated-full-source-lint.log",
       "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
       "mode": "0o600"
     },
-    "target_race": {
-      "passed": 799,
+    "receipt_subset_race": {
+      "source_tree": "7a4c942ac98d58d8390dd81320465221645b63b0",
+      "passed": 298,
       "failed": 0,
       "skipped": 7,
-      "path": "/tmp/m3-t15-prepared-ack-green-race.jsonl",
-      "sha256": "ba4939300107091b13526f1951619444257b89a4f8900967af885daef20ed288",
+      "scope": "application/aibridge and infra/mysql/aibridge",
+      "path": "/tmp/m3-t15-correlated-receipt-race.jsonl",
+      "sha256": "6e51e1d7d0e0b49496036e28d384a7c2eb6cfd33eb2c2e51f60f5cfffd1f8a6f",
       "mode": "0o600"
     },
     "native_compile": {
+      "source_tree": "7a4c942ac98d58d8390dd81320465221645b63b0",
       "status": "passed_compile_only",
-      "path": "/tmp/m3-t15-native-final-compile.log",
-      "sha256": "57b04e61a040f5a0145417fa80b2e3f910e2b1ba667bb4075cdf3c6a906cbd3c",
+      "path": "/tmp/m3-t15-correlated-native-compile.log",
+      "sha256": "f1bc8e0c8e748bc3375eb225b1d830c7d91196aa4ce2bd30228664d9f683fdef",
       "mode": "0o600"
     },
     "native_changed_code_lint": {
+      "source_tree": "7a4c942ac98d58d8390dd81320465221645b63b0",
       "issues": 0,
       "version": "2.5.0",
-      "scope": "new-from-rev=0ed41ea5cf5f53d2953150739112811836fef8e2; existing integration fixtures retain six unchecked cleanup warnings",
-      "path": "/tmp/m3-t15-final-native-changed-lint.log",
+      "scope": "new-from-rev=0ed41ea5cf5f53d2953150739112811836fef8e2",
+      "path": "/tmp/m3-t15-correlated-native-changed-lint.log",
       "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
       "mode": "0o600"
     },
     "docs": {
+      "source_tree": "7a4c942ac98d58d8390dd81320465221645b63b0",
       "self_tests": 87,
       "hygiene": true,
       "facts": true,
-      "path": "/tmp/m3-t15-docs.log",
-      "sha256": "495431072055d352d58b6a1db5f23efbc9b4f36ff270c9d13419125c976add4b",
+      "path": "/tmp/m3-t15-correlated-docs.log",
+      "sha256": "6193745d3524c82d99b6a98e22b65740b51ca8b26c840440b8c186d44539b5a7",
       "mode": "0o600"
     },
     "infra_unit": {
+      "source_tree": "137c5465db77a3865b819459477592e2d91766cf",
       "passed": 62,
       "failed": 0,
+      "unchanged_python_on_current_head": true,
       "path": "/tmp/m3-t15-infra-unit-final.log",
       "sha256": "1d5d6bc9cd13ec282e7796f70ef8aafd789263d048529f5d6e129305bf0ad18b",
       "mode": "0o600"
     }
   },
   "required_native": {
-    "status": "in_progress",
-    "run": "https://github.com/FangcunMount/infra/actions/runs/39498223478",
-    "source_sha": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+    "status": "revalidation_in_progress",
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39500000104",
+    "source_sha": "762c2db0d836cb628b4f514e313acfeba1082db9",
     "mysql": [
       "8.0.36",
       "8.0.44",
@@ -104,6 +113,184 @@
       "path": "/tmp/m3-t15-native-lint.log",
       "sha256": "37ace1b274ae664bd94f8683c3b424f44c47653f99198868e3c51c5dfa674f42",
       "mode": "0o600"
+    },
+    {
+      "kind": "superseded_candidate_snapshot",
+      "candidate": {
+        "qs_head": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+        "qs_implementation": "b1776025fe5d4448469f2d9b33f4f0eff78bf72d",
+        "qs_pr": "https://github.com/FangcunMount/qs-server/pull/419",
+        "infra_head": "137c5465db77a3865b819459477592e2d91766cf",
+        "infra_pr": "https://github.com/FangcunMount/infra/pull/72",
+        "source_merged": false,
+        "harness_merged": false
+      },
+      "local_validation": {
+        "source_head": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+        "full_race": {
+          "passed": 7326,
+          "failed": 0,
+          "skipped": 60,
+          "skip_scope": "existing optional dependencies; not native required profile",
+          "path": "/tmp/m3-t15-final-full-source-race.jsonl",
+          "sha256": "b686139af29e798664d5cf603c3b12b8abd4189712ec25e388f76683b4bade2c",
+          "mode": "0o600"
+        },
+        "full_default_lint": {
+          "issues": 0,
+          "version": "2.5.0",
+          "path": "/tmp/m3-t15-final-full-source-lint.log",
+          "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
+          "mode": "0o600"
+        },
+        "target_race": {
+          "passed": 799,
+          "failed": 0,
+          "skipped": 7,
+          "path": "/tmp/m3-t15-prepared-ack-green-race.jsonl",
+          "sha256": "ba4939300107091b13526f1951619444257b89a4f8900967af885daef20ed288",
+          "mode": "0o600"
+        },
+        "native_compile": {
+          "status": "passed_compile_only",
+          "path": "/tmp/m3-t15-native-final-compile.log",
+          "sha256": "57b04e61a040f5a0145417fa80b2e3f910e2b1ba667bb4075cdf3c6a906cbd3c",
+          "mode": "0o600"
+        },
+        "native_changed_code_lint": {
+          "issues": 0,
+          "version": "2.5.0",
+          "scope": "new-from-rev=0ed41ea5cf5f53d2953150739112811836fef8e2; existing integration fixtures retain six unchecked cleanup warnings",
+          "path": "/tmp/m3-t15-final-native-changed-lint.log",
+          "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47",
+          "mode": "0o600"
+        },
+        "docs": {
+          "self_tests": 87,
+          "hygiene": true,
+          "facts": true,
+          "path": "/tmp/m3-t15-docs.log",
+          "sha256": "495431072055d352d58b6a1db5f23efbc9b4f36ff270c9d13419125c976add4b",
+          "mode": "0o600"
+        },
+        "infra_unit": {
+          "passed": 62,
+          "failed": 0,
+          "path": "/tmp/m3-t15-infra-unit-final.log",
+          "sha256": "1d5d6bc9cd13ec282e7796f70ef8aafd789263d048529f5d6e129305bf0ad18b",
+          "mode": "0o600"
+        }
+      },
+      "required_native": {
+        "status": "in_progress",
+        "run": "https://github.com/FangcunMount/infra/actions/runs/39498223478",
+        "source_sha": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+        "mysql": [
+          "8.0.36",
+          "8.0.44",
+          "8.4.11"
+        ],
+        "required_cases_per_job": 17,
+        "broker": "5.5.1",
+        "sdk_go": "v0.5.0-rocketmq-tx.2",
+        "report_verified": false
+      }
+    },
+    {
+      "kind": "native_fixture_missing_command_receipt_correlation",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39498223478",
+      "source_sha": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+      "report_path": "/tmp/m3-t15-native-first-all/rocketmq-qs-event-0-1.25.12-f71927ff2b850484063ccffe891bff19b25a8c92/rocketmq-qs-event.json",
+      "report_sha256": "c6781e704fa6736e4463b3da190fd4993b6cca536e1e5d20fc3817b5186b6e71",
+      "mysql": "8.0.36",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3AIEventBrokerHost"
+        ],
+        "assertion_lines": [
+          173,
+          270
+        ]
+      },
+      "private_output_sha256": "40eb3338adb40e8cfa4d0522546732c5af2c35d3d0abbdf1d3fa2774fca2e647",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cause": "fixture passed empty correlation to ProtectMessaging(COMMAND_RECEIPT); existing exact original-command contract correctly rejected it before receive/root"
+    },
+    {
+      "kind": "native_fixture_missing_command_receipt_correlation",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39498223478",
+      "source_sha": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+      "report_path": "/tmp/m3-t15-native-first-all/rocketmq-qs-event-1-1.25.12-f71927ff2b850484063ccffe891bff19b25a8c92/rocketmq-qs-event.json",
+      "report_sha256": "5491173b5ae739c0ba810ecaab96f5baad0efb5f75dbe20eb9d8165f2b394c67",
+      "mysql": "8.0.44",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3AIEventBrokerHost"
+        ],
+        "assertion_lines": [
+          173,
+          270
+        ]
+      },
+      "private_output_sha256": "0e3aca41bfab869e0e7391798b10fff929f364216002143764bffcd08651b6c3",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cause": "fixture passed empty correlation to ProtectMessaging(COMMAND_RECEIPT); existing exact original-command contract correctly rejected it before receive/root"
+    },
+    {
+      "kind": "native_fixture_missing_command_receipt_correlation",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39498223478",
+      "source_sha": "4fed2b588b9d16c11e76304edb3d9762f1a7933f",
+      "report_path": "/tmp/m3-t15-native-first-all/rocketmq-qs-event-2-1.25.12-f71927ff2b850484063ccffe891bff19b25a8c92/rocketmq-qs-event.json",
+      "report_sha256": "ba7b44d32a6eff6a4910e8484e9641673805ab7ccc9c3369da5141571efd87bb",
+      "mysql": "8.4.11",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3AIEventBrokerHost"
+        ],
+        "assertion_lines": [
+          173,
+          270
+        ]
+      },
+      "private_output_sha256": "03264895719e9f6cfba4961be3d17291792f0bc5fb7d401097ec46b2b41866c4",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cause": "fixture passed empty correlation to ProtectMessaging(COMMAND_RECEIPT); existing exact original-command contract correctly rejected it before receive/root"
     }
   ],
   "boundaries": {
@@ -123,6 +310,7 @@
     "Receipt settlement uses the same root connection; one-slot unit proof. New commands need exact archive/witness, true historical commands retain Outbox settlement.",
     "Prepared ACK historical Payload fallback now guarded by exact owner/branch footprint, bounded by server1s and client2s.",
     "Selected transaction event runtime creates no legacy command/ACK Relay; old Inbox responsibility is retained and not adopted as a new witness.",
-    "Native controlled signed AI inputs and observer ACK only. Real paired AI flow, SIGKILL, packet commit faults, production and system acceptance remain later tasks."
+    "Native controlled signed AI inputs and observer ACK only. Real paired AI flow, SIGKILL, packet commit faults, production and system acceptance remain later tasks.",
+    "First native run failed on all three MySQL versions at fixture lines173/270, no race/skip/timeout, all own resources cleaned. Corrected only receipt correlation + one unit contract and documentation; product code byte-identical. New exact candidate must pass before merge/checkoff."
   ]
 }
