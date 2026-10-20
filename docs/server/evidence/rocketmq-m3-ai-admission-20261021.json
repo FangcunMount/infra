@@ -37,11 +37,166 @@
       "scope": "ordinary container/request/worker/listener and root regression"
     },
     "native_root": {
-      "collected": 4,
-      "executed_locally": false,
-      "ci_pending": true
+      "passed_per_mysql": 8,
+      "mysql_ci_labels": [
+        "8.0.36",
+        "8.4"
+      ],
+      "failed": 0,
+      "skipped": 0,
+      "versions": [
+        "host archive v1",
+        "host archive v2"
+      ],
+      "cases": [
+        "common commit",
+        "server archive rejection with root rollback",
+        "server witness rejection with root rollback",
+        "client-discarded completed commit reply with fresh exact proof"
+      ],
+      "not_packet_network_fault": true,
+      "not_actual_command_or_model": true
     },
-    "full_unit_after_root": "rerun in progress at b37f9734cc5c1daf40b62d32180b945d74192f49"
+    "full_unit_after_root": {
+      "source": "8fe05c74e00f72b054b56eccc010074310e2e3bd",
+      "passed": 2371,
+      "failed": 0,
+      "deselected": 869,
+      "mypy_source_files": 362,
+      "ruff": "passed",
+      "format_files": 674,
+      "docs_files": 75,
+      "docs_links": 1315,
+      "clock_followup": {
+        "source": "5c0e5c2",
+        "targeted_passed": 80,
+        "failed": 0
+      }
+    },
+    "ci": {
+      "source_head": "80805fbfc4991425e2e62789e5e2ca7042e4b1ca",
+      "run": "https://github.com/FangcunMount/qs-ai/actions/runs/39512001863",
+      "status": "success",
+      "checks": 12,
+      "github_test_merge_sha": "daa79e805fa384926c815db343da109b0e9de2d4",
+      "mysql_profiles": {
+        "8.0.36": {
+          "passed": 3242,
+          "failed": 0,
+          "skipped": 0,
+          "root_cases": 8,
+          "configuration_cases": 2
+        },
+        "8.4": {
+          "passed": 3242,
+          "failed": 0,
+          "skipped": 0,
+          "root_cases": 8,
+          "configuration_cases": 2
+        }
+      },
+      "coverage": "eight downloaded manifests checked: identical collections within each MySQL profile; exact disjoint selected/passed coverage; nonempty and zero skips",
+      "scope": "original host HELD root and configuration binding plus existing full regression; not actual transactional command receiver, RocketMQ host E2E, packet fault or business acceptance",
+      "reports": [
+        {
+          "mysql": "8.0.36",
+          "index": 0,
+          "revision": "daa79e805fa384926c815db343da109b0e9de2d4",
+          "passed": 811,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "6daa7459b3a0cbc7306550dd6b06ee1a5103d4c67feaa9148bb7f2f74ac5885a",
+          "path": "/tmp/m3-t16-ci-808-complete/tests-8.0.36-0/shard-8.0.36-0.json"
+        },
+        {
+          "mysql": "8.0.36",
+          "index": 1,
+          "revision": "daa79e805fa384926c815db343da109b0e9de2d4",
+          "passed": 811,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "1119bb20704a84cea4066a27095f26d17e695d640b14e45e1f13ebe1b91f5d86",
+          "path": "/tmp/m3-t16-ci-808-complete/tests-8.0.36-1/shard-8.0.36-1.json"
+        },
+        {
+          "mysql": "8.0.36",
+          "index": 2,
+          "revision": "daa79e805fa384926c815db343da109b0e9de2d4",
+          "passed": 810,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "daa0938a84fb7a4d315d76e79d0cef08403a205b4ae92d37414a969e7045afd3",
+          "path": "/tmp/m3-t16-ci-808-complete/tests-8.0.36-2/shard-8.0.36-2.json"
+        },
+        {
+          "mysql": "8.0.36",
+          "index": 3,
+          "revision": "daa79e805fa384926c815db343da109b0e9de2d4",
+          "passed": 810,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "91495daf8d5531b5dfd2daa7968a49b411eb7172c87371506643d63200c57379",
+          "path": "/tmp/m3-t16-ci-808-complete/tests-8.0.36-3/shard-8.0.36-3.json"
+        },
+        {
+          "mysql": "8.4",
+          "index": 0,
+          "revision": "daa79e805fa384926c815db343da109b0e9de2d4",
+          "passed": 811,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "e59c5ef13bd3ebcf7949819afbcbe8e694f9d719d16fa9691dad576590880fdc",
+          "path": "/tmp/m3-t16-ci-808-complete/tests-8.4-0/shard-8.4-0.json"
+        },
+        {
+          "mysql": "8.4",
+          "index": 1,
+          "revision": "daa79e805fa384926c815db343da109b0e9de2d4",
+          "passed": 811,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "6204c7a8369706eda70f27f7ff497af46b639a11b31a0d88897d877e5fe94cfc",
+          "path": "/tmp/m3-t16-ci-808-complete/tests-8.4-1/shard-8.4-1.json"
+        },
+        {
+          "mysql": "8.4",
+          "index": 2,
+          "revision": "daa79e805fa384926c815db343da109b0e9de2d4",
+          "passed": 810,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "3c09d4b62f41dcd96a0779b9776e0419bd0eb231b93a122aa7c4eb333b9fa00c",
+          "path": "/tmp/m3-t16-ci-808-complete/tests-8.4-2/shard-8.4-2.json"
+        },
+        {
+          "mysql": "8.4",
+          "index": 3,
+          "revision": "daa79e805fa384926c815db343da109b0e9de2d4",
+          "passed": 810,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "98f2a07d3dda7e12da65a68b85c49d094129a27e3a984657bda95a955a40554b",
+          "path": "/tmp/m3-t16-ci-808-complete/tests-8.4-3/shard-8.4-3.json"
+        }
+      ]
+    },
+    "local_followup": {
+      "source": "ddca8299bf5e38cb9fae9c0d2d455d99a4a7f56e",
+      "read_only_START": {
+        "targeted_passed": 58,
+        "native_cases_collected": 2,
+        "native_executed": false
+      },
+      "frozen_root_resources": {
+        "targeted_passed": 67
+      },
+      "frozen_state_transcription": {
+        "targeted_passed": 64,
+        "mypy_source_files": 364
+      },
+      "source_not_pushed": true,
+      "source_not_merged": true
+    }
   },
   "logs": {
     "first-full-unit": {
@@ -148,6 +303,111 @@
       "local_path": "/tmp/m3-t16-di-fix-mypy.log",
       "sha256": "8df64684ab3ddd6d5e70a1b315c82e4bba977462a77e9d2efd25fe4d4e4e6f24",
       "mode": "0o600"
+    },
+    "context-full-unit": {
+      "local_path": "/tmp/m3-t16-context-full-unit.log",
+      "sha256": "af4220d328af9c75f9a8d7b02bd447c35365060ae751ddeb5cc6d671b6243ed9",
+      "mode": "0o600"
+    },
+    "context-full-mypy": {
+      "local_path": "/tmp/m3-t16-context-full-mypy.log",
+      "sha256": "fa3656b2d9a66acab2a71012b2be763903adaccea52cd58ae2e9b4e363afcf1d",
+      "mode": "0o600"
+    },
+    "context-full-ruff": {
+      "local_path": "/tmp/m3-t16-context-full-ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "mode": "0o600"
+    },
+    "context-full-format": {
+      "local_path": "/tmp/m3-t16-context-full-format.log",
+      "sha256": "2a01642212ef741519d3ffca71cdff23892f534348d4f240e0e069d60b2b1c53",
+      "mode": "0o600"
+    },
+    "context-full-docs": {
+      "local_path": "/tmp/m3-t16-context-full-docs.log",
+      "sha256": "eac30f03399ceb2cdd6c26b9a3a9fe8effe2e522d68a9993fdd708f24d46a0a7",
+      "mode": "0o600"
+    },
+    "start-clock-red": {
+      "local_path": "/tmp/m3-t16-start-clock-red.log",
+      "sha256": "af0af562e298c2a03f60539d99f7c740cf875758749769716b01e4fae8bf5997",
+      "mode": "0o600"
+    },
+    "start-clock-green": {
+      "local_path": "/tmp/m3-t16-start-clock-green.log",
+      "sha256": "94e9ca010205d86ff1adbdc08445681ea4f1046a13727edb34c8fa7a47fc4f36",
+      "mode": "0o600"
+    },
+    "collection-a": {
+      "local_path": "/tmp/m3-t16-collection-a.log",
+      "sha256": "16d5c57d4a96beb4176c0bc854b12cff2eb9ed0fb4d0a204c78d883f4c83cf66",
+      "mode": "0o600"
+    },
+    "collection-b": {
+      "local_path": "/tmp/m3-t16-collection-b.log",
+      "sha256": "634467bd1201942319e6084319828e3489e99417716accf57d09b15455835d9f",
+      "mode": "0o600"
+    },
+    "configuration-plan-green": {
+      "local_path": "/tmp/m3-t16-configuration-plan-green.log",
+      "sha256": "87a014c5feae1c3cd05a61a78c429aef96bdfbd59c7c927466dd2b92a60e2653",
+      "mode": "0o600"
+    },
+    "archive-context-final": {
+      "local_path": "/tmp/m3-t16-archive-context-final.log",
+      "sha256": "7c3b13394a5d1fac3bc6ad054bd45fa5236f35d22a0ff6d541fb126acfabca4c",
+      "mode": "0o600"
+    },
+    "start-facts-final": {
+      "local_path": "/tmp/m3-t16-start-facts-final.log",
+      "sha256": "3b38cef89c688324b2c74c307e9428ebc856b86805d4f7dd29f06abb7aff871e",
+      "mode": "0o600"
+    },
+    "start-facts-final-mypy": {
+      "local_path": "/tmp/m3-t16-start-facts-final-mypy.log",
+      "sha256": "fa3656b2d9a66acab2a71012b2be763903adaccea52cd58ae2e9b4e363afcf1d",
+      "mode": "0o600"
+    },
+    "read-only-start-green": {
+      "local_path": "/tmp/m3-t16-read-only-start-green.log",
+      "sha256": "f6a984810b50372b074d37f29380600a3b68b9edfaac65d3ede5be74a75255ae",
+      "mode": "0o600"
+    },
+    "read-only-start-mypy": {
+      "local_path": "/tmp/m3-t16-read-only-start-mypy.log",
+      "sha256": "5f41072bd6e9be3ae8541110905d6c4521073278c2fa6428b4de31afa3e9f41a",
+      "mode": "0o600"
+    },
+    "start-native-collection": {
+      "local_path": "/tmp/m3-t16-start-native-collection.log",
+      "sha256": "4d50ec48c2ee567b45ce00b6300343665f9f01e0638ea48c4c8a0ffa44aad1c7",
+      "mode": "0o600"
+    },
+    "frozen-resources-green": {
+      "local_path": "/tmp/m3-t16-frozen-resources-green.log",
+      "sha256": "47ecf567b8ba5a02f8a24f7b2904d7104ab51f4cfa69ee43e1fb2f92a66d379a",
+      "mode": "0o600"
+    },
+    "frozen-resources-mypy": {
+      "local_path": "/tmp/m3-t16-frozen-resources-mypy.log",
+      "sha256": "5f41072bd6e9be3ae8541110905d6c4521073278c2fa6428b4de31afa3e9f41a",
+      "mode": "0o600"
+    },
+    "frozen-events-green": {
+      "local_path": "/tmp/m3-t16-frozen-events-green.log",
+      "sha256": "ea1d021b69d3ab3fb4c589ed869bbb5d01dcda8d546bb86bc3246359e4f51853",
+      "mode": "0o600"
+    },
+    "frozen-events-mypy": {
+      "local_path": "/tmp/m3-t16-frozen-events-mypy.log",
+      "sha256": "1695340b816f28980deafb8d151dfd5cab89cbc29c5a3ccb925a4a814dcc5a75",
+      "mode": "0o600"
+    },
+    "frozen-events-first-mypy": {
+      "local_path": "/tmp/m3-t16-frozen-events-first-mypy.log",
+      "sha256": "de82123cacb4b11f5183023ad3b22621ebf9227ef7d41b4dab5e72495be09c3d",
+      "mode": "0o600"
     }
   },
   "next": [
@@ -156,16 +416,20 @@
     "actual authenticated receiver and real isolated Broker/storage verification"
   ],
   "previous_checkpoint": "2a225d956ba5f863a758b1fef29fa4181bc9a801",
-  "checkpoint": "b37f9734cc5c1daf40b62d32180b945d74192f49",
+  "checkpoint": "80805fbfc4991425e2e62789e5e2ca7042e4b1ca",
   "source_pr": "https://github.com/FangcunMount/qs-ai/pull/159",
   "source_pr_draft": true,
-  "source_pushed_checkpoint": "1ea1a41b69892718c9e3534e95e7fcd8b6d4694b",
+  "source_pushed_checkpoint": "80805fbfc4991425e2e62789e5e2ca7042e4b1ca",
   "foundation_additions": [
     "Frozen job identity with unchanged ordinary defaults",
     "Frozen receipt Inbox decision without legacy Outbox stage",
     "One-call AdmissionRoot: original guard, exact result comparison, Inbox/archive/witness root ownership",
     "Fresh bounded exact evidence after uncertain commit; actual rollback plus durable abort required",
-    "Four native HELD-root cases collected; required MySQL CI pending; not actual receiver or Broker proof"
+    "Four native HELD-root cases collected; required MySQL CI pending; not actual receiver or Broker proof",
+    "Explicit bounded host archive/v2 context; v1 golden/first wire and SDK codec unchanged",
+    "Canonical START facts bind original input/evidence, identities, configuration and first event clocks",
+    "Read-only original START service projection and capacity preview; new native proof pending",
+    "Original UoW borrows frozen time/state ID/configuration; transcription claims state history without MQ Outbox, no Seal or PUB"
   ],
   "failures": [
     {
@@ -191,5 +455,174 @@
       "cause": "existing parse_body rejected invalid correlation earlier with MessagingContractError; assertion now accepts exact early contract rejection",
       "product_changed_for_fix": false
     }
-  ]
+  ],
+  "previous_checkpoints": [
+    "2a225d956ba5f863a758b1fef29fa4181bc9a801",
+    "b37f9734cc5c1daf40b62d32180b945d74192f49"
+  ],
+  "local_checkpoint": "ddca8299bf5e38cb9fae9c0d2d455d99a4a7f56e",
+  "native_ci_failure_history": {
+    "run": "https://github.com/FangcunMount/qs-ai/actions/runs/39510174814",
+    "head": "b37f9734cc5c1daf40b62d32180b945d74192f49",
+    "test_merge_sha": "710c10d73f6f6cc9f316b71aaa1923bf417e16ea",
+    "parents": [
+      "c321a69411d1f9494de1e36f94834a974fbb15ea",
+      "b37f9734cc5c1daf40b62d32180b945d74192f49"
+    ],
+    "result": "failure",
+    "failure": "new native fixture omitted occurred_at; failed before original root execution; also random UUID parameter caused different shard collection IDs",
+    "fixes": [
+      "e4c6be2 freezes native fixture timestamp and covers v1/v2",
+      "62545b2 uses fixed test parameter; independent collection processes matched 3238 IDs"
+    ],
+    "reports": [
+      {
+        "report": "/tmp/m3-t16-ci-b37-all/tests-8.0.36-0/shard-8.0.36-0.json",
+        "sha256": "68a2cb04a6ca6e5f379825199263d52b1edf23360f3f036ed12e31bf2f87f5b7",
+        "revision": "710c10d73f6f6cc9f316b71aaa1923bf417e16ea",
+        "mysql": "8.0.36",
+        "index": 0,
+        "collected": 3189,
+        "passed": 796,
+        "skipped": 0,
+        "exitstatus": 1,
+        "failures": [
+          {
+            "id": "tests.integration.test_transaction_admission_root::test_held_root_uses_actual_inbox_archive_and_witness_atomically[archive_rejected]",
+            "reason": "fixture missing frozen occurred_at before SDK plan validation"
+          },
+          {
+            "id": "tests.integration.test_transaction_admission_root::test_held_root_uses_actual_inbox_archive_and_witness_atomically[client_reply_discarded]",
+            "reason": "fixture missing frozen occurred_at before SDK plan validation"
+          }
+        ],
+        "nodeid_digest": "ea72feee6c782cfe7b050285f03d264e9d2911c54810797c0119d8042fd81d04"
+      },
+      {
+        "report": "/tmp/m3-t16-ci-b37-all/tests-8.0.36-1/shard-8.0.36-1.json",
+        "sha256": "8e3165643473a27e42761df4cea624dd39e6bb3fc54d09d970b0657a34b4e1b5",
+        "revision": "710c10d73f6f6cc9f316b71aaa1923bf417e16ea",
+        "mysql": "8.0.36",
+        "index": 1,
+        "collected": 3189,
+        "passed": 797,
+        "skipped": 0,
+        "exitstatus": 0,
+        "failures": [],
+        "nodeid_digest": "74c645383633cb3844fbcf4b873bcea89006f82ebfe91eb401cd4041108332c4"
+      },
+      {
+        "report": "/tmp/m3-t16-ci-b37-all/tests-8.0.36-2/shard-8.0.36-2.json",
+        "sha256": "0a82c397d1e7c76d121414df22c5c88fb9414b2d5e28d54fc54cdfa60dfba8e5",
+        "revision": "710c10d73f6f6cc9f316b71aaa1923bf417e16ea",
+        "mysql": "8.0.36",
+        "index": 2,
+        "collected": 3189,
+        "passed": 796,
+        "skipped": 0,
+        "exitstatus": 1,
+        "failures": [
+          {
+            "id": "tests.integration.test_transaction_admission_root::test_held_root_uses_actual_inbox_archive_and_witness_atomically[none]",
+            "reason": "fixture missing frozen occurred_at before SDK plan validation"
+          }
+        ],
+        "nodeid_digest": "75440ce1985a2441f86ef15b62f4d5a0072d3ff5ed599c5896d720136a0c9a12"
+      },
+      {
+        "report": "/tmp/m3-t16-ci-b37-all/tests-8.0.36-3/shard-8.0.36-3.json",
+        "sha256": "3719b47db49d9e0e08ca2da694fcfbadcf874e94610ba93b146ab1ef99fae1ee",
+        "revision": "710c10d73f6f6cc9f316b71aaa1923bf417e16ea",
+        "mysql": "8.0.36",
+        "index": 3,
+        "collected": 3189,
+        "passed": 796,
+        "skipped": 0,
+        "exitstatus": 1,
+        "failures": [
+          {
+            "id": "tests.integration.test_transaction_admission_root::test_held_root_uses_actual_inbox_archive_and_witness_atomically[witness_rejected]",
+            "reason": "fixture missing frozen occurred_at before SDK plan validation"
+          }
+        ],
+        "nodeid_digest": "db88188e79778e06c6a43db2322507ebdc5921935deb62b040f2750d1230607c"
+      },
+      {
+        "report": "/tmp/m3-t16-ci-b37-all/tests-8.4-0/shard-8.4-0.json",
+        "sha256": "1d75f3a90cda7297afa2015bd6700695c938a9553f7bd2d5c152829b01467ae8",
+        "revision": "710c10d73f6f6cc9f316b71aaa1923bf417e16ea",
+        "mysql": "8.4",
+        "index": 0,
+        "collected": 3189,
+        "passed": 798,
+        "skipped": 0,
+        "exitstatus": 0,
+        "failures": [],
+        "nodeid_digest": "dce1d97eb7e92cafe70f819bada7f6e2eaee9184f27652dc77445e89c597cce1"
+      },
+      {
+        "report": "/tmp/m3-t16-ci-b37-all/tests-8.4-1/shard-8.4-1.json",
+        "sha256": "79f05874ab587610dbfc2b89ae462061d0f5b80e8bf8478660f221a7453ee558",
+        "revision": "710c10d73f6f6cc9f316b71aaa1923bf417e16ea",
+        "mysql": "8.4",
+        "index": 1,
+        "collected": 3189,
+        "passed": 795,
+        "skipped": 0,
+        "exitstatus": 1,
+        "failures": [
+          {
+            "id": "tests.integration.test_transaction_admission_root::test_held_root_uses_actual_inbox_archive_and_witness_atomically[archive_rejected]",
+            "reason": "fixture missing frozen occurred_at before SDK plan validation"
+          },
+          {
+            "id": "tests.integration.test_transaction_admission_root::test_held_root_uses_actual_inbox_archive_and_witness_atomically[client_reply_discarded]",
+            "reason": "fixture missing frozen occurred_at before SDK plan validation"
+          }
+        ],
+        "nodeid_digest": "2ed8c06e5b031b622d6262e1a0883880058e28d083413c3c1f3e986a34bc5655"
+      },
+      {
+        "report": "/tmp/m3-t16-ci-b37-all/tests-8.4-2/shard-8.4-2.json",
+        "sha256": "27032d9a5099ad7a89839466d31043df0e1356609ecc0e2a65540f1d8948e4ce",
+        "revision": "710c10d73f6f6cc9f316b71aaa1923bf417e16ea",
+        "mysql": "8.4",
+        "index": 2,
+        "collected": 3189,
+        "passed": 796,
+        "skipped": 0,
+        "exitstatus": 1,
+        "failures": [
+          {
+            "id": "tests.integration.test_transaction_admission_root::test_held_root_uses_actual_inbox_archive_and_witness_atomically[none]",
+            "reason": "fixture missing frozen occurred_at before SDK plan validation"
+          }
+        ],
+        "nodeid_digest": "6321e366ae70147049c7013959e8aafb37c9a4effd3d322b16348181f10d88f8"
+      },
+      {
+        "report": "/tmp/m3-t16-ci-b37-all/tests-8.4-3/shard-8.4-3.json",
+        "sha256": "c933c4b55f48d1c8c292cd2539faa90a1d6dc84e44ddadb656e8b0b51da32ddd",
+        "revision": "710c10d73f6f6cc9f316b71aaa1923bf417e16ea",
+        "mysql": "8.4",
+        "index": 3,
+        "collected": 3189,
+        "passed": 795,
+        "skipped": 0,
+        "exitstatus": 1,
+        "failures": [
+          {
+            "id": "tests.integration.test_transaction_admission_root::test_held_root_uses_actual_inbox_archive_and_witness_atomically[none]",
+            "reason": "fixture missing frozen occurred_at before SDK plan validation"
+          },
+          {
+            "id": "tests.integration.test_transaction_admission_root::test_held_root_uses_actual_inbox_archive_and_witness_atomically[witness_rejected]",
+            "reason": "fixture missing frozen occurred_at before SDK plan validation"
+          }
+        ],
+        "nodeid_digest": "8351eb331709c76e4bbf6ad27c73fc8adc26740307f382e216b8fbef8274150c"
+      }
+    ],
+    "not_counted_as_native_proof": true
+  }
 }
