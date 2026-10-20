@@ -533,7 +533,7 @@
     },
     "cloud_native": {
       "run": "https://github.com/FangcunMount/infra/actions/runs/39410103140",
-      "infra_source": "aff3dd3",
+      "infra_source": "aff3dd31f8569582870f64458674580da077983e",
       "reports": [
         {
           "artifact": "rocketmq-qs-evaluation-1-1.25.12-e3545edbc255708f6aa3a3bbd19f3689d2a76b30",
@@ -649,6 +649,15 @@
       "internal/apiserver/infra/mysql/evaluationfailure/commit_test.go",
       "internal/apiserver/infra/mysql/evaluationfailure/plan_test.go",
       "docs/document-closure.json"
-    ]
+    ],
+    "infra_delivery": {
+      "pr": "https://github.com/FangcunMount/infra/pull/49",
+      "head": "aff3dd31f8569582870f64458674580da077983e",
+      "successful_checks": 13,
+      "failed_checks": 0,
+      "merged_at": "2026-10-20T11:08:59Z",
+      "merge_commit": "a4547f8311d7aff7850508f706a642148e0de3b7",
+      "production_changed": false
+    }
   }
 }
