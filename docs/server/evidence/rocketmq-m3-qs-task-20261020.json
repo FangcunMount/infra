@@ -39,12 +39,103 @@
     "skipped": 0
   },
   "native_gate": {
-    "status": "queued",
+    "status": "passed",
     "run": "https://github.com/FangcunMount/infra/actions/runs/39439182533",
     "source_sha": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
     "harness_sha": "56eed1b1bece4e00718482949600c0c8ef6b0a8d",
     "expected_cases": 14,
-    "required_zero_skip": true
+    "required_zero_skip": true,
+    "passed_per_matrix": 14,
+    "failed": 0,
+    "skipped": 0,
+    "matrices": [
+      {
+        "version": "8.4.11",
+        "mysql_digest": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "broker_digest": "sha256:c4b3878b1f8bfa43bd1bee6e439bc1efd180e587f1ed308eb7d0a0f69eb58418",
+        "report_sha256": "9cb7b37e422e29164ae5fff845dc45f23172f1aa37a1f2fe34e7ab75b60f9d39",
+        "report": "/tmp/m3-t12-final-native/mysql84/rocketmq-qs-task.json",
+        "receipt": {
+          "cases": {
+            "closed_admission_no_business": true,
+            "constructor_no_ddl": true,
+            "first_entry_reused": true,
+            "fresh_owner_recovery": true,
+            "half_invisible": true,
+            "no_new_publish_outbox": true,
+            "normal_best_effort_fanout": true,
+            "normal_rejects_transaction_event": true,
+            "normal_root_commit_boundary": true,
+            "original_task_witness_wire": true,
+            "original_write_abort_atomic": true,
+            "reminder_precision_compatible": true,
+            "root_abort_atomic": true,
+            "stale_schedule_cannot_commit": true
+          },
+          "failed": 0,
+          "passed": 14,
+          "process_exit_not_claimed": true,
+          "root": "original_mysql_gorm",
+          "skipped": 0,
+          "system_login_not_claimed": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "version": "8.0.36",
+        "mysql_digest": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "broker_digest": "sha256:b072237292984d80dae8760234baee2656c16cc06f829c3cae82be111e622afe",
+        "report_sha256": "ea126c6e194a383141e479ee610b6f0d762cb6fd33246cb374cd9a88842d2b7c",
+        "report": "/tmp/m3-t12-final-native/mysql80/rocketmq-qs-task.json",
+        "receipt": {
+          "cases": {
+            "closed_admission_no_business": true,
+            "constructor_no_ddl": true,
+            "first_entry_reused": true,
+            "fresh_owner_recovery": true,
+            "half_invisible": true,
+            "no_new_publish_outbox": true,
+            "normal_best_effort_fanout": true,
+            "normal_rejects_transaction_event": true,
+            "normal_root_commit_boundary": true,
+            "original_task_witness_wire": true,
+            "original_write_abort_atomic": true,
+            "reminder_precision_compatible": true,
+            "root_abort_atomic": true,
+            "stale_schedule_cannot_commit": true
+          },
+          "failed": 0,
+          "passed": 14,
+          "process_exit_not_claimed": true,
+          "root": "original_mysql_gorm",
+          "skipped": 0,
+          "system_login_not_claimed": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      }
+    ]
   },
   "source_full_race": {
     "source_sha": "2626fd900b8dc36c4a72b37bfcea1d8367d8a3e4",
@@ -119,5 +210,11 @@
     "all_cleanup_complete": true,
     "does_not_cover_final_precision_and_post_write_abort_cases": true
   },
-  "production_cd_pause_readback": true
+  "production_cd_pause_readback": true,
+  "ci_status": "pending final current-head CI and merges",
+  "infra_pr_refresh": {
+    "old_head": "787d61e7d04680d53f9396ef20a6bae5d7653fde",
+    "remote_branch": "56eed1b1bece4e00718482949600c0c8ef6b0a8d",
+    "resolution": "PR head remained stale after push; close/reopen refreshed it. Final checks must bind 56eed1b1; the manual final native run independently binds the same exact source."
+  }
 }
