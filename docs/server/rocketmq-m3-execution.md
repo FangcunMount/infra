@@ -113,7 +113,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T08 | IAM 自身与 QS 订阅、乱序和 freshness 回归 | 2026-10-20；IAM51405831/QS696ee314锁定正式Go SDKtx.2；三档MySQL原事务各34项、成对Broker/fanout各22项0失败/跳过，Mac mini额外22项通过；IAM PR135合并e3efa5b3、QS PR409合并2e95630b；[证据](evidence/rocketmq-m3-iam-fanout-20261020.json) |
 | ☑ | T09 | QS Mongo 答卷，202/幂等/callback/未知提交 | 已完成实现与验证；原事务/冻结BSON与wire、V2精确读取、实际Collection/gRPC 202和503、并发原赢家、Mongo failpoint重入、ACK客户端丢弃及新实例读取16项在Mac mini和GitHub实际通过。最终源码deb46e67全仓race6909通过/60既有可选依赖跳过，同包策略与87项文档检查通过；PR410合并3afc76a6，PR411/infra46最终头CI和合并单列；不表示生产或system验收。[证据](evidence/rocketmq-m3-qs-answer-20261020.json) |
 | ✅ | T10 | QS 评分请求、结果和失败，Run 与幂等 | 2026-10-20；5a1f489bb完整CI28成功/1不适用，完整UTC race6977通过；双档原生Broker各9项0失败/跳过/race。保留Run claim、首次wire、未来原due/授权及原调度职责（T13再交接）。[证据/失败历史](evidence/rocketmq-m3-qs-evaluation-20261020.json)；PR412合并db9b4918、infra49合并a4547f83；生产未变更 |
-| ☐ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 进行中（源码预核对）；原Generation/Run/Report/Catalog均Mongo，采用qs.mongo。纠正规划owner偏差并保留记录，[证据](evidence/rocketmq-m3-report-preflight-20261020.json)；事务入口/显式安装/原生验收待实现，不勾选 |
+| ☐ | T11 | QS 报告生成及失败，冻结输入和终态恢复 | 进行中；qs.mongo原事务。6eb704e64首批Generation独立V2/BSON/混合拒绝/session写约束/clone；7包UTC race159通过/0失败/5既有可选Mongo跳过，固定lint及87项文档通过。[证据](evidence/rocketmq-m3-qs-report-20261020.json)。共享owner、Sender、故障与原生验收待实现，不勾选 |
 | ☐ | T12 | QS 提醒事务、最终 NORMAL 与 fanout | 待开始 |
 | ☐ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 待开始 |
 | ☐ | T14 | QS command/档案，Operation/Payload新旧兼容 | 待开始 |
@@ -305,3 +305,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-20：infra PR49精确aff3dd31当前头13项完整检查全部成功（含双档9项原生与SDK/故障回归），2026-10-20T11:08:59Z合并a4547f83。源码PR412当前头5a1f489bb暂无失败，尚待全仓测试/运行时E2E及后续构建结束，未合并，不提前勾选T10；生产未变更。
 
 - 2026-10-20：T10完成并勾选，总进度更新10/36。QS最终5a1f489bb当前头28项CI成功，1项API生成同步不适用；精确head与生产CD暂停true核验后，PR412于2026-10-20T11:15:49Z合并db9b4918。infra PR49的13项完整门禁此前通过并合并a4547f83。原生36aa双档各9项通过，后续仅两个单元测试/文档基线差异，原生报告保持原源码；完整UTC25501aac7 race6977通过/0失败/60既有可选跳过。所有源码/架构/夹具/UTC/文档失败历史保留。T11进入实施准备，沿用已核对Mongo原事务/qs.mongo；未来调度交接仍T13，生命周期/跨实例/真实故障仍T22/T23，生产/system/48h观察均未执行，M3-2继续进行中。
+
+- 2026-10-20：T11首批模型源码6eb704e64（文档head d0b23a6a0）已提交到独立qs-report分支。保留旧V1字段，新增独立V2，不把事务证据冒充旧Outbox；拒绝混合/错事件/错完成时间，BSON保留原SDK引用bytes，生成状态写入要求原活跃session，clone不丢V2。7包UTC race159通过/0失败/5既有AgainstMongo缺依赖跳过，固定lint2.5和87项文档检查通过；这不是原生Mongo原子性或Broker验证。共享owner/原guard、报告成功失败发送/恢复、显式安装和真实验收仍待实现，T11不勾选，总进度10/36。另T10源码squash后main39413704472仅文档SHA祖先门禁失败，PR413独立修复两处元数据，缓存生产blob与原验证完全相同，87项文档及相关CI通过，完整CI/合并另记，未修改验证规则或生产。

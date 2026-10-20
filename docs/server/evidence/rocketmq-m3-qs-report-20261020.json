@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "task": "T11",
+  "status": "in_progress",
+  "completed": false,
+  "total_progress": "10/36",
+  "owner": "qs.mongo",
+  "source": "6eb704e64c69306eeace3b9f7af3aa8b7cf32952",
+  "head": "d0b23a6a0892e43a3bea687af93c438ebc4fffd8",
+  "branch": "codex/rocketmq-m3-qs-report",
+  "source_merged": false,
+  "pr": null,
+  "implemented": [
+    "separate generation V2 field, original V1 remains V1",
+    "strict event/identity/completion-time and mixed-protocol refusal",
+    "canonical transaction reference bytes survive BSON round trip with millisecond business clocks",
+    "generation create/save reject absent or inactive original session; full bound-guard integration still pending",
+    "clone preserves V2 without aliasing or Outbox promotion"
+  ],
+  "source_race": {
+    "command": "TZ=UTC go test -race -json <generation,run,report,execution,Mongo interpretation,module interpretation,architecture>",
+    "passed": 159,
+    "failed": 0,
+    "skipped": 5,
+    "skip_scope": "five existing Mongo AgainstMongo tests require QS_SERVER_TEST_MONGO_URI; these are not native acceptance",
+    "skipped_tests": [
+      "TestReportCatalogAuditIndexesAndBatchBoundAgainstMongo",
+      "TestReportReadModelListReportsFiltersAgainstMongo",
+      "TestReportReadModelFailsClosedOnArtifactAssociationMismatchAgainstMongo",
+      "TestCurrentReportMetadataCarriesVerifiedSourceIdentityAgainstMongo",
+      "TestGenerationRepositoryRejectsStaleCASAgainstMongo"
+    ],
+    "report_sha256": "270ea077b05f3625f5c32dd175701a20c9a02dd6b54a596d4c95992889d4334f"
+  },
+  "lint": {
+    "version": "2.5.0",
+    "target_packages": "passed"
+  },
+  "docs": {
+    "unit_passed": 87,
+    "hygiene": "passed",
+    "facts": "passed after binding cache verification to unchanged merged ancestor db9b4918"
+  },
+  "native": {
+    "run": false,
+    "broker_or_original_mongo_atomicity_claimed": false
+  },
+  "pending": [
+    "shared original-database Mongo owner and root guard, explicit all-topic runtime ownership",
+    "frozen report success/failure Sender and exact pending-result recovery",
+    "selected constructors without DDL and explicit index installation",
+    "authority-aware V2 audit and old recovery boundaries",
+    "real dependency/Broker acceptance, current-head full CI and source merge"
+  ],
+  "production": {
+    "changed": false,
+    "provider_switched": false,
+    "system_acceptance": false
+  }
+}

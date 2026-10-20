@@ -837,5 +837,16 @@
     "skip_scope": "existing optional dependency tests; separate native job requires zero skips",
     "report_sha256": "6a02c17291c7aa4eb0599f1d2fd986442477268620099e8c6bdac72923ea9654",
     "source": "de7db811036b5bd3f390742328ede60ca18ba189"
+  },
+  "post_merge_documentation": {
+    "main_source": "db9b4918df761db61560f681825f38f036c959d2",
+    "run": "https://github.com/FangcunMount/qs-server/actions/runs/39413704472",
+    "failure": "only Docs Hygiene & Facts; squash replaced referenced branch history",
+    "private_log_sha256": "ba07b0afaab87da32aef764a522e912bd878fca5f85faedd8e08c2cef97015cd",
+    "repair_pr": "https://github.com/FangcunMount/qs-server/pull/413",
+    "repair_scope": "only source baseline and cache verified ancestor; exact cache blob unchanged",
+    "local_docs": "87 unit/hygiene/facts passed",
+    "related_docs_ci": "passed",
+    "complete_ci_and_merge": "pending"
   }
 }
