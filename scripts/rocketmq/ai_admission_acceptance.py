@@ -4,6 +4,7 @@ import json
 import os
 import re
 import secrets
+import tomllib
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -123,6 +124,19 @@ def host_failure_diagnostics(raw, filename, tests):
 
 
 
+def validate_host_sdk_lock(lock, profile):
+    """uv verifies the archive hash from its immutable lock, not direct_url.json."""
+    if profile['sdk_sha256'] is None:
+        return None  # Historical admission profile keeps its original provenance contract.
+    packages = [p for p in lock.get('package', []) if p.get('name') == 'fangcun-reliable-messaging']
+    expected = {'url': profile['sdk_url'], 'hash': 'sha256:' + profile['sdk_sha256']}
+    if (len(packages) != 1 or packages[0].get('version') != profile['sdk_version']
+            or packages[0].get('source') != {'url': profile['sdk_url']}
+            or packages[0].get('wheels') != [expected]):
+        raise RuntimeError('Exact released SDK version, URL and wheel hash required in uv lock')
+    return profile['sdk_sha256']
+
+
 def validate_host_runtime(runtime, profile, python):
     direct = runtime.get('direct_url', {})
     if (runtime.get('sdk') != profile['sdk_version'] or runtime.get('client') != '5.1.2'
@@ -130,7 +144,7 @@ def validate_host_runtime(runtime, profile, python):
             or direct.get('url') != profile['sdk_url']
             or runtime.get('installed_in_prefix') is not True
             or (profile['sdk_sha256'] is not None
-                and direct.get('archive_info', {}).get('hashes', {}).get('sha256') != profile['sdk_sha256'])):
+                and direct.get('archive_info', {}).get('hashes', {}).get('sha256') not in (None, profile['sdk_sha256']))):
         raise RuntimeError('released fixed SDK wheel and client required, no editable SDK')
 
 
@@ -142,6 +156,7 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
     proof['host_profile'] = profile['name']
     proof['lock_sha256'] = hashlib.sha256((source / 'uv.lock').read_bytes()).hexdigest()
+    proof['locked_sdk_archive_sha256'] = validate_host_sdk_lock(tomllib.loads((source / 'uv.lock').read_text()), profile)
     python = os.environ.get('QS_AI_ACCEPTANCE_PYTHON')
     if python not in ('3.11', '3.13'):
         raise RuntimeError('fixed AI acceptance Python compatibility profile required')

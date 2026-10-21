@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from ai_admission_acceptance import acceptance_profile, host_failure_diagnostics, parse_admission_receipt, validate_host_runtime
+from ai_admission_acceptance import acceptance_profile, host_failure_diagnostics, parse_admission_receipt, validate_host_runtime, validate_host_sdk_lock
 from ai_state_acceptance import CASES, TESTS, state_manifest
 
 
@@ -154,9 +154,25 @@ class AIStateAcceptanceTests(unittest.TestCase):
             direct_url={'url': profile['sdk_url'], 'archive_info': {'hashes': {'sha256': profile['sdk_sha256']}}})
         validate_host_runtime(runtime, profile, '3.13')
         for field, value in [('sdk', '0.4.0a1'), ('client', '5.1.1'), ('installed_in_prefix', False),
-                ('direct_url', {'url': profile['sdk_url']}), ('direct_url', {'url': 'file:///workspace/sdk'})]:
+                ('direct_url', {'url': profile['sdk_url'], 'archive_info': {'hashes': {'sha256': 'wrong'}}}), ('direct_url', {'url': 'file:///workspace/sdk'})]:
             with self.assertRaises(RuntimeError):
                 validate_host_runtime(dict(runtime, **{field: value}), profile, '3.13')
+
+    def test_uv_empty_archive_metadata_uses_strict_immutable_lock_hash(self):
+        profile = acceptance_profile('state')
+        lock = {'package': [{'name': 'fangcun-reliable-messaging', 'version': '0.4.0a2',
+            'source': {'url': profile['sdk_url']},
+            'wheels': [{'url': profile['sdk_url'], 'hash': 'sha256:' + profile['sdk_sha256']}]}]}
+        self.assertEqual(validate_host_sdk_lock(lock, profile), profile['sdk_sha256'])
+        validate_host_runtime(dict(sdk='0.4.0a2', client='5.1.2', python='3.13.15', installed_in_prefix=True,
+            direct_url={'url': profile['sdk_url'], 'archive_info': {}}), profile, '3.13')
+        for field, value in [('version', '0.4.0a1'), ('source', {'url': 'file:///workspace/sdk'}),
+                ('wheels', []), ('wheels', [{'url': profile['sdk_url'], 'hash': 'sha256:wrong'}])]:
+            changed = json.loads(json.dumps(lock)); changed['package'][0][field] = value
+            with self.assertRaises(RuntimeError):
+                validate_host_sdk_lock(changed, profile)
+        with self.assertRaises(RuntimeError):
+            validate_host_sdk_lock({'package': lock['package'] * 2}, profile)
 
     def test_incomplete_failed_skipped_duplicate_or_broader_state_scope_cannot_pass(self):
         profile = acceptance_profile('state')
