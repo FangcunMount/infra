@@ -805,7 +805,6 @@
     "docs_links": 1321
   },
   "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39562163112",
-  "source_messaging_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39559277604",
   "worker_preflight_native_cases": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
     "file": "tests/integration/test_transaction_worker_preflight.py",
@@ -2187,5 +2186,8 @@
     "native_executed": false,
     "scope": "reuse original review rules for read-only planning; one and full35 unchanged bounds; no review SDK dispatch yet",
     "task_completed": false
-  }
+  },
+  "foundation_messaging_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39559277604",
+  "source_messaging_ci": null,
+  "source_messaging_ci_status": "governance-only paths do not trigger separate M7 workflow; unchanged baseline M7 proof retained with exact foundation source; full source suite remains required"
 }
