@@ -6,9 +6,9 @@
   "base": "e8392c0582020d6cacf44c6caaa2f2061c66cb41",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-creation",
   "branch": "codex/rocketmq-m3-ai-interpretation-finish-broker",
-  "source_candidate": "dc8461c922ba234d9de65bc49583c8bc04ae5679",
+  "source_candidate": "fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4",
   "source_pushed": true,
-  "source_merged": true,
+  "source_merged": false,
   "production_assembly_enabled": false,
   "production_changed": false,
   "stable_sdk_released": false,
@@ -604,7 +604,7 @@
     "Keep durable model-response finalization and invocation-count failure proof as T18; do not fake a candidate claim for serial ownership",
     "Preserve legacy/archive/ACK responsibilities and default runtime activation gates; T17 remains unchecked"
   ],
-  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/190",
+  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/197",
   "source_pr_draft": false,
   "foundation_native_acceptance": {
     "source_sha": "b4eedb634adefa50ea818ac6cf26e119e29b94fd",
@@ -804,7 +804,7 @@
     "docs_files": 75,
     "docs_links": 1321
   },
-  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39651736542",
+  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39673641728",
   "worker_preflight_native_cases": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
     "file": "tests/integration/test_transaction_worker_preflight.py",
@@ -12324,7 +12324,7 @@
     "source_candidate_branch": "codex/rocketmq-m3-ai-creation-plan",
     "branch": "codex/rocketmq-m3-ai-solution-sdk"
   },
-  "source_ci_status": "required_source_and_six_profile_broker_verified_merged",
+  "source_ci_status": "in_progress",
   "superseded_main_push_ci_deduplication_186": {
     "at": "2026-10-21T18:26:01.637785+00:00",
     "run": 39650592198,
@@ -15063,7 +15063,10 @@
       ],
       "receipt": "https://github.com/FangcunMount/reliable-messaging/releases/download/python/v0.4.0a2/published-installation-receipt.json",
       "stable_release": false,
-      "production_changed": false
+      "production_changed": false,
+      "published_receipt_download_hashes_verified": true,
+      "release_index_pr": "https://github.com/FangcunMount/reliable-messaging/pull/50",
+      "release_index_merge_sha": "b1679360542699efcc831eabeb3b4526015c394f"
     }
   },
   "claim_authorized_runtime_development": {
@@ -15090,5 +15093,35 @@
     },
     "required_gate_claimed": false,
     "scope": "Public SDK-authorized runtime delegation and explicit first-plan claim retry; first source recheck and new owned fence reuse original commit/handoff, no reseal/direct Store bypass/implicit model retry. Must replace development override with fixed released URL/hash and rerun all required gates before merge"
+  },
+  "claim_scanner_fixed_sdk": {
+    "status": "required_ci_in_progress",
+    "code_sha": "009b28771865c46b07aad8418ebbb57806870a62",
+    "candidate_sha": "fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/197",
+    "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39673641728",
+    "harness_sha": "b0111bbdc6fa81237bb54d62c5dd42a118f3df21",
+    "harness_pr": "https://github.com/FangcunMount/infra/pull/121",
+    "broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39673821397",
+    "sdk_version": "0.4.0a2",
+    "sdk_wheel_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2",
+    "local": {
+      "target_passed": 122,
+      "full_unit_passed": 3427,
+      "failed": 0,
+      "skipped": 0,
+      "integration_interop_deselected": 1179,
+      "mypy_sources": 418,
+      "native_scanner_collected_only": 6,
+      "native_explicit_claim_retry_collected_only": 5,
+      "broker_host_cases_collected_only": 26,
+      "required_broker_flags": 64,
+      "harness_original_tests_passed": 82,
+      "harness_tests_passed": 84
+    },
+    "source_merged": false,
+    "harness_merged": false,
+    "production_deploy_enabled": false,
+    "scope": "Explicit opt-in original20-candidate order, close source before MQ, exact old abort host authorization through public bounded SDK Retry, first wire retained; typed local-Aborted quota denial plus fresh proof before separate no-event job maintenance; half unknown does not authorize business/deferral, no new model handoff for duplicate. Default DI, complete terminal recovery and production remain pending."
   }
 }
