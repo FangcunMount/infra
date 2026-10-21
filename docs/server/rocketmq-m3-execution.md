@@ -588,3 +588,15 @@ PR201/4c068f2（核心977f1fa）新增串行generation终态Sender、来源规�
 ✅ PR201/be28a30全部12检查success；八分片/JUnit的集合完整、互斥、源码父SHA全部核验，MySQL8.0.36与8.4各4740、均含13原生事务用例，0失败/跳过。六档实际Broker各31宿主/76证据、完整清理与固定SDK/源/工具/hash/digest均通过。合并前CD=false，正常合并32be530，整棵tree与候选一致。infra PR128的13项检查全部通过，合并73df2bc，四个功能文件与c4a7ca0一致。
 
 首次持久化response、candidate、终态证据及wire被复用；原业务完成、archive与witness同根提交，确认丢失不擦除本地提交，重复只读首结果；来源变化需宿主显式新plan并保留旧Aborted。此子批次不是T18真实provider/网络/进程恢复或默认装配验收。semantic/candidate/恢复/取消drain及统一装配仍待完成，M3保持16/36、T17不勾选；生产切换、稳定SDK、system及48小时观察未开始。
+
+
+### 2026-10-22 T17 semantic 原规则闭环与串行终态入口
+
+| 子门禁 | 状态 | 验收及下一步 |
+| --- | --- | --- |
+| semantic 原规则/只读受理 | ✅ 验证并合并 | PR202/c300e89全部12检查success；八分片JSON/JUnit集合完整互斥、测试父SHA核验；MySQL8.0.36/8.4各4802，均含4原生事务用例，零失败/跳过。CD=false，合并82bc619，整棵tree一致 |
+| semantic 虚拟终态投影 | ☐ CI待核验 | PR203/941e925，118目标、3599本地单元及421类型通过；1216 integration/interop明确排除。CI39689597385待核验；原candidate聚合仍归complete_claim |
+| 串行 semantic Sender | ☐ 源码/真实Broker待验 | PR204/101775e，核心169f024；150目标、3631本地单元、423类型通过，1229 integration/interop排除；13原生仅收集，CI39690447013运行中。首response、原candidate及wire固定；原根共同提交，不产生新模型调用 |
+| 六档真实Broker新档 | ☐ 排队 | infra PR132/5280ead固定101775e及公开0.4.0a2；88工具测试通过，精确匹配34宿主/84证据，旧31/76收据被拒绝。39690792859尚未实际核验，排队不算通过 |
+
+原读写边界、取消来源版本、原根CAS和首次业务结果保持；提交后FinalUnknown不擦除本地提交，显式重建计划须先证明旧Aborted。T17其余candidate/恢复/取消drain与默认装配仍待完成。总进度16/36，T17不勾选；稳定SDK、生产、system和48小时观察未开始。
