@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T16已闭环，AI9485f28两档MySQL各3531项零失败/跳过，14项源码/消息兼容检查成功；实际SDK/Broker六档每档15项协议检查、8项宿主用例均零失败/跳过且完整清理，infra37项检查全部成功。AI PR159合并e8392c05，infra PR83合并b770ed68。T17实际worker预检0be8755通过两档MySQL各3633测试及六档真实Broker各13检查/3宿主用例；其余状态入口仍推进，尚未完成；[T16完整证据与失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。
+- 当前批次：T17状态基础/worker预检已合并AI PR160（2342eb6b），精确cbc47d9的14源码检查、两档MySQL各3649和六档真实SDK/Broker各13检查/3用例均通过、完整清理；合并文件树与候选一致。治理定稿/重开旧计划8b44358两档各3680/各8原生通过，新RPC编排候选ecdb144在PR161重验12原生用例；评审只读规划PR162继续推进。默认事务装配未启用，T17未闭环；[分批证据与失败历史](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -132,7 +132,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
-| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；worker/共享原根cbc47d9共14检查通过，两档MySQL各3649零失败/跳过，修正原子提交表征通过；精确CBC六档Broker39560981646运行中。治理计划8b44358两档各3680、各8项原生用例通过；新c2ebf08的RPC适配/首次响应/有界原事务发送本地2788通过、390文件类型通过，12原生用例CI待完成。默认装配未切换，其余评审/创建/裁决和worker状态继续推进。[分批证据](evidence/rocketmq-m3-ai-state-20261021.json) |
+| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；基础/worker预检PR160已合并2342eb6b，cbc47d9共14源码检查、两档各3649及六档Broker各13检查/3用例零失败/跳过、清理完整。治理8b44358两档各3680/各8原生通过，最新ecdb144/PR161的12原生重验中；评审只读规划PR162本地50通过/390文件类型通过，2原生仅收集。其余活跃状态入口未闭环，默认装配未启用。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
 | ☐ | T20 | 成对契约、安全、wire、receipt/ACK重复与取消 | 待开始 |
@@ -422,3 +422,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-21：T17部分验收工具PR88已合并46bb54e2，43检查成功，0be8755的六档worker/Broker证据保持不变。下一候选3cf74b5新增原准备/dispatch原生表征在MySQL8.4分片失败：误将PreparedStep.cp保留快照断言为dispatching，数据库final版本v5及提交探针已通过；失败报告摘要保留。断言修正4b32439、文档候选cbc47d9重新执行39559277637/39559277604，旧失败运行已请求取消，未计通过。治理冻结计划移至独立codex/rocketmq-m3-ai-governance分支，0f787c5本地2765单元通过、388源文件类型通过，定稿/重开及显式RR根保护已实现，8原生用例只收集、未验收；尚未接入实际RPC或合并。T17仍未完成，16/36。
 
 - 2026-10-21：已核对cbc47d9完整八分片/JUnit及合并父SHA，两档MySQL各3649零失败/跳过，修正原子提交用例各通过；14项检查成功，M7两档六份报告均非空/零失败跳过。使用infra已有workflow_dispatch.ai_ref绑定精确CBC，真实六档Broker39560981646仍在执行，不套用旧0be证据。治理计划8b44358的12项源码检查成功，两档各3680通过，新增定稿/重开原根各8项全部通过；新c2ebf08发送编排与显式RPC适配器本地2788通过、390源文件类型通过，12项原生用例/当前CI39561117309仍待执行完成，不将原8项证明替换为12项。生产装配不启用，T17仍进行中、16/36。
+
+- 2026-10-21：cbc47d9精确六档真实SDK/Broker39560981646各13协议检查/3宿主用例通过，零失败/跳过与完整清理已核对；首次报告下载EOF已重试，未跳过报告验证。AI PR160合并2342eb6b，候选/合并tree均8c3f97e，AUTO_DEPLOY_ENABLED=false，代码合并不记为部署或任务完成。治理分支基于新main整理为ecdb144，整理前后tree均fcf3847，旧c2 CI已取消，当前39562163112重新验收；不能用旧8b的8项原生替代当前12项。评审只读规划PR162为b696b3e，原writer保持原锁和CAS，本地50目标/390文件类型通过，新增单项/35项实际MySQL用例仅收集。T17继续进行中，总进度16/36，生产/system/观察未开始。
