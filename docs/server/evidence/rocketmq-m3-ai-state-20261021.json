@@ -5212,7 +5212,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T15:31:22.896480+00:00",
+  "updated_at": "2026-10-21T15:41:57.790684+00:00",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -5736,8 +5736,8 @@
     ]
   },
   "resolution_readonly_plan": {
-    "status": "pushed_required_ci_pending",
-    "source_sha": "06ac70981b56b6ae571b0fdf3d30ea346ff6b957",
+    "status": "restacked_with_corrected_parent_rpc_assertions_required_ci_pending",
+    "source_sha": "440461fc87fbf2985647fe514cb628373fbc8d1d",
     "code_sha": "f925cfa7249dfce5e7b8e85bbc85a0b0953e080f",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/175",
     "baseline_passed_before_refactor": 7,
@@ -5754,6 +5754,43 @@
     "mypy_source_files": 403,
     "format_files": 1016,
     "scope": "Original unknown evidence, manual decision audit, lock/CAS/root/capacity ownership unchanged; immutable read-only plan only; no resolution SDK send claimed",
+    "default_runtime_assembly_enabled": false,
+    "prior_candidate": "06ac70981b56b6ae571b0fdf3d30ea346ff6b957",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39626904176",
+    "restack_scope": "Readonly resolution application source unchanged; preserve corrected parent SDK/Broker assertions and both documentation baselines"
+  },
+  "resolution_sdk": {
+    "status": "pushed_required_native_ci_pending",
+    "source_sha": "73ee3b830cb768a4e0f3dd0a39d6ea5759095056",
+    "code_sha": "c44499b609daded207ab7ecca66f91d49a7acfa4",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/176",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39627648431",
+    "merged": false,
+    "target_passed": 27,
+    "full_unit": {
+      "passed": 3098,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 1038,
+      "warnings": 5
+    },
+    "native_collected": 12,
+    "native_executed_locally": false,
+    "mypy_source_files": 405,
+    "format_files": 1021,
+    "docs": {
+      "files": 75,
+      "links": 1357,
+      "errors": 0
+    },
+    "scope": "Exact first manual audit/source and guarded original root; original resolver borrows host transaction/capacity/models/quota/runtime limits; precise SDK proof, no model call or automatic retry authorization",
+    "source_conflict_and_real_competing_capacity_native_pending": true,
     "default_runtime_assembly_enabled": false
+  },
+  "pending_maintenance_writer_followup": {
+    "source": "src/qs_ai/bootstrap/recover_semantic_contract.py:run",
+    "writes": "evaluation_contract_recovery.authorize_contract_recovery",
+    "already_in_inventory": true,
+    "scope": "Trusted-host maintenance path still owns old transaction; must retain exact failed-evidence/policy exception and inspect SDK assembly before T17/T19 completion; no production invocation authorized by this code followup"
   }
 }
