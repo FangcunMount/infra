@@ -5212,7 +5212,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T16:53:31.894369+00:00",
+  "updated_at": "2026-10-21T16:59:00.888891+00:00",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -8090,7 +8090,11 @@
       }
     },
     "source_merge_status": "original_74f9_all12_checks_passed_and_4136_per_mysql_verified; docs-only merge of verified main as f60f61f now awaits new exact CI; original six-profile proof stays pinned74f9",
-    "source_candidate_with_verified_main": "f60f61f54b23c7dfd271441011def7952e53640c"
+    "source_candidate_with_verified_main": "f60f61f54b23c7dfd271441011def7952e53640c",
+    "infra_merged": true,
+    "infra_merge_sha": "684166fa39f65dcdc814de716c6847c78cf7ee5f",
+    "infra_successful_checks": 19,
+    "merged_workflow_and_three_harness_files_match_verified_candidate": true
   },
   "dispatch_record_readonly_local": {
     "status": "pushed_required_native_ci_pending",
@@ -8148,6 +8152,24 @@
       "files": 75,
       "links": 1362,
       "errors": 0
-    }
+    },
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39638783636"
+  },
+  "worker_dispatch_broker_followup": {
+    "status": "pushed_required_six_profile_ci_pending",
+    "source_sha": "17c0e915d90026479d0d088764445a749be35649",
+    "code_sha": "5b20088bbb4e0c81381d1caefd8edbc662875d4e",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/182",
+    "infra_sha": "f0c476634f5398dcff67dc581b9c642a081189fb",
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/111",
+    "actual_broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39639411031",
+    "actual_broker_status": "queued",
+    "host_tests_collected": 15,
+    "required_flags": 42,
+    "harness_unit_passed": 80,
+    "mypy_source_files": 407,
+    "native_executed_locally": false,
+    "scope": "Original serial generation/semantic preparation sender, same-root two CAS, first inputs/ledger/wire/witness, FinalUnknown and once-only permit handoff/repeat protection, cancellation rollback; observer only, no model or complete graph/QS/system/process/network acceptance claim",
+    "production_changed": false
   }
 }
