@@ -15,7 +15,10 @@ CASES = frozenset(('constructor_inert', 'halves_before_worker_root', 'half_invis
     'correction_final_unknown_keeps_commit', 'correction_source_conflict_rollback',
     'solution_half_invisible', 'solution_final_unknown_keeps_commit',
     'solution_original_assets_receipt_wire_and_witness',
-    'solution_first_receipt_replay_no_new_send', 'solution_source_conflict_rollback'))
+    'solution_first_receipt_replay_no_new_send', 'solution_source_conflict_rollback',
+    'resolution_half_invisible', 'resolution_final_unknown_keeps_commit',
+    'resolution_original_audit_wire_and_witness',
+    'resolution_repeated_invocation_no_new_send_or_model', 'resolution_source_conflict_rollback'))
 TESTS = frozenset((
     'test_actual_worker_preflight_half_gate_and_duplicate_preserve_original_evidence',
     'test_actual_worker_preflight_lost_final_reply_preserves_local_commit',
@@ -26,7 +29,9 @@ TESTS = frozenset((
     'test_actual_correction_first_wire_final_unknown_and_replay_after_finalization',
     'test_actual_correction_source_conflict_rolls_back_prepared_half',
     'test_actual_solution_prepare_rpc_half_gate_first_receipt_and_final_unknown',
-    'test_actual_solution_source_conflict_rolls_back_prepared_half'))
+    'test_actual_solution_source_conflict_rolls_back_prepared_half',
+    'test_actual_resolution_rpc_half_gate_first_audit_and_final_unknown',
+    'test_actual_resolution_source_conflict_rolls_back_prepared_half'))
 
 
 def state_manifest():
