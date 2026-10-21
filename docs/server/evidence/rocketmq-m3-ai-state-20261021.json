@@ -13298,7 +13298,7 @@
       "all8_new_claim_flags_match": true
     },
     "source_merged": false,
-    "harness_merged": false,
+    "harness_merged": true,
     "scope": "Actual fixed Broker/SDK normal claim, attempts exhausted, source conflict and real capacity denial; first-only handoff, precise first wire/witness, client-discarded final confirmation and no phantom running. No observer proof substitutes for provider, paired QS, system, process exit or network faults; prior19/51 receipt explicitly rejected",
     "complete_broker_ci": {
       "harness_source_sha": "c22b729371c8c5962788741294b3a4afe7b335f7",
@@ -13944,7 +13944,11 @@
         "05c8cf2cbb15788bbf606c90e0470b001636757f",
         "c22b729371c8c5962788741294b3a4afe7b335f7"
       ]
-    }
+    },
+    "harness_merge_sha": "420ab7ed4b89d84574aaefc8c2a2c27e07fde2d6",
+    "harness_required_checks_success": 13,
+    "harness_changed_functional_files_equal": true,
+    "source_required_ci_status": "coverage_check_pending"
   },
   "interpretation_claim_no_event_deferral": {
     "status": "required_ci_pending",
@@ -13996,6 +14000,12 @@
       "skipped": 0,
       "python_mypy_sources": 15
     },
-    "fixed_release": false
+    "fixed_release": false,
+    "checks": {
+      "sdk": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39666771562",
+      "python": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39666771272",
+      "storage": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39666771417",
+      "infrastructure": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39666771241"
+    }
   }
 }
