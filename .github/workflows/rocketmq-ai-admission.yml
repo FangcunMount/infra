@@ -6,7 +6,7 @@ on:
         description: Exact AI admission candidate SHA
         type: string
         required: true
-        default: 2bfbb65d8aff3ea6dce69fe170827c8164e470db
+        default: bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4
   pull_request:
     paths: ['scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/test_ai_admission_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-admission.yml', 'Makefile']
 permissions:
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '2bfbb65d8aff3ea6dce69fe170827c8164e470db' }}
+          ref: ${{ inputs.ai_ref || 'bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4' }}
           path: .ai-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -45,7 +45,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Verify exact AI candidate and harness gates
         env:
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '2bfbb65d8aff3ea6dce69fe170827c8164e470db' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || 'bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
