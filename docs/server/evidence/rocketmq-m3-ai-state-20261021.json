@@ -598,11 +598,11 @@
   },
   "previous_t16_broker_proof_not_rebound": true,
   "remaining": [
-    "Complete real worker and governance state adapters with frozen original inputs",
-    "Freeze interpretation identities and sequence for non-command writes",
-    "Use actual host roots and fixed published SDK/Broker acceptance",
-    "Keep deterministic model-response finalization as T18 and full runtime/history/ACK as T19",
-    "Merge only after required gates; T17 remains unchecked"
+    "Complete interpretation claim/refusal/attempts-exhausted writers with frozen exact source and sequence",
+    "Complete evaluation finalization Sender, candidate/recovery/cancellation drain and all active writer coverage",
+    "Verify current17-case native finish and19-case/51-flag actual Broker gates before merging",
+    "Keep durable model-response finalization and invocation-count failure proof as T18; do not fake a candidate claim for serial ownership",
+    "Preserve legacy/archive/ACK responsibilities and default runtime activation gates; T17 remains unchecked"
   ],
   "source_pr": "https://github.com/FangcunMount/qs-ai/pull/190",
   "source_pr_draft": false,
@@ -1438,6 +1438,18 @@
       "result": "14 setup errors and 11 passing original cases",
       "cause": "New question_sequence codec field was added to encoder but omitted from exact decoder whitelist",
       "resolution": "Added exact field, 25 target plus final59 target pass; full3256 unit run passed; no failed candidate merged"
+    },
+    {
+      "batch": "evaluation_finish_root_local",
+      "source": "uncommitted development before code752029e",
+      "baseline": "6 original characterization cases passed before application edits",
+      "observed": [
+        "lint F823 from retained inner CheckpointConflict import shadowing original global import; removed redundant inner import before tests",
+        "22 passing target cases and1 failing new success fixture: missing PreparedStep.max_output_characters; fixture corrected without changing application rules",
+        "Native collection failed with1 missing-module import error; corrected to actual application.evaluation.provider_failure, no native DB execution claimed"
+      ],
+      "resolution": "23 target cases pass, 10 native cases collect, 3280 full unit cases pass; final repr-only privacy adjustment checked with23 target cases",
+      "failed_candidate_merged": false
     }
   ],
   "governance_followup": {
@@ -5219,7 +5231,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T18:21:59.451254+00:00",
+  "updated_at": "2026-10-21T18:33:39.942975+00:00",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -11117,5 +11129,50 @@
     "source_candidate_branch": "codex/rocketmq-m3-ai-creation-plan",
     "branch": "codex/rocketmq-m3-ai-solution-sdk"
   },
-  "source_ci_status": "queued_no_native_or_broker_acceptance_claimed"
+  "source_ci_status": "queued_no_native_or_broker_acceptance_claimed",
+  "superseded_main_push_ci_deduplication_186": {
+    "at": "2026-10-21T18:26:01.637785+00:00",
+    "run": 39650592198,
+    "main": "cbe020556cfcb6ccd8fc81d29d93f50adbeac841",
+    "source": "3df0eee7051c27084707cd3a5d5b777b92ea019b",
+    "merged": "4302e1cd79cda34a63a7dc776f9e34c0a524c136",
+    "tree": "62bc9ee5943cde22f31ae25e9facd438d0ef3672",
+    "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39645994402",
+    "before": {
+      "conclusion": "",
+      "event": "push",
+      "headSha": "4302e1cd79cda34a63a7dc776f9e34c0a524c136",
+      "status": "in_progress"
+    },
+    "scope": "Superseded duplicate main push only; current main187 and current candidate required checks retained"
+  },
+  "evaluation_finish_root": {
+    "status": "pushed_required_native_ci_pending",
+    "branch": "codex/rocketmq-m3-ai-evaluation-finish-root",
+    "source_sha": "3679a6ea4dc1051b231cf92f4302bce7211093ac",
+    "code_sha": "752029ecd9469792f5226b10c5e424c322741faf",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/191",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39653185357",
+    "baseline_original_passed": 6,
+    "target_passed": 23,
+    "full_unit": {
+      "passed": 3280,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 1123,
+      "warnings": 6
+    },
+    "final_repr_only_privacy_change_rechecked_target": 23,
+    "native_collected": 10,
+    "native_executed_locally": false,
+    "mypy_source_files": 413,
+    "format_files": 1056,
+    "docs": {
+      "files": 75,
+      "links": 1374,
+      "errors": 0
+    },
+    "scope": "Prepare original response/semantic evidence and first candidate ID before DB; stage original serial/candidate completion on active host root; original owned-root commit, replay without commit/emit and recovery checks retained; state/applied is not commit/witness proof; no full completion Sender/durable model-response recovery/default DI claim",
+    "production_changed": false
+  }
 }
