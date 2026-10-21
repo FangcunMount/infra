@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI领取/scanner PR197与显式完成重试PR198、infra PR121/123均已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17进行中，16/36。领取/拒绝/耗尽及完整scanner子批次已闭环：修复源5963d0c两档各4614、含9维护/6scanner/5显式重试原生，六档Broker各26宿主/64证据，0失败跳过且完整清理；AI PR197及infra PR121已合并并核对候选一致。旧63/64失败保留。完成重试8d0a300的六档Broker各28/68通过，AI PR198及infra PR123完整门禁通过并已合并。评测规划/权威来源v3基础PR199双MySQL各4665、含5原生通过并已合并；串行终态来源PR200两档各4687、5原生及12检查通过并已合并，Sender PR201六档31/76 Broker通过，完整源码CI待核验；完整终态/candidate/恢复和默认装配仍待闭环，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36。领取/拒绝/耗尽及完整scanner子批次已闭环：修复源5963d0c两档各4614、含9维护/6scanner/5显式重试原生，六档Broker各26宿主/64证据，0失败跳过且完整清理；AI PR197及infra PR121已合并并核对候选一致。旧63/64失败保留。完成重试8d0a300的六档Broker各28/68通过，AI PR198及infra PR123完整门禁通过并已合并。评测规划/权威来源v3基础PR199双MySQL各4665、含5原生通过并已合并；串行终态来源PR200两档各4687、5原生及12检查通过并已合并，Sender PR201两档各4740/13原生及六档31/76 Broker通过并已合并；完整终态/candidate/恢复和默认装配仍待闭环，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -581,3 +581,10 @@ PR201/4c068f2（核心977f1fa）新增串行generation终态Sender、来源规�
 | semantic原规则及只读来源基础 | ☐ 本地验证，原生待验 | 独立未push分支1b296f6：47基线、14原入口表征、16来源边界，77目标/3558本地单元/421类型通过；1216 integration/interop排除，4原生仅收集。候选、dispatch/历史/资产、原CAS、取消/候审与提交责任保留，没有完整semantic事务Sender或默认装配 |
 
 本次不把Broker通过等同完整源码CI、默认启用或生产业务验收。M3仍16/36、T17未勾选；稳定SDK、生产、system与48小时观察未开始。旧main aa38ed6的同tree重复push已结束，未取消；新main和required门禁均保留。
+
+
+### 2026-10-22 T17 串行generation事务入口子门禁闭环
+
+✅ PR201/be28a30全部12检查success；八分片/JUnit的集合完整、互斥、源码父SHA全部核验，MySQL8.0.36与8.4各4740、均含13原生事务用例，0失败/跳过。六档实际Broker各31宿主/76证据、完整清理与固定SDK/源/工具/hash/digest均通过。合并前CD=false，正常合并32be530，整棵tree与候选一致。infra PR128的13项检查全部通过，合并73df2bc，四个功能文件与c4a7ca0一致。
+
+首次持久化response、candidate、终态证据及wire被复用；原业务完成、archive与witness同根提交，确认丢失不擦除本地提交，重复只读首结果；来源变化需宿主显式新plan并保留旧Aborted。此子批次不是T18真实provider/网络/进程恢复或默认装配验收。semantic/candidate/恢复/取消drain及统一装配仍待完成，M3保持16/36、T17不勾选；生产切换、稳定SDK、system及48小时观察未开始。
