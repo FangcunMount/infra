@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17进行中，16/36。更正Broker PR167已以12检查成功合并87900b4，两档各3844零失败跳过，候选/合并树一致；真实Broker六档各8宿主/25证据及infra PR97的19门禁已通过。创建原根PR168首次真实CI暴露“根内响应即提交收据”的错误断言，原子回滚证明正常；修正及文档合并问题保留记录，新候选85c7b0d/39613740912待完整CI，52目标通过，不计原生验收完成。Sender PR169本地2943/78目标、14原生待CI。Solution只读Prompt/Profile规划本地2963完整单元、62目标通过，4原生仅收集，整批Solution准备仍未接入。默认装配关闭，T17未勾选；[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36。更正Broker、创建原根PR168、创建Sender PR169和只读资产基础PR170均已合并：各自12检查成功，最新双MySQL各3960零失败跳过（含创建根10、Create处理入口16、资产只读6项/档），候选/合并树一致。整批Solution资产计划PR171/9541305本地2992单元、45目标，借用原根候选a864895本地3005单元、31目标，新增各4原生仅收集，待独立CI；完整SDK/源快照/witness与其余状态写入口仍未闭环。失败历史保留，默认装配关闭，T17未勾选；[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -132,7 +132,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
-| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；基础/预检、治理、评审、更正已合并。更正Broker PR167最终候选双档各3844零失败跳过、12检查成功，六档各8宿主/25证据通过，infra19检查后合并。创建只读已合并；创建根85c7b0d修正错误测试断言后待新CI，Sender及Solution资产规划仍在验证。创建/方案原根、其余活动状态及默认装配未闭环。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
+| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；治理、评审、更正、创建根/发送器和资产只读基础已合并，最新各3960/档零失败跳过、12检查成功；更正六档Broker各8宿主/25证据独立通过。整批Solution资产计划与借用原根待原生CI，完整SDK、源快照、witness、其余状态及默认装配未完成。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
 | ☐ | T20 | 成对契约、安全、wire、receipt/ACK重复与取消 | 待开始 |
