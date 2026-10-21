@@ -1676,10 +1676,10 @@
     ]
   },
   "broker_profile_candidate": {
-    "ai_source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
-    "infra_sha": "76a0b1e082edbad168a1f1018a7234051ab8d7fc",
+    "ai_source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+    "infra_sha": "8ad7f7a6a39da054e5384199b46765bbc6880427",
     "pull_request": "https://github.com/FangcunMount/infra/pull/83",
-    "checks": "https://github.com/FangcunMount/infra/actions/runs/39535745152",
+    "checks": "https://github.com/FangcunMount/infra/actions/runs/39539009218",
     "python": [
       "3.11",
       "3.13"
@@ -1693,7 +1693,7 @@
     "host_tests": 8,
     "required_cases": 15,
     "harness_unit_passed": 66,
-    "status": "queued",
+    "status": "queued_retry_after_fixture_timestamp_fix",
     "verified": false,
     "production_changed": false
   },
@@ -1706,5 +1706,141 @@
     "format_files": 932,
     "docs_markdown_files": 75,
     "docs_links": 1315
+  },
+  "broker_first_failure": {
+    "checks": "https://github.com/FangcunMount/infra/actions/runs/39535745152",
+    "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+    "infra_sha": "76a0b1e082edbad168a1f1018a7234051ab8d7fc",
+    "reports": [
+      {
+        "file": "rocketmq-ai-admission-0-3.11-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "d9bcb41ea4327f5285f74c0651da140c2f1e8e210006cf68a629e783057fcd14",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.11.16",
+        "mysql_version": "8.0.36",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "99953494a04fe00d793e3e5e42f724151e7c60f2c1da93aa2804f6231235b087",
+        "junit_sha256": "aa357529e138003e4c16386fc74736ef18d3dc72ebae90ba4a1f24ed6e63737b",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-1-3.11-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "d250821b7162254f51d17cc60956c96422ba6e6b55f49b48ddd0a28b7ecdce3c",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.11.16",
+        "mysql_version": "8.0.44",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "3fb30b1625415b3bc45dade626c36ac489d3d179c33c371c620eb7c7cc51a200",
+        "junit_sha256": "f9b96a891e2f4d1d46bb7dd26632994f6d6a268766d4c996b6ed069ab54747b9",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-2-3.11-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "dcb10fec64107dbc9555c0c006771838fb28881cb2a61d9b73aa2e80c69bb774",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.11.16",
+        "mysql_version": "8.4.11",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "920ef2132c2ff1009726e7b7939507c23612e4ee9d53bb529aef1f06e8111081",
+        "junit_sha256": "6367447f294e41b77c6f37ff12c758df52f12b492e5b183b520d81a5db9398bf",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-3-3.13-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "d9b0d15d9faa5002b72b82c44b45f109b64ab90e3b8e569cfd98b17cf9cee0eb",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.13.15",
+        "mysql_version": "8.0.36",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "620c3403fe4fb205afd3346d779d7611d7ccb6fa62b86ae1fc4e36dddd3aa008",
+        "junit_sha256": "6c2fbb8360c68c835fddeb5a8410fcd6d9ff6d4f80a66d5b8c146386b5c1bbda",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-4-3.13-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "1018ff6665e703e97113584230a0de81a0f833ac85cdd69aa85d9a3edd590280",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.13.15",
+        "mysql_version": "8.0.44",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "42c8fece36bb0249b1ffc982db3741b5b860db514f8d9130665ba078fbace00d",
+        "junit_sha256": "51da38ce68f269332ab5f24f57429f762ca2f7467b4b800c0c15f7028933b22f",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-5-3.13-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "111841e72ebcf205a8c5ff1e3ba2a516c51a16d507877649de63a8cd0ed30a0a",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.13.15",
+        "mysql_version": "8.4.11",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "5d8a46afbddb87a20ce06e6889d1b1fe3265d1100131dae60830c50f12283d5b",
+        "junit_sha256": "3b12bcd7c591a379b64d0cadd95da4d0c74c23a11b415be316753d419f7d66a2",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "cause": "Historical control-input helper omits original_occurred_at. Frozen SDK Message rejects empty timestamp at freeze_branch before these input halves are prepared; local reproduction matches ValueError field64/empty.",
+    "fix_sha": "cde36ea39b0e7bef584b93acd7fadba99048859a",
+    "fix": "Optional explicit first timestamp passed before the initial fixture seal for all five command families. Historical default unchanged; no wire reconstruction after freezing.",
+    "fixture_protocol_regressions": 6,
+    "targeted_selected_passed": 36,
+    "interop_deselected": 9,
+    "application_src_unchanged_from_verified_2bf": true,
+    "accepted": false
+  },
+  "latest_ai_ci_candidate": {
+    "source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39538869956",
+    "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39538869952",
+    "status": "in_progress",
+    "not_yet_passed": true
   }
 }
