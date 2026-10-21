@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17进行中，16/36。完整Solution事务SDK修正候选db2b989已通过12检查、双MySQL各4083零失败跳过（10原根/17入口各档），PR173合并6feb352，候选/合并tree一致。Broker源f572612的六档各10宿主/30必需证据及完整清理通过，工具与lock hash、测试合并父SHA已核对，源PR174的12检查、工具PR104的13检查均已通过并合并。ResolveUnknown事务候选73ee3b8和维护只读计划b820bf6仍待原生CI；worker准备规划本地进行中，默认装配及其余状态写入口未完成，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36。Solution与ResolveUnknown事务源码已合并；维护只读规划PR177与worker准备只读规划PR178也已合并，完整八分片/JUnit核验双MySQL各4146/4161零失败跳过，12检查均成功、合并tree一致。原Go发布超时同源单次重验已成功，首轮失败保留且未改5秒预算。新Broker源74f9d35/工具cbe1d9d的12宿主/35证据六档39635351591排队；dispatch预算只读PR180本地3125通过、4原生待CI。完整worker/维护SDK/状态及统一装配未完成，默认装配关闭，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -132,7 +132,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
-| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；Solution完整SDK已合并，各4083/档、10原根/17入口通过；六档Broker各10/30通过、完整清理，源/工具均已合并，各12/13检查成功。ResolveUnknown、维护原规划、worker准备及其余状态和默认装配仍待闭环；失败历史保留。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
+| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；原ResolveUnknown源码已合并，两档各4136、4只读/12原根与入口通过，旧超时与同源重验保留。新Broker12/35档、维护/串行准备/dispatch与其余状态、统一装配待闭环；默认装配未启用。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
 | ☐ | T20 | 成对契约、安全、wire、receipt/ACK重复与取消 | 待开始 |
@@ -454,3 +454,9 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-21：修正精确db2b989/39625934747的八分片/JUnit、零重叠完整集合及测试合并父SHA核验通过，两档各4083零失败/跳过，均含10项Solution SDK原根和17项实际处理入口。12检查全部成功，生产CD仍false，PR173正常合并6feb352，tree同a650de27。独立Broker源f572612/工具d0f61bd六档39626265764各10宿主用例/30必需证据、零失败跳过、完整清理；两工具hash、源lock及测试infra合并648ac0b的父SHA均已核验。源PR174与工具PR104其余CI仍待完成，不提前合并或将其计作T17完成。worker原准备的10项原始行为表征已在改动前通过，首次断言误把统一CompletionRecords当独立表已按真实kind作用域修正；只读规划28目标和405类型通过，4原生仅收集，完整本地回归执行中。T17继续16/36，未发布稳定SDK或部署。
 
 - 2026-10-22：Broker源f572612/39626084626八分片与JUnit、完整集合及测试父SHA已核对，两档各4083零失败/跳过；12检查全部成功，生产CD仍false，PR174合并e483f8f，tree同53599a62。infra PR104精确d0f61bd的13检查全部成功并正常合并91a4e76，三项实际工具文件与已验收源逐字节一致；六档10/30真实Broker证据保留。串行worker原准备规划22c95b6/候选46d2697（PR178）本地28目标、3117完整单元、405类型、1025格式与75文档/1359链接通过，4原生仅收集，39631039661待验收；原双CAS prepare+dispatch根未拆开，也未接通worker SDK。T17继续不勾选，总计16/36，生产未改动。
+
+- 2026-10-22：只读候选440461f/39626904176首次8.0.36各4097通过，8.4为4096通过/1失败/零跳过：既有Go发布互操作在publication_grpc:286返回DeadlineExceeded，固定QS2b62432的5秒预算未改，4项新增只读原生两档均通过。8份报告与失败摘要保留，并只请求一次同源失败分片重验。更完整候选73ee3b8/39627648431已通过12检查、完整八分片/JUnit、两档各4136零失败跳过（4只读/12原根与入口）；全部4097旧用例均包含并通过，原实现/探针/锁/工作流逐字节一致，原超时用例两档成功。以完整候选收口原规划与SDK，PR176正常合并0e92008、PR175祖先自动标记合并，tree同004bc993，生产CD仍false；旧失败/重验历史不抹除。
+
+- 2026-10-22：原ResolveUnknown真实Broker扩展源1442bf5/候选74f9d35（PR179）与工具cbe1d9d（infra PR108）已推送；12宿主用例仅收集，35项精确证据要求及79工具单元通过。新增半消息不可见、首审核/wire/witness、FinalUnknown、同调用不重发/不重做模型与竞争裁决回滚；旧10/30报告不能替代。串行dispatch预算/不可变记录只读提取本地19目标/405类型通过，尚未完成原生、提交或发送接线。T17仍不勾选，总进度16/36；未发布稳定SDK、未操作生产。
+
+- 2026-10-22：PR177精确b820bf6/39628837038与PR178精确46d2697/39631039661全部12检查成功；八分片JSON/JUnit及完整不重叠集合、测试合并父SHA已核验，双MySQL各4146/4161零失败跳过，分别含2维护只读与4串行准备原生。生产CD仍false，正常合并24e3326/eb1189e，源码tree一致。原Go发布超时的同源单次失败分片重验39626904176 attempt2完成success，首轮失败与未修改5秒预算记录保留，不覆盖原报告。dispatch只读代码82b403f/候选ceea84b（PR180）完成6原行为表征、19目标、3125完整单元零失败跳过、405类型及75文档/1360链接；4原生仅收集待CI。新Broker六档39635351591仍排队，维护原CLI、完整worker模型容量/终态/恢复及默认装配未转换；总进度16/36，T17未勾选。
