@@ -5212,7 +5212,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T15:41:57.790684+00:00",
+  "updated_at": "2026-10-21T15:51:08.469055+00:00",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -5655,7 +5655,6 @@
         "source_sha": "f87af32b39cb1162c48653ca0d01532671b88918",
         "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39623720568",
         "status": "failed_native_rpc_assertion",
-        "verified_failed_cases_per_complete_profile": 2,
         "reason": "Domain receipt immutable tuple compared directly to JSON array; actual business/Checker assertions before the wire comparison passed",
         "counts_as_gate_pass": false,
         "reports": [
@@ -5683,7 +5682,12 @@
             "file": "tests-8.4-3/shard-8.4-3.xml",
             "sha256": "d437446f1e8bb41a4f2e935b02e8c32fd0b9aba36c15edfe9accc591b2d8d177"
           }
-        ]
+        ],
+        "observed_failed_rpc_cases_per_mysql": 2,
+        "observed_report_count": 6,
+        "expected_report_count": 8,
+        "complete_success_not_claimed": true,
+        "superseded_remaining_jobs_cancellation_requested": true
       }
     ],
     "correction_scope": "Native assertion only: original receipt through unchanged RPC JSON encoding; no application change",
@@ -5792,5 +5796,32 @@
     "writes": "evaluation_contract_recovery.authorize_contract_recovery",
     "already_in_inventory": true,
     "scope": "Trusted-host maintenance path still owns old transaction; must retain exact failed-evidence/policy exception and inspect SDK assembly before T17/T19 completion; no production invocation authorized by this code followup"
+  },
+  "contract_recovery_readonly_plan": {
+    "status": "pushed_required_native_ci_pending",
+    "source_sha": "b820bf66d55646e0617cc43ec929f6d1ac827a79",
+    "code_sha": "ece2b2135dba3a09e3d28bdc707869a5c2907c32",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/177",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39628837038",
+    "merged": false,
+    "baseline_passed_before_refactor": 7,
+    "target_passed": 25,
+    "full_unit": {
+      "passed": 3106,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 1040,
+      "warnings": 6
+    },
+    "native_collected": 2,
+    "native_executed_locally": false,
+    "mypy_source_files": 405,
+    "format_files": 1023,
+    "docs": {
+      "files": 75,
+      "links": 1358,
+      "errors": 0
+    },
+    "scope": "Readonly original semantic exception plan; failed ledger, release, policy/budget and audit preserved; original writer keeps CP/Run locks/CAS and trusted CLI keeps its old preview/apply root; no SDK send or production tool invocation claimed"
   }
 }
