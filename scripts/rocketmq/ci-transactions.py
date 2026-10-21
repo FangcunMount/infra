@@ -456,11 +456,13 @@ def main():
             raise RuntimeError("required MySQL 8.0 fixture absent")
         if args.ai_admission_host:
             from ai_admission_acceptance import run_ai_admission_host
-            proof['ai_admission_host'] = {}
+            state_profile = os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') == 'state'
+            proof_name = 'ai_state_host' if state_profile else 'ai_admission_host'
+            proof[proof_name] = {}
             run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
-                                  mysql_password, ca, run, proof['ai_admission_host'])
-            for name in proof['ai_admission_host']['native_receipt']['cases']:
-                passed('ai_admission_' + name)
+                                  mysql_password, ca, run, proof[proof_name])
+            for name in proof[proof_name]['native_receipt']['cases']:
+                passed(('ai_state_' if state_profile else 'ai_admission_') + name)
             return
         if args.qs_event_host:
             from qs_event_acceptance import run_qs_event_host
@@ -909,6 +911,13 @@ def main():
                                 'Controlled QS input and observer ACK only; no paired QS business or real provider',
                                 'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
             report['ai_admission_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_admission_acceptance.py').read_bytes()).hexdigest()
+            if os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') == 'state':
+                report['batch'] = 'M3-AI-worker-state-original-SQLAlchemy-and-real-Broker'
+                report['limits'] = ['No production/system acceptance or throughput claim',
+                                    'Actual evaluation worker preflight, released SDK and original state root',
+                                    'Event observer ACK only; no paired QS business or real provider',
+                                    'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
+                report['ai_state_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_state_acceptance.py').read_bytes()).hexdigest()
         if args.qs_event_host:
             report['batch'] = 'M3-QS-AI-event-original-SQL-and-ACK-Broker'
             report['limits'] = ['No production/system acceptance or throughput claim',
