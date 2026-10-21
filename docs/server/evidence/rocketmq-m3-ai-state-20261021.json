@@ -2205,13 +2205,19 @@
     "scope": "full35 input digest and original clock facts; original pre/post-write audits, guarded review root, shared dispatcher and explicit RPC adapter; default assembly disabled",
     "task_completed": false,
     "source_ci_status": "in progress for current source",
-    "full_local_status": "in progress",
+    "full_local_status": "passed",
     "docs": {
       "files": 75,
       "links": 1330,
       "errors": 0
     },
-    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39598394073"
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39598394073",
+    "full_unit": {
+      "passed": 2826,
+      "failed": 0,
+      "deselected": 933,
+      "warnings": 4
+    }
   },
   "foundation_messaging_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39559277604",
   "source_messaging_ci": null,
