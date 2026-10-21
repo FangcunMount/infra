@@ -577,7 +577,7 @@ PR201/4c068f2（核心977f1fa）新增串行generation终态Sender、来源规�
 | 子门禁 | 状态 | 精确验收 |
 | --- | --- | --- |
 | 串行generation来源与原提交器 | ✅ 已验证/合并 | PR200/3068e1，12检查全部success，八分片/JUnit完整互斥、测试父SHA核验；MySQL8.0.36与8.4各4687、含5原生，0失败/跳过。CD=false后正常合并7ee4b06，tree精确一致；旧0ef夹具失败保留 |
-| 串行终态实际SDK/Broker | ✅ 六档通过，合并另计 | 源be28a30/工具c4a7ca0，CI39685078238；Python3.11/3.13×MySQL8.0.36/8.0.44/8.4.11各31宿主/76证据，0失败/跳过；完整清理、源/工具/lock、固定wheel/client与镜像digest均核验。PR201源码完整CI及PR128其余工具检查仍待完成 |
+| 串行终态实际SDK/Broker | ✅ 六档通过，合并另计 | 源be28a30/工具c4a7ca0，CI39685078238；Python3.11/3.13×MySQL8.0.36/8.0.44/8.4.11各31宿主/76证据，0失败/跳过；完整清理、源/工具/lock、固定wheel/client与镜像digest均核验。PR128全部13检查success并合并73df2bc，四个功能文件与c4a7ca0一致；PR201源码完整CI仍待完成 |
 | semantic原规则及只读来源基础 | ☐ 本地验证，原生待验 | 独立未push分支1b296f6：47基线、14原入口表征、16来源边界，77目标/3558本地单元/421类型通过；1216 integration/interop排除，4原生仅收集。候选、dispatch/历史/资产、原CAS、取消/候审与提交责任保留，没有完整semantic事务Sender或默认装配 |
 
 本次不把Broker通过等同完整源码CI、默认启用或生产业务验收。M3仍16/36、T17未勾选；稳定SDK、生产、system与48小时观察未开始。旧main aa38ed6的同tree重复push已结束，未取消；新main和required门禁均保留。

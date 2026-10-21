@@ -5230,7 +5230,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T22:34:20.059400+00:00",
+  "updated_at": "2026-10-21T22:40:04.130658+00:00",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -18716,7 +18716,11 @@
           }
         }
       ]
-    }
+    },
+    "harness_merged": true,
+    "harness_merge_sha": "73df2bc72c64d6f23667e14d9968e6def190b8e4",
+    "harness_checks_successful": 13,
+    "harness_functional_files_equal_verified_candidate": true
   },
   "superseded_main_push_ci_deduplication_198_199": {
     "at": "2026-10-21T22:05:09.338795+00:00",
