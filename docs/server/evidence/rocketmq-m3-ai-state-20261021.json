@@ -5,8 +5,8 @@
   "progress": "16/36",
   "base": "e8392c0582020d6cacf44c6caaa2f2061c66cb41",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-creation",
-  "branch": "codex/rocketmq-m3-ai-creation-plan",
-  "source_candidate": "a864895a17a7c0eed13efe8bdc7f960380764007",
+  "branch": "codex/rocketmq-m3-ai-solution-sdk",
+  "source_candidate": "db2b98952a6e3038eb0b0529a8a3da8b51eda4e0",
   "source_pushed": true,
   "source_merged": false,
   "production_assembly_enabled": false,
@@ -5212,7 +5212,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T15:14:22.496268+00:00",
+  "updated_at": "2026-10-21T15:31:22.896480+00:00",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -5404,11 +5404,11 @@
     }
   },
   "solution_borrowed_root": {
-    "status": "required_reports_verified_final_check_pending",
+    "status": "merged_completed_suite_and_aggregate_verified",
     "source_sha": "a864895a17a7c0eed13efe8bdc7f960380764007",
     "code_sha": "4fa18b842d02ebea33b797365994d74ec88651ed",
     "pushed": true,
-    "merged": false,
+    "merged": true,
     "original_baseline_passed": 7,
     "target_passed": 31,
     "full_unit": {
@@ -5589,16 +5589,32 @@
         }
       }
     },
-    "native_borrowed_root_passed_per_mysql": 4
+    "native_borrowed_root_passed_per_mysql": 4,
+    "merged_sha": "b0f10043f38660cf575fd99149362d80372a1f06",
+    "merged_tree": "b9d36f9acce9c765eb253db314928895a761fb62",
+    "candidate_and_merged_trees_equal": true,
+    "gate_authority": {
+      "exact_suite": "107366223070",
+      "suite_status": "completed",
+      "suite_conclusion": "success",
+      "workflow_status": "completed",
+      "workflow_conclusion": "success",
+      "complete_test_coverage_job": 119297967285,
+      "every_partition_required_success": true,
+      "all_eight_reports_independently_verified": true,
+      "individual_job_status_inconsistency": "verify8.4/1 API still reported in_progress while every step, completed workflow/suite and downstream needs.verify success gate passed",
+      "normal_merge_no_bypass": true,
+      "production_cd_enabled": false
+    }
   },
   "solution_sdk_root_sender": {
-    "status": "pushed_required_native_ci_pending",
-    "source_sha": "f87af32b39cb1162c48653ca0d01532671b88918",
+    "status": "fixed_rpc_boundary_assertion_required_ci_pending",
+    "source_sha": "db2b98952a6e3038eb0b0529a8a3da8b51eda4e0",
     "pushed": true,
     "merged": false,
     "target_passed": 56,
     "native_collected": 27,
-    "native_executed": false,
+    "native_executed": true,
     "scope": "Independent transaction input/facts, exact source/draft/assets/target digests, one guarded original root, first receipt recovery; actual Prepare handler and concurrency tests collected only",
     "default_runtime_assembly_enabled": false,
     "business_receipt_is_not_sdk_proof": true,
@@ -5617,9 +5633,9 @@
         "resolution": "Original unit scope rerun: 3061 passed, zero failed/skipped; complete cross-language/native matrix remains required CI"
       }
     ],
-    "code_sha": "e1e7b6e223b325131e65312b4f23c94c013d12e6",
+    "code_sha": "5948cc98fe4268502aa0a045c20607260551edbf",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/173",
-    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39623720568",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39625934747",
     "full_unit": {
       "passed": 3061,
       "failed": 0,
@@ -5633,6 +5649,111 @@
       "files": 75,
       "links": 1352,
       "errors": 0
-    }
+    },
+    "failure_history": [
+      {
+        "source_sha": "f87af32b39cb1162c48653ca0d01532671b88918",
+        "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39623720568",
+        "status": "failed_native_rpc_assertion",
+        "verified_failed_cases_per_complete_profile": 2,
+        "reason": "Domain receipt immutable tuple compared directly to JSON array; actual business/Checker assertions before the wire comparison passed",
+        "counts_as_gate_pass": false,
+        "reports": [
+          {
+            "file": "tests-8.0.36-0/shard-8.0.36-0.xml",
+            "sha256": "531438e9ed565ef91ba4ba1597ac87de6dea35eab70e5722b8773f855dce01fb"
+          },
+          {
+            "file": "tests-8.0.36-2/shard-8.0.36-2.xml",
+            "sha256": "ac62f9903a1cd22a7d99440703b34d91c1c2abc14189a3662771da9d6c5044f2"
+          },
+          {
+            "file": "tests-8.0.36-3/shard-8.0.36-3.xml",
+            "sha256": "e51e80cb503475fa8c74048288fcb061bc62da7b0dba13181b19373d42726a9b"
+          },
+          {
+            "file": "tests-8.4-0/shard-8.4-0.xml",
+            "sha256": "02a7eb1cc0657589668d71edcc300cedbbde186848cbdf6cb217877369a6e452"
+          },
+          {
+            "file": "tests-8.4-2/shard-8.4-2.xml",
+            "sha256": "0a10fc9bf6410d85039666927c33b49cd836ac9b3f6de01fcb6fbe21f2703588"
+          },
+          {
+            "file": "tests-8.4-3/shard-8.4-3.xml",
+            "sha256": "d437446f1e8bb41a4f2e935b02e8c32fd0b9aba36c15edfe9accc591b2d8d177"
+          }
+        ]
+      }
+    ],
+    "correction_scope": "Native assertion only: original receipt through unchanged RPC JSON encoding; no application change",
+    "corrected_target_passed": 56,
+    "full_unit_verified_before_assertion_correction": true,
+    "native_gate_passed": false
+  },
+  "solution_broker_followup": {
+    "status": "corrected_source_and_harness_pushed_exact_matrix_pending",
+    "source_sha": "f572612518823a183daed5411d35a7d39aae2200",
+    "code_sha": "0b83defccb83eb9fecb3a005693acdbb94ff8473",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/174",
+    "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39626084626",
+    "infra_sha": "d0f61bddd44dc8963b984d2159ca58409e285ed7",
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/104",
+    "checks": "https://github.com/FangcunMount/infra/actions/runs/39626265764",
+    "required_host_tests": 10,
+    "required_flags": 30,
+    "harness_unit_passed": 78,
+    "collected_locally": 10,
+    "executed_locally": false,
+    "merged": false,
+    "scope": "Actual Solution Prepare handler, half invisibility, complete original assets/Run/receipt/witness, first wire, client-discarded final RPC reply, immutable receipt replay, source-conflict rollback; observer is not paired QS or real provider",
+    "production_changed": false,
+    "failure_history": [
+      {
+        "source_sha": "9eaac0ac5694e7e597c65c8fb474f3b68240e69c",
+        "checks": "https://github.com/FangcunMount/infra/actions/runs/39624273750",
+        "profile": "Python3.11/MySQL8.4.11",
+        "report_sha256": "be6ac711e65e1e21471b726e5c4369606f11b978f38e2e4eec5512fcc5a16723",
+        "failed": 1,
+        "skipped": 0,
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_solution_prepare_rpc_half_gate_first_receipt_and_final_unknown"
+          ],
+          "assertion_lines": [
+            963
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "counts_as_gate_pass": false,
+        "reason": "Domain tuple versus RPC JSON array; corrected candidate pending; remaining old profiles cancellation requested"
+      }
+    ]
+  },
+  "resolution_readonly_plan": {
+    "status": "pushed_required_ci_pending",
+    "source_sha": "06ac70981b56b6ae571b0fdf3d30ea346ff6b957",
+    "code_sha": "f925cfa7249dfce5e7b8e85bbc85a0b0953e080f",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/175",
+    "baseline_passed_before_refactor": 7,
+    "target_passed": 36,
+    "full_unit": {
+      "passed": 3071,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 1026,
+      "warnings": 6
+    },
+    "native_collected": 4,
+    "native_executed": false,
+    "mypy_source_files": 403,
+    "format_files": 1016,
+    "scope": "Original unknown evidence, manual decision audit, lock/CAS/root/capacity ownership unchanged; immutable read-only plan only; no resolution SDK send claimed",
+    "default_runtime_assembly_enabled": false
   }
 }
