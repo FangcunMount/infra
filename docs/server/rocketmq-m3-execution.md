@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17进行中，16/36。整批Solution资产计划PR171已合并，12检查成功、双MySQL各3983零失败跳过（各4原生）；借用原根PR172/a864895的八分片与JUnit已验证，各4000零失败跳过（各4原根），最终检查状态待结束。独立SDK原根及Sender候选f87af32/PR173本地56目标、3061单元通过、27原生仅收集，当前39623720568待验收，源/草稿/资产/首次业务回执摘要冻结与新witness原根已实现；其余状态及默认装配未完成，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36。借用原根PR172已合并b0f1004，双MySQL各4000/各4原根通过，suite/workflow及全分片汇总已独立核验。SDK候选f87真实用例因领域tuple直接比较RPC JSON数组而失败；5948cc9修正断言、候选db2b989/39625934747待重验，56目标通过。真实Broker旧9ea同类断言失败，首档清理完整，旧运行取消请求已提交；修正f572612另行固定。ResolveUnknown只读候选06ac709的36目标/3071单元通过、4原生仅收集。其余状态、完整默认装配及T17门禁未完成。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -132,7 +132,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
-| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；治理、评审、更正、创建及整批Solution只读资产计划已合并，最新各3983/档零失败跳过、12检查成功。借用原根各4000/4原生报告已核对待最终检查；SDK原根与Sender本地56通过、27原生仅收集，其余状态及默认装配未完成。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
+| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；借用原根已合并，各4000/档、4原根通过；完整SDK与Broker候选的RPC边界比较断言失败已保留，修正后独立重验，不冒充门禁通过。ResolveUnknown只读规划已推送，其余状态与默认装配未完成。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
 | ☐ | T20 | 成对契约、安全、wire、receipt/ACK重复与取消 | 待开始 |
@@ -442,3 +442,7 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-21：新Solution事务候选f87af32（代码e1e7b6e，PR173）推送后启动39623720568；本地56目标、3061非集成/非interop、403源类型、1014格式及75文档/1352链接通过，27原生仅收集。首次本地命令漏排interop而缺固定Go探针，3061通过/9失败/3跳过，该轮保留为失败，不记门禁通过；重跑原单元范围后零失败/跳过。实际原生和Broker仍分别验收，不因单元通过启用默认装配或勾选T17，16/36。
 
 - 2026-10-21：Solution真实Broker档源9eaac0a/PR174及infra工具0b702f6/PR104已推送，工具78单元通过、10宿主用例仅收集；六档39624273750待执行完成，新增30项精确证据，旧8/25报告不能代替。ResolveUnknown原写入口先完成7项原始行为表征，再抽取只读不可变计划f925cfa/候选06ac709（PR175），保留CP→Run锁、原裁决时间、恢复预算、原CAS及management容量/根提交归属；36目标与3071完整单元通过，4原生仅收集，尚无resolution SDK入口。未勾选T17，16/36，生产与默认装配保持关闭。
+
+- 2026-10-21：PR172精确a864895的suite/workflow和要求全部分片成功的coverage作业均已完成成功，八份报告各4000/各4借用原根通过；单个作业列表仍in_progress的状态差异单独记录。正常标记ready后合并b0f1004（未使用绕过选项），候选/合并tree同b9d36f9。完整SDK候选f87在两档各2个成功处理入口用例的最后回执比较断言失败：领域content含tuple，原RPC JSON编码成数组；业务、version、模式、调用次数及Checker前置断言通过，但该运行仍记失败。5948cc9修正实际RPC边界比较，56目标通过，db2b989启动39625934747待完整验收。真实Broker9ea首档同类断言963失败，清理完整；旧运行39624273750取消请求已提交，修正源码f572612将与工具重新绑定，不沿用旧报告。T17仍不勾选，16/36，生产未变更。
+
+- 2026-10-21：RPC比较修正后的SDK精确db2b989/39625934747、Broker源f572612/39626084626与工具d0f61bd/六档39626265764已固定并启动重验；工具78单元继续通过。原失败记录与首档完整清理已保留，不能将旧源成功阶段或先前其他链路报告当作本批通过。ResolveUnknown原规划仍独立追踪，未启用统一装配，16/36。
