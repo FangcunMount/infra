@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T16进行中。已验AI2bfbb65两档MySQL各3520项0失败/跳过、当前12+2检查成功，评测9项与receiver4项通过。首轮Broker六档39535745152因控制输入缺少原时间而在准备半消息前失败，全部清理；cde36ea只修测试首次时间，6项协议回归/合计36定向通过。新AI bdbaa30与infra8ad7f7a完整CI/真实SDK六档正在复验，仍15/36、T16不勾选。[证据](evidence/rocketmq-m3-ai-admission-20261021.json)。
+- 当前批次：T16进行中。已验AI2bfbb65两档MySQL各3520项0失败/跳过、当前12+2检查成功，评测9项与receiver4项通过。首轮Broker六档39535745152因控制输入缺少原时间而在准备半消息前失败，全部清理；cde36ea只修测试首次时间，6项协议回归/合计36定向通过。第二轮六档在最终确认丢回复场景暴露SDK结构化异常结果适配缺口，失败报告及完整清理证据已保留。3e6f178补齐LocalCommitted + FinalUnknown后的精确读取，本地2636项与381文件类型通过；当前AI9485f28/infra21be02d完整CI及六档真实SDK正在复验，仍15/36、T16不勾选。[证据](evidence/rocketmq-m3-ai-admission-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -131,7 +131,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 2026-10-21；最终7e8aba25/fd985a122全仓race7198通过/60既有可选跳过、固定lint零问题；原库三档各44项、真实Broker三档各41项均0失败/跳过/无race且清理完整。QS当前头28项CI成功/1API同步不适用，PR417合并133fc073；infra22项CI全部成功，PR61合并d4324a87。[完整证据与失败历史](evidence/rocketmq-m3-qs-retry-20261021.json)。生产未变更 |
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
-| ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 进行中；已验AI2bfbb65的14检查及两档各3520零失败/跳过；首轮Broker控制输入缺时间已修，AI bdbaa30与[infra PR83](https://github.com/FangcunMount/infra/pull/83)六档重新验证中，源码仍草稿未合并 |
+| ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 进行中；已验AI2bfbb65的14检查及两档各3520零失败/跳过；首轮控制输入时间及第二轮SDK结构化异常适配均已修，失败历史保留；AI9485f28与[infra PR83](https://github.com/FangcunMount/infra/pull/83)六档重新验证中，源码仍草稿未合并 |
 | ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 待开始 |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
