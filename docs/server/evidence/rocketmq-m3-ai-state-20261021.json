@@ -1,12 +1,12 @@
 {
   "task": "T17",
-  "status": "in_progress",
+  "status": "verification_failed_repair_in_progress",
   "completed": false,
   "progress": "16/36",
   "base": "e8392c0582020d6cacf44c6caaa2f2061c66cb41",
-  "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-creation",
-  "branch": "codex/rocketmq-m3-ai-interpretation-finish-broker",
-  "source_candidate": "fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4",
+  "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-claim-runtime",
+  "branch": "codex/rocketmq-m3-ai-authorized-claim-runtime",
+  "source_candidate": "5963d0c6ee9d355c15361cbbe2d17bf881dd6d66",
   "source_pushed": true,
   "source_merged": false,
   "production_assembly_enabled": false,
@@ -598,7 +598,7 @@
   },
   "previous_t16_broker_proof_not_rebound": true,
   "remaining": [
-    "Complete fixed SDK original scanner11-new-native and26-case/64-flag Broker gates and source/harness merges",
+    "Verify repaired scanner exact-source14 new-native and26-host/64-flag real-Broker gates and merges; preserve prior quota failure",
     "Complete explicit finalization retry7-new-native and28-case/68-flag Broker gates and source/harness merges",
     "Complete evaluation terminal Sender, candidate/recovery/cancellation drain and all active writer coverage",
     "Keep durable model-response finalization and invocation-count failure proof as T18; do not fabricate serial candidate ownership",
@@ -804,7 +804,7 @@
     "docs_files": 75,
     "docs_links": 1321
   },
-  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39673641728",
+  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39677490917",
   "worker_preflight_native_cases": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
     "file": "tests/integration/test_transaction_worker_preflight.py",
@@ -1405,7 +1405,7 @@
     "no_task_completion_claimed": true,
     "native_status": "cbc47d9 both MySQL profiles: 3649 passed, including corrected original atomic-root case; zero failed/skipped"
   },
-  "source_candidate_branch": "codex/rocketmq-m3-ai-interpretation-finish-broker",
+  "source_candidate_branch": "codex/rocketmq-m3-ai-authorized-claim-runtime",
   "failure_history": [
     {
       "source_sha": "3cf74b5eccc66bd271d4d8e250714e4a312bde59",
@@ -12324,7 +12324,7 @@
     "source_candidate_branch": "codex/rocketmq-m3-ai-creation-plan",
     "branch": "codex/rocketmq-m3-ai-solution-sdk"
   },
-  "source_ci_status": "in_progress",
+  "source_ci_status": "queued",
   "superseded_main_push_ci_deduplication_186": {
     "at": "2026-10-21T18:26:01.637785+00:00",
     "run": 39650592198,
@@ -15095,29 +15095,34 @@
     "scope": "Public SDK-authorized runtime delegation and explicit first-plan claim retry; first source recheck and new owned fence reuse original commit/handoff, no reseal/direct Store bypass/implicit model retry. Must replace development override with fixed released URL/hash and rerun all required gates before merge"
   },
   "claim_scanner_fixed_sdk": {
-    "status": "required_ci_in_progress",
-    "code_sha": "009b28771865c46b07aad8418ebbb57806870a62",
-    "candidate_sha": "fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4",
+    "status": "broker_gate_failed_repair_candidate_pending",
+    "code_sha": "54007b01b0df1f80e8ce2dd0f05f6a42b68a2505",
+    "candidate_sha": "5963d0c6ee9d355c15361cbbe2d17bf881dd6d66",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/197",
-    "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39673641728",
-    "harness_sha": "7919c7a5a03d85e74ba2e29dfe2e56e81583a0e3",
+    "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39677490917",
+    "harness_sha": "8a058570ea609c14c00895717629bd75ef1338e6",
     "harness_pr": "https://github.com/FangcunMount/infra/pull/121",
-    "broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39674399523",
+    "broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39677577483",
     "sdk_version": "0.4.0a2",
     "sdk_wheel_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2",
     "local": {
-      "target_passed": 122,
-      "full_unit_passed": 3427,
+      "target_passed": 127,
+      "full_unit_passed": 3432,
       "failed": 0,
       "skipped": 0,
-      "integration_interop_deselected": 1179,
+      "integration_interop_deselected": 1182,
       "mypy_sources": 418,
+      "native_maintenance_collected_only": 9,
+      "new_native_maintenance_cases": 3,
       "native_scanner_collected_only": 6,
       "native_explicit_claim_retry_collected_only": 5,
       "broker_host_cases_collected_only": 26,
       "required_broker_flags": 64,
-      "harness_original_tests_passed": 82,
       "harness_tests_passed": 85,
+      "red_regression_before_fix": {
+        "passed": 16,
+        "failed": 5
+      },
       "actual_uv_metadata_and_immutable_lock_verified": true
     },
     "source_merged": false,
@@ -15128,41 +15133,408 @@
       "sha": "b0111bbdc6fa81237bb54d62c5dd42a118f3df21",
       "checks": "https://github.com/FangcunMount/infra/actions/runs/39673821397",
       "reason": "Before acceptance reproduced actual uv direct_url.json archive_info empty; moved archive hash proof to strict uv.lock boundary while preserving URL/version/prefix checks. Earlier run superseded by repository concurrency policy, not acceptance."
-    }
+    },
+    "previous_candidate_before_job_hook_repair": {
+      "status": "required_ci_in_progress",
+      "code_sha": "009b28771865c46b07aad8418ebbb57806870a62",
+      "candidate_sha": "fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4",
+      "source_pr": "https://github.com/FangcunMount/qs-ai/pull/197",
+      "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39673641728",
+      "harness_sha": "7919c7a5a03d85e74ba2e29dfe2e56e81583a0e3",
+      "harness_pr": "https://github.com/FangcunMount/infra/pull/121",
+      "broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39674399523",
+      "sdk_version": "0.4.0a2",
+      "sdk_wheel_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2",
+      "local": {
+        "target_passed": 122,
+        "full_unit_passed": 3427,
+        "failed": 0,
+        "skipped": 0,
+        "integration_interop_deselected": 1179,
+        "mypy_sources": 418,
+        "native_scanner_collected_only": 6,
+        "native_explicit_claim_retry_collected_only": 5,
+        "broker_host_cases_collected_only": 26,
+        "required_broker_flags": 64,
+        "harness_original_tests_passed": 82,
+        "harness_tests_passed": 85,
+        "actual_uv_metadata_and_immutable_lock_verified": true
+      },
+      "source_merged": false,
+      "harness_merged": false,
+      "production_deploy_enabled": false,
+      "scope": "Explicit opt-in original20-candidate order, close source before MQ, exact old abort host authorization through public bounded SDK Retry, first wire retained; typed local-Aborted quota denial plus fresh proof before separate no-event job maintenance; half unknown does not authorize business/deferral, no new model handoff for duplicate. Default DI, complete terminal recovery and production remain pending.",
+      "complete_native_source_ci": {
+        "source_sha": "fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4",
+        "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39673641728",
+        "tested_merge_sha": "88b69da6cba1408c23d26bfc058d0c8df662c340",
+        "verified_merge_parents": [
+          "03260228984f3412a39f7ed845b992aec1ab936f",
+          "fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4"
+        ],
+        "reports": [
+          {
+            "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+            "sha256": "8171b292eb253f6aaab002bddd3c19cfc95ec416f23da2830bbaa61cc721cc4e",
+            "xml_sha256": "3dd13dfcee1acf7dbc694ffc70967763caf1d9d222026ba713fc764d19fc65ef",
+            "revision": "88b69da6cba1408c23d26bfc058d0c8df662c340",
+            "mysql": "8.0.36",
+            "index": 0,
+            "passed": 1152,
+            "failed": 0,
+            "skipped": 0
+          },
+          {
+            "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+            "sha256": "e41397c1ecbf8a2ba55fe3f24c6817697de1620755d0f662440b08fa56af3aa5",
+            "xml_sha256": "3719650f1265ec27e199a4f58f40874cf483da2d653ba6cbc8a0337dc28a97b6",
+            "revision": "88b69da6cba1408c23d26bfc058d0c8df662c340",
+            "mysql": "8.0.36",
+            "index": 1,
+            "passed": 1152,
+            "failed": 0,
+            "skipped": 0
+          },
+          {
+            "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+            "sha256": "af7657684bb72c0ee7e878b6975c3dee1c0eb530c3242b0cc32d5e298e5442d6",
+            "xml_sha256": "34fcbbc3f9bd3b6f86fbc573c8abf70f6424d14265d1d91d2dad158151c54724",
+            "revision": "88b69da6cba1408c23d26bfc058d0c8df662c340",
+            "mysql": "8.0.36",
+            "index": 2,
+            "passed": 1151,
+            "failed": 0,
+            "skipped": 0
+          },
+          {
+            "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+            "sha256": "1c748d7efa2e76e42b0cc5e27847d85d6356fbb19bfa7de681c65cfe65c271b5",
+            "xml_sha256": "eba5c73b813ed96191cd1ee319f9f0db4e01e8661a498914217615e2d49ee9bc",
+            "revision": "88b69da6cba1408c23d26bfc058d0c8df662c340",
+            "mysql": "8.0.36",
+            "index": 3,
+            "passed": 1151,
+            "failed": 0,
+            "skipped": 0
+          },
+          {
+            "file": "tests-8.4-0/shard-8.4-0.json",
+            "sha256": "302d1adeb8779441a99a1380b9afe0f817ae575bf622cee8bc54d7eac52a8fbb",
+            "xml_sha256": "86773bc189ec6822265c0158cb872588846538072e002590551a0788b29688e3",
+            "revision": "88b69da6cba1408c23d26bfc058d0c8df662c340",
+            "mysql": "8.4",
+            "index": 0,
+            "passed": 1152,
+            "failed": 0,
+            "skipped": 0
+          },
+          {
+            "file": "tests-8.4-1/shard-8.4-1.json",
+            "sha256": "512aa8df5dfc4beaeea97ab96d8e5249f914ea5b2fcabee61d642e7ab2fb79f9",
+            "xml_sha256": "98e394f4ec1425e60376f6f14ace2166842990d6d5048f5905cd387267213e4d",
+            "revision": "88b69da6cba1408c23d26bfc058d0c8df662c340",
+            "mysql": "8.4",
+            "index": 1,
+            "passed": 1152,
+            "failed": 0,
+            "skipped": 0
+          },
+          {
+            "file": "tests-8.4-2/shard-8.4-2.json",
+            "sha256": "084e075d092d1fad5748f406ec3ea08faf815b0d35a9d1f46472b89a49a6fbc6",
+            "xml_sha256": "1f8af938f7c7830dd87e87e65aeff072bda70b5b0cc51d2c883d9ea771b1e7d6",
+            "revision": "88b69da6cba1408c23d26bfc058d0c8df662c340",
+            "mysql": "8.4",
+            "index": 2,
+            "passed": 1151,
+            "failed": 0,
+            "skipped": 0
+          },
+          {
+            "file": "tests-8.4-3/shard-8.4-3.json",
+            "sha256": "341f7bca53e73863b43c7ed8a8538bd10764988dcb6e7d0450c8b53e2f274027",
+            "xml_sha256": "f4040e84b05c9e0b59263940d70c5f3ecb7dfd47a6c0e4378b67275c1abab812",
+            "revision": "88b69da6cba1408c23d26bfc058d0c8df662c340",
+            "mysql": "8.4",
+            "index": 3,
+            "passed": 1151,
+            "failed": 0,
+            "skipped": 0
+          }
+        ],
+        "profiles": {
+          "8.0.36": {
+            "collected": 4606,
+            "passed": 4606,
+            "failed": 0,
+            "skipped": 0,
+            "native": {
+              "test_transaction_admission_root": 8,
+              "test_transaction_start_admission": 4,
+              "test_transaction_change_admission": 4,
+              "test_transaction_retry_admission": 3,
+              "test_transaction_evaluation_admission": 9,
+              "test_transaction_command_receiver": 4,
+              "test_transaction_evaluation_state_root": 6,
+              "test_transaction_worker_preflight": 5,
+              "test_transaction_governance_state": 12,
+              "test_review_readonly_planning": 2,
+              "test_transaction_review_state": 12,
+              "test_review_correction_readonly": 4,
+              "test_transaction_correction_state": 9,
+              "test_transaction_input_conflict": 5,
+              "test_run_creation_readonly": 4,
+              "test_transaction_creation_state": 10,
+              "test_transaction_creation_dispatch": 16,
+              "test_prompt_freeze_readonly": 2,
+              "test_profile_registration_readonly": 2,
+              "test_suite_registration_readonly": 2,
+              "test_solution_preparation_readonly": 4,
+              "test_solution_borrowed_root": 4,
+              "test_transaction_solution_preparation": 10,
+              "test_transaction_solution_dispatch": 17,
+              "test_resolution_readonly_planning": 4,
+              "test_transaction_resolution_state": 12,
+              "test_contract_recovery_readonly": 2,
+              "test_evaluation_preparation_readonly": 4,
+              "test_dispatch_record_readonly": 4,
+              "test_transaction_worker_dispatch": 15,
+              "test_transaction_contract_recovery": 9,
+              "test_interpretation_finish_root": 6,
+              "test_interpretation_state_transcription": 4,
+              "test_artifact_identity": 2,
+              "test_transaction_interpretation_state": 8,
+              "test_interpretation_claim_source": 4,
+              "test_transaction_interpretation_finish": 17,
+              "test_evaluation_finish_root": 10,
+              "test_evaluation_serial_response_receipts": 9,
+              "test_interpretation_state_versions": 4,
+              "test_interpretation_claim_root": 8,
+              "test_transaction_interpretation_claim": 18,
+              "test_interpretation_claim_deferral": 6,
+              "test_transaction_interpretation_claim_retry": 5,
+              "test_transactional_interpretation_execution": 6,
+              "test_transaction_interpretation_finish_retry": 0
+            }
+          },
+          "8.4": {
+            "collected": 4606,
+            "passed": 4606,
+            "failed": 0,
+            "skipped": 0,
+            "native": {
+              "test_transaction_admission_root": 8,
+              "test_transaction_start_admission": 4,
+              "test_transaction_change_admission": 4,
+              "test_transaction_retry_admission": 3,
+              "test_transaction_evaluation_admission": 9,
+              "test_transaction_command_receiver": 4,
+              "test_transaction_evaluation_state_root": 6,
+              "test_transaction_worker_preflight": 5,
+              "test_transaction_governance_state": 12,
+              "test_review_readonly_planning": 2,
+              "test_transaction_review_state": 12,
+              "test_review_correction_readonly": 4,
+              "test_transaction_correction_state": 9,
+              "test_transaction_input_conflict": 5,
+              "test_run_creation_readonly": 4,
+              "test_transaction_creation_state": 10,
+              "test_transaction_creation_dispatch": 16,
+              "test_prompt_freeze_readonly": 2,
+              "test_profile_registration_readonly": 2,
+              "test_suite_registration_readonly": 2,
+              "test_solution_preparation_readonly": 4,
+              "test_solution_borrowed_root": 4,
+              "test_transaction_solution_preparation": 10,
+              "test_transaction_solution_dispatch": 17,
+              "test_resolution_readonly_planning": 4,
+              "test_transaction_resolution_state": 12,
+              "test_contract_recovery_readonly": 2,
+              "test_evaluation_preparation_readonly": 4,
+              "test_dispatch_record_readonly": 4,
+              "test_transaction_worker_dispatch": 15,
+              "test_transaction_contract_recovery": 9,
+              "test_interpretation_finish_root": 6,
+              "test_interpretation_state_transcription": 4,
+              "test_artifact_identity": 2,
+              "test_transaction_interpretation_state": 8,
+              "test_interpretation_claim_source": 4,
+              "test_transaction_interpretation_finish": 17,
+              "test_evaluation_finish_root": 10,
+              "test_evaluation_serial_response_receipts": 9,
+              "test_interpretation_state_versions": 4,
+              "test_interpretation_claim_root": 8,
+              "test_transaction_interpretation_claim": 18,
+              "test_interpretation_claim_deferral": 6,
+              "test_transaction_interpretation_claim_retry": 5,
+              "test_transactional_interpretation_execution": 6,
+              "test_transaction_interpretation_finish_retry": 0
+            }
+          }
+        }
+      },
+      "source_run_final_conclusion": "cancelled_by_repository_concurrency_after_required_repair",
+      "remote_coverage_job_before_supersession": "queued; exact source coverage verifier independently passed4606 per MySQL"
+    },
+    "failure_history": [
+      {
+        "checks": "https://github.com/FangcunMount/infra/actions/runs/39674399523",
+        "status": "failed_then_superseded_by_repair",
+        "failure_not_erased": true,
+        "reports": [
+          {
+            "file": "rocketmq-ai-state-0-3.11-75f369799bf1ce1cff9741eb5727eb8459d97a11/rocketmq-ai-state.json",
+            "sha256": "06848b3158c73d2e2ff31098cd05efe89e0e4c91e9aba31052275f3608f4422f",
+            "python": "3.11.16",
+            "mysql": "8.0.36",
+            "sdk": "0.4.0a2",
+            "source_sha": "fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4",
+            "harness_sha": "7919c7a5a03d85e74ba2e29dfe2e56e81583a0e3",
+            "passed_flags": 63,
+            "failed": 1,
+            "skipped": 0,
+            "failed_cases": [
+              "test_actual_original_claim_scanner_quota_defers_without_running_event"
+            ],
+            "assertion_lines": [
+              1886
+            ],
+            "missing_flag": "scanner_quota_deferral_no_running_event",
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_and_harness_hashes_verified": true
+          },
+          {
+            "file": "rocketmq-ai-state-2-3.11-75f369799bf1ce1cff9741eb5727eb8459d97a11/rocketmq-ai-state.json",
+            "sha256": "f8a44ba261d2fa9c040c9f28cd7a285508963e70a30fac6a622d4f6f85c9be8d",
+            "python": "3.11.16",
+            "mysql": "8.4.11",
+            "sdk": "0.4.0a2",
+            "source_sha": "fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4",
+            "harness_sha": "7919c7a5a03d85e74ba2e29dfe2e56e81583a0e3",
+            "passed_flags": 63,
+            "failed": 1,
+            "skipped": 0,
+            "failed_cases": [
+              "test_actual_original_claim_scanner_quota_defers_without_running_event"
+            ],
+            "assertion_lines": [
+              1886
+            ],
+            "missing_flag": "scanner_quota_deferral_no_running_event",
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_and_harness_hashes_verified": true
+          }
+        ],
+        "cause": "Independent no-event job root inherited legacy EventSession state recorder and invoked its prohibited flush; reproduced by five failing unit regression cases before repair",
+        "repair_source": "5963d0c6ee9d355c15361cbbe2d17bf881dd6d66",
+        "repair_code": "54007b01b0df1f80e8ce2dd0f05f6a42b68a2505",
+        "production_changed": false
+      }
+    ],
+    "repair_scope": "Fresh independent job-only root installs a rejecting local event recorder, rejects interpretation/evaluation state writes and recorder/root replacement, refuses BorrowedTransactions; normal EventSession commit remains owner and global Database.state_events remains unchanged. Native and real-Broker acceptance must rerun the new exact SHA without weaker budgets/required cases."
   },
   "interpretation_finish_explicit_retry": {
     "status": "required_ci_pending",
-    "source_sha": "07002dc6303c78f36f36ce3afe79ea0e9ca064de",
+    "source_sha": "8d0a300723c7746c3422bd894fc7f1392073fb9e",
     "code_sha": "29b9a72748ceda7e4f7e024b0aec1e866b2717a4",
     "broker_cases_code_sha": "6f42998639c47a1c7d3d8eaacc3fff2155a881de",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/198",
     "source_pr_base": "codex/rocketmq-m3-ai-authorized-claim-runtime (PR197 pending)",
-    "harness_sha": "4e613f1de422c6b187a9e9e34c0a875b044daa7b",
+    "harness_sha": "34d4a9666aab5f78cafedeadc79a3d1e67bf34e7",
     "harness_pr": "https://github.com/FangcunMount/infra/pull/123",
     "harness_pr_base": "codex/rocketmq-m3-ai-claim-scanner-harness (PR121 pending)",
     "local": {
-      "original_characterization": 74,
-      "target": 81,
-      "unit": 3434,
+      "current_combined_target_passed": 208,
       "failed": 0,
       "skipped": 0,
-      "integration_interop_deselected": 1186,
       "mypy_sources": 418,
+      "current_whole_unit_not_claimed": true,
       "native_finish_retry_collected_only": 7,
       "broker_host_cases_collected_only": 28,
       "broker_flags": 68,
-      "harness_unit_passed": 86
+      "harness_unit_passed": 86,
+      "parent_guard_and_finish_source_files_preserved_byte_for_byte": true
     },
     "scope": "Explicit host-owned deterministic finalization retry; closes fresh original claim/request/source/sequence read before SDK Retry, preserves exact old abort and first plan/wire/IDs/time, shares original root/commit proof; ordinary duplicate and Checker never call retry. Not T18 response-recovery/provider invocation fault acceptance; no default DI/production change",
     "merged": false,
     "production_deploy_enabled": false,
-    "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39674774186",
-    "broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39674875067",
+    "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39677743142",
+    "broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39677788087",
     "superseded_source": {
       "sha": "72780361ce7f4a9ff7966de96b7be7d55dea8ee2",
       "run": 39674640768,
       "conclusion": "cancelled_by_repository_pr_concurrency_after_adding_required_broker_cases",
       "acceptance_claimed": false
-    }
+    },
+    "previous_source_before_parent_repair": {
+      "source_sha": "07002dc6303c78f36f36ce3afe79ea0e9ca064de",
+      "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39674774186",
+      "local": {
+        "original_characterization": 74,
+        "target": 81,
+        "unit": 3434,
+        "failed": 0,
+        "skipped": 0,
+        "integration_interop_deselected": 1186,
+        "mypy_sources": 418,
+        "native_finish_retry_collected_only": 7,
+        "broker_host_cases_collected_only": 28,
+        "broker_flags": 68,
+        "harness_unit_passed": 86
+      },
+      "source_run_conclusion": "cancelled_by_repository_concurrency_after_parent_repair"
+    },
+    "combined_repair_merge_sha": "6ddf2c6a2da8fb99d8d257a19267e9d3303c32e3"
+  },
+  "evaluation_generation_progress_foundation": {
+    "status": "local_foundation_only",
+    "branch": "codex/rocketmq-m3-eval-completion-plan",
+    "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-eval-completion",
+    "characterization_sha": "e3883d6186e9a8eb7e8e195561690a971a6eeeee",
+    "code_sha": "7d32da5896b357cea707433c6dd30c069997ab74",
+    "source_before_parent_repair": "3e00e3a6adbdec80ab644eac7c2c122f71324f12",
+    "source_sha": "5c6ab5ecda54f8e572e67adeb8fbeec25ed616aa",
+    "parent_repair_merge_sha": "37faf0322ac3c0c13809ff95250c6d4ea3840209",
+    "pushed": true,
+    "pr": null,
+    "local_before_parent_repair": {
+      "old_target": 42,
+      "new_original_entrypoint_characterization": 10,
+      "before_and_after_target": 52,
+      "unit": 3444,
+      "failed": 0,
+      "skipped": 0,
+      "integration_interop_deselected": 1186,
+      "mypy_sources": 419
+    },
+    "local_after_parent_repair": {
+      "combined_target": 260,
+      "failed": 0,
+      "skipped": 0,
+      "mypy_sources": 419,
+      "whole_unit_not_claimed": true
+    },
+    "failure_history": [
+      {
+        "kind": "characterization_fixture",
+        "initial_passed": 8,
+        "initial_failed": 2,
+        "cause": "Fixture used illegal execution_ordinal3; actual domain limit is2",
+        "fixed_before_production_source_extraction": true,
+        "final_characterization_passed": 10,
+        "business_limits_changed": false
+      }
+    ],
+    "scope": "Pure original generation terminal progress shared between SQL writer and forthcoming readonly planning; serial blocking, candidate completion owner, unknown count, first failure budgets and caller commit preserved. Not full terminal Sender, native post-extraction proof, T18 provider recovery or default/production assembly."
   }
 }
