@@ -29,9 +29,9 @@ class AIStateAcceptanceTests(unittest.TestCase):
         self.assertEqual(manifest['accounts']['ai']['publish'], [route['id']])
         self.assertEqual(manifest['accounts']['observer']['subscriptions'], [route['id']])
 
-    def test_exact_twelve_original_state_tests_and_thirty_five_proofs_are_required(self):
+    def test_exact_fifteen_original_state_tests_and_forty_two_proofs_are_required(self):
         profile = acceptance_profile('state')
-        self.assertEqual(profile['parse'](self.output(), self.junit())['passed'], 35)
+        self.assertEqual(profile['parse'](self.output(), self.junit())['passed'], 42)
         self.assertEqual(profile['file'], 'rocketmq_state_host.py')
         with self.assertRaises(RuntimeError):
             parse_admission_receipt(self.output(), self.junit())
@@ -40,10 +40,10 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith(('governance_', 'review_', 'correction_', 'solution_', 'resolution_'))}
+               if not name.startswith(('governance_', 'review_', 'correction_', 'solution_', 'resolution_', 'serial_dispatch_'))}
         receipt.update(cases=old, passed=len(old))
         self.assertEqual(len(old), 13)
-        self.assertEqual(len(TESTS), 12)
+        self.assertEqual(len(TESTS), 15)
         with self.assertRaises(RuntimeError):
             profile['parse'](self.output(receipt), self.junit())
 
@@ -51,7 +51,7 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith(('correction_', 'solution_', 'resolution_'))}
+               if not name.startswith(('correction_', 'solution_', 'resolution_', 'serial_dispatch_'))}
         self.assertEqual(len(old), 20)
         receipt.update(cases=old, passed=len(old))
         with self.assertRaises(RuntimeError):
@@ -60,7 +60,7 @@ class AIStateAcceptanceTests(unittest.TestCase):
     def test_other_profile_receipt_is_not_substituted_for_state_acceptance(self):
         old = 'M3_AI_ADMISSION_RECEIPT ' + json.dumps(dict(self.receipt(), cases={}, passed=0))
         profile = acceptance_profile('state')
-        self.assertEqual(profile['parse'](self.output() + '\n' + old, self.junit())['passed'], 35)
+        self.assertEqual(profile['parse'](self.output() + '\n' + old, self.junit())['passed'], 42)
         with self.assertRaises(RuntimeError):
             profile['parse'](old, self.junit())
 
@@ -68,10 +68,10 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith(('solution_', 'resolution_'))}
+               if not name.startswith(('solution_', 'resolution_', 'serial_dispatch_'))}
         self.assertEqual(len(old), 25)
         receipt.update(cases=old, passed=len(old))
-        old_tests = [name for name in TESTS if not name.startswith(('test_actual_solution_', 'test_actual_resolution_'))]
+        old_tests = [name for name in TESTS if not name.startswith(('test_actual_solution_', 'test_actual_resolution_', 'test_actual_serial_'))]
         self.assertEqual(len(old_tests), 8)
         old_junit = '<testsuites><testsuite>' + ''.join(
             f'<testcase name="{name}"/>' for name in old_tests) + '</testsuite></testsuites>'
@@ -82,11 +82,25 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith('resolution_')}
+               if not name.startswith(('resolution_', 'serial_dispatch_'))}
         self.assertEqual(len(old), 30)
         receipt.update(cases=old, passed=len(old))
-        old_tests = [name for name in TESTS if not name.startswith('test_actual_resolution_')]
+        old_tests = [name for name in TESTS if not name.startswith(('test_actual_resolution_', 'test_actual_serial_'))]
         self.assertEqual(len(old_tests), 10)
+        old_junit = '<testsuites><testsuite>' + ''.join(
+            f'<testcase name="{name}"/>' for name in old_tests) + '</testsuite></testsuites>'
+        with self.assertRaises(RuntimeError):
+            profile['parse'](self.output(receipt), old_junit)
+
+    def test_old_twelve_tests_and_thirty_five_flags_cannot_claim_serial_dispatch_acceptance(self):
+        profile = acceptance_profile('state')
+        receipt = self.receipt()
+        old = {name: value for name, value in receipt['cases'].items()
+               if not name.startswith('serial_dispatch_')}
+        self.assertEqual(len(old), 35)
+        receipt.update(cases=old, passed=len(old))
+        old_tests = [name for name in TESTS if not name.startswith('test_actual_serial_')]
+        self.assertEqual(len(old_tests), 12)
         old_junit = '<testsuites><testsuite>' + ''.join(
             f'<testcase name="{name}"/>' for name in old_tests) + '</testsuite></testsuites>'
         with self.assertRaises(RuntimeError):
