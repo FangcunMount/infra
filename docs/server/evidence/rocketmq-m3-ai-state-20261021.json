@@ -9921,7 +9921,7 @@
     "final_status": "completed",
     "final_conclusion": "cancelled"
   },
-  "latest_verified_main": "fcd8325b8465690bcca8d2e1379e009678f48b39",
+  "latest_verified_main": "8b6cfa4856bd632fadb25745d0ea1cce0d849e25",
   "interpretation_finish_root": {
     "status": "required_source_ci_and_native_reports_verified_merged",
     "branch": "codex/rocketmq-m3-ai-interpretation-finish-root",
@@ -12598,5 +12598,242 @@
       "status": "queued"
     },
     "scope": "Superseded duplicate main187 push only; current main188 and all current candidate required gates retained"
+  },
+  "interpretation_state_two_transition": {
+    "code_sha": "a26cbf5ddee852ade43adddcae5be0a550b67593",
+    "candidate_sha": "988b5d27c2dda793cb27c38b019d53a92a171e0a",
+    "pr": "https://github.com/FangcunMount/qs-ai/pull/192",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39659404226",
+    "local": {
+      "original_baseline": 16,
+      "target": 41,
+      "unit": 3312,
+      "failed": 0,
+      "skipped": 0,
+      "native_collected_only": 4,
+      "mypy_sources": 414
+    },
+    "required_ci": "passed",
+    "merged": true,
+    "scope": "Exact original v1 bytes retained; explicit v2 only for two original domain transitions with one final history; generic original-root fixture, not complete claim Sender or Broker acceptance",
+    "failure_history": [
+      "Initial cross-file fixture export missing:40 passed/1 setup error; lint F401/F811 during correction; explicit module fixture export fixed before candidate,41 target and3312 full unit passed"
+    ],
+    "required_checks_success": 12,
+    "merge_sha": "8b6cfa4856bd632fadb25745d0ea1cce0d849e25",
+    "production_deploy_enabled": false,
+    "complete_ci": {
+      "source_sha": "988b5d27c2dda793cb27c38b019d53a92a171e0a",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39659404226",
+      "tested_merge_sha": "4c56dce3e85bd8046af64b6612e0f55f28a65587",
+      "verified_merge_parents": [
+        "fcd8325b8465690bcca8d2e1379e009678f48b39",
+        "988b5d27c2dda793cb27c38b019d53a92a171e0a"
+      ],
+      "reports": [
+        {
+          "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+          "sha256": "c1ec320eaddf5fbb3974e24ca30316f5f3ce759b7fb5cacc06b4149f7dc67405",
+          "xml_sha256": "ed0abdf7d98adb0e35341bcbcc33b1b64d4dbc411428bc474724931623f0cfb3",
+          "revision": "4c56dce3e85bd8046af64b6612e0f55f28a65587",
+          "mysql": "8.0.36",
+          "index": 0,
+          "passed": 1112,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+          "sha256": "094551f0c5183f7c40bfe7e11e833aba743b5f47f17715b138f96df3f96a3975",
+          "xml_sha256": "a88fece29fda92599877a5c01e65db469826eb822c42ba63252738a4fc6ec49a",
+          "revision": "4c56dce3e85bd8046af64b6612e0f55f28a65587",
+          "mysql": "8.0.36",
+          "index": 1,
+          "passed": 1112,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+          "sha256": "8a84afadd650273a10ff2b6642ff5f7988b09d04ba0e6d5fda568b6226f047c6",
+          "xml_sha256": "69c4beb540edc98b39e4579188c174e2fde4463196d5401f812c37965ec4ccb9",
+          "revision": "4c56dce3e85bd8046af64b6612e0f55f28a65587",
+          "mysql": "8.0.36",
+          "index": 2,
+          "passed": 1112,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+          "sha256": "33715ff0c577bb99aaa2c28cb252b8e2cbb8a0bb782e8bc89218138cc72c2127",
+          "xml_sha256": "022ee3b3c07e5eaf66ed8ced8a9c11fb4cc6f465f49984cdc2c19cad6dca6157",
+          "revision": "4c56dce3e85bd8046af64b6612e0f55f28a65587",
+          "mysql": "8.0.36",
+          "index": 3,
+          "passed": 1112,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-0/shard-8.4-0.json",
+          "sha256": "a937237980c9a3d69a69c9f5e72d24324ceadebd9facdc730127ad388ae45e20",
+          "xml_sha256": "531a6b94183ab7dd68f8c8680fef551d669975ea09bf4b6cde5c1952dc73ccce",
+          "revision": "4c56dce3e85bd8046af64b6612e0f55f28a65587",
+          "mysql": "8.4",
+          "index": 0,
+          "passed": 1112,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-1/shard-8.4-1.json",
+          "sha256": "c2d1ece654903db010b6a1d6182d93d46c9d51a2f0042aa775448d6a6adc36c2",
+          "xml_sha256": "f2df7c89bed87010dccacb9ed8af8fae95f22a123b1dfa17b5dd59b3447adfbf",
+          "revision": "4c56dce3e85bd8046af64b6612e0f55f28a65587",
+          "mysql": "8.4",
+          "index": 1,
+          "passed": 1112,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-2/shard-8.4-2.json",
+          "sha256": "1aec1399b283a534893ba1a8b8290b81eddc72f7cbf8ec7b5942f2891aaa72ae",
+          "xml_sha256": "dc0f2c5734687522484a382398d2949b1e1dd3de737d60bad998a7a4db9871b5",
+          "revision": "4c56dce3e85bd8046af64b6612e0f55f28a65587",
+          "mysql": "8.4",
+          "index": 2,
+          "passed": 1112,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-3/shard-8.4-3.json",
+          "sha256": "8371809be1c6a3c18b4fb64847039ffda7b614e83fd11d83175c22c908b47a52",
+          "xml_sha256": "19b1ee7cc26fd802cfe9bd282e094d9d4bf6c50a3cdad16f43cfa19b08b81a49",
+          "revision": "4c56dce3e85bd8046af64b6612e0f55f28a65587",
+          "mysql": "8.4",
+          "index": 3,
+          "passed": 1112,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "profiles": {
+        "8.0.36": {
+          "collected": 4448,
+          "passed": 4448,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 8,
+            "test_interpretation_claim_source": 4,
+            "test_transaction_interpretation_finish": 17,
+            "test_evaluation_finish_root": 10,
+            "test_evaluation_serial_response_receipts": 9,
+            "test_interpretation_state_versions": 4
+          }
+        },
+        "8.4": {
+          "collected": 4448,
+          "passed": 4448,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 8,
+            "test_interpretation_claim_source": 4,
+            "test_transaction_interpretation_finish": 17,
+            "test_evaluation_finish_root": 10,
+            "test_evaluation_serial_response_receipts": 9,
+            "test_interpretation_state_versions": 4
+          }
+        }
+      }
+    }
+  },
+  "interpretation_claim_original_root": {
+    "status": "local_implementation_in_progress",
+    "candidate_sha": null,
+    "merged": false,
+    "local": {
+      "original_baseline": 15,
+      "target": 24,
+      "failed_after_fix": 0,
+      "skipped": 0,
+      "native_collected_only": 8
+    },
+    "scope": "Borrowed original active AsyncSession root, no own commit/rollback/open/close; original owned scanner retains20 candidates, locks/fences/attempt exhaustion, deferral and one host session; staged Claim is not commit, witness or model handoff authority; complete transaction Sender pending",
+    "failure_history": [
+      "One new scanner test used AsyncSession.begin spec MagicMock as coroutine:23 pass/1 assertion failed; fixture changed to explicit AsyncMock,24 pass without app change"
+    ]
   }
 }
