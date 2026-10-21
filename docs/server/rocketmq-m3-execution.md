@@ -611,3 +611,29 @@ candidate来源PR205/efb3715（核心6610fe9）已提交39691432567：原入口1
 原candidate聚合PR206/8406e4a（核心59f1ef5）已提交39691768849，先补11项原入口表征，抽取后以RO/原根22项对照，138目标、3687完整本地单元零失败跳过、423类型、1100格式及文档门禁通过；1233 integration/interop明确排除。required实际依赖CI排队。保留其他在途claim、unknown优先级、取消、失败证据时间与候审责任；原根仍释放claim、校验全部dispatch并CAS，尚未构成完整虚拟聚合或candidate Sender。
 
 总进度16/36，T17不勾选。candidate终态Sender/虚拟聚合、恢复与取消drain和默认装配仍待完成；生产、稳定SDK、system及48小时观察未操作。
+
+
+### 2026-10-22 T17 串行 semantic 源码门禁通过与 candidate 虚拟记录
+
+| 子门禁 | 状态 | 精确验收 |
+| --- | --- | --- |
+| semantic 原虚拟投影 | ✅ 验证并合并 | PR203/941e925全部12检查success；两档MySQL各4815、4原生，零失败跳过；CD=false后合并a4c457c，整棵tree与候选一致 |
+| 串行 semantic Sender 源码 | ✅ 源码检查通过，合并另计 | PR204/101775e全部12检查success；八分片JSON/JUnit完整互斥及父SHA核验；MySQL8.0.36/8.4各4860、均含13新增原生，零失败跳过。等待完整六档Broker，暂未合并 |
+| 实际SDK/Broker新档 | ☐ 4/6档作业成功，完整证据待验 | infra PR132/5280ead固定101775e，34宿主/84证据。首个3.11.16/8.4.11报告已核验计数、精确源及完整清理；剩余两档与全体源/工具/lock/镜像摘要核验仍待完成 |
+| candidate记录投影 | ☐ PR207，CI排队 | 8c54f73/核心e914ac5，8原入口→24锁/RO/纯记录对照，110目标、3711本地单元、423类型、1102格式通过；1237 integration/interop排除，4原生仅收集，39692294219待核验 |
+| candidate semantic虚拟终态 | ☐ PR208，原生待验 | 1e884fe/核心d83e1ca，18正反例、153目标、3729本地单元、424类型、1105格式及文档通过；1241 integration/interop排除。4原根提交/回滚对照仅收集。隔离夹具不是生产模式转换或迁移模板 |
+
+虚拟记录先验证原Run/claim/ledger及未复核candidate，只在内存移除本次claim、追加原终态，保留其他claim与首字节。没有提交/租约/模型授权。初始单元夹具混用generation/semantic指纹和其他active invocation，在通过前只修正夹具，原保护不放宽。完整失败证据虚拟选择、generation终态、candidate准备/dispatch/恢复/drain及默认装配仍待闭环。
+
+仅取消旧main push39690831772：82bc619整棵tree与已验c300e89一致，且为新main a4c457c祖先；最新main和required PR门禁全部保留，取消不计通过。M3仍16/36，T17未勾选；生产、稳定SDK、system与48小时观察未操作。
+
+
+### 2026-10-22 T17 串行 semantic 事务子批次闭环
+
+✅ PR204/101775e全部12检查success，MySQL8.0.36与8.4八分片/JUnit各4860、均含13新增原生，零失败/跳过、集合完整互斥及测试父SHA核验。实际Broker六档Python3.11/3.13×MySQL8.0.36/8.0.44/8.4.11各34宿主/84证据、零失败跳过，全部源/工具/lock/hash、固定wheel/client、镜像digest、实际Broker参数及完整清理已核验。CD=false后正常合并e0ad323，整棵tree与候选一致。infra PR132其他工具检查尚未全部完成，工具合并单独记账。
+
+PR208追加虚拟阻断证据选择，最终657302d（代码e87a86b）/39693326573：18 overlay与13证据/进度边界、166目标、3742本地单元零失败跳过、424类型、1106格式及文档通过；1245 integration/interop明确排除。8原生仅收集，覆盖成功/Unknown、其他claim有/无、原根提交/回滚。旧1e884fe/39692806950仅为先前候选，不代替新head门禁；原写者仍读真实数据库证据，不以虚拟结果证明提交。
+
+候选准备/dispatch、generation终态、不可变首响应身份与租约续期、确定性恢复/取消drain及默认装配继续推进。M3仍16/36、T17不勾选；稳定SDK、生产、system和48小时观察未操作。
+
+GitHub普通取消请求后，旧main82bc619重复run仍停留queued；已对它及随后被取代的a4c457c重复run39692015129执行force-cancel，两者均回读completed/cancelled。两棵tree分别与已验c300e89、941e925精确一致，且均为新main e0ad323祖先；最新main及required PR全部保留，取消不计通过。
