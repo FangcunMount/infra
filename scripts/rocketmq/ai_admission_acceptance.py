@@ -4,6 +4,7 @@ import json
 import os
 import re
 import secrets
+import tomllib
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -52,7 +53,7 @@ _FLAGS = frozenset(('system_login_not_claimed', 'paired_qs_business_not_claimed'
 _FIELDS = _FLAGS | {'cases', 'passed', 'failed', 'skipped', 'root', 'sdk', 'client', 'python'}
 
 
-def read_host_receipt(output, *, marker='M3_AI_ADMISSION_RECEIPT', cases=CASES):
+def read_host_receipt(output, *, marker='M3_AI_ADMISSION_RECEIPT', cases=CASES, sdk_version='0.4.0a1'):
     """Export only bounded counters, fixed labels and known scope; never raw diagnostics."""
     lines = [line.split(marker + ' ', 1)[1]
              for line in output.splitlines() if marker + ' {' in line]
@@ -69,7 +70,7 @@ def read_host_receipt(output, *, marker='M3_AI_ADMISSION_RECEIPT', cases=CASES):
                    for k in ('passed', 'failed', 'skipped'))
             or receipt['passed'] != len(receipt['cases'])
             or receipt.get('root') != 'original_mysql_sqlalchemy'
-            or receipt.get('sdk') != '0.4.0a1' or receipt.get('client') != '5.1.2'
+            or receipt.get('sdk') != sdk_version or receipt.get('client') != '5.1.2'
             or not isinstance(receipt.get('python'), str)
             or re.fullmatch(r'3\.(?:11|13)\.\d{1,3}', receipt['python']) is None
             or any(receipt.get(k) is not True for k in _FLAGS)):
@@ -77,8 +78,8 @@ def read_host_receipt(output, *, marker='M3_AI_ADMISSION_RECEIPT', cases=CASES):
     return receipt
 
 
-def parse_host_receipt(output, junit, *, marker='M3_AI_ADMISSION_RECEIPT', cases=CASES, tests=TESTS):
-    receipt = read_host_receipt(output, marker=marker, cases=cases)
+def parse_host_receipt(output, junit, *, marker='M3_AI_ADMISSION_RECEIPT', cases=CASES, tests=TESTS, sdk_version='0.4.0a1'):
+    receipt = read_host_receipt(output, marker=marker, cases=cases, sdk_version=sdk_version)
     if (receipt is None or receipt['passed'] != len(cases)
             or receipt['failed'] != 0 or receipt['skipped'] != 0
             or set(receipt['cases']) != cases):
@@ -100,14 +101,15 @@ def parse_admission_receipt(output, junit):
 
 def acceptance_profile(kind):
     if kind == 'admission':
-        return dict(name=kind, file='rocketmq_admission_host.py', manifest=admission_manifest,
+        return dict(name=kind, sdk_version='0.4.0a1', sdk_url=SDK_URL, sdk_sha256=None, file='rocketmq_admission_host.py', manifest=admission_manifest,
                     partial=read_partial_receipt, parse=parse_admission_receipt, tests=TESTS,
                     scope='actual Python AI receiver, published SDK, original roots and real Broker; controlled QS input/observer only')
     if kind == 'state':
         from ai_state_acceptance import CASES as STATE_CASES, TESTS as STATE_TESTS, state_manifest
-        return dict(name=kind, file='rocketmq_state_host.py', manifest=state_manifest,
-                    partial=lambda output: read_host_receipt(output, marker='M3_AI_STATE_RECEIPT', cases=STATE_CASES),
-                    parse=lambda output, junit: parse_host_receipt(output, junit, marker='M3_AI_STATE_RECEIPT', cases=STATE_CASES, tests=STATE_TESTS),
+        return dict(name=kind, sdk_version='0.4.0a2', sdk_url=SDK_URL.replace('0.4.0a1', '0.4.0a2'),
+                    sdk_sha256='570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2', file='rocketmq_state_host.py', manifest=state_manifest,
+                    partial=lambda output: read_host_receipt(output, marker='M3_AI_STATE_RECEIPT', cases=STATE_CASES, sdk_version='0.4.0a2'),
+                    parse=lambda output, junit: parse_host_receipt(output, junit, marker='M3_AI_STATE_RECEIPT', cases=STATE_CASES, tests=STATE_TESTS, sdk_version='0.4.0a2'),
                     tests=STATE_TESTS,
                     scope='actual Python worker/preflight, governance/review/correction/Solution and unknown-resolution handlers plus serial dispatch senders, published SDK, original state roots and real Broker; event observer only')
     raise RuntimeError('explicit known AI acceptance profile required')
@@ -121,6 +123,31 @@ def host_failure_diagnostics(raw, filename, tests):
                 re.escape(filename) + r':(\d{1,6})(?!\d)', raw)))[:32]}
 
 
+
+def validate_host_sdk_lock(lock, profile):
+    """uv verifies the archive hash from its immutable lock, not direct_url.json."""
+    if profile['sdk_sha256'] is None:
+        return None  # Historical admission profile keeps its original provenance contract.
+    packages = [p for p in lock.get('package', []) if p.get('name') == 'fangcun-reliable-messaging']
+    expected = {'url': profile['sdk_url'], 'hash': 'sha256:' + profile['sdk_sha256']}
+    if (len(packages) != 1 or packages[0].get('version') != profile['sdk_version']
+            or packages[0].get('source') != {'url': profile['sdk_url']}
+            or packages[0].get('wheels') != [expected]):
+        raise RuntimeError('Exact released SDK version, URL and wheel hash required in uv lock')
+    return profile['sdk_sha256']
+
+
+def validate_host_runtime(runtime, profile, python):
+    direct = runtime.get('direct_url', {})
+    if (runtime.get('sdk') != profile['sdk_version'] or runtime.get('client') != '5.1.2'
+            or not runtime.get('python', '').startswith(python + '.')
+            or direct.get('url') != profile['sdk_url']
+            or runtime.get('installed_in_prefix') is not True
+            or (profile['sdk_sha256'] is not None
+                and direct.get('archive_info', {}).get('hashes', {}).get('sha256') not in (None, profile['sdk_sha256']))):
+        raise RuntimeError('released fixed SDK wheel and client required, no editable SDK')
+
+
 def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof):
     profile = acceptance_profile(os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission'))
     source = source.resolve()
@@ -129,6 +156,7 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
     proof['host_profile'] = profile['name']
     proof['lock_sha256'] = hashlib.sha256((source / 'uv.lock').read_bytes()).hexdigest()
+    proof['locked_sdk_archive_sha256'] = validate_host_sdk_lock(tomllib.loads((source / 'uv.lock').read_text()), profile)
     python = os.environ.get('QS_AI_ACCEPTANCE_PYTHON')
     if python not in ('3.11', '3.13'):
         raise RuntimeError('fixed AI acceptance Python compatibility profile required')
@@ -158,11 +186,7 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     info = run([*command, 'python', '-I', '-c',
         "import sys,json,pathlib,importlib.metadata as m,reliable_messaging as r; d=m.distribution('fangcun-reliable-messaging'); print(json.dumps({'python':sys.version.split()[0],'sdk':d.version,'client':m.version('rocketmq-python-client'),'package_file':r.__file__,'installed_in_prefix':pathlib.Path(r.__file__).resolve().is_relative_to(pathlib.Path(sys.prefix).resolve()),'direct_url':json.loads(d.read_text('direct_url.json'))}))"], cwd=source, env=env).stdout
     runtime = json.loads(info)
-    if (runtime.get('sdk') != '0.4.0a1' or runtime.get('client') != '5.1.2'
-            or not runtime.get('python', '').startswith(python + '.')
-            or runtime.get('direct_url', {}).get('url') != SDK_URL
-            or runtime.get('installed_in_prefix') is not True):
-        raise RuntimeError('released fixed SDK wheel and client required, no editable SDK')
+    validate_host_runtime(runtime, profile, python)
     proof['python_runtime'] = runtime
     junit = directory / ('ai-' + profile['name'] + '-private.xml')
     filename = profile['file']
