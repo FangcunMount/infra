@@ -9,14 +9,19 @@ CASES = frozenset(('constructor_inert', 'halves_before_worker_root', 'half_invis
     'governance_half_invisible', 'governance_final_unknown_keeps_commit',
     'governance_finalize_reopen_original_roots', 'review_half_invisible',
     'review_full35_original_root', 'review_first_clocks_and_wire',
-    'review_source_conflict_rollback'))
+    'review_source_conflict_rollback', 'correction_half_invisible',
+    'correction_first_clock_wire_and_witness',
+    'correction_replay_after_finalization_no_new_send',
+    'correction_final_unknown_keeps_commit', 'correction_source_conflict_rollback'))
 TESTS = frozenset((
     'test_actual_worker_preflight_half_gate_and_duplicate_preserve_original_evidence',
     'test_actual_worker_preflight_lost_final_reply_preserves_local_commit',
     'test_actual_worker_preflight_source_conflict_rolls_back_prepared_half',
     'test_actual_governance_finalize_reopen_halves_and_lost_final_reply',
     'test_actual_review_full35_rpc_half_gate_first_clocks_and_wire',
-    'test_actual_review_source_conflict_rolls_back_prepared_half'))
+    'test_actual_review_source_conflict_rolls_back_prepared_half',
+    'test_actual_correction_first_wire_final_unknown_and_replay_after_finalization',
+    'test_actual_correction_source_conflict_rolls_back_prepared_half'))
 
 
 def state_manifest():
