@@ -40,7 +40,12 @@ CASES = frozenset(('constructor_inert', 'halves_before_worker_root', 'half_invis
     'scanner_first_claim_committed_handoff', 'scanner_duplicate_no_new_model_or_send',
     'scanner_quota_deferral_no_running_event',
     'finish_retry_half_invisible', 'finish_retry_first_plan_and_old_abort',
-    'finish_retry_duplicate_first_result', 'finish_retry_no_new_provider'))
+    'finish_retry_duplicate_first_result', 'finish_retry_no_new_provider',
+    'serial_completion_half_invisible_success', 'serial_completion_half_invisible_unknown',
+    'serial_completion_first_response_candidate_wire_and_witness',
+    'serial_completion_final_unknown_keeps_commit', 'serial_completion_duplicate_first_result_no_model',
+    'serial_completion_cancel_old_abort_and_new_plan', 'serial_completion_cancel_new_half_invisible',
+    'serial_completion_cancel_same_response_candidate'))
 TESTS = frozenset((
     'test_actual_worker_preflight_half_gate_and_duplicate_preserve_original_evidence',
     'test_actual_worker_preflight_lost_final_reply_preserves_local_commit',
@@ -69,7 +74,10 @@ TESTS = frozenset((
     'test_actual_original_claim_scanner_first_plan_and_explicit_abort_retry[True]',
     'test_actual_original_claim_scanner_quota_defers_without_running_event',
     'test_actual_explicit_finalization_retry_preserves_first_wire_and_durable_response[question]',
-    'test_actual_explicit_finalization_retry_preserves_first_wire_and_durable_response[artifact]'))
+    'test_actual_explicit_finalization_retry_preserves_first_wire_and_durable_response[artifact]',
+    'test_actual_serial_generation_terminal_half_gate_and_first_response[success]',
+    'test_actual_serial_generation_terminal_half_gate_and_first_response[unknown]',
+    'test_actual_serial_terminal_cancel_requires_explicit_old_abort_replan'))
 
 
 def state_manifest():
