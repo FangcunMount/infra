@@ -6,10 +6,10 @@
 
 - 进度：**16/36**；T01–T16实现与任务必需验证完成，相关源码与infra均已合并。T15完整UTC race7327通过/60项既有可选依赖跳过、完整固定lint零问题；真实Broker/MySQL三档事件各17项、同候选命令各15项均0失败/跳过、清理完整。源码CI28项成功/1项API同步不适用，infra28项全部成功。生产切换未执行。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
-- 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI新领取/scanner PR197、infra PR121已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
+- 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI领取/scanner PR197与显式完成重试PR198、infra PR121/123均已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17进行中，16/36。领取/拒绝/耗尽及完整scanner子批次已闭环：修复源5963d0c两档各4614、含9维护/6scanner/5显式重试原生，六档Broker各26宿主/64证据，0失败跳过且完整清理；AI PR197及infra PR121已合并并核对候选一致。旧63/64失败保留。完成重试8d0a300的六档Broker各28/68通过，AI PR198及infra PR123待余下检查。评测规划/权威来源v3基础PR199本地3471/419类型通过、5原生待CI；完整终态/candidate/恢复和默认装配仍待闭环，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36。领取/拒绝/耗尽及完整scanner子批次已闭环：修复源5963d0c两档各4614、含9维护/6scanner/5显式重试原生，六档Broker各26宿主/64证据，0失败跳过且完整清理；AI PR197及infra PR121已合并并核对候选一致。旧63/64失败保留。完成重试8d0a300的六档Broker各28/68通过，AI PR198及infra PR123完整门禁通过并已合并。评测规划/权威来源v3基础PR199本地3471/419类型通过、5原生待CI；完整终态/candidate/恢复和默认装配仍待闭环，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -546,3 +546,13 @@ AI PR198当前8d0a300、infra PR123当前34d4a96已纳入同一修复，208组�
 本次完成的是T17内部领取链路，M3仍16/36、T17不勾选。精确修复源5963d0c的14项检查全部通过；两档完整八分片/JUnit各4614，包含维护9、scanner6及显式重试5个原生用例，0失败/跳过、集合完整互斥。六档Python3.11/3.13×MySQL8.0.36/8.0.44/8.4.11均26宿主/64证据通过，源/工具/lock hash、固定wheel、镜像digest和清理逐项核验。AI PR197正常合并`011740eae06df52af8284a1345dfba72bf8dfdfb`，合并tree与候选一致；合并前AUTO_DEPLOY_ENABLED=false。infra PR121的19项检查全部通过，合并`d0af560a8862f1e958be28d00fec725765a3c77e`，四个功能文件与已验候选一致。旧63/64失败与修复过程保留。
 
 完成阶段显式重试源8d0a300另通过六档每档28/68的真实Broker，清理完整；源码完整CI与其余工具检查尚待核验，不借领取批次代替。评测基础PR199增加显式权威来源v3，旧v1/v2字节摘要不变；允许稳定操作身份与稍后原事务版本分离，实际业务仍持有权限、原CAS与精确最终投影。74目标、3471完整本地单元及419类型通过，5原生仅收集；它不是完整终态Sender、T18模型恢复或生产验收。默认装配、稳定发布、生产和system均未开始。
+
+
+### 2026-10-22 T17 显式完成重试子门禁闭环
+
+本次完成T17内部显式完成重试，M3仍16/36、T17未勾选。源8d0a300的12项检查全部success，八分片/JUnit完整互斥、测试合并父SHA核验；MySQL8.0.36和8.4各4628通过、零失败零跳过，均含7项完成重试原生用例。六档实际Broker各28宿主/68证据通过，源/工具/lock hash、发布wheel/client、镜像digest及清理均精确核对。AI PR198合并前CD=false，正常合并bb614db，整棵tree与已验候选相等；infra PR123全部13项检查success，正常合并e3f785f，四个功能文件与34d4a96候选一致。
+
+完成恢复由宿主显式授权精确旧Aborted，经公开SDK有界入口竞争新fence，复用首次plan/wire/问题或Artifact身份；普通重复、Checker和消息错误均不授权模型重做。PR199评测来源v3基础及串行终态来源读取仍继续验证，完整评测terminal/candidate/恢复/取消drain和默认装配尚待闭环。稳定SDK、生产切换、system及48小时观察未开始。
+
+
+串行generation终态来源基础PR200（0ef23e8，代码3c6e5ff）新增9项原入口表征后抽取共享只读来源校验；19基线、41目标、3486完整本地单元、419源类型通过，1199 integration/interop不计通过，5原生仅收集。原写入口仍按checkpoint→Run加锁、验证原ledger/资产/历史及CAS；只读观察不授予提交或模型重做。required CI39682853102排队，PR199与该批未合并，不勾选T17。
