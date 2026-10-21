@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T16已闭环，AI9485f28两档MySQL各3531项零失败/跳过，14项源码/消息兼容检查成功；实际SDK/Broker六档每档15项协议检查、8项宿主用例均零失败/跳过且完整清理，infra37项检查全部成功。AI PR159合并e8392c05，infra PR83合并b770ed68。T17开始状态冻结与原根转录，尚未完成；[T16完整证据与失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。
+- 当前批次：T16已闭环，AI9485f28两档MySQL各3531项零失败/跳过，14项源码/消息兼容检查成功；实际SDK/Broker六档每档15项协议检查、8项宿主用例均零失败/跳过且完整清理，infra37项检查全部成功。AI PR159合并e8392c05，infra PR83合并b770ed68。T17实际worker预检0be8755通过两档MySQL各3633测试及六档真实Broker各13检查/3宿主用例；其余状态入口仍推进，尚未完成；[T16完整证据与失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -132,7 +132,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
-| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；独立AI state工作区基于e8392c05。共享纯投影、非command评测冻结计划和共享原根转录已实现，目标测试/385源文件类型通过；b4eedb6两档MySQL各3582项零失败/跳过（新增状态根各6项），14项源码检查成功，现有command六档Broker回归通过；源码仍草稿PR160。实际worker预检的冻结证据/原规则本地推进中。实际worker/治理入口及完整原生证明仍推进，[分批证据](evidence/rocketmq-m3-ai-state-20261021.json)，不提前勾选 |
+| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；独立AI state工作区基于e8392c05。共享纯投影、非command评测冻结计划和共享原根转录已实现，目标测试/385源文件类型通过；b4eedb6两档MySQL各3582项零失败/跳过（新增状态根各6项），14项源码检查成功，现有command六档Broker回归通过；源码仍草稿PR160。当前0be8755已接入实际worker预检，本地完整2727通过、387文件类型通过；两档MySQL各3633项通过，含各5项新worker原事务测试，14项源码检查成功；infra PR88六档实际worker/SDK状态验收均13项协议检查/3宿主用例零失败/跳过，完整清理，43检查成功。实际worker/治理入口及完整原生证明仍推进，[分批证据](evidence/rocketmq-m3-ai-state-20261021.json)，不提前勾选 |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
 | ☐ | T20 | 成对契约、安全、wire、receipt/ACK重复与取消 | 待开始 |
@@ -416,3 +416,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-21：真实SDK/Broker首轮39535745152六档均失败，全部临时容器/目录/进程组完整清理，报告原始摘要保留；各档固定SDK wheel0.4.0a1/client5.1.2及两个typed Topic/三个最小角色已回读，不能因此计业务通过。8用例均在控制QS输入freeze_branch337处缺原时间；本地复现SDK字段校验ValueError，cde36ea仅扩展测试构造器显式传入首次签名前时间，旧默认仍空、不改应用/SDK、不重新签名冻结wire。6协议回归与合计36定向通过（9interop未选）。新源bdbaa30、infra8ad7f7a已固定并启动Source39538869956/M7 39538869952与Broker39539009218；此前infra同候选31项既有回归成功与6项新Broker失败分别保留，不重绑定。总进度15/36、T16未完成、两源码草稿，生产未改。
 
 - 2026-10-21：T16最终9485f28完整CI39540533886与M7 39540533753共14检查成功；八份分片/JUnit与测试合并父SHA已核对，MySQL8.0.36/8.4各3531通过、零失败/跳过。真实SDK/Broker39540599454的Python3.11/3.13×三档MySQL六组均15项协议检查/8宿主用例通过，实际事务参数、固定wheel/client、first wire和完整清理已回读，报告摘要保留；最后确认回复客户端丢弃不计为网络级故障。此前两轮失败均保留。AI PR159合并e8392c05，infra PR83精确21be02d共37检查成功并合并b770ed68；T16勾选，总进度16/36。未发布稳定SDK、未修改生产，system/48小时观察未开始。T17新独立工作区基于该AI main推进，共享原根保护继续覆盖取消/未知提交，不因阶段结束启用尚未完成的生产装配。
+
+- 2026-10-21：T17 的0be8755源码14项检查通过，两档MySQL各3633通过、零失败/跳过，分片与JUnit完整集合和测试合并父SHA已核对，各含5项实际worker原事务测试。实际worker/预检/发布SDK/Broker六档39551357301均13项协议检查、3宿主用例通过，首次wire、半消息门禁、源冲突回滚、LocalCommitted/FinalUnknown及完整清理报告已核对；infra PR88精确62a90f2共43检查成功。证明范围为worker预检及事件观察者，不代表完整治理入口、QS成对链路、真实模型、网络级提交丢回复或生产。下一批已本地修正原准备/dispatch一次事务多版本的最终状态冻结，并抽出定稿/重开纯投影；尚未原生验收或合并。T17继续不勾选，总进度16/36。
