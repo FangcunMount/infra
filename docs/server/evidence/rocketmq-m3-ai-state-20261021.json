@@ -5,8 +5,8 @@
   "progress": "16/36",
   "base": "e8392c0582020d6cacf44c6caaa2f2061c66cb41",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-state",
-  "branch": "codex/rocketmq-m3-ai-state",
-  "source_candidate": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
+  "branch": "codex/rocketmq-m3-ai-governance",
+  "source_candidate": "cbc47d9d3404a8e87cb6318fa07d43ced2ba2a2c",
   "source_pushed": true,
   "source_merged": false,
   "production_assembly_enabled": false,
@@ -804,8 +804,8 @@
     "docs_files": 75,
     "docs_links": 1321
   },
-  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39551281159",
-  "source_messaging_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39551281172",
+  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39559277637",
+  "source_messaging_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39559277604",
   "worker_preflight_native_cases": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
     "file": "tests/integration/test_transaction_worker_preflight.py",
@@ -849,7 +849,8 @@
     "verified": true,
     "production_changed": false,
     "infra_head_checks_success": 43,
-    "infra_merged": false
+    "infra_merged": true,
+    "infra_merge_sha": "46bb54e238cc99554dcdfe2b4c7b1448e55c1751"
   },
   "worker_preflight_source_verified": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
@@ -1393,15 +1394,66 @@
   },
   "atomic_root_followup": {
     "source_commit": "928eacc7133843b778498b0bcf686db28e52b5d9",
-    "pushed": false,
+    "pushed": true,
     "scope": "preserve final version of original multi-checkpoint root with one event",
     "targeted_passed": 75,
     "mypy_source_files": 387,
     "native_case_collected": true,
     "native_executed": false,
     "governance_projection_targeted_passed": 62,
-    "governance_projection_committed": false,
-    "full_unit_status": "first run interrupted; rerun running",
-    "no_task_completion_claimed": true
+    "governance_projection_committed": true,
+    "full_unit_status": "2742 passed before later governance plans; first interrupted run retained separately; latest 2765 passed includes new pure plans",
+    "no_task_completion_claimed": true,
+    "native_status": "initial assertion failure retained; corrected cbc47d9 rerun pending"
+  },
+  "source_candidate_branch": "codex/rocketmq-m3-ai-state",
+  "failure_history": [
+    {
+      "source_sha": "3cf74b5eccc66bd271d4d8e250714e4a312bde59",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39557967784",
+      "failed_test": "tests/integration/test_evaluation_step.py::test_atomic_preparation_dispatch_emits_only_final_checkpoint_from_one_root",
+      "reason": "new characterization assertion mistook retained PreparedStep.cp snapshot for final PreparedStep.state.checkpoint; original database final version and one-root probe succeeded",
+      "reports": [
+        {
+          "file": "shard-8.4-0.json",
+          "sha256": "b167c58f45c5aecd7eed40409c71236ff692f2099c680738889006d81ad6522d"
+        },
+        {
+          "file": "shard-8.4-0.xml",
+          "sha256": "d166e8c63e1cbba831f020bb4ace8fdd4e87da505b3beab2ed317b2ff8244b9b"
+        }
+      ],
+      "obsolete_run_cancel_requested": true,
+      "replacement_source_sha": "cbc47d9d3404a8e87cb6318fa07d43ced2ba2a2c",
+      "correction_code_sha": "4b32439",
+      "correction_scope": "test assertion and documentation hashes only; original business unchanged",
+      "replacement_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39559277637"
+    }
+  ],
+  "governance_followup": {
+    "source_sha": "0f787c51c9f29264d555919bd57de8b473d10e2b",
+    "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-state",
+    "branch": "codex/rocketmq-m3-ai-governance",
+    "pushed": false,
+    "merged": false,
+    "frozen_operations": [
+      "finalize",
+      "reopen"
+    ],
+    "full_unit": {
+      "passed": 2765,
+      "failed": 0,
+      "deselected": 915
+    },
+    "mypy_source_files": 388,
+    "format_files": 955,
+    "targeted_governance_and_root_passed": 64,
+    "native_cases_collected": 8,
+    "native_cases_executed": false,
+    "explicit_repeatable_read_before_guard": true,
+    "sdk_published_version": "0.4.0a1",
+    "actual_governance_rpc_enabled": false,
+    "other_governance_and_worker_writers": "pending",
+    "task_completed": false
   }
 }
