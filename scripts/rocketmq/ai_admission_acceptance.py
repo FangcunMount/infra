@@ -47,21 +47,42 @@ def admission_manifest():
     return manifest
 
 
-def parse_admission_receipt(output, junit):
-    receipts = [json.loads(line.split('M3_AI_ADMISSION_RECEIPT ', 1)[1])
-                for line in output.splitlines() if 'M3_AI_ADMISSION_RECEIPT {' in line]
-    if len(receipts) != 1:
-        raise RuntimeError('exact nonempty AI host receipt required')
-    receipt = receipts[0]
-    if (receipt.get('passed') != len(CASES) or receipt.get('failed') != 0
-            or receipt.get('skipped') != 0 or set(receipt.get('cases', {})) != CASES
+_FLAGS = frozenset(('system_login_not_claimed', 'paired_qs_business_not_claimed',
+    'real_provider_not_claimed', 'process_exit_not_claimed', 'database_commit_network_fault_not_claimed'))
+_FIELDS = _FLAGS | {'cases', 'passed', 'failed', 'skipped', 'root', 'sdk', 'client', 'python'}
+
+
+def read_partial_receipt(output):
+    """Export only bounded counters, fixed labels and known scope; never raw diagnostics."""
+    lines = [line.split('M3_AI_ADMISSION_RECEIPT ', 1)[1]
+             for line in output.splitlines() if 'M3_AI_ADMISSION_RECEIPT {' in line]
+    if len(lines) != 1:
+        return None
+    try:
+        receipt = json.loads(lines[0])
+    except (ValueError, TypeError):
+        return None
+    if (not isinstance(receipt, dict) or set(receipt) != _FIELDS
+            or not isinstance(receipt.get('cases'), dict) or not set(receipt['cases']) <= CASES
             or any(v is not True for v in receipt['cases'].values())
+            or any(type(receipt.get(k)) is not int or not 0 <= receipt[k] <= 100
+                   for k in ('passed', 'failed', 'skipped'))
+            or receipt['passed'] != len(receipt['cases'])
             or receipt.get('root') != 'original_mysql_sqlalchemy'
             or receipt.get('sdk') != '0.4.0a1' or receipt.get('client') != '5.1.2'
-            or any(receipt.get(key) is not True for key in (
-                'system_login_not_claimed', 'paired_qs_business_not_claimed', 'real_provider_not_claimed',
-                'process_exit_not_claimed', 'database_commit_network_fault_not_claimed'))):
-        raise RuntimeError('AI host receipt incomplete or broader than proven scope')
+            or not isinstance(receipt.get('python'), str)
+            or re.fullmatch(r'3\.(?:11|13)\.\d{1,3}', receipt['python']) is None
+            or any(receipt.get(k) is not True for k in _FLAGS)):
+        return None
+    return receipt
+
+
+def parse_admission_receipt(output, junit):
+    receipt = read_partial_receipt(output)
+    if (receipt is None or receipt['passed'] != len(CASES)
+            or receipt['failed'] != 0 or receipt['skipped'] != 0
+            or set(receipt['cases']) != CASES):
+        raise RuntimeError('AI host receipt absent, incomplete or broader than proven scope')
     tests = list(ET.fromstring(junit).iter('testcase'))
     if (len(tests) != len(TESTS) or {case.get('name') for case in tests} != TESTS
             or any(case.find(node) is not None for case in tests for node in ('failure', 'error', 'skipped'))):
@@ -123,6 +144,9 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     proof['diagnostics'] = {'failed_cases': sorted(set(re.findall(r'FAILED tests/integration/rocketmq_admission_host.py::([A-Za-z0-9_\[\]-]+)', raw)))[:16],
                             'assertion_lines': sorted(set(int(n) for n in re.findall(r'rocketmq_admission_host\.py:(\d+)', raw)))[:32]}
     if result.returncode or not junit.is_file():
+        partial = read_partial_receipt(result.stdout)
+        if partial is not None:
+            proof['partial_native_receipt'] = partial
         raise RuntimeError('actual AI admission SDK/Broker host failed (private output withheld)')
     proof['native_receipt'] = parse_admission_receipt(result.stdout, junit.read_text())
     proof['native_tests_passed'] = len(TESTS)
