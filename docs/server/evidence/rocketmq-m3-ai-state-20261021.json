@@ -5212,7 +5212,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T16:40:47.181624+00:00",
+  "updated_at": "2026-10-21T16:53:31.894369+00:00",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -8089,7 +8089,8 @@
         }
       }
     },
-    "source_merge_status": "source_checks_coverage_summary_pending_and_main_docs_conflict_requires_resolution"
+    "source_merge_status": "original_74f9_all12_checks_passed_and_4136_per_mysql_verified; docs-only merge of verified main as f60f61f now awaits new exact CI; original six-profile proof stays pinned74f9",
+    "source_candidate_with_verified_main": "f60f61f54b23c7dfd271441011def7952e53640c"
   },
   "dispatch_record_readonly_local": {
     "status": "pushed_required_native_ci_pending",
@@ -8123,13 +8124,30 @@
     "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39636713295"
   },
   "worker_dispatch_sdk": {
-    "status": "local_implementation_validation_in_progress",
+    "status": "pushed_required_native_ci_pending",
     "branch": "codex/rocketmq-m3-ai-worker-dispatch-sdk",
     "baseline_original_cases_passed": 29,
-    "target_passed": 60,
-    "native_collected": 13,
+    "target_passed": 65,
+    "native_collected": 15,
     "native_executed_locally": false,
-    "scope": "Explicit serial SDK sender: frozen first CP/input/ledger digests, same original root with two CAS, model permit transferred only after precise local commit/archive proof; default assembly, terminal finalization, candidate and recovery still pending",
-    "production_changed": false
+    "scope": "Explicit serial two-CAS original SDK root and guarded graph handoff; exact first checkpoint/source/model inputs/ledger with source cleanup before Seal and schema reads in same primary snapshot; fresh local/archive/witness proof transfers one original model permit; no actual Broker, terminal/candidate/recovery/default assembly or production claim",
+    "production_changed": false,
+    "source_sha": "764415c7b9f5fcad8b7ba5dfbb981874517c6f82",
+    "code_sha": "9ac16de8d04dd66805eab18d6a5a76a3997b1c07",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/181",
+    "full_unit": {
+      "passed": 3157,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 1063,
+      "warnings": 6
+    },
+    "mypy_source_files": 407,
+    "format_files": 1032,
+    "docs": {
+      "files": 75,
+      "links": 1362,
+      "errors": 0
+    }
   }
 }
