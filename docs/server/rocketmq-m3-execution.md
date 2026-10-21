@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17进行中，16/36。最新合并源码仍为PR180/d307c45（双MySQL各4173零失败跳过、12检查成功）。串行dispatch SDK/Broker PR181/182的实际六档39639411031已核验：15宿主/42证据每档零失败跳过、完整清理与精确源/工具hash；其余CI及源码/工具合并待门禁。维护SDK/CLI PR183（3189本地/9原生待CI）、interpretation原根PR184（3200本地/6原生待CI）及独立转录PR185（3205本地/4原生待CI）分别追踪，未启用默认装配；完整state/终态/candidate/恢复仍待完成，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36。串行SDK PR181精确764415c已通过12检查、双MySQL各4220零失败跳过（含15新增原根/入口），正常合并6a73d55且tree一致。真实Broker六档15宿主/42证据已核验，工具PR111的19检查全通过并合并9ab9295。Broker源17c/PR182也已通过完整4220双档，但GitHub判定合并冲突；本地tree无变化地显式合main为38f017a，新head门禁重验，旧证据保留不改绑。维护PR183、interpretation基础PR184/185和原Artifact身份PR186仍待原生CI；默认装配、完整state/终态/candidate/恢复未闭环，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -470,3 +470,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-22：PR180精确ceea84b/39636713295八分片/JUnit与完整集合、父SHA核验通过，双MySQL各4173零失败跳过、含4新增原dispatch账本原生；12检查成功、生产CD false，正常合并d307c45且tree一致，PR181回到main。仅取消已被新main取代、tree与已通过PR178完全相同的重复push检查39636813645，保留其候选4161双档证明和取消原因，不取消当前候选必需PR门禁。维护SDK/CLI代码b349ae7、候选a8cf8d6（PR183）冻结精确operator/成本确认/release/输出与首次审核，保留原授权锁/CAS；实际CLI显式事务apply关闭来源后才开SDK，准入关闭拒绝，SDK关闭未完成先Wait再关原库。25既有规则+4原CLI门禁、57目标、3189完整单元零失败跳过、409类型、1037格式与75文档/1365链接通过；9原生仅收集，旧预览/配置路径原行为保留，未调用模型或生产工具。串行真实Broker新15/42当前仅首档3.11/8.4.11完成success，其他档仍排队，不提前宣称六档全部通过。T17仍不勾选，总进度16/36。
 
 - 2026-10-22：串行dispatch真实Broker39639411031六档15宿主/42精确证据、零失败跳过及全部清理已核验；17c0e91源、wheel/client、两工具hash、源lock与测试infra虚拟合并dd75d1f（父含f0c4766）均匹配。不把这一报告绑定后续maintenance/interpretation源码或当作真实模型/完整graph/成对QS/system/进程/网络故障验收。ResolveUnknown f60/39638538124全部12检查及双MySQL各4161完整八分片/JUnit已核验，保留与新main180的组合责任，不重复丢弃已有证明。interpretation暂存原根代码9bfdb27/候选f2e37e1（PR184）通过4原表征、11目标、3200完整单元和409类型，6原生仅收集；原Artifact验证保留，尚未完整冻结或接SDK。独立转录代码b3a4455/候选742c883（PR185）保留Start/Change/Retry原wrapper与root/CAS规则，30原门禁、35目标、3205完整单元和409类型通过，4原生仅收集；不伪造command/Inbox，不提供新授权或witness。T17继续进行中、总进度16/36，生产与稳定发布未操作。
+
+- 2026-10-22：串行SDK764415c/39638783636和Broker源17c0e91/39639305104的完整八分片/JUnit、父SHA及零重叠集合均核验，两档各4220零失败跳过、含15新增worker原根/入口；各12检查全成功。生产CD仍false，PR181正常合并6a73d55、tree一致；工具PR111的19检查全成功，正常合并9ab9295且四工具/工作流与已验收f0c4766逐字节相同。PR182经retarget后GitHub报DIRTY/CONFLICTING，虽然本地merge-tree恰为已测17c树f2233d8；保留拒绝/旧报告，不使用admin/auto绕过，显式合入当前已验main为38f017a，整个tree仍逐字节一致且GitHub恢复MERGEABLE，必须重新等待新head CI。已过时main178重复push运行39636813645最终completed/cancelled，PR候选完整成功证明保留。Artifact身份代码05f03ad/候选3df0eee（PR186）在执行器前验证原UUID5身份，再完整执行原内容/来源/配置/安全验证，原v1/v2及默认字节不变；32原门禁、47目标、3209完整单元零失败跳过、409类型和75文档/1368链接通过，2原生仅收集。完整interpretation State计划仍实施中，无新任务勾选，总进度16/36，生产与稳定发布未操作。
