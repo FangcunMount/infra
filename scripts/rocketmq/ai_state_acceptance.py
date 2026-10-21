@@ -22,7 +22,16 @@ CASES = frozenset(('constructor_inert', 'halves_before_worker_root', 'half_invis
     'serial_dispatch_half_invisible_generation', 'serial_dispatch_half_invisible_semantic',
     'serial_dispatch_two_cas_first_inputs_and_witness', 'serial_dispatch_final_unknown_handoff',
     'serial_dispatch_original_permit_transfer', 'serial_dispatch_repeat_no_new_model_or_send',
-    'serial_dispatch_source_conflict_rollback'))
+    'serial_dispatch_source_conflict_rollback',
+    'interpretation_finish_half_invisible_question',
+    'interpretation_finish_half_invisible_failure',
+    'interpretation_finish_half_invisible_artifact',
+    'interpretation_finish_final_unknown_keeps_commit',
+    'interpretation_finish_original_business_archive_witness',
+    'interpretation_finish_first_question_sequence',
+    'interpretation_finish_durable_artifact_no_new_invocation',
+    'interpretation_finish_repeat_no_replan_or_send',
+    'interpretation_finish_source_conflict_rollback'))
 TESTS = frozenset((
     'test_actual_worker_preflight_half_gate_and_duplicate_preserve_original_evidence',
     'test_actual_worker_preflight_lost_final_reply_preserves_local_commit',
@@ -38,7 +47,11 @@ TESTS = frozenset((
     'test_actual_resolution_source_conflict_rolls_back_prepared_half',
     'test_actual_serial_generation_dispatch_half_gate_first_inputs_and_final_unknown',
     'test_actual_serial_semantic_dispatch_half_gate_first_inputs_and_final_unknown',
-    'test_actual_serial_dispatch_source_conflict_rolls_back_without_model_call'))
+    'test_actual_serial_dispatch_source_conflict_rolls_back_without_model_call',
+    'test_actual_interpretation_finish_question_half_gate_first_wire_and_final_unknown',
+    'test_actual_interpretation_finish_failure_half_gate_first_wire_and_final_unknown',
+    'test_actual_interpretation_finish_artifact_half_gate_first_wire_and_final_unknown',
+    'test_actual_interpretation_finish_source_conflict_rolls_back_without_new_send'))
 
 
 def state_manifest():
