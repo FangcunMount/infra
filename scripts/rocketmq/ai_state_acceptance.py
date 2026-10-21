@@ -45,7 +45,12 @@ CASES = frozenset(('constructor_inert', 'halves_before_worker_root', 'half_invis
     'serial_completion_first_response_candidate_wire_and_witness',
     'serial_completion_final_unknown_keeps_commit', 'serial_completion_duplicate_first_result_no_model',
     'serial_completion_cancel_old_abort_and_new_plan', 'serial_completion_cancel_new_half_invisible',
-    'serial_completion_cancel_same_response_candidate'))
+    'serial_completion_cancel_same_response_candidate',
+    'semantic_completion_half_invisible_success', 'semantic_completion_half_invisible_unknown',
+    'semantic_completion_first_response_candidate_wire_and_witness',
+    'semantic_completion_final_unknown_keeps_commit', 'semantic_completion_duplicate_first_result_no_model',
+    'semantic_completion_cancel_old_abort_and_new_plan', 'semantic_completion_cancel_new_half_invisible',
+    'semantic_completion_cancel_same_response_candidate'))
 TESTS = frozenset((
     'test_actual_worker_preflight_half_gate_and_duplicate_preserve_original_evidence',
     'test_actual_worker_preflight_lost_final_reply_preserves_local_commit',
@@ -77,7 +82,10 @@ TESTS = frozenset((
     'test_actual_explicit_finalization_retry_preserves_first_wire_and_durable_response[artifact]',
     'test_actual_serial_generation_terminal_half_gate_and_first_response[success]',
     'test_actual_serial_generation_terminal_half_gate_and_first_response[unknown]',
-    'test_actual_serial_terminal_cancel_requires_explicit_old_abort_replan'))
+    'test_actual_serial_terminal_cancel_requires_explicit_old_abort_replan',
+    'test_actual_serial_semantic_terminal_half_gate_and_first_response[success]',
+    'test_actual_serial_semantic_terminal_half_gate_and_first_response[unknown]',
+    'test_actual_serial_semantic_cancel_requires_explicit_old_abort_replan'))
 
 
 def state_manifest():
