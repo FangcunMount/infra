@@ -6,10 +6,10 @@
 
 - 进度：**16/36**；T01–T16实现与任务必需验证完成，相关源码与infra均已合并。T15完整UTC race7327通过/60项既有可选依赖跳过、完整固定lint零问题；真实Broker/MySQL三档事件各17项、同候选命令各15项均0失败/跳过、清理完整。源码CI28项成功/1项API同步不适用，infra28项全部成功。生产切换未执行。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
-- 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
+- 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI新领取/scanner PR197、infra PR121已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17 **验证失败，修复待验收**，16/36。原scanner fd141源码双MySQL各4606零失败跳过、八分片/完整覆盖独立核验；真实Broker已返回的Python3.11两档均63/64，失败于无事件job维护继承旧flush，清理完整。修复5963d0c（AI PR197）已通过127目标/3432本地/418类型，新增3原生维护用例，新源码CI与26/64 Broker重新排队；旧失败保留。完成阶段分支8d0a300已纳入修复、208组合目标通过，AI PR198/infra PR123待门禁。评测进度计算基础5c6ab5e的260组合目标通过，完整终态Sender仍待完成。T17不勾选；默认装配、稳定版、生产及system未执行。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36。领取/拒绝/耗尽及完整scanner子批次已闭环：修复源5963d0c两档各4614、含9维护/6scanner/5显式重试原生，六档Broker各26宿主/64证据，0失败跳过且完整清理；AI PR197及infra PR121已合并并核对候选一致。旧63/64失败保留。完成重试8d0a300的六档Broker各28/68通过，AI PR198及infra PR123待余下检查。评测规划/权威来源v3基础PR199本地3471/419类型通过、5原生待CI；完整终态/candidate/恢复和默认装配仍待闭环，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -34,7 +34,7 @@
 | 评测原根与原串行响应输入 | ✅ 双 MySQL 各4433；10原根+9响应存储；旧candidate读取和原取消drain保留 | ✅ AI PR191 | 原根/输入证据基础，不是完整终态Sender或T18恢复验收 |
 | 原一次事务连续两次版本推进的冻结 | ✅ 旧v1字节向量不变，41目标/3312本地；双MySQL各4448零失败跳过、含4原生 | ✅ PR192合并8b6cfa4；12检查通过 | 仅协议及原根基础，不冒充完整claim入口 |
 | 原领取根及并发锁 | ✅ PR193双MySQL各4480，8原根/并发新增用例；完整八分片/JUnit核验 | ✅ PR193合并ca6f1be | ClaimStage不等于witness或模型执行授权 |
-| 完整claim/refusal/attempts-exhausted入口 | ☐ 原根双MySQL各4480/8原生、Sender各4547/18原生、Broker六档23/59、无事件延后各4569/6原生已通过；固定SDK授权入口已发布，完整scanner待闭环 | ✅ PR193–196、infra PR119及SDK PR48/49；scanner未合并 | 保留原调度资格、租约、配额和模型未知治理 |
+| 完整claim/refusal/attempts-exhausted及scanner | ✅ 双MySQL各4614，9维护/6scanner/5显式重试原生，六档Broker各26/64，零失败跳过、完整清理 | ✅ AI PR193–197、infra PR119/121及SDK PR48–50 | 原租约/配额/首次wire和失败历史保留；默认装配与其他T17入口仍待完成 |
 | evaluation完整终态/candidate/恢复/取消drain | ☐ 待闭环 | — | 不重做模型，不用已有业务行冒充witness |
 | 全部state写入口及统一事务装配 | ☐ 待闭环 | — | 默认事务装配未启用；生产另有具名批准门禁 |
 
@@ -540,3 +540,9 @@ AI [PR198](https://github.com/FangcunMount/qs-ai/pull/198)候选`07002dc6303c78f
 AI PR197修复候选`5963d0c6ee9d355c15361cbbe2d17bf881dd6d66`（代码54007b0）仅在该新根安装拒绝状态写入的事件保护，提交前及正常提交钩子均检查根与记录器；拒绝借用业务事务，全局记录器保留。127目标/3432本地/418源类型通过；维护原生由6增至9（新3项仅收集），新源[CI39677490917](https://github.com/FangcunMount/qs-ai/actions/runs/39677490917)及infra PR121新源8a05857的[26/64实际Broker](https://github.com/FangcunMount/infra/actions/runs/39677577483)重新排队，预算和必需用例不减。
 
 AI PR198当前8d0a300、infra PR123当前34d4a96已纳入同一修复，208组合目标及418源类型通过，28/68实际Broker与完整CI待验收。评测计算基础分支5c6ab5e已保留原串行/candidate进度规则；原42+新10表征、抽取后52目标和修复前3444本地通过，纳入修复后260组合目标/419类型通过。它仍是只读规划基础，没有完整终态Sender或新的原生验收，也未启用默认装配。所有历史失败、取消和对应源码继续保留；本轮没有生产操作。
+
+### 2026-10-22 T17 原领取/拒绝/耗尽及完整scanner子门禁闭环
+
+本次完成的是T17内部领取链路，M3仍16/36、T17不勾选。精确修复源5963d0c的14项检查全部通过；两档完整八分片/JUnit各4614，包含维护9、scanner6及显式重试5个原生用例，0失败/跳过、集合完整互斥。六档Python3.11/3.13×MySQL8.0.36/8.0.44/8.4.11均26宿主/64证据通过，源/工具/lock hash、固定wheel、镜像digest和清理逐项核验。AI PR197正常合并`011740eae06df52af8284a1345dfba72bf8dfdfb`，合并tree与候选一致；合并前AUTO_DEPLOY_ENABLED=false。infra PR121的19项检查全部通过，合并`d0af560a8862f1e958be28d00fec725765a3c77e`，四个功能文件与已验候选一致。旧63/64失败与修复过程保留。
+
+完成阶段显式重试源8d0a300另通过六档每档28/68的真实Broker，清理完整；源码完整CI与其余工具检查尚待核验，不借领取批次代替。评测基础PR199增加显式权威来源v3，旧v1/v2字节摘要不变；允许稳定操作身份与稍后原事务版本分离，实际业务仍持有权限、原CAS与精确最终投影。74目标、3471完整本地单元及419类型通过，5原生仅收集；它不是完整终态Sender、T18模型恢复或生产验收。默认装配、稳定发布、生产和system均未开始。
