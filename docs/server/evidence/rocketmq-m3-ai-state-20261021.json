@@ -5230,7 +5230,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T23:26:08.608218+00:00",
+  "updated_at": "2026-10-21T23:30:53.355582+00:00",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -19495,7 +19495,7 @@
     "checks_passed": 12
   },
   "serial_semantic_transaction_sender": {
-    "status": "source_and_six_profile_broker_verified_source_merged_harness_other_checks_pending",
+    "status": "source_and_six_profile_broker_verified_both_merged",
     "source_sha": "101775ecd04e3973eff791d0d24e2147f6bdcecd",
     "code_sha": "169f024727af5e2f7484eb17906951fe3eb065c1",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/204",
@@ -19513,7 +19513,7 @@
     },
     "scope": "First durable semantic response and original accepted candidate fixed across explicit old-abort retry/replan. Snapshot assets borrow the original session; original semantic acceptor/CAS/archive/witness share the root. No model or fresh candidate creation; duplicate returns exact first receipt. No candidate-mode/default assembly/T18 provider fault proof.",
     "broker": {
-      "status": "six_profiles_verified_other_harness_checks_pending",
+      "status": "verified_merged",
       "source_sha": "101775ecd04e3973eff791d0d24e2147f6bdcecd",
       "harness_sha": "5280eadc377d424e76e778c8545a5f26c2312521",
       "harness_pr": "https://github.com/FangcunMount/infra/pull/132",
@@ -20322,7 +20322,10 @@
           }
         ]
       },
-      "harness_merged": false
+      "harness_merged": true,
+      "harness_merge_sha": "26be5d8101bfeb02e28f43fd4c86a8e3791a9caa",
+      "harness_checks_passed": 19,
+      "functional_files_equal": true
     },
     "source_ci_status": "success",
     "checks_passed": 12,
@@ -20720,5 +20723,28 @@
         "conclusion": "cancelled"
       }
     }
-  ]
+  ],
+  "candidate_response_reference": {
+    "status": "local_verified_required_native_ci_queued",
+    "source_sha": "257c20f6cffca051cba620157e1cdc0276d4ef82",
+    "code_sha": "d639f849fa13eae7d39adbef5d4164720daf15dc",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/209",
+    "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39693905447",
+    "source_pushed": true,
+    "merged": false,
+    "local": {
+      "baseline": 57,
+      "new_cases": 19,
+      "target": 94,
+      "unit": 3761,
+      "failed": 0,
+      "skipped": 0,
+      "integration_interop_deselected": 1248,
+      "mypy_sources": 425,
+      "formatted_files": 1109,
+      "native_collected_only": 3
+    },
+    "scope": "Read original scoped candidate response through immutable dispatch ledger. Renewed lease and released claim cannot change original first reference; original receipt codec and readers retained. Durable response, including valid renewals past original lease, never grants live ownership/model/commit/retry authority.",
+    "remaining": "Native acceptance, candidate generation/prepare/dispatch/Sender, recovery/drain, default assembly and T18 actual faults"
+  }
 }

@@ -637,3 +637,12 @@ PR208追加虚拟阻断证据选择，最终657302d（代码e87a86b）/396933265
 候选准备/dispatch、generation终态、不可变首响应身份与租约续期、确定性恢复/取消drain及默认装配继续推进。M3仍16/36、T17不勾选；稳定SDK、生产、system和48小时观察未操作。
 
 GitHub普通取消请求后，旧main82bc619重复run仍停留queued；已对它及随后被取代的a4c457c重复run39692015129执行force-cancel，两者均回读completed/cancelled。两棵tree分别与已验c300e89、941e925精确一致，且均为新main e0ad323祖先；最新main及required PR全部保留，取消不计通过。
+
+
+### 2026-10-22 T17 串行 semantic 工具闭环与 candidate 首响应引用
+
+✅ infra PR132/5280ead全部19检查success，正常合并26be5d8；四个功能文件与已验候选逐字节一致。与源码PR204/e0ad323及六档34宿主/84证据共同闭环串行semantic内部子批次；不是完整T17、默认启用或生产验收。
+
+首响应引用PR209/257c20f（代码d639f84），39693905447排队：57旧兼容基线、19正反例、94目标、3761完整本地单元零失败跳过、425类型、1109格式及文档通过；1248 integration/interop明确排除，3原生仅收集。组织Run→不可变ledger→原receipt读取保留，续租只改变当前资格，不改变首次引用；claim释放后可读首响应，但原根继续拒绝失去的所有权。旧codec/schema及保存/读取器不变，没有模型或重试授权。GitHub创建PR首次GraphQL临时错误，查无重复PR后重试成功；未把push、排队或仅收集记为实际CI。
+
+M3保持16/36，T17未勾选；candidate完整事务链路、恢复/drain与默认装配仍待完成。生产、稳定SDK、system与48小时观察未操作。
