@@ -12821,19 +12821,39 @@
     }
   },
   "interpretation_claim_original_root": {
-    "status": "local_implementation_in_progress",
-    "candidate_sha": null,
+    "status": "required_ci_in_progress",
+    "candidate_sha": "e57d0c801016a51c8a534acaa632b65ca3f63a7a",
     "merged": false,
     "local": {
       "original_baseline": 15,
       "target": 24,
       "failed_after_fix": 0,
       "skipped": 0,
-      "native_collected_only": 8
+      "native_collected_only": 8,
+      "unit_on_main192": 3336,
+      "mypy_sources": 414,
+      "format_files": 1062
     },
     "scope": "Borrowed original active AsyncSession root, no own commit/rollback/open/close; original owned scanner retains20 candidates, locks/fences/attempt exhaustion, deferral and one host session; staged Claim is not commit, witness or model handoff authority; complete transaction Sender pending",
     "failure_history": [
-      "One new scanner test used AsyncSession.begin spec MagicMock as coroutine:23 pass/1 assertion failed; fixture changed to explicit AsyncMock,24 pass without app change"
-    ]
+      "One new scanner test used AsyncSession.begin spec MagicMock as coroutine:23 pass/1 assertion failed; fixture changed to explicit AsyncMock,24 pass without app change",
+      "After main alignment targeted command referenced nonexistent tests/test_interpretation_state_versions.py:0 collected exit4; corrected to actual tests/test_interpretation_state_plan.py,51 target and3336 full unit passed"
+    ],
+    "code_sha": "0e8e42baa703ba212303c917cb46cd2898686360",
+    "pr": "https://github.com/FangcunMount/qs-ai/pull/193",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39662264474"
+  },
+  "interpretation_claim_sender": {
+    "status": "local_implementation_in_progress",
+    "candidate_sha": null,
+    "merged": false,
+    "local": {
+      "target_with_original_root": 73,
+      "failed": 0,
+      "skipped": 0,
+      "native_collected_only": 18,
+      "mypy_sources": 416
+    },
+    "scope": "Explicit original candidate planner/root/Sender only; exact first source, wire and delta1/2, half-before-business, precise fresh witness+archive and active lease before first handoff; committed duplicate never repeats model admission. No-event quota denial aborts prepared state instead of publishing phantom running; operational deferral/scanner ownership/default runtime/full Broker and recovery gates pending"
   }
 }
