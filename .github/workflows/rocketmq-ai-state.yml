@@ -1,12 +1,12 @@
-name: RocketMQ AI worker state original SQL and published SDK
+name: RocketMQ AI worker and governance original SQL and published SDK
 on:
   workflow_dispatch:
     inputs:
       ai_ref:
-        description: Exact AI worker state candidate SHA
+        description: Exact AI worker and governance state candidate SHA
         type: string
         required: true
-        default: 0be8755af8600d0c62b95b31bf5a8e36841434f7
+        default: 9394c370600e0352a4a87eac9938306679b0b2eb
   pull_request:
     paths: ['scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ai_state_acceptance.py', 'scripts/rocketmq/test_ai_state_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-state.yml', 'Makefile']
 permissions:
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '0be8755af8600d0c62b95b31bf5a8e36841434f7' }}
+          ref: ${{ inputs.ai_ref || '9394c370600e0352a4a87eac9938306679b0b2eb' }}
           path: .ai-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -45,7 +45,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Verify exact AI state candidate and receipt gates
         env:
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '0be8755af8600d0c62b95b31bf5a8e36841434f7' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '9394c370600e0352a4a87eac9938306679b0b2eb' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
@@ -56,7 +56,7 @@ jobs:
           set -euo pipefail
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-ai-state:5.5.1 components/rocketmq
-      - name: Required actual worker, SDK and original state roots
+      - name: Required worker, governance, SDK and original state roots
         run: |
           set -euo pipefail
           make rocketmq-ai-state-test SDK_DIR="$PWD/.sdk-acceptance" AI_DIR="$PWD/.ai-acceptance" \

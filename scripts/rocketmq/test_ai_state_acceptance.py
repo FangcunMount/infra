@@ -29,17 +29,28 @@ class AIStateAcceptanceTests(unittest.TestCase):
         self.assertEqual(manifest['accounts']['ai']['publish'], [route['id']])
         self.assertEqual(manifest['accounts']['observer']['subscriptions'], [route['id']])
 
-    def test_exact_three_worker_tests_and_thirteen_state_proofs_are_required(self):
+    def test_exact_six_worker_governance_tests_and_twenty_proofs_are_required(self):
         profile = acceptance_profile('state')
-        self.assertEqual(profile['parse'](self.output(), self.junit())['passed'], 13)
+        self.assertEqual(profile['parse'](self.output(), self.junit())['passed'], 20)
         self.assertEqual(profile['file'], 'rocketmq_state_host.py')
         with self.assertRaises(RuntimeError):
             parse_admission_receipt(self.output(), self.junit())
 
+    def test_old_worker_only_receipt_cannot_claim_governance_or_full_review_acceptance(self):
+        profile = acceptance_profile('state')
+        receipt = self.receipt()
+        old = {name: value for name, value in receipt['cases'].items()
+               if not name.startswith(('governance_', 'review_'))}
+        receipt.update(cases=old, passed=len(old))
+        self.assertEqual(len(old), 13)
+        self.assertEqual(len(TESTS), 6)
+        with self.assertRaises(RuntimeError):
+            profile['parse'](self.output(receipt), self.junit())
+
     def test_other_profile_receipt_is_not_substituted_for_state_acceptance(self):
         old = 'M3_AI_ADMISSION_RECEIPT ' + json.dumps(dict(self.receipt(), cases={}, passed=0))
         profile = acceptance_profile('state')
-        self.assertEqual(profile['parse'](self.output() + '\n' + old, self.junit())['passed'], 13)
+        self.assertEqual(profile['parse'](self.output() + '\n' + old, self.junit())['passed'], 20)
         with self.assertRaises(RuntimeError):
             profile['parse'](old, self.junit())
 
