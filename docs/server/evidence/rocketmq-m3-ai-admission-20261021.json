@@ -1425,5 +1425,422 @@
     ],
     "source_merged": false,
     "production_changed": false
+  },
+  "receiver_native_failure": {
+    "source_sha": "30b3d321e4dfaeda6ee72c6df92947d30f65e25d",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39532387712",
+    "tested_merge_sha": "01c9216f719d8d782a7d02c2a68284743e145c66",
+    "verified_merge_parents": [
+      "c321a69411d1f9494de1e36f94834a974fbb15ea",
+      "30b3d321e4dfaeda6ee72c6df92947d30f65e25d"
+    ],
+    "per_mysql_collected": 3519,
+    "per_mysql_call_phase_passed": 3514,
+    "per_mysql_junit_failures": 2,
+    "per_mysql_junit_errors": 4,
+    "per_mysql_skipped": 0,
+    "per_mysql_evaluation_native_passed": 9,
+    "reports": [
+      {
+        "file": "shard-8.0.36-0.json",
+        "sha256": "07812ffac062489153033b21ba828246d2095d1fa5e13a90cb38d43ce4450c4c",
+        "revision": "01c9216f719d8d782a7d02c2a68284743e145c66",
+        "mysql": "8.0.36",
+        "index": 0,
+        "call_phase_passed": 880,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      {
+        "file": "shard-8.0.36-1.json",
+        "sha256": "f3c26ee8e6725b56501ddc93e4fab5296a1d16bf36d7d39d8b6e75cc7bc44992",
+        "revision": "01c9216f719d8d782a7d02c2a68284743e145c66",
+        "mysql": "8.0.36",
+        "index": 1,
+        "call_phase_passed": 879,
+        "skipped": 0,
+        "exitstatus": 1
+      },
+      {
+        "file": "shard-8.0.36-2.json",
+        "sha256": "abf7f04f92b70d784b1b7416533d66f293cfb61afc84dbf70553ad7c7a3375f1",
+        "revision": "01c9216f719d8d782a7d02c2a68284743e145c66",
+        "mysql": "8.0.36",
+        "index": 2,
+        "call_phase_passed": 879,
+        "skipped": 0,
+        "exitstatus": 1
+      },
+      {
+        "file": "shard-8.0.36-3.json",
+        "sha256": "651532c75283b551e6483e2652523e2396b5559e5248d886bf3c9b46cb4937a6",
+        "revision": "01c9216f719d8d782a7d02c2a68284743e145c66",
+        "mysql": "8.0.36",
+        "index": 3,
+        "call_phase_passed": 876,
+        "skipped": 0,
+        "exitstatus": 1
+      },
+      {
+        "file": "shard-8.4-0.json",
+        "sha256": "31e3403896798ade04ed46f17eb8de22794c419e4ef0b787c024f143603198ce",
+        "revision": "01c9216f719d8d782a7d02c2a68284743e145c66",
+        "mysql": "8.4",
+        "index": 0,
+        "call_phase_passed": 880,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      {
+        "file": "shard-8.4-1.json",
+        "sha256": "fbb86c7a58d63f1a8418193a17deecd8972f1019b0d1c493663e8446b8b321bd",
+        "revision": "01c9216f719d8d782a7d02c2a68284743e145c66",
+        "mysql": "8.4",
+        "index": 1,
+        "call_phase_passed": 879,
+        "skipped": 0,
+        "exitstatus": 1
+      },
+      {
+        "file": "shard-8.4-2.json",
+        "sha256": "defeaa4193d7e5462477f616269a3f3716b4bc1d51af757bf48e6558219285c4",
+        "revision": "01c9216f719d8d782a7d02c2a68284743e145c66",
+        "mysql": "8.4",
+        "index": 2,
+        "call_phase_passed": 879,
+        "skipped": 0,
+        "exitstatus": 1
+      },
+      {
+        "file": "shard-8.4-3.json",
+        "sha256": "250a42ce1a4e2dc5ccfdb1e3ad91050770b9222fcc9674a7f527b4b2ab0c2cce",
+        "revision": "01c9216f719d8d782a7d02c2a68284743e145c66",
+        "mysql": "8.4",
+        "index": 3,
+        "call_phase_passed": 876,
+        "skipped": 0,
+        "exitstatus": 1
+      }
+    ],
+    "causes": [
+      "technical budget read called original-transaction binder without explicit begin; technical hold then reached the failing legacy hook while recording that technical failure",
+      "autouse cleanup created participant before publication; inverse teardown violated publication foreign keys and caused three later fixture setup errors"
+    ],
+    "fixes": [
+      "6597f45 explicit original technical-ledger read transaction plus expected red regression",
+      "76bf130/f528e63 explicit receiver_host cleanup after publication setup; static setup-plan verified; missing intermediate fixture export corrected before CI"
+    ],
+    "source_merged": false,
+    "accepted": false
+  },
+  "native_evaluation_receiver_acceptance": {
+    "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39534228137",
+    "tested_merge_sha": "5ce8b7cd7b903ff946ef9beae8bc2a5cc9208875",
+    "reports": [
+      {
+        "file": "shard-8.0.36-0.json",
+        "sha256": "971d9e7395a9998b1cec03ea4af4fea6b3f4e5bc8ab28bd48e8c38b4a74d5293",
+        "revision": "5ce8b7cd7b903ff946ef9beae8bc2a5cc9208875",
+        "mysql": "8.0.36",
+        "index": 0,
+        "passed": 880
+      },
+      {
+        "file": "shard-8.0.36-1.json",
+        "sha256": "c63fd89a239c7426a4d73bd6cfc66a322a5c574ca9a387736045351de6af496b",
+        "revision": "5ce8b7cd7b903ff946ef9beae8bc2a5cc9208875",
+        "mysql": "8.0.36",
+        "index": 1,
+        "passed": 880
+      },
+      {
+        "file": "shard-8.0.36-2.json",
+        "sha256": "f5d440c803de1f9c2f58e5b65259a007f8259855d032115906cd5ba59f3beb66",
+        "revision": "5ce8b7cd7b903ff946ef9beae8bc2a5cc9208875",
+        "mysql": "8.0.36",
+        "index": 2,
+        "passed": 880
+      },
+      {
+        "file": "shard-8.0.36-3.json",
+        "sha256": "a06681acce22da5a68b8619a0e973dadac63f02adeecc0e2576b750deee276d1",
+        "revision": "5ce8b7cd7b903ff946ef9beae8bc2a5cc9208875",
+        "mysql": "8.0.36",
+        "index": 3,
+        "passed": 880
+      },
+      {
+        "file": "shard-8.4-0.json",
+        "sha256": "0d321c52522441b766d8793554dcae43135f6918e97053538373de9c5b41fca8",
+        "revision": "5ce8b7cd7b903ff946ef9beae8bc2a5cc9208875",
+        "mysql": "8.4",
+        "index": 0,
+        "passed": 880
+      },
+      {
+        "file": "shard-8.4-1.json",
+        "sha256": "99b4701380b242cf9dd33214e1dcba605671312bff79831daf58be28fd565c1a",
+        "revision": "5ce8b7cd7b903ff946ef9beae8bc2a5cc9208875",
+        "mysql": "8.4",
+        "index": 1,
+        "passed": 880
+      },
+      {
+        "file": "shard-8.4-2.json",
+        "sha256": "16036d041917c20324e0be0e85e2ccdb8512ba938d1429a9416b03ef059dafd9",
+        "revision": "5ce8b7cd7b903ff946ef9beae8bc2a5cc9208875",
+        "mysql": "8.4",
+        "index": 2,
+        "passed": 880
+      },
+      {
+        "file": "shard-8.4-3.json",
+        "sha256": "22ef5f78c61d9e3e2c03c8481cac0569203419f2a1ea314e10fa90a88765dfdb",
+        "revision": "5ce8b7cd7b903ff946ef9beae8bc2a5cc9208875",
+        "mysql": "8.4",
+        "index": 3,
+        "passed": 880
+      }
+    ],
+    "profiles": {
+      "8.0.36": {
+        "passed": 3520,
+        "failed": 0,
+        "skipped": 0,
+        "native_evaluation": 9,
+        "native_receiver": 4,
+        "nonoverlapping_complete": true
+      },
+      "8.4": {
+        "passed": 3520,
+        "failed": 0,
+        "skipped": 0,
+        "native_evaluation": 9,
+        "native_receiver": 4,
+        "nonoverlapping_complete": true
+      }
+    },
+    "checks_success": 12,
+    "messaging_success": 2,
+    "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39534228024",
+    "verified_merge_parents": [
+      "c321a69411d1f9494de1e36f94834a974fbb15ea",
+      "2bfbb65d8aff3ea6dce69fe170827c8164e470db"
+    ],
+    "source_merged": false,
+    "broker_verified": false,
+    "messaging_reports": [
+      {
+        "file": "m7-qs-ai-mysql-8.0.36/m7-m3-schema.xml",
+        "sha256": "5bb3e66b26de499ed6c9f2222ce1f7202312a9e57e2d46bd16a3ca06bc66b511",
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.0.36/m7-storage.xml",
+        "sha256": "d2fc85a77227ec08ecc03c301a0dd2c539d1a8314da2efb3aef6593c184ed6f9",
+        "passed": 85,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.0.36/m7-unit.xml",
+        "sha256": "7f5b2f3239a854dff95d4325a0073498a5a65ac40014da3d880eef37f9e159c9",
+        "passed": 119,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.4/m7-m3-schema.xml",
+        "sha256": "5388377f4e12ad5db88e405d5a6d3a4956597a682c8a1ef8a5c8dc5916a7148c",
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.4/m7-storage.xml",
+        "sha256": "5f6de0e8fe3791a7164096299440e88b46a6224fbb1d002b4dba20088e68debd",
+        "passed": 85,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.4/m7-unit.xml",
+        "sha256": "a25869e1cebebdc8f1b6df8e3b5129456d75415cdf6ac8f8667710af753346e9",
+        "passed": 119,
+        "failed": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "broker_profile_candidate": {
+    "ai_source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+    "infra_sha": "8ad7f7a6a39da054e5384199b46765bbc6880427",
+    "pull_request": "https://github.com/FangcunMount/infra/pull/83",
+    "checks": "https://github.com/FangcunMount/infra/actions/runs/39539009218",
+    "python": [
+      "3.11",
+      "3.13"
+    ],
+    "mysql": [
+      "8.0.36",
+      "8.0.44",
+      "8.4.11"
+    ],
+    "sdk": "0.4.0a1 released wheel, client5.1.2",
+    "host_tests": 8,
+    "required_cases": 15,
+    "harness_unit_passed": 66,
+    "status": "queued_retry_after_fixture_timestamp_fix",
+    "verified": false,
+    "production_changed": false
+  },
+  "latest_local_gate": {
+    "source_sha": "f528e63db17c8085199de1f69b86f76d622b8636",
+    "unit_passed": 2625,
+    "integration_interop_deselected": 895,
+    "mypy_source_files": 381,
+    "ruff": "passed",
+    "format_files": 932,
+    "docs_markdown_files": 75,
+    "docs_links": 1315
+  },
+  "broker_first_failure": {
+    "checks": "https://github.com/FangcunMount/infra/actions/runs/39535745152",
+    "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+    "infra_sha": "76a0b1e082edbad168a1f1018a7234051ab8d7fc",
+    "reports": [
+      {
+        "file": "rocketmq-ai-admission-0-3.11-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "d9bcb41ea4327f5285f74c0651da140c2f1e8e210006cf68a629e783057fcd14",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.11.16",
+        "mysql_version": "8.0.36",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "99953494a04fe00d793e3e5e42f724151e7c60f2c1da93aa2804f6231235b087",
+        "junit_sha256": "aa357529e138003e4c16386fc74736ef18d3dc72ebae90ba4a1f24ed6e63737b",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-1-3.11-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "d250821b7162254f51d17cc60956c96422ba6e6b55f49b48ddd0a28b7ecdce3c",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.11.16",
+        "mysql_version": "8.0.44",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "3fb30b1625415b3bc45dade626c36ac489d3d179c33c371c620eb7c7cc51a200",
+        "junit_sha256": "f9b96a891e2f4d1d46bb7dd26632994f6d6a268766d4c996b6ed069ab54747b9",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-2-3.11-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "dcb10fec64107dbc9555c0c006771838fb28881cb2a61d9b73aa2e80c69bb774",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.11.16",
+        "mysql_version": "8.4.11",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "920ef2132c2ff1009726e7b7939507c23612e4ee9d53bb529aef1f06e8111081",
+        "junit_sha256": "6367447f294e41b77c6f37ff12c758df52f12b492e5b183b520d81a5db9398bf",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-3-3.13-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "d9b0d15d9faa5002b72b82c44b45f109b64ab90e3b8e569cfd98b17cf9cee0eb",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.13.15",
+        "mysql_version": "8.0.36",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "620c3403fe4fb205afd3346d779d7611d7ccb6fa62b86ae1fc4e36dddd3aa008",
+        "junit_sha256": "6c2fbb8360c68c835fddeb5a8410fcd6d9ff6d4f80a66d5b8c146386b5c1bbda",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-4-3.13-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "1018ff6665e703e97113584230a0de81a0f833ac85cdd69aa85d9a3edd590280",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.13.15",
+        "mysql_version": "8.0.44",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "42c8fece36bb0249b1ffc982db3741b5b860db514f8d9130665ba078fbace00d",
+        "junit_sha256": "51da38ce68f269332ab5f24f57429f762ca2f7467b4b800c0c15f7028933b22f",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-5-3.13-0d3018dbf818475ce0496b8bf7f132b67cc6d501/rocketmq-ai-admission.json",
+        "sha256": "111841e72ebcf205a8c5ff1e3ba2a516c51a16d507877649de63a8cd0ed30a0a",
+        "source_sha": "2bfbb65d8aff3ea6dce69fe170827c8164e470db",
+        "python": "3.13.15",
+        "mysql_version": "8.4.11",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "private_output_sha256": "5d8a46afbddb87a20ce06e6889d1b1fe3265d1100131dae60830c50f12283d5b",
+        "junit_sha256": "3b12bcd7c591a379b64d0cadd95da4d0c74c23a11b415be316753d419f7d66a2",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "cause": "Historical control-input helper omits original_occurred_at. Frozen SDK Message rejects empty timestamp at freeze_branch before these input halves are prepared; local reproduction matches ValueError field64/empty.",
+    "fix_sha": "cde36ea39b0e7bef584b93acd7fadba99048859a",
+    "fix": "Optional explicit first timestamp passed before the initial fixture seal for all five command families. Historical default unchanged; no wire reconstruction after freezing.",
+    "fixture_protocol_regressions": 6,
+    "targeted_selected_passed": 36,
+    "interop_deselected": 9,
+    "application_src_unchanged_from_verified_2bf": true,
+    "accepted": false
+  },
+  "latest_ai_ci_candidate": {
+    "source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39538869956",
+    "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39538869952",
+    "status": "in_progress",
+    "not_yet_passed": true
   }
 }
