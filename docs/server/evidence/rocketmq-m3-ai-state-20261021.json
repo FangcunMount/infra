@@ -4410,13 +4410,17 @@
     "verified_infra_merge_parents": [
       "60a7d5dc6057d9f1cf60ea8cb60100bfb7771011",
       "528d17d67c83ea381e8bd2bf0fbd732e74ed51fd"
-    ]
+    ],
+    "infra_source_merged": true,
+    "infra_merge_sha": "6ce188c9728c6fe34286d9981e579d7ba34e6c1f",
+    "infra_required_checks_successful": 19,
+    "effective_harness_files_equal_tested_source": true
   },
   "creation_transaction_followup": {
-    "status": "local_implementation_in_progress",
+    "status": "candidate_pushed_required_ci_pending",
     "branch": "codex/rocketmq-m3-ai-creation-state",
     "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-creation",
-    "pushed": false,
+    "pushed": true,
     "merged": false,
     "task_completed": false,
     "local_target_passed": 52,
@@ -4435,6 +4439,86 @@
       "Required source/native CI",
       "Real Broker creation profile"
     ],
-    "default_runtime_assembly_enabled": false
-  }
+    "default_runtime_assembly_enabled": false,
+    "source_sha": "9900f6fb22af56e08a189c9133e0bd5435675e07",
+    "code_sha": "0f08068a7048f71a018e62cd6941c2eb7bed133a",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/168",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39611367088",
+    "full_unit": {
+      "passed": 2922,
+      "failed": 0,
+      "deselected": 965,
+      "warnings": 6
+    },
+    "format_files": 816,
+    "docs": {
+      "files": 75,
+      "links": 1338,
+      "errors": 0
+    }
+  },
+  "creation_sender_followup": {
+    "status": "candidate_pushed_required_ci_pending",
+    "source_sha": "53dd0b62e9e8fe71aa92304b7807d87cfb80620b",
+    "code_sha": "dee74c5e45854e0af259a851d96c2ffff4c2df39",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/169",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39612107587",
+    "pr_base": "codex/rocketmq-m3-ai-creation-state",
+    "pushed": true,
+    "merged": false,
+    "target_passed": 78,
+    "full_unit": {
+      "passed": 2943,
+      "failed": 0,
+      "dependency_cases_excluded_by_marker": true,
+      "warnings": 4
+    },
+    "mypy_source_files": 398,
+    "format_files": 819,
+    "docs": {
+      "files": 75,
+      "links": 1339,
+      "errors": 0
+    },
+    "native_cases_collected": 14,
+    "native_executed": false,
+    "preserved": [
+      "Exact original current view on same creation replay, including after start and host mode changes",
+      "Legacy creation receipt remains legacy; no new half or adopted witness",
+      "Prepared/Aborted SDK records stay unresolved; no automatic retry",
+      "Original local root response after exact witness and archive proof, including FinalUnknown",
+      "Authoritative input conflict classification without exception-text parsing",
+      "One reservation winner invokes the original business executor"
+    ],
+    "default_runtime_assembly_enabled": false,
+    "system_acceptance": false,
+    "production_changed": false
+  },
+  "solution_prepare_followup": {
+    "status": "original_prompt_freeze_readonly_extraction_local_only",
+    "branch": "codex/rocketmq-m3-ai-solution-freeze-plan",
+    "pushed": false,
+    "merged": false,
+    "target_passed": 26,
+    "mypy_source_files": 398,
+    "new_native_cases_collected": 2,
+    "native_executed": false,
+    "remaining": [
+      "Full frozen route/profile/suite/Run plan",
+      "Original all-assets plus Run guarded root",
+      "Solution command receipt replay proof",
+      "Required source/native and actual Broker acceptance"
+    ],
+    "original_baseline": {
+      "passed": 2,
+      "failed_assumption_before_application_edit": "Test used logical asset/receipt table names instead of actual governance_asset_versions/governance_prompt_draft_freezes and body_bytes",
+      "private_failed_logs": [
+        "/tmp/m3-t17-solution-freeze-baseline.log",
+        "/tmp/m3-t17-solution-freeze-baseline-fixed.log"
+      ],
+      "private_original_pass_log": "/tmp/m3-t17-solution-freeze-original-final.log"
+    },
+    "task_completed": false
+  },
+  "updated_at": "2026-10-21T13:57:34.596485+00:00"
 }
