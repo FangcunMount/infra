@@ -4709,7 +4709,14 @@
       "deselected": 983,
       "warnings": 6
     },
-    "code_sha": "0d8bbe7"
+    "code_sha": "0d8bbe7ece955739b61ab86ca6f1cf3b7fd4987e",
+    "local_source_sha": "853c21670de97504c80c14ec5424c73dd9bc51af",
+    "docs": {
+      "files": 75,
+      "links": 1342,
+      "errors": 0
+    },
+    "format_files": 824
   },
   "updated_at": "2026-10-21T14:06:42.199893+00:00"
 }
