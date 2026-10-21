@@ -5,8 +5,8 @@
   "progress": "16/36",
   "base": "e8392c0582020d6cacf44c6caaa2f2061c66cb41",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-state",
-  "branch": "codex/rocketmq-m3-ai-review",
-  "source_candidate": "26810621bb75b5d5a7f31a994606b87971a68892",
+  "branch": "codex/rocketmq-m3-ai-state-broker",
+  "source_candidate": "9394c370600e0352a4a87eac9938306679b0b2eb",
   "source_pushed": true,
   "source_merged": false,
   "production_assembly_enabled": false,
@@ -604,7 +604,7 @@
     "Keep deterministic model-response finalization as T18 and full runtime/history/ACK as T19",
     "Merge only after required gates; T17 remains unchecked"
   ],
-  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/162",
+  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/164",
   "source_pr_draft": true,
   "foundation_native_acceptance": {
     "source_sha": "b4eedb634adefa50ea818ac6cf26e119e29b94fd",
@@ -804,7 +804,7 @@
     "docs_files": 75,
     "docs_links": 1321
   },
-  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39562163112",
+  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39599970243",
   "worker_preflight_native_cases": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
     "file": "tests/integration/test_transaction_worker_preflight.py",
@@ -1405,7 +1405,7 @@
     "no_task_completion_claimed": true,
     "native_status": "cbc47d9 both MySQL profiles: 3649 passed, including corrected original atomic-root case; zero failed/skipped"
   },
-  "source_candidate_branch": "codex/rocketmq-m3-ai-review",
+  "source_candidate_branch": "codex/rocketmq-m3-ai-state-broker",
   "failure_history": [
     {
       "source_sha": "3cf74b5eccc66bd271d4d8e250714e4a312bde59",
@@ -2197,14 +2197,14 @@
     "base_pr": null,
     "base": "main with governance PR161 merged",
     "pushed": true,
-    "merged": false,
+    "merged": true,
     "targeted_passed": 96,
     "mypy_source_files": 392,
     "native_cases_collected": 12,
-    "native_executed": false,
+    "native_executed": true,
     "scope": "full35 input digest and original clock facts; original pre/post-write audits, guarded review root, shared dispatcher and explicit RPC adapter; default assembly disabled",
     "task_completed": false,
-    "source_ci_status": "in progress for current source",
+    "source_ci_status": "all 12 checks succeeded; both profiles 3759 passed and 12 review root cases each, zero failures/skips",
     "full_local_status": "passed",
     "docs": {
       "files": 75,
@@ -2217,7 +2217,10 @@
       "failed": 0,
       "deselected": 933,
       "warnings": 4
-    }
+    },
+    "merge_sha": "4a8993c9b3424c42de11326b3c6bbcf4f4a35dc8",
+    "merged_tree_equals_candidate": true,
+    "candidate_tree_sha": "2c15d495fa39052db61ad049bd5ba8b58f394ec5"
   },
   "foundation_messaging_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39559277604",
   "source_messaging_ci": null,
@@ -2508,5 +2511,196 @@
     },
     "current_head_checks_success": 12,
     "scope": "Read-only original review planning only, one/full35; does not prove the later review SDK execution root."
+  },
+  "review_transaction_source_verified": {
+    "source_sha": "26810621bb75b5d5a7f31a994606b87971a68892",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39598394073",
+    "tested_merge_sha": "a526f661c6fdce6e4ad466b9b1b895c1c6acd9bd",
+    "verified_merge_parents": [
+      "6a3adb8e69c4579332e52a7676fce46123d66058",
+      "26810621bb75b5d5a7f31a994606b87971a68892"
+    ],
+    "reports": [
+      {
+        "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+        "sha256": "28ecf1c6d60e88d21b9a3a9b224da6e75bce85e278e714477bf26861473be872",
+        "xml_sha256": "1090b7a05eafeecb27156062d365d30357199227f1c709e2269493e4ea761ce8",
+        "revision": "a526f661c6fdce6e4ad466b9b1b895c1c6acd9bd",
+        "mysql": "8.0.36",
+        "index": 0,
+        "passed": 940,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+        "sha256": "945f250a2efef8e9b2ac43726c0ce808dca4840c297cd8a15bcaa7168a16f65e",
+        "xml_sha256": "75a9a833cbd1002e0bdfc60fd742f3c558507cac217766271a8dea08c44e1568",
+        "revision": "a526f661c6fdce6e4ad466b9b1b895c1c6acd9bd",
+        "mysql": "8.0.36",
+        "index": 1,
+        "passed": 940,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+        "sha256": "9dbe906f1547fc04ad8f6bb0650eb1c81b62bee1511282a2d60fb8c4da3a89ca",
+        "xml_sha256": "9457d30377820f70dc31b9badd77fe16bedd39b888a1309189d1f8177ef20eb4",
+        "revision": "a526f661c6fdce6e4ad466b9b1b895c1c6acd9bd",
+        "mysql": "8.0.36",
+        "index": 2,
+        "passed": 940,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+        "sha256": "45bd1efb883f447140acae6e269c9b1e7142687bcb951d17fbfe328995c71b0f",
+        "xml_sha256": "1de07c7af125037b3b54768425424d269b8b2885cdc6cb171d18e8ba9c60efbe",
+        "revision": "a526f661c6fdce6e4ad466b9b1b895c1c6acd9bd",
+        "mysql": "8.0.36",
+        "index": 3,
+        "passed": 939,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.4-0/shard-8.4-0.json",
+        "sha256": "1e5aa3f36f059d39ad9f686f4cf63adcf4bd32acab35eb0eed6cdec6b82d0a7d",
+        "xml_sha256": "63da21d9a3e1340611f2cecaa4debbfb899d46a1f20704776dab97a7e20e8898",
+        "revision": "a526f661c6fdce6e4ad466b9b1b895c1c6acd9bd",
+        "mysql": "8.4",
+        "index": 0,
+        "passed": 940,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.4-1/shard-8.4-1.json",
+        "sha256": "9f99afd8a8e504e1ba1e9c22ffa66f5743ba04070e60a3e4f3519a02c1a7fcd9",
+        "xml_sha256": "0e34917527c7ac7199cb813881ec55135904020090f5a43ce651d8fb849334f4",
+        "revision": "a526f661c6fdce6e4ad466b9b1b895c1c6acd9bd",
+        "mysql": "8.4",
+        "index": 1,
+        "passed": 940,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.4-2/shard-8.4-2.json",
+        "sha256": "d005048271e27f131aa28b3c4765289d4d717c758d32a30d7776aa27a622d19f",
+        "xml_sha256": "5cbcc0a91c4787f2d9f116271fc42121cb5629e2c6aa4c7718f571715eaf48fb",
+        "revision": "a526f661c6fdce6e4ad466b9b1b895c1c6acd9bd",
+        "mysql": "8.4",
+        "index": 2,
+        "passed": 940,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.4-3/shard-8.4-3.json",
+        "sha256": "ccaa5f78957eac36b7b358397c2f39240e4f555275443a73e7aa8a76bce644a6",
+        "xml_sha256": "9a58e0f9e6c7fbb674d1ebeb73ad1222cc3c981954bfa20a79d2d84229d9dd88",
+        "revision": "a526f661c6fdce6e4ad466b9b1b895c1c6acd9bd",
+        "mysql": "8.4",
+        "index": 3,
+        "passed": 939,
+        "failed": 0,
+        "skipped": 0
+      }
+    ],
+    "profiles": {
+      "8.0.36": {
+        "collected": 3759,
+        "passed": 3759,
+        "failed": 0,
+        "skipped": 0,
+        "native": {
+          "test_transaction_admission_root": 8,
+          "test_transaction_start_admission": 4,
+          "test_transaction_change_admission": 4,
+          "test_transaction_retry_admission": 3,
+          "test_transaction_evaluation_admission": 9,
+          "test_transaction_command_receiver": 4,
+          "test_transaction_evaluation_state_root": 6,
+          "test_transaction_worker_preflight": 5,
+          "test_transaction_governance_state": 12,
+          "test_review_readonly_planning": 2,
+          "test_transaction_review_state": 12,
+          "test_review_correction_readonly": 0
+        }
+      },
+      "8.4": {
+        "collected": 3759,
+        "passed": 3759,
+        "failed": 0,
+        "skipped": 0,
+        "native": {
+          "test_transaction_admission_root": 8,
+          "test_transaction_start_admission": 4,
+          "test_transaction_change_admission": 4,
+          "test_transaction_retry_admission": 3,
+          "test_transaction_evaluation_admission": 9,
+          "test_transaction_command_receiver": 4,
+          "test_transaction_evaluation_state_root": 6,
+          "test_transaction_worker_preflight": 5,
+          "test_transaction_governance_state": 12,
+          "test_review_readonly_planning": 2,
+          "test_transaction_review_state": 12,
+          "test_review_correction_readonly": 0
+        }
+      }
+    },
+    "current_head_checks_success": 12,
+    "scope": "Original review roots and direct full35 RPC handler with DB-only runtime; actual Broker proof remains separate."
+  },
+  "correction_readonly_followup": {
+    "source_sha": "eba5d53cb7c54d63e5f0e5bc8d31b80c18fd0519",
+    "code_sha": "b282b5a7ef275fcbf466f227c60f21a354eb53f7",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/163",
+    "source_branch": "codex/rocketmq-m3-ai-review-correction",
+    "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-correction",
+    "pushed": true,
+    "merged": false,
+    "targeted_passed": 30,
+    "full_unit": {
+      "passed": 2836,
+      "deselected": 937,
+      "failed": 0,
+      "warnings": 6
+    },
+    "local_python": "3.11.3",
+    "mypy_source_files": 392,
+    "format_files": 970,
+    "docs": {
+      "files": 75,
+      "links": 1331,
+      "errors": 0
+    },
+    "native_cases_collected": 4,
+    "native_executed": false,
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39599193045",
+    "checks_status": "in progress",
+    "scope": "Original read-only correction planning and exact historical replay-before-CAS; no correction SDK dispatcher yet",
+    "task_completed": false
+  },
+  "broker_governance_followup": {
+    "source_sha": "9394c370600e0352a4a87eac9938306679b0b2eb",
+    "code_sha": "1abb1f21da3877fa3991c88473fb6c450f70be12",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/164",
+    "source_pushed": true,
+    "source_merged": false,
+    "harness_sha": "1d4a73cf43739cf451213638e9342ecb57e476dc",
+    "harness_pr": "https://github.com/FangcunMount/infra/pull/93",
+    "helper_tests_passed": 76,
+    "native_cases_collected": 6,
+    "required_protocol_flags": 20,
+    "native_executed": false,
+    "checks": "https://github.com/FangcunMount/infra/actions/runs/39600072506",
+    "checks_status": "queued/in progress, not accepted",
+    "scope": "Existing worker3 plus actual SDK/Broker finalize-reopen, full35 Review handler and review conflict rollback; event observer only; no system/provider/packet fault/SIGKILL claim",
+    "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39599970243",
+    "source_ci_status": "in progress"
   }
 }
