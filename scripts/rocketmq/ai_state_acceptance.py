@@ -31,7 +31,11 @@ CASES = frozenset(('constructor_inert', 'halves_before_worker_root', 'half_invis
     'interpretation_finish_first_question_sequence',
     'interpretation_finish_durable_artifact_no_new_invocation',
     'interpretation_finish_repeat_no_replan_or_send',
-    'interpretation_finish_source_conflict_rollback'))
+    'interpretation_finish_source_conflict_rollback',
+    'claim_half_invisible_running', 'claim_half_invisible_exhausted',
+    'claim_final_unknown_keeps_commit', 'claim_first_handoff_once',
+    'claim_original_business_archive_witness', 'claim_duplicate_no_handoff_or_send',
+    'claim_source_conflict_rollback', 'claim_quota_deferral_no_phantom_event'))
 TESTS = frozenset((
     'test_actual_worker_preflight_half_gate_and_duplicate_preserve_original_evidence',
     'test_actual_worker_preflight_lost_final_reply_preserves_local_commit',
@@ -51,7 +55,11 @@ TESTS = frozenset((
     'test_actual_interpretation_finish_question_half_gate_first_wire_and_final_unknown',
     'test_actual_interpretation_finish_failure_half_gate_first_wire_and_final_unknown',
     'test_actual_interpretation_finish_artifact_half_gate_first_wire_and_final_unknown',
-    'test_actual_interpretation_finish_source_conflict_rolls_back_without_new_send'))
+    'test_actual_interpretation_finish_source_conflict_rolls_back_without_new_send',
+    'test_actual_interpretation_claim_running_half_gate_first_handoff_and_final_unknown',
+    'test_actual_interpretation_claim_exhausted_two_transitions_and_final_unknown',
+    'test_actual_interpretation_claim_source_conflict_rolls_back_without_handoff',
+    'test_actual_interpretation_claim_capacity_denial_cannot_publish_running'))
 
 
 def state_manifest():
