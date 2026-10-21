@@ -1,0 +1,72 @@
+name: RocketMQ AI admission original SQL and published SDK
+on:
+  workflow_dispatch:
+    inputs:
+      ai_ref:
+        description: Exact AI admission candidate SHA
+        type: string
+        required: true
+        default: 9485f28f9bf7d078b691b6b561473272d436e5ba
+  pull_request:
+    paths: ['scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/test_ai_admission_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-admission.yml', 'Makefile']
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-ai-admission-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  original-ai-root:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.13']
+        mysql: ['mysql:8.0.36', 'mysql:8.0.44', 'mysql:8.4.11']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 8fb6fc57a415dc11e27fc64d71722f9675838bc3
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-ai
+          ref: ${{ inputs.ai_ref || '9485f28f9bf7d078b691b6b561473272d436e5ba' }}
+          path: .ai-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .sdk-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: ${{ matrix.python }}
+      - name: Verify exact AI candidate and harness gates
+        env:
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '9485f28f9bf7d078b691b6b561473272d436e5ba' }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .ai-acceptance rev-parse HEAD)" = "$EXPECTED_AI_SHA"
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+      - name: Build verified isolated Broker
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-ai-admission:5.5.1 components/rocketmq
+      - name: Required actual AI receiver, SDK and original SQL roots
+        run: |
+          set -euo pipefail
+          make rocketmq-ai-admission-test SDK_DIR="$PWD/.sdk-acceptance" AI_DIR="$PWD/.ai-acceptance" \
+            ROCKETMQ_TEST_IMAGE=rocketmq-ai-admission:5.5.1 \
+            AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' ROCKETMQ_TEST_MYSQL_IMAGE='${{ matrix.mysql }}' \
+            ROCKETMQ_AI_ADMISSION_REPORT=rocketmq-ai-admission.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-ai-admission-${{ strategy.job-index }}-${{ matrix.python }}-${{ github.sha }}
+          path: rocketmq-ai-admission.json
+          if-no-files-found: error
+          retention-days: 14

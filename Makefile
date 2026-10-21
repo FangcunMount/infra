@@ -1597,3 +1597,13 @@ rocketmq-iam-native-test: ## IAM 固定 MySQL 离线原事务/HTTP 验证；仅�
 	$(call require_param,MYSQL_TEST_IMAGE,MYSQL_TEST_IMAGE must name an existing fixed MySQL8.0.36/8.0.44/8.4 image)
 	$(call require_param,IAM_NATIVE_REPORT,IAM_NATIVE_REPORT must name a new file in an owned0700 directory)
 	python3 scripts/rocketmq/iam_native.py --iam "$(IAM_DIR)" --mysql-image "$(MYSQL_TEST_IMAGE)" --report "$(IAM_NATIVE_REPORT)"
+
+.PHONY: rocketmq-ai-admission-test
+rocketmq-ai-admission-test: ## 隔离验证 AI 原事务接收器/固定 SDK/Broker；不操作生产
+	$(call require_param,SDK_DIR,SDK_DIR must name a fixed clean SDK checkout)
+	$(call require_param,AI_DIR,AI_DIR must name a fixed clean AI checkout)
+	$(call require_param,ROCKETMQ_TEST_IMAGE,ROCKETMQ_TEST_IMAGE must name an existing owned Broker image)
+	QS_AI_ACCEPTANCE_PYTHON="$(or $(AI_ACCEPTANCE_PYTHON),3.13)" \
+		python3 scripts/rocketmq/ci-transactions.py --sdk "$(SDK_DIR)" --ai-admission-host "$(AI_DIR)" \
+		--image "$(ROCKETMQ_TEST_IMAGE)" --mysql-image "$(or $(ROCKETMQ_TEST_MYSQL_IMAGE),mysql:8.0.36)" \
+		--report "$(or $(ROCKETMQ_AI_ADMISSION_REPORT),rocketmq-ai-admission.json)"
