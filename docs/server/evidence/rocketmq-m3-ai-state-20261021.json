@@ -5212,7 +5212,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T15:14:22.496268+00:00",
+  "updated_at": "2026-10-21T15:23:03.796320+00:00",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -5634,5 +5634,44 @@
       "links": 1352,
       "errors": 0
     }
+  },
+  "solution_broker_followup": {
+    "status": "pushed_exact_matrix_pending",
+    "source_sha": "9eaac0ac5694e7e597c65c8fb474f3b68240e69c",
+    "code_sha": "8e3dbd5ba1365546af8ea3b987e39be6fecf05f0",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/174",
+    "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39624176189",
+    "infra_sha": "0b702f68fcec4171e7c83912b5097b126fef0d15",
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/104",
+    "checks": "https://github.com/FangcunMount/infra/actions/runs/39624273750",
+    "required_host_tests": 10,
+    "required_flags": 30,
+    "harness_unit_passed": 78,
+    "collected_locally": 10,
+    "executed_locally": false,
+    "merged": false,
+    "scope": "Actual Solution Prepare handler, half invisibility, complete original assets/Run/receipt/witness, first wire, client-discarded final RPC reply, immutable receipt replay, source-conflict rollback; observer is not paired QS or real provider",
+    "production_changed": false
+  },
+  "resolution_readonly_plan": {
+    "status": "pushed_required_ci_pending",
+    "source_sha": "06ac70981b56b6ae571b0fdf3d30ea346ff6b957",
+    "code_sha": "f925cfa7249dfce5e7b8e85bbc85a0b0953e080f",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/175",
+    "baseline_passed_before_refactor": 7,
+    "target_passed": 36,
+    "full_unit": {
+      "passed": 3071,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 1026,
+      "warnings": 6
+    },
+    "native_collected": 4,
+    "native_executed": false,
+    "mypy_source_files": 403,
+    "format_files": 1016,
+    "scope": "Original unknown evidence, manual decision audit, lock/CAS/root/capacity ownership unchanged; immutable read-only plan only; no resolution SDK send claimed",
+    "default_runtime_assembly_enabled": false
   }
 }
