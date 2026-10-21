@@ -6,9 +6,9 @@
   "base": "e8392c0582020d6cacf44c6caaa2f2061c66cb41",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-creation",
   "branch": "codex/rocketmq-m3-ai-creation-plan",
-  "source_candidate": "fd6f9bef13873536f89a50af9b6b68ccabeab012",
+  "source_candidate": "a864895a17a7c0eed13efe8bdc7f960380764007",
   "source_pushed": true,
-  "source_merged": true,
+  "source_merged": false,
   "production_assembly_enabled": false,
   "production_changed": false,
   "stable_sdk_released": false,
@@ -5007,7 +5007,7 @@
     "actual_broker_proof": false
   },
   "solution_prepare_followup": {
-    "status": "read_only_components_merged; whole_asset_plan_and_borrowed_root_pending",
+    "status": "read_only_components_and_whole_asset_plan_merged; borrowed_root_final_check_pending",
     "branch": "codex/rocketmq-m3-ai-solution-freeze-plan",
     "pushed": true,
     "merged": true,
@@ -5212,15 +5212,15 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T14:37:27.826095+00:00",
+  "updated_at": "2026-10-21T15:14:22.496268+00:00",
   "solution_whole_asset_plan": {
-    "status": "pushed_required_ci_pending",
+    "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
     "code_sha": "73520f2e0309e349da234d0555b93372b63f7eb9",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/171",
     "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39617243516",
     "pushed": true,
-    "merged": false,
+    "merged": true,
     "target_passed": 45,
     "full_unit": {
       "passed": 2992,
@@ -5236,12 +5236,175 @@
       "errors": 0
     },
     "native_cases_collected": 4,
-    "native_executed": false,
-    "scope": "Complete original asset graph and Run frozen read-only; command root, SDK and Broker still pending",
-    "default_runtime_assembly_enabled": false
+    "native_executed": true,
+    "scope": "Complete original asset graph and Run frozen read-only; this sub-batch does not prove SDK root or Broker integration",
+    "default_runtime_assembly_enabled": false,
+    "merged_sha": "954eb2a5583b9086e3fe5aa647d99410dd7a7e31",
+    "merged_tree": "f742613ae5bb7fcfb62614be3eb2621d7c04f238",
+    "candidate_and_merged_trees_equal": true,
+    "required_checks_successful": 12,
+    "verification": {
+      "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39617243516",
+      "tested_merge_sha": "fc6a53c5fa9e1def795fbdfc852ac6773effd443",
+      "verified_merge_parents": [
+        "fd6f9bef13873536f89a50af9b6b68ccabeab012",
+        "9541305d7eceecac151620df1c3625fab7a67c18"
+      ],
+      "reports": [
+        {
+          "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+          "sha256": "9243845e734eb60bc649e71b08e5737746cbba5902cfb3708996111e99da7cd7",
+          "xml_sha256": "ae264a6cfa78770fa54a2f7fa5135f4f6519864bc0767c3fc3fbf1f6de4cd4e9",
+          "revision": "fc6a53c5fa9e1def795fbdfc852ac6773effd443",
+          "mysql": "8.0.36",
+          "index": 0,
+          "passed": 996,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+          "sha256": "bb4ef74500ddf9715dddf4bfeba17bb672b61fbf08f1745a496aabf5928ad418",
+          "xml_sha256": "bee3ecf01b41e43695bef708a35c09fcffffac9d2790a37cd4de495084bb7dcd",
+          "revision": "fc6a53c5fa9e1def795fbdfc852ac6773effd443",
+          "mysql": "8.0.36",
+          "index": 1,
+          "passed": 996,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+          "sha256": "e378b662d543b1a35b79e3237bf65e632f1cc3ae2978c3a4fe6d80a429a4875f",
+          "xml_sha256": "d64c38365208fbec054a129fcce460cefb648eb8cb28ee5cdb935c9609132bf1",
+          "revision": "fc6a53c5fa9e1def795fbdfc852ac6773effd443",
+          "mysql": "8.0.36",
+          "index": 2,
+          "passed": 996,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+          "sha256": "faecd25897a1a42448cd3bbadcffcd8fb4214c89957dada3df4b9f8ad08e3951",
+          "xml_sha256": "135d2b33d6d85ebb6f0caf5243fb94d5772e7cb21f40ae54c947c0b19a4d3081",
+          "revision": "fc6a53c5fa9e1def795fbdfc852ac6773effd443",
+          "mysql": "8.0.36",
+          "index": 3,
+          "passed": 995,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-0/shard-8.4-0.json",
+          "sha256": "ae5b9538a52053e4b1a494de1129412aa2b8d33fd52c7984bfa2f9fec26e9ec6",
+          "xml_sha256": "b251ae0e50c195c477fe0a86e80531ef6146656f5b299fc80940353927b06f2f",
+          "revision": "fc6a53c5fa9e1def795fbdfc852ac6773effd443",
+          "mysql": "8.4",
+          "index": 0,
+          "passed": 996,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-1/shard-8.4-1.json",
+          "sha256": "eab3a4141eb5831a87f362b5fcc460fd8d75b58c4c0a93c05ce21e22d66db966",
+          "xml_sha256": "e117b2c71f56496d6198f68ca50b6179e591690477f031e7e0abf95e9fb760ad",
+          "revision": "fc6a53c5fa9e1def795fbdfc852ac6773effd443",
+          "mysql": "8.4",
+          "index": 1,
+          "passed": 996,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-2/shard-8.4-2.json",
+          "sha256": "5b3e0806fcabac1cf0ac1254a224781273bb65b2603d6fff33029142478a53b6",
+          "xml_sha256": "61b97fa203be8d2864dd898c2b4bb9d6d7d1dbc678b68dbc8af5d91537ba4d26",
+          "revision": "fc6a53c5fa9e1def795fbdfc852ac6773effd443",
+          "mysql": "8.4",
+          "index": 2,
+          "passed": 996,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-3/shard-8.4-3.json",
+          "sha256": "52d15d321f0b70878313e112d8aa15333bab97bebeccebcc50378a9a68121b5d",
+          "xml_sha256": "58d704b154d0bc1b3aff289784d9c0a83867a77379db1a9948c056550d9b64cb",
+          "revision": "fc6a53c5fa9e1def795fbdfc852ac6773effd443",
+          "mysql": "8.4",
+          "index": 3,
+          "passed": 995,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "profiles": {
+        "8.0.36": {
+          "collected": 3983,
+          "passed": 3983,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4
+          }
+        },
+        "8.4": {
+          "collected": 3983,
+          "passed": 3983,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4
+          }
+        }
+      }
+    }
   },
   "solution_borrowed_root": {
-    "status": "pushed_required_ci_pending",
+    "status": "required_reports_verified_final_check_pending",
     "source_sha": "a864895a17a7c0eed13efe8bdc7f960380764007",
     "code_sha": "4fa18b842d02ebea33b797365994d74ec88651ed",
     "pushed": true,
@@ -5262,10 +5425,214 @@
       "errors": 0
     },
     "native_cases_collected": 4,
-    "native_executed": false,
-    "scope": "Original caller root only; wrote is staged, not a commit receipt; SDK root/witness integration still pending",
+    "native_executed": true,
+    "scope": "Original caller root only; wrote is staged, not a commit receipt; SDK root/witness is a separate uncommitted candidate",
     "default_runtime_assembly_enabled": false,
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/172",
-    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39618480075"
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39618480075",
+    "verification": {
+      "source_sha": "a864895a17a7c0eed13efe8bdc7f960380764007",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39618480075",
+      "tested_merge_sha": "8669060545acf848fa660f94f33c6c2b12f530fa",
+      "verified_merge_parents": [
+        "9541305d7eceecac151620df1c3625fab7a67c18",
+        "a864895a17a7c0eed13efe8bdc7f960380764007"
+      ],
+      "reports": [
+        {
+          "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+          "sha256": "ad2766467809980f13189d4190c26f2b419ee581dda96a77360d19a8a6c2cc00",
+          "xml_sha256": "8700d7a81982d86a313a7b3818c5d5e21e30e87d87f93e364d73c7a78f5864ec",
+          "revision": "8669060545acf848fa660f94f33c6c2b12f530fa",
+          "mysql": "8.0.36",
+          "index": 0,
+          "passed": 1000,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+          "sha256": "2fd767d583b0d4327f2ddcb22a2837e237888add73bdd3e29830d5230cd50fef",
+          "xml_sha256": "77c4f3074a2963e3b3deb716aa5efce6ac8d191ee5ce500d9eca18f199f72a2a",
+          "revision": "8669060545acf848fa660f94f33c6c2b12f530fa",
+          "mysql": "8.0.36",
+          "index": 1,
+          "passed": 1000,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+          "sha256": "c8500b41432281c23957b577a47e3969339fb604bcb7eb885a301ffb60bb2e92",
+          "xml_sha256": "76755cc1bb44574efa0f37ae83f9eeca5f15d88ed38d0e5ca1ac21e3563daddc",
+          "revision": "8669060545acf848fa660f94f33c6c2b12f530fa",
+          "mysql": "8.0.36",
+          "index": 2,
+          "passed": 1000,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+          "sha256": "140ff6360aefbba97e21524c76ed7c5e0ec752229104f863ecf64a126e8e172f",
+          "xml_sha256": "6688bee4b253163482d080774fe5eef398e1a6b88d47a7ddce7a05293c007bc2",
+          "revision": "8669060545acf848fa660f94f33c6c2b12f530fa",
+          "mysql": "8.0.36",
+          "index": 3,
+          "passed": 1000,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-0/shard-8.4-0.json",
+          "sha256": "8bf11332c5b9587e2da4c1c121170da8ef8ffb37a8e3f0a72eaa219edfcffd65",
+          "xml_sha256": "10e21eba46702a2f8cfef677fb6ceb2402942ca37287b4a1ef44d14ec8564de1",
+          "revision": "8669060545acf848fa660f94f33c6c2b12f530fa",
+          "mysql": "8.4",
+          "index": 0,
+          "passed": 1000,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-1/shard-8.4-1.json",
+          "sha256": "a96befbc2bbd66d544c576a6309ffd9fc5f502c83e122997ff7323d89ef18ca6",
+          "xml_sha256": "f1da7bcd2614b474ad4d93d9c2993faa9e25b8f6baf715a222ef4b3597b545dd",
+          "revision": "8669060545acf848fa660f94f33c6c2b12f530fa",
+          "mysql": "8.4",
+          "index": 1,
+          "passed": 1000,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-2/shard-8.4-2.json",
+          "sha256": "26007846837a857077b0be4413af76f2dcbb16d91787f56ce446aece8df46343",
+          "xml_sha256": "efd96335fed6520180dba92469038dc1a0840c59c04867a49cc1e34e16e3e561",
+          "revision": "8669060545acf848fa660f94f33c6c2b12f530fa",
+          "mysql": "8.4",
+          "index": 2,
+          "passed": 1000,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-3/shard-8.4-3.json",
+          "sha256": "a00fb3b2994bbd633868b2c35a42de5a062a5eff49c119d1cdbfcd5f26a1df2f",
+          "xml_sha256": "58251b3e0f87b570d928092d58a8babbe0a2beb88e7fa1924742866b8e51bf14",
+          "revision": "8669060545acf848fa660f94f33c6c2b12f530fa",
+          "mysql": "8.4",
+          "index": 3,
+          "passed": 1000,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "profiles": {
+        "8.0.36": {
+          "collected": 4000,
+          "passed": 4000,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4
+          }
+        },
+        "8.4": {
+          "collected": 4000,
+          "passed": 4000,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4
+          }
+        }
+      }
+    },
+    "native_borrowed_root_passed_per_mysql": 4
+  },
+  "solution_sdk_root_sender": {
+    "status": "pushed_required_native_ci_pending",
+    "source_sha": "f87af32b39cb1162c48653ca0d01532671b88918",
+    "pushed": true,
+    "merged": false,
+    "target_passed": 56,
+    "native_collected": 27,
+    "native_executed": false,
+    "scope": "Independent transaction input/facts, exact source/draft/assets/target digests, one guarded original root, first receipt recovery; actual Prepare handler and concurrency tests collected only",
+    "default_runtime_assembly_enabled": false,
+    "business_receipt_is_not_sdk_proof": true,
+    "cached_root_value_is_not_commit_proof": true,
+    "native_scope": "10 guarded roots and 17 actual Prepare/first receipt/concurrency/rollback host entries; collected only",
+    "local_failure_history": [
+      {
+        "kind": "incorrect_local_test_command",
+        "scope": "not integration included interop cases without fixed probes",
+        "passed": 3061,
+        "failed": 9,
+        "skipped": 3,
+        "deselected": 1008,
+        "private_log": "/tmp/m3-t17-solution-sdk-sender-full-unit.log",
+        "counts_as_gate_pass": false,
+        "resolution": "Original unit scope rerun: 3061 passed, zero failed/skipped; complete cross-language/native matrix remains required CI"
+      }
+    ],
+    "code_sha": "e1e7b6e223b325131e65312b4f23c94c013d12e6",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/173",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39623720568",
+    "full_unit": {
+      "passed": 3061,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 1022,
+      "warnings": 5
+    },
+    "mypy_source_files": 403,
+    "format_files": 1014,
+    "docs": {
+      "files": 75,
+      "links": 1352,
+      "errors": 0
+    }
   }
 }
