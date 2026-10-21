@@ -5,10 +5,10 @@
   "progress": "16/36",
   "base": "e8392c0582020d6cacf44c6caaa2f2061c66cb41",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-creation",
-  "branch": "codex/rocketmq-m3-ai-solution-sdk",
-  "source_candidate": "73ee3b830cb768a4e0f3dd0a39d6ea5759095056",
+  "branch": "codex/rocketmq-m3-ai-interpretation-finish-broker",
+  "source_candidate": "dc8461c922ba234d9de65bc49583c8bc04ae5679",
   "source_pushed": true,
-  "source_merged": true,
+  "source_merged": false,
   "production_assembly_enabled": false,
   "production_changed": false,
   "stable_sdk_released": false,
@@ -604,7 +604,7 @@
     "Keep deterministic model-response finalization as T18 and full runtime/history/ACK as T19",
     "Merge only after required gates; T17 remains unchecked"
   ],
-  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/170",
+  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/190",
   "source_pr_draft": false,
   "foundation_native_acceptance": {
     "source_sha": "b4eedb634adefa50ea818ac6cf26e119e29b94fd",
@@ -804,7 +804,7 @@
     "docs_files": 75,
     "docs_links": 1321
   },
-  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39607704140",
+  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39651736542",
   "worker_preflight_native_cases": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
     "file": "tests/integration/test_transaction_worker_preflight.py",
@@ -1405,7 +1405,7 @@
     "no_task_completion_claimed": true,
     "native_status": "cbc47d9 both MySQL profiles: 3649 passed, including corrected original atomic-root case; zero failed/skipped"
   },
-  "source_candidate_branch": "codex/rocketmq-m3-ai-creation-plan",
+  "source_candidate_branch": "codex/rocketmq-m3-ai-interpretation-finish-broker",
   "failure_history": [
     {
       "source_sha": "3cf74b5eccc66bd271d4d8e250714e4a312bde59",
@@ -1431,6 +1431,13 @@
       "replacement_source_checks": "success",
       "replacement_source_checks_success": 14,
       "replacement_broker_status": "success"
+    },
+    {
+      "batch": "interpretation_finish_sdk_local_sequence_whitelist",
+      "source": "uncommitted development before code9b49b1d; corrected before the first pushed candidate",
+      "result": "14 setup errors and 11 passing original cases",
+      "cause": "New question_sequence codec field was added to encoder but omitted from exact decoder whitelist",
+      "resolution": "Added exact field, 25 target plus final59 target pass; full3256 unit run passed; no failed candidate merged"
     }
   ],
   "governance_followup": {
@@ -5212,7 +5219,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-21T18:03:09.162131+00:00",
+  "updated_at": "2026-10-21T18:21:59.451254+00:00",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -8701,7 +8708,7 @@
     "production_auto_deploy_enabled": false
   },
   "worker_dispatch_broker_followup": {
-    "status": "actual_broker_and_previous_source_verified_explicit_main_alignment_requires_new_head_ci",
+    "status": "current_head_native_verified_source_and_infra_merged",
     "source_sha": "17c0e915d90026479d0d088764445a749be35649",
     "code_sha": "5b20088bbb4e0c81381d1caefd8edbc662875d4e",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/182",
@@ -9483,10 +9490,202 @@
         "39639411031"
       ]
     },
-    "current_source_sha": "38f017ae4db8db06b562d15223d1a6c64bf57b5e"
+    "current_source_sha": "38f017ae4db8db06b562d15223d1a6c64bf57b5e",
+    "current_head_source_proof": {
+      "source_sha": "38f017ae4db8db06b562d15223d1a6c64bf57b5e",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39646469495",
+      "tested_merge_sha": "cc7a2bf4d11316f80873e066998d6f7f64f213e0",
+      "verified_merge_parents": [
+        "6a73d55b81bf3517ab3b5718ad8f9b6fb090d921",
+        "38f017ae4db8db06b562d15223d1a6c64bf57b5e"
+      ],
+      "reports": [
+        {
+          "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+          "sha256": "986bc430194a32d25c97fc31378489dbcb8983ad37eead6f290cf59446439f12",
+          "xml_sha256": "06b9f6ea4e2dd75c565bbe370cde82c47e02eb6a0335ded9004a8f590a260ae3",
+          "revision": "cc7a2bf4d11316f80873e066998d6f7f64f213e0",
+          "mysql": "8.0.36",
+          "index": 0,
+          "passed": 1055,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+          "sha256": "925bc42ea6e089b353998c21cc775a0fe1d1220cc1c747d53c259d4b5f1bf9be",
+          "xml_sha256": "8e25aa61cf3f97f4022701a23ffaa799e84b8eb27078c21cc4da5b88e8543a0e",
+          "revision": "cc7a2bf4d11316f80873e066998d6f7f64f213e0",
+          "mysql": "8.0.36",
+          "index": 1,
+          "passed": 1055,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+          "sha256": "728d76643ced5c2a08dc2b46cb5ccfac05e22c3859c7b04053617b8e48009170",
+          "xml_sha256": "7da9706fed3add69ab7e2a87186b033b539d14f3fa3999da9860778f9562e0ae",
+          "revision": "cc7a2bf4d11316f80873e066998d6f7f64f213e0",
+          "mysql": "8.0.36",
+          "index": 2,
+          "passed": 1055,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+          "sha256": "ec28bd43d0c2b83e86bc0c5297b01026ba51a902e43fe71e804450746f6f3f84",
+          "xml_sha256": "6fd637e8078418b98b870cf0f78db4b94e679af3b31ddf74e5ec4c841869c3c8",
+          "revision": "cc7a2bf4d11316f80873e066998d6f7f64f213e0",
+          "mysql": "8.0.36",
+          "index": 3,
+          "passed": 1055,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-0/shard-8.4-0.json",
+          "sha256": "37c9d215bc753d3901d11488454c2c5ffd17e60a774b7f641917b7bf893debf9",
+          "xml_sha256": "65d9fcdf8b7e6dc5774c6b270b687c916fb470c1a332b356e5df5680e9dfc742",
+          "revision": "cc7a2bf4d11316f80873e066998d6f7f64f213e0",
+          "mysql": "8.4",
+          "index": 0,
+          "passed": 1055,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-1/shard-8.4-1.json",
+          "sha256": "4a7e66a2d7f5f428f857e5a98c74b24852ec892b7164b60b0f761cb9e9a4c320",
+          "xml_sha256": "97e2fcd98cabb372d906a39d4faeca0d1027585f2929e39fab03089a4a6c734e",
+          "revision": "cc7a2bf4d11316f80873e066998d6f7f64f213e0",
+          "mysql": "8.4",
+          "index": 1,
+          "passed": 1055,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-2/shard-8.4-2.json",
+          "sha256": "ae056e6ca10fa5df979a46e35ec585705d111fcf3c23f65930b7830adf9f935a",
+          "xml_sha256": "d4cdf1c9ca23fecc3c9b644031cd64928ef3547687a9bfe8fd8f06165f68f600",
+          "revision": "cc7a2bf4d11316f80873e066998d6f7f64f213e0",
+          "mysql": "8.4",
+          "index": 2,
+          "passed": 1055,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-3/shard-8.4-3.json",
+          "sha256": "e46984eeb961d7db4410a668e339bf1c7b5fb9d4a5acd527f5988b00c650aadc",
+          "xml_sha256": "b170ecc908a93db8a65981295aa207b9bbbdb9e23fb82e44aae4eb18603c0ee6",
+          "revision": "cc7a2bf4d11316f80873e066998d6f7f64f213e0",
+          "mysql": "8.4",
+          "index": 3,
+          "passed": 1055,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "profiles": {
+        "8.0.36": {
+          "collected": 4220,
+          "passed": 4220,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 0,
+            "test_interpretation_finish_root": 0,
+            "test_interpretation_state_transcription": 0,
+            "test_artifact_identity": 0,
+            "test_transaction_interpretation_state": 0,
+            "test_interpretation_claim_source": 0
+          }
+        },
+        "8.4": {
+          "collected": 4220,
+          "passed": 4220,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 0,
+            "test_interpretation_finish_root": 0,
+            "test_interpretation_state_transcription": 0,
+            "test_artifact_identity": 0,
+            "test_transaction_interpretation_state": 0,
+            "test_interpretation_claim_source": 0
+          }
+        }
+      }
+    },
+    "current_head_sha": "38f017ae4db8db06b562d15223d1a6c64bf57b5e",
+    "source_merge_sha": "25b04f41801f2633d19e62875ba2c4947f425597",
+    "ancestor_resolution_pr179_merged": true
   },
   "contract_recovery_sdk": {
-    "status": "required_source_ci_and_native_reports_verified_not_merged",
+    "status": "required_source_ci_and_native_reports_verified_merged",
     "branch": "codex/rocketmq-m3-ai-contract-recovery-sdk",
     "source_sha": "a8cf8d6005ca36d64d3097eaafbedfef4f8e40a0",
     "code_sha": "b349ae7770b4f5a0cc1e7fef93fd96b0ea7ae987",
@@ -9693,7 +9892,10 @@
         }
       }
     },
-    "required_checks_success": 12
+    "required_checks_success": 12,
+    "merge_sha": "8bdf9da8c09720e8c96142549f91b32899581a7f",
+    "merged": true,
+    "production_deploy_enabled": false
   },
   "superseded_main_push_ci_deduplication": {
     "run": "39636813645",
@@ -9707,15 +9909,9 @@
     "final_status": "completed",
     "final_conclusion": "cancelled"
   },
-  "latest_verified_main": {
-    "repo": "FangcunMount/qs-ai",
-    "sha": "6a73d55b81bf3517ab3b5718ad8f9b6fb090d921",
-    "source_candidate": "764415c7b9f5fcad8b7ba5dfbb981874517c6f82",
-    "pr": 181,
-    "production_deployed": false
-  },
+  "latest_verified_main": "cbe020556cfcb6ccd8fc81d29d93f50adbeac841",
   "interpretation_finish_root": {
-    "status": "required_source_ci_and_native_reports_verified_not_merged",
+    "status": "required_source_ci_and_native_reports_verified_merged",
     "branch": "codex/rocketmq-m3-ai-interpretation-finish-root",
     "source_sha": "f2e37e1dc419b3a3ecb36b0c4a477c0a5f99952d",
     "code_sha": "9bfdb278270b395a26673cde01391ac1b14a7efe",
@@ -9929,10 +10125,13 @@
         }
       }
     },
-    "required_checks_success": 12
+    "required_checks_success": 12,
+    "merge_sha": "03264bc02d4c72b8982b08b6747d2c7085d757a2",
+    "merged": true,
+    "production_deploy_enabled": false
   },
   "interpretation_state_transcription": {
-    "status": "required_source_ci_and_native_reports_verified_not_merged",
+    "status": "required_source_ci_and_native_reports_verified_merged",
     "branch": "codex/rocketmq-m3-ai-interpretation-state-transcription",
     "source_sha": "742c88314a98c456a8d74c8a44f1b738c33d1cd0",
     "code_sha": "b3a4455d821fc41cc43f68bd975a6bcf62327b1e",
@@ -10145,10 +10344,13 @@
         }
       }
     },
-    "required_checks_success": 12
+    "required_checks_success": 12,
+    "merge_sha": "a14ab631fa1abf8d84cdbdb156659cb3e3033190",
+    "merged": true,
+    "production_deploy_enabled": false
   },
   "artifact_identity": {
-    "status": "pushed_required_native_ci_pending",
+    "status": "required_source_ci_and_native_reports_verified_merged",
     "branch": "codex/rocketmq-m3-ai-artifact-identity",
     "source_sha": "3df0eee7051c27084707cd3a5d5b777b92ea019b",
     "code_sha": "05f03adf006c1cb6ee73d8fae723f99a8e8b1b8c",
@@ -10172,10 +10374,203 @@
       "links": 1368,
       "errors": 0
     },
-    "scope": "Existing deterministic Artifact UUID5/run/invocation validated before DB executor; optional identity retains original content/config/safety gates and v1/v2 bytes without UUID generation in original callback; no full finish Sender/witness/model recovery or production claim"
+    "scope": "Existing deterministic Artifact UUID5/run/invocation validated before DB executor; optional identity retains original content/config/safety gates and v1/v2 bytes without UUID generation in original callback; no full finish Sender/witness/model recovery or production claim",
+    "source_proof": {
+      "source_sha": "3df0eee7051c27084707cd3a5d5b777b92ea019b",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39645994402",
+      "tested_merge_sha": "f46a498cdee554f5cdcd5b4f81884fdc176173fe",
+      "verified_merge_parents": [
+        "742c88314a98c456a8d74c8a44f1b738c33d1cd0",
+        "3df0eee7051c27084707cd3a5d5b777b92ea019b"
+      ],
+      "reports": [
+        {
+          "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+          "sha256": "8aa3420ec0f84b4d0d5541c091b79093de66ff13ad304d3369a580c4a8cec0fc",
+          "xml_sha256": "aa566f807fb3abc8238f07df4462c4b0f54414aa00ee53c7a64ef871122e4ebc",
+          "revision": "f46a498cdee554f5cdcd5b4f81884fdc176173fe",
+          "mysql": "8.0.36",
+          "index": 0,
+          "passed": 1074,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+          "sha256": "b216b93a0052db5b0c2173aa03ff48de57ae2cd336e96eaa9b6f44af05ba914b",
+          "xml_sha256": "8266fd64eae495082a732c4bac1c539ad50a1068e8666f5ad6eda6e4d42ff3c5",
+          "revision": "f46a498cdee554f5cdcd5b4f81884fdc176173fe",
+          "mysql": "8.0.36",
+          "index": 1,
+          "passed": 1073,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+          "sha256": "89466c1f59001822e104b614d2ba312f28f975765ad3a6ae1ac50d4f3e8844a5",
+          "xml_sha256": "412aabb10952334b7bcb6b9ad827db5ef4a5e7e5c6d0dbb34111711807cc9ebb",
+          "revision": "f46a498cdee554f5cdcd5b4f81884fdc176173fe",
+          "mysql": "8.0.36",
+          "index": 2,
+          "passed": 1073,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+          "sha256": "5a31af6be38c8f795b41f68e417f896dcb24a567079a25af3b8e19ea7f71aa10",
+          "xml_sha256": "bb4265a405f9856b2fe7741919ad470b964bbec68b8db46943933f764e6351f7",
+          "revision": "f46a498cdee554f5cdcd5b4f81884fdc176173fe",
+          "mysql": "8.0.36",
+          "index": 3,
+          "passed": 1073,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-0/shard-8.4-0.json",
+          "sha256": "9b5e47a083c0a1613c6aface958d7c771e3e8e2997641fa7e2731f0b6df33a45",
+          "xml_sha256": "f09b75173245730281221c81bb2eb274afbec4b64e38ecc608741a8ea679936d",
+          "revision": "f46a498cdee554f5cdcd5b4f81884fdc176173fe",
+          "mysql": "8.4",
+          "index": 0,
+          "passed": 1074,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-1/shard-8.4-1.json",
+          "sha256": "c4c1366367f5fe99b965b27a04f88f54d6dd62f85175e20e49137aae6dce9b1d",
+          "xml_sha256": "897cd2e430dc25a1aa695f5cbd6a1431c069bee53e1d2fb4f337425db01f18b0",
+          "revision": "f46a498cdee554f5cdcd5b4f81884fdc176173fe",
+          "mysql": "8.4",
+          "index": 1,
+          "passed": 1073,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-2/shard-8.4-2.json",
+          "sha256": "e587da5a75cf2cf8ff0f5f100845ffbf0862759fd5fe6f92eda683dbcbd49f2f",
+          "xml_sha256": "e1aae78a7a2f27d0ebe6d91a6229b23664796a70d3af2b2dc125989ecda24f38",
+          "revision": "f46a498cdee554f5cdcd5b4f81884fdc176173fe",
+          "mysql": "8.4",
+          "index": 2,
+          "passed": 1073,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-3/shard-8.4-3.json",
+          "sha256": "eda16b512699dca9fdd7e3e8ccaad6cd4b5a34f20997bab603fc09c5a756f4b9",
+          "xml_sha256": "edb3e380cdd916503ae5f70759ea333bfdba130bedd875dd9fbba2a85ea127b4",
+          "revision": "f46a498cdee554f5cdcd5b4f81884fdc176173fe",
+          "mysql": "8.4",
+          "index": 3,
+          "passed": 1073,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "profiles": {
+        "8.0.36": {
+          "collected": 4293,
+          "passed": 4293,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 0,
+            "test_interpretation_claim_source": 0
+          }
+        },
+        "8.4": {
+          "collected": 4293,
+          "passed": 4293,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 0,
+            "test_interpretation_claim_source": 0
+          }
+        }
+      }
+    },
+    "required_checks_success": 12,
+    "merge_sha": "4302e1cd79cda34a63a7dc776f9e34c0a524c136",
+    "merged": true,
+    "production_deploy_enabled": false
   },
   "interpretation_state_plan": {
-    "status": "pushed_required_native_ci_pending",
+    "status": "required_source_ci_and_native_reports_verified_merged",
     "branch": "codex/rocketmq-m3-ai-interpretation-state-plan",
     "source_sha": "9f83ec3d1fef0a0aa3ec1aa0ebb3021ada8a1e7a",
     "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39648086155",
@@ -10188,10 +10583,203 @@
     "native_collected": 8,
     "native_executed_locally": false,
     "scope": "Generic standalone state plan and original guard/archive/witness root; business-specific finish planner/Sender still pending",
-    "production_changed": false
+    "production_changed": false,
+    "source_proof": {
+      "source_sha": "9f83ec3d1fef0a0aa3ec1aa0ebb3021ada8a1e7a",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39648086155",
+      "tested_merge_sha": "914038c416ab08f4c074c28a2b6cb9f1ad3339c1",
+      "verified_merge_parents": [
+        "3df0eee7051c27084707cd3a5d5b777b92ea019b",
+        "9f83ec3d1fef0a0aa3ec1aa0ebb3021ada8a1e7a"
+      ],
+      "reports": [
+        {
+          "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+          "sha256": "b5ca8456b586ff5abd7736e7914c7b53af3aa519e8a5f2ad8c7d5190b46c641a",
+          "xml_sha256": "073d963df299f498f0ec690f041355cd82e267fd01ca5e826a67d2174cae06f9",
+          "revision": "914038c416ab08f4c074c28a2b6cb9f1ad3339c1",
+          "mysql": "8.0.36",
+          "index": 0,
+          "passed": 1080,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+          "sha256": "ff5816302a58dcdcd6a30e8f7ffc9e4ca06d2d1c2b9305710cd8fc4b553cface",
+          "xml_sha256": "aaf72b4c9ad9487f18346bba8c492b481470a6d65f6d9b52cda792587dc937a0",
+          "revision": "914038c416ab08f4c074c28a2b6cb9f1ad3339c1",
+          "mysql": "8.0.36",
+          "index": 1,
+          "passed": 1080,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+          "sha256": "a2e4d4e17821aa0d7c5ea93a68cddec8352b54670a68154e9cb17b4b973789ae",
+          "xml_sha256": "acb9d0d0bafc965d9f08090b25536ad35b03f7f3a19d75e358846eb1477be71c",
+          "revision": "914038c416ab08f4c074c28a2b6cb9f1ad3339c1",
+          "mysql": "8.0.36",
+          "index": 2,
+          "passed": 1080,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+          "sha256": "6d4ccc90bb48fe8dead2636392d673865709d784e40e8d119efbb043ad9e49c6",
+          "xml_sha256": "4c99bd17c36906cf7934a218638a55ad04e1589f96a07ad1a9b9f18b00c29150",
+          "revision": "914038c416ab08f4c074c28a2b6cb9f1ad3339c1",
+          "mysql": "8.0.36",
+          "index": 3,
+          "passed": 1080,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-0/shard-8.4-0.json",
+          "sha256": "5a125e2651bb9570b7ad21fb32ab474cd4058b34aa91b744b0d206bd65167abc",
+          "xml_sha256": "fa093002890968fa12b6a3169753b4498404fa893d21b372d7b939fc4ff2c228",
+          "revision": "914038c416ab08f4c074c28a2b6cb9f1ad3339c1",
+          "mysql": "8.4",
+          "index": 0,
+          "passed": 1080,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-1/shard-8.4-1.json",
+          "sha256": "bb629afeb8c118632ce56c441343450f50b3b11094803351d34b544dbebf9fb8",
+          "xml_sha256": "e248dea52290694b9a45dfe9c1bb59db43117974fab5369a0adf979f876c7d87",
+          "revision": "914038c416ab08f4c074c28a2b6cb9f1ad3339c1",
+          "mysql": "8.4",
+          "index": 1,
+          "passed": 1080,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-2/shard-8.4-2.json",
+          "sha256": "5da3a4f1888761de66ec35185550c0679ec0259ea869a29443b9426bd46b0483",
+          "xml_sha256": "bbe5e18d89d8f7e29e2a55871ac4fc58d297c1ce814ecc8d22d28030044630b5",
+          "revision": "914038c416ab08f4c074c28a2b6cb9f1ad3339c1",
+          "mysql": "8.4",
+          "index": 2,
+          "passed": 1080,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-3/shard-8.4-3.json",
+          "sha256": "cf7397e9f86ebb9cb02f8da62b0059485e3be4596c601025c665af41189b265d",
+          "xml_sha256": "cbcce5064dff213502d74994bf22c1bd853d9728dae62580adbe1b15b2916473",
+          "revision": "914038c416ab08f4c074c28a2b6cb9f1ad3339c1",
+          "mysql": "8.4",
+          "index": 3,
+          "passed": 1080,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "profiles": {
+        "8.0.36": {
+          "collected": 4320,
+          "passed": 4320,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 8,
+            "test_interpretation_claim_source": 0
+          }
+        },
+        "8.4": {
+          "collected": 4320,
+          "passed": 4320,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 8,
+            "test_interpretation_claim_source": 0
+          }
+        }
+      }
+    },
+    "required_checks_success": 12,
+    "merge_sha": "cbe020556cfcb6ccd8fc81d29d93f50adbeac841",
+    "merged": true,
+    "production_deploy_enabled": false
   },
   "interpretation_claim_source": {
-    "status": "pushed_required_native_ci_pending",
+    "status": "native_reports_verified_final_aggregate_gate_queued_not_merged",
     "branch": "codex/rocketmq-m3-ai-interpretation-claim-source",
     "source_sha": "b11a351aa06acc9703d6f0f8e9e2d8b6be8fadbb",
     "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39648775144",
@@ -10204,6 +10792,330 @@
     "native_collected": 4,
     "native_executed_locally": false,
     "scope": "Original read-only claim hint, same Session/job/lease rules; no execution reservation or permission, original guard retains locks",
+    "production_changed": false,
+    "source_proof": {
+      "source_sha": "b11a351aa06acc9703d6f0f8e9e2d8b6be8fadbb",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39648775144",
+      "tested_merge_sha": "63d6186da6750d36cdafea9099e376adb2dada1a",
+      "verified_merge_parents": [
+        "9f83ec3d1fef0a0aa3ec1aa0ebb3021ada8a1e7a",
+        "b11a351aa06acc9703d6f0f8e9e2d8b6be8fadbb"
+      ],
+      "reports": [
+        {
+          "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+          "sha256": "d845e078ff7711dc9628b751b7e14823e294ef96642f14c78de00704edc584c8",
+          "xml_sha256": "d5af3ab9b8fd936d553fa54c527e4aadd1f011748c64954f8526cf4d8cb863e6",
+          "revision": "63d6186da6750d36cdafea9099e376adb2dada1a",
+          "mysql": "8.0.36",
+          "index": 0,
+          "passed": 1083,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+          "sha256": "ddfde5c9346a284dc533c00b759e8349b5eedf2fbfb7db8150745652dc42e3b0",
+          "xml_sha256": "8f618236ff8dc7e5338f9341aee4e36f0d3bb01d13b723eb44d135ee579cc0d5",
+          "revision": "63d6186da6750d36cdafea9099e376adb2dada1a",
+          "mysql": "8.0.36",
+          "index": 1,
+          "passed": 1083,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+          "sha256": "5211596f29406724c76c1138144ee79a4b268537c17f0277747a28f4d13e36fb",
+          "xml_sha256": "52d944d8689686eab53d8540c5d9f41022ec3fe9ec865571cd8b4310a7b75f06",
+          "revision": "63d6186da6750d36cdafea9099e376adb2dada1a",
+          "mysql": "8.0.36",
+          "index": 2,
+          "passed": 1083,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+          "sha256": "7ebbb0015c771a502577bb2bbbdf4cfeb2b3b4aeaa44b26c5798e63fba4f62aa",
+          "xml_sha256": "7678196385a5f56f43fe8f21f8a1a97bc60259a35010732f37420ce8e008a933",
+          "revision": "63d6186da6750d36cdafea9099e376adb2dada1a",
+          "mysql": "8.0.36",
+          "index": 3,
+          "passed": 1082,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-0/shard-8.4-0.json",
+          "sha256": "a2f7cf1d5faa3a16dabd3f32c629b4744d34c2c8f21174574f2681550c298101",
+          "xml_sha256": "72eb48a80356f4a7f00f33ec3ca096236696e48a0e62d551f539ee6b016bdc33",
+          "revision": "63d6186da6750d36cdafea9099e376adb2dada1a",
+          "mysql": "8.4",
+          "index": 0,
+          "passed": 1083,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-1/shard-8.4-1.json",
+          "sha256": "de44cacefcdecfb0958f69360cb015fda01ff6a54dc98e2ca2eb8c49d0f4f4e7",
+          "xml_sha256": "efa890de5e82f2ddfeb75c2a3db45f5cf3eaa1b53e2ea96d4c3bc395efbcb0fc",
+          "revision": "63d6186da6750d36cdafea9099e376adb2dada1a",
+          "mysql": "8.4",
+          "index": 1,
+          "passed": 1083,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-2/shard-8.4-2.json",
+          "sha256": "0776d0b1583c45211ea310cd19a2ab54c37e18a691165a58cd2d6abe0aa4b4e6",
+          "xml_sha256": "878d0049da45d3508f62616e9c7433490f102f9bac8e02343087aca916e96595",
+          "revision": "63d6186da6750d36cdafea9099e376adb2dada1a",
+          "mysql": "8.4",
+          "index": 2,
+          "passed": 1083,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-3/shard-8.4-3.json",
+          "sha256": "19c2a7f29d611d34d83386da4cb3490ed89aeaee6f993ec5a9d68cd96186804e",
+          "xml_sha256": "0bc8a0737dc418c52e3b5f5d583cc72ad5364826ce3dee0767918cf9acf94022",
+          "revision": "63d6186da6750d36cdafea9099e376adb2dada1a",
+          "mysql": "8.4",
+          "index": 3,
+          "passed": 1082,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "profiles": {
+        "8.0.36": {
+          "collected": 4331,
+          "passed": 4331,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 8,
+            "test_interpretation_claim_source": 4,
+            "test_transaction_interpretation_finish": 0
+          }
+        },
+        "8.4": {
+          "collected": 4331,
+          "passed": 4331,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 8,
+            "test_interpretation_claim_source": 4,
+            "test_transaction_interpretation_finish": 0
+          }
+        }
+      }
+    },
+    "required_checks_success": 11,
+    "required_checks_queued": 1
+  },
+  "superseded_main_push_ci_deduplication_182_185": {
+    "at": "2026-10-21T18:13:26.451191+00:00",
+    "scope": "Only superseded main push duplicate trees; every current candidate required gate retained",
+    "runs": [
+      {
+        "run": 39650123083,
+        "merged_sha": "25b04f41801f2633d19e62875ba2c4947f425597",
+        "source_sha": "38f017ae4db8db06b562d15223d1a6c64bf57b5e",
+        "tree": "f2233d8b8caa2347e809cbeafa58848f0824b7b0",
+        "verified_source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39646469495",
+        "current_main": "4302e1cd79cda34a63a7dc776f9e34c0a524c136",
+        "before": {
+          "conclusion": "",
+          "event": "push",
+          "headSha": "25b04f41801f2633d19e62875ba2c4947f425597",
+          "status": "in_progress"
+        },
+        "cancel_requested": true
+      },
+      {
+        "run": 39650255416,
+        "merged_sha": "8bdf9da8c09720e8c96142549f91b32899581a7f",
+        "source_sha": "a8cf8d6005ca36d64d3097eaafbedfef4f8e40a0",
+        "tree": "70e6f84d7b84a62e5dcaa61094813a1d5f16bdbf",
+        "verified_source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39641529793",
+        "current_main": "4302e1cd79cda34a63a7dc776f9e34c0a524c136",
+        "before": {
+          "conclusion": "",
+          "event": "push",
+          "headSha": "8bdf9da8c09720e8c96142549f91b32899581a7f",
+          "status": "queued"
+        },
+        "cancel_requested": true
+      },
+      {
+        "run": 39650386499,
+        "merged_sha": "03264bc02d4c72b8982b08b6747d2c7085d757a2",
+        "source_sha": "f2e37e1dc419b3a3ecb36b0c4a477c0a5f99952d",
+        "tree": "dc327f9bb693497121fd6d2c0ae78bf1da772afb",
+        "verified_source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39642949227",
+        "current_main": "4302e1cd79cda34a63a7dc776f9e34c0a524c136",
+        "before": {
+          "conclusion": "",
+          "event": "push",
+          "headSha": "03264bc02d4c72b8982b08b6747d2c7085d757a2",
+          "status": "queued"
+        },
+        "cancel_requested": true
+      },
+      {
+        "run": 39650479934,
+        "merged_sha": "a14ab631fa1abf8d84cdbdb156659cb3e3033190",
+        "source_sha": "742c88314a98c456a8d74c8a44f1b738c33d1cd0",
+        "tree": "41d5276dfdcb059f5bdb12a0d00085ca014623ff",
+        "verified_source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39644510374",
+        "current_main": "4302e1cd79cda34a63a7dc776f9e34c0a524c136",
+        "before": {
+          "conclusion": "",
+          "event": "push",
+          "headSha": "a14ab631fa1abf8d84cdbdb156659cb3e3033190",
+          "status": "queued"
+        },
+        "cancel_requested": true
+      }
+    ]
+  },
+  "interpretation_finish_sdk": {
+    "status": "current_source_pushed_required_ci_queued",
+    "branch": "codex/rocketmq-m3-ai-interpretation-finish-sdk",
+    "source_sha": "faa82b9856624c30f2ec2d58a31cd0561edde562",
+    "code_sha": "9b49b1dc510fdd29e9398cabb20db5d532f7abc3",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/189",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39651456288",
+    "baseline_original_passed": 38,
+    "target_passed": 59,
+    "full_unit": {
+      "passed": 3266,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 1113,
+      "warnings": 6
+    },
+    "native_collected": 17,
+    "native_executed_locally": false,
+    "mypy_source_files": 413,
+    "format_source_test_files": 853,
+    "docs": {
+      "files": 75,
+      "links": 1373,
+      "errors": 0
+    },
+    "scope": "Explicit original finish Sender; original server Claim/result, first identities/question sequence/time/wire, source and live lease recheck, same-root business/history/archive/witness, precise committed replay; no default DI/model retry/actual Broker or network fault claim",
+    "production_changed": false,
+    "previous_source_candidate": {
+      "source_sha": "d25552492ac4c491da144e1dcfa502979510c856",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39650795992",
+      "status": "superseded_by_artifact_projection_followup_workflow_cancelled_no_native_acceptance_claimed"
+    },
+    "artifact_projection_code_sha": "94e25aad404d6ddb330a7f5e17299954880eeedd",
+    "final_target_passed": 56,
+    "format_files": 1054,
+    "artifact_projection_scope": "MySQL JSON order/whitespace/escape differences compare only exact unambiguous string-field values; no first body/wire/archive/hash replacement; remaining projection and delivery guards exact"
+  },
+  "interpretation_finish_broker": {
+    "status": "pushed_required_native_and_six_profile_execution_queued",
+    "source_sha": "dc8461c922ba234d9de65bc49583c8bc04ae5679",
+    "code_sha": "3b17d653a2fe56333be01f68d0ce18f40435fa92",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/190",
+    "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39651736542",
+    "infra_sha": "f34d1b2b2a1a6ff33266f23b55fe47f811e68e0b",
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/114",
+    "actual_broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39651804242",
+    "host_cases_collected": 19,
+    "required_flags": 51,
+    "tool_baseline_passed": 80,
+    "tool_unit_passed": 81,
+    "control_input_unit_passed": 6,
+    "mypy_source_files": 413,
+    "host_cases_executed_locally": false,
+    "scope": "Actual published SDK Sender, original question/failure/Artifact root, half invisibility, FinalUnknown, first wire/witness, durable response and duplicate/source-conflict behavior; event observer only, no complete graph/paired QS/provider/system/process/network proof",
     "production_changed": false
-  }
+  },
+  "historical_top_level_fields_before_active_candidate_normalization": {
+    "source_candidate": "73ee3b830cb768a4e0f3dd0a39d6ea5759095056",
+    "source_merged": true,
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/170",
+    "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39607704140",
+    "source_candidate_branch": "codex/rocketmq-m3-ai-creation-plan",
+    "branch": "codex/rocketmq-m3-ai-solution-sdk"
+  },
+  "source_ci_status": "queued_no_native_or_broker_acceptance_claimed"
 }
