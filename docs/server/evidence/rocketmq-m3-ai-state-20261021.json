@@ -5264,6 +5264,8 @@
     "native_cases_collected": 4,
     "native_executed": false,
     "scope": "Original caller root only; wrote is staged, not a commit receipt; SDK root/witness integration still pending",
-    "default_runtime_assembly_enabled": false
+    "default_runtime_assembly_enabled": false,
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/172",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39618480075"
   }
 }
