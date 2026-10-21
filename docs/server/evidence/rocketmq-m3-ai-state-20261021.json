@@ -785,7 +785,7 @@
     "source_merged": false
   },
   "local_preflight_followup": {
-    "source_sha": "c065e07",
+    "source_sha": "c065e07061797e55898e0edde7261393e8ec45c8",
     "pushed": false,
     "typed_evidence_and_pure_original_projection_passed": 44,
     "mypy_source_files": 386,
