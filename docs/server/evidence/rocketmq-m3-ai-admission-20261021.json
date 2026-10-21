@@ -419,7 +419,7 @@
   "checkpoint": "80805fbfc4991425e2e62789e5e2ca7042e4b1ca",
   "source_pr": "https://github.com/FangcunMount/qs-ai/pull/159",
   "source_pr_draft": true,
-  "source_pushed_checkpoint": "80805fbfc4991425e2e62789e5e2ca7042e4b1ca",
+  "source_pushed_checkpoint": "384a440f76e46afa5e83d0be4564ce9cf60968e4",
   "foundation_additions": [
     "Frozen job identity with unchanged ordinary defaults",
     "Frozen receipt Inbox decision without legacy Outbox stage",
@@ -623,6 +623,163 @@
         "nodeid_digest": "8351eb331709c76e4bbf6ad27c73fc8adc26740307f382e216b8fbef8274150c"
       }
     ],
-    "not_counted_as_native_proof": true
+    "not_counted_as_native_proof": true,
+    "f45a9ed": {
+      "source": "f45a9ed221b09e75103f2199f6723b29d5817c01",
+      "run": "https://github.com/FangcunMount/qs-ai/actions/runs/39518763398",
+      "reports": [
+        {
+          "file": "shard-8.0.36-0.json",
+          "sha256": "ad19797ade447b179612e2654a41a11e00d257a461d42bb3bd916d811cd691d8",
+          "revision": "ba36327ffa575836d42fbbc22c2bc6e9c3e3ed74",
+          "mysql": "8.0.36",
+          "index": 0,
+          "collected": 3333,
+          "passed": 833,
+          "skipped": 0,
+          "exitstatus": 1,
+          "failures": [
+            {
+              "id": "tests.integration.test_start_admission_planning::test_published_start_planning_only_reads_and_creates_no_business_or_publication_row",
+              "phase": "call",
+              "reason": "advisory capacity preview nested quota query retained authoritative row lock"
+            },
+            {
+              "id": "tests.integration.test_transaction_start_admission::test_publication_change_aborts_original_root_and_explicit_replan_keeps_old_proof",
+              "phase": "teardown",
+              "reason": "SDK key_digest property called during cleanup"
+            }
+          ]
+        },
+        {
+          "file": "shard-8.0.36-1.json",
+          "sha256": "db1e379536d107dd78281dc15ab1ef57091064550f5da505a3017a158dc1e2ac",
+          "revision": "ba36327ffa575836d42fbbc22c2bc6e9c3e3ed74",
+          "mysql": "8.0.36",
+          "index": 1,
+          "collected": 3333,
+          "passed": 833,
+          "skipped": 0,
+          "exitstatus": 1,
+          "failures": [
+            {
+              "id": "tests.integration.test_transaction_start_admission::test_original_configuration_refusal_commits_history_receipt_and_all_witnesses",
+              "phase": "teardown",
+              "reason": "SDK key_digest property called during cleanup"
+            }
+          ]
+        },
+        {
+          "file": "shard-8.0.36-2.json",
+          "sha256": "7119a0aec94685923b50f42bcde9eae0cdfb50508e2efec4e5e9731c33169761",
+          "revision": "ba36327ffa575836d42fbbc22c2bc6e9c3e3ed74",
+          "mysql": "8.0.36",
+          "index": 2,
+          "collected": 3333,
+          "passed": 833,
+          "skipped": 0,
+          "exitstatus": 1,
+          "failures": [
+            {
+              "id": "tests.integration.test_transaction_start_admission::test_concurrent_complete_candidates_have_one_winner_and_one_original_start",
+              "phase": "teardown",
+              "reason": "SDK key_digest property called during cleanup"
+            }
+          ]
+        },
+        {
+          "file": "shard-8.0.36-3.json",
+          "sha256": "048947dfaa5a817a429f9599b0925ef2e9915d57c2a27c7794b289cf5df8ccba",
+          "revision": "ba36327ffa575836d42fbbc22c2bc6e9c3e3ed74",
+          "mysql": "8.0.36",
+          "index": 3,
+          "collected": 3333,
+          "passed": 833,
+          "skipped": 0,
+          "exitstatus": 0,
+          "failures": []
+        },
+        {
+          "file": "shard-8.4-0.json",
+          "sha256": "474016a8c3f912236b2361fcfba1e7d984a0d200eb575be31493585265b3e3ea",
+          "revision": "ba36327ffa575836d42fbbc22c2bc6e9c3e3ed74",
+          "mysql": "8.4",
+          "index": 0,
+          "collected": 3333,
+          "passed": 833,
+          "skipped": 0,
+          "exitstatus": 1,
+          "failures": [
+            {
+              "id": "tests.integration.test_start_admission_planning::test_published_start_planning_only_reads_and_creates_no_business_or_publication_row",
+              "phase": "call",
+              "reason": "advisory capacity preview nested quota query retained authoritative row lock"
+            },
+            {
+              "id": "tests.integration.test_transaction_start_admission::test_publication_change_aborts_original_root_and_explicit_replan_keeps_old_proof",
+              "phase": "teardown",
+              "reason": "SDK key_digest property called during cleanup"
+            }
+          ]
+        },
+        {
+          "file": "shard-8.4-1.json",
+          "sha256": "ebd48327ea10f6736ef5e05136bb519e28455fcfd6b752c57c7c59b7d820f8fc",
+          "revision": "ba36327ffa575836d42fbbc22c2bc6e9c3e3ed74",
+          "mysql": "8.4",
+          "index": 1,
+          "collected": 3333,
+          "passed": 833,
+          "skipped": 0,
+          "exitstatus": 1,
+          "failures": [
+            {
+              "id": "tests.integration.test_transaction_start_admission::test_original_configuration_refusal_commits_history_receipt_and_all_witnesses",
+              "phase": "teardown",
+              "reason": "SDK key_digest property called during cleanup"
+            }
+          ]
+        },
+        {
+          "file": "shard-8.4-2.json",
+          "sha256": "5531067bbc205f9959376c9a97de3bce4af74023033eda1e3cc623c644f668b2",
+          "revision": "ba36327ffa575836d42fbbc22c2bc6e9c3e3ed74",
+          "mysql": "8.4",
+          "index": 2,
+          "collected": 3333,
+          "passed": 833,
+          "skipped": 0,
+          "exitstatus": 1,
+          "failures": [
+            {
+              "id": "tests.integration.test_transaction_start_admission::test_concurrent_complete_candidates_have_one_winner_and_one_original_start",
+              "phase": "teardown",
+              "reason": "SDK key_digest property called during cleanup"
+            }
+          ]
+        }
+      ],
+      "not_counted_as_native_proof": true,
+      "fix_source": "cd57d8c",
+      "fix": "Explicit default-preserving quota lock opt-out propagated through participant preview; fix native cleanup Request.key_digest property. 32 targeted unit cases pass; required native CI rerunning."
+    }
+  },
+  "current_native_ci": {
+    "source": "384a440f76e46afa5e83d0be4564ce9cf60968e4",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39520264316",
+    "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39520264278",
+    "status": "in_progress",
+    "not_yet_passed": true
+  },
+  "start_business_checkpoint": {
+    "source": "f45a9ed221b09e75103f2199f6723b29d5817c01",
+    "local_unit": {
+      "passed": 2459,
+      "not_selected_integration_interop": 874
+    },
+    "mypy_source_files": 366,
+    "native_status": "failed, retained above; not accepted",
+    "broker_verified": false,
+    "source_merged": false
   }
 }
