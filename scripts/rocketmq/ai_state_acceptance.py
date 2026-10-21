@@ -38,7 +38,9 @@ CASES = frozenset(('constructor_inert', 'halves_before_worker_root', 'half_invis
     'claim_source_conflict_rollback', 'claim_quota_deferral_no_phantom_event',
     'scanner_half_before_original_root', 'scanner_explicit_abort_retry_first_wire',
     'scanner_first_claim_committed_handoff', 'scanner_duplicate_no_new_model_or_send',
-    'scanner_quota_deferral_no_running_event'))
+    'scanner_quota_deferral_no_running_event',
+    'finish_retry_half_invisible', 'finish_retry_first_plan_and_old_abort',
+    'finish_retry_duplicate_first_result', 'finish_retry_no_new_provider'))
 TESTS = frozenset((
     'test_actual_worker_preflight_half_gate_and_duplicate_preserve_original_evidence',
     'test_actual_worker_preflight_lost_final_reply_preserves_local_commit',
@@ -65,7 +67,9 @@ TESTS = frozenset((
     'test_actual_interpretation_claim_capacity_denial_cannot_publish_running',
     'test_actual_original_claim_scanner_first_plan_and_explicit_abort_retry[False]',
     'test_actual_original_claim_scanner_first_plan_and_explicit_abort_retry[True]',
-    'test_actual_original_claim_scanner_quota_defers_without_running_event'))
+    'test_actual_original_claim_scanner_quota_defers_without_running_event',
+    'test_actual_explicit_finalization_retry_preserves_first_wire_and_durable_response[question]',
+    'test_actual_explicit_finalization_retry_preserves_first_wire_and_durable_response[artifact]'))
 
 
 def state_manifest():
