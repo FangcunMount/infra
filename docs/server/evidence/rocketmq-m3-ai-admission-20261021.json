@@ -419,7 +419,7 @@
   "checkpoint": "80805fbfc4991425e2e62789e5e2ca7042e4b1ca",
   "source_pr": "https://github.com/FangcunMount/qs-ai/pull/159",
   "source_pr_draft": true,
-  "source_pushed_checkpoint": "62f5053ae15d9c72fb16c903356a584c1ff902f2",
+  "source_pushed_checkpoint": "8264093bcf45477c85dd27172d3eba73656daf6c",
   "foundation_additions": [
     "Frozen job identity with unchanged ordinary defaults",
     "Frozen receipt Inbox decision without legacy Outbox stage",
@@ -765,9 +765,9 @@
     }
   },
   "current_native_ci": {
-    "source": "62f5053ae15d9c72fb16c903356a584c1ff902f2",
-    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39521665607",
-    "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39521665603",
+    "source": "8264093bcf45477c85dd27172d3eba73656daf6c",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39523138592",
+    "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39523138451",
     "status": "in_progress",
     "not_yet_passed": true
   },
@@ -936,5 +936,160 @@
       "transactional receiver assembly",
       "actual SDK/Broker host acceptance"
     ]
+  },
+  "native_change_acceptance": {
+    "source_sha": "62f5053ae15d9c72fb16c903356a584c1ff902f2",
+    "reports": [
+      {
+        "file": "shard-8.0.36-0.json",
+        "sha256": "9a99c0e1c1370d58bdcb827f2fdca2432ec1b68e565e0a4de8799d0d912716b1",
+        "revision": "091bd048cd578e01e4b4ba1d0a24320b0d10d716",
+        "mysql": "8.0.36",
+        "index": 0,
+        "passed": 846
+      },
+      {
+        "file": "shard-8.0.36-1.json",
+        "sha256": "948c6068c1376784a8799d23e9f0e638f6d16c59447e55b300c56978444b8abd",
+        "revision": "091bd048cd578e01e4b4ba1d0a24320b0d10d716",
+        "mysql": "8.0.36",
+        "index": 1,
+        "passed": 845
+      },
+      {
+        "file": "shard-8.0.36-2.json",
+        "sha256": "001a315e547fdea0d2a5b59f1f7a553839b0df68fa1a76afe0c02b5782aeeba2",
+        "revision": "091bd048cd578e01e4b4ba1d0a24320b0d10d716",
+        "mysql": "8.0.36",
+        "index": 2,
+        "passed": 845
+      },
+      {
+        "file": "shard-8.0.36-3.json",
+        "sha256": "ac6c42371824702ac55b98bafad004c6b4697c789793c3fb2fc5e3fb57744c5a",
+        "revision": "091bd048cd578e01e4b4ba1d0a24320b0d10d716",
+        "mysql": "8.0.36",
+        "index": 3,
+        "passed": 845
+      },
+      {
+        "file": "shard-8.4-0.json",
+        "sha256": "dc82dba0f69e96c6be0bf4306af1633a3e3d4c2bdad1ab2d645ca0d0d2920b01",
+        "revision": "091bd048cd578e01e4b4ba1d0a24320b0d10d716",
+        "mysql": "8.4",
+        "index": 0,
+        "passed": 846
+      },
+      {
+        "file": "shard-8.4-1.json",
+        "sha256": "e3ef369f0add327ac17104a769ca2140609bcbf7152dc98eab3fa6e31cf41954",
+        "revision": "091bd048cd578e01e4b4ba1d0a24320b0d10d716",
+        "mysql": "8.4",
+        "index": 1,
+        "passed": 845
+      },
+      {
+        "file": "shard-8.4-2.json",
+        "sha256": "a9fcedf61ebd60adb535fe923f1eee721e87a9ab5e3396227143ac1f75a3e493",
+        "revision": "091bd048cd578e01e4b4ba1d0a24320b0d10d716",
+        "mysql": "8.4",
+        "index": 2,
+        "passed": 845
+      },
+      {
+        "file": "shard-8.4-3.json",
+        "sha256": "ffe8b5c65513b15f9de4b74bae5e00d3834597ff499312670b9ead363e01dc2e",
+        "revision": "091bd048cd578e01e4b4ba1d0a24320b0d10d716",
+        "mysql": "8.4",
+        "index": 3,
+        "passed": 845
+      }
+    ],
+    "complete_nonoverlapping_zero_skip": true,
+    "per_mysql_passed": 3381,
+    "per_mysql_native_change": 4,
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39521665607",
+    "checks_success": 12,
+    "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39521665603",
+    "messaging_success": 2,
+    "tested_merge_sha": "091bd048cd578e01e4b4ba1d0a24320b0d10d716",
+    "verified_merge_parents": [
+      "c321a69411d1f9494de1e36f94834a974fbb15ea",
+      "62f5053ae15d9c72fb16c903356a584c1ff902f2"
+    ],
+    "failed": 0,
+    "skipped": 0,
+    "broker_verified": false,
+    "source_merged": false,
+    "messaging_reports": [
+      {
+        "file": "m7-qs-ai-mysql-8.0.36/m7-m3-schema.xml",
+        "sha256": "967793f3d9e4160badd89451e08d7c4ce229384a7fc59dc4bd0af338dc100a4e",
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.0.36/m7-storage.xml",
+        "sha256": "62f77f25343a979c439ab27056f7032e50d752a2aa09f820bf57711ad16a928c",
+        "passed": 85,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.0.36/m7-unit.xml",
+        "sha256": "edd0e087a38477ee8c8ec3626e618991d0496c96206b25bb41f61febfc7e7b5b",
+        "passed": 119,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.4/m7-m3-schema.xml",
+        "sha256": "652db89d3b6691049af2a3bd5f33041293da2e0e31c0fe7980a077fe4fb23a44",
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.4/m7-storage.xml",
+        "sha256": "4ae01cf8a934542daa018f6456dd9d49cae012d9184ccb8c8d1f7433f0b6d88d",
+        "passed": 85,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.4/m7-unit.xml",
+        "sha256": "57e60b20184df547912055c44e0618b5c0a47b6f742dae77285fd82e3c273561",
+        "passed": 119,
+        "failed": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "retry_checkpoint": {
+    "source": "b210b84e399ebc7034c1c3cf421a419b382b4b4d",
+    "candidate": "8264093bcf45477c85dd27172d3eba73656daf6c",
+    "local_unit": {
+      "passed": 2527,
+      "not_selected_integration_interop": 881,
+      "log": "/tmp/m3-t16-retry-batch-full-unit.log"
+    },
+    "mypy_source_files": 374,
+    "new_native_retry_cases": 3,
+    "native_status": "pending",
+    "preserved": [
+      "original explicit retry authority and unknown-result risk consent",
+      "first frozen model request and audit digest",
+      "original participant target and CAS",
+      "one root commit, frozen Run/job/state identities",
+      "CHANGE context golden digest unchanged"
+    ],
+    "remaining": [
+      "two evaluation command planners/root executors",
+      "actual transactional receiver",
+      "formal SDK/Broker host gate"
+    ],
+    "production_changed": false,
+    "source_merged": false
   }
 }

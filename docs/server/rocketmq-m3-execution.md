@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T16进行中。START修复候选384a440完整CI12项及消息兼容2项成功，真实MySQL8.0.36/8.4各3339项0失败/跳过；八份分片完整无重叠，含每档8项HELD根、2项只读START、3项完整业务原根。CHANGE候选62f5053已推送，新增4项真实原根用例待CI；其余三类命令/事务receiver/Broker仍待完成。T16不勾选、源码不合并。[T16证据](evidence/rocketmq-m3-ai-admission-20261021.json)。
+- 当前批次：T16进行中。START/CHANGE候选62f5053完整CI12项及消息兼容2项成功，真实MySQL8.0.36/8.4各3381项0失败/跳过；八份分片完整无重叠，新增4项CHANGE原根证明通过。PARTICIPANT_RETRY8264093已推送，新增3项真实原根用例待CI；两类评测命令/事务receiver/Broker仍待完成。T16不勾选、源码不合并。[T16证据](evidence/rocketmq-m3-ai-admission-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -131,7 +131,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T13 | 到期 dispatcher、重试授权、交接和 Replay 边界 | 2026-10-21；最终7e8aba25/fd985a122全仓race7198通过/60既有可选跳过、固定lint零问题；原库三档各44项、真实Broker三档各41项均0失败/跳过/无race且清理完整。QS当前头28项CI成功/1API同步不适用，PR417合并133fc073；infra22项CI全部成功，PR61合并d4324a87。[完整证据与失败历史](evidence/rocketmq-m3-qs-retry-20261021.json)。生产未变更 |
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
-| ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 进行中；[AI草稿PR159](https://github.com/FangcunMount/qs-ai/pull/159)384a440完整CI14项成功，两档MySQL各3339通过/0失败/跳过，START原根已证。CHANGE62f5053只读/冻结/原根及4项native用例待CI；其余三类命令、receiver和Broker待完成，未合并 |
+| ☐ | T16 | AI command admission/receipt 原事务与根提交归属 | 进行中；[AI草稿PR159](https://github.com/FangcunMount/qs-ai/pull/159)62f5053完整CI14项成功，两档MySQL各3381通过/0失败/跳过，START/CHANGE已证；RETRY8264093及3项native用例待CI，两类评测/receiver/Broker待完成，未合并 |
 | ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 待开始 |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
@@ -402,3 +402,5 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-21：T16 新 START 候选 f45a9ed 本地完整纯单元2459通过、874项真实依赖按标记未选择，mypy366源文件通过；真实两档MySQL CI暴露预览间接取得配额行锁与测试清理误调用SDK属性，失败报告和精确SHA保留，不计通过。cd57d8c保持原根锁默认值、只对预览关闭嵌套锁并修复清理，32项定向测试通过；新384a440候选正在重跑完整CI39520264316。CHANGE目标绑定授权组件5项通过，实际命令/Receiver/Broker仍待完成；T16未勾选，总进度15/36。
 
 - 2026-10-21：T16 START修复384a440两档MySQL各3339项0失败/跳过，八份分片报告完整无重叠；实际合并测试SHA f907af2c父提交已核对。完整12检查及M7两档成功，M7每档schema3、unit119、storage85分别通过（子集不叠加作完整计数）；每档含8项HELD根、2项只读START、3项完整业务START，先前失败保留。CHANGE62f5053完成只读原answer/cancel、冻结首次消息、精确主体/目标和60秒观察、原根/witness组装；本地完整纯单元2502通过/878真实依赖未选，mypy371源文件通过，最后锁等待后读取时钟的25项定向通过。新增4项真实CHANGE原根正在CI39521665607验证，不沿用START成功；SDK/Broker与其余三类命令未完成，T16仍不勾选、15/36，无生产变更。
+
+- 2026-10-21：T16 CHANGE62f5053完整12检查与消息兼容2检查成功，两档MySQL各3381项零失败/跳过，八分片无遗漏/重复，新增各4项CHANGE业务原根通过。测试合并SHA091bd048父提交已核对，M7每档schema3/unit119/storage85报告分别保留。RETRY8264093完成共享原风险/CAS/档案规则、无锁只读规划、冻结Run/job/state/时钟、原参与者观察、源档案摘要及原根witness；本地完整2527通过/881真实依赖未选，mypy374源文件通过，3项新原生重试用例收集完成待CI39523138592。共享上下文保留CHANGE原bytes摘要向量，SDK协议/schema未改；两类评测/receiver/Broker仍未完成。总进度15/36，未合并AI源码、未发布/部署。
