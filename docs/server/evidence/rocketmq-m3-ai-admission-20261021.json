@@ -6,7 +6,7 @@
   "base": "c321a69411d1f9494de1e36f94834a974fbb15ea",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-admission",
   "branch": "codex/rocketmq-m3-ai-admission",
-  "source_pushed": false,
+  "source_pushed": true,
   "source_merged": false,
   "native_host_acceptance": false,
   "production_changed": false,
@@ -1676,10 +1676,10 @@
     ]
   },
   "broker_profile_candidate": {
-    "ai_source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
-    "infra_sha": "8ad7f7a6a39da054e5384199b46765bbc6880427",
+    "ai_source_sha": "9485f28f9bf7d078b691b6b561473272d436e5ba",
+    "infra_sha": "21be02d366c95d2d42e621c57ccb9d45c174f252",
     "pull_request": "https://github.com/FangcunMount/infra/pull/83",
-    "checks": "https://github.com/FangcunMount/infra/actions/runs/39539009218",
+    "checks": "https://github.com/FangcunMount/infra/actions/runs/39540599454",
     "python": [
       "3.11",
       "3.13"
@@ -1692,18 +1692,19 @@
     "sdk": "0.4.0a1 released wheel, client5.1.2",
     "host_tests": 8,
     "required_cases": 15,
-    "harness_unit_passed": 66,
-    "status": "queued_retry_after_fixture_timestamp_fix",
+    "harness_unit_passed": 68,
+    "status": "in_progress_after_structured_sdk_result_fix",
     "verified": false,
     "production_changed": false
   },
   "latest_local_gate": {
-    "source_sha": "f528e63db17c8085199de1f69b86f76d622b8636",
-    "unit_passed": 2625,
+    "source_sha": "3e6f178107c351a41b40589afbc0dff040c61129",
+    "unit_passed": 2636,
     "integration_interop_deselected": 895,
     "mypy_source_files": 381,
+    "structured_sdk_error_regressions": 5,
     "ruff": "passed",
-    "format_files": 932,
+    "format_files": 933,
     "docs_markdown_files": 75,
     "docs_links": 1315
   },
@@ -1837,10 +1838,188 @@
     "accepted": false
   },
   "latest_ai_ci_candidate": {
-    "source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
-    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39538869956",
-    "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39538869952",
+    "source_sha": "9485f28f9bf7d078b691b6b561473272d436e5ba",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39540533886",
+    "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39540533753",
     "status": "in_progress",
     "not_yet_passed": true
+  },
+  "broker_second_failure": {
+    "checks": "https://github.com/FangcunMount/infra/actions/runs/39539009218",
+    "source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+    "infra_sha": "8ad7f7a6a39da054e5384199b46765bbc6880427",
+    "reports": [
+      {
+        "file": "rocketmq-ai-admission-0-3.11-4b034293cbde1fe0f506a65347d33bf17869c046/rocketmq-ai-admission.json",
+        "sha256": "27f1df039b5a0e83611673ee598bddc932d2b1b19b1bd4b8d5311cdde9cc27e1",
+        "source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+        "python": "3.11.16",
+        "mysql_version": "8.0.36",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "junit_sha256": "779553486c8e5f28da80cb833717eb1688c45bda07209e740dbdf35765fe7ad7",
+        "private_output_sha256": "2c39063ffff8ca7e63287cd55e812507b714642636f42e6376b7003ea5af09df",
+        "diagnostics": {
+          "failed_cases": [
+            "test_real_commit_reply_deliberately_discarded_keeps_local_commit_and_first_wire"
+          ],
+          "assertion_lines": [
+            589,
+            590
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-1-3.11-4b034293cbde1fe0f506a65347d33bf17869c046/rocketmq-ai-admission.json",
+        "sha256": "ab8a2f5948a919d68fe2ab5ab30a255bbfecca36268a765758b0fffaaf6941d9",
+        "source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+        "python": "3.11.16",
+        "mysql_version": "8.0.44",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "junit_sha256": "2b480eb211ade3b7f98960ed15586236b80e8db3c988e3857024f337b7575b96",
+        "private_output_sha256": "18b0f031833690a5d52b1259eb2e2213dde505943939f4025e3cf412889c026e",
+        "diagnostics": {
+          "failed_cases": [
+            "test_real_commit_reply_deliberately_discarded_keeps_local_commit_and_first_wire"
+          ],
+          "assertion_lines": [
+            589,
+            590
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-2-3.11-4b034293cbde1fe0f506a65347d33bf17869c046/rocketmq-ai-admission.json",
+        "sha256": "8201885d6161cbdfdec2093722be67cb662e751a6a70495600d2fb188f759ca0",
+        "source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+        "python": "3.11.16",
+        "mysql_version": "8.4.11",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "junit_sha256": "44e44e13aa914ae4fade5af75cf13ee15c6f944c279828bedecc86ef8bedfb06",
+        "private_output_sha256": "bce72a11320a7f22ee593cb36eff08adabcf581986e83a1837859272d114bc31",
+        "diagnostics": {
+          "failed_cases": [
+            "test_real_commit_reply_deliberately_discarded_keeps_local_commit_and_first_wire"
+          ],
+          "assertion_lines": [
+            589,
+            590
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-3-3.13-4b034293cbde1fe0f506a65347d33bf17869c046/rocketmq-ai-admission.json",
+        "sha256": "b0888b6395d24be37288c98bd54740d7b8b9035bf84ca0718565675e59831877",
+        "source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+        "python": "3.13.15",
+        "mysql_version": "8.0.36",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "junit_sha256": "ccf1bfd9ef448e68f805e072395d23badc17c3e28d3821e6f1b76de35724f505",
+        "private_output_sha256": "d29903ca9d9c11dc18b4f25013735a016c8e07e226621e116853211a2175bb74",
+        "diagnostics": {
+          "failed_cases": [
+            "test_real_commit_reply_deliberately_discarded_keeps_local_commit_and_first_wire"
+          ],
+          "assertion_lines": [
+            589,
+            590
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-4-3.13-4b034293cbde1fe0f506a65347d33bf17869c046/rocketmq-ai-admission.json",
+        "sha256": "709e9d2130034f158dbd365cbd577461caf4132ce368efe3bf48cb1cce9c8d9c",
+        "source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+        "python": "3.13.15",
+        "mysql_version": "8.0.44",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "junit_sha256": "7af8e84ba3f4042ab72a21534768b919cb743edc55dc13e7cbf03592590e9357",
+        "private_output_sha256": "54cab85639cf9c78ce87b6e2d52a1ed914fcc23a32e76ea8cc5947c0ddc73954",
+        "diagnostics": {
+          "failed_cases": [
+            "test_real_commit_reply_deliberately_discarded_keeps_local_commit_and_first_wire"
+          ],
+          "assertion_lines": [
+            589,
+            590
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "file": "rocketmq-ai-admission-5-3.13-4b034293cbde1fe0f506a65347d33bf17869c046/rocketmq-ai-admission.json",
+        "sha256": "2a0b4ec71312f9b8838394276010f491edad56f1e34c826a33724813c6f5cc33",
+        "source_sha": "bdbaa30a4aef9ea3b3b9ed9c3a651c1bbfb70ba4",
+        "python": "3.13.15",
+        "mysql_version": "8.4.11",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "exit_code": 1,
+        "junit_sha256": "dd7aca85208786576d42579e9772e0ee4705ed5b968ec49aabda4a9b8007ce53",
+        "private_output_sha256": "be770eedb16dd05c5b7f6502f7a09a5ac5bdd475b2ee99d1354895f9a367f82c",
+        "diagnostics": {
+          "failed_cases": [
+            "test_real_commit_reply_deliberately_discarded_keeps_local_commit_and_first_wire"
+          ],
+          "assertion_lines": [
+            589,
+            590
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "cause": "Published SDK raises TransactionSendError carrying LocalCommitted + FinalUnknown; host must inspect exact proof before ACK, not treat a completed local root as technical failure. Probe observer must record structured result while rethrowing.",
+    "fix_sha": "3e6f178107c351a41b40589afbc0dff040c61129",
+    "accepted": false
   }
 }
