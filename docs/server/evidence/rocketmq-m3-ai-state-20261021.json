@@ -1452,7 +1452,7 @@
     "format_files": 959,
     "targeted_governance_and_root_passed": 64,
     "native_cases_collected": 12,
-    "native_cases_executed": false,
+    "native_cases_executed": true,
     "explicit_repeatable_read_before_guard": true,
     "sdk_published_version": "0.4.0a1",
     "actual_governance_rpc_enabled": false,
@@ -1469,7 +1469,22 @@
     "previous_candidate_checks_status": "cancelled after base integration; not accepted",
     "candidate_tree_sha": "fcf3847218ab4a2cb21b33f34812a58d95ad05c1",
     "previous_candidate_tree_sha": "fcf3847218ab4a2cb21b33f34812a58d95ad05c1",
-    "base_main_sha": "2342eb6b0260db0d0e20db1c8dad24cd2cf2a90a"
+    "base_main_sha": "2342eb6b0260db0d0e20db1c8dad24cd2cf2a90a",
+    "checks_status": "success; all 12 current-head checks and all 8 test shards verified",
+    "mysql_profiles": {
+      "8.0.36": {
+        "passed": 3707,
+        "failed": 0,
+        "skipped": 0,
+        "governance_native_passed": 12
+      },
+      "8.4": {
+        "passed": 3707,
+        "failed": 0,
+        "skipped": 0,
+        "governance_native_passed": 12
+      }
+    }
   },
   "atomic_root_source_verified": {
     "source_sha": "cbc47d9d3404a8e87cb6318fa07d43ced2ba2a2c",
@@ -2189,5 +2204,153 @@
   },
   "foundation_messaging_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39559277604",
   "source_messaging_ci": null,
-  "source_messaging_ci_status": "governance-only paths do not trigger separate M7 workflow; unchanged baseline M7 proof retained with exact foundation source; full source suite remains required"
+  "source_messaging_ci_status": "governance-only paths do not trigger separate M7 workflow; unchanged baseline M7 proof retained with exact foundation source; full source suite remains required",
+  "governance_rpc_source_verified": {
+    "source_sha": "ecdb1448dff57ebc5f4ae4f64b062638e7d1de47",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39562163112",
+    "tested_merge_sha": "edf0c1dbf9eff49e66ebb589a32969c538678af1",
+    "verified_merge_parents": [
+      "2342eb6b0260db0d0e20db1c8dad24cd2cf2a90a",
+      "ecdb1448dff57ebc5f4ae4f64b062638e7d1de47"
+    ],
+    "reports": [
+      {
+        "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+        "sha256": "716c2d02d6749c138b2a70cbfe5f0e8e102674cd3a7d33c32631d5440a5cccfd",
+        "xml_sha256": "1410490a16a1c1842f3e558b4ae3548bc99ec83b671b1b562d6fafc57d658e38",
+        "revision": "edf0c1dbf9eff49e66ebb589a32969c538678af1",
+        "mysql": "8.0.36",
+        "index": 0,
+        "passed": 927,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+        "sha256": "f1ec73ab6e50e152fa5dc4e09bc7e43778cf1b33fd9f28a30dee9128427c59fb",
+        "xml_sha256": "9b56ceba99e6129979ce80c718f0bb7ec3acb76690e02759c8d6bf416a1051d6",
+        "revision": "edf0c1dbf9eff49e66ebb589a32969c538678af1",
+        "mysql": "8.0.36",
+        "index": 1,
+        "passed": 927,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+        "sha256": "48ecacc996a89a8600bd60d804f4f2c2cca20101d5f0b1bfa57fc077e2a12eaa",
+        "xml_sha256": "29761b99f4fe9f0906ae9b8b622ed5ac3020a9f35a30cc8395e73a5ce2b11828",
+        "revision": "edf0c1dbf9eff49e66ebb589a32969c538678af1",
+        "mysql": "8.0.36",
+        "index": 2,
+        "passed": 927,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+        "sha256": "c1280f99f74f0f6c32dc42d725f62e3fe548cf6daa45de7b171cefb963e5f2bb",
+        "xml_sha256": "c82a4f4c9a7791a69cd03efda1b89ee191c1db80a2b76ebf0a7373f612ba4739",
+        "revision": "edf0c1dbf9eff49e66ebb589a32969c538678af1",
+        "mysql": "8.0.36",
+        "index": 3,
+        "passed": 926,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.4-0/shard-8.4-0.json",
+        "sha256": "975e54a9790a245f0fb3360d4bedbc70f2549d140ede45cedd58710ba3d30be8",
+        "xml_sha256": "ba9202a6456a04659c745207f54d026c6e64fc7e812b0d8382d99d47ee9fbb3f",
+        "revision": "edf0c1dbf9eff49e66ebb589a32969c538678af1",
+        "mysql": "8.4",
+        "index": 0,
+        "passed": 927,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.4-1/shard-8.4-1.json",
+        "sha256": "817f57cf42f0e524fcccc4c7c1256cc992d05b17ff13e3f6ea45dbdb9f005662",
+        "xml_sha256": "f866fe9963c9d1c0d7820331a1996b82bc7d1dbf1ed980abd414df6a70846694",
+        "revision": "edf0c1dbf9eff49e66ebb589a32969c538678af1",
+        "mysql": "8.4",
+        "index": 1,
+        "passed": 927,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.4-2/shard-8.4-2.json",
+        "sha256": "9142a79e64dd33114ced2375c9c7c6504617e94cbc7f8f326d372f1d4a0501b3",
+        "xml_sha256": "8aa6f0897e9ba912b7668aa28bced4241f393b8f92f0b3d7f2052f2760d847a8",
+        "revision": "edf0c1dbf9eff49e66ebb589a32969c538678af1",
+        "mysql": "8.4",
+        "index": 2,
+        "passed": 927,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests-8.4-3/shard-8.4-3.json",
+        "sha256": "b6aeff01b160573595f2eedff99bda7adf94af3bec1f9007cb1090d4c8078d67",
+        "xml_sha256": "9df38cb6c7a54574d24b65063fe35f772ded01390dd21d0481c692714f8c5520",
+        "revision": "edf0c1dbf9eff49e66ebb589a32969c538678af1",
+        "mysql": "8.4",
+        "index": 3,
+        "passed": 926,
+        "failed": 0,
+        "skipped": 0
+      }
+    ],
+    "profiles": {
+      "8.0.36": {
+        "collected": 3707,
+        "passed": 3707,
+        "failed": 0,
+        "skipped": 0,
+        "native": {
+          "test_transaction_admission_root": 8,
+          "test_transaction_start_admission": 4,
+          "test_transaction_change_admission": 4,
+          "test_transaction_retry_admission": 3,
+          "test_transaction_evaluation_admission": 9,
+          "test_transaction_command_receiver": 4,
+          "test_transaction_evaluation_state_root": 6,
+          "test_transaction_worker_preflight": 5,
+          "test_transaction_governance_state": 12
+        }
+      },
+      "8.4": {
+        "collected": 3707,
+        "passed": 3707,
+        "failed": 0,
+        "skipped": 0,
+        "native": {
+          "test_transaction_admission_root": 8,
+          "test_transaction_start_admission": 4,
+          "test_transaction_change_admission": 4,
+          "test_transaction_retry_admission": 3,
+          "test_transaction_evaluation_admission": 9,
+          "test_transaction_command_receiver": 4,
+          "test_transaction_evaluation_state_root": 6,
+          "test_transaction_worker_preflight": 5,
+          "test_transaction_governance_state": 12
+        }
+      }
+    },
+    "current_head_checks_success": 12,
+    "scope": "Actual host SQLAlchemy roots and direct RPC adapters with database-only runtime; no governance real-Broker, packet-loss, process-exit or production proof."
+  },
+  "review_codec_local_followup": {
+    "source_sha": null,
+    "source_status": "uncommitted; not published or accepted as current PR source",
+    "targeted_passed": 44,
+    "failed": 0,
+    "mypy_source_files": 391,
+    "scope": "pure review input digest and bounded first-clock facts; no review SDK dispatch yet",
+    "failure_fixed": "new test used nonexistent SDK FrozenBranch.context; corrected assertion checks the actual decoded archive context",
+    "log": "/tmp/m3-t17-review-codec-fixed.log",
+    "task_completed": false
+  }
 }
