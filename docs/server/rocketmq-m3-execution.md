@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17进行中，16/36。Solution与ResolveUnknown事务源码已合并；维护只读规划PR177与worker准备只读规划PR178也已合并，完整八分片/JUnit核验双MySQL各4146/4161零失败跳过，12检查均成功、合并tree一致。原Go发布超时同源单次重验已成功，首轮失败保留且未改5秒预算。新Broker源74f9d35/工具cbe1d9d的12宿主/35证据六档39635351591排队；dispatch预算只读PR180本地3125通过、4原生待CI。完整worker/维护SDK/状态及统一装配未完成，默认装配关闭，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36。维护只读PR177与worker准备只读PR178已合并，双MySQL各4146/4161零失败跳过、12检查均成功且tree一致。ResolveUnknown新真实Broker六档39635351591已核验：精确74f9d35/cbe1d9d每档12宿主/35证据、零失败跳过和完整清理；源PR179与工具PR108其余合并门禁继续追踪。dispatch预算只读PR180本地3125通过、4原生待CI；完整串行SDK dispatch已实现并通过60目标，13原生仅收集、全仓验证中。终态/candidate/恢复/维护SDK及统一装配未完成，默认装配关闭，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
