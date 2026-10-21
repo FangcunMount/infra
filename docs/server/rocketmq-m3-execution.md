@@ -528,3 +528,7 @@ Go `v0.5.0-rocketmq-tx.3` 与 Python `0.4.0a2` 均绑定 `8de893b367cc797580799a
 ### 2026-10-22 T17 原领取scanner接入（仍未勾选）
 
 AI [PR197](https://github.com/FangcunMount/qs-ai/pull/197)固定候选`fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4`，代码`009b287`，已用发布wheel完成122目标、3427本地单元、418源类型及文档门禁。原20候选顺序保留，源读取在MQ前关闭；宿主持久化到期job仅在精确旧Aborted后显式授权新fence，首次wire不重建。配额延后只接受实际本地Aborted的专用信号和新的精确中止证明。半消息未知不启动该维护。默认装配未启用。infra [PR121](https://github.com/FangcunMount/infra/pull/121)工具84项通过，新档要求26宿主/64证据及SDK发布URL/hash；旧23/59不得代替。真实MySQL与六档Broker CI待核验，源码/工具未合并。M3保持16/36；完成阶段显式恢复和其他T17写入口继续推进。
+
+### 2026-10-22 T17 完成阶段显式恢复候选
+
+AI [PR198](https://github.com/FangcunMount/qs-ai/pull/198)候选`07002dc6303c78f36f36ce3afe79ea0e9ca064de`在PR197之后独立排队：74原表征、81目标、3434本地单元、418源类型及文档通过，7新原生MySQL仅收集。先在新根核验原Claim/请求/来源/问题序号并关闭连接，再经SDK显式Retry竞争旧Aborted，复用首plan/wire；不重复模型或Seal、不自动重试。infra [PR123](https://github.com/FangcunMount/infra/pull/123)工具86项通过，28宿主/68证据已与源收集器对齐，实际六档待执行。scanner工具PR121另在7919c7a修正uv元数据兼容：以严格uv.lock验证发布URL/hash，运行版本/URL/安装前缀继续校验；85工具项及真实uv安装信息验证通过。旧b011候选和自动并发取代记录保留，不算验收。源码及工具当前均待完整CI/合并。T17仍未勾选，16/36；T18模型恢复、默认装配、稳定版和生产门禁未完成。

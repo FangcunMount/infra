@@ -598,10 +598,10 @@
   },
   "previous_t16_broker_proof_not_rebound": true,
   "remaining": [
-    "Complete interpretation claim/refusal/attempts-exhausted writers with frozen exact source and sequence",
-    "Complete evaluation finalization Sender, candidate/recovery/cancellation drain and all active writer coverage",
-    "Verify current17-case native finish and19-case/51-flag actual Broker gates before merging",
-    "Keep durable model-response finalization and invocation-count failure proof as T18; do not fake a candidate claim for serial ownership",
+    "Complete fixed SDK original scanner11-new-native and26-case/64-flag Broker gates and source/harness merges",
+    "Complete explicit finalization retry7-new-native and28-case/68-flag Broker gates and source/harness merges",
+    "Complete evaluation terminal Sender, candidate/recovery/cancellation drain and all active writer coverage",
+    "Keep durable model-response finalization and invocation-count failure proof as T18; do not fabricate serial candidate ownership",
     "Preserve legacy/archive/ACK responsibilities and default runtime activation gates; T17 remains unchecked"
   ],
   "source_pr": "https://github.com/FangcunMount/qs-ai/pull/197",
@@ -15100,9 +15100,9 @@
     "candidate_sha": "fd1419625d8d3dc4dc731cfc1c0ac8b1e06e2df4",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/197",
     "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39673641728",
-    "harness_sha": "b0111bbdc6fa81237bb54d62c5dd42a118f3df21",
+    "harness_sha": "7919c7a5a03d85e74ba2e29dfe2e56e81583a0e3",
     "harness_pr": "https://github.com/FangcunMount/infra/pull/121",
-    "broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39673821397",
+    "broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39674399523",
     "sdk_version": "0.4.0a2",
     "sdk_wheel_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2",
     "local": {
@@ -15117,11 +15117,52 @@
       "broker_host_cases_collected_only": 26,
       "required_broker_flags": 64,
       "harness_original_tests_passed": 82,
-      "harness_tests_passed": 84
+      "harness_tests_passed": 85,
+      "actual_uv_metadata_and_immutable_lock_verified": true
     },
     "source_merged": false,
     "harness_merged": false,
     "production_deploy_enabled": false,
-    "scope": "Explicit opt-in original20-candidate order, close source before MQ, exact old abort host authorization through public bounded SDK Retry, first wire retained; typed local-Aborted quota denial plus fresh proof before separate no-event job maintenance; half unknown does not authorize business/deferral, no new model handoff for duplicate. Default DI, complete terminal recovery and production remain pending."
+    "scope": "Explicit opt-in original20-candidate order, close source before MQ, exact old abort host authorization through public bounded SDK Retry, first wire retained; typed local-Aborted quota denial plus fresh proof before separate no-event job maintenance; half unknown does not authorize business/deferral, no new model handoff for duplicate. Default DI, complete terminal recovery and production remain pending.",
+    "superseded_harness": {
+      "sha": "b0111bbdc6fa81237bb54d62c5dd42a118f3df21",
+      "checks": "https://github.com/FangcunMount/infra/actions/runs/39673821397",
+      "reason": "Before acceptance reproduced actual uv direct_url.json archive_info empty; moved archive hash proof to strict uv.lock boundary while preserving URL/version/prefix checks. Earlier run superseded by repository concurrency policy, not acceptance."
+    }
+  },
+  "interpretation_finish_explicit_retry": {
+    "status": "required_ci_pending",
+    "source_sha": "07002dc6303c78f36f36ce3afe79ea0e9ca064de",
+    "code_sha": "29b9a72748ceda7e4f7e024b0aec1e866b2717a4",
+    "broker_cases_code_sha": "6f42998639c47a1c7d3d8eaacc3fff2155a881de",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/198",
+    "source_pr_base": "codex/rocketmq-m3-ai-authorized-claim-runtime (PR197 pending)",
+    "harness_sha": "4e613f1de422c6b187a9e9e34c0a875b044daa7b",
+    "harness_pr": "https://github.com/FangcunMount/infra/pull/123",
+    "harness_pr_base": "codex/rocketmq-m3-ai-claim-scanner-harness (PR121 pending)",
+    "local": {
+      "original_characterization": 74,
+      "target": 81,
+      "unit": 3434,
+      "failed": 0,
+      "skipped": 0,
+      "integration_interop_deselected": 1186,
+      "mypy_sources": 418,
+      "native_finish_retry_collected_only": 7,
+      "broker_host_cases_collected_only": 28,
+      "broker_flags": 68,
+      "harness_unit_passed": 86
+    },
+    "scope": "Explicit host-owned deterministic finalization retry; closes fresh original claim/request/source/sequence read before SDK Retry, preserves exact old abort and first plan/wire/IDs/time, shares original root/commit proof; ordinary duplicate and Checker never call retry. Not T18 response-recovery/provider invocation fault acceptance; no default DI/production change",
+    "merged": false,
+    "production_deploy_enabled": false,
+    "source_checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39674774186",
+    "broker_checks": "https://github.com/FangcunMount/infra/actions/runs/39674875067",
+    "superseded_source": {
+      "sha": "72780361ce7f4a9ff7966de96b7be7d55dea8ee2",
+      "run": 39674640768,
+      "conclusion": "cancelled_by_repository_pr_concurrency_after_adding_required_broker_cases",
+      "acceptance_claimed": false
+    }
   }
 }
