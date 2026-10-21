@@ -768,8 +768,8 @@
     "source": "8264093bcf45477c85dd27172d3eba73656daf6c",
     "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39523138592",
     "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39523138451",
-    "status": "in_progress",
-    "not_yet_passed": true
+    "status": "success",
+    "not_yet_passed": false
   },
   "start_business_checkpoint": {
     "source": "f45a9ed221b09e75103f2199f6723b29d5817c01",
@@ -1090,6 +1090,154 @@
       "formal SDK/Broker host gate"
     ],
     "production_changed": false,
+    "source_merged": false
+  },
+  "native_retry_acceptance": {
+    "source_sha": "8264093bcf45477c85dd27172d3eba73656daf6c",
+    "reports": [
+      {
+        "file": "shard-8.0.36-0.json",
+        "sha256": "c373d8a45d6b4e7e17183643fdd2f9a809849668d0965e16b3b3a9d422fb7670",
+        "revision": "b41e4a525d9af90c3a8691c70f481ec88d15183f",
+        "mysql": "8.0.36",
+        "index": 0,
+        "passed": 852
+      },
+      {
+        "file": "shard-8.0.36-1.json",
+        "sha256": "4e616bd4b8b949016b99e5a9e773b982bb888632d1d9c151b860d6e3c1cc464c",
+        "revision": "b41e4a525d9af90c3a8691c70f481ec88d15183f",
+        "mysql": "8.0.36",
+        "index": 1,
+        "passed": 852
+      },
+      {
+        "file": "shard-8.0.36-2.json",
+        "sha256": "c483bb27e5fae10e9324eb29b040b65faee9c710625dbe8e198a215821b576be",
+        "revision": "b41e4a525d9af90c3a8691c70f481ec88d15183f",
+        "mysql": "8.0.36",
+        "index": 2,
+        "passed": 852
+      },
+      {
+        "file": "shard-8.0.36-3.json",
+        "sha256": "305cfcf82b7a92942ae1e83718e4a34b0f94fea1b5984e77bcc64eb11ef8503c",
+        "revision": "b41e4a525d9af90c3a8691c70f481ec88d15183f",
+        "mysql": "8.0.36",
+        "index": 3,
+        "passed": 852
+      },
+      {
+        "file": "shard-8.4-0.json",
+        "sha256": "0e569e6012d1b511166395a7219e1aea25766af15f2bcde298eeed27fd03f85c",
+        "revision": "b41e4a525d9af90c3a8691c70f481ec88d15183f",
+        "mysql": "8.4",
+        "index": 0,
+        "passed": 852
+      },
+      {
+        "file": "shard-8.4-1.json",
+        "sha256": "34bb0442c088c3e7a3bf2fe58b5b896ad921bc5de33b9bd5004efae212c335b8",
+        "revision": "b41e4a525d9af90c3a8691c70f481ec88d15183f",
+        "mysql": "8.4",
+        "index": 1,
+        "passed": 852
+      },
+      {
+        "file": "shard-8.4-2.json",
+        "sha256": "58ea167a963a471adb84f08d4b8088799b93d799a9a53b881e9b3bf43c8bc690",
+        "revision": "b41e4a525d9af90c3a8691c70f481ec88d15183f",
+        "mysql": "8.4",
+        "index": 2,
+        "passed": 852
+      },
+      {
+        "file": "shard-8.4-3.json",
+        "sha256": "25092b62b9686a6890b63f5488ed1914dac2a5fdc10fb4ab1a9e9b72612ec9c6",
+        "revision": "b41e4a525d9af90c3a8691c70f481ec88d15183f",
+        "mysql": "8.4",
+        "index": 3,
+        "passed": 852
+      }
+    ],
+    "complete_nonoverlapping_zero_skip": true,
+    "per_mysql_passed": 3408,
+    "per_mysql_native_retry": 3,
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39523138592",
+    "checks_success": 12,
+    "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39523138451",
+    "messaging_success": 2,
+    "tested_merge_sha": "b41e4a525d9af90c3a8691c70f481ec88d15183f",
+    "verified_merge_parents": [
+      "c321a69411d1f9494de1e36f94834a974fbb15ea",
+      "8264093bcf45477c85dd27172d3eba73656daf6c"
+    ],
+    "failed": 0,
+    "skipped": 0,
+    "source_merged": false,
+    "broker_verified": false,
+    "messaging_reports": [
+      {
+        "file": "m7-qs-ai-mysql-8.0.36/m7-m3-schema.xml",
+        "sha256": "c82eb3cc753737a6a64f322ddef26d878bf4a63cf90e72cc23ec8364c059bb7b",
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.0.36/m7-storage.xml",
+        "sha256": "1103dbb9dedc65e55769e45eebf6a8edba3de977fe351196b9cb568ae9a2a15f",
+        "passed": 85,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.0.36/m7-unit.xml",
+        "sha256": "3c85ff8318e79d5996ecf92784105e24f4301398bcc19cf3a1920a2a27c15b15",
+        "passed": 119,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.4/m7-m3-schema.xml",
+        "sha256": "128a83c3f4fff03d25a4d3e0b2e2cb52668e827b2c6e1f5b3692b3be8977ef06",
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.4/m7-storage.xml",
+        "sha256": "1c2c0dc2dcc53764a80378c5efea44420833d00edd3bde3d467932aecfaf93d6",
+        "passed": 85,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "m7-qs-ai-mysql-8.4/m7-unit.xml",
+        "sha256": "7e813056d624a7248b56c76668e77c357e82f2401fe7471fd8527fd9004f2314",
+        "passed": 119,
+        "failed": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "evaluation_foundation_checkpoint": {
+    "source": "9435de7",
+    "pushed": false,
+    "components": [
+      "pure original requested transition and early checkpoint conflict boundary",
+      "shared original evaluation view/audit projection",
+      "shared capacity math and explicit quota lock opt-out",
+      "shared terminal cancellation and unknown-work drain projection",
+      "explicit opt-in root READ COMMITTED before first guard SQL; ordinary entry default retained",
+      "narrow unchanged start/cancel storage contract"
+    ],
+    "native_new_case": "root isolation mode and unchanged host default; collected, not yet run",
+    "not_accepted": [
+      "full evaluation candidate/sequence/root",
+      "actual SDK/Broker",
+      "transactional receiver"
+    ],
     "source_merged": false
   }
 }
