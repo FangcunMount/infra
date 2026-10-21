@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409及SDK修复/索引PR46/47已合并；infra PR41已合并d544918f。固定Go修订预发布tx.2已发布并重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17进行中，16/36。借用原根PR172已合并b0f1004，双MySQL各4000/各4原根通过，suite/workflow及全分片汇总已独立核验。SDK候选f87真实用例因领域tuple直接比较RPC JSON数组而失败；5948cc9修正断言、候选db2b989/39625934747待重验，56目标通过。真实Broker旧9ea同类断言失败，首档清理完整，旧运行取消请求已提交；修正f572612另行固定。ResolveUnknown只读候选06ac709的36目标/3071单元通过、4原生仅收集。其余状态、完整默认装配及T17门禁未完成。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36。完整Solution事务SDK修正候选db2b989已通过12检查、双MySQL各4083零失败跳过（10原根/17入口各档），PR173合并6feb352，候选/合并tree一致。Broker源f572612的六档各10宿主/30必需证据及完整清理通过，工具与lock hash、测试合并父SHA已核对，源PR174的12检查、工具PR104的13检查均已通过并合并。ResolveUnknown事务候选73ee3b8和维护只读计划b820bf6仍待原生CI；worker准备规划本地进行中，默认装配及其余状态写入口未完成，T17不勾选。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -132,7 +132,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
-| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；借用原根已合并，各4000/档、4原根通过；完整SDK与Broker候选的RPC边界比较断言失败已保留，修正后独立重验，不冒充门禁通过。ResolveUnknown只读规划已推送，其余状态与默认装配未完成。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
+| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；Solution完整SDK已合并，各4083/档、10原根/17入口通过；六档Broker各10/30通过、完整清理，源/工具均已合并，各12/13检查成功。ResolveUnknown、维护原规划、worker准备及其余状态和默认装配仍待闭环；失败历史保留。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
 | ☐ | T20 | 成对契约、安全、wire、receipt/ACK重复与取消 | 待开始 |
@@ -450,3 +450,7 @@ M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像�
 - 2026-10-21：ResolveUnknown源码c44499b/候选73ee3b8（PR176）实现首次人工裁决/源摘要codec、原容量只读预检及显式原宿主绑定；SDK guard后持有原组织锁，原resolver借用同一根，保留CP/Run锁、原预算/模型/配额配置和裁决响应。缺绑定在协议读取前拒绝；本地Committed/FinalUnknown仍需精确证据，不授权自动重试。27目标、3098完整单元零失败/跳过、405类型、1021格式及75文档/1357链接通过；12原生仅收集，包括真实第二个Run争夺宿主容量和并发原裁决，39627648431待验收。原只读规划候选随修正父级整理为440461f/39626904176，原应用源未变。已在原库存中的可信主机semantic-contract-recovery维护写入口继续纳入后续原根/装配审计，不调用生产工具，T17仍不勾选、16/36。
 
 - 2026-10-21：维护语义契约例外只读计划代码ece2b21/候选b820bf6（PR177）已推送39628837038；抽取前7原实现表征、抽取后25目标/3106完整单元零失败跳过、405类型、1023格式及75文档/1358链接通过。新增2原生仅收集，原CLI的预览回滚、apply根提交及旧写入口仍保持原归属；不宣称已接通维护SDK或执行生产工具。失败f87的报告明确为已观察的6/8报告、各档2个RPC比较失败，未将未完成分片视为成功；修正验收独立运行。T17仍不勾选，总计16/36。
+
+- 2026-10-21：修正精确db2b989/39625934747的八分片/JUnit、零重叠完整集合及测试合并父SHA核验通过，两档各4083零失败/跳过，均含10项Solution SDK原根和17项实际处理入口。12检查全部成功，生产CD仍false，PR173正常合并6feb352，tree同a650de27。独立Broker源f572612/工具d0f61bd六档39626265764各10宿主用例/30必需证据、零失败跳过、完整清理；两工具hash、源lock及测试infra合并648ac0b的父SHA均已核验。源PR174与工具PR104其余CI仍待完成，不提前合并或将其计作T17完成。worker原准备的10项原始行为表征已在改动前通过，首次断言误把统一CompletionRecords当独立表已按真实kind作用域修正；只读规划28目标和405类型通过，4原生仅收集，完整本地回归执行中。T17继续16/36，未发布稳定SDK或部署。
+
+- 2026-10-22：Broker源f572612/39626084626八分片与JUnit、完整集合及测试父SHA已核对，两档各4083零失败/跳过；12检查全部成功，生产CD仍false，PR174合并e483f8f，tree同53599a62。infra PR104精确d0f61bd的13检查全部成功并正常合并91a4e76，三项实际工具文件与已验收源逐字节一致；六档10/30真实Broker证据保留。串行worker原准备规划22c95b6/候选46d2697（PR178）本地28目标、3117完整单元、405类型、1025格式与75文档/1359链接通过，4原生仅收集，39631039661待验收；原双CAS prepare+dispatch根未拆开，也未接通worker SDK。T17继续不勾选，总计16/36，生产未改动。
