@@ -1276,7 +1276,7 @@
     "extra_native_root_isolation_case": "collected_only_pending_CI",
     "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39530725568",
     "messaging": "https://github.com/FangcunMount/qs-ai/actions/runs/39530725484",
-    "ci_status": "queued",
+    "ci_status": "failed_fault_trigger_administrator_missing",
     "source_merged": false,
     "broker_verified": false,
     "receiver_assembled": false,
@@ -1297,5 +1297,133 @@
       "actual SDK/Broker host verification",
       "T16 source/harness merge gates"
     ]
+  },
+  "evaluation_native_failure": {
+    "source_sha": "fbb1bbdea447a2901866aebde83a9b45753f6486",
+    "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39530725568",
+    "tested_merge_sha": "58d12fea670647e369dd2b4045a28e168abb8ae7",
+    "verified_merge_parents": [
+      "c321a69411d1f9494de1e36f94834a974fbb15ea",
+      "fbb1bbdea447a2901866aebde83a9b45753f6486"
+    ],
+    "per_mysql_passed": 3485,
+    "per_mysql_failed": 2,
+    "per_mysql_skipped": 0,
+    "reports": [
+      {
+        "file": "shard-8.0.36-0.json",
+        "sha256": "741203c98d1dd81f48cc2b050b37f756e142a7b138a5b6dd98b13a4dc61aae4c",
+        "revision": "58d12fea670647e369dd2b4045a28e168abb8ae7",
+        "mysql": "8.0.36",
+        "index": 0,
+        "passed": 872,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      {
+        "file": "shard-8.0.36-1.json",
+        "sha256": "9ec80f778439873ec80bba37d458e279fb47f1aaf2243cf5ec436bcbf7a436b3",
+        "revision": "58d12fea670647e369dd2b4045a28e168abb8ae7",
+        "mysql": "8.0.36",
+        "index": 1,
+        "passed": 872,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      {
+        "file": "shard-8.0.36-2.json",
+        "sha256": "9600865c894bfb8294339d0809e05086eb93107ece39021e318597c346d1c652",
+        "revision": "58d12fea670647e369dd2b4045a28e168abb8ae7",
+        "mysql": "8.0.36",
+        "index": 2,
+        "passed": 871,
+        "skipped": 0,
+        "exitstatus": 1
+      },
+      {
+        "file": "shard-8.0.36-3.json",
+        "sha256": "28a3b58a869887efcd09da7cf448b26dcd61b9ffc0ae0b88aa66f97bb93bf75e",
+        "revision": "58d12fea670647e369dd2b4045a28e168abb8ae7",
+        "mysql": "8.0.36",
+        "index": 3,
+        "passed": 870,
+        "skipped": 0,
+        "exitstatus": 1
+      },
+      {
+        "file": "shard-8.4-0.json",
+        "sha256": "f580b8853c89789ab7236292ef33dbe1e8e0503bfa0dd13c47bd8c7c09c1d584",
+        "revision": "58d12fea670647e369dd2b4045a28e168abb8ae7",
+        "mysql": "8.4",
+        "index": 0,
+        "passed": 872,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      {
+        "file": "shard-8.4-1.json",
+        "sha256": "7ce227fc5af544f0cdb4c3f86639e62bf3837f53128784a066860e58777fda58",
+        "revision": "58d12fea670647e369dd2b4045a28e168abb8ae7",
+        "mysql": "8.4",
+        "index": 1,
+        "passed": 872,
+        "skipped": 0,
+        "exitstatus": 0
+      },
+      {
+        "file": "shard-8.4-2.json",
+        "sha256": "b59e3d08f20266e4c408260947da0339e37ab155820dde85bf9aed79945e9262",
+        "revision": "58d12fea670647e369dd2b4045a28e168abb8ae7",
+        "mysql": "8.4",
+        "index": 2,
+        "passed": 871,
+        "skipped": 0,
+        "exitstatus": 1
+      },
+      {
+        "file": "shard-8.4-3.json",
+        "sha256": "fbb7a21eef86c8add7d6a162cde343e5ba9ca2753ff303fcb12ee4ef3e4d01ff",
+        "revision": "58d12fea670647e369dd2b4045a28e168abb8ae7",
+        "mysql": "8.4",
+        "index": 3,
+        "passed": 870,
+        "skipped": 0,
+        "exitstatus": 1
+      }
+    ],
+    "failure": "MySQL1419: test attempted CREATE TRIGGER with application user while binary logging enabled",
+    "failed_cases": [
+      "test_evaluation_root_failure_keeps_original_commit_truth[archive]",
+      "test_evaluation_root_failure_keeps_original_commit_truth[witness]"
+    ],
+    "fix_sha": "98f4bf93c38db8500914243d8105e20bee8d32ba",
+    "fix": "Use existing explicit isolated fault DDL administrator; require same loopback host/port/database; business keeps original account/pool. No grant or server-setting change.",
+    "m7_success_independent": true,
+    "acceptance_passed": false
+  },
+  "receiver_local_checkpoint": {
+    "source_sha": "f7fbc89f0d50c8b2df1ed6a5a186f9046f2e2f4b",
+    "unit_passed": 2624,
+    "integration_interop_deselected": 894,
+    "mypy_source_files": 381,
+    "targeted_passed": 52,
+    "new_native_receiver_cases": 4,
+    "native_status": "collected_pending_CI",
+    "broker_verified": false,
+    "production_assembled": false,
+    "hold_fix_sha": "61c1cda5673c5f021b7c755055e214c137f0fbcf",
+    "hold_fix_targeted_passed": 51,
+    "hold_fix_full_gate": "in_progress",
+    "scope": [
+      "actual transport route and authentication before planning",
+      "lookup first and never reuse losing candidate",
+      "no automatic retry/replan for Prepared/Aborted",
+      "exact witness/archive/Inbox before inbound ACK",
+      "old Inbox compatibility read without witness adoption",
+      "local technical budget hold only; physical failures audit only",
+      "empty hold state transcription replaces prior commit hook for original root"
+    ],
+    "source_merged": false,
+    "production_changed": false
   }
 }
