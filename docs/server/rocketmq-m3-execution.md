@@ -193,7 +193,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 2026-10-22；内部3/3。最终6be5f80源码12检查成功，两档MySQL各5529通过（含12串行原根/5 ACK原生），0失败/跳过；infra2950e9a全部19项成功，六档Broker各55宿主/148证据及独立focus4/12通过，完整清理。AI PR212合并be91fde，infra PR142合并f84b3a9，merge tree均一致。失败/取消历史保留，旧SDK一次超时根因未确认、本轮原SDK两档均31通过；生产未变更。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ✅ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 2026-10-22；内部5/5。最终1643afe源码12检查成功，两MySQL各5562项（含原根恢复20）0失败/跳过；六档Broker各22原生/32证据通过，源/工具/SDK/报告及清理独立核验。AI PR213合并c04a181、infra PR144合并e1eb1c3；原树与候选一致，失败历史保留，生产未变更。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
 | ✅ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 2026-10-22；最终b88f40b源码12检查成功，两档MySQL各5573（含11引用/绑定及20原根恢复）0失败/跳过；六档原根/mTLS各15原生/21证据通过，10服务/15类自有记录清理核验。infra0333993的8检查和289 SDK回归通过，AI PR214合并64ffa15、工具PR146合并3f3bd73，完整tree一致；目标pin/进度PR147单列。历史兼容/清理交M4，生产未变更。[完整证据/失败历史](evidence/rocketmq-m3-ai-payload-20261022.json) |
-| ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 进行中；内部A/B完成2/4。AI45ec3b2/QSfb62c1d/infraf264145的core39788646533真实1原生/10证据通过，0失败/跳过，摘要和清理核验；full5原生/25证据、双向大正文/安全/重复/取消及完整矩阵/合并仍待C/D。源码/工具仅隔离分支，不扩展历史格式 |
+| ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 进行中；内部A/B完成2/4。真实完整首轮已推进到4/5原生场景、22项证据，第五场景evaluation start闭环已达成，checkpoint测试读取修正等待5/25复验；源码草稿QS420/AI215及最终CI/六档/合并另计。生产未变更。[完整证据与失败历史](evidence/rocketmq-m3-paired-20261022.json) |
 | ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
 | ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 待开始 |
 | ☐ | T23 | 宿主端到端及真实网络/进程/DB/Broker故障 | 待开始 |
@@ -1003,3 +1003,14 @@ QS测试进程fb62c1d直接调用原Service.Start/Change、共享事务owner、�
 QS4230655/AI32f70ac/infra2ac9916的39792502329已完成前两个原生用例、15项证据；第三个大正文START的60秒业务观察期限取消了当时的私有QS控制读取；目前尚不能区分业务未收敛和Go查询阻塞。原生无跳过，Compose、进程组和私有目录全部清理。保留失败报告摘要及定位信息，不把此前core或已通过的重复场景当作全量通过。新增验收进程固定阶段诊断，禁止导出正文、wire、DSN或原始stderr；重新race编译/vet、Python收集及114工具测试通过后重跑。T20-C仍进行中，内部2/4、全局19/36。
 
 原控制exchange现在由验收进程单独记账，外层轮询取消不会把下一条close响应读错；诊断仅含allowlist阶段、gRPC状态码和有界轮询/正文请求/ACK计数。中间诊断39794406776在原生执行前被更新版本替代并取消，另行保留。没有扩大业务重试、改变超时预算或修改生产实现。
+
+
+### 2026-10-22：T20-C四原生场景通过，最终checkpoint断言修正
+
+39797236451（QS1938773 / AI0c7a53a / infrab766a39）前四个原生场景通过，22项固定证据成立：首次wire/重复command-event-ACK，双向真实mTLS大正文及错误身份/组织/hash/长度拒绝，原interpretation取消及重复无新事件/模型调用。第五个evaluation start已完成双端原事务、receipt/state/ACK，随后测试读取不存在的evaluation_runs.version失败；原版本实际在evaluation_checkpoints，b55c7a6仅修正该原记录读取，保留Run/policy冻结及准确版本/序号断言。失败及清理报告保留，完整5/25仍待39798461241，内部保持2/4、M3为19/36。
+
+此前39792502329的长正文夹具破坏了标准报告JSON，现以合法JSON空白增加原始字节而保留业务facts/workflow；39795568798已证明真实Go正文RPC和START成功，但提问版本期望错误（原domain为created1→queued2→running3→question4），已按原模型修正，未修改业务版本规则。控制帧取消现在单独有界记账，关闭不会误读前一响应。
+
+另发现并用三个定向red子例复现QS新档案的调用方引用错误分类：1938773只将组织/hash/长度不匹配恢复为既有Conflict→RPC NotFound；内部workload、witness/binding及不确定证据仍保持原保护，不允许新档案历史回退。三相关包race及docs-check通过。提交后完整CI暴露文档source baseline未同步，7ee34a3只更新声明SHA/日期，87项docs测试及提交后facts复验通过；完整当前头门禁仍待回传。
+
+源码草稿[QS PR420](https://github.com/FangcunMount/qs-server/pull/420)、[AI PR215](https://github.com/FangcunMount/qs-ai/pull/215)分别记账；AI checkpoint修正先保留独立candidate分支，真实5/25通过后再快进PR并运行最终CI，避免每次夹具修正重复全矩阵。合并门禁尚未满足，不发布稳定SDK、不操作生产；QS PRODUCTION_DEPLOY_PAUSED=true、AI AUTO_DEPLOY_ENABLED=false已只读回查。GitHub自14:18 UTC起报告[Actions结果处理延迟](https://www.githubstatus.com/incidents/q29p76qtnkyk)，queued/步骤状态可能滞后，以原生报告核验，不将平台延迟或取消记录当通过。
