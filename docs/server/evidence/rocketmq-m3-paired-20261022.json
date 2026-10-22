@@ -1,14 +1,14 @@
 {
   "task": "T20",
-  "status": "in_progress",
-  "completed": false,
-  "progress": "19/36",
+  "status": "completed",
+  "completed": true,
+  "progress": "20/36",
   "started_at": "2026-10-22T12:55:21.817402+00:00",
   "internal_gates": {
     "A": "completed",
     "B": "completed",
     "C": "completed",
-    "D": "in_progress"
+    "D": "completed"
   },
   "source_baselines": {
     "qs": "be22b9274d1d7ab21abd3be24fb0ebde834ec78b",
@@ -178,7 +178,7 @@
     "core_is_development_only": true,
     "core_status": "passed and independently verified; full profile pending",
     "full_native_tests_collected": 5,
-    "full_status": "full single profile passed and independently verified; final six profiles and source/tool gates pending"
+    "full_status": "full single and exact six-profile matrix verified; final source/tool gates and functional merges complete"
   },
   "core_acceptance": {
     "run_id": 39788646533,
@@ -195,10 +195,25 @@
     "scope": "core only; does not satisfy full T20"
   },
   "merge_status": {
-    "qs": "draft PR420; source/doc candidate full gates pending",
-    "ai": "PR215 advanced to exact b55c7a6 final candidate; final CI pending",
-    "infra_tools": "no functional PR; full gate and final regressions pending",
-    "progress_pr150": "merged 6c863b2a44098e00257937a41e999543bfabb24e; exact tree verified"
+    "qs": {
+      "pr": 420,
+      "state": "merged",
+      "commit": "276eb24edc692a6b769e3b02fdbf87e41d8cb319",
+      "tree_matches_tested": true
+    },
+    "ai": {
+      "pr": 215,
+      "state": "merged",
+      "commit": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+      "tree_matches_tested": true
+    },
+    "infra_tools": {
+      "pr": 152,
+      "state": "merged",
+      "commit": "78e3e904b68887fff06382c973291321c6b40fea",
+      "tree_matches_tested": true
+    },
+    "progress": "completion table PR pending"
   },
   "development_cancelled_runs": [
     {
@@ -246,7 +261,7 @@
   "current_candidates": {
     "qs": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
     "ai": "b55c7a61423db807d2746c38245a4a021e4f37c4",
-    "infra": "da4630f5122cf9b788570f0f03aff7d4a8502716"
+    "infra": "ef83c3e716667c9f5d59962646c194fbc16a0134"
   },
   "full_single_acceptance": {
     "report_sha256": "c460a3ca4fcea1cbd2c326e1f4c87cd42f7fef3cf721be2b9c8a66d99cee7f33",
@@ -264,5 +279,823 @@
     "infra_source": "da4630f5122cf9b788570f0f03aff7d4a8502716",
     "run_id": 39798461241,
     "scope": "full five-case single-profile C gate; six-profile final D gate pending"
-  }
+  },
+  "completed_at": "2026-10-22T15:52:44.967220+00:00",
+  "full_matrix_acceptance": {
+    "run_id": 39800301468,
+    "profiles": [
+      {
+        "report_sha256": "b61089bfb4991a2a5b84b5194740f72d93486ac48a9ba74c79767c8425382680",
+        "file": "rocketmq-paired-full-0-a52ff29232949d696563c400e9ac522d2b230ce1",
+        "python": "3.11.16",
+        "mysql": "8.0.36",
+        "native": 5,
+        "evidence": 25,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true,
+        "qs_source": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+        "ai_source": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+        "infra_source": "ef83c3e716667c9f5d59962646c194fbc16a0134"
+      },
+      {
+        "report_sha256": "5652f1ffc75ccfafa265a7dfe602607bafc43d01cd909c3c094a11f32d492c74",
+        "file": "rocketmq-paired-full-1-a52ff29232949d696563c400e9ac522d2b230ce1",
+        "python": "3.11.16",
+        "mysql": "8.0.44",
+        "native": 5,
+        "evidence": 25,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true,
+        "qs_source": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+        "ai_source": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+        "infra_source": "ef83c3e716667c9f5d59962646c194fbc16a0134"
+      },
+      {
+        "report_sha256": "28abad17fe0afa373dc5a9704f086b8f067c7ac363985761666fd83e2bcdc54a",
+        "file": "rocketmq-paired-full-2-a52ff29232949d696563c400e9ac522d2b230ce1",
+        "python": "3.11.16",
+        "mysql": "8.4.11",
+        "native": 5,
+        "evidence": 25,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true,
+        "qs_source": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+        "ai_source": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+        "infra_source": "ef83c3e716667c9f5d59962646c194fbc16a0134"
+      },
+      {
+        "report_sha256": "29b46be1bfc7f86517b7577c09a44f6a48bf1ca80884ffe20d5ad2827e4ecc69",
+        "file": "rocketmq-paired-full-3-a52ff29232949d696563c400e9ac522d2b230ce1",
+        "python": "3.13.15",
+        "mysql": "8.0.36",
+        "native": 5,
+        "evidence": 25,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true,
+        "qs_source": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+        "ai_source": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+        "infra_source": "ef83c3e716667c9f5d59962646c194fbc16a0134"
+      },
+      {
+        "report_sha256": "25b75f8a49cd0c0611c7945356723d4fcadc9202bdf7313e2de047f4e03a141f",
+        "file": "rocketmq-paired-full-4-a52ff29232949d696563c400e9ac522d2b230ce1",
+        "python": "3.13.15",
+        "mysql": "8.0.44",
+        "native": 5,
+        "evidence": 25,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true,
+        "qs_source": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+        "ai_source": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+        "infra_source": "ef83c3e716667c9f5d59962646c194fbc16a0134"
+      },
+      {
+        "report_sha256": "ab11a1994ff4285fadd09c61d5a83ca3c3e2fa724dcb5d6ccb807fdfdd8d041a",
+        "file": "rocketmq-paired-full-5-a52ff29232949d696563c400e9ac522d2b230ce1",
+        "python": "3.13.15",
+        "mysql": "8.4.11",
+        "native": 5,
+        "evidence": 25,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true,
+        "qs_source": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+        "ai_source": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+        "infra_source": "ef83c3e716667c9f5d59962646c194fbc16a0134"
+      }
+    ],
+    "native_cases": 30,
+    "evidence_flags": 150,
+    "failed": 0,
+    "skipped": 0,
+    "full_matrix_exact_once": true
+  },
+  "final_tested_and_merged_trees": {
+    "qs-paired": {
+      "source": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+      "tested_merge": "9c930cca06b00aa982b7433d48b351552d574c10",
+      "tree": "f22d2ac38a77457b2f5bd31b0b638c95d7e5c2f2",
+      "actual_main_merge": "276eb24edc692a6b769e3b02fdbf87e41d8cb319",
+      "actual_main_tree": "f22d2ac38a77457b2f5bd31b0b638c95d7e5c2f2"
+    },
+    "qs-ai-paired": {
+      "source": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+      "tested_merge": "11d889332c91fc7a6ae20af0bdf9ce21a12b89ce",
+      "tree": "25a51ece0a621868e43a4466fc9e0e59c102ab73",
+      "actual_main_merge": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+      "actual_main_tree": "25a51ece0a621868e43a4466fc9e0e59c102ab73"
+    },
+    "infra-paired": {
+      "source": "ef83c3e716667c9f5d59962646c194fbc16a0134",
+      "tested_merge": "a52ff29232949d696563c400e9ac522d2b230ce1",
+      "tree": "453ab8dc8af1166a86bcbae087448a8499e7bfa9",
+      "actual_main_merge": "78e3e904b68887fff06382c973291321c6b40fea",
+      "actual_main_tree": "453ab8dc8af1166a86bcbae087448a8499e7bfa9"
+    }
+  },
+  "source_ci": {
+    "qs": {
+      "pr": 420,
+      "checks": [
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119897389219",
+          "name": "Build Applications (worker)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119897389168",
+          "name": "Build Applications (collection)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119897389282",
+          "name": "Build Applications (apiserver)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119895172170",
+          "name": "Docs & API Generated Sync",
+          "state": "SKIPPED"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890216320",
+          "name": "Docs Hygiene & Facts",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215781",
+          "name": "QS-03 original effect recovery after actual broker loss",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215009",
+          "name": "MongoDB Authenticated Native Metadata",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215297",
+          "name": "QS-05/06 original business effects after actual broker loss",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215340",
+          "name": "Tier 1 Test Policy",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215461",
+          "name": "Actor Store MySQL Transactions",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215134",
+          "name": "Security Scan (Advisory)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215501",
+          "name": "AuthZ committed version two-process MySQL",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215456",
+          "name": "Seeddata Retirement and Current Runtime E2E",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215396",
+          "name": "Layer Boundaries (depguard)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215051",
+          "name": "Deployment Contracts",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890215062",
+          "name": "Lint Code",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890214935",
+          "name": "Maintainability Scan (Advisory)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890214769",
+          "name": "Action audit MySQL JSON lifecycle",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965089/job/119890213552",
+          "name": "images (qs-apiserver)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890214696",
+          "name": "MySQL Native Metadata and Readiness",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965089/job/119890214027",
+          "name": "delivery (8.4)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965089/job/119890213100",
+          "name": "delivery (8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797964991/job/119890212355",
+          "name": "original-mysql-root (8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797964991/job/119890212541",
+          "name": "original-mysql-root (8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965089/job/119890213745",
+          "name": "images (collection-server)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965033/job/119890213035",
+          "name": "mysql-audit",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797964991/job/119890211867",
+          "name": "original-mysql-root (8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797965078/job/119890214302",
+          "name": "Run Tests",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-server/actions/runs/39797960942/job/119890205205",
+          "name": "Analyze (go)",
+          "state": "SUCCESS"
+        }
+      ],
+      "native_original_mysql": [
+        {
+          "profile": "evaluation-original-root-8.0.36-9c930cca06b00aa982b7433d48b351552d574c10",
+          "passed": 6,
+          "failed": 0,
+          "skipped": 0,
+          "tests": [
+            "TestM3MySQLOriginalEventRoot/lookup-without-inventing-input-hash",
+            "TestM3MySQLOriginalEventRoot/commit",
+            "TestM3MySQLOriginalEventRoot/rollback",
+            "TestM3MySQLOriginalEventRoot/half-unknown",
+            "TestM3MySQLOriginalEventRoot/actual-json-column-and-original-witness",
+            "TestM3MySQLOriginalEventRoot"
+          ],
+          "native_cases": 5,
+          "parent_test_counted_separately": true,
+          "report_sha256": "7cb3c5794210472eb69b38453099f60b5b7fc01e9aa6d111275bbd2363f7e989"
+        },
+        {
+          "profile": "evaluation-original-root-8.0.44-9c930cca06b00aa982b7433d48b351552d574c10",
+          "passed": 6,
+          "failed": 0,
+          "skipped": 0,
+          "tests": [
+            "TestM3MySQLOriginalEventRoot/lookup-without-inventing-input-hash",
+            "TestM3MySQLOriginalEventRoot/commit",
+            "TestM3MySQLOriginalEventRoot/rollback",
+            "TestM3MySQLOriginalEventRoot/half-unknown",
+            "TestM3MySQLOriginalEventRoot/actual-json-column-and-original-witness",
+            "TestM3MySQLOriginalEventRoot"
+          ],
+          "native_cases": 5,
+          "parent_test_counted_separately": true,
+          "report_sha256": "3cb520f611382d88a2d8968819d7830ddf4132e114b845bc8a7b3b123cd88373"
+        },
+        {
+          "profile": "evaluation-original-root-8.4.11-9c930cca06b00aa982b7433d48b351552d574c10",
+          "passed": 6,
+          "failed": 0,
+          "skipped": 0,
+          "tests": [
+            "TestM3MySQLOriginalEventRoot/lookup-without-inventing-input-hash",
+            "TestM3MySQLOriginalEventRoot/commit",
+            "TestM3MySQLOriginalEventRoot/rollback",
+            "TestM3MySQLOriginalEventRoot/half-unknown",
+            "TestM3MySQLOriginalEventRoot/actual-json-column-and-original-witness",
+            "TestM3MySQLOriginalEventRoot"
+          ],
+          "native_cases": 5,
+          "parent_test_counted_separately": true,
+          "report_sha256": "ede79c695db2429415f414486742979c326b69d28f8544c36d0a4bb9795b8f6d"
+        }
+      ],
+      "conditional_job_not_applicable": "Docs & API Generated Sync; no generated API surface changed"
+    },
+    "ai": {
+      "pr": 215,
+      "run_id": 39799884397,
+      "checks": [
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119906034066",
+          "name": "Complete test coverage",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897248693",
+          "name": "verify (8.0.36, 0)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897248918",
+          "name": "verify (8.0.36, 3)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897248646",
+          "name": "verify (8.4, 0)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897248658",
+          "name": "verify (8.4, 1)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897248654",
+          "name": "verify (8.4, 2)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897248753",
+          "name": "verify (8.4, 3)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897247959",
+          "name": "image",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897248495",
+          "name": "Retirement backup and restore (8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897248608",
+          "name": "Retirement backup and restore (8.4)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897248544",
+          "name": "verify (8.0.36, 1)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39799884397/job/119897248584",
+          "name": "verify (8.0.36, 2)",
+          "state": "SUCCESS"
+        }
+      ],
+      "mysql_source_tests": [
+        {
+          "mysql": "8.0.36",
+          "passed": 5573,
+          "failed": 0,
+          "skipped": 0,
+          "shards": 4,
+          "junit_exact_once": true,
+          "current_rpc": 11,
+          "original_mysql_recovery": 20,
+          "revision": "11d889332c91fc7a6ae20af0bdf9ce21a12b89ce"
+        },
+        {
+          "mysql": "8.4",
+          "passed": 5573,
+          "failed": 0,
+          "skipped": 0,
+          "shards": 4,
+          "junit_exact_once": true,
+          "current_rpc": 11,
+          "original_mysql_recovery": 20,
+          "revision": "11d889332c91fc7a6ae20af0bdf9ce21a12b89ce"
+        }
+      ]
+    },
+    "infra": {
+      "pr": 152,
+      "checks": [
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301609/job/119916547326",
+          "name": "host (mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301472/job/119898764122",
+          "name": "original-mysql-root (1.25.12, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301716/job/119898763811",
+          "name": "original-mysql-root (1.25.12, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301609/job/119916599872",
+          "name": "host (mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301472/job/119898763415",
+          "name": "original-mysql-root (1.25.12, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301402/job/119898762336",
+          "name": "original-worker-state (3.11, mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301318/job/119898761395",
+          "name": "original-ai-root (3.13, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301318/job/119898761302",
+          "name": "original-ai-root (3.13, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301318/job/119898761265",
+          "name": "original-ai-root (3.11, mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301402/job/119898762225",
+          "name": "original-worker-state (3.13, mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301318/job/119898761372",
+          "name": "original-ai-root (3.13, mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301402/job/119898762170",
+          "name": "original-worker-state (3.11, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301716/job/119898763373",
+          "name": "original-mysql-root (1.25.12, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301318/job/119898761322",
+          "name": "original-ai-root (3.11, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301609/job/119916550394",
+          "name": "host (mysql:8.4)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301351/job/119898763181",
+          "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301402/job/119898762231",
+          "name": "original-worker-state (3.11, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301318/job/119898760650",
+          "name": "original-ai-root (3.11, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301402/job/119898761976",
+          "name": "original-worker-state (3.13, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301527/job/119898762087",
+          "name": "original-dual-store-root (1.25.12, mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301752/job/119898763928",
+          "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301843/job/119898764525",
+          "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301578/job/119898762829",
+          "name": "acceptance",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301752/job/119898764143",
+          "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301155/job/119898761318",
+          "name": "original-event-root (1.25.12, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301468/job/119898761949",
+          "name": "paired (3.11, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301468/job/119898761749",
+          "name": "paired (3.13, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301843/job/119898763635",
+          "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301351/job/119898761730",
+          "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301527/job/119898762378",
+          "name": "original-dual-store-root (1.25.12, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301308/job/119898761262",
+          "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301468/job/119898761777",
+          "name": "paired (3.11, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301527/job/119898762334",
+          "name": "original-dual-store-root (1.25.12, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301823/job/119898763984",
+          "name": "original-mongo-root (1.25.12)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301468/job/119898761822",
+          "name": "paired (3.13, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301351/job/119898760822",
+          "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301220/job/119898761439",
+          "name": "independent-worker-broker (3.11, mysql:8.0.36, py311-mysql8036)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301392/job/119898761486",
+          "name": "validate",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301674/job/119898762886",
+          "name": "validate",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301468/job/119898761828",
+          "name": "paired (3.13, mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301354/job/119898761000",
+          "name": "original-command-root (1.25.12, mysql:8.4.11)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301155/job/119898761013",
+          "name": "original-event-root (1.25.12, mysql:8.0.36)",
+          "state": "IN_PROGRESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301402/job/119898762112",
+          "name": "original-worker-state (3.13, mysql:8.0.36)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301220/job/119898760684",
+          "name": "original-worker-mysql",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301468/job/119898761252",
+          "name": "paired (3.11, mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301308/job/119898760922",
+          "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301367/job/119898760816",
+          "name": "original-mongo-root (1.25.12)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301354/job/119898761519",
+          "name": "original-command-root (1.25.12, mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301155/job/119898760643",
+          "name": "original-event-root (1.25.12, mysql:8.0.44)",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301465/job/119898760508",
+          "name": "promtool",
+          "state": "SUCCESS"
+        },
+        {
+          "link": "https://github.com/FangcunMount/infra/actions/runs/39800301354/job/119898761385",
+          "name": "original-command-root (1.25.12, mysql:8.0.36)",
+          "state": "SUCCESS"
+        }
+      ],
+      "gate_verification": [
+        {
+          "repo": "FangcunMount/qs-server",
+          "pr": 420,
+          "source": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+          "reported_check_counts": {
+            "SUCCESS": 28,
+            "SKIPPED": 1
+          },
+          "conditional_not_applicable": [
+            "Docs & API Generated Sync"
+          ],
+          "reporting_lag_cross_checked": [],
+          "all_executed_gates_verified_success": true
+        },
+        {
+          "repo": "FangcunMount/infra",
+          "pr": 152,
+          "source": "ef83c3e716667c9f5d59962646c194fbc16a0134",
+          "reported_check_counts": {
+            "SUCCESS": 51
+          },
+          "conditional_not_applicable": [],
+          "reporting_lag_cross_checked": [],
+          "all_executed_gates_verified_success": true
+        }
+      ],
+      "critical_regressions": [
+        {
+          "artifact": "rocketmq-qs-event-1-1.25.12-a52ff29232949d696563c400e9ac522d2b230ce1",
+          "report_sha256": "23559e52644e8bfcf7616af2de6aaf51b4344942115cc28fae8d89abc9831e07",
+          "passed": 17,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup_verified": true,
+          "harness_hashes_verified": true
+        },
+        {
+          "artifact": "rocketmq-qs-event-0-1.25.12-a52ff29232949d696563c400e9ac522d2b230ce1",
+          "report_sha256": "2c452cf74ceb5dd346aaa16eb552a2f61c36b10c07dcdcf57b51cdc24507145f",
+          "passed": 17,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup_verified": true,
+          "harness_hashes_verified": true
+        },
+        {
+          "artifact": "rocketmq-qs-event-2-1.25.12-a52ff29232949d696563c400e9ac522d2b230ce1",
+          "report_sha256": "d6112eef360cee6d2899d92f7f2ab85ec49a9985883704b9c145c1a40d66622b",
+          "passed": 17,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup_verified": true,
+          "harness_hashes_verified": true
+        },
+        {
+          "artifact": "rocketmq-iam-host-1-a52ff29232949d696563c400e9ac522d2b230ce1",
+          "report_sha256": "82cc193dabeac870721734fe9425d1be50937c579fc902ef2ca7172df7a9fe2c",
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup_verified": true,
+          "harness_hashes_verified": true
+        },
+        {
+          "artifact": "rocketmq-iam-host-2-a52ff29232949d696563c400e9ac522d2b230ce1",
+          "report_sha256": "fe34910939279798b93a44236abe212efd5cb35fc436fc41c4aca8ea5e335cab",
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup_verified": true,
+          "harness_hashes_verified": true
+        },
+        {
+          "artifact": "rocketmq-iam-host-0-a52ff29232949d696563c400e9ac522d2b230ce1",
+          "report_sha256": "bdb2c96b0220382c993cb9d4a05d9ea898695e1edd9d98503fc62621514984a6",
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup_verified": true,
+          "harness_hashes_verified": true
+        }
+      ],
+      "iam_original_mysql_http": [
+        {
+          "artifact": "iam-native-root-0-a52ff29232949d696563c400e9ac522d2b230ce1",
+          "source": "57b07babe49666341b678af5aecb168b40511d7e",
+          "passed": 34,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "ba8ed389d398c4e20d49e3f99332c06283e0c188856fbebc6f0d03585ffadce9",
+          "cleanup_verified": true
+        },
+        {
+          "artifact": "iam-native-root-1-a52ff29232949d696563c400e9ac522d2b230ce1",
+          "source": "57b07babe49666341b678af5aecb168b40511d7e",
+          "passed": 34,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "81e4c5ad95821fdf99f9ce71af6e2c3a29c39f61de617d068c54285d097a2059",
+          "cleanup_verified": true
+        },
+        {
+          "artifact": "iam-native-root-2-a52ff29232949d696563c400e9ac522d2b230ce1",
+          "source": "57b07babe49666341b678af5aecb168b40511d7e",
+          "passed": 34,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "11d151055eaeefc4078618cefa9807a06f4ad4e29fc83811fe785140ffb09ebe",
+          "cleanup_verified": true
+        }
+      ]
+    }
+  },
+  "final_regression_failure_history": [
+    {
+      "repo": "FangcunMount/infra",
+      "run_id": 39800301609,
+      "job_id": 119898762702,
+      "source": "ef83c3e716667c9f5d59962646c194fbc16a0134",
+      "workflow": "RocketMQ IAM original host transaction",
+      "mysql": "8.0.44",
+      "stage": "docker pull mysql:8.0.44",
+      "cause": "Docker daemon received HTTP 500 Internal Server Error",
+      "unit_tests_passed": 114,
+      "native_executed": false,
+      "report_artifacts_created": false,
+      "containers_started_by_native": false,
+      "private_job_log_sha256": "9d4b00fb1e7b2a54646122438fdb97b28780db3e16cc3305a004f40dcb6771f8",
+      "action": "retry this failed job on unchanged source; keep original attempt",
+      "retry_status": "passed on unchanged source",
+      "retry_rejection": "HTTP 403: The workflow run containing this job is already running",
+      "retry_attempt": 2,
+      "retry_job_id": 119916547326,
+      "final_workflow_conclusion": "success"
+    }
+  ],
+  "stable_sdk_published": false,
+  "runtime_status": "unknown; no production operations performed",
+  "next_task": "T21 production v2 manifest, owner ACL/TLS and conflict refusal in isolated validation only"
 }
