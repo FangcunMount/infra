@@ -75,7 +75,7 @@ def close(client):
         client.rpc_client.stop()
 
 
-def run(config, cases):
+def run(config, cases, *, tls_only=False):
     if importlib.metadata.version('rocketmq-python-client') != '5.1.2':
         raise RuntimeError('fixed Python client required')
     if not config['endpoint'].startswith('127.0.0.1:'):
@@ -106,6 +106,8 @@ def run(config, cases):
     cases['tls/plaintext'] = 'rejected'
     handshake()
     cases['tls/verified_control_after_negatives'] = 'allowed'
+    if tls_only:
+        return
     manifest = config['manifest']
     routes = {r['id']:r for r in manifest['routes']}
     topics = {r['physical_topic']:r for r in routes.values()}
@@ -173,6 +175,7 @@ def run(config, cases):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
+    parser.add_argument('--tls-only', action='store_true')
     args = parser.parse_args()
     os.umask(0o077)
     # The pinned raw client has no log-root option. Replace its process-local
@@ -184,7 +187,7 @@ def main():
     logger.addHandler(logging.FileHandler(args.config.parent/'m3-raw-client.log'))
     cases, failed = {}, 0
     try:
-        run(json.loads(args.config.read_text()), cases)
+        run(json.loads(args.config.read_text()), cases, tls_only=args.tls_only)
     except Exception:
         failed = 1
     print(MARKER + json.dumps(dict(client='5.1.2',passed=len(cases),failed=failed,

@@ -12,6 +12,7 @@ services:
     stop_grace_period: 30s
     volumes:
       - ${ROCKETMQ_DATA_ROOT:?}/nameserver-logs:/home/rocketmq/logs
+      - ${ROCKETMQ_CONFIG_ROOT:?}/tls:/etc/rocketmq/tls:ro
     networks: [rocketmq]
     healthcheck:
       test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9876"]

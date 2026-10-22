@@ -283,7 +283,7 @@ def main():
     proxy["grpcServerPort"] = grpc_port
     (config / "proxy.json").write_text(json.dumps(proxy))
     run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
-         "-subj", "/CN=rocketmq-m2-isolated", "-addext", "subjectAltName=IP:127.0.0.1,DNS:localhost",
+         "-subj", "/CN=rocketmq-m2-isolated", "-addext", "subjectAltName=IP:127.0.0.1,DNS:localhost,DNS:nameserver,DNS:broker",
          "-keyout", str(config / "tls/server.key"), "-out", str(config / "tls/server.crt")])
     ca = directory / "ca.crt"
     shutil.copyfile(config / "tls/server.crt", ca)
@@ -887,7 +887,9 @@ def main():
                 'No production resources, private-network reachability, host startup, system login or business acceptance']
             report['resource_harness_sha256'] = {name:hashlib.sha256((repo/name).read_bytes()).hexdigest()
                 for name in ('scripts/rocketmq/m3_resources.py','scripts/rocketmq/m3_resource_probe.py',
-                             'components/rocketmq/serverd-routes-m3-v2.json','scripts/rocketmq/txprobe/uv.lock')}
+                             'components/rocketmq/serverd-routes-m3-v2.json','scripts/rocketmq/txprobe/uv.lock',
+                             'components/rocketmq/Dockerfile','components/rocketmq/entrypoint.sh',
+                             'components/rocketmq/proxy.json.example')}
         report["go_version"] = run(["go", "env", "GOVERSION"], cwd=sdk).stdout.strip()
         api_binary = args.sdk_go_probe or directory / "sdk-go-probe"
         if args.sdk_api_go and api_binary.is_file():

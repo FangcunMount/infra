@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "task": "T21",
+  "status": "verification_failed_fix_in_progress",
+  "progress": "20/36",
+  "production_changed": false,
+  "first_run": {
+    "id": 39811388627,
+    "url": "https://github.com/FangcunMount/infra/actions/runs/39811388627",
+    "infra_sha": "c9e6e0569e025108cf0cba2b9f3d86a4001bfb08",
+    "report_sha256": "2bf22643bc862df7189070fe96edecb9d823e5e3ba7485dcc63f46f94a0c2d8a",
+    "outer_passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "native_partial": {
+      "client": "5.1.2",
+      "passed": 3,
+      "failed": 1,
+      "skipped": 0,
+      "cases": {
+        "tls/verified_ca_and_san": "allowed",
+        "tls/wrong_ca": "rejected",
+        "tls/wrong_san": "rejected"
+      },
+      "scope": "isolated_transport_acl_and_broker_type_only"
+    },
+    "provision": {
+      "version": 2,
+      "operations": 54,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true
+    },
+    "idempotent": {
+      "version": 2,
+      "operations": 0,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true
+    },
+    "conflict_checks": [
+      "queues",
+      "credentials",
+      "acl",
+      "type"
+    ],
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "observation": "TLS client CA/SAN cases passed; plaintext rejection case failed; the approved required case is retained."
+  },
+  "upstream": {
+    "version": "5.5.1",
+    "tls_system_config": "https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/remoting/src/main/java/org/apache/rocketmq/remoting/netty/TlsSystemConfig.java",
+    "grpc_negotiator": "https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/ProxyAndTlsProtocolNegotiator.java",
+    "finding": "tlsTestModeEnable=false selects supplied keys; tls.server.mode defaults to permissive and controls gRPC and remoting together."
+  },
+  "qs_credentials": {
+    "pr": "https://github.com/FangcunMount/qs-server/pull/421",
+    "source_sha": "f04c328c1ef0b37da9a07eef6d23ad909fcdee39",
+    "candidate_sha": "f79909b1dd932b1453389995bea0e4af2dbc4b52",
+    "merged_main": "07d82aba216886f8fa28eecddc296d9f6c77b6fb",
+    "tree": "bae47e51f48296bb3e27b3fc1315b9fae7cdfa17",
+    "checks_success": 28,
+    "conditional_not_applicable": "Docs & API Generated Sync",
+    "production_deploy_paused": true,
+    "production_environment_pause_override": false
+  },
+  "pending": [
+    "verify TLS-only Broker and NameServer remoting plus MQAdmin",
+    "verify all126 transport outcomes and4 preflight conflicts",
+    "verify current full CI and cleanup",
+    "merge infra source and update T21 completion separately"
+  ]
+}

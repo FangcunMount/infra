@@ -10,6 +10,9 @@ RUN groupadd -g 3000 rocketmq && useradd -u 3000 -g 3000 -m -d /home/rocketmq ro
 COPY --from=verify /opt/rocketmq-all-5.5.1-bin-release /opt/rocketmq
 COPY --chmod=0555 entrypoint.sh /opt/rocketmq/entrypoint.sh
 ENV ROCKETMQ_HOME=/opt/rocketmq HOME=/home/rocketmq NAMESRV_ADDR=nameserver:9876
+# Applies also to explicit MQAdmin invocations. Pin trust to the mounted server
+# certificate; never enable insecure trust when encrypting internal remoting.
+ENV JAVA_TOOL_OPTIONS="-Dtls.enable=true -Dtls.client.authServer=true -Dtls.client.trustCertPath=/etc/rocketmq/tls/server.crt"
 WORKDIR /opt/rocketmq
 USER 3000:3000
 ENTRYPOINT ["/opt/rocketmq/entrypoint.sh"]

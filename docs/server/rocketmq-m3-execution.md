@@ -194,7 +194,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 2026-10-22；内部5/5。最终1643afe源码12检查成功，两MySQL各5562项（含原根恢复20）0失败/跳过；六档Broker各22原生/32证据通过，源/工具/SDK/报告及清理独立核验。AI PR213合并c04a181、infra PR144合并e1eb1c3；原树与候选一致，失败历史保留，生产未变更。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
 | ✅ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 2026-10-22；最终b88f40b源码12检查成功，两档MySQL各5573（含11引用/绑定及20原根恢复）0失败/跳过；六档原根/mTLS各15原生/21证据通过，10服务/15类自有记录清理核验。infra0333993的8检查和289 SDK回归通过，AI PR214合并64ffa15、工具PR146合并3f3bd73，完整tree一致；目标pin/进度PR147单列。历史兼容/清理交M4，生产未变更。[完整证据/失败历史](evidence/rocketmq-m3-ai-payload-20261022.json) |
 | ✅ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 2026-10-22；六档各5原生/25证据，共30/150，零失败/跳过，全部源码/锁/制品/清理核验；QS28检查成功+1 API不适用、AI12检查及两档各5573通过，工具全部实际门禁完成（1check回传滞后已按成功工作流/原生报告核验）。PR420/215/152合并且完整树一致；生产未变更。[证据、失败及回传差异](evidence/rocketmq-m3-paired-20261022.json) |
-| ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 进行中；最终候选及独立凭据已实现，真实隔离CI待完成 |
+| ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 验证失败后修复中；首轮明文拒绝未通过，保留失败与清理证据 |
 | ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 待开始 |
 | ☐ | T23 | 宿主端到端及真实网络/进程/DB/Broker故障 | 待开始 |
 | ☐ | T24 | 指标、告警、准入保护、DLQ/超限审计与规程 | 待开始 |
@@ -1041,3 +1041,12 @@ D勾选、内部4/4、父T20完成，M3更新20/36，M3-3里程碑完成，M4保
 T20进度PR153已合并aa257c2，M3保持20/36。T21在独立工作区开始：新增m3-1 v2生产资源候选（12绑定/10 Topic/9 Group/4事务owner/5角色），原v1资源文件不改。模型目录NORMAL跟随实际survey目录；evaluation两存储输入共享逻辑Group。QS新增每owner凭据覆盖，双owner同文件或同Broker username拒绝；两包race及87文档门禁通过，源码f04c328/文档f79909、PR待CI，不计完整宿主或生产。
 
 infra 117工具测试/actionlint通过，开发候选c9e6e05的真实隔离CI39811388627进行中。新增126项ACL/类型/TLS操作矩阵及四类完整资源冲突拒绝；只有实际报告和清理核验后才计通过。原始失败保留，不以纯测试代替Broker。当前生产、稳定发布、system和观察状态均不变。完整资源契约见[候选说明](rocketmq-m3-resources.md)；T22再补齐全进程NORMAL/事务装配、共享owner生命周期和预算，T21不冒充该验收。
+
+
+### 2026-10-23：T21 首轮真实门禁失败与 TLS 修正
+
+CI39811388627/c9e6e05已完成：typed资源安装/幂等/冲突检查完成，但原生TLS仅3项后在明文拒绝检查失败，父门禁0通过/1失败/0跳过；所属Compose、进程组和私有目录全部清理。未删用例或记为skip，T21不勾选，M3仍20/36。[失败与修正证据](evidence/rocketmq-m3-resources-20261023.json)保留源码、报告摘要和原始结果。
+
+核对固定5.5.1官方源码：tlsTestModeEnable=false仅选真实证书，gRPC读取全局tls.server.mode默认permissive。候选改为服务端enforcing，Broker和NameServer内部remoting也使用TLS，显式MQAdmin通过镜像环境启用证书信任；两角色挂载同一只读证书，隔离证书补齐内部DNS。保持进程、CPU/内存与worker配置不变。新增真实Java启动参数契约；TLS快门禁移到耗时资源安装之前，修正后仍须完整126操作/4冲突及清理通过。此为源码候选，serverD未变更。
+
+QS PR421已在28检查成功、1项API生成同步不适用后按精确head正常合并07d82aba；实际main完整tree与已测候选一致bae47e5，合并前回读生产暂停true且环境无覆盖。双owner凭据隔离源码已合并，不代表T21/T22或生产完成。T22默认组合根基线143通过/0跳过，只读预研未修改装配。

@@ -26,7 +26,7 @@ SMS 只声明 IAM 当前目录中的尽力发布责任，manifest 不虚构尚�
 
 沿用 infra 的 Docker Broker/Proxy：只绑定受控私网 IP，管理端口不对宿主发布；应用以私网 endpoint 和明确 CA 文件校验证书链、SAN，TLS 最低 1.2，不设置 insecure skip。保持现有 Docker 内存/CPU 及 serverD 三个 worker 配置，Prometheus/Grafana 继续在 Mac mini。
 
-T21 在回环隔离 Broker 验证相同模板的可信 CA/SAN 正例、错误 CA、错误 SAN、明文拒绝，随后再次验证可信连接。它不能证明生产私网、防火墙或当前证书已正确配置，这些由 T30/T31 实际回读。
+T21 在回环隔离 Broker 必须验证相同模板的可信 CA/SAN 正例、错误 CA、错误 SAN、明文拒绝，随后再次验证可信连接。首轮在明文拒绝失败，当前修正候选仍待真实复验，不把已具备TLS握手等同于强制TLS。它不能证明生产私网、防火墙或当前证书已正确配置，这些由 T30/T31 实际回读。
 
 资源安装必须显式传入新 manifest 和私有凭据文件，经 Compose 项目身份校验后调用 `scripts/rocketmq/provision.py`。v2 工具先完整读取 Topic/Group、用户及 ACL；类型、队列、凭据或既有超额 ACL 冲突时全部拒绝，不旋转密码、不改写旧资源、不删除或转换 Topic。构造和宿主启动不执行安装。
 
@@ -37,3 +37,5 @@ T21 在回环隔离 Broker 验证相同模板的可信 CA/SAN 正例、错误 CA
 必需证据包括 126 个实际传输操作结果（含 78 个越权拒绝、16 个实际 Broker 错误类型拒绝和 TLS 正反例），以及类型、队列、凭据和 ACL 四类完整冲突拒绝。为证明服务端类型检查，隔离 raw-client 子类仅在本进程实例中关闭发送前类型校验；不修改 SDK、全局 factory 或生产配置。半消息成功后立即回滚，不产生业务提交。所需依赖缺失、缺项、跳过、未知错误码或不完整清理全部失败。
 
 报告记录源码、manifest/探针/锁摘要、实际 Broker 参数和镜像、结果及清理。只上传安全 JSON，不输出凭据、原正文或原生日志。原始客户端日志限制在临时私有目录，随所属 Compose、进程组和目录清理；首次失败仍保留安全计数及退出状态。T22 再验收全宿主装配、共享 owner 生命周期及预算，T23 验收宿主真实故障。
+
+固定5.5.1的 [gRPC negotiator](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/ProxyAndTlsProtocolNegotiator.java) 使用 [TlsSystemConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/remoting/src/main/java/org/apache/rocketmq/remoting/netty/TlsSystemConfig.java) 的全局 `tls.server.mode`，默认permissive。新候选以JVM固定参数强制enforcing，并为同进程Broker、NameServer及MQAdmin的内部remoting同步启用TLS与证书信任，避免仅强制gRPC后破坏内部链路。NameServer只读挂载tls目录，不增加常驻进程或预算。T30/T31需按冻结新镜像核对证书链及外部/内部SAN、挂载与实际明文拒绝，不能只替换proxy.json或沿用旧验收receipt。
