@@ -9,12 +9,13 @@ import secrets
 
 import grpc
 
-from rocketmq.grpc_protocol import Code, TransactionResolution
+from rocketmq.grpc_protocol import Code, QueryRouteRequest, TransactionResolution
 from rocketmq.v5.client import ClientConfiguration, Credentials
 from rocketmq.v5.consumer import SimpleConsumer
 from rocketmq.v5.exception import ClientException
 from rocketmq.v5.model import FilterExpression, Message
 from rocketmq.v5.producer import Producer, TransactionChecker
+from rocketmq.v5.util import MessagingResultChecker
 
 MARKER = 'M3_RESOURCE_RECEIPT '
 
@@ -48,6 +49,30 @@ def check_denied(operation, codes):
             raise RuntimeError('negative probe failed for an unexpected Broker status') from None
         return error.code
     raise RuntimeError('Broker accepted a forbidden operation')
+
+
+def check_route(client, topic):
+    # The 5.1.2 route cache logs and discards the original Broker exception.
+    # Verify its actual signed response before invoking that cache so a generic
+    # connection/route error can never be counted as a permission rejection.
+    req = QueryRouteRequest()
+    req.topic.name = topic
+    req.topic.resource_namespace = client.client_configuration.namespace
+    req.endpoints.CopyFrom(client.client_configuration.rpc_endpoints.endpoints)
+    response = client.rpc_client.query_topic_route_async(
+        client.client_configuration.rpc_endpoints,req,metadata=client.sign(),timeout=5).result(timeout=7)
+    MessagingResultChecker.check(response.status)
+    if response.status.code != Code.OK or not response.message_queues:
+        raise RuntimeError('authoritative Broker route absent')
+
+
+def close(client):
+    if client.is_running:
+        client.shutdown()
+    else:
+        # A denied pre-start route still created an instance-owned RPC channel.
+        # The upstream shutdown short-circuits when not running; close it here.
+        client.rpc_client.stop()
 
 
 def run(config, cases):
@@ -95,6 +120,7 @@ def run(config, cases):
             start(producer, sorted(allowed)[0])
             for physical, route in sorted(topics.items()):
                 def send(kind=route['message_type']):
+                    check_route(producer, physical)
                     transaction = producer.begin_transaction() if kind == 'TRANSACTION' else None
                     message = Message()
                     message.topic, message.body = physical, b'isolated-m3-transport-proof'
@@ -116,7 +142,7 @@ def run(config, cases):
                 else:
                     cases[identity] = check_denied(send, {Code.FORBIDDEN})
         finally:
-            producer.shutdown()
+            close(producer)
         permissions = config['permissions'][role]
         for route in routes.values():
             if not route['consumer_group']:
@@ -127,6 +153,7 @@ def run(config, cases):
             consumer = SimpleConsumer(client_config, group,
                 subscription={physical:FilterExpression()}, await_duration=1, tls_enable=True)
             def receive():
+                check_route(consumer, physical)
                 start(consumer, physical)
                 for message in consumer.receive(16, 15):
                     consumer.ack(message)
@@ -138,7 +165,7 @@ def run(config, cases):
                 else:
                     cases[identity] = check_denied(receive, {Code.FORBIDDEN})
             finally:
-                consumer.shutdown()
+                close(consumer)
 
 
 def main():

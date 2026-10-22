@@ -1,7 +1,5 @@
 name: RocketMQ M3 final resource candidate
 on:
-  push:
-    branches: [codex/rocketmq-m3-resources]
   pull_request:
     paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '.github/workflows/rocketmq-m3-resources.yml']
   workflow_dispatch:
