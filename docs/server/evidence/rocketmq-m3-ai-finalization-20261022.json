@@ -1,0 +1,76 @@
+{
+  "task": "T18",
+  "status": "in_progress",
+  "completed": false,
+  "progress": "17/36",
+  "internal_progress": "0/5",
+  "source_base": "be91fde27616f60a2bcedd0a70280c2ead427d4a",
+  "infra_base": "80776fbe4de79e5a65fd11407dfbe87ff42e28ea",
+  "source_worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-finalization",
+  "infra_worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/infra-finalization",
+  "branch": "codex/rocketmq-m3-finalization",
+  "internal_gates": [
+    {
+      "id": "T18-A",
+      "done": false,
+      "status": "in_progress"
+    },
+    {
+      "id": "T18-B",
+      "done": false,
+      "status": "pending"
+    },
+    {
+      "id": "T18-C",
+      "done": false,
+      "status": "pending"
+    },
+    {
+      "id": "T18-D",
+      "done": false,
+      "status": "pending"
+    },
+    {
+      "id": "T18-E",
+      "done": false,
+      "status": "pending"
+    }
+  ],
+  "model_paths": [
+    "interpretation_report",
+    "serial_generation",
+    "serial_semantic",
+    "candidate_generation",
+    "candidate_semantic"
+  ],
+  "core_scenarios": [
+    "normal",
+    "response_committed_terminal_mq_unavailable",
+    "terminal_committed_confirmation_lost",
+    "response_committed_process_sigkill"
+  ],
+  "core_scenario_groups": 20,
+  "production_changed": false,
+  "stable_sdk_released": false,
+  "system_acceptance_claimed": false,
+  "failure_history": [
+    {
+      "scope": "local baseline command",
+      "status": "collection_error_no_tests",
+      "cause": "nonexistent test filename; corrected before editing",
+      "log": "/tmp/m3-t18-original-target-baseline.log",
+      "corrected_baseline_passed": 31
+    }
+  ],
+  "characterization_candidate": "0b7f838578c6191ac02748254a718a33113618f2",
+  "local": {
+    "baseline_passed": 31,
+    "baseline_log": "/tmp/m3-t18-target-baseline-corrected.log",
+    "native_collected_only": 2,
+    "fixture_order_plan": "/tmp/m3-t18-characterization-fixture-order.log",
+    "harness_unit_passed": 4,
+    "source_docs_markdown": 75,
+    "source_docs_links": 1388,
+    "real_mysql_status": "pending"
+  }
+}

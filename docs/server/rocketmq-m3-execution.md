@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI领取/scanner PR197与显式完成重试PR198、infra PR121/123均已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：**T17已完成，三个内部子门禁3/3**。AI PR212合并`be91fde27616f60a2bcedd0a70280c2ead427d4a`，infra PR142合并`f84b3a9e3dce70180ff7b5a8eb7d60f04bbdc992`；两棵合并tree均与已验候选一致。默认事务装配仅在显式配置下启用，生产配置未变，AUTO_DEPLOY_ENABLED=false。下一项T18尚未开始。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：**T18进行中，内部0/5；M3保持17/36**。T17三个内部门禁3/3，源码与infra已合并。T18先验证解释报告终态发送失败及跨租约恢复，再补宿主接线、独立进程/provider计数和实际故障证明；生产配置未变，AUTO_DEPLOY_ENABLED=false。[T18证据](evidence/rocketmq-m3-ai-finalization-20261022.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -37,6 +37,22 @@
 | 完整claim/refusal/attempts-exhausted及scanner | ✅ 双MySQL各4614，9维护/6scanner/5显式重试原生，六档Broker各26/64，零失败跳过、完整清理 | ✅ AI PR193–197、infra PR119/121及SDK PR48–50 | 原租约/配额/首次wire和失败历史保留；默认装配与其他T17入口仍待完成 |
 | evaluation完整终态/candidate/恢复/取消drain | ✅ SDK入口及两个内部子门禁已闭环 | ✅ AI PR210/211、infra PR138/140 | 默认运行装配仍须下行独立验收，不代表生产启用 |
 | 全部state写入口及统一事务装配 | ✅ 两档各5529、六档各55/148及focus4/12，全部required通过 | ✅ AI PR212、infra PR142 | 默认事务装配可显式配置；生产未启用，成对QS、真实provider、system及真实故障矩阵另有任务 |
+
+### T18 内部执行批次（同一正式任务，初始0/5）
+
+全局任务总数仍36，M3保持17/36。T18聚焦五条路径：解释报告、串行generation/semantic、candidate generation/semantic。仅宿主明确确认响应已持久化后恢复终态；dispatched/unknown继续原provider_result_unknown治理。执行身份、worker租约和稳定业务身份分别核验，不通过换操作ID绕过未决责任。
+
+| 完成 | 批次 | 实现与完成门禁 | 当前状态 |
+| --- | --- | --- | --- |
+| ☐ | T18-A | 实际MySQL验证MQ失败、旧Aborted与租约接管，冻结身份/兼容规则和完整验收manifest | 进行中：准备两项定向表征 |
+| ☐ | T18-B | 补齐宿主终态恢复接线，保留权限/取消/CAS/业务重试授权及原配额 | 待开始 |
+| ☐ | T18-C | 回环HTTP假provider、进程外持久计数、独立worker、真实MySQL/RocketMQ与代理 | 待开始 |
+| ☐ | T18-D | 五路径×正常/响应后MQ故障/终态确认丢失/响应后SIGKILL的20核心情景及交叉约束 | 待开始 |
+| ☐ | T18-E | 固定候选，完整CI及六档Broker验收、报告核验、合并后关闭T18 | 待开始 |
+
+关键约束：按invocation统计真实HTTP请求，恢复进程不得追加模型请求；允许Broker重复delivery，业务效果及逻辑事件身份必须保持幂等。网络故障与客户端丢弃回复分开命名；DB故障锁定业务+witness原根提交，不误用全进程第N次commit。缺真实依赖直接失败，required非空零失败/跳过；报告记录SHA、镜像/制品摘要、实际版本、测试ID和清理，正文/密钥不进入日志。
+
+开发先单档定向门禁，完整候选冻结后统一全量门禁；每项通过后回表打勾并保存证据，合并/发布/部署/业务验收分别记录。不调整SDK稳定发布、生产资源、NSQ责任或原三个worker配额。
 
 ## 1. 目标、基线和授权边界
 
@@ -147,7 +163,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
 | ✅ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 2026-10-22；内部3/3。最终6be5f80源码12检查成功，两档MySQL各5529通过（含12串行原根/5 ACK原生），0失败/跳过；infra2950e9a全部19项成功，六档Broker各55宿主/148证据及独立focus4/12通过，完整清理。AI PR212合并be91fde，infra PR142合并f84b3a9，merge tree均一致。失败/取消历史保留，旧SDK一次超时根因未确认、本轮原SDK两档均31通过；生产未变更。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
-| ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
+| ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 进行中；内部0/5，先定向验证解释任务MQ失败/旧Aborted/租约接管；SDK与生产保持原状。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
 | ☐ | T20 | 成对契约、安全、wire、receipt/ACK重复与取消 | 待开始 |
 | ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
