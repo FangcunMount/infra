@@ -5244,7 +5244,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-22T04:01:23Z",
+  "updated_at": "2026-10-22T04:13:50Z",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -21321,10 +21321,10 @@
     },
     {
       "id": "recovery_and_drain",
-      "status": "frozen_candidate_actual_dependencies_pending",
+      "status": "fixture_fix_actual_dependencies_pending",
       "done": false,
       "acceptance": "Expired ownership, persisted response recovery, cancellation and draining have explicit owners; no unknown model re-invocation.",
-      "source_sha": "9776f546086228bc1ea12c50831b18ee44ec743e"
+      "source_sha": "4d8706e3fac6ab501fd4ce2758be1177108a3726"
     },
     {
       "id": "default_assembly",
@@ -23074,7 +23074,7 @@
   ],
   "recovery_drain_sdk": {
     "status": "frozen_candidate_actual_dependencies_pending",
-    "source_sha": "9776f546086228bc1ea12c50831b18ee44ec743e",
+    "source_sha": "4d8706e3fac6ab501fd4ce2758be1177108a3726",
     "code_sha": "6a3f481869bbd3c90b90d085eaef5b35e5d55adf",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/211",
     "source_pushed": true,
@@ -23092,7 +23092,8 @@
       "infra_unit_passed": 90,
       "native_collected_only": 39,
       "broker_collected_only": 51,
-      "broker_required_flags": 137
+      "broker_required_flags": 137,
+      "fixture_fix_dispatch_native_collected_only": 8
     },
     "scope": [
       "Original serial expiry and candidate expiry, durable first-response recovery, cancellation drain and bounded scan dispatch seams",
@@ -23101,13 +23102,17 @@
       "Client deliberately discarded replies are named separately from network fault acceptance"
     ],
     "source_ci": {
-      "status": "pending"
+      "status": "pending",
+      "run": "https://github.com/FangcunMount/qs-ai/actions/runs/39721122314"
     },
     "actual_broker": {
-      "status": "pending",
+      "status": "replacement_candidate_pending",
       "profiles": 6,
       "expected_tests_each": 51,
-      "expected_flags_each": 137
+      "expected_flags_each": 137,
+      "previous_run": "https://github.com/FangcunMount/infra/actions/runs/39720060568",
+      "previous_source_sha": "9776f546086228bc1ea12c50831b18ee44ec743e",
+      "reports_not_rebound": true
     },
     "default_assembly_enabled": false,
     "production_changed": false,
@@ -23122,6 +23127,20 @@
       "/tmp/m3-recovery-drain-infra-unit.log",
       "/tmp/m3-recovery-drain-native-collected.log",
       "/tmp/m3-recovery-broker-collected.log"
-    ]
+    ],
+    "failure_history": [
+      {
+        "source_sha": "9776f546086228bc1ea12c50831b18ee44ec743e",
+        "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39720018268",
+        "status": "failed_with_owned_fixture_teardown_and_capacity_contamination",
+        "actual_reports_saved": "/tmp/m3-t17-ci-recovery-9776-failed",
+        "summary": "/tmp/m3-recovery-drain-native-first-failures-summary.json",
+        "diagnosis": "New candidate dispatch fixture left active slot claims. Parent Run teardown failed FK checks, retaining org active capacity; subsequent admission/preflight cases failed. Test-owned claim cleanup is now explicit before parent teardown.",
+        "replacement_sha": "4d8706e3fac6ab501fd4ce2758be1177108a3726",
+        "production_changed": false
+      }
+    ],
+    "fixture_fix_sha": "4d8706e3fac6ab501fd4ce2758be1177108a3726",
+    "fixture_fix_scope": "Only the owned integration test fixture changed; app src, original Broker host profile, SDK lock, migrations and contracts are byte-identical. Final gates still rerun at the new exact SHA."
   }
 }
