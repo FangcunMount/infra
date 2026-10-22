@@ -9,6 +9,7 @@ import secrets
 from iam_acceptance import host_failure_summary, retain_private_host_output
 from m3_resources import manifest
 from provision_v2 import provision
+from routes import validate_v2
 
 CASES = frozenset((
     'explicit_schema_before_subscription',
@@ -61,6 +62,17 @@ def worker_failure_diagnostics(output):
         return {'invalid': True}
 
 
+def worker_manifest(repo):
+    value = manifest(repo)
+    worker = value['accounts']['m3-qs-worker']
+    wanted = set(worker['subscriptions'])
+    value['routes'] = [route for route in value['routes'] if route['id'] in wanted]
+    value['accounts'] = {'m3-qs-worker': worker,
+        'm3-qs-apiserver': {'owner': 'qs.mysql', 'publish': ['qs-evaluation-mysql'], 'subscriptions': []}}
+    validate_v2(value)
+    return value
+
+
 def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port, password, ca,
                        run, proof, native_runner, repo, private_log=None):
     source = source.resolve()
@@ -72,9 +84,9 @@ def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port
     if module.get('Replace') or module.get('Version') != 'v0.5.0-rocketmq-tx.2' or not module.get('Sum'):
         raise RuntimeError('fixed published worker SDK without replace required')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
-    document = manifest(repo)
-    # Keep the reviewed current routes; provision only this test's two roles.
-    document['accounts'] = {role: document['accounts'][role] for role in ('m3-qs-worker', 'm3-qs-apiserver')}
+    # Retain ALL canonical worker subscriptions; fixture producer only supplies
+    # evaluation TX input. Full production-resource ACL proof is T21.
+    document = worker_manifest(repo)
     accounts = {role: {'username': 'worker-native-' + secrets.token_hex(4), 'password': secrets.token_hex(32)}
                 for role in document['accounts']}
     proof['provision'] = provision(broker, document, accounts)

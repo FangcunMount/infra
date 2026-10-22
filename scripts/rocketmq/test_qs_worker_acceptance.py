@@ -1,6 +1,7 @@
 import json
 import unittest
-from qs_worker_acceptance import CASES, SCOPE, parse_worker_receipt, worker_failure_diagnostics
+from pathlib import Path
+from qs_worker_acceptance import CASES, SCOPE, parse_worker_receipt, worker_failure_diagnostics, worker_manifest
 
 class WorkerRuntimeReceiptTest(unittest.TestCase):
     def output(self):
@@ -34,3 +35,10 @@ class WorkerRuntimeReceiptTest(unittest.TestCase):
                     dict(value, consume_outcomes={'identity-label': 1}),dict(value, holds=-1),
                     dict(value, consume_outcomes={'held': float('nan')})):
             self.assertEqual(worker_failure_diagnostics('M3_WORKER_DIAGNOSTIC '+json.dumps(bad)), {'invalid': True})
+
+    def test_fixture_keeps_every_current_worker_input_and_no_worker_publication(self):
+        value=worker_manifest(Path(__file__).resolve().parents[2])
+        self.assertEqual({r['id'] for r in value['routes']}, {'qs-survey-worker','qs-evaluation-mysql','qs-evaluation-mongo','qs-task-normal','qs-task-transaction'})
+        self.assertEqual(value['accounts']['m3-qs-worker']['publish'], [])
+        self.assertEqual(set(value['accounts']['m3-qs-worker']['subscriptions']), {r['id'] for r in value['routes']})
+        self.assertEqual(value['accounts']['m3-qs-apiserver']['publish'], ['qs-evaluation-mysql'])
