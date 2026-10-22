@@ -1028,7 +1028,7 @@
     }
   },
   "iam_native_lifecycle_batch": {
-    "status": "source_preparation",
+    "status": "development_native_queued",
     "worktree": "iam-host-runtime",
     "base": "424720df1ae687e3df6a82671df08a434f5e5ceb",
     "scope": "actual owner/in-process original root against owned Broker/MySQL; full API, process fault, provider and system not claimed",
@@ -1037,6 +1037,14 @@
     "new_test_cases": 6,
     "infra_unit_tests": 122,
     "infra_actionlint": "passed",
-    "production_changed": false
+    "production_changed": false,
+    "source": "89f261ae707055eac7651c7a8753224cbd8925a3",
+    "infra": "4b9696768004130e555fe77381a94c930762589c",
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39859642752",
+    "native_tagged_new_diff_lint": "passed pinned2.5.0 zero issues",
+    "normal_full_lint": "failed on5 preexisting errcheck issues in two old M6 test utilities; not claimed passed",
+    "native_tagged_full_lint": "failed on9 preexisting errcheck issues in two old transaction integration files; new file has no findings",
+    "docs_hygiene_facts": "passed; no product contract or schema change",
+    "source_pr": "not yet created; first real dependencies pending"
   }
 }
