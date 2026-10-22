@@ -1,6 +1,7 @@
 """Actual current worker runtime with owned Broker/MySQL and business RPC fixture."""
 import hashlib
 import json
+import math
 import os
 import re
 import secrets
@@ -37,6 +38,27 @@ def parse_worker_receipt(output, expected_source):
             or re.search(r'--- (?:FAIL|SKIP):|WARNING: DATA RACE', output)):
         raise RuntimeError('worker runtime receipt wrong source, partial, failed, skipped or cleanup incomplete')
     return receipt
+
+
+def worker_failure_diagnostics(output):
+    rows = [line.split('M3_WORKER_DIAGNOSTIC ', 1)[1] for line in output.splitlines()
+            if line.startswith('M3_WORKER_DIAGNOSTIC ')]
+    if not rows:
+        return None
+    if len(rows) != 1 or len(rows[0]) > 4096:
+        return {'invalid': True}
+    try:
+        value = json.loads(rows[0])
+        if (not isinstance(value, dict) or set(value) != {'phase', 'active', 'waiting', 'holds', 'evidence', 'query_failed', 'consume_outcomes'}
+                or value['phase'] != 'paused_delivery' or type(value['query_failed']) is not bool
+                or any(type(value[k]) is not int or not 0 <= value[k] <= 1000000 for k in ('active', 'waiting', 'holds', 'evidence'))
+                or not isinstance(value['consume_outcomes'], dict)
+                or set(value['consume_outcomes']) - {'held', 'hold_failed', 'dispatch_failed', 'decode_failed', 'acked', 'unknown_acked', 'unknown_persist_failed'}
+                or any(type(v) not in (int, float) or not math.isfinite(v) or not 0 <= v <= 1000000 for v in value['consume_outcomes'].values())):
+            return {'invalid': True}
+        return value
+    except (ValueError, TypeError):
+        return {'invalid': True}
 
 
 def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port, password, ca,
@@ -86,6 +108,7 @@ def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
     proof['diagnostics'] = host_failure_summary(raw)
+    proof['diagnostics']['worker_state'] = worker_failure_diagnostics(raw)
     proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'rocketmq_native_integration_test\.go:(\d+)', raw)))[:32]
     if private_log is not None:
         retain_private_host_output(private_log, raw)
