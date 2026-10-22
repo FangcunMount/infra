@@ -39,7 +39,9 @@ GO_PHASES = frozenset(('not_started','ready','invalid_ready','private_configurat
     'shared_owner','original_commands','original_events','payload_ca','payload_certificate',
     'payload_client','event_runtime','owner_start','owner_admission','consumer_start',
     'payload_listener','control_ready','drop_owned_schema','owner_close','consumer_close',
-    'payload_close','control_write','control_read'))
+    'payload_close','control_write','control_read','control_received','control_output',
+    'control_waiting','facts_operation','facts_evaluation_projection','facts_projection',
+    'facts_command_archive','facts_archive_identities','facts_archive_evidence','facts_counts'))
 MARKER = 'M3_PAIRED_HOST_RECEIPT '
 SDK_SHA256 = '570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2'
 

@@ -996,3 +996,8 @@ QS测试进程fb62c1d直接调用原Service.Start/Change、共享事务owner、�
 39788646533在AI45ec3b2/QSfb62c1d/infraf264145固定组合完成core：1原生/10精确证据，0失败/跳过。双方实际默认消费者和原根完成command→AI admission/receipt/state→QS operation/投影/首次ACK→AI event_receipts/history；首次command/ACK wire与原档案对照，未新增发布型Outbox或模型调用。8类源码/工具/SDK映射、Go模块摘要、AI lock、两端source clean及Compose/进程组/私有目录清理独立核验。首轮NoResultFound是验收错误地读取通用ACK Inbox，保留原失败记录并按实际event_receipts边界修正。
 
 仅勾选内部T20-B，父T20仍未完成，总计19/36。源码/工具尚在隔离分支，full5用例/25证据、六档矩阵、完整源码与工具PR门禁均待T20-C/D；不计system/生产/真实provider或网络故障验收。接下来验证大正文双向mTLS、重复及取消。
+
+
+### 2026-10-22：T20-C完整首轮与固定阶段诊断
+
+QS4230655/AI32f70ac/infra2ac9916的39792502329已完成前两个原生用例、15项证据；第三个大正文START在私有QS控制响应读取处超时，尚未证明是哪一步阻塞。原生无跳过，Compose、进程组和私有目录全部清理。保留失败报告摘要及定位信息，不把此前core或已通过的重复场景当作全量通过。新增验收进程固定阶段诊断，禁止导出正文、wire、DSN或原始stderr；重新race编译/vet、Python收集及114工具测试通过后重跑。T20-C仍进行中，内部2/4、全局19/36。

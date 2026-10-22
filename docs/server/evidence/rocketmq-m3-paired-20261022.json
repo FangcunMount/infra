@@ -100,6 +100,25 @@
         "private_fixture_directory_removed": true
       },
       "report_sha256": "9088670bb85cdd4bcefc93f129bf48a77c6977f050c9533a40f62285177fcb71"
+    },
+    {
+      "run_id": 39792502329,
+      "source_qs": "42306552ed8261307f0ac4e9d9c5655707ce91a4",
+      "source_ai": "32f70acf74a4446f60fa442cb249ebe446eb4811",
+      "infra": "2ac9916cc56fa459f021ef3b7fb2bb932e50b3f5",
+      "passed_native_flags": 15,
+      "failed": 1,
+      "skipped": 0,
+      "failed_test": "test_actual_qs_ai_large_payloads_and_mtls_denial",
+      "cause": "private QS control response timeout during large START observation; exact Go blocking stage not yet established",
+      "resolution": "in progress; add allowlisted fixture-only control stage diagnostics; do not weaken deadline or claim business failure resolved",
+      "report_sha256": "817042b4f8f2e60bc2264be8727a246b6b0bf2afeb9e4f024e8d4ccdccf6d76e",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
     }
   ],
   "prototype": {
@@ -112,7 +131,9 @@
     "full_native_tests_required": 5,
     "full_evidence_flags_required": 25,
     "core_is_development_only": true,
-    "core_status": "passed and independently verified; full profile pending"
+    "core_status": "passed and independently verified; full profile pending",
+    "full_native_tests_collected": 5,
+    "full_status": "first complete-profile run failed in third case after first two passed; diagnostic rerun pending"
   },
   "core_acceptance": {
     "run_id": 39788646533,
