@@ -119,7 +119,13 @@ def run(config, cases, *, tls_only=False):
         producer = BrokerTypeProbe(client_config, topics=allowed,
             checker=FixtureRollback(), tls_enable=True)
         try:
-            start(producer, sorted(allowed)[0])
+            if allowed:
+                start(producer, sorted(allowed)[0])
+            else:
+                # A consume-only principal must still fail actual Pub requests.
+                # Start without declaring producer topics; never manufacture a
+                # positive publisher grant merely to bootstrap this negative probe.
+                producer.startup()
             for physical, route in sorted(topics.items()):
                 def send(kind=route['message_type']):
                     check_route(producer, physical)

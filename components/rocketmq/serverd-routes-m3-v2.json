@@ -159,16 +159,7 @@
       ]
     },
     "m3-qs-worker": {
-      "owner": "qs.mysql",
-      "publish": [
-        "qs-survey-worker",
-        "qs-survey-catalog",
-        "qs-evaluation-mysql",
-        "qs-task-normal",
-        "qs-task-transaction",
-        "qs-ai-command",
-        "qs-ai-ack"
-      ],
+      "publish": [],
       "subscriptions": [
         "qs-survey-worker",
         "qs-evaluation-mysql",

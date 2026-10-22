@@ -36,23 +36,26 @@ class M3ResourceTests(unittest.TestCase):
         routes = {r['id']:r for r in m['routes']}
         for role, grants in m['accounts'].items():
             with self.subTest(role=role):
-                self.assertEqual({routes[r]['owner'] for r in grants['publish']},{grants['owner']})
+                if grants['publish']:
+                    self.assertEqual({routes[r]['owner'] for r in grants['publish']},{grants['owner']})
                 permissions = permissions_v2(m,grants)
                 self.assertTrue(all('*' not in key and actions <= {'Pub','Sub','Get'} for key,actions in permissions.items()))
                 for route in routes.values():
-                    if route['owner'] != grants['owner']:
+                    if route['owner'] != grants.get('owner'):
                         self.assertNotIn('Pub',permissions.get('Topic:'+route['physical_topic'],()))
         bad = copy.deepcopy(m)
         bad['accounts']['m3-qs-apiserver']['publish'].append('qs-evaluation-mongo')
         with self.assertRaises(ValueError):validate_v2(bad)
         self.assertFalse(m['accounts']['m3-qs-mongo']['subscriptions'])
+        self.assertEqual(m['accounts']['m3-qs-worker']['publish'],[])
+        self.assertNotIn('owner',m['accounts']['m3-qs-worker'])
 
     def test_required_real_matrix_cannot_accept_missing_negative_positive_or_tls_proof(self):
         expected = expected_cases(self.document)
-        self.assertEqual(len(expected),126)
-        self.assertEqual(sum(value==40300 for value in expected.values()),78)
-        self.assertEqual(sum(value==40014 for value in expected.values()),16)
-        receipt = dict(client='5.1.2',passed=126,failed=0,skipped=0,cases=expected,
+        self.assertEqual(len(expected),120)
+        self.assertEqual(sum(value==40300 for value in expected.values()),84)
+        self.assertEqual(sum(value==40014 for value in expected.values()),10)
+        receipt = dict(client='5.1.2',passed=120,failed=0,skipped=0,cases=expected,
             scope='isolated_transport_acl_and_broker_type_only')
         output = lambda v:'M3_RESOURCE_RECEIPT '+json.dumps(v)
         self.assertEqual(parse_receipt(output(receipt),self.document),receipt)
@@ -62,7 +65,7 @@ class M3ResourceTests(unittest.TestCase):
         for key in ('tls/wrong_ca',next(k for k,v in expected.items() if v==40300)):
             bad=copy.deepcopy(receipt);del bad['cases'][key];bad['passed']-=1
             with self.assertRaises(RuntimeError):parse_receipt(output(bad),self.document)
-            self.assertEqual(parse_receipt(output(bad),self.document,partial=True)['passed'],125)
+            self.assertEqual(parse_receipt(output(bad),self.document,partial=True)['passed'],119)
         with self.assertRaises(RuntimeError):parse_receipt(output(receipt)+'\n'+output(receipt),self.document)
 
 

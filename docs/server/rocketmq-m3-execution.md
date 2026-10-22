@@ -1050,3 +1050,10 @@ CI39811388627/c9e6e05已完成：typed资源安装/幂等/冲突检查完成，�
 核对固定5.5.1官方源码：tlsTestModeEnable=false仅选真实证书，gRPC读取全局tls.server.mode默认permissive。候选改为服务端enforcing，Broker和NameServer内部remoting也使用TLS，显式MQAdmin通过镜像环境启用证书信任；两角色挂载同一只读证书，隔离证书补齐内部DNS。保持进程、CPU/内存与worker配置不变。新增真实Java启动参数契约；TLS快门禁移到耗时资源安装之前，修正后仍须完整126操作/4冲突及清理通过。此为源码候选，serverD未变更。
 
 QS PR421已在28检查成功、1项API生成同步不适用后按精确head正常合并07d82aba；实际main完整tree与已测候选一致bae47e5，合并前回读生产暂停true且环境无覆盖。双owner凭据隔离源码已合并，不代表T21/T22或生产完成。T22默认组合根基线143通过/0跳过，只读预研未修改装配。
+
+
+### 2026-10-23：T21 worker 最小权限复核；T22 独立离线准备
+
+追踪worker实际入口确认其业务事务通过gRPC在API执行，唯一发布入口是旧retry-hold replay。最终worker角色收紧为仅消费，不声明owner、不创建Sender/Checker；API持有qs.mysql/qs.mongo。旧hold责任仍必须在T25/T32交接，关闭发布准入不能代替停止旧扫描。最终资源操作矩阵120（84越权、10服务端类型拒绝），旧126草案与失败报告保留；减少的6项是被删除worker发布授权对应的类型正例，worker全部Topic发布改为拒绝，没有删减现存授权边界验证。
+
+GitHub官方报告Actions降级，TLS修正076129c的原生资源与回归仍排队；T21不勾选，20/36。按既有离线推进安排，T22独立工作区从QS main07d82aba准备共享owner借用及报告/答卷组合接线，e37b41f92五包race通过，尚未发PR、未接完整Start/Close/默认工厂，不计门禁或任务完成。

@@ -71,8 +71,18 @@
   },
   "pending": [
     "verify TLS-only Broker and NameServer remoting plus MQAdmin",
-    "verify all126 transport outcomes and4 preflight conflicts",
+    "verify all120 transport outcomes and4 preflight conflicts",
     "verify current full CI and cleanup",
     "merge infra source and update T21 completion separately"
-  ]
+  ],
+  "worker_scope": {
+    "source": "QS actual process/runtime_bootstrap.go and worker handlers",
+    "final_role": "consume_only",
+    "transaction_owners": [],
+    "publish_allowed_topics": 0,
+    "required_transport_cases": 120,
+    "required_forbidden_cases": 84,
+    "required_type_conflicts": 10,
+    "legacy_hold_replay": "must stop and hand off active responsibilities in T25/T32"
+  }
 }

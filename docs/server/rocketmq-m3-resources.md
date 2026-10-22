@@ -10,11 +10,11 @@
 | --- | --- | --- |
 | `m3-iam` | `iam.mysql`：授权事务、SMS NORMAL | IAM 自身授权广播 |
 | `m3-qs-apiserver` | `qs.mysql`：评分、Task 事务、command/ACK、survey/Task NORMAL | QS 授权广播、模型目录 NORMAL、AI event |
-| `m3-qs-worker` | `qs.mysql`，完整 owner Topic 登记供空闲实例回查 | `qs-worker` 的 survey、Task NORMAL/事务、evaluation MySQL/Mongo 事务 |
+| `m3-qs-worker` | 无发布权限；不持有事务 owner | `qs-worker` 的 survey、Task NORMAL/事务、evaluation MySQL/Mongo 事务 |
 | `m3-qs-mongo` | `qs.mongo`：答卷、报告及其到期 dispatch | 无消费授权；宿主显式借用此身份创建该 owner Sender/Checker |
 | `m3-ai` | `ai.mysql`：receipt/state event | QS command、业务 ACK |
 
-每个角色的 Pub/Get 只覆盖本 owner 精确 Topic；Sub/Get 只覆盖其 Topic 和 Group，不授权管理或通配符。RocketMQ ACL 分别授权 Topic、Group 资源；验收按有效权限交集计算，不假称支持 Topic/Group 对的关联策略。apiserver 与 worker 分别使用角色凭据；它们各自的 Mongo owner 使用显式 `transactions.qs.mongo.credentials_file`，MySQL owner 也显式设置 `credentials_file`。双 owner 不能共用 Broker username，不能仅用两个相同内容的文件绕过检查。
+每个角色的 Pub/Get 只覆盖本 owner 精确 Topic；Sub/Get 只覆盖其 Topic 和 Group，不授权管理或通配符。RocketMQ ACL 分别授权 Topic、Group 资源；验收按有效权限交集计算，不假称支持 Topic/Group 对的关联策略。apiserver 与 worker 分别使用角色凭据；仅 apiserver 持有两个事务 owner，Mongo owner 使用显式 `transactions.qs.mongo.credentials_file`，MySQL owner 也显式设置 `credentials_file`。双 owner 不能共用 Broker username，不能仅用两个相同内容的文件绕过检查。
 
 `assessment_model.changed` 实际位于 `qs.survey.lifecycle`；独立 modelcatalog 订阅跟随这个 NORMAL 输入。`qs.evaluation.lifecycle` 有 `qs.mysql` 与 `qs.mongo` 两个事务物理输入，它们共用原逻辑 `qs-worker` Group 和宿主在途预算。拆 Topic 不增加 worker 或执行额度。
 
@@ -34,8 +34,10 @@ T21 在回环隔离 Broker 必须验证相同模板的可信 CA/SAN 正例、错
 
 `make rocketmq-m3-resources-test SDK_DIR=/path/to/fixed-sdk ROCKETMQ_TEST_IMAGE=owned-image` 复用 infra 隔离 Compose 生命周期及清理。显式 SDK 源码固定 `8de893b367cc797580799abd8325f41dd62356db`，原生权限探针固定 Python 客户端 5.1.2，Broker 5.5.1。探针不是 SDK/宿主业务验收。
 
-必需证据包括 126 个实际传输操作结果（含 78 个越权拒绝、16 个实际 Broker 错误类型拒绝和 TLS 正反例），以及类型、队列、凭据和 ACL 四类完整冲突拒绝。为证明服务端类型检查，隔离 raw-client 子类仅在本进程实例中关闭发送前类型校验；不修改 SDK、全局 factory 或生产配置。半消息成功后立即回滚，不产生业务提交。所需依赖缺失、缺项、跳过、未知错误码或不完整清理全部失败。
+必需证据包括 120 个实际传输操作结果（含 84 个越权拒绝、10 个实际 Broker 错误类型拒绝和 TLS 正反例），以及类型、队列、凭据和 ACL 四类完整冲突拒绝。为证明服务端类型检查，隔离 raw-client 子类仅在本进程实例中关闭发送前类型校验；不修改 SDK、全局 factory 或生产配置。半消息成功后立即回滚，不产生业务提交。所需依赖缺失、缺项、跳过、未知错误码或不完整清理全部失败。
 
 报告记录源码、manifest/探针/锁摘要、实际 Broker 参数和镜像、结果及清理。只上传安全 JSON，不输出凭据、原正文或原生日志。原始客户端日志限制在临时私有目录，随所属 Compose、进程组和目录清理；首次失败仍保留安全计数及退出状态。T22 再验收全宿主装配、共享 owner 生命周期及预算，T23 验收宿主真实故障。
 
 固定5.5.1的 [gRPC negotiator](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/ProxyAndTlsProtocolNegotiator.java) 使用 [TlsSystemConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/remoting/src/main/java/org/apache/rocketmq/remoting/netty/TlsSystemConfig.java) 的全局 `tls.server.mode`，默认permissive。新候选以JVM固定参数强制enforcing，并为同进程Broker、NameServer及MQAdmin的内部remoting同步启用TLS与证书信任，避免仅强制gRPC后破坏内部链路。NameServer只读挂载tls目录，不增加常驻进程或预算。T30/T31需按冻结新镜像核对证书链及外部/内部SAN、挂载与实际明文拒绝，不能只替换proxy.json或沿用旧验收receipt。
+
+实际worker入口只通过gRPC调用API业务根；唯一旧发布器用于retry-hold replay。最终worker为consume-only，不配置事务owner、Sender或Checker，不因迁移新增worker goroutine/配额。最终配置关闭发布准入并停止旧hold replay；旧hold/未来责任须在T25/T32具名交接或处置，不以越权失败代替退出活动扫描。旧126操作开发草案对应worker曾有发布授权；修正后保留全部现存Topic正反例，worker发布正例改成明确拒绝，移除其6个不适用的错误类型发布正例，最终120操作，不增加完成数。
