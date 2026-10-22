@@ -213,12 +213,21 @@ def main():
     parser.add_argument("--sdk-go-probe", type=Path, help="prebuilt public SDK executable from a verified published Go module")
     parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
     parser.add_argument("--qs-retry-store-host", type=Path, help="exact QS checkout; original dual-store future authorization atomicity only")
+    parser.add_argument("--qs-deferred-consumer-host", type=Path, help="exact QS checkout; current deferred-consumer original MySQL/lease/process proof, no Broker claim")
+    parser.add_argument("--qs-deferred-consumer-private-log", type=Path, help="new0600 private diagnostic, never a CI artifact")
     parser.add_argument("--qs-retry-store-private-log", type=Path, help="new0600 private diagnostic; never a CI artifact")
     parser.add_argument("--qs-retry-dispatch-host", type=Path, help="exact QS candidate; real original failure/report roots and due Broker dispatch")
     parser.add_argument("--qs-command-host", type=Path, help="exact QS checkout; original SQL command root and real Broker")
     parser.add_argument("--qs-event-host", type=Path, help="exact QS checkout; authenticated event Inbox/projection and original ACK SQL root")
     parser.add_argument("--ai-admission-host", type=Path, help="exact AI checkout; real published Python SDK and original admission roots/Broker")
     args = parser.parse_args()
+    if args.qs_deferred_consumer_private_log and not args.qs_deferred_consumer_host:
+        parser.error("deferred private output requires its exact host profile")
+    if args.qs_deferred_consumer_host and any((args.m3_resources, args.iam_host, args.sdk_api_go, args.sdk_api_python,
+            args.qs_answer_host, args.qs_evaluation_host, args.qs_report_host, args.qs_task_host, args.qs_retry_store_host,
+            args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host, args.ai_admission_host,
+            args.sdk_faults, args.sdk_limits, args.iam_fanout_qs, args.go_probe, args.sdk_go_probe, args.installed_python)):
+        parser.error("deferred consumer MySQL proof is a separate required profile")
     if args.m3_resources and (args.iam_host or args.sdk_api_go or args.sdk_api_python or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host):
         parser.error("M3 resource proof is a separate required profile")
     if args.ai_admission_host and (args.iam_host or args.sdk_api_go or args.sdk_api_python or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host):
@@ -316,7 +325,7 @@ def main():
         "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
-    if args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host:
+    if args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host:
         # Host profiles explicitly create/drop their OWN random schema.
         # This root login exists only in this private loopback Compose project.
         spec['services']['mysql']['environment']['MYSQL_ROOT_HOST'] = '%'
@@ -475,8 +484,16 @@ def main():
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
-        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host)):
+        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
+        if args.qs_deferred_consumer_host:
+            from qs_deferred_acceptance import run_qs_deferred_host
+            proof['qs_deferred_consumer_host'] = {}
+            run_qs_deferred_host(args.qs_deferred_consumer_host, directory, project, mysql_port,
+                                 mysql_password, run, proof['qs_deferred_consumer_host'], owned_native_run, args.qs_deferred_consumer_private_log)
+            for name in proof['qs_deferred_consumer_host']['native_receipt']['cases']:
+                passed('qs_deferred_consumer_' + name)
+            return
         if args.m3_resources:
             from m3_resources import run_resources
             proof['m3_resources'] = {}
@@ -954,6 +971,12 @@ def main():
                                 'Original MySQL/Mongo authorization and explicit legacy future ownership handoff',
                                 'No due dispatcher, Broker visibility, packet loss, SIGKILL or production handoff claim']
             report['qs_retry_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_retry_acceptance.py').read_bytes()).hexdigest()
+        if args.qs_deferred_consumer_host:
+            report['batch'] = 'M3-QS-deferred-consumer-original-MySQL'
+            report['limits'] = ['No Broker delivery, whole-worker, system, production or throughput claim',
+                                'Actual MySQL original evidence/hold root, finite technical attempts, lock/lease and owned child-kill boundaries',
+                                'Callback errors and technical grant are controlled fixtures, not packet loss or human API acceptance']
+            report['qs_deferred_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_deferred_acceptance.py').read_bytes()).hexdigest()
         if args.ai_admission_host:
             report['batch'] = 'M3-AI-admission-original-SQLAlchemy-and-real-Broker'
             report['limits'] = ['No production/system acceptance or throughput claim',
