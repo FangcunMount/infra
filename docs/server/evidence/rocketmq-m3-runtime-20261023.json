@@ -626,6 +626,37 @@
       "Controlled callback errors are not network faults",
       "Manual technical grant fixture is not human authorization API acceptance",
       "No production/system login proof"
+    ],
+    "source_pr": "https://github.com/FangcunMount/qs-server/pull/426",
+    "source_current": "8fb35d344a4685d3f164ae68dddf9791e15a439e",
+    "source_ci_status": "current required CI queued; old 13bfecc host audit import cycle failed, fixed by extraction and local all integration compile",
+    "import_cycle_failure": {
+      "run": "https://github.com/FangcunMount/qs-server/actions/runs/39845297016",
+      "source": "13bfecc58963",
+      "cause": "transport same-package integration test imports worker messaging; deferred messaging imported transport",
+      "fix": "8fb35d344a4685d3f164ae68dddf9791e15a439e extracts shared immutable SQL evidence to deliveryevidence, unchanged legacy identity and SQL",
+      "verification": "36 race tests zero failed/skipped; eventing and worker complete integration-tag compile; lint2.5.0;88 docs tests pass",
+      "native_rerun": "https://github.com/FangcunMount/infra/actions/runs/39846389533",
+      "native_rerun_status": "queued, not counted passed"
+    },
+    "worker_runtime_candidate": {
+      "infra_source": "bbe0e5b",
+      "qs_source": "8e52d8de7",
+      "scope": "actual worker Container/initializeRuntime/lifecycle, real Broker/MySQL, owned loopback business RPC; not complete apiserver/provider/system",
+      "verification": "initial native compile and lint passed; process baseline22 and shared-budget two-package33 race zero failed/skipped; final merged compile/lint/docs running",
+      "development_run": "https://github.com/FangcunMount/infra/actions/runs/39846170583",
+      "development_run_source": "1ae0ebd0500e0b899867548225108d6a929b6477",
+      "development_run_status": "running; earlier source before shared queue snapshot and evidence extraction; not counted passed"
+    },
+    "dispatch_input_errors": [
+      {
+        "run": "39846137194",
+        "result": "canceled before acceptance; incorrect manually transcribed source SHA; not counted as tests"
+      },
+      {
+        "run": "39846360702",
+        "result": "canceled before acceptance; incorrect manually transcribed source SHA; corrected dispatch uses actual git rev-parse HEAD"
+      }
     ]
   }
 }

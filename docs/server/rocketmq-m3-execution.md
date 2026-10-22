@@ -1149,3 +1149,12 @@ M3保持21/36、T22进行中、M4为0/8；尚未发布稳定SDK、安装生产sc
 已证明原SQL事务中的首次wire、重复和V1拒绝、证据断链回滚、真实过期租约接管与旧token拒绝、真实锁等待预算、8次自动技术投递及一次人工技术授权、真实子进程SIGKILL后计数和wire保留。callback错误是受控错误，不冒充网络故障；人工授权夹具不冒充权限API。infra工具121项通过，草稿PR159的广域回归仍运行；当前源码PR及其门禁、完整worker/Broker投递、当前全宿主生命周期/跨实例Checker/数据库与队列上界仍待完成。
 
 M3仍21/36，T22进行中、M4为0/8。未操作生产schema/Topic/ACL/provider、worker资源、稳定发布、system或48小时观察。下一步补齐真实Broker与当前worker执行入口，不能以本次原SQL组件验收替代T22整项门禁。
+
+
+### 2026-10-23：T22 当前 PR 与真实 worker 运行时门禁
+
+[QS PR426](https://github.com/FangcunMount/qs-server/pull/426)已提交。旧head13bfecc的运输审计CI39845297016编译失败：同包集成测试经worker形成导入循环。8fb35d344将共享原SQL证据下移独立deliveryevidence包，保留原身份算法和原子SQL，未关闭或削弱测试；36项race零失败/跳过、整个eventing及worker的integration标签编译、lint2.5.0及88文档测试通过。当前head源码CI与[三版本原生复验39846389533](https://github.com/FangcunMount/infra/actions/runs/39846389533)排队，不把8751605原生报告直接移签新源码。
+
+新增实际worker Container、initializeRuntime、处理器及生命周期的原生入口；使用真实Broker/MySQL和独立回环gRPC业务夹具，不等于完整apiserver或模型/system验收。验证显式schema先于订阅、暂停投递首次wire、原处理器/授权、共享预算与实际RPC排空。后续候选8e52d8de7增加只读有界执行/等待计数，要求真实新投递已等待名额，不能只用短暂未收到RPC代替并发证明。原生开发档39846170583使用较早1ae0ebd源码仍运行；当前候选仍须正式门禁。infra工具123项通过，PR159广域回归继续，未发现已完成作业失败。两次手抄SHA错误的调度已取消并留记录，修正后调度从git直接取得精确SHA，不计为测试通过。
+
+总进度21/36，T22不勾选、M4为0/8。未执行生产、稳定发布、system或48小时观察。
