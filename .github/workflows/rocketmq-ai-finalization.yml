@@ -34,6 +34,7 @@ jobs:
     env:
       QS_AI_DATABASE_URL: mysql+asyncmy://qs_ai_t18:isolated_t18@127.0.0.1:3306/qs_ai_t18
       QS_AI_TEST_MYSQL_DSN: mysql://qs_ai_t18:isolated_t18@127.0.0.1:3306/qs_ai_t18
+      QS_AI_T18_MIGRATION_DATABASE_URL: mysql+asyncmy://root:isolated_t18_root@127.0.0.1:3306/qs_ai_t18
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6

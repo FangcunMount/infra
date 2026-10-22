@@ -115,14 +115,23 @@ def main():
         url = env['QS_AI_DATABASE_URL']
         if make_url(url).host not in {'127.0.0.1', 'localhost', '::1'}:
             raise ValueError('disposable loopback database required')
+        migration_url = env['QS_AI_T18_MIGRATION_DATABASE_URL']
+        application, installer = make_url(url), make_url(migration_url)
+        if (application.host, application.port, application.database) != (
+                installer.host, installer.port, installer.database):
+            raise ValueError('installer must bind the same disposable host and schema')
         phase = 'explicit_schema_install'
         log = directory / 'migration-private.log'
         with log.open('wb') as stream:
             log.chmod(0o600)
             migration = subprocess.run([sys.executable, '-m', 'alembic', 'upgrade', 'head'],
-                cwd=source, env=env, stdout=stream, stderr=subprocess.STDOUT, timeout=180)
+                cwd=source, env=dict(env, QS_AI_DATABASE_URL=migration_url),
+                stdout=stream, stderr=subprocess.STDOUT, timeout=180)
         report['migration_output_sha256'] = hashlib.sha256(log.read_bytes()).hexdigest()
         if migration.returncode:
+            raw_migration = log.read_text(errors='replace')
+            report['migration_error_codes'] = sorted(set(re.findall(
+                r'\b(?:10[0-9]{2}|11[0-9]{2}|12[0-9]{2})\b', raw_migration)))
             raise RuntimeError('explicit schema installation failed')
         phase = 'native_characterization'
         junit = directory / 'native-private.xml'

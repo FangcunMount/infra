@@ -60,6 +60,16 @@
       "cause": "nonexistent test filename; corrected before editing",
       "log": "/tmp/m3-t18-original-target-baseline.log",
       "corrected_baseline_passed": 31
+    },
+    {
+      "run": 39738053698,
+      "infra_source": "526aa7a",
+      "source": "0b7f838578c6191ac02748254a718a33113618f2",
+      "phase": "explicit_schema_install",
+      "status": "failure_before_native_tests",
+      "report": "/tmp/m3-t18-characterization-first",
+      "evidence": "historical0039 migration creates separate temporary schemas; plain app account lacks permission",
+      "repair": "isolated administrator installs same loopback schema; original app account still runs actual tests"
     }
   ],
   "characterization_candidate": "0b7f838578c6191ac02748254a718a33113618f2",
@@ -72,5 +82,8 @@
     "source_docs_markdown": 75,
     "source_docs_links": 1388,
     "real_mysql_status": "pending"
-  }
+  },
+  "source_branch_pushed": true,
+  "infra_pr": "https://github.com/FangcunMount/infra/pull/144",
+  "source_pr_created": false
 }
