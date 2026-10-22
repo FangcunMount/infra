@@ -10,7 +10,7 @@ on:
       kind:
         description: Exact required host acceptance scope
         type: choice
-        options: [retry, deferred, worker]
+        options: [retry, deferred, worker, factory]
         default: retry
       profile:
         description: Development is one MySQL only; final gate requires full
@@ -18,7 +18,7 @@ on:
         options: [full, development]
         default: full
   pull_request:
-    paths: ['scripts/rocketmq/qs_retry_acceptance.py', 'scripts/rocketmq/test_qs_retry_acceptance.py', 'scripts/rocketmq/qs_deferred_acceptance.py', 'scripts/rocketmq/qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_deferred_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-retry.yml']
+    paths: ['scripts/rocketmq/ci-dispatch-factory.py', 'scripts/rocketmq/test_dispatch_factory.py', 'scripts/rocketmq/qs_retry_acceptance.py', 'scripts/rocketmq/test_qs_retry_acceptance.py', 'scripts/rocketmq/qs_deferred_acceptance.py', 'scripts/rocketmq/qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_deferred_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-retry.yml']
 permissions:
   contents: read
 env:
@@ -62,6 +62,7 @@ jobs:
           test "$(git -C .qs-acceptance rev-parse HEAD)" = "$EXPECTED_QS_SHA"
           python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
       - name: Build verified isolated Broker
+        if: inputs.kind != 'factory'
         run: |
           set -euo pipefail
           bash scripts/rocketmq/fetch-release.sh
@@ -69,6 +70,11 @@ jobs:
       - name: Required exact host profile and real original stores
         run: |
           set -euo pipefail
+          if [ "${{ inputs.kind }}" = factory ]; then
+            python3 scripts/rocketmq/ci-dispatch-factory.py --source "$PWD/.qs-acceptance" \
+              --mysql-image "${{ matrix.mysql }}" --report rocketmq-qs-retry.json
+            exit 0
+          fi
           host_profile=--qs-retry-store-host
           extra_args=()
           if [ "${{ inputs.kind }}" = deferred ] || [ "${{ inputs.kind }}" = worker ]; then
