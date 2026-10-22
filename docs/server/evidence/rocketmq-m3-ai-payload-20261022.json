@@ -1,8 +1,8 @@
 {
   "task": "T19",
-  "status": "in_progress",
-  "completed": false,
-  "progress": "18/36",
+  "status": "completed",
+  "completed": true,
+  "progress": "19/36",
   "source_base": "c04a181f2f8323aecff7007dfc50a7828b252590",
   "infra_base": "2270c8c9eede8c1241e04b04eacfc62e3b9c4caf",
   "source_worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-current-payload",
@@ -73,7 +73,7 @@
     "infra_log": "/tmp/m3-t19-infra-tool-tests.log",
     "native_collected_log": "/tmp/m3-t19-native-collected.log"
   },
-  "native_acceptance_status": "prior six-profile checkpoint retained; final source and compatibility gates pending",
+  "native_acceptance_status": "final source, six MySQL/mTLS profiles, complete source and SDK regression gates passed; source and tool implementations merged",
   "infra_candidate": "033399384a665ad927bfe47d454329d2a173f31b",
   "source_pr": "https://github.com/FangcunMount/qs-ai/pull/214",
   "infra_pr": "https://github.com/FangcunMount/infra/pull/146",
@@ -102,9 +102,104 @@
     }
   ],
   "source_ci": {
-    "id": 39776667935,
-    "status": "superseded after preserved internal-binding contract fix; MySQL8.4 shard0 failure retained",
-    "source_sha": "83769afae07658a821e3957cdb36cb213cb823f5"
+    "id": 39779070678,
+    "url": "https://github.com/FangcunMount/qs-ai/actions/runs/39779070678",
+    "status": "passed",
+    "source_sha": "b88f40b0f4affb59b3a900ac8b0823fab1dfa813",
+    "tested_merge": "775ac49310d068c18f4cdcc0d0f021575b1f8020",
+    "full_tree_equal_candidate": true,
+    "checks": 12,
+    "checks_passed": 12,
+    "verified_partitions": [
+      {
+        "mysql": "8.0.36",
+        "passed": 5573,
+        "failed": 0,
+        "skipped": 0,
+        "shards": 4,
+        "junit_exact_once": true,
+        "current_rpc": 11,
+        "original_mysql_recovery": 20,
+        "revision": "775ac49310d068c18f4cdcc0d0f021575b1f8020"
+      },
+      {
+        "mysql": "8.4",
+        "passed": 5573,
+        "failed": 0,
+        "skipped": 0,
+        "shards": 4,
+        "junit_exact_once": true,
+        "current_rpc": 11,
+        "original_mysql_recovery": 20,
+        "revision": "775ac49310d068c18f4cdcc0d0f021575b1f8020"
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "tests-8.0.36-0/shard-8.0.36-0.json",
+        "sha256": "0a4fdc7fc0ab76128b13074f428e1567e2ac4001080fa15f4f95da07ba005473"
+      },
+      {
+        "path": "tests-8.0.36-0/shard-8.0.36-0.xml",
+        "sha256": "abf23ee008397d0299d01814f21e2e7b60a1530f8330d4db80da4a8335c92b5a"
+      },
+      {
+        "path": "tests-8.0.36-1/shard-8.0.36-1.json",
+        "sha256": "125cb737ea602141d49da608ff6fc69d65a1f759ad8898c4b009e1af22422521"
+      },
+      {
+        "path": "tests-8.0.36-1/shard-8.0.36-1.xml",
+        "sha256": "4b75d1d8e4b896b3c35a0be35602ab2755c2844bc42d150b08667e5f56f76efb"
+      },
+      {
+        "path": "tests-8.0.36-2/shard-8.0.36-2.json",
+        "sha256": "01b3722f988028a7f4e431aad3f4b21134d13ee0e1e2851fc6e1bb9910ca2220"
+      },
+      {
+        "path": "tests-8.0.36-2/shard-8.0.36-2.xml",
+        "sha256": "8a2f79bd7f37f52701aecdbb03eca821713bce709098665604b346ff98a28d5c"
+      },
+      {
+        "path": "tests-8.0.36-3/shard-8.0.36-3.json",
+        "sha256": "83018943d584cbe0ddbd1cbc338ccc3706ab8f54dcfe48f3aeae6e19215447ac"
+      },
+      {
+        "path": "tests-8.0.36-3/shard-8.0.36-3.xml",
+        "sha256": "6c39ef05d52aeeb396fb91567e7048bbfaef4b1b98872e9b275101bd1de5676c"
+      },
+      {
+        "path": "tests-8.4-0/shard-8.4-0.json",
+        "sha256": "9259b04af1d86433d8cf504dd7596d3f6b73346914afe58d091dd406370b9efd"
+      },
+      {
+        "path": "tests-8.4-0/shard-8.4-0.xml",
+        "sha256": "f74cf6f24d657080750a2c5c9d74e07f3152358206f4c9c3a932658e4370487c"
+      },
+      {
+        "path": "tests-8.4-1/shard-8.4-1.json",
+        "sha256": "ab60c01a0f4539f0ad8744b3bd68e6fceb81ba3b1c5a9e1fa90b56924ec06df4"
+      },
+      {
+        "path": "tests-8.4-1/shard-8.4-1.xml",
+        "sha256": "358a8df141e44612b4b9e27bc1f54d38bf6579749310fd5ceb6bae2b803f5ea0"
+      },
+      {
+        "path": "tests-8.4-2/shard-8.4-2.json",
+        "sha256": "24989acebd6b00206a629341a7a0a34525c31e6872010f490af3e26fb3717987"
+      },
+      {
+        "path": "tests-8.4-2/shard-8.4-2.xml",
+        "sha256": "fcfdd82371eb821f8bb61e1bb6c15eccb923f42ac62bc8f83b5f573fbd6b28e7"
+      },
+      {
+        "path": "tests-8.4-3/shard-8.4-3.json",
+        "sha256": "8ec3cd899c375f2a93df3185a28e4b1ccfd3da5ea2a50c79dbbf4410b78d12d3"
+      },
+      {
+        "path": "tests-8.4-3/shard-8.4-3.xml",
+        "sha256": "9d98776285f5e8af8feeb31fd4beb2a690d19f0d128743f618bce93e599efad4"
+      }
+    ]
   },
   "tested_merge": {
     "source": "c62116de13f950c6cb35997d0fe33f9a7916adae",
@@ -202,5 +297,227 @@
     "all_github_service_teardowns": "success"
   },
   "focused_final_local_passed": 49,
-  "final_local_log": "/tmp/m3-t19-binding-green.log"
+  "final_local_log": "/tmp/m3-t19-binding-green.log",
+  "typed_final_source_files": 447,
+  "final_type_log": "/tmp/m3-t19-binding-mypy.log",
+  "final_compatibility_matrix": {
+    "id": 39779208812,
+    "url": "https://github.com/FangcunMount/infra/actions/runs/39779208812",
+    "status": "passed",
+    "profiles": [
+      {
+        "report": "/tmp/m3-t19-final-six-39779208812/rocketmq-ai-current-payload-py313-mysql8411-097cbd20e40195bbbc71ff871ed2341c5481c90b/rocketmq-ai-current-payload.json",
+        "sha256": "b0bf5e38c31179e1da21bf64695a70b850fe42bc6d8722a0d75614091d106420",
+        "source_sha": "b88f40b0f4affb59b3a900ac8b0823fab1dfa813",
+        "infra_sha": "097cbd20e40195bbbc71ff871ed2341c5481c90b",
+        "python": "3.13.15",
+        "mysql": "8.4.11",
+        "image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "native": 15,
+        "evidence": 21,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true
+      },
+      {
+        "report": "/tmp/m3-t19-final-six-39779208812/rocketmq-ai-current-payload-py313-mysql8036-097cbd20e40195bbbc71ff871ed2341c5481c90b/rocketmq-ai-current-payload.json",
+        "sha256": "4edeedcc503b82f66507d59f9827a65921f37182a53555088c2026824dcd71c1",
+        "source_sha": "b88f40b0f4affb59b3a900ac8b0823fab1dfa813",
+        "infra_sha": "097cbd20e40195bbbc71ff871ed2341c5481c90b",
+        "python": "3.13.15",
+        "mysql": "8.0.36",
+        "image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "native": 15,
+        "evidence": 21,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true
+      },
+      {
+        "report": "/tmp/m3-t19-final-six-39779208812/rocketmq-ai-current-payload-py311-mysql8044-097cbd20e40195bbbc71ff871ed2341c5481c90b/rocketmq-ai-current-payload.json",
+        "sha256": "69daa02cc8e0b5680ea81d683a59002fe2f3ee09a1f0bc1d6b98fdee2d81e847",
+        "source_sha": "b88f40b0f4affb59b3a900ac8b0823fab1dfa813",
+        "infra_sha": "097cbd20e40195bbbc71ff871ed2341c5481c90b",
+        "python": "3.11.16",
+        "mysql": "8.0.44",
+        "image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "native": 15,
+        "evidence": 21,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true
+      },
+      {
+        "report": "/tmp/m3-t19-final-six-39779208812/rocketmq-ai-current-payload-py311-mysql8036-097cbd20e40195bbbc71ff871ed2341c5481c90b/rocketmq-ai-current-payload.json",
+        "sha256": "95a8cf41d4371b430ccc5111380111afe91b4074a8dcb16afd53978618f526b5",
+        "source_sha": "b88f40b0f4affb59b3a900ac8b0823fab1dfa813",
+        "infra_sha": "097cbd20e40195bbbc71ff871ed2341c5481c90b",
+        "python": "3.11.16",
+        "mysql": "8.0.36",
+        "image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "native": 15,
+        "evidence": 21,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true
+      },
+      {
+        "report": "/tmp/m3-t19-final-six-39779208812/rocketmq-ai-current-payload-py311-mysql8411-097cbd20e40195bbbc71ff871ed2341c5481c90b/rocketmq-ai-current-payload.json",
+        "sha256": "5cfb171f34e25baf65b468df5b657a4ffa106f1392db11c343890d4b8cec7c07",
+        "source_sha": "b88f40b0f4affb59b3a900ac8b0823fab1dfa813",
+        "infra_sha": "097cbd20e40195bbbc71ff871ed2341c5481c90b",
+        "python": "3.11.16",
+        "mysql": "8.4.11",
+        "image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "native": 15,
+        "evidence": 21,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true
+      },
+      {
+        "report": "/tmp/m3-t19-final-six-39779208812/rocketmq-ai-current-payload-py313-mysql8044-097cbd20e40195bbbc71ff871ed2341c5481c90b/rocketmq-ai-current-payload.json",
+        "sha256": "96cc885957fb1dcd90ceb49f33ffcecd4ce3f63e294775f220a26a8cb5214802",
+        "source_sha": "b88f40b0f4affb59b3a900ac8b0823fab1dfa813",
+        "infra_sha": "097cbd20e40195bbbc71ff871ed2341c5481c90b",
+        "python": "3.13.15",
+        "mysql": "8.0.44",
+        "image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "native": 15,
+        "evidence": 21,
+        "cleanup_verified": true,
+        "all_source_hashes_verified": true
+      }
+    ],
+    "total_native": 90,
+    "total_evidence_flags": 126,
+    "failed": 0,
+    "skipped": 0,
+    "all_github_service_teardowns": "success"
+  },
+  "initial_focused_source_sha": "729faee986d0553392b4b0c9f88a3830347923ec",
+  "infra_implementation": {
+    "candidate": "033399384a665ad927bfe47d454329d2a173f31b",
+    "pr": 146,
+    "status": "merged",
+    "merge_sha": "3f3bd73b2790d1f90c5c6de53d86ad44bd9eb867",
+    "full_tree_equal_candidate": true,
+    "checks": 8,
+    "checks_passed": 8,
+    "check_receipt": "/tmp/m3-t19-infra-final-checks.json"
+  },
+  "sdk_regression": {
+    "reports": [
+      {
+        "run_id": 39777257193,
+        "kind": "complete",
+        "report": "/tmp/m3-t19-complete-39777257193/rocketmq-complete-sdk-0-c84c2a45b1abf8b293b9dd241ca5a870c21e2027/rocketmq-complete-sdk.json",
+        "sha256": "b5ad241ba87eff00eb5491f4ece902494afe156e58bff14d3a7d77a20e88bac3",
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "source_mappings_verified": true,
+        "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+      },
+      {
+        "run_id": 39777257193,
+        "kind": "complete",
+        "report": "/tmp/m3-t19-complete-39777257193/rocketmq-complete-sdk-1-c84c2a45b1abf8b293b9dd241ca5a870c21e2027/rocketmq-complete-sdk.json",
+        "sha256": "523030cacab43d13faf1717a7bcfc80c3f9707d0b6be89b04c0d88a68c67382a",
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "source_mappings_verified": true,
+        "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+      },
+      {
+        "run_id": 39777257116,
+        "kind": "faults",
+        "report": "/tmp/m3-t19-faults-39777257116/rocketmq-packet-faults-1-c84c2a45b1abf8b293b9dd241ca5a870c21e2027/rocketmq-packet-faults.json",
+        "sha256": "495546040634a1a1136f99fc2215d3cf95622db230a2c15468081f68546e8465",
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "source_mappings_verified": true,
+        "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+      },
+      {
+        "run_id": 39777257116,
+        "kind": "faults",
+        "report": "/tmp/m3-t19-faults-39777257116/rocketmq-packet-faults-0-c84c2a45b1abf8b293b9dd241ca5a870c21e2027/rocketmq-packet-faults.json",
+        "sha256": "c3bfbcf0def555bd630d0d2ca68235e4e7cdc075b4ae4e3f17077edc2ba74891",
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "source_mappings_verified": true,
+        "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+      },
+      {
+        "run_id": 39777257107,
+        "kind": "sdk",
+        "report": "/tmp/m3-t19-sdk-39777257107/rocketmq-public-sdk-1-c84c2a45b1abf8b293b9dd241ca5a870c21e2027/rocketmq-public-sdk.json",
+        "sha256": "85a78be7877c59167a10d965aec1f91ac14cb5873bef79d24b6dcb8f557b64dc",
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "source_mappings_verified": true,
+        "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+      },
+      {
+        "run_id": 39777257107,
+        "kind": "sdk",
+        "report": "/tmp/m3-t19-sdk-39777257107/rocketmq-public-sdk-0-c84c2a45b1abf8b293b9dd241ca5a870c21e2027/rocketmq-public-sdk.json",
+        "sha256": "079660c2f9b2bf1bbca4cb87410538e1f134ef33483d80c81fd9b11d2907c324",
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "source_mappings_verified": true,
+        "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+      },
+      {
+        "run_id": 39777257838,
+        "kind": "rocketmq-m2-go-sdk",
+        "report": "/tmp/m3-t19-docker-reports-39777257838/rocketmq-m2-go-sdk-c84c2a45b1abf8b293b9dd241ca5a870c21e2027/rocketmq-m2-go-sdk.json",
+        "sha256": "cc6fff896ee0c0aae0db95b918c265fc6a12e7f642784725fd7a02fb2d745bb3",
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "source_mappings_verified": true,
+        "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+      },
+      {
+        "run_id": 39777257838,
+        "kind": "rocketmq-m2-transactions",
+        "report": "/tmp/m3-t19-docker-reports-39777257838/rocketmq-m2-transactions-c84c2a45b1abf8b293b9dd241ca5a870c21e2027/rocketmq-m2-transactions.json",
+        "sha256": "b991fa0ac9156de841e1a65fa5add8598c7d653cb1e21e7103e3230c12c767aa",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup_verified": true,
+        "source_mappings_verified": true,
+        "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+      }
+    ],
+    "passed": 289,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "unchanged M2 baseline SDK bfaae2b regression; not the current AI host acceptance"
+  },
+  "completed_at": "2026-10-22T12:49:01.811662+00:00",
+  "source_implementation": {
+    "candidate": "b88f40b0f4affb59b3a900ac8b0823fab1dfa813",
+    "pr": 214,
+    "status": "merged",
+    "merge_sha": "64ffa15b226d66da12fabce8b5041aae3457eff1",
+    "full_tree_equal_candidate": true,
+    "automatic_production_deploy_enabled": false,
+    "deploy_variable_receipt": "/tmp/m3-t19-ai-cd-paused.json"
+  },
+  "progress_pr": {
+    "id": 147,
+    "status": "pending_merge",
+    "scope": "fixed host workflow target plus canonical evidence/progress; implementation and mandatory verification complete"
+  }
 }
