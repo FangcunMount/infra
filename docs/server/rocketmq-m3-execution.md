@@ -28,7 +28,7 @@
 - 当前批次：**T20进行中；M3为19/36**。T19源码/工具/进度PR214/146/147均合并，完整树核验，生产未变更。T20独立工作区与原入口基线已建立，内部A–D推进；只验收最终QS＋AI版本组合。[T20证据](evidence/rocketmq-m3-paired-20261022.json)。
 
 
-### T20 分批验证（2/4，总进度仍19/36）
+### T20 分批验证（3/4，总进度仍19/36）
 
 以下是T20内部门禁，不新增或拆掉原36项任务；只有A–D全部实现并验证、相关源码和工具合并后，才勾选T20。
 
@@ -36,7 +36,7 @@
 | --- | --- | --- |
 | ✅ | T20-A：实际入口、独立工作区及定向基线 | 三仓完整SHA、实际SDK锁、owner/路由及双方根/读取入口已核对；AI92通过，QS804通过，7项既有可选DSN测试如实单列；这不是依赖验收 |
 | ✅ | T20-B：真实两端最小业务闭环 | QS原command根→Broker→AI原admission/receipt/state→QS原event投影/首次ACK→AI原ACK根；双方实际消费者参与，不能用observer代替 |
-| ☐ | T20-C：正文、安全、重复及取消 | 双向真实mTLS大正文，首次ID/wire复用，重复command/event/receipt/ACK，最终版本的取消；不生成业务重试或模型重做，不扩展历史互通 |
+| ✅ | T20-C：正文、安全、重复及取消 | 双向真实mTLS大正文，首次ID/wire复用，重复command/event/receipt/ACK，最终版本的取消；不生成业务重试或模型重做，不扩展历史互通 |；39798461241真实5原生/25证据全部通过，0失败/跳过，源码/摘要/清理独立核验
 | ☐ | T20-D：冻结完整候选及合并 | 固定最终QS/AI版本，完整源码/必需真实矩阵与清理报告通过，required非空且0跳过；原SDK/普通消息回归保持；源码和工具合并后关闭父任务 |
 
 
@@ -193,7 +193,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 2026-10-22；内部3/3。最终6be5f80源码12检查成功，两档MySQL各5529通过（含12串行原根/5 ACK原生），0失败/跳过；infra2950e9a全部19项成功，六档Broker各55宿主/148证据及独立focus4/12通过，完整清理。AI PR212合并be91fde，infra PR142合并f84b3a9，merge tree均一致。失败/取消历史保留，旧SDK一次超时根因未确认、本轮原SDK两档均31通过；生产未变更。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ✅ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 2026-10-22；内部5/5。最终1643afe源码12检查成功，两MySQL各5562项（含原根恢复20）0失败/跳过；六档Broker各22原生/32证据通过，源/工具/SDK/报告及清理独立核验。AI PR213合并c04a181、infra PR144合并e1eb1c3；原树与候选一致，失败历史保留，生产未变更。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
 | ✅ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 2026-10-22；最终b88f40b源码12检查成功，两档MySQL各5573（含11引用/绑定及20原根恢复）0失败/跳过；六档原根/mTLS各15原生/21证据通过，10服务/15类自有记录清理核验。infra0333993的8检查和289 SDK回归通过，AI PR214合并64ffa15、工具PR146合并3f3bd73，完整tree一致；目标pin/进度PR147单列。历史兼容/清理交M4，生产未变更。[完整证据/失败历史](evidence/rocketmq-m3-ai-payload-20261022.json) |
-| ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 进行中；内部A/B完成2/4。真实完整首轮已推进到4/5原生场景、22项证据，第五场景evaluation start闭环已达成，checkpoint测试读取修正等待5/25复验；源码草稿QS420/AI215及最终CI/六档/合并另计。生产未变更。[完整证据与失败历史](evidence/rocketmq-m3-paired-20261022.json) |
+| ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 进行中；内部A/B/C完成3/4。39798461241真实5原生/25证据零失败/跳过，双向mTLS、重复及两种取消全部通过；D六档矩阵/最终完整CI/源码和工具合并待完成。生产未变更。[完整证据与失败历史](evidence/rocketmq-m3-paired-20261022.json) |
 | ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
 | ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 待开始 |
 | ☐ | T23 | 宿主端到端及真实网络/进程/DB/Broker故障 | 待开始 |
@@ -1014,3 +1014,10 @@ QS4230655/AI32f70ac/infra2ac9916的39792502329已完成前两个原生用例、1
 另发现并用三个定向red子例复现QS新档案的调用方引用错误分类：1938773只将组织/hash/长度不匹配恢复为既有Conflict→RPC NotFound；内部workload、witness/binding及不确定证据仍保持原保护，不允许新档案历史回退。三相关包race及docs-check通过。提交后完整CI暴露文档source baseline未同步，7ee34a3只更新声明SHA/日期，87项docs测试及提交后facts复验通过；完整当前头门禁仍待回传。
 
 源码草稿[QS PR420](https://github.com/FangcunMount/qs-server/pull/420)、[AI PR215](https://github.com/FangcunMount/qs-ai/pull/215)分别记账；AI checkpoint修正先保留独立candidate分支，真实5/25通过后再快进PR并运行最终CI，避免每次夹具修正重复全矩阵。合并门禁尚未满足，不发布稳定SDK、不操作生产；QS PRODUCTION_DEPLOY_PAUSED=true、AI AUTO_DEPLOY_ENABLED=false已只读回查。GitHub自14:18 UTC起报告[Actions结果处理延迟](https://www.githubstatus.com/incidents/q29p76qtnkyk)，queued/步骤状态可能滞后，以原生报告核验，不将平台延迟或取消记录当通过。
+
+
+### 2026-10-22：T20-C完整五场景通过（内部3/4）
+
+39798461241固定QS7ee34a3 / AIb55c7a6 / infrada4630f，Python3.11.16/MySQL8.0.36完整5原生/25证据通过，0失败/0跳过，真实evaluation start→cancel→receipt/state→ACK及重复也已通过。独立下载并核对57份SDK源、宿主与工具摘要、SDK模块/锁/制品、原生精确集合和全部资源清理；报告SHA256 c460a3ca4fcea1cbd2c326e1f4c87cd42f7fef3cf721be2b9c8a66d99cee7f33。C打勾、内部3/4；父T20仍不勾选，M3维持19/36，M4为0/8。
+
+最终AI候选将快进至PR215，D执行六档兼容矩阵、两库完整当前头CI、工具完整回归与合并。此前失败、被替代运行及源码文档基线修正均保留，未发布SDK稳定版或执行生产变更。
