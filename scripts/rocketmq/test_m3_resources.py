@@ -33,11 +33,12 @@ class M3ResourceTests(unittest.TestCase):
 
     def test_bootstrap_is_a_distinct_development_profile_and_cannot_pass_full_receipt(self):
         doc=bootstrap_manifest(self.document)
-        self.assertEqual(len(doc['accounts']),1)
-        self.assertEqual(len(doc['routes']),2)
+        self.assertEqual(len(doc['accounts']),2)
+        self.assertEqual(len(doc['routes']),3)
         cases=expected_cases(doc)
-        self.assertEqual(len(cases),12)
-        receipt=dict(client='5.1.2',passed=12,failed=0,skipped=0,cases=cases,
+        self.assertEqual(len(cases),22)
+        self.assertEqual(sum(v==40100 for v in cases.values()),6)
+        receipt=dict(client='5.1.2',passed=22,failed=0,skipped=0,cases=cases,
             scope='isolated_transport_acl_and_broker_type_only',denial_path='direct_signed_send_receive_rpc',diagnostic=None)
         raw='M3_RESOURCE_RECEIPT '+json.dumps(receipt)
         self.assertEqual(parse_receipt(raw,doc),receipt)

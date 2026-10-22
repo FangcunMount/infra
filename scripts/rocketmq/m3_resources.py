@@ -23,12 +23,12 @@ def manifest(repo):
 
 
 def bootstrap_manifest(document):
-    """Development-only first producer reproduction; cannot satisfy the full gate."""
+    """Development-only two-owner direct-denial reproduction; never the full gate."""
     value=copy.deepcopy(document)
-    role='m3-iam'
-    ids=set(value['accounts'][role]['publish']+value['accounts'][role]['subscriptions'])
+    roles=('m3-iam','m3-qs-mongo')
+    ids={route for role in roles for route in value['accounts'][role]['publish']+value['accounts'][role]['subscriptions']}
     value['routes']=[r for r in value['routes'] if r['id'] in ids]
-    value['accounts']={role:value['accounts'][role]}
+    value['accounts']={role:value['accounts'][role] for role in roles}
     validate_v2(value)
     return value
 

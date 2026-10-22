@@ -42,7 +42,7 @@ T21 在回环隔离 Broker 必须验证相同模板的可信 CA/SAN 正例、错
 
 实际worker入口只通过gRPC调用API业务根；唯一旧发布器用于retry-hold replay。最终worker为consume-only，不配置事务owner、Sender或Checker，不因迁移新增worker goroutine/配额。最终配置关闭发布准入并停止旧hold replay；旧hold/未来责任须在T25/T32具名交接或处置，不以越权失败代替退出活动扫描。旧126操作开发草案对应worker曾有发布授权；修正后保留全部现存Topic正反例，worker发布正例改成明确拒绝，移除其6个不适用的错误类型发布正例，最终120操作，不增加完成数。
 
-开发调试可以显式选择workflow_dispatch的bootstrap档，只安装首个IAM角色的两个Topic/一个Group，执行12个原生结果，不跑完整冲突矩阵，报告固定full_gate=false。PR与默认dispatch始终为full档，必须130个结果及4类冲突；bootstrap报告不能用于T21勾选或合并门禁。开发阶段暂时关闭PR154，仅手动运行定向原生workflow；冻结后重新打开同一PR并执行全部必需矩阵，不删除已有失败。
+开发调试可以显式选择workflow_dispatch的bootstrap档，安装IAM与qs.mongo两个角色、三个Topic/两个Group，执行22个原生结果（包含6项直接Pub/Sub越权拒绝），不跑完整冲突矩阵，报告固定full_gate=false。PR与默认dispatch始终为full档，必须130个结果及4类冲突；bootstrap报告不能用于T21勾选或合并门禁。开发阶段暂时关闭PR154，仅手动运行定向原生workflow；冻结后重新打开同一PR并执行全部必需矩阵，不删除已有失败。
 
 固定5.5.1的ResponseBuilder将认证和授权异常统一映射为40100（UNAUTHORIZED）。越权测试只接受该确切状态；每个角色在拒绝批次前后以同一凭据读取其获准Topic，两个成功对照都必须存在，避免错误凭据伪装为权限拒绝。类型错误仍要求40014。当前矩阵从120增加10个对照为130；保留旧失败和开发档来源，不修改任务总数。
 
