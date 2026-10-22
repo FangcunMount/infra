@@ -10,6 +10,10 @@ from provision_v2 import Admin, desired_topics, provision
 from routes import permissions_v2, physical_topic_v2, validate_v2
 
 MANIFEST = 'components/rocketmq/serverd-routes-m3-v2.json'
+DIAGNOSTIC_KINDS = {'RuntimeError','ValueError','TimeoutError','AttributeError','TypeError',
+    'ForbiddenException','BadRequestException','IllegalStateException','IllegalArgumentException',
+    'ClientException','Exception','other'}
+DIAGNOSTIC_STATUSES = {40000,40014,40100,40300,40400,40401,50000,50001,50400}
 
 
 def manifest(repo):
@@ -48,11 +52,22 @@ def parse_receipt(output, document, *, partial=False):
         raise RuntimeError('one bounded resource proof required')
     value = json.loads(receipts[0])
     expected = expected_cases(document)
-    if (set(value) != {'client','passed','failed','skipped','cases','scope'}
+    diagnostic = value.get('diagnostic')
+    phases = {'native_started'} | expected.keys() | {
+        'producer_bootstrap:'+role+suffix for role in document['accounts']
+        for suffix in ('','/route','/startup','/settings')}
+    valid_diagnostic = (diagnostic is None if value.get('failed') == 0 else
+        isinstance(diagnostic,dict) and set(diagnostic)=={'phase','kind','status'}
+        and isinstance(diagnostic['phase'],str) and diagnostic['phase'] in phases
+        and isinstance(diagnostic['kind'],str) and diagnostic['kind'] in DIAGNOSTIC_KINDS
+        and (diagnostic['status'] is None or type(diagnostic['status']) is int
+             and diagnostic['status'] in DIAGNOSTIC_STATUSES))
+    if (set(value) != {'client','passed','failed','skipped','cases','scope','diagnostic'}
         or value['client'] != '5.1.2' or type(value['passed']) is not int
         or not isinstance(value['cases'],dict) or type(value['failed']) is not int
         or value['failed'] not in (0,1) or type(value['skipped']) is not int or value['skipped'] != 0
         or value['passed'] != len(value['cases'])
+        or not valid_diagnostic
         or any(key not in expected or result != expected[key] for key,result in value['cases'].items())
         or (not partial and (value['cases'] != expected or value['failed'] != 0))
         or value['scope'] != 'isolated_transport_acl_and_broker_type_only'):

@@ -16,6 +16,7 @@ from rocketmq.v5.exception import ClientException
 from rocketmq.v5.model import FilterExpression, Message
 from rocketmq.v5.producer import Producer, TransactionChecker
 from rocketmq.v5.util import MessagingResultChecker
+from m3_resources import DIAGNOSTIC_KINDS, DIAGNOSTIC_STATUSES
 
 MARKER = 'M3_RESOURCE_RECEIPT '
 
@@ -46,7 +47,7 @@ def check_denied(operation, codes):
         operation()
     except ClientException as error:
         if error.code not in codes:
-            raise RuntimeError('negative probe failed for an unexpected Broker status') from None
+            raise
         return error.code
     raise RuntimeError('Broker accepted a forbidden operation')
 
@@ -75,12 +76,13 @@ def close(client):
         client.rpc_client.stop()
 
 
-def run(config, cases, *, tls_only=False):
+def run(config, cases, progress, *, tls_only=False):
     if importlib.metadata.version('rocketmq-python-client') != '5.1.2':
         raise RuntimeError('fixed Python client required')
     if not config['endpoint'].startswith('127.0.0.1:'):
         raise RuntimeError('owned loopback endpoint required')
     def handshake(ca=None, *, name=None, plaintext=False, expected=True, stage):
+        progress['phase'] = stage
         print('M3_RESOURCE_STAGE '+stage,flush=True)
         channel = (grpc.insecure_channel(config['endpoint']) if plaintext else
             grpc.secure_channel(config['endpoint'], grpc.ssl_channel_credentials(
@@ -113,6 +115,7 @@ def run(config, cases, *, tls_only=False):
     routes = {r['id']:r for r in manifest['routes']}
     topics = {r['physical_topic']:r for r in routes.values()}
     for role, grants in manifest['accounts'].items():
+        progress['phase'] = 'producer_bootstrap:'+role
         account = config['accounts'][role]
         client_config = ClientConfiguration(config['endpoint'], Credentials(
             account['username'], account['password']), request_timeout=5)
@@ -121,7 +124,14 @@ def run(config, cases, *, tls_only=False):
             checker=FixtureRollback(), tls_enable=True)
         try:
             if allowed:
-                start(producer, sorted(allowed)[0])
+                progress['phase'] = 'producer_bootstrap:'+role+'/route'
+                check_route(producer,sorted(allowed)[0])
+                progress['phase'] = 'producer_bootstrap:'+role+'/startup'
+                producer.startup()
+                progress['phase'] = 'producer_bootstrap:'+role+'/settings'
+                producer._retrieve_topic_route_data(sorted(allowed)[0])
+                if not producer._init_settings_event.wait(timeout=5):
+                    raise RuntimeError('pinned Broker producer settings not received')
             else:
                 # A consume-only principal must still fail actual Pub requests.
                 # Start without declaring producer topics; never manufacture a
@@ -142,10 +152,12 @@ def run(config, cases, *, tls_only=False):
                             raise RuntimeError('half transaction receipt absent')
                         transaction.rollback()
                 identity = role + '/publish/' + route['id']
+                progress['phase'] = identity
                 if physical in allowed:
                     send()
                     cases[identity] = 'allowed'
                     wrong = 'NORMAL' if route['message_type'] == 'TRANSACTION' else 'TRANSACTION'
+                    progress['phase'] = role + '/type/' + route['id']
                     code = check_denied(lambda:send(wrong), {Code.MESSAGE_PROPERTY_CONFLICT_WITH_TYPE})
                     cases[role + '/type/' + route['id']] = code
                 else:
@@ -157,6 +169,7 @@ def run(config, cases, *, tls_only=False):
             if not route['consumer_group']:
                 continue
             physical, group = route['physical_topic'], route['consumer_group']
+            progress['phase'] = role+'/subscribe/'+route['id']
             allowed = ('Sub' in permissions.get('Topic:'+physical, [])
                        and 'Sub' in permissions.get('Group:'+group, []))
             consumer = SimpleConsumer(client_config, group,
@@ -193,13 +206,18 @@ def main():
         handler.close()
     logger.addHandler(logging.FileHandler(args.config.parent/'m3-raw-client.log'))
     print('M3_RESOURCE_STAGE native_started',flush=True)
-    cases, failed = {}, 0
+    cases, failed, diagnostic = {}, 0, None
+    progress = {'phase':'native_started'}
     try:
-        run(json.loads(args.config.read_text()), cases, tls_only=args.tls_only)
-    except Exception:
+        run(json.loads(args.config.read_text()), cases, progress, tls_only=args.tls_only)
+    except Exception as error:
         failed = 1
+        kind=type(error).__name__
+        status=getattr(error,'code',None)
+        diagnostic=dict(phase=progress['phase'],kind=kind if kind in DIAGNOSTIC_KINDS else 'other',
+            status=status if type(status) is int and status in DIAGNOSTIC_STATUSES else None)
     print(MARKER + json.dumps(dict(client='5.1.2',passed=len(cases),failed=failed,
-        skipped=0,cases=cases,scope='isolated_transport_acl_and_broker_type_only')),flush=True)
+        skipped=0,cases=cases,scope='isolated_transport_acl_and_broker_type_only',diagnostic=diagnostic)),flush=True)
     return failed
 
 

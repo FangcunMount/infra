@@ -114,5 +114,97 @@
     "exit_code": 0,
     "elapsed_seconds": 10.11,
     "purpose": "TLS-only probe lifecycle reproducer; does not replace actual Broker gate"
+  },
+  "warmed_native_first_run": {
+    "run": 39816891357,
+    "source": "47f80034456e1964698f99671570a4bd7ca3a537",
+    "report_sha256": "893928c6dd11a246d2d7dffbc07a8265ed2623a1c0ca0959a8d099389ccd3651",
+    "failed": 1,
+    "passed": 0,
+    "skipped": 0,
+    "failure": "RuntimeError: resource ACL/type/TLS proof incomplete or substituted",
+    "proof": {
+      "manifest_sha256": "a1dfc3ca90eaf4b6a5357b22b68fd603be011805624b1a216ecc68ca8417dfcf",
+      "phase": "native_acl_and_type",
+      "dependencies_ready": true,
+      "tls_private_output_sha256": "7f9b494571fe401e534b88e3fac5366d253eb549dd8b17b3eff832d6dd167abf",
+      "tls_progress": [
+        "native_started",
+        "tls/verified_ca_and_san",
+        "tls/wrong_ca",
+        "tls/wrong_san",
+        "tls/plaintext",
+        "tls/verified_control_after_negatives"
+      ],
+      "tls_preflight": {
+        "client": "5.1.2",
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "tls/verified_ca_and_san": "allowed",
+          "tls/wrong_ca": "rejected",
+          "tls/wrong_san": "rejected",
+          "tls/plaintext": "rejected",
+          "tls/verified_control_after_negatives": "allowed"
+        },
+        "scope": "isolated_transport_acl_and_broker_type_only"
+      },
+      "provision": {
+        "version": 2,
+        "operations": 52,
+        "typed_topics": 10,
+        "principals": 5,
+        "verified": true
+      },
+      "idempotent": {
+        "version": 2,
+        "operations": 0,
+        "typed_topics": 10,
+        "principals": 5,
+        "verified": true
+      },
+      "conflicts_refused_without_mutation": [
+        "queues",
+        "credentials",
+        "acl",
+        "type"
+      ],
+      "typed_topics": {
+        "rmq2_t_d5784a735b691b0beda4d5e5d27727b0": "TRANSACTION",
+        "rmq2_t_a52d2c8d9a6ba5229d8c34ff3f828b1e": "NORMAL",
+        "rmq2_t_e093a39dd58a0085979347c160911d22": "NORMAL",
+        "rmq2_t_f8513086d2e7f2155fb9875c039a1a47": "TRANSACTION",
+        "rmq2_t_99b374cae35ddb4c549a513e5b20e6c9": "TRANSACTION",
+        "rmq2_t_e216bf5d9a3bb731db6180efea06365e": "NORMAL",
+        "rmq2_t_50fafcf8477fa156a6f9b46bccac0638": "TRANSACTION",
+        "rmq2_t_3aa191459362e22de17098fb223344b2": "TRANSACTION",
+        "rmq2_t_f605f539fa9db24e69f346d2089f8098": "TRANSACTION",
+        "rmq2_t_9336fe19e37ff6fdb14bd39230c6997b": "TRANSACTION"
+      },
+      "private_output_sha256": "0d8a4005a3bc91ff570428e8b9b87fb94f1201cecff01e63ea03e670bd72be84",
+      "exit_code": 1,
+      "native_partial": {
+        "client": "5.1.2",
+        "passed": 5,
+        "failed": 1,
+        "skipped": 0,
+        "cases": {
+          "tls/verified_ca_and_san": "allowed",
+          "tls/wrong_ca": "rejected",
+          "tls/wrong_san": "rejected",
+          "tls/plaintext": "rejected",
+          "tls/verified_control_after_negatives": "allowed"
+        },
+        "scope": "isolated_transport_acl_and_broker_type_only"
+      }
+    },
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "diagnosis": "TLS5/5 and4 conflict checks passed; full native receipt stopped before first Pub case, next candidate adds bounded stage/class/status diagnostics without raw exceptions."
   }
 }

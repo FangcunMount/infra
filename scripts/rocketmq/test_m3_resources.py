@@ -56,7 +56,7 @@ class M3ResourceTests(unittest.TestCase):
         self.assertEqual(sum(value==40300 for value in expected.values()),84)
         self.assertEqual(sum(value==40014 for value in expected.values()),10)
         receipt = dict(client='5.1.2',passed=120,failed=0,skipped=0,cases=expected,
-            scope='isolated_transport_acl_and_broker_type_only')
+            scope='isolated_transport_acl_and_broker_type_only',diagnostic=None)
         output = lambda v:'M3_RESOURCE_RECEIPT '+json.dumps(v)
         self.assertEqual(parse_receipt(output(receipt),self.document),receipt)
         for field,value in [('skipped',1),('failed',1),('client','5.1.1'),('passed',True),('wire','private')]:
@@ -67,6 +67,13 @@ class M3ResourceTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):parse_receipt(output(bad),self.document)
             self.assertEqual(parse_receipt(output(bad),self.document,partial=True)['passed'],119)
         with self.assertRaises(RuntimeError):parse_receipt(output(receipt)+'\n'+output(receipt),self.document)
+        partial=copy.deepcopy(receipt);partial.update(passed=0,failed=1,cases={},diagnostic=dict(
+            phase='producer_bootstrap:m3-iam/settings',kind='RuntimeError',status=None))
+        self.assertEqual(parse_receipt(output(partial),self.document,partial=True),partial)
+        for diagnostic in ({'wire':'private'},dict(phase='private-token',kind='RuntimeError',status=None),
+                           dict(phase='native_started',kind='raw private exception',status=None)):
+            partial['diagnostic']=diagnostic
+            with self.assertRaises(RuntimeError):parse_receipt(output(partial),self.document,partial=True)
 
 
 if __name__ == '__main__':
