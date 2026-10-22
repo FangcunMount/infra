@@ -48,6 +48,30 @@ def parse_host_receipt(output, require_business_result=False):
     return receipts[0]
 
 
+RUNTIME_CASES = frozenset(('actual_owner_start', 'inflight_root_shutdown_incomplete_retains_pool',
+    'late_commit_once_with_witness', 'new_owner_fresh_exact_checker',
+    'paused_owner_keeps_checker_and_seals_writes', 'actual_stop_retains_host_pool'))
+
+
+def parse_runtime_receipt(output, source):
+    receipts = [json.loads(line.split('M3_IAM_RUNTIME_RECEIPT ', 1)[1])
+                for line in output.splitlines() if 'M3_IAM_RUNTIME_RECEIPT {' in line]
+    if len(receipts) != 1:
+        raise RuntimeError('one exact IAM owner runtime receipt required')
+    value = receipts[0]
+    if (not re.fullmatch('[0-9a-f]{40}', source) or value.get('source_sha') != source
+            or value.get('scope') != 'actual IAM owner lifecycle and original root; in-process only'
+            or value.get('passed') != len(RUNTIME_CASES) or value.get('failed') != 0 or value.get('skipped') != 0
+            or set(value.get('cases', {})) != RUNTIME_CASES
+            or any(v is not True for v in value['cases'].values())
+            or value.get('business_executions') != 1
+            or value.get('full_api_process_fault_or_system_not_claimed') is not True
+            or not re.search(r'--- PASS: TestM3ActualOwnerDrain \(', output)
+            or re.search(r'--- (?:SKIP|FAIL):|WARNING: DATA RACE', output)):
+        raise RuntimeError('IAM runtime receipt wrong source, incomplete, failed, skipped or outside exact scope')
+    return value
+
+
 def host_failure_summary(raw):
     # Fixed classifications only; never copy a driver error, wire or credential.
     return {'build_failed': '[build failed]' in raw,
@@ -83,12 +107,18 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     if tracked:
         raise RuntimeError('IAM source checkout is dirty before acceptance')
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
+    runtime_flag = os.environ.get('ROCKETMQ_IAM_RUNTIME_REQUIRED', '0')
+    if runtime_flag not in ('0', '1'):
+        raise RuntimeError('explicit IAM runtime profile flag required')
+    runtime_required = runtime_flag == '1'
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'],
                             cwd=source, env=env).stdout)
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('IAM must use its pinned downloaded SDK without replace')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
+    if runtime_required and module.get('Version') != 'v0.5.0-rocketmq-tx.2':
+        raise RuntimeError('current IAM runtime proof requires fixed SDK tx.2')
     manifest = iam_manifest(fanout=qs_source is not None)
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4),
                        'password': secrets.token_hex(32)} for role in manifest['accounts']}
@@ -130,19 +160,25 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
                     'IAM_M3_FANOUT_A_CONFIG': str(paths['iam-fanout-a']),
                     'IAM_M3_FANOUT_B_CONFIG': str(paths['iam-fanout-b']),
                     'IAM_M3_FANOUT_QS_CONFIG': str(paths['qs-fanout'])})
-    result = run(['go', 'test', '-race', '-tags=integration', '-count=1', '-timeout=3m', '-v',
-                  './internal/pkg/migration', '-run', '^TestM3ActualBrokerHost$'],
+    tags = 'integration,m3_iam_runtime' if runtime_required else 'integration'
+    selected = '^(TestM3ActualBrokerHost|TestM3ActualOwnerDrain)$' if runtime_required else '^TestM3ActualBrokerHost$'
+    result = run(['go', 'test', '-race', '-tags=' + tags, '-count=1', '-timeout=3m', '-v',
+                  './internal/pkg/migration', '-run', selected],
                  cwd=source, env=env, timeout=240, required=False)
     raw = result.stdout + result.stderr
     capture = directory / 'iam-host-private.log'; capture.write_text(raw); capture.chmod(0o600)
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
     proof['diagnostics'] = host_failure_summary(raw)
+    if runtime_required:
+        proof['runtime_assertion_lines'] = sorted(set(map(int,re.findall(r'transaction_runtime_native_integration_test\.go:(\d+)',raw))))[:32]
     if private_log is not None:
         retain_private_host_output(private_log, raw)
     if result.returncode:
         raise RuntimeError('actual IAM host acceptance failed (private output withheld)')
     proof['native_receipt'] = parse_host_receipt(result.stdout, require_business_result)
+    if runtime_required:
+        proof['runtime_receipt'] = parse_runtime_receipt(result.stdout, proof['source_sha'])
     if qs_source is not None:
         proof['qs_fanout']['receipt'] = parse_fanout_receipt(result.stdout)
         proof['qs_fanout']['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=qs_source).stdout.strip()

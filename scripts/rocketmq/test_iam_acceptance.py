@@ -92,5 +92,22 @@ class IAMAcceptanceTest(unittest.TestCase):
                 parse_host_receipt(altered)
 
 
+class IAMRuntimeReceiptTest(unittest.TestCase):
+    def test_current_exact_scope_and_failure_boundaries(self):
+        from iam_acceptance import RUNTIME_CASES, parse_runtime_receipt
+        value={'source_sha':'a'*40,'scope':'actual IAM owner lifecycle and original root; in-process only',
+               'passed':6,'failed':0,'skipped':0,'cases':{case:True for case in RUNTIME_CASES},
+               'business_executions':1,'full_api_process_fault_or_system_not_claimed':True}
+        output='M3_IAM_RUNTIME_RECEIPT '+json.dumps(value)+'\n--- PASS: TestM3ActualOwnerDrain (1.00s)'
+        self.assertEqual(parse_runtime_receipt(output,'a'*40),value)
+        for bad in ('', output+'\n'+output, output.replace('a'*40,'b'*40),
+                    output.replace('"passed": 6','"passed": 0'),output.replace('true','false',1),
+                    output.replace('"business_executions": 1','"business_executions": 2'),
+                    output.replace('"skipped": 0','"skipped": 1'),output.replace('TestM3ActualOwnerDrain','TestSDKProbe'),
+                    output.replace('in-process only','complete API'),output+'\nWARNING: DATA RACE',
+                    output+'\n--- SKIP: optional (1s)'):
+            with self.subTest(bad=bad[:80]):
+                with self.assertRaises(RuntimeError):parse_runtime_receipt(bad,'a'*40)
+
 if __name__ == '__main__':
     unittest.main()
