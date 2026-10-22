@@ -25,7 +25,19 @@
 - 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI领取/scanner PR197与显式完成重试PR198、infra PR121/123均已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：**T19已闭环；M3为19/36，下一项T20待开始**。AI PR214合并64ffa15、infra工具PR146合并3f3bd73，完整树等于固定候选；本进度与工作流目标由PR147独立同步。生产CD=false，未操作生产。T20只验收最终QS＋AI版本组合，不扩展历史兼容。[T19证据](evidence/rocketmq-m3-ai-payload-20261022.json)。
+- 当前批次：**T20进行中；M3为19/36**。T19源码/工具/进度PR214/146/147均合并，完整树核验，生产未变更。T20独立工作区与原入口基线已建立，内部A–D推进；只验收最终QS＋AI版本组合。[T20证据](evidence/rocketmq-m3-paired-20261022.json)。
+
+
+### T20 分批验证（1/4，总进度仍19/36）
+
+以下是T20内部门禁，不新增或拆掉原36项任务；只有A–D全部实现并验证、相关源码和工具合并后，才勾选T20。
+
+| 完成 | 内部门禁 | 必须证据 |
+| --- | --- | --- |
+| ✅ | T20-A：实际入口、独立工作区及定向基线 | 三仓完整SHA、实际SDK锁、owner/路由及双方根/读取入口已核对；AI92通过，QS804通过，7项既有可选DSN测试如实单列；这不是依赖验收 |
+| ☐ | T20-B：真实两端最小业务闭环 | QS原command根→Broker→AI原admission/receipt/state→QS原event投影/首次ACK→AI原ACK根；双方实际消费者参与，不能用observer代替 |
+| ☐ | T20-C：正文、安全、重复及取消 | 双向真实mTLS大正文，首次ID/wire复用，重复command/event/receipt/ACK，最终版本的取消；不生成业务重试或模型重做，不扩展历史互通 |
+| ☐ | T20-D：冻结完整候选及合并 | 固定最终QS/AI版本，完整源码/必需真实矩阵与清理报告通过，required非空且0跳过；原SDK/普通消息回归保持；源码和工具合并后关闭父任务 |
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -181,7 +193,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 2026-10-22；内部3/3。最终6be5f80源码12检查成功，两档MySQL各5529通过（含12串行原根/5 ACK原生），0失败/跳过；infra2950e9a全部19项成功，六档Broker各55宿主/148证据及独立focus4/12通过，完整清理。AI PR212合并be91fde，infra PR142合并f84b3a9，merge tree均一致。失败/取消历史保留，旧SDK一次超时根因未确认、本轮原SDK两档均31通过；生产未变更。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ✅ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 2026-10-22；内部5/5。最终1643afe源码12检查成功，两MySQL各5562项（含原根恢复20）0失败/跳过；六档Broker各22原生/32证据通过，源/工具/SDK/报告及清理独立核验。AI PR213合并c04a181、infra PR144合并e1eb1c3；原树与候选一致，失败历史保留，生产未变更。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
 | ✅ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 2026-10-22；最终b88f40b源码12检查成功，两档MySQL各5573（含11引用/绑定及20原根恢复）0失败/跳过；六档原根/mTLS各15原生/21证据通过，10服务/15类自有记录清理核验。infra0333993的8检查和289 SDK回归通过，AI PR214合并64ffa15、工具PR146合并3f3bd73，完整tree一致；目标pin/进度PR147单列。历史兼容/清理交M4，生产未变更。[完整证据/失败历史](evidence/rocketmq-m3-ai-payload-20261022.json) |
-| ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 待开始；仅最终版本组合，不新增新旧版本互通矩阵 |
+| ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 进行中；内部A完成1/4。QS be22b927 / AI64ffa15 / infra662edf4独立工作区；AI92、QS804定向通过，7项既有可选本地MySQL跳过单列，不计原生验收。下一步连接实际两端消费者与原根，required原生缺依赖直接失败 |
 | ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
 | ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 待开始 |
 | ☐ | T23 | 宿主端到端及真实网络/进程/DB/Broker故障 | 待开始 |
@@ -966,3 +978,7 @@ infra0333993的8项检查全部成功，PR146合并3f3bd73，完整tree与候选
 AI最终b88f40b的12检查全部通过；39779070678八分片和JUnit独立核验，两档各5573项完整且仅执行一次，含11引用/内部绑定断言和20原根恢复，0失败/跳过。合并前再次读取AUTO_DEPLOY_ENABLED=false，PR214合并64ffa15，完整tree与候选一致；infra PR146已合并3f3bd73，8项检查成功。最终六档39779208812的90原生/126证据、289既有SDK回归和全部摘要/清理均核验。引用错误的NotFound与权威未知的Unavailable分开，内部绑定原异常保留，首次body/wire及原receipt不变。
 
 勾选T19，总进度19/36；M3-3仍待T20，M4为0/8。目标pin与本总表由PR147独立收尾，不重新发布SDK，不创建生产schema/Topic/ACL，不切provider/NSQ，不代替system和48h观察。下一项按最终协议连接实际QS与AI接收器进行成对验收。
+
+### 2026-10-22：T19总表合并并启动T20原入口基线
+
+T19进度/固定目标PR147合并662edf4，完整tree与3c8f670一致，回填其实际合并状态。T20从QS be22b927、AI64ffa15、infra662edf4创建独立paired工作区；实际SDK为Go tx.2/Python0.4.0a2。AI命令/回执/档案/运行时92项目标通过，QS五相关包race804通过、0失败，7个既有MySQL可选测试因QS_AI_BRIDGE_TEST_DSN未配置跳过并单列；不把它们计为原生通过，后续required依赖缺失直接失败。入口读码确认可直接借用两端原根、实际receiver及专用Payload reader，不新增生产服务或历史格式兼容。内部A完成1/4，父T20不勾选，总计19/36，生产未变更。

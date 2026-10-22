@@ -1,0 +1,84 @@
+{
+  "task": "T20",
+  "status": "in_progress",
+  "completed": false,
+  "progress": "19/36",
+  "started_at": "2026-10-22T12:55:21.817402+00:00",
+  "internal_gates": {
+    "A": "completed",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending"
+  },
+  "source_baselines": {
+    "qs": "be22b9274d1d7ab21abd3be24fb0ebde834ec78b",
+    "ai": "64ffa15b226d66da12fabce8b5041aae3457eff1",
+    "infra": "662edf4b1ef2cffd8ccd05550ea6fdf8377ce2fa"
+  },
+  "worktrees": {
+    "qs": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-paired",
+    "ai": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-paired",
+    "infra": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/infra-paired"
+  },
+  "branch": "codex/rocketmq-m3-paired",
+  "sdk": {
+    "go": "v0.5.0-rocketmq-tx.2",
+    "go_sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+    "python": "0.4.0a2",
+    "python_wheel_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2"
+  },
+  "baseline": {
+    "qs": {
+      "tests_passed": 804,
+      "tests_skipped": 7,
+      "failed": 0,
+      "packages": [
+        [
+          "github.com/FangcunMount/qs-server/internal/apiserver/application/aibridge",
+          "pass"
+        ],
+        [
+          "github.com/FangcunMount/qs-server/internal/apiserver/infra/mysql/aibridge",
+          "pass"
+        ],
+        [
+          "github.com/FangcunMount/qs-server/internal/apiserver/transport/grpc/aibridge",
+          "pass"
+        ],
+        [
+          "github.com/FangcunMount/qs-server/internal/apiserver/infra/aibridge",
+          "pass"
+        ],
+        [
+          "github.com/FangcunMount/qs-server/internal/apiserver/infra/mysql/eventtransaction",
+          "pass"
+        ]
+      ]
+    },
+    "ai_passed": 92,
+    "ai_failed": 0,
+    "ai_skipped": 0,
+    "go_log": "/tmp/m3-t20-qs-baseline.jsonl",
+    "ai_log": "/tmp/m3-t20-ai-baseline.log",
+    "optional_local_skips_reason": "seven pre-existing QS_AI_BRIDGE_TEST_DSN MySQL tests; not native acceptance or passed evidence"
+  },
+  "production_changed": false,
+  "system_acceptance_claimed": false,
+  "real_provider_acceptance_claimed": false,
+  "new_historical_compatibility": false,
+  "entrypoints": {
+    "qs_command": "MessagingCommandStore.StageStart/StageChange and TransactionCommands.Submit",
+    "qs_event": "MessagingRuntime -> MessagingEventReceiver.Receive -> TransactionEvents.Settle",
+    "qs_payload": "MessagePayloads with MessagingReader.Archive bound to TransactionCommands.Archive",
+    "ai_command": "TransactionCommandReceiver over WorkflowCommandAdmission and original roots",
+    "ai_ack": "CommandReceiver.receive_ack with TransactionMessagingStore",
+    "ai_payload": "MessagePayloads with MySQLPayloadAccess and committed TransactionArchive"
+  },
+  "scope": [
+    "actual final-version host command/receipt/state/ACK roots on real Broker",
+    "actual cross-host loopback mTLS payload RPC",
+    "first wire/idempotency/security/cancellation",
+    "required native jobs fail if dependencies absent; zero skip"
+  ],
+  "failure_history": []
+}

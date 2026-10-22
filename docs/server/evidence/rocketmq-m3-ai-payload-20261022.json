@@ -517,7 +517,9 @@
   },
   "progress_pr": {
     "id": 147,
-    "status": "pending_merge",
-    "scope": "fixed host workflow target plus canonical evidence/progress; implementation and mandatory verification complete"
+    "status": "merged",
+    "scope": "fixed host workflow target plus canonical evidence/progress; implementation and mandatory verification complete",
+    "merge_sha": "662edf4b1ef2cffd8ccd05550ea6fdf8377ce2fa",
+    "full_tree_equal_candidate": true
   }
 }
