@@ -3,7 +3,7 @@
   "status": "in_progress",
   "completed": false,
   "progress": "17/36",
-  "internal_progress": "0/5",
+  "internal_progress": "1/5",
   "source_base": "be91fde27616f60a2bcedd0a70280c2ead427d4a",
   "infra_base": "80776fbe4de79e5a65fd11407dfbe87ff42e28ea",
   "source_worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-finalization",
@@ -12,13 +12,13 @@
   "internal_gates": [
     {
       "id": "T18-A",
-      "done": false,
-      "status": "in_progress"
+      "done": true,
+      "status": "completed_implementation_and_validation_pending_merge"
     },
     {
       "id": "T18-B",
       "done": false,
-      "status": "pending"
+      "status": "in_progress_local_only"
     },
     {
       "id": "T18-C",
@@ -81,9 +81,100 @@
     "harness_unit_passed": 4,
     "source_docs_markdown": 75,
     "source_docs_links": 1388,
-    "real_mysql_status": "pending"
+    "real_mysql_status": "passed_characterization_only_not_repaired",
+    "recovery_target_passed": 35,
+    "recovery_integration_collected_only": 1,
+    "recovery_real_mysql_status": "not_run",
+    "recovery_source_status": "uncommitted_worktree_not_merged_not_deployed",
+    "recovery_source_hashes": {
+      "src/qs_ai/infrastructure/workflow_transport/interpretation_finish_sender.py": "9cd1b2a8a1d460b8da879047165185a0dc35f18143fbed02f72659fac90e044a",
+      "src/qs_ai/infrastructure/workflow_transport/transactional_interpretation_execution.py": "1e34dcc5b81b940f3064f42cb785397f61d2efaf13cd521ed608a0df05c7a23c",
+      "tests/test_interpretation_finish_retry.py": "d45fdf29e0ce4d10758d646bd6d68ab684e8517df82adaf6c04cab9bc01666ea",
+      "tests/test_transactional_interpretation_execution.py": "bb4675d250b90bfab60eee07af00ae3b20abaed670b8db6eedf99644f0c1e975",
+      "tests/integration/test_finalization_recovery.py": "8a65a86006aa77d915e58e9dd3efbef2807dc6a91e61c26f943942a07f657147"
+    }
   },
   "source_branch_pushed": true,
   "infra_pr": "https://github.com/FangcunMount/infra/pull/144",
-  "source_pr_created": false
+  "source_pr_created": false,
+  "characterization_ci": {
+    "run": 39738320198,
+    "url": "https://github.com/FangcunMount/infra/actions/runs/39738320198",
+    "infra_source": "b2ef8a3eb1bdc606179117a76ec303d98b9d96d3",
+    "report_sha256": "1581382304ca75b87faa20f2e399e928ea287588901d79687d802ffc44db8a7f",
+    "report": {
+      "version": 1,
+      "batch": "T18-A-original-worker-MySQL-characterization",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "known missing recovery characterization, not repaired finalization",
+      "broker_fault_claimed": false,
+      "external_http_counter_claimed": false,
+      "process_restart_claimed": false,
+      "production_changed": false,
+      "source_sha": "0b7f838578c6191ac02748254a718a33113618f2",
+      "python": "3.11.16",
+      "sdk": "0.4.0a2",
+      "client": "5.1.2",
+      "lock_sha256": "89b80f1ccb09c859de93905aae56f6e0ae5f064e7eabdaf0ecf9dcdfe4ce8e3e",
+      "test_source_sha256": "7cb4221e0091dba084ece8921478f244cce7785af7b9771efc54791d6dbfb5cf",
+      "harness_sha256": "4480dca67873b0cb8516a77b1fb8345eb5b0f3a14cd107f954363af8b4239317",
+      "mysql_image_id": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "migration_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_exit_code": 0,
+      "native_output_sha256": "9c1b7f82a013debf9d1944144ce461fd066b4bd50009920bd020a5bd9aa6ba5e",
+      "native_junit_sha256": "17b6a1bb2fcdf38fc4e59e59b9b11a90591bb191ab0fa224e820bc1cb1fa760b",
+      "diagnostics": [],
+      "native": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0,
+        "tests": [
+          "test_original_worker_live_claim_ordinary_finish_leaves_aborted_terminal_unresolved",
+          "test_original_worker_new_lease_reuses_model_response_but_conflicts_with_old_finish"
+        ],
+        "known_recovery_gap_reproduced": true
+      },
+      "remaining_rows": {
+        "interpretation_artifacts": 0,
+        "execution_jobs": 0,
+        "execution_model_calls": 0,
+        "interpretation_sessions": 0,
+        "messaging_archive": 0,
+        "rm_tx_binding": 0,
+        "rm_tx_execution": 0,
+        "rm_tx_request": 0,
+        "rm_tx_witness": 0
+      },
+      "mysql_version": "8.0.36",
+      "source_clean_after": true,
+      "private_evidence_removed": true
+    },
+    "independent_source_hash_verification": true,
+    "identity_and_compatibility_rules_frozen": true,
+    "completed_date": "2026-10-22"
+  },
+  "finalization_contract": "../rocketmq-m3-t18-finalization.md",
+  "scope_revision": {
+    "date": "2026-10-22",
+    "authority": "User: no historical compatibility; M3 production cutover; M4 cleanup",
+    "m3_progress": "17/36",
+    "m4_progress": "0/8",
+    "current_contract": "../rocketmq-m3-t18-finalization.md",
+    "cleanup_progress": "../rocketmq-m4-execution.md",
+    "new_host_intermediate_protocol_compatibility": false,
+    "single_final_host_protocol": true,
+    "published_sdk_immutability_preserved": true,
+    "scope_transfer_is_not_test_success": true,
+    "production_changed": false,
+    "offline_validation": {
+      "m3_tasks": 36,
+      "m3_complete": 17,
+      "m4_tasks": 8,
+      "m4_complete": 0,
+      "local_links_checked": 59,
+      "json_valid": true
+    }
+  }
 }

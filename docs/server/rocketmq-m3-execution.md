@@ -1,6 +1,22 @@
-# M3 完整实施规划：业务事务接入、稳定发布与生产切换
+# M3 实施规划：业务事务接入、稳定发布与生产切换
 
 本文件是 M3 唯一进度总表，维护已批准规划、任务、证据和交付状态。M2 保持 [24/24](rocketmq-m2-execution.md)，不重复计数。最初状态为 0/36；任务通过实现与验证后才勾选，合并、发布、部署和业务验收分别记账。
+
+## 2026-10-22 范围修订：M3 生产切换，M4 清理
+
+用户已确认不需要历史兼容，并同意新增 [M4 清理执行表](rocketmq-m4-execution.md)。本节及下文当前任务表优先于本文件旧执行记录和前序规划。M3 保留 T01–T36 的 ID、总数及既有证据，仍为 **17/36**；M4 独立 **0/8**。调整范围不增加完成数，不把转移到 M4 的工作伪装成验证通过。
+
+| 边界 | M3：生产切换必须完成 | M4：切换后清理 |
+| --- | --- | --- |
+| 协议 | 三库只支持首发最终协议及当前版本恢复；不新增历史格式、宿主中间协议的在线兼容 | 删除未使用的中间实现、旧 codec 和兼容分支 |
+| 新旧链路 | 排空或具名处置旧未决责任，关闭旧写者/Relay/调度，证明新链路只走 RocketMQ | 删除旧生产 provider、Relay、配置和部署入口 |
+| 业务数据 | 保留当前业务需要的 response/checkpoint、Inbox、receipt、幂等、计划及 witness | 整理旧表仍承担的当前职责，再按具名清单处理废弃字段/表/资产 |
+| 验收 | 最终 QS＋AI 成对链路、必要真实故障、稳定制品、固定镜像、system 和 48h 观察 | 清理后的回归、依赖/配置审计及资产处置验证 |
+| 恢复 | 新 runtime 启动前的冻结恢复；启动后以前向修复为主，不承诺 NSQ provider 回退 | 观察通过后退出剩余恢复资产；不回写旧备份覆盖新业务 |
+
+不要求新版本读取历史 Outbox 或跨版本执行记录，不为旧模型响应自动生成新任务。已有兼容代码若不妨碍最终链路，可暂留到 M4；不扩建，不作为上线能力承诺。要停用的旧组件必须在 M3 中确实失去运行责任，不能仅把其删除工作移交 M4 后继续双写。历史数据不兼容不等于删除授权，旧未决责任不能直接遗忘。
+
+开发批次运行定向门禁，最终候选冻结后执行完整必需矩阵；不同证据仍绑定各自 SHA，不通过减少断言、伪造 skip 或重复改名报告提速。48h 是生产切换后的观察，不是启动生产前的开发等待。
 
 ## 当前执行快照
 
@@ -9,7 +25,7 @@
 - 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI领取/scanner PR197与显式完成重试PR198、infra PR121/123均已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：**T18进行中，内部0/5；M3保持17/36**。T17三个内部门禁3/3，源码与infra已合并。T18先验证解释报告终态发送失败及跨租约恢复，再补宿主接线、独立进程/provider计数和实际故障证明；生产配置未变，AUTO_DEPLOY_ENABLED=false。[T18证据](evidence/rocketmq-m3-ai-finalization-20261022.json)。
+- 当前批次：**T18进行中，内部1/5；M3保持17/36**。T17三个内部门禁3/3，源码与infra已合并。T18先验证解释报告终态发送失败及跨租约恢复，再补宿主接线、独立进程/provider计数和实际故障证明；生产配置未变，AUTO_DEPLOY_ENABLED=false。[T18证据](evidence/rocketmq-m3-ai-finalization-20261022.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -38,14 +54,14 @@
 | evaluation完整终态/candidate/恢复/取消drain | ✅ SDK入口及两个内部子门禁已闭环 | ✅ AI PR210/211、infra PR138/140 | 默认运行装配仍须下行独立验收，不代表生产启用 |
 | 全部state写入口及统一事务装配 | ✅ 两档各5529、六档各55/148及focus4/12，全部required通过 | ✅ AI PR212、infra PR142 | 默认事务装配可显式配置；生产未启用，成对QS、真实provider、system及真实故障矩阵另有任务 |
 
-### T18 内部执行批次（同一正式任务，初始0/5）
+### T18 内部执行批次（同一正式任务，当前1/5）
 
 全局任务总数仍36，M3保持17/36。T18聚焦五条路径：解释报告、串行generation/semantic、candidate generation/semantic。仅宿主明确确认响应已持久化后恢复终态；dispatched/unknown继续原provider_result_unknown治理。执行身份、worker租约和稳定业务身份分别核验，不通过换操作ID绕过未决责任。
 
 | 完成 | 批次 | 实现与完成门禁 | 当前状态 |
 | --- | --- | --- | --- |
-| ☐ | T18-A | 实际MySQL验证MQ失败、旧Aborted与租约接管，冻结身份/兼容规则和完整验收manifest | 进行中：准备两项定向表征 |
-| ☐ | T18-B | 补齐宿主终态恢复接线，保留权限/取消/CAS/业务重试授权及原配额 | 待开始 |
+| ✅ | T18-A | 实际MySQL验证MQ失败、Aborted与租约接管，冻结当前协议身份和完整验收manifest | CI39738320198真实MySQL两项表征通过，0失败/跳过，9类表清理为零；同租约终态未恢复、换租约幂等冲突均已复现且模型未重调。[恢复规则/manifest](rocketmq-m3-t18-finalization.md)按本次范围修订为单一最终宿主协议，不做v1/v2在线兼容；表征证据不变，infra PR144待合并 |
+| ☐ | T18-B | 补齐宿主终态恢复接线，保留权限/取消/CAS/业务重试授权及原配额 | 进行中：先同租约精确Aborted恢复 |
 | ☐ | T18-C | 回环HTTP假provider、进程外持久计数、独立worker、真实MySQL/RocketMQ与代理 | 待开始 |
 | ☐ | T18-D | 五路径×正常/响应后MQ故障/终态确认丢失/响应后SIGKILL的20核心情景及交叉约束 | 待开始 |
 | ☐ | T18-E | 固定候选，完整CI及六档Broker验收、报告核验、合并后关闭T18 | 待开始 |
@@ -116,7 +132,7 @@ Mongo CreateDurably 替换 Outbox Stage，答卷/幂等/V2 证据/witness 共同
 
 先拆旧 Outbox 的 immutable archive、operation/Inbox/receipt、SDK 协议状态。QS command 首份 Seal 和身份在事务外冻结，重复读取首次档案。接收 AI 事件先准备业务 ACK 半消息，再原事务提交 Inbox/投影/首份 ACK/witness，提交前不确认原 delivery；重复事件复用 ACK。正文沿用 mTLS/tenant/recipient/hash 校验，Prepared 正文不可公开。
 
-AI StateEventRecorder 拆成 frozen plan builder 与原事务写入；EventSession.commit 不执行 MQ I/O，BorrowedTransactions 根提交仍属接收器。分别改造 command receipt、interpretation/evaluation state、event ACK。已持久化模型 response/checkpoint 用于确定性 finalization，MQ 故障不增加 invocation；dispatched/unknown 保留 provider_result_unknown，问题 ID/sequence/artifact/密文/版本预冻结并在事务内复核。历史 result_outbox/mq_owned/attempt/first-wire/delivered/receipt 保留兼容读取，新消息退出旧 MQRelay 扫描。
+AI StateEventRecorder 拆成 frozen plan builder 与原事务写入；EventSession.commit 不执行 MQ I/O，BorrowedTransactions 根提交仍属接收器。分别改造 command receipt、interpretation/evaluation state、event ACK。已持久化模型 response/checkpoint 用于确定性 finalization，MQ 故障不增加 invocation；dispatched/unknown 保留 provider_result_unknown，问题 ID/sequence/artifact/密文/版本预冻结并在事务内复核。新消息退出旧 MQRelay 扫描；不新增历史 result_outbox/mq_owned/旧协议 reader 兼容。旧命名下仍承担当前业务 receipt、first-wire、attempt 或调度责任的事实继续保留；其解耦与清理由 M4 负责，不在 M3 为改名重写业务存储。
 
 ### 路由、预算和生命周期
 
@@ -142,7 +158,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | M3-4 | 故障与运维 | T21–T25 | ☐ 待开始 | 真实故障及切换工具 |
 | M3-5 | 稳定发布及候选 | T26–T29 | ☐ 待开始 | 正式制品及最终镜像演练 |
 | M3-6 | 生产切换 | T30–T33 | ☐ 待开始 | 105 前置、实际部署及 system 验收 |
-| M3-7 | 观察与退役 | T34–T36 | ☐ 待开始 | 48h 观察及责任退出 |
+| M3-7 | 观察与生产闭环 | T34–T36 | ☐ 待开始 | 48h 观察、旧运行责任退出及M4移交；物理清理另计 |
 
 | 完成 | ID | 任务及验收结果 | 状态/证据 |
 | --- | --- | --- | --- |
@@ -163,14 +179,14 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
 | ✅ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 2026-10-22；内部3/3。最终6be5f80源码12检查成功，两档MySQL各5529通过（含12串行原根/5 ACK原生），0失败/跳过；infra2950e9a全部19项成功，六档Broker各55宿主/148证据及独立focus4/12通过，完整清理。AI PR212合并be91fde，infra PR142合并f84b3a9，merge tree均一致。失败/取消历史保留，旧SDK一次超时根因未确认、本轮原SDK两档均31通过；生产未变更。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
-| ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 进行中；内部0/5，先定向验证解释任务MQ失败/旧Aborted/租约接管；SDK与生产保持原状。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
-| ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
-| ☐ | T20 | 成对契约、安全、wire、receipt/ACK重复与取消 | 待开始 |
+| ☐ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 进行中；内部1/5。不新增宿主中间协议兼容。B同租约恢复本地35项通过，新增原根用例仅收集，尚未计实依赖通过；跨租约仍待实现。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
+| ☐ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 待开始；历史reader/新旧格式互通不作为上线门禁，兼容代码删除移交M4-C03 |
+| ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 待开始；仅最终版本组合，不新增新旧版本互通矩阵 |
 | ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
 | ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 待开始 |
 | ☐ | T23 | 宿主端到端及真实网络/进程/DB/Broker故障 | 待开始 |
 | ☐ | T24 | 指标、告警、准入保护、DLQ/超限审计与规程 | 待开始 |
-| ☐ | T25 | 切换工具、排空、调度交接与回退/前向恢复演练 | 待开始 |
+| ☐ | T25 | 一次停写切换工具、旧责任处置/调度交接、启动前恢复与启动后前向修复 | 待开始；不开发在线共存或NSQ provider回退候选；兼容工具清理移交M4 |
 | ☐ | T26 | 预发布三库完整CI/API评审/混合链路，稳定协议冻结 | 待开始 |
 | ☐ | T27 | 同SDK SHA的稳定Go/Python发布、摘要/锁/receipt | 待开始 |
 | ☐ | T28 | 三库正式稳定制品重装及完整非空零跳过门禁 | 待开始 |
@@ -180,8 +196,8 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ☐ | T32 | 排空、交接、同窗口保护及显式离线迁移 | 待开始 |
 | ☐ | T33 | 最终镜像/Checker/消费者/system验收及恢复准入 | 待开始 |
 | ☐ | T34 | 连续48小时业务/回执/积压/资源观察 | 待开始 |
-| ☐ | T35 | 生产NSQ及自动重启/活动连接责任退出，保留数据 | 待开始 |
-| ☐ | T36 | 依赖/文档审计、合并收尾、发布索引及36项闭环 | 待开始 |
+| ☐ | T35 | 旧生产写者/Relay/调度及NSQ活动责任退出，停止并阻止自动重启 | 待开始；保留容器/卷/配置和证据，代码及物理资产清理移交M4-C02/C06/C07 |
+| ☐ | T36 | M3源码合并、生产发布索引、业务/观察验收与M4具名移交 | 待开始；完整废弃依赖/历史实现审计另属M4-C08 |
 
 依赖：T01→T02→T03→T04→IAM→QS→成对QS/AI→运维故障→稳定SDK/最终候选→生产→观察退役。按表推进，前一接入批次通过其门禁后才进入下一批；源码开发不要求先执行生产105。
 
@@ -198,7 +214,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | AI | main c321a694 | [PR158](https://github.com/FangcunMount/qs-ai/pull/158)已合并；[完整CI](https://github.com/FangcunMount/qs-ai/actions/runs/39254547832)/[M7](https://github.com/FangcunMount/qs-ai/actions/runs/39254547837)通过 | 自动生产部署false，M3未切换 |
 | 生命周期 | 关闭准入、真实在途、队列/锁等待、关闭超时/重复关闭/客户端隔离 |
 | 安全 | owner/类型/ACL/查询越权拒绝，Prepared正文不可读 |
-| 兼容恢复 | 旧档案、非空记录、未来计划精确交接，unknown不重置 |
+| 切换与恢复 | 旧未决责任具名处置，未来计划精确交接，最终协议重启恢复；unknown不重置，不要求新runtime读取旧格式 |
 | 资源 | 原三worker配置不变，逻辑预算不放大，D可用内存≥512MiB，无OOM/非预期重启 |
 
 使用隔离Compose/回环端口/临时DB/独立进程，required缺依赖失败，报告非空、0失败、0跳过。沿用M2 Broker/客户端与存储矩阵，另外绑定宿主真实版本；SDK探针不代替宿主验收。
@@ -213,9 +229,9 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 
 窗口内：先封新写（IAM留登录鉴权读取），旧已接受工作继续收敛；核对有效NSQ内存/磁盘depth、inflight、deferred及到期Outbox/receipt，旧消息只沿原NSQ排空。未来计划保留原身份/授权/due，证明旧调度退出。再停相关旧写者/自主任务，完成同窗口保护与批准的离线DDL；QS遵循现有双库身份/保护/恢复协议。启动消费者与Checker、保持外部封准入；合法system登录验收核对DB/witness/消费/receipt后恢复准入。无会话时用户正常登录配合，不用探针/替代身份冒充。
 
-首个新runtime启动前按批准范围恢复；发出第一个启动命令后，即使未ready也不能旧全库备份覆盖。provider回退独立判断：无新责任，或half已全部处置且无新业务提交，才可用已验证schema兼容的NSQ回退候选。已Committed/有消费效果/无法排除提交则向前恢复，不翻开关、换ID或重调模型。
+首个新runtime启动前按批准范围恢复；发出第一个启动命令后，即使未ready也不能旧全库备份覆盖。M3不再开发兼容当前schema的NSQ provider回退候选；新runtime启动后采用保留当前协议及数据事实的修复镜像前向恢复，不翻provider开关、换ID或重调模型。启动前恢复所用旧镜像、旧配置和原保护资产独立冻结，不要求新版本兼容旧运行数据。
 
-连续48h观察，低流量补充有界system验收。观察期旧生产/消费责任退出，可停NSQ并保留恢复材料；通过后关闭自动重启/部署入口/活动连接/旧Relay。Mac mini开发NSQ与测试/SDK兼容包不在生产退役范围。历史表/卷/wire/备份按原保留政策，不自动删除，未决责任不得GC。
+连续48h观察，低流量补充有界system验收。观察期旧生产/消费责任退出，NSQ停止且阻止自动重启，保留恢复材料；通过后T35核验全部旧写者、活动连接和自主扫描责任已经退出。删除旧部署入口、NSQ容器/卷、代码及配置交M4。Mac mini开发NSQ与测试/SDK通用兼容包不在本次生产清理范围。历史表/卷/wire/备份按原保留政策，不自动删除，未决责任不得GC。
 
 ## 5. 进度和证据规则
 
@@ -225,7 +241,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 
 验证命令按任务实际记录，不把参考命令写成已执行：基础检查 `git diff --check`；Go目标package及race；Python目标pytest/type/lint；infra离线脚本单测；required真实依赖门禁另行记录。T01验证进度表36个唯一任务ID、勾选计数、8个里程碑分区、基线与工作区branch/clean state。
 
-M3完成要求36项实现验证、源码合并、稳定SDK与固定生产镜像、适用新发布退出Outbox、生产NSQ退出、system验收和连续48h观察全部通过，并保留历史读取/恢复窗口/回退限制/未结责任记录。
+M3完成要求修订后的36项实现验证、源码合并、稳定SDK与固定生产镜像、适用新发布退出Outbox/Relay、旧生产运行责任退出、system验收和连续48h观察全部通过，并记录有限恢复窗口、前向修复边界、旧责任处置结果及M4移交清单。M4清理无需完成才宣布M3生产切换闭环；历史兼容不是本批承诺。T01–T17中已经实现的兼容能力及其测试记录保留为历史事实，不继续扩建或倒改原完成证据。
 
 ### PR / 发布 / 部署台账
 
@@ -834,3 +850,10 @@ AI6be5f80 / infra2950e9a 的[Broker39733212490](https://github.com/FangcunMount/
 - 所有准备/清理失败、真实SDK部分启动关闭修复、取消作业及旧SDK一次8/9消费超时完整保留。旧SDK在最终相同工具下两档31/31通过，未改SDK或放宽断言，原超时根因仍未确认。
 
 唯一进度总表勾选T17，M3更新为17/36；M3-3仍须T18–T20通过后才完成。未执行稳定版发布、生产部署/DDL/Topic/ACL/provider切换、worker资源变更或NSQ退役；不计成对QS/真实provider/system业务及48小时观察。下一项为T18确定性finalization与消息故障不增加模型调用证明。
+
+
+### 2026-10-22：M3生产切换与M4清理分离
+
+用户确认不需要历史兼容并同意新增M4。当前任务表保留原36项ID及17项完成证据，M3仍17/36；M4独立0/8。本次仅调整范围，不把转移工作记作已通过。T19/T20只要求最终协议的Payload/receipt及QS＋AI成对验收；T25取消新旧在线共存/NSQ provider回退开发；T35保留旧运行责任退出和NSQ停用，物理清理交M4；T36仅完成生产索引与具名移交。
+
+T18-A旧源码实际MySQL报告仍为2通过/0失败/0跳过、9类表清理为零；其精确源码和报告不改绑新候选。恢复规则改为修正单一未投产宿主协议，不构建v1/v2在线兼容。T18-B同租约恢复本地35项通过，新增真实原根测试仅收集1项，未执行实依赖、不勾选B。SDK已发布制品、源码合并状态和生产均未改变。M3仍要求必要真实故障、稳定制品、system验收与上线后48小时观察。
