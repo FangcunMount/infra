@@ -11,6 +11,15 @@ on:
         description: Optional exact QS source SHA for the required separate business fanout profile
         type: string
         required: false
+      runtime:
+        description: Require current host owner drain with original roots and fixed SDK
+        type: boolean
+        default: false
+      profile:
+        description: Development uses one MySQL; final gate requires full matrix
+        type: choice
+        options: [full, development]
+        default: full
   pull_request:
     paths: ['scripts/rocketmq/ci-transactions.py', 'scripts/rocketmq/iam_acceptance.py', 'scripts/rocketmq/test_iam_acceptance.py', 'scripts/rocketmq/iam_native.py', 'scripts/rocketmq/test_iam_native.py', '.github/workflows/rocketmq-iam.yml']
 permissions:
@@ -27,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mysql: ['mysql:8.0.36', 'mysql:8.0.44', 'mysql:8.4']
+        mysql: ${{ fromJSON(inputs.profile == 'development' && '["mysql:8.0.36"]' || '["mysql:8.0.36","mysql:8.0.44","mysql:8.4"]') }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
@@ -86,6 +95,7 @@ jobs:
         env:
           MYSQL_IMAGE: ${{ matrix.mysql }}
           QS_FANOUT_SHA: ${{ inputs.qs_ref }}
+          ROCKETMQ_IAM_RUNTIME_REQUIRED: ${{ inputs.runtime == true && '1' || '0' }}
         run: |
           set -euo pipefail
           fanout_args=()
