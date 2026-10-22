@@ -16,7 +16,7 @@ def receipt(full=False):
         passed=len(cases),failed=0,skipped=0,root='original_go_mysql_and_python_sqlalchemy',
         sdk_go='v0.5.0-rocketmq-tx.2',sdk_python='0.4.0a2',client_python='5.1.2',
         python='3.11.16',profile='full' if full else 'core',go_phase='ready',
-        delivery_errors=[],last_observation=dict(polls=1,payload_calls=0,ack_count=2,operation_status='accepted'))
+        delivery_errors=[],last_observation=dict(polls=1,payload_calls=0,ack_count=2,operation_status='accepted',projection_version=2,projection_status='queued',ai_payload_reads=0))
 
 
 def xml(names):

@@ -123,6 +123,26 @@
         "large fixture overwrote the valid standard-report JSON with a raw string; preserve exact business document using trailing JSON whitespace",
         "outer poll cancellation could abandon an active control response and confuse close; keep one bounded exchange until drained"
       ]
+    },
+    {
+      "run_id": 39795568798,
+      "source_ai": "4e19f11646a17cd6003198f2a06a8c4b53b9c96e",
+      "source_qs": "19387732e7475891dffdaed894500ecacb57668e",
+      "infra": "17f0e47014628129b7408af980444246f8442f70",
+      "passed_native_flags": 16,
+      "failed": 1,
+      "skipped": 0,
+      "failed_test": "test_actual_qs_ai_large_payloads_and_mtls_denial",
+      "cause": "test expected question v3; original domain creates v1, queues v2, claims running v3, then question is v4",
+      "resolution": "assert queued v2 and claimed v3 explicitly, require final v4; queued cancellation uses current v2 and must reach v3; retain original domain semantics",
+      "report_sha256": "2b1103e5577228020fd4868cd3e37d47a17bdfadee113913d073fea36f06e174",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "actual_large_command_rpc_verified": true
     }
   ],
   "prototype": {
@@ -177,5 +197,10 @@
     "green": "three related packages race pass; QS docs-check pass",
     "internal_proof_and_workload_errors_unchanged": true,
     "production_changed": false
+  },
+  "github_actions_processing_incident": {
+    "url": "https://www.githubstatus.com/incidents/q29p76qtnkyk",
+    "reported_at": "2026-10-22T14:18:15Z",
+    "scope": "workflow/step result and repository update processing delays; do not infer actual execution from delayed queued status"
   }
 }

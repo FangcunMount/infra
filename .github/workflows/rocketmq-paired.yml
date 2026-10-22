@@ -11,7 +11,7 @@ on:
         description: Exact AI paired host source SHA
         type: string
         required: true
-        default: 4e19f11646a17cd6003198f2a06a8c4b53b9c96e
+        default: 0c7a53a3a9371918cd7d7d7c6cf8851cd92d4b31
       profile:
         description: Core is development only; full is mandatory for T20
         type: choice
@@ -57,7 +57,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '4e19f11646a17cd6003198f2a06a8c4b53b9c96e' }}
+          ref: ${{ inputs.ai_ref || '0c7a53a3a9371918cd7d7d7c6cf8851cd92d4b31' }}
           path: .ai-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -70,7 +70,7 @@ jobs:
       - name: Verify exact host candidates and strict receipt gates
         env:
           EXPECTED_QS_SHA: ${{ inputs.qs_ref || '19387732e7475891dffdaed894500ecacb57668e' }}
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '4e19f11646a17cd6003198f2a06a8c4b53b9c96e' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '0c7a53a3a9371918cd7d7d7c6cf8851cd92d4b31' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]

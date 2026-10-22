@@ -51,9 +51,13 @@ DELIVERY_ERRORS = frozenset({'other'} | {'grpc_' + name for name in (
 
 def valid_observation(value):
     return (isinstance(value,dict)
-        and set(value) == {'polls','payload_calls','ack_count','operation_status'}
+        and set(value) == {'polls','payload_calls','ack_count','operation_status',
+                          'projection_version','projection_status','ai_payload_reads'}
         and all(type(value[k]) is int and 0 <= value[k] <= 100000
-                for k in ('polls','payload_calls','ack_count'))
+                for k in ('polls','payload_calls','ack_count','projection_version','ai_payload_reads'))
+        and isinstance(value['projection_status'],str)
+        and value['projection_status'] in {'missing','queued','running','awaiting_answer',
+                                           'blocked','cancelled','completed'}
         and isinstance(value['operation_status'],str)
         and value['operation_status'] in {'unobserved','submitted','accepted','held','rejected'})
 
