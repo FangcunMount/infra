@@ -5,10 +5,10 @@
   "progress": "16/36",
   "base": "e8392c0582020d6cacf44c6caaa2f2061c66cb41",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-semantic-completion",
-  "branch": "codex/rocketmq-m3-serial-semantic-state",
-  "source_candidate": "101775ecd04e3973eff791d0d24e2147f6bdcecd",
+  "branch": "codex/rocketmq-m3-candidate-runtime",
+  "source_candidate": "a0acc995d05abf38b95033063910074368d15620",
   "source_pushed": true,
-  "source_merged": true,
+  "source_merged": false,
   "production_assembly_enabled": false,
   "production_changed": false,
   "stable_sdk_released": false,
@@ -603,7 +603,7 @@
     "Keep durable model-response finalization and invocation-count actual fault proofs as T18; no fabricated serial candidate ownership",
     "Preserve legacy/archive/ACK responsibilities and default runtime activation gates; T17 remains unchecked"
   ],
-  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/204",
+  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/210",
   "source_pr_draft": false,
   "foundation_native_acceptance": {
     "source_sha": "b4eedb634adefa50ea818ac6cf26e119e29b94fd",
@@ -803,7 +803,7 @@
     "docs_files": 75,
     "docs_links": 1321
   },
-  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39690447013",
+  "source_ci": "pending_current_source_run_binding",
   "worker_preflight_native_cases": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
     "file": "tests/integration/test_transaction_worker_preflight.py",
@@ -1404,7 +1404,7 @@
     "no_task_completion_claimed": true,
     "native_status": "cbc47d9 both MySQL profiles: 3649 passed, including corrected original atomic-root case; zero failed/skipped"
   },
-  "source_candidate_branch": "codex/rocketmq-m3-serial-semantic-state",
+  "source_candidate_branch": "codex/rocketmq-m3-candidate-runtime",
   "failure_history": [
     {
       "source_sha": "3cf74b5eccc66bd271d4d8e250714e4a312bde59",
@@ -1455,6 +1455,13 @@
       "task": "T17",
       "test": "test_candidate_without_matching_runtime_never_falls_back_from_serial_transaction_hook",
       "result": "1 failed / 4 passed before guard fix;29 targeted green after fix",
+      "production_changed": false
+    },
+    {
+      "kind": "required_native_and_actual_broker_failure",
+      "task": "T17",
+      "source_sha": "f0538fd671e1bef19ea566a87242893cd78345a1",
+      "cause": "First durable response commit invoked the global legacy recorder. MySQL profiles each5137 pass/1 fail/0 skip;27 candidate native cases each26 pass/1 graph fail. Three Broker profiles each88 flags/4 host failures/0 skips; cleanup verified. Reports retained in candidate_complete_runtime.history.",
       "production_changed": false
     }
   ],
@@ -12330,7 +12337,7 @@
     "source_candidate_branch": "codex/rocketmq-m3-ai-creation-plan",
     "branch": "codex/rocketmq-m3-ai-solution-sdk"
   },
-  "source_ci_status": "success",
+  "source_ci_status": "current_operational_root_repair_queued",
   "superseded_main_push_ci_deduplication_186": {
     "at": "2026-10-21T18:26:01.637785+00:00",
     "run": 39650592198,
@@ -21323,27 +21330,25 @@
     }
   ],
   "candidate_complete_runtime": {
-    "status": "source_pr_open_real_dependencies_pending",
-    "source_sha": "f0538fd671e1bef19ea566a87242893cd78345a1",
+    "status": "operational_root_repair_real_dependencies_pending",
+    "source_sha": "a0acc995d05abf38b95033063910074368d15620",
     "code_sha": "e69efd593a3fe2d089b736bd612380f4712e87bf",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/210",
     "source_pushed": true,
     "merged": false,
     "local": {
-      "unit_passed": 3862,
-      "integration_interop_deselected": 1273,
+      "unit_passed": 3870,
+      "integration_interop_deselected": 1275,
       "mypy_sources": 430,
-      "ruff_formatted_files": 1120,
+      "ruff_formatted_files": 1121,
       "docs_markdown": 75,
       "docs_local_links": 1385,
+      "target_passed": 101,
       "native_collected_only": 27,
       "broker_host_collected_only": 38,
       "broker_required_flags": 95,
       "collector_matches_harness_exactly": true,
-      "full_unit_run_before_native_only_replan_cases_added": true,
-      "full_unit_source_before_guard_fix": "b93b68ca33a1758a66a0d7d635dbc8b33bb3da33",
-      "guard_red_failed": 1,
-      "guard_target_passed": 29
+      "full_unit_code_sha": "7096312b7d2a03ff88b1e737f2a70e7779d0bf59"
     },
     "scope": "Explicit candidate prepare/dispatch and generation/semantic completion through the actual host graph; same candidate selection/capacity/guarded original roots, first response/candidate, archive/witness; no provider retry or default production assembly. Broker profile uses actual fixed published SDK and real isolated Broker with a controlled provider and event observer. Real dependency gates are pending.",
     "production_changed": false,
@@ -21351,11 +21356,261 @@
     "t17_done": false,
     "remaining": "Required source and Broker profiles, recovery/drain and default runtime assembly",
     "prior_candidate": "b93b68ca33a1758a66a0d7d635dbc8b33bb3da33",
-    "guard_fix_code_sha": "e45ada8",
+    "guard_fix_code_sha": "e45ada808bae104dccd255cf18920c163744d286",
     "superseded_ci": {
       "source": "https://github.com/FangcunMount/qs-ai/actions/runs/39710945796",
       "infra_state": "https://github.com/FangcunMount/infra/actions/runs/39710991265",
       "reason": "New no-fallback regression reproduced and repaired; earlier candidates are not final acceptance. Existing concurrency cancels obsolete PR runs."
-    }
+    },
+    "history": [
+      {
+        "source_sha": "f0538fd671e1bef19ea566a87242893cd78345a1",
+        "local": {
+          "unit_passed": 3862,
+          "integration_interop_deselected": 1273,
+          "mypy_sources": 430,
+          "ruff_formatted_files": 1120,
+          "docs_markdown": 75,
+          "docs_local_links": 1385,
+          "native_collected_only": 27,
+          "broker_host_collected_only": 38,
+          "broker_required_flags": 95,
+          "collector_matches_harness_exactly": true,
+          "full_unit_run_before_native_only_replan_cases_added": true,
+          "full_unit_source_before_guard_fix": "b93b68ca33a1758a66a0d7d635dbc8b33bb3da33",
+          "guard_red_failed": 1,
+          "guard_target_passed": 29
+        },
+        "native_failure": {
+          "source_sha": "f0538fd671e1bef19ea566a87242893cd78345a1",
+          "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39711234921",
+          "status": "failed",
+          "cause": "First durable response commit called the host legacy recorder. Original standalone completion roots passed; complete host graph failed.",
+          "tested_merge_sha": "c96f66b665e9cd138e5ca2db530f0d167bc22ea3",
+          "profiles": {
+            "8.0.36": {
+              "collected": 5138,
+              "passed": 5137,
+              "failed": 1,
+              "skipped": 0,
+              "candidate_native_passed": 26,
+              "candidate_native_failed": 1,
+              "failed_cases": [
+                "tests/integration/test_transaction_candidate_runtime.py::test_actual_candidate_graph_both_stages_without_legacy_hook"
+              ]
+            },
+            "8.4": {
+              "collected": 5138,
+              "passed": 5137,
+              "failed": 1,
+              "skipped": 0,
+              "candidate_native_passed": 26,
+              "candidate_native_failed": 1,
+              "failed_cases": [
+                "tests/integration/test_transaction_candidate_runtime.py::test_actual_candidate_graph_both_stages_without_legacy_hook"
+              ]
+            }
+          },
+          "reports": [
+            {
+              "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+              "sha256": "e5487882898b01cf64f21660e67d1d44bf956a01198fe05f7245eff2659a58b4",
+              "xml_sha256": "96ff5ff8bb53715cf5965fd7e15d8fd5f71da8de062adc5e41354b42e81ba392",
+              "mysql": "8.0.36",
+              "index": 2,
+              "passed": 1284,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+              "sha256": "01cd17ff2481be74bb955bf39621cf7051410dbfd34baf5ee1fcdfa6a0f40034",
+              "xml_sha256": "6529d7fb00580fb18a6a88713a59b6ce90961510f5592543c57572ab67b9ce8d",
+              "mysql": "8.0.36",
+              "index": 3,
+              "passed": 1284,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+              "sha256": "822885f75680b9be82506c60401752ab6d3d5a79495ee32f620fda89294a48b2",
+              "xml_sha256": "232372f3f350df5ebb07d9087fd9ce7b8a0dddd2e8a8b3d89a6310354e97f448",
+              "mysql": "8.0.36",
+              "index": 1,
+              "passed": 1285,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+              "sha256": "1bd3f82a6519ad89356c633bf02726191ba28a0e74dd7e2ad5bd7e8ceaf34d24",
+              "xml_sha256": "36ac08b735f858eb8195f23ff5ffa70ea0f15c97c28e35378de8a9894260125d",
+              "mysql": "8.0.36",
+              "index": 0,
+              "passed": 1284,
+              "failed": 1,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.4-1/shard-8.4-1.json",
+              "sha256": "20d7ababf61e83ad4c0215200c9320c135d6712f39ec228c41638ff4858bde8d",
+              "xml_sha256": "9c14a0b6e1281f62ae559d56a8c9f69f10396694cca8331ffd389083a43fbf5e",
+              "mysql": "8.4",
+              "index": 1,
+              "passed": 1285,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.4-0/shard-8.4-0.json",
+              "sha256": "ba099520a670e43847543efcc63ade88784ddf19f798ea93d83415544752522b",
+              "xml_sha256": "106469dd56c175187100b895042e9fa6ca10c4f39e04a3666eb68dd9f9b6eaab",
+              "mysql": "8.4",
+              "index": 0,
+              "passed": 1284,
+              "failed": 1,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.4-2/shard-8.4-2.json",
+              "sha256": "72096d44fcece7919b7918f000182f09153d4c21e16eb769406dd169c060a750",
+              "xml_sha256": "67f0180c0167a8bcedea751bd87505b805fcdd2b3661460adb5100aba0c9478f",
+              "mysql": "8.4",
+              "index": 2,
+              "passed": 1284,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.4-3/shard-8.4-3.json",
+              "sha256": "ed0b94661075cc4d87d05be149d0cb3375ff24376895930e943649ec7f30546c",
+              "xml_sha256": "48e5c3dcb1c95623f21804bdcc7e284881118fdd4aefc618e587fb5a248ce3eb",
+              "mysql": "8.4",
+              "index": 3,
+              "passed": 1284,
+              "failed": 0,
+              "skipped": 0
+            }
+          ]
+        },
+        "broker_failure": {
+          "source_sha": "f0538fd671e1bef19ea566a87242893cd78345a1",
+          "harness_sha": "e5e5a6bc25390ce7d2551bcb1339a433bd6b2b2c",
+          "checks": "https://github.com/FangcunMount/infra/actions/runs/39711284393",
+          "status": "failed_partial_three_profiles_preserved",
+          "reports": [
+            {
+              "file": "rocketmq-ai-state-1-3.11-ffd8e2a9fb3c4908c3997425aed8b834d226da67/rocketmq-ai-state.json",
+              "sha256": "6add497a0d28fbeac37c7047d96a346c5dbd91b5868a691c6033b9d1092d4ce1",
+              "python": "3.11.16",
+              "mysql": "8.0.44",
+              "host_failed": 4,
+              "flags_passed": 88,
+              "required_flags": 95,
+              "skipped": 0,
+              "failed_cases": [
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-unknown]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-unknown]"
+              ],
+              "assertion_lines": [
+                2512
+              ],
+              "junit_sha256": "da07b221a21364eeefadefc3f1b873ba0db51f1bab077af77617ab92b186895f",
+              "private_output_sha256": "1ed52afaa53c8f5e3d5c6aafd0f36708bc06b41588256e7d10c05cdee0670956",
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            },
+            {
+              "file": "rocketmq-ai-state-5-3.13-ffd8e2a9fb3c4908c3997425aed8b834d226da67/rocketmq-ai-state.json",
+              "sha256": "8530699a894972b85dde4c0d5dae9f884fd6425ecf6d8aa4716028a2ca1be2d5",
+              "python": "3.13.15",
+              "mysql": "8.4.11",
+              "host_failed": 4,
+              "flags_passed": 88,
+              "required_flags": 95,
+              "skipped": 0,
+              "failed_cases": [
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-unknown]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-unknown]"
+              ],
+              "assertion_lines": [
+                2512
+              ],
+              "junit_sha256": "d4c3b102e8d943f2acf698c8116425bfb86bf364c48ad421c810a4ea3167e5f5",
+              "private_output_sha256": "a58a7a6d546f975bb5958cd9e5bbc58a1fc4fb7341d70d790d8803913934235f",
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            },
+            {
+              "file": "rocketmq-ai-state-3-3.13-ffd8e2a9fb3c4908c3997425aed8b834d226da67/rocketmq-ai-state.json",
+              "sha256": "84887f947c4bfdb7bae924b4d20d609df72a5357c5d461804e9c51335ea935e6",
+              "python": "3.13.15",
+              "mysql": "8.0.36",
+              "host_failed": 4,
+              "flags_passed": 88,
+              "required_flags": 95,
+              "skipped": 0,
+              "failed_cases": [
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-unknown]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-unknown]"
+              ],
+              "assertion_lines": [
+                2512
+              ],
+              "junit_sha256": "8eaa49a70aee302073f0f6d2c8c98124b3c3d41b5ecd5bfe8ab10b084aafd4e4",
+              "private_output_sha256": "cc30a4af3fa7892d02a139fed3d4de1221e966f313f34ca5700b0c58697ddb1a",
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            }
+          ],
+          "full_gate_complete": false
+        }
+      }
+    ],
+    "operational_root_fix_code_sha": "7096312b7d2a03ff88b1e737f2a70e7779d0bf59",
+    "response_root_fix": "Response persistence and original claim renewal install a rejecting session-local operational event guard, retain bind validation and normal EventSession commit, never change the global recorder, and cannot transcribe business transitions. Original host/native test renews both generation/semantic claims. Broker barrier surfaces original host failure and cannot repause during cleanup."
+  },
+  "prior_top_level_before_complete_candidate_runtime": {
+    "source_candidate": "101775ecd04e3973eff791d0d24e2147f6bdcecd",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/204",
+    "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39690447013",
+    "source_merged": true,
+    "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-semantic-completion",
+    "branch": "codex/rocketmq-m3-serial-semantic-state",
+    "source_candidate_branch": "codex/rocketmq-m3-serial-semantic-state"
+  },
+  "recovery_drain_local_followup": {
+    "status": "uncommitted_whole_batch_development",
+    "base_sha": "a0acc995d05abf38b95033063910074368d15620",
+    "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-recovery-drain",
+    "branch": "codex/rocketmq-m3-recovery-drain",
+    "original_characterization": {
+      "cancel_drain_before": 9,
+      "serial_expiry_before": 10,
+      "candidate_recovery_before": 9
+    },
+    "local_targets_passed": 67,
+    "scope": "Original expiry/drain source snapshots shared with readonly mode. Original writers retain locking, ledger/unknown checks, audit and root commit. No auxiliary PR or CI; full SDK recovery/drain and activation remain pending.",
+    "merged": false,
+    "production_changed": false
   }
 }
