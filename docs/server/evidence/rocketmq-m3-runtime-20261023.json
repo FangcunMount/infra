@@ -311,14 +311,23 @@
       "junit_sha256": "29768aaaea09c19d895d9d486ed59f14ece1ad785a1dac9ad7e40fbb8930be40",
       "scope": "three existing controlled lifecycle/configuration unit files; no native DB/Broker, complete host, provider or system claim",
       "source_changed": false
+    },
+    "current_native_run": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39860580207",
+      "source": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+      "infra": "f2a49e69ab94066c15f393746239ec980b7c8979",
+      "status": "running all six Python3.11/3.13 x MySQL8.0.36/8.0.44/8.4.11 profiles",
+      "reused_evidence_entry": "existing actual default DI/SDK/subscriptions/idle checker/pause/shutdown native focus plus existing state roots",
+      "byte_comparison": "bootstrap messaging.py, transaction_messaging.py and rocketmq_state_host.py are identical to previously tested6be5f8; current exact source rerun still required, not relabeled old proof",
+      "source_changed": false
     }
   },
   "remaining": [
-    "default due-dispatch native dual-store wiring",
-    "current worker deferred deliveries without publication permissions and shared original in-flight budget",
-    "actual current-host startup/failure/close with native dependencies",
-    "cross-instance Checker and exact DB deadline/queue/concurrency proofs",
-    "final current-head CI and merges; task stays unchecked until all gates pass"
+    "final current-head source CI and merges for exact default factory owner binding",
+    "actual IAM owner in-flight original-root shutdown and fresh next-instance native gate",
+    "current AI default assembly native six-profile rerun and remaining current-host lifecycle gaps",
+    "cross-instance Checker and exact DB deadline/queue/concurrency proofs across host bindings",
+    "complete T22 evidence review; task stays unchecked until all gates pass"
   ],
   "unchanged": [
     "no local Docker/shared dependency started",
@@ -932,7 +941,17 @@
     "infra_worker_runtime_pr": {
       "pr": "https://github.com/FangcunMount/infra/pull/163",
       "head": "3b30b904049d0a14704b042d0aefcbc4443b7b60",
-      "status": "draft; full current-head regression running"
+      "status": "merged after49 successful checks and56 nonempty zero-failure/skip report audits",
+      "main": "f2a49e69ab94066c15f393746239ec980b7c8979",
+      "checks": 49,
+      "reports": 56,
+      "report_schemas": {
+        "root_counts": 53,
+        "structured_IAM_tests": 3
+      },
+      "audit_index_sha256": "864067b6ce47e51f127bdcd1374f1d36aabe760d0cacf64a50975d73e635aa77",
+      "cleanup": "54 structured cleanup objects verified; original worker report nine remaining-row counters zero/private evidence removed and Stop containers success; M1 report no cleanup object, not invented",
+      "candidate_to_main_difference": "only two progress documents; functional code identical to tested candidate"
     },
     "source_merge": {
       "pr": 426,
@@ -977,7 +996,7 @@
       "source_sha": "5811955e2f06392012dbc4cf3d344b3d289acf2a",
       "candidate_sha": "d32788bdce32d81df1f67b1f5bcb35cf56f432a5",
       "pr": "https://github.com/FangcunMount/qs-server/pull/427",
-      "status": "draft; current-head CI and native verification pending",
+      "status": "draft; native three-profile gate verified; current-head source CI still pending",
       "behavior": "exact MySQL and Mongo owner pointers must be registered by the original event subsystem; same DB identity cannot authorize a second runtime",
       "local_reproduction": "two expected failures with real constructors and disconnected original handles before fix, not native DB evidence",
       "local_red_log_sha256": "19614c6834396fdb4ef9d6e02b8b42c4ca351be89bd0f969c62b7c946692c67d",
@@ -1020,11 +1039,82 @@
       "run": "https://github.com/FangcunMount/infra/actions/runs/39858676263",
       "source": "d32788bdce32d81df1f67b1f5bcb35cf56f432a5",
       "infra": "5714a218e4b2c90e6a9528d039f6d0407704ed74",
-      "status": "running; MySQL8.0.44 job successful, other two queued; final report audit not completed"
+      "status": "verified three MySQL profiles,10 cases each,zero failed/skipped; exact source and SDK,source clean,zero endpoint connections,all owned cleanup",
+      "reports": [
+        {
+          "sha256": "044f82bce1d0f8a2e774095f1b27a62f5df75e975eca18feac2bb5a8039ebd35",
+          "source": "d32788bdce32d81df1f67b1f5bcb35cf56f432a5",
+          "mysql": "8.4.11",
+          "mongo": "7.0.37",
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0,
+          "endpoint_connections": 0,
+          "cleanup": {
+            "owned_endpoint_trap_joined": true,
+            "compose_down_succeeded": true,
+            "project_containers_remaining": false,
+            "private_fixture_removed": true,
+            "owned_process_groups_drained": true
+          },
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        },
+        {
+          "sha256": "35cb83474be6e7a0c5fa951051ad8f275c1f4f92eac6f059c9e9c16898ccc914",
+          "source": "d32788bdce32d81df1f67b1f5bcb35cf56f432a5",
+          "mysql": "8.0.36",
+          "mongo": "7.0.37",
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0,
+          "endpoint_connections": 0,
+          "cleanup": {
+            "owned_endpoint_trap_joined": true,
+            "compose_down_succeeded": true,
+            "project_containers_remaining": false,
+            "private_fixture_removed": true,
+            "owned_process_groups_drained": true
+          },
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        },
+        {
+          "sha256": "3db4690e44f575addfbea8a4346b7baf330e9f14dde097470cf661f16e8fcb6b",
+          "source": "d32788bdce32d81df1f67b1f5bcb35cf56f432a5",
+          "mysql": "8.0.44",
+          "mongo": "7.0.37",
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0,
+          "endpoint_connections": 0,
+          "cleanup": {
+            "owned_endpoint_trap_joined": true,
+            "compose_down_succeeded": true,
+            "project_containers_remaining": false,
+            "private_fixture_removed": true,
+            "owned_process_groups_drained": true
+          },
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        }
+      ]
     },
     "infra_pr": {
       "url": "https://github.com/FangcunMount/infra/pull/165",
-      "status": "draft stacked on Worker harness PR163; retarget main after parent merge"
+      "status": "draft retargeted to main after parent PR163 merged; only three factory files differ; current-head CI pending"
     }
   },
   "iam_native_lifecycle_batch": {
