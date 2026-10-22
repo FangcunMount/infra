@@ -478,7 +478,7 @@ def main():
             from ai_admission_acceptance import run_ai_admission_host
             kind = os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission')
             state_profile = kind == 'state'
-            proof_name = 'ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')
+            proof_name = ('paired_host' if kind == 'paired' else ('ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')))
             fault_tools = None
             if kind == 'finalization':
                 run(['go', 'build', '-o', str(directory / 'fault-proxy'),
@@ -487,9 +487,9 @@ def main():
             proof[proof_name] = {}
             run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
                                   mysql_password, ca, run, proof[proof_name], fault_tools=fault_tools,
-                                  native_runner=owned_native_run if kind == 'finalization' else None)
+                                  native_runner=owned_native_run if kind in ('finalization', 'paired') else None)
             for name in proof[proof_name]['native_receipt']['cases']:
-                passed(('ai_finalization_' if kind == 'finalization' else ('ai_state_' if state_profile else 'ai_admission_')) + name)
+                passed(('paired_' if kind == 'paired' else ('ai_finalization_' if kind == 'finalization' else ('ai_state_' if state_profile else 'ai_admission_'))) + name)
             return
         if args.qs_event_host:
             from qs_event_acceptance import run_qs_event_host
@@ -945,6 +945,13 @@ def main():
                                     'Event observer ACK only; no paired QS business or real provider',
                                     'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
                 report['ai_state_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_state_acceptance.py').read_bytes()).hexdigest()
+        if args.ai_admission_host and os.environ.get('QS_AI_ACCEPTANCE_KIND') == 'paired':
+            report['batch'] = 'M3-paired-final-version-' + os.environ.get('QS_M3_PAIRED_PROFILE', 'core')
+            report['limits'] = ['No production/system, public HTTP, real provider or packet-fault acceptance',
+                                'Actual Go QS/Python AI default consumers and original roots on real Broker',
+                                'Core is development-only; full five-case profile is mandatory for T20 completion',
+                                'Synthetic read-side source; no historical-format compatibility claim']
+            report['paired_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/paired_acceptance.py').read_bytes()).hexdigest()
         if args.ai_admission_host and os.environ.get('QS_AI_ACCEPTANCE_KIND') == 'finalization':
             report['batch'] = 'M3-AI-five-path-finalization-RPC-fault-and-SIGKILL-recovery'
             report['limits'] = ['No production/system or paired QS business acceptance',

@@ -982,3 +982,7 @@ AI最终b88f40b的12检查全部通过；39779070678八分片和JUnit独立核�
 ### 2026-10-22：T19总表合并并启动T20原入口基线
 
 T19进度/固定目标PR147合并662edf4，完整tree与3c8f670一致，回填其实际合并状态。T20从QS be22b927、AI64ffa15、infra662edf4创建独立paired工作区；实际SDK为Go tx.2/Python0.4.0a2。AI命令/回执/档案/运行时92项目标通过，QS五相关包race804通过、0失败，7个既有MySQL可选测试因QS_AI_BRIDGE_TEST_DSN未配置跳过并单列；不把它们计为原生通过，后续required依赖缺失直接失败。入口读码确认可直接借用两端原根、实际receiver及专用Payload reader，不新增生产服务或历史格式兼容。内部A完成1/4，父T20不勾选，总计19/36，生产未变更。
+
+### 2026-10-22：T20-B双端原消费者接线与开发门禁准备
+
+QS测试进程fb62c1d直接调用原Service.Start/Change、共享事务owner、默认事件runtime及MessagePayloads，race编译/go vet通过；控制只走私有stdio，不新增生产HTTP服务。AI06653ce接默认DI、MessagingRuntime、真实command/ACK消费者与原服务/表，单个完整START→receipt/state→ACK用例已收集，尚未实际运行。infra增加core开发门禁（1原生/10证据）与full必需门禁（5原生/25证据）的精确隔离契约及少量接入钩子；114工具测试通过，core不能代替full或勾选T20-C/D。工作分支临时push触发只运行定向开发门禁，最终冻结后仍执行完整PR/必需矩阵。开始隔离Broker CI，T20-B仍进行中，19/36。

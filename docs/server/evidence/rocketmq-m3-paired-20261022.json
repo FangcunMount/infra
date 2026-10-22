@@ -6,7 +6,7 @@
   "started_at": "2026-10-22T12:55:21.817402+00:00",
   "internal_gates": {
     "A": "completed",
-    "B": "pending",
+    "B": "in_progress",
     "C": "pending",
     "D": "pending"
   },
@@ -80,5 +80,16 @@
     "first wire/idempotency/security/cancellation",
     "required native jobs fail if dependencies absent; zero skip"
   ],
-  "failure_history": []
+  "failure_history": [],
+  "prototype": {
+    "qs_source": "fb62c1d01b5e9c068659ba27b554a57b923e4a28",
+    "ai_source": "06653cef77bf79bac3ce2b412789b7f0d14ada00",
+    "qs_race_build_and_vet": "passed",
+    "native_collected": 1,
+    "native_executed": false,
+    "infra_unit_tests": 114,
+    "full_native_tests_required": 5,
+    "full_evidence_flags_required": 25,
+    "core_is_development_only": true
+  }
 }

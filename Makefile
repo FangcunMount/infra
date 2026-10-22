@@ -1627,3 +1627,15 @@ rocketmq-ai-finalization-test: ## 隔离验证独立AI worker/HTTP计数/SIGKILL
 		python3 scripts/rocketmq/ci-transactions.py --sdk "$(SDK_DIR)" --ai-admission-host "$(AI_DIR)" \
 		--image "$(ROCKETMQ_TEST_IMAGE)" --mysql-image "$(or $(ROCKETMQ_TEST_MYSQL_IMAGE),mysql:8.0.36)" \
 		--report "$(or $(ROCKETMQ_AI_FINALIZATION_REPORT),rocketmq-ai-finalization-live.json)"
+
+.PHONY: rocketmq-paired-host-test
+rocketmq-paired-host-test: ## 隔离验证最终 QS/AI 原业务闭环；core 为开发门禁，full 为完整门禁
+	$(call require_param,SDK_DIR,SDK_DIR must name a fixed clean SDK checkout)
+	$(call require_param,QS_DIR,QS_DIR must name a fixed clean QS checkout)
+	$(call require_param,AI_DIR,AI_DIR must name a fixed clean AI checkout)
+	$(call require_param,ROCKETMQ_TEST_IMAGE,ROCKETMQ_TEST_IMAGE must name an existing owned Broker image)
+	QS_AI_ACCEPTANCE_KIND=paired QS_M3_PAIRED_PROFILE="$(or $(PAIRED_PROFILE),core)" \
+		QS_M3_PAIRED_SOURCE="$(QS_DIR)" QS_AI_ACCEPTANCE_PYTHON="$(or $(AI_ACCEPTANCE_PYTHON),3.13)" \
+		python3 scripts/rocketmq/ci-transactions.py --sdk "$(SDK_DIR)" --ai-admission-host "$(AI_DIR)" \
+		--image "$(ROCKETMQ_TEST_IMAGE)" --mysql-image "$(or $(ROCKETMQ_TEST_MYSQL_IMAGE),mysql:8.0.36)" \
+		--report "$(or $(ROCKETMQ_PAIRED_REPORT),rocketmq-paired.json)"

@@ -1,0 +1,102 @@
+name: RocketMQ final-version paired QS AI roots
+on:
+  workflow_dispatch:
+    inputs:
+      qs_ref:
+        description: Exact QS paired host source SHA
+        type: string
+        required: true
+        default: fb62c1d01b5e9c068659ba27b554a57b923e4a28
+      ai_ref:
+        description: Exact AI paired host source SHA
+        type: string
+        required: true
+        default: 06653cef77bf79bac3ce2b412789b7f0d14ada00
+      profile:
+        description: Core is development only; full is mandatory for T20
+        type: choice
+        options: [core, full]
+        default: core
+      full_matrix:
+        description: Frozen-candidate six-profile compatibility gate
+        type: boolean
+        default: false
+  # Development-only trigger; final required PR/full gates remain separate.
+  push:
+    branches: ['codex/rocketmq-m3-paired']
+    paths: ['scripts/rocketmq/paired_acceptance.py', 'scripts/rocketmq/test_paired_acceptance.py', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-paired.yml', 'Makefile']
+  pull_request:
+    paths: ['scripts/rocketmq/paired_acceptance.py', 'scripts/rocketmq/test_paired_acceptance.py', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-paired.yml', 'Makefile']
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-paired-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  paired:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.full_matrix && '[{"python":"3.11","mysql":"mysql:8.0.36"},{"python":"3.11","mysql":"mysql:8.0.44"},{"python":"3.11","mysql":"mysql:8.4.11"},{"python":"3.13","mysql":"mysql:8.0.36"},{"python":"3.13","mysql":"mysql:8.0.44"},{"python":"3.13","mysql":"mysql:8.4.11"}]' || '[{"python":"3.11","mysql":"mysql:8.0.36"}]') }}
+    env:
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 8de893b367cc797580799abd8325f41dd62356db
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ inputs.qs_ref || 'fb62c1d01b5e9c068659ba27b554a57b923e4a28' }}
+          path: .qs-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-ai
+          ref: ${{ inputs.ai_ref || '06653cef77bf79bac3ce2b412789b7f0d14ada00' }}
+          path: .ai-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: ${{ matrix.python }}
+      - name: Verify exact host candidates and strict receipt gates
+        env:
+          EXPECTED_QS_SHA: ${{ inputs.qs_ref || 'fb62c1d01b5e9c068659ba27b554a57b923e4a28' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '06653cef77bf79bac3ce2b412789b7f0d14ada00' }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .qs-acceptance rev-parse HEAD)" = "$EXPECTED_QS_SHA"
+          test "$(git -C .ai-acceptance rev-parse HEAD)" = "$EXPECTED_AI_SHA"
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+      - name: Build verified isolated Broker
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-paired:5.5.1 components/rocketmq
+      - name: Required original QS AI roots
+        env:
+          PAIRED_PROFILE: ${{ inputs.profile || 'core' }}
+        run: |
+          set -euo pipefail
+          [[ "$PAIRED_PROFILE" == core || "$PAIRED_PROFILE" == full ]]
+          make rocketmq-paired-host-test SDK_DIR="$PWD/.sdk-acceptance" QS_DIR="$PWD/.qs-acceptance" \
+            AI_DIR="$PWD/.ai-acceptance" ROCKETMQ_TEST_IMAGE=rocketmq-paired:5.5.1 \
+            PAIRED_PROFILE="$PAIRED_PROFILE" AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' \
+            ROCKETMQ_TEST_MYSQL_IMAGE='${{ matrix.mysql }}' ROCKETMQ_PAIRED_REPORT=rocketmq-paired.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-paired-${{ inputs.profile || 'core' }}-${{ strategy.job-index }}-${{ github.sha }}
+          path: rocketmq-paired.json
+          if-no-files-found: error
+          retention-days: 14
