@@ -118,7 +118,11 @@
         "compose_down_succeeded": true,
         "probe_process_groups_drained": true,
         "private_fixture_directory_removed": true
-      }
+      },
+      "source_review_findings": [
+        "large fixture overwrote the valid standard-report JSON with a raw string; preserve exact business document using trailing JSON whitespace",
+        "outer poll cancellation could abandon an active control response and confuse close; keep one bounded exchange until drained"
+      ]
     }
   ],
   "prototype": {
@@ -159,6 +163,19 @@
       "run_id": 39794406776,
       "infra": "6d48581b4752cf26f480453d82ba7f82198228dd",
       "reason": "superseded before native execution by fixture-only polling/framing diagnostics"
+    },
+    {
+      "run_id": 39794857424,
+      "infra": "ceb80686ab93f272033bb756eb8efd17a85e1068",
+      "reason": "superseded by valid frozen report fixture and narrowly corrected Go reference classification"
     }
-  ]
+  ],
+  "current_source_correction": {
+    "scope": "caller payload organization/hash/length mismatch only",
+    "source_qs": "19387732e7475891dffdaed894500ecacb57668e",
+    "red": "three exact-reference subcases reproduced internal contract error instead of existing caller conflict classification",
+    "green": "three related packages race pass; QS docs-check pass",
+    "internal_proof_and_workload_errors_unchanged": true,
+    "production_changed": false
+  }
 }
