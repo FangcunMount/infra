@@ -2,7 +2,9 @@ import json
 import unittest
 
 from ai_admission_acceptance import acceptance_profile, host_failure_diagnostics, parse_admission_receipt, validate_host_runtime, validate_host_sdk_lock
-from ai_state_acceptance import CASES, TESTS, state_manifest
+from ai_state_acceptance import CASES, TESTS, RECOVERY_TESTS, state_manifest
+
+PRE_RECOVERY_TESTS = TESTS - RECOVERY_TESTS
 
 
 class AIStateAcceptanceTests(unittest.TestCase):
@@ -29,9 +31,9 @@ class AIStateAcceptanceTests(unittest.TestCase):
         self.assertEqual(manifest['accounts']['ai']['publish'], [route['id']])
         self.assertEqual(manifest['accounts']['observer']['subscriptions'], [route['id']])
 
-    def test_exact_thirty_eight_original_state_tests_and_ninety_five_proofs_are_required(self):
+    def test_exact_fifty_one_original_state_tests_and_137_proofs_are_required(self):
         profile = acceptance_profile('state')
-        self.assertEqual(profile['parse'](self.output(), self.junit())['passed'], 95)
+        self.assertEqual(profile['parse'](self.output(), self.junit())['passed'], 137)
         self.assertEqual(profile['file'], 'rocketmq_state_host.py')
         with self.assertRaises(RuntimeError):
             parse_admission_receipt(self.output(), self.junit())
@@ -40,10 +42,10 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith(('governance_', 'review_', 'correction_', 'solution_', 'resolution_', 'serial_dispatch_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
+               if not name.startswith(('recovery_', 'governance_', 'review_', 'correction_', 'solution_', 'resolution_', 'serial_dispatch_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
         receipt.update(cases=old, passed=len(old))
         self.assertEqual(len(old), 13)
-        self.assertEqual(len(TESTS), 38)
+        self.assertEqual(len(TESTS), 51)
         with self.assertRaises(RuntimeError):
             profile['parse'](self.output(receipt), self.junit())
 
@@ -51,7 +53,7 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith(('correction_', 'solution_', 'resolution_', 'serial_dispatch_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
+               if not name.startswith(('recovery_', 'correction_', 'solution_', 'resolution_', 'serial_dispatch_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
         self.assertEqual(len(old), 20)
         receipt.update(cases=old, passed=len(old))
         with self.assertRaises(RuntimeError):
@@ -60,7 +62,7 @@ class AIStateAcceptanceTests(unittest.TestCase):
     def test_other_profile_receipt_is_not_substituted_for_state_acceptance(self):
         old = 'M3_AI_ADMISSION_RECEIPT ' + json.dumps(dict(self.receipt(), cases={}, passed=0))
         profile = acceptance_profile('state')
-        self.assertEqual(profile['parse'](self.output() + '\n' + old, self.junit())['passed'], 95)
+        self.assertEqual(profile['parse'](self.output() + '\n' + old, self.junit())['passed'], 137)
         with self.assertRaises(RuntimeError):
             profile['parse'](old, self.junit())
 
@@ -68,10 +70,10 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith(('solution_', 'resolution_', 'serial_dispatch_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
+               if not name.startswith(('recovery_', 'solution_', 'resolution_', 'serial_dispatch_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
         self.assertEqual(len(old), 25)
         receipt.update(cases=old, passed=len(old))
-        old_tests = [name for name in TESTS if not name.startswith(('test_actual_solution_', 'test_actual_resolution_', 'test_actual_serial_', 'test_actual_interpretation_finish_', 'test_actual_interpretation_claim_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
+        old_tests = [name for name in PRE_RECOVERY_TESTS if not name.startswith(('recovery_', 'test_actual_solution_', 'test_actual_resolution_', 'test_actual_serial_', 'test_actual_interpretation_finish_', 'test_actual_interpretation_claim_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
         self.assertEqual(len(old_tests), 8)
         old_junit = '<testsuites><testsuite>' + ''.join(
             f'<testcase name="{name}"/>' for name in old_tests) + '</testsuite></testsuites>'
@@ -82,10 +84,10 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith(('resolution_', 'serial_dispatch_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
+               if not name.startswith(('recovery_', 'resolution_', 'serial_dispatch_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
         self.assertEqual(len(old), 30)
         receipt.update(cases=old, passed=len(old))
-        old_tests = [name for name in TESTS if not name.startswith(('test_actual_resolution_', 'test_actual_serial_', 'test_actual_interpretation_finish_', 'test_actual_interpretation_claim_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
+        old_tests = [name for name in PRE_RECOVERY_TESTS if not name.startswith(('recovery_', 'test_actual_resolution_', 'test_actual_serial_', 'test_actual_interpretation_finish_', 'test_actual_interpretation_claim_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
         self.assertEqual(len(old_tests), 10)
         old_junit = '<testsuites><testsuite>' + ''.join(
             f'<testcase name="{name}"/>' for name in old_tests) + '</testsuite></testsuites>'
@@ -96,10 +98,10 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith(('serial_dispatch_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
+               if not name.startswith(('recovery_', 'serial_dispatch_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
         self.assertEqual(len(old), 35)
         receipt.update(cases=old, passed=len(old))
-        old_tests = [name for name in TESTS if not name.startswith(('test_actual_serial_', 'test_actual_interpretation_finish_', 'test_actual_interpretation_claim_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
+        old_tests = [name for name in PRE_RECOVERY_TESTS if not name.startswith(('recovery_', 'test_actual_serial_', 'test_actual_interpretation_finish_', 'test_actual_interpretation_claim_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
         self.assertEqual(len(old_tests), 12)
         old_junit = '<testsuites><testsuite>' + ''.join(
             f'<testcase name="{name}"/>' for name in old_tests) + '</testsuite></testsuites>'
@@ -110,9 +112,9 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith(('interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
-        old_tests = [name for name in TESTS
-                     if not name.startswith(('test_actual_interpretation_finish_', 'test_actual_interpretation_claim_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
+               if not name.startswith(('recovery_', 'interpretation_finish_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
+        old_tests = [name for name in PRE_RECOVERY_TESTS
+                     if not name.startswith(('recovery_', 'test_actual_interpretation_finish_', 'test_actual_interpretation_claim_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
         self.assertEqual((len(old_tests), len(old)), (15, 42))
         receipt.update(cases=old, passed=len(old))
         old_junit = '<testsuites><testsuite>' + ''.join(
@@ -124,9 +126,9 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         old = {name: value for name, value in receipt['cases'].items()
-               if not name.startswith(('claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
-        old_tests = [name for name in TESTS
-                     if not name.startswith(('test_actual_interpretation_claim_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
+               if not name.startswith(('recovery_', 'claim_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
+        old_tests = [name for name in PRE_RECOVERY_TESTS
+                     if not name.startswith(('recovery_', 'test_actual_interpretation_claim_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
         self.assertEqual((len(old_tests), len(old)), (19, 51))
         receipt.update(cases=old, passed=len(old))
         old_junit = '<testsuites><testsuite>' + ''.join(
@@ -137,9 +139,9 @@ class AIStateAcceptanceTests(unittest.TestCase):
     def test_old_claim_proofs_or_old_installed_package_cannot_claim_scanner_acceptance(self):
         profile = acceptance_profile('state')
         receipt = self.receipt()
-        receipt['cases'] = {k: v for k, v in receipt['cases'].items() if not k.startswith(('scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
+        receipt['cases'] = {k: v for k, v in receipt['cases'].items() if not k.startswith(('recovery_', 'scanner_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
         receipt['passed'] = len(receipt['cases'])
-        old_tests = [n for n in TESTS if not n.startswith(('test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
+        old_tests = [n for n in PRE_RECOVERY_TESTS if not n.startswith(('recovery_', 'test_actual_original_claim_scanner_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
         self.assertEqual((len(old_tests), receipt['passed']), (23, 59))
         old_junit = '<testsuites><testsuite>' + ''.join(f'<testcase name="{n}"/>' for n in old_tests) + '</testsuite></testsuites>'
         with self.assertRaises(RuntimeError):
@@ -177,9 +179,9 @@ class AIStateAcceptanceTests(unittest.TestCase):
     def test_old_scanner_receipt_does_not_prove_explicit_finish_retry(self):
         profile = acceptance_profile('state')
         receipt = self.receipt()
-        receipt['cases'] = {k: v for k, v in receipt['cases'].items() if not k.startswith(('finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
+        receipt['cases'] = {k: v for k, v in receipt['cases'].items() if not k.startswith(('recovery_', 'finish_retry_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
         receipt['passed'] = len(receipt['cases'])
-        old_tests = [n for n in TESTS if not n.startswith(('test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
+        old_tests = [n for n in PRE_RECOVERY_TESTS if not n.startswith(('recovery_', 'test_actual_explicit_finalization_retry_', 'test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
         self.assertEqual((len(old_tests), receipt['passed']), (26, 64))
         old_junit = '<testsuites><testsuite>' + ''.join(f'<testcase name="{n}"/>' for n in old_tests) + '</testsuite></testsuites>'
         with self.assertRaises(RuntimeError):
@@ -189,9 +191,9 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         receipt['cases'] = {k: v for k, v in receipt['cases'].items()
-                            if not k.startswith(('serial_completion_', 'semantic_completion_', 'candidate_'))}
+                            if not k.startswith(('recovery_', 'serial_completion_', 'semantic_completion_', 'candidate_'))}
         receipt['passed'] = len(receipt['cases'])
-        old_tests = [n for n in TESTS if not n.startswith(
+        old_tests = [n for n in PRE_RECOVERY_TESTS if not n.startswith(
             ('test_actual_serial_generation_terminal_', 'test_actual_serial_terminal_', 'test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
         self.assertEqual((len(old_tests), receipt['passed']), (28, 68))
         old_junit = '<testsuites><testsuite>' + ''.join(
@@ -203,9 +205,9 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         receipt['cases'] = {k: v for k, v in receipt['cases'].items()
-                            if not k.startswith(('semantic_completion_', 'candidate_'))}
+                            if not k.startswith(('recovery_', 'semantic_completion_', 'candidate_'))}
         receipt['passed'] = len(receipt['cases'])
-        old_tests = [n for n in TESTS if not n.startswith(
+        old_tests = [n for n in PRE_RECOVERY_TESTS if not n.startswith(
             ('test_actual_serial_semantic_terminal_', 'test_actual_serial_semantic_cancel_', 'test_actual_candidate_'))]
         self.assertEqual((len(old_tests), receipt['passed']), (31, 76))
         old_junit = '<testsuites><testsuite>' + ''.join(
@@ -217,14 +219,32 @@ class AIStateAcceptanceTests(unittest.TestCase):
         profile = acceptance_profile('state')
         receipt = self.receipt()
         receipt['cases'] = {k: v for k, v in receipt['cases'].items()
-                            if not k.startswith('candidate_')}
+                            if not k.startswith(('recovery_', 'candidate_'))}
         receipt['passed'] = len(receipt['cases'])
-        old_tests = [n for n in TESTS if not n.startswith('test_actual_candidate_')]
+        old_tests = [n for n in PRE_RECOVERY_TESTS if not n.startswith('test_actual_candidate_')]
         self.assertEqual((len(old_tests), receipt['passed']), (34, 84))
         old_junit = '<testsuites><testsuite>' + ''.join(
             f'<testcase name="{n}"/>' for n in old_tests) + '</testsuite></testsuites>'
         with self.assertRaises(RuntimeError):
             profile['parse'](self.output(receipt), old_junit)
+
+    def test_old_38_candidate_tests_and_95_flags_cannot_claim_recovery_drain(self):
+        receipt = self.receipt()
+        receipt['cases'] = {k: v for k, v in receipt['cases'].items() if not k.startswith('recovery_')}
+        receipt['passed'] = len(receipt['cases'])
+        prefixes = ('test_actual_recovery_', 'test_actual_aborted_dispatch_',
+                    'test_actual_cancel_drain_', 'test_actual_candidate_expiry_',
+                    'test_actual_serial_expiry_')
+        old_tests = [n for n in PRE_RECOVERY_TESTS if not n.startswith(prefixes)]
+        self.assertEqual((len(old_tests), receipt['passed']), (38, 95))
+        old_junit = '<testsuites><testsuite>' + ''.join(
+            f'<testcase name="{n}"/>' for n in old_tests) + '</testsuite></testsuites>'
+        profile = acceptance_profile('state')
+        for output, junit in ((self.output(receipt), old_junit),
+                              (self.output(), old_junit),
+                              (self.output(receipt), self.junit())):
+            with self.assertRaises(RuntimeError):
+                profile['parse'](output, junit)
 
     def test_incomplete_failed_skipped_duplicate_or_broader_state_scope_cannot_pass(self):
         profile = acceptance_profile('state')

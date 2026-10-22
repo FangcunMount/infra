@@ -103,6 +103,70 @@ TESTS = frozenset((
     'test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-unknown]'))
 
 
+# Whole recovery/drain batch: prior candidate receipts are insufficient.
+RECOVERY_CASES = frozenset((
+    'recovery_serial_prepared_half_invisible',
+    'recovery_serial_prepared_committed_final_unknown',
+    'recovery_serial_prepared_no_new_provider',
+    'recovery_serial_generation_half_invisible',
+    'recovery_serial_generation_committed_final_unknown',
+    'recovery_serial_generation_no_new_provider',
+    'recovery_serial_semantic_half_invisible',
+    'recovery_serial_semantic_committed_final_unknown',
+    'recovery_serial_semantic_no_new_provider',
+    'recovery_candidate_prepared_half_invisible',
+    'recovery_candidate_prepared_committed_final_unknown',
+    'recovery_candidate_prepared_no_new_provider',
+    'recovery_candidate_generation_half_invisible',
+    'recovery_candidate_generation_committed_final_unknown',
+    'recovery_candidate_generation_no_new_provider',
+    'recovery_candidate_semantic_half_invisible',
+    'recovery_candidate_semantic_committed_final_unknown',
+    'recovery_candidate_semantic_no_new_provider',
+    'recovery_first_serial_generation_half_invisible',
+    'recovery_first_serial_generation_committed_final_unknown',
+    'recovery_first_serial_generation_no_new_provider',
+    'recovery_first_serial_semantic_half_invisible',
+    'recovery_first_serial_semantic_committed_final_unknown',
+    'recovery_first_serial_semantic_no_new_provider',
+    'recovery_first_candidate_generation_half_invisible',
+    'recovery_first_candidate_generation_committed_final_unknown',
+    'recovery_first_candidate_generation_no_new_provider',
+    'recovery_first_candidate_semantic_half_invisible',
+    'recovery_first_candidate_semantic_committed_final_unknown',
+    'recovery_first_candidate_semantic_no_new_provider',
+    'recovery_cancel_drain_half_invisible',
+    'recovery_cancel_drain_committed_final_unknown',
+    'recovery_cancel_drain_no_new_provider',
+    'recovery_dispatch_serial_half_invisible',
+    'recovery_dispatch_serial_committed_final_unknown',
+    'recovery_dispatch_serial_no_new_provider',
+    'recovery_dispatch_candidate_half_invisible',
+    'recovery_dispatch_candidate_committed_final_unknown',
+    'recovery_dispatch_candidate_no_new_provider',
+    'recovery_first_wire_authenticated',
+    'recovery_committed_archive_witness',
+    'recovery_no_legacy_commit_hook',
+))
+RECOVERY_TESTS = frozenset((
+    'test_actual_aborted_dispatch_requires_explicit_replan_and_one_capacity_handoff[False]',
+    'test_actual_aborted_dispatch_requires_explicit_replan_and_one_capacity_handoff[True]',
+    'test_actual_cancel_drain_keeps_original_request_and_completed_response',
+    'test_actual_candidate_expiry_preserves_other_claim_and_original_unknown[generation]',
+    'test_actual_candidate_expiry_preserves_other_claim_and_original_unknown[prepared]',
+    'test_actual_candidate_expiry_preserves_other_claim_and_original_unknown[semantic]',
+    'test_actual_recovery_reuses_first_response_without_provider[generation-False]',
+    'test_actual_recovery_reuses_first_response_without_provider[generation-True]',
+    'test_actual_recovery_reuses_first_response_without_provider[semantic-False]',
+    'test_actual_recovery_reuses_first_response_without_provider[semantic-True]',
+    'test_actual_serial_expiry_recovery_halves_and_original_unknown[generation]',
+    'test_actual_serial_expiry_recovery_halves_and_original_unknown[prepared]',
+    'test_actual_serial_expiry_recovery_halves_and_original_unknown[semantic]',
+))
+CASES = CASES | RECOVERY_CASES
+TESTS = TESTS | RECOVERY_TESTS
+
+
 def state_manifest():
     topic, subscription, owner = 'qs.ai.events.v1', 'qs-m3-ai-state-observer', 'ai.mysql'
     route = {'id': 'ai-state-event', 'topic': topic, 'subscription': subscription,
