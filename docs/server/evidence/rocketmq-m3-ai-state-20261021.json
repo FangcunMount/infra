@@ -1449,6 +1449,13 @@
       ],
       "resolution": "23 target cases pass, 10 native cases collect, 3280 full unit cases pass; final repr-only privacy adjustment checked with23 target cases",
       "failed_candidate_merged": false
+    },
+    {
+      "kind": "local_red_characterization",
+      "task": "T17",
+      "test": "test_candidate_without_matching_runtime_never_falls_back_from_serial_transaction_hook",
+      "result": "1 failed / 4 passed before guard fix;29 targeted green after fix",
+      "production_changed": false
     }
   ],
   "governance_followup": {
@@ -21317,7 +21324,7 @@
   ],
   "candidate_complete_runtime": {
     "status": "source_pr_open_real_dependencies_pending",
-    "source_sha": "b93b68ca33a1758a66a0d7d635dbc8b33bb3da33",
+    "source_sha": "f0538fd671e1bef19ea566a87242893cd78345a1",
     "code_sha": "e69efd593a3fe2d089b736bd612380f4712e87bf",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/210",
     "source_pushed": true,
@@ -21333,12 +21340,22 @@
       "broker_host_collected_only": 38,
       "broker_required_flags": 95,
       "collector_matches_harness_exactly": true,
-      "full_unit_run_before_native_only_replan_cases_added": true
+      "full_unit_run_before_native_only_replan_cases_added": true,
+      "full_unit_source_before_guard_fix": "b93b68ca33a1758a66a0d7d635dbc8b33bb3da33",
+      "guard_red_failed": 1,
+      "guard_target_passed": 29
     },
     "scope": "Explicit candidate prepare/dispatch and generation/semantic completion through the actual host graph; same candidate selection/capacity/guarded original roots, first response/candidate, archive/witness; no provider retry or default production assembly. Broker profile uses actual fixed published SDK and real isolated Broker with a controlled provider and event observer. Real dependency gates are pending.",
     "production_changed": false,
     "stable_sdk_released": false,
     "t17_done": false,
-    "remaining": "Required source and Broker profiles, recovery/drain and default runtime assembly"
+    "remaining": "Required source and Broker profiles, recovery/drain and default runtime assembly",
+    "prior_candidate": "b93b68ca33a1758a66a0d7d635dbc8b33bb3da33",
+    "guard_fix_code_sha": "e45ada8",
+    "superseded_ci": {
+      "source": "https://github.com/FangcunMount/qs-ai/actions/runs/39710945796",
+      "infra_state": "https://github.com/FangcunMount/infra/actions/runs/39710991265",
+      "reason": "New no-fallback regression reproduced and repaired; earlier candidates are not final acceptance. Existing concurrency cancels obsolete PR runs."
+    }
   }
 }
