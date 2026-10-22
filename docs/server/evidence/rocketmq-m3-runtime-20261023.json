@@ -315,8 +315,8 @@
     "source_sha": "43f3e5e3b199b37ff754adc1b0d3d879b64689e5",
     "candidate_sha": "21817e1f66b1130852a4c33a862d1a42e353981b",
     "pr": "https://github.com/FangcunMount/qs-server/pull/424",
-    "source_merged_into_main": false,
-    "ci": "pending_on_exact_final_head",
+    "source_merged_into_main": true,
+    "ci": "28 success;1 conditional API generation sync not applicable",
     "tests": {
       "pass": 341,
       "fail": 0,
@@ -329,10 +329,161 @@
     "docs_tests": 88,
     "docs_hygiene_facts": "passed",
     "parent_metadata_preserved": true,
-    "production_changed": false
+    "production_changed": false,
+    "merged_main": "17ed4615075f1b066c7f43c9483deb14d88c65a9",
+    "candidate_and_main_tree": "501d791c9bb017fc292f5ba9e178eb0934c43e6d",
+    "checks": [
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120033452224",
+        "name": "Build Applications (apiserver)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120033452320",
+        "name": "Build Applications (worker)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120033452373",
+        "name": "Build Applications (collection)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836552043/job/120026299431",
+        "name": "Analyze (go)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315906",
+        "name": "Deployment Contracts",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315721",
+        "name": "Seeddata Retirement and Current Runtime E2E",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315738",
+        "name": "Actor Store MySQL Transactions",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315964",
+        "name": "QS-03 original effect recovery after actual broker loss",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558284/job/120026314271",
+        "name": "original-mysql-root (8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315523",
+        "name": "Security Scan (Advisory)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315810",
+        "name": "Run Tests",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315842",
+        "name": "QS-05/06 original business effects after actual broker loss",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558440/job/120026314492",
+        "name": "images (qs-apiserver)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315923",
+        "name": "Tier 1 Test Policy",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315489",
+        "name": "MySQL Native Metadata and Readiness",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558440/job/120026314440",
+        "name": "delivery (8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315601",
+        "name": "Lint Code",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315867",
+        "name": "Layer Boundaries (depguard)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558284/job/120026314854",
+        "name": "original-mysql-root (8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315693",
+        "name": "Action audit MySQL JSON lifecycle",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315836",
+        "name": "Maintainability Scan (Advisory)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315447",
+        "name": "AuthZ committed version two-process MySQL",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315837",
+        "name": "Docs Hygiene & Facts",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558440/job/120026314640",
+        "name": "images (collection-server)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558440/job/120026314046",
+        "name": "delivery (8.4)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026314938",
+        "name": "MongoDB Authenticated Native Metadata",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558384/job/120026314221",
+        "name": "mysql-audit",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558284/job/120026314535",
+        "name": "original-mysql-root (8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026317028",
+        "name": "Docs & API Generated Sync",
+        "state": "SKIPPED"
+      }
+    ],
+    "production_deploy_paused_readback": true,
+    "production_environment_pause_override": false
   },
   "deferred_consumer_batch": {
-    "status": "implementation_next",
+    "status": "source_frozen_native_mysql_development_running",
     "scope": "current v2 RocketMQ paused retry deliveries only; same original dispatcher/identity, no publication or business retry authorization",
     "storage": "reuse original transport evidence104 and explicit host migration for v2 deferred linkage; no historical reader",
     "resource_contract": "same original worker execution concurrency, one bounded resume loop, bounded SQL/lease renewal and actual completion accounting",
@@ -340,6 +491,49 @@
       "pure contract/race",
       "required isolated real MySQL/Broker",
       "shared budget and crash/lease ownership"
+    ],
+    "source_sha": "9304ba3d97c269f546f2749296574e06f7709d12",
+    "resource_pair_source_sha": "c1d4a79f76fe7f868cfd8320270c80280d24b5bf",
+    "candidate_sha": "875160597fdd3acf870c695ef478b78eecdafb11",
+    "schema_target": "109/42",
+    "source_merged_into_main": false,
+    "unit_tests": {
+      "packages": 6,
+      "pass": 79,
+      "fail": 0,
+      "skip": 0,
+      "sha256": "90d750531edcf203d24c1b7b99e9700539e2804347f2f5fdf45cf09b4be2dd72"
+    },
+    "migration_resource_tests": {
+      "pass": 172,
+      "fail": 0,
+      "skip": 0
+    },
+    "offline_tool_tests": {
+      "pass": 2,
+      "fail": 0,
+      "skip": 0
+    },
+    "ordinary_and_native_tag_lint": "2.5.0 passed",
+    "docs_tests": 88,
+    "docs_hygiene_facts": "passed",
+    "native_compile_only": true,
+    "infra_candidate": "46c62c45919d719aa44501247f2b44f1ddda528d",
+    "infra_tool_tests": 121,
+    "actionlint": "passed",
+    "native_run": {
+      "id": 39843841383,
+      "url": "https://github.com/FangcunMount/infra/actions/runs/39843841383",
+      "profile": "development",
+      "mysql": "8.0.36",
+      "status": "in_progress",
+      "full_matrix": false,
+      "broker_and_whole_worker_not_claimed": true
+    },
+    "development_failures": [
+      "staticcheck nil-context test and tagged-switch guidance fixed",
+      "docs expected migration maximum and both sidecar source/target bindings updated from108 to actual109",
+      "initial schema109 source lacked declared109/42 pair; explicit pair and contract proof added before native dispatch"
     ]
   }
 }
