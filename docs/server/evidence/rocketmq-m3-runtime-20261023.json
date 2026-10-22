@@ -295,7 +295,7 @@
   "ai_read_only_review": {
     "source_sha": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
     "changed": false,
-    "observation": "existing close holds actual accepted components, SDK and host DB/loop in order; native current-host proof remains pending",
+    "observation": "existing actual default DI, SDK subscriptions and paused idle Checker rerun against current source; no source changes",
     "current_unit_addendum": {
       "source": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
       "sdk": "0.4.0a2",
@@ -311,14 +311,165 @@
       "junit_sha256": "29768aaaea09c19d895d9d486ed59f14ece1ad785a1dac9ad7e40fbb8930be40",
       "scope": "three existing controlled lifecycle/configuration unit files; no native DB/Broker, complete host, provider or system claim",
       "source_changed": false
+    },
+    "current_native_run": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39860580207",
+      "source": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+      "infra": "f2a49e69ab94066c15f393746239ec980b7c8979",
+      "status": "verified six profiles:55 native tests/148 evidence cases each,focus4/12 each,zero failed/skipped,exact source/installed SDK and all owned cleanup verified",
+      "reused_evidence_entry": "existing actual default DI/SDK/subscriptions/idle checker/pause/shutdown native focus plus existing state roots",
+      "byte_comparison": "bootstrap messaging.py, transaction_messaging.py and rocketmq_state_host.py are identical to previously tested6be5f8; current exact source rerun still required, not relabeled old proof",
+      "source_changed": false,
+      "audit_index_sha256": "9bda839e02bcd3a7bb2354b6f4c393e534f8704685ea3171fb09bcc3bfd6a3ec",
+      "reports": [
+        {
+          "sha256": "ee908041ea2a4ed529ccad015ce03b9d64dad5e67d489654223e03f3aaf50d85",
+          "source": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+          "mysql": "8.4.11",
+          "python": "3.13.15",
+          "sdk": "0.4.0a2",
+          "client": "5.1.2",
+          "native_tests": 55,
+          "evidence_cases": 148,
+          "focus_tests": 4,
+          "focus_cases": 12,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "locked_sdk_archive_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2",
+          "junit_sha256": "f30cd0bb6fb96eed00d959c113776b2522ac79246ba44914c0af795d58a05451",
+          "focus_junit_sha256": "17d8e42f6dc00a55e1a3acf8f3c77f8f45bddfc6863c066abe0b082a898de171"
+        },
+        {
+          "sha256": "129ecb22d246b000f3664c6500284a1ba09b7f1bffbccc2a225ab8b8c0eac353",
+          "source": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+          "mysql": "8.4.11",
+          "python": "3.11.16",
+          "sdk": "0.4.0a2",
+          "client": "5.1.2",
+          "native_tests": 55,
+          "evidence_cases": 148,
+          "focus_tests": 4,
+          "focus_cases": 12,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "locked_sdk_archive_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2",
+          "junit_sha256": "61326955fd179fb8e84877451480a2658d223a89a5a9ecdbcfed9dae59950a00",
+          "focus_junit_sha256": "0a76870ada8d2240f275c4d8b9b4308db342377ed912bd0a35e226a5549839ac"
+        },
+        {
+          "sha256": "74da98fd177ce57f10be778ee4f84b49e4429b7a5eef58a148ab162f7a801875",
+          "source": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+          "mysql": "8.0.44",
+          "python": "3.13.15",
+          "sdk": "0.4.0a2",
+          "client": "5.1.2",
+          "native_tests": 55,
+          "evidence_cases": 148,
+          "focus_tests": 4,
+          "focus_cases": 12,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "locked_sdk_archive_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2",
+          "junit_sha256": "2408c6f370441cf553a9bd60c99b563dc55b0d00d6c7c1e75cffe581510dedd5",
+          "focus_junit_sha256": "4fc425616225f8702c8eac16ef0928ec328a5563ee51d1cce1ff96e44042fea4"
+        },
+        {
+          "sha256": "2465416137338dcabbf79535b6c2abf7c57521a68c9ead555ce74d107f1d706e",
+          "source": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+          "mysql": "8.0.44",
+          "python": "3.11.16",
+          "sdk": "0.4.0a2",
+          "client": "5.1.2",
+          "native_tests": 55,
+          "evidence_cases": 148,
+          "focus_tests": 4,
+          "focus_cases": 12,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "locked_sdk_archive_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2",
+          "junit_sha256": "44d06e80b32b3282af49e5fb2ee07832488a5e4b3f3d1e75b3ac18ed51b7fdaa",
+          "focus_junit_sha256": "9b469718daa15b1f4dedb055352d375a2ed98aaacf5da186ba572e5bff2bf5af"
+        },
+        {
+          "sha256": "d4a3ce357826a88a0c3a333715edcd6820b736837e20453619e456dc6f6fc54a",
+          "source": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+          "mysql": "8.0.36",
+          "python": "3.11.16",
+          "sdk": "0.4.0a2",
+          "client": "5.1.2",
+          "native_tests": 55,
+          "evidence_cases": 148,
+          "focus_tests": 4,
+          "focus_cases": 12,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "locked_sdk_archive_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2",
+          "junit_sha256": "fa09df870a295e60a27a9d908827d611948c3cbfbb79ef2dd6e1f8dd0fa9e3eb",
+          "focus_junit_sha256": "3935d8bdbc59f3c04de9a02822cdad4ffefaf18851fb70fee4f209b4deb06f64"
+        },
+        {
+          "sha256": "23ba9832acda7b9ff73ecf3f7e05ca471fa5c09a328bb9f58c501b0402d6e7b9",
+          "source": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+          "mysql": "8.0.36",
+          "python": "3.13.15",
+          "sdk": "0.4.0a2",
+          "client": "5.1.2",
+          "native_tests": 55,
+          "evidence_cases": 148,
+          "focus_tests": 4,
+          "focus_cases": 12,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "locked_sdk_archive_sha256": "570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2",
+          "junit_sha256": "f0674a36be1d3e4f1a8d11e2f9f981185e3ff99409be5b46136f6bce1b101d73",
+          "focus_junit_sha256": "376507392c53780c18eec5d8d29ce298425787569b6ef40c35364a3266c6a7a4"
+        }
+      ],
+      "limits": [
+        "No producer process-exit, database commit-network fault, real provider, paired QS business effect or system acceptance claim from this state profile. T18/T20 carry their separate proofs."
+      ]
     }
   },
   "remaining": [
-    "default due-dispatch native dual-store wiring",
-    "current worker deferred deliveries without publication permissions and shared original in-flight budget",
-    "actual current-host startup/failure/close with native dependencies",
-    "cross-instance Checker and exact DB deadline/queue/concurrency proofs",
-    "final current-head CI and merges; task stays unchecked until all gates pass"
+    "QS actual default dual-owner real Broker restart/new-instance native gate, full current-head source/tool CI and merges",
+    "Cross-instance Checker and exact DB deadline/queue/concurrency proof composition across actual host bindings",
+    "Complete T22 evidence review; task stays unchecked until all gates pass"
   ],
   "unchanged": [
     "no local Docker/shared dependency started",
@@ -932,7 +1083,17 @@
     "infra_worker_runtime_pr": {
       "pr": "https://github.com/FangcunMount/infra/pull/163",
       "head": "3b30b904049d0a14704b042d0aefcbc4443b7b60",
-      "status": "draft; full current-head regression running"
+      "status": "merged after49 successful checks and56 nonempty zero-failure/skip report audits",
+      "main": "f2a49e69ab94066c15f393746239ec980b7c8979",
+      "checks": 49,
+      "reports": 56,
+      "report_schemas": {
+        "root_counts": 53,
+        "structured_IAM_tests": 3
+      },
+      "audit_index_sha256": "864067b6ce47e51f127bdcd1374f1d36aabe760d0cacf64a50975d73e635aa77",
+      "cleanup": "54 structured cleanup objects verified; original worker report nine remaining-row counters zero/private evidence removed and Stop containers success; M1 report no cleanup object, not invented",
+      "candidate_to_main_difference": "only two progress documents; functional code identical to tested candidate"
     },
     "source_merge": {
       "pr": 426,
@@ -945,7 +1106,7 @@
     }
   },
   "default_factory_native_batch": {
-    "status": "in_progress",
+    "status": "completed declared factory scope; source and tools merged",
     "scope": "actual default factory, original dual-store authoritative preflight and empty scans; no Broker or business dispatch/complete host claim",
     "first_native_run": {
       "run": "https://github.com/FangcunMount/infra/actions/runs/39855965323",
@@ -977,7 +1138,7 @@
       "source_sha": "5811955e2f06392012dbc4cf3d344b3d289acf2a",
       "candidate_sha": "d32788bdce32d81df1f67b1f5bcb35cf56f432a5",
       "pr": "https://github.com/FangcunMount/qs-server/pull/427",
-      "status": "draft; current-head CI and native verification pending",
+      "status": "merged PR427;28 checks successful,API generated sync not applicable",
       "behavior": "exact MySQL and Mongo owner pointers must be registered by the original event subsystem; same DB identity cannot authorize a second runtime",
       "local_reproduction": "two expected failures with real constructors and disconnected original handles before fix, not native DB evidence",
       "local_red_log_sha256": "19614c6834396fdb4ef9d6e02b8b42c4ca351be89bd0f969c62b7c946692c67d",
@@ -998,7 +1159,8 @@
           "one consecutive blank line corrected before final gate"
         ]
       },
-      "new_runtime_or_budget_created": false
+      "new_runtime_or_budget_created": false,
+      "merge_sha": "6cf3eab6dd59add33e7a2e7964d65f51620235b8"
     },
     "current_native_gate": {
       "run": "https://github.com/FangcunMount/infra/actions/runs/39858124963",
@@ -1020,20 +1182,92 @@
       "run": "https://github.com/FangcunMount/infra/actions/runs/39858676263",
       "source": "d32788bdce32d81df1f67b1f5bcb35cf56f432a5",
       "infra": "5714a218e4b2c90e6a9528d039f6d0407704ed74",
-      "status": "running; MySQL8.0.44 job successful, other two queued; final report audit not completed"
+      "status": "verified three MySQL profiles,10 cases each,zero failed/skipped; exact source and SDK,source clean,zero endpoint connections,all owned cleanup",
+      "reports": [
+        {
+          "sha256": "044f82bce1d0f8a2e774095f1b27a62f5df75e975eca18feac2bb5a8039ebd35",
+          "source": "d32788bdce32d81df1f67b1f5bcb35cf56f432a5",
+          "mysql": "8.4.11",
+          "mongo": "7.0.37",
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0,
+          "endpoint_connections": 0,
+          "cleanup": {
+            "owned_endpoint_trap_joined": true,
+            "compose_down_succeeded": true,
+            "project_containers_remaining": false,
+            "private_fixture_removed": true,
+            "owned_process_groups_drained": true
+          },
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        },
+        {
+          "sha256": "35cb83474be6e7a0c5fa951051ad8f275c1f4f92eac6f059c9e9c16898ccc914",
+          "source": "d32788bdce32d81df1f67b1f5bcb35cf56f432a5",
+          "mysql": "8.0.36",
+          "mongo": "7.0.37",
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0,
+          "endpoint_connections": 0,
+          "cleanup": {
+            "owned_endpoint_trap_joined": true,
+            "compose_down_succeeded": true,
+            "project_containers_remaining": false,
+            "private_fixture_removed": true,
+            "owned_process_groups_drained": true
+          },
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        },
+        {
+          "sha256": "3db4690e44f575addfbea8a4346b7baf330e9f14dde097470cf661f16e8fcb6b",
+          "source": "d32788bdce32d81df1f67b1f5bcb35cf56f432a5",
+          "mysql": "8.0.44",
+          "mongo": "7.0.37",
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0,
+          "endpoint_connections": 0,
+          "cleanup": {
+            "owned_endpoint_trap_joined": true,
+            "compose_down_succeeded": true,
+            "project_containers_remaining": false,
+            "private_fixture_removed": true,
+            "owned_process_groups_drained": true
+          },
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        }
+      ]
     },
     "infra_pr": {
       "url": "https://github.com/FangcunMount/infra/pull/165",
-      "status": "draft stacked on Worker harness PR163; retarget main after parent merge"
+      "status": "merged;11 current-head checks successful;15 nonempty reports zero failed/skipped audited",
+      "merge_sha": "30bb726724498d74be0308b25d5e0bcb70150d10"
     }
   },
   "iam_native_lifecycle_batch": {
-    "status": "development_native_queued",
+    "status": "completed declared in-process owner scope; source and tooling merged",
     "worktree": "iam-host-runtime",
     "base": "424720df1ae687e3df6a82671df08a434f5e5ceb",
     "scope": "actual owner/in-process original root against owned Broker/MySQL; full API, process fault, provider and system not claimed",
     "native_compile": "passed; no local native execution",
-    "native_tagged_lint": "9 preexisting errcheck issues in two old integration files; no new-file findings; new-diff and ordinary lint still pending",
+    "native_tagged_lint": "new diff zero issues;full tagged lint9 preexisting errcheck findings,not claimed passed",
     "new_test_cases": 6,
     "infra_unit_tests": 122,
     "infra_actionlint": "passed",
@@ -1045,6 +1279,156 @@
     "normal_full_lint": "failed on5 preexisting errcheck issues in two old M6 test utilities; not claimed passed",
     "native_tagged_full_lint": "failed on9 preexisting errcheck issues in two old transaction integration files; new file has no findings",
     "docs_hygiene_facts": "passed; no product contract or schema change",
-    "source_pr": "not yet created; first real dependencies pending"
+    "source_pr": "https://github.com/FangcunMount/iam/pull/137",
+    "source_merge_sha": "f8a474f87b017565888a452099279d0c51b2d5b4",
+    "source_ci_successful_checks": 8,
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/167",
+    "infra_merge_sha": "3238258fee008a9edbd82aa37dd0d9dd62549623",
+    "infra_ci_successful_checks": 11,
+    "development_result": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39859642752",
+      "owner_cases": 6,
+      "original_business_cases": 4,
+      "separate_storage_cases": 34,
+      "failed": 0,
+      "skipped": 0,
+      "owned_cleanup_verified": true
+    },
+    "full_native_gate": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39861578608",
+      "audit_index_sha256": "ffcb13d3d18eeef1cf405c278cdca6f4a0b20b7c5618f8f8a07ed9e595e34e62",
+      "runtime_reports": [
+        {
+          "sha256": "3355e1ea073e13bea5f922388235892c7e80dddff43fb593dc644f43caa086a4",
+          "mysql": "8.4.13",
+          "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+          "source": "89f261ae707055eac7651c7a8753224cbd8925a3",
+          "baseline_cases": 21,
+          "owner_cases": 6,
+          "original_business_cases": 4,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        },
+        {
+          "sha256": "442903e43ece4b8c83cb08103c345a33752094a56d80f16093f8f8dfd79616f4",
+          "mysql": "8.0.44",
+          "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "source": "89f261ae707055eac7651c7a8753224cbd8925a3",
+          "baseline_cases": 21,
+          "owner_cases": 6,
+          "original_business_cases": 4,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        },
+        {
+          "sha256": "f58f12bac2873829f44d9cad14203fa3aa507a3879361499d71442f670bce85a",
+          "mysql": "8.0.36",
+          "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+          "source": "89f261ae707055eac7651c7a8753224cbd8925a3",
+          "baseline_cases": 21,
+          "owner_cases": 6,
+          "original_business_cases": 4,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        }
+      ],
+      "storage_reports": [
+        {
+          "sha256": "dda057b35a3355501a059ea7eea89a20f88dbb73398a1ec7bea1e44eca7df0a8",
+          "mysql": "8.0.36",
+          "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+          "passed": 34,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "owned_containers_remaining": false,
+            "private_fixture_removed": true
+          }
+        },
+        {
+          "sha256": "9cb86515ca0eecc280d6d7efe04721929dff78906bc39b034da73f572c3eadb9",
+          "mysql": "8.4.13",
+          "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+          "passed": 34,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "owned_containers_remaining": false,
+            "private_fixture_removed": true
+          }
+        },
+        {
+          "sha256": "cb14626701fbe928698c00dffa6a05559be9e39bf15759d443615b4815cdf38d",
+          "mysql": "8.0.44",
+          "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "passed": 34,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "owned_containers_remaining": false,
+            "private_fixture_removed": true
+          }
+        }
+      ],
+      "version_note": "Workflow declares mysql:8.4 compatibility family, resolved actual8.4.13. Earlier auditor assumption8.4.11 corrected; no native assertion changed. Exact content image IDs retained; fixed release-input pin review remains T26."
+    },
+    "merge_history": [
+      "First tooling merge attempt used manually transcribed wrong SHA and was rejected by exact-head guard. Actual Git/GitHub head read and matched before successful merge; no wrong revision merged."
+    ]
+  },
+  "qs_default_owner_runtime_batch": {
+    "status": "development native dispatched; not yet verified",
+    "source": "c15df6f3ff0686c574520a9c5d274f86d08d9868",
+    "source_baseline": "cc7609ad6dd78b8250437a36f777c98da8b22a24",
+    "infra": "a1602bed8e72cae537de386e161e8936d300e733",
+    "required_cases": 13,
+    "scope": "actual default QS dual owner, original MySQL/Mongo protocol fact roots, real owned Broker SIGKILL/restart and new paused instance actual Broker Checker",
+    "local_compile": "passed; no local native execution",
+    "native_container_lint": "passed zero issues pinned2.5.0",
+    "tool_unit_tests": 133,
+    "actionlint": "passed",
+    "docs_check": "passed after replacing unsupported compile-command notation with actually rerun reproducible compile selector",
+    "limits": [
+      "Protocol fixture facts; no domain API/provider/system or producer process exit claim",
+      "Observed callbacks do not alone prove saturation"
+    ],
+    "production_changed": false,
+    "development_run": "https://github.com/FangcunMount/infra/actions/runs/39868563639"
   }
 }
