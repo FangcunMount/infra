@@ -1,8 +1,8 @@
 {
   "version": 1,
   "task": "T21",
-  "status": "verification_failed_fix_in_progress",
-  "progress": "20/36",
+  "status": "implemented_verified_merged",
+  "progress": "21/36",
   "production_changed": false,
   "first_run": {
     "id": 39811388627,
@@ -70,11 +70,7 @@
     "production_deploy_paused": true,
     "production_environment_pause_override": false
   },
-  "pending": [
-    "verify final130 direct signed RPC outcomes and4 preflight conflicts",
-    "verify current full PR CI and cleanup",
-    "merge infra source and update T21 completion separately"
-  ],
+  "pending": [],
   "worker_scope": {
     "source": "QS actual process/runtime_bootstrap.go and worker handlers",
     "final_role": "consume_only",
@@ -458,5 +454,418 @@
       "private_fixture_directory_removed": true
     },
     "accepted_as_full_final_gate": false
+  },
+  "final": {
+    "candidate": "bdb96abb24576f6311b34dd367e54d826bfc3cbb",
+    "tree": "b1282d0ca2004c241e9465c08cae9c46292348cc",
+    "pr": "https://github.com/FangcunMount/infra/pull/154",
+    "merged_main": "d639ea693cd5b3b35e37898e7b38c74106679c90",
+    "merged_at": "2026-10-22T18:23:31Z",
+    "actual_tree_matches_tested_candidate": true,
+    "checks_success": 52,
+    "regression_reports": [
+      {
+        "path": "39826302467/rocketmq-qs-report-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-report.json",
+        "sha256": "200f1c0b92d6bc64bf557fd81eb74b605ae3bfa01217d7c1cc89a30a4c14b072",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302494/rocketmq-ai-state-0-3.11-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-state.json",
+        "sha256": "fb35620dc6d654a968421e39c7d1446f1b3bd7204b33c26dfd5babb8d530d41d",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302494/rocketmq-ai-state-1-3.11-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-state.json",
+        "sha256": "2ca18f26004aa5bdbb0969fafd336e181df978ffa82a6ce67ace6c8817c94365",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302494/rocketmq-ai-state-4-3.13-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-state.json",
+        "sha256": "36bb1bafb9ae068bbb14601339338d8a26c7d93a36b8d300d3c676f424518e54",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302494/rocketmq-ai-state-2-3.11-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-state.json",
+        "sha256": "bb52225c7d9498765685565e5629192dd87e1119f371881b1a7650da047a52b3",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302494/rocketmq-ai-state-5-3.13-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-state.json",
+        "sha256": "edd591dbc8aff32047440d88a977225401c5d6c03f6191439cd507d5938c26ad",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302494/rocketmq-ai-state-3-3.13-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-state.json",
+        "sha256": "b8aa0d6eef412399d979db976674ec47e81f97ec2a0fd9ed7cc0ede895c53134",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302837/rocketmq-complete-sdk-0-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-complete-sdk.json",
+        "sha256": "b0e8484220baa405b8df5d5af4f771dad4bffeeaba8c9afb17f9fc7d0c58e3cf",
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302837/rocketmq-complete-sdk-1-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-complete-sdk.json",
+        "sha256": "348a0b2cc64e9e95f0892bff018ad844944f2703c9d0644e841cde739d461307",
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302899/rocketmq-ai-admission-3-3.13-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-admission.json",
+        "sha256": "ac957d405cf42070b678dab8282c05dda9a50b4bd90dd332c667486acca6304c",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302899/rocketmq-ai-admission-2-3.11-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-admission.json",
+        "sha256": "55998afd4cf05e4d30d6abcd6f3e14f093d4b37f4776189b7cad91e9ac382959",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302899/rocketmq-ai-admission-4-3.13-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-admission.json",
+        "sha256": "3499941b222adb2dec372ea7099103dfe3ebf50381dde1221f03247d2bbe26a3",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302899/rocketmq-ai-admission-5-3.13-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-admission.json",
+        "sha256": "ef6ae17286c77a922f49e93e103d88a98e6f0256adedf9a365a442acfeb0f528",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302899/rocketmq-ai-admission-0-3.11-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-admission.json",
+        "sha256": "d13d00b48c253f6d6d9e39c7309df9fefa8e78e55d3566f7341947c983bdb738",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302899/rocketmq-ai-admission-1-3.11-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-admission.json",
+        "sha256": "06b9c74c11514609ff718e9eab9439c712aa9092b35b1be2a3df1593a49107a2",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302735/rocketmq-qs-event-1-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-event.json",
+        "sha256": "73626fbebae117397945a7efe8739ea44e729376ef13d59399593460a606eef7",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302735/rocketmq-qs-event-2-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-event.json",
+        "sha256": "a99b148e194a4e2bd9a632553a7261b4ea7dec09a9c17d39150c3a6d7af75194",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302735/rocketmq-qs-event-0-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-event.json",
+        "sha256": "abfcad4b23161c6a8f4a2ebc3d92d72bdb46b80f3f571013ecef22a2e44a816c",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302768/rocketmq-qs-answer-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-answer.json",
+        "sha256": "5ae83a836cbc48be441f7d3b5226036fd21cd7fa0c3ed1a44fe91760631e2690",
+        "passed": 16,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302411/rocketmq-public-sdk-1-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-public-sdk.json",
+        "sha256": "9183f81129b17107a662de756b6df4682752155d8025531bd400abfff2f6ba52",
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302411/rocketmq-public-sdk-0-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-public-sdk.json",
+        "sha256": "71a4460e8c6fbefadd8eefa68e7ba934d286a872d1b92f859284a95c0d085a0d",
+        "passed": 31,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302885/rocketmq-5.5.1-amd64-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-m1-evidence.json",
+        "sha256": "19e8a5457c7450b34fea68910359260bfc708b1ec18ffb96ef7c110281950bd5",
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302885/rocketmq-5.5.1-amd64-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-m2-transactions.json",
+        "sha256": "845dbcdf323010bad470db4aa381e11623ac2cd1297bcee9244c0efdb7ad0fdc",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302885/rocketmq-5.5.1-amd64-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-m2-go-sdk.json",
+        "sha256": "28f1a208250dd3477b4d6ff38801c1690980aac8b5707dce5c7ab496efd0f077",
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302885/rocketmq-m2-transactions-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-m2-transactions.json",
+        "sha256": "845dbcdf323010bad470db4aa381e11623ac2cd1297bcee9244c0efdb7ad0fdc",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302885/rocketmq-m2-go-sdk-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-m2-go-sdk.json",
+        "sha256": "28f1a208250dd3477b4d6ff38801c1690980aac8b5707dce5c7ab496efd0f077",
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302439/rocketmq-qs-task-0-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-task.json",
+        "sha256": "babb2a15eaa2af07e40da809a1d21990e1dcfbd009312c65c7ae557a12916bb8",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302439/rocketmq-qs-task-1-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-task.json",
+        "sha256": "c40b1b6b663b7810db0d8fb0bd5614ca9b13602a22ac2c6fd16d967a1d8bd65b",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302605/iam-native-root-0-03b8d5bc77be75d0aed03f238793352261fdc8b3/receipt.json",
+        "sha256": "863c06e03dce9e5ec65c2e21a5fe9ee162e6a6426d601ce328738fa93b074757",
+        "schema": "iam-native-receipt",
+        "failed": 0
+      },
+      {
+        "path": "39826302605/rocketmq-iam-host-1-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-iam-host.json",
+        "sha256": "06b85354690a87ae4c8eab02dd35bb19b83ace04477959dda492b7b5181774d4",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302605/rocketmq-iam-host-2-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-iam-host.json",
+        "sha256": "16e37cf7780088a4899786bde9aa91fe9ca4beda2250cb4ea17fdc7ff402d5ce",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302605/iam-native-root-1-03b8d5bc77be75d0aed03f238793352261fdc8b3/receipt.json",
+        "sha256": "c75311c3b8665258575edb06968f99519de4907a6383a2944a526a873e32353a",
+        "schema": "iam-native-receipt",
+        "failed": 0
+      },
+      {
+        "path": "39826302605/rocketmq-iam-host-0-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-iam-host.json",
+        "sha256": "3bb5060cc024fd28952addc304e15c95d68dd24ac0024395327789c279d8eca2",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302605/iam-native-root-2-03b8d5bc77be75d0aed03f238793352261fdc8b3/receipt.json",
+        "sha256": "3313e18d481d3bf7cc32944f4ce30215e52a5c2bb57a248deb2a31f49f831c03",
+        "schema": "iam-native-receipt",
+        "failed": 0
+      },
+      {
+        "path": "39826302833/rocketmq-qs-retry-2-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-retry.json",
+        "sha256": "ba2696908eef3b5eccdb75f741262a5c4df6dbc4d01edde2ac75a5f641ee7612",
+        "passed": 44,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302833/rocketmq-qs-retry-0-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-retry.json",
+        "sha256": "51005f42d150336a9a65cd9f344a2c4c777b0f70d88872518fab09cba27343ed",
+        "passed": 44,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302833/rocketmq-qs-retry-1-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-retry.json",
+        "sha256": "cebfea29eff3f7b91d7febdb099b4fe5e5ecc77ec2c9f457f8d63812fa3cc110",
+        "passed": 44,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826303007/rocketmq-packet-faults-1-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-packet-faults.json",
+        "sha256": "2ba803abea5ab6af8fa08363141499a05e0535440daec88f2faf40e27276ad7e",
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826303007/rocketmq-packet-faults-0-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-packet-faults.json",
+        "sha256": "104beacfa7517bf7de2c600e0a25ae9f4ab9c615865c9e42f8e38a90036cf2d1",
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302338/rocketmq-qs-evaluation-0-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-evaluation.json",
+        "sha256": "52e5788b66b48d079d258a1758ba03c8fefdb0f836f2aec46d224d32ef454639",
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302338/rocketmq-qs-evaluation-1-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-evaluation.json",
+        "sha256": "9dd90abcc20079431e2e5480604f0bf2786a90ec59dd8c8e917866741aa56c4f",
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302309/rocketmq-qs-retry-dispatch-0-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-retry-dispatch.json",
+        "sha256": "1d56193a5b9ced5c7dceb2469e3a670012b1ad0f357d391b0a2d3f02ae021062",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302309/rocketmq-qs-retry-dispatch-2-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-retry-dispatch.json",
+        "sha256": "5c60725ea6cead9aa7579a1534984de3fa18c52cdf3e48b311ccf11ff1fde91f",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302309/rocketmq-qs-retry-dispatch-1-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-retry-dispatch.json",
+        "sha256": "14337fe21109004eed973b0c704a2da777cfe8a96c7ea4db1b04cdad646d8a97",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302954/rocketmq-paired-full-1-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-paired.json",
+        "sha256": "b35e232880adf5fb2576e839bc4b5947c3b55e8511d149a6f9c705ba2fe42ed3",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302954/rocketmq-paired-full-5-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-paired.json",
+        "sha256": "62f219be39c281891949a69e0314c3972ccbdf484286192cab58f72bf3d9e439",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302954/rocketmq-paired-full-2-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-paired.json",
+        "sha256": "da44e8edf191693ab11e47de0e7190613533111c0a8fedbdd2a9b5c12e3330e5",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302954/rocketmq-paired-full-4-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-paired.json",
+        "sha256": "193adb7d790f1c7b96cd8fcdaea96ede9776f07d0c9d60833b97e9a9beb74096",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302954/rocketmq-paired-full-0-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-paired.json",
+        "sha256": "7c262832ff778878c1a31ff4eb1215fe9a9a6759da76bf0647812460a26757d9",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302954/rocketmq-paired-full-3-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-paired.json",
+        "sha256": "58a68b68f06459e2e04740abb63f35515b09f1363a18ae041ea18dbcb71955e8",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302337/rocketmq-ai-finalization-live-py311-mysql8036-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-finalization-live.json",
+        "sha256": "df44f72e242dbefc2f738fbe2d7bb335ca58c921afea1e3a74e79203e0ce62e9",
+        "passed": 32,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302337/rocketmq-ai-finalization-recovery-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-ai-finalization-recovery.json",
+        "sha256": "6522b39aef269473b530df0e730b26a920c6b7dc008bc0002ae8e0d1ea84b3e2",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302616/rocketmq-qs-command-1-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-command.json",
+        "sha256": "b36a94fafe9d264ed5a12879a94d285f40c35b129cbc8467ab6d8ffdf6c1c9b1",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302616/rocketmq-qs-command-2-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-command.json",
+        "sha256": "0b59fc02b0aa84d7d1101440f1988ff12b22562e28e2113311a428ad2dcfd13f",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "39826302616/rocketmq-qs-command-0-1.25.12-03b8d5bc77be75d0aed03f238793352261fdc8b3/rocketmq-qs-command.json",
+        "sha256": "b3de2a3474f622ff3ca89cd4ccffb0736762a29fa8c9dedf47b724ad44e2c9e1",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      }
+    ],
+    "resource": {
+      "run": 39826302254,
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0,
+      "sha256": "6d808608bb1a3bf8f23f20c3652fc9a699d142925e0b5e027892e9e76424e0bb"
+    },
+    "direct_native_cases": 130,
+    "authorization_denials": 84,
+    "type_denials": 10,
+    "credential_controls": 10,
+    "conflicts": 4,
+    "cleanup_verified": true,
+    "production_changed": false,
+    "proof_limits": [
+      "M1 legacy report has no structured cleanup field; parent fixture cleanup remains a separate assertion from M3 resource cleanup.",
+      "Historical pinned host regression sources do not validate T22 candidates.",
+      "Legacy M1 ci-smoke cleanup uses finally with required=True; its actual job and all steps completed successfully.",
+      "Packet-fault parent run briefly retained in_progress while both real jobs/all steps/reports and52 PR checks were successful; no rerun or inferred business acceptance."
+    ]
   }
 }
