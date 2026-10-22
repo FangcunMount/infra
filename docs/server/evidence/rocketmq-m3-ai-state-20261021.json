@@ -6,7 +6,7 @@
   "base": "6d74880283a55fbd22122636d427379c11c8e1f3",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-default-assembly",
   "branch": "codex/rocketmq-m3-default-assembly",
-  "source_candidate": "cb47e5a77d12335c836a53ff9b8a309a362a992f",
+  "source_candidate": "3d982c680bc6a0eea92c60222db23e692a4719fd",
   "source_pushed": true,
   "source_merged": false,
   "production_assembly_enabled": false,
@@ -206,32 +206,29 @@
     "scope": "Original MySQL roots and controlled client discard; not host packet fault, real provider or process-exit acceptance"
   },
   "full_local_gate": {
-    "full_unit_passed": 4194,
-    "full_unit_failed": 0,
-    "full_unit_skipped": 0,
-    "integration_interop_deselected": 1331,
+    "status": "replacement_unit_running",
+    "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+    "last_complete_source_sha": "cb47e5a77d12335c836a53ff9b8a309a362a992f",
+    "last_complete_unit_passed": 4194,
     "latest_mypy_sources": 446,
     "format_files": 1171,
     "markdown_files": 75,
     "local_links": 1388,
-    "infra_unit_passed": 91,
-    "broker_host_tests_collected_only": 53,
-    "broker_required_flags": 145,
-    "source_sha": "cb47e5a77d12335c836a53ff9b8a309a362a992f",
-    "unit_log": "/tmp/m3-default-assembled-final-unit.log",
-    "scope": "Default assembly whole-batch local gate; actual native dependencies still pending"
+    "infra_unit_passed": 92,
+    "broker_tests_collected_only": 55,
+    "broker_required_flags": 148
   },
   "actual_broker_gate": {
-    "status": "not_yet_run_for_default_assembly",
-    "required_tests": 53,
-    "required_flags": 145,
-    "prior_recovery_proof_not_rebound": true
+    "status": "replacement_pending",
+    "required_tests": 55,
+    "required_flags": 148,
+    "prior_proofs_not_rebound": true
   },
   "previous_t16_broker_proof_not_rebound": true,
   "remaining": [
-    "Complete fixed-candidate source CI and real MySQL tests with zero failures/skips",
-    "Complete six real Broker profiles using actual default DI/SDK/subscription/worker entrypoint; strict 53-test/145-flag receipt rejects prior 51/137",
-    "Review/merge source and infra; only then close T17 and advance formal progress"
+    "Complete exact replacement source CI and real MySQL roots with zero failures/skips",
+    "Complete six real Broker profiles with exact 55 tests/148 flags; prior 51/137 and 53/145 receipts rejected",
+    "Review and merge source/infra; only then complete T17 and advance task count"
   ],
   "source_pr": "https://github.com/FangcunMount/qs-ai/pull/212",
   "source_pr_draft": false,
@@ -433,7 +430,7 @@
     "docs_files": 75,
     "docs_links": 1321
   },
-  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39727969476",
+  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39728795742",
   "worker_preflight_native_cases": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
     "file": "tests/integration/test_transaction_worker_preflight.py",
@@ -11967,7 +11964,7 @@
     "source_candidate_branch": "codex/rocketmq-m3-ai-creation-plan",
     "branch": "codex/rocketmq-m3-ai-solution-sdk"
   },
-  "source_ci_status": "in_progress_not_accepted",
+  "source_ci_status": "pending_not_accepted",
   "superseded_main_push_ci_deduplication_186": {
     "at": "2026-10-21T18:26:01.637785+00:00",
     "run": 39650592198,
@@ -20961,10 +20958,10 @@
     },
     {
       "id": "default_assembly",
-      "status": "frozen_candidate_actual_gates_pending",
+      "status": "replacement_candidate_actual_gates_pending",
       "done": false,
       "acceptance": "All active writers use the transaction runtime in actual default composition; startup/close and original entrypoint end-to-end gates pass.",
-      "source_sha": "cb47e5a77d12335c836a53ff9b8a309a362a992f",
+      "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
       "source_pr": "https://github.com/FangcunMount/qs-ai/pull/212"
     }
   ],
@@ -24504,7 +24501,7 @@
     "auto_deploy_readback_verified": true
   },
   "default_assembly_local_followup": {
-    "status": "frozen_source_candidate_actual_gates_pending",
+    "status": "replacement_candidate_actual_gates_pending",
     "base_sha": "6d74880283a55fbd22122636d427379c11c8e1f3",
     "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-default-assembly",
     "branch": "codex/rocketmq-m3-default-assembly",
@@ -24518,11 +24515,11 @@
       "format_files": 1171,
       "native_serial_graph_and_worker_collected_only": 12,
       "full_unit_status": "passed",
-      "full_unit_passed": 4194,
-      "full_unit_failed": 0,
-      "full_unit_skipped": 0,
+      "full_unit_passed": null,
+      "full_unit_failed": null,
+      "full_unit_skipped": null,
       "integration_interop_deselected": 1331,
-      "unit_log": "/tmp/m3-default-assembled-final-unit.log",
+      "unit_log": "/tmp/m3-default-partial-shutdown-whole-unit.log",
       "latest_mypy_sources": 446,
       "operational_guard_targets_passed": 32,
       "operational_guard_new_unit_cases": 7,
@@ -24530,12 +24527,13 @@
       "markdown_files": 75,
       "local_links": 1388,
       "default_assembly_architecture_receipt_lifecycle_targets_passed": 54,
-      "source_full_unit_current_status": "passed_after_cycle_repair",
+      "source_full_unit_current_status": "running_after_partial_shutdown_repair",
       "native_ack_roots_collected_only": 5,
-      "broker_host_tests_collected_only": 53,
-      "broker_required_flags": 145,
-      "infra_unit_passed": 91,
-      "mypy_log": "/tmp/m3-default-assembled-final-types.log"
+      "broker_host_tests_collected_only": 55,
+      "broker_required_flags": 148,
+      "infra_unit_passed": 92,
+      "mypy_log": "/tmp/m3-default-partial-shutdown-types.log",
+      "partial_start_sdk_driver_targets_passed": 28
     },
     "scope": [
       "Paired serial graph prepares only through original dispatch, separately persists the first response, and calls generation/semantic transaction completion without legacy terminal fallback",
@@ -24548,19 +24546,21 @@
       "New archive ACK settlement uses exact committed evidence, append-only business receipts and explicit forward migration 0042; legacy fallback only when the new identity is absent",
       "Original history and ACK receipt commit/rollback together; same ACK identity is immutable and late HELD cannot undo STORED",
       "Checker starts before subscriptions and paused producers retain it; business claims require ready Sender/admission. Shutdown drains business/subscriptions before SDK Close and waits real work before host pool disposal",
-      "Pure host configuration readers extracted to break detected static dependency cycle; existing read entrypoints re-exported without changing file validation"
+      "Pure host configuration readers extracted to break detected static dependency cycle; existing read entrypoints re-exported without changing file validation",
+      "Partial-start subscription shutdown uses actual fixed SDK driver/executor regression; host timeout preserves real pending capacity while completed RPC errors are not retried indefinitely",
+      "Actual serial generation/semantic graph now uses the complete default factory, real SDK/Broker, original response root and terminal witness with a synthetic provider"
     ],
     "activation_guard_retained": false,
     "remaining": [
-      "Complete fixed-candidate source CI and real MySQL tests with zero failures/skips",
-      "Complete six real Broker profiles using actual default DI/SDK/subscription/worker entrypoint; strict 53-test/145-flag receipt rejects prior 51/137",
-      "Review/merge source and infra; only then close T17 and advance formal progress"
+      "Complete exact replacement source CI and real MySQL roots with zero failures/skips",
+      "Complete six real Broker profiles with exact 55 tests/148 flags; prior 51/137 and 53/145 receipts rejected",
+      "Review and merge source/infra; only then complete T17 and advance task count"
     ],
     "production_changed": false,
     "system_login_claimed": false,
     "last_complete_unit_base_sha": "4d8706e3fac6ab501fd4ce2758be1177108a3726",
-    "source_sha": "cb47e5a77d12335c836a53ff9b8a309a362a992f",
-    "source_code_sha": "5a191cbfd0a5ab254d952aae508f856f2ba8683a",
+    "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+    "source_code_sha": "323b53a1daf00c8ef732501645098a34b25b47fd",
     "production_default_config_unchanged": true,
     "failure_history": [
       {
@@ -24577,6 +24577,33 @@
         "failed": 1,
         "log": "/tmp/m3-default-infra-tools.log",
         "repair": "Keep exact new three-route count; complete 91-tool suite passed"
+      },
+      {
+        "kind": "actual_sdk_partial_subscriber_start_close",
+        "reproduced": true,
+        "real_pending_driver_calls_retained": 1,
+        "owner_close_calls_before_fix": 0,
+        "no_network_or_database_fault_claimed": true,
+        "repair": "Use finite host Stop budgets, distinguish actual RPC TimeoutError from host deadline, retain real driver capacity until completion and close owner/resources before propagating completed shutdown failures",
+        "target_passed": 28,
+        "target_log": "/tmp/m3-default-partial-start-driver-target-final.log"
+      },
+      {
+        "kind": "intermediate_historical_fixture_prefix",
+        "passed": 78,
+        "failed": 13,
+        "log": "/tmp/m3-default-infra-tools-expanded.log",
+        "repair": "Exclude both declared default assembly and serial flags from historical fixtures; retain historical exact counts, complete 92 tool cases passed"
+      }
+    ],
+    "candidate_history": [
+      {
+        "source_sha": "cb47e5a77d12335c836a53ff9b8a309a362a992f",
+        "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39727969476",
+        "local_full_unit_passed": 4194,
+        "source_ci_outcome": "cancel_requested_superseded_before_complete",
+        "replacement_reason": "Reproduced real SDK partial-subscriber-start Close(0) failure; fix cleanup and add paired serial graph Broker acceptance",
+        "not_rebound_as_final_proof": true
       }
     ]
   },

@@ -6,7 +6,7 @@ on:
         description: Exact AI original state root candidate SHA
         type: string
         required: true
-        default: cb47e5a77d12335c836a53ff9b8a309a362a992f
+        default: 3d982c680bc6a0eea92c60222db23e692a4719fd
   pull_request:
     paths: ['scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ai_state_acceptance.py', 'scripts/rocketmq/test_ai_state_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-state.yml', 'Makefile']
 permissions:
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || 'cb47e5a77d12335c836a53ff9b8a309a362a992f' }}
+          ref: ${{ inputs.ai_ref || '3d982c680bc6a0eea92c60222db23e692a4719fd' }}
           path: .ai-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -45,7 +45,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Verify exact AI state candidate and receipt gates
         env:
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || 'cb47e5a77d12335c836a53ff9b8a309a362a992f' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '3d982c680bc6a0eea92c60222db23e692a4719fd' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]

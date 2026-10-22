@@ -175,10 +175,15 @@ DEFAULT_CASES = frozenset((
     'default_assembly_exact_archive_witness',
     'default_assembly_authenticated_business_ack',
     'default_assembly_close_preserves_pool',
+    'default_serial_actual_factory_generation',
+    'default_serial_actual_factory_semantic',
+    'default_serial_first_response_original_witness_no_legacy',
 ))
 DEFAULT_TESTS = frozenset((
     'test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]',
     'test_actual_default_transport_and_worker_share_sender_root_and_shutdown[True]',
+    'test_actual_default_serial_factory_commits_dispatch_response_and_terminal[generation]',
+    'test_actual_default_serial_factory_commits_dispatch_response_and_terminal[semantic]',
 ))
 CASES = CASES | DEFAULT_CASES
 TESTS = TESTS | DEFAULT_TESTS
