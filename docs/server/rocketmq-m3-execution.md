@@ -62,7 +62,7 @@
 | --- | --- | --- | --- |
 | ✅ | T18-A | 实际MySQL验证MQ失败、Aborted与租约接管，冻结当前协议身份和完整验收manifest | CI39738320198真实MySQL两项表征通过，0失败/跳过，9类表清理为零；同租约终态未恢复、换租约幂等冲突均已复现且模型未重调。[恢复规则/manifest](rocketmq-m3-t18-finalization.md)按本次范围修订为单一最终宿主协议，不做v1/v2在线兼容；表征证据不变，infra PR144待合并 |
 | ✅ | T18-B | 补齐宿主终态恢复接线，保留权限/取消/CAS/业务重试授权及原配额 | 2026-10-22：AI432fe19/infra c9a4510，CI39749586153实际MySQL20通过/0失败/0跳过，9类表清理为零；源码/锁/工具/测试摘要独立核对。87定向、447源类型通过；尚未合并，不计HTTP/进程/Broker故障 |
-| ☐ | T18-C | 回环HTTP假provider、进程外持久计数、独立worker、真实MySQL/RocketMQ与代理 | 进行中：753317f独立HTTP/worker/SDK网络代理候选，4项真实HTTP/计数器单元通过；2原生/12证据仅收集，真实Broker待验 |
+| ☐ | T18-C | 回环HTTP假provider、进程外持久计数、独立worker、真实MySQL/RocketMQ与代理 | 进行中：首轮753317f在测试JWK导出失败（未启动worker），资源已清理；修正2b65140的5项本地契约通过，定向Broker39754954807复验中 |
 | ☐ | T18-D | 五路径×正常/响应后MQ故障/终态确认丢失/响应后SIGKILL的20核心情景及交叉约束 | 待开始 |
 | ☐ | T18-E | 固定候选，完整CI及六档Broker验收、报告核验、合并后关闭T18 | 待开始 |
 
@@ -876,3 +876,10 @@ CI39749586153绑定AI432fe19121c9a6ebd3e80c1f21f51db6eb36d3c5及infra c9a45101f6
 AI功能2384217、文档绑定753317f168c1da38b198458f1ad1e4886eebb86a：独立HTTP provider以SQLite追加每次实际POST，不去重；测试关联header只作计数，正文/凭据不入ledger。4项真实回环HTTP/调用进程SIGKILL/计数持久性/原DeepSeek适配器验证通过。新增独立业务worker正常及response_committed后SIGKILL/新实例恢复两项Broker原生用例，仅完成收集，不计通过。复用固定SDK已有TLS RPC proxy，不另写网络故障代理；12项严格证据与原生集合绑定，infra工具104项通过。
 
 真实C验证继续使用隔离Compose项目、单档Python3.11/MySQL8.0.36、Broker5.5.1及固定0.4.0a2 SDK。CLI拥有native pytest整个进程组，异常/超时终止其worker/provider/proxy；正常测试也逐项停止所属进程并删除私有输入/密钥/日志目录。C不勾选，内部2/5、M3为17/36、M4为0/8，生产无操作。五路径/20情景及真实网络/数据库提交丢回复仍属D，不由两项C用例替代。
+
+
+### 2026-10-22：T18-C首轮失败与JWK修正
+
+首轮39753087409的MySQL20项通过，独立Broker两项在测试私有输入导出阶段失败，未启动业务worker。现有fixture实际使用EC JWK，探针误调用PEM对象的private_bytes；本地新增契约测试精确复现同一AttributeError后，ae5b36f改为JWK导出/导入并保留kid，只向worker提供收件方公钥。2b651402b8f97d4c18f99190772332f864fef09c的5项本地HTTP/进程/密钥契约通过，75文档/1389链接通过。旧报告、摘要与失败保留，临时容器、进程组和私有目录完整清理。
+
+实际验证了按完整source SHA参数化触发定向workflow：39754954807仅执行live开发门禁，不重复非相关矩阵；未选择的MySQL作业不计本次通过，最终冻结候选仍必须跑完整门禁。C未勾选，内部2/5，M3仍17/36，M4为0/8。

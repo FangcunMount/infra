@@ -70,6 +70,29 @@
       "report": "/tmp/m3-t18-characterization-first",
       "evidence": "historical0039 migration creates separate temporary schemas; plain app account lacks permission",
       "repair": "isolated administrator installs same loopback schema; original app account still runs actual tests"
+    },
+    {
+      "run": 39753087409,
+      "infra_source": "ea723a9cc52249d5dbe6c7b557f7995dd055c7da",
+      "source": "753317f168c1da38b198458f1ad1e4886eebb86a",
+      "profile": "independent_worker_broker",
+      "status": "two_native_failures_before_worker_start",
+      "cause": "Original fixture uses EC JWK; probe incorrectly called cryptography private_bytes. Local contract test reproduced AttributeError at the same export line.",
+      "native_exit_code": 1,
+      "native_failed": 2,
+      "assertion_lines": [
+        87,
+        229
+      ],
+      "report_sha256": "9887618f1ff6823c006e1d79a1410936866279170b8011b1aaa4e9d48e218a77",
+      "private_output_sha256": "9b73513967b00e5f4bc6ea54229825610ec6e1bf89fdf18a64bcc7d4f5a4a648",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "repair": "ae5b36f JWK private signing/public recipient export; fixed source2b65140, 5 local contract tests passed; native rerun pending"
     }
   ],
   "characterization_candidate": "0b7f838578c6191ac02748254a718a33113618f2",
@@ -261,15 +284,17 @@
     }
   },
   "independent_process_candidate": {
-    "source_sha": "753317f168c1da38b198458f1ad1e4886eebb86a",
-    "status": "native_pending",
-    "counter_unit_passed": 4,
+    "source_sha": "2b651402b8f97d4c18f99190772332f864fef09c",
+    "status": "native_rerun_in_progress",
+    "counter_unit_passed": 5,
     "broker_native_collected_only": 2,
     "required_case_count": 12,
     "infra_tool_unit_passed": 104,
     "new_proxy_implementation": false,
     "proxy_source": "fixed SDK transport/rocketmq/internal/faultproxy",
     "includes_current_protocol_sigkill_case": true,
-    "actual_sigkill_acceptance_passed": false
+    "actual_sigkill_acceptance_passed": false,
+    "run": 39754954807,
+    "workflow_profile": "live_only_development_gate_not_final_full_CI"
   }
 }
