@@ -111,7 +111,7 @@ def acceptance_profile(kind):
                     partial=lambda output: read_host_receipt(output, marker='M3_AI_STATE_RECEIPT', cases=STATE_CASES, sdk_version='0.4.0a2'),
                     parse=lambda output, junit: parse_host_receipt(output, junit, marker='M3_AI_STATE_RECEIPT', cases=STATE_CASES, tests=STATE_TESTS, sdk_version='0.4.0a2'),
                     tests=STATE_TESTS,
-                    scope='actual Python worker/preflight, governance/review/correction/Solution and unknown-resolution handlers plus serial dispatch, claim and durable generation/semantic terminal senders, published SDK, original state roots and real Broker; event observer only')
+                    scope='actual Python worker/preflight, governance/review/correction/Solution and unknown-resolution handlers plus serial/candidate dispatch, claim and durable generation/semantic terminal senders, published SDK, original state roots and real Broker; event observer only')
     raise RuntimeError('explicit known AI acceptance profile required')
 
 

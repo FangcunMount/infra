@@ -50,7 +50,18 @@ CASES = frozenset(('constructor_inert', 'halves_before_worker_root', 'half_invis
     'semantic_completion_first_response_candidate_wire_and_witness',
     'semantic_completion_final_unknown_keeps_commit', 'semantic_completion_duplicate_first_result_no_model',
     'semantic_completion_cancel_old_abort_and_new_plan', 'semantic_completion_cancel_new_half_invisible',
-    'semantic_completion_cancel_same_response_candidate'))
+    'semantic_completion_cancel_same_response_candidate',
+    'candidate_dispatch_half_invisible_generation_success',
+    'candidate_dispatch_half_invisible_generation_unknown',
+    'candidate_dispatch_half_invisible_semantic_success',
+    'candidate_dispatch_half_invisible_semantic_unknown',
+    'candidate_completion_half_invisible_generation_success',
+    'candidate_completion_half_invisible_generation_unknown',
+    'candidate_completion_half_invisible_semantic_success',
+    'candidate_completion_half_invisible_semantic_unknown',
+    'candidate_final_unknown_preserves_dispatch_and_terminal_commit',
+    'candidate_duplicate_never_reinvokes_provider_or_reseals',
+    'candidate_original_roots_first_response_archive_and_witness'))
 TESTS = frozenset((
     'test_actual_worker_preflight_half_gate_and_duplicate_preserve_original_evidence',
     'test_actual_worker_preflight_lost_final_reply_preserves_local_commit',
@@ -85,7 +96,11 @@ TESTS = frozenset((
     'test_actual_serial_terminal_cancel_requires_explicit_old_abort_replan',
     'test_actual_serial_semantic_terminal_half_gate_and_first_response[success]',
     'test_actual_serial_semantic_terminal_half_gate_and_first_response[unknown]',
-    'test_actual_serial_semantic_cancel_requires_explicit_old_abort_replan'))
+    'test_actual_serial_semantic_cancel_requires_explicit_old_abort_replan',
+    'test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-success]',
+    'test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-unknown]',
+    'test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-success]',
+    'test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-unknown]'))
 
 
 def state_manifest():

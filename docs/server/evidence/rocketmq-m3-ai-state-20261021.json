@@ -9920,7 +9920,7 @@
     "final_status": "completed",
     "final_conclusion": "cancelled"
   },
-  "latest_verified_main": "e0ad323873e1e1ab3a64ece7968245c3c8fa241b",
+  "latest_verified_main": "13f50c310f71ea74575180f003bb0bdc5e47df33",
   "interpretation_finish_root": {
     "status": "required_source_ci_and_native_reports_verified_merged",
     "branch": "codex/rocketmq-m3-ai-interpretation-finish-root",
@@ -20741,13 +20741,13 @@
     }
   ],
   "candidate_response_reference": {
-    "status": "consolidated_foundation_required_ci_running",
+    "status": "merged_complete_required_ci_verified",
     "source_sha": "257c20f6cffca051cba620157e1cdc0276d4ef82",
     "code_sha": "d639f849fa13eae7d39adbef5d4164720daf15dc",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/209",
     "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39693905447",
     "source_pushed": true,
-    "merged": false,
+    "merged": true,
     "local": {
       "baseline": 57,
       "new_cases": 19,
@@ -20761,7 +20761,238 @@
       "native_collected_only": 3
     },
     "scope": "Read original scoped candidate response through immutable dispatch ledger. Renewed lease and released claim cannot change original first reference; original receipt codec and readers retained. Durable response, including valid renewals past original lease, never grants live ownership/model/commit/retry authority.",
-    "remaining": "Native acceptance, candidate generation/prepare/dispatch/Sender, recovery/drain, default assembly and T18 actual faults"
+    "remaining": "Complete candidate runtime dependency gates, recovery/drain, default assembly and T18 actual faults",
+    "merge_sha": "13f50c310f71ea74575180f003bb0bdc5e47df33",
+    "head_checks_success": 12,
+    "source_native_verification": {
+      "source_sha": "257c20f6cffca051cba620157e1cdc0276d4ef82",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39693905447",
+      "tested_merge_sha": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+      "verified_merge_parents": [
+        "657302d3860f856b943afaecf2d6da4ef459fd66",
+        "257c20f6cffca051cba620157e1cdc0276d4ef82"
+      ],
+      "reports": [
+        {
+          "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+          "sha256": "58df77eff43f91be2b2de1b11e948f2a76f8ca2de21abf4fe2b9874d790173a9",
+          "xml_sha256": "2336e67e9c8ecfeab63c4b3d117501ddadd9da6d601bf658be65d88f663416c8",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.0.36",
+          "index": 0,
+          "passed": 1253,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+          "sha256": "c4eb2ba8bc8ae9feb81cf4a056675170d3a4dc74e23451575536100e9cd6db80",
+          "xml_sha256": "f66637f35f777a5bc760caea379999c587a15eaac50383db48d5290f7cfa244b",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.0.36",
+          "index": 1,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+          "sha256": "f006ee6fa9f0c260978a76e20b5bc5ef5c4dc6df2ce462a9f757813645224081",
+          "xml_sha256": "b4e3c4ec96be8fffa4f1399df46b8d4a81d2422b3f4626ced82c288fb70e1b2c",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.0.36",
+          "index": 2,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+          "sha256": "22620470e0ba0c6bfec74f0036776da41f23db26f9109d812547934cedd0310b",
+          "xml_sha256": "a8014052ec2343e4db88d2bf26a43442818af54bb56699b7cde02af953bb0d06",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.0.36",
+          "index": 3,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-0/shard-8.4-0.json",
+          "sha256": "e40c3363ba4200386a539e7b0689801e7a380a0f320b6e660e4f31b8beee59ba",
+          "xml_sha256": "909e4250b4c7847e8027670930139824c244598ed4ca39bf212630bca7697927",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.4",
+          "index": 0,
+          "passed": 1253,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-1/shard-8.4-1.json",
+          "sha256": "49971558cf921bc52f5c3b3879f8ece13fd89e6e21c78c64600145b98203ea78",
+          "xml_sha256": "4d24e30692e857901f0d96a3c8da0d3bd32ead2bcbd0c947b67bbb8b127117c1",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.4",
+          "index": 1,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-2/shard-8.4-2.json",
+          "sha256": "e644694701b55861d8135df1c8690ddeeab2e465ed368792c34a42f9ffa12e3d",
+          "xml_sha256": "c8ee4a192c0d4e6ede8f38b33193794b3a9b5eba4bfd72a31b81a34777fdd746",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.4",
+          "index": 2,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-3/shard-8.4-3.json",
+          "sha256": "c7816d7f72f4b4af63b3b15b4a81691617ce80105a8250f611d446ad537cf1b7",
+          "xml_sha256": "ec9606e3ee1eebda3542f4d5b6345ec8a3248e678682cf31dfa0eddffba23b87",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.4",
+          "index": 3,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "profiles": {
+        "8.0.36": {
+          "collected": 5009,
+          "passed": 5009,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 8,
+            "test_interpretation_claim_source": 4,
+            "test_transaction_interpretation_finish": 17,
+            "test_evaluation_finish_root": 10,
+            "test_evaluation_serial_response_receipts": 9,
+            "test_interpretation_state_versions": 4,
+            "test_interpretation_claim_root": 8,
+            "test_transaction_interpretation_claim": 18,
+            "test_interpretation_claim_deferral": 9,
+            "test_transaction_interpretation_claim_retry": 5,
+            "test_transactional_interpretation_execution": 6,
+            "test_transaction_interpretation_finish_retry": 7,
+            "test_transaction_evaluation_source_version": 5,
+            "test_generation_completion_source": 5,
+            "test_transaction_serial_generation": 13,
+            "test_semantic_readonly_source": 4,
+            "test_transaction_serial_semantic": 13,
+            "test_candidate_completion_source": 4,
+            "test_candidate_record_projection": 4,
+            "test_candidate_semantic_records": 8,
+            "test_candidate_response_reference": 3
+          }
+        },
+        "8.4": {
+          "collected": 5009,
+          "passed": 5009,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 8,
+            "test_interpretation_claim_source": 4,
+            "test_transaction_interpretation_finish": 17,
+            "test_evaluation_finish_root": 10,
+            "test_evaluation_serial_response_receipts": 9,
+            "test_interpretation_state_versions": 4,
+            "test_interpretation_claim_root": 8,
+            "test_transaction_interpretation_claim": 18,
+            "test_interpretation_claim_deferral": 9,
+            "test_transaction_interpretation_claim_retry": 5,
+            "test_transactional_interpretation_execution": 6,
+            "test_transaction_interpretation_finish_retry": 7,
+            "test_transaction_evaluation_source_version": 5,
+            "test_generation_completion_source": 5,
+            "test_transaction_serial_generation": 13,
+            "test_semantic_readonly_source": 4,
+            "test_transaction_serial_semantic": 13,
+            "test_candidate_completion_source": 4,
+            "test_candidate_record_projection": 4,
+            "test_candidate_semantic_records": 8,
+            "test_candidate_response_reference": 3
+          }
+        }
+      }
+    },
+    "merge_tree_equal_to_source": true,
+    "production_changed": false
   },
   "candidate_pr_consolidation": {
     "final_pr": 209,
@@ -21060,7 +21291,9 @@
         }
       }
     },
-    "execution_adjustment": "One final candidate foundation PR209 replaces PR205-208; commits/branches/evidence retained. Next changes are grouped by runnable candidate runtime, recovery/drain, default assembly gates; targeted checks during implementation and one full gate per frozen delivery candidate."
+    "execution_adjustment": "One final candidate foundation PR209 replaces PR205-208; commits/branches/evidence retained. Next changes are grouped by runnable candidate runtime, recovery/drain, default assembly gates; targeted checks during implementation and one full gate per frozen delivery candidate.",
+    "status": "final_pr209_merged_complete_ci_verified",
+    "merge_sha": "13f50c310f71ea74575180f003bb0bdc5e47df33"
   },
   "t17_delivery_gates": [
     {
@@ -21081,5 +21314,31 @@
       "done": false,
       "acceptance": "All active writers use the transaction runtime in actual default composition; startup/close and original entrypoint end-to-end gates pass."
     }
-  ]
+  ],
+  "candidate_complete_runtime": {
+    "status": "source_pr_open_real_dependencies_pending",
+    "source_sha": "b93b68ca33a1758a66a0d7d635dbc8b33bb3da33",
+    "code_sha": "e69efd593a3fe2d089b736bd612380f4712e87bf",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/210",
+    "source_pushed": true,
+    "merged": false,
+    "local": {
+      "unit_passed": 3862,
+      "integration_interop_deselected": 1273,
+      "mypy_sources": 430,
+      "ruff_formatted_files": 1120,
+      "docs_markdown": 75,
+      "docs_local_links": 1385,
+      "native_collected_only": 27,
+      "broker_host_collected_only": 38,
+      "broker_required_flags": 95,
+      "collector_matches_harness_exactly": true,
+      "full_unit_run_before_native_only_replan_cases_added": true
+    },
+    "scope": "Explicit candidate prepare/dispatch and generation/semantic completion through the actual host graph; same candidate selection/capacity/guarded original roots, first response/candidate, archive/witness; no provider retry or default production assembly. Broker profile uses actual fixed published SDK and real isolated Broker with a controlled provider and event observer. Real dependency gates are pending.",
+    "production_changed": false,
+    "stable_sdk_released": false,
+    "t17_done": false,
+    "remaining": "Required source and Broker profiles, recovery/drain and default runtime assembly"
+  }
 }

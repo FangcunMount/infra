@@ -663,3 +663,13 @@ PR205–208已收拢到[PR209](https://github.com/FangcunMount/qs-ai/pull/209)�
 | 默认运行装配 | ☐ 待完整装配/验收 | 全部活动写者实际接入事务runtime，启动/关闭与原入口端到端通过 |
 
 已合并的interpretation领取/完成及串行generation/semantic事务子批次保持通过。当前实现分支统一为codex/rocketmq-m3-candidate-runtime，下一次功能提交围绕完整candidate运行链路，不再为单个辅助抽取建立独立PR。M3保持16/36、T17未勾选；生产、稳定SDK、system及48小时观察未操作。
+
+
+### 2026-10-22 T17 合并后的完整 candidate 运行链路批次
+
+PR209/257c20f完整12项检查通过，八份分片/JUnit的集合、无重叠和合并父SHA已核验：MySQL8.0.36/8.4各5009通过、零失败/跳过，包含4原归属、4记录投影、8虚拟semantic记录、3首响应引用原生用例。正常合并13f50c3，完整tree与已验源码一致，AUTO_DEPLOY_ENABLED=false。该合并闭环基础批次，不代表完整candidate运行链路验收。
+
+统一分支codex/rocketmq-m3-candidate-runtime正在实现原prepare/dispatch、generation/semantic终态Sender及实际工作流配对接入。原候选规划、冲突保护、容量和根事务规则保留；补充实际宿主MySQL根与发布SDK/Broker验收。按完整批次冻结后统一验证，不再为辅助抽取分别建PR。三个T17验收门禁均未提前勾选，总进度16/36；恢复扫描/drain、默认装配与生产仍待完成。
+
+
+本批候选已固定为AI PR210/b93b68c（功能e69efd5）：本地3862单元、430源类型、1120文件格式及75文档/1385链接通过。新增27个真实MySQL原根用例、四个发布SDK/Broker宿主用例只完成收集；38项宿主与95项证据的collector严格一致。infra工具同时拒绝旧34/84报告冒充新candidate验收。源码与六档Broker实际依赖门禁待运行/核验，不提前计通过；M3仍16/36。
