@@ -9,7 +9,8 @@ import secrets
 
 import grpc
 
-from rocketmq.grpc_protocol import Code, QueryRouteRequest, TransactionResolution
+from rocketmq.grpc_protocol import (Code, QueryRouteRequest, TransactionResolution,
+    ReceiveMessageRequest, MessagingServiceStub, FilterType)
 from rocketmq.v5.client import ClientConfiguration, Credentials
 from rocketmq.v5.consumer import SimpleConsumer
 from rocketmq.v5.exception import ClientException
@@ -65,6 +66,7 @@ def check_route(client, topic):
     MessagingResultChecker.check(response.status)
     if response.status.code != Code.OK or not response.message_queues:
         raise RuntimeError('authoritative Broker route absent')
+    return response.message_queues[0]
 
 
 def close(client):
@@ -114,6 +116,50 @@ def run(config, cases, progress, *, tls_only=False):
     manifest = config['manifest']
     routes = {r['id']:r for r in manifest['routes']}
     topics = {r['physical_topic']:r for r in routes.values()}
+    # Learn each queue using a principal already granted Get on that Topic.
+    # Negative operations then address the known queue/Proxy directly: denying
+    # QueryRoute alone is insufficient to prove Pub or Sub authorization.
+    queues = {}
+    for physical, route in topics.items():
+        progress['phase'] = 'queue_lookup:'+route['id']
+        role = next(role for role, permissions in config['permissions'].items()
+            if 'Get' in permissions.get('Topic:'+physical,[]))
+        account = config['accounts'][role]
+        lookup = BrokerTypeProbe(ClientConfiguration(config['endpoint'], Credentials(
+            account['username'],account['password']),request_timeout=5),tls_enable=True)
+        try:
+            queues[physical] = check_route(lookup,physical)
+        finally:
+            close(lookup)
+    def reject_publish(producer, physical, kind):
+        message = Message()
+        message.topic, message.body = physical, b'isolated-m3-direct-denial'
+        producer._Producer__wrap_sending_message(message,kind=='TRANSACTION')
+        request = producer._Producer__send_req(message)
+        with grpc.secure_channel(config['endpoint'],grpc.ssl_channel_credentials(
+                root_certificates=Path(config['ca']).read_bytes())) as channel:
+            response = MessagingServiceStub(channel).SendMessage(request,metadata=producer.sign(),timeout=5)
+            MessagingResultChecker.check(response.status)
+        raise RuntimeError('Broker accepted a forbidden direct Pub RPC')
+    def reject_receive(consumer, physical, group):
+        request = ReceiveMessageRequest()
+        request.group.name = group
+        request.group.resource_namespace = consumer.client_configuration.namespace
+        request.message_queue.CopyFrom(queues[physical])
+        request.batch_size = 1
+        request.invisible_duration.seconds = 15
+        request.long_polling_timeout.seconds = 1
+        request.filter_expression.type = FilterType.TAG
+        request.filter_expression.expression = '*'
+        with grpc.secure_channel(config['endpoint'],grpc.ssl_channel_credentials(
+                root_certificates=Path(config['ca']).read_bytes())) as channel:
+            responses = MessagingServiceStub(channel).ReceiveMessage(request,metadata=consumer.sign(),timeout=5)
+            for response in responses:
+                if response.HasField('status'):
+                    MessagingResultChecker.check(response.status)
+                elif response.HasField('message'):
+                    raise RuntimeError('Broker delivered to a forbidden direct Sub RPC')
+        raise RuntimeError('Broker accepted a forbidden direct Sub RPC')
     for role, grants in manifest['accounts'].items():
         progress['phase'] = 'producer_bootstrap:'+role
         account = config['accounts'][role]
@@ -172,7 +218,7 @@ def run(config, cases, progress, *, tls_only=False):
                     code = check_denied(lambda:send(wrong), {Code.MESSAGE_PROPERTY_CONFLICT_WITH_TYPE})
                     cases[role + '/type/' + route['id']] = code
                 else:
-                    cases[identity] = check_denied(send, {Code.UNAUTHORIZED})
+                    cases[identity] = check_denied(lambda:reject_publish(producer,physical,route['message_type']), {Code.UNAUTHORIZED})
         finally:
             close(producer)
             close(control)
@@ -199,7 +245,7 @@ def run(config, cases, progress, *, tls_only=False):
                     receive()
                     cases[identity] = 'allowed'
                 else:
-                    cases[identity] = check_denied(receive, {Code.UNAUTHORIZED})
+                    cases[identity] = check_denied(lambda:reject_receive(consumer,physical,group), {Code.UNAUTHORIZED})
             finally:
                 close(consumer)
         control = BrokerTypeProbe(client_config, tls_enable=True)
@@ -236,7 +282,8 @@ def main():
         diagnostic=dict(phase=progress['phase'],kind=kind if kind in DIAGNOSTIC_KINDS else 'other',
             status=status if type(status) is int and status in DIAGNOSTIC_STATUSES else None)
     print(MARKER + json.dumps(dict(client='5.1.2',passed=len(cases),failed=failed,
-        skipped=0,cases=cases,scope='isolated_transport_acl_and_broker_type_only',diagnostic=diagnostic)),flush=True)
+        skipped=0,cases=cases,scope='isolated_transport_acl_and_broker_type_only',
+        denial_path='direct_signed_send_receive_rpc',diagnostic=diagnostic)),flush=True)
     return failed
 
 

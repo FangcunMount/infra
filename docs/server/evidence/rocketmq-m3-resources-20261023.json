@@ -228,5 +228,25 @@
       "private_fixture_directory_removed": true
     },
     "finding": "5.5.1 ResponseBuilder maps AuthenticationException and AuthorizationException to UNAUTHORIZED40100. The first denied foreign-topic query was correctly rejected; old expected40300 was wrong. No full gate passed."
-  }
+  },
+  "bootstrap_verified": [
+    {
+      "run": 39821912675,
+      "source": "c17e261f8df9c3620c06f717ff81a5416496f39b",
+      "native_passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "full_gate": false,
+      "cleanup_verified": true
+    },
+    {
+      "run": 39822780825,
+      "source": "ae3200db4eb86f6a464a07f7828049d925e73547",
+      "native_passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "full_gate": false,
+      "cleanup_verified": true
+    }
+  ]
 }

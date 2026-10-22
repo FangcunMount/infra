@@ -66,7 +66,7 @@ def parse_receipt(output, document, *, partial=False):
     value = json.loads(receipts[0])
     expected = expected_cases(document)
     diagnostic = value.get('diagnostic')
-    phases = {'native_started'} | expected.keys() | {
+    phases = {'native_started'} | expected.keys() | {'queue_lookup:'+r['id'] for r in document['routes']} | {
         'producer_bootstrap:'+role+suffix for role in document['accounts']
         for suffix in ('','/route','/startup','/settings')}
     valid_diagnostic = (diagnostic is None if value.get('failed') == 0 else
@@ -75,7 +75,8 @@ def parse_receipt(output, document, *, partial=False):
         and isinstance(diagnostic['kind'],str) and diagnostic['kind'] in DIAGNOSTIC_KINDS
         and (diagnostic['status'] is None or type(diagnostic['status']) is int
              and diagnostic['status'] in DIAGNOSTIC_STATUSES))
-    if (set(value) != {'client','passed','failed','skipped','cases','scope','diagnostic'}
+    if (set(value) != {'client','passed','failed','skipped','cases','scope','diagnostic','denial_path'}
+        or value.get('denial_path') != 'direct_signed_send_receive_rpc'
         or value['client'] != '5.1.2' or type(value['passed']) is not int
         or not isinstance(value['cases'],dict) or type(value['failed']) is not int
         or value['failed'] not in (0,1) or type(value['skipped']) is not int or value['skipped'] != 0

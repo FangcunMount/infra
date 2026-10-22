@@ -45,3 +45,5 @@ T21 在回环隔离 Broker 必须验证相同模板的可信 CA/SAN 正例、错
 开发调试可以显式选择workflow_dispatch的bootstrap档，只安装首个IAM角色的两个Topic/一个Group，执行12个原生结果，不跑完整冲突矩阵，报告固定full_gate=false。PR与默认dispatch始终为full档，必须130个结果及4类冲突；bootstrap报告不能用于T21勾选或合并门禁。开发阶段暂时关闭PR154，仅手动运行定向原生workflow；冻结后重新打开同一PR并执行全部必需矩阵，不删除已有失败。
 
 固定5.5.1的ResponseBuilder将认证和授权异常统一映射为40100（UNAUTHORIZED）。越权测试只接受该确切状态；每个角色在拒绝批次前后以同一凭据读取其获准Topic，两个成功对照都必须存在，避免错误凭据伪装为权限拒绝。类型错误仍要求40014。当前矩阵从120增加10个对照为130；保留旧失败和开发档来源，不修改任务总数。
+
+最终权限拒绝必须直接签名调用SendMessage/ReceiveMessage：先由原本具有Get的角色读取权威队列地址，随后用被测账号直接访问该队列，不依赖其QueryRoute结果。receipt固定denial_path=direct_signed_send_receive_rpc；旧仅路由查询拒绝报告不能替代完整Pub/Sub门禁。此前运行仍保留，不回填新字段或冒充新范围。

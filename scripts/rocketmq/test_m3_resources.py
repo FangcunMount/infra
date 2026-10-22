@@ -38,7 +38,7 @@ class M3ResourceTests(unittest.TestCase):
         cases=expected_cases(doc)
         self.assertEqual(len(cases),12)
         receipt=dict(client='5.1.2',passed=12,failed=0,skipped=0,cases=cases,
-            scope='isolated_transport_acl_and_broker_type_only',diagnostic=None)
+            scope='isolated_transport_acl_and_broker_type_only',denial_path='direct_signed_send_receive_rpc',diagnostic=None)
         raw='M3_RESOURCE_RECEIPT '+json.dumps(receipt)
         self.assertEqual(parse_receipt(raw,doc),receipt)
         with self.assertRaises(RuntimeError):parse_receipt(raw,self.document)
@@ -68,10 +68,10 @@ class M3ResourceTests(unittest.TestCase):
         self.assertEqual(sum(value==40100 for value in expected.values()),84)
         self.assertEqual(sum(value==40014 for value in expected.values()),10)
         receipt = dict(client='5.1.2',passed=130,failed=0,skipped=0,cases=expected,
-            scope='isolated_transport_acl_and_broker_type_only',diagnostic=None)
+            scope='isolated_transport_acl_and_broker_type_only',denial_path='direct_signed_send_receive_rpc',diagnostic=None)
         output = lambda v:'M3_RESOURCE_RECEIPT '+json.dumps(v)
         self.assertEqual(parse_receipt(output(receipt),self.document),receipt)
-        for field,value in [('skipped',1),('failed',1),('client','5.1.1'),('passed',True),('wire','private')]:
+        for field,value in [('skipped',1),('failed',1),('client','5.1.1'),('passed',True),('wire','private'),('denial_path','query_route_only')]:
             bad=copy.deepcopy(receipt);bad[field]=value
             with self.subTest(field=field),self.assertRaises(RuntimeError):parse_receipt(output(bad),self.document)
         for key in ('tls/wrong_ca',next(k for k,v in expected.items() if v==40100)):
