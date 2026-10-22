@@ -115,6 +115,9 @@ def acceptance_profile(kind):
     if kind == 'finalization':
         from ai_finalization_acceptance import profile
         return profile()
+    if kind == 'paired':
+        from paired_acceptance import profile
+        return profile()
     raise RuntimeError('explicit known AI acceptance profile required')
 
 
@@ -181,6 +184,13 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     private_config.write_text(json.dumps(dict(accounts, **({'fault_tools': fault_tools} if fault_tools else {}), endpoint=f'127.0.0.1:{grpc_port}',
         client_log=str(directory / 'ai-client-private.log'), routes=manifest['routes'],
         ca_file=str(ca)))); private_config.chmod(0o600)
+    if profile['name'] == 'paired':
+        from paired_acceptance import prepare_qs
+        extra = prepare_qs(Path(os.environ['QS_M3_PAIRED_SOURCE']), directory, project,
+                           mysql_port, password, run, proof)
+        private_data = json.loads(private_config.read_text())
+        private_data.update(extra)
+        private_config.write_text(json.dumps(private_data)); private_config.chmod(0o600)
     env = dict(os.environ, QS_AI_DATABASE_URL=application_url,
                QS_AI_TEST_MYSQL_DSN=application_url.replace('mysql+asyncmy://', 'mysql://', 1),
                QS_MQ_FAULT_DDL_MYSQL_URL=root_url, QS_AI_M3_BROKER_CONFIG=str(private_config),
@@ -243,7 +253,8 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
                 stdin=f"DROP DATABASE `{focus_schema}`;")
             focus['schema_removed'] = True
     result = (native_runner or run)([*command, 'pytest', '-q', '-s',
-                  *(['-x'] if profile.get('fail_fast') else []), str(source / 'tests/integration' / filename),
+                  *(['-x'] if profile.get('fail_fast') else []), *profile.get('pytest_selection', []),
+                  str(source / 'tests/integration' / filename),
                   '--junitxml=' + str(junit)], cwd=source, env=env, timeout=900, required=False)
     raw = result.stdout + result.stderr
     capture = directory / ('ai-' + profile['name'] + '-host-private.log'); capture.write_text(raw); capture.chmod(0o600)
@@ -265,4 +276,11 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('AI source changed during native host acceptance')
+    if profile['name'] == 'paired':
+        qs_source = Path(os.environ['QS_M3_PAIRED_SOURCE']).resolve()
+        qs = proof['paired_qs']
+        qs['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=qs_source).stdout.strip()
+        if (not qs['source_clean_after']
+                or run(['git', 'rev-parse', 'HEAD'], cwd=qs_source).stdout.strip() != qs['source_sha']):
+            raise RuntimeError('paired QS source changed during acceptance')
     proof['scope'] = profile['scope']
