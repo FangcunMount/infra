@@ -20,7 +20,7 @@ from iam_acceptance import host_failure_summary
 CASES = frozenset(('original_handles_and_inert_factory', 'missing_schema_rejected_before_loops',
     'explicit_dual_store_preflight', 'foreign_original_handles_rejected', 'fresh_authoritative_binding_reads',
     'original_transaction_context_refused', 'empty_factory_dispatch_never_starts_sender_or_business',
-    'real_mysql_metadata_lock_respects_fresh_budget', 'factory_cleanup_preserves_host_database_ownership'))
+    'real_mysql_metadata_lock_respects_fresh_budget', 'factory_cleanup_preserves_host_database_ownership', 'duplicate_owner_runtime_refused'))
 SCOPE = 'actual default dispatch factory; original MySQL and MongoDB preflight and empty scans'
 MONGO = 'mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f'
 

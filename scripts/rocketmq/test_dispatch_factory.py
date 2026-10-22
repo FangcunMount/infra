@@ -16,7 +16,7 @@ class FactoryReceiptTest(unittest.TestCase):
           system_login_not_claimed=True,owned_databases_dropped=True,original_client_closed_by_fixture=True)
         return 'M3_QS_DISPATCH_FACTORY_RECEIPT '+json.dumps(value)+'\n--- PASS: TestM3DefaultDispatchFactory (2.00s)'
     def test_exact_scope_source_cases_and_cleanup(self):
-        self.assertEqual(harness.parse_receipt(self.output(),'a'*40)['passed'],9)
+        self.assertEqual(harness.parse_receipt(self.output(),'a'*40)['passed'],10)
     def test_refuse_empty_partial_scope_skip_race_wrong_source_cleanup(self):
         output=self.output()
         for bad in ('',output+'\n'+output,output.replace('a'*40,'b'*40),output.replace('true','false',1),
