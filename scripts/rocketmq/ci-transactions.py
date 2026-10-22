@@ -883,6 +883,8 @@ def main():
         report["sdk_sha"] = run(["git", "rev-parse", "HEAD"], cwd=sdk).stdout.strip()
         if args.m3_resources:
             report['batch'] = 'M3-production-candidate-resources-isolated'
+            if proof.get('m3_resources',{}).get('profile')=='bootstrap':
+                report['batch']='M3-resource-bootstrap-development-only'
             report['limits'] = ['Isolated transport ACL/type/TLS and provisioning proof only',
                 'No production resources, private-network reachability, host startup, system login or business acceptance']
             report['resource_harness_sha256'] = {name:hashlib.sha256((repo/name).read_bytes()).hexdigest()

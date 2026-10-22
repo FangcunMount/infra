@@ -41,3 +41,5 @@ T21 在回环隔离 Broker 必须验证相同模板的可信 CA/SAN 正例、错
 固定5.5.1的 [gRPC negotiator](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/ProxyAndTlsProtocolNegotiator.java) 使用 [TlsSystemConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/remoting/src/main/java/org/apache/rocketmq/remoting/netty/TlsSystemConfig.java) 的全局 `tls.server.mode`，默认permissive。新候选以JVM固定参数强制enforcing，并为同进程Broker、NameServer及MQAdmin的内部remoting同步启用TLS与证书信任，避免仅强制gRPC后破坏内部链路。NameServer只读挂载tls目录，不增加常驻进程或预算。T30/T31需按冻结新镜像核对证书链及外部/内部SAN、挂载与实际明文拒绝，不能只替换proxy.json或沿用旧验收receipt。
 
 实际worker入口只通过gRPC调用API业务根；唯一旧发布器用于retry-hold replay。最终worker为consume-only，不配置事务owner、Sender或Checker，不因迁移新增worker goroutine/配额。最终配置关闭发布准入并停止旧hold replay；旧hold/未来责任须在T25/T32具名交接或处置，不以越权失败代替退出活动扫描。旧126操作开发草案对应worker曾有发布授权；修正后保留全部现存Topic正反例，worker发布正例改成明确拒绝，移除其6个不适用的错误类型发布正例，最终120操作，不增加完成数。
+
+开发调试可以显式选择workflow_dispatch的bootstrap档，只安装首个IAM角色的两个Topic/一个Group，执行10个原生结果，不跑完整冲突矩阵，报告固定full_gate=false。PR与默认dispatch始终为full档，必须120个结果及4类冲突；bootstrap报告不能用于T21勾选或合并门禁。开发阶段暂时关闭PR154，仅手动运行定向原生workflow；冻结后重新打开同一PR并执行全部必需矩阵，不删除已有失败。

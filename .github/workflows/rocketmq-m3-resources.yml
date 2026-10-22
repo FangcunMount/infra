@@ -3,6 +3,14 @@ on:
   pull_request:
     paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '.github/workflows/rocketmq-m3-resources.yml']
   workflow_dispatch:
+    inputs:
+      profile:
+        description: Bootstrap is development-only and never satisfies the full gate
+        type: choice
+        default: full
+        options: [full, bootstrap]
+env:
+  ROCKETMQ_M3_RESOURCE_PROFILE: ${{ github.event_name == 'workflow_dispatch' && inputs.profile || 'full' }}
 permissions:
   contents: read
 concurrency:

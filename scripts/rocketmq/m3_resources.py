@@ -22,6 +22,17 @@ def manifest(repo):
     return value
 
 
+def bootstrap_manifest(document):
+    """Development-only first producer reproduction; cannot satisfy the full gate."""
+    value=copy.deepcopy(document)
+    role='m3-iam'
+    ids=set(value['accounts'][role]['publish']+value['accounts'][role]['subscriptions'])
+    value['routes']=[r for r in value['routes'] if r['id'] in ids]
+    value['accounts']={role:value['accounts'][role]}
+    validate_v2(value)
+    return value
+
+
 def expected_cases(document):
     """ACLs grant Topic and Group independently; check effective resources honestly."""
     rows = {r['id']:r for r in document['routes']}
@@ -78,10 +89,17 @@ def parse_receipt(output, document, *, partial=False):
 def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_run, proof):
     if not project.startswith('rocketmq-m2-') or not broker.startswith(project+'-'):
         raise RuntimeError('owned Compose fixture required')
+    profile=os.environ.get('ROCKETMQ_M3_RESOURCE_PROFILE','full')
+    if profile not in ('full','bootstrap'):
+        raise ValueError('explicit full/bootstrap resource profile required')
     document = manifest(repo)
+    proof['profile']=profile
+    proof['full_gate']=False
+    if profile=='bootstrap':document=bootstrap_manifest(document)
     accounts = {role:dict(username='m3-'+secrets.token_hex(8),password=secrets.token_hex(32))
         for role in document['accounts']}
     proof['manifest_sha256'] = hashlib.sha256((repo/MANIFEST).read_bytes()).hexdigest()
+    proof['active_manifest_sha256']=hashlib.sha256(json.dumps(document,sort_keys=True,separators=(',',':')).encode()).hexdigest()
     proof['phase'] = 'dependency_warmup'
     # Do not charge uv downloads/builds to the actual TLS process lifetime.
     # Missing dependencies still fail this required profile.
@@ -121,71 +139,74 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
     proof['idempotent'] = provision(broker,document,accounts)
     if proof['idempotent']['operations'] != 0:
         raise RuntimeError('production candidate provisioning not idempotent')
-    reader = Admin(broker)
-    snapshot = '/tmp/m3-resource-snapshot-'+secrets.token_hex(6)
-    reader.docker('mkdir','-m','700',snapshot)
-    try:
-        before, users = reader.metadata(snapshot), reader.users()
-        acls = {role:reader.acl(account['username']) for role,account in accounts.items()}
-        def unchanged(metadata):
-            return (reader.metadata(snapshot) == metadata and reader.users() == users
-                and all(reader.acl(accounts[role]['username']) == grants for role,grants in acls.items()))
-        # Submit a missing candidate together with a conflicting existing queue
-        # or credential; the entire preflight must reject before any mutation.
-        for kind in ('queues','credentials','acl'):
-            candidate = copy.deepcopy(document)
-            role = next(iter(accounts))
-            missing = dict(id='never-create',topic='infra.m3.never-created',subscription='',
-                message_type='NORMAL',owner='iam.mysql',route_revision='m3-1',consumer_group='',
-                physical_topic=physical_topic_v2('infra.m3.never-created','NORMAL','iam.mysql','m3-1'))
-            candidate['routes'].append(missing)
-            candidate['accounts'][role]['publish'].append(missing['id'])
-            credentials = copy.deepcopy(accounts)
-            if kind == 'queues':
-                candidate['topic_options']['read_queue_nums'] = 2
-            elif kind == 'credentials':
-                credentials[role]['password'] = secrets.token_hex(32)
-            else:
-                candidate['accounts'][role]['subscriptions'] = []
-            try:
-                provision(broker,candidate,credentials)
-            except RuntimeError as error:
-                reason = {'queues':'existing topic type or configuration conflicts',
-                    'credentials':'existing principal differs; credential rotation refused',
-                    'acl':'existing principal ACL exceeds or conflicts with reviewed grants'}[kind]
-                if str(error) != 'v2 provision: '+reason:
-                    raise RuntimeError('conflict proof failed for an unexpected preflight reason') from None
-            else:
-                raise RuntimeError('conflicting candidate unexpectedly provisioned')
-            if not unchanged(before):
-                raise RuntimeError('conflicting preflight mutated Broker resources')
-        proof['conflicts_refused_without_mutation'] = ['queues','credentials','acl']
-        # A separate sentinel has deliberately conflicting type metadata. Never
-        # alter a candidate business Topic, even inside this isolated fixture.
-        sentinel = dict(id='type-conflict',topic='infra.m3.type-conflict',subscription='',
-            message_type='TRANSACTION',owner='iam.mysql',route_revision='m3-1',consumer_group='',
-            physical_topic=physical_topic_v2('infra.m3.type-conflict','TRANSACTION','iam.mysql','m3-1'))
-        reader('updateTopic','-t',sentinel['physical_topic'],'-r','1','-w','1',
-            '-p','6','-a','+message.type=NORMAL',mutation=True)
-        before = reader.metadata(snapshot)
-        candidate = copy.deepcopy(document)
-        candidate['routes'].extend([sentinel,missing])
-        candidate['accounts'][role]['publish'].extend([sentinel['id'],missing['id']])
+    proof['conflicts_refused_without_mutation']=[]
+    proof['typed_topics']={k:v['message_type'] for k,v in desired_topics(document).items()}
+    if profile=='full':
+        reader = Admin(broker)
+        snapshot = '/tmp/m3-resource-snapshot-'+secrets.token_hex(6)
+        reader.docker('mkdir','-m','700',snapshot)
         try:
-            provision(broker,candidate,accounts)
-        except RuntimeError as error:
-            if str(error) != 'v2 provision: existing topic type or configuration conflicts':
-                raise RuntimeError('type proof failed for an unexpected preflight reason') from None
-        else:
-            raise RuntimeError('conflicting type unexpectedly provisioned')
-        if not unchanged(before):
-            raise RuntimeError('type preflight mutated Broker resources')
-        proof['conflicts_refused_without_mutation'].append('type')
-        proof['typed_topics'] = {k:v['message_type'] for k,v in desired_topics(document).items()}
-    finally:
-        for name in ('topic.json','subscriptionGroup.json'):
-            reader.docker('rm','-f','--',snapshot+'/'+name,required=False)
-        reader.docker('rmdir',snapshot)
+            before, users = reader.metadata(snapshot), reader.users()
+            acls = {role:reader.acl(account['username']) for role,account in accounts.items()}
+            def unchanged(metadata):
+                return (reader.metadata(snapshot) == metadata and reader.users() == users
+                    and all(reader.acl(accounts[role]['username']) == grants for role,grants in acls.items()))
+            # Submit a missing candidate together with a conflicting existing queue
+            # or credential; the entire preflight must reject before any mutation.
+            for kind in ('queues','credentials','acl'):
+                candidate = copy.deepcopy(document)
+                role = next(iter(accounts))
+                missing = dict(id='never-create',topic='infra.m3.never-created',subscription='',
+                    message_type='NORMAL',owner='iam.mysql',route_revision='m3-1',consumer_group='',
+                    physical_topic=physical_topic_v2('infra.m3.never-created','NORMAL','iam.mysql','m3-1'))
+                candidate['routes'].append(missing)
+                candidate['accounts'][role]['publish'].append(missing['id'])
+                credentials = copy.deepcopy(accounts)
+                if kind == 'queues':
+                    candidate['topic_options']['read_queue_nums'] = 2
+                elif kind == 'credentials':
+                    credentials[role]['password'] = secrets.token_hex(32)
+                else:
+                    candidate['accounts'][role]['subscriptions'] = []
+                try:
+                    provision(broker,candidate,credentials)
+                except RuntimeError as error:
+                    reason = {'queues':'existing topic type or configuration conflicts',
+                        'credentials':'existing principal differs; credential rotation refused',
+                        'acl':'existing principal ACL exceeds or conflicts with reviewed grants'}[kind]
+                    if str(error) != 'v2 provision: '+reason:
+                        raise RuntimeError('conflict proof failed for an unexpected preflight reason') from None
+                else:
+                    raise RuntimeError('conflicting candidate unexpectedly provisioned')
+                if not unchanged(before):
+                    raise RuntimeError('conflicting preflight mutated Broker resources')
+            proof['conflicts_refused_without_mutation'] = ['queues','credentials','acl']
+            # A separate sentinel has deliberately conflicting type metadata. Never
+            # alter a candidate business Topic, even inside this isolated fixture.
+            sentinel = dict(id='type-conflict',topic='infra.m3.type-conflict',subscription='',
+                message_type='TRANSACTION',owner='iam.mysql',route_revision='m3-1',consumer_group='',
+                physical_topic=physical_topic_v2('infra.m3.type-conflict','TRANSACTION','iam.mysql','m3-1'))
+            reader('updateTopic','-t',sentinel['physical_topic'],'-r','1','-w','1',
+                '-p','6','-a','+message.type=NORMAL',mutation=True)
+            before = reader.metadata(snapshot)
+            candidate = copy.deepcopy(document)
+            candidate['routes'].extend([sentinel,missing])
+            candidate['accounts'][role]['publish'].extend([sentinel['id'],missing['id']])
+            try:
+                provision(broker,candidate,accounts)
+            except RuntimeError as error:
+                if str(error) != 'v2 provision: existing topic type or configuration conflicts':
+                    raise RuntimeError('type proof failed for an unexpected preflight reason') from None
+            else:
+                raise RuntimeError('conflicting type unexpectedly provisioned')
+            if not unchanged(before):
+                raise RuntimeError('type preflight mutated Broker resources')
+            proof['conflicts_refused_without_mutation'].append('type')
+            proof['typed_topics'] = {k:v['message_type'] for k,v in desired_topics(document).items()}
+        finally:
+            for name in ('topic.json','subscriptionGroup.json'):
+                reader.docker('rm','-f','--',snapshot+'/'+name,required=False)
+            reader.docker('rmdir',snapshot)
     proof['phase'] = 'native_acl_and_type'
     result = native_run(argv,
         cwd=repo,env=env,timeout=900,required=False)
@@ -199,4 +220,5 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
     if result.returncode:
         raise RuntimeError('isolated resource probe failed')
     proof['phase'] = 'complete'
+    proof['full_gate'] = profile=='full'
     proof['scope'] = 'reviewed production names in an isolated Broker; production resources and runtime unchanged'

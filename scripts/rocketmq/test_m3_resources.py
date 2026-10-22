@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import unittest
 
-from m3_resources import manifest, expected_cases, parse_receipt
+from m3_resources import manifest, expected_cases, parse_receipt, bootstrap_manifest
 from provision_v2 import desired_topics
 from routes import permissions_v2, validate_v2
 
@@ -30,6 +30,18 @@ class M3ResourceTests(unittest.TestCase):
         authz = [r for r in m['routes'] if r['topic']=='iam.authz.version.v2']
         self.assertEqual(len({r['consumer_group'] for r in authz}),2)
         self.assertEqual(len({r['physical_topic'] for r in authz}),1)
+
+    def test_bootstrap_is_a_distinct_development_profile_and_cannot_pass_full_receipt(self):
+        doc=bootstrap_manifest(self.document)
+        self.assertEqual(len(doc['accounts']),1)
+        self.assertEqual(len(doc['routes']),2)
+        cases=expected_cases(doc)
+        self.assertEqual(len(cases),10)
+        receipt=dict(client='5.1.2',passed=10,failed=0,skipped=0,cases=cases,
+            scope='isolated_transport_acl_and_broker_type_only',diagnostic=None)
+        raw='M3_RESOURCE_RECEIPT '+json.dumps(receipt)
+        self.assertEqual(parse_receipt(raw,doc),receipt)
+        with self.assertRaises(RuntimeError):parse_receipt(raw,self.document)
 
     def test_minimum_effective_permissions_do_not_publish_cross_owner_or_use_wildcards(self):
         m = self.document
