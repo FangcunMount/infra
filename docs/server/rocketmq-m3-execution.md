@@ -25,7 +25,7 @@
 - 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI领取/scanner PR197与显式完成重试PR198、infra PR121/123均已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：**T18进行中，内部2/5；M3保持17/36**。T17三个内部门禁3/3，源码与infra已合并。T18先验证解释报告终态发送失败及跨租约恢复，再补宿主接线、独立进程/provider计数和实际故障证明；生产配置未变，AUTO_DEPLOY_ENABLED=false。[T18证据](evidence/rocketmq-m3-ai-finalization-20261022.json)。
+- 当前批次：**T18进行中，内部3/5；M3保持17/36**。T17三个内部门禁3/3，源码与infra已合并。T18先验证解释报告终态发送失败及跨租约恢复，再补宿主接线、独立进程/provider计数和实际故障证明；生产配置未变，AUTO_DEPLOY_ENABLED=false。[T18证据](evidence/rocketmq-m3-ai-finalization-20261022.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -62,8 +62,8 @@
 | --- | --- | --- | --- |
 | ✅ | T18-A | 实际MySQL验证MQ失败、Aborted与租约接管，冻结当前协议身份和完整验收manifest | CI39738320198真实MySQL两项表征通过，0失败/跳过，9类表清理为零；同租约终态未恢复、换租约幂等冲突均已复现且模型未重调。[恢复规则/manifest](rocketmq-m3-t18-finalization.md)按本次范围修订为单一最终宿主协议，不做v1/v2在线兼容；表征证据不变，infra PR144待合并 |
 | ✅ | T18-B | 补齐宿主终态恢复接线，保留权限/取消/CAS/业务重试授权及原配额 | 2026-10-22：AI432fe19/infra c9a4510，CI39749586153实际MySQL20通过/0失败/0跳过，9类表清理为零；源码/锁/工具/测试摘要独立核对。87定向、447源类型通过；尚未合并，不计HTTP/进程/Broker故障 |
-| ☐ | T18-C | 回环HTTP假provider、进程外持久计数、独立worker、真实MySQL/RocketMQ与代理 | 进行中：首轮753317f在测试JWK导出失败（未启动worker），资源已清理；修正2b65140的5项本地契约通过，定向Broker39754954807复验中 |
-| ☐ | T18-D | 五路径×正常/响应后MQ故障/终态确认丢失/响应后SIGKILL的20核心情景及交叉约束 | 待开始 |
+| ✅ | T18-C | 回环HTTP假provider、进程外持久计数、独立worker、真实MySQL/RocketMQ与代理 | 2026-10-22：AI2b65140/infra ea723a9，CI39754954807两项原生/12证据通过，0失败/跳过；真实SIGKILL后新实例复用响应，原invocation仅一次HTTP；源/工具/锁摘要及完整清理核对。尚未合并，不代替D矩阵 |
+| ☐ | T18-D | 五路径×正常/响应后MQ故障/终态确认丢失/响应后SIGKILL的20核心情景及交叉约束 | 进行中；复用C进程/provider/固定SDK代理，先验证终态RPC真实断链 |
 | ☐ | T18-E | 固定候选，完整CI及六档Broker验收、报告核验、合并后关闭T18 | 待开始 |
 
 关键约束：按invocation统计真实HTTP请求，恢复进程不得追加模型请求；允许Broker重复delivery，业务效果及逻辑事件身份必须保持幂等。网络故障与客户端丢弃回复分开命名；DB故障锁定业务+witness原根提交，不误用全进程第N次commit。缺真实依赖直接失败，required非空零失败/跳过；报告记录SHA、镜像/制品摘要、实际版本、测试ID和清理，正文/密钥不进入日志。
@@ -179,7 +179,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
 | ✅ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 2026-10-22；内部3/3。最终6be5f80源码12检查成功，两档MySQL各5529通过（含12串行原根/5 ACK原生），0失败/跳过；infra2950e9a全部19项成功，六档Broker各55宿主/148证据及独立focus4/12通过，完整清理。AI PR212合并be91fde，infra PR142合并f84b3a9，merge tree均一致。失败/取消历史保留，旧SDK一次超时根因未确认、本轮原SDK两档均31通过；生产未变更。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
-| ☐ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 进行中；内部2/5。不新增宿主中间协议兼容。B最终协议同/跨租约恢复候选432fe19的实际MySQL20项通过/零失败跳过；独立HTTP/进程/Broker故障待C/D。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
+| ☐ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 进行中；内部3/5。不新增宿主中间协议兼容。B实际MySQL20项及C独立HTTP/进程/Broker两项/12证据通过；五路径真实故障矩阵待D。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
 | ☐ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 待开始；历史reader/新旧格式互通不作为上线门禁，兼容代码删除移交M4-C03 |
 | ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 待开始；仅最终版本组合，不新增新旧版本互通矩阵 |
 | ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
@@ -883,3 +883,7 @@ AI功能2384217、文档绑定753317f168c1da38b198458f1ad1e4886eebb86a：独立H
 首轮39753087409的MySQL20项通过，独立Broker两项在测试私有输入导出阶段失败，未启动业务worker。现有fixture实际使用EC JWK，探针误调用PEM对象的private_bytes；本地新增契约测试精确复现同一AttributeError后，ae5b36f改为JWK导出/导入并保留kid，只向worker提供收件方公钥。2b651402b8f97d4c18f99190772332f864fef09c的5项本地HTTP/进程/密钥契约通过，75文档/1389链接通过。旧报告、摘要与失败保留，临时容器、进程组和私有目录完整清理。
 
 实际验证了按完整source SHA参数化触发定向workflow：39754954807仅执行live开发门禁，不重复非相关矩阵；未选择的MySQL作业不计本次通过，最终冻结候选仍必须跑完整门禁。C未勾选，内部2/5，M3仍17/36，M4为0/8。
+
+### 2026-10-22：T18-C实际独立进程与Broker闭环，进入D
+
+CI39754954807绑定AI2b651402b8f97d4c18f99190772332f864fef09c及infra ea723a9：两项原生/12项证据全部通过，0失败/跳过。实际HTTP provider进程追加计数，原worker在原MySQL响应提交后被SIGKILL，新进程复用同一响应完成原事务与Broker投递，每原invocation仍仅一次HTTP；首次wire、精确witness、无新Outbox及所属资源清理核对。报告/工具/固定wheel摘要已独立验证。C勾选，内部3/5；M3仍17/36、M4为0/8，未合并或生产切换。D开始覆盖五路径故障矩阵，C的转发代理不冒充实际丢包证明。
