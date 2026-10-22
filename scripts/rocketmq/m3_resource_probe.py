@@ -34,10 +34,10 @@ class BrokerTypeProbe(Producer):
         self._Producer__validate_message_type = False
 
 
-def start(client, topic):
+def start(client, topic, *, wait_settings=True):
     client.startup()
     client._retrieve_topic_route_data(topic)
-    if not client._init_settings_event.wait(timeout=5):
+    if wait_settings and not client._init_settings_event.wait(timeout=5):
         raise RuntimeError('pinned Broker settings not received')
 
 
@@ -154,7 +154,9 @@ def run(config, cases):
                 subscription={physical:FilterExpression()}, await_duration=1, tls_enable=True)
             def receive():
                 check_route(consumer, physical)
-                start(consumer, physical)
+                # An unauthorized Group may reject telemetry settings. Require
+                # the actual receive RPC denial instead of counting that timeout.
+                start(consumer, physical, wait_settings=allowed)
                 for message in consumer.receive(16, 15):
                     consumer.ack(message)
             try:
