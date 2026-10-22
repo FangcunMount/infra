@@ -496,6 +496,14 @@ def main():
                 run_qs_worker_host(args.qs_deferred_consumer_host, directory, broker, project, grpc_port,
                                    mysql_port, mysql_password, ca, run, proof['qs_deferred_consumer_host'],
                                    owned_native_run, repo, args.qs_deferred_consumer_private_log)
+                # Same exact QS candidate also proves its immutable SQL/lease/
+                # SIGKILL component boundary; keep that narrower receipt separate.
+                from qs_deferred_acceptance import run_qs_deferred_host
+                proof['qs_deferred_mysql_component'] = {}
+                run_qs_deferred_host(args.qs_deferred_consumer_host, directory, project, mysql_port,
+                                     mysql_password, run, proof['qs_deferred_mysql_component'], owned_native_run)
+                for name in proof['qs_deferred_mysql_component']['native_receipt']['cases']:
+                    passed('qs_deferred_mysql_component_' + name)
             else:
                 from qs_deferred_acceptance import run_qs_deferred_host
                 run_qs_deferred_host(args.qs_deferred_consumer_host, directory, project, mysql_port,
