@@ -25,7 +25,7 @@
 - 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI领取/scanner PR197与显式完成重试PR198、infra PR121/123均已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：**T21完成；M3为21/36**。infra PR154已合并d639ea6，实际main完整tree与候选bdb96ab及已测虚拟merge完全一致；130直接传输＋4冲突、52检查及55份回归报告/收据已核验，失败历史保留。[T21证据](evidence/rocketmq-m3-resources-20261023.json)。T22进行中：QS草稿PR422、IAM草稿PR136推进默认宿主/关闭源码，完整真实宿主、跨实例与预算尚未验收。生产未操作。
+- 当前批次：**T21完成；M3为21/36**。infra PR154已合并d639ea6，实际main完整tree与候选bdb96ab及已测虚拟merge完全一致；130直接传输＋4冲突、52检查及55份回归报告/收据已核验，失败历史保留。[T21证据](evidence/rocketmq-m3-resources-20261023.json)。T22进行中：QS PR422已合并469629f、IAM PR136已合并424720d；默认到期接线PR423和worker关闭保护PR424待CI/合并。完整真实宿主、跨实例与预算尚未验收。[T22批次证据](evidence/rocketmq-m3-runtime-20261023.json)。生产未操作。
 
 
 ### T20 分批验证（4/4，总进度20/36）
@@ -195,7 +195,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 2026-10-22；最终b88f40b源码12检查成功，两档MySQL各5573（含11引用/绑定及20原根恢复）0失败/跳过；六档原根/mTLS各15原生/21证据通过，10服务/15类自有记录清理核验。infra0333993的8检查和289 SDK回归通过，AI PR214合并64ffa15、工具PR146合并3f3bd73，完整tree一致；目标pin/进度PR147单列。历史兼容/清理交M4，生产未变更。[完整证据/失败历史](evidence/rocketmq-m3-ai-payload-20261022.json) |
 | ✅ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 2026-10-22；六档各5原生/25证据，共30/150，零失败/跳过，全部源码/锁/制品/清理核验；QS28检查成功+1 API不适用、AI12检查及两档各5573通过，工具全部实际门禁完成（1check回传滞后已按成功工作流/原生报告核验）。PR420/215/152合并且完整树一致；生产未变更。[证据、失败及回传差异](evidence/rocketmq-m3-paired-20261022.json) |
 | ✅ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 2026-10-23；130直接操作＋4冲突，零失败/跳过、完整清理；52 CI成功、55回归报告/收据；PR154合并d639ea6，tree=b1282d0；[证据](evidence/rocketmq-m3-resources-20261023.json)；未安装生产资源 |
-| ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 进行中；QS PR422/IAM PR136为源码子批，367/68定向race通过；完整宿主原生、跨实例和资源预算待验收，未勾选 |
+| ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 进行中；QS PR422/IAM PR136已合并，367/68 race及28/7检查通过；PR423到期接线293 race、PR424关闭45 race待CI/合并；完整宿主/跨实例/预算仍待验收。[证据](evidence/rocketmq-m3-runtime-20261023.json) |
 | ☐ | T23 | 宿主端到端及真实网络/进程/DB/Broker故障 | 待开始 |
 | ☐ | T24 | 指标、告警、准入保护、DLQ/超限审计与规程 | 待开始 |
 | ☐ | T25 | 一次停写切换工具、旧责任处置/调度交接、启动前恢复与启动后前向修复 | 待开始；不开发在线共存或NSQ provider回退候选；兼容工具清理移交M4 |
@@ -1102,3 +1102,23 @@ QS源码9b192baae八包297项race零失败/跳过，固定lint2.5.0零问题；8
 PR154按精确head正常合并d639ea693cd5b3b35e37898e7b38c74106679c90，实际main完整tree=b1282d0，与已测候选一致。T21勾选，M3更新21/36；M3-4仍进行中，M4保持0/8。未执行生产Topic/ACL、证书/镜像、参数、schema或provider变更，也未进行system验收。
 
 下一项T22：QS默认组合根共享双owner、空闲Topic登记、NORMAL客户端、事件/进程清理、main屏障、旧Outbox依赖退出和无事件pending保存；当前本地5504b042e十一包367项race零失败/跳过、lint2.5.0零问题，PR422现有ac2d9ff的28项检查成功（1 API同步不适用），新增本地尾批仍须更新文档并重新跑最新head CI。IAM 530c5cc5/9d7db3a2三包68项race、原生Go传输单元、文档及7检查成功，草稿PR136尚未合并。完整三库实际宿主/跨实例/队列与DB预算门禁仍待完成，不用这些源码证明替代。
+
+
+### 2026-10-23：T22 默认宿主与 IAM 关闭源码合并，推进到期接线和 worker
+
+M3保持 **21/36**，T22继续进行中、M4保持0/8。任务完整门禁尚未通过，以下源码子批分别记账，不累计为新的任务完成数。
+
+| T22 子批 | 实现与定向验证 | 合并 / CI | 尚未证明 |
+| --- | --- | --- | --- |
+| QS默认事务组合根 | ✅ 共享双owner、空闲Topic、NORMAL边界、模块/HTTP/main真实关闭、退出旧Outbox依赖；11包367 race，0失败/跳过，固定lint和87文档测试通过 | PR422候选9b9c82c通过28检查，1 API同步不适用；按精确head正常合并469629f；已测候选与main完整tree均e0f5463 | 完整当前宿主、跨实例、队列/DB上界 |
+| IAM关闭链 | ✅ HTTP/gRPC在途排空时保留Checker/MySQL；3包68 race，0失败/跳过；文档和lint通过 | PR136候选9d7db3a通过7检查，精确head正常合并424720d；候选与main完整tree均0e4345e | 当前完整宿主真实依赖、进程/DB故障 |
+| 默认到期dispatch | ✅ 原MySQL/Mongo和同owner、启动有界只读预检、每owner单循环5秒/50条/5秒预算、准入封闭不取新计划、取消后真实等待；4包293 race零失败/跳过、lint与87文档测试通过 | 草稿PR423，源码2be7d03/候选c0f911f，CI/合并待完成 | 默认接线真实双库/Broker证据 |
+| worker真实关闭 | ✅ 单信号所有者、main等待同一排空、失败保留下游；3包45 race零失败/跳过、lint与88文档测试通过；受控子进程实际SIGTERM证明阻塞排空/退出1 | 草稿PR424，源码a1c877b/候选6945dcd，CI/合并待完成 | 当前完整worker与真实Broker/DB；延期消费责任 |
+
+合并前分别回读QS/IAM生产CD暂停true，production环境无覆盖；没有执行生产部署。AI从当前main e9bbba4只读核对：现有关闭已等待业务组件和SDK，再关闭原DB/loop，本批未进行推测性重写；当前宿主原生证明仍待完成。
+
+默认dispatch只投递已有授权的到期事件，不执行评分、报告、模型或增加业务attempt；原SDK维护仍独立运行。API `system_governance.retry.automatic_retry_enabled` 与worker `retry_governance.automatic_retry_enabled` 是各进程固定配置，生产冻结清单必须协调它们，不声称全局动态开关。构造不建连接/producer、不执行DDL。worker关闭改为先停止接收、等待真实handler，再停止容器后台任务并关闭gRPC/数据库；任何失败保留后续依赖。
+
+worker信号开发测试的首轮失败属于父进程stat/exit观察竞争：子进程已经写入标记并正确退出1，父进程尚未复核标记便误报。保留失败事实，修正为退出后核验标记并保留原退出结果；未移除场景。最终受控信号测试通过不代表完整worker或数据库/Broker验收。
+
+下一步：完成当前两份候选CI/合并，补齐worker当前延期消息的consume-only恢复及共享原并发预算；再完成实际宿主启动/失败/关闭、跨实例Checker与数据库/队列上界门禁。旧hold责任交接仍属T25/T32，不允许以关闭发布权限代替责任退出。没有启动本地Docker或共享依赖，没有生产schema/Topic/ACL/provider、资源配额、稳定发布、system或48h观察变更。
