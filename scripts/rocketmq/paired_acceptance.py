@@ -23,7 +23,7 @@ FULL_TESTS = frozenset((CORE_TEST,
 FULL_CASES = CORE_CASES | frozenset((
     'duplicate_original_command_no_new_seal', 'duplicate_event_uses_first_ack',
     'duplicate_ack_keeps_first_receipt', 'cross_language_first_wire_unchanged',
-    'consumer_redelivery_without_business_retry', 'actual_go_large_command_body_rpc',
+    'duplicate_delivery_does_not_authorize_business_retry', 'actual_go_large_command_body_rpc',
     'actual_ai_large_state_body_rpc', 'wrong_peer_mtls_denied_both_hosts',
     'wrong_reference_never_serves_body_both_hosts', 'interpretation_cancel_original_roots',
     'cancel_duplicate_no_new_event', 'cancel_no_provider_or_attempt_change',
@@ -120,7 +120,7 @@ def profile():
         tests=FULL_TESTS if full else {CORE_TEST},
         failure_diagnostics=lambda raw:diagnostics(raw,tests=FULL_TESTS if full else {CORE_TEST}),
         fail_fast=True,pytest_selection=[] if full else ['-k',CORE_TEST],
-        scope=('full mandatory final-version paired gate' if full else 'core development gate; does not satisfy T20-C/D')
+        scope=('full mandatory final-version paired gate; duplicate delivery is controlled at original receivers, physical transport faults are T23' if full else 'core development gate; does not satisfy T20-C/D')
             + '; actual Go QS/Python AI default consumers and original roots; synthetic read-side source, no real provider/public HTTP/system or packet-fault claim')
 
 

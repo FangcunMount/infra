@@ -6,17 +6,17 @@ on:
         description: Exact QS paired host source SHA
         type: string
         required: true
-        default: fb62c1d01b5e9c068659ba27b554a57b923e4a28
+        default: 42306552ed8261307f0ac4e9d9c5655707ce91a4
       ai_ref:
         description: Exact AI paired host source SHA
         type: string
         required: true
-        default: 06653cef77bf79bac3ce2b412789b7f0d14ada00
+        default: 32f70acf74a4446f60fa442cb249ebe446eb4811
       profile:
         description: Core is development only; full is mandatory for T20
         type: choice
         options: [core, full]
-        default: core
+        default: full
       full_matrix:
         description: Frozen-candidate six-profile compatibility gate
         type: boolean
@@ -52,12 +52,12 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: ${{ inputs.qs_ref || 'fb62c1d01b5e9c068659ba27b554a57b923e4a28' }}
+          ref: ${{ inputs.qs_ref || '42306552ed8261307f0ac4e9d9c5655707ce91a4' }}
           path: .qs-acceptance
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '06653cef77bf79bac3ce2b412789b7f0d14ada00' }}
+          ref: ${{ inputs.ai_ref || '32f70acf74a4446f60fa442cb249ebe446eb4811' }}
           path: .ai-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -69,8 +69,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Verify exact host candidates and strict receipt gates
         env:
-          EXPECTED_QS_SHA: ${{ inputs.qs_ref || 'fb62c1d01b5e9c068659ba27b554a57b923e4a28' }}
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '06653cef77bf79bac3ce2b412789b7f0d14ada00' }}
+          EXPECTED_QS_SHA: ${{ inputs.qs_ref || '42306552ed8261307f0ac4e9d9c5655707ce91a4' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '32f70acf74a4446f60fa442cb249ebe446eb4811' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]
@@ -85,7 +85,7 @@ jobs:
           docker build --no-cache -t rocketmq-paired:5.5.1 components/rocketmq
       - name: Required original QS AI roots
         env:
-          PAIRED_PROFILE: ${{ inputs.profile || 'core' }}
+          PAIRED_PROFILE: ${{ inputs.profile || 'full' }}
         run: |
           set -euo pipefail
           [[ "$PAIRED_PROFILE" == core || "$PAIRED_PROFILE" == full ]]
@@ -96,7 +96,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: rocketmq-paired-${{ inputs.profile || 'core' }}-${{ strategy.job-index }}-${{ github.sha }}
+          name: rocketmq-paired-${{ inputs.profile || 'full' }}-${{ strategy.job-index }}-${{ github.sha }}
           path: rocketmq-paired.json
           if-no-files-found: error
           retention-days: 14

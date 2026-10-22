@@ -28,14 +28,14 @@
 - 当前批次：**T20进行中；M3为19/36**。T19源码/工具/进度PR214/146/147均合并，完整树核验，生产未变更。T20独立工作区与原入口基线已建立，内部A–D推进；只验收最终QS＋AI版本组合。[T20证据](evidence/rocketmq-m3-paired-20261022.json)。
 
 
-### T20 分批验证（1/4，总进度仍19/36）
+### T20 分批验证（2/4，总进度仍19/36）
 
 以下是T20内部门禁，不新增或拆掉原36项任务；只有A–D全部实现并验证、相关源码和工具合并后，才勾选T20。
 
 | 完成 | 内部门禁 | 必须证据 |
 | --- | --- | --- |
 | ✅ | T20-A：实际入口、独立工作区及定向基线 | 三仓完整SHA、实际SDK锁、owner/路由及双方根/读取入口已核对；AI92通过，QS804通过，7项既有可选DSN测试如实单列；这不是依赖验收 |
-| ☐ | T20-B：真实两端最小业务闭环 | QS原command根→Broker→AI原admission/receipt/state→QS原event投影/首次ACK→AI原ACK根；双方实际消费者参与，不能用observer代替 |
+| ✅ | T20-B：真实两端最小业务闭环 | QS原command根→Broker→AI原admission/receipt/state→QS原event投影/首次ACK→AI原ACK根；双方实际消费者参与，不能用observer代替 |
 | ☐ | T20-C：正文、安全、重复及取消 | 双向真实mTLS大正文，首次ID/wire复用，重复command/event/receipt/ACK，最终版本的取消；不生成业务重试或模型重做，不扩展历史互通 |
 | ☐ | T20-D：冻结完整候选及合并 | 固定最终QS/AI版本，完整源码/必需真实矩阵与清理报告通过，required非空且0跳过；原SDK/普通消息回归保持；源码和工具合并后关闭父任务 |
 
@@ -193,7 +193,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 2026-10-22；内部3/3。最终6be5f80源码12检查成功，两档MySQL各5529通过（含12串行原根/5 ACK原生），0失败/跳过；infra2950e9a全部19项成功，六档Broker各55宿主/148证据及独立focus4/12通过，完整清理。AI PR212合并be91fde，infra PR142合并f84b3a9，merge tree均一致。失败/取消历史保留，旧SDK一次超时根因未确认、本轮原SDK两档均31通过；生产未变更。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ✅ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 2026-10-22；内部5/5。最终1643afe源码12检查成功，两MySQL各5562项（含原根恢复20）0失败/跳过；六档Broker各22原生/32证据通过，源/工具/SDK/报告及清理独立核验。AI PR213合并c04a181、infra PR144合并e1eb1c3；原树与候选一致，失败历史保留，生产未变更。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
 | ✅ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 2026-10-22；最终b88f40b源码12检查成功，两档MySQL各5573（含11引用/绑定及20原根恢复）0失败/跳过；六档原根/mTLS各15原生/21证据通过，10服务/15类自有记录清理核验。infra0333993的8检查和289 SDK回归通过，AI PR214合并64ffa15、工具PR146合并3f3bd73，完整tree一致；目标pin/进度PR147单列。历史兼容/清理交M4，生产未变更。[完整证据/失败历史](evidence/rocketmq-m3-ai-payload-20261022.json) |
-| ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 进行中；内部A完成1/4。QS be22b927 / AI64ffa15 / infra662edf4独立工作区；AI92、QS804定向通过，7项既有可选本地MySQL跳过单列，不计原生验收。下一步连接实际两端消费者与原根，required原生缺依赖直接失败 |
+| ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 进行中；内部A/B完成2/4。AI45ec3b2/QSfb62c1d/infraf264145的core39788646533真实1原生/10证据通过，0失败/跳过，摘要和清理核验；full5原生/25证据、双向大正文/安全/重复/取消及完整矩阵/合并仍待C/D。源码/工具仅隔离分支，不扩展历史格式 |
 | ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
 | ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 待开始 |
 | ☐ | T23 | 宿主端到端及真实网络/进程/DB/Broker故障 | 待开始 |
@@ -986,3 +986,13 @@ T19进度/固定目标PR147合并662edf4，完整tree与3c8f670一致，回填�
 ### 2026-10-22：T20-B双端原消费者接线与开发门禁准备
 
 QS测试进程fb62c1d直接调用原Service.Start/Change、共享事务owner、默认事件runtime及MessagePayloads，race编译/go vet通过；控制只走私有stdio，不新增生产HTTP服务。AI06653ce接默认DI、MessagingRuntime、真实command/ACK消费者与原服务/表，单个完整START→receipt/state→ACK用例已收集，尚未实际运行。infra增加core开发门禁（1原生/10证据）与full必需门禁（5原生/25证据）的精确隔离契约及少量接入钩子；114工具测试通过，core不能代替full或勾选T20-C/D。工作分支临时push触发只运行定向开发门禁，最终冻结后仍执行完整PR/必需矩阵。开始隔离Broker CI，T20-B仍进行中，19/36。
+
+### 2026-10-22：T20-B首轮真实闭环与ACK核验假设修正
+
+39786016742实际完成双方默认消费者启动、QS原command根、AI原admission/receipt/state和witness、QS原投影/首次ACK以及AI业务receipt和history提交，7项门禁已有证据；最终wire断言错误地假设ACK进入通用Inbox，在417行NoResultFound失败。真实实现将已认证ACK写入精确event_receipts，45ec3b2仅修正验收：在原默认ACK handler周围观察实际received bytes并与Go首次档案及已提交receipt body核对，不新增业务表或改变接收器。首轮失败报告和完整Compose/进程组/私有文件清理保留；T20-B不勾选，core继续重跑，19/36。
+
+### 2026-10-22：T20-B真实最小闭环通过（内部2/4）
+
+39788646533在AI45ec3b2/QSfb62c1d/infraf264145固定组合完成core：1原生/10精确证据，0失败/跳过。双方实际默认消费者和原根完成command→AI admission/receipt/state→QS operation/投影/首次ACK→AI event_receipts/history；首次command/ACK wire与原档案对照，未新增发布型Outbox或模型调用。8类源码/工具/SDK映射、Go模块摘要、AI lock、两端source clean及Compose/进程组/私有目录清理独立核验。首轮NoResultFound是验收错误地读取通用ACK Inbox，保留原失败记录并按实际event_receipts边界修正。
+
+仅勾选内部T20-B，父T20仍未完成，总计19/36。源码/工具尚在隔离分支，full5用例/25证据、六档矩阵、完整源码与工具PR门禁均待T20-C/D；不计system/生产/真实provider或网络故障验收。接下来验证大正文双向mTLS、重复及取消。
