@@ -5244,7 +5244,7 @@
     "merged_tree": "f60a42043416e8535c1ea0a9da66573142cbf09a",
     "native_cases_collected": 6
   },
-  "updated_at": "2026-10-22T03:19:30Z",
+  "updated_at": "2026-10-22T04:01:23Z",
   "solution_whole_asset_plan": {
     "status": "merged_required_ci_passed",
     "source_sha": "9541305d7eceecac151620df1c3625fab7a67c18",
@@ -21321,9 +21321,10 @@
     },
     {
       "id": "recovery_and_drain",
-      "status": "partial_not_closed",
+      "status": "frozen_candidate_actual_dependencies_pending",
       "done": false,
-      "acceptance": "Expired ownership, persisted response recovery, cancellation and draining have explicit owners; no unknown model re-invocation."
+      "acceptance": "Expired ownership, persisted response recovery, cancellation and draining have explicit owners; no unknown model re-invocation.",
+      "source_sha": "9776f546086228bc1ea12c50831b18ee44ec743e"
     },
     {
       "id": "default_assembly",
@@ -23062,12 +23063,65 @@
     "merged": false,
     "production_changed": false,
     "mypy_sources": 432,
-    "native_collected_only": 4
+    "native_collected_only": 4,
+    "historical_snapshot": true
   },
   "verification_audit_notes": [
     {
       "source_sha": "a0acc995d05abf38b95033063910074368d15620",
       "note": "Progress commentary incorrectly reused the previous shard location for the complete graph. The partial verifier rejected that assumption; commentary was corrected before final status. Complete eight-shard/JUnit verification now proves all27 candidate native cases per MySQL profile, including the graph."
     }
-  ]
+  ],
+  "recovery_drain_sdk": {
+    "status": "frozen_candidate_actual_dependencies_pending",
+    "source_sha": "9776f546086228bc1ea12c50831b18ee44ec743e",
+    "code_sha": "6a3f481869bbd3c90b90d085eaef5b35e5d55adf",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/211",
+    "source_pushed": true,
+    "merged": false,
+    "base_sha": "8938b7fd07d75d06b73fdad2720d1695456cf0e7",
+    "local": {
+      "unit_passed": 4118,
+      "unit_failed": 0,
+      "unit_skipped": 0,
+      "integration_interop_deselected": 1314,
+      "mypy_sources": 439,
+      "formatted_files": 1153,
+      "markdown_files": 75,
+      "local_links": 1385,
+      "infra_unit_passed": 90,
+      "native_collected_only": 39,
+      "broker_collected_only": 51,
+      "broker_required_flags": 137
+    },
+    "scope": [
+      "Original serial expiry and candidate expiry, durable first-response recovery, cancellation drain and bounded scan dispatch seams",
+      "Explicit SDK Retry/Replan only after exact old Aborted; ordinary repeated dispatch never grants a provider call",
+      "Shared original terminal projection, original root/witness/archive atomicity and unchanged original ModelCapacity",
+      "Client deliberately discarded replies are named separately from network fault acceptance"
+    ],
+    "source_ci": {
+      "status": "pending"
+    },
+    "actual_broker": {
+      "status": "pending",
+      "profiles": 6,
+      "expected_tests_each": 51,
+      "expected_flags_each": 137
+    },
+    "default_assembly_enabled": false,
+    "production_changed": false,
+    "system_login_claimed": false,
+    "real_provider_claimed": false,
+    "process_exit_claimed": false,
+    "database_commit_network_fault_claimed": false,
+    "local_reports": [
+      "/tmp/m3-recovery-drain-whole-unit.log",
+      "/tmp/m3-recovery-drain-whole-types.log",
+      "/tmp/m3-recovery-drain-whole-docs.log",
+      "/tmp/m3-recovery-drain-infra-unit.log",
+      "/tmp/m3-recovery-drain-native-collected.log",
+      "/tmp/m3-recovery-broker-collected.log"
+    ]
+  }
 }

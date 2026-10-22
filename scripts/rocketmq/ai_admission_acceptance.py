@@ -66,7 +66,7 @@ def read_host_receipt(output, *, marker='M3_AI_ADMISSION_RECEIPT', cases=CASES, 
     if (not isinstance(receipt, dict) or set(receipt) != _FIELDS
             or not isinstance(receipt.get('cases'), dict) or not set(receipt['cases']) <= cases
             or any(v is not True for v in receipt['cases'].values())
-            or any(type(receipt.get(k)) is not int or not 0 <= receipt[k] <= 100
+            or any(type(receipt.get(k)) is not int or not 0 <= receipt[k] <= max(100, len(cases))
                    for k in ('passed', 'failed', 'skipped'))
             or receipt['passed'] != len(receipt['cases'])
             or receipt.get('root') != 'original_mysql_sqlalchemy'
