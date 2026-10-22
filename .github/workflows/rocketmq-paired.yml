@@ -18,13 +18,9 @@ on:
         options: [core, full]
         default: full
       full_matrix:
-        description: Frozen-candidate six-profile compatibility gate
+        description: Manual six-profile gate; pull requests always run all six
         type: boolean
         default: false
-  # Development-only trigger; final required PR/full gates remain separate.
-  push:
-    branches: ['codex/rocketmq-m3-paired']
-    paths: ['scripts/rocketmq/paired_acceptance.py', 'scripts/rocketmq/test_paired_acceptance.py', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-paired.yml', 'Makefile']
   pull_request:
     paths: ['scripts/rocketmq/paired_acceptance.py', 'scripts/rocketmq/test_paired_acceptance.py', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-paired.yml', 'Makefile']
 permissions:
@@ -39,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(inputs.full_matrix && '[{"python":"3.11","mysql":"mysql:8.0.36"},{"python":"3.11","mysql":"mysql:8.0.44"},{"python":"3.11","mysql":"mysql:8.4.11"},{"python":"3.13","mysql":"mysql:8.0.36"},{"python":"3.13","mysql":"mysql:8.0.44"},{"python":"3.13","mysql":"mysql:8.4.11"}]' || '[{"python":"3.11","mysql":"mysql:8.0.36"}]') }}
+        include: ${{ fromJSON((github.event_name == 'pull_request' || inputs.full_matrix) && '[{"python":"3.11","mysql":"mysql:8.0.36"},{"python":"3.11","mysql":"mysql:8.0.44"},{"python":"3.11","mysql":"mysql:8.4.11"},{"python":"3.13","mysql":"mysql:8.0.36"},{"python":"3.13","mysql":"mysql:8.0.44"},{"python":"3.13","mysql":"mysql:8.4.11"}]' || '[{"python":"3.11","mysql":"mysql:8.0.36"}]') }}
     env:
       GOTOOLCHAIN: local
     steps:
