@@ -6,12 +6,16 @@ on:
         description: Exact AI recovery candidate source SHA
         type: string
         required: true
-        default: 9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38
+        default: 1643afe4ba4d846c951f36a1fdd4f1fcf0463ac3
       profile:
         description: Development gate; all is required for the frozen candidate
         type: choice
         options: [live, mysql, all]
         default: live
+      full_matrix:
+        description: Frozen-candidate six-profile acceptance; development uses one profile
+        type: boolean
+        default: false
   pull_request:
     paths: ['scripts/rocketmq/ai_finalization_characterization.py', 'scripts/rocketmq/test_ai_finalization_characterization.py', 'scripts/rocketmq/ai_finalization_acceptance.py', 'scripts/rocketmq/test_ai_finalization_acceptance.py', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-finalization.yml', 'Makefile']
 permissions:
@@ -46,7 +50,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38' }}
+          ref: ${{ inputs.ai_ref || '1643afe4ba4d846c951f36a1fdd4f1fcf0463ac3' }}
           path: .ai-acceptance
       - uses: astral-sh/setup-uv@v6
         with:
@@ -59,11 +63,12 @@ jobs:
         run: uv sync --locked
       - name: Required original worker MySQL recovery
         env:
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '1643afe4ba4d846c951f36a1fdd4f1fcf0463ac3' }}
           MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
         run: |
           set -euo pipefail
-          export QS_AI_T18_MYSQL_IMAGE_ID="$(docker inspect --format '{{.Image}}' "$MYSQL_CONTAINER_ID")"
+          QS_AI_T18_MYSQL_IMAGE_ID="$(docker inspect --format '{{.Image}}' "$MYSQL_CONTAINER_ID")"
+          export QS_AI_T18_MYSQL_IMAGE_ID
           cd .ai-acceptance
           uv run python ../scripts/rocketmq/ai_finalization_characterization.py --recovery \
             --source "$PWD" --expected-source "$EXPECTED_AI_SHA" \
@@ -80,6 +85,10 @@ jobs:
     if: github.event_name != 'workflow_dispatch' || inputs.profile != 'mysql'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.full_matrix && '[{"python":"3.11","mysql":"mysql:8.0.36","name":"py311-mysql8036"},{"python":"3.11","mysql":"mysql:8.0.44","name":"py311-mysql8044"},{"python":"3.11","mysql":"mysql:8.4.11","name":"py311-mysql8411"},{"python":"3.13","mysql":"mysql:8.0.36","name":"py313-mysql8036"},{"python":"3.13","mysql":"mysql:8.0.44","name":"py313-mysql8044"},{"python":"3.13","mysql":"mysql:8.4.11","name":"py313-mysql8411"}]' || '[{"python":"3.11","mysql":"mysql:8.0.36","name":"py311-mysql8036"}]') }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
@@ -90,7 +99,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38' }}
+          ref: ${{ inputs.ai_ref || '1643afe4ba4d846c951f36a1fdd4f1fcf0463ac3' }}
           path: .ai-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -99,10 +108,10 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           version: '0.12.13'
-          python-version: '3.11'
+          python-version: ${{ matrix.python }}
       - name: Verify fixed source and strict profile receipts
         env:
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '1643afe4ba4d846c951f36a1fdd4f1fcf0463ac3' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
@@ -117,13 +126,13 @@ jobs:
         run: |
           set -euo pipefail
           make rocketmq-ai-finalization-test SDK_DIR="$PWD/.sdk-acceptance" AI_DIR="$PWD/.ai-acceptance" \
-            ROCKETMQ_TEST_IMAGE=rocketmq-ai-finalization:5.5.1 AI_ACCEPTANCE_PYTHON=3.11 \
-            ROCKETMQ_TEST_MYSQL_IMAGE=mysql:8.0.36 \
+            ROCKETMQ_TEST_IMAGE=rocketmq-ai-finalization:5.5.1 AI_ACCEPTANCE_PYTHON=${{ matrix.python }} \
+            ROCKETMQ_TEST_MYSQL_IMAGE=${{ matrix.mysql }} \
             ROCKETMQ_AI_FINALIZATION_REPORT=rocketmq-ai-finalization-live.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: rocketmq-ai-finalization-live-${{ github.sha }}
+          name: rocketmq-ai-finalization-live-${{ matrix.name }}-${{ github.sha }}
           path: rocketmq-ai-finalization-live.json
           if-no-files-found: error
           retention-days: 14

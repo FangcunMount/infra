@@ -119,11 +119,13 @@ def acceptance_profile(kind):
 
 
 def host_failure_diagnostics(raw, filename, tests):
-    names = set(re.findall(r'(?:FAILED|ERROR) tests/integration/' + re.escape(filename) +
+    filenames = (filename,) if isinstance(filename, str) else filename
+    pattern = '(?:' + '|'.join(re.escape(f) for f in filenames) + ')'
+    names = set(re.findall(r'(?:FAILED|ERROR) tests/integration/' + pattern +
                            r'::([A-Za-z0-9_\[\]-]+)', raw))
     return {'failed_cases': sorted(names & tests)[:16],
             'assertion_lines': sorted(set(int(n) for n in re.findall(
-                re.escape(filename) + r':(\d{1,6})(?!\d)', raw)))[:32]}
+                pattern + r':(\d{1,6})(?!\d)', raw)))[:32]}
 
 
 
@@ -240,7 +242,8 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
             run(['docker', 'exec', '-i', '-e', 'MYSQL_PWD=' + password, mysql, 'mysql', '-uroot', '--batch'],
                 stdin=f"DROP DATABASE `{focus_schema}`;")
             focus['schema_removed'] = True
-    result = (native_runner or run)([*command, 'pytest', '-q', '-s', str(source / 'tests/integration' / filename),
+    result = (native_runner or run)([*command, 'pytest', '-q', '-s',
+                  *(['-x'] if profile.get('fail_fast') else []), str(source / 'tests/integration' / filename),
                   '--junitxml=' + str(junit)], cwd=source, env=env, timeout=900, required=False)
     raw = result.stdout + result.stderr
     capture = directory / ('ai-' + profile['name'] + '-host-private.log'); capture.write_text(raw); capture.chmod(0o600)
@@ -249,8 +252,10 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
         proof['junit_sha256'] = hashlib.sha256(junit.read_bytes()).hexdigest()
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
-    proof['diagnostics'] = host_failure_diagnostics(raw, filename, profile['tests'])
+    proof['diagnostics'] = host_failure_diagnostics(raw, profile.get('diagnostic_files', filename), profile['tests'])
     if result.returncode or not junit.is_file():
+        if junit.is_file() and profile.get('failure_diagnostics'):
+            proof['native_failure_details'] = profile['failure_diagnostics'](junit.read_text())
         partial = profile['partial'](result.stdout)
         if partial is not None:
             proof['partial_native_receipt'] = partial

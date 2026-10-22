@@ -2,6 +2,7 @@
 import json
 import re
 import xml.etree.ElementTree as ET
+from ai_finalization_characterization import diagnostics
 
 from routes import consumer_group_v2, physical_topic_v2, validate_v2
 
@@ -80,6 +81,8 @@ def profile():
     return dict(name='finalization', sdk_version='0.4.0a2',
         sdk_url='https://github.com/FangcunMount/reliable-messaging/releases/download/python/v0.4.0a2/fangcun_reliable_messaging-0.4.0a2-py3-none-any.whl',
         sdk_sha256='570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2',
-        file='rocketmq_finalization_host.py', manifest=finalization_manifest,
+        file='rocketmq_finalization_host.py', manifest=finalization_manifest, fail_fast=True,
+        diagnostic_files=('rocketmq_finalization_host.py', 'rocketmq_finalization_matrix.py'),
+        failure_diagnostics=lambda raw: diagnostics(raw, tests=TESTS),
         partial=read_receipt, parse=parse_receipt, tests=TESTS,
         scope='five original report/serial/candidate worker paths in independent processes; synthetic HTTP provider with external persistent counter; real MySQL/SDK/Broker; actual terminal SendMessage and EndTransaction TCP reply loss; response-committed SIGKILL/recovery; observer ACK only, no paired QS/system or database commit network-fault proof')

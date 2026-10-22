@@ -61,12 +61,13 @@ def parse_native(raw, *, recovery=False):
             'current_protocol_recovery_verified': recovery}
 
 
-def diagnostics(raw, *, recovery=False):
+def diagnostics(raw, *, recovery=False, tests=None):
     # Never export traceback values, body/wire, DSNs or credentials.
     root = ET.fromstring(raw)
+    allowed = tests if tests is not None else (RECOVERY_TESTS if recovery else TESTS)
     rows = []
     for c in root.iter('testcase'):
-        name = c.get('name') if c.get('name') in (RECOVERY_TESTS if recovery else TESTS) else 'unlisted'
+        name = c.get('name') if c.get('name') in allowed else 'unlisted'
         nodes = [n for tag in ('error', 'failure', 'skipped') for n in c.findall(tag)]
         if nodes:
             text = '\n'.join((n.text or '') for n in nodes)

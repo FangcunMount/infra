@@ -3,6 +3,8 @@ import unittest
 import xml.etree.ElementTree as ET
 
 from ai_finalization_acceptance import CASES, TESTS, finalization_manifest, parse_receipt, read_receipt
+from ai_admission_acceptance import host_failure_diagnostics
+from ai_finalization_characterization import diagnostics
 from routes import validate_v2
 
 
@@ -24,6 +26,21 @@ def output(value):
 
 
 class FinalizationHostProof(unittest.TestCase):
+    def test_matrix_fixture_failures_keep_only_source_locations_and_exception_classes(self):
+        name = sorted(TESTS)[0]
+        value = ET.Element('testsuite')
+        case = ET.SubElement(value, 'testcase', name=name)
+        ET.SubElement(case, 'error').text = ('tests/integration/test_evaluation_step.py:53\n'
+            'sqlalchemy.exc.IntegrityError: password=never-export wire=private-fixture')
+        actual = diagnostics(ET.tostring(value), tests=TESTS)
+        self.assertEqual(actual, [dict(test=name, statuses=['error'],
+            error_classes=['sqlalchemy.exc.IntegrityError'],
+            source_locations=['tests/integration/test_evaluation_step.py:53'])])
+        raw = f'ERROR tests/integration/rocketmq_finalization_host.py::{name}\nrocketmq_finalization_matrix.py:42\nwire=never-export'
+        self.assertEqual(host_failure_diagnostics(raw,
+            ('rocketmq_finalization_host.py', 'rocketmq_finalization_matrix.py'), TESTS),
+            dict(failed_cases=[name], assertion_lines=[42]))
+
     def test_exact_manifest_and_nonempty_receipt(self):
         validate_v2(finalization_manifest())
         value, root = proof()

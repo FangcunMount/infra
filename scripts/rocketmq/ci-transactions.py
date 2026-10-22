@@ -952,6 +952,7 @@ def main():
                                 'Five paths x normal/terminal send unavailable/commit reply lost/response-committed SIGKILL',
                                 'Actual SDK RPC TCP interruption and external HTTP invocation ledger; no database commit network-fault claim']
             report['ai_finalization_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_finalization_acceptance.py').read_bytes()).hexdigest()
+            report['ai_finalization_diagnostics_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_finalization_characterization.py').read_bytes()).hexdigest()
         if args.qs_event_host:
             report['batch'] = 'M3-QS-AI-event-original-SQL-and-ACK-Broker'
             report['limits'] = ['No production/system acceptance or throughput claim',
