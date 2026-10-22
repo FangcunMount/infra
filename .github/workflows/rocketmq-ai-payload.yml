@@ -1,0 +1,86 @@
+name: RocketMQ AI current payload and receipt roots
+on:
+  workflow_dispatch:
+    inputs:
+      ai_ref:
+        description: Exact current payload host source SHA
+        type: string
+        required: true
+        default: 729faee986d0553392b4b0c9f88a3830347923ec
+      full_matrix:
+        description: Frozen-candidate six-profile gate; development uses one
+        type: boolean
+        default: false
+  pull_request:
+    paths: ['scripts/rocketmq/ai_payload_acceptance.py', 'scripts/rocketmq/test_ai_payload_acceptance.py', '.github/workflows/rocketmq-ai-payload.yml']
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-ai-payload-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  current-mysql-mtls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.full_matrix && '[{"python":"3.11","mysql":"8.0.36","name":"py311-mysql8036"},{"python":"3.11","mysql":"8.0.44","name":"py311-mysql8044"},{"python":"3.11","mysql":"8.4.11","name":"py311-mysql8411"},{"python":"3.13","mysql":"8.0.36","name":"py313-mysql8036"},{"python":"3.13","mysql":"8.0.44","name":"py313-mysql8044"},{"python":"3.13","mysql":"8.4.11","name":"py313-mysql8411"}]' || '[{"python":"3.11","mysql":"8.0.36","name":"py311-mysql8036"}]') }}
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql }}
+        env:
+          MYSQL_DATABASE: qs_ai_t19
+          MYSQL_USER: qs_ai_t19
+          MYSQL_PASSWORD: isolated_t19
+          MYSQL_ROOT_PASSWORD: isolated_t19_root
+        options: >-
+          --publish 127.0.0.1:3306:3306
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pisolated_t19_root --silent"
+          --health-interval=5s --health-timeout=3s --health-retries=30
+    env:
+      QS_AI_DATABASE_URL: mysql+asyncmy://qs_ai_t19:isolated_t19@127.0.0.1:3306/qs_ai_t19
+      QS_AI_TEST_MYSQL_DSN: mysql://qs_ai_t19:isolated_t19@127.0.0.1:3306/qs_ai_t19
+      QS_AI_T19_MIGRATION_DATABASE_URL: mysql+asyncmy://root:isolated_t19_root@127.0.0.1:3306/qs_ai_t19
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-ai
+          ref: ${{ inputs.ai_ref || '729faee986d0553392b4b0c9f88a3830347923ec' }}
+          path: .ai-acceptance
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: ${{ matrix.python }}
+      - name: Verify strict native IDs and exact source
+        env:
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '729faee986d0553392b4b0c9f88a3830347923ec' }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .ai-acceptance rev-parse HEAD)" = "$EXPECTED_AI_SHA"
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_ai_payload_acceptance.py' -v
+      - name: Install fixed locked host and SDK
+        working-directory: .ai-acceptance
+        run: uv sync --locked
+      - name: Required current original MySQL and mTLS RPC gate
+        env:
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '729faee986d0553392b4b0c9f88a3830347923ec' }}
+          MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
+        run: |
+          set -euo pipefail
+          QS_AI_T19_MYSQL_IMAGE_ID="$(docker inspect --format '{{.Image}}' "$MYSQL_CONTAINER_ID")"
+          QS_AI_T19_MYSQL_PORTS="$(docker inspect --format '{{json .NetworkSettings.Ports}}' "$MYSQL_CONTAINER_ID")"
+          export QS_AI_T19_MYSQL_IMAGE_ID QS_AI_T19_MYSQL_PORTS
+          cd .ai-acceptance
+          uv run python ../scripts/rocketmq/ai_payload_acceptance.py --source "$PWD" \
+            --expected-source "$EXPECTED_AI_SHA" --mysql '${{ matrix.mysql }}' --python '${{ matrix.python }}' \
+            --report "$GITHUB_WORKSPACE/rocketmq-ai-current-payload.json"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-ai-current-payload-${{ matrix.name }}-${{ github.sha }}
+          path: rocketmq-ai-current-payload.json
+          if-no-files-found: error
+          retention-days: 14

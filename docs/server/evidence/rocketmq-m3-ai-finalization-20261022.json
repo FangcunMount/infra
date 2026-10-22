@@ -2917,8 +2917,10 @@
     "number": 145,
     "url": "https://github.com/FangcunMount/infra/pull/145",
     "base": "main",
-    "status": "final_completion_record_pending_progress_document_merge",
-    "functional_infra_head_held_at": "2fc1af9390d92c7795fa055c744e0b5d899e7e26"
+    "status": "merged",
+    "functional_infra_head_held_at": "2fc1af9390d92c7795fa055c744e0b5d899e7e26",
+    "merge": "2270c8c9eede8c1241e04b04eacfc62e3b9c4caf",
+    "complete_tree_equals_progress_candidate": true
   },
   "source_review": {
     "source": "1643afe4ba4d846c951f36a1fdd4f1fcf0463ac3",

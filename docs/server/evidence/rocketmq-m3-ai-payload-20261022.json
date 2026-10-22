@@ -1,0 +1,59 @@
+{
+  "task": "T19",
+  "status": "in_progress",
+  "completed": false,
+  "progress": "18/36",
+  "source_base": "c04a181f2f8323aecff7007dfc50a7828b252590",
+  "infra_base": "2270c8c9eede8c1241e04b04eacfc62e3b9c4caf",
+  "source_worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-current-payload",
+  "infra_worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/infra-current-payload",
+  "branch": "codex/rocketmq-m3-current-payload",
+  "sdk_source": "8de893b367cc797580799abd8325f41dd62356db",
+  "sdk_python": "0.4.0a2",
+  "scope": "current protocol Payload RPC, exact business receipt, diagnostics and no new Relay responsibility",
+  "new_historical_format_compatibility": false,
+  "cleanup_deferred_to": "M4-C03",
+  "production_changed": false,
+  "system_acceptance_claimed": false,
+  "baseline_local_passed": 45,
+  "baseline_log": "/tmp/m3-t19-baseline.log",
+  "source_analysis": {
+    "existing_default_archive_reader": true,
+    "existing_transaction_receipt_roots": true,
+    "existing_default_relay_disabled": true,
+    "candidate_gap": "Current archive reference/workload mismatches use MessagingContractError, while the existing RPC maps only MessageConflict to reference-denial diagnostics; authority proof errors must remain unavailable."
+  },
+  "acceptance_targets": [
+    "committed first body through actual mTLS RPC",
+    "wrong workload/tenant/recipient/hash/length deny without payload leakage",
+    "uncommitted or contradictory exact evidence cannot serve a body",
+    "reference failures and authority/storage unavailability keep distinct fixed diagnostics",
+    "exact STORED/HELD/duplicate receipt semantics retain original SQL root",
+    "new transaction assembly has no MQRelay or ordinary publisher",
+    "fixed current source complete CI and source/tools merge"
+  ],
+  "failure_history": [
+    {
+      "phase": "reference diagnostic red test",
+      "failed": 5,
+      "passed": 5,
+      "cause": "permanent current archive reference mismatches incorrectly mapped to UNAVAILABLE",
+      "resolution": "raise existing MessageConflict only for request reference mismatch; authority errors remain unavailable"
+    }
+  ],
+  "source_candidate": "729faee986d0553392b4b0c9f88a3830347923ec",
+  "focused_local_passed": 55,
+  "typed_source_files": 447,
+  "native_ids_collected": 15,
+  "evidence_flags_required": 21,
+  "infra_unit_tests_passed": 109,
+  "workflow_actionlint_passed": true,
+  "local_evidence": {
+    "red_log": "/tmp/m3-t19-current-rpc-red.log",
+    "green_log": "/tmp/m3-t19-current-rpc-green.log",
+    "type_log": "/tmp/m3-t19-mypy.log",
+    "infra_log": "/tmp/m3-t19-infra-tool-tests.log",
+    "native_collected_log": "/tmp/m3-t19-native-collected.log"
+  },
+  "native_acceptance_status": "pending actual isolated MySQL and mTLS CI; collection is not execution"
+}
