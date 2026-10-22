@@ -660,7 +660,7 @@ PR205–208已收拢到[PR209](https://github.com/FangcunMount/qs-ai/pull/209)�
 | --- | --- | --- |
 | candidate完整事务链路 | ✅ 已完成（源码与工具均合并） | 原prepare/dispatch、generation/semantic完成和首响应恢复通过实际宿主入口串联；原根/witness/重复/故障通过 |
 | 恢复与取消drain | ✅ 已完成（源码与工具均合并） | 过期所有权、已持久化首响应恢复、取消收尾与显式旧Aborted恢复经两档MySQL与六档Broker验证；不授权未知模型重做 |
-| 默认运行装配 | ☐ 原事务成对入口/DI本地推进；启动关闭及实际依赖待验，未启用 | 全部活动写者实际接入事务runtime，启动/关闭与原入口端到端通过 |
+| 默认运行装配 | ☐ 完整源码候选PR212；本地启动/关闭通过，真实依赖门禁待验 | 全部活动写者实际接入事务runtime，启动/关闭与原入口端到端通过 |
 
 已合并的interpretation领取/完成及串行generation/semantic事务子批次保持通过。当前实现分支统一为codex/rocketmq-m3-candidate-runtime，下一次功能提交围绕完整candidate运行链路，不再为单个辅助抽取建立独立PR。M3保持16/36、T17未勾选；生产、稳定SDK、system及48小时观察未操作。
 
@@ -746,3 +746,16 @@ M3保持16/36，T17恢复/drain与默认装配仍未勾选，源码及工具尚�
 默认装配在独立工作区继续：上次完整本地4161单元通过（1326真实依赖用例明确排除）；新增无消息发布的操作事务保护另32目标通过、444源类型通过，12项串行成对原生仅收集。原事务/DI/配额与共享Sender已接线；完整启动/准入/在途关闭，以及新档案ACK与历史读取兼容仍待完成。没有为辅助组件另建PR，默认事务启动保护保持关闭。
 
 上述门禁不代表QS配对业务、真实provider、宿主SIGKILL/数据库网络故障或system验收。稳定SDK、生产配置/DDL/Topic/ACL切换和48小时观察均未执行；原NSQ运行责任与三个worker配额保持。
+
+
+### 2026-10-22 T17 默认事务装配完整候选（门禁待验）
+
+[AI PR212](https://github.com/FangcunMount/qs-ai/pull/212) 固定 `cb47e5a77d12335c836a53ff9b8a309a362a992f`（功能5a191cb），基线6d7488。显式 ai.mysql 配置现在选择完整 APP Sender、command receiver、串行/candidate 工作流与恢复/取消排空；不创建普通 Publisher/MQRelay。未配置 transactions 的旧链路及生产配置保持。新增0042仅为显式迁移源码，保存独立业务 ACK 历史；新身份必须有精确 Committed 档案/witness，缺身份才读取旧 Outbox，STORED/HELD及历史 delivered在原ACK根内处理。
+
+54项装配/架构/回执/生命周期目标通过，446源类型、1171格式及75文档/1388链接通过。启动先Checker后订阅；暂停仍保留Checker，领取依赖Sender就绪/准入；已接受工作可在排空时发送终态，Close超时经Wait等真实任务，重复父取消不提前释放宿主资源。完整单元首轮4193通过、1依赖环失败，已提取纯文件读取器修复并执行完整重验，失败日志保留；不能据目标通过冒充完整门禁。
+
+新增12串行成对、5业务ACK原生用例仅收集。隔离Broker扩大至53宿主/145证据，实际默认DI、SDK、双订阅及worker preflight入口参与；ACK为受保护的可控输入，不声称QS成对业务。infra精确收据拒绝旧51/137冒充新装配；三路由资源限定AI发布自己事件、读取原command/ACK组，observer只订阅事件。工具91项通过（首轮旧单路由计数断言失败已保留并修正）。
+
+[源码39727969476](https://github.com/FangcunMount/qs-ai/actions/runs/39727969476)已开始；实际MySQL与六档Broker待验。AUTO_DEPLOY_ENABLED=false。M3保持16/36，T17内部2/3，不勾选最后门禁；尚未合并、发布稳定SDK或更改生产DDL/Topic/ACL/provider、worker资源及NSQ运行责任。system及48小时观察未执行。
+
+默认装配候选 cb47e5a 完整本地重验：**4194通过、0失败/跳过，1331 integration/interop明确排除**；446源类型、1171格式及文档75/1388通过。依赖环目标54通过后，完整套件重新执行，未把旧失败快照重标为通过。原生17和Broker53仅收集，源码CI与六档实际Broker门禁仍待验，不提前合并或勾选。

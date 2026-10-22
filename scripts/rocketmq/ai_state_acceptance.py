@@ -1,4 +1,4 @@
-"""Required worker/governance-state profile: one transaction owner and an event observer only."""
+"""Required original-root/default-assembly profile; controlled ACK input, not paired QS."""
 
 from routes import consumer_group_v2, physical_topic_v2, validate_v2
 
@@ -166,6 +166,23 @@ RECOVERY_TESTS = frozenset((
 CASES = CASES | RECOVERY_CASES
 TESTS = TESTS | RECOVERY_TESTS
 
+DEFAULT_CASES = frozenset((
+    'default_assembly_shared_primary_sender',
+    'default_assembly_no_legacy_publish_path',
+    'default_assembly_idle_checker_subscriptions',
+    'default_assembly_pause_no_new_writes',
+    'default_assembly_original_worker_preflight',
+    'default_assembly_exact_archive_witness',
+    'default_assembly_authenticated_business_ack',
+    'default_assembly_close_preserves_pool',
+))
+DEFAULT_TESTS = frozenset((
+    'test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]',
+    'test_actual_default_transport_and_worker_share_sender_root_and_shutdown[True]',
+))
+CASES = CASES | DEFAULT_CASES
+TESTS = TESTS | DEFAULT_TESTS
+
 
 def state_manifest():
     topic, subscription, owner = 'qs.ai.events.v1', 'qs-m3-ai-state-observer', 'ai.mysql'
@@ -173,11 +190,19 @@ def state_manifest():
              'message_type': 'TRANSACTION', 'owner': owner, 'route_revision': 'm3-1',
              'physical_topic': physical_topic_v2(topic, 'TRANSACTION', owner, 'm3-1'),
              'consumer_group': consumer_group_v2(topic, subscription)}
-    manifest = {'version': 2, 'routes': [route],
+    inputs = [dict(id=name, topic=topic, subscription=subscription,
+                   message_type='TRANSACTION', owner='qs.mysql', route_revision='m3-1',
+                   physical_topic=physical_topic_v2(topic, 'TRANSACTION', 'qs.mysql', 'm3-1'),
+                   consumer_group=consumer_group_v2(topic, subscription))
+              for name, topic, subscription in (
+                  ('ai-default-command', 'qs.ai.commands.v1', 'qs-ai.commands.v1'),
+                  ('ai-default-ack', 'qs.ai.acks.v1', 'qs-ai.acks.v1'))]
+    manifest = {'version': 2, 'routes': [route, *inputs],
         'topic_options': {'read_queue_nums': 1, 'write_queue_nums': 1, 'perm': 6},
         'group_options': {'retry_queue_nums': 8},
         'accounts': {
-            'ai': {'owner': owner, 'publish': [route['id']], 'subscriptions': []},
+            'ai': {'owner': owner, 'publish': [route['id']],
+                   'subscriptions': [r['id'] for r in inputs]},
             'observer': {'publish': [], 'subscriptions': [route['id']]}}}
     validate_v2(manifest)
     return manifest
