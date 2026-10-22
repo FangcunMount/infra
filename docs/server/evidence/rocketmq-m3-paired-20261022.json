@@ -7,8 +7,8 @@
   "internal_gates": {
     "A": "completed",
     "B": "completed",
-    "C": "in_progress",
-    "D": "pending"
+    "C": "completed",
+    "D": "in_progress"
   },
   "source_baselines": {
     "qs": "be22b9274d1d7ab21abd3be24fb0ebde834ec78b",
@@ -118,7 +118,52 @@
         "compose_down_succeeded": true,
         "probe_process_groups_drained": true,
         "private_fixture_directory_removed": true
-      }
+      },
+      "source_review_findings": [
+        "large fixture overwrote the valid standard-report JSON with a raw string; preserve exact business document using trailing JSON whitespace",
+        "outer poll cancellation could abandon an active control response and confuse close; keep one bounded exchange until drained"
+      ]
+    },
+    {
+      "run_id": 39795568798,
+      "source_ai": "4e19f11646a17cd6003198f2a06a8c4b53b9c96e",
+      "source_qs": "19387732e7475891dffdaed894500ecacb57668e",
+      "infra": "17f0e47014628129b7408af980444246f8442f70",
+      "passed_native_flags": 16,
+      "failed": 1,
+      "skipped": 0,
+      "failed_test": "test_actual_qs_ai_large_payloads_and_mtls_denial",
+      "cause": "test expected question v3; original domain creates v1, queues v2, claims running v3, then question is v4",
+      "resolution": "assert queued v2 and claimed v3 explicitly, require final v4; queued cancellation uses current v2 and must reach v3; retain original domain semantics",
+      "report_sha256": "2b1103e5577228020fd4868cd3e37d47a17bdfadee113913d073fea36f06e174",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "actual_large_command_rpc_verified": true
+    },
+    {
+      "run_id": 39797236451,
+      "source_ai": "0c7a53a3a9371918cd7d7d7c6cf8851cd92d4b31",
+      "source_qs": "19387732e7475891dffdaed894500ecacb57668e",
+      "infra": "b766a39d2b4eaea0a08aee5cd49cd68d70fa8e07",
+      "passed_native_flags": 22,
+      "failed": 1,
+      "skipped": 0,
+      "failed_test": "test_actual_qs_ai_evaluation_start_cancel_receipt_state_ack",
+      "cause": "fixture read evaluation_runs.version; version belongs to original evaluation_checkpoints row",
+      "resolution": "read original checkpoint version, keep immutable Run/policy comparison and exact projection/ACK checks",
+      "report_sha256": "8b373e04e76b0c4946eb322002d413cd5728ab8a42d82f5b38b3de707f4636d3",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "native_cases_passed": 4,
+      "evaluation_start_loop_reached": true
     }
   ],
   "prototype": {
@@ -133,7 +178,7 @@
     "core_is_development_only": true,
     "core_status": "passed and independently verified; full profile pending",
     "full_native_tests_collected": 5,
-    "full_status": "first complete-profile run failed in third case after first two passed; diagnostic rerun pending"
+    "full_status": "full single profile passed and independently verified; final six profiles and source/tool gates pending"
   },
   "core_acceptance": {
     "run_id": 39788646533,
@@ -150,15 +195,74 @@
     "scope": "core only; does not satisfy full T20"
   },
   "merge_status": {
-    "qs": "source branch only; final PR/gates pending",
-    "ai": "source branch only; final PR/gates pending",
-    "infra_tools": "source branch only; full PR regressions pending"
+    "qs": "draft PR420; source/doc candidate full gates pending",
+    "ai": "PR215 advanced to exact b55c7a6 final candidate; final CI pending",
+    "infra_tools": "no functional PR; full gate and final regressions pending",
+    "progress_pr150": "merged 6c863b2a44098e00257937a41e999543bfabb24e; exact tree verified"
   },
   "development_cancelled_runs": [
     {
       "run_id": 39794406776,
       "infra": "6d48581b4752cf26f480453d82ba7f82198228dd",
       "reason": "superseded before native execution by fixture-only polling/framing diagnostics"
+    },
+    {
+      "run_id": 39794857424,
+      "infra": "ceb80686ab93f272033bb756eb8efd17a85e1068",
+      "reason": "superseded by valid frozen report fixture and narrowly corrected Go reference classification"
     }
-  ]
+  ],
+  "current_source_correction": {
+    "scope": "caller payload organization/hash/length mismatch only",
+    "source_qs": "19387732e7475891dffdaed894500ecacb57668e",
+    "red": "three exact-reference subcases reproduced internal contract error instead of existing caller conflict classification",
+    "green": "three related packages race pass; QS docs-check pass",
+    "internal_proof_and_workload_errors_unchanged": true,
+    "production_changed": false
+  },
+  "github_actions_processing_incident": {
+    "url": "https://www.githubstatus.com/incidents/q29p76qtnkyk",
+    "reported_at": "2026-10-22T14:18:15Z",
+    "scope": "workflow/step result and repository update processing delays; do not infer actual execution from delayed queued status"
+  },
+  "source_ci_history": [
+    {
+      "repo": "qs-server",
+      "pr": 420,
+      "run_id": 39795642717,
+      "source": "19387732e7475891dffdaed894500ecacb57668e",
+      "failed_check": "Docs Hygiene & Facts",
+      "cause": "source change committed without advancing documentation closure baseline",
+      "resolution": "7ee34a3c6 updates only source baseline/date; 87 docs tests and post-commit facts passed"
+    },
+    {
+      "repo": "qs-ai",
+      "run_id": 39797121836,
+      "source": "0c7a53a3a9371918cd7d7d7c6cf8851cd92d4b31",
+      "status": "cancel_requested",
+      "reason": "superseded by checkpoint-only final candidate b55c7a6; not accepted as final source proof"
+    }
+  ],
+  "current_candidates": {
+    "qs": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+    "ai": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+    "infra": "da4630f5122cf9b788570f0f03aff7d4a8502716"
+  },
+  "full_single_acceptance": {
+    "report_sha256": "c460a3ca4fcea1cbd2c326e1f4c87cd42f7fef3cf721be2b9c8a66d99cee7f33",
+    "file": "rocketmq-paired-full-0-da4630f5122cf9b788570f0f03aff7d4a8502716",
+    "python": "3.11.16",
+    "mysql": "8.0.36",
+    "native": 5,
+    "evidence": 25,
+    "failed": 0,
+    "skipped": 0,
+    "cleanup_verified": true,
+    "all_source_hashes_verified": true,
+    "qs_source": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+    "ai_source": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+    "infra_source": "da4630f5122cf9b788570f0f03aff7d4a8502716",
+    "run_id": 39798461241,
+    "scope": "full five-case single-profile C gate; six-profile final D gate pending"
+  }
 }
