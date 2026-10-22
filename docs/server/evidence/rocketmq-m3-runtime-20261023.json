@@ -483,14 +483,14 @@
     "production_environment_pause_override": false
   },
   "deferred_consumer_batch": {
-    "status": "source_frozen_native_mysql_development_running",
+    "status": "native_mysql_verified_whole_worker_pending",
     "scope": "current v2 RocketMQ paused retry deliveries only; same original dispatcher/identity, no publication or business retry authorization",
     "storage": "reuse original transport evidence104 and explicit host migration for v2 deferred linkage; no historical reader",
     "resource_contract": "same original worker execution concurrency, one bounded resume loop, bounded SQL/lease renewal and actual completion accounting",
     "verification_pending": [
-      "pure contract/race",
-      "required isolated real MySQL/Broker",
-      "shared budget and crash/lease ownership"
+      "current full worker/Broker delivery and shared execution budget",
+      "whole-host native lifecycle and cross-instance Checker",
+      "actual current-head source CI and merges"
     ],
     "source_sha": "9304ba3d97c269f546f2749296574e06f7709d12",
     "resource_pair_source_sha": "c1d4a79f76fe7f868cfd8320270c80280d24b5bf",
@@ -534,6 +534,98 @@
       "staticcheck nil-context test and tagged-switch guidance fixed",
       "docs expected migration maximum and both sidecar source/target bindings updated from108 to actual109",
       "initial schema109 source lacked declared109/42 pair; explicit pair and contract proof added before native dispatch"
+    ],
+    "resource_pair_source": "c1d4a79f76fe7f868cfd8320270c80280d24b5bf",
+    "native_candidate": "875160597fdd3acf870c695ef478b78eecdafb11",
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/159",
+    "native_full_run": "https://github.com/FangcunMount/infra/actions/runs/39844371120",
+    "native_development_run": "https://github.com/FangcunMount/infra/actions/runs/39843841383",
+    "mysql_matrix": [
+      {
+        "sha256": "ffeb8c0453e3488b9bc085cfbd8db91db902dd798b51cb10b5453139d56e9353",
+        "mysql_version": "8.0.44",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "cases": [
+          "broken_first_link_rolls_back_new_physical_evidence",
+          "durable_eight_attempt_budget_and_one_manual_delivery",
+          "exact_wire_duplicate_and_legacy_refusal",
+          "explicit_schema_required",
+          "real_child_kill_retains_attempt_and_frozen_wire",
+          "real_expiry_new_claim_blocks_old_owner",
+          "sql_lock_budget_does_not_grant_execution"
+        ],
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "sha256": "f3a2e2b714edba9bbec35f40e4483807f3cd79f31abfcae3621feb94ae2082e2",
+        "mysql_version": "8.4.11",
+        "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "cases": [
+          "broken_first_link_rolls_back_new_physical_evidence",
+          "durable_eight_attempt_budget_and_one_manual_delivery",
+          "exact_wire_duplicate_and_legacy_refusal",
+          "explicit_schema_required",
+          "real_child_kill_retains_attempt_and_frozen_wire",
+          "real_expiry_new_claim_blocks_old_owner",
+          "sql_lock_budget_does_not_grant_execution"
+        ],
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "sha256": "4af17850a73f760961a1dccd88688271008d6eb494a5e7e2cca8eb78e46b7516",
+        "mysql_version": "8.0.36",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "cases": [
+          "broken_first_link_rolls_back_new_physical_evidence",
+          "durable_eight_attempt_budget_and_one_manual_delivery",
+          "exact_wire_duplicate_and_legacy_refusal",
+          "explicit_schema_required",
+          "real_child_kill_retains_attempt_and_frozen_wire",
+          "real_expiry_new_claim_blocks_old_owner",
+          "sql_lock_budget_does_not_grant_execution"
+        ],
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      }
+    ],
+    "native_full_status": "3 jobs SUCCESS; each exact 7 cases, zero failed/skipped; all owned cleanup verified",
+    "scope_limits": [
+      "No Broker delivery or full-worker proof",
+      "Controlled callback errors are not network faults",
+      "Manual technical grant fixture is not human authorization API acceptance",
+      "No production/system login proof"
     ]
   }
 }

@@ -1140,3 +1140,12 @@ PR424精确候选21817e1通过28检查，1项API生成同步不适用；合并�
 本地6包79 race、迁移资源172、维护工具2全部零失败/跳过，普通及原生标签lint2.5.0、88文档门禁通过。原生入口仅编译；infra121工具测试/actionlint通过，固定infra46c62c4＋QS8751605的真实MySQL8.0.36开发档39843841383运行中。开发档不是完整三版本矩阵，更不代表Broker/完整worker/生产/system验收。原始失败、缺少版本对后的修正和文档基线修正保留；不把未跑原生计通过。
 
 M3保持21/36、T22进行中、M4为0/8；尚未发布稳定SDK、安装生产schema或改变生产provider/资源。下一步先核验原生开发报告与所属资源清理，再跑三版本固定矩阵和当前实际worker/Broker、全宿主/跨实例/资源上界门禁。
+
+
+### 2026-10-23：T22 延期消费真实 MySQL 完整矩阵通过
+
+固定QS875160597fdd3acf870c695ef478b78eecdafb11与infra46c62c45919d719aa44501247f2b44f1ddda528d，[开发档39843841383](https://github.com/FangcunMount/infra/actions/runs/39843841383)及[完整矩阵39844371120](https://github.com/FangcunMount/infra/actions/runs/39844371120)均成功。完整矩阵MySQL8.0.36、8.0.44、8.4.11各7项，零失败/跳过；逐份核验精确源码、完整用例、固定发布SDK无replace、实际镜像ID、原数据库/子进程及Compose私有资源清理，摘要见[运行时证据](evidence/rocketmq-m3-runtime-20261023.json)。
+
+已证明原SQL事务中的首次wire、重复和V1拒绝、证据断链回滚、真实过期租约接管与旧token拒绝、真实锁等待预算、8次自动技术投递及一次人工技术授权、真实子进程SIGKILL后计数和wire保留。callback错误是受控错误，不冒充网络故障；人工授权夹具不冒充权限API。infra工具121项通过，草稿PR159的广域回归仍运行；当前源码PR及其门禁、完整worker/Broker投递、当前全宿主生命周期/跨实例Checker/数据库与队列上界仍待完成。
+
+M3仍21/36，T22进行中、M4为0/8。未操作生产schema/Topic/ACL/provider、worker资源、稳定发布、system或48小时观察。下一步补齐真实Broker与当前worker执行入口，不能以本次原SQL组件验收替代T22整项门禁。
