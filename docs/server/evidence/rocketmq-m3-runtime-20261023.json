@@ -643,7 +643,7 @@
       "infra_source": "bbe0e5b",
       "qs_source": "8e52d8de7",
       "scope": "actual worker Container/initializeRuntime/lifecycle, real Broker/MySQL, owned loopback business RPC; not complete apiserver/provider/system",
-      "verification": "initial native compile and lint passed; process baseline22 and shared-budget two-package26 race zero failed/skipped; final merged compile/lint/docs running",
+      "verification": "initial native compile and lint passed; process baseline22 and shared-budget two-package33 race zero failed/skipped; final merged compile/lint/docs running",
       "development_run": "https://github.com/FangcunMount/infra/actions/runs/39846170583",
       "development_run_source": "1ae0ebd0500e0b899867548225108d6a929b6477",
       "development_run_status": "running; earlier source before shared queue snapshot and evidence extraction; not counted passed"
