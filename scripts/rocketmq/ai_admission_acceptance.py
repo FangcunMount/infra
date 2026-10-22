@@ -192,6 +192,51 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     proof['python_runtime'] = runtime
     junit = directory / ('ai-' + profile['name'] + '-private.xml')
     filename = profile['file']
+    if profile['name'] == 'state':
+        from ai_state_acceptance import FOCUS_CASES, FOCUS_TESTS
+        # Give new default assembly an early, strict gate. Its temporary DB is
+        # separate so repeated fixtures cannot seed the complete profile's state.
+        focus_schema = schema + '_focus'
+        focus_url = application_url.rsplit('/', 1)[0] + '/' + focus_schema
+        focus_root = root_url.rsplit('/', 1)[0] + '/' + focus_schema
+        focus_env = dict(env, QS_AI_DATABASE_URL=focus_url,
+            QS_AI_TEST_MYSQL_DSN=focus_url.replace('mysql+asyncmy://', 'mysql://', 1),
+            QS_MQ_FAULT_DDL_MYSQL_URL=focus_root)
+        focus = proof['default_assembly_focus'] = {'schema_isolated_from_full': True}
+        focus_junit = directory / 'ai-default-focus-private.xml'
+        run(['docker', 'exec', '-i', '-e', 'MYSQL_PWD=' + password, mysql, 'mysql', '-uroot', '--batch'],
+            stdin=f"CREATE DATABASE `{focus_schema}` CHARACTER SET utf8mb4; GRANT ALL ON `{focus_schema}`.* TO '{db_user}'@'%';")
+        try:
+            installed = run([*command, 'alembic', 'upgrade', 'head'], cwd=source,
+                env=dict(focus_env, QS_AI_DATABASE_URL=focus_root), timeout=180, required=False)
+            if installed.returncode:
+                raise RuntimeError('isolated AI focus migration failed (private output withheld)')
+            selected = run([*command, 'pytest', '-q', '-s', str(source / 'tests/integration' / filename),
+                '-k', 'test_actual_default_', '--junitxml=' + str(focus_junit)],
+                cwd=source, env=focus_env, timeout=180, required=False)
+            output = selected.stdout + selected.stderr
+            capture = directory / 'ai-default-focus-host-private.log'
+            capture.write_text(output); capture.chmod(0o600)
+            focus.update(exit_code=selected.returncode,
+                private_output_sha256=hashlib.sha256(output.encode()).hexdigest(),
+                diagnostics=host_failure_diagnostics(output, filename, FOCUS_TESTS))
+            if focus_junit.exists():
+                focus_junit.chmod(0o600)
+                focus['junit_sha256'] = hashlib.sha256(focus_junit.read_bytes()).hexdigest()
+            if selected.returncode or not focus_junit.is_file():
+                partial = read_host_receipt(selected.stdout, marker='M3_AI_STATE_RECEIPT',
+                    cases=FOCUS_CASES, sdk_version='0.4.0a2')
+                if partial is not None:
+                    focus['partial_native_receipt'] = partial
+                raise RuntimeError('actual default AI assembly focus failed (private output withheld)')
+            focus['native_receipt'] = parse_host_receipt(selected.stdout, focus_junit.read_text(),
+                marker='M3_AI_STATE_RECEIPT', cases=FOCUS_CASES, tests=FOCUS_TESTS,
+                sdk_version='0.4.0a2')
+            focus['native_tests_passed'] = len(FOCUS_TESTS)
+        finally:
+            run(['docker', 'exec', '-i', '-e', 'MYSQL_PWD=' + password, mysql, 'mysql', '-uroot', '--batch'],
+                stdin=f"DROP DATABASE `{focus_schema}`;")
+            focus['schema_removed'] = True
     result = run([*command, 'pytest', '-q', '-s', str(source / 'tests/integration' / filename),
                   '--junitxml=' + str(junit)], cwd=source, env=env, timeout=900, required=False)
     raw = result.stdout + result.stderr

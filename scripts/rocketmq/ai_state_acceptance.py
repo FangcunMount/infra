@@ -187,6 +187,8 @@ DEFAULT_TESTS = frozenset((
 ))
 CASES = CASES | DEFAULT_CASES
 TESTS = TESTS | DEFAULT_TESTS
+FOCUS_TESTS = DEFAULT_TESTS
+FOCUS_CASES = DEFAULT_CASES | frozenset(('halves_before_worker_root',))
 
 
 def state_manifest():

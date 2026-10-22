@@ -6,7 +6,7 @@
   "base": "6d74880283a55fbd22122636d427379c11c8e1f3",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-default-assembly",
   "branch": "codex/rocketmq-m3-default-assembly",
-  "source_candidate": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+  "source_candidate": "3ecf8c4ea653cf11f8480fb19144b0eb0960edb3",
   "source_pushed": true,
   "source_merged": false,
   "production_assembly_enabled": false,
@@ -206,29 +206,36 @@
     "scope": "Original MySQL roots and controlled client discard; not host packet fault, real provider or process-exit acceptance"
   },
   "full_local_gate": {
-    "status": "replacement_unit_running",
-    "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+    "status": "passed_current_candidate",
+    "source_sha": "3ecf8c4ea653cf11f8480fb19144b0eb0960edb3",
     "last_complete_source_sha": "cb47e5a77d12335c836a53ff9b8a309a362a992f",
     "last_complete_unit_passed": 4194,
     "latest_mypy_sources": 446,
     "format_files": 1171,
     "markdown_files": 75,
     "local_links": 1388,
-    "infra_unit_passed": 92,
+    "infra_unit_passed": 93,
     "broker_tests_collected_only": 55,
-    "broker_required_flags": 148
+    "broker_required_flags": 148,
+    "unit_passed": 4198,
+    "unit_failed": 0,
+    "unit_skipped": 0,
+    "integration_interop_deselected": 1331
   },
   "actual_broker_gate": {
-    "status": "replacement_pending",
+    "status": "repaired_candidate_focus_and_full_pending",
+    "source_sha": "3ecf8c4ea653cf11f8480fb19144b0eb0960edb3",
+    "focus_required_tests": 4,
+    "focus_required_flags": 12,
     "required_tests": 55,
     "required_flags": 148,
-    "prior_proofs_not_rebound": true
+    "prior_failed_reports_not_rebound": true
   },
   "previous_t16_broker_proof_not_rebound": true,
   "remaining": [
-    "Complete exact replacement source CI and real MySQL roots with zero failures/skips",
-    "Complete six real Broker profiles with exact 55 tests/148 flags; prior 51/137 and 53/145 receipts rejected",
-    "Review and merge source/infra; only then complete T17 and advance task count"
+    "Complete exact repaired source CI and five ACK MySQL fixtures; prior five setups failed and remain recorded",
+    "Complete isolated four-test/twelve-flag focus gate before the unchanged required 55-test/148-flag Broker matrix",
+    "Review/merge source and infra; only then close T17 and advance formal progress"
   ],
   "source_pr": "https://github.com/FangcunMount/qs-ai/pull/212",
   "source_pr_draft": false,
@@ -430,7 +437,7 @@
     "docs_files": 75,
     "docs_links": 1321
   },
-  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39728795742",
+  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39731027992",
   "worker_preflight_native_cases": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
     "file": "tests/integration/test_transaction_worker_preflight.py",
@@ -11964,7 +11971,7 @@
     "source_candidate_branch": "codex/rocketmq-m3-ai-creation-plan",
     "branch": "codex/rocketmq-m3-ai-solution-sdk"
   },
-  "source_ci_status": "pending_not_accepted",
+  "source_ci_status": "in_progress_not_accepted",
   "superseded_main_push_ci_deduplication_186": {
     "at": "2026-10-21T18:26:01.637785+00:00",
     "run": 39650592198,
@@ -20958,10 +20965,10 @@
     },
     {
       "id": "default_assembly",
-      "status": "replacement_candidate_actual_gates_pending",
+      "status": "fixture_repair_candidate_actual_gates_pending",
       "done": false,
       "acceptance": "All active writers use the transaction runtime in actual default composition; startup/close and original entrypoint end-to-end gates pass.",
-      "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+      "source_sha": "3ecf8c4ea653cf11f8480fb19144b0eb0960edb3",
       "source_pr": "https://github.com/FangcunMount/qs-ai/pull/212"
     }
   ],
@@ -24501,7 +24508,7 @@
     "auto_deploy_readback_verified": true
   },
   "default_assembly_local_followup": {
-    "status": "replacement_candidate_actual_gates_pending",
+    "status": "fixture_repair_candidate_actual_gates_pending",
     "base_sha": "6d74880283a55fbd22122636d427379c11c8e1f3",
     "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-default-assembly",
     "branch": "codex/rocketmq-m3-default-assembly",
@@ -24515,11 +24522,11 @@
       "format_files": 1171,
       "native_serial_graph_and_worker_collected_only": 12,
       "full_unit_status": "passed",
-      "full_unit_passed": null,
-      "full_unit_failed": null,
-      "full_unit_skipped": null,
+      "full_unit_passed": 4198,
+      "full_unit_failed": 0,
+      "full_unit_skipped": 0,
       "integration_interop_deselected": 1331,
-      "unit_log": "/tmp/m3-default-partial-shutdown-whole-unit.log",
+      "unit_log": "/tmp/m3-default-fixture-repair-whole-unit.log",
       "latest_mypy_sources": 446,
       "operational_guard_targets_passed": 32,
       "operational_guard_new_unit_cases": 7,
@@ -24527,13 +24534,16 @@
       "markdown_files": 75,
       "local_links": 1388,
       "default_assembly_architecture_receipt_lifecycle_targets_passed": 54,
-      "source_full_unit_current_status": "running_after_partial_shutdown_repair",
+      "source_full_unit_current_status": "passed_current_fixture_repair",
       "native_ack_roots_collected_only": 5,
       "broker_host_tests_collected_only": 55,
       "broker_required_flags": 148,
-      "infra_unit_passed": 92,
+      "infra_unit_passed": 93,
       "mypy_log": "/tmp/m3-default-partial-shutdown-types.log",
-      "partial_start_sdk_driver_targets_passed": 28
+      "partial_start_sdk_driver_targets_passed": 28,
+      "configuration_and_receipt_lifecycle_target_passed": 29,
+      "focus_host_tests_required": 4,
+      "focus_flags_required": 12
     },
     "scope": [
       "Paired serial graph prepares only through original dispatch, separately persists the first response, and calls generation/semantic transaction completion without legacy terminal fallback",
@@ -24552,15 +24562,15 @@
     ],
     "activation_guard_retained": false,
     "remaining": [
-      "Complete exact replacement source CI and real MySQL roots with zero failures/skips",
-      "Complete six real Broker profiles with exact 55 tests/148 flags; prior 51/137 and 53/145 receipts rejected",
-      "Review and merge source/infra; only then complete T17 and advance task count"
+      "Complete exact repaired source CI and five ACK MySQL fixtures; prior five setups failed and remain recorded",
+      "Complete isolated four-test/twelve-flag focus gate before the unchanged required 55-test/148-flag Broker matrix",
+      "Review/merge source and infra; only then close T17 and advance formal progress"
     ],
     "production_changed": false,
     "system_login_claimed": false,
     "last_complete_unit_base_sha": "4d8706e3fac6ab501fd4ce2758be1177108a3726",
-    "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
-    "source_code_sha": "323b53a1daf00c8ef732501645098a34b25b47fd",
+    "source_sha": "3ecf8c4ea653cf11f8480fb19144b0eb0960edb3",
+    "source_code_sha": "db2b4c31b173f46866732cf9a6e2ba85e8771217",
     "production_default_config_unchanged": true,
     "failure_history": [
       {
@@ -24594,6 +24604,136 @@
         "failed": 13,
         "log": "/tmp/m3-default-infra-tools-expanded.log",
         "repair": "Exclude both declared default assembly and serial flags from historical fixtures; retain historical exact counts, complete 92 tool cases passed"
+      },
+      {
+        "kind": "native_ack_fixture_publication_missing",
+        "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+        "per_profile_failed": 5,
+        "per_profile_passed": 5522,
+        "skipped": 0,
+        "business_assertions_not_relaxed": true,
+        "repair": "Depend explicitly on existing published_configuration fixture before reserving accepted START plans",
+        "full_reports": "/tmp/m3-default-source-3d-complete",
+        "verified_source_tree_and_merge_parent": true
+      },
+      {
+        "kind": "broker_default_profile_settings_driver",
+        "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+        "reports": [
+          {
+            "report": "/tmp/m3-default-broker-3d-firstfail/rocketmq-ai-state-1-3.11-0dcf54d7750f4f57bd78ee0e6681e690470a319b/rocketmq-ai-state.json",
+            "sha256": "df4ca5d59d46674ad778fbe813acf200464c40ca95f3c07d4dcffa1ef6772fe4",
+            "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+            "mysql": "8.0.44",
+            "python": "3.11.16",
+            "native_failed": 2,
+            "passed_flags": 140,
+            "failed_cases": [
+              "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]",
+              "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[True]"
+            ],
+            "assertion_lines": [
+              1361
+            ],
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "report": "/tmp/m3-default-broker-3d-firstfail/rocketmq-ai-state-5-3.13-0dcf54d7750f4f57bd78ee0e6681e690470a319b/rocketmq-ai-state.json",
+            "sha256": "7c23dfcfee30820daf5bb4a417ce660531f833694527ce285150959224ae23bc",
+            "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+            "mysql": "8.4.11",
+            "python": "3.13.15",
+            "native_failed": 2,
+            "passed_flags": 140,
+            "failed_cases": [
+              "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]",
+              "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[True]"
+            ],
+            "assertion_lines": [
+              1361
+            ],
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "report": "/tmp/m3-default-broker-3d-firstfail/rocketmq-ai-state-2-3.11-0dcf54d7750f4f57bd78ee0e6681e690470a319b/rocketmq-ai-state.json",
+            "sha256": "bd149fa7872568c4d6250e789dce34f551454371c8a1ccb117a2158f0617ea77",
+            "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+            "mysql": "8.4.11",
+            "python": "3.11.16",
+            "native_failed": 2,
+            "passed_flags": 140,
+            "failed_cases": [
+              "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]",
+              "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[True]"
+            ],
+            "assertion_lines": [
+              1361
+            ],
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "report": "/tmp/m3-default-broker-3d-firstfail/rocketmq-ai-state-4-3.13-0dcf54d7750f4f57bd78ee0e6681e690470a319b/rocketmq-ai-state.json",
+            "sha256": "4abdeb5fe6d3f48dd4df8b49f61e9ad2e83e13abbdd3d05b23b2a1d019206bee",
+            "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+            "mysql": "8.0.44",
+            "python": "3.13.15",
+            "native_failed": 2,
+            "passed_flags": 140,
+            "failed_cases": [
+              "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]",
+              "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[True]"
+            ],
+            "assertion_lines": [
+              1361
+            ],
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "report": "/tmp/m3-default-broker-3d-firstfail/rocketmq-ai-state-3-3.13-0dcf54d7750f4f57bd78ee0e6681e690470a319b/rocketmq-ai-state.json",
+            "sha256": "339bc7c6ce1344f1f1dcae03534b7e867a537d5e4c929c5cd65507348da01e69",
+            "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+            "mysql": "8.0.36",
+            "python": "3.13.15",
+            "native_failed": 2,
+            "passed_flags": 140,
+            "failed_cases": [
+              "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]",
+              "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[True]"
+            ],
+            "assertion_lines": [
+              1361
+            ],
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          }
+        ],
+        "diagnosis": "Two default transport fixtures passed raw mysql:// test DSN into Settings, which requires mysql+asyncmy://. Other 53 tests and 140 flags passed in each available profile; these are not complete acceptance.",
+        "repair": "Build Settings through shared test configuration helper with explicit async driver; both paused variants validated locally",
+        "application_sdk_schema_lock_changed": false
       }
     ],
     "candidate_history": [
@@ -24604,8 +24744,44 @@
         "source_ci_outcome": "cancel_requested_superseded_before_complete",
         "replacement_reason": "Reproduced real SDK partial-subscriber-start Close(0) failure; fix cleanup and add paired serial graph Broker acceptance",
         "not_rebound_as_final_proof": true
+      },
+      {
+        "source_sha": "3d982c680bc6a0eea92c60222db23e692a4719fd",
+        "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39728795742",
+        "status": "failed_not_accepted",
+        "per_mysql": {
+          "selected": 5527,
+          "passed": 5522,
+          "failed": 5,
+          "skipped": 0
+        },
+        "source_reports": "/tmp/m3-default-source-3d-complete",
+        "summary": "/tmp/m3-default-source-3d-failure-summary.json",
+        "all_new_serial_native_passed": 12,
+        "diagnosis": "All five ACK setup fixtures lacked explicit published_configuration; the real producer roots correctly committed blocked, while setup required queued"
       }
-    ]
+    ],
+    "superseded_runs": {
+      "source": {
+        "id": 39727969476,
+        "status": "cancelled",
+        "not_passed": true
+      },
+      "broker": {
+        "id": 39728181178,
+        "status": "cancelled",
+        "not_passed": true
+      },
+      "other_infra_old_candidate": {
+        "source_sha": "c7be94af0a89054bf0db119f46409ebcb9a6701c",
+        "cancel_requested_for_remaining": [
+          39728181286,
+          39728181393
+        ],
+        "latest_candidate_runs_not_cancelled": true
+      }
+    },
+    "application_code_unchanged_since": "323b53a1daf00c8ef732501645098a34b25b47fd"
   },
   "prior_top_level_before_recovery_drain": {
     "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-semantic-completion",

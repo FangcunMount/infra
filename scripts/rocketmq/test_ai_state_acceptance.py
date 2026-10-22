@@ -1,8 +1,8 @@
 import json
 import unittest
 
-from ai_admission_acceptance import acceptance_profile, host_failure_diagnostics, parse_admission_receipt, validate_host_runtime, validate_host_sdk_lock
-from ai_state_acceptance import CASES, TESTS, RECOVERY_TESTS, DEFAULT_CASES, DEFAULT_TESTS, state_manifest
+from ai_admission_acceptance import acceptance_profile, host_failure_diagnostics, parse_admission_receipt, parse_host_receipt, validate_host_runtime, validate_host_sdk_lock
+from ai_state_acceptance import CASES, TESTS, RECOVERY_TESTS, DEFAULT_CASES, DEFAULT_TESTS, FOCUS_CASES, FOCUS_TESTS, state_manifest
 
 PRE_RECOVERY_TESTS = TESTS - RECOVERY_TESTS - DEFAULT_TESTS
 
@@ -65,6 +65,23 @@ class AIStateAcceptanceTests(unittest.TestCase):
             f'<testcase name="{n}"/>' for n in old_tests) + '</testsuite></testsuites>'
         with self.assertRaises(RuntimeError):
             acceptance_profile('state')['parse'](self.output(receipt), old_junit)
+
+    def test_default_focus_requires_exact_four_cases_and_twelve_flags(self):
+        self.assertEqual((len(FOCUS_TESTS), len(FOCUS_CASES)), (4, 12))
+        receipt = self.receipt()
+        receipt.update(cases={k: True for k in FOCUS_CASES}, passed=12)
+        junit = '<testsuites><testsuite>' + ''.join(
+            f'<testcase name="{n}"/>' for n in FOCUS_TESTS) + '</testsuite></testsuites>'
+        def parse(output, xml):
+            return parse_host_receipt(output, xml, marker='M3_AI_STATE_RECEIPT',
+                cases=FOCUS_CASES, tests=FOCUS_TESTS, sdk_version='0.4.0a2')
+        self.assertEqual(parse(self.output(receipt), junit)['passed'], 12)
+        for output, xml in ((self.output(), junit), (self.output(receipt), self.junit()),
+                            (self.output(receipt), junit.replace('/>', '><skipped/></testcase>', 1))):
+            with self.assertRaises(RuntimeError):
+                parse(output, xml)
+        with self.assertRaises(RuntimeError):
+            acceptance_profile('state')['parse'](self.output(receipt), junit)
 
     def test_old_worker_only_receipt_cannot_claim_governance_or_full_review_acceptance(self):
         profile = acceptance_profile('state')
