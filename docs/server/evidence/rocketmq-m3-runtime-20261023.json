@@ -628,7 +628,7 @@
       "No production/system login proof"
     ],
     "source_pr": "https://github.com/FangcunMount/qs-server/pull/426",
-    "source_current": "7ffae7470",
+    "source_current": "d85535bc726737a2a8d6e96a6e79128c0fae2b67",
     "source_ci_status": "current required CI queued; old 13bfecc host audit import cycle failed, fixed by extraction and local all integration compile",
     "import_cycle_failure": {
       "run": "https://github.com/FangcunMount/qs-server/actions/runs/39845297016",
@@ -737,12 +737,20 @@
         "source": "9b78c5403f16e77f9a84ba6222e1c572d65d3898",
         "outcome": "actual receive readiness passed; initial paused row still absent; original SQL queries succeed, holds/evidence/consume outcomes allzero; no timeout/race; full owned cleanup",
         "root_cause": "unknown; intact frozen input/pause/owner guards separately pass inert contract test"
+      },
+      {
+        "run": "39849972277",
+        "source": "7ffae747096956d36e59461ec706d98acca45fd6",
+        "outcome": "half prepared, local committed and final commit confirmed; transport readiness passed;20s hold observation failed; no transport errors/consume outcomes, originalSQL count queries normal; full owned cleanup",
+        "root_cause": "unknown; serial polling budget under one shared slot is being tested; no source business assertion removed",
+        "diagnostic_limitation": "Admin helper injected unsupported -b into topicStatus; query unavailable, not evidence of empty Broker"
       }
     ],
     "worker_runtime_development_current": {
-      "run": "https://github.com/FangcunMount/infra/actions/runs/39849972277",
-      "infra": "c8bc9cf",
-      "scope": "confirmed seed, actual runtime, bounded receive status codes and read-only topic offsets; original assertions retained",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39851006275",
+      "infra": "73f34cb",
+      "source": "d85535bc726737a2a8d6e96a6e79128c0fae2b67",
+      "scope": "same original assertions, one shared slot,3 logical groups/max2 physical inputs with5s polls; fixture observation60s/RPC+handler3m; records actual observation latency, no production change",
       "status": "running, not passed"
     },
     "local_verification_addendum": {
@@ -750,7 +758,8 @@
       "frozen_wire_contract": "1 race and lint passed; inert, no DB/Broker claim",
       "expanded_tagged_lint": "failed on5 preexisting tagged transport-test issues (4 unchecked Close,1 unused constant); not claimed passed; normal transport+process and native process lint passed",
       "docs_failure": "8fb source CI detected stale baselinec1; integrated47fe docs corrected baseline9b with88 tests/hygiene/facts pass; newest diagnostic source needs rebind before freeze",
-      "harness_tests": 125
+      "harness_tests": 125,
+      "current_six_packages": "73 race zero failure/skip on current candidate; docs88/hygiene pass, tracked native fixture baseline rebind required then checked"
     },
     "development_ci_cancellations": {
       "source": "7ffae747096956d36e59461ec706d98acca45fd6",
@@ -773,6 +782,7 @@
           "cancel_requested": true
         }
       ]
-    }
+    },
+    "regression_audit_index_sha256": "5858ebe1cd54068e88a4ab19cd007ff3577063f3bbab306cb4691601a061d4f0"
   }
 }
