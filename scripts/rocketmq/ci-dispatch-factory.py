@@ -51,6 +51,16 @@ def command(argv, *, required=True, timeout=180, **kwargs):
     return result
 
 
+def safe_container_state(raw):
+    """Only fixed status fields may leave the owned Docker response."""
+    state = json.loads(raw)
+    return {'status': str(state.get('Status', 'unknown')),
+            'oom_killed': state.get('OOMKilled') is True,
+            'exit_code': int(state.get('ExitCode', -1)),
+            'restarting': state.get('Restarting') is True,
+            'health': str(state.get('Health', {}).get('Status', 'unavailable'))}
+
+
 def unused_port():
     with socket.socket() as listener:
         listener.bind(('127.0.0.1', 0))
@@ -153,10 +163,13 @@ def main():
                           'interval':'2s','timeout':'3s','retries':60}}}}
     compose_file.write_text(json.dumps(spec)); compose_file.chmod(0o600)
     try:
+        proof['phase']='pull_images'
         for name, image in (('mysql_image',args.mysql_image),('mongo_image',MONGO)):
             command(['docker','pull',image], timeout=300)
             proof[name] = command(['docker','image','inspect',image,'--format','{{.Id}}']).stdout.strip()
+        proof['phase']='start_original_stores'
         command(compose+['up','-d','--wait','--wait-timeout','180'],timeout=240)
+        proof['phase']='initialize_replica_set'
         mongo = project+'-mongo-1'
         command(['docker','exec',mongo,'mongosh','--quiet','--eval',
             'rs.initiate({_id:"sdk-proof",members:[{_id:0,host:"localhost:27017"}]})'])
@@ -166,9 +179,12 @@ def main():
             if result.returncode==0:break
             time.sleep(.5)
         else:raise RuntimeError('owned Mongo primary unavailable')
+        proof['phase']='read_mysql_version'
         proof['mysql_version']=command(['docker','exec',project+'-mysql-1','sh','-c',
             'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B -e "SELECT VERSION()"']).stdout.strip()
+        proof['phase']='read_mongo_version'
         proof['mongo_version']=command(['docker','exec',mongo,'mongosh','--quiet','--eval','db.version()']).stdout.strip()
+        proof['phase']='prepare_inert_configuration'
         command(['openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1','-subj','/CN=owned-factory-trap',
                  '-keyout',str(root/'key.pem'),'-out',str(root/'ca.pem')])
         (root/'key.pem').chmod(0o600)
@@ -185,6 +201,7 @@ def main():
         env=dict(os.environ,GOWORK='off',GOFLAGS='-mod=readonly',QS_M3_FIXTURE_PROJECT=project,
             QS_M3_FACTORY_DSN=f'root:{password}@tcp(127.0.0.1:{sql_port})/?parseTime=true',
             QS_M3_FACTORY_MONGO_URI=f'mongodb://127.0.0.1:{mongo_port}/?replicaSet=sdk-proof&directConnection=true',QS_M3_FACTORY_OPTIONS=str(options))
+        proof['phase']='native_default_factory'
         code,output=native_run(['go','test','-race','-p','1','-tags=integration,m3_dispatch_factory','-run','^TestM3DefaultDispatchFactory$',
             '-count=1','-v','-timeout=3m','./internal/apiserver/container'],env=env,source=source,proof=proof)
         private=root/'native-private.log';private.write_text(output);private.chmod(0o600)
@@ -192,6 +209,7 @@ def main():
         proof['diagnostics']=host_failure_summary(output)
         proof['diagnostics']['assertion_lines']=sorted(set(map(int,re.findall(r'retry_dispatch_native_integration_test\.go:(\d+)',output))))[:32]
         if code:raise RuntimeError('native default factory failed; private output withheld')
+        proof['phase']='verify_native_receipt'
         receipt=parse_receipt(output,source_sha)
         if trap.connections:raise RuntimeError('inert factory attempted to connect to the endpoint trap')
         proof['endpoint_connections']=trap.connections
@@ -199,6 +217,11 @@ def main():
         if not proof['source_clean_after']:raise RuntimeError('source changed during factory proof')
     except Exception as exc:
         failure=type(exc).__name__+': owned factory proof failed; private output withheld'
+        proof['owned_container_states']={}
+        for service in ('mysql','mongo'):
+            state=command(['docker','inspect','--format','{{json .State}}',project+'-'+service+'-1'],required=False,timeout=10)
+            if state.returncode==0:
+                proof['owned_container_states'][service]=safe_container_state(state.stdout)
     finally:
         cleanup['owned_endpoint_trap_joined']=trap.close()
         proof['endpoint_connections']=trap.connections

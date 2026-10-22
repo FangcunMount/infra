@@ -37,3 +37,12 @@ class FactoryReceiptTest(unittest.TestCase):
                 time.sleep(.01)
             self.assertEqual(trap.connections,1)
         finally:self.assertTrue(trap.close())
+
+class FailureStateTest(unittest.TestCase):
+    def test_diagnostics_export_only_fixed_state_fields(self):
+        raw=json.dumps({'Status':'exited','OOMKilled':True,'ExitCode':137,'Restarting':False,
+            'Error':'sensitive internal path', 'Health':{'Status':'unhealthy','Log':[{'Output':'private body'}]}})
+        state=harness.safe_container_state(raw)
+        self.assertEqual(state,{'status':'exited','oom_killed':True,'exit_code':137,'restarting':False,'health':'unhealthy'})
+        self.assertNotIn('private',json.dumps(state))
+        self.assertNotIn('sensitive',json.dumps(state))
