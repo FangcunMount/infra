@@ -1413,7 +1413,7 @@
     ]
   },
   "qs_default_owner_runtime_batch": {
-    "status": "development native dispatched; not yet verified",
+    "status": "corrected development native queued; source/tool PRs draft; not verified",
     "source": "c15df6f3ff0686c574520a9c5d274f86d08d9868",
     "source_baseline": "cc7609ad6dd78b8250437a36f777c98da8b22a24",
     "infra": "a1602bed8e72cae537de386e161e8936d300e733",
@@ -1429,6 +1429,120 @@
       "Observed callbacks do not alone prove saturation"
     ],
     "production_changed": false,
-    "development_run": "https://github.com/FangcunMount/infra/actions/runs/39868563639"
+    "development_run": "https://github.com/FangcunMount/infra/actions/runs/39868563639",
+    "failed_runs": [
+      {
+        "run": "https://github.com/FangcunMount/infra/actions/runs/39868563639",
+        "source": "c15df6f3ff0686c574520a9c5d274f86d08d9868",
+        "infra": "a1602bed8e72cae537de386e161e8936d300e733",
+        "report_sha256": "6a2e4b486cb082af30631a8e965e742aa62bf3696af4a7745201844c2ccba036",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "native_build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "assertion_source_line": 244,
+        "phase": "default subsystem Start before any Reserve/Execute/Broker kill",
+        "cause": "protocol fixture left catalog projection consumers enabled without domain handler bindings; default fail-closed startup correctly rejected it",
+        "all_owned_cleanup_verified": true,
+        "owned_broker_parameters_restored": true
+      }
+    ],
+    "source_pr": "https://github.com/FangcunMount/qs-server/pull/428",
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/169",
+    "current_infra_candidate": "c65e2deedf809ddaab494cd26ec3bb1e828a1bdb",
+    "combined_tool_unit_tests": 134,
+    "corrected_candidate": {
+      "source": "965e568f5439787e1ab4c39580fcbb44d6b2f70b",
+      "source_baseline": "ce9445c049b381c787eb3915b58764589b7c3aa3",
+      "infra": "c65e2deedf809ddaab494cd26ec3bb1e828a1bdb",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39869534165",
+      "change": "explicitly disable unbound domain projections only in protocol fixture; real consume-only observer retained",
+      "local_missing_binding_regression": "existing fail-closed subsystem test passed",
+      "native_tag_compile": "passed",
+      "native_tagged_lint": "passed zero issues",
+      "docs_check": "passed",
+      "execution_status": "in progress after runner capacity released"
+    },
+    "scheduling_note": "Full own infra PR169 regressions deferred while current candidate native debugging completes; only current own pull_request runs canceled,workflow_dispatch retained. Required gates will be resumed at fixed final candidate; cancellation is not a pass."
+  },
+  "bounded_lifecycle_verification": {
+    "qs_host": {
+      "sha256": "1b71d661a77dcd6d3c4e8820d4ef70160e8667ac9a1745d198b0fc11a889cf33",
+      "passed": 58,
+      "failed": 0,
+      "skipped": 0,
+      "source_sha": "c15df6f3ff0686c574520a9c5d274f86d08d9868",
+      "command": "go test -race -count=1 -json ./internal/pkg/options ./internal/pkg/messagingruntime"
+    },
+    "iam_host": {
+      "sha256": "907c0f05de83848c07900ea7ba2182b61a7d3fd91cd8fea2b53ead32c2291d04",
+      "passed": 71,
+      "failed": 0,
+      "skipped": 0,
+      "source_sha": "89f261ae707055eac7651c7a8753224cbd8925a3",
+      "command": "go test -race -count=1 -json ./internal/apiserver/options ./internal/apiserver/container/platform"
+    },
+    "published_go_sdk": {
+      "sha256": "4fb24685022cb11e5ed8cd04138e5895955d8d98acd0cf77ba91697cfb4fa7bc",
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0,
+      "version": "v0.5.0-rocketmq-tx.2",
+      "sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+      "go_mod_sum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=",
+      "local_replace": false,
+      "command": "GOWORK=off GOFLAGS=-mod=readonly go test -race -count=1 -json ./transport/rocketmq ./transport/rocketmq/internal/driver (inside installed tx.2 module directory)"
+    },
+    "published_python_sdk": {
+      "junit_sha256": "d8aea07e4939ffbecc68eaa6b7997dbaafbbfe89396dd902446881492a2d8a7e",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "sdk": "0.4.0a2",
+      "client": "5.1.2",
+      "from_site_packages": true,
+      "warning": "one upstream deprecated logger.warn warning",
+      "suite_source": "existing SDK baseline1630aa59 tests run against installed0.4.0a2; not workspace SDK imports",
+      "command": "installed python -m pytest existing tests/test_transaction_recovery_pool.py tests/test_rocketmq_transaction.py --import-mode=importlib with no workspace pythonpath"
+    },
+    "scope": "existing targeted source/configuration/race and published SDK bounded queue, pre-admission, timeout/cancellation tests; local controlled loopback/thread tests, not native full host saturation or production proof",
+    "contracts": [
+      {
+        "host": "IAM",
+        "send": 8,
+        "checker_workers": 4,
+        "queue": 32,
+        "maintenance_batch": 100
+      },
+      {
+        "host": "QS each owner",
+        "send": 4,
+        "checker_workers": 2,
+        "queue": 16,
+        "maintenance_batch": 50
+      },
+      {
+        "host": "AI",
+        "send": 4,
+        "checker_workers": 1,
+        "queue": 16,
+        "maintenance_batch": 100
+      }
+    ],
+    "common": {
+      "db_check_seconds": 2,
+      "rpc_seconds": 5,
+      "lease_seconds": 60,
+      "maintenance_interval_seconds": 5,
+      "max_branches": 16
+    },
+    "proof_composition": [
+      "Host configuration passes exact limits into installed SDK; exact registered owner identity prevents duplicate independent sender budgets.",
+      "Published SDK tests cover real pre-goroutine/pre-thread-pool admission, bounded queues and retained real capacity after timeout/cancellation; TLS driver tests use owned loopback peers.",
+      "Actual native host lifecycle/recovery reports prove original dependency ownership and paused Checker behavior. Low-load native observations alone are not saturation evidence.",
+      "Complete API daemons, business fault matrix and final images remain T23/T29; this entry does not advance T22 by itself."
+    ]
   }
 }
