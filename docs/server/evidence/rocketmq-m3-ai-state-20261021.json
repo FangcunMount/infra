@@ -5,10 +5,10 @@
   "progress": "16/36",
   "base": "e8392c0582020d6cacf44c6caaa2f2061c66cb41",
   "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-semantic-completion",
-  "branch": "codex/rocketmq-m3-serial-semantic-state",
-  "source_candidate": "101775ecd04e3973eff791d0d24e2147f6bdcecd",
+  "branch": "codex/rocketmq-m3-candidate-runtime",
+  "source_candidate": "a0acc995d05abf38b95033063910074368d15620",
   "source_pushed": true,
-  "source_merged": true,
+  "source_merged": false,
   "production_assembly_enabled": false,
   "production_changed": false,
   "stable_sdk_released": false,
@@ -603,7 +603,7 @@
     "Keep durable model-response finalization and invocation-count actual fault proofs as T18; no fabricated serial candidate ownership",
     "Preserve legacy/archive/ACK responsibilities and default runtime activation gates; T17 remains unchecked"
   ],
-  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/204",
+  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/210",
   "source_pr_draft": false,
   "foundation_native_acceptance": {
     "source_sha": "b4eedb634adefa50ea818ac6cf26e119e29b94fd",
@@ -803,7 +803,7 @@
     "docs_files": 75,
     "docs_links": 1321
   },
-  "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39690447013",
+  "source_ci": "pending_current_source_run_binding",
   "worker_preflight_native_cases": {
     "source_sha": "0be8755af8600d0c62b95b31bf5a8e36841434f7",
     "file": "tests/integration/test_transaction_worker_preflight.py",
@@ -1404,7 +1404,7 @@
     "no_task_completion_claimed": true,
     "native_status": "cbc47d9 both MySQL profiles: 3649 passed, including corrected original atomic-root case; zero failed/skipped"
   },
-  "source_candidate_branch": "codex/rocketmq-m3-serial-semantic-state",
+  "source_candidate_branch": "codex/rocketmq-m3-candidate-runtime",
   "failure_history": [
     {
       "source_sha": "3cf74b5eccc66bd271d4d8e250714e4a312bde59",
@@ -1449,6 +1449,20 @@
       ],
       "resolution": "23 target cases pass, 10 native cases collect, 3280 full unit cases pass; final repr-only privacy adjustment checked with23 target cases",
       "failed_candidate_merged": false
+    },
+    {
+      "kind": "local_red_characterization",
+      "task": "T17",
+      "test": "test_candidate_without_matching_runtime_never_falls_back_from_serial_transaction_hook",
+      "result": "1 failed / 4 passed before guard fix;29 targeted green after fix",
+      "production_changed": false
+    },
+    {
+      "kind": "required_native_and_actual_broker_failure",
+      "task": "T17",
+      "source_sha": "f0538fd671e1bef19ea566a87242893cd78345a1",
+      "cause": "First durable response commit invoked the global legacy recorder. MySQL profiles each5137 pass/1 fail/0 skip;27 candidate native cases each26 pass/1 graph fail. Three Broker profiles each88 flags/4 host failures/0 skips; cleanup verified. Reports retained in candidate_complete_runtime.history.",
+      "production_changed": false
     }
   ],
   "governance_followup": {
@@ -9920,7 +9934,7 @@
     "final_status": "completed",
     "final_conclusion": "cancelled"
   },
-  "latest_verified_main": "e0ad323873e1e1ab3a64ece7968245c3c8fa241b",
+  "latest_verified_main": "13f50c310f71ea74575180f003bb0bdc5e47df33",
   "interpretation_finish_root": {
     "status": "required_source_ci_and_native_reports_verified_merged",
     "branch": "codex/rocketmq-m3-ai-interpretation-finish-root",
@@ -12323,7 +12337,7 @@
     "source_candidate_branch": "codex/rocketmq-m3-ai-creation-plan",
     "branch": "codex/rocketmq-m3-ai-solution-sdk"
   },
-  "source_ci_status": "success",
+  "source_ci_status": "current_operational_root_repair_queued",
   "superseded_main_push_ci_deduplication_186": {
     "at": "2026-10-21T18:26:01.637785+00:00",
     "run": 39650592198,
@@ -20741,13 +20755,13 @@
     }
   ],
   "candidate_response_reference": {
-    "status": "consolidated_foundation_required_ci_running",
+    "status": "merged_complete_required_ci_verified",
     "source_sha": "257c20f6cffca051cba620157e1cdc0276d4ef82",
     "code_sha": "d639f849fa13eae7d39adbef5d4164720daf15dc",
     "source_pr": "https://github.com/FangcunMount/qs-ai/pull/209",
     "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39693905447",
     "source_pushed": true,
-    "merged": false,
+    "merged": true,
     "local": {
       "baseline": 57,
       "new_cases": 19,
@@ -20761,7 +20775,238 @@
       "native_collected_only": 3
     },
     "scope": "Read original scoped candidate response through immutable dispatch ledger. Renewed lease and released claim cannot change original first reference; original receipt codec and readers retained. Durable response, including valid renewals past original lease, never grants live ownership/model/commit/retry authority.",
-    "remaining": "Native acceptance, candidate generation/prepare/dispatch/Sender, recovery/drain, default assembly and T18 actual faults"
+    "remaining": "Complete candidate runtime dependency gates, recovery/drain, default assembly and T18 actual faults",
+    "merge_sha": "13f50c310f71ea74575180f003bb0bdc5e47df33",
+    "head_checks_success": 12,
+    "source_native_verification": {
+      "source_sha": "257c20f6cffca051cba620157e1cdc0276d4ef82",
+      "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39693905447",
+      "tested_merge_sha": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+      "verified_merge_parents": [
+        "657302d3860f856b943afaecf2d6da4ef459fd66",
+        "257c20f6cffca051cba620157e1cdc0276d4ef82"
+      ],
+      "reports": [
+        {
+          "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+          "sha256": "58df77eff43f91be2b2de1b11e948f2a76f8ca2de21abf4fe2b9874d790173a9",
+          "xml_sha256": "2336e67e9c8ecfeab63c4b3d117501ddadd9da6d601bf658be65d88f663416c8",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.0.36",
+          "index": 0,
+          "passed": 1253,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+          "sha256": "c4eb2ba8bc8ae9feb81cf4a056675170d3a4dc74e23451575536100e9cd6db80",
+          "xml_sha256": "f66637f35f777a5bc760caea379999c587a15eaac50383db48d5290f7cfa244b",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.0.36",
+          "index": 1,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+          "sha256": "f006ee6fa9f0c260978a76e20b5bc5ef5c4dc6df2ce462a9f757813645224081",
+          "xml_sha256": "b4e3c4ec96be8fffa4f1399df46b8d4a81d2422b3f4626ced82c288fb70e1b2c",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.0.36",
+          "index": 2,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+          "sha256": "22620470e0ba0c6bfec74f0036776da41f23db26f9109d812547934cedd0310b",
+          "xml_sha256": "a8014052ec2343e4db88d2bf26a43442818af54bb56699b7cde02af953bb0d06",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.0.36",
+          "index": 3,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-0/shard-8.4-0.json",
+          "sha256": "e40c3363ba4200386a539e7b0689801e7a380a0f320b6e660e4f31b8beee59ba",
+          "xml_sha256": "909e4250b4c7847e8027670930139824c244598ed4ca39bf212630bca7697927",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.4",
+          "index": 0,
+          "passed": 1253,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-1/shard-8.4-1.json",
+          "sha256": "49971558cf921bc52f5c3b3879f8ece13fd89e6e21c78c64600145b98203ea78",
+          "xml_sha256": "4d24e30692e857901f0d96a3c8da0d3bd32ead2bcbd0c947b67bbb8b127117c1",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.4",
+          "index": 1,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-2/shard-8.4-2.json",
+          "sha256": "e644694701b55861d8135df1c8690ddeeab2e465ed368792c34a42f9ffa12e3d",
+          "xml_sha256": "c8ee4a192c0d4e6ede8f38b33193794b3a9b5eba4bfd72a31b81a34777fdd746",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.4",
+          "index": 2,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "file": "tests-8.4-3/shard-8.4-3.json",
+          "sha256": "c7816d7f72f4b4af63b3b15b4a81691617ce80105a8250f611d446ad537cf1b7",
+          "xml_sha256": "ec9606e3ee1eebda3542f4d5b6345ec8a3248e678682cf31dfa0eddffba23b87",
+          "revision": "1349218ba088aa437a99d0ee81ae174ca60efc74",
+          "mysql": "8.4",
+          "index": 3,
+          "passed": 1252,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "profiles": {
+        "8.0.36": {
+          "collected": 5009,
+          "passed": 5009,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 8,
+            "test_interpretation_claim_source": 4,
+            "test_transaction_interpretation_finish": 17,
+            "test_evaluation_finish_root": 10,
+            "test_evaluation_serial_response_receipts": 9,
+            "test_interpretation_state_versions": 4,
+            "test_interpretation_claim_root": 8,
+            "test_transaction_interpretation_claim": 18,
+            "test_interpretation_claim_deferral": 9,
+            "test_transaction_interpretation_claim_retry": 5,
+            "test_transactional_interpretation_execution": 6,
+            "test_transaction_interpretation_finish_retry": 7,
+            "test_transaction_evaluation_source_version": 5,
+            "test_generation_completion_source": 5,
+            "test_transaction_serial_generation": 13,
+            "test_semantic_readonly_source": 4,
+            "test_transaction_serial_semantic": 13,
+            "test_candidate_completion_source": 4,
+            "test_candidate_record_projection": 4,
+            "test_candidate_semantic_records": 8,
+            "test_candidate_response_reference": 3
+          }
+        },
+        "8.4": {
+          "collected": 5009,
+          "passed": 5009,
+          "failed": 0,
+          "skipped": 0,
+          "native": {
+            "test_transaction_admission_root": 8,
+            "test_transaction_start_admission": 4,
+            "test_transaction_change_admission": 4,
+            "test_transaction_retry_admission": 3,
+            "test_transaction_evaluation_admission": 9,
+            "test_transaction_command_receiver": 4,
+            "test_transaction_evaluation_state_root": 6,
+            "test_transaction_worker_preflight": 5,
+            "test_transaction_governance_state": 12,
+            "test_review_readonly_planning": 2,
+            "test_transaction_review_state": 12,
+            "test_review_correction_readonly": 4,
+            "test_transaction_correction_state": 9,
+            "test_transaction_input_conflict": 5,
+            "test_run_creation_readonly": 4,
+            "test_transaction_creation_state": 10,
+            "test_transaction_creation_dispatch": 16,
+            "test_prompt_freeze_readonly": 2,
+            "test_profile_registration_readonly": 2,
+            "test_suite_registration_readonly": 2,
+            "test_solution_preparation_readonly": 4,
+            "test_solution_borrowed_root": 4,
+            "test_transaction_solution_preparation": 10,
+            "test_transaction_solution_dispatch": 17,
+            "test_resolution_readonly_planning": 4,
+            "test_transaction_resolution_state": 12,
+            "test_contract_recovery_readonly": 2,
+            "test_evaluation_preparation_readonly": 4,
+            "test_dispatch_record_readonly": 4,
+            "test_transaction_worker_dispatch": 15,
+            "test_transaction_contract_recovery": 9,
+            "test_interpretation_finish_root": 6,
+            "test_interpretation_state_transcription": 4,
+            "test_artifact_identity": 2,
+            "test_transaction_interpretation_state": 8,
+            "test_interpretation_claim_source": 4,
+            "test_transaction_interpretation_finish": 17,
+            "test_evaluation_finish_root": 10,
+            "test_evaluation_serial_response_receipts": 9,
+            "test_interpretation_state_versions": 4,
+            "test_interpretation_claim_root": 8,
+            "test_transaction_interpretation_claim": 18,
+            "test_interpretation_claim_deferral": 9,
+            "test_transaction_interpretation_claim_retry": 5,
+            "test_transactional_interpretation_execution": 6,
+            "test_transaction_interpretation_finish_retry": 7,
+            "test_transaction_evaluation_source_version": 5,
+            "test_generation_completion_source": 5,
+            "test_transaction_serial_generation": 13,
+            "test_semantic_readonly_source": 4,
+            "test_transaction_serial_semantic": 13,
+            "test_candidate_completion_source": 4,
+            "test_candidate_record_projection": 4,
+            "test_candidate_semantic_records": 8,
+            "test_candidate_response_reference": 3
+          }
+        }
+      }
+    },
+    "merge_tree_equal_to_source": true,
+    "production_changed": false
   },
   "candidate_pr_consolidation": {
     "final_pr": 209,
@@ -21060,7 +21305,9 @@
         }
       }
     },
-    "execution_adjustment": "One final candidate foundation PR209 replaces PR205-208; commits/branches/evidence retained. Next changes are grouped by runnable candidate runtime, recovery/drain, default assembly gates; targeted checks during implementation and one full gate per frozen delivery candidate."
+    "execution_adjustment": "One final candidate foundation PR209 replaces PR205-208; commits/branches/evidence retained. Next changes are grouped by runnable candidate runtime, recovery/drain, default assembly gates; targeted checks during implementation and one full gate per frozen delivery candidate.",
+    "status": "final_pr209_merged_complete_ci_verified",
+    "merge_sha": "13f50c310f71ea74575180f003bb0bdc5e47df33"
   },
   "t17_delivery_gates": [
     {
@@ -21081,5 +21328,289 @@
       "done": false,
       "acceptance": "All active writers use the transaction runtime in actual default composition; startup/close and original entrypoint end-to-end gates pass."
     }
-  ]
+  ],
+  "candidate_complete_runtime": {
+    "status": "operational_root_repair_real_dependencies_pending",
+    "source_sha": "a0acc995d05abf38b95033063910074368d15620",
+    "code_sha": "e69efd593a3fe2d089b736bd612380f4712e87bf",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/210",
+    "source_pushed": true,
+    "merged": false,
+    "local": {
+      "unit_passed": 3870,
+      "integration_interop_deselected": 1275,
+      "mypy_sources": 430,
+      "ruff_formatted_files": 1121,
+      "docs_markdown": 75,
+      "docs_local_links": 1385,
+      "target_passed": 101,
+      "native_collected_only": 27,
+      "broker_host_collected_only": 38,
+      "broker_required_flags": 95,
+      "collector_matches_harness_exactly": true,
+      "full_unit_code_sha": "7096312b7d2a03ff88b1e737f2a70e7779d0bf59"
+    },
+    "scope": "Explicit candidate prepare/dispatch and generation/semantic completion through the actual host graph; same candidate selection/capacity/guarded original roots, first response/candidate, archive/witness; no provider retry or default production assembly. Broker profile uses actual fixed published SDK and real isolated Broker with a controlled provider and event observer. Real dependency gates are pending.",
+    "production_changed": false,
+    "stable_sdk_released": false,
+    "t17_done": false,
+    "remaining": "Required source and Broker profiles, recovery/drain and default runtime assembly",
+    "prior_candidate": "b93b68ca33a1758a66a0d7d635dbc8b33bb3da33",
+    "guard_fix_code_sha": "e45ada808bae104dccd255cf18920c163744d286",
+    "superseded_ci": {
+      "source": "https://github.com/FangcunMount/qs-ai/actions/runs/39710945796",
+      "infra_state": "https://github.com/FangcunMount/infra/actions/runs/39710991265",
+      "reason": "New no-fallback regression reproduced and repaired; earlier candidates are not final acceptance. Existing concurrency cancels obsolete PR runs."
+    },
+    "history": [
+      {
+        "source_sha": "f0538fd671e1bef19ea566a87242893cd78345a1",
+        "local": {
+          "unit_passed": 3862,
+          "integration_interop_deselected": 1273,
+          "mypy_sources": 430,
+          "ruff_formatted_files": 1120,
+          "docs_markdown": 75,
+          "docs_local_links": 1385,
+          "native_collected_only": 27,
+          "broker_host_collected_only": 38,
+          "broker_required_flags": 95,
+          "collector_matches_harness_exactly": true,
+          "full_unit_run_before_native_only_replan_cases_added": true,
+          "full_unit_source_before_guard_fix": "b93b68ca33a1758a66a0d7d635dbc8b33bb3da33",
+          "guard_red_failed": 1,
+          "guard_target_passed": 29
+        },
+        "native_failure": {
+          "source_sha": "f0538fd671e1bef19ea566a87242893cd78345a1",
+          "checks": "https://github.com/FangcunMount/qs-ai/actions/runs/39711234921",
+          "status": "failed",
+          "cause": "First durable response commit called the host legacy recorder. Original standalone completion roots passed; complete host graph failed.",
+          "tested_merge_sha": "c96f66b665e9cd138e5ca2db530f0d167bc22ea3",
+          "profiles": {
+            "8.0.36": {
+              "collected": 5138,
+              "passed": 5137,
+              "failed": 1,
+              "skipped": 0,
+              "candidate_native_passed": 26,
+              "candidate_native_failed": 1,
+              "failed_cases": [
+                "tests/integration/test_transaction_candidate_runtime.py::test_actual_candidate_graph_both_stages_without_legacy_hook"
+              ]
+            },
+            "8.4": {
+              "collected": 5138,
+              "passed": 5137,
+              "failed": 1,
+              "skipped": 0,
+              "candidate_native_passed": 26,
+              "candidate_native_failed": 1,
+              "failed_cases": [
+                "tests/integration/test_transaction_candidate_runtime.py::test_actual_candidate_graph_both_stages_without_legacy_hook"
+              ]
+            }
+          },
+          "reports": [
+            {
+              "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+              "sha256": "e5487882898b01cf64f21660e67d1d44bf956a01198fe05f7245eff2659a58b4",
+              "xml_sha256": "96ff5ff8bb53715cf5965fd7e15d8fd5f71da8de062adc5e41354b42e81ba392",
+              "mysql": "8.0.36",
+              "index": 2,
+              "passed": 1284,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+              "sha256": "01cd17ff2481be74bb955bf39621cf7051410dbfd34baf5ee1fcdfa6a0f40034",
+              "xml_sha256": "6529d7fb00580fb18a6a88713a59b6ce90961510f5592543c57572ab67b9ce8d",
+              "mysql": "8.0.36",
+              "index": 3,
+              "passed": 1284,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+              "sha256": "822885f75680b9be82506c60401752ab6d3d5a79495ee32f620fda89294a48b2",
+              "xml_sha256": "232372f3f350df5ebb07d9087fd9ce7b8a0dddd2e8a8b3d89a6310354e97f448",
+              "mysql": "8.0.36",
+              "index": 1,
+              "passed": 1285,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+              "sha256": "1bd3f82a6519ad89356c633bf02726191ba28a0e74dd7e2ad5bd7e8ceaf34d24",
+              "xml_sha256": "36ac08b735f858eb8195f23ff5ffa70ea0f15c97c28e35378de8a9894260125d",
+              "mysql": "8.0.36",
+              "index": 0,
+              "passed": 1284,
+              "failed": 1,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.4-1/shard-8.4-1.json",
+              "sha256": "20d7ababf61e83ad4c0215200c9320c135d6712f39ec228c41638ff4858bde8d",
+              "xml_sha256": "9c14a0b6e1281f62ae559d56a8c9f69f10396694cca8331ffd389083a43fbf5e",
+              "mysql": "8.4",
+              "index": 1,
+              "passed": 1285,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.4-0/shard-8.4-0.json",
+              "sha256": "ba099520a670e43847543efcc63ade88784ddf19f798ea93d83415544752522b",
+              "xml_sha256": "106469dd56c175187100b895042e9fa6ca10c4f39e04a3666eb68dd9f9b6eaab",
+              "mysql": "8.4",
+              "index": 0,
+              "passed": 1284,
+              "failed": 1,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.4-2/shard-8.4-2.json",
+              "sha256": "72096d44fcece7919b7918f000182f09153d4c21e16eb769406dd169c060a750",
+              "xml_sha256": "67f0180c0167a8bcedea751bd87505b805fcdd2b3661460adb5100aba0c9478f",
+              "mysql": "8.4",
+              "index": 2,
+              "passed": 1284,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "file": "tests-8.4-3/shard-8.4-3.json",
+              "sha256": "ed0b94661075cc4d87d05be149d0cb3375ff24376895930e943649ec7f30546c",
+              "xml_sha256": "48e5c3dcb1c95623f21804bdcc7e284881118fdd4aefc618e587fb5a248ce3eb",
+              "mysql": "8.4",
+              "index": 3,
+              "passed": 1284,
+              "failed": 0,
+              "skipped": 0
+            }
+          ]
+        },
+        "broker_failure": {
+          "source_sha": "f0538fd671e1bef19ea566a87242893cd78345a1",
+          "harness_sha": "e5e5a6bc25390ce7d2551bcb1339a433bd6b2b2c",
+          "checks": "https://github.com/FangcunMount/infra/actions/runs/39711284393",
+          "status": "failed_partial_three_profiles_preserved",
+          "reports": [
+            {
+              "file": "rocketmq-ai-state-1-3.11-ffd8e2a9fb3c4908c3997425aed8b834d226da67/rocketmq-ai-state.json",
+              "sha256": "6add497a0d28fbeac37c7047d96a346c5dbd91b5868a691c6033b9d1092d4ce1",
+              "python": "3.11.16",
+              "mysql": "8.0.44",
+              "host_failed": 4,
+              "flags_passed": 88,
+              "required_flags": 95,
+              "skipped": 0,
+              "failed_cases": [
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-unknown]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-unknown]"
+              ],
+              "assertion_lines": [
+                2512
+              ],
+              "junit_sha256": "da07b221a21364eeefadefc3f1b873ba0db51f1bab077af77617ab92b186895f",
+              "private_output_sha256": "1ed52afaa53c8f5e3d5c6aafd0f36708bc06b41588256e7d10c05cdee0670956",
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            },
+            {
+              "file": "rocketmq-ai-state-5-3.13-ffd8e2a9fb3c4908c3997425aed8b834d226da67/rocketmq-ai-state.json",
+              "sha256": "8530699a894972b85dde4c0d5dae9f884fd6425ecf6d8aa4716028a2ca1be2d5",
+              "python": "3.13.15",
+              "mysql": "8.4.11",
+              "host_failed": 4,
+              "flags_passed": 88,
+              "required_flags": 95,
+              "skipped": 0,
+              "failed_cases": [
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-unknown]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-unknown]"
+              ],
+              "assertion_lines": [
+                2512
+              ],
+              "junit_sha256": "d4c3b102e8d943f2acf698c8116425bfb86bf364c48ad421c810a4ea3167e5f5",
+              "private_output_sha256": "a58a7a6d546f975bb5958cd9e5bbc58a1fc4fb7341d70d790d8803913934235f",
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            },
+            {
+              "file": "rocketmq-ai-state-3-3.13-ffd8e2a9fb3c4908c3997425aed8b834d226da67/rocketmq-ai-state.json",
+              "sha256": "84887f947c4bfdb7bae924b4d20d609df72a5357c5d461804e9c51335ea935e6",
+              "python": "3.13.15",
+              "mysql": "8.0.36",
+              "host_failed": 4,
+              "flags_passed": 88,
+              "required_flags": 95,
+              "skipped": 0,
+              "failed_cases": [
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[generation-unknown]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-success]",
+                "test_actual_candidate_graph_halves_first_response_and_final_unknown[semantic-unknown]"
+              ],
+              "assertion_lines": [
+                2512
+              ],
+              "junit_sha256": "8eaa49a70aee302073f0f6d2c8c98124b3c3d41b5ecd5bfe8ab10b084aafd4e4",
+              "private_output_sha256": "cc30a4af3fa7892d02a139fed3d4de1221e966f313f34ca5700b0c58697ddb1a",
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            }
+          ],
+          "full_gate_complete": false
+        }
+      }
+    ],
+    "operational_root_fix_code_sha": "7096312b7d2a03ff88b1e737f2a70e7779d0bf59",
+    "response_root_fix": "Response persistence and original claim renewal install a rejecting session-local operational event guard, retain bind validation and normal EventSession commit, never change the global recorder, and cannot transcribe business transitions. Original host/native test renews both generation/semantic claims. Broker barrier surfaces original host failure and cannot repause during cleanup."
+  },
+  "prior_top_level_before_complete_candidate_runtime": {
+    "source_candidate": "101775ecd04e3973eff791d0d24e2147f6bdcecd",
+    "source_pr": "https://github.com/FangcunMount/qs-ai/pull/204",
+    "source_ci": "https://github.com/FangcunMount/qs-ai/actions/runs/39690447013",
+    "source_merged": true,
+    "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-semantic-completion",
+    "branch": "codex/rocketmq-m3-serial-semantic-state",
+    "source_candidate_branch": "codex/rocketmq-m3-serial-semantic-state"
+  },
+  "recovery_drain_local_followup": {
+    "status": "uncommitted_whole_batch_development",
+    "base_sha": "a0acc995d05abf38b95033063910074368d15620",
+    "worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-recovery-drain",
+    "branch": "codex/rocketmq-m3-recovery-drain",
+    "original_characterization": {
+      "cancel_drain_before": 9,
+      "serial_expiry_before": 10,
+      "candidate_recovery_before": 9
+    },
+    "local_targets_passed": 67,
+    "scope": "Original expiry/drain source snapshots shared with readonly mode. Original writers retain locking, ledger/unknown checks, audit and root commit. No auxiliary PR or CI; full SDK recovery/drain and activation remain pending.",
+    "merged": false,
+    "production_changed": false
+  }
 }
