@@ -2,10 +2,10 @@ name: RocketMQ Docker acceptance
 # AI finalization tools run their own required host gate; shared changes retain this matrix.
 on:
   pull_request:
-    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '!scripts/rocketmq/ai_finalization_characterization.py', '!scripts/rocketmq/test_ai_finalization_characterization.py', '.github/workflows/rocketmq.yml']
+    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '!scripts/rocketmq/ai_finalization_*', '!scripts/rocketmq/test_ai_finalization_*', '.github/workflows/rocketmq.yml']
   push:
     branches: [main]
-    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '!scripts/rocketmq/ai_finalization_characterization.py', '!scripts/rocketmq/test_ai_finalization_characterization.py', '.github/workflows/rocketmq.yml']
+    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '!scripts/rocketmq/ai_finalization_*', '!scripts/rocketmq/test_ai_finalization_*', '.github/workflows/rocketmq.yml']
   workflow_dispatch:
     inputs:
       sdk_ref:

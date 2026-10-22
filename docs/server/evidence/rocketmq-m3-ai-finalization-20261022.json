@@ -3,7 +3,7 @@
   "status": "in_progress",
   "completed": false,
   "progress": "17/36",
-  "internal_progress": "1/5",
+  "internal_progress": "2/5",
   "source_base": "be91fde27616f60a2bcedd0a70280c2ead427d4a",
   "infra_base": "80776fbe4de79e5a65fd11407dfbe87ff42e28ea",
   "source_worktree": "/Users/yangshujie/.codex/worktrees/rocketmq-m3/qs-ai-finalization",
@@ -17,13 +17,13 @@
     },
     {
       "id": "T18-B",
-      "done": false,
-      "status": "candidate_submitted_native_pending"
+      "done": true,
+      "status": "completed_implementation_and_validation_pending_merge"
     },
     {
       "id": "T18-C",
       "done": false,
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "id": "T18-D",
@@ -84,7 +84,7 @@
     "real_mysql_status": "passed_characterization_only_not_repaired",
     "recovery_target_passed": 87,
     "recovery_integration_collected_only": 20,
-    "recovery_real_mysql_status": "not_run",
+    "recovery_real_mysql_status": "passed_20_current_protocol_host_tests_controlled_transport_only",
     "recovery_source_status": "committed_candidate_branch_not_merged_not_deployed",
     "recovery_source_hashes": {
       "src/qs_ai/infrastructure/workflow_transport/interpretation_finish_sender.py": "9cd1b2a8a1d460b8da879047165185a0dc35f18143fbed02f72659fac90e044a",
@@ -182,5 +182,94 @@
       "json_valid": true
     }
   },
-  "recovery_candidate": "432fe19121c9a6ebd3e80c1f21f51db6eb36d3c5"
+  "recovery_candidate": "432fe19121c9a6ebd3e80c1f21f51db6eb36d3c5",
+  "recovery_ci": {
+    "run": 39749586153,
+    "url": "https://github.com/FangcunMount/infra/actions/runs/39749586153",
+    "infra_source": "c9a45101f6cdb8c0f4d69219ad873688d7b9ed6c",
+    "report_sha256": "7e62a142fd5fe40d2bb8b3b02d5d626a10d70dca61cb361f1bcb7a3d86d71c53",
+    "independent_hash_and_test_manifest_verification": true,
+    "completed_date": "2026-10-22",
+    "report": {
+      "version": 1,
+      "batch": "T18-B-original-worker-MySQL-recovery",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "current protocol host recovery; controlled transport and in-process model",
+      "broker_fault_claimed": false,
+      "external_http_counter_claimed": false,
+      "process_restart_claimed": false,
+      "production_changed": false,
+      "source_sha": "432fe19121c9a6ebd3e80c1f21f51db6eb36d3c5",
+      "python": "3.11.16",
+      "sdk": "0.4.0a2",
+      "client": "5.1.2",
+      "lock_sha256": "89b80f1ccb09c859de93905aae56f6e0ae5f064e7eabdaf0ecf9dcdfe4ce8e3e",
+      "test_source_sha256": "da43cb41059612d8407e34cee960c2ce044cfc0a2b8d461ba7d5848c3e448932",
+      "harness_sha256": "1127cbf10e4322919360f0a86c8a9c138b14e0ff05dcf3a2040e3be7191c1ef5",
+      "mysql_image_id": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "recovery_test_source_sha256": "22be0b66bc149a1d6714e598065968b31bef87d3cf3a06995f183cbd83c2ff55",
+      "migration_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_exit_code": 0,
+      "native_output_sha256": "3cb918484a147ef004ed9f4017cf802858f90878eb8ff91d47e3e10402cba0b4",
+      "native_junit_sha256": "5438ca5a2d6f1efb5ded18be445caa3ee2a13e379ef8c451b7dc17276ab47229",
+      "diagnostics": [],
+      "native": {
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "tests": [
+          "test_concurrent_finalization_takeover_has_one_winner_and_fences_old_writer",
+          "test_conflicting_recovery_evidence_does_not_grant_ordinary_business_work[active_lease]",
+          "test_conflicting_recovery_evidence_does_not_grant_ordinary_business_work[cancelled]",
+          "test_conflicting_recovery_evidence_does_not_grant_ordinary_business_work[empty_response]",
+          "test_conflicting_recovery_evidence_does_not_grant_ordinary_business_work[future_receipt_fence]",
+          "test_conflicting_recovery_evidence_does_not_grant_ordinary_business_work[missing_slot]",
+          "test_conflicting_recovery_evidence_does_not_grant_ordinary_business_work[wrong_fence]",
+          "test_conflicting_recovery_evidence_does_not_grant_ordinary_business_work[zero_receipt_fence]",
+          "test_host_same_lease_finalizes_exact_aborted_plan_without_model_replay",
+          "test_locked_claim_recheck_sees_response_beyond_its_earlier_snapshot",
+          "test_locked_finalization_root_cannot_be_taken_over",
+          "test_lost_lease_commit_reply_returns_no_claim_and_preserves_fencing",
+          "test_normal_claim_refuses_a_response_that_committed_after_its_probe[False]",
+          "test_normal_claim_refuses_a_response_that_committed_after_its_probe[True]",
+          "test_original_worker_live_claim_ordinary_finish_leaves_aborted_terminal_unresolved",
+          "test_original_worker_new_lease_finishes_with_original_response",
+          "test_prepared_terminal_cannot_be_bypassed_after_lease_handover",
+          "test_recovery_keeps_existing_capacity_without_model_admission",
+          "test_repeated_mq_refusals_never_exhaust_business_attempts_or_repeat_model",
+          "test_revoked_authorization_cannot_publish_the_first_artifact_or_repeat_model"
+        ],
+        "known_recovery_gap_reproduced": false,
+        "current_protocol_recovery_verified": true
+      },
+      "remaining_rows": {
+        "interpretation_artifacts": 0,
+        "execution_jobs": 0,
+        "execution_model_calls": 0,
+        "interpretation_sessions": 0,
+        "messaging_archive": 0,
+        "rm_tx_binding": 0,
+        "rm_tx_execution": 0,
+        "rm_tx_request": 0,
+        "rm_tx_witness": 0
+      },
+      "mysql_version": "8.0.36",
+      "source_clean_after": true,
+      "private_evidence_removed": true
+    }
+  },
+  "independent_process_candidate": {
+    "source_sha": "753317f168c1da38b198458f1ad1e4886eebb86a",
+    "status": "native_pending",
+    "counter_unit_passed": 4,
+    "broker_native_collected_only": 2,
+    "required_case_count": 12,
+    "infra_tool_unit_passed": 104,
+    "new_proxy_implementation": false,
+    "proxy_source": "fixed SDK transport/rocketmq/internal/faultproxy",
+    "includes_current_protocol_sigkill_case": true,
+    "actual_sigkill_acceptance_passed": false
+  }
 }
