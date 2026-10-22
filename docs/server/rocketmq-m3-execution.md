@@ -1088,3 +1088,9 @@ QS T22离线准备追加aa1d41b89共享双owner默认装配、0c609df6d原消费
 ### 2026-10-23：T21 直接 Pub/Sub 权限门禁补齐
 
 复核发现完整探针的旧负例先检查QueryRoute，缺Get会在发送/接收RPC之前拒绝；这不能单独证明已知队列地址下的Pub/Sub隔离。新增从获准角色读取权威队列，使用被测账号直接签名SendMessage/ReceiveMessage，固定receipt.denial_path并拒绝旧范围报告替代。未放宽ACL、不授予额外Get、不减少130项；39823445415保留其原范围结果，完整直接RPC候选必须重新真实验证。20/36不变。
+
+### 2026-10-23：T21 直接RPC开发证明通过，进入最终完整回归
+
+0c0217a/39824957958双owner开发档22项全部通过，含6个直接SendMessage/ReceiveMessage越权40100；receipt明确direct_signed_send_receive_rpc、full_gate=false，所属容器/进程/私有目录清理完整。ae3200d/39823445415旧范围完整134项（130运输＋4冲突）通过并完整清理，但其部分拒绝仅为QueryRoute，保留原范围、不用于最终门禁。最终候选移除consume-only账号无用的producer启动，不增授权；重新打开PR154运行完整130直接RPC及全部required矩阵。T21仍未勾选、M3保持20/36。
+
+QS源码9b192baae八包297项race零失败/跳过，固定lint2.5.0零问题；87文档门禁通过，并把旧单文件关闭顺序扫描更新为真实协调器注册＋调用链，保留变异拒绝检查。候选3e42b41da已提交[草稿PR422](https://github.com/FangcunMount/qs-server/pull/422)，不代表T22完成或生产部署。IAM/AI生命周期后续审查从新建隔离main工作区e3efa5b3/e9bbba4开始，不使用旧T03工作区推断当前实现。

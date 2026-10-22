@@ -189,11 +189,8 @@ def run(config, cases, progress, *, tls_only=False):
                 producer._retrieve_topic_route_data(sorted(allowed)[0])
                 if not producer._init_settings_event.wait(timeout=5):
                     raise RuntimeError('pinned Broker producer settings not received')
-            else:
-                # A consume-only principal must still fail actual Pub requests.
-                # Start without declaring producer topics; never manufacture a
-                # positive publisher grant merely to bootstrap this negative probe.
-                producer.startup()
+            # A consume-only account signs direct negative RPCs without
+            # starting a producer or manufacturing any positive Pub grant.
             for physical, route in sorted(topics.items()):
                 def send(kind=route['message_type']):
                     check_route(producer, physical)
