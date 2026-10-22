@@ -247,7 +247,9 @@
       "pinned_lint": "2.5.0 passed",
       "docs_tests": 87,
       "docs_hygiene_facts": "passed",
-      "scope": "source/targeted contract only; real dual-store default wiring/full host pending"
+      "scope": "source/targeted contract only; real dual-store default wiring/full host pending",
+      "followup": "integrated into final PR424; original source/tests retained; original CI is not the final integrated gate",
+      "pr_state": "closed_superseded_by_424"
     },
     "worker_owned_shutdown": {
       "repository": "qs-server",
@@ -266,7 +268,22 @@
       "pinned_lint": "2.5.0 passed",
       "docs_tests": 88,
       "docs_hygiene_facts": "passed",
-      "scope": "owned actual SIGTERM child using test subscriber/dependency; not Broker/DB or full worker"
+      "scope": "owned actual SIGTERM child using test subscriber/dependency; not Broker/DB or full worker",
+      "followup": "integrated into final PR424; original source/tests retained; original CI is not the final integrated gate"
+    },
+    "worker_partial_startup": {
+      "source_sha": "c8212560a853ab9f4df9be72337e844bd9f156ee",
+      "candidate_sha": "e557d7c647290e8e40c4fb3fc62ccd7de9b6b39a",
+      "pr": "https://github.com/FangcunMount/qs-server/pull/425",
+      "pr_state": "merged_into_candidate_branch_not_main",
+      "source_merged_into_main": false,
+      "tests": {
+        "pass": 48,
+        "fail": 0,
+        "skip": 0
+      },
+      "test_report_sha256": "27051f457666aa62aef31f2d6379833f996a3235d0a091e3d390cd6563412b50",
+      "scope": "actual inert constructor failure/partial ownership and bounded owned drain; not connected native DB/Broker"
     }
   },
   "worker_signal_development_failure": {
@@ -293,5 +310,36 @@
     "no worker resource/concurrency change",
     "no SDK release, system login or48h observation",
     "no historical compatibility expansion or cleanup deletion"
-  ]
+  ],
+  "integrated_runtime_candidate": {
+    "source_sha": "43f3e5e3b199b37ff754adc1b0d3d879b64689e5",
+    "candidate_sha": "21817e1f66b1130852a4c33a862d1a42e353981b",
+    "pr": "https://github.com/FangcunMount/qs-server/pull/424",
+    "source_merged_into_main": false,
+    "ci": "pending_on_exact_final_head",
+    "tests": {
+      "pass": 341,
+      "fail": 0,
+      "skip": 0
+    },
+    "packages": 7,
+    "test_report_sha256": "6893d33f38e0e143264f805a9f24a008986bcd2c7cf4bcbc07bb70cf9898288b",
+    "local_report": "/tmp/m3-t22-integrated-runtime-tests.jsonl",
+    "pinned_lint": "repository-wide2.5.0 passed",
+    "docs_tests": 88,
+    "docs_hygiene_facts": "passed",
+    "parent_metadata_preserved": true,
+    "production_changed": false
+  },
+  "deferred_consumer_batch": {
+    "status": "implementation_next",
+    "scope": "current v2 RocketMQ paused retry deliveries only; same original dispatcher/identity, no publication or business retry authorization",
+    "storage": "reuse original transport evidence104 and explicit host migration for v2 deferred linkage; no historical reader",
+    "resource_contract": "same original worker execution concurrency, one bounded resume loop, bounded SQL/lease renewal and actual completion accounting",
+    "verification_pending": [
+      "pure contract/race",
+      "required isolated real MySQL/Broker",
+      "shared budget and crash/lease ownership"
+    ]
+  }
 }
