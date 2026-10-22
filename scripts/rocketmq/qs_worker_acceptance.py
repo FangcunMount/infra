@@ -8,7 +8,7 @@ import secrets
 
 from iam_acceptance import host_failure_summary, retain_private_host_output
 from m3_resources import manifest
-from provision_v2 import provision
+from provision_v2 import provision, Admin
 from routes import validate_v2
 
 CASES = frozenset((
@@ -50,9 +50,12 @@ def worker_failure_diagnostics(output):
         return {'invalid': True}
     try:
         value = json.loads(rows[0])
-        if (not isinstance(value, dict) or set(value) != {'phase', 'active', 'waiting', 'holds', 'evidence', 'query_failed', 'consume_outcomes'}
+        if (not isinstance(value, dict) or set(value) != {'phase', 'active', 'waiting', 'holds', 'evidence', 'query_failed', 'consume_outcomes', 'transport_errors'}
                 or value['phase'] != 'paused_delivery' or type(value['query_failed']) is not bool
                 or any(type(value[k]) is not int or not 0 <= value[k] <= 1000000 for k in ('active', 'waiting', 'holds', 'evidence'))
+                or not isinstance(value.get('transport_errors'),dict)
+                or set(value['transport_errors']) - {'auth_or_acl','deadline','tls','connection','other'}
+                or any(type(v) is not int or not 0<=v<=8 for v in value['transport_errors'].values())
                 or not isinstance(value['consume_outcomes'], dict)
                 or set(value['consume_outcomes']) - {'held', 'hold_failed', 'dispatch_failed', 'decode_failed', 'acked', 'unknown_acked', 'unknown_persist_failed'}
                 or any(type(v) not in (int, float) or not math.isfinite(v) or not 0 <= v <= 1000000 for v in value['consume_outcomes'].values())):
@@ -125,6 +128,17 @@ def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port
     if private_log is not None:
         retain_private_host_output(private_log, raw)
     if result.returncode:
+        seed = next(r for r in document['routes'] if r['id'] == 'qs-evaluation-mysql')
+        try:
+            topic_output = Admin(broker)('topicStatus', '-t', seed['physical_topic'])
+            queues = []
+            for line in topic_output.splitlines():
+                fields = line.split()
+                if len(fields)>=4 and all(re.fullmatch(r'[0-9]{1,12}',v) for v in fields[1:4]):
+                    queues.append({'queue':int(fields[1]),'min_offset':int(fields[2]),'max_offset':int(fields[3])})
+            proof['diagnostics']['seed_topic_offsets'] = queues[:8]
+        except RuntimeError:
+            proof['diagnostics']['seed_topic_offsets_unavailable'] = True
         raise RuntimeError('actual worker runtime native acceptance failed; private output withheld')
     proof['native_receipt'] = parse_worker_receipt(result.stdout, proof['source_sha'])
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()

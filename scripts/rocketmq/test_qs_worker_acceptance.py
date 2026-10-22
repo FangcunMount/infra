@@ -28,11 +28,11 @@ class WorkerRuntimeReceiptTest(unittest.TestCase):
 
     def test_bounded_failure_facts_reject_identity_payload_and_non_finite_counts(self):
         value=dict(phase='paused_delivery', active=1, waiting=0, holds=0, evidence=0,
-                   query_failed=False, consume_outcomes={'hold_failed': 1})
+                   query_failed=False, consume_outcomes={'hold_failed': 1}, transport_errors={'deadline': 1})
         self.assertEqual(worker_failure_diagnostics('M3_WORKER_DIAGNOSTIC '+json.dumps(value)), value)
         self.assertIsNone(worker_failure_diagnostics(''))
         for bad in (dict(value, wire='forbidden'),dict(value, phase='arbitrary'),dict(value, active=True),
-                    dict(value, consume_outcomes={'identity-label': 1}),dict(value, holds=-1),
+                    dict(value, consume_outcomes={'identity-label': 1}),dict(value, holds=-1),dict(value, transport_errors={'raw-error': 1}),dict(value, transport_errors={'other': 9}),
                     dict(value, consume_outcomes={'held': float('nan')})):
             self.assertEqual(worker_failure_diagnostics('M3_WORKER_DIAGNOSTIC '+json.dumps(bad)), {'invalid': True})
 
