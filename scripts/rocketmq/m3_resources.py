@@ -67,6 +67,11 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
     accounts = {role:dict(username='m3-'+secrets.token_hex(8),password=secrets.token_hex(32))
         for role in document['accounts']}
     proof['manifest_sha256'] = hashlib.sha256((repo/MANIFEST).read_bytes()).hexdigest()
+    proof['phase'] = 'dependency_warmup'
+    # Do not charge uv downloads/builds to the actual TLS process lifetime.
+    # Missing dependencies still fail this required profile.
+    run(['uv','sync','--locked','--project',str(repo/'scripts/rocketmq/txprobe')],timeout=300)
+    proof['dependencies_ready'] = True
     wrong_ca = directory/'m3-wrong-ca.crt'
     run(['openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1',
         '-subj','/CN=isolated-wrong-root','-keyout',str(directory/'m3-wrong-ca.key'),'-out',str(wrong_ca)])
@@ -77,14 +82,26 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
                      for role,grants in document['accounts'].items()})))
     config.chmod(0o600)
     env = dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(ca))
-    argv = ['uv','run','--locked','--project',str(repo/'scripts/rocketmq/txprobe'),
+    argv = ['uv','run','--locked','--no-sync','--project',str(repo/'scripts/rocketmq/txprobe'),
         'python',str(repo/'scripts/rocketmq/m3_resource_probe.py'),'--config',str(config)]
     # TLS failure must be visible before the relatively slow MQAdmin provisioning.
-    tls = native_run(argv+['--tls-only'],cwd=repo,env=env,timeout=60,required=False)
+    proof['phase'] = 'tls_preflight'
+    previous = set(directory.glob('probe-*.log'))
+    try:
+        tls = native_run(argv+['--tls-only'],cwd=repo,env=env,timeout=60,required=False)
+    finally:
+        logs = set(directory.glob('probe-*.log'))-previous
+        if len(logs) == 1:
+            raw = logs.pop().read_bytes()
+            proof['tls_private_output_sha256'] = hashlib.sha256(raw).hexdigest()
+            allowed = {'native_started'} | {k for k in expected_cases(document) if k.startswith('tls/')}
+            proof['tls_progress'] = [line.removeprefix('M3_RESOURCE_STAGE ') for line in raw[-32768:].decode(errors='replace').splitlines()
+                if line.startswith('M3_RESOURCE_STAGE ') and line.removeprefix('M3_RESOURCE_STAGE ') in allowed][-8:]
     proof['tls_preflight'] = parse_receipt(tls.stdout,document,partial=True)
     if (tls.returncode or proof['tls_preflight']['failed']
         or set(proof['tls_preflight']['cases']) != {k for k in expected_cases(document) if k.startswith('tls/')}):
         raise RuntimeError('TLS-only preflight failed before resource mutation')
+    proof['phase'] = 'provision'
     proof['provision'] = provision(broker,document,accounts)
     proof['idempotent'] = provision(broker,document,accounts)
     if proof['idempotent']['operations'] != 0:
@@ -154,6 +171,7 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
         for name in ('topic.json','subscriptionGroup.json'):
             reader.docker('rm','-f','--',snapshot+'/'+name,required=False)
         reader.docker('rmdir',snapshot)
+    proof['phase'] = 'native_acl_and_type'
     result = native_run(argv,
         cwd=repo,env=env,timeout=900,required=False)
     raw = result.stdout+result.stderr
@@ -165,4 +183,5 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
     proof['native_receipt'] = parse_receipt(result.stdout,document)
     if result.returncode:
         raise RuntimeError('isolated resource probe failed')
+    proof['phase'] = 'complete'
     proof['scope'] = 'reviewed production names in an isolated Broker; production resources and runtime unchanged'

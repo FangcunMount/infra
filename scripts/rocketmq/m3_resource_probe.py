@@ -80,7 +80,8 @@ def run(config, cases, *, tls_only=False):
         raise RuntimeError('fixed Python client required')
     if not config['endpoint'].startswith('127.0.0.1:'):
         raise RuntimeError('owned loopback endpoint required')
-    def handshake(ca=None, *, name=None, plaintext=False, expected=True):
+    def handshake(ca=None, *, name=None, plaintext=False, expected=True, stage):
+        print('M3_RESOURCE_STAGE '+stage,flush=True)
         channel = (grpc.insecure_channel(config['endpoint']) if plaintext else
             grpc.secure_channel(config['endpoint'], grpc.ssl_channel_credentials(
                 root_certificates=Path(ca or config['ca']).read_bytes()),
@@ -96,15 +97,15 @@ def run(config, cases, *, tls_only=False):
                     raise RuntimeError('untrusted or plaintext TLS probe was accepted')
         finally:
             channel.close()
-    handshake()
+    handshake(stage='tls/verified_ca_and_san')
     cases['tls/verified_ca_and_san'] = 'allowed'
-    handshake(config['wrong_ca'],expected=False)
+    handshake(config['wrong_ca'],expected=False,stage='tls/wrong_ca')
     cases['tls/wrong_ca'] = 'rejected'
-    handshake(name='wrong-server-name.invalid',expected=False)
+    handshake(name='wrong-server-name.invalid',expected=False,stage='tls/wrong_san')
     cases['tls/wrong_san'] = 'rejected'
-    handshake(plaintext=True,expected=False)
+    handshake(plaintext=True,expected=False,stage='tls/plaintext')
     cases['tls/plaintext'] = 'rejected'
-    handshake()
+    handshake(stage='tls/verified_control_after_negatives')
     cases['tls/verified_control_after_negatives'] = 'allowed'
     if tls_only:
         return
@@ -191,6 +192,7 @@ def main():
         logger.removeHandler(handler)
         handler.close()
     logger.addHandler(logging.FileHandler(args.config.parent/'m3-raw-client.log'))
+    print('M3_RESOURCE_STAGE native_started',flush=True)
     cases, failed = {}, 0
     try:
         run(json.loads(args.config.read_text()), cases, tls_only=args.tls_only)

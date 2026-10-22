@@ -84,5 +84,35 @@
     "required_forbidden_cases": 84,
     "required_type_conflicts": 10,
     "legacy_hold_replay": "must stop and hand off active responsibilities in T25/T32"
+  },
+  "tls_fix_first_run": {
+    "run": 39814299493,
+    "source": "076129c562c6498b4fa0112a7b527221df3d789d",
+    "report_sha256": "6d42254b90dca03056d77ce3aa717d76e9d08cb41b8342fe8cca32c917746454",
+    "failed": 1,
+    "passed": 0,
+    "skipped": 0,
+    "failure": "RuntimeError: owned native process tree failed or exceeded its budget",
+    "broker_parameters_read": true,
+    "mysql_version": "8.0.36",
+    "native_exits": [
+      -9
+    ],
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "diagnosis": "TLS-only child exceeded60s including uv startup; insufficient cursor evidence to attribute the timeout to dependency setup or Broker TLS; neither is claimed passed."
+  },
+  "tool_tls_unit": {
+    "scope": "owned loopback gRPC TLS fixture only, not RocketMQ",
+    "cases": 5,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "elapsed_seconds": 10.11,
+    "purpose": "TLS-only probe lifecycle reproducer; does not replace actual Broker gate"
   }
 }
