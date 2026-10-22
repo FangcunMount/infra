@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI领取/scanner PR197与显式完成重试PR198、infra PR121/123均已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17进行中，16/36。candidate完整事务链路已实现；修复首响应/续租原根调用旧记录器的缺口后，a0acc99完整12项源码门禁通过，MySQL8.0.36/8.4各5145项、含27个candidate原生用例全部通过，零失败/跳过。六档Broker每档38宿主/95证据通过，AI PR210与infra PR138均已合并，candidate子门禁已勾选。恢复/drain修复候选4d8706e两档各5432通过；首档Broker137项证据但三个串行断言失败，现按原codec修复为b3b6072，完整门禁待精确重验；默认装配未启用。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36；三个内部子门禁已完成2项。candidate与恢复/取消drain均已验证并合并。最新恢复候选b3b6072两档MySQL各5432项（含39新增原生）、六档Broker各51宿主/137证据全部通过，0失败/跳过；AI PR211、infra PR140已合并。默认装配本地推进，未启用。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -35,7 +35,7 @@
 | 原一次事务连续两次版本推进的冻结 | ✅ 旧v1字节向量不变，41目标/3312本地；双MySQL各4448零失败跳过、含4原生 | ✅ PR192合并8b6cfa4；12检查通过 | 仅协议及原根基础，不冒充完整claim入口 |
 | 原领取根及并发锁 | ✅ PR193双MySQL各4480，8原根/并发新增用例；完整八分片/JUnit核验 | ✅ PR193合并ca6f1be | ClaimStage不等于witness或模型执行授权 |
 | 完整claim/refusal/attempts-exhausted及scanner | ✅ 双MySQL各4614，9维护/6scanner/5显式重试原生，六档Broker各26/64，零失败跳过、完整清理 | ✅ AI PR193–197、infra PR119/121及SDK PR48–50 | 原租约/配额/首次wire和失败历史保留；默认装配与其他T17入口仍待完成 |
-| evaluation完整终态/candidate/恢复/取消drain | ☐ 待闭环 | — | 不重做模型，不用已有业务行冒充witness |
+| evaluation完整终态/candidate/恢复/取消drain | ✅ SDK入口及两个内部子门禁已闭环 | ✅ AI PR210/211、infra PR138/140 | 默认运行装配仍须下行独立验收，不代表生产启用 |
 | 全部state写入口及统一事务装配 | ☐ 待闭环 | — | 默认事务装配未启用；生产另有具名批准门禁 |
 
 ## 1. 目标、基线和授权边界
@@ -146,7 +146,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T14 | QS command/档案，Operation/Payload新旧兼容 | 2026-10-21；冻结首次wire/输入、原SQL事实/operation/档案/witness、序号CAS与真实前序receipt门禁；实际Participant的Pending查询和原请求复用保留当前权限及资源绑定，计划不冒充已接受业务。最终3dd33af4f完整race7290通过/60既有可选跳过、完整lint零问题，三档Broker/MySQL各15项零失败/跳过并完整清理；QS CI28成功/1不适用，PR418合并0ed41ea5；infra25项CI成功，PR68合并53d18bb5。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-command-20261021.json)。生产未变更 |
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
-| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；interpretation和串行终态子批次已合并。candidate a0acc99源码12检查、两档各5145/27原生、六档Broker各38/95通过，AI PR210与infra PR138均已合并，完整candidate子门禁完成。恢复/drain两档各5432/39新原生通过；Broker版本字段断言修复为b3b6072，51/137完整门禁待精确重验；统一装配未闭环。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
+| ☐ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 进行中；三个内部子门禁2/3闭环。candidate及恢复/drain已合并；b3b6072双MySQL各5432/39新增原生、六档Broker各51/137，0失败/跳过。默认装配本地4161单元快照通过，新增提交保护另32目标/444类型；完整启动/关闭及新档案ACK兼容未闭环。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ☐ | T18 | AI确定性finalization，故障不增加模型调用 | 待开始 |
 | ☐ | T19 | AI历史reader/RPC/诊断/恢复兼容，退出新消息Relay | 待开始 |
 | ☐ | T20 | 成对契约、安全、wire、receipt/ACK重复与取消 | 待开始 |
@@ -659,7 +659,7 @@ PR205–208已收拢到[PR209](https://github.com/FangcunMount/qs-ai/pull/209)�
 | T17验收门禁 | 当前状态 | 完成口径 |
 | --- | --- | --- |
 | candidate完整事务链路 | ✅ 已完成（源码与工具均合并） | 原prepare/dispatch、generation/semantic完成和首响应恢复通过实际宿主入口串联；原根/witness/重复/故障通过 |
-| 恢复与取消drain | ☐ 部分实现，未闭环 | 过期所有权、已持久化响应恢复、取消收尾的责任完整；未知结果不触发模型重做 |
+| 恢复与取消drain | ✅ 已完成（源码与工具均合并） | 过期所有权、已持久化首响应恢复、取消收尾与显式旧Aborted恢复经两档MySQL与六档Broker验证；不授权未知模型重做 |
 | 默认运行装配 | ☐ 原事务成对入口/DI本地推进；启动关闭及实际依赖待验，未启用 | 全部活动写者实际接入事务runtime，启动/关闭与原入口端到端通过 |
 
 已合并的interpretation领取/完成及串行generation/semantic事务子批次保持通过。当前实现分支统一为codex/rocketmq-m3-candidate-runtime，下一次功能提交围绕完整candidate运行链路，不再为单个辅助抽取建立独立PR。M3保持16/36、T17未勾选；生产、稳定SDK、system及48小时观察未操作。
@@ -735,3 +735,14 @@ M3保持16/36，T17恢复/drain与默认装配仍未勾选，源码及工具尚�
 [Broker39721226174](https://github.com/FangcunMount/infra/actions/runs/39721226174) 的首档Python3.13/MySQL8.0.44报告包含全部137证据，但三个串行expiry宿主用例在同一行失败，因此整批不接受。精确source、发布wheel、工具hash和完整清理均核对。原因是新增验收错误地要求 `facts.source_version == checkpoint.version`；现有expiry codec明确要求该字段为None，并将精确原版本冻结在 `facts.intent.expected_version`。
 
 02196c6只修正测试为同时校验expected_version和None，并在原planner回归补充同一约束；没有改codec/业务/SDK、放宽CAS或删断言。56目标通过，51宿主重新收集、文档通过，最终固定b3b6072重新执行完整源码及六档Broker。旧137/3失败报告和原生已通过证据分别保留，不将旧SHA重标为新验收。恢复/drain第二子门禁不勾选，M3仍16/36，相关PR未合并、生产未操作。
+
+
+### 2026-10-22 T17 恢复与取消排空子门禁闭环（2/3）
+
+- [AI PR211](https://github.com/FangcunMount/qs-ai/pull/211) 正常合并 `6d74880283a55fbd22122636d427379c11c8e1f3`，整棵tree与冻结候选b3b6072一致；合并前读取AUTO_DEPLOY_ENABLED=false。最终 [源码39722940306](https://github.com/FangcunMount/qs-ai/actions/runs/39722940306) 12检查全部success，八分片/JUnit完整互斥、merge父SHA和tree核验。MySQL8.0.36/8.4每档5432通过、0失败/跳过，均含39新增原生用例。
+- [infra PR140](https://github.com/FangcunMount/infra/pull/140) 正常合并 `d122ff61049f78c4c6aabb2aeb25711573c9d0f3`，tree与已验工具c3cf469一致。19项required检查全部success；最终 [六档Broker39723062263](https://github.com/FangcunMount/infra/actions/runs/39723062263) 每档51宿主/137证据通过，0失败/跳过、完整清理。源码/工具/锁文件/wheel摘要、运行版本、镜像digest及实际参数已逐报告核验。
+- 勾选T17内部“恢复与取消drain”；T17整体仍未完成，**M3保持16/36，内部子门禁2/3**。两轮测试夹具失败（候选claim清理、串行expiry可选字段断言）及修复完整保留，取消不计通过。最终候选沿用原应用、固定SDK及迁移，完整门禁在修正验收夹具后重新执行。
+
+默认装配在独立工作区继续：上次完整本地4161单元通过（1326真实依赖用例明确排除）；新增无消息发布的操作事务保护另32目标通过、444源类型通过，12项串行成对原生仅收集。原事务/DI/配额与共享Sender已接线；完整启动/准入/在途关闭，以及新档案ACK与历史读取兼容仍待完成。没有为辅助组件另建PR，默认事务启动保护保持关闭。
+
+上述门禁不代表QS配对业务、真实provider、宿主SIGKILL/数据库网络故障或system验收。稳定SDK、生产配置/DDL/Topic/ACL切换和48小时观察均未执行；原NSQ运行责任与三个worker配额保持。
