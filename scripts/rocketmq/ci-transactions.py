@@ -92,7 +92,7 @@ def port():
 
 
 class Probe:
-    def __init__(self, argv, directory, env, prefix="TXPROBE "):
+    def __init__(self, argv, directory, env, prefix="TXPROBE ", *, cwd=None):
         self.events = []
         self.incoming = queue.Queue()
         self.log = open(directory / ("probe-" + secrets.token_hex(5) + ".log"), "x")
@@ -103,7 +103,7 @@ class Probe:
                           'rocketmq.client.logLevel': 'error'})
         self.process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=self.log, text=True, env=env, bufsize=1,
-                                        start_new_session=True)
+                                        start_new_session=True, cwd=cwd)
 
         def collect():
             for line in self.process.stdout:
@@ -144,8 +144,8 @@ class Probe:
         self.process.stdin.write(action + "\n")
         self.process.stdin.flush()
 
-    def finish(self, expected=0):
-        if self.process.wait(timeout=30) != expected:
+    def finish(self, expected=0, *, timeout=30):
+        if self.process.wait(timeout=timeout) != expected:
             raise RuntimeError("unexpected probe process status")
         self.reader.join(timeout=2)
         self.drain()
@@ -412,6 +412,26 @@ def main():
         probes.append(p)
         return p
 
+    def owned_native_run(argv, *, cwd, env, timeout=900, required=False):
+        # uv is a launcher. Own its whole session so timeouts cannot leave the
+        # worker/provider/proxy processes running after the private fixture ends.
+        native = Probe(argv, directory, env, prefix="NATIVE_UNUSED_PREFIX ", cwd=cwd)
+        probes.append(native)
+        try:
+            code = native.process.wait(timeout=timeout)
+            native.finish(expected=code)
+            native.log.flush()
+            if code:
+                native.signal_group(signal.SIGTERM)
+            result = subprocess.CompletedProcess(argv, code, Path(native.log.name).read_text(), "")
+            if required and code:
+                raise RuntimeError("owned native operation failed (private output withheld)")
+            return result
+        except (subprocess.TimeoutExpired, OSError):
+            native.signal_group(signal.SIGKILL)
+            native.close()
+            raise RuntimeError("owned native process tree failed or exceeded its budget") from None
+
     def proxy_start(kind):
         endpoint = grpc_port if kind == "rocketmq" else (mysql_port if kind == "mysql" else mongo_port)
         argv = [str(directory / "fault-proxy"), "--kind", kind,
@@ -456,13 +476,20 @@ def main():
             raise RuntimeError("required MySQL 8.0 fixture absent")
         if args.ai_admission_host:
             from ai_admission_acceptance import run_ai_admission_host
-            state_profile = os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') == 'state'
-            proof_name = 'ai_state_host' if state_profile else 'ai_admission_host'
+            kind = os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission')
+            state_profile = kind == 'state'
+            proof_name = 'ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')
+            fault_tools = None
+            if kind == 'finalization':
+                run(['go', 'build', '-o', str(directory / 'fault-proxy'),
+                     './transport/rocketmq/internal/faultproxy'], cwd=sdk)
+                fault_tools = dict(binary=str(directory / 'fault-proxy'), cert=str(ca), key=str(fault_key))
             proof[proof_name] = {}
             run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
-                                  mysql_password, ca, run, proof[proof_name])
+                                  mysql_password, ca, run, proof[proof_name], fault_tools=fault_tools,
+                                  native_runner=owned_native_run if kind == 'finalization' else None)
             for name in proof[proof_name]['native_receipt']['cases']:
-                passed(('ai_state_' if state_profile else 'ai_admission_') + name)
+                passed(('ai_finalization_' if kind == 'finalization' else ('ai_state_' if state_profile else 'ai_admission_')) + name)
             return
         if args.qs_event_host:
             from qs_event_acceptance import run_qs_event_host
@@ -918,6 +945,14 @@ def main():
                                     'Event observer ACK only; no paired QS business or real provider',
                                     'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
                 report['ai_state_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_state_acceptance.py').read_bytes()).hexdigest()
+        if args.ai_admission_host and os.environ.get('QS_AI_ACCEPTANCE_KIND') == 'finalization':
+            report['batch'] = 'M3-AI-five-path-finalization-RPC-fault-and-SIGKILL-recovery'
+            report['limits'] = ['No production/system or paired QS business acceptance',
+                                'Synthetic HTTP provider; process-external append-only invocation counter',
+                                'Five paths x normal/terminal send unavailable/commit reply lost/response-committed SIGKILL',
+                                'Actual SDK RPC TCP interruption and external HTTP invocation ledger; no database commit network-fault claim']
+            report['ai_finalization_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_finalization_acceptance.py').read_bytes()).hexdigest()
+            report['ai_finalization_diagnostics_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_finalization_characterization.py').read_bytes()).hexdigest()
         if args.qs_event_host:
             report['batch'] = 'M3-QS-AI-event-original-SQL-and-ACK-Broker'
             report['limits'] = ['No production/system acceptance or throughput claim',

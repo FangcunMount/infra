@@ -49,6 +49,8 @@ docs/
 
 | 我想... | 参考文档 |
 |---------|----------|
+| 查看RocketMQ生产切换规划与进度 | [M3执行总表](./server/rocketmq-m3-execution.md) |
+| 查看RocketMQ切换后的旧链路清理 | [M4清理执行表](./server/rocketmq-m4-execution.md) |
 | 准备阿里云 Redis 切到腾讯云 | [Redis 切换手册](./server/redis-tencent-cutover.md) |
 | 了解四机拓扑和服务落点 | [架构设计](./server/architecture.md) |
 | 查看 IAM 迁至腾讯云 serverA 的结果 | [IAM 腾讯云迁移记录](./server/iam-tencent-servera-migration.md) |

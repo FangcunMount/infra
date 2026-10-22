@@ -112,15 +112,20 @@ def acceptance_profile(kind):
                     parse=lambda output, junit: parse_host_receipt(output, junit, marker='M3_AI_STATE_RECEIPT', cases=STATE_CASES, tests=STATE_TESTS, sdk_version='0.4.0a2'),
                     tests=STATE_TESTS,
                     scope='actual Python worker/preflight, governance/review/correction/Solution and unknown-resolution handlers plus serial dispatch, claim and durable generation/semantic terminal senders, published SDK, default DI/transport/worker assembly, original state roots and real Broker; controlled authenticated ACK and event observer only')
+    if kind == 'finalization':
+        from ai_finalization_acceptance import profile
+        return profile()
     raise RuntimeError('explicit known AI acceptance profile required')
 
 
 def host_failure_diagnostics(raw, filename, tests):
-    names = set(re.findall(r'(?:FAILED|ERROR) tests/integration/' + re.escape(filename) +
+    filenames = (filename,) if isinstance(filename, str) else filename
+    pattern = '(?:' + '|'.join(re.escape(f) for f in filenames) + ')'
+    names = set(re.findall(r'(?:FAILED|ERROR) tests/integration/' + pattern +
                            r'::([A-Za-z0-9_\[\]-]+)', raw))
     return {'failed_cases': sorted(names & tests)[:16],
             'assertion_lines': sorted(set(int(n) for n in re.findall(
-                re.escape(filename) + r':(\d{1,6})(?!\d)', raw)))[:32]}
+                pattern + r':(\d{1,6})(?!\d)', raw)))[:32]}
 
 
 
@@ -148,7 +153,7 @@ def validate_host_runtime(runtime, profile, python):
         raise RuntimeError('released fixed SDK wheel and client required, no editable SDK')
 
 
-def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof):
+def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, *, fault_tools=None, native_runner=None):
     profile = acceptance_profile(os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission'))
     source = source.resolve()
     if not (source / 'pyproject.toml').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
@@ -173,7 +178,7 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     root_url = f'mysql+asyncmy://root:{password}@127.0.0.1:{mysql_port}/{schema}'
     application_url = f'mysql+asyncmy://{db_user}:{db_password}@127.0.0.1:{mysql_port}/{schema}'
     private_config = directory / ('ai-' + profile['name'] + '-config.json')
-    private_config.write_text(json.dumps(dict(accounts, endpoint=f'127.0.0.1:{grpc_port}',
+    private_config.write_text(json.dumps(dict(accounts, **({'fault_tools': fault_tools} if fault_tools else {}), endpoint=f'127.0.0.1:{grpc_port}',
         client_log=str(directory / 'ai-client-private.log'), routes=manifest['routes'],
         ca_file=str(ca)))); private_config.chmod(0o600)
     env = dict(os.environ, QS_AI_DATABASE_URL=application_url,
@@ -237,7 +242,8 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
             run(['docker', 'exec', '-i', '-e', 'MYSQL_PWD=' + password, mysql, 'mysql', '-uroot', '--batch'],
                 stdin=f"DROP DATABASE `{focus_schema}`;")
             focus['schema_removed'] = True
-    result = run([*command, 'pytest', '-q', '-s', str(source / 'tests/integration' / filename),
+    result = (native_runner or run)([*command, 'pytest', '-q', '-s',
+                  *(['-x'] if profile.get('fail_fast') else []), str(source / 'tests/integration' / filename),
                   '--junitxml=' + str(junit)], cwd=source, env=env, timeout=900, required=False)
     raw = result.stdout + result.stderr
     capture = directory / ('ai-' + profile['name'] + '-host-private.log'); capture.write_text(raw); capture.chmod(0o600)
@@ -246,8 +252,10 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
         proof['junit_sha256'] = hashlib.sha256(junit.read_bytes()).hexdigest()
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
-    proof['diagnostics'] = host_failure_diagnostics(raw, filename, profile['tests'])
+    proof['diagnostics'] = host_failure_diagnostics(raw, profile.get('diagnostic_files', filename), profile['tests'])
     if result.returncode or not junit.is_file():
+        if junit.is_file() and profile.get('failure_diagnostics'):
+            proof['native_failure_details'] = profile['failure_diagnostics'](junit.read_text())
         partial = profile['partial'](result.stdout)
         if partial is not None:
             proof['partial_native_receipt'] = partial

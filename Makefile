@@ -1617,3 +1617,13 @@ rocketmq-ai-state-test: ## 隔离验证实际 AI worker 状态原事务与固定
 		python3 scripts/rocketmq/ci-transactions.py --sdk "$(SDK_DIR)" --ai-admission-host "$(AI_DIR)" \
 		--image "$(ROCKETMQ_TEST_IMAGE)" --mysql-image "$(or $(ROCKETMQ_TEST_MYSQL_IMAGE),mysql:8.0.36)" \
 		--report "$(or $(ROCKETMQ_AI_STATE_REPORT),rocketmq-ai-state.json)"
+
+.PHONY: rocketmq-ai-finalization-test
+rocketmq-ai-finalization-test: ## 隔离验证独立AI worker/HTTP计数/SIGKILL及固定SDK/Broker；不操作生产
+	$(call require_param,SDK_DIR,SDK_DIR must name a fixed clean SDK checkout)
+	$(call require_param,AI_DIR,AI_DIR must name a fixed clean AI checkout)
+	$(call require_param,ROCKETMQ_TEST_IMAGE,ROCKETMQ_TEST_IMAGE must name an existing owned Broker image)
+	QS_AI_ACCEPTANCE_KIND=finalization QS_AI_ACCEPTANCE_PYTHON="$(or $(AI_ACCEPTANCE_PYTHON),3.11)" \
+		python3 scripts/rocketmq/ci-transactions.py --sdk "$(SDK_DIR)" --ai-admission-host "$(AI_DIR)" \
+		--image "$(ROCKETMQ_TEST_IMAGE)" --mysql-image "$(or $(ROCKETMQ_TEST_MYSQL_IMAGE),mysql:8.0.36)" \
+		--report "$(or $(ROCKETMQ_AI_FINALIZATION_REPORT),rocketmq-ai-finalization-live.json)"
