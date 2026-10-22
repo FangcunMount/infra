@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 import unittest
 
-from qs_runtime_acceptance import CASES, SCOPE, parse_runtime_receipt, runtime_manifest
+from qs_runtime_acceptance import CASES, SCOPE, parse_runtime_receipt, runtime_manifest, runtime_diagnostics
 from routes import permissions_v2
 
 
@@ -53,3 +53,24 @@ class RuntimeProfileIsolationTest(unittest.TestCase):
                 capture_output=True, text=True, timeout=5, env=dict(os.environ, PATH=''))
             self.assertEqual(result.returncode, 2)
             self.assertIn('default QS owner runtime is a separate required profile', result.stderr)
+
+
+class DefaultRuntimeDiagnosticTest(unittest.TestCase):
+    def sample(self):
+        return dict(stage='local_committed', owner_index=1, local='unknown',
+                    error=dict(kind='deadline', code=0), root_phases=[5, 2],
+                    lease_remaining_ms=[-100, 20], elapsed_ms=60100)
+
+    def test_only_fixed_synthetic_counters_are_retained(self):
+        value = self.sample()
+        self.assertEqual(runtime_diagnostics('private non-marker text'), [])
+        self.assertEqual(runtime_diagnostics('M3_QS_OWNER_DIAGNOSTIC '+json.dumps(value)), [value])
+
+    def test_refuse_raw_errors_unknown_fields_and_unbounded_values(self):
+        for changes in (dict(wire='private'), dict(stage='arbitrary'), dict(elapsed_ms=True),
+                        dict(root_phases=[9, 0]), dict(lease_remaining_ms=[1]),
+                        dict(error=dict(kind='private error text', code=0)),
+                        dict(error=dict(kind='mysql', code=-1))):
+            value = dict(self.sample(), **changes)
+            with self.assertRaises(RuntimeError):
+                runtime_diagnostics('M3_QS_OWNER_DIAGNOSTIC '+json.dumps(value))

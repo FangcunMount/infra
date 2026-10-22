@@ -63,6 +63,36 @@ def parse_runtime_receipt(output, source):
     return value
 
 
+
+def runtime_diagnostics(output):
+    """Only schema-bound synthetic phases/counters; never retain error text."""
+    result = []
+    for line in output.splitlines():
+        if not line.startswith('M3_QS_OWNER_DIAGNOSTIC '):
+            continue
+        try:
+            value = json.loads(line.removeprefix('M3_QS_OWNER_DIAGNOSTIC '))
+        except ValueError:
+            raise RuntimeError('invalid fixed owner diagnostic') from None
+        fields = {'stage', 'owner_index', 'local', 'error', 'root_phases', 'lease_remaining_ms', 'elapsed_ms'}
+        if (not isinstance(value, dict) or set(value) != fields
+                or value['stage'] not in {'local_entered', 'local_committed', 'before_observer_close', 'after_observer_close'}
+                or type(value['owner_index']) is not int or value['owner_index'] not in (-1, 0, 1)
+                or value['local'] not in {'not_started', 'committed', 'aborted', 'unknown'}
+                or not isinstance(value['error'], dict) or set(value['error']) != {'kind', 'code'}
+                or value['error']['kind'] not in {'none', 'deadline', 'canceled', 'stale_execution', 'binding', 'transaction_required', 'other', 'mysql', 'mongo'}
+                or type(value['error']['code']) is not int or not 0 <= value['error']['code'] <= 1000000000
+                or not isinstance(value['root_phases'], list) or len(value['root_phases']) != 2
+                or any(type(n) is not int or not 0 <= n <= 5 for n in value['root_phases'])
+                or not isinstance(value['lease_remaining_ms'], list) or len(value['lease_remaining_ms']) != 2
+                or any(type(n) is not int or not -86400000 <= n <= 86400000 for n in value['lease_remaining_ms'])
+                or type(value['elapsed_ms']) is not int or not 0 <= value['elapsed_ms'] <= 600000
+                or len(result) >= 16):
+            raise RuntimeError('owner diagnostic outside fixed safe schema')
+        result.append(value)
+    return result
+
+
 def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_port, mongo_port,
                         password, ca, run, proof, native_runner, repo, read_parameters):
     source = source.resolve()
@@ -117,6 +147,7 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         proof['native_exit_code'] = result.returncode
         proof['diagnostics'] = host_failure_summary(output)
         proof['diagnostics']['assertion_lines'] = sorted(set(map(int, re.findall(r'owner_runtime_native_integration_test\.go:(\d+)', output))))[:32]
+        proof['diagnostics']['owner_runtime'] = runtime_diagnostics(output)
         if result.returncode:
             raise RuntimeError('actual default QS owners failed; private output withheld')
         proof['native_receipt'] = parse_runtime_receipt(output, proof['source_sha'])
