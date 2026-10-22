@@ -7,8 +7,18 @@ on:
         type: string
         required: true
         default: de6289e46c45cbb321b6638b93885bfebe050912
+      kind:
+        description: Exact required host acceptance scope
+        type: choice
+        options: [retry, deferred]
+        default: retry
+      profile:
+        description: Development is one MySQL only; final gate requires full
+        type: choice
+        options: [full, development]
+        default: full
   pull_request:
-    paths: ['scripts/rocketmq/qs_retry_acceptance.py', 'scripts/rocketmq/test_qs_retry_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-retry.yml']
+    paths: ['scripts/rocketmq/qs_retry_acceptance.py', 'scripts/rocketmq/test_qs_retry_acceptance.py', 'scripts/rocketmq/qs_deferred_acceptance.py', 'scripts/rocketmq/test_qs_deferred_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-retry.yml']
 permissions:
   contents: read
 env:
@@ -26,13 +36,13 @@ jobs:
         # QS go.mod requires 1.25.12. The separate SDK workflow retains its
         # own 1.25.9/1.25.12 compatibility matrix.
         go: ['1.25.12']
-        mysql: ['mysql:8.0.36', 'mysql:8.0.44', 'mysql:8.4.11']
+        mysql: ${{ fromJSON(inputs.profile == 'development' && '["mysql:8.0.36"]' || '["mysql:8.0.36","mysql:8.0.44","mysql:8.4.11"]') }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: bfaae2b82ee0d1229b8c965fce472cdf5dec486f
+          ref: ${{ inputs.kind == 'deferred' && '8de893b367cc797580799abd8325f41dd62356db' || 'bfaae2b82ee0d1229b8c965fce472cdf5dec486f' }}
           path: .sdk-acceptance
       - uses: actions/checkout@v6
         with:
@@ -56,11 +66,15 @@ jobs:
           set -euo pipefail
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-qs-retry:5.5.1 components/rocketmq
-      - name: Required real host original MySQL and Mongo authorization roots
+      - name: Required exact host profile and real original stores
         run: |
           set -euo pipefail
+          host_profile=--qs-retry-store-host
+          if [ "${{ inputs.kind }}" = deferred ]; then
+            host_profile=--qs-deferred-consumer-host
+          fi
           python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
-            --qs-retry-store-host "$PWD/.qs-acceptance" --image rocketmq-qs-retry:5.5.1 \
+            "$host_profile" "$PWD/.qs-acceptance" --image rocketmq-qs-retry:5.5.1 \
             --mysql-image "${{ matrix.mysql }}" --report rocketmq-qs-retry.json
       - uses: actions/upload-artifact@v7
         if: always()
