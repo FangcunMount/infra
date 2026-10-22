@@ -143,6 +143,27 @@
         "private_fixture_directory_removed": true
       },
       "actual_large_command_rpc_verified": true
+    },
+    {
+      "run_id": 39797236451,
+      "source_ai": "0c7a53a3a9371918cd7d7d7c6cf8851cd92d4b31",
+      "source_qs": "19387732e7475891dffdaed894500ecacb57668e",
+      "infra": "b766a39d2b4eaea0a08aee5cd49cd68d70fa8e07",
+      "passed_native_flags": 22,
+      "failed": 1,
+      "skipped": 0,
+      "failed_test": "test_actual_qs_ai_evaluation_start_cancel_receipt_state_ack",
+      "cause": "fixture read evaluation_runs.version; version belongs to original evaluation_checkpoints row",
+      "resolution": "read original checkpoint version, keep immutable Run/policy comparison and exact projection/ACK checks",
+      "report_sha256": "8b373e04e76b0c4946eb322002d413cd5728ab8a42d82f5b38b3de707f4636d3",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "native_cases_passed": 4,
+      "evaluation_start_loop_reached": true
     }
   ],
   "prototype": {
@@ -157,7 +178,7 @@
     "core_is_development_only": true,
     "core_status": "passed and independently verified; full profile pending",
     "full_native_tests_collected": 5,
-    "full_status": "first complete-profile run failed in third case after first two passed; diagnostic rerun pending"
+    "full_status": "four native cases passed and evaluation start receipt loop reached; checkpoint fixture assertion corrected, final five-case rerun pending"
   },
   "core_acceptance": {
     "run_id": 39788646533,
@@ -202,5 +223,16 @@
     "url": "https://www.githubstatus.com/incidents/q29p76qtnkyk",
     "reported_at": "2026-10-22T14:18:15Z",
     "scope": "workflow/step result and repository update processing delays; do not infer actual execution from delayed queued status"
-  }
+  },
+  "source_ci_history": [
+    {
+      "repo": "qs-server",
+      "pr": 420,
+      "run_id": 39795642717,
+      "source": "19387732e7475891dffdaed894500ecacb57668e",
+      "failed_check": "Docs Hygiene & Facts",
+      "cause": "source change committed without advancing documentation closure baseline",
+      "resolution": "7ee34a3c6 updates only source baseline/date; 87 docs tests and post-commit facts passed"
+    }
+  ]
 }

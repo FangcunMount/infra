@@ -6,12 +6,12 @@ on:
         description: Exact QS paired host source SHA
         type: string
         required: true
-        default: 19387732e7475891dffdaed894500ecacb57668e
+        default: 7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a
       ai_ref:
         description: Exact AI paired host source SHA
         type: string
         required: true
-        default: 0c7a53a3a9371918cd7d7d7c6cf8851cd92d4b31
+        default: b55c7a61423db807d2746c38245a4a021e4f37c4
       profile:
         description: Core is development only; full is mandatory for T20
         type: choice
@@ -52,12 +52,12 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: ${{ inputs.qs_ref || '19387732e7475891dffdaed894500ecacb57668e' }}
+          ref: ${{ inputs.qs_ref || '7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a' }}
           path: .qs-acceptance
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '0c7a53a3a9371918cd7d7d7c6cf8851cd92d4b31' }}
+          ref: ${{ inputs.ai_ref || 'b55c7a61423db807d2746c38245a4a021e4f37c4' }}
           path: .ai-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -69,8 +69,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Verify exact host candidates and strict receipt gates
         env:
-          EXPECTED_QS_SHA: ${{ inputs.qs_ref || '19387732e7475891dffdaed894500ecacb57668e' }}
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '0c7a53a3a9371918cd7d7d7c6cf8851cd92d4b31' }}
+          EXPECTED_QS_SHA: ${{ inputs.qs_ref || '7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || 'b55c7a61423db807d2746c38245a4a021e4f37c4' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]
