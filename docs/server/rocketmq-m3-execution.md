@@ -25,7 +25,7 @@
 - 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI领取/scanner PR197与显式完成重试PR198、infra PR121/123均已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：**T20完成；M3为20/36**。QS PR420、AI PR215、infra工具PR152均合并，三个实际main文件树与已测候选完全一致。下一项T21待开始；[T20完整证据](evidence/rocketmq-m3-paired-20261022.json)。
+- 当前批次：**T20完成；M3为20/36**。QS PR420、AI PR215、infra工具PR152均合并，三个实际main文件树与已测候选完全一致。T21进行中：最终v2资源候选与QS双owner凭据隔离已实现，正在隔离CI验证ACL/类型/TLS；[T20完整证据](evidence/rocketmq-m3-paired-20261022.json)。
 
 
 ### T20 分批验证（4/4，总进度20/36）
@@ -167,7 +167,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | M3-1 | IAM | T05–T08 | ✅ 已完成 | 原事务、幂等与双订阅 |
 | M3-2 | QS 领域及调度 | T09–T13 | ✅ 已完成 | 双存储及未来授权/到期dispatch/责任交接验证通过，相关源码和infra已合并；生产另行切换 |
 | M3-3 | QS↔AI | T14–T20 | ✅ 已完成 | 档案、回执、安全、模型恢复及最终成对矩阵；相关源码/工具均合并 |
-| M3-4 | 故障与运维 | T21–T25 | ☐ 待开始 | 真实故障及切换工具 |
+| M3-4 | 故障与运维 | T21–T25 | ☐ 进行中 | 真实故障及切换工具 |
 | M3-5 | 稳定发布及候选 | T26–T29 | ☐ 待开始 | 正式制品及最终镜像演练 |
 | M3-6 | 生产切换 | T30–T33 | ☐ 待开始 | 105 前置、实际部署及 system 验收 |
 | M3-7 | 观察与生产闭环 | T34–T36 | ☐ 待开始 | 48h 观察、旧运行责任退出及M4移交；物理清理另计 |
@@ -194,7 +194,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 2026-10-22；内部5/5。最终1643afe源码12检查成功，两MySQL各5562项（含原根恢复20）0失败/跳过；六档Broker各22原生/32证据通过，源/工具/SDK/报告及清理独立核验。AI PR213合并c04a181、infra PR144合并e1eb1c3；原树与候选一致，失败历史保留，生产未变更。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
 | ✅ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 2026-10-22；最终b88f40b源码12检查成功，两档MySQL各5573（含11引用/绑定及20原根恢复）0失败/跳过；六档原根/mTLS各15原生/21证据通过，10服务/15类自有记录清理核验。infra0333993的8检查和289 SDK回归通过，AI PR214合并64ffa15、工具PR146合并3f3bd73，完整tree一致；目标pin/进度PR147单列。历史兼容/清理交M4，生产未变更。[完整证据/失败历史](evidence/rocketmq-m3-ai-payload-20261022.json) |
 | ✅ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 2026-10-22；六档各5原生/25证据，共30/150，零失败/跳过，全部源码/锁/制品/清理核验；QS28检查成功+1 API不适用、AI12检查及两档各5573通过，工具全部实际门禁完成（1check回传滞后已按成功工作流/原生报告核验）。PR420/215/152合并且完整树一致；生产未变更。[证据、失败及回传差异](evidence/rocketmq-m3-paired-20261022.json) |
-| ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
+| ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 进行中；最终候选及独立凭据已实现，真实隔离CI待完成 |
 | ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 待开始 |
 | ☐ | T23 | 宿主端到端及真实网络/进程/DB/Broker故障 | 待开始 |
 | ☐ | T24 | 指标、告警、准入保护、DLQ/超限审计与规程 | 待开始 |
@@ -1034,3 +1034,10 @@ GitHub结果处理延迟使工具original-event-root(1.25.12/mysql8.0.36)的chec
 功能合并：QS PR420→276eb24、AI PR215→e9bbba4、infra PR152→78e3e90。三个actual main tree与已测试虚拟merge及候选完整tree逐项一致。合并前回读QS生产暂停true、AI自动部署false；稳定SDK发布、生产DDL/Topic/ACL/provider/NSQ、system业务验收和48h观察均未执行。
 
 D勾选、内部4/4、父T20完成，M3更新20/36，M3-3里程碑完成，M4保持0/8。后续T21单独处理生产v2 manifest、最小owner ACL/私网TLS与冲突拒绝，先在隔离环境验证；代码/CI合并不能代替T30之后的具名生产批准与业务验收。
+
+
+### 2026-10-23：T21 最终资源候选与 owner 凭据隔离
+
+T20进度PR153已合并aa257c2，M3保持20/36。T21在独立工作区开始：新增m3-1 v2生产资源候选（12绑定/10 Topic/9 Group/4事务owner/5角色），原v1资源文件不改。模型目录NORMAL跟随实际survey目录；evaluation两存储输入共享逻辑Group。QS新增每owner凭据覆盖，双owner同文件或同Broker username拒绝；两包race及87文档门禁通过，源码f04c328/文档f79909、PR待CI，不计完整宿主或生产。
+
+infra 117工具测试/actionlint通过，开发候选c9e6e05的真实隔离CI39811388627进行中。新增126项ACL/类型/TLS操作矩阵及四类完整资源冲突拒绝；只有实际报告和清理核验后才计通过。原始失败保留，不以纯测试代替Broker。当前生产、稳定发布、system和观察状态均不变。完整资源契约见[候选说明](rocketmq-m3-resources.md)；T22再补齐全进程NORMAL/事务装配、共享owner生命周期和预算，T21不冒充该验收。

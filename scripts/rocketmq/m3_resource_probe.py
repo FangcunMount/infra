@@ -2,6 +2,8 @@
 import argparse
 import importlib.metadata
 import json
+import logging
+import os
 from pathlib import Path
 import secrets
 
@@ -143,6 +145,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, required=True)
     args = parser.parse_args()
+    os.umask(0o077)
+    # The pinned raw client has no log-root option. Replace its process-local
+    # handler before reading credentials or starting any client operation.
+    logger = logging.getLogger('rocketmq-python-client')
+    for handler in list(logger.handlers):
+        logger.removeHandler(handler)
+        handler.close()
+    logger.addHandler(logging.FileHandler(args.config.parent/'m3-raw-client.log'))
     cases, failed = {}, 0
     try:
         run(json.loads(args.config.read_text()), cases)

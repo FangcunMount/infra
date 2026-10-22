@@ -76,6 +76,10 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
     reader.docker('mkdir','-m','700',snapshot)
     try:
         before, users = reader.metadata(snapshot), reader.users()
+        acls = {role:reader.acl(account['username']) for role,account in accounts.items()}
+        def unchanged(metadata):
+            return (reader.metadata(snapshot) == metadata and reader.users() == users
+                and all(reader.acl(accounts[role]['username']) == grants for role,grants in acls.items()))
         # Submit a missing candidate together with a conflicting existing queue
         # or credential; the entire preflight must reject before any mutation.
         for kind in ('queues','credentials','acl'):
@@ -95,11 +99,15 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
                 candidate['accounts'][role]['subscriptions'] = []
             try:
                 provision(broker,candidate,credentials)
-            except RuntimeError:
-                pass
+            except RuntimeError as error:
+                reason = {'queues':'existing topic type or configuration conflicts',
+                    'credentials':'existing principal differs; credential rotation refused',
+                    'acl':'existing principal ACL exceeds or conflicts with reviewed grants'}[kind]
+                if str(error) != 'v2 provision: '+reason:
+                    raise RuntimeError('conflict proof failed for an unexpected preflight reason') from None
             else:
                 raise RuntimeError('conflicting candidate unexpectedly provisioned')
-            if reader.metadata(snapshot) != before or reader.users() != users:
+            if not unchanged(before):
                 raise RuntimeError('conflicting preflight mutated Broker resources')
         proof['conflicts_refused_without_mutation'] = ['queues','credentials','acl']
         # A separate sentinel has deliberately conflicting type metadata. Never
@@ -115,11 +123,12 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
         candidate['accounts'][role]['publish'].extend([sentinel['id'],missing['id']])
         try:
             provision(broker,candidate,accounts)
-        except RuntimeError:
-            pass
+        except RuntimeError as error:
+            if str(error) != 'v2 provision: existing topic type or configuration conflicts':
+                raise RuntimeError('type proof failed for an unexpected preflight reason') from None
         else:
             raise RuntimeError('conflicting type unexpectedly provisioned')
-        if reader.metadata(snapshot) != before or reader.users() != users:
+        if not unchanged(before):
             raise RuntimeError('type preflight mutated Broker resources')
         proof['conflicts_refused_without_mutation'].append('type')
         proof['typed_topics'] = {k:v['message_type'] for k,v in desired_topics(document).items()}
