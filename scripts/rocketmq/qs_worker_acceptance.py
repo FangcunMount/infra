@@ -32,6 +32,8 @@ def parse_worker_receipt(output, expected_source):
             or receipt.get('skipped') != 0 or set(receipt.get('cases', {})) != CASES
             or any(value is not True for value in receipt['cases'].values())
             or receipt.get('scope') != SCOPE
+            or type(receipt.get('paused_observation_ms')) is not int or not 0 <= receipt['paused_observation_ms'] <= 65000
+            or receipt.get('fixture_shared_limit') != 1 or receipt.get('fixture_observation_budget_ms') != 60000
             or any(receipt.get(key) is not True for key in (
                 'complete_apiserver_not_claimed', 'provider_not_called', 'system_login_not_claimed',
                 'owned_database_dropped', 'owned_runtime_drained'))
@@ -130,13 +132,27 @@ def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port
     if result.returncode:
         seed = next(r for r in document['routes'] if r['id'] == 'qs-evaluation-mysql')
         try:
-            topic_output = Admin(broker)('topicStatus', '-t', seed['physical_topic'])
+            admin = Admin(broker)
+            topic_output = admin.docker('java', '-Xms32m', '-Xmx128m', '-cp',
+                '/opt/rocketmq/conf:/opt/rocketmq/lib/*', 'org.apache.rocketmq.tools.command.MQAdminStartup',
+                'topicStatus', '-n', 'nameserver:9876', '-t', seed['physical_topic']).stdout
+            if 'Exception' in topic_output or 'command failed' in topic_output:
+                raise RuntimeError('owned topic offset query unavailable')
             queues = []
             for line in topic_output.splitlines():
                 fields = line.split()
                 if len(fields)>=4 and all(re.fullmatch(r'[0-9]{1,12}',v) for v in fields[1:4]):
                     queues.append({'queue':int(fields[1]),'min_offset':int(fields[2]),'max_offset':int(fields[3])})
             proof['diagnostics']['seed_topic_offsets'] = queues[:8]
+            progress_output = admin.docker('java', '-Xms32m', '-Xmx128m', '-cp',
+                '/opt/rocketmq/conf:/opt/rocketmq/lib/*', 'org.apache.rocketmq.tools.command.MQAdminStartup',
+                'consumerProgress', '-n', 'nameserver:9876', '-g', seed['consumer_group'], '-t', seed['physical_topic']).stdout
+            progress = []
+            for line in progress_output.splitlines():
+                fields = line.split()
+                if len(fields)>=7 and fields[0] == seed['physical_topic'] and all(re.fullmatch(r'-?[0-9]{1,12}',v) for v in fields[2:7]):
+                    progress.append(dict(zip(('queue','broker_offset','consumer_offset','diff','inflight'),map(int,fields[2:7]))))
+            proof['diagnostics']['seed_consumer_progress'] = progress[:8]
         except RuntimeError:
             proof['diagnostics']['seed_topic_offsets_unavailable'] = True
         raise RuntimeError('actual worker runtime native acceptance failed; private output withheld')

@@ -8,7 +8,7 @@ class WorkerRuntimeReceiptTest(unittest.TestCase):
         receipt = dict(source_sha='a'*40, passed=len(CASES), failed=0, skipped=0,
                        cases={case: True for case in CASES}, scope=SCOPE,
                        complete_apiserver_not_claimed=True, provider_not_called=True,
-                       system_login_not_claimed=True, owned_database_dropped=True, owned_runtime_drained=True)
+                       system_login_not_claimed=True, owned_database_dropped=True, owned_runtime_drained=True, paused_observation_ms=25, fixture_shared_limit=1, fixture_observation_budget_ms=60000)
         return 'M3_QS_WORKER_RUNTIME_RECEIPT '+json.dumps(receipt)+'\n--- PASS: TestM3WorkerRocketMQRuntime (1.00s)'
 
     def test_exact_worker_source_scope_cases_cleanup(self):
@@ -16,7 +16,7 @@ class WorkerRuntimeReceiptTest(unittest.TestCase):
 
     def test_refuses_wrong_source_scope_partial_cleanup_skip_race(self):
         output=self.output()
-        for bad in ('',output+'\n'+output,output.replace('a'*40,'b'*40),
+        for bad in ('',output+'\n'+output,output.replace('a'*40,'b'*40),output.replace('60000','20000'),output.replace('"paused_observation_ms": 25','"paused_observation_ms": -1'),
                     output.replace('"failed": 0','"failed": 1'), output.replace('"skipped": 0','"skipped": 1'),
                     output.replace('true','false',1),output.replace(SCOPE,'production system acceptance'),
                     output.replace('"owned_runtime_drained": true','"owned_runtime_drained": false'),
