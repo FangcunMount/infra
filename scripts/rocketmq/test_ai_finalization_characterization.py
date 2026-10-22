@@ -1,7 +1,7 @@
 import unittest
 import xml.etree.ElementTree as ET
 
-from ai_finalization_characterization import TESTS, diagnostics, parse_native
+from ai_finalization_characterization import RECOVERY_TESTS, TESTS, diagnostics, parse_native
 
 
 def suite(names=TESTS):
@@ -36,6 +36,46 @@ class CharacterizationReceiptTest(unittest.TestCase):
         ET.SubElement(root[0], 'error').text = 'ValueError: private credential/body'
         rows = diagnostics(ET.tostring(root))
         self.assertEqual(rows[0]['error_classes'], ['ValueError'])
+        self.assertNotIn('private', str(rows))
+
+
+class RecoveryReceiptTest(unittest.TestCase):
+    def suite(self):
+        root = ET.Element('testsuite')
+        for name, classname in RECOVERY_TESTS.items():
+            ET.SubElement(root, 'testcase', name=name, classname=classname)
+        return root
+
+    def test_exact_recovery_set_cannot_be_confused_with_old_characterization(self):
+        raw = ET.tostring(self.suite())
+        receipt = parse_native(raw, recovery=True)
+        self.assertEqual(receipt['passed'], 20)
+        self.assertTrue(receipt['current_protocol_recovery_verified'])
+        self.assertFalse(receipt['known_recovery_gap_reproduced'])
+        with self.assertRaises(ValueError):
+            parse_native(raw)
+        with self.assertRaises(ValueError):
+            parse_native(ET.tostring(suite()), recovery=True)
+
+    def test_missing_wrong_class_and_failure_are_rejected(self):
+        for damage in ('missing', 'class', 'failure', 'error', 'skipped', 'duplicate'):
+            root = self.suite()
+            if damage == 'missing':
+                root.remove(root[0])
+            elif damage == 'class':
+                root[0].set('classname', 'another.test')
+            elif damage == 'duplicate':
+                root[1].set('name', root[0].get('name'))
+            else:
+                ET.SubElement(root[0], damage).text = 'private body'
+            with self.subTest(damage=damage), self.assertRaises(ValueError):
+                parse_native(ET.tostring(root), recovery=True)
+
+    def test_recovery_diagnostics_keep_only_known_test_ids_and_classes(self):
+        root = self.suite()
+        ET.SubElement(root[0], 'error').text = 'ValueError: private response/credential'
+        rows = diagnostics(ET.tostring(root), recovery=True)
+        self.assertEqual(rows[0]['test'], root[0].get('name'))
         self.assertNotIn('private', str(rows))
 
 

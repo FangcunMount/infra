@@ -61,7 +61,7 @@
 | 完成 | 批次 | 实现与完成门禁 | 当前状态 |
 | --- | --- | --- | --- |
 | ✅ | T18-A | 实际MySQL验证MQ失败、Aborted与租约接管，冻结当前协议身份和完整验收manifest | CI39738320198真实MySQL两项表征通过，0失败/跳过，9类表清理为零；同租约终态未恢复、换租约幂等冲突均已复现且模型未重调。[恢复规则/manifest](rocketmq-m3-t18-finalization.md)按本次范围修订为单一最终宿主协议，不做v1/v2在线兼容；表征证据不变，infra PR144待合并 |
-| ☐ | T18-B | 补齐宿主终态恢复接线，保留权限/取消/CAS/业务重试授权及原配额 | 进行中：先同租约精确Aborted恢复 |
+| ☐ | T18-B | 补齐宿主终态恢复接线，保留权限/取消/CAS/业务重试授权及原配额 | 进行中：单一最终协议的租约接管/首次plan复用已提交候选432fe19；87定向、447源类型通过，20原生用例待真实MySQL验证 |
 | ☐ | T18-C | 回环HTTP假provider、进程外持久计数、独立worker、真实MySQL/RocketMQ与代理 | 待开始 |
 | ☐ | T18-D | 五路径×正常/响应后MQ故障/终态确认丢失/响应后SIGKILL的20核心情景及交叉约束 | 待开始 |
 | ☐ | T18-E | 固定候选，完整CI及六档Broker验收、报告核验、合并后关闭T18 | 待开始 |
@@ -179,7 +179,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T15 | QS AI事件 Inbox/投影/首次ACK/witness原子提交 | 2026-10-21；最终762c2db0d完整race7327通过/60既有可选跳过、完整固定lint零问题；事件三档各17项、同候选命令三档各15项均0失败/跳过/无race，清理完整。QS PR419当前头CI28成功/1项API同步不适用，合并be22b927；infra PR72当前头28项全部成功，合并db183399f。[全部证据/失败历史](evidence/rocketmq-m3-qs-ai-event-20261021.json)。生产未变更 |
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
 | ✅ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 2026-10-22；内部3/3。最终6be5f80源码12检查成功，两档MySQL各5529通过（含12串行原根/5 ACK原生），0失败/跳过；infra2950e9a全部19项成功，六档Broker各55宿主/148证据及独立focus4/12通过，完整清理。AI PR212合并be91fde，infra PR142合并f84b3a9，merge tree均一致。失败/取消历史保留，旧SDK一次超时根因未确认、本轮原SDK两档均31通过；生产未变更。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
-| ☐ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 进行中；内部1/5。不新增宿主中间协议兼容。B同租约恢复本地35项通过，新增原根用例仅收集，尚未计实依赖通过；跨租约仍待实现。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
+| ☐ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 进行中；内部1/5。不新增宿主中间协议兼容。B最终协议同/跨租约恢复候选432fe19已提交；87定向及447源类型通过，20原生用例仅收集，实依赖待验证。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
 | ☐ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 待开始；历史reader/新旧格式互通不作为上线门禁，兼容代码删除移交M4-C03 |
 | ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 待开始；仅最终版本组合，不新增新旧版本互通矩阵 |
 | ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
@@ -857,3 +857,10 @@ AI6be5f80 / infra2950e9a 的[Broker39733212490](https://github.com/FangcunMount/
 用户确认不需要历史兼容并同意新增M4。当前任务表保留原36项ID及17项完成证据，M3仍17/36；M4独立0/8。本次仅调整范围，不把转移工作记作已通过。T19/T20只要求最终协议的Payload/receipt及QS＋AI成对验收；T25取消新旧在线共存/NSQ provider回退开发；T35保留旧运行责任退出和NSQ停用，物理清理交M4；T36仅完成生产索引与具名移交。
 
 T18-A旧源码实际MySQL报告仍为2通过/0失败/0跳过、9类表清理为零；其精确源码和报告不改绑新候选。恢复规则改为修正单一未投产宿主协议，不构建v1/v2在线兼容。T18-B同租约恢复本地35项通过，新增真实原根测试仅收集1项，未执行实依赖、不勾选B。SDK已发布制品、源码合并状态和生产均未改变。M3仍要求必要真实故障、稳定制品、system验收与上线后48小时观察。
+
+
+### 2026-10-22：T18-B最终协议恢复候选
+
+AI功能4e6dd17、文档绑定候选432fe19121c9a6ebd3e80c1f21f51db6eb36d3c5：专用response_received租约接管只推进fence/有效期，保留业务version/attempt及原participant slot。finish稳定输入与来源摘要排除操作性fence，原根仍验证当前真实Claim；精确Aborted后显式retry复用首次plan/wire。普通claim在锁定原根中以当前读拒绝已保存响应，覆盖旧RR快照竞态，不建设v1/v2兼容。
+
+87定向、447源文件类型、75文档/1389链接及格式门禁通过；开发快照4205单元通过（1348 integration/interop明确未选，尚不替代最终SHA完整CI）。20个实际MySQL用例与infra严格收据manifest精确一致，仅完成收集，固定候选实依赖待运行；B不勾选，内部仍1/5，全局17/36，M4保持0/8。生产和固定SDK制品未改变。开发仅触发自身原生门禁；四个共享workflow排除这两个独立profile工具路径，其余共享脚本/组件/自身workflow变更仍触发完整矩阵，最终门禁不删除。

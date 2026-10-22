@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Required T18-A MySQL characterization; no Broker/provider/production claim."""
+"""Required T18 original worker characterization/recovery; no network/production claim."""
 import argparse
 import asyncio
 import hashlib
@@ -21,24 +21,52 @@ TESTS = {
 }
 
 
-def parse_native(raw):
+RECOVERY_FILE = 'tests/integration/test_finalization_recovery.py'
+RECOVERY_TESTS = {
+    name: 'tests.integration.test_finalization_recovery' for name in (
+        'test_host_same_lease_finalizes_exact_aborted_plan_without_model_replay',
+        'test_concurrent_finalization_takeover_has_one_winner_and_fences_old_writer',
+        'test_repeated_mq_refusals_never_exhaust_business_attempts_or_repeat_model',
+        'test_prepared_terminal_cannot_be_bypassed_after_lease_handover',
+        'test_normal_claim_refuses_a_response_that_committed_after_its_probe[False]',
+        'test_normal_claim_refuses_a_response_that_committed_after_its_probe[True]',
+        *('test_conflicting_recovery_evidence_does_not_grant_ordinary_business_work[' + d + ']'
+          for d in ('empty_response', 'wrong_fence', 'active_lease', 'cancelled', 'missing_slot',
+                    'future_receipt_fence', 'zero_receipt_fence')),
+        'test_recovery_keeps_existing_capacity_without_model_admission',
+        'test_revoked_authorization_cannot_publish_the_first_artifact_or_repeat_model',
+        'test_locked_finalization_root_cannot_be_taken_over',
+        'test_lost_lease_commit_reply_returns_no_claim_and_preserves_fencing',
+        'test_locked_claim_recheck_sees_response_beyond_its_earlier_snapshot',
+    )
+}
+RECOVERY_TESTS.update({name: 'tests.integration.test_finalization_characterization' for name in (
+    'test_original_worker_live_claim_ordinary_finish_leaves_aborted_terminal_unresolved',
+    'test_original_worker_new_lease_finishes_with_original_response',
+)})
+
+
+def parse_native(raw, *, recovery=False):
+    expected = RECOVERY_TESTS if recovery else {
+        name: 'tests.integration.test_finalization_characterization' for name in TESTS}
     cases = list(ET.fromstring(raw).iter('testcase'))
-    if len(cases) != len(TESTS) or {c.get('name') for c in cases} != TESTS:
-        raise ValueError('required characterization test set differs')
-    if any(c.get('classname') != 'tests.integration.test_finalization_characterization'
+    if len(cases) != len(expected) or {c.get('name') for c in cases} != set(expected):
+        raise ValueError('required finalization test set differs')
+    if any(c.get('classname') != expected[c.get('name')]
            or any(c.find(tag) is not None for tag in ('error', 'failure', 'skipped'))
            for c in cases):
-        raise ValueError('required characterization failed or skipped')
+        raise ValueError('required finalization failed or skipped')
     return {'passed': len(cases), 'failed': 0, 'skipped': 0,
-            'tests': sorted(TESTS), 'known_recovery_gap_reproduced': True}
+            'tests': sorted(expected), 'known_recovery_gap_reproduced': not recovery,
+            'current_protocol_recovery_verified': recovery}
 
 
-def diagnostics(raw):
+def diagnostics(raw, *, recovery=False):
     # Never export traceback values, body/wire, DSNs or credentials.
     root = ET.fromstring(raw)
     rows = []
     for c in root.iter('testcase'):
-        name = c.get('name') if c.get('name') in TESTS else 'unlisted'
+        name = c.get('name') if c.get('name') in (RECOVERY_TESTS if recovery else TESTS) else 'unlisted'
         nodes = [n for tag in ('error', 'failure', 'skipped') for n in c.findall(tag)]
         if nodes:
             text = '\n'.join((n.text or '') for n in nodes)
@@ -74,6 +102,7 @@ async def remaining_rows(url):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--source', type=Path, required=True)
+    parser.add_argument('--recovery', action='store_true')
     parser.add_argument('--expected-source', required=True)
     parser.add_argument('--report', type=Path, required=True)
     args = parser.parse_args()
@@ -83,6 +112,9 @@ def main():
               'scope': 'known missing recovery characterization, not repaired finalization',
               'broker_fault_claimed': False, 'external_http_counter_claimed': False,
               'process_restart_claimed': False, 'production_changed': False}
+    if args.recovery:
+        report.update(batch='T18-B-original-worker-MySQL-recovery',
+                      scope='current protocol host recovery; controlled transport and in-process model')
     private = tempfile.TemporaryDirectory(prefix='ai-t18-characterization-')
     directory = Path(private.name)
     directory.chmod(0o700)
@@ -110,6 +142,9 @@ def main():
             raise ValueError('actual MySQL image digest required')
         if (report['sdk'], report['client']) != ('0.4.0a2', '5.1.2'):
             raise ValueError('fixed SDK/client required')
+        if args.recovery:
+            report['recovery_test_source_sha256'] = hashlib.sha256(
+                (source / RECOVERY_FILE).read_bytes()).hexdigest()
         env = dict(os.environ, PYTHONPATH=str(source / 'src'))
         from sqlalchemy.engine import make_url
         url = env['QS_AI_DATABASE_URL']
@@ -139,7 +174,7 @@ def main():
         with log.open('wb') as stream:
             log.chmod(0o600)
             result = subprocess.run([sys.executable, '-m', 'pytest', '-q', TEST_FILE,
-                '--junitxml=' + str(junit)], cwd=source, env=env,
+                *([RECOVERY_FILE] if args.recovery else []), '--junitxml=' + str(junit)], cwd=source, env=env,
                 stdout=stream, stderr=subprocess.STDOUT, timeout=180)
         report['native_exit_code'] = result.returncode
         report['native_output_sha256'] = hashlib.sha256(log.read_bytes()).hexdigest()
@@ -147,10 +182,10 @@ def main():
             junit.chmod(0o600)
             raw = junit.read_text()
             report['native_junit_sha256'] = hashlib.sha256(junit.read_bytes()).hexdigest()
-            report['diagnostics'] = diagnostics(raw)
+            report['diagnostics'] = diagnostics(raw, recovery=args.recovery)
         if result.returncode or not junit.exists():
             raise RuntimeError('required native characterization failed')
-        report['native'] = parse_native(raw)
+        report['native'] = parse_native(raw, recovery=args.recovery)
         phase = 'test_row_cleanup'
         rows, mysql = asyncio.run(remaining_rows(url))
         report['remaining_rows'] = rows
@@ -163,7 +198,7 @@ def main():
             ['git', 'status', '--porcelain'], cwd=source, text=True).strip()
         if not report['source_clean_after']:
             raise RuntimeError('source changed during characterization')
-        report.update(passed=len(TESTS), failed=0)
+        report.update(passed=report['native']['passed'], failed=0)
         exit_code = 0
     except Exception as error:
         report.update(failure_phase=phase, error_class=type(error).__name__)

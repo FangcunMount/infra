@@ -1,12 +1,12 @@
-name: RocketMQ AI finalization characterization
+name: RocketMQ AI finalization recovery
 on:
   workflow_dispatch:
     inputs:
       ai_ref:
-        description: Exact AI characterization source SHA
+        description: Exact AI recovery candidate source SHA
         type: string
         required: true
-        default: 0b7f838578c6191ac02748254a718a33113618f2
+        default: 432fe19121c9a6ebd3e80c1f21f51db6eb36d3c5
   pull_request:
     paths: ['scripts/rocketmq/ai_finalization_characterization.py', 'scripts/rocketmq/test_ai_finalization_characterization.py', '.github/workflows/rocketmq-ai-finalization.yml']
 permissions:
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '0b7f838578c6191ac02748254a718a33113618f2' }}
+          ref: ${{ inputs.ai_ref || '432fe19121c9a6ebd3e80c1f21f51db6eb36d3c5' }}
           path: .ai-acceptance
       - uses: astral-sh/setup-uv@v6
         with:
@@ -51,21 +51,21 @@ jobs:
       - name: Install exact locked host dependencies
         working-directory: .ai-acceptance
         run: uv sync --locked
-      - name: Required original worker MySQL characterization
+      - name: Required original worker MySQL recovery
         env:
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '0b7f838578c6191ac02748254a718a33113618f2' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '432fe19121c9a6ebd3e80c1f21f51db6eb36d3c5' }}
           MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
         run: |
           set -euo pipefail
           export QS_AI_T18_MYSQL_IMAGE_ID="$(docker inspect --format '{{.Image}}' "$MYSQL_CONTAINER_ID")"
           cd .ai-acceptance
-          uv run python ../scripts/rocketmq/ai_finalization_characterization.py \
+          uv run python ../scripts/rocketmq/ai_finalization_characterization.py --recovery \
             --source "$PWD" --expected-source "$EXPECTED_AI_SHA" \
-            --report "$GITHUB_WORKSPACE/rocketmq-ai-finalization-characterization.json"
+            --report "$GITHUB_WORKSPACE/rocketmq-ai-finalization-recovery.json"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: rocketmq-ai-finalization-characterization-${{ github.sha }}
-          path: rocketmq-ai-finalization-characterization.json
+          name: rocketmq-ai-finalization-recovery-${{ github.sha }}
+          path: rocketmq-ai-finalization-recovery.json
           if-no-files-found: error
           retention-days: 14
