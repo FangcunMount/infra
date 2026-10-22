@@ -9,7 +9,7 @@
 - 源码合并：IAM PR134/135、QS PR409、SDK PR46–50及infra既有批次已合并；AI领取/scanner PR197与显式完成重试PR198、infra PR121/123均已闭环。固定Go tx.3/Python0.4.0a2同源预发布已发布并下载安装重验；稳定SDK配对发布未执行。生产部署/DDL/Topic/ACL/provider切换未执行；system验收与48小时观察未开始。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：T17进行中，16/36；三个内部子门禁已完成2项。candidate与恢复/取消drain均已验证并合并。最新恢复候选b3b6072两档MySQL各5432项（含39新增原生）、六档Broker各51宿主/137证据全部通过，0失败/跳过；AI PR211、infra PR140已合并。默认装配本地推进，未启用。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
+- 当前批次：T17进行中，16/36；三个内部子门禁已完成2项。candidate与恢复/取消drain均已验证并合并。最新恢复候选b3b6072两档MySQL各5432项（含39新增原生）、六档Broker各51宿主/137证据全部通过，0失败/跳过；AI PR211、infra PR140已合并。默认装配完整候选已提交；前候选3ec六档Broker各55宿主/148证据通过、完整清理，新6be的ACK清理修复与源码重验待验。尚未合并或生产启用。[证据](evidence/rocketmq-m3-ai-state-20261021.json)。
 
 
 ### T13 分批验证（任务已闭环，13/36）
@@ -781,3 +781,17 @@ M3保持16/36，T17恢复/drain与默认装配仍未勾选，源码及工具尚�
 新候选 `3ecf8c4ea653cf11f8480fb19144b0eb0960edb3`（测试db2b4c3），本地4198通过/0失败跳过、1331真实依赖明确排除，446类型、1171格式与文档75/1388通过。[源码39731027992](https://github.com/FangcunMount/qs-ai/actions/runs/39731027992)运行。infra工具93通过，并在独立临时schema先执行4个默认装配用例/12精确标志；通过后才执行原完整55/148。两阶段schema、JUnit、摘要、证据及清理分别记账，先行通过不能替代完整门禁。
 
 M3保持16/36，T17不勾选；源码和infra尚未合并、生产未操作。正式SDK、system和48小时观察仍未完成。
+
+### 2026-10-22 ACK 原生夹具清理顺序修复（T17 仍未完成）
+
+3ecf8c4 源码 CI39731027992 已失败，八分片报告保留于 `/tmp/m3-default-source-3ec-complete`。ACK 用例原参与者 kit 先于 published_configuration 创建，导致配置父记录早于引用它的 execution_configurations 清理，触发真实 MySQL 外键错误，并使后续 publication 夹具失败。原 ACK 测试体不放宽；专用 kit 显式依赖 published_configuration，使参与者及其配置引用先于父记录清理。五个用例的 setup-plan 顺序、目标 Ruff/format、diff 及文档门禁通过；这些不是实际 MySQL 通过证据。
+
+修复候选 `6be5f80905c5c499017e96391282a994c033958e`（测试提交 beee9b8）已推至同一 AI PR212，[新源码 CI39732527996](https://github.com/FangcunMount/qs-ai/actions/runs/39732527996) 排队。应用、迁移、SDK 与依赖锁未改变；旧 4198 本地单元通过只绑定原 3ec 候选。infra 六档 Broker39731449670 仍绑定 3ec，在运行，不重标为新候选证明。M3保持16/36、T17内部2/3，源码及infra未合并、生产未改；AUTO_DEPLOY_ENABLED=false。
+
+### 2026-10-22 默认装配六档 Broker 通过，最终测试修复候选固定
+
+AI3ecf8c4 / infra526357e 的 [Broker39731449670](https://github.com/FangcunMount/infra/actions/runs/39731449670) 六档全部通过：Python3.11/3.13 × MySQL8.0.36/8.0.44/8.4.11，每档独立focus4宿主/12标志及完整55宿主/148标志、0失败/跳过。已核对完整flag集合、两阶段报告摘要、固定wheel、实际版本、source/harness逐文件摘要、schema隔离和完整清理。报告摘要 `/tmp/m3-default-broker-3ec-first-completed-summary.json` 保留原SHA，不重标6be。
+
+独立旧SDK bfaae2b 兼容检查39731449802 的3.13档29通过/1失败（shared Go消费等待，9条期望只观察到8条；正常3、Mongo3、MySQL2），清理完整，根因尚未确认；3.11档31通过。失败报告及 `/tmp/m3-default-public-sdk-526-failure-summary.json` 保留，不放宽断言、不改SDK。
+
+最终验收固定到 `6be5f80905c5c499017e96391282a994c033958e`，应用/Broker profile与3ec逐字节相同，差异仅ACK清理夹具及文档摘要。workflow三处引用一致更新，随后以新infra head执行完整必需检查；旧候选未完成作业若被并发控制替换，按superseded记录，不计通过。源码CI39732527996仍在执行。M3保持16/36、T17内部2/3；本轮未合并、发布或更改生产。
