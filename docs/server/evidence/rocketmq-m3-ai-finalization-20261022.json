@@ -93,6 +93,13 @@
         "private_fixture_directory_removed": true
       },
       "repair": "ae5b36f JWK private signing/public recipient export; fixed source2b65140, 5 local contract tests passed; native rerun pending"
+    },
+    {
+      "scope": "T18-D local collection before real dependencies",
+      "status": "corrected_before_native_dispatch",
+      "cause": "Test imported evaluation_sequences from the schema instead of the actual state_events module; exact local import/collection failed, fixed without product change.",
+      "corrected_probe_contracts_passed": 6,
+      "corrected_native_collected": 22
     }
   ],
   "characterization_candidate": "0b7f838578c6191ac02748254a718a33113618f2",
@@ -514,5 +521,23 @@
       },
       "go_probe_sha256": null
     }
+  },
+  "matrix_candidate": {
+    "source_sha": "9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38",
+    "status": "native_collected_only_pending_real_dependencies",
+    "paths": 5,
+    "core_scenarios": 4,
+    "core_groups": 20,
+    "native_tests": 22,
+    "strict_evidence_cases": 32,
+    "local_probe_contracts_passed": 6,
+    "infra_tool_tests_passed": 104,
+    "exact_native_manifest_verified": true,
+    "uses_original_evaluation_factory": true,
+    "uses_original_mysql_asset_stores": true,
+    "model_retry_authority_added": false,
+    "process_internal_nth_database_commit_fault_used": false,
+    "real_network_faults_passed": false,
+    "all_matrix_groups_passed": false
   }
 }

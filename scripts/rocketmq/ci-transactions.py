@@ -946,11 +946,11 @@ def main():
                                     'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
                 report['ai_state_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_state_acceptance.py').read_bytes()).hexdigest()
         if args.ai_admission_host and os.environ.get('QS_AI_ACCEPTANCE_KIND') == 'finalization':
-            report['batch'] = 'M3-AI-independent-worker-HTTP-counter-SIGKILL-recovery'
+            report['batch'] = 'M3-AI-five-path-finalization-RPC-fault-and-SIGKILL-recovery'
             report['limits'] = ['No production/system or paired QS business acceptance',
                                 'Synthetic HTTP provider; process-external append-only invocation counter',
-                                'Actual worker SIGKILL after durable response; real SDK/MySQL/Broker and owned RPC proxy',
-                                'No packet/database-commit network fault or five-path matrix claim']
+                                'Five paths x normal/terminal send unavailable/commit reply lost/response-committed SIGKILL',
+                                'Actual SDK RPC TCP interruption and external HTTP invocation ledger; no database commit network-fault claim']
             report['ai_finalization_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_finalization_acceptance.py').read_bytes()).hexdigest()
         if args.qs_event_host:
             report['batch'] = 'M3-QS-AI-event-original-SQL-and-ACK-Broker'

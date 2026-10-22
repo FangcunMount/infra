@@ -887,3 +887,9 @@ AI功能2384217、文档绑定753317f168c1da38b198458f1ad1e4886eebb86a：独立H
 ### 2026-10-22：T18-C实际独立进程与Broker闭环，进入D
 
 CI39754954807绑定AI2b651402b8f97d4c18f99190772332f864fef09c及infra ea723a9：两项原生/12项证据全部通过，0失败/跳过。实际HTTP provider进程追加计数，原worker在原MySQL响应提交后被SIGKILL，新进程复用同一响应完成原事务与Broker投递，每原invocation仍仅一次HTTP；首次wire、精确witness、无新Outbox及所属资源清理核对。报告/工具/固定wheel摘要已独立验证。C勾选，内部3/5；M3仍17/36、M4为0/8，未合并或生产切换。D开始覆盖五路径故障矩阵，C的转发代理不冒充实际丢包证明。
+
+### 2026-10-22：T18-D五路径核心矩阵候选
+
+固定AI9b3a888（功能a11645c）：解释报告/串行generation与semantic/candidate generation与semantic五路径×四情景，共20核心组；加原C两项共22原生、32严格证据。原响应提交后用跨进程屏障放行，真实SDK代理在终态SendMessage转发前、EndTransaction后端成功回复后断开TCP；独立worker真实SIGKILL并由新实例经原工厂恢复。按原invocation核对外部HTTP=1、响应不变、首次plan/wire、精确witness及原业务终态；semantic前置generation属受控fixture，不冒充完整成对链路。
+
+6项本地HTTP/provider/JWK契约、104项infra工具通过；22项原生仅收集，集合与严格manifest精确一致。首次本地import错误已在真实依赖前修正并保留历史。D仍进行中、内部3/5、M3为17/36、M4为0/8；真实数据库提交边界/跨实例实际Broker回查及交叉约束仍待后续验证，不把20核心组代替完整D/E。

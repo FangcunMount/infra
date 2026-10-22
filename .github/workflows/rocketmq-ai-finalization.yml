@@ -1,4 +1,4 @@
-name: RocketMQ AI finalization recovery and independent workers
+name: RocketMQ AI five-path finalization and independent workers
 on:
   workflow_dispatch:
     inputs:
@@ -6,7 +6,7 @@ on:
         description: Exact AI recovery candidate source SHA
         type: string
         required: true
-        default: 753317f168c1da38b198458f1ad1e4886eebb86a
+        default: 9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38
       profile:
         description: Development gate; all is required for the frozen candidate
         type: choice
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '753317f168c1da38b198458f1ad1e4886eebb86a' }}
+          ref: ${{ inputs.ai_ref || '9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38' }}
           path: .ai-acceptance
       - uses: astral-sh/setup-uv@v6
         with:
@@ -59,7 +59,7 @@ jobs:
         run: uv sync --locked
       - name: Required original worker MySQL recovery
         env:
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '753317f168c1da38b198458f1ad1e4886eebb86a' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38' }}
           MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
         run: |
           set -euo pipefail
@@ -90,7 +90,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '753317f168c1da38b198458f1ad1e4886eebb86a' }}
+          ref: ${{ inputs.ai_ref || '9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38' }}
           path: .ai-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -102,7 +102,7 @@ jobs:
           python-version: '3.11'
       - name: Verify fixed source and strict profile receipts
         env:
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '753317f168c1da38b198458f1ad1e4886eebb86a' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '9b3a88865f6f2d1134c7b0e0b48ab73af3e58d38' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
@@ -113,7 +113,7 @@ jobs:
           set -euo pipefail
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-ai-finalization:5.5.1 components/rocketmq
-      - name: Required independent HTTP and worker SIGKILL recovery
+      - name: Required five-path RPC fault and worker SIGKILL recovery
         run: |
           set -euo pipefail
           make rocketmq-ai-finalization-test SDK_DIR="$PWD/.sdk-acceptance" AI_DIR="$PWD/.ai-acceptance" \

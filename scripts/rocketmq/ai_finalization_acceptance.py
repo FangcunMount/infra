@@ -10,11 +10,20 @@ CASES = frozenset(('external_http_counter', 'no_new_publish_outbox',
     'normal_broker_delivery', 'recovery_broker_delivery', 'normal_actual_worker',
     'recovery_actual_worker', 'normal_witness_and_archive', 'recovery_witness_and_archive',
     'rpc_proxy_forwarding', 'all_owned_processes_stopped'))
-TESTS = frozenset('test_actual_independent_report_worker_http_counter_and_broker[' + k + ']'
+PATHS = ('interpretation_report', 'serial_generation', 'serial_semantic',
+         'candidate_generation', 'candidate_semantic')
+SCENARIOS = ('normal', 'response_committed_terminal_mq_unavailable',
+             'terminal_committed_confirmation_lost', 'response_committed_process_sigkill')
+MATRIX = frozenset('matrix_' + path + '_' + scenario for path in PATHS for scenario in SCENARIOS)
+CASES = CASES | MATRIX
+TESTS = (frozenset('test_actual_independent_report_worker_http_counter_and_broker[' + k + ']'
                   for k in ('False', 'True'))
+         | frozenset('test_independent_five_path_finalization_matrix[' + scenario + '-' + path + ']'
+                     for path in PATHS for scenario in SCENARIOS))
 _MARKER = 'M3_AI_FINALIZATION_RECEIPT '
 _FLAGS = frozenset(('system_login_not_claimed', 'paired_qs_business_not_claimed',
-    'real_external_provider_not_claimed', 'packet_or_database_network_fault_not_claimed',
+    'real_external_provider_not_claimed', 'database_commit_network_fault_not_claimed',
+    'real_packet_fault_verified', 'five_path_matrix_verified',
     'real_http_counter_verified', 'process_sigkill_verified'))
 _FIELDS = _FLAGS | {'cases', 'passed', 'failed', 'skipped', 'root', 'sdk', 'client', 'python'}
 
@@ -73,4 +82,4 @@ def profile():
         sdk_sha256='570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2',
         file='rocketmq_finalization_host.py', manifest=finalization_manifest,
         partial=read_receipt, parse=parse_receipt, tests=TESTS,
-        scope='actual original report worker in independent processes; synthetic HTTP provider with external persistent counter; real MySQL/SDK/Broker via owned RPC proxy; actual response-committed SIGKILL/recovery; observer ACK only, no paired QS/system or packet/database network-fault proof')
+        scope='five original report/serial/candidate worker paths in independent processes; synthetic HTTP provider with external persistent counter; real MySQL/SDK/Broker; actual terminal SendMessage and EndTransaction TCP reply loss; response-committed SIGKILL/recovery; observer ACK only, no paired QS/system or database commit network-fault proof')
