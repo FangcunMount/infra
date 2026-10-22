@@ -1,0 +1,49 @@
+name: RocketMQ M3 final resource candidate
+on:
+  push:
+    branches: [codex/rocketmq-m3-resources]
+  pull_request:
+    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '.github/workflows/rocketmq-m3-resources.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-m3-resources-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  resources:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 8de893b367cc797580799abd8325f41dd62356db
+          path: .sdk-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .sdk-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Tools and final manifest contracts
+        run: python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+      - name: Verify official archive and build isolated Broker
+        run: |
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-m3-resources:5.5.1 components/rocketmq
+      - name: Actual typed resources, principal permissions and TLS
+        run: |
+          python3 scripts/rocketmq/ci-transactions.py --m3-resources \
+            --sdk "$PWD/.sdk-acceptance" --image rocketmq-m3-resources:5.5.1 \
+            --report rocketmq-m3-resources.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-m3-resources-${{ github.sha }}
+          path: rocketmq-m3-resources.json
+          if-no-files-found: error
+          retention-days: 14
