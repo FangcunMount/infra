@@ -52,8 +52,11 @@ def worker_failure_diagnostics(output):
         return {'invalid': True}
     try:
         value = json.loads(rows[0])
-        if (not isinstance(value, dict) or set(value) != {'phase', 'active', 'waiting', 'holds', 'evidence', 'query_failed', 'consume_outcomes', 'transport_errors'}
-                or value['phase'] != 'paused_delivery' or type(value['query_failed']) is not bool
+        if (not isinstance(value, dict) or set(value) != {'phase', 'active', 'waiting', 'holds', 'evidence', 'query_failed', 'consume_outcomes', 'transport_errors', 'sdk_stack_sites', 'sdk_stack_truncated'}
+                or value['phase'] != 'paused_delivery'
+                or type(value.get('sdk_stack_truncated')) is not bool
+                or not isinstance(value.get('sdk_stack_sites'), dict) or len(value['sdk_stack_sites'])>32
+                or any(not re.fullmatch(r'(?:subscriber|simple_consumer):[0-9]{1,4}',k) or type(v) is not int or not 1<=v<=32 for k,v in value['sdk_stack_sites'].items()) or type(value['query_failed']) is not bool
                 or any(type(value[k]) is not int or not 0 <= value[k] <= 1000000 for k in ('active', 'waiting', 'holds', 'evidence'))
                 or not isinstance(value.get('transport_errors'),dict)
                 or set(value['transport_errors']) - {'auth_or_acl','deadline','tls','connection','other'}
