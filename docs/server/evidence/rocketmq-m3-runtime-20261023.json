@@ -315,8 +315,8 @@
     "source_sha": "43f3e5e3b199b37ff754adc1b0d3d879b64689e5",
     "candidate_sha": "21817e1f66b1130852a4c33a862d1a42e353981b",
     "pr": "https://github.com/FangcunMount/qs-server/pull/424",
-    "source_merged_into_main": false,
-    "ci": "pending_on_exact_final_head",
+    "source_merged_into_main": true,
+    "ci": "28 success;1 conditional API generation sync not applicable",
     "tests": {
       "pass": 341,
       "fail": 0,
@@ -329,17 +329,460 @@
     "docs_tests": 88,
     "docs_hygiene_facts": "passed",
     "parent_metadata_preserved": true,
-    "production_changed": false
+    "production_changed": false,
+    "merged_main": "17ed4615075f1b066c7f43c9483deb14d88c65a9",
+    "candidate_and_main_tree": "501d791c9bb017fc292f5ba9e178eb0934c43e6d",
+    "checks": [
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120033452224",
+        "name": "Build Applications (apiserver)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120033452320",
+        "name": "Build Applications (worker)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120033452373",
+        "name": "Build Applications (collection)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836552043/job/120026299431",
+        "name": "Analyze (go)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315906",
+        "name": "Deployment Contracts",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315721",
+        "name": "Seeddata Retirement and Current Runtime E2E",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315738",
+        "name": "Actor Store MySQL Transactions",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315964",
+        "name": "QS-03 original effect recovery after actual broker loss",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558284/job/120026314271",
+        "name": "original-mysql-root (8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315523",
+        "name": "Security Scan (Advisory)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315810",
+        "name": "Run Tests",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315842",
+        "name": "QS-05/06 original business effects after actual broker loss",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558440/job/120026314492",
+        "name": "images (qs-apiserver)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315923",
+        "name": "Tier 1 Test Policy",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315489",
+        "name": "MySQL Native Metadata and Readiness",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558440/job/120026314440",
+        "name": "delivery (8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315601",
+        "name": "Lint Code",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315867",
+        "name": "Layer Boundaries (depguard)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558284/job/120026314854",
+        "name": "original-mysql-root (8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315693",
+        "name": "Action audit MySQL JSON lifecycle",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315836",
+        "name": "Maintainability Scan (Advisory)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315447",
+        "name": "AuthZ committed version two-process MySQL",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026315837",
+        "name": "Docs Hygiene & Facts",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558440/job/120026314640",
+        "name": "images (collection-server)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558440/job/120026314046",
+        "name": "delivery (8.4)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026314938",
+        "name": "MongoDB Authenticated Native Metadata",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558384/job/120026314221",
+        "name": "mysql-audit",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558284/job/120026314535",
+        "name": "original-mysql-root (8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/qs-server/actions/runs/39836558674/job/120026317028",
+        "name": "Docs & API Generated Sync",
+        "state": "SKIPPED"
+      }
+    ],
+    "production_deploy_paused_readback": true,
+    "production_environment_pause_override": false
   },
   "deferred_consumer_batch": {
-    "status": "implementation_next",
+    "status": "native_mysql_verified_whole_worker_pending",
     "scope": "current v2 RocketMQ paused retry deliveries only; same original dispatcher/identity, no publication or business retry authorization",
     "storage": "reuse original transport evidence104 and explicit host migration for v2 deferred linkage; no historical reader",
     "resource_contract": "same original worker execution concurrency, one bounded resume loop, bounded SQL/lease renewal and actual completion accounting",
     "verification_pending": [
-      "pure contract/race",
-      "required isolated real MySQL/Broker",
-      "shared budget and crash/lease ownership"
-    ]
+      "current full worker/Broker delivery and shared execution budget",
+      "whole-host native lifecycle and cross-instance Checker",
+      "actual current-head source CI and merges"
+    ],
+    "source_sha": "9304ba3d97c269f546f2749296574e06f7709d12",
+    "resource_pair_source_sha": "c1d4a79f76fe7f868cfd8320270c80280d24b5bf",
+    "candidate_sha": "875160597fdd3acf870c695ef478b78eecdafb11",
+    "schema_target": "109/42",
+    "source_merged_into_main": false,
+    "unit_tests": {
+      "packages": 6,
+      "pass": 79,
+      "fail": 0,
+      "skip": 0,
+      "sha256": "90d750531edcf203d24c1b7b99e9700539e2804347f2f5fdf45cf09b4be2dd72"
+    },
+    "migration_resource_tests": {
+      "pass": 172,
+      "fail": 0,
+      "skip": 0
+    },
+    "offline_tool_tests": {
+      "pass": 2,
+      "fail": 0,
+      "skip": 0
+    },
+    "ordinary_and_native_tag_lint": "2.5.0 passed",
+    "docs_tests": 88,
+    "docs_hygiene_facts": "passed",
+    "native_compile_only": true,
+    "infra_candidate": "46c62c45919d719aa44501247f2b44f1ddda528d",
+    "infra_tool_tests": 121,
+    "actionlint": "passed",
+    "native_run": {
+      "id": 39843841383,
+      "url": "https://github.com/FangcunMount/infra/actions/runs/39843841383",
+      "profile": "development",
+      "mysql": "8.0.36",
+      "status": "in_progress",
+      "full_matrix": false,
+      "broker_and_whole_worker_not_claimed": true
+    },
+    "development_failures": [
+      "staticcheck nil-context test and tagged-switch guidance fixed",
+      "docs expected migration maximum and both sidecar source/target bindings updated from108 to actual109",
+      "initial schema109 source lacked declared109/42 pair; explicit pair and contract proof added before native dispatch"
+    ],
+    "resource_pair_source": "c1d4a79f76fe7f868cfd8320270c80280d24b5bf",
+    "native_candidate": "875160597fdd3acf870c695ef478b78eecdafb11",
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/159",
+    "native_full_run": "https://github.com/FangcunMount/infra/actions/runs/39844371120",
+    "native_development_run": "https://github.com/FangcunMount/infra/actions/runs/39843841383",
+    "mysql_matrix": [
+      {
+        "sha256": "ffeb8c0453e3488b9bc085cfbd8db91db902dd798b51cb10b5453139d56e9353",
+        "mysql_version": "8.0.44",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "cases": [
+          "broken_first_link_rolls_back_new_physical_evidence",
+          "durable_eight_attempt_budget_and_one_manual_delivery",
+          "exact_wire_duplicate_and_legacy_refusal",
+          "explicit_schema_required",
+          "real_child_kill_retains_attempt_and_frozen_wire",
+          "real_expiry_new_claim_blocks_old_owner",
+          "sql_lock_budget_does_not_grant_execution"
+        ],
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "sha256": "f3a2e2b714edba9bbec35f40e4483807f3cd79f31abfcae3621feb94ae2082e2",
+        "mysql_version": "8.4.11",
+        "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "cases": [
+          "broken_first_link_rolls_back_new_physical_evidence",
+          "durable_eight_attempt_budget_and_one_manual_delivery",
+          "exact_wire_duplicate_and_legacy_refusal",
+          "explicit_schema_required",
+          "real_child_kill_retains_attempt_and_frozen_wire",
+          "real_expiry_new_claim_blocks_old_owner",
+          "sql_lock_budget_does_not_grant_execution"
+        ],
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      },
+      {
+        "sha256": "4af17850a73f760961a1dccd88688271008d6eb494a5e7e2cca8eb78e46b7516",
+        "mysql_version": "8.0.36",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "cases": [
+          "broken_first_link_rolls_back_new_physical_evidence",
+          "durable_eight_attempt_budget_and_one_manual_delivery",
+          "exact_wire_duplicate_and_legacy_refusal",
+          "explicit_schema_required",
+          "real_child_kill_retains_attempt_and_frozen_wire",
+          "real_expiry_new_claim_blocks_old_owner",
+          "sql_lock_budget_does_not_grant_execution"
+        ],
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.2",
+          "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        }
+      }
+    ],
+    "native_full_status": "3 jobs SUCCESS; each exact 7 cases, zero failed/skipped; all owned cleanup verified",
+    "scope_limits": [
+      "No Broker delivery or full-worker proof",
+      "Controlled callback errors are not network faults",
+      "Manual technical grant fixture is not human authorization API acceptance",
+      "No production/system login proof"
+    ],
+    "source_pr": "https://github.com/FangcunMount/qs-server/pull/426",
+    "source_current": "d85535bc726737a2a8d6e96a6e79128c0fae2b67",
+    "source_ci_status": "current required CI queued; old 13bfecc host audit import cycle failed, fixed by extraction and local all integration compile",
+    "import_cycle_failure": {
+      "run": "https://github.com/FangcunMount/qs-server/actions/runs/39845297016",
+      "source": "13bfecc58963",
+      "cause": "transport same-package integration test imports worker messaging; deferred messaging imported transport",
+      "fix": "8fb35d344a4685d3f164ae68dddf9791e15a439e extracts shared immutable SQL evidence to deliveryevidence, unchanged legacy identity and SQL",
+      "verification": "36 race tests zero failed/skipped; eventing and worker complete integration-tag compile; lint2.5.0;88 docs tests pass",
+      "native_rerun": "https://github.com/FangcunMount/infra/actions/runs/39846389533",
+      "native_rerun_status": "queued, not counted passed"
+    },
+    "worker_runtime_candidate": {
+      "infra_source": "bbe0e5b",
+      "qs_source": "8e52d8de7",
+      "scope": "actual worker Container/initializeRuntime/lifecycle, real Broker/MySQL, owned loopback business RPC; not complete apiserver/provider/system",
+      "verification": "initial native compile and lint passed; process baseline22 and shared-budget two-package33 race zero failed/skipped; final merged compile/lint/docs running",
+      "development_run": "https://github.com/FangcunMount/infra/actions/runs/39846170583",
+      "development_run_source": "1ae0ebd0500e0b899867548225108d6a929b6477",
+      "development_run_status": "running; earlier source before shared queue snapshot and evidence extraction; not counted passed"
+    },
+    "dispatch_input_errors": [
+      {
+        "run": "39846137194",
+        "result": "canceled before acceptance; incorrect manually transcribed source SHA; not counted as tests"
+      },
+      {
+        "run": "39846360702",
+        "result": "canceled before acceptance; incorrect manually transcribed source SHA; corrected dispatch uses actual git rev-parse HEAD"
+      }
+    ],
+    "native_rerun_current": {
+      "source": "8fb35d344a4685d3f164ae68dddf9791e15a439e",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39846389533",
+      "status": "verified 3x7, zero failure/skip; all owned cleanup true",
+      "reports": [
+        {
+          "sha256": "1bdecb48cd1dec1e216712620ecbb6a367899e45a34558fc787396cc51f84d70",
+          "mysql_version": "8.0.44",
+          "source": "8fb35d344a4685d3f164ae68dddf9791e15a439e",
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "sha256": "9182d87b8832a69a8625f654a75536459fb83f7b2b714d0624bc2e7ac4161a74",
+          "mysql_version": "8.4.11",
+          "source": "8fb35d344a4685d3f164ae68dddf9791e15a439e",
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "sha256": "e72c41c37918cfc4d98f456cd2220e5beb4e04c2767087d78577c93bc88272db",
+          "mysql_version": "8.0.36",
+          "source": "8fb35d344a4685d3f164ae68dddf9791e15a439e",
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ]
+    },
+    "infra_merge": {
+      "pr": 159,
+      "head": "46c62c45919d719aa44501247f2b44f1ddda528d",
+      "main": "789dfcfd480aea8c84d5fd1d51df56d02b9d68ba",
+      "checks": 49,
+      "regression_reports": 53,
+      "status": "merged after all successful checks and report audit",
+      "base_drift": "current main vs tested base changed only execution Markdown/JSON; functional sources unchanged",
+      "cleanup": "51 reports have full owned Compose cleanup; original worker MySQL report has9 zero row counts/private removal and Stop containers success; M1 report has no cleanup field, do not invent one"
+    },
+    "infra_registry_failure": {
+      "run": "39844457263",
+      "job": "120053933950",
+      "failure": "Docker Hub fixed eclipse-temurin blob returned502 during build; no test executed/no report",
+      "rerun_job": "120068188816",
+      "rerun": "only failed job rerun after inspecting cause; now success; other two jobs retained"
+    },
+    "source_pr_state": "temporarily closed for focused native debugging; final required CI will run after freeze; source remains reviewable on branch",
+    "worker_runtime_failures": [
+      {
+        "run": "39846170583",
+        "source": "1ae0ebd0500e0b899867548225108d6a929b6477",
+        "outcome": "initial paused row not observed; no timeout/race; full owned cleanup",
+        "root_cause": "unknown"
+      },
+      {
+        "run": "39848361009",
+        "source": "9b78c5403f16e77f9a84ba6222e1c572d65d3898",
+        "outcome": "actual receive readiness passed; initial paused row still absent; original SQL queries succeed, holds/evidence/consume outcomes allzero; no timeout/race; full owned cleanup",
+        "root_cause": "unknown; intact frozen input/pause/owner guards separately pass inert contract test"
+      },
+      {
+        "run": "39849972277",
+        "source": "7ffae747096956d36e59461ec706d98acca45fd6",
+        "outcome": "half prepared, local committed and final commit confirmed; transport readiness passed;20s hold observation failed; no transport errors/consume outcomes, originalSQL count queries normal; full owned cleanup",
+        "root_cause": "unknown; serial polling budget under one shared slot is being tested; no source business assertion removed",
+        "diagnostic_limitation": "Admin helper injected unsupported -b into topicStatus; query unavailable, not evidence of empty Broker"
+      }
+    ],
+    "worker_runtime_development_current": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39851006275",
+      "infra": "73f34cb",
+      "source": "d85535bc726737a2a8d6e96a6e79128c0fae2b67",
+      "scope": "same original assertions, one shared slot,3 logical groups/max2 physical inputs with5s polls; fixture observation60s/RPC+handler3m; records actual observation latency, no production change",
+      "status": "running, not passed"
+    },
+    "local_verification_addendum": {
+      "combined_six_packages": "72 race zero failed/skipped on integrated source before last diagnostic wrapper",
+      "frozen_wire_contract": "1 race and lint passed; inert, no DB/Broker claim",
+      "expanded_tagged_lint": "failed on5 preexisting tagged transport-test issues (4 unchecked Close,1 unused constant); not claimed passed; normal transport+process and native process lint passed",
+      "docs_failure": "8fb source CI detected stale baselinec1; integrated47fe docs corrected baseline9b with88 tests/hygiene/facts pass; newest diagnostic source needs rebind before freeze",
+      "harness_tests": 125,
+      "current_six_packages": "73 race zero failure/skip on current candidate; docs88/hygiene pass, tracked native fixture baseline rebind required then checked"
+    },
+    "development_ci_cancellations": {
+      "source": "7ffae747096956d36e59461ec706d98acca45fd6",
+      "scope": "owned incomplete development PR426 runs only; completed results retained; final gate will rerun after freeze",
+      "runs": [
+        {
+          "run": "39849971906",
+          "cancel_requested": true
+        },
+        {
+          "run": "39849976805",
+          "cancel_requested": true
+        },
+        {
+          "run": "39849976830",
+          "cancel_requested": true
+        },
+        {
+          "run": "39849977028",
+          "cancel_requested": true
+        }
+      ]
+    },
+    "regression_audit_index_sha256": "5858ebe1cd54068e88a4ab19cd007ff3577063f3bbab306cb4691601a061d4f0"
   }
 }
