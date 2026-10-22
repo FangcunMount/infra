@@ -46,9 +46,20 @@
       "cause": "test assumed client abort status completed the subsequent server-side technical observation",
       "resolution": "await an instance-local event after the real diagnostic transaction returns; no runtime change",
       "source_sha": "83769afae07658a821e3957cdb36cb213cb823f5"
+    },
+    {
+      "phase": "complete source MySQL8.4 shard0",
+      "run_id": 39776667935,
+      "passed": 1392,
+      "selected": 1393,
+      "skipped": 0,
+      "test": "tests.integration.test_transaction_schema::test_transaction_archive_shares_original_root_and_never_exposes_prepared",
+      "cause": "internal authenticated_workload binding error was unnecessarily changed alongside caller reference errors",
+      "resolution": "restore original MessagingContractError for internal binding; only caller reference errors raise MessageConflict; add focused regression",
+      "source_sha": "b88f40b0f4affb59b3a900ac8b0823fab1dfa813"
     }
   ],
-  "source_candidate": "83769afae07658a821e3957cdb36cb213cb823f5",
+  "source_candidate": "b88f40b0f4affb59b3a900ac8b0823fab1dfa813",
   "focused_local_passed": 55,
   "typed_source_files": 447,
   "native_ids_collected": 15,
@@ -62,7 +73,7 @@
     "infra_log": "/tmp/m3-t19-infra-tool-tests.log",
     "native_collected_log": "/tmp/m3-t19-native-collected.log"
   },
-  "native_acceptance_status": "six profiles passed and independently verified; complete source and infra regression CI pending",
+  "native_acceptance_status": "prior six-profile checkpoint retained; final source and compatibility gates pending",
   "infra_candidate": "033399384a665ad927bfe47d454329d2a173f31b",
   "source_pr": "https://github.com/FangcunMount/qs-ai/pull/214",
   "infra_pr": "https://github.com/FangcunMount/infra/pull/146",
@@ -92,7 +103,7 @@
   ],
   "source_ci": {
     "id": 39776667935,
-    "status": "in_progress",
+    "status": "superseded after preserved internal-binding contract fix; MySQL8.4 shard0 failure retained",
     "source_sha": "83769afae07658a821e3957cdb36cb213cb823f5"
   },
   "tested_merge": {
@@ -103,7 +114,7 @@
   "compatibility_matrix": {
     "id": 39777261632,
     "url": "https://github.com/FangcunMount/infra/actions/runs/39777261632",
-    "status": "passed",
+    "status": "passed for 83769af checkpoint; final b88f40b matrix pending",
     "profiles": [
       {
         "report": "/tmp/m3-t19-six-39777261632/rocketmq-ai-current-payload-py311-mysql8411-033399384a665ad927bfe47d454329d2a173f31b/rocketmq-ai-current-payload.json",
@@ -189,5 +200,7 @@
     "failed": 0,
     "skipped": 0,
     "all_github_service_teardowns": "success"
-  }
+  },
+  "focused_final_local_passed": 49,
+  "final_local_log": "/tmp/m3-t19-binding-green.log"
 }

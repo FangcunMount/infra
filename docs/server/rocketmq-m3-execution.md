@@ -180,7 +180,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
 | ✅ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 2026-10-22；内部3/3。最终6be5f80源码12检查成功，两档MySQL各5529通过（含12串行原根/5 ACK原生），0失败/跳过；infra2950e9a全部19项成功，六档Broker各55宿主/148证据及独立focus4/12通过，完整清理。AI PR212合并be91fde，infra PR142合并f84b3a9，merge tree均一致。失败/取消历史保留，旧SDK一次超时根因未确认、本轮原SDK两档均31通过；生产未变更。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ✅ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 2026-10-22；内部5/5。最终1643afe源码12检查成功，两MySQL各5562项（含原根恢复20）0失败/跳过；六档Broker各22原生/32证据通过，源/工具/SDK/报告及清理独立核验。AI PR213合并c04a181、infra PR144合并e1eb1c3；原树与候选一致，失败历史保留，生产未变更。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
-| ☐ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 进行中；候选83769af，引用诊断5项红测已复现并修正，55目标测试/447源码类型检查通过；六档原根MySQL/mTLS各15原生/21证据全部通过且独立核验，infra109工具测试通过；完整源码和SDK回归CI待完成。历史reader/新旧格式互通不进入门禁，清理交M4-C03 |
+| ☐ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 进行中；最终候选b88f40b，保留内部workload绑定异常契约；修正后49目标通过。83769af六档各15原生/21证据通过且保留；b88f40b完整源码/六档重跑待通过，infra109工具测试通过。历史reader/新旧格式互通不进入门禁，清理交M4-C03 |
 | ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 待开始；仅最终版本组合，不新增新旧版本互通矩阵 |
 | ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
 | ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 待开始 |
@@ -948,3 +948,7 @@ AI候选729faee修正当前档案引用不匹配的RPC错误类别；5项红测�
 ### 2026-10-22：T19固定候选六档验收通过
 
 AI83769af/infra0333993固定，39777261632六档Python3.11.16/3.13.15×MySQL8.0.36/8.0.44/8.4.11全部成功；每档15原生/21证据，共90/126，零失败跳过。已下载逐份核对所有源码/工具/lock/wheel摘要、精确测试集合、10个mTLS服务排空、15类自有记录零残留、私有证据删除及全部GitHub Stop containers成功；测试虚拟merge完整tree等于候选。此为当前Payload/receipt组件验收，不替代T20成对QS/AI或T22/T23完整生命周期/网络故障。完整源码CI39776667935及infra PR146回归仍运行，T19保持进行中，18/36。
+
+### 2026-10-22：T19完整源码发现内部绑定契约回归
+
+83769af完整CI39776667935的MySQL8.4分片0为1392通过/1393执行、0跳过，原schema测试发现内部authenticated_workload错误的异常类型被一并改变。此超出请求引用诊断修复范围，b88f40b恢复原MessagingContractError，仅producer/destination/org/hash/length请求不匹配使用MessageConflict；增加内部绑定回归，修正后49目标通过，文档75篇/1389链接通过。原失败与旧六档证据保留，后者不冒充新源码通过。最终AI完整CI与六档将重跑；工作流目标固定更新放在独立进度PR147，避免重跑未变化的SDK工具实现，工具PR146原候选仍冻结。T19不勾选，18/36。
