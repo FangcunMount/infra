@@ -180,7 +180,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T16 | AI command admission/receipt 原事务与根提交归属 | 2026-10-21；AI9485f28完整两档各3531项零失败/跳过、14项检查成功；已发布Python SDK0.4.0a1/client5.1.2与Broker5.5.1六档每档15项协议检查/8项实际宿主用例通过、清理完整。AI PR159合并e8392c05；infra PR83当前头37项成功、合并b770ed68。[全部证据/失败历史](evidence/rocketmq-m3-ai-admission-20261021.json)。受控QS输入/observer，不计成对业务、真实模型或生产验收 |
 | ✅ | T17 | AI interpretation/evaluation计划冻结，退出commit hook编排 | 2026-10-22；内部3/3。最终6be5f80源码12检查成功，两档MySQL各5529通过（含12串行原根/5 ACK原生），0失败/跳过；infra2950e9a全部19项成功，六档Broker各55宿主/148证据及独立focus4/12通过，完整清理。AI PR212合并be91fde，infra PR142合并f84b3a9，merge tree均一致。失败/取消历史保留，旧SDK一次超时根因未确认、本轮原SDK两档均31通过；生产未变更。[证据](evidence/rocketmq-m3-ai-state-20261021.json) |
 | ✅ | T18 | 当前最终协议的AI确定性finalization，故障不增加模型调用 | 2026-10-22；内部5/5。最终1643afe源码12检查成功，两MySQL各5562项（含原根恢复20）0失败/跳过；六档Broker各22原生/32证据通过，源/工具/SDK/报告及清理独立核验。AI PR213合并c04a181、infra PR144合并e1eb1c3；原树与候选一致，失败历史保留，生产未变更。[证据](evidence/rocketmq-m3-ai-finalization-20261022.json) |
-| ☐ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 进行中；候选729faee，引用诊断5项红测已复现并修正，55目标测试/447源码类型检查通过；15项原根MySQL/mTLS验收已收集，infra109工具测试通过，真实CI待执行。历史reader/新旧格式互通不进入门禁，清理交M4-C03 |
+| ☐ | T19 | 当前协议Payload RPC/receipt/诊断可用，新消息不走旧Relay | 进行中；候选83769af，引用诊断5项红测已复现并修正，55目标测试/447源码类型检查通过；15项原根MySQL/mTLS验收已收集，infra109工具测试通过，真实CI待执行。历史reader/新旧格式互通不进入门禁，清理交M4-C03 |
 | ☐ | T20 | 最终QS＋AI成对契约、安全、wire、receipt/ACK重复与取消 | 待开始；仅最终版本组合，不新增新旧版本互通矩阵 |
 | ☐ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 待开始 |
 | ☐ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 待开始 |
@@ -940,3 +940,7 @@ T18进度PR145已合并2270c8c，完整tree与进度候选一致。T19从AIc04a1
 ### 2026-10-22：T19引用诊断修正与隔离验收准备
 
 AI候选729faee修正当前档案引用不匹配的RPC错误类别；5项红测先复现错误Unavailable，修正后55目标测试、447源码类型检查、格式及文档检查通过。权威witness缺失、矛盾或数据库故障仍Unavailable，不回退旧reader。新增15项显式原MySQL根/mTLS用例和21项证据标记，已核对收集清单；infra109工具测试及actionlint通过。下一步在隔离CI实际运行，不将收集、本地unit或receipt合成测试当作真实存储/业务验收；M3仍18/36。
+
+### 2026-10-22：T19首轮真实失败记录与窄档通过
+
+39776198937首轮在错误workload的诊断计数断言失败：实际gRPC拒绝已完成，而abort后的服务端技术计数尚未提交。测试改为等待实例级真实record_failure完成事件，不修改运行逻辑；失败报告及Stop containers成功记录保留。83769af在39776619906窄档MySQL8.0.36/Python3.11通过15项原生和21项证据，0失败/跳过；10个mTLS服务全部关闭，15类自有业务/协议表零残留，SDK/wire测试/工具摘要及source clean独立核验。AI PR214完整源码CI39776667935及infra PR146门禁仍在执行，T19不勾选，18/36。

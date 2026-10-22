@@ -39,9 +39,16 @@
       "passed": 5,
       "cause": "permanent current archive reference mismatches incorrectly mapped to UNAVAILABLE",
       "resolution": "raise existing MessageConflict only for request reference mismatch; authority errors remain unavailable"
+    },
+    {
+      "phase": "first real MySQL/mTLS run",
+      "run_id": 39776198937,
+      "cause": "test assumed client abort status completed the subsequent server-side technical observation",
+      "resolution": "await an instance-local event after the real diagnostic transaction returns; no runtime change",
+      "source_sha": "83769afae07658a821e3957cdb36cb213cb823f5"
     }
   ],
-  "source_candidate": "729faee986d0553392b4b0c9f88a3830347923ec",
+  "source_candidate": "83769afae07658a821e3957cdb36cb213cb823f5",
   "focused_local_passed": 55,
   "typed_source_files": 447,
   "native_ids_collected": 15,
@@ -55,5 +62,37 @@
     "infra_log": "/tmp/m3-t19-infra-tool-tests.log",
     "native_collected_log": "/tmp/m3-t19-native-collected.log"
   },
-  "native_acceptance_status": "pending actual isolated MySQL and mTLS CI; collection is not execution"
+  "native_acceptance_status": "single profile passed and independently verified; six-profile and complete CI pending",
+  "infra_candidate": "f0fe9cf2f353be0e7e93e71fc666f5dba3927b31",
+  "source_pr": "https://github.com/FangcunMount/qs-ai/pull/214",
+  "infra_pr": "https://github.com/FangcunMount/infra/pull/146",
+  "native_runs": [
+    {
+      "id": 39776198937,
+      "source_sha": "729faee986d0553392b4b0c9f88a3830347923ec",
+      "status": "failed",
+      "phase": "native_mysql_mtls",
+      "assertion": "tests/integration/rocketmq_payload_host.py:356",
+      "private_evidence_removed": true,
+      "github_service_teardown": "success"
+    },
+    {
+      "id": 39776619906,
+      "source_sha": "83769afae07658a821e3957cdb36cb213cb823f5",
+      "status": "passed",
+      "native_tests": 15,
+      "evidence_flags": 21,
+      "failed": 0,
+      "skipped": 0,
+      "github_service_teardown": "success",
+      "report_sha256": "c1ef8da4ffae82d433f584e3a5a4c0586d7f8bd8afc82d7c23f5d5de41b81e62",
+      "private_evidence_removed": true,
+      "owned_rows_remaining": 0
+    }
+  ],
+  "source_ci": {
+    "id": 39776667935,
+    "status": "in_progress",
+    "source_sha": "83769afae07658a821e3957cdb36cb213cb823f5"
+  }
 }

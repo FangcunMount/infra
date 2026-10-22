@@ -6,7 +6,7 @@ on:
         description: Exact current payload host source SHA
         type: string
         required: true
-        default: 729faee986d0553392b4b0c9f88a3830347923ec
+        default: 83769afae07658a821e3957cdb36cb213cb823f5
       full_matrix:
         description: Frozen-candidate six-profile gate; development uses one
         type: boolean
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || '729faee986d0553392b4b0c9f88a3830347923ec' }}
+          ref: ${{ inputs.ai_ref || '83769afae07658a821e3957cdb36cb213cb823f5' }}
           path: .ai-acceptance
       - uses: astral-sh/setup-uv@v6
         with:
@@ -55,7 +55,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Verify strict native IDs and exact source
         env:
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '729faee986d0553392b4b0c9f88a3830347923ec' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '83769afae07658a821e3957cdb36cb213cb823f5' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
@@ -66,7 +66,7 @@ jobs:
         run: uv sync --locked
       - name: Required current original MySQL and mTLS RPC gate
         env:
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '729faee986d0553392b4b0c9f88a3830347923ec' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '83769afae07658a821e3957cdb36cb213cb823f5' }}
           MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
         run: |
           set -euo pipefail
