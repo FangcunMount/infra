@@ -6,8 +6,8 @@
   "started_at": "2026-10-22T12:55:21.817402+00:00",
   "internal_gates": {
     "A": "completed",
-    "B": "pending",
-    "C": "pending",
+    "B": "completed",
+    "C": "in_progress",
     "D": "pending"
   },
   "source_baselines": {
@@ -80,5 +80,57 @@
     "first wire/idempotency/security/cancellation",
     "required native jobs fail if dependencies absent; zero skip"
   ],
-  "failure_history": []
+  "failure_history": [
+    {
+      "run_id": 39786016742,
+      "source_ai": "06653cef77bf79bac3ce2b412789b7f0d14ada00",
+      "source_qs": "fb62c1d01b5e9c068659ba27b554a57b923e4a28",
+      "infra": "f2641458859988176fdc4d5ba12c7b4a07e62a0a",
+      "passed_native_flags": 7,
+      "failed": 1,
+      "skipped": 0,
+      "assertion": "tests/integration/rocketmq_paired_host.py:417",
+      "cause": "test incorrectly expected ACK rows in general Inbox; actual authenticated receiver commits exact event_receipts",
+      "resolution": "observe received bytes around original default ACK handler; compare first Go archive wire/body hashes with actual handler and committed receipt",
+      "application_source_changed": false,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "report_sha256": "9088670bb85cdd4bcefc93f129bf48a77c6977f050c9533a40f62285177fcb71"
+    }
+  ],
+  "prototype": {
+    "qs_source": "fb62c1d01b5e9c068659ba27b554a57b923e4a28",
+    "ai_source": "45ec3b24a669ce1cd2b1e8849a236955b59d01f5",
+    "qs_race_build_and_vet": "passed",
+    "native_collected": 1,
+    "native_executed": true,
+    "infra_unit_tests": 114,
+    "full_native_tests_required": 5,
+    "full_evidence_flags_required": 25,
+    "core_is_development_only": true,
+    "core_status": "passed and independently verified; full profile pending"
+  },
+  "core_acceptance": {
+    "run_id": 39788646533,
+    "report_sha256": "2f6a3d79fe3238aa559bb1bdb7b40f8bb3c59866527a1889315926566bbff2ef",
+    "qs_source": "fb62c1d01b5e9c068659ba27b554a57b923e4a28",
+    "ai_source": "45ec3b24a669ce1cd2b1e8849a236955b59d01f5",
+    "infra_source": "f2641458859988176fdc4d5ba12c7b4a07e62a0a",
+    "native": 1,
+    "evidence": 10,
+    "failed": 0,
+    "skipped": 0,
+    "all_source_hashes_verified": true,
+    "cleanup_verified": true,
+    "scope": "core only; does not satisfy full T20"
+  },
+  "merge_status": {
+    "qs": "source branch only; final PR/gates pending",
+    "ai": "source branch only; final PR/gates pending",
+    "infra_tools": "source branch only; full PR regressions pending"
+  }
 }
