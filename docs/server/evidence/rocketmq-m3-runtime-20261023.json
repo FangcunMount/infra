@@ -1413,7 +1413,7 @@
     ]
   },
   "qs_default_owner_runtime_batch": {
-    "status": "corrected development native queued; source/tool PRs draft; not verified",
+    "status": "development13/13 native audited; frozen full matrix/current-head CI in progress",
     "source": "c15df6f3ff0686c574520a9c5d274f86d08d9868",
     "source_baseline": "cc7609ad6dd78b8250437a36f777c98da8b22a24",
     "infra": "a1602bed8e72cae537de386e161e8936d300e733",
@@ -1447,6 +1447,104 @@
         "cause": "protocol fixture left catalog projection consumers enabled without domain handler bindings; default fail-closed startup correctly rejected it",
         "all_owned_cleanup_verified": true,
         "owned_broker_parameters_restored": true
+      },
+      {
+        "run": "https://github.com/FangcunMount/infra/actions/runs/39869534165",
+        "source": "965e568f5439787e1ab4c39580fcbb44d6b2f70b",
+        "infra": "c65e2deedf809ddaab494cd26ec3bb1e828a1bdb",
+        "report_sha256": "255ed2e2fba13f96e52643bea24e3ed07b9ca42d3b868d4dc853be3e647e788c",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "native_build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "assertion_source_line": 473,
+        "phase": "original root committed barrier after actual startup/half visibility/inflight close; before Broker kill",
+        "cause": "not established; fixed root phase/error class/lease timing instrumentation added without weakening assertions or changing limits",
+        "all_owned_cleanup_verified": true,
+        "owned_broker_parameters_restored": true
+      },
+      {
+        "run": "https://github.com/FangcunMount/infra/actions/runs/39870851183",
+        "source": "f05d61c311c169c60fcc9703855116e2cd34bd0d",
+        "infra": "c259b4992479d4f084acab104393a87a83f2d410",
+        "report_sha256": "2a99ebe2dddbf35c88f746613aebbbbf31aae5ff0a43f6d19efbead714d1a1f2",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "diagnostics": {
+          "build_failed": false,
+          "test_timeout": false,
+          "race_reports": 0,
+          "race_frames": [],
+          "failed_tests": [
+            "TestM3DefaultOwnerRuntime"
+          ],
+          "assertion_lines": [
+            530
+          ],
+          "owner_runtime": [
+            {
+              "elapsed_ms": 1095,
+              "error": {
+                "code": 0,
+                "kind": "none"
+              },
+              "lease_remaining_ms": [
+                58894,
+                58900
+              ],
+              "local": "not_started",
+              "owner_index": -1,
+              "root_phases": [
+                1,
+                1
+              ],
+              "stage": "before_observer_close"
+            },
+            {
+              "elapsed_ms": 1113,
+              "error": {
+                "code": 0,
+                "kind": "none"
+              },
+              "lease_remaining_ms": [
+                58876,
+                58882
+              ],
+              "local": "not_started",
+              "owner_index": -1,
+              "root_phases": [
+                1,
+                1
+              ],
+              "stage": "after_observer_close"
+            },
+            {
+              "elapsed_ms": 1223,
+              "error": {
+                "code": 1136,
+                "kind": "mysql"
+              },
+              "lease_remaining_ms": [
+                58766,
+                58772
+              ],
+              "local": "unknown",
+              "owner_index": 0,
+              "root_phases": [
+                3,
+                5
+              ],
+              "stage": "local_committed"
+            }
+          ]
+        },
+        "phase": "MySQL fact insert in original root; Mongo root committed; no Broker kill",
+        "cause": "fixture first GORM raw placeholder expanded []byte ID into multiple parameters; MySQL1136 column/value arity mismatch,not lease expiry",
+        "all_owned_cleanup_verified": true,
+        "owned_broker_parameters_restored": true
       }
     ],
     "source_pr": "https://github.com/FangcunMount/qs-server/pull/428",
@@ -1463,9 +1561,154 @@
       "native_tag_compile": "passed",
       "native_tagged_lint": "passed zero issues",
       "docs_check": "passed",
-      "execution_status": "in progress after runner capacity released"
+      "execution_status": "failed original root committed barrier; superseded by diagnostic-only candidate"
     },
-    "scheduling_note": "Full own infra PR169 regressions deferred while current candidate native debugging completes; only current own pull_request runs canceled,workflow_dispatch retained. Required gates will be resumed at fixed final candidate; cancellation is not a pass."
+    "scheduling_note": "Own infra PR169 c65e2de full regression canceled/deferred during native debugging; final current-head snapshot42 canceled checks and7 successful. Cancellation loop stopped on a workflow that had already completed; final state reread. New diagnostic candidate is on a separate branch,final required gates will run only after freeze; no cancellation counted passed. Final source b7cd31cd/tool c259b499 frozen after audited development success; both PR heads updated and required checks triggered anew. Full13-case manual three-profile run admitted before large regression queue.",
+    "diagnostic_candidate": {
+      "source": "f05d61c311c169c60fcc9703855116e2cd34bd0d",
+      "source_baseline": "61dd0ac48a9595c850978f430b5421495db88947",
+      "infra": "c259b4992479d4f084acab104393a87a83f2d410",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39870851183",
+      "status": "failed and diagnosed MySQL1136 fixture arity with approximately58s lease remaining",
+      "source_native_compile": "passed",
+      "source_tagged_lint": "zero issues",
+      "source_docs": "passed",
+      "harness_tests": 136,
+      "diagnostics_policy": "only strict whitelisted stages, enums and bounded numbers; no raw errors, tokens, references, bodies or credentials"
+    },
+    "source_pr_head_note": "PR428 updated to exact frozen b7cd31cd; current-head source checks in progress; old c15 checks retained as old proof only",
+    "fixture_arity_reproduction": {
+      "gorm": "v1.30.0",
+      "old_bind_count": 11,
+      "fixed_bind_count": 2,
+      "open_connections": 0,
+      "log_sha256": "1815570ba7c3c61b5ec0e8eb89bc4b20939f1a3a44b331cbe660c87cd184d28b",
+      "script_sha256": "bd2b30e40a8134422fff6fb4603e01bca63a095f65fde58551c2c4525fb9468e",
+      "fix_source": "da0ef4529a0a78fe6ea65ec14e320782134233b9",
+      "change": "scalar original message ID and explicit fact columns in same original GORM root; no business code,limit or assertion change"
+    },
+    "current_source": "b7cd31cd704b3f479b315efc6d066f44f5dd556e",
+    "current_infra": "c259b4992479d4f084acab104393a87a83f2d410",
+    "current_native_gate": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39871880276",
+      "status": "verified13/13,zero failed/skipped,source clean,exact published SDK/full owned cleanup and actual parameter restore",
+      "audit_index_sha256": "ba90d2f677c7eb59df6f29cf3c20038644e22425fbee1576ec3f00854bdcb610",
+      "reports": [
+        {
+          "sha256": "b64a3b2bcba9098d64ac06e9d1ee091ff8fcce7bfe076a75e6b5b97406407374",
+          "source": "b7cd31cd704b3f479b315efc6d066f44f5dd556e",
+          "infra": "c259b4992479d4f084acab104393a87a83f2d410",
+          "mysql": "8.0.36",
+          "mongo": "7.0.37",
+          "go": "go1.25.12",
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0,
+          "images": {
+            "image": "sha256:958b9709e77acbe526b135d5d3a17c2b5b85c7e97c50eebf3d0629c2842269d5",
+            "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+            "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3"
+          },
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "native_receipt": {
+            "cases": {
+              "actual_shutdown_and_owned_cleanup": true,
+              "default_dual_owner_start_full_idle_topics": true,
+              "explicit_original_schema_no_constructor_ddl": true,
+              "fresh_paused_instance_actual_broker_checker_commits": true,
+              "frozen_protocol_inputs_before_roots": true,
+              "idempotent_observer_preserves_first_wire": true,
+              "local_committed_final_unknown_both_owners": true,
+              "original_mysql_and_mongo_facts_witness_atomic": true,
+              "owner_budget_and_callback_observation": true,
+              "prepared_halves_hidden_before_original_roots": true,
+              "real_broker_sigkill_after_commit_before_final_rpc": true,
+              "real_inflight_close_retains_original_dependencies": true,
+              "wrong_reference_unknown_without_changed_facts": true
+            },
+            "close_wait_ms": 100,
+            "domain_api_provider_system_not_claimed": true,
+            "domain_consumers_explicitly_disabled": true,
+            "duplicate_deliveries": 0,
+            "failed": 0,
+            "local_executor_calls": [
+              1,
+              1
+            ],
+            "mongo_database_callbacks": 1,
+            "new_checker_commits": [
+              1,
+              1
+            ],
+            "new_half_prepared_results": [
+              0,
+              0
+            ],
+            "observed_callbacks": {
+              "queued": 0,
+              "running": 2
+            },
+            "owned_databases_dropped": true,
+            "owned_runtimes_drained": true,
+            "passed": 13,
+            "producer_process_exit_not_claimed": true,
+            "same_broker_container_restarted": true,
+            "scope": "default QS dual-owner lifecycle, actual Broker restart and next-instance Checker; protocol fixture facts",
+            "skipped": 0,
+            "source_sha": "b7cd31cd704b3f479b315efc6d066f44f5dd556e"
+          },
+          "parameters": {
+            "parameters_before": {
+              "transactionTimeOut": 6000,
+              "transactionCheckInterval": 5000,
+              "transactionCheckMax": 24,
+              "fileReservedTime": 48
+            },
+            "parameters_before_native": {
+              "transactionTimeOut": 60000,
+              "transactionCheckInterval": 5000,
+              "transactionCheckMax": 24,
+              "fileReservedTime": 48
+            },
+            "parameters_after_restart": {
+              "transactionTimeOut": 6000,
+              "transactionCheckInterval": 5000,
+              "transactionCheckMax": 24,
+              "fileReservedTime": 48
+            },
+            "parameters_restored": {
+              "transactionTimeOut": 6000,
+              "transactionCheckInterval": 5000,
+              "transactionCheckMax": 24,
+              "fileReservedTime": 48
+            }
+          }
+        }
+      ]
+    },
+    "full_native_gate": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39872769912",
+      "source": "b7cd31cd704b3f479b315efc6d066f44f5dd556e",
+      "infra": "c259b4992479d4f084acab104393a87a83f2d410",
+      "status": "running all three fixed MySQL profiles"
+    },
+    "remaining": [
+      "three-profile current frozen13-case native matrix and independent report audit",
+      "current b7cd31cd QS PR428 source CI and merge",
+      "current c259b499 infra PR169 required full CI/report audit and merge",
+      "T22 final evidence review; task remains unchecked until gates pass"
+    ]
   },
   "bounded_lifecycle_verification": {
     "qs_host": {
