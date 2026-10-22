@@ -15,7 +15,8 @@ def receipt(full=False):
     return dict({k:True for k in FLAGS}, cases={k:True for k in cases},
         passed=len(cases),failed=0,skipped=0,root='original_go_mysql_and_python_sqlalchemy',
         sdk_go='v0.5.0-rocketmq-tx.2',sdk_python='0.4.0a2',client_python='5.1.2',
-        python='3.11.16',profile='full' if full else 'core',go_phase='ready')
+        python='3.11.16',profile='full' if full else 'core',go_phase='ready',
+        delivery_errors=[],last_observation=dict(polls=1,payload_calls=0,ack_count=2,operation_status='accepted'))
 
 
 def xml(names):
@@ -57,7 +58,9 @@ class PairedAcceptanceTests(unittest.TestCase):
         for change in ({'raw_wire':'secret'},{'paired_qs_business_not_claimed':True},
                        {'passed':True},{'failed':-1},{'go_phase':['ready']},
                        {'python':None},{'go_phase':'private_dsn_123'},
-                       {'system_login_not_claimed':False}):
+                       {'system_login_not_claimed':False},{'delivery_errors':['raw private error']},
+                       {'last_observation':{'raw_wire':'secret'}},
+                       {'last_observation':dict(polls=True,payload_calls=0,ack_count=0,operation_status='accepted')}):
             value = receipt();value.update(change)
             with self.subTest(change=change):
                 self.assertIsNone(read_receipt(MARKER+json.dumps(value)))

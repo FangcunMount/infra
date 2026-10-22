@@ -110,8 +110,8 @@
       "failed": 1,
       "skipped": 0,
       "failed_test": "test_actual_qs_ai_large_payloads_and_mtls_denial",
-      "cause": "private QS control response timeout during large START observation; exact Go blocking stage not yet established",
-      "resolution": "in progress; add allowlisted fixture-only control stage diagnostics; do not weaken deadline or claim business failure resolved",
+      "cause": "60-second large START observation deadline canceled an in-flight private control read; outer business polling vs blocked Go read not distinguished in first report",
+      "resolution": "in progress; retain the single control exchange until cleanup; add bounded fixed-phase, gRPC code and polling counters, without private logs",
       "report_sha256": "817042b4f8f2e60bc2264be8727a246b6b0bf2afeb9e4f024e8d4ccdccf6d76e",
       "cleanup": {
         "project_containers_remaining": false,
@@ -153,5 +153,12 @@
     "qs": "source branch only; final PR/gates pending",
     "ai": "source branch only; final PR/gates pending",
     "infra_tools": "source branch only; full PR regressions pending"
-  }
+  },
+  "development_cancelled_runs": [
+    {
+      "run_id": 39794406776,
+      "infra": "6d48581b4752cf26f480453d82ba7f82198228dd",
+      "reason": "superseded before native execution by fixture-only polling/framing diagnostics"
+    }
+  ]
 }

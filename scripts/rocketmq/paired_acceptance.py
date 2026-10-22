@@ -32,7 +32,7 @@ FULL_CASES = CORE_CASES | frozenset((
 FLAGS = frozenset(('system_login_not_claimed', 'real_provider_not_claimed',
     'public_http_not_claimed', 'packet_fault_not_claimed', 'synthetic_evidence_source'))
 FIELDS = FLAGS | {'cases','passed','failed','skipped','root','sdk_go','sdk_python',
-                 'client_python','python','profile','go_phase'}
+                 'client_python','python','profile','go_phase','delivery_errors','last_observation'}
 GO_PHASES = frozenset(('not_started','ready','invalid_ready','private_configuration',
     'mysql_admin','create_owned_schema','mysql_primary','mysql_pool','migration_source',
     'explicit_migrations','owner_binding','fixture_admission','local_workload_keys',
@@ -42,6 +42,22 @@ GO_PHASES = frozenset(('not_started','ready','invalid_ready','private_configurat
     'payload_close','control_write','control_read','control_received','control_output',
     'control_waiting','facts_operation','facts_evaluation_projection','facts_projection',
     'facts_command_archive','facts_archive_identities','facts_archive_evidence','facts_counts'))
+DELIVERY_ERRORS = frozenset({'other'} | {'grpc_' + name for name in (
+    'OK','CANCELLED','UNKNOWN','INVALID_ARGUMENT','DEADLINE_EXCEEDED','NOT_FOUND',
+    'ALREADY_EXISTS','PERMISSION_DENIED','RESOURCE_EXHAUSTED','FAILED_PRECONDITION',
+    'ABORTED','OUT_OF_RANGE','UNIMPLEMENTED','INTERNAL','UNAVAILABLE','DATA_LOSS',
+    'UNAUTHENTICATED')})
+
+
+def valid_observation(value):
+    return (isinstance(value,dict)
+        and set(value) == {'polls','payload_calls','ack_count','operation_status'}
+        and all(type(value[k]) is int and 0 <= value[k] <= 100000
+                for k in ('polls','payload_calls','ack_count'))
+        and isinstance(value['operation_status'],str)
+        and value['operation_status'] in {'unobserved','submitted','accepted','held','rejected'})
+
+
 MARKER = 'M3_PAIRED_HOST_RECEIPT '
 SDK_SHA256 = '570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2'
 
@@ -81,6 +97,10 @@ def read_receipt(output, *, full=False, partial=False):
             or (value['sdk_go'],value['sdk_python'],value['client_python']) != (
                 'v0.5.0-rocketmq-tx.2','0.4.0a2','5.1.2')
             or value['profile'] != ('full' if full else 'core')
+            or not isinstance(value['delivery_errors'],list)
+            or any(not isinstance(v,str) or v not in DELIVERY_ERRORS for v in value['delivery_errors'])
+            or len(value['delivery_errors']) > len(DELIVERY_ERRORS)
+            or not valid_observation(value['last_observation'])
             or not isinstance(value['go_phase'],str) or value['go_phase'] not in GO_PHASES
             or not isinstance(value['python'],str)
             or re.fullmatch(r'3\.(11|13)\.\d{1,3}',value['python']) is None
