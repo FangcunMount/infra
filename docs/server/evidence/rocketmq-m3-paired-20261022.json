@@ -7,8 +7,8 @@
   "internal_gates": {
     "A": "completed",
     "B": "completed",
-    "C": "in_progress",
-    "D": "pending"
+    "C": "completed",
+    "D": "in_progress"
   },
   "source_baselines": {
     "qs": "be22b9274d1d7ab21abd3be24fb0ebde834ec78b",
@@ -178,7 +178,7 @@
     "core_is_development_only": true,
     "core_status": "passed and independently verified; full profile pending",
     "full_native_tests_collected": 5,
-    "full_status": "four native cases passed and evaluation start receipt loop reached; checkpoint fixture assertion corrected, final five-case rerun pending"
+    "full_status": "full single profile passed and independently verified; final six profiles and source/tool gates pending"
   },
   "core_acceptance": {
     "run_id": 39788646533,
@@ -195,9 +195,10 @@
     "scope": "core only; does not satisfy full T20"
   },
   "merge_status": {
-    "qs": "source branch only; final PR/gates pending",
-    "ai": "source branch only; final PR/gates pending",
-    "infra_tools": "source branch only; full PR regressions pending"
+    "qs": "draft PR420; source/doc candidate full gates pending",
+    "ai": "PR215 advanced to exact b55c7a6 final candidate; final CI pending",
+    "infra_tools": "no functional PR; full gate and final regressions pending",
+    "progress_pr150": "merged 6c863b2a44098e00257937a41e999543bfabb24e; exact tree verified"
   },
   "development_cancelled_runs": [
     {
@@ -233,6 +234,35 @@
       "failed_check": "Docs Hygiene & Facts",
       "cause": "source change committed without advancing documentation closure baseline",
       "resolution": "7ee34a3c6 updates only source baseline/date; 87 docs tests and post-commit facts passed"
+    },
+    {
+      "repo": "qs-ai",
+      "run_id": 39797121836,
+      "source": "0c7a53a3a9371918cd7d7d7c6cf8851cd92d4b31",
+      "status": "cancel_requested",
+      "reason": "superseded by checkpoint-only final candidate b55c7a6; not accepted as final source proof"
     }
-  ]
+  ],
+  "current_candidates": {
+    "qs": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+    "ai": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+    "infra": "da4630f5122cf9b788570f0f03aff7d4a8502716"
+  },
+  "full_single_acceptance": {
+    "report_sha256": "c460a3ca4fcea1cbd2c326e1f4c87cd42f7fef3cf721be2b9c8a66d99cee7f33",
+    "file": "rocketmq-paired-full-0-da4630f5122cf9b788570f0f03aff7d4a8502716",
+    "python": "3.11.16",
+    "mysql": "8.0.36",
+    "native": 5,
+    "evidence": 25,
+    "failed": 0,
+    "skipped": 0,
+    "cleanup_verified": true,
+    "all_source_hashes_verified": true,
+    "qs_source": "7ee34a3c6d10e47f38b963a0f1d2b25c1566ad3a",
+    "ai_source": "b55c7a61423db807d2746c38245a4a021e4f37c4",
+    "infra_source": "da4630f5122cf9b788570f0f03aff7d4a8502716",
+    "run_id": 39798461241,
+    "scope": "full five-case single-profile C gate; six-profile final D gate pending"
+  }
 }
