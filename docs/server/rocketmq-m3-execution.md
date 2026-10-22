@@ -1074,3 +1074,7 @@ GitHub官方报告Actions降级，TLS修正076129c的原生资源与回归仍排
 ### 2026-10-23：T21 原生开发门禁与最终完整门禁分开
 
 PR154暂时关闭进入定向调试；70f8931的实际资源作业39819488917保留运行，其余17个未完成的广域开发回归已取消并留本地收据，不记通过。后续只显式dispatch资源workflow；首个客户端bootstrap档固定10项、full_gate=false，不能代替完整120/4。冻结后重开PR154，全部required完整矩阵仍要通过。未修改SDK/Broker依赖版本、不移动任何tag、不执行生产。T22本地共享owner借用e37b41f92、有界关闭aa2bf63db及NORMAL工厂6540f1abf各自定向race通过，仍为离线准备，无PR/合并或门禁完成。
+
+### 2026-10-23：T21 越权状态映射已定位
+
+70f8931/39819488917的脱敏报告精确定位到m3-iam对qs-ai-command的首个越权请求，返回40100。固定5.5.1官方ResponseBuilder将AuthenticationException和AuthorizationException统一映射UNAUTHORIZED；此前40300预期错误，失败保留。修正为确切40100并增加每角色前后签名成功对照10项，完整矩阵130，开发bootstrap12；错误码、缺对照或凭据无效仍失败。真实TLS5、资源安装/幂等和4冲突此前通过不等于整个T21完成，进度仍20/36。

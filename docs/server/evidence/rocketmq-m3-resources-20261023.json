@@ -56,7 +56,8 @@
     "version": "5.5.1",
     "tls_system_config": "https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/remoting/src/main/java/org/apache/rocketmq/remoting/netty/TlsSystemConfig.java",
     "grpc_negotiator": "https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/ProxyAndTlsProtocolNegotiator.java",
-    "finding": "tlsTestModeEnable=false selects supplied keys; tls.server.mode defaults to permissive and controls gRPC and remoting together."
+    "finding": "tlsTestModeEnable=false selects supplied keys; tls.server.mode defaults to permissive and controls gRPC and remoting together.",
+    "authorization_status_mapping": "https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/v2/common/ResponseBuilder.java"
   },
   "qs_credentials": {
     "pr": "https://github.com/FangcunMount/qs-server/pull/421",
@@ -70,20 +71,21 @@
     "production_environment_pause_override": false
   },
   "pending": [
-    "verify TLS-only Broker and NameServer remoting plus MQAdmin",
-    "verify all120 transport outcomes and4 preflight conflicts",
+    "verify130 transport outcomes including10 signed credential controls and4 preflight conflicts",
     "verify current full CI and cleanup",
-    "merge infra source and update T21 completion separately"
+    "reopen PR154, merge infra source and update T21 completion separately"
   ],
   "worker_scope": {
     "source": "QS actual process/runtime_bootstrap.go and worker handlers",
     "final_role": "consume_only",
     "transaction_owners": [],
     "publish_allowed_topics": 0,
-    "required_transport_cases": 120,
+    "required_transport_cases": 130,
     "required_forbidden_cases": 84,
     "required_type_conflicts": 10,
-    "legacy_hold_replay": "must stop and hand off active responsibilities in T25/T32"
+    "legacy_hold_replay": "must stop and hand off active responsibilities in T25/T32",
+    "authenticated_control_cases": 10,
+    "authorization_denial_status": 40100
   },
   "tls_fix_first_run": {
     "run": 39814299493,
@@ -206,5 +208,25 @@
       "private_fixture_directory_removed": true
     },
     "diagnosis": "TLS5/5 and4 conflict checks passed; full native receipt stopped before first Pub case, next candidate adds bounded stage/class/status diagnostics without raw exceptions."
+  },
+  "authorization_mapping_run": {
+    "run": 39819488917,
+    "source": "70f89315c0ba42df6aadc954f2488b08c6a896c5",
+    "report_sha256": "aa96fd71da0d58c027fdf651ce82e04b96c9a5d0d1e32ea9787d8d8dcdb35110",
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "diagnostic": {
+      "phase": "m3-iam/publish/qs-ai-command",
+      "kind": "other",
+      "status": 40100
+    },
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "finding": "5.5.1 ResponseBuilder maps AuthenticationException and AuthorizationException to UNAUTHORIZED40100. The first denied foreign-topic query was correctly rejected; old expected40300 was wrong. No full gate passed."
   }
 }

@@ -11,7 +11,7 @@ from routes import permissions_v2, physical_topic_v2, validate_v2
 
 MANIFEST = 'components/rocketmq/serverd-routes-m3-v2.json'
 DIAGNOSTIC_KINDS = {'RuntimeError','ValueError','TimeoutError','AttributeError','TypeError',
-    'ForbiddenException','BadRequestException','IllegalStateException','IllegalArgumentException',
+    'ForbiddenException','UnauthorizedException','BadRequestException','IllegalStateException','IllegalArgumentException',
     'ClientException','Exception','other'}
 DIAGNOSTIC_STATUSES = {40000,40014,40100,40300,40400,40401,50000,50001,50400}
 
@@ -42,17 +42,19 @@ def expected_cases(document):
         'tls/wrong_san':'rejected','tls/plaintext':'rejected',
         'tls/verified_control_after_negatives':'allowed'}
     for role, grants in document['accounts'].items():
+        result[role+'/authentication/before'] = 'allowed'
+        result[role+'/authentication/after'] = 'allowed'
         allowed = {rows[i]['physical_topic'] for i in grants['publish']}
         permissions = permissions_v2(document,grants)
         for physical, row in sorted(topics.items()):
-            result[role+'/publish/'+row['id']] = 'allowed' if physical in allowed else 40300
+            result[role+'/publish/'+row['id']] = 'allowed' if physical in allowed else 40100
             if physical in allowed:
                 result[role+'/type/'+row['id']] = 40014
         for row in rows.values():
             if row['consumer_group']:
                 permitted = ('Sub' in permissions.get('Topic:'+row['physical_topic'],())
                     and 'Sub' in permissions.get('Group:'+row['consumer_group'],()))
-                result[role+'/subscribe/'+row['id']] = 'allowed' if permitted else 40300
+                result[role+'/subscribe/'+row['id']] = 'allowed' if permitted else 40100
     return result
 
 

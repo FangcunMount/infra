@@ -34,7 +34,7 @@ T21 在回环隔离 Broker 必须验证相同模板的可信 CA/SAN 正例、错
 
 `make rocketmq-m3-resources-test SDK_DIR=/path/to/fixed-sdk ROCKETMQ_TEST_IMAGE=owned-image` 复用 infra 隔离 Compose 生命周期及清理。显式 SDK 源码固定 `8de893b367cc797580799abd8325f41dd62356db`，原生权限探针固定 Python 客户端 5.1.2，Broker 5.5.1。探针不是 SDK/宿主业务验收。
 
-必需证据包括 120 个实际传输操作结果（含 84 个越权拒绝、10 个实际 Broker 错误类型拒绝和 TLS 正反例），以及类型、队列、凭据和 ACL 四类完整冲突拒绝。为证明服务端类型检查，隔离 raw-client 子类仅在本进程实例中关闭发送前类型校验；不修改 SDK、全局 factory 或生产配置。半消息成功后立即回滚，不产生业务提交。所需依赖缺失、缺项、跳过、未知错误码或不完整清理全部失败。
+必需证据包括 130 个实际传输操作结果（含每角色前后各一次的10个签名授权对照、84 个越权拒绝、10 个实际 Broker 错误类型拒绝和 TLS 正反例），以及类型、队列、凭据和 ACL 四类完整冲突拒绝。为证明服务端类型检查，隔离 raw-client 子类仅在本进程实例中关闭发送前类型校验；不修改 SDK、全局 factory 或生产配置。半消息成功后立即回滚，不产生业务提交。所需依赖缺失、缺项、跳过、未知错误码或不完整清理全部失败。
 
 报告记录源码、manifest/探针/锁摘要、实际 Broker 参数和镜像、结果及清理。只上传安全 JSON，不输出凭据、原正文或原生日志。原始客户端日志限制在临时私有目录，随所属 Compose、进程组和目录清理；首次失败仍保留安全计数及退出状态。T22 再验收全宿主装配、共享 owner 生命周期及预算，T23 验收宿主真实故障。
 
@@ -42,4 +42,6 @@ T21 在回环隔离 Broker 必须验证相同模板的可信 CA/SAN 正例、错
 
 实际worker入口只通过gRPC调用API业务根；唯一旧发布器用于retry-hold replay。最终worker为consume-only，不配置事务owner、Sender或Checker，不因迁移新增worker goroutine/配额。最终配置关闭发布准入并停止旧hold replay；旧hold/未来责任须在T25/T32具名交接或处置，不以越权失败代替退出活动扫描。旧126操作开发草案对应worker曾有发布授权；修正后保留全部现存Topic正反例，worker发布正例改成明确拒绝，移除其6个不适用的错误类型发布正例，最终120操作，不增加完成数。
 
-开发调试可以显式选择workflow_dispatch的bootstrap档，只安装首个IAM角色的两个Topic/一个Group，执行10个原生结果，不跑完整冲突矩阵，报告固定full_gate=false。PR与默认dispatch始终为full档，必须120个结果及4类冲突；bootstrap报告不能用于T21勾选或合并门禁。开发阶段暂时关闭PR154，仅手动运行定向原生workflow；冻结后重新打开同一PR并执行全部必需矩阵，不删除已有失败。
+开发调试可以显式选择workflow_dispatch的bootstrap档，只安装首个IAM角色的两个Topic/一个Group，执行12个原生结果，不跑完整冲突矩阵，报告固定full_gate=false。PR与默认dispatch始终为full档，必须130个结果及4类冲突；bootstrap报告不能用于T21勾选或合并门禁。开发阶段暂时关闭PR154，仅手动运行定向原生workflow；冻结后重新打开同一PR并执行全部必需矩阵，不删除已有失败。
+
+固定5.5.1的ResponseBuilder将认证和授权异常统一映射为40100（UNAUTHORIZED）。越权测试只接受该确切状态；每个角色在拒绝批次前后以同一凭据读取其获准Topic，两个成功对照都必须存在，避免错误凭据伪装为权限拒绝。类型错误仍要求40014。当前矩阵从120增加10个对照为130；保留旧失败和开发档来源，不修改任务总数。

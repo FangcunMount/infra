@@ -122,7 +122,18 @@ def run(config, cases, progress, *, tls_only=False):
         allowed = {routes[i]['physical_topic'] for i in grants['publish']}
         producer = BrokerTypeProbe(client_config, topics=allowed,
             checker=FixtureRollback(), tls_enable=True)
+        # A real signed Get using this exact account brackets every denied Pub
+        # and Sub batch. 5.5.1 maps both authentication and authorization to
+        # UNAUTHORIZED; a failed credential control can never pass the ACL gate.
+        control_topic = sorted({routes[i]['physical_topic'] for i in
+            grants['publish'] + grants['subscriptions']})[0]
+        control = BrokerTypeProbe(client_config, tls_enable=True)
+        def authenticate():
+            check_route(control, control_topic)
         try:
+            progress['phase'] = role+'/authentication/before'
+            authenticate()
+            cases[role+'/authentication/before'] = 'allowed'
             if allowed:
                 progress['phase'] = 'producer_bootstrap:'+role+'/route'
                 check_route(producer,sorted(allowed)[0])
@@ -161,9 +172,10 @@ def run(config, cases, progress, *, tls_only=False):
                     code = check_denied(lambda:send(wrong), {Code.MESSAGE_PROPERTY_CONFLICT_WITH_TYPE})
                     cases[role + '/type/' + route['id']] = code
                 else:
-                    cases[identity] = check_denied(send, {Code.FORBIDDEN})
+                    cases[identity] = check_denied(send, {Code.UNAUTHORIZED})
         finally:
             close(producer)
+            close(control)
         permissions = config['permissions'][role]
         for route in routes.values():
             if not route['consumer_group']:
@@ -187,9 +199,16 @@ def run(config, cases, progress, *, tls_only=False):
                     receive()
                     cases[identity] = 'allowed'
                 else:
-                    cases[identity] = check_denied(receive, {Code.FORBIDDEN})
+                    cases[identity] = check_denied(receive, {Code.UNAUTHORIZED})
             finally:
                 close(consumer)
+        control = BrokerTypeProbe(client_config, tls_enable=True)
+        try:
+            progress['phase'] = role+'/authentication/after'
+            check_route(control, control_topic)
+            cases[role+'/authentication/after'] = 'allowed'
+        finally:
+            close(control)
 
 
 def main():
