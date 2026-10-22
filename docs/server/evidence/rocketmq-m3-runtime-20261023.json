@@ -494,9 +494,9 @@
     ],
     "source_sha": "9304ba3d97c269f546f2749296574e06f7709d12",
     "resource_pair_source_sha": "c1d4a79f76fe7f868cfd8320270c80280d24b5bf",
-    "candidate_sha": "875160597fdd3acf870c695ef478b78eecdafb11",
+    "candidate_sha": "b32ca346949e63fdb20c0ff03d3e4b1dfaf83f25",
     "schema_target": "109/42",
-    "source_merged_into_main": false,
+    "source_merged_into_main": true,
     "unit_tests": {
       "packages": 6,
       "pass": 79,
@@ -628,8 +628,8 @@
       "No production/system login proof"
     ],
     "source_pr": "https://github.com/FangcunMount/qs-server/pull/426",
-    "source_current": "d85535bc726737a2a8d6e96a6e79128c0fae2b67",
-    "source_ci_status": "current required CI queued; old 13bfecc host audit import cycle failed, fixed by extraction and local all integration compile",
+    "source_current": "93968428287c2980c4d73743112bf3bbcad0f6e1",
+    "source_ci_status": "28 successful; one generated API job conditionally not applicable, not a skipped native test",
     "import_cycle_failure": {
       "run": "https://github.com/FangcunMount/qs-server/actions/runs/39845297016",
       "source": "13bfecc58963",
@@ -724,7 +724,7 @@
       "rerun_job": "120068188816",
       "rerun": "only failed job rerun after inspecting cause; now success; other two jobs retained"
     },
-    "source_pr_state": "temporarily closed for focused native debugging; final required CI will run after freeze; source remains reviewable on branch",
+    "source_pr_state": "merged after28 successful checks; generated API sync condition not applicable",
     "worker_runtime_failures": [
       {
         "run": "39846170583",
@@ -744,14 +744,25 @@
         "outcome": "half prepared, local committed and final commit confirmed; transport readiness passed;20s hold observation failed; no transport errors/consume outcomes, originalSQL count queries normal; full owned cleanup",
         "root_cause": "unknown; serial polling budget under one shared slot is being tested; no source business assertion removed",
         "diagnostic_limitation": "Admin helper injected unsupported -b into topicStatus; query unavailable, not evidence of empty Broker"
+      },
+      {
+        "run": "39851006275",
+        "source": "d85535bc726737a2a8d6e96a6e79128c0fae2b67",
+        "outcome": "60s paused-row observation also failed; sender confirmed and receive readiness passed; no race/test timeout; full owned cleanup",
+        "root_cause": "not established; later passes do not erase this failure",
+        "broker_diagnostics": "topic max_offset1; group broker_offset1/consumer_offset0/diff1; POP inflight0 is not proof that message was never received"
       }
     ],
     "worker_runtime_development_current": {
-      "run": "https://github.com/FangcunMount/infra/actions/runs/39851006275",
-      "infra": "73f34cb",
-      "source": "d85535bc726737a2a8d6e96a6e79128c0fae2b67",
-      "scope": "same original assertions, one shared slot,3 logical groups/max2 physical inputs with5s polls; fixture observation60s/RPC+handler3m; records actual observation latency, no production change",
-      "status": "running, not passed"
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39852491754",
+      "infra": "5ad64f22d3f9272589a89def8fdf0bc165f6d6d8",
+      "source": "93968428287c2980c4d73743112bf3bbcad0f6e1",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "paused_observation_ms": 29776,
+      "report_sha256": "f0e57283b263bd13fbffef56bec2d3cd69ea81c76ecc26aa4fbc54d5478f2bf9",
+      "status": "verified development only; separate full matrix below"
     },
     "local_verification_addendum": {
       "combined_six_packages": "72 race zero failed/skipped on integrated source before last diagnostic wrapper",
@@ -783,6 +794,161 @@
         }
       ]
     },
-    "regression_audit_index_sha256": "5858ebe1cd54068e88a4ab19cd007ff3577063f3bbab306cb4691601a061d4f0"
+    "regression_audit_index_sha256": "5858ebe1cd54068e88a4ab19cd007ff3577063f3bbab306cb4691601a061d4f0",
+    "worker_runtime_full": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39853362567",
+      "source": "93968428287c2980c4d73743112bf3bbcad0f6e1",
+      "infra": "5ad64f22d3f9272589a89def8fdf0bc165f6d6d8",
+      "status": "verified three profiles,11 cases each,zero failed/skipped,all owned cleanup",
+      "reports": [
+        {
+          "sha256": "9ff12df8a307136caa9932c9c94577c8324d4ff3c40632ba4bc72d742d2ed785",
+          "mysql": "8.4.11",
+          "paused_observation_ms": 29804,
+          "source": "93968428287c2980c4d73743112bf3bbcad0f6e1",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "worker_cases": [
+            "actual_broker_paused_delivery_preserves_first_wire",
+            "explicit_schema_before_subscription",
+            "original_dispatcher_and_shared_execution_budget",
+            "real_broker_handler_drain_retains_grpc_until_return"
+          ],
+          "component_cases": [
+            "broken_first_link_rolls_back_new_physical_evidence",
+            "durable_eight_attempt_budget_and_one_manual_delivery",
+            "exact_wire_duplicate_and_legacy_refusal",
+            "explicit_schema_required",
+            "real_child_kill_retains_attempt_and_frozen_wire",
+            "real_expiry_new_claim_blocks_old_owner",
+            "sql_lock_budget_does_not_grant_execution"
+          ],
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        },
+        {
+          "sha256": "1a666c9fa04fa1e5c7d6b17c2ff710a50ed2a6e5d296422dfa1b11c94dea5ce4",
+          "mysql": "8.0.36",
+          "paused_observation_ms": 7504,
+          "source": "93968428287c2980c4d73743112bf3bbcad0f6e1",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "worker_cases": [
+            "actual_broker_paused_delivery_preserves_first_wire",
+            "explicit_schema_before_subscription",
+            "original_dispatcher_and_shared_execution_budget",
+            "real_broker_handler_drain_retains_grpc_until_return"
+          ],
+          "component_cases": [
+            "broken_first_link_rolls_back_new_physical_evidence",
+            "durable_eight_attempt_budget_and_one_manual_delivery",
+            "exact_wire_duplicate_and_legacy_refusal",
+            "explicit_schema_required",
+            "real_child_kill_retains_attempt_and_frozen_wire",
+            "real_expiry_new_claim_blocks_old_owner",
+            "sql_lock_budget_does_not_grant_execution"
+          ],
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        },
+        {
+          "sha256": "125cc0636cb88ac36353641ca6e833a3a98b8668345e77a1de60243eb92fdc19",
+          "mysql": "8.0.44",
+          "paused_observation_ms": 29776,
+          "source": "93968428287c2980c4d73743112bf3bbcad0f6e1",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "worker_cases": [
+            "actual_broker_paused_delivery_preserves_first_wire",
+            "explicit_schema_before_subscription",
+            "original_dispatcher_and_shared_execution_budget",
+            "real_broker_handler_drain_retains_grpc_until_return"
+          ],
+          "component_cases": [
+            "broken_first_link_rolls_back_new_physical_evidence",
+            "durable_eight_attempt_budget_and_one_manual_delivery",
+            "exact_wire_duplicate_and_legacy_refusal",
+            "explicit_schema_required",
+            "real_child_kill_retains_attempt_and_frozen_wire",
+            "real_expiry_new_claim_blocks_old_owner",
+            "sql_lock_budget_does_not_grant_execution"
+          ],
+          "sdk": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0-rocketmq-tx.2",
+            "Sum": "h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          }
+        }
+      ],
+      "scope": "actual worker Container/runtime/original handler/lifecycle with real Broker and MySQL; owned loopback downstream RPC fixture; does not prove whole apiserver/provider/system",
+      "observation_limit": "60s fixture budget; observed7504/29776/29804ms, one earlier60s failure remains unexplained; no production budget or quota change"
+    },
+    "infra_worker_runtime_pr": {
+      "pr": "https://github.com/FangcunMount/infra/pull/163",
+      "head": "3b30b904049d0a14704b042d0aefcbc4443b7b60",
+      "status": "draft; full current-head regression running"
+    },
+    "source_merge": {
+      "pr": 426,
+      "head": "b32ca346949e63fdb20c0ff03d3e4b1dfaf83f25",
+      "main": "c96a83d00ea62955f9dc12c58e2cee84b792c3e2",
+      "candidate_and_main_tree": "e648a67ff0cde6badb2208d2e801c7d922ada1ba",
+      "fresh_repo_production_deploy_paused": true,
+      "environment_override_present": false,
+      "deployment_claimed": false
+    }
+  },
+  "default_factory_native_batch": {
+    "status": "in_progress",
+    "scope": "actual default factory, original dual-store authoritative preflight and empty scans; no Broker or business dispatch/complete host claim",
+    "first_native_run": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39855965323",
+      "source": "947c1ebe36dd5ec5a7edddf31d77f6d3a2a3ce6f",
+      "infra": "316805359a9e650c9c11901d312fec89503bc116",
+      "mysql": "8.0.36",
+      "mongo": "7.0.37",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "d8f4b87cd0b105542dc5f005c2cb7fb8ba32d0fadafad399df50c30591865a7b",
+      "endpoint_connections": 0,
+      "all_owned_cleanup_verified": true
+    },
+    "next_gate": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39856851094",
+      "source": "e0c01346180c1b02a57d2184e2a05083a4affcce",
+      "infra": "f6166573610ba8339e074237c3498e5b91c006c7",
+      "status": "running expected-red regression; must refuse second independent owner runtime on the same original database; fix only after reproduction"
+    }
   }
 }
