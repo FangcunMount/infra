@@ -628,7 +628,7 @@
       "No production/system login proof"
     ],
     "source_pr": "https://github.com/FangcunMount/qs-server/pull/426",
-    "source_current": "8fb35d344a4685d3f164ae68dddf9791e15a439e",
+    "source_current": "7ffae7470",
     "source_ci_status": "current required CI queued; old 13bfecc host audit import cycle failed, fixed by extraction and local all integration compile",
     "import_cycle_failure": {
       "run": "https://github.com/FangcunMount/qs-server/actions/runs/39845297016",
@@ -657,6 +657,122 @@
         "run": "39846360702",
         "result": "canceled before acceptance; incorrect manually transcribed source SHA; corrected dispatch uses actual git rev-parse HEAD"
       }
-    ]
+    ],
+    "native_rerun_current": {
+      "source": "8fb35d344a4685d3f164ae68dddf9791e15a439e",
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39846389533",
+      "status": "verified 3x7, zero failure/skip; all owned cleanup true",
+      "reports": [
+        {
+          "sha256": "1bdecb48cd1dec1e216712620ecbb6a367899e45a34558fc787396cc51f84d70",
+          "mysql_version": "8.0.44",
+          "source": "8fb35d344a4685d3f164ae68dddf9791e15a439e",
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "sha256": "9182d87b8832a69a8625f654a75536459fb83f7b2b714d0624bc2e7ac4161a74",
+          "mysql_version": "8.4.11",
+          "source": "8fb35d344a4685d3f164ae68dddf9791e15a439e",
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "sha256": "e72c41c37918cfc4d98f456cd2220e5beb4e04c2767087d78577c93bc88272db",
+          "mysql_version": "8.0.36",
+          "source": "8fb35d344a4685d3f164ae68dddf9791e15a439e",
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ]
+    },
+    "infra_merge": {
+      "pr": 159,
+      "head": "46c62c45919d719aa44501247f2b44f1ddda528d",
+      "main": "789dfcfd480aea8c84d5fd1d51df56d02b9d68ba",
+      "checks": 49,
+      "regression_reports": 53,
+      "status": "merged after all successful checks and report audit",
+      "base_drift": "current main vs tested base changed only execution Markdown/JSON; functional sources unchanged",
+      "cleanup": "51 reports have full owned Compose cleanup; original worker MySQL report has9 zero row counts/private removal and Stop containers success; M1 report has no cleanup field, do not invent one"
+    },
+    "infra_registry_failure": {
+      "run": "39844457263",
+      "job": "120053933950",
+      "failure": "Docker Hub fixed eclipse-temurin blob returned502 during build; no test executed/no report",
+      "rerun_job": "120068188816",
+      "rerun": "only failed job rerun after inspecting cause; now success; other two jobs retained"
+    },
+    "source_pr_state": "temporarily closed for focused native debugging; final required CI will run after freeze; source remains reviewable on branch",
+    "worker_runtime_failures": [
+      {
+        "run": "39846170583",
+        "source": "1ae0ebd0500e0b899867548225108d6a929b6477",
+        "outcome": "initial paused row not observed; no timeout/race; full owned cleanup",
+        "root_cause": "unknown"
+      },
+      {
+        "run": "39848361009",
+        "source": "9b78c5403f16e77f9a84ba6222e1c572d65d3898",
+        "outcome": "actual receive readiness passed; initial paused row still absent; original SQL queries succeed, holds/evidence/consume outcomes allzero; no timeout/race; full owned cleanup",
+        "root_cause": "unknown; intact frozen input/pause/owner guards separately pass inert contract test"
+      }
+    ],
+    "worker_runtime_development_current": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/39849972277",
+      "infra": "c8bc9cf",
+      "scope": "confirmed seed, actual runtime, bounded receive status codes and read-only topic offsets; original assertions retained",
+      "status": "running, not passed"
+    },
+    "local_verification_addendum": {
+      "combined_six_packages": "72 race zero failed/skipped on integrated source before last diagnostic wrapper",
+      "frozen_wire_contract": "1 race and lint passed; inert, no DB/Broker claim",
+      "expanded_tagged_lint": "failed on5 preexisting tagged transport-test issues (4 unchecked Close,1 unused constant); not claimed passed; normal transport+process and native process lint passed",
+      "docs_failure": "8fb source CI detected stale baselinec1; integrated47fe docs corrected baseline9b with88 tests/hygiene/facts pass; newest diagnostic source needs rebind before freeze",
+      "harness_tests": 125
+    },
+    "development_ci_cancellations": {
+      "source": "7ffae747096956d36e59461ec706d98acca45fd6",
+      "scope": "owned incomplete development PR426 runs only; completed results retained; final gate will rerun after freeze",
+      "runs": [
+        {
+          "run": "39849971906",
+          "cancel_requested": true
+        },
+        {
+          "run": "39849976805",
+          "cancel_requested": true
+        },
+        {
+          "run": "39849976830",
+          "cancel_requested": true
+        },
+        {
+          "run": "39849977028",
+          "cancel_requested": true
+        }
+      ]
+    }
   }
 }
