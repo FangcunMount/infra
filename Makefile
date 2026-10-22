@@ -1582,6 +1582,13 @@ service-ports: ## 显示所有服务端口
 rocketmq-validate rocketmq-up rocketmq-stop rocketmq-status rocketmq-logs:
 	@bash scripts/rocketmq/manage.sh $(@:rocketmq-%=%)
 
+.PHONY: rocketmq-m3-resources-test
+rocketmq-m3-resources-test: ## 仅隔离验证 M3 最终资源、ACL、类型与 TLS；不安装生产资源
+	$(call require_param,SDK_DIR,explicit fixed SDK source required)
+	$(call require_param,ROCKETMQ_TEST_IMAGE,owned immutable Broker image required)
+	python3 scripts/rocketmq/ci-transactions.py --m3-resources --sdk "$(SDK_DIR)" \
+		--image "$(ROCKETMQ_TEST_IMAGE)" --report "$(or $(ROCKETMQ_M3_RESOURCES_REPORT),rocketmq-m3-resources.json)"
+
 .PHONY: rocketmq-iam-test
 rocketmq-iam-test: ## 隔离验证 IAM 实际事务入口；SDK_DIR/IAM_DIR/ROCKETMQ_TEST_IMAGE 必须显式提供
 	$(call require_param,SDK_DIR,make rocketmq-iam-test SDK_DIR=/path/to/fixed-sdk IAM_DIR=/path/to/fixed-iam ROCKETMQ_TEST_IMAGE=owned-image)

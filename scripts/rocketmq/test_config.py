@@ -1,5 +1,7 @@
 import json
 import tempfile
+import os
+import subprocess
 import unittest
 from pathlib import Path
 from render import render
@@ -7,6 +9,25 @@ from routes import validate,physical_topic,consumer_group
 
 
 class ConfigurationTests(unittest.TestCase):
+    def test_both_java_server_roles_enforce_tls_even_after_caller_jvm_options(self):
+        root=Path(__file__).resolve().parents[2]
+        with tempfile.TemporaryDirectory() as directory:
+            home=Path(directory);(home/'bin').mkdir()
+            java=home/'bin/java'
+            java.write_text('#!/bin/sh\nprintf "%s\\n" "$@" > "$TEST_ARGS_FILE"\n')
+            java.chmod(0o700)
+            for role in ('nameserver','broker'):
+                capture=home/(role+'.args')
+                subprocess.run(['bash',str(root/'components/rocketmq/entrypoint.sh'),role],
+                    env=dict(os.environ,JAVA_HOME=str(home),JAVA_OPT_EXT='-Xmx128m -Dtls.server.mode=permissive',
+                             TEST_ARGS_FILE=str(capture)),check=True,capture_output=True)
+                args=capture.read_text().splitlines()
+                modes=[arg for arg in args if arg.startswith('-Dtls.server.mode=')]
+                self.assertEqual(modes[-1],'-Dtls.server.mode=enforcing')
+                self.assertIn('-Dtls.test.mode.enable=false',args)
+                self.assertIn('-Dtls.server.keyPath=/etc/rocketmq/tls/server.key',args)
+                self.assertIn('-Dtls.server.certPath=/etc/rocketmq/tls/server.crt',args)
+
     def test_private_renderer_enables_flush_auth_and_distinct_accounts(self):
         templates=Path(__file__).resolve().parents[2]/"components/rocketmq"
         with tempfile.TemporaryDirectory() as d:

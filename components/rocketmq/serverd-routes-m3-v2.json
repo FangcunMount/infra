@@ -1,0 +1,189 @@
+{
+  "version": 2,
+  "topic_options": {
+    "read_queue_nums": 1,
+    "write_queue_nums": 1,
+    "perm": 6
+  },
+  "group_options": {
+    "retry_queue_nums": 8
+  },
+  "routes": [
+    {
+      "id": "iam-authz-iam",
+      "topic": "iam.authz.version.v2",
+      "subscription": "iam-policy-sync.iam-primary-1",
+      "message_type": "TRANSACTION",
+      "owner": "iam.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_d5784a735b691b0beda4d5e5d27727b0",
+      "consumer_group": "rmq2_g_caea451c856c9d070c4d98937cf3d455"
+    },
+    {
+      "id": "iam-authz-qs",
+      "topic": "iam.authz.version.v2",
+      "subscription": "qs-authz-sync-apiserver-qs-apiserver-1",
+      "message_type": "TRANSACTION",
+      "owner": "iam.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_d5784a735b691b0beda4d5e5d27727b0",
+      "consumer_group": "rmq2_g_f39948626178a8826473440d2af2bea2"
+    },
+    {
+      "id": "iam-sms",
+      "topic": "iam.notify.sms",
+      "subscription": "",
+      "message_type": "NORMAL",
+      "owner": "iam.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_a52d2c8d9a6ba5229d8c34ff3f828b1e",
+      "consumer_group": ""
+    },
+    {
+      "id": "qs-survey-worker",
+      "topic": "qs.survey.lifecycle",
+      "subscription": "qs-worker",
+      "message_type": "NORMAL",
+      "owner": "qs.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_e093a39dd58a0085979347c160911d22",
+      "consumer_group": "rmq2_g_cd01b0229ac8ce4e3b35fc84d0ec241b"
+    },
+    {
+      "id": "qs-survey-catalog",
+      "topic": "qs.survey.lifecycle",
+      "subscription": "qs-apiserver-modelcatalog-hot-rank-v1",
+      "message_type": "NORMAL",
+      "owner": "qs.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_e093a39dd58a0085979347c160911d22",
+      "consumer_group": "rmq2_g_819c7935a80e1deaff9d9183f097a4de"
+    },
+    {
+      "id": "qs-evaluation-mysql",
+      "topic": "qs.evaluation.lifecycle",
+      "subscription": "qs-worker",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_f8513086d2e7f2155fb9875c039a1a47",
+      "consumer_group": "rmq2_g_7bb901843f272104b0be12177e0a472a"
+    },
+    {
+      "id": "qs-evaluation-mongo",
+      "topic": "qs.evaluation.lifecycle",
+      "subscription": "qs-worker",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mongo",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_99b374cae35ddb4c549a513e5b20e6c9",
+      "consumer_group": "rmq2_g_7bb901843f272104b0be12177e0a472a"
+    },
+    {
+      "id": "qs-task-normal",
+      "topic": "qs.plan.task",
+      "subscription": "qs-worker",
+      "message_type": "NORMAL",
+      "owner": "qs.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_e216bf5d9a3bb731db6180efea06365e",
+      "consumer_group": "rmq2_g_2664bfced560b00143ddd453766d620f"
+    },
+    {
+      "id": "qs-task-transaction",
+      "topic": "qs.plan.task",
+      "subscription": "qs-worker",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_50fafcf8477fa156a6f9b46bccac0638",
+      "consumer_group": "rmq2_g_2664bfced560b00143ddd453766d620f"
+    },
+    {
+      "id": "qs-ai-command",
+      "topic": "qs.ai.commands.v1",
+      "subscription": "qs-ai.commands.v1",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_3aa191459362e22de17098fb223344b2",
+      "consumer_group": "rmq2_g_396b9fde7dfa0a23f83de11c8abd53ff"
+    },
+    {
+      "id": "qs-ai-ack",
+      "topic": "qs.ai.acks.v1",
+      "subscription": "qs-ai.acks.v1",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_f605f539fa9db24e69f346d2089f8098",
+      "consumer_group": "rmq2_g_84e76836e227cd4954d16f6f937ff29c"
+    },
+    {
+      "id": "ai-qs-event",
+      "topic": "qs.ai.events.v1",
+      "subscription": "qs-server.ai-events.v1",
+      "message_type": "TRANSACTION",
+      "owner": "ai.mysql",
+      "route_revision": "m3-1",
+      "physical_topic": "rmq2_t_9336fe19e37ff6fdb14bd39230c6997b",
+      "consumer_group": "rmq2_g_f39e44e367173c58d4e5120f02afbac3"
+    }
+  ],
+  "accounts": {
+    "m3-iam": {
+      "owner": "iam.mysql",
+      "publish": [
+        "iam-authz-iam",
+        "iam-sms"
+      ],
+      "subscriptions": [
+        "iam-authz-iam"
+      ]
+    },
+    "m3-qs-apiserver": {
+      "owner": "qs.mysql",
+      "publish": [
+        "qs-survey-worker",
+        "qs-survey-catalog",
+        "qs-evaluation-mysql",
+        "qs-task-normal",
+        "qs-task-transaction",
+        "qs-ai-command",
+        "qs-ai-ack"
+      ],
+      "subscriptions": [
+        "iam-authz-qs",
+        "qs-survey-catalog",
+        "ai-qs-event"
+      ]
+    },
+    "m3-qs-worker": {
+      "publish": [],
+      "subscriptions": [
+        "qs-survey-worker",
+        "qs-evaluation-mysql",
+        "qs-evaluation-mongo",
+        "qs-task-normal",
+        "qs-task-transaction"
+      ]
+    },
+    "m3-qs-mongo": {
+      "owner": "qs.mongo",
+      "publish": [
+        "qs-evaluation-mongo"
+      ],
+      "subscriptions": []
+    },
+    "m3-ai": {
+      "owner": "ai.mysql",
+      "publish": [
+        "ai-qs-event"
+      ],
+      "subscriptions": [
+        "qs-ai-command",
+        "qs-ai-ack"
+      ]
+    }
+  }
+}

@@ -65,7 +65,7 @@ def main():
     secret.write_text(json.dumps(credentials)); secret.chmod(0o600)
     render(credentials, config, "127.0.0.1", repo / "components/rocketmq")
     command(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
-             "-subj", "/CN=rocketmq-m1-ci", "-addext", "subjectAltName=IP:127.0.0.1,DNS:localhost",
+             "-subj", "/CN=rocketmq-m1-ci", "-addext", "subjectAltName=IP:127.0.0.1,DNS:localhost,DNS:nameserver,DNS:broker",
              "-keyout", str(config / "tls/server.key"), "-out", str(config / "tls/server.crt")])
     ca = directory / "ca.crt"
     shutil.copyfile(config / "tls/server.crt", ca)

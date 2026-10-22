@@ -191,6 +191,7 @@ def main():
     parser.add_argument("--mysql-image", default="mysql:8.0.36")
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
+    parser.add_argument("--m3-resources", action="store_true", help="isolated final M3 manifest/ACL/type/TLS proof only; no production changes")
     parser.add_argument("--iam-host", type=Path, help="exact IAM checkout; require actual host SDK/Broker acceptance in the owned fixture")
     parser.add_argument("--qs-evaluation-host", type=Path, help="exact QS checkout; require real MySQL evaluation application/Broker profile")
     parser.add_argument("--qs-evaluation-private-log", type=Path, help="new0600 diagnostic in an owned0700 directory; never a CI artifact")
@@ -218,6 +219,8 @@ def main():
     parser.add_argument("--qs-event-host", type=Path, help="exact QS checkout; authenticated event Inbox/projection and original ACK SQL root")
     parser.add_argument("--ai-admission-host", type=Path, help="exact AI checkout; real published Python SDK and original admission roots/Broker")
     args = parser.parse_args()
+    if args.m3_resources and (args.iam_host or args.sdk_api_go or args.sdk_api_python or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host):
+        parser.error("M3 resource proof is a separate required profile")
     if args.ai_admission_host and (args.iam_host or args.sdk_api_go or args.sdk_api_python or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host):
         parser.error("AI admission host is a separate required profile")
     if args.qs_event_host and (args.iam_host or args.sdk_api_go or args.sdk_api_python or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host):
@@ -280,7 +283,7 @@ def main():
     proxy["grpcServerPort"] = grpc_port
     (config / "proxy.json").write_text(json.dumps(proxy))
     run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
-         "-subj", "/CN=rocketmq-m2-isolated", "-addext", "subjectAltName=IP:127.0.0.1,DNS:localhost",
+         "-subj", "/CN=rocketmq-m2-isolated", "-addext", "subjectAltName=IP:127.0.0.1,DNS:localhost,DNS:nameserver,DNS:broker",
          "-keyout", str(config / "tls/server.key"), "-out", str(config / "tls/server.crt")])
     ca = directory / "ca.crt"
     shutil.copyfile(config / "tls/server.crt", ca)
@@ -474,6 +477,15 @@ def main():
         proof["mysql_version"] = sql("SELECT VERSION();")
         if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
+        if args.m3_resources:
+            from m3_resources import run_resources
+            proof['m3_resources'] = {}
+            run_resources(repo,directory,broker,project,grpc_port,ca,run,owned_native_run,proof['m3_resources'])
+            for name in proof['m3_resources']['native_receipt']['cases']:
+                passed('m3_resources/'+name)
+            for name in proof['m3_resources']['conflicts_refused_without_mutation']:
+                passed('m3_resources/conflict/'+name)
+            return
         if args.ai_admission_host:
             from ai_admission_acceptance import run_ai_admission_host
             kind = os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission')
@@ -869,6 +881,17 @@ def main():
         report["sdk_source_sha256"] = {str(p.relative_to(sdk)): hashlib.sha256(p.read_bytes()).hexdigest()
                                        for p in sorted(sdk_sources.rglob("*")) if p.is_file()}
         report["sdk_sha"] = run(["git", "rev-parse", "HEAD"], cwd=sdk).stdout.strip()
+        if args.m3_resources:
+            report['batch'] = 'M3-production-candidate-resources-isolated'
+            if proof.get('m3_resources',{}).get('profile')=='bootstrap':
+                report['batch']='M3-resource-bootstrap-development-only'
+            report['limits'] = ['Isolated transport ACL/type/TLS and provisioning proof only',
+                'No production resources, private-network reachability, host startup, system login or business acceptance']
+            report['resource_harness_sha256'] = {name:hashlib.sha256((repo/name).read_bytes()).hexdigest()
+                for name in ('scripts/rocketmq/m3_resources.py','scripts/rocketmq/m3_resource_probe.py',
+                             'components/rocketmq/serverd-routes-m3-v2.json','scripts/rocketmq/txprobe/uv.lock',
+                             'components/rocketmq/Dockerfile','components/rocketmq/entrypoint.sh',
+                             'components/rocketmq/proxy.json.example')}
         report["go_version"] = run(["go", "env", "GOVERSION"], cwd=sdk).stdout.strip()
         api_binary = args.sdk_go_probe or directory / "sdk-go-probe"
         if args.sdk_api_go and api_binary.is_file():
