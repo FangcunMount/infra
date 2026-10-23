@@ -5,6 +5,10 @@ on:
     paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '!scripts/rocketmq/ai_finalization_*', '!scripts/rocketmq/test_ai_finalization_*', '.github/workflows/rocketmq-limits.yml']
   workflow_dispatch:
     inputs:
+      native_dlq:
+        description: Isolated native DLQ index audit only; not complete SDK transaction acceptance
+        type: boolean
+        default: false
       sdk_ref:
         description: Exact candidate SDK revision
         type: string
@@ -19,6 +23,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   sdk:
+    if: github.event_name == 'pull_request' || !inputs.native_dlq
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     strategy:
@@ -60,5 +65,45 @@ jobs:
         with:
           name: rocketmq-complete-sdk-${{ strategy.job-index }}-${{ github.sha }}
           path: rocketmq-complete-sdk.json
+          if-no-files-found: error
+          retention-days: 14
+
+  native-index-audit:
+    if: github.event_name == 'pull_request' || inputs.native_dlq
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 8de893b367cc797580799abd8325f41dd62356db
+          path: .sdk-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: scripts/rocketmq/probes/native-dead-letter/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.11'
+      - name: Strict index privacy and isolated profile guards
+        run: |
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_native_dead_letter*.py'
+          (cd scripts/rocketmq/probes/native-dead-letter && go test -race ./...)
+      - name: Verify archive and build exact isolated Broker
+        run: |
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-native-audit:5.5.1 components/rocketmq
+      - name: Required real native DLQ and read-only index export
+        run: |
+          make rocketmq-native-dlq-audit-test SDK_DIR="$PWD/.sdk-acceptance" \
+            ROCKETMQ_TEST_IMAGE=rocketmq-native-audit:5.5.1 \
+            ROCKETMQ_NATIVE_AUDIT_REPORT=rocketmq-native-dlq-audit.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-native-dlq-audit-${{ github.sha }}
+          path: rocketmq-native-dlq-audit.json
           if-no-files-found: error
           retention-days: 14

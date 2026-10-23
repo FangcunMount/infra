@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "batch": "M3-T24-protocol-observability",
+  "status": "in_progress",
+  "task_completed": false,
+  "global_progress": {
+    "m3_completed": 23,
+    "m3_total": 36,
+    "m4_completed": 0,
+    "m4_total": 8
+  },
+  "native_dlq": {
+    "run_url": "https://github.com/FangcunMount/infra/actions/runs/39916396134",
+    "job_url": "https://github.com/FangcunMount/infra/actions/runs/39916396134/job/120290798952",
+    "infra_sha": "0372f588ab025cf9e8cadb0025c89758943ac28b",
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "report_sha256": "cb52cad97381ff47036980b9e23fdf8ba02fb53d8d3912ba47b4fbaed4b0e5cf",
+    "audit_sha256": "b35b76065ad78ee0ca3331f989255c1fa7b36a10a140496da18e625bd42c9222",
+    "sdk_module": {
+      "Path": "github.com/FangcunMount/reliable-messaging",
+      "Version": "v0.5.0-rocketmq-tx.3",
+      "Sum": "h1:25yHjaHAcZYjp96+iNVJyYbdnDPvR6p16J06KeG0sP4=",
+      "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+    },
+    "isolated_group_parameters": {
+      "retryMaxTimes": 1,
+      "retryQueueNums": 8,
+      "consumeEnable": true
+    },
+    "index": {
+      "records": 1,
+      "read_only": true,
+      "body_exported": false,
+      "mode": "0600",
+      "key_sha256": "96a8c1d7b9cda6c8d765076f06db381463171a5b3c140e11f8be324b8e0b65eb",
+      "manifest_sha256": "6092dc7f8043db0d162f0a0a20db0e443ee46f84c6dcc8b1ddac325b68f5c9b4",
+      "records_sha256": "fc8de399dc4518866e014a465149efe42e3cdb4245188da1017a75832b13d72a",
+      "repeat_records_unchanged": true,
+      "candidate_owners": [
+        "qs.mysql"
+      ],
+      "owner_scope_ambiguous": false,
+      "query_scope": "one_key_one_group_not_global_inventory",
+      "cli_exit_code": 2
+    },
+    "closed": {
+      "application_ack_calls": 0,
+      "closed": true,
+      "event": "closed",
+      "failed_handoff_calls": 2,
+      "handler_calls": 1,
+      "published": 1,
+      "wire_mismatches": 0
+    },
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "audit_cli_exit_codes": [
+      1,
+      2,
+      2
+    ],
+    "limitations": [
+      "Read-only one-key index, not a global DLQ inventory",
+      "One initial unavailable query retained; two positive read-only queries exited critical=2 as designed",
+      "No host transaction/database, production or system acceptance"
+    ]
+  },
+  "delivery": {
+    "source_merged": false,
+    "stable_sdk_released": false,
+    "production_deployed": false,
+    "system_accepted": false,
+    "observation_48h_completed": false
+  },
+  "remaining": [
+    "Positive post-RPC recovery audit across Go/Python storage adapters",
+    "Host protocol metrics and explicit admission protection",
+    "Prometheus alert tests and full current-head CI"
+  ]
+}

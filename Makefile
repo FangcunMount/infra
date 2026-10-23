@@ -1646,3 +1646,9 @@ rocketmq-paired-host-test: ## 隔离验证最终 QS/AI 原业务闭环；core �
 		python3 scripts/rocketmq/ci-transactions.py --sdk "$(SDK_DIR)" --ai-admission-host "$(AI_DIR)" \
 		--image "$(ROCKETMQ_TEST_IMAGE)" --mysql-image "$(or $(ROCKETMQ_TEST_MYSQL_IMAGE),mysql:8.0.36)" \
 		--report "$(or $(ROCKETMQ_PAIRED_REPORT),rocketmq-paired.json)"
+
+.PHONY: rocketmq-native-dlq-audit-test
+rocketmq-native-dlq-audit-test: ## 隔离验证原生DLQ与只读索引；不操作生产或业务数据库
+	python3 scripts/rocketmq/ci-transactions.py --sdk "$(SDK_DIR)" --native-dlq-audit --image "$(ROCKETMQ_TEST_IMAGE)" --report "$(ROCKETMQ_NATIVE_AUDIT_REPORT)"
+
+ROCKETMQ_NATIVE_AUDIT_REPORT ?= rocketmq-native-dlq-audit.json
