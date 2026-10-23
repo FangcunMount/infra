@@ -15,7 +15,7 @@ CASES = frozenset((
     'producer_sigkill_exit_negative9', 'same_primary_epoch_readonly_resume_no_new_half',
     'new_paused_broker_commit_callback', 'same_first_command_wire_after_resume',
     'recovered_pair_receipt_state_ack_without_model', 'recovered_process_resources_drained',
-    'ai_root_witness_committed_before_broker_kill', 'actual_final_rpc_unknown_after_committed_root',
+    'ai_half_prepared_before_broker_kill', 'actual_final_rpc_unknown_after_committed_root',
     'broker_sigkill_and_same_container_restart', 'broker_recheck_original_ai_first_wire',
     'pair_both_business_acks_without_executor_replay', 'no_additional_model_or_old_business_executor',
     'broker_fault_resources_drained'))
@@ -61,7 +61,7 @@ def parse_receipt(output, junit, ai_sha, qs_sha, *, full):
         original_root_lock_wait_observed=True,old_exit_code=-9,distinct_producer_pid=True,
         old_seals=1,recovered_completed_results=0,recovered_half_prepared=0,
         original_wire_unchanged=True,final_recovered_seals=2,provider_invocations=0)
-    b_expected = dict(local_calls=1,half_prepared=2,actual_final_unknown=2,pending_calls=0,
+    b_expected = dict(local_calls=1,half_prepared_before_kill=2,local_calls_before_kill=0,half_prepared=2,actual_final_unknown=2,pending_calls=0,
         provider_invocations=0)
     for row, expected, count, original, replacements in (
             (q,q_expected,'recovered_broker_commit_checks',-9,[0]),
@@ -94,11 +94,43 @@ def parse_receipt(output, junit, ai_sha, qs_sha, *, full):
     return r
 
 
+
+def read_partial_receipt(output, ai_sha, qs_sha):
+    """Export only fixed case names and integer diagnostics from failed native output."""
+    marker = 'M3_PAIRED_FAULT_RECEIPT '
+    lines = [line.split(marker,1)[1] for line in output.splitlines() if marker+'{' in line]
+    if len(lines) != 1 or len(lines[0]) > 16384:
+        return None
+    try:
+        r = json.loads(lines[0])
+    except (ValueError,TypeError):
+        return None
+    if (not isinstance(r,dict) or r.get('source_sha') != ai_sha or r.get('qs_source_sha') != qs_sha
+            or r.get('scope') != SCOPE or not isinstance(r.get('cases'),dict)
+            or not set(r['cases']).issubset(CASES) or any(v is not True for v in r['cases'].values())
+            or any(not bounded_int(r.get(k),0) for k in ('passed','failed','skipped'))
+            or r['passed'] != len(r['cases']) or not isinstance(r.get('proof'),dict)):
+        return None
+    allowed = ('half_prepared_before_loss','old_exit_code','old_seals',
+        'recovered_completed_results','recovered_half_prepared','recovered_broker_commit_checks',
+        'final_recovered_seals','provider_invocations','local_calls','half_prepared',
+        'actual_final_unknown','broker_commit_checks','pending_calls',
+        'half_prepared_before_kill','local_calls_before_kill')
+    counters = {}
+    for fault in ('qs_sigkill','broker_restart'):
+        row = r['proof'].get(fault)
+        if isinstance(row,dict):
+            counters[fault] = {key:row[key] for key in allowed if bounded_int(row.get(key),-9)}
+    return dict(cases=r['cases'],passed=r['passed'],failed=r['failed'],skipped=r['skipped'],
+        counters=counters,partial=True,complete_acceptance_claimed=False)
+
+
 def write_control(path, content):
     if path.exists() or path.parent.stat().st_mode & 0o077:
         raise RuntimeError('new control in owned0700 fixture required')
-    with path.open('x') as stream:
-        path.chmod(0o600)
+    fd = os.open(path,os.O_WRONLY | os.O_CREAT | os.O_EXCL,0o600)
+    os.fchmod(fd,0o600)
+    with os.fdopen(fd,'w') as stream:
         stream.write(content)
 
 
@@ -113,7 +145,7 @@ def run_profile(source,directory,env,command,run,proof,native_runner,broker_faul
     config_path.write_text(json.dumps(config)); config_path.chmod(0o600)
     def supervise(native):
         try:
-            native.wait('ai_root_committed',timeout=600)
+            native.wait('ai_half_prepared',timeout=600)
             proof['broker_kill'] = broker_fault.kill()
             write_control(paths['broker_killed'],'broker-killed')
             native.wait('final_unknown_observed',timeout=80)
@@ -133,6 +165,16 @@ def run_profile(source,directory,env,command,run,proof,native_runner,broker_faul
         assertion_lines=sorted(set(map(int,re.findall(r'rocketmq_paired_faults\.py:(\d+)',raw))))[:32])
     if junit.exists(): junit.chmod(0o600)
     if result.returncode or not junit.is_file():
+        from ai_admission_acceptance import host_failure_diagnostics
+        proof['diagnostics'] = host_failure_diagnostics(raw,
+            ('rocketmq_paired_host.py','rocketmq_paired_faults.py'),
+            TESTS | (FULL_TESTS if full else frozenset()))
+        partial = read_receipt(raw,full=full,partial=True,marker='M3_PAIRED_BASELINE_RECEIPT ')
+        if partial is not None:
+            proof['partial_baseline_receipt'] = partial
+        fault_partial = read_partial_receipt(raw,proof['source_sha'],proof['paired_qs']['source_sha'])
+        if fault_partial is not None:
+            proof['partial_fault_receipt'] = fault_partial
         raise RuntimeError('actual paired host fault failed; private output withheld')
     proof['junit_sha256'] = hashlib.sha256(junit.read_bytes()).hexdigest()
     receipt = parse_receipt(raw,junit.read_text(),proof['source_sha'],proof['paired_qs']['source_sha'],full=full)

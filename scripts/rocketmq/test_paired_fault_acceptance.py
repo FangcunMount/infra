@@ -4,7 +4,7 @@ from pathlib import Path
 import unittest
 import xml.etree.ElementTree as ET
 
-from paired_fault_acceptance import CASES, TESTS, SCOPE, parse_receipt, write_control
+from paired_fault_acceptance import CASES, TESTS, SCOPE, parse_receipt, read_partial_receipt, write_control
 from paired_acceptance import FULL_TESTS
 from test_paired_acceptance import receipt as baseline
 
@@ -21,7 +21,7 @@ def receipt(full=False):
             original_wire_unchanged=True,final_recovered_seals=2,provider_invocations=0,
             recovered_broker_commit_checks=1,resources=dict(closed=True,private_files_removed=True,
                 original_exit_code=-9,replacement_exit_codes=[0])),
-            broker_restart=dict(local_calls=1,half_prepared=2,actual_final_unknown=2,
+            broker_restart=dict(local_calls=1,half_prepared_before_kill=2,local_calls_before_kill=0,half_prepared=2,actual_final_unknown=2,
                 broker_commit_checks=2,pending_calls=0,provider_invocations=0,
                 resources=dict(closed=True,private_files_removed=True,original_exit_code=0,
                     replacement_exit_codes=[]))))
@@ -63,6 +63,17 @@ class PairedFaultAcceptanceTests(unittest.TestCase):
         for change in changes:
             row=receipt();change(row)
             with self.assertRaises(RuntimeError):parse_receipt(output(row),xml(),AI,QS,full=False)
+
+    def test_partial_failure_exports_only_known_counters_not_private_values(self):
+        row=receipt();row['failed']=1
+        row['proof']['broker_restart']['raw_wire']='private'
+        row['proof']['broker_restart']['local_calls']=True
+        partial=read_partial_receipt(output(row),AI,QS)
+        self.assertFalse(partial['complete_acceptance_claimed'])
+        self.assertNotIn('private',json.dumps(partial))
+        self.assertNotIn('local_calls',partial['counters']['broker_restart'])
+        self.assertIsNone(read_partial_receipt(output(row),'c'*40,QS))
+        self.assertIsNone(read_partial_receipt(output(row)+'\n'+output(row),AI,QS))
 
     def test_owned_control_is_new_and_private(self):
         with tempfile.TemporaryDirectory() as directory:
