@@ -2,7 +2,7 @@
   "schema": "m3-cutover-tool-progress/v1",
   "m3_completed": 23,
   "m3_total": 36,
-  "t25_subgates_completed": 0,
+  "t25_subgates_completed": 1,
   "t25_subgates_total": 4,
   "nsq_drain": {
     "pr": "https://github.com/FangcunMount/infra/pull/189",
@@ -35,10 +35,65 @@
       },
       "production_tool_read_only": true,
       "cutover_authorized": false,
-      "other_pr_gates_complete": false
+      "other_pr_gates_complete": true
     },
-    "merge": "pending",
-    "other_ci": "pending"
+    "merge": "39b0bfe490e9b0e733a85cc38edfdc37e234928e",
+    "other_ci": "all_ten_checks_passed",
+    "ci_proof": {
+      "schema": "m3-infra-cutover-gate-proof/v1",
+      "source": "d06bb314658aac12c0703c72e73b1e0ec3657e82",
+      "checks_passed": 10,
+      "workflows": 6,
+      "reports": 14,
+      "report_index_sha256": "fe528ea5e8647b8cc0d8e38c57ccce9600fec6bd427828abe6784982430abad2",
+      "verified_harness_files": {
+        "scripts/rocketmq/ci-transactions.py": "631f59323fda500382f8b3d1e0650d954f2c4f27ae4ebcbb1ed8a49c0dac5f0c",
+        "scripts/rocketmq/render.py": "d2a91207804ca9f85ce15511edfbd1858a087e78141a5bd9668745d8cc72f4dc",
+        "components/rocketmq/docker-compose.yml": "a930c0286ed6749d4926cde886edc44b126a2c03fe67aba3d5bb9604f6258996",
+        "scripts/rocketmq/sdk_acceptance.py": "d89cdec6947464d9293d1f3ddb9bd261af6f0ae185b1842a7d813be43bf4c0c0",
+        "scripts/rocketmq/v2_acceptance.py": "c0f0a90ceb10bca8c5af0bb3815155abe6309b5665d4c58cd112d1320ac72b66",
+        "scripts/rocketmq/sdk_faults.py": "5f6dc071f3b9f5359b021439299b630053eb8c646c37cd38dc2db77cfc3490b7",
+        "scripts/rocketmq/sdk_limits.py": "422102ce805c2985c80e60d5a0fa0dd291ac5d44f13aa7f451709a94f9d250e1",
+        "scripts/rocketmq/audit_transaction_limit.py": "aa2f8538940034c35e0baf8bbfd328cfe6840442beaf1545e31b52405e3a02e9",
+        "scripts/rocketmq/routes.py": "914e784eb4ad841d6a0ac4b1d83e41454c5269a6cb3c13796e8b3b616cf77e31",
+        "scripts/rocketmq/provision_v2.py": "dd91c82de4a8e632da708aa504f8cabe50cc85115a59f6a8ba87e642542ee31e",
+        "scripts/rocketmq/route_read_probe.py": "474defeb3f2c28753b19bff285b97f41587611793c06f62cf21c2c54e6c791d3",
+        "scripts/rocketmq/failure_diagnostics.py": "e71357ab08fee26165f0c1f74e1dc4f6e833826ced7e8aa349235c434aa84261",
+        "scripts/rocketmq/published_runtime.py": "365f38543d08911917da4d185d500fe5d78e355326b829367876bb9f98d7414a",
+        "scripts/rocketmq/native_dead_letter_acceptance.py": "df617bd986e40e90abe5c29771982065c84a9bd64ba09570aaef9cc750ff72e5",
+        "scripts/rocketmq/audit_native_dead_letters.py": "e78be730310b256717356647ded4cca6f8f5b8fb0c17b5c5d2322871f40c4c23",
+        "scripts/rocketmq/provision.py": "39e7048ed5fdf7ef488cdc826361b94a225b061cdc522277e5f36c36237dc08b",
+        "scripts/rocketmq/probes/native-dead-letter/main.go": "d84efd6fcafa790a44621604cb35e6eeb7b1c9d35e420cf1abbabbd8d4b8f6e5",
+        "scripts/rocketmq/probes/native-dead-letter/go.mod": "251278990c6be26ed3bdf7c32debcf2b3753729a5ba5cf34f8d10f6a9e906e71",
+        "scripts/rocketmq/probes/native-dead-letter/go.sum": "92c5f568f75e70d286db969456098a11b1821449ac6765089ef0fac65717ea08",
+        "scripts/rocketmq/ci-nsq-drain.py": "fd04affd43d15a5887d4367fb4b42126380b71d6abbc5fbf7857f51a8bce5efb",
+        "scripts/rocketmq/nsq_drain_evidence.py": "b31f48f155ec1e493aae71cf2214e8331e13ea4c3550db2e9e0b8b1ee9aeb778"
+      },
+      "legacy_cleanup_limits": [
+        {
+          "report": "rocketmq-m1-evidence.json",
+          "run": "39954709040",
+          "explicit_cleanup_object": false,
+          "limit": "Source required finally and successful workflow only; no cleanup readback object invented"
+        }
+      ],
+      "base_sha": "f43172c55ef7c540b7a1b08c52752d0d2a2df52d",
+      "all_reports_failed": 0,
+      "all_reports_skipped": 0,
+      "production_deployed": false,
+      "legacy_bundle_checksums": {
+        "rocketmq-5.5.1-amd64.tar.gz": "f31b1dcd60a0857740fafa24c1a955effeb2a7c0548ecfad6c256bf6ebfecf1d",
+        "rocketmq-m1-evidence.json": "543705975fe2f2543b4d4b3b383f690fd079257b6dd05ac1900f64d880b43c23",
+        "rocketmq-m2-transactions.json": "db907bece462631d5d1079348c2179b8378b8d546744175b74b0faf2217f4f9b",
+        "rocketmq-m2-go-sdk.json": "a62782e6de1294f845b068ea4e0882a02762b0e49bebe1e614b4a8f820c9f84f"
+      }
+    },
+    "merge_delta_from_candidate": [
+      "docs/server/evidence/rocketmq-m3-cutover-20261023.json",
+      "docs/server/evidence/rocketmq-m3-host-observation-20261023.json",
+      "docs/server/rocketmq-m3-execution.md"
+    ],
+    "merge_delta_limit": "Only previously merged PR190 ledger/evidence differs; production tool, fixture, workflow and recovery documentation bytes preserved"
   },
   "failed_native_runs": [
     {
@@ -48,7 +103,9 @@
       "failed": 1,
       "skipped": 0,
       "cleanup_verified": true,
-      "limit": "initial report no stage classification; not relabelled with later diagnosis"
+      "limit": "initial report no stage classification; not relabelled with later diagnosis",
+      "report_sha256": "7d17205b54cf602c60bd5d6fc3d44817ae28b3d495bc2a94489ca8ec0de6c4ed",
+      "source_identity_kind": "workflow_head_reference_not_a_claim_of_reported_compiled_SHA"
     },
     {
       "run": 39953425532,
@@ -57,7 +114,9 @@
       "failed": 1,
       "skipped": 0,
       "cleanup_verified": true,
-      "limit": "initial report no stage classification"
+      "limit": "initial report no stage classification",
+      "report_sha256": "cd2d8540259b699030ac601b3b6f0d731abc625f4f68107dd9537386e5ad057f",
+      "source_identity_kind": "workflow_head_reference_not_a_claim_of_reported_compiled_SHA"
     },
     {
       "run": 39953729256,
@@ -67,7 +126,9 @@
       "skipped": 0,
       "failure_stage": "create_owned_subscription",
       "correction": "owned Topic must be created before Channel",
-      "cleanup_verified": true
+      "cleanup_verified": true,
+      "report_sha256": "ed355a004327b590e44ddc728b6832af9b68b13522b7f23b556af6551f6b9f90",
+      "source_identity_kind": "workflow_head_reference_not_a_claim_of_reported_compiled_SHA"
     },
     {
       "run": 39953922290,
@@ -77,7 +138,9 @@
       "skipped": 0,
       "failure_stage": "original_container_restart",
       "correction": "reread actual ephemeral port bindings; later positive proof confirms reassignment",
-      "cleanup_verified": true
+      "cleanup_verified": true,
+      "report_sha256": "376153fce34d4abc54164389ce4dba5003baee03aa9788a61d3f2509e5baa195",
+      "source_identity_kind": "workflow_head_reference_not_a_claim_of_reported_compiled_SHA"
     }
   ],
   "limitations": [
@@ -85,5 +148,304 @@
     "NSQ observation is not writer/relay/business/schedule responsibility closure or cutover authorization",
     "No native dependency executed locally, no production operations",
     "Startup/recovery and no-callback audit debt still require T25-C proof"
-  ]
+  ],
+  "recorded_at": "2026-10-23T13:03:24.183953+00:00",
+  "workflow_history": [
+    {
+      "conclusion": "success",
+      "databaseId": 39954709041,
+      "headSha": "d06bb314658aac12c0703c72e73b1e0ec3657e82",
+      "status": "completed",
+      "workflowName": "RocketMQ cutover original NSQ drain observation"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39954709084,
+      "headSha": "d06bb314658aac12c0703c72e73b1e0ec3657e82",
+      "status": "completed",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39954709098,
+      "headSha": "d06bb314658aac12c0703c72e73b1e0ec3657e82",
+      "status": "completed",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39954709040,
+      "headSha": "d06bb314658aac12c0703c72e73b1e0ec3657e82",
+      "status": "completed",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39954709052,
+      "headSha": "d06bb314658aac12c0703c72e73b1e0ec3657e82",
+      "status": "completed",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39954709062,
+      "headSha": "d06bb314658aac12c0703c72e73b1e0ec3657e82",
+      "status": "completed",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39954456131,
+      "headSha": "1e1f17b6149ece63d66ea0a489785cd2960da5e8",
+      "status": "completed",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39954456077,
+      "headSha": "1e1f17b6149ece63d66ea0a489785cd2960da5e8",
+      "status": "completed",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39954456055,
+      "headSha": "1e1f17b6149ece63d66ea0a489785cd2960da5e8",
+      "status": "completed",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39954456075,
+      "headSha": "1e1f17b6149ece63d66ea0a489785cd2960da5e8",
+      "status": "completed",
+      "workflowName": "RocketMQ cutover original NSQ drain observation"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39954455960,
+      "headSha": "1e1f17b6149ece63d66ea0a489785cd2960da5e8",
+      "status": "completed",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39954455773,
+      "headSha": "1e1f17b6149ece63d66ea0a489785cd2960da5e8",
+      "status": "completed",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39954298786,
+      "headSha": "b70cb0d9fba1c3980951d0b77bf05694281f94fa",
+      "status": "completed",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39954298651,
+      "headSha": "b70cb0d9fba1c3980951d0b77bf05694281f94fa",
+      "status": "completed",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39954298559,
+      "headSha": "b70cb0d9fba1c3980951d0b77bf05694281f94fa",
+      "status": "completed",
+      "workflowName": "RocketMQ cutover original NSQ drain observation"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39954298681,
+      "headSha": "b70cb0d9fba1c3980951d0b77bf05694281f94fa",
+      "status": "completed",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39954298688,
+      "headSha": "b70cb0d9fba1c3980951d0b77bf05694281f94fa",
+      "status": "completed",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39954298765,
+      "headSha": "b70cb0d9fba1c3980951d0b77bf05694281f94fa",
+      "status": "completed",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "conclusion": "failure",
+      "databaseId": 39953922290,
+      "headSha": "b199aa8aa63ad333ff690168bdb272ea86820564",
+      "status": "completed",
+      "workflowName": "RocketMQ cutover original NSQ drain observation"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953922336,
+      "headSha": "b199aa8aa63ad333ff690168bdb272ea86820564",
+      "status": "completed",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953922356,
+      "headSha": "b199aa8aa63ad333ff690168bdb272ea86820564",
+      "status": "completed",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953922260,
+      "headSha": "b199aa8aa63ad333ff690168bdb272ea86820564",
+      "status": "completed",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953922270,
+      "headSha": "b199aa8aa63ad333ff690168bdb272ea86820564",
+      "status": "completed",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953922338,
+      "headSha": "b199aa8aa63ad333ff690168bdb272ea86820564",
+      "status": "completed",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "conclusion": "failure",
+      "databaseId": 39953729256,
+      "headSha": "2bf1a03b05b65eaabad519573ab35a0d00609c97",
+      "status": "completed",
+      "workflowName": "RocketMQ cutover original NSQ drain observation"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953729044,
+      "headSha": "2bf1a03b05b65eaabad519573ab35a0d00609c97",
+      "status": "completed",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953729030,
+      "headSha": "2bf1a03b05b65eaabad519573ab35a0d00609c97",
+      "status": "completed",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953729086,
+      "headSha": "2bf1a03b05b65eaabad519573ab35a0d00609c97",
+      "status": "completed",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953729325,
+      "headSha": "2bf1a03b05b65eaabad519573ab35a0d00609c97",
+      "status": "completed",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953729077,
+      "headSha": "2bf1a03b05b65eaabad519573ab35a0d00609c97",
+      "status": "completed",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "conclusion": "failure",
+      "databaseId": 39953425532,
+      "headSha": "680a4178132058c513131f911de4c2c7c334a356",
+      "status": "completed",
+      "workflowName": "RocketMQ cutover original NSQ drain observation"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953425089,
+      "headSha": "680a4178132058c513131f911de4c2c7c334a356",
+      "status": "completed",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953424961,
+      "headSha": "680a4178132058c513131f911de4c2c7c334a356",
+      "status": "completed",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953425096,
+      "headSha": "680a4178132058c513131f911de4c2c7c334a356",
+      "status": "completed",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953425187,
+      "headSha": "680a4178132058c513131f911de4c2c7c334a356",
+      "status": "completed",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953425479,
+      "headSha": "680a4178132058c513131f911de4c2c7c334a356",
+      "status": "completed",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953332423,
+      "headSha": "e88a4c0270b5f070fa06181b8b01ac360fb96399",
+      "status": "completed",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953332432,
+      "headSha": "e88a4c0270b5f070fa06181b8b01ac360fb96399",
+      "status": "completed",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953332369,
+      "headSha": "e88a4c0270b5f070fa06181b8b01ac360fb96399",
+      "status": "completed",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953332390,
+      "headSha": "e88a4c0270b5f070fa06181b8b01ac360fb96399",
+      "status": "completed",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "conclusion": "cancelled",
+      "databaseId": 39953332290,
+      "headSha": "e88a4c0270b5f070fa06181b8b01ac360fb96399",
+      "status": "completed",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "conclusion": "failure",
+      "databaseId": 39953332407,
+      "headSha": "e88a4c0270b5f070fa06181b8b01ac360fb96399",
+      "status": "completed",
+      "workflowName": "RocketMQ cutover original NSQ drain observation"
+    }
+  ],
+  "workflow_history_limit": "Prior source or superseded run status retained; does not claim cleanup readback or current-source acceptance for those runs",
+  "workflow_history_observed_at": "2026-10-23T13:03:54.046450+00:00"
 }
