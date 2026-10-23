@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"database/sql"
+	_ "embed"
 	"encoding/hex"
 	"errors"
 	"testing"
@@ -167,5 +168,17 @@ func TestNoticeIdentityMatchesFrozenHostCrossLanguageVector(t *testing.T) {
 	key := NoticeKey(transaction.Binding{Owner: "qs.mysql", StoreID: "原库", WriterEpoch: "epoch-1"}, index)
 	if hex.EncodeToString(key[:]) != "f93835f735b87a3a4af30ceb3b0dae81b08815fb24c8705644f20e7ad5b608ff" {
 		t.Fatal("host notice framing changed")
+	}
+}
+
+// Frozen test-only copy of IAM migration45, not an operator installation path.
+//
+//go:embed testdata/iam-000045-governance.sql
+var nativeNoticeSchema string
+
+func TestFrozenGovernanceFixtureMatchesRecordedHostMigration(t *testing.T) {
+	sum := sha256.Sum256([]byte(nativeNoticeSchema))
+	if hex.EncodeToString(sum[:]) != "0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a" {
+		t.Fatal("frozen IAM45 governance fixture changed")
 	}
 }

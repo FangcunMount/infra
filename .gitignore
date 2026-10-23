@@ -184,3 +184,6 @@ audit-*.log
 
 # Public official RDS trust bundle; database/client private keys remain ignored.
 !components/mysql-client/ca-chain.pem
+
+# Public frozen schema fixture required by the recovery-tool test binary.
+!tools/rocketmq-native-recovery/internal/authority/testdata/iam-000045-governance.sql

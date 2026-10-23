@@ -6,8 +6,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"database/sql"
-	_ "embed"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -21,11 +19,6 @@ import (
 	"github.com/FangcunMount/reliable-messaging/transport"
 	driver "github.com/go-sql-driver/mysql"
 )
-
-// Frozen test-only copy of IAM migration45, not an operator installation path.
-//
-//go:embed testdata/iam-000045-governance.sql
-var nativeNoticeSchema string
 
 func ownedMySQL(t *testing.T) *sql.DB {
 	t.Helper()
@@ -220,13 +213,6 @@ func TestMySQLSnapshotNative(t *testing.T) {
 				t.Fatal("readonly snapshot changed facts", err)
 			}
 		})
-	}
-}
-
-func TestFrozenGovernanceFixtureMatchesRecordedHostMigration(t *testing.T) {
-	sum := sha256.Sum256([]byte(nativeNoticeSchema))
-	if hex.EncodeToString(sum[:]) != "0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a" {
-		t.Fatal("frozen IAM45 governance fixture changed")
 	}
 }
 
