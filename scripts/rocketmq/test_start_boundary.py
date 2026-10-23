@@ -91,6 +91,19 @@ class StartBoundaryTest(unittest.TestCase):
                 operation.maintain_before_start('repair-2', lambda: calls.append('new-review'), '7'*64)
             self.assertEqual(calls, ['new-review'])
 
+    def test_distinct_scope_restores_keep_normal_start_permanently_closed(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory, _, digest = fixture(root); calls = []
+            with Boundary(directory, digest) as operation:
+                for scope in ('iam', 'qs', 'ai'):
+                    operation.restore_before_start('restore-'+scope, lambda scope=scope: calls.append(scope))
+                    self.assertEqual(operation.status()['phase'], 'restore_returned')
+                    self.assertTrue(operation.status()['old_data_restore_eligible'])
+                    self.assertFalse((directory/'first-runtime-start.json').exists())
+                    with self.assertRaises(BoundaryError): operation.start('runtime-1', lambda: calls.append('unsafe'))
+                    with self.assertRaises(BoundaryError): operation.maintain_before_start('offline-1', lambda: calls.append('unsafe'))
+            self.assertEqual(calls, ['iam', 'qs', 'ai'])
+
     def test_old_data_restore_can_close_a_failed_prestart_operation(self):
         with tempfile.TemporaryDirectory() as root:
             directory, _, digest = fixture(root)

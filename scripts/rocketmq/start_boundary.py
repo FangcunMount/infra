@@ -176,7 +176,7 @@ class Boundary:
         return {'phase': state['phase'], 'runtime_may_have_started': self._started(),
                 'old_data_restore_eligible': not self._started() and state['phase'] in
                 {'initialized', 'maintenance_issued', 'maintenance_returned', 'maintenance_failed',
-                 'restore_issued', 'restore_failed'}, 'cutover_authorized': False}
+                 'restore_issued', 'restore_failed', 'restore_returned'}, 'cutover_authorized': False}
 
     def start(self, step, callback):
         _step(step)
@@ -200,7 +200,7 @@ class Boundary:
         _step(step)
         state = self._state()
         if self._started() or state['phase'] not in {'initialized', 'maintenance_issued', 'maintenance_returned',
-                                                   'maintenance_failed', 'restore_issued', 'restore_failed'}:
+                                                   'maintenance_failed', 'restore_issued', 'restore_failed', 'restore_returned'}:
             raise BoundaryError('old-data restore forbidden after any runtime start attempt')
         self._record('restore_issued', step)  # Also closes normal start, including failed restores.
         try:
