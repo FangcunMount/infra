@@ -711,11 +711,11 @@
     "sdk_fix": {
       "source_baseline": "b1679360542699efcc831eabeb3b4526015c394f",
       "upstream": "rocketmq-python-client5.1.2",
-      "strategy": "instance-only ended telemetry recovery on structured heartbeat OK or40015 missing-settings response, using existing heartbeat/I/O loop; forbidden/auth errors excluded",
-      "local_unit_tests": 105,
+      "strategy": "instance-only settings re-registration on heartbeat OK or40015: recover ended streams and sync active unregistered streams; one actual settings write per endpoint, retain capacity until real Future/callback completion and close drains it",
+      "local_unit_tests": 106,
       "native_patch_pass_claimed": false,
       "release_claimed": false,
-      "source_sha": "93ec30178dad4c5d71ecb4a7987c03a3168c5665",
+      "source_sha": "18b8d0e92c08f01d63e54f0173125c77f3f4a014",
       "pr": "https://github.com/FangcunMount/reliable-messaging/pull/51",
       "probe_baseline": {
         "regression_probe_baseline_sha": "bc8fc1577d731432c513aa8f95a12c075f427b8e",
@@ -829,8 +829,218 @@
           ],
           "finding": "Initial reconnect hook required heartbeat OK. Exact Broker5.5.1 returns structured40015 UNRECOGNIZED_CLIENT_TYPE while settings are absent after restart, so waiting forOK creates a re-registration cycle. Fix acceptsOK or40015 only on an ended stream; authorization/refusal errors still do not qualify.",
           "primary_source": "https://raw.githubusercontent.com/apache/rocketmq/rocketmq-all-5.5.1/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/v2/client/ClientActivity.java"
+        },
+        {
+          "run_url": "https://github.com/FangcunMount/infra/actions/runs/39892338582",
+          "candidates": {
+            "sdk": "1cb683d63b56cb8ebb64f8735d1753ebc5ee4f49",
+            "infra": "2b75a9b73537f5881ab999facde6e0507a161b6d",
+            "profile": "fixed a3 source candidate before publication; two live producer native profiles"
+          },
+          "profiles": [
+            {
+              "report_sha256": "38d863dd0bbfd220573fa28f07ca6b8ef48e20f26ea5258c340531101def5a08",
+              "counts": {
+                "passed": 4,
+                "failed": 1,
+                "skipped": 0
+              },
+              "failure": "RuntimeError: probe timed out waiting for checked_reference/commit",
+              "mysql": "8.0.36",
+              "python": "3.11.16",
+              "go": "go1.25.9",
+              "live": {
+                "same_producer_pid": 21165,
+                "half_prepared_before_kill": 3,
+                "business_before_kill": 0,
+                "broker_kill": {
+                  "signal": "SIGKILL",
+                  "exit_code": 137,
+                  "automatic_restart_disabled": true,
+                  "immutable_container_verified": true,
+                  "oom_killed": false
+                },
+                "local_calls": 1,
+                "business_after_commit": 1,
+                "final_unknown": 3,
+                "broker_restart": {
+                  "same_container": true,
+                  "pid_changed": true,
+                  "healthy": true,
+                  "effective_parameters": {
+                    "transactionTimeOut": 6000,
+                    "transactionCheckInterval": 5000,
+                    "transactionCheckMax": 24,
+                    "fileReservedTime": 48
+                  }
+                }
+              },
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            },
+            {
+              "report_sha256": "5d54ee3d72d0806c521756df8a96d2ea6caac791a20aa0b48a39c03476ffe6bc",
+              "counts": {
+                "passed": 4,
+                "failed": 1,
+                "skipped": 0
+              },
+              "failure": "RuntimeError: probe timed out waiting for checked_reference/commit",
+              "mysql": "8.4.13",
+              "python": "3.13.15",
+              "go": "go1.25.12",
+              "live": {
+                "same_producer_pid": 19950,
+                "half_prepared_before_kill": 3,
+                "business_before_kill": 0,
+                "broker_kill": {
+                  "signal": "SIGKILL",
+                  "exit_code": 137,
+                  "automatic_restart_disabled": true,
+                  "immutable_container_verified": true,
+                  "oom_killed": false
+                },
+                "local_calls": 1,
+                "business_after_commit": 1,
+                "final_unknown": 3,
+                "broker_restart": {
+                  "same_container": true,
+                  "pid_changed": true,
+                  "healthy": true,
+                  "effective_parameters": {
+                    "transactionTimeOut": 6000,
+                    "transactionCheckInterval": 5000,
+                    "transactionCheckMax": 24,
+                    "fileReservedTime": 48
+                  }
+                }
+              },
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            }
+          ],
+          "finding": "Unpublished a3 version-only candidate used same first-hook driver; both exact native profiles still timed out. No published artifact or host acceptance."
+        },
+        {
+          "run_url": "https://github.com/FangcunMount/infra/actions/runs/39893915999",
+          "candidates": {
+            "sdk": "5f0bb9892eef06f73b24aac85bd09b450e1c1a3e",
+            "infra": "e92c26aafa723b4bb19c29abcfbf244f471c2bc5",
+            "profile": "a3 corrected40015 recovery candidate; exact source before release"
+          },
+          "profiles": [
+            {
+              "report_sha256": "c6ad21f4abf86039d6b6791c1997ebff314ae6e254212273fb106c418336ed54",
+              "counts": {
+                "passed": 4,
+                "failed": 1,
+                "skipped": 0
+              },
+              "failure": "RuntimeError: probe timed out waiting for checked_reference/commit",
+              "mysql": "8.0.36",
+              "python": "3.11.16",
+              "go": "go1.25.9",
+              "live": {
+                "launcher_pid": 20955,
+                "producer_pid": 20961,
+                "client_identity_sha256": "2bc74b6bddddf440ed7f3900384f842abad0bb5834a99db54991e1352f5c9557",
+                "half_prepared_before_kill": 3,
+                "business_before_kill": 0,
+                "broker_kill": {
+                  "signal": "SIGKILL",
+                  "exit_code": 137,
+                  "automatic_restart_disabled": true,
+                  "immutable_container_verified": true,
+                  "oom_killed": false
+                },
+                "local_calls": 1,
+                "business_after_commit": 1,
+                "final_unknown": 3,
+                "broker_restart": {
+                  "same_container": true,
+                  "pid_changed": true,
+                  "healthy": true,
+                  "effective_parameters": {
+                    "transactionTimeOut": 6000,
+                    "transactionCheckInterval": 5000,
+                    "transactionCheckMax": 24,
+                    "fileReservedTime": 48
+                  }
+                }
+              },
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            },
+            {
+              "report_sha256": "08397de0d1624d89c2a9976fb81530381a1ebd5a8063fc96059c8a566a511b68",
+              "counts": {
+                "passed": 4,
+                "failed": 1,
+                "skipped": 0
+              },
+              "failure": "RuntimeError: probe timed out waiting for checked_reference/commit",
+              "mysql": "8.4.13",
+              "python": "3.13.15",
+              "go": "go1.25.12",
+              "live": {
+                "launcher_pid": 21658,
+                "producer_pid": 21663,
+                "client_identity_sha256": "5226089874962e84dfab500980c8f17dc8b852ce3dde0dbb82117311fc407e0b",
+                "half_prepared_before_kill": 3,
+                "business_before_kill": 0,
+                "broker_kill": {
+                  "signal": "SIGKILL",
+                  "exit_code": 137,
+                  "automatic_restart_disabled": true,
+                  "immutable_container_verified": true,
+                  "oom_killed": false
+                },
+                "local_calls": 1,
+                "business_after_commit": 1,
+                "final_unknown": 3,
+                "broker_restart": {
+                  "same_container": true,
+                  "pid_changed": true,
+                  "healthy": true,
+                  "effective_parameters": {
+                    "transactionTimeOut": 6000,
+                    "transactionCheckInterval": 5000,
+                    "transactionCheckMax": 24,
+                    "fileReservedTime": 48
+                  }
+                }
+              },
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            }
+          ],
+          "finding": "Accepting40015 only on an ended stream still failed both real profiles. Upstream may already rebuild an active stream without resending settings; next candidate adds bounded active-stream settings sync and safe native diagnostics."
         }
-      ]
+      ],
+      "current_source_candidate": {
+        "sdk": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
+        "infra": "9b1f63fb54f4846198a91f387a7046e3d9721638",
+        "profile": "a3 bounded active-stream settings recovery; unpublished exact source"
+      },
+      "current_native_run": "https://github.com/FangcunMount/infra/actions/runs/39897483972",
+      "current_native_status": "running; no pass claim",
+      "diagnostics": "Fixed numeric/boolean whitelist only; before restart, after failed real checks, and after actual close; no body/wire/credentials"
     }
   }
 }
