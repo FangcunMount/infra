@@ -1,10 +1,10 @@
 {
   "version": 1,
   "task": "T23",
-  "status": "in_progress",
-  "task_completed": false,
+  "status": "completed_declared_host_fault_scope",
+  "task_completed": true,
   "global_progress": {
-    "M3": "22/36",
+    "M3": "23/36",
     "M4": "0/8"
   },
   "recorded_at": "2026-10-23T02:46:12.081125+00:00",
@@ -43,7 +43,7 @@
     ]
   },
   "delivery": {
-    "merged": false,
+    "merged": true,
     "stable_release": false,
     "production": false,
     "system_acceptance": false,
@@ -296,7 +296,7 @@
     "production_deploy_paused": true,
     "production_environment_override_count": 0
   },
-  "internal_progress": "2/4",
+  "internal_progress": "4/4",
   "ai_development": {
     "run_url": "https://github.com/FangcunMount/infra/actions/runs/39881283339",
     "source_sha": "724595abdd92e8b0d88389609e239a6b6b1a9055",
@@ -531,7 +531,7 @@
     "production_environment_override_count": 0
   },
   "paired_faults": {
-    "status": "published_a3_host_recovery_validation_in_progress",
+    "status": "completed_declared_native_and_host_source_scope",
     "native_pass_claimed": false,
     "scenarios": [
       "actual MQ disconnect/producer SIGKILL/new paused same-owner Checker",
@@ -2316,6 +2316,1699 @@
       "scope": "actual paired host components/original roots/physical MQ and process failures with coordinated affected-host restart; controlled read-side, no live-Go-autoheal/real provider/public HTTP/system/production"
     },
     "full_host_development_audit_sha256": "89d1b9253935e1bc84e69b7d88074241af64f3e67a7b550a39995da91e303dd0",
-    "full_matrix_gate_status": "single-profile full7/40passed and independently audited; freeze corrected source for full6/current-head shared CI; no task completion yet"
-  }
+    "full_matrix_gate_status": "full6 native and host source merges complete;49 shared infra checks/56reports verified and PR179merged",
+    "full_matrix_audit": {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39910620867",
+      "infra_sha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "sources": {
+        "qs-paired-faults": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+        "ai-paired-faults": "c17b36665578edddcd09ee5cac6fc5ba83cbcd56",
+        "infra-host-faults": "28678789579a22d031030d6630061f1b8f31b06a"
+      },
+      "mode": "full",
+      "workflow_conclusion": "success",
+      "profiles": [
+        {
+          "mysql": "8.0.36",
+          "python": "3.13.15",
+          "go": "go1.25.12",
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0,
+          "native_tests": 7,
+          "report_sha256": "c6f0d8f411a76c8bb7a6360d408de6c39b630bb811830e7b9eb8063470965da9",
+          "source_tool_sdk_and_cleanup_verified": true,
+          "producer_exit_code": -9,
+          "recovered_commit_checks": 1,
+          "broker_exit_code": 137,
+          "restarted_commit_checks": 2
+        },
+        {
+          "mysql": "8.0.44",
+          "python": "3.13.15",
+          "go": "go1.25.12",
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0,
+          "native_tests": 7,
+          "report_sha256": "9a42c8e3e00c61e237da811c37328652d3d991a9415f5911444bce0ff11a86ed",
+          "source_tool_sdk_and_cleanup_verified": true,
+          "producer_exit_code": -9,
+          "recovered_commit_checks": 1,
+          "broker_exit_code": 137,
+          "restarted_commit_checks": 2
+        },
+        {
+          "mysql": "8.0.36",
+          "python": "3.11.16",
+          "go": "go1.25.12",
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0,
+          "native_tests": 7,
+          "report_sha256": "ebd9b4793783532bb48628e7867fc4b091324e93d878541dd61f457642fc9b0f",
+          "source_tool_sdk_and_cleanup_verified": true,
+          "producer_exit_code": -9,
+          "recovered_commit_checks": 1,
+          "broker_exit_code": 137,
+          "restarted_commit_checks": 2
+        },
+        {
+          "mysql": "8.4.11",
+          "python": "3.11.16",
+          "go": "go1.25.12",
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0,
+          "native_tests": 7,
+          "report_sha256": "7c4fa8232fb947683959d4edb2e679be453488aba702c468cf44932c565ea716",
+          "source_tool_sdk_and_cleanup_verified": true,
+          "producer_exit_code": -9,
+          "recovered_commit_checks": 1,
+          "broker_exit_code": 137,
+          "restarted_commit_checks": 2
+        },
+        {
+          "mysql": "8.0.44",
+          "python": "3.11.16",
+          "go": "go1.25.12",
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0,
+          "native_tests": 7,
+          "report_sha256": "5ee1206ecacad7f2034ad7e15b4438c561c348a6e6451d3446fe05d0e6d89385",
+          "source_tool_sdk_and_cleanup_verified": true,
+          "producer_exit_code": -9,
+          "recovered_commit_checks": 1,
+          "broker_exit_code": 137,
+          "restarted_commit_checks": 2
+        },
+        {
+          "mysql": "8.4.11",
+          "python": "3.13.15",
+          "go": "go1.25.12",
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0,
+          "native_tests": 7,
+          "report_sha256": "54854ac1987bb41812c9bbeb57e7f0e5d9a1989118819fdef2f941b0c33665b6",
+          "source_tool_sdk_and_cleanup_verified": true,
+          "producer_exit_code": -9,
+          "recovered_commit_checks": 1,
+          "broker_exit_code": 137,
+          "restarted_commit_checks": 2
+        }
+      ],
+      "scope": "actual paired host components/original roots/physical MQ and process failures with coordinated affected-host restart; controlled read-side, no live-Go-autoheal/real provider/public HTTP/system/production"
+    },
+    "full_matrix_audit_sha256": "6d00c77e0c6fc6a3daa88785304edec996ab58ec9891ee5869ec121098c6e986",
+    "paired_source_merges": {
+      "qs-server": {
+        "pr": 430,
+        "source_sha": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+        "checks": [
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120263280472",
+            "name": "Build Applications (apiserver)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120263280449",
+            "name": "Build Applications (worker)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120263280446",
+            "name": "Build Applications (collection)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648944",
+            "name": "Seeddata Retirement and Current Runtime E2E",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259649048",
+            "name": "QS-03 original effect recovery after actual broker loss",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259649024",
+            "name": "QS-05/06 original business effects after actual broker loss",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648984",
+            "name": "Lint Code",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648957",
+            "name": "Actor Store MySQL Transactions",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259649102",
+            "name": "Docs Hygiene & Facts",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648912",
+            "name": "Deployment Contracts",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648922",
+            "name": "MongoDB Authenticated Native Metadata",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648939",
+            "name": "Maintainability Scan (Advisory)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523136/job/120259648334",
+            "name": "original-mysql-root (8.4.11)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648840",
+            "name": "Tier 1 Test Policy",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648868",
+            "name": "Action audit MySQL JSON lifecycle",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523127/job/120259648875",
+            "name": "images (collection-server)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648864",
+            "name": "MySQL Native Metadata and Readiness",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648849",
+            "name": "Layer Boundaries (depguard)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523127/job/120259648788",
+            "name": "images (qs-apiserver)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648843",
+            "name": "Security Scan (Advisory)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523127/job/120259648733",
+            "name": "delivery (8.0.36)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648627",
+            "name": "AuthZ committed version two-process MySQL",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523136/job/120259648042",
+            "name": "original-mysql-root (8.0.44)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259648842",
+            "name": "Run Tests",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523127/job/120259648652",
+            "name": "delivery (8.4)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523123/job/120259647984",
+            "name": "mysql-audit",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523136/job/120259648235",
+            "name": "original-mysql-root (8.0.36)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906520247/job/120259642513",
+            "name": "Analyze (go)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-server/actions/runs/39906523170/job/120259650351",
+            "name": "Docs & API Generated Sync",
+            "state": "SKIPPED"
+          }
+        ],
+        "skipped_not_native": [
+          "Docs & API Generated Sync"
+        ],
+        "production_guard": {
+          "name": "PRODUCTION_DEPLOY_PAUSED",
+          "value": "true",
+          "environment_override_absent": true
+        },
+        "mergeable": true,
+        "merge": "1fc75580b76491511f81f4482fa682ba7a392f52",
+        "merged_at": "2026-10-23T06:39:33Z",
+        "tree": "77e3801417730ae67a0f06f9d893d316f70720fc",
+        "entire_tree_equals_candidate": true
+      },
+      "qs-ai": {
+        "pr": 217,
+        "source_sha": "c17b36665578edddcd09ee5cac6fc5ba83cbcd56",
+        "checks": [
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120275772177",
+            "name": "Complete test coverage",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661871",
+            "name": "verify (8.4, 1)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661864",
+            "name": "image",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661854",
+            "name": "verify (8.4, 3)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661723",
+            "name": "Retirement backup and restore (8.0.36)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661805",
+            "name": "verify (8.4, 2)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661590",
+            "name": "Retirement backup and restore (8.4)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661782",
+            "name": "verify (8.0.36, 3)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661671",
+            "name": "verify (8.0.36, 0)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661703",
+            "name": "verify (8.0.36, 2)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661732",
+            "name": "verify (8.0.36, 1)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551667/job/120269661686",
+            "name": "verify (8.4, 0)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551799/job/120269096485",
+            "name": "m7 (8.0.36)",
+            "state": "SUCCESS"
+          },
+          {
+            "link": "https://github.com/FangcunMount/qs-ai/actions/runs/39909551799/job/120269096272",
+            "name": "m7 (8.4)",
+            "state": "SUCCESS"
+          }
+        ],
+        "skipped_not_native": [],
+        "production_guard": {
+          "name": "AUTO_DEPLOY_ENABLED",
+          "value": "false",
+          "environment_override_absent": true
+        },
+        "mergeable": true,
+        "merge": "00f2ca0dedc29d13860bc566c474e5bf2c6ceb84",
+        "merged_at": "2026-10-23T06:39:47Z",
+        "tree": "8c4b923df220a12a6a741d6b7d4f7cc8e97bdbcb",
+        "entire_tree_equals_candidate": true
+      }
+    },
+    "native_full_gate_passed": true,
+    "host_source_merged": true,
+    "current_host_acceptance": {
+      "candidates": {
+        "qs-paired-faults": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+        "ai-paired-faults": "c17b36665578edddcd09ee5cac6fc5ba83cbcd56",
+        "infra-host-faults": "28678789579a22d031030d6630061f1b8f31b06a"
+      },
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39910620867",
+      "status": "complete_for_declared_scope",
+      "real_provider_public_http_system_production_not_claimed": true
+    }
+  },
+  "infra_source_merge": {
+    "pr": 179,
+    "source_sha": "28678789579a22d031030d6630061f1b8f31b06a",
+    "merge": "4070b072db3748a8c9fe913c2bc0bfcdef6e8e6c",
+    "merged_at": "2026-10-23T06:56:12Z",
+    "checks": [
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620901/job/120272983941",
+        "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621025/job/120272963019",
+        "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620901/job/120272983594",
+        "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621099/job/120272901218",
+        "name": "original-worker-state (3.11, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621099/job/120272901073",
+        "name": "original-worker-state (3.11, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621099/job/120272901052",
+        "name": "original-worker-state (3.13, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621032/job/120272522500",
+        "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621099/job/120272901037",
+        "name": "original-worker-state (3.11, mysql:8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621032/job/120272522502",
+        "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620890/job/120272720091",
+        "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621099/job/120272900862",
+        "name": "original-worker-state (3.13, mysql:8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620956/job/120272522276",
+        "name": "original-ai-root (3.11, mysql:8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620956/job/120272522244",
+        "name": "original-ai-root (3.13, mysql:8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621032/job/120272522236",
+        "name": "original-roots-and-due-dispatch (1.25.12, mysql:8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621025/job/120272962816",
+        "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620956/job/120272522186",
+        "name": "original-ai-root (3.13, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621019/job/120272522536",
+        "name": "host (mysql:8.4)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620879/job/120272522475",
+        "name": "original-dual-store-root (1.25.12, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620867/job/120272521692",
+        "name": "paired (3.11, mysql:8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620879/job/120272522209",
+        "name": "original-dual-store-root (1.25.12, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621099/job/120272900967",
+        "name": "original-worker-state (3.13, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620879/job/120272521979",
+        "name": "original-dual-store-root (1.25.12, mysql:8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620867/job/120272521707",
+        "name": "paired (3.13, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620867/job/120272521784",
+        "name": "paired (3.13, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620867/job/120272521660",
+        "name": "paired (3.11, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620867/job/120272521635",
+        "name": "paired (3.11, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620956/job/120272522170",
+        "name": "original-ai-root (3.13, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620840/job/120272522004",
+        "name": "original-event-root (1.25.12, mysql:8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620890/job/120272719629",
+        "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621235/job/120272523216",
+        "name": "independent-worker-broker (3.11, mysql:8.0.36, py311-mysql8036)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620840/job/120272521919",
+        "name": "original-event-root (1.25.12, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620840/job/120272521985",
+        "name": "original-event-root (1.25.12, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621235/job/120272522903",
+        "name": "original-worker-mysql",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620956/job/120272522123",
+        "name": "original-ai-root (3.11, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620867/job/120272521354",
+        "name": "paired (3.13, mysql:8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621000/job/120272522814",
+        "name": "original-mongo-root (1.25.12)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621010/job/120272522259",
+        "name": "original-mysql-root (1.25.12, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621019/job/120272522477",
+        "name": "host (mysql:8.0.44)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620853/job/120272522191",
+        "name": "original-mysql-root (1.25.12, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620812/job/120272521112",
+        "name": "original-command-root (1.25.12, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620974/job/120272521832",
+        "name": "acceptance",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620956/job/120272521969",
+        "name": "original-ai-root (3.11, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620853/job/120272521951",
+        "name": "original-mysql-root (1.25.12, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621019/job/120272522234",
+        "name": "host (mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910621010/job/120272522055",
+        "name": "original-mysql-root (1.25.12, mysql:8.0.36)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620842/job/120272521300",
+        "name": "resources",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620812/job/120272520862",
+        "name": "original-command-root (1.25.12, mysql:8.4.11)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620849/job/120272521227",
+        "name": "original-mongo-root (1.25.12)",
+        "state": "SUCCESS"
+      },
+      {
+        "link": "https://github.com/FangcunMount/infra/actions/runs/39910620812/job/120272521106",
+        "name": "original-command-root (1.25.12, mysql:8.0.44)",
+        "state": "SUCCESS"
+      }
+    ],
+    "entire_tree_equals_candidate": true,
+    "tree": "75b3223e8b266d1f85eff8c0dc45c794c8ee3692",
+    "workflow_count": 18,
+    "report_count": 56,
+    "failed": 0,
+    "skipped": 0,
+    "regression_index_sha256": "ff7b583fbe3efb3b93ccc673b6993d7584b1583c8991bc0fb290a44a75e3a913",
+    "production_operations_performed": false,
+    "legacy_cleanup_limits_documented": true
+  },
+  "regression_workflows": [
+    {
+      "conclusion": "success",
+      "databaseId": 39910621235,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ AI five-path finalization and independent workers"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620853,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ QS evaluation original MySQL transaction"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910621000,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ QS answer original Mongo transaction"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910621010,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ QS task original MySQL and NORMAL fanout"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620849,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ QS report original Mongo transaction"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620812,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ QS AI commands original SQL and Broker"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620840,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ QS AI events original SQL and Broker"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620842,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620867,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ final-version paired QS AI roots"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620879,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ QS future retry original dual-store authorization"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620974,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620956,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ AI admission original SQL and published SDK"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910621019,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ IAM original host transaction"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620901,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910621032,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ QS retry original roots and real due dispatch"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910620890,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910621099,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ AI original SQL state roots and published SDK"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 39910621025,
+      "headSha": "28678789579a22d031030d6630061f1b8f31b06a",
+      "status": "completed",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    }
+  ],
+  "regression_reports": [
+    {
+      "run": "39910620901",
+      "file": "rocketmq-public-sdk.json",
+      "sha256": "a19c39b9dc2e8fc304bbfa908db0f7a11be61c26477c050c1dca62fcc63a9ae1",
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620901",
+      "file": "rocketmq-public-sdk.json",
+      "sha256": "dc18727e2dd59ac8f2c29ed4cbb5eb9bd30b5ac61900a9322849ec2a8dad3fbe",
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621025",
+      "file": "rocketmq-complete-sdk.json",
+      "sha256": "69989822c6ae80aed250951b61531a6c42168cb83388ec6f5b45cacaaadbb4fc",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621025",
+      "file": "rocketmq-complete-sdk.json",
+      "sha256": "6b8fba509d251076e0cf3fe5ddcd5c74c37aa88ef5639aeddcb588c3dfd87a2d",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620842",
+      "file": "rocketmq-m3-resources.json",
+      "sha256": "707cd2506cf9f151a131492be9dc5b6914cc00d26e1dbaa000ded7e9c6ba2bf3",
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620867",
+      "file": "rocketmq-paired.json",
+      "sha256": "c6f0d8f411a76c8bb7a6360d408de6c39b630bb811830e7b9eb8063470965da9",
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620867",
+      "file": "rocketmq-paired.json",
+      "sha256": "9a42c8e3e00c61e237da811c37328652d3d991a9415f5911444bce0ff11a86ed",
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620867",
+      "file": "rocketmq-paired.json",
+      "sha256": "ebd9b4793783532bb48628e7867fc4b091324e93d878541dd61f457642fc9b0f",
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620867",
+      "file": "rocketmq-paired.json",
+      "sha256": "7c4fa8232fb947683959d4edb2e679be453488aba702c468cf44932c565ea716",
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620867",
+      "file": "rocketmq-paired.json",
+      "sha256": "5ee1206ecacad7f2034ad7e15b4438c561c348a6e6451d3446fe05d0e6d89385",
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620867",
+      "file": "rocketmq-paired.json",
+      "sha256": "54854ac1987bb41812c9bbeb57e7f0e5d9a1989118819fdef2f941b0c33665b6",
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621000",
+      "file": "rocketmq-qs-answer.json",
+      "sha256": "690bd9e7a1c57d2a506bbfbf3439f5755c28b7e753d258c6def6b1f0ba0da962",
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621235",
+      "file": "rocketmq-ai-finalization-recovery.json",
+      "sha256": "e81083cb019f64d79d0025e6baca117f5b67bd52bc72b5447b09f2b056e2e6c4",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": null,
+      "cleanup_limit": "Nine original row counters zero/private evidence removed; require actual workflow Stop containers separately"
+    },
+    {
+      "run": "39910621235",
+      "file": "rocketmq-ai-finalization-live.json",
+      "sha256": "be6ce50e77d8447e76cf8faa096c4a2f2a9093d9d709e68c814b543af8e71f05",
+      "passed": 32,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621099",
+      "file": "rocketmq-ai-state.json",
+      "sha256": "dc0326b3b09de79ed6a2aa1da45f46b5db89fb3db5a02c5ed847e4cb84726414",
+      "passed": 148,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621099",
+      "file": "rocketmq-ai-state.json",
+      "sha256": "54d3a5a1b73df0bc0d65e9bc582ecb23acca290838f2035fbe7373cb918137a2",
+      "passed": 148,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621099",
+      "file": "rocketmq-ai-state.json",
+      "sha256": "0923c227012514a1762a83fbe195f20e09e2ba1ee69a5214ce488db04e6f20d9",
+      "passed": 148,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621099",
+      "file": "rocketmq-ai-state.json",
+      "sha256": "46b4ed8f3b893999d1f63e0edac465083428d4c87f06559dd5dd455c2fe36a4c",
+      "passed": 148,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621099",
+      "file": "rocketmq-ai-state.json",
+      "sha256": "ec1c1893ab9cedc21cd7f3c022815ffb6e586e5f829e739d7a75a5fad9db041b",
+      "passed": 148,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621099",
+      "file": "rocketmq-ai-state.json",
+      "sha256": "88512065e86727ec3c795d11f604012ec6a41782cbb3ac8fdd8f7d4a59bdfcf6",
+      "passed": 148,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620956",
+      "file": "rocketmq-ai-admission.json",
+      "sha256": "626e392b19a4f1a4aa8dba520befbb4e63e8449e530d9e6153294fd97b4cb285",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620956",
+      "file": "rocketmq-ai-admission.json",
+      "sha256": "b1fc431ccb580726c83d9ecce5b7e940f9a54db60a36cd4bec5d3ab0fd9c3986",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620956",
+      "file": "rocketmq-ai-admission.json",
+      "sha256": "626b6357b445f8b0095a2dedc914f9daca21c2f97e810df3d3edc2c3537657fd",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620956",
+      "file": "rocketmq-ai-admission.json",
+      "sha256": "1750d220a0e1c1906505dd08adbdd5239d0ccc67925fec6c0c69e8a9218c761f",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620956",
+      "file": "rocketmq-ai-admission.json",
+      "sha256": "ebdfa2cc2f508f086aa1519539e266eceb6ec150569cfe76eb7cf3f44218635a",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620956",
+      "file": "rocketmq-ai-admission.json",
+      "sha256": "2584f5eb10c837c8007a96a59ce3b42b4a8006b90f88c35d94f34c7212d76185",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621019",
+      "file": "receipt.json",
+      "sha256": "21ec85fc2710dd7a014b7d180155b2a0575f67aafc187e67a59dea0ac0c322ac",
+      "passed": 34,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "structured_storage",
+      "cleanup": {
+        "owned_containers_remaining": false,
+        "private_fixture_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621019",
+      "file": "rocketmq-iam-host.json",
+      "sha256": "2fa6dbd7225364a95a1d83e45ca15cd4ade358b623f0dd85d38beecc2207ba9f",
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621019",
+      "file": "receipt.json",
+      "sha256": "ec60473a363c6387eead048513d5fc14cd641fd676f0b91ecd8d29e285a174cd",
+      "passed": 34,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "structured_storage",
+      "cleanup": {
+        "owned_containers_remaining": false,
+        "private_fixture_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621019",
+      "file": "rocketmq-iam-host.json",
+      "sha256": "dcf0a0809b76f2080c07f5c3d189a174dceead5cbc2cf7f5140e391bf36d3d1e",
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621019",
+      "file": "rocketmq-iam-host.json",
+      "sha256": "73ab5422a2c0ee1c3edc44b548b9cfb42b9c7d7a34382d82e633a537b0dabcb1",
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621019",
+      "file": "receipt.json",
+      "sha256": "6e25382926524bac78609fdddd64b67f13322f474dd92f3138c5a244bfb41dd0",
+      "passed": 34,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "structured_storage",
+      "cleanup": {
+        "owned_containers_remaining": false,
+        "private_fixture_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621010",
+      "file": "rocketmq-qs-task.json",
+      "sha256": "a06fad00cf787c6ad933ea86caa87d025f8d1a234a772199af57fa1c38b95ae6",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621010",
+      "file": "rocketmq-qs-task.json",
+      "sha256": "8cf135e101f5de1aadab727c0ad51c13b7340eaea8c2bd1c8cec90656b43682d",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620840",
+      "file": "rocketmq-qs-event.json",
+      "sha256": "d67da8e251fee29223640ef6e0efd697c2f8f153937a891b206107adf3e5a569",
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620840",
+      "file": "rocketmq-qs-event.json",
+      "sha256": "50eb528698dd2216cf3ab02effc0872ffd21d9c9e80f90708d8db3567c801a07",
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620840",
+      "file": "rocketmq-qs-event.json",
+      "sha256": "ff011a9eb422ed5ae03637926f81630b50c7780b1ed0c75efcc114940f701517",
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620849",
+      "file": "rocketmq-qs-report.json",
+      "sha256": "59bd9cdaade2e5139e94a625dea5074d09ffa7a99de7432257284e8b17100be1",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620879",
+      "file": "rocketmq-qs-retry.json",
+      "sha256": "2b528fee6ee2a9f0500c602199f205ab9b31da4ba80dd7ba613919f1792ebc48",
+      "passed": 44,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620879",
+      "file": "rocketmq-qs-retry.json",
+      "sha256": "243d63dd4cb41e4e5a0e18708301cccc510ab63204b94ad5272773771e08a2ab",
+      "passed": 44,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620879",
+      "file": "rocketmq-qs-retry.json",
+      "sha256": "a9f4ad32a8c5a6266d461cff46e1f9e48b317f3e04964e20ddc521dd33f0da35",
+      "passed": 44,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620812",
+      "file": "rocketmq-qs-command.json",
+      "sha256": "935006ce9bfa6dee9ecb3a738d3779c9e380be3877cced589fd21618ef8477df",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620812",
+      "file": "rocketmq-qs-command.json",
+      "sha256": "61f9eec8104bf5b347ef41bed297f5ddd55e07cfa790ea7b8626d75b1dd29152",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620812",
+      "file": "rocketmq-qs-command.json",
+      "sha256": "c995318145ca0a094c5387da16da2b86d7273cac7616f653b71782f72b72edc1",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620890",
+      "file": "rocketmq-packet-faults.json",
+      "sha256": "fad2c7ad56b71413678cbbf2af3b306ba3cdc5bcf7119734c2488b07511ecf58",
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620890",
+      "file": "rocketmq-packet-faults.json",
+      "sha256": "17e1e9e97b3d8bb73521f6d1fb2b634b962fd2995cc02bf0e82ec2d7e1477c02",
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620853",
+      "file": "rocketmq-qs-evaluation.json",
+      "sha256": "4844c1f91a67fc742c8263dd674263fb05aa19c09a36f54631780a759d24b86f",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620853",
+      "file": "rocketmq-qs-evaluation.json",
+      "sha256": "e9248103869d0faeab97c1a2b315e29482119c16084d37338803ee7639e2711a",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621032",
+      "file": "rocketmq-qs-retry-dispatch.json",
+      "sha256": "07937054a9419baabc17ea01cb8304337198e99cfbef54fb0c480809ac657a80",
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621032",
+      "file": "rocketmq-qs-retry-dispatch.json",
+      "sha256": "9566be2702e23df9959dd1096207917a4d4b5d0461c53f308cf088546d87d49c",
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910621032",
+      "file": "rocketmq-qs-retry-dispatch.json",
+      "sha256": "d6016f2e117982d69df204df3ea88a836f56867d1023f43a93d600cf9b60b0af",
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620974",
+      "file": "rocketmq-m1-evidence.json",
+      "sha256": "89e64d9a8dc237f25abd07d79ef77f98e529fa9a3fa9323afb2d12bdbb8b14b8",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": null,
+      "cleanup_limit": "Legacy artifact has no cleanup/readback object; ci-smoke finally requires owned compose down and required workflow step succeeded; do not invent readback fields"
+    },
+    {
+      "run": "39910620974",
+      "file": "rocketmq-m2-transactions.json",
+      "sha256": "60d8c08c679322bf2db611d902343173cb34ad43fb04ef11826ac21b269e0666",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620974",
+      "file": "rocketmq-m2-go-sdk.json",
+      "sha256": "350cdfb791b6da7e6ff4672c333522e38f2c6e4265b9c3cd6c90b0769839ca46",
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620974",
+      "file": "rocketmq-m2-transactions.json",
+      "sha256": "60d8c08c679322bf2db611d902343173cb34ad43fb04ef11826ac21b269e0666",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    },
+    {
+      "run": "39910620974",
+      "file": "rocketmq-m2-go-sdk.json",
+      "sha256": "350cdfb791b6da7e6ff4672c333522e38f2c6e4265b9c3cd6c90b0769839ca46",
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "counter_shape": "root",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "cleanup_limit": null
+    }
+  ],
+  "regression_report_index_sha256": "ff7b583fbe3efb3b93ccc673b6993d7584b1583c8991bc0fb290a44a75e3a913",
+  "source_scope_equivalence": [
+    {
+      "repo": "qs-paired-faults",
+      "left": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
+      "right": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+      "path": "internal",
+      "git_object": "ea69ac8619f8909b62b1eeba47eaed487262dd3c",
+      "byte_identical": true
+    },
+    {
+      "repo": "qs-paired-faults",
+      "left": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
+      "right": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+      "path": "go.mod",
+      "git_object": "837e52a5ea055b3959a6696f47a235472da2a6c4",
+      "byte_identical": true
+    },
+    {
+      "repo": "qs-paired-faults",
+      "left": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
+      "right": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+      "path": "go.sum",
+      "git_object": "5dc843bcd2a8a06de3d4452fec1bcb2dbb7ac230",
+      "byte_identical": true
+    },
+    {
+      "repo": "ai-paired-faults",
+      "left": "724595abdd92e8b0d88389609e239a6b6b1a9055",
+      "right": "c17b36665578edddcd09ee5cac6fc5ba83cbcd56",
+      "path": "src",
+      "git_object": "42ee74195f2e19d95064b93378c8358c97934752",
+      "byte_identical": true
+    },
+    {
+      "repo": "sdk-telemetry-prerelease",
+      "left": "python/v0.4.0a2",
+      "right": "python/v0.4.0a3",
+      "path": "python/src/reliable_messaging/transaction_mysql.py",
+      "git_object": "026f6083375fc57e46500909470ef7c31479e57a",
+      "byte_identical": true
+    },
+    {
+      "repo": "sdk-telemetry-prerelease",
+      "left": "python/v0.4.0a2",
+      "right": "python/v0.4.0a3",
+      "path": "python/src/reliable_messaging/transaction.py",
+      "git_object": "3cd16b589f80fec2e7e2fb8f1cefdf68d1a735af",
+      "byte_identical": true
+    }
+  ]
 }
