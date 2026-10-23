@@ -60,6 +60,7 @@ def run_live_recovery(start,sql,control,proof,passed,observer_topics):
         raise RuntimeError('all actual half ACKs without business commit required before Broker crash')
     proof.update(launcher_pid=sender.process.pid,producer_pid=identity_before['pid'],
         client_identity_sha256=identity_before['client_sha256'],half_prepared_before_kill=3,business_before_kill=0)
+    proof['broker_topics_before_crash']=control.topic_metadata(observer_topics)
     reader=start('sdk-route','route-read')
     proof['observer_proxy_route_before_crash']=json.loads(reader.wait('proxy_route',timeout=65)['decision'])
     reader.finish()
@@ -89,6 +90,7 @@ def run_live_recovery(start,sql,control,proof,passed,observer_topics):
         raise
     proof['after_recheck_snapshot']=inspect(sender,identity)
     proof['topic_routes_ready']=control.wait_topic_routes(observer_topics)
+    proof['broker_topics_after_restart']=control.topic_metadata(observer_topics)
     reader=start('sdk-route','route-read')
     proof['observer_proxy_route']=json.loads(reader.wait('proxy_route',timeout=65)['decision'])
     reader.finish()

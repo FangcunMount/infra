@@ -102,3 +102,23 @@ class OwnedBrokerFault:
         if remaining:
             raise RuntimeError('persisted topic routes not registered after Broker restart')
         return dict(topic_count=len(topics),nameserver_routes_ready=True,read_only=True)
+
+    def topic_metadata(self, topics):
+        """Count exact fixture topics in live Broker metadata, not NameServer cache."""
+        import secrets
+        from provision_v2 import Admin
+        self.inspect()
+        if not topics or len(topics)>16 or any(not re.fullmatch('[A-Za-z0-9_-]{1,255}',t) for t in topics):
+            raise RuntimeError('bounded exact fixture topics required')
+        reader=Admin(self.broker)
+        directory='/tmp/m3-topic-read-'+secrets.token_hex(8)
+        reader.docker('mkdir','-m','700',directory)
+        try:
+            rows=reader.metadata(directory)['topicConfigTable']
+            selected=[rows.get(topic,{}) for topic in topics]
+            return dict(expected=len(topics),present=sum(bool(r) for r in selected),
+                transaction_type=sum(r.get('attributes',{}).get('message.type')=='TRANSACTION' for r in selected),
+                read_only=True)
+        finally:
+            reader.docker('rm','-f','--',directory+'/topic.json',directory+'/subscriptionGroup.json')
+            reader.docker('rmdir',directory)
