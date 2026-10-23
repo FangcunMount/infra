@@ -1,6 +1,6 @@
 {
   "schema": "m3-cutover-tool-progress/v1",
-  "m3_completed": 24,
+  "m3_completed": 23,
   "m3_total": 36,
   "t25_subgates_completed": 0,
   "t25_subgates_total": 4,

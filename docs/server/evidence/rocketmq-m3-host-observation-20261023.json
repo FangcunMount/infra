@@ -1,9 +1,9 @@
 {
   "schema_version": "m3-host-observation-progress/v1",
   "recorded_at": "2026-10-23T12:46:31.170421+00:00",
-  "m3_completed": 24,
+  "m3_completed": 23,
   "m3_total": 36,
-  "t24_completed_subgates": 4,
+  "t24_completed_subgates": 3,
   "t24_total_subgates": 4,
   "hosts": [
     {
@@ -928,5 +928,6 @@
     ],
     "budget": "existing5secondRPC/owner/worker settings unchanged",
     "older_start_failure_root_cause": "unknown"
-  }
+  },
+  "remaining_t24_gate": "Native transaction-limit evidence must trigger actual host admission closure while retaining Checker; current keyed CLI critical audit alone is insufficient"
 }
