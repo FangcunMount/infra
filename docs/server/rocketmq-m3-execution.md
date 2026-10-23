@@ -36,7 +36,7 @@
 | --- | --- | --- | --- |
 | ✅ | T23-A | 固定实际写入口、原根提交匹配、源版本和安全证据；IAM原COMMIT前/后真实TCP断连 | IAM0c4e46c1/infra1d44b58：完整CI39879917332三档MySQL8.0.36/44/8.4.13各14证据＋34原根/HTTP通过，零失败/跳过，源码/工具/原参数/清理审计完成；PR138源码8项CI成功并合并2cd61beb，main完整tree与候选一致，生产暂停及无环境覆盖已回读。共享infra完整回归/合并归T23-D；首轮uv缓存失败保留 |
 | ✅ | T23-B | QS MySQL/Mongo及AI SQLAlchemy实际业务根提交故障 | QS Mongo39883468210固定7.0.37通过14/14；AI39883476843六档各14/14；QS MySQL39884730972三档各14/14，全部零失败/跳过且源码/工具/清理已审计。AI PR216合并0809a16；QS PR429在28源码检查通过、1项API同步不适用后合并cfbbfd48，main完整tree与候选一致。生产自动部署保持暂停；共享infra完整CI/合并归D |
-| ☐ | T23-C | 实际宿主进程退出、新实例回查、必要MQ/Broker及成对链路故障 | 39890322666失败已审计：Go SIGKILL/新暂停实例回查及业务闭环8项完成；AI杀Broker前half2/local0，之后原根提交1/FinalUnknown2，重启后CheckCommit0。固定Python5.1.2关闭telemetry流后依赖300秒settings同步，SDK必要实例级恢复修正进行中；105本地单元、类型/静态通过，真实补丁回归及发布未完成；共享工具164通过 |
+| ☐ | T23-C | 实际宿主进程退出、新实例回查、必要MQ/Broker及成对链路故障 | 39890322666失败已审计：Go SIGKILL/新暂停实例回查及业务闭环8项完成；AI杀Broker前half2/local0，之后原根提交1/FinalUnknown2，重启后CheckCommit0。固定Python5.1.2关闭telemetry流后依赖300秒settings同步，SDK必要实例级恢复修正进行中；106本地单元、类型/静态通过，真实补丁回归及发布未完成；共享工具167通过 |
 | ☐ | T23-D | 冻结候选、完整必需矩阵、报告审计与相关PR合并 | 待开始；每份报告绑定真实源码/工具SHA，非空且零失败/跳过，失败历史保留 |
 
 ### T22 已完成子批（不增加36项任务计数）
@@ -1299,3 +1299,11 @@ T23-C开发CI39889024998失败并保留：固定QS0f353a04/AI8886f739/infra8f2bf
 T23-C确定性复验39890322666保留失败（0/1/0、完整清理）：Go生产者SIGKILL-9、新暂停同owner/store/epoch真实CheckCommit1、原wire/半消息0/执行0及完整receipt/state/ACK成功；AI在kill前精确Prepared2且原local0，之后原根仅提交1、真实FinalUnknown2且pending_calls0，Broker实际SIGKILL137/无OOM、同容器新PID/参数回读成功，100秒内存活Python生产者CheckCommit0。源实现5.1.2的telemetry read异常退出，默认settings重同步300秒，现有SDK重启门禁关闭旧生产者并创建新实例，未覆盖该存活场景。必要SDK修正已在独立工作区实施：复用自身已有心跳与I/O loop，在成功心跳后仅重建自身已关闭stream并发送settings，不新增timer/thread/global patch；105本地单元、Ruff及mypy通过，真实补丁门禁/发布尚未完成。保持22/36、内部2/4，生产未操作。
 
 必要SDK修正PR51固定93ec30178dad4c5d71ecb4a7987c03a3168c5665，探针红基线bc8fc157的driver与本次实际失败已发布a2文件逐字节一致。新增源码SDK独立原生门禁（并非发布制品/宿主验收替代）：同一存活producer全部half ACK3且业务0时SIGKILL所属Broker，原根提交1/FinalUnknown3，关闭新准入并排空旧检查，恢复同容器后要求三个精确reference真实Commit回查和原消息消费。复用既有rocketmq-faults workflow显式live_python选项，两语言运行档仍隔离；普通完整faults默认路径保留。工具165项通过、actionlint通过，SDK自身I/O loop/实例隔离及关闭6项通过，真实修正门禁待执行。
+
+SDK源码原生39891842554两档各4通过/1失败/0跳过，完整清理通过；原half3/业务0、原根提交1/FinalUnknown3、真实SIGKILL137/恢复参数通过，但无精确回查。首版hook等待heartbeat OK；已核对固定5.5.1 ClientActivity源码，重启丢失settings时心跳返回结构化40015 UNRECOGNIZED_CLIENT_TYPE，必须先重新注册才能OK。改为仅在stream已结束时接受OK或40015重建；401/403及其他拒绝不重建。补充真实I/O loop的40015/授权拒绝单元场景；原生探针补充actual Python PID及producer client ID摘要，区分uv launcher并证明同一实例。SDK及0.4.0a3均未发布/合并，继续独立门禁，不弱化三条真实回查要求。
+
+
+SDK存活生产者修正续验：39892338582（旧a3版本候选）及39893915999（OK/40015但仅关闭stream恢复）均为两档各4通过/1失败/0跳过，完整清理通过，失败历史已附原报告摘要。后者仍无三条精确回查，不发布或合并。新候选补齐活跃但未注册stream的settings重同步，每端点单个真实在途写入、重复合并、关闭封准入并等待实际Future/callback；不新增timer/thread/global patch。SDK18b8d0e本地106单元、Ruff/mypy/文档通过，工具167通过；固定a3源码2258ad70275ae974e71fb3ffeaa5ed7def4c2893、infra9b1f63fb54f4846198a91f387a7046e3d9721638正在39897483972双档真实门禁。新增有界只读诊断，不导出正文/凭据。M3仍22/36、T23内部2/4，M4为0/8；稳定发布、生产、system及48h均未执行。
+
+
+SDK恢复39897483972两档已完成同一实际Python生产者的三条原Reference Commit回查，原根1/半消息3/FinalUnknown3；随后新Go消费者启动返回40402 TOPIC_NOT_FOUND，整体仍各4通过/1失败/0跳过，所属清理完成。保留原报告，不将局部回查成功视为整项完成。沿用现有ci-smoke的NameServer持久化路由等待，新增只读有界回读、不重建Topic；同SDK2258ad70与infraa978aeb1在39898433212复验完整消费/关闭。SDK PR51/52各12源码检查已通过；2258ad70的Python CI39897477622两档各134源码＋134独立wheel测试、零失败/跳过，wheel/sdist摘要跨档一致并与源码核对。尚未发布。工具169项通过。实际宿主C2另按现有fail-fast监督器契约改为旧宿主排空、全新DI owner暂停回查原两条Reference、零新half/执行后恢复默认消费者；不修改消费者失败契约，且新runtime不冒称新OS进程。M3仍22/36、T23内部2/4，M4为0/8。
