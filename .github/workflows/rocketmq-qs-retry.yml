@@ -10,7 +10,7 @@ on:
       kind:
         description: Exact required host acceptance scope
         type: choice
-        options: [retry, deferred, worker, factory, runtime, protection]
+        options: [retry, deferred, worker, factory, runtime, protection, native-limit]
         default: retry
       profile:
         description: Development is one MySQL only; final gate requires full
@@ -18,7 +18,7 @@ on:
         options: [full, development]
         default: full
   pull_request:
-    paths: ['scripts/rocketmq/qs_runtime_acceptance.py', 'scripts/rocketmq/test_qs_runtime_acceptance.py', 'scripts/rocketmq/ci-dispatch-factory.py', 'scripts/rocketmq/test_dispatch_factory.py', 'scripts/rocketmq/qs_retry_acceptance.py', 'scripts/rocketmq/test_qs_retry_acceptance.py', 'scripts/rocketmq/qs_deferred_acceptance.py', 'scripts/rocketmq/qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_deferred_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-retry.yml']
+    paths: ['scripts/rocketmq/native_limit_acceptance.py', 'scripts/rocketmq/test_native_limit_acceptance.py', 'scripts/rocketmq/probes/native-transaction-limit/**', 'scripts/rocketmq/qs_runtime_acceptance.py', 'scripts/rocketmq/test_qs_runtime_acceptance.py', 'scripts/rocketmq/ci-dispatch-factory.py', 'scripts/rocketmq/test_dispatch_factory.py', 'scripts/rocketmq/qs_retry_acceptance.py', 'scripts/rocketmq/test_qs_retry_acceptance.py', 'scripts/rocketmq/qs_deferred_acceptance.py', 'scripts/rocketmq/qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_deferred_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-retry.yml']
 permissions:
   contents: read
 env:
@@ -42,7 +42,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: ${{ inputs.kind == 'protection' && '04757bd3212ca961d8eaec22ecd3560101111e18' || inputs.kind != 'retry' && inputs.kind != '' && '8de893b367cc797580799abd8325f41dd62356db' || 'bfaae2b82ee0d1229b8c965fce472cdf5dec486f' }}
+          ref: ${{ (inputs.kind == 'protection' || inputs.kind == 'native-limit') && '04757bd3212ca961d8eaec22ecd3560101111e18' || inputs.kind != 'retry' && inputs.kind != '' && '8de893b367cc797580799abd8325f41dd62356db' || 'bfaae2b82ee0d1229b8c965fce472cdf5dec486f' }}
           path: .sdk-acceptance
       - uses: actions/checkout@v6
         with:
@@ -77,11 +77,14 @@ jobs:
           fi
           host_profile=--qs-retry-store-host
           extra_args=()
-          if [ "${{ inputs.kind }}" = runtime ] || [ "${{ inputs.kind }}" = protection ]; then
+          if [ "${{ inputs.kind }}" = runtime ] || [ "${{ inputs.kind }}" = protection ] || [ "${{ inputs.kind }}" = native-limit ]; then
             host_profile=--qs-runtime-host
           fi
           if [ "${{ inputs.kind }}" = protection ]; then
             extra_args=(--qs-protocol-protection)
+          fi
+          if [ "${{ inputs.kind }}" = native-limit ]; then
+            extra_args=(--qs-native-limit)
           fi
           if [ "${{ inputs.kind }}" = deferred ] || [ "${{ inputs.kind }}" = worker ]; then
             host_profile=--qs-deferred-consumer-host

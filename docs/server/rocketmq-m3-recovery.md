@@ -92,3 +92,12 @@ python3 scripts/rocketmq/nsq_drain_evidence.py \
 成功状态为`nsq_drain_observed`，始终保留`cutover_authorized=false`。它不是旧HTTP/TCP写者、Relay、自主任务、在途业务或未来调度已经停止的证明，也不是原生超限、历史业务回执或事务audit缺口的处置授权；这些责任必须在T25/T30–T32单独冻结并验证。不可通过删Channel、清空队列、改计数或遗忘旧责任让工具通过。
 
 真实依赖验收由[独立CI](../../.github/workflows/rocketmq-nsq-drain.yml)创建唯一临时NSQ1.3.0，验证原生后台队列、in-flight、deferred、原FIN后的排空、采样间发布/消费以及同容器重启。容器加入按attempt命名并校验label的独立网络，清理后回读网络集合未变。临时`/data`使用有界tmpfs，不产生生产卷或匿名数据卷；清理必须保留既有容器且回读无本attempt残留。尚未取得这项CI通过前，只记录纯测试与接线，不勾选T25。
+
+
+### T24-D 实际原生超限保护候选
+
+`rocketmq-qs-retry.yml` 的 `kind=native-limit` 单独验证实际SYS超限索引→QS原MySQL/Mongo持久保护→运行实例封新写→新实例继续保持保护及真实Checker恢复。它不能与旧 `protection` 的审计时间老化profile合并或混记。故障生成器只使用固定底层5.1.4制造一条Unknown半消息，不表示业务SDK验收；实际宿主仍要求发布tx.4及精确模块摘要。
+
+索引由只读导出器0600写入，正文与原key不导出，宿主接收独立原始摘要。记录绑定来自宿主配置，SYS索引本身不证明owner；隔离测试保守封闭两个固定QS owner，不依此改写业务/witness。只封新写的治理记录不自动解除，Checker应继续完成原已提交事实的真实回查及正向RPC审计。生产交接、解除和无回调审计债务仍属于T25；本候选不构成生产批准。
+
+源生故障、超限参数回读及还原、宿主原事务/lifecycle证据和完整清理均须在报告同时存在。真实通过之前，T24-D不勾选，总进度保持23/36。
