@@ -26,7 +26,7 @@
 
 ## 只读原生索引审计
 
-事务超限使用现有 [audit_transaction_limit.py](../../scripts/rocketmq/audit_transaction_limit.py)。新增 [audit_native_dead_letters.py](../../scripts/rocketmq/audit_native_dead_letters.py)按冻结的 v2 manifest 和具名 route 选择原生 `%DLQ%` Group，拒绝未登记、无订阅或非规范资源。两者只运行 `docker inspect` 和固定 `queryMsgByKey`，不读取正文、不移动消费位点、不补建 Topic、不重放消息、不改变 ACL 或数据库。
+事务超限使用现有 [audit_transaction_limit.py](../../scripts/rocketmq/audit_transaction_limit.py)。新增 [audit_native_dead_letters.py](../../scripts/rocketmq/audit_native_dead_letters.py)按冻结的 v2 manifest 和具名 route 选择原生 `%DLQ%` Group，拒绝未登记、无订阅或非规范资源。两者只运行 `docker inspect` 和固定 `queryMsgByKey`，不解析或导出正文、不移动消费位点、不补建 Topic、不重放消息、不改变 ACL 或数据库。
 
 DLQ 工具参数为 `--container`、`--project`、`--manifest`、`--route`、`--key` 和 `--output`，必须显式指定。它先验证 Compose 项目身份，再按一个 Group、一个受限 key 查询最多64条索引。输出0600文件原子新建，不覆盖现有文件或跟随已有链接；标准输出仅含条数、是否可能截断和告警枚举，不回显 key、消息 ID、原生日志或正文。失败返回固定 unavailable，不泄露命令输出和凭据。
 
@@ -40,7 +40,7 @@ DLQ 工具参数为 `--container`、`--project`、`--manifest`、`--route`、`--
 
 一个 Group 可能对应多个物理输入及事务 owner，例如 `qs-worker` 的评分订阅同时承接 MySQL、Mongo。审计报告保留完整候选 owner 集合并标记歧义，不凭 Group 或 key 选择某个数据库、修改 witness 或替任何 owner 确认事务。原生索引是取证材料，不是业务重试授权。
 
-固定5.5.1的 [QueryMsgByKeySubCommand](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/tools/src/main/java/org/apache/rocketmq/tools/command/message/QueryMsgByKeySubCommand.java)输出消息索引表。纯解析/权限与隐私测试只证明工具边界；T24 必须另取得真实 DLQ 记录的原生验收，不能用拼接文本替代。
+固定5.5.1的 [QueryMsgByKeySubCommand](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/tools/src/main/java/org/apache/rocketmq/tools/command/message/QueryMsgByKeySubCommand.java)输出消息索引表。工具承诺限制输出，不据此承诺Broker/MQAdmin内部不加载消息内容。纯解析/权限与隐私测试只证明工具边界；T24 必须另取得真实 DLQ 记录的原生验收，不能用拼接文本替代。
 
 ## Broker 中断后的协调恢复
 

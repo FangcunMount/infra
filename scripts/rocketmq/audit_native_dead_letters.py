@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only keyed DLQ index export for one explicit canonical v2 subscription.
 
-No bodies, replay, consumer offsets, resource provisioning or database selection.
+No body export, replay, consumer offsets, resource provisioning or database selection.
 A shared group lists candidate owners; its index does not prove one owner.
 """
 import argparse

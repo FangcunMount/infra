@@ -1,10 +1,20 @@
 import unittest
 
-from native_dead_letter_acceptance import manifest, safe_event, require_event, SDK
+from native_dead_letter_acceptance import manifest, safe_event, require_event, validate_options, SDK
 from routes import validate_v2
 
 
 class NativeDeadLetterAcceptanceTest(unittest.TestCase):
+    def test_profile_refuses_other_gates_before_fixture_startup(self):
+        options=dict(native_dlq_audit=True,sdk='/fixed/source',image='fixture',mysql_image='mysql:8.0.36',
+                     report='report.json',python='uv',qs_deferred_kind='mysql',sdk_api_go=False,iam_host=None)
+        validate_options(options)
+        for name,value in [('sdk_api_go',True),('iam_host','never-export'),
+                           ('python','other-runner'),('qs_deferred_kind','worker'),('native_dlq_audit',False)]:
+            mixed=dict(options);mixed[name]=value
+            with self.assertRaisesRegex(ValueError,'^native DLQ audit is a standalone fixture profile$'):
+                validate_options(mixed)
+
     def test_manifest_has_one_explicit_normal_group_and_owned_least_privilege_role(self):
         plan=manifest();validate_v2(plan)
         self.assertEqual(len(plan['routes']),1)

@@ -20,6 +20,16 @@ SDK = dict(Path='github.com/FangcunMount/reliable-messaging',Version='v0.5.0-roc
     GoModSum='h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')
 
 
+
+def validate_options(options):
+    allowed={'native_dlq_audit','sdk','image','mysql_image','report','python','qs_deferred_kind'}
+    if (options.get('native_dlq_audit') is not True
+            or any(value for key,value in options.items() if key not in allowed)
+            or options.get('python','uv')!='uv'
+            or options.get('qs_deferred_kind','mysql')!='mysql'):
+        raise ValueError('native DLQ audit is a standalone fixture profile')
+
+
 def manifest():
     topic,subscription='infra.native.audit','native-audit-observer'
     route=dict(id='native-audit',topic=topic,subscription=subscription,message_type='NORMAL',
