@@ -192,6 +192,7 @@ def main():
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
     parser.add_argument("--m3-resources", action="store_true", help="isolated final M3 manifest/ACL/type/TLS proof only; no production changes")
+    parser.add_argument("--native-dlq-audit", action="store_true", help="isolated native DLQ and index-only audit; no host/DB/business acceptance")
     parser.add_argument("--iam-host", type=Path, help="exact IAM checkout; require actual host SDK/Broker acceptance in the owned fixture")
     parser.add_argument("--qs-evaluation-host", type=Path, help="exact QS checkout; require real MySQL evaluation application/Broker profile")
     parser.add_argument("--qs-evaluation-private-log", type=Path, help="new0600 diagnostic in an owned0700 directory; never a CI artifact")
@@ -229,6 +230,12 @@ def main():
     parser.add_argument("--paired-host-faults", action="store_true", help="explicit paired MQ/process/Broker physical fault profile")
     parser.add_argument("--sdk-python-live-recovery", action="store_true", help="source-candidate Python producer survives actual owned Broker SIGKILL")
     args = parser.parse_args()
+    if args.native_dlq_audit:
+        from native_dead_letter_acceptance import validate_options
+        try:
+            validate_options(vars(args))
+        except ValueError:
+            parser.error("native DLQ audit is a standalone fixture profile")
     if args.sdk_python_live_recovery and (not args.sdk_api_go or not args.sdk_api_python
             or any((args.iam_host,args.m3_resources,args.iam_fanout_qs,args.qs_answer_host,
                 args.qs_evaluation_host,args.qs_report_host,args.qs_task_host,args.qs_retry_store_host,
@@ -582,6 +589,13 @@ def main():
                                      mysql_password, run, proof['qs_deferred_consumer_host'], owned_native_run, args.qs_deferred_consumer_private_log)
             for name in proof['qs_deferred_consumer_host']['native_receipt']['cases']:
                 passed(('qs_worker_runtime_' if args.qs_deferred_kind == 'worker' else 'qs_deferred_consumer_') + name)
+            return
+        if args.native_dlq_audit:
+            from native_dead_letter_acceptance import run_native
+            proof['native_dlq_audit'] = {}
+            run_native(repo,directory,broker,project,grpc_port,ca,run,owned_native_run,proof['native_dlq_audit'])
+            for name in proof['native_dlq_audit']['cases']:
+                passed('native_dlq/'+name)
             return
         if args.m3_resources:
             from m3_resources import run_resources
@@ -1064,6 +1078,18 @@ def main():
         report["sdk_source_sha256"] = {str(p.relative_to(sdk)): hashlib.sha256(p.read_bytes()).hexdigest()
                                        for p in sorted(sdk_sources.rglob("*")) if p.is_file()}
         report["sdk_sha"] = run(["git", "rev-parse", "HEAD"], cwd=sdk).stdout.strip()
+        if args.native_dlq_audit:
+            report['batch'] = 'M3-native-DLQ-index-audit-isolated'
+            report['limits'] = ['Fixed published Go SDK NORMAL poison and failed handoff in an isolated group',
+                'Real native DLQ index-only export; no host, database, transaction, real provider, system or production acceptance',
+                'Only this isolated group uses retryMaxTimes=1; production resources and budgets unchanged']
+            report['fixture_sdk_sha'] = report.pop('sdk_sha')
+            report['fixture_sdk_source_sha256'] = report.pop('sdk_source_sha256')
+            native_files = ['scripts/rocketmq/native_dead_letter_acceptance.py','scripts/rocketmq/audit_native_dead_letters.py',
+                'scripts/rocketmq/audit_transaction_limit.py','scripts/rocketmq/route_read_probe.py','scripts/rocketmq/routes.py',
+                'scripts/rocketmq/provision.py','scripts/rocketmq/provision_v2.py','scripts/rocketmq/ci-transactions.py']
+            native_files += ['scripts/rocketmq/probes/native-dead-letter/'+name for name in ('main.go','go.mod','go.sum')]
+            report['native_dlq_harness_sha256'] = {name:hashlib.sha256((repo/name).read_bytes()).hexdigest() for name in native_files}
         if args.m3_resources:
             report['batch'] = 'M3-production-candidate-resources-isolated'
             if proof.get('m3_resources',{}).get('profile')=='bootstrap':
