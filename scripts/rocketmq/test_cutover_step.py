@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import socket
+import shlex
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -129,6 +130,24 @@ class CutoverStepTest(unittest.TestCase):
                 repair_sha = hashlib.sha256(step._encoded(plan)).hexdigest()
                 step.execute(plan, b'exit 0\n', repair_sha)
             self.assertTrue((directory/('repair-approval-'+repair_sha+'.json')).is_file())
+
+    def test_distinct_reviewed_scope_commands_share_original_restore_boundary(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory, _, digest = fixture(root)
+            with patch.object(step.platform, 'system', return_value='Linux'):
+                for scope in ('iam', 'qs', 'ai'):
+                    done = Path(root)/(scope+'-restored')
+                    source = ('/usr/bin/touch '+shlex.quote(str(done))+'\n').encode()
+                    _, _, plan = planned(root, directory, digest, source, kind='pre-start-restore')
+                    plan['step'] = 'restore-'+scope
+                    sha = hashlib.sha256(step._encoded(plan)).hexdigest()
+                    status = step.execute(plan, source, sha)
+                    self.assertTrue(done.exists())
+                    self.assertEqual(status['phase'], 'restore_returned')
+                    self.assertFalse(status['cutover_authorized'])
+                    with Boundary(directory, digest) as operation:
+                        with self.assertRaises(BoundaryError): operation.start('unsafe-runtime', lambda: None)
+            self.assertEqual(len(list(directory.glob('reviewed-step-*.json'))), 3)
 
     def test_unavailable_never_prints_plan_script_or_exception(self):
         with tempfile.TemporaryDirectory() as root:
