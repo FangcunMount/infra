@@ -76,3 +76,12 @@ make prometheus-rules-verify
 首次部署先发布 qs-ai `/metrics`，再更新本组件的模板和规则，检查 `qs-ai` target、规则组和指标。规则单测验证等待时间、触发、恢复、抓取目标缺失和零样本；不会往生产写入假任务或伪造故障。发布时还需验证实际抓取和规则加载。告警在 Prometheus/Grafana 中可见；没有配置通知通道时不宣称完成外部通知。
 
 未知调用告警只能提示人工核对模型回执，禁止直接重发。容量拒绝告警不能自动修改业务策略。本批阈值是初始运维门槛，不是性能 SLA；qs-ai 的 `docs/operational-metrics.md` 记录每个聚合值的窗口、边界和故障处理。
+
+
+## RocketMQ 事务宿主指标
+
+`rules/rocketmq-transactions.yml` 消费 IAM、QS、AI 原 `/metrics` 的固定 `reliable_messaging_transaction_` 指标；Mac mini 仍直接抓取，serverD 不增加代理。规则覆盖当前确认audit缺口/准备过期120秒告警、宿主300秒保护锁定、实际回查连续饱和120秒、观测失败/过期、矛盾证据、新增无效回查及正向恢复audit失败。Python导出的是实际等待数，不把包含running的pending重复相加。
+
+保护由宿主执行，Prometheus只报警。确认audit缺口不等于Broker实际积压，累计FinalUnknown不作为当前未决；可能未发送的Aborted不会单独触发已知积压告警。关闭中的Checker不报持续饱和，锁定在健康采样后仍需同代次具名复核。规则测试分别覆盖边界、恢复、历史计数与无时间证据；运行 `make prometheus-rules-verify` 需要隔离CI中的固定promtool，本地不启动Docker。
+
+规则入库不表示Mac mini已安装/加载或生产告警已验收。目标发现、已配置owner的缺指标检查、实际路由/账号/保护与恢复责任，须在M3 T29–T33具名清单与演练中核对；system和48小时观察另记。当前状态见 [M3执行总表](../../docs/server/rocketmq-m3-execution.md)。

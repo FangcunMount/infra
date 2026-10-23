@@ -1,0 +1,122 @@
+{
+  "schema_version": "m3-host-observation-progress/v1",
+  "recorded_at": "2026-10-23T10:54:55.642125+00:00",
+  "m3_completed": 23,
+  "m3_total": 36,
+  "t24_completed_subgates": 2,
+  "t24_total_subgates": 4,
+  "hosts": [
+    {
+      "repository": "iam",
+      "source_sha": "990445fab1cb545157eb55fd932d002e5385e654",
+      "pr": "https://github.com/FangcunMount/iam/pull/139",
+      "source_files": {
+        "docs/03-基础设施/03-事件与Transactional-Outbox.md": "d936abd59a765c8211e4509eee06e424bc3c59ce6e46107f7db01ef36af9127b",
+        "go.mod": "7717b236831f33bbbea0916911079972437956a2ff7277bd19a93c1fc262a8cb",
+        "go.sum": "0bc46e326852a9a4bce94482e40fac779bacc395c71f0025c78b36368baaf8bc",
+        "internal/apiserver/container/platform/transaction.go": "007115976c5965148878455ed5848842ba88c1d949ef3abb3b1caa28d8c118e4",
+        "internal/apiserver/container/platform/transaction_eventing.go": "d5c0500a9dc4bb8cb1fe77f70140b8ea135196568718d35e673c973497dd9236",
+        "internal/apiserver/container/platform/transaction_lifecycle.go": "7211481a10515b38bac75235a3c51b0aae379696afea8cf74f53c484577968ae",
+        "internal/apiserver/container/platform/transaction_metrics.go": "77d20a0e905c797604235dc7731a3298b3bcd3b71c46c46d50aa01ab8ebf1248",
+        "internal/apiserver/container/platform/transaction_metrics_http_test.go": "ec3c45e12cc384c00ceb7e517619fe8a57a95e7483db43f174eea9d7c9072c48",
+        "internal/apiserver/container/platform/transaction_observation.go": "aed35c65443a57968fa7a6905b7a7e3dc59928a118c0848489ed66373f84190c",
+        "internal/apiserver/container/platform/transaction_observation_binding.go": "2d3d1479802a8598a46609204f9fb46952fb67194fcc98b30f98857cacbb7186",
+        "internal/apiserver/container/platform/transaction_observation_test.go": "16914c4c431a8ed5b8334032d382aee8b33582ca0009f21d8ea1a8b21adf7d89",
+        "internal/apiserver/container/platform/transaction_protection.go": "5573c0b2183431b80035eca1dee9516d7e50f45f014e83a5637a2050f0f08b72",
+        "internal/apiserver/container/platform/transaction_protection_test.go": "b4e1527e281be711b35bce4f286acae5363f531cf1d4cc3f83d01086ae0b7d76",
+        "internal/pkg/migration/transaction_runtime_native_integration_test.go": "ffc2c4b839964ecde3dceee734d823e3c1fcfb739db4358f2faf726def3eb4ba"
+      },
+      "merge": "pending",
+      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39942099168",
+      "native_status": "pending",
+      "deployment": "not_performed",
+      "business_system": "not_performed"
+    },
+    {
+      "repository": "qs-server",
+      "source_sha": "73ccd95f980fdfee2a510323f29f6f43eb728595",
+      "pr": "https://github.com/FangcunMount/qs-server/pull/431",
+      "source_files": {
+        "docs/03-基础设施/event/50-可观测性与故障恢复.md": "8860baf7a05de7635f069e8ccc17e19dcdd4b6ec95ea6fc19010dc1b5927b007",
+        "docs/document-closure.json": "afc2127bab5da08ea059050b17569e5e6190a6a1ae789009292bbbc0245fdddb",
+        "go.mod": "adb1002c0d7585d1899ebb51e429a522cebe444d5f4a001607ab84a994d3ef84",
+        "go.sum": "4015004bc1354067207704d5797da145ad7b60cbb27a16f912c425f397a781a9",
+        "internal/apiserver/container/owner_runtime_native_integration_test.go": "a45c4c690ac6179707c56b81977a36c03e2890eda61de3126179b8946b77641d",
+        "internal/pkg/messagingruntime/transaction.go": "482f81770a56a4399197566f0af2f32e7ee0106f89a91986e561ab1ce7bd793c",
+        "internal/pkg/messagingruntime/transaction_lifecycle.go": "8e25adf4822c899dc9aea636cae3f92c958358ddc9f9e9678e13ee613764d6a7",
+        "internal/pkg/messagingruntime/transaction_metrics.go": "5d994fca73402c8c82f161bd83c0b8b2846a5048c4af50c4f30e829a7130b5fd",
+        "internal/pkg/messagingruntime/transaction_metrics_http_test.go": "9a7268b68a6da626c57fbc9e8c3b3b429166c96ac62bc49ca0ba18c772a8b693",
+        "internal/pkg/messagingruntime/transaction_observation.go": "b39437250d1baa5ce0da10a7cb201bcfe36e52793523814a7a4f1527d4a7f779",
+        "internal/pkg/messagingruntime/transaction_observation_binding.go": "ce9d01646e6c9137ed64225fefecd31045c23ac9e76c5151b8911de557a45a95",
+        "internal/pkg/messagingruntime/transaction_observation_test.go": "c9f918998b01dc1ba2b5d8c80c59d67ccbc728ebaccd6d90a8634e53c3263e98",
+        "internal/pkg/messagingruntime/transaction_protection.go": "9721ac068ab9ab7f5b8cef1169a171a008fd0bacbe4bbe48db5cec7916b1bbd0",
+        "internal/pkg/messagingruntime/transaction_protection_test.go": "a3af9abd3a7a1823e5c25bbfeee34f8f02be5c50f039b42d33cb785e13dacb00",
+        "scripts/check_docs_facts.py": "1bd1d6b810ea19af4a59929797a066be8f9e19bd4a7b754e29ae93a05ff6eaf2",
+        "scripts/tests/test_docs_facts_infrastructure.py": "672297968c38c7c96294b1660c15d6311fad8efa2a1539186268c50a47a94689"
+      },
+      "merge": "pending",
+      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39941387566",
+      "native_status": "pending",
+      "deployment": "not_performed",
+      "business_system": "not_performed"
+    },
+    {
+      "repository": "qs-ai",
+      "source_sha": "a2c844f6d06b3e313f0020bc5f53e998d698051b",
+      "pr": "https://github.com/FangcunMount/qs-ai/pull/218",
+      "source_files": {
+        "docs/03-基础设施/messaging/README.md": "3d6cd83abb6a8966e5242a417651c994e8f2942e67b50ec029ba4de97fe337c9",
+        "docs/03-基础设施/observability/README.md": "b21798dca3ee5c44f470e8c4aaa8e53b26dded3af43c2822181ed205a829022a",
+        "docs/document-closure.json": "d494084f7736c26833861076ff90e7c7fbd3ca68b8739b24cd704e8dde307caf",
+        "pyproject.toml": "4c71e6ade6535de1deda93789bd4c5ebc9722482798e79a27216589e4e4f4ea9",
+        "src/qs_ai/application/operations/metrics.py": "85524da36c6e4f8a8b1300fc400944be59e72a0ddda70324ac54162c70d50438",
+        "src/qs_ai/bootstrap/providers/transactions.py": "3510b87509267997d77da32856f6582e0c6919da36d480aed45e1187adbdbfe5",
+        "src/qs_ai/bootstrap/transaction_messaging.py": "7041b7066685bc2d3e287710769de4852b4fb4110a30bf71412940305089141f",
+        "src/qs_ai/bootstrap/transaction_observation.py": "07fdaa1e2554d8664679d0e2754e19e27cc5605b4b04124e48333032a7a6efab",
+        "src/qs_ai/bootstrap/transaction_protection.py": "a782a543778a7cc20c5749defe79db0c6e2afd3d3d9b92160cb0d8a7f0cd29a2",
+        "src/qs_ai/transport/http/metrics.py": "b786adf9f1e268c62b5f1c8d0ef754190cf6362bc7a2b603eeae3839378d6ee7",
+        "src/qs_ai/transport/http/transaction_metrics.py": "b5854af57a2f75a2c09f619a749936a1943b9ed0f976ad1e2d7eb3b2b655d5e1",
+        "tests/integration/rocketmq_state_host.py": "e32d3a10ae461ea137d45c553eca7c423029140e9292ce1a1d78e7f84cbde640",
+        "tests/test_transaction_metrics.py": "4d9fea5519499c7783f850bea76d9a591029f34d693dafb2d3a5f8b87694cbc5",
+        "tests/test_transaction_protection.py": "b292060be73553f9bf8f6d52141dc1d815b575f9f8cf9df36709385f7419f3ed",
+        "uv.lock": "75b260e09a27bc28d09003f2a02684fcf7c229c988320dd7260e8e41092d5041"
+      },
+      "merge": "pending",
+      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39942158522",
+      "native_status": "pending",
+      "deployment": "not_performed",
+      "business_system": "not_performed"
+    }
+  ],
+  "sdk": {
+    "go": "v0.5.0-rocketmq-tx.4",
+    "python": "0.4.0a4",
+    "sha": "04757bd3212ca961d8eaec22ecd3560101111e18",
+    "published": true,
+    "stable": false
+  },
+  "infra": {
+    "pr": "https://github.com/FangcunMount/infra/pull/185",
+    "sha": "a89931c0ac388a5ecea6dc9641d1a63e81ddf468",
+    "merge": "pending"
+  },
+  "local_validation": {
+    "go_target_race": "passed",
+    "go_changed_lint": "passed",
+    "go_native": "compiled_only",
+    "ai_pure_passed": 4239,
+    "ai_integration_interop_deselected": 1351,
+    "ai_mypy_source_files": 450,
+    "ai_ruff": "passed",
+    "harness_pure_passed": 200,
+    "docs": "passed"
+  },
+  "limitations": [
+    "Real DB/Broker restricted to isolated GitHub Actions",
+    "QS ages exact owned half audit timestamps by600s; no real ten-minute elapsed claim",
+    "IAM/AI changes only owned temporary binding; no business or positive audit fabrication",
+    "Observation gaps are not exact Broker pending responsibility",
+    "No-callback terminal audit debt requires separately verified T25 recovery",
+    "No production config/schema/provider/worker changes, system login or48h"
+  ]
+}

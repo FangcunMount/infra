@@ -1,0 +1,280 @@
+rule_files:
+- ../rules/rocketmq-transactions.yml
+evaluation_interval: 30s
+tests:
+- name: confirmation warning uses current gap and freshness, not historical unknown count
+  interval: 30s
+  input_series:
+  - series: reliable_messaging_transaction_oldest_confirmation_observation_age_seconds{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 119 120 300 600 600
+  - series: reliable_messaging_transaction_confirmation_gap_branches{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 1 1 1 0 1
+  - series: reliable_messaging_transaction_observation_fresh{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 1 1 1 1 0
+  - series: reliable_messaging_transaction_outcomes_total{owner="ai.mysql",job="qs-ai",instance="fixture:8000",stage="final",outcome="unknown"}
+    values: 900+1x4
+  alert_rule_test:
+  - eval_time: 0m
+    alertname: RocketMQTransactionConfirmationObservationAged
+    exp_alerts: []
+  - eval_time: 30s
+    alertname: RocketMQTransactionConfirmationObservationAged
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: warning
+        subsystem: messaging
+      exp_annotations: &id001
+        summary: Transaction confirmation audit gap exceeds warning age
+        description: Inspect exact original witnesses and positive recovery RPC audits. This is observation debt,
+          not exact Broker backlog or permission to rerun business.
+  - eval_time: 1m
+    alertname: RocketMQTransactionConfirmationObservationAged
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: warning
+        subsystem: messaging
+      exp_annotations: *id001
+  - eval_time: 90s
+    alertname: RocketMQTransactionConfirmationObservationAged
+    exp_alerts: []
+  - eval_time: 2m
+    alertname: RocketMQTransactionConfirmationObservationAged
+    exp_alerts: []
+- name: preparation warning starts since expiry and requires actual preparing work
+  interval: 30s
+  input_series:
+  - series: reliable_messaging_transaction_prepared_expiry_age_seconds{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 119 120 300 300
+  - series: reliable_messaging_transaction_preparing_executions{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 1 1 0 1
+  - series: reliable_messaging_transaction_observation_fresh{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 1 1 1 0
+  alert_rule_test:
+  - eval_time: 0m
+    alertname: RocketMQTransactionPreparationExpired
+    exp_alerts: []
+  - eval_time: 30s
+    alertname: RocketMQTransactionPreparationExpired
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: warning
+        subsystem: messaging
+      exp_annotations:
+        summary: Transaction preparation remains expired
+        description: Inspect exact execution and bounded abort maintenance. Lease expiry alone is not rollback evidence
+          or permission to repeat the executor.
+  - eval_time: 1m
+    alertname: RocketMQTransactionPreparationExpired
+    exp_alerts: []
+  - eval_time: 90s
+    alertname: RocketMQTransactionPreparationExpired
+    exp_alerts: []
+- name: missing observation retained until fresh healthy sampling
+  interval: 30s
+  input_series:
+  - series: reliable_messaging_transaction_observation_available{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 0 0 0 0 0 1
+  - series: reliable_messaging_transaction_observation_fresh{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 0 0 0 0 0 1
+  alert_rule_test:
+  - eval_time: 90s
+    alertname: RocketMQTransactionObservationUnavailable
+    exp_alerts: []
+  - eval_time: 2m
+    alertname: RocketMQTransactionObservationUnavailable
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: warning
+        subsystem: messaging
+      exp_annotations:
+        summary: Transaction protocol observation unavailable
+        description: New sends must remain paused. Inspect the primary-store binding, sampler and actual in-flight
+          work; failed reads do not mean zero responsibility.
+  - eval_time: 150s
+    alertname: RocketMQTransactionObservationUnavailable
+    exp_alerts: []
+- name: latched protection remains critical after the observation gap resolves
+  interval: 30s
+  input_series:
+  - series: reliable_messaging_transaction_admission_protected{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 0 1 1 0
+  - series: reliable_messaging_transaction_confirmation_gap_branches{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 1 0 0 0
+  alert_rule_test:
+  - eval_time: 0m
+    alertname: RocketMQTransactionAdmissionProtected
+    exp_alerts: []
+  - eval_time: 30s
+    alertname: RocketMQTransactionAdmissionProtected
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: critical
+        subsystem: messaging
+      exp_annotations: &id002
+        summary: Transaction owner admission protection latched
+        description: Retain Checker and primary dependencies. Resolve exact responsibility, record a matching generation
+          and named review, then explicitly restore admission; do not switch providers.
+  - eval_time: 1m
+    alertname: RocketMQTransactionAdmissionProtected
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: critical
+        subsystem: messaging
+      exp_annotations: *id002
+  - eval_time: 90s
+    alertname: RocketMQTransactionAdmissionProtected
+    exp_alerts: []
+- name: continuous full capacity requires120seconds and ignores intentional shutdown
+  interval: 30s
+  input_series:
+  - series: reliable_messaging_transaction_running_checks{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 1+0x7
+  - series: reliable_messaging_transaction_queued_checks{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 16 16 16 16 16 15 16 16
+  - series: reliable_messaging_transaction_check_workers_limit{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 1+0x7
+  - series: reliable_messaging_transaction_check_queue_limit{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 16+0x7
+  - series: reliable_messaging_transaction_sdk_stopping{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 0 0 0 0 0 0 1 1
+  alert_rule_test:
+  - eval_time: 90s
+    alertname: RocketMQTransactionCheckerSaturated
+    exp_alerts: []
+  - eval_time: 2m
+    alertname: RocketMQTransactionCheckerSaturated
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: critical
+        subsystem: messaging
+      exp_annotations:
+        summary: Transaction Checker capacity continuously saturated
+        description: Preserve the existing shared owner budget and still-running work. Inspect database and RPC
+          completion before reviewing protection; cancellation does not release actual capacity.
+  - eval_time: 150s
+    alertname: RocketMQTransactionCheckerSaturated
+    exp_alerts: []
+  - eval_time: 3m
+    alertname: RocketMQTransactionCheckerSaturated
+    exp_alerts: []
+- name: unsafe metadata is separate from ambiguous possibly unsent aborts
+  interval: 30s
+  input_series:
+  - series: reliable_messaging_transaction_metadata_conflicts{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 0 1 0 0
+  - series: reliable_messaging_transaction_unaged_confirmation_gap_branches{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 0 0 1 0
+  - series: reliable_messaging_transaction_unobserved_committed_branches{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 0 0 0 1
+  - series: reliable_messaging_transaction_untracked_aborted_branches{owner="ai.mysql",job="qs-ai",instance="fixture:8000"}
+    values: 1000+0x3
+  alert_rule_test:
+  - eval_time: 0m
+    alertname: RocketMQTransactionEvidenceUnsafe
+    exp_alerts: []
+  - eval_time: 30s
+    alertname: RocketMQTransactionEvidenceUnsafe
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: critical
+        subsystem: messaging
+      exp_annotations: &id003
+        summary: Transaction protocol evidence requires review
+        description: Refuse new owner executions and inspect exact persistent binding and witnesses. Do not synthesize
+          a positive confirmation or discard unclassified evidence.
+  - eval_time: 1m
+    alertname: RocketMQTransactionEvidenceUnsafe
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: critical
+        subsystem: messaging
+      exp_annotations: *id003
+  - eval_time: 90s
+    alertname: RocketMQTransactionEvidenceUnsafe
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: critical
+        subsystem: messaging
+      exp_annotations: *id003
+- name: new positive audit failure alerts, old cumulative failures resolve
+  interval: 30s
+  input_series:
+  - series: reliable_messaging_transaction_recovery_audits_total{owner="ai.mysql",job="qs-ai",instance="fixture:8000",outcome="error"}
+    values: 1 1 2 2 2 2 2 2 2 2 2 2 2
+  alert_rule_test:
+  - eval_time: 30s
+    alertname: RocketMQTransactionRecoveryAuditFailure
+    exp_alerts: []
+  - eval_time: 1m
+    alertname: RocketMQTransactionRecoveryAuditFailure
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: critical
+        subsystem: messaging
+        outcome: error
+      exp_annotations:
+        summary: Transaction positive recovery audit failed
+        description: A Broker acknowledgement and audit persistence are separate. Keep the original reference and
+          terminal evidence; use named recovery rather than business or model replay.
+  - eval_time: 6m
+    alertname: RocketMQTransactionRecoveryAuditFailure
+    exp_alerts: []
+- name: new invalid callback alerts instead of permanent historical counter alarm
+  interval: 30s
+  input_series:
+  - series: reliable_messaging_transaction_checks_total{owner="ai.mysql",job="qs-ai",instance="fixture:8000",outcome="invalid"}
+    values: 5 5 6 6 6 6 6 6 6 6 6 6 6
+  alert_rule_test:
+  - eval_time: 30s
+    alertname: RocketMQTransactionInvalidCheck
+    exp_alerts: []
+  - eval_time: 1m
+    alertname: RocketMQTransactionInvalidCheck
+    exp_alerts:
+    - exp_labels:
+        owner: ai.mysql
+        job: qs-ai
+        instance: fixture:8000
+        severity: critical
+        subsystem: messaging
+        outcome: invalid
+      exp_annotations:
+        summary: Transaction owner rejected invalid recovery evidence
+        description: Inspect owner, route, wire hash and primary binding; retain Checker. Review only the matching
+          protection generation with fresh authoritative evidence.
+  - eval_time: 6m
+    alertname: RocketMQTransactionInvalidCheck
+    exp_alerts: []
