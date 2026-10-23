@@ -1,9 +1,13 @@
 import copy
+import contextlib
+import io
+import os
 import datetime as dt
 import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 import nsq_drain_evidence as drain
 
@@ -108,6 +112,30 @@ class DrainTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/"bad.json";path.write_text('{"nodes":[],"nodes":[]}')
             with self.assertRaisesRegex(ValueError,"duplicate_json_key"):drain.load(path)
+
+    def test_missing_empty_channel_array_is_not_an_authoritative_empty_list(self):
+        self.manifest["nodes"][0]["topics"]["qs.events"] = []
+        for capture in self.captures["nodes"][0]["captures"]:
+            capture["stats"]["topics"][0].pop("channels")
+        with self.assertRaisesRegex(ValueError,"invalid_stats"):self.run_gate()
+
+    def test_cli_private_atomic_output_and_redacted_refusal(self):
+        now = dt.datetime.now(dt.timezone.utc)
+        for index, capture in enumerate(self.captures["nodes"][0]["captures"]):
+            capture["captured_at"] = (now-dt.timedelta(seconds=10 if index==0 else 1)).isoformat().replace("+00:00","Z")
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);manifest=root/"inventory.json";captures=root/"captures.json";output=root/"receipt.json"
+            manifest.write_text(json.dumps(self.manifest));captures.write_text(json.dumps(self.captures))
+            args=["gate","--inventory",str(manifest),"--captures",str(captures),"--output",str(output)]
+            with mock.patch("sys.argv",args),contextlib.redirect_stdout(io.StringIO()) as stdout:
+                self.assertEqual(drain.main(),0)
+            self.assertEqual(os.stat(output).st_mode & 0o777,0o600)
+            receipt=output.read_bytes();self.assertFalse(json.loads(receipt)["cutover_authorized"])
+            self.assertNotIn("qs.events",stdout.getvalue());self.assertNotIn("worker",stdout.getvalue())
+            with mock.patch("sys.argv",args),contextlib.redirect_stdout(io.StringIO()) as stdout:
+                self.assertEqual(drain.main(),1)
+            self.assertEqual(output.read_bytes(),receipt)
+            self.assertNotIn(str(output),stdout.getvalue())
 
     def test_cumulative_counter_reset_not_a_clean_window(self):
         self.latest()["stats"]["topics"][0]["message_count"] = 0

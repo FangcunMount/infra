@@ -91,7 +91,8 @@ def normalize(capture, expected):
         for field in ("depth", "backend_depth"):
             require(counter(topic.get(field)) == 0, "topic_backlog")
         counts = [counter(topic.get(field)) for field in ("message_count", "message_bytes")]
-        channels = topic.get("channels")
+        require("channels" in topic, "invalid_stats")
+        channels = topic["channels"]
         # Pinned NSQ marshals a nil empty channel slice as null.
         if channels is None:
             channels = []
