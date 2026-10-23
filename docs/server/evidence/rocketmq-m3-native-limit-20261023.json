@@ -876,5 +876,121 @@
   "notes": [
     "AI focus partial cases are aggregated across the two parameterized tests; native8 in39974192038 came from True only. False failed, so the profile is not accepted.",
     "IAM39971013040 top18/1/0 failed before native fault construction: compiler1.25.9 vs fault module minimum1.25.12. The same SDK4 itself supports minimum1.25.9; probe minimum corrected, no race disabled."
-  ]
+  ],
+  "iam_final_native": {
+    "run": 39977471006,
+    "source_sha": "87b4a20f2aa5e4c2e59e49d366d1abc25889a6cc",
+    "merge_sha": "488689d342a4965bc7e5ae21ec2f95e173cfa64b",
+    "scope": "three real MySQL profiles; actual Writer/new owner/native deny; idle Checker readiness not new callback",
+    "host_profiles": [
+      {
+        "file": "rocketmq-iam-host.json",
+        "report_sha256": "54d5f127f491d43e75daf153a476ac8298141f8048bff2adc587bd51f44f1e33",
+        "source_sha": "87b4a20f2aa5e4c2e59e49d366d1abc25889a6cc",
+        "kind": "iam",
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.9",
+        "mysql_version": "8.0.36",
+        "image": "sha256:56869abcbe3933e6b2508066651009a78f0815a4a46efeb10a24938b5cb2ca62",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "b9e347d9e92983bda1bf8c1b59489d876c4a4054e176c4a635f1b708567eabe1"
+      },
+      {
+        "file": "rocketmq-iam-host.json",
+        "report_sha256": "33ba4237db6b6d170ec7f67529689087765094cc5e76e1b21c5fe132a15dd062",
+        "source_sha": "87b4a20f2aa5e4c2e59e49d366d1abc25889a6cc",
+        "kind": "iam",
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.9",
+        "mysql_version": "8.0.44",
+        "image": "sha256:47f66208e949a418234c1b4991eb6095d32aa61c649247b969bb852a29266501",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "7a1b5623e0bfb530a3e5b47255b4e7df86c7477d4c5f5248e1d9acfaf71362b4"
+      },
+      {
+        "file": "rocketmq-iam-host.json",
+        "report_sha256": "771eab13a4b1357c6e3ee54de2b89ae552e680b51df38c9152e6ec1b2e471487",
+        "source_sha": "87b4a20f2aa5e4c2e59e49d366d1abc25889a6cc",
+        "kind": "iam",
+        "passed": 28,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.9",
+        "mysql_version": "8.4.13",
+        "image": "sha256:a440014f44db6a3566d78c3d675b3696f452ce658f44ba210c85345c76a72ba7",
+        "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "2df214dca03d8d792e83001ad1bf58d3455f10cfffd6a5abb63a444b3b9a0b81"
+      }
+    ],
+    "root_profiles": [
+      {
+        "report_sha256": "cb2f35b13452038a6227f16ae65659e2f3207a0c372a6aa53cdc283a207aafcc",
+        "source_sha": "87b4a20f2aa5e4c2e59e49d366d1abc25889a6cc",
+        "mysql_version": "8.0.36",
+        "tests": {
+          "pass": 34,
+          "fail": 0,
+          "skip": 0
+        },
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        }
+      },
+      {
+        "report_sha256": "010ebd97eff03a427f4fe76fd53a479eb185162d955cd2222c27cb9814a0af4d",
+        "source_sha": "87b4a20f2aa5e4c2e59e49d366d1abc25889a6cc",
+        "mysql_version": "8.0.44",
+        "tests": {
+          "pass": 34,
+          "fail": 0,
+          "skip": 0
+        },
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        }
+      },
+      {
+        "report_sha256": "4ebe4a56ac6cb94660566cff4e78e2989a0f9617eaf7fddda8c67ed25401676b",
+        "source_sha": "87b4a20f2aa5e4c2e59e49d366d1abc25889a6cc",
+        "mysql_version": "8.4.13",
+        "tests": {
+          "pass": 34,
+          "fail": 0,
+          "skip": 0
+        },
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        }
+      }
+    ],
+    "source_checks_success": 11,
+    "conditional_image_publication_not_selected": 1,
+    "production_deploy_paused": true,
+    "production_deployment_performed": false
+  }
 }
