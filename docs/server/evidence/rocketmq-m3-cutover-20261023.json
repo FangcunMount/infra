@@ -149,7 +149,7 @@
     "No native dependency executed locally, no production operations",
     "Startup/recovery and no-callback audit debt still require T25-C proof"
   ],
-  "recorded_at": "2026-10-23T19:12:23.452244+00:00",
+  "recorded_at": "2026-10-23T20:02:22.028313+00:00",
   "workflow_history": [
     {
       "conclusion": "success",
@@ -1839,5 +1839,298 @@
       "T25-D whole cutover gate; T29 final image/30-minute rehearsal"
     ],
     "production_executed": false
+  },
+  "pre_start_maintenance": {
+    "pr": "https://github.com/FangcunMount/infra/pull/199",
+    "source": "eaf95da410aa0a606c4cb3e52c5056782d2cda0b",
+    "merge": "520729ac6c233ba6c5fbe36983e46352953f6ad5",
+    "merged_at": "2026-10-23T19:58:39Z",
+    "test_merge_tree": "bdc407cde46d31e4283473d951f7e910907aa78b",
+    "actual_merge_tree": "bdc407cde46d31e4283473d951f7e910907aa78b",
+    "pure_tests": 257,
+    "checks_passed": 11,
+    "workflows": 7,
+    "artifact_instances": 17,
+    "unique_reports": 13,
+    "duplicate_limit": "Two image-bundle report copies and two manually selected download copies; unique evidence counted by SHA256",
+    "report_index_sha256": "ec24499f4aff2d59cc54bf4610ed58e099ace9c3f5c0989d898bfd50218296e4",
+    "reports": [
+      {
+        "run": "40011939297",
+        "file": "runtime-start-native.json",
+        "sha256": "9da9840ccdbf13376d0465f035664954f2d8044ab79b270bde70701a1f22e421",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "no_rescue_needed": true,
+          "private_fixture_directory_removed": true,
+          "existing_container_id_set_unchanged": true,
+          "existing_network_id_set_unchanged": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939538",
+        "file": "rocketmq-packet-faults.json",
+        "sha256": "f9a47d2dade61533add9747e24c0ddb99faeaa9243cbf3714b23136c44954b6c",
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939538",
+        "file": "rocketmq-packet-faults.json",
+        "sha256": "b4c67fee1bd4930f617d8281cf6815d949409271d5945b31359bd52d8660b063",
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939968",
+        "file": "rocketmq-public-sdk.json",
+        "sha256": "283cc2c55d5f71faa74d9fc974bfef34015ff0f18462e78e5c2fc2e12a829697",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939968",
+        "file": "rocketmq-public-sdk.json",
+        "sha256": "2dde26e0cb5406a4c9343f194923df20e991f153edd1824c219f52973ade3cfb",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939668",
+        "file": "rocketmq-m2-transactions.json",
+        "sha256": "17bf29d697d3e940f741110c2305bca67e65ec718030427e34e2c833d97c2439",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939668",
+        "file": "rocketmq-m2-go-sdk.json",
+        "sha256": "c98961e91997e9255c913279db269fb43d9bcdb6c33bd4dbc6f530d0d1ce4413",
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939668",
+        "file": "rocketmq-m2-go-sdk.json",
+        "sha256": "c98961e91997e9255c913279db269fb43d9bcdb6c33bd4dbc6f530d0d1ce4413",
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939668",
+        "file": "rocketmq-m2-transactions.json",
+        "sha256": "17bf29d697d3e940f741110c2305bca67e65ec718030427e34e2c833d97c2439",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939668",
+        "file": "rocketmq-m1-evidence.json",
+        "sha256": "95e0f3d487ac5d676c7a66ceaa4cb5ac8beb9614689c23e8ea3d6047a76c84d8",
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": null,
+        "cleanup_limit": "Legacy artifact has no cleanup/readback object; ci-smoke finally requires owned compose down and required workflow step succeeded; do not invent readback fields"
+      },
+      {
+        "run": "40011939668",
+        "file": "rocketmq-m2-transactions.json",
+        "sha256": "17bf29d697d3e940f741110c2305bca67e65ec718030427e34e2c833d97c2439",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939668",
+        "file": "rocketmq-m2-go-sdk.json",
+        "sha256": "c98961e91997e9255c913279db269fb43d9bcdb6c33bd4dbc6f530d0d1ce4413",
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939377",
+        "file": "rocketmq-m3-resources.json",
+        "sha256": "f2eb48928779ed40eda41bfc392f9cf4304f396385e24123f936fcb336ac3afb",
+        "passed": 134,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939306",
+        "file": "cutover-boundary.json",
+        "sha256": "bf93fcf054ac732c55e167313d3642b22beaec6536cc338f106fac2287165683",
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "fixture_empty_before_removal": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939551",
+        "file": "rocketmq-complete-sdk.json",
+        "sha256": "e7fba0795f96a2eb7e1689fe87288c88341df8bec50ab407046fdc378ad6bc7f",
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939551",
+        "file": "rocketmq-complete-sdk.json",
+        "sha256": "823d6eccf59294f6ea198e6e8e16823c9e7c339db4199b6880c54f907412c610",
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "40011939551",
+        "file": "rocketmq-native-dlq-audit.json",
+        "sha256": "4c90f2ea1637806a05753c1a0ea13928f0744caee2ae967231e6e01017b245ab",
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      }
+    ],
+    "candidate_to_test_delta": [
+      "docs/server/evidence/rocketmq-m3-cutover-20261023.json",
+      "docs/server/rocketmq-m3-execution.md",
+      "docs/server/rocketmq-m3-start-boundary.md"
+    ],
+    "delta_limit": "Only already merged PR198 progress/closure docs; all tool/fixture/workflow source bytes identical",
+    "component_complete": true,
+    "c2_complete": false,
+    "t25_complete": false,
+    "production_authorized": false
   }
 }
