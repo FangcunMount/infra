@@ -153,6 +153,16 @@ def run_profile(source,directory,env,command,run,proof,native_runner,broker_faul
             proof['broker_restart'] = broker_fault.start()
             proof['topic_routes_ready'] = broker_fault.wait_topic_routes(
                 sorted({r['physical_topic'] for r in config['routes']}))
+            from route_read_probe import parse_output
+            proof['proxy_routes_ready'] = []
+            for ordinal, topic in enumerate(sorted({r['physical_topic'] for r in config['routes']})):
+                private = directory / ('paired-proxy-route-' + str(ordinal) + '.json')
+                private.write_text(json.dumps(dict(endpoint=config['endpoint'],ca=config['ca_file'],
+                    topic=topic,accesskey=config['ai']['username'],secretkey=config['ai']['password'])))
+                private.chmod(0o600)
+                response = run([*command,'python',str(Path(__file__).with_name('route_read_probe.py')),
+                    '--config',str(private),'--mode','route-read'],cwd=source,env=env,timeout=65)
+                proof['proxy_routes_ready'].append(parse_output(response.stdout,topic))
             write_control(paths['broker_ready'],'broker-ready')
         except Exception:
             proof['supervision_failed'] = True

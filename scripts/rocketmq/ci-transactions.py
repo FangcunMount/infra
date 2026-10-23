@@ -1253,8 +1253,7 @@ def main():
                                               repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/sdk_faults.py", repo / "scripts/rocketmq/sdk_limits.py",
                                               repo / "scripts/rocketmq/audit_transaction_limit.py", repo / "scripts/rocketmq/routes.py",
                                               repo / "scripts/rocketmq/provision_v2.py")}
-        if args.sdk_python_live_recovery:
-            report['harness_sha256']['scripts/rocketmq/route_read_probe.py'] = hashlib.sha256((repo / 'scripts/rocketmq/route_read_probe.py').read_bytes()).hexdigest()
+        report['harness_sha256']['scripts/rocketmq/route_read_probe.py'] = hashlib.sha256((repo / 'scripts/rocketmq/route_read_probe.py').read_bytes()).hexdigest()
         report['harness_sha256']['scripts/rocketmq/failure_diagnostics.py'] = hashlib.sha256(
             (repo / 'scripts/rocketmq/failure_diagnostics.py').read_bytes()).hexdigest()
         report['harness_sha256']['scripts/rocketmq/published_runtime.py'] = hashlib.sha256(

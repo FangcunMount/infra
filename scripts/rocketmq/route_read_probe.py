@@ -17,6 +17,22 @@ def receipt(response, topic, attempts):
         topic_sha256=hashlib.sha256(topic.encode()).hexdigest(),read_only=True)
 
 
+def parse_output(output, topic):
+    rows=[line.removeprefix('TXPROBE ') for line in output.splitlines() if line.startswith('TXPROBE ')]
+    if len(rows)!=1 or len(rows[0])>2048:
+        raise RuntimeError('one bounded read-only Proxy route receipt required')
+    event=json.loads(rows[0])
+    value=json.loads(event['decision'])
+    if (event.get('event')!='proxy_route' or set(event)!={'event','id','decision'}
+            or not isinstance(value,dict) or set(value)!={'code','queues','attempts','topic_sha256','read_only'}
+            or any(type(value[k]) is not int for k in ('code','queues','attempts'))
+            or value['code']!=20000 or not 1 <= value['queues'] <= 1024 or not 1 <= value['attempts'] <= 10
+            or value['topic_sha256']!=hashlib.sha256(topic.encode()).hexdigest()
+            or value['read_only'] is not True):
+        raise RuntimeError('actual authenticated Proxy route readiness missing or unsafe')
+    return value
+
+
 async def main(args):
     import grpc
     from rocketmq.grpc_protocol import Code, MessagingServiceStub, QueryRouteRequest, Resource
