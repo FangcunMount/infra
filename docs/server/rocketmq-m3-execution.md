@@ -1548,3 +1548,15 @@ T25-A打勾，内部1/4。T25只是独立准备，不依此跳过T24-D的原生�
 第二轮与AI开发失败保留在 [native-limit证据](evidence/rocketmq-m3-native-limit-20261023.json)。QS run39969675310确认固定SDK4故障进程exit0、实际索引1/Unknown2/故障库删除及参数恢复；宿主在同一10秒预算里的第二个Java管理命令失败，已改成每条45秒独立夹具预算，生产SDK RPC仍5秒。AI run39971012968确认实际SYS索引及原主库幂等写入，focus两用例失败：False参数的idle worker无到期工作不应被要求抛准入错误，随后不同绑定的参数化夹具也须隔离治理记录。修正为原有效计划Reserve/Execute拒绝、实际worker只准无进展或拒绝，并仅在自有测试schema、实际默认runtimes已关闭后清理精确绑定的夹具治理行；不新增运行时解除/删除入口。0通过/1失败/0跳过的顶层回执、focus12项部分证据/2失败/0跳过、原始摘要和完整清理均原样保留，不冒充正式门禁。
 
 IAM来源2f69c88的完整CI发现schema白名单漏列新表与文档机器目标仍44，候选534fb252修正为明确45/对应表；相关race、文档事实及链接检查通过，原生仍另验收。全仓本地golangci-lint暴露两个既有M6夹具的5个errcheck问题，未修改这些无关历史工具，也不签全仓lint通过；本轮平台/迁移范围lint通过，实际CI使用原make lint门禁，结果另记。T24-D保持未勾选。
+
+
+### T24-D 验证分支与当前门禁
+
+后续小修先在四库 `codex/rocketmq-m3-native-limit-verify` 验证，同一通过SHA再正常fast-forward到现有草稿PR；完整CI门禁保留，避免每次夹具小修都重复排队全部旧profile。草稿PR仍为QS432/IAM140/AI219/infra192，未合并、未发布稳定版、未部署。
+
+- QS候选b57dcdc5：独立45秒管理命令预算已编译/lint/文档检查，开发run39974192103进行中。
+- IAM验证87b4a20f：只读dbops按精确clean45增加治理表，要求29个基础表（可另含原可选审计表），旧版本的提前治理表、dirty45和future46继续拒绝。16.258秒纯race、ShellCheck及文档事实通过；真实回归run39976925368进行中。此前主线CI只接受38..44的失败保留，原备份/恢复授权不变。
+- AI验证34384f8：恢复旧binding-conflict场景原断言，将有效原计划Reserve/Execute拒绝与idle-worker无进展逻辑放入正确native区块；两参数均必需通过，不能凭聚合partial cases接受。run39974192038只有True参数完成native8，False仍失败；已保留0/1/0顶层、20/1/0 focus partial和清理。修正后的六档最终矩阵run39976927758已启动。
+- infra验证d6158a8：故障探针最小Go对齐SDK4的1.25.9，保留1.25.9/1.25.12兼容窗口及race。IAM前run39971013040的34原生root项通过，但top18/1/0在Go版本不匹配处失败，原生保护尚未运行；不作为D通过。当前IAM最终三档矩阵另记后续receipt。
+
+进度保持M3 23/36、T24 3/4、T25 1/4；除纯测试/静态/编译外，真实依赖仅隔离GitHub Actions，未在本机或生产运行。先完成这些非空零失败零跳过门禁和源码合并，再勾选D及T24。

@@ -300,6 +300,167 @@
         "probe_process_groups_drained": true,
         "private_fixture_directory_removed": true
       }
+    },
+    {
+      "run": 39974192038,
+      "ci_url": "https://github.com/FangcunMount/infra/actions/runs/39974192038",
+      "report_file": "rocketmq-ai-state.json",
+      "report_sha256": "c87613fe6e2e7ff3cecd2ea8cfc54b9275d6b1071ae5a86c5f82818a88612732",
+      "reported_source_sha": "0d542ca5c9bd9a46ddc94a84e7a0df37d07193a1",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: actual default AI assembly focus failed (private output withheld)",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "native_fault": {
+        "parameters_before": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "binary_sha256": "c3f550675bf51836e49e32d83b46bdf784d8a2e280930ef500c2a2bd3576d654",
+        "published_fault_sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.4",
+          "Sum": "h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "domain_business_acceptance_not_claimed": true,
+        "parameters_effective": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 2,
+          "fileReservedTime": 48
+        },
+        "ready": {
+          "event": "ready",
+          "prepared": 1
+        },
+        "index": {
+          "records": 1,
+          "evidence_sha256": "e20c93a508fbae91148f5a1a5e9709ad4806613c2de4fa09880761e1d41d3230",
+          "read_only": true,
+          "body_exported": false,
+          "mode": "0600",
+          "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+          "alert": "native_transaction_check_limit_reached",
+          "owner_inferred_from_index": false
+        },
+        "closed": {
+          "event": "closed",
+          "prepared": 1,
+          "unknown_checks": 2,
+          "business_calls": 0,
+          "local_fault_callbacks": 1,
+          "owned_database_dropped": true,
+          "final_confirmation_calls": 0
+        },
+        "parameters_restored": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        }
+      },
+      "focus": {
+        "schema_isolated_from_full": true,
+        "exit_code": 1,
+        "private_output_sha256": "a0d73c20690f4a4a823f982bccd011c11fc678f70da82fefa5e63b7355c65c48",
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]"
+          ],
+          "assertion_lines": [
+            1658,
+            1661
+          ]
+        },
+        "junit_sha256": "aabbd89747634943a75aad38a7dc515a74b98e758f5690ad96c11c88b5de84fd",
+        "partial_native_receipt": {
+          "cases": {
+            "default_assembly_shared_primary_sender": true,
+            "default_assembly_no_legacy_publish_path": true,
+            "default_assembly_idle_checker_subscriptions": true,
+            "default_assembly_original_worker_preflight": true,
+            "default_assembly_exact_archive_witness": true,
+            "default_assembly_authenticated_business_ack": true,
+            "native_actual_sys_index_idempotent_original_primary_governance": true,
+            "default_assembly_pause_no_new_writes": true,
+            "native_live_sampler_blocks_actual_worker_without_new_half": true,
+            "native_idle_sdk_checker_readiness_existing_host_loop": true,
+            "native_plain_open_and_unresolved_review_refused": true,
+            "native_original_sampler_sdk_shutdown_joined": true,
+            "native_new_configured_open_default_assembly_keeps_durable_deny": true,
+            "native_original_facts_witness_and_host_primary_preserved": true,
+            "native_no_runtime_governance_resolution_or_deletion": true,
+            "default_assembly_close_preserves_pool": true,
+            "halves_before_worker_root": true,
+            "default_serial_actual_factory_generation": true,
+            "default_serial_first_response_original_witness_no_legacy": true,
+            "default_serial_actual_factory_semantic": true
+          },
+          "passed": 20,
+          "failed": 1,
+          "skipped": 0,
+          "root": "original_mysql_sqlalchemy",
+          "sdk": "0.4.0a4",
+          "client": "5.1.2",
+          "python": "3.13.15",
+          "system_login_not_claimed": true,
+          "paired_qs_business_not_claimed": true,
+          "real_provider_not_claimed": true,
+          "process_exit_not_claimed": true,
+          "database_commit_network_fault_not_claimed": true
+        },
+        "schema_removed": true
+      }
+    },
+    {
+      "run": 39971013040,
+      "ci_url": "https://github.com/FangcunMount/infra/actions/runs/39971013040",
+      "report_file": "receipt.json",
+      "report_sha256": "a797044ddfaa25fcf60a143c41a0ab62600e013a070838e013807d314c1c8138",
+      "reported_source_sha": "2f69c88d242beb3adb30136d5da63e41850c1e5c",
+      "scope": "IAM native storage/HTTP; stored half fixture, not Broker/system acceptance",
+      "tests": {
+        "pass": 34,
+        "fail": 0,
+        "skip": 0
+      },
+      "cleanup": {
+        "owned_containers_remaining": false,
+        "private_fixture_removed": true
+      },
+      "native_limit_control_not_claimed": true
+    },
+    {
+      "run": 39971013040,
+      "ci_url": "https://github.com/FangcunMount/infra/actions/runs/39971013040",
+      "report_file": "rocketmq-iam-host.json",
+      "report_sha256": "f8eb2ef4d52e968d2009d8aff1ea15aaa6fb820227b7fb906b45a01a227cbbcf",
+      "reported_source_sha": "2f69c88d242beb3adb30136d5da63e41850c1e5c",
+      "passed": 18,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: go operation failed (private output withheld)",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "native_fault": {},
+      "focus": null
     }
+  ],
+  "notes": [
+    "AI focus partial cases are aggregated across the two parameterized tests; native8 in39974192038 came from True only. False failed, so the profile is not accepted.",
+    "IAM39971013040 top18/1/0 failed before native fault construction: compiler1.25.9 vs fault module minimum1.25.12. The same SDK4 itself supports minimum1.25.9; probe minimum corrected, no race disabled."
   ]
 }
