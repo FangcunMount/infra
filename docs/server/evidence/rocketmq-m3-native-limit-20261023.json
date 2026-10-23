@@ -1062,5 +1062,64 @@
     ],
     "source_merge_pending": true,
     "production_deployment_performed": false
+  },
+  "ai_development_native": {
+    "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39980299784",
+    "reports": [
+      {
+        "file": "rocketmq-ai-state.json",
+        "report_sha256": "139fefa579ab0e854c1776d499e0027a53111d32155f6cf5efcadfe83a291e06",
+        "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+        "kind": "ai",
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.0.36",
+        "image": "sha256:3f580f3597cf76a86785971c5bc7553c7c7d2993c4be29fc9216cb3e8821a9d5",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "2807d04b32b4d00ad0b301f1fab54eab96c2df00674d436f92f4927877f0778d"
+      }
+    ],
+    "focus": {
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0
+    },
+    "full_matrix_run": "https://github.com/FangcunMount/infra/actions/runs/39982896849",
+    "full_matrix_status": "running_or_queued",
+    "source_pr": 219,
+    "production_deployed": false
+  },
+  "t25_b_local_foundation": {
+    "source_sha": "94cc6d50a2c1ac1cfb62bccdef7a6de3630a6354",
+    "branch": "codex/rocketmq-m3-retry-handoff",
+    "status": "local_partial_not_merged",
+    "implemented": [
+      "bounded canonical reviewed selection with exact original plan bytes and configured primary binding",
+      "offline original-root coordinator; metadata-only callback reentry; confirmed prefix retained and first unknown stops batch",
+      "inert MySQL/Mongo assembly without sender, runtime or schema installation"
+    ],
+    "verification": [
+      "race: retryschedule and retrydispatch packages passed",
+      "compile-only: container passed (no tests selected; not native acceptance)",
+      "golangci-lint: retryschedule/retrydispatch/container 0 issues",
+      "git diff --check passed"
+    ],
+    "initial_fixture_failure": "First new review fixture changed due without changing the original requested_at wire. Existing validation correctly refused. Corrected fixture to use the same frozen deadline; no runtime rule changed.",
+    "remaining": [
+      "maintenance CLI and private receipt I/O",
+      "actual original-primary handoff through the new host entry",
+      "complete CI and source merge"
+    ],
+    "task_completed": false,
+    "production_deployed": false
   }
 }
