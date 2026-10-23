@@ -10,7 +10,7 @@ on:
       kind:
         description: Exact required host acceptance scope
         type: choice
-        options: [retry, deferred, worker, factory]
+        options: [retry, deferred, worker, factory, runtime]
         default: retry
       profile:
         description: Development is one MySQL only; final gate requires full
@@ -18,7 +18,7 @@ on:
         options: [full, development]
         default: full
   pull_request:
-    paths: ['scripts/rocketmq/ci-dispatch-factory.py', 'scripts/rocketmq/test_dispatch_factory.py', 'scripts/rocketmq/qs_retry_acceptance.py', 'scripts/rocketmq/test_qs_retry_acceptance.py', 'scripts/rocketmq/qs_deferred_acceptance.py', 'scripts/rocketmq/qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_deferred_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-retry.yml']
+    paths: ['scripts/rocketmq/qs_runtime_acceptance.py', 'scripts/rocketmq/test_qs_runtime_acceptance.py', 'scripts/rocketmq/ci-dispatch-factory.py', 'scripts/rocketmq/test_dispatch_factory.py', 'scripts/rocketmq/qs_retry_acceptance.py', 'scripts/rocketmq/test_qs_retry_acceptance.py', 'scripts/rocketmq/qs_deferred_acceptance.py', 'scripts/rocketmq/qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_worker_acceptance.py', 'scripts/rocketmq/test_qs_deferred_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-retry.yml']
 permissions:
   contents: read
 env:
@@ -77,6 +77,9 @@ jobs:
           fi
           host_profile=--qs-retry-store-host
           extra_args=()
+          if [ "${{ inputs.kind }}" = runtime ]; then
+            host_profile=--qs-runtime-host
+          fi
           if [ "${{ inputs.kind }}" = deferred ] || [ "${{ inputs.kind }}" = worker ]; then
             host_profile=--qs-deferred-consumer-host
           fi

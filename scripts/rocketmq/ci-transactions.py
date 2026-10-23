@@ -212,6 +212,7 @@ def main():
     parser.add_argument("--sdk-limits", action="store_true", help="require public SDK finite native check audit and admission alarm")
     parser.add_argument("--sdk-go-probe", type=Path, help="prebuilt public SDK executable from a verified published Go module")
     parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
+    parser.add_argument("--qs-runtime-host", type=Path, help="exact QS checkout; actual default dual owners, original stores and owned Broker restart/Checker")
     parser.add_argument("--qs-retry-store-host", type=Path, help="exact QS checkout; original dual-store future authorization atomicity only")
     parser.add_argument("--qs-deferred-consumer-host", type=Path, help="exact QS checkout; current deferred-consumer original MySQL/lease/process proof, no Broker claim")
     parser.add_argument("--qs-deferred-kind", choices=("mysql", "worker"), default="mysql", help="worker includes actual Broker/runtime and loopback business RPC fixture")
@@ -222,6 +223,12 @@ def main():
     parser.add_argument("--qs-event-host", type=Path, help="exact QS checkout; authenticated event Inbox/projection and original ACK SQL root")
     parser.add_argument("--ai-admission-host", type=Path, help="exact AI checkout; real published Python SDK and original admission roots/Broker")
     args = parser.parse_args()
+    if args.qs_runtime_host and any((args.m3_resources, args.iam_host, args.sdk_api_go, args.sdk_api_python,
+            args.qs_answer_host, args.qs_evaluation_host, args.qs_report_host, args.qs_task_host, args.qs_retry_store_host,
+            args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host, args.ai_admission_host,
+            args.qs_deferred_consumer_host, args.sdk_faults, args.sdk_limits, args.iam_fanout_qs,
+            args.go_probe, args.sdk_go_probe, args.installed_python)):
+        parser.error("default QS owner runtime is a separate required profile")
     if args.qs_deferred_kind != "mysql" and not args.qs_deferred_consumer_host:
         parser.error("worker kind requires its exact deferred host checkout")
     if args.qs_deferred_consumer_private_log and not args.qs_deferred_consumer_host:
@@ -328,13 +335,13 @@ def main():
         "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
-    if args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host:
+    if args.qs_runtime_host or args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host:
         # Host profiles explicitly create/drop their OWN random schema.
         # This root login exists only in this private loopback Compose project.
         spec['services']['mysql']['environment']['MYSQL_ROOT_HOST'] = '%'
     mongo_port = port()
     mongo_image = None
-    if args.sdk_api_go or args.qs_answer_host or args.qs_report_host or args.qs_retry_store_host or args.qs_retry_dispatch_host:
+    if args.qs_runtime_host or args.sdk_api_go or args.qs_answer_host or args.qs_report_host or args.qs_retry_store_host or args.qs_retry_dispatch_host:
         mongo_pin = "mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f"
         run(["docker", "pull", mongo_pin], timeout=300)
         mongo_image = run(["docker", "image", "inspect", mongo_pin, "--format", "{{.Id}}"]).stdout.strip()
@@ -487,7 +494,7 @@ def main():
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
-        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host)):
+        if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.qs_runtime_host or args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
         if args.qs_deferred_consumer_host:
             proof['qs_deferred_consumer_host'] = {}
@@ -569,7 +576,7 @@ def main():
             for name in proof['qs_evaluation_host']['native_receipt']['cases']:
                 passed('qs_evaluation_' + name)
             return
-        if args.qs_answer_host or args.qs_report_host or args.qs_retry_store_host or args.qs_retry_dispatch_host:
+        if args.qs_runtime_host or args.qs_answer_host or args.qs_report_host or args.qs_retry_store_host or args.qs_retry_dispatch_host:
             mongo_command('rs.initiate({_id:"sdk-proof",members:[{_id:0,host:"mongo:27017"}]})')
             deadline = time.monotonic() + 60
             while time.monotonic() < deadline:
@@ -581,6 +588,15 @@ def main():
             proof['mongo_version'] = mongo_command('db.version()')
             if proof['mongo_version'] != '7.0.37':
                 raise RuntimeError('required Mongo version differs')
+            if args.qs_runtime_host:
+                from qs_runtime_acceptance import run_qs_runtime_host
+                proof['qs_runtime_host'] = {}
+                run_qs_runtime_host(args.qs_runtime_host, directory, broker, project, grpc_port,
+                    mysql_port, mongo_port, mysql_password, ca, run, proof['qs_runtime_host'],
+                    owned_native_run, repo, broker_parameters)
+                for name in proof['qs_runtime_host']['native_receipt']['cases']:
+                    passed('qs_runtime_' + name)
+                return
             if args.qs_retry_dispatch_host:
                 from qs_retry_dispatch_acceptance import run_qs_retry_dispatch_host
                 proof['qs_retry_dispatch_host'] = {}
@@ -988,6 +1004,13 @@ def main():
                                 'Original MySQL/Mongo authorization and explicit legacy future ownership handoff',
                                 'No due dispatcher, Broker visibility, packet loss, SIGKILL or production handoff claim']
             report['qs_retry_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_retry_acceptance.py').read_bytes()).hexdigest()
+        if args.qs_runtime_host:
+            report['batch'] = 'M3-QS-default-dual-owner-runtime-and-real-Broker-restart'
+            report['limits'] = ['Protocol fixture facts on actual default subsystem/owners/original stores; no domain API/provider/system claim',
+                'Real owned Broker SIGKILL/restart; producer runtimes closed in process, no producer process-exit claim',
+                'Observed callback counts and configured SDK bounds are distinct from queue saturation proof',
+                'Fixture first-check window read back and restored; no production parameter or SLA change']
+            report['qs_runtime_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_runtime_acceptance.py').read_bytes()).hexdigest()
         if args.qs_deferred_consumer_host:
             report['batch'] = 'M3-QS-deferred-consumer-original-MySQL'
             report['limits'] = ['No Broker delivery, whole-worker, system, production or throughput claim',
