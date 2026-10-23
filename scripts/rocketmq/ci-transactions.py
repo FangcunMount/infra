@@ -225,7 +225,15 @@ def main():
     parser.add_argument("--iam-host-faults", action="store_true", help="separate actual IAM role original-root COMMIT packet faults")
     parser.add_argument("--qs-answer-host-faults", action="store_true", help="separate actual AnswerSheet original Mongo COMMIT packet faults")
     parser.add_argument("--ai-host-database-faults", action="store_true", help="actual AI command original SQLAlchemy COMMIT packet faults")
+    parser.add_argument("--qs-command-host-faults", action="store_true", help="actual QS command original MySQL COMMIT TCP faults")
     args = parser.parse_args()
+    if args.qs_command_host_faults and (not args.qs_command_host or any((args.iam_host, args.m3_resources,
+            args.iam_fanout_qs, args.qs_answer_host, args.qs_evaluation_host, args.qs_report_host,
+            args.qs_task_host, args.qs_retry_store_host, args.qs_retry_dispatch_host, args.qs_event_host,
+            args.ai_admission_host, args.qs_runtime_host, args.qs_deferred_consumer_host, args.sdk_api_go,
+            args.sdk_api_python, args.sdk_faults, args.sdk_limits, args.go_probe, args.sdk_go_probe,
+            args.installed_python))):
+        parser.error('original QS command faults require one explicit QS command source without another profile')
     if args.ai_host_database_faults and (not args.ai_admission_host
             or os.environ.get('QS_AI_ACCEPTANCE_KIND') != 'db_faults'
             or any((args.iam_host, args.m3_resources, args.iam_fanout_qs, args.qs_answer_host,
@@ -467,10 +475,11 @@ def main():
         # worker/provider/proxy processes running after the private fixture ends.
         native = Probe(argv, directory, env, prefix=prefix, cwd=cwd)
         probes.append(native)
+        deadline = time.monotonic() + timeout
         try:
             if supervise is not None:
                 supervise(native)
-            code = native.process.wait(timeout=timeout)
+            code = native.process.wait(timeout=max(0.01, deadline - time.monotonic()))
             native.finish(expected=code)
             native.log.flush()
             if code:
@@ -606,6 +615,19 @@ def main():
                 for name in evidence['receipt']['cases']:
                     passed('iam_' + boundary + '_' + name)
                 passed('iam_' + boundary + '_actual_original_commit_tcp_boundary')
+            return
+        if args.qs_command_host_faults:
+            from qs_command_acceptance import run_qs_command_host
+            run(['go', 'build', '-o', str(directory / 'fault-proxy'),
+                 './transport/rocketmq/internal/faultproxy'], cwd=sdk)
+            proof['qs_command_host'] = {}
+            run_qs_command_host(args.qs_command_host, directory, broker, project, grpc_port, mysql_port,
+                mysql_password, ca, run, proof['qs_command_host'], faults=True,
+                native_runner=owned_native_run, proxy_start=proxy_start)
+            for boundary, evidence in proof['qs_command_host']['faults'].items():
+                for name in evidence['receipt']['cases']:
+                    passed('qs_command_' + boundary + '_' + name)
+                passed('qs_command_' + boundary + '_actual_original_commit_tcp_boundary')
             return
         if args.qs_command_host:
             from qs_command_acceptance import run_qs_command_host
@@ -1164,6 +1186,12 @@ def main():
             report['limits'] = ['Actual authenticated command receiver/original SQLAlchemy root with COMMIT TCP loss; controlled input/observer',
                 'No full API daemon, paired QS business, producer SIGKILL, Broker restart, real provider, system or production claim',
                 'After: exact committed facts/Inbox/two frozen branches; before: exact persisted abort AND actual new paused Broker callback']
+        if args.qs_command_host_faults:
+            report['batch'] = 'M3-T23-QS-original-command-COMMIT-packet-faults'
+            report['qs_command_fault_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_command_fault_acceptance.py').read_bytes()).hexdigest()
+            report['limits'] = ['Actual QS command store/original MySQL root; initial seal, plan, operation and first wire preserved',
+                'Completed SDK execution count is not presented as a measured database callback count',
+                'No full API daemon, paired AI receiver, producer SIGKILL, Broker restart, provider, system or production claim']
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",

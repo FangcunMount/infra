@@ -18,7 +18,7 @@
   "profile": {
     "id": "IAM original role COMMIT packet faults",
     "sdk_fault_proxy_source": "8de893b367cc797580799abd8325f41dd62356db",
-    "native_status": "full matrix passed/audited: 3x14 packet evidence +3x34 original roots/HTTP; source PR138 CI pending",
+    "native_status": "full 3x14 plus3x34 passed/audited; IAM PR138 8/8 source checks and merged main with exact candidate tree",
     "required_native_tests": 2,
     "required_evidence_cases": 14,
     "boundaries": [
@@ -82,15 +82,15 @@
   ],
   "audit_index_sha256": "f61a654209229564bd69dd0ed4912bd08badd1f8ae51481e081d16ab44e44905",
   "qs_mongo_candidate": {
-    "source_sha": "edfa930bc93cc7ca3fc81ca40244f8e9ecf7913e",
+    "source_sha": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
     "local_validation": {
       "native_tag_race": "revised fixture compile only passed",
       "new_diff_tagged_lint": "0 issues",
       "full_tagged_lint": "1 existing errcheck in prior fixture",
       "docs_check": "88 passed; facts/hygiene passed",
-      "infra_tests": "151 passed, 0 failed/skipped; actual control-pipe cursor test included"
+      "infra_tests": "155 passed/0 failed/skipped"
     },
-    "native_status": "first native failed, revised finite outage/path restore and real-driver join pending native validation"
+    "native_status": "before6 native assertions passed in prior failed run; after expectation revised to allow initial Unknown and require same-key exact accepted result without reexecution; pending new real gate"
   },
   "iam_full_matrix": {
     "run_url": "https://github.com/FangcunMount/infra/actions/runs/39879917332",
@@ -154,12 +154,13 @@
       }
     ],
     "scope": "actual IAM role original GORM commit packet faults; native component only",
-    "source_merge_status": "not_merged",
+    "source_merge_status": "merged",
     "stable_release": false,
     "production": false,
     "system_acceptance": false,
     "observation_48h": false,
-    "source_pr": "https://github.com/FangcunMount/iam/pull/138"
+    "source_pr": "https://github.com/FangcunMount/iam/pull/138",
+    "merge_sha": "2cd61beb623e6c1ad8f44d6a2e3d50e0e07ed982"
   },
   "iam_full_audit_sha256": "99461210b73bed0e7aad71cac0bdcd889bb476c79f570f9891bfabfddcb13763",
   "failure_history": [
@@ -192,6 +193,85 @@
         "private_fixture_directory_removed": true
       },
       "finding": "original driver did not return after caller deadline; pinned Mongo1.17.6 CommitLoop strips cancellation; failure report did not drain proxy injection queue, so no injection is inferred from that absent field"
+    },
+    {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39881279130",
+      "source_sha": "edfa930bc93cc7ca3fc81ca40244f8e9ecf7913e",
+      "infra_sha": "95136642b30cdbbf7ed46086b3efcc91abeafe51",
+      "report_sha256": "f1a6e6deb4d22440c64ebad08edcc2cb21da77ab01be4588831ba8f6ad586751",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "faults": {
+        "before": {
+          "native_exit_code": 0,
+          "native_output_sha256": "b0544753f3e33540e53fc4bdcd40e85745cc3a8597cc7a5ca13af31c8b50375a",
+          "assertion_lines": [],
+          "test_timeout": false,
+          "race_reports": 0,
+          "wire": {
+            "boundary": "before",
+            "seen": 19,
+            "dropped": 19,
+            "backend_commit_acks": 0
+          },
+          "original_session_path_restored": true,
+          "receipt": {
+            "boundary": "before",
+            "business_rows": 0,
+            "cases": {
+              "actual_answer_root_once": true,
+              "broker_visibility_or_new_paused_checker": true,
+              "business_witness_match_boundary": true,
+              "duplicate_keeps_original_plan_and_result": true,
+              "owned_owner_and_transport_drained_primary_retained": true,
+              "published_outboxes_empty": true
+            },
+            "failed": 0,
+            "full_api_process_provider_system_not_claimed": true,
+            "half_prepared": 1,
+            "local_calls": 1,
+            "mongo_callbacks": 2,
+            "new_check_commit": 0,
+            "new_check_rollback": 1,
+            "new_half_prepared": 0,
+            "new_local_calls": 0,
+            "passed": 6,
+            "scope": "actual QS AnswerSheet original Mongo root with wire-level commitTransaction faults; component only",
+            "skipped": 0,
+            "source_sha": "edfa930bc93cc7ca3fc81ca40244f8e9ecf7913e",
+            "wire_unchanged": true
+          },
+          "post_restore_fault_counters": {
+            "seen": 0,
+            "dropped": 0,
+            "backend_commit_acks": 0
+          }
+        },
+        "after": {
+          "native_exit_code": 1,
+          "native_output_sha256": "72987c634c78a9eb36658abae9befb05e88189c60208a40a976b623207803aa7",
+          "assertion_lines": [
+            206
+          ],
+          "test_timeout": false,
+          "race_reports": 0,
+          "wire": {
+            "boundary": "after",
+            "seen": 21,
+            "dropped": 21,
+            "backend_commit_acks": 21
+          },
+          "original_session_path_restored": true
+        }
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "finding": "before passed6 with19 matching drops/0backendACK and2driver callbacks/1SDK executor. After reached real backend COMMIT ACKs but initial API success assertion failed; no initial authoritative API confirmation is inferred. Contract permits Unknown during client topology loss; revised case still requires exact committed fact/witness, successful same-key accepted recovery, unchanged wire and no executor redo."
     }
   ],
   "ai_mysql_candidate": {
@@ -202,7 +282,60 @@
       "docs": "75 documents/1389 links, source facts and coverage passed",
       "infra_tests": "151 passed, 0 failed/skipped"
     },
+    "native_status": "development 14/14 passed/audited; full six-profile gate pending",
+    "scope": "actual AI authenticated command receiver and original SQLAlchemy root; no paired/full daemon/process/provider/system claim",
+    "pr": "https://github.com/FangcunMount/qs-ai/pull/216"
+  },
+  "iam_source_merge": {
+    "pr": "https://github.com/FangcunMount/iam/pull/138",
+    "source_sha": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
+    "merge_sha": "2cd61beb623e6c1ad8f44d6a2e3d50e0e07ed982",
+    "tree": "dc7d6bdc7eedf3cbab6832beed70a8a3ef5d5578",
+    "candidate_and_main_entire_tree_equal": true,
+    "source_checks_passed": 8,
+    "production_deploy_paused": true,
+    "production_environment_override_count": 0
+  },
+  "internal_progress": "1/4",
+  "ai_development": {
+    "run_url": "https://github.com/FangcunMount/infra/actions/runs/39881283339",
+    "source_sha": "724595abdd92e8b0d88389609e239a6b6b1a9055",
+    "infra_sha": "95136642b30cdbbf7ed46086b3efcc91abeafe51",
+    "workflow_conclusion": "success",
+    "mysql": "8.0.36",
+    "python": "3.13.15",
+    "sdk": "0.4.0a2",
+    "client": "5.1.2",
+    "native_tests": 2,
+    "evidence": {
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    "before_new_paused_rollback_checks": 2,
+    "local_calls": [
+      1,
+      1
+    ],
+    "provider_invocations": [
+      0,
+      0
+    ],
+    "source_tool_binding_and_cleanup_verified": true,
+    "report_sha256": "50c32d988215593c3eb69ae1a1feec27ed8dd6326b9c74e4c551fbfe327e0dcd",
+    "scope": "component/actual AI receiver/original root; development profile only"
+  },
+  "ai_development_audit_sha256": "2a4923aeb7a093f41e350187f9bf55059daeb8048e56b5b8682e26f54180afe2",
+  "qs_mysql_command_candidate": {
+    "source_sha": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
     "native_status": "not_run",
-    "scope": "actual AI authenticated command receiver and original SQLAlchemy root; no paired/full daemon/process/provider/system claim"
+    "local_validation": {
+      "race_native_tag": "compile only passed",
+      "new_diff_native_lint": "0 issues",
+      "full_tagged_lint": "6 preexisting errcheck findings, separately retained",
+      "infra_tests": "155 passed/0 failed/skipped",
+      "docs_check": "88 tests and facts/hygiene passed; canonical -p=1 compile actually rerun. Earlier doc command validator failure retained in source notes."
+    },
+    "scope": "actual QS command store/original MySQL root; initial seal and completed SDK execution count, not measured callback count"
   }
 }

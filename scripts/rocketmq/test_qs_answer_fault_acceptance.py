@@ -14,6 +14,7 @@ class AnswerOriginalPacketReceiptTest(unittest.TestCase):
             cases={case: True for case in CASES}, local_calls=1, mongo_callbacks=2, half_prepared=1,
             new_half_prepared=0, new_check_commit=0, new_check_rollback=int(boundary == 'before'),
             business_rows=int(boundary == 'after'), new_local_calls=0, wire_unchanged=True,
+            initial_api_accepted=False, duplicate_api_accepted=boundary == 'after',
             full_api_process_provider_system_not_claimed=True)
 
     def output(self, receipt):
@@ -30,7 +31,7 @@ class AnswerOriginalPacketReceiptTest(unittest.TestCase):
         for changes in (dict(source_sha='b'*40), dict(scope='full API'), dict(cases={}),
                         dict(passed=0), dict(skipped=1), dict(local_calls=2), dict(mongo_callbacks=17),
                         dict(half_prepared=True), dict(new_local_calls=1), dict(new_half_prepared=1),
-                        dict(business_rows=1), dict(new_check_rollback=0), dict(new_check_commit=1),
+                        dict(business_rows=1), dict(initial_api_accepted=True), dict(duplicate_api_accepted=True), dict(new_check_rollback=0), dict(new_check_commit=1),
                         dict(wire_unchanged=False), dict(full_api_process_provider_system_not_claimed=False)):
             with self.subTest(changes=changes):
                 with self.assertRaises(RuntimeError): parse_receipt(self.output(dict(value, **changes)), 'a'*40, 'before')
@@ -38,6 +39,14 @@ class AnswerOriginalPacketReceiptTest(unittest.TestCase):
         for bad in ('', output+'\n'+output, output.replace('TestM3AnswerOriginalCommitPacketFault', 'TestSDKProbe'),
                     output+'\nWARNING: DATA RACE', output+'\n--- SKIP: optional (1s)'):
             with self.assertRaises(RuntimeError): parse_receipt(bad, 'a'*40, 'before')
+
+    def test_after_unknown_must_recover_same_key_without_false_success(self):
+        value = self.receipt('after')
+        self.assertFalse(parse_receipt(self.output(value), 'a'*40, 'after')['initial_api_accepted'])
+        accepted = dict(value, initial_api_accepted=True)
+        self.assertTrue(parse_receipt(self.output(accepted), 'a'*40, 'after')['initial_api_accepted'])
+        with self.assertRaises(RuntimeError):
+            parse_receipt(self.output(dict(value, duplicate_api_accepted=False)), 'a'*40, 'after')
 
     def test_wire_evidence_counts_all_matching_original_session_commit_retries(self):
         for boundary in ('before', 'after'):

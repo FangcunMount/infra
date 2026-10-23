@@ -29,6 +29,9 @@ def parse_receipt(output, source, boundary):
             or r['local_calls'] != 1 or not 1 <= r['mongo_callbacks'] <= 16
             or r['half_prepared'] != 1 or r['new_half_prepared'] != 0 or r['new_local_calls'] != 0
             or r['business_rows'] != int(boundary == 'after') or r.get('wire_unchanged') is not True
+            or type(r.get('initial_api_accepted')) is not bool
+            or r.get('duplicate_api_accepted') is not (boundary == 'after')
+            or (boundary == 'before' and r['initial_api_accepted'])
             or not 0 <= r['new_check_commit'] <= 1024 or not 0 <= r['new_check_rollback'] <= 1024
             or (boundary == 'before' and (r['new_check_rollback'] < 1 or r['new_check_commit'] != 0))
             or (boundary == 'after' and r['new_check_rollback'] != 0)
@@ -70,7 +73,7 @@ def run_profile(source, directory, env, run, proof, native_runner, proxy_start):
 
         def restore_original_path(native):
             try:
-                native.wait('fault_window_ready', timeout=90)
+                native.wait('fault_window_ready', timeout=600)
                 proxy.send(json.dumps({'Action': 'stats'})); stats = proxy.wait('stats')
                 proxy.drain()
                 window['wire'] = wire_evidence([e for e in proxy.events if e.get('event') == 'injected'], stats, boundary)

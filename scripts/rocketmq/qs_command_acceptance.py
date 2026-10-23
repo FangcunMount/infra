@@ -52,7 +52,7 @@ def parse_command_receipt(output):
     return receipts[0]
 
 
-def run_qs_command_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof):
+def run_qs_command_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, *, faults=False, native_runner=None, proxy_start=None):
     source = source.resolve()
     if not (source / 'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS host source required')
@@ -62,6 +62,8 @@ def run_qs_command_host(source, directory, broker, project, grpc_port, mysql_por
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('fixed published SDK without local replace required')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
+    if faults and module.get('Version') != 'v0.5.0-rocketmq-tx.2':
+        raise RuntimeError('original command faults require fixed SDK tx.2')
     manifest = command_manifest()
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4), 'password': secrets.token_hex(32)}
                 for role in manifest['accounts']}
@@ -87,6 +89,10 @@ def run_qs_command_host(source, directory, broker, project, grpc_port, mysql_por
                 'QS_M3_PRODUCER_CONFIG': str(paths['qs-command-producer']),
                 'QS_M3_OBSERVER_CONFIG': str(paths['qs-command-observer']),
                 'rocketmq.client.logRoot': str(logs), 'rocketmq.client.logLevel': 'error'})
+    if faults:
+        from qs_command_fault_acceptance import run_profile
+        run_profile(source, directory, env, run, proof, native_runner, proxy_start)
+        return
     result = run(['go', 'test', '-p', '1', '-race', '-tags=integration,m3_ai_command_broker', '-count=1',
                   '-timeout=4m', '-v', './internal/apiserver/infra/mysql/aibridge',
                   '-run', '^TestM3AICommandBrokerHost$'], cwd=source, env=env, timeout=420, required=False)
