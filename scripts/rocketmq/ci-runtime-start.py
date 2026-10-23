@@ -41,7 +41,7 @@ def main():
               'scope': 'isolated_nsqd_container_as_compose_fixture_not_m3_business_images_or_transactions',
               'production_executed': False, 'cutover_authorized': False,
               'source_clean_before': before == ''}
-    plan = None; down_ok = False; owned_root = None
+    plan = None; down_ok = False; owned_root = None; stage = 'fixture_setup'
     try:
         docker('pull', 'nsqio/nsq:v1.3.0')
         image = json.loads(docker('image', 'inspect', 'nsqio/nsq:v1.3.0'))[0]
@@ -80,16 +80,23 @@ def main():
                 if condition is not True: raise BoundaryError('owned target assertion failed')
                 report['cases'][name] = True
             starts = []
+            report['target_commands'] = []
             command = target.command
             def observed(value, argv, timeout=30):
+                kind = next((x for x in ('config', 'up', 'ps', 'inspect') if x in argv), 'unknown')
+                row = {'stage': kind, 'returned': False}
+                report['target_commands'].append(row)
                 if 'up' in argv:
                     check('coordinator_marker_before_actual_up', (directory/'first-runtime-start.json').is_file())
                     starts.append(True)
-                return command(value, argv, timeout)
+                result = command(value, argv, timeout)
+                row['returned'] = True
+                return result
             try:
                 with patch.object(cutover_step, 'GLOBAL_LOCK', root/'deploy.lock'), patch.object(cutover_step, 'AI_LOCK', root/'ai.lock'), patch.object(target, 'command', side_effect=observed):
                     plan = freeze()
                     with Boundary(directory, binding_sha) as operation:
+                        stage = 'expected_failed_start'
                         try:
                             operation.start('failed-new-runtime', lambda: target.execute(plan))
                         except BoundaryError:
@@ -102,6 +109,7 @@ def main():
                         spec['services']['fixture']['command'] = ['/nsqd', '--data-path=/data', '--mem-queue-size=2']
                         plan = freeze()
                         approval = hashlib.sha256(_encoded(plan)).hexdigest()
+                        stage = 'explicit_forward_repair'
                         operation.forward_repair('compatible-fixed-runtime', approval, lambda: target.execute(plan))
                         check('explicit_forward_repair_actual_running_readback', operation.status()['phase'] == 'forward_repair_returned')
                         check('forward_repair_keeps_irreversible_boundary', not operation.status()['old_data_restore_eligible'])
@@ -123,10 +131,29 @@ def main():
                     check('only_failed_start_and_reviewed_repair_issued', len(starts) == 2)
             finally:
                 if plan is not None:
+                    # Only bounded state of this known empty fixture, no env/logs/body.
+                    ids = docker('ps', '-aq', '--filter', 'label=com.docker.compose.project='+project).decode().split()
+                    observed_state = []
+                    for identity in ids[:2]:
+                        template = '{{json .State.Status}} {{.State.Running}} {{.State.ExitCode}}'
+                        state = docker('inspect', '--format', template, identity).decode().split()
+                        if (len(state) == 3 and state[0] in {'"created"', '"running"', '"exited"', '"dead"', '"restarting"', '"paused"'}
+                                and state[1] in {'true', 'false'} and re.fullmatch('[0-9]{1,5}', state[2])):
+                            observed_state.append({'status': json.loads(state[0]), 'running': state[1] == 'true', 'exit_code': int(state[2])})
+                    report['owned_fixture_state_before_cleanup'] = observed_state
                     result = subprocess.run(target.compose(plan, 'down', '--volumes', '--remove-orphans'), capture_output=True, timeout=90)
                     down_ok = result.returncode == 0
-    except Exception:
+    except Exception as error:
         report['failure'] = 'owned_target_start_fixture_failed'
+        report['failure_stage'] = stage
+        codes = {'target command failed; preserve coordinator evidence': 'target_command_nonzero_or_output_cap',
+                 'target container readback unavailable': 'container_readback_shape',
+                 'target runtime readback differs': 'container_readback_identity_or_health',
+                 'target service instance set differs': 'compose_service_id_set',
+                 'target runtime instance budget differs': 'readback_instance_budget',
+                 'target configured instance budget differs': 'configured_instance_budget',
+                 'target image is not the frozen runtime': 'configured_image'}
+        report['failure_code'] = codes.get(str(error), 'unclassified_fixed_fixture_failure')
         report['failed'] += 1
     finally:
         owned = docker('ps', '-aq', '--filter', 'label=com.docker.compose.project='+project).decode().split()
@@ -136,8 +163,8 @@ def main():
         for identity in networks: docker('network', 'rm', identity)
         report['cleanup'] = {'compose_down_succeeded': down_ok, 'no_rescue_needed': not owned and not networks,
                              'private_fixture_directory_removed': owned_root is not None and not owned_root.exists(),
-                             'existing_containers_unchanged': set(docker('ps', '-aq').decode().split()) == existing,
-                             'existing_networks_unchanged': set(docker('network', 'ls', '-q').decode().split()) == existing_networks}
+                             'existing_container_id_set_unchanged': set(docker('ps', '-aq').decode().split()) == existing,
+                             'existing_network_id_set_unchanged': set(docker('network', 'ls', '-q').decode().split()) == existing_networks}
         report['passed'] = len(report['cases'])
         report['source_clean_after'] = subprocess.check_output(['git', 'status', '--porcelain'], text=True) == ''
         report['harness_sha256'] = {str(path): hashlib.sha256(path.read_bytes()).hexdigest()

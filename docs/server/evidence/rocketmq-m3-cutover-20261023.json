@@ -696,5 +696,31 @@
       "test_result_claimed": false,
       "retry_run": 39990541142
     }
-  ]
+  ],
+  "first_start_boundary": {
+    "failed_target_runs": [
+      {
+        "run": "https://github.com/FangcunMount/infra/actions/runs/40001580590",
+        "source_sha": "1372bf82177427c097badf643efc0650aa0d6347",
+        "passed": 3,
+        "failed": 1,
+        "skipped": 0,
+        "report_sha256": "6adc916f2cb349b5b6af1e0081c5f5fb18767246cbf8fa87fa6b3bb47697e3f5",
+        "cases": {
+          "coordinator_marker_before_actual_up": true,
+          "actual_failed_up_retains_start_barrier": true,
+          "failed_new_runtime_forbids_old_backup": true
+        },
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "no_rescue_needed": true,
+          "private_fixture_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        },
+        "failure_stage_at_record": "Not captured; only first three completed cases known, do not retroactively assign a root cause",
+        "scope": "isolated_nsqd_container_as_compose_fixture_not_m3_business_images_or_transactions"
+      }
+    ]
+  }
 }
