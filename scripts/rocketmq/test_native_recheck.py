@@ -21,6 +21,11 @@ class NativeRecheckGuards(unittest.TestCase):
         for raw in ('', 'SAFE []', 'SAFE {}\nSAFE {}'):
             with self.assertRaises(RuntimeError): subject.frame(raw, 'SAFE ')
 
+    def test_pinned_admin_update_uses_comma_and_readback_is_separate(self):
+        self.assertTrue(subject.positive_admin_reply('updateBrokerConfig', 'update broker config success, 127.0.0.1:10911'))
+        self.assertFalse(subject.positive_admin_reply('updateBrokerConfig', 'update broker config failed'))
+        self.assertFalse(subject.positive_admin_reply('updateBrokerConfig', ' success.'))
+
     def test_exact_primary_read_requires_all_three_hashes_and_states(self):
         good = '\t'.join(['1'*64,'2'*64,'3'*64,'committed','committed','not_attempted'])
         self.assertEqual(subject.authoritative_snapshot(good)['execution_state'], 'committed')

@@ -43,6 +43,12 @@ def frame(raw, prefix):
     return result
 
 
+def positive_admin_reply(operation, raw):
+    # Pinned UpdateBrokerConfigSubCommand uses a comma, unlike UpdateTopic.
+    phrase = 'update broker config success, ' if operation == 'updateBrokerConfig' else ' success.'
+    return phrase in raw
+
+
 def authoritative_snapshot(raw):
     fields = raw.split('\t')
     require(len(fields) == 6 and all(len(s) == 64 and all(c in '0123456789abcdefABCDEF' for c in s)
@@ -85,6 +91,9 @@ def main():
                           'Native internal copy may redeliver; no exactly-once or indefinite recovery promise',
                           'No production, system, real provider or persisted host notice resolution acceptance'])
     proof, cases, probes = report['proof'], report['cases'], []
+    proof['harness_sha256'] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in (Path(__file__).resolve(), repo/'scripts/rocketmq/probes/native-recheck/NativeHalfRecheck.java',
+                  repo/'scripts/rocketmq/probes/native-recheck/NativeHalfWindowTest.java')}
     compose = None; image = None; broker = project+'-broker-1'; mysql = project+'-mysql-1'
     before = {}; stage = 'fixture_preflight'; before_parameters = None
     def passed(name):
@@ -97,7 +106,7 @@ def main():
         raw = run(['docker', 'exec', broker, 'java', '-Xms32m', '-Xmx128m', '-XX:MaxDirectMemorySize=32m',
                    '-cp', '/opt/rocketmq/conf:/opt/rocketmq/lib/*', 'org.apache.rocketmq.tools.command.MQAdminStartup',
                    operation, '-b', '127.0.0.1:10911', *params], timeout=45).stdout
-        require(not success or ' success.' in raw, 'admin_positive_reply_required')
+        require(not success or positive_admin_reply(operation, raw), 'admin_positive_reply_required')
         return raw
     def sql(query):
         return run(['docker', 'exec', '-i', mysql, 'sh', '-c',
@@ -280,7 +289,11 @@ def main():
                 for key,value in before_parameters.items(): admin('updateBrokerConfig', '-k', key, '-v', str(value), success=True)
                 report['cleanup']['broker_parameters_restored'] = common.broker_parameters(admin('getBrokerConfig'))==before_parameters
             except Exception: report['cleanup']['broker_parameters_restored'] = False
-        report['cleanup']['probe_process_groups_drained'] = all([p.close() for p in probes])
+        drained = []
+        for probe in probes:
+            try: drained.append(probe.close())
+            except Exception: drained.append(False)
+        report['cleanup']['probe_process_groups_drained'] = all(drained)
         if compose:
             report['cleanup']['compose_down_succeeded'] = run(compose+['down','-v','--remove-orphans'], required=False, timeout=120).returncode==0
             report['cleanup']['project_containers_remaining'] = bool(run(['docker','ps','-aq','--filter','label=com.docker.compose.project='+project]).stdout.strip())
