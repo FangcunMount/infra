@@ -62,7 +62,8 @@ def parse_receipt(output, junit, ai_sha, qs_sha, *, full, sdk_python="0.4.0a2"):
         old_seals=1,recovered_completed_results=0,recovered_half_prepared=0,
         original_wire_unchanged=True,final_recovered_seals=2,provider_invocations=0)
     b_expected = dict(local_calls=1,checks_drained_before_restart=True,half_prepared_before_kill=2,local_calls_before_kill=0,half_prepared=2,actual_final_unknown=2,pending_calls=0,
-        provider_invocations=0)
+        provider_invocations=0,original_host_failed_and_drained=True,new_host_runtime=True,
+        recovered_half_prepared=0,recovered_completed_results=0,recovered_committed_references=2)
     for row, expected, count, original, replacements in (
             (q,q_expected,'recovered_broker_commit_checks',-9,[0]),
             (b,b_expected,'broker_commit_checks',0,[])):
@@ -115,7 +116,7 @@ def read_partial_receipt(output, ai_sha, qs_sha):
         'recovered_completed_results','recovered_half_prepared','recovered_broker_commit_checks',
         'final_recovered_seals','provider_invocations','local_calls','half_prepared',
         'actual_final_unknown','broker_commit_checks','pending_calls',
-        'half_prepared_before_kill','local_calls_before_kill')
+        'half_prepared_before_kill','local_calls_before_kill','recovered_committed_references')
     counters = {}
     for fault in ('qs_sigkill','broker_restart'):
         row = r['proof'].get(fault)
@@ -150,6 +151,8 @@ def run_profile(source,directory,env,command,run,proof,native_runner,broker_faul
             write_control(paths['broker_killed'],'broker-killed')
             native.wait('final_unknown_observed',timeout=80)
             proof['broker_restart'] = broker_fault.start()
+            proof['topic_routes_ready'] = broker_fault.wait_topic_routes(
+                sorted({r['physical_topic'] for r in config['routes']}))
             write_control(paths['broker_ready'],'broker-ready')
         except Exception:
             proof['supervision_failed'] = True

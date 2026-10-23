@@ -23,6 +23,8 @@ def receipt(full=False):
                 original_exit_code=-9,replacement_exit_codes=[0])),
             broker_restart=dict(local_calls=1,checks_drained_before_restart=True,half_prepared_before_kill=2,local_calls_before_kill=0,half_prepared=2,actual_final_unknown=2,
                 broker_commit_checks=2,pending_calls=0,provider_invocations=0,
+                original_host_failed_and_drained=True,new_host_runtime=True,
+                recovered_half_prepared=0,recovered_completed_results=0,recovered_committed_references=2,
                 resources=dict(closed=True,private_files_removed=True,original_exit_code=0,
                     replacement_exit_codes=[]))))
 
@@ -58,6 +60,9 @@ class PairedFaultAcceptanceTests(unittest.TestCase):
             lambda r:r['proof']['qs_sigkill'].update(recovered_half_prepared=1),
             lambda r:r['proof']['qs_sigkill'].update(recovered_broker_commit_checks=0),
             lambda r:r['proof']['broker_restart'].update(local_calls=2),
+            lambda r:r['proof']['broker_restart'].update(new_host_runtime=False),
+            lambda r:r['proof']['broker_restart'].update(recovered_half_prepared=1),
+            lambda r:r['proof']['broker_restart'].update(recovered_committed_references=1),
             lambda r:r['proof']['qs_sigkill']['resources'].update(replacement_exit_codes=[False]),
             lambda r:r['proof']['broker_restart']['resources'].update(closed=False)]
         for change in changes:
