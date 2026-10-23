@@ -67,3 +67,28 @@ SDK源码PR54增加独立的正向回查审计。Checker.Check仍只读取精确
 39919796704两档各41项证明了新实例、跨语言MySQL及Go Mongo的正向记账，源码/存储与候选wheel验收分别通过。此处是已合并源码能力，尚未发布新固定版本或更新三个业务库依赖，不能视为宿主保护已启用。
 
 确认计数与持久化审计计数分开；RPC ACK后进程退出或审计数据库失败时，Broker可能已经接受确认。这样的缺口不能标作确定的Broker半消息积压，也不能靠累计Unknown或租约时间推算精确最老年龄。宿主采样与保护仍需验证这些边界，并保留Checker和原业务恢复责任。
+
+## T25 准备：旧 NSQ 排空观察
+
+[nsq_drain_evidence.py](../../scripts/rocketmq/nsq_drain_evidence.py)仅离线核对冻结清单和原始只读捕获，不连接服务、不清空队列、不创建订阅、不确认消息。输入各不超过4 MiB；输出以0600原子新建，不覆盖旧证据。标准输出只给固定状态与节点数，不回显订阅、客户端或原始响应。
+
+输入格式：
+
+- 清单 `schema=m3-nsq-drain-inventory/v1`：`nodes[]` 每项含 `node_id`、完整 `container_id`、原 `docker inspect` 的 `container_started_at`、`version=1.3.0` 及 `topics`（精确Topic到全部Channel名数组）。必须有节点和Topic；不得从空响应推导空清单。清单须在T30根据实际节点及有效/历史订阅责任冻结，不能直接照抄过期部署记录。
+- 捕获 `schema=m3-nsq-drain-captures/v1`：`nodes[]` 每项含 `node_id` 与恰好两个 `captures`。每份含上述容器身份、`captured_at`（UTC Z）、`request_path=/stats?format=json&include_clients=false&include_mem=false` 和未经重建的 `stats` JSON对象。必须从原节点全量采集，不用Topic/Channel过滤结果代替全清单。工具能拒绝声明的过滤路径，不能证明采集方没有伪造声明或内容。
+- 同节点两份必须相隔5–60秒，后一份在判定时不超过15秒且不在未来。NSQ `start_time`及精确容器启动时间不变；节点、Topic、Channel清单必须完全匹配，重复、遗漏、未登记和缺字段都拒绝。
+
+判定同时要求全部Topic和Channel的`depth/backend_depth`为零，全部Channel的`in_flight_count/deferred_count`为零；两次Topic的`message_count/message_bytes`和Channel的`message_count/requeue_count/timeout_count`均不变化。这样即使新消息已在采样间消费完毕，也不能把这段窗口当作稳定排空。旧消费者仍可连接；连接数为零不构成HTTP写者退出证据。
+
+这些字段直接对应固定[NSQ1.3.0 stats结构](https://github.com/nsqio/nsq/blob/v1.3.0/nsqd/stats.go)和[HTTP统计入口](https://github.com/nsqio/nsq/blob/v1.3.0/nsqd/http.go)。`include_clients=false`避免采集客户端细节，也意味着此报告不提供生产连接盘点。后台队列字段只是原生队列计数，不推断底层磁盘可靠性。
+
+```sh
+python3 scripts/rocketmq/nsq_drain_evidence.py \
+  --inventory /受限目录/nsq-inventory.json \
+  --captures /受限目录/nsq-captures.json \
+  --output /受限目录/nsq-drain-observation.json
+```
+
+成功状态为`nsq_drain_observed`，始终保留`cutover_authorized=false`。它不是旧HTTP/TCP写者、Relay、自主任务、在途业务或未来调度已经停止的证明，也不是原生超限、历史业务回执或事务audit缺口的处置授权；这些责任必须在T25/T30–T32单独冻结并验证。不可通过删Channel、清空队列、改计数或遗忘旧责任让工具通过。
+
+真实依赖验收由[独立CI](../../.github/workflows/rocketmq-nsq-drain.yml)创建唯一临时NSQ1.3.0，验证原生后台队列、in-flight、deferred、原FIN后的排空、采样间发布/消费以及同容器重启。容器加入按attempt命名并校验label的独立网络，清理后回读网络集合未变。临时`/data`使用有界tmpfs，不产生生产卷或匿名数据卷；清理必须保留既有容器且回读无本attempt残留。尚未取得这项CI通过前，只记录纯测试与接线，不勾选T25。

@@ -1,0 +1,59 @@
+name: RocketMQ cutover original NSQ drain observation
+on:
+  pull_request:
+    paths:
+      - scripts/rocketmq/nsq_drain_evidence.py
+      - scripts/rocketmq/test_nsq_drain_evidence.py
+      - scripts/rocketmq/ci-nsq-drain.py
+      - .github/workflows/rocketmq-nsq-drain.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-nsq-responsibility:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Verify exact candidate checkout
+        env:
+          EXPECTED_INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_INFRA_SHA"
+      - name: Pure drain and existing RocketMQ tool contracts
+        run: python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+      - name: Required isolated NSQ 1.3.0 original responsibility
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 scripts/rocketmq/ci-nsq-drain.py
+      - name: Verify no owned fixture remains
+        if: always()
+        run: |
+          set -euo pipefail
+          project="m3-nsq-drain-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          remaining="$(docker ps -aq --filter "label=com.docker.compose.project=$project")"
+          rescue=0
+          if [ -n "$remaining" ]; then
+            # Rescue cleanup is confined to this attempt; its necessity fails the job.
+            while IFS= read -r owned_id; do
+              docker rm -f "$owned_id"
+            done <<< "$remaining"
+            rescue=1
+          fi
+          networks="$(docker network ls -q --filter "label=com.docker.compose.project=$project")"
+          if [ -n "$networks" ]; then
+            while IFS= read -r owned_network; do
+              docker network rm "$owned_network"
+            done <<< "$networks"
+            rescue=1
+          fi
+          test "$rescue" = 0
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: nsq-drain-${{ github.sha }}
+          path: nsq-drain-native.json
+          if-no-files-found: error
+          retention-days: 14
