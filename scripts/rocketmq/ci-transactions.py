@@ -437,7 +437,7 @@ def main():
     def start(language, mode, identity="", owner="owner-a", topic=None, trust=None,
               storage="mysql", branches=1, revision="sdk-v2", subscription=None, principal=None,
               database_proxy=None, mq_proxy=None, lease_millis=15000):
-        is_sdk = language in ("sdk-go", "sdk-python")
+        is_sdk = language in ("sdk-go", "sdk-python", "sdk-route")
         logical_owner, inputs, owner_routes = owner, [], []
         group = "m2-tx-consumer"
         if is_sdk:
@@ -456,7 +456,7 @@ def main():
             physical_inputs = ([r for r in sdk_manifest["routes"] if r.get("subscription") == subscription]
                                if mode == "shared-consume" else matches)
             inputs = [{k: v for k, v in r.items() if k != "id"} for r in physical_inputs]
-            role = principal or ("observer" if mode in ("consume", "shared-consume") else
+            role = principal or ("observer" if mode in ("consume", "shared-consume", "route-read") else
                                  ("owner-a" if storage == "mysql" else "owner-b"))
             account = accounts[role]
             owner_routes = [{"topic":r["topic"],"physical_topic":r["physical_topic"],
@@ -486,6 +486,10 @@ def main():
                     str(sdk / "python/tests/integration/transaction_probe.py")]
         if language == "sdk-python" and args.installed_python:
             argv = [interpreter_path(args.installed_python), "-I", str(sdk / "python/tests/integration/transaction_probe.py")]
+        if language == "sdk-route":
+            argv = [args.python, "run", "--locked", "--project", str(sdk / "python"),
+                    "--extra", "rocketmq", "--extra", "nsq", "python",
+                    str(repo / "scripts/rocketmq/route_read_probe.py")]
         argv += ["--config", str(path), "--mode", mode, "--id", identity]
         p = Probe(argv, directory, dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(trust or ca)))
         probes.append(p)
@@ -1249,6 +1253,8 @@ def main():
                                               repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/sdk_faults.py", repo / "scripts/rocketmq/sdk_limits.py",
                                               repo / "scripts/rocketmq/audit_transaction_limit.py", repo / "scripts/rocketmq/routes.py",
                                               repo / "scripts/rocketmq/provision_v2.py")}
+        if args.sdk_python_live_recovery:
+            report['harness_sha256']['scripts/rocketmq/route_read_probe.py'] = hashlib.sha256((repo / 'scripts/rocketmq/route_read_probe.py').read_bytes()).hexdigest()
         report['harness_sha256']['scripts/rocketmq/failure_diagnostics.py'] = hashlib.sha256(
             (repo / 'scripts/rocketmq/failure_diagnostics.py').read_bytes()).hexdigest()
         report['harness_sha256']['scripts/rocketmq/published_runtime.py'] = hashlib.sha256(

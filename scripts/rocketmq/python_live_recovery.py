@@ -60,6 +60,11 @@ def run_live_recovery(start,sql,control,proof,passed,observer_topics):
         raise RuntimeError('all actual half ACKs without business commit required before Broker crash')
     proof.update(launcher_pid=sender.process.pid,producer_pid=identity_before['pid'],
         client_identity_sha256=identity_before['client_sha256'],half_prepared_before_kill=3,business_before_kill=0)
+    reader=start('sdk-route','route-read')
+    proof['observer_proxy_route_before_crash']=json.loads(reader.wait('proxy_route',timeout=65)['decision'])
+    reader.finish()
+    if proof['observer_proxy_route_before_crash']['code'] != 20000:
+        raise RuntimeError('observer Proxy route unavailable before fault; no Broker crash performed')
     proof['broker_kill']=control.kill()
     sender.send('commit')
     sender.wait('fault_observed',identity,'fault-live-broker',timeout=45)
@@ -84,6 +89,11 @@ def run_live_recovery(start,sql,control,proof,passed,observer_topics):
         raise
     proof['after_recheck_snapshot']=inspect(sender,identity)
     proof['topic_routes_ready']=control.wait_topic_routes(observer_topics)
+    reader=start('sdk-route','route-read')
+    proof['observer_proxy_route']=json.loads(reader.wait('proxy_route',timeout=65)['decision'])
+    reader.finish()
+    if proof['observer_proxy_route']['code'] != 20000 or proof['observer_proxy_route']['queues'] < 1:
+        raise RuntimeError('actual observer Proxy route not ready after Broker recovery')
     observer=start('sdk-go','consume')
     observer.wait('ready')
     for i in range(3):observer.wait('received',f'{identity}-b{i}')

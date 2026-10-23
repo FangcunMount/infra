@@ -29,4 +29,14 @@ class TelemetryDiagnosticSchemaTest(unittest.TestCase):
         with self.assertRaises(RuntimeError):telemetry_receipt({'decision':json.dumps(row)})
 
 
+class ProxyRouteDiagnosticTest(unittest.TestCase):
+    def test_response_exports_only_bounded_codes_and_topic_hash(self):
+        from types import SimpleNamespace
+        from route_read_probe import receipt
+        row=SimpleNamespace(status=SimpleNamespace(code=20000,message='private-token'),message_queues=[object()])
+        value=receipt(row,'private-topic',1)
+        self.assertNotIn('private',str(value))
+        self.assertEqual(value['queues'],1)
+        with self.assertRaises(RuntimeError):receipt(row,'private-topic',11)
+
 if __name__=='__main__':unittest.main()
