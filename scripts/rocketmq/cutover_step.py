@@ -60,7 +60,7 @@ def absolute(value):
 def load_step(path, digest):
     value = reviewed(path, digest)
     fields = {'schema', 'directory', 'binding_sha256', 'host', 'step', 'kind',
-              'script', 'script_sha256', 'cwd', 'timeout_seconds', 'ai_host'}
+              'script', 'script_sha256', 'cwd', 'timeout_seconds'}
     if set(value) != fields or value['schema'] != 'm3-cutover-step/v1':
         raise BoundaryError('exact reviewed step required')
     absolute(value['directory']); absolute(value['cwd']); absolute(value['script'])
@@ -69,8 +69,7 @@ def load_step(path, digest):
             or any(ord(c) < 33 for c in value['host'])
             or not isinstance(value['kind'], str)
             or value['kind'] not in {'runtime-start', 'pre-start-restore', 'forward-repair'}
-            or type(value['timeout_seconds']) is not int or not 1 <= value['timeout_seconds'] <= 1200
-            or type(value['ai_host']) is not bool):
+            or type(value['timeout_seconds']) is not int or not 1 <= value['timeout_seconds'] <= 1200):
         raise BoundaryError('bounded host step required')
     script = private_bytes(value['script'], 1024 * 1024)
     if hashlib.sha256(script).hexdigest() != value['script_sha256']:
@@ -138,22 +137,25 @@ def execute(plan, script, reviewed_sha256):
         raise BoundaryError('reviewed execution snapshot differs')
     if platform.system() != 'Linux' or socket.gethostname() != plan['host']:
         raise BoundaryError('reviewed execution host differs')
-    with deployment_locks(plan['ai_host']):
-        with Boundary(plan['directory'], plan['binding_sha256']) as operation:
-            receipt = 'reviewed-step-' + _digest(reviewed_sha256) + '.json'
-            try:
-                _publish(operation.fd, receipt, plan)
-            except FileExistsError:
-                if _read(operation.fd, receipt) != _encoded(plan):
-                    raise BoundaryError('reviewed step receipt differs') from None
-            callback = lambda: run_script(script, plan, operation)
-            if plan['kind'] == 'runtime-start':
-                operation.start(plan['step'], callback)
-            elif plan['kind'] == 'pre-start-restore':
-                operation.restore_before_start(plan['step'], callback)
-            else:
-                operation.forward_repair(plan['step'], reviewed_sha256, callback)
-            return operation.status()
+    # The single coordinator owns this barrier; the actual target entrypoint
+    # holds that target's existing deployment locks. Taking the coordinator's
+    # unrelated host lock here would neither protect remote hosts nor permit a
+    # co-located target entrypoint to acquire its own lock safely.
+    with Boundary(plan['directory'], plan['binding_sha256']) as operation:
+        receipt = 'reviewed-step-' + _digest(reviewed_sha256) + '.json'
+        try:
+            _publish(operation.fd, receipt, plan)
+        except FileExistsError:
+            if _read(operation.fd, receipt) != _encoded(plan):
+                raise BoundaryError('reviewed step receipt differs') from None
+        callback = lambda: run_script(script, plan, operation)
+        if plan['kind'] == 'runtime-start':
+            operation.start(plan['step'], callback)
+        elif plan['kind'] == 'pre-start-restore':
+            operation.restore_before_start(plan['step'], callback)
+        else:
+            operation.forward_repair(plan['step'], reviewed_sha256, callback)
+        return operation.status()
 
 
 def main(argv=None):

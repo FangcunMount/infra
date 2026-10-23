@@ -1,0 +1,57 @@
+name: RocketMQ cutover fixed target runtime start
+on:
+  pull_request:
+    paths:
+      - scripts/rocketmq/runtime_start.py
+      - scripts/rocketmq/test_runtime_start.py
+      - scripts/rocketmq/ci-runtime-start.py
+      - scripts/rocketmq/start_boundary.py
+      - scripts/rocketmq/cutover_step.py
+      - .github/workflows/rocketmq-runtime-start.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-target-start:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Exact source and pure tool regressions
+        env:
+          EXPECTED_INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_INFRA_SHA"
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+      - name: Required isolated target start and forward repair
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 scripts/rocketmq/ci-runtime-start.py
+      - name: Verify no owned target remains
+        if: always()
+        run: |
+          set -euo pipefail
+          project="m3-runtime-start-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rescue=0
+          while IFS= read -r identity; do
+            [ -z "$identity" ] && continue
+            docker rm -f "$identity"
+            rescue=1
+          done < <(docker ps -aq --filter "label=com.docker.compose.project=$project")
+          while IFS= read -r identity; do
+            [ -z "$identity" ] && continue
+            docker network rm "$identity"
+            rescue=1
+          done < <(docker network ls -q --filter "label=com.docker.compose.project=$project")
+          test "$rescue" = 0
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: runtime-start-${{ github.sha }}
+          path: runtime-start-native.json
+          if-no-files-found: error
+          retention-days: 14

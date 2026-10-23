@@ -25,7 +25,7 @@ def planned(root, directory, digest, script=b'exit 0\n', kind='runtime-start'):
     value = {'schema': 'm3-cutover-step/v1', 'directory': str(directory),
              'binding_sha256': digest, 'host': socket.gethostname(), 'step': 'isolated-1',
              'kind': kind, 'script': str(source), 'script_sha256': source_digest,
-             'cwd': root, 'timeout_seconds': 1, 'ai_host': False}
+             'cwd': root, 'timeout_seconds': 1}
     path = Path(root)/'step.json'
     sha = private(path, step._encoded(value))
     return path, sha, value

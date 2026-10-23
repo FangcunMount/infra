@@ -159,7 +159,8 @@ class Boundary:
                   'restore_issued', 'restore_returned', 'restore_failed',
                   'forward_repair_issued', 'forward_repair_returned', 'forward_repair_failed'}
         if (set(value) != {'binding_sha256', 'phase', 'step'} or value['binding_sha256'] != self.digest
-                or value['phase'] not in phases or not isinstance(value['step'], str)):
+                or not isinstance(value['phase'], str) or value['phase'] not in phases
+                or not isinstance(value['step'], str)):
             raise BoundaryError('operation state is incomplete or inconsistent')
         if value['phase'].startswith(('runtime_', 'forward_')) and not self._started():
             raise BoundaryError('start history without its persistent barrier')
