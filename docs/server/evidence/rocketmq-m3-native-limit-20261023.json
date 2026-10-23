@@ -1,0 +1,305 @@
+{
+  "version": 1,
+  "scope": "T24-D candidate development failures; no formal gate/source merge/production claim",
+  "m3_completed": 23,
+  "m3_total": 36,
+  "t24_completed": 3,
+  "t24_total": 4,
+  "records": [
+    {
+      "run": 39967687681,
+      "ci_url": "https://github.com/FangcunMount/infra/actions/runs/39967687681",
+      "report_sha256": "086b5d6c92d9ab6e79419b7d884b00b79dc76e8deaebbac46c48e275e43b6996",
+      "reported_source_sha": "a784c574704d8cdf29ed308785e754479fa25345",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: owned native-limit fault process failed",
+      "native_fault": {
+        "parameters_before": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "binary_sha256": "fce5b1d933d049c545e90f32ba75a80df9a8aaf3d6578c7014af67dc0abcc8c4",
+        "raw_fault_driver": "5.1.4",
+        "business_sdk_acceptance_not_claimed": true,
+        "parameters_effective": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 2,
+          "fileReservedTime": 48
+        },
+        "ready": {
+          "event": "ready",
+          "prepared": 1
+        },
+        "index": {
+          "records": 1,
+          "evidence_sha256": "5663bb5c6f8cbd8b6bb038c51f3d8f834cf40261e9f14e81670be0920827d990",
+          "read_only": true,
+          "body_exported": false,
+          "mode": "0600",
+          "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+          "alert": "native_transaction_check_limit_reached",
+          "owner_inferred_from_index": false
+        },
+        "closed": {
+          "event": "closed",
+          "prepared": 1,
+          "unknown_checks": 2,
+          "business_calls": 0,
+          "final_confirmation_calls": 0
+        },
+        "parameters_restored": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        }
+      },
+      "host_diagnostics": null,
+      "focus": null,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "run": 39969675310,
+      "ci_url": "https://github.com/FangcunMount/infra/actions/runs/39969675310",
+      "report_sha256": "9af55f826c0bbebfb020ac022063e9d8201ea6c2d4d2b38c5186dc2a6bddddfa",
+      "reported_source_sha": "1290f0130bff230b45d957630a8d54f8d87c2b83",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: actual default QS owners failed; private output withheld",
+      "native_fault": {
+        "parameters_before": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "binary_sha256": "26aa439844bc9f664ac7ee281dafb7d2d0a405f3384c895de390ccd6fc7cb336",
+        "published_fault_sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.4",
+          "Sum": "h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "domain_business_acceptance_not_claimed": true,
+        "parameters_effective": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 2,
+          "fileReservedTime": 48
+        },
+        "ready": {
+          "event": "ready",
+          "prepared": 1
+        },
+        "index": {
+          "records": 1,
+          "evidence_sha256": "90edc7b18b98a33ed19d16d32820153c21c8d0a1b0f712b4970a7e664258a3b0",
+          "read_only": true,
+          "body_exported": false,
+          "mode": "0600",
+          "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+          "alert": "native_transaction_check_limit_reached",
+          "owner_inferred_from_index": false
+        },
+        "closed": {
+          "event": "closed",
+          "prepared": 1,
+          "unknown_checks": 2,
+          "business_calls": 0,
+          "local_fault_callbacks": 1,
+          "owned_database_dropped": true,
+          "final_confirmation_calls": 0
+        },
+        "parameters_restored": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        }
+      },
+      "host_diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3DefaultOwnerRuntime"
+        ],
+        "assertion_lines": [
+          139,
+          638
+        ],
+        "owner_runtime": [
+          {
+            "elapsed_ms": 1015,
+            "error": {
+              "code": 0,
+              "kind": "none"
+            },
+            "lease_remaining_ms": [
+              58975,
+              58981
+            ],
+            "local": "not_started",
+            "owner_index": -1,
+            "root_phases": [
+              1,
+              1
+            ],
+            "stage": "before_observer_close"
+          },
+          {
+            "elapsed_ms": 1020,
+            "error": {
+              "code": 0,
+              "kind": "none"
+            },
+            "lease_remaining_ms": [
+              58970,
+              58975
+            ],
+            "local": "not_started",
+            "owner_index": -1,
+            "root_phases": [
+              1,
+              1
+            ],
+            "stage": "after_observer_close"
+          }
+        ]
+      },
+      "focus": null,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "run": 39971012968,
+      "ci_url": "https://github.com/FangcunMount/infra/actions/runs/39971012968",
+      "report_sha256": "dab2099880fa325a1f4815e1eb8c0258bf4e14a2f27666cc7428b76ff5e137a0",
+      "reported_source_sha": "bac40c023c622fd03d01f6d5b986febb7551643e",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: actual default AI assembly focus failed (private output withheld)",
+      "native_fault": {
+        "parameters_before": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "binary_sha256": "9952b36b38d028014d5afc1cd11a666e4213e0bcd66a83a35869d8d06855b682",
+        "published_fault_sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.4",
+          "Sum": "h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "domain_business_acceptance_not_claimed": true,
+        "parameters_effective": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 2,
+          "fileReservedTime": 48
+        },
+        "ready": {
+          "event": "ready",
+          "prepared": 1
+        },
+        "index": {
+          "records": 1,
+          "evidence_sha256": "e6fb1491258ab653bbc214230fda6ac2467a39724e6f1531584a4217563b23c9",
+          "read_only": true,
+          "body_exported": false,
+          "mode": "0600",
+          "topic": "TRANS_CHECK_MAX_TIME_TOPIC",
+          "alert": "native_transaction_check_limit_reached",
+          "owner_inferred_from_index": false
+        },
+        "closed": {
+          "event": "closed",
+          "prepared": 1,
+          "unknown_checks": 2,
+          "business_calls": 0,
+          "local_fault_callbacks": 1,
+          "owned_database_dropped": true,
+          "final_confirmation_calls": 0
+        },
+        "parameters_restored": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        }
+      },
+      "host_diagnostics": null,
+      "focus": {
+        "schema_isolated_from_full": true,
+        "exit_code": 1,
+        "private_output_sha256": "76b164985d49d491e731ef3398f0a46cf95d02c48cb12523e0dba489774822fa",
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]",
+            "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[True]"
+          ],
+          "assertion_lines": [
+            1610,
+            1635,
+            1638
+          ]
+        },
+        "junit_sha256": "acd41992a561e78ccf8478c7233db4a8218a04b0ee3199f776cc70edc65120d6",
+        "partial_native_receipt": {
+          "cases": {
+            "default_assembly_shared_primary_sender": true,
+            "default_assembly_no_legacy_publish_path": true,
+            "default_assembly_idle_checker_subscriptions": true,
+            "default_assembly_original_worker_preflight": true,
+            "default_assembly_exact_archive_witness": true,
+            "default_assembly_authenticated_business_ack": true,
+            "native_actual_sys_index_idempotent_original_primary_governance": true,
+            "default_assembly_pause_no_new_writes": true,
+            "halves_before_worker_root": true,
+            "default_serial_actual_factory_generation": true,
+            "default_serial_first_response_original_witness_no_legacy": true,
+            "default_serial_actual_factory_semantic": true
+          },
+          "passed": 12,
+          "failed": 2,
+          "skipped": 0,
+          "root": "original_mysql_sqlalchemy",
+          "sdk": "0.4.0a4",
+          "client": "5.1.2",
+          "python": "3.13.15",
+          "system_login_not_claimed": true,
+          "paired_qs_business_not_claimed": true,
+          "real_provider_not_claimed": true,
+          "process_exit_not_claimed": true,
+          "database_commit_network_fault_not_claimed": true
+        },
+        "schema_removed": true
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    }
+  ]
+}

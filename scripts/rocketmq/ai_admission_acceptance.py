@@ -32,7 +32,7 @@ NATIVE_LIMIT_CASES = frozenset((
     'native_original_sampler_sdk_shutdown_joined',
     'native_new_configured_open_default_assembly_keeps_durable_deny',
     'native_original_facts_witness_and_host_primary_preserved',
-    'native_no_governance_resolution_or_deletion'))
+    'native_no_runtime_governance_resolution_or_deletion'))
 
 PROTECTION_CASES = frozenset((
     'protection_sampler_uses_existing_host_loop', 'protection_actual_primary_binding_conflict_latches',
