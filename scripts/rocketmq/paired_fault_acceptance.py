@@ -157,9 +157,8 @@ def run_profile(source,directory,env,command,run,proof,native_runner,broker_faul
             proof['proxy_routes_ready'] = []
             for ordinal, topic in enumerate(sorted({r['physical_topic'] for r in config['routes']})):
                 private = directory / ('paired-proxy-route-' + str(ordinal) + '.json')
-                private.write_text(json.dumps(dict(endpoint=config['endpoint'],ca=config['ca_file'],
+                write_control(private,json.dumps(dict(endpoint=config['endpoint'],ca=config['ca_file'],
                     topic=topic,accesskey=config['ai']['username'],secretkey=config['ai']['password'])))
-                private.chmod(0o600)
                 response = run([*command,'python',str(Path(__file__).with_name('route_read_probe.py')),
                     '--config',str(private),'--mode','route-read'],cwd=source,env=env,timeout=65)
                 proof['proxy_routes_ready'].append(parse_output(response.stdout,topic))
