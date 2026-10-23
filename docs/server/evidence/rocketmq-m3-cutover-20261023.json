@@ -2,7 +2,7 @@
   "schema": "m3-cutover-tool-progress/v1",
   "m3_completed": 24,
   "m3_total": 36,
-  "t25_subgates_completed": 1,
+  "t25_subgates_completed": 2,
   "t25_subgates_total": 4,
   "nsq_drain": {
     "pr": "https://github.com/FangcunMount/infra/pull/189",
@@ -149,7 +149,7 @@
     "No native dependency executed locally, no production operations",
     "Startup/recovery and no-callback audit debt still require T25-C proof"
   ],
-  "recorded_at": "2026-10-23T13:03:24.183953+00:00",
+  "recorded_at": "2026-10-24T02:08:00+08:00",
   "workflow_history": [
     {
       "conclusion": "success",
@@ -682,11 +682,687 @@
       "task_completed": false
     },
     "full_run": "https://github.com/FangcunMount/infra/actions/runs/39996078545",
-    "full_status_at_record": "running",
-    "source_ci_status_at_record": "draft_pr_created",
-    "b_gate_complete": false,
+    "b_gate_complete": true,
     "production_changed": false,
-    "scope": "Selected original future responsibility handoff and complete rm_outbox state inventory with exact reviewed held source/target pairs. Writer/process exit, NSQ/AI receipt responsibilities, first-runtime barrier and final cutover remain separate."
+    "scope": "Completed source/tool gate for exact original future-plan handoff and complete rm_outbox snapshot counts. Does not prove actual legacy processes stopped, NSQ/AI business receipts settled or production cutover. Full writer freeze and recovery boundary remain T25-C/D and actual production evidence T30-T33.",
+    "full_status_at_initial_record": "running",
+    "source_ci_status_at_initial_record": "draft_pr_created",
+    "full_status": "success",
+    "full_reports": [
+      {
+        "source_sha": "c2e105686299e4de47e3590b733515aacc02bb6c",
+        "report_sha256": "a96ef645700957389fd377d1cc840f3959cc0f0e461a5b08aec6ee069602d834",
+        "passed": 68,
+        "failed": 0,
+        "skipped": 0,
+        "native_receipts": {
+          "mysql": {
+            "backend": "mysql",
+            "broker_dispatch_not_claimed": true,
+            "cases": {
+              "constructor_no_ddl": true,
+              "due_index_not_early": true,
+              "duplicate_first_wire_deadline": true,
+              "future_authorization_no_half_or_outbox": true,
+              "governed_changed_input_conflict": true,
+              "governed_commit_reply_discard_recovered": true,
+              "governed_first_plan_and_authorization_reused": true,
+              "governed_force_original_root": true,
+              "governed_manual_original_root": true,
+              "governed_no_outbox_or_business_attempt": true,
+              "governed_root_rollback_atomic": true,
+              "governed_wrong_scope_rejected": true,
+              "legacy_old_relay_cannot_claim_transferred": true,
+              "legacy_replay_cannot_reauthorize_transferred": true,
+              "legacy_transfer_attempted_or_due_refused": true,
+              "legacy_transfer_exact_first_wire_and_due": true,
+              "legacy_transfer_repeat_keeps_single_owner": true,
+              "legacy_transfer_root_rollback_atomic": true,
+              "legacy_transferred_status_not_pending": true,
+              "offline_cli_default_without_database_binding": true,
+              "offline_cli_does_not_authorize_cutover": true,
+              "offline_cli_exact_source_original_primary": true,
+              "offline_cli_first_transfer_and_same_plan_idempotence": true,
+              "offline_cli_no_new_tables_or_collections": true,
+              "offline_cli_no_sdk_transaction_rows": true,
+              "offline_cli_private_receipt_preserved": true,
+              "offline_cli_wrong_binding_and_digest_refused": true,
+              "offline_inventory_exact_pairs_read_only_accounted": true,
+              "offline_inventory_missing_ledger_not_empty": true,
+              "offline_inventory_pending_blocks_exit": true,
+              "offline_inventory_unreviewed_held_blocks_exit": true,
+              "original_root_commit_atomic": true,
+              "original_root_rollback_atomic": true,
+              "schema_missing_rejected": true
+            },
+            "failed": 0,
+            "offline_cli_required": true,
+            "passed": 34,
+            "scope": "original_authorization_and_explicit_future_ownership_handoff",
+            "skipped": 0,
+            "system_login_not_claimed": true
+          },
+          "mongo": {
+            "backend": "mongo",
+            "broker_dispatch_not_claimed": true,
+            "cases": {
+              "constructor_no_ddl": true,
+              "due_index_not_early": true,
+              "expired_session_rejected": true,
+              "future_authorization_no_half_or_outbox": true,
+              "governed_changed_input_conflict": true,
+              "governed_commit_reply_discard_recovered": true,
+              "governed_first_plan_and_authorization_reused": true,
+              "governed_force_original_root": true,
+              "governed_manual_original_root": true,
+              "governed_no_outbox_or_business_attempt": true,
+              "governed_root_rollback_atomic": true,
+              "governed_wrong_scope_rejected": true,
+              "legacy_old_relay_cannot_claim_transferred": true,
+              "legacy_replay_cannot_reauthorize_transferred": true,
+              "legacy_transfer_attempted_or_due_refused": true,
+              "legacy_transfer_exact_first_wire_and_due": true,
+              "legacy_transfer_repeat_keeps_single_owner": true,
+              "legacy_transfer_root_rollback_atomic": true,
+              "legacy_transferred_status_not_pending": true,
+              "offline_cli_default_without_database_binding": true,
+              "offline_cli_does_not_authorize_cutover": true,
+              "offline_cli_exact_source_original_primary": true,
+              "offline_cli_first_transfer_and_same_plan_idempotence": true,
+              "offline_cli_no_new_tables_or_collections": true,
+              "offline_cli_no_sdk_transaction_rows": true,
+              "offline_cli_private_receipt_preserved": true,
+              "offline_cli_wrong_binding_and_digest_refused": true,
+              "offline_inventory_exact_pairs_read_only_accounted": true,
+              "offline_inventory_missing_ledger_not_empty": true,
+              "offline_inventory_pending_blocks_exit": true,
+              "offline_inventory_unreviewed_held_blocks_exit": true,
+              "original_root_commit_atomic": true,
+              "original_root_rollback_atomic": true,
+              "schema_missing_rejected": true
+            },
+            "failed": 0,
+            "offline_cli_required": true,
+            "passed": 34,
+            "scope": "original_authorization_and_explicit_future_ownership_handoff",
+            "skipped": 0,
+            "system_login_not_claimed": true
+          }
+        },
+        "cli_binary_sha256": "688cd95c76fd51c88afaa6f7d73dc876cfac1a4884e50d8567c7d94af624cbd7",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.4",
+          "Sum": "h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "mysql_version": "8.0.36",
+        "image": "sha256:9e0b7e41385c861ec0d4d20f4b15e66a46b34fab13c1ad53d5111078169433d0",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "scope": "actual governed authorization entrypoints, original MySQL/Mongo Run/future schedule atomicity and legacy future ownership handoff; root reply discard is client-level; no due dispatcher, Broker, model consumer, system or production claim; explicit exact-source offline CLI first transfer/repeat/default verification/private receipt and original ledger readonly accounting with reviewed source-target pairs/missing-ledger refusal; no production snapshot, all-writer exit or cutover authorization claim"
+      },
+      {
+        "source_sha": "c2e105686299e4de47e3590b733515aacc02bb6c",
+        "report_sha256": "29d7e679416aa50b8483b533dbdd8a49441c2ffed3cb219dd767b2daa4bd8eeb",
+        "passed": 68,
+        "failed": 0,
+        "skipped": 0,
+        "native_receipts": {
+          "mysql": {
+            "backend": "mysql",
+            "broker_dispatch_not_claimed": true,
+            "cases": {
+              "constructor_no_ddl": true,
+              "due_index_not_early": true,
+              "duplicate_first_wire_deadline": true,
+              "future_authorization_no_half_or_outbox": true,
+              "governed_changed_input_conflict": true,
+              "governed_commit_reply_discard_recovered": true,
+              "governed_first_plan_and_authorization_reused": true,
+              "governed_force_original_root": true,
+              "governed_manual_original_root": true,
+              "governed_no_outbox_or_business_attempt": true,
+              "governed_root_rollback_atomic": true,
+              "governed_wrong_scope_rejected": true,
+              "legacy_old_relay_cannot_claim_transferred": true,
+              "legacy_replay_cannot_reauthorize_transferred": true,
+              "legacy_transfer_attempted_or_due_refused": true,
+              "legacy_transfer_exact_first_wire_and_due": true,
+              "legacy_transfer_repeat_keeps_single_owner": true,
+              "legacy_transfer_root_rollback_atomic": true,
+              "legacy_transferred_status_not_pending": true,
+              "offline_cli_default_without_database_binding": true,
+              "offline_cli_does_not_authorize_cutover": true,
+              "offline_cli_exact_source_original_primary": true,
+              "offline_cli_first_transfer_and_same_plan_idempotence": true,
+              "offline_cli_no_new_tables_or_collections": true,
+              "offline_cli_no_sdk_transaction_rows": true,
+              "offline_cli_private_receipt_preserved": true,
+              "offline_cli_wrong_binding_and_digest_refused": true,
+              "offline_inventory_exact_pairs_read_only_accounted": true,
+              "offline_inventory_missing_ledger_not_empty": true,
+              "offline_inventory_pending_blocks_exit": true,
+              "offline_inventory_unreviewed_held_blocks_exit": true,
+              "original_root_commit_atomic": true,
+              "original_root_rollback_atomic": true,
+              "schema_missing_rejected": true
+            },
+            "failed": 0,
+            "offline_cli_required": true,
+            "passed": 34,
+            "scope": "original_authorization_and_explicit_future_ownership_handoff",
+            "skipped": 0,
+            "system_login_not_claimed": true
+          },
+          "mongo": {
+            "backend": "mongo",
+            "broker_dispatch_not_claimed": true,
+            "cases": {
+              "constructor_no_ddl": true,
+              "due_index_not_early": true,
+              "expired_session_rejected": true,
+              "future_authorization_no_half_or_outbox": true,
+              "governed_changed_input_conflict": true,
+              "governed_commit_reply_discard_recovered": true,
+              "governed_first_plan_and_authorization_reused": true,
+              "governed_force_original_root": true,
+              "governed_manual_original_root": true,
+              "governed_no_outbox_or_business_attempt": true,
+              "governed_root_rollback_atomic": true,
+              "governed_wrong_scope_rejected": true,
+              "legacy_old_relay_cannot_claim_transferred": true,
+              "legacy_replay_cannot_reauthorize_transferred": true,
+              "legacy_transfer_attempted_or_due_refused": true,
+              "legacy_transfer_exact_first_wire_and_due": true,
+              "legacy_transfer_repeat_keeps_single_owner": true,
+              "legacy_transfer_root_rollback_atomic": true,
+              "legacy_transferred_status_not_pending": true,
+              "offline_cli_default_without_database_binding": true,
+              "offline_cli_does_not_authorize_cutover": true,
+              "offline_cli_exact_source_original_primary": true,
+              "offline_cli_first_transfer_and_same_plan_idempotence": true,
+              "offline_cli_no_new_tables_or_collections": true,
+              "offline_cli_no_sdk_transaction_rows": true,
+              "offline_cli_private_receipt_preserved": true,
+              "offline_cli_wrong_binding_and_digest_refused": true,
+              "offline_inventory_exact_pairs_read_only_accounted": true,
+              "offline_inventory_missing_ledger_not_empty": true,
+              "offline_inventory_pending_blocks_exit": true,
+              "offline_inventory_unreviewed_held_blocks_exit": true,
+              "original_root_commit_atomic": true,
+              "original_root_rollback_atomic": true,
+              "schema_missing_rejected": true
+            },
+            "failed": 0,
+            "offline_cli_required": true,
+            "passed": 34,
+            "scope": "original_authorization_and_explicit_future_ownership_handoff",
+            "skipped": 0,
+            "system_login_not_claimed": true
+          }
+        },
+        "cli_binary_sha256": "688cd95c76fd51c88afaa6f7d73dc876cfac1a4884e50d8567c7d94af624cbd7",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.4",
+          "Sum": "h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "mysql_version": "8.0.44",
+        "image": "sha256:b051314e9224dae6e6685fa5a2a6ade5d35b3a7c47cdfe3c95f17532a56c5d4d",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "scope": "actual governed authorization entrypoints, original MySQL/Mongo Run/future schedule atomicity and legacy future ownership handoff; root reply discard is client-level; no due dispatcher, Broker, model consumer, system or production claim; explicit exact-source offline CLI first transfer/repeat/default verification/private receipt and original ledger readonly accounting with reviewed source-target pairs/missing-ledger refusal; no production snapshot, all-writer exit or cutover authorization claim"
+      },
+      {
+        "source_sha": "c2e105686299e4de47e3590b733515aacc02bb6c",
+        "report_sha256": "628963b1f33effa52439f370b1cebeac50f46d246243170ddd817c383ab6f011",
+        "passed": 68,
+        "failed": 0,
+        "skipped": 0,
+        "native_receipts": {
+          "mysql": {
+            "backend": "mysql",
+            "broker_dispatch_not_claimed": true,
+            "cases": {
+              "constructor_no_ddl": true,
+              "due_index_not_early": true,
+              "duplicate_first_wire_deadline": true,
+              "future_authorization_no_half_or_outbox": true,
+              "governed_changed_input_conflict": true,
+              "governed_commit_reply_discard_recovered": true,
+              "governed_first_plan_and_authorization_reused": true,
+              "governed_force_original_root": true,
+              "governed_manual_original_root": true,
+              "governed_no_outbox_or_business_attempt": true,
+              "governed_root_rollback_atomic": true,
+              "governed_wrong_scope_rejected": true,
+              "legacy_old_relay_cannot_claim_transferred": true,
+              "legacy_replay_cannot_reauthorize_transferred": true,
+              "legacy_transfer_attempted_or_due_refused": true,
+              "legacy_transfer_exact_first_wire_and_due": true,
+              "legacy_transfer_repeat_keeps_single_owner": true,
+              "legacy_transfer_root_rollback_atomic": true,
+              "legacy_transferred_status_not_pending": true,
+              "offline_cli_default_without_database_binding": true,
+              "offline_cli_does_not_authorize_cutover": true,
+              "offline_cli_exact_source_original_primary": true,
+              "offline_cli_first_transfer_and_same_plan_idempotence": true,
+              "offline_cli_no_new_tables_or_collections": true,
+              "offline_cli_no_sdk_transaction_rows": true,
+              "offline_cli_private_receipt_preserved": true,
+              "offline_cli_wrong_binding_and_digest_refused": true,
+              "offline_inventory_exact_pairs_read_only_accounted": true,
+              "offline_inventory_missing_ledger_not_empty": true,
+              "offline_inventory_pending_blocks_exit": true,
+              "offline_inventory_unreviewed_held_blocks_exit": true,
+              "original_root_commit_atomic": true,
+              "original_root_rollback_atomic": true,
+              "schema_missing_rejected": true
+            },
+            "failed": 0,
+            "offline_cli_required": true,
+            "passed": 34,
+            "scope": "original_authorization_and_explicit_future_ownership_handoff",
+            "skipped": 0,
+            "system_login_not_claimed": true
+          },
+          "mongo": {
+            "backend": "mongo",
+            "broker_dispatch_not_claimed": true,
+            "cases": {
+              "constructor_no_ddl": true,
+              "due_index_not_early": true,
+              "expired_session_rejected": true,
+              "future_authorization_no_half_or_outbox": true,
+              "governed_changed_input_conflict": true,
+              "governed_commit_reply_discard_recovered": true,
+              "governed_first_plan_and_authorization_reused": true,
+              "governed_force_original_root": true,
+              "governed_manual_original_root": true,
+              "governed_no_outbox_or_business_attempt": true,
+              "governed_root_rollback_atomic": true,
+              "governed_wrong_scope_rejected": true,
+              "legacy_old_relay_cannot_claim_transferred": true,
+              "legacy_replay_cannot_reauthorize_transferred": true,
+              "legacy_transfer_attempted_or_due_refused": true,
+              "legacy_transfer_exact_first_wire_and_due": true,
+              "legacy_transfer_repeat_keeps_single_owner": true,
+              "legacy_transfer_root_rollback_atomic": true,
+              "legacy_transferred_status_not_pending": true,
+              "offline_cli_default_without_database_binding": true,
+              "offline_cli_does_not_authorize_cutover": true,
+              "offline_cli_exact_source_original_primary": true,
+              "offline_cli_first_transfer_and_same_plan_idempotence": true,
+              "offline_cli_no_new_tables_or_collections": true,
+              "offline_cli_no_sdk_transaction_rows": true,
+              "offline_cli_private_receipt_preserved": true,
+              "offline_cli_wrong_binding_and_digest_refused": true,
+              "offline_inventory_exact_pairs_read_only_accounted": true,
+              "offline_inventory_missing_ledger_not_empty": true,
+              "offline_inventory_pending_blocks_exit": true,
+              "offline_inventory_unreviewed_held_blocks_exit": true,
+              "original_root_commit_atomic": true,
+              "original_root_rollback_atomic": true,
+              "schema_missing_rejected": true
+            },
+            "failed": 0,
+            "offline_cli_required": true,
+            "passed": 34,
+            "scope": "original_authorization_and_explicit_future_ownership_handoff",
+            "skipped": 0,
+            "system_login_not_claimed": true
+          }
+        },
+        "cli_binary_sha256": "688cd95c76fd51c88afaa6f7d73dc876cfac1a4884e50d8567c7d94af624cbd7",
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0-rocketmq-tx.4",
+          "Sum": "h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "mysql_version": "8.4.11",
+        "image": "sha256:e8a1f5ee6697c70ac65289c69abadde866d0254e6df3f469de80cc73c2994e3d",
+        "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "scope": "actual governed authorization entrypoints, original MySQL/Mongo Run/future schedule atomicity and legacy future ownership handoff; root reply discard is client-level; no due dispatcher, Broker, model consumer, system or production claim; explicit exact-source offline CLI first transfer/repeat/default verification/private receipt and original ledger readonly accounting with reviewed source-target pairs/missing-ledger refusal; no production snapshot, all-writer exit or cutover authorization claim"
+      }
+    ],
+    "source_ci_status": "merged",
+    "source_pr": "https://github.com/FangcunMount/qs-server/pull/433",
+    "source_merge_sha": "35504b7f6a5f28f1d5bb21c3fe7c8f806ee0d504",
+    "infra_pr": "https://github.com/FangcunMount/infra/pull/194",
+    "infra_candidate_sha": "1ce1e3f65a6ebe48f67dc9967eb46ff5e9f9143a",
+    "infra_merge_sha": "7efa41e63e1a4bfc62e0c8b51c6b0ce4514fe9ad",
+    "source_successful_checks": 28,
+    "source_conditional_api_sync": "N/A: event conditions, not an executed validation",
+    "source_test_run": "https://github.com/FangcunMount/qs-server/actions/runs/39996167928",
+    "production_deploy_paused": true,
+    "source_candidate_and_merge_tree": "420c9eb823afb42d8843f30cb468cca07dda17f8",
+    "infra_candidate_test_and_merge_tree": "87b248276bfb635f4e142b6d85b57b8a127003fb",
+    "infra_test_merge_sha": "f57004231ee41b2b0608685b4a9566809dfc7bd8",
+    "infra_regression": {
+      "successful_checks": 12,
+      "successful_workflows": 6,
+      "artifact_report_instances": 16,
+      "unique_report_sha256_count": 14,
+      "duplicate_artifact_copies": 2,
+      "reports": [
+        {
+          "run": "39996368400",
+          "file": "rocketmq-m1-evidence.json",
+          "sha256": "6f019adfc9718812e168acef3794cc77d22ecda28992585e65157825803ca3cc",
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": null,
+          "cleanup_limit": "Legacy artifact has no cleanup/readback object; ci-smoke finally requires owned compose down and required workflow step succeeded; do not invent readback fields"
+        },
+        {
+          "run": "39996368400",
+          "file": "rocketmq-m2-transactions.json",
+          "sha256": "11a242785be9392b82020bc1d9764ba95e06e889311aa4f95c0be197a0b7fb57",
+          "passed": 20,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368400",
+          "file": "rocketmq-m2-go-sdk.json",
+          "sha256": "66104743b60b7d7036371859ee939fbfc3ca1eb38c7ba08b8407c648653fb0cf",
+          "passed": 19,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368400",
+          "file": "rocketmq-m2-transactions.json",
+          "sha256": "11a242785be9392b82020bc1d9764ba95e06e889311aa4f95c0be197a0b7fb57",
+          "passed": 20,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368400",
+          "file": "rocketmq-m2-go-sdk.json",
+          "sha256": "66104743b60b7d7036371859ee939fbfc3ca1eb38c7ba08b8407c648653fb0cf",
+          "passed": 19,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368370",
+          "file": "rocketmq-qs-retry.json",
+          "sha256": "b3fda82d789b6e7423992c2adaeefd5958faf927a5bf2ba6c192a1f67b1903e9",
+          "passed": 44,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368370",
+          "file": "rocketmq-qs-retry.json",
+          "sha256": "80f59dfeb8fb0ab098faa99e8b8d223ef652cdbab810e3577f76c1858afb08e7",
+          "passed": 44,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368370",
+          "file": "rocketmq-qs-retry.json",
+          "sha256": "3d3cd5f5f6c9e3b4bb55a7716e56a580a9acaafb209f460a3f63138fedff6eb7",
+          "passed": 44,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368364",
+          "file": "rocketmq-packet-faults.json",
+          "sha256": "aeabffb14213dad5ee2002a4507bf53f4e26694deb628810357df496c18466b7",
+          "passed": 46,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368364",
+          "file": "rocketmq-packet-faults.json",
+          "sha256": "d00ffd83a6a012885f32e44d1a84e26849dab6af45cd9e2de2d9fcbeb67a61c0",
+          "passed": 46,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368412",
+          "file": "rocketmq-public-sdk.json",
+          "sha256": "66b61a7cc8ee4bff8503fac06d71050c249c4d6aa2d45b8ce7b9023a47f01511",
+          "passed": 41,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368412",
+          "file": "rocketmq-public-sdk.json",
+          "sha256": "20d6bfcedb7e021164c0a86e6115bfbb46686f3866861449b862d263d92afcef",
+          "passed": 41,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368351",
+          "file": "rocketmq-complete-sdk.json",
+          "sha256": "606f518fb95e7eb443b8f6e03b24e7c2c03b24e517d44ef37bdfee969800c19e",
+          "passed": 48,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368351",
+          "file": "rocketmq-native-dlq-audit.json",
+          "sha256": "35974c57f37dfb919c96583f677146c1a216a10137a1973eb00b69de1f23710c",
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368351",
+          "file": "rocketmq-complete-sdk.json",
+          "sha256": "89e7c5f9f583e73ada9e485eb1d4f66019838d6268ba824e0056de8ec413fdf4",
+          "passed": 48,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        },
+        {
+          "run": "39996368358",
+          "file": "rocketmq-m3-resources.json",
+          "sha256": "114d4776df5c9ed541958fbcd039a18385c325c51fed6133b119f984b08e3b83",
+          "passed": 134,
+          "failed": 0,
+          "skipped": 0,
+          "counter_shape": "root",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "cleanup_limit": null
+        }
+      ],
+      "explicit_cleanup_objects": 15,
+      "legacy_m1_cleanup_limit": "One M1 instance has no cleanup readback object; required workflow and existing finally only, not invented fields",
+      "workflows": [
+        {
+          "conclusion": "success",
+          "databaseId": 39996368370,
+          "headSha": "1ce1e3f65a6ebe48f67dc9967eb46ff5e9f9143a",
+          "status": "completed",
+          "workflowName": "RocketMQ QS future retry original dual-store authorization"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 39996368400,
+          "headSha": "1ce1e3f65a6ebe48f67dc9967eb46ff5e9f9143a",
+          "status": "completed",
+          "workflowName": "RocketMQ Docker acceptance"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 39996368358,
+          "headSha": "1ce1e3f65a6ebe48f67dc9967eb46ff5e9f9143a",
+          "status": "completed",
+          "workflowName": "RocketMQ M3 final resource candidate"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 39996368412,
+          "headSha": "1ce1e3f65a6ebe48f67dc9967eb46ff5e9f9143a",
+          "status": "completed",
+          "workflowName": "RocketMQ public transaction SDK"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 39996368364,
+          "headSha": "1ce1e3f65a6ebe48f67dc9967eb46ff5e9f9143a",
+          "status": "completed",
+          "workflowName": "RocketMQ packet transaction faults"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 39996368351,
+          "headSha": "1ce1e3f65a6ebe48f67dc9967eb46ff5e9f9143a",
+          "status": "completed",
+          "workflowName": "RocketMQ complete transaction acceptance"
+        }
+      ]
+    }
   },
   "dispatch_failure_observations": [
     {
