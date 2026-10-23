@@ -25,7 +25,7 @@ class QSRetryAcceptanceTest(unittest.TestCase):
     def test_offline_cli_requires_both_full_case_sets_and_explicit_profile(self):
         output = self.output(handoff_cli=True)
         receipts = parse_retry_receipts(output, handoff_cli=True)
-        self.assertEqual({r['passed'] for r in receipts.values()}, {30})
+        self.assertEqual({r['passed'] for r in receipts.values()}, {34})
         for bad in (self.output(),
                     output.replace('"offline_cli_required": true', '"offline_cli_required": false'),
                     output.replace('"offline_cli_required": true', '"offline_cli_required": 1'),

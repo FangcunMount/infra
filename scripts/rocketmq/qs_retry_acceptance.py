@@ -25,7 +25,11 @@ CLI_CASES = frozenset(('offline_cli_exact_source_original_primary',
                        'offline_cli_private_receipt_preserved',
                        'offline_cli_does_not_authorize_cutover',
                        'offline_cli_no_new_tables_or_collections',
-                       'offline_cli_no_sdk_transaction_rows'))
+                       'offline_cli_no_sdk_transaction_rows',
+                       'offline_inventory_pending_blocks_exit',
+                       'offline_inventory_unreviewed_held_blocks_exit',
+                       'offline_inventory_exact_pairs_read_only_accounted',
+                       'offline_inventory_missing_ledger_not_empty'))
 
 
 def parse_retry_receipts(output, *, handoff_cli=False):
@@ -108,4 +112,4 @@ def run_qs_retry_store_host(source, directory, project, mysql_port, mongo_port, 
         raise RuntimeError('QS source changed during native acceptance')
     proof['scope'] = 'actual governed authorization entrypoints, original MySQL/Mongo Run/future schedule atomicity and legacy future ownership handoff; root reply discard is client-level; no due dispatcher, Broker, model consumer, system or production claim'
     if handoff_cli:
-        proof['scope'] += '; explicit exact-source offline CLI first transfer/repeat/default verification/private receipt; no complete production inventory or cutover authorization claim'
+        proof['scope'] += '; explicit exact-source offline CLI first transfer/repeat/default verification/private receipt and original ledger readonly accounting with reviewed source-target pairs/missing-ledger refusal; no production snapshot, all-writer exit or cutover authorization claim'
