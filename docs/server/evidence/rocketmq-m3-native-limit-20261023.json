@@ -992,5 +992,75 @@
     "conditional_image_publication_not_selected": 1,
     "production_deploy_paused": true,
     "production_deployment_performed": false
+  },
+  "qs_final_native": {
+    "run": 39978853228,
+    "tested_source_sha": "b57dcdc5d4a24424aa866f650387bd11e77ec844",
+    "current_candidate": "85d3e976e",
+    "subsequent_delta": "only scripts/tests/test_docs_checks.py migration inventory assertion109/42 ->110/43; runtime code and migration bytes unchanged",
+    "profiles": [
+      {
+        "file": "rocketmq-qs-retry.json",
+        "report_sha256": "a1d400d2abd9280a5a52cff97a31864dc6ef31ec487ea912d8ab5c2ef7667faa",
+        "source_sha": "b57dcdc5d4a24424aa866f650387bd11e77ec844",
+        "kind": "qs",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.0.36",
+        "image": "sha256:9116d2c0b7b1e57e9cb0ea405de51bc6f006a735e00e5e72e397f52417460dff",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "45e6042846a18745b2265f30dbcb271931d04da0ae9a69cd976d5d8745c9ab11"
+      },
+      {
+        "file": "rocketmq-qs-retry.json",
+        "report_sha256": "82af18d9a93f3f443dd17840e97348ff66914a7921c0c79e880360f475f64889",
+        "source_sha": "b57dcdc5d4a24424aa866f650387bd11e77ec844",
+        "kind": "qs",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.0.44",
+        "image": "sha256:417424a23b3432b8f317a6b16287966f08c1f8cb8e8db37085a807aeb39ef0d5",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "24ff1e8f38a74c1f4b3ca96f50adc5ced8d902075b642c72a81155e744125e74"
+      },
+      {
+        "file": "rocketmq-qs-retry.json",
+        "report_sha256": "df9ee257dcfcdaebd2fa4df47d486872241cfdba5fc15d652cf04f60aa3adc5a",
+        "source_sha": "b57dcdc5d4a24424aa866f650387bd11e77ec844",
+        "kind": "qs",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.4.11",
+        "image": "sha256:31b80ce6578363fb46e9b6881677566d8d95ad80468db4bec32d3e19b3a6f7c5",
+        "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "a311f44aa2003f7704218ef0ee0736950bc33388cd4d526ff5dc85a5eab72575"
+      }
+    ],
+    "source_merge_pending": true,
+    "production_deployment_performed": false
   }
 }
