@@ -226,7 +226,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 2026-10-23；130直接操作＋4冲突，零失败/跳过、完整清理；52 CI成功、55回归报告/收据；PR154合并d639ea6，tree=b1282d0；[证据](evidence/rocketmq-m3-resources-20261023.json)；未安装生产资源 |
 | ✅ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 2026-10-23完成声明范围：IAM三档/AI六档、QS真实双owner三档各13及默认工厂三档各10、worker三档各11；配置＋已发布SDK上界证据复核。PR428/169已合并，源码28检查、工具49检查/56非空报告零失败/跳过。完整API/业务故障及最终镜像仍归T23/T29。[证据](evidence/rocketmq-m3-runtime-20261023.json) |
 | ☐ | T23 | 宿主端到端及真实网络/进程/DB/Broker故障 | 进行中；从实际IAM角色写入原GORM根事务的COMMIT前后TCP断连开始，随后补齐QS双存储、AI与成对/进程故障；[当前证据](evidence/rocketmq-m3-host-faults-20261023.json) |
-| ☐ | T24 | 指标、告警、准入保护、DLQ/超限审计与规程 | 待开始 |
+| ☐ | T24 | 指标、告警、准入保护、DLQ/超限审计与规程 | 进行中：独立准备只读审计/恢复规程，T23门禁继续运行；宿主指标、准入保护及真实DLQ验收待完成 |
 | ☐ | T25 | 一次停写切换工具、旧责任处置/调度交接、启动前恢复与启动后前向修复 | 待开始；不开发在线共存或NSQ provider回退候选；兼容工具清理移交M4 |
 | ☐ | T26 | 预发布三库完整CI/API评审/混合链路，稳定协议冻结 | 待开始 |
 | ☐ | T27 | 同SDK SHA的稳定Go/Python发布、摘要/锁/receipt | 待开始 |
@@ -1323,3 +1323,8 @@ SDK必要修订闭环：39899882809两档各5/5、零失败/跳过，Broker前�
 39902972061保留失败：单次Start后，新AI暂停owner完成原两条Reference Commit回查，新half/执行均0，但原存活Go消费者未在60秒内完成receipt/state/ACK；部分证据13通过、1失败、0跳过，所属清理完成。固定Go driver周期settings同步为5分钟，与现象相符但尚未证明唯一根因。下一轮明确验证跨实例协调恢复，不冒称存活Go自动恢复：Broker仍停止时排空旧AI，恢复Broker并只读确认三路由，再关闭旧QS、以同DB/owner/epoch/端口启动新QS，暂停新AI精确回查后恢复消费者；保留首次wire，禁止command重发/业务重做。具名受影响进程重启步骤纳入T25。
 
 固定QS0f353a04、AIbb437608、infra1b2b84d2的开发CI39905702688进行中，仅2故障用例；完整六档、当前头源码CI及相关合并仍待完成。工具171纯测试通过，生产无操作。M3仍22/36、T23内部2/4，M4为0/8。
+
+
+### 2026-10-23：T24 独立准备，不改变 T23 冻结候选
+
+在独立工作区准备[观察/恢复边界](rocketmq-m3-recovery.md)及按v2 manifest具名Group/key读取的DLQ索引工具。只允许docker inspect和queryMsgByKey，0600原子新建文件，标准输出不含key、消息ID或正文；同Group跨owner时保留候选集合，不决定数据库或确认事务。当前仅纯测试与源码边界，不冒充真实DLQ、宿主准入保护或生产生效；T24未勾选，M3仍22/36，T23完整验收继续运行。
