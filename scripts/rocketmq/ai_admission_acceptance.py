@@ -196,6 +196,7 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
                            mysql_port, password, run, proof)
         private_data = json.loads(private_config.read_text())
         private_data.update(extra)
+        private_data['sdk_python_version'] = profile['sdk_version']
         if profile["name"] == "paired_faults":
             private_data.update(paired_faults=True,qs_primary_url=root_url)
         private_config.write_text(json.dumps(private_data)); private_config.chmod(0o600)

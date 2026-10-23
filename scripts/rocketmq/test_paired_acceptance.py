@@ -68,6 +68,13 @@ class PairedAcceptanceTests(unittest.TestCase):
         self.assertIsNone(read_receipt(good+'\n'+good))
         self.assertIsNone(read_receipt(MARKER+'{broken'))
 
+    def test_fixed_profile_sdk_version_must_match_actual_receipt(self):
+        value=receipt(True);value['sdk_python']='0.4.0a3'
+        raw=MARKER+json.dumps(value)
+        self.assertIsNone(read_receipt(raw,full=True))
+        self.assertIsNotNone(read_receipt(raw,full=True,sdk_python='0.4.0a3'))
+        self.assertIsNone(read_receipt(raw,full=True,sdk_python='0.4.0a4'))
+
     def test_partial_failure_keeps_only_known_bounded_facts(self):
         value = receipt();value['cases']={};value['passed']=0
         value['failed']=1;value['go_phase']='owner_start'

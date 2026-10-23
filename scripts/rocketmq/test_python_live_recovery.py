@@ -16,4 +16,17 @@ class PythonLiveRecoveryProfileTest(unittest.TestCase):
             self.assertIn('requires source SDK Go/Python fixture',result.stderr)
             self.assertNotIn('Traceback',result.stderr)
 
+class TelemetryDiagnosticSchemaTest(unittest.TestCase):
+    def test_diagnostics_export_only_known_scalar_counters(self):
+        import json
+        from python_live_recovery import SDK_FIELDS, TELEMETRY_FIELDS, telemetry_receipt
+        row=dict(sdk={key:0 for key in SDK_FIELDS},telemetry={key:0 for key in TELEMETRY_FIELDS})
+        row['sdk']['wire']='private-body'
+        row['telemetry']['credentials']='private-token'
+        parsed=telemetry_receipt({'decision':json.dumps(row)})
+        self.assertNotIn('private',json.dumps(parsed))
+        row['telemetry']['pending_settings']='private-value'
+        with self.assertRaises(RuntimeError):telemetry_receipt({'decision':json.dumps(row)})
+
+
 if __name__=='__main__':unittest.main()

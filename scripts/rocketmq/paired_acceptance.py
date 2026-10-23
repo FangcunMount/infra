@@ -86,7 +86,7 @@ def paired_manifest():
     return manifest
 
 
-def read_receipt(output, *, full=False, partial=False, marker=MARKER):
+def read_receipt(output, *, full=False, partial=False, marker=MARKER, sdk_python="0.4.0a2"):
     lines = [line.split(marker,1)[1] for line in output.splitlines() if marker+'{' in line]
     if len(lines) != 1 or len(lines[0]) > 16384:
         return None
@@ -99,7 +99,7 @@ def read_receipt(output, *, full=False, partial=False, marker=MARKER):
             or any(value[k] is not True for k in FLAGS)
             or value['root'] != 'original_go_mysql_and_python_sqlalchemy'
             or (value['sdk_go'],value['sdk_python'],value['client_python']) != (
-                'v0.5.0-rocketmq-tx.2','0.4.0a2','5.1.2')
+                'v0.5.0-rocketmq-tx.2',sdk_python,'5.1.2')
             or value['profile'] != ('full' if full else 'core')
             or not isinstance(value['delivery_errors'],list)
             or any(not isinstance(v,str) or v not in DELIVERY_ERRORS for v in value['delivery_errors'])

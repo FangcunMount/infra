@@ -10,6 +10,40 @@ SETUP_CASES=frozenset(('v2_go_python_infra_exact_route_vectors',
     'v2_existing_configuration_conflict_refused'))
 
 
+
+TELEMETRY_FIELDS=frozenset(('pending_settings','settings_closing','settings_writes',
+    'settings_failures','settings_skipped','heartbeat_ok','heartbeat_missing','heartbeat_errors',
+    'last_heartbeat_code','client_running','heartbeat_thread_alive','route_endpoints',
+    'channels','closed_streams','open_streams'))
+SDK_FIELDS=frozenset(('stopped','stopping','ready','active_sends','pending_calls','pending_checks',
+    'running_checks','completed_results','local_committed_results','half_prepared_results',
+    'final_unknown_results','check_commit','check_unknown','check_rollback','callback_errors',
+    'invalid_checks','database_errors'))
+
+
+def telemetry_receipt(event):
+    raw=event.get('decision','')
+    if not isinstance(raw,str) or len(raw)>16384:
+        raise RuntimeError('bounded telemetry diagnostic required')
+    value=json.loads(raw)
+    if not isinstance(value,dict) or set(value) != {'sdk','telemetry'}:
+        raise RuntimeError('fixed telemetry diagnostic schema required')
+    result={}
+    for group,fields in (('sdk',SDK_FIELDS),('telemetry',TELEMETRY_FIELDS)):
+        row=value[group]
+        if (not isinstance(row,dict) or not fields.issubset(row)
+                or any(type(row[k]) not in (bool,int) or not 0 <= row[k] <= 1000000 for k in fields)):
+            raise RuntimeError('safe telemetry counters required; no raw log export')
+        result[group]={k:row[k] for k in sorted(fields)}
+    return result
+
+
+def inspect(probe,identity):
+    cursor=len(probe.events)
+    probe.send('inspect')
+    return telemetry_receipt(probe.wait('live_telemetry',identity,timeout=10,after=cursor))
+
+
 def run_live_recovery(start,sql,control,proof,passed):
     identity='packet-sdk-python-live-restart'
     sender=start('sdk-python','fault-live-broker',identity,branches=3)
@@ -37,8 +71,17 @@ def run_live_recovery(start,sql,control,proof,passed):
             or sql(f"SELECT COUNT(*) FROM sdk_business WHERE id='{identity}';") != '1'):
         raise RuntimeError('one committed original root and three actual final Unknown results required')
     proof.update(local_calls=1,business_after_commit=1,final_unknown=3)
+    proof['before_restart_snapshot']=inspect(sender,identity)
     proof['broker_restart']=control.start()
-    wait_reference_checks(sender,[f'{identity}-b{i}' for i in range(3)],'commit')
+    try:
+        wait_reference_checks(sender,[f'{identity}-b{i}' for i in range(3)],'commit')
+    except RuntimeError:
+        proof['reference_check_failed']=True
+        try:
+            proof['on_failure_snapshot']=inspect(sender,identity)
+        except RuntimeError:
+            proof['inspection_failed']=True
+        raise
     observer=start('sdk-go','consume')
     observer.wait('ready')
     for i in range(3):observer.wait('received',f'{identity}-b{i}')
@@ -48,6 +91,10 @@ def run_live_recovery(start,sql,control,proof,passed):
     if identity_before != identity_after:
         raise RuntimeError('producer process or client instance replaced during recovery')
     sender.wait('closed');sender.finish()
+    proof['closed_telemetry']=telemetry_receipt(sender.wait('live_telemetry_closed',identity))
+    closed=proof['closed_telemetry']['telemetry']
+    if closed['pending_settings'] != 0 or not closed['settings_closing'] or closed['client_running']:
+        raise RuntimeError('metadata settings RPCs or client still active after close')
     stats=json.loads(sender.wait('metrics')['decision'])
     if (not stats.get('stopped') or stats.get('completed_results') != 1
             or stats.get('local_committed_results') != 1 or stats.get('half_prepared_results') != 3
