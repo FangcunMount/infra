@@ -72,6 +72,44 @@ def parse_runtime_receipt(output, source):
     return value
 
 
+PROTECTION_CASES = frozenset((
+    'actual_primary_binding_conflict_latches_current_observation',
+    'protected_writer_never_reaches_original_root', 'idle_checker_owner_stays_live',
+    'unhealthy_review_and_plain_open_refused', 'healthy_sampling_does_not_unlatch',
+    'exact_generation_named_review_restores_admission', 'committed_replay_keeps_one_business_execution',
+    'actual_sampler_shutdown_retains_primary_pool'))
+
+
+def parse_protection_receipt(output, source):
+    parse_runtime_receipt(output, source)
+    rows = [json.loads(line.split('M3_IAM_PROTOCOL_PROTECTION_RECEIPT ', 1)[1])
+            for line in output.splitlines() if 'M3_IAM_PROTOCOL_PROTECTION_RECEIPT {' in line]
+    if len(rows) != 1:
+        raise RuntimeError('one exact IAM protection receipt required')
+    value = rows[0]
+    fields = {'source_sha', 'passed', 'failed', 'skipped', 'cases', 'business_executions',
+              'binding_fixture_only', 'full_api_process_fault_or_system_not_claimed'}
+    if (set(value) != fields or value['source_sha'] != source
+            or type(value['passed']) is not int or value['passed'] != len(PROTECTION_CASES)
+            or type(value['failed']) is not int or value['failed'] != 0
+            or type(value['skipped']) is not int or value['skipped'] != 0
+            or set(value['cases']) != PROTECTION_CASES or any(v is not True for v in value['cases'].values())
+            or type(value['business_executions']) is not int or value['business_executions'] != 1
+            or value['binding_fixture_only'] is not True
+            or value['full_api_process_fault_or_system_not_claimed'] is not True):
+        raise RuntimeError('IAM protection receipt wrong source, incomplete or outside fixed scope')
+    return value
+
+
+def validate_protection_profile(module, protection, runtime, faults, fanout):
+    if protection and (not runtime or faults or fanout):
+        raise RuntimeError('IAM protection requires separate actual runtime without faults/fanout')
+    if protection and ('Replace' in module or module.get('Path') != 'github.com/FangcunMount/reliable-messaging'
+            or tuple(module.get(k) for k in ('Version', 'Sum', 'GoModSum')) != (
+                'v0.5.0-rocketmq-tx.4', 'h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=',
+                'h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')):
+        raise RuntimeError('IAM protection requires exact published tx.4 module and sums')
+
 def host_failure_summary(raw):
     # Fixed classifications only; never copy a driver error, wire or credential.
     return {'build_failed': '[build failed]' in raw,
@@ -111,13 +149,19 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     if runtime_flag not in ('0', '1'):
         raise RuntimeError('explicit IAM runtime profile flag required')
     runtime_required = runtime_flag == '1'
+    protection_flag = os.environ.get('ROCKETMQ_IAM_PROTOCOL_PROTECTION', '0')
+    if protection_flag not in ('0', '1'):
+        raise RuntimeError('explicit IAM protection profile flag required')
+    protection = protection_flag == '1'
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'],
                             cwd=source, env=env).stdout)
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('IAM must use its pinned downloaded SDK without replace')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
-    if (runtime_required or faults) and module.get('Version') != 'v0.5.0-rocketmq-tx.2':
+    validate_protection_profile(module, protection, runtime_required, faults, qs_source is not None)
+    env['IAM_M3_VERIFY_PROTOCOL_PROTECTION'] = '1' if protection else '0'
+    if (runtime_required or faults) and not protection and module.get('Version') != 'v0.5.0-rocketmq-tx.2':
         raise RuntimeError('current IAM runtime proof requires fixed SDK tx.2')
     manifest = iam_manifest(fanout=qs_source is not None)
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4),
@@ -185,6 +229,8 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     proof['native_receipt'] = parse_host_receipt(result.stdout, require_business_result)
     if runtime_required:
         proof['runtime_receipt'] = parse_runtime_receipt(result.stdout, proof['source_sha'])
+        if protection:
+            proof['protection_receipt'] = parse_protection_receipt(result.stdout, proof['source_sha'])
     if qs_source is not None:
         proof['qs_fanout']['receipt'] = parse_fanout_receipt(result.stdout)
         proof['qs_fanout']['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=qs_source).stdout.strip()

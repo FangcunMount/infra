@@ -24,6 +24,12 @@ TESTS = frozenset((
     'test_actual_evaluation_original_root_over_broker[5]',
     'test_actual_local_technical_budget_only_publishes_one_held_receipt',
     'test_real_commit_reply_deliberately_discarded_keeps_local_commit_and_first_wire'))
+PROTECTION_CASES = frozenset((
+    'protection_sampler_uses_existing_host_loop', 'protection_actual_primary_binding_conflict_latches',
+    'protection_idle_checker_stays_live', 'protection_plain_open_and_unhealthy_review_refused',
+    'protection_worker_cannot_reach_original_business_root', 'protection_healthy_sampling_does_not_unlatch',
+    'protection_named_review_preserves_explicit_host_admission', 'protection_actual_sampler_shutdown_retains_primary_pool'))
+
 SDK_URL = 'https://github.com/FangcunMount/reliable-messaging/releases/download/python/v0.4.0a1/fangcun_reliable_messaging-0.4.0a1-py3-none-any.whl'
 
 
@@ -112,6 +118,17 @@ def acceptance_profile(kind):
                     parse=lambda output, junit: parse_host_receipt(output, junit, marker='M3_AI_STATE_RECEIPT', cases=STATE_CASES, tests=STATE_TESTS, sdk_version='0.4.0a2'),
                     tests=STATE_TESTS,
                     scope='actual Python worker/preflight, governance/review/correction/Solution and unknown-resolution handlers plus serial dispatch, claim and durable generation/semantic terminal senders, published SDK, default DI/transport/worker assembly, original state roots and real Broker; controlled authenticated ACK and event observer only')
+    if kind == 'protection':
+        from ai_state_acceptance import CASES as STATE_CASES, TESTS as STATE_TESTS, FOCUS_CASES, state_manifest
+        cases = STATE_CASES | PROTECTION_CASES
+        return dict(name=kind, sdk_version='0.4.0a4', sdk_url=SDK_URL.replace('0.4.0a1', '0.4.0a4'),
+                    sdk_sha256='d2aa5fee9979dee43f9e5151026400bf730bf03ab29e7d0ba29536f3c6d4d471',
+                    file='rocketmq_state_host.py', manifest=state_manifest,
+                    focus_cases=FOCUS_CASES | PROTECTION_CASES,
+                    partial=lambda output: read_host_receipt(output, marker='M3_AI_STATE_RECEIPT', cases=cases, sdk_version='0.4.0a4'),
+                    parse=lambda output, junit: parse_host_receipt(output, junit, marker='M3_AI_STATE_RECEIPT', cases=cases, tests=STATE_TESTS, sdk_version='0.4.0a4'),
+                    tests=STATE_TESTS,
+                    scope='actual AI default DI/worker/current primary protocol guard, named binding recovery and original state roots; controlled ACK, no paired QS/provider/system claim')
     if kind == 'finalization':
         from ai_finalization_acceptance import profile
         return profile()
@@ -189,7 +206,7 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     private_config = directory / ('ai-' + profile['name'] + '-config.json')
     private_config.write_text(json.dumps(dict(accounts, **({'fault_tools': fault_tools} if fault_tools else {}), sdk_python_version=profile['sdk_version'],endpoint=f'127.0.0.1:{grpc_port}',
         client_log=str(directory / 'ai-client-private.log'), routes=manifest['routes'],
-        ca_file=str(ca)))); private_config.chmod(0o600)
+        ca_file=str(ca), protocol_protection=profile['name'] == 'protection'))); private_config.chmod(0o600)
     if profile['name'] in ('paired','paired_faults'):
         from paired_acceptance import prepare_qs
         extra = prepare_qs(Path(os.environ['QS_M3_PAIRED_SOURCE']), directory, project,
@@ -223,8 +240,9 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
         return
     junit = directory / ('ai-' + profile['name'] + '-private.xml')
     filename = profile['file']
-    if profile['name'] == 'state':
+    if profile['name'] in ('state', 'protection'):
         from ai_state_acceptance import FOCUS_CASES, FOCUS_TESTS
+        focus_cases = profile.get('focus_cases', FOCUS_CASES)
         # Give new default assembly an early, strict gate. Its temporary DB is
         # separate so repeated fixtures cannot seed the complete profile's state.
         focus_schema = schema + '_focus'
@@ -256,13 +274,13 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
                 focus['junit_sha256'] = hashlib.sha256(focus_junit.read_bytes()).hexdigest()
             if selected.returncode or not focus_junit.is_file():
                 partial = read_host_receipt(selected.stdout, marker='M3_AI_STATE_RECEIPT',
-                    cases=FOCUS_CASES, sdk_version='0.4.0a2')
+                    cases=focus_cases, sdk_version=profile['sdk_version'])
                 if partial is not None:
                     focus['partial_native_receipt'] = partial
                 raise RuntimeError('actual default AI assembly focus failed (private output withheld)')
             focus['native_receipt'] = parse_host_receipt(selected.stdout, focus_junit.read_text(),
-                marker='M3_AI_STATE_RECEIPT', cases=FOCUS_CASES, tests=FOCUS_TESTS,
-                sdk_version='0.4.0a2')
+                marker='M3_AI_STATE_RECEIPT', cases=focus_cases, tests=FOCUS_TESTS,
+                sdk_version=profile['sdk_version'])
             focus['native_tests_passed'] = len(FOCUS_TESTS)
         finally:
             run(['docker', 'exec', '-i', '-e', 'MYSQL_PWD=' + password, mysql, 'mysql', '-uroot', '--batch'],
