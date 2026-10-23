@@ -1,0 +1,53 @@
+name: RocketMQ isolated native recheck feasibility
+on:
+  pull_request:
+    paths:
+      - scripts/rocketmq/ci-native-recheck.py
+      - scripts/rocketmq/probes/native-recheck/**
+      - scripts/rocketmq/test_native_recheck.py
+      - .github/workflows/rocketmq-native-recheck.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  GOTOOLCHAIN: local
+jobs:
+  fixed-sdk-source-native-recheck:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 04757bd3212ca961d8eaec22ecd3560101111e18
+          path: .sdk-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .sdk-acceptance/go.sum
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Pure fixture guards
+        run: python3 -m unittest discover -s scripts/rocketmq -p test_native_recheck.py
+      - name: Official fixed Broker archive verification
+        run: bash scripts/rocketmq/fetch-release.sh
+      - name: Fresh verified isolated Broker
+        run: docker build --no-cache -t rocketmq-native-recheck:5.5.1 components/rocketmq
+      - name: Real original commit, exhausted half and new owner recheck
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 scripts/rocketmq/ci-native-recheck.py --sdk "$PWD/.sdk-acceptance" \
+            --image rocketmq-native-recheck:5.5.1 --report native-recheck.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-recheck-${{ github.sha }}
+          path: native-recheck.json
+          if-no-files-found: error
+          retention-days: 14
