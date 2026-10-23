@@ -1,5 +1,9 @@
 import unittest
-from unittest.mock import Mock
+import contextlib
+import io
+import runpy
+from pathlib import Path
+from unittest.mock import Mock,patch
 from sdk_recovery_audit import require_records,validate_options
 
 
@@ -21,6 +25,15 @@ class RecoveryAuditTests(unittest.TestCase):
             with self.subTest(key=key),self.assertRaises(ValueError):
                 validate_options(dict(options,**{key:True}))
         with self.assertRaises(ValueError):validate_options(dict(options,sdk_api_python=False))
+
+    def test_actual_cli_rejects_mixed_profiles_before_subprocess(self):
+        script=Path(__file__).with_name('ci-transactions.py')
+        argv=[str(script),'--sdk','/missing-fixture','--sdk-api-go','--sdk-api-python',
+              '--sdk-recovery-audit','--native-dlq-audit']
+        with patch('sys.argv',argv),patch('subprocess.run') as child,contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit) as error:runpy.run_path(str(script),run_name='__main__')
+        self.assertEqual(error.exception.code,2)
+        child.assert_not_called()
 
 
 if __name__=='__main__':unittest.main()
