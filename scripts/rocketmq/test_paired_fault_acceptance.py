@@ -25,8 +25,11 @@ def receipt(full=False):
                 broker_commit_checks=2,pending_calls=0,provider_invocations=0,
                 original_host_failed_and_drained=True,new_host_runtime=True,
                 recovered_half_prepared=0,recovered_completed_results=0,recovered_committed_references=2,
+                qs_consumer_restarted=True,original_go_local_results=1,old_go_seals=1,
+                recovered_go_half_before_open=0,recovered_go_results_before_open=0,original_go_wire_preserved=True,
+                distinct_go_pid=True,final_recovered_go_seals=2,checker_callback_errors=0,
                 resources=dict(closed=True,private_files_removed=True,original_exit_code=0,
-                    replacement_exit_codes=[]))))
+                    replacement_exit_codes=[0]))))
 
 def output(row,full=False):
     text='M3_PAIRED_FAULT_RECEIPT '+json.dumps(row)
@@ -63,6 +66,8 @@ class PairedFaultAcceptanceTests(unittest.TestCase):
             lambda r:r['proof']['broker_restart'].update(new_host_runtime=False),
             lambda r:r['proof']['broker_restart'].update(recovered_half_prepared=1),
             lambda r:r['proof']['broker_restart'].update(recovered_committed_references=1),
+            lambda r:r['proof']['broker_restart'].update(recovered_go_half_before_open=1),
+            lambda r:r['proof']['broker_restart'].update(checker_callback_errors=1),
             lambda r:r['proof']['qs_sigkill']['resources'].update(replacement_exit_codes=[False]),
             lambda r:r['proof']['broker_restart']['resources'].update(closed=False)]
         for change in changes:

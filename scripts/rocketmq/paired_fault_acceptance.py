@@ -65,10 +65,13 @@ def parse_receipt(output, junit, ai_sha, qs_sha, *, full, sdk_python="0.4.0a2"):
         original_wire_unchanged=True,final_recovered_seals=2,provider_invocations=0)
     b_expected = dict(local_calls=1,checks_drained_before_restart=True,half_prepared_before_kill=2,local_calls_before_kill=0,half_prepared=2,actual_final_unknown=2,pending_calls=0,
         provider_invocations=0,original_host_failed_and_drained=True,new_host_runtime=True,
-        recovered_half_prepared=0,recovered_completed_results=0,recovered_committed_references=2)
+        recovered_half_prepared=0,recovered_completed_results=0,recovered_committed_references=2,
+        qs_consumer_restarted=True,original_go_local_results=1,old_go_seals=1,
+        recovered_go_half_before_open=0,recovered_go_results_before_open=0,original_go_wire_preserved=True,
+        distinct_go_pid=True,final_recovered_go_seals=2,checker_callback_errors=0)
     for row, expected, count, original, replacements in (
             (q,q_expected,'recovered_broker_commit_checks',-9,[0]),
-            (b,b_expected,'broker_commit_checks',0,[])):
+            (b,b_expected,'broker_commit_checks',0,[0])):
         if (not isinstance(row,dict) or set(row) != set(expected) | {count,'resources'}
                 or any(type(row[k]) is not type(v) or row[k] != v for k,v in expected.items())
                 or not bounded_int(row[count],1)
@@ -118,7 +121,8 @@ def read_partial_receipt(output, ai_sha, qs_sha):
         'recovered_completed_results','recovered_half_prepared','recovered_broker_commit_checks',
         'final_recovered_seals','provider_invocations','local_calls','half_prepared',
         'actual_final_unknown','broker_commit_checks','pending_calls',
-        'half_prepared_before_kill','local_calls_before_kill','recovered_committed_references','startup_rpc_code')
+        'half_prepared_before_kill','local_calls_before_kill','recovered_committed_references','startup_rpc_code','original_go_local_results','old_go_seals',
+        'recovered_go_half_before_open','recovered_go_results_before_open','final_recovered_go_seals','checker_callback_errors')
     counters = {}
     for fault in ('qs_sigkill','broker_restart'):
         row = r['proof'].get(fault)
