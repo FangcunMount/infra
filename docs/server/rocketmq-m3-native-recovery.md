@@ -54,7 +54,7 @@ PR200合并1fc072b，原生报告摘要`f4e50b2a156470e3a2badbcfa7a42e2eb1676ab7
 管理响应只记`RecheckEnqueued`，成功提交由新Checker读取原证据并实际调用RPC、写正向审计证明。原程序真实exit23不是SIGKILL或网络故障；这是固定SDK源码探针，不是正式制品/四宿主或system入口，也尚无持久notice处置证明。失败40015398289、40016571315、40016777071和40018504724保留；后两轮均未发出resume，不将其读取失败冒称回查失败。完整源码/CI、报告摘要及限制回链总表的结构化证据文件。
 
 
-### 客户端ID复用的源码修正（未合并）
+### 客户端ID复用的源码修正（已合并，完整恢复仍待验证）
 
 5.5.1原生复制保留UNIQ_KEY，getMsgId可能返回客户端ID。IAM/QS Go及AI Python先复现“两位置同客户端ID”被拒绝，再改为按完整v1指纹拒绝重复；摘要字节保持。两语言固定向量c17eef089ffe8dcd195b09d54c8d7af26283362fc173a6226b964a4a4c0968d3和61922da276bd4e4b9eced322f30aac9224929b6614dce2205f5fed99df91a878一致，大小写等价的同一完整索引仍拒绝。当前Go纯race/Python28纯通过，仅源码准备，不是实际两副本Broker证明或C3闭环。
 
@@ -64,3 +64,10 @@ PR200合并1fc072b，原生报告摘要`f4e50b2a156470e3a2badbcfa7a42e2eb1676ab7
 `tools/rocketmq-native-recovery`固定下载 tx.4，拒绝本地replace。check-only Store不暴露Bind，拒绝Lookup/Reserve/Prepare/Abort/普通记账，本实例不执行中止维护。私有Runtime不提供Sender，只登记完整owner路由、有限Checker并在Start返回后立即StopAdmission；固定SDK在StopAdmission之后拒绝Start，不能使用错误顺序。执行能力从构造时即被Store封住，启动仍必须经过首次runtime屏障。
 
 本次观察只由SDK真实RPC→原正向audit→包装sink路径产生，首次DB时间不变。独占0700目录/0600文件绑定受审请求摘要、本次nonce、源码、Reference摘要及终态；最多16份，同步I/O不脱离真实回查容量，取消/碰撞/限额/写入或同步失败保留文件并拒绝成功证明。关闭必须实际排空，不能以调用方超时宣告完成。当前本地race、文件隐私/不可覆盖及生命周期契约使用明确fake，不是实际RPC或治理CAS验证；完整CLI/四种宿主矩阵继续。
+
+
+### 已合并的读取/存储组件与余项
+
+IAM145、QS436、AI221已分别合并；合法resolved历史导入保留首次证据，周期仅读取活动责任，新物理索引仍封闭。infra207/209/210已合并check-only/私有观察、三SQL owner与qs.mongo snapshot；最新64纯、MySQL三档各17、Mongo7.0.37的10项通过，自有DB/容器清理均回读。均使用固定发布Go tag tx.4，无replace或SDK协议改写。旧正向audit为明确的受控reader fixture，不是本次真实RPC。
+
+当前没有生产解除CLI或治理CAS；源绑定、真实物理核验、受审请求/receipt、实际SDK RPC和治理提交仍须组合验证。组件表、完整源码/CI/报告摘要及失败历史回到[M3总表](rocketmq-m3-execution.md)。首次SQL资源遗漏setup失败以及QS文档空白门禁失败均保留，未改写为通过；稳定SDK、实际生产、system与48小时观察未执行。
