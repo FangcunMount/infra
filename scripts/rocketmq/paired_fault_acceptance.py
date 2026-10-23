@@ -17,7 +17,7 @@ CASES = frozenset((
     'recovered_pair_receipt_state_ack_without_model', 'recovered_process_resources_drained',
     'ai_root_witness_committed_before_broker_kill', 'actual_final_rpc_unknown_after_committed_root',
     'broker_sigkill_and_same_container_restart', 'broker_recheck_original_ai_first_wire',
-    'pair_both_business_acks_and_idempotent_redelivery', 'no_additional_model_or_old_business_executor',
+    'pair_both_business_acks_without_executor_replay', 'no_additional_model_or_old_business_executor',
     'broker_fault_resources_drained'))
 TESTS = frozenset('test_actual_paired_fault_recovery[' + mode + ']'
                   for mode in ('qs_sigkill', 'broker_restart'))
@@ -69,6 +69,10 @@ def parse_receipt(output, junit, ai_sha, qs_sha, *, full):
         if (not isinstance(row,dict) or set(row) != set(expected) | {count,'resources'}
                 or any(type(row[k]) is not type(v) or row[k] != v for k,v in expected.items())
                 or not bounded_int(row[count],1)
+                or not isinstance(row['resources'],dict)
+                or type(row['resources'].get('original_exit_code')) is not int
+                or not isinstance(row['resources'].get('replacement_exit_codes'),list)
+                or any(type(code) is not int for code in row['resources']['replacement_exit_codes'])
                 or row['resources'] != dict(closed=True,private_files_removed=True,
                     original_exit_code=original,replacement_exit_codes=replacements)):
             raise RuntimeError('actual paired fault counters or process/resource proof invalid')
@@ -134,8 +138,10 @@ def run_profile(source,directory,env,command,run,proof,native_runner,broker_faul
     receipt = parse_receipt(raw,junit.read_text(),proof['source_sha'],proof['paired_qs']['source_sha'],full=full)
     proof['native_receipt'] = receipt
     proof['native_tests_passed'] = 7 if full else 2
-    for current in (source,Path(os.environ['QS_M3_PAIRED_SOURCE'])):
-        if run(['git','status','--porcelain'],cwd=current).stdout.strip():
+    for current, expected in ((source,proof['source_sha']),
+            (Path(os.environ['QS_M3_PAIRED_SOURCE']),proof['paired_qs']['source_sha'])):
+        if (run(['git','status','--porcelain'],cwd=current).stdout.strip()
+                or run(['git','rev-parse','HEAD'],cwd=current).stdout.strip() != expected):
             raise RuntimeError('paired host source changed during fault acceptance')
     proof['source_clean_after'] = proof['paired_qs']['source_clean_after'] = True
     proof['scope'] = SCOPE

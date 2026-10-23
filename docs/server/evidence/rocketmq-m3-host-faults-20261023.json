@@ -7,7 +7,7 @@
     "M3": "22/36",
     "M4": "0/8"
   },
-  "recorded_at": "2026-10-23T02:07:41.514296+00:00",
+  "recorded_at": "2026-10-23T02:18:16.909265+00:00",
   "source_baselines": {
     "iam": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
     "qs-server": "0428b701347774282fb3deafb9cd8c841ba86fc4",
@@ -536,6 +536,32 @@
     "scenarios": [
       "actual MQ disconnect/producer SIGKILL/new paused same-owner Checker",
       "AI original root committed/Broker SIGKILL/same container restart/paired receipts"
-    ]
+    ],
+    "local_validation": {
+      "infra_unit_tests": {
+        "passed": 163,
+        "failed": 0,
+        "skipped": 0
+      },
+      "go": "race compile-only and new diff lint0 passed",
+      "python": "Ruff/format,75docs and7collect-only passed",
+      "actionlint": "paired workflow passed"
+    },
+    "first_development_run": {
+      "url": "https://github.com/FangcunMount/infra/actions/runs/39888369615",
+      "sources": {
+        "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+        "ai-paired-faults": "fa28db273b6884df97884314033e31b83a0874c0",
+        "infra-host-faults": "0ac4411ee1520e2d125563fb75b725b689070d88"
+      },
+      "status": "cancellation_requested",
+      "native_pass_claimed": false,
+      "finding": "Stopped superseded development run after identifying pytest progress/control-prefix framing defect. No native pass or explicit fixture cleanup claim; GitHub disposable runner owns teardown."
+    },
+    "source_prs": [
+      "https://github.com/FangcunMount/qs-server/pull/430",
+      "https://github.com/FangcunMount/qs-ai/pull/217"
+    ],
+    "preflight_finding": "pytest progress may join control prefix; explicit newline fix queued. Preserve first run outcome."
   }
 }

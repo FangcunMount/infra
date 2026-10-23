@@ -1,4 +1,3 @@
-import copy
 import json
 import tempfile
 from pathlib import Path
@@ -59,6 +58,7 @@ class PairedFaultAcceptanceTests(unittest.TestCase):
             lambda r:r['proof']['qs_sigkill'].update(recovered_half_prepared=1),
             lambda r:r['proof']['qs_sigkill'].update(recovered_broker_commit_checks=0),
             lambda r:r['proof']['broker_restart'].update(local_calls=2),
+            lambda r:r['proof']['qs_sigkill']['resources'].update(replacement_exit_codes=[False]),
             lambda r:r['proof']['broker_restart']['resources'].update(closed=False)]
         for change in changes:
             row=receipt();change(row)
