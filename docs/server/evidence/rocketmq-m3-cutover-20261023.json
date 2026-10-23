@@ -149,7 +149,7 @@
     "No native dependency executed locally, no production operations",
     "Startup/recovery and no-callback audit debt still require T25-C proof"
   ],
-  "recorded_at": "2026-10-23T20:11:50.570361+00:00",
+  "recorded_at": "2026-10-23T20:30:58.278990+00:00",
   "workflow_history": [
     {
       "conclusion": "success",
@@ -2270,6 +2270,168 @@
       }
     ],
     "scope_limit": "Actual CLI on fresh minimal version41 fixtures; seven child cases plus parent per profile. Not actual production version, backup/restore or complete AuthN acceptance",
+    "c2_complete": false,
+    "production_deployed": false
+  },
+  "iam_scope_recovery": {
+    "pr": "https://github.com/FangcunMount/iam/pull/142",
+    "source": "121384916a3e1abca8aba34fed26e7237116e1d8",
+    "merge": "cb5a42e08a1889f870aa16b35aca515a10b2ba7d",
+    "merged_at": "2026-10-23T20:30:03Z",
+    "candidate_tree": "39a9612fcbc6769eee217a6797b21583dee495a2",
+    "test_merge_tree": "39a9612fcbc6769eee217a6797b21583dee495a2",
+    "checks_passed": 8,
+    "production_deploy_paused": true,
+    "native_cli": [
+      {
+        "profile": "mysql8044",
+        "file": "m3-offline.log",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "de5680e75435c4a8b69150113aac39b5b80217e4e68b81212fd2a5dcade17d3e",
+        "cases": [
+          "--- PASS: TestM3MessagingOfflineNative (0.57s)",
+          "--- PASS: TestM3MessagingOfflineNative/original-protection-is-exclusive-real-journal-and-no-business-copy (0.03s)",
+          "--- PASS: TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive (0.02s)",
+          "--- PASS: TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/independent-digest-and-current-primary-required (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts (0.14s)",
+          "--- PASS: TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained (0.04s)",
+          "--- PASS: TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility (0.04s)",
+          "--- PASS: TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime (0.07s)",
+          "--- PASS: TestM3MessagingOfflineNative/original-migrator-lock-blocks-scope-restore (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/new-request-responsibility-refuses-scope-restore (0.02s)",
+          "--- PASS: TestM3MessagingOfflineNative/journal-shape-drift-refuses-before-removing-any-object (0.02s)",
+          "--- PASS: TestM3MessagingOfflineNative/scope-restore-keeps-new-authn-fact-and-original-journal-ddl (0.07s)",
+          "--- PASS: TestM3MessagingOfflineNative/controlled-partial-ddl-dirty-stage-restores-only-original-scope (0.06s)"
+        ]
+      },
+      {
+        "profile": "mysql84",
+        "file": "m3-offline.log",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "487a72f262fa401107627fcafb5d6e51f1d7fc68171837800ae4704b3a5555b3",
+        "cases": [
+          "--- PASS: TestM3MessagingOfflineNative (0.51s)",
+          "--- PASS: TestM3MessagingOfflineNative/original-protection-is-exclusive-real-journal-and-no-business-copy (0.03s)",
+          "--- PASS: TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive (0.02s)",
+          "--- PASS: TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/independent-digest-and-current-primary-required (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts (0.11s)",
+          "--- PASS: TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained (0.03s)",
+          "--- PASS: TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility (0.03s)",
+          "--- PASS: TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime (0.06s)",
+          "--- PASS: TestM3MessagingOfflineNative/original-migrator-lock-blocks-scope-restore (0.00s)",
+          "--- PASS: TestM3MessagingOfflineNative/new-request-responsibility-refuses-scope-restore (0.02s)",
+          "--- PASS: TestM3MessagingOfflineNative/journal-shape-drift-refuses-before-removing-any-object (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/scope-restore-keeps-new-authn-fact-and-original-journal-ddl (0.07s)",
+          "--- PASS: TestM3MessagingOfflineNative/controlled-partial-ddl-dirty-stage-restores-only-original-scope (0.06s)"
+        ]
+      },
+      {
+        "profile": "mysql8036",
+        "file": "m3-offline.log",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "7fde91fad34c2f1013bcd76efc424c8079ecfca0f36f52d2491ea7e1eb9ea1e6",
+        "cases": [
+          "--- PASS: TestM3MessagingOfflineNative (0.59s)",
+          "--- PASS: TestM3MessagingOfflineNative/original-protection-is-exclusive-real-journal-and-no-business-copy (0.03s)",
+          "--- PASS: TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive (0.02s)",
+          "--- PASS: TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/independent-digest-and-current-primary-required (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts (0.14s)",
+          "--- PASS: TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained (0.04s)",
+          "--- PASS: TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility (0.04s)",
+          "--- PASS: TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime (0.07s)",
+          "--- PASS: TestM3MessagingOfflineNative/original-migrator-lock-blocks-scope-restore (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/new-request-responsibility-refuses-scope-restore (0.02s)",
+          "--- PASS: TestM3MessagingOfflineNative/journal-shape-drift-refuses-before-removing-any-object (0.02s)",
+          "--- PASS: TestM3MessagingOfflineNative/scope-restore-keeps-new-authn-fact-and-original-journal-ddl (0.08s)",
+          "--- PASS: TestM3MessagingOfflineNative/controlled-partial-ddl-dirty-stage-restores-only-original-scope (0.07s)"
+        ]
+      }
+    ],
+    "required_logs": [
+      {
+        "profile": "mysql8044",
+        "file": "m3-maintenance.log",
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "89623fe28023cd019a3ce42442dbff31b0dee9734c4a9a4ecd6d366d51150069"
+      },
+      {
+        "profile": "mysql8044",
+        "file": "m3-schema.log",
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "2db48e3bacacf6074dde6f8a2fb0a1e1fdebf2c360e77ed70f03853cddcfc868"
+      },
+      {
+        "profile": "mysql8044",
+        "file": "m3-offline.log",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "de5680e75435c4a8b69150113aac39b5b80217e4e68b81212fd2a5dcade17d3e"
+      },
+      {
+        "profile": "mysql84",
+        "file": "m3-maintenance.log",
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "2573585fe4bc82a29b95ad7ee922e696a475ca3815ace6048e182ca72f7cfb3b"
+      },
+      {
+        "profile": "mysql84",
+        "file": "m3-schema.log",
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "66b673a16a98d314941026fb759bb1321d3c0d6ec3d3b39246f6a55d7ff9f286"
+      },
+      {
+        "profile": "mysql84",
+        "file": "m3-offline.log",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "487a72f262fa401107627fcafb5d6e51f1d7fc68171837800ae4704b3a5555b3"
+      },
+      {
+        "profile": "mysql8036",
+        "file": "m3-maintenance.log",
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "014dc8e7edbe76f1d6ecb58cccb5309a44fe59b2387ba0b49c0a9fb5f5e505a9"
+      },
+      {
+        "profile": "mysql8036",
+        "file": "m3-schema.log",
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "4c20f2d168673e48109829aae1221913692e87b748803c2adac59669b76493a4"
+      },
+      {
+        "profile": "mysql8036",
+        "file": "m3-offline.log",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "7fde91fad34c2f1013bcd76efc424c8079ecfca0f36f52d2491ea7e1eb9ea1e6"
+      }
+    ],
+    "scope": "Seven initially absent objects plus unchanged original two-column InnoDB migration journal; no business/AuthN restore",
+    "partial_ddl_limit": "Controlled actual dirty42/partial-MySQL-DDL fixture, not real migrate process exit or network fault",
     "c2_complete": false,
     "production_deployed": false
   }
