@@ -711,7 +711,7 @@
     "sdk_fix": {
       "source_baseline": "b1679360542699efcc831eabeb3b4526015c394f",
       "upstream": "rocketmq-python-client5.1.2",
-      "strategy": "instance-only closed telemetry recovery on successful existing heartbeat, without new timer/thread/global patch",
+      "strategy": "instance-only ended telemetry recovery on structured heartbeat OK or40015 missing-settings response, using existing heartbeat/I/O loop; forbidden/auth errors excluded",
       "local_unit_tests": 105,
       "native_patch_pass_claimed": false,
       "release_claimed": false,
@@ -728,7 +728,109 @@
         "failed": 0,
         "skipped": 0
       },
-      "native_strategy": "Explicit source-SDK-only regression: same surviving producer, actual half ACKs3/zero business, owned Broker SIGKILL137, one original root/FinalUnknown3, stop new admission but keep Checker, same container restart, exact reference checks3 and actual original-message consumption; public artifact/host acceptance follows separately."
+      "native_strategy": "Explicit source-SDK-only regression: same surviving producer, actual half ACKs3/zero business, owned Broker SIGKILL137, one original root/FinalUnknown3, stop new admission but keep Checker, same container restart, exact reference checks3 and actual original-message consumption; public artifact/host acceptance follows separately.",
+      "source_native_failures": [
+        {
+          "run_url": "https://github.com/FangcunMount/infra/actions/runs/39891842554",
+          "candidates": {
+            "sdk": "93ec30178dad4c5d71ecb4a7987c03a3168c5665",
+            "infra": "2b75a9b73537f5881ab999facde6e0507a161b6d",
+            "profile": "source SDK, surviving producer, two compatibility profiles; no published or host acceptance"
+          },
+          "profiles": [
+            {
+              "report_sha256": "418be7ce4b9530f852066494af84a258f8f114192e03c37ba87f0de85f0b07cf",
+              "counts": {
+                "passed": 4,
+                "failed": 1,
+                "skipped": 0
+              },
+              "failure": "RuntimeError: probe timed out waiting for checked_reference/commit",
+              "mysql": "8.0.36",
+              "python": "3.11.16",
+              "go": "go1.25.9",
+              "live": {
+                "same_producer_pid": 20546,
+                "half_prepared_before_kill": 3,
+                "business_before_kill": 0,
+                "broker_kill": {
+                  "signal": "SIGKILL",
+                  "exit_code": 137,
+                  "automatic_restart_disabled": true,
+                  "immutable_container_verified": true,
+                  "oom_killed": false
+                },
+                "local_calls": 1,
+                "business_after_commit": 1,
+                "final_unknown": 3,
+                "broker_restart": {
+                  "same_container": true,
+                  "pid_changed": true,
+                  "healthy": true,
+                  "effective_parameters": {
+                    "transactionTimeOut": 6000,
+                    "transactionCheckInterval": 5000,
+                    "transactionCheckMax": 24,
+                    "fileReservedTime": 48
+                  }
+                }
+              },
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            },
+            {
+              "report_sha256": "9baeb2d269ca9ef0c87df02550ff22df0ea9e2ffe92d8d2d65e775c97f1f915a",
+              "counts": {
+                "passed": 4,
+                "failed": 1,
+                "skipped": 0
+              },
+              "failure": "RuntimeError: probe timed out waiting for checked_reference/commit",
+              "mysql": "8.4.13",
+              "python": "3.13.15",
+              "go": "go1.25.12",
+              "live": {
+                "same_producer_pid": 21462,
+                "half_prepared_before_kill": 3,
+                "business_before_kill": 0,
+                "broker_kill": {
+                  "signal": "SIGKILL",
+                  "exit_code": 137,
+                  "automatic_restart_disabled": true,
+                  "immutable_container_verified": true,
+                  "oom_killed": false
+                },
+                "local_calls": 1,
+                "business_after_commit": 1,
+                "final_unknown": 3,
+                "broker_restart": {
+                  "same_container": true,
+                  "pid_changed": true,
+                  "healthy": true,
+                  "effective_parameters": {
+                    "transactionTimeOut": 6000,
+                    "transactionCheckInterval": 5000,
+                    "transactionCheckMax": 24,
+                    "fileReservedTime": 48
+                  }
+                }
+              },
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            }
+          ],
+          "finding": "Initial reconnect hook required heartbeat OK. Exact Broker5.5.1 returns structured40015 UNRECOGNIZED_CLIENT_TYPE while settings are absent after restart, so waiting forOK creates a re-registration cycle. Fix acceptsOK or40015 only on an ended stream; authorization/refusal errors still do not qualify.",
+          "primary_source": "https://raw.githubusercontent.com/apache/rocketmq/rocketmq-all-5.5.1/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/v2/client/ClientActivity.java"
+        }
+      ]
     }
   }
 }
