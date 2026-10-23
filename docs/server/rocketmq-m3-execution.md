@@ -1696,3 +1696,15 @@ IAM [PR143](https://github.com/FangcunMount/iam/pull/143)合并e91b8ca2：纯离
 infra [PR204](https://github.com/FangcunMount/infra/pull/204)合并ae00c0f：同一协调目录可顺序恢复不同受审原范围；每次恢复后普通启动/维护继续拒绝，首个runtime记录仍拒绝一切旧恢复。259纯、26受控进程及17实际Compose/CLI通过，11检查/15制品实例（13独立摘要）零失败/跳过。三条真实私有命令/三个自有文件不是三数据库恢复；实际合并另含已独立验证的PR200，不冒称两棵完整tree一致，组合门禁留T25-D。
 
 当前M3仍 **24/36**、T25 **2/4**、C **1/3**、C2 **3/4**，新增C3内部 **1/3**。事务runtime禁自动DDL的IAM/QS补强仍在独立候选验证中，QS/AI显式绑定与三库组合、持久notice处置继续。稳定SDK、生产配置/DDL/资源/provider/部署、Mac mini规则加载、system与48小时观察均未执行。
+
+### 2026-10-24：T25-C2 事务runtime禁DDL闭环，初始绑定候选继续
+
+IAM [PR144](https://github.com/FangcunMount/iam/pull/144)合并90469b27，源码2c10ea16的8检查全部成功；候选/实际test merge tree同为5d0b7ab。事务配置在创建连接前拒绝自动DDL，禁DDL后仍用原业务池限时只读核验唯一clean45；缺metadata、旧/未来/dirty/多行均拒绝且不创建journal。三档必需日志分别schema32、maintenance10、offline15项，零失败/跳过；schema32包含本次新增的8项父/子场景，其余为原有回归，不重复计为新增。部署暂停true，不代替完整AuthN/system验收。
+
+QS [PR434](https://github.com/FangcunMount/qs-server/pull/434)合并1f5f9f35，源码444f4422共28检查成功，唯一可选Docs/API同步按规则跳过并单独记N/A。领域或启用AI事务owner要求显式migration.enabled=false，原双库身份/clean head只读核验保留；已有实际DisabledDDL及M3 schema required父测试PASS，原生日志摘要46f9bf94c4480b415e62302e7afd78ee1e29c4b592b22a34247007bf30454fb7。首次Lint/Seeddata因Go模块代理HTTP2 INTERNAL_ERROR在lint/测试前失败，原记录保留；同源码attempt2通过。tested/candidate tree为93b34af，生产暂停true。
+
+AI [PR220](https://github.com/FangcunMount/qs-ai/pull/220)候选fabf944提供纯离线ai.mysql初始绑定：实际UUID/库、完整schema/DDL/资源摘要与私有计划，原SERIALIZABLE唯一INSERT及独立verify；不覆盖绑定或新增事务责任。13纯、本仓ruff/格式/mypy通过；MySQL8.0.36与8.4专项各7 schema/实际CLI、119单元、85存储回归通过，六份非空报告均零失败/跳过，四个独立CLI场景含两进程唯一赢家。全仓8分片中7通过、8.0.36分片2为1408/1409，唯一失败是既有Go草稿create回放返回State revision0，原断言未保留完整RPC code，根因尚未证明。完整失败证据已保存，同SHA仅重跑失败分片及汇总；AI暂不合并，不将专项成功冒充完整CI。
+
+QS [PR435](https://github.com/FangcunMount/qs-server/pull/435)新增原qs-migrate-offline的独立binding action，每次只处理qs.mysql或qs.mongo，两个原根分别保留not_attempted/unknown/committed与独立verified；无跨库原子承诺、补偿覆盖或业务执行。初始源码d7aa4ddd/文档6db7b855已通过两包race、普通/带标签差异lint、native仅编译及docs/actionlint，真实CLI门禁尚待；正在整合已合并PR434并重验最终候选，不能沿用整合前的检查关闭父项。
+
+当前正式进度仍M3 **24/36**、T25 **2/4**、C **1/3**、C2 **3/4**、C3 **1/3**。初始绑定候选、三库组合/全写者责任及C3持久notice处置未完成。M2 **24/24**、M4 **0/8**。本轮没有SDK稳定发布、生产DDL/资源/provider/部署、Mac mini规则加载、system或48小时观察。

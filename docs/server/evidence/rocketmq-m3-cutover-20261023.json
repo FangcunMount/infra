@@ -149,7 +149,7 @@
     "No native dependency executed locally, no production operations",
     "Startup/recovery and no-callback audit debt still require T25-C proof"
   ],
-  "recorded_at": "2026-10-23T21:22:07.652287+00:00",
+  "recorded_at": "2026-10-23T21:57:26.645330+00:00",
   "workflow_history": [
     {
       "conclusion": "success",
@@ -3630,5 +3630,903 @@
         "stage": "physical record view before any resume"
       }
     ]
+  },
+  "transaction_runtime_no_ddl": {
+    "iam": {
+      "headRefOid": "2c10ea16a56fa24bc23599530273950024e1e759",
+      "mergeStateStatus": "CLEAN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:24:20Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/iam/actions/runs/40026206314/job/120662927523",
+          "name": "Lint Code",
+          "startedAt": "2026-10-23T21:21:52Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:23:33Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/iam/actions/runs/40026169380/job/120662808997",
+          "name": "Analyze (go)",
+          "startedAt": "2026-10-23T21:21:35Z",
+          "status": "COMPLETED",
+          "workflowName": "CodeQL - Code Quality"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:23:48Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/iam/actions/runs/40026206559/job/120662928855",
+          "name": "Run MySQL-backed concurrency tests",
+          "startedAt": "2026-10-23T21:21:53Z",
+          "status": "COMPLETED",
+          "workflowName": "MySQL Concurrency Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:24:54Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/iam/actions/runs/40026206314/job/120662927795",
+          "name": "Run Tests",
+          "startedAt": "2026-10-23T21:21:52Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:23:02Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/iam/actions/runs/40026206314/job/120662927814",
+          "name": "m3-transaction-schema (8.0.36)",
+          "startedAt": "2026-10-23T21:21:52Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:23:06Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/iam/actions/runs/40026206314/job/120662927800",
+          "name": "m3-transaction-schema (8.0.44)",
+          "startedAt": "2026-10-23T21:21:51Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:23:41Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/iam/actions/runs/40026206314/job/120662927825",
+          "name": "m3-transaction-schema (8.4)",
+          "startedAt": "2026-10-23T21:21:52Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:26:30Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/iam/actions/runs/40026206314/job/120664197560",
+          "name": "Build Application",
+          "startedAt": "2026-10-23T21:25:21Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        }
+      ],
+      "production_deploy_paused": true,
+      "recorded_at": "2026-10-23T21:27:26.428053+00:00",
+      "candidate_tree": "5d0b7abdaec6c5d1d6f46880e38cbb1fed588ec1",
+      "test_merge_sha": "e7d8511c67cde1cac8ac391288eba04d9ca3b281",
+      "test_merge_tree": "5d0b7abdaec6c5d1d6f46880e38cbb1fed588ec1",
+      "native_reports": [
+        {
+          "artifact": "m3-schema-mysql-8.0.36",
+          "file": "m3-maintenance.log",
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "15b4757ac8027191e6af7bbf89e4d8edd27842b517c54baddfd284e6dc2043eb",
+          "cases": [
+            "--- PASS: TestM3TransactionMaintenanceRoleModel (1.95s)",
+            "--- PASS: TestPlannedRoleModelPreviewApplyAndCompensation (1.09s)",
+            "--- PASS: TestM3TransactionMaintenanceConditionRetirement (0.99s)",
+            "--- PASS: TestPlannedRetirementPreservesReceiptAndRollbackBoundaries (0.59s)",
+            "--- PASS: TestM3TransactionMaintenanceScope (1.02s)",
+            "--- PASS: TestPlannedScopeCopiesMappingAndPreservesCompensation (0.67s)",
+            "--- PASS: TestM3TransactionMaintenanceReviewerScope (2.42s)",
+            "--- PASS: TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput (2.36s)",
+            "--- PASS: TestM3TransactionMaintenanceOperationsCatalog (0.43s)",
+            "--- PASS: TestPlannedCatalogPreviewsNoopAndRejectsDrift (0.17s)"
+          ]
+        },
+        {
+          "artifact": "m3-schema-mysql-8.0.36",
+          "file": "m3-schema.log",
+          "passed": 32,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "60643adac9e9cc6542293fed19428f1ff831a785d1b7651cc64c3981ce61d019",
+          "cases": [
+            "--- PASS: TestM3DisabledDDLSchemaHeadNative (0.07s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/missing-journal-remains-absent (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/empty (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/clean-current (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/old (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/future (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/dirty (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/multiple (0.01s)",
+            "--- PASS: TestM3PlannedPolicyNative (4.68s)",
+            "    --- PASS: TestM3PlannedPolicyNative/guarded-host-root (0.14s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/all-halves-and-exact-event (0.03s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/frozen-role-id-and-audit (0.03s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/unprepared-half-never-starts-business (0.02s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/missing-event-rolls-back-facts (0.03s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/business-error-rolls-back-witness (0.03s)",
+            "    --- PASS: TestM3PlannedPolicyNative/planned-host-entries (0.29s)",
+            "    --- PASS: TestM3PlannedPolicyNative/protocol-selection (1.03s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/old-stager-rolls-back-original-facts (0.00s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/selection-update-cannot-cross-live-root (1.01s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/missing-installed-row-fails-closed (0.00s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/missing-installed-table-fails-closed (0.01s)",
+            "    --- PASS: TestM3PlannedPolicyNative/business-operation-journal (0.80s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/one-complete-winner-no-generated-artifact-conflict (0.03s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/business-and-result-root-commit-false (0.02s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/business-and-result-root-commit-true (0.02s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/expired-noop-must-win-an-abort-before-late-bind-is-rejected (0.01s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/live-original-root-fences-the-expiry-aborter (0.61s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/sdk-and-business-guards-share-original-root (0.09s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/wrong-store-and-corrupt-evidence-refused (0.01s)",
+            "    --- PASS: TestM3PlannedPolicyNative/journal-host-entries (0.25s)",
+            "    --- PASS: TestM3PlannedPolicyNative/operation-http-original-root (0.34s)",
+            "--- PASS: TestM3TransactionSchemaNative (0.12s)"
+          ]
+        },
+        {
+          "artifact": "m3-schema-mysql-8.0.36",
+          "file": "m3-offline.log",
+          "passed": 15,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "e7133cc5442a7f6e8cf82a65160252c1dd98c6e0fc86d5962526bf0490fd77c6",
+          "cases": [
+            "--- PASS: TestM3MessagingOfflineNative (0.85s)",
+            "    --- PASS: TestM3MessagingOfflineNative/original-protection-is-exclusive-real-journal-and-no-business-copy (0.03s)",
+            "    --- PASS: TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive (0.02s)",
+            "    --- PASS: TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force (0.01s)",
+            "    --- PASS: TestM3MessagingOfflineNative/independent-digest-and-current-primary-required (0.01s)",
+            "    --- PASS: TestM3MessagingOfflineNative/original-journal-lock-honors-real-offline-deadline (0.25s)",
+            "    --- PASS: TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts (0.14s)",
+            "    --- PASS: TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained (0.04s)",
+            "    --- PASS: TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility (0.04s)",
+            "    --- PASS: TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime (0.07s)",
+            "    --- PASS: TestM3MessagingOfflineNative/original-migrator-lock-blocks-scope-restore (0.01s)",
+            "    --- PASS: TestM3MessagingOfflineNative/new-request-responsibility-refuses-scope-restore (0.02s)",
+            "    --- PASS: TestM3MessagingOfflineNative/journal-shape-drift-refuses-before-removing-any-object (0.02s)",
+            "    --- PASS: TestM3MessagingOfflineNative/scope-restore-keeps-new-authn-fact-and-original-journal-ddl (0.08s)",
+            "    --- PASS: TestM3MessagingOfflineNative/controlled-partial-ddl-dirty-stage-restores-only-original-scope (0.07s)"
+          ]
+        },
+        {
+          "artifact": "m3-schema-mysql-8.4",
+          "file": "m3-maintenance.log",
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "1f13dea842ceca13885eb7b453deafda1c2d916b43883104fcaf51be262e2909",
+          "cases": [
+            "--- PASS: TestM3TransactionMaintenanceRoleModel (1.60s)",
+            "--- PASS: TestPlannedRoleModelPreviewApplyAndCompensation (0.81s)",
+            "--- PASS: TestM3TransactionMaintenanceConditionRetirement (0.80s)",
+            "--- PASS: TestPlannedRetirementPreservesReceiptAndRollbackBoundaries (0.48s)",
+            "--- PASS: TestM3TransactionMaintenanceScope (0.83s)",
+            "--- PASS: TestPlannedScopeCopiesMappingAndPreservesCompensation (0.69s)",
+            "--- PASS: TestM3TransactionMaintenanceReviewerScope (1.83s)",
+            "--- PASS: TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput (1.99s)",
+            "--- PASS: TestM3TransactionMaintenanceOperationsCatalog (6.18s)",
+            "--- PASS: TestPlannedCatalogPreviewsNoopAndRejectsDrift (0.17s)"
+          ]
+        },
+        {
+          "artifact": "m3-schema-mysql-8.4",
+          "file": "m3-schema.log",
+          "passed": 32,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "c6d3cd481ad4d40c3230545ce068195e65f27e36f26b3fac3aceff54f1ed8ec5",
+          "cases": [
+            "--- PASS: TestM3DisabledDDLSchemaHeadNative (1.35s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/missing-journal-remains-absent (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/empty (0.08s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/clean-current (0.05s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/old (0.07s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/future (0.03s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/dirty (0.03s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/multiple (0.06s)",
+            "--- PASS: TestM3PlannedPolicyNative (7.19s)",
+            "    --- PASS: TestM3PlannedPolicyNative/guarded-host-root (0.15s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/all-halves-and-exact-event (0.02s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/frozen-role-id-and-audit (0.04s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/unprepared-half-never-starts-business (0.03s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/missing-event-rolls-back-facts (0.05s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/business-error-rolls-back-witness (0.02s)",
+            "    --- PASS: TestM3PlannedPolicyNative/planned-host-entries (0.18s)",
+            "    --- PASS: TestM3PlannedPolicyNative/protocol-selection (1.02s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/old-stager-rolls-back-original-facts (0.00s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/selection-update-cannot-cross-live-root (1.01s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/missing-installed-row-fails-closed (0.00s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/missing-installed-table-fails-closed (0.01s)",
+            "    --- PASS: TestM3PlannedPolicyNative/business-operation-journal (0.77s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/one-complete-winner-no-generated-artifact-conflict (0.03s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/business-and-result-root-commit-false (0.01s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/business-and-result-root-commit-true (0.01s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/expired-noop-must-win-an-abort-before-late-bind-is-rejected (0.01s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/live-original-root-fences-the-expiry-aborter (0.63s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/sdk-and-business-guards-share-original-root (0.06s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/wrong-store-and-corrupt-evidence-refused (0.01s)",
+            "    --- PASS: TestM3PlannedPolicyNative/journal-host-entries (0.18s)",
+            "    --- PASS: TestM3PlannedPolicyNative/operation-http-original-root (0.31s)",
+            "--- PASS: TestM3TransactionSchemaNative (0.10s)"
+          ]
+        },
+        {
+          "artifact": "m3-schema-mysql-8.4",
+          "file": "m3-offline.log",
+          "passed": 15,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "3e3cbab68f884fe87b3213889224139126969887cc85ca2b52e2b1fe3ffc4890",
+          "cases": [
+            "--- PASS: TestM3MessagingOfflineNative (1.61s)",
+            "    --- PASS: TestM3MessagingOfflineNative/original-protection-is-exclusive-real-journal-and-no-business-copy (0.02s)",
+            "    --- PASS: TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive (0.02s)",
+            "    --- PASS: TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force (0.10s)",
+            "    --- PASS: TestM3MessagingOfflineNative/independent-digest-and-current-primary-required (0.01s)",
+            "    --- PASS: TestM3MessagingOfflineNative/original-journal-lock-honors-real-offline-deadline (0.25s)",
+            "    --- PASS: TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts (0.25s)",
+            "    --- PASS: TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained (0.02s)",
+            "    --- PASS: TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility (0.39s)",
+            "    --- PASS: TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime (0.06s)",
+            "    --- PASS: TestM3MessagingOfflineNative/original-migrator-lock-blocks-scope-restore (0.00s)",
+            "    --- PASS: TestM3MessagingOfflineNative/new-request-responsibility-refuses-scope-restore (0.10s)",
+            "    --- PASS: TestM3MessagingOfflineNative/journal-shape-drift-refuses-before-removing-any-object (0.01s)",
+            "    --- PASS: TestM3MessagingOfflineNative/scope-restore-keeps-new-authn-fact-and-original-journal-ddl (0.05s)",
+            "    --- PASS: TestM3MessagingOfflineNative/controlled-partial-ddl-dirty-stage-restores-only-original-scope (0.06s)"
+          ]
+        },
+        {
+          "artifact": "m3-schema-mysql-8.0.44",
+          "file": "m3-maintenance.log",
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "40e5c5cef9794c974480a9d47bf817b6796cc5e38157be653f07cf69ccfc66b7",
+          "cases": [
+            "--- PASS: TestM3TransactionMaintenanceRoleModel (1.81s)",
+            "--- PASS: TestPlannedRoleModelPreviewApplyAndCompensation (1.24s)",
+            "--- PASS: TestM3TransactionMaintenanceConditionRetirement (0.77s)",
+            "--- PASS: TestPlannedRetirementPreservesReceiptAndRollbackBoundaries (0.51s)",
+            "--- PASS: TestM3TransactionMaintenanceScope (0.92s)",
+            "--- PASS: TestPlannedScopeCopiesMappingAndPreservesCompensation (0.62s)",
+            "--- PASS: TestM3TransactionMaintenanceReviewerScope (2.79s)",
+            "--- PASS: TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput (2.06s)",
+            "--- PASS: TestM3TransactionMaintenanceOperationsCatalog (0.60s)",
+            "--- PASS: TestPlannedCatalogPreviewsNoopAndRejectsDrift (0.20s)"
+          ]
+        },
+        {
+          "artifact": "m3-schema-mysql-8.0.44",
+          "file": "m3-schema.log",
+          "passed": 32,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "fa1c398db918d7d2910c2d7f9c4518ba813fe6f1ace0302c75c25679c303229e",
+          "cases": [
+            "--- PASS: TestM3DisabledDDLSchemaHeadNative (0.07s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/missing-journal-remains-absent (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/empty (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/clean-current (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/old (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/future (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/dirty (0.01s)",
+            "    --- PASS: TestM3DisabledDDLSchemaHeadNative/multiple (0.01s)",
+            "--- PASS: TestM3PlannedPolicyNative (5.57s)",
+            "    --- PASS: TestM3PlannedPolicyNative/guarded-host-root (0.84s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/all-halves-and-exact-event (0.05s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/frozen-role-id-and-audit (0.16s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/unprepared-half-never-starts-business (0.07s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/missing-event-rolls-back-facts (0.07s)",
+            "        --- PASS: TestM3PlannedPolicyNative/guarded-host-root/business-error-rolls-back-witness (0.49s)",
+            "    --- PASS: TestM3PlannedPolicyNative/planned-host-entries (0.42s)",
+            "    --- PASS: TestM3PlannedPolicyNative/protocol-selection (1.03s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/old-stager-rolls-back-original-facts (0.00s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/selection-update-cannot-cross-live-root (1.01s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/missing-installed-row-fails-closed (0.00s)",
+            "        --- PASS: TestM3PlannedPolicyNative/protocol-selection/missing-installed-table-fails-closed (0.01s)",
+            "    --- PASS: TestM3PlannedPolicyNative/business-operation-journal (0.79s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/one-complete-winner-no-generated-artifact-conflict (0.03s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/business-and-result-root-commit-false (0.02s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/business-and-result-root-commit-true (0.02s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/expired-noop-must-win-an-abort-before-late-bind-is-rejected (0.01s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/live-original-root-fences-the-expiry-aborter (0.61s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/sdk-and-business-guards-share-original-root (0.08s)",
+            "        --- PASS: TestM3PlannedPolicyNative/business-operation-journal/wrong-store-and-corrupt-evidence-refused (0.01s)",
+            "    --- PASS: TestM3PlannedPolicyNative/journal-host-entries (0.24s)",
+            "    --- PASS: TestM3PlannedPolicyNative/operation-http-original-root (0.35s)",
+            "--- PASS: TestM3TransactionSchemaNative (0.12s)"
+          ]
+        },
+        {
+          "artifact": "m3-schema-mysql-8.0.44",
+          "file": "m3-offline.log",
+          "passed": 15,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "5aa713a4f4ae7987b1b7f17ea0add88826b1cabcc346b38795dda5df54c2a903",
+          "cases": [
+            "--- PASS: TestM3MessagingOfflineNative (0.85s)",
+            "    --- PASS: TestM3MessagingOfflineNative/original-protection-is-exclusive-real-journal-and-no-business-copy (0.03s)",
+            "    --- PASS: TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive (0.02s)",
+            "    --- PASS: TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force (0.01s)",
+            "    --- PASS: TestM3MessagingOfflineNative/independent-digest-and-current-primary-required (0.01s)",
+            "    --- PASS: TestM3MessagingOfflineNative/original-journal-lock-honors-real-offline-deadline (0.25s)",
+            "    --- PASS: TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts (0.13s)",
+            "    --- PASS: TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained (0.04s)",
+            "    --- PASS: TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility (0.04s)",
+            "    --- PASS: TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime (0.07s)",
+            "    --- PASS: TestM3MessagingOfflineNative/original-migrator-lock-blocks-scope-restore (0.01s)",
+            "    --- PASS: TestM3MessagingOfflineNative/new-request-responsibility-refuses-scope-restore (0.02s)",
+            "    --- PASS: TestM3MessagingOfflineNative/journal-shape-drift-refuses-before-removing-any-object (0.02s)",
+            "    --- PASS: TestM3MessagingOfflineNative/scope-restore-keeps-new-authn-fact-and-original-journal-ddl (0.08s)",
+            "    --- PASS: TestM3MessagingOfflineNative/controlled-partial-ddl-dirty-stage-restores-only-original-scope (0.08s)"
+          ]
+        }
+      ],
+      "pr": "https://github.com/FangcunMount/iam/pull/144",
+      "merge_sha": "90469b278e941ba238faab67b10ac4a84adb6fa3",
+      "merged_at": "2026-10-23T21:27:33Z",
+      "production_deployed": false,
+      "scope": "Reject transaction auto-DDL before resources; readonly original-pool clean exact head, not full runtime or business acceptance"
+    },
+    "qs": {
+      "headRefOid": "444f4422d215f4cd12c77be20f756ea631687097",
+      "mergeStateStatus": "CLEAN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:31:07Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647807/job/120664396599",
+          "name": "delivery (8.0.36)",
+          "startedAt": "2026-10-23T21:25:56Z",
+          "status": "COMPLETED",
+          "workflowName": "AI bridge MySQL"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:39:50Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670525814",
+          "name": "Run Tests",
+          "startedAt": "2026-10-23T21:27:11Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:27:52Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026641572/job/120664381088",
+          "name": "Analyze (go)",
+          "startedAt": "2026-10-23T21:25:24Z",
+          "status": "COMPLETED",
+          "workflowName": "CodeQL - Code Quality"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:27:08Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647811/job/120664396165",
+          "name": "original-mysql-root (8.0.36)",
+          "startedAt": "2026-10-23T21:25:37Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ evaluation original MySQL root"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:27:42Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647880/job/120664395730",
+          "name": "mysql-audit",
+          "startedAt": "2026-10-23T21:25:25Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ host failure audit"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:30:29Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647807/job/120664396653",
+          "name": "delivery (8.4)",
+          "startedAt": "2026-10-23T21:26:32Z",
+          "status": "COMPLETED",
+          "workflowName": "AI bridge MySQL"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:27:53Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647811/job/120664395900",
+          "name": "original-mysql-root (8.0.44)",
+          "startedAt": "2026-10-23T21:26:39Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ evaluation original MySQL root"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:29:21Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647811/job/120664396491",
+          "name": "original-mysql-root (8.4.11)",
+          "startedAt": "2026-10-23T21:26:54Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ evaluation original MySQL root"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:30:21Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647807/job/120664396226",
+          "name": "images (qs-apiserver)",
+          "startedAt": "2026-10-23T21:25:46Z",
+          "status": "COMPLETED",
+          "workflowName": "AI bridge MySQL"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:30:38Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670461805",
+          "name": "MySQL Native Metadata and Readiness",
+          "startedAt": "2026-10-23T21:29:06Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:28:12Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647807/job/120664396421",
+          "name": "images (collection-server)",
+          "startedAt": "2026-10-23T21:25:54Z",
+          "status": "COMPLETED",
+          "workflowName": "AI bridge MySQL"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:27:52Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670506689",
+          "name": "MongoDB Authenticated Native Metadata",
+          "startedAt": "2026-10-23T21:27:08Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:28:57Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670527801",
+          "name": "Action audit MySQL JSON lifecycle",
+          "startedAt": "2026-10-23T21:27:10Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:31:24Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670461578",
+          "name": "AuthZ committed version two-process MySQL",
+          "startedAt": "2026-10-23T21:29:44Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:29:05Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670461440",
+          "name": "Actor Store MySQL Transactions",
+          "startedAt": "2026-10-23T21:26:28Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:50:08Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670458963",
+          "name": "Seeddata Retirement and Current Runtime E2E",
+          "startedAt": "2026-10-23T21:40:24Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:43:17Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670459204",
+          "name": "Lint Code",
+          "startedAt": "2026-10-23T21:40:24Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:27:06Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670508595",
+          "name": "Layer Boundaries (depguard)",
+          "startedAt": "2026-10-23T21:25:56Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:28:17Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670507875",
+          "name": "Deployment Contracts",
+          "startedAt": "2026-10-23T21:27:43Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:35:21Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670461950",
+          "name": "Security Scan (Advisory)",
+          "startedAt": "2026-10-23T21:27:55Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:29:19Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670502192",
+          "name": "Maintainability Scan (Advisory)",
+          "startedAt": "2026-10-23T21:27:16Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:26:52Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670512097",
+          "name": "Tier 1 Test Policy",
+          "startedAt": "2026-10-23T21:26:34Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:30:47Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670460557",
+          "name": "Docs Hygiene & Facts",
+          "startedAt": "2026-10-23T21:29:06Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:25:23Z",
+          "conclusion": "SKIPPED",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670461309",
+          "name": "Docs & API Generated Sync",
+          "startedAt": "2026-10-23T21:40:22Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:29:48Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670517295",
+          "name": "QS-03 original effect recovery after actual broker loss",
+          "startedAt": "2026-10-23T21:27:54Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:30:23Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120670503572",
+          "name": "QS-05/06 original business effects after actual broker loss",
+          "startedAt": "2026-10-23T21:28:14Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:51:53Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120674245765",
+          "name": "Build Applications (apiserver)",
+          "startedAt": "2026-10-23T21:50:11Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:51:49Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120674245794",
+          "name": "Build Applications (collection)",
+          "startedAt": "2026-10-23T21:50:11Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-23T21:51:28Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/qs-server/actions/runs/40026647833/job/120674245784",
+          "name": "Build Applications (worker)",
+          "startedAt": "2026-10-23T21:50:11Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        }
+      ],
+      "recorded_at": "2026-10-23T21:54:15.512540+00:00",
+      "production_deploy_paused": true,
+      "test_merge_sha": "2622cb8e37682cc1305478734f6bb1f86765f8f2",
+      "test_merge_tree": "93b34af60bdd793733d5849467e18eb1e1f32be2",
+      "candidate_tree": "93b34af60bdd793733d5849467e18eb1e1f32be2",
+      "optional_skipped": [
+        "Docs & API Generated Sync"
+      ],
+      "network_failure_history": {
+        "run": "40026647833",
+        "attempt": 1,
+        "jobs": [
+          {
+            "id": 120664397303,
+            "name": "Lint Code",
+            "failure": "Go module proxy HTTP2 INTERNAL_ERROR before lint"
+          },
+          {
+            "id": 120664397319,
+            "name": "Seeddata Retirement and Current Runtime E2E",
+            "failure": "Go module proxy HTTP2 INTERNAL_ERROR before tests"
+          }
+        ],
+        "rerun_attempt": 2,
+        "latest_checks_succeeded": true
+      },
+      "pr": "https://github.com/FangcunMount/qs-server/pull/434",
+      "merge_sha": "1f5f9f351d4d9b85655cac4044959b325793370e",
+      "merged_at": "2026-10-23T21:54:22Z",
+      "native": {
+        "job_id": 120670458963,
+        "run_attempt": 2,
+        "raw_log_sha256": "46f9bf94c4480b415e62302e7afd78ee1e29c4b592b22a34247007bf30454fb7",
+        "required_parent_passes": {
+          "TestDisabledDDLNativeValidatesCurrentHeadsAndNeverCreatesMetadata": true,
+          "TestM3TransactionSchemaNative": true
+        },
+        "scope": "Existing original paired readonly-head and explicit host schema gates; no new binding CLI acceptance claimed"
+      },
+      "production_deployed": false
+    },
+    "both_merged": true,
+    "production_deployed": false,
+    "stable_sdk_released": false
+  },
+  "initial_binding_candidates": {
+    "ai": {
+      "pr": "https://github.com/FangcunMount/qs-ai/pull/220",
+      "source_sha": "fabf9449ee4ce81a9f6552844f9380042cf84d5f",
+      "tested_merge_sha": "d5a97957249748f6fcbc65b8b0492c12a7dbc086",
+      "merged": false,
+      "pure_passed": 13,
+      "native_reports": [
+        {
+          "artifact": "m7-qs-ai-mysql-8.4",
+          "file": "m7-m3-schema.xml",
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0,
+          "initial_binding_cases": [
+            "test_initial_binding_cli_preserves_old_responsibility_and_only_installs_reviewed_root",
+            "test_initial_binding_rejects_actual_new_protocol_responsibility",
+            "test_initial_binding_refuses_reviewed_primary_identity_mismatch",
+            "test_initial_binding_two_real_cli_installers_choose_one_original_winner"
+          ],
+          "sha256": "acdc11bb03eb9a4b2fa3cf1d6ffc1932816f602b3bc00102c455ba9aaa85a8c3"
+        },
+        {
+          "artifact": "m7-qs-ai-mysql-8.4",
+          "file": "m7-unit.xml",
+          "passed": 119,
+          "failed": 0,
+          "skipped": 0,
+          "initial_binding_cases": [],
+          "sha256": "91ec8dc07dceae44ef491ce1a0da0280f9dbbbbe3f3676c701be106021a8a88d"
+        },
+        {
+          "artifact": "m7-qs-ai-mysql-8.4",
+          "file": "m7-storage.xml",
+          "passed": 85,
+          "failed": 0,
+          "skipped": 0,
+          "initial_binding_cases": [],
+          "sha256": "453c964cc7219612deaa613de4bcecb5e7176f1f8c96242e0c3c47614ee482db"
+        },
+        {
+          "artifact": "m7-qs-ai-mysql-8.0.36",
+          "file": "m7-m3-schema.xml",
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0,
+          "initial_binding_cases": [
+            "test_initial_binding_cli_preserves_old_responsibility_and_only_installs_reviewed_root",
+            "test_initial_binding_rejects_actual_new_protocol_responsibility",
+            "test_initial_binding_refuses_reviewed_primary_identity_mismatch",
+            "test_initial_binding_two_real_cli_installers_choose_one_original_winner"
+          ],
+          "sha256": "6a31d85c5860a44da6f89f4954bea83761b8a5d02b55ac14f80b71690710657a"
+        },
+        {
+          "artifact": "m7-qs-ai-mysql-8.0.36",
+          "file": "m7-unit.xml",
+          "passed": 119,
+          "failed": 0,
+          "skipped": 0,
+          "initial_binding_cases": [],
+          "sha256": "0d244815c4911f254000b546b4ef9d3c34314e89f4e5aaeb4dc5f5f3713997b5"
+        },
+        {
+          "artifact": "m7-qs-ai-mysql-8.0.36",
+          "file": "m7-storage.xml",
+          "passed": 85,
+          "failed": 0,
+          "skipped": 0,
+          "initial_binding_cases": [],
+          "sha256": "83efada0c3e20e1cf2f48499b699f96e235df6c14d49d37748297c30327793f3"
+        }
+      ],
+      "full_ci_attempt1": [
+        {
+          "file": "tests-8.4-1/shard-8.4-1.json",
+          "sha256": "9c6bcf37cb8d1cf15e042c47bf2ee6d3275b3030d442a38fa48b5897e6e62d32",
+          "revision": "d5a97957249748f6fcbc65b8b0492c12a7dbc086",
+          "mysql": "8.4",
+          "index": 1,
+          "selected": 1409,
+          "passed": 1409,
+          "skipped": 0,
+          "exitstatus": 0,
+          "missing_passed": []
+        },
+        {
+          "file": "tests-8.4-0/shard-8.4-0.json",
+          "sha256": "bd6bfec203f601030591f3a18ca07f4a29f4ee1ccc3950426b3b68416d0500bc",
+          "revision": "d5a97957249748f6fcbc65b8b0492c12a7dbc086",
+          "mysql": "8.4",
+          "index": 0,
+          "selected": 1409,
+          "passed": 1409,
+          "skipped": 0,
+          "exitstatus": 0,
+          "missing_passed": []
+        },
+        {
+          "file": "tests-8.0.36-2/shard-8.0.36-2.json",
+          "sha256": "0f93c2d36d2e86b727eee7d3e73933b5a549d20e4d37c29babfe086830b11602",
+          "revision": "d5a97957249748f6fcbc65b8b0492c12a7dbc086",
+          "mysql": "8.0.36",
+          "index": 2,
+          "selected": 1409,
+          "passed": 1408,
+          "skipped": 0,
+          "exitstatus": 1,
+          "missing_passed": [
+            "tests/integration/test_prompt_draft_go.py::test_go_draft_edit_history_replay_and_receipt"
+          ]
+        },
+        {
+          "file": "tests-8.0.36-3/shard-8.0.36-3.json",
+          "sha256": "d59c0507b2cd197bebb4990232113c4a153d883d5ddd5929656c5951f1b48fc5",
+          "revision": "d5a97957249748f6fcbc65b8b0492c12a7dbc086",
+          "mysql": "8.0.36",
+          "index": 3,
+          "selected": 1408,
+          "passed": 1408,
+          "skipped": 0,
+          "exitstatus": 0,
+          "missing_passed": []
+        },
+        {
+          "file": "tests-8.4-2/shard-8.4-2.json",
+          "sha256": "fc6b769dc3216dbe0662b49f3f647355f3dc779443c50c5f5cf3be142410abd5",
+          "revision": "d5a97957249748f6fcbc65b8b0492c12a7dbc086",
+          "mysql": "8.4",
+          "index": 2,
+          "selected": 1409,
+          "passed": 1409,
+          "skipped": 0,
+          "exitstatus": 0,
+          "missing_passed": []
+        },
+        {
+          "file": "tests-8.4-3/shard-8.4-3.json",
+          "sha256": "8650787b28730c1052d11d870fb33b442ffb53be43a7580df67ac21c02ccc995",
+          "revision": "d5a97957249748f6fcbc65b8b0492c12a7dbc086",
+          "mysql": "8.4",
+          "index": 3,
+          "selected": 1408,
+          "passed": 1408,
+          "skipped": 0,
+          "exitstatus": 0,
+          "missing_passed": []
+        },
+        {
+          "file": "tests-8.0.36-1/shard-8.0.36-1.json",
+          "sha256": "938c595ffab75c6d014e97cf5c7e32dabc6d40837924ad37a08a53cec93c5e42",
+          "revision": "d5a97957249748f6fcbc65b8b0492c12a7dbc086",
+          "mysql": "8.0.36",
+          "index": 1,
+          "selected": 1409,
+          "passed": 1409,
+          "skipped": 0,
+          "exitstatus": 0,
+          "missing_passed": []
+        },
+        {
+          "file": "tests-8.0.36-0/shard-8.0.36-0.json",
+          "sha256": "0d67b4ce10ebc49c006a25920e78a01275d47bdf526e5afc5acf4114bf6554b6",
+          "revision": "d5a97957249748f6fcbc65b8b0492c12a7dbc086",
+          "mysql": "8.0.36",
+          "index": 0,
+          "selected": 1409,
+          "passed": 1409,
+          "skipped": 0,
+          "exitstatus": 0,
+          "missing_passed": []
+        }
+      ],
+      "full_ci_failure": {
+        "node": "tests/integration/test_prompt_draft_go.py::test_go_draft_edit_history_replay_and_receipt",
+        "observed": "Create replay State revision0 instead of revision1; original assertion did not retain full returned RPC code; cause not proven",
+        "business_source_changed": false,
+        "same_source_failed_partition_rerun": 2,
+        "latest_result": "pending"
+      }
+    },
+    "qs": {
+      "pr": "https://github.com/FangcunMount/qs-server/pull/435",
+      "initial_source_sha": "d7aa4ddd16460d25a82d6116413b547a9f37d836",
+      "initial_docs_sha": "6db7b8556755ed9979523a28ab70ffe032629ce8",
+      "merged": false,
+      "actual_dependencies_locally_run": false,
+      "local_validation": [
+        "original migration/maintenance pure race passed",
+        "ordinary and integration diff lint zero new issues",
+        "integration compile only",
+        "88 docs units, 211 markdown hygiene, source facts and actionlint passed"
+      ],
+      "combined_startup_guard_integration": "In progress; final candidate must run fresh CI after integrating merged PR434"
+    },
+    "c2_complete": false,
+    "production_deployed": false
   }
 }
