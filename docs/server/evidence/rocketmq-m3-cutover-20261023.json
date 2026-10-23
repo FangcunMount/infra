@@ -1372,5 +1372,116 @@
       "test_result_claimed": false,
       "retry_run": 39990541142
     }
-  ]
+  ],
+  "first_start_boundary": {
+    "failed_target_runs": [
+      {
+        "run": "https://github.com/FangcunMount/infra/actions/runs/40001580590",
+        "source_sha": "1372bf82177427c097badf643efc0650aa0d6347",
+        "passed": 3,
+        "failed": 1,
+        "skipped": 0,
+        "report_sha256": "6adc916f2cb349b5b6af1e0081c5f5fb18767246cbf8fa87fa6b3bb47697e3f5",
+        "cases": {
+          "coordinator_marker_before_actual_up": true,
+          "actual_failed_up_retains_start_barrier": true,
+          "failed_new_runtime_forbids_old_backup": true
+        },
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "no_rescue_needed": true,
+          "private_fixture_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        },
+        "failure_stage_at_record": "Not captured; only first three completed cases known, do not retroactively assign a root cause",
+        "scope": "isolated_nsqd_container_as_compose_fixture_not_m3_business_images_or_transactions"
+      },
+      {
+        "run": "https://github.com/FangcunMount/infra/actions/runs/40002027652",
+        "source_sha": "f805961072dd54757fa8f889e3fb16a880a4acf3",
+        "passed": 3,
+        "failed": 1,
+        "skipped": 0,
+        "report_sha256": "1a89a2ad64576568673436b1a9e11db04e6fb4cd4c125af4b3c6987738137db3",
+        "cases": {
+          "coordinator_marker_before_actual_up": true,
+          "actual_failed_up_retains_start_barrier": true,
+          "failed_new_runtime_forbids_old_backup": true
+        },
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "no_rescue_needed": true,
+          "private_fixture_directory_removed": true,
+          "existing_container_id_set_unchanged": true,
+          "existing_network_id_set_unchanged": true
+        },
+        "target_commands": [
+          {
+            "stage": "config",
+            "returned": true
+          },
+          {
+            "stage": "up",
+            "returned": false
+          },
+          {
+            "stage": "config",
+            "returned": true
+          },
+          {
+            "stage": "up",
+            "returned": true
+          },
+          {
+            "stage": "ps",
+            "returned": true
+          },
+          {
+            "stage": "inspect",
+            "returned": false
+          }
+        ],
+        "failure_stage": "explicit_forward_repair",
+        "failure_code": "target_command_nonzero_or_output_cap",
+        "owned_fixture_state_before_cleanup": [
+          {
+            "status": "running",
+            "running": true,
+            "exit_code": 0
+          }
+        ],
+        "limit": "Actual repair up returned and fixture was running; inspect command failed. Missing-Health template reproduced separately with Go missingkey=error; fixed template still requires new native CI."
+      }
+    ],
+    "development_target_pass": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/40002465696",
+      "source_sha": "4f2dda815e9b2ab34763d4dafe6aa18dd5072249",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "50bc6e803d460448a07074a8864dcadf08d19d9a7cb2bdf96fb075d7ea9f9d54",
+      "cases": {
+        "coordinator_marker_before_actual_up": true,
+        "actual_failed_up_retains_start_barrier": true,
+        "failed_new_runtime_forbids_old_backup": true,
+        "explicit_forward_repair_actual_running_readback": true,
+        "forward_repair_keeps_irreversible_boundary": true,
+        "no_deps_does_not_start_unselected_service": true,
+        "original_target_deploy_lock_excludes_start": true,
+        "configured_image_conflict_before_up": true,
+        "configured_instances_conflict_before_up": true,
+        "only_failed_start_and_reviewed_repair_issued": true
+      },
+      "cleanup": {
+        "compose_down_succeeded": true,
+        "no_rescue_needed": true,
+        "private_fixture_directory_removed": true,
+        "existing_container_id_set_unchanged": true,
+        "existing_network_id_set_unchanged": true
+      },
+      "scope": "isolated_nsqd_container_as_compose_fixture_not_m3_business_images_or_transactions",
+      "limit": "Ten function-entry cases passed; the added independent CLI pair still requires a new exact-source CI."
+    }
+  }
 }
