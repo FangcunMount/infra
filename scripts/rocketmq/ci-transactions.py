@@ -635,7 +635,7 @@ def main():
                     passed('ai_' + boundary + '_actual_original_commit_tcp_boundary')
                 return
             from broker_fault_control import OwnedBrokerFault
-            state_profile = kind in ('state', 'protection')
+            state_profile = kind in ('state', 'protection', 'native_limit')
             proof_name = ('paired_host' if kind in ('paired','paired_faults') else ('ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')))
             fault_tools = None
             if kind in ('finalization','paired_faults'):
@@ -645,7 +645,8 @@ def main():
             proof[proof_name] = {}
             run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
                                   mysql_password, ca, run, proof[proof_name], fault_tools=fault_tools,
-                                  native_runner=owned_native_run if kind in ('finalization', 'paired','paired_faults') else None,
+                                  native_runner=owned_native_run if kind in ('finalization', 'paired','paired_faults', 'native_limit') else None,
+                                  read_parameters=broker_parameters,
                                   broker_fault=(OwnedBrokerFault(run,broker,project,
                                     lambda: broker_parameters(admin('getBrokerConfig')),effective)
                                     if kind == 'paired_faults' else None))
@@ -1235,7 +1236,7 @@ def main():
                                 'Controlled QS input and observer ACK only; no paired QS business or real provider',
                                 'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
             report['ai_admission_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_admission_acceptance.py').read_bytes()).hexdigest()
-            if os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') in ('state', 'protection'):
+            if os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') in ('state', 'protection', 'native_limit'):
                 report['batch'] = 'M3-AI-worker-state-original-SQLAlchemy-and-real-Broker'
                 report['limits'] = ['No production/system acceptance or throughput claim',
                                     'Actual evaluation worker preflight, released SDK and original state root',
@@ -1317,7 +1318,7 @@ def main():
                                               repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/sdk_faults.py", repo / "scripts/rocketmq/sdk_limits.py",
                                               repo / "scripts/rocketmq/audit_transaction_limit.py", repo / "scripts/rocketmq/routes.py",
                                               repo / "scripts/rocketmq/provision_v2.py")}
-        if args.qs_native_limit or os.environ.get('ROCKETMQ_IAM_NATIVE_LIMIT') == '1':
+        if args.qs_native_limit or os.environ.get('ROCKETMQ_IAM_NATIVE_LIMIT') == '1' or os.environ.get('QS_AI_ACCEPTANCE_KIND') == 'native_limit':
             for relative in ('scripts/rocketmq/native_limit_acceptance.py',
                              'scripts/rocketmq/qs_runtime_acceptance.py',
                              'scripts/rocketmq/probes/native-transaction-limit/go.mod',
