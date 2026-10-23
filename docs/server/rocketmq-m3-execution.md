@@ -1651,3 +1651,10 @@ infra [PR199](https://github.com/FangcunMount/infra/pull/199)候选`eaf95da410aa
 新增`pre-start-maintenance`在命令前持久记录，失败或进程中断会阻止正常新runtime启动；`pre-start-repair`需要独立摘要且一次消费，失败也不能复用同一批准。所有步骤仍使用原唯一协调目录。首次runtime发出之后拒绝启动前维护；恢复命令的边界资格不是数据库工作已停止或备份有效的证明。测试merge与实际merge树同为`bdc407cde46d31e4283473d951f7e910907aa78b`，候选到测试仅已合并PR198三份进度/闭环文档差异，所有工具、夹具和工作流字节一致。
 
 仅该保护组件完成，不勾选C2或父任务。IAM仍需纯离线迁移/绑定和协议选择入口，全体旧写者及自主任务冻结、保留职责与实际保护恢复附件也继续；原生超限后的实际回查与持久notice处置属于C3。当前M3仍24/36、T25为2/4、C为1/3、M2为24/24、M4为0/8。稳定SDK、生产DDL/provider/部署、system及48小时观察均未执行。
+
+
+### 2026-10-24：T25-C2 IAM纯离线安装与协议选择组件闭环
+
+IAM [PR141](https://github.com/FangcunMount/iam/pull/141)候选`5a643d61a8a357da0eb818656084e5650a3be675`于2026-10-23T20:10:19Z合并`13d55e3d34276ce6233693dcbd0b50ec56c70042`。8项源码检查全成功，包括单元/race、lint、并发、CodeQL、构建和三档MySQL。required实际CLI在8.0.36/8.0.44/8.4各8项（7子用例+父用例）通过/0失败/0跳过；预查不DDL、旧双账本/新责任/脏版本/摘要与主库变化拒绝、离线DDL、绑定/协议共同提交及范围外夹具事实保留均通过。三档9份既有schema/maintenance/新CLI日志全部非空、零失败/跳过，无race。候选与测试merge tree同为`5df1ed842528c72b8ff7d336e036ab4d360fde35`；自动生产CD仍暂停true。
+
+入口不启动API、SDK、Redis或MQ，不包含保护备份、删除或恢复。实际初始库与完整AuthN/全量恢复不由最小41夹具证明。全体旧REST/gRPC/维护/自主写者、保留责任、原保护恢复和三库组合步骤见[离线维护契约](rocketmq-m3-offline-maintenance.md)，这些部分仍须闭环。C2保持未勾选，C3原生回查恢复及持久notice处置继续；T25仍2/4、C仍1/3、M3仍24/36。稳定发布、生产DDL/provider/部署、system及48小时观察均未执行。

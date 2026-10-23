@@ -149,7 +149,7 @@
     "No native dependency executed locally, no production operations",
     "Startup/recovery and no-callback audit debt still require T25-C proof"
   ],
-  "recorded_at": "2026-10-23T20:02:22.028313+00:00",
+  "recorded_at": "2026-10-23T20:11:50.570361+00:00",
   "workflow_history": [
     {
       "conclusion": "success",
@@ -2132,5 +2132,145 @@
     "c2_complete": false,
     "t25_complete": false,
     "production_authorized": false
+  },
+  "iam_offline_installation": {
+    "pr": "https://github.com/FangcunMount/iam/pull/141",
+    "source": "5a643d61a8a357da0eb818656084e5650a3be675",
+    "merge": "13d55e3d34276ce6233693dcbd0b50ec56c70042",
+    "merged_at": "2026-10-23T20:10:19Z",
+    "source_tree": "5df1ed842528c72b8ff7d336e036ab4d360fde35",
+    "test_merge_tree": "5df1ed842528c72b8ff7d336e036ab4d360fde35",
+    "checks_passed": 8,
+    "production_deploy_paused": true,
+    "native_cli": [
+      {
+        "profile": "mysql8044",
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "c748b5d0ced6d2977f4326ae832eea62cfef4f85484cfd6944cdc322540102d2",
+        "cases": [
+          "--- PASS: TestM3MessagingOfflineNative (0.44s)",
+          "--- PASS: TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive (0.03s)",
+          "--- PASS: TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/independent-digest-and-current-primary-required (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts (0.16s)",
+          "--- PASS: TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained (0.04s)",
+          "--- PASS: TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility (0.04s)",
+          "--- PASS: TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime (0.09s)"
+        ]
+      },
+      {
+        "profile": "mysql84",
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "be2a87f874e9166903769f6271220b106e5a7c8c4ecf68541cf9adea5bcaf55a",
+        "cases": [
+          "--- PASS: TestM3MessagingOfflineNative (0.32s)",
+          "--- PASS: TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive (0.02s)",
+          "--- PASS: TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/independent-digest-and-current-primary-required (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts (0.11s)",
+          "--- PASS: TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained (0.03s)",
+          "--- PASS: TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility (0.03s)",
+          "--- PASS: TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime (0.06s)"
+        ]
+      },
+      {
+        "profile": "mysql8036",
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "7bb28f1856df2f39c89ada234708feb2d09e7b90e0efa8e7f4debbbbf4118efa",
+        "cases": [
+          "--- PASS: TestM3MessagingOfflineNative (0.35s)",
+          "--- PASS: TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive (0.02s)",
+          "--- PASS: TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/independent-digest-and-current-primary-required (0.01s)",
+          "--- PASS: TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts (0.12s)",
+          "--- PASS: TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained (0.03s)",
+          "--- PASS: TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility (0.03s)",
+          "--- PASS: TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime (0.07s)"
+        ]
+      }
+    ],
+    "required_native_logs": [
+      {
+        "profile": "mysql8044",
+        "name": "m3-maintenance.log",
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "f35990b43d5eb01a47193734bfcca45b6656c5bad62f635e6ad2b78648ba6471"
+      },
+      {
+        "profile": "mysql8044",
+        "name": "m3-schema.log",
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "1c84fe642271fef620c2c8596ac51c6ab39add394a1ce906594607f5aacf5393"
+      },
+      {
+        "profile": "mysql8044",
+        "name": "m3-offline.log",
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "c748b5d0ced6d2977f4326ae832eea62cfef4f85484cfd6944cdc322540102d2"
+      },
+      {
+        "profile": "mysql84",
+        "name": "m3-maintenance.log",
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "d9c4ce7492c8263cbbf938109fb9acd45bafccf8182594599693e55151e8496c"
+      },
+      {
+        "profile": "mysql84",
+        "name": "m3-schema.log",
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "5bdb76ab4464cd638d43e73e379e0c628fe3313103a812b2c688bd648a2cd686"
+      },
+      {
+        "profile": "mysql84",
+        "name": "m3-offline.log",
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "be2a87f874e9166903769f6271220b106e5a7c8c4ecf68541cf9adea5bcaf55a"
+      },
+      {
+        "profile": "mysql8036",
+        "name": "m3-maintenance.log",
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "c652890dfdd6c06ec9a949ba6f5027038ad1d61d9fd496f3c09a04d762e2fa65"
+      },
+      {
+        "profile": "mysql8036",
+        "name": "m3-schema.log",
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "fb47c2c9cc534f673c96101793fda7375fb1a93b4e40c7b9cf7d848357bc98a8"
+      },
+      {
+        "profile": "mysql8036",
+        "name": "m3-offline.log",
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "sha256": "7bb28f1856df2f39c89ada234708feb2d09e7b90e0efa8e7f4debbbbf4118efa"
+      }
+    ],
+    "scope_limit": "Actual CLI on fresh minimal version41 fixtures; seven child cases plus parent per profile. Not actual production version, backup/restore or complete AuthN acceptance",
+    "c2_complete": false,
+    "production_deployed": false
   }
 }
