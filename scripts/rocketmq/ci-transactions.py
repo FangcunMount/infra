@@ -226,7 +226,21 @@ def main():
     parser.add_argument("--qs-answer-host-faults", action="store_true", help="separate actual AnswerSheet original Mongo COMMIT packet faults")
     parser.add_argument("--ai-host-database-faults", action="store_true", help="actual AI command original SQLAlchemy COMMIT packet faults")
     parser.add_argument("--qs-command-host-faults", action="store_true", help="actual QS command original MySQL COMMIT TCP faults")
+    parser.add_argument("--paired-host-faults", action="store_true", help="explicit paired MQ/process/Broker physical fault profile")
     args = parser.parse_args()
+    if args.paired_host_faults and (not args.ai_admission_host
+            or os.environ.get("QS_AI_ACCEPTANCE_KIND") != "paired_faults"
+            or not os.environ.get("QS_M3_PAIRED_SOURCE")
+            or any((args.iam_host, args.m3_resources, args.iam_fanout_qs, args.qs_answer_host,
+                args.qs_evaluation_host, args.qs_report_host, args.qs_task_host, args.qs_retry_store_host,
+                args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host, args.qs_runtime_host,
+                args.qs_deferred_consumer_host, args.sdk_api_go, args.sdk_api_python, args.sdk_faults,
+                args.sdk_limits, args.go_probe, args.sdk_go_probe, args.installed_python,
+                args.ai_host_database_faults, args.iam_host_faults, args.qs_answer_host_faults,
+                args.qs_command_host_faults))):
+        parser.error("paired physical faults require exact paired sources and no other profile")
+    if os.environ.get("QS_AI_ACCEPTANCE_KIND") == "paired_faults" and not args.paired_host_faults:
+        parser.error("paired_faults requires its explicit physical fault gate")
     if args.qs_command_host_faults and (not args.qs_command_host or any((args.iam_host, args.m3_resources,
             args.iam_fanout_qs, args.qs_answer_host, args.qs_evaluation_host, args.qs_report_host,
             args.qs_task_host, args.qs_retry_store_host, args.qs_retry_dispatch_host, args.qs_event_host,
@@ -581,19 +595,23 @@ def main():
                         passed('ai_' + boundary + '_' + name)
                     passed('ai_' + boundary + '_actual_original_commit_tcp_boundary')
                 return
+            from broker_fault_control import OwnedBrokerFault
             state_profile = kind == 'state'
-            proof_name = ('paired_host' if kind == 'paired' else ('ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')))
+            proof_name = ('paired_host' if kind in ('paired','paired_faults') else ('ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')))
             fault_tools = None
-            if kind == 'finalization':
+            if kind in ('finalization','paired_faults'):
                 run(['go', 'build', '-o', str(directory / 'fault-proxy'),
                      './transport/rocketmq/internal/faultproxy'], cwd=sdk)
                 fault_tools = dict(binary=str(directory / 'fault-proxy'), cert=str(ca), key=str(fault_key))
             proof[proof_name] = {}
             run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
                                   mysql_password, ca, run, proof[proof_name], fault_tools=fault_tools,
-                                  native_runner=owned_native_run if kind in ('finalization', 'paired') else None)
-            for name in proof[proof_name]['native_receipt']['cases']:
-                passed(('paired_' if kind == 'paired' else ('ai_finalization_' if kind == 'finalization' else ('ai_state_' if state_profile else 'ai_admission_'))) + name)
+                                  native_runner=owned_native_run if kind in ('finalization', 'paired','paired_faults') else None,
+                                  broker_fault=(OwnedBrokerFault(run,broker,project,
+                                    lambda: broker_parameters(admin('getBrokerConfig')),effective)
+                                    if kind == 'paired_faults' else None))
+            for name in proof[proof_name]['native_receipt'].get('combined_cases',proof[proof_name]['native_receipt']['cases']):
+                passed(('paired_' if kind in ('paired','paired_faults') else ('ai_finalization_' if kind == 'finalization' else ('ai_state_' if state_profile else 'ai_admission_'))) + name)
             return
         if args.qs_event_host:
             from qs_event_acceptance import run_qs_event_host
@@ -1139,6 +1157,12 @@ def main():
                                     'Event observer ACK only; no paired QS business or real provider',
                                     'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
                 report['ai_state_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_state_acceptance.py').read_bytes()).hexdigest()
+        if args.paired_host_faults:
+            report['batch'] = 'M3-T23-paired-physical-faults-' + os.environ.get('QS_M3_PAIRED_PROFILE','core')
+            report['limits'] = ['Actual paired original roots, controlled read-side inputs; no public HTTP, real provider, system or production acceptance',
+                'core development requires2 fault tests/15 evidence; final full requires7 tests/40 evidence']
+            report['paired_fault_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/paired_fault_acceptance.py').read_bytes()).hexdigest()
+            report['broker_fault_control_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/broker_fault_control.py').read_bytes()).hexdigest()
         if args.ai_admission_host and os.environ.get('QS_AI_ACCEPTANCE_KIND') == 'paired':
             report['batch'] = 'M3-paired-final-version-' + os.environ.get('QS_M3_PAIRED_PROFILE', 'core')
             report['limits'] = ['No production/system, public HTTP, real provider or packet-fault acceptance',

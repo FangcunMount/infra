@@ -118,6 +118,9 @@ def acceptance_profile(kind):
     if kind == 'db_faults':
         from ai_database_fault_acceptance import profile
         return profile()
+    if kind == 'paired_faults':
+        from paired_fault_acceptance import profile
+        return profile()
     if kind == 'paired':
         from paired_acceptance import profile
         return profile()
@@ -159,7 +162,7 @@ def validate_host_runtime(runtime, profile, python):
         raise RuntimeError('released fixed SDK wheel and client required, no editable SDK')
 
 
-def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, *, fault_tools=None, native_runner=None, proxy_start=None):
+def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, *, fault_tools=None, native_runner=None, proxy_start=None, broker_fault=None):
     profile = acceptance_profile(os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission'))
     source = source.resolve()
     if not (source / 'pyproject.toml').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
@@ -187,12 +190,14 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     private_config.write_text(json.dumps(dict(accounts, **({'fault_tools': fault_tools} if fault_tools else {}), endpoint=f'127.0.0.1:{grpc_port}',
         client_log=str(directory / 'ai-client-private.log'), routes=manifest['routes'],
         ca_file=str(ca)))); private_config.chmod(0o600)
-    if profile['name'] == 'paired':
+    if profile['name'] in ('paired','paired_faults'):
         from paired_acceptance import prepare_qs
         extra = prepare_qs(Path(os.environ['QS_M3_PAIRED_SOURCE']), directory, project,
                            mysql_port, password, run, proof)
         private_data = json.loads(private_config.read_text())
         private_data.update(extra)
+        if profile["name"] == "paired_faults":
+            private_data.update(paired_faults=True,qs_primary_url=root_url)
         private_config.write_text(json.dumps(private_data)); private_config.chmod(0o600)
     env = dict(os.environ, QS_AI_DATABASE_URL=application_url,
                QS_AI_TEST_MYSQL_DSN=application_url.replace('mysql+asyncmy://', 'mysql://', 1),
@@ -208,6 +213,10 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     runtime = json.loads(info)
     validate_host_runtime(runtime, profile, python)
     proof['python_runtime'] = runtime
+    if profile['name'] == 'paired_faults':
+        from paired_fault_acceptance import run_profile
+        run_profile(source,directory,env,command,run,proof,native_runner,broker_fault)
+        return
     if profile['name'] == 'db_faults':
         from ai_database_fault_acceptance import run_profile
         run_profile(source, directory, env, command, run, proof, native_runner, proxy_start, mysql_port)
@@ -283,7 +292,7 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('AI source changed during native host acceptance')
-    if profile['name'] == 'paired':
+    if profile['name'] in ('paired','paired_faults'):
         qs_source = Path(os.environ['QS_M3_PAIRED_SOURCE']).resolve()
         qs = proof['paired_qs']
         qs['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=qs_source).stdout.strip()

@@ -86,8 +86,8 @@ def paired_manifest():
     return manifest
 
 
-def read_receipt(output, *, full=False, partial=False):
-    lines = [line.split(MARKER,1)[1] for line in output.splitlines() if MARKER+'{' in line]
+def read_receipt(output, *, full=False, partial=False, marker=MARKER):
+    lines = [line.split(marker,1)[1] for line in output.splitlines() if marker+'{' in line]
     if len(lines) != 1 or len(lines[0]) > 16384:
         return None
     try:

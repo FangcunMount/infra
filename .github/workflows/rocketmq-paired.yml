@@ -17,12 +17,16 @@ on:
         type: choice
         options: [core, full]
         default: full
+      faults:
+        description: Explicit T23 paired process/network/Broker fault gate
+        type: boolean
+        default: false
       full_matrix:
         description: Manual six-profile gate; pull requests always run all six
         type: boolean
         default: false
   pull_request:
-    paths: ['scripts/rocketmq/paired_acceptance.py', 'scripts/rocketmq/test_paired_acceptance.py', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-paired.yml', 'Makefile']
+    paths: ['scripts/rocketmq/paired_acceptance.py', 'scripts/rocketmq/paired_fault_acceptance.py', 'scripts/rocketmq/broker_fault_control.py', 'scripts/rocketmq/test_paired_fault_acceptance.py', 'scripts/rocketmq/test_broker_fault_control.py', 'scripts/rocketmq/test_paired_acceptance.py', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-paired.yml', 'Makefile']
 permissions:
   contents: read
 concurrency:
@@ -81,14 +85,24 @@ jobs:
           docker build --no-cache -t rocketmq-paired:5.5.1 components/rocketmq
       - name: Required original QS AI roots
         env:
+          PAIRED_FAULTS: ${{ inputs.faults || false }}
           PAIRED_PROFILE: ${{ inputs.profile || 'full' }}
         run: |
           set -euo pipefail
           [[ "$PAIRED_PROFILE" == core || "$PAIRED_PROFILE" == full ]]
-          make rocketmq-paired-host-test SDK_DIR="$PWD/.sdk-acceptance" QS_DIR="$PWD/.qs-acceptance" \
+          if [[ "$PAIRED_FAULTS" == true ]]; then
+            export QS_AI_ACCEPTANCE_KIND=paired_faults
+            export QS_M3_PAIRED_PROFILE="$PAIRED_PROFILE" QS_M3_PAIRED_SOURCE="$PWD/.qs-acceptance"
+            export QS_AI_ACCEPTANCE_PYTHON='${{ matrix.python }}'
+            python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
+              --ai-admission-host "$PWD/.ai-acceptance" --paired-host-faults \
+              --image rocketmq-paired:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-paired.json
+          else
+            make rocketmq-paired-host-test SDK_DIR="$PWD/.sdk-acceptance" QS_DIR="$PWD/.qs-acceptance" \
             AI_DIR="$PWD/.ai-acceptance" ROCKETMQ_TEST_IMAGE=rocketmq-paired:5.5.1 \
             PAIRED_PROFILE="$PAIRED_PROFILE" AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' \
             ROCKETMQ_TEST_MYSQL_IMAGE='${{ matrix.mysql }}' ROCKETMQ_PAIRED_REPORT=rocketmq-paired.json
+          fi
       - uses: actions/upload-artifact@v7
         if: always()
         with:
