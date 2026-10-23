@@ -1,6 +1,6 @@
 # M3 事务消息观察与恢复边界
 
-[M3 总表](rocketmq-m3-execution.md)记录 T24 的完成状态。此文档与只读工具是 T24 实施中的工作，宿主指标、准入保护、真实 DLQ 验收与生产启用仍待独立验证。它不授权生产变更，也不替代 T25/T29 的具名恢复演练。
+[M3 总表](rocketmq-m3-execution.md)记录 T24 的完成状态。此文档与只读工具是 T24 实施中的工作，真实 DLQ 定向验收已通过；宿主指标、准入保护、完整回归与生产启用仍待独立验证。它不授权生产变更，也不替代 T25/T29 的具名恢复演练。
 
 ## 分清责任再处置
 
@@ -55,6 +55,6 @@ T23 开发验收39906622326证明了以下受控路径，完整矩阵和生产�
 
 隔离 Go 探针的 `close_for_recovery` 仅移交临时 schema 清理责任；生产部署没有此控制命令，禁止把测试探针或临时库 DROP 逻辑用于生产。生产动作仍等待 T29 固定镜像/配置/资源清单与 T30 具名确认。Prometheus/Grafana 继续由 Mac mini 采集，不在 serverD 增加常驻代理，不改变原三个 worker 的配置。
 
-原生DLQ验收探针位于[scripts/rocketmq/probes/native-dead-letter](../../scripts/rocketmq/probes/native-dead-letter/main.go)，锁定公开Go预发布tx.3、无本地replace。当前仅完成race编译和隔离配置边界测试，尚未连接Broker；后续隔离profile须校验实际Compose身份，显式设置该测试Group的有限重试参数，并证明原消息经过失败handoff后出现真实DLQ索引、只读导出不泄露正文和全部所属资源清理。探针或其NORMAL测试消息不代表业务中间上线。
+原生DLQ验收探针位于[scripts/rocketmq/probes/native-dead-letter](../../scripts/rocketmq/probes/native-dead-letter/main.go)，锁定公开Go预发布tx.3、无本地replace。39916396134已完成真实5.5.1隔离验收8项、零失败跳过：校验实际Compose身份，显式设置并回读该测试Group的有限重试参数，证明原消息经过失败handoff后出现真实DLQ索引、重复只读导出一致，以及所属进程、容器与私有文件清理。完整PR回归与宿主保护仍待完成。探针或其NORMAL测试消息不代表业务中间上线。
 
 隔离入口为`make rocketmq-native-dlq-audit-test`，显式传入SDK_DIR及已验证测试镜像。开发CI复用rocketmq-limits工作流的native_dlq=true模式，只选择native-index-audit；未选择的SDK事务矩阵不是已通过项。PR继续要求原SDK两档及新增审计job全部通过。新的CLI模式拒绝与其他SDK/宿主profile混用，在任何子进程启动前失败。
