@@ -1,0 +1,93 @@
+name: RocketMQ native recovery storage snapshots
+on:
+  pull_request:
+    paths:
+      - tools/rocketmq-native-recovery/**
+      - .github/workflows/rocketmq-native-recovery-storage.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mysql-original-snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: ['8.0.36', '8.0.44', '8.4']
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql }}
+        env:
+          MYSQL_ROOT_PASSWORD: native-tool-disposable
+        ports:
+          - 127.0.0.1:3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pnative-tool-disposable --silent"
+          --health-interval=5s --health-timeout=3s --health-retries=30
+    defaults:
+      run:
+        working-directory: tools/rocketmq-native-recovery
+    env:
+      GOWORK: off
+      GOTOOLCHAIN: local
+      NATIVE_TOOL_TEST_MYSQL_DSN: root:native-tool-disposable@tcp(127.0.0.1:3306)/?parseTime=true&multiStatements=true
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: tools/rocketmq-native-recovery/go.sum
+      - name: Read actual service image identity
+        env:
+          SERVICE_ID: ${{ job.services.mysql.id }}
+        run: |
+          set -euo pipefail
+          umask 077
+          docker inspect --format '{{.Image}}' "$SERVICE_ID" > mysql-image-id.txt
+      - name: Original primary terminal facts and private governance fixture
+        run: |
+          set -euo pipefail
+          umask 077
+          go test -race -tags=integration -json -count=1 -timeout=3m \
+            -run '^Test(MySQLSnapshotNative|FrozenGovernanceFixtureMatchesRecordedHostMigration)$' \
+            ./internal/authority > mysql-snapshot.jsonl
+      - name: Nonempty zero-skip owned-storage report
+        if: always()
+        env:
+          MYSQL_PROFILE: ${{ matrix.mysql }}
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, subprocess
+          path = pathlib.Path('mysql-snapshot.jsonl')
+          events = [json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
+          ran = {e['Test'] for e in events if e.get('Test') and e['Action']=='run'}
+          passed = {e['Test'] for e in events if e.get('Test') and e['Action']=='pass'}
+          failed = sum(e['Action']=='fail' for e in events)
+          skipped = sum(e['Action']=='skip' for e in events)
+          cleanups = sum('owned_database_removed=true' in e.get('Output','') for e in events)
+          owners = {f'TestMySQLSnapshotNative/{name}' for name in ('iam.mysql','qs.mysql','ai.mysql')}
+          valid = bool(ran) and ran==passed and owners<=passed and failed==skipped==0 and cleanups==3
+          image = pathlib.Path('mysql-image-id.txt')
+          report = dict(schema='m3-native-recovery-storage/v1',source_sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+                        mysql_profile=os.environ['MYSQL_PROFILE'],image_id=image.read_text().strip() if image.exists() else None,
+                        test_kind='owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance',
+                        passed=len(passed),failed=failed,skipped=skipped,owned_databases_removed=cleanups,valid=valid,
+                        raw_report_sha256=hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None)
+          pathlib.Path('mysql-snapshot-summary.json').write_text(json.dumps(report,indent=2)+'\n')
+          assert valid,'Incomplete original-storage proof or cleanup'
+          print(json.dumps(report))
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-recovery-mysql-${{ matrix.mysql }}-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            tools/rocketmq-native-recovery/mysql-snapshot.jsonl
+            tools/rocketmq-native-recovery/mysql-snapshot-summary.json
+          if-no-files-found: error
+          retention-days: 14
