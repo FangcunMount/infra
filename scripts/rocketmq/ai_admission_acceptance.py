@@ -187,7 +187,7 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     root_url = f'mysql+asyncmy://root:{password}@127.0.0.1:{mysql_port}/{schema}'
     application_url = f'mysql+asyncmy://{db_user}:{db_password}@127.0.0.1:{mysql_port}/{schema}'
     private_config = directory / ('ai-' + profile['name'] + '-config.json')
-    private_config.write_text(json.dumps(dict(accounts, **({'fault_tools': fault_tools} if fault_tools else {}), endpoint=f'127.0.0.1:{grpc_port}',
+    private_config.write_text(json.dumps(dict(accounts, **({'fault_tools': fault_tools} if fault_tools else {}), sdk_python_version=profile['sdk_version'],endpoint=f'127.0.0.1:{grpc_port}',
         client_log=str(directory / 'ai-client-private.log'), routes=manifest['routes'],
         ca_file=str(ca)))); private_config.chmod(0o600)
     if profile['name'] in ('paired','paired_faults'):
@@ -196,7 +196,6 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
                            mysql_port, password, run, proof)
         private_data = json.loads(private_config.read_text())
         private_data.update(extra)
-        private_data['sdk_python_version'] = profile['sdk_version']
         if profile["name"] == "paired_faults":
             private_data.update(paired_faults=True,qs_primary_url=root_url)
         private_config.write_text(json.dumps(private_data)); private_config.chmod(0o600)

@@ -7,7 +7,9 @@ import re
 import signal
 import xml.etree.ElementTree as ET
 
-from paired_acceptance import FULL_CASES, FULL_TESTS, paired_manifest, read_receipt, SDK_SHA256
+from paired_acceptance import FULL_CASES, FULL_TESTS, paired_manifest, read_receipt
+
+SDK_SHA256 = '7a0a35438ed6890cff37aea3305e1ee1fcec4b9bcac0667959fbc2cda62c636e'
 
 SCOPE = 'actual paired Go QS/Python AI original roots with MQ disconnect, producer SIGKILL and Broker SIGKILL/restart'
 CASES = frozenset((
@@ -28,8 +30,8 @@ FIELDS = {'source_sha','qs_source_sha','profile','passed','failed','skipped','ca
 def profile():
     if os.environ.get('QS_M3_PAIRED_PROFILE', 'core') not in ('core', 'full'):
         raise ValueError('explicit paired fault core/full profile required')
-    return dict(name='paired_faults',sdk_version='0.4.0a2',
-        sdk_url='https://github.com/FangcunMount/reliable-messaging/releases/download/python/v0.4.0a2/fangcun_reliable_messaging-0.4.0a2-py3-none-any.whl',
+    return dict(name='paired_faults',sdk_version='0.4.0a3',
+        sdk_url='https://github.com/FangcunMount/reliable-messaging/releases/download/python/v0.4.0a3/fangcun_reliable_messaging-0.4.0a3-py3-none-any.whl',
         sdk_sha256=SDK_SHA256,manifest=paired_manifest,file='rocketmq_paired_faults.py',scope=SCOPE)
 
 
