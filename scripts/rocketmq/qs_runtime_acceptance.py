@@ -122,11 +122,11 @@ def runtime_diagnostics(output):
             raise RuntimeError('invalid fixed owner diagnostic') from None
         fields = {'stage', 'owner_index', 'local', 'error', 'root_phases', 'lease_remaining_ms', 'elapsed_ms'}
         if (not isinstance(value, dict) or set(value) != fields
-                or value['stage'] not in {'local_entered', 'local_committed', 'before_observer_close', 'after_observer_close'}
+                or value['stage'] not in {'local_entered', 'local_committed', 'before_observer_close', 'after_observer_close', 'next_owner_start'}
                 or type(value['owner_index']) is not int or value['owner_index'] not in (-1, 0, 1)
                 or value['local'] not in {'not_started', 'committed', 'aborted', 'unknown'}
                 or not isinstance(value['error'], dict) or set(value['error']) != {'kind', 'code'}
-                or value['error']['kind'] not in {'none', 'deadline', 'canceled', 'stale_execution', 'binding', 'transaction_required', 'other', 'mysql', 'mongo'}
+                or value['error']['kind'] not in {'none', 'deadline', 'canceled', 'stale_execution', 'binding', 'transaction_required', 'other', 'mysql', 'mongo', 'metrics_registration', 'protocol_protection', 'host_admission'}
                 or type(value['error']['code']) is not int or not 0 <= value['error']['code'] <= 1000000000
                 or not isinstance(value['root_phases'], list) or len(value['root_phases']) != 2
                 or any(type(n) is not int or not 0 <= n <= 5 for n in value['root_phases'])

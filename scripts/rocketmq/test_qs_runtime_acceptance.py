@@ -66,6 +66,11 @@ class DefaultRuntimeDiagnosticTest(unittest.TestCase):
         self.assertEqual(runtime_diagnostics('private non-marker text'), [])
         self.assertEqual(runtime_diagnostics('M3_QS_OWNER_DIAGNOSTIC '+json.dumps(value)), [value])
 
+    def test_next_owner_start_exports_only_fixed_failure_categories(self):
+        for kind in ('deadline', 'metrics_registration', 'protocol_protection', 'host_admission'):
+            value = dict(self.sample(), stage='next_owner_start', owner_index=-1, error=dict(kind=kind, code=0))
+            self.assertEqual(runtime_diagnostics('M3_QS_OWNER_DIAGNOSTIC '+json.dumps(value)), [value])
+
     def test_refuse_raw_errors_unknown_fields_and_unbounded_values(self):
         for changes in (dict(wire='private'), dict(stage='arbitrary'), dict(elapsed_ms=True),
                         dict(root_phases=[9, 0]), dict(lease_remaining_ms=[1]),
