@@ -7,7 +7,7 @@
     "M3": "22/36",
     "M4": "0/8"
   },
-  "recorded_at": "2026-10-23T01:41:41.097212+00:00",
+  "recorded_at": "2026-10-23T02:07:41.514296+00:00",
   "source_baselines": {
     "iam": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
     "qs-server": "0428b701347774282fb3deafb9cd8c841ba86fc4",
@@ -296,7 +296,7 @@
     "production_deploy_paused": true,
     "production_environment_override_count": 0
   },
-  "internal_progress": "1/4",
+  "internal_progress": "2/4",
   "ai_development": {
     "run_url": "https://github.com/FangcunMount/infra/actions/runs/39881283339",
     "source_sha": "724595abdd92e8b0d88389609e239a6b6b1a9055",
@@ -328,7 +328,7 @@
   "ai_development_audit_sha256": "2a4923aeb7a093f41e350187f9bf55059daeb8048e56b5b8682e26f54180afe2",
   "qs_mysql_command_candidate": {
     "source_sha": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
-    "native_status": "development14/14 passed/audited; full3 CI39884730972 and source PR429 pending",
+    "native_status": "full three profiles each14/14 passed/audited; PR429 merged exact candidate tree after28 source checks,1 API sync N/A",
     "local_validation": {
       "race_native_tag": "compile only passed",
       "new_diff_native_lint": "0 issues",
@@ -482,5 +482,60 @@
     "source_checks_passed": 12,
     "auto_deploy_enabled": false,
     "production_environment_override_count": 0
+  },
+  "qs_command_full_matrix": {
+    "run_url": "https://github.com/FangcunMount/infra/actions/runs/39884730972",
+    "source_sha": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
+    "infra_sha": "96eb495ef04e303325c5af05fa245f740cc7d768",
+    "workflow_conclusion": "success",
+    "profiles": [
+      {
+        "mysql": "8.0.36",
+        "go": "go1.25.12",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "d55bc1e499adfde40867345dd17317e5c20650452fe3a16aac8517f7d6e13853",
+        "source_tool_binding_and_cleanup_verified": true
+      },
+      {
+        "mysql": "8.0.44",
+        "go": "go1.25.12",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "d5cf20720e2ebf9f8de36f8101219363f2c7972df5917c5250028e16f01e3202",
+        "source_tool_binding_and_cleanup_verified": true
+      },
+      {
+        "mysql": "8.4.11",
+        "go": "go1.25.12",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "d8b93aa0373d3427323f8407d73ceb889f49e479e799c09a088ff18dc9416a7c",
+        "source_tool_binding_and_cleanup_verified": true
+      }
+    ]
+  },
+  "qs_command_full_audit_sha256": "1c88ecb0c8bfdd1869ac92ef82614d05bb6cc5d9f48fbf82865aaf154a360f7f",
+  "qs_source_merge": {
+    "pr": "https://github.com/FangcunMount/qs-server/pull/429",
+    "source_sha": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
+    "merge_sha": "cfbbfd48a663062eee981ad8897ff9521bb519b2",
+    "tree": "791e1202a5e8df7187ea593a77acee25dfbc0332",
+    "candidate_and_main_entire_tree_equal": true,
+    "source_checks_passed": 28,
+    "not_applicable_source_check": "Docs & API Generated Sync",
+    "production_deploy_paused": true,
+    "production_environment_override_count": 0
+  },
+  "paired_faults": {
+    "status": "implementation_in_progress",
+    "native_pass_claimed": false,
+    "scenarios": [
+      "actual MQ disconnect/producer SIGKILL/new paused same-owner Checker",
+      "AI original root committed/Broker SIGKILL/same container restart/paired receipts"
+    ]
   }
 }
