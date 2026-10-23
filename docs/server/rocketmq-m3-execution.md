@@ -1336,3 +1336,6 @@ SDK必要修订闭环：39899882809两档各5/5、零失败/跳过，Broker前�
 39906622326绑定QS99826d86、AI5de95730、infra32cd1c62：2原生/15证据全部通过，零失败/跳过，源码/工具摘要、已发布a3 wheel、Go固定模块及全部所属清理独立审计，审计b84246b0。两种故障下首次wire与业务身份不变；Go原进程SIGKILL-9、暂停新owner仅回查；Broker真实SIGKILL137后同容器新PID、原参数不变，旧AI排空，原库交接后的新QS进程和新AI DI runtime完成原receipt/state/ACK。原AI本地执行1/half2/FinalUnknown2，恢复新增half/执行0、精确原Reference Commit2、callback_errors0、provider调用0；原Go Seal1＋新ACK Seal2。AI新DI不冒称新Python OS进程，Go存活自动恢复未验收。
 
 启用最终PR六档，每档完整7原生/40证据，继续旧SDK和宿主回归；不是把开发报告移签新SHA。相关源码CI/合并、共享工具完整门禁未完成，T23-C/D仍未勾选，M3仍22/36、内部2/4。
+
+
+完整矩阵39907327708发现开发2用例未覆盖的基线夹具遗漏：start_ai提取后ACK subscriber成为内层局部变量，原重复ACK用例仍读取不存在的p.acknowledgement。已完成四档均停在相同771行，原基本业务链路通过、尚未执行后续故障用例；四份0/1/0报告及显式清理保留，未返回报告的取消档不冒称清理回读。仅将重复用例改为从当前实际runtime取得原ACK订阅handler，不削减首次wire、幂等或业务快照断言。新AI4ecc1b4d静态/7收集/文档通过，必须重跑完整矩阵；M3仍22/36、T23内部2/4。

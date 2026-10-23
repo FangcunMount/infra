@@ -2122,6 +2122,109 @@
       ],
       "scope": "actual paired host components/original roots/physical MQ and process failures with coordinated affected-host restart; controlled read-side, no live-Go-autoheal/real provider/public HTTP/system/production"
     },
-    "coordinated_host_development_audit_sha256": "b84246b04bb90c55d8cf3b94b43d62a09d428accec009c6fb7e334a40c64419e"
+    "coordinated_host_development_audit_sha256": "b84246b04bb90c55d8cf3b94b43d62a09d428accec009c6fb7e334a40c64419e",
+    "full_matrix_attempts": [
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39907327708",
+        "sources": {
+          "qs-paired-faults": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+          "ai-paired-faults": "5de957302904dde07ee499c5dbac0e5a96c74c92",
+          "infra-host-faults": "4f439f5c8e6d708000ba8859b7bd6009927cdea0"
+        },
+        "reports": [
+          {
+            "artifact": "rocketmq-paired-full-0-198fccc922a2b33980f258bfc72675384dd5bc81",
+            "sha256": "d4899e54215bb84a2142aa185c93fbf5be99b1233af530163e012ec5f0cdd6ba",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "diagnostics": {
+              "failed_cases": [
+                "test_actual_qs_ai_first_wire_and_duplicate_command_event_ack"
+              ],
+              "assertion_lines": [
+                771
+              ]
+            },
+            "partial_baseline_passed": 11,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "artifact": "rocketmq-paired-full-2-198fccc922a2b33980f258bfc72675384dd5bc81",
+            "sha256": "398340e910a92e18c4b86d563742685d2ef5364a0dd5ee0f6a50b966bf6153a0",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "diagnostics": {
+              "failed_cases": [
+                "test_actual_qs_ai_first_wire_and_duplicate_command_event_ack"
+              ],
+              "assertion_lines": [
+                771
+              ]
+            },
+            "partial_baseline_passed": 11,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "artifact": "rocketmq-paired-full-3-198fccc922a2b33980f258bfc72675384dd5bc81",
+            "sha256": "4fbbaa2b38e577a89ba88c726596ffaf3ed5a77483d02148fa768275d6fd2b6d",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "diagnostics": {
+              "failed_cases": [
+                "test_actual_qs_ai_first_wire_and_duplicate_command_event_ack"
+              ],
+              "assertion_lines": [
+                771
+              ]
+            },
+            "partial_baseline_passed": 11,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "artifact": "rocketmq-paired-full-4-198fccc922a2b33980f258bfc72675384dd5bc81",
+            "sha256": "f14f19abfef9e632d1b4b8cf24a3b26a5453bdd2daaf08f024dec9465e248e88",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "diagnostics": {
+              "failed_cases": [
+                "test_actual_qs_ai_first_wire_and_duplicate_command_event_ack"
+              ],
+              "assertion_lines": [
+                771
+              ]
+            },
+            "partial_baseline_passed": 11,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          }
+        ],
+        "status": "failed native baseline; completed reports retained; remaining jobs may be cancelled by corrected candidate push, no unreported cleanup claim",
+        "finding": "Extracting start_ai moved acknowledgement into nested scope while old duplicate ACK test still used p.acknowledgement. Full matrix caught AttributeError before fault tests. Obtain the actual ACK subscriber from current owned runtime; preserve every first-wire/idempotency/business-snapshot assertion. No production behavior changed."
+      }
+    ],
+    "current_full_ai_candidate": "4ecc1b4da3383ad5a24fcb08f0feabea3432d3d2"
   }
 }
