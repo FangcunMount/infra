@@ -1313,3 +1313,6 @@ SDK恢复39897483972两档已完成同一实际Python生产者的三条原Refere
 
 
 SDK必要修订闭环：39899882809两档各5/5、零失败/跳过，Broker前后实时Topic均存在且TRANSACTION、观察者实际Proxy QueryRoute OK，原生产者身份不变、原根1/half3/FinalUnknown3、原wire消费3，关闭后settings/真实RPC/Checker均排空。此前NameServer-only失败保留，未将触发差异单独归因为已证明的唯一根因。审计bfa2d982；PR51/52以各12项源码检查正常合并bac04c4/c7b5a1e，main tree与2258ad70候选一致。Python0.4.0a3已正式预发布，tag远端解引用2258ad70；9资产服务器摘要与回下内容一致，wheel/sdist独立安装driver与源码相同，发布后证明e698b8f0。SDK发布索引PR53进行中；Go未重新发布，稳定版与生产无变更。宿主39899886480仍失败且完整清理：Go SIGKILL闭环保留，AI新owner恢复后进入默认组件启动失败，增加三Topic实际AI凭据Proxy QueryRoute就绪门禁。当前AI依赖已锁公开a3且只变更SDK锁项；静态/447源类型通过，完整非集成回归4221通过/1信号夹具启动5秒端口超时（信号发送前），不调阈值，定向复验另记。M3仍22/36、T23内部2/4，M4为0/8。
+
+
+实际a3宿主39901898242仍保留失败：三条AI凭据Proxy QueryRoute均OK；新暂停owner已精确回查原Reference2、新half0/执行0。失败随后发生在夹具手动Start后由监督器第二次Start，SDK依约拒绝。改为同一原监督器只Start一次、暂缓消费者Start完成取证后再释放；仅故障夹具140秒总启动预算包含100秒回查观察屏障，常规夹具30秒、生产/SDK生命周期不变。新AI7aafd75d、QS0f353a04、infrab106ead3在39902972061开发复验，完整六档/源码合并仍待完成。SDK发布索引PR53合并1b7b6c9。AI本地初次非integration/interop4221通过/1端口就绪失败保留，信号定向4/4复验通过且未调阈值；文档75篇/1391链接、12文档测试及7项仅收集通过，447源类型通过。初次16项文档摘要漂移仅更新6已审来源并追加2成对夹具归属，runtime未知；当前精确头13项源码CI运行中。M3仍22/36、T23内部2/4，M4为0/8，生产、system、48h未执行。

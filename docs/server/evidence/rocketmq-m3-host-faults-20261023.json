@@ -1634,7 +1634,8 @@
         }
       },
       "remote_tag": "Annotated tag peeled remotely to2258ad70275ae974e71fb3ffeaa5ed7def4c2893; no overwrite",
-      "release_index_pr": "https://github.com/FangcunMount/reliable-messaging/pull/53"
+      "release_index_pr": "https://github.com/FangcunMount/reliable-messaging/pull/53",
+      "release_index_merge": "1b7b6c97ee432e3bcd6b768d83b9d015c6bd5a3d"
     },
     "fresh_host_development_runs": [
       {
@@ -1744,6 +1745,155 @@
       "run_url": "https://github.com/FangcunMount/infra/actions/runs/39899886480",
       "scope": "development on existing published a2; not final a3 acceptance",
       "status": "failed; preserved in development history"
+    },
+    "published_a3_host_development_runs": [
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39901898242",
+        "candidates": {
+          "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+          "ai-paired-faults": "39e103d94de692fe1fc2492f7b777516c73a9312",
+          "infra-host-faults": "b106ead319d004b205d3c7931d4fe6b392d65431"
+        },
+        "counts": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "report_sha256": "77701be6b3a55c438053dbec33c79ba7bc4c38894c989cecd797c6e736de2fe5",
+        "proxy_routes_ready": [
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "d8547f57cdbd8d38e7211ebb1eb34c23c2801763756327baa7f01fc3ebbdf9c6",
+            "read_only": true
+          },
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "b42197cee876775438bf66ae3ac8c56844e1c005963dbd2f89340e366a708186",
+            "read_only": true
+          },
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "53be1810d69680ced19d42ac387ae81a0d5020ca08e593742cb2ad54606f3207",
+            "read_only": true
+          }
+        ],
+        "partial_fault_receipt": {
+          "cases": {
+            "half_ack_before_actual_mq_disconnect": true,
+            "old_local_committed_final_unknown": true,
+            "producer_sigkill_exit_negative9": true,
+            "same_primary_epoch_readonly_resume_no_new_half": true,
+            "new_paused_broker_commit_callback": true,
+            "same_first_command_wire_after_resume": true,
+            "recovered_pair_receipt_state_ack_without_model": true,
+            "ai_half_prepared_before_broker_kill": true,
+            "actual_final_rpc_unknown_after_committed_root": true,
+            "broker_sigkill_and_same_container_restart": true,
+            "recovered_process_resources_drained": true
+          },
+          "passed": 11,
+          "failed": 1,
+          "skipped": 0,
+          "counters": {
+            "qs_sigkill": {
+              "half_prepared_before_loss": 1,
+              "old_exit_code": -9,
+              "old_seals": 1,
+              "recovered_completed_results": 0,
+              "recovered_half_prepared": 0,
+              "recovered_broker_commit_checks": 1,
+              "final_recovered_seals": 2,
+              "provider_invocations": 0
+            },
+            "broker_restart": {
+              "recovered_completed_results": 0,
+              "recovered_half_prepared": 0,
+              "local_calls": 1,
+              "half_prepared": 2,
+              "actual_final_unknown": 2,
+              "pending_calls": 0,
+              "half_prepared_before_kill": 2,
+              "local_calls_before_kill": 0,
+              "recovered_committed_references": 2
+            }
+          },
+          "partial": true,
+          "complete_acceptance_claimed": false
+        },
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_paired_fault_recovery[broker_restart]"
+          ],
+          "assertion_lines": [
+            326,
+            355,
+            370,
+            487,
+            506,
+            529,
+            595
+          ]
+        },
+        "finding": "Actual three authenticated Proxy routes ready; new paused owner proved exact committed references2, new half0/execution0. Fixture then manually called Start before ordinary supervisor called it again; fixed to let original supervisor Start once, gating only subscribers during observation. SDK single-Start contract and production lifecycle untouched. Scope remains incomplete until full native loop passes.",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "published_a3_current_host_candidate": {
+      "candidates": {
+        "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+        "ai-paired-faults": "7aafd75d3482f73dd63200049f3f2468db7293af",
+        "infra-host-faults": "b106ead319d004b205d3c7931d4fe6b392d65431"
+      },
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39902972061",
+      "status": "running; development core2 only, not full6-profile acceptance",
+      "scope": "same supervisor sole Start; bounded fixture startup140 includes100s check-observation barrier; ordinary fixture startup30 unchanged"
+    },
+    "local_a3_validation": {
+      "scope": "local worktree only; no DB/MQ/Docker; current-head required GitHub CI separate",
+      "reports": [
+        {
+          "name": "initial_nonintegration",
+          "tests": 4222,
+          "passed": 4221,
+          "failed": 1,
+          "skipped": 0,
+          "sha256": "ffa59772247561723b48c67c298470a5299e2e541c394e69c448484e4346e5df"
+        },
+        {
+          "name": "signal_startup_recheck",
+          "tests": 4,
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "020379dbd3103b4de3b1d796149235431146a8a49336fb0fb5ef7b61ef1b7787"
+        },
+        {
+          "name": "docs",
+          "tests": 12,
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "b04e3134c83bf4dd4349912c3cb638d434ff413a4336200a3337b0c4bbea8616"
+        }
+      ],
+      "ruff_format": true,
+      "mypy_source_files": 447,
+      "paired_collection_only": 7,
+      "docs_markdown": 75,
+      "docs_links": 1391,
+      "docs_drift_history": "16 source-baseline drifts on6reviewed sources; reconciled only those sources, added2paired fixture source ownership; production/runtime unknown",
+      "signal_failure": "Initial5s child-port readiness timeout before signal dispatch; targeted4/4passed without changing thresholds; cause not independently proved"
     }
   }
 }
