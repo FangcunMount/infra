@@ -44,7 +44,7 @@ def inspect(probe,identity):
     return telemetry_receipt(probe.wait('live_telemetry',identity,timeout=10,after=cursor))
 
 
-def run_live_recovery(start,sql,control,proof,passed):
+def run_live_recovery(start,sql,control,proof,passed,observer_topics):
     identity='packet-sdk-python-live-restart'
     sender=start('sdk-python','fault-live-broker',identity,branches=3)
     sender.wait('ready')
@@ -82,6 +82,8 @@ def run_live_recovery(start,sql,control,proof,passed):
         except RuntimeError:
             proof['inspection_failed']=True
         raise
+    proof['after_recheck_snapshot']=inspect(sender,identity)
+    proof['topic_routes_ready']=control.wait_topic_routes(observer_topics)
     observer=start('sdk-go','consume')
     observer.wait('ready')
     for i in range(3):observer.wait('received',f'{identity}-b{i}')

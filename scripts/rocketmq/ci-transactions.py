@@ -794,7 +794,10 @@ def main():
                 proof['python_live_recovery'] = {}
                 control = OwnedBrokerFault(run,broker,project,
                     lambda: broker_parameters(admin('getBrokerConfig')),effective)
-                run_live_recovery(start,sql,control,proof['python_live_recovery'],passed)
+                run_live_recovery(start,sql,control,proof['python_live_recovery'],passed,
+                    [r['physical_topic'] for r in sdk_manifest['routes']
+                     if r['owner']=='iam.mysql' and r['route_revision']=='sdk-v2'
+                     and r['message_type']=='TRANSACTION'])
                 if set(cases) != SETUP_CASES | {CASE}:
                     raise RuntimeError('source SDK live recovery profile incomplete or substituted')
                 return

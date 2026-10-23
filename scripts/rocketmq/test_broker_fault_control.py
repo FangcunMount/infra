@@ -48,4 +48,34 @@ class BrokerFaultControlTests(unittest.TestCase):
         f.read_parameters=lambda:dict(PARAMS,transactionCheckMax=2)
         with self.assertRaises(RuntimeError):f.start()
 
+
+    def test_route_readiness_waits_for_actual_nameserver_readback_only(self):
+        from unittest.mock import patch
+        f,row,_=self.fixture();f.kill();f.start();calls=[]
+        route='{"brokerDatas":[{"brokerAddrs":{\n0:"broker:10911"}}],"queueDatas":[{}]}'
+        def read(argv,**kwargs):
+            calls.append(argv)
+            if argv[1]=='inspect':return SimpleNamespace(stdout=json.dumps([row]))
+            return SimpleNamespace(returncode=0,stdout='not ready' if len(calls)==2 else route)
+        f.command=read
+        with patch('broker_fault_control.time.sleep'):
+            result=f.wait_topic_routes(['rmq2_t_fixture'])
+        self.assertEqual(result,dict(topic_count=1,nameserver_routes_ready=True,read_only=True))
+        self.assertEqual(len(calls),3)
+        self.assertTrue(all('topicRoute' in cmd for cmd in calls[1:]))
+        for topics in ([],['foreign/topic'],['same','same']):
+            with self.assertRaises(RuntimeError):f.wait_topic_routes(topics)
+
+    def test_missing_persisted_route_is_not_reprovisioned(self):
+        from unittest.mock import patch
+        f,row,_=self.fixture();f.kill();f.start();calls=[]
+        def read(argv,**kwargs):
+            calls.append(argv)
+            return SimpleNamespace(stdout=json.dumps([row]))
+        f.command=read
+        with patch('broker_fault_control.time.monotonic',side_effect=[0,2]):
+            with self.assertRaisesRegex(RuntimeError,'persisted topic routes'):
+                f.wait_topic_routes(['rmq2_t_missing'],timeout=1)
+        self.assertEqual(len(calls),1) # inspect only; no updateTopic/re-provision.
+
 if __name__=='__main__':unittest.main()

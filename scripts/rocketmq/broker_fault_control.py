@@ -70,3 +70,35 @@ class OwnedBrokerFault:
             raise RuntimeError('restarted Broker effective transaction parameters changed')
         return dict(same_container=True, pid_changed=True, healthy=True,
                     effective_parameters=actual)
+
+    def wait_topic_routes(self, topics, *, timeout=90):
+        """Read persisted routes from NameServer; never recreate missing topics."""
+        if (not self._killed or not 0 < timeout <= 90
+                or not topics or len(topics)>16 or len(set(topics))!=len(topics)
+                or any(not isinstance(t,str) or not re.fullmatch('[A-Za-z0-9_-]{1,255}',t) for t in topics)):
+            raise RuntimeError('exact bounded owned topic routes required')
+        state=self.inspect()["State"]
+        if state.get("Running") is not True or state.get("Pid")==self._pid:
+            raise RuntimeError("restarted owned Broker required for route readback")
+        remaining=set(topics)
+        deadline=time.monotonic()+timeout
+        while remaining and time.monotonic()<deadline:
+            for topic in tuple(remaining):
+                budget=deadline-time.monotonic()
+                if budget<=0:break
+                result=self.command(['docker','exec',self.broker,'java','-Xms32m','-Xmx128m',
+                    '-XX:MaxDirectMemorySize=32m','-cp','/opt/rocketmq/conf:/opt/rocketmq/lib/*',
+                    'org.apache.rocketmq.tools.command.MQAdminStartup','topicRoute',
+                    '-n','nameserver:9876','-t',topic],required=False,timeout=min(20,budget))
+                try:
+                    payload=result.stdout[result.stdout.index('{'):]
+                    payload=re.sub(r'(?m)^(\s*)([0-9]+):',r'\1"\2":',payload)
+                    route=json.loads(payload)
+                    if result.returncode==0 and route.get('brokerDatas') and route.get('queueDatas'):
+                        remaining.remove(topic)
+                except (ValueError,TypeError,AttributeError):
+                    pass
+            if remaining:time.sleep(min(2,max(0,deadline-time.monotonic())))
+        if remaining:
+            raise RuntimeError('persisted topic routes not registered after Broker restart')
+        return dict(topic_count=len(topics),nameserver_routes_ready=True,read_only=True)
