@@ -9,6 +9,8 @@ import java.util.HexFormat;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.rocketmq.acl.common.AclUtils;
+import org.apache.rocketmq.client.exception.MQBrokerException;
+import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageConst;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
@@ -104,7 +106,11 @@ public final class NativeHalfRecheck {
             InetAddress current = InetAddress.getByName(config.getProperty("brokerIP1"));
             String id = physicalId(current.getAddress(), Integer.parseInt(config.getProperty("listenPort", "10911")), offset);
             stage = "physical_record";
-            MessageExt message = admin.viewMessage(topic, id);
+            // 5.5.1 validates VIEW_MESSAGE_BY_ID against REAL_TOPIC for half /
+            // check-max storage. Read the exact local offset directly, without
+            // DefaultMQAdminExt's catch-all fallback to a UNIQ_KEY search.
+            MessageExt message = admin.getDefaultMQAdminExtImpl().getMqClientInstance()
+                .getMQClientAPIImpl().viewMessage("127.0.0.1:10911", realTopic, offset, 8_000);
             checks.put("physical_message_present", message != null);
             require(message != null);
             checks.put("source_topic", topic.equals(message.getTopic()));
@@ -134,7 +140,7 @@ public final class NativeHalfRecheck {
             if (mode.equals("resume")) {
                 stage = "native_recheck";
                 attempted = true;
-                enqueued = admin.resumeCheckHalfMessage(topic, id);
+                enqueued = admin.resumeCheckHalfMessage(realTopic, id);
                 require(enqueued);
             }
             result = new JSONObject();
@@ -155,6 +161,8 @@ public final class NativeHalfRecheck {
             result.put("status", "unavailable");
             result.put("stage", stage);
             result.put("failure_kind", failure.getClass().getSimpleName());
+            if (failure instanceof MQBrokerException) result.put("response_code", ((MQBrokerException) failure).getResponseCode());
+            if (failure instanceof MQClientException) result.put("response_code", ((MQClientException) failure).getResponseCode());
             result.put("checks", checks);
             result.put("body_exported", false);
             exitCode = 1;
