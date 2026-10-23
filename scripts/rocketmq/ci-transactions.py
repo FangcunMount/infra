@@ -205,6 +205,7 @@ def main():
     parser.add_argument("--iam-operation-results", action="store_true", help="also require schema44 business-result atomicity from the actual IAM owner")
     parser.add_argument("--iam-private-log", type=Path, help="explicit owned0700 directory / new0600 local IAM log; never upload as CI artifact")
     parser.add_argument("--go-probe", type=Path)
+    parser.add_argument("--sdk-recovery-audit", action="store_true", help="require exact post-RPC persistent recovery audit on candidate SDK")
     parser.add_argument("--sdk-api-python", action="store_true", help="also require public Python/MySQL and cross-language recovery")
     parser.add_argument("--sdk-api-go", action="store_true", help="required public Go SDK acceptance; separate from raw M2-0")
     parser.add_argument("--python", default="uv")
@@ -229,6 +230,12 @@ def main():
     parser.add_argument("--paired-host-faults", action="store_true", help="explicit paired MQ/process/Broker physical fault profile")
     parser.add_argument("--sdk-python-live-recovery", action="store_true", help="source-candidate Python producer survives actual owned Broker SIGKILL")
     args = parser.parse_args()
+    if args.sdk_recovery_audit:
+        from sdk_recovery_audit import validate_options
+        try:
+            validate_options(vars(args))
+        except ValueError as error:
+            parser.error(str(error))
     if args.sdk_python_live_recovery and (not args.sdk_api_go or not args.sdk_api_python
             or any((args.iam_host,args.m3_resources,args.iam_fanout_qs,args.qs_answer_host,
                 args.qs_evaluation_host,args.qs_report_host,args.qs_task_host,args.qs_retry_store_host,
@@ -828,8 +835,11 @@ def main():
                 from sdk_limits import run_limits
                 proof["finite_sdk_limit"] = run_limits(start,passed,sql,admin,broker_parameters,
                                                        broker,project,directory,python=args.sdk_api_python)
+            if args.sdk_recovery_audit:
+                from sdk_recovery_audit import run as run_recovery_audit
+                proof['recovery_rpc_audit'] = run_recovery_audit(start,passed,sql,mongo_command)
             required_cases = (31 if args.sdk_api_python else 19) + ((15 if args.sdk_api_python else 9) if args.sdk_faults else 0) + ((2 if args.sdk_api_python else 1) if args.sdk_limits else 0)
-            if len(cases) != required_cases:
+            if len(cases) != required_cases + (10 if args.sdk_recovery_audit else 0):
                 raise RuntimeError("required public SDK case count differs")
             return
         run([args.python, "sync", "--locked", "--project", str(sources)], timeout=180)
@@ -1182,6 +1192,10 @@ def main():
                                     'Event observer ACK only; no paired QS business or real provider',
                                     'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
                 report['ai_state_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_state_acceptance.py').read_bytes()).hexdigest()
+        if args.sdk_recovery_audit:
+            report['batch'] = 'M3-T24-source-SDK-positive-recovery-audit'
+            report['limits'].append('Candidate source SDK only, not a published artifact or host/production acceptance')
+            report['recovery_audit_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/sdk_recovery_audit.py').read_bytes()).hexdigest()
         if args.sdk_python_live_recovery:
             report['batch'] = 'M3-T23-source-SDK-Python-surviving-producer-Broker-SIGKILL'
             report['limits'] = ['Exact source SDK regression, not a published SDK or host/business/system/production acceptance',
