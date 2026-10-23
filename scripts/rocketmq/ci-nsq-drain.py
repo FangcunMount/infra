@@ -156,13 +156,21 @@ def main():
             passed("publication_consumed_between_samples_still_blocks")
         stage = "original_container_restart"
         inspect();command("docker","restart",container)
+        previous_ports = (http_port,tcp_port)
+        state = inspect()
+        http_port,tcp_port = port(4151),port(4150)
+        report["restart_published_binding_changed"] = previous_ports != (http_port,tcp_port)
+        stage = "restart_readiness"
         eventually(lambda:stats().get("health")=="OK")
+        stage = "restart_capture"
         blocked("process_restarted");passed("same_container_restart_invalidates_frozen_process")
         image_state=json.loads(command("docker","image","inspect",state["Image"]))[0]
         report.update(image_id=state["Image"],repo_digests=image_state["RepoDigests"],actual_version=stats()["version"],source_sha=command("git","rev-parse","HEAD"),source_clean=not bool(command("git","status","--porcelain")),read_only_production_tool=True)
     except Exception as error:
         report["failure_stage"]=stage
         report["error_type"]=type(error).__name__
+        if type(error) is RuntimeError and str(error) in {"owned_fixture_condition_timeout", "expected_original_responsibility_not_blocked", "owned_socket_closed", "owned_frame_limit", "owned_protocol_error", "owned_message_missing", "unseen_new_publisher_activity_not_detected"}:
+            report["diagnostic_reason"]=str(error)
         if isinstance(error,CommandFailure):
             report["command_exit_code"]=error.code
             report["command_error_kind"]=error.kind
