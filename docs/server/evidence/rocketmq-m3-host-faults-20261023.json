@@ -1948,6 +1948,103 @@
           "private_fixture_directory_removed": true
         },
         "finding": "Single supervisor Start succeeded; new paused AI owner read both original committed references with zero new halves/executions, but original live Go consumer did not complete receipt/state/ACK within60s. Go driver periodic settings resync is5minutes; this is a plausible contributing factor, not independently proven sole cause. Next gate explicitly restarts both affected host instances on the same databases/bindings/epoch, preserves first wires, no business replay. Unattended live-Go recovery is not claimed."
+      },
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39905702688",
+        "candidates": {
+          "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+          "ai-paired-faults": "bb4376087a03e6d1c49193988dfe56208a65275c",
+          "infra-host-faults": "1b2b84d2f887e46ff70f74cdc51e8176b777d784"
+        },
+        "counts": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "report_sha256": "4f120fe8bdfbc95def1abe6f4e46f19f112738ad480c73a2befe672d150b05ff",
+        "proxy_routes_ready": [
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "d8547f57cdbd8d38e7211ebb1eb34c23c2801763756327baa7f01fc3ebbdf9c6",
+            "read_only": true
+          },
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "b42197cee876775438bf66ae3ac8c56844e1c005963dbd2f89340e366a708186",
+            "read_only": true
+          },
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "53be1810d69680ced19d42ac387ae81a0d5020ca08e593742cb2ad54606f3207",
+            "read_only": true
+          }
+        ],
+        "partial_fault_receipt": {
+          "cases": {
+            "half_ack_before_actual_mq_disconnect": true,
+            "old_local_committed_final_unknown": true,
+            "producer_sigkill_exit_negative9": true,
+            "same_primary_epoch_readonly_resume_no_new_half": true,
+            "new_paused_broker_commit_callback": true,
+            "same_first_command_wire_after_resume": true,
+            "recovered_pair_receipt_state_ack_without_model": true,
+            "ai_half_prepared_before_broker_kill": true,
+            "actual_final_rpc_unknown_after_committed_root": true,
+            "broker_sigkill_and_same_container_restart": true,
+            "recovered_process_resources_drained": true
+          },
+          "passed": 11,
+          "failed": 1,
+          "skipped": 0,
+          "counters": {
+            "qs_sigkill": {
+              "half_prepared_before_loss": 1,
+              "old_exit_code": -9,
+              "old_seals": 1,
+              "recovered_completed_results": 0,
+              "recovered_half_prepared": 0,
+              "recovered_broker_commit_checks": 1,
+              "final_recovered_seals": 2,
+              "provider_invocations": 0
+            },
+            "broker_restart": {
+              "half_prepared_before_kill": 2,
+              "local_calls_before_kill": 0
+            }
+          },
+          "partial": true,
+          "complete_acceptance_claimed": false
+        },
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_paired_fault_recovery[broker_restart]"
+          ],
+          "assertion_lines": [
+            124,
+            182,
+            188,
+            196,
+            203,
+            346,
+            393,
+            412,
+            567,
+            627
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "finding": "Go SIGKILL recovery passed. In Broker restart case, fresh Go process failed readiness before AI owner recovery. Deterministic fixture defect: ordinary graceful close drops its owned temporary schema, so the replacement cannot verify original binding. Added explicit fixture-only cleanup ownership handoff: retain schema at graceful shutdown, new process validates exact original binding and adopts final cleanup. No production or domain change. Native rerun required."
       }
     ],
     "published_a3_current_host_candidate": {
@@ -1957,7 +2054,7 @@
         "infra-host-faults": "1b2b84d2f887e46ff70f74cdc51e8176b777d784"
       },
       "run_url": "https://github.com/FangcunMount/infra/actions/runs/39905702688",
-      "status": "running; development core2 only, not full6-profile acceptance",
+      "status": "failed; retained in published_a3_host_development_runs; explicit fixture schema cleanup handoff fix awaits native rerun",
       "scope": "coordinated fresh QS process and AI DI runtime; old AI drained while Broker down; same DB/owner/epoch/first wire; no command replay, new halves or model calls. Affected-process restart must enter T25 runbook."
     },
     "local_a3_validation": {
