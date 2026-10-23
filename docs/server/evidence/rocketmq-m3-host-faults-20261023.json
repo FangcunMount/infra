@@ -531,7 +531,7 @@
     "production_environment_override_count": 0
   },
   "paired_faults": {
-    "status": "sdk_python_live_telemetry_recovery_fix_in_progress",
+    "status": "published_a3_host_recovery_validation_in_progress",
     "native_pass_claimed": false,
     "scenarios": [
       "actual MQ disconnect/producer SIGKILL/new paused same-owner Checker",
@@ -713,8 +713,8 @@
       "upstream": "rocketmq-python-client5.1.2",
       "strategy": "instance-only settings re-registration on heartbeat OK or40015: recover ended streams and sync active unregistered streams; one actual settings write per endpoint, retain capacity until real Future/callback completion and close drains it",
       "local_unit_tests": 106,
-      "native_patch_pass_claimed": false,
-      "release_claimed": false,
+      "native_patch_pass_claimed": true,
+      "release_claimed": true,
       "source_sha": "18b8d0e92c08f01d63e54f0173125c77f3f4a014",
       "pr": "https://github.com/FangcunMount/reliable-messaging/pull/51",
       "probe_baseline": {
@@ -1212,15 +1212,282 @@
             }
           ],
           "finding": "Both profiles completed three exact Commit callbacks on unchanged producer; subsequent fresh Go observer startup failed TOPIC_NOT_FOUND. Existing ci-smoke already waits for persisted NameServer routes after listening Broker; add that read-only fixture readiness, never recreate topics. Full drain/consumption gate not yet passed."
+        },
+        {
+          "run_url": "https://github.com/FangcunMount/infra/actions/runs/39898433212",
+          "candidates": {
+            "sdk": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
+            "infra": "a978aeb1c4557ffd4a206bd81f28e914abfebc54",
+            "profile": "a3 same candidate; read-only persisted NameServer route readiness before fresh consumer"
+          },
+          "profiles": [
+            {
+              "report_sha256": "f46850b70963bb61f634e4834a8d2083e764583fd50117067479ebda2bd5def8",
+              "counts": {
+                "passed": 4,
+                "failed": 1,
+                "skipped": 0
+              },
+              "failure": "RuntimeError: probe ended before ready",
+              "mysql": "8.0.36",
+              "python": "3.11.16",
+              "exact_real_commit_checks": 3,
+              "consumer_failure_code": "rocketmq_40402_TOPIC_NOT_FOUND",
+              "live": {
+                "launcher_pid": 21186,
+                "producer_pid": 21191,
+                "client_identity_sha256": "8071a488c06191360172faeeb3961710dcad20167e6a9b03f6bec9751850e771",
+                "half_prepared_before_kill": 3,
+                "business_before_kill": 0,
+                "broker_kill": {
+                  "signal": "SIGKILL",
+                  "exit_code": 137,
+                  "automatic_restart_disabled": true,
+                  "immutable_container_verified": true,
+                  "oom_killed": false
+                },
+                "local_calls": 1,
+                "business_after_commit": 1,
+                "final_unknown": 3,
+                "before_restart_snapshot": {
+                  "sdk": {
+                    "active_sends": 0,
+                    "callback_errors": 0,
+                    "check_commit": 0,
+                    "check_rollback": 0,
+                    "check_unknown": 0,
+                    "completed_results": 1,
+                    "database_errors": 0,
+                    "final_unknown_results": 3,
+                    "half_prepared_results": 3,
+                    "invalid_checks": 0,
+                    "local_committed_results": 1,
+                    "pending_calls": 0,
+                    "pending_checks": 0,
+                    "ready": false,
+                    "running_checks": 0,
+                    "stopped": false,
+                    "stopping": true
+                  },
+                  "telemetry": {
+                    "channels": 1,
+                    "client_running": true,
+                    "closed_streams": 0,
+                    "heartbeat_errors": 1,
+                    "heartbeat_missing": 0,
+                    "heartbeat_ok": 0,
+                    "heartbeat_thread_alive": true,
+                    "last_heartbeat_code": 0,
+                    "open_streams": 1,
+                    "pending_settings": 0,
+                    "route_endpoints": 1,
+                    "settings_closing": false,
+                    "settings_failures": 1,
+                    "settings_skipped": 0,
+                    "settings_writes": 2
+                  }
+                },
+                "broker_restart": {
+                  "same_container": true,
+                  "pid_changed": true,
+                  "healthy": true,
+                  "effective_parameters": {
+                    "transactionTimeOut": 6000,
+                    "transactionCheckInterval": 5000,
+                    "transactionCheckMax": 24,
+                    "fileReservedTime": 48
+                  }
+                },
+                "after_recheck_snapshot": {
+                  "sdk": {
+                    "active_sends": 0,
+                    "callback_errors": 0,
+                    "check_commit": 3,
+                    "check_rollback": 0,
+                    "check_unknown": 0,
+                    "completed_results": 1,
+                    "database_errors": 0,
+                    "final_unknown_results": 3,
+                    "half_prepared_results": 3,
+                    "invalid_checks": 0,
+                    "local_committed_results": 1,
+                    "pending_calls": 0,
+                    "pending_checks": 0,
+                    "ready": false,
+                    "running_checks": 0,
+                    "stopped": false,
+                    "stopping": true
+                  },
+                  "telemetry": {
+                    "channels": 1,
+                    "client_running": true,
+                    "closed_streams": 0,
+                    "heartbeat_errors": 1,
+                    "heartbeat_missing": 1,
+                    "heartbeat_ok": 0,
+                    "heartbeat_thread_alive": true,
+                    "last_heartbeat_code": 40015,
+                    "open_streams": 1,
+                    "pending_settings": 0,
+                    "route_endpoints": 1,
+                    "settings_closing": false,
+                    "settings_failures": 1,
+                    "settings_skipped": 0,
+                    "settings_writes": 3
+                  }
+                },
+                "topic_routes_ready": {
+                  "topic_count": 1,
+                  "nameserver_routes_ready": true,
+                  "read_only": true
+                }
+              },
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            },
+            {
+              "report_sha256": "5b508d64cdd838422a29aad2c21a25e2337edd1b1c4bfea529e8fe9b2c23785f",
+              "counts": {
+                "passed": 4,
+                "failed": 1,
+                "skipped": 0
+              },
+              "failure": "RuntimeError: probe ended before ready",
+              "mysql": "8.4.13",
+              "python": "3.13.15",
+              "exact_real_commit_checks": 3,
+              "consumer_failure_code": "rocketmq_40402_TOPIC_NOT_FOUND",
+              "live": {
+                "launcher_pid": 21320,
+                "producer_pid": 21325,
+                "client_identity_sha256": "ce7547090d534dea1d7fbfbf67bc280df469d9b5e5e5ec2d6a0da6b6fc86e049",
+                "half_prepared_before_kill": 3,
+                "business_before_kill": 0,
+                "broker_kill": {
+                  "signal": "SIGKILL",
+                  "exit_code": 137,
+                  "automatic_restart_disabled": true,
+                  "immutable_container_verified": true,
+                  "oom_killed": false
+                },
+                "local_calls": 1,
+                "business_after_commit": 1,
+                "final_unknown": 3,
+                "before_restart_snapshot": {
+                  "sdk": {
+                    "active_sends": 0,
+                    "callback_errors": 0,
+                    "check_commit": 0,
+                    "check_rollback": 0,
+                    "check_unknown": 0,
+                    "completed_results": 1,
+                    "database_errors": 0,
+                    "final_unknown_results": 3,
+                    "half_prepared_results": 3,
+                    "invalid_checks": 0,
+                    "local_committed_results": 1,
+                    "pending_calls": 0,
+                    "pending_checks": 0,
+                    "ready": false,
+                    "running_checks": 0,
+                    "stopped": false,
+                    "stopping": true
+                  },
+                  "telemetry": {
+                    "channels": 1,
+                    "client_running": true,
+                    "closed_streams": 0,
+                    "heartbeat_errors": 1,
+                    "heartbeat_missing": 0,
+                    "heartbeat_ok": 0,
+                    "heartbeat_thread_alive": true,
+                    "last_heartbeat_code": 0,
+                    "open_streams": 1,
+                    "pending_settings": 0,
+                    "route_endpoints": 1,
+                    "settings_closing": false,
+                    "settings_failures": 1,
+                    "settings_skipped": 0,
+                    "settings_writes": 2
+                  }
+                },
+                "broker_restart": {
+                  "same_container": true,
+                  "pid_changed": true,
+                  "healthy": true,
+                  "effective_parameters": {
+                    "transactionTimeOut": 6000,
+                    "transactionCheckInterval": 5000,
+                    "transactionCheckMax": 24,
+                    "fileReservedTime": 48
+                  }
+                },
+                "after_recheck_snapshot": {
+                  "sdk": {
+                    "active_sends": 0,
+                    "callback_errors": 0,
+                    "check_commit": 3,
+                    "check_rollback": 0,
+                    "check_unknown": 0,
+                    "completed_results": 1,
+                    "database_errors": 0,
+                    "final_unknown_results": 3,
+                    "half_prepared_results": 3,
+                    "invalid_checks": 0,
+                    "local_committed_results": 1,
+                    "pending_calls": 0,
+                    "pending_checks": 3,
+                    "ready": false,
+                    "running_checks": 3,
+                    "stopped": false,
+                    "stopping": true
+                  },
+                  "telemetry": {
+                    "channels": 1,
+                    "client_running": true,
+                    "closed_streams": 0,
+                    "heartbeat_errors": 1,
+                    "heartbeat_missing": 1,
+                    "heartbeat_ok": 0,
+                    "heartbeat_thread_alive": true,
+                    "last_heartbeat_code": 40015,
+                    "open_streams": 1,
+                    "pending_settings": 0,
+                    "route_endpoints": 1,
+                    "settings_closing": false,
+                    "settings_failures": 1,
+                    "settings_skipped": 0,
+                    "settings_writes": 3
+                  }
+                },
+                "topic_routes_ready": {
+                  "topic_count": 1,
+                  "nameserver_routes_ready": true,
+                  "read_only": true
+                }
+              },
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            }
+          ],
+          "finding": "Both exact Reference callbacks and read-only NameServer route readiness succeeded, but new Go observer still returned40402; route wait alone did not fix it. Next diagnostic compares live Broker metadata and authenticated Proxy QueryRoute before/after actual crash. No pass/release claim."
         }
       ],
       "current_source_candidate": {
         "sdk": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
-        "infra": "a978aeb1c4557ffd4a206bd81f28e914abfebc54",
-        "profile": "a3 same candidate; read-only persisted NameServer route readiness before fresh consumer"
+        "infra": "f6dc96a42a0e77fd95ae52d5533482415f83f1f5",
+        "profile": "same a3 source; exact authenticated observer QueryRoute and live Broker metadata diagnostics"
       },
-      "current_native_run": "https://github.com/FangcunMount/infra/actions/runs/39898433212",
-      "current_native_status": "running; no pass claim",
+      "current_native_run": "https://github.com/FangcunMount/infra/actions/runs/39899882809",
+      "current_native_status": "source SDK complete2profiles x5; actual host on published a3 still separate",
       "diagnostics": "Fixed numeric/boolean whitelist only; before restart, after failed real checks, and after actual close; no body/wire/credentials",
       "source_and_wheel_audit": {
         "source_sha": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
@@ -1273,7 +1540,360 @@
         ],
         "release_claimed": false
       },
-      "source_and_wheel_audit_sha256": "ae1fcebb38fe3d0dceebf931c58e3505a0bda08ff87b8fb24c596297568a1ef9"
+      "source_and_wheel_audit_sha256": "ae1fcebb38fe3d0dceebf931c58e3505a0bda08ff87b8fb24c596297568a1ef9",
+      "native_recovery_audit": {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39899882809",
+        "candidates": {
+          "sdk": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
+          "infra": "f6dc96a42a0e77fd95ae52d5533482415f83f1f5",
+          "profile": "same a3 source; exact authenticated observer QueryRoute and live Broker metadata diagnostics"
+        },
+        "profiles": [
+          {
+            "mysql": "8.0.36",
+            "python": "3.11.16",
+            "sdk_version": "0.4.0a3",
+            "go": "go1.25.9",
+            "passed": 5,
+            "failed": 0,
+            "skipped": 0,
+            "original_local_calls": 1,
+            "half_prepared": 3,
+            "final_unknown": 3,
+            "surviving_producer_commit_checks": 6,
+            "consumed": 3,
+            "source_tool_and_cleanup_verified": true,
+            "report_sha256": "c7a6fe913f3aef7d6675e12a82a403b926964df05deace9bcecef471344885f8"
+          },
+          {
+            "mysql": "8.4.13",
+            "python": "3.13.15",
+            "sdk_version": "0.4.0a3",
+            "go": "go1.25.12",
+            "passed": 5,
+            "failed": 0,
+            "skipped": 0,
+            "original_local_calls": 1,
+            "half_prepared": 3,
+            "final_unknown": 3,
+            "surviving_producer_commit_checks": 3,
+            "consumed": 3,
+            "source_tool_and_cleanup_verified": true,
+            "report_sha256": "e02e80ccb2dcc05f25010e54a9a3a9c658a3d3da6d833c0743a0e9bec5f54912"
+          }
+        ],
+        "scope": "source SDK real Broker survivor recovery only; published SDK and host acceptance separate"
+      },
+      "native_recovery_audit_sha256": "bfa2d9822d020dcc3fe3bd5361221f4a6afd46196833ce75e1e67a1c57a9f7ac",
+      "published_prerelease": {
+        "release_id": 421453556,
+        "release_url": "https://github.com/FangcunMount/reliable-messaging/releases/tag/python/v0.4.0a3",
+        "published_at": "2026-10-23T04:34:13Z",
+        "tag": "python/v0.4.0a3",
+        "source": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
+        "assets": {
+          "fangcun_reliable_messaging-0.4.0a3-py3-none-any.whl": "sha256:7a0a35438ed6890cff37aea3305e1ee1fcec4b9bcac0667959fbc2cda62c636e",
+          "fangcun_reliable_messaging-0.4.0a3.tar.gz": "sha256:096a5f548ca871407f793cc1fbc3158ce649771bb17362375203acc47dfe7d20",
+          "native-recovery-audit.json": "sha256:bfa2d9822d020dcc3fe3bd5361221f4a6afd46196833ce75e1e67a1c57a9f7ac",
+          "python-live-recovery-3.11.json": "sha256:c7a6fe913f3aef7d6675e12a82a403b926964df05deace9bcecef471344885f8",
+          "python-live-recovery-3.13.json": "sha256:e02e80ccb2dcc05f25010e54a9a3a9c658a3d3da6d833c0743a0e9bec5f54912",
+          "python-telemetry-release-receipt.json": "sha256:69b74c208b310d2534e1ed75f01ec2931b7e8d0ccdf604a08fe35a8846addd93",
+          "SHA256SUMS": "sha256:3c846684f31b1455bdc149f6c06d91d50f3867340a80a49db6258239cab70940",
+          "source-and-wheel-audit.json": "sha256:ae1fcebb38fe3d0dceebf931c58e3505a0bda08ff87b8fb24c596297568a1ef9",
+          "uv.lock": "sha256:bd65b5c2193182aa27a3a6db8b0d6a960eac287ce0d139dbaf35ecc92f5f73c8"
+        },
+        "all_server_digests_and_redownloaded_bytes_verified": true,
+        "installation": [
+          {
+            "format": "wheel",
+            "python": "3.11.3",
+            "sdk": "0.4.0a3",
+            "client": "5.1.2",
+            "isolated_site_packages": true,
+            "driver_sha256": "26e3c783521c6dde407adee4dd7b244e5a54b0a0d40787852d9d92818eaaab6d"
+          },
+          {
+            "format": "sdist",
+            "python": "3.11.3",
+            "sdk": "0.4.0a3",
+            "client": "5.1.2",
+            "isolated_site_packages": true,
+            "driver_sha256": "26e3c783521c6dde407adee4dd7b244e5a54b0a0d40787852d9d92818eaaab6d"
+          }
+        ]
+      },
+      "published_prerelease_proof_sha256": "e698b8f0f51810fe052a2e06c80708b160aabe4b21f72ffca6256042a06c1edd",
+      "source_merges": {
+        "51": {
+          "source": "18b8d0e92c08f01d63e54f0173125c77f3f4a014",
+          "merge": "bac04c4f4ced239a2a833dc2c468da223d2d26ce"
+        },
+        "52": {
+          "source": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
+          "merge": "c7b5a1eca6ee2d9a68500a7e2298dd9cb63d9dd3"
+        }
+      },
+      "remote_tag": "Annotated tag peeled remotely to2258ad70275ae974e71fb3ffeaa5ed7def4c2893; no overwrite",
+      "release_index_pr": "https://github.com/FangcunMount/reliable-messaging/pull/53",
+      "release_index_merge": "1b7b6c97ee432e3bcd6b768d83b9d015c6bd5a3d"
+    },
+    "fresh_host_development_runs": [
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39899057580",
+        "candidates": {
+          "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+          "ai-paired-faults": "ab44988c2fbcc6dbe9d5a385a0811f5b74d1f9f0",
+          "infra-host-faults": "4cb402ed11780028b7679eebb55914ec34c48d8a"
+        },
+        "counts": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "report_sha256": "c87427735afc2913f5fcfe90153e53f09c63c3ed8a17a31d8921bcf5a26d1088",
+        "finding": "Fixture attempted direct mutation of frozen MessagingOptions at initial startup; no business/fault case ran. Corrected to nested model_copy and locally proved original Settings remains unchanged. Failed report retained.",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39899886480",
+        "candidates": {
+          "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+          "ai-paired-faults": "e7c121356448eaec16b6326516327f00de49fd3d",
+          "infra-host-faults": "f6dc96a42a0e77fd95ae52d5533482415f83f1f5"
+        },
+        "counts": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "report_sha256": "287c32275e9f452eed19ca634509ca04387e6d22de1f10858cbcce91e8d647c8",
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_paired_fault_recovery[broker_restart]"
+          ],
+          "assertion_lines": [
+            325,
+            345,
+            360,
+            472,
+            489,
+            512,
+            578
+          ]
+        },
+        "partial_fault_receipt": {
+          "cases": {
+            "half_ack_before_actual_mq_disconnect": true,
+            "old_local_committed_final_unknown": true,
+            "producer_sigkill_exit_negative9": true,
+            "same_primary_epoch_readonly_resume_no_new_half": true,
+            "new_paused_broker_commit_callback": true,
+            "same_first_command_wire_after_resume": true,
+            "recovered_pair_receipt_state_ack_without_model": true,
+            "ai_half_prepared_before_broker_kill": true,
+            "actual_final_rpc_unknown_after_committed_root": true,
+            "broker_sigkill_and_same_container_restart": true,
+            "recovered_process_resources_drained": true
+          },
+          "passed": 11,
+          "failed": 1,
+          "skipped": 0,
+          "counters": {
+            "qs_sigkill": {
+              "half_prepared_before_loss": 1,
+              "old_exit_code": -9,
+              "old_seals": 1,
+              "recovered_completed_results": 0,
+              "recovered_half_prepared": 0,
+              "recovered_broker_commit_checks": 1,
+              "final_recovered_seals": 2,
+              "provider_invocations": 0
+            },
+            "broker_restart": {
+              "half_prepared_before_kill": 2,
+              "local_calls_before_kill": 0
+            }
+          },
+          "partial": true,
+          "complete_acceptance_claimed": false
+        },
+        "topic_routes_ready": {
+          "topic_count": 3,
+          "nameserver_routes_ready": true,
+          "read_only": true
+        },
+        "finding": "Go SIGKILL path completed; AI original host drained and new recovery owner reached subsequent mandatory component startup, where supervision failed. No complete host acceptance claim. Add actual authenticated Proxy readiness for all3routes before restarting full default consumers; SDK new artifact acceptance follows separately.",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "current_fresh_host_development": {
+      "candidates": {
+        "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+        "ai-paired-faults": "e7c121356448eaec16b6326516327f00de49fd3d",
+        "infra-host-faults": "f6dc96a42a0e77fd95ae52d5533482415f83f1f5"
+      },
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39899886480",
+      "scope": "development on existing published a2; not final a3 acceptance",
+      "status": "failed; preserved in development history"
+    },
+    "published_a3_host_development_runs": [
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39901898242",
+        "candidates": {
+          "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+          "ai-paired-faults": "39e103d94de692fe1fc2492f7b777516c73a9312",
+          "infra-host-faults": "b106ead319d004b205d3c7931d4fe6b392d65431"
+        },
+        "counts": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "report_sha256": "77701be6b3a55c438053dbec33c79ba7bc4c38894c989cecd797c6e736de2fe5",
+        "proxy_routes_ready": [
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "d8547f57cdbd8d38e7211ebb1eb34c23c2801763756327baa7f01fc3ebbdf9c6",
+            "read_only": true
+          },
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "b42197cee876775438bf66ae3ac8c56844e1c005963dbd2f89340e366a708186",
+            "read_only": true
+          },
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "53be1810d69680ced19d42ac387ae81a0d5020ca08e593742cb2ad54606f3207",
+            "read_only": true
+          }
+        ],
+        "partial_fault_receipt": {
+          "cases": {
+            "half_ack_before_actual_mq_disconnect": true,
+            "old_local_committed_final_unknown": true,
+            "producer_sigkill_exit_negative9": true,
+            "same_primary_epoch_readonly_resume_no_new_half": true,
+            "new_paused_broker_commit_callback": true,
+            "same_first_command_wire_after_resume": true,
+            "recovered_pair_receipt_state_ack_without_model": true,
+            "ai_half_prepared_before_broker_kill": true,
+            "actual_final_rpc_unknown_after_committed_root": true,
+            "broker_sigkill_and_same_container_restart": true,
+            "recovered_process_resources_drained": true
+          },
+          "passed": 11,
+          "failed": 1,
+          "skipped": 0,
+          "counters": {
+            "qs_sigkill": {
+              "half_prepared_before_loss": 1,
+              "old_exit_code": -9,
+              "old_seals": 1,
+              "recovered_completed_results": 0,
+              "recovered_half_prepared": 0,
+              "recovered_broker_commit_checks": 1,
+              "final_recovered_seals": 2,
+              "provider_invocations": 0
+            },
+            "broker_restart": {
+              "recovered_completed_results": 0,
+              "recovered_half_prepared": 0,
+              "local_calls": 1,
+              "half_prepared": 2,
+              "actual_final_unknown": 2,
+              "pending_calls": 0,
+              "half_prepared_before_kill": 2,
+              "local_calls_before_kill": 0,
+              "recovered_committed_references": 2
+            }
+          },
+          "partial": true,
+          "complete_acceptance_claimed": false
+        },
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_paired_fault_recovery[broker_restart]"
+          ],
+          "assertion_lines": [
+            326,
+            355,
+            370,
+            487,
+            506,
+            529,
+            595
+          ]
+        },
+        "finding": "Actual three authenticated Proxy routes ready; new paused owner proved exact committed references2, new half0/execution0. Fixture then manually called Start before ordinary supervisor called it again; fixed to let original supervisor Start once, gating only subscribers during observation. SDK single-Start contract and production lifecycle untouched. Scope remains incomplete until full native loop passes.",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "published_a3_current_host_candidate": {
+      "candidates": {
+        "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+        "ai-paired-faults": "7aafd75d3482f73dd63200049f3f2468db7293af",
+        "infra-host-faults": "b106ead319d004b205d3c7931d4fe6b392d65431"
+      },
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39902972061",
+      "status": "running; development core2 only, not full6-profile acceptance",
+      "scope": "same supervisor sole Start; bounded fixture startup140 includes100s check-observation barrier; ordinary fixture startup30 unchanged"
+    },
+    "local_a3_validation": {
+      "scope": "local worktree only; no DB/MQ/Docker; current-head required GitHub CI separate",
+      "reports": [
+        {
+          "name": "initial_nonintegration",
+          "tests": 4222,
+          "passed": 4221,
+          "failed": 1,
+          "skipped": 0,
+          "sha256": "ffa59772247561723b48c67c298470a5299e2e541c394e69c448484e4346e5df"
+        },
+        {
+          "name": "signal_startup_recheck",
+          "tests": 4,
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "020379dbd3103b4de3b1d796149235431146a8a49336fb0fb5ef7b61ef1b7787"
+        },
+        {
+          "name": "docs",
+          "tests": 12,
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "b04e3134c83bf4dd4349912c3cb638d434ff413a4336200a3337b0c4bbea8616"
+        }
+      ],
+      "ruff_format": true,
+      "mypy_source_files": 447,
+      "paired_collection_only": 7,
+      "docs_markdown": 75,
+      "docs_links": 1391,
+      "docs_drift_history": "16 source-baseline drifts on6reviewed sources; reconciled only those sources, added2paired fixture source ownership; production/runtime unknown",
+      "signal_failure": "Initial5s child-port readiness timeout before signal dispatch; targeted4/4passed without changing thresholds; cause not independently proved"
     }
   }
 }
