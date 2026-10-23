@@ -1,6 +1,6 @@
 # T25：原生回查恢复与持久保护处置（验证中）
 
-本批属于[M3总表](rocketmq-m3-execution.md)的T25-C，尚未完成，不授权生产。启动屏障/目标CLI的14项隔离验证已经通过；此处继续处理原生超限与不再收到回查的确认审计缺口。先完成真实依赖可行性验证，再冻结处置文件和宿主接口。SDK仍固定tx.4/a4，业务写入、schema、Topic/ACL及worker预算均不变。
+本批属于[M3总表](rocketmq-m3-execution.md)的T25-C，尚未完成，不授权生产。启动屏障/目标CLI已扩展至17项隔离验证通过；此处继续处理原生超限与不再收到回查的确认审计缺口。先完成真实依赖可行性验证，再冻结处置文件和宿主接口。SDK仍固定tx.4/a4，业务写入、schema、Topic/ACL及worker预算均不变。
 
 ## 已核对的源码边界
 
@@ -30,10 +30,17 @@
 
 全部旧写者/自主任务冻结、保留责任清单、原链路排空及启动前维护/恢复仍须组合验证；T25-D收口源码/隔离门禁，T29再绑定最终镜像和具体生产清单，T30–T33负责实际运行核验、具名批准和system验收。
 
-可重复开发入口：`rocketmq-native-recheck.yml`固定SDK源码04757bd3、Go1.25.12、Java17、MySQL8.0.36与Broker5.5.1；`ci-native-recheck.py`只允许GitHub-hosted Linux和本地daemon，不接受外部服务。当前为可行性开发，尚未有真实通过报告；不据此勾选C3。
+可重复开发入口：`rocketmq-native-recheck.yml`固定SDK源码04757bd3、Go1.25.12、Java17、MySQL8.0.36与Broker5.5.1；`ci-native-recheck.py`只允许GitHub-hosted Linux和本地daemon，不接受外部服务。固定源码815f4656已在40020383336通过17/0/0并由PR200合并；仅勾选可行性组件C3-a，持久notice和完整故障矩阵未完成，C3不勾选。
 
 首轮开发40015398289（530f43e）为4通过/1失败/0跳过，停在编译/纯Java探针组合阶段，尚未准备SDK half；Go与Java编译摘要已经记录，但原报告没有更细启动阶段，不推断原生恢复失败。自有Compose/进程/文件与既有资源集合清理通过；Broker参数恢复正向文案判定失败单独保留。固定源码已确认UpdateBrokerConfig使用逗号而非句点；后续按其实际文案及参数回读。Java class受umask077影响的权限明确安装到自有容器UID3000，新增分阶段与固定错误分类诊断，待真实复验，不改写旧报告。
 
 第三轮40016777071（b6d7163）已通过8项：纯Java7边界、真实Prepared超限、原MySQL提交后exit23、新暂停实例无自动回查；停在精确原生记录读取，尚未调用恢复管理操作，所有参数和所属资源清理通过。源码核对发现`QueryMsgByKey`经clientDecode返回MessageClientExt，其getMsgId可能是UNIQ_KEY而不是物理offset ID；不能把审计字段名broker_message_id当作地址。后续从同一固定Broker实际配置和原索引commitlog_offset构造物理ID，并重新验证source Topic、队列位置、Reference/wire/UNIQ摘要；不放宽身份检查。增加IPv4/IPv6及非法offset/port纯向量，失败诊断只输出阶段和布尔验证项，不输出正文/原属性。
 
 第四轮40018504724（ef47725）仍8/1/0，物理读取阶段返回MQClientException，未发出恢复操作，全部实际参数和资源清理通过。进一步核对5.5.1 `QueryMessageProcessor.matchesRequestTopic`：HALF与CHECK_MAX存储的VIEW_BY_ID必须使用REAL_TOPIC做请求Topic，不能传内部存储Topic；`DefaultMQAdminExt.viewMessage`又会吞掉物理读错误改做UNIQ搜索。后续固定本机Broker直接按原offset/REAL_TOPIC读取，继续核对返回的内部Topic与所有队列/身份字段；resume使用同一REAL_TOPIC。新增仅数值response code诊断，无原始errmsg/正文/凭据，不修改ACL或绕过Topic授权。
+
+
+## 可行性通过：40020383336
+
+PR200合并1fc072b，原生报告摘要`f4e50b2a156470e3a2badbcfa7a42e2eb1676ab7f6a299434e42cec32d8022b6`。实际17/0/0；包含11个有限窗口/物理地址纯向量、真实CHECK_MAX、原事务commit后exit23、新实例封新发送、原生resume和真实Checker Commit RPC/audit。恢复指标CommitConfirmed=1、AuditRecorded=1、CheckCommit=1；新half、普通发送、本地业务回调计数均0，所有在途/排队为0且Stopped=true。原请求/执行/witness/业务事实各1，原始索引摘要不变；八项清理全部通过。原始参数6000ms/5000ms/checkMax24/fileReserved48h已回读恢复，不能把该配置乘积作为SLA。
+
+管理响应只记`RecheckEnqueued`，成功提交由新Checker读取原证据并实际调用RPC、写正向审计证明。原程序真实exit23不是SIGKILL或网络故障；这是固定SDK源码探针，不是正式制品/四宿主或system入口，也尚无持久notice处置证明。失败40015398289、40016571315、40016777071和40018504724保留；后两轮均未发出resume，不将其读取失败冒称回查失败。完整源码/CI、报告摘要及限制回链总表的结构化证据文件。
