@@ -1,0 +1,82 @@
+name: RocketMQ native recovery tool contracts
+on:
+  pull_request:
+    paths:
+      - tools/rocketmq-native-recovery/**
+      - .github/workflows/rocketmq-native-recovery-tool.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fixed-release-pure-contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: tools/rocketmq-native-recovery
+    env:
+      GOWORK: off
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: tools/rocketmq-native-recovery/go.sum
+      - name: Fixed published SDK and formatting
+        run: |
+          set -euo pipefail
+          umask 077
+          test -z "$(gofmt -l internal)"
+          go mod download
+          go list -m -json github.com/FangcunMount/reliable-messaging > sdk-module.json
+          python3 - <<'PY'
+          import json
+          value = json.load(open('sdk-module.json'))
+          assert value['Version'] == 'v0.5.0-rocketmq-tx.4'
+          assert value['Sum'] == 'h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI='
+          assert value['GoModSum'] == 'h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I='
+          assert not value.get('Replace')
+          PY
+          go mod verify
+          go vet ./...
+      - name: Pure race contracts without databases or MQ
+        run: |
+          set -euo pipefail
+          umask 077
+          go test -race -json -count=1 -timeout=2m ./... > contracts.jsonl
+      - name: Nonempty zero-skip report
+        if: always()
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 - <<'PY'
+          import hashlib, json, pathlib, subprocess
+          path = pathlib.Path('contracts.jsonl')
+          events = [json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
+          selected = {(e['Package'], e['Test']) for e in events if e['Action'] == 'run' and e.get('Test')}
+          passed = {(e['Package'], e['Test']) for e in events if e['Action'] == 'pass' and e.get('Test')}
+          failed = sum(e['Action'] == 'fail' for e in events)
+          skipped = sum(e['Action'] == 'skip' for e in events)
+          packages = [e['Package'] for e in events if e['Action'] == 'pass' and not e.get('Test')]
+          valid = bool(selected) and selected == passed and len(packages) >= 2 and failed == skipped == 0
+          report = dict(schema='m3-native-recovery-tool-contracts/v1', source_sha=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(),
+                        sdk_version='v0.5.0-rocketmq-tx.4', test_kind='pure contracts, not real RPC or storage recovery',
+                        passed=len(passed), failed=failed, skipped=skipped, packages=len(packages),
+                        report_sha256=hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None,
+                        external_dependencies_started=False, valid=valid)
+          pathlib.Path('contracts-summary.json').write_text(json.dumps(report, indent=2)+'\n')
+          assert valid, 'Missing, failed, skipped or incomplete contracts'
+          print(json.dumps(report))
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-recovery-tool-contracts-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            tools/rocketmq-native-recovery/contracts-summary.json
+            tools/rocketmq-native-recovery/contracts.jsonl
+          if-no-files-found: error
+          retention-days: 14
