@@ -4671,5 +4671,414 @@
     "governance_cas_implemented": false,
     "full_native_matrix_passed": false,
     "c3_complete": false
+  },
+  "native_recovery_component_completion": {
+    "merges": {
+      "iam_reader": {
+        "headRefOid": "da7ab7f163f0a0c23312bf3b7e61a6cd30498dfe",
+        "mergeCommit": {
+          "oid": "36456cdf2f1c980a5edeedce2eee44634097a00d"
+        },
+        "mergedAt": "2026-10-23T23:16:50Z",
+        "state": "MERGED",
+        "pr": "https://github.com/FangcunMount/iam/pull/145"
+      },
+      "qs_reader": {
+        "headRefOid": "761767feb8af3951a54bf8455af3bb2e5442bfcc",
+        "mergeCommit": {
+          "oid": "83147d8e99e00fd36c57bc2fc4feb193ebe2a844"
+        },
+        "mergedAt": "2026-10-23T23:39:57Z",
+        "state": "MERGED",
+        "pr": "https://github.com/FangcunMount/qs-server/pull/436"
+      },
+      "ai_reader": {
+        "headRefOid": "e9446a5d5d975bfd82a8201009b654fbd402ecdf",
+        "mergeCommit": {
+          "oid": "05d2db7151d492bec127270d53121396b515f763"
+        },
+        "mergedAt": "2026-10-23T23:30:08Z",
+        "state": "MERGED",
+        "pr": "https://github.com/FangcunMount/qs-ai/pull/221"
+      },
+      "tool_primitives": {
+        "headRefOid": "544e90dcc7a3c29b5a45f475cb616a5987278b7c",
+        "mergeCommit": {
+          "oid": "2c136032a4caf20e627415475744cd24dbedf7dc"
+        },
+        "mergedAt": "2026-10-23T23:14:38Z",
+        "state": "MERGED",
+        "pr": "https://github.com/FangcunMount/infra/pull/207"
+      },
+      "mysql_snapshot": {
+        "headRefOid": "453581b08014752f17411e7bb27579e5a29bfc75",
+        "mergeCommit": {
+          "oid": "8ed9f99d5d4b25d03798ff4135e5c9aa405123f6"
+        },
+        "mergedAt": "2026-10-23T23:29:13Z",
+        "state": "MERGED",
+        "pr": "https://github.com/FangcunMount/infra/pull/209"
+      },
+      "mongo_snapshot": {
+        "headRefOid": "2a947410d08793685aefdbda3c7b33bbf30b2ea0",
+        "mergeCommit": {
+          "oid": "56e407d80a992dc562a58726b698cf4c05a09c7b"
+        },
+        "mergedAt": "2026-10-23T23:40:03Z",
+        "state": "MERGED",
+        "pr": "https://github.com/FangcunMount/infra/pull/210"
+      }
+    },
+    "proofs": {
+      "iam_reader": {
+        "proof": {
+          "head": "da7ab7f163f0a0c23312bf3b7e61a6cd30498dfe",
+          "checks": 12,
+          "optional_na": "Publish reviewed primary image to unique GHCR tag",
+          "reports": [
+            {
+              "file": "m3-schema-mysql-8.0.36/m3-maintenance.log",
+              "passed": 10,
+              "failed": 0,
+              "skipped": 0,
+              "sha256": "5f22830ef265f89ac705ed9a7f4204211d631910b49c603fa9aba661bb38ee35"
+            },
+            {
+              "file": "m3-schema-mysql-8.0.36/m3-schema.log",
+              "passed": 33,
+              "failed": 0,
+              "skipped": 0,
+              "sha256": "b37aa9444f875530fb5fd6892251a16a9cbffec7cbb212cab51fde6d0daf192a"
+            },
+            {
+              "file": "m3-schema-mysql-8.0.36/m3-offline.log",
+              "passed": 15,
+              "failed": 0,
+              "skipped": 0,
+              "sha256": "9965164f3a93f9450bdc7a22f1b0cfa9f19ff9f85ca063ec0939e25efa768272"
+            },
+            {
+              "file": "m3-schema-mysql-8.4/m3-maintenance.log",
+              "passed": 10,
+              "failed": 0,
+              "skipped": 0,
+              "sha256": "5c513cc559c73b6429357a7b30d5a4472dd29178f474260dadf658fc58ca9b0b"
+            },
+            {
+              "file": "m3-schema-mysql-8.4/m3-schema.log",
+              "passed": 33,
+              "failed": 0,
+              "skipped": 0,
+              "sha256": "5589592b35efddaf3868b56fd8ac2ac568c37fb04d60b89e73fc20d646f3b40a"
+            },
+            {
+              "file": "m3-schema-mysql-8.4/m3-offline.log",
+              "passed": 15,
+              "failed": 0,
+              "skipped": 0,
+              "sha256": "13b326f2a2981160c8cec146d89b880451a73dde764108c0a29b1aece336f9b7"
+            },
+            {
+              "file": "m3-schema-mysql-8.0.44/m3-maintenance.log",
+              "passed": 10,
+              "failed": 0,
+              "skipped": 0,
+              "sha256": "eddc73c5291b5f069d899d2994cacc08372f4d008ebfd27a2097024232913618"
+            },
+            {
+              "file": "m3-schema-mysql-8.0.44/m3-schema.log",
+              "passed": 33,
+              "failed": 0,
+              "skipped": 0,
+              "sha256": "90ad68b43016f26771995452f36d45f200b4975e47c4fa43afec81dd4f7848a3"
+            },
+            {
+              "file": "m3-schema-mysql-8.0.44/m3-offline.log",
+              "passed": 15,
+              "failed": 0,
+              "skipped": 0,
+              "sha256": "756d9f743f8012ed0dfbca1341d15782d859bbf8e3b9d7e6a1be79fad7875960"
+            }
+          ],
+          "production_deploy_paused": true
+        },
+        "proof_sha256": "395e89157ddfdfb9f736f6aca29948a8c415935189c329df234ecf72f503bfd5"
+      },
+      "qs_reader": {
+        "proof": {
+          "head": "761767feb8af3951a54bf8455af3bb2e5442bfcc",
+          "run": 40039346714,
+          "job": 120706485593,
+          "log_sha256": "63b3a3a20d604a53445a6f298361faf192569bb6da9c2da1c38a723ec0908b73",
+          "go_pass_lines": 162,
+          "actual_native_cases": [
+            "--- PASS: TestM3TransactionSchemaNative/resolved-native-governance-read-and-reimport (0.03s)",
+            "--- PASS: TestM3TransactionSchemaNative/resolved-Mongo-native-governance-read-and-reimport (0.03s)"
+          ],
+          "checkout_sha_candidates": [
+            "f0aa777a5153debd8dd3ef9f9d8cb36d67f44c86"
+          ],
+          "failed": 0,
+          "skipped": 0,
+          "checks": 29,
+          "optional_na": "Docs & API Generated Sync",
+          "production_deploy_paused": true,
+          "trees": {
+            "candidate": "53e958e7f6e3248e57b2bb737ecdaea66f486048",
+            "tested_merge": "53e958e7f6e3248e57b2bb737ecdaea66f486048"
+          },
+          "initial_docs_failure": {
+            "run": 40038030089,
+            "job": 120702195574,
+            "reason": "one extra blank line in new documentation; fixed without production code change",
+            "retained": true
+          }
+        },
+        "proof_sha256": "e534bdd9bb5b28af0eb29153ba7ed48bba3499da2dde0a723243816395ce6d73"
+      },
+      "ai_reader": {
+        "proof": {
+          "head": "e9446a5d5d975bfd82a8201009b654fbd402ecdf",
+          "tested_merge": "3d23714ecb48b9fdd17b0efff55356817d1f381c",
+          "checks": 12,
+          "tests_per_mysql": 5659,
+          "xml": [
+            {
+              "file": "tests-8.4-3-attempt-1/shard-8.4-3.xml",
+              "tests": 1414,
+              "sha256": "f9ed828e45c1e69acc2528045a6556d451cae04769d6cde8890bf58eb96f092f"
+            },
+            {
+              "file": "tests-8.0.36-2-attempt-1/shard-8.0.36-2.xml",
+              "tests": 1415,
+              "sha256": "53c9b72856c3ebebe5be0774104997c4015a0fc622966732c46c6dbd3a3b93e3"
+            },
+            {
+              "file": "tests-8.4-2-attempt-1/shard-8.4-2.xml",
+              "tests": 1415,
+              "sha256": "fb82a561a59f0e70721401df3e49bfaa0b8dbcc96514ed61b233bbb70a4c3df9"
+            },
+            {
+              "file": "tests-8.0.36-3-attempt-1/shard-8.0.36-3.xml",
+              "tests": 1414,
+              "sha256": "99c784256d4eda6cfa3e5e6f0bb5c4193e95a67cef375ab75f1d6d4e92282b84"
+            },
+            {
+              "file": "tests-8.4-1-attempt-1/shard-8.4-1.xml",
+              "tests": 1415,
+              "sha256": "d058d1139552712bbe8878f9942147715626c523c80294f8b269fe76b548b9bf"
+            },
+            {
+              "file": "tests-8.0.36-0-attempt-1/shard-8.0.36-0.xml",
+              "tests": 1415,
+              "sha256": "b1d402c266720981bb75ea7fb9fd3fe7a761c409b6de4333cf7d1bf29c629c7d"
+            },
+            {
+              "file": "tests-8.4-0-attempt-1/shard-8.4-0.xml",
+              "tests": 1415,
+              "sha256": "7d9201d75e428c83718ec514b63dbdbb1cf793596bd39326b7f704736ac14623"
+            },
+            {
+              "file": "tests-8.0.36-1-attempt-1/shard-8.0.36-1.xml",
+              "tests": 1415,
+              "sha256": "d3f002ef02da5daeff11782c4884ac4414a57b6a7dc777bfca1043f748f55835"
+            }
+          ],
+          "native_schema_case_passed_each_profile": true,
+          "automatic_production_deploy": false
+        },
+        "proof_sha256": "557b6aad665962cda019afb506011dbd7d5ed0f0239285b4693648900bea8af6"
+      },
+      "mysql_snapshot": {
+        "proof": {
+          "head": "453581b08014752f17411e7bb27579e5a29bfc75",
+          "reports": [
+            {
+              "report": {
+                "schema": "m3-native-recovery-storage/v1",
+                "source_sha": "453581b08014752f17411e7bb27579e5a29bfc75",
+                "mysql_profile": "8.0.44",
+                "image_id": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+                "test_kind": "owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance",
+                "passed": 17,
+                "failed": 0,
+                "skipped": 0,
+                "owned_databases_removed": 3,
+                "valid": true,
+                "raw_report_sha256": "447aab38d90eacd1ee432ae12031e36b24b2571a333f3098a90fb35ad0d06ee5"
+              },
+              "sha256": "d789939b083cb7898d862da308007e08c114c5a79584962d37bc2e239dd9145e"
+            },
+            {
+              "report": {
+                "schema": "m3-native-recovery-storage/v1",
+                "source_sha": "453581b08014752f17411e7bb27579e5a29bfc75",
+                "mysql_profile": "8.4",
+                "image_id": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+                "test_kind": "owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance",
+                "passed": 17,
+                "failed": 0,
+                "skipped": 0,
+                "owned_databases_removed": 3,
+                "valid": true,
+                "raw_report_sha256": "ea2de0de72e3588fd09162579d5b87ec1c92b2cbbfa597ea8983b43cdebd0375"
+              },
+              "sha256": "7c73c9870ac4d2b8e0b0cfb646886c58d84efcae359ab84cdd4b7c6f342d9c64"
+            },
+            {
+              "report": {
+                "schema": "m3-native-recovery-storage/v1",
+                "source_sha": "453581b08014752f17411e7bb27579e5a29bfc75",
+                "mysql_profile": "8.0.36",
+                "image_id": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+                "test_kind": "owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance",
+                "passed": 17,
+                "failed": 0,
+                "skipped": 0,
+                "owned_databases_removed": 3,
+                "valid": true,
+                "raw_report_sha256": "ce7a02fcf8f6394289fd3a50e6a88a030a62eaed99dc66b48849b434cc51f1d6"
+              },
+              "sha256": "170c761670dd161d4e19cf010dbcec30f9e7c7f04c46cb52812af7a7d75b044a"
+            },
+            {
+              "report": {
+                "schema": "m3-native-recovery-tool-contracts/v1",
+                "source_sha": "453581b08014752f17411e7bb27579e5a29bfc75",
+                "sdk_version": "v0.5.0-rocketmq-tx.4",
+                "test_kind": "pure contracts, not real RPC or storage recovery",
+                "passed": 48,
+                "failed": 0,
+                "skipped": 0,
+                "packages": 3,
+                "report_sha256": "006e424739c127d4a25db40ef25d466d0954eca5faafe4ba64c9ea6e815ab98a",
+                "external_dependencies_started": false,
+                "valid": true
+              },
+              "sha256": "6b84ed0442db1b4f8c04fc5a5b591155c5f01d0f668c17d883203511a4524b31"
+            }
+          ]
+        },
+        "proof_sha256": "7b2c460dc82574d7b27d6539beb02cd0d06d128fff07356c28766931bf174cfd"
+      },
+      "mongo_snapshot": {
+        "proof": {
+          "head": "2a947410d08793685aefdbda3c7b33bbf30b2ea0",
+          "reports": [
+            {
+              "report": {
+                "schema": "m3-native-recovery-storage/v1",
+                "source_sha": "2a947410d08793685aefdbda3c7b33bbf30b2ea0",
+                "mysql_profile": "8.0.36",
+                "image_id": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+                "test_kind": "owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance",
+                "passed": 17,
+                "failed": 0,
+                "skipped": 0,
+                "owned_databases_removed": 3,
+                "valid": true,
+                "raw_report_sha256": "fda8a848d5b2b2305e097092eb2f5b5b05dc09054dc64a8d61bbb1d3cd8100c2"
+              },
+              "sha256": "eb4cec5bdad5c72d572b3a854e34917fdff004ac6d53cff9e031a1aef01c99e0"
+            },
+            {
+              "report": {
+                "schema": "m3-native-recovery-storage/v1",
+                "source_sha": "2a947410d08793685aefdbda3c7b33bbf30b2ea0",
+                "mysql_profile": "8.4",
+                "image_id": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+                "test_kind": "owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance",
+                "passed": 17,
+                "failed": 0,
+                "skipped": 0,
+                "owned_databases_removed": 3,
+                "valid": true,
+                "raw_report_sha256": "c7a1ac452655466459aaa03575e5d79496e9793e6d0a3698de729810c3ce8867"
+              },
+              "sha256": "b59a42afb68d00b8c2ab9c84c97abdcd7b00ee75c9e7a9643271e63bca96b317"
+            },
+            {
+              "report": {
+                "schema": "m3-native-recovery-storage/v1",
+                "source_sha": "2a947410d08793685aefdbda3c7b33bbf30b2ea0",
+                "mysql_profile": "8.0.44",
+                "image_id": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+                "test_kind": "owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance",
+                "passed": 17,
+                "failed": 0,
+                "skipped": 0,
+                "owned_databases_removed": 3,
+                "valid": true,
+                "raw_report_sha256": "a57903b4e187de2250ca1021d4c5f74c748aba7927fbe56401890a976d1ba46e"
+              },
+              "sha256": "79ff2cc8873de93b6b0d95282d490f410c985fc43d3eebead4e9ba734e35ce33"
+            },
+            {
+              "report": {
+                "schema": "m3-native-recovery-tool-contracts/v1",
+                "source_sha": "2a947410d08793685aefdbda3c7b33bbf30b2ea0",
+                "sdk_version": "v0.5.0-rocketmq-tx.4",
+                "test_kind": "pure contracts, not real RPC or storage recovery",
+                "passed": 64,
+                "failed": 0,
+                "skipped": 0,
+                "packages": 3,
+                "report_sha256": "71d773531d5355a841ba72d93cd1b09b3e429ecce4765bcd36b33ba658f3b498",
+                "external_dependencies_started": false,
+                "valid": true
+              },
+              "sha256": "efbe304b4986b80757b683a8fddd2c6aafab55c28613bcf41608ce5ce21c7a64"
+            },
+            {
+              "report": {
+                "schema": "m3-native-recovery-mongo/v1",
+                "source_sha": "2a947410d08793685aefdbda3c7b33bbf30b2ea0",
+                "test_kind": "owned original Mongo root and SDK/host-schema fixture, not Broker/RPC or production clearance",
+                "passed": 10,
+                "failed": 0,
+                "skipped": 0,
+                "owned_databases_removed": 1,
+                "owned_container_removed": true,
+                "mongo_version": "7.0.37",
+                "image_id": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+                "raw_report_sha256": "6cc6b34ed233b355a0415730a8e1e4836c45d2196f56f66c1691aa5fc30844da",
+                "valid": true
+              },
+              "sha256": "186858443a116c28edd70cd46a751853b39e54be04add10c90dd1a2a7680ff3b"
+            }
+          ]
+        },
+        "proof_sha256": "9039ec4041ee8bcbb5ee223ae29dafe918db9002dfa93e8198cf4f5304603207"
+      }
+    },
+    "tool_primitives": {
+      "run": 40038179509,
+      "passed_with_subcases": 20,
+      "failed": 0,
+      "skipped": 0,
+      "summary_sha256": "d5fa055747301796d6ebfa4c2d259ad4acd487774a576ce8425c7ea79d48c1f8",
+      "pure_is_not_actual_rpc": true
+    },
+    "mysql_setup_failure": {
+      "source": "34bb6fc8034292d6aa371dbe430fb237def13f00",
+      "run": 40039265183,
+      "profiles": [
+        "8.0.36",
+        "8.0.44",
+        "8.4"
+      ],
+      "each_passed": 0,
+      "each_setup_failed": 1,
+      "each_skipped": 0,
+      "reason": "public SQL test fixture omitted by broad ignore rule; failed at go:embed before database tests",
+      "retained": true,
+      "fixed_source": "453581b08014752f17411e7bb27579e5a29bfc75"
+    },
+    "native_rpc_matrix_completed": false,
+    "governance_cas_implemented": false,
+    "production_cli_available": false,
+    "c3_complete": false,
+    "production_deployed": false,
+    "system_accepted": false
   }
 }

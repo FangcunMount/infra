@@ -1723,3 +1723,29 @@ C3宿主候选为IAM [PR145](https://github.com/FangcunMount/iam/pull/145)、QS 
 infra [PR207](https://github.com/FangcunMount/infra/pull/207)源码544e90d新增固定发布SDK tx.4的check-only Store、私有SDK生命周期和当前RPC私有观察原语；本地20项纯race（含子项）、vet/actionlint通过。原SDK保留首次audit时间，观察在真实RPC→原audit之后生成，不比较时间戳伪造本次成功。SDK先StopAdmission会拒绝Start，因此工具从构造起禁用执行能力、不暴露Sender，Start返回立即封SDK准入；同步私有I/O仍占真实回查容量，Close/Wait超时不冒称排空。尚非完整CLI，原库snapshot、物理核验、批准图、治理CAS和四种宿主真实矩阵继续；纯fake不是RPC证明。
 
 当前M3仍 **24/36**，T25 **2/4**、C **1/3**、C2 **3/4**、C3 **1/3**。QS/AI初始绑定组件已合并，C2的三库组合/全写者责任和C3闭环未完成，均不提前勾选。M2 **24/24**、M4 **0/8**；无SDK稳定发布、生产DDL/资源/provider/部署、Mac mini规则加载、system或48小时观察操作。
+
+
+### 2026-10-24：T25-C3 宿主读取与双存储 snapshot 组件闭环
+
+IAM [PR145](https://github.com/FangcunMount/iam/pull/145)源码da7ab7f1合并36456cdf：11检查成功，唯一人工制品发布job按规则N/A；三档必需原生日志schema各33、maintenance各10、offline各15项，九份报告非空、零失败/跳过。QS [PR436](https://github.com/FangcunMount/qs-server/pull/436)最终761767fe合并83147d8e：28成功、可选Docs/API同步N/A；种子/迁移/当前运行原生日志162项PASS、无失败/跳过，含MySQL/Mongo已处置重导入、首次证据保留及新索引封锁，日志摘要63b3a3a20d604a53445a6f298361faf192569bb6da9c2da1c38a723ec0908b73。candidate/tested tree均53e958e7；此前单行空白导致的文档失败40038030089保留，未改业务逻辑来通过门禁。
+
+AI [PR221](https://github.com/FangcunMount/qs-ai/pull/221)源码e9446a5d合并05d2db71，12检查成功；[40037939770](https://github.com/FangcunMount/qs-ai/actions/runs/40037939770)两档各5659项，8分片完整覆盖、零失败/跳过。新增原MySQL治理fixture在每档各执行一次，完整XML摘要已保存。M7按本次路径未单独触发，记N/A，不能伪造专项运行；新增fixture包含在required完整分片中。三库生产部署仍暂停；这些受控状态fixture不冒称真实MQ恢复或生产解除。
+
+infra [PR207](https://github.com/FangcunMount/infra/pull/207)源码544e90dc合并2c136032，20项纯race含子项、零失败/跳过；[40038179509](https://github.com/FangcunMount/infra/actions/runs/40038179509)报告摘要d5fa055747301796d6ebfa4c2d259ad4acd487774a576ce8425c7ea79d48c1f8。提供不暴露Sender的有界Checker原语、原审计后的本次私有观察和排空证明，不是实际RPC或完整CLI。
+
+infra [PR209](https://github.com/FangcunMount/infra/pull/209)源码453581b0合并8ed9f99d，三档MySQL各17项、纯契约48项、4检查通过；[40039507926](https://github.com/FangcunMount/infra/actions/runs/40039507926)每档三个自有数据库均删除并回读。快照使用新只读根、精确原绑定/事务/notice，真实提交与SDK中止均读取正确；旧正向audit是命名synthetic fixture，不是RPC证明。首轮40039265183三档均0通过/1 setup失败/0跳过：通用*.sql忽略规则遗漏公开测试模板，编译前失败，未执行数据库测试。只为该固定模板增加跟踪例外并移入普通编译/摘要门禁；旧报告与镜像ID保留。
+
+infra [PR210](https://github.com/FangcunMount/infra/pull/210)源码2a947410合并56e407d8；5检查成功，纯契约64、MySQL三档各17、[Mongo门禁40040593617](https://github.com/FangcunMount/infra/actions/runs/40040593617)10项（含父/固定资源校验）通过，全部零失败/跳过。固定digest的7.0.37 replica set验证真实原Mongo业务+witness根、拒绝借用session、错误epoch/fence/index及缺审计时间；自有数据库与精确标签容器均删除并回读。读取投影排除plan/token/wire/Broker handles，simple/primary/UUID和新snapshot session有2秒上界，无事务callback重入或写操作。
+
+下表仅列既有C3-b的验收组件，不新增正式任务、不改变36项总数：
+
+| 组件 | 源码/验证/合并 | 尚缺范围 |
+|---|---|---|
+| 完整物理指纹及三宿主resolved读取 | ☑ 三库已合并并通过各自完整门禁 | 真实两个原生副本/完整宿主恢复仍由C3-c验证 |
+| check-only SDK及本次私有观察原语 | ☑ 已合并，20项初始纯契约 | 本次真实RPC及批准文件图/完整CLI未通过 |
+| 原MySQL只读snapshot | ☑ 已合并，三档各17项 | 不代替实际Python生产者或MQ恢复 |
+| 原Mongo只读snapshot | ☑ 已合并，固定7.0.37原根10项 | 不代替MQ或生产解除 |
+| 精确治理CAS及未知提交处理 | ☐ 继续实施 | 只改status/解除元数据，保留SDK首次审计/原证据 |
+| 具名批准、物理核验和短生命周期CLI | ☐ 未闭环 | 必须经过首次runtime屏障，hash本身不是授权 |
+
+M3继续 **24/36**，T25 **2/4**、C **1/3**、C2 **3/4**、C3 **1/3**，不因组件合并提前勾选父任务。C2全写者/三库组合、C3具名管理与真实矩阵、T25-D组合门禁仍未完成。M2 **24/24**、M4 **0/8**；没有SDK稳定发布、生产DDL/资源/provider/部署、Mac mini规则加载、system或48小时观察。
