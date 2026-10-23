@@ -156,6 +156,7 @@ class Boundary:
     def _state(self):
         value = _json(_read(self.fd, 'state.json'))
         phases = {'initialized', 'runtime_start_issued', 'runtime_start_returned', 'runtime_start_failed',
+                  'maintenance_issued', 'maintenance_returned', 'maintenance_failed',
                   'restore_issued', 'restore_returned', 'restore_failed',
                   'forward_repair_issued', 'forward_repair_returned', 'forward_repair_failed'}
         if (set(value) != {'binding_sha256', 'phase', 'step'} or value['binding_sha256'] != self.digest
@@ -174,14 +175,15 @@ class Boundary:
         state = self._state()
         return {'phase': state['phase'], 'runtime_may_have_started': self._started(),
                 'old_data_restore_eligible': not self._started() and state['phase'] in
-                {'initialized', 'restore_issued', 'restore_failed'}, 'cutover_authorized': False}
+                {'initialized', 'maintenance_issued', 'maintenance_returned', 'maintenance_failed',
+                 'restore_issued', 'restore_failed'}, 'cutover_authorized': False}
 
     def start(self, step, callback):
         _step(step)
         state = self._state()
-        if state['phase'] not in {'initialized', 'runtime_start_returned', 'forward_repair_returned'}:
+        if state['phase'] not in {'initialized', 'maintenance_returned', 'runtime_start_returned', 'forward_repair_returned'}:
             raise BoundaryError('failed or unknown start requires forward repair')
-        if state['phase'] == 'initialized' and self._started():
+        if state['phase'] in {'initialized', 'maintenance_returned'} and self._started():
             raise BoundaryError('interrupted start publication requires forward repair')
         if not self._started():
             _publish(self.fd, 'first-runtime-start.json', {'binding_sha256': self.digest, 'first_step': step})
@@ -197,7 +199,8 @@ class Boundary:
     def restore_before_start(self, step, callback):
         _step(step)
         state = self._state()
-        if self._started() or state['phase'] not in {'initialized', 'restore_issued', 'restore_failed'}:
+        if self._started() or state['phase'] not in {'initialized', 'maintenance_issued', 'maintenance_returned',
+                                                   'maintenance_failed', 'restore_issued', 'restore_failed'}:
             raise BoundaryError('old-data restore forbidden after any runtime start attempt')
         self._record('restore_issued', step)  # Also closes normal start, including failed restores.
         try:
@@ -206,6 +209,37 @@ class Boundary:
             self._record('restore_failed', step)
             raise
         self._record('restore_returned', step)
+        return result
+
+    def maintain_before_start(self, step, callback, repair_approval_sha256=None):
+        """Guard an explicit offline step, never migrate or install implicitly.
+
+        Failure/exit is not proof that remote DDL stopped. The reviewed repair or
+        restore script must verify actual database activity before doing work.
+        """
+        _step(step)
+        state = self._state()
+        if self._started():
+            raise BoundaryError('pre-start maintenance forbidden after runtime start attempt')
+        if repair_approval_sha256 is None:
+            if state['phase'] not in {'initialized', 'maintenance_returned'}:
+                raise BoundaryError('failed or unknown maintenance requires separate repair')
+        else:
+            _digest(repair_approval_sha256)
+            if state['phase'] not in {'maintenance_issued', 'maintenance_failed'}:
+                raise BoundaryError('pre-start repair requires failed or unknown maintenance')
+            try:
+                _publish(self.fd, 'prestart-repair-approval-' + repair_approval_sha256 + '.json',
+                         {'binding_sha256': self.digest, 'step': step, 'approval_sha256': repair_approval_sha256})
+            except FileExistsError:
+                raise BoundaryError('pre-start repair approval already consumed') from None
+        self._record('maintenance_issued', step)
+        try:
+            result = callback()
+        except BaseException:
+            self._record('maintenance_failed', step)
+            raise
+        self._record('maintenance_returned', step)
         return result
 
     def forward_repair(self, step, approval_sha256, callback):

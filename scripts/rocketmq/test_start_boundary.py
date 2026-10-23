@@ -28,6 +28,11 @@ def crash_after_boundary(directory, digest):
         operation.start('runtime-1', lambda: os._exit(23))
 
 
+def crash_during_maintenance(directory, digest):
+    with Boundary(directory, digest) as operation:
+        operation.maintain_before_start('offline-1', lambda: os._exit(23))
+
+
 def hold_started(directory, digest, ready, release):
     with Boundary(directory, digest) as operation:
         def command():
@@ -38,6 +43,87 @@ def hold_started(directory, digest, ready, release):
 
 
 class StartBoundaryTest(unittest.TestCase):
+    def test_successful_prestart_steps_do_not_publish_runtime_barrier(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory, _, digest = fixture(root); calls = []
+            with Boundary(directory, digest) as operation:
+                operation.maintain_before_start('offline-1', lambda: calls.append('first'))
+                operation.maintain_before_start('offline-2', lambda: calls.append('second'))
+                self.assertTrue(operation.status()['old_data_restore_eligible'])
+                self.assertFalse((directory/'first-runtime-start.json').exists())
+                operation.start('runtime-1', lambda: calls.append('start'))
+            self.assertEqual(calls, ['first', 'second', 'start'])
+
+    def test_failed_maintenance_blocks_start_until_independent_repair(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory, _, digest = fixture(root); calls = []
+            with Boundary(directory, digest) as operation:
+                def failed(): raise RuntimeError('controlled offline failure')
+                with self.assertRaises(RuntimeError): operation.maintain_before_start('offline-1', failed)
+                with self.assertRaises(BoundaryError): operation.start('runtime-1', lambda: calls.append('unsafe'))
+                with self.assertRaises(BoundaryError): operation.maintain_before_start('offline-1', lambda: calls.append('repeat'))
+                operation.maintain_before_start('reviewed-repair', lambda: calls.append('repair'), '6'*64)
+                operation.start('runtime-1', lambda: calls.append('start'))
+            self.assertEqual(calls, ['repair', 'start'])
+
+    def test_interrupted_maintenance_keeps_start_closed_without_false_runtime_marker(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory, _, digest = fixture(root)
+            proc = multiprocessing.get_context('fork').Process(target=crash_during_maintenance, args=(directory, digest))
+            proc.start(); proc.join(10)
+            if proc.is_alive(): proc.kill(); proc.join(5)
+            self.assertEqual(proc.exitcode, 23)
+            with Boundary(directory, digest) as operation:
+                self.assertEqual(operation.status()['phase'], 'maintenance_issued')
+                self.assertFalse((directory/'first-runtime-start.json').exists())
+                with self.assertRaises(BoundaryError): operation.start('runtime-1', lambda: None)
+                operation.maintain_before_start('independent-repair', lambda: None, '6'*64)
+                operation.start('runtime-1', lambda: None)
+
+    def test_prestart_repair_approval_cannot_repeat_after_failure(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory, _, digest = fixture(root); calls = []
+            with Boundary(directory, digest) as operation:
+                def failed(): raise RuntimeError('controlled failure')
+                with self.assertRaises(RuntimeError): operation.maintain_before_start('offline-1', failed)
+                with self.assertRaises(RuntimeError): operation.maintain_before_start('repair-1', failed, '6'*64)
+                with self.assertRaises(BoundaryError): operation.maintain_before_start('repair-1', lambda: calls.append('unsafe'), '6'*64)
+                operation.maintain_before_start('repair-2', lambda: calls.append('new-review'), '7'*64)
+            self.assertEqual(calls, ['new-review'])
+
+    def test_old_data_restore_can_close_a_failed_prestart_operation(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory, _, digest = fixture(root)
+            with Boundary(directory, digest) as operation:
+                def failed(): raise RuntimeError('controlled offline failure')
+                with self.assertRaises(RuntimeError): operation.maintain_before_start('offline-1', failed)
+                operation.restore_before_start('approved-old-scope', lambda: None)
+                with self.assertRaises(BoundaryError): operation.start('runtime-1', lambda: None)
+                with self.assertRaises(BoundaryError): operation.maintain_before_start('offline-2', lambda: None)
+
+    def test_prestart_maintenance_never_runs_after_first_runtime_attempt(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory, _, digest = fixture(root); calls = []
+            with Boundary(directory, digest) as operation:
+                operation.start('runtime-1', lambda: None)
+                with self.assertRaises(BoundaryError): operation.maintain_before_start('offline-1', lambda: calls.append('unsafe'))
+                with self.assertRaises(BoundaryError): operation.maintain_before_start('repair-1', lambda: calls.append('unsafe'), '6'*64)
+            self.assertEqual(calls, [])
+
+    def test_interrupted_first_marker_after_maintenance_requires_forward_repair(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory, _, digest = fixture(root)
+            with Boundary(directory, digest) as operation:
+                operation.maintain_before_start('offline-1', lambda: None)
+                with patch('start_boundary.os.fsync', side_effect=OSError('controlled durability failure')):
+                    with self.assertRaises(OSError): operation.start('runtime-1', lambda: None)
+            with Boundary(directory, digest) as operation:
+                self.assertFalse(operation.status()['old_data_restore_eligible'])
+                with self.assertRaises(BoundaryError): operation.start('runtime-1', lambda: None)
+                with self.assertRaises(BoundaryError): operation.restore_before_start('old', lambda: None)
+                operation.forward_repair('compatible-fix', '8'*64, lambda: None)
+                self.assertEqual(operation.status()['phase'], 'forward_repair_returned')
+
     def test_barrier_is_durable_before_command_and_restore_never_runs(self):
         with tempfile.TemporaryDirectory() as root:
             directory, _, digest = fixture(root)

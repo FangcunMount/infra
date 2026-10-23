@@ -32,7 +32,7 @@
 | --- | --- |
 | `directory` / `binding_sha256` | 原固定协调目录与原绑定独立摘要 |
 | `host` | 精确协调主机；不能用目标主机身份代替 |
-| `step` / `kind` | 固定步骤；`runtime-start`、`pre-start-restore` 或 `forward-repair` |
+| `step` / `kind` | 固定步骤；`runtime-start`、`pre-start-maintenance`、`pre-start-repair`、`pre-start-restore` 或 `forward-repair` |
 | `script` / `script_sha256` | 固定绝对路径的0600原始脚本，最多1MiB |
 | `cwd` / `timeout_seconds` | 已审核工作目录；1–1200秒命令预算 |
 
@@ -71,3 +71,14 @@ compose up --detach --no-deps --no-build --pull never --wait --wait-timeout 120 
 
 
 2026-10-24隔离开发门禁40002465696：固定4f2dda815e9b2ab34763d4dafe6aa18dd5072249，实际Compose失败、拒绝旧备份、独立前向修复、目标锁及预算/镜像拒绝共10项通过，零失败/跳过，临时容器/网络/私有目录清理回读通过。之前两轮3/1/0失败保留；第二轮已证实repair up返回且容器running，失败位于无Health字段的inspect模板，纯Go严格模板重现及真实修复复验均通过。新增独立协调/目标CLI进程的四项证明仍待新精确头门禁；临时锁选择器只用于CI自有inode，不冒充生产inode回读或SSH跨主机验收。T25-C继续未完成。
+
+
+## C2：显式启动前维护
+
+`pre-start-maintenance`用于已经审核的离线DDL、绑定安装或只读核验。它不发布首次runtime标记、不自动迁移、启动应用或执行种子；具体脚本仍受原数据库/工具的独立批准约束。成功返回后可继续下一个维护步骤，最终启动仍先发布不可逆标记。
+
+维护失败或进程中断会保留`maintenance_failed/issued`，阻断普通维护重试和新runtime启动。必须使用独立审核的`pre-start-repair`或批准的启动前恢复；修复批准在执行前一次消费，失败/未知后不能复用同一摘要。恢复完成则关闭本次正常启动。首个runtime标记存在后，两种启动前维护模式均拒绝；首次标记写入中断同样只能具名前向修复。
+
+`old_data_restore_eligible`只说明首次启动边界没有禁止恢复，**不证明服务器DDL已停止、备份可恢复或保护范围仍成立**。客户端超时/退出后，具名脚本必须先核实真实数据库活动与当前版本；不得根据本地进程退出执行覆盖、force dirty或业务重试。QS继续使用原`qs-migrate-offline`双库身份、单次批准、保护与恢复协议。
+
+C2仍需补IAM纯离线入口与各宿主保护范围/写者清单。当前IAM head45中的42–45仅新增七张协议/操作/治理表；43初始协议保持outbox，需要排空与写者退出后显式选择transaction。新增对象和真实版本记录可作为独立保护范围验证，已有AuthN事实与撤销任务不纳入旧全库覆盖；此选择必须通过实际保护/恢复测试及T29/T30冻结，不能仅凭本段执行。首次新runtime之后仍不允许旧完整备份覆盖。

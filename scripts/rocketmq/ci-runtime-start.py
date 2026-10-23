@@ -81,6 +81,23 @@ def main():
             def check(name, condition):
                 if condition is not True: raise BoundaryError('owned target assertion failed')
                 report['cases'][name] = True
+            def cli(kind, name, script):
+                entry = root/(name+'.sh'); entry.write_text(script); entry.chmod(0o600)
+                value = {'schema': 'm3-cutover-step/v1', 'directory': str(directory),
+                         'binding_sha256': binding_sha, 'host': target.socket.gethostname(),
+                         'step': name, 'kind': kind, 'script': str(entry),
+                         'script_sha256': hashlib.sha256(entry.read_bytes()).hexdigest(),
+                         'cwd': str(root), 'timeout_seconds': 270}
+                selected = root/(name+'.json'); selected.write_bytes(_encoded(value)); selected.chmod(0o600)
+                result = subprocess.run([sys.executable, str(Path('scripts/rocketmq/cutover_step.py').resolve()),
+                                         '--plan', str(selected), '--reviewed-sha256',
+                                         hashlib.sha256(selected.read_bytes()).hexdigest(), '--execute'],
+                                        capture_output=True, timeout=280)
+                summary = json.loads(result.stdout)
+                if set(summary) != {'status', 'cutover_authorized'} or summary['cutover_authorized'] is not False:
+                    raise BoundaryError('coordinator CLI output contract differs')
+                return result.returncode, summary
+
             starts = []
             report['target_commands'] = []
             command = target.command
@@ -97,6 +114,19 @@ def main():
             try:
                 with patch.object(cutover_step, 'GLOBAL_LOCK', root/'deploy.lock'), patch.object(cutover_step, 'AI_LOCK', root/'ai.lock'), patch.object(target, 'command', side_effect=observed):
                     plan = freeze()
+                    stage = 'prestart_offline_cli'
+                    failed, _ = cli('pre-start-maintenance', 'cli-offline-failed', 'exit 9\n')
+                    forbidden_start = root/'forbidden-prestart-runtime'
+                    denied, _ = cli('runtime-start', 'cli-start-before-repair', 'touch '+shlex.quote(str(forbidden_start))+'\n')
+                    with Boundary(directory, binding_sha) as operation:
+                        check('cli_failed_prestart_maintenance_blocks_runtime', failed == denied == 1
+                              and operation.status()['phase'] == 'maintenance_failed'
+                              and not (directory/'first-runtime-start.json').exists() and not forbidden_start.exists())
+                    repaired, _ = cli('pre-start-repair', 'cli-offline-reviewed-repair', 'exit 0\n')
+                    with Boundary(directory, binding_sha) as operation:
+                        check('cli_independent_prestart_repair_returns_before_runtime', repaired == 0
+                              and operation.status()['phase'] == 'maintenance_returned'
+                              and not (directory/'first-runtime-start.json').exists())
                     with Boundary(directory, binding_sha) as operation:
                         stage = 'expected_failed_start'
                         try:
@@ -146,22 +176,6 @@ def main():
                         sha = hashlib.sha256(selected.read_bytes()).hexdigest()
                         return shlex.join([sys.executable, '-c', bootstrap, '--plan', str(selected),
                                            '--reviewed-sha256', sha, '--execute', '--coordinated-start-already-issued'])+'\n'
-                    def cli(kind, name, script):
-                        entry = root/(name+'.sh'); entry.write_text(script); entry.chmod(0o600)
-                        value = {'schema': 'm3-cutover-step/v1', 'directory': str(directory),
-                                 'binding_sha256': binding_sha, 'host': target.socket.gethostname(),
-                                 'step': name, 'kind': kind, 'script': str(entry),
-                                 'script_sha256': hashlib.sha256(entry.read_bytes()).hexdigest(),
-                                 'cwd': str(root), 'timeout_seconds': 270}
-                        selected = root/(name+'.json'); selected.write_bytes(_encoded(value)); selected.chmod(0o600)
-                        result = subprocess.run([sys.executable, str(Path('scripts/rocketmq/cutover_step.py').resolve()),
-                                                 '--plan', str(selected), '--reviewed-sha256',
-                                                 hashlib.sha256(selected.read_bytes()).hexdigest(), '--execute'],
-                                                capture_output=True, timeout=280)
-                        summary = json.loads(result.stdout)
-                        if set(summary) != {'status', 'cutover_authorized'} or summary['cutover_authorized'] is not False:
-                            raise BoundaryError('coordinator CLI output contract differs')
-                        return result.returncode, summary
                     spec['services']['fixture']['command'] = ['/owned-missing-entrypoint']
                     plan = freeze()
                     code, summary = cli('runtime-start', 'cli-failed-start', target_script(plan))
@@ -175,6 +189,9 @@ def main():
                     code, summary = cli('forward-repair', 'cli-compatible-repair', target_script(plan))
                     with Boundary(directory, binding_sha) as operation:
                         check('cli_separate_forward_repair_and_runtime_readback', code == 0 and operation.status()['phase'] == 'forward_repair_returned' and not operation.status()['old_data_restore_eligible'])
+                    forbidden_offline = root/'forbidden-poststart-maintenance'
+                    denied, _ = cli('pre-start-maintenance', 'cli-offline-after-start', 'touch '+shlex.quote(str(forbidden_offline))+'\n')
+                    check('cli_prestart_maintenance_refused_after_runtime', denied == 1 and not forbidden_offline.exists())
                     check('cli_private_evidence_and_no_cutover_authorization', summary == {'status': 'reviewed_command_returned', 'cutover_authorized': False}
                           and all(p.is_file() and p.stat().st_mode & 0o777 == 0o600 for p in directory.iterdir()))
             finally:
@@ -223,7 +240,7 @@ def main():
             report['failed'] += 1
         write_private(Path('runtime-start-native.json'), report)
     print(json.dumps({'passed': report['passed'], 'failed': report['failed'], 'skipped': 0}))
-    return 0 if report['passed'] == 14 and report['failed'] == 0 else 1
+    return 0 if report['passed'] == 17 and report['failed'] == 0 else 1
 
 
 if __name__ == '__main__':

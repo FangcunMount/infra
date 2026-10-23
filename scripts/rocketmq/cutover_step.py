@@ -68,7 +68,8 @@ def load_step(path, digest):
     if (not isinstance(value['host'], str) or not value['host'] or len(value['host']) > 253
             or any(ord(c) < 33 for c in value['host'])
             or not isinstance(value['kind'], str)
-            or value['kind'] not in {'runtime-start', 'pre-start-restore', 'forward-repair'}
+            or value['kind'] not in {'runtime-start', 'pre-start-restore', 'forward-repair',
+                                     'pre-start-maintenance', 'pre-start-repair'}
             or type(value['timeout_seconds']) is not int or not 1 <= value['timeout_seconds'] <= 1200):
         raise BoundaryError('bounded host step required')
     script = private_bytes(value['script'], 1024 * 1024)
@@ -153,8 +154,14 @@ def execute(plan, script, reviewed_sha256):
             operation.start(plan['step'], callback)
         elif plan['kind'] == 'pre-start-restore':
             operation.restore_before_start(plan['step'], callback)
-        else:
+        elif plan['kind'] == 'pre-start-maintenance':
+            operation.maintain_before_start(plan['step'], callback)
+        elif plan['kind'] == 'pre-start-repair':
+            operation.maintain_before_start(plan['step'], callback, reviewed_sha256)
+        elif plan['kind'] == 'forward-repair':
             operation.forward_repair(plan['step'], reviewed_sha256, callback)
+        else:
+            raise BoundaryError('exact reviewed step kind required')
         return operation.status()
 
 
