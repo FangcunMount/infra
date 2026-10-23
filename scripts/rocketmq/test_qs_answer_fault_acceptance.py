@@ -44,7 +44,8 @@ class AnswerOriginalPacketReceiptTest(unittest.TestCase):
             events = [dict(kind='mongo', boundary=boundary, backend_ack=boundary == 'after')]*3
             stats = dict(event='stats', seen=3, dropped=3, backend_commit_acks=3 if boundary == 'after' else 0)
             self.assertEqual(wire_evidence(events, stats, boundary)['dropped'], 3)
-            for changes in (dict(seen=0), dict(dropped=2), dict(backend_commit_acks=1)):
+            self.assertEqual(wire_evidence(events, dict(stats, seen=4), boundary)['seen'], 4)
+            for changes in (dict(seen=0), dict(dropped=0), dict(backend_commit_acks=1)):
                 with self.assertRaises(RuntimeError): wire_evidence(events, dict(stats, **changes), boundary)
             with self.assertRaises(RuntimeError): wire_evidence([], stats, boundary)
             wrong = [dict(events[0], kind='mysql')]

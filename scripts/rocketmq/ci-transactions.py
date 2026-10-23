@@ -126,11 +126,11 @@ class Probe:
             except queue.Empty:
                 return
 
-    def wait(self, event, identity=None, decision=None, timeout=90):
+    def wait(self, event, identity=None, decision=None, timeout=90, *, after=0):
         deadline = time.monotonic() + timeout
         while True:
             self.drain()
-            for item in self.events:
+            for item in self.events[after:]:
                 if (item.get("event") == event and (identity is None or item.get("id") == identity)
                         and (decision is None or item.get("decision") == decision)):
                     return item
@@ -224,7 +224,18 @@ def main():
     parser.add_argument("--ai-admission-host", type=Path, help="exact AI checkout; real published Python SDK and original admission roots/Broker")
     parser.add_argument("--iam-host-faults", action="store_true", help="separate actual IAM role original-root COMMIT packet faults")
     parser.add_argument("--qs-answer-host-faults", action="store_true", help="separate actual AnswerSheet original Mongo COMMIT packet faults")
+    parser.add_argument("--ai-host-database-faults", action="store_true", help="actual AI command original SQLAlchemy COMMIT packet faults")
     args = parser.parse_args()
+    if args.ai_host_database_faults and (not args.ai_admission_host
+            or os.environ.get('QS_AI_ACCEPTANCE_KIND') != 'db_faults'
+            or any((args.iam_host, args.m3_resources, args.iam_fanout_qs, args.qs_answer_host,
+                args.qs_evaluation_host, args.qs_report_host, args.qs_task_host, args.qs_retry_store_host,
+                args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host, args.qs_runtime_host,
+                args.qs_deferred_consumer_host, args.sdk_api_go, args.sdk_api_python, args.sdk_faults,
+                args.sdk_limits, args.go_probe, args.sdk_go_probe, args.installed_python))):
+        parser.error('AI original database faults require one explicit AI source and db_faults profile')
+    if os.environ.get('QS_AI_ACCEPTANCE_KIND') == 'db_faults' and not args.ai_host_database_faults:
+        parser.error('db_faults requires its explicit original database fault gate')
     if args.qs_answer_host_faults and (not args.qs_answer_host or any((args.iam_host, args.m3_resources,
             args.iam_fanout_qs, args.qs_evaluation_host, args.qs_report_host, args.qs_task_host,
             args.qs_retry_store_host, args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host,
@@ -450,12 +461,15 @@ def main():
         probes.append(p)
         return p
 
-    def owned_native_run(argv, *, cwd, env, timeout=900, required=False):
+    def owned_native_run(argv, *, cwd, env, timeout=900, required=False,
+                         prefix="NATIVE_UNUSED_PREFIX ", supervise=None):
         # uv is a launcher. Own its whole session so timeouts cannot leave the
         # worker/provider/proxy processes running after the private fixture ends.
-        native = Probe(argv, directory, env, prefix="NATIVE_UNUSED_PREFIX ", cwd=cwd)
+        native = Probe(argv, directory, env, prefix=prefix, cwd=cwd)
         probes.append(native)
         try:
+            if supervise is not None:
+                supervise(native)
             code = native.process.wait(timeout=timeout)
             native.finish(expected=code)
             native.log.flush()
@@ -546,6 +560,18 @@ def main():
         if args.ai_admission_host:
             from ai_admission_acceptance import run_ai_admission_host
             kind = os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission')
+            if args.ai_host_database_faults:
+                run(['go', 'build', '-o', str(directory / 'fault-proxy'),
+                     './transport/rocketmq/internal/faultproxy'], cwd=sdk)
+                proof['ai_database_faults_host'] = {}
+                run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
+                    mysql_password, ca, run, proof['ai_database_faults_host'],
+                    native_runner=owned_native_run, proxy_start=proxy_start)
+                for boundary, evidence in proof['ai_database_faults_host']['faults'].items():
+                    for name in evidence['receipt']['cases']:
+                        passed('ai_' + boundary + '_' + name)
+                    passed('ai_' + boundary + '_actual_original_commit_tcp_boundary')
+                return
             state_profile = kind == 'state'
             proof_name = ('paired_host' if kind == 'paired' else ('ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')))
             fault_tools = None
@@ -1132,6 +1158,12 @@ def main():
                                 'Actual submission/outcome application roots and original MySQL/Broker',
                                 'No packet loss, SIGKILL or future retry handoff claim']
             report['qs_evaluation_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_evaluation_acceptance.py').read_bytes()).hexdigest()
+        if args.ai_host_database_faults:
+            report['batch'] = 'M3-T23-AI-original-command-COMMIT-packet-faults'
+            report['ai_database_fault_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_database_fault_acceptance.py').read_bytes()).hexdigest()
+            report['limits'] = ['Actual authenticated command receiver/original SQLAlchemy root with COMMIT TCP loss; controlled input/observer',
+                'No full API daemon, paired QS business, producer SIGKILL, Broker restart, real provider, system or production claim',
+                'After: exact committed facts/Inbox/two frozen branches; before: exact persisted abort AND actual new paused Broker callback']
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",

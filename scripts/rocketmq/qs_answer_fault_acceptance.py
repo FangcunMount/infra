@@ -2,6 +2,7 @@
 import hashlib
 import json
 import re
+import signal
 
 from iam_acceptance import retain_private_host_output
 
@@ -39,15 +40,15 @@ def parse_receipt(output, source, boundary):
 
 
 def wire_evidence(events, stats, boundary):
-    # The pinned Mongo proxy intentionally blocks every matching COMMIT retry,
-    # unlike the MySQL one-shot proxy. Successful server ACKs are counted alone.
+    # During the finite outage the pinned proxy blocks matching session retries.
+    # A snapshot may include one in-flight reply; only actual backend OKs count.
     if (boundary not in ('before', 'after') or not events
             or any(e.get('kind') != 'mongo' or e.get('boundary') != boundary
                    or e.get('backend_ack') is not (boundary == 'after') for e in events)
             or stats.get('event') != 'stats'
             or any(type(stats.get(k)) is not int or not 1 <= stats[k] <= 1024 for k in ('seen', 'dropped'))
             or type(stats.get('backend_commit_acks')) is not int
-            or stats['seen'] != stats['dropped'] or len(events) != stats['dropped']
+            or stats['seen'] < stats['dropped']
             or stats['backend_commit_acks'] != (stats['dropped'] if boundary == 'after' else 0)):
         raise RuntimeError('matching original Mongo session COMMIT TCP boundary not established')
     return dict(boundary=boundary, seen=stats['seen'], dropped=stats['dropped'],
@@ -62,23 +63,51 @@ def run_profile(source, directory, env, run, proof, native_runner, proxy_start):
         proxy = proxy_start('mongo')
         proxy.send(json.dumps({'Action': 'arm', 'Boundary': boundary, 'Method': 'commit', 'Nth': 1}))
         proxy.wait('armed')
-        current = dict(env, QS_M3_FAULT_BOUNDARY=boundary, QS_M3_FAULT_MONGO_PROXY=proxy.address)
+        restored = directory / ('qs-original-' + boundary + '-path-restored')
+        current = dict(env, QS_M3_FAULT_BOUNDARY=boundary, QS_M3_FAULT_MONGO_PROXY=proxy.address,
+                       QS_M3_FAULT_PATH_RESTORED=str(restored))
+        window = {}
+
+        def restore_original_path(native):
+            try:
+                native.wait('fault_window_ready', timeout=90)
+                proxy.send(json.dumps({'Action': 'stats'})); stats = proxy.wait('stats')
+                proxy.drain()
+                window['wire'] = wire_evidence([e for e in proxy.events if e.get('event') == 'injected'], stats, boundary)
+                # Re-arm clears retained sessions after capturing the fault window.
+                # Existing-session COMMIT retries now traverse the original server;
+                # no response, callback error or database outcome is synthesized.
+                cursor = len(proxy.events)
+                proxy.send(json.dumps({'Action': 'arm', 'Boundary': boundary, 'Method': 'commit', 'Nth': 1}))
+                proxy.wait('armed', after=cursor)
+                retain_private_host_output(restored, 'original-path-restored')
+                window['original_session_path_restored'] = True
+            except (RuntimeError, OSError):
+                window['native_window_supervision_failed'] = True
+                native.signal_group(signal.SIGKILL)
         result = native_runner(['go', 'test', '-race', '-p', '1',
             '-tags=integration,m3_answersheet_integration,m3_host_faults', '-count=1', '-timeout=5m', '-v',
             './internal/apiserver/container/internal/transaction', '-run', '^TestM3AnswerOriginalCommitPacketFault$'],
-            cwd=source, env=current, timeout=720, required=False)
+            cwd=source, env=current, timeout=720, required=False,
+            prefix='M3_QS_MONGO_FAULT_STATE ', supervise=restore_original_path)
         raw = result.stdout + result.stderr
         retain_private_host_output(directory / ('qs-answer-original-' + boundary + '-private.log'), raw)
         evidence = dict(native_exit_code=result.returncode, native_output_sha256=hashlib.sha256(raw.encode()).hexdigest(),
             assertion_lines=sorted(set(map(int, re.findall(r'm3_answersheet_packet_fault_integration_test\.go:(\d+)', raw))))[:32],
             test_timeout='panic: test timed out' in raw, race_reports=raw.count('WARNING: DATA RACE'))
+        evidence.update(window)
         proof['faults'][boundary] = evidence
         if result.returncode:
             raise RuntimeError('actual original AnswerSheet packet fault failed; private output withheld')
         evidence['receipt'] = parse_receipt(raw, proof['source_sha'], boundary)
-        proxy.send(json.dumps({'Action': 'stats'})); stats = proxy.wait('stats')
+        cursor = len(proxy.events)
+        proxy.send(json.dumps({'Action': 'stats'})); stats = proxy.wait('stats', after=cursor)
         proxy.drain()
-        evidence['wire'] = wire_evidence([e for e in proxy.events if e.get('event') == 'injected'], stats, boundary)
+        evidence.update(window)
+        if any(type(stats.get(k)) is not int or not 0 <= stats[k] <= 1024
+               for k in ('seen', 'dropped', 'backend_commit_acks')):
+            raise RuntimeError('post-restoration Mongo proxy counters outside safe bounds')
+        evidence['post_restore_fault_counters'] = {k: stats[k] for k in ('seen', 'dropped', 'backend_commit_acks')}
         proxy.send(json.dumps({'Action': 'stop'})); proxy.wait('closed'); proxy.finish()
     proof['scope'] = SCOPE
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()

@@ -115,6 +115,9 @@ def acceptance_profile(kind):
     if kind == 'finalization':
         from ai_finalization_acceptance import profile
         return profile()
+    if kind == 'db_faults':
+        from ai_database_fault_acceptance import profile
+        return profile()
     if kind == 'paired':
         from paired_acceptance import profile
         return profile()
@@ -156,7 +159,7 @@ def validate_host_runtime(runtime, profile, python):
         raise RuntimeError('released fixed SDK wheel and client required, no editable SDK')
 
 
-def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, *, fault_tools=None, native_runner=None):
+def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, *, fault_tools=None, native_runner=None, proxy_start=None):
     profile = acceptance_profile(os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission'))
     source = source.resolve()
     if not (source / 'pyproject.toml').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
@@ -205,6 +208,10 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     runtime = json.loads(info)
     validate_host_runtime(runtime, profile, python)
     proof['python_runtime'] = runtime
+    if profile['name'] == 'db_faults':
+        from ai_database_fault_acceptance import run_profile
+        run_profile(source, directory, env, command, run, proof, native_runner, proxy_start, mysql_port)
+        return
     junit = directory / ('ai-' + profile['name'] + '-private.xml')
     filename = profile['file']
     if profile['name'] == 'state':

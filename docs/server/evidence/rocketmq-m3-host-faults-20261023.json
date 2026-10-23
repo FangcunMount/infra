@@ -18,7 +18,7 @@
   "profile": {
     "id": "IAM original role COMMIT packet faults",
     "sdk_fault_proxy_source": "8de893b367cc797580799abd8325f41dd62356db",
-    "native_status": "development native passed 14/14 and separate roots34; workflow failed post-uv cache; full required matrix pending",
+    "native_status": "full matrix passed/audited: 3x14 packet evidence +3x34 original roots/HTTP; source PR138 CI pending",
     "required_native_tests": 2,
     "required_evidence_cases": 14,
     "boundaries": [
@@ -82,14 +82,127 @@
   ],
   "audit_index_sha256": "f61a654209229564bd69dd0ed4912bd08badd1f8ae51481e081d16ab44e44905",
   "qs_mongo_candidate": {
-    "source_sha": "d367605dd6ae889a281395a4ea0665fdf5b7ae61",
+    "source_sha": "edfa930bc93cc7ca3fc81ca40244f8e9ecf7913e",
     "local_validation": {
-      "native_tag_race": "compile only passed",
+      "native_tag_race": "revised fixture compile only passed",
       "new_diff_tagged_lint": "0 issues",
       "full_tagged_lint": "1 existing errcheck in prior fixture",
       "docs_check": "88 passed; facts/hygiene passed",
-      "infra_tests": "146 passed; 0 failed/skipped"
+      "infra_tests": "151 passed, 0 failed/skipped; actual control-pipe cursor test included"
     },
-    "native_status": "not_run"
+    "native_status": "first native failed, revised finite outage/path restore and real-driver join pending native validation"
+  },
+  "iam_full_matrix": {
+    "run_url": "https://github.com/FangcunMount/infra/actions/runs/39879917332",
+    "source_sha": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
+    "infra_sha": "1d44b58c1863d6d28c98e8300180ff0915c03a5a",
+    "workflow_conclusion": "success",
+    "profiles": [
+      {
+        "mysql_version": "8.0.36",
+        "go_version": "go1.25.12",
+        "report_sha256": "f03c2b74eaa670b5d843d536081bcc51716b716c4ccb90efab2c374145e5b2ae",
+        "original_roots": {
+          "sha256": "0e522821b77ddee6cd411765dbdb7b726547c520a69bec9018dbd97d7f50a2d2",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          }
+        },
+        "native_tests": 2,
+        "evidence_passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "source_tool_binding_and_cleanup_verified": true
+      },
+      {
+        "mysql_version": "8.0.44",
+        "go_version": "go1.25.12",
+        "report_sha256": "535840715ac66cd68da66adef015e09a8248adb38d601de291bd219df0bbf43f",
+        "original_roots": {
+          "sha256": "0a7f31f3fe656aa3d8ed0c63223e9d07e430eb6cdc8a738a65ba60aae73c2ca3",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          }
+        },
+        "native_tests": 2,
+        "evidence_passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "source_tool_binding_and_cleanup_verified": true
+      },
+      {
+        "mysql_version": "8.4.13",
+        "go_version": "go1.25.12",
+        "report_sha256": "8584f4deaee5ab7240f38ee4aaab34fcdbd1598f8a81a3749e486e393601cb62",
+        "original_roots": {
+          "sha256": "9033259c1c0a02d1f894fedef1c34eb5de9b3fca67703999a82fc9729da4d2fc",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          }
+        },
+        "native_tests": 2,
+        "evidence_passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "source_tool_binding_and_cleanup_verified": true
+      }
+    ],
+    "scope": "actual IAM role original GORM commit packet faults; native component only",
+    "source_merge_status": "not_merged",
+    "stable_release": false,
+    "production": false,
+    "system_acceptance": false,
+    "observation_48h": false,
+    "source_pr": "https://github.com/FangcunMount/iam/pull/138"
+  },
+  "iam_full_audit_sha256": "99461210b73bed0e7aad71cac0bdcd889bb476c79f570f9891bfabfddcb13763",
+  "failure_history": [
+    {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39879921975",
+      "source_sha": "d367605dd6ae889a281395a4ea0665fdf5b7ae61",
+      "infra_sha": "1d44b58c1863d6d28c98e8300180ff0915c03a5a",
+      "report_sha256": "86d21a4f196d36eec699dd378be1c178dbb47bc41a4ea951b1d57563fc8607ff",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "faults": {
+        "before": {
+          "native_exit_code": 1,
+          "native_output_sha256": "158b4ce8b5ba2bdc5d366c4b063f67cb0928de46dbdae16bee0609395df1b71d",
+          "assertion_lines": [
+            61,
+            117,
+            119,
+            155
+          ],
+          "test_timeout": false,
+          "race_reports": 0
+        }
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "finding": "original driver did not return after caller deadline; pinned Mongo1.17.6 CommitLoop strips cancellation; failure report did not drain proxy injection queue, so no injection is inferred from that absent field"
+    }
+  ],
+  "ai_mysql_candidate": {
+    "source_sha": "724595abdd92e8b0d88389609e239a6b6b1a9055",
+    "local_validation": {
+      "collection": "1 explicitly selected native test collected; no DB execution",
+      "ruff": "check and format passed",
+      "docs": "75 documents/1389 links, source facts and coverage passed",
+      "infra_tests": "151 passed, 0 failed/skipped"
+    },
+    "native_status": "not_run",
+    "scope": "actual AI authenticated command receiver and original SQLAlchemy root; no paired/full daemon/process/provider/system claim"
   }
 }
