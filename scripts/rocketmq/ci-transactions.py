@@ -222,7 +222,15 @@ def main():
     parser.add_argument("--qs-command-host", type=Path, help="exact QS checkout; original SQL command root and real Broker")
     parser.add_argument("--qs-event-host", type=Path, help="exact QS checkout; authenticated event Inbox/projection and original ACK SQL root")
     parser.add_argument("--ai-admission-host", type=Path, help="exact AI checkout; real published Python SDK and original admission roots/Broker")
+    parser.add_argument("--iam-host-faults", action="store_true", help="separate actual IAM role original-root COMMIT packet faults")
     args = parser.parse_args()
+    if args.iam_host_faults and (not args.iam_host or os.environ.get('ROCKETMQ_IAM_RUNTIME_REQUIRED', '0') != '0'
+            or any((args.m3_resources, args.iam_fanout_qs, args.qs_answer_host, args.qs_evaluation_host,
+                args.qs_report_host, args.qs_task_host, args.qs_retry_store_host, args.qs_retry_dispatch_host,
+                args.qs_command_host, args.qs_event_host, args.ai_admission_host, args.qs_runtime_host,
+                args.qs_deferred_consumer_host, args.sdk_api_go, args.sdk_api_python, args.sdk_faults,
+                args.sdk_limits, args.go_probe, args.sdk_go_probe, args.installed_python, args.iam_private_log))):
+        parser.error('original IAM faults require one explicit IAM source without runtime or fanout profile')
     if args.qs_runtime_host and any((args.m3_resources, args.iam_host, args.sdk_api_go, args.sdk_api_python,
             args.qs_answer_host, args.qs_evaluation_host, args.qs_report_host, args.qs_task_host, args.qs_retry_store_host,
             args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host, args.ai_admission_host,
@@ -551,6 +559,19 @@ def main():
                               mysql_password, ca, run, proof['qs_event_host'])
             for name in proof['qs_event_host']['native_receipt']['cases']:
                 passed('qs_event_' + name)
+            return
+        if args.iam_host_faults:
+            from iam_acceptance import run_iam_host
+            run(['go', 'build', '-o', str(directory / 'fault-proxy'),
+                 './transport/rocketmq/internal/faultproxy'], cwd=sdk)
+            proof['iam_host'] = {}
+            run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
+                mysql_password, ca, run, proof['iam_host'], faults=True,
+                native_runner=owned_native_run, proxy_start=proxy_start)
+            for boundary, evidence in proof['iam_host']['faults'].items():
+                for name in evidence['receipt']['cases']:
+                    passed('iam_' + boundary + '_' + name)
+                passed('iam_' + boundary + '_actual_original_commit_tcp_boundary')
             return
         if args.qs_command_host:
             from qs_command_acceptance import run_qs_command_host
@@ -980,6 +1001,12 @@ def main():
             report['batch'] = 'M3-IAM-host-with-M2-0-baseline'
             report['limits'].append('IAM host acceptance uses released SDK; base raw-client cases remain separately scoped')
             report['iam_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/iam_acceptance.py').read_bytes()).hexdigest()
+        if args.iam_host_faults:
+            report['batch'] = 'M3-T23-IAM-original-role-COMMIT-packet-faults'
+            report['iam_fault_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/iam_fault_acceptance.py').read_bytes()).hexdigest()
+            report['limits'] = ['Actual role.create/original GORM root and real before/after COMMIT TCP loss',
+                'No full API daemon, producer SIGKILL, Broker restart, provider or system claim',
+                'New paused owner requires persisted exact abort plus actual Broker rollback callback;expiry alone is not proof']
         if args.qs_answer_host:
             report['batch'] = 'M3-QS-answer-original-Mongo-host'
             report['limits'] = ['No production/system acceptance or throughput claim',

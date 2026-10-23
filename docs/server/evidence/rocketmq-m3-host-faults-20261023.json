@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "task": "T23",
+  "status": "in_progress",
+  "task_completed": false,
+  "global_progress": {
+    "M3": "22/36",
+    "M4": "0/8"
+  },
+  "recorded_at": "2026-10-23T00:34:40.792832+00:00",
+  "source_baselines": {
+    "iam": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
+    "qs-server": "0428b701347774282fb3deafb9cd8c841ba86fc4",
+    "qs-ai": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+    "infra": "de64c443b509686b8372be2fe09c52a95da22744"
+  },
+  "source_note": "IAM is the first packet-fault candidate; other SHAs are starting baselines, not fault acceptance results.",
+  "profile": {
+    "id": "IAM original role COMMIT packet faults",
+    "sdk_fault_proxy_source": "8de893b367cc797580799abd8325f41dd62356db",
+    "native_status": "not_run",
+    "required_native_tests": 2,
+    "required_evidence_cases": 14,
+    "boundaries": [
+      "before original witness COMMIT reaches MySQL",
+      "after backend COMMIT OK before original client receives reply"
+    ],
+    "local_validation": {
+      "infra_unit_tests": {
+        "passed": 142,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actionlint": "passed",
+      "iam_race_native_tag": "compile_only; zero native execution",
+      "iam_full_tagged_lint": "9 pre-existing errcheck findings; new diff gate separate",
+      "iam_new_diff_tagged_lint": "passed: 0 issues",
+      "iam_docs_facts": "passed"
+    },
+    "scope_limits": [
+      "actual RoleCatalog.CreateRole/original GORM root component",
+      "does not claim full API daemon, producer SIGKILL, Broker restart, provider, system or production"
+    ]
+  },
+  "delivery": {
+    "merged": false,
+    "stable_release": false,
+    "production": false,
+    "system_acceptance": false,
+    "observation_48h": false
+  }
+}
