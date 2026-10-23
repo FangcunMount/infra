@@ -1380,7 +1380,7 @@ T24 内部拆为四个验证批次，不改变36项分母。勾选只表示该�
 | --- | --- | --- |
 | ☑ | T24-A 原生索引审计 | 18定向/189工具纯测试、Go race配置边界；真实5.5.1验收8/0/0；PR181合并b7814c9，53检查/57报告通过 |
 | ☑ | T24-B 回查确认观察 | SDK PR54合并bfb4936；15 CI、双存储三档各27、Python源及安装各142；原生两档各41/0/0。持续门禁接线与宿主采用另记 |
-| ☐ | T24-C 宿主指标与保护 | 进行中：SDK PR55存储观察已合并，Go三档各29、Python两档源码/wheel各145通过；宿主指标、120/300秒保护及显式恢复仍待接入 |
+| ☐ | T24-C 宿主指标与保护 | 进行中：SDK tx.4/a4已发布；IAM PR139、QS PR431、AI PR218已提交，实际构造/指标/保护/具名恢复已接线；目标测试通过，宿主原生、完整CI及合并待完成 |
 | ☐ | T24-D 完整门禁 | 持续回查接线PR182已合并，50检查/57报告通过；宿主保护真实验证及告警门禁仍待完成 |
 
 原生报告绑定infra0372f588ab025cf9e8cadb0025c89758943ac28b、公开Go tx.3及固定模块sum，测试Group单独回读retryMaxTimes=1/retryQueueNums=8；生产未改变。真实单条DLQ索引重复读取一致，工具0600不导出正文/key，原SDK进程退出0，Compose/私有目录与进程组清理通过。初次索引读取unavailable返回1如实保留，后两次找到记录返回critical=2；不把这些合法CLI状态冒称全为0。未选择的SDK事务矩阵为N/A，不计入原生8项。
@@ -1435,3 +1435,23 @@ SDK PR56精确`04757bd3212ca961d8eaec22ecd3560101111e18`的15项当前头检查�
 | 告警、运维恢复及最终门禁 | T24-C/D及T25继续，未声明生产生效 |
 
 保护对新无效回查采用增量判断，历史累计值不会在显式复核后永久阻止恢复；Python pending_checks含运行中的Future，队列预算不重复相加。采样不在scrape中启动DB工作，失败不清零；实际DB调用未返回时保留所有权并返回ShutdownIncomplete。宿主组件仍需真实依赖验证，不能用单元结果替代。T24正式任务不勾选，内部2/4，M3仍23/36；M2为24/24、M4为0/8。稳定SDK、生产、system与48h均未执行。
+
+
+### 2026-10-23：T24-C 三库宿主候选提交，真实保护门禁验证中
+
+| 宿主 | 精确候选 / PR | 已验证 | 隔离原生运行 |
+| --- | --- | --- | --- |
+| iam | `990445fab1cb545157eb55fd932d002e5385e654` / [PR](https://github.com/FangcunMount/iam/pull/139) | 目标race/lint及native编译（Go）；4239纯测/1351依赖deselect、mypy450/Ruff（AI）；所属文档通过 | [待结果](https://github.com/FangcunMount/infra/actions/runs/39942099168) |
+| qs-server | `73ccd95f980fdfee2a510323f29f6f43eb728595` / [PR](https://github.com/FangcunMount/qs-server/pull/431) | 目标race/lint及native编译（Go）；4239纯测/1351依赖deselect、mypy450/Ruff（AI）；所属文档通过 | [待结果](https://github.com/FangcunMount/infra/actions/runs/39941387566) |
+| qs-ai | `a2c844f6d06b3e313f0020bc5f53e998d698051b` / [PR](https://github.com/FangcunMount/qs-ai/pull/218) | 目标race/lint及native编译（Go）；4239纯测/1351依赖deselect、mypy450/Ruff（AI）；所属文档通过 | [待结果](https://github.com/FangcunMount/infra/actions/runs/39942158522) |
+
+infra [PR185](https://github.com/FangcunMount/infra/pull/185)候选`a89931c0ac388a5ecea6dc9641d1a63e81ddf468`的200项纯脚手架测试通过；旧tx.2/a2与新tx.4/a4 profile严格分开，新profile校验正式下载制品摘要，无replace/editable SDK。工具完整回归和三库完整CI待完成，原生代码编译/收集不算执行通过。
+
+IAM/QS复用既有 `/metrics` 默认registry；AI通过现有HTTP DI端口提供缓存指标。构造无I/O，初次权威读取先于Producer注册，保护保留空闲Checker，抓取不查库。采样、SDK实际在途与宿主池分别承担关闭责任，取消或超时不提前释放容量。健康采样不自动解除锁定，需同保护代次具名复核后显式恢复准入。
+
+QS仅将自有两临时库的精确半消息audit时间戳前移600秒，再要求真实Broker回查RPC/audit、具名复核及零新半消息/业务，不宣称真实经过十分钟。IAM/AI仅改变并恢复临时库原绑定，验证writer/worker受保护、Checker保留和同代次恢复，不伪造业务或正向确认。已完成且不再回查的audit缺口需要T25具名处置，不能假定一定会自动收敛。
+
+三库自动生产CD已只读核验：IAM/QS PRODUCTION_DEPLOY_PAUSED=true；AI AUTO_DEPLOY_ENABLED=false。候选逐文件摘要和限制见[宿主收据](evidence/rocketmq-m3-host-observation-20261023.json)。T24仍未打勾，内部2/4，M3为23/36；真实依赖、告警、合并及T25继续。稳定版、生产、system和48h均未执行。
+
+
+T24-D并行补入8条固定宿主协议告警与8组promtool场景：观察缺口/准备过期120秒、宿主锁定、连续回查饱和120秒、观测不可用、矛盾证据、正向audit失败及新增invalid check。正常历史Unknown或可能未发的Aborted不直接报已知积压，恢复后历史累计错误不永久报警。新规则仅入库待CI，未在Mac mini加载，不打勾；实际目标/缺指标与原生超限告警现场回读仍属后续具名演练。
