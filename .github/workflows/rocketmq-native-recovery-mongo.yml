@@ -1,0 +1,117 @@
+name: RocketMQ native recovery Mongo snapshot
+on:
+  pull_request:
+    paths:
+      - tools/rocketmq-native-recovery/**
+      - .github/workflows/rocketmq-native-recovery-mongo.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-replica-snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      GOWORK: off
+      GOTOOLCHAIN: local
+      NATIVE_NAME: native-proof-${{ github.run_id }}-${{ github.run_attempt }}
+      NATIVE_OWNER: ${{ github.run_id }}:${{ github.run_attempt }}
+      NATIVE_IMAGE: mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f
+      NATIVE_TOOL_TEST_MONGO_URI: mongodb://127.0.0.1:27017/?directConnection=true&replicaSet=native-proof
+    defaults:
+      run:
+        working-directory: tools/rocketmq-native-recovery
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: tools/rocketmq-native-recovery/go.sum
+      - name: Owned loopback replica set only on GitHub local daemon
+        run: |
+          set -euo pipefail
+          umask 077
+          test "$GITHUB_ACTIONS" = true
+          test "$RUNNER_ENVIRONMENT" = github-hosted
+          test -z "${DOCKER_HOST:-}"
+          test "$(docker context show)" = default
+          if docker inspect "$NATIVE_NAME" >/dev/null 2>&1; then exit 1; fi
+          timeout 300 docker pull "$NATIVE_IMAGE"
+          timeout 15 docker run --detach --name "$NATIVE_NAME" \
+            --label "codex.native-owner=$NATIVE_OWNER" \
+            --memory=512m --cpus=1 --tmpfs /data/db --tmpfs /data/configdb \
+            -p 127.0.0.1:27017:27017 "$NATIVE_IMAGE" \
+            mongod --replSet native-proof --bind_ip_all --wiredTigerCacheSizeGB 0.25 > "$RUNNER_TEMP/native-mongo.cid"
+          for _ in $(seq 1 60); do
+            if timeout 5 docker exec "$NATIVE_NAME" mongosh --quiet --eval 'db.adminCommand({ping:1})' >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          timeout 15 docker exec "$NATIVE_NAME" mongosh --quiet --eval \
+            'rs.initiate({_id:"native-proof",members:[{_id:0,host:"localhost:27017"}]})' >/dev/null
+          ready=false
+          for _ in $(seq 1 60); do
+            if timeout 5 docker exec "$NATIVE_NAME" mongosh --quiet --eval 'if(!db.adminCommand({hello:1}).isWritablePrimary){quit(1)}' >/dev/null 2>&1; then ready=true; break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          timeout 5 docker exec "$NATIVE_NAME" mongosh --quiet --eval 'db.version()' > mongo-version.txt
+          test "$(cat mongo-version.txt)" = 7.0.37
+          docker inspect --format '{{.Image}}' "$NATIVE_NAME" > mongo-image-id.txt
+      - name: Actual original Mongo root and fresh primary snapshot
+        run: |
+          set -euo pipefail
+          umask 077
+          go test -race -tags=integration -json -count=1 -timeout=3m \
+            -run '^Test(MongoSnapshotNative|FrozenMongoGovernanceFixtureMatchesRecordedHostMigration)$' \
+            ./internal/authority > mongo-snapshot.jsonl
+      - name: Remove only the exact owned container and verify absence
+        if: always()
+        run: |
+          set -euo pipefail
+          umask 077
+          if docker inspect "$NATIVE_NAME" >/dev/null 2>&1; then
+            label=$(docker inspect --format '{{index .Config.Labels "codex.native-owner"}}' "$NATIVE_NAME")
+            test "$label" = "$NATIVE_OWNER"
+            timeout 30 docker rm --force "$NATIVE_NAME" >/dev/null
+          fi
+          if docker inspect "$NATIVE_NAME" >/dev/null 2>&1; then exit 1; fi
+          echo true > mongo-container-removed.txt
+      - name: Nonempty zero-skip storage report
+        if: always()
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 - <<'PY'
+          import hashlib,json,pathlib,subprocess
+          path=pathlib.Path('mongo-snapshot.jsonl')
+          events=[json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
+          ran={e['Test'] for e in events if e.get('Test') and e['Action']=='run'}
+          passed={e['Test'] for e in events if e.get('Test') and e['Action']=='pass'}
+          failed=sum(e['Action']=='fail' for e in events)
+          skipped=sum(e['Action']=='skip' for e in events)
+          cleanups=sum('owned_database_removed=true' in e.get('Output','') for e in events)
+          removed=pathlib.Path('mongo-container-removed.txt').exists()
+          version=pathlib.Path('mongo-version.txt')
+          image=pathlib.Path('mongo-image-id.txt')
+          actual_version=version.read_text().strip() if version.exists() else None
+          valid=bool(ran) and ran==passed and failed==skipped==0 and cleanups==1 and removed and actual_version=='7.0.37'
+          report=dict(schema='m3-native-recovery-mongo/v1',source_sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+                      test_kind='owned original Mongo root and SDK/host-schema fixture, not Broker/RPC or production clearance',
+                      passed=len(passed),failed=failed,skipped=skipped,owned_databases_removed=cleanups,owned_container_removed=removed,
+                      mongo_version=actual_version,image_id=image.read_text().strip() if image.exists() else None,
+                      raw_report_sha256=hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None,valid=valid)
+          pathlib.Path('mongo-snapshot-summary.json').write_text(json.dumps(report,indent=2)+'\n')
+          assert valid,'Incomplete original Mongo snapshot or cleanup'
+          print(json.dumps(report))
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-recovery-mongo-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            tools/rocketmq-native-recovery/mongo-snapshot.jsonl
+            tools/rocketmq-native-recovery/mongo-snapshot-summary.json
+          if-no-files-found: error
+          retention-days: 14
