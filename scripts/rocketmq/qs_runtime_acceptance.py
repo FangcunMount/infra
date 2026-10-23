@@ -18,6 +18,15 @@ CASES = frozenset((
     'fresh_paused_instance_actual_broker_checker_commits', 'idempotent_observer_preserves_first_wire',
     'owner_budget_and_callback_observation', 'wrong_reference_unknown_without_changed_facts',
     'actual_shutdown_and_owned_cleanup'))
+NATIVE_LIMIT_CASES = frozenset((
+    'live_configured_open_before_private_native_ingest',
+    'actual_sys_index_recorded_idempotently_on_both_original_primaries',
+    'live_sampler_seals_reserve_execute_plain_open_and_review',
+    'new_configured_open_instance_retains_durable_deny_before_registration',
+    'real_original_checker_commit_rpc_and_positive_audit_while_native_blocked',
+    'first_wire_facts_and_single_executor_preserved_without_new_half',
+    'no_automatic_or_unaudited_governance_resolution',
+    'actual_sampler_sdk_shutdown_joined_original_pools_owned_cleanup'))
 PROTECTION_CASES = frozenset((
     'exact_owned_audit_timestamp_fixture_only',
     'initial_authoritative_observation_latches_before_registration',
@@ -63,6 +72,26 @@ def parse_protection_receipt(output, source):
                 'domain_api_provider_system_not_claimed', 'owned_databases_dropped'))):
         raise RuntimeError('protocol protection proof incomplete, wrong source or outside fixed scope')
     return value
+
+def parse_native_limit_receipt(output, source):
+    parse_runtime_receipt(output, source)
+    rows = [json.loads(line.split('M3_QS_NATIVE_LIMIT_RECEIPT ', 1)[1])
+            for line in output.splitlines() if line.startswith('M3_QS_NATIVE_LIMIT_RECEIPT ')]
+    if len(rows) != 1:
+        raise RuntimeError('one exact native limit host receipt required')
+    value = rows[0]
+    flags = {'real_sys_index_required', 'timestamp_aging_not_used', 'governance_resolution_not_claimed',
+             'domain_api_provider_system_not_claimed', 'owned_databases_dropped'}
+    if (set(value) != flags | {'source_sha', 'passed', 'failed', 'skipped', 'cases', 'owner_count'}
+            or value['source_sha'] != source
+            or any(value[k] is not True for k in flags)
+            or any(type(value[k]) is not int for k in ('passed', 'failed', 'skipped', 'owner_count'))
+            or (value['passed'], value['failed'], value['skipped'], value['owner_count']) != (8, 0, 0, 2)
+            or not isinstance(value['cases'], dict) or set(value['cases']) != NATIVE_LIMIT_CASES
+            or any(v is not True for v in value['cases'].values())):
+        raise RuntimeError('native-limit host evidence incomplete or wrong scope')
+    return value
+
 
 SCOPE = 'default QS dual-owner lifecycle, actual Broker restart and next-instance Checker; protocol fixture facts'
 
@@ -140,14 +169,14 @@ def runtime_diagnostics(output):
 
 
 def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_port, mongo_port,
-                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False):
+                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False, native_limit=False):
     source = source.resolve()
     if not (source/'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS default runtime source required')
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'], cwd=source, env=env).stdout)
-    validate_module(module, protection)
+    validate_module(module, protection or native_limit)
     proof['sdk_module'] = {k: module.get(k) for k in ('Path', 'Version', 'Sum', 'GoModSum')}
     document = runtime_manifest(repo)
     accounts = {role: {'username': 'runtime-' + secrets.token_hex(5), 'password': secrets.token_hex(32)}
@@ -175,6 +204,20 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
     else:
         env.pop('QS_M3_VERIFY_PROTOCOL_PROTECTION', None)
     env.update({'rocketmq.client.logRoot': str(logs), 'rocketmq.client.logLevel': 'error'})
+    if native_limit:
+        from native_limit_acceptance import create_native_limit
+        proof['native_fault'] = {}
+        # Generate/export the actual poison BEFORE any host owner registration;
+        # its deliberately absent business reference must not be mistaken for a
+        # production owner's invalid-check fault.
+        route = next(r for r in document['routes'] if r['owner'] == 'qs.mysql' and r['message_type'] == 'TRANSACTION')
+        audit, digest = create_native_limit(repo, directory, broker, project, grpc_port, ca,
+            accounts['m3-qs-apiserver'], route, run, native_runner, read_parameters, proof['native_fault'], mysql_port, password)
+        env.update(QS_M3_VERIFY_NATIVE_LIMIT='1', QS_M3_NATIVE_LIMIT_AUDIT=str(audit), QS_M3_NATIVE_LIMIT_SHA256=digest)
+    else:
+        for key in ('QS_M3_VERIFY_NATIVE_LIMIT', 'QS_M3_NATIVE_LIMIT_AUDIT', 'QS_M3_NATIVE_LIMIT_SHA256'):
+            env.pop(key, None)
+
     if native_runner is None:
         raise RuntimeError('owned native process group runner required')
     admin = Admin(broker)
@@ -202,6 +245,8 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         proof['native_receipt'] = parse_runtime_receipt(output, proof['source_sha'])
         if protection:
             proof['protection_receipt'] = parse_protection_receipt(output, proof['source_sha'])
+        if native_limit:
+            proof['native_limit_receipt'] = parse_native_limit_receipt(output, proof['source_sha'])
         proof['parameters_after_restart'] = read_parameters(admin('getBrokerConfig'))
     finally:
         # Failure may leave only this owned Broker stopped. Do not target any

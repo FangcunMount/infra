@@ -353,3 +353,26 @@ class AIProtocolProtectionTest(unittest.TestCase):
         self.assertEqual(validate_host_sdk_lock(lock, profile), profile['sdk_sha256'])
         lock['package'][0]['version'] = '0.4.0a2'
         with self.assertRaises(RuntimeError): validate_host_sdk_lock(lock, profile)
+
+
+class AINativeLimitProfileTest(unittest.TestCase):
+    def test_native_profile_requires_all_real_control_cases_and_fixed_sdk(self):
+        from ai_admission_acceptance import NATIVE_LIMIT_CASES, PROTECTION_CASES
+        profile = acceptance_profile('native_limit')
+        self.assertEqual(profile['sdk_version'], '0.4.0a4')
+        self.assertEqual(profile['tests'], TESTS)
+        self.assertEqual(profile['focus_cases'], FOCUS_CASES | NATIVE_LIMIT_CASES)
+        self.assertEqual(len(NATIVE_LIMIT_CASES), 8)
+        self.assertFalse(NATIVE_LIMIT_CASES & PROTECTION_CASES)
+        receipt = AIStateAcceptanceTests().receipt()
+        receipt.update(sdk='0.4.0a4', cases={k: True for k in CASES | NATIVE_LIMIT_CASES},
+                       passed=len(CASES | NATIVE_LIMIT_CASES))
+        output = 'M3_AI_STATE_RECEIPT '+json.dumps(receipt)
+        self.assertEqual(profile['parse'](output, AIStateAcceptanceTests().junit()), receipt)
+        for old in ('state', 'protection'):
+            with self.assertRaises(RuntimeError):
+                acceptance_profile(old)['parse'](output, AIStateAcceptanceTests().junit())
+        for name in NATIVE_LIMIT_CASES:
+            value = dict(receipt, cases={k: v for k, v in receipt['cases'].items() if k != name}, passed=receipt['passed']-1)
+            with self.assertRaises(RuntimeError):
+                profile['parse']('M3_AI_STATE_RECEIPT '+json.dumps(value), AIStateAcceptanceTests().junit())

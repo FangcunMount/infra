@@ -11,13 +11,17 @@ on:
         description: Require current protocol guard and published a4 (not the a2 baseline)
         type: boolean
         default: false
+      native_limit:
+        description: Require actual SYS index, durable host deny and new default owner (separate from protection)
+        type: boolean
+        default: false
       profile:
         description: Development is one interpreter/MySQL; full is required for final gate
         type: choice
         options: [full, development]
         default: full
   pull_request:
-    paths: ['scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ai_state_acceptance.py', 'scripts/rocketmq/test_ai_state_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-state.yml', 'Makefile']
+    paths: ['scripts/rocketmq/native_limit_acceptance.py', 'scripts/rocketmq/test_native_limit_acceptance.py', 'scripts/rocketmq/probes/native-transaction-limit/**', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ai_state_acceptance.py', 'scripts/rocketmq/test_ai_state_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-state.yml', 'Makefile']
 permissions:
   contents: read
 concurrency:
@@ -37,7 +41,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: ${{ inputs.protection == true && '04757bd3212ca961d8eaec22ecd3560101111e18' || '8de893b367cc797580799abd8325f41dd62356db' }}
+          ref: ${{ (inputs.protection == true || inputs.native_limit == true) && '04757bd3212ca961d8eaec22ecd3560101111e18' || '8de893b367cc797580799abd8325f41dd62356db' }}
           path: .sdk-acceptance
       - uses: actions/checkout@v6
         with:
@@ -57,6 +61,7 @@ jobs:
           EXPECTED_AI_SHA: ${{ inputs.ai_ref || '6be5f80905c5c499017e96391282a994c033958e' }}
         run: |
           set -euo pipefail
+          test '${{ inputs.protection == true && inputs.native_limit == true }}' != true
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
           test "$(git -C .ai-acceptance rev-parse HEAD)" = "$EXPECTED_AI_SHA"
           python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
@@ -67,7 +72,7 @@ jobs:
           docker build --no-cache -t rocketmq-ai-state:5.5.1 components/rocketmq
       - name: Required worker, governance, SDK and original state roots
         env:
-          QS_AI_ACCEPTANCE_KIND: ${{ inputs.protection == true && 'protection' || 'state' }}
+          QS_AI_ACCEPTANCE_KIND: ${{ inputs.native_limit == true && 'native_limit' || inputs.protection == true && 'protection' || 'state' }}
         run: |
           set -euo pipefail
           QS_AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' python3 scripts/rocketmq/ci-transactions.py \

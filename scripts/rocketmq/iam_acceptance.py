@@ -101,6 +101,36 @@ def parse_protection_receipt(output, source):
     return value
 
 
+NATIVE_LIMIT_CASES = frozenset((
+    'actual_sys_index_idempotent_original_primary_governance',
+    'live_sampler_blocks_actual_writer_plain_open_and_review',
+    'idle_sdk_checker_readiness_kept_with_original_pool',
+    'new_configured_open_owner_keeps_durable_native_protection',
+    'original_committed_witness_and_one_business_execution_preserved',
+    'no_native_governance_resolution_or_deletion',
+    'actual_sampler_shutdown_retains_primary_pool'))
+
+
+def parse_native_limit_receipt(output, source):
+    parse_runtime_receipt(output, source)
+    rows = [json.loads(line.split('M3_IAM_NATIVE_LIMIT_RECEIPT ', 1)[1])
+            for line in output.splitlines() if 'M3_IAM_NATIVE_LIMIT_RECEIPT {' in line]
+    flags = {'real_sys_index_required', 'idle_checker_readiness_not_new_broker_callback',
+             'governance_resolution_not_claimed', 'full_api_process_fault_or_system_not_claimed'}
+    fields = flags | {'source_sha', 'passed', 'failed', 'skipped', 'cases', 'business_executions'}
+    if len(rows) != 1:
+        raise RuntimeError('one exact IAM native limit receipt required')
+    value = rows[0]
+    if (set(value) != fields or value['source_sha'] != source
+            or any(type(value[k]) is not int for k in ('passed', 'failed', 'skipped', 'business_executions'))
+            or (value['passed'], value['failed'], value['skipped'], value['business_executions']) != (7, 0, 0, 1)
+            or not isinstance(value['cases'], dict) or set(value['cases']) != NATIVE_LIMIT_CASES
+            or any(v is not True for v in value['cases'].values())
+            or any(value[k] is not True for k in flags)):
+        raise RuntimeError('IAM native limit receipt incomplete or wrong scope')
+    return value
+
+
 def validate_protection_profile(module, protection, runtime, faults, fanout):
     if protection and (not runtime or faults or fanout):
         raise RuntimeError('IAM protection requires separate actual runtime without faults/fanout')
@@ -137,7 +167,7 @@ def retain_private_host_output(path, raw):
         stream.write(raw)
 
 
-def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, require_business_result=False, qs_source=None, *, faults=False, native_runner=None, proxy_start=None):
+def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, require_business_result=False, qs_source=None, *, faults=False, native_runner=None, proxy_start=None, read_parameters=None):
     source = source.resolve()
     if not (source / 'go.mod').is_file():
         raise RuntimeError('required exact IAM source checkout missing')
@@ -153,20 +183,38 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     if protection_flag not in ('0', '1'):
         raise RuntimeError('explicit IAM protection profile flag required')
     protection = protection_flag == '1'
+    native_flag = os.environ.get('ROCKETMQ_IAM_NATIVE_LIMIT', '0')
+    if native_flag not in ('0', '1') or (native_flag == '1' and protection):
+        raise RuntimeError('explicit separate IAM native limit profile required')
+    native_limit = native_flag == '1'
+
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'],
                             cwd=source, env=env).stdout)
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('IAM must use its pinned downloaded SDK without replace')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
-    validate_protection_profile(module, protection, runtime_required, faults, qs_source is not None)
+    validate_protection_profile(module, protection or native_limit, runtime_required, faults, qs_source is not None)
     env['IAM_M3_VERIFY_PROTOCOL_PROTECTION'] = '1' if protection else '0'
-    if (runtime_required or faults) and not protection and module.get('Version') != 'v0.5.0-rocketmq-tx.2':
+    if (runtime_required or faults) and not (protection or native_limit) and module.get('Version') != 'v0.5.0-rocketmq-tx.2':
         raise RuntimeError('current IAM runtime proof requires fixed SDK tx.2')
     manifest = iam_manifest(fanout=qs_source is not None)
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4),
                        'password': secrets.token_hex(32)} for role in manifest['accounts']}
     proof['provision'] = provision(broker, manifest, accounts)
+    env['IAM_M3_VERIFY_NATIVE_LIMIT'] = '1' if native_limit else '0'
+    if native_limit:
+        if read_parameters is None:
+            raise RuntimeError('fixed original Broker parameter parser required')
+        from native_limit_acceptance import create_native_limit
+        proof['native_fault'] = {}
+        route = next(r for r in manifest['routes'] if r['owner'] == 'iam.mysql' and r['message_type'] == 'TRANSACTION')
+        audit, digest = create_native_limit(repo=Path(__file__).resolve().parents[2], directory=directory,
+            broker=broker, project=project, grpc_port=grpc_port, ca=ca, account=accounts['iam-producer'],
+            route=route, run=run, native_runner=native_runner, parameters=read_parameters,
+            proof=proof['native_fault'], mysql_port=mysql_port, password=password)
+        env.update(IAM_M3_NATIVE_LIMIT_AUDIT=str(audit), IAM_M3_NATIVE_LIMIT_SHA256=digest)
+
     routes = directory / 'iam-routes.json'
     routes.write_text(json.dumps(manifest)); routes.chmod(0o600)
     paths = {}
@@ -231,6 +279,8 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
         proof['runtime_receipt'] = parse_runtime_receipt(result.stdout, proof['source_sha'])
         if protection:
             proof['protection_receipt'] = parse_protection_receipt(result.stdout, proof['source_sha'])
+        if native_limit:
+            proof['native_limit_receipt'] = parse_native_limit_receipt(result.stdout, proof['source_sha'])
     if qs_source is not None:
         proof['qs_fanout']['receipt'] = parse_fanout_receipt(result.stdout)
         proof['qs_fanout']['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=qs_source).stdout.strip()

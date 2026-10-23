@@ -214,6 +214,7 @@ def main():
     parser.add_argument("--sdk-limits", action="store_true", help="require public SDK finite native check audit and admission alarm")
     parser.add_argument("--sdk-go-probe", type=Path, help="prebuilt public SDK executable from a verified published Go module")
     parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
+    parser.add_argument("--qs-native-limit", action="store_true", help="actual SYS native limit -> durable original-primary host deny, restart and live Checker")
     parser.add_argument("--qs-protocol-protection", action="store_true", help="requires actual QS runtime, published tx.4, current observation guard and real recovery audit")
     parser.add_argument("--qs-runtime-host", type=Path, help="exact QS checkout; actual default dual owners, original stores and owned Broker restart/Checker")
     parser.add_argument("--qs-retry-store-host", type=Path, help="exact QS checkout; original dual-store future authorization atomicity only")
@@ -295,6 +296,8 @@ def main():
                 args.qs_deferred_consumer_host, args.sdk_api_go, args.sdk_api_python, args.sdk_faults,
                 args.sdk_limits, args.go_probe, args.sdk_go_probe, args.installed_python, args.iam_private_log))):
         parser.error('original IAM faults require one explicit IAM source without runtime or fanout profile')
+    if args.qs_native_limit and (not args.qs_runtime_host or args.qs_protocol_protection):
+        parser.error("native limit requires its own QS runtime profile without timestamp aging")
     if args.qs_protocol_protection and not args.qs_runtime_host:
         parser.error("protocol protection requires the separate default QS runtime profile")
     if args.qs_runtime_host and any((args.m3_resources, args.iam_host, args.sdk_api_go, args.sdk_api_python,
@@ -632,7 +635,7 @@ def main():
                     passed('ai_' + boundary + '_actual_original_commit_tcp_boundary')
                 return
             from broker_fault_control import OwnedBrokerFault
-            state_profile = kind in ('state', 'protection')
+            state_profile = kind in ('state', 'protection', 'native_limit')
             proof_name = ('paired_host' if kind in ('paired','paired_faults') else ('ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')))
             fault_tools = None
             if kind in ('finalization','paired_faults'):
@@ -642,7 +645,8 @@ def main():
             proof[proof_name] = {}
             run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
                                   mysql_password, ca, run, proof[proof_name], fault_tools=fault_tools,
-                                  native_runner=owned_native_run if kind in ('finalization', 'paired','paired_faults') else None,
+                                  native_runner=owned_native_run if kind in ('finalization', 'paired','paired_faults', 'native_limit') else None,
+                                  read_parameters=broker_parameters,
                                   broker_fault=(OwnedBrokerFault(run,broker,project,
                                     lambda: broker_parameters(admin('getBrokerConfig')),effective)
                                     if kind == 'paired_faults' else None))
@@ -724,7 +728,10 @@ def main():
                 proof['qs_runtime_host'] = {}
                 run_qs_runtime_host(args.qs_runtime_host, directory, broker, project, grpc_port,
                     mysql_port, mongo_port, mysql_password, ca, run, proof['qs_runtime_host'],
-                    owned_native_run, repo, broker_parameters, protection=args.qs_protocol_protection)
+                    owned_native_run, repo, broker_parameters, protection=args.qs_protocol_protection, native_limit=args.qs_native_limit)
+                if args.qs_native_limit:
+                    for name in proof['qs_runtime_host']['native_limit_receipt']['cases']:
+                        passed('qs_native_limit_' + name)
                 for name in proof['qs_runtime_host']['native_receipt']['cases']:
                     passed('qs_runtime_' + name)
                 if args.qs_protocol_protection:
@@ -982,8 +989,11 @@ def main():
             from iam_acceptance import run_iam_host
             proof['iam_host'] = {}
             run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
-                         mysql_password, ca, run, proof['iam_host'], args.iam_private_log, args.iam_operation_results, args.iam_fanout_qs)
+                         mysql_password, ca, run, proof['iam_host'], args.iam_private_log, args.iam_operation_results, args.iam_fanout_qs, native_runner=owned_native_run, read_parameters=broker_parameters)
             passed('iam_host_actual_sdk_original_root_and_application')
+            if 'native_limit_receipt' in proof['iam_host']:
+                for name in proof['iam_host']['native_limit_receipt']['cases']:
+                    passed('iam_native_limit_' + name)
             if 'protection_receipt' in proof['iam_host']:
                 for name in proof['iam_host']['protection_receipt']['cases']:
                     passed('iam_protocol_protection_' + name)
@@ -1204,6 +1214,9 @@ def main():
             if args.qs_protocol_protection:
                 report['batch'] = 'M3-T24-QS-dual-owner-protection-and-positive-recovery'
                 report['limits'].append('Owned audit timestamps aged by 600 seconds; no real ten-minute elapsed, no unresolved no-callback debt recovery claim')
+            if args.qs_native_limit:
+                report['batch'] = 'M3-T24-QS-native-limit-original-primary-durable-deny-and-live-Checker'
+                report['limits'].append('Actual native SYS index; no timestamp aging, governance resolution or production authorization claim')
             report['qs_runtime_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_runtime_acceptance.py').read_bytes()).hexdigest()
         if args.qs_deferred_consumer_host:
             report['batch'] = 'M3-QS-deferred-consumer-original-MySQL'
@@ -1223,7 +1236,7 @@ def main():
                                 'Controlled QS input and observer ACK only; no paired QS business or real provider',
                                 'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
             report['ai_admission_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_admission_acceptance.py').read_bytes()).hexdigest()
-            if os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') in ('state', 'protection'):
+            if os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') in ('state', 'protection', 'native_limit'):
                 report['batch'] = 'M3-AI-worker-state-original-SQLAlchemy-and-real-Broker'
                 report['limits'] = ['No production/system acceptance or throughput claim',
                                     'Actual evaluation worker preflight, released SDK and original state root',
@@ -1305,6 +1318,13 @@ def main():
                                               repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/sdk_faults.py", repo / "scripts/rocketmq/sdk_limits.py",
                                               repo / "scripts/rocketmq/audit_transaction_limit.py", repo / "scripts/rocketmq/routes.py",
                                               repo / "scripts/rocketmq/provision_v2.py")}
+        if args.qs_native_limit or os.environ.get('ROCKETMQ_IAM_NATIVE_LIMIT') == '1' or os.environ.get('QS_AI_ACCEPTANCE_KIND') == 'native_limit':
+            for relative in ('scripts/rocketmq/native_limit_acceptance.py',
+                             'scripts/rocketmq/qs_runtime_acceptance.py',
+                             'scripts/rocketmq/probes/native-transaction-limit/go.mod',
+                             'scripts/rocketmq/probes/native-transaction-limit/go.sum',
+                             'scripts/rocketmq/probes/native-transaction-limit/main.go'):
+                report['harness_sha256'][relative] = hashlib.sha256((repo / relative).read_bytes()).hexdigest()
         report['harness_sha256']['scripts/rocketmq/route_read_probe.py'] = hashlib.sha256((repo / 'scripts/rocketmq/route_read_probe.py').read_bytes()).hexdigest()
         report['harness_sha256']['scripts/rocketmq/failure_diagnostics.py'] = hashlib.sha256(
             (repo / 'scripts/rocketmq/failure_diagnostics.py').read_bytes()).hexdigest()
