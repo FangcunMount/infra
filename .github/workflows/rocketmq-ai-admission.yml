@@ -7,8 +7,17 @@ on:
         type: string
         required: true
         default: 9485f28f9bf7d078b691b6b561473272d436e5ba
+      faults:
+        description: Actual command receiver original SQLAlchemy COMMIT TCP before/after
+        type: boolean
+        default: false
+      profile:
+        description: Development is one profile; full is mandatory for a frozen fault candidate
+        type: choice
+        options: [full, development]
+        default: full
   pull_request:
-    paths: ['scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/test_ai_admission_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-admission.yml', 'Makefile']
+    paths: ['scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/test_ai_admission_acceptance.py', 'scripts/rocketmq/ai_database_fault_acceptance.py', 'scripts/rocketmq/test_ai_database_fault_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-admission.yml', 'Makefile']
 permissions:
   contents: read
 concurrency:
@@ -21,14 +30,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ['3.11', '3.13']
-        mysql: ['mysql:8.0.36', 'mysql:8.0.44', 'mysql:8.4.11']
+        python: ${{ fromJSON(inputs.profile == 'development' && '["3.13"]' || '["3.11","3.13"]') }}
+        mysql: ${{ fromJSON(inputs.profile == 'development' && '["mysql:8.0.36"]' || '["mysql:8.0.36","mysql:8.0.44","mysql:8.4.11"]') }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: 8fb6fc57a415dc11e27fc64d71722f9675838bc3
+          ref: ${{ inputs.faults == true && '8de893b367cc797580799abd8325f41dd62356db' || '8fb6fc57a415dc11e27fc64d71722f9675838bc3' }}
           path: .sdk-acceptance
       - uses: actions/checkout@v6
         with:
@@ -57,12 +66,22 @@ jobs:
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-ai-admission:5.5.1 components/rocketmq
       - name: Required actual AI receiver, SDK and original SQL roots
+        env:
+          HOST_FAULTS: ${{ inputs.faults == true && '1' || '0' }}
+          QS_AI_ACCEPTANCE_PYTHON: ${{ matrix.python }}
         run: |
           set -euo pipefail
+          if [[ "$HOST_FAULTS" == 1 ]]; then
+            QS_AI_ACCEPTANCE_KIND=db_faults python3 scripts/rocketmq/ci-transactions.py \
+              --sdk "$PWD/.sdk-acceptance" --ai-admission-host "$PWD/.ai-acceptance" \
+              --ai-host-database-faults --image rocketmq-ai-admission:5.5.1 \
+              --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-admission.json
+          else
           make rocketmq-ai-admission-test SDK_DIR="$PWD/.sdk-acceptance" AI_DIR="$PWD/.ai-acceptance" \
             ROCKETMQ_TEST_IMAGE=rocketmq-ai-admission:5.5.1 \
             AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' ROCKETMQ_TEST_MYSQL_IMAGE='${{ matrix.mysql }}' \
             ROCKETMQ_AI_ADMISSION_REPORT=rocketmq-ai-admission.json
+          fi
       - uses: actions/upload-artifact@v7
         if: always()
         with:

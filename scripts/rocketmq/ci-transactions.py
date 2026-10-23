@@ -126,11 +126,11 @@ class Probe:
             except queue.Empty:
                 return
 
-    def wait(self, event, identity=None, decision=None, timeout=90):
+    def wait(self, event, identity=None, decision=None, timeout=90, *, after=0):
         deadline = time.monotonic() + timeout
         while True:
             self.drain()
-            for item in self.events:
+            for item in self.events[after:]:
                 if (item.get("event") == event and (identity is None or item.get("id") == identity)
                         and (decision is None or item.get("decision") == decision)):
                     return item
@@ -222,7 +222,64 @@ def main():
     parser.add_argument("--qs-command-host", type=Path, help="exact QS checkout; original SQL command root and real Broker")
     parser.add_argument("--qs-event-host", type=Path, help="exact QS checkout; authenticated event Inbox/projection and original ACK SQL root")
     parser.add_argument("--ai-admission-host", type=Path, help="exact AI checkout; real published Python SDK and original admission roots/Broker")
+    parser.add_argument("--iam-host-faults", action="store_true", help="separate actual IAM role original-root COMMIT packet faults")
+    parser.add_argument("--qs-answer-host-faults", action="store_true", help="separate actual AnswerSheet original Mongo COMMIT packet faults")
+    parser.add_argument("--ai-host-database-faults", action="store_true", help="actual AI command original SQLAlchemy COMMIT packet faults")
+    parser.add_argument("--qs-command-host-faults", action="store_true", help="actual QS command original MySQL COMMIT TCP faults")
+    parser.add_argument("--paired-host-faults", action="store_true", help="explicit paired MQ/process/Broker physical fault profile")
+    parser.add_argument("--sdk-python-live-recovery", action="store_true", help="source-candidate Python producer survives actual owned Broker SIGKILL")
     args = parser.parse_args()
+    if args.sdk_python_live_recovery and (not args.sdk_api_go or not args.sdk_api_python
+            or any((args.iam_host,args.m3_resources,args.iam_fanout_qs,args.qs_answer_host,
+                args.qs_evaluation_host,args.qs_report_host,args.qs_task_host,args.qs_retry_store_host,
+                args.qs_retry_dispatch_host,args.qs_command_host,args.qs_event_host,args.ai_admission_host,
+                args.qs_runtime_host,args.qs_deferred_consumer_host,args.sdk_faults,args.sdk_limits,
+                args.installed_python,args.go_probe,args.sdk_go_probe))):
+        parser.error("Python live recovery requires source SDK Go/Python fixture without another profile")
+    if args.paired_host_faults and (not args.ai_admission_host
+            or os.environ.get("QS_AI_ACCEPTANCE_KIND") != "paired_faults"
+            or not os.environ.get("QS_M3_PAIRED_SOURCE")
+            or any((args.iam_host, args.m3_resources, args.iam_fanout_qs, args.qs_answer_host,
+                args.qs_evaluation_host, args.qs_report_host, args.qs_task_host, args.qs_retry_store_host,
+                args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host, args.qs_runtime_host,
+                args.qs_deferred_consumer_host, args.sdk_api_go, args.sdk_api_python, args.sdk_faults,
+                args.sdk_limits, args.go_probe, args.sdk_go_probe, args.installed_python,
+                args.ai_host_database_faults, args.iam_host_faults, args.qs_answer_host_faults,
+                args.qs_command_host_faults))):
+        parser.error("paired physical faults require exact paired sources and no other profile")
+    if os.environ.get("QS_AI_ACCEPTANCE_KIND") == "paired_faults" and not args.paired_host_faults:
+        parser.error("paired_faults requires its explicit physical fault gate")
+    if args.qs_command_host_faults and (not args.qs_command_host or any((args.iam_host, args.m3_resources,
+            args.iam_fanout_qs, args.qs_answer_host, args.qs_evaluation_host, args.qs_report_host,
+            args.qs_task_host, args.qs_retry_store_host, args.qs_retry_dispatch_host, args.qs_event_host,
+            args.ai_admission_host, args.qs_runtime_host, args.qs_deferred_consumer_host, args.sdk_api_go,
+            args.sdk_api_python, args.sdk_faults, args.sdk_limits, args.go_probe, args.sdk_go_probe,
+            args.installed_python))):
+        parser.error('original QS command faults require one explicit QS command source without another profile')
+    if args.ai_host_database_faults and (not args.ai_admission_host
+            or os.environ.get('QS_AI_ACCEPTANCE_KIND') != 'db_faults'
+            or any((args.iam_host, args.m3_resources, args.iam_fanout_qs, args.qs_answer_host,
+                args.qs_evaluation_host, args.qs_report_host, args.qs_task_host, args.qs_retry_store_host,
+                args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host, args.qs_runtime_host,
+                args.qs_deferred_consumer_host, args.sdk_api_go, args.sdk_api_python, args.sdk_faults,
+                args.sdk_limits, args.go_probe, args.sdk_go_probe, args.installed_python))):
+        parser.error('AI original database faults require one explicit AI source and db_faults profile')
+    if os.environ.get('QS_AI_ACCEPTANCE_KIND') == 'db_faults' and not args.ai_host_database_faults:
+        parser.error('db_faults requires its explicit original database fault gate')
+    if args.qs_answer_host_faults and (not args.qs_answer_host or any((args.iam_host, args.m3_resources,
+            args.iam_fanout_qs, args.qs_evaluation_host, args.qs_report_host, args.qs_task_host,
+            args.qs_retry_store_host, args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host,
+            args.ai_admission_host, args.qs_runtime_host, args.qs_deferred_consumer_host, args.sdk_api_go,
+            args.sdk_api_python, args.sdk_faults, args.sdk_limits, args.go_probe, args.sdk_go_probe,
+            args.installed_python, args.qs_answer_private_log))):
+        parser.error('original AnswerSheet faults require one explicit QS source without another profile')
+    if args.iam_host_faults and (not args.iam_host or os.environ.get('ROCKETMQ_IAM_RUNTIME_REQUIRED', '0') != '0'
+            or any((args.m3_resources, args.iam_fanout_qs, args.qs_answer_host, args.qs_evaluation_host,
+                args.qs_report_host, args.qs_task_host, args.qs_retry_store_host, args.qs_retry_dispatch_host,
+                args.qs_command_host, args.qs_event_host, args.ai_admission_host, args.qs_runtime_host,
+                args.qs_deferred_consumer_host, args.sdk_api_go, args.sdk_api_python, args.sdk_faults,
+                args.sdk_limits, args.go_probe, args.sdk_go_probe, args.installed_python, args.iam_private_log))):
+        parser.error('original IAM faults require one explicit IAM source without runtime or fanout profile')
     if args.qs_runtime_host and any((args.m3_resources, args.iam_host, args.sdk_api_go, args.sdk_api_python,
             args.qs_answer_host, args.qs_evaluation_host, args.qs_report_host, args.qs_task_host, args.qs_retry_store_host,
             args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host, args.ai_admission_host,
@@ -380,7 +437,7 @@ def main():
     def start(language, mode, identity="", owner="owner-a", topic=None, trust=None,
               storage="mysql", branches=1, revision="sdk-v2", subscription=None, principal=None,
               database_proxy=None, mq_proxy=None, lease_millis=15000):
-        is_sdk = language in ("sdk-go", "sdk-python")
+        is_sdk = language in ("sdk-go", "sdk-python", "sdk-route")
         logical_owner, inputs, owner_routes = owner, [], []
         group = "m2-tx-consumer"
         if is_sdk:
@@ -399,7 +456,7 @@ def main():
             physical_inputs = ([r for r in sdk_manifest["routes"] if r.get("subscription") == subscription]
                                if mode == "shared-consume" else matches)
             inputs = [{k: v for k, v in r.items() if k != "id"} for r in physical_inputs]
-            role = principal or ("observer" if mode in ("consume", "shared-consume") else
+            role = principal or ("observer" if mode in ("consume", "shared-consume", "route-read") else
                                  ("owner-a" if storage == "mysql" else "owner-b"))
             account = accounts[role]
             owner_routes = [{"topic":r["topic"],"physical_topic":r["physical_topic"],
@@ -429,18 +486,26 @@ def main():
                     str(sdk / "python/tests/integration/transaction_probe.py")]
         if language == "sdk-python" and args.installed_python:
             argv = [interpreter_path(args.installed_python), "-I", str(sdk / "python/tests/integration/transaction_probe.py")]
+        if language == "sdk-route":
+            argv = [args.python, "run", "--locked", "--project", str(sdk / "python"),
+                    "--extra", "rocketmq", "--extra", "nsq", "python",
+                    str(repo / "scripts/rocketmq/route_read_probe.py")]
         argv += ["--config", str(path), "--mode", mode, "--id", identity]
         p = Probe(argv, directory, dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(trust or ca)))
         probes.append(p)
         return p
 
-    def owned_native_run(argv, *, cwd, env, timeout=900, required=False):
+    def owned_native_run(argv, *, cwd, env, timeout=900, required=False,
+                         prefix="NATIVE_UNUSED_PREFIX ", supervise=None):
         # uv is a launcher. Own its whole session so timeouts cannot leave the
         # worker/provider/proxy processes running after the private fixture ends.
-        native = Probe(argv, directory, env, prefix="NATIVE_UNUSED_PREFIX ", cwd=cwd)
+        native = Probe(argv, directory, env, prefix=prefix, cwd=cwd)
         probes.append(native)
+        deadline = time.monotonic() + timeout
         try:
-            code = native.process.wait(timeout=timeout)
+            if supervise is not None:
+                supervise(native)
+            code = native.process.wait(timeout=max(0.01, deadline - time.monotonic()))
             native.finish(expected=code)
             native.log.flush()
             if code:
@@ -530,19 +595,35 @@ def main():
         if args.ai_admission_host:
             from ai_admission_acceptance import run_ai_admission_host
             kind = os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission')
+            if args.ai_host_database_faults:
+                run(['go', 'build', '-o', str(directory / 'fault-proxy'),
+                     './transport/rocketmq/internal/faultproxy'], cwd=sdk)
+                proof['ai_database_faults_host'] = {}
+                run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
+                    mysql_password, ca, run, proof['ai_database_faults_host'],
+                    native_runner=owned_native_run, proxy_start=proxy_start)
+                for boundary, evidence in proof['ai_database_faults_host']['faults'].items():
+                    for name in evidence['receipt']['cases']:
+                        passed('ai_' + boundary + '_' + name)
+                    passed('ai_' + boundary + '_actual_original_commit_tcp_boundary')
+                return
+            from broker_fault_control import OwnedBrokerFault
             state_profile = kind == 'state'
-            proof_name = ('paired_host' if kind == 'paired' else ('ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')))
+            proof_name = ('paired_host' if kind in ('paired','paired_faults') else ('ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')))
             fault_tools = None
-            if kind == 'finalization':
+            if kind in ('finalization','paired_faults'):
                 run(['go', 'build', '-o', str(directory / 'fault-proxy'),
                      './transport/rocketmq/internal/faultproxy'], cwd=sdk)
                 fault_tools = dict(binary=str(directory / 'fault-proxy'), cert=str(ca), key=str(fault_key))
             proof[proof_name] = {}
             run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
                                   mysql_password, ca, run, proof[proof_name], fault_tools=fault_tools,
-                                  native_runner=owned_native_run if kind in ('finalization', 'paired') else None)
-            for name in proof[proof_name]['native_receipt']['cases']:
-                passed(('paired_' if kind == 'paired' else ('ai_finalization_' if kind == 'finalization' else ('ai_state_' if state_profile else 'ai_admission_'))) + name)
+                                  native_runner=owned_native_run if kind in ('finalization', 'paired','paired_faults') else None,
+                                  broker_fault=(OwnedBrokerFault(run,broker,project,
+                                    lambda: broker_parameters(admin('getBrokerConfig')),effective)
+                                    if kind == 'paired_faults' else None))
+            for name in proof[proof_name]['native_receipt'].get('combined_cases',proof[proof_name]['native_receipt']['cases']):
+                passed(('paired_' if kind in ('paired','paired_faults') else ('ai_finalization_' if kind == 'finalization' else ('ai_state_' if state_profile else 'ai_admission_'))) + name)
             return
         if args.qs_event_host:
             from qs_event_acceptance import run_qs_event_host
@@ -551,6 +632,32 @@ def main():
                               mysql_password, ca, run, proof['qs_event_host'])
             for name in proof['qs_event_host']['native_receipt']['cases']:
                 passed('qs_event_' + name)
+            return
+        if args.iam_host_faults:
+            from iam_acceptance import run_iam_host
+            run(['go', 'build', '-o', str(directory / 'fault-proxy'),
+                 './transport/rocketmq/internal/faultproxy'], cwd=sdk)
+            proof['iam_host'] = {}
+            run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
+                mysql_password, ca, run, proof['iam_host'], faults=True,
+                native_runner=owned_native_run, proxy_start=proxy_start)
+            for boundary, evidence in proof['iam_host']['faults'].items():
+                for name in evidence['receipt']['cases']:
+                    passed('iam_' + boundary + '_' + name)
+                passed('iam_' + boundary + '_actual_original_commit_tcp_boundary')
+            return
+        if args.qs_command_host_faults:
+            from qs_command_acceptance import run_qs_command_host
+            run(['go', 'build', '-o', str(directory / 'fault-proxy'),
+                 './transport/rocketmq/internal/faultproxy'], cwd=sdk)
+            proof['qs_command_host'] = {}
+            run_qs_command_host(args.qs_command_host, directory, broker, project, grpc_port, mysql_port,
+                mysql_password, ca, run, proof['qs_command_host'], faults=True,
+                native_runner=owned_native_run, proxy_start=proxy_start)
+            for boundary, evidence in proof['qs_command_host']['faults'].items():
+                for name in evidence['receipt']['cases']:
+                    passed('qs_command_' + boundary + '_' + name)
+                passed('qs_command_' + boundary + '_actual_original_commit_tcp_boundary')
             return
         if args.qs_command_host:
             from qs_command_acceptance import run_qs_command_host
@@ -622,6 +729,19 @@ def main():
                 for name in proof['qs_report_host']['native_receipt']['cases']:
                     passed('qs_report_' + name)
                 return
+            if args.qs_answer_host_faults:
+                from qs_answer_acceptance import run_qs_answer_host
+                run(['go', 'build', '-o', str(directory / 'fault-proxy'),
+                     './transport/rocketmq/internal/faultproxy'], cwd=sdk)
+                proof['qs_answer_host'] = {}
+                run_qs_answer_host(args.qs_answer_host, directory, broker, project, grpc_port, mongo_port,
+                    ca, run, proof['qs_answer_host'], faults=True,
+                    native_runner=owned_native_run, proxy_start=proxy_start)
+                for boundary, evidence in proof['qs_answer_host']['faults'].items():
+                    for name in evidence['receipt']['cases']:
+                        passed('qs_answer_' + boundary + '_' + name)
+                    passed('qs_answer_' + boundary + '_actual_original_commit_tcp_boundary')
+                return
             from qs_answer_acceptance import run_qs_answer_host
             proof['qs_answer_host'] = {}
             run_qs_answer_host(args.qs_answer_host, directory, broker, project, grpc_port, mongo_port,
@@ -672,6 +792,19 @@ def main():
                 if not args.installed_python:
                     run([args.python, "sync", "--locked", "--project", str(sdk / "python"),
                          "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
+            if args.sdk_python_live_recovery:
+                from broker_fault_control import OwnedBrokerFault
+                from python_live_recovery import CASE, SETUP_CASES, run_live_recovery
+                proof['python_live_recovery'] = {}
+                control = OwnedBrokerFault(run,broker,project,
+                    lambda: broker_parameters(admin('getBrokerConfig')),effective)
+                run_live_recovery(start,sql,control,proof['python_live_recovery'],passed,
+                    [r['physical_topic'] for r in sdk_manifest['routes']
+                     if r['owner']=='iam.mysql' and r['route_revision']=='sdk-v2'
+                     and r['message_type']=='TRANSACTION'])
+                if set(cases) != SETUP_CASES | {CASE}:
+                    raise RuntimeError('source SDK live recovery profile incomplete or substituted')
+                return
             from v2_acceptance import denied_owners, shared_budget
             denied_owners(start,sql,mongo_command,passed,python=args.sdk_api_python)
             wrong_ca = directory / "sdk-wrong-ca.crt"
@@ -980,12 +1113,25 @@ def main():
             report['batch'] = 'M3-IAM-host-with-M2-0-baseline'
             report['limits'].append('IAM host acceptance uses released SDK; base raw-client cases remain separately scoped')
             report['iam_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/iam_acceptance.py').read_bytes()).hexdigest()
+        if args.iam_host_faults:
+            report['batch'] = 'M3-T23-IAM-original-role-COMMIT-packet-faults'
+            report['iam_fault_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/iam_fault_acceptance.py').read_bytes()).hexdigest()
+            report['limits'] = ['Actual role.create/original GORM root and real before/after COMMIT TCP loss',
+                'No full API daemon, producer SIGKILL, Broker restart, provider or system claim',
+                'New paused owner requires persisted exact abort plus actual Broker rollback callback;expiry alone is not proof']
         if args.qs_answer_host:
             report['batch'] = 'M3-QS-answer-original-Mongo-host'
             report['limits'] = ['No production/system acceptance or throughput claim',
                                 'Actual host SDK and original Mongo transactions, not raw-client feasibility',
                                 'Root ACK discard is client-level; packet-loss and process-exit acceptance remain separate gates']
             report['qs_answer_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_answer_acceptance.py').read_bytes()).hexdigest()
+        if args.qs_answer_host_faults:
+            report['batch'] = 'M3-T23-QS-original-AnswerSheet-COMMIT-packet-faults'
+            report['qs_answer_fault_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_answer_fault_acceptance.py').read_bytes()).hexdigest()
+            report['limits'] = ['Actual AnswerSheet/original Mongo root with all matching COMMIT retries disconnected',
+                'Before: exact original sessions killed after driver returns; persisted Aborted AND new paused Broker rollback callback required',
+                'After: exact committed witness, first wire and duplicate recovery; new instance Commit callback not claimed',
+                'No full API daemon, producer SIGKILL, Broker restart, provider, system or production claim']
         if args.qs_report_host:
             report['batch'] = 'M3-QS-report-original-Mongo-host'
             report['limits'] = ['No production/system acceptance or throughput claim',
@@ -1036,6 +1182,17 @@ def main():
                                     'Event observer ACK only; no paired QS business or real provider',
                                     'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
                 report['ai_state_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_state_acceptance.py').read_bytes()).hexdigest()
+        if args.sdk_python_live_recovery:
+            report['batch'] = 'M3-T23-source-SDK-Python-surviving-producer-Broker-SIGKILL'
+            report['limits'] = ['Exact source SDK regression, not a published SDK or host/business/system/production acceptance',
+                'Original producer stays alive, new send admission stopped, original root once and actual Broker callbacks/consumption required']
+            report['python_live_recovery_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/python_live_recovery.py').read_bytes()).hexdigest()
+        if args.paired_host_faults:
+            report['batch'] = 'M3-T23-paired-physical-faults-' + os.environ.get('QS_M3_PAIRED_PROFILE','core')
+            report['limits'] = ['Actual paired original roots, controlled read-side inputs; no public HTTP, real provider, system or production acceptance',
+                'core development requires2 fault tests/15 evidence; final full requires7 tests/40 evidence']
+            report['paired_fault_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/paired_fault_acceptance.py').read_bytes()).hexdigest()
+            report['broker_fault_control_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/broker_fault_control.py').read_bytes()).hexdigest()
         if args.ai_admission_host and os.environ.get('QS_AI_ACCEPTANCE_KIND') == 'paired':
             report['batch'] = 'M3-paired-final-version-' + os.environ.get('QS_M3_PAIRED_PROFILE', 'core')
             report['limits'] = ['No production/system, public HTTP, real provider or packet-fault acceptance',
@@ -1077,6 +1234,18 @@ def main():
                                 'Actual submission/outcome application roots and original MySQL/Broker',
                                 'No packet loss, SIGKILL or future retry handoff claim']
             report['qs_evaluation_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_evaluation_acceptance.py').read_bytes()).hexdigest()
+        if args.ai_host_database_faults:
+            report['batch'] = 'M3-T23-AI-original-command-COMMIT-packet-faults'
+            report['ai_database_fault_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_database_fault_acceptance.py').read_bytes()).hexdigest()
+            report['limits'] = ['Actual authenticated command receiver/original SQLAlchemy root with COMMIT TCP loss; controlled input/observer',
+                'No full API daemon, paired QS business, producer SIGKILL, Broker restart, real provider, system or production claim',
+                'After: exact committed facts/Inbox/two frozen branches; before: exact persisted abort AND actual new paused Broker callback']
+        if args.qs_command_host_faults:
+            report['batch'] = 'M3-T23-QS-original-command-COMMIT-packet-faults'
+            report['qs_command_fault_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_command_fault_acceptance.py').read_bytes()).hexdigest()
+            report['limits'] = ['Actual QS command store/original MySQL root; initial seal, plan, operation and first wire preserved',
+                'Completed SDK execution count is not presented as a measured database callback count',
+                'No full API daemon, paired AI receiver, producer SIGKILL, Broker restart, provider, system or production claim']
         report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
@@ -1084,6 +1253,7 @@ def main():
                                               repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/sdk_faults.py", repo / "scripts/rocketmq/sdk_limits.py",
                                               repo / "scripts/rocketmq/audit_transaction_limit.py", repo / "scripts/rocketmq/routes.py",
                                               repo / "scripts/rocketmq/provision_v2.py")}
+        report['harness_sha256']['scripts/rocketmq/route_read_probe.py'] = hashlib.sha256((repo / 'scripts/rocketmq/route_read_probe.py').read_bytes()).hexdigest()
         report['harness_sha256']['scripts/rocketmq/failure_diagnostics.py'] = hashlib.sha256(
             (repo / 'scripts/rocketmq/failure_diagnostics.py').read_bytes()).hexdigest()
         report['harness_sha256']['scripts/rocketmq/published_runtime.py'] = hashlib.sha256(

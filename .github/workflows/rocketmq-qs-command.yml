@@ -7,8 +7,17 @@ on:
         type: string
         required: true
         default: 3dd33af4fc86d03fc80545276f18d0fef862f376
+      faults:
+        description: Original QS command COMMIT before/after TCP faults
+        type: boolean
+        default: false
+      profile:
+        description: Development uses one MySQL; full is the frozen-candidate gate
+        type: choice
+        options: [full, development]
+        default: full
   pull_request:
-    paths: ['scripts/rocketmq/qs_command_acceptance.py', 'scripts/rocketmq/test_qs_command_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-command.yml']
+    paths: ['scripts/rocketmq/qs_command_acceptance.py', 'scripts/rocketmq/test_qs_command_acceptance.py', 'scripts/rocketmq/qs_command_fault_acceptance.py', 'scripts/rocketmq/test_qs_command_fault_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-command.yml']
 permissions:
   contents: read
 env:
@@ -26,13 +35,13 @@ jobs:
         # QS go.mod requires 1.25.12. The separate SDK workflow retains its
         # own 1.25.9/1.25.12 compatibility matrix.
         go: ['1.25.12']
-        mysql: ['mysql:8.0.36', 'mysql:8.0.44', 'mysql:8.4.11']
+        mysql: ${{ fromJSON(inputs.profile == 'development' && '["mysql:8.0.36"]' || '["mysql:8.0.36","mysql:8.0.44","mysql:8.4.11"]') }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: 8fb6fc57a415dc11e27fc64d71722f9675838bc3
+          ref: ${{ inputs.faults == true && '8de893b367cc797580799abd8325f41dd62356db' || '8fb6fc57a415dc11e27fc64d71722f9675838bc3' }}
           path: .sdk-acceptance
       - uses: actions/checkout@v6
         with:
@@ -57,11 +66,17 @@ jobs:
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-qs-command:5.5.1 components/rocketmq
       - name: Required actual QS command entrypoints and original SQL roots
+        env:
+          HOST_FAULTS: ${{ inputs.faults == true && '1' || '0' }}
         run: |
           set -euo pipefail
+          fault_args=()
+          if [[ "$HOST_FAULTS" == 1 ]]; then
+            fault_args+=(--qs-command-host-faults)
+          fi
           python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
             --qs-command-host "$PWD/.qs-acceptance" --image rocketmq-qs-command:5.5.1 \
-            --mysql-image "${{ matrix.mysql }}" --report rocketmq-qs-command.json
+            --mysql-image "${{ matrix.mysql }}" --report rocketmq-qs-command.json "${fault_args[@]}"
       - uses: actions/upload-artifact@v7
         if: always()
         with:

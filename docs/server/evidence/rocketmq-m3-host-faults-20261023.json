@@ -1948,17 +1948,114 @@
           "private_fixture_directory_removed": true
         },
         "finding": "Single supervisor Start succeeded; new paused AI owner read both original committed references with zero new halves/executions, but original live Go consumer did not complete receipt/state/ACK within60s. Go driver periodic settings resync is5minutes; this is a plausible contributing factor, not independently proven sole cause. Next gate explicitly restarts both affected host instances on the same databases/bindings/epoch, preserves first wires, no business replay. Unattended live-Go recovery is not claimed."
+      },
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39905702688",
+        "candidates": {
+          "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+          "ai-paired-faults": "bb4376087a03e6d1c49193988dfe56208a65275c",
+          "infra-host-faults": "1b2b84d2f887e46ff70f74cdc51e8176b777d784"
+        },
+        "counts": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "report_sha256": "4f120fe8bdfbc95def1abe6f4e46f19f112738ad480c73a2befe672d150b05ff",
+        "proxy_routes_ready": [
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "d8547f57cdbd8d38e7211ebb1eb34c23c2801763756327baa7f01fc3ebbdf9c6",
+            "read_only": true
+          },
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "b42197cee876775438bf66ae3ac8c56844e1c005963dbd2f89340e366a708186",
+            "read_only": true
+          },
+          {
+            "code": 20000,
+            "queues": 1,
+            "attempts": 1,
+            "topic_sha256": "53be1810d69680ced19d42ac387ae81a0d5020ca08e593742cb2ad54606f3207",
+            "read_only": true
+          }
+        ],
+        "partial_fault_receipt": {
+          "cases": {
+            "half_ack_before_actual_mq_disconnect": true,
+            "old_local_committed_final_unknown": true,
+            "producer_sigkill_exit_negative9": true,
+            "same_primary_epoch_readonly_resume_no_new_half": true,
+            "new_paused_broker_commit_callback": true,
+            "same_first_command_wire_after_resume": true,
+            "recovered_pair_receipt_state_ack_without_model": true,
+            "ai_half_prepared_before_broker_kill": true,
+            "actual_final_rpc_unknown_after_committed_root": true,
+            "broker_sigkill_and_same_container_restart": true,
+            "recovered_process_resources_drained": true
+          },
+          "passed": 11,
+          "failed": 1,
+          "skipped": 0,
+          "counters": {
+            "qs_sigkill": {
+              "half_prepared_before_loss": 1,
+              "old_exit_code": -9,
+              "old_seals": 1,
+              "recovered_completed_results": 0,
+              "recovered_half_prepared": 0,
+              "recovered_broker_commit_checks": 1,
+              "final_recovered_seals": 2,
+              "provider_invocations": 0
+            },
+            "broker_restart": {
+              "half_prepared_before_kill": 2,
+              "local_calls_before_kill": 0
+            }
+          },
+          "partial": true,
+          "complete_acceptance_claimed": false
+        },
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_paired_fault_recovery[broker_restart]"
+          ],
+          "assertion_lines": [
+            124,
+            182,
+            188,
+            196,
+            203,
+            346,
+            393,
+            412,
+            567,
+            627
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "finding": "Go SIGKILL recovery passed. In Broker restart case, fresh Go process failed readiness before AI owner recovery. Deterministic fixture defect: ordinary graceful close drops its owned temporary schema, so the replacement cannot verify original binding. Added explicit fixture-only cleanup ownership handoff: retain schema at graceful shutdown, new process validates exact original binding and adopts final cleanup. No production or domain change. Native rerun required."
       }
     ],
     "published_a3_current_host_candidate": {
       "candidates": {
-        "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
-        "ai-paired-faults": "bb4376087a03e6d1c49193988dfe56208a65275c",
-        "infra-host-faults": "1b2b84d2f887e46ff70f74cdc51e8176b777d784"
+        "qs-paired-faults": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+        "ai-paired-faults": "5de957302904dde07ee499c5dbac0e5a96c74c92",
+        "infra-host-faults": "32cd1c62cc6109d32b617eb546a9bf5a2a38be3c"
       },
-      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39905702688",
-      "status": "running; development core2 only, not full6-profile acceptance",
-      "scope": "coordinated fresh QS process and AI DI runtime; old AI drained while Broker down; same DB/owner/epoch/first wire; no command replay, new halves or model calls. Affected-process restart must enter T25 runbook."
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39906622326",
+      "status": "development core2 passed and independently audited; full6-profile acceptance/source merges/shared CI pending",
+      "scope": "explicit disposable schema cleanup ownership handoff, same original binding and first wire; old AI drained before Broker restart; new QS process/new AI DI runtime; no business or model replay"
     },
     "local_a3_validation": {
       "scope": "local worktree only; no DB/MQ/Docker; current-head required GitHub CI separate",
@@ -1995,6 +2092,230 @@
       "docs_links": 1391,
       "docs_drift_history": "16 source-baseline drifts on6reviewed sources; reconciled only those sources, added2paired fixture source ownership; production/runtime unknown",
       "signal_failure": "Initial5s child-port readiness timeout before signal dispatch; targeted4/4passed without changing thresholds; cause not independently proved"
-    }
+    },
+    "coordinated_host_development_audit": {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39906622326",
+      "infra_sha": "32cd1c62cc6109d32b617eb546a9bf5a2a38be3c",
+      "sources": {
+        "qs-paired-faults": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+        "ai-paired-faults": "5de957302904dde07ee499c5dbac0e5a96c74c92",
+        "infra-host-faults": "32cd1c62cc6109d32b617eb546a9bf5a2a38be3c"
+      },
+      "mode": "core",
+      "workflow_conclusion": "success",
+      "profiles": [
+        {
+          "mysql": "8.0.36",
+          "python": "3.11.16",
+          "go": "go1.25.12",
+          "passed": 15,
+          "failed": 0,
+          "skipped": 0,
+          "native_tests": 2,
+          "report_sha256": "911c8d4be24510adc0c3f85f8e6af420f2125147ebee8cde21dd48d4a6a503a5",
+          "source_tool_sdk_and_cleanup_verified": true,
+          "producer_exit_code": -9,
+          "recovered_commit_checks": 1,
+          "broker_exit_code": 137,
+          "restarted_commit_checks": 2
+        }
+      ],
+      "scope": "actual paired host components/original roots/physical MQ and process failures with coordinated affected-host restart; controlled read-side, no live-Go-autoheal/real provider/public HTTP/system/production"
+    },
+    "coordinated_host_development_audit_sha256": "b84246b04bb90c55d8cf3b94b43d62a09d428accec009c6fb7e334a40c64419e",
+    "full_matrix_attempts": [
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39907327708",
+        "sources": {
+          "qs-paired-faults": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+          "ai-paired-faults": "5de957302904dde07ee499c5dbac0e5a96c74c92",
+          "infra-host-faults": "4f439f5c8e6d708000ba8859b7bd6009927cdea0"
+        },
+        "reports": [
+          {
+            "artifact": "rocketmq-paired-full-0-198fccc922a2b33980f258bfc72675384dd5bc81",
+            "sha256": "d4899e54215bb84a2142aa185c93fbf5be99b1233af530163e012ec5f0cdd6ba",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "diagnostics": {
+              "failed_cases": [
+                "test_actual_qs_ai_first_wire_and_duplicate_command_event_ack"
+              ],
+              "assertion_lines": [
+                771
+              ]
+            },
+            "partial_baseline_passed": 11,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "artifact": "rocketmq-paired-full-2-198fccc922a2b33980f258bfc72675384dd5bc81",
+            "sha256": "398340e910a92e18c4b86d563742685d2ef5364a0dd5ee0f6a50b966bf6153a0",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "diagnostics": {
+              "failed_cases": [
+                "test_actual_qs_ai_first_wire_and_duplicate_command_event_ack"
+              ],
+              "assertion_lines": [
+                771
+              ]
+            },
+            "partial_baseline_passed": 11,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "artifact": "rocketmq-paired-full-3-198fccc922a2b33980f258bfc72675384dd5bc81",
+            "sha256": "4fbbaa2b38e577a89ba88c726596ffaf3ed5a77483d02148fa768275d6fd2b6d",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "diagnostics": {
+              "failed_cases": [
+                "test_actual_qs_ai_first_wire_and_duplicate_command_event_ack"
+              ],
+              "assertion_lines": [
+                771
+              ]
+            },
+            "partial_baseline_passed": 11,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "artifact": "rocketmq-paired-full-4-198fccc922a2b33980f258bfc72675384dd5bc81",
+            "sha256": "f14f19abfef9e632d1b4b8cf24a3b26a5453bdd2daaf08f024dec9465e248e88",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "diagnostics": {
+              "failed_cases": [
+                "test_actual_qs_ai_first_wire_and_duplicate_command_event_ack"
+              ],
+              "assertion_lines": [
+                771
+              ]
+            },
+            "partial_baseline_passed": 11,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          }
+        ],
+        "status": "failed native baseline; completed reports retained; remaining jobs may be cancelled by corrected candidate push, no unreported cleanup claim",
+        "finding": "Extracting start_ai moved acknowledgement into nested scope while old duplicate ACK test still used p.acknowledgement. Full matrix caught AttributeError before fault tests. Obtain the actual ACK subscriber from current owned runtime; preserve every first-wire/idempotency/business-snapshot assertion. No production behavior changed."
+      },
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39908190195",
+        "sources": {
+          "qs-paired-faults": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+          "ai-paired-faults": "4ecc1b4da3383ad5a24fcb08f0feabea3432d3d2",
+          "infra-host-faults": "696e6a2022d38ff64dea4f5a227b49fe410c2920"
+        },
+        "reports": [
+          {
+            "artifact": "rocketmq-paired-full-3-0a8bd35e69e668199c9373e43df24a3fa6a17a34",
+            "sha256": "2be35f07dcfbd896777ef3bf92bff0220b5e6a3ba9921ad79be878bb0740b009",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "native_exit_code": 0,
+            "junit_sha256": "fef54b2252c87ec90e0eeb2f5fcff81340a2ba562de9cf3922a2305e0914b517",
+            "failure": "RuntimeError: mandatory baseline paired regression incomplete",
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "artifact": "rocketmq-paired-full-4-0a8bd35e69e668199c9373e43df24a3fa6a17a34",
+            "sha256": "0deee1f0227ece7a3a34b8b09eb1c2fbdb298cfb2bc1819f14d9f57470fdc6f9",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "native_exit_code": 0,
+            "junit_sha256": "14c43c3d1c96c3b45a2e4739bddb28df8633b7491488361e2e1c82a75de95e40",
+            "failure": "RuntimeError: mandatory baseline paired regression incomplete",
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          },
+          {
+            "artifact": "rocketmq-paired-full-5-0a8bd35e69e668199c9373e43df24a3fa6a17a34",
+            "sha256": "a4a1be21136b8fa008e5617d7c665e043e11af7e79ab1f01c2e1ad681dfbd67b",
+            "passed": 0,
+            "failed": 1,
+            "skipped": 0,
+            "native_exit_code": 0,
+            "junit_sha256": "4a5247ce0eac72280bf9a4c7b2d8ad72a26ca2d67a1e281995839ad0a37ceafb",
+            "failure": "RuntimeError: mandatory baseline paired regression incomplete",
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            }
+          }
+        ],
+        "status": "cancelled after3completed failures; other3cancelled, no unreported cleanup claim",
+        "finding": "Native tests exited0 and strict exact native case validation passed, then baseline parser rejected duplicate baseline receipts from separately registered imported session fixtures. Current pytest-session stash now shares unchanged config/logger/report ownership; three local regression cases failed first and then passed. Strict single receipt parser unchanged."
+      }
+    ],
+    "current_full_ai_candidate": "c17b36665578edddcd09ee5cac6fc5ba83cbcd56",
+    "full_host_development_audit": {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39909607760",
+      "infra_sha": "696e6a2022d38ff64dea4f5a227b49fe410c2920",
+      "sources": {
+        "qs-paired-faults": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+        "ai-paired-faults": "c17b36665578edddcd09ee5cac6fc5ba83cbcd56",
+        "infra-host-faults": "696e6a2022d38ff64dea4f5a227b49fe410c2920"
+      },
+      "mode": "full-development",
+      "workflow_conclusion": "success",
+      "profiles": [
+        {
+          "mysql": "8.0.36",
+          "python": "3.11.16",
+          "go": "go1.25.12",
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0,
+          "native_tests": 7,
+          "report_sha256": "b393d5691e007ee80d7604d25cd72361d9810dcd4b9ddabb25e478b2530fd151",
+          "source_tool_sdk_and_cleanup_verified": true,
+          "producer_exit_code": -9,
+          "recovered_commit_checks": 1,
+          "broker_exit_code": 137,
+          "restarted_commit_checks": 2
+        }
+      ],
+      "scope": "actual paired host components/original roots/physical MQ and process failures with coordinated affected-host restart; controlled read-side, no live-Go-autoheal/real provider/public HTTP/system/production"
+    },
+    "full_host_development_audit_sha256": "89d1b9253935e1bc84e69b7d88074241af64f3e67a7b550a39995da91e303dd0",
+    "full_matrix_gate_status": "single-profile full7/40passed and independently audited; freeze corrected source for full6/current-head shared CI; no task completion yet"
   }
 }

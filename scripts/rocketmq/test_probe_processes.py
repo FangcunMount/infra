@@ -42,3 +42,29 @@ class ProbeProcessTest(unittest.TestCase):
             self.assertIsNotNone(probe.process.poll())
             self.assertFalse(probe.reader.is_alive())
             self.assertTrue(probe.log.closed)
+
+
+class ProbeCursorTest(unittest.TestCase):
+    def test_second_control_reply_cannot_reuse_a_prior_stats_event(self):
+        with tempfile.TemporaryDirectory() as directory:
+            code = """import sys,json
+count=0
+for line in sys.stdin:
+ if line.strip() == 'stats':
+  count+=1
+  print('TXPROBE '+json.dumps({'event':'stats','count':count}),flush=True)
+ else:
+  print('TXPROBE '+json.dumps({'event':'closed'}),flush=True)
+  break
+"""
+            probe = harness.Probe([sys.executable, '-u', '-c', code], Path(directory), dict(os.environ))
+            self.addCleanup(probe.close)
+            probe.send('stats')
+            self.assertEqual(probe.wait('stats', timeout=5)['count'], 1)
+            cursor = len(probe.events)
+            probe.send('stats')
+            self.assertEqual(probe.wait('stats', timeout=5, after=cursor)['count'], 2)
+            probe.send('stop')
+            probe.wait('closed', timeout=5)
+            probe.finish()
+            self.assertTrue(probe.close())
