@@ -26,7 +26,15 @@
 
 可行性通过后，再实现受审核的一次管理入口：固定Broker身份/消息、原主库绑定、单次批准消费、独立证据和有界观察。管理入口不调用宿主executor或模型，不生成新业务ID、wire、授权或fence。原生内部复制必须单独记录；消费者继续使用原业务身份幂等。
 
-持久notice的解除需要精确处置证明，并保留原始notice与首次导出摘要。优先验证在不改动M2 codec/schema、业务witness和旧notice的条件下，以显式冻结的宿主处置文件建立已核验的终态视图：当前配置owner/store/epoch/route精确匹配，原分支终态与真实正向RPC审计重新读取，新notice不得被旧文件覆盖。缺审计、未知/矛盾证据以及错误绑定仍封闭。该文件格式和跨语言适配尚未冻结，不能提前据此部署或解除保护。
+持久notice处置由infra中的短生命周期Go CLI实现，复用固定SDK跨实例/跨语言读取MySQL与Mongo见证的能力，不新增常驻服务。宿主保留正常池/事务/Checker与准入，只补受审resolved治理记录的读取/校验；临时工具只持有原具名owner/主库/路由配置，不根据消息属性选数据库。
+
+固定SDK的RecordRecoveryFinal保留首次正向审计时间，同一终态再次确认时不会刷新final_recorded_at；不能用“时间戳比恢复前更新”证明本次RPC。工具包装现有RecoveryReceiptRecorder，只在SDK完成真实RPC及原审计后，为本次匹配Reference写独占0600私有观察。SDK源码、首次时间、codec/schema均不改，CLI不能手工调用该接口补证据。
+
+临时实例封新发送、登记完整owner事务Topic并保持有界Checker；不调用Reserve/Execute/业务回调，不授权模型、调度或业务重试。本实例中止维护明确禁用，原宿主继续负责维护；文件I/O仍占真实回查容量，超时不能谎报排空。启动任何可回查/确认的SDK连接前都经过infra不可逆首次运行屏障，不能将它标成允许旧备份覆盖的纯DDL维护。
+
+顺序为：原主库只读snapshot/私有计划、独立审核、原Broker物理位置/REAL_TOPIC/Reference/wire与有限窗口核验、必要的native recheck（仅RecheckEnqueued）、新实例真实RPC及本次私有观察、fresh原库精确终态/SDK正向审计、独立审核的治理CAS。本地提交、RPC结果与消费完成分别记账。
+
+治理只用现有status/resolved_at/resolution_receipt_sha256；首次evidence_sha256及原索引不变。同一已处置索引重导出不重开，新的物理索引仍blocked。缺记录、Prepared、错误owner/epoch/fence/route/wire、矛盾终态、DB/审计失败、缺失/过期正文均封闭；truncated_possible不能当完整范围来解除。文件契约、四种存储CAS、具名入口与真实拒绝矩阵仍待完成，不授权生产或勾选C3。
 
 全部旧写者/自主任务冻结、保留责任清单、原链路排空及启动前维护/恢复仍须组合验证；T25-D收口源码/隔离门禁，T29再绑定最终镜像和具体生产清单，T30–T33负责实际运行核验、具名批准和system验收。
 
@@ -44,3 +52,15 @@
 PR200合并1fc072b，原生报告摘要`f4e50b2a156470e3a2badbcfa7a42e2eb1676ab7f6a299434e42cec32d8022b6`。实际17/0/0；包含11个有限窗口/物理地址纯向量、真实CHECK_MAX、原事务commit后exit23、新实例封新发送、原生resume和真实Checker Commit RPC/audit。恢复指标CommitConfirmed=1、AuditRecorded=1、CheckCommit=1；新half、普通发送、本地业务回调计数均0，所有在途/排队为0且Stopped=true。原请求/执行/witness/业务事实各1，原始索引摘要不变；八项清理全部通过。原始参数6000ms/5000ms/checkMax24/fileReserved48h已回读恢复，不能把该配置乘积作为SLA。
 
 管理响应只记`RecheckEnqueued`，成功提交由新Checker读取原证据并实际调用RPC、写正向审计证明。原程序真实exit23不是SIGKILL或网络故障；这是固定SDK源码探针，不是正式制品/四宿主或system入口，也尚无持久notice处置证明。失败40015398289、40016571315、40016777071和40018504724保留；后两轮均未发出resume，不将其读取失败冒称回查失败。完整源码/CI、报告摘要及限制回链总表的结构化证据文件。
+
+
+### 客户端ID复用的源码修正（未合并）
+
+5.5.1原生复制保留UNIQ_KEY，getMsgId可能返回客户端ID。IAM/QS Go及AI Python先复现“两位置同客户端ID”被拒绝，再改为按完整v1指纹拒绝重复；摘要字节保持。两语言固定向量c17eef089ffe8dcd195b09d54c8d7af26283362fc173a6226b964a4a4c0968d3和61922da276bd4e4b9eced322f30aac9224929b6614dce2205f5fed99df91a878一致，大小写等价的同一完整索引仍拒绝。当前Go纯race/Python28纯通过，仅源码准备，不是实际两副本Broker证明或C3闭环。
+
+
+### 当前恢复工具原语（尚非完整 CLI）
+
+`tools/rocketmq-native-recovery`固定下载 tx.4，拒绝本地replace。check-only Store不暴露Bind，拒绝Lookup/Reserve/Prepare/Abort/普通记账，本实例不执行中止维护。私有Runtime不提供Sender，只登记完整owner路由、有限Checker并在Start返回后立即StopAdmission；固定SDK在StopAdmission之后拒绝Start，不能使用错误顺序。执行能力从构造时即被Store封住，启动仍必须经过首次runtime屏障。
+
+本次观察只由SDK真实RPC→原正向audit→包装sink路径产生，首次DB时间不变。独占0700目录/0600文件绑定受审请求摘要、本次nonce、源码、Reference摘要及终态；最多16份，同步I/O不脱离真实回查容量，取消/碰撞/限额/写入或同步失败保留文件并拒绝成功证明。关闭必须实际排空，不能以调用方超时宣告完成。当前本地race、文件隐私/不可覆盖及生命周期契约使用明确fake，不是实际RPC或治理CAS验证；完整CLI/四种宿主矩阵继续。
