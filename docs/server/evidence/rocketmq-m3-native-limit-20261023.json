@@ -457,6 +457,420 @@
       },
       "native_fault": {},
       "focus": null
+    },
+    {
+      "run": 39976927758,
+      "artifact": "rocketmq-ai-state-0-3.11-d6158a853ed3e07a92b4a4064f1987e7237cc946",
+      "report_sha256": "bf1bb43271d37755021e2a9f7ddd1c077d487bfa313d36f6b04f35a6770fec68",
+      "reported_source_sha": "34384f8d607d82a9145e516691648eda7261f65c",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: actual default AI assembly focus failed (private output withheld)",
+      "focus": {
+        "schema_isolated_from_full": true,
+        "exit_code": 1,
+        "private_output_sha256": "942f50bc00af1594aa5c130983bee38eca858dc5a33f6d5438da7ce76232823c",
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]"
+          ],
+          "assertion_lines": [
+            1655,
+            1661
+          ]
+        },
+        "junit_sha256": "69d02b536879c8da668694d20356e8b6b4f697eb083e4bf204b4a9fb5b778670",
+        "partial_native_receipt": {
+          "cases": {
+            "default_assembly_shared_primary_sender": true,
+            "default_assembly_no_legacy_publish_path": true,
+            "default_assembly_idle_checker_subscriptions": true,
+            "default_assembly_original_worker_preflight": true,
+            "default_assembly_exact_archive_witness": true,
+            "default_assembly_authenticated_business_ack": true,
+            "native_actual_sys_index_idempotent_original_primary_governance": true,
+            "default_assembly_pause_no_new_writes": true,
+            "native_live_sampler_blocks_actual_worker_without_new_half": true,
+            "native_idle_sdk_checker_readiness_existing_host_loop": true,
+            "native_plain_open_and_unresolved_review_refused": true,
+            "native_original_sampler_sdk_shutdown_joined": true,
+            "native_new_configured_open_default_assembly_keeps_durable_deny": true,
+            "native_original_facts_witness_and_host_primary_preserved": true,
+            "native_no_runtime_governance_resolution_or_deletion": true,
+            "default_assembly_close_preserves_pool": true,
+            "halves_before_worker_root": true,
+            "default_serial_actual_factory_generation": true,
+            "default_serial_first_response_original_witness_no_legacy": true,
+            "default_serial_actual_factory_semantic": true
+          },
+          "passed": 20,
+          "failed": 1,
+          "skipped": 0,
+          "root": "original_mysql_sqlalchemy",
+          "sdk": "0.4.0a4",
+          "client": "5.1.2",
+          "python": "3.11.16",
+          "system_login_not_claimed": true,
+          "paired_qs_business_not_claimed": true,
+          "real_provider_not_claimed": true,
+          "process_exit_not_claimed": true,
+          "database_commit_network_fault_not_claimed": true
+        },
+        "schema_removed": true
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "scope": "Full six profiles failed False fixture at unsupported second candidate/model stage; no accepted full native gate"
+    },
+    {
+      "run": 39976927758,
+      "artifact": "rocketmq-ai-state-1-3.11-d6158a853ed3e07a92b4a4064f1987e7237cc946",
+      "report_sha256": "d766155865bdb870bb7844b373967146360568dd653d944cb0b3ca7c2fed61c7",
+      "reported_source_sha": "34384f8d607d82a9145e516691648eda7261f65c",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: actual default AI assembly focus failed (private output withheld)",
+      "focus": {
+        "schema_isolated_from_full": true,
+        "exit_code": 1,
+        "private_output_sha256": "defb0558b96b4e5a463281ad3e50f662cbd9b7b1089a47293e1e11dd9e58c4ae",
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]"
+          ],
+          "assertion_lines": [
+            1655,
+            1661
+          ]
+        },
+        "junit_sha256": "facba15c7fabba09da18c19532127fed3f219edddbbfa52fb48f6683cc013b8b",
+        "partial_native_receipt": {
+          "cases": {
+            "default_assembly_shared_primary_sender": true,
+            "default_assembly_no_legacy_publish_path": true,
+            "default_assembly_idle_checker_subscriptions": true,
+            "default_assembly_original_worker_preflight": true,
+            "default_assembly_exact_archive_witness": true,
+            "default_assembly_authenticated_business_ack": true,
+            "native_actual_sys_index_idempotent_original_primary_governance": true,
+            "default_assembly_pause_no_new_writes": true,
+            "native_live_sampler_blocks_actual_worker_without_new_half": true,
+            "native_idle_sdk_checker_readiness_existing_host_loop": true,
+            "native_plain_open_and_unresolved_review_refused": true,
+            "native_original_sampler_sdk_shutdown_joined": true,
+            "native_new_configured_open_default_assembly_keeps_durable_deny": true,
+            "native_original_facts_witness_and_host_primary_preserved": true,
+            "native_no_runtime_governance_resolution_or_deletion": true,
+            "default_assembly_close_preserves_pool": true,
+            "halves_before_worker_root": true,
+            "default_serial_actual_factory_generation": true,
+            "default_serial_first_response_original_witness_no_legacy": true,
+            "default_serial_actual_factory_semantic": true
+          },
+          "passed": 20,
+          "failed": 1,
+          "skipped": 0,
+          "root": "original_mysql_sqlalchemy",
+          "sdk": "0.4.0a4",
+          "client": "5.1.2",
+          "python": "3.11.16",
+          "system_login_not_claimed": true,
+          "paired_qs_business_not_claimed": true,
+          "real_provider_not_claimed": true,
+          "process_exit_not_claimed": true,
+          "database_commit_network_fault_not_claimed": true
+        },
+        "schema_removed": true
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "scope": "Full six profiles failed False fixture at unsupported second candidate/model stage; no accepted full native gate"
+    },
+    {
+      "run": 39976927758,
+      "artifact": "rocketmq-ai-state-2-3.11-d6158a853ed3e07a92b4a4064f1987e7237cc946",
+      "report_sha256": "1b8fefcda83cfa96d63ab644b7332f5c85194e0f52f9bc7287670c7a64e1e060",
+      "reported_source_sha": "34384f8d607d82a9145e516691648eda7261f65c",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: actual default AI assembly focus failed (private output withheld)",
+      "focus": {
+        "schema_isolated_from_full": true,
+        "exit_code": 1,
+        "private_output_sha256": "f209fae6c2fac2c306b13774403707d2d9b0335f563b06500eedcb2880cfcc95",
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]"
+          ],
+          "assertion_lines": [
+            1655,
+            1661
+          ]
+        },
+        "junit_sha256": "c0bcfc4ea86129619249f4f2f379bab11b407b27b9d799a9d9d606d9cde7395c",
+        "partial_native_receipt": {
+          "cases": {
+            "default_assembly_shared_primary_sender": true,
+            "default_assembly_no_legacy_publish_path": true,
+            "default_assembly_idle_checker_subscriptions": true,
+            "default_assembly_original_worker_preflight": true,
+            "default_assembly_exact_archive_witness": true,
+            "default_assembly_authenticated_business_ack": true,
+            "native_actual_sys_index_idempotent_original_primary_governance": true,
+            "default_assembly_pause_no_new_writes": true,
+            "native_live_sampler_blocks_actual_worker_without_new_half": true,
+            "native_idle_sdk_checker_readiness_existing_host_loop": true,
+            "native_plain_open_and_unresolved_review_refused": true,
+            "native_original_sampler_sdk_shutdown_joined": true,
+            "native_new_configured_open_default_assembly_keeps_durable_deny": true,
+            "native_original_facts_witness_and_host_primary_preserved": true,
+            "native_no_runtime_governance_resolution_or_deletion": true,
+            "default_assembly_close_preserves_pool": true,
+            "halves_before_worker_root": true,
+            "default_serial_actual_factory_generation": true,
+            "default_serial_first_response_original_witness_no_legacy": true,
+            "default_serial_actual_factory_semantic": true
+          },
+          "passed": 20,
+          "failed": 1,
+          "skipped": 0,
+          "root": "original_mysql_sqlalchemy",
+          "sdk": "0.4.0a4",
+          "client": "5.1.2",
+          "python": "3.11.16",
+          "system_login_not_claimed": true,
+          "paired_qs_business_not_claimed": true,
+          "real_provider_not_claimed": true,
+          "process_exit_not_claimed": true,
+          "database_commit_network_fault_not_claimed": true
+        },
+        "schema_removed": true
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "scope": "Full six profiles failed False fixture at unsupported second candidate/model stage; no accepted full native gate"
+    },
+    {
+      "run": 39976927758,
+      "artifact": "rocketmq-ai-state-3-3.13-d6158a853ed3e07a92b4a4064f1987e7237cc946",
+      "report_sha256": "91d1049cc06caeeba187ffcca09f396355e1ddb82ecea27838de89adf32e4b16",
+      "reported_source_sha": "34384f8d607d82a9145e516691648eda7261f65c",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: actual default AI assembly focus failed (private output withheld)",
+      "focus": {
+        "schema_isolated_from_full": true,
+        "exit_code": 1,
+        "private_output_sha256": "3622eb82db9ce86f79e143eeee209cc22abeb547476271235349535d895ed4db",
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]"
+          ],
+          "assertion_lines": [
+            1655,
+            1661
+          ]
+        },
+        "junit_sha256": "1dd38140707347d4d08495ba5cb0cc5592f51d97fda37432f39aaa581faf7c4f",
+        "partial_native_receipt": {
+          "cases": {
+            "default_assembly_shared_primary_sender": true,
+            "default_assembly_no_legacy_publish_path": true,
+            "default_assembly_idle_checker_subscriptions": true,
+            "default_assembly_original_worker_preflight": true,
+            "default_assembly_exact_archive_witness": true,
+            "default_assembly_authenticated_business_ack": true,
+            "native_actual_sys_index_idempotent_original_primary_governance": true,
+            "default_assembly_pause_no_new_writes": true,
+            "native_live_sampler_blocks_actual_worker_without_new_half": true,
+            "native_idle_sdk_checker_readiness_existing_host_loop": true,
+            "native_plain_open_and_unresolved_review_refused": true,
+            "native_original_sampler_sdk_shutdown_joined": true,
+            "native_new_configured_open_default_assembly_keeps_durable_deny": true,
+            "native_original_facts_witness_and_host_primary_preserved": true,
+            "native_no_runtime_governance_resolution_or_deletion": true,
+            "default_assembly_close_preserves_pool": true,
+            "halves_before_worker_root": true,
+            "default_serial_actual_factory_generation": true,
+            "default_serial_first_response_original_witness_no_legacy": true,
+            "default_serial_actual_factory_semantic": true
+          },
+          "passed": 20,
+          "failed": 1,
+          "skipped": 0,
+          "root": "original_mysql_sqlalchemy",
+          "sdk": "0.4.0a4",
+          "client": "5.1.2",
+          "python": "3.13.15",
+          "system_login_not_claimed": true,
+          "paired_qs_business_not_claimed": true,
+          "real_provider_not_claimed": true,
+          "process_exit_not_claimed": true,
+          "database_commit_network_fault_not_claimed": true
+        },
+        "schema_removed": true
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "scope": "Full six profiles failed False fixture at unsupported second candidate/model stage; no accepted full native gate"
+    },
+    {
+      "run": 39976927758,
+      "artifact": "rocketmq-ai-state-4-3.13-d6158a853ed3e07a92b4a4064f1987e7237cc946",
+      "report_sha256": "63b0c26ab4da2f04c955bd6133629f9a8c13ff9f5e44f904ebcf18ba35eb48be",
+      "reported_source_sha": "34384f8d607d82a9145e516691648eda7261f65c",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: actual default AI assembly focus failed (private output withheld)",
+      "focus": {
+        "schema_isolated_from_full": true,
+        "exit_code": 1,
+        "private_output_sha256": "6d666b522bfaca2e99f0514dd9f2875f114a5491c7f51afbf3904298103f1a06",
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]"
+          ],
+          "assertion_lines": [
+            1655,
+            1661
+          ]
+        },
+        "junit_sha256": "d4a181830900024cad24cbacc77438ae0a77b6db25000414130ff59166c5c3c9",
+        "partial_native_receipt": {
+          "cases": {
+            "default_assembly_shared_primary_sender": true,
+            "default_assembly_no_legacy_publish_path": true,
+            "default_assembly_idle_checker_subscriptions": true,
+            "default_assembly_original_worker_preflight": true,
+            "default_assembly_exact_archive_witness": true,
+            "default_assembly_authenticated_business_ack": true,
+            "native_actual_sys_index_idempotent_original_primary_governance": true,
+            "default_assembly_pause_no_new_writes": true,
+            "native_live_sampler_blocks_actual_worker_without_new_half": true,
+            "native_idle_sdk_checker_readiness_existing_host_loop": true,
+            "native_plain_open_and_unresolved_review_refused": true,
+            "native_original_sampler_sdk_shutdown_joined": true,
+            "native_new_configured_open_default_assembly_keeps_durable_deny": true,
+            "native_original_facts_witness_and_host_primary_preserved": true,
+            "native_no_runtime_governance_resolution_or_deletion": true,
+            "default_assembly_close_preserves_pool": true,
+            "halves_before_worker_root": true,
+            "default_serial_actual_factory_generation": true,
+            "default_serial_first_response_original_witness_no_legacy": true,
+            "default_serial_actual_factory_semantic": true
+          },
+          "passed": 20,
+          "failed": 1,
+          "skipped": 0,
+          "root": "original_mysql_sqlalchemy",
+          "sdk": "0.4.0a4",
+          "client": "5.1.2",
+          "python": "3.13.15",
+          "system_login_not_claimed": true,
+          "paired_qs_business_not_claimed": true,
+          "real_provider_not_claimed": true,
+          "process_exit_not_claimed": true,
+          "database_commit_network_fault_not_claimed": true
+        },
+        "schema_removed": true
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "scope": "Full six profiles failed False fixture at unsupported second candidate/model stage; no accepted full native gate"
+    },
+    {
+      "run": 39976927758,
+      "artifact": "rocketmq-ai-state-5-3.13-d6158a853ed3e07a92b4a4064f1987e7237cc946",
+      "report_sha256": "48dff51cc763097363bcd8a41d4bdc785b8a7c736fd5f3de1194280b11094004",
+      "reported_source_sha": "34384f8d607d82a9145e516691648eda7261f65c",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: actual default AI assembly focus failed (private output withheld)",
+      "focus": {
+        "schema_isolated_from_full": true,
+        "exit_code": 1,
+        "private_output_sha256": "74fae5af116dd9d49c06683ed9aed90baa2ba88ec0f25efceb23c8aa95a04c5e",
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_default_transport_and_worker_share_sender_root_and_shutdown[False]"
+          ],
+          "assertion_lines": [
+            1655,
+            1661
+          ]
+        },
+        "junit_sha256": "e29968fa67e25c1906dd294eb235a6ba1111e46c617ac52e06dfd9aaa7fed89a",
+        "partial_native_receipt": {
+          "cases": {
+            "default_assembly_shared_primary_sender": true,
+            "default_assembly_no_legacy_publish_path": true,
+            "default_assembly_idle_checker_subscriptions": true,
+            "default_assembly_original_worker_preflight": true,
+            "default_assembly_exact_archive_witness": true,
+            "default_assembly_authenticated_business_ack": true,
+            "native_actual_sys_index_idempotent_original_primary_governance": true,
+            "default_assembly_pause_no_new_writes": true,
+            "native_live_sampler_blocks_actual_worker_without_new_half": true,
+            "native_idle_sdk_checker_readiness_existing_host_loop": true,
+            "native_plain_open_and_unresolved_review_refused": true,
+            "native_original_sampler_sdk_shutdown_joined": true,
+            "native_new_configured_open_default_assembly_keeps_durable_deny": true,
+            "native_original_facts_witness_and_host_primary_preserved": true,
+            "native_no_runtime_governance_resolution_or_deletion": true,
+            "default_assembly_close_preserves_pool": true,
+            "halves_before_worker_root": true,
+            "default_serial_actual_factory_generation": true,
+            "default_serial_first_response_original_witness_no_legacy": true,
+            "default_serial_actual_factory_semantic": true
+          },
+          "passed": 20,
+          "failed": 1,
+          "skipped": 0,
+          "root": "original_mysql_sqlalchemy",
+          "sdk": "0.4.0a4",
+          "client": "5.1.2",
+          "python": "3.13.15",
+          "system_login_not_claimed": true,
+          "paired_qs_business_not_claimed": true,
+          "real_provider_not_claimed": true,
+          "process_exit_not_claimed": true,
+          "database_commit_network_fault_not_claimed": true
+        },
+        "schema_removed": true
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "scope": "Full six profiles failed False fixture at unsupported second candidate/model stage; no accepted full native gate"
     }
   ],
   "notes": [

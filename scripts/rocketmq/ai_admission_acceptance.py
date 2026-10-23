@@ -26,7 +26,7 @@ TESTS = frozenset((
     'test_real_commit_reply_deliberately_discarded_keeps_local_commit_and_first_wire'))
 NATIVE_LIMIT_CASES = frozenset((
     'native_actual_sys_index_idempotent_original_primary_governance',
-    'native_live_sampler_blocks_actual_worker_without_new_half',
+    'native_live_admission_and_pending_worker_preflight_without_new_half',
     'native_idle_sdk_checker_readiness_existing_host_loop',
     'native_plain_open_and_unresolved_review_refused',
     'native_original_sampler_sdk_shutdown_joined',
