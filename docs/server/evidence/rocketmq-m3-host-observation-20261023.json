@@ -1,6 +1,6 @@
 {
   "schema_version": "m3-host-observation-progress/v1",
-  "recorded_at": "2026-10-23T11:12:33.532281+00:00",
+  "recorded_at": "2026-10-23T11:58:33.340541+00:00",
   "m3_completed": 23,
   "m3_total": 36,
   "t24_completed_subgates": 2,
@@ -26,40 +26,117 @@
         "internal/apiserver/container/platform/transaction_protection_test.go": "b4e1527e281be711b35bce4f286acae5363f531cf1d4cc3f83d01086ae0b7d76",
         "internal/pkg/migration/transaction_runtime_native_integration_test.go": "ca465ec4203a6fd54f1ab42c07e2a42ee499b05f5b26d8ee9f51e77ddb56d57a"
       },
-      "merge": "pending",
+      "merge": "32d197fcae61e029d888bc3e2ec6e7978588a0b5",
       "native_run": "https://github.com/FangcunMount/infra/actions/runs/39943958129",
-      "native_status": "pending",
+      "native_status": "passed_full_three_mysql_profiles",
       "deployment": "not_performed",
-      "business_system": "not_performed"
+      "business_system": "not_performed",
+      "source_checks_successful": 11,
+      "image_publication": "not_applicable_to_pull_request",
+      "native_proof": {
+        "schema": "m3-iam-protection-native-proof/v1",
+        "source": "433689c94c11cc3a77a81bab0ae67bbddfba6a18",
+        "run": 39943958129,
+        "infra": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "native_mysql_versions": [
+          "8.0.36",
+          "8.0.44",
+          "8.4.13"
+        ],
+        "each_host_report_passed": 29,
+        "each_storage_http_passed": 34,
+        "owner_runtime_cases": 6,
+        "owner_protection_cases": 8,
+        "failed": 0,
+        "skipped": 0,
+        "source_checks_passed": 11,
+        "image_publication_not_applicable": true,
+        "cleanup_verified": true,
+        "reports": [
+          {
+            "artifact": "iam-native-root-0-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "sha256": "31c9d6e0fa694abd422d95d356f1c35dbd55a39fd4da8ca5ec3ce12584ef897d"
+          },
+          {
+            "artifact": "rocketmq-iam-host-1-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "sha256": "d4a9fdd3181fc36bcf9a07a8579c15a7ac4fcaa975d82660e4ea2c98f8de1c24"
+          },
+          {
+            "artifact": "rocketmq-iam-host-2-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "sha256": "68ab847ec6aa316c136f5b56aa4c8c184f676276c7f58c8715bb616eb0215870"
+          },
+          {
+            "artifact": "iam-native-root-1-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "sha256": "a7f5f8985012da423c04e205d15e2b724e5fd0f1e9a42b423e828f605ab4503f"
+          },
+          {
+            "artifact": "rocketmq-iam-host-0-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "sha256": "45027c8cedea005eb7cfa1d6d108c991bd74c5f522ae818d2232c8bdbaaf3091"
+          },
+          {
+            "artifact": "iam-native-root-2-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "sha256": "97aafaa811d79808502d16da18ededbfa06715d7815757abdec55c9d163bd983"
+          }
+        ],
+        "production_deploy_paused": true,
+        "production_or_system_not_claimed": true
+      }
     },
     {
       "repository": "qs-server",
-      "source_sha": "47316edfb4e72779b98d93852244ecda6ec161cb",
+      "source_sha": "2940f445e21b0cef1c00d7081ba2e0258c2fed45",
       "pr": "https://github.com/FangcunMount/qs-server/pull/431",
       "source_files": {
-        "docs/03-基础设施/event/50-可观测性与故障恢复.md": "8860baf7a05de7635f069e8ccc17e19dcdd4b6ec95ea6fc19010dc1b5927b007",
-        "docs/document-closure.json": "afc2127bab5da08ea059050b17569e5e6190a6a1ae789009292bbbc0245fdddb",
+        "docs/03-基础设施/event/50-可观测性与故障恢复.md": "6ae011434dab803c8223ca131b34e969cb99f24b4f24a939e5f9ff6e3675d649",
+        "docs/document-closure.json": "1f8571cbfcb7b58624d322acd01df1057da6432f81884580cedd7d72095a5ede",
         "go.mod": "adb1002c0d7585d1899ebb51e429a522cebe444d5f4a001607ab84a994d3ef84",
         "go.sum": "4015004bc1354067207704d5797da145ad7b60cbb27a16f912c425f397a781a9",
-        "internal/apiserver/container/owner_runtime_native_integration_test.go": "4fade2aa6c493d25f709dd3d338d3a7052f98645a6a556e959511642248fffd3",
+        "internal/apiserver/container/owner_runtime_error_test.go": "3e3ce93c641a44b39dc5b712eca5f2daeaf04eb09166fc0c6b227cdf97cfdd40",
+        "internal/apiserver/container/owner_runtime_native_integration_test.go": "39c366720e84622a806a25790dec872be283fdda35fca1271ab61af89efdf991",
+        "internal/apiserver/eventing/subsystem/transactions.go": "2cedc05ebc6f58a03ca9046843449f5a200c75ee2bf312fc319174112d81e57e",
         "internal/pkg/messagingruntime/transaction.go": "482f81770a56a4399197566f0af2f32e7ee0106f89a91986e561ab1ce7bd793c",
-        "internal/pkg/messagingruntime/transaction_lifecycle.go": "8e25adf4822c899dc9aea636cae3f92c958358ddc9f9e9678e13ee613764d6a7",
+        "internal/pkg/messagingruntime/transaction_lifecycle.go": "4a03cb27efa644180e9b05059d89f92597c75ce95fd7a558b9e6ef67238d90bf",
         "internal/pkg/messagingruntime/transaction_metrics.go": "5d994fca73402c8c82f161bd83c0b8b2846a5048c4af50c4f30e829a7130b5fd",
         "internal/pkg/messagingruntime/transaction_metrics_http_test.go": "9a7268b68a6da626c57fbc9e8c3b3b429166c96ac62bc49ca0ba18c772a8b693",
         "internal/pkg/messagingruntime/transaction_observation.go": "b39437250d1baa5ce0da10a7cb201bcfe36e52793523814a7a4f1527d4a7f779",
         "internal/pkg/messagingruntime/transaction_observation_binding.go": "ce9d01646e6c9137ed64225fefecd31045c23ac9e76c5151b8911de557a45a95",
-        "internal/pkg/messagingruntime/transaction_observation_test.go": "8a7c5b23bc445d1e178ae71e3923d256a4dc8d03c0058130ce6550148aedf0bf",
+        "internal/pkg/messagingruntime/transaction_observation_test.go": "88235a9b6799bad7e4c9ec3768c22e4681a03375fd56046e15d60c2032ba547e",
         "internal/pkg/messagingruntime/transaction_protection.go": "9721ac068ab9ab7f5b8cef1169a171a008fd0bacbe4bbe48db5cec7916b1bbd0",
         "internal/pkg/messagingruntime/transaction_protection_test.go": "a3af9abd3a7a1823e5c25bbfeee34f8f02be5c50f039b42d33cb785e13dacb00",
         "scripts/check_docs_facts.py": "1bd1d6b810ea19af4a59929797a066be8f9e19bd4a7b754e29ae93a05ff6eaf2",
+        "scripts/oneoff/mysql_metadata_profile/README.md": "b5e8e497e2ebd631d51130c441988e3f56ea30e165ddb0d6e4f4932f8c5a6492",
         "scripts/oneoff/mysql_metadata_profile/readiness_native_test.go": "9b5f9f7686a583225f82225f9cda0e93e2dccca2f0cf4c1da79138ab399a3a69",
         "scripts/tests/test_docs_facts_infrastructure.py": "672297968c38c7c96294b1660c15d6311fad8efa2a1539186268c50a47a94689"
       },
       "merge": "pending",
-      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39943810049",
-      "native_status": "pending",
+      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39948283390",
+      "native_status": "pending_configured_open_startup_revision",
       "deployment": "not_performed",
-      "business_system": "not_performed"
+      "business_system": "not_performed",
+      "prior_source_shas": [
+        "47316edfb4e72779b98d93852244ecda6ec161cb"
+      ],
+      "prior_development_proof": {
+        "schema": "m3-qs-protection-native-proof/v1",
+        "run": 39943810049,
+        "infra": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "source": "47316edfb4e72779b98d93852244ecda6ec161cb",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "a047c566be669ec353c5b3c8b07e9a1a0c543aa60a094678e4025e005e0e655f",
+        "cleanup_verified": true,
+        "exact_sdk_sums_verified": true,
+        "broker_parameters_restored": true,
+        "no_new_half_or_business": true,
+        "fixture_aging_seconds": 600,
+        "not_claimed": [
+          "full API/provider/system",
+          "real ten-minute elapsed",
+          "production",
+          "first native startup failure root cause resolved"
+        ]
+      }
     },
     {
       "repository": "qs-ai",
@@ -83,10 +160,36 @@
         "uv.lock": "75b260e09a27bc28d09003f2a02684fcf7c229c988320dd7260e8e41092d5041"
       },
       "merge": "pending",
-      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39943817391",
-      "native_status": "pending",
+      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39945895719",
+      "native_status": "pending_full_six_profiles",
       "deployment": "not_performed",
-      "business_system": "not_performed"
+      "business_system": "not_performed",
+      "development_proof": {
+        "schema": "m3-ai-protection-native-proof/v1",
+        "run": 39943817391,
+        "infra": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "source": "abd5109ecda053d6d2e1d676897cd0f570f3db64",
+        "native_tests": 55,
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "focus": {
+          "native_tests": 4,
+          "passed": 20,
+          "failed": 0,
+          "skipped": 0
+        },
+        "cleanup_verified": true,
+        "fixed_release_lock_verified": true,
+        "report_sha256": "d670d10bcb6b23cfe72ff72f55cdba3bfadc1a9cecc323fbfca7a42405ecc46b",
+        "not_claimed": [
+          "paired QS business",
+          "real provider",
+          "production",
+          "system",
+          "full Python/MySQL compatibility matrix"
+        ]
+      }
     }
   ],
   "sdk": {
@@ -236,6 +339,31 @@
       "failure": "fixture incorrectly required ready while primary binding invalid",
       "correction": "distinguish admission health from stopped checker; restore binding and require same owner ready",
       "cleanup": "explicit owned cleanup verified"
+    },
+    {
+      "run": 39945242049,
+      "repository": "qs-server",
+      "source": "47316edfb4e72779b98d93852244ecda6ec161cb",
+      "scope": "initial protection with configured admission paused",
+      "mysql_results": {
+        "8.0.36": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "8.0.44": {
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0
+        },
+        "8.4.11": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        }
+      },
+      "failure": "next owner startup; fixed diagnostic other/0; root cause unresolved",
+      "cleanup": "all_three_explicitly_verified"
     }
   ],
   "canceled_superseded_native": {
@@ -392,6 +520,73 @@
         "status": "in_progress",
         "workflowName": "RocketMQ public transaction SDK"
       }
+    ],
+    "resumed_at": "2026-10-23T11:25:54.345266+00:00",
+    "resume_requests": [
+      {
+        "run": 39943739790,
+        "previous_attempt": 1,
+        "previous_conclusion": "cancelled",
+        "rerun_requested": true,
+        "required_pass": true
+      },
+      {
+        "run": 39943739831,
+        "previous_attempt": 1,
+        "previous_conclusion": "cancelled",
+        "rerun_requested": true,
+        "required_pass": true
+      },
+      {
+        "run": 39943739989,
+        "previous_attempt": 1,
+        "previous_conclusion": "cancelled",
+        "rerun_requested": true,
+        "required_pass": true
+      },
+      {
+        "run": 39943739833,
+        "previous_attempt": 1,
+        "previous_conclusion": "cancelled",
+        "rerun_requested": true,
+        "required_pass": true
+      },
+      {
+        "run": 39943739714,
+        "previous_attempt": 1,
+        "previous_conclusion": "cancelled",
+        "rerun_requested": true,
+        "required_pass": true
+      },
+      {
+        "run": 39943739723,
+        "previous_attempt": 1,
+        "previous_conclusion": "cancelled",
+        "rerun_requested": true,
+        "required_pass": true
+      },
+      {
+        "run": 39943739751,
+        "previous_attempt": 1,
+        "previous_conclusion": "cancelled",
+        "rerun_requested": true,
+        "required_pass": true
+      }
     ]
+  },
+  "qs_startup_revision": {
+    "code": "5a5095e8786ae667566be1a8eebc0aef76e27ff9",
+    "candidate": "2940f445e21b0cef1c00d7081ba2e0258c2fed45",
+    "runtime_fix": "independent hold/release preserves configured admission and concurrent explicit pause; protected startup keeps idle Checker",
+    "native_scope": "configured admission open at restart; actual consume-only route ready barrier before owner registration",
+    "local_validation": [
+      "target+subsystem race",
+      "tagged fixed-error classification race",
+      "native compile",
+      "lint",
+      "docs88/facts/hygiene"
+    ],
+    "budget": "existing5secondRPC/owner/worker settings unchanged",
+    "older_start_failure_root_cause": "unknown"
   }
 }
