@@ -1,6 +1,6 @@
 {
   "schema_version": "m3-host-observation-progress/v1",
-  "recorded_at": "2026-10-23T11:58:33.340541+00:00",
+  "recorded_at": "2026-10-23T12:19:09.707956+00:00",
   "m3_completed": 23,
   "m3_total": 36,
   "t24_completed_subgates": 2,
@@ -84,15 +84,15 @@
     },
     {
       "repository": "qs-server",
-      "source_sha": "2940f445e21b0cef1c00d7081ba2e0258c2fed45",
+      "source_sha": "09cce635b3be789df8067b2fc28f4c610c055ec3",
       "pr": "https://github.com/FangcunMount/qs-server/pull/431",
       "source_files": {
         "docs/03-基础设施/event/50-可观测性与故障恢复.md": "6ae011434dab803c8223ca131b34e969cb99f24b4f24a939e5f9ff6e3675d649",
-        "docs/document-closure.json": "1f8571cbfcb7b58624d322acd01df1057da6432f81884580cedd7d72095a5ede",
+        "docs/document-closure.json": "e939136a476533ae8f482bf57a1572afb9c325d4244b15a55031ce927b38bbac",
         "go.mod": "adb1002c0d7585d1899ebb51e429a522cebe444d5f4a001607ab84a994d3ef84",
         "go.sum": "4015004bc1354067207704d5797da145ad7b60cbb27a16f912c425f397a781a9",
-        "internal/apiserver/container/owner_runtime_error_test.go": "3e3ce93c641a44b39dc5b712eca5f2daeaf04eb09166fc0c6b227cdf97cfdd40",
-        "internal/apiserver/container/owner_runtime_native_integration_test.go": "39c366720e84622a806a25790dec872be283fdda35fca1271ab61af89efdf991",
+        "internal/apiserver/container/owner_runtime_error_test.go": "c77ac6d337f191ccc85a6be2d107c1bd8770c09db284e40d639a109a739a193e",
+        "internal/apiserver/container/owner_runtime_native_integration_test.go": "b14d76afce38f3f23a678b20da3490b13310706e04754e047b5f313f9c1e150a",
         "internal/apiserver/eventing/subsystem/transactions.go": "2cedc05ebc6f58a03ca9046843449f5a200c75ee2bf312fc319174112d81e57e",
         "internal/pkg/messagingruntime/transaction.go": "482f81770a56a4399197566f0af2f32e7ee0106f89a91986e561ab1ce7bd793c",
         "internal/pkg/messagingruntime/transaction_lifecycle.go": "4a03cb27efa644180e9b05059d89f92597c75ce95fd7a558b9e6ef67238d90bf",
@@ -106,15 +106,17 @@
         "scripts/check_docs_facts.py": "1bd1d6b810ea19af4a59929797a066be8f9e19bd4a7b754e29ae93a05ff6eaf2",
         "scripts/oneoff/mysql_metadata_profile/README.md": "b5e8e497e2ebd631d51130c441988e3f56ea30e165ddb0d6e4f4932f8c5a6492",
         "scripts/oneoff/mysql_metadata_profile/readiness_native_test.go": "9b5f9f7686a583225f82225f9cda0e93e2dccca2f0cf4c1da79138ab399a3a69",
-        "scripts/tests/test_docs_facts_infrastructure.py": "672297968c38c7c96294b1660c15d6311fad8efa2a1539186268c50a47a94689"
+        "scripts/tests/test_docs_facts_infrastructure.py": "672297968c38c7c96294b1660c15d6311fad8efa2a1539186268c50a47a94689",
+        "internal/apiserver/container/owner_runtime_route_probe_test.go": "a186d2e2dec7bb953e79eab405b64f49b71e1800e44243d7d4f7b902989ac874"
       },
       "merge": "pending",
-      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39948283390",
-      "native_status": "pending_configured_open_startup_revision",
+      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39952347643",
+      "native_status": "pending_full_authenticated_route_preflight",
       "deployment": "not_performed",
       "business_system": "not_performed",
       "prior_source_shas": [
-        "47316edfb4e72779b98d93852244ecda6ec161cb"
+        "47316edfb4e72779b98d93852244ecda6ec161cb",
+        "2940f445e21b0cef1c00d7081ba2e0258c2fed45"
       ],
       "prior_development_proof": {
         "schema": "m3-qs-protection-native-proof/v1",
@@ -159,9 +161,9 @@
         "tests/test_transaction_protection.py": "b292060be73553f9bf8f6d52141dc1d815b575f9f8cf9df36709385f7419f3ed",
         "uv.lock": "75b260e09a27bc28d09003f2a02684fcf7c229c988320dd7260e8e41092d5041"
       },
-      "merge": "pending",
+      "merge": "9103ce41d0d9d43b2b4c5218cf65befaf3bc8d6d",
       "native_run": "https://github.com/FangcunMount/infra/actions/runs/39945895719",
-      "native_status": "pending_full_six_profiles",
+      "native_status": "passed_full_six_profiles",
       "deployment": "not_performed",
       "business_system": "not_performed",
       "development_proof": {
@@ -189,6 +191,89 @@
           "system",
           "full Python/MySQL compatibility matrix"
         ]
+      },
+      "source_checks_successful": 14,
+      "candidate_and_merge_tree": "466ba3f6cd4540e1564415c504d83bcb58670a46",
+      "native_proof": {
+        "schema": "m3-ai-protection-full-native-proof/v1",
+        "source": "abd5109ecda053d6d2e1d676897cd0f570f3db64",
+        "run": 39945895719,
+        "infra": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "matrix": [
+          [
+            "3.11",
+            "8.0.36"
+          ],
+          [
+            "3.11",
+            "8.0.44"
+          ],
+          [
+            "3.11",
+            "8.4.11"
+          ],
+          [
+            "3.13",
+            "8.0.36"
+          ],
+          [
+            "3.13",
+            "8.0.44"
+          ],
+          [
+            "3.13",
+            "8.4.11"
+          ]
+        ],
+        "each_native_tests": 55,
+        "each_passed": 156,
+        "each_focus_native_tests": 4,
+        "each_focus_passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "source_checks_passed": 14,
+        "cleanup_verified": true,
+        "release_lock_verified": true,
+        "auto_deploy_enabled": false,
+        "reports": [
+          {
+            "artifact": "rocketmq-ai-state-0-3.11-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "python": "3.11.16",
+            "mysql": "8.0.36",
+            "sha256": "806b1705f2f63f7d040d26ef12e25cbf04b260a5603464107a0127e019dd588a"
+          },
+          {
+            "artifact": "rocketmq-ai-state-1-3.11-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "python": "3.11.16",
+            "mysql": "8.0.44",
+            "sha256": "e9e12579084388803b5a7a296793fc287c11f41ea30fbef72593786599677a55"
+          },
+          {
+            "artifact": "rocketmq-ai-state-4-3.13-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "python": "3.13.15",
+            "mysql": "8.0.44",
+            "sha256": "de26c86ec7792a1b7475cab0f74f3066c45b78ccf2989654836f63f4c867796c"
+          },
+          {
+            "artifact": "rocketmq-ai-state-2-3.11-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "python": "3.11.16",
+            "mysql": "8.4.11",
+            "sha256": "124867487b2acf3572b72e0060c86aba87d100972be5d94a5b655a9e6c8935b8"
+          },
+          {
+            "artifact": "rocketmq-ai-state-5-3.13-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "python": "3.13.15",
+            "mysql": "8.4.11",
+            "sha256": "473d76cfbffb1356a108fa6c8ea1348f7bba192283449af74063433387ede66c"
+          },
+          {
+            "artifact": "rocketmq-ai-state-3-3.13-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "python": "3.13.15",
+            "mysql": "8.0.36",
+            "sha256": "c4e9540c927d55a5c067b05a8d09039429bb23fb39dfe9332a93654bf8978ce4"
+          }
+        ],
+        "production_system_or_paired_business_not_claimed": true
       }
     }
   ],
@@ -202,7 +287,29 @@
   "infra": {
     "pr": "https://github.com/FangcunMount/infra/pull/185",
     "sha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
-    "merge": "pending"
+    "merge": "3fc139f4693afaa26e156cfb1fce4828a9384198",
+    "checks_passed": 50,
+    "reports": 57,
+    "explicit_cleanup_reports": 55,
+    "legacy_cleanup_limits": [
+      {
+        "report": "rocketmq-ai-finalization-recovery.json",
+        "run": "39943739651",
+        "workflow": "RocketMQ AI five-path finalization and independent workers",
+        "jobs_successful": true,
+        "explicit_cleanup_object": false
+      },
+      {
+        "report": "rocketmq-m1-evidence.json",
+        "run": "39943739989",
+        "workflow": "RocketMQ Docker acceptance",
+        "jobs_successful": true,
+        "explicit_cleanup_object": false
+      }
+    ],
+    "harness_files_verified": 20,
+    "report_index_sha256": "5a015ddfd34caa899b55a5f4ca186c7988ffd9a475b41021b554dc84b6c89377",
+    "merge_tree_limit": "Candidate tools identical after normal merge; five previously merged monitoring/progress files differ from candidate tree, separately tracked by PR186/187"
   },
   "local_validation": {
     "go_target_race": "passed",
@@ -363,6 +470,31 @@
         }
       },
       "failure": "next owner startup; fixed diagnostic other/0; root cause unresolved",
+      "cleanup": "all_three_explicitly_verified"
+    },
+    {
+      "run": 39948283390,
+      "repository": "qs-server",
+      "source": "2940f445e21b0cef1c00d7081ba2e0258c2fed45",
+      "mysql_results": {
+        "8.0.36": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "8.0.44": {
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0
+        },
+        "8.4.11": {
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      "failure": "consume-only observer Subscribe after Broker restart, before next owner Start",
+      "root_cause": "unresolved; authenticated route readiness preflight added to owned fixture",
       "cleanup": "all_three_explicitly_verified"
     }
   ],
@@ -572,7 +704,136 @@
         "rerun_requested": true,
         "required_pass": true
       }
-    ]
+    ],
+    "final_runs": [
+      {
+        "conclusion": "success",
+        "databaseId": 39943739747,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ QS task original MySQL and NORMAL fanout"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739744,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ QS report original Mongo transaction"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739785,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ QS AI commands original SQL and Broker"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739651,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ AI five-path finalization and independent workers"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739822,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ QS evaluation original MySQL transaction"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739762,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ QS answer original Mongo transaction"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739677,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ packet transaction faults"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739796,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ complete transaction acceptance"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739805,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ public transaction SDK"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739792,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ final-version paired QS AI roots"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739657,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ AI admission original SQL and published SDK"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739790,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ QS future retry original dual-store authorization"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739751,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ QS AI events original SQL and Broker"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739714,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ IAM original host transaction"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739831,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ QS retry original roots and real due dispatch"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739833,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ M3 final resource candidate"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739989,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ Docker acceptance"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 39943739723,
+        "headSha": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "status": "completed",
+        "workflowName": "RocketMQ AI original SQL state roots and published SDK"
+      }
+    ],
+    "all_required_reruns_successful": true
   },
   "qs_startup_revision": {
     "code": "5a5095e8786ae667566be1a8eebc0aef76e27ff9",
