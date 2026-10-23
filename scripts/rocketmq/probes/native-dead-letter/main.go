@@ -11,6 +11,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"os"
@@ -70,7 +71,10 @@ func readConfig(path string) (config, error) {
 	return c, nil
 }
 
-func emit(values map[string]any) { _ = json.NewEncoder(os.Stdout).Encode(values) }
+func emit(values map[string]any) {
+	fmt.Print("M3_NATIVE_DLQ_PROBE ")
+	_ = json.NewEncoder(os.Stdout).Encode(values)
+}
 
 func run(c config) (result error) {
 	ca, err := os.ReadFile(c.CAFile)
@@ -147,7 +151,7 @@ func run(c config) (result error) {
 		return errors.New("fixture publish unconfirmed")
 	}
 	digest := sha256.Sum256(encoded)
-	emit(map[string]any{"ready": true, "published": 1, "wire_sha256": hex.EncodeToString(digest[:]), "max_inflight": 1})
+	emit(map[string]any{"event": "ready", "ready": true, "published": 1, "wire_sha256": hex.EncodeToString(digest[:]), "max_inflight": 1})
 	stop := make(chan bool, 1)
 	go func() {
 		scanner := bufio.NewScanner(os.Stdin)
@@ -167,14 +171,14 @@ func run(c config) (result error) {
 	if handlers.Load() < 1 || failures.Load() < 1 || mismatches.Load() != 0 {
 		return errors.New("fixture delivery evidence incomplete")
 	}
-	emit(map[string]any{"closed": true, "published": 1, "handler_calls": handlers.Load(),
+	emit(map[string]any{"event": "closed", "closed": true, "published": 1, "handler_calls": handlers.Load(),
 		"failed_handoff_calls": failures.Load(), "wire_mismatches": mismatches.Load(), "application_ack_calls": 0})
 	return nil
 }
 
 func main() {
 	if len(os.Args) != 2 {
-		emit(map[string]any{"status": "invalid_fixture"})
+		emit(map[string]any{"event": "failed", "status": "invalid_fixture"})
 		os.Exit(1)
 	}
 	c, err := readConfig(os.Args[1])
@@ -182,7 +186,7 @@ func main() {
 		err = run(c)
 	}
 	if err != nil {
-		emit(map[string]any{"status": "fixture_failed"})
+		emit(map[string]any{"event": "failed", "status": "fixture_failed"})
 		os.Exit(1)
 	}
 }
