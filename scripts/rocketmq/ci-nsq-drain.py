@@ -16,10 +16,22 @@ import nsq_drain_evidence as gate
 from audit_transaction_limit import write_private
 
 
+class CommandFailure(RuntimeError):
+    def __init__(self, code, kind):
+        self.code, self.kind = code, kind
+        super().__init__("owned_fixture_command_failed")
+
+
 def command(*args):
     result = subprocess.run(args, capture_output=True, text=True, timeout=30, check=False)
     if result.returncode:
-        raise RuntimeError("owned_fixture_command_failed")
+        raw = (result.stdout+result.stderr).lower()
+        kind = "other"
+        for needle, category in (("toomanyrequests", "registry_rate_limit"), ("manifest unknown", "image_unavailable"), ("pull access denied", "registry_access_denied"), ("x509:", "registry_tls"), ("unknown flag", "unsupported_fixture_flag")):
+            if needle in raw:
+                kind = category
+                break
+        raise CommandFailure(result.returncode,kind)
     return result.stdout.strip()
 
 
@@ -39,8 +51,10 @@ def main():
     image = "nsqio/nsq:v1.3.0"
     report = dict(schema="m3-nsq-drain-native/v1", passed=0, failed=0, skipped=0, cases={})
     container = None
+    stage = "pull_image"
     try:
         command("docker", "pull", image)
+        stage = "create_container"
         container = command("docker", "run", "--detach", "--name", name, "--label", "com.docker.compose.project="+project,
                             "--memory=128m", "--cpus=1", "--tmpfs", "/data:rw,size=32m", "--publish", "127.0.0.1::4150", "--publish", "127.0.0.1::4151",
                             image, "/nsqd", "--data-path=/data", "--mem-queue-size=0", "--sync-every=1", "--msg-timeout=30s")
@@ -51,6 +65,7 @@ def main():
             if state["Config"]["Labels"].get("com.docker.compose.project") != project:
                 raise RuntimeError("owned_identity_changed")
             return state
+        stage = "inspect_container"
         state = inspect()
         def port(number):
             binding = state["NetworkSettings"]["Ports"][str(number)+"/tcp"]
@@ -72,7 +87,9 @@ def main():
                 except (OSError,ValueError):pass
                 time.sleep(.1)
             raise RuntimeError("owned_fixture_condition_timeout")
+        stage = "node_readiness"
         eventually(lambda:stats().get("health")=="OK")
+        stage = "create_owned_subscription"
         http("/channel/create?topic=owned-drain&channel=owned-worker", b"")
         frozen = dict(node_id="owned-nsqd",container_id=container,container_started_at=state["State"]["StartedAt"],version="1.3.0",topics={"owned-drain":["owned-worker"]})
         manifest = dict(schema="m3-nsq-drain-inventory/v1",nodes=[frozen])
@@ -87,6 +104,7 @@ def main():
                 if str(error)==reason:return
             raise RuntimeError("expected_original_responsibility_not_blocked")
         def passed(label):report["cases"][label]=True;report["passed"]+=1
+        stage = "initial_observation"
         first=capture();time.sleep(5.1);result=evaluate(first,capture())
         if result["cutover_authorized"]:raise RuntimeError("cutover_not_authorized")
         passed("empty_original_node_requires_two_real_samples")
@@ -137,7 +155,12 @@ def main():
         blocked("process_restarted");passed("same_container_restart_invalidates_frozen_process")
         image_state=json.loads(command("docker","image","inspect",state["Image"]))[0]
         report.update(image_id=state["Image"],repo_digests=image_state["RepoDigests"],actual_version=stats()["version"],source_sha=command("git","rev-parse","HEAD"),source_clean=not bool(command("git","status","--porcelain")),read_only_production_tool=True)
-    except Exception:
+    except Exception as error:
+        report["failure_stage"]=stage
+        report["error_type"]=type(error).__name__
+        if isinstance(error,CommandFailure):
+            report["command_exit_code"]=error.code
+            report["command_error_kind"]=error.kind
         report["failed"]+=1
         report["failure"]="owned_native_drain_fixture_failed"
     finally:
