@@ -1031,16 +1031,249 @@
             }
           ],
           "finding": "Accepting40015 only on an ended stream still failed both real profiles. Upstream may already rebuild an active stream without resending settings; next candidate adds bounded active-stream settings sync and safe native diagnostics."
+        },
+        {
+          "run_url": "https://github.com/FangcunMount/infra/actions/runs/39897483972",
+          "candidates": {
+            "sdk": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
+            "infra": "9b1f63fb54f4846198a91f387a7046e3d9721638",
+            "profile": "a3 bounded active-stream settings recovery; unpublished exact source"
+          },
+          "profiles": [
+            {
+              "report_sha256": "adac699956079ccf36345780d775cc44f75ad636d9d9b1766dab2406ea35856c",
+              "counts": {
+                "passed": 4,
+                "failed": 1,
+                "skipped": 0
+              },
+              "failure": "RuntimeError: probe ended before ready",
+              "mysql": "8.0.36",
+              "python": "3.11.16",
+              "exact_real_commit_checks": 3,
+              "consumer_failure_code": "rocketmq_40402_TOPIC_NOT_FOUND",
+              "live": {
+                "launcher_pid": 19879,
+                "producer_pid": 19884,
+                "client_identity_sha256": "67105febc955c282f9963b5f8c8512a0b263ee581977579d1aa2e9455761bb81",
+                "half_prepared_before_kill": 3,
+                "business_before_kill": 0,
+                "broker_kill": {
+                  "signal": "SIGKILL",
+                  "exit_code": 137,
+                  "automatic_restart_disabled": true,
+                  "immutable_container_verified": true,
+                  "oom_killed": false
+                },
+                "local_calls": 1,
+                "business_after_commit": 1,
+                "final_unknown": 3,
+                "before_restart_snapshot": {
+                  "sdk": {
+                    "active_sends": 0,
+                    "callback_errors": 0,
+                    "check_commit": 0,
+                    "check_rollback": 0,
+                    "check_unknown": 0,
+                    "completed_results": 1,
+                    "database_errors": 0,
+                    "final_unknown_results": 3,
+                    "half_prepared_results": 3,
+                    "invalid_checks": 0,
+                    "local_committed_results": 1,
+                    "pending_calls": 0,
+                    "pending_checks": 0,
+                    "ready": false,
+                    "running_checks": 0,
+                    "stopped": false,
+                    "stopping": true
+                  },
+                  "telemetry": {
+                    "channels": 1,
+                    "client_running": true,
+                    "closed_streams": 0,
+                    "heartbeat_errors": 1,
+                    "heartbeat_missing": 0,
+                    "heartbeat_ok": 0,
+                    "heartbeat_thread_alive": true,
+                    "last_heartbeat_code": 0,
+                    "open_streams": 1,
+                    "pending_settings": 0,
+                    "route_endpoints": 1,
+                    "settings_closing": false,
+                    "settings_failures": 1,
+                    "settings_skipped": 0,
+                    "settings_writes": 2
+                  }
+                },
+                "broker_restart": {
+                  "same_container": true,
+                  "pid_changed": true,
+                  "healthy": true,
+                  "effective_parameters": {
+                    "transactionTimeOut": 6000,
+                    "transactionCheckInterval": 5000,
+                    "transactionCheckMax": 24,
+                    "fileReservedTime": 48
+                  }
+                }
+              },
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            },
+            {
+              "report_sha256": "a1207dd10fe1e9f2b2e45471c3c22c2e8510ecbd853adb70a3b6c3f05de5dae7",
+              "counts": {
+                "passed": 4,
+                "failed": 1,
+                "skipped": 0
+              },
+              "failure": "RuntimeError: probe ended before ready",
+              "mysql": "8.4.13",
+              "python": "3.13.15",
+              "exact_real_commit_checks": 3,
+              "consumer_failure_code": "rocketmq_40402_TOPIC_NOT_FOUND",
+              "live": {
+                "launcher_pid": 20307,
+                "producer_pid": 20312,
+                "client_identity_sha256": "79084b801fc45e458425a49e2f7a5478d5f7d3374736c7bdc57a19f08d61255e",
+                "half_prepared_before_kill": 3,
+                "business_before_kill": 0,
+                "broker_kill": {
+                  "signal": "SIGKILL",
+                  "exit_code": 137,
+                  "automatic_restart_disabled": true,
+                  "immutable_container_verified": true,
+                  "oom_killed": false
+                },
+                "local_calls": 1,
+                "business_after_commit": 1,
+                "final_unknown": 3,
+                "before_restart_snapshot": {
+                  "sdk": {
+                    "active_sends": 0,
+                    "callback_errors": 0,
+                    "check_commit": 0,
+                    "check_rollback": 0,
+                    "check_unknown": 0,
+                    "completed_results": 1,
+                    "database_errors": 0,
+                    "final_unknown_results": 3,
+                    "half_prepared_results": 3,
+                    "invalid_checks": 0,
+                    "local_committed_results": 1,
+                    "pending_calls": 0,
+                    "pending_checks": 0,
+                    "ready": false,
+                    "running_checks": 0,
+                    "stopped": false,
+                    "stopping": true
+                  },
+                  "telemetry": {
+                    "channels": 1,
+                    "client_running": true,
+                    "closed_streams": 0,
+                    "heartbeat_errors": 1,
+                    "heartbeat_missing": 0,
+                    "heartbeat_ok": 0,
+                    "heartbeat_thread_alive": true,
+                    "last_heartbeat_code": 0,
+                    "open_streams": 1,
+                    "pending_settings": 0,
+                    "route_endpoints": 1,
+                    "settings_closing": false,
+                    "settings_failures": 1,
+                    "settings_skipped": 0,
+                    "settings_writes": 2
+                  }
+                },
+                "broker_restart": {
+                  "same_container": true,
+                  "pid_changed": true,
+                  "healthy": true,
+                  "effective_parameters": {
+                    "transactionTimeOut": 6000,
+                    "transactionCheckInterval": 5000,
+                    "transactionCheckMax": 24,
+                    "fileReservedTime": 48
+                  }
+                }
+              },
+              "cleanup": {
+                "project_containers_remaining": false,
+                "compose_down_succeeded": true,
+                "probe_process_groups_drained": true,
+                "private_fixture_directory_removed": true
+              }
+            }
+          ],
+          "finding": "Both profiles completed three exact Commit callbacks on unchanged producer; subsequent fresh Go observer startup failed TOPIC_NOT_FOUND. Existing ci-smoke already waits for persisted NameServer routes after listening Broker; add that read-only fixture readiness, never recreate topics. Full drain/consumption gate not yet passed."
         }
       ],
       "current_source_candidate": {
         "sdk": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
-        "infra": "9b1f63fb54f4846198a91f387a7046e3d9721638",
-        "profile": "a3 bounded active-stream settings recovery; unpublished exact source"
+        "infra": "a978aeb1c4557ffd4a206bd81f28e914abfebc54",
+        "profile": "a3 same candidate; read-only persisted NameServer route readiness before fresh consumer"
       },
-      "current_native_run": "https://github.com/FangcunMount/infra/actions/runs/39897483972",
+      "current_native_run": "https://github.com/FangcunMount/infra/actions/runs/39898433212",
       "current_native_status": "running; no pass claim",
-      "diagnostics": "Fixed numeric/boolean whitelist only; before restart, after failed real checks, and after actual close; no body/wire/credentials"
+      "diagnostics": "Fixed numeric/boolean whitelist only; before restart, after failed real checks, and after actual close; no body/wire/credentials",
+      "source_and_wheel_audit": {
+        "source_sha": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
+        "run_url": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39897477622",
+        "profiles": [
+          {
+            "profile": "python-3.11-mysql-8.0.36",
+            "source_sha": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
+            "reports": {
+              "results.xml": {
+                "tests": 134,
+                "failed": 0,
+                "skipped": 0,
+                "sha256": "beab3975030e1ec760c04544e8b5e7681df00aae667329be9b889cf4b265e072"
+              },
+              "wheel-results.xml": {
+                "tests": 134,
+                "failed": 0,
+                "skipped": 0,
+                "sha256": "842dbf11f710c6f163ff761752dbdd4f100e9bbf0166472f9e7d2fa67f1c64ac"
+              }
+            },
+            "unpublished_candidate_assets": {
+              "fangcun_reliable_messaging-0.4.0a3-py3-none-any.whl": "7a0a35438ed6890cff37aea3305e1ee1fcec4b9bcac0667959fbc2cda62c636e",
+              "fangcun_reliable_messaging-0.4.0a3.tar.gz": "096a5f548ca871407f793cc1fbc3158ce649771bb17362375203acc47dfe7d20"
+            }
+          },
+          {
+            "profile": "python-3.13-mysql-8.4",
+            "source_sha": "2258ad70275ae974e71fb3ffeaa5ed7def4c2893",
+            "reports": {
+              "results.xml": {
+                "tests": 134,
+                "failed": 0,
+                "skipped": 0,
+                "sha256": "69400a51d5325a5fbc9567a139251eb734ee4c5fa9cd939d6398d9b60d5da9a0"
+              },
+              "wheel-results.xml": {
+                "tests": 134,
+                "failed": 0,
+                "skipped": 0,
+                "sha256": "29bcf86020ae0b14ca2b57920ca447812c0f175975f3f44491e04a140334a593"
+              }
+            },
+            "unpublished_candidate_assets": {
+              "fangcun_reliable_messaging-0.4.0a3-py3-none-any.whl": "7a0a35438ed6890cff37aea3305e1ee1fcec4b9bcac0667959fbc2cda62c636e",
+              "fangcun_reliable_messaging-0.4.0a3.tar.gz": "096a5f548ca871407f793cc1fbc3158ce649771bb17362375203acc47dfe7d20"
+            }
+          }
+        ],
+        "release_claimed": false
+      },
+      "source_and_wheel_audit_sha256": "ae1fcebb38fe3d0dceebf931c58e3505a0bda08ff87b8fb24c596297568a1ef9"
     }
   }
 }
