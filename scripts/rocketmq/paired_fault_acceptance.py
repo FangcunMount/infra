@@ -118,12 +118,13 @@ def read_partial_receipt(output, ai_sha, qs_sha):
         'recovered_completed_results','recovered_half_prepared','recovered_broker_commit_checks',
         'final_recovered_seals','provider_invocations','local_calls','half_prepared',
         'actual_final_unknown','broker_commit_checks','pending_calls',
-        'half_prepared_before_kill','local_calls_before_kill','recovered_committed_references')
+        'half_prepared_before_kill','local_calls_before_kill','recovered_committed_references','startup_rpc_code')
     counters = {}
     for fault in ('qs_sigkill','broker_restart'):
         row = r['proof'].get(fault)
         if isinstance(row,dict):
-            counters[fault] = {key:row[key] for key in allowed if bounded_int(row.get(key),-9)}
+            counters[fault] = {key:row[key] for key in allowed if bounded_int(row.get(key),0 if key=='startup_rpc_code' else -9,
+                99999 if key=='startup_rpc_code' else 1024)}
     return dict(cases=r['cases'],passed=r['passed'],failed=r['failed'],skipped=r['skipped'],
         counters=counters,partial=True,complete_acceptance_claimed=False)
 

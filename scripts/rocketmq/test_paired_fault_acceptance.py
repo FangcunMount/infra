@@ -73,10 +73,12 @@ class PairedFaultAcceptanceTests(unittest.TestCase):
         row=receipt();row['failed']=1
         row['proof']['broker_restart']['raw_wire']='private'
         row['proof']['broker_restart']['local_calls']=True
+        row['proof']['broker_restart']['startup_rpc_code']=40402
         partial=read_partial_receipt(output(row),AI,QS)
         self.assertFalse(partial['complete_acceptance_claimed'])
         self.assertNotIn('private',json.dumps(partial))
         self.assertNotIn('local_calls',partial['counters']['broker_restart'])
+        self.assertEqual(partial['counters']['broker_restart']['startup_rpc_code'],40402)
         self.assertIsNone(read_partial_receipt(output(row),'c'*40,QS))
         self.assertIsNone(read_partial_receipt(output(row)+'\n'+output(row),AI,QS))
 
