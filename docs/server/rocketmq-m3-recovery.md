@@ -91,4 +91,4 @@ python3 scripts/rocketmq/nsq_drain_evidence.py \
 
 成功状态为`nsq_drain_observed`，始终保留`cutover_authorized=false`。它不是旧HTTP/TCP写者、Relay、自主任务、在途业务或未来调度已经停止的证明，也不是原生超限、历史业务回执或事务audit缺口的处置授权；这些责任必须在T25/T30–T32单独冻结并验证。不可通过删Channel、清空队列、改计数或遗忘旧责任让工具通过。
 
-真实依赖验收由[独立CI](../../.github/workflows/rocketmq-nsq-drain.yml)创建唯一临时NSQ1.3.0，验证原生后台队列、in-flight、deferred、原FIN后的排空、采样间发布/消费以及同容器重启。临时`/data`使用有界tmpfs，不产生生产卷或匿名数据卷；清理必须保留既有容器且回读无本attempt残留。尚未取得这项CI通过前，只记录纯测试与接线，不勾选T25。
+真实依赖验收由[独立CI](../../.github/workflows/rocketmq-nsq-drain.yml)创建唯一临时NSQ1.3.0，验证原生后台队列、in-flight、deferred、原FIN后的排空、采样间发布/消费以及同容器重启。容器加入按attempt命名并校验label的独立网络，清理后回读网络集合未变。临时`/data`使用有界tmpfs，不产生生产卷或匿名数据卷；清理必须保留既有容器且回读无本attempt残留。尚未取得这项CI通过前，只记录纯测试与接线，不勾选T25。

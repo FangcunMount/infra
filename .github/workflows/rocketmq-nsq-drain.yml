@@ -28,13 +28,22 @@ jobs:
           set -euo pipefail
           project="m3-nsq-drain-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           remaining="$(docker ps -aq --filter "label=com.docker.compose.project=$project")"
+          rescue=0
           if [ -n "$remaining" ]; then
             # Rescue cleanup is confined to this attempt; its necessity fails the job.
             while IFS= read -r owned_id; do
               docker rm -f "$owned_id"
             done <<< "$remaining"
-            exit 1
+            rescue=1
           fi
+          networks="$(docker network ls -q --filter "label=com.docker.compose.project=$project")"
+          if [ -n "$networks" ]; then
+            while IFS= read -r owned_network; do
+              docker network rm "$owned_network"
+            done <<< "$networks"
+            rescue=1
+          fi
+          test "$rescue" = 0
       - uses: actions/upload-artifact@v7
         if: always()
         with:

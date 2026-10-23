@@ -48,15 +48,20 @@ def main():
     name = "m3-nsq-drain-" + run + "-" + attempt
     project = name
     initial = set(command("docker", "ps", "-aq").split())
+    initial_networks = set(command("docker", "network", "ls", "-q").split())
     image = "nsqio/nsq:v1.3.0"
     report = dict(schema="m3-nsq-drain-native/v1", passed=0, failed=0, skipped=0, cases={})
-    container = None
+    container, network = None, None
     stage = "pull_image"
     try:
         command("docker", "pull", image)
+        stage = "create_owned_network"
+        network = command("docker", "network", "create", "--label", "com.docker.compose.project="+project, name)
+        if not re.fullmatch(r"[0-9a-f]{64}",network):
+            raise RuntimeError("owned_network_required")
         stage = "create_container"
         container = command("docker", "run", "--detach", "--name", name, "--label", "com.docker.compose.project="+project,
-                            "--memory=128m", "--cpus=1", "--tmpfs", "/data:rw,size=32m", "--publish", "127.0.0.1::4150", "--publish", "127.0.0.1::4151",
+                            "--network",network,"--memory=128m", "--cpus=1", "--tmpfs", "/data:rw,size=32m", "--publish", "127.0.0.1::4150", "--publish", "127.0.0.1::4151",
                             image, "/nsqd", "--data-path=/data", "--mem-queue-size=0", "--sync-every=1", "--msg-timeout=30s")
         if not re.fullmatch(r"[0-9a-f]{64}", container):
             raise RuntimeError("owned_container_required")
@@ -180,8 +185,14 @@ def main():
         try:
             if container:
                 inspect();command("docker","rm","-f",container)
+            if network:
+                info=json.loads(command("docker","network","inspect",network))[0]
+                if info["Labels"].get("com.docker.compose.project")!=project or info.get("Containers"):
+                    raise RuntimeError("owned_network_cleanup_identity_changed")
+                command("docker","network","rm",network)
             final=set(command("docker","ps","-aq").split())
-            report["cleanup"]=dict(owned_container_removed=container is None or container not in final,existing_containers_unchanged=initial==final)
+            final_networks=set(command("docker","network","ls","-q").split())
+            report["cleanup"]=dict(owned_container_removed=container is None or container not in final,existing_containers_unchanged=initial==final,owned_network_removed=initial_networks==final_networks)
             if not all(report["cleanup"].values()):report["failed"]+=1
         except Exception:
             report["failed"]+=1;report["cleanup"]={"unavailable":True}
