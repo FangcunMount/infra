@@ -7,6 +7,15 @@ on:
         type: string
         required: true
         default: 6be5f80905c5c499017e96391282a994c033958e
+      protection:
+        description: Require current protocol guard and published a4 (not the a2 baseline)
+        type: boolean
+        default: false
+      profile:
+        description: Development is one interpreter/MySQL; full is required for final gate
+        type: choice
+        options: [full, development]
+        default: full
   pull_request:
     paths: ['scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ai_state_acceptance.py', 'scripts/rocketmq/test_ai_state_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-state.yml', 'Makefile']
 permissions:
@@ -21,14 +30,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ['3.11', '3.13']
-        mysql: ['mysql:8.0.36', 'mysql:8.0.44', 'mysql:8.4.11']
+        python: ${{ fromJSON(inputs.profile == 'development' && '["3.13"]' || '["3.11","3.13"]') }}
+        mysql: ${{ fromJSON(inputs.profile == 'development' && '["mysql:8.0.36"]' || '["mysql:8.0.36","mysql:8.0.44","mysql:8.4.11"]') }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: 8de893b367cc797580799abd8325f41dd62356db
+          ref: ${{ inputs.protection == true && '04757bd3212ca961d8eaec22ecd3560101111e18' || '8de893b367cc797580799abd8325f41dd62356db' }}
           path: .sdk-acceptance
       - uses: actions/checkout@v6
         with:
@@ -57,12 +66,13 @@ jobs:
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-ai-state:5.5.1 components/rocketmq
       - name: Required worker, governance, SDK and original state roots
+        env:
+          QS_AI_ACCEPTANCE_KIND: ${{ inputs.protection == true && 'protection' || 'state' }}
         run: |
           set -euo pipefail
-          make rocketmq-ai-state-test SDK_DIR="$PWD/.sdk-acceptance" AI_DIR="$PWD/.ai-acceptance" \
-            ROCKETMQ_TEST_IMAGE=rocketmq-ai-state:5.5.1 \
-            AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' ROCKETMQ_TEST_MYSQL_IMAGE='${{ matrix.mysql }}' \
-            ROCKETMQ_AI_STATE_REPORT=rocketmq-ai-state.json
+          QS_AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' python3 scripts/rocketmq/ci-transactions.py \
+            --sdk "$PWD/.sdk-acceptance" --ai-admission-host "$PWD/.ai-acceptance" \
+            --image rocketmq-ai-state:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-state.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:

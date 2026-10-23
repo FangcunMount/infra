@@ -109,5 +109,40 @@ class IAMRuntimeReceiptTest(unittest.TestCase):
             with self.subTest(bad=bad[:80]):
                 with self.assertRaises(RuntimeError):parse_runtime_receipt(bad,'a'*40)
 
+
+class IAMProtectionReceiptTest(unittest.TestCase):
+    def output(self):
+        from iam_acceptance import RUNTIME_CASES, PROTECTION_CASES
+        runtime = dict(source_sha='a'*40, scope='actual IAM owner lifecycle and original root; in-process only',
+                       passed=6, failed=0, skipped=0, cases={k: True for k in RUNTIME_CASES},
+                       business_executions=1, full_api_process_fault_or_system_not_claimed=True)
+        protection = dict(source_sha='a'*40, passed=8, failed=0, skipped=0,
+                          cases={k: True for k in PROTECTION_CASES}, business_executions=1,
+                          binding_fixture_only=True, full_api_process_fault_or_system_not_claimed=True)
+        return ('M3_IAM_RUNTIME_RECEIPT '+json.dumps(runtime)+'\n--- PASS: TestM3ActualOwnerDrain (1s)\n'
+                'M3_IAM_PROTOCOL_PROTECTION_RECEIPT '+json.dumps(protection))
+
+    def test_require_both_complete_scoped_receipts(self):
+        from iam_acceptance import parse_protection_receipt
+        self.assertEqual(parse_protection_receipt(self.output(), 'a'*40)['passed'], 8)
+        output = self.output()
+        for bad in ('', output+'\n'+output, output.replace('a'*40, 'b'*40),
+                    output.replace('"passed": 8', '"passed": 0'), output.replace('true', 'false', 1),
+                    output.replace('"business_executions": 1', '"business_executions": true'),
+                    output+'\nWARNING: DATA RACE', output+'\n--- SKIP: required (0s)'):
+            with self.subTest(bad=bad[:60]):
+                with self.assertRaises(RuntimeError): parse_protection_receipt(bad, 'a'*40)
+
+    def test_exact_fixed_module_and_separate_profile(self):
+        from iam_acceptance import validate_protection_profile
+        module = dict(Path='github.com/FangcunMount/reliable-messaging', Version='v0.5.0-rocketmq-tx.4',
+                      Sum='h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=',
+                      GoModSum='h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')
+        validate_protection_profile(module, True, True, False, False)
+        for runtime, faults, fanout in ((False, False, False), (True, True, False), (True, False, True)):
+            with self.assertRaises(RuntimeError): validate_protection_profile(module, True, runtime, faults, fanout)
+        for changes in (dict(Replace={}), dict(Sum='wrong'), dict(Version='v0.5.0-rocketmq-tx.2')):
+            with self.assertRaises(RuntimeError): validate_protection_profile(dict(module, **changes), True, True, False, False)
+
 if __name__ == '__main__':
     unittest.main()

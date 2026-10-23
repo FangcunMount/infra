@@ -214,6 +214,7 @@ def main():
     parser.add_argument("--sdk-limits", action="store_true", help="require public SDK finite native check audit and admission alarm")
     parser.add_argument("--sdk-go-probe", type=Path, help="prebuilt public SDK executable from a verified published Go module")
     parser.add_argument("--installed-python", type=Path, help="isolated Python interpreter with a verified downloaded release wheel installed")
+    parser.add_argument("--qs-protocol-protection", action="store_true", help="requires actual QS runtime, published tx.4, current observation guard and real recovery audit")
     parser.add_argument("--qs-runtime-host", type=Path, help="exact QS checkout; actual default dual owners, original stores and owned Broker restart/Checker")
     parser.add_argument("--qs-retry-store-host", type=Path, help="exact QS checkout; original dual-store future authorization atomicity only")
     parser.add_argument("--qs-deferred-consumer-host", type=Path, help="exact QS checkout; current deferred-consumer original MySQL/lease/process proof, no Broker claim")
@@ -294,6 +295,8 @@ def main():
                 args.qs_deferred_consumer_host, args.sdk_api_go, args.sdk_api_python, args.sdk_faults,
                 args.sdk_limits, args.go_probe, args.sdk_go_probe, args.installed_python, args.iam_private_log))):
         parser.error('original IAM faults require one explicit IAM source without runtime or fanout profile')
+    if args.qs_protocol_protection and not args.qs_runtime_host:
+        parser.error("protocol protection requires the separate default QS runtime profile")
     if args.qs_runtime_host and any((args.m3_resources, args.iam_host, args.sdk_api_go, args.sdk_api_python,
             args.qs_answer_host, args.qs_evaluation_host, args.qs_report_host, args.qs_task_host, args.qs_retry_store_host,
             args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host, args.ai_admission_host,
@@ -629,7 +632,7 @@ def main():
                     passed('ai_' + boundary + '_actual_original_commit_tcp_boundary')
                 return
             from broker_fault_control import OwnedBrokerFault
-            state_profile = kind == 'state'
+            state_profile = kind in ('state', 'protection')
             proof_name = ('paired_host' if kind in ('paired','paired_faults') else ('ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')))
             fault_tools = None
             if kind in ('finalization','paired_faults'):
@@ -721,9 +724,12 @@ def main():
                 proof['qs_runtime_host'] = {}
                 run_qs_runtime_host(args.qs_runtime_host, directory, broker, project, grpc_port,
                     mysql_port, mongo_port, mysql_password, ca, run, proof['qs_runtime_host'],
-                    owned_native_run, repo, broker_parameters)
+                    owned_native_run, repo, broker_parameters, protection=args.qs_protocol_protection)
                 for name in proof['qs_runtime_host']['native_receipt']['cases']:
                     passed('qs_runtime_' + name)
+                if args.qs_protocol_protection:
+                    for name in proof['qs_runtime_host']['protection_receipt']['cases']:
+                        passed('qs_protocol_protection_' + name)
                 return
             if args.qs_retry_dispatch_host:
                 from qs_retry_dispatch_acceptance import run_qs_retry_dispatch_host
@@ -978,6 +984,9 @@ def main():
             run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
                          mysql_password, ca, run, proof['iam_host'], args.iam_private_log, args.iam_operation_results, args.iam_fanout_qs)
             passed('iam_host_actual_sdk_original_root_and_application')
+            if 'protection_receipt' in proof['iam_host']:
+                for name in proof['iam_host']['protection_receipt']['cases']:
+                    passed('iam_protocol_protection_' + name)
             if args.iam_fanout_qs:
                 passed('iam_two_instances_and_qs_separate_business_subscription')
 
@@ -1192,6 +1201,9 @@ def main():
                 'Real owned Broker SIGKILL/restart; producer runtimes closed in process, no producer process-exit claim',
                 'Observed callback counts and configured SDK bounds are distinct from queue saturation proof',
                 'Fixture first-check window read back and restored; no production parameter or SLA change']
+            if args.qs_protocol_protection:
+                report['batch'] = 'M3-T24-QS-dual-owner-protection-and-positive-recovery'
+                report['limits'].append('Owned audit timestamps aged by 600 seconds; no real ten-minute elapsed, no unresolved no-callback debt recovery claim')
             report['qs_runtime_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_runtime_acceptance.py').read_bytes()).hexdigest()
         if args.qs_deferred_consumer_host:
             report['batch'] = 'M3-QS-deferred-consumer-original-MySQL'
@@ -1211,7 +1223,7 @@ def main():
                                 'Controlled QS input and observer ACK only; no paired QS business or real provider',
                                 'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
             report['ai_admission_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_admission_acceptance.py').read_bytes()).hexdigest()
-            if os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') == 'state':
+            if os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') in ('state', 'protection'):
                 report['batch'] = 'M3-AI-worker-state-original-SQLAlchemy-and-real-Broker'
                 report['limits'] = ['No production/system acceptance or throughput claim',
                                     'Actual evaluation worker preflight, released SDK and original state root',
