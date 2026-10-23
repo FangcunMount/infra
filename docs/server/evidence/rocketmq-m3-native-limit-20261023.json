@@ -1100,9 +1100,9 @@
       "skipped": 0
     },
     "full_matrix_run": "https://github.com/FangcunMount/infra/actions/runs/39982896849",
-    "full_matrix_status": "running_or_queued",
     "source_pr": 219,
-    "production_deployed": false
+    "production_deployed": false,
+    "full_matrix_status_at_development_record": "running_or_queued"
   },
   "t25_b_local_foundation": {
     "source_sha": "94cc6d50a2c1ac1cfb62bccdef7a6de3630a6354",
