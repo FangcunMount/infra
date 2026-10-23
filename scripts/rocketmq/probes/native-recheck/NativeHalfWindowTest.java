@@ -17,6 +17,13 @@ public final class NativeHalfWindowTest {
         rejected(now, now, 0);
         rejected(now, now, 8761);
         rejected(now - 3_600_000 + 120_000, now, 1);
-        System.out.println("M3_NATIVE_WINDOW {\"passed\":7,\"failed\":0,\"skipped\":0,\"network_started\":false}");
+        String id = NativeHalfRecheck.physicalId(new byte[] {127,0,0,1}, 10911, 4096);
+        if (!id.equals("7F00000100002A9F0000000000001000")) throw new AssertionError();
+        if (NativeHalfRecheck.physicalId(new byte[16],10911,0).length() != 56) throw new AssertionError();
+        try { NativeHalfRecheck.physicalId(new byte[4],10911,-1); throw new AssertionError(); }
+        catch (IllegalArgumentException expected) { }
+        try { NativeHalfRecheck.physicalId(new byte[4],0,1); throw new AssertionError(); }
+        catch (IllegalArgumentException expected) { }
+        System.out.println("M3_NATIVE_WINDOW {\"passed\":11,\"failed\":0,\"skipped\":0,\"network_started\":false}");
     }
 }

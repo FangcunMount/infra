@@ -33,3 +33,5 @@
 可重复开发入口：`rocketmq-native-recheck.yml`固定SDK源码04757bd3、Go1.25.12、Java17、MySQL8.0.36与Broker5.5.1；`ci-native-recheck.py`只允许GitHub-hosted Linux和本地daemon，不接受外部服务。当前为可行性开发，尚未有真实通过报告；不据此勾选C3。
 
 首轮开发40015398289（530f43e）为4通过/1失败/0跳过，停在编译/纯Java探针组合阶段，尚未准备SDK half；Go与Java编译摘要已经记录，但原报告没有更细启动阶段，不推断原生恢复失败。自有Compose/进程/文件与既有资源集合清理通过；Broker参数恢复正向文案判定失败单独保留。固定源码已确认UpdateBrokerConfig使用逗号而非句点；后续按其实际文案及参数回读。Java class受umask077影响的权限明确安装到自有容器UID3000，新增分阶段与固定错误分类诊断，待真实复验，不改写旧报告。
+
+第三轮40016777071（b6d7163）已通过8项：纯Java7边界、真实Prepared超限、原MySQL提交后exit23、新暂停实例无自动回查；停在精确原生记录读取，尚未调用恢复管理操作，所有参数和所属资源清理通过。源码核对发现`QueryMsgByKey`经clientDecode返回MessageClientExt，其getMsgId可能是UNIQ_KEY而不是物理offset ID；不能把审计字段名broker_message_id当作地址。后续从同一固定Broker实际配置和原索引commitlog_offset构造物理ID，并重新验证source Topic、队列位置、Reference/wire/UNIQ摘要；不放宽身份检查。增加IPv4/IPv6及非法offset/port纯向量，失败诊断只输出阶段和布尔验证项，不输出正文/原属性。

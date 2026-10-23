@@ -198,8 +198,8 @@ def main():
                 else 'java_policy_or_launch_failure')
             raise RuntimeError('pure_java_failed')
         window = frame(window_process.stdout, 'M3_NATIVE_WINDOW ')
-        require(window == dict(passed=7, failed=0, skipped=0, network_started=False), 'finite_window_policy_failed')
-        proof['finite_window_pure'] = window; passed('seven_pure_finite_window_bounds')
+        require(window == dict(passed=11, failed=0, skipped=0, network_started=False), 'finite_window_policy_failed')
+        proof['finite_window_pure'] = window; passed('eleven_pure_finite_window_and_physical_bounds')
         def start(mode, identity=''):
             role = 'observer' if mode == 'consume' else 'owner-a'; account = accounts[role]
             path = directory/('client-'+secrets.token_hex(8)+'.json')
@@ -254,7 +254,8 @@ def main():
                 and not any(e.get('event')=='received' and e.get('id')==identity for e in consumer.events), 'native_exhaustion_not_established')
         passed('new_process_admission_stopped_checker_alive_no_automatic_recovery')
         request = dict(mode='inspect', source_topic='TRANS_CHECK_MAX_TIME_TOPIC',
-            offset_message_id=index['records'][0]['broker_message_id'], expected_real_topic=route['physical_topic'],
+            commitlog_offset=index['records'][0]['commitlog_offset'], queue_id=index['records'][0]['queue_id'],
+            queue_offset=index['records'][0]['queue_offset'], expected_real_topic=route['physical_topic'],
             expected_owner='iam.mysql', expected_route_revision='sdk-v2', expected_retention_hours=48,
             expected_reference_sha256=committed['reference_sha256'], expected_wire_sha256=committed['wire_sha256'],
             expected_unique_id_sha256=committed['unique_id_sha256'])
@@ -264,7 +265,9 @@ def main():
             require(safe.get('admin_shutdown_returned') is True and safe.get('body_exported') is False, 'native_private_shutdown_required')
             if negative:
                 require(result.returncode!=0 and safe.get('outcome')=='NotAttempted' and safe.get('stage')=='frozen_identity', 'wrong_identity_not_refused')
-            else: require(result.returncode==0, 'native_private_operation_failed_at_'+safe.get('stage','unknown'))
+            elif result.returncode:
+                proof['native_operation_failure'] = safe
+                raise RuntimeError('native_private_operation_failed')
             return safe
         stage = 'exact_native_inspection'
         proof['inspection'] = invoke(request); passed('exact_native_body_reference_identity_and_finite_window_verified')

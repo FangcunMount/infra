@@ -2,7 +2,7 @@
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.HexFormat;
@@ -10,7 +10,6 @@ import java.util.Properties;
 import java.util.Set;
 import org.apache.rocketmq.acl.common.AclUtils;
 import org.apache.rocketmq.common.message.MessageConst;
-import org.apache.rocketmq.common.message.MessageDecoder;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 
@@ -25,6 +24,15 @@ public final class NativeHalfRecheck {
         long value = Math.subtractExact(end, now);
         if (value <= MIN_REMAINING_MS) throw new IllegalArgumentException("finite_window_exhausted");
         return value;
+    }
+
+    static String physicalId(byte[] address, int port, long offset) {
+        if ((address.length != 4 && address.length != 16) || port < 1 || port > 65535 || offset < 0) {
+            throw new IllegalArgumentException("invalid_physical_context");
+        }
+        ByteBuffer encoded = ByteBuffer.allocate(address.length + 12);
+        encoded.put(address).putInt(port).putLong(offset);
+        return HexFormat.of().withUpperCase().formatHex(encoded.array());
     }
 
     static String hash(byte[] value) throws Exception {
@@ -48,6 +56,7 @@ public final class NativeHalfRecheck {
         String stage = "request";
         int exitCode = 0;
         boolean closed = true;
+        JSONObject checks = new JSONObject();
         try {
             require(args.length == 0);
             require("true".equals(System.getenv("GITHUB_ACTIONS")));
@@ -56,16 +65,19 @@ public final class NativeHalfRecheck {
             byte[] raw = System.in.readNBytes(16_385);
             require(raw.length > 0 && raw.length <= 16_384);
             JSONObject request = JSON.parseObject(raw, JSONObject.class);
-            Set<String> fields = Set.of("mode", "source_topic", "offset_message_id", "expected_real_topic", "expected_owner",
+            Set<String> fields = Set.of("mode", "source_topic", "commitlog_offset", "queue_id", "queue_offset", "expected_real_topic", "expected_owner",
                 "expected_reference_sha256", "expected_wire_sha256", "expected_unique_id_sha256", "expected_retention_hours",
                 "expected_route_revision");
             require(request != null && request.keySet().equals(fields));
             String mode = text(request, "mode");
             String topic = text(request, "source_topic");
-            String id = text(request, "offset_message_id");
+            for (String key : Set.of("commitlog_offset", "queue_id", "queue_offset")) {
+                Object value = request.get(key);
+                require((value instanceof Long || value instanceof Integer) && ((Number) value).longValue() >= 0);
+            }
+            long offset = request.getLongValue("commitlog_offset");
             require(mode.equals("inspect") || mode.equals("resume"));
             require(topic.equals("RMQ_SYS_TRANS_HALF_TOPIC") || topic.equals("TRANS_CHECK_MAX_TIME_TOPIC"));
-            require(id.matches("[0-9A-Fa-f]{32,64}"));
             for (String key : Set.of("expected_reference_sha256", "expected_wire_sha256", "expected_unique_id_sha256")) {
                 require(text(request, key).matches("[0-9a-f]{64}"));
             }
@@ -85,25 +97,33 @@ public final class NativeHalfRecheck {
             int hours = Integer.parseInt(config.getProperty("fileReservedTime"));
             require(request.get("expected_retention_hours") instanceof Integer
                 && request.getIntValue("expected_retention_hours") == hours);
-            // Offset IDs embed an address. Do not let an input select another Broker.
-            InetSocketAddress selected = (InetSocketAddress) MessageDecoder.decodeMessageId(id).getAddress();
+            // QueryMsgByKey returns MessageClientExt.getMsgId(), which can be
+            // UNIQ_KEY. It is NOT a physical offset ID. Build the physical ID
+            // from the exact index offset and this fixed Broker's own address.
             require(config.getProperty("brokerIP1") != null && !config.getProperty("brokerIP1").isBlank());
             InetAddress current = InetAddress.getByName(config.getProperty("brokerIP1"));
-            require(selected.getAddress().equals(current)
-                && selected.getPort() == Integer.parseInt(config.getProperty("listenPort", "10911")));
+            String id = physicalId(current.getAddress(), Integer.parseInt(config.getProperty("listenPort", "10911")), offset);
             stage = "physical_record";
             MessageExt message = admin.viewMessage(topic, id);
-            require(message != null && topic.equals(message.getTopic())
-                && realTopic.equals(message.getUserProperty(MessageConst.PROPERTY_REAL_TOPIC)));
+            checks.put("physical_message_present", message != null);
+            require(message != null);
+            checks.put("source_topic", topic.equals(message.getTopic()));
+            checks.put("physical_offset", message.getCommitLogOffset() == offset);
+            checks.put("queue_id", message.getQueueId() == request.getLongValue("queue_id"));
+            checks.put("queue_offset", message.getQueueOffset() == request.getLongValue("queue_offset"));
+            checks.put("real_topic", realTopic.equals(message.getUserProperty(MessageConst.PROPERTY_REAL_TOPIC)));
+            for (Object value : checks.values()) require(Boolean.TRUE.equals(value));
             stage = "frozen_identity";
             byte[] body = message.getBody();
             String reference = message.getUserProperty("rm_tx_ref");
             String unique = message.getUserProperty(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX);
             require(body != null && body.length > 0 && body.length <= 262_144 && reference != null && unique != null);
             byte[] encoded = reference.getBytes(StandardCharsets.UTF_8);
-            require(encoded.length <= 8192 && hash(encoded).equals(text(request, "expected_reference_sha256"))
-                && hash(body).equals(text(request, "expected_wire_sha256"))
-                && hash(unique.getBytes(StandardCharsets.UTF_8)).equals(text(request, "expected_unique_id_sha256")));
+            checks.put("bounded_reference", encoded.length <= 8192);
+            checks.put("reference_sha256", hash(encoded).equals(text(request, "expected_reference_sha256")));
+            checks.put("wire_sha256", hash(body).equals(text(request, "expected_wire_sha256")));
+            checks.put("unique_id_sha256", hash(unique.getBytes(StandardCharsets.UTF_8)).equals(text(request, "expected_unique_id_sha256")));
+            for (Object value : checks.values()) require(Boolean.TRUE.equals(value));
             JSONObject ref = JSON.parseObject(reference);
             require(owner.equals(ref.getString("owner")) && realTopic.equals(ref.getString("physical_topic"))
                 && revision.equals(ref.getString("route_revision"))
@@ -135,6 +155,7 @@ public final class NativeHalfRecheck {
             result.put("status", "unavailable");
             result.put("stage", stage);
             result.put("failure_kind", failure.getClass().getSimpleName());
+            result.put("checks", checks);
             result.put("body_exported", false);
             exitCode = 1;
         } finally {
