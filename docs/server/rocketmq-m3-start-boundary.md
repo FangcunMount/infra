@@ -1,6 +1,6 @@
 # M3 单次切换的首次启动边界
 
-进度以 [M3总表](rocketmq-m3-execution.md) 为准。本工具是 T25-C 的离线实现候选，尚不构成该子项完成、生产执行批准或 T29 最终候选演练。它不修改业务、SDK、schema、Topic、ACL 或 worker 配额。
+进度以 [M3总表](rocketmq-m3-execution.md) 为准。启动屏障组件C1已完成源码合并与隔离门禁；T25-C整项、生产执行批准与T29最终候选演练仍未完成。它不修改业务、SDK、schema、Topic、ACL 或 worker 配额。
 
 ## 唯一协调位置
 
