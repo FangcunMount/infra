@@ -227,7 +227,15 @@ def main():
     parser.add_argument("--ai-host-database-faults", action="store_true", help="actual AI command original SQLAlchemy COMMIT packet faults")
     parser.add_argument("--qs-command-host-faults", action="store_true", help="actual QS command original MySQL COMMIT TCP faults")
     parser.add_argument("--paired-host-faults", action="store_true", help="explicit paired MQ/process/Broker physical fault profile")
+    parser.add_argument("--sdk-python-live-recovery", action="store_true", help="source-candidate Python producer survives actual owned Broker SIGKILL")
     args = parser.parse_args()
+    if args.sdk_python_live_recovery and (not args.sdk_api_go or not args.sdk_api_python
+            or any((args.iam_host,args.m3_resources,args.iam_fanout_qs,args.qs_answer_host,
+                args.qs_evaluation_host,args.qs_report_host,args.qs_task_host,args.qs_retry_store_host,
+                args.qs_retry_dispatch_host,args.qs_command_host,args.qs_event_host,args.ai_admission_host,
+                args.qs_runtime_host,args.qs_deferred_consumer_host,args.sdk_faults,args.sdk_limits,
+                args.installed_python,args.go_probe,args.sdk_go_probe))):
+        parser.error("Python live recovery requires source SDK Go/Python fixture without another profile")
     if args.paired_host_faults and (not args.ai_admission_host
             or os.environ.get("QS_AI_ACCEPTANCE_KIND") != "paired_faults"
             or not os.environ.get("QS_M3_PAIRED_SOURCE")
@@ -780,6 +788,16 @@ def main():
                 if not args.installed_python:
                     run([args.python, "sync", "--locked", "--project", str(sdk / "python"),
                          "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
+            if args.sdk_python_live_recovery:
+                from broker_fault_control import OwnedBrokerFault
+                from python_live_recovery import CASE, SETUP_CASES, run_live_recovery
+                proof['python_live_recovery'] = {}
+                control = OwnedBrokerFault(run,broker,project,
+                    lambda: broker_parameters(admin('getBrokerConfig')),effective)
+                run_live_recovery(start,sql,control,proof['python_live_recovery'],passed)
+                if set(cases) != SETUP_CASES | {CASE}:
+                    raise RuntimeError('source SDK live recovery profile incomplete or substituted')
+                return
             from v2_acceptance import denied_owners, shared_budget
             denied_owners(start,sql,mongo_command,passed,python=args.sdk_api_python)
             wrong_ca = directory / "sdk-wrong-ca.crt"
@@ -1157,6 +1175,11 @@ def main():
                                     'Event observer ACK only; no paired QS business or real provider',
                                     'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
                 report['ai_state_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_state_acceptance.py').read_bytes()).hexdigest()
+        if args.sdk_python_live_recovery:
+            report['batch'] = 'M3-T23-source-SDK-Python-surviving-producer-Broker-SIGKILL'
+            report['limits'] = ['Exact source SDK regression, not a published SDK or host/business/system/production acceptance',
+                'Original producer stays alive, new send admission stopped, original root once and actual Broker callbacks/consumption required']
+            report['python_live_recovery_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/python_live_recovery.py').read_bytes()).hexdigest()
         if args.paired_host_faults:
             report['batch'] = 'M3-T23-paired-physical-faults-' + os.environ.get('QS_M3_PAIRED_PROFILE','core')
             report['limits'] = ['Actual paired original roots, controlled read-side inputs; no public HTTP, real provider, system or production acceptance',

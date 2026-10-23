@@ -5,6 +5,10 @@ on:
     paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '!scripts/rocketmq/ai_finalization_*', '!scripts/rocketmq/test_ai_finalization_*', '.github/workflows/rocketmq-faults.yml']
   workflow_dispatch:
     inputs:
+      live_python:
+        description: Source SDK surviving Python producer recovery; not a published artifact gate
+        type: boolean
+        default: false
       sdk_ref:
         description: Exact candidate SDK revision
         type: string
@@ -15,7 +19,7 @@ permissions:
 env:
   GOTOOLCHAIN: local
 concurrency:
-  group: rocketmq-packet-faults-${{ github.ref }}
+  group: rocketmq-packet-faults-${{ github.ref }}-${{ inputs.live_python && inputs.sdk_ref || 'standard' }}
   cancel-in-progress: true
 jobs:
   sdk:
@@ -46,13 +50,27 @@ jobs:
         with:
           version: '0.12.13'
           python-version: ${{ matrix.python }}
+      - name: Verify immutable SDK source
+        env:
+          SDK_REF: ${{ inputs.sdk_ref || 'bfaae2b82ee0d1229b8c965fce472cdf5dec486f' }}
+        run: |
+          set -euo pipefail
+          [[ "$SDK_REF" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .sdk-acceptance rev-parse HEAD)" = "$SDK_REF"
       - name: Fetch and verify official release archive
         run: bash scripts/rocketmq/fetch-release.sh
       - name: Build exact isolated Broker with fresh PGP proof
         run: docker build --no-cache -t rocketmq-sdk:5.5.1 components/rocketmq
       - name: Required public SDK MySQL, Mongo and cross-language recovery proofs
+        env:
+          LIVE_PYTHON: ${{ inputs.live_python || false }}
         run: |
-          python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python --sdk-faults \
+          set -euo pipefail
+          fault_options=(--sdk-faults)
+          if [[ "$LIVE_PYTHON" == true ]]; then
+            fault_options=(--sdk-python-live-recovery)
+          fi
+          python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python "${fault_options[@]}" \
             --sdk "$PWD/.sdk-acceptance" --image rocketmq-sdk:5.5.1 --mysql-image '${{ matrix.mysql }}' \
             --report rocketmq-packet-faults.json
       - uses: actions/upload-artifact@v7

@@ -61,7 +61,7 @@ def parse_receipt(output, junit, ai_sha, qs_sha, *, full):
         original_root_lock_wait_observed=True,old_exit_code=-9,distinct_producer_pid=True,
         old_seals=1,recovered_completed_results=0,recovered_half_prepared=0,
         original_wire_unchanged=True,final_recovered_seals=2,provider_invocations=0)
-    b_expected = dict(local_calls=1,half_prepared_before_kill=2,local_calls_before_kill=0,half_prepared=2,actual_final_unknown=2,pending_calls=0,
+    b_expected = dict(local_calls=1,checks_drained_before_restart=True,half_prepared_before_kill=2,local_calls_before_kill=0,half_prepared=2,actual_final_unknown=2,pending_calls=0,
         provider_invocations=0)
     for row, expected, count, original, replacements in (
             (q,q_expected,'recovered_broker_commit_checks',-9,[0]),
