@@ -34,8 +34,8 @@
 
 | 完成 | 子批 | 完成门禁 | 当前状态 |
 | --- | --- | --- | --- |
-| ☐ | T23-A | 固定实际写入口、原根提交匹配、源版本和安全证据；IAM原COMMIT前/后真实TCP断连 | IAM候选0c4e46c1；race带标签仅编译通过、工具142项及actionlint通过；原生尚未运行，不计14证据通过 |
-| ☐ | T23-B | QS MySQL/Mongo及AI SQLAlchemy实际业务根提交故障 | 待开始；沿用原ID、wire、业务幂等及response/checkpoint |
+| ☐ | T23-A | 固定实际写入口、原根提交匹配、源版本和安全证据；IAM原COMMIT前/后真实TCP断连 | IAM0c4e46c1/infra ab08a18：开发CI39878992417原生14/14、原根/HTTP另34项通过，清理及源码摘要已审计；workflow仅post-uv空缓存失败。修复缓存后仍须完整三档及CI闭环 |
+| ☐ | T23-B | QS MySQL/Mongo及AI SQLAlchemy实际业务根提交故障 | QS Mongo候选d367605dd：race标签编译、新增lint零问题及88文档检查通过，原生待运行；QS MySQL/AI待实现，保留原ID、wire、业务幂等及response/checkpoint |
 | ☐ | T23-C | 实际宿主进程退出、新实例回查、必要MQ/Broker及成对链路故障 | 待开始；与既有T18/T20/T22证据逐项组合，缺项补测，不重复整套无关验收 |
 | ☐ | T23-D | 冻结候选、完整必需矩阵、报告审计与相关PR合并 | 待开始；每份报告绑定真实源码/工具SHA，非空且零失败/跳过，失败历史保留 |
 
@@ -1271,3 +1271,5 @@ QS源码PR428与infra工具PR169均已合并。QS当前候选28项检查成功�
 独立工作区`{iam,qs,ai,infra}-host-faults`从T22已合并main建立。首批调用IAM真实`RoleCatalog.CreateRole`，原GORM业务连接经过冻结SDK故障代理；独立直连只用于同一自有数据库的建库及权威读取。提交前断开必须没有角色/版本推进，且新暂停owner读取持久化精确Aborted并收到真实Broker回查；提交后丢回复必须恢复同一角色成功、精确witness和first wire，重复请求不重执行业务。
 
 本地只做race标签编译、静态检查和工具纯测试：142项通过，actionlint通过；整包tagged lint保留9项既有errcheck，新增差异单独验证。原生依赖不在本机启动；开发CI与最终矩阵尚未通过，不勾选T23-A或T23。未发布稳定SDK、未操作生产或system，48h未开始。
+
+T23首轮IAM开发CI39878992417：真实MySQL8.0.36，原角色COMMIT前/后TCP断连共14/14证据，另原根/HTTP34项全部通过，零失败/跳过。提交前业务0/版本增量0/初始Unknown，新暂停owner真实CheckRollback1；提交后业务1/版本增量1/精确Commit，两个分支各业务回调1、半消息1，重复不重做。所有源码/工具摘要及自有清理独立核对。workflow整体失败原因仅setup-uv收尾试图缓存未创建的目录，保留该失败；新纯Go档关闭uv缓存后重跑，不把旧失败标绿。QS Mongo故障组件及工具新增通过编译/纯测试，真实门禁未运行。T23继续进行中，22/36；生产未操作。

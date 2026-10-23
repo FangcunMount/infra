@@ -7,8 +7,12 @@ on:
         type: string
         required: true
         default: 528ec496c621a54f0d2c82f13fed057500366e6d
+      faults:
+        description: Original AnswerSheet Mongo COMMIT before/after TCP faults
+        type: boolean
+        default: false
   pull_request:
-    paths: ['scripts/rocketmq/qs_answer_acceptance.py', 'scripts/rocketmq/test_qs_answer_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-answer.yml']
+    paths: ['scripts/rocketmq/qs_answer_acceptance.py', 'scripts/rocketmq/test_qs_answer_acceptance.py', 'scripts/rocketmq/qs_answer_fault_acceptance.py', 'scripts/rocketmq/test_qs_answer_fault_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-qs-answer.yml']
 permissions:
   contents: read
 env:
@@ -31,7 +35,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: bfaae2b82ee0d1229b8c965fce472cdf5dec486f
+          ref: ${{ inputs.faults == true && '8de893b367cc797580799abd8325f41dd62356db' || 'bfaae2b82ee0d1229b8c965fce472cdf5dec486f' }}
           path: .sdk-acceptance
       - uses: actions/checkout@v6
         with:
@@ -56,11 +60,17 @@ jobs:
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-qs-answer:5.5.1 components/rocketmq
       - name: Required real host original Mongo and Broker
+        env:
+          HOST_FAULTS: ${{ inputs.faults == true && '1' || '0' }}
         run: |
           set -euo pipefail
+          fault_args=()
+          if [[ "$HOST_FAULTS" == 1 ]]; then
+            fault_args+=(--qs-answer-host-faults)
+          fi
           python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
             --qs-answer-host "$PWD/.qs-acceptance" --image rocketmq-qs-answer:5.5.1 \
-            --mysql-image mysql:8.0.44 --report rocketmq-qs-answer.json
+            --mysql-image mysql:8.0.44 --report rocketmq-qs-answer.json "${fault_args[@]}"
       - uses: actions/upload-artifact@v7
         if: always()
         with:

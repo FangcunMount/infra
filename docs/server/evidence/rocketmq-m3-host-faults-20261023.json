@@ -18,7 +18,7 @@
   "profile": {
     "id": "IAM original role COMMIT packet faults",
     "sdk_fault_proxy_source": "8de893b367cc797580799abd8325f41dd62356db",
-    "native_status": "not_run",
+    "native_status": "development native passed 14/14 and separate roots34; workflow failed post-uv cache; full required matrix pending",
     "required_native_tests": 2,
     "required_evidence_cases": 14,
     "boundaries": [
@@ -48,5 +48,48 @@
     "production": false,
     "system_acceptance": false,
     "observation_48h": false
+  },
+  "development_runs": [
+    {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39878992417",
+      "source_sha": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
+      "infra_sha": "ab08a18fd7c9b93aac5349d1db91e052ee578bb1",
+      "workflow_conclusion": "failure",
+      "failed_steps": [
+        "Post Run astral-sh/setup-uv@v6"
+      ],
+      "native": {
+        "mysql": "8.0.36",
+        "root_tests": {
+          "pass": 34,
+          "fail": 0,
+          "skip": 0
+        },
+        "fault_evidence": {
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0
+        },
+        "cleanup_verified": true,
+        "source_and_hashes_verified": true
+      },
+      "artifacts": {
+        "rocketmq-iam-host.json": "6c9044ac4a0eacce0cb2a72631c5240d2901ea05dd7024d72aa0d63139c2d366",
+        "receipt.json": "1e398bf5c023946e9a604456b55e0d1c6797033f8b61d9451eddeed36bdc49a5"
+      },
+      "cache_failure": "Go-only fault profile did not create a uv dependency cache; post-action failed. Not an acceptance failure; workflow still failed."
+    }
+  ],
+  "audit_index_sha256": "f61a654209229564bd69dd0ed4912bd08badd1f8ae51481e081d16ab44e44905",
+  "qs_mongo_candidate": {
+    "source_sha": "d367605dd6ae889a281395a4ea0665fdf5b7ae61",
+    "local_validation": {
+      "native_tag_race": "compile only passed",
+      "new_diff_tagged_lint": "0 issues",
+      "full_tagged_lint": "1 existing errcheck in prior fixture",
+      "docs_check": "88 passed; facts/hygiene passed",
+      "infra_tests": "146 passed; 0 failed/skipped"
+    },
+    "native_status": "not_run"
   }
 }

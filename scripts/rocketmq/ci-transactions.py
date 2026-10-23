@@ -223,7 +223,15 @@ def main():
     parser.add_argument("--qs-event-host", type=Path, help="exact QS checkout; authenticated event Inbox/projection and original ACK SQL root")
     parser.add_argument("--ai-admission-host", type=Path, help="exact AI checkout; real published Python SDK and original admission roots/Broker")
     parser.add_argument("--iam-host-faults", action="store_true", help="separate actual IAM role original-root COMMIT packet faults")
+    parser.add_argument("--qs-answer-host-faults", action="store_true", help="separate actual AnswerSheet original Mongo COMMIT packet faults")
     args = parser.parse_args()
+    if args.qs_answer_host_faults and (not args.qs_answer_host or any((args.iam_host, args.m3_resources,
+            args.iam_fanout_qs, args.qs_evaluation_host, args.qs_report_host, args.qs_task_host,
+            args.qs_retry_store_host, args.qs_retry_dispatch_host, args.qs_command_host, args.qs_event_host,
+            args.ai_admission_host, args.qs_runtime_host, args.qs_deferred_consumer_host, args.sdk_api_go,
+            args.sdk_api_python, args.sdk_faults, args.sdk_limits, args.go_probe, args.sdk_go_probe,
+            args.installed_python, args.qs_answer_private_log))):
+        parser.error('original AnswerSheet faults require one explicit QS source without another profile')
     if args.iam_host_faults and (not args.iam_host or os.environ.get('ROCKETMQ_IAM_RUNTIME_REQUIRED', '0') != '0'
             or any((args.m3_resources, args.iam_fanout_qs, args.qs_answer_host, args.qs_evaluation_host,
                 args.qs_report_host, args.qs_task_host, args.qs_retry_store_host, args.qs_retry_dispatch_host,
@@ -643,6 +651,19 @@ def main():
                 for name in proof['qs_report_host']['native_receipt']['cases']:
                     passed('qs_report_' + name)
                 return
+            if args.qs_answer_host_faults:
+                from qs_answer_acceptance import run_qs_answer_host
+                run(['go', 'build', '-o', str(directory / 'fault-proxy'),
+                     './transport/rocketmq/internal/faultproxy'], cwd=sdk)
+                proof['qs_answer_host'] = {}
+                run_qs_answer_host(args.qs_answer_host, directory, broker, project, grpc_port, mongo_port,
+                    ca, run, proof['qs_answer_host'], faults=True,
+                    native_runner=owned_native_run, proxy_start=proxy_start)
+                for boundary, evidence in proof['qs_answer_host']['faults'].items():
+                    for name in evidence['receipt']['cases']:
+                        passed('qs_answer_' + boundary + '_' + name)
+                    passed('qs_answer_' + boundary + '_actual_original_commit_tcp_boundary')
+                return
             from qs_answer_acceptance import run_qs_answer_host
             proof['qs_answer_host'] = {}
             run_qs_answer_host(args.qs_answer_host, directory, broker, project, grpc_port, mongo_port,
@@ -1013,6 +1034,13 @@ def main():
                                 'Actual host SDK and original Mongo transactions, not raw-client feasibility',
                                 'Root ACK discard is client-level; packet-loss and process-exit acceptance remain separate gates']
             report['qs_answer_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_answer_acceptance.py').read_bytes()).hexdigest()
+        if args.qs_answer_host_faults:
+            report['batch'] = 'M3-T23-QS-original-AnswerSheet-COMMIT-packet-faults'
+            report['qs_answer_fault_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_answer_fault_acceptance.py').read_bytes()).hexdigest()
+            report['limits'] = ['Actual AnswerSheet/original Mongo root with all matching COMMIT retries disconnected',
+                'Before: exact original sessions killed after driver returns; persisted Aborted AND new paused Broker rollback callback required',
+                'After: exact committed witness, first wire and duplicate recovery; new instance Commit callback not claimed',
+                'No full API daemon, producer SIGKILL, Broker restart, provider, system or production claim']
         if args.qs_report_host:
             report['batch'] = 'M3-QS-report-original-Mongo-host'
             report['limits'] = ['No production/system acceptance or throughput claim',

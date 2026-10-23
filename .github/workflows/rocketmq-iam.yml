@@ -66,6 +66,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           version: '0.12.13'
+          enable-cache: ${{ inputs.faults != true }}
           python-version: '3.13'
       - name: Verify exact candidate and source harness
         env:
