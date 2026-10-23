@@ -20,3 +20,10 @@
 不SELECT execution token、冻结plan/wire或业务正文；不更改任何SDK、业务、Outbox或治理行，不执行DDL。首次正向audit只作为before状态，旧时间不能证明本次RPC。固定IAM45治理模板仅用于隔离测试，摘要0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a，不是操作器安装资源。原生测试在GitHub-hosted回环MySQL服务中显式安装自有数据库，真实原事务提交/SDK中止、读回、拒绝和删除回读分别记账；“旧audit”是命名的受控fixture，不冒称真实RPC。Mongo、批准文件图、物理检查、治理CAS及完整CLI仍待实现。
 
 首次存储CI 40039265183 在编译前发现根忽略规则排除了 SQL 测试模板，三档均0通过/1 setup失败/0跳过，尚未连接自有测试数据库。报告保留；仅对这一个公开固定模板增加跟踪例外，并把embed与摘要检查放入普通纯测试，使缺失资源在基础编译门禁就失败。不放宽数据库dump忽略规则。
+
+
+## qs.mongo 原主库 snapshot（候选）
+
+Mongo适配显式绑定qs.mongo，固定原client/database的Primary/Majority；构造不连接。2秒总预算覆盖已安装simple schema、replica set primary、原binding collection UUID/库身份和新snapshot session。拒绝借用任何业务session；原session不重试数据库callback，也不写SDK/业务/治理。投影排除plan、token、wire和Broker handles，限制16分支及Reference大小，检查int64 fence、精确原引用和重复分支；scope/epoch/fence/owner或终态不符均拒绝，错误不交付部分snapshot。
+
+固定QS43模板仅用于自有隔离数据库，摘要d6904ab7c3ab3c4a310314dc7f532eb321679a0e7a31c0b867c11a9280bfc4fa。required GitHub验证固定digest的7.0.37 replica set、真实原业务+witness根、未知/错误读取和删除回读，实际RPC及治理CAS仍未实现。私有观察、native管理动作和消费完成继续分别记账，不能用这些存储fixture关闭C3。
