@@ -720,6 +720,62 @@
         },
         "failure_stage_at_record": "Not captured; only first three completed cases known, do not retroactively assign a root cause",
         "scope": "isolated_nsqd_container_as_compose_fixture_not_m3_business_images_or_transactions"
+      },
+      {
+        "run": "https://github.com/FangcunMount/infra/actions/runs/40002027652",
+        "source_sha": "f805961072dd54757fa8f889e3fb16a880a4acf3",
+        "passed": 3,
+        "failed": 1,
+        "skipped": 0,
+        "report_sha256": "1a89a2ad64576568673436b1a9e11db04e6fb4cd4c125af4b3c6987738137db3",
+        "cases": {
+          "coordinator_marker_before_actual_up": true,
+          "actual_failed_up_retains_start_barrier": true,
+          "failed_new_runtime_forbids_old_backup": true
+        },
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "no_rescue_needed": true,
+          "private_fixture_directory_removed": true,
+          "existing_container_id_set_unchanged": true,
+          "existing_network_id_set_unchanged": true
+        },
+        "target_commands": [
+          {
+            "stage": "config",
+            "returned": true
+          },
+          {
+            "stage": "up",
+            "returned": false
+          },
+          {
+            "stage": "config",
+            "returned": true
+          },
+          {
+            "stage": "up",
+            "returned": true
+          },
+          {
+            "stage": "ps",
+            "returned": true
+          },
+          {
+            "stage": "inspect",
+            "returned": false
+          }
+        ],
+        "failure_stage": "explicit_forward_repair",
+        "failure_code": "target_command_nonzero_or_output_cap",
+        "owned_fixture_state_before_cleanup": [
+          {
+            "status": "running",
+            "running": true,
+            "exit_code": 0
+          }
+        ],
+        "limit": "Actual repair up returned and fixture was running; inspect command failed. Missing-Health template reproduced separately with Go missingkey=error; fixed template still requires new native CI."
       }
     ]
   }

@@ -147,6 +147,9 @@ class StartBoundaryTest(unittest.TestCase):
             (directory/'state.json').write_bytes(b'{')
             with self.assertRaises(ValueError):
                 with Boundary(directory, digest): pass
+            (directory/'state.json').write_text(json.dumps({'binding_sha256': digest, 'phase': [], 'step': ''}))
+            with self.assertRaises(BoundaryError):
+                with Boundary(directory, digest): pass
             (directory/'state.json').unlink()
             with self.assertRaises(FileNotFoundError):
                 with Boundary(directory, digest): pass

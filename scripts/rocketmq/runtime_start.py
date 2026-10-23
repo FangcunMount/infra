@@ -131,7 +131,7 @@ def execute(plan):
             raise BoundaryError('target service instance set differs')
         template = ('{{.Id}} {{.Config.Image}} {{index .Config.Labels "com.docker.compose.project"}} '
                     '{{index .Config.Labels "com.docker.compose.service"}} {{.State.Running}} '
-                    '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}')
+                    '{{if index .State "Health"}}{{index (index .State "Health") "Status"}}{{else}}none{{end}}')
         verify_running(plan, command(plan, [DOCKER, '--host', SOCKET, 'inspect', '--type', 'container',
                                            '--format', template, *ids]))
 
