@@ -212,7 +212,7 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         # production owner's invalid-check fault.
         route = next(r for r in document['routes'] if r['owner'] == 'qs.mysql' and r['message_type'] == 'TRANSACTION')
         audit, digest = create_native_limit(repo, directory, broker, project, grpc_port, ca,
-            accounts['m3-qs-apiserver'], route, run, native_runner, read_parameters, proof['native_fault'])
+            accounts['m3-qs-apiserver'], route, run, native_runner, read_parameters, proof['native_fault'], mysql_port, password)
         env.update(QS_M3_VERIFY_NATIVE_LIMIT='1', QS_M3_NATIVE_LIMIT_AUDIT=str(audit), QS_M3_NATIVE_LIMIT_SHA256=digest)
     else:
         for key in ('QS_M3_VERIFY_NATIVE_LIMIT', 'QS_M3_NATIVE_LIMIT_AUDIT', 'QS_M3_NATIVE_LIMIT_SHA256'):

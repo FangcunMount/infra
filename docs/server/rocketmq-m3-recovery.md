@@ -96,7 +96,7 @@ python3 scripts/rocketmq/nsq_drain_evidence.py \
 
 ### T24-D 实际原生超限保护候选
 
-`rocketmq-qs-retry.yml` 的 `kind=native-limit` 单独验证实际SYS超限索引→QS原MySQL/Mongo持久保护→运行实例封新写→新实例继续保持保护及真实Checker恢复。它不能与旧 `protection` 的审计时间老化profile合并或混记。故障生成器只使用固定底层5.1.4制造一条Unknown半消息，不表示业务SDK验收；实际宿主仍要求发布tx.4及精确模块摘要。
+`rocketmq-qs-retry.yml` 的 `kind=native-limit` 单独验证实际SYS超限索引→QS原MySQL/Mongo持久保护→运行实例封新写→新实例继续保持保护及真实Checker恢复。它不能与旧 `protection` 的审计时间老化profile合并或混记。故障生成器使用固定已发布SDK4制造一条Unknown半消息，不表示业务SDK验收；实际宿主仍要求发布tx.4及精确模块摘要。故障库由夹具显式安装并独立释放，模拟Unknown回调不执行业务、witness提交或模型调用。未加补丁的原始5.1.4生成器首轮退出触发race；保留失败，不通过关闭race检测绕过。
 
 索引由只读导出器0600写入，正文与原key不导出，宿主接收独立原始摘要。记录绑定来自宿主配置，SYS索引本身不证明owner；隔离测试保守封闭两个固定QS owner，不依此改写业务/witness。只封新写的治理记录不自动解除，Checker应继续完成原已提交事实的真实回查及正向RPC审计。生产交接、解除和无回调审计债务仍属于T25；本候选不构成生产批准。
 

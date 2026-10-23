@@ -988,8 +988,11 @@ def main():
             from iam_acceptance import run_iam_host
             proof['iam_host'] = {}
             run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
-                         mysql_password, ca, run, proof['iam_host'], args.iam_private_log, args.iam_operation_results, args.iam_fanout_qs)
+                         mysql_password, ca, run, proof['iam_host'], args.iam_private_log, args.iam_operation_results, args.iam_fanout_qs, native_runner=owned_native_run, read_parameters=broker_parameters)
             passed('iam_host_actual_sdk_original_root_and_application')
+            if 'native_limit_receipt' in proof['iam_host']:
+                for name in proof['iam_host']['native_limit_receipt']['cases']:
+                    passed('iam_native_limit_' + name)
             if 'protection_receipt' in proof['iam_host']:
                 for name in proof['iam_host']['protection_receipt']['cases']:
                     passed('iam_protocol_protection_' + name)
@@ -1314,7 +1317,7 @@ def main():
                                               repo / "scripts/rocketmq/v2_acceptance.py", repo / "scripts/rocketmq/sdk_faults.py", repo / "scripts/rocketmq/sdk_limits.py",
                                               repo / "scripts/rocketmq/audit_transaction_limit.py", repo / "scripts/rocketmq/routes.py",
                                               repo / "scripts/rocketmq/provision_v2.py")}
-        if args.qs_native_limit:
+        if args.qs_native_limit or os.environ.get('ROCKETMQ_IAM_NATIVE_LIMIT') == '1':
             for relative in ('scripts/rocketmq/native_limit_acceptance.py',
                              'scripts/rocketmq/qs_runtime_acceptance.py',
                              'scripts/rocketmq/probes/native-transaction-limit/go.mod',
