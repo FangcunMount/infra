@@ -79,13 +79,13 @@
     "observation_48h_completed": false,
     "native_audit_source_merged": true,
     "sdk_recovery_source_merged": true,
-    "continuous_recovery_gate_merged": false,
-    "host_protection_merged": false
+    "continuous_recovery_gate_merged": true,
+    "host_protection_merged": false,
+    "sdk_protocol_observation_source_merged": true
   },
   "remaining": [
     "Host current protocol observation and explicit admission protection",
     "Prometheus rules, metrics and bounded lifecycle acceptance",
-    "Current combined infra CI and continuous recovery gate merge",
     "Fixed SDK publication and host adoption remain separate delivery states"
   ],
   "internal_progress": {
@@ -222,5 +222,146 @@
       "failed_each": 0,
       "skipped_each": 0
     }
-  ]
+  ],
+  "protocol_observation": {
+    "status": "source_merged_host_adoption_pending",
+    "sdk_pr": "https://github.com/FangcunMount/reliable-messaging/pull/55",
+    "sdk_head": "d3ef74bac2dae26daadee1720f425f86e14f8bcb",
+    "sdk_merge": "a30f91a7348183ac8dedd3942bc963b997f09fa6",
+    "merge_tree": "bf000ac5c539dc9e3262a6c8bcfb0b2c2031973b",
+    "checks_passed": 15,
+    "shared_semantic_vectors": 14,
+    "go_mysql_mongo_profiles": 3,
+    "go_storage_cases_each": 29,
+    "python_profiles": 2,
+    "python_source_cases_each": 145,
+    "python_installed_wheel_cases_each": 145,
+    "failed": 0,
+    "skipped": 0,
+    "reports": [
+      {
+        "file": "39926005253/tx-storage-0-8f49fec1d9673a60e2aeeb6bef88876cf696d619/transaction-storage.json",
+        "sha256": "34f3118993a45e0fe30dca9c450facbf3194f177a84c25c714ff29bdd875ae5b",
+        "passed": 29,
+        "failed": 0,
+        "skipped": 0,
+        "cleaned": true,
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3"
+      },
+      {
+        "file": "39926005253/tx-storage-1-8f49fec1d9673a60e2aeeb6bef88876cf696d619/transaction-storage.json",
+        "sha256": "bca300649a00bf8631530ee73ca746a42f9378fde3c7097b1144e70a60eaf26a",
+        "passed": 29,
+        "failed": 0,
+        "skipped": 0,
+        "cleaned": true,
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3"
+      },
+      {
+        "file": "39926005253/tx-storage-2-8f49fec1d9673a60e2aeeb6bef88876cf696d619/transaction-storage.json",
+        "sha256": "f87991c72e4b5512013a07f633a7eef2bcf0c236187a42fa361203f5639bb2e9",
+        "passed": 29,
+        "failed": 0,
+        "skipped": 0,
+        "cleaned": true,
+        "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+        "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3"
+      },
+      {
+        "file": "39926005331/python-3.11-mysql-8.0.36/results.xml",
+        "sha256": "97b523ae521d42366e40b12515c6a5d4910089da7ae06ba5fa8fcc6310bfa6d7",
+        "passed": 145,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "39926005331/python-3.11-mysql-8.0.36/wheel-results.xml",
+        "sha256": "2a6b09b223057731b56ee9e7dd1174ca3480ae6e98b84a7a4b0262d6f9ca863f",
+        "passed": 145,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "39926005331/python-3.13-mysql-8.4/results.xml",
+        "sha256": "f896bb6f395ea74ecfcdc37f324462c557bfcc233efc0a2ac430ddb7e0a82a29",
+        "passed": 145,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "39926005331/python-3.13-mysql-8.4/wheel-results.xml",
+        "sha256": "9d117328e9922fcb9785684633252ae77d9b2b66bf66c80ce9322cfa145569d2",
+        "passed": 145,
+        "failed": 0,
+        "skipped": 0
+      }
+    ],
+    "proof_sha256": "aa7facf8d31c2254cb08c6e8f26c6c1ad09b3ddab57d1619d7b200f337a8a14d",
+    "source_go_storage_run": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39926005253",
+    "source_python_run": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39926005331",
+    "source_sdk_checks_run": "https://github.com/FangcunMount/reliable-messaging/actions/runs/39926005314",
+    "candidate_assets_formally_published": false,
+    "candidate_assets": {
+      "fangcun_reliable_messaging-0.4.0a3-py3-none-any.whl": "977b35330ca7cf9e705896f4d8d4254fe7cf1000c6983370d7c2f69148e36df9",
+      "fangcun_reliable_messaging-0.4.0a3.tar.gz": "fae38815ee7437955b60c353ec707338a46187c3c1d6968291a8d3de93d8a662"
+    },
+    "local": {
+      "go_make_check": true,
+      "race": true,
+      "pinned_golangci_issues": 0,
+      "python_pure_passed": 114,
+      "integration_deselected": 31,
+      "ruff": true,
+      "mypy_source_files": 16
+    },
+    "limits": [
+      "Read-only metadata observation is not actual Broker pending or consumer receipt",
+      "Half audit age is a lower bound; expiry age is time since lease expiry, never rollback proof",
+      "Untracked aborted branches are separate from known confirmation gaps",
+      "Partial or failed sampling is unavailable, not zero pending",
+      "No schema, codec, production, host adoption or fixed SDK release in this component"
+    ],
+    "host_metrics_and_admission_verified": false
+  },
+  "continuous_recovery_gate": {
+    "pr": "https://github.com/FangcunMount/infra/pull/182",
+    "head": "ef9f206aa3b9f141361feae9de800c750d533489",
+    "merge": "884bd321df289ec0ef3ad7a5e6136de1170d992f",
+    "tree": "ebaef9c573ffc9b92245fc06d6ebe150e2ddac4f",
+    "checks_passed": 50,
+    "workflows_passed": 18,
+    "nonempty_reports": 57,
+    "failed": 0,
+    "skipped": 0,
+    "explicit_cleanup_reports": 55,
+    "legacy_cleanup_limits": [
+      {
+        "report": "rocketmq-ai-finalization-recovery.json",
+        "run": "39923352148",
+        "workflow": "RocketMQ AI five-path finalization and independent workers",
+        "jobs_successful": true,
+        "explicit_cleanup_object": false
+      },
+      {
+        "report": "rocketmq-m1-evidence.json",
+        "run": "39923352460",
+        "workflow": "RocketMQ Docker acceptance",
+        "jobs_successful": true,
+        "explicit_cleanup_object": false
+      }
+    ],
+    "report_index_sha256": "40b7a09c790b018632e4b136a67522410c4e8fb1862245c01e37f59a27683501",
+    "premerge_proof_sha256": "f0ba368f923a3f179327d30c57d63da1021fb9b95f7b19cccf4253d107a6dc9f",
+    "verified_harness_files": 20,
+    "exact_sdk_sha": "d3b23c16e354dd09a812641403029e0cc03abed2",
+    "native_run": "https://github.com/FangcunMount/infra/actions/runs/39923352200",
+    "native_cases_each": 41,
+    "native_profiles": 2,
+    "exact_recovery_cases_each": 10,
+    "native_audit_sha256": "c7c4e652eb11177150035cf08e8ec634244ee33069fa406fdb32b61be2696805",
+    "host_protection_verified": false,
+    "production_deployed": false
+  }
 }
