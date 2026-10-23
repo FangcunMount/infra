@@ -36,7 +36,7 @@
 | --- | --- | --- | --- |
 | ✅ | T23-A | 固定实际写入口、原根提交匹配、源版本和安全证据；IAM原COMMIT前/后真实TCP断连 | IAM0c4e46c1/infra1d44b58：完整CI39879917332三档MySQL8.0.36/44/8.4.13各14证据＋34原根/HTTP通过，零失败/跳过，源码/工具/原参数/清理审计完成；PR138源码8项CI成功并合并2cd61beb，main完整tree与候选一致，生产暂停及无环境覆盖已回读。共享infra完整回归/合并归T23-D；首轮uv缓存失败保留 |
 | ✅ | T23-B | QS MySQL/Mongo及AI SQLAlchemy实际业务根提交故障 | QS Mongo39883468210固定7.0.37通过14/14；AI39883476843六档各14/14；QS MySQL39884730972三档各14/14，全部零失败/跳过且源码/工具/清理已审计。AI PR216合并0809a16；QS PR429在28源码检查通过、1项API同步不适用后合并cfbbfd48，main完整tree与候选一致。生产自动部署保持暂停；共享infra完整CI/合并归D |
-| ☐ | T23-C | 实际宿主进程退出、新实例回查、必要MQ/Broker及成对链路故障 | 进行中；与既有T18/T20/T22证据逐项组合，缺项补测，不重复整套无关验收 |
+| ☐ | T23-C | 实际宿主进程退出、新实例回查、必要MQ/Broker及成对链路故障 | 39890322666失败已审计：Go SIGKILL/新暂停实例回查及业务闭环8项完成；AI杀Broker前half2/local0，之后原根提交1/FinalUnknown2，重启后CheckCommit0。固定Python5.1.2关闭telemetry流后依赖300秒settings同步，SDK必要实例级恢复修正进行中；105本地单元、类型/静态通过，真实补丁回归及发布未完成；共享工具164通过 |
 | ☐ | T23-D | 冻结候选、完整必需矩阵、报告审计与相关PR合并 | 待开始；每份报告绑定真实源码/工具SHA，非空且零失败/跳过，失败历史保留 |
 
 ### T22 已完成子批（不增加36项任务计数）
@@ -1288,3 +1288,14 @@ AI完整39883476843：Python3.11/3.13×MySQL8.0.36/8.0.44/8.4.11六档各14/14�
 
 
 T23-B完成：QS MySQL39884730972三档实际8.0.36/8.0.44/8.4.11各14/14，零失败/跳过；原Seal及SDK执行各1，不冒称数据库callback测量。源码PR429合并cfbbfd48，28检查通过、1项API生成同步不适用，main完整tree与0b8ee42a候选一致，PRODUCTION_DEPLOY_PAUSED=true且production无覆盖。Mongo及AI完整报告与合并均已核对，内部进度2/4，M3仍22/36。T23-C开始实现实际MQ断连后生产者SIGKILL/新暂停owner回查及AI根提交后Broker SIGKILL/原容器恢复的成对验证；尚无C原生通过声明。M4仍0/8，生产、system与48h未执行。
+
+
+T23-C固定首轮候选：QS0f353a04、AIfa28db27、infra0ac4411e，开发CI39888369615（仅2故障用例）已启动；源码PR430/217为草稿。工具163项、Go race编译与新增lint0、AI Ruff/文档及7项collect-only通过。Broker控制器只操作精确隔离Compose身份、关闭自动重启的同一容器，核对真实SIGKILL137/无OOM/新PID/参数回读；Go恢复必须复用原owner/store/epoch且不安装DDL，暂停准入运行Checker。此处记录实现边界，不冒充原生验证通过。后续复核发现pytest进度可能粘连控制前缀，下一候选显式分行；原始首轮结果仍保留。
+
+首轮开发CI39888369615因已确认的pytest进度/控制标记粘连风险请求取消，避免继续消耗过期候选。原结果保留，不计通过，不声明显式夹具清理；仅限GitHub临时runner，未操作本机或生产依赖。下一候选显式换行，报告收紧源码HEAD及数值类型校验，并将“幂等重投”名称改为真实证明的“不重跑执行器”，完整重投仍由原成对重复投递测试证明。
+
+T23-C开发CI39889024998失败并保留：固定QS0f353a04/AI8886f739/infra8f2bffa2，0/1/0；真实Broker SIGKILL137/无OOM、同容器新PID健康及6000/5000/24/48参数均通过，失败断言为等待重启后两次新增回查超时。旧屏障在原事务提交后，允许合法并发Checker在kill前完成确认，无法保证重启后仍有未决半消息，不能将该断言失败直接判作恢复缺陷。修正故障边界为全部half ACK后、实际local callback之前停止Broker，再执行一次原事务、精确Committed并排空真实Unknown确认，最后恢复并验证回查。所有所属进程/容器/私有目录显式清理通过。T23-C未勾选，M3仍22/36、内部2/4。
+
+T23-C确定性复验39890322666保留失败（0/1/0、完整清理）：Go生产者SIGKILL-9、新暂停同owner/store/epoch真实CheckCommit1、原wire/半消息0/执行0及完整receipt/state/ACK成功；AI在kill前精确Prepared2且原local0，之后原根仅提交1、真实FinalUnknown2且pending_calls0，Broker实际SIGKILL137/无OOM、同容器新PID/参数回读成功，100秒内存活Python生产者CheckCommit0。源实现5.1.2的telemetry read异常退出，默认settings重同步300秒，现有SDK重启门禁关闭旧生产者并创建新实例，未覆盖该存活场景。必要SDK修正已在独立工作区实施：复用自身已有心跳与I/O loop，在成功心跳后仅重建自身已关闭stream并发送settings，不新增timer/thread/global patch；105本地单元、Ruff及mypy通过，真实补丁门禁/发布尚未完成。保持22/36、内部2/4，生产未操作。
+
+必要SDK修正PR51固定93ec30178dad4c5d71ecb4a7987c03a3168c5665，探针红基线bc8fc157的driver与本次实际失败已发布a2文件逐字节一致。新增源码SDK独立原生门禁（并非发布制品/宿主验收替代）：同一存活producer全部half ACK3且业务0时SIGKILL所属Broker，原根提交1/FinalUnknown3，关闭新准入并排空旧检查，恢复同容器后要求三个精确reference真实Commit回查和原消息消费。复用既有rocketmq-faults workflow显式live_python选项，两语言运行档仍隔离；普通完整faults默认路径保留。工具165项通过、actionlint通过，SDK自身I/O loop/实例隔离及关闭6项通过，真实修正门禁待执行。

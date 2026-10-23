@@ -7,7 +7,7 @@
     "M3": "22/36",
     "M4": "0/8"
   },
-  "recorded_at": "2026-10-23T02:07:41.514296+00:00",
+  "recorded_at": "2026-10-23T02:46:12.081125+00:00",
   "source_baselines": {
     "iam": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
     "qs-server": "0428b701347774282fb3deafb9cd8c841ba86fc4",
@@ -531,11 +531,204 @@
     "production_environment_override_count": 0
   },
   "paired_faults": {
-    "status": "implementation_in_progress",
+    "status": "sdk_python_live_telemetry_recovery_fix_in_progress",
     "native_pass_claimed": false,
     "scenarios": [
       "actual MQ disconnect/producer SIGKILL/new paused same-owner Checker",
-      "AI original root committed/Broker SIGKILL/same container restart/paired receipts"
-    ]
+      "all actual AI halves acknowledged/exact Prepared evidence, Broker SIGKILL, original root once while stopped/exact Committed, drained FinalUnknown RPCs, same container restart and actual checks/paired receipts"
+    ],
+    "local_validation": {
+      "infra_unit_tests": {
+        "passed": 165,
+        "failed": 0,
+        "skipped": 0
+      },
+      "go": "race compile-only and new diff lint0 passed",
+      "python": "Ruff/format,75docs and7collect-only passed",
+      "actionlint": "paired workflow passed"
+    },
+    "first_development_run": {
+      "url": "https://github.com/FangcunMount/infra/actions/runs/39888369615",
+      "sources": {
+        "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+        "ai-paired-faults": "fa28db273b6884df97884314033e31b83a0874c0",
+        "infra-host-faults": "0ac4411ee1520e2d125563fb75b725b689070d88"
+      },
+      "status": "completed/cancelled",
+      "native_pass_claimed": false,
+      "finding": "Stopped superseded development run after identifying pytest progress/control-prefix framing defect. No native pass or explicit fixture cleanup claim; GitHub disposable runner owns teardown.",
+      "artifacts_present": false
+    },
+    "source_prs": [
+      "https://github.com/FangcunMount/qs-server/pull/430",
+      "https://github.com/FangcunMount/qs-ai/pull/217"
+    ],
+    "preflight_finding": "pytest progress may join control prefix; explicit newline fix queued. Preserve first run outcome.",
+    "development_failures": [
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39889024998",
+        "candidates": {
+          "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+          "ai-paired-faults": "8886f739db839d35b724843aa638e88c14ae2e3c",
+          "infra-host-faults": "8f2bffa2ef34f657ed21ddf317eb97b52ba1c464"
+        },
+        "workflow_conclusion": "failure",
+        "report_sha256": "20b6d355d464ef88c2d4d30182ca2f5a0d23148baf119977444967d1c594ae09",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "native_exit_code": 1,
+        "assertion_lines": [
+          39,
+          41,
+          305,
+          319,
+          334
+        ],
+        "private_output_sha256": "bda61f5a4688dba4899ef021ea00bec2736c10292dd910727db0ca71bb422aa5",
+        "broker_kill": {
+          "signal": "SIGKILL",
+          "exit_code": 137,
+          "automatic_restart_disabled": true,
+          "immutable_container_verified": true,
+          "oom_killed": false
+        },
+        "broker_restart": {
+          "same_container": true,
+          "pid_changed": true,
+          "healthy": true,
+          "effective_parameters": {
+            "transactionTimeOut": 6000,
+            "transactionCheckInterval": 5000,
+            "transactionCheckMax": 24,
+            "fileReservedTime": 48
+          }
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "finding": "Timed out waiting for two additional CheckCommit decisions after restart. Old fault barrier was after root commit and allowed a legitimate concurrent Checker to finalize before the kill; no post-restart pending half-message guarantee. Revised barrier is after actual half ACKs and before invoking the original local callback; require exact Prepared/Unknown before kill, exact Committed after actual root while Broker is stopped, drained real FinalUnknown RPCs, then two actual restart check decisions."
+      },
+      {
+        "run_url": "https://github.com/FangcunMount/infra/actions/runs/39890322666",
+        "candidates": {
+          "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
+          "ai-paired-faults": "3264d11545622f6320b064405c29a5a51e372a2e",
+          "infra-host-faults": "0de79380faffc78e06da62afa483e00375ae9179"
+        },
+        "workflow_conclusion": "failure",
+        "report_sha256": "1dfa3a00fad7b7405c7ce5dbb0c26afef3558d0e6389bc102447a9fccac5d456",
+        "counts": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "partial_fault_receipt": {
+          "cases": {
+            "half_ack_before_actual_mq_disconnect": true,
+            "old_local_committed_final_unknown": true,
+            "producer_sigkill_exit_negative9": true,
+            "same_primary_epoch_readonly_resume_no_new_half": true,
+            "new_paused_broker_commit_callback": true,
+            "same_first_command_wire_after_resume": true,
+            "recovered_pair_receipt_state_ack_without_model": true,
+            "ai_half_prepared_before_broker_kill": true,
+            "actual_final_rpc_unknown_after_committed_root": true,
+            "broker_sigkill_and_same_container_restart": true,
+            "recovered_process_resources_drained": true
+          },
+          "passed": 11,
+          "failed": 1,
+          "skipped": 0,
+          "counters": {
+            "qs_sigkill": {
+              "half_prepared_before_loss": 1,
+              "old_exit_code": -9,
+              "old_seals": 1,
+              "recovered_completed_results": 0,
+              "recovered_half_prepared": 0,
+              "recovered_broker_commit_checks": 1,
+              "final_recovered_seals": 2,
+              "provider_invocations": 0
+            },
+            "broker_restart": {
+              "local_calls": 1,
+              "half_prepared": 2,
+              "actual_final_unknown": 2,
+              "broker_commit_checks": 0,
+              "pending_calls": 0,
+              "half_prepared_before_kill": 2,
+              "local_calls_before_kill": 0
+            }
+          },
+          "partial": true,
+          "complete_acceptance_claimed": false
+        },
+        "diagnostics": {
+          "failed_cases": [
+            "test_actual_paired_fault_recovery[broker_restart]"
+          ],
+          "assertion_lines": [
+            39,
+            41,
+            325,
+            340,
+            355,
+            450,
+            516
+          ]
+        },
+        "broker_kill": {
+          "signal": "SIGKILL",
+          "exit_code": 137,
+          "automatic_restart_disabled": true,
+          "immutable_container_verified": true,
+          "oom_killed": false
+        },
+        "broker_restart": {
+          "same_container": true,
+          "pid_changed": true,
+          "healthy": true,
+          "effective_parameters": {
+            "transactionTimeOut": 6000,
+            "transactionCheckInterval": 5000,
+            "transactionCheckMax": 24,
+            "fileReservedTime": 48
+          }
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "finding": "Deterministic pre-local Broker crash: exact Prepared halves2 and local calls0 before kill; one actual committed root and2FinalUnknown after kill; live Python producer had0CheckCommit after restart. Go SIGKILL/recovery completed8scoped cases. Pinned upstream telemetry read exits on RPC error and only300-second periodic settings sync rebuilds; existing SDK restart regression creates a new instance and does not cover a surviving producer."
+      }
+    ],
+    "sdk_fix": {
+      "source_baseline": "b1679360542699efcc831eabeb3b4526015c394f",
+      "upstream": "rocketmq-python-client5.1.2",
+      "strategy": "instance-only closed telemetry recovery on successful existing heartbeat, without new timer/thread/global patch",
+      "local_unit_tests": 105,
+      "native_patch_pass_claimed": false,
+      "release_claimed": false,
+      "source_sha": "93ec30178dad4c5d71ecb4a7987c03a3168c5665",
+      "pr": "https://github.com/FangcunMount/reliable-messaging/pull/51",
+      "probe_baseline": {
+        "regression_probe_baseline_sha": "bc8fc1577d731432c513aa8f95a12c075f427b8e",
+        "driver_sha256": "9455c87bf7807e0eb105bba9ecf7c5602c939239a9c8b7463220a9f739a01dd1",
+        "baseline_driver_byte_equal_to_failed_released_a2": true,
+        "failed_actual_host_run": "https://github.com/FangcunMount/infra/actions/runs/39890322666"
+      },
+      "local_io_loop_and_isolation_tests": {
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      "native_strategy": "Explicit source-SDK-only regression: same surviving producer, actual half ACKs3/zero business, owned Broker SIGKILL137, one original root/FinalUnknown3, stop new admission but keep Checker, same container restart, exact reference checks3 and actual original-message consumption; public artifact/host acceptance follows separately."
+    }
   }
 }
