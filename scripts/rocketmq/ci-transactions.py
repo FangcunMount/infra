@@ -632,7 +632,7 @@ def main():
                     passed('ai_' + boundary + '_actual_original_commit_tcp_boundary')
                 return
             from broker_fault_control import OwnedBrokerFault
-            state_profile = kind == 'state'
+            state_profile = kind in ('state', 'protection')
             proof_name = ('paired_host' if kind in ('paired','paired_faults') else ('ai_finalization_host' if kind == 'finalization' else ('ai_state_host' if state_profile else 'ai_admission_host')))
             fault_tools = None
             if kind in ('finalization','paired_faults'):
@@ -984,6 +984,9 @@ def main():
             run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
                          mysql_password, ca, run, proof['iam_host'], args.iam_private_log, args.iam_operation_results, args.iam_fanout_qs)
             passed('iam_host_actual_sdk_original_root_and_application')
+            if 'protection_receipt' in proof['iam_host']:
+                for name in proof['iam_host']['protection_receipt']['cases']:
+                    passed('iam_protocol_protection_' + name)
             if args.iam_fanout_qs:
                 passed('iam_two_instances_and_qs_separate_business_subscription')
 
@@ -1220,7 +1223,7 @@ def main():
                                 'Controlled QS input and observer ACK only; no paired QS business or real provider',
                                 'Final reply deliberately discarded at client; no packet fault or SIGKILL claim']
             report['ai_admission_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/ai_admission_acceptance.py').read_bytes()).hexdigest()
-            if os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') == 'state':
+            if os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission') in ('state', 'protection'):
                 report['batch'] = 'M3-AI-worker-state-original-SQLAlchemy-and-real-Broker'
                 report['limits'] = ['No production/system acceptance or throughput claim',
                                     'Actual evaluation worker preflight, released SDK and original state root',

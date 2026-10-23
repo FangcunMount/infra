@@ -324,3 +324,32 @@ class AIStateAcceptanceTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class AIProtocolProtectionTest(unittest.TestCase):
+    def test_fixed_published_a4_and_complete_state_and_protection_cases(self):
+        from ai_admission_acceptance import PROTECTION_CASES
+        profile = acceptance_profile('protection')
+        self.assertEqual(profile['sdk_version'], '0.4.0a4')
+        self.assertEqual(profile['tests'], TESTS)
+        self.assertEqual(profile['focus_cases'], FOCUS_CASES | PROTECTION_CASES)
+        receipt = AIStateAcceptanceTests().receipt()
+        receipt.update(sdk='0.4.0a4', cases={k: True for k in CASES | PROTECTION_CASES},
+                       passed=len(CASES | PROTECTION_CASES))
+        output = 'M3_AI_STATE_RECEIPT '+json.dumps(receipt)
+        self.assertEqual(profile['parse'](output, AIStateAcceptanceTests().junit()), receipt)
+        with self.assertRaises(RuntimeError):
+            acceptance_profile('state')['parse'](output, AIStateAcceptanceTests().junit())
+        for name in PROTECTION_CASES:
+            value = dict(receipt, cases={k: v for k, v in receipt['cases'].items() if k != name}, passed=receipt['passed']-1)
+            with self.assertRaises(RuntimeError):
+                profile['parse']('M3_AI_STATE_RECEIPT '+json.dumps(value), AIStateAcceptanceTests().junit())
+
+    def test_release_wheel_hash_and_url_are_exact_not_editable(self):
+        profile = acceptance_profile('protection')
+        lock = {'package': [dict(name='fangcun-reliable-messaging', version=profile['sdk_version'],
+                 source={'url': profile['sdk_url']}, wheels=[{'url': profile['sdk_url'],
+                 'hash': 'sha256:'+profile['sdk_sha256']}])]}
+        self.assertEqual(validate_host_sdk_lock(lock, profile), profile['sdk_sha256'])
+        lock['package'][0]['version'] = '0.4.0a2'
+        with self.assertRaises(RuntimeError): validate_host_sdk_lock(lock, profile)
