@@ -1,9 +1,9 @@
 {
   "version": 1,
   "scope": "T24-D candidate development failures; no formal gate/source merge/production claim",
-  "m3_completed": 23,
+  "m3_completed": 24,
   "m3_total": 36,
-  "t24_completed": 3,
+  "t24_completed": 4,
   "t24_total": 4,
   "records": [
     {
@@ -1060,7 +1060,1222 @@
         "native_index_sha256": "a311f44aa2003f7704218ef0ee0736950bc33388cd4d526ff5dc85a5eab72575"
       }
     ],
-    "source_merge_pending": true,
+    "source_merge_pending": false,
+    "production_deployment_performed": false,
+    "merge_sha": "179c990051c3c06338f21b34fc7fd14474358658",
+    "merged_source_sha": "85d3e976e1576ad771eaf23f2499870a41466290",
+    "source_checks_success": 28,
+    "conditional_api_sync_not_selected": 1,
+    "merge_tree_equals_tested_source": true,
+    "production_deploy_paused": true
+  },
+  "ai_development_native": {
+    "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39980299784",
+    "reports": [
+      {
+        "file": "rocketmq-ai-state.json",
+        "report_sha256": "139fefa579ab0e854c1776d499e0027a53111d32155f6cf5efcadfe83a291e06",
+        "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+        "kind": "ai",
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.0.36",
+        "image": "sha256:3f580f3597cf76a86785971c5bc7553c7c7d2993c4be29fc9216cb3e8821a9d5",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "2807d04b32b4d00ad0b301f1fab54eab96c2df00674d436f92f4927877f0778d"
+      }
+    ],
+    "focus": {
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0
+    },
+    "full_matrix_run": "https://github.com/FangcunMount/infra/actions/runs/39982896849",
+    "full_matrix_status": "running_or_queued",
+    "source_pr": 219,
+    "production_deployed": false
+  },
+  "t25_b_local_foundation": {
+    "source_sha": "94cc6d50a2c1ac1cfb62bccdef7a6de3630a6354",
+    "branch": "codex/rocketmq-m3-retry-handoff",
+    "status": "local_partial_not_merged",
+    "implemented": [
+      "bounded canonical reviewed selection with exact original plan bytes and configured primary binding",
+      "offline original-root coordinator; metadata-only callback reentry; confirmed prefix retained and first unknown stops batch",
+      "inert MySQL/Mongo assembly without sender, runtime or schema installation"
+    ],
+    "verification": [
+      "race: retryschedule and retrydispatch packages passed",
+      "compile-only: container passed (no tests selected; not native acceptance)",
+      "golangci-lint: retryschedule/retrydispatch/container 0 issues",
+      "git diff --check passed"
+    ],
+    "initial_fixture_failure": "First new review fixture changed due without changing the original requested_at wire. Existing validation correctly refused. Corrected fixture to use the same frozen deadline; no runtime rule changed.",
+    "remaining": [
+      "maintenance CLI and private receipt I/O",
+      "actual original-primary handoff through the new host entry",
+      "complete CI and source merge"
+    ],
+    "task_completed": false,
+    "production_deployed": false,
+    "cli_candidate": {
+      "source_sha": "9edd299cf51a44beab766efb50a978c6f05dbbae",
+      "documentation_sha": "9b483576c",
+      "status": "local_unit_race_lint_docs_and_build_passed_not_native_or_merged",
+      "implemented": [
+        "offline default file verification without database bindings",
+        "explicit original-primary apply with source/binding/digest and stopped-writer attestation",
+        "0600 started/final receipt; refusal of existing receipt and symlink; partial/unknown and cleanup outcomes retained"
+      ],
+      "remaining": [
+        "complete original-record inventory/export",
+        "actual CLI through isolated original MySQL/Mongo roots",
+        "complete CI and source merge"
+      ]
+    }
+  },
+  "ai_final_native": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/39982896849",
+    "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+    "merge_sha": "511ce630a24113c8da16d248209d2e351abab04a",
+    "profiles": [
+      {
+        "file": "rocketmq-ai-state.json",
+        "report_sha256": "c28ac7572bbe7c6a48a6adb0672213fb8965ff4d6f45a380b178503864af3d9d",
+        "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+        "kind": "ai",
+        "python_version": "3.11.16",
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.0.36",
+        "image": "sha256:fb90d0a86c91de04f134b781865a3e0fd2b6835e610e1804349fc24a4f53c501",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "3c6b3da658e1e3162f2ddf173fde7a54c9cf41af73ebaf7f32edc01f7705fce7"
+      },
+      {
+        "file": "rocketmq-ai-state.json",
+        "report_sha256": "d0e3dce121eee0100781ab32657667abbdb4921513f56bdf98896cc93caa192f",
+        "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+        "kind": "ai",
+        "python_version": "3.11.16",
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.0.44",
+        "image": "sha256:2589964e19b5e065c2ce300c50ba25fb19b7406c1c6ffdbec260644748afa3cf",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "ec137e04039dae3d0ac61f56658167fcbfe92e612a33ee07268292bd5aa84beb"
+      },
+      {
+        "file": "rocketmq-ai-state.json",
+        "report_sha256": "f5efcee8fd127cf9d0d483cfc0cc41a49a4fe180f20b0527f17cef15fd7a9882",
+        "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+        "kind": "ai",
+        "python_version": "3.11.16",
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.4.11",
+        "image": "sha256:47cc5c7b06101e217c297ccf02c07730575a2ee302a3d81f13d21ded790673cd",
+        "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "9fa0010a5657a124c83011d6f5976c6d8dc6c0e5af09951b971791ef7e0e77cf"
+      },
+      {
+        "file": "rocketmq-ai-state.json",
+        "report_sha256": "fd223b8ecff7732d5d38298e5cf0b5da994f961d8afa4fdaa6bdf18a0b135e4a",
+        "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+        "kind": "ai",
+        "python_version": "3.13.15",
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.0.36",
+        "image": "sha256:28e6a24be92c8e395817d535607e89c7c42ffe8bdbdd9b16a48054b0c69e7c71",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "d5e560f179687a77e809ed8ac592ecd763b989a44c62b22ffb82afd54a37ca19"
+      },
+      {
+        "file": "rocketmq-ai-state.json",
+        "report_sha256": "30e2d97e47fd7e3c9a56358a0aa889d1a3441a9b1545611dc623cc744820305a",
+        "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+        "kind": "ai",
+        "python_version": "3.13.15",
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.0.44",
+        "image": "sha256:a7e8b5c8c8af1f356868384cf030efea2ed2f5140664eb71d5174f1f288f0555",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "fcc7281b0fc5dc2cb58272b0bb0fd2f9ab6b284bf7d974d85dcd6d316bf9617b"
+      },
+      {
+        "file": "rocketmq-ai-state.json",
+        "report_sha256": "78a9d7014a5c1b0711c6f9bef9af2baa0c614ae58a1c369567f9d55685169367",
+        "source_sha": "805ea92227d9cc33ec0f86c915002c39cb18b81f",
+        "kind": "ai",
+        "python_version": "3.13.15",
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "go_version": "go1.25.12",
+        "mysql_version": "8.4.11",
+        "image": "sha256:c23929731540ee64b369cbee3c3c1d0db4ab70a77487937be3e862aace8b1849",
+        "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_index_sha256": "4596b55bd7d217a2dce63c39e3f49d17b640d98d3dacf69e79f0c2ed8c5b9757"
+      }
+    ],
+    "source_checks_success": 12,
+    "source_ci_run": "https://github.com/FangcunMount/qs-ai/actions/runs/39982919433",
+    "source_junit_shards": [
+      {
+        "mysql": "8.0.36",
+        "shard": 0,
+        "passed": 1405,
+        "failed": 0,
+        "skipped": 0,
+        "revision": "3e34577c136228d60eb1ae09a1e82cb459734f3d",
+        "manifest_sha256": "c86120e834b0a6af20e7242efd06c6f723b817e1eb60dc1013ff9096ab964ae6",
+        "junit_sha256": "3624fa5b51f682412d799516ddb921d3bf9b8bacdda71d0b73064c6ee68c495e"
+      },
+      {
+        "mysql": "8.0.36",
+        "shard": 1,
+        "passed": 1405,
+        "failed": 0,
+        "skipped": 0,
+        "revision": "3e34577c136228d60eb1ae09a1e82cb459734f3d",
+        "manifest_sha256": "e609d4100aa680ff7794e958224914bd59c73fd352a8a1465e47e4d83785e044",
+        "junit_sha256": "e9832b2f07f7b21e36d12c1a74e9ff36564df7e7dfe59fc8df72369d7530e4db"
+      },
+      {
+        "mysql": "8.0.36",
+        "shard": 2,
+        "passed": 1404,
+        "failed": 0,
+        "skipped": 0,
+        "revision": "3e34577c136228d60eb1ae09a1e82cb459734f3d",
+        "manifest_sha256": "8bffc881fd4efeadbc0fe124f50d1f3eae7096973dad19a77fe94332d9de5d6d",
+        "junit_sha256": "49590bf9a33f9b5220b7772831104b636904767c41c832841ddf0b33441b0e24"
+      },
+      {
+        "mysql": "8.0.36",
+        "shard": 3,
+        "passed": 1404,
+        "failed": 0,
+        "skipped": 0,
+        "revision": "3e34577c136228d60eb1ae09a1e82cb459734f3d",
+        "manifest_sha256": "585306467d6c28cea002873242f8387b0d29705b84b096933d89909898295fe0",
+        "junit_sha256": "ede80b21d1565f3dbbee7edc4aacf04ca2c8c8b49e12dcdcadf98e3e051381ad"
+      },
+      {
+        "mysql": "8.4",
+        "shard": 0,
+        "passed": 1405,
+        "failed": 0,
+        "skipped": 0,
+        "revision": "3e34577c136228d60eb1ae09a1e82cb459734f3d",
+        "manifest_sha256": "9b7834e52bf7815d23cf4cfc5e4d85b7e5006966f0c27104b666e79876f3db23",
+        "junit_sha256": "14f7b384c1ccde91363a54424c995e3d6a9da8b3b01b0a15de84245db48363cd"
+      },
+      {
+        "mysql": "8.4",
+        "shard": 1,
+        "passed": 1405,
+        "failed": 0,
+        "skipped": 0,
+        "revision": "3e34577c136228d60eb1ae09a1e82cb459734f3d",
+        "manifest_sha256": "fe11fa72773cf67c6f8cceb4cc4e5a598609df79187069e6501ca97e1077c96f",
+        "junit_sha256": "121326e8b4235fe8bd013649768aba96b0d2624dfcd2ba0ea8ebb83cd3d85c34"
+      },
+      {
+        "mysql": "8.4",
+        "shard": 2,
+        "passed": 1404,
+        "failed": 0,
+        "skipped": 0,
+        "revision": "3e34577c136228d60eb1ae09a1e82cb459734f3d",
+        "manifest_sha256": "c839f523a08bfba34b106dfa4f5dff06daacf18d52e502f6711b2018f6f2903f",
+        "junit_sha256": "e06d8ca6d4847f8288652bcd17bfdca76c3ca3bc4c6a350ee9f01539d2f578a1"
+      },
+      {
+        "mysql": "8.4",
+        "shard": 3,
+        "passed": 1404,
+        "failed": 0,
+        "skipped": 0,
+        "revision": "3e34577c136228d60eb1ae09a1e82cb459734f3d",
+        "manifest_sha256": "f355fa1135f54ca1935c61f890733b6887df78e62fc20ba12cbd7ed2ec4fb5f8",
+        "junit_sha256": "2cabc66a1eae5d607cd4bf9eaf57ce7293e2c4898fe9ac2da7bca15b640fdd68"
+      }
+    ],
+    "source_mysql_tests": {
+      "8.0.36": 5618,
+      "8.4": 5618
+    },
+    "merge_tree_equals_tested_source": true,
+    "auto_deploy_enabled": false,
+    "production_deployment_performed": false,
+    "scope": "Actual SYS index / original primary deny / default assembly restart with idle SDK checker readiness. No new Broker callback claim for IAM/AI; QS separately proves actual new Checker commit RPC."
+  },
+  "infra_final_gates": {
+    "source_sha": "01ddb5b6e077262025ffb041ba69c4079915b014",
+    "merge_sha": "7e5fa36021f619f726a4bb1407d55e70817a5448",
+    "checks_success": 50,
+    "workflows_success": 18,
+    "report_count": 57,
+    "reports": [
+      {
+        "run": "39982021648",
+        "file": "rocketmq-complete-sdk.json",
+        "sha256": "753c725852907a79e90a280286ebe00a7043cb18da4bf9dbad9242799fbe5147",
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021648",
+        "file": "rocketmq-native-dlq-audit.json",
+        "sha256": "69208925de7f923e21bc56267405635b4c973ef08bd3114fe5e70b050b811498",
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021648",
+        "file": "rocketmq-complete-sdk.json",
+        "sha256": "b890e4dc08ec1e82e91c4042ac7fe180463fb5956de9fd17488033bd0c9e48aa",
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021670",
+        "file": "rocketmq-packet-faults.json",
+        "sha256": "c4185f2d24429278e50df468ded280e1a354494dae933d88e4c666219547180d",
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021670",
+        "file": "rocketmq-packet-faults.json",
+        "sha256": "661ad19824bc947f5925609dc2a8551bd20d66dd754273fe0227304b244710a6",
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021608",
+        "file": "rocketmq-ai-state.json",
+        "sha256": "bbaf6f6239b162c9cf16158619fdc5f8b90e2bab2558c588bdc1481b153549d0",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021608",
+        "file": "rocketmq-ai-state.json",
+        "sha256": "e89081302137101bb2e0cee02af2d06fe83259ba53ea94086d33e91f908f6984",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021608",
+        "file": "rocketmq-ai-state.json",
+        "sha256": "950bb1a7f59856e4d0bf8f523d2729a7afe5b3d68260c2da9d03c7adbe844120",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021608",
+        "file": "rocketmq-ai-state.json",
+        "sha256": "0fac1d5f0bfccadfebdf5cf60fc3cc6592a1c36ed4a23f5a63efa8e3a797d336",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021608",
+        "file": "rocketmq-ai-state.json",
+        "sha256": "bfba87ce5a025190ac53c3549edf1a139e6f24c85add75489ae0c0ec25039884",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021608",
+        "file": "rocketmq-ai-state.json",
+        "sha256": "d5e291a843675ad5091f19916ee8fdafbb15a26ea49bf29a23507db0ec0c5e17",
+        "passed": 148,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021540",
+        "file": "rocketmq-qs-command.json",
+        "sha256": "4213e915109256466e9ff84815d1f086135511bd6ac241c7765d27bed7811ab0",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021540",
+        "file": "rocketmq-qs-command.json",
+        "sha256": "65a8fe2fdc554a1b32c3d6949231d03dc32238c8e9e670c5e976e6274404242d",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021540",
+        "file": "rocketmq-qs-command.json",
+        "sha256": "c14f77f77cab2a743d9206d1243511ec1434aa6924830f52e840d187e00a2301",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021547",
+        "file": "rocketmq-qs-task.json",
+        "sha256": "926af2bc563e0bc8e22f5a9872207c9b11307c314d669e2dc649f588c7c7778e",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021547",
+        "file": "rocketmq-qs-task.json",
+        "sha256": "72139d7424fa731fd2b177fa60d21d43d088e61103b68f168fbfcb5abe731636",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021736",
+        "file": "rocketmq-m3-resources.json",
+        "sha256": "8d0716f65172ef0cfde12236596fefd4a1235efaf182fe67956e32b1e2a0ab39",
+        "passed": 134,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021730",
+        "file": "rocketmq-qs-retry.json",
+        "sha256": "017de4956858dffc5e7662b6934ee8ef4224165429655028bbe87f7971b4fd62",
+        "passed": 44,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021730",
+        "file": "rocketmq-qs-retry.json",
+        "sha256": "24abbd83843260daf1c562b9bb67755d397710bb8ff56f6e200545f256840c9c",
+        "passed": 44,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021730",
+        "file": "rocketmq-qs-retry.json",
+        "sha256": "0b04953cb668e9d2748b3a7ad1fd4bc6c6835d91393c7f0b34fd9a4262bcccbf",
+        "passed": 44,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021594",
+        "file": "rocketmq-qs-answer.json",
+        "sha256": "da4b4bebd7730c27f587f2f905071af62ea001f3d0cdeff3e242665dfc137824",
+        "passed": 16,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021645",
+        "file": "rocketmq-qs-report.json",
+        "sha256": "388b4f8699dd8bdf7a4a3469e01c90636ebdfdf828fbac51e1a7010cb14ef49c",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021673",
+        "file": "receipt.json",
+        "sha256": "543e65c14fe5cb78dc9ee98ac443cd88e8ce5f1eb248659f26312425643c20f3",
+        "passed": 34,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "structured_storage",
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021673",
+        "file": "rocketmq-iam-host.json",
+        "sha256": "f665fc724dfda9bdcdec989672c1681e20114379b8899ccf6ab37bd3810feb46",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021673",
+        "file": "receipt.json",
+        "sha256": "edc0bdb8cefa46d5432de53e48ef33630b97e69e61b95a258189a5144c926a4d",
+        "passed": 34,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "structured_storage",
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021673",
+        "file": "rocketmq-iam-host.json",
+        "sha256": "70bcd74cbb08e278aad5b8a67b4d318d850ad8e9afbabed29814b159e5b0bb3b",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021673",
+        "file": "rocketmq-iam-host.json",
+        "sha256": "fd56c984fae63d35bd17dda4cdb8b6a1ee691154711c821b49221169fa40bdb5",
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021673",
+        "file": "receipt.json",
+        "sha256": "f52c651fa48e4d5a5cc635ed185e67afeb89849f835d2df4d04edf0f7611d2de",
+        "passed": 34,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "structured_storage",
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021621",
+        "file": "rocketmq-public-sdk.json",
+        "sha256": "f93b27edb7a89ec5077a5c53db60d49891aa5d732fb5083d0e209633b77cc15f",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021621",
+        "file": "rocketmq-public-sdk.json",
+        "sha256": "7d72ebcb56854f6c7a2c9b346e283d199d9db36f0e3c6ff4b9b9fa4754f59a85",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021688",
+        "file": "rocketmq-ai-finalization-recovery.json",
+        "sha256": "2e34f8c1260ef2c1ad36ccfe68ee0f9fd9f896472911251a748a3f17b90840e8",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": null,
+        "cleanup_limit": "Nine original row counters zero/private evidence removed; require actual workflow Stop containers separately"
+      },
+      {
+        "run": "39982021688",
+        "file": "rocketmq-ai-finalization-live.json",
+        "sha256": "297dd00d5b8a15d21a5cff6f95f80fd40bd4840b20f6d97aa83c5b4d1f8e3f49",
+        "passed": 32,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021692",
+        "file": "rocketmq-ai-admission.json",
+        "sha256": "827965dee247ad0f590131933738aff173020b3340d18132f666559a6b2dd94f",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021692",
+        "file": "rocketmq-ai-admission.json",
+        "sha256": "b0c273f56b8177bce61fb55666012d87daff263cac0f99a334b78eda66425498",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021692",
+        "file": "rocketmq-ai-admission.json",
+        "sha256": "bc07dcce46bf3401fa71e6d89b22fb133e4a20acd749470852641f702fa9df7a",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021692",
+        "file": "rocketmq-ai-admission.json",
+        "sha256": "214fa415fd6d7a0c402a3a335aac3895aeff680c5e47c65c38c0b2ede54ca3a6",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021692",
+        "file": "rocketmq-ai-admission.json",
+        "sha256": "5d6e919413bb81884f4c12c0920b772c742737f7025b3f935069d8ed715149f9",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021692",
+        "file": "rocketmq-ai-admission.json",
+        "sha256": "007c795ec5fee02e88110e2afe84b4df4606ef381729dd35bdfcd8de9986bc32",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021545",
+        "file": "rocketmq-paired.json",
+        "sha256": "600fe378134cdcdfdc61032cb9be65f4cea2ffe1bd2ec4444bd105df107f01a1",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021545",
+        "file": "rocketmq-paired.json",
+        "sha256": "7e7fa5787cf9d7a17a49a2aa84c63d62c28e69d9d7d0fb68eca405e256c83a90",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021545",
+        "file": "rocketmq-paired.json",
+        "sha256": "a4b074cd77bcb901e6c4afe32e1c2c1c7cf525eb95722b4392f2ce955aeb7dac",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021545",
+        "file": "rocketmq-paired.json",
+        "sha256": "e62830b933c4cd20537e61f60a5f18e31f9207bcc8b4297d1ca961d762d4bfba",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021545",
+        "file": "rocketmq-paired.json",
+        "sha256": "d8adf70f18f5fff3b289ebc1e317db8d3d1f7f8d7e569c8cf3a5fd1edf3987b5",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021545",
+        "file": "rocketmq-paired.json",
+        "sha256": "ddc52d48b0fdf0dfedf5a7e38552e11bdff0fc160cc963f65125a9cb8585d3d3",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021573",
+        "file": "rocketmq-qs-event.json",
+        "sha256": "873b41148123ee82327a263c35546fd85f3ba3e15150df30cbb04ffc53070e68",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021573",
+        "file": "rocketmq-qs-event.json",
+        "sha256": "9749f2307f5efa6d43d8ae945e7520a5361da4ff244001e2fbfb09e841b1d2a2",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021573",
+        "file": "rocketmq-qs-event.json",
+        "sha256": "cf807dc74cdaafeae7317fabe2042168bd2e5f6c2df662cf35b5fc5d2d179f14",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021574",
+        "file": "rocketmq-m2-transactions.json",
+        "sha256": "c7d12c3ac7991671d2ae87070884dafa18fbdadfa060d576e6317f0434c717c1",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021574",
+        "file": "rocketmq-m1-evidence.json",
+        "sha256": "5b136b252ffa06d937b71c4c83f184f837745b145e20690a0375b4f5a18b04b5",
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": null,
+        "cleanup_limit": "Legacy artifact has no cleanup/readback object; ci-smoke finally requires owned compose down and required workflow step succeeded; do not invent readback fields"
+      },
+      {
+        "run": "39982021574",
+        "file": "rocketmq-m2-transactions.json",
+        "sha256": "c7d12c3ac7991671d2ae87070884dafa18fbdadfa060d576e6317f0434c717c1",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021574",
+        "file": "rocketmq-m2-go-sdk.json",
+        "sha256": "ea3dcfa53ab29a38e7be13bae12a67a11fe16d44227160731c897cb8f93b41a6",
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021574",
+        "file": "rocketmq-m2-go-sdk.json",
+        "sha256": "ea3dcfa53ab29a38e7be13bae12a67a11fe16d44227160731c897cb8f93b41a6",
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021575",
+        "file": "rocketmq-qs-retry-dispatch.json",
+        "sha256": "300da46df0f6a5dde498f2a708d1a458ae5ab8f9ab2f67508a9813c2e2aead69",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021575",
+        "file": "rocketmq-qs-retry-dispatch.json",
+        "sha256": "807814cf8407284e290dc7a02599a46762519a48f17276e8144745837abe7829",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021575",
+        "file": "rocketmq-qs-retry-dispatch.json",
+        "sha256": "9f7a70f79c16ef37fb963b9b9fde6daf3e0f4ac231c8bf997100c0f8701acd1a",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021544",
+        "file": "rocketmq-qs-evaluation.json",
+        "sha256": "c680b38e53646fecffe87e266bcb8e550a89c9e03b5682eafc9b6ddc53687b9b",
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      },
+      {
+        "run": "39982021544",
+        "file": "rocketmq-qs-evaluation.json",
+        "sha256": "67541a90f99d1464751d12299c7b89cc19a71f1aa0309ba65298ba67693dc0bd",
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0,
+        "counter_shape": "root",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "cleanup_limit": null
+      }
+    ],
+    "merge_tree_equals_tested_source": true,
+    "tested_merge_ref": "da5279302b681289491dc4e584b10f6af9b9625b",
+    "direct_cleanup_objects": 55,
+    "legacy_cleanup_limitations_preserved": 2,
     "production_deployment_performed": false
   }
 }
