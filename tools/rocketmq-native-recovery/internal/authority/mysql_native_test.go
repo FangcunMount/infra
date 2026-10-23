@@ -212,6 +212,8 @@ func TestMySQLSnapshotNative(t *testing.T) {
 			if err != nil || !reflect.DeepEqual(final, old) {
 				t.Fatal("readonly snapshot changed facts", err)
 			}
+
+			t.Run("controlled-governance-storage-not-rpc-proof", func(t *testing.T) { mysqlResolutionStorageFixture(t, db, reader, before) })
 		})
 	}
 }

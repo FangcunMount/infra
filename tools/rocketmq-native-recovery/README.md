@@ -27,3 +27,12 @@
 Mongo适配显式绑定qs.mongo，固定原client/database的Primary/Majority；构造不连接。2秒总预算覆盖已安装simple schema、replica set primary、原binding collection UUID/库身份和新snapshot session。拒绝借用任何业务session；原session不重试数据库callback，也不写SDK/业务/治理。投影排除plan、token、wire和Broker handles，限制16分支及Reference大小，检查int64 fence、精确原引用和重复分支；scope/epoch/fence/owner或终态不符均拒绝，错误不交付部分snapshot。
 
 固定QS43模板仅用于自有隔离数据库，摘要d6904ab7c3ab3c4a310314dc7f532eb321679a0e7a31c0b867c11a9280bfc4fa。required GitHub验证固定digest的7.0.37 replica set、真实原业务+witness根、未知/错误读取和删除回读，实际RPC及治理CAS仍未实现。私有观察、native管理动作和消费完成继续分别记账，不能用这些存储fixture关闭C3。
+
+
+## MySQL治理CAS存储原语（候选，非授权入口）
+
+`ResolveNotice`只接受已由上层独立核验的受审snapshot、请求/完整receipt摘要和当前SDK观察元数据；这些DTO或hash本身不构成授权/真实RPC证明。目前没有调用它的生产CLI。上层仍须完成具名批准、首次runtime屏障、私有文件图/nonce/source、原物理记录和真实RPC校验，完整门禁不能跳过。
+
+原主库2秒上界的RC根持有binding共享锁及目标notice行锁，重新读取精确Ref/原库身份/本地终态/正向SDK审计/首次索引证据后，仅UPDATE status/resolved_at/resolution_receipt_sha256。同receipt重复只回读、不刷新首次时间；不同receipt拒绝覆盖。受影响行数不等于提交，Commit报错返回governance Unknown，独立VerifyResolution用新读取边界确认；不补写SDK审计、不修改业务或Outbox、不自动开准入。旧确认时间不要求更新。
+
+三档真实SQL存储fixture使用明确命名的synthetic受审输入，验证锁等待、竞争CAS、幂等/不同receipt、未具正向审计拒绝、原SDK时间与未选索引保留；它不证明批准、实际RPC或提交回复丢失。真正网络故障及完整CLI/治理图仍待C3后续。

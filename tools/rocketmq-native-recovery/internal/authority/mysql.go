@@ -49,6 +49,12 @@ func (s *MySQL) Snapshot(ctx context.Context, l Locator, index [32]byte) (out Sn
 			out = Snapshot{}
 		}
 	}()
+	return s.snapshotIn(ctx, tx, l, index, false)
+}
+
+// snapshotIn borrows this operation root. Only governance resolution requests
+// binding/notice locks; it never locks or changes terminal SDK witnesses.
+func (s *MySQL) snapshotIn(ctx context.Context, tx *sql.Tx, l Locator, index [32]byte, lock bool) (out Snapshot, err error) {
 	// Read-only applies to this transaction; these flags additionally reject a
 	// configured replica. The reviewed UUID/database digest freezes actual identity.
 	var uuid, database string
@@ -61,7 +67,11 @@ func (s *MySQL) Snapshot(ctx context.Context, l Locator, index [32]byte) (out Sn
 	}
 	var store, epoch []byte
 	var schema int
-	if err = tx.QueryRowContext(ctx, `SELECT store_id,writer_epoch,schema_version FROM rm_tx_binding WHERE owner=?`, []byte(s.binding.Owner)).Scan(&store, &epoch, &schema); err != nil {
+	bindingQuery := `SELECT store_id,writer_epoch,schema_version FROM rm_tx_binding WHERE owner=?`
+	if lock {
+		bindingQuery += ` FOR SHARE`
+	}
+	if err = tx.QueryRowContext(ctx, bindingQuery, []byte(s.binding.Owner)).Scan(&store, &epoch, &schema); err != nil {
 		return out, err
 	}
 	if schema != 1 || !bytes.Equal(store, []byte(s.binding.StoreID)) || !bytes.Equal(epoch, []byte(s.binding.WriterEpoch)) {
@@ -87,7 +97,11 @@ func (s *MySQL) Snapshot(ctx context.Context, l Locator, index [32]byte) (out Sn
 	out.Decision = transaction.Resolve(out.Reference, &transaction.Evidence{Reference: out.Reference, ExecutionState: execution, BranchState: branch})
 	key := NoticeKey(s.binding, index)
 	var actualKey, noticeOwner, noticeStore, noticeEpoch, revision, actualIndex, proof []byte
-	if err = tx.QueryRowContext(ctx, `SELECT notice_key,owner,store_id,writer_epoch,route_revision,native_index_sha256,evidence_sha256,status,schema_version,resolved_at,resolution_receipt_sha256 FROM messaging_native_limit_notices WHERE notice_key=?`, key[:]).Scan(&actualKey, &noticeOwner, &noticeStore, &noticeEpoch, &revision, &actualIndex, &proof, &out.Notice.Status, &schema, &out.Notice.ResolvedAt, &out.Notice.ResolutionReceiptSHA256); err != nil {
+	noticeQuery := `SELECT notice_key,owner,store_id,writer_epoch,route_revision,native_index_sha256,evidence_sha256,status,schema_version,resolved_at,resolution_receipt_sha256 FROM messaging_native_limit_notices WHERE notice_key=?`
+	if lock {
+		noticeQuery += ` FOR UPDATE`
+	}
+	if err = tx.QueryRowContext(ctx, noticeQuery, key[:]).Scan(&actualKey, &noticeOwner, &noticeStore, &noticeEpoch, &revision, &actualIndex, &proof, &out.Notice.Status, &schema, &out.Notice.ResolvedAt, &out.Notice.ResolutionReceiptSHA256); err != nil {
 		return out, err
 	}
 	if schema != 1 || !bytes.Equal(actualKey, key[:]) || !bytes.Equal(noticeOwner, []byte(s.binding.Owner)) || !bytes.Equal(noticeStore, store) || !bytes.Equal(noticeEpoch, epoch) || string(revision) != "m3-1" || !bytes.Equal(actualIndex, index[:]) || len(proof) != 32 {
@@ -99,6 +113,6 @@ func (s *MySQL) Snapshot(ctx context.Context, l Locator, index [32]byte) (out Sn
 	if err = validateSnapshot(out, l, execution, branch, finalError); err != nil {
 		return out, err
 	}
-	// A read-only rollback ends the snapshot; do not imply an audited write.
+	// The caller owns commit/rollback; this helper performs reads only.
 	return out, nil
 }
