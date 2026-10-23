@@ -777,6 +777,35 @@
         ],
         "limit": "Actual repair up returned and fixture was running; inspect command failed. Missing-Health template reproduced separately with Go missingkey=error; fixed template still requires new native CI."
       }
-    ]
+    ],
+    "development_target_pass": {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/40002465696",
+      "source_sha": "4f2dda815e9b2ab34763d4dafe6aa18dd5072249",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "50bc6e803d460448a07074a8864dcadf08d19d9a7cb2bdf96fb075d7ea9f9d54",
+      "cases": {
+        "coordinator_marker_before_actual_up": true,
+        "actual_failed_up_retains_start_barrier": true,
+        "failed_new_runtime_forbids_old_backup": true,
+        "explicit_forward_repair_actual_running_readback": true,
+        "forward_repair_keeps_irreversible_boundary": true,
+        "no_deps_does_not_start_unselected_service": true,
+        "original_target_deploy_lock_excludes_start": true,
+        "configured_image_conflict_before_up": true,
+        "configured_instances_conflict_before_up": true,
+        "only_failed_start_and_reviewed_repair_issued": true
+      },
+      "cleanup": {
+        "compose_down_succeeded": true,
+        "no_rescue_needed": true,
+        "private_fixture_directory_removed": true,
+        "existing_container_id_set_unchanged": true,
+        "existing_network_id_set_unchanged": true
+      },
+      "scope": "isolated_nsqd_container_as_compose_fixture_not_m3_business_images_or_transactions",
+      "limit": "Ten function-entry cases passed; the added independent CLI pair still requires a new exact-source CI."
+    }
   }
 }

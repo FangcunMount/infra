@@ -68,3 +68,6 @@ compose up --detach --no-deps --no-build --pull never --wait --wait-timeout 120 
 入口不发出pull/build/DDL/stop/down/remove-orphans/旧镜像恢复命令。它读取精确服务容器集合，核对项目/服务label、Config.Image、running/health及原定实例数；缺失或矛盾保持失败，不自动重试或回退。成功只表示本次目标runtime回读完成，`cutover_authorized=false`，不等于业务、消费者、Checker或system验收。镜像内部启动行为和实际资源/worker预算仍由T28/T29最终镜像门禁验证。
 
 隔离GitHub验收使用唯一临时NSQ1.3.0容器仅作为Compose启动夹具，记录实际digest；它不是业务普通消息中间上线，也不代表RocketMQ事务验收。测试先真实启动失败，证明协调屏障阻止恢复；再以独立修复引用启动同项目固定镜像并回读，验证未选中依赖不启动、原目标锁互斥、镜像/实例冲突在up前拒绝，以及所有临时容器/网络/私有目录清理。实际跨主机命令、生产保护恢复附件和最终候选30分钟演练仍单独记账。
+
+
+2026-10-24隔离开发门禁40002465696：固定4f2dda815e9b2ab34763d4dafe6aa18dd5072249，实际Compose失败、拒绝旧备份、独立前向修复、目标锁及预算/镜像拒绝共10项通过，零失败/跳过，临时容器/网络/私有目录清理回读通过。之前两轮3/1/0失败保留；第二轮已证实repair up返回且容器running，失败位于无Health字段的inspect模板，纯Go严格模板重现及真实修复复验均通过。新增独立协调/目标CLI进程的四项证明仍待新精确头门禁；临时锁选择器只用于CI自有inode，不冒充生产inode回读或SSH跨主机验收。T25-C继续未完成。

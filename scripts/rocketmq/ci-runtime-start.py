@@ -6,7 +6,9 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import subprocess
+import sys
 import tempfile
 from unittest.mock import patch
 
@@ -128,7 +130,53 @@ def main():
                         try: target.execute(altered)
                         except BoundaryError: check('configured_'+kind+'_conflict_before_up', len(starts) == before_count)
                         else: raise BoundaryError('conflicting target configuration accepted')
-                    check('only_failed_start_and_reviewed_repair_issued', len(starts) == 2)
+                    check('in_process_failed_start_and_reviewed_repair_only', len(starts) == 2)
+                    # Exercise the real two CLI mains in independent processes.
+                    # Only the target lock selectors use this attempt's temporary
+                    # inodes; no production host locks or paths are created.
+                    stage = 'coordinator_and_target_cli'
+                    bootstrap = ('import sys;from pathlib import Path;'
+                                 'sys.path.insert(0,'+repr(str(Path('scripts/rocketmq').resolve()))+');'
+                                 'import cutover_step,runtime_start;'
+                                 'cutover_step.GLOBAL_LOCK=Path('+repr(str(root/'deploy.lock'))+');'
+                                 'cutover_step.AI_LOCK=Path('+repr(str(root/'ai.lock'))+');'
+                                 'raise SystemExit(runtime_start.main(sys.argv[1:]))')
+                    def target_script(value):
+                        selected = root/'cli-target.json'; selected.write_bytes(_encoded(value)); selected.chmod(0o600)
+                        sha = hashlib.sha256(selected.read_bytes()).hexdigest()
+                        return shlex.join([sys.executable, '-c', bootstrap, '--plan', str(selected),
+                                           '--reviewed-sha256', sha, '--execute', '--coordinated-start-already-issued'])+'\n'
+                    def cli(kind, name, script):
+                        entry = root/(name+'.sh'); entry.write_text(script); entry.chmod(0o600)
+                        value = {'schema': 'm3-cutover-step/v1', 'directory': str(directory),
+                                 'binding_sha256': binding_sha, 'host': target.socket.gethostname(),
+                                 'step': name, 'kind': kind, 'script': str(entry),
+                                 'script_sha256': hashlib.sha256(entry.read_bytes()).hexdigest(),
+                                 'cwd': str(root), 'timeout_seconds': 270}
+                        selected = root/(name+'.json'); selected.write_bytes(_encoded(value)); selected.chmod(0o600)
+                        result = subprocess.run([sys.executable, str(Path('scripts/rocketmq/cutover_step.py').resolve()),
+                                                 '--plan', str(selected), '--reviewed-sha256',
+                                                 hashlib.sha256(selected.read_bytes()).hexdigest(), '--execute'],
+                                                capture_output=True, timeout=280)
+                        summary = json.loads(result.stdout)
+                        if set(summary) != {'status', 'cutover_authorized'} or summary['cutover_authorized'] is not False:
+                            raise BoundaryError('coordinator CLI output contract differs')
+                        return result.returncode, summary
+                    spec['services']['fixture']['command'] = ['/owned-missing-entrypoint']
+                    plan = freeze()
+                    code, summary = cli('runtime-start', 'cli-failed-start', target_script(plan))
+                    with Boundary(directory, binding_sha) as operation:
+                        check('cli_original_coordinator_dir_and_failed_target', code == 1 and operation.status()['phase'] == 'runtime_start_failed')
+                    restored = root/'forbidden-old-restore'
+                    code, _ = cli('pre-start-restore', 'cli-old-backup', 'touch '+shlex.quote(str(restored))+'\n')
+                    check('cli_pre_start_restore_refused_after_actual_start', code == 1 and not restored.exists())
+                    spec['services']['fixture']['command'] = ['/nsqd', '--data-path=/data', '--mem-queue-size=2']
+                    plan = freeze()
+                    code, summary = cli('forward-repair', 'cli-compatible-repair', target_script(plan))
+                    with Boundary(directory, binding_sha) as operation:
+                        check('cli_separate_forward_repair_and_runtime_readback', code == 0 and operation.status()['phase'] == 'forward_repair_returned' and not operation.status()['old_data_restore_eligible'])
+                    check('cli_private_evidence_and_no_cutover_authorization', summary == {'status': 'reviewed_command_returned', 'cutover_authorized': False}
+                          and all(p.is_file() and p.stat().st_mode & 0o777 == 0o600 for p in directory.iterdir()))
             finally:
                 if plan is not None:
                     # Only bounded state of this known empty fixture, no env/logs/body.
@@ -175,7 +223,7 @@ def main():
             report['failed'] += 1
         write_private(Path('runtime-start-native.json'), report)
     print(json.dumps({'passed': report['passed'], 'failed': report['failed'], 'skipped': 0}))
-    return 0 if report['passed'] == 10 and report['failed'] == 0 else 1
+    return 0 if report['passed'] == 14 and report['failed'] == 0 else 1
 
 
 if __name__ == '__main__':
