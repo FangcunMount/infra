@@ -169,6 +169,7 @@ def main():
         run(['go', 'build', '-race', '-mod=readonly', '-o', str(binary), './transport/rocketmq/internal/sdkprobe'], cwd=sdk,
             env=dict(os.environ, GOWORK='off', GOTOOLCHAIN='local'), timeout=300)
         proof['go_binary_sha256'] = hashlib.sha256(binary.read_bytes()).hexdigest()
+        stage = 'java_compile'
         java_source = repo/'scripts/rocketmq/probes/native-recheck'
         libraries, classes = directory/'java-lib', directory/'java-classes'; libraries.mkdir(); classes.mkdir()
         run(['docker', 'cp', broker+':/opt/rocketmq/lib/.', str(libraries)], timeout=60)
@@ -177,12 +178,26 @@ def main():
         proof['java_compiler'] = run(['javac', '-version']).stdout.strip()
         container_java = '/tmp/native-recheck-'+secrets.token_hex(8)
         run(['docker', 'exec', broker, 'mkdir', '-m', '700', container_java])
+        # javac inherits the fixture's umask077. Only these public bytecode files
+        # are copied; make them readable by the fixed nonroot Broker JVM.
+        stage = 'owned_java_classes_install'
+        for public_class in classes.glob('*.class'): public_class.chmod(0o644)
+        classes.chmod(0o755)
         run(['docker', 'cp', str(classes)+'/.', broker+':'+container_java])
+        run(['docker', 'exec', '--user', '0', broker, 'chown', '-R', '3000:3000', container_java])
+        run(['docker', 'exec', broker, 'chmod', '700', container_java])
         java = ['docker', 'exec', '-i', '-e', 'GITHUB_ACTIONS=true', '-e', 'M3_NATIVE_RECHECK_PROJECT='+project,
                 broker, 'java', '-Xms32m', '-Xmx128m', '-XX:MaxDirectMemorySize=32m',
                 '-Djava.io.tmpdir='+container_java, '-Drocketmq.client.logRoot='+container_java+'/logs',
                 '-cp', '/opt/rocketmq/conf:/opt/rocketmq/lib/*:'+container_java]
-        window = frame(run(java+['NativeHalfWindowTest']).stdout, 'M3_NATIVE_WINDOW ')
+        stage = 'pure_java_finite_window'
+        window_process = run(java+['NativeHalfWindowTest'], required=False)
+        proof['pure_java_exit_code'] = window_process.returncode
+        if window_process.returncode:
+            proof['pure_java_failure_category'] = ('main_class_unavailable' if 'Could not find or load main class' in window_process.stderr
+                else 'java_policy_or_launch_failure')
+            raise RuntimeError('pure_java_failed')
+        window = frame(window_process.stdout, 'M3_NATIVE_WINDOW ')
         require(window == dict(passed=7, failed=0, skipped=0, network_started=False), 'finite_window_policy_failed')
         proof['finite_window_pure'] = window; passed('seven_pure_finite_window_bounds')
         def start(mode, identity=''):
