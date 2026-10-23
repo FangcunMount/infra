@@ -2049,13 +2049,13 @@
     ],
     "published_a3_current_host_candidate": {
       "candidates": {
-        "qs-paired-faults": "0f353a04f70209b03c928e377221417a4bab4d2c",
-        "ai-paired-faults": "bb4376087a03e6d1c49193988dfe56208a65275c",
-        "infra-host-faults": "1b2b84d2f887e46ff70f74cdc51e8176b777d784"
+        "qs-paired-faults": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+        "ai-paired-faults": "5de957302904dde07ee499c5dbac0e5a96c74c92",
+        "infra-host-faults": "32cd1c62cc6109d32b617eb546a9bf5a2a38be3c"
       },
-      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39905702688",
-      "status": "failed; retained in published_a3_host_development_runs; explicit fixture schema cleanup handoff fix awaits native rerun",
-      "scope": "coordinated fresh QS process and AI DI runtime; old AI drained while Broker down; same DB/owner/epoch/first wire; no command replay, new halves or model calls. Affected-process restart must enter T25 runbook."
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39906622326",
+      "status": "development core2 passed and independently audited; full6-profile acceptance/source merges/shared CI pending",
+      "scope": "explicit disposable schema cleanup ownership handoff, same original binding and first wire; old AI drained before Broker restart; new QS process/new AI DI runtime; no business or model replay"
     },
     "local_a3_validation": {
       "scope": "local worktree only; no DB/MQ/Docker; current-head required GitHub CI separate",
@@ -2092,6 +2092,36 @@
       "docs_links": 1391,
       "docs_drift_history": "16 source-baseline drifts on6reviewed sources; reconciled only those sources, added2paired fixture source ownership; production/runtime unknown",
       "signal_failure": "Initial5s child-port readiness timeout before signal dispatch; targeted4/4passed without changing thresholds; cause not independently proved"
-    }
+    },
+    "coordinated_host_development_audit": {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39906622326",
+      "infra_sha": "32cd1c62cc6109d32b617eb546a9bf5a2a38be3c",
+      "sources": {
+        "qs-paired-faults": "99826d86deeee427ac8b1cb287f2185ba300d78b",
+        "ai-paired-faults": "5de957302904dde07ee499c5dbac0e5a96c74c92",
+        "infra-host-faults": "32cd1c62cc6109d32b617eb546a9bf5a2a38be3c"
+      },
+      "mode": "core",
+      "workflow_conclusion": "success",
+      "profiles": [
+        {
+          "mysql": "8.0.36",
+          "python": "3.11.16",
+          "go": "go1.25.12",
+          "passed": 15,
+          "failed": 0,
+          "skipped": 0,
+          "native_tests": 2,
+          "report_sha256": "911c8d4be24510adc0c3f85f8e6af420f2125147ebee8cde21dd48d4a6a503a5",
+          "source_tool_sdk_and_cleanup_verified": true,
+          "producer_exit_code": -9,
+          "recovered_commit_checks": 1,
+          "broker_exit_code": 137,
+          "restarted_commit_checks": 2
+        }
+      ],
+      "scope": "actual paired host components/original roots/physical MQ and process failures with coordinated affected-host restart; controlled read-side, no live-Go-autoheal/real provider/public HTTP/system/production"
+    },
+    "coordinated_host_development_audit_sha256": "b84246b04bb90c55d8cf3b94b43d62a09d428accec009c6fb7e334a40c64419e"
   }
 }
