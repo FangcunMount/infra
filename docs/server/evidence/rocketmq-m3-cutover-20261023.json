@@ -1,0 +1,89 @@
+{
+  "schema": "m3-cutover-tool-progress/v1",
+  "m3_completed": 24,
+  "m3_total": 36,
+  "t25_subgates_completed": 0,
+  "t25_subgates_total": 4,
+  "nsq_drain": {
+    "pr": "https://github.com/FangcunMount/infra/pull/189",
+    "source": "d06bb314658aac12c0703c72e73b1e0ec3657e82",
+    "native_proof": {
+      "schema": "m3-nsq-drain-native-proof/v1",
+      "source": "d06bb314658aac12c0703c72e73b1e0ec3657e82",
+      "run": 39954709041,
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "pure_tests": 215,
+      "source_clean": true,
+      "source_tree": "8ab8e9583486419fd24b0d307bb798b9f67790cf",
+      "report_sha256": "a3afaa9683c10ddbe739f9456445853d9c7c4688677638933449b93d74d45eb0",
+      "harness_sha256": {
+        "scripts/rocketmq/ci-nsq-drain.py": "fd04affd43d15a5887d4367fb4b42126380b71d6abbc5fbf7857f51a8bce5efb",
+        "scripts/rocketmq/nsq_drain_evidence.py": "b31f48f155ec1e493aae71cf2214e8331e13ea4c3550db2e9e0b8b1ee9aeb778"
+      },
+      "image_id": "sha256:728389d1c6966c5a9959b31c14a8fc475992bf64abe84b9c230557534ccc27ae",
+      "repo_digests": [
+        "nsqio/nsq@sha256:1a369c146af71bc95c25d54b375a2b98452478c1eaf4e85f8fcb01da20f2c78a"
+      ],
+      "actual_version": "1.3.0",
+      "restart_published_binding_changed": true,
+      "cleanup": {
+        "owned_container_removed": true,
+        "existing_containers_unchanged": true,
+        "owned_network_removed": true
+      },
+      "production_tool_read_only": true,
+      "cutover_authorized": false,
+      "other_pr_gates_complete": false
+    },
+    "merge": "pending",
+    "other_ci": "pending"
+  },
+  "failed_native_runs": [
+    {
+      "run": 39953332407,
+      "source": "e88a4c0270b5f070fa06181b8b01ac360fb96399",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "cleanup_verified": true,
+      "limit": "initial report no stage classification; not relabelled with later diagnosis"
+    },
+    {
+      "run": 39953425532,
+      "source": "680a4178132058c513131f911de4c2c7c334a356",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "cleanup_verified": true,
+      "limit": "initial report no stage classification"
+    },
+    {
+      "run": 39953729256,
+      "source": "2bf1a03b05b65eaabad519573ab35a0d00609c97",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "failure_stage": "create_owned_subscription",
+      "correction": "owned Topic must be created before Channel",
+      "cleanup_verified": true
+    },
+    {
+      "run": 39953922290,
+      "source": "b199aa8aa63ad333ff690168bdb272ea86820564",
+      "passed": 6,
+      "failed": 1,
+      "skipped": 0,
+      "failure_stage": "original_container_restart",
+      "correction": "reread actual ephemeral port bindings; later positive proof confirms reassignment",
+      "cleanup_verified": true
+    }
+  ],
+  "limitations": [
+    "Offline captures cannot independently attest collector honesty or production freeze",
+    "NSQ observation is not writer/relay/business/schedule responsibility closure or cutover authorization",
+    "No native dependency executed locally, no production operations",
+    "Startup/recovery and no-callback audit debt still require T25-C proof"
+  ]
+}

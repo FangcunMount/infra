@@ -1,9 +1,9 @@
 {
   "schema_version": "m3-host-observation-progress/v1",
-  "recorded_at": "2026-10-23T12:19:09.707956+00:00",
-  "m3_completed": 23,
+  "recorded_at": "2026-10-23T12:46:31.170421+00:00",
+  "m3_completed": 24,
   "m3_total": 36,
-  "t24_completed_subgates": 2,
+  "t24_completed_subgates": 4,
   "t24_total_subgates": 4,
   "hosts": [
     {
@@ -84,11 +84,11 @@
     },
     {
       "repository": "qs-server",
-      "source_sha": "09cce635b3be789df8067b2fc28f4c610c055ec3",
+      "source_sha": "5024a2536156a8b561122e2cbe33bc21bc26edc9",
       "pr": "https://github.com/FangcunMount/qs-server/pull/431",
       "source_files": {
         "docs/03-基础设施/event/50-可观测性与故障恢复.md": "6ae011434dab803c8223ca131b34e969cb99f24b4f24a939e5f9ff6e3675d649",
-        "docs/document-closure.json": "e939136a476533ae8f482bf57a1572afb9c325d4244b15a55031ce927b38bbac",
+        "docs/document-closure.json": "3d1ecb425e767fc274e48fe0d4cabdbf536a5793fd84b692e52c971260d540ab",
         "go.mod": "adb1002c0d7585d1899ebb51e429a522cebe444d5f4a001607ab84a994d3ef84",
         "go.sum": "4015004bc1354067207704d5797da145ad7b60cbb27a16f912c425f397a781a9",
         "internal/apiserver/container/owner_runtime_error_test.go": "c77ac6d337f191ccc85a6be2d107c1bd8770c09db284e40d639a109a739a193e",
@@ -107,16 +107,17 @@
         "scripts/oneoff/mysql_metadata_profile/README.md": "b5e8e497e2ebd631d51130c441988e3f56ea30e165ddb0d6e4f4932f8c5a6492",
         "scripts/oneoff/mysql_metadata_profile/readiness_native_test.go": "9b5f9f7686a583225f82225f9cda0e93e2dccca2f0cf4c1da79138ab399a3a69",
         "scripts/tests/test_docs_facts_infrastructure.py": "672297968c38c7c96294b1660c15d6311fad8efa2a1539186268c50a47a94689",
-        "internal/apiserver/container/owner_runtime_route_probe_test.go": "a186d2e2dec7bb953e79eab405b64f49b71e1800e44243d7d4f7b902989ac874"
+        "internal/apiserver/container/owner_runtime_route_probe_test.go": "8a7f647e6a870f10d8224d66046566d6aed75fb429de1e6e86b5a1ade4e87e9e"
       },
-      "merge": "pending",
-      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39952347643",
-      "native_status": "pending_full_authenticated_route_preflight",
+      "merge": "c4b174367c8563ce7d322b9d909ed0f3b25ec0aa",
+      "native_run": "https://github.com/FangcunMount/infra/actions/runs/39953814946",
+      "native_status": "passed_full_three_mysql_profiles",
       "deployment": "not_performed",
       "business_system": "not_performed",
       "prior_source_shas": [
         "47316edfb4e72779b98d93852244ecda6ec161cb",
-        "2940f445e21b0cef1c00d7081ba2e0258c2fed45"
+        "2940f445e21b0cef1c00d7081ba2e0258c2fed45",
+        "09cce635b3be789df8067b2fc28f4c610c055ec3"
       ],
       "prior_development_proof": {
         "schema": "m3-qs-protection-native-proof/v1",
@@ -138,7 +139,59 @@
           "production",
           "first native startup failure root cause resolved"
         ]
-      }
+      },
+      "native_proof": {
+        "schema": "m3-qs-protection-full-native-proof/v1",
+        "source": "5024a2536156a8b561122e2cbe33bc21bc26edc9",
+        "infra": "43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+        "run": 39953814946,
+        "reports": [
+          {
+            "artifact": "rocketmq-qs-retry-2-1.25.12-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "mysql_version": "8.4.11",
+            "report_sha256": "43a19ba6bf52473f494be567d2d3f57ac6020048f693d98f2526f0bfc8f9fed0",
+            "passed": 21,
+            "failed": 0,
+            "skipped": 0
+          },
+          {
+            "artifact": "rocketmq-qs-retry-0-1.25.12-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "mysql_version": "8.0.36",
+            "report_sha256": "f1f696e47731f64a8185cdd4c5275cace8a66e27b8ca55744c3a43b2c67ff17c",
+            "passed": 21,
+            "failed": 0,
+            "skipped": 0
+          },
+          {
+            "artifact": "rocketmq-qs-retry-1-1.25.12-43cbade4d1e40eb5191ce721a800fa2a2ed93276",
+            "mysql_version": "8.0.44",
+            "report_sha256": "d9058da9928377f8186593bfd85916675d4d601979fdacaf55917eedab689c2a",
+            "passed": 21,
+            "failed": 0,
+            "skipped": 0
+          }
+        ],
+        "each_native_receipt_cases": 13,
+        "each_protection_cases": 8,
+        "failed": 0,
+        "skipped": 0,
+        "original_executor_calls_each_owner": 1,
+        "new_half_preparations": 0,
+        "fixture_aging_seconds": 600,
+        "real_ten_minute_elapsed_not_claimed": true,
+        "cleanup_verified": true,
+        "source_clean": true,
+        "exact_sdk_sums_verified": true,
+        "broker_parameters_restored": true,
+        "production_or_system_not_claimed": true,
+        "source_checks_passed": 28,
+        "not_applicable_checks": [
+          "Docs & API Generated Sync"
+        ],
+        "production_deploy_paused": true
+      },
+      "candidate_and_merge_tree": "987fff0e1e7875189343e746f252292096ea0da3",
+      "source_checks_successful": 28
     },
     {
       "repository": "qs-ai",
@@ -495,6 +548,32 @@
       },
       "failure": "consume-only observer Subscribe after Broker restart, before next owner Start",
       "root_cause": "unresolved; authenticated route readiness preflight added to owned fixture",
+      "cleanup": "all_three_explicitly_verified"
+    },
+    {
+      "run": 39952347643,
+      "repository": "qs-server",
+      "source": "09cce635b3be789df8067b2fc28f4c610c055ec3",
+      "mysql_results": {
+        "8.0.36": {
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0
+        },
+        "8.0.44": {
+          "passed": 21,
+          "failed": 0,
+          "skipped": 0
+        },
+        "8.4.11": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        }
+      },
+      "failure": "read-only preflight QueryRoute TOPIC_NOT_FOUND40402 before new owner Start",
+      "correction": "owned fixture loop10/2s could end before Proxy20s async negative-cache refresh despite outer45s; now90s overall46attempts3s RPC, no production SDK budget or business/half retry",
+      "root_cause_limit": "does not establish unique root cause for earlier failures",
       "cleanup": "all_three_explicitly_verified"
     }
   ],
