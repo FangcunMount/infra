@@ -18,6 +18,52 @@ CASES = frozenset((
     'fresh_paused_instance_actual_broker_checker_commits', 'idempotent_observer_preserves_first_wire',
     'owner_budget_and_callback_observation', 'wrong_reference_unknown_without_changed_facts',
     'actual_shutdown_and_owned_cleanup'))
+PROTECTION_CASES = frozenset((
+    'exact_owned_audit_timestamp_fixture_only',
+    'initial_authoritative_observation_latches_before_registration',
+    'plain_admission_cannot_bypass_latch',
+    'real_broker_recovery_rpc_then_positive_audit_clears_gap',
+    'healthy_sampling_does_not_unlatch',
+    'generation_bound_named_review_then_explicit_admission',
+    'duplicate_plan_no_new_half_or_business_executor',
+    'actual_sampler_and_sdk_shutdown_joined'))
+PROTECTION_MODULE = ('v0.5.0-rocketmq-tx.4', 'h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=',
+                     'h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')
+
+
+def validate_module(module, protection=False):
+    if 'Replace' in module or module.get('Path') != 'github.com/FangcunMount/reliable-messaging':
+        raise RuntimeError('fixed published QS SDK without replacement required')
+    if protection:
+        if tuple(module.get(k) for k in ('Version', 'Sum', 'GoModSum')) != PROTECTION_MODULE:
+            raise RuntimeError('protocol protection requires exact published SDK tx.4 and verified module sums')
+    elif module.get('Version') != 'v0.5.0-rocketmq-tx.2' or not module.get('Sum'):
+        raise RuntimeError('baseline default owner profile requires fixed SDK tx.2')
+
+
+def parse_protection_receipt(output, source):
+    # The base receipt separately proves real business roots/first wire/call counts.
+    parse_runtime_receipt(output, source)
+    rows = [json.loads(line.split('M3_QS_PROTOCOL_PROTECTION_RECEIPT ', 1)[1])
+            for line in output.splitlines() if line.startswith('M3_QS_PROTOCOL_PROTECTION_RECEIPT ')]
+    if len(rows) != 1:
+        raise RuntimeError('one exact protocol protection receipt required')
+    value = rows[0]
+    fields = {'source_sha', 'passed', 'failed', 'skipped', 'cases', 'fixture_timestamp_aging_seconds',
+              'real_ten_minute_elapsed_not_claimed', 'owner_count', 'domain_api_provider_system_not_claimed',
+              'owned_databases_dropped'}
+    if (set(value) != fields or value['source_sha'] != source
+            or type(value['passed']) is not int or value['passed'] != len(PROTECTION_CASES)
+            or type(value['failed']) is not int or value['failed'] != 0
+            or type(value['skipped']) is not int or value['skipped'] != 0
+            or set(value['cases']) != PROTECTION_CASES or any(v is not True for v in value['cases'].values())
+            or type(value['owner_count']) is not int or value['owner_count'] != 2
+            or type(value['fixture_timestamp_aging_seconds']) is not int or value['fixture_timestamp_aging_seconds'] != 600
+            or any(value[k] is not True for k in ('real_ten_minute_elapsed_not_claimed',
+                'domain_api_provider_system_not_claimed', 'owned_databases_dropped'))):
+        raise RuntimeError('protocol protection proof incomplete, wrong source or outside fixed scope')
+    return value
+
 SCOPE = 'default QS dual-owner lifecycle, actual Broker restart and next-instance Checker; protocol fixture facts'
 
 
@@ -94,15 +140,14 @@ def runtime_diagnostics(output):
 
 
 def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_port, mongo_port,
-                        password, ca, run, proof, native_runner, repo, read_parameters):
+                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False):
     source = source.resolve()
     if not (source/'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS default runtime source required')
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'], cwd=source, env=env).stdout)
-    if module.get('Replace') or module.get('Version') != 'v0.5.0-rocketmq-tx.2' or not module.get('Sum'):
-        raise RuntimeError('fixed published QS SDK tx.2 without replacement required')
+    validate_module(module, protection)
     proof['sdk_module'] = {k: module.get(k) for k in ('Path', 'Version', 'Sum', 'GoModSum')}
     document = runtime_manifest(repo)
     accounts = {role: {'username': 'runtime-' + secrets.token_hex(5), 'password': secrets.token_hex(32)}
@@ -125,6 +170,10 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         QS_M3_HOST_DSN=f'root:{password}@tcp(127.0.0.1:{mysql_port})/?parseTime=true',
         QS_M3_HOST_MONGO_URI=f'mongodb://127.0.0.1:{mongo_port}/?replicaSet=sdk-proof&directConnection=true',
         QS_M3_HOST_OPTIONS=str(opts), QS_M3_HOST_OBSERVER_OPTIONS=str(observer))
+    if protection:
+        env['QS_M3_VERIFY_PROTOCOL_PROTECTION'] = '1'
+    else:
+        env.pop('QS_M3_VERIFY_PROTOCOL_PROTECTION', None)
     env.update({'rocketmq.client.logRoot': str(logs), 'rocketmq.client.logLevel': 'error'})
     if native_runner is None:
         raise RuntimeError('owned native process group runner required')
@@ -151,6 +200,8 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         if result.returncode:
             raise RuntimeError('actual default QS owners failed; private output withheld')
         proof['native_receipt'] = parse_runtime_receipt(output, proof['source_sha'])
+        if protection:
+            proof['protection_receipt'] = parse_protection_receipt(output, proof['source_sha'])
         proof['parameters_after_restart'] = read_parameters(admin('getBrokerConfig'))
     finally:
         # Failure may leave only this owned Broker stopped. Do not target any

@@ -74,3 +74,51 @@ class DefaultRuntimeDiagnosticTest(unittest.TestCase):
             value = dict(self.sample(), **changes)
             with self.assertRaises(RuntimeError):
                 runtime_diagnostics('M3_QS_OWNER_DIAGNOSTIC '+json.dumps(value))
+
+
+class ProtocolProtectionReceiptTest(unittest.TestCase):
+    def output(self):
+        return DefaultRuntimeReceiptTest().output()
+    def protection_output(self):
+        from qs_runtime_acceptance import PROTECTION_CASES
+        value = dict(source_sha='a'*40, passed=len(PROTECTION_CASES), failed=0, skipped=0,
+                     cases={k: True for k in PROTECTION_CASES}, fixture_timestamp_aging_seconds=600,
+                     real_ten_minute_elapsed_not_claimed=True, owner_count=2,
+                     domain_api_provider_system_not_claimed=True, owned_databases_dropped=True)
+        return self.output()+'\nM3_QS_PROTOCOL_PROTECTION_RECEIPT '+json.dumps(value)
+
+    def test_both_receipts_and_fixed_aging_scope(self):
+        from qs_runtime_acceptance import parse_protection_receipt, PROTECTION_CASES
+        self.assertEqual(parse_protection_receipt(self.protection_output(), 'a'*40)['passed'], len(PROTECTION_CASES))
+
+    def test_refuse_missing_duplicate_wrong_source_partial_or_expanded_scope(self):
+        from qs_runtime_acceptance import parse_protection_receipt
+        output = self.protection_output()
+        for bad in (self.output(), output+'\n'+output, output.replace('a'*40, 'b'*40),
+                    output.replace('"passed": 8', '"passed": 0'),
+                    output.replace('"owner_count": 2', '"owner_count": true'),
+                    output.replace('"fixture_timestamp_aging_seconds": 600', '"fixture_timestamp_aging_seconds": 300'),
+                    output.replace('"real_ten_minute_elapsed_not_claimed": true', '"real_ten_minute_elapsed_not_claimed": false'),
+                    output+'\nWARNING: DATA RACE', output+'\n--- SKIP: dependency (0s)'):
+            with self.subTest(bad=bad[:60]):
+                with self.assertRaises(RuntimeError): parse_protection_receipt(bad, 'a'*40)
+
+    def test_exact_published_protection_module_and_legacy_profile_separate(self):
+        from qs_runtime_acceptance import validate_module, PROTECTION_MODULE
+        module = dict(Path='github.com/FangcunMount/reliable-messaging',
+                      **dict(zip(('Version', 'Sum', 'GoModSum'), PROTECTION_MODULE)))
+        validate_module(module, True)
+        for changes in (dict(Replace={}), dict(Version='v0.5.0-rocketmq-tx.2'),
+                        dict(Sum='forged'), dict(GoModSum='forged'), dict(Path='other')):
+            with self.assertRaises(RuntimeError): validate_module(dict(module, **changes), True)
+        with self.assertRaises(RuntimeError): validate_module(module, False)
+        validate_module(dict(module, Version='v0.5.0-rocketmq-tx.2'), False)
+
+    def test_protection_flag_without_runtime_fails_before_dependency_work(self):
+        import subprocess
+        import sys
+        result = subprocess.run([sys.executable, str(Path(__file__).with_name('ci-transactions.py')),
+            '--sdk', '.', '--image', 'unused', '--report', '/not-created-protection-report.json',
+            '--qs-protocol-protection'], capture_output=True, text=True, timeout=5)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn('protocol protection requires', result.stderr)
