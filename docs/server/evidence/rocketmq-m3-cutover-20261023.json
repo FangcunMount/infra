@@ -446,5 +446,6 @@
       "workflowName": "RocketMQ cutover original NSQ drain observation"
     }
   ],
-  "workflow_history_limit": "Prior source or superseded run status retained; does not claim cleanup readback or current-source acceptance for those runs"
+  "workflow_history_limit": "Prior source or superseded run status retained; does not claim cleanup readback or current-source acceptance for those runs",
+  "workflow_history_observed_at": "2026-10-23T13:03:54.046450+00:00"
 }
