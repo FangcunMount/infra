@@ -226,7 +226,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T21 | infra生产v2 manifest、ACL、TLS与冲突拒绝 | 2026-10-23；130直接操作＋4冲突，零失败/跳过、完整清理；52 CI成功、55回归报告/收据；PR154合并d639ea6，tree=b1282d0；[证据](evidence/rocketmq-m3-resources-20261023.json)；未安装生产资源 |
 | ✅ | T22 | 宿主真实生命周期、跨实例Checker与资源上界 | 2026-10-23完成声明范围：IAM三档/AI六档、QS真实双owner三档各13及默认工厂三档各10、worker三档各11；配置＋已发布SDK上界证据复核。PR428/169已合并，源码28检查、工具49检查/56非空报告零失败/跳过。完整API/业务故障及最终镜像仍归T23/T29。[证据](evidence/rocketmq-m3-runtime-20261023.json) |
 | ✅ | T23 | 宿主端到端及真实网络/进程/DB/Broker故障 | 2026-10-23；内部A–D全部完成：四owner原业务根提交、真实TCP回复丢失、Go进程SIGKILL、新实例回查、Broker硬重启与成对receipt/state/ACK。最终六档各7原生/40证据；49工具检查/56报告零失败/跳过，相关PR合并。受控read-side，不冒称真实provider/public HTTP/system或生产。[完整证据/失败历史](evidence/rocketmq-m3-host-faults-20261023.json) |
-| ☐ | T24 | 指标、告警、准入保护、DLQ/超限审计与规程 | 进行中：独立工作区已有DLQ只读索引工具、公开固定SDK探针/验收适配，17纯测试及Go race配置边界通过；真实DLQ、宿主协议指标/准入保护和最终门禁待完成 |
+| ☐ | T24 | 指标、告警、准入保护、DLQ/超限审计与规程 | 进行中：独立工作区已有DLQ只读索引工具、公开固定SDK探针/验收适配，18定向/189工具纯测试及Go race配置边界通过；真实DLQ、宿主协议指标/准入保护和最终门禁待完成 |
 | ☐ | T25 | 一次停写切换工具、旧责任处置/调度交接、启动前恢复与启动后前向修复 | 待开始；不开发在线共存或NSQ provider回退候选；兼容工具清理移交M4 |
 | ☐ | T26 | 预发布三库完整CI/API评审/混合链路，稳定协议冻结 | 待开始 |
 | ☐ | T27 | 同SDK SHA的稳定Go/Python发布、摘要/锁/receipt | 待开始 |
@@ -1367,3 +1367,6 @@ T23-D及T23正式任务打勾，M3更新23/36，M3-4仍进行中（T24/T25未完
 在独立工作区准备[观察/恢复边界](rocketmq-m3-recovery.md)及按v2 manifest具名Group/key读取的DLQ索引工具。只允许docker inspect和queryMsgByKey，0600原子新建文件，标准输出不含key、消息ID或正文；同Group跨owner时保留候选集合，不决定数据库或确认事务。当前仅纯测试与源码边界，不冒充真实DLQ、宿主准入保护或生产生效；T24未勾选，M3仍22/36，T23完整验收继续运行。
 
 承接T23闭环后，当前M3为23/36，T24仍未完成；后续独立原生profile只验证真实DLQ索引/只读导出，不代替宿主事务/指标/生产验收。
+
+
+T24原生接线候选：新增互斥native-dlq-audit模式，复用原隔离Compose/身份/清理和受控进程组；SDK完整原两档在PR保留，另增DLQ审计job。手工native_dlq=true只选中开发审计job，不冒称完整SDK验收。当前18定向/189工具纯测试、Go race边界及actionlint通过，真实Broker尚未执行，T24不勾选。

@@ -1,10 +1,28 @@
 import unittest
+import contextlib
+import importlib.util
+import io
+from pathlib import Path
+from unittest.mock import patch
 
 from native_dead_letter_acceptance import manifest, safe_event, require_event, validate_options, SDK
 from routes import validate_v2
 
 
 class NativeDeadLetterAcceptanceTest(unittest.TestCase):
+    def test_actual_cli_rejects_mixed_profiles_before_any_process(self):
+        entry=Path(__file__).with_name('ci-transactions.py')
+        spec=importlib.util.spec_from_file_location('native_audit_cli_guard',entry)
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        for extra in (['--sdk-api-go'],['--iam-host','/not-a-host'],['--m3-resources']):
+            args=['ci-transactions','--sdk','/not-a-sdk','--image','unused',
+                  '--report','/tmp/native-audit-not-created.json','--native-dlq-audit',*extra]
+            with patch('sys.argv',args), patch('subprocess.run',side_effect=AssertionError('fixture must not start')) as process, \
+                    contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as raised:module.main()
+                self.assertEqual(raised.exception.code,2)
+                process.assert_not_called()
+
     def test_profile_refuses_other_gates_before_fixture_startup(self):
         options=dict(native_dlq_audit=True,sdk='/fixed/source',image='fixture',mysql_image='mysql:8.0.36',
                      report='report.json',python='uv',qs_deferred_kind='mysql',sdk_api_go=False,iam_host=None)
