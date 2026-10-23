@@ -99,7 +99,7 @@ def retain_private_host_output(path, raw):
         stream.write(raw)
 
 
-def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, require_business_result=False, qs_source=None):
+def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, require_business_result=False, qs_source=None, *, faults=False, native_runner=None, proxy_start=None):
     source = source.resolve()
     if not (source / 'go.mod').is_file():
         raise RuntimeError('required exact IAM source checkout missing')
@@ -117,7 +117,7 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('IAM must use its pinned downloaded SDK without replace')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
-    if runtime_required and module.get('Version') != 'v0.5.0-rocketmq-tx.2':
+    if (runtime_required or faults) and module.get('Version') != 'v0.5.0-rocketmq-tx.2':
         raise RuntimeError('current IAM runtime proof requires fixed SDK tx.2')
     manifest = iam_manifest(fanout=qs_source is not None)
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4),
@@ -143,6 +143,12 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
                 'IAM_M3_BROKER_CONFIG': str(paths['iam-producer']),
                 'IAM_M3_OBSERVER_CONFIG': str(paths['iam-observer']),
                 'rocketmq.client.logRoot': str(logs), 'rocketmq.client.logLevel': 'error'})
+    if faults:
+        if runtime_required or qs_source is not None:
+            raise RuntimeError('original-root faults are a separate IAM profile')
+        from iam_fault_acceptance import run_profile
+        run_profile(source, directory, env, run, proof, native_runner, proxy_start)
+        return
     if qs_source is not None:
         qs_source = qs_source.resolve()
         if not (qs_source / 'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=qs_source).stdout.strip():
