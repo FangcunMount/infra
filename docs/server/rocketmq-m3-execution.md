@@ -1708,3 +1708,18 @@ AI [PR220](https://github.com/FangcunMount/qs-ai/pull/220)候选fabf944提供纯
 QS [PR435](https://github.com/FangcunMount/qs-server/pull/435)新增原qs-migrate-offline的独立binding action，每次只处理qs.mysql或qs.mongo，两个原根分别保留not_attempted/unknown/committed与独立verified；无跨库原子承诺、补偿覆盖或业务执行。初始源码d7aa4ddd/文档6db7b855已通过两包race、普通/带标签差异lint、native仅编译及docs/actionlint，真实CLI门禁尚待；正在整合已合并PR434并重验最终候选，不能沿用整合前的检查关闭父项。
 
 当前正式进度仍M3 **24/36**、T25 **2/4**、C **1/3**、C2 **3/4**、C3 **1/3**。初始绑定候选、三库组合/全写者责任及C3持久notice处置未完成。M2 **24/24**、M4 **0/8**。本轮没有SDK稳定发布、生产DDL/资源/provider/部署、Mac mini规则加载、system或48小时观察。
+
+
+### 2026-10-24：T25-C2 QS/AI 初始绑定组件闭环，C3读取和恢复工具进入候选
+
+QS [PR435](https://github.com/FangcunMount/qs-server/pull/435)最终源码30214bae合并c6a376d4；28检查成功，唯一可选Docs/API同步按规则记N/A。实际原CLI门禁验证qs.mysql/qs.mongo分别两进程唯一赢家、精确回读、重装/缺attestation/摘要错误拒绝、原双库版本账本不变；实际新协议责任存在时保留原行并拒绝安装。必需原生日志摘要db20dbf8733470bad22b56f0d4b406707d348884b527aff30a37a012b80e3f73；不是三库分布式原子承诺，不代替整体停写与恢复演练。生产暂停true。
+
+AI [PR220](https://github.com/FangcunMount/qs-ai/pull/220)最终源码57e91bf8合并2fcb46e7；14检查成功。[完整门禁40035612732](https://github.com/FangcunMount/qs-ai/actions/runs/40035612732)两档MySQL各5648项，8分片各1412项，非空、零失败、零跳过，完整收集及执行覆盖独立重验。[专项40035612739](https://github.com/FangcunMount/qs-ai/actions/runs/40035612739)每档schema/实际CLI7、单元119、存储85项均通过；14份XML摘要保存。candidate/tested merge/实际merge tree均f1a6f22f。自动生产部署false。
+
+旧fabf944门禁和失败历史保留：原Go草稿回放场景同源码重跑1409/1409通过，原业务失败根因仍未证明，补充RPC状态诊断不冒称业务修复。另查明两个独立测试基础设施问题：重跑制品同名会混入旧分片；本次新增测试在收集时生成时间参数，导致固定源码下收集ID漂移。后者为本次测试实现错误，已改静态ID并用独立进程真实重复收集验证。制品名称加入attempt，汇总保留所有历史、按每分片最新attempt核验且拒绝ID/分区漂移，不选择“最后一次成功”掩盖新失败。初始失败、重跑、取消的21cb候选和最终新源码报告分别保存，没有覆盖原制品。
+
+C3宿主候选为IAM [PR145](https://github.com/FangcunMount/iam/pull/145)、QS [PR436](https://github.com/FangcunMount/qs-server/pull/436)、AI [PR221](https://github.com/FangcunMount/qs-ai/pull/221)：原生副本保留客户端ID时仍按完整v1物理指纹区分；合法resolved重导入不重开、不替换首次证据，新的物理索引继续blocked。Go包race、Python37项native纯测试及相关69项合计通过，新增原库受控fixture等待完整CI；fixture不冒称实际RPC/生产解除。周期读取仅未处置责任，宿主没有新增解除或自动开准入入口。
+
+infra [PR207](https://github.com/FangcunMount/infra/pull/207)源码544e90d新增固定发布SDK tx.4的check-only Store、私有SDK生命周期和当前RPC私有观察原语；本地20项纯race（含子项）、vet/actionlint通过。原SDK保留首次audit时间，观察在真实RPC→原audit之后生成，不比较时间戳伪造本次成功。SDK先StopAdmission会拒绝Start，因此工具从构造起禁用执行能力、不暴露Sender，Start返回立即封SDK准入；同步私有I/O仍占真实回查容量，Close/Wait超时不冒称排空。尚非完整CLI，原库snapshot、物理核验、批准图、治理CAS和四种宿主真实矩阵继续；纯fake不是RPC证明。
+
+当前M3仍 **24/36**，T25 **2/4**、C **1/3**、C2 **3/4**、C3 **1/3**。QS/AI初始绑定组件已合并，C2的三库组合/全写者责任和C3闭环未完成，均不提前勾选。M2 **24/24**、M4 **0/8**；无SDK稳定发布、生产DDL/资源/provider/部署、Mac mini规则加载、system或48小时观察操作。
