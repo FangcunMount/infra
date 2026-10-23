@@ -58,3 +58,12 @@ T23 开发验收39906622326证明了以下受控路径，完整矩阵和生产�
 原生DLQ验收探针位于[scripts/rocketmq/probes/native-dead-letter](../../scripts/rocketmq/probes/native-dead-letter/main.go)，锁定公开Go预发布tx.3、无本地replace。39916396134已完成真实5.5.1隔离验收8项、零失败跳过：校验实际Compose身份，显式设置并回读该测试Group的有限重试参数，证明原消息经过失败handoff后出现真实DLQ索引、重复只读导出一致，以及所属进程、容器与私有文件清理。完整PR回归与宿主保护仍待完成。探针或其NORMAL测试消息不代表业务中间上线。
 
 隔离入口为`make rocketmq-native-dlq-audit-test`，显式传入SDK_DIR及已验证测试镜像。开发CI复用rocketmq-limits工作流的native_dlq=true模式，只选择native-index-audit；未选择的SDK事务矩阵不是已通过项。PR继续要求原SDK两档及新增审计job全部通过。新的CLI模式拒绝与其他SDK/宿主profile混用，在任何子进程启动前失败。
+
+
+## 回查 RPC 后的确认审计
+
+SDK源码PR54增加独立的正向回查审计。Checker.Check仍只读取精确本地证据；只有实际EndTransaction成功之后，运输适配才在原有界worker内，用新协议事务记录精确分支的确认。原业务事务、witness终态和winner token均不改变，不调用executor、不重新准备旧半消息。Python数据库工作回到宿主loop，拒绝AUTOCOMMIT或外部绑定会话；容量保留到实际审计完成。
+
+39919796704两档各41项证明了新实例、跨语言MySQL及Go Mongo的正向记账，源码/存储与候选wheel验收分别通过。此处是已合并源码能力，尚未发布新固定版本或更新三个业务库依赖，不能视为宿主保护已启用。
+
+确认计数与持久化审计计数分开；RPC ACK后进程退出或审计数据库失败时，Broker可能已经接受确认。这样的缺口不能标作确定的Broker半消息积压，也不能靠累计Unknown或租约时间推算精确最老年龄。宿主采样与保护仍需验证这些边界，并保留Checker和原业务恢复责任。

@@ -76,11 +76,151 @@
     "stable_sdk_released": false,
     "production_deployed": false,
     "system_accepted": false,
-    "observation_48h_completed": false
+    "observation_48h_completed": false,
+    "native_audit_source_merged": true,
+    "sdk_recovery_source_merged": true,
+    "continuous_recovery_gate_merged": false,
+    "host_protection_merged": false
   },
   "remaining": [
-    "Positive post-RPC recovery audit across Go/Python storage adapters",
-    "Host protocol metrics and explicit admission protection",
-    "Prometheus alert tests and full current-head CI"
+    "Host current protocol observation and explicit admission protection",
+    "Prometheus rules, metrics and bounded lifecycle acceptance",
+    "Current combined infra CI and continuous recovery gate merge",
+    "Fixed SDK publication and host adoption remain separate delivery states"
+  ],
+  "internal_progress": {
+    "verified": 2,
+    "total": 4,
+    "formal_task_completed": false
+  },
+  "component_merges": [
+    {
+      "repo": "FangcunMount/infra",
+      "pr": 181,
+      "head_sha": "baa197cebd739dab68e9719ec710f148450edfb9",
+      "merge_sha": "b7814c941aba89205dc2088c2253775adbd62ba7",
+      "merged_at": "2026-10-23T08:06:37Z",
+      "tree": "6c61f797bf83c15fbf8daa98a267e8a7602b0a21",
+      "merge_tree_equals_candidate": true
+    },
+    {
+      "repo": "FangcunMount/reliable-messaging",
+      "pr": 54,
+      "head_sha": "d3b23c16e354dd09a812641403029e0cc03abed2",
+      "merge_sha": "bfb49365824806543ed5a6826452a84f6ef0b02e",
+      "merged_at": "2026-10-23T08:10:19Z",
+      "tree": "ed4533da50ee2551f8f72c9480f71a3266c534eb",
+      "merge_tree_equals_candidate": true
+    }
+  ],
+  "native_audit_full_ci": {
+    "pr": 181,
+    "checks_passed": 53,
+    "workflows_passed": 21,
+    "reports": 57,
+    "failed": 0,
+    "skipped": 0,
+    "explicit_cleanup_objects": 55,
+    "legacy_cleanup_limitations": 2,
+    "harness_files_verified": 20,
+    "report_index_sha256": "65029516b94d5bbaa99b05519ac06e198e1974dfbb736863a5292eb3911814b7",
+    "proof_sha256": "971bb4e7a9342914cec6453a050fd789d5e2e2caf072ab7624825aecbd008470"
+  },
+  "recovery_receipt": {
+    "sdk_pr": 54,
+    "sdk_head": "d3b23c16e354dd09a812641403029e0cc03abed2",
+    "sdk_merge": "bfb49365824806543ed5a6826452a84f6ef0b02e",
+    "checks_passed": 15,
+    "go_mysql_mongo_profiles": 3,
+    "go_storage_cases_each": 27,
+    "python_profiles": 2,
+    "python_source_cases_each": 142,
+    "python_installed_wheel_cases_each": 142,
+    "failed": 0,
+    "skipped": 0,
+    "candidate_assets_formally_published": false,
+    "source_ci_index_sha256": "4510c4c9ecb308e1fd35cc36dc63f28fa25a43f370b20e25c59f156f69f2add9",
+    "native_run_url": "https://github.com/FangcunMount/infra/actions/runs/39919796704",
+    "native_infra_sha": "9ac673f9dc29a3244b69737e7df435e2f307b042",
+    "native_sdk_sha": "30dec8b6cb8ba26b7c2286baaac0bdb079003f3e",
+    "native_profiles": 2,
+    "native_cases_each": 41,
+    "exact_recovery_cases_each": 10,
+    "native_audit_sha256": "441a5332bb8ec2cabfcbff08671742b98a5c82c31f85b99b3713193acdba7460",
+    "runtime_scope_equivalence": {
+      "changed_paths": [
+        "storage/transaction/mysql/store_integration_test.go"
+      ],
+      "unchanged_go_python_runtime_objects": 134,
+      "proof_sha256": "795e84166eaf60d612cdd7e1618839d0f48f852ab5924f241c4b5588e18911c4"
+    },
+    "limitations": [
+      "Source SDK and candidate CI wheel only; no new published version or host dependency update",
+      "RPC acknowledgement followed by database audit failure remains an observation gap",
+      "Checker decision and cumulative FinalUnknown are not current Broker pending gauges"
+    ]
+  },
+  "validation_history": [
+    {
+      "run": 39918708683,
+      "status": "cancelled",
+      "phase": "queued_source_sdk_development",
+      "acceptance_claimed": false,
+      "reason": "Superseded by explicit physical SQLAlchemy root validation"
+    },
+    {
+      "run": 39919709866,
+      "status": "failed",
+      "phase": "go_storage",
+      "profiles": 3,
+      "failed_each": 1,
+      "skipped_each": 0,
+      "owned_resources_cleaned": true,
+      "reason": "New test incorrectly required parseTime=true; fixed explicit DATE_FORMAT timestamp read",
+      "reports": [
+        {
+          "file": "tx-storage-2-e4eb68b2b43b7980e2acd03e60307930032515d7/transaction-storage.json",
+          "sha256": "8cbc0ac96cc1e40868a2349a73c241c8d4312d0cf6aab7ed6e393027b636c2f7",
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "cleaned": true
+        },
+        {
+          "file": "tx-storage-1-e4eb68b2b43b7980e2acd03e60307930032515d7/transaction-storage.json",
+          "sha256": "11cc755361bea780d2cc7c587e1f3d35a0f720015f30e2d7ca16fa7fc66a4a60",
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "cleaned": true
+        },
+        {
+          "file": "tx-storage-0-e4eb68b2b43b7980e2acd03e60307930032515d7/transaction-storage.json",
+          "sha256": "666ec9d21bc0cb2921cb6c6f3783fdd12ce9916572e1378653f8c10280cc11b1",
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "cleaned": true
+        }
+      ]
+    },
+    {
+      "run": 39920470197,
+      "status": "success",
+      "phase": "go_storage",
+      "profiles": 3,
+      "passed_each": 27,
+      "failed_each": 0,
+      "skipped_each": 0
+    },
+    {
+      "run": 39920470269,
+      "status": "success",
+      "phase": "python_source_and_installed_candidate_wheel",
+      "profiles": 2,
+      "passed_each_per_install": 142,
+      "failed_each": 0,
+      "skipped_each": 0
+    }
   ]
 }

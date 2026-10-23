@@ -5,11 +5,15 @@ on:
     paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '!scripts/rocketmq/ai_finalization_*', '!scripts/rocketmq/test_ai_finalization_*', '.github/workflows/rocketmq-sdk.yml']
   workflow_dispatch:
     inputs:
+      recovery_audit:
+        description: Candidate source post-RPC persistent recovery audit
+        type: boolean
+        default: false
       sdk_ref:
         description: Exact candidate SDK revision
         type: string
         required: true
-        default: bfaae2b82ee0d1229b8c965fce472cdf5dec486f
+        default: d3b23c16e354dd09a812641403029e0cc03abed2
 permissions:
   contents: read
 env:
@@ -36,8 +40,15 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: ${{ inputs.sdk_ref || 'bfaae2b82ee0d1229b8c965fce472cdf5dec486f' }}
+          ref: ${{ inputs.sdk_ref || 'd3b23c16e354dd09a812641403029e0cc03abed2' }}
           path: .sdk-acceptance
+      - name: Verify exact source candidate
+        env:
+          SDK_REF: ${{ inputs.sdk_ref || 'd3b23c16e354dd09a812641403029e0cc03abed2' }}
+        run: |
+          set -euo pipefail
+          [[ "$SDK_REF" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .sdk-acceptance rev-parse HEAD)" = "$SDK_REF"
       - uses: actions/setup-go@v6
         with:
           go-version: ${{ matrix.go }}
@@ -51,8 +62,15 @@ jobs:
       - name: Build exact isolated Broker with fresh PGP proof
         run: docker build --no-cache -t rocketmq-sdk:5.5.1 components/rocketmq
       - name: Required public SDK MySQL, Mongo and cross-language recovery proofs
+        env:
+          RECOVERY_AUDIT: ${{ inputs.recovery_audit || github.event_name == 'pull_request' }}
         run: |
-          python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python \
+          set -euo pipefail
+          audit_options=()
+          if [[ "$RECOVERY_AUDIT" == true ]]; then
+            audit_options=(--sdk-recovery-audit)
+          fi
+          python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python "${audit_options[@]}" \
             --sdk "$PWD/.sdk-acceptance" --image rocketmq-sdk:5.5.1 --mysql-image '${{ matrix.mysql }}' \
             --report rocketmq-public-sdk.json
       - uses: actions/upload-artifact@v7
