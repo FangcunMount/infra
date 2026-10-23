@@ -1,0 +1,486 @@
+{
+  "version": 1,
+  "task": "T23",
+  "status": "in_progress",
+  "task_completed": false,
+  "global_progress": {
+    "M3": "22/36",
+    "M4": "0/8"
+  },
+  "recorded_at": "2026-10-23T01:41:41.097212+00:00",
+  "source_baselines": {
+    "iam": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
+    "qs-server": "0428b701347774282fb3deafb9cd8c841ba86fc4",
+    "qs-ai": "e9bbba4fbf11c15d9fa9a86f4815d9e565e71692",
+    "infra": "de64c443b509686b8372be2fe09c52a95da22744"
+  },
+  "source_note": "IAM is the first packet-fault candidate; other SHAs are starting baselines, not fault acceptance results.",
+  "profile": {
+    "id": "IAM original role COMMIT packet faults",
+    "sdk_fault_proxy_source": "8de893b367cc797580799abd8325f41dd62356db",
+    "native_status": "full 3x14 plus3x34 passed/audited; IAM PR138 8/8 source checks and merged main with exact candidate tree",
+    "required_native_tests": 2,
+    "required_evidence_cases": 14,
+    "boundaries": [
+      "before original witness COMMIT reaches MySQL",
+      "after backend COMMIT OK before original client receives reply"
+    ],
+    "local_validation": {
+      "infra_unit_tests": {
+        "passed": 142,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actionlint": "passed",
+      "iam_race_native_tag": "compile_only; zero native execution",
+      "iam_full_tagged_lint": "9 pre-existing errcheck findings; new diff gate separate",
+      "iam_new_diff_tagged_lint": "passed: 0 issues",
+      "iam_docs_facts": "passed"
+    },
+    "scope_limits": [
+      "actual RoleCatalog.CreateRole/original GORM root component",
+      "does not claim full API daemon, producer SIGKILL, Broker restart, provider, system or production"
+    ]
+  },
+  "delivery": {
+    "merged": false,
+    "stable_release": false,
+    "production": false,
+    "system_acceptance": false,
+    "observation_48h": false
+  },
+  "development_runs": [
+    {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39878992417",
+      "source_sha": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
+      "infra_sha": "ab08a18fd7c9b93aac5349d1db91e052ee578bb1",
+      "workflow_conclusion": "failure",
+      "failed_steps": [
+        "Post Run astral-sh/setup-uv@v6"
+      ],
+      "native": {
+        "mysql": "8.0.36",
+        "root_tests": {
+          "pass": 34,
+          "fail": 0,
+          "skip": 0
+        },
+        "fault_evidence": {
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0
+        },
+        "cleanup_verified": true,
+        "source_and_hashes_verified": true
+      },
+      "artifacts": {
+        "rocketmq-iam-host.json": "6c9044ac4a0eacce0cb2a72631c5240d2901ea05dd7024d72aa0d63139c2d366",
+        "receipt.json": "1e398bf5c023946e9a604456b55e0d1c6797033f8b61d9451eddeed36bdc49a5"
+      },
+      "cache_failure": "Go-only fault profile did not create a uv dependency cache; post-action failed. Not an acceptance failure; workflow still failed."
+    }
+  ],
+  "audit_index_sha256": "f61a654209229564bd69dd0ed4912bd08badd1f8ae51481e081d16ab44e44905",
+  "qs_mongo_candidate": {
+    "source_sha": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
+    "local_validation": {
+      "native_tag_race": "revised fixture compile only passed",
+      "new_diff_tagged_lint": "0 issues",
+      "full_tagged_lint": "1 existing errcheck in prior fixture",
+      "docs_check": "88 passed; facts/hygiene passed",
+      "infra_tests": "155 passed/0 failed/skipped"
+    },
+    "native_status": "current full Mongo7.0.37 host gate14/14 passed; initial after API unresolved and same-key duplicate accepted, local executor1/half1/newhalf0 verified"
+  },
+  "iam_full_matrix": {
+    "run_url": "https://github.com/FangcunMount/infra/actions/runs/39879917332",
+    "source_sha": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
+    "infra_sha": "1d44b58c1863d6d28c98e8300180ff0915c03a5a",
+    "workflow_conclusion": "success",
+    "profiles": [
+      {
+        "mysql_version": "8.0.36",
+        "go_version": "go1.25.12",
+        "report_sha256": "f03c2b74eaa670b5d843d536081bcc51716b716c4ccb90efab2c374145e5b2ae",
+        "original_roots": {
+          "sha256": "0e522821b77ddee6cd411765dbdb7b726547c520a69bec9018dbd97d7f50a2d2",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          }
+        },
+        "native_tests": 2,
+        "evidence_passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "source_tool_binding_and_cleanup_verified": true
+      },
+      {
+        "mysql_version": "8.0.44",
+        "go_version": "go1.25.12",
+        "report_sha256": "535840715ac66cd68da66adef015e09a8248adb38d601de291bd219df0bbf43f",
+        "original_roots": {
+          "sha256": "0a7f31f3fe656aa3d8ed0c63223e9d07e430eb6cdc8a738a65ba60aae73c2ca3",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          }
+        },
+        "native_tests": 2,
+        "evidence_passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "source_tool_binding_and_cleanup_verified": true
+      },
+      {
+        "mysql_version": "8.4.13",
+        "go_version": "go1.25.12",
+        "report_sha256": "8584f4deaee5ab7240f38ee4aaab34fcdbd1598f8a81a3749e486e393601cb62",
+        "original_roots": {
+          "sha256": "9033259c1c0a02d1f894fedef1c34eb5de9b3fca67703999a82fc9729da4d2fc",
+          "tests": {
+            "pass": 34,
+            "fail": 0,
+            "skip": 0
+          }
+        },
+        "native_tests": 2,
+        "evidence_passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "source_tool_binding_and_cleanup_verified": true
+      }
+    ],
+    "scope": "actual IAM role original GORM commit packet faults; native component only",
+    "source_merge_status": "merged",
+    "stable_release": false,
+    "production": false,
+    "system_acceptance": false,
+    "observation_48h": false,
+    "source_pr": "https://github.com/FangcunMount/iam/pull/138",
+    "merge_sha": "2cd61beb623e6c1ad8f44d6a2e3d50e0e07ed982"
+  },
+  "iam_full_audit_sha256": "99461210b73bed0e7aad71cac0bdcd889bb476c79f570f9891bfabfddcb13763",
+  "failure_history": [
+    {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39879921975",
+      "source_sha": "d367605dd6ae889a281395a4ea0665fdf5b7ae61",
+      "infra_sha": "1d44b58c1863d6d28c98e8300180ff0915c03a5a",
+      "report_sha256": "86d21a4f196d36eec699dd378be1c178dbb47bc41a4ea951b1d57563fc8607ff",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "faults": {
+        "before": {
+          "native_exit_code": 1,
+          "native_output_sha256": "158b4ce8b5ba2bdc5d366c4b063f67cb0928de46dbdae16bee0609395df1b71d",
+          "assertion_lines": [
+            61,
+            117,
+            119,
+            155
+          ],
+          "test_timeout": false,
+          "race_reports": 0
+        }
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "finding": "original driver did not return after caller deadline; pinned Mongo1.17.6 CommitLoop strips cancellation; failure report did not drain proxy injection queue, so no injection is inferred from that absent field"
+    },
+    {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39881279130",
+      "source_sha": "edfa930bc93cc7ca3fc81ca40244f8e9ecf7913e",
+      "infra_sha": "95136642b30cdbbf7ed46086b3efcc91abeafe51",
+      "report_sha256": "f1a6e6deb4d22440c64ebad08edcc2cb21da77ab01be4588831ba8f6ad586751",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "faults": {
+        "before": {
+          "native_exit_code": 0,
+          "native_output_sha256": "b0544753f3e33540e53fc4bdcd40e85745cc3a8597cc7a5ca13af31c8b50375a",
+          "assertion_lines": [],
+          "test_timeout": false,
+          "race_reports": 0,
+          "wire": {
+            "boundary": "before",
+            "seen": 19,
+            "dropped": 19,
+            "backend_commit_acks": 0
+          },
+          "original_session_path_restored": true,
+          "receipt": {
+            "boundary": "before",
+            "business_rows": 0,
+            "cases": {
+              "actual_answer_root_once": true,
+              "broker_visibility_or_new_paused_checker": true,
+              "business_witness_match_boundary": true,
+              "duplicate_keeps_original_plan_and_result": true,
+              "owned_owner_and_transport_drained_primary_retained": true,
+              "published_outboxes_empty": true
+            },
+            "failed": 0,
+            "full_api_process_provider_system_not_claimed": true,
+            "half_prepared": 1,
+            "local_calls": 1,
+            "mongo_callbacks": 2,
+            "new_check_commit": 0,
+            "new_check_rollback": 1,
+            "new_half_prepared": 0,
+            "new_local_calls": 0,
+            "passed": 6,
+            "scope": "actual QS AnswerSheet original Mongo root with wire-level commitTransaction faults; component only",
+            "skipped": 0,
+            "source_sha": "edfa930bc93cc7ca3fc81ca40244f8e9ecf7913e",
+            "wire_unchanged": true
+          },
+          "post_restore_fault_counters": {
+            "seen": 0,
+            "dropped": 0,
+            "backend_commit_acks": 0
+          }
+        },
+        "after": {
+          "native_exit_code": 1,
+          "native_output_sha256": "72987c634c78a9eb36658abae9befb05e88189c60208a40a976b623207803aa7",
+          "assertion_lines": [
+            206
+          ],
+          "test_timeout": false,
+          "race_reports": 0,
+          "wire": {
+            "boundary": "after",
+            "seen": 21,
+            "dropped": 21,
+            "backend_commit_acks": 21
+          },
+          "original_session_path_restored": true
+        }
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "finding": "before passed6 with19 matching drops/0backendACK and2driver callbacks/1SDK executor. After reached real backend COMMIT ACKs but initial API success assertion failed; no initial authoritative API confirmation is inferred. Contract permits Unknown during client topology loss; revised case still requires exact committed fact/witness, successful same-key accepted recovery, unchanged wire and no executor redo."
+    }
+  ],
+  "ai_mysql_candidate": {
+    "source_sha": "724595abdd92e8b0d88389609e239a6b6b1a9055",
+    "local_validation": {
+      "collection": "1 explicitly selected native test collected; no DB execution",
+      "ruff": "check and format passed",
+      "docs": "75 documents/1389 links, source facts and coverage passed",
+      "infra_tests": "151 passed, 0 failed/skipped"
+    },
+    "native_status": "full six profiles passed/audited, each14 evidence/2 native; source PR216 12 checks passed and merged main0809a16 exact candidate tree",
+    "scope": "actual AI authenticated command receiver and original SQLAlchemy root; no paired/full daemon/process/provider/system claim",
+    "pr": "https://github.com/FangcunMount/qs-ai/pull/216"
+  },
+  "iam_source_merge": {
+    "pr": "https://github.com/FangcunMount/iam/pull/138",
+    "source_sha": "0c4e46c1a7ada7551fdfc14189ff33feb086e2d3",
+    "merge_sha": "2cd61beb623e6c1ad8f44d6a2e3d50e0e07ed982",
+    "tree": "dc7d6bdc7eedf3cbab6832beed70a8a3ef5d5578",
+    "candidate_and_main_entire_tree_equal": true,
+    "source_checks_passed": 8,
+    "production_deploy_paused": true,
+    "production_environment_override_count": 0
+  },
+  "internal_progress": "1/4",
+  "ai_development": {
+    "run_url": "https://github.com/FangcunMount/infra/actions/runs/39881283339",
+    "source_sha": "724595abdd92e8b0d88389609e239a6b6b1a9055",
+    "infra_sha": "95136642b30cdbbf7ed46086b3efcc91abeafe51",
+    "workflow_conclusion": "success",
+    "mysql": "8.0.36",
+    "python": "3.13.15",
+    "sdk": "0.4.0a2",
+    "client": "5.1.2",
+    "native_tests": 2,
+    "evidence": {
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    "before_new_paused_rollback_checks": 2,
+    "local_calls": [
+      1,
+      1
+    ],
+    "provider_invocations": [
+      0,
+      0
+    ],
+    "source_tool_binding_and_cleanup_verified": true,
+    "report_sha256": "50c32d988215593c3eb69ae1a1feec27ed8dd6326b9c74e4c551fbfe327e0dcd",
+    "scope": "component/actual AI receiver/original root; development profile only"
+  },
+  "ai_development_audit_sha256": "2a4923aeb7a093f41e350187f9bf55059daeb8048e56b5b8682e26f54180afe2",
+  "qs_mysql_command_candidate": {
+    "source_sha": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
+    "native_status": "development14/14 passed/audited; full3 CI39884730972 and source PR429 pending",
+    "local_validation": {
+      "race_native_tag": "compile only passed",
+      "new_diff_native_lint": "0 issues",
+      "full_tagged_lint": "6 preexisting errcheck findings, separately retained",
+      "infra_tests": "155 passed/0 failed/skipped",
+      "docs_check": "88 tests and facts/hygiene passed; canonical -p=1 compile actually rerun. Earlier doc command validator failure retained in source notes."
+    },
+    "scope": "actual QS command store/original MySQL root; initial seal and completed SDK execution count, not measured callback count",
+    "pr": "https://github.com/FangcunMount/qs-server/pull/429"
+  },
+  "other_host_audits": [
+    {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39883468210",
+      "source_sha": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
+      "infra_sha": "96eb495ef04e303325c5af05fa245f740cc7d768",
+      "workflow_conclusion": "success",
+      "kind": "mongo",
+      "profiles": [
+        {
+          "mysql": "8.0.44",
+          "mongo": "7.0.37",
+          "python": null,
+          "go": "go1.25.12",
+          "native_tests": 2,
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "eaa20df1f22fac623e65cbf31608db3201acd4d5798a65fa7eff9312899342fc",
+          "source_tool_binding_and_cleanup_verified": true,
+          "initial_after_api_accepted": false,
+          "same_key_after_api_accepted": true
+        }
+      ],
+      "full_matrix": true,
+      "scope": "actual host component/original roots/packet faults; not full API/process/system/production"
+    },
+    {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39883472580",
+      "source_sha": "0b8ee42a184ae852c052247964fb42ee37f58cd2",
+      "infra_sha": "96eb495ef04e303325c5af05fa245f740cc7d768",
+      "workflow_conclusion": "success",
+      "kind": "command",
+      "profiles": [
+        {
+          "mysql": "8.0.36",
+          "mongo": null,
+          "python": null,
+          "go": "go1.25.12",
+          "native_tests": 2,
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "de4e7c396e1b2ad7895864f2c4e55ff07eedb3ef120a644e85c711cc7c43d073",
+          "source_tool_binding_and_cleanup_verified": true
+        }
+      ],
+      "full_matrix": false,
+      "scope": "actual host component/original roots/packet faults; not full API/process/system/production"
+    },
+    {
+      "run_url": "https://github.com/FangcunMount/infra/actions/runs/39883476843",
+      "source_sha": "724595abdd92e8b0d88389609e239a6b6b1a9055",
+      "infra_sha": "96eb495ef04e303325c5af05fa245f740cc7d768",
+      "workflow_conclusion": "success",
+      "kind": "ai",
+      "profiles": [
+        {
+          "mysql": "8.4.11",
+          "mongo": null,
+          "python": "3.11.16",
+          "go": "go1.25.12",
+          "native_tests": 2,
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "2864dc4f553ae1d0756b4650378d2d3d3d4b79ed3a20cbb62e4c4ed2a416e06a",
+          "source_tool_binding_and_cleanup_verified": true
+        },
+        {
+          "mysql": "8.0.44",
+          "mongo": null,
+          "python": "3.13.15",
+          "go": "go1.25.12",
+          "native_tests": 2,
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "a64445e3cfed331123cf0a50235d3940575a169344a7254e21f6d0ac30ed4667",
+          "source_tool_binding_and_cleanup_verified": true
+        },
+        {
+          "mysql": "8.4.11",
+          "mongo": null,
+          "python": "3.13.15",
+          "go": "go1.25.12",
+          "native_tests": 2,
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "098328b6aa6f4423a3a85645126e1b54b0e461e0ddea6c7d45a6e9bb9565f381",
+          "source_tool_binding_and_cleanup_verified": true
+        },
+        {
+          "mysql": "8.0.36",
+          "mongo": null,
+          "python": "3.11.16",
+          "go": "go1.25.12",
+          "native_tests": 2,
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "2671846ced3b756b36c8bbdcbc23042d5b07bc7d8d42db0d7b8c563365a9bb56",
+          "source_tool_binding_and_cleanup_verified": true
+        },
+        {
+          "mysql": "8.0.44",
+          "mongo": null,
+          "python": "3.11.16",
+          "go": "go1.25.12",
+          "native_tests": 2,
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "dff151c74832435a0090c78bbcf59ab729fc8ccdb94f81de392bbcb1aaa924e1",
+          "source_tool_binding_and_cleanup_verified": true
+        },
+        {
+          "mysql": "8.0.36",
+          "mongo": null,
+          "python": "3.13.15",
+          "go": "go1.25.12",
+          "native_tests": 2,
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0,
+          "report_sha256": "24c65f0d2cd4714f637e7b839ec5b32f711bff76ea68b157c1adcfaaa16ac4c9",
+          "source_tool_binding_and_cleanup_verified": true
+        }
+      ],
+      "full_matrix": true,
+      "scope": "actual host component/original roots/packet faults; not full API/process/system/production"
+    }
+  ],
+  "other_host_audit_sha256": "075b507115e0fdde17616f214f79916e3fbbcf262e2c5e9084936ccbb0c2f76e",
+  "ai_source_merge": {
+    "pr": "https://github.com/FangcunMount/qs-ai/pull/216",
+    "source_sha": "724595abdd92e8b0d88389609e239a6b6b1a9055",
+    "merge_sha": "0809a16dd0d3cb619296cc1af62ed1f7b4714054",
+    "tree": "a88e575a6cc31cabf006ebe971532610f1e6f2b0",
+    "candidate_and_main_entire_tree_equal": true,
+    "source_checks_passed": 12,
+    "auto_deploy_enabled": false,
+    "production_environment_override_count": 0
+  }
+}
