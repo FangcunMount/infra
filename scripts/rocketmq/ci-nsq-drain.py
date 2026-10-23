@@ -89,6 +89,8 @@ def main():
             raise RuntimeError("owned_fixture_condition_timeout")
         stage = "node_readiness"
         eventually(lambda:stats().get("health")=="OK")
+        stage = "create_owned_topic"
+        http("/topic/create?topic=owned-drain", b"")
         stage = "create_owned_subscription"
         http("/channel/create?topic=owned-drain&channel=owned-worker", b"")
         frozen = dict(node_id="owned-nsqd",container_id=container,container_started_at=state["State"]["StartedAt"],version="1.3.0",topics={"owned-drain":["owned-worker"]})
@@ -108,6 +110,7 @@ def main():
         first=capture();time.sleep(5.1);result=evaluate(first,capture())
         if result["cutover_authorized"]:raise RuntimeError("cutover_not_authorized")
         passed("empty_original_node_requires_two_real_samples")
+        stage = "backend_queue"
         http("/pub?topic=owned-drain",b"owned-drain-fixture")
         eventually(lambda:stats()["topics"][0]["channels"][0]["backend_depth"]==1)
         blocked("channel_responsibility");passed("disk_channel_depth_blocks_with_zero_topic_depth")
@@ -129,6 +132,7 @@ def main():
                 if kind==0 and data[4:]==b"_heartbeat_":connection.sendall(b"NOP\n")
                 elif kind==1:raise RuntimeError("owned_protocol_error")
             raise RuntimeError("owned_message_missing")
+        stage = "consumer_inflight_and_deferred"
         with socket.create_connection(("127.0.0.1",tcp_port),timeout=12) as connection:
             connection.sendall(b"  V2SUB owned-drain owned-worker\nRDY 1\n")
             identity=message(connection)
@@ -150,6 +154,7 @@ def main():
                 if str(error)!="activity_between_captures":raise
             else:raise RuntimeError("unseen_new_publisher_activity_not_detected")
             passed("publication_consumed_between_samples_still_blocks")
+        stage = "original_container_restart"
         inspect();command("docker","restart",container)
         eventually(lambda:stats().get("health")=="OK")
         blocked("process_restarted");passed("same_container_restart_invalidates_frozen_process")
