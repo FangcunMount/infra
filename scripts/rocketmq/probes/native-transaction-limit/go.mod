@@ -1,6 +1,6 @@
 module fangcunmount.infra/rocketmq-native-transaction-limit-probe
 
-go 1.25.12
+go 1.25.9
 
 require github.com/FangcunMount/reliable-messaging v0.5.0-rocketmq-tx.4
 
