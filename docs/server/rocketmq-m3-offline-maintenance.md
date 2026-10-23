@@ -1,0 +1,44 @@
+# M3 旧写者停写与离线维护契约（C2验证中）
+
+唯一进度见[M3总表](rocketmq-m3-execution.md)。本契约用于T25-C2/D组合验证和T29冻结实际步骤，不授权生产；源码清单不能替代T30实际进程、数据库、入口和具名执行核验。当前未勾选C2。
+
+## 先区分停写和关闭发布
+
+最终RocketMQ实例设置`publish_enabled=false`后，仍需登记本owner完整事务Topic、运行Checker和有界协议维护，不能直接关闭SDK。IAM/QS/AI均已有该装配及隔离验收。这个开关不自动冻结旧NSQ业务、HTTP根事务、外部CLI、未来调度或模型调用，不能据此声明旧写者已退出。
+
+整次切换使用原唯一协调目录及[首次启动屏障](rocketmq-m3-start-boundary.md)。只读盘点/保护先完成，真正DDL、绑定选择和旧未来计划交接均作为独立受审`pre-start-maintenance`步骤。维护失败/中断后保持封闭；独立`pre-start-repair`不是业务重试。首次新runtime命令发出后，禁止所有库旧备份覆盖，只有受审兼容前向修复。
+
+## 原责任交接顺序
+
+| 阶段/对象 | 必须保留并完成的责任 | 进入下一阶段所需证据 |
+| --- | --- | --- |
+| 窗口前QS/AI长任务 | 提前关闭新长任务；原已接受模型调用自然收敛，保留response/checkpoint/provider unknown | 原operation、租约、provider状态和业务receipt；未知模型不能重做或换ID |
+| IAM授权写者 | 冻结Role/Resource/Grant/Assignment及受管替换的REST、全部有权gRPC caller；暂停scopemigrate apply/rollback、conditionretire、operationscatalog、rolemodel、accountprovision/reviewer-scope及bootstrap/bypass工具 | 实际入口禁写、原在途授权事务结束、版本不再增加；保留登录、鉴权、读取和sessionrevocation。发布暂停不替代禁写 |
+| QS外部入口 | 封闭答卷/评分/报告/Task及AI command的新业务写，包含collection/API和直接维护入口 | 禁写与必要读取实测；原已返回202答卷仍由旧链路处理，不把MQ半消息ACK当业务202 |
+| 旧消费者/Relay | 原NSQ、旧Outbox、AI事件/ACK及receipt仍沿旧链路收敛 | 完整原订阅快照、到期Outbox、in-flight/deferred、业务回执及已接受工作逐项核对；不能先停Relay再宣称队列为空 |
+| 未来计划 | 保留原授权、due、attempt、first wire与未知责任；使用已合并QS PR433实际CLI/冻结清单交接 | 原未来调度先失去执行资格；新dispatcher尚未运行；旧Relay/Replay不再拥有已交接行。行交接不代替旧进程停止 |
+| 最后旧写者/自主任务 | 停止QS三个旧worker、旧API/collection写路径、AI worker/scanner/Relay/自主恢复、相关维护和所有自动部署/重启入口 | 精确原进程/容器退出、所属DB事务与外部调用核对、业务版本/计划不再变化。失败退出不记作成功排空；资源/并发保持原配置 |
+| 原备份与离线维护 | 对冻结保护范围生成可核对备份/恢复附件，再执行显式DDL和绑定选择 | 主库身份、schema、source/image/config/resource摘要、保护文件摘要及恢复演练；任何不符仍关闭准入 |
+| 新runtime | 先持久首个启动记录，再运行目标助手，发布关闭但Checker/消费者可验证 | 原绑定回查、消费者及所有fanout效果/receipt；合法system验收后再开准入。无system会话不能用探针代替 |
+
+原NSQ的排空工具只提供两次稳定原生快照，未来交接工具只交接冻结行；二者都不输出生产授权。原NSQ服务及数据卷的退出另按T33–T35记录，不能为制造零积压而删Channel、清空队列、ACK未知消息或删除卷。
+
+## IAM：保留登录时的保护范围
+
+IAM既有`/opt/iam/maintenance/authz-write-freeze`只负责跨普通部署保留已审核gRPC ACL，不自动改写运行ACL、冻结REST或暂停QS侧授权写。M3固定启动入口不会调用普通部署同步脚本，因此最终Compose/config必须明确包含冻结ACL及摘要，不能以该目录存在代替运行禁写实测。所有维护/bypass写者仍需独立排除。
+
+已核对的M3迁移42–45只新增七张表：`rm_tx_binding/request/execution/witness`、`iam_authz_message_protocol`、`iam_authz_operations`、`messaging_native_limit_notices`。保护候选范围因此是这七个原先不存在的对象及原真实`schema_migrations`的DDL/行。已有AuthN/login/sessionrevocation、授权事实、版本、Redis会话/JWKS等不在该旧数据恢复范围内；不是冻结全库后允许全库覆盖。
+
+IAM [PR141](https://github.com/FangcunMount/iam/pull/141)提供实际`iam-maintenance m3-messaging`：默认只读导出新0600计划；独立审核后，先显式迁至45，再重新预查并独立选择`iam.mysql`原store/epoch及`transaction/m3-1`。绑定和协议CAS共同提交，不启动业务/SDK/MQ/Redis；脏版本、主库/DDL漂移、旧双Outbox未排空、新事务责任或已有绑定拒绝。`writers-excluded`只是声明。计划/连接预算有界，提交不明不自动重试。
+
+该入口不是保护/恢复工具。T25-C2仍需组合验证原真实版本表保护、维护中断/部分DDL、批准范围恢复与AuthN范围外事实保留，不能以“新增表”推导任意DROP/恢复已获授权。生产初始版本必须T30重新读取，未证实41或已有新增对象时阻断，不能force、伪造版本行或覆盖旧证据。
+
+## QS与AI显式维护边界
+
+QS使用原`qs-migrate-offline`，维护所持MySQL/Mongo连接及双库保护/批准，不启动API/worker/SDK。105独立上线仍阻塞T30及之后，不能并入M3切换或恢复到未兼容105的旧镜像。最终资源目标由冻结候选读取，不照抄规划初始106/41；恢复沿用原双库身份、保护、未知结果和不可逆启动边界。
+
+AI的Alembic入口只构造显式MySQL engine和宿主迁移metadata；当前M3新增41事务表、42事件证据、43原生超限表，源码head为`0043_native_transaction_limit`。最终候选必须显式核对该head及迁移文件摘要，复用已验证TLS；不调用普通deploy apply的自动DDL/旧镜像fallback。旧`schema-maintenance`数据重构和历史MySQL迁云工具有各自的source/head/freeze契约，不能换个target参数就当作本轮M3授权。原模型checkpoint、Inbox/receipt和当前业务事实继续保留。
+
+## 尚未完成的组合证据
+
+本轮源码/隔离门禁不证明实际Nginx/gRPC入口、容器自动重启、全体工具、DB会话和未来计划已冻结。C2剩余：保护/恢复原库附件、原三库维护步骤组合及全部写者/保留责任复核。C3另处理原生有限回查恢复和持久notice的具名处置；缺少真实正向RPC审计仍封闭。T25-D收口工具组合，T29绑定最终镜像和30分钟演练，T30–T33才执行具名生产步骤。不会为关闭一个开发任务宣称生产已停写。
