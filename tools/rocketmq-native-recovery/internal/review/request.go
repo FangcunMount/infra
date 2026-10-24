@@ -155,6 +155,17 @@ func Load(path string, expected [32]byte, now time.Time) (r Request, err error) 
 	return r, nil
 }
 
+// LoadRecorded permits only forensic, read-only verification after a request
+// expires. Its full frozen graph still validates; it cannot authorize a new
+// SDK start, native recheck or governance write.
+func LoadRecorded(path string, expected [32]byte, now time.Time) (r Request, err error) {
+	raw, err := privatefile.Read(path, expected)
+	if err != nil || privatefile.Decode(raw, &r) != nil || r.CreatedAt.After(now.Add(time.Minute)) || r.Validate(r.CreatedAt) != nil {
+		return Request{}, ErrReview
+	}
+	return r, nil
+}
+
 func Write(path string, value any) ([32]byte, error) {
 	raw, err := json.Marshal(value)
 	if err != nil {

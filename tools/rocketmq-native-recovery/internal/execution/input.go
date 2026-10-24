@@ -29,6 +29,9 @@ type reviewed struct {
 
 func load(in Input, action string, now time.Time) (out reviewed, err error) {
 	r, err := review.Load(in.Request.Path, in.Request.SHA256, now)
+	if action == "verify" {
+		r, err = review.LoadRecorded(in.Request.Path, in.Request.SHA256, now)
+	}
 	if err != nil || r.SourceSHA != in.SourceSHA || r.BinarySHA != review.Hex(in.BinarySHA) || r.ConfigSHA != review.Hex(in.Config.SHA256) || r.ManifestSHA != review.Hex(in.Manifest.SHA256) || r.ExportSHA != review.Hex(in.Export.SHA256) {
 		return out, review.ErrReview
 	}
@@ -56,7 +59,11 @@ func load(in Input, action string, now time.Time) (out reviewed, err error) {
 	if _, err = review.SelectExport(in.Export.Path, in.Export.SHA256, s.Notice.IndexSHA256); err != nil {
 		return out, review.ErrReview
 	}
-	if review.Approve(in.Approval.Path, in.Approval.SHA256, r, in.Request.SHA256, in.Receipt.SHA256, in.Barrier.BindingSHA256, action, now) != nil {
+	reviewAt := now
+	if action == "verify" {
+		reviewAt = r.CreatedAt
+	}
+	if review.Approve(in.Approval.Path, in.Approval.SHA256, r, in.Request.SHA256, in.Receipt.SHA256, in.Barrier.BindingSHA256, action, reviewAt) != nil {
 		return out, review.ErrReview
 	}
 	issued, err := barrier.RequireIssued(in.Barrier)
@@ -67,8 +74,15 @@ func load(in Input, action string, now time.Time) (out reviewed, err error) {
 }
 
 func stillIssued(in Input, r review.Request) error {
+	if r.Validate(time.Now().UTC()) != nil {
+		return review.ErrReview
+	}
+	return issuedForRecordedRead(in, r)
+}
+
+func issuedForRecordedRead(in Input, r review.Request) error {
 	p, err := barrier.RequireIssued(in.Barrier)
-	if err != nil || !p.Matches(r.DataOwner, r.RecoveryOwner, r.SourceBundleSHA) || r.Validate(time.Now().UTC()) != nil {
+	if err != nil || !p.Matches(r.DataOwner, r.RecoveryOwner, r.SourceBundleSHA) {
 		return review.ErrReview
 	}
 	return nil

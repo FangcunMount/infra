@@ -434,3 +434,29 @@ func TestSealedReceiptRejectsReplayTruncationAndRuntimeCounterForgery(t *testing
 		})
 	}
 }
+
+func TestExpiredReviewStillAllowsOnlyRecordedVerificationWithLiveNewStep(t *testing.T) {
+	in, r, _, _ := executionFixture(t)
+	r.CreatedAt = r.CreatedAt.Add(-time.Hour)
+	r.ExpiresAt = r.ExpiresAt.Add(-time.Hour)
+	p := filepath.Join(filepath.Dir(in.Request.Path), "expired-request.json")
+	sha, err := review.Write(p, r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	in.Request = preview.File{Path: p, SHA256: sha}
+	in.Receipt.SHA256 = [32]byte{9}
+	a := review.Approval{Schema: "m3-native-recovery-approval/v1", Action: "resolve", RequestSHA: review.Hex(sha), ReceiptSHA: review.Hex(in.Receipt.SHA256), CoordinatorBindingSHA: review.Hex(in.Barrier.BindingSHA256), SourceBundleSHA: r.SourceBundleSHA, DataOwner: r.DataOwner, RecoveryOwner: r.RecoveryOwner, ExpiresAt: r.ExpiresAt}
+	ap := filepath.Join(filepath.Dir(in.Request.Path), "recorded-resolution-approval.json")
+	as, err := review.Write(ap, a)
+	if err != nil {
+		t.Fatal(err)
+	}
+	in.Approval = preview.File{Path: ap, SHA256: as}
+	if _, err := load(in, "resolve", time.Now().UTC()); err == nil {
+		t.Fatal("expired request allowed governance write")
+	}
+	if _, err := load(in, "verify", time.Now().UTC()); err != nil {
+		t.Fatal("read-only uncertain-commit verification incorrectly needs a new RPC", err)
+	}
+}

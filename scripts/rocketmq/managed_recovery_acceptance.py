@@ -27,6 +27,42 @@ def require(value,stage):
         raise RuntimeError(stage)
 
 
+def safe_failure(directory):
+    """Retain stage-only evidence before deleting private fixtures; never echo logs."""
+    result=[]
+    for path in sorted(Path(directory).rglob('*.log')):
+        if path.stat().st_size>65536:
+            continue
+        for line in path.read_text(errors='replace').splitlines():
+            if line.startswith('M3_MANAGED_NATIVE '):
+                line=line[len('M3_MANAGED_NATIVE '):]
+            elif not line.startswith('{'):
+                continue
+            try:value=json.loads(line)
+            except ValueError:continue
+            if not isinstance(value,dict) or value.get('schema') not in ('m3-native-recovery-result/v1','m3-managed-native-recheck/v1'):
+                continue
+            selected={'schema':value['schema']}
+            allowed={
+                'last_stage':{'review','single_use_claim','original_primary','native_inspection','sdk_start','native_resume','current_rpc_wait','sdk_drain','fresh_sdk_audit','owned_pool_close','receipt_seal','receipt_sealed','recorded_rpc_receipt','fresh_governance_verify','governance_commit'},
+                'failure_stage':{'request','admin_start','broker_binding','physical_record','frozen_identity','finite_window','native_recheck','admin_shutdown'},
+                'mode':{'inspect','resume'},'outcome':{'NotAttempted','Unknown','RecheckEnqueued'},
+                'native_recheck_outcome':{'NotAttempted','Unknown','RecheckEnqueued'},
+                'broker_final_outcome':{'not_attempted','unknown','commit_confirmed','rollback_confirmed'},
+                'governance_outcome':{'not_attempted','unknown','commit_confirmed','already_resolved'},
+                'failure_kind':{'IllegalArgumentException','NumberFormatException','MQBrokerException','MQClientException','RemotingException','RemotingConnectException','RemotingSendRequestException','RemotingTimeoutException','InterruptedException','UnknownHostException'},
+            }
+            for key,options in allowed.items():
+                item=value.get(key)
+                if isinstance(item,str) and item in options:
+                    selected[key]=item
+            if value.get('failure_kind') and 'failure_kind' not in selected:
+                selected['failure_kind']='unclassified_runtime_failure'
+            if selected:
+                result.append(selected)
+    return result[:16]
+
+
 def fixture_manifest(repo):
     document=json.loads((repo/'components/rocketmq/test-routes-v2.json').read_text())
     document['routes']=document['routes'][:3]
@@ -67,6 +103,7 @@ def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_po
         write_private(path,value)
         return path,hashlib.sha256(path.read_bytes()).hexdigest()
     def call(arguments,*,success=True):
+        proof['managed_last_cli']=str(arguments[0])
         result=run([str(binary),*map(str,arguments)],required=False,timeout=225)
         require((result.returncode==0)==success,'compiled_managed_cli_outcome')
         if not success:return None
@@ -118,7 +155,11 @@ def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_po
         plan=dict(schema='m3-cutover-step/v1',directory=str(op),binding_sha256=binding_sha,host=socket.gethostname(),step=name,kind=kind,
             script=str(script),script_sha256=hashlib.sha256(script.read_bytes()).hexdigest(),cwd=str(root),timeout_seconds=240)
         path=root/(name+'-plan.json');path.write_bytes(_encoded(plan));path.chmod(0o600)
-        digest=hashlib.sha256(path.read_bytes()).hexdigest();loaded,raw=load_step(path,digest);execute(loaded,raw,digest)
+        digest=hashlib.sha256(path.read_bytes()).hexdigest();loaded,raw=load_step(path,digest)
+        try:execute(loaded,raw,digest)
+        except Exception:
+            proof['managed_failure_diagnostics']=safe_failure(op)
+            raise
     row=index['records'][0];fingerprint=physical_fingerprint(index,row);key=notice_key(fingerprint)
     index_sha=hashlib.sha256(index_path.read_bytes()).hexdigest()
     sql(f"INSERT INTO messaging_native_limit_notices(notice_key,owner,store_id,writer_epoch,route_revision,native_index_sha256,evidence_sha256,status,schema_version,recorded_at) VALUES(UNHEX('{key.hex()}'),'iam.mysql','sdk-disposable','sdk-epoch-1','m3-1',UNHEX('{fingerprint.hex()}'),UNHEX('{index_sha}'),'blocked',1,UTC_TIMESTAMP(6));")

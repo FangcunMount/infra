@@ -25,6 +25,7 @@ var ErrIncomplete = errors.New("recovery incomplete; retain private attempt and 
 
 type Result struct {
 	Schema        string                      `json:"schema"`
+	Stage         string                      `json:"last_stage"`
 	ReceiptPath   string                      `json:"receipt_path,omitempty"`
 	ReceiptSHA    string                      `json:"receipt_sha256,omitempty"`
 	NativeOutcome string                      `json:"native_recheck_outcome"`
@@ -60,13 +61,14 @@ func Recover(ctx context.Context, in Input) (Result, error) {
 }
 
 func recoverWith(ctx context.Context, in Input, deps dependencies) (result Result, err error) {
-	result = Result{Schema: "m3-native-recovery-result/v1", NativeOutcome: "NotAttempted", Final: transaction.FinalUnknown, Governance: authority.GovernanceNotAttempted}
+	result = Result{Schema: "m3-native-recovery-result/v1", Stage: "review", NativeOutcome: "NotAttempted", Final: transaction.FinalUnknown, Governance: authority.GovernanceNotAttempted}
 	started := time.Now().UTC()
 	v, err := load(in, "recover", started)
 	if err != nil || v.issued.TimeoutSeconds() < 240 || v.request.ExpiresAt.Sub(started) < 4*time.Minute {
 		return result, review.ErrReview
 	}
 	r := v.request
+	result.Stage = "single_use_claim"
 	// Exclusive durable claim is consumed before any network/start operation.
 	// A crashed/unknown attempt needs explicit new review, never silent reuse.
 	claim := filepath.Join(in.Barrier.Directory, "native-recovery-claim-"+review.Hex(in.Request.SHA256)+".json")
@@ -81,6 +83,7 @@ func recoverWith(ctx context.Context, in Input, deps dependencies) (result Resul
 	if err != nil {
 		return result, ErrIncomplete
 	}
+	result.Stage = "original_primary"
 	owned, err := deps.open(ctx, v.config)
 	if err != nil {
 		return result, ErrIncomplete
@@ -108,6 +111,7 @@ func recoverWith(ctx context.Context, in Input, deps dependencies) (result Resul
 	if stillIssued(in, r) != nil {
 		return result, ErrIncomplete
 	}
+	result.Stage = "native_inspection"
 	_, inspectionSHA, err := managed.Run(ctx, r, in.Request.SHA256, "inspect", work)
 	if err != nil {
 		return result, ErrIncomplete
@@ -141,14 +145,17 @@ func recoverWith(ctx context.Context, in Input, deps dependencies) (result Resul
 	// A short-lived runtime owns its pool. Never close that pool or seal the
 	// observation while actual SDK callbacks/RPC are still running.
 	mayClose = false
+	result.Stage = "sdk_start"
 	startErr := checker.Start(ctx)
 	var nativeSHA [32]byte
 	var nativeErr error
 	if startErr == nil && stillIssued(in, r) == nil {
+		result.Stage = "native_resume"
 		nativeReport, sum, e := managed.Run(ctx, r, in.Request.SHA256, "resume", work)
 		nativeErr = e
 		nativeSHA = sum
 		if e == nil {
+			result.Stage = "current_rpc_wait"
 			result.NativeOutcome = nativeReport.Outcome
 		}
 		if e == nil {
@@ -163,6 +170,7 @@ func recoverWith(ctx context.Context, in Input, deps dependencies) (result Resul
 	} else {
 		nativeErr = ErrIncomplete
 	}
+	result.Stage = "sdk_drain"
 	drain, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	closeErr := checker.Close(drain)
 	if closeErr != nil {
@@ -177,15 +185,18 @@ func recoverWith(ctx context.Context, in Input, deps dependencies) (result Resul
 	if errors.Join(startErr, nativeErr, closeErr, observationErr, checker.VerifyDrained(), ctx.Err()) != nil {
 		return result, ErrIncomplete
 	}
+	result.Stage = "fresh_sdk_audit"
 	current, err = owned.Authority.Snapshot(ctx, locator, s.Notice.IndexSHA256)
 	if err != nil || connection.Match(r, current) != nil || current.BeforeFinal != r.Expected() || current.BeforeFinalAt == nil {
 		return result, ErrIncomplete
 	}
+	result.Stage = "owned_pool_close"
 	if owned.Close() != nil {
 		closed = true
 		return result, ErrIncomplete
 	}
 	closed = true
+	result.Stage = "receipt_seal"
 	stats, err := json.Marshal(checker.Stats())
 	if err != nil {
 		return result, ErrIncomplete
@@ -200,5 +211,6 @@ func recoverWith(ctx context.Context, in Input, deps dependencies) (result Resul
 		return result, ErrIncomplete
 	}
 	result.ReceiptPath, result.ReceiptSHA, result.Final = path, review.Hex(sum), r.Expected()
+	result.Stage = "receipt_sealed"
 	return result, nil
 }

@@ -21,6 +21,7 @@ public final class NativeHalfManaged {
         boolean attempted = false;
         int exitCode = 0;
         boolean closed = true;
+        String stage = "request";
         try {
             NativeHalfRecheck.require(args.length == 0);
             byte[] raw = System.in.readNBytes(16_385);
@@ -59,10 +60,12 @@ public final class NativeHalfManaged {
 
             // Credentials/config are supplied only by the frozen script/image,
             // never by a message or the generated request. No Docker socket.
+            stage = "admin_start";
             admin = new DefaultMQAdminExt(AclUtils.getAclRPCHook(System.getProperty("m3.native.tools", "/opt/rocketmq/conf/tools.yml")), 8_000);
             admin.setNamesrvAddr(request.getString("nameserver"));
             admin.setVipChannelEnabled(false);
             admin.start();
+            stage = "broker_binding";
             String broker = request.getString("broker");
             Properties config = admin.getBrokerConfig(broker);
             int hours = Integer.parseInt(config.getProperty("fileReservedTime"));
@@ -74,10 +77,12 @@ public final class NativeHalfManaged {
             NativeHalfRecheck.require(config.getProperty("brokerIP1") != null && !config.getProperty("brokerIP1").isBlank());
             InetAddress address = InetAddress.getByName(config.getProperty("brokerIP1"));
             String id = NativeHalfRecheck.physicalId(address.getAddress(), Integer.parseInt(config.getProperty("listenPort", "10911")), offset);
+            stage = "physical_record";
             MessageExt message = admin.getDefaultMQAdminExtImpl().getMqClientInstance().getMQClientAPIImpl().viewMessage(broker, realTopic, offset, 8_000);
             NativeHalfRecheck.require(message != null && topic.equals(message.getTopic()) && message.getCommitLogOffset() == offset
                 && message.getQueueId() == request.getLongValue("queue_id") && message.getQueueOffset() == request.getLongValue("queue_offset")
                 && realTopic.equals(message.getUserProperty(MessageConst.PROPERTY_REAL_TOPIC)));
+            stage = "frozen_identity";
             byte[] body = message.getBody();
             String reference = message.getUserProperty("rm_tx_ref");
             String unique = message.getUserProperty(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX);
@@ -90,6 +95,7 @@ public final class NativeHalfManaged {
             JSONObject ref = JSON.parseObject(reference);
             NativeHalfRecheck.require(owner.equals(ref.getString("owner")) && realTopic.equals(ref.getString("physical_topic"))
                 && "m3-1".equals(ref.getString("route_revision")) && request.getString("expected_wire_sha256").equals(ref.getString("wire_hash")));
+            stage = "finite_window";
             long window = NativeHalfRecheck.remaining(message.getBornTimestamp(), System.currentTimeMillis(), hours);
             result.put("wire_sha256", NativeHalfRecheck.hash(body));
             result.put("reference_sha256", NativeHalfRecheck.hash(encoded));
@@ -98,6 +104,7 @@ public final class NativeHalfManaged {
             result.put("remaining_seconds", window / 1000);
             result.put("body_bytes", body.length);
             if (mode.equals("resume")) {
+                stage = "native_recheck";
                 attempted = true;
                 result.put("outcome", "Unknown");
                 NativeHalfRecheck.require(admin.resumeCheckHalfMessage(realTopic, id));
@@ -105,10 +112,12 @@ public final class NativeHalfManaged {
             }
         } catch (Exception unavailable) {
             result.put("outcome", attempted ? "Unknown" : "NotAttempted");
+            result.put("failure_stage", stage);
+            result.put("failure_kind", unavailable.getClass().getSimpleName());
             exitCode = 1; // No raw exception, body, reference or credential output.
         } finally {
             try { if (admin != null) admin.shutdown(); }
-            catch (RuntimeException failure) { closed = false; exitCode = 1; }
+            catch (RuntimeException failure) { closed = false; exitCode = 1; result.put("failure_stage", "admin_shutdown"); result.put("failure_kind", failure.getClass().getSimpleName()); }
         }
         result.put("admin_shutdown_returned", closed);
         result.put("observed_at", Instant.now().toString());

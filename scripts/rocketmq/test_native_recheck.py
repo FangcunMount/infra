@@ -1,8 +1,10 @@
 """Pure request/primary-read guards; never construct real clients."""
 import importlib.util
 from pathlib import Path
+import tempfile
+import json
 import unittest
-from managed_recovery_acceptance import fixture_manifest, physical_fingerprint, notice_key
+from managed_recovery_acceptance import fixture_manifest, physical_fingerprint, notice_key, safe_failure
 from routes import validate
 
 spec = importlib.util.spec_from_file_location('native_recheck', Path(__file__).with_name('ci-native-recheck.py'))
@@ -11,6 +13,16 @@ spec.loader.exec_module(subject)
 
 
 class NativeRecheckGuards(unittest.TestCase):
+    def test_failure_summary_never_exports_raw_log_body_identity_or_credentials(self):
+        with tempfile.TemporaryDirectory() as root:
+            path=Path(root)/'owned.log'
+            path.write_text('DO_NOT_EXPORT_RAW\n'+json.dumps(dict(schema='m3-native-recovery-result/v1',last_stage='native_inspection',receipt_path='DO_NOT_EXPORT_PATH',request_sha256='1'*64))+'\nM3_MANAGED_NATIVE '+json.dumps(dict(schema='m3-managed-native-recheck/v1',failure_stage='frozen_identity',failure_kind='DO_NOT_EXPORT_CLASS_VALUE',body='DO_NOT_EXPORT_BODY',outcome='NotAttempted'))+'\n')
+            result=safe_failure(root)
+            self.assertEqual(len(result),2)
+            self.assertNotIn('DO_NOT_EXPORT',json.dumps(result))
+            self.assertIn(dict(schema='m3-native-recovery-result/v1',last_stage='native_inspection'),result)
+            self.assertIn('unclassified_runtime_failure',json.dumps(result))
+
     def test_managed_fixture_keeps_exact_m3_owner_routing(self):
         repo=Path(__file__).resolve().parents[2]
         document=fixture_manifest(repo)

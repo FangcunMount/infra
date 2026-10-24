@@ -141,6 +141,21 @@ func TestRepeatedPreviewUsesNewNonceWithoutChangingOriginalReference(t *testing.
 	}
 }
 
+func TestExpiredRequestCanOnlyBeLoadedForRecordedReadonlyVerification(t *testing.T) {
+	r, _ := fixture(t)
+	p, sha := write(t, r)
+	later := r.ExpiresAt.Add(time.Hour)
+	if _, err := Load(p, sha, later); err == nil {
+		t.Fatal("expired review authorized new recovery")
+	}
+	if got, err := LoadRecorded(p, sha, later); err != nil || got.Nonce != r.Nonce || got.Snapshot.Reference != r.Snapshot.Reference {
+		t.Fatal("lost ability to inspect an old uncertain governance commit", err)
+	}
+	if _, err := LoadRecorded(p, sha, r.CreatedAt.Add(-2*time.Minute)); err == nil {
+		t.Fatal("accepted future recorded request")
+	}
+}
+
 func TestApprovalPinsBothNamesBindingSourceAndCurrentReceipt(t *testing.T) {
 	r, _ := fixture(t)
 	requestSHA := [32]byte{1}

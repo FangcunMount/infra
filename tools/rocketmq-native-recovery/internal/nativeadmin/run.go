@@ -62,6 +62,8 @@ type Report struct {
 	BodyBytes    int64     `json:"body_bytes"`
 	Shutdown     *bool     `json:"admin_shutdown_returned"`
 	ObservedAt   time.Time `json:"observed_at"`
+	FailureStage string    `json:"failure_stage,omitempty"`
+	FailureKind  string    `json:"failure_kind,omitempty"`
 }
 
 type Runner struct {
@@ -95,6 +97,12 @@ func makeRequest(r review.Request, sha [32]byte, mode string, c connection.Confi
 func (p Report) Validate(r review.Request, sha [32]byte, mode string, started, ended time.Time) error {
 	s, err := r.Snapshot.Authority()
 	if err != nil || p.Schema != "m3-managed-native-recheck/v1" || p.Mode != mode || p.RequestSHA != review.Hex(sha) || p.Nonce != r.Nonce || p.SourceSHA != r.SourceSHA || p.IndexSHA != r.Snapshot.Index || p.BodyExported == nil || *p.BodyExported || p.Shutdown == nil || !*p.Shutdown || p.ReferenceSHA != review.Hex(review.ReferenceSHA(r)) || p.WireSHA != review.Hex(s.Reference.WireHash) || p.Retention != 48 || p.Remaining <= 120 || p.BodyBytes < 1 || p.BodyBytes > 262144 || p.ObservedAt.Before(started.Add(-time.Second)) || p.ObservedAt.After(ended.Add(time.Second)) {
+		return ErrNative
+	}
+	if p.Outcome != "Unknown" && (p.FailureStage != "" || p.FailureKind != "") {
+		return ErrNative
+	}
+	if len(p.FailureStage) > 64 || len(p.FailureKind) > 128 {
 		return ErrNative
 	}
 	u := sha256.Sum256([]byte(r.Index.BrokerMessageID))

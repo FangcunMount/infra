@@ -54,7 +54,7 @@ func OwnedDirectory(path string) bool {
 }
 
 func (r Receipt) Validate(request review.Request, requestSHA [32]byte, now time.Time) (event checkonly.Event, err error) {
-	if request.Validate(request.CreatedAt) != nil || requestSHA == [32]byte{} || r.Schema != "m3-native-recovery-receipt/v1" || r.RequestSHA != review.Hex(requestSHA) || r.SourceSHA != request.SourceSHA || r.BinarySHA != request.BinarySHA || r.Nonce != request.Nonce || r.StartedAt.Before(request.CreatedAt) || !r.StartedAt.Before(request.ExpiresAt) || r.CompletedAt.Before(r.StartedAt) || r.CompletedAt.After(now.Add(time.Minute)) || r.CompletedAt.Sub(r.StartedAt) > 4*time.Minute || !OwnedDirectory(r.ObservationDirectory) || len(r.Observations) < 1 || len(r.Observations) > 16 {
+	if request.Validate(request.CreatedAt) != nil || requestSHA == [32]byte{} || r.Schema != "m3-native-recovery-receipt/v1" || r.RequestSHA != review.Hex(requestSHA) || r.SourceSHA != request.SourceSHA || r.BinarySHA != request.BinarySHA || r.Nonce != request.Nonce || r.StartedAt.Before(request.CreatedAt) || !r.StartedAt.Before(request.ExpiresAt) || r.CompletedAt.Before(r.StartedAt) || r.CompletedAt.After(request.ExpiresAt) || r.CompletedAt.After(now.Add(time.Minute)) || r.CompletedAt.Sub(r.StartedAt) > 4*time.Minute || !OwnedDirectory(r.ObservationDirectory) || len(r.Observations) < 1 || len(r.Observations) > 16 {
 		return event, review.ErrReview
 	}
 	for _, v := range []string{r.CoordinatorBindingSHA, r.StepPlanSHA, r.InspectionSHA, r.NativeSHA} {
