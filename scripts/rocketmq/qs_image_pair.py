@@ -21,6 +21,15 @@ MONGO = 'mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9
 GO_SUM = 'h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0='
 
 
+def canonical_dump(raw):
+    # MySQL verified bug110825: a recreated column gains an explicit redundant
+    # CHARACTER SET in SHOW CREATE. Keep the original protection bytes; compare
+    # this one syntactic difference only alongside exact information_schema
+    # column metadata. Never rewrite INSERT, comments, collation or values.
+    pattern = re.compile(r'^([ \t]+`[A-Za-z0-9_]+` (?:varchar\([0-9]+\)|char\([0-9]+\)|(?:tiny|medium|long)?text|enum\([^;]*\)|set\([^;]*\))) CHARACTER SET (utf8mb[34]) (COLLATE \2_[a-z0-9_]+.*)$', re.MULTILINE)
+    return pattern.sub(lambda m: m[1] + ' ' + m[3], raw)
+
+
 def dump_difference(before, after):
     """Diagnostic shape and hashes only; never export SQL/data/comment text."""
     def line(value):
@@ -119,6 +128,9 @@ class QSPairFixture(OwnedImageFixture):
         self.sql(f'CREATE TABLE `{database}`.fixture_retained_state (id BIGINT PRIMARY KEY,body LONGBLOB NOT NULL); INSERT INTO `{database}`.fixture_retained_state VALUES(1,0x00ff03);')
         self.mongo('db.getSiblingDB(' + json.dumps(database) + ").fixture_retained_state.insertOne({_id:1,body:BinData(0,'AP8D'),attempt:7})")
         sql, original_mongo = self.snapshot(database)
+        def columns():
+            return self.sql("SELECT table_name,ordinal_position,column_name,column_type,is_nullable,IF(column_default IS NULL,'NULL',CONCAT('HEX:',HEX(column_default))),extra,character_set_name,collation_name,HEX(column_comment),generation_expression FROM information_schema.columns WHERE table_schema='" + database + "' ORDER BY table_name,ordinal_position;")
+        original_columns = columns()
         def mongo_parts():
             value = json.loads(self.mongo(mongo_snapshot_program(database)))
             return {hashlib.sha256(c['name'].encode()).hexdigest(): {
@@ -143,14 +155,21 @@ class QSPairFixture(OwnedImageFixture):
         self.mongo('db.getSiblingDB(' + json.dumps(database) + ').dropDatabase()')
         self.run(['docker', 'exec', self.mongo_name, 'mongorestore', '--quiet', '--archive=' + archive, '--gzip', '--drop', '--preserveUUID', '--nsInclude=' + database + '.*'], timeout=120)
         after_sql, after_mongo = self.snapshot(database)
+        after_columns = columns()
         after_parts = mongo_parts()
         self.report.setdefault('restore_readbacks', {})[database] = dict(
             mysql_before_sha256=hashlib.sha256(sql.encode()).hexdigest(),
             mysql_after_sha256=hashlib.sha256(after_sql.encode()).hexdigest(),
             mysql_difference=dump_difference(sql,after_sql),
+            mysql_original_protection_unmodified=True,
+            mysql_canonical_before_sha256=hashlib.sha256(canonical_dump(sql).encode()).hexdigest(),
+            mysql_canonical_after_sha256=hashlib.sha256(canonical_dump(after_sql).encode()).hexdigest(),
+            mysql_column_metadata_before_sha256=hashlib.sha256(original_columns.encode()).hexdigest(),
+            mysql_column_metadata_after_sha256=hashlib.sha256(after_columns.encode()).hexdigest(),
             mongo_before_sha256=original_mongo, mongo_after_sha256=after_mongo,
             mongo_before_parts=before_parts, mongo_after_parts=after_parts)
-        require((after_sql, after_mongo) == (sql, original_mongo), 'full_pair_restore_must_match_original_bytes_and_uuid')
+        require(canonical_dump(after_sql) == canonical_dump(sql) and original_columns == after_columns
+                and after_mongo == original_mongo, 'full_pair_restore_must_match_original_schema_data_and_uuid')
         return protection
 
 

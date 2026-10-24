@@ -2,10 +2,21 @@ import copy
 import json
 import unittest
 
-from qs_image_pair import QS_SHA, initializer_receipt, mongo_snapshot_program
+from qs_image_pair import QS_SHA, canonical_dump, initializer_receipt, mongo_snapshot_program
 
 
 class QSPairImageContractTest(unittest.TestCase):
+    def test_only_redundant_column_charset_rendering_is_canonicalized(self):
+        before="  `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'retained'\n"
+        after=before.replace('COLLATE','CHARACTER SET utf8mb4 COLLATE')
+        self.assertEqual(canonical_dump(before),canonical_dump(after))
+        for changed in (after.replace('unicode_ci','bin'),after.replace('NOT NULL','NULL'),after.replace('retained','changed')):
+            self.assertNotEqual(canonical_dump(before),canonical_dump(changed))
+        body="INSERT INTO `archive` VALUES (' CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');\n"
+        self.assertEqual(canonical_dump(body),body)
+        mismatched=after.replace('SET utf8mb4','SET utf8mb3')
+        self.assertEqual(canonical_dump(mismatched),mismatched)
+
     def test_original_initializer_receipt_requires_full_source_and_both_heads(self):
         value = dict(source_sha=QS_SHA, profile='current', mysql=110, mongo=43,
                      resources_sha256='a' * 64, original_templates_applied=True,
