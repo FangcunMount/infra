@@ -89,3 +89,12 @@ QS441合并20cd2184，当前镜像源码b75d4a52与main完整tree一致；新三
 
 
 生产落点以执行时只读核验为准。[2026-10-19 serverA记录](serverA-tencent-migration.md)与[IAM记录](iam-tencent-servera-migration.md)登记collection为2副本、IAM为1GiB/1CPU；当前隔离组合只运行1个collection角色、IAM512MiB，因此七进程报告只证明该受控规格，不能声称完整生产副本/资源一比一复刻。实际执行清单必须保留原collection副本数及各服务真实预算，并继续保留serverD的三个原worker；不把CI较小规格直接导出为生产配置。原DB版本、Redis落点及主机私有文件也不能照抄这些历史记录。
+
+
+## 完整受控C1已通过（18/18，生产配置仍待冻结）
+
+[40103917422](https://github.com/FangcunMount/infra/actions/runs/40103917422)使用原固定五镜像、独立v3启停回执、原维护CLI与唯一协调目录，18/0/0；原范围恢复/不可变交付、四owner Checker/封新写、七进程正常关闭与零运行期DDL逐项通过，[证据](evidence/rocketmq-m3-c1-actual-images-passed-20261024.json)。原生成列/字符集保护保持精确比较；不通过篡改journal、修改成功hash或忽略事实差异取得通过。
+
+当前窗口46.85秒只代表受控数据上的离线维护/启动，不代替生产副本/体量/传输、旧责任排空交接或system。最终配置/执行包仍为未冻结，实际只读核验入口已请求；旧快照只作路径参考。
+
+原Go CD脚本已支持显式普通RocketMQ provider/endpoint等选项，但本轮事务owner映射、原事务绑定与分阶段准入以完整M3 JSON及受审环境/命令为准。不能把旧NSQ/provider/Outbox或自动迁移环境变量原样叠在新JSON上；最终参数回读必须核对实际优先级、保留非MQ预算/TLS/存储设置，并分别冻结封新写与验收阶段输入。自动生产CD继续暂停，当前不直接调用旧自动DDL/fallback发布路径。
