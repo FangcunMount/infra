@@ -7577,5 +7577,30 @@
       "c2": "4/4",
       "c3": "1/3"
     }
+  },
+  "actual_iam_recovery_20261024": {
+    "source_sha": "07863d003e42714ff6fa5e76e7802660c77a3d3d",
+    "merge_sha": "2676aeaccad3098fcd2ebbb5365529651112681c",
+    "pr": 221,
+    "iam_source_sha": "bee9c5c1a9945922dc4e88631af451babee646ca",
+    "iam_merge_sha": "035f94e572290ed3e1b316db45b30d88db399a16",
+    "iam_pr": 146,
+    "checks_success": 18,
+    "report_count": 19,
+    "reported_cases": 932,
+    "failed": 0,
+    "skipped": 0,
+    "target_run": 40056778292,
+    "target_passed": 15,
+    "target_report_sha256": "33bd91c120a5429894d866e083d22da9828860a6b9d25eb1e96b53964c2d981f",
+    "scope": "Actual original IAM GORM root and stopped owner; current SDK Commit RPC, audit and scoped governance; no full API, production or system acceptance",
+    "production_operations": false
+  },
+  "fast_cutover_proposal_20261024": {
+    "status": "pending_user_scope_confirmation",
+    "document": "../rocketmq-m3-fast-cutover-proposal.md",
+    "changes_progress": false,
+    "changes_existing_gate": false,
+    "production_authorized": false
   }
 }
