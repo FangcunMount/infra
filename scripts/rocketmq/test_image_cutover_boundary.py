@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from image_cutover_boundary import COMPONENTS, SOURCES, startup_receipt
+from image_cutover_boundary import COMPONENTS, SOURCES, parse_private_hashes, startup_receipt
 
 
 def synthetic_unit_receipt():
@@ -19,6 +19,12 @@ def synthetic_unit_receipt():
 
 
 class CutoverReceiptAdmissionTest(unittest.TestCase):
+    def test_private_file_hashes_cannot_substitute_similar_paths_or_partial_output(self):
+        raw='1'*64+'  /fixture/runtime.json\n'+'2'*64+'  /fixture/routes.json\n'
+        self.assertEqual(set(parse_private_hashes(raw,('runtime.json','routes.json'))),{'/fixture/runtime.json','/fixture/routes.json'})
+        for bad in (raw.splitlines()[0],raw+raw,raw.replace('/fixture/routes.json','/fixture/routes.json.extra'),raw.replace('/fixture/runtime.json','/other/runtime.json')):
+            with self.assertRaises(RuntimeError):parse_private_hashes(bad,('runtime.json','routes.json'))
+
     def check(self,value):
         with tempfile.TemporaryDirectory(prefix='m3-receipt-unit-') as root:
             p=Path(root)/'synthetic-unit-only.json';p.write_text(json.dumps(value));p.chmod(0o600)

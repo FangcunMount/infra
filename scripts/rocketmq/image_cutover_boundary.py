@@ -23,11 +23,40 @@ from start_boundary import Boundary, BoundaryError, _encoded, initialize
 
 COMPONENTS = ('iam', 'ai', 'api', 'collection', 'worker1', 'worker2', 'worker3')
 IMAGE_TARGETS = dict(iam='iam', ai='ai', api='qs-api', collection='qs-collection', worker='qs-worker')
+RUNTIME_INPUTS = {
+    'iam': ('runtime.json', 'routes.json', 'mq-ca.crt', 'service-ca.crt', 'iam-apiserver.crt', 'iam-apiserver.key', 'iam-credentials.json'),
+    'ai': ('routes.json', 'mq-ca.crt', 'service-ca.crt', 'ai.crt', 'ai.key', 'credentials.json', 'ai-sign-private.json', 'ai-decrypt-private.json', 'qs-sign-public.json', 'qs-recipient-public.json'),
+    'api': ('runtime.json', 'routes.json', 'mq-ca.crt', 'service-ca.crt', 'qs-apiserver.crt', 'qs-apiserver.key', 'qs-credentials.json', 'mongo-credentials.json', 'qs-sign-private.json', 'qs-recipient-private.json', 'ai-sign-public.json', 'ai-decrypt-public.json'),
+    'collection': ('runtime.json', 'service-ca.crt', 'qs-collection-server.crt', 'qs-collection-server.key'),
+    'worker': ('runtime.json', 'routes.json', 'mq-ca.crt', 'service-ca.crt', 'qs-worker.crt', 'qs-worker.key', 'worker-credentials.json'),
+}
 
 
 def digest(value):
     require(isinstance(value, str) and re.fullmatch('[0-9a-f]{64}', value), 'exact_evidence_digest_required')
     return value
+
+
+def parse_private_hashes(raw, names):
+    expected = {'/fixture/' + n for n in names}; result = {}
+    for line in raw.splitlines():
+        match = re.fullmatch('([0-9a-f]{64})  (/fixture/[a-z0-9.-]+)', line)
+        require(match is not None and match[2] in expected and match[2] not in result, 'exact_private_file_hash_required')
+        result[match[2]] = match[1]
+    require(set(result) == expected, 'complete_private_input_hashes_required')
+    return result
+
+
+def private_input_hashes(fixture):
+    # The CI host cannot read private files owned by the actual image UIDs.
+    # Root helpers read only their owned mount and return hashes, never bytes.
+    prior = fixture.image, fixture.private; result = {}
+    try:
+        for component, names in RUNTIME_INPUTS.items():
+            fixture.select(component)
+            result[component] = parse_private_hashes(fixture.once('/usr/bin/sha256sum', ['/fixture/' + name for name in names], root=True, network=False), names)
+    finally: fixture.image, fixture.private = prior
+    return result
 
 
 def startup_receipt(path):
@@ -109,9 +138,11 @@ class ActualImageBoundary:
             require(selected['writer_epoch'] == selected['route_revision'] == 'm3-1'
                     and selected['store_id'] == {'iam.mysql': 'isolated-iam-primary', 'ai.mysql': 'isolated-ai-primary',
                         'qs.mysql': 'isolated-qs-mysql-primary', 'qs.mongo': 'isolated-qs-mongo-primary'}[owner], 'exact_frozen_store_binding_required')
+        self.private_inputs = private_input_hashes(fixture)
+        source_bundle = dict(reviewed_source_bundle_sha256=digest(source_bundle_sha256), runtime_files=self.private_inputs, runtime_specs=specs)
         binding = dict(schema='m3-start-boundary/v1', operation_id=fixture.project, directory=str(self.directory),
             scope_sha256=hashlib.sha256(_encoded(scope)).hexdigest(), protection_sha256=digest(protection_sha256),
-            restore_receipt_sha256=digest(restore_receipt_sha256), source_bundle_sha256=digest(source_bundle_sha256),
+            restore_receipt_sha256=digest(restore_receipt_sha256), source_bundle_sha256=hashlib.sha256(_encoded(source_bundle)).hexdigest(),
             data_owner='owned-isolated-ci', recovery_owner='owned-isolated-ci')
         self.binding_sha = hashlib.sha256(_encoded(binding)).hexdigest()
         initialize(self.directory, binding, self.binding_sha)
@@ -151,6 +182,7 @@ class ActualImageBoundary:
 
     def start(self, component):
         require(component in self.plans and component not in self.started, 'one_frozen_component_start_required')
+        require(private_input_hashes(self.f) == self.private_inputs, 'frozen_runtime_input_changed')
         original = runtime_start.command
         def observed(plan, argv, timeout=30):
             if 'up' in argv:
