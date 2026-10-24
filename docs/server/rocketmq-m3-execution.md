@@ -237,7 +237,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T24 | 指标、告警、准入保护、DLQ/超限审计与规程 | 2026-10-24；内部4/4。原生超限控制IAM三档host28/root34、QS三档21、AI六档156及FOCUS20，均零失败/跳过；源码11/28/12成功，条件发布/API同步分别N/A；工具50检查/18工作流/57报告通过，相关PR全部合并且merge tree一致。Checker范围与旧格式清理限制独立保留；生产另属T31。[超限证据](evidence/rocketmq-m3-native-limit-20261023.json)；[前序观察证据](evidence/rocketmq-m3-host-observation-20261023.json) |
 | ✅ | T25 | 一次停写切换工具、旧责任处置/调度交接、启动前恢复与启动后前向修复 | 2026-10-24；按用户批准首发范围4/4完成。固定f0f82869，6作业/6报告281项零失败/跳过，279纯契约通过；NSQ排空、三档未来交接、三库维护及首次启动边界全部核验。原高级恢复R01–R03仍未完成；最终镜像和实际生产另属T29–T33。[组合证据](evidence/rocketmq-m3-launch-cutover-20261024.json) |
 | ☐ | T26 | 预发布三库完整CI/API评审/混合链路，稳定协议冻结 | 进行中：三库main与已通过源码候选tree一致（IAM8/QS28+1条件N/A/AI12）；成对夹具旧版本绑定待同步，最终当前依赖组合验收继续 |
-| ☐ | T27 | 同SDK SHA的稳定Go/Python发布、摘要/锁/receipt | 待开始 |
+| ☐ | T27 | 同SDK SHA的稳定Go/Python发布、摘要/锁/receipt | 版本/构建候选准备中，实际发布等待T26及本候选全部门禁；SDK PR58固定1345266，未创建tag/Release，三库仍用预发布 |
 | ☐ | T28 | 三库正式稳定制品重装及完整非空零跳过门禁 | 待开始 |
 | ☐ | T29 | 最终镜像/配置摘要及恢复启动/30分钟切换演练 | 待开始 |
 | ☐ | T30 | 105前置、真实库/运行基线及具名生产清单 | 待开始；生产前置未核验 |
@@ -1873,3 +1873,12 @@ QS源码PR437的文档门禁因source_baseline仍指旧源码而失败，已以�
 固定infra `f0f8286909e490007385dacca718ae27df248195`：NSQ [40061512904](https://github.com/FangcunMount/infra/actions/runs/40061512904)7项，启动边界[40061516061](https://github.com/FangcunMount/infra/actions/runs/40061516061)27项，三库维护[40061518711](https://github.com/FangcunMount/infra/actions/runs/40061518711)43项，未来计划交接[40061521764](https://github.com/FangcunMount/infra/actions/runs/40061521764)三档MySQL各68项。6作业全部成功，下载6报告共281项零失败/跳过，所属清理逐项回读；当前279纯契约全部通过。维护组合使用明示synthetic启动sentinel，不冒称真实runtime、共同业务DB或生产备份恢复；已有C1/C2及原T24失败历史和范围限制均保留。
 
 按已批准的新首发范围，T25为4/4，正式进度**25/36**。原高级C3-b/c/R01–R03继续未完成，未验收恢复CLI不进生产首发包。T26基线复核IAM035f94e5/QS83147d8e/AI05d2db71与其8/28/12源码CI候选完整tree相同，QS条件API同步N/A不计测试skip；源码CI通过不替代当前依赖的成对真实验收。当前成对夹具仍固定tx.2/a2/a3，下一批只同步真实tx.4/a4依赖及严格receipt，不增加业务能力。SDK稳定发布、生产、system与48小时均未执行。
+
+
+### 2026-10-24：T26 当前版本成对候选与稳定版元数据候选
+
+T25关闭记录[PR232](https://github.com/FangcunMount/infra/pull/232)已合并5b53f54d。T26提交infra [PR233](https://github.com/FangcunMount/infra/pull/233) `8e1a5f0e43c7dacd5018df3897e1b56cd203ce59`及AI [PR222](https://github.com/FangcunMount/qs-ai/pull/222)：成对profile固定实际Go tx.4模块Sum/GoModSum、Python a4正式wheel摘要，receipt拒绝旧Go版本；AI夹具从冻结配置核验并报告实际模块版本。280工具纯测试、AI4项目标及ruff/format通过；六档真实原根/默认消费者/进程与Broker故障及关联工具完整CI继续。原AI b0cb329的40062178263在源码文档hash检查失败，8分片未开始测试，coverage汇总也失败；仅文档修复01c38784更新两hash后，本地75文档/1392链接检查通过，完整源码CI重跑。当前原生候选仍固定b0cb329，后续源码head只差两文档，实际证据分别绑定，不冒称完整tree相同。
+
+SDK [PR58](https://github.com/FangcunMount/reliable-messaging/pull/58)固定 `1345266aa0e864c46de5d1e3e3c939dd8002a890`仅准备Go v0.5.0/Python0.4.0稳定候选：6个版本/锁/构建断言/文档文件变化，所有锁定依赖记录不变。原构建export掩盖git失败的SC2155经actionlint发现并改为先赋值后export；不改变来源或协议实现。源码/包CI及[三档存储40062504946](https://github.com/FangcunMount/reliable-messaging/actions/runs/40062504946)运行；源码候选[实际公开SDK40062507903](https://github.com/FangcunMount/infra/actions/runs/40062507903)及[完整故障/有限窗口40062511606](https://github.com/FangcunMount/infra/actions/runs/40062511606)已启动。它们不是已发布制品验收；正式发布必须等待T26及候选全部门禁。
+
+M3保持**25/36**，T26进行中、T27只有未发布候选，稳定tag/Release/宿主依赖/最终镜像及生产均未切换。三个仓库生产CD保护已回读：IAM/QS暂停true，AI自动部署false。T29仍须最终包排除未验收恢复工具，T30须105实际前置及具名批准，system和48小时观察未执行。
