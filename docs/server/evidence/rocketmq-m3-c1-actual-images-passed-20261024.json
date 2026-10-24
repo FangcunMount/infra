@@ -1,0 +1,628 @@
+{
+  "schema": "m3-c1-actual-images-passed/v1",
+  "run_id": 40103917422,
+  "report_sha256": "146d349681e04b1327663bce85913b41a688aad1afa538152a94aca9cb1179fe",
+  "report": {
+    "schema": "m3-five-actual-image-cutover/v1",
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0,
+    "production": false,
+    "system_acceptance": false,
+    "combined_cutover_rehearsal_complete": true,
+    "c1_cutover_barrier_exercised": true,
+    "cases": {
+      "actual_source_registry_consumers_match_manifest": true,
+      "all_five_exact_archives_loaded": true,
+      "original_pre_m3_qs_pair_prepared": true,
+      "actual_full_scope_restore_before_window": true,
+      "original_iam_schema45_and_binding_selected": true,
+      "original_qs_dual_binding_verified": true,
+      "original_ai_schema43_and_binding_verified": true,
+      "original_offline_upgrades_inside_single_c1": true,
+      "actual_iam_ready_and_paused_checker_live": true,
+      "actual_readonly_ai_ready_and_paused_checker_live": true,
+      "actual_qs_api_with_iam_ai_and_both_paused_owners": true,
+      "actual_collection_with_required_iam_and_api": true,
+      "actual_worker1_prepared_http_healthy_original_concurrency48": true,
+      "actual_worker2_prepared_http_healthy_original_concurrency48": true,
+      "actual_worker3_prepared_http_healthy_original_concurrency48": true,
+      "actual_seven_process_c1_and_thirty_minute_window": true,
+      "all_seven_actual_processes_shutdown_exit_zero": true,
+      "actual_all_runtime_start_shutdown_no_ddl_attempts": true
+    },
+    "sources": {
+      "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "qs": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+    },
+    "scope": "owned old-schema full restore training, original offline upgrades and actual seven-process C1/30-minute start; no production/system/business claim",
+    "infra_sha": "a28b380bf8a1d44246b27a38bdcce8369fd28c93",
+    "original_qs_consumer_count": 1,
+    "original_qs_consumer_contract": {
+      "consumers": [
+        {
+          "id": "modelcatalog.hot_rank_projection",
+          "runtime": "apiserver",
+          "event_type": "answersheet.submitted",
+          "topic": "qs.evaluation.lifecycle",
+          "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+          "delivery": "durable_outbox",
+          "outbox_profile": "mongo_domain_events"
+        }
+      ],
+      "schema": "qs-original-consumer-contract/v1",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "original_qs_consumer_contract_sha256": "f65853c2aee20108a26d53c7e65d4234a5d66235df4440355a48e1d90f883a4a",
+    "candidates": {
+      "iam": {
+        "target": "iam",
+        "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+      },
+      "qs-api": {
+        "target": "qs-api",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:c1c1093a411dba90bb47ad7dabe8dc50b21a0fed633efef4cb94eeae909886c4",
+        "archive_sha256": "3c2aefb67ea9f50b7acea8d232a05d7ba0296173e75ecf2ebeb3b52bf2dab71b"
+      },
+      "qs-collection": {
+        "target": "qs-collection",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:07e13f2fcd1bd59cdc14a81e0334c73a8b5b7939d235b056254378f939af37ce",
+        "archive_sha256": "a3140df0c4ba98fbefd82f6da06ef4f4cb4867e0eb63fd37cfa91b9ca6cc77cb"
+      },
+      "qs-worker": {
+        "target": "qs-worker",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:98b5b635aa72cae96899a5289dea4aa038bcd25ba1eeebe9f944682f4e3a0d98",
+        "archive_sha256": "907abca7e5b2b410ab4383bead344d2c08d01fac9e0e7ba54fbf00b4eee21b25"
+      },
+      "ai": {
+        "target": "ai",
+        "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+      }
+    },
+    "dependency_image_ids": {
+      "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "rocketmq": "sha256:481d6ad0a8e19793cafbd5a543cc39a04c93feb98cf2573f89b1bee467bd7dc0",
+      "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+    },
+    "resources": {
+      "version": 2,
+      "operations": 53,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true
+    },
+    "qs_schema": {
+      "journal_force_used": false,
+      "mongo": 40,
+      "mysql": 105,
+      "original_templates_applied": true,
+      "production": false,
+      "profile": "pre_m3",
+      "resources_sha256": "c37b639804391172b2209f11c7056b4867309a31054af3c5d3f740cd6145b86d",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "iam_controlled_seed": {
+      "controlled_seed": true,
+      "legacy_drain_claimed": false,
+      "publication_intents_created": false,
+      "schema_version": 41,
+      "seed_events_retained": 2,
+      "witnesses_created": false
+    },
+    "configuration_sha256": {
+      "iam": "ce8eb70f34ea02af441b101887a2083f0792f089be33aeb4949aac21621f2d9d",
+      "api": "cc8c94c134d1a5ee0d1482e9181e038af477b1a98e28eac33fa64db0ab633a5b",
+      "collection": "27b9a8a41d0acfcc3c1a4975720cd4067ddeb814dc95c6bd64f2251e5c59ed93",
+      "worker": "e5a0cfa922e007c622ee297ec08a7587f5eb4db35dac6d45a0d444bb5a603288"
+    },
+    "mysql_client_default_charsets": [
+      "latin1",
+      "latin1",
+      "latin1"
+    ],
+    "mysql_restore_session_charsets": [
+      "utf8mb4",
+      "utf8mb4",
+      "utf8mb4"
+    ],
+    "full_scope_restore": {
+      "schema": "m3-owned-full-image-restore/v1",
+      "protection_manifest_sha256": "116bf72ea43889c99ca072a7b65da20fce1aab22e88afd070aadf7d245dc1be4",
+      "snapshots_before": {
+        "iam": {
+          "canonical_dump_sha256": "5a23f185f8373877d98038a2528b0ca1b487f0dbea5b3450d7dcc3ffcd740739",
+          "columns_sha256": "23e1cb268c83697a50ede67570075627fb21a58b1eb233eb48d54c59c1ffb1c2",
+          "database_definition_sha256": "c33b49900733341cf7625440319c36525a5356cfa80fe20cd5309d6f717e21ad"
+        },
+        "qs": {
+          "canonical_dump_sha256": "cb88fde945ac0964c22fd25386cf72acdcbe50f5d825a98476b6e0d7e4c970c3",
+          "columns_sha256": "6c6356b024476f854092f6f3663c47595b112295952de5ee20d2b7276faae3fc",
+          "database_definition_sha256": "b7b56b23f8bf16f4045c4bc28c20902737036991f777dada6d95f534395fdd8e"
+        },
+        "ai": {
+          "canonical_dump_sha256": "7950c08816efc056326072a89f7ee136c7566ad120dc2bcd9bdcb1305088c7ed",
+          "columns_sha256": "4b8485652abbe4ec2bbea7f527127dffbcb532e77efd81b0a0adcc68a98c5405",
+          "database_definition_sha256": "90a30c98356d56856793c3ecfa58f54af51cd5bc603f9c18997448ccfb82d563"
+        },
+        "mongo": {
+          "snapshot_sha256": "d5adb550a96017776062993401b88c3dcaf89b38ba5b43e5f4485e0d64275f77",
+          "collections": 14
+        }
+      },
+      "snapshots_after": {
+        "iam": {
+          "canonical_dump_sha256": "5a23f185f8373877d98038a2528b0ca1b487f0dbea5b3450d7dcc3ffcd740739",
+          "columns_sha256": "23e1cb268c83697a50ede67570075627fb21a58b1eb233eb48d54c59c1ffb1c2",
+          "database_definition_sha256": "c33b49900733341cf7625440319c36525a5356cfa80fe20cd5309d6f717e21ad"
+        },
+        "qs": {
+          "canonical_dump_sha256": "cb88fde945ac0964c22fd25386cf72acdcbe50f5d825a98476b6e0d7e4c970c3",
+          "columns_sha256": "6c6356b024476f854092f6f3663c47595b112295952de5ee20d2b7276faae3fc",
+          "database_definition_sha256": "b7b56b23f8bf16f4045c4bc28c20902737036991f777dada6d95f534395fdd8e"
+        },
+        "ai": {
+          "canonical_dump_sha256": "7950c08816efc056326072a89f7ee136c7566ad120dc2bcd9bdcb1305088c7ed",
+          "columns_sha256": "4b8485652abbe4ec2bbea7f527127dffbcb532e77efd81b0a0adcc68a98c5405",
+          "database_definition_sha256": "90a30c98356d56856793c3ecfa58f54af51cd5bc603f9c18997448ccfb82d563"
+        },
+        "mongo": {
+          "snapshot_sha256": "d5adb550a96017776062993401b88c3dcaf89b38ba5b43e5f4485e0d64275f77",
+          "collections": 14
+        }
+      },
+      "restore_duration_seconds": 5,
+      "original_protection_bytes_unmodified": true,
+      "mongo_uuid_preserved": true,
+      "runtime_started": false,
+      "original_ai_expressions_restored": true,
+      "original_expression_restore_sha256": "11a1341ce1b084c10d85e739b1cf54df947f0beeba7caae886e47346acda0a3d",
+      "production": false,
+      "production_backup_retention_verified": false,
+      "scope": "pre-window controlled restore training; not a production restore or business acceptance"
+    },
+    "owned_registry": {
+      "image_id": "sha256:26b2eb03618e749084668eaff68cff8f81dda12d06ac641be7a6398b82a6f25b",
+      "references": {
+        "iam": {
+          "reference": "127.0.0.1:50709/m3/iam@sha256:a5b1c1f3e8cd6e71f52d150919baba530638b0fc96e623a5a72980217d40c04c",
+          "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99"
+        },
+        "ai": {
+          "reference": "127.0.0.1:50709/m3/ai@sha256:3f36ba7c5f427225cf2fbb971b16f4f8476a9d8426db24cc9588fdaa4b62c8ff",
+          "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849"
+        },
+        "api": {
+          "reference": "127.0.0.1:50709/m3/api@sha256:512f19617c0a759a75bf652b66ab6218b81820605a85a2805471c8b199b4b183",
+          "image_config_id": "sha256:c1c1093a411dba90bb47ad7dabe8dc50b21a0fed633efef4cb94eeae909886c4"
+        },
+        "collection": {
+          "reference": "127.0.0.1:50709/m3/collection@sha256:909702b307624d461de2ffd23d79a83f0a6b23c397f6a817b09f438f582abbfd",
+          "image_config_id": "sha256:07e13f2fcd1bd59cdc14a81e0334c73a8b5b7939d235b056254378f939af37ce"
+        },
+        "worker": {
+          "reference": "127.0.0.1:50709/m3/worker@sha256:ec43d163d4eb1b8323b49386dc4da1d4bd48ec171fa79c1b9a6acf3b83695433",
+          "image_config_id": "sha256:98b5b635aa72cae96899a5289dea4aa038bcd25ba1eeebe9f944682f4e3a0d98"
+        }
+      },
+      "production_published": false,
+      "scope": "loopback-only owned CI registry, not a production handoff"
+    },
+    "startup_receipt_sha256": "1e9b8547f41e880e2aa9675aba1a8b523b53a864c638c39069b4e225a8199554",
+    "source_bundle_sha256": "61acd9b19e7e82a7af3731a0732728f9fdeced86b459fb1f8994a3bc8dc99641",
+    "production_backup_retention_verified": false,
+    "ci_approval_only": true,
+    "offline_pair": {
+      "initial": {
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "migration_resources_sha256": "42eaf899667ee3347abcf4e6767fb68ac45f2b597b586344e6a0f87cc498020b",
+        "mysql_database": "qs_m3_image_start_5f3a77e897b6",
+        "mongo_database": "qs_m3_image_start_5f3a77e897b6",
+        "mysql_identity_sha256": "0031f7833b168d06d4c0b83110ef40d073b2bc59aa2e0b8f651f747834bf60fc",
+        "mongo_cluster_sha256": "9730416db650e33e96633d2ae24d9688b9146edf751973e65582280c0adf30ec",
+        "mysql_version": 105,
+        "mongo_version": 40,
+        "target_mysql_version": 110,
+        "target_mongo_version": 44
+      },
+      "stage": "complete",
+      "operation_id": "40103917422-1",
+      "authorization_consumed": true,
+      "mysql_changed": true,
+      "mongo_changed": true,
+      "migration_outcome_unknown": false,
+      "verified": true
+    },
+    "runtime_environment_sha256": {
+      "iam": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ai": "78258b04060492daefd5a70bca7aa27d9210effdab75cf4143016b02f937ebff",
+      "api": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collection": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "worker1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "worker2": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "worker3": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "actual_up_after_marker": [
+      "iam",
+      "ai",
+      "api",
+      "collection",
+      "worker1",
+      "worker2",
+      "worker3"
+    ],
+    "actual_runtime_budgets": {
+      "iam": {
+        "memory_bytes": 536870912,
+        "nano_cpus": 1000000000
+      },
+      "ai": {
+        "memory_bytes": 805306368,
+        "nano_cpus": 750000000
+      },
+      "api": {
+        "memory_bytes": 1073741824,
+        "nano_cpus": 2000000000
+      },
+      "collection": {
+        "memory_bytes": 335544320,
+        "nano_cpus": 1000000000
+      },
+      "worker1": {
+        "memory_bytes": 805306368,
+        "nano_cpus": 1000000000
+      },
+      "worker2": {
+        "memory_bytes": 805306368,
+        "nano_cpus": 1000000000
+      },
+      "worker3": {
+        "memory_bytes": 805306368,
+        "nano_cpus": 1000000000
+      }
+    },
+    "iam_metrics": {
+      "sdk_ready": 1,
+      "sampler_running": 1,
+      "observation_available": 1,
+      "admission_open": 0,
+      "check_workers_limit": 4,
+      "check_queue_limit": 32
+    },
+    "ai_metrics": {
+      "sdk_ready": 1,
+      "sampler_running": 1,
+      "observation_available": 1,
+      "admission_open": 0,
+      "check_workers_limit": 1,
+      "check_queue_limit": 16
+    },
+    "qs_metrics": {
+      "qs.mysql": {
+        "sdk_ready": 1,
+        "sampler_running": 1,
+        "observation_available": 1,
+        "admission_open": 0,
+        "check_workers_limit": 2,
+        "check_queue_limit": 16
+      },
+      "qs.mongo": {
+        "sdk_ready": 1,
+        "sampler_running": 1,
+        "observation_available": 1,
+        "admission_open": 0,
+        "check_workers_limit": 2,
+        "check_queue_limit": 16
+      }
+    },
+    "workers_prepared": {
+      "worker1": true,
+      "worker2": true,
+      "worker3": true
+    },
+    "actual_cutover": {
+      "coordinator_binding_sha256": "8b6cd1a855253af5ab0046ae4e4ffaf4187ee9f27bba83e55fbfbb49da07a110",
+      "actual_processes": 7,
+      "poststart_refused": [
+        "old-full-backup",
+        "poststart-offline"
+      ],
+      "elapsed_seconds": 46.84583276000001,
+      "phase": "runtime_start_returned",
+      "production_authorized": false
+    },
+    "processes": {
+      "worker3": {
+        "private_log_sha256": "2676de0198a511dedff3b109d7ac898548346400f34476bc0907454de0391be0",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      },
+      "worker2": {
+        "private_log_sha256": "85d71d2043c9f0789992afe37f483b85f16a8fe6246e0677d7f5d824b656d11b",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      },
+      "worker1": {
+        "private_log_sha256": "f82120052b6414383c24a913a1e8d34dc62525cd0f6719d85a1420fda6a36471",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      },
+      "collection": {
+        "private_log_sha256": "ea381a55ec3230df0c415e9fe47d66cbdca9cfa21d85fe63d16a40d294ea624f",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": true,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": false,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": false,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      },
+      "api": {
+        "private_log_sha256": "203eee8f50b78dd305a32c4522a1c27d3f8a2da43b7b8bfbe16037d46e8da951",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": true,
+          "permission_denied": true,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      },
+      "ai": {
+        "private_log_sha256": "d95d6a00d9b6bb921b329990068b5004159f581291d47099101de09c1404865b",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": false,
+          "invalid_configuration": false,
+          "panic": false
+        }
+      },
+      "iam": {
+        "private_log_sha256": "f1ab4798f56e5cf58d3618068115a5478a9caab065c513e49266080c6d01fead",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": false,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    "shutdown_failed_components": [],
+    "mysql_runtime_ddl_attempts": 0,
+    "mongo_ddl_audit": {
+      "attempts": 0,
+      "commands": [],
+      "positive_controls": 4,
+      "profile_capacity_bytes": 67108864,
+      "command_bodies_exported": false
+    },
+    "mongo_runtime_ddl_attempts": 0,
+    "coordinator_status": {
+      "phase": "runtime_start_returned",
+      "old_data_restore_eligible": false,
+      "first_start_recorded": true,
+      "first_start_sha256": "f9bb0d9f971defa0694e3357c9fa568b615bba94005bbc4d2ebde9e2d2352650"
+    },
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    },
+    "sources_unchanged": true
+  },
+  "source_pr": 253,
+  "source_pr_head": "676fabed144775ffb16dc1a3488d4d7d38eb8310",
+  "native_source_sha": "a28b380bf8a1d44246b27a38bdcce8369fd28c93",
+  "pr_head_difference_docs_only": [
+    "docs/server/evidence/rocketmq-m3-ai-expression-restore-followup-20261024.json",
+    "docs/server/evidence/rocketmq-m3-c1-first-restore-failure-20261024.json",
+    "docs/server/evidence/rocketmq-m3-cf3-candidate-ci-20261024.json",
+    "docs/server/evidence/rocketmq-m3-full-restore-charset-followup-20261024.json",
+    "docs/server/evidence/rocketmq-m3-full-restore-difference-20261024.json",
+    "docs/server/evidence/rocketmq-m3-full-scope-restore-passed-20261024.json",
+    "docs/server/evidence/rocketmq-m3-prepared-worker-restarts-20261024.json",
+    "docs/server/rocketmq-m3-execution.md",
+    "docs/server/rocketmq-m3-final-candidate.md"
+  ],
+  "original_go_approval_contract": {
+    "job_id": 120901540108,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "Synthetic Python producer through original Go reader; no database authority"
+  },
+  "scope": "Controlled nonempty full protection/restore, original offline IAM45/QS110-44/AI43, one real seven-process coordinator and immutable image handoff, normal shutdown and zero runtime DDL. Excludes production data volume/transport/replica budget, old NSQ/future-plan component scope, legal system and48h.",
+  "production": false,
+  "system_acceptance": false,
+  "production_30minute_sla_verified": false,
+  "final_production_configuration_frozen": false
+}
