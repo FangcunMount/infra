@@ -10,6 +10,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import shutil
 import time
@@ -76,6 +77,20 @@ def protocol_metrics(raw):
         expected = f'reliable_messaging_transaction_{key}{{owner="iam.mysql"}} {value}'
         require(expected in raw.splitlines(), 'actual_paused_owner_metrics_required:' + key)
     return required
+
+
+def fixture_diagnostic(raw):
+    prefix='IAM_IMAGE_FIXTURE_FAILURE '
+    rows=[json.loads(line[len(prefix):]) for line in raw.splitlines() if line.startswith(prefix)]
+    require(len(rows)==1,'one_private_fixture_failure_kind_required')
+    value=rows[0]
+    require(set(value)=={'phase','kind','server_code'}
+            and value['phase'] in {'guard','open_pool','check_empty','gorm','catalog','bootstrap_stager',
+                'migrate_31','migrate_33','migrate_35','migrate_41','bootstrap_31','bootstrap_33','bootstrap_35','bootstrap_41'}
+            and isinstance(value['kind'],str) and re.fullmatch(r'[A-Za-z0-9*._]{1,96}',value['kind'])
+            and type(value['server_code']) is int and 0<=value['server_code']<=65535,
+            'bounded_fixture_failure_metadata_required')
+    return value
 
 
 def main():
@@ -162,9 +177,14 @@ def main():
         prepared=source/'scripts/testing/m3_image_start_fixture'; prepared.mkdir()
         shutil.copyfile(repo/'scripts/rocketmq/image_fixtures/iam_init.go',prepared/'main.go')
         fixture_binary=directory/'prepare-iam'
+        stage='fixture_compilation'
         run(['go','build','-o',str(fixture_binary),'./scripts/testing/m3_image_start_fixture'],cwd=source,timeout=300)
         env=dict(os.environ,IAM_IMAGE_FIXTURE_DSN=f'root:{password}@tcp(127.0.0.1:{mysql_port})/{database}?parseTime=true&multiStatements=true')
-        run([str(fixture_binary)],cwd=source,env=env,timeout=180)
+        stage='original_schema41_execution'
+        result=run([str(fixture_binary)],cwd=source,env=env,timeout=180,required=False)
+        if result.returncode:
+            report['fixture_failure']=fixture_diagnostic(result.stdout)
+            raise RuntimeError('original_fixture_preparation_failed')
         case('original_full_schema41_and_bootstrap')
         run(['openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1','-subj','/CN=iam-apiserver','-addext','subjectAltName=DNS:iam-apiserver,IP:127.0.0.1',
              '-keyout',str(fixture/'server.key'),'-out',str(fixture/'server.crt')])

@@ -5,6 +5,8 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -20,6 +22,8 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
+
+var preparationStage = "guard"
 
 func prepare() error {
 	if os.Getenv("GITHUB_ACTIONS") != "true" || os.Getenv("RUNNER_ENVIRONMENT") != "github-hosted" {
@@ -40,37 +44,47 @@ func prepare() error {
 		}
 		return sql.OpenDB(c), nil
 	}
+	preparationStage = "open_pool"
 	pool, err := open()
 	if err != nil {
 		return err
 	}
 	defer pool.Close()
 	var tables int
+	preparationStage = "check_empty"
 	if err = pool.QueryRow("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE()").Scan(&tables); err != nil || tables != 0 {
 		return fmt.Errorf("empty fixture schema required")
 	}
+	preparationStage = "gorm"
 	db, err := gorm.Open(gormmysql.New(gormmysql.Config{Conn: pool}), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
 		return err
 	}
+	preparationStage = "catalog"
 	catalog, err := eventcatalog.Load("configs/events.yaml")
 	if err != nil {
 		return err
 	}
+	preparationStage = "bootstrap_stager"
 	stager, err := eventoutbox.NewBootstrapStager(eventcatalog.NewCatalog(catalog))
 	if err != nil {
 		return err
 	}
 	ctx := context.Background()
 	for _, target := range []uint{31, 33, 35, 41} {
+		preparationStage = fmt.Sprintf("migrate_%d", target)
 		migrationPool, err := open()
 		if err != nil {
 			return err
 		}
 		version, _, err := migration.NewMigrator(migrationPool, &migration.Config{Enabled: true, Database: cfg.DBName}).RunTo(target)
-		if err != nil || version != target {
-			return fmt.Errorf("original fixture migration failed at %d", target)
+		if err != nil {
+			return err
 		}
+		if version != target {
+			return fmt.Errorf("original fixture migration version differs")
+		}
+		preparationStage = fmt.Sprintf("bootstrap_%d", target)
 		switch target {
 		case 31:
 			err = rolemodel.PrepareBootstrapTenant(ctx, db)
@@ -88,7 +102,14 @@ func prepare() error {
 
 func main() {
 	if err := prepare(); err != nil {
-		fmt.Fprintln(os.Stderr, "isolated IAM fixture preparation failed")
+		// Never print migration SQL, DSNs or original error messages.
+		var server *mysql.MySQLError
+		code := uint16(0)
+		if errors.As(err, &server) {
+			code = server.Number
+		}
+		raw, _ := json.Marshal(map[string]any{"phase": preparationStage, "kind": fmt.Sprintf("%T", err), "server_code": code})
+		fmt.Println("IAM_IMAGE_FIXTURE_FAILURE " + string(raw))
 		os.Exit(1)
 	}
 	fmt.Println("original schema41 fixture prepared; bootstrap messages still require real NSQ drain")

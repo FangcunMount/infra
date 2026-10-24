@@ -2,10 +2,15 @@ import copy
 import unittest
 
 from final_image_candidate import GO_SUM
-from iam_image_start import IAM_SHA, configuration, inventory, protocol_metrics
+from iam_image_start import IAM_SHA, configuration, inventory, protocol_metrics, fixture_diagnostic
 
 
 class ImageStartContractTest(unittest.TestCase):
+    def test_diagnostics_cannot_export_sql_or_credentials(self):
+        raw='IAM_IMAGE_FIXTURE_FAILURE {"phase":"migrate_31","kind":"*mysql.MySQLError","server_code":1146}'
+        self.assertEqual(fixture_diagnostic(raw)['server_code'],1146)
+        for bad in (raw+ '\n'+raw,raw.replace('migrate_31','private body'),raw[:-1]+',"sql":"private"}'):
+            with self.assertRaises(RuntimeError):fixture_diagnostic(bad)
     def test_old_source_wrong_sdk_and_unverified_cleanup_are_rejected(self):
         valid = dict(target='iam',source_sha=IAM_SHA,passed=1,failed=0,skipped=0,
                      deferred_tools_absent=True,verified_uid_gid=[2000,2000],
