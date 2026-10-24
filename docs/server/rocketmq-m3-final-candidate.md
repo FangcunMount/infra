@@ -164,3 +164,6 @@ tailscale login --login-server=https://controlplane.tailscale.com --hostname=ser
 此次恢复清单仅涵盖主机重新认证和回读。Broker启动、管理员凭据更换、v2 Topic/ACL、数据库迁移及M3业务切换仍按各自具名清单处理；该步骤成功不等于T29/T30完成。
 
 2026-10-25执行结果：用户网页认证后，serverD实际Running/Online且原IP、全部非身份prefs保持；原业务容器/锁不变，Mac mini三个worker发现/抓取全部恢复。仅执行了获准的主机重新认证，Broker仍停止，凭据更换及M3资源/业务切换未执行。用户随后追加B/C同样恢复，逐机发起认证并等待实际地址/设置/容器回读，不扩大本次M3批准范围。
+
+
+2026-10-25 B/C后续完成：用户分别完成网页认证，新回读两台Running/Online且health为空，B100.91.31.24/C100.70.252.103保持。全部非身份prefs、B9/C1容器的ID/镜像/启动时间/状态/重启计数及原锁均一致，实际原私网SSH经Mac mini连通。网络重新认证已完成，[回执](evidence/rocketmq-m3-serverd-tailnet-recovery-20261025.json)保留分阶段结果；M3仍28/36，不代签MQ/DDL/业务切换。
