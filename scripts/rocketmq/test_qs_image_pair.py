@@ -2,10 +2,19 @@ import copy
 import json
 import unittest
 
-from qs_image_pair import QS_SHA, canonical_dump, initializer_receipt, mongo_snapshot_program
+from qs_image_pair import QS_SHA, canonical_dump, initializer_receipt, mongo_snapshot_program, verify_current_pair
 
 
 class QSPairImageContractTest(unittest.TestCase):
+    def test_actual_offline_readback_requires_current_pair_and_exact_resources(self):
+        receipt={'resources_sha256':'a'*64}
+        snapshot=dict(read_only=True,snapshot=dict(source_sha=QS_SHA,migration_resources_sha256='a'*64,mysql_version=110,mongo_version=44))
+        verify_current_pair(snapshot,receipt)
+        for key,value in (('source_sha','b'*40),('migration_resources_sha256','c'*64),('mysql_version',109),('mongo_version',43)):
+            bad=copy.deepcopy(snapshot);bad['snapshot'][key]=value
+            with self.subTest(key=key),self.assertRaises(RuntimeError):verify_current_pair(bad,receipt)
+        with self.assertRaises(RuntimeError):verify_current_pair(dict(snapshot,read_only=False),receipt)
+
     def test_only_redundant_column_charset_rendering_is_canonicalized(self):
         before="  `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'retained'\n"
         after=before.replace('COLLATE','CHARACTER SET utf8mb4 COLLATE')

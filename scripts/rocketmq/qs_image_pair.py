@@ -61,6 +61,14 @@ def initializer_receipt(raw, profile):
     return value
 
 
+def verify_current_pair(snapshot, receipt):
+    observed = snapshot['snapshot']
+    require(snapshot['read_only'] is True and observed['source_sha'] == QS_SHA
+            and observed['migration_resources_sha256'] == receipt['resources_sha256']
+            and (observed['mysql_version'], observed['mongo_version']) == QS_HEAD,
+            'original_pair_readback_required')
+
+
 def mongo_snapshot_program(database):
     require(re.fullmatch(r'qs_m3_image_[a-z0-9_]{1,36}', database), 'owned_database_required')
     # Sort object keys as well as collection/index/document order. UUIDs are
@@ -219,10 +227,7 @@ def main():
                            QS_OFFLINE_MONGO_URI='mongodb://mongo:27017/?replicaSet=image-proof')
                 common = ['--mysql-database', database, '--mongo-database', database, '--timeout', '30s']
                 snapshot = json.loads(fixture.once('/fixture/qs-migrate-offline', common, environment=env))
-                observed = snapshot['snapshot']
-                require(snapshot['read_only'] and observed['source_sha'] == QS_SHA
-                        and observed['migration_resources_sha256'] == receipt['resources_sha256']
-                        and (observed['mysql_version'], observed['mongo_version']) == (110, 43), 'original_pair_readback_required')
+                verify_current_pair(snapshot, receipt)
                 for owner in ('qs.mysql', 'qs.mongo'):
                     plan = '/fixture/' + owner + '-binding.json'
                     fixture.once('/fixture/qs-migrate-offline', common + ['--binding-action', 'preview', '--binding-plan', plan,
