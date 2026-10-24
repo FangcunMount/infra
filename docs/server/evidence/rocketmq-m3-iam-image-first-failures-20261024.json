@@ -1,0 +1,368 @@
+{
+  "schema": "m3-iam-image-component-development-failures/v1",
+  "scope": "isolated IAM image component; all failures retained; not production",
+  "attempts": [
+    {
+      "run_id": 40074810737,
+      "report_sha256": "ca0521471a44f7ca33db2b441efff379a5e5907b67fcba13e0b48f928c08b66c",
+      "report": {
+        "schema": "m3-iam-actual-image-start/v1",
+        "infra_sha": "5a9662e99b675dd7c4a63e24a097b9e8b1652260",
+        "iam_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "cases": {
+          "exact_repaired_stable_archive_loaded": true
+        },
+        "cleanup": {
+          "application_absent": true,
+          "compose_down_succeeded": true,
+          "private_fixture_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "host_source_unchanged": true
+        },
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "candidate": {
+          "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+          "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746",
+          "runtime_binary_sha256": "0e611a043ca7ab2349ba3be797972d311c7a2463ff8fb83aa06235e9021827e6"
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65",
+          "nsq": "sha256:728389d1c6966c5a9959b31c14a8fc475992bf64abe84b9c230557534ccc27ae",
+          "rocketmq": "sha256:c719e41b0963941af5f78c0e97a49ce8d03e050017ead6a1d5732bab913cdd78"
+        },
+        "failure_stage": "original_schema41_preparation",
+        "failure_kind": "RuntimeError"
+      }
+    },
+    {
+      "run_id": 40075110320,
+      "report_sha256": "df75f8f3f76064fba203a13ca43e297489609c2d4b6b787f3423bfbad33cf4fa",
+      "report": {
+        "schema": "m3-iam-actual-image-start/v1",
+        "infra_sha": "bc336eb14366226e65e5a796282c836403e9b64d",
+        "iam_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "cases": {
+          "exact_repaired_stable_archive_loaded": true
+        },
+        "cleanup": {
+          "application_absent": true,
+          "compose_down_succeeded": true,
+          "private_fixture_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "host_source_unchanged": true
+        },
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "candidate": {
+          "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+          "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746",
+          "runtime_binary_sha256": "0e611a043ca7ab2349ba3be797972d311c7a2463ff8fb83aa06235e9021827e6"
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65",
+          "nsq": "sha256:728389d1c6966c5a9959b31c14a8fc475992bf64abe84b9c230557534ccc27ae",
+          "rocketmq": "sha256:666807a026e235ee1534db816084ad3443c937389dada74f4a54b60ecfedefbf"
+        },
+        "fixture_failure": {
+          "kind": "*errors.errorString",
+          "phase": "check_empty",
+          "server_code": 0
+        },
+        "failure_stage": "original_schema41_execution",
+        "failure_kind": "RuntimeError"
+      }
+    },
+    {
+      "run_id": 40075437104,
+      "report_sha256": "8dff02de5892e214245bc36fa434f5fa9be8d442866cbf455b7b49fb09f78f5e",
+      "report": {
+        "schema": "m3-iam-actual-image-start/v1",
+        "infra_sha": "064ea544b8a4146dbf585916b94172ca78a29db2",
+        "iam_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "passed": 1,
+        "failed": 1,
+        "skipped": 0,
+        "cases": {
+          "exact_repaired_stable_archive_loaded": true
+        },
+        "cleanup": {
+          "application_absent": true,
+          "compose_down_succeeded": true,
+          "private_fixture_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "host_source_unchanged": true
+        },
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "candidate": {
+          "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+          "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746",
+          "runtime_binary_sha256": "0e611a043ca7ab2349ba3be797972d311c7a2463ff8fb83aa06235e9021827e6"
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65",
+          "nsq": "sha256:728389d1c6966c5a9959b31c14a8fc475992bf64abe84b9c230557534ccc27ae",
+          "rocketmq": "sha256:8f1a2d4740f457b07e6b204ed2e08e4bb38fd50f2cca06ae4515610a24dfc827"
+        },
+        "failure_stage": "original_schema41_execution",
+        "failure_kind": "RuntimeError"
+      }
+    },
+    {
+      "run_id": 40075675603,
+      "report_sha256": "8fc9b1c29925f66bc6ae2a76e71f993b5b0c75a7779d75c2558d3a3e67e31d11",
+      "report": {
+        "schema": "m3-iam-actual-image-start/v1",
+        "infra_sha": "d85d96c476f08e056262bdb5f84d7615de01a509",
+        "iam_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "passed": 2,
+        "failed": 1,
+        "skipped": 0,
+        "cases": {
+          "exact_repaired_stable_archive_loaded": true,
+          "original_full_schema41_and_bootstrap": true
+        },
+        "cleanup": {
+          "application_absent": true,
+          "compose_down_succeeded": true,
+          "private_fixture_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "host_source_unchanged": true
+        },
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "candidate": {
+          "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+          "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746",
+          "runtime_binary_sha256": "0e611a043ca7ab2349ba3be797972d311c7a2463ff8fb83aa06235e9021827e6"
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65",
+          "nsq": "sha256:728389d1c6966c5a9959b31c14a8fc475992bf64abe84b9c230557534ccc27ae",
+          "rocketmq": "sha256:8ea0a0bb4e36cac3dddcddbedb44eb3fe6e7e8f85547d8c402cbca3118b0198b"
+        },
+        "fixture_initializer_sha256": "aa115fbec8144d289e92484224ce453becd3fd274dd0ae8cc39f52373bd305f3",
+        "failure_stage": "actual_old_chain_fixture_drain",
+        "failure_kind": "RuntimeError",
+        "private_application_log_sha256": "adf698855a50d19928aa6c855c86a4376e61f6207627f59bcb5e87c1f5ca75ec"
+      }
+    },
+    {
+      "run_id": 40076137875,
+      "report_sha256": "60771824df89b2cfff3e5b4f09eb8d2e7a9978751cd93cf33dd28c526befeaae",
+      "report": {
+        "schema": "m3-iam-actual-image-start/v1",
+        "infra_sha": "955e13141d6f9df9e1bb4474920949c124fb3709",
+        "iam_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "passed": 2,
+        "failed": 1,
+        "skipped": 0,
+        "cases": {
+          "exact_repaired_stable_archive_loaded": true,
+          "original_full_schema41_and_bootstrap": true
+        },
+        "cleanup": {
+          "application_absent": true,
+          "compose_down_succeeded": true,
+          "private_fixture_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "host_source_unchanged": true
+        },
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "candidate": {
+          "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+          "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746",
+          "runtime_binary_sha256": "0e611a043ca7ab2349ba3be797972d311c7a2463ff8fb83aa06235e9021827e6"
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65",
+          "nsq": "sha256:728389d1c6966c5a9959b31c14a8fc475992bf64abe84b9c230557534ccc27ae",
+          "rocketmq": "sha256:827bf62a8e9c9dfc877c34ce6db75895b4683ff3531518706700c707544441f5"
+        },
+        "fixture_initializer_sha256": "aa115fbec8144d289e92484224ce453becd3fd274dd0ae8cc39f52373bd305f3",
+        "failure_stage": "actual_old_chain_fixture_drain",
+        "failure_kind": "RuntimeError",
+        "failure_reason": "actual_app_exited",
+        "private_application_log_sha256": "5a680f32822cd6362a72b921219243f8594fb19c0739582ae09076881cc21fd9",
+        "application_source_error_markers": [
+          {
+            "path": "internal/apiserver/options/validation.go",
+            "line": 94,
+            "template_sha256": "bf11426b5898f3d1d2d0fac4d153ac48a14284fe07ac6eac88925133f64cf9cb"
+          }
+        ],
+        "application_mysql_error_codes": [],
+        "application_process_state": {
+          "Status": "exited",
+          "ExitCode": 1,
+          "OOMKilled": false
+        }
+      }
+    },
+    {
+      "run_id": 40076584873,
+      "report_sha256": "5a2b3f8576fc1747b93c74a906a00d9f1851700fff1e28f9ff2b95728705ec25",
+      "report": {
+        "schema": "m3-iam-actual-image-start/v1",
+        "infra_sha": "88172b6c9bfe21a751d9d32075ef2c7a3a12ad97",
+        "iam_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "passed": 2,
+        "failed": 1,
+        "skipped": 0,
+        "cases": {
+          "exact_repaired_stable_archive_loaded": true,
+          "original_full_schema41_and_bootstrap": true
+        },
+        "cleanup": {
+          "application_absent": true,
+          "compose_down_succeeded": true,
+          "private_fixture_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "host_source_unchanged": true
+        },
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "candidate": {
+          "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+          "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746",
+          "runtime_binary_sha256": "0e611a043ca7ab2349ba3be797972d311c7a2463ff8fb83aa06235e9021827e6"
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65",
+          "nsq": "sha256:728389d1c6966c5a9959b31c14a8fc475992bf64abe84b9c230557534ccc27ae",
+          "rocketmq": "sha256:77043f0ac722b6a556c6b4c357a39361204ff92d442179cabef7c4a4e5c3766f"
+        },
+        "fixture_initializer_sha256": "aa115fbec8144d289e92484224ce453becd3fd274dd0ae8cc39f52373bd305f3",
+        "failure_stage": "actual_old_chain_fixture_drain",
+        "failure_kind": "RuntimeError",
+        "failure_reason": "actual_app_exited",
+        "private_application_log_sha256": "ace90fbc1b269aae69f8b89f8a051ebad1d29b129cee55a9ba33ab4e289dc7ff",
+        "application_source_error_markers": [
+          {
+            "path": "internal/apiserver/container/container.go",
+            "line": 82,
+            "template_sha256": "904f275a9fe24cd9cffb669f50e0bac21217a144bfbf73a7278a2d3185e7c311"
+          },
+          {
+            "path": "internal/apiserver/container/platform/eventing.go",
+            "line": 73,
+            "template_sha256": "82a9d0cd073df0ff8e9b24dc78b4cf1cd30330abebfb68b46caabb8ecf07b8cc"
+          },
+          {
+            "path": "internal/apiserver/infra/mysql/eventoutbox/standard_status.go",
+            "line": 15,
+            "template_sha256": "3c0ec26e077be15626bb6e41534e17a8bce14de37b21c5c725b2a196ab06a8ce"
+          },
+          {
+            "path": "internal/apiserver/process/bootstrap.go",
+            "line": 136,
+            "template_sha256": "73bde90ba94532ac769264cd7088afcd2ee3b2c14689e5e1dd956c0dcbc1e814"
+          }
+        ],
+        "application_mysql_error_codes": [],
+        "application_process_state": {
+          "Status": "exited",
+          "ExitCode": 1,
+          "OOMKilled": false
+        }
+      }
+    },
+    {
+      "run_id": 40077095572,
+      "report_sha256": "c748d7d99faf1e746a94314a4dd4a855c90829a88472f06e13970d430a9c362f",
+      "report": {
+        "schema": "m3-iam-actual-image-start/v1",
+        "infra_sha": "6d6cf85596ee604848f2c3fd37a9133ef4f574a5",
+        "iam_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "passed": 2,
+        "failed": 1,
+        "skipped": 0,
+        "cases": {
+          "exact_repaired_stable_archive_loaded": true,
+          "actual_schema41_migrations_with_controlled_authz_seed": true
+        },
+        "cleanup": {
+          "application_absent": true,
+          "compose_down_succeeded": true,
+          "private_fixture_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "host_source_unchanged": true
+        },
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "scope": "real final image, limited original maintenance/restore and paused startup; controlled seed only; no old-message drain or business acceptance",
+        "candidate": {
+          "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+          "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746",
+          "runtime_binary_sha256": "0e611a043ca7ab2349ba3be797972d311c7a2463ff8fb83aa06235e9021827e6"
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65",
+          "rocketmq": "sha256:0c70216c5f384b71775f49b3f454f3ded10022e39148456994a4c135a3d447d7"
+        },
+        "fixture_initializer_sha256": "e54507e5f896e35eb0f82a312c6fdd837ef3f24bb0d9b085b9f4834507cd5544",
+        "controlled_seed": {
+          "controlled_seed": true,
+          "legacy_drain_claimed": false,
+          "publication_intents_created": false,
+          "schema_version": 41,
+          "seed_events_retained": 2,
+          "witnesses_created": false
+        },
+        "failure_stage": "original_schema41_execution",
+        "failure_kind": "UnicodeDecodeError"
+      }
+    }
+  ],
+  "counter_note": "First two reports assigned passed only after total success; true archive case retained; later code counts partial successes. Original reports unchanged.",
+  "latest_revalidation": {
+    "run_id": 40077501698,
+    "source_sha": "91ea2e1ce7e7bca2bd72327b2c59309431d87384",
+    "status": "running_not_passed"
+  },
+  "production_executed": false,
+  "task_complete": false,
+  "notes": [
+    "Fifth attempt rejected fixture sms.provider=log under original release policy; original application source unchanged.",
+    "Sixth attempt correctly rejected unfinished legacy Bootstrap rows at original SDK handoff guard; not treated as a passing run.",
+    "Final-image component now uses an explicit fixture seed archive in the original root. It creates no publication intents or witnesses and makes no legacy-drain claim. Actual nonempty old-chain gates remain in T25/T32.",
+    "Seventh attempt retained a controlled seed receipt and failed with UnicodeDecodeError before maintenance/runtime; snapshot command now uses hex-blob, pending revalidation.",
+    "Current component uses a DML-only runtime principal and private MySQL query audit to reject actual startup/shutdown DDL attempts."
+  ]
+}

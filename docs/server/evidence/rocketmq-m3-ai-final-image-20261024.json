@@ -1,0 +1,74 @@
+{
+  "schema": "m3-ai-final-image-component/v1",
+  "pull_request": 243,
+  "source_sha": "5577953b26a9640d36b6924aa31e2e69b9693e12",
+  "native_run_id": 40079069646,
+  "report_sha256": "b0127b15a50ee88dff0292e61caa24549f19afd25c0a7bd6e04d31df99804f48",
+  "report": {
+    "schema": "m3-ai-actual-image-start/v1",
+    "ai_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "cases": {
+      "exact_stable_ai_archive_loaded": true,
+      "original_alembic40_and_nonempty_controlled_fact": true,
+      "first_explicit_alembic43": true,
+      "original_full_scope_restored_exactly": true,
+      "original_initial_binding_cli_applied_and_verified": true,
+      "actual_readonly_server_ready_and_paused_checker_live": true,
+      "actual_ai_shutdown_exit_zero": true,
+      "actual_ai_start_and_shutdown_without_ddl_attempt": true,
+      "held_old_identity_wire_attempt_and_state_unchanged": true
+    },
+    "production": false,
+    "system_acceptance": false,
+    "combined_cutover_rehearsal_complete": false,
+    "scope": "actual read-only AI image/original migrations/restore/initial binding/paused lifecycle; controlled retained fact; no model or upstream RPC exercised",
+    "infra_sha": "5577953b26a9640d36b6924aa31e2e69b9693e12",
+    "candidate": {
+      "target": "ai",
+      "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+      "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+    },
+    "dependency_image_ids": {
+      "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "rocketmq": "sha256:84c6c6034bcda626e936f39bbb69b98780d3d10f83c6cfde5b865bbbae26ab93"
+    },
+    "protection_sha256": "e76bf820c0767a6893265d6e52f41b27491e3d8be4738045e9ddc07e4e149f05",
+    "resource_provision": {
+      "version": 2,
+      "operations": 12,
+      "typed_topics": 3,
+      "principals": 1,
+      "verified": true
+    },
+    "runtime_environment_sha256": "1bdbb1cf616bb157c7d1d3732414939aaf97dbe71afe5942541f9b89c73f713c",
+    "paused_owner_metrics": {
+      "sdk_ready": 1,
+      "sampler_running": 1,
+      "observation_available": 1,
+      "admission_open": 0,
+      "check_workers_limit": 1,
+      "check_queue_limit": 16
+    },
+    "private_application_log_sha256": "337b5378cc7475aae1c77d128b854e56fafa933fd34b00151c64805d1c4aced6",
+    "application_source_frames": [],
+    "application_process_state": {
+      "Status": "exited",
+      "ExitCode": 0,
+      "OOMKilled": false
+    },
+    "runtime_ddl_attempts": 0,
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    },
+    "source_unchanged": true
+  },
+  "merge_status": "pending_full_ci_and_merge",
+  "t29_complete": false
+}

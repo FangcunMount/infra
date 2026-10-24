@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | 镜像及维护二进制 | 修复后五候选构建/归档核验通过 | 五个原Dockerfile实际构建、源码SHA/模块/wheel身份、image config ID/归档摘要、UID及恢复工具排除清单 |
 | 配置、资源与执行包 | 待开始 | 实际所需M3 events/routes/owner绑定、禁自动DDL、封新写配置、ACL/TLS/资源摘要和原维护命令逐项绑定 |
-| 原范围恢复、启动与窗口 | 待开始 | 最终候选实际恢复/启动和切换演练，具名步骤及耗时证明30分钟目标；不能用进程sentinel代替实际runtime |
+| 原范围恢复、启动与窗口 | IAM组件通过；QS/AI及全组合进行中 | 最终候选实际恢复/启动和切换演练，具名步骤及耗时证明30分钟目标；不能用进程sentinel代替实际runtime |
 
 ## 仅构建路径
 
@@ -34,12 +34,24 @@ QS当前runtime镜像没有`qs-migrate-offline`。候选构建从同一固定源
 
 [40071645211](https://github.com/FangcunMount/infra/actions/runs/40071645211)五镜像的元数据与归档均核验通过；标准配置入口随后发现点号owner被Viper层级重建，IAM148修复已合并、QS440完整CI中。因此首次Go归档不能充当最终候选，需包含修复后重建。原生协议/存储测试直接构造配置，不替代这个文件入口证明。详见[当前候选证据](evidence/rocketmq-m3-candidate-progress-20261024.json)；真实启动、恢复与窗口演练仍未完成。
 
-[修复后候选40074229224](https://github.com/FangcunMount/infra/actions/runs/40074229224)五镜像全部通过，IAM148/QS440已合并且完整tree相同，详见[归档及源码证据](evidence/rocketmq-m3-repaired-image-candidates-20261024.json)。实际IAM组件PR241正在隔离CI，尚未完成T29。
+[修复后候选40074229224](https://github.com/FangcunMount/infra/actions/runs/40074229224)五镜像全部通过，IAM148/QS440已合并且完整tree相同，详见[归档及源码证据](evidence/rocketmq-m3-repaired-image-candidates-20261024.json)。实际IAM组件PR241已通过原生8/8与完整CI后合并，尚未完成父T29。
 
-## IAM实际镜像组件演练（开发中）
+## IAM实际镜像组件（8/8通过，已合并）
 
 `rocketmq-final-images.yml`保留默认build路径，显式iam-start只从指定Actions运行下载已核验IAM归档，在托管runner隔离内部网络启动依赖。原迁移准备完整schema41，AuthZ Bootstrap回调用于受控种子：事件身份/类型和正文摘要在原根内保存到明确fixture archive，不构造待发布消息、SDK witness或业务验收。候选镜像自带原iam-maintenance执行有限范围保护、42–45安装、恢复至41、原事实摘要复核、再次安装及绑定；最后用修复后的标准JSON配置封新写启动原apiserver，核验Checker/采样/预算指标并真实关闭。
 
 这只是T29的IAM组件，不能替代完整五镜像组合、原协调目录首次启动屏障、QS双库/AI原范围恢复、最终执行包或30分钟窗口。只有组件真实报告通过后才更新状态。该路径不SSH、不接生产、不使用外部凭据，不执行模型或system登录；CI原始日志/配置/保护文件不上传。完整schema41准备程序仅是隔离夹具，不进入生产镜像或执行包。
 
 IAM组件初版试图让当前SDK入口排空fresh Bootstrap的legacy行；第六轮确认原handoff门禁正确拒绝，失败不作通过。当前组件改用明确受控输入，不再重演这个已退役入口；不会删除legacy行、改成published、复制业务事实为新半消息或放宽guard。非空旧NSQ/Outbox排空仍由原T25真实工具门禁及生产T32承担。受控种子不是发布型Outbox、业务命令、消息原子性或system证明，原M3任务数和门禁不变。
+
+## 候选输入索引与首发工具清单
+
+[候选输入索引](evidence/rocketmq-m3-candidate-input-index-20261024.json)记录5个镜像config/归档摘要、42份精确源码输入（27迁移文件、2宿主事件目录、4资源模板、9工具）及固定repo SHA。工具本地import闭包已核对，仅依赖标准库和清单内模块；首发明确排除后移恢复程序及全部CI夹具，不复制整个工具目录。该索引仅是待审输入，尚未生成最终可执行配置/包，不代替真实宿主/数据库UUID、TLS、worker配额回读或任何具名批准。registry/受审归档交付与目标启动助手的匹配、完整恢复/启动及30分钟窗口仍须验证。
+
+IAM组件[40077501698](https://github.com/FangcunMount/infra/actions/runs/40077501698)全部8项通过，包含DML-only实际运行、0 DDL尝试、原保护恢复及优雅退出；[完整证据](evidence/rocketmq-m3-iam-final-image-20261024.json)。它只覆盖受控种子数据库上的最终镜像恢复/启动，不证明fresh legacy Bootstrap历史入口可直接进入当前SDK；原拒绝及T25/T32旧排空责任保留。
+
+## AI实际镜像组件（原生9/9通过，完整CI/合并待核验）
+
+使用原0040→0043 Alembic、完整原范围恢复与initial-binding CLI，再启动原只读镜像，保持768MiB/0.75CPU、64MiB tmpfs、210秒关闭及原worker循环/预算。新准入关闭，运行账号只有DML权限。固定Python5.1.2的home日志放入既有/tmp，须在最终配置加入HOME=/tmp并通过实际镜像复验。上游RPC和模型不在本组件验收范围；无法代替QS/成对业务或system。原严格schema拒绝额外测试表的失败保留，复验使用原受控held行，不放宽schema/绑定验证。
+
+AI [40079069646](https://github.com/FangcunMount/infra/actions/runs/40079069646)原生9项通过；原严格schema下的受控held旧记录、完整恢复、原绑定、只读启动/关闭、0 DDL尝试及旧first wire/attempt状态保留分别验收。[证据](evidence/rocketmq-m3-ai-final-image-20261024.json)将原生与PR243未完成合并门禁分列。

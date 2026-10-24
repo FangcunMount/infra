@@ -1,0 +1,55 @@
+{
+  "schema": "m3-ai-image-development/v1",
+  "first_run_id": 40078764464,
+  "report_sha256": "aef1b3d8f7da04e7375295395fe8eeac775013bff1b1649628ce3f736d2ea27c",
+  "report": {
+    "schema": "m3-ai-actual-image-start/v1",
+    "ai_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+    "passed": 4,
+    "failed": 1,
+    "skipped": 0,
+    "cases": {
+      "exact_stable_ai_archive_loaded": true,
+      "original_alembic40_and_nonempty_controlled_fact": true,
+      "first_explicit_alembic43": true,
+      "original_full_scope_restored_exactly": true
+    },
+    "production": false,
+    "system_acceptance": false,
+    "combined_cutover_rehearsal_complete": false,
+    "scope": "actual read-only AI image/original migrations/restore/initial binding/paused lifecycle; controlled retained fact; no model or upstream RPC exercised",
+    "infra_sha": "1a783d63e3e0e816cc8ab1747958e528d5bca625",
+    "candidate": {
+      "target": "ai",
+      "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+      "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+    },
+    "dependency_image_ids": {
+      "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "rocketmq": "sha256:e3da9eefe9766c23e85a0b418c4dcaf5dc1492095c2e1e68d7362f0a8a88bba6"
+    },
+    "protection_sha256": "669a75f628f07e45930714788adc81e695ebb750da7a2bd319190fe77620705f",
+    "failed_command": {
+      "exit_code": 1,
+      "entrypoint": "python",
+      "private_output_sha256": "52a016bf953b8c59a9ab1dfb176c6d2e8b8f0a5cb94ef29a24b56f1b7ac05372"
+    },
+    "failure_stage": "original_initial_binding",
+    "failure_kind": "RuntimeError",
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    },
+    "source_unchanged": true
+  },
+  "diagnosis": "Extra fixture table conflicts with original exact table-set validator; current input uses original existing messaging_outbox held-row fixture; no guard relaxation",
+  "revalidation": {
+    "run_id": 40079069646,
+    "head": "5577953",
+    "status": "running_not_passed"
+  },
+  "production_executed": false
+}
