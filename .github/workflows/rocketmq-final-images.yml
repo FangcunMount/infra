@@ -122,6 +122,7 @@ jobs:
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_qs_runtime_configuration.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_qs_consumer_contract.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_mongo_ddl_audit.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_image_start_provenance.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_image_cutover_boundary.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_image_full_protection.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_image_cutover_offline.py

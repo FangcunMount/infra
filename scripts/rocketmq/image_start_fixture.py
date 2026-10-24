@@ -21,6 +21,24 @@ def require(value, reason):
     if not value:raise RuntimeError(reason)
 
 
+IMAGE_PROVENANCE = {
+    ('iam', '954ad9dee2f71a51151b696ec05d5cb90cc65b50'): '9833d67e631587b908df00e2cc21371403912326',
+    ('ai', 'ddff86cad27d03c95dad28490d6cccbc1ce5b15f'): '9833d67e631587b908df00e2cc21371403912326',
+    **{(target, 'd6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7'): '835cf766ceffd2694e2e0132bdf2408a2b2d0627'
+       for target in ('qs-api', 'qs-collection', 'qs-worker')},
+}
+
+
+def verified_image_inventory(value, target, source_sha):
+    expected = IMAGE_PROVENANCE.get((target, source_sha))
+    require(expected is not None and value['target'] == target and value['source_sha'] == source_sha
+        and (value['passed'], value['failed'], value['skipped']) == (1, 0, 0)
+        and value['builder_source_sha'] == expected and value['deferred_tools_absent']
+        and all(value['cleanup'].get(key) is True for key in
+            ('owned_container_absent', 'owned_image_tag_absent', 'existing_containers_unchanged')),
+        'exact_verified_image_required')
+
+
 def resource_subset(document, account):
     result=json.loads(json.dumps(document));grants=result['accounts'][account]
     selected=set(grants['publish']+grants['subscriptions'])
@@ -50,11 +68,7 @@ class OwnedImageFixture:
 
     def load(self, candidate, target, source_sha):
         value=json.loads((candidate/'image-inventory.json').read_text())
-        require(value['target']==target and value['source_sha']==source_sha
-            and (value['passed'],value['failed'],value['skipped'])==(1,0,0)
-            and value['builder_source_sha']=='9833d67e631587b908df00e2cc21371403912326'
-            and value['deferred_tools_absent'] and all(value['cleanup'].get(key) is True for key in
-                ('owned_container_absent','owned_image_tag_absent','existing_containers_unchanged')),'exact_verified_image_required')
+        verified_image_inventory(value, target, source_sha)
         files=list(candidate.glob('*.tar.gz'));require(len(files)==1,'one_image_archive_required')
         archive=files[0];require(sha256(archive)==value['archive_sha256'],'archive_digest_differs')
         with tarfile.open(archive) as source:
@@ -64,7 +78,7 @@ class OwnedImageFixture:
         require(saved_config(archive,self.image)[0]==value['image_config_id'],'archived_config_digest_differs')
         self.run(['docker','load','-i',str(archive)],timeout=180)
         require(self.run(['docker','image','inspect',self.image,'--format','{{.Id}}']).stdout.strip()==value['engine_image_id'],'loaded_image_differs')
-        self.report['candidate']={key:value[key] for key in ('target','source_sha','image_config_id','archive_sha256')}
+        self.report['candidate']={key:value[key] for key in ('target','source_sha','builder_source_sha','image_config_id','archive_sha256')}
         return value
 
     def once(self, entrypoint, arguments, *, environment=None, root=False, network=True, timeout=180):

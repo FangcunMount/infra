@@ -9,6 +9,7 @@ from unittest.mock import patch
 from image_cutover_boundary import ActualImageBoundary, COMPONENTS, SOURCES, parse_private_hashes, startup_receipt
 from start_boundary import Boundary, BoundaryError
 from test_start_boundary import fixture
+from image_start_fixture import IMAGE_PROVENANCE
 
 
 def synthetic_unit_receipt():
@@ -19,7 +20,7 @@ def synthetic_unit_receipt():
         production=False,system_acceptance=False,combined_cutover_rehearsal_complete=False,c1_cutover_barrier_exercised=False,
         processes={c:{'state':dict(Status='exited',ExitCode=0,OOMKilled=False)} for c in COMPONENTS},
         cleanup=dict(compose_down_succeeded=True,private_directory_removed=True,existing_containers_unchanged=True,existing_networks_unchanged=True),
-        candidates={target:dict(source_sha=SOURCES[source],archive_sha256='1'*64,image_config_id='sha256:'+'2'*64)
+        candidates={target:dict(source_sha=SOURCES[source],builder_source_sha=IMAGE_PROVENANCE[(target,SOURCES[source])],archive_sha256='1'*64,image_config_id='sha256:'+'2'*64)
             for target,source in [('iam','iam'),('ai','ai'),('qs-api','qs'),('qs-worker','qs'),('qs-collection','qs')]})
 
 

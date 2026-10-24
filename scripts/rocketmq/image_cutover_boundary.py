@@ -18,7 +18,7 @@ from audit_transaction_limit import write_private
 import cutover_step
 from five_image_start import SOURCES
 from final_image_candidate import ci_guard
-from image_start_fixture import require
+from image_start_fixture import IMAGE_PROVENANCE, require
 import runtime_start
 from start_boundary import Boundary, BoundaryError, _encoded, initialize
 
@@ -80,6 +80,7 @@ def startup_receipt(path):
     for target, candidate in value['candidates'].items():
         source = SOURCES['iam' if target == 'iam' else 'ai' if target == 'ai' else 'qs']
         require(candidate['source_sha'] == source, 'startup_source_differs')
+        require(candidate['builder_source_sha'] == IMAGE_PROVENANCE.get((target, source)), 'startup_builder_differs')
         digest(candidate['archive_sha256'])
         require(re.fullmatch('sha256:[0-9a-f]{64}', candidate['image_config_id']), 'startup_image_identity_required')
     return value, hashlib.sha256(raw).hexdigest()
