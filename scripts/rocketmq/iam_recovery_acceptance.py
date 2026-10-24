@@ -17,13 +17,14 @@ def require(value,stage):
 
 
 def metadata(value):
-    keys={'database','owner','store_id','writer_epoch','operation_id','branch_id','fence','message_id'}
+    keys={'database','owner','store_id','writer_epoch','operation_id','branch_id','fence','message_id','wire_hash'}
     require(isinstance(value,dict) and set(value)==keys,'exact_original_host_metadata_required')
     require(value['owner']=='iam.mysql' and value['store_id']=='iam-native-primary' and value['writer_epoch']=='m3-1','original_host_binding_required')
     require(isinstance(value['database'],str) and re.fullmatch(r'iam_m3_broker_test_[0-9]{10,30}',value['database']),'owned_original_database_required')
     require(type(value['fence']) is int and 1<=value['fence']<=2**63-1,'exact_original_fence_required')
     for key in ('operation_id','branch_id','message_id'):
         require(isinstance(value[key],str) and re.fullmatch(r'[A-Za-z0-9_.:-]{1,128}',value[key]),'bounded_original_identity_required')
+    require(isinstance(value['wire_hash'],str) and re.fullmatch('[0-9a-f]{64}',value['wire_hash']),'original_wire_digest_required')
     return dict(value,user='root',business_count_sql="SELECT COUNT(*) FROM authz_roles WHERE name='m3:native_recovery_original'",
         writer='actual IAM WithinPlannedTx original GORM role/version/witness root',
         scope='one original IAM host commit with actual Broker network disconnection; not whole API, SIGKILL or system')

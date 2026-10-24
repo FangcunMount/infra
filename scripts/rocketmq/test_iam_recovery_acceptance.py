@@ -7,7 +7,7 @@ from iam_recovery_acceptance import metadata
 
 class IAMRecoveryMetadata(unittest.TestCase):
     def good(self):
-        return dict(database='iam_m3_broker_test_1792800000000000000',owner='iam.mysql',store_id='iam-native-primary',writer_epoch='m3-1',operation_id='original-op',branch_id='policy-version',fence=1,message_id='original-message')
+        return dict(database='iam_m3_broker_test_1792800000000000000',owner='iam.mysql',store_id='iam-native-primary',writer_epoch='m3-1',operation_id='original-op',branch_id='policy-version',fence=1,message_id='original-message',wire_hash='1'*64)
 
     def test_original_metadata_is_private_host_locator_not_connection_authority(self):
         value=metadata(self.good())

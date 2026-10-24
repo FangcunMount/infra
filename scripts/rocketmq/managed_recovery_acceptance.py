@@ -215,7 +215,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         and stats['HalfPreparedResults']==stats['CompletedResults']==stats['LocalCommittedResults']==stats['Reconciled']==0,'genuine_checkonly_rpc_drain_required')
     require(governed()==before,'broker_confirmation_auto_resolved_governance')
     passed('published_sdk_actual_native_recheck_current_rpc_private_receipt_and_true_drain')
-    consumer.wait('received',identity,timeout=100)
+    consumer.wait('received',identity,decision=source['wire_hash'] if original else None,timeout=100)
     require(sql('SELECT ('+source['business_count_sql']+'),(SELECT COUNT(*) FROM rm_tx_request),(SELECT COUNT(*) FROM rm_tx_execution),(SELECT COUNT(*) FROM rm_tx_witness);')=='1\t1\t1\t1','recovery_repeated_business_or_sent_new_half')
     passed('original_consumer_identity_and_one_original_business_root_preserved')
     first_audit=sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;")

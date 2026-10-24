@@ -71,10 +71,11 @@ def main():
     parser.add_argument('--managed-tool', type=Path, help='fixed published-module CLI; owned isolated fixture only')
     parser.add_argument('--governance-faults',action='store_true',help='actual MySQL COMMIT before/after reply loss for managed CLI only')
     parser.add_argument('--iam-host',type=Path,help='actual fixed IAM original writer, owned fixture only')
+    parser.add_argument('--host-observer',type=Path,help='CI-only actual-host consumer compiled against the same published SDK')
     args = parser.parse_args()
     ci_guard(os.environ)  # Never construct a client or invoke Docker on a workstation.
     require(not args.governance_faults or args.managed_tool is not None,'managed_cli_required_for_governance_faults')
-    require(not args.iam_host or (args.managed_tool and not args.governance_faults),'separate_actual_iam_managed_profile_required')
+    require(not args.iam_host or (args.managed_tool and args.host_observer and not args.governance_faults),'separate_actual_iam_managed_profile_required')
     require(not args.report.exists() and not args.report.is_symlink(), 'report_already_exists')
     module = importlib.util.spec_from_file_location('_native_fixture', Path(__file__).with_name('ci-transactions.py'))
     common = importlib.util.module_from_spec(module)
@@ -220,11 +221,14 @@ def main():
                               for r in manifest['routes'] if r['owner']=='iam.mysql' and r['message_type']=='TRANSACTION'],
                 route_revision=revision, storage='mysql', branches=1, lease_millis=3_600_000,
                 dsn=f'txprobe:{password}@tcp(127.0.0.1:{mysql_port})/txprobe?timeout=1s&readTimeout=5s&writeTimeout=5s'))
-            probe = common.Probe([str(binary), '--config', str(path), '--mode', mode, '--id', identity], directory,
+            argv=([str(args.host_observer.resolve()),'--config',str(path),'--config-sha',hashlib.sha256(path.read_bytes()).hexdigest()]
+                if args.iam_host and mode=='consume' else [str(binary), '--config', str(path), '--mode', mode, '--id', identity])
+            probe = common.Probe(argv, directory,
                                  dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(ca)))
             probes.append(probe); return probe
         if not args.iam_host:
             install = start('init'); install.wait('installed'); install.finish()
+        stage='original_observer_start'
         consumer = start('consume'); consumer.wait('ready')
         identity = 'native-recheck-'+secrets.token_hex(12)
         host=None;original=None

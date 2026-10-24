@@ -34,6 +34,7 @@ jobs:
           umask 077
           test -z "$(git status --porcelain)"
           go build -trimpath -buildvcs=true -ldflags "-X main.sourceSHA=$(git rev-parse HEAD)" -o "$RUNNER_TEMP/native-recovery" ./cmd/native-recovery
+          go build -trimpath -buildvcs=true -o "$RUNNER_TEMP/host-observer" ./cmd/host-observer
           "$RUNNER_TEMP/native-recovery" version
           go list -m -json github.com/FangcunMount/reliable-messaging > "$RUNNER_TEMP/native-recovery-module.json"
           python3 - <<'PY'
@@ -50,7 +51,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/iam
-          ref: 380af7c5c8208afde72fd56b6b401931746a1235
+          ref: bee9c5c1a9945922dc4e88631af451babee646ca
           path: .iam-acceptance
       - uses: actions/setup-java@v5
         with:
@@ -69,7 +70,7 @@ jobs:
           set -euo pipefail
           umask 077
           python3 scripts/rocketmq/ci-native-recheck.py --sdk "$PWD/.sdk-acceptance" \
-            --image rocketmq-managed-recovery:5.5.1 --managed-tool "$RUNNER_TEMP/native-recovery" --iam-host "$PWD/.iam-acceptance" --report iam-native-recovery.json
+            --image rocketmq-managed-recovery:5.5.1 --managed-tool "$RUNNER_TEMP/native-recovery" --iam-host "$PWD/.iam-acceptance" --host-observer "$RUNNER_TEMP/host-observer" --report iam-native-recovery.json
       - name: Nonempty exact host recovery and cleanup
         if: always()
         run: |
@@ -79,7 +80,7 @@ jobs:
           x=json.load(open('iam-native-recovery.json'))
           assert x['passed']==15 and x['failed']==x['skipped']==0
           p=x['proof']
-          assert p['iam_original_host']['source_sha']=='380af7c5c8208afde72fd56b6b401931746a1235'
+          assert p['iam_original_host']['source_sha']=='bee9c5c1a9945922dc4e88631af451babee646ca'
           assert p['iam_original_host']['receipt']['passed']==5 and p['iam_original_host']['source_clean']
           assert p['iam_broker_network_disconnected'] and p['iam_broker_network_reconnected_after_owner_stop']
           assert p['owned_iam_database_removed'] and p['managed_recovery']['actual_sdk_stats']['Stopped']
