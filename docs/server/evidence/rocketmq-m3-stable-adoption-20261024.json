@@ -1,0 +1,695 @@
+{
+  "schema": "m3-stable-adoption-final/v1",
+  "infra_sha": "90cc911352ce2479d3a59d0de66278eedc8db309",
+  "tested_merge": "e449fa17a4aea83d234141a649d99bfd9a75304a",
+  "associated_checks_succeeded": 20,
+  "reports": [
+    {
+      "report": "iam-native-root-0-e449fa17a4aea83d234141a649d99bfd9a75304a/receipt.json",
+      "sha256": "22593aed94118dc974551fddef58425dcbffd2c5ed4242611c050ab1f4eb9158",
+      "kind": "current_iam_native_root",
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "owned_containers_remaining": false,
+        "private_fixture_removed": true
+      },
+      "sdk_sha": null
+    },
+    {
+      "report": "iam-native-root-1-e449fa17a4aea83d234141a649d99bfd9a75304a/receipt.json",
+      "sha256": "77b2ffd1db26baac622f80b4256cfd8b08ac08cf02d59667c16ac27b2f99beb2",
+      "kind": "current_iam_native_root",
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "owned_containers_remaining": false,
+        "private_fixture_removed": true
+      },
+      "sdk_sha": null
+    },
+    {
+      "report": "iam-native-root-2-e449fa17a4aea83d234141a649d99bfd9a75304a/receipt.json",
+      "sha256": "be7ccd106303da7bfc3d8bf4657579143af6a56b3ca3ab0ce3d895e11993f521",
+      "kind": "current_iam_native_root",
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "owned_containers_remaining": false,
+        "private_fixture_removed": true
+      },
+      "sdk_sha": null
+    },
+    {
+      "report": "rocketmq-complete-sdk-0-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-complete-sdk.json",
+      "sha256": "69349740d75210eccb9101fae164a6fc41a76bd76536424a2200aba77bcf3ef5",
+      "kind": "historical_sdk_or_resource_regression",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-complete-sdk-1-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-complete-sdk.json",
+      "sha256": "f953d445f772e975df1a475fb7ec798fbb27e775da4a3e33f105572edc3ffee7",
+      "kind": "historical_sdk_or_resource_regression",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-iam-host-0-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-iam-host.json",
+      "sha256": "5b0a36b7f067348d3efa092eb7cf8722c44524bc71e506e5ff58bc258627a6f7",
+      "kind": "current_iam_broker",
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890"
+    },
+    {
+      "report": "rocketmq-iam-host-1-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-iam-host.json",
+      "sha256": "79ee1aacd8b556650128cf480868abbecef6f024722069674a1145d8a64ce158",
+      "kind": "current_iam_broker",
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890"
+    },
+    {
+      "report": "rocketmq-iam-host-2-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-iam-host.json",
+      "sha256": "f145c4a8d8db6e5962c3794676bf98fd3ba7570b8502c176ec812d419a2a3639",
+      "kind": "current_iam_broker",
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890"
+    },
+    {
+      "report": "rocketmq-m2-go-sdk-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-m2-go-sdk.json",
+      "sha256": "248ca6cb14a22d080005444cc04cc7038cc494ef042d764c32546dfa4ea1e894",
+      "kind": "historical_sdk_or_resource_regression",
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-m2-transactions-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-m2-transactions.json",
+      "sha256": "25b9edf35a99f9ebe0ee34745a3336857ee4b344a7d7fe899019b20d6e9bc721",
+      "kind": "historical_sdk_or_resource_regression",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-m3-resources-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-m3-resources.json",
+      "sha256": "ed7296f4ecde35e755a053291c765581465b413727ba087f125e83e303aa2043",
+      "kind": "historical_sdk_or_resource_regression",
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "8de893b367cc797580799abd8325f41dd62356db"
+    },
+    {
+      "report": "rocketmq-native-dlq-audit-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-native-dlq-audit.json",
+      "sha256": "7095eb79b5a6e48665c81aa1552e6f6f2ce35539f8c8b6f56cef1babd813201d",
+      "kind": "historical_sdk_or_resource_regression",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "8de893b367cc797580799abd8325f41dd62356db"
+    },
+    {
+      "report": "rocketmq-packet-faults-0-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-packet-faults.json",
+      "sha256": "2b586757f7632f47e4ca6850e45486c0d30e6080d4506c497d833255d439f6f4",
+      "kind": "historical_sdk_or_resource_regression",
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-packet-faults-1-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-packet-faults.json",
+      "sha256": "7db6c79e7aef09333142141879e2ef82e5eed61c24899d0e285e0208f8957b47",
+      "kind": "historical_sdk_or_resource_regression",
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-public-sdk-0-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-public-sdk.json",
+      "sha256": "7f3e1c13dde815659f013f393bd6b6211a300e7a9c1f84cf85f642ae7f034939",
+      "kind": "historical_sdk_or_resource_regression",
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "d3b23c16e354dd09a812641403029e0cc03abed2"
+    },
+    {
+      "report": "rocketmq-public-sdk-1-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-public-sdk.json",
+      "sha256": "45843279342d845a7857e9120a53844eb652d8f02b843b6da1cb1c109c7c4997",
+      "kind": "historical_sdk_or_resource_regression",
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "d3b23c16e354dd09a812641403029e0cc03abed2"
+    },
+    {
+      "report": "rocketmq-published-0-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-published-sdk.json",
+      "sha256": "c23c53897fdd4ff53b583ec93a79ad512cc465965a1cd7bdcda74334fcdf6a35",
+      "kind": "current_published_sdk_full_faults",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890"
+    },
+    {
+      "report": "rocketmq-published-1-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-published-sdk.json",
+      "sha256": "d2bb4de026030ec74ca5e64c403801503dcf80047e57f028b7ccc259ddcf776f",
+      "kind": "current_published_sdk_full_faults",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890"
+    }
+  ],
+  "published_installations": [
+    {
+      "receipt": "rocketmq-published-0-e449fa17a4aea83d234141a649d99bfd9a75304a/.published/published-installation.json",
+      "sha256": "2e78be6fee269980dabd121b36a9dd91e642d7d99f76b4810195bb08a129df59",
+      "go_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.5.0",
+        "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "go_verified_files": 234,
+      "wheel_and_sdist_verified_package_files": 19,
+      "native_report_probe_matches": true,
+      "local_replace": false,
+      "editable_install": false
+    },
+    {
+      "receipt": "rocketmq-published-1-e449fa17a4aea83d234141a649d99bfd9a75304a/.published/published-installation.json",
+      "sha256": "ced283cb2fc65e51a796d796d84f64e39bd610d94f220e123418e7b9a8acc4e5",
+      "go_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.5.0",
+        "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "go_verified_files": 234,
+      "wheel_and_sdist_verified_package_files": 19,
+      "native_report_probe_matches": true,
+      "local_replace": false,
+      "editable_install": false
+    }
+  ],
+  "paired": {
+    "schema": "m3-stable-paired-final/v1",
+    "run": 40067288975,
+    "infra_sha": "90cc911352ce2479d3a59d0de66278eedc8db309",
+    "tested_merge": "e449fa17a4aea83d234141a649d99bfd9a75304a",
+    "qs_sha": "480a632ad5ab459441425dcccfed1547c4fd84a3",
+    "ai_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+    "reports": [
+      {
+        "report": "rocketmq-paired-full-0-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-paired.json",
+        "sha256": "4f3e2a6bce7a0e63eb603988fa524e7c38ed80f5df917e06b27ec0a5cc633023",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests_passed": 7,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "report": "rocketmq-paired-full-1-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-paired.json",
+        "sha256": "d396ee64070e3ebf2e7456cdb4d99c98fed59c4c90e310ea1a9258c419c2b1db",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests_passed": 7,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "report": "rocketmq-paired-full-2-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-paired.json",
+        "sha256": "2b7a3c188d7eab380bf6da87f7d4d9981b7c7d370e0bdc9d61b840969005c528",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests_passed": 7,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "report": "rocketmq-paired-full-3-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-paired.json",
+        "sha256": "e4937a8b62a878dde2d752540f1145b17465894fe7db8154463afb8e6957924a",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests_passed": 7,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "report": "rocketmq-paired-full-4-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-paired.json",
+        "sha256": "a5cf34c4148aad21969221a2531bad8d6898c1b8a6ef05db0ed10859351bbbde",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests_passed": 7,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "report": "rocketmq-paired-full-5-e449fa17a4aea83d234141a649d99bfd9a75304a/rocketmq-paired.json",
+        "sha256": "bbac845f00f0d9bfea0f7cf56883c58e43c26feeecd7df9686062774edd6741b",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests_passed": 7,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      }
+    ],
+    "passed": 240,
+    "failed": 0,
+    "skipped": 0,
+    "production": false,
+    "system": false
+  },
+  "iam_runtime_fanout": {
+    "schema": "m3-stable-iam-runtime/v1",
+    "run": 40068518563,
+    "infra_sha": "90cc911352ce2479d3a59d0de66278eedc8db309",
+    "reports": [
+      {
+        "report": "iam-native-root-0-90cc911352ce2479d3a59d0de66278eedc8db309/receipt.json",
+        "sha256": "48b0f3e7a61f778f5571a6ee83d6239783e9ee1c52e7b045f3dea761ceb23bfa",
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        }
+      },
+      {
+        "report": "iam-native-root-1-90cc911352ce2479d3a59d0de66278eedc8db309/receipt.json",
+        "sha256": "6a5c223497df888635418b5d38e47e597d597a6665eadfe63fde031efe1851a2",
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        }
+      },
+      {
+        "report": "iam-native-root-2-90cc911352ce2479d3a59d0de66278eedc8db309/receipt.json",
+        "sha256": "d6feef93a10e5d744eb11f0c314df886e74ea50aaad9ea88554ee575da40993a",
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-iam-host-0-90cc911352ce2479d3a59d0de66278eedc8db309/rocketmq-iam-host.json",
+        "sha256": "6db66183e62cb7093cea1d4f77baebcdfd53f33c9d6658285c13a2864c19003a",
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-iam-host-1-90cc911352ce2479d3a59d0de66278eedc8db309/rocketmq-iam-host.json",
+        "sha256": "86e9410a5c23ddc1021294aa6ee92cee1afefe722afb4a448d0d390f60fb1609",
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-iam-host-2-90cc911352ce2479d3a59d0de66278eedc8db309/rocketmq-iam-host.json",
+        "sha256": "d2077243a1123fda767bf420c8bf92667a880fb3fe4019ac959efaeb34d7cf00",
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "passed": 171,
+    "failed": 0,
+    "skipped": 0,
+    "initial_run_cancelled": 40067336998,
+    "initial_cancellation_reason": "Two profiles shared workflow concurrency group; rerun on independent ref at identical source",
+    "production": false
+  },
+  "iam_protection": {
+    "run": 40067339543,
+    "profile": "runtime_and_protection_mysql8.0.36",
+    "reports": [
+      {
+        "report": "rocketmq-iam-host-0-90cc911352ce2479d3a59d0de66278eedc8db309",
+        "sha256": "18643366d21674eee0944f3ada88d44aed8ae0ef95abf0bb3a332551e46d3056",
+        "passed": 29,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "iam-native-root-0-90cc911352ce2479d3a59d0de66278eedc8db309",
+        "sha256": "a7da2cbd5d33cf08f4ada78c891e1312731eb63a2aa5b1c0d33087123f5c1c93",
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        }
+      }
+    ],
+    "passed": 64,
+    "failed": 0,
+    "skipped": 0,
+    "production": false
+  },
+  "ai_source": {
+    "schema": "m3-stable-ai-source/v1",
+    "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+    "tested_merge": "a177dee23d3b698881bc570120ecd6a6defbb3fe",
+    "head_and_tested_merge_tree": "7be58e3add5e1a7048622bdf14d093ee6adbb9e9",
+    "run": 40067220682,
+    "source_checks_succeeded": 14,
+    "reports": [
+      {
+        "report": "tests-8.0.36-0-attempt-1/shard-8.0.36-0.json",
+        "metadata_sha256": "408df3783dc30936481810c9a75e5ae5c5a6d8f80424300f6563f427fa96776a",
+        "junit_sha256": "fd7679be92c8effeb940e1822c36c70bab46c61e49fbe730d0d11acc9a1a2899",
+        "passed": 1415,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "report": "tests-8.0.36-1-attempt-1/shard-8.0.36-1.json",
+        "metadata_sha256": "b65de9629803e2d88c59f2ef6f350208050adb3338c8def4fd9ef5ba509c7ad1",
+        "junit_sha256": "f785e06972211f716cab36acea081f1990a5427251a57ed2896842993fde7c05",
+        "passed": 1415,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "report": "tests-8.0.36-2-attempt-1/shard-8.0.36-2.json",
+        "metadata_sha256": "4c8ce946786ef1bca43e3f29bc3b28849492521c1b4a898691a2c978b7916be0",
+        "junit_sha256": "18f4052b00092e865dbaa8fbd54dd6396126806a3140e54d5c01e9cce197f808",
+        "passed": 1415,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "report": "tests-8.0.36-3-attempt-1/shard-8.0.36-3.json",
+        "metadata_sha256": "4b3e262a715aa07ea657173325cc6776b0b2e6c931f9b82cacca6b0a7fe85129",
+        "junit_sha256": "5ae4d51281856d61bc8e6f487a44d90bf7c8f3adb6bfbfa939a249644ec88db5",
+        "passed": 1415,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "report": "tests-8.4-0-attempt-1/shard-8.4-0.json",
+        "metadata_sha256": "88e61fd92dccc9225f1138c9eb39b25616a53d034a416e8156844bdaa715a0ef",
+        "junit_sha256": "cf0501ea3c68143083ee55c1ed00f6e1d84f949fef48271752d89339c3e02743",
+        "passed": 1415,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "report": "tests-8.4-1-attempt-1/shard-8.4-1.json",
+        "metadata_sha256": "051c4fdf9ae2de3da5773c7502dfcd192925a61228b1873afaf7f504447c6246",
+        "junit_sha256": "0378188054cbdb3fd732847fb63574f4327e10cbe025687bb071f1f2d64ce80c",
+        "passed": 1415,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "report": "tests-8.4-2-attempt-1/shard-8.4-2.json",
+        "metadata_sha256": "f8f261fc7e85e60228f150d3986ab676ccb130514c16238f51786cd554eb7448",
+        "junit_sha256": "9b9b49e2916ff2b030430426f27dae6ebfecd0d66def792098f85421c024c4a0",
+        "passed": 1415,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "report": "tests-8.4-3-attempt-1/shard-8.4-3.json",
+        "metadata_sha256": "4b6244667233b0a8c81a268fcd5e7fe276aaee7ae2f9812a8c076e3f2f992ba3",
+        "junit_sha256": "e31cee06a097c6c2af514db745cd43c8a686f19a8f920ea7cc892ab15b39423f",
+        "passed": 1415,
+        "failed": 0,
+        "skipped": 0
+      }
+    ],
+    "passed_per_database": 5660,
+    "failed": 0,
+    "skipped": 0,
+    "all_shards_disjoint_and_complete": true,
+    "validator": "scripts/ci/verify_test_shards.py; frozen revision and SHA256 partitions",
+    "validator_history": "Initial local ad hoc checker assumed lexical stride and refused reports; repository SHA256 partition verifier used without modifying reports",
+    "production": false
+  },
+  "source_merges": {
+    "iam": {
+      "pr": 147,
+      "headRefOid": "8be32adea54ad354257e54122cca923edd00572b",
+      "mergeCommit": {
+        "oid": "713f83b221b74601325dc5f39a90eca893abbcbf"
+      },
+      "mergedAt": "2026-10-24T06:25:33Z",
+      "state": "MERGED"
+    },
+    "qs-server": {
+      "pr": 439,
+      "headRefOid": "480a632ad5ab459441425dcccfed1547c4fd84a3",
+      "mergeCommit": {
+        "oid": "3b0774f9d88a9dd660de329183f74ccfcc0f8fa5"
+      },
+      "mergedAt": "2026-10-24T06:25:37Z",
+      "state": "MERGED"
+    },
+    "qs-ai": {
+      "pr": 223,
+      "headRefOid": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "mergeCommit": {
+        "oid": "404323f7f840541cf9d8e032e9fb26ac1f890187"
+      },
+      "mergedAt": "2026-10-24T06:25:43Z",
+      "state": "MERGED"
+    }
+  },
+  "host_merge_trees_verified": {
+    "iam": "45babb2ab572755617f7fd360632f37be60e733e",
+    "qs-server": "d8e3910322bdfbbcdd8ee52966068c00b1873fac",
+    "qs-ai": "7be58e3add5e1a7048622bdf14d093ee6adbb9e9"
+  },
+  "native_report_count": 32,
+  "native_passed_report_counter_sum": 1190,
+  "counter_semantics": "sum of report counters across matrix profiles; not unique business scenarios",
+  "failed": 0,
+  "skipped": 0,
+  "production_deployed": false,
+  "system_acceptance": false,
+  "observation_48h": false,
+  "infra_merge": "68b25ecebc429ca8a2bae62e970b76e9442a797f",
+  "infra_changed_files_match_tested_source": true
+}
