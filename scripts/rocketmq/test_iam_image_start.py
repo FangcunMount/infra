@@ -10,11 +10,17 @@ from iam_image_start import IAM_SHA, configuration, inventory, protocol_metrics,
 class ImageStartContractTest(unittest.TestCase):
     def test_seed_archive_cannot_be_reported_as_publication_or_witness(self):
         import json
-        value=dict(schema_version=41,seed_events_retained=2,controlled_seed=True,
+        value=dict(schema_version=40,seed_events_retained=2,controlled_seed=True,
                    publication_intents_created=False,witnesses_created=False,legacy_drain_claimed=False)
         self.assertEqual(seed_receipt('IAM_IMAGE_FIXTURE_READY '+json.dumps(value)),value)
         for key in ('publication_intents_created','witnesses_created','legacy_drain_claimed'):
             with self.assertRaises(RuntimeError):seed_receipt('IAM_IMAGE_FIXTURE_READY '+json.dumps(dict(value,**{key:True})))
+    def test_old_schema41_initializer_cannot_replace_live_schema40_proof(self):
+        import json
+        value=dict(schema_version=41,seed_events_retained=2,controlled_seed=True,
+            publication_intents_created=False,witnesses_created=False,legacy_drain_claimed=False)
+        with self.assertRaises(RuntimeError):seed_receipt('IAM_IMAGE_FIXTURE_READY '+json.dumps(value))
+
     def test_component_keeps_exact_iam_grants_without_other_owner_resources(self):
         import json
         source=json.loads((Path(__file__).resolve().parents[2]/'components/rocketmq/serverd-routes-m3-v2.json').read_text())

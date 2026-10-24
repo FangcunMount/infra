@@ -17,11 +17,14 @@ from image_start_fixture import IMAGE_PROVENANCE
 
 
 def synthetic_unit_receipt():
-    return dict(schema='m3-five-actual-image-startup-trial/v3', passed=15, failed=0, skipped=0,
+    return dict(schema='m3-five-actual-image-startup-trial/v4', passed=16, failed=0, skipped=0,
         workers_prepared={name:True for name in ('worker1','worker2','worker3')},
         worker_restart_checks=[dict(component=name,cycle=cycle,result={'state':dict(Status='exited',ExitCode=0,OOMKilled=False)})
             for name in ('worker1','worker2','worker3') for cycle in range(1,4)],
-        cases={str(n):True for n in range(15)}, sources=SOURCES, sources_unchanged=True,
+        cases={str(n):True for n in range(16)}, sources=SOURCES, sources_unchanged=True,
+        dependency_versions=dict(mysql='8.0.36',mongo='7.0.31'),
+        actual_runtime_budgets={name:dict(memory_bytes=memory*1024*1024,nano_cpus=int(cpu*1_000_000_000))
+          for name,memory,cpu in (('iam',1024,1),('ai',768,.75),('api',1024,2),('collection',320,1),('collection2',320,1),('worker1',768,1),('worker2',768,1),('worker3',768,1))},
         mysql_runtime_ddl_attempts=0,mongo_runtime_ddl_attempts=0,
         mongo_ddl_audit=dict(positive_controls=4,commands=[]),
         production=False,system_acceptance=False,combined_cutover_rehearsal_complete=False,c1_cutover_barrier_exercised=False,
@@ -65,7 +68,7 @@ class CutoverReceiptAdmissionTest(unittest.TestCase):
         value=synthetic_unit_receipt();value['sources']=dict(value['sources'],qs='3'*40)
         with self.assertRaises(RuntimeError):self.check(value)
 
-    def test_all_seven_processes_and_original_cleanup_are_required(self):
+    def test_all_eight_processes_and_original_cleanup_are_required(self):
         value=synthetic_unit_receipt();value['processes'].pop('worker3')
         with self.assertRaises(RuntimeError):self.check(value)
         value=synthetic_unit_receipt();value['processes']['api']['state']['ExitCode']=137
@@ -118,3 +121,22 @@ class CutoverReceiptAdmissionTest(unittest.TestCase):
                     self.assertEqual(operation.status()['phase'],'runtime_start_failed')
                     self.assertFalse(operation.status()['old_data_restore_eligible'])
                     with self.assertRaises(BoundaryError):operation.restore_before_start('forbidden',lambda:self.fail('old restore ran'))
+
+class LiveProductionProfileTest(unittest.TestCase):
+    def test_current_replica_scope_cannot_accept_the_old_seven_process_receipt(self):
+        self.assertEqual(set(COMPONENTS), {'iam','ai','api','collection','collection2','worker1','worker2','worker3'})
+        value=synthetic_unit_receipt();value['processes'].pop('collection2')
+        with tempfile.TemporaryDirectory() as root:
+            path=Path(root)/'old-seven-process.json';path.write_text(json.dumps(value))
+            with self.assertRaises(RuntimeError):startup_receipt(path)
+
+    def test_old_database_versions_or_small_iam_budget_cannot_authorize_cutover(self):
+        cases=[]
+        for key,value in (('mysql','8.0.44'),('mongo','7.0.37')):
+            r=synthetic_unit_receipt();r['dependency_versions'][key]=value;cases.append(r)
+        r=synthetic_unit_receipt();r['actual_runtime_budgets']['iam']['memory_bytes']=512*1024*1024;cases.append(r)
+        r=synthetic_unit_receipt();r['schema']='m3-five-actual-image-startup-trial/v3';cases.append(r)
+        for value in cases:
+            with self.subTest(value=value),tempfile.TemporaryDirectory() as root:
+                path=Path(root)/'wrong-profile.json';path.write_text(json.dumps(value))
+                with self.assertRaises(RuntimeError):startup_receipt(path)

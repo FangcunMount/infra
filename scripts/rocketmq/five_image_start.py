@@ -25,7 +25,7 @@ from qs_consumer_contract import parse_contract, validate_manifest
 from mongo_ddl_audit import AuditError, install as install_mongo_audit, read as read_mongo_audit
 from go_failure_diagnostics import diagnostics as go_diagnostics
 
-IAM_SHA = '954ad9dee2f71a51151b696ec05d5cb90cc65b50'
+IAM_SHA = 'ca59dec47fe4e544cd06bf52f9e3c64fbbdad211'
 SOURCES = dict(iam=IAM_SHA, qs=QS_SHA, ai=AI_SHA)
 
 
@@ -137,12 +137,12 @@ def main():
     args = p.parse_args(); require(not args.report.exists(), 'new_report_required')
     cutover = args.startup_receipt is not None
     repo = Path(__file__).resolve().parents[2]
-    report = dict(schema='m3-five-actual-image-startup-trial/v3', passed=0, failed=0, skipped=0,
+    report = dict(schema='m3-five-actual-image-startup-trial/v4', passed=0, failed=0, skipped=0,
                   production=False, system_acceptance=False, combined_cutover_rehearsal_complete=False,
                   c1_cutover_barrier_exercised=False, cases={}, sources=SOURCES,
                   scope='actual processes, required IAM/AI and closed SDK owners; completed worker startup phase, HTTP/Redis and catalog consistency; no business or per-worker delivery proof')
     if cutover:
-        report.update(schema='m3-five-actual-image-cutover/v1', scope='owned old-schema full restore training, original offline upgrades and actual seven-process C1/30-minute start; no production/system/business claim')
+        report.update(schema='m3-five-actual-image-cutover/v1', scope='owned old-schema full restore training, original offline upgrades and actual eight-process C1/30-minute start; no production/system/business claim')
     f = FiveImageFixture(repo, report); run = f.run
     f.applications = {}; f.images = {}; f.private_dirs = {}
     def case(name):
@@ -287,17 +287,18 @@ def main():
             f.select(component); f.ownership(10001 if component == 'ai' else 2000)
         if cutover:
             from image_cutover_offline import prepare
-            specs = dict(iam=dict(alias='iam-apiserver',memory='512m',cpus='1'),
+            specs = dict(iam=dict(alias='iam-apiserver',memory='1024m',cpus='1'),
                 ai=dict(alias='ai',memory='768m',cpus='0.75',environment=ai_env),
                 api=dict(alias='qs-apiserver',memory='1024m',cpus='2'),
-                collection=dict(alias='qs-collection',memory='320m',cpus='1'))
+                collection=dict(alias='qs-collection',memory='320m',cpus='1'),
+                collection2=dict(alias='qs-collection-2',memory='320m',cpus='1'))
             specs.update({name:dict(alias=name,memory='768m',cpus='1') for name in ('worker1','worker2','worker3')})
             admin_env = dict(ai_env, QS_AI_DATABASE_URL=f'mysql+asyncmy://root:{f.password}@mysql:3306/{ai_db}')
             prepare(f,args,dict(iam=iam_db,qs=qs_db,ai=ai_db),admin_env,specs,case)
             case('original_offline_upgrades_inside_single_c1')
         f.stage = 'mongo_runtime_ddl_audit_install'
         install_mongo_audit(f.mongo, qs_db)
-        f.stage = 'actual_iam_with_mtls_start'; f.start('iam', alias='iam-apiserver', memory='512m', cpus='1')
+        f.stage = 'actual_iam_with_mtls_start'; f.start('iam', alias='iam-apiserver', memory='1024m', cpus='1')
         f.ready('iam', 9080, '/healthz'); report['iam_metrics'] = f.ready('iam', 9080, '/metrics', protocol_metrics); case('actual_iam_ready_and_paused_checker_live')
         f.stage = 'actual_readonly_ai_start'
         f.start('ai', alias='ai', memory='768m', cpus='0.75', environment=ai_env)
@@ -306,6 +307,9 @@ def main():
         f.ready('api', 8080, '/healthz'); report['qs_metrics'] = f.ready('api', 8080, '/metrics', qs_metrics); case('actual_qs_api_with_iam_ai_and_both_paused_owners')
         f.stage = 'actual_collection_start'; f.start('collection', alias='qs-collection', memory='320m', cpus='1')
         f.ready('collection', 8080, '/healthz'); case('actual_collection_with_required_iam_and_api')
+        f.images['collection2']=f.images['collection'];f.private_dirs['collection2']=f.private_dirs['collection']
+        f.stage='actual_second_collection_start';f.start('collection2',alias='qs-collection-2',memory='320m',cpus='1')
+        f.ready('collection2',8080,'/healthz');case('actual_second_collection_with_original_replica_budget')
         f.stage = 'actual_three_workers_start'
         for index in range(1, 4):
             component = 'worker' + str(index); f.images[component] = f.images['worker']; f.private_dirs[component] = f.private_dirs['worker']
@@ -336,14 +340,14 @@ def main():
         if cutover:
             report['actual_cutover'] = f.boundary.finish()
             report['c1_cutover_barrier_exercised'] = True
-            case('actual_seven_process_c1_and_thirty_minute_window')
+            case('actual_eight_process_c1_and_thirty_minute_window')
         f.stage = 'actual_five_image_shutdown'; report['processes'] = {}
         shutdown_failed = []
-        for component in ('worker3', 'worker2', 'worker1', 'collection', 'api', 'ai', 'iam'):
+        for component in ('worker3', 'worker2', 'worker1', 'collection2', 'collection', 'api', 'ai', 'iam'):
             result = stop_actual(component); report['processes'][component] = result
             if result['state'] != dict(Status='exited', ExitCode=0, OOMKilled=False): shutdown_failed.append(component)
         report['shutdown_failed_components'] = shutdown_failed
-        if not shutdown_failed: case('all_seven_actual_processes_shutdown_exit_zero')
+        if not shutdown_failed: case('all_eight_actual_processes_shutdown_exit_zero')
         ddl = f.sql("SELECT COUNT(*) FROM mysql.general_log WHERE user_host REGEXP '^(iam|qs|ai)_runtime' AND command_type='Query' AND UPPER(argument) REGEXP '^[[:space:]]*(CREATE|ALTER|DROP|TRUNCATE|RENAME)[[:space:]]';")
         report['mysql_runtime_ddl_attempts'] = int(ddl)
         report['mongo_ddl_audit'] = read_mongo_audit(f.mongo, qs_db)

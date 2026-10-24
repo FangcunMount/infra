@@ -22,8 +22,8 @@ def require(value, reason):
 
 
 IMAGE_PROVENANCE = {
-    ('iam', '954ad9dee2f71a51151b696ec05d5cb90cc65b50'): '9833d67e631587b908df00e2cc21371403912326',
-    ('ai', 'ddff86cad27d03c95dad28490d6cccbc1ce5b15f'): '9833d67e631587b908df00e2cc21371403912326',
+    ('iam', 'ca59dec47fe4e544cd06bf52f9e3c64fbbdad211'): '835cf766ceffd2694e2e0132bdf2408a2b2d0627',
+    ('ai', 'ddff86cad27d03c95dad28490d6cccbc1ce5b15f'): '835cf766ceffd2694e2e0132bdf2408a2b2d0627',
     **{(target, 'b75d4a52ec261275a0ffb588eeb31fd6496966d0'): '835cf766ceffd2694e2e0132bdf2408a2b2d0627'
        for target in ('qs-api', 'qs-collection', 'qs-worker')},
 }
@@ -115,7 +115,7 @@ class OwnedImageFixture:
     def dependencies(self):
         self.stage='owned_dependencies'
         broker_image='rocketmq-m3-image-start:5.5.1'
-        for image in ('mysql:8.0.44',):self.run(['docker','pull',image],timeout=300)
+        for image in ('mysql:8.0.36',):self.run(['docker','pull',image],timeout=300)
         config=self.directory/'broker';data=self.directory/'data';data.mkdir()
         accounts={name:dict(username='owned-'+name,password=secrets.token_hex(32)) for name in ('admin','inner')}
         render(accounts,config,'broker',self.repo/'components/rocketmq');(config/'tls').mkdir()
@@ -131,14 +131,18 @@ class OwnedImageFixture:
         for network in document['networks'].values():network.pop('name',None);network['internal']=True
         for service in document['services'].values():service['restart']='no'
         self.password=secrets.token_hex(32)
-        document['services']['mysql']=dict(image='mysql:8.0.44',restart='no',networks=['rocketmq'],mem_limit='512m',
+        document['services']['mysql']=dict(image='mysql:8.0.36',restart='no',networks=['rocketmq'],mem_limit='512m',
             tmpfs=['/var/lib/mysql'],environment=dict(MYSQL_ROOT_PASSWORD=self.password,MYSQL_ROOT_HOST='%'),
             healthcheck=dict(test=['CMD-SHELL','MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e "SELECT 1"'],interval='3s',timeout='3s',retries=50))
         file=self.directory/'compose.json';write_private(file,document)
         self.compose=['docker','compose','-p',self.project,'-f',str(file)];self.started=True
         self.run(self.compose+['up','-d','--wait','--wait-timeout','180'],timeout=210)
         self.report['dependency_image_ids']={name:self.run(['docker','image','inspect',tag,'--format','{{.Id}}']).stdout.strip()
-            for name,tag in dict(mysql='mysql:8.0.44',rocketmq=broker_image).items()}
+            for name,tag in dict(mysql='mysql:8.0.36',rocketmq=broker_image).items()}
+
+        version=self.sql('SELECT VERSION();')
+        require(version == '8.0.36', 'actual_production_mysql_version_required')
+        self.report.setdefault('dependency_versions', {})['mysql']=version
 
     def sql(self, statement):
         return self.run(self.compose+['exec','-T','mysql','sh','-c','MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B'],stdin=statement).stdout.strip()
