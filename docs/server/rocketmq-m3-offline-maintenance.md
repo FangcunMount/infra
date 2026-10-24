@@ -50,3 +50,19 @@ IAM PR144、QS PR434已合并事务runtime禁自动DDL：最终配置须显式mi
 AI PR220、QS PR435为初始绑定候选，未关闭C2。AI双档实际CLI已通过，但完整CI仍有旧草稿回放失败待复验；QS正在整合PR434并等待实际原双库CLI。两者只在显式安装后的原库内INSERT新owner绑定，私有计划/独立摘要/有效期、空新责任、原身份和schema均重查；不覆盖旧绑定，不将绑定当消息迁移或排空，不自动启动业务。QS两个owner分属两个原根，必须分别读取结果；任一失败/未知都继续停机，不删另一个已提交根来补偿。
 
 最终三库组合仍需验证：IAM限定范围保护/安装/选择，QS原双库保护/显式完整DDL及两owner绑定，AI原保护/显式Alembic及单owner绑定；都经同一infra协调目录的独立受审步骤和单次摘要，不以声明替代真实全写者排除。最终生产命令、原对象/数据保护与恢复材料、实际版本/主机和具体镜像由T29冻结；T30之后才具名生产操作。
+
+
+## 2026-10-24 全写者源码复核补充
+
+固定IAM36456cdf、QS83147d8e、AI05d2db71的17份入口/装配/工作流原字节摘要见总表结构化证据。源码清单不证明实际旧镜像、外部caller、DB会话及自动重启已冻结，T29–T33继续回读。
+
+| 入口 | 窗口内责任 | 必须保留的边界 |
+| --- | --- | --- |
+| IAM REST authz及gRPC scoped/managed replacement | 冻结授权写，核对原版本不再增加 | 保留AuthN登录、读取和session撤销；不能连带封闭全部HTTP POST |
+| IAM maintenance dispatcher | scope/role-model/condition/statistics-operations/account-provision/reviewer-scope及authorization-migrate分别排除；DDL只走冻结C1步骤 | reliable-messaging当前仅只读preflight；tenant-retirement在连接DB前拒绝，不当作活动写者排空 |
+| QS worker/runtime | 旧hold replayer、NSQ消费者与未来计划先交接；新consume-only deferred consumer承接原业务责任 | 关闭publish不证明未来计划无执行者；拆Topic不放大并发 |
+| QS维护工具 | qs-operator prepare/recover apply、selected/orphan retire，以及qs-ai-messaging admission open单列权限 | 审计或close记录不授权其他工具apply/open |
+| AI supervisor及维护 | generation/evaluation、旧mq_relay和显式semantic-contract恢复分开排除；保留checkpoint/provider unknown及receipt | 新事务模式不装配旧Relay，不证明旧容器/scanner已停 |
+| 自动及手工部署 | IAM/QS原CD暂停继续保留；AI排除AUTO_DEPLOY_ENABLED及手工workflow_dispatch，schema-maintenance同样列入 | AI自动开关只门控workflow_run，不阻止手工触发 |
+
+三库维护组合草稿PR222在同一C1目录执行真实宿主维护契约，再用明确标注的进程sentinel验证首个启动后的拒绝。它不代替实际业务runtime、原生产备份/恢复或全写者停写；门禁通过前不勾选C2。
