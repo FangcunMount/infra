@@ -33,7 +33,7 @@ T25-D 按新首发范围冻结候选并组合验证原 NSQ 排空、未来计划
 - 源码合并：T24-D IAM PR140、QS PR432、AI PR219、infra PR192已合并；此前常规保护/规则及SDK固定tx.4/a4证据保留。稳定SDK、生产部署/DDL/Topic/ACL/provider切换、Mac mini规则加载、system与48h观察均未执行。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：**T01–T28已完成，T29最终候选进行中**。固定五镜像；IAM8/AI9组件已合并，当前QS110/44双库9/9；实际七进程v3的15/15、三worker九次启停/全体正常关闭/零DDL通过。cf3完整CI16检查、16报告691项通过。40101320282的完整三MySQL/整Mongo保护恢复和五镜像私有回环交付已精确通过，总体在协调清单初始化仍失败；规范编码修复4715c96与332纯测试通过，40102265403原生复验中。完整协调启动/30分钟、最终实际配置/包、修复最终头合并、生产105前置与切换/system/48小时仍未完成。
+- 当前批次：**T01–T28已完成，T29最终候选进行中**。固定五镜像；IAM8/AI9组件已合并，当前QS110/44双库9/9；实际七进程v3的15/15、三worker九次启停/全体正常关闭/零DDL通过。cf3完整CI16检查、16报告691项通过。40101320282的完整三MySQL/整Mongo保护恢复和五镜像私有回环交付已精确通过，总体在协调清单初始化仍失败；规范协调与IAM45已过；QS审批ID格式修正a28b380、334纯测试及原Go文件契约通过，40103917422完整复验中。完整协调启动/30分钟、最终实际配置/包、修复最终头合并、生产105前置与切换/system/48小时仍未完成。
 
 
 ### T23 执行验收（同一正式任务，4/4已完成）
@@ -239,7 +239,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T26 | 预发布三库完整CI/API评审/混合链路，稳定协议冻结 | 2026-10-24；infra PR233 bff1b895、QS PR438 9a20f62a、AI PR222 1b380a29均合并；六档各40项、关联10报告451项，合计691/0/0；[最终证据](evidence/rocketmq-m3-t26-final-20261024.json) |
 | ✅ | T27 | 同SDK SHA的稳定Go/Python发布、摘要/锁/receipt | 2026-10-24；Go v0.5.0/Python0.4.0同源码1345266，PR58/59已合并；双Release各9资产重新下载/digest核验、234模块文件及wheel/sdist各114纯测试；[发布证明](evidence/rocketmq-m3-stable-release-20261024.json) |
 | ✅ | T28 | 三库正式稳定制品、重新安装及非空零跳过完整门禁 | 2026-10-24；IAM147 713f83b2/QS439 3b0774f9/AI223 404323f7，实际tree均与源码CI候选相同；infra236 68b25ece，20检查通过、正式制品与宿主完整门禁收口；[证据](evidence/rocketmq-m3-stable-adoption-20261024.json) |
-| ☐ | T29 | 固定最终镜像/配置/资源、恢复/启动及30分钟演练 | 进行中：五镜像固定、IAM8/AI9组件已合并、QS110/44双库9/9；七进程15/15＋九次worker启停/零DDL、cf3完整CI691项、三MySQL/整Mongo精确保护恢复与隔离镜像交付通过。4715c96规范清单/原协调启动复验40102265403；完整C1/30分钟、实际配置/包及最终头合并待完成。[候选证据](rocketmq-m3-final-candidate.md) |
+| ☐ | T29 | 固定最终镜像/配置/资源、恢复/启动及30分钟演练 | 进行中：五镜像固定、IAM8/AI9组件已合并、QS110/44双库9/9；七进程15/15＋九次worker启停/零DDL、cf3完整CI691项、三MySQL/整Mongo精确保护恢复与隔离镜像交付通过。a28b380原审批契约/实际协调启动复验40103917422；完整C1/30分钟、实际配置/包及最终头合并待完成。[候选证据](rocketmq-m3-final-candidate.md) |
 | ☐ | T30 | 105前置、真实库/运行基线及具名生产清单 | 待开始；生产前置未核验 |
 | ☐ | T31 | 回读生产v2资源/配置与Mac mini告警，保持封准入 | 待开始 |
 | ☐ | T32 | 排空、交接、同窗口保护及显式离线迁移 | 待开始 |
@@ -2102,3 +2102,12 @@ ad5c468dd50ac39559c0c3b69491a921e31e4b19为完整保护导出显式设置utf8mb4
 总体随后在协调器初始化中抛BoundaryError，未执行原离线升级或业务runtime；原报告没有异常消息/源码帧，不能断言唯一原因。已在原producer/consumer路径纯复现：`write_private`写报告格式JSON，而原`runtime_start.load`要求`_encoded`规范bytes，必然冲突。4715c96改为独占0600写规范bytes＋fsync，由原reader立即校验；原报告/迁移审批格式不变。332项纯测试通过（新增原writer→reader回归、非规范拒绝/不覆盖）；新增失败消息hash/本repo源码行诊断及分阶段已过case记账，不输出异常正文。40102265403原生组合复验中。
 
 M3仍**28/36**、T29未勾选。T29完整恢复及隔离镜像交付组件已验收；原维护/实际协调启动/30分钟、最终配置/执行包和最终头合并仍未完成。生产实际105、具名批准、合法system和48小时未执行。
+
+
+### 2026-10-24：规范协调器与IAM维护通过；修正QS原审批ID并增加真实原Go读取器契约
+
+40102265403实际5/1/0，完整保护恢复、规范启动清单、原IAM45 schema/选择通过；在QS原offline apply拒绝。协调器状态maintenance_failed、旧保护恢复资格仍在、first_start_recorded=false，无新runtime。原报告与清理/源码未改见[证据](evidence/rocketmq-m3-original-offline-approval-followup-20261024.json)。
+
+原Go`retirementOpRE`要求`数字-数字`，而夹具传入Compose项目名；已用固定b75源的原`readOfflineAuthorization`/`validateOfflineAuthorization`验证此不兼容。a28b380只为schema子操作选用真实GitHub RUN_ID-ATTEMPT，原协调目录仍保留自身绑定与责任摘要，不改Go政策。334纯测试/actionlint通过；本地原Go私有文件读取器实际接受Python生成审批、拒绝错误Compose名/目标，临时_test文件finally移除且QS工作区干净。
+
+新增required `approval-contract`在真实依赖前运行同一原Go读取器、核对编译资源目标并清理临时源文件，缺输入直接fail；40103917422该job与contracts均已成功，完整cutover仍运行中。这是纯跨语言/文件协议验证，不是实际DB/备份/生产证明。失败命令额外只提取原offline JSON固定stage/布尔；正文/DSN/SQL不导出，redaction测试通过。原审批文件schema/绑定、原范围保护、30分钟与首次启动门禁均保留。M3仍**28/36**、T29不勾选，生产未操作。
