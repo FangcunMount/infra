@@ -2068,3 +2068,12 @@ QS441当前b75d4a52在28项检查成功、1项条件文档/API同步N/A后正常
 [40097426163](https://github.com/FangcunMount/infra/actions/runs/40097426163)实际3/1/0，在窗口前完整三MySQL/整QS Mongo保护恢复核对处返回`actual_full_scope_restore_readback_differs`；尚无协调目录/首次启动标记、离线升级或业务进程，声明清理4项与源码未改通过。[原报告](evidence/rocketmq-m3-c1-first-restore-failure-20261024.json)保留，不把已有组件恢复及七进程成功代替本次完整范围通过。
 
 3260414保留同一精确摘要门禁，补充失败前后逐库/对象摘要、provider/无runtime布尔及DDL行类别/长度/hash诊断，不输出SQL、业务事实、注释或保护原文；1项保护准入＋5项原dump规范化纯测试通过。40098200483继续同一固定镜像/已成功v3回执复验，原因尚未确认。原cf3ddbd源码CI同时进行，修复最终头仍须门禁；M3仍**28/36**、T29未勾选，生产未操作。
+
+
+### 2026-10-24：cf3完整CI691项通过；完整恢复差异已缩小，显式字符集复验中
+
+infra253分支头cf3ddbd840c4c3518af0ba7165ebd13abdf26ac8、实际PR测试merge5c4062885a97df25c193eda3cfc22fc89cef4003：7工作流/16检查成功，6个条件不适用job单列；下载16份小型报告共691/0/0（6档成对各40＋原10报告451），每份4项声明清理按原真假语义回读。15份正式SDK1345266，一份原生DLQ生成夹具仍单列8de893b；未下载227MB Broker归档。[CI回执](evidence/rocketmq-m3-cf3-candidate-ci-20261024.json)。该头早于恢复诊断/字符集改动，不能代替修复后最终头门禁。
+
+40098200483继续3/1/0，[逐库差异](evidence/rocketmq-m3-full-restore-difference-20261024.json)表明QS MySQL与整Mongo一致，IAM列/库定义一致但数据dump变化，AI完整dump一致但列元数据变化；provider保持，runtime未启动，声明清理与源码未变更通过。没有把这些差异归为可忽略，也未增加列元数据规范化。
+
+ad5c468dd50ac39559c0c3b69491a921e31e4b19为完整保护导出显式设置utf8mb4及`--set-charset`（在`--compact`之后）；完整导入在同一连接先SET NAMES utf8mb4并回读client/connection/results三个值，再恢复原保护bytes。原dump/列/Mongo精确比较保持；含中文/四字节字符及二进制的原文保留、会话设置与错误回读拒绝等7项定向纯测试通过。MySQL[官方dump选项](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html)说明compact关闭set-charset；实际默认字符集与修复结果由40099179996回读，尚未验收，不先称根因已修复。M3仍**28/36**、T29未勾选，生产未操作。

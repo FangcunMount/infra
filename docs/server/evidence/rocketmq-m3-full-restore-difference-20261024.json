@@ -1,0 +1,948 @@
+{
+  "schema": "m3-full-restore-difference-followup/v1",
+  "run_id": 40098200483,
+  "report_sha256": "6c75052861766d82efa9eb32d0ad53b54afe65c4a4780314d4f43a3a03cb0f8b",
+  "report": {
+    "schema": "m3-five-actual-image-cutover/v1",
+    "passed": 3,
+    "failed": 1,
+    "skipped": 0,
+    "production": false,
+    "system_acceptance": false,
+    "combined_cutover_rehearsal_complete": false,
+    "c1_cutover_barrier_exercised": false,
+    "cases": {
+      "actual_source_registry_consumers_match_manifest": true,
+      "all_five_exact_archives_loaded": true,
+      "original_pre_m3_qs_pair_prepared": true
+    },
+    "sources": {
+      "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "qs": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+    },
+    "scope": "owned old-schema full restore training, original offline upgrades and actual seven-process C1/30-minute start; no production/system/business claim",
+    "infra_sha": "3260414cc1dee1276eb8baa9fb1517a30ca27c81",
+    "original_qs_consumer_count": 1,
+    "original_qs_consumer_contract": {
+      "consumers": [
+        {
+          "id": "modelcatalog.hot_rank_projection",
+          "runtime": "apiserver",
+          "event_type": "answersheet.submitted",
+          "topic": "qs.evaluation.lifecycle",
+          "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+          "delivery": "durable_outbox",
+          "outbox_profile": "mongo_domain_events"
+        }
+      ],
+      "schema": "qs-original-consumer-contract/v1",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "original_qs_consumer_contract_sha256": "f65853c2aee20108a26d53c7e65d4234a5d66235df4440355a48e1d90f883a4a",
+    "candidates": {
+      "iam": {
+        "target": "iam",
+        "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+      },
+      "qs-api": {
+        "target": "qs-api",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:c1c1093a411dba90bb47ad7dabe8dc50b21a0fed633efef4cb94eeae909886c4",
+        "archive_sha256": "3c2aefb67ea9f50b7acea8d232a05d7ba0296173e75ecf2ebeb3b52bf2dab71b"
+      },
+      "qs-collection": {
+        "target": "qs-collection",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:07e13f2fcd1bd59cdc14a81e0334c73a8b5b7939d235b056254378f939af37ce",
+        "archive_sha256": "a3140df0c4ba98fbefd82f6da06ef4f4cb4867e0eb63fd37cfa91b9ca6cc77cb"
+      },
+      "qs-worker": {
+        "target": "qs-worker",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:98b5b635aa72cae96899a5289dea4aa038bcd25ba1eeebe9f944682f4e3a0d98",
+        "archive_sha256": "907abca7e5b2b410ab4383bead344d2c08d01fac9e0e7ba54fbf00b4eee21b25"
+      },
+      "ai": {
+        "target": "ai",
+        "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+      }
+    },
+    "dependency_image_ids": {
+      "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "rocketmq": "sha256:0ff381f0e09196ea32c8cb23142aad038acbc59baaa0411571805c275e8f78d3",
+      "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+    },
+    "resources": {
+      "version": 2,
+      "operations": 53,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true
+    },
+    "qs_schema": {
+      "journal_force_used": false,
+      "mongo": 40,
+      "mysql": 105,
+      "original_templates_applied": true,
+      "production": false,
+      "profile": "pre_m3",
+      "resources_sha256": "c37b639804391172b2209f11c7056b4867309a31054af3c5d3f740cd6145b86d",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "iam_controlled_seed": {
+      "controlled_seed": true,
+      "legacy_drain_claimed": false,
+      "publication_intents_created": false,
+      "schema_version": 41,
+      "seed_events_retained": 2,
+      "witnesses_created": false
+    },
+    "configuration_sha256": {
+      "iam": "3e93f1ade88ba8aca987275f7a98e74341c7157f85d4f253fb7d8758ed18205c",
+      "api": "c66ae6172ceeb0e06e9f96c592b0d20e99edbf41bf70ce2e29268728e5a9f1fc",
+      "collection": "0df46001470a8ee4a5568c834fe03a4f3095ced666b2dbf210716dab95a0318f",
+      "worker": "979d6fd4353164d4955f385baac9ea11838764786b4ce260f6f904bb5d7fa42c"
+    },
+    "full_restore_difference": {
+      "before": {
+        "iam": {
+          "canonical_dump_sha256": "c32be3c6e9054900205b6812951939e03bdc3a6af3332af989a4edc73d28611f",
+          "columns_sha256": "23e1cb268c83697a50ede67570075627fb21a58b1eb233eb48d54c59c1ffb1c2",
+          "database_definition_sha256": "78a6cf66eb10b6876daa17a2085a186c488be9e1f0af2d6dcb7ae564541bb5d7"
+        },
+        "qs": {
+          "canonical_dump_sha256": "ba51ee3ac16478b8dc029d0a14f03d3e56c0de10afca40004a57f6545f3ddab6",
+          "columns_sha256": "6c6356b024476f854092f6f3663c47595b112295952de5ee20d2b7276faae3fc",
+          "database_definition_sha256": "c6564fff3cefa37961c01ddeaa84323308f76df7b1b2b5c966734ef8e6f18644"
+        },
+        "ai": {
+          "canonical_dump_sha256": "f46b59be26cb077b7cce7d3cce19f2851b575aeeb2816aa6d0e510a982f6a0dd",
+          "columns_sha256": "4b8485652abbe4ec2bbea7f527127dffbcb532e77efd81b0a0adcc68a98c5405",
+          "database_definition_sha256": "fd203d0ec151eff395ca35c8c0ec75c148d0c3eb2ff3034be94157784fe2f955"
+        },
+        "mongo": {
+          "snapshot_sha256": "e76eb9d911a5579822846d058a4bc39f2e2c1520c909bfb4cc92fa82c142f877",
+          "collections": 14
+        }
+      },
+      "after": {
+        "iam": {
+          "canonical_dump_sha256": "8c5f410f27a4bfb0a5d7d72e0213bad1d07cb36470d38e5c50fe5f050d2940f5",
+          "columns_sha256": "23e1cb268c83697a50ede67570075627fb21a58b1eb233eb48d54c59c1ffb1c2",
+          "database_definition_sha256": "78a6cf66eb10b6876daa17a2085a186c488be9e1f0af2d6dcb7ae564541bb5d7"
+        },
+        "qs": {
+          "canonical_dump_sha256": "ba51ee3ac16478b8dc029d0a14f03d3e56c0de10afca40004a57f6545f3ddab6",
+          "columns_sha256": "6c6356b024476f854092f6f3663c47595b112295952de5ee20d2b7276faae3fc",
+          "database_definition_sha256": "c6564fff3cefa37961c01ddeaa84323308f76df7b1b2b5c966734ef8e6f18644"
+        },
+        "ai": {
+          "canonical_dump_sha256": "f46b59be26cb077b7cce7d3cce19f2851b575aeeb2816aa6d0e510a982f6a0dd",
+          "columns_sha256": "9bc29987bb0317684c284406c07d48d3780d4291bcc4d9874c304d516e7d8e2f",
+          "database_definition_sha256": "fd203d0ec151eff395ca35c8c0ec75c148d0c3eb2ff3034be94157784fe2f955"
+        },
+        "mongo": {
+          "snapshot_sha256": "e76eb9d911a5579822846d058a4bc39f2e2c1520c909bfb4cc92fa82c142f877",
+          "collections": 14
+        }
+      },
+      "provider_unchanged": true,
+      "runtime_started": false,
+      "mysql": {
+        "iam": {
+          "raw_dump": [
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 117,
+                  "sha256": "c5802b9a44237289214722fdfe2491dc189f9d822f421f03626c99cf86da6216",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 139,
+                  "sha256": "b0812adf7ba0167f51813e201048543462270c9ea1a02c16baf09ec1937b79de",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 105,
+                  "sha256": "d91aaef7f2716a1bdc9ec5f52d7dd267b230e3c4bf446d206835964b888bf9da",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 127,
+                  "sha256": "9d1535f8fbf322bd17880afd133f46f7c8121df70d3ebbbb9876a260c01810d4",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 94,
+                  "sha256": "769872f6fd515b1871e7c99b360f4c42afb0506158fa74fae28a83a93e7b7665",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 116,
+                  "sha256": "7a5e2cef15e43917aa3132b08c8bb43377af42828a4b374c8e7b4480fa20d0d0",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 128,
+                  "sha256": "9772a19c346f113ca683aebd005b0413568b2dd776f410f65b931ed30a11b344",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 131,
+                  "sha256": "c4237406c09ad263da8eb95e101f1326b73566bd7820c4dfebfd43564eb10b70",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 126,
+                  "sha256": "3bf4ce51540ea5fe5f2d8f3581698ee85e0c00d2d413472ec571ecf5320c6340",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 118,
+                  "sha256": "70c117cda2bdb6adec4dbf3e78504dab2839cf18856ec1ffbe1e8039b5217050",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 110,
+                  "sha256": "6c43aab47b361b7626a277a7e591ca9e6bdcf87a6e90fdfacd4a04ec4ac00bc3",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 150,
+                  "sha256": "46d14d230504a357dc43b8bcda67ead27ada4ebfaf8e23a9ea416c6d85a2feb7",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 153,
+                  "sha256": "f123b11fbc8ab0106b0ed99969a71cd7a8c06274703bfd46ded99b40915fb33f",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 148,
+                  "sha256": "736ab84201817146032fc0336c85ec6b30ba8656351edc2f67f9312892954311",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 140,
+                  "sha256": "7059e494d99c084200334aae38eed63a8bf39b319f2f7c61bd62c932791a4bab",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 132,
+                  "sha256": "74e88fed4a2767095637b9019b8c3eb68e64e2b8f39665801a8d207767e307cd",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 100,
+                  "sha256": "01a741880ab4ef8ddba646d6c74f6365fe8fa53f8f8c25f3743afd3a3ec2646f",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 82,
+                  "sha256": "009983251be26e069f7748eec33b7fa54f572c793cf0c043c6fd0aab5ba2f32c",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 122,
+                  "sha256": "35e359fc026769fec66be60f2aff08dd7de68bca366bc74d77d443b07a2ae5bd",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 104,
+                  "sha256": "c28f49b0d27148efc83373e50c7dd1548b0c1fd087d156eabc924a83dd95f1aa",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 74,
+                  "sha256": "f6cf39f44f425c05ad91a13dc7beb4feb7f6fd728c2ad1df2a9eaf4c62a5586a",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 96,
+                  "sha256": "d06e3401d9c98865c61efe9035a1a1ea489adf77ad70bf00d074d425bb5827d3",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 93,
+                  "sha256": "d1a3f1468a7b2e31c82675c84a5829581eca1374660c5b15a3a3ae980088c854",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 115,
+                  "sha256": "6e9e836f3c966f4ebb7b840425b2ebd88a7bf6a5f4baba7da05ed6766bb2d2e4",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 120,
+                  "sha256": "4abcef68a3e96f6810c663e3ea8e1fd449ca77932c38c96ed0ef2997965c7a69",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 107,
+                  "sha256": "e4cd2acf2e234e45227839c617630e69a4bd5c2560197d4c8b829a85a7048efa",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 142,
+                  "sha256": "7e8fc5f4425b2fe17747b5082bc3100eeb98a47a7d467680816a46580dc60191",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 129,
+                  "sha256": "0a28cb76a4eb3f724b7b35a19656b058e1465e1af6f0ab31e579b5f9ff5c5df7",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 102,
+                  "sha256": "e85dc832e376252e4e5d8a24a0e925be3ee1053e528caf724db398c1dbf507d9",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 96,
+                  "sha256": "cacb3d3db3674e46f9183f9ac73a3b64c34cc5df7e884d8e7b7d543f18b6b416",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 124,
+                  "sha256": "bca2737496b0323493fd806fb9b146f768df17f53f98b9bfa3e96811cc8a029a",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 118,
+                  "sha256": "dcdabb998bc91f69e4a78e92002fe6343fa9b783cb29d3d9e829e8faeed2f698",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 93,
+                  "sha256": "5840a1d4bba51a696e44ed70b50afd003e3a31a6c96ba889cf3c806e98455a19",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 87,
+                  "sha256": "84f493390f35c90f0cbc310f4d7c9bf953509a1866a82055265788ecc6d8886b",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 115,
+                  "sha256": "babdc9119ee321967a2935f9caadeec4280e3c89d6dd37d97a7c2b3f63c9fe36",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 109,
+                  "sha256": "e76194acd651b9ad6569586e88decae54d9da92f499d0568f9c57e9d70b9db0c",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 89,
+                  "sha256": "9f6d24ed36063b5d0bdd697054d4b3524b6eb919f4e2c9aa7814afe33c6bfe4b",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 99,
+                  "sha256": "6aec9973e6e2a85d3fd35ae3d18ece24036b7d273c5548403c18b08b9de7ab2b",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 94,
+                  "sha256": "66210467053cfbc77fc4c22e66bf20f54093198e530b97eb40db285b4f2fe18c",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 83,
+                  "sha256": "753a2be59553454786645885839471d92f120f0199bd388966f1469fae890463",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 84,
+                  "sha256": "1856ae2c9b3fde7d7fc3e9f492ba325162768dfc93f3f8e7710b6e1dc0a48772",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 92,
+                  "sha256": "b36c6e922db210aa1b1881e9ffbe7a94c703fdda79405b3486ae3d7b9155070c",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 111,
+                  "sha256": "3c47910e4982ea3dbaebd887091dba2cd4734235d4b50b969e78930ef1b60a1f",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 121,
+                  "sha256": "49605c1c8419a15c770b406ab7d4b15d4149d24124ce52dc8bd47f4f68d37d67",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 116,
+                  "sha256": "e1465fe2fdeff32ad3fade25c1d3416039693235bf684bde8f54b22104542032",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 105,
+                  "sha256": "55cf57ff6a5d4265538fb3f3be1a96dad0171c054f5455d1f7a3a8c0e9713620",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 106,
+                  "sha256": "ba805fcff1c2597e7906922403255f707d9146b5df16d13523bab2a3e487376b",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 114,
+                  "sha256": "96159e17cdfce42146de782eb660d6126a01a07be3f4983da0cd409d43274deb",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 92,
+                  "sha256": "e908bee61bc4018251636e862134218cf1c8f114aa7557da7065b780728a448c",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 114,
+                  "sha256": "d36b40a846c63134336ef4d30462e4fbeda222a62d23be3afb677056611cd034",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 7291,
+                  "sha256": "7b35079f6a8e0cf6527fe1500f290ff71466d68fdb047e4a8d96342edd9cdb3a",
+                  "encoding_tokens": []
+                }
+              ],
+              "after": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 8802,
+                  "sha256": "e5154b3a0492b2e168fd71ac641afce16b2d10a172d17652f4df1116424699d8",
+                  "encoding_tokens": []
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 92,
+                  "sha256": "b27614c14706c7d531d2eef1e8937388140030b13333c96868480839ada7d8c7",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 99,
+                  "sha256": "27080c294e771c4accc6d77406082a1704c0f5b4d1dcc7b3bc57d102f66a82b6",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 114,
+                  "sha256": "b0591c29dc597dcc7e2c3882ec38fd599e633a703fc0c9447ab856ff0f96a7bb",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                },
+                {
+                  "kind": "column_definition",
+                  "bytes": 121,
+                  "sha256": "71653913d8b217590843e2e51c7e9c1ed82e904603893395bb54bccbdcd6d468",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 92,
+                  "sha256": "f1077ef1dad3b3156d3ba38f90e95be29320937606bcbeaa41223380c530efdf",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 114,
+                  "sha256": "8c91afacc4302dc85db697a71fdc56b3bf72b827836b61f15f9494d608171082",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 93,
+                  "sha256": "54a737f49549563c2bf68bf8691919514ef3f016084d7e7add54a85eb847cd93",
+                  "encoding_tokens": [
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "column_definition",
+                  "bytes": 115,
+                  "sha256": "fb14caf5d9bacf7002ecfb2e8a6718a325c398302f2433e93845dee230bcfdcd",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_unicode_ci"
+                  ]
+                }
+              ]
+            }
+          ],
+          "canonical_dump": [
+            {
+              "before": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 7291,
+                  "sha256": "7b35079f6a8e0cf6527fe1500f290ff71466d68fdb047e4a8d96342edd9cdb3a",
+                  "encoding_tokens": []
+                }
+              ],
+              "after": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 8802,
+                  "sha256": "e5154b3a0492b2e168fd71ac641afce16b2d10a172d17652f4df1116424699d8",
+                  "encoding_tokens": []
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 2087,
+                  "sha256": "8936e190b7e6c918d4ecfa54fc83e9ffb1bd8214f677ff0a7ddd030c84aa610d",
+                  "encoding_tokens": []
+                }
+              ],
+              "after": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 2810,
+                  "sha256": "570402b9267bd429d4d8750621a344218c937604dd9314237b274eeff722c4c6",
+                  "encoding_tokens": []
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 167670,
+                  "sha256": "d27169e3bd47597eaa1a1ea2a68bfa72807c0eff581000a9fcf500e01ddfebdb",
+                  "encoding_tokens": []
+                }
+              ],
+              "after": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 172138,
+                  "sha256": "bd12987064105e9f15ae5aec5e3c15f0ce3df5d8a5ec5532cbeb2288f05a58c4",
+                  "encoding_tokens": []
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 112570,
+                  "sha256": "f15a8c63b3882fdf021d8a09bff9befc92acedb9a6da5da6cf27052e2f00a431",
+                  "encoding_tokens": []
+                }
+              ],
+              "after": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 116700,
+                  "sha256": "c0a03b601bc48b28dc837238be599751f2a58877a1a1e8377053400f0e333978",
+                  "encoding_tokens": []
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 221,
+                  "sha256": "af6afabce09f599c0a30386437949e4e58f678c62bb022f455126834ca5a0ed7",
+                  "encoding_tokens": []
+                }
+              ],
+              "after": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 248,
+                  "sha256": "1602544021f2205be9cebac7a734f7e6b856654fe4ba20d3243262d62f191d92",
+                  "encoding_tokens": []
+                }
+              ]
+            },
+            {
+              "before": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 556,
+                  "sha256": "d6cb80dec89be2ac4b635d06dc38c7b47be4ba9d889b2c6c63dae3516a5351e0",
+                  "encoding_tokens": []
+                }
+              ],
+              "after": [
+                {
+                  "kind": "insert_rows",
+                  "bytes": 622,
+                  "sha256": "8ec8d66794fff738762f249215489af9b26024746d0105acdbe2ac570d8610f7",
+                  "encoding_tokens": []
+                }
+              ]
+            }
+          ],
+          "column_metadata": []
+        },
+        "ai": {
+          "raw_dump": [],
+          "canonical_dump": [],
+          "column_metadata": [
+            {
+              "before": [
+                {
+                  "kind": "other",
+                  "bytes": 187,
+                  "sha256": "4257a573673fb143338cc38dfd9657fab1480251d6d6bee74725f0c7915f7117",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_0900_ai_ci"
+                  ]
+                },
+                {
+                  "kind": "other",
+                  "bytes": 184,
+                  "sha256": "0f8608f1f2237f1d08794f2b85d0fec80dc3e4cc84a7eea9871d6019ba6741a5",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_bin"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "other",
+                  "bytes": 185,
+                  "sha256": "f25e8ffe121a338e560514d4af639358e2af81a533423b601045b1113a7cda22",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_0900_ai_ci"
+                  ]
+                },
+                {
+                  "kind": "other",
+                  "bytes": 182,
+                  "sha256": "ca4d69ebdbed974089b10e4d35d7e74b241d54a234d36e04a01c40f10f982a66",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_bin"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "failure_stage": "full_scope_pre_window_protection_and_restore",
+    "failure_kind": "RuntimeError",
+    "failure_reason": "actual_full_scope_restore_readback_differs",
+    "processes": {},
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    },
+    "sources_unchanged": true
+  },
+  "scope": "QS MySQL and full Mongo snapshots exact; IAM canonical data dump differs with exact columns/DB definition; AI dump exact but column metadata differs. No runtime/offline upgrade started.",
+  "fix_source_sha": "ad5c468dd50ac39559c0c3b69491a921e31e4b19",
+  "fix_scope": "Explicit utf8mb4 export and import session; original protection bytes and exact dump/column/Mongo gates retained, no added metadata normalization.",
+  "targeted_pure_tests": 7,
+  "retry_run_id": 40099179996,
+  "retry_verified": false,
+  "production": false
+}
