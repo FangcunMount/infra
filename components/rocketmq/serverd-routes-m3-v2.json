@@ -50,14 +50,14 @@
       "consumer_group": "rmq2_g_cd01b0229ac8ce4e3b35fc84d0ec241b"
     },
     {
-      "id": "qs-survey-catalog",
-      "topic": "qs.survey.lifecycle",
+      "id": "qs-evaluation-catalog-mongo",
+      "topic": "qs.evaluation.lifecycle",
       "subscription": "qs-apiserver-modelcatalog-hot-rank-v1",
-      "message_type": "NORMAL",
-      "owner": "qs.mysql",
+      "message_type": "TRANSACTION",
+      "owner": "qs.mongo",
       "route_revision": "m3-1",
-      "physical_topic": "rmq2_t_e093a39dd58a0085979347c160911d22",
-      "consumer_group": "rmq2_g_819c7935a80e1deaff9d9183f097a4de"
+      "physical_topic": "rmq2_t_99b374cae35ddb4c549a513e5b20e6c9",
+      "consumer_group": "rmq2_g_31b6493148baeff7d2aa268059f98459"
     },
     {
       "id": "qs-evaluation-mysql",
@@ -145,7 +145,6 @@
       "owner": "qs.mysql",
       "publish": [
         "qs-survey-worker",
-        "qs-survey-catalog",
         "qs-evaluation-mysql",
         "qs-task-normal",
         "qs-task-transaction",
@@ -154,7 +153,7 @@
       ],
       "subscriptions": [
         "iam-authz-qs",
-        "qs-survey-catalog",
+        "qs-evaluation-catalog-mongo",
         "ai-qs-event"
       ]
     },

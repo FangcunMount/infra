@@ -22,11 +22,11 @@ class M3ResourceTests(unittest.TestCase):
         self.assertEqual({r['owner'] for r in m['routes']},{'iam.mysql','qs.mysql','qs.mongo','ai.mysql'})
         self.assertEqual({r['topic'] for r in m['routes'] if r['message_type']=='NORMAL'},
                          {'iam.notify.sms','qs.survey.lifecycle','qs.plan.task'})
-        catalog = next(r for r in m['routes'] if r['id']=='qs-survey-catalog')
-        self.assertEqual((catalog['topic'],catalog['message_type']),('qs.survey.lifecycle','NORMAL'))
+        catalog = next(r for r in m['routes'] if r['id']=='qs-evaluation-catalog-mongo')
+        self.assertEqual((catalog['topic'],catalog['message_type'],catalog['owner']),('qs.evaluation.lifecycle','TRANSACTION','qs.mongo'))
         evaluations = [r for r in m['routes'] if r['topic']=='qs.evaluation.lifecycle']
         self.assertEqual({r['owner'] for r in evaluations},{'qs.mysql','qs.mongo'})
-        self.assertEqual(len({r['consumer_group'] for r in evaluations}),1)
+        self.assertEqual(len({r['consumer_group'] for r in evaluations}),2)
         authz = [r for r in m['routes'] if r['topic']=='iam.authz.version.v2']
         self.assertEqual(len({r['consumer_group'] for r in authz}),2)
         self.assertEqual(len({r['physical_topic'] for r in authz}),1)
