@@ -1,11 +1,22 @@
 import copy
+from pathlib import Path
+import tempfile
 import unittest
 
 from final_image_candidate import GO_SUM
-from iam_image_start import IAM_SHA, configuration, inventory, protocol_metrics, fixture_diagnostic
+from iam_image_start import IAM_SHA, configuration, inventory, protocol_metrics, fixture_diagnostic, source_failure_markers
 
 
 class ImageStartContractTest(unittest.TestCase):
+    def test_startup_marker_only_exports_authored_source_identity(self):
+        with tempfile.TemporaryDirectory() as root:
+            source=Path(root);folder=source/'internal/apiserver';folder.mkdir(parents=True)
+            (folder/'startup.go').write_text('return fmt.Errorf("explicit fixture startup failed: %w", err)\n')
+            body='explicit fixture startup failed: private-password wire payload SELECT personal-data'
+            markers=source_failure_markers(body,source)
+            self.assertEqual(len(markers),1)
+            self.assertEqual(set(markers[0]),{'path','line','template_sha256'})
+            self.assertNotIn('private-password',str(markers))
     def test_diagnostics_cannot_export_sql_or_credentials(self):
         raw='IAM_IMAGE_FIXTURE_FAILURE {"phase":"migrate_31","kind":"*mysql.MySQLError","server_code":1146}'
         self.assertEqual(fixture_diagnostic(raw)['server_code'],1146)

@@ -93,6 +93,23 @@ def fixture_diagnostic(raw):
     return value
 
 
+def source_failure_markers(raw, source):
+    """Export authored source locations, never a captured line or SQL/body."""
+    matches=[]
+    for relative in ('internal/apiserver','internal/pkg','pkg/app'):
+        for path in sorted((source/relative).rglob('*.go')):
+            if path.name.endswith('_test.go'):continue
+            text=path.read_text()
+            for token in re.finditer(r'(?:errors\.New|fmt\.Errorf)\(("(?:[^"\\]|\\.)*")',text):
+                try:template=json.loads(token.group(1))
+                except ValueError:continue
+                prefix=template.split('%',1)[0]
+                if len(prefix)<16 or prefix not in raw:continue
+                matches.append(dict(path=str(path.relative_to(source)),line=text[:token.start()].count('\n')+1,
+                    template_sha256=hashlib.sha256(template.encode()).hexdigest()))
+    return matches[:32]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('source', 'candidate', 'report'):
@@ -128,6 +145,11 @@ def main():
         result = run(['docker','logs',app], required=False)
         path = directory/'application-private.log'; path.write_text(result.stdout+result.stderr); path.chmod(0o600)
         report['private_application_log_sha256'] = sha256(path)
+        raw=result.stdout+result.stderr
+        report['application_source_error_markers']=source_failure_markers(raw,source)
+        report['application_mysql_error_codes']=sorted({int(code) for code in re.findall(r'Error ([0-9]{4})',raw)})[:16]
+        state=json.loads(run(['docker','inspect',app]).stdout)[0]['State']
+        report['application_process_state']={key:state[key] for key in ('Status','ExitCode','OOMKilled')}
     try:
         metadata = json.loads((args.candidate/'image-inventory.json').read_text()); inventory(metadata)
         archives = list(args.candidate.glob('*.tar.gz')); require(len(archives)==1, 'one_candidate_archive_required')
@@ -237,10 +259,11 @@ def main():
             runtime_logs();run(['docker','rm',app]);app_created=False
             require(code=='0','actual_shutdown_not_clean')
         stage='actual_old_chain_fixture_drain'
-        start('baseline.json');wait_http('/healthz')
+        start('baseline.json');wait_http('/healthz');case('actual_old_baseline_process_healthy')
         deadline=time.monotonic()+90
         while time.monotonic()<deadline:
             pending=sql(f"SELECT (SELECT COUNT(*) FROM {database}.rm_outbox WHERE BINARY state <> 'published')+(SELECT COUNT(*) FROM {database}.domain_event_outbox WHERE BINARY status <> 'published');")
+            if pending.isdigit():report['old_unpublished_fixture_rows']=int(pending)
             if pending=='0':break
             time.sleep(1)
         else:raise RuntimeError('original_bootstrap_outbox_not_drained')
@@ -294,6 +317,8 @@ def main():
     except Exception as error:
         report['failed']=1;report['failure_stage']=stage
         report['failure_kind']=type(error).__name__
+        if str(error) in {'actual_app_exited','actual_app_http_budget_exceeded',
+            'original_bootstrap_outbox_not_drained','actual_shutdown_not_clean'}:report['failure_reason']=str(error)
         if app_created:runtime_logs()
     finally:
         clean=report['cleanup']
