@@ -1,4 +1,7 @@
 import unittest
+from pathlib import Path
+from managed_recovery_acceptance import fixture_manifest
+from routes import validate_v2,consumer_group_v2
 from iam_recovery_acceptance import metadata
 
 
@@ -21,3 +24,12 @@ class IAMRecoveryMetadata(unittest.TestCase):
     def test_extra_fields_cannot_select_an_endpoint(self):
         value=self.good();value['database_uri']='external'
         with self.assertRaises(RuntimeError):metadata(value)
+
+
+class IAMRecoveryRoutes(unittest.TestCase):
+    def test_actual_host_logical_route_recomputes_both_physical_names(self):
+        value=fixture_manifest(Path(__file__).resolve().parents[2],iam=True)
+        validate_v2(value)
+        route=next(r for r in value['routes'] if r['owner']=='iam.mysql' and r['message_type']=='TRANSACTION')
+        self.assertEqual(route['topic'],'iam.authz.version.v2')
+        self.assertEqual(route['consumer_group'],consumer_group_v2(route['topic'],route['subscription']))

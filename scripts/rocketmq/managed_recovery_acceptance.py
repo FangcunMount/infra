@@ -17,7 +17,7 @@ import struct
 import time
 
 from audit_transaction_limit import export, write_private
-from routes import physical_topic_v2
+from routes import physical_topic_v2,consumer_group_v2
 from start_boundary import initialize, _encoded
 from cutover_step import execute, load_step
 from mysql_commit_proxy import MySQLCommitProxy
@@ -72,6 +72,7 @@ def fixture_manifest(repo,*,iam=False):
         if iam and route['owner']=='iam.mysql' and route['message_type']=='TRANSACTION':route['topic']='iam.authz.version.v2'
         route['route_revision']='m3-1'
         route['physical_topic']=physical_topic_v2(route['topic'],route['message_type'],route['owner'],'m3-1')
+        route['consumer_group']=consumer_group_v2(route['topic'],route['subscription'])
     for account in document['accounts'].values():
         for key in ('publish','subscriptions'):
             account[key]=[identity for identity in account[key] if identity in ids]

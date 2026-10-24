@@ -169,6 +169,7 @@ def main():
         before_parameters = common.broker_parameters(admin('getBrokerConfig'))
         require(before_parameters == PARAMETERS, 'actual_parameters_required')
         proof['parameters_before'] = before_parameters
+        stage='typed_route_setup'
         manifest, proof['routing'] = setup(repo, sdk, broker, project, accounts, directory, admin, run, passed,
             fixture_manifest=managed_manifest(repo,iam=bool(args.iam_host)) if args.managed_tool else None)
         revision = 'm3-1' if args.managed_tool else 'sdk-v2'
