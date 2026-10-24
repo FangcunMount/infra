@@ -20,6 +20,7 @@ from audit_transaction_limit import export, write_private
 from routes import physical_topic_v2
 from start_boundary import initialize, _encoded
 from cutover_step import execute, load_step
+from mysql_commit_proxy import MySQLCommitProxy
 
 
 def require(value,stage):
@@ -96,7 +97,19 @@ def notice_key(index):
 
 
 def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False):
+    proxy=MySQLCommitProxy(mysql_port).start() if governance_faults else None
+    try:
+        return _accept(repo=repo,binary=binary,broker=broker,project=project,directory=directory,manifest=manifest,route=route,account=account,
+            grpc_port=grpc_port,mysql_port=mysql_port,password=password,ca=ca,java=java,identity=identity,index_path=index_path,index=index,
+            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy)
+    finally:
+        if proxy is not None:
+            proof['governance_wire_proxy_cleanup']=proxy.close()
+
+
+def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
+           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy):
     root=directory/'managed-cli';root.mkdir(mode=0o700)
     def write(name,value):
         path=root/name
@@ -133,7 +146,7 @@ def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_po
     command=[docker,'--host','unix:///var/run/docker.sock','--config',str(docker_config),'exec','-i',broker,*java[java.index('java'):],'NativeHalfManaged']
     native_script.write_text('#!/bin/bash\nset -euo pipefail\nexec '+shlex.join(command)+' < "$1"\n');native_script.chmod(0o600)
     config=dict(schema='m3-native-recovery-config/v1',owner='iam.mysql',store_id='sdk-disposable',writer_epoch='sdk-epoch-1',
-        database_kind='mysql',database_uri=f'txprobe:{password}@tcp(127.0.0.1:{mysql_port})/txprobe',database_name='txprobe',database_ca_pem='',
+        database_kind='mysql',database_uri=f'txprobe:{password}@tcp(127.0.0.1:{proxy.port if proxy else mysql_port})/txprobe',database_name='txprobe',database_ca_pem='',
         endpoint=f'127.0.0.1:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
         native_admin_script=str(native_script),native_admin_script_sha256=hashlib.sha256(native_script.read_bytes()).hexdigest(),
         native_admin_nameserver='nameserver:9876',native_admin_broker='127.0.0.1:10911')
@@ -201,7 +214,26 @@ def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_po
     approval['action']='resolve';approval['receipt_sha256']=receipt_sha
     resolve_path,resolve_sha=write('synthetic-resolution-approval.json',approval)
     common_resolve=common[:-4]+['--approval',resolve_path,'--approval-sha',resolve_sha,'--receipt',receipt_path,'--receipt-sha',receipt_sha]
-    step(['resolve-notice',*common_resolve],'resolve-original','forward-repair')
+    if proxy is None:
+        step(['resolve-notice',*common_resolve],'resolve-original','forward-repair')
+    else:
+        def dropped(name,mode):
+            proxy.arm(mode)
+            try:step(['resolve-notice',*common_resolve],name,'forward-repair')
+            except Exception:
+                diagnosis=proof.get('managed_failure_diagnostics',[])
+                require(any(d.get('last_stage')=='governance_commit' and d.get('governance_outcome')=='unknown'
+                    and d.get('broker_final_outcome')=='commit_confirmed' for d in diagnosis),'separate_actual_broker_final_and_governance_unknown_required')
+            else:raise RuntimeError('real_governance_commit_fault_was_not_reported_unknown')
+        dropped('resolve-before-server-commit','before')
+        require(proxy.events==[dict(mode='before',commit_forwarded=False,server_ok=False,reply_dropped=True)]
+                and governed()==before,'before_commit_not_sent_or_rolled_back_scope_required')
+        passed('actual_governance_commit_before_forward_drop_stays_unknown_and_notice_blocked')
+        dropped('resolve-after-server-commit','after')
+        require(len(proxy.events)==2 and proxy.events[-1]==dict(mode='after',commit_forwarded=True,server_ok=True,reply_dropped=True),
+                'real_server_commit_ok_must_precede_dropped_reply')
+        passed('actual_governance_server_commit_reply_drop_is_unknown_without_sdk_or_business_reexecution')
+        proof['governance_wire_faults']=list(proxy.events)
     resolved=governed();require("resolved" in resolved and receipt_sha.upper() in resolved,'approved_exact_governance_commit_required')
     step(['verify-resolution',*common_resolve],'verify-original','forward-repair')
     require(governed()==resolved and first_audit==sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;"),'verification_refreshed_first_evidence_or_sdk_audit')

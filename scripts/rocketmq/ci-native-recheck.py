@@ -69,8 +69,10 @@ def main():
     parser.add_argument('--image', required=True)
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--managed-tool', type=Path, help='fixed published-module CLI; owned isolated fixture only')
+    parser.add_argument('--governance-faults',action='store_true',help='actual MySQL COMMIT before/after reply loss for managed CLI only')
     args = parser.parse_args()
     ci_guard(os.environ)  # Never construct a client or invoke Docker on a workstation.
+    require(not args.governance_faults or args.managed_tool is not None,'managed_cli_required_for_governance_faults')
     require(not args.report.exists() and not args.report.is_symlink(), 'report_already_exists')
     module = importlib.util.spec_from_file_location('_native_fixture', Path(__file__).with_name('ci-transactions.py'))
     common = importlib.util.module_from_spec(module)
@@ -255,7 +257,7 @@ def main():
             stage = 'compiled_managed_original_primary_recovery'
             managed_accept(repo=repo,binary=args.managed_tool.resolve(),broker=broker,project=project,directory=directory,
                 manifest=manifest,route=route,account=accounts['owner-a'],grpc_port=grpc_port,mysql_port=mysql_port,password=password,
-                ca=ca,java=java,identity=identity,index_path=index_path,index=index,sql=sql,run=run,consumer=consumer,passed=passed,proof=proof)
+                ca=ca,java=java,identity=identity,index_path=index_path,index=index,sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,governance_faults=args.governance_faults)
         else:
             recovery = start('recover', identity); recovery.wait('ready', identity)
             recovery.send('seal'); recovery.wait('sealed', '', 'admission_stopped_checker_alive')
@@ -308,7 +310,7 @@ def main():
         consumer.send('stop'); consumer.wait('closed'); consumer.finish()
         require(not run(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=sdk).stdout, 'sdk_source_changed')
         proof['sdk_tracked_sources_clean'] = True
-        require(report['passed']==(14 if args.managed_tool else 17), 'complete_nonempty_native_matrix_required')
+        require(report['passed']==((16 if args.governance_faults else 14) if args.managed_tool else 17), 'complete_nonempty_native_matrix_required')
     except Exception:
         report['failed'] = 1; report['failure'] = stage
     finally:
