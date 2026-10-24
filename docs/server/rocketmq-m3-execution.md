@@ -2077,3 +2077,12 @@ infra253分支头cf3ddbd840c4c3518af0ba7165ebd13abdf26ac8、实际PR测试merge5
 40098200483继续3/1/0，[逐库差异](evidence/rocketmq-m3-full-restore-difference-20261024.json)表明QS MySQL与整Mongo一致，IAM列/库定义一致但数据dump变化，AI完整dump一致但列元数据变化；provider保持，runtime未启动，声明清理与源码未变更通过。没有把这些差异归为可忽略，也未增加列元数据规范化。
 
 ad5c468dd50ac39559c0c3b69491a921e31e4b19为完整保护导出显式设置utf8mb4及`--set-charset`（在`--compact`之后）；完整导入在同一连接先SET NAMES utf8mb4并回读client/connection/results三个值，再恢复原保护bytes。原dump/列/Mongo精确比较保持；含中文/四字节字符及二进制的原文保留、会话设置与错误回读拒绝等7项定向纯测试通过。MySQL[官方dump选项](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html)说明compact关闭set-charset；实际默认字符集与修复结果由40099179996回读，尚未验收，不先称根因已修复。M3仍**28/36**、T29未勾选，生产未操作。
+
+
+### 2026-10-24：恢复字符集问题已证实并修复IAM；保留AI原表达式附件继续精确恢复
+
+40099179996仍3/1/0，但明确回读原mysql CLI默认client/connection/results均latin1，显式utf8mb4后三MySQL数据/DDL dump、IAM/QS全部列与库定义、完整Mongo均精确一致；仅AI两行列元数据不同。无runtime/离线升级，清理与源码未改通过。[原报告及哈希重建证据](evidence/rocketmq-m3-full-restore-charset-followup-20261024.json)保留。
+
+按固定AI源码ddff86ca的0040模型重建`governance_draft_heads`两行完整元数据，SHA逐项匹配真实前后4个hash：差异仅`prompt_draft_id_key`与`semantic_draft_id_key`的generation_expression字符串常量标记，从原_utf8mb4变为dump重建的_ascii；全部其他字段精确匹配。没有把它规范化掉。d5aae623新增原表达式私有保护附件，要求精确源码元数据，摘要纳入原保护manifest；恢复时实际重新声明原两表达式，再核验原dump/列/Mongo全量精确快照。原保护SQL未被重写，不用成功hash替换失败值。未知源/schema拒绝；附件仅隔离夹具，未进入生产执行包或SDK。
+
+定向8项纯测试通过（含原文/utf8mb4、错误会话、私有MySQL错误码提取、原表达式来源拒绝及原dump比较）。40100409721原生复验中，尚未证明完整恢复/后续C1/30分钟通过。M3仍**28/36**、T29未勾选，生产未操作。
