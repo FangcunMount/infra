@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | 镜像及维护二进制 | 修复后五候选构建/归档核验通过 | 五个原Dockerfile实际构建、源码SHA/模块/wheel身份、image config ID/归档摘要、UID及恢复工具排除清单 |
 | 配置、资源与执行包 | 待开始 | 实际所需M3 events/routes/owner绑定、禁自动DDL、封新写配置、ACL/TLS/资源摘要和原维护命令逐项绑定 |
-| 原范围恢复、启动与窗口 | IAM、AI组件已合并；QS双库9/9原生通过，七进程复验中 | 最终候选实际恢复/启动和切换演练，具名步骤及耗时证明30分钟目标；不能用进程sentinel代替实际runtime |
+| 原范围恢复、启动与窗口 | IAM、AI组件已合并；QS双库9/9及完整CI已合并，七进程复验中 | 最终候选实际恢复/启动和切换演练，具名步骤及耗时证明30分钟目标；不能用进程sentinel代替实际runtime |
 
 ## 仅构建路径
 
@@ -56,8 +56,10 @@ IAM组件[40077501698](https://github.com/FangcunMount/infra/actions/runs/400775
 
 AI [40079069646](https://github.com/FangcunMount/infra/actions/runs/40079069646)原生9项通过；原严格schema下的受控held旧记录、完整恢复、原绑定、只读启动/关闭、0 DDL尝试及旧first wire/attempt状态保留分别验收。[证据](evidence/rocketmq-m3-ai-final-image-20261024.json)记录原生9/9、关联10份报告451/0/0及PR243合并032d7c7a；四个变更文件与受验源码逐字节一致。
 
-## QS双库组件（原生9/9，完整CI/合并待核验）
+## QS双库组件（原生9/9及完整CI通过，已合并）
 
 [40082780271](https://github.com/FangcunMount/infra/actions/runs/40082780271)使用原嵌入模板与migrator得到105/40和110/43，journal不force。MySQL全库、Mongo整库包含非空受控事实，新增保护之后的对象后完整恢复；Mongo索引、UUID、文档保持，原维护CLI分别安装/回读两个owner。MySQL原保护bytes保留；严格列元数据及数据/其余DDL保持，只规范化[官方110825](https://bugs.mysql.com/bug.php?id=110825)记录的冗余CHARACTER SET显示。原失败保留，详见[审计](evidence/rocketmq-m3-qs-image-pair-20261024.json)。这不表示生产105完成或业务进程已启动。
 
 五镜像/七进程试验PR246使用真实IAM mTLS与AI，原资源及三个48并发worker。首轮7/1/0在QS读取相对缓存策略失败；原配置纯本地复现后修正fixture挂载路径，未改缓存策略/宿主源码，复验40083039784进行中。完整C1/30分钟仍独立待完成。
+
+QS组件PR245已合并e73fe4aa，5个变更文件与受验e67f2eb相同，关联10报告451/0/0。七进程第二轮7/1/0由原事务owner/标准Outbox互斥保护拒绝；f61f189修正最终provider配置，原保护保留，302工具测试通过，40083809501定向验证中。PR246被修订候选取代并关闭；实际启动通过后才冻结新PR及完整CI，不能用前候选通过证明新候选通过。
