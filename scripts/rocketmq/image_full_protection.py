@@ -17,24 +17,33 @@ from qs_image_pair import canonical_dump, dump_difference, mongo_snapshot_progra
 from start_boundary import _encoded
 
 
-def ai_expression_companion(database, original_columns):
+def ai_restoration_script(database, original_columns, original_dump):
     """Restore two exact source-bound expressions lost by SHOW CREATE output.
 
     These are the original ddff86ca/0040 metadata rows, not success-hash
-    replacements. The companion performs real DDL; all original comparisons
-    still have to pass after it. Unknown source/schema variants are refused.
+    replacements. The derived CREATE script restores original metadata before
+    loading data, without a post-load ALTER normalizing other constraints.
+    All original comparisons still apply; unknown source/schema is refused.
     """
     require(bool(re.fullmatch('ai_m3_image_[a-z0-9_]{1,36}', database)), 'owned_ai_database_required')
     expected = {'4257a573673fb143338cc38dfd9657fab1480251d6d6bee74725f0c7915f7117',
                 '0f8608f1f2237f1d08794f2b85d0fec80dc3e4cc84a7eea9871d6019ba6741a5'}
     observed = [hashlib.sha256(row.encode()).hexdigest() for row in original_columns.splitlines()]
     require(all(observed.count(sha) == 1 for sha in expected), 'exact_original_ai_expression_metadata_required')
-    clauses = []
-    for kind, collation in [('prompt', 'utf8mb4_0900_ai_ci'), ('semantic', 'utf8mb4_bin')]:
-        clauses.append('MODIFY COLUMN `' + kind + '_draft_id_key` CHAR(36) CHARACTER SET utf8mb4 COLLATE '
-            + collation + " GENERATED ALWAYS AS (CASE WHEN draft_kind=_utf8mb4'" + kind
-            + "' THEN draft_id ELSE NULL END) STORED")
-    return 'ALTER TABLE `' + database + '`.`governance_draft_heads` ' + ', '.join(clauses) + ';'
+    lines = original_dump.splitlines(keepends=True)
+    start = [i for i, line in enumerate(lines) if line.rstrip('\n') == 'CREATE TABLE `governance_draft_heads` (']
+    require(len(start) == 1, 'one_original_ai_heads_definition_required')
+    end = next((i for i in range(start[0]+1,len(lines)) if lines[i].startswith(') ENGINE=')), None)
+    require(end is not None, 'complete_original_ai_heads_definition_required')
+    for kind in ('prompt', 'semantic'):
+        selected = [i for i in range(start[0]+1,end) if lines[i].startswith('  `' + kind + '_draft_id_key` ')]
+        require(len(selected) == 1, 'one_original_generated_column_required')
+        index = selected[0]; line = lines[index]; literal = "_ascii'" + kind + "'"
+        require(' GENERATED ALWAYS AS (' in line and ' STORED' in line
+            and line.count(literal) == 1 and line.count('_ascii') == 1,
+            'exact_original_dump_expression_required')
+        lines[index] = line.replace(literal, "_utf8mb4'" + kind + "'", 1)
+    return ''.join(lines)
 
 
 def validate_databases(databases):
@@ -49,7 +58,7 @@ class FullImageProtection:
         ci_guard(os.environ)
         self.f = fixture; self.databases = validate_databases(databases)
         require(not fixture.applications, 'no_runtime_before_restore_training_required')
-        self.sql = {}; self.columns = {}; self.definitions = {}; self.companions = {}; self.provider = fixture.sql('SELECT @@server_uuid;')
+        self.sql = {}; self.columns = {}; self.definitions = {}; self.restore_sql = {}; self.provider = fixture.sql('SELECT @@server_uuid;')
         require(bool(re.fullmatch('[a-z0-9-]{36}', self.provider)), 'actual_owned_mysql_identity_required')
 
     def dump(self, database):
@@ -64,8 +73,7 @@ class FullImageProtection:
         database = self.databases[store]
         statement = ('SET NAMES utf8mb4; SELECT @@character_set_client,@@character_set_connection,@@character_set_results;\n'
             + 'DROP DATABASE `' + database + '`; ' + self.definitions[store] + ';\n'
-            + 'SET FOREIGN_KEY_CHECKS=0; USE `' + database + '`;\n' + self.sql[store]
-            + '\n' + self.companions.get(store, '') + '\nSET FOREIGN_KEY_CHECKS=1;')
+            + 'SET FOREIGN_KEY_CHECKS=0; USE `' + database + '`;\n' + self.restore_sql[store] + '\nSET FOREIGN_KEY_CHECKS=1;')
         result = self.f.run(self.f.compose + ['exec', '-T', 'mysql', 'sh', '-c',
             'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B'], stdin=statement, required=False)
         if result.returncode:
@@ -103,6 +111,7 @@ class FullImageProtection:
             scope='three full MySQL databases and the complete selected QS Mongo database, including controlled retained facts')
         for store, database in self.databases.items():
             self.sql[store] = self.dump(database); self.columns[store] = self.column_metadata(database)
+            self.restore_sql[store] = self.sql[store]
             definition = f.sql('SHOW CREATE DATABASE `' + database + '`;').split('\t', 1)
             require(len(definition) == 2 and definition[0] == database and definition[1].startswith('CREATE DATABASE '), 'original_database_definition_required')
             self.definitions[store] = definition[1]
@@ -112,10 +121,10 @@ class FullImageProtection:
                 selected_identity_sha256=hashlib.sha256(_encoded(dict(identity_scheme='owned-mysql-selected-database-v1',server_uuid=self.provider,database=database))).hexdigest(),
                 snapshot=before[store])
             if store == 'ai':
-                self.companions[store] = ai_expression_companion(database, self.columns[store])
-                companion = f.directory / 'ai-original-generated-expressions.sql'
-                companion.write_text(self.companions[store]); companion.chmod(0o600)
-                manifest['mysql'][store]['original_expression_companion_sha256'] = hashlib.sha256(companion.read_bytes()).hexdigest()
+                self.restore_sql[store] = ai_restoration_script(database, self.columns[store], self.sql[store])
+                derived = f.directory / 'ai-full-restoration.sql'
+                derived.write_text(self.restore_sql[store]); derived.chmod(0o600)
+                manifest['mysql'][store]['original_expression_restore_sha256'] = hashlib.sha256(derived.read_bytes()).hexdigest()
         before['mongo'] = self.mongo_snapshot()
         self.mongo_archive = '/tmp/' + qs + '-full-protection.gz'
         f.run(['docker', 'exec', f.mongo_name, 'mongodump', '--quiet', '--db', qs, '--archive=' + self.mongo_archive, '--gzip'], timeout=120)
@@ -157,7 +166,7 @@ class FullImageProtection:
             snapshots_before=before, snapshots_after=after, restore_duration_seconds=self.restore_seconds,
             original_protection_bytes_unmodified=True, mongo_uuid_preserved=True, runtime_started=False,
             original_ai_expressions_restored=True,
-            original_expression_companion_sha256=manifest['mysql']['ai']['original_expression_companion_sha256'],
+            original_expression_restore_sha256=manifest['mysql']['ai']['original_expression_restore_sha256'],
             production=False, production_backup_retention_verified=False,
             scope='pre-window controlled restore training; not a production restore or business acceptance')
         path = f.directory / 'full-restore-receipt.json'; write_private(path, receipt)

@@ -2,7 +2,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import Mock
 
-from image_full_protection import FullImageProtection, ai_expression_companion, validate_databases
+from image_full_protection import FullImageProtection, ai_restoration_script, validate_databases
 
 
 class FullScopeProtectionAdmissionTest(unittest.TestCase):
@@ -14,7 +14,7 @@ class FullScopeProtectionAdmissionTest(unittest.TestCase):
         f.definitions = {'iam':'CREATE DATABASE `iam_m3_image_owned` CHARACTER SET utf8mb4'}
         original = "INSERT INTO retained VALUES ('受控事实🚀',0x00ff03);"
         f.sql = {'iam':original}
-        f.companions = {}
+        f.restore_sql = {'iam':original}
         f.restore_mysql('iam')
         statement = f.f.run.call_args.kwargs['stdin']
         self.assertEqual(f.f.run.call_count,1)
@@ -36,12 +36,21 @@ class FullScopeProtectionAdmissionTest(unittest.TestCase):
             rows.append('\t'.join(['governance_draft_heads',pos,kind+'_draft_id_key','char(36)','YES','NULL',
                 'STORED GENERATED','utf8mb4',collation,'',expression]))
         original='\n'.join(rows)
-        statement=ai_expression_companion('ai_m3_image_owned',original)
-        self.assertEqual(statement.count('MODIFY COLUMN'),2)
-        self.assertIn("draft_kind=_utf8mb4'prompt'",statement)
-        self.assertIn("draft_kind=_utf8mb4'semantic'",statement)
+        raw=("CREATE TABLE `governance_draft_heads` (\n"
+             "  `prompt_draft_id_key` char(36) GENERATED ALWAYS AS ((case when draft_kind=_ascii'prompt' then draft_id else NULL end)) STORED,\n"
+             "  `semantic_draft_id_key` char(36) GENERATED ALWAYS AS ((case when draft_kind=_ascii'semantic' then draft_id else NULL end)) STORED,\n"
+             "  CONSTRAINT kind CHECK (draft_kind IN (_utf8mb4'prompt',_utf8mb4'semantic'))\n"
+             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n"
+             "INSERT INTO retained VALUES ('_ascii text remains intact');\n")
+        statement=ai_restoration_script('ai_m3_image_owned',original,raw)
+        self.assertEqual(statement,raw.replace("draft_kind=_ascii'","draft_kind=_utf8mb4'"))
+        self.assertIn("INSERT INTO retained VALUES ('_ascii text remains intact');",statement)
+        self.assertNotIn('ALTER TABLE',statement)
         for invalid in (original.replace('char(36)','char(35)'),rows[0],original.replace('_utf8mb4','_ascii')):
-            with self.assertRaisesRegex(RuntimeError,'exact_original_ai_expression_metadata'):ai_expression_companion('ai_m3_image_owned',invalid)
+            with self.assertRaisesRegex(RuntimeError,'exact_original_ai_expression_metadata'):ai_restoration_script('ai_m3_image_owned',invalid,raw)
+        for invalid in (raw.replace('CREATE TABLE `governance_draft_heads`','CREATE TABLE `other`'),raw+raw,
+                        raw.replace("_ascii'prompt'","_ascii'changed'")):
+            with self.assertRaises(RuntimeError):ai_restoration_script('ai_m3_image_owned',original,invalid)
 
     def test_exact_owned_selected_set_is_required_before_any_database_mutation(self):
         selected={'iam':'iam_m3_image_owned','qs':'qs_m3_image_owned','ai':'ai_m3_image_owned'}
