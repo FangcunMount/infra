@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
+import re
 
 from ai_image_start import PYTHON
 from audit_transaction_limit import write_private
@@ -15,6 +16,13 @@ from image_full_protection import FullImageProtection
 from image_start_fixture import require
 from qs_image_pair import QS_HEAD, QS_SHA
 from start_boundary import _encoded
+
+
+def offline_operation_id(environment):
+    value = str(environment.get('GITHUB_RUN_ID', '')) + '-' + str(environment.get('GITHUB_RUN_ATTEMPT', ''))
+    require(bool(re.fullmatch('[0-9]{1,20}-[0-9]{1,4}', value))
+        and all(int(part) > 0 for part in value.split('-')), 'original_offline_ci_operation_id_required')
+    return value
 
 
 def qs_environment(f, database):
@@ -36,6 +44,8 @@ def qs_snapshot(f, database):
 
 
 def offline_approval(snapshot, *, operation_id, started, protection, startup_sha, scope_sha, responsibility_sha):
+    require(isinstance(operation_id, str) and bool(re.fullmatch('[0-9]{1,20}-[0-9]{1,4}', operation_id)),
+        'original_offline_operation_id_required')
     now = datetime.now(timezone.utc)
     require(started <= now and (now - started).total_seconds() < 1500, 'owned_cutover_window_required')
     return dict(format_version=1, kind='qs_schema_pair_offline_upgrade', operation_id=operation_id,
@@ -122,7 +132,7 @@ def prepare(f, args, databases, ai_admin_environment, specs, record_case):
     f.stage = 'original_offline_qs10540_to11044'
     def qs():
         f.select('api'); f.ownership(os.getuid())
-        approval = offline_approval(snapshot, operation_id=f.project, started=started, protection=protection,
+        approval = offline_approval(snapshot, operation_id=offline_operation_id(os.environ), started=started, protection=protection,
             startup_sha=trial_sha, scope_sha=hashlib.sha256(_encoded(scope)).hexdigest(), responsibility_sha=boundary.binding_sha)
         path = f.private / 'offline-approval.json'; write_private(path, approval)
         sha = hashlib.sha256(path.read_bytes()).hexdigest(); f.ownership(2000)

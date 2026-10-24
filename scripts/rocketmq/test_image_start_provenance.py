@@ -1,10 +1,28 @@
 import copy
+import json
+from pathlib import Path
+import tempfile
+from types import SimpleNamespace
 import unittest
+from unittest.mock import Mock
 
-from image_start_fixture import IMAGE_PROVENANCE, verified_image_inventory
+from image_start_fixture import IMAGE_PROVENANCE, OwnedImageFixture, verified_image_inventory
 
 
 class ImageProvenanceTest(unittest.TestCase):
+    def test_offline_failure_exports_only_fixed_stage_and_booleans(self):
+        with tempfile.TemporaryDirectory() as root:
+            f=OwnedImageFixture.__new__(OwnedImageFixture)
+            f.directory=f.private=Path(root); f.report={}; f.label=f.network=f.image='owned-unit'
+            outcome=dict(stage='approval',authorization_consumed=False,migration_outcome_unknown=False,
+                         verified=False,private_body='unexported-data',initial={'private_dsn':'unexported-dsn'})
+            f.run=Mock(return_value=SimpleNamespace(returncode=1,stdout=json.dumps(outcome),stderr='unexported-stderr'))
+            with self.assertRaisesRegex(RuntimeError,'owned_image_command_failed'):
+                f.once('/fixture/qs-migrate-offline',[])
+            safe=f.report['failed_command']['offline_diagnostic']
+            self.assertEqual(safe,dict(stage='approval',authorization_consumed=False,migration_outcome_unknown=False,verified=False))
+            self.assertNotIn('unexported',json.dumps(f.report))
+
     def fixture(self, target, source, builder):
         return dict(target=target,source_sha=source,builder_source_sha=builder,passed=1,failed=0,skipped=0,
             deferred_tools_absent=True,cleanup=dict(owned_container_absent=True,owned_image_tag_absent=True,existing_containers_unchanged=True))

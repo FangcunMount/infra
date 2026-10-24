@@ -97,6 +97,15 @@ class OwnedImageFixture:
             # never an error message or SQL. Do not export captured log lines.
             phases=re.findall(r'QS_IMAGE_FAILURE phase=([a-z_]+) kind=([A-Za-z0-9_.*]+)',result.stdout+result.stderr)
             if phases:self.report['failed_command']['initializer_diagnostic']=[dict(phase=p,kind=k) for p,k in phases[-4:]]
+            if Path(entrypoint).name == 'qs-migrate-offline':
+                try:
+                    outcome=json.loads(result.stdout)
+                    if isinstance(outcome,dict) and outcome.get('stage') in {'resources','preflight','approval','claim','mysql','mongodb','verify','complete'}:
+                        safe={'stage':outcome['stage']}
+                        for key in ('authorization_consumed','migration_outcome_unknown','verified','mysql_changed','mongo_changed'):
+                            if type(outcome.get(key)) is bool:safe[key]=outcome[key]
+                        self.report['failed_command']['offline_diagnostic']=safe
+                except (ValueError,TypeError):pass
             raise RuntimeError('owned_image_command_failed')
         return result.stdout
 

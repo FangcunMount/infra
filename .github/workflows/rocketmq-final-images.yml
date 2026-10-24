@@ -23,6 +23,8 @@ on:
       - scripts/rocketmq/test_qs_consumer_contract.py
       - scripts/rocketmq/image_fixtures/qs_consumer_contract.go
       - scripts/rocketmq/image_fixtures/qs_consumer_contract.json
+      - scripts/rocketmq/image_fixtures/offline_approval_contract.py
+      - scripts/rocketmq/image_fixtures/offline_approval_contract_test.go
       - components/rocketmq/serverd-routes-m3-v2.json
       - scripts/rocketmq/test_qs_runtime_configuration.py
       - scripts/rocketmq/image_fixtures/qs_init_test.go
@@ -127,6 +129,37 @@ jobs:
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_image_cutover_boundary.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_image_full_protection.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_image_cutover_offline.py
+  approval-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+      M3_EXPECTED_QS_SHA: b75d4a52ec261275a0ffb588eeb31fd6496966d0
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: b75d4a52ec261275a0ffb588eeb31fd6496966d0
+          path: .approval-source
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .approval-source/go.sum
+      - name: Python producer through original Go private-file reader, no real dependencies
+        run: |
+          set -euo pipefail
+          umask 077
+          fixture="$PWD/.approval-contract.json"
+          contract_path="$PWD/.approval-source/internal/pkg/migration/m3_image_offline_contract_test.go"
+          test ! -e "$contract_path"
+          trap 'rm -f -- "$contract_path" "$fixture"' EXIT
+          python3 scripts/rocketmq/image_fixtures/offline_approval_contract.py "$fixture"
+          cp scripts/rocketmq/image_fixtures/offline_approval_contract_test.go "$contract_path"
+          (cd .approval-source && M3_OFFLINE_APPROVAL_FIXTURE="$fixture" go test ./internal/pkg/migration -run '^TestM3ImageOfflineApprovalContract$' -count=1 -v)
+          rm -f -- "$contract_path"
+          test -z "$(git -C .approval-source status --porcelain)"
   images:
     if: github.event_name == 'workflow_dispatch' && inputs.phase == 'build'
     needs: contracts
@@ -394,7 +427,7 @@ jobs:
 
   five-start:
     if: github.event_name == 'workflow_dispatch' && (inputs.phase == 'five-start' || inputs.phase == 'cutover')
-    needs: contracts
+    needs: [contracts, approval-contract]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
