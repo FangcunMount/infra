@@ -46,6 +46,8 @@ IAM组件初版试图让当前SDK入口排空fresh Bootstrap的legacy行；第�
 
 ## 候选输入索引与首发工具清单
 
+**旧索引与源审阅包已被取代。** 131a721按实际QS注册表修正热度投影路由；下列旧索引及其原归档摘要保留作历史，包含旧manifest，不能作为当前执行输入。修正清单的真实资源40087075186已通过134/0/0；最终配置/执行包仍须重新冻结，详见总表最新T29记录。
+
 [候选输入索引](evidence/rocketmq-m3-candidate-input-index-20261024.json)记录5个镜像config/归档摘要、42份精确源码输入（27迁移文件、2宿主事件目录、4资源模板、9工具）及固定repo SHA。工具本地import闭包已核对，仅依赖标准库和清单内模块；首发明确排除后移恢复程序及全部CI夹具，不复制整个工具目录。该索引仅是待审输入，尚未生成最终可执行配置/包，不代替真实宿主/数据库UUID、TLS、worker配额回读或任何具名批准。registry/受审归档交付与目标启动助手的匹配、完整恢复/启动及30分钟窗口仍须验证。
 
 IAM组件[40077501698](https://github.com/FangcunMount/infra/actions/runs/40077501698)全部8项通过，包含DML-only实际运行、0 DDL尝试、原保护恢复及优雅退出；[完整证据](evidence/rocketmq-m3-iam-final-image-20261024.json)。它只覆盖受控种子数据库上的最终镜像恢复/启动，不证明fresh legacy Bootstrap历史入口可直接进入当前SDK；原拒绝及T25/T32旧排空责任保留。
