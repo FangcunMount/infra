@@ -1,0 +1,145 @@
+{
+  "schema": "m3-qs-image-pair-first-failures/v1",
+  "reports": [
+    {
+      "run_id": 40081414343,
+      "report_sha256": "317142806b1acd9581ab4a26312142ef9a96a175de126d6ea1ef2486326399a5",
+      "report": {
+        "schema": "m3-qs-image-pair-preparation/v1",
+        "qs_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "passed": 3,
+        "failed": 1,
+        "skipped": 0,
+        "production": false,
+        "system_acceptance": false,
+        "application_started": false,
+        "combined_cutover_rehearsal_complete": false,
+        "cases": {
+          "exact_qs_collection_archive_loaded": true,
+          "exact_qs_worker_archive_loaded": true,
+          "exact_qs_api_archive_loaded": true
+        },
+        "infra_sha": "f9546446f307680eea266b5c8a103762352568b0",
+        "candidates": {
+          "qs-collection": {
+            "target": "qs-collection",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+            "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c"
+          },
+          "qs-worker": {
+            "target": "qs-worker",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+            "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc"
+          },
+          "qs-api": {
+            "target": "qs-api",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+            "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3"
+          }
+        },
+        "initializer_sha256": "7b80f8fa107939aa19fd26e7cd4510eb8990ade232b163ffa1dfc1bd6fcb8755",
+        "original_offline_tool_sha256": "94de163f78f1bac8cc323338b279c2bf1eb7f2a222a8c05977fce3c5e6ac6d47",
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "rocketmq": "sha256:c0d17ffb085218977f3db8284d530355e3557f89873104767925fe214d60b908",
+          "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3"
+        },
+        "failed_command": {
+          "exit_code": 1,
+          "entrypoint": "qs-pair-init",
+          "private_output_sha256": "2971f472133bcd863a9a0c7ee60a4f0eac8494d7d9b3ffe8da884e3f9df67f9b",
+          "initializer_diagnostic": [
+            {
+              "phase": "resources",
+              "kind": "*strconv.NumError"
+            }
+          ]
+        },
+        "failure_stage": "original_pair_pre_m3",
+        "failure_kind": "RuntimeError",
+        "failure_reason": "owned_image_command_failed",
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "private_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        },
+        "source_unchanged": true
+      }
+    },
+    {
+      "run_id": 40081713445,
+      "report_sha256": "cb734b7681ada5e18d81ca7116845c19e36e9070bdbe638ff92c760c2708f09d",
+      "report": {
+        "schema": "m3-qs-image-pair-preparation/v1",
+        "qs_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "passed": 4,
+        "failed": 1,
+        "skipped": 0,
+        "production": false,
+        "system_acceptance": false,
+        "application_started": false,
+        "combined_cutover_rehearsal_complete": false,
+        "cases": {
+          "exact_qs_collection_archive_loaded": true,
+          "exact_qs_worker_archive_loaded": true,
+          "exact_qs_api_archive_loaded": true,
+          "original_migration_pair_pre_m3": true
+        },
+        "infra_sha": "966268e0c7e8f9357a5697dd6b6947f5a91bca52",
+        "candidates": {
+          "qs-collection": {
+            "target": "qs-collection",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+            "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c"
+          },
+          "qs-worker": {
+            "target": "qs-worker",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+            "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc"
+          },
+          "qs-api": {
+            "target": "qs-api",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+            "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3"
+          }
+        },
+        "initializer_sha256": "a3c4aa6546a716eda8e9dbda3dff92f186c46f0c0473f9397c2b197cf53bd1b1",
+        "original_offline_tool_sha256": "94de163f78f1bac8cc323338b279c2bf1eb7f2a222a8c05977fce3c5e6ac6d47",
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "rocketmq": "sha256:9248a41ed58ba983d005c1baad3d5f9e7b3ef560a4e1fa69366049c561e6a4dc",
+          "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3"
+        },
+        "pre_m3_schema": {
+          "journal_force_used": false,
+          "mongo": 40,
+          "mysql": 105,
+          "original_templates_applied": true,
+          "production": false,
+          "profile": "pre_m3",
+          "resources_sha256": "c37b639804391172b2209f11c7056b4867309a31054af3c5d3f740cd6145b86d",
+          "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+        },
+        "failure_stage": "actual_full_pair_restore_pre_m3",
+        "failure_kind": "RuntimeError",
+        "failure_reason": "full_pair_restore_must_match_original_bytes_and_uuid",
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "private_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        },
+        "source_unchanged": true
+      }
+    }
+  ],
+  "production": false,
+  "t29_complete": false
+}
