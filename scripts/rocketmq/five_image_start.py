@@ -97,6 +97,13 @@ class FiveImageFixture(QSPairFixture):
             require(self.run(['docker', 'inspect', self.applications[component], '--format', '{{.State.Running}}']).stdout.strip() == 'true', 'actual_' + component.replace('-', '_') + '_exited')
             try:
                 value = self.http(component, port, path)
+                if re.fullmatch('worker[123]', component):
+                    # Metrics starts before subscription preparation. HTTP
+                    # alone cannot authorize a test shutdown during startup.
+                    logs = self.run(['docker', 'logs', self.applications[component]])
+                    require('Worker started, waiting for events...' in logs.stdout + logs.stderr,
+                            'original_worker_startup_phase_not_ready')
+                    self.report.setdefault('workers_prepared', {})[component] = True
                 return validator(value) if validator else hashlib.sha256(value.encode()).hexdigest()
             except RuntimeError:
                 time.sleep(1)
@@ -129,10 +136,10 @@ def main():
     args = p.parse_args(); require(not args.report.exists(), 'new_report_required')
     cutover = args.startup_receipt is not None
     repo = Path(__file__).resolve().parents[2]
-    report = dict(schema='m3-five-actual-image-startup-trial/v2', passed=0, failed=0, skipped=0,
+    report = dict(schema='m3-five-actual-image-startup-trial/v3', passed=0, failed=0, skipped=0,
                   production=False, system_acceptance=False, combined_cutover_rehearsal_complete=False,
                   c1_cutover_barrier_exercised=False, cases={}, sources=SOURCES,
-                  scope='actual processes, required IAM/AI and closed SDK owners; worker HTTP/Redis health and catalog consistency, no business or per-worker delivery proof')
+                  scope='actual processes, required IAM/AI and closed SDK owners; completed worker startup phase, HTTP/Redis and catalog consistency; no business or per-worker delivery proof')
     if cutover:
         report.update(schema='m3-five-actual-image-cutover/v1', scope='owned old-schema full restore training, original offline upgrades and actual seven-process C1/30-minute start; no production/system/business claim')
     f = FiveImageFixture(repo, report); run = f.run
@@ -301,7 +308,7 @@ def main():
         for index in range(1, 4):
             component = 'worker' + str(index); f.images[component] = f.images['worker']; f.private_dirs[component] = f.private_dirs['worker']
             f.start(component, alias=component, memory='768m', cpus='1')
-            f.ready(component, 9092, '/healthz'); case('actual_' + component + '_http_healthy_original_concurrency48')
+            f.ready(component, 9092, '/healthz'); case('actual_' + component + '_prepared_http_healthy_original_concurrency48')
         if cutover:
             report['actual_cutover'] = f.boundary.finish()
             report['c1_cutover_barrier_exercised'] = True

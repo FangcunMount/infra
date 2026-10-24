@@ -521,6 +521,7 @@ jobs:
           assert all(x['cases'].values()) and all(x['cleanup'].values()) and x['sources_unchanged']
           assert x['mysql_runtime_ddl_attempts']==x['mongo_runtime_ddl_attempts']==0
           assert len(x['processes'])==7 and x['original_qs_consumer_count']==1
+          assert x['workers_prepared']=={name:True for name in ('worker1','worker2','worker3')}
           assert not x['production'] and not x['system_acceptance']
           assert x['combined_cutover_rehearsal_complete']==x['c1_cutover_barrier_exercised']==cutover
           assert x['mongo_ddl_audit']['positive_controls']==4

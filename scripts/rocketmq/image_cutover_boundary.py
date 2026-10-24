@@ -63,7 +63,7 @@ def private_input_hashes(fixture):
 def startup_receipt(path):
     raw = path.read_bytes(); require(len(raw) < 1024 * 1024, 'bounded_startup_receipt_required')
     value = json.loads(raw)
-    require(value['schema'] == 'm3-five-actual-image-startup-trial/v2'
+    require(value['schema'] == 'm3-five-actual-image-startup-trial/v3'
             and (value['passed'], value['failed'], value['skipped']) == (15, 0, 0)
             and len(value['cases']) == 15 and all(v is True for v in value['cases'].values())
             and value['sources'] == SOURCES and value['sources_unchanged'] is True
@@ -72,6 +72,8 @@ def startup_receipt(path):
             and value['mongo_ddl_audit']['commands'] == []
             and not any(value[k] for k in ('production', 'system_acceptance', 'combined_cutover_rehearsal_complete', 'c1_cutover_barrier_exercised')),
             'actual_original_startup_trial_required')
+    require(value.get('workers_prepared') == {name:True for name in ('worker1','worker2','worker3')},
+            'complete_original_worker_startup_required')
     require(set(value['processes']) == set(COMPONENTS)
             and all(p['state'] == dict(Status='exited', ExitCode=0, OOMKilled=False) for p in value['processes'].values())
             and all(value['cleanup'].get(k) is True for k in ('compose_down_succeeded', 'private_directory_removed', 'existing_containers_unchanged', 'existing_networks_unchanged')),

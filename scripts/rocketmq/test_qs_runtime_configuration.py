@@ -1,7 +1,9 @@
 import copy
 import unittest
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
-from five_image_start import qs_metrics
+from five_image_start import FiveImageFixture, qs_metrics
 from qs_runtime_configuration import configuration, rocketmq
 
 
@@ -16,6 +18,27 @@ def base():
 
 
 class QSRuntimeConfigurationTest(unittest.TestCase):
+    def worker_fixture(self, logs):
+        fixture=FiveImageFixture.__new__(FiveImageFixture)
+        fixture.report={};fixture.applications={'worker1':'owned-worker1'}
+        fixture.http=Mock(return_value='healthy')
+        values=iter(logs)
+        fixture.run=lambda args:SimpleNamespace(stdout='true' if args[1]=='inspect' else next(values),stderr='')
+        return fixture
+
+    def test_http_worker_health_waits_for_original_completed_startup_phase(self):
+        f=self.worker_fixture(['metrics live only','Worker started, waiting for events...'])
+        with patch('five_image_start.time.monotonic',side_effect=[0,1,2]),patch('five_image_start.time.sleep'):
+            f.ready('worker1',9092,'/healthz')
+        self.assertEqual(f.http.call_count,2)
+        self.assertEqual(f.report['workers_prepared'],{'worker1':True})
+
+    def test_http_only_worker_cannot_exceed_the_original_startup_budget(self):
+        f=self.worker_fixture(['metrics live only'])
+        with patch('five_image_start.time.monotonic',side_effect=[0,1,151]),patch('five_image_start.time.sleep'):
+            with self.assertRaisesRegex(RuntimeError,'ready_budget_exceeded'):f.ready('worker1',9092,'/healthz')
+        self.assertNotIn('workers_prepared',f.report)
+
     def test_two_owners_distinct_credentials_and_shared_mysql_binding(self):
         original=base(); frozen=copy.deepcopy(original)
         c=configuration(original,'api','qs_m3_image_owned','unused-owned-password','a'*64)

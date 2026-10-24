@@ -13,7 +13,8 @@ from image_start_fixture import IMAGE_PROVENANCE
 
 
 def synthetic_unit_receipt():
-    return dict(schema='m3-five-actual-image-startup-trial/v2', passed=15, failed=0, skipped=0,
+    return dict(schema='m3-five-actual-image-startup-trial/v3', passed=15, failed=0, skipped=0,
+        workers_prepared={name:True for name in ('worker1','worker2','worker3')},
         cases={str(n):True for n in range(15)}, sources=SOURCES, sources_unchanged=True,
         mysql_runtime_ddl_attempts=0,mongo_runtime_ddl_attempts=0,
         mongo_ddl_audit=dict(positive_controls=4,commands=[]),
@@ -52,6 +53,14 @@ class CutoverReceiptAdmissionTest(unittest.TestCase):
         value=synthetic_unit_receipt();value['processes']['api']['state']['ExitCode']=137
         with self.assertRaises(RuntimeError):self.check(value)
         value=synthetic_unit_receipt();value['cleanup']['private_directory_removed']=False
+        with self.assertRaises(RuntimeError):self.check(value)
+
+    def test_http_only_worker_receipts_cannot_authorize_cutover(self):
+        value=synthetic_unit_receipt();value.pop('workers_prepared')
+        with self.assertRaises(RuntimeError):self.check(value)
+        value=synthetic_unit_receipt();value['workers_prepared']['worker3']=False
+        with self.assertRaises(RuntimeError):self.check(value)
+        value=synthetic_unit_receipt();value['schema']='m3-five-actual-image-startup-trial/v2'
         with self.assertRaises(RuntimeError):self.check(value)
 
     def test_matching_versions_do_not_replace_frozen_image_identity(self):
