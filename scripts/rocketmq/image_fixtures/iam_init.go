@@ -34,8 +34,8 @@ func prepare() error {
 		return err
 	}
 	host, _, err := net.SplitHostPort(cfg.Addr)
-	if err != nil || host != "127.0.0.1" || !strings.HasPrefix(cfg.DBName, "iam_m3_image_") {
-		return fmt.Errorf("owned loopback schema required")
+	if err != nil || host != "mysql" || !strings.HasPrefix(cfg.DBName, "iam_m3_image_") {
+		return fmt.Errorf("owned internal fixture schema required")
 	}
 	open := func() (*sql.DB, error) {
 		c, err := mysql.NewConnector(cfg)
@@ -52,7 +52,10 @@ func prepare() error {
 	defer pool.Close()
 	var tables int
 	preparationStage = "check_empty"
-	if err = pool.QueryRow("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE()").Scan(&tables); err != nil || tables != 0 {
+	if err = pool.QueryRow("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE()").Scan(&tables); err != nil {
+		return err
+	}
+	if tables != 0 {
 		return fmt.Errorf("empty fixture schema required")
 	}
 	preparationStage = "gorm"

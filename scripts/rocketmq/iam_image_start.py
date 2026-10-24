@@ -160,9 +160,9 @@ def main():
         document.pop('name',None)
         for network in document['networks'].values(): network.pop('name',None); network['internal']=True
         for service in document['services'].values(): service['restart']='no'
-        password=secrets.token_hex(32); database='iam_m3_image_'+secrets.token_hex(8); mysql_port=common.port()
+        password=secrets.token_hex(32); database='iam_m3_image_'+secrets.token_hex(8)
         document['services'].update(mysql=dict(image='mysql:8.0.44',environment=dict(MYSQL_ROOT_PASSWORD=password,MYSQL_ROOT_HOST='%'),
-            ports=[f'127.0.0.1:{mysql_port}:3306'],tmpfs=['/var/lib/mysql'],mem_limit='512m',networks=['rocketmq'],
+            tmpfs=['/var/lib/mysql'],mem_limit='512m',networks=['rocketmq'],
             healthcheck=dict(test=['CMD-SHELL','MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e "SELECT 1"'],interval='3s',timeout='3s',retries=50)),
             redis=dict(image='redis:7-alpine',networks=['rocketmq']),
             nsqlookupd=dict(image=NSQ,command=['/nsqlookupd'],networks=['rocketmq']),
@@ -179,9 +179,17 @@ def main():
         fixture_binary=directory/'prepare-iam'
         stage='fixture_compilation'
         run(['go','build','-o',str(fixture_binary),'./scripts/testing/m3_image_start_fixture'],cwd=source,timeout=300)
-        env=dict(os.environ,IAM_IMAGE_FIXTURE_DSN=f'root:{password}@tcp(127.0.0.1:{mysql_port})/{database}?parseTime=true&multiStatements=true')
+        network=project+'_rocketmq'
+        init_env=directory/'fixture-init.env'
+        init_env.write_text('GITHUB_ACTIONS=true\nRUNNER_ENVIRONMENT=github-hosted\n'+
+            f'IAM_IMAGE_FIXTURE_DSN=root:{password}@tcp(mysql:3306)/{database}?parseTime=true&multiStatements=true\n')
+        init_env.chmod(0o600)
         stage='original_schema41_execution'
-        result=run([str(fixture_binary)],cwd=source,env=env,timeout=180,required=False)
+        # Keep the database completely internal; the exact candidate image runs
+        # only the mounted CI initializer, not its business entrypoint.
+        result=run(['docker','run','--rm','--name',project+'-initializer','--network',network,
+            '--env-file',str(init_env),'--entrypoint','/tmp/prepare-iam',
+            '-v',str(fixture_binary)+':/tmp/prepare-iam:ro',image],timeout=180,required=False)
         if result.returncode:
             report['fixture_failure']=fixture_diagnostic(result.stdout)
             raise RuntimeError('original_fixture_preparation_failed')
@@ -203,7 +211,6 @@ def main():
         def own(uid,gid):
             run(['docker','run','--rm','--user','0','--entrypoint','sh','-v',str(fixture)+':/fixture',image,'-c',f'chown -R {uid}:{gid} /fixture'])
         own(2000,2000)
-        network=project+'_rocketmq'
         def start(filename):
             nonlocal app_created
             run(['docker','run','-d','--name',app,'--network',network,'--memory','512m','--cpus','1',
@@ -242,10 +249,12 @@ def main():
             return hashlib.sha256(dump.encode()).hexdigest()
         original_digest=retained_digest()
         stage='original_image_maintenance_restore'
-        cli_env=[]
-        for key,value in dict(HOST='mysql',PORT='3306',USERNAME='root',PASSWORD=password,DATABASE=database,TLS_MODE='disabled').items(): cli_env+=['-e','IAM_APISERVER_MYSQL_'+key+'='+value]
+        cli_env=directory/'maintenance.env'
+        cli_env.write_text(''.join('IAM_APISERVER_MYSQL_'+key+'='+value+'\n' for key,value in
+            dict(HOST='mysql',PORT='3306',USERNAME='root',PASSWORD=password,DATABASE=database,TLS_MODE='disabled').items()))
+        cli_env.chmod(0o600)
         def cli(*argv):
-            return run(['docker','run','--rm','--network',network,'--entrypoint','/app/iam-maintenance',*cli_env,
+            return run(['docker','run','--rm','--name',project+'-maintenance','--network',network,'--entrypoint','/app/iam-maintenance','--env-file',str(cli_env),
                         '-v',str(fixture)+':/fixture',image,*argv],timeout=180).stdout
         def file_sha(name):
             return run(['docker','run','--rm','--network','none','--entrypoint','sha256sum','-v',str(fixture)+':/fixture:ro',image,'/fixture/'+name]).stdout.split()[0]
@@ -281,7 +290,9 @@ def main():
         if app_created:runtime_logs()
     finally:
         clean=report['cleanup']
+        report['passed']=len(report['cases'])
         if app_created:run(['docker','rm','-f',app],required=False)
+        for name in (project+'-initializer',project+'-maintenance'):run(['docker','rm','-f',name],required=False)
         clean['application_absent']=not run(['docker','ps','-aq','--filter','name=^/'+app+'$']).stdout.strip()
         clean['compose_down_succeeded']=not started or run(compose+['down','-v','--remove-orphans'],required=False,timeout=150).returncode==0
         if prepared and prepared.exists():shutil.rmtree(prepared)
