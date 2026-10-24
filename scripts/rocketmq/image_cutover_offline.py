@@ -13,7 +13,7 @@ from audit_transaction_limit import write_private
 from image_cutover_boundary import ActualImageBoundary, digest, publish_owned_images, startup_receipt
 from image_full_protection import FullImageProtection
 from image_start_fixture import require
-from qs_image_pair import QS_SHA
+from qs_image_pair import QS_HEAD, QS_SHA
 from start_boundary import _encoded
 
 
@@ -30,7 +30,7 @@ def qs_snapshot(f, database):
     snapshot = result['snapshot']
     require(snapshot['source_sha'] == QS_SHA and snapshot['mysql_database'] == snapshot['mongo_database'] == database
             and (snapshot['mysql_version'], snapshot['mongo_version']) == (105, 40)
-            and (snapshot['target_mysql_version'], snapshot['target_mongo_version']) == (110, 43), 'original_pre_m3_pair_required')
+            and (snapshot['target_mysql_version'], snapshot['target_mongo_version']) == QS_HEAD, 'original_pre_m3_pair_required')
     for key in ('mysql_identity_sha256', 'mongo_cluster_sha256', 'migration_resources_sha256'): digest(snapshot[key])
     return snapshot
 
@@ -43,7 +43,7 @@ def offline_approval(snapshot, *, operation_id, started, protection, startup_sha
         approved_source_sha=snapshot['source_sha'], migration_resources_sha256=snapshot['migration_resources_sha256'],
         mysql_database=snapshot['mysql_database'], mongo_database=snapshot['mongo_database'],
         mysql_identity_sha256=snapshot['mysql_identity_sha256'], mongo_cluster_sha256=snapshot['mongo_cluster_sha256'],
-        initial_mysql_version=105, initial_mongo_version=40, target_mysql_version=110, target_mongo_version=43,
+        initial_mysql_version=105, initial_mongo_version=40, target_mysql_version=QS_HEAD[0], target_mongo_version=QS_HEAD[1],
         approval_summary_sha256=hashlib.sha256(_encoded(dict(scope='owned-isolated-ci-only', snapshot=snapshot,
             protection=protection.manifest_sha, responsibility=responsibility_sha))).hexdigest(),
         freeze_scope_sha256=digest(scope_sha), protection_scope='full_database_pair',
@@ -115,7 +115,7 @@ def prepare(f, args, databases, ai_admin_environment, specs):
             sha = f.once('/usr/bin/sha256sum', [plan], network=False).split()[0]
             f.once('/app/iam-maintenance', ['m3-messaging', '--apply', '--writers-excluded', '--plan', plan, '--reviewed-sha256', sha], environment=env)
     boundary.maintain('original-iam45', iam)
-    f.stage = 'original_offline_qs10540_to11043'
+    f.stage = 'original_offline_qs10540_to11044'
     def qs():
         f.select('api'); f.ownership(os.getuid())
         approval = offline_approval(snapshot, operation_id=f.project, started=started, protection=protection,
@@ -128,7 +128,7 @@ def prepare(f, args, databases, ai_admin_environment, specs):
         require(result['verified'] is True and result['authorization_consumed'] is True and result['migration_outcome_unknown'] is False, 'original_offline_pair_upgrade_verified_required')
         f.report['offline_pair'] = result
         bind_qs(f, databases['qs'])
-    boundary.maintain('original-qs10540-to11043', qs)
+    boundary.maintain('original-qs10540-to11044', qs)
     f.stage = 'original_offline_ai40_to43'
     def ai():
         f.select('ai')

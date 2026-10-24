@@ -18,7 +18,7 @@ class QSPairImageContractTest(unittest.TestCase):
         self.assertEqual(canonical_dump(mismatched),mismatched)
 
     def test_original_initializer_receipt_requires_full_source_and_both_heads(self):
-        value = dict(source_sha=QS_SHA, profile='current', mysql=110, mongo=43,
+        value = dict(source_sha=QS_SHA, profile='current', mysql=110, mongo=44,
                      resources_sha256='a' * 64, original_templates_applied=True,
                      journal_force_used=False, production=False)
         def check(v): return initializer_receipt('QS_IMAGE_INIT ' + json.dumps(v), 'current')

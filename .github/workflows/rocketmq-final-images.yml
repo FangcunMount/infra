@@ -41,6 +41,15 @@ on:
         description: Exact prior five-image run for a component; no registry or production input
         type: string
         default: '40074229224'
+      build_scope:
+        description: Rebuild all candidates or only the affected three QS images
+        type: choice
+        options: [all, qs]
+        default: all
+      qs_image_run_id:
+        description: Optional exact QS build run; IAM and AI retain image_run_id archives
+        type: string
+        default: ''
       startup_run_id:
         description: Successful independent five-start receipt required only for owned cutover rehearsal
         type: string
@@ -124,17 +133,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - target: iam
-            repository: iam
-          - target: qs-api
-            repository: qs-server
-          - target: qs-collection
-            repository: qs-server
-          - target: qs-worker
-            repository: qs-server
-          - target: ai
-            repository: qs-ai
+        include: ${{ fromJSON(inputs.build_scope == 'qs' && '[{"target":"qs-api","repository":"qs-server"},{"target":"qs-collection","repository":"qs-server"},{"target":"qs-worker","repository":"qs-server"}]' || '[{"target":"iam","repository":"iam"},{"target":"qs-api","repository":"qs-server"},{"target":"qs-collection","repository":"qs-server"},{"target":"qs-worker","repository":"qs-server"},{"target":"ai","repository":"qs-ai"}]') }}
     env:
       SOURCE_SHA: ${{ matrix.repository == 'iam' && inputs.iam_sha || matrix.repository == 'qs-server' && inputs.qs_sha || inputs.ai_sha }}
       TARGET: ${{ matrix.target }}
@@ -330,7 +329,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: d3269bda672b97582edb691ca4f924484c653822
+          ref: d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7
           path: .qs-pair-source
       - uses: actions/setup-go@v6
         with:
@@ -345,9 +344,9 @@ jobs:
           for target in qs-api qs-collection qs-worker; do
             mkdir -m 700 ".qs-image-candidates/$target"
             gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
-              --name "m3-final-image-metadata-$target-d3269bda672b97582edb691ca4f924484c653822-$IMAGE_RUN_ID" --dir ".qs-image-candidates/$target"
+              --name "m3-final-image-metadata-$target-d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7-$IMAGE_RUN_ID" --dir ".qs-image-candidates/$target"
             gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
-              --name "m3-final-image-archive-$target-d3269bda672b97582edb691ca4f924484c653822-$IMAGE_RUN_ID" --dir ".qs-image-candidates/$target"
+              --name "m3-final-image-archive-$target-d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7-$IMAGE_RUN_ID" --dir ".qs-image-candidates/$target"
           done
       - name: Compile owned fixture against unchanged original migration package
         run: |
@@ -358,7 +357,7 @@ jobs:
           cp scripts/rocketmq/image_fixtures/qs_init_test.go "$fixture"
           cd .qs-pair-source
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c -tags=integration \
-            -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d3269bda672b97582edb691ca4f924484c653822' \
+            -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7' \
             -o "$GITHUB_WORKSPACE/qs-pair-init" ./internal/pkg/migration
           cd "$GITHUB_WORKSPACE"
           test -z "$(readelf -l qs-pair-init | sed -n '/INTERP/p')"
@@ -403,6 +402,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       IMAGE_RUN_ID: ${{ inputs.image_run_id }}
       STARTUP_RUN_ID: ${{ inputs.startup_run_id }}
+      QS_IMAGE_RUN_ID: ${{ inputs.qs_image_run_id }}
       IMAGE_PHASE: ${{ inputs.phase }}
       GOWORK: 'off'
       GOTOOLCHAIN: local
@@ -416,7 +416,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: d3269bda672b97582edb691ca4f924484c653822
+          ref: d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7
           path: .five-sources/qs
       - uses: actions/checkout@v6
         with:
@@ -438,18 +438,21 @@ jobs:
           set -euo pipefail
           umask 077
           [[ "$IMAGE_RUN_ID" =~ ^[0-9]{1,20}$ ]]
+          QS_IMAGE_RUN_ID="${QS_IMAGE_RUN_ID:-$IMAGE_RUN_ID}"
+          [[ "$QS_IMAGE_RUN_ID" =~ ^[0-9]{1,20}$ ]]
           mkdir -m 700 .five-candidates
           for target in iam qs-api qs-collection qs-worker ai; do
+            target_run="$IMAGE_RUN_ID"
             case "$target" in
               iam) source_sha=954ad9dee2f71a51151b696ec05d5cb90cc65b50 ;;
               ai) source_sha=ddff86cad27d03c95dad28490d6cccbc1ce5b15f ;;
-              *) source_sha=d3269bda672b97582edb691ca4f924484c653822 ;;
+              *) source_sha=d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7; target_run="$QS_IMAGE_RUN_ID" ;;
             esac
             mkdir -m 700 ".five-candidates/$target"
-            gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
-              --name "m3-final-image-metadata-$target-$source_sha-$IMAGE_RUN_ID" --dir ".five-candidates/$target"
-            gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
-              --name "m3-final-image-archive-$target-$source_sha-$IMAGE_RUN_ID" --dir ".five-candidates/$target"
+            gh run download "$target_run" --repo "$GITHUB_REPOSITORY" \
+              --name "m3-final-image-metadata-$target-$source_sha-$target_run" --dir ".five-candidates/$target"
+            gh run download "$target_run" --repo "$GITHUB_REPOSITORY" \
+              --name "m3-final-image-archive-$target-$source_sha-$target_run" --dir ".five-candidates/$target"
           done
       - name: Download independent successful startup receipt for cutover
         if: inputs.phase == 'cutover'
@@ -477,9 +480,9 @@ jobs:
           cp scripts/rocketmq/image_fixtures/qs_consumer_contract.go "$consumer_fixture/main.go"
           cd .five-sources/qs
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c -tags=integration \
-            -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d3269bda672b97582edb691ca4f924484c653822' \
+            -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7' \
             -o "$GITHUB_WORKSPACE/five-qs-init" ./internal/pkg/migration
-          go run -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d3269bda672b97582edb691ca4f924484c653822' \
+          go run -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7' \
             ./scripts/testing/m3_consumer_contract > "$GITHUB_WORKSPACE/qs-consumer-contract.txt"
           cd "$GITHUB_WORKSPACE/.five-sources/iam"
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "$GITHUB_WORKSPACE/five-iam-init" ./scripts/testing/m3_five_image_fixture

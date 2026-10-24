@@ -16,7 +16,8 @@ import time
 from audit_transaction_limit import write_private
 from image_start_fixture import OwnedImageFixture, require
 
-QS_SHA = 'd3269bda672b97582edb691ca4f924484c653822'
+QS_SHA = 'd6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7'
+QS_HEAD = (110, 44)
 MONGO = 'mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f'
 GO_SUM = 'h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0='
 
@@ -50,7 +51,7 @@ def initializer_receipt(raw, profile):
     rows = [line.removeprefix('QS_IMAGE_INIT ') for line in raw.splitlines() if line.startswith('QS_IMAGE_INIT ')]
     require(len(rows) == 1, 'one_original_initializer_receipt_required')
     value = json.loads(rows[0])
-    heads = (105, 40) if profile == 'pre_m3' else (110, 43)
+    heads = (105, 40) if profile == 'pre_m3' else QS_HEAD
     require(value['source_sha'] == QS_SHA and value['profile'] == profile
             and (value['mysql'], value['mongo']) == heads
             and re.fullmatch('[0-9a-f]{64}', value['resources_sha256'])

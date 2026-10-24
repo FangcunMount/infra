@@ -27,7 +27,7 @@ class OfflineEvidenceBindingTest(unittest.TestCase):
         self.assertEqual(value['startup_receipt_sha256'],'3'*64)
         self.assertEqual(value['responsibility_sha256'],'5'*64)
         self.assertEqual((value['initial_mysql_version'],value['initial_mongo_version']),(105,40))
-        self.assertEqual((value['target_mysql_version'],value['target_mongo_version']),(110,43))
+        self.assertEqual((value['target_mysql_version'],value['target_mongo_version']),(110,44))
         self.assertEqual(value['protection_scope'],'full_database_pair')
         self.assertTrue(value['runtime_frozen'] and value['runtime_not_started'])
         self.assertEqual(json.loads(json.dumps(value)),value)
