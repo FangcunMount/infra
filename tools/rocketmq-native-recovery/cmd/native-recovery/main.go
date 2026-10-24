@@ -1,6 +1,6 @@
-// native-recovery currently exposes only read-only preview and review checking.
-// No invocation of this binary can start an SDK or perform native/governance
-// recovery yet; those effectful entrypoints require their own real-MQ gates.
+// native-recovery composes reviewed, bounded recovery operations. Source/CI
+// verification never authorizes production: its frozen coordinator command,
+// named request/receipt reviews and actual first-runtime barrier are mandatory.
 package main
 
 import (
@@ -18,6 +18,8 @@ import (
 	"syscall"
 	"time"
 
+	"fangcunmount.infra/rocketmq-native-recovery/internal/barrier"
+	"fangcunmount.infra/rocketmq-native-recovery/internal/execution"
 	"fangcunmount.infra/rocketmq-native-recovery/internal/preview"
 	"fangcunmount.infra/rocketmq-native-recovery/internal/review"
 )
@@ -26,7 +28,7 @@ import (
 // A working-tree string or an unversioned build must not claim a release SHA.
 var sourceSHA string
 
-var errCommand = errors.New("native recovery input/build unavailable; no recovery action performed")
+var errCommand = errors.New("native recovery rejected or incomplete; inspect private evidence before any retry")
 
 func identity() ([32]byte, error) {
 	var sum [32]byte
@@ -108,7 +110,7 @@ func run(ctx context.Context, args []string, out, diagnostics io.Writer) error {
 		if err != nil {
 			return errCommand
 		}
-		return json.NewEncoder(out).Encode(map[string]any{"schema": "m3-native-recovery-build/v1", "source_sha": sourceSHA, "binary_sha256": hex.EncodeToString(sum[:]), "sdk_version": "v0.5.0-rocketmq-tx.4", "effectful_commands": false})
+		return json.NewEncoder(out).Encode(map[string]any{"schema": "m3-native-recovery-build/v1", "source_sha": sourceSHA, "binary_sha256": hex.EncodeToString(sum[:]), "sdk_version": "v0.5.0-rocketmq-tx.4", "effectful_commands": true})
 	case "preview":
 		config, manifest, export, selection := fileFlags(f, "config"), fileFlags(f, "manifest"), fileFlags(f, "export"), fileFlags(f, "selection")
 		output := f.String("output", "", "new request file under an existing private 0700 directory")
@@ -140,6 +142,7 @@ func run(ctx context.Context, args []string, out, diagnostics io.Writer) error {
 	case "verify-review":
 		request, approval := fileFlags(f, "request"), fileFlags(f, "approval")
 		binding := f.String("binding-sha", "", "original coordinator binding SHA-256")
+		action := f.String("action", "check", "check or recover; validation only, never authorizes effects")
 		if f.Parse(args[1:]) != nil || f.NArg() != 0 {
 			return errCommand
 		}
@@ -161,14 +164,74 @@ func run(ctx context.Context, args []string, out, diagnostics io.Writer) error {
 		}
 		now := time.Now().UTC()
 		r, err := review.Load(rf.Path, rf.SHA256, now)
-		if err != nil || r.SourceSHA != sourceSHA || r.BinarySHA != review.Hex(binarySHA) || review.Approve(af.Path, af.SHA256, r, rf.SHA256, [32]byte{}, bs, "check", now) != nil {
+		if (*action != "check" && *action != "recover") || err != nil || r.SourceSHA != sourceSHA || r.BinarySHA != review.Hex(binarySHA) || review.Approve(af.Path, af.SHA256, r, rf.SHA256, [32]byte{}, bs, *action, now) != nil {
 			return errCommand
 		}
 		// This command does not inspect a live issued barrier or authorize any
 		// effect. It is an offline review aid, not the recovery execution gate.
 		return json.NewEncoder(out).Encode(map[string]any{"schema": "m3-native-recovery-review/v1", "review_graph_valid": true, "execution_authorized": false, "sdk_started": false, "governance_written": false})
+	case "recover", "resolve-notice", "verify-resolution":
+		config, manifest, export, request, approval, receipt := fileFlags(f, "config"), fileFlags(f, "manifest"), fileFlags(f, "export"), fileFlags(f, "request"), fileFlags(f, "approval"), fileFlags(f, "receipt")
+		directory := f.String("directory", "", "live original coordinator directory")
+		bindingSHA := f.String("binding-sha", "", "original coordinator binding SHA-256")
+		stepPlanSHA := f.String("step-plan-sha", "", "independently approved current step SHA-256")
+		step := f.String("step", "", "exact currently issued runtime/forward step")
+		if f.Parse(args[1:]) != nil || f.NArg() != 0 {
+			return errCommand
+		}
+		binarySHA, err := identity()
+		if err != nil {
+			return errCommand
+		}
+		b, err := review.Digest(*bindingSHA)
+		if err != nil {
+			return errCommand
+		}
+		p, err := review.Digest(*stepPlanSHA)
+		if err != nil {
+			return errCommand
+		}
+		input := execution.Input{Barrier: barrier.Context{Directory: *directory, BindingSHA256: b, StepPlanSHA256: p, Step: *step}, SourceSHA: sourceSHA, BinarySHA: binarySHA}
+		for _, item := range []struct {
+			in   *commandFile
+			dest *preview.File
+		}{{config, &input.Config}, {manifest, &input.Manifest}, {export, &input.Export}, {request, &input.Request}, {approval, &input.Approval}} {
+			value, e := item.in.value()
+			if e != nil {
+				return errCommand
+			}
+			*item.dest = value
+		}
+		if args[0] != "recover" {
+			value, e := receipt.value()
+			if e != nil {
+				return errCommand
+			}
+			input.Receipt = value
+		} else if receipt.path != "" || receipt.sha != "" {
+			return errCommand
+		}
+		budget := 180 * time.Second
+		if args[0] != "recover" {
+			budget = 10 * time.Second
+		}
+		bounded, cancel := context.WithTimeout(ctx, budget)
+		defer cancel()
+		var result execution.Result
+		if args[0] == "recover" {
+			result, err = execution.Recover(bounded, input)
+		} else {
+			result, err = execution.Resolve(bounded, input, args[0] == "verify-resolution")
+		}
+		if encodeErr := json.NewEncoder(out).Encode(result); encodeErr != nil {
+			return errCommand
+		}
+		if err != nil {
+			return errCommand
+		}
+		return nil
 	case "help", "--help", "-h":
-		_, err := fmt.Fprintln(out, "native-recovery: version | preview | verify-review\nRead-only request preparation; no SDK, native admin or governance recovery entrypoint.")
+		_, err := fmt.Fprintln(out, "native-recovery: version | preview | verify-review | recover | resolve-notice | verify-resolution\nRead-only preparation is separate. Recovery requires named private review and a live issued coordinator barrier; no automatic business retry or admission reopening.")
 		return err
 	default:
 		_ = diagnostics // Reserved for generic stage-only diagnostics, never raw inputs.

@@ -110,7 +110,14 @@ def run_script(script, plan, operation):
                                    stdin=subprocess.PIPE, stdout=output, stderr=output,
                                    cwd=plan['cwd'], start_new_session=True,
                                    env={'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C',
-                                        'HOME': str(operation.directory)})
+                                        'HOME': str(operation.directory),
+                                        # Derived from this already approved plan. Scripts
+                                        # cannot embed their own plan hash without a cycle.
+                                        # These values alone never grant authorization.
+                                        'M3_COORDINATOR_DIRECTORY': str(operation.directory),
+                                        'M3_COORDINATOR_BINDING_SHA256': plan['binding_sha256'],
+                                        'M3_COORDINATOR_STEP': plan['step'],
+                                        'M3_COORDINATOR_STEP_PLAN_SHA256': hashlib.sha256(_encoded(plan)).hexdigest()})
         try:
             process.communicate(script, timeout=plan['timeout_seconds'])
         finally:

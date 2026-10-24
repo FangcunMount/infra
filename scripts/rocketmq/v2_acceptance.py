@@ -9,12 +9,13 @@ from provision_v2 import Admin
 from routes import consumer_group_v2, physical_topic_v2, validate
 
 
-def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed):
+def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed, *, fixture_manifest=None):
     vectors = repo / 'components/rocketmq/routing-v2-vectors.json'
     if vectors.read_bytes() != (sdk / 'contracts/rocketmq-routing-v2.json').read_bytes():
         raise RuntimeError('SDK/infra canonical route vectors differ')
     passed('v2_go_python_infra_exact_route_vectors')
-    manifest = json.loads((repo / 'components/rocketmq/test-routes-v2.json').read_text())
+    manifest = (json.loads((repo / 'components/rocketmq/test-routes-v2.json').read_text())
+                if fixture_manifest is None else copy.deepcopy(fixture_manifest))
     validate(manifest)
     secret = directory / 'sdk-v2-credentials.json'
     secret.write_text(json.dumps(accounts)); secret.chmod(0o600)
@@ -75,6 +76,7 @@ def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed):
         passed('v2_existing_configuration_conflict_refused')
         proof={'route_vectors_sha256':hashlib.sha256(vectors.read_bytes()).hexdigest(),
                'manifest_sha256':hashlib.sha256((repo/'components/rocketmq/test-routes-v2.json').read_bytes()).hexdigest(),
+               'effective_manifest_sha256':hashlib.sha256(json.dumps(manifest,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
                'provision_receipt':receipt,'idempotent_operations':0,
                'typed_topics':{r['physical_topic']:r['message_type'] for r in manifest['routes']},
                'owner_actions':'publishers Pub/Get on their exact owner routes; observer Sub/Get only'}

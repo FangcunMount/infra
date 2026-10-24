@@ -67,7 +67,7 @@ func previewCLINative(t *testing.T, s Snapshot, databaseKind, uri, databaseName 
 		return value
 	}
 	version := invoke(true, "version")
-	if version["sdk_version"] != "v0.5.0-rocketmq-tx.4" || version["effectful_commands"] != false {
+	if version["sdk_version"] != "v0.5.0-rocketmq-tx.4" || version["effectful_commands"] != true {
 		t.Fatal("wrong executable provenance or effect boundary")
 	}
 	export := map[string]any{"topic": "TRANS_CHECK_MAX_TIME_TOPIC", "key_sha256": strings.Repeat("1", 64), "records": []map[string]any{{"broker_message_id": strings.Repeat("A", 32), "queue_id": 0, "queue_offset": 1, "commitlog_offset": 2, "index_hour": 3}}, "raw_admin_sha256": strings.Repeat("2", 64), "read_only": true, "body_exported": false, "truncated_possible": false, "alert": "native_transaction_check_limit_reached", "severity": "critical"}

@@ -32,7 +32,7 @@ func Approve(path string, expected [32]byte, request Request, requestSHA, receip
 		return ErrReview
 	}
 	switch action {
-	case "check":
+	case "check", "recover":
 		if receiptSHA != [32]byte{} || a.ReceiptSHA != "" {
 			return ErrReview
 		}

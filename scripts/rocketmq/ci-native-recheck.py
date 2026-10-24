@@ -16,6 +16,7 @@ from audit_transaction_limit import export, write_private
 from render import render
 from routes import consumer_group_v2
 from v2_acceptance import setup
+from managed_recovery_acceptance import accept as managed_accept, fixture_manifest as managed_manifest
 
 SDK_SHA = '04757bd3212ca961d8eaec22ecd3560101111e18'
 PARAMETERS = {'transactionTimeOut': 6000, 'transactionCheckInterval': 5000,
@@ -67,6 +68,7 @@ def main():
     parser.add_argument('--sdk', type=Path, required=True)
     parser.add_argument('--image', required=True)
     parser.add_argument('--report', type=Path, required=True)
+    parser.add_argument('--managed-tool', type=Path, help='fixed published-module CLI; owned isolated fixture only')
     args = parser.parse_args()
     ci_guard(os.environ)  # Never construct a client or invoke Docker on a workstation.
     require(not args.report.exists() and not args.report.is_symlink(), 'report_already_exists')
@@ -89,7 +91,7 @@ def main():
                   limits=['Isolated fixed SDK source probe, not published-artifact or original host acceptance',
                           'Original producer exits23 after real local COMMIT; not SIGKILL or packet loss',
                           'Native internal copy may redeliver; no exactly-once or indefinite recovery promise',
-                          'No production, system, real provider or persisted host notice resolution acceptance'])
+                          'No production/system/provider or original business-host acceptance; managed mode tests owned original SDK DB/governance'])
     proof, cases, probes = report['proof'], report['cases'], []
     proof['harness_sha256'] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
         for p in (Path(__file__).resolve(), repo/'scripts/rocketmq/probes/native-recheck/NativeHalfRecheck.java',
@@ -162,8 +164,10 @@ def main():
         before_parameters = common.broker_parameters(admin('getBrokerConfig'))
         require(before_parameters == PARAMETERS, 'actual_parameters_required')
         proof['parameters_before'] = before_parameters
-        manifest, proof['routing'] = setup(repo, sdk, broker, project, accounts, directory, admin, run, passed)
-        route = next(r for r in manifest['routes'] if r['owner']=='iam.mysql' and r['route_revision']=='sdk-v2' and r['message_type']=='TRANSACTION')
+        manifest, proof['routing'] = setup(repo, sdk, broker, project, accounts, directory, admin, run, passed,
+            fixture_manifest=managed_manifest(repo) if args.managed_tool else None)
+        revision = 'm3-1' if args.managed_tool else 'sdk-v2'
+        route = next(r for r in manifest['routes'] if r['owner']=='iam.mysql' and r['route_revision']==revision and r['message_type']=='TRANSACTION')
         binary = directory/'sdk-go-probe'
         stage = 'fixed_source_compile'
         run(['go', 'build', '-race', '-mod=readonly', '-o', str(binary), './transport/rocketmq/internal/sdkprobe'], cwd=sdk,
@@ -174,7 +178,7 @@ def main():
         libraries, classes = directory/'java-lib', directory/'java-classes'; libraries.mkdir(); classes.mkdir()
         run(['docker', 'cp', broker+':/opt/rocketmq/lib/.', str(libraries)], timeout=60)
         run(['javac', '--release', '17', '-g:none', '-cp', str(libraries/'*'), '-d', str(classes),
-             str(java_source/'NativeHalfRecheck.java'), str(java_source/'NativeHalfWindowTest.java')])
+             str(java_source/'NativeHalfRecheck.java'), str(java_source/'NativeHalfWindowTest.java'), str(java_source/'NativeHalfManaged.java')])
         proof['java_compiler'] = run(['javac', '-version']).stdout.strip()
         container_java = '/tmp/native-recheck-'+secrets.token_hex(8)
         run(['docker', 'exec', broker, 'mkdir', '-m', '700', container_java])
@@ -208,7 +212,7 @@ def main():
                 owner='iam.mysql', subscription='sdk-mysql-observer', inputs=[{k:v for k,v in route.items() if k!='id'}],
                 owner_routes=[dict(topic=r['topic'], physical_topic=r['physical_topic'], route_revision=r['route_revision'])
                               for r in manifest['routes'] if r['owner']=='iam.mysql' and r['message_type']=='TRANSACTION'],
-                route_revision='sdk-v2', storage='mysql', branches=1, lease_millis=3_600_000,
+                route_revision=revision, storage='mysql', branches=1, lease_millis=3_600_000,
                 dsn=f'txprobe:{password}@tcp(127.0.0.1:{mysql_port})/txprobe?timeout=1s&readTimeout=5s&writeTimeout=5s'))
             probe = common.Probe([str(binary), '--config', str(path), '--mode', mode, '--id', identity], directory,
                                  dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(ca)))
@@ -247,58 +251,64 @@ def main():
                 and committed['final_outcome']!='commit_confirmed' and counts()=='1\t1\t1\t1', 'original_commit_without_final_confirmation_required')
         require(all(committed[k]==prepared[k] for k in ('reference_sha256','wire_sha256','unique_id_sha256')), 'original_frozen_identity_changed')
         proof['original_exit_code'] = 23; passed('real_original_root_committed_then_process_exited_before_final_rpc')
-        recovery = start('recover', identity); recovery.wait('ready', identity)
-        recovery.send('seal'); recovery.wait('sealed', '', 'admission_stopped_checker_alive')
-        time.sleep(2); recovery.drain(); consumer.drain()
-        require(not any(e.get('event') in ('checked_reference', 'recovery_recorded', 'half') for e in recovery.events)
-                and not any(e.get('event')=='received' and e.get('id')==identity for e in consumer.events), 'native_exhaustion_not_established')
-        passed('new_process_admission_stopped_checker_alive_no_automatic_recovery')
-        request = dict(mode='inspect', source_topic='TRANS_CHECK_MAX_TIME_TOPIC',
-            commitlog_offset=index['records'][0]['commitlog_offset'], queue_id=index['records'][0]['queue_id'],
-            queue_offset=index['records'][0]['queue_offset'], expected_real_topic=route['physical_topic'],
-            expected_owner='iam.mysql', expected_route_revision='sdk-v2', expected_retention_hours=48,
-            expected_reference_sha256=committed['reference_sha256'], expected_wire_sha256=committed['wire_sha256'],
-            expected_unique_id_sha256=committed['unique_id_sha256'])
-        def invoke(value, negative=False):
-            result = run(java+['NativeHalfRecheck'], stdin=json.dumps(value), required=False, timeout=45)
-            safe = frame(result.stdout, 'M3_NATIVE_RECHECK ')
-            require(safe.get('admin_shutdown_returned') is True and safe.get('body_exported') is False, 'native_private_shutdown_required')
-            if negative:
-                require(result.returncode!=0 and safe.get('outcome')=='NotAttempted' and safe.get('stage')=='frozen_identity', 'wrong_identity_not_refused')
-            elif result.returncode:
-                proof['native_operation_failure'] = safe
-                raise RuntimeError('native_private_operation_failed')
-            return safe
-        stage = 'exact_native_inspection'
-        proof['inspection'] = invoke(request); passed('exact_native_body_reference_identity_and_finite_window_verified')
-        for field, wrong in (('expected_reference_sha256','0'*64), ('expected_wire_sha256','0'*64), ('expected_owner','qs.mysql')):
-            invoke(dict(request, **{field:wrong}), negative=True); passed('native_refuses_'+field)
-        require(snapshot()==committed and counts()=='1\t1\t1\t1', 'inspection_mutated_primary')
-        stage = 'explicit_native_recheck'
-        proof['native_recheck'] = invoke(dict(request, mode='resume'))
-        require(proof['native_recheck']['outcome']=='RecheckEnqueued', 'native_recheck_enqueue_not_confirmed')
-        passed('explicit_original_native_record_recheck_enqueued_not_committed_by_admin')
-        stage = 'real_new_checker_rpc_and_audit'
-        recovery.wait('checked_reference', identity, 'commit', timeout=100)
-        recovery.wait('recovery_recorded', identity, 'commit_confirmed', timeout=100)
-        consumer.wait('received', identity, timeout=100)
-        final = snapshot()
-        require(final == dict(committed, final_outcome='commit_confirmed') and counts()=='1\t1\t1\t1', 'exact_final_receipt_or_original_counts_changed')
-        passed('new_checker_reads_original_committed_witness_actual_rpc_positive_audit')
-        passed('consumer_receives_original_message_identity_without_new_execution')
-        after_index = export(broker, project, identity, directory/'native-index-after.json')
-        require(after_index['records']==index['records'] and hashlib.sha256(index_path.read_bytes()).hexdigest()==proof['native_index_sha256'], 'original_native_index_changed')
-        passed('raw_native_index_retained_unchanged')
-        recovery.send('stop'); recovery.wait('closed', identity, 'drained'); recovery.finish()
-        metrics = [json.loads(e['decision']) for e in recovery.events if e.get('event')=='metrics']
-        require(metrics and metrics[-1]['RecoveryAuditRecorded']>=1 and metrics[-1]['RecoveryAuditErrors']==0
-                and not any(e.get('event')=='half' for e in recovery.events), 'real_recovery_stats_required')
-        proof['recovery_metrics'] = metrics[-1]; proof['original_counts'] = dict(business=1, requests=1, executions=1, witnesses=1)
-        proof['exact_witness'] = final; passed('replacement_has_zero_new_half_and_actual_resources_drained')
+        if args.managed_tool:
+            stage = 'compiled_managed_original_primary_recovery'
+            managed_accept(repo=repo,binary=args.managed_tool.resolve(),broker=broker,project=project,directory=directory,
+                manifest=manifest,route=route,account=accounts['owner-a'],grpc_port=grpc_port,mysql_port=mysql_port,password=password,
+                ca=ca,java=java,identity=identity,index_path=index_path,index=index,sql=sql,run=run,consumer=consumer,passed=passed,proof=proof)
+        else:
+            recovery = start('recover', identity); recovery.wait('ready', identity)
+            recovery.send('seal'); recovery.wait('sealed', '', 'admission_stopped_checker_alive')
+            time.sleep(2); recovery.drain(); consumer.drain()
+            require(not any(e.get('event') in ('checked_reference', 'recovery_recorded', 'half') for e in recovery.events)
+                    and not any(e.get('event')=='received' and e.get('id')==identity for e in consumer.events), 'native_exhaustion_not_established')
+            passed('new_process_admission_stopped_checker_alive_no_automatic_recovery')
+            request = dict(mode='inspect', source_topic='TRANS_CHECK_MAX_TIME_TOPIC',
+                commitlog_offset=index['records'][0]['commitlog_offset'], queue_id=index['records'][0]['queue_id'],
+                queue_offset=index['records'][0]['queue_offset'], expected_real_topic=route['physical_topic'],
+                expected_owner='iam.mysql', expected_route_revision=revision, expected_retention_hours=48,
+                expected_reference_sha256=committed['reference_sha256'], expected_wire_sha256=committed['wire_sha256'],
+                expected_unique_id_sha256=committed['unique_id_sha256'])
+            def invoke(value, negative=False):
+                result = run(java+['NativeHalfRecheck'], stdin=json.dumps(value), required=False, timeout=45)
+                safe = frame(result.stdout, 'M3_NATIVE_RECHECK ')
+                require(safe.get('admin_shutdown_returned') is True and safe.get('body_exported') is False, 'native_private_shutdown_required')
+                if negative:
+                    require(result.returncode!=0 and safe.get('outcome')=='NotAttempted' and safe.get('stage')=='frozen_identity', 'wrong_identity_not_refused')
+                elif result.returncode:
+                    proof['native_operation_failure'] = safe
+                    raise RuntimeError('native_private_operation_failed')
+                return safe
+            stage = 'exact_native_inspection'
+            proof['inspection'] = invoke(request); passed('exact_native_body_reference_identity_and_finite_window_verified')
+            for field, wrong in (('expected_reference_sha256','0'*64), ('expected_wire_sha256','0'*64), ('expected_owner','qs.mysql')):
+                invoke(dict(request, **{field:wrong}), negative=True); passed('native_refuses_'+field)
+            require(snapshot()==committed and counts()=='1\t1\t1\t1', 'inspection_mutated_primary')
+            stage = 'explicit_native_recheck'
+            proof['native_recheck'] = invoke(dict(request, mode='resume'))
+            require(proof['native_recheck']['outcome']=='RecheckEnqueued', 'native_recheck_enqueue_not_confirmed')
+            passed('explicit_original_native_record_recheck_enqueued_not_committed_by_admin')
+            stage = 'real_new_checker_rpc_and_audit'
+            recovery.wait('checked_reference', identity, 'commit', timeout=100)
+            recovery.wait('recovery_recorded', identity, 'commit_confirmed', timeout=100)
+            consumer.wait('received', identity, timeout=100)
+            final = snapshot()
+            require(final == dict(committed, final_outcome='commit_confirmed') and counts()=='1\t1\t1\t1', 'exact_final_receipt_or_original_counts_changed')
+            passed('new_checker_reads_original_committed_witness_actual_rpc_positive_audit')
+            passed('consumer_receives_original_message_identity_without_new_execution')
+            after_index = export(broker, project, identity, directory/'native-index-after.json')
+            require(after_index['records']==index['records'] and hashlib.sha256(index_path.read_bytes()).hexdigest()==proof['native_index_sha256'], 'original_native_index_changed')
+            passed('raw_native_index_retained_unchanged')
+            recovery.send('stop'); recovery.wait('closed', identity, 'drained'); recovery.finish()
+            metrics = [json.loads(e['decision']) for e in recovery.events if e.get('event')=='metrics']
+            require(metrics and metrics[-1]['RecoveryAuditRecorded']>=1 and metrics[-1]['RecoveryAuditErrors']==0
+                    and not any(e.get('event')=='half' for e in recovery.events), 'real_recovery_stats_required')
+            proof['recovery_metrics'] = metrics[-1]; proof['original_counts'] = dict(business=1, requests=1, executions=1, witnesses=1)
+            proof['exact_witness'] = final; passed('replacement_has_zero_new_half_and_actual_resources_drained')
         consumer.send('stop'); consumer.wait('closed'); consumer.finish()
         require(not run(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=sdk).stdout, 'sdk_source_changed')
         proof['sdk_tracked_sources_clean'] = True
-        require(report['passed']==17, 'complete_nonempty_native_matrix_required')
+        require(report['passed']==(14 if args.managed_tool else 17), 'complete_nonempty_native_matrix_required')
     except Exception:
         report['failed'] = 1; report['failure'] = stage
     finally:

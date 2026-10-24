@@ -26,18 +26,22 @@ import (
 var ErrConfig = errors.New("explicit reviewed original database and complete owner routes required")
 
 type Config struct {
-	Schema       string `json:"schema"`
-	Owner        string `json:"owner"`
-	StoreID      string `json:"store_id"`
-	WriterEpoch  string `json:"writer_epoch"`
-	DatabaseKind string `json:"database_kind"`
-	DatabaseURI  string `json:"database_uri"`
-	DatabaseName string `json:"database_name"`
-	DatabaseCA   string `json:"database_ca_pem"`
-	Endpoint     string `json:"endpoint"`
-	AccessKey    string `json:"access_key"`
-	SecretKey    string `json:"secret_key"`
-	RootCA       string `json:"root_ca_pem"`
+	Schema          string `json:"schema"`
+	Owner           string `json:"owner"`
+	StoreID         string `json:"store_id"`
+	WriterEpoch     string `json:"writer_epoch"`
+	DatabaseKind    string `json:"database_kind"`
+	DatabaseURI     string `json:"database_uri"`
+	DatabaseName    string `json:"database_name"`
+	DatabaseCA      string `json:"database_ca_pem"`
+	Endpoint        string `json:"endpoint"`
+	AccessKey       string `json:"access_key"`
+	SecretKey       string `json:"secret_key"`
+	RootCA          string `json:"root_ca_pem"`
+	AdminScript     string `json:"native_admin_script,omitempty"`
+	AdminScriptSHA  string `json:"native_admin_script_sha256,omitempty"`
+	AdminNameserver string `json:"native_admin_nameserver,omitempty"`
+	AdminBroker     string `json:"native_admin_broker,omitempty"`
 }
 
 func (c Config) Binding() transaction.Binding {
@@ -78,6 +82,21 @@ func (c Config) Validate() error {
 	}
 	if _, err = c.TLS(); err != nil {
 		return ErrConfig
+	}
+	if c.AdminScript != "" || c.AdminScriptSHA != "" || c.AdminNameserver != "" || c.AdminBroker != "" {
+		if c.AdminScript == "" || c.AdminNameserver == "" || c.AdminBroker == "" {
+			return ErrConfig
+		}
+		if _, e := review.Digest(c.AdminScriptSHA); e != nil {
+			return ErrConfig
+		}
+		for _, address := range []string{c.AdminNameserver, c.AdminBroker} {
+			host, port, e := net.SplitHostPort(address)
+			n, ne := strconv.Atoi(port)
+			if e != nil || ne != nil || host == "" || n < 1 || n > 65535 {
+				return ErrConfig
+			}
+		}
 	}
 	return nil
 }

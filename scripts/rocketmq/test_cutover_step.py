@@ -33,6 +33,20 @@ def planned(root, directory, digest, script=b'exit 0\n', kind='runtime-start'):
 
 
 class CutoverStepTest(unittest.TestCase):
+    def test_issued_child_receives_actual_plan_context_without_self_hash_cycle(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory, _, digest = fixture(root)
+            script = b'printf "%s\\n%s\\n%s\\n%s\\n" "$M3_COORDINATOR_DIRECTORY" "$M3_COORDINATOR_BINDING_SHA256" "$M3_COORDINATOR_STEP" "$M3_COORDINATOR_STEP_PLAN_SHA256"\n'
+            path, sha, _ = planned(root, directory, digest, script)
+            plan, raw = step.load_step(path, sha)
+            with patch.object(step.platform, 'system', return_value='Linux'):
+                step.execute(plan, raw, sha)
+            logs = list(directory.glob('command-*.log'))
+            self.assertEqual(len(logs), 1)
+            self.assertEqual(logs[0].read_text().splitlines(), [str(directory), digest, plan['step'], sha])
+            self.assertNotIn(sha.encode(), script)
+            self.assertTrue((directory/'first-runtime-start.json').exists())
+
     def test_default_only_verifies_without_host_locks_or_command(self):
         with tempfile.TemporaryDirectory() as root:
             directory, _, digest = fixture(root)
