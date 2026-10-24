@@ -56,6 +56,8 @@ class CutoverReceiptAdmissionTest(unittest.TestCase):
     def test_matching_versions_do_not_replace_frozen_image_identity(self):
         value=synthetic_unit_receipt();value['candidates']['qs-worker']['source_sha']=SOURCES['iam']
         with self.assertRaises(RuntimeError):self.check(value)
+        value=synthetic_unit_receipt();value['candidates']['ai']['archive_sha256']='unverified'
+        with self.assertRaises(RuntimeError):self.check(value)
 
     def test_failed_target_start_keeps_real_barrier_and_owned_process_diagnostic(self):
         # Real fsync-backed coordinator; target command/readback are controlled
@@ -80,5 +82,3 @@ class CutoverReceiptAdmissionTest(unittest.TestCase):
                     self.assertEqual(operation.status()['phase'],'runtime_start_failed')
                     self.assertFalse(operation.status()['old_data_restore_eligible'])
                     with self.assertRaises(BoundaryError):operation.restore_before_start('forbidden',lambda:self.fail('old restore ran'))
-        value=synthetic_unit_receipt();value['candidates']['ai']['archive_sha256']='unverified'
-        with self.assertRaises(RuntimeError):self.check(value)
