@@ -9,7 +9,7 @@ from qs_runtime_configuration import configuration, rocketmq
 
 def base():
     return dict(insecure={}, secure={}, redis={'max-active':384}, mysql={'max-open-connections':150}, mongodb={'max-pool-size':256},
-        messaging={}, cache={'policy_file':'cache/apiserver.prod.yaml'},
+        messaging={}, log={'level':'warn'}, cache={'policy_file':'cache/apiserver.prod.yaml'},
         oss={'enabled':True,'connect-timeout':'3s','read-write-timeout':'10s','retry-max-attempts':2},
         assessment_assets={'enabled':True}, iam=dict(grpc={'tls':{}}, jwks={}, **{'authz-sync':{}}),
         **{'delegated-subject':{}, 'migration':{}, 'grpc':{'mtls':{}, 'acl':{}},
@@ -66,13 +66,17 @@ class QSRuntimeConfigurationTest(unittest.TestCase):
 
     def test_collection_and_workers_do_not_invent_owner_runtimes(self):
         for component in ('collection','worker'):
-            c=configuration(base(),component,'qs_m3_image_owned','unused-owned-password','a'*64)
+            original=base()
+            c=configuration(original,component,'qs_m3_image_owned','unused-owned-password','a'*64)
+            self.assertEqual(original['log']['level'],'warn')
             self.assertEqual(c['worker']['concurrency'],48)
             self.assertEqual(c['grpc_client']['max_inflight'],420)
             if component=='worker':
+                self.assertEqual(c['log']['level'],'info')
                 self.assertEqual(c['messaging']['rocketmq']['transactions'],{})
                 self.assertEqual(c['messaging']['rocketmq']['credentials_file'],'/fixture/worker-credentials.json')
             else:
+                self.assertEqual(c['log']['level'],'warn')
                 self.assertTrue(c['iam']['enabled'])
 
     def test_metrics_require_both_exact_owners_and_closed_admission(self):

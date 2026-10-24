@@ -87,6 +87,10 @@ def configuration(base, component, database, password, delegated_key):
         c['grpc_client'].update(endpoint='qs-apiserver:9090', **{'tls-ca-file': '/fixture/service-ca.crt',
             'tls-cert-file': '/fixture/qs-collection-server.crt', 'tls-key-file': '/fixture/qs-collection-server.key'})
     else:
+        # CI-only: the original completed-startup marker is INFO, while the
+        # production template is WARN. Observe that phase without changing
+        # the product template, startup budget or worker execution capacity.
+        c.setdefault('log', {})['level'] = 'info'
         c['grpc'].update(**{'tls-ca-file': '/fixture/service-ca.crt', 'tls-cert-file': '/fixture/qs-worker.crt',
             'tls-key-file': '/fixture/qs-worker.key'})
     return c
