@@ -1,0 +1,297 @@
+{
+  "schema": "m3-stable-release/v1",
+  "installation": {
+    "schema": "stable-published-installation/v1",
+    "source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+    "go_tag": "v0.5.0",
+    "python_tag": "python/v0.4.0",
+    "releases": {
+      "v0.5.0": {
+        "id": 422539494,
+        "url": "https://github.com/FangcunMount/reliable-messaging/releases/tag/v0.5.0",
+        "published_at": "2026-10-24T05:34:23Z",
+        "initial_assets_verified": 6
+      },
+      "python/v0.4.0": {
+        "id": 422539519,
+        "url": "https://github.com/FangcunMount/reliable-messaging/releases/tag/python/v0.4.0",
+        "published_at": "2026-10-24T05:34:29Z",
+        "initial_assets_verified": 6
+      }
+    },
+    "downloaded_asset_sha256": {
+      "SHA256SUMS": "4afc01ef1d9ced9fa170e35f0fea1cdf9cefb177d4282501c033d639ac662702",
+      "fangcun_reliable_messaging-0.4.0-py3-none-any.whl": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1",
+      "fangcun_reliable_messaging-0.4.0.tar.gz": "ef171171eaee085a2b2fdce502b1218a710c9ab10b7b75978583263dcad07582",
+      "transaction-acceptance.json": "5e5278527a7382740a94a6074d7bc70a28b8190bf7edc81eed454504f5bfaab4",
+      "transaction-release-receipt.json": "249bfc1ff69575ed1a2de72a0061fd532e3e1a3255f29f4a7fc932cef77fe2e9",
+      "uv.lock": "4790531ed38286bed91da3b28ed88c4d7cc8b65668a7db4d6e23bfcfbd0d9cf9"
+    },
+    "server_asset_digests_verified": true,
+    "both_releases_byte_identical": true,
+    "go_module": {
+      "Path": "github.com/FangcunMount/reliable-messaging",
+      "Version": "v0.5.0",
+      "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+      "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+    },
+    "go_verified_files": 234,
+    "go_probe_sha256": "03ff6d217dc41cb013aa5aaa4db90a2a295fab9af690f8cba860c92528cc75aa",
+    "packages": {
+      "wheel": {
+        "version": "0.4.0",
+        "client": "5.1.2",
+        "verified_files": 19,
+        "dependency_versions": {
+          "opentelemetry-sdk": "1.45.1",
+          "asyncmy": "0.2.15",
+          "greenlet": "3.5.6",
+          "protobuf": "7.36.2",
+          "requests": "2.34.2",
+          "tornado": "6.5.10",
+          "opentelemetry-proto": "1.45.1",
+          "opentelemetry-api": "1.45.1",
+          "grpcio-tools": "1.84.0",
+          "pynsq": "0.9.1",
+          "opentelemetry-exporter-otlp-proto-grpc": "1.45.1",
+          "grpcio": "1.84.0",
+          "jwcrypto": "1.6.1",
+          "googleapis-common-protos": "1.75.5",
+          "setuptools": "84.0.0",
+          "cryptography": "49.0.0",
+          "urllib3": "2.8.0",
+          "pycparser": "3.0",
+          "fangcun-reliable-messaging": "0.4.0",
+          "cffi": "2.1.1",
+          "certifi": "2026.7.22",
+          "opentelemetry-exporter-http-transport": "0.66b1",
+          "opentelemetry-semantic-conventions": "0.66b1",
+          "opentelemetry-exporter-otlp-proto-http": "1.45.1",
+          "opentelemetry-exporter-otlp-common": "0.66b1",
+          "sqlalchemy": "2.0.54",
+          "rocketmq-python-client": "5.1.2",
+          "typing-extensions": "4.16.0",
+          "opentelemetry-exporter-otlp-proto-common": "1.45.1",
+          "charset-normalizer": "3.5.2",
+          "opentelemetry-exporter-otlp": "1.45.1",
+          "idna": "3.20"
+        }
+      },
+      "sdist": {
+        "version": "0.4.0",
+        "client": "5.1.2",
+        "verified_files": 19,
+        "dependency_versions": {
+          "opentelemetry-sdk": "1.45.1",
+          "asyncmy": "0.2.15",
+          "greenlet": "3.5.6",
+          "protobuf": "7.36.2",
+          "requests": "2.34.2",
+          "tornado": "6.5.10",
+          "opentelemetry-proto": "1.45.1",
+          "opentelemetry-api": "1.45.1",
+          "grpcio-tools": "1.84.0",
+          "pynsq": "0.9.1",
+          "opentelemetry-exporter-otlp-proto-grpc": "1.45.1",
+          "grpcio": "1.84.0",
+          "jwcrypto": "1.6.1",
+          "googleapis-common-protos": "1.75.5",
+          "setuptools": "84.0.0",
+          "cryptography": "49.0.0",
+          "urllib3": "2.8.0",
+          "pycparser": "3.0",
+          "fangcun-reliable-messaging": "0.4.0",
+          "cffi": "2.1.1",
+          "certifi": "2026.7.22",
+          "opentelemetry-exporter-http-transport": "0.66b1",
+          "opentelemetry-semantic-conventions": "0.66b1",
+          "opentelemetry-exporter-otlp-proto-http": "1.45.1",
+          "opentelemetry-exporter-otlp-common": "0.66b1",
+          "sqlalchemy": "2.0.54",
+          "rocketmq-python-client": "5.1.2",
+          "typing-extensions": "4.16.0",
+          "opentelemetry-exporter-otlp-proto-common": "1.45.1",
+          "charset-normalizer": "3.5.2",
+          "opentelemetry-exporter-otlp": "1.45.1",
+          "idna": "3.20"
+        }
+      }
+    },
+    "local_replace": false,
+    "editable_install": false,
+    "source_import": false,
+    "published_installation_verified": true,
+    "host_adoption": false,
+    "production": false,
+    "pure_tests": {
+      "schema": "published-pure-tests/v1",
+      "source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "python": "3.13",
+      "results": {
+        "wheel": {
+          "passed": 114,
+          "failed": 0,
+          "skipped": 0,
+          "junit_sha256": "a7e488529ab13bcc2629d27d87eaae270b0a067cdee631e878852598dd22d658",
+          "package_version": "0.4.0",
+          "source_import": false
+        },
+        "sdist": {
+          "passed": 114,
+          "failed": 0,
+          "skipped": 0,
+          "junit_sha256": "64f280bb0bd9b487d5edcc27528cb389ca0b8c41a63469a86804358bd440e144",
+          "package_version": "0.4.0",
+          "source_import": false
+        }
+      },
+      "real_dependency_tests_excluded_locally": 31,
+      "real_dependencies_tested_in_candidate_ci": true,
+      "collection_attempt_history": [
+        {
+          "attempt": 1,
+          "outcome": "collection_error",
+          "cause": "pytest importlib mode cannot resolve existing sibling test helper",
+          "product_changed": false
+        },
+        {
+          "attempt": 2,
+          "outcome": "passed",
+          "correction": "default test import mode; installed package provenance independently verified"
+        }
+      ],
+      "go": {
+        "tag": "v0.5.0",
+        "packages": [
+          "transaction",
+          "transport/rocketmq"
+        ],
+        "race": true,
+        "passed": true,
+        "module_cache_source": true
+      },
+      "production": false
+    }
+  },
+  "asset_verification": {
+    "source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+    "assets": [
+      {
+        "tag": "v0.5.0",
+        "asset": "fangcun_reliable_messaging-0.4.0-py3-none-any.whl",
+        "id": 671382630,
+        "sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "tag": "v0.5.0",
+        "asset": "fangcun_reliable_messaging-0.4.0.tar.gz",
+        "id": 671382627,
+        "sha256": "ef171171eaee085a2b2fdce502b1218a710c9ab10b7b75978583263dcad07582"
+      },
+      {
+        "tag": "v0.5.0",
+        "asset": "published-installation-receipt.json",
+        "id": 671387912,
+        "sha256": "7b849aecc1312d2de9afb00be5ab0d58877a1038d81c59d5533063d71b7504c4"
+      },
+      {
+        "tag": "v0.5.0",
+        "asset": "PUBLISHED-INSTALLATION-SHA256SUMS",
+        "id": 671387913,
+        "sha256": "1242fd0e5a42ae3d38c8c9fd24c1547c8d3efcc49bf29bf8c8960a976a4bcb37"
+      },
+      {
+        "tag": "v0.5.0",
+        "asset": "published-pure-unit-summary.json",
+        "id": 671387914,
+        "sha256": "990936ef8287b094475187c8884982c9f236e16dc0b8734620d65fe39a902c4e"
+      },
+      {
+        "tag": "v0.5.0",
+        "asset": "SHA256SUMS",
+        "id": 671382631,
+        "sha256": "4afc01ef1d9ced9fa170e35f0fea1cdf9cefb177d4282501c033d639ac662702"
+      },
+      {
+        "tag": "v0.5.0",
+        "asset": "transaction-acceptance.json",
+        "id": 671382628,
+        "sha256": "5e5278527a7382740a94a6074d7bc70a28b8190bf7edc81eed454504f5bfaab4"
+      },
+      {
+        "tag": "v0.5.0",
+        "asset": "transaction-release-receipt.json",
+        "id": 671382629,
+        "sha256": "249bfc1ff69575ed1a2de72a0061fd532e3e1a3255f29f4a7fc932cef77fe2e9"
+      },
+      {
+        "tag": "v0.5.0",
+        "asset": "uv.lock",
+        "id": 671382659,
+        "sha256": "4790531ed38286bed91da3b28ed88c4d7cc8b65668a7db4d6e23bfcfbd0d9cf9"
+      },
+      {
+        "tag": "python/v0.4.0",
+        "asset": "fangcun_reliable_messaging-0.4.0-py3-none-any.whl",
+        "id": 671382764,
+        "sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "tag": "python/v0.4.0",
+        "asset": "fangcun_reliable_messaging-0.4.0.tar.gz",
+        "id": 671382773,
+        "sha256": "ef171171eaee085a2b2fdce502b1218a710c9ab10b7b75978583263dcad07582"
+      },
+      {
+        "tag": "python/v0.4.0",
+        "asset": "published-installation-receipt.json",
+        "id": 671387979,
+        "sha256": "7b849aecc1312d2de9afb00be5ab0d58877a1038d81c59d5533063d71b7504c4"
+      },
+      {
+        "tag": "python/v0.4.0",
+        "asset": "PUBLISHED-INSTALLATION-SHA256SUMS",
+        "id": 671387980,
+        "sha256": "1242fd0e5a42ae3d38c8c9fd24c1547c8d3efcc49bf29bf8c8960a976a4bcb37"
+      },
+      {
+        "tag": "python/v0.4.0",
+        "asset": "published-pure-unit-summary.json",
+        "id": 671387981,
+        "sha256": "990936ef8287b094475187c8884982c9f236e16dc0b8734620d65fe39a902c4e"
+      },
+      {
+        "tag": "python/v0.4.0",
+        "asset": "SHA256SUMS",
+        "id": 671382753,
+        "sha256": "4afc01ef1d9ced9fa170e35f0fea1cdf9cefb177d4282501c033d639ac662702"
+      },
+      {
+        "tag": "python/v0.4.0",
+        "asset": "transaction-acceptance.json",
+        "id": 671382775,
+        "sha256": "5e5278527a7382740a94a6074d7bc70a28b8190bf7edc81eed454504f5bfaab4"
+      },
+      {
+        "tag": "python/v0.4.0",
+        "asset": "transaction-release-receipt.json",
+        "id": 671382756,
+        "sha256": "249bfc1ff69575ed1a2de72a0061fd532e3e1a3255f29f4a7fc932cef77fe2e9"
+      },
+      {
+        "tag": "python/v0.4.0",
+        "asset": "uv.lock",
+        "id": 671382789,
+        "sha256": "4790531ed38286bed91da3b28ed88c4d7cc8b65668a7db4d6e23bfcfbd0d9cf9"
+      }
+    ],
+    "verified_downloads": 18,
+    "assets_overwritten": false,
+    "tags_moved": false
+  },
+  "source_merge": "912190700b3c79d5ea646437d03d22fc997a945d",
+  "source_pr": 58,
+  "release_index_pr": 59,
+  "implementation_schema_patch_files_unchanged_vs_previous": 217,
+  "production_deployed": false
+}

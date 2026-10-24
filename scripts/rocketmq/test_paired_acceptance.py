@@ -73,7 +73,7 @@ class PairedAcceptanceTests(unittest.TestCase):
         raw=MARKER+json.dumps(value)
         self.assertIsNone(read_receipt(raw,full=True))
         self.assertIsNotNone(read_receipt(raw,full=True,sdk_python='0.4.0a3'))
-        self.assertIsNone(read_receipt(raw,full=True,sdk_python='0.4.0a4'))
+        self.assertIsNone(read_receipt(raw,full=True,sdk_python='0.4.0'))
 
     def test_old_go_module_receipt_cannot_satisfy_current_fixed_profile(self):
         value=receipt(True);value['sdk_go']='v0.5.0-rocketmq-tx.2'

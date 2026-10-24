@@ -27,3 +27,9 @@ T26门禁通过后，Go拟发v0.5.0、Python拟发0.4.0/tag python/v0.4.0（2026
 ## 当前版本预检与失败保留
 
 首轮40062279084六档均在owner_admission失败；QS旧夹具缺少当前保护读所需的110表。QS候选0a7baa2e只增加现有110迁移的显式安装，不改业务、迁移正文或准入保护；AI仅文档修正后的01c38784完整12源码检查成功。固定这两个候选的[单档预检40063020639](https://github.com/FangcunMount/infra/actions/runs/40063020639)10项通过、零失败/跳过，原根和实际默认消费者完成command→receipt/state→ACK；四项旧格式清理边界如实保存。它是core开发profile，不代替最终六档7原生/40证据故障门禁。
+
+## T28 稳定制品重验候选（2026-10-24）
+
+Go v0.5.0 / Python0.4.0已正式发布，同源码1345266；217份实现/schema/patch与已验收tx.4/a4字节摘要不变。正式Go Sum为`h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=`，wheel为`f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1`。IAM8be32ade、QS480a632a、AIddff86ca候选改用正式制品，未改生产provider。
+
+成对夹具固定新版本与摘要、源码1345266及上述宿主SHA，继续六档完整门禁。published工作流从正式tag下载模块、wheel/sdist/lock与receipt，拒绝prerelease/draft并执行两档完整故障/有限窗口；IAM固定稳定模块继续原根/HTTP及显式runtime/protection/native-limit独立profile。旧失败保留：QS文档门禁版本仍绑定tx.4，完成实现不变审阅后更新严格版本断言和mutation负测；infra release receipt单测旧a1夹具未同步，已改为稳定版且保留拒绝旧a1的负测。280工具纯测试与三工作流actionlint通过。真实稳定制品CI尚待执行，T28不打勾。

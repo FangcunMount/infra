@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Download immutable GitHub prerelease assets and install outside SDK sources.
+"""Download immutable GitHub stable release assets and install outside SDK sources.
 
 No publication, tag mutation, production connection or editable/replace install.
 The following Docker acceptance consumes the verified Go binary and interpreter.
@@ -15,9 +15,9 @@ import tomllib
 
 REPO = 'FangcunMount/reliable-messaging'
 MODULE = 'github.com/' + REPO
-GO_TAG = 'v0.5.0-rocketmq-tx.1'
-PY_TAG = 'python/v0.4.0a1'
-VERSION = '0.4.0a1'
+GO_TAG = 'v0.5.0'
+PY_TAG = 'python/v0.4.0'
+VERSION = '0.4.0'
 
 
 def run(arguments, *, cwd=None):
@@ -117,9 +117,9 @@ def main():
         raise RuntimeError('both published tags must equal the checked-out candidate SHA')
     metadata={}
     for tag in (GO_TAG,PY_TAG):
-        release=json.loads(run(['gh','release','view',tag,'-R',REPO,'--json','tagName,isPrerelease,assets']))
-        if not release['isPrerelease'] or release['tagName']!=tag:
-            raise RuntimeError('fixed prerelease metadata absent')
+        release=json.loads(run(['gh','release','view',tag,'-R',REPO,'--json','tagName,isPrerelease,isDraft,assets']))
+        if release['isPrerelease'] or release.get('isDraft', False) or release['tagName']!=tag:
+            raise RuntimeError('fixed stable release metadata absent')
         metadata[tag]=release
     downloads=output/'assets'; downloads.mkdir(mode=0o700)
     run(['gh','release','download',PY_TAG,'-R',REPO,'--dir',str(downloads),'--pattern','*'])
