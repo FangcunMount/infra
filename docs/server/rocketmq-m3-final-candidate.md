@@ -38,6 +38,8 @@ QS当前runtime镜像没有`qs-migrate-offline`。候选构建从同一固定源
 
 ## IAM实际镜像组件演练（开发中）
 
-`rocketmq-final-images.yml`保留默认build路径，新增显式iam-start阶段：只从指定Actions运行下载已核验IAM归档，在托管runner隔离内部网络启动依赖。使用固定IAM原迁移/Bootstrap准备完整schema41，先沿真实NSQ SDK排空夹具bootstrap消息，再停止旧进程。候选镜像自带原iam-maintenance执行有限范围保护、42–45安装、恢复至41、原事实摘要复核、再次安装及绑定；最后用修复后的标准JSON配置封新写启动原apiserver，核验Checker/采样/预算指标并真实关闭。
+`rocketmq-final-images.yml`保留默认build路径，显式iam-start只从指定Actions运行下载已核验IAM归档，在托管runner隔离内部网络启动依赖。原迁移准备完整schema41，AuthZ Bootstrap回调用于受控种子：事件身份/类型和正文摘要在原根内保存到明确fixture archive，不构造待发布消息、SDK witness或业务验收。候选镜像自带原iam-maintenance执行有限范围保护、42–45安装、恢复至41、原事实摘要复核、再次安装及绑定；最后用修复后的标准JSON配置封新写启动原apiserver，核验Checker/采样/预算指标并真实关闭。
 
 这只是T29的IAM组件，不能替代完整五镜像组合、原协调目录首次启动屏障、QS双库/AI原范围恢复、最终执行包或30分钟窗口。只有组件真实报告通过后才更新状态。该路径不SSH、不接生产、不使用外部凭据，不执行模型或system登录；CI原始日志/配置/保护文件不上传。完整schema41准备程序仅是隔离夹具，不进入生产镜像或执行包。
+
+IAM组件初版试图让当前SDK入口排空fresh Bootstrap的legacy行；第六轮确认原handoff门禁正确拒绝，失败不作通过。当前组件改用明确受控输入，不再重演这个已退役入口；不会删除legacy行、改成published、复制业务事实为新半消息或放宽guard。非空旧NSQ/Outbox排空仍由原T25真实工具门禁及生产T32承担。受控种子不是发布型Outbox、业务命令、消息原子性或system证明，原M3任务数和门禁不变。

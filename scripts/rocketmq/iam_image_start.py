@@ -22,7 +22,6 @@ from m3_resources import manifest
 from audit_transaction_limit import write_private
 
 IAM_SHA = '954ad9dee2f71a51151b696ec05d5cb90cc65b50'
-NSQ = 'nsqio/nsq@sha256:1a369c146af71bc95c25d54b375a2b98452478c1eaf4e85f8fcb01da20f2c78a'
 
 
 def require(value, stage):
@@ -43,7 +42,7 @@ def inventory(value):
             'candidate_cleanup_required')
 
 
-def configuration(base, database, password, *, transaction):
+def configuration(base, database, password):
     """Keep the original production shape; substitute only owned fixture inputs."""
     c = copy.deepcopy(base)
     c['mysql'].update({'host': 'mysql:3306', 'username': 'root', 'password': password,
@@ -58,17 +57,14 @@ def configuration(base, database, password, *, transaction):
     c['insecure'].update({'bind-address': '0.0.0.0', 'bind-port': 9080})
     c['grpc']['mtls'].update({'cert-file': '/fixture/server.crt', 'key-file': '/fixture/server.key',
                              'ca-file': '/fixture/server.crt'})
-    c['events']['catalog_path'] = '/app/configs/events-m3.yaml' if transaction else '/app/configs/events.yaml'
-    c['events']['reliable_messaging']['enabled'] = not transaction
-    c['nsq'] = {'enabled': not transaction, 'consumer-sdk-enabled': not transaction,
-                'nsqd-addr': 'nsqd:4150', 'lookupd-addrs': ['nsqlookupd:4161'],
-                'nsqd-http-addrs': ['http://nsqd:4151']}
-    c['messaging'] = dict(provider='rocketmq' if transaction else 'nsq', publish_enabled=transaction is False,
+    c['events']['catalog_path'] = '/app/configs/events-m3.yaml'
+    c['events']['reliable_messaging']['enabled'] = False
+    c['nsq'] = {'enabled': False, 'consumer-sdk-enabled': False}
+    c['messaging'] = dict(provider='rocketmq', publish_enabled=False,
                           instance_id='iam-primary-1', endpoint='broker:8081',
                           credentials_file='/fixture/credentials.json', ca_file='/fixture/mq-ca.crt',
                           routes_file='/fixture/routes.json', transactions={})
-    if transaction:
-        c['messaging']['transactions'] = {'iam.mysql': dict(store_id='isolated-iam-primary', writer_epoch='m3-1', route_revision='m3-1')}
+    c['messaging']['transactions'] = {'iam.mysql': dict(store_id='isolated-iam-primary', writer_epoch='m3-1', route_revision='m3-1')}
     return c
 
 
@@ -102,6 +98,18 @@ def fixture_diagnostic(raw):
             and isinstance(value['kind'],str) and re.fullmatch(r'[A-Za-z0-9*._]{1,96}',value['kind'])
             and type(value['server_code']) is int and 0<=value['server_code']<=65535,
             'bounded_fixture_failure_metadata_required')
+    return value
+
+
+def seed_receipt(raw):
+    prefix='IAM_IMAGE_FIXTURE_READY '
+    rows=[json.loads(line[len(prefix):]) for line in raw.splitlines() if line.startswith(prefix)]
+    require(len(rows)==1,'exact_controlled_seed_receipt_required')
+    value=rows[0]
+    require(set(value)=={'schema_version','seed_events_retained','controlled_seed','publication_intents_created','witnesses_created','legacy_drain_claimed'}
+        and value['schema_version']==41 and type(value['seed_events_retained']) is int and 1<=value['seed_events_retained']<=16
+        and value['controlled_seed'] is True and all(value[key] is False for key in
+            ('publication_intents_created','witnesses_created','legacy_drain_claimed')),'controlled_input_is_not_a_message_or_witness_proof')
     return value
 
 
@@ -143,6 +151,7 @@ def main():
     report = dict(schema='m3-iam-actual-image-start/v1', infra_sha=run(['git', 'rev-parse', 'HEAD'], cwd=repo).stdout.strip(),
                   iam_sha=IAM_SHA, passed=0, failed=0, skipped=0, cases={}, cleanup={},
                   production=False, system_acceptance=False, combined_cutover_rehearsal_complete=False)
+    report['scope']='real final image, limited original maintenance/restore and paused startup; controlled seed only; no old-message drain or business acceptance'
     before = {key:set(run(argv).stdout.split()) for key,argv in
               (('containers',['docker','ps','-aq']),('networks',['docker','network','ls','-q']))}
     compose = None; prepared = None; started = False; app = project+'-iam'; app_created = False
@@ -179,7 +188,7 @@ def main():
         case('exact_repaired_stable_archive_loaded')
         stage='owned_dependencies'
         broker_image='rocketmq-m3-image-start:5.5.1'
-        for dep in ('mysql:8.0.44','redis:7-alpine',NSQ): run(['docker','pull',dep],timeout=300)
+        for dep in ('mysql:8.0.44','redis:7-alpine'): run(['docker','pull',dep],timeout=300)
         config=directory/'broker'; data=directory/'data'; data.mkdir()
         accounts={name:dict(username='fixture-'+name,password=secrets.token_hex(32)) for name in ('admin','inner')}
         render(accounts,config,'broker',repo/'components/rocketmq'); (config/'tls').mkdir()
@@ -198,14 +207,12 @@ def main():
         document['services'].update(mysql=dict(image='mysql:8.0.44',environment=dict(MYSQL_ROOT_PASSWORD=password,MYSQL_ROOT_HOST='%'),
             tmpfs=['/var/lib/mysql'],mem_limit='512m',networks=['rocketmq'],
             healthcheck=dict(test=['CMD-SHELL','MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e "SELECT 1"'],interval='3s',timeout='3s',retries=50)),
-            redis=dict(image='redis:7-alpine',networks=['rocketmq']),
-            nsqlookupd=dict(image=NSQ,command=['/nsqlookupd'],networks=['rocketmq']),
-            nsqd=dict(image=NSQ,command=['/nsqd','--broadcast-address=nsqd','--lookupd-tcp-address=nsqlookupd:4160'],networks=['rocketmq']))
+            redis=dict(image='redis:7-alpine',networks=['rocketmq']))
         compose_file=directory/'compose.json';write_private(compose_file,document)
         compose=['docker','compose','-p',project,'-f',str(compose_file)];started=True
         run(compose+['up','-d','--wait','--wait-timeout','180'],timeout=210)
         report['dependency_image_ids']={name:run(['docker','image','inspect',tag,'--format','{{.Id}}']).stdout.strip()
-             for name,tag in dict(mysql='mysql:8.0.44',redis='redis:7-alpine',nsq=NSQ,rocketmq=broker_image).items()}
+             for name,tag in dict(mysql='mysql:8.0.44',redis='redis:7-alpine',rocketmq=broker_image).items()}
         sql('CREATE DATABASE `'+database+'`;')
         stage='original_schema41_preparation'
         prepared=source/'scripts/testing/m3_image_start_fixture'; prepared.mkdir()
@@ -234,7 +241,8 @@ def main():
                  ('permission_denied','permission denied'),('wrong_architecture','exec format error'))}
             report['fixture_failure']=fixture_diagnostic(result.stdout)
             raise RuntimeError('original_fixture_preparation_failed')
-        case('original_full_schema41_and_bootstrap')
+        report['controlled_seed']=seed_receipt(result.stdout)
+        case('actual_schema41_migrations_with_controlled_authz_seed')
         run(['openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1','-subj','/CN=iam-apiserver','-addext','subjectAltName=DNS:iam-apiserver,IP:127.0.0.1',
              '-keyout',str(fixture/'server.key'),'-out',str(fixture/'server.crt')])
         doc=manifest(repo); principal=dict(username='iam-'+secrets.token_hex(8),password=secrets.token_hex(32))
@@ -245,9 +253,7 @@ def main():
         write_private(fixture/'credentials.json',principal);write_private(fixture/'routes.json',doc)
         import yaml
         base=yaml.safe_load((source/'configs/apiserver.prod.yaml').read_text())
-        for selected in (False,True):
-            c=configuration(base,database,password,transaction=selected)
-            write_private(fixture/('transaction.json' if selected else 'baseline.json'),c)
+        write_private(fixture/'transaction.json',configuration(base,database,password))
         # Restrict fixture files to the image's actual non-root owner.
         for file in fixture.iterdir(): file.chmod(0o700 if file.is_dir() else 0o600)
         def own(uid,gid):
@@ -271,16 +277,6 @@ def main():
             code=run(['docker','inspect',app,'--format','{{.State.ExitCode}}']).stdout.strip()
             runtime_logs();run(['docker','rm',app]);app_created=False
             require(code=='0','actual_shutdown_not_clean')
-        stage='actual_old_chain_fixture_drain'
-        start('baseline.json');wait_http('/healthz');case('actual_old_baseline_process_healthy')
-        deadline=time.monotonic()+90
-        while time.monotonic()<deadline:
-            pending=sql(f"SELECT (SELECT COUNT(*) FROM {database}.rm_outbox WHERE BINARY state <> 'published')+(SELECT COUNT(*) FROM {database}.domain_event_outbox WHERE BINARY status <> 'published');")
-            if pending.isdigit():report['old_unpublished_fixture_rows']=int(pending)
-            if pending=='0':break
-            time.sleep(1)
-        else:raise RuntimeError('original_bootstrap_outbox_not_drained')
-        stop();case('actual_old_sdk_nsqueue_bootstrap_drain')
         # Hash all original tables before installing the seven additive objects.
         # No source body or SQL dump leaves this private command capture.
         tables=sql(f"SELECT table_name FROM information_schema.tables WHERE table_schema='{database}' AND table_name <> 'schema_migrations' ORDER BY table_name;").splitlines()

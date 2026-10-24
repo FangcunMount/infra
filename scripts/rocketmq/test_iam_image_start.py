@@ -4,10 +4,17 @@ import tempfile
 import unittest
 
 from final_image_candidate import GO_SUM
-from iam_image_start import IAM_SHA, configuration, inventory, protocol_metrics, fixture_diagnostic, source_failure_markers, iam_resources
+from iam_image_start import IAM_SHA, configuration, inventory, protocol_metrics, fixture_diagnostic, source_failure_markers, iam_resources, seed_receipt
 
 
 class ImageStartContractTest(unittest.TestCase):
+    def test_seed_archive_cannot_be_reported_as_publication_or_witness(self):
+        import json
+        value=dict(schema_version=41,seed_events_retained=2,controlled_seed=True,
+                   publication_intents_created=False,witnesses_created=False,legacy_drain_claimed=False)
+        self.assertEqual(seed_receipt('IAM_IMAGE_FIXTURE_READY '+json.dumps(value)),value)
+        for key in ('publication_intents_created','witnesses_created','legacy_drain_claimed'):
+            with self.assertRaises(RuntimeError):seed_receipt('IAM_IMAGE_FIXTURE_READY '+json.dumps(dict(value,**{key:True})))
     def test_component_keeps_exact_iam_grants_without_other_owner_resources(self):
         import json
         source=json.loads((Path(__file__).resolve().parents[2]/'components/rocketmq/serverd-routes-m3-v2.json').read_text())
@@ -46,7 +53,7 @@ class ImageStartContractTest(unittest.TestCase):
         base=dict(mysql={},migration={},redis=dict(cache={}),seed_mock_auth={},idp={},sms={},insecure={},
                   grpc=dict(mtls={}),events=dict(reliable_messaging={}))
         original=copy.deepcopy(base)
-        new=configuration(base,'owned','private',transaction=True)
+        new=configuration(base,'owned','private')
         self.assertEqual(base,original)
         self.assertFalse(new['migration']['enabled'])
         self.assertFalse(new['messaging']['publish_enabled'])
@@ -57,9 +64,6 @@ class ImageStartContractTest(unittest.TestCase):
         self.assertEqual(new['messaging']['instance_id'],'iam-primary-1')
         self.assertEqual(new['events']['catalog_path'],'/app/configs/events-m3.yaml')
         self.assertNotIn('limits',new['messaging']['transactions']['iam.mysql'])
-        old=configuration(base,'owned','private',transaction=False)
-        self.assertTrue(old['events']['reliable_messaging']['enabled'])
-        self.assertFalse(old['messaging']['transactions'])
 
     def test_readiness_requires_live_checker_and_closed_admission(self):
         values={'sdk_ready':1,'sampler_running':1,'observation_available':1,'admission_open':0,
