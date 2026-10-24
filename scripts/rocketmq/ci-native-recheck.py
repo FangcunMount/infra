@@ -72,10 +72,12 @@ def main():
     parser.add_argument('--governance-faults',action='store_true',help='actual MySQL COMMIT before/after reply loss for managed CLI only')
     parser.add_argument('--iam-host',type=Path,help='actual fixed IAM original writer, owned fixture only')
     parser.add_argument('--host-observer',type=Path,help='CI-only actual-host consumer compiled against the same published SDK')
+    parser.add_argument('--terminal',choices=('commit','rollback'),default='commit',help='terminal SDK evidence; rollback uses durable abort fence, no business root')
     args = parser.parse_args()
     ci_guard(os.environ)  # Never construct a client or invoke Docker on a workstation.
     require(not args.governance_faults or args.managed_tool is not None,'managed_cli_required_for_governance_faults')
     require(not args.iam_host or (args.managed_tool and args.host_observer and not args.governance_faults),'separate_actual_iam_managed_profile_required')
+    require(args.terminal=='commit' or (args.managed_tool and not args.iam_host and not args.governance_faults),'separate_compiled_rollback_profile_required')
     require(not args.report.exists() and not args.report.is_symlink(), 'report_already_exists')
     module = importlib.util.spec_from_file_location('_native_fixture', Path(__file__).with_name('ci-transactions.py'))
     common = importlib.util.module_from_spec(module)
@@ -232,6 +234,11 @@ def main():
         consumer = start('consume'); consumer.wait('ready')
         identity = 'native-recheck-'+secrets.token_hex(12)
         host=None;original=None
+        if args.terminal=='rollback':
+            report['limits']=['Fixed SDK source producer returns LocalAborted after genuine half reaches native limit; actual durable abort fence, no business row',
+                'Original sender exit/RPC outcome and true drain separately verified; no process crash, business root rollback or whole-host claim',
+                'Compiled published SDK recheck performs actual Rollback RPC, preserves first audit; bounded three-second consumer observation',
+                'Synthetic reviewers, no production/system authorization']
         if args.iam_host:
             report['limits']=['Actual IAM planned writer and owned original GORM root, not whole API or system',
                 'Original owner drains during real Broker network disconnection; no SIGKILL claim',
@@ -254,7 +261,7 @@ def main():
         require(proof['parameters_fault'] == dict(PARAMETERS, transactionCheckMax=2), 'bounded_fault_parameters_required')
         producer=None
         if not host:
-            producer = start('crash-committed', identity); producer.wait('half', identity)
+            producer = start('send' if args.terminal=='rollback' else 'crash-committed', identity); producer.wait('half', identity)
         else:
             network=run(['docker','inspect','--format','{{range $name,$config := .NetworkSettings.Networks}}{{$name}}{{end}}',broker]).stdout.strip()
             require(network.startswith(project+'_') and json.loads(run(['docker','network','inspect',network]).stdout)[0]['Labels']['com.docker.compose.project']==project,'owned_broker_network_required')
@@ -282,21 +289,36 @@ def main():
         require(proof['parameters_restored_before_recovery'] == before_parameters, 'parameters_not_restored')
         stage = 'original_commit_then_real_process_exit'
         if producer:
-            producer.send('commit'); producer.finish(expected=23)
+            producer.send('rollback' if args.terminal=='rollback' else 'commit')
+            if args.terminal=='rollback':
+                code=producer.process.wait(timeout=30)
+                producer.finish(expected=code)
+                metrics=[json.loads(e['decision']) for e in producer.events if e.get('event')=='metrics']
+                proof['original_abort_exit_code']=code
+                proof['original_abort_stats']=metrics[-1] if metrics else None
+                require(code in (0,1) and metrics and metrics[-1]['Stopped']
+                    and metrics[-1]['CompletedResults']==metrics[-1]['HalfPreparedResults']==metrics[-1]['LocalAbortedResults']==1
+                    and metrics[-1]['LocalCommittedResults']==metrics[-1]['ActiveSends']==metrics[-1]['RunningChecks']==metrics[-1]['QueuedChecks']==metrics[-1]['DatabaseErrors']==metrics[-1]['HalfUnknownResults']==metrics[-1]['HalfRejectedResults']==0
+                    and metrics[-1]['FinalRollbackResults']+metrics[-1]['FinalUnknownResults']==1
+                    and metrics[-1]['FinalUnknownResults']==int(code==1)
+                    and any(e.get('event')=='closed' for e in producer.events),'original_abort_and_actual_drain_required')
+            else:producer.finish(expected=23)
         if host:
             shutil.copyfile(index_path,host.control/'native-index.json');(host.control/'native-index.json').chmod(0o600)
             host.signal('record-notice');require(host.wait('notice.json',10)==dict(exact_original_index_recorded=True),'original_host_native_import_required')
         committed = snapshot()
-        require(committed['execution_state']==committed['witness_state']=='committed'
-                and committed['final_outcome']!='commit_confirmed' and counts()=='1\t1\t1\t1', 'original_commit_without_final_confirmation_required')
+        expected_state='aborted' if args.terminal=='rollback' else 'committed'
+        expected_counts='0\t1\t1\t1' if args.terminal=='rollback' else '1\t1\t1\t1'
+        require(committed['execution_state']==committed['witness_state']==expected_state
+                and (args.terminal=='rollback' or committed['final_outcome']!='commit_confirmed') and counts()==expected_counts, 'original_terminal_evidence_required')
         require(all(committed[k]==prepared[k] for k in ('reference_sha256','wire_sha256','unique_id_sha256')), 'original_frozen_identity_changed')
-        proof['original_exit_code'] = None if host else 23
-        passed('actual_iam_root_committed_during_broker_disconnect_and_owner_stopped' if host else 'real_original_root_committed_then_process_exited_before_final_rpc')
+        proof['original_exit_code'] = None if host else proof['original_abort_exit_code'] if args.terminal=='rollback' else 23
+        passed('actual_iam_root_committed_during_broker_disconnect_and_owner_stopped' if host else 'real_prepared_execution_durably_aborted_without_business_fact' if args.terminal=='rollback' else 'real_original_root_committed_then_process_exited_before_final_rpc')
         if args.managed_tool:
             stage = 'compiled_managed_original_primary_recovery'
             managed_accept(repo=repo,binary=args.managed_tool.resolve(),broker=broker,project=project,directory=directory,
                 manifest=manifest,route=route,account=accounts['owner-a'],grpc_port=grpc_port,mysql_port=mysql_port,password=password,
-                ca=ca,java=java,identity=identity,index_path=index_path,index=index,sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,governance_faults=args.governance_faults,original=original)
+                ca=ca,java=java,identity=identity,index_path=index_path,index=index,sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,governance_faults=args.governance_faults,original=original,terminal=args.terminal)
         else:
             recovery = start('recover', identity); recovery.wait('ready', identity)
             recovery.send('seal'); recovery.wait('sealed', '', 'admission_stopped_checker_alive')
@@ -354,7 +376,7 @@ def main():
             proof['owned_iam_database_removed']=True
         require(not run(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=sdk).stdout, 'sdk_source_changed')
         proof['sdk_tracked_sources_clean'] = True
-        require(report['passed']==((15 if host else 16 if args.governance_faults else 14) if args.managed_tool else 17), 'complete_nonempty_native_matrix_required')
+        require(report['passed']==((15 if host or args.terminal=='rollback' else 16 if args.governance_faults else 14) if args.managed_tool else 17), 'complete_nonempty_native_matrix_required')
     except Exception:
         report['failed'] = 1; report['failure'] = stage
     finally:
