@@ -34,8 +34,18 @@ class FullImageProtection:
 
     def dump(self, database):
         return self.f.run(self.f.compose + ['exec', '-T', 'mysql', 'sh', '-c',
-            'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump -uroot --single-transaction --routines --events --triggers --order-by-primary --hex-blob --compact --skip-comments --skip-dump-date --no-tablespaces --set-gtid-purged=OFF --skip-lock-tables --column-statistics=0 "$@"',
+            'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump -uroot --single-transaction --routines --events --triggers --order-by-primary --hex-blob --compact --skip-comments --skip-dump-date --no-tablespaces --set-gtid-purged=OFF --skip-lock-tables --column-statistics=0 --default-character-set=utf8mb4 --set-charset "$@"',
             'owned-full-protection', database]).stdout
+
+    def restore_mysql(self, store):
+        # --compact disables SET NAMES unless explicitly re-enabled above.
+        # Pin the restore session too: client defaults must not reinterpret
+        # retained Unicode facts or generated-expression string literals.
+        database = self.databases[store]
+        observed = self.f.sql('SET NAMES utf8mb4; SELECT @@character_set_client,@@character_set_connection,@@character_set_results;\n'
+            + 'DROP DATABASE `' + database + '`; ' + self.definitions[store] + ';\n'
+            + 'SET FOREIGN_KEY_CHECKS=0; USE `' + database + '`;\n' + self.sql[store] + '\nSET FOREIGN_KEY_CHECKS=1;')
+        require(observed == 'utf8mb4\tutf8mb4\tutf8mb4', 'exact_restore_session_charset_required')
 
     def column_metadata(self, database):
         return self.f.sql("SELECT table_name,ordinal_position,column_name,column_type,is_nullable,IF(column_default IS NULL,'NULL',CONCAT('HEX:',HEX(column_default))),extra,character_set_name,collation_name,HEX(column_comment),generation_expression FROM information_schema.columns WHERE table_schema='" + database + "' ORDER BY table_name,ordinal_position;")
@@ -52,6 +62,9 @@ class FullImageProtection:
     def train(self):
         f = self.f; qs = self.databases['qs']; ai = self.databases['ai']; iam = self.databases['iam']
         require(not f.applications and f.sql('SELECT @@server_uuid;') == self.provider, 'original_selected_provider_and_no_runtime_required')
+        default_charset = f.sql('SELECT @@character_set_client,@@character_set_connection,@@character_set_results;')
+        require(bool(re.fullmatch('[a-z0-9_]+\t[a-z0-9_]+\t[a-z0-9_]+', default_charset)), 'fixed_mysql_charset_readback_required')
+        f.report['mysql_client_default_charsets'] = default_charset.split('\t')
         f.sql(f'CREATE TABLE `{qs}`.fixture_retained_state(id BIGINT PRIMARY KEY,body LONGBLOB NOT NULL); INSERT INTO `{qs}`.fixture_retained_state VALUES(1,0x00ff03);')
         f.mongo('db.getSiblingDB(' + json.dumps(qs) + ").fixture_retained_state.insertOne({_id:1,body:BinData(0,'AP8D'),attempt:7})")
         require(int(f.sql(f'SELECT COUNT(*) FROM `{iam}`.fixture_bootstrap_event_archive;')) > 0, 'controlled_iam_seed_fact_required')
@@ -84,8 +97,8 @@ class FullImageProtection:
         require(self.mongo_snapshot() != before['mongo'], 'actual_mongo_protection_mutation_required')
         started = time.monotonic()
         for store, database in self.databases.items():
-            f.sql('DROP DATABASE `' + database + '`; ' + self.definitions[store] + ';')
-            f.sql('SET FOREIGN_KEY_CHECKS=0; USE `' + database + '`;\n' + self.sql[store] + '\nSET FOREIGN_KEY_CHECKS=1;')
+            self.restore_mysql(store)
+        f.report['mysql_restore_session_charsets'] = ['utf8mb4'] * 3
         f.mongo('db.getSiblingDB(' + json.dumps(qs) + ').dropDatabase()')
         f.run(['docker', 'exec', f.mongo_name, 'mongorestore', '--quiet', '--archive=' + self.mongo_archive,
             '--gzip', '--drop', '--preserveUUID', '--nsInclude=' + qs + '.*'], timeout=120)
