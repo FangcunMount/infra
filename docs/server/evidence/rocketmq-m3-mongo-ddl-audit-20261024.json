@@ -1,0 +1,178 @@
+{
+  "schema": "m3-mongo-ddl-audit-followup/v1",
+  "records": [
+    {
+      "run_id": 40088589097,
+      "scope": "failed audit setup; no business application started",
+      "report_sha256": "1eb882a8dd42be6c94945571d387bb624274b5c1a09a9cc30b2c58eb7ab3ef12",
+      "report": {
+        "schema": "m3-five-actual-image-startup-trial/v2",
+        "passed": 6,
+        "failed": 1,
+        "skipped": 0,
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "c1_cutover_barrier_exercised": false,
+        "cases": {
+          "actual_source_registry_consumers_match_manifest": true,
+          "all_five_exact_archives_loaded": true,
+          "original_current_qs_pair_prepared": true,
+          "original_qs_dual_binding_verified": true,
+          "original_iam_schema45_and_binding_selected": true,
+          "original_ai_schema43_and_binding_verified": true
+        },
+        "sources": {
+          "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "qs": "d3269bda672b97582edb691ca4f924484c653822",
+          "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+        },
+        "scope": "actual processes, required IAM/AI and closed SDK owners; worker HTTP/Redis health and catalog consistency, no business or per-worker delivery proof",
+        "infra_sha": "fd20c5929e1facefef160e7fc47874481de26045",
+        "original_qs_consumer_count": 1,
+        "original_qs_consumer_contract": {
+          "consumers": [
+            {
+              "id": "modelcatalog.hot_rank_projection",
+              "runtime": "apiserver",
+              "event_type": "answersheet.submitted",
+              "topic": "qs.evaluation.lifecycle",
+              "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+              "delivery": "durable_outbox",
+              "outbox_profile": "mongo_domain_events"
+            }
+          ],
+          "schema": "qs-original-consumer-contract/v1",
+          "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+        },
+        "original_qs_consumer_contract_sha256": "78479bb3233a607e5e7fc8a2e6ab563b3bfebb99c9ced423b2e6b952775f3776",
+        "candidates": {
+          "iam": {
+            "target": "iam",
+            "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+            "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+            "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+          },
+          "qs-api": {
+            "target": "qs-api",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+            "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3"
+          },
+          "qs-collection": {
+            "target": "qs-collection",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+            "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c"
+          },
+          "qs-worker": {
+            "target": "qs-worker",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+            "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc"
+          },
+          "ai": {
+            "target": "ai",
+            "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+            "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+            "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+          }
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "rocketmq": "sha256:9b0c0ba15c7a5665e6f19b45d2c7d40b7e6009ae092fd9c28d3b56725eb6eaea",
+          "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+        },
+        "resources": {
+          "version": 2,
+          "operations": 53,
+          "typed_topics": 10,
+          "principals": 5,
+          "verified": true
+        },
+        "qs_schema": {
+          "journal_force_used": false,
+          "mongo": 43,
+          "mysql": 110,
+          "original_templates_applied": true,
+          "production": false,
+          "profile": "current",
+          "resources_sha256": "f0ddf4125b7f39435c5cfed88ca7a4bd89be2362bc3bf7d7394c9dc6c82d6812",
+          "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+        },
+        "iam_controlled_seed": {
+          "controlled_seed": true,
+          "legacy_drain_claimed": false,
+          "publication_intents_created": false,
+          "schema_version": 41,
+          "seed_events_retained": 2,
+          "witnesses_created": false
+        },
+        "failure_stage": "original_ai_schema_and_binding",
+        "failure_kind": "RuntimeError",
+        "processes": {},
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "private_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        },
+        "sources_unchanged": true
+      }
+    },
+    {
+      "run_id": 40089529435,
+      "scope": "independent real-Mongo audit instrumentation proof, not application startup",
+      "report_sha256": "a314474016d37f798a7bf446dca5d3f7522152d93f3005a21d4a89fb6d9e6496",
+      "report": {
+        "schema": "m3-owned-mongo-ddl-audit-proof/v1",
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "pinned_real_mongo_replica_set": true,
+          "original_setup_only_projected_readback": true,
+          "plain_mongosh_audit_installation": true,
+          "real_ddl_detected_with_retained_positive_controls": true
+        },
+        "dependency_image_ids": {
+          "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3"
+        },
+        "production": false,
+        "application_startup_verified": false,
+        "infra_sha": "f16ca20f83c73f44c2f4db97f6a0a276eda0fd26",
+        "original_setup_only_commands": [],
+        "audit": {
+          "attempts": 2,
+          "commands": [
+            {
+              "kind": "create",
+              "collection": "actual_ddl_probe",
+              "client": "127.0.0.1",
+              "error_code": 0
+            },
+            {
+              "kind": "drop",
+              "collection": "actual_ddl_probe",
+              "client": "127.0.0.1",
+              "error_code": 0
+            }
+          ],
+          "positive_controls": 4,
+          "profile_capacity_bytes": 67108864,
+          "command_bodies_exported": false
+        },
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "private_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        }
+      }
+    }
+  ],
+  "production": false,
+  "app_zero_ddl_gate_passed": false,
+  "followup": "f16ca20 replaces legacy shell assertions with plain JavaScript and safe phase/class/code diagnostics. Real audit detects create/drop2 with four retained controls. Original setup-only probe contains no DDL; original fifth single runtime command remains unexplained until seven-process re-run 40089532397."
+}
