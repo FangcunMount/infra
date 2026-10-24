@@ -7602,5 +7602,23 @@
     "changes_progress": false,
     "changes_existing_gate": false,
     "production_authorized": false
+  },
+  "actual_rollback_recovery_20261024": {
+    "source_sha": "11ecf0a678a7726d084391138e3047f17049a67c",
+    "checks_success": 14,
+    "report_count": 15,
+    "reported_cases": 528,
+    "production_operations": false,
+    "old_cleanup_limit": "Two legacy ordinary SDK reports expose only four cleanup fields; do not infer explicit network absence.",
+    "pr": 225,
+    "merge_sha": "ca931569affda274a0c3dc775753573a182ed0c6",
+    "proof_index_sha256": "ba9a6bb583dd927dbb3732a394f2bab9be89416cc887df6711a0abeb0153589c",
+    "target_run": 40058191925,
+    "target_cases": {
+      "basic": 14,
+      "governance_faults": 16,
+      "rollback": 15
+    },
+    "scope": "SDK durable Abort fence and actual recovery Rollback RPC; not original business root write-then-rollback"
   }
 }

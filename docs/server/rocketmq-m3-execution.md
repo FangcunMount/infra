@@ -1840,3 +1840,10 @@ IAM [PR146](https://github.com/FangcunMount/iam/pull/146)源码 bee9c5c1 合并0
 Rollback [PR225](https://github.com/FangcunMount/infra/pull/225)11ecf0a6的[40058191925](https://github.com/FangcunMount/infra/actions/runs/40058191925)basic14、治理故障16、Rollback15目标均通过；完整关联门禁/合并仍待完成。实际SDK原Abort证据与FinalUnknown并存，新恢复实例真实Rollback RPC及正向audit，不把原生产者exit1当成已知最终确认，也不冒称业务原根写入后回滚。QS原双存储候选[PR437](https://github.com/FangcunMount/qs-server/pull/437)9301bf80、工具[PR228](https://github.com/FangcunMount/infra/pull/228)a5cc2c92已提交，实际门禁排队/运行；AI原SQLAlchemy根恢复未完成。
 
 [尽快上线提案](rocketmq-m3-fast-cutover-proposal.md)仅供用户确认：后移完整四宿主原生超限手工恢复工具验收，M3保留持久保护、Checker和具名人工修复，未完成的解保护工具不进入生产执行包。它改变原T25-C3门禁，**尚未批准，不改变当前范围、勾选或计数**。稳定SDK、最终镜像/切换演练、105前置、具名生产清单/system和切换后48小时仍保留。M3仍24/36，T25 2/4，C2 4/4，C3 1/3；没有生产操作。
+
+
+### 2026-10-24：Rollback 恢复候选完整门禁合并
+
+[PR225](https://github.com/FangcunMount/infra/pull/225)固定11ecf0a678a7726d084391138e3047f17049a67c的14检查全部成功；下载15份小型报告并核验528项、零失败/跳过、全部声明cases及所属清理，通过后合并ca931569affda274a0c3dc775753573a182ed0c6。两份旧普通SDK报告仅四个cleanup字段，不额外声称网络回读。目标[40058191925](https://github.com/FangcunMount/infra/actions/runs/40058191925)basic14/治理故障16/Rollback15通过；原SDK LocalAborted＋FinalUnknown由持久中止fence、新实例真实Rollback RPC和正向audit收敛。它不表示原业务根写入后回滚，也不表示四宿主完整矩阵通过。
+
+QS源码PR437的文档门禁因source_baseline仍指旧源码而失败，已以仅文档提交9879cdb9e修正至9301bf80并补齐夹具范围说明；本地88项文档测试、hygiene/facts通过，不重写旧失败。实际双存储工具门禁仍在运行。当前M3 24/36、T25 2/4、C3 1/3不变；尽快上线范围提案仍待用户确认，不提前发布SDK或生产部署。
