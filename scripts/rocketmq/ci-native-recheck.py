@@ -236,7 +236,7 @@ def main():
         host=None;original=None
         if args.terminal=='rollback':
             report['limits']=['Fixed SDK source producer returns LocalAborted after genuine half reaches native limit; actual durable abort fence, no business row',
-                'Original sender drains normally; no process crash, business root rollback or whole-host acceptance claim',
+                'Original sender exit/RPC outcome and true drain separately verified; no process crash, business root rollback or whole-host claim',
                 'Compiled published SDK recheck performs actual Rollback RPC, preserves first audit; bounded three-second consumer observation',
                 'Synthetic reviewers, no production/system authorization']
         if args.iam_host:
@@ -289,7 +289,18 @@ def main():
         require(proof['parameters_restored_before_recovery'] == before_parameters, 'parameters_not_restored')
         stage = 'original_commit_then_real_process_exit'
         if producer:
-            producer.send('rollback' if args.terminal=='rollback' else 'commit'); producer.finish(expected=0 if args.terminal=='rollback' else 23)
+            producer.send('rollback' if args.terminal=='rollback' else 'commit')
+            if args.terminal=='rollback':
+                code=producer.process.wait(timeout=30)
+                producer.finish(expected=code)
+                metrics=[json.loads(e['decision']) for e in producer.events if e.get('event')=='metrics']
+                proof['original_abort_exit_code']=code
+                proof['original_abort_stats']=metrics[-1] if metrics else None
+                require(code in (0,1) and metrics and metrics[-1]['Stopped']
+                    and metrics[-1]['CompletedResults']==metrics[-1]['HalfPreparedResults']==metrics[-1]['LocalAbortedResults']==1
+                    and metrics[-1]['LocalCommittedResults']==metrics[-1]['ActiveSends']==metrics[-1]['RunningChecks']==metrics[-1]['QueuedChecks']==0
+                    and any(e.get('event')=='closed' for e in producer.events),'original_abort_and_actual_drain_required')
+            else:producer.finish(expected=23)
         if host:
             shutil.copyfile(index_path,host.control/'native-index.json');(host.control/'native-index.json').chmod(0o600)
             host.signal('record-notice');require(host.wait('notice.json',10)==dict(exact_original_index_recorded=True),'original_host_native_import_required')
@@ -299,7 +310,7 @@ def main():
         require(committed['execution_state']==committed['witness_state']==expected_state
                 and (args.terminal=='rollback' or committed['final_outcome']!='commit_confirmed') and counts()==expected_counts, 'original_terminal_evidence_required')
         require(all(committed[k]==prepared[k] for k in ('reference_sha256','wire_sha256','unique_id_sha256')), 'original_frozen_identity_changed')
-        proof['original_exit_code'] = None if host else 0 if args.terminal=='rollback' else 23
+        proof['original_exit_code'] = None if host else proof['original_abort_exit_code'] if args.terminal=='rollback' else 23
         passed('actual_iam_root_committed_during_broker_disconnect_and_owner_stopped' if host else 'real_prepared_execution_durably_aborted_without_business_fact' if args.terminal=='rollback' else 'real_original_root_committed_then_process_exited_before_final_rpc')
         if args.managed_tool:
             stage = 'compiled_managed_original_primary_recovery'

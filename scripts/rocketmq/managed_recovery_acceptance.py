@@ -237,8 +237,12 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     first_audit=sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;")
     require(first_audit.startswith(expected['final']+'\t'),'positive_sdk_primary_audit_required')
     if prior_audit is not None:
-        require(first_audit==prior_audit,'native_recovery_refreshed_first_positive_rollback_audit')
-        passed('actual_rollback_native_recheck_preserves_original_first_positive_audit')
+        if prior_audit.startswith(expected['final']+'\t'):
+            require(first_audit==prior_audit,'native_recovery_refreshed_first_positive_rollback_audit')
+            passed('actual_rollback_native_recheck_preserves_original_first_positive_audit')
+        else:
+            require(prior_audit.split('\t')[0] in ('unknown','not_attempted'),'prior_rollback_confirmation_must_be_positive_or_unconfirmed')
+            passed('first_positive_rollback_audit_only_after_actual_native_rpc')
     approval['action']='resolve';approval['receipt_sha256']=receipt_sha
     resolve_path,resolve_sha=write('synthetic-resolution-approval.json',approval)
     common_resolve=common[:-4]+['--approval',resolve_path,'--approval-sha',resolve_sha,'--receipt',receipt_path,'--receipt-sha',receipt_sha]
