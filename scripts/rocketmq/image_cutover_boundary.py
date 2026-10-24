@@ -62,9 +62,9 @@ def private_input_hashes(fixture):
 def startup_receipt(path):
     raw = path.read_bytes(); require(len(raw) < 1024 * 1024, 'bounded_startup_receipt_required')
     value = json.loads(raw)
-    require(value['schema'] == 'm3-five-actual-image-startup-trial/v1'
-            and (value['passed'], value['failed'], value['skipped']) == (14, 0, 0)
-            and len(value['cases']) == 14 and all(v is True for v in value['cases'].values())
+    require(value['schema'] == 'm3-five-actual-image-startup-trial/v2'
+            and (value['passed'], value['failed'], value['skipped']) == (15, 0, 0)
+            and len(value['cases']) == 15 and all(v is True for v in value['cases'].values())
             and value['sources'] == SOURCES and value['sources_unchanged'] is True
             and value['mysql_runtime_ddl_attempts'] == value['mongo_runtime_ddl_attempts'] == 0
             and not any(value[k] for k in ('production', 'system_acceptance', 'combined_cutover_rehearsal_complete', 'c1_cutover_barrier_exercised')),

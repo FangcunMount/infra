@@ -8,8 +8,8 @@ from image_cutover_boundary import COMPONENTS, SOURCES, parse_private_hashes, st
 
 
 def synthetic_unit_receipt():
-    return dict(schema='m3-five-actual-image-startup-trial/v1', passed=14, failed=0, skipped=0,
-        cases={str(n):True for n in range(14)}, sources=SOURCES, sources_unchanged=True,
+    return dict(schema='m3-five-actual-image-startup-trial/v2', passed=15, failed=0, skipped=0,
+        cases={str(n):True for n in range(15)}, sources=SOURCES, sources_unchanged=True,
         mysql_runtime_ddl_attempts=0,mongo_runtime_ddl_attempts=0,
         production=False,system_acceptance=False,combined_cutover_rehearsal_complete=False,c1_cutover_barrier_exercised=False,
         processes={c:{'state':dict(Status='exited',ExitCode=0,OOMKilled=False)} for c in COMPONENTS},
