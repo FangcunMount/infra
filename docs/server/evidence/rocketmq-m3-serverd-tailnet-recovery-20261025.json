@@ -40,7 +40,7 @@
   "serverb_serverc_followup": {
     "authorized_by_user": true,
     "reauthentication_initiated": true,
-    "awaiting_user_web_authentication": true,
+    "awaiting_user_web_authentication": false,
     "preserve_existing_settings": true,
     "expected_ipv4": {
       "serverB": "100.91.31.24",
@@ -50,6 +50,49 @@
       "serverb": "3f58be8cbb37857755055b6cd2e408869d31fbccce2f0c9ac7f7d7a6485bd2d7",
       "serverc": "bc26b7e9b678440a0ea561282ac5e18c9276ab83338482d81c9695e358b1ac8c"
     },
-    "completed": false
+    "completed": true,
+    "user_web_authentication_completed": true,
+    "observed_at_utc": "2026-10-24T17:00:34.444451+00:00",
+    "completion_verified_from_fresh_state_not_cli_exit": true,
+    "results": [
+      {
+        "host": "serverB",
+        "state": "Running",
+        "online": true,
+        "expected_original_ipv4": "100.91.31.24",
+        "original_ipv4_verified": true,
+        "health_count": 0,
+        "non_identity_preference_changes": [],
+        "private_ssh_via_mac_mini_succeeded": true,
+        "existing_container_ids_images_starts_states_restarts_unchanged": true,
+        "deployment_locks_unchanged": true,
+        "container_count": 9,
+        "initial_login_command_exit_code": 1,
+        "after_evidence_sha256": {
+          "serverb-tailscale-after.private.json": "866d126344c0114ac4e044fa0bd1b0b4b0a7d2efb4f6e6559f9af136b792c163",
+          "serverb-tailscale-prefs-after.private.json": "3f58be8cbb37857755055b6cd2e408869d31fbccce2f0c9ac7f7d7a6485bd2d7",
+          "serverb-inventory-after-tailnet.json": "f404affae6664ec3325620389de7fc1450f5b4b2b7ca059494264e91d7bc01b0"
+        }
+      },
+      {
+        "host": "serverC",
+        "state": "Running",
+        "online": true,
+        "expected_original_ipv4": "100.70.252.103",
+        "original_ipv4_verified": true,
+        "health_count": 0,
+        "non_identity_preference_changes": [],
+        "private_ssh_via_mac_mini_succeeded": true,
+        "existing_container_ids_images_starts_states_restarts_unchanged": true,
+        "deployment_locks_unchanged": true,
+        "container_count": 1,
+        "initial_login_command_exit_code": 1,
+        "after_evidence_sha256": {
+          "serverc-tailscale-after.private.json": "b8c15fec6dbd1b8eac55c41991585a93eca929597449c426eac72b146db022c9",
+          "serverc-tailscale-prefs-after.private.json": "bc26b7e9b678440a0ea561282ac5e18c9276ab83338482d81c9695e358b1ac8c",
+          "serverc-inventory-after-tailnet.json": "ea117b39568d9704aaa1f346985f43bd2e7b1d31ef853624275b2c2b5f7aacf3"
+        }
+      }
+    ]
   }
 }
