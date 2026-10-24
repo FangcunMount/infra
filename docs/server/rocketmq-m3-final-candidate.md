@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | 镜像及维护二进制 | 修复后五候选构建/归档核验通过 | 五个原Dockerfile实际构建、源码SHA/模块/wheel身份、image config ID/归档摘要、UID及恢复工具排除清单 |
 | 配置、资源与执行包 | 待开始 | 实际所需M3 events/routes/owner绑定、禁自动DDL、封新写配置、ACL/TLS/资源摘要和原维护命令逐项绑定 |
-| 原范围恢复、启动与窗口 | IAM、AI组件通过；QS及全组合进行中 | 最终候选实际恢复/启动和切换演练，具名步骤及耗时证明30分钟目标；不能用进程sentinel代替实际runtime |
+| 原范围恢复、启动与窗口 | IAM、AI组件已合并；QS双库9/9原生通过，七进程复验中 | 最终候选实际恢复/启动和切换演练，具名步骤及耗时证明30分钟目标；不能用进程sentinel代替实际runtime |
 
 ## 仅构建路径
 
@@ -55,3 +55,9 @@ IAM组件[40077501698](https://github.com/FangcunMount/infra/actions/runs/400775
 使用原0040→0043 Alembic、完整原范围恢复与initial-binding CLI，再启动原只读镜像，保持768MiB/0.75CPU、64MiB tmpfs、210秒关闭及原worker循环/预算。新准入关闭，运行账号只有DML权限。固定Python5.1.2的home日志放入既有/tmp，须在最终配置加入HOME=/tmp并通过实际镜像复验。上游RPC和模型不在本组件验收范围；无法代替QS/成对业务或system。原严格schema拒绝额外测试表的失败保留，复验使用原受控held行，不放宽schema/绑定验证。
 
 AI [40079069646](https://github.com/FangcunMount/infra/actions/runs/40079069646)原生9项通过；原严格schema下的受控held旧记录、完整恢复、原绑定、只读启动/关闭、0 DDL尝试及旧first wire/attempt状态保留分别验收。[证据](evidence/rocketmq-m3-ai-final-image-20261024.json)记录原生9/9、关联10份报告451/0/0及PR243合并032d7c7a；四个变更文件与受验源码逐字节一致。
+
+## QS双库组件（原生9/9，完整CI/合并待核验）
+
+[40082780271](https://github.com/FangcunMount/infra/actions/runs/40082780271)使用原嵌入模板与migrator得到105/40和110/43，journal不force。MySQL全库、Mongo整库包含非空受控事实，新增保护之后的对象后完整恢复；Mongo索引、UUID、文档保持，原维护CLI分别安装/回读两个owner。MySQL原保护bytes保留；严格列元数据及数据/其余DDL保持，只规范化[官方110825](https://bugs.mysql.com/bug.php?id=110825)记录的冗余CHARACTER SET显示。原失败保留，详见[审计](evidence/rocketmq-m3-qs-image-pair-20261024.json)。这不表示生产105完成或业务进程已启动。
+
+五镜像/七进程试验PR246使用真实IAM mTLS与AI，原资源及三个48并发worker。首轮7/1/0在QS读取相对缓存策略失败；原配置纯本地复现后修正fixture挂载路径，未改缓存策略/宿主源码，复验40083039784进行中。完整C1/30分钟仍独立待完成。

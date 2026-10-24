@@ -1,0 +1,93 @@
+{
+  "schema": "m3-qs-image-pair-audit/v1",
+  "run_id": 40082780271,
+  "report_sha256": "3cf6fc9a86176e722e93f0b07ed00f976611dfd97ea88bcee2adca3ea65fde39",
+  "infra_sha": "e67f2eb30418ce57cf4b8ff5e4580750aa242f40",
+  "passed": 9,
+  "failed": 0,
+  "skipped": 0,
+  "cases": {
+    "exact_qs_collection_archive_loaded": true,
+    "exact_qs_worker_archive_loaded": true,
+    "exact_qs_api_archive_loaded": true,
+    "original_migration_pair_pre_m3": true,
+    "full_mysql_mongo_restore_with_uuid_pre_m3": true,
+    "original_migration_pair_current": true,
+    "full_mysql_mongo_restore_with_uuid_current": true,
+    "original_binding_qs_mysql": true,
+    "original_binding_qs_mongo": true
+  },
+  "restores": [
+    {
+      "profile": "pre_m3",
+      "mysql_raw_equal": false,
+      "mysql_canonical_sha256": "2fc12585a9ae0748b4d643760247836b55ba851d054be225ddcf3c9ac7c3c27d",
+      "mysql_columns_sha256": "6c6356b024476f854092f6f3663c47595b112295952de5ee20d2b7276faae3fc",
+      "mongo_snapshot_sha256": "fb27a10a4d27b0e3890c5dadf6e5aa14fda36f6d2478e7fe20964c3b9ee7d846",
+      "mongo_collection_count": 14,
+      "all_parts_equal": true
+    },
+    {
+      "profile": "current",
+      "mysql_raw_equal": false,
+      "mysql_canonical_sha256": "313549ff62a675849bf4a3588c39d874761583f7836d67a25379d5d29d52ea9f",
+      "mysql_columns_sha256": "dfc5cb8f0c1a2cacd82d7aec98692a0d995816c912acf0ebdb860eaf1eb0d0e6",
+      "mongo_snapshot_sha256": "2c14f08b596a74f22a1efe233cc2ec8c4a4c8a0bd5af37f43288e1cb235923d7",
+      "mongo_collection_count": 21,
+      "all_parts_equal": true
+    }
+  ],
+  "cleanup": {
+    "compose_down_succeeded": true,
+    "private_directory_removed": true,
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true
+  },
+  "sources_unchanged": true,
+  "pre_m3_schema": {
+    "journal_force_used": false,
+    "mongo": 40,
+    "mysql": 105,
+    "original_templates_applied": true,
+    "production": false,
+    "profile": "pre_m3",
+    "resources_sha256": "c37b639804391172b2209f11c7056b4867309a31054af3c5d3f740cd6145b86d",
+    "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+  },
+  "current_schema": {
+    "journal_force_used": false,
+    "mongo": 43,
+    "mysql": 110,
+    "original_templates_applied": true,
+    "production": false,
+    "profile": "current",
+    "resources_sha256": "f0ddf4125b7f39435c5cfed88ca7a4bd89be2362bc3bf7d7394c9dc6c82d6812",
+    "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+  },
+  "candidates": {
+    "qs-collection": {
+      "target": "qs-collection",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+      "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c"
+    },
+    "qs-worker": {
+      "target": "qs-worker",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+      "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc"
+    },
+    "qs-api": {
+      "target": "qs-api",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+      "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3"
+    }
+  },
+  "original_offline_tool_sha256": "94de163f78f1bac8cc323338b279c2bf1eb7f2a222a8c05977fce3c5e6ac6d47",
+  "production": false,
+  "t29_complete": false,
+  "mysql_show_create_reference": "https://bugs.mysql.com/bug.php?id=110825",
+  "merge_status": "pending_full_ci_and_merge",
+  "pull_request": 245
+}
