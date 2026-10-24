@@ -1,0 +1,17 @@
+{
+  "schema": "m3-source-review-packet/v2",
+  "files": 44,
+  "members": 46,
+  "input_index_sha256": "b659e4ea5064683d25c0005375b3b149cd98e085869f89c1cc41b68d74d3d4cd",
+  "archive_sha256": "8b9ef65ccb5f21b797447e24f8d8164b8ffc5e9c362c81c931c9a082e20c8cb6",
+  "source_refs": {
+    "infra": "eb9575077353202ce5eb9de1effd1411de56e486",
+    "qs": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+    "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+    "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+  },
+  "production_approved": false,
+  "runtime_configuration_frozen": false,
+  "execution_bundle_complete": false,
+  "operator_and_route_source_sha256": "61acd9b19e7e82a7af3731a0732728f9fdeced86b459fb1f8994a3bc8dc99641"
+}
