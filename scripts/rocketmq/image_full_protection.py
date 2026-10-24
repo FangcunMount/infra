@@ -13,7 +13,7 @@ import time
 from audit_transaction_limit import write_private
 from final_image_candidate import ci_guard
 from image_start_fixture import require
-from qs_image_pair import canonical_dump, mongo_snapshot_program
+from qs_image_pair import canonical_dump, dump_difference, mongo_snapshot_program
 from start_boundary import _encoded
 
 
@@ -91,7 +91,20 @@ class FullImageProtection:
             '--gzip', '--drop', '--preserveUUID', '--nsInclude=' + qs + '.*'], timeout=120)
         after = {store: self.mysql_snapshot(database) for store, database in self.databases.items()}
         after['mongo'] = self.mongo_snapshot()
-        require(before == after and f.sql('SELECT @@server_uuid;') == self.provider and not f.applications, 'actual_full_scope_restore_readback_differs')
+        provider_unchanged = f.sql('SELECT @@server_uuid;') == self.provider
+        if before != after or not provider_unchanged or f.applications:
+            # Retain exact readback hashes on failure as well. Never export
+            # SQL, retained facts, column comments or private protection bytes.
+            f.report['full_restore_difference'] = dict(before=before, after=after,
+                provider_unchanged=provider_unchanged, runtime_started=bool(f.applications), mysql={})
+            for store, database in self.databases.items():
+                if before[store] != after[store]:
+                    current = self.dump(database)
+                    f.report['full_restore_difference']['mysql'][store] = dict(
+                        raw_dump=dump_difference(self.sql[store], current),
+                        canonical_dump=dump_difference(canonical_dump(self.sql[store]), canonical_dump(current)),
+                        column_metadata=dump_difference(self.columns[store], self.column_metadata(database)))
+        require(before == after and provider_unchanged and not f.applications, 'actual_full_scope_restore_readback_differs')
         self.restore_seconds = max(1, math.ceil(time.monotonic() - started))
         receipt = dict(schema='m3-owned-full-image-restore/v1', protection_manifest_sha256=self.manifest_sha,
             snapshots_before=before, snapshots_after=after, restore_duration_seconds=self.restore_seconds,
