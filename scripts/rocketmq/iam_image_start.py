@@ -178,7 +178,10 @@ def main():
         shutil.copyfile(repo/'scripts/rocketmq/image_fixtures/iam_init.go',prepared/'main.go')
         fixture_binary=directory/'prepare-iam'
         stage='fixture_compilation'
-        run(['go','build','-o',str(fixture_binary),'./scripts/testing/m3_image_start_fixture'],cwd=source,timeout=300)
+        run(['go','build','-o',str(fixture_binary),'./scripts/testing/m3_image_start_fixture'],cwd=source,
+            env=dict(os.environ,CGO_ENABLED='0',GOOS='linux',GOARCH='amd64'),timeout=300)
+        report['fixture_initializer_sha256']=sha256(fixture_binary)
+        require('INTERP' not in run(['readelf','-l',str(fixture_binary)]).stdout,'static_initializer_for_original_alpine_image_required')
         network=project+'_rocketmq'
         init_env=directory/'fixture-init.env'
         init_env.write_text('GITHUB_ACTIONS=true\nRUNNER_ENVIRONMENT=github-hosted\n'+
@@ -191,6 +194,10 @@ def main():
             '--env-file',str(init_env),'--entrypoint','/tmp/prepare-iam',
             '-v',str(fixture_binary)+':/tmp/prepare-iam:ro',image],timeout=180,required=False)
         if result.returncode:
+            report['fixture_exit_code']=result.returncode
+            report['fixture_preexec_signals']={key:needle in result.stderr.lower() for key,needle in
+                (('missing_entrypoint_or_loader','no such file or directory'),
+                 ('permission_denied','permission denied'),('wrong_architecture','exec format error'))}
             report['fixture_failure']=fixture_diagnostic(result.stdout)
             raise RuntimeError('original_fixture_preparation_failed')
         case('original_full_schema41_and_bootstrap')
