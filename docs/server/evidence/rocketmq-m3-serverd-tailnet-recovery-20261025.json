@@ -1,0 +1,55 @@
+{
+  "schema": "m3-serverd-tailnet-recovery/v1",
+  "record_date_asia_shanghai": "2026-10-25",
+  "approved_scope": "reauthenticate existing serverD Tailnet with preserved settings and verify original address; no Broker or M3 business cutover",
+  "authorization": "user explicitly approved restoring serverD Tailscale",
+  "plan_pr": "https://github.com/FangcunMount/infra/pull/262",
+  "plan_head_sha": "3c9add498bac21a500c108267703698adae3ec78",
+  "reviewed_document_sha256": "9e6719858ab15dea8db635ee06ec00b296b72e9c3a9f43a95f39470a4df75331",
+  "target": "serverD",
+  "ssh_ingress": "mac-mini-old",
+  "tailscale_version": "1.104.2",
+  "original_preferences_sha256": "c62a7a2576db5fc3fa96c43e5023985825a47a9e4080496dd78478ef3a3f8e95",
+  "original_preferences_matched_before_login": true,
+  "reauthentication_initiated": true,
+  "user_web_authentication_completed": true,
+  "expected_original_ipv4": "100.118.164.39",
+  "original_ipv4_verified_after_login": true,
+  "preferences_verified_after_login": true,
+  "three_worker_containers_verified_after_login": true,
+  "monitoring_verified_after_login": true,
+  "automatic_route_acl_config_rewrite_allowed": false,
+  "broker_started": false,
+  "admin_credential_rotated": false,
+  "production_business_cutover_performed": false,
+  "state": "verified_running_original_address_and_settings",
+  "m3_completed_tasks": 28,
+  "m3_total_tasks": 36,
+  "observed_at_utc": "2026-10-24T16:54:07.790401+00:00",
+  "initial_login_command_exit_code": 1,
+  "completion_verified_from_fresh_state_not_cli_exit": true,
+  "network_preferences_changed_except_identity": [],
+  "worker_monitoring_up_count": 3,
+  "existing_container_ids_images_starts_states_restarts_unchanged": true,
+  "after_evidence_sha256": {
+    "serverd-tailscale-after.private.json": "4a1a77cb67ec4360e0708680a88d0dca586778e84d3d01c3386c408986709bda",
+    "serverd-tailscale-prefs-after.private.json": "c62a7a2576db5fc3fa96c43e5023985825a47a9e4080496dd78478ef3a3f8e95",
+    "serverd-inventory-after-tailnet.json": "4b54aad03a259ed97d4cc0c08b037e31eece45abf0e45c69d7741feb0e8ce5dd",
+    "prom-targets-after-serverd.private.json": "3107150cbd2a459a3fffffce522341d4fb3d3404f24e9aaacc46a1312598e6e3"
+  },
+  "serverb_serverc_followup": {
+    "authorized_by_user": true,
+    "reauthentication_initiated": true,
+    "awaiting_user_web_authentication": true,
+    "preserve_existing_settings": true,
+    "expected_ipv4": {
+      "serverB": "100.91.31.24",
+      "serverC": "100.70.252.103"
+    },
+    "original_preferences_sha256": {
+      "serverb": "3f58be8cbb37857755055b6cd2e408869d31fbccce2f0c9ac7f7d7a6485bd2d7",
+      "serverc": "bc26b7e9b678440a0ea561282ac5e18c9276ab83338482d81c9695e358b1ac8c"
+    },
+    "completed": false
+  }
+}
