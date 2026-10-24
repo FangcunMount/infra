@@ -45,7 +45,7 @@ def inventory(value):
 def configuration(base, database, password):
     """Keep the original production shape; substitute only owned fixture inputs."""
     c = copy.deepcopy(base)
-    c['mysql'].update({'host': 'mysql:3306', 'username': 'root', 'password': password,
+    c['mysql'].update({'host': 'mysql:3306', 'username': 'iam_runtime', 'password': password,
                        'database': database, 'tls-mode': 'DISABLED'})
     c['migration'].update(enabled=False, database=database)
     c['redis']['cache'].update(host='redis', port=6379, username='', password='')
@@ -253,7 +253,8 @@ def main():
         write_private(fixture/'credentials.json',principal);write_private(fixture/'routes.json',doc)
         import yaml
         base=yaml.safe_load((source/'configs/apiserver.prod.yaml').read_text())
-        write_private(fixture/'transaction.json',configuration(base,database,password))
+        runtime_password=secrets.token_hex(32)
+        write_private(fixture/'transaction.json',configuration(base,database,runtime_password))
         # Restrict fixture files to the image's actual non-root owner.
         for file in fixture.iterdir(): file.chmod(0o700 if file.is_dir() else 0o600)
         def own(uid,gid):
@@ -277,13 +278,14 @@ def main():
             code=run(['docker','inspect',app,'--format','{{.State.ExitCode}}']).stdout.strip()
             runtime_logs();run(['docker','rm',app]);app_created=False
             require(code=='0','actual_shutdown_not_clean')
+        stage='retained_business_snapshot'
         # Hash all original tables before installing the seven additive objects.
         # No source body or SQL dump leaves this private command capture.
         tables=sql(f"SELECT table_name FROM information_schema.tables WHERE table_schema='{database}' AND table_name <> 'schema_migrations' ORDER BY table_name;").splitlines()
         require(tables and all(t.replace('_','').isalnum() for t in tables),'original_business_tables_required')
         def retained_digest():
             dump=run(compose+['exec','-T','mysql','sh','-c',
-                'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump -uroot --compact --skip-comments --skip-dump-date --no-tablespaces --set-gtid-purged=OFF --skip-lock-tables --column-statistics=0 "$@"',
+                'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump -uroot --hex-blob --compact --skip-comments --skip-dump-date --no-tablespaces --set-gtid-purged=OFF --skip-lock-tables --column-statistics=0 "$@"',
                 'owned-dump',database,*tables]).stdout
             return hashlib.sha256(dump.encode()).hexdigest()
         original_digest=retained_digest()
@@ -311,6 +313,10 @@ def main():
         cli('m3-messaging','--action','select','--store-id','isolated-iam-primary','--writer-epoch','m3-1','--export-plan','/fixture/select.json')
         cli('m3-messaging','--apply','--writers-excluded','--plan','/fixture/select.json','--reviewed-sha256',file_sha('select.json'))
         case('original_schema45_and_binding_selected',sql(f'SELECT version,dirty FROM {database}.schema_migrations;')=='45\t0')
+        sql(f"CREATE USER 'iam_runtime'@'%' IDENTIFIED BY '{runtime_password}'; GRANT SELECT,INSERT,UPDATE,DELETE ON `{database}`.* TO 'iam_runtime'@'%';")
+        # Enforce the actual database boundary and audit attempted DDL as well.
+        # Raw general-log SQL remains only inside the owned temporary MySQL.
+        sql("SET GLOBAL log_output='TABLE'; SET GLOBAL general_log='ON';")
         stage='actual_paused_transaction_image_start'
         start('transaction.json');wait_http('/healthz')
         deadline=time.monotonic()+30
@@ -320,8 +326,10 @@ def main():
                 if time.monotonic()>=deadline:raise
                 time.sleep(1)
         case('actual_standard_config_and_live_paused_owner')
-        case('startup_did_not_execute_ddl',sql(f'SELECT version,dirty FROM {database}.schema_migrations;')=='45\t0')
         stop();case('actual_transaction_shutdown_exit_zero')
+        ddl=sql("SELECT COUNT(*) FROM mysql.general_log WHERE user_host LIKE 'iam_runtime%' AND command_type='Query' AND UPPER(argument) REGEXP '^[[:space:]]*(CREATE|ALTER|DROP|TRUNCATE|RENAME)[[:space:]]';")
+        report['runtime_ddl_attempts']=int(ddl)
+        case('real_start_and_shutdown_attempted_no_ddl',ddl=='0' and sql(f'SELECT version,dirty FROM {database}.schema_migrations;')=='45\t0')
         report['passed']=len(report['cases'])
     except Exception as error:
         report['failed']=1;report['failure_stage']=stage

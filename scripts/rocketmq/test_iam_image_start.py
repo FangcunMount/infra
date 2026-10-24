@@ -56,6 +56,7 @@ class ImageStartContractTest(unittest.TestCase):
         new=configuration(base,'owned','private')
         self.assertEqual(base,original)
         self.assertFalse(new['migration']['enabled'])
+        self.assertEqual(new['mysql']['username'],'iam_runtime')
         self.assertFalse(new['messaging']['publish_enabled'])
         self.assertFalse(new['events']['reliable_messaging']['enabled'])
         self.assertFalse(new['nsq']['enabled'])
