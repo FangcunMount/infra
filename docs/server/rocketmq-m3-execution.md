@@ -1808,3 +1808,12 @@ infra [PR219](https://github.com/FangcunMount/infra/pull/219)源码508bebce415b0
 固定IAM36456cdf、QS83147d8e、AI05d2db71复核17份入口/装配/工作流并记录原字节SHA256。补明确IAM显式DDL、只读preflight和已退役入口，QS人工维护/admission与新旧hold所有权，AI监督组件、semantic recovery及手工部署责任。源码核对不证明实际进程或外部caller已停，详见离线维护契约。
 
 [PR222](https://github.com/FangcunMount/infra/pull/222)提供同一C1目录的三库原生维护组合，固定源码/存储/工具、实际宿主迁移绑定及启动后拒绝；本地3项纯契约/静态通过，实际门禁仍运行。进程sentinel不冒充实际业务runtime，夹具保护不冒充生产备份恢复。C2-d/C2与T25均未勾选；M3仍24/36。
+
+
+### 2026-10-24：T25 当前候选与失败保留
+
+IAM实际恢复候选更新为bee9c5c1，infra为d741ace8。第二轮失败在观察消费者准备阶段：固定SDK源码探针硬编码sdk.logical及探针正文，不能观察IAM业务wire；未进入IAM根写入。新增仅允许GitHub-hosted/回环端点/固定IAM路由的正式SDK观察器，ACK后向私有管道报告原ID与wire摘要，并与原Reference摘要核对；不改固定SDK源码。当前本地275纯、整包Go race/vet与IAM集成编译通过，实际CI继续，尚不打勾。
+
+三库组合首轮2fb1291中三个受审命令均返回0，但报告汇总失败；原始报告不当作完整通过。9de0b50将依赖下载stderr与Go JSON独立保存，增加逐宿主报告阶段定位，再跑完整门禁，不能靠过滤skip或丢弃异常行通过。两批首次报告均确认所属容器/网络/目录清理及既有资源集合不变，原摘要进入结构化证据。
+
+仅取消已被替代源码的剩余CI请求；当前候选完整required门禁不取消、不跳过。M3仍24/36，T25内部2/4、C2 3/4、C3 1/3。稳定版、生产切换、system与48小时观察仍未执行。
