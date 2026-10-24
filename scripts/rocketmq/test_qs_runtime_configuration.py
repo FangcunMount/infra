@@ -7,7 +7,9 @@ from qs_runtime_configuration import configuration, rocketmq
 
 def base():
     return dict(insecure={}, secure={}, redis={'max-active':384}, mysql={'max-open-connections':150}, mongodb={'max-pool-size':256},
-        messaging={}, cache={'policy_file':'cache/apiserver.prod.yaml'}, iam=dict(grpc={'tls':{}}, jwks={}, **{'authz-sync':{}}),
+        messaging={}, cache={'policy_file':'cache/apiserver.prod.yaml'},
+        oss={'enabled':True,'connect-timeout':'3s','read-write-timeout':'10s','retry-max-attempts':2},
+        assessment_assets={'enabled':True}, iam=dict(grpc={'tls':{}}, jwks={}, **{'authz-sync':{}}),
         **{'delegated-subject':{}, 'migration':{}, 'grpc':{'mtls':{}, 'acl':{}},
            'ai_workflow':{'management':{}}, 'worker':{'concurrency':48},
            'grpc_client':{'max_inflight':420}, 'backpressure':{'mysql':{'max_inflight':150}}})
@@ -23,6 +25,11 @@ class QSRuntimeConfigurationTest(unittest.TestCase):
         self.assertNotEqual(owners['qs.mysql']['credentials_file'],owners['qs.mongo']['credentials_file'])
         self.assertEqual(c['ai_workflow']['messaging']['rocketmq']['transactions']['qs.mysql'],owners['qs.mysql'])
         self.assertFalse(c['migration']['enabled'])
+        self.assertTrue(c['oss']['enabled'])
+        self.assertTrue(c['assessment_assets']['enabled'])
+        for key in ('connect-timeout','read-write-timeout','retry-max-attempts'):
+            self.assertEqual(c['oss'][key],original['oss'][key])
+        self.assertEqual(c['oss']['endpoint'],'http://owned-unused-oss.invalid')
         self.assertEqual(c['eventing']['standard_outbox'],{'mongo':False,'assessment':False})
         self.assertEqual(c['cache']['policy_file'],'/app/configs/cache/apiserver.prod.yaml')
         self.assertFalse(c['messaging']['rocketmq']['publish_enabled'])
