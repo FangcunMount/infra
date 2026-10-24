@@ -99,23 +99,32 @@ def notice_key(index,binding=None):
     return hashlib.sha256(raw).digest()
 
 
+def terminal_expectation(terminal):
+    require(terminal in ('commit','rollback'),'explicit_terminal_decision_required')
+    return dict(decision=terminal,final=terminal+'_confirmed',business=1 if terminal=='commit' else 0,
+        counter='RecoveryCommitConfirmed' if terminal=='commit' else 'RecoveryRollbackConfirmed')
+
+
 def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False,original=None):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False,original=None,terminal="commit"):
+    terminal_expectation(terminal)
+    require(terminal=="commit" or (not governance_faults and original is None),"separate_rollback_sdk_fixture_required")
     proxy=MySQLCommitProxy(mysql_port).start() if governance_faults else None
     try:
         return _accept(repo=repo,binary=binary,broker=broker,project=project,directory=directory,manifest=manifest,route=route,account=account,
             grpc_port=grpc_port,mysql_port=mysql_port,password=password,ca=ca,java=java,identity=identity,index_path=index_path,index=index,
-            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original)
+            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original,terminal=terminal)
     finally:
         if proxy is not None:
             proof['governance_wire_proxy_cleanup']=proxy.close()
 
 
 def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original,terminal):
+    expected=terminal_expectation(terminal)
     source=original or dict(owner="iam.mysql",store_id="sdk-disposable",writer_epoch="sdk-epoch-1",database="txprobe",user="txprobe",
         operation_id="op-"+identity,branch_id="branch-0",fence=1,business_count_sql="SELECT COUNT(*) FROM sdk_business",
-        writer="fixed Go SDK source probe, not IAM business host",scope="one iam.mysql terminal commit, not the complete four-host/fault matrix")
+        writer="fixed Go SDK source probe, not IAM business host",scope="one iam.mysql terminal "+terminal+", not the complete four-host/fault matrix")
     root=directory/'managed-cli';root.mkdir(mode=0o700)
     def write(name,value):
         path=root/name
@@ -193,7 +202,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         '--export',index_path,'--export-sha',index_sha,'--selection',selection_path,'--selection-sha',selection_sha,'--output',request_path])
     require(preview['sdk_started'] is False and preview['governance_written'] is False and governed()==before,'preview_changed_original_governance')
     request=json.loads(request_path.read_text());request_sha=preview['request_sha256']
-    require(request['snapshot']['local_decision']=='commit' and request['snapshot']['before_final']!='commit_confirmed','real_unconfirmed_original_root_required')
+    require(request['snapshot']['local_decision']==expected['decision'] and (terminal=='rollback' or request['snapshot']['before_final']!='commit_confirmed'),'real_unconfirmed_original_root_required')
     passed('compiled_cli_preview_freezes_exact_original_primary_and_native_notice')
     approval=dict(schema='m3-native-recovery-approval/v1',action='recover',request_sha256=request_sha,receipt_sha256='',coordinator_binding_sha256=binding_sha,
         source_bundle_sha256=source_bundle,data_owner=binding['data_owner'],recovery_owner=binding['recovery_owner'],expires_at=request['expires_at'])
@@ -205,21 +214,31 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     call(['recover',*common,'--directory',op,'--binding-sha',binding_sha,'--step','not-issued','--step-plan-sha','1'*64],success=False)
     require(not list(op.glob('native-attempt-*')) and governed()==before,'prestart_gate_created_effects')
     passed('compiled_recovery_refuses_before_real_first_runtime_boundary')
+    prior_audit=sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;") if terminal=='rollback' else None
     step(['recover',*common],'recover-original','runtime-start')
     receipts=list(op.glob('native-attempt-*/receipt.json'));require(len(receipts)==1,'single_complete_current_rpc_receipt_required')
     receipt_path=receipts[0];raw=receipt_path.read_bytes();receipt_data=json.loads(raw);receipt_sha=hashlib.sha256(raw).hexdigest()
     stats=json.loads(receipt_data['runtime_stats'])
     require(receipt_data['request_sha256']==request_sha and receipt_data['invocation_nonce']==request['invocation_nonce'] and receipt_data['native_recheck_outcome']=='RecheckEnqueued'
-        and stats['RecoveryCommitConfirmed']>=1 and stats['RecoveryAuditRecorded']==stats['RecoveryCommitConfirmed']+stats['RecoveryRollbackConfirmed']
+        and stats[expected['counter']]>=1 and stats['RecoveryAuditRecorded']==stats['RecoveryCommitConfirmed']+stats['RecoveryRollbackConfirmed']
         and stats['Stopped'] and stats['ActiveSends']==stats['RunningChecks']==stats['QueuedChecks']==0
         and stats['HalfPreparedResults']==stats['CompletedResults']==stats['LocalCommittedResults']==stats['Reconciled']==0,'genuine_checkonly_rpc_drain_required')
     require(governed()==before,'broker_confirmation_auto_resolved_governance')
     passed('published_sdk_actual_native_recheck_current_rpc_private_receipt_and_true_drain')
-    consumer.wait('received',identity,decision=source['wire_hash'] if original else None,timeout=100)
-    require(sql('SELECT ('+source['business_count_sql']+'),(SELECT COUNT(*) FROM rm_tx_request),(SELECT COUNT(*) FROM rm_tx_execution),(SELECT COUNT(*) FROM rm_tx_witness);')=='1\t1\t1\t1','recovery_repeated_business_or_sent_new_half')
-    passed('original_consumer_identity_and_one_original_business_root_preserved')
+    if terminal=='commit':
+        consumer.wait('received',identity,decision=source['wire_hash'] if original else None,timeout=100)
+    else:
+        deadline=time.monotonic()+3
+        while time.monotonic()<deadline:
+            consumer.drain();require(not any(e.get('event')=='received' for e in consumer.events),'rolled_back_native_copy_became_visible')
+            time.sleep(.1)
+    require(sql('SELECT ('+source['business_count_sql']+'),(SELECT COUNT(*) FROM rm_tx_request),(SELECT COUNT(*) FROM rm_tx_execution),(SELECT COUNT(*) FROM rm_tx_witness);')==str(expected['business'])+'\t1\t1\t1','recovery_repeated_business_or_sent_new_half')
+    passed('original_consumer_identity_and_one_original_business_root_preserved' if terminal=='commit' else 'aborted_original_stays_invisible_and_business_count_zero')
     first_audit=sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;")
-    require(first_audit.startswith('commit_confirmed\t'),'positive_sdk_primary_audit_required')
+    require(first_audit.startswith(expected['final']+'\t'),'positive_sdk_primary_audit_required')
+    if prior_audit is not None:
+        require(first_audit==prior_audit,'native_recovery_refreshed_first_positive_rollback_audit')
+        passed('actual_rollback_native_recheck_preserves_original_first_positive_audit')
     approval['action']='resolve';approval['receipt_sha256']=receipt_sha
     resolve_path,resolve_sha=write('synthetic-resolution-approval.json',approval)
     common_resolve=common[:-4]+['--approval',resolve_path,'--approval-sha',resolve_sha,'--receipt',receipt_path,'--receipt-sha',receipt_sha]
@@ -257,6 +276,6 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     require(after['records']==index['records'] and hashlib.sha256(index_path.read_bytes()).hexdigest()==index_sha,'native_original_index_rewritten')
     passed('actual_managed_recovery_keeps_original_physical_index_and_first_notice_evidence')
     proof['managed_recovery']=dict(request_sha256=request_sha,receipt_sha256=receipt_sha,native_index_sha256=fingerprint.hex(),
-        actual_sdk_stats=stats,original_counts=dict(business=1,requests=1,executions=1,witnesses=1),first_primary_audit_preserved=True,
+        actual_sdk_stats=stats,original_counts=dict(business=expected["business"],requests=1,executions=1,witnesses=1),first_primary_audit_preserved=True,
         approved_governance_resolved=True,same_request_reexecution_refused=True,private_observations=len(receipt_data['observations']),
         production=False,system_acceptance=False,reviewers='synthetic fixture',original_writer=source['writer'],scope=source['scope'])

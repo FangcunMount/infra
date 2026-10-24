@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [basic, governance_faults]
+        mode: [basic, governance_faults, rollback]
     steps:
       - uses: actions/checkout@v6
         with:
@@ -71,6 +71,7 @@ jobs:
           umask 077
           flags=()
           if [ "$MATRIX_MODE" = governance_faults ]; then flags+=(--governance-faults); fi
+          if [ "$MATRIX_MODE" = rollback ]; then flags+=(--terminal rollback); fi
           python3 scripts/rocketmq/ci-native-recheck.py --sdk "$PWD/.sdk-acceptance" \
             --image rocketmq-managed-recovery:5.5.1 --managed-tool "$RUNNER_TEMP/native-recovery" "${flags[@]}" --report managed-recovery.json
       - name: Nonempty zero-skip actual recovery and cleanup
@@ -83,11 +84,15 @@ jobs:
           import json,os,pathlib
           p=pathlib.Path('managed-recovery.json')
           x=json.loads(p.read_text())
-          expected=16 if os.environ['MATRIX_MODE']=='governance_faults' else 14
+          expected=16 if os.environ['MATRIX_MODE']=='governance_faults' else 15 if os.environ['MATRIX_MODE']=='rollback' else 14
           assert x['passed']==expected and x['failed']==x['skipped']==0
           proof=x['proof']['managed_recovery']
           assert proof['approved_governance_resolved'] and proof['same_request_reexecution_refused']
           assert proof['actual_sdk_stats']['Stopped'] and proof['private_observations']>0
+          if expected==15:
+            assert proof['original_counts']['business']==0
+            assert proof['actual_sdk_stats']['RecoveryRollbackConfirmed']>0
+            assert proof['actual_sdk_stats']['RecoveryCommitConfirmed']==0
           if expected==16:
             assert len(x['proof']['governance_wire_faults'])==2
             assert x['proof']['governance_wire_proxy_cleanup']['threads_drained']

@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import json
 import unittest
-from managed_recovery_acceptance import fixture_manifest, physical_fingerprint, notice_key, safe_failure
+from managed_recovery_acceptance import fixture_manifest, physical_fingerprint, notice_key, safe_failure,terminal_expectation
 from routes import validate
 
 spec = importlib.util.spec_from_file_location('native_recheck', Path(__file__).with_name('ci-native-recheck.py'))
@@ -13,6 +13,12 @@ spec.loader.exec_module(subject)
 
 
 class NativeRecheckGuards(unittest.TestCase):
+    def test_terminal_evidence_keeps_abort_and_business_commit_distinct(self):
+        self.assertEqual(terminal_expectation('rollback'),dict(decision='rollback',final='rollback_confirmed',business=0,counter='RecoveryRollbackConfirmed'))
+        self.assertEqual(terminal_expectation('commit')['business'],1)
+        for value in ('unknown','prepared','',None):
+            with self.assertRaises(RuntimeError):terminal_expectation(value)
+
     def test_failure_summary_never_exports_raw_log_body_identity_or_credentials(self):
         with tempfile.TemporaryDirectory() as root:
             path=Path(root)/'owned.log'
