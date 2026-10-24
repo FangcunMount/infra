@@ -134,7 +134,10 @@ def main():
         report.update(schema='m3-five-actual-image-cutover/v1', scope='owned old-schema full restore training, original offline upgrades and actual seven-process C1/30-minute start; no production/system/business claim')
     f = FiveImageFixture(repo, report); run = f.run
     f.applications = {}; f.images = {}; f.private_dirs = {}
-    def case(name): report['cases'][name] = True
+    def case(name):
+        require(re.fullmatch('[a-z][a-z0-9_]{1,100}', name), 'fixed_case_identifier_required')
+        report['cases'][name] = True
+        print('M3_IMAGE_CASE ' + name, flush=True)
     try:
         report['infra_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=repo).stdout.strip()
         for name, sha in SOURCES.items():
