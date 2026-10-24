@@ -4,7 +4,7 @@
 
 | 子项 | 当前状态 | 完成证据 |
 | --- | --- | --- |
-| 镜像及维护二进制 | 准备中 | 五个原Dockerfile实际构建、源码SHA/模块/wheel身份、image config ID/归档摘要、UID及恢复工具排除清单 |
+| 镜像及维护二进制 | 修复后五候选构建/归档核验通过 | 五个原Dockerfile实际构建、源码SHA/模块/wheel身份、image config ID/归档摘要、UID及恢复工具排除清单 |
 | 配置、资源与执行包 | 待开始 | 实际所需M3 events/routes/owner绑定、禁自动DDL、封新写配置、ACL/TLS/资源摘要和原维护命令逐项绑定 |
 | 原范围恢复、启动与窗口 | 待开始 | 最终候选实际恢复/启动和切换演练，具名步骤及耗时证明30分钟目标；不能用进程sentinel代替实际runtime |
 
@@ -29,3 +29,9 @@ QS当前runtime镜像没有`qs-migrate-offline`。候选构建从同一固定源
 首次PR238旧源码dedbd391的旧SDK bfaae2b在共享消费预算测试等待received超时，29通过/1失败/0跳过，原声明清理通过。根因尚未确认，[原失败证据](evidence/rocketmq-m3-image-ci-first-failure-20261024.json)保留。已正式发布的1345266在T28两档同类完整故障各48项通过。通用Docker/public/fault/limits/resource CI默认引用同步1345266；所有用例、90秒等待、队列/并发和错误门禁保持原值，独立原生index生成fixture仍绑定其原版本。旧SDK可显式传SHA复现，不把新版本通过称为旧版本bug修复。新head全部门禁未通过前不合并辅助实现、不勾选T29。
 
 镜像inventory另记录实际构建工具的完整infra SHA，并要求等于workflow事件SHA；同时记录原Dockerfile摘要。构建、配置资源冻结、恢复/启动演练分别保留证据。
+
+## 首次构建与配置入口发现
+
+[40071645211](https://github.com/FangcunMount/infra/actions/runs/40071645211)五镜像的元数据与归档均核验通过；标准配置入口随后发现点号owner被Viper层级重建，IAM148修复已合并、QS440完整CI中。因此首次Go归档不能充当最终候选，需包含修复后重建。原生协议/存储测试直接构造配置，不替代这个文件入口证明。详见[当前候选证据](evidence/rocketmq-m3-candidate-progress-20261024.json)；真实启动、恢复与窗口演练仍未完成。
+
+[修复后候选40074229224](https://github.com/FangcunMount/infra/actions/runs/40074229224)五镜像全部通过，IAM148/QS440已合并且完整tree相同，详见[归档及源码证据](evidence/rocketmq-m3-repaired-image-candidates-20261024.json)。实际IAM组件PR241正在隔离CI，尚未完成T29。

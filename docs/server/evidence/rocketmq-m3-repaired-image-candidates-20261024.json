@@ -1,0 +1,261 @@
+{
+  "schema": "m3-repaired-candidates/v1",
+  "run_id": 40074229224,
+  "reports": [
+    {
+      "report_sha256": "4b1ffc52fb8cb99a75ae0ce998e4b081b4bc2afbb38ffc7b4e65f65e4bc14a95",
+      "inventory": {
+        "schema": "m3-final-image-inventory/v1",
+        "target": "ai",
+        "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "production": false,
+        "application_started": false,
+        "registry_published": false,
+        "runtime_ready": false,
+        "cutover_rehearsal_complete": false,
+        "dockerfile_sha256": "a228b397109b1627bee2c2cb66b3d33d3a2c7d4238a726c5b7e1a61503accf8a",
+        "engine_image_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "entrypoint": null,
+        "command": [
+          "/app/.venv/bin/python",
+          "-m",
+          "qs_ai.bootstrap.server"
+        ],
+        "image_user": "app",
+        "rootfs_member_count": 19004,
+        "deferred_tools_absent": true,
+        "runtime_sdk": {
+          "uid": 10001,
+          "version": "0.4.0",
+          "client": "5.1.2",
+          "source": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+        },
+        "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3",
+        "archive_bytes": 133782116,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "owned_container_absent": true,
+          "owned_image_tag_absent": true,
+          "existing_containers_unchanged": true
+        }
+      }
+    },
+    {
+      "report_sha256": "fd169fb8a382a5a8c1569f181d331b83290de0a23dd3e08333aa926d97cdd4aa",
+      "inventory": {
+        "schema": "m3-final-image-inventory/v1",
+        "target": "iam",
+        "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "production": false,
+        "application_started": false,
+        "registry_published": false,
+        "runtime_ready": false,
+        "cutover_rehearsal_complete": false,
+        "dockerfile_sha256": "f8385035ea2b03dd4a55a144557d2da2d069cdfe8493ab30fa1353c58531cb72",
+        "engine_image_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "entrypoint": [
+          "/app/apiserver"
+        ],
+        "command": [
+          "--config=/app/configs/apiserver.prod.yaml"
+        ],
+        "image_user": "www",
+        "rootfs_member_count": 2196,
+        "deferred_tools_absent": true,
+        "runtime_sdk": {
+          "version": "v0.5.0",
+          "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "replace": false
+        },
+        "runtime_binary_sha256": "0e611a043ca7ab2349ba3be797972d311c7a2463ff8fb83aa06235e9021827e6",
+        "verified_uid_gid": [
+          2000,
+          2000
+        ],
+        "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746",
+        "archive_bytes": 84817881,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "owned_container_absent": true,
+          "owned_image_tag_absent": true,
+          "existing_containers_unchanged": true
+        }
+      }
+    },
+    {
+      "report_sha256": "a1bd798014600a9c52f860bd3904a3817095261a336cbe9d3e2ee0a565e45fd7",
+      "inventory": {
+        "schema": "m3-final-image-inventory/v1",
+        "target": "qs-api",
+        "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "production": false,
+        "application_started": false,
+        "registry_published": false,
+        "runtime_ready": false,
+        "cutover_rehearsal_complete": false,
+        "dockerfile_sha256": "2acb1516b15186ac092c0118b7a1e662bddc87bb920770a802f13acc6c8f4e10",
+        "engine_image_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+        "entrypoint": [
+          "/app/qs-apiserver"
+        ],
+        "command": null,
+        "image_user": "www",
+        "rootfs_member_count": 1578,
+        "deferred_tools_absent": true,
+        "runtime_sdk": {
+          "version": "v0.5.0",
+          "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "replace": false
+        },
+        "runtime_binary_sha256": "5165bc385b7bb17c564f27f076bf68b2749897e069790fa163d12d1a3b32cda8",
+        "verified_uid_gid": [
+          2000,
+          2000
+        ],
+        "offline_tool_sha256": "94de163f78f1bac8cc323338b279c2bf1eb7f2a222a8c05977fce3c5e6ac6d47",
+        "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+        "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3",
+        "archive_bytes": 73317746,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "owned_container_absent": true,
+          "owned_image_tag_absent": true,
+          "existing_containers_unchanged": true
+        }
+      }
+    },
+    {
+      "report_sha256": "855b13e523780e481da2052974488f78a1bd5086a583db9c8193a56f4111324d",
+      "inventory": {
+        "schema": "m3-final-image-inventory/v1",
+        "target": "qs-collection",
+        "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "production": false,
+        "application_started": false,
+        "registry_published": false,
+        "runtime_ready": false,
+        "cutover_rehearsal_complete": false,
+        "dockerfile_sha256": "45fa166143345e510312cf145a1ab0954d0fe8e4918792dbac18429a40097f30",
+        "engine_image_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+        "entrypoint": [
+          "/app/collection-server"
+        ],
+        "command": null,
+        "image_user": "www",
+        "rootfs_member_count": 1574,
+        "deferred_tools_absent": true,
+        "runtime_sdk": {
+          "version": "v0.5.0",
+          "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "replace": false
+        },
+        "runtime_binary_sha256": "d12fd53ab824fa3fcd7d71caede7306a13cbfe3691d5a67460df75fa410632f6",
+        "verified_uid_gid": [
+          2000,
+          2000
+        ],
+        "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+        "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c",
+        "archive_bytes": 24920134,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "owned_container_absent": true,
+          "owned_image_tag_absent": true,
+          "existing_containers_unchanged": true
+        }
+      }
+    },
+    {
+      "report_sha256": "62d9a62f062485eb3944432cb53259d5587c24adae1de568f1c8a8d9d66e259b",
+      "inventory": {
+        "schema": "m3-final-image-inventory/v1",
+        "target": "qs-worker",
+        "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "production": false,
+        "application_started": false,
+        "registry_published": false,
+        "runtime_ready": false,
+        "cutover_rehearsal_complete": false,
+        "dockerfile_sha256": "57f3148d5950fdef2e35a2714239b1d8fab6e9327b0ee3fa995eba33cd269890",
+        "engine_image_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+        "entrypoint": [
+          "/app/qs-worker"
+        ],
+        "command": [
+          "--config=/app/configs/worker.prod.yaml"
+        ],
+        "image_user": "www",
+        "rootfs_member_count": 1531,
+        "deferred_tools_absent": true,
+        "runtime_sdk": {
+          "version": "v0.5.0",
+          "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "replace": false
+        },
+        "runtime_binary_sha256": "7d328997755faaf9ca1c63c85c7bab19244a494815875b789931ac8b8878549e",
+        "verified_uid_gid": [
+          2000,
+          2000
+        ],
+        "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+        "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc",
+        "archive_bytes": 20624873,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "owned_container_absent": true,
+          "owned_image_tag_absent": true,
+          "existing_containers_unchanged": true
+        }
+      }
+    }
+  ],
+  "runtime_started": false,
+  "t29_complete": false,
+  "host_repairs": {
+    "iam": {
+      "pull_request": 148,
+      "merge_sha": "3200e06e3a8f8f621d4fb70ba04357d300680973",
+      "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "checks_succeeded": 8,
+      "candidate_and_merge_tree": "70f5b25959cc22d1171c30cd3f75d1b44d3a87ef"
+    },
+    "qs": {
+      "pull_request": 440,
+      "merge_sha": "dd88277829048081b697b92162693a9e32946026",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "checks_succeeded": 28,
+      "conditional_api_sync_not_applicable": true,
+      "candidate_and_merge_tree": "3edd65a9358e8d865ba54d625a9a7972c3f31f81"
+    }
+  },
+  "iam_actual_image_component": {
+    "pull_request": 241,
+    "head": "5a9662e99b675dd7c4a63e24a097b9e8b1652260",
+    "run_id": 40074810737,
+    "status": "running_not_yet_audited",
+    "complete": false
+  },
+  "production_executed": false
+}
