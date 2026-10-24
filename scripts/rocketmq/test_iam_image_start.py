@@ -4,10 +4,18 @@ import tempfile
 import unittest
 
 from final_image_candidate import GO_SUM
-from iam_image_start import IAM_SHA, configuration, inventory, protocol_metrics, fixture_diagnostic, source_failure_markers
+from iam_image_start import IAM_SHA, configuration, inventory, protocol_metrics, fixture_diagnostic, source_failure_markers, iam_resources
 
 
 class ImageStartContractTest(unittest.TestCase):
+    def test_component_keeps_exact_iam_grants_without_other_owner_resources(self):
+        import json
+        source=json.loads((Path(__file__).resolve().parents[2]/'components/rocketmq/serverd-routes-m3-v2.json').read_text())
+        owned=iam_resources(source)
+        self.assertEqual(set(owned['accounts']),{'m3-iam'})
+        self.assertEqual({r['id'] for r in owned['routes']},{'iam-authz-iam','iam-sms'})
+        self.assertEqual(owned['accounts']['m3-iam'],source['accounts']['m3-iam'])
+        self.assertGreater(len(source['routes']),len(owned['routes']))
     def test_startup_marker_only_exports_authored_source_identity(self):
         with tempfile.TemporaryDirectory() as root:
             source=Path(root);folder=source/'internal/apiserver';folder.mkdir(parents=True)
@@ -44,6 +52,7 @@ class ImageStartContractTest(unittest.TestCase):
         self.assertFalse(new['messaging']['publish_enabled'])
         self.assertFalse(new['events']['reliable_messaging']['enabled'])
         self.assertFalse(new['nsq']['enabled'])
+        self.assertEqual(new['sms']['provider'],'mq')
         self.assertEqual(set(new['messaging']['transactions']),{'iam.mysql'})
         self.assertEqual(new['messaging']['instance_id'],'iam-primary-1')
         self.assertEqual(new['events']['catalog_path'],'/app/configs/events-m3.yaml')

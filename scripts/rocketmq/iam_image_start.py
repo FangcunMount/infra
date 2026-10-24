@@ -52,7 +52,9 @@ def configuration(base, database, password, *, transaction):
     c['redis']['cache'].update(host='redis', port=6379, username='', password='')
     c['seed_mock_auth']['enabled'] = False
     c['idp']['encryption-key'] = secrets.token_hex(16)
-    c['sms'] = {'provider': 'log'}
+    # Keep release validation and original OTP budgets. No OTP is invoked in
+    # this component; the supported MQ adapter needs no external SMS keys.
+    c['sms']['provider'] = 'mq'
     c['insecure'].update({'bind-address': '0.0.0.0', 'bind-port': 9080})
     c['grpc']['mtls'].update({'cert-file': '/fixture/server.crt', 'key-file': '/fixture/server.key',
                              'ca-file': '/fixture/server.crt'})
@@ -68,6 +70,16 @@ def configuration(base, database, password, *, transaction):
     if transaction:
         c['messaging']['transactions'] = {'iam.mysql': dict(store_id='isolated-iam-primary', writer_epoch='m3-1', route_revision='m3-1')}
     return c
+
+
+def iam_resources(document):
+    value=copy.deepcopy(document)
+    grants=value['accounts']['m3-iam']
+    selected=set(grants['publish']+grants['subscriptions'])
+    value['routes']=[r for r in value['routes'] if r['id'] in selected]
+    value['accounts']={'m3-iam':grants}
+    require({r['id'] for r in value['routes']}==selected,'exact_iam_resource_subset_required')
+    return value
 
 
 def protocol_metrics(raw):
@@ -226,8 +238,9 @@ def main():
         run(['openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1','-subj','/CN=iam-apiserver','-addext','subjectAltName=DNS:iam-apiserver,IP:127.0.0.1',
              '-keyout',str(fixture/'server.key'),'-out',str(fixture/'server.crt')])
         doc=manifest(repo); principal=dict(username='iam-'+secrets.token_hex(8),password=secrets.token_hex(32))
-        # Full fixed manifest but only its exact IAM account; no temporary broad grants.
-        owned=copy.deepcopy(doc);owned['accounts']={'m3-iam':owned['accounts']['m3-iam']}
+        # Provision the exact IAM resources/grants of the fixed manifest. The
+        # complete four-owner resource matrix remains a separate required gate.
+        owned=iam_resources(doc)
         provision(project+'-broker-1',owned,{'m3-iam':principal})
         write_private(fixture/'credentials.json',principal);write_private(fixture/'routes.json',doc)
         import yaml
