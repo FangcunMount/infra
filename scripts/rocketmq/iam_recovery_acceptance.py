@@ -53,7 +53,7 @@ class IAMHost:
         run(['go','test','-race','-tags=integration,m3_iam_runtime','-c','-o',str(binary),'./internal/pkg/migration'],cwd=source,env=env,timeout=300)
         env.update(IAM_M3_FIXTURE_PROJECT=project,IAM_M3_TEST_MYSQL_DSN=f'root:{password}@tcp(127.0.0.1:{mysql_port})/mysql?parseTime=true&multiStatements=true',
             IAM_M3_BROKER_CONFIG=str(config),IAM_M3_NATIVE_RECOVERY_DIRECTORY=str(control))
-        self.probe=common.Probe([str(binary),'-test.v','-test.timeout=6m','-test.run=^TestM3ActualOwnerNativeRecovery$'],directory,env,cwd=source)
+        self.probe=common.Probe([str(binary),'-test.v','-test.timeout=6m','-test.run=^TestM3ActualOwnerNativeRecovery$'],directory,env,cwd=source/'internal/pkg/migration')
         probes.append(self.probe)
         proof['iam_original_host']=dict(source_sha=source_sha,sdk_version=module['Version'],sdk_sum=module['Sum'],binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),
             whole_api=False,sigkill=False,system_acceptance=False)
@@ -73,6 +73,8 @@ class IAMHost:
     def signal(self,name):write_private(self.control/name,dict(continue_owned_fixture=True))
 
     def failure(self):
+        if self.probe.process.poll() is not None:self.probe.reader.join(timeout=2)
+        self.probe.log.flush()
         raw=Path(self.probe.log.name).read_text(errors='replace')
         self.proof['iam_host_failure']=dict(exit_code=self.probe.process.poll(),output_sha256=hashlib.sha256(raw.encode()).hexdigest(),
             race_reports=raw.count('WARNING: DATA RACE'),assertion_lines=sorted(set(map(int,re.findall(r'transaction_recovery_native_integration_test.go:(\d+)',raw))))[:32])
