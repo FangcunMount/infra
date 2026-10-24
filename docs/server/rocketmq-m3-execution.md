@@ -2047,3 +2047,10 @@ QS441当前b75d4a52在28项检查成功、1项条件文档/API同步N/A后正常
 [40094707933](https://github.com/FangcunMount/infra/actions/runs/40094707933)固定23e2f72、原五镜像及b75d4a52：15/0/0，七进程全部Exit0，无OOM，MySQL/Mongo运行期DDL均0、审计正控4、声明清理4项与源码未变更全部通过。[报告](evidence/rocketmq-m3-seven-process-diagnostic-followup-20261024.json)保留私有原日志hash与无正文终止诊断；没有观察到worker fatal/panic，不据此宣称原40093244038 Exit2根因已修复。
 
 源71927ecc在独立trial补足原Worker完成启动日志＋原HTTP/Redis健康就绪，保持原150秒预算；三个原worker各3轮顺序有界启停（最多3个worker槽，原并发48与CPU/内存不变）。329项纯测试通过，实际40095705485尚在执行；新v3回执要求九次Exit0及完整七进程/DDL/清理通过，旧v2不冒充该回执。完整C1将消费独立v3成功回执，仅启动每角色一次。infra253原8e7ea12完整通用/六档成对CI通过，新trial尚未合入或验收。M3仍**28/36**、T29未勾选，生产/system/48小时未执行。
+
+
+### 2026-10-24：新增worker准备阶段检查被WARN日志过滤；夹具已修正，复验中
+
+40095705485实际10/1/0，worker1持续running、无OOM/fatal，但150秒准备检查未满足，九次启停及DDL审计尚未达到。[原报告](evidence/rocketmq-m3-worker-readiness-fixture-failure-20261024.json)保留，声明清理与源码未改均通过。已核对原`configs/worker.prod.yaml`的`log.level=warn`与`process/lifecycle.go`的INFO完成启动日志；新增检查依赖了被原生产过滤器关闭的日志，这是本次验收夹具错误，不归因于业务卡死或SDK。
+
+独立trial08821c6仅将隔离worker日志级别改INFO以观察原完成启动点；原生产模板、worker并发48、CPU/内存/连接池及150秒预算不变。6项定向纯契约通过，40096686662复验中；没有把失败标成通过，也不据此解释此前Exit2。完整C1/30分钟尚未执行，M3仍**28/36**、T29未勾选，生产未操作。

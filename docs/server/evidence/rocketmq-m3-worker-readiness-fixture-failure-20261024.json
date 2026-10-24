@@ -1,0 +1,366 @@
+{
+  "schema": "m3-worker-readiness-fixture-failure/v1",
+  "run_id": 40095705485,
+  "report_sha256": "30f7ccdad985142025d7f6fead43ee6c8e5046dc72d978967c9920831a26b840",
+  "report": {
+    "schema": "m3-five-actual-image-startup-trial/v3",
+    "passed": 10,
+    "failed": 1,
+    "skipped": 0,
+    "production": false,
+    "system_acceptance": false,
+    "combined_cutover_rehearsal_complete": false,
+    "c1_cutover_barrier_exercised": false,
+    "cases": {
+      "actual_source_registry_consumers_match_manifest": true,
+      "all_five_exact_archives_loaded": true,
+      "original_current_qs_pair_prepared": true,
+      "original_qs_dual_binding_verified": true,
+      "original_iam_schema45_and_binding_selected": true,
+      "original_ai_schema43_and_binding_verified": true,
+      "actual_iam_ready_and_paused_checker_live": true,
+      "actual_readonly_ai_ready_and_paused_checker_live": true,
+      "actual_qs_api_with_iam_ai_and_both_paused_owners": true,
+      "actual_collection_with_required_iam_and_api": true
+    },
+    "sources": {
+      "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "qs": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+    },
+    "scope": "actual processes, required IAM/AI and closed SDK owners; completed worker startup phase, HTTP/Redis and catalog consistency; no business or per-worker delivery proof",
+    "infra_sha": "71927ecc7448d93f7ba0a912f9a26df8a6d87f0f",
+    "original_qs_consumer_count": 1,
+    "original_qs_consumer_contract": {
+      "consumers": [
+        {
+          "id": "modelcatalog.hot_rank_projection",
+          "runtime": "apiserver",
+          "event_type": "answersheet.submitted",
+          "topic": "qs.evaluation.lifecycle",
+          "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+          "delivery": "durable_outbox",
+          "outbox_profile": "mongo_domain_events"
+        }
+      ],
+      "schema": "qs-original-consumer-contract/v1",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "original_qs_consumer_contract_sha256": "f65853c2aee20108a26d53c7e65d4234a5d66235df4440355a48e1d90f883a4a",
+    "candidates": {
+      "iam": {
+        "target": "iam",
+        "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+      },
+      "qs-api": {
+        "target": "qs-api",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:c1c1093a411dba90bb47ad7dabe8dc50b21a0fed633efef4cb94eeae909886c4",
+        "archive_sha256": "3c2aefb67ea9f50b7acea8d232a05d7ba0296173e75ecf2ebeb3b52bf2dab71b"
+      },
+      "qs-collection": {
+        "target": "qs-collection",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:07e13f2fcd1bd59cdc14a81e0334c73a8b5b7939d235b056254378f939af37ce",
+        "archive_sha256": "a3140df0c4ba98fbefd82f6da06ef4f4cb4867e0eb63fd37cfa91b9ca6cc77cb"
+      },
+      "qs-worker": {
+        "target": "qs-worker",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:98b5b635aa72cae96899a5289dea4aa038bcd25ba1eeebe9f944682f4e3a0d98",
+        "archive_sha256": "907abca7e5b2b410ab4383bead344d2c08d01fac9e0e7ba54fbf00b4eee21b25"
+      },
+      "ai": {
+        "target": "ai",
+        "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+      }
+    },
+    "dependency_image_ids": {
+      "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "rocketmq": "sha256:8026d2b53f45f068ee129ec89af745acf3bb32cd8d6fcc852139bd0eeee38f38",
+      "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+    },
+    "resources": {
+      "version": 2,
+      "operations": 53,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true
+    },
+    "qs_schema": {
+      "journal_force_used": false,
+      "mongo": 44,
+      "mysql": 110,
+      "original_templates_applied": true,
+      "production": false,
+      "profile": "current",
+      "resources_sha256": "42eaf899667ee3347abcf4e6767fb68ac45f2b597b586344e6a0f87cc498020b",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "iam_controlled_seed": {
+      "controlled_seed": true,
+      "legacy_drain_claimed": false,
+      "publication_intents_created": false,
+      "schema_version": 41,
+      "seed_events_retained": 2,
+      "witnesses_created": false
+    },
+    "configuration_sha256": {
+      "iam": "48f01ccfc3d6c80778dc89625f92c9d1eecb0fa283ef1e92bf784ba048a4edc7",
+      "api": "916a188786372dd33b7950603e049d4d977601e0f7578797995f7854a89cb74e",
+      "collection": "bf8d4afc9f693c38083f7ba22c7d830a22e38493d09dcccbb17463d322894abe",
+      "worker": "b78f8604f24c0fcdb6ceb9f42c4fe8abf5b47d819eb7190dee4a184b0398d5a6"
+    },
+    "runtime_environment_sha256": {
+      "iam": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ai": "0fd777eddc43c1c418d3e4a037f1b42b21cff79a12e5813ee6e22196a0ede568",
+      "api": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collection": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "worker1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "actual_runtime_budgets": {
+      "iam": {
+        "memory_bytes": 536870912,
+        "nano_cpus": 1000000000
+      },
+      "ai": {
+        "memory_bytes": 805306368,
+        "nano_cpus": 750000000
+      },
+      "api": {
+        "memory_bytes": 1073741824,
+        "nano_cpus": 2000000000
+      },
+      "collection": {
+        "memory_bytes": 335544320,
+        "nano_cpus": 1000000000
+      },
+      "worker1": {
+        "memory_bytes": 805306368,
+        "nano_cpus": 1000000000
+      }
+    },
+    "iam_metrics": {
+      "sdk_ready": 1,
+      "sampler_running": 1,
+      "observation_available": 1,
+      "admission_open": 0,
+      "check_workers_limit": 4,
+      "check_queue_limit": 32
+    },
+    "ai_metrics": {
+      "sdk_ready": 1,
+      "sampler_running": 1,
+      "observation_available": 1,
+      "admission_open": 0,
+      "check_workers_limit": 1,
+      "check_queue_limit": 16
+    },
+    "qs_metrics": {
+      "qs.mysql": {
+        "sdk_ready": 1,
+        "sampler_running": 1,
+        "observation_available": 1,
+        "admission_open": 0,
+        "check_workers_limit": 2,
+        "check_queue_limit": 16
+      },
+      "qs.mongo": {
+        "sdk_ready": 1,
+        "sampler_running": 1,
+        "observation_available": 1,
+        "admission_open": 0,
+        "check_workers_limit": 2,
+        "check_queue_limit": 16
+      }
+    },
+    "failure_stage": "actual_three_workers_start",
+    "failure_kind": "RuntimeError",
+    "failure_reason": "actual_worker1_ready_budget_exceeded",
+    "processes": {
+      "iam": {
+        "private_log_sha256": "e5aed1ee95468c7d3bcb3aede4288bb6d4595e4b405896b99571667a48846d39",
+        "state": {
+          "Status": "running",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": false,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      },
+      "ai": {
+        "private_log_sha256": "4e39da403114330704dfa311db436554f6fe535050e3d1ee8ea6cd6f125c6a53",
+        "state": {
+          "Status": "running",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": false,
+          "invalid_configuration": false,
+          "panic": false
+        }
+      },
+      "api": {
+        "private_log_sha256": "e95e602ba22164926550f3d276d97554ef1de8ce99ff112877f9343c9e86e1f9",
+        "state": {
+          "Status": "running",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": true,
+          "permission_denied": true,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": false,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      },
+      "collection": {
+        "private_log_sha256": "ef44af7b878ac81a6788c2b5de6dedbea7f276a26cb80fc8e03c24b3a9721e71",
+        "state": {
+          "Status": "running",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": true,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": false,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": false,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      },
+      "worker1": {
+        "private_log_sha256": "a9e8300dbc8899f2c54ccef2ee18f9fcc4beb9dadb38920a8c7cee48734cf015",
+        "state": {
+          "Status": "running",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": false,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    },
+    "sources_unchanged": true
+  },
+  "cause": "Owned readiness fixture required INFO completed-startup marker while inheriting production WARN log filter. Worker remained running; nine restart checks and runtime DDL audit not reached.",
+  "fix_source": "08821c6",
+  "fix_scope": "CI configuration alone enables INFO for original startup marker; product configuration/resources/deadline unchanged.",
+  "targeted_pure_tests": 6,
+  "retry_run_id": 40096686662,
+  "retry_verified": false,
+  "production": false
+}
