@@ -1986,11 +1986,11 @@ PR245固定e67f2eb经10项检查全成功后正常合并e73fe4aa，5个变更文
 
 | T29分项（不增加36项任务数） | 当前状态 |
 | --- | --- |
-| 五种实际原Dockerfile与正式SDK归档身份 | ✅ 已合并 |
+| 五种实际原Dockerfile与正式SDK归档身份 | 原候选已核验/合并；IAM/AI复用，新QS三镜像重建中 |
 | IAM原范围恢复与实际镜像生命周期 | ✅ 8/8及关联完整CI，已合并 |
 | AI完整范围恢复与实际只读镜像生命周期 | ✅ 9/9及关联完整CI，已合并 |
-| QS两组原schema、完整双库恢复、原双owner绑定 | ✅ 9/9及关联完整CI，已合并 |
-| 五镜像/七进程、真实IAM/AI、三个原48并发worker | 进行中，候选定向复验 |
+| QS两组原schema、完整双库恢复、原双owner绑定 | 原110/43的9/9及CI已合并；新110/44待复验 |
+| 五镜像/七进程、真实IAM/AI、三个原48并发worker | 原14/15已定位DDL；QS修复后需完整复验 |
 | 最终配置/资源/执行包、完整C1及30分钟 | 待完成 |
 
 M3仍28/36，T29未勾选。生产实际105、具名执行清单/批准、合法system及48小时观察未执行。
@@ -2012,3 +2012,13 @@ M3维持**28/36**，T29未勾选；最终配置/资源包、完整C1与30分钟�
 独立候选新增实际镜像C1组合入口：引用真实独立启动报告；原IAM41、QS105/40、AI0040非空受控事实做三MySQL/整Mongo保护与完整恢复，窗口前训练不复用已启动的协调器。原离线CLI在同一C1内升级/绑定，五镜像经回环私有临时registry核验manifest/config，原runtime_start执行七进程启动，屏障后禁止旧恢复/离线维护。正式生产执行包只保留原9工具，其本地import闭包未引入高级恢复或CI夹具。代码和319纯测试不代替完整原生C1/30分钟通过；该组合仍未原生验收。
 
 M3 **28/36**、T29进行中，M4 0/8；未执行生产资源/schema/provider切换。
+
+### 2026-10-24：T29实际DDL定位，修复共享Survey装配并显式安装索引
+
+七进程40089532397在f16ca20仍14/1/0；原IAM、AI、QS API、Collection和三个worker全部退出0、无OOM，MySQL0 DDL；受控Mongo审计精确记录answersheets.createIndexes1，前后正向控制4条完整。不得把它当profile初始化噪声。原报告与摘要追加到[审计证据](evidence/rocketmq-m3-mongo-ddl-audit-20261024.json)，之前失败/通过记录未改写。
+
+真实composition root在EnsureSurveyRuntimeInfra先调用旧NewRepository，才绑定Mongo事务owner；因此SDK/单模块无DDL测试未覆盖此实际入口。QS [PR441](https://github.com/FangcunMount/qs-server/pull/441)候选d6fdc2bc、源码6a1a001a：先验证原owner，再以BorrowInstalledSchema选择原无DDL构造器，非事务旧路径保留。Mongo44显式安装原writer/idempotency-key唯一部分索引，不删除约束、不重写旧迁移、不自动修复重复数据。新候选完整目标110/44，SQL105独立前置不变。原生M3 schema门禁新增实际索引、同writer/key拒绝、跨writer/无key兼容验证。
+
+本地目标及完整survey/migration race、root编译、integration仅编译、88文档测试及事实/卫生检查通过；最初文档inventory/closure旧43拒绝保留并按新实际资源44、已提交源6a1a001a重绑定，历史原生/生产归属不变。源CI运行中，生产CD暂停true已再次回读。infra835cf76同步新SHA/11044与实际Go注册表向量，320项纯工具及actionlint通过；支持仅重建QS三镜像、继续引用原IAM/AI归档。
+
+当前T29子门禁口径：原IAM8/AI9保持有效；原QS110/43双库9项仅保留历史，新110/44双库/镜像需复验。原七进程14/15不作为新源码通过。最终包/C1/30分钟仍待完成，M3维持**28/36**，未执行生产/schema/provider切换。
