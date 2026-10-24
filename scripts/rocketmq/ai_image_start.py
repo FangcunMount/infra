@@ -75,7 +75,18 @@ def main():
             HOME='/tmp',GRPC_DEFAULT_SSL_ROOTS_FILE_PATH='/fixture/mq-ca.crt')
         fixture.stage='original_alembic40'
         fixture.once(PYTHON,['-m','alembic','upgrade',OLD_HEAD],environment=base_env)
-        fixture.sql(f"CREATE TABLE `{database}`.fixture_retained_state(id INT PRIMARY KEY,value BINARY(32) NOT NULL); INSERT INTO `{database}`.fixture_retained_state VALUES(1,UNHEX(SHA2('owned controlled state',256)));")
+        # Use the existing native schema fixture's held old record, with real
+        # hashes. No extra table may bypass the host's exact-layout validator.
+        fixture.sql(f"""INSERT INTO `{database}`.messaging_outbox
+            (producer,destination,message_id,body_sha256,body,wire,wire_sha256,
+             topic,kind,organization_id,aggregate_key,aggregate_sequence,ordered,
+             requires_receipt,stage,attempts,available_at,created_at,error_code)
+            VALUES('qs-ai','qs-server','fixture-held',SHA2(0x00ff03,256),0x00ff03,0x00ff04,
+             SHA2(0x00ff04,256),'old.fixture',1,7,'fixture-held',1,0,1,'held',7,
+             UTC_TIMESTAMP(6),UTC_TIMESTAMP(6),'controlled')""")
+        def old_record():
+            return fixture.sql(f"SELECT SHA2(CONCAT_WS('|',stage,attempts,error_code,HEX(body),HEX(wire),body_sha256,wire_sha256),256) FROM `{database}`.messaging_outbox WHERE message_id='fixture-held';")
+        old_digest=old_record();require(re.fullmatch('[0-9a-f]{64}',old_digest),'retained_held_record_required')
         old=fixture.sql(f'SELECT version_num FROM `{database}`.alembic_version;')
         case('original_alembic40_and_nonempty_controlled_fact',old==OLD_HEAD)
         fixture.stage='actual_full_scope_restore'
@@ -137,6 +148,7 @@ def main():
         ddl=fixture.sql("SELECT COUNT(*) FROM mysql.general_log WHERE user_host LIKE 'ai_runtime%' AND command_type='Query' AND UPPER(argument) REGEXP '^[[:space:]]*(CREATE|ALTER|DROP|TRUNCATE|RENAME)[[:space:]]';")
         report['runtime_ddl_attempts']=int(ddl)
         case('actual_ai_start_and_shutdown_without_ddl_attempt',ddl=='0' and fixture.sql(f'SELECT version_num FROM `{database}`.alembic_version;')==HEAD)
+        case('held_old_identity_wire_attempt_and_state_unchanged',old_record()==old_digest)
     except Exception as error:
         report['failed']=1;report['failure_stage']=fixture.stage;report['failure_kind']=type(error).__name__
         if str(error) in {'actual_ai_process_exited','actual_ai_ready_budget_exceeded'}:report['failure_reason']=str(error)

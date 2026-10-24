@@ -241,8 +241,8 @@ jobs:
           python3 - <<'PYREPORT'
           import json
           x=json.load(open('ai-image-start.json'))
-          assert x['passed']==8 and x['failed']==x['skipped']==0
-          assert len(x['cases'])==8 and all(x['cases'].values()) and all(x['cleanup'].values())
+          assert x['passed']==9 and x['failed']==x['skipped']==0
+          assert len(x['cases'])==9 and all(x['cases'].values()) and all(x['cleanup'].values())
           assert x['source_unchanged'] and x['runtime_ddl_attempts']==0
           assert not x['production'] and not x['system_acceptance'] and not x['combined_cutover_rehearsal_complete']
           PYREPORT
