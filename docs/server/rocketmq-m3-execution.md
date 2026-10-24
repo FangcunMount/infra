@@ -33,7 +33,7 @@ T25-D 按新首发范围冻结候选并组合验证原 NSQ 排空、未来计划
 - 源码/制品：Go v0.5.0、Python 0.4.0已按同一SDK源码1345266固定发布；三库稳定依赖已合并，T29辅助infra253已合并1465a129。此前预发布及T24保护证据保留为历史。生产部署/DDL/Topic/ACL/provider切换、Mac mini生产规则加载、合法system与48小时观察仍未执行。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 2026-10-25最新：原SSH已恢复并完成只读回读。IAM40工具修复PR149已合并、8项CI及三档真实MySQL通过；候选IAM需重建并补实际起点/版本/副本演练。serverD自身Tailnet NeedsLogin、Broker停止、worker监控缺失及管理员凭据更换仍待具名处理；不因MacBook重新登录而签成生产网络已恢复。
+- 2026-10-25最新：原SSH已恢复并完成只读回读。IAM40工具修复PR149已合并、8项CI及三档真实MySQL通过；候选IAM需重建并补实际起点/版本/副本演练。serverD原Tailnet已按批准恢复、三个worker监控已回读up；B/C重新认证处理中。Broker停止及管理员凭据更换仍待具名处理；不因MacBook重新登录而签成生产网络已恢复。
 - 当前批次：**T01–T28已完成，T29最终候选进行中**。固定五镜像；当前QS110/44双库9/9；七进程v3的15/15与三worker九次启停/零DDL已过；40103917422完整实际组合C1为18/18（受控原范围恢复、原维护、七进程屏障、正常退出和零运行期DDL），四owner Checker继续且准入关闭。676fabed最终辅助实现17检查/691报告项通过，PR253已合并1465a129。最终生产配置及执行包已取得本次只读快照，发现IAM40、Mongo7.0.31、Broker停止及监控缺口，正在补齐实际起点与候选；源审阅包仍非生产执行包。M3仍28/36，T29、105实际前置、具名生产清单、生产切换/system/48小时未完成。
 
 
@@ -2165,3 +2165,10 @@ IAM维护入口原拒绝40，独立工作区`iam-production-baseline`/PR149 ca59
 只读续查确认serverD自身Tailscale同样为`NeedsLogin`、Online=false，控制平面连接被重置、无peer状态；Mac mini固定发现入口100.118.164.39的SSH超时与此一致。已恢复的是MacBook连接，不能据此推定serverD已恢复。该私网恢复需要单独具名操作/合法重新认证，尚未执行，不改公网或监控白名单来绕过。
 
 serverD原Tailnet恢复的具体目标、命令、原网络设置、超时和地址变更停止条件已写入最终候选页，准备独立确认。其批准仅覆盖主机合法重新认证，不代替Broker/凭据/M3切换批准；未执行网络变更。
+
+
+### 2026-10-25：按独立批准恢复serverD原Tailnet；B/C扩展申请
+
+用户明确批准infra262具名清单中的serverD重新认证，并通过网页完成合法登录。初始有界login命令返回1，未据此宣称成功；新边界实际回读Running/Online、原100.118.164.39/IPv6地址保持、health为空。原prefs除身份Persist外全部字段一致；业务容器ID、镜像、启动时间、状态、重启数均未变化。Mac mini原受限SSH发现命令返回3个worker，Prometheus三个worker target均up/无lastError；未手工改发现配置或reload。[恢复回执](evidence/rocketmq-m3-serverd-tailnet-recovery-20261025.json)不包含一次性认证链接/凭据。Broker仍停止、管理员凭据尚未更换，未进行MQ/DB/业务切换。
+
+用户追加要求serverB/serverC也重新登录，已只读确认各自NeedsLogin及原设置，再逐主机按原prefs摘要守卫发起对应合法认证，等待网页完成；未替换其原DNS/route/SSH/firewall设置或业务服务。原私网地址须回读保持B100.91.31.24/C100.70.252.103，若变化停止而非改写配置。M3仍28/36，网络恢复分别记录，不勾选T29/T30。

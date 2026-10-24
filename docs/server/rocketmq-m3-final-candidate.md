@@ -146,9 +146,9 @@ IAM [PR149](https://github.com/FangcunMount/iam/pull/149)仅补离线工具40起
 只读续查确认serverD自身Tailscale同样为`NeedsLogin`、Online=false，控制平面连接被重置、无peer状态；Mac mini固定发现入口100.118.164.39的SSH超时与此一致。已恢复的是MacBook连接，不能据此推定serverD已恢复。该私网恢复需要单独具名操作/合法重新认证，尚未执行，不改公网或监控白名单来绕过。
 
 
-### 待独立确认：仅恢复serverD原Tailnet登录
+### 原具名清单：仅恢复serverD原Tailnet登录（已获批准，执行结果见下）
 
-本清单已准备，**未批准/未执行**。生产只读授权不包含网络状态变更。目标为serverD（82.157.204.239），经Mac mini固定跳板、现有SSH key，以root调用原已安装Tailscale1.104.2；不安装或重启任何服务。原偏好为CorpDNS=false、RouteAll=false、RunSSH=false、NetfilterMode=2（on）、ShieldsUp=false、NoSNAT=false，无advertise routes/exit node；原私有prefs摘要记录在回执中。数字2对on的映射以[该固定版本源码](https://github.com/tailscale/tailscale/blob/v1.104.2/types/preftype/netfiltermode.go)核对，命令flags已用目标机`login --help`只读核对。
+本清单已由用户独立批准；原生产只读授权本身不包含网络状态变更。执行结果另列，不改写原只读快照。目标为serverD（82.157.204.239），经Mac mini固定跳板、现有SSH key，以root调用原已安装Tailscale1.104.2；不安装或重启任何服务。原偏好为CorpDNS=false、RouteAll=false、RunSSH=false、NetfilterMode=2（on）、ShieldsUp=false、NoSNAT=false，无advertise routes/exit node；原私有prefs摘要记录在回执中。数字2对on的映射以[该固定版本源码](https://github.com/tailscale/tailscale/blob/v1.104.2/types/preftype/netfiltermode.go)核对，命令flags已用目标机`login --help`只读核对。
 
 批准后先再次比较原偏好和状态；若不符，停止并重新冻结。使用现有控制面和以下显式设置发起合法网页认证（不使用聊天提供的密码/auth key，不删除旧状态）：
 
@@ -162,3 +162,5 @@ tailscale login --login-server=https://controlplane.tailscale.com --hostname=ser
 登录链接仅用于用户正常完成现有Tailnet认证。超时/认证失败保留原状态和错误类别，不循环重试、切换控制面、重置状态或改公网白名单。成功后只读回读Running/Online、原100.118.164.39地址、原偏好、原3worker容器/锁及Mac mini固定发现SSH/Prometheus targets；地址或身份变化时停止，不自动改配置/ACL/防火墙。控制面/ACL配置本次不变；认证可能按Tailnet既有策略分配节点身份，不能事先保证原地址保持。
 
 此次恢复清单仅涵盖主机重新认证和回读。Broker启动、管理员凭据更换、v2 Topic/ACL、数据库迁移及M3业务切换仍按各自具名清单处理；该步骤成功不等于T29/T30完成。
+
+2026-10-25执行结果：用户网页认证后，serverD实际Running/Online且原IP、全部非身份prefs保持；原业务容器/锁不变，Mac mini三个worker发现/抓取全部恢复。仅执行了获准的主机重新认证，Broker仍停止，凭据更换及M3资源/业务切换未执行。用户随后追加B/C同样恢复，逐机发起认证并等待实际地址/设置/容器回读，不扩大本次M3批准范围。
