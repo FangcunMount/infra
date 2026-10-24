@@ -21,7 +21,7 @@ from provision_v2 import provision
 from qs_image_pair import QSPairFixture, QS_SHA
 from qs_runtime_configuration import configuration as qs_configuration
 from qs_consumer_contract import parse_contract, validate_manifest
-from mongo_ddl_audit import install as install_mongo_audit, read as read_mongo_audit
+from mongo_ddl_audit import AuditError, install as install_mongo_audit, read as read_mongo_audit
 
 IAM_SHA = '954ad9dee2f71a51151b696ec05d5cb90cc65b50'
 SOURCES = dict(iam=IAM_SHA, qs=QS_SHA, ai=AI_SHA)
@@ -283,6 +283,7 @@ def main():
             case('original_qs_dual_binding_verified')
             case('original_ai_schema43_and_binding_verified')
             case('original_offline_upgrades_inside_single_c1')
+        f.stage = 'mongo_runtime_ddl_audit_install'
         install_mongo_audit(f.mongo, qs_db)
         f.stage = 'actual_iam_with_mtls_start'; f.start('iam', alias='iam-apiserver', memory='512m', cpus='1')
         f.ready('iam', 9080, '/healthz'); report['iam_metrics'] = f.ready('iam', 9080, '/metrics', protocol_metrics); case('actual_iam_ready_and_paused_checker_live')
@@ -318,6 +319,7 @@ def main():
         if cutover: report['combined_cutover_rehearsal_complete'] = True
     except Exception as error:
         report.update(failed=1, failure_stage=f.stage, failure_kind=type(error).__name__)
+        if isinstance(error, AuditError): report['mongo_audit_failure'] = error.audit_diagnostic
         if re.fullmatch(r'[a-z][a-z0-9_]{1,100}', str(error)): report['failure_reason'] = str(error)
         report['processes'] = {}
         for component in f.applications:

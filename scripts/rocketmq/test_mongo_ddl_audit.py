@@ -1,8 +1,9 @@
 import copy
 import json
+import subprocess
 import unittest
 
-from mongo_ddl_audit import CONTROL, FILTER, install, read
+from mongo_ddl_audit import AuditError, CONTROL, FILTER, execute, install, read
 
 
 class MongoDDLAuditTest(unittest.TestCase):
@@ -34,10 +35,27 @@ class MongoDDLAuditTest(unittest.TestCase):
 
     def test_setup_requires_owned_database_and_precreates_capped_profile(self):
         calls = []
-        install(calls.append, 'qs_m3_image_start_aabbccddeeff')
+        def installed(program):
+            calls.append(program)
+            return '{"installed":true}'
+        install(installed, 'qs_m3_image_start_aabbccddeeff')
         self.assertLess(calls[0].index('createCollection("system.profile"'), calls[0].index('setProfilingLevel'))
         with self.assertRaises(RuntimeError): install(calls.append, 'production')
         with self.assertRaises(RuntimeError): read(calls.append, 'production')
+
+    def test_plain_javascript_setup_without_legacy_assert_and_safe_failure(self):
+        def node(program, failure=False):
+            stub = ('const db={getSiblingDB:()=>({createCollection:()=>{'
+                + ('throw Object.assign(new Error("private body"),{code:48});' if failure else 'return {ok:1};')
+                + '},setProfilingLevel:()=>({ok:1}),getCollection:()=>({drop:()=>true})})};'
+                + 'function print(x){console.log(x);}')
+            result = subprocess.run(['node','-e',stub+program], capture_output=True,text=True,check=True)
+            return result.stdout
+        install(node,'qs_m3_image_start_aabbccddeeff')
+        with self.assertRaises(AuditError) as caught:
+            install(lambda p:node(p,True),'qs_m3_image_start_aabbccddeeff')
+        self.assertEqual(caught.exception.audit_diagnostic,dict(audit_failed=True,phase='profile_collection',error_class='Error',error_code=48))
+        self.assertNotIn('private body',json.dumps(caught.exception.audit_diagnostic))
 
     def test_unexpected_command_data_is_rejected(self):
         value = self.fixture()

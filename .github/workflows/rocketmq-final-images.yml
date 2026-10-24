@@ -35,7 +35,7 @@ on:
       phase:
         description: Build five candidates or start an existing IAM/AI archive in an owned fixture
         type: choice
-        options: [build, iam-start, ai-start, qs-pair, five-start, cutover]
+        options: [build, iam-start, ai-start, qs-pair, five-start, cutover, mongo-audit]
         default: build
       image_run_id:
         description: Exact prior five-image run for a component; no registry or production input
@@ -71,6 +71,37 @@ concurrency:
   group: m3-final-images-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  mongo-audit:
+    if: github.event_name == 'workflow_dispatch' && inputs.phase == 'mongo-audit'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Audit instrumentation against fixed real Mongo only
+        run: |
+          set -euo pipefail
+          umask 077
+          uv run --no-project --with pyyaml==6.0.2 python scripts/rocketmq/mongo_audit_probe.py --report mongo-audit-proof.json
+          python3 - <<'PYREPORT'
+          import json
+          x=json.load(open('mongo-audit-proof.json'))
+          assert x['passed']==4 and x['failed']==x['skipped']==0
+          assert all(x['cases'].values()) and all(x['cleanup'].values())
+          assert not x['production'] and not x['application_startup_verified']
+          PYREPORT
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m3-mongo-audit-proof-${{ github.run_id }}
+          path: mongo-audit-proof.json
+          if-no-files-found: error
+          retention-days: 14
   contracts:
     runs-on: ubuntu-24.04
     steps:
