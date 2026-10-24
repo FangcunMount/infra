@@ -1,0 +1,511 @@
+{
+  "schema": "m3-candidate-ci-followup/v1",
+  "pr": 253,
+  "head_sha": "cf3ddbd840c4c3518af0ba7165ebd13abdf26ac8",
+  "tested_merge_sha": "5c4062885a97df25c193eda3cfc22fc89cef4003",
+  "reports": [
+    {
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": null,
+      "go_version": "go1.25.12",
+      "python_runtime": null,
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617457/rocketmq-m3-resources-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-m3-resources.json",
+      "report_sha256": "a8394877c65ecd6735b05dae7973565e258ab2d15aaa99d68a702f6fab0ecd8b",
+      "run_id": 40097617457
+    },
+    {
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": null,
+      "go_version": "go1.25.12",
+      "python_runtime": null,
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617465/rocketmq-paired-full-0-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-paired.json",
+      "report_sha256": "19e0654387e1d49ebcf2979d5c462947eed4d4ea7c0b43ae98f58e4f3e1e151c",
+      "run_id": 40097617465
+    },
+    {
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "mongo_image": null,
+      "go_version": "go1.25.12",
+      "python_runtime": null,
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617465/rocketmq-paired-full-1-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-paired.json",
+      "report_sha256": "9940733a243f044d8622cb172c80592d1adaefea43f971352401e3076ea340ba",
+      "run_id": 40097617465
+    },
+    {
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+      "mongo_image": null,
+      "go_version": "go1.25.12",
+      "python_runtime": null,
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617465/rocketmq-paired-full-2-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-paired.json",
+      "report_sha256": "fc3ad6bb5956cc4572a46570e8738ad006a58ddba77063db6e62e9787280a41d",
+      "run_id": 40097617465
+    },
+    {
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": null,
+      "go_version": "go1.25.12",
+      "python_runtime": null,
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617465/rocketmq-paired-full-3-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-paired.json",
+      "report_sha256": "dea24695190f9911dad4522e5a980111d5ff43fae1a0bedb03be0ebd4f2417d4",
+      "run_id": 40097617465
+    },
+    {
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "mongo_image": null,
+      "go_version": "go1.25.12",
+      "python_runtime": null,
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617465/rocketmq-paired-full-4-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-paired.json",
+      "report_sha256": "e3f6c3e6a423c08d2d1f0e3e23d46ec5c55cdf3a65fd7a5047131e485396e092",
+      "run_id": 40097617465
+    },
+    {
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+      "mongo_image": null,
+      "go_version": "go1.25.12",
+      "python_runtime": null,
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617465/rocketmq-paired-full-5-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-paired.json",
+      "report_sha256": "dddbb2f9537ae8dd476e1b43f3f71f852fff1eb0fb38cbaef68ea68adeefa78f",
+      "run_id": 40097617465
+    },
+    {
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "go_version": "go1.25.12",
+      "python_runtime": null,
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617497/rocketmq-m2-go-sdk-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-m2-go-sdk.json",
+      "report_sha256": "809aaee5b43e68bb54739e7fe107857e52a4356174dea01d6e00ed65d79430e4",
+      "run_id": 40097617497
+    },
+    {
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": null,
+      "go_version": "go1.25.12",
+      "python_runtime": null,
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617497/rocketmq-m2-transactions-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-m2-transactions.json",
+      "report_sha256": "e5b336fddb0441f04216dfd10b591572e8dfa49f8a6d22b990e672bb0c0e2d7c",
+      "run_id": 40097617497
+    },
+    {
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "go_version": "go1.25.9",
+      "python_runtime": {
+        "python": "3.11.16",
+        "client": "5.1.2",
+        "sdk_version": "0.4.0",
+        "package_file": "/home/runner/work/infra/infra/.sdk-acceptance/python/src/reliable_messaging/__init__.py"
+      },
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617500/rocketmq-packet-faults-0-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-packet-faults.json",
+      "report_sha256": "b53d156ff38def8393b389cc98a0515b0f8af14f203e99ba412af74629511e35",
+      "run_id": 40097617500
+    },
+    {
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+      "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "go_version": "go1.25.12",
+      "python_runtime": {
+        "python": "3.13.15",
+        "client": "5.1.2",
+        "sdk_version": "0.4.0",
+        "package_file": "/home/runner/work/infra/infra/.sdk-acceptance/python/src/reliable_messaging/__init__.py"
+      },
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617500/rocketmq-packet-faults-1-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-packet-faults.json",
+      "report_sha256": "968de88b72e9894db0cb2c10a8dd05aa1c404b2b055b6c90a421bb75298d6864",
+      "run_id": 40097617500
+    },
+    {
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "go_version": "go1.25.9",
+      "python_runtime": {
+        "python": "3.11.16",
+        "client": "5.1.2",
+        "sdk_version": "0.4.0",
+        "package_file": "/home/runner/work/infra/infra/.sdk-acceptance/python/src/reliable_messaging/__init__.py"
+      },
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617528/rocketmq-public-sdk-0-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-public-sdk.json",
+      "report_sha256": "ee5bc886f26a0b26af220086e3bfb2c8678e6b22f170738faed72634e4c23d24",
+      "run_id": 40097617528
+    },
+    {
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+      "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "go_version": "go1.25.12",
+      "python_runtime": {
+        "python": "3.13.15",
+        "client": "5.1.2",
+        "sdk_version": "0.4.0",
+        "package_file": "/home/runner/work/infra/infra/.sdk-acceptance/python/src/reliable_messaging/__init__.py"
+      },
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617528/rocketmq-public-sdk-1-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-public-sdk.json",
+      "report_sha256": "e06295f7656c95c0455a0d6195d9fb46ebae6e0a3ba38d33f9f080f27e0e9734",
+      "run_id": 40097617528
+    },
+    {
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "go_version": "go1.25.9",
+      "python_runtime": {
+        "python": "3.11.16",
+        "client": "5.1.2",
+        "sdk_version": "0.4.0",
+        "package_file": "/home/runner/work/infra/infra/.sdk-acceptance/python/src/reliable_messaging/__init__.py"
+      },
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617571/rocketmq-complete-sdk-0-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-complete-sdk.json",
+      "report_sha256": "b06702d5891881fc5947ddccd344cfe99dfaf4f4b8e1885d04a900d6a76d8c31",
+      "run_id": 40097617571
+    },
+    {
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "fixture_sdk_sha": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+      "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "go_version": "go1.25.12",
+      "python_runtime": {
+        "python": "3.13.15",
+        "client": "5.1.2",
+        "sdk_version": "0.4.0",
+        "package_file": "/home/runner/work/infra/infra/.sdk-acceptance/python/src/reliable_messaging/__init__.py"
+      },
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617571/rocketmq-complete-sdk-1-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-complete-sdk.json",
+      "report_sha256": "4a9e925a4ac037af7bdff8cb0c990f86c6054fb7555b40b41807df16da5bdc5d",
+      "run_id": 40097617571
+    },
+    {
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "sdk_sha": null,
+      "fixture_sdk_sha": "8de893b367cc797580799abd8325f41dd62356db",
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": null,
+      "go_version": "go1.25.12",
+      "python_runtime": null,
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "path": "40097617571/rocketmq-native-dlq-audit-5c4062885a97df25c193eda3cfc22fc89cef4003/rocketmq-native-dlq-audit.json",
+      "report_sha256": "26cc41ac0a9bcd07a2bfb58c449630103cc0d5af58bd216b16bae6099ad93e7e",
+      "run_id": 40097617571
+    }
+  ],
+  "passed": 691,
+  "failed": 0,
+  "skipped": 0,
+  "workflow_successes": 7,
+  "check_successes": 16,
+  "conditional_nonapplicable_jobs": 6,
+  "production": false,
+  "full_c1_verified": false,
+  "scope": "Small report artifacts only; 227MB Broker archive not downloaded. This head precedes restore diagnostic and explicit-charset changes."
+}
