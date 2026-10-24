@@ -3,6 +3,7 @@
 Preparation component only: does not start business runtimes or authorize cutover.
 """
 import argparse
+import difflib
 import hashlib
 import json
 import os
@@ -18,6 +19,22 @@ from image_start_fixture import OwnedImageFixture, require
 QS_SHA = 'd3269bda672b97582edb691ca4f924484c653822'
 MONGO = 'mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f'
 GO_SUM = 'h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0='
+
+
+def dump_difference(before, after):
+    """Diagnostic shape and hashes only; never export SQL/data/comment text."""
+    def line(value):
+        if value.startswith('CREATE TABLE '): kind = 'create_table'
+        elif value.startswith('INSERT INTO '): kind = 'insert_rows'
+        elif value.lstrip().startswith('`'): kind = 'column_definition'
+        elif value.startswith(') '): kind = 'table_options'
+        elif value.startswith('/*!'): kind = 'versioned_directive'
+        else: kind = 'other'
+        return dict(kind=kind, bytes=len(value.encode()), sha256=hashlib.sha256(value.encode()).hexdigest(),
+                    encoding_tokens=sorted(set(re.findall(r'\b(?:utf8mb4|utf8mb3|latin1)(?:_[a-z0-9_]+)?\b', value))) if kind != 'insert_rows' else [])
+    a, b = before.splitlines(), after.splitlines()
+    return [dict(before=[line(v) for v in a[i:j]], after=[line(v) for v in b[k:l]])
+            for op,i,j,k,l in difflib.SequenceMatcher(a=a,b=b,autojunk=False).get_opcodes() if op!='equal'][:16]
 
 
 def initializer_receipt(raw, profile):
@@ -130,6 +147,7 @@ class QSPairFixture(OwnedImageFixture):
         self.report.setdefault('restore_readbacks', {})[database] = dict(
             mysql_before_sha256=hashlib.sha256(sql.encode()).hexdigest(),
             mysql_after_sha256=hashlib.sha256(after_sql.encode()).hexdigest(),
+            mysql_difference=dump_difference(sql,after_sql),
             mongo_before_sha256=original_mongo, mongo_after_sha256=after_mongo,
             mongo_before_parts=before_parts, mongo_after_parts=after_parts)
         require((after_sql, after_mongo) == (sql, original_mongo), 'full_pair_restore_must_match_original_bytes_and_uuid')
