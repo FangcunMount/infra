@@ -1830,4 +1830,13 @@ IAM实际恢复候选更新为bee9c5c1，infra为d741ace8。第二轮失败在�
 
 [PR222](https://github.com/FangcunMount/infra/pull/222)固定9de0b5024453a1f5d096b7b0260680294aec09b4的10检查全部成功，11份报告494项零失败/跳过逐份核验；同一C1原生组合43项（IAM15/QS17/AI8及三次启动后拒绝）和全写者17文件复核闭环。原生数据库及自有容器/网络/目录全部删除回读；旧回归报告仅四项清理的边界单列，不补造网络证据。合并a94c831f19e63019c1c21ce7864788070796ab02；实际merge与tested merge仅多三份独立验证进度文档，不冒称完整tree相同。
 
-据此勾选C2-d及C2，C2 **4/4**、T25-C **2/3**。正式T25仍 **2/4**、M3 **24/36**；C3 **1/3**与D仍须收口。生产真实写者停写、原保护恢复附件和业务镜像绑定仍在T29–T33，工具门禁不代替生产执行。IAM原宿主恢复及Rollback真实矩阵仍运行；无稳定版、生产、system或48小时观察。
+据此勾选C2-d及C2，C2 **4/4**、T25-C **2/3**。正式T25仍 **2/4**、M3 **24/36**；C3 **1/3**与D仍须收口。生产真实写者停写、原保护恢复附件和业务镜像绑定仍在T29–T33，工具门禁不代替生产执行。IAM原宿主恢复及Rollback真实矩阵当时仍运行；后续结果见下条。无稳定版、生产、system或48小时观察。
+
+
+### 2026-10-24：IAM 原宿主恢复合并，T25 上线范围提案待确认
+
+IAM [PR146](https://github.com/FangcunMount/iam/pull/146)源码 bee9c5c1 合并035f94e572290ed3e1b316db45b30d88db399a16；infra [PR221](https://github.com/FangcunMount/infra/pull/221)源码07863d003e42714ff6fa5e76e7802660c77a3d3d在18检查全部成功、19份报告932项零失败/跳过核验后，合并2676aeaccad3098fcd2ebbb5365529651112681c。实际原宿主目标[40056778292](https://github.com/FangcunMount/infra/actions/runs/40056778292)15项通过：IAM原GORM业务/witness共同提交、原owner真实停止、当前SDK真实Commit RPC及正向audit、原业务事实不增、具名治理和新暂停实例保护验证。目标原报告sha256 `33bd91c120a5429894d866e083d22da9828860a6b9d25eb1e96b53964c2d981f`；清理八项均回读。既有夹具失败和测试cwd/观察者修复记录保留。此处不是完整API、生产或system验收。
+
+Rollback [PR225](https://github.com/FangcunMount/infra/pull/225)11ecf0a6的[40058191925](https://github.com/FangcunMount/infra/actions/runs/40058191925)basic14、治理故障16、Rollback15目标均通过；完整关联门禁/合并仍待完成。实际SDK原Abort证据与FinalUnknown并存，新恢复实例真实Rollback RPC及正向audit，不把原生产者exit1当成已知最终确认，也不冒称业务原根写入后回滚。QS原双存储候选[PR437](https://github.com/FangcunMount/qs-server/pull/437)9301bf80、工具[PR228](https://github.com/FangcunMount/infra/pull/228)a5cc2c92已提交，实际门禁排队/运行；AI原SQLAlchemy根恢复未完成。
+
+[尽快上线提案](rocketmq-m3-fast-cutover-proposal.md)仅供用户确认：后移完整四宿主原生超限手工恢复工具验收，M3保留持久保护、Checker和具名人工修复，未完成的解保护工具不进入生产执行包。它改变原T25-C3门禁，**尚未批准，不改变当前范围、勾选或计数**。稳定SDK、最终镜像/切换演练、105前置、具名生产清单/system和切换后48小时仍保留。M3仍24/36，T25 2/4，C2 4/4，C3 1/3；没有生产操作。
