@@ -1745,6 +1745,7 @@ infra [PR210](https://github.com/FangcunMount/infra/pull/210)源码2a947410合�
 | check-only SDK及本次私有观察原语 | ☑ 已合并，20项初始纯契约 | 本次真实RPC及批准文件图/完整CLI未通过 |
 | 原MySQL只读snapshot | ☑ 已合并，三档各17项 | 不代替实际Python生产者或MQ恢复 |
 | 原Mongo只读snapshot | ☑ 已合并，固定7.0.37原根10项 | 不代替MQ或生产解除 |
+| 私有请求准备与审核 CLI | ☑ PR216已合并；纯211、MySQL三档各41、Mongo17项通过 | 仅preview/verify-review；真实MQ、RPC receipt及执行批准继续 |
 | 精确治理CAS及未知提交处理 | ☐ 继续实施 | 只改status/解除元数据，保留SDK首次审计/原证据 |
 | 具名批准、物理核验和短生命周期CLI | ☐ 未闭环 | 必须经过首次runtime屏障，hash本身不是授权 |
 
@@ -1765,3 +1766,16 @@ infra [PR213](https://github.com/FangcunMount/infra/pull/213)源码d67a22c8合�
 
 
 PR214最终8d447f6d的5检查全部成功并合并4dadacf1；[40044689252](https://github.com/FangcunMount/infra/actions/runs/40044689252)纯契约109、MySQL三档各38、Mongo16项通过，全部非空、零失败/跳过、自有清理回读。真实Python协调器producer与Go校验的runtime/forward、已结束步骤、修复批准缺失、错误绑定/step/marker/模式等纯边界均验证；没有启动DB/MQ/SSH的本地操作。它只确认既有受审步骤已发出，完整生产请求/receipt/物理/真实RPC/单次管理入口仍须独立验证，不因活动锁或hash即授权生产。完整报告摘要进入结构化证据；M3/T25/C3计数和生产边界不变。
+
+
+### 2026-10-24：T25-C3 私有请求与原主库只读 CLI 闭环
+
+infra [PR216](https://github.com/FangcunMount/infra/pull/216)源码c9affdf28eb1e3c1bf3d0fac3b4258380fef861c合并ddad9fd1fd522f12045e363d8d337ef26eed481a；5检查全部成功。[纯门禁40049301908](https://github.com/FangcunMount/infra/actions/runs/40049301908)211、[MySQL40049301899](https://github.com/FangcunMount/infra/actions/runs/40049301899)8.0.36/8.0.44/8.4各41、[Mongo40049301949](https://github.com/FangcunMount/infra/actions/runs/40049301949)7.0.37的17项通过，非空、零失败/跳过，原DB及固定标签容器删除回读。逐份raw报告摘要与实际测试集合已独立复核，保存结构化证据。
+
+工具新增编译后的`preview`与`verify-review`，先校验私有配置、完整owner manifest、全部物理export及选择，再读取原主库。请求冻结原库身份、绑定、精确canonical Reference、v1物理指纹/首次证据、本地终态/原audit、源码/二进制/配置/manifest/export摘要、具名责任人与本次nonce，30分钟到期；重复请求不覆盖。原池关闭失败不返回成功摘要。审核文件绑定原协调binding/source bundle、双方姓名、请求及期限，不由工具自动生成；文件和hash不是身份认证或执行授权。
+
+实际CLI以独立进程分别读取三种MySQL owner（每档3次）及qs.mongo原库（1次），核对私有文件、原Reference/库身份、旧audit保留、重复拒绝及`execution_authorized=false`。索引与姓名明确synthetic，不是实际Broker物理核验、Python业务生产者、具名生产批准或当前RPC；源码未暴露check/resolve/native-resume入口，没有SDK、native admin、治理或业务写入。构建核对固定发布tx.4及module sum、无replace，版本必须匹配编译VCS revision/clean标记和当前binary摘要。
+
+首轮纯测试拒绝已有manifest的accounts/连字符账号键，已增加仅供原清单的显式账号名单解析，重复/大小写别名/未知字段仍拒绝，批准文件解码规则未放宽。本地worktree构建因固定Go VCS识别要求`.git`目录而没有VCS标记，`version`正确拒绝，未绕过门禁；GitHub干净checkout的版本构建及实际CLI验证均通过。该差异与首轮失败均保留。
+
+本次完成C3-b的只读请求组件；完整恢复执行、真实物理管理、当前RPC receipt及治理提交/故障矩阵仍待闭环，未勾选父任务。M3仍 **24/36**、T25 **2/4**、C2 **3/4**、C3 **1/3**；M2 **24/24**、M4 **0/8**。下一批接通协调器屏障之后的短生命周期Checker、实际RPC receipt和治理管理，再进入真实MQ/网络组合门禁。SDK稳定发布、生产DDL/资源/provider/部署、system及48小时观察均未执行。
