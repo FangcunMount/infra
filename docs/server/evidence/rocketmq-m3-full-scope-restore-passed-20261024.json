@@ -1,0 +1,231 @@
+{
+  "schema": "m3-full-scope-restore-passed-coordinator-followup/v1",
+  "run_id": 40101320282,
+  "report_sha256": "5ee742c7406425a4bfdaa81a55bfff59c0091bfb86651e80974c908c5e123d02",
+  "report": {
+    "schema": "m3-five-actual-image-cutover/v1",
+    "passed": 3,
+    "failed": 1,
+    "skipped": 0,
+    "production": false,
+    "system_acceptance": false,
+    "combined_cutover_rehearsal_complete": false,
+    "c1_cutover_barrier_exercised": false,
+    "cases": {
+      "actual_source_registry_consumers_match_manifest": true,
+      "all_five_exact_archives_loaded": true,
+      "original_pre_m3_qs_pair_prepared": true
+    },
+    "sources": {
+      "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "qs": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+    },
+    "scope": "owned old-schema full restore training, original offline upgrades and actual seven-process C1/30-minute start; no production/system/business claim",
+    "infra_sha": "42bc3721d3185760792bb3df64a30f5db25bf33b",
+    "original_qs_consumer_count": 1,
+    "original_qs_consumer_contract": {
+      "consumers": [
+        {
+          "id": "modelcatalog.hot_rank_projection",
+          "runtime": "apiserver",
+          "event_type": "answersheet.submitted",
+          "topic": "qs.evaluation.lifecycle",
+          "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+          "delivery": "durable_outbox",
+          "outbox_profile": "mongo_domain_events"
+        }
+      ],
+      "schema": "qs-original-consumer-contract/v1",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "original_qs_consumer_contract_sha256": "f65853c2aee20108a26d53c7e65d4234a5d66235df4440355a48e1d90f883a4a",
+    "candidates": {
+      "iam": {
+        "target": "iam",
+        "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+      },
+      "qs-api": {
+        "target": "qs-api",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:c1c1093a411dba90bb47ad7dabe8dc50b21a0fed633efef4cb94eeae909886c4",
+        "archive_sha256": "3c2aefb67ea9f50b7acea8d232a05d7ba0296173e75ecf2ebeb3b52bf2dab71b"
+      },
+      "qs-collection": {
+        "target": "qs-collection",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:07e13f2fcd1bd59cdc14a81e0334c73a8b5b7939d235b056254378f939af37ce",
+        "archive_sha256": "a3140df0c4ba98fbefd82f6da06ef4f4cb4867e0eb63fd37cfa91b9ca6cc77cb"
+      },
+      "qs-worker": {
+        "target": "qs-worker",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:98b5b635aa72cae96899a5289dea4aa038bcd25ba1eeebe9f944682f4e3a0d98",
+        "archive_sha256": "907abca7e5b2b410ab4383bead344d2c08d01fac9e0e7ba54fbf00b4eee21b25"
+      },
+      "ai": {
+        "target": "ai",
+        "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+      }
+    },
+    "dependency_image_ids": {
+      "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "rocketmq": "sha256:1466b7d25e8a031177d683decc017ad702147ae0e1346521c6a75a3ad0a3f529",
+      "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+    },
+    "resources": {
+      "version": 2,
+      "operations": 53,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true
+    },
+    "qs_schema": {
+      "journal_force_used": false,
+      "mongo": 40,
+      "mysql": 105,
+      "original_templates_applied": true,
+      "production": false,
+      "profile": "pre_m3",
+      "resources_sha256": "c37b639804391172b2209f11c7056b4867309a31054af3c5d3f740cd6145b86d",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "iam_controlled_seed": {
+      "controlled_seed": true,
+      "legacy_drain_claimed": false,
+      "publication_intents_created": false,
+      "schema_version": 41,
+      "seed_events_retained": 2,
+      "witnesses_created": false
+    },
+    "configuration_sha256": {
+      "iam": "2ae194d1414e8100d03d4a6a81fb121f000061a86630d8752d670cc8ec3ba33b",
+      "api": "578755101e118fdf0e35231657fb067df52c2c2e91686702478677d40d24a502",
+      "collection": "2b26e75c53ebc38d971376747d4b533b635c737350a9eec2ad0f6382efd292da",
+      "worker": "e731115d58d2973d22dbfaca41d17d6894f987d4776dde183d573569414edd23"
+    },
+    "mysql_client_default_charsets": [
+      "latin1",
+      "latin1",
+      "latin1"
+    ],
+    "mysql_restore_session_charsets": [
+      "utf8mb4",
+      "utf8mb4",
+      "utf8mb4"
+    ],
+    "full_scope_restore": {
+      "schema": "m3-owned-full-image-restore/v1",
+      "protection_manifest_sha256": "11b336f50e7a2b229795d5554d2f320bcb817c570b06a06f527efa44a9fa1137",
+      "snapshots_before": {
+        "iam": {
+          "canonical_dump_sha256": "f8e51deb49fc7839a4df0fb0667899b33cf96cb7e65a21997753c9ac14a4ab56",
+          "columns_sha256": "23e1cb268c83697a50ede67570075627fb21a58b1eb233eb48d54c59c1ffb1c2",
+          "database_definition_sha256": "e17469252a11a40aa572cc438dbc5012428e876edd8b3f78ef5f96dc59d65cc3"
+        },
+        "qs": {
+          "canonical_dump_sha256": "3acf68e7ef6b1047a390a272914a8907e22f6eeac48cb301f098bbe517df77e0",
+          "columns_sha256": "6c6356b024476f854092f6f3663c47595b112295952de5ee20d2b7276faae3fc",
+          "database_definition_sha256": "60f334b0732eb3b8f33e1394c65e21c316caf76cd244475b18d48f88f20ca8d1"
+        },
+        "ai": {
+          "canonical_dump_sha256": "4186a229504ebe68037d9fa24401be6505a9d35ab81438872569c4527a5e8eee",
+          "columns_sha256": "4b8485652abbe4ec2bbea7f527127dffbcb532e77efd81b0a0adcc68a98c5405",
+          "database_definition_sha256": "77fd4bd2583969c70e92bf9d15ee51d0495308ab1d42ff0f843f207d85c1f349"
+        },
+        "mongo": {
+          "snapshot_sha256": "09bc8a67489404fdd7c73329da1af722b3c11ab234c250395ad38f37f8ddc9f0",
+          "collections": 14
+        }
+      },
+      "snapshots_after": {
+        "iam": {
+          "canonical_dump_sha256": "f8e51deb49fc7839a4df0fb0667899b33cf96cb7e65a21997753c9ac14a4ab56",
+          "columns_sha256": "23e1cb268c83697a50ede67570075627fb21a58b1eb233eb48d54c59c1ffb1c2",
+          "database_definition_sha256": "e17469252a11a40aa572cc438dbc5012428e876edd8b3f78ef5f96dc59d65cc3"
+        },
+        "qs": {
+          "canonical_dump_sha256": "3acf68e7ef6b1047a390a272914a8907e22f6eeac48cb301f098bbe517df77e0",
+          "columns_sha256": "6c6356b024476f854092f6f3663c47595b112295952de5ee20d2b7276faae3fc",
+          "database_definition_sha256": "60f334b0732eb3b8f33e1394c65e21c316caf76cd244475b18d48f88f20ca8d1"
+        },
+        "ai": {
+          "canonical_dump_sha256": "4186a229504ebe68037d9fa24401be6505a9d35ab81438872569c4527a5e8eee",
+          "columns_sha256": "4b8485652abbe4ec2bbea7f527127dffbcb532e77efd81b0a0adcc68a98c5405",
+          "database_definition_sha256": "77fd4bd2583969c70e92bf9d15ee51d0495308ab1d42ff0f843f207d85c1f349"
+        },
+        "mongo": {
+          "snapshot_sha256": "09bc8a67489404fdd7c73329da1af722b3c11ab234c250395ad38f37f8ddc9f0",
+          "collections": 14
+        }
+      },
+      "restore_duration_seconds": 5,
+      "original_protection_bytes_unmodified": true,
+      "mongo_uuid_preserved": true,
+      "runtime_started": false,
+      "original_ai_expressions_restored": true,
+      "original_expression_restore_sha256": "4c43460eb71084de10beee9187f37f4a04901adf54e272f6ca67d8988ea87f0d",
+      "production": false,
+      "production_backup_retention_verified": false,
+      "scope": "pre-window controlled restore training; not a production restore or business acceptance"
+    },
+    "owned_registry": {
+      "image_id": "sha256:26b2eb03618e749084668eaff68cff8f81dda12d06ac641be7a6398b82a6f25b",
+      "references": {
+        "iam": {
+          "reference": "127.0.0.1:40219/m3/iam@sha256:a5b1c1f3e8cd6e71f52d150919baba530638b0fc96e623a5a72980217d40c04c",
+          "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99"
+        },
+        "ai": {
+          "reference": "127.0.0.1:40219/m3/ai@sha256:3f36ba7c5f427225cf2fbb971b16f4f8476a9d8426db24cc9588fdaa4b62c8ff",
+          "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849"
+        },
+        "api": {
+          "reference": "127.0.0.1:40219/m3/api@sha256:512f19617c0a759a75bf652b66ab6218b81820605a85a2805471c8b199b4b183",
+          "image_config_id": "sha256:c1c1093a411dba90bb47ad7dabe8dc50b21a0fed633efef4cb94eeae909886c4"
+        },
+        "collection": {
+          "reference": "127.0.0.1:40219/m3/collection@sha256:909702b307624d461de2ffd23d79a83f0a6b23c397f6a817b09f438f582abbfd",
+          "image_config_id": "sha256:07e13f2fcd1bd59cdc14a81e0334c73a8b5b7939d235b056254378f939af37ce"
+        },
+        "worker": {
+          "reference": "127.0.0.1:40219/m3/worker@sha256:ec43d163d4eb1b8323b49386dc4da1d4bd48ec171fa79c1b9a6acf3b83695433",
+          "image_config_id": "sha256:98b5b635aa72cae96899a5289dea4aa038bcd25ba1eeebe9f944682f4e3a0d98"
+        }
+      },
+      "production_published": false,
+      "scope": "loopback-only owned CI registry, not a production handoff"
+    },
+    "failure_stage": "full_scope_pre_window_protection_and_restore",
+    "failure_kind": "BoundaryError",
+    "processes": {},
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    },
+    "sources_unchanged": true
+  },
+  "component_full_restore_verified": true,
+  "component_owned_image_handoff_verified": true,
+  "overall_cutover_verified": false,
+  "scope": "Full controlled3MySQL/complete QS Mongo restore exact, metadata/DDL/data/UUID protected; owned loopback5-image manifest/config identities passed. Overall3/1/0 ended in BoundaryError during coordinator setup, no offline/runtime execution.",
+  "deterministic_local_finding": "Report-style pretty JSON is rejected by original canonical start-plan reader; regression reproduces exact original producer/consumer conflict. Old native report lacks message/source frame, not asserted as sole possible cause.",
+  "fix_source_sha": "4715c96bca323538e8591bea031ef1d68f78ba22",
+  "pure_tests": 332,
+  "retry_run_id": 40102265403,
+  "retry_verified": false,
+  "production": false,
+  "system_acceptance": false
+}
