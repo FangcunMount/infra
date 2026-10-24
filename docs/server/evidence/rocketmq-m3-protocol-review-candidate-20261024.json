@@ -1,6 +1,6 @@
 {
   "schema": "m3-protocol-review-candidate/v1",
-  "status": "candidate_pending_actual_current_paired_ci",
+  "status": "single_current_profile_passed_full_matrix_pending",
   "sdk_source": "04757bd3212ca961d8eaec22ecd3560101111e18",
   "sdk_main": "03c62b403de0873ba945b5dd6f3bc91df602e4e8",
   "sdk_implementation_unchanged_from_prerelease": true,
@@ -20,9 +20,12 @@
   "production_advanced_recovery": "excluded_pending_separate_acceptance",
   "host_baselines": {
     "iam": "035f94e572290ed3e1b316db45b30d88db399a16",
-    "qs": "83147d8e99e00fd36c57bc2fc4feb193ebe2a844",
-    "ai": "b0cb329af92bd6914c6cf7907f3ce5d64f509bbe"
+    "qs": "0a7baa2ee22b4963a75deddf935fa5f6909db6b5",
+    "ai": "01c38784ce93c8c6506fd9848dff35eaeb8aa7dd"
   },
   "stable_tags_published": false,
-  "production_deployed": false
+  "production_deployed": false,
+  "preflight_run": 40063020639,
+  "preflight_passed": 10,
+  "original_failed_run": 40062279084
 }

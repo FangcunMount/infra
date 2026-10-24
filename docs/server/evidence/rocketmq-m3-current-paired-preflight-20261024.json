@@ -1,0 +1,20 @@
+{
+  "schema": "m3-current-paired-preflight/v1",
+  "run": 40063020639,
+  "infra_sha": "8e1a5f0e43c7dacd5018df3897e1b56cd203ce59",
+  "qs_sha": "0a7baa2ee22b4963a75deddf935fa5f6909db6b5",
+  "ai_sha": "01c38784ce93c8c6506fd9848dff35eaeb8aa7dd",
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "report_sha256": "d25d728123bc627a3cd72afb973aa39b894c5045554c21383fa7f44b99ffaae3",
+  "cleanup": {
+    "project_containers_remaining": false,
+    "compose_down_succeeded": true,
+    "probe_process_groups_drained": true,
+    "private_fixture_directory_removed": true
+  },
+  "profile": "core",
+  "full_matrix_complete": false,
+  "production_deployed": false
+}
