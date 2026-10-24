@@ -1955,3 +1955,9 @@ AI组件PR243正在推进：首轮40078764464实际原Alembic40→43及含非空
 5577953b/40079069646原生9项零失败/跳过，报告独立复核b0127b15；固定0.4.0/5.1.2镜像、原Alembic40→43、非空受控held旧记录的完整范围原样恢复、原initial-binding preview/apply/verify、实际只读server ready、封新写但SDK ready/采样活跃、checker1/队列16、正常退出0、DML-only运行账号的启动/关闭DDL尝试0，旧ID/first wire/attempt/status/hash保持原值。所有4项声明清理及源码未变通过。HOME=/tmp在原64MiB tmpfs生效，保持768MiB/0.75CPU、原循环/预算及210秒关闭；没有实际模型、上游RPC、成对业务或system验收。原额外表被schema拒绝的4/1/0仍保留，无放宽validator。
 
 [AI组件证据](evidence/rocketmq-m3-ai-final-image-20261024.json)当前明确PR243待完整CI/合并，不能把原生通过等同代码收口。IAM组件已合并；QS实际镜像、完整C1/配置资源包及30分钟还未完成，T29/M3保持进行中28/36。
+
+### 2026-10-24：AI最终镜像组件合并，QS双库准备继续
+
+PR243固定5577953b经10项成功检查后合并032d7c7a，4个变更文件逐字节与受验源码相同；main包含额外进度文档，不声明整个tree相同。10份关联原生报告451/0/0，全部原声明清理字段通过；独立AI镜像40079069646为9/9，不重复计入451。原失败、严格schema保护和受控held范围均保留。[AI证据](evidence/rocketmq-m3-ai-final-image-20261024.json)已更新合并及报告摘要。
+
+QS双库夹具静态编译通过，后续使用原嵌入迁移模板和原migrator，不force journal。双库准备/恢复不冒充实际API、collection、三个worker启动或完整C1窗口。M3仍28/36，T29不勾选，生产/system/48小时没有执行。
