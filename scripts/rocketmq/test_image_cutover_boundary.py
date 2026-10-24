@@ -2,9 +2,13 @@
 import json
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 
-from image_cutover_boundary import COMPONENTS, SOURCES, parse_private_hashes, startup_receipt
+from image_cutover_boundary import ActualImageBoundary, COMPONENTS, SOURCES, parse_private_hashes, startup_receipt
+from start_boundary import Boundary, BoundaryError
+from test_start_boundary import fixture
 
 
 def synthetic_unit_receipt():
@@ -52,5 +56,29 @@ class CutoverReceiptAdmissionTest(unittest.TestCase):
     def test_matching_versions_do_not_replace_frozen_image_identity(self):
         value=synthetic_unit_receipt();value['candidates']['qs-worker']['source_sha']=SOURCES['iam']
         with self.assertRaises(RuntimeError):self.check(value)
+
+    def test_failed_target_start_keeps_real_barrier_and_owned_process_diagnostic(self):
+        # Real fsync-backed coordinator; target command/readback are controlled
+        # unit seams. This test never claims an actual Docker process existed.
+        for owner in ('owned-unit', 'different-owner'):
+            with self.subTest(owner=owner),tempfile.TemporaryDirectory() as root:
+                directory,_,sha=fixture(root)
+                adapter=ActualImageBoundary.__new__(ActualImageBoundary)
+                adapter.directory=directory;adapter.binding_sha=sha;adapter.plans={'api':{}}
+                adapter.private_inputs={};adapter.started=set()
+                adapter.global_lock=Path(root)/'global.lock';adapter.ai_lock=Path(root)/'ai.lock'
+                adapter.f=SimpleNamespace(project='owned-unit',report={},applications={},
+                    run=lambda *a,**k:SimpleNamespace(returncode=0,stdout=owner))
+                def failed(_):
+                    self.assertTrue((directory/'first-runtime-start.json').is_file())
+                    raise RuntimeError('controlled_target_failure')
+                with patch('image_cutover_boundary.private_input_hashes',return_value={}),patch('image_cutover_boundary.runtime_start.execute',side_effect=failed):
+                    with self.assertRaisesRegex(RuntimeError,'controlled_target_failure'):adapter.start('api')
+                self.assertEqual(adapter.f.applications,{'api':'owned-unit-api'} if owner=='owned-unit' else {})
+                self.assertFalse(adapter.started)
+                with Boundary(directory,sha) as operation:
+                    self.assertEqual(operation.status()['phase'],'runtime_start_failed')
+                    self.assertFalse(operation.status()['old_data_restore_eligible'])
+                    with self.assertRaises(BoundaryError):operation.restore_before_start('forbidden',lambda:self.fail('old restore ran'))
         value=synthetic_unit_receipt();value['candidates']['ai']['archive_sha256']='unverified'
         with self.assertRaises(RuntimeError):self.check(value)
