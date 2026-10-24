@@ -68,7 +68,7 @@ QS组件PR245已合并e73fe4aa，5个变更文件与受验e67f2eb相同，关联
 
 ## Mongo44候选跟进（当前待验收，不是生产执行包）
 
-QS441合并20cd2184，当前镜像源码b75d4a52与main完整tree一致；新三个QS归档来自固定构建器835c/40092281533，原IAM/AI归档复用。Mongo44保留原提交幂等唯一约束并显式离线安装，SQL105前置不变。新双库40093627714为9/9；七进程仍受worker关闭Exit2阻断，未验证完零DDL/完整关闭，原因和恢复演练尚待新试验。
+QS441合并20cd2184，当前镜像源码b75d4a52与main完整tree一致；新三个QS归档来自固定构建器835c/40092281533，原IAM/AI归档复用。Mongo44保留原提交幂等唯一约束并显式离线安装，SQL105前置不变。新双库40093627714为9/9。此阶段七进程曾受worker关闭Exit2阻断；后续独立v3及完整C1已通过，见下方当前收口清单；旧Exit2根因仍未确认。
 
 [新44份输入索引](evidence/rocketmq-m3-candidate-input-index-mongo44-20261024.json)与[46成员源审阅包回执](evidence/rocketmq-m3-source-review-packet-mongo44-20261024.json)替代前述旧42份包。当前archive为私有source review，实际目标配置、受审镜像交付、完整C1/30分钟、生产清单及system仍未完成；不能执行或作为具名生产批准。
 
@@ -81,7 +81,7 @@ QS441合并20cd2184，当前镜像源码b75d4a52与main完整tree一致；新三
 | 五种镜像 | IAM/AI来自40074229224，QS三镜像来自40092281533；逐项config ID、归档/SDK摘要与builder SHA已核验 | 生产registry/受审归档的真实交付与目标回读 |
 | 资源与输入 | 新路由真实134/0/0；当前44文件索引及46成员源审阅包已复核，旧42文件包仅保留历史 | 真实Topic/账号/TLS、原worker配额与DB身份等生产绑定，不能填CI值 |
 | 存储 | IAM45、QS110/44、AI0043；新QS9/9实际双库升级/完整恢复及绑定通过 | 完整三MySQL/整QS Mongo保护恢复、原维护/实际启动已过；生产身份/schema待回读 |
-| 七进程 | 诊断复跑15/15、全部Exit0、两种运行期DDL均零；原worker Exit2原因未确认 | v3的15/15与九次有界启停已通过；40101320282完整精确保护恢复及回环交付已通过；原清单及IAM维护已通过；原QS审批格式修正后40103917422复验中 |
+| 七进程 | 独立v3为15/15，三worker九次启停通过；完整C1 40103917422为18/18，正常退出及零运行期DDL通过；旧Exit2根因仍未确认 | 实际生产副本/资源回读及最终输入冻结；隔离七进程不替代生产副本证明 |
 
 40095705485准备阶段检查误依赖WARN模板过滤的INFO日志，实际10/1/0、worker仍running；失败保留。08821c6仅在隔离夹具启用原INFO启动日志，生产模板及原预算不变。原生验证通过前不冻结该回执。
 
@@ -95,9 +95,26 @@ QS441合并20cd2184，当前镜像源码b75d4a52与main完整tree一致；新三
 
 [40103917422](https://github.com/FangcunMount/infra/actions/runs/40103917422)使用原固定五镜像、独立v3启停回执、原维护CLI与唯一协调目录，18/0/0；原范围恢复/不可变交付、四owner Checker/封新写、七进程正常关闭与零运行期DDL逐项通过，[证据](evidence/rocketmq-m3-c1-actual-images-passed-20261024.json)。原生成列/字符集保护保持精确比较；不通过篡改journal、修改成功hash或忽略事实差异取得通过。
 
-当前窗口46.85秒只代表受控数据上的离线维护/启动，不代替生产副本/体量/传输、旧责任排空交接或system。最终配置/执行包仍为未冻结，实际只读核验入口已请求；旧快照只作路径参考。
+当前窗口46.85秒只代表受控数据上的离线维护/启动，不代替生产副本/体量/传输、旧责任排空交接或system。最终配置/执行包仍为未冻结，实际只读核验入口已获准沿用现有SSH；当前入口状态见下节，旧快照只作路径参考。
 
 原Go CD脚本已支持显式普通RocketMQ provider/endpoint等选项，但本轮事务owner映射、原事务绑定与分阶段准入以完整M3 JSON及受审环境/命令为准。不能把旧NSQ/provider/Outbox或自动迁移环境变量原样叠在新JSON上；最终参数回读必须核对实际优先级、保留非MQ预算/TLS/存储设置，并分别冻结封新写与验收阶段输入。自动生产CD继续暂停，当前不直接调用旧自动DDL/fallback发布路径。
 
 
 最终辅助PR253已正常合并至1465a129；17项CI检查、16报告691/0/0、334纯测试及原Go文件读取器通过，[合并回执](evidence/rocketmq-m3-final-candidate-ci-20261024.json)。截至此记录，T29仍缺实际生产输入与完整执行包，不涉及生产部署/DDL/provider变更。
+
+
+## 生产只读核验入口与待回读清单（2026-10-24）
+
+用户已授权沿用现有SSH做只读核验。保留Mac mini固定生产入口，不改成GitHub托管runner登录。首次连接`mac-mini-old`在SSH密钥交换前关闭；本机Tailscale查询为`NeedsLogin`、本机Online=false。尚未获得远端主机命令结果，不能据此判断Mac mini或生产主机故障；已请求用户恢复本机Tailscale登录。见[连接核验记录](evidence/rocketmq-m3-readonly-entry-20261024.json)。
+
+本次仅准备私有只读检查脚本并检查语法，未在生产执行。远端命令先核对hostname及Docker本机Unix socket，再输出白名单字段：镜像config ID、revision、Compose项目/服务/实例、资源与重启/OOM/health、挂载路径和原锁inode；环境只输出键名，命令只输出摘要，不打印环境值、DSN、配置正文或容器日志。原始私有材料保持目录0700/文件0600。
+
+| 待回读范围 | 冻结所需事实 | 完成状态 |
+| --- | --- | --- |
+| serverA / serverD业务runtime | 实际镜像与revision、项目/服务集合、collection实际副本、三个worker原预算、IAM/AI/API资源、锁路径与inode、变更前后容器身份 | 待SSH恢复 |
+| 三MySQL / QS Mongo | 由实际配置解析的数据库身份/版本、真实迁移journal与dirty、105前置证据位置及状态、当前owner绑定；不读取业务正文 | 待SSH恢复；版本达到105本身不代替前置验收 |
+| serverD RocketMQ / NSQ | 实际Broker/Proxy版本与镜像、事务/保留参数、Topic类型及owner授权、TLS身份/有效期、资源/可用内存、有效订阅积压/in-flight/deferred | 待SSH恢复；只查询，不provision或排空 |
+| Mac mini监控 | Prometheus/Grafana镜像与健康、targets、规则/告警加载及其摘要 | 待SSH恢复；不reload |
+| 最终输入与交付 | 原配置及覆盖项私有摘要、封新写/验收/开准入各阶段输入、目标镜像不可变引用、传输与回读、唯一协调目录和具名执行/恢复步骤 | 前置事实取得后冻结；不填CI值 |
+
+连接恢复后先完成以上事实回读，再生成可审阅生产执行清单。当前生产运行快照未取得、`runtime_configuration_frozen=false`、`execution_bundle_complete=false`、`production_approved=false`；T29不打勾。生产DDL/Topic/ACL/provider/部署仍需按最终具名清单确认，system验收及48小时另记。
