@@ -135,8 +135,8 @@ class IAMProtectionReceiptTest(unittest.TestCase):
 
     def test_exact_fixed_module_and_separate_profile(self):
         from iam_acceptance import validate_protection_profile
-        module = dict(Path='github.com/FangcunMount/reliable-messaging', Version='v0.5.0-rocketmq-tx.4',
-                      Sum='h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=',
+        module = dict(Path='github.com/FangcunMount/reliable-messaging', Version='v0.5.0',
+                      Sum='h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=',
                       GoModSum='h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')
         validate_protection_profile(module, True, True, False, False)
         for runtime, faults, fanout in ((False, False, False), (True, True, False), (True, False, True)):

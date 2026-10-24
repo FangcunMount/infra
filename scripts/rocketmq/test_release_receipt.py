@@ -30,7 +30,7 @@ class ReleaseGateTest(unittest.TestCase):
         self.report = {'sdk_sha': self.sha, 'passed': 48, 'failed': 0, 'skipped': 0,
                        'failure': None, 'cases': cases, 'sdk_tracked_sources_clean': True,
                        'clients': {'go': '5.1.4', 'python': '5.1.2'},
-                       'python_runtime': {'client': '5.1.2', 'sdk_version': '0.4.0a1'},
+                       'python_runtime': {'client': '5.1.2', 'sdk_version': '0.4.0'},
                        'cleanup': {'project_containers_remaining': False,
                                    'compose_down_succeeded': True,
                                    'probe_process_groups_drained': True,
@@ -64,6 +64,10 @@ class ReleaseGateTest(unittest.TestCase):
             self.check(report)
         report = copy.deepcopy(self.report)
         report['python_runtime']['client'] = '5.1.1'
+        with self.assertRaises(ValueError):
+            self.check(report)
+        report = copy.deepcopy(self.report)
+        report['python_runtime']['sdk_version'] = '0.4.0a1'
         with self.assertRaises(ValueError):
             self.check(report)
         self.source.write_text('changed after tests')
