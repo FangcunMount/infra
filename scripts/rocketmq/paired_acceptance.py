@@ -63,7 +63,10 @@ def valid_observation(value):
 
 
 MARKER = 'M3_PAIRED_HOST_RECEIPT '
-SDK_SHA256 = '570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2'
+SDK_GO_VERSION = 'v0.5.0-rocketmq-tx.4'
+SDK_GO_SUM = 'h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI='
+SDK_PYTHON_VERSION = '0.4.0a4'
+SDK_SHA256 = 'd2aa5fee9979dee43f9e5151026400bf730bf03ab29e7d0ba29536f3c6d4d471'
 
 
 def paired_manifest():
@@ -86,7 +89,7 @@ def paired_manifest():
     return manifest
 
 
-def read_receipt(output, *, full=False, partial=False, marker=MARKER, sdk_python="0.4.0a2"):
+def read_receipt(output, *, full=False, partial=False, marker=MARKER, sdk_python=SDK_PYTHON_VERSION):
     lines = [line.split(marker,1)[1] for line in output.splitlines() if marker+'{' in line]
     if len(lines) != 1 or len(lines[0]) > 16384:
         return None
@@ -99,7 +102,7 @@ def read_receipt(output, *, full=False, partial=False, marker=MARKER, sdk_python
             or any(value[k] is not True for k in FLAGS)
             or value['root'] != 'original_go_mysql_and_python_sqlalchemy'
             or (value['sdk_go'],value['sdk_python'],value['client_python']) != (
-                'v0.5.0-rocketmq-tx.2',sdk_python,'5.1.2')
+                SDK_GO_VERSION,sdk_python,'5.1.2')
             or value['profile'] != ('full' if full else 'core')
             or not isinstance(value['delivery_errors'],list)
             or any(not isinstance(v,str) or v not in DELIVERY_ERRORS for v in value['delivery_errors'])
@@ -138,8 +141,8 @@ def profile():
         raise ValueError('explicit paired core/full profile required')
     full = kind == 'full'
     from ai_finalization_characterization import diagnostics
-    return dict(name='paired',sdk_version='0.4.0a2',
-        sdk_url='https://github.com/FangcunMount/reliable-messaging/releases/download/python/v0.4.0a2/fangcun_reliable_messaging-0.4.0a2-py3-none-any.whl',
+    return dict(name='paired',sdk_version=SDK_PYTHON_VERSION,
+        sdk_url=f'https://github.com/FangcunMount/reliable-messaging/releases/download/python/v{SDK_PYTHON_VERSION}/fangcun_reliable_messaging-{SDK_PYTHON_VERSION}-py3-none-any.whl',
         sdk_sha256=SDK_SHA256,file='rocketmq_paired_host.py',manifest=paired_manifest,
         partial=lambda output:read_receipt(output,full=full,partial=True),
         parse=lambda output,junit:parse_receipt(output,junit,full=full),
@@ -160,7 +163,7 @@ def prepare_qs(source,directory,project,mysql_port,password,run,proof):
         raise ValueError('exact paired QS source required')
     env = dict(os.environ,GOWORK='off',GOFLAGS='-mod=readonly')
     module = json.loads(run(['go','list','-m','-json','github.com/FangcunMount/reliable-messaging'],cwd=source,env=env).stdout)
-    if (module.get('Replace') or module.get('Version') != 'v0.5.0-rocketmq-tx.2' or module.get('Sum') != 'h1:kBHB/1aG/fAB6BPlITOwRYIX9XazRisz0PgfwyJ1VFY='
+    if (module.get('Replace') or module.get('Version') != SDK_GO_VERSION or module.get('Sum') != SDK_GO_SUM
             or module.get('GoModSum') != 'h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I='):
         raise ValueError('fixed published QS host SDK required')
     go_version = run(['go','version'],cwd=source,env=env).stdout.strip()
@@ -175,6 +178,6 @@ def prepare_qs(source,directory,project,mysql_port,password,run,proof):
         helper_source_sha256=hashlib.sha256((source/'tests/m3_ai_paired_probe/main.go').read_bytes()).hexdigest(),
         helper_binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest())
     return dict(qs_source=str(source),qs_source_sha=sha,qs_binary=str(binary),
-        qs_sdk_module=module,qs_dsn=f'root:{password}@tcp(127.0.0.1:{mysql_port})/?parseTime=true',
+        qs_sdk_module=module,sdk_go_version=SDK_GO_VERSION,qs_dsn=f'root:{password}@tcp(127.0.0.1:{mysql_port})/?parseTime=true',
         project=project,private_directory=str(directory),
         paired_profile=os.environ.get('QS_M3_PAIRED_PROFILE','core'))

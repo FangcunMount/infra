@@ -1,0 +1,28 @@
+{
+  "schema": "m3-protocol-review-candidate/v1",
+  "status": "candidate_pending_actual_current_paired_ci",
+  "sdk_source": "04757bd3212ca961d8eaec22ecd3560101111e18",
+  "sdk_main": "03c62b403de0873ba945b5dd6f3bc91df602e4e8",
+  "sdk_implementation_unchanged_from_prerelease": true,
+  "contract_sha256": {
+    "transaction/store.go": "bb4b8daec928b4dd5ee923d70b25399e674d630d5398404c4b4ee60ff792e9fd",
+    "transaction/evidence.go": "1af6428e3209d6870918221a90cd462efdcad24481e2cf1db7c3d29c5f4ed286",
+    "transport/rocketmq/transaction_sender.go": "4bcdc197db334a7cdb11b9aa58099ef7159d895bd99f7cd247d0082a9bb259af",
+    "transport/rocketmq/transaction_lifecycle.go": "e31614f64d913f2f12d51896916f57a4b4cdc299133326cf90160caf42cb8ee9",
+    "storage/transaction/mysql/schema.sql": "74c5ed5a477e1a420682082e15b034ff0d68ca2c5e54d2c3275906c19a789b98",
+    "python/src/reliable_messaging/transaction.py": "14cdf37af39d91b3e771e6b2d801fd5eb8f7ef054cace7186a98f4dd79e5faf4",
+    "python/src/reliable_messaging/rocketmq_transaction.py": "07c6ffc2afe8d7965701b315a247f35d7a2259acee09e398629f9dfcc085f7a4",
+    "python/src/reliable_messaging/transaction_mysql.py": "2b22fde8b1241cd407fd7e09951046bd4519d7f9858f1b8f77ff352b993e8179"
+  },
+  "scope": "Go/Python API, exact original witness, independent three-stage outcome, explicit retry/replan, bounded lifecycle and unchanged schema/codec; producer consistency does not prove consumer effect",
+  "go_version": "v0.5.0-rocketmq-tx.4",
+  "python_version": "0.4.0a4",
+  "production_advanced_recovery": "excluded_pending_separate_acceptance",
+  "host_baselines": {
+    "iam": "035f94e572290ed3e1b316db45b30d88db399a16",
+    "qs": "83147d8e99e00fd36c57bc2fc4feb193ebe2a844",
+    "ai": "b0cb329af92bd6914c6cf7907f3ce5d64f509bbe"
+  },
+  "stable_tags_published": false,
+  "production_deployed": false
+}

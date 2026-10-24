@@ -6,12 +6,12 @@ on:
         description: Exact QS paired host source SHA
         type: string
         required: true
-        default: 99826d86deeee427ac8b1cb287f2185ba300d78b
+        default: 83147d8e99e00fd36c57bc2fc4feb193ebe2a844
       ai_ref:
         description: Exact AI paired host source SHA
         type: string
         required: true
-        default: c17b36665578edddcd09ee5cac6fc5ba83cbcd56
+        default: b0cb329af92bd6914c6cf7907f3ce5d64f509bbe
       profile:
         description: Core is development only; full is mandatory for T20/T23
         type: choice
@@ -47,17 +47,17 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: 8de893b367cc797580799abd8325f41dd62356db
+          ref: 04757bd3212ca961d8eaec22ecd3560101111e18
           path: .sdk-acceptance
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: ${{ inputs.qs_ref || '99826d86deeee427ac8b1cb287f2185ba300d78b' }}
+          ref: ${{ inputs.qs_ref || '83147d8e99e00fd36c57bc2fc4feb193ebe2a844' }}
           path: .qs-acceptance
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: ${{ inputs.ai_ref || 'c17b36665578edddcd09ee5cac6fc5ba83cbcd56' }}
+          ref: ${{ inputs.ai_ref || 'b0cb329af92bd6914c6cf7907f3ce5d64f509bbe' }}
           path: .ai-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -69,8 +69,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Verify exact host candidates and strict receipt gates
         env:
-          EXPECTED_QS_SHA: ${{ inputs.qs_ref || '99826d86deeee427ac8b1cb287f2185ba300d78b' }}
-          EXPECTED_AI_SHA: ${{ inputs.ai_ref || 'c17b36665578edddcd09ee5cac6fc5ba83cbcd56' }}
+          EXPECTED_QS_SHA: ${{ inputs.qs_ref || '83147d8e99e00fd36c57bc2fc4feb193ebe2a844' }}
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || 'b0cb329af92bd6914c6cf7907f3ce5d64f509bbe' }}
         run: |
           set -euo pipefail
           [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]
