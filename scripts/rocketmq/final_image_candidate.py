@@ -111,16 +111,23 @@ def main():
     output = args.output.resolve()
     output.mkdir(mode=0o700, parents=True, exist_ok=False)
     os.umask(0o077)
+    builder = Path(__file__).resolve().parents[2]
+    builder_sha = run(['git', 'rev-parse', 'HEAD'], cwd=builder).strip()
+    if builder_sha != os.environ.get('GITHUB_SHA'):
+        raise ValueError('reviewed_workflow_checkout_identity_required')
     suffix = uuid.uuid4().hex[:12]
     image = 'm3-final-' + args.target + ':' + suffix
     container = 'm3-final-inventory-' + suffix
     original = run(['docker', 'ps', '-aq']).split()
     report = {'schema': 'm3-final-image-inventory/v1', 'target': args.target,
-              'source_sha': args.source_sha, 'production': False,
+              'source_sha': args.source_sha, 'builder_source_sha': builder_sha,
+              'expected_sdk_source_sha': '1345266aa0e864c46de5d1e3e3c939dd8002a890',
+              'production': False,
               'application_started': False, 'registry_published': False,
               'runtime_ready': False, 'cutover_rehearsal_complete': False}
     try:
         dockerfile, binary = TARGETS[args.target]
+        report['dockerfile_sha256'] = sha256(source / dockerfile)
         build_time = datetime.datetime.now(datetime.timezone.utc).isoformat()
         run(['docker', 'build', '--platform', 'linux/amd64', '--file', dockerfile,
              '--tag', image, '--build-arg', 'VERSION=m3-' + args.source_sha,

@@ -1,0 +1,22 @@
+{
+  "schema": "m3-image-ci-first-failure/v1",
+  "run": 40068013187,
+  "job": 120795224703,
+  "infra_sha": "dedbd3911d01757f8adf1b8aa466724bc2b3918e",
+  "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+  "report_sha256": "a22431c9e17e921d519f9ac804789e2da2442fc8fa645351e91fe274af7913f6",
+  "passed": 29,
+  "failed": 1,
+  "skipped": 0,
+  "failure_class": "three_physical_inputs_shared_budget_receive_timeout",
+  "cleanup": {
+    "project_containers_remaining": false,
+    "compose_down_succeeded": true,
+    "probe_process_groups_drained": true,
+    "private_fixture_directory_removed": true
+  },
+  "root_cause": "not_established",
+  "decision": "Run unchanged cases and budgets against formally published stable SDK1345266 as canonical default; retain historical failure and explicit old-ref reproduction",
+  "tests_or_timeouts_relaxed": false,
+  "production": false
+}

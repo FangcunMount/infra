@@ -1,6 +1,6 @@
 # M3 最终候选准备与验收边界
 
-唯一任务进度见[M3总表](rocketmq-m3-execution.md)。本页细化原T29，不增加任务数。T28正式制品宿主门禁尚在执行；以下为独立准备，不表示T29完成或生产授权。
+唯一任务进度见[M3总表](rocketmq-m3-execution.md)。本页细化原T29，不增加任务数。T28正式制品宿主门禁已完成；以下为最终候选准备，不表示T29完成或生产授权。
 
 | 子项 | 当前状态 | 完成证据 |
 | --- | --- | --- |
@@ -23,3 +23,9 @@ QS当前runtime镜像没有`qs-migrate-offline`。候选构建从同一固定源
 镜像inventory不是恢复/启动演练；本路径明确输出`runtime_ready=false`和`cutover_rehearsal_complete=false`。最终配置必须另行挂载M3事件清单与route revision，保持原三个worker资源/并发；不得依赖镜像默认NSQ配置启动。最终镜像、配置、保护范围与执行清单齐全后才提交具名生产确认。
 
 105独立生产前置、T30实际版本/对象身份、合法system登录以及上线后48小时观察继续保留。首次新runtime命令之前按原批准范围恢复；发出后保留不可逆启动屏障，只做兼容前向修复。未决事务/notice/witness和历史保护资产不清理。
+
+## 通用SDK门禁默认版本同步
+
+首次PR238旧源码dedbd391的旧SDK bfaae2b在共享消费预算测试等待received超时，29通过/1失败/0跳过，原声明清理通过。根因尚未确认，[原失败证据](evidence/rocketmq-m3-image-ci-first-failure-20261024.json)保留。已正式发布的1345266在T28两档同类完整故障各48项通过。通用Docker/public/fault/limits/resource CI默认引用同步1345266；所有用例、90秒等待、队列/并发和错误门禁保持原值，独立原生index生成fixture仍绑定其原版本。旧SDK可显式传SHA复现，不把新版本通过称为旧版本bug修复。新head全部门禁未通过前不合并辅助实现、不勾选T29。
+
+镜像inventory另记录实际构建工具的完整infra SHA，并要求等于workflow事件SHA；同时记录原Dockerfile摘要。构建、配置资源冻结、恢复/启动演练分别保留证据。
