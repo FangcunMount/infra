@@ -1,0 +1,118 @@
+name: M3 isolated final image candidates
+on:
+  pull_request:
+    paths:
+      - scripts/rocketmq/final_image_candidate.py
+      - scripts/rocketmq/test_final_image_candidate.py
+      - .github/workflows/rocketmq-final-images.yml
+  workflow_dispatch:
+    inputs:
+      iam_sha:
+        description: Exact reviewed stable IAM source SHA
+        type: string
+        required: true
+      qs_sha:
+        description: Exact reviewed stable QS source SHA
+        type: string
+        required: true
+      ai_sha:
+        description: Exact reviewed stable AI source SHA
+        type: string
+        required: true
+      run_uid:
+        description: Explicit reviewed Go image UID; T30 must match actual hosts
+        type: string
+        default: '2000'
+      run_gid:
+        description: Explicit reviewed Go image GID; T30 must match actual hosts
+        type: string
+        default: '2000'
+permissions:
+  contents: read
+concurrency:
+  group: m3-final-images-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_final_image_candidate.py
+  images:
+    if: github.event_name == 'workflow_dispatch'
+    needs: contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: iam
+            repository: iam
+          - target: qs-api
+            repository: qs-server
+          - target: qs-collection
+            repository: qs-server
+          - target: qs-worker
+            repository: qs-server
+          - target: ai
+            repository: qs-ai
+    env:
+      SOURCE_SHA: ${{ matrix.repository == 'iam' && inputs.iam_sha || matrix.repository == 'qs-server' && inputs.qs_sha || inputs.ai_sha }}
+      TARGET: ${{ matrix.target }}
+      RUN_UID: ${{ inputs.run_uid }}
+      RUN_GID: ${{ inputs.run_gid }}
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate exact source and explicit image identity
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$RUN_UID" =~ ^[1-9][0-9]*$ && "$RUN_GID" =~ ^[1-9][0-9]*$ ]]
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/${{ matrix.repository }}
+          ref: ${{ env.SOURCE_SHA }}
+          path: .image-source
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache: false
+      - name: Build original Dockerfile, inventory and save exact candidate
+        run: |
+          set -euo pipefail
+          python3 scripts/rocketmq/final_image_candidate.py --source "$PWD/.image-source" \
+            --source-sha "$SOURCE_SHA" --target "$TARGET" --output "$PWD/.image-candidate" \
+            --run-uid "$RUN_UID" --run-gid "$RUN_GID"
+      - name: Require nonempty inventory and owned cleanup
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('.image-candidate/image-inventory.json').read_text())
+          assert x['passed']==1 and x['failed']==x['skipped']==0
+          assert x['deferred_tools_absent'] and x['archive_bytes']>0
+          assert all(x['cleanup'].values())
+          assert not any(x[k] for k in ('production','registry_published','application_started','runtime_ready','cutover_rehearsal_complete'))
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m3-final-image-metadata-${{ matrix.target }}-${{ env.SOURCE_SHA }}-${{ github.run_id }}
+          path: .image-candidate/image-inventory.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        with:
+          name: m3-final-image-archive-${{ matrix.target }}-${{ env.SOURCE_SHA }}-${{ github.run_id }}
+          path: |
+            .image-candidate/*.tar.gz
+            .image-candidate/qs-migrate-offline
+          include-hidden-files: true
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
