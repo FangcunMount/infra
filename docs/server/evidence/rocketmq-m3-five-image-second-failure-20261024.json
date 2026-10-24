@@ -1,0 +1,213 @@
+{
+  "schema": "m3-five-image-start-second-failure/v1",
+  "run_id": 40083039784,
+  "report_sha256": "96b74852409068380f90aba266e1ada6aae5db1ab76f305bbad4d1ba3920741a",
+  "report": {
+    "schema": "m3-five-actual-image-startup-trial/v1",
+    "passed": 7,
+    "failed": 1,
+    "skipped": 0,
+    "production": false,
+    "system_acceptance": false,
+    "combined_cutover_rehearsal_complete": false,
+    "c1_cutover_barrier_exercised": false,
+    "cases": {
+      "all_five_exact_archives_loaded": true,
+      "original_current_qs_pair_prepared": true,
+      "original_qs_dual_binding_verified": true,
+      "original_iam_schema45_and_binding_selected": true,
+      "original_ai_schema43_and_binding_verified": true,
+      "actual_iam_ready_and_paused_checker_live": true,
+      "actual_readonly_ai_ready_and_paused_checker_live": true
+    },
+    "sources": {
+      "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "qs": "d3269bda672b97582edb691ca4f924484c653822",
+      "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+    },
+    "infra_sha": "b6fa6e1272814f732f54c62a60ff9a40135128ba",
+    "candidates": {
+      "iam": {
+        "target": "iam",
+        "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+      },
+      "qs-api": {
+        "target": "qs-api",
+        "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+        "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3"
+      },
+      "qs-collection": {
+        "target": "qs-collection",
+        "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+        "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c"
+      },
+      "qs-worker": {
+        "target": "qs-worker",
+        "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+        "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc"
+      },
+      "ai": {
+        "target": "ai",
+        "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+        "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+      }
+    },
+    "dependency_image_ids": {
+      "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "rocketmq": "sha256:316d51659b6e0ed87bfb1bc164c9bc746af63846624513b191a3b3d0146e97d5",
+      "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+    },
+    "resources": {
+      "version": 2,
+      "operations": 52,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true
+    },
+    "qs_schema": {
+      "journal_force_used": false,
+      "mongo": 43,
+      "mysql": 110,
+      "original_templates_applied": true,
+      "production": false,
+      "profile": "current",
+      "resources_sha256": "f0ddf4125b7f39435c5cfed88ca7a4bd89be2362bc3bf7d7394c9dc6c82d6812",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+    },
+    "iam_controlled_seed": {
+      "controlled_seed": true,
+      "legacy_drain_claimed": false,
+      "publication_intents_created": false,
+      "schema_version": 41,
+      "seed_events_retained": 2,
+      "witnesses_created": false
+    },
+    "configuration_sha256": {
+      "iam": "61f9e87242562ffe406037c48f8142dc82d95aa3e42a1067d66f754f3e529967",
+      "api": "97f08186ec0c66e5b011a0fcedd4a1036bf4c1e39769a247104c50c0dba3444d",
+      "collection": "9948f60c17b587d179d5d18112d09072a1801e65ff77cc1df150afe0b8b6ac5c",
+      "worker": "f4790f1f00ee571e58401e944fd72b03cf5457aad869f76c3935722e7159f1c1"
+    },
+    "runtime_environment_sha256": {
+      "iam": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ai": "3b148c2545134b4484c1efd3f26943ef0ea750ad238298d409614a6de9642899",
+      "api": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "actual_runtime_budgets": {
+      "iam": {
+        "memory_bytes": 536870912,
+        "nano_cpus": 1000000000
+      },
+      "ai": {
+        "memory_bytes": 805306368,
+        "nano_cpus": 750000000
+      },
+      "api": {
+        "memory_bytes": 1073741824,
+        "nano_cpus": 2000000000
+      }
+    },
+    "iam_metrics": {
+      "sdk_ready": 1,
+      "sampler_running": 1,
+      "observation_available": 1,
+      "admission_open": 0,
+      "check_workers_limit": 4,
+      "check_queue_limit": 32
+    },
+    "ai_metrics": {
+      "sdk_ready": 1,
+      "sampler_running": 1,
+      "observation_available": 1,
+      "admission_open": 0,
+      "check_workers_limit": 1,
+      "check_queue_limit": 16
+    },
+    "failure_stage": "actual_qs_api_start",
+    "failure_kind": "RuntimeError",
+    "failure_reason": "actual_api_exited",
+    "processes": {
+      "iam": {
+        "private_log_sha256": "a8945581299af4ee13decc0089a6d53ea0ffdbd6bbf13ee2d7418ad66f987c5d",
+        "state": {
+          "Status": "running",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": false,
+          "panic": false
+        },
+        "source_markers": []
+      },
+      "ai": {
+        "private_log_sha256": "a6b040dadd8ba90a6f582514232c96795d5a46f3ffeaa73469649e62c799e851",
+        "state": {
+          "Status": "running",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": false,
+          "invalid_configuration": false,
+          "panic": false
+        }
+      },
+      "api": {
+        "private_log_sha256": "2fb03f868ef4359cb357bf04714a464cf7ed296d0de72cadd86776c92055734e",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 1,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": true,
+          "permission_denied": true,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [
+          {
+            "path": "internal/apiserver/process/standard_event_subsystem_m4.go",
+            "line": 54,
+            "template_sha256": "490707ad40719de9e28c1c511221b283b78a7521c5925a3e11110127ed2d1c84"
+          }
+        ]
+      }
+    },
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    },
+    "sources_unchanged": true
+  },
+  "diagnostic_followup": "The authored error marker is original standard_event_subsystem_m4.go:54: transaction owners cannot also select standard Outbox profiles. Fixed by final runtime configuration selecting both standard_outbox publication profiles false; guard and host source unchanged. Fixed-token log presence is not a causal error diagnosis.",
+  "production": false
+}
