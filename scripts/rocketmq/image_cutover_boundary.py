@@ -3,6 +3,7 @@
 The caller must supply real protection/restore evidence and frozen seven-process
 specifications. This adapter neither migrates nor restores any database.
 """
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -67,6 +68,8 @@ def startup_receipt(path):
             and len(value['cases']) == 15 and all(v is True for v in value['cases'].values())
             and value['sources'] == SOURCES and value['sources_unchanged'] is True
             and value['mysql_runtime_ddl_attempts'] == value['mongo_runtime_ddl_attempts'] == 0
+            and value['mongo_ddl_audit']['positive_controls'] == 4
+            and value['mongo_ddl_audit']['commands'] == []
             and not any(value[k] for k in ('production', 'system_acceptance', 'combined_cutover_rehearsal_complete', 'c1_cutover_barrier_exercised')),
             'actual_original_startup_trial_required')
     require(set(value['processes']) == set(COMPONENTS)
@@ -126,6 +129,8 @@ def publish_owned_images(fixture):
 class ActualImageBoundary:
     def __init__(self, fixture, *, scope, protection_sha256, restore_receipt_sha256, source_bundle_sha256, specs):
         ci_guard(os.environ)
+        self.window_started = time.monotonic()
+        self.window_started_wall = datetime.now(timezone.utc)
         self.f = fixture; self.root = fixture.directory; self.directory = self.root / 'actual-cutover'; self.plans = {}
         self.specs = json.loads(json.dumps(specs))
         require(set(scope) == {'iam.mysql', 'qs.mysql', 'qs.mongo', 'ai.mysql'} and set(specs) == set(COMPONENTS), 'complete_four_store_seven_process_scope_required')
@@ -175,7 +180,7 @@ class ActualImageBoundary:
                 images={component: compose['services'][component]['image']}, instances={component: 1}, ai_host=component == 'ai')
             plan = self.root / (component + '-actual-start.json'); write_private(plan, value)
             sha = hashlib.sha256(plan.read_bytes()).hexdigest(); self.plans[component] = runtime_start.load(plan, sha)
-        self.started = set(); self.window_started = time.monotonic()
+        self.started = set()
 
     def maintain(self, name, callback):
         with Boundary(self.directory, self.binding_sha) as operation:

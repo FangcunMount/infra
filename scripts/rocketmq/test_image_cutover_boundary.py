@@ -11,6 +11,7 @@ def synthetic_unit_receipt():
     return dict(schema='m3-five-actual-image-startup-trial/v2', passed=15, failed=0, skipped=0,
         cases={str(n):True for n in range(15)}, sources=SOURCES, sources_unchanged=True,
         mysql_runtime_ddl_attempts=0,mongo_runtime_ddl_attempts=0,
+        mongo_ddl_audit=dict(positive_controls=4,commands=[]),
         production=False,system_acceptance=False,combined_cutover_rehearsal_complete=False,c1_cutover_barrier_exercised=False,
         processes={c:{'state':dict(Status='exited',ExitCode=0,OOMKilled=False)} for c in COMPONENTS},
         cleanup=dict(compose_down_succeeded=True,private_directory_removed=True,existing_containers_unchanged=True,existing_networks_unchanged=True),

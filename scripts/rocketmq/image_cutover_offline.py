@@ -102,7 +102,7 @@ def prepare(f, args, databases, ai_admin_environment, specs):
     boundary = ActualImageBoundary(f, scope=scope, protection_sha256=protection.manifest_sha,
         restore_receipt_sha256=protection.receipt_sha, source_bundle_sha256=bundle_sha, specs=specs)
     f.boundary = boundary
-    started = datetime.now(timezone.utc)
+    started = boundary.window_started_wall
     f.report.update(startup_receipt_sha256=trial_sha, source_bundle_sha256=bundle_sha,
         production_backup_retention_verified=False, ci_approval_only=True)
     f.stage = 'original_offline_iam45'
