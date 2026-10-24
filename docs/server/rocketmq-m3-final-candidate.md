@@ -153,7 +153,7 @@ IAM [PR149](https://github.com/FangcunMount/iam/pull/149)仅补离线工具40起
 批准后先再次比较原偏好和状态；若不符，停止并重新冻结。使用现有控制面和以下显式设置发起合法网页认证（不使用聊天提供的密码/auth key，不删除旧状态）：
 
 ```sh
-tailscale login --login-server=https://controlplane.tailscale.com \
+tailscale login --login-server=https://controlplane.tailscale.com --hostname=serverD \
   --accept-dns=false --accept-routes=false --ssh=false --netfilter-mode=on \
   --snat-subnet-routes=true --shields-up=false --advertise-routes= \
   --advertise-exit-node=false --exit-node= --timeout=2m
