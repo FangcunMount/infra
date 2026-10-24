@@ -7049,6 +7049,25 @@
           ]
         },
         "scope": "failed development fixture retained, not actual host acceptance"
+      },
+      {
+        "report_sha256": "5b023733a55552a9acf845db71fd34df634d4c63a0aad920a7835da3122892bb",
+        "candidate_sha": "d741ace8724b7851294f832ffdadb2b5f6b318f0",
+        "passed": 5,
+        "failed": 1,
+        "skipped": 0,
+        "failure_stage": "original_observer_start",
+        "cleanup": {
+          "broker_parameters_restored": true,
+          "probe_process_groups_drained": true,
+          "compose_down_succeeded": true,
+          "project_containers_remaining": false,
+          "project_networks_remaining": false,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "private_fixture_directory_removed": true
+        },
+        "diagnostic_limit": "host log not flushed, empty output digest; concrete package cwd error fixed, further native outcome pending"
       }
     ],
     "iam_candidates": [
@@ -7060,7 +7079,7 @@
       "CI host observer initially used unsupported Shutdown method; changed to published Close and all package race/vet passed"
     ],
     "current_iam_source": "bee9c5c1a9945922dc4e88631af451babee646ca",
-    "current_infra_host_source": "d741ace8724b7851294f832ffdadb2b5f6b318f0",
+    "current_infra_host_source": "07863d003e42714ff6fa5e76e7802660c77a3d3d",
     "current_maintenance_source": "9de0b5024453a1f5d096b7b0260680294aec09b4",
     "current_gates_complete": false,
     "superseded_runs_cancel_requested": [
@@ -7070,6 +7089,493 @@
       40055090147
     ],
     "required_current_head_cancelled": false,
-    "production_touched": false
+    "production_touched": false,
+    "current_rollback_source": "5f472c73c99f9ab61d9b1febea6f738d4bb3d69b"
+  },
+  "t25_c2_composed_maintenance_target_gate": {
+    "report": {
+      "schema": "m3-host-maintenance-composition/v1",
+      "infra_sha": "9de0b5024453a1f5d096b7b0260680294aec09b4",
+      "passed": 43,
+      "failed": 0,
+      "skipped": 0,
+      "failure": null,
+      "proof": {
+        "images": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3"
+        },
+        "versions": {
+          "mysql": "8.0.44",
+          "mongo": "7.0.37"
+        },
+        "progress": {
+          "stage": "ai-forbidden-poststart",
+          "completed_steps": [
+            "iam-maintenance",
+            "qs-maintenance",
+            "ai-maintenance",
+            "first-runtime-sentinel"
+          ],
+          "reports": {
+            "iam": {
+              "passed": 15,
+              "failed": 0,
+              "skipped": 0,
+              "test_ids": [
+                "TestM3MessagingOfflineNative",
+                "TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts",
+                "TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime",
+                "TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained",
+                "TestM3MessagingOfflineNative/controlled-partial-ddl-dirty-stage-restores-only-original-scope",
+                "TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force",
+                "TestM3MessagingOfflineNative/independent-digest-and-current-primary-required",
+                "TestM3MessagingOfflineNative/journal-shape-drift-refuses-before-removing-any-object",
+                "TestM3MessagingOfflineNative/new-request-responsibility-refuses-scope-restore",
+                "TestM3MessagingOfflineNative/original-journal-lock-honors-real-offline-deadline",
+                "TestM3MessagingOfflineNative/original-migrator-lock-blocks-scope-restore",
+                "TestM3MessagingOfflineNative/original-protection-is-exclusive-real-journal-and-no-business-copy",
+                "TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive",
+                "TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility",
+                "TestM3MessagingOfflineNative/scope-restore-keeps-new-authn-fact-and-original-journal-ddl"
+              ],
+              "raw_sha256": "439c16ee107b132bc9bc67ab35b784aee1dca99b286f780cbba9be7fed32a963"
+            },
+            "qs": {
+              "passed": 17,
+              "failed": 0,
+              "skipped": 0,
+              "test_ids": [
+                "TestM3InitialBindingCLINative",
+                "TestM3InitialBindingCLINative/actual-new-protocol-responsibility-refuses-without-replacing-any-evidence",
+                "TestM3InitialBindingCLINative/two-real-installers-one-winner-per-owner-and-original-pair-unchanged",
+                "TestOfflineNativeMissingBoundResourcesRefusedBeforeDDL",
+                "TestOfflineNativeMissingBoundResourcesRefusedBeforeDDL/mongodb",
+                "TestOfflineNativeMissingBoundResourcesRefusedBeforeDDL/mysql",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL/invalid_protection_scope_",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL/invalid_protection_scope_m4_actor_columns",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL/invalid_protection_scope_m4_mongo_historical_indexes",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL/invalid_protection_scope_m4_sql_historical_columns",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL/invalid_protection_scope_unknown",
+                "TestOfflineNativeMongoCancellationRetainsPartialState",
+                "TestOfflineNativeMongoPartialFailureRemainsDirty",
+                "TestOfflineNativeSQLDeadlineRetainsUnknownPartialState",
+                "TestOfflineNativeSQLPartialFailureRemainsDirty",
+                "TestOfflineNativeUpgradeAndFreshNoop"
+              ],
+              "raw_sha256": "3dad1adb16513806c9df8d01f85ccdd0c0851821b1d6b30565617aee3a70c698"
+            },
+            "ai": {
+              "passed": 8,
+              "failed": 0,
+              "skipped": 0,
+              "test_ids": [
+                "tests.integration.test_initial_transaction_binding.test_initial_binding_cli_preserves_old_responsibility_and_only_installs_reviewed_root",
+                "tests.integration.test_initial_transaction_binding.test_initial_binding_refuses_reviewed_primary_identity_mismatch",
+                "tests.integration.test_initial_transaction_binding.test_initial_binding_rejects_actual_new_protocol_responsibility",
+                "tests.integration.test_initial_transaction_binding.test_initial_binding_two_real_cli_installers_choose_one_original_winner",
+                "tests.integration.test_transaction_schema.test_installed_schema_requires_binding_and_preserves_original_root",
+                "tests.integration.test_transaction_schema.test_native_governance_resolved_reimport_preserves_first_index",
+                "tests.integration.test_transaction_schema.test_transaction_archive_shares_original_root_and_never_exposes_prepared",
+                "tests.integration.test_transaction_schema.test_transaction_downgrade_retains_all_evidence"
+              ],
+              "raw_sha256": "c891f1581e546c658a9de4fac7f93834baf7de9e14027c5ecb62fc73bf56c466"
+            }
+          }
+        },
+        "composition": {
+          "source_bundle_sha256": "141c63ae832459952e4593d73117fbe84500b96728483e0019757246866b8759",
+          "host_sources": {
+            "iam": "36456cdf2f1c980a5edeedce2eee44634097a00d",
+            "qs": "83147d8e99e00fd36c57bc2fc4feb193ebe2a844",
+            "ai": "05d2db7151d492bec127270d53121396b515f763"
+          },
+          "reports": {
+            "iam": {
+              "passed": 15,
+              "failed": 0,
+              "skipped": 0,
+              "test_ids": [
+                "TestM3MessagingOfflineNative",
+                "TestM3MessagingOfflineNative/additive-offline-migration-keeps-unprotected-authn-facts",
+                "TestM3MessagingOfflineNative/binding-and-selection-commit-together-no-runtime",
+                "TestM3MessagingOfflineNative/both-legacy-ledgers-must-be-drained",
+                "TestM3MessagingOfflineNative/controlled-partial-ddl-dirty-stage-restores-only-original-scope",
+                "TestM3MessagingOfflineNative/dirty-metadata-refuses-without-force",
+                "TestM3MessagingOfflineNative/independent-digest-and-current-primary-required",
+                "TestM3MessagingOfflineNative/journal-shape-drift-refuses-before-removing-any-object",
+                "TestM3MessagingOfflineNative/new-request-responsibility-refuses-scope-restore",
+                "TestM3MessagingOfflineNative/original-journal-lock-honors-real-offline-deadline",
+                "TestM3MessagingOfflineNative/original-migrator-lock-blocks-scope-restore",
+                "TestM3MessagingOfflineNative/original-protection-is-exclusive-real-journal-and-no-business-copy",
+                "TestM3MessagingOfflineNative/preview-is-read-only-and-exclusive",
+                "TestM3MessagingOfflineNative/reviewed-selection-cannot-cross-new-protocol-responsibility",
+                "TestM3MessagingOfflineNative/scope-restore-keeps-new-authn-fact-and-original-journal-ddl"
+              ],
+              "raw_sha256": "439c16ee107b132bc9bc67ab35b784aee1dca99b286f780cbba9be7fed32a963"
+            },
+            "qs": {
+              "passed": 17,
+              "failed": 0,
+              "skipped": 0,
+              "test_ids": [
+                "TestM3InitialBindingCLINative",
+                "TestM3InitialBindingCLINative/actual-new-protocol-responsibility-refuses-without-replacing-any-evidence",
+                "TestM3InitialBindingCLINative/two-real-installers-one-winner-per-owner-and-original-pair-unchanged",
+                "TestOfflineNativeMissingBoundResourcesRefusedBeforeDDL",
+                "TestOfflineNativeMissingBoundResourcesRefusedBeforeDDL/mongodb",
+                "TestOfflineNativeMissingBoundResourcesRefusedBeforeDDL/mysql",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL/invalid_protection_scope_",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL/invalid_protection_scope_m4_actor_columns",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL/invalid_protection_scope_m4_mongo_historical_indexes",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL/invalid_protection_scope_m4_sql_historical_columns",
+                "TestOfflineNativeMissingRecoveryAndPristineRefusedBeforeDDL/invalid_protection_scope_unknown",
+                "TestOfflineNativeMongoCancellationRetainsPartialState",
+                "TestOfflineNativeMongoPartialFailureRemainsDirty",
+                "TestOfflineNativeSQLDeadlineRetainsUnknownPartialState",
+                "TestOfflineNativeSQLPartialFailureRemainsDirty",
+                "TestOfflineNativeUpgradeAndFreshNoop"
+              ],
+              "raw_sha256": "3dad1adb16513806c9df8d01f85ccdd0c0851821b1d6b30565617aee3a70c698"
+            },
+            "ai": {
+              "passed": 8,
+              "failed": 0,
+              "skipped": 0,
+              "test_ids": [
+                "tests.integration.test_initial_transaction_binding.test_initial_binding_cli_preserves_old_responsibility_and_only_installs_reviewed_root",
+                "tests.integration.test_initial_transaction_binding.test_initial_binding_refuses_reviewed_primary_identity_mismatch",
+                "tests.integration.test_initial_transaction_binding.test_initial_binding_rejects_actual_new_protocol_responsibility",
+                "tests.integration.test_initial_transaction_binding.test_initial_binding_two_real_cli_installers_choose_one_original_winner",
+                "tests.integration.test_transaction_schema.test_installed_schema_requires_binding_and_preserves_original_root",
+                "tests.integration.test_transaction_schema.test_native_governance_resolved_reimport_preserves_first_index",
+                "tests.integration.test_transaction_schema.test_transaction_archive_shares_original_root_and_never_exposes_prepared",
+                "tests.integration.test_transaction_schema.test_transaction_downgrade_retains_all_evidence"
+              ],
+              "raw_sha256": "c891f1581e546c658a9de4fac7f93834baf7de9e14027c5ecb62fc73bf56c466"
+            }
+          },
+          "post_start_refused": [
+            "iam",
+            "qs",
+            "ai"
+          ],
+          "production_authorized": false,
+          "actual_runtime": false,
+          "actual_writer_freeze": false,
+          "actual_production_backup_restore": false,
+          "scope": "same C1 operation, actual individual host maintenance/DDL/binding test contracts; synthetic process sentinel; not a shared business DB or production cutover"
+        },
+        "owned_databases_removed": true
+      },
+      "cleanup": {
+        "compose_down_succeeded": true,
+        "project_containers_remaining": false,
+        "project_networks_remaining": false,
+        "existing_containers_unchanged": true,
+        "existing_networks_unchanged": true,
+        "private_fixture_directory_removed": true
+      },
+      "limits": [
+        "Individual original host contracts under one C1 operation, not one shared business database",
+        "Runtime sentinel is synthetic; no actual production writer freeze, backup or system acceptance",
+        "Host fixture protection/recovery does not authorize production DDL or data restoration"
+      ]
+    },
+    "raw_report_sha256": "d3896f2def0b9a1a7744cb6a0073102c2e43dcfa70762a0e731137eb33d740a2",
+    "ci_run": 40055950137,
+    "pr": 222,
+    "associated_full_checks_complete": true,
+    "merged": true,
+    "c2_parent_complete": true,
+    "full_gate_proof": {
+      "source_sha": "9de0b5024453a1f5d096b7b0260680294aec09b4",
+      "checks": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-24T03:12:44Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40055950154/job/120758951122",
+          "name": "acceptance",
+          "startedAt": "2026-10-24T02:53:05Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ Docker acceptance"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-24T03:09:39Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40055950136/job/120758917944",
+          "name": "resources",
+          "startedAt": "2026-10-24T02:52:30Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ M3 final resource candidate"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-24T03:12:00Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40055950142/job/120759083314",
+          "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+          "startedAt": "2026-10-24T02:53:34Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ complete transaction acceptance"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-24T03:11:51Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40055950148/job/120758923065",
+          "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+          "startedAt": "2026-10-24T02:53:30Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ packet transaction faults"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-24T03:11:03Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40055950197/job/120759175658",
+          "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+          "startedAt": "2026-10-24T02:54:11Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ public transaction SDK"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-24T02:58:27Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40055950137/job/120758858744",
+          "name": "original-host-maintenance-c1",
+          "startedAt": "2026-10-24T02:53:07Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ three host maintenance composition"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-24T03:12:14Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40055950142/job/120759083442",
+          "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+          "startedAt": "2026-10-24T02:53:30Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ complete transaction acceptance"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-24T03:10:58Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40055950148/job/120758922864",
+          "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+          "startedAt": "2026-10-24T02:53:27Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ packet transaction faults"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-24T03:11:58Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40055950197/job/120759175883",
+          "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+          "startedAt": "2026-10-24T02:55:09Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ public transaction SDK"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-24T02:56:34Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40055950142/job/120759083426",
+          "name": "native-index-audit",
+          "startedAt": "2026-10-24T02:53:24Z",
+          "status": "COMPLETED",
+          "workflowName": "RocketMQ complete transaction acceptance"
+        }
+      ],
+      "reports": [
+        {
+          "report": "rocketmq-m2-go-sdk.json",
+          "artifact": "rocketmq-m2-go-sdk-9d2feca5de96b9d2326835715193f4e8cd8572a4",
+          "sha256": "806ab684b563ff0a15582eff56a220d53ca7da0714a9be74a8280438112502b8",
+          "passed": 19,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-m2-transactions.json",
+          "artifact": "rocketmq-m2-transactions-9d2feca5de96b9d2326835715193f4e8cd8572a4",
+          "sha256": "a11341dd1236cc189563a5d2f6442e3a5afeb2a9996ae6b03c4e9a37cbcd29f8",
+          "passed": 20,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-complete-sdk.json",
+          "artifact": "rocketmq-complete-sdk-0-9d2feca5de96b9d2326835715193f4e8cd8572a4",
+          "sha256": "26be033465abea8e005df3d6e1f5cf3a0b4fbef4a6c51581dce23e6850300aaa",
+          "passed": 48,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-complete-sdk.json",
+          "artifact": "rocketmq-complete-sdk-1-9d2feca5de96b9d2326835715193f4e8cd8572a4",
+          "sha256": "91e18d29dd54c3c496a7272ea9cddb54048af46ba6591d86f58ba598e6d9f3f1",
+          "passed": 48,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-m3-resources.json",
+          "artifact": "rocketmq-m3-resources-9d2feca5de96b9d2326835715193f4e8cd8572a4",
+          "sha256": "07ba473fe6856ffcb4b9ec4fd29fb06d7c0dc7e06de07ea1b593d3146d88bfb6",
+          "passed": 134,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-native-dlq-audit.json",
+          "artifact": "rocketmq-native-dlq-audit-9d2feca5de96b9d2326835715193f4e8cd8572a4",
+          "sha256": "35a7fabd7f13842ef0c576634bf5cabface99dd6e8c814abd2d57d8c11e34f52",
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-public-sdk.json",
+          "artifact": "rocketmq-public-sdk-1-9d2feca5de96b9d2326835715193f4e8cd8572a4",
+          "sha256": "86fa42fa4f00c96b38b05e20a90bc25cad0a8510c3d9c9671d518e6507a6c342",
+          "passed": 41,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-public-sdk.json",
+          "artifact": "rocketmq-public-sdk-0-9d2feca5de96b9d2326835715193f4e8cd8572a4",
+          "sha256": "96276ad8ffc620782610fa1b9e676f2ffaf08d48cfe28b7aa2a9ce1acb80cb9e",
+          "passed": 41,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-packet-faults.json",
+          "artifact": "rocketmq-packet-faults-1-9d2feca5de96b9d2326835715193f4e8cd8572a4",
+          "sha256": "6df5991d784728a67654ee9a26a212a2847eb97189a2c9ef3072608a2bc771cb",
+          "passed": 46,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-packet-faults.json",
+          "artifact": "rocketmq-packet-faults-0-9d2feca5de96b9d2326835715193f4e8cd8572a4",
+          "sha256": "ce073cd03cf9a0f44e0b44850866aff741e8a24a45c2a2f8535b07e6760659c1",
+          "passed": 46,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "maintenance-composition.json",
+          "artifact": "maintenance-composition-9de0b5024453a1f5d096b7b0260680294aec09b4-1",
+          "sha256": "d3896f2def0b9a1a7744cb6a0073102c2e43dcfa70762a0e731137eb33d740a2",
+          "passed": 43,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "compose_down_succeeded": true,
+            "project_containers_remaining": false,
+            "project_networks_remaining": false,
+            "existing_containers_unchanged": true,
+            "existing_networks_unchanged": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ],
+      "tested_merge_sha": "9d2feca5de96b9d2326835715193f4e8cd8572a4",
+      "tested_merge_tree": "12d360d4b895891ce9c1c99da6ba1188c78e307f",
+      "candidate_vs_tested_diff": "three independently merged progress documents only",
+      "formal_m3_progress": "24/36",
+      "production_touched": false,
+      "merge": {
+        "sha": "a94c831f19e63019c1c21ce7864788070796ab02",
+        "merged_at": "2026-10-24T03:14:35Z",
+        "tree": "3475324d030e924bc683e2c13afd4790f25cf3ab"
+      },
+      "actual_vs_tested_diff": [
+        "docs/server/evidence/rocketmq-m3-cutover-20261023.json",
+        "docs/server/rocketmq-m3-execution.md",
+        "docs/server/rocketmq-m3-offline-maintenance.md"
+      ],
+      "identical_full_merged_tree_claimed": false
+    },
+    "full_gate_proof_sha256": "69e2dbcb28bf794537db1f4d732b6db1a9ed9694485b21c3e17bf6a6d45d1153",
+    "progress": {
+      "m3": "24/36",
+      "t25": "2/4",
+      "t25_c": "2/3",
+      "c2": "4/4",
+      "c3": "1/3"
+    }
   }
 }
