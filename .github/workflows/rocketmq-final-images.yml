@@ -4,9 +4,21 @@ on:
     paths:
       - scripts/rocketmq/final_image_candidate.py
       - scripts/rocketmq/test_final_image_candidate.py
+      - scripts/rocketmq/iam_image_start.py
+      - scripts/rocketmq/test_iam_image_start.py
+      - scripts/rocketmq/image_fixtures/iam_init.go
       - .github/workflows/rocketmq-final-images.yml
   workflow_dispatch:
     inputs:
+      phase:
+        description: Build five candidates or start one existing IAM archive in an owned fixture
+        type: choice
+        options: [build, iam-start]
+        default: build
+      image_run_id:
+        description: Exact prior five-image run for iam-start; no registry or production input
+        type: string
+        default: '40074229224'
       iam_sha:
         description: Exact reviewed stable IAM source SHA
         type: string
@@ -38,8 +50,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_final_image_candidate.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_iam_image_start.py
   images:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.phase != 'iam-start'
     needs: contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 40
@@ -115,4 +128,67 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           compression-level: 0
+          retention-days: 14
+  iam-start:
+    if: github.event_name == 'workflow_dispatch' && inputs.phase == 'iam-start'
+    needs: contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+      IMAGE_RUN_ID: ${{ inputs.image_run_id }}
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/iam
+          ref: 954ad9dee2f71a51151b696ec05d5cb90cc65b50
+          path: .iam-start-source
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .iam-start-source/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Download exact previously built IAM archive on isolated runner
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$IMAGE_RUN_ID" =~ ^[0-9]{1,20}$ ]]
+          mkdir -m 700 .iam-image-candidate
+          gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name "m3-final-image-metadata-iam-954ad9dee2f71a51151b696ec05d5cb90cc65b50-$IMAGE_RUN_ID" --dir .iam-image-candidate
+          gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name "m3-final-image-archive-iam-954ad9dee2f71a51151b696ec05d5cb90cc65b50-$IMAGE_RUN_ID" --dir .iam-image-candidate
+      - name: Verify official archive and build owned Broker
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-m3-image-start:5.5.1 components/rocketmq
+      - name: Original IAM image restore and paused real entrypoint
+        run: |
+          set -euo pipefail
+          umask 077
+          uv run --no-project --with pyyaml==6.0.2 python scripts/rocketmq/iam_image_start.py \
+            --source "$PWD/.iam-start-source" --candidate "$PWD/.iam-image-candidate" --report iam-image-start.json
+      - name: Nonempty zero skips and owned cleanup
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          x=json.load(open('iam-image-start.json'))
+          assert x['passed']>0 and x['failed']==x['skipped']==0
+          assert all(x['cleanup'].values())
+          assert not x['production'] and not x['system_acceptance'] and not x['combined_cutover_rehearsal_complete']
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m3-iam-image-start-${{ github.run_id }}
+          path: iam-image-start.json
+          if-no-files-found: error
           retention-days: 14
