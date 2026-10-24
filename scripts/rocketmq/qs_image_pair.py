@@ -48,6 +48,13 @@ print(JSON.stringify(ordered(JSON.parse(EJSON.stringify(value,{relaxed:false})))
 
 
 class QSPairFixture(OwnedImageFixture):
+    def dump(self, database):
+        # A full database can have seed rows inserted in non-key order. Compare
+        # deterministic original dump output, not physical table scan order.
+        return self.run(self.compose + ['exec', '-T', 'mysql', 'sh', '-c',
+            'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump -uroot --order-by-primary --hex-blob --compact --skip-comments --skip-dump-date --no-tablespaces --set-gtid-purged=OFF --skip-lock-tables --column-statistics=0 "$@"',
+            'owned-protection', database]).stdout
+
     def mongo(self, program):
         return self.run(['docker', 'exec', self.mongo_name, 'mongosh', '--quiet', '--eval', program]).stdout.strip()
 
@@ -95,6 +102,12 @@ class QSPairFixture(OwnedImageFixture):
         self.sql(f'CREATE TABLE `{database}`.fixture_retained_state (id BIGINT PRIMARY KEY,body LONGBLOB NOT NULL); INSERT INTO `{database}`.fixture_retained_state VALUES(1,0x00ff03);')
         self.mongo('db.getSiblingDB(' + json.dumps(database) + ").fixture_retained_state.insertOne({_id:1,body:BinData(0,'AP8D'),attempt:7})")
         sql, original_mongo = self.snapshot(database)
+        def mongo_parts():
+            value = json.loads(self.mongo(mongo_snapshot_program(database)))
+            return {hashlib.sha256(c['name'].encode()).hexdigest(): {
+                key: hashlib.sha256(json.dumps(c.get(key), sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+                for key in ('type', 'options', 'uuid', 'indexes', 'documents')} for c in value}
+        before_parts = mongo_parts()
         backup = self.directory / (database + '.sql'); backup.write_text(sql); backup.chmod(0o600)
         archive = '/tmp/' + database + '.archive.gz'
         self.run(['docker', 'exec', self.mongo_name, 'mongodump', '--quiet', '--db', database, '--archive=' + archive, '--gzip'], timeout=120)
@@ -112,7 +125,14 @@ class QSPairFixture(OwnedImageFixture):
         self.sql('SET FOREIGN_KEY_CHECKS=0; USE `' + database + '`;\n' + sql + '\nSET FOREIGN_KEY_CHECKS=1;')
         self.mongo('db.getSiblingDB(' + json.dumps(database) + ').dropDatabase()')
         self.run(['docker', 'exec', self.mongo_name, 'mongorestore', '--quiet', '--archive=' + archive, '--gzip', '--drop', '--preserveUUID', '--nsInclude=' + database + '.*'], timeout=120)
-        require(self.snapshot(database) == (sql, original_mongo), 'full_pair_restore_must_match_original_bytes_and_uuid')
+        after_sql, after_mongo = self.snapshot(database)
+        after_parts = mongo_parts()
+        self.report.setdefault('restore_readbacks', {})[database] = dict(
+            mysql_before_sha256=hashlib.sha256(sql.encode()).hexdigest(),
+            mysql_after_sha256=hashlib.sha256(after_sql.encode()).hexdigest(),
+            mongo_before_sha256=original_mongo, mongo_after_sha256=after_mongo,
+            mongo_before_parts=before_parts, mongo_after_parts=after_parts)
+        require((after_sql, after_mongo) == (sql, original_mongo), 'full_pair_restore_must_match_original_bytes_and_uuid')
         return protection
 
 
