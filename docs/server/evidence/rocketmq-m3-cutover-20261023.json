@@ -1,8 +1,8 @@
 {
   "schema": "m3-cutover-tool-progress/v1",
-  "m3_completed": 24,
+  "m3_completed": 25,
   "m3_total": 36,
-  "t25_subgates_completed": 3,
+  "t25_subgates_completed": 4,
   "t25_subgates_total": 4,
   "nsq_drain": {
     "pr": "https://github.com/FangcunMount/infra/pull/189",
@@ -7642,5 +7642,11 @@
     "all_eight_declared_cleanup_readbacks_passed": true,
     "root_cause_confirmed": false,
     "status": "deferred_incomplete"
+  },
+  "approved_launch_composition": {
+    "proof": "rocketmq-m3-launch-cutover-20261024.json",
+    "completed": true,
+    "original_advanced_recovery_completed": false,
+    "production_cutover_completed": false
   }
 }

@@ -1,0 +1,98 @@
+{
+  "schema": "m3-t25-approved-launch-composition/v1",
+  "infra_sha": "f0f8286909e490007385dacca718ae27df248195",
+  "runs": [
+    40061512904,
+    40061516061,
+    40061518711,
+    40061521764
+  ],
+  "jobs_success": 6,
+  "reports": [
+    {
+      "report": "boundary/cutover-boundary-f0f8286909e490007385dacca718ae27df248195/cutover-boundary.json",
+      "sha256": "933f2b5508d7c30ba679f3938faf92d7747b76fb3d88518b23e198808ea88caf",
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "fixture_empty_before_removal": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "report": "handoff/rocketmq-qs-retry-0-1.25.12-f0f8286909e490007385dacca718ae27df248195/rocketmq-qs-retry.json",
+      "sha256": "62801ca257d1fc7a75a00eea8b9767c8d6f4090aebafe7f471b68326defa3ee8",
+      "passed": 68,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "report": "handoff/rocketmq-qs-retry-1-1.25.12-f0f8286909e490007385dacca718ae27df248195/rocketmq-qs-retry.json",
+      "sha256": "9eb328851ea06917aa2b4f90610abff6e62c5d9afa96c74f51e22e9877d5454d",
+      "passed": 68,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "report": "handoff/rocketmq-qs-retry-2-1.25.12-f0f8286909e490007385dacca718ae27df248195/rocketmq-qs-retry.json",
+      "sha256": "a88a24d5bc3b66128faf59a2dfa9d8a1c9591c4e7bfee2334937e6fe8023d6b8",
+      "passed": 68,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "report": "maintenance/maintenance-composition-f0f8286909e490007385dacca718ae27df248195-1/maintenance-composition.json",
+      "sha256": "ff49f9cb3ca8c49f0147c4e0e82baae03a4d70e0fc4e3dac0d2725d43047d163",
+      "passed": 43,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "compose_down_succeeded": true,
+        "project_containers_remaining": false,
+        "project_networks_remaining": false,
+        "existing_containers_unchanged": true,
+        "existing_networks_unchanged": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "report": "nsq/nsq-drain-f0f8286909e490007385dacca718ae27df248195/nsq-drain-native.json",
+      "sha256": "5fe33a28e74c0d0c6d05aca57b7cb13b9e831cc4c263aec3e1ad75eaa12b7991",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "owned_container_removed": true,
+        "existing_containers_unchanged": true,
+        "owned_network_removed": true
+      }
+    }
+  ],
+  "passed": 281,
+  "failed": 0,
+  "skipped": 0,
+  "pure_python_passed": 279,
+  "production_cutover": false,
+  "actual_production_backup_restore": false,
+  "system_acceptance": false,
+  "scope": "Owned isolated original NSQ responsibility, 27 process boundary contracts, three-host original maintenance and three MySQL-profile future plan handoff. Runtime sentinel is synthetic; final images and actual deployment are T29-T33."
+}
