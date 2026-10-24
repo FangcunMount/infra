@@ -20,6 +20,7 @@ from m3_resources import manifest
 from provision_v2 import provision
 from qs_image_pair import QSPairFixture, QS_SHA
 from qs_runtime_configuration import configuration as qs_configuration
+from qs_consumer_contract import parse_contract, validate_manifest
 
 IAM_SHA = '954ad9dee2f71a51151b696ec05d5cb90cc65b50'
 SOURCES = dict(iam=IAM_SHA, qs=QS_SHA, ai=AI_SHA)
@@ -112,13 +113,14 @@ class FiveImageFixture(QSPairFixture):
 def main():
     import yaml
     p = argparse.ArgumentParser(description=__doc__)
-    for key in ('sources', 'candidate', 'qs_initializer', 'iam_initializer', 'report'):
+    for key in ('sources', 'candidate', 'qs_initializer', 'iam_initializer', 'consumer_contract', 'report'):
         p.add_argument('--' + key.replace('_', '-'), type=Path, required=True)
     args = p.parse_args(); require(not args.report.exists(), 'new_report_required')
     repo = Path(__file__).resolve().parents[2]
-    report = dict(schema='m3-five-actual-image-startup-trial/v1', passed=0, failed=0, skipped=0,
+    report = dict(schema='m3-five-actual-image-startup-trial/v2', passed=0, failed=0, skipped=0,
                   production=False, system_acceptance=False, combined_cutover_rehearsal_complete=False,
-                  c1_cutover_barrier_exercised=False, cases={}, sources=SOURCES)
+                  c1_cutover_barrier_exercised=False, cases={}, sources=SOURCES,
+                  scope='actual processes, required IAM/AI and closed SDK owners; worker HTTP/Redis health and catalog consistency, no business or per-worker delivery proof')
     f = FiveImageFixture(repo, report); run = f.run
     f.applications = {}; f.images = {}; f.private_dirs = {}
     def case(name): report['cases'][name] = True
@@ -127,6 +129,12 @@ def main():
         for name, sha in SOURCES.items():
             require(run(['git', 'rev-parse', 'HEAD'], cwd=args.sources / name).stdout.strip() == sha
                     and not run(['git', 'status', '--porcelain'], cwd=args.sources / name).stdout, 'exact_clean_source_required')
+        document = manifest(repo)
+        contract = parse_contract(args.consumer_contract.read_text())
+        report['original_qs_consumer_count'] = validate_manifest(document, contract)
+        report['original_qs_consumer_contract'] = contract
+        report['original_qs_consumer_contract_sha256'] = hashlib.sha256(args.consumer_contract.read_bytes()).hexdigest()
+        case('actual_source_registry_consumers_match_manifest')
         candidates = {}
         for component, target, sha in [('iam', 'iam', IAM_SHA), ('api', 'qs-api', QS_SHA), ('collection', 'qs-collection', QS_SHA), ('worker', 'qs-worker', QS_SHA), ('ai', 'ai', AI_SHA)]:
             metadata = f.load(args.candidate / target, target, sha)
@@ -144,7 +152,7 @@ def main():
         report['dependency_image_ids']['redis'] = run(['docker', 'image', 'inspect', 'redis:7-alpine', '--format', '{{.Id}}']).stdout.strip()
         # Resource types and the five exact accounts come from the current
         # reviewed manifest. No fixture superuser is used by an application.
-        document = manifest(repo); accounts = {role: dict(username='owned-' + secrets.token_hex(8), password=secrets.token_hex(32)) for role in document['accounts']}
+        accounts = {role: dict(username='owned-' + secrets.token_hex(8), password=secrets.token_hex(32)) for role in document['accounts']}
         report['resources'] = provision(f.project + '-broker-1', document, accounts)
         tls = f.directory / 'service-tls'; tls.mkdir(mode=0o700)
         run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1', '-subj', '/CN=owned-service-ca',
@@ -250,7 +258,7 @@ def main():
         for index in range(1, 4):
             component = 'worker' + str(index); f.images[component] = f.images['worker']; f.private_dirs[component] = f.private_dirs['worker']
             f.start(component, alias=component, memory='768m', cpus='1')
-            f.ready(component, 9092, '/healthz'); case('actual_' + component + '_ready_original_concurrency48')
+            f.ready(component, 9092, '/healthz'); case('actual_' + component + '_http_healthy_original_concurrency48')
         f.stage = 'actual_five_image_shutdown'; report['processes'] = {}
         for component in ('worker3', 'worker2', 'worker1', 'collection', 'api', 'ai', 'iam'):
             timeout = 210 if component == 'ai' else 60

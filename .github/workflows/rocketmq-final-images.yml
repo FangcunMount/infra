@@ -11,6 +11,11 @@ on:
       - scripts/rocketmq/test_qs_image_pair.py
       - scripts/rocketmq/five_image_start.py
       - scripts/rocketmq/qs_runtime_configuration.py
+      - scripts/rocketmq/qs_consumer_contract.py
+      - scripts/rocketmq/test_qs_consumer_contract.py
+      - scripts/rocketmq/image_fixtures/qs_consumer_contract.go
+      - scripts/rocketmq/image_fixtures/qs_consumer_contract.json
+      - components/rocketmq/serverd-routes-m3-v2.json
       - scripts/rocketmq/test_qs_runtime_configuration.py
       - scripts/rocketmq/image_fixtures/qs_init_test.go
       - scripts/rocketmq/iam_image_start.py
@@ -63,6 +68,7 @@ jobs:
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_ai_image_start.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_qs_image_pair.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_qs_runtime_configuration.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_qs_consumer_contract.py
   images:
     if: github.event_name == 'workflow_dispatch' && inputs.phase == 'build'
     needs: contracts
@@ -401,16 +407,21 @@ jobs:
           set -euo pipefail
           fixture="$GITHUB_WORKSPACE/.five-sources/qs/internal/pkg/migration/m3_image_pair_fixture_test.go"
           iam_fixture="$GITHUB_WORKSPACE/.five-sources/iam/scripts/testing/m3_five_image_fixture"
+          consumer_fixture="$GITHUB_WORKSPACE/.five-sources/qs/scripts/testing/m3_consumer_contract"
           test ! -e "$fixture"
           test ! -e "$iam_fixture"
-          mkdir "$iam_fixture"
-          trap 'rm -f "$fixture" "$iam_fixture/main.go"; rmdir "$iam_fixture"' EXIT
+          test ! -e "$consumer_fixture"
+          mkdir "$iam_fixture" "$consumer_fixture"
+          trap 'rm -f "$fixture" "$iam_fixture/main.go" "$consumer_fixture/main.go"; rmdir "$iam_fixture" "$consumer_fixture"' EXIT
           cp scripts/rocketmq/image_fixtures/qs_init_test.go "$fixture"
           cp scripts/rocketmq/image_fixtures/iam_init.go "$iam_fixture/main.go"
+          cp scripts/rocketmq/image_fixtures/qs_consumer_contract.go "$consumer_fixture/main.go"
           cd .five-sources/qs
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c -tags=integration \
             -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d3269bda672b97582edb691ca4f924484c653822' \
             -o "$GITHUB_WORKSPACE/five-qs-init" ./internal/pkg/migration
+          go run -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d3269bda672b97582edb691ca4f924484c653822' \
+            ./scripts/testing/m3_consumer_contract > "$GITHUB_WORKSPACE/qs-consumer-contract.txt"
           cd "$GITHUB_WORKSPACE/.five-sources/iam"
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "$GITHUB_WORKSPACE/five-iam-init" ./scripts/testing/m3_five_image_fixture
           cd "$GITHUB_WORKSPACE"
@@ -428,17 +439,18 @@ jobs:
           umask 077
           uv run --no-project --with pyyaml==6.0.2 python scripts/rocketmq/five_image_start.py \
             --sources "$PWD/.five-sources" --candidate "$PWD/.five-candidates" \
-            --qs-initializer "$PWD/five-qs-init" --iam-initializer "$PWD/five-iam-init" --report five-image-start.json
+            --qs-initializer "$PWD/five-qs-init" --iam-initializer "$PWD/five-iam-init" \
+            --consumer-contract "$PWD/qs-consumer-contract.txt" --report five-image-start.json
       - name: Actual image evidence is separate from C1 and business acceptance
         if: always()
         run: |
           python3 - <<'PYREPORT'
           import json
           x=json.load(open('five-image-start.json'))
-          assert x['passed']==14 and len(x['cases'])==14 and x['failed']==x['skipped']==0
+          assert x['passed']==15 and len(x['cases'])==15 and x['failed']==x['skipped']==0
           assert all(x['cases'].values()) and all(x['cleanup'].values()) and x['sources_unchanged']
           assert x['mysql_runtime_ddl_attempts']==x['mongo_runtime_ddl_attempts']==0
-          assert len(x['processes'])==7
+          assert len(x['processes'])==7 and x['original_qs_consumer_count']==1
           assert not any(x[k] for k in ('production','system_acceptance','combined_cutover_rehearsal_complete','c1_cutover_barrier_exercised'))
           PYREPORT
       - uses: actions/upload-artifact@v7
