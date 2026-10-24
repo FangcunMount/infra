@@ -43,3 +43,12 @@ Mongo适配显式绑定qs.mongo，固定原client/database的Primary/Majority；
 Mongo使用独立Primary/Snapshot/Majority根，借用session直接拒绝。先按相同原库UUID/绑定、精确终态/正向SDK审计和目标原notice核验，再条件写同一治理document的三个解除字段；新物理索引仍独立blocked。根内不写binding/执行/witness/业务；caller必须持有具名独占操作锁、排除binding/schema写者，DTO/hash不构成授权。没有WithTransaction callback或手动重试；实际写冲突直接返回，提交错误保留governance Unknown，独立新读Verify判断同receipt结果。
 
 新增固定replica set的受控存储fixture检查真实写冲突、两根竞争、不同/重复receipt、首次SDK与治理时间及未选索引保留。RPC/批准元数据为明确synthetic输入，完整CLI/真实RPC/真实提交回复丢失未据此完成。原只读snapshot不改变，CI收尾改为成功的docker ps查询判定资源不存在，daemon/读取错误不能被记作清理成功。
+
+
+## 受审文件与协调器门禁（候选）
+
+`privatefile`限64KiB、0600同UID单硬链接常规文件，拒绝symlink/FIFO/目录/超限/不同独立SHA，不覆写旧对象；Root相对读取固定协调目录inode。协议JSON拒绝大小写别名/重复key、未知字段、多对象和过深嵌套，错误不回显原值。
+
+`barrier.RequireIssued`读取既有C1的binding、state、first-runtime-start和精确reviewed-step：要求0700同UID目录、被实际协调器持有的锁、同绑定/本机/当前step、runtime_start_issued或forward_repair_issued，修复另核对消费的repair approval。不会新建、重置或删除屏障，结束/维护状态和单独旧marker不允许新操作；记录完整与hash匹配仍不替代请求/receipt审核、物理核验或真实RPC。
+
+纯门禁用现有Python协调器实际发布runtime/forward步骤并持锁，验证Go读取及故障拒绝，没有DB/MQ/SSH。本地首轮负例收尾误用t.Context：Go在t.Cleanup之前取消它，导致自有Python子进程被提前杀死；已改为10秒独立资源预算、先关输入并Wait再cancel，未放宽协调器规则。完整CLI/单次native管理授权和真实MQ矩阵仍待，不能据此发布生产解除入口。
