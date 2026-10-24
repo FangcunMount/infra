@@ -69,6 +69,7 @@ jobs:
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_qs_image_pair.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_qs_runtime_configuration.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_qs_consumer_contract.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_mongo_ddl_audit.py
   images:
     if: github.event_name == 'workflow_dispatch' && inputs.phase == 'build'
     needs: contracts
