@@ -1,0 +1,31 @@
+{
+  "schema": "m3-readonly-entry/v1",
+  "observed_at_utc": "2026-10-24T15:37:19.646677+00:00",
+  "scope": "existing SSH read-only production preflight",
+  "authorization": "user explicitly selected existing SSH read-only inspection",
+  "entry_alias": "mac-mini-old",
+  "attempts": 2,
+  "ssh_stage": "before key exchange",
+  "ssh_result": "connection closed",
+  "local_tailscale": {
+    "backend_state": "NeedsLogin",
+    "self_online": false
+  },
+  "remote_command_executed": false,
+  "remote_runtime_snapshot_obtained": false,
+  "production_host_failure_inferred": false,
+  "hosted_runner_production_ssh": false,
+  "private_probe": {
+    "syntax_validated": true,
+    "remote_executed": false,
+    "sha256": "c0a67f4bd7c05d5af5ff0dcbaea96d75af1308ad6e46908ed7beafe66733649d"
+  },
+  "runtime_configuration_frozen": false,
+  "execution_bundle_complete": false,
+  "production_approved": false,
+  "production_mutation_performed": false,
+  "task_complete": false,
+  "m3_completed_tasks": 28,
+  "m3_total_tasks": 36,
+  "next_step": "Restore existing local Tailscale login, then inspect via the existing Mac mini SSH ingress."
+}
