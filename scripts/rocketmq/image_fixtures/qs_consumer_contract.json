@@ -1,0 +1,15 @@
+{
+  "consumers": [
+    {
+      "id": "modelcatalog.hot_rank_projection",
+      "runtime": "apiserver",
+      "event_type": "answersheet.submitted",
+      "topic": "qs.evaluation.lifecycle",
+      "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+      "delivery": "durable_outbox",
+      "outbox_profile": "mongo_domain_events"
+    }
+  ],
+  "schema": "qs-original-consumer-contract/v1",
+  "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+}

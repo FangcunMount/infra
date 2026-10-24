@@ -16,7 +16,8 @@ import time
 from audit_transaction_limit import write_private
 from image_start_fixture import OwnedImageFixture, require
 
-QS_SHA = 'd3269bda672b97582edb691ca4f924484c653822'
+QS_SHA = 'b75d4a52ec261275a0ffb588eeb31fd6496966d0'
+QS_HEAD = (110, 44)
 MONGO = 'mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f'
 GO_SUM = 'h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0='
 
@@ -50,7 +51,7 @@ def initializer_receipt(raw, profile):
     rows = [line.removeprefix('QS_IMAGE_INIT ') for line in raw.splitlines() if line.startswith('QS_IMAGE_INIT ')]
     require(len(rows) == 1, 'one_original_initializer_receipt_required')
     value = json.loads(rows[0])
-    heads = (105, 40) if profile == 'pre_m3' else (110, 43)
+    heads = (105, 40) if profile == 'pre_m3' else QS_HEAD
     require(value['source_sha'] == QS_SHA and value['profile'] == profile
             and (value['mysql'], value['mongo']) == heads
             and re.fullmatch('[0-9a-f]{64}', value['resources_sha256'])
@@ -58,6 +59,14 @@ def initializer_receipt(raw, profile):
             and value['journal_force_used'] is False and value['production'] is False,
             'exact_original_initializer_receipt_required')
     return value
+
+
+def verify_current_pair(snapshot, receipt):
+    observed = snapshot['snapshot']
+    require(snapshot['read_only'] is True and observed['source_sha'] == QS_SHA
+            and observed['migration_resources_sha256'] == receipt['resources_sha256']
+            and (observed['mysql_version'], observed['mongo_version']) == QS_HEAD,
+            'original_pair_readback_required')
 
 
 def mongo_snapshot_program(database):
@@ -218,10 +227,7 @@ def main():
                            QS_OFFLINE_MONGO_URI='mongodb://mongo:27017/?replicaSet=image-proof')
                 common = ['--mysql-database', database, '--mongo-database', database, '--timeout', '30s']
                 snapshot = json.loads(fixture.once('/fixture/qs-migrate-offline', common, environment=env))
-                observed = snapshot['snapshot']
-                require(snapshot['read_only'] and observed['source_sha'] == QS_SHA
-                        and observed['migration_resources_sha256'] == receipt['resources_sha256']
-                        and (observed['mysql_version'], observed['mongo_version']) == (110, 43), 'original_pair_readback_required')
+                verify_current_pair(snapshot, receipt)
                 for owner in ('qs.mysql', 'qs.mongo'):
                     plan = '/fixture/' + owner + '-binding.json'
                     fixture.once('/fixture/qs-migrate-offline', common + ['--binding-action', 'preview', '--binding-plan', plan,
