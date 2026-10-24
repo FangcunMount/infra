@@ -70,4 +70,9 @@ PR200合并1fc072b，原生报告摘要`f4e50b2a156470e3a2badbcfa7a42e2eb1676ab7
 
 IAM145、QS436、AI221已分别合并；合法resolved历史导入保留首次证据，周期仅读取活动责任，新物理索引仍封闭。infra207/209/210已合并check-only/私有观察、三SQL owner与qs.mongo snapshot；最新64纯、MySQL三档各17、Mongo7.0.37的10项通过，自有DB/容器清理均回读。均使用固定发布Go tag tx.4，无replace或SDK协议改写。旧正向audit为明确的受控reader fixture，不是本次真实RPC。
 
-当前没有生产解除CLI或治理CAS；源绑定、真实物理核验、受审请求/receipt、实际SDK RPC和治理提交仍须组合验证。组件表、完整源码/CI/报告摘要及失败历史回到[M3总表](rocketmq-m3-execution.md)。首次SQL资源遗漏setup失败以及QS文档空白门禁失败均保留，未改写为通过；稳定SDK、实际生产、system与48小时观察未执行。
+当前没有生产解除CLI；双存储条件治理原语已由infra212/213合并，但它们不是授权或RPC证明入口。源绑定、真实物理核验、受审请求/receipt、实际SDK RPC和治理提交仍须组合验证。组件表、完整源码/CI/报告摘要及失败历史回到[M3总表](rocketmq-m3-execution.md)。首次SQL资源遗漏setup失败以及QS文档空白门禁失败均保留，未改写为通过；稳定SDK、实际生产、system与48小时观察未执行。
+
+
+MySQL条件治理已通过三档各38，Mongo条件治理16及最新84纯契约通过；实际写冲突、并发原根、幂等/不同receipt和首次时间保留分别记账。批准/RPC输入为明确synthetic fixture，治理提交回复丢失仍未由真实网络证明；协调器活步骤校验候选infra214不能单独授权生产。完整进度/报告摘要回链M3总表。
+
+协调器与私有对象原语infra214已由5项完整门禁通过并合并，纯109/三档SQL38/Mongo16均通过；校验只是其中一道门禁，不是生产授权或实际RPC证明。完整CLI与实际MQ/网络恢复仍未关闭。
