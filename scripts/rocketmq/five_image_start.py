@@ -21,6 +21,7 @@ from provision_v2 import provision
 from qs_image_pair import QSPairFixture, QS_SHA
 from qs_runtime_configuration import configuration as qs_configuration
 from qs_consumer_contract import parse_contract, validate_manifest
+from mongo_ddl_audit import install as install_mongo_audit, read as read_mongo_audit
 
 IAM_SHA = '954ad9dee2f71a51151b696ec05d5cb90cc65b50'
 SOURCES = dict(iam=IAM_SHA, qs=QS_SHA, ai=AI_SHA)
@@ -227,7 +228,7 @@ def main():
         f.sql("SET GLOBAL log_output='TABLE'; SET GLOBAL general_log='ON';")
         # Mongo profiler is private and counts attempts; auth is not enabled in
         # this owned fixture, so this is not a production privilege proof.
-        f.mongo('db.getSiblingDB(' + json.dumps(qs_db) + ').setProfilingLevel(2)')
+        install_mongo_audit(f.mongo, qs_db)
         cfg = iam_configuration(yaml.safe_load((args.sources / 'iam/configs/apiserver.prod.yaml').read_text()), iam_db, passwords['iam'])
         cfg['grpc']['mtls'].update(**{'cert-file': '/fixture/iam-apiserver.crt', 'key-file': '/fixture/iam-apiserver.key', 'ca-file': '/fixture/service-ca.crt'})
         cfg['messaging']['credentials_file'] = '/fixture/iam-credentials.json'
@@ -269,9 +270,9 @@ def main():
         case('all_seven_actual_processes_shutdown_exit_zero')
         ddl = f.sql("SELECT COUNT(*) FROM mysql.general_log WHERE user_host REGEXP '^(iam|qs|ai)_runtime' AND command_type='Query' AND UPPER(argument) REGEXP '^[[:space:]]*(CREATE|ALTER|DROP|TRUNCATE|RENAME)[[:space:]]';")
         report['mysql_runtime_ddl_attempts'] = int(ddl)
-        mongo_ddl = f.mongo('print(db.getSiblingDB(' + json.dumps(qs_db) + ').system.profile.countDocuments({$or:["create","createIndexes","drop","dropDatabase","collMod","dropIndexes","renameCollection"].map(k=>({["command."+k]:{$exists:true}}))}))')
-        report['mongo_runtime_ddl_attempts'] = int(mongo_ddl)
-        require(ddl == mongo_ddl == '0', 'startup_shutdown_ddl_attempted'); case('actual_all_runtime_start_shutdown_no_ddl_attempts')
+        report['mongo_ddl_audit'] = read_mongo_audit(f.mongo, qs_db)
+        report['mongo_runtime_ddl_attempts'] = report['mongo_ddl_audit']['attempts']
+        require(int(ddl) == report['mongo_runtime_ddl_attempts'] == 0, 'startup_shutdown_ddl_attempted'); case('actual_all_runtime_start_shutdown_no_ddl_attempts')
     except Exception as error:
         report.update(failed=1, failure_stage=f.stage, failure_kind=type(error).__name__)
         if re.fullmatch(r'[a-z][a-z0-9_]{1,100}', str(error)): report['failure_reason'] = str(error)
