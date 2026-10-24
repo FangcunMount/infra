@@ -238,6 +238,7 @@ def main():
                 'Native internal copy may redeliver; no exactly-once or indefinite recovery promise',
                 'Synthetic reviewers and isolated owned resources; no production authorization']
         if args.iam_host:
+            stage='actual_iam_original_half'
             from iam_recovery_acceptance import IAMHost,metadata
             host=IAMHost(source=args.iam_host,directory=directory,project=project,route=route,grpc_port=grpc_port,mysql_port=mysql_port,
                 password=password,ca=ca,account=accounts['owner-a'],run=run,common=common,probes=probes,proof=proof)
