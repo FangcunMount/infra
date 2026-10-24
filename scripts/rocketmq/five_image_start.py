@@ -22,6 +22,7 @@ from qs_image_pair import QSPairFixture, QS_SHA
 from qs_runtime_configuration import configuration as qs_configuration
 from qs_consumer_contract import parse_contract, validate_manifest
 from mongo_ddl_audit import AuditError, install as install_mongo_audit, read as read_mongo_audit
+from go_failure_diagnostics import diagnostics as go_diagnostics
 
 IAM_SHA = '954ad9dee2f71a51151b696ec05d5cb90cc65b50'
 SOURCES = dict(iam=IAM_SHA, qs=QS_SHA, ai=AI_SHA)
@@ -113,7 +114,9 @@ class FiveImageFixture(QSPairFixture):
             'permission_denied': 'permission denied', 'connection_refused': 'connection refused',
             'deadline': 'deadline exceeded', 'certificate_authority': 'unknown authority',
             'missing_route': 'route', 'invalid_configuration': 'invalid', 'panic': 'panic:'}.items()}
-        if component != 'ai': result['source_markers'] = source_failure_markers(raw, source)
+        if component != 'ai':
+            result['source_markers'] = source_failure_markers(raw, source)
+            result['go_termination'] = go_diagnostics(raw, source)
         return result
 
 
@@ -304,18 +307,21 @@ def main():
             report['c1_cutover_barrier_exercised'] = True
             case('actual_seven_process_c1_and_thirty_minute_window')
         f.stage = 'actual_five_image_shutdown'; report['processes'] = {}
+        shutdown_failed = []
         for component in ('worker3', 'worker2', 'worker1', 'collection', 'api', 'ai', 'iam'):
             timeout = 210 if component == 'ai' else 60
             run(['docker', 'stop', '--time', str(timeout), f.applications[component]], timeout=timeout + 15)
             source = args.sources / ('ai' if component == 'ai' else 'iam' if component == 'iam' else 'qs')
             result = f.diagnostic(component, source); report['processes'][component] = result
-            require(result['state'] == dict(Status='exited', ExitCode=0, OOMKilled=False), 'actual_' + component + '_shutdown_failed')
-        case('all_seven_actual_processes_shutdown_exit_zero')
+            if result['state'] != dict(Status='exited', ExitCode=0, OOMKilled=False): shutdown_failed.append(component)
+        report['shutdown_failed_components'] = shutdown_failed
+        if not shutdown_failed: case('all_seven_actual_processes_shutdown_exit_zero')
         ddl = f.sql("SELECT COUNT(*) FROM mysql.general_log WHERE user_host REGEXP '^(iam|qs|ai)_runtime' AND command_type='Query' AND UPPER(argument) REGEXP '^[[:space:]]*(CREATE|ALTER|DROP|TRUNCATE|RENAME)[[:space:]]';")
         report['mysql_runtime_ddl_attempts'] = int(ddl)
         report['mongo_ddl_audit'] = read_mongo_audit(f.mongo, qs_db)
         report['mongo_runtime_ddl_attempts'] = report['mongo_ddl_audit']['attempts']
         require(int(ddl) == report['mongo_runtime_ddl_attempts'] == 0, 'startup_shutdown_ddl_attempted'); case('actual_all_runtime_start_shutdown_no_ddl_attempts')
+        require(not shutdown_failed, 'actual_runtime_shutdown_failed')
         if cutover: report['combined_cutover_rehearsal_complete'] = True
     except Exception as error:
         report.update(failed=1, failure_stage=f.stage, failure_kind=type(error).__name__)

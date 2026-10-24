@@ -116,7 +116,7 @@ def seed_receipt(raw):
 def source_failure_markers(raw, source):
     """Export authored source locations, never a captured line or SQL/body."""
     matches=[]
-    for relative in ('internal/apiserver','internal/pkg','pkg/app'):
+    for relative in ('internal/apiserver','internal/worker','internal/collection-server','internal/pkg','pkg/app'):
         for path in sorted((source/relative).rglob('*.go')):
             if path.name.endswith('_test.go'):continue
             text=path.read_text()
