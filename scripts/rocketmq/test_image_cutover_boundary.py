@@ -140,3 +140,18 @@ class LiveProductionProfileTest(unittest.TestCase):
             with self.subTest(value=value),tempfile.TemporaryDirectory() as root:
                 path=Path(root)/'wrong-profile.json';path.write_text(json.dumps(value))
                 with self.assertRaises(RuntimeError):startup_receipt(path)
+
+    def test_final_receipt_counts_the_verified_eight_started_processes(self):
+        import time
+        with tempfile.TemporaryDirectory() as root:
+            directory,_,sha=fixture(root)
+            with Boundary(directory,sha) as operation:
+                operation.start('unit-runtime',lambda:None)
+            adapter=ActualImageBoundary.__new__(ActualImageBoundary)
+            adapter.directory=directory;adapter.binding_sha=sha;adapter.started=set(COMPONENTS)
+            adapter.window_started=time.monotonic();adapter.lock_inodes={}
+            result=adapter.finish()
+            self.assertEqual(result['actual_processes'],8)
+            self.assertEqual(result['actual_processes'],len(adapter.started))
+            self.assertEqual(result['poststart_refused'],['old-full-backup','poststart-offline'])
+            self.assertFalse(result['production_authorized'])

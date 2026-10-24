@@ -248,7 +248,7 @@ class ActualImageBoundary:
             status = operation.status()
             require(not status['old_data_restore_eligible'], 'old_restore_eligibility_must_remain_closed')
         require(all(Path(p).stat().st_ino == inode for p, inode in self.lock_inodes.items()), 'owned_lock_inode_changed')
-        return dict(coordinator_binding_sha256=self.binding_sha, actual_processes=7, poststart_refused=refused,
+        return dict(coordinator_binding_sha256=self.binding_sha, actual_processes=len(self.started), poststart_refused=refused,
             elapsed_seconds=time.monotonic() - self.window_started, phase=status['phase'], production_authorized=False)
 
     def status(self):
