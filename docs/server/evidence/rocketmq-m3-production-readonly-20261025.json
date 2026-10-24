@@ -1,0 +1,567 @@
+{
+  "schema": "m3-production-readonly/v1",
+  "record_date_asia_shanghai": "2026-10-25",
+  "observed_at_utc": "2026-10-24T16:23:22.964083+00:00",
+  "authorized_scope": "existing SSH read-only inspection",
+  "ingress": "SSH ProxyJump through mac-mini-old; local key authentication; no agent forwarding or hosted-runner production SSH",
+  "tailscale_and_ingress_recovered": true,
+  "hosts": [
+    {
+      "alias": "servera",
+      "hostname": "serverA",
+      "memory_kib": {
+        "MemAvailable_kib": 6704096,
+        "MemTotal_kib": 7869652,
+        "SwapFree_kib": 2035440,
+        "SwapTotal_kib": 2035708
+      },
+      "container_ids_images_starts_states_restarts_unchanged": true,
+      "deploy_locks_unchanged": true,
+      "apps": [
+        {
+          "name": "iam-apiserver",
+          "id": "2e1acaa0acdb35ca3856c1c7c291f46c6c086f22b110a534748c45cf7e1b24b0",
+          "image_config_id": "sha256:57a47a713f336d84f6ba48fac7c0f229c38318ed16115071b20b7e7bcabdfbf5",
+          "source_revision": "3ed775c23b696680536e902b5977fa5438789892",
+          "state": {
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "Restarting": false,
+            "Running": true,
+            "StartedAt": "2026-10-19T15:09:05.156073402Z",
+            "Status": "running"
+          },
+          "resources": {
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "Memory": 1073741824,
+            "MemorySwap": 2147483648,
+            "NanoCpus": 1000000000,
+            "PidsLimit": null,
+            "ReadonlyRootfs": false
+          },
+          "restart_count": 0,
+          "compose_project": "docker",
+          "compose_service": "iam-apiserver",
+          "instance": "1"
+        },
+        {
+          "name": "qs-collection-server-2",
+          "id": "2d79a2f4150cd34896cd1ce5f133bb5052ca270c11e371819a7bc0663cc4a354",
+          "image_config_id": "sha256:b0f51841f84e4dd798286fd1c8629303fd0b619ca351af26b26db76896f00932",
+          "source_revision": "84d65b5b58d9037257f5da2660a6a58b2e625378",
+          "state": {
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "Restarting": false,
+            "Running": true,
+            "StartedAt": "2026-10-19T15:11:31.091547874Z",
+            "Status": "running"
+          },
+          "resources": {
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "Memory": 335544320,
+            "MemorySwap": 671088640,
+            "NanoCpus": 1000000000,
+            "PidsLimit": null,
+            "ReadonlyRootfs": false
+          },
+          "restart_count": 0,
+          "compose_project": "qs-collection",
+          "compose_service": "server",
+          "instance": "2"
+        },
+        {
+          "name": "qs-collection-server-1",
+          "id": "7a9ccb1e7e85a05755e8bf55e274387197121f467f19cb937a33d311a75167b9",
+          "image_config_id": "sha256:b0f51841f84e4dd798286fd1c8629303fd0b619ca351af26b26db76896f00932",
+          "source_revision": "84d65b5b58d9037257f5da2660a6a58b2e625378",
+          "state": {
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "Restarting": false,
+            "Running": true,
+            "StartedAt": "2026-10-19T15:10:54.416424821Z",
+            "Status": "running"
+          },
+          "resources": {
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "Memory": 335544320,
+            "MemorySwap": 671088640,
+            "NanoCpus": 1000000000,
+            "PidsLimit": null,
+            "ReadonlyRootfs": false
+          },
+          "restart_count": 0,
+          "compose_project": "qs-collection",
+          "compose_service": "server",
+          "instance": "1"
+        },
+        {
+          "name": "qs-apiserver",
+          "id": "2fe8dc429fbc32b2f9ec9a2a2e0dd505d30c30308c72696f1262bd3d2a0b6fa3",
+          "image_config_id": "sha256:72c13c69cfa4ed68c9eeeba81c72bff678f02b803a7ddc3d5aac2205ae7cfbdd",
+          "source_revision": "e8056025e0d5a13aa97c82d0912253034c486ae4",
+          "state": {
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "Restarting": false,
+            "Running": true,
+            "StartedAt": "2026-10-19T15:09:37.30204824Z",
+            "Status": "running"
+          },
+          "resources": {
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "Memory": 1073741824,
+            "MemorySwap": 2147483648,
+            "NanoCpus": 2000000000,
+            "PidsLimit": null,
+            "ReadonlyRootfs": false
+          },
+          "restart_count": 0,
+          "compose_project": "servera-migrated",
+          "compose_service": "qs-apiserver",
+          "instance": "1"
+        },
+        {
+          "name": "qs-ai",
+          "id": "7bb71fbe76222abd2ca737174bb0a6f12de7e42b838ae071405ee5e6ba982cf2",
+          "image_config_id": "sha256:35902a73acfcb0d3169110a28bf1fef95bbe3c1e3a8f38666ec973a8d262fcd3",
+          "source_revision": "67d418b66251a075b771624e82ce43d049db4f03",
+          "state": {
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "Restarting": false,
+            "Running": true,
+            "StartedAt": "2026-10-19T10:39:56.889668772Z",
+            "Status": "running"
+          },
+          "resources": {
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "Memory": 805306368,
+            "MemorySwap": 1610612736,
+            "NanoCpus": 750000000,
+            "PidsLimit": null,
+            "ReadonlyRootfs": true
+          },
+          "restart_count": 0,
+          "compose_project": "qs-ai",
+          "compose_service": "qs-ai",
+          "instance": "1"
+        }
+      ]
+    },
+    {
+      "alias": "serverd",
+      "hostname": "serverD",
+      "memory_kib": {
+        "MemAvailable_kib": 2051240,
+        "MemTotal_kib": 3808588,
+        "SwapFree_kib": 0,
+        "SwapTotal_kib": 0
+      },
+      "container_ids_images_starts_states_restarts_unchanged": true,
+      "deploy_locks_unchanged": true,
+      "apps": [
+        {
+          "name": "qs-worker-runtime-3",
+          "id": "67472ecba9b238600721d1b6b4edb8c889bc4e41454b4ee95112ddcd58ee66b1",
+          "image_config_id": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+          "source_revision": "e8056025e0d5a13aa97c82d0912253034c486ae4",
+          "state": {
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "Restarting": false,
+            "Running": true,
+            "StartedAt": "2026-10-19T15:10:38.248111345Z",
+            "Status": "running"
+          },
+          "resources": {
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "Memory": 805306368,
+            "MemorySwap": 1610612736,
+            "NanoCpus": 1000000000,
+            "PidsLimit": null,
+            "ReadonlyRootfs": false
+          },
+          "restart_count": 0,
+          "compose_project": "qs-worker",
+          "compose_service": "runtime",
+          "instance": "3"
+        },
+        {
+          "name": "qs-worker-runtime-2",
+          "id": "3523a3a7eaa607be9e6d503266446ecef26390281c3153e85a396ac83a175c91",
+          "image_config_id": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+          "source_revision": "e8056025e0d5a13aa97c82d0912253034c486ae4",
+          "state": {
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "Restarting": false,
+            "Running": true,
+            "StartedAt": "2026-10-19T15:10:28.265099554Z",
+            "Status": "running"
+          },
+          "resources": {
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "Memory": 805306368,
+            "MemorySwap": 1610612736,
+            "NanoCpus": 1000000000,
+            "PidsLimit": null,
+            "ReadonlyRootfs": false
+          },
+          "restart_count": 0,
+          "compose_project": "qs-worker",
+          "compose_service": "runtime",
+          "instance": "2"
+        },
+        {
+          "name": "qs-worker-runtime-1",
+          "id": "5a5981cca6dc5e09cb685db33a9b5ffce9d179fd29e16c3ba3cd780d95d0b1b4",
+          "image_config_id": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+          "source_revision": "e8056025e0d5a13aa97c82d0912253034c486ae4",
+          "state": {
+            "ExitCode": 0,
+            "OOMKilled": false,
+            "Restarting": false,
+            "Running": true,
+            "StartedAt": "2026-10-19T15:10:17.22467278Z",
+            "Status": "running"
+          },
+          "resources": {
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "Memory": 805306368,
+            "MemorySwap": 1610612736,
+            "NanoCpus": 1000000000,
+            "PidsLimit": null,
+            "ReadonlyRootfs": false
+          },
+          "restart_count": 0,
+          "compose_project": "qs-worker",
+          "compose_service": "runtime",
+          "instance": "1"
+        }
+      ]
+    }
+  ],
+  "mysql": [
+    {
+      "database": "iam",
+      "version": "8.0.36",
+      "server_identity_sha256": "0a96e9407b8b5170840dd617ec907200fc2e073b778a4e654aa22adf353661ac",
+      "migration_journal": [
+        {
+          "dirty": 0,
+          "version": 40
+        }
+      ],
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "read_only_transaction_rolled_back": true,
+      "estimated_allocated_bytes": 450281472,
+      "entry_token_column_present": false
+    },
+    {
+      "database": "qs",
+      "version": "8.0.36",
+      "server_identity_sha256": "0a96e9407b8b5170840dd617ec907200fc2e073b778a4e654aa22adf353661ac",
+      "migration_journal": [
+        {
+          "dirty": 0,
+          "version": 105
+        }
+      ],
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "read_only_transaction_rolled_back": true,
+      "estimated_allocated_bytes": 599703552,
+      "entry_token_column_present": false
+    },
+    {
+      "database": "ai",
+      "version": "8.0.36",
+      "server_identity_sha256": "0a96e9407b8b5170840dd617ec907200fc2e073b778a4e654aa22adf353661ac",
+      "migration_journal": [
+        {
+          "version_num": "0040_module_table_names"
+        }
+      ],
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "read_only_transaction_rolled_back": true,
+      "estimated_allocated_bytes": 178536448,
+      "entry_token_column_present": false
+    }
+  ],
+  "mongo": {
+    "server_version": "7.0.31",
+    "replica_set": "rs0",
+    "is_primary": true,
+    "journal": {
+      "schema_migrations": [
+        {
+          "version": 40,
+          "dirty": false
+        }
+      ]
+    },
+    "estimated_data_bytes": 6423463,
+    "storage_bytes": 1006448640,
+    "index_bytes": 449773568,
+    "image_digest": "mongo@sha256:43fddee7e532a920f3dfdee9e8f4834398c155c26bcb92d790cc1cd3c630fc40"
+  },
+  "rocketmq": {
+    "version": "5.5.1",
+    "image_id": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+    "container_id": "ce02d3e209b1f17dbf9b7544b3629f363fa45e5a80e3766b77295f038e86ccce",
+    "state": {
+      "Status": "exited",
+      "ExitCode": 143,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-19T07:57:38.214011918Z",
+      "FinishedAt": "2026-10-23T13:15:59.271456623Z"
+    },
+    "restart_policy": {
+      "Name": "unless-stopped",
+      "MaximumRetryCount": 0
+    },
+    "persisted_parameters_only": {
+      "brokerClusterName": "FangcunMount",
+      "brokerName": "serverd-rocketmq",
+      "brokerId": "0",
+      "fileReservedTime": "48",
+      "authenticationEnabled": "true",
+      "authorizationEnabled": "true"
+    },
+    "effective_runtime_parameters_available": false,
+    "v2_topics_persisted": 0,
+    "persistent_topic_count": 25,
+    "tls_certificate_not_after": "2027-10-18T14:03:51Z",
+    "acl_authoritative_readback_available": false,
+    "stop_cause_confirmed": false
+  },
+  "nsq": {
+    "version": "1.3.0",
+    "topic_count": 288,
+    "active_channels": [
+      {
+        "topic": "cb.failed.3be7d176a570204ab1ae554a",
+        "channel": "cb-failed-handler",
+        "depth": 0,
+        "backend_depth": 0,
+        "in_flight_count": 0,
+        "deferred_count": 0,
+        "client_count": 3
+      },
+      {
+        "topic": "cb.failed.980c094fa7a287057301bce7",
+        "channel": "cb-failed-handler",
+        "depth": 0,
+        "backend_depth": 0,
+        "in_flight_count": 0,
+        "deferred_count": 0,
+        "client_count": 3
+      },
+      {
+        "topic": "cb.failed.b6abe5a59ae6cb4454f2a271",
+        "channel": "cb-failed-handler",
+        "depth": 0,
+        "backend_depth": 0,
+        "in_flight_count": 0,
+        "deferred_count": 0,
+        "client_count": 3
+      },
+      {
+        "topic": "qs.evaluation.lifecycle",
+        "channel": "qs-worker",
+        "depth": 0,
+        "backend_depth": 0,
+        "in_flight_count": 0,
+        "deferred_count": 0,
+        "client_count": 3
+      },
+      {
+        "topic": "qs.plan.task",
+        "channel": "qs-worker",
+        "depth": 0,
+        "backend_depth": 0,
+        "in_flight_count": 0,
+        "deferred_count": 0,
+        "client_count": 3
+      },
+      {
+        "topic": "qs.survey.lifecycle",
+        "channel": "qs-worker",
+        "depth": 0,
+        "backend_depth": 0,
+        "in_flight_count": 0,
+        "deferred_count": 0,
+        "client_count": 3
+      }
+    ],
+    "inactive_channels_with_pending": 444,
+    "inactive_pending_channel_depth_sum": 4364,
+    "pending_channel_counts_by_topic": {
+      "iam.authz.version": 358,
+      "iam.authz.version.v2": 86
+    },
+    "channel_sum_is_not_unique_event_count": true,
+    "old_responsibilities_drained": false,
+    "disposition_performed": false
+  },
+  "monitoring": {
+    "prometheus_ready": true,
+    "grafana_healthy": true,
+    "grafana_version": "11.1.4",
+    "targets_by_job": {
+      "qs-collection-server": 2,
+      "qs-apiserver": 1,
+      "qs-ai": 1,
+      "prometheus": 1,
+      "rocketmq": 1
+    },
+    "down_jobs": [
+      "rocketmq"
+    ],
+    "firing_alerts": [
+      "QSEventOutboxStatusScrapeFailed",
+      "RocketMQBrokerUnavailable"
+    ],
+    "worker_targets_present": false,
+    "serverd_discovery_file_empty": true,
+    "recent_serverd_discovery_error_type": "CalledProcessError",
+    "m3_protocol_rules_loaded": false,
+    "serverd_discovery_fixed_ssh_probe": {
+      "exit_code": 255,
+      "timeout": true,
+      "authentication_denied": false,
+      "host_key_error": false
+    }
+  },
+  "production_cd": {
+    "iam_PRODUCTION_DEPLOY_PAUSED": true,
+    "qs_PRODUCTION_DEPLOY_PAUSED": true,
+    "ai_AUTO_DEPLOY_ENABLED": false
+  },
+  "credential_incident": {
+    "admin_credential_emitted_to_tool_output": true,
+    "rotation_required": true,
+    "rotation_performed": false,
+    "public_receipt_contains_credentials": false
+  },
+  "prerequisites": {
+    "qs105_clean_schema_verified": true,
+    "qs105_original_protection_restore_acceptance_evidence_verified": false,
+    "iam40_offline_support_pr": "https://github.com/FangcunMount/iam/pull/149",
+    "iam40_source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+    "iam40_native_ci_passed": true,
+    "actual_mongo7031_candidate_validation_passed": false,
+    "production_shaped_two_collection_and_iam1g_rehearsal_passed": false,
+    "iam40_native_ci": {
+      "run_id": 40112071230,
+      "profiles": [
+        "8.0.36",
+        "8.0.44",
+        "8.4"
+      ],
+      "pass_markers_per_profile": 61,
+      "counts_include_parent_and_subtests": true,
+      "failures": 0,
+      "skips": 0,
+      "real_cli_baselines": [
+        40,
+        41
+      ],
+      "final_build_and_merge_pending": false,
+      "source_checks_successful": 8,
+      "merged_sha": "0ce9cb2100120a617b548743ca78eb0e82b48044",
+      "final_candidate_image_validation_pending": true,
+      "leaf_pass_markers_per_profile": 53,
+      "offline_leaf_pass_markers_per_profile": 16,
+      "jobs": [
+        120925694613,
+        120925694529,
+        120925694542
+      ]
+    },
+    "qs105_original_backup_verified": true,
+    "qs105_backup": {
+      "path": "/Users/yangshujie/backups/qs-server/cleanup-m4/m6-final-retirement-20261019/1792381216800-1/",
+      "backup_receipt_sha256": "2980248eb3c932a81661ec9d70b8e83d0ff9442046f03b8a9f1ac2711d8d7531",
+      "completed_release_receipt_sha256": "b00c26af368cb76b37090edf36943acfb975af345d7dc2f923c6abadbdad65ec",
+      "task_protection_sha256": "522a9dd4418ba0cd8ad3585f06355e3fec8e38ec1ecff55d49f231af6be96414",
+      "protected_rows": 14,
+      "actual_pair": [
+        105,
+        40
+      ],
+      "original_pair": [
+        103,
+        40
+      ],
+      "retained_until_at_least": "2026-11-19T03:41:15.457499+00:00",
+      "automatic_deletion": false,
+      "full_service_RTO_rehearsal_claimed": false,
+      "task_id_positive_business_acceptance_still_pending_per_source_ledger": true
+    }
+  },
+  "runtime_configuration_frozen": false,
+  "execution_bundle_complete": false,
+  "production_approved": false,
+  "production_mutation_performed": false,
+  "business_or_system_acceptance_performed": false,
+  "m3_completed_tasks": 28,
+  "m3_total_tasks": 36,
+  "private_evidence_sha256": {
+    "servera-inventory.json": "5b833959e91521baec14aaba02ba92dcae63cfb80225f2796d8fd5ff44a3006d",
+    "serverd-inventory.json": "b8c3683d0fdb65610feebd2848c6d1785e5b81269c0504dbfe9228b059975140",
+    "servera-inventory-after.json": "539652003133db85a4cf92861bd38ce42bf8e29132faa00087fd5a8dbd61f0ef",
+    "serverd-inventory-after.json": "0a0086505e4383ad079ed75c889e1c66be51080335c6a777a0369286a74cc012",
+    "servera-config.private.json": "5818302ad602d3ea93a3c0b960c9dd509b5c8df37d2d858c041d6a2d81815aed",
+    "serverd-config.private.json": "3a6e68c8a5146ebfc0cc75fd66630df6822779443286cee17ea232005a2c40c2",
+    "mysql-readback.json": "125cdb51ff454d4f01a85dfdfad820a4726560132326d36097fd71a79eb85cb4",
+    "mongo-readback.private.json": "fc58aa2d3050ded33a482740903dc4d65f27f0e2313db56bc6e961cf4e141a69",
+    "broker-readback.private.json": "13563d09ab3a67a04649f3593bc39e0742cdd6001afc6a238c1aab29b10d5413",
+    "rocketmq-image.private.json": "d198ee23c9e074868a1de0729545679be68bdf62df4f06516445ef52a27645ba",
+    "rocketmq-tls-readback.json": "6662eaf9a0c2e190f63b0714d4fc4d76922b4962e6af86bee11262f0945a3485",
+    "prom-targets.private.json": "9f605232595253494fa499e26bab5016c8d0e552af57fde5c6c041d1bb3dd01d",
+    "prom-rules.private.json": "28a849ba9e99dc5c58cd66319c14b6e064557826dbf2aa69e3cb8fd6151c2b8f",
+    "nsq-stats.private.json": "d80a804e9de8c6be228019f0a51089393b715ade37433991ca4f48c4fa43d219"
+  },
+  "serverd_tailnet": {
+    "backend_state": "NeedsLogin",
+    "self_online": false,
+    "reauthentication_performed": false,
+    "settings_changed": false,
+    "monitoring_ssh_to_original_tailnet_address_times_out": true,
+    "broker_private_endpoint_unavailable": true,
+    "health_classification": [
+      "logged_out",
+      "control_plane_connection_reset"
+    ],
+    "version": "1.104.2",
+    "existing_preferences": {
+      "ControlURL": "https://controlplane.tailscale.com",
+      "RouteAll": false,
+      "CorpDNS": false,
+      "WantRunning": true,
+      "LoggedOut": false,
+      "AdvertiseRoutes": null,
+      "AdvertiseTags": null,
+      "RunSSH": false,
+      "NetfilterMode": 2,
+      "ShieldsUp": false,
+      "NoSNAT": false,
+      "ExitNodeID": "",
+      "ExitNodeIP": "",
+      "Hostname": "serverD"
+    },
+    "private_preferences_sha256": "c62a7a2576db5fc3fa96c43e5023985825a47a9e4080496dd78478ef3a3f8e95",
+    "recovery_review_prepared": true,
+    "recovery_approved": false
+  }
+}
