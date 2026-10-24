@@ -29,7 +29,10 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
-          test -z "$(gofmt -l internal)"
+          test -z "$(gofmt -l internal cmd)"
+          go build -trimpath -buildvcs=true -ldflags "-X main.sourceSHA=$(git rev-parse HEAD)" -o "$RUNNER_TEMP/native-recovery" ./cmd/native-recovery
+          "$RUNNER_TEMP/native-recovery" version
+          "$RUNNER_TEMP/native-recovery" help
           go mod download
           go list -m -json github.com/FangcunMount/reliable-messaging > sdk-module.json
           python3 - <<'PY'

@@ -1,6 +1,35 @@
 # RocketMQ 具名恢复维护工具（实现中）
 
-这是infra维护的短生命周期SDK宿主，尚无可用于生产的CLI。共享Go SDK可在相同原主库读取Go/Python MySQL见证及Go Mongo见证，不新增常驻服务；业务宿主继续拥有业务池、原业务事务、正常Checker及维护。
+这是infra维护的短生命周期SDK宿主，当前CLI只支持只读请求准备与文件审核，尚无可用于生产的恢复执行入口。共享Go SDK可在相同原主库读取Go/Python MySQL见证及Go Mongo见证，不新增常驻服务；业务宿主继续拥有业务池、原业务事务、正常Checker及维护。
+
+## 当前可执行的只读入口
+
+`cmd/native-recovery`提供`version`、`preview`与`verify-review`。`check`、`resolve`、`native-resume`均拒绝；没有隐藏的生产执行开关。完整SDK回查、物理检查、当前RPC receipt、治理解除与具名保护复核仍需后续入口和真实MQ门禁，不把文件审核成功当作执行授权。
+
+构建必须来自精确、干净的infra提交：
+
+```sh
+go build -trimpath -buildvcs=true \
+  -ldflags "-X main.sourceSHA=$(git rev-parse HEAD)" \
+  -o /absolute/private/native-recovery ./cmd/native-recovery
+/absolute/private/native-recovery version
+```
+
+`version`核验编译VCS revision/clean标记与声明源码一致，依赖必须是固定已发布tx.4、原module sum、无replace，并计算当前二进制摘要。未冻结/脏源码构建不能形成可审核请求。固定源码与二进制摘要仍须独立审查，不能靠自报版本批准生产。
+
+`preview`接收四份0600同UID单硬链接输入及各自独立原字节SHA：`--config/--config-sha`、`--manifest/--manifest-sha`、`--export/--export-sha`、`--selection/--selection-sha`，另指定新`--output`文件，其父目录必须为自有0700。所有输入和完整owner路由先验证，再连接原数据库；manifest保留原NORMAL/TRANSACTION及fanout结构，只为本owner登记去重后的全部事务Topic。公开manifest需在具名操作目录中复制为私有受审文件，不直接修改仓库文件权限。
+
+配置schema为`m3-native-recovery-config/v1`，显式提供owner/store_id/writer_epoch、database_kind/database_uri/database_name、database_ca_pem、endpoint/access_key/secret_key/root_ca_pem。MQ字段仅验证并冻结，不创建客户端；MySQL仅借当前显式原库，连接池上限4/idle1，禁止multiStatements、interpolateParams、skip-verify及明文回退；Mongo拒绝无效URI和不安全TLS，固定Primary/Majority读取。凭据仅存在私有配置中，命令参数传文件路径，错误不回显原URI或未知参数。
+
+selection schema为`m3-native-recovery-selection/v1`，包含operation_id、branch_id、fence、完整native_index_sha256、source_bundle_sha256、data_owner、recovery_owner。原索引export继续使用现有v1指纹，不用clientID去重；完整验证全部行，包括未选择的复制记录。64条截断集合允许精确选择目标，但不能证明owner责任已经清空。
+
+只读snapshot通过后，输出`m3-native-recovery-request/v1`，冻结原主库身份、绑定、精确SDK canonical Reference、本地终态、原audit时间、首次notice证据、物理位置、配置/manifest/export/源码/二进制摘要、具名责任人与随机nonce，30分钟到期。重复preview不覆盖首次文件，不重新生成消息或修改业务事实。输出摘要只有在原池真正关闭成功后才返回；失败文件保留取证。
+
+`verify-review`只检查`--request/--request-sha`、`--approval/--approval-sha`与`--binding-sha`。批准文件由具名负责人在工具外明确审核，schema为`m3-native-recovery-approval/v1`；绑定check动作、原请求SHA、空receipt_sha256、原协调绑定/source bundle、双方姓名和不超过请求期限的expires_at。它不校验活动issued屏障、不连接数据库、不产生批准文件或消息，不可据`review_graph_valid`执行恢复。后续resolve/verify会绑定同一个已审实际RPC receipt，未知治理提交不要求伪造新RPC。
+
+本批纯测试的所有权威数据/批准均为明确fixture。required存储门禁额外运行**编译后的独立CLI进程**，分别读取三种MySQL owner与qs.mongo原库并核对私有文件、原Reference/主库身份/旧audit、重复拒绝和审核非授权；物理索引与姓名均为synthetic，不当作真实MQ或生产批准。原SDK执行/见证/业务、目标notice在只读前后保持不变，自有资源单独删除回读。
+
+首轮完整manifest纯测试拒绝已有`accounts`对象：原清单使用`m3-iam`等带连字符的账号键。增加仅供该manifest使用的显式账号键名单解析，未知字段、重复键、大小写别名仍拒绝；批准/request解码器未放宽。失败及修复继续保留在进度记录。
 
 当前包含`internal/checkonly`和`internal/observation`原语：构造纯验证；拒绝Lookup/Reserve/Prepare/Abort和常规半消息/最终确认记账；本实例Reconcile明确不处理，不能把零解释为没有Prepared。权威Evidence及真实RPC后的RecoveryReceiptRecorder仍借用原Store，DB预算2秒。本次目标的终态漂移返回Unknown，不据旧成功时间伪造本次回查。
 

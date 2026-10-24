@@ -33,6 +33,8 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
+          go build -trimpath -buildvcs=true -ldflags "-X main.sourceSHA=$(git rev-parse HEAD)" -o "$RUNNER_TEMP/native-recovery" ./cmd/native-recovery
+          "$RUNNER_TEMP/native-recovery" version
           test "$GITHUB_ACTIONS" = true
           test "$RUNNER_ENVIRONMENT" = github-hosted
           test -z "${DOCKER_HOST:-}"
@@ -63,6 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
+          export NATIVE_TOOL_TEST_CLI="$RUNNER_TEMP/native-recovery"
           go test -race -tags=integration -json -count=1 -timeout=3m \
             -run '^Test(MongoSnapshotNative|FrozenMongoGovernanceFixtureMatchesRecordedHostMigration)$' \
             ./internal/authority > mongo-snapshot.jsonl
@@ -94,14 +97,15 @@ jobs:
           failed=sum(e['Action']=='fail' for e in events)
           skipped=sum(e['Action']=='skip' for e in events)
           cleanups=sum('owned_database_removed=true' in e.get('Output','') for e in events)
+          previews=sum('compiled_preview_cli_original_primary=true' in e.get('Output','') for e in events)
           removed=pathlib.Path('mongo-container-removed.txt').exists()
           version=pathlib.Path('mongo-version.txt')
           image=pathlib.Path('mongo-image-id.txt')
           actual_version=version.read_text().strip() if version.exists() else None
-          valid=bool(ran) and ran==passed and failed==skipped==0 and cleanups==1 and removed and actual_version=='7.0.37'
+          valid=bool(ran) and ran==passed and failed==skipped==0 and cleanups==1 and previews==1 and removed and actual_version=='7.0.37'
           report=dict(schema='m3-native-recovery-mongo/v1',source_sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
                       test_kind='owned original Mongo root and SDK/host-schema fixture, not Broker/RPC or production clearance',
-                      passed=len(passed),failed=failed,skipped=skipped,owned_databases_removed=cleanups,owned_container_removed=removed,
+                      passed=len(passed),failed=failed,skipped=skipped,owned_databases_removed=cleanups,owned_container_removed=removed,compiled_preview_original_primary=previews,
                       mongo_version=actual_version,image_id=image.read_text().strip() if image.exists() else None,
                       raw_report_sha256=hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None,valid=valid)
           pathlib.Path('mongo-snapshot-summary.json').write_text(json.dumps(report,indent=2)+'\n')

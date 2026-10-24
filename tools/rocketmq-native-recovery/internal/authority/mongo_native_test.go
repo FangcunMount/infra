@@ -199,4 +199,20 @@ func TestMongoSnapshotNative(t *testing.T) {
 	})
 
 	t.Run("controlled-governance-storage-not-rpc-proof", func(t *testing.T) { mongoResolutionStorageFixture(t, db, reader, original) })
+	t.Run("compiled-preview-cli-readonly-not-rpc-proof", func(t *testing.T) {
+		current, e := reader.Snapshot(t.Context(), l, index)
+		if e != nil {
+			t.Fatal(e)
+		}
+		previewCLINative(t, current, "mongo", os.Getenv("NATIVE_TOOL_TEST_MONGO_URI"), db.Name(), func(index, proof [32]byte) {
+			key := NoticeKey(b, index)
+			if _, e := db.Collection("messaging_native_limit_notices").InsertOne(t.Context(), bson.M{"_id": key[:], "owner": b.Owner, "store_id": b.StoreID, "writer_epoch": b.WriterEpoch, "route_revision": "m3-1", "native_index_sha256": index[:], "evidence_sha256": proof[:], "status": "blocked", "schema_version": 1, "recorded_at": time.Now().UTC()}); e != nil {
+				t.Fatal(e)
+			}
+		})
+		after, e := reader.Snapshot(t.Context(), l, index)
+		if e != nil || !reflect.DeepEqual(current, after) {
+			t.Fatal("preview changed original witness/notice", e)
+		}
+	})
 }

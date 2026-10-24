@@ -214,6 +214,32 @@ func TestMySQLSnapshotNative(t *testing.T) {
 			}
 
 			t.Run("controlled-governance-storage-not-rpc-proof", func(t *testing.T) { mysqlResolutionStorageFixture(t, db, reader, before) })
+			t.Run("compiled-preview-cli-readonly-not-rpc-proof", func(t *testing.T) {
+				var name string
+				if e := db.QueryRowContext(t.Context(), `SELECT DATABASE()`).Scan(&name); e != nil {
+					t.Fatal(e)
+				}
+				c, e := driver.ParseDSN(os.Getenv("NATIVE_TOOL_TEST_MYSQL_DSN"))
+				if e != nil {
+					t.Fatal("fixture DSN")
+				}
+				c.DBName = name
+				c.MultiStatements = false
+				current, e := reader.Snapshot(t.Context(), l, index)
+				if e != nil {
+					t.Fatal(e)
+				}
+				previewCLINative(t, current, "mysql", c.FormatDSN(), name, func(index, proof [32]byte) {
+					key := NoticeKey(s.Binding, index)
+					if _, e := db.ExecContext(t.Context(), `INSERT INTO messaging_native_limit_notices(notice_key,owner,store_id,writer_epoch,route_revision,native_index_sha256,evidence_sha256,status,schema_version,recorded_at) VALUES(?,?,?,?,?,?,?,'blocked',1,UTC_TIMESTAMP(6))`, key[:], []byte(owner), []byte(s.Binding.StoreID), []byte(s.Binding.WriterEpoch), []byte("m3-1"), index[:], proof[:]); e != nil {
+						t.Fatal(e)
+					}
+				})
+				after, e := reader.Snapshot(t.Context(), l, index)
+				if e != nil || !reflect.DeepEqual(current, after) {
+					t.Fatal("preview changed original witness/notice", e)
+				}
+			})
 		})
 	}
 }

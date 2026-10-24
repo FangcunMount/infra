@@ -45,6 +45,18 @@ type Snapshot struct {
 	Notice                 Notice
 }
 
+// ValidateReview validates a terminal snapshot as review input. It establishes
+// neither that a database was read nor that a Broker RPC or approval occurred.
+func ValidateReview(s Snapshot) error {
+	state := transaction.Committed
+	if s.Decision == transaction.Rollback {
+		state = transaction.Aborted
+	} else if s.Decision != transaction.Commit {
+		return ErrSnapshot
+	}
+	return validateSnapshot(s, Locator{s.Reference.OperationID, s.Reference.BranchID, s.Reference.Fence}, state, state, "")
+}
+
 func validBinding(b transaction.Binding, mongo bool) bool {
 	if !b.Valid() || len(b.Owner) > 128 || len(b.StoreID) > 128 || len(b.WriterEpoch) > 128 {
 		return false

@@ -112,12 +112,37 @@ func Write(path string, raw []byte) (digest [32]byte, err error) {
 // non-object roots and unknown fields before any side effect. Protocol object
 // keys use lower snake case; SDK canonical Reference bytes remain opaque strings.
 func Decode(raw []byte, target any) error {
+	return decode(raw, target, nil)
+}
+
+// DecodeNamed additionally accepts explicitly enumerated map keys in an
+// existing manifest. Approval/request callers use Decode, without extensions.
+// It never relaxes duplicate, alias, unknown-field or structural checks.
+func DecodeNamed(raw []byte, target any, names ...string) error {
+	allowed := make(map[string]bool, len(names))
+	if len(names) > 32 {
+		return ErrPrivate
+	}
+	for _, name := range names {
+		if name == "" || len(name) > 128 || name != strings.ToLower(name) {
+			return ErrPrivate
+		}
+		for _, c := range name {
+			if (c < 'a' || c > 'z') && (c < '0' || c > '9') && c != '-' && c != '_' {
+				return ErrPrivate
+			}
+		}
+		allowed[name] = true
+	}
+	return decode(raw, target, allowed)
+}
+func decode(raw []byte, target any, names map[string]bool) error {
 	if len(raw) < 2 || len(raw) > MaxBytes || target == nil {
 		return ErrPrivate
 	}
 	d := json.NewDecoder(bytes.NewReader(raw))
 	d.UseNumber()
-	if err := fields(d, 0); err != nil {
+	if err := fields(d, 0, names); err != nil {
 		return err
 	}
 	if _, err := d.Token(); err != io.EOF {
@@ -130,7 +155,7 @@ func Decode(raw []byte, target any) error {
 	}
 	return nil
 }
-func fields(d *json.Decoder, depth int) error {
+func fields(d *json.Decoder, depth int, names map[string]bool) error {
 	if depth > 12 {
 		return ErrPrivate
 	}
@@ -154,11 +179,11 @@ func fields(d *json.Decoder, depth int) error {
 				return ErrPrivate
 			}
 			key, ok := token.(string)
-			if !ok || !protocolKey(key) || seen[key] {
+			if !ok || (!protocolKey(key) && !names[key]) || seen[key] {
 				return ErrPrivate
 			}
 			seen[key] = true
-			if fields(d, depth+1) != nil {
+			if fields(d, depth+1, names) != nil {
 				return ErrPrivate
 			}
 		}
@@ -168,7 +193,7 @@ func fields(d *json.Decoder, depth int) error {
 		}
 	case '[':
 		for d.More() {
-			if fields(d, depth+1) != nil {
+			if fields(d, depth+1, names) != nil {
 				return ErrPrivate
 			}
 		}
