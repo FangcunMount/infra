@@ -46,11 +46,14 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
+          go build -trimpath -buildvcs=true -ldflags "-X main.sourceSHA=$(git rev-parse HEAD)" -o "$RUNNER_TEMP/native-recovery" ./cmd/native-recovery
+          "$RUNNER_TEMP/native-recovery" version
           docker inspect --format '{{.Image}}' "$SERVICE_ID" > mysql-image-id.txt
       - name: Original primary terminal facts and private governance fixture
         run: |
           set -euo pipefail
           umask 077
+          export NATIVE_TOOL_TEST_CLI="$RUNNER_TEMP/native-recovery"
           go test -race -tags=integration -json -count=1 -timeout=3m \
             -run '^Test(MySQLSnapshotNative|FrozenGovernanceFixtureMatchesRecordedHostMigration)$' \
             ./internal/authority > mysql-snapshot.jsonl
@@ -70,13 +73,14 @@ jobs:
           failed = sum(e['Action']=='fail' for e in events)
           skipped = sum(e['Action']=='skip' for e in events)
           cleanups = sum('owned_database_removed=true' in e.get('Output','') for e in events)
+          previews = sum('compiled_preview_cli_original_primary=true' in e.get('Output','') for e in events)
           owners = {f'TestMySQLSnapshotNative/{name}' for name in ('iam.mysql','qs.mysql','ai.mysql')}
-          valid = bool(ran) and ran==passed and owners<=passed and failed==skipped==0 and cleanups==3
+          valid = bool(ran) and ran==passed and owners<=passed and failed==skipped==0 and cleanups==3 and previews==3
           image = pathlib.Path('mysql-image-id.txt')
           report = dict(schema='m3-native-recovery-storage/v1',source_sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
                         mysql_profile=os.environ['MYSQL_PROFILE'],image_id=image.read_text().strip() if image.exists() else None,
                         test_kind='owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance',
-                        passed=len(passed),failed=failed,skipped=skipped,owned_databases_removed=cleanups,valid=valid,
+                        passed=len(passed),failed=failed,skipped=skipped,owned_databases_removed=cleanups,compiled_preview_original_primary=previews,valid=valid,
                         raw_report_sha256=hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None)
           pathlib.Path('mysql-snapshot-summary.json').write_text(json.dumps(report,indent=2)+'\n')
           assert valid,'Incomplete original-storage proof or cleanup'
