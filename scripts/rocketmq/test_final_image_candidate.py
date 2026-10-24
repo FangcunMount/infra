@@ -4,10 +4,18 @@ import tarfile
 import tempfile
 import unittest
 
-from final_image_candidate import GO_SUM, MODULE, check_go_buildinfo, inventory_names
+from final_image_candidate import GO_SUM, MODULE, check_go_buildinfo, ci_guard, inventory_names
 
 
 class FinalImageProofTest(unittest.TestCase):
+    def test_refuses_local_self_hosted_and_external_daemon(self):
+        env = dict(GITHUB_ACTIONS='true', RUNNER_OS='Linux', RUNNER_ENVIRONMENT='github-hosted')
+        ci_guard(env)
+        for changed in ({}, dict(env, RUNNER_ENVIRONMENT='self-hosted'),
+                        dict(env, DOCKER_HOST='tcp://outside'), dict(env, DOCKER_CONTEXT='other')):
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                ci_guard(changed)
+
     def test_binary_rejects_other_version_sum_and_replace(self):
         raw = 'runtime\n\tdep\t' + MODULE + '\tv0.5.0\t' + GO_SUM + '\n'
         self.assertEqual(check_go_buildinfo(raw)['version'], 'v0.5.0')

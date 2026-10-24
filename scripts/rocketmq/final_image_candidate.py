@@ -21,6 +21,13 @@ TARGETS = {
 }
 
 
+def ci_guard(env):
+    if (env.get('GITHUB_ACTIONS') != 'true' or env.get('RUNNER_OS') != 'Linux'
+            or env.get('RUNNER_ENVIRONMENT') != 'github-hosted'
+            or env.get('DOCKER_HOST') or env.get('DOCKER_CONTEXT')):
+        raise ValueError('github_hosted_isolated_daemon_required')
+
+
 def sha256(path):
     value = hashlib.sha256()
     with path.open('rb') as stream:
@@ -73,6 +80,7 @@ def main():
     parser.add_argument('--run-uid', type=int, default=2000)
     parser.add_argument('--run-gid', type=int, default=2000)
     args = parser.parse_args()
+    ci_guard(os.environ)
     if not re.fullmatch('[0-9a-f]{40}', args.source_sha):
         raise ValueError('exact_source_sha_required')
     if min(args.run_uid, args.run_gid) < 1:
@@ -167,6 +175,8 @@ def main():
         subprocess.run(['docker', 'image', 'rm', '--no-prune', image], capture_output=True, check=False)
         report['cleanup'] = {'owned_container_absent': container not in run(
             ['docker', 'ps', '-a', '--format', '{{.Names}}']).split(),
+            'owned_image_tag_absent': image not in run(
+                ['docker', 'image', 'ls', '--format', '{{.Repository}}:{{.Tag}}']).split(),
             'existing_containers_unchanged': sorted(original) == sorted(run(['docker', 'ps', '-aq']).split())}
         (output / 'image-inventory.json').write_text(json.dumps(report, indent=2) + '\n')
     if not all(report['cleanup'].values()):
