@@ -95,7 +95,7 @@ func TestM3ImagePreparePair(t *testing.T) {
 			entries, err := fs.ReadDir(migrations, "migrations/"+item.directory)
 			check(err)
 			for _, entry := range entries {
-				if len(entry.Name()) < 7 {
+				if entry.IsDir() || !regexp.MustCompile(`^[0-9]{6}_`).MatchString(entry.Name()) {
 					continue
 				}
 				n, err := strconv.ParseUint(entry.Name()[:6], 10, 32)
