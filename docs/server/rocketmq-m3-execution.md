@@ -1749,3 +1749,19 @@ infra [PR210](https://github.com/FangcunMount/infra/pull/210)源码2a947410合�
 | 具名批准、物理核验和短生命周期CLI | ☐ 未闭环 | 必须经过首次runtime屏障，hash本身不是授权 |
 
 M3继续 **24/36**，T25 **2/4**、C **1/3**、C2 **3/4**、C3 **1/3**，不因组件合并提前勾选父任务。C2全写者/三库组合、C3具名管理与真实矩阵、T25-D组合门禁仍未完成。M2 **24/24**、M4 **0/8**；没有SDK稳定发布、生产DDL/资源/provider/部署、Mac mini规则加载、system或48小时观察。
+
+
+### 2026-10-24：T25-C3 双存储条件治理原语闭环，受审入口继续
+
+infra [PR212](https://github.com/FangcunMount/infra/pull/212)源码8e1e6f9e合并d427660a；[40042254141](https://github.com/FangcunMount/infra/actions/runs/40042254141)三档MySQL各38、纯契约83、Mongo回归10项通过，5检查全部成功，非空、零失败/跳过及自有清理回读。原RC根持binding共享/notice排他锁，精确重新读取原库/Ref/终态/正向SDK审计/首次native证据，只更新治理三字段；100ms真实行锁、两实际根唯一写入、同receipt幂等/不同receipt拒绝及未选索引责任均证明。首次SDK时间与原事实不改，行数不冒充提交；提交错误单列governance Unknown，另有fresh Verify。
+
+infra [PR213](https://github.com/FangcunMount/infra/pull/213)源码d67a22c8合并8179236a；[40043629246](https://github.com/FangcunMount/infra/actions/runs/40043629246)Mongo16、MySQL三档各38、纯84项通过，5检查全部成功、零失败/跳过，自有DB/容器清理均回读。Primary/Snapshot/Majority原根的真实Gov写冲突直接返回TransientTransactionError，不重入callback；竞争根最多一次治理写入，同receipt与首次时间保持，新的物理索引继续blocked。提交错误保留Unknown，Verify独立读取。收尾成功docker ps查询后才判定空集合，不能把daemon错误记成清理成功。
+
+两者只是内部条件存储原语，受审DTO与hash不构成批准或实际RPC证明；native输入明确synthetic，不当作生产解除。没有生产CLI，caller仍须具名批准/首次runtime屏障、排除binding/schema写者、完整私有文件/nonce/source、物理核验和真实SDK观察。实际治理提交回复丢失/网络故障与完整CLI仍在C3-c门禁中，不因83/84纯或存储fixture成功而跳过。
+
+[PR214](https://github.com/FangcunMount/infra/pull/214)候选8d447f6d加入受审私有对象与原C1协调器校验：0600同UID单硬链接/无symlink或FIFO、有界原字节及独立SHA；JSON拒绝重复/大小写别名、未知字段/多对象/过深结构。读取真实协调器的活动目录锁、原binding/state/不可逆first-runtime/精确reviewed-step与消费修复批准，结束/维护状态及旧marker不能授权新命令。用实际Python producer发布并持锁的Go纯race/vet已通过，完整CI等待。首轮本地负例使用t.Context导致Cleanup前子进程被取消，改为独立10秒资源预算、先关闭输入并Wait再cancel，保留失败，不改协调器语义或回滚边界。
+
+当前M3 **24/36**、T25 **2/4**、C2 **3/4**、C3 **1/3**；双存储治理原语源代码/验证/合并完成，完整受审管理入口、真实MQ恢复/故障与T25-D组合仍未关闭，父任务继续未勾选。M2 **24/24**、M4 **0/8**。SDK稳定发布、生产DDL/资源/provider/部署、Mac mini规则加载、system与48小时观察均未执行。
+
+
+PR214最终8d447f6d的5检查全部成功并合并4dadacf1；[40044689252](https://github.com/FangcunMount/infra/actions/runs/40044689252)纯契约110、MySQL三档各38、Mongo16项通过，全部非空、零失败/跳过、自有清理回读。真实Python协调器producer与Go校验的runtime/forward、已结束步骤、修复批准缺失、错误绑定/step/marker/模式等纯边界均验证；没有启动DB/MQ/SSH的本地操作。它只确认既有受审步骤已发出，完整生产请求/receipt/物理/真实RPC/单次管理入口仍须独立验证，不因活动锁或hash即授权生产。完整报告摘要进入结构化证据；M3/T25/C3计数和生产边界不变。
