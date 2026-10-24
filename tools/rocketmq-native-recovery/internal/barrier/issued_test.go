@@ -15,6 +15,17 @@ import (
 	"time"
 )
 
+func TestIssuedProofRetainsActualNamedOwnersAndSourceBundle(t *testing.T) {
+	c, _ := issuedFixture(t, "runtime-start")
+	p, err := RequireIssued(c)
+	if err != nil || !p.Matches("unit-data-owner", "unit-recovery-owner", strings.Repeat("4", 64)) || p.TimeoutSeconds() != 30 {
+		t.Fatal("lost actual coordinator review context", err)
+	}
+	if p.Matches("other", "unit-recovery-owner", strings.Repeat("4", 64)) || p.Matches("unit-data-owner", "other", strings.Repeat("4", 64)) || p.Matches("unit-data-owner", "unit-recovery-owner", strings.Repeat("5", 64)) {
+		t.Fatal("foreign named review matched issued proof")
+	}
+}
+
 // Uses the actual infra Python coordinator producer and its live lock. It
 // starts no service, database, MQ or SSH connection.
 func issuedFixture(t *testing.T, kind string) (Context, func()) {

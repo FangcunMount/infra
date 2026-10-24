@@ -23,11 +23,22 @@ type Context struct {
 	BindingSHA256, StepPlanSHA256 [32]byte
 	Step                          string
 }
-type Issued struct{ context Context }
+type Issued struct {
+	context                                Context
+	dataOwner, recoveryOwner, sourceBundle string
+	timeout                                int
+}
 
 func (p Issued) Valid() bool {
 	return p.context.BindingSHA256 != [32]byte{} && p.context.StepPlanSHA256 != [32]byte{}
 }
+
+// Matches ties the actual coordinator's named owners/source to the separately
+// reviewed request. Neither a matching digest nor a live lock is an approval.
+func (p Issued) Matches(dataOwner, recoveryOwner, sourceBundle string) bool {
+	return p.Valid() && p.dataOwner == dataOwner && p.recoveryOwner == recoveryOwner && p.sourceBundle == sourceBundle
+}
+func (p Issued) TimeoutSeconds() int { return p.timeout }
 
 type binding struct {
 	Schema        string `json:"schema"`
@@ -160,5 +171,5 @@ func RequireIssued(c Context) (proof Issued, err error) {
 			return proof, ErrIssued
 		}
 	}
-	return Issued{c}, nil
+	return Issued{context: c, dataOwner: b.DataOwner, recoveryOwner: b.RecoveryOwner, sourceBundle: b.Source, timeout: p.Timeout}, nil
 }

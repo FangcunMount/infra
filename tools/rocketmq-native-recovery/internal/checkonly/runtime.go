@@ -3,6 +3,7 @@ package checkonly
 import (
 	"context"
 	"errors"
+	"reflect"
 	"time"
 
 	"github.com/FangcunMount/reliable-messaging/transaction"
@@ -59,7 +60,19 @@ var ErrRuntimeProof = errors.New("check-only runtime has not drained with a posi
 // observation alone cannot disguise unfinished work, missing SDK audit, a new
 // send/local callback, or failed confirmation in this owned instance.
 func (r *Runtime) VerifyDrained() error {
-	s := r.sdk.Stats()
+	return VerifyStats(r.sdk.Stats())
+}
+
+// VerifyStats validates a sealed runtime observation as data, not authority or
+// proof of provenance. Only this instance's SDK can produce its live Stats.
+func VerifyStats(s rocketmq.TransactionStats) error {
+	v := reflect.ValueOf(s)
+	for i := 0; i < v.NumField(); i++ {
+		f := v.Field(i)
+		if (f.Kind() == reflect.Int || f.Kind() == reflect.Int64) && f.Int() < 0 {
+			return ErrRuntimeProof
+		}
+	}
 	if !s.Stopped || s.Ready || s.ActiveSends != 0 || s.RunningChecks != 0 || s.QueuedChecks != 0 ||
 		s.RecoveryAuditRecorded < 1 || s.RecoveryAuditRecorded != s.RecoveryCommitConfirmed+s.RecoveryRollbackConfirmed ||
 		s.RecoveryRPCFailed != 0 || s.RecoveryAuditErrors != 0 || s.RecoveryAuditUnsupported != 0 ||

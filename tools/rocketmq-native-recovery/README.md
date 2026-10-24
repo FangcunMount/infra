@@ -1,10 +1,20 @@
 # RocketMQ 具名恢复维护工具（实现中）
 
-这是infra维护的短生命周期SDK宿主，当前CLI只支持只读请求准备与文件审核，尚无可用于生产的恢复执行入口。共享Go SDK可在相同原主库读取Go/Python MySQL见证及Go Mongo见证，不新增常驻服务；业务宿主继续拥有业务池、原业务事务、正常Checker及维护。
+这是infra维护的短生命周期SDK宿主，当前恢复执行为受审候选，四种宿主/完整故障门禁仍待完成，不授权生产。共享Go SDK可在相同原主库读取Go/Python MySQL见证及Go Mongo见证，不新增常驻服务；业务宿主继续拥有业务池、原业务事务、正常Checker及维护。
 
 ## 当前可执行的只读入口
 
-`cmd/native-recovery`提供`version`、`preview`与`verify-review`。`check`、`resolve`、`native-resume`均拒绝；没有隐藏的生产执行开关。完整SDK回查、物理检查、当前RPC receipt、治理解除与具名保护复核仍需后续入口和真实MQ门禁，不把文件审核成功当作执行授权。
+`cmd/native-recovery`提供`version`、`preview`、`verify-review`、`recover`、`resolve-notice`与`verify-resolution`。只读命令不启动SDK或native admin，不把文件审核成功当作执行授权。恢复执行必须同时通过私有请求/批准、源码/二进制/配置/完整路由、真实协调器issued屏障及双方责任人核验；没有绕过这些条件的开关。完整宿主与真实故障门禁继续。
+
+`recover`仅接受单独审核的`action=recover`批准。先消费独占、同步到盘的单次请求claim，再以新原库snapshot重验绑定/终态/首次证据；受审native脚本执行精确物理检查后，启动不暴露Sender的check-only SDK，显式请求一次原生recheck，并等待当前SDK RPC→原审计→私有观察。所有owner配置事务Topic进入Checker；普通发送、原业务执行和中止维护都不可用。原生管理只返回RecheckEnqueued/Unknown，不能写成Broker确认或业务成功。
+
+本实例只有在SDK实际Stopped、全部在途/队列为零、无新half/业务/中止、正向RPC与审计完整，且原池确实关闭后才封存receipt。回执绑定请求/nonce/源码/二进制/原协调绑定与当前步骤、完整原始观察文件及摘要、SDK统计和实际物理报告。拒绝未列出的观察文件、缺文件、错误nonce/来源、JSON重建或未排空；旧SDK成功时间不构成本次RPC。启动/取消/超时/未知均保留claim和私有材料，不复用原请求重跑。
+
+`resolve-notice`需要另一个`action=resolve`批准，绑定该完整receipt摘要，在新的受审forward步骤重新核验所有私有原字节、原物理报告和原库精确证据，之后仅调用治理CAS。Broker final与governance commit分别返回；治理提交错误保持Unknown，`verify-resolution`用原receipt和新的权威读取判断，不重启SDK或补造RPC。工具从不自动开放宿主准入，剩余notice和健康/freshness仍需具名宿主复核。
+
+可选私有配置`native_admin_script/native_admin_script_sha256/native_admin_nameserver/native_admin_broker`为执行所必需。脚本构造时复制已审原字节，以受控进程组执行，不重开路径；仅生成的私有请求路径进入argv，输出有64KiB上界且只保存在0600日志。多响应、超限、取消、遗留进程组、admin未关闭或身份/正文/保留窗口不符不能产生成功receipt。脚本必须为本次固定镜像/网络/凭据配置审查；生产使用单独受限helper cgroup内的直接Java子进程，不使用Docker socket或常驻代理。隔离CI为复用自有Broker暂运行Docker exec，容器归CI统一排空，不当作生产资源演练。
+
+协调器仅在已经审核并issued的脚本环境中传递`M3_COORDINATOR_DIRECTORY/BINDING_SHA256/STEP/STEP_PLAN_SHA256`（字段均带`M3_COORDINATOR_`前缀），避免脚本包含自身计划hash的循环。环境值本身不是批准，Go仍重读活动锁/原binding/state/marker/精确reviewed step。首个启动后旧备份恢复边界保持不变。
 
 构建必须来自精确、干净的infra提交：
 
@@ -25,7 +35,7 @@ selection schema为`m3-native-recovery-selection/v1`，包含operation_id、bran
 
 只读snapshot通过后，输出`m3-native-recovery-request/v1`，冻结原主库身份、绑定、精确SDK canonical Reference、本地终态、原audit时间、首次notice证据、物理位置、配置/manifest/export/源码/二进制摘要、具名责任人与随机nonce，30分钟到期。重复preview不覆盖首次文件，不重新生成消息或修改业务事实。输出摘要只有在原池真正关闭成功后才返回；失败文件保留取证。
 
-`verify-review`只检查`--request/--request-sha`、`--approval/--approval-sha`与`--binding-sha`。批准文件由具名负责人在工具外明确审核，schema为`m3-native-recovery-approval/v1`；绑定check动作、原请求SHA、空receipt_sha256、原协调绑定/source bundle、双方姓名和不超过请求期限的expires_at。它不校验活动issued屏障、不连接数据库、不产生批准文件或消息，不可据`review_graph_valid`执行恢复。后续resolve/verify会绑定同一个已审实际RPC receipt，未知治理提交不要求伪造新RPC。
+`verify-review`只检查`--request/--request-sha`、`--approval/--approval-sha`与`--binding-sha`，可显式指定`--action recover`。批准文件由具名负责人在工具外明确审核，schema为`m3-native-recovery-approval/v1`；绑定check/recover动作、原请求SHA、空receipt_sha256、原协调绑定/source bundle、双方姓名和不超过请求期限的expires_at。它不校验活动issued屏障、不连接数据库、不产生批准文件或消息，不可据`review_graph_valid`执行恢复。resolve/verify另行绑定同一个已审实际RPC receipt，未知治理提交不要求伪造新RPC。
 
 本批纯测试的所有权威数据/批准均为明确fixture。required存储门禁额外运行**编译后的独立CLI进程**，分别读取三种MySQL owner与qs.mongo原库并核对私有文件、原Reference/主库身份/旧audit、重复拒绝和审核非授权；物理索引与姓名均为synthetic，不当作真实MQ或生产批准。原SDK执行/见证/业务、目标notice在只读前后保持不变，自有资源单独删除回读。
 
