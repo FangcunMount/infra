@@ -1,0 +1,83 @@
+name: RocketMQ three host maintenance composition
+on:
+  pull_request:
+    paths:
+      - scripts/rocketmq/maintenance_composition.py
+      - scripts/rocketmq/ci-maintenance-composition.py
+      - scripts/rocketmq/test_maintenance_composition.py
+      - scripts/rocketmq/cutover_step.py
+      - scripts/rocketmq/start_boundary.py
+      - .github/workflows/rocketmq-maintenance-composition.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-host-maintenance-c1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GOWORK: off
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/iam
+          ref: 36456cdf2f1c980a5edeedce2eee44634097a00d
+          path: .iam-maintenance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: 83147d8e99e00fd36c57bc2fc4feb193ebe2a844
+          path: .qs-maintenance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-ai
+          ref: 05d2db7151d492bec127270d53121396b515f763
+          path: .ai-maintenance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: |
+            .iam-maintenance/go.sum
+            .qs-maintenance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Pure guard and report contracts
+        run: python3 -m unittest discover -s scripts/rocketmq -p test_maintenance_composition.py
+      - name: Required original host maintenance under one C1 operation
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 scripts/rocketmq/ci-maintenance-composition.py \
+            --iam "$PWD/.iam-maintenance" --qs "$PWD/.qs-maintenance" --ai "$PWD/.ai-maintenance" \
+            --report maintenance-composition.json
+      - name: Nonempty zero skip and exact owned cleanup
+        if: always()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          x=json.load(open('maintenance-composition.json'))
+          assert x['passed']>3 and x['failed']==x['skipped']==0
+          p=x['proof']['composition']
+          assert set(p['reports'])=={'iam','qs','ai'}
+          assert all(v['passed']>0 and v['failed']==v['skipped']==0 for v in p['reports'].values())
+          assert p['reports']['ai']['passed']==8
+          assert p['post_start_refused']==['iam','qs','ai']
+          assert not p['actual_runtime'] and not p['actual_writer_freeze'] and not p['production_authorized']
+          assert x['proof']['owned_databases_removed']
+          assert x['cleanup']==dict(compose_down_succeeded=True,project_containers_remaining=False,project_networks_remaining=False,existing_containers_unchanged=True,existing_networks_unchanged=True,private_fixture_directory_removed=True)
+          print('three-host maintenance composition passed; no production authorization')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: maintenance-composition-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.run_attempt }}
+          path: maintenance-composition.json
+          if-no-files-found: error
+          retention-days: 14
