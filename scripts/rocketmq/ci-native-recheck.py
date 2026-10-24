@@ -70,9 +70,11 @@ def main():
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--managed-tool', type=Path, help='fixed published-module CLI; owned isolated fixture only')
     parser.add_argument('--governance-faults',action='store_true',help='actual MySQL COMMIT before/after reply loss for managed CLI only')
+    parser.add_argument('--iam-host',type=Path,help='actual fixed IAM original writer, owned fixture only')
     args = parser.parse_args()
     ci_guard(os.environ)  # Never construct a client or invoke Docker on a workstation.
     require(not args.governance_faults or args.managed_tool is not None,'managed_cli_required_for_governance_faults')
+    require(not args.iam_host or (args.managed_tool and not args.governance_faults),'separate_actual_iam_managed_profile_required')
     require(not args.report.exists() and not args.report.is_symlink(), 'report_already_exists')
     module = importlib.util.spec_from_file_location('_native_fixture', Path(__file__).with_name('ci-transactions.py'))
     common = importlib.util.module_from_spec(module)
@@ -112,9 +114,10 @@ def main():
                    operation, '-b', '127.0.0.1:10911', *params], timeout=45).stdout
         require(not success or positive_admin_reply(operation, raw), 'admin_positive_reply_required')
         return raw
+    original_database='txprobe'
     def sql(query):
         return run(['docker', 'exec', '-i', mysql, 'sh', '-c',
-                    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B txprobe'], stdin=query).stdout.strip()
+                    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B "$1"','sh',original_database], stdin=query).stdout.strip()
     try:
         before = {kind: ids(kind) for kind in ('containers', 'networks')}
         image = run(['docker', 'image', 'inspect', args.image, '--format', '{{.Id}}']).stdout.strip()
@@ -167,7 +170,7 @@ def main():
         require(before_parameters == PARAMETERS, 'actual_parameters_required')
         proof['parameters_before'] = before_parameters
         manifest, proof['routing'] = setup(repo, sdk, broker, project, accounts, directory, admin, run, passed,
-            fixture_manifest=managed_manifest(repo) if args.managed_tool else None)
+            fixture_manifest=managed_manifest(repo,iam=bool(args.iam_host)) if args.managed_tool else None)
         revision = 'm3-1' if args.managed_tool else 'sdk-v2'
         route = next(r for r in manifest['routes'] if r['owner']=='iam.mysql' and r['route_revision']==revision and r['message_type']=='TRANSACTION')
         binary = directory/'sdk-go-probe'
@@ -210,7 +213,7 @@ def main():
             role = 'observer' if mode == 'consume' else 'owner-a'; account = accounts[role]
             path = directory/('client-'+secrets.token_hex(8)+'.json')
             write_private(path, dict(endpoint=f'127.0.0.1:{grpc_port}', accesskey=account['username'], secretkey=account['password'],
-                ca=str(ca), topic=route['physical_topic'], group=consumer_group_v2('sdk.logical', 'sdk-mysql-observer'),
+                ca=str(ca), topic=route['physical_topic'], group=consumer_group_v2(route['topic'], route['subscription']),
                 owner='iam.mysql', subscription='sdk-mysql-observer', inputs=[{k:v for k,v in route.items() if k!='id'}],
                 owner_routes=[dict(topic=r['topic'], physical_topic=r['physical_topic'], route_revision=r['route_revision'])
                               for r in manifest['routes'] if r['owner']=='iam.mysql' and r['message_type']=='TRANSACTION'],
@@ -219,20 +222,45 @@ def main():
             probe = common.Probe([str(binary), '--config', str(path), '--mode', mode, '--id', identity], directory,
                                  dict(os.environ, GRPC_DEFAULT_SSL_ROOTS_FILE_PATH=str(ca)))
             probes.append(probe); return probe
-        install = start('init'); install.wait('installed'); install.finish()
+        if not args.iam_host:
+            install = start('init'); install.wait('installed'); install.finish()
         consumer = start('consume'); consumer.wait('ready')
         identity = 'native-recheck-'+secrets.token_hex(12)
+        host=None;original=None
+        if args.iam_host:
+            report['limits']=['Actual IAM planned writer and owned original GORM root, not whole API or system',
+                'Original owner drains during real Broker network disconnection; no SIGKILL claim',
+                'Native internal copy may redeliver; no exactly-once or indefinite recovery promise',
+                'Synthetic reviewers and isolated owned resources; no production authorization']
+        if args.iam_host:
+            from iam_recovery_acceptance import IAMHost,metadata
+            host=IAMHost(source=args.iam_host,directory=directory,project=project,route=route,grpc_port=grpc_port,mysql_port=mysql_port,
+                password=password,ca=ca,account=accounts['owner-a'],run=run,common=common,probes=probes,proof=proof)
+            original=metadata(host.wait('half.json'));identity=original['message_id'];original_database=original['database']
+        original_operation=original['operation_id'] if original else 'op-'+identity
         def snapshot():
-            return authoritative_snapshot(sql("SELECT SHA2(w.reference,256), JSON_UNQUOTE(JSON_EXTRACT(CONVERT(w.reference USING utf8mb4),'$.wire_hash')), SHA2(w.broker_message_id,256),e.state,w.state,w.final_outcome FROM rm_tx_execution e JOIN rm_tx_witness w ON w.execution_key=e.execution_key WHERE e.owner='iam.mysql' AND e.operation_id='op-"+identity+"';"))
+            return authoritative_snapshot(sql("SELECT SHA2(w.reference,256), JSON_UNQUOTE(JSON_EXTRACT(CONVERT(w.reference USING utf8mb4),'$.wire_hash')), SHA2(w.broker_message_id,256),e.state,w.state,w.final_outcome FROM rm_tx_execution e JOIN rm_tx_witness w ON w.execution_key=e.execution_key WHERE e.owner='iam.mysql' AND e.operation_id='"+original_operation+"';"))
         def counts():
-            return sql("SELECT (SELECT COUNT(*) FROM sdk_business),(SELECT COUNT(*) FROM rm_tx_request),(SELECT COUNT(*) FROM rm_tx_execution),(SELECT COUNT(*) FROM rm_tx_witness);")
+            return sql("SELECT ("+(original["business_count_sql"] if original else "SELECT COUNT(*) FROM sdk_business")+"),(SELECT COUNT(*) FROM rm_tx_request),(SELECT COUNT(*) FROM rm_tx_execution),(SELECT COUNT(*) FROM rm_tx_witness);")
         stage = 'native_limit_of_genuinely_prepared_message'
         admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', '2', success=True)
         proof['parameters_fault'] = common.broker_parameters(admin('getBrokerConfig'))
         require(proof['parameters_fault'] == dict(PARAMETERS, transactionCheckMax=2), 'bounded_fault_parameters_required')
-        producer = start('crash-committed', identity); producer.wait('half', identity)
+        producer=None
+        if not host:
+            producer = start('crash-committed', identity); producer.wait('half', identity)
+        else:
+            network=run(['docker','inspect','--format','{{range $name,$config := .NetworkSettings.Networks}}{{$name}}{{end}}',broker]).stdout.strip()
+            require(network.startswith(project+'_') and json.loads(run(['docker','network','inspect',network]).stdout)[0]['Labels']['com.docker.compose.project']==project,'owned_broker_network_required')
+            run(['docker','network','disconnect',network,broker])
+            proof['iam_broker_network_disconnected']=True
+            host.signal('commit');require(host.wait('closed.json',35)==dict(original_root_committed=True,owner_stopped=True,business_executions=1),'original_root_not_closed')
+            run(['docker','network','connect','--alias','broker',network,broker])
+            proof['iam_broker_network_reconnected_after_owner_stop']=True
         prepared = snapshot()
-        require(prepared['execution_state'] == prepared['witness_state'] == 'prepared' and counts() == '0\t1\t1\t1', 'prepared_original_root_required')
+        wanted_state='committed' if host else 'prepared'
+        wanted_counts='1\t1\t1\t1' if host else '0\t1\t1\t1'
+        require(prepared['execution_state'] == prepared['witness_state'] == wanted_state and counts() == wanted_counts, 'prepared_original_root_required')
         index_path = directory/'native-index.json'; index = None
         deadline = time.monotonic()+110
         while time.monotonic() < deadline:
@@ -242,22 +270,27 @@ def main():
         require(index is not None and len(index['records'])==1 and not index['truncated_possible'], 'exact_native_limit_index_required')
         require(stat.S_IMODE(index_path.stat().st_mode)==0o600, 'private_index_mode')
         proof['native_index_sha256'] = hashlib.sha256(index_path.read_bytes()).hexdigest()
-        proof['native_index_records'] = 1; passed('genuine_prepared_unknown_reaches_native_check_limit')
+        proof['native_index_records'] = 1; passed('actual_iam_unconfirmed_original_commit_reaches_native_check_limit' if host else 'genuine_prepared_unknown_reaches_native_check_limit')
         for key, value in before_parameters.items(): admin('updateBrokerConfig', '-k', key, '-v', str(value), success=True)
         proof['parameters_restored_before_recovery'] = common.broker_parameters(admin('getBrokerConfig'))
         require(proof['parameters_restored_before_recovery'] == before_parameters, 'parameters_not_restored')
         stage = 'original_commit_then_real_process_exit'
-        producer.send('commit'); producer.finish(expected=23)
+        if producer:
+            producer.send('commit'); producer.finish(expected=23)
+        if host:
+            shutil.copyfile(index_path,host.control/'native-index.json');(host.control/'native-index.json').chmod(0o600)
+            host.signal('record-notice');require(host.wait('notice.json',10)==dict(exact_original_index_recorded=True),'original_host_native_import_required')
         committed = snapshot()
         require(committed['execution_state']==committed['witness_state']=='committed'
                 and committed['final_outcome']!='commit_confirmed' and counts()=='1\t1\t1\t1', 'original_commit_without_final_confirmation_required')
         require(all(committed[k]==prepared[k] for k in ('reference_sha256','wire_sha256','unique_id_sha256')), 'original_frozen_identity_changed')
-        proof['original_exit_code'] = 23; passed('real_original_root_committed_then_process_exited_before_final_rpc')
+        proof['original_exit_code'] = None if host else 23
+        passed('actual_iam_root_committed_during_broker_disconnect_and_owner_stopped' if host else 'real_original_root_committed_then_process_exited_before_final_rpc')
         if args.managed_tool:
             stage = 'compiled_managed_original_primary_recovery'
             managed_accept(repo=repo,binary=args.managed_tool.resolve(),broker=broker,project=project,directory=directory,
                 manifest=manifest,route=route,account=accounts['owner-a'],grpc_port=grpc_port,mysql_port=mysql_port,password=password,
-                ca=ca,java=java,identity=identity,index_path=index_path,index=index,sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,governance_faults=args.governance_faults)
+                ca=ca,java=java,identity=identity,index_path=index_path,index=index,sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,governance_faults=args.governance_faults,original=original)
         else:
             recovery = start('recover', identity); recovery.wait('ready', identity)
             recovery.send('seal'); recovery.wait('sealed', '', 'admission_stopped_checker_alive')
@@ -308,9 +341,14 @@ def main():
             proof['recovery_metrics'] = metrics[-1]; proof['original_counts'] = dict(business=1, requests=1, executions=1, witnesses=1)
             proof['exact_witness'] = final; passed('replacement_has_zero_new_half_and_actual_resources_drained')
         consumer.send('stop'); consumer.wait('closed'); consumer.finish()
+        if host:
+            host.finish();passed('actual_iam_original_primary_resolved_and_paused_replacement_keeps_checker')
+            remaining=run(['docker','exec','-i',mysql,'sh','-c','MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B'],stdin="SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name LIKE 'iam_m3_broker_test_%';").stdout.strip()
+            require(remaining=='0','owned_original_host_database_cleanup_required')
+            proof['owned_iam_database_removed']=True
         require(not run(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=sdk).stdout, 'sdk_source_changed')
         proof['sdk_tracked_sources_clean'] = True
-        require(report['passed']==((16 if args.governance_faults else 14) if args.managed_tool else 17), 'complete_nonempty_native_matrix_required')
+        require(report['passed']==((15 if host else 16 if args.governance_faults else 14) if args.managed_tool else 17), 'complete_nonempty_native_matrix_required')
     except Exception:
         report['failed'] = 1; report['failure'] = stage
     finally:

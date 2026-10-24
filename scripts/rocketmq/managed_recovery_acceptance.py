@@ -64,11 +64,12 @@ def safe_failure(directory):
     return result[:16]
 
 
-def fixture_manifest(repo):
+def fixture_manifest(repo,*,iam=False):
     document=json.loads((repo/'components/rocketmq/test-routes-v2.json').read_text())
     document['routes']=document['routes'][:3]
     ids={r['id'] for r in document['routes']}
     for route in document['routes']:
+        if iam and route['owner']=='iam.mysql' and route['message_type']=='TRANSACTION':route['topic']='iam.authz.version.v2'
         route['route_revision']='m3-1'
         route['physical_topic']=physical_topic_v2(route['topic'],route['message_type'],route['owner'],'m3-1')
     for account in document['accounts'].values():
@@ -89,27 +90,31 @@ def physical_fingerprint(document,row):
     return hashlib.sha256(raw).digest()
 
 
-def notice_key(index):
+def notice_key(index,binding=None):
     raw=b'm3-native-limit-notice-v1\x00'
-    for value in (b'iam.mysql',b'sdk-disposable',b'sdk-epoch-1',b'm3-1',index):
+    binding=binding or dict(owner='iam.mysql',store_id='sdk-disposable',writer_epoch='sdk-epoch-1')
+    for value in (binding['owner'].encode(),binding['store_id'].encode(),binding['writer_epoch'].encode(),b'm3-1',index):
         raw+=struct.pack('>I',len(value))+value
     return hashlib.sha256(raw).digest()
 
 
 def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False,original=None):
     proxy=MySQLCommitProxy(mysql_port).start() if governance_faults else None
     try:
         return _accept(repo=repo,binary=binary,broker=broker,project=project,directory=directory,manifest=manifest,route=route,account=account,
             grpc_port=grpc_port,mysql_port=mysql_port,password=password,ca=ca,java=java,identity=identity,index_path=index_path,index=index,
-            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy)
+            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original)
     finally:
         if proxy is not None:
             proof['governance_wire_proxy_cleanup']=proxy.close()
 
 
 def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original):
+    source=original or dict(owner="iam.mysql",store_id="sdk-disposable",writer_epoch="sdk-epoch-1",database="txprobe",user="txprobe",
+        operation_id="op-"+identity,branch_id="branch-0",fence=1,business_count_sql="SELECT COUNT(*) FROM sdk_business",
+        writer="fixed Go SDK source probe, not IAM business host",scope="one iam.mysql terminal commit, not the complete four-host/fault matrix")
     root=directory/'managed-cli';root.mkdir(mode=0o700)
     def write(name,value):
         path=root/name
@@ -131,7 +136,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     # CLI's constructor/start/preview never performs schema or binding writes.
     resource=repo/'tools/rocketmq-native-recovery/internal/authority/testdata/iam-000045-governance.sql'
     require(hashlib.sha256(resource.read_bytes()).hexdigest()=='0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a','frozen_host_governance_schema_required')
-    sql(resource.read_text())
+    if original is None:sql(resource.read_text())
     owner_manifest=copy.deepcopy(manifest)
     owner_manifest['accounts']={name:dict(owner='',publish=[],subscriptions=[]) for name in
         ('m3-iam','m3-qs-apiserver','m3-qs-worker','m3-qs-mongo','m3-ai')}
@@ -145,8 +150,8 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     # receives only the private generated request from the reviewed Go wrapper.
     command=[docker,'--host','unix:///var/run/docker.sock','--config',str(docker_config),'exec','-i',broker,*java[java.index('java'):],'NativeHalfManaged']
     native_script.write_text('#!/bin/bash\nset -euo pipefail\nexec '+shlex.join(command)+' < "$1"\n');native_script.chmod(0o600)
-    config=dict(schema='m3-native-recovery-config/v1',owner='iam.mysql',store_id='sdk-disposable',writer_epoch='sdk-epoch-1',
-        database_kind='mysql',database_uri=f'txprobe:{password}@tcp(127.0.0.1:{proxy.port if proxy else mysql_port})/txprobe',database_name='txprobe',database_ca_pem='',
+    config=dict(schema='m3-native-recovery-config/v1',owner=source['owner'],store_id=source['store_id'],writer_epoch=source['writer_epoch'],
+        database_kind='mysql',database_uri=f"{source['user']}:{password}@tcp(127.0.0.1:{proxy.port if proxy else mysql_port})/{source['database']}",database_name=source['database'],database_ca_pem='',
         endpoint=f'127.0.0.1:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
         native_admin_script=str(native_script),native_admin_script_sha256=hashlib.sha256(native_script.read_bytes()).hexdigest(),
         native_admin_nameserver='nameserver:9876',native_admin_broker='127.0.0.1:10911')
@@ -173,11 +178,14 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         except Exception:
             proof['managed_failure_diagnostics']=safe_failure(op)
             raise
-    row=index['records'][0];fingerprint=physical_fingerprint(index,row);key=notice_key(fingerprint)
+    row=index['records'][0];fingerprint=physical_fingerprint(index,row);key=notice_key(fingerprint,source)
     index_sha=hashlib.sha256(index_path.read_bytes()).hexdigest()
-    sql(f"INSERT INTO messaging_native_limit_notices(notice_key,owner,store_id,writer_epoch,route_revision,native_index_sha256,evidence_sha256,status,schema_version,recorded_at) VALUES(UNHEX('{key.hex()}'),'iam.mysql','sdk-disposable','sdk-epoch-1','m3-1',UNHEX('{fingerprint.hex()}'),UNHEX('{index_sha}'),'blocked',1,UTC_TIMESTAMP(6));")
+    if original is None:
+        sql(f"INSERT INTO messaging_native_limit_notices(notice_key,owner,store_id,writer_epoch,route_revision,native_index_sha256,evidence_sha256,status,schema_version,recorded_at) VALUES(UNHEX('{key.hex()}'),'iam.mysql','sdk-disposable','sdk-epoch-1','m3-1',UNHEX('{fingerprint.hex()}'),UNHEX('{index_sha}'),'blocked',1,UTC_TIMESTAMP(6));")
+    else:
+        require(governed().split("\t")==[key.hex().upper(),index_sha.upper(),"blocked"],"actual_host_must_import_exact_original_index")
     before=governed()
-    selection_path,selection_sha=write('selection.json',dict(schema='m3-native-recovery-selection/v1',operation_id='op-'+identity,branch_id='branch-0',fence=1,
+    selection_path,selection_sha=write('selection.json',dict(schema='m3-native-recovery-selection/v1',operation_id=source['operation_id'],branch_id=source['branch_id'],fence=source['fence'],
         native_index_sha256=fingerprint.hex(),source_bundle_sha256=source_bundle,data_owner=binding['data_owner'],recovery_owner=binding['recovery_owner']))
     request_path=root/'request.json'
     preview=call(['preview','--config',config_path,'--config-sha',config_sha,'--manifest',manifest_file,'--manifest-sha',manifest_sha,
@@ -207,7 +215,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     require(governed()==before,'broker_confirmation_auto_resolved_governance')
     passed('published_sdk_actual_native_recheck_current_rpc_private_receipt_and_true_drain')
     consumer.wait('received',identity,timeout=100)
-    require(sql('SELECT (SELECT COUNT(*) FROM sdk_business),(SELECT COUNT(*) FROM rm_tx_request),(SELECT COUNT(*) FROM rm_tx_execution),(SELECT COUNT(*) FROM rm_tx_witness);')=='1\t1\t1\t1','recovery_repeated_business_or_sent_new_half')
+    require(sql('SELECT ('+source['business_count_sql']+'),(SELECT COUNT(*) FROM rm_tx_request),(SELECT COUNT(*) FROM rm_tx_execution),(SELECT COUNT(*) FROM rm_tx_witness);')=='1\t1\t1\t1','recovery_repeated_business_or_sent_new_half')
     passed('original_consumer_identity_and_one_original_business_root_preserved')
     first_audit=sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;")
     require(first_audit.startswith('commit_confirmed\t'),'positive_sdk_primary_audit_required')
@@ -250,5 +258,4 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     proof['managed_recovery']=dict(request_sha256=request_sha,receipt_sha256=receipt_sha,native_index_sha256=fingerprint.hex(),
         actual_sdk_stats=stats,original_counts=dict(business=1,requests=1,executions=1,witnesses=1),first_primary_audit_preserved=True,
         approved_governance_resolved=True,same_request_reexecution_refused=True,private_observations=len(receipt_data['observations']),
-        production=False,system_acceptance=False,reviewers='synthetic fixture',original_writer='fixed Go SDK source probe, not IAM business host',
-        scope='one iam.mysql terminal commit, not the complete four-host/fault matrix')
+        production=False,system_acceptance=False,reviewers='synthetic fixture',original_writer=source['writer'],scope=source['scope'])
