@@ -195,9 +195,21 @@ class ActualImageBoundary:
                 require((self.directory / 'first-runtime-start.json').is_file(), 'actual_up_before_durable_marker_refused')
                 self.f.report.setdefault('actual_up_after_marker', []).append(component)
             return original(plan, argv, timeout)
-        with patch.object(cutover_step, 'GLOBAL_LOCK', self.global_lock), patch.object(cutover_step, 'AI_LOCK', self.ai_lock), patch.object(runtime_start, 'command', side_effect=observed):
-            with Boundary(self.directory, self.binding_sha) as operation:
-                operation.start('actual-' + component, lambda: runtime_start.execute(self.plans[component]))
+        try:
+            with patch.object(cutover_step, 'GLOBAL_LOCK', self.global_lock), patch.object(cutover_step, 'AI_LOCK', self.ai_lock), patch.object(runtime_start, 'command', side_effect=observed):
+                with Boundary(self.directory, self.binding_sha) as operation:
+                    operation.start('actual-' + component, lambda: runtime_start.execute(self.plans[component]))
+        finally:
+            # execute can fail after creating a container. Keep that actual
+            # process in diagnostics without masking the durable start failure.
+            try:
+                name = self.f.project + '-' + component
+                result = self.f.run(['docker', 'inspect', '--type', 'container', name, '--format',
+                    '{{index .Config.Labels "com.fangcunmount.m3.fixture"}}'], required=False)
+                if result.returncode == 0 and result.stdout.strip() == self.f.project:
+                    self.f.applications[component] = name
+            except RuntimeError:
+                self.f.report.setdefault('actual_process_readback_unavailable', []).append(component)
         self.started.add(component)
         self.f.applications[component] = self.f.project + '-' + component
 

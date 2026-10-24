@@ -327,7 +327,9 @@ def main():
             report['processes'][component] = f.diagnostic(component, source)
     finally:
         if hasattr(f, 'boundary'):
-            report['coordinator_status'] = f.boundary.status()
+            try: report['coordinator_status'] = f.boundary.status()
+            except Exception:
+                report.update(failed=1, coordinator_status_unavailable=True)
         report['passed'] = len(report['cases'])
         try: f.cleanup()
         except Exception: report['failed'] = 1; report.setdefault('failure_stage', 'owned_cleanup')
