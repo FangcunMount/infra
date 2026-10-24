@@ -7,6 +7,9 @@ on:
       - scripts/rocketmq/ai_image_start.py
       - scripts/rocketmq/image_start_fixture.py
       - scripts/rocketmq/test_ai_image_start.py
+      - scripts/rocketmq/qs_image_pair.py
+      - scripts/rocketmq/test_qs_image_pair.py
+      - scripts/rocketmq/image_fixtures/qs_init_test.go
       - scripts/rocketmq/iam_image_start.py
       - scripts/rocketmq/test_iam_image_start.py
       - scripts/rocketmq/image_fixtures/iam_init.go
@@ -16,7 +19,7 @@ on:
       phase:
         description: Build five candidates or start an existing IAM/AI archive in an owned fixture
         type: choice
-        options: [build, iam-start, ai-start]
+        options: [build, iam-start, ai-start, qs-pair]
         default: build
       image_run_id:
         description: Exact prior five-image run for a component; no registry or production input
@@ -55,6 +58,7 @@ jobs:
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_final_image_candidate.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_iam_image_start.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_ai_image_start.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_qs_image_pair.py
   images:
     if: github.event_name == 'workflow_dispatch' && inputs.phase == 'build'
     needs: contracts
@@ -251,5 +255,81 @@ jobs:
         with:
           name: m3-ai-image-start-${{ github.run_id }}
           path: ai-image-start.json
+          if-no-files-found: error
+          retention-days: 14
+
+  qs-pair:
+    if: github.event_name == 'workflow_dispatch' && inputs.phase == 'qs-pair'
+    needs: contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+      IMAGE_RUN_ID: ${{ inputs.image_run_id }}
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: d3269bda672b97582edb691ca4f924484c653822
+          path: .qs-pair-source
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-pair-source/go.sum
+      - name: Download exact previously built QS archives on isolated runner
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$IMAGE_RUN_ID" =~ ^[0-9]{1,20}$ ]]
+          mkdir -m 700 .qs-image-candidates
+          for target in qs-api qs-collection qs-worker; do
+            mkdir -m 700 ".qs-image-candidates/$target"
+            gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+              --name "m3-final-image-metadata-$target-d3269bda672b97582edb691ca4f924484c653822-$IMAGE_RUN_ID" --dir ".qs-image-candidates/$target"
+            gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+              --name "m3-final-image-archive-$target-d3269bda672b97582edb691ca4f924484c653822-$IMAGE_RUN_ID" --dir ".qs-image-candidates/$target"
+          done
+      - name: Compile owned fixture against unchanged original migration package
+        run: |
+          set -euo pipefail
+          fixture="$GITHUB_WORKSPACE/.qs-pair-source/internal/pkg/migration/m3_image_pair_fixture_test.go"
+          test ! -e "$fixture"
+          trap 'rm -f "$fixture"' EXIT
+          cp scripts/rocketmq/image_fixtures/qs_init_test.go "$fixture"
+          cd .qs-pair-source
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c -tags=integration \
+            -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d3269bda672b97582edb691ca4f924484c653822' \
+            -o "$GITHUB_WORKSPACE/qs-pair-init" ./internal/pkg/migration
+          cd "$GITHUB_WORKSPACE"
+          test -z "$(readelf -l qs-pair-init | sed -n '/INTERP/p')"
+      - name: Verify official Broker archive and build owned dependency
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-m3-image-start:5.5.1 components/rocketmq
+      - name: Original paired schemas, exact full restore and initial bindings
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 scripts/rocketmq/qs_image_pair.py --source "$PWD/.qs-pair-source" \
+            --candidate "$PWD/.qs-image-candidates" --initializer "$PWD/qs-pair-init" --report qs-image-pair.json
+      - name: Nonempty zero skips and owned cleanup
+        if: always()
+        run: |
+          python3 - <<'PYREPORT'
+          import json
+          x=json.load(open('qs-image-pair.json'))
+          assert x['passed']==9 and len(x['cases'])==9 and x['failed']==x['skipped']==0
+          assert all(x['cases'].values()) and all(x['cleanup'].values()) and x['source_unchanged']
+          assert not any(x[k] for k in ('production','system_acceptance','application_started','combined_cutover_rehearsal_complete'))
+          PYREPORT
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m3-qs-image-pair-${{ github.run_id }}
+          path: qs-image-pair.json
           if-no-files-found: error
           retention-days: 14
