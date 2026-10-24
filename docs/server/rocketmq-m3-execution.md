@@ -33,7 +33,7 @@ T25-D 按新首发范围冻结候选并组合验证原 NSQ 排空、未来计划
 - 源码合并：T24-D IAM PR140、QS PR432、AI PR219、infra PR192已合并；此前常规保护/规则及SDK固定tx.4/a4证据保留。稳定SDK、生产部署/DDL/Topic/ACL/provider切换、Mac mini规则加载、system与48h观察均未执行。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 当前批次：**T01–T28已完成，T29最终候选进行中**。正式SDK及三库接入均已合并；QS441修复运行期Survey索引安装，当前候选为b75d4a52（main合并20cd2184、完整tree一致），五镜像归档固定。IAM实际组件8/8、AI9/9及各完整门禁已合并；新QS110/44双库9/9通过。七进程诊断复跑40094707933为15/0/0、全部正常关闭、SQL/Mongo运行期DDL为零，原worker Exit2原因尚未复现；v3首次准备检查受WARN日志过滤失败，夹具08821c6修正后40096686662为15/15、三个worker九次启停均Exit0；完整C1首次40097426163在窗口前完整恢复摘要核对失败；3260414补安全逐库诊断，40098200483复验中。infra253当前完整CI通过但新试验改动尚未合入；完整C1/30分钟、最终配置/执行包、实际105前置与生产切换尚未完成。
+- 当前批次：**T01–T28已完成，T29最终候选进行中**。五镜像及稳定SDK已固定；IAM8/8、AI9/9组件及完整CI已合并，QS441合并且当前110/44双库9/9。实际七进程v3为15/15、三个worker九次启停均Exit0、两类运行期DDL均零；旧Exit2未解释。infra253的cf3头完整CI16检查/16报告691项通过，后续恢复修正尚未合入最终头。完整C1在窗口前精确恢复核对中发现字符集问题：显式utf8mb4已精确还原IAM/QS/Mongo，AI剩两生成列表达式元数据；d5aae623原表达式保护附件＋331纯测试通过，40100409721原生复验中。完整C1/30分钟、实际配置/执行包、105前置、生产/system/48小时尚未完成。
 
 
 ### T23 执行验收（同一正式任务，4/4已完成）
@@ -239,7 +239,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T26 | 预发布三库完整CI/API评审/混合链路，稳定协议冻结 | 2026-10-24；infra PR233 bff1b895、QS PR438 9a20f62a、AI PR222 1b380a29均合并；六档各40项、关联10报告451项，合计691/0/0；[最终证据](evidence/rocketmq-m3-t26-final-20261024.json) |
 | ✅ | T27 | 同SDK SHA的稳定Go/Python发布、摘要/锁/receipt | 2026-10-24；Go v0.5.0/Python0.4.0同源码1345266，PR58/59已合并；双Release各9资产重新下载/digest核验、234模块文件及wheel/sdist各114纯测试；[发布证明](evidence/rocketmq-m3-stable-release-20261024.json) |
 | ✅ | T28 | 三库正式稳定制品、重新安装及非空零跳过完整门禁 | 2026-10-24；IAM147 713f83b2/QS439 3b0774f9/AI223 404323f7，实际tree均与源码CI候选相同；infra236 68b25ece，20检查通过、正式制品与宿主完整门禁收口；[证据](evidence/rocketmq-m3-stable-adoption-20261024.json) |
-| ☐ | T29 | 固定最终镜像/配置/资源、恢复/启动及30分钟演练 | 进行中：修复后五镜像归档核验通过；IAM原生8/8及关联451项已合并a9dd669e；AI原生9/9及关联451项已合并032d7c7a。QS双库原生9/9及10检查/451项通过并合并e73fe4aa，实际五镜像/七进程启动试验复验中。原失败保留；配置资源/执行包、完整C1及30分钟未完成。[候选证据](rocketmq-m3-final-candidate.md) |
+| ☐ | T29 | 固定最终镜像/配置/资源、恢复/启动及30分钟演练 | 进行中：五镜像固定；IAM8/AI9组件已合并，当前QS110/44双库9/9；七进程v3的15/15及三worker九次启停/全体正常关闭、零DDL通过。cf3完整CI691项通过；完整恢复剩AI原表达式附件复验40100409721，最终配置/执行包、完整C1/30分钟及最终头合并尚未完成。原失败保留。[候选证据](rocketmq-m3-final-candidate.md) |
 | ☐ | T30 | 105前置、真实库/运行基线及具名生产清单 | 待开始；生产前置未核验 |
 | ☐ | T31 | 回读生产v2资源/配置与Mac mini告警，保持封准入 | 待开始 |
 | ☐ | T32 | 排空、交接、同窗口保护及显式离线迁移 | 待开始 |
@@ -2068,3 +2068,21 @@ QS441当前b75d4a52在28项检查成功、1项条件文档/API同步N/A后正常
 [40097426163](https://github.com/FangcunMount/infra/actions/runs/40097426163)实际3/1/0，在窗口前完整三MySQL/整QS Mongo保护恢复核对处返回`actual_full_scope_restore_readback_differs`；尚无协调目录/首次启动标记、离线升级或业务进程，声明清理4项与源码未改通过。[原报告](evidence/rocketmq-m3-c1-first-restore-failure-20261024.json)保留，不把已有组件恢复及七进程成功代替本次完整范围通过。
 
 3260414保留同一精确摘要门禁，补充失败前后逐库/对象摘要、provider/无runtime布尔及DDL行类别/长度/hash诊断，不输出SQL、业务事实、注释或保护原文；1项保护准入＋5项原dump规范化纯测试通过。40098200483继续同一固定镜像/已成功v3回执复验，原因尚未确认。原cf3ddbd源码CI同时进行，修复最终头仍须门禁；M3仍**28/36**、T29未勾选，生产未操作。
+
+
+### 2026-10-24：cf3完整CI691项通过；完整恢复差异已缩小，显式字符集复验中
+
+infra253分支头cf3ddbd840c4c3518af0ba7165ebd13abdf26ac8、实际PR测试merge5c4062885a97df25c193eda3cfc22fc89cef4003：7工作流/16检查成功，6个条件不适用job单列；下载16份小型报告共691/0/0（6档成对各40＋原10报告451），每份4项声明清理按原真假语义回读。15份正式SDK1345266，一份原生DLQ生成夹具仍单列8de893b；未下载227MB Broker归档。[CI回执](evidence/rocketmq-m3-cf3-candidate-ci-20261024.json)。该头早于恢复诊断/字符集改动，不能代替修复后最终头门禁。
+
+40098200483继续3/1/0，[逐库差异](evidence/rocketmq-m3-full-restore-difference-20261024.json)表明QS MySQL与整Mongo一致，IAM列/库定义一致但数据dump变化，AI完整dump一致但列元数据变化；provider保持，runtime未启动，声明清理与源码未变更通过。没有把这些差异归为可忽略，也未增加列元数据规范化。
+
+ad5c468dd50ac39559c0c3b69491a921e31e4b19为完整保护导出显式设置utf8mb4及`--set-charset`（在`--compact`之后）；完整导入在同一连接先SET NAMES utf8mb4并回读client/connection/results三个值，再恢复原保护bytes。原dump/列/Mongo精确比较保持；含中文/四字节字符及二进制的原文保留、会话设置与错误回读拒绝等7项定向纯测试通过。MySQL[官方dump选项](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html)说明compact关闭set-charset；实际默认字符集与修复结果由40099179996回读，尚未验收，不先称根因已修复。M3仍**28/36**、T29未勾选，生产未操作。
+
+
+### 2026-10-24：恢复字符集问题已证实并修复IAM；保留AI原表达式附件继续精确恢复
+
+40099179996仍3/1/0，但明确回读原mysql CLI默认client/connection/results均latin1，显式utf8mb4后三MySQL数据/DDL dump、IAM/QS全部列与库定义、完整Mongo均精确一致；仅AI两行列元数据不同。无runtime/离线升级，清理与源码未改通过。[原报告及哈希重建证据](evidence/rocketmq-m3-full-restore-charset-followup-20261024.json)保留。
+
+按固定AI源码ddff86ca的0040模型重建`governance_draft_heads`两行完整元数据，SHA逐项匹配真实前后4个hash：差异仅`prompt_draft_id_key`与`semantic_draft_id_key`的generation_expression字符串常量标记，从原_utf8mb4变为dump重建的_ascii；全部其他字段精确匹配。没有把它规范化掉。d5aae623新增原表达式私有保护附件，要求精确源码元数据，摘要纳入原保护manifest；恢复时实际重新声明原两表达式，再核验原dump/列/Mongo全量精确快照。原保护SQL未被重写，不用成功hash替换失败值。未知源/schema拒绝；附件仅隔离夹具，未进入生产执行包或SDK。
+
+定向8项纯测试通过（含原文/utf8mb4、错误会话、私有MySQL错误码提取、原表达式来源拒绝及原dump比较）。40100409721原生复验中，尚未证明完整恢复/后续C1/30分钟通过。M3仍**28/36**、T29未勾选，生产未操作。

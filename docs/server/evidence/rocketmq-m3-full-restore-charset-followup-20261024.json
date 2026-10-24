@@ -1,0 +1,263 @@
+{
+  "schema": "m3-full-restore-charset-followup/v1",
+  "run_id": 40099179996,
+  "report_sha256": "144fe5900df93b1ddd688f42c94cc930abeb20d4a78d10b671dc8c67b6ab51ce",
+  "report": {
+    "schema": "m3-five-actual-image-cutover/v1",
+    "passed": 3,
+    "failed": 1,
+    "skipped": 0,
+    "production": false,
+    "system_acceptance": false,
+    "combined_cutover_rehearsal_complete": false,
+    "c1_cutover_barrier_exercised": false,
+    "cases": {
+      "actual_source_registry_consumers_match_manifest": true,
+      "all_five_exact_archives_loaded": true,
+      "original_pre_m3_qs_pair_prepared": true
+    },
+    "sources": {
+      "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "qs": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+    },
+    "scope": "owned old-schema full restore training, original offline upgrades and actual seven-process C1/30-minute start; no production/system/business claim",
+    "infra_sha": "ad5c468dd50ac39559c0c3b69491a921e31e4b19",
+    "original_qs_consumer_count": 1,
+    "original_qs_consumer_contract": {
+      "consumers": [
+        {
+          "id": "modelcatalog.hot_rank_projection",
+          "runtime": "apiserver",
+          "event_type": "answersheet.submitted",
+          "topic": "qs.evaluation.lifecycle",
+          "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+          "delivery": "durable_outbox",
+          "outbox_profile": "mongo_domain_events"
+        }
+      ],
+      "schema": "qs-original-consumer-contract/v1",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "original_qs_consumer_contract_sha256": "f65853c2aee20108a26d53c7e65d4234a5d66235df4440355a48e1d90f883a4a",
+    "candidates": {
+      "iam": {
+        "target": "iam",
+        "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+      },
+      "qs-api": {
+        "target": "qs-api",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:c1c1093a411dba90bb47ad7dabe8dc50b21a0fed633efef4cb94eeae909886c4",
+        "archive_sha256": "3c2aefb67ea9f50b7acea8d232a05d7ba0296173e75ecf2ebeb3b52bf2dab71b"
+      },
+      "qs-collection": {
+        "target": "qs-collection",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:07e13f2fcd1bd59cdc14a81e0334c73a8b5b7939d235b056254378f939af37ce",
+        "archive_sha256": "a3140df0c4ba98fbefd82f6da06ef4f4cb4867e0eb63fd37cfa91b9ca6cc77cb"
+      },
+      "qs-worker": {
+        "target": "qs-worker",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:98b5b635aa72cae96899a5289dea4aa038bcd25ba1eeebe9f944682f4e3a0d98",
+        "archive_sha256": "907abca7e5b2b410ab4383bead344d2c08d01fac9e0e7ba54fbf00b4eee21b25"
+      },
+      "ai": {
+        "target": "ai",
+        "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+      }
+    },
+    "dependency_image_ids": {
+      "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "rocketmq": "sha256:75104cfa148ec97a31c2de805b1ea76c71d4368035b9ead9f0d5add76db20b75",
+      "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+    },
+    "resources": {
+      "version": 2,
+      "operations": 53,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true
+    },
+    "qs_schema": {
+      "journal_force_used": false,
+      "mongo": 40,
+      "mysql": 105,
+      "original_templates_applied": true,
+      "production": false,
+      "profile": "pre_m3",
+      "resources_sha256": "c37b639804391172b2209f11c7056b4867309a31054af3c5d3f740cd6145b86d",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "iam_controlled_seed": {
+      "controlled_seed": true,
+      "legacy_drain_claimed": false,
+      "publication_intents_created": false,
+      "schema_version": 41,
+      "seed_events_retained": 2,
+      "witnesses_created": false
+    },
+    "configuration_sha256": {
+      "iam": "45681409ce6be879c028bfe9e96bb40d3bdf4a241db23a3c872f1413f5c30f0c",
+      "api": "df85b522e1a07505cc226748c693c4056700bf9a34865d6070bbfe8430e5c698",
+      "collection": "78c7efc95bce5f3ae631e96102fc71e359f0a63f85bf1d2ca7af07ac5cd65bb6",
+      "worker": "4b8c8904635e3dd6aff57f7f69aa7054fe78d9ea5748c331165fa591d24efa1a"
+    },
+    "mysql_client_default_charsets": [
+      "latin1",
+      "latin1",
+      "latin1"
+    ],
+    "mysql_restore_session_charsets": [
+      "utf8mb4",
+      "utf8mb4",
+      "utf8mb4"
+    ],
+    "full_restore_difference": {
+      "before": {
+        "iam": {
+          "canonical_dump_sha256": "6313b7aad4b5a946bc166edf91263578a86fdaffb2e7cdc6003678d3d2ad60fe",
+          "columns_sha256": "23e1cb268c83697a50ede67570075627fb21a58b1eb233eb48d54c59c1ffb1c2",
+          "database_definition_sha256": "4e3731c330d2de7facc62379e9a120d182c20583e8bccc9faba7c5ce6b7055b8"
+        },
+        "qs": {
+          "canonical_dump_sha256": "dd3894c6e098443ca3f948489982027f040ca6b1ca22dee27b8b5564f35cccea",
+          "columns_sha256": "6c6356b024476f854092f6f3663c47595b112295952de5ee20d2b7276faae3fc",
+          "database_definition_sha256": "21755e87c25a18aa39ccea41c0f94eddccd7d1569dc38b0b67edf2c5047383a0"
+        },
+        "ai": {
+          "canonical_dump_sha256": "2cc96f0de3af95815b9e0920d18fd40a8b0c5abe00b52b25c0f8645a3bff07d0",
+          "columns_sha256": "4b8485652abbe4ec2bbea7f527127dffbcb532e77efd81b0a0adcc68a98c5405",
+          "database_definition_sha256": "40b5323f084f6aa32fc5fcb20ed313e475163b0c3bc452ab68605570436f344e"
+        },
+        "mongo": {
+          "snapshot_sha256": "7dcf432a351225ad501f707dcd9fd3274b1d7d35921e1ae88d871581185ecfd2",
+          "collections": 14
+        }
+      },
+      "after": {
+        "iam": {
+          "canonical_dump_sha256": "6313b7aad4b5a946bc166edf91263578a86fdaffb2e7cdc6003678d3d2ad60fe",
+          "columns_sha256": "23e1cb268c83697a50ede67570075627fb21a58b1eb233eb48d54c59c1ffb1c2",
+          "database_definition_sha256": "4e3731c330d2de7facc62379e9a120d182c20583e8bccc9faba7c5ce6b7055b8"
+        },
+        "qs": {
+          "canonical_dump_sha256": "dd3894c6e098443ca3f948489982027f040ca6b1ca22dee27b8b5564f35cccea",
+          "columns_sha256": "6c6356b024476f854092f6f3663c47595b112295952de5ee20d2b7276faae3fc",
+          "database_definition_sha256": "21755e87c25a18aa39ccea41c0f94eddccd7d1569dc38b0b67edf2c5047383a0"
+        },
+        "ai": {
+          "canonical_dump_sha256": "2cc96f0de3af95815b9e0920d18fd40a8b0c5abe00b52b25c0f8645a3bff07d0",
+          "columns_sha256": "9bc29987bb0317684c284406c07d48d3780d4291bcc4d9874c304d516e7d8e2f",
+          "database_definition_sha256": "40b5323f084f6aa32fc5fcb20ed313e475163b0c3bc452ab68605570436f344e"
+        },
+        "mongo": {
+          "snapshot_sha256": "7dcf432a351225ad501f707dcd9fd3274b1d7d35921e1ae88d871581185ecfd2",
+          "collections": 14
+        }
+      },
+      "provider_unchanged": true,
+      "runtime_started": false,
+      "mysql": {
+        "ai": {
+          "raw_dump": [],
+          "canonical_dump": [],
+          "column_metadata": [
+            {
+              "before": [
+                {
+                  "kind": "other",
+                  "bytes": 187,
+                  "sha256": "4257a573673fb143338cc38dfd9657fab1480251d6d6bee74725f0c7915f7117",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_0900_ai_ci"
+                  ]
+                },
+                {
+                  "kind": "other",
+                  "bytes": 184,
+                  "sha256": "0f8608f1f2237f1d08794f2b85d0fec80dc3e4cc84a7eea9871d6019ba6741a5",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_bin"
+                  ]
+                }
+              ],
+              "after": [
+                {
+                  "kind": "other",
+                  "bytes": 185,
+                  "sha256": "f25e8ffe121a338e560514d4af639358e2af81a533423b601045b1113a7cda22",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_0900_ai_ci"
+                  ]
+                },
+                {
+                  "kind": "other",
+                  "bytes": 182,
+                  "sha256": "ca4d69ebdbed974089b10e4d35d7e74b241d54a234d36e04a01c40f10f982a66",
+                  "encoding_tokens": [
+                    "utf8mb4",
+                    "utf8mb4_bin"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "failure_stage": "full_scope_pre_window_protection_and_restore",
+    "failure_kind": "RuntimeError",
+    "failure_reason": "actual_full_scope_restore_readback_differs",
+    "processes": {},
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    },
+    "sources_unchanged": true
+  },
+  "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+  "source_reconstructed_metadata": [
+    {
+      "table": "governance_draft_heads",
+      "column": "prompt_draft_id_key",
+      "field": "generation_expression",
+      "before_literal_introducer": "_utf8mb4",
+      "after_literal_introducer": "_ascii",
+      "source_reconstructed_before_sha256": "4257a573673fb143338cc38dfd9657fab1480251d6d6bee74725f0c7915f7117",
+      "source_reconstructed_after_sha256": "f25e8ffe121a338e560514d4af639358e2af81a533423b601045b1113a7cda22"
+    },
+    {
+      "table": "governance_draft_heads",
+      "column": "semantic_draft_id_key",
+      "field": "generation_expression",
+      "before_literal_introducer": "_utf8mb4",
+      "after_literal_introducer": "_ascii",
+      "source_reconstructed_before_sha256": "0f8608f1f2237f1d08794f2b85d0fec80dc3e4cc84a7eea9871d6019ba6741a5",
+      "source_reconstructed_after_sha256": "ca4d69ebdbed974089b10e4d35d7e74b241d54a234d36e04a01c40f10f982a66"
+    }
+  ],
+  "scope": "Actual latin1 defaults confirmed. Explicit utf8mb4 exactly restores IAM,QS and Mongo; AI data/DDL exact, only two original expression literal introducers differ. No runtime/offline upgrade begun.",
+  "companion_source_sha": "d5aae623622992eb0be5c1142fe571429f2bef75",
+  "companion_scope": "Private original-metadata-bound DDL attachment, manifest hash protected; reapply original two expressions before exact snapshots. No hash mapping or relaxed comparison; CI only, not production tool.",
+  "targeted_pure_tests": 8,
+  "retry_run_id": 40100409721,
+  "retry_verified": false,
+  "production": false
+}
