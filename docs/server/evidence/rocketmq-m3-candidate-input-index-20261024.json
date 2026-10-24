@@ -1,0 +1,424 @@
+{
+  "schema": "m3-candidate-input-index/v1",
+  "status": "proposed_only_not_executable_or_approved",
+  "source_refs": {
+    "infra": "4f9c35e5883be11057737285a658c6dc58677a37",
+    "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+    "qs": "d3269bda672b97582edb691ca4f924484c653822",
+    "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+  },
+  "images": {
+    "run_id": 40074229224,
+    "scope": "five actual original Dockerfiles; metadata and archive digests verified; application startup separate",
+    "candidates": [
+      {
+        "target": "ai",
+        "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+        "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "engine_image_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3",
+        "archive_bytes": 133782116
+      },
+      {
+        "target": "iam",
+        "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "engine_image_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746",
+        "archive_bytes": 84817881
+      },
+      {
+        "target": "qs-api",
+        "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+        "engine_image_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+        "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3",
+        "archive_bytes": 73317746
+      },
+      {
+        "target": "qs-collection",
+        "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+        "engine_image_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+        "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c",
+        "archive_bytes": 24920134
+      },
+      {
+        "target": "qs-worker",
+        "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+        "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+        "engine_image_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+        "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc",
+        "archive_bytes": 20624873
+      }
+    ]
+  },
+  "files": [
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "scripts/rocketmq/start_boundary.py",
+      "sha256": "2c2b18a4d8b0865f5cb7d6fa81840d7d4f50c7dbc1265d7fa657bb9236f1700c",
+      "bytes": 12238,
+      "role": "proposed_operator_tool"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "scripts/rocketmq/cutover_step.py",
+      "sha256": "894f27388d1914f7064c49d8c14a05958e77fb5935c1850cbdae7afda85cb7dd",
+      "bytes": 10097,
+      "role": "proposed_operator_tool"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "scripts/rocketmq/runtime_start.py",
+      "sha256": "e558189ca58bc2d73b71c829d043541eb1ff3ddd9c02f82953a0041c95b1ee23",
+      "bytes": 8402,
+      "role": "proposed_operator_tool"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "scripts/rocketmq/nsq_drain_evidence.py",
+      "sha256": "b31f48f155ec1e493aae71cf2214e8331e13ea4c3550db2e9e0b8b1ee9aeb778",
+      "bytes": 8530,
+      "role": "proposed_operator_tool"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "scripts/rocketmq/audit_transaction_limit.py",
+      "sha256": "aa2f8538940034c35e0baf8bbfd328cfe6840442beaf1545e31b52405e3a02e9",
+      "bytes": 4168,
+      "role": "proposed_operator_tool"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "scripts/rocketmq/render.py",
+      "sha256": "d2a91207804ca9f85ce15511edfbd1858a087e78141a5bd9668745d8cc72f4dc",
+      "bytes": 2561,
+      "role": "proposed_operator_tool"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "scripts/rocketmq/provision.py",
+      "sha256": "39e7048ed5fdf7ef488cdc826361b94a225b061cdc522277e5f36c36237dc08b",
+      "bytes": 4324,
+      "role": "proposed_operator_tool"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "scripts/rocketmq/provision_v2.py",
+      "sha256": "dd91c82de4a8e632da708aa504f8cabe50cc85115a59f6a8ba87e642542ee31e",
+      "bytes": 10576,
+      "role": "proposed_operator_tool"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "scripts/rocketmq/routes.py",
+      "sha256": "914e784eb4ad841d6a0ac4b1d83e41454c5269a6cb3c13796e8b3b616cf77e31",
+      "bytes": 6521,
+      "role": "proposed_operator_tool"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "components/rocketmq/serverd-routes-m3-v2.json",
+      "sha256": "a1dfc3ca90eaf4b6a5357b22b68fd603be011805624b1a216ecc68ca8417dfcf",
+      "bytes": 5468,
+      "role": "reviewed_resource_template_not_live_state"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "components/rocketmq/broker.conf.example",
+      "sha256": "430fa7d583100ed7589b95aa5a947291c552d7168ed5eabcb9f915397bb985b9",
+      "bytes": 1310,
+      "role": "reviewed_resource_template_not_live_state"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "components/rocketmq/proxy.json.example",
+      "sha256": "390d28d554c98ccc4da21603eef0b0496bddf75eb76bad603ffd8be982bdc654",
+      "bytes": 801,
+      "role": "reviewed_resource_template_not_live_state"
+    },
+    {
+      "repository": "infra",
+      "source_sha": "4f9c35e5883be11057737285a658c6dc58677a37",
+      "path": "components/rocketmq/docker-compose.yml",
+      "sha256": "a930c0286ed6749d4926cde886edc44b126a2c03fe67aba3d5bb9604f6258996",
+      "bytes": 2019,
+      "role": "reviewed_resource_template_not_live_state"
+    },
+    {
+      "repository": "iam",
+      "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "path": "internal/pkg/migration/migrations/000042_transaction_messaging.down.sql",
+      "sha256": "bc7d6646853e842e2869ca1893c936a6559659c0fd31c842d5c7d49c5a1dd1ed",
+      "bytes": 130,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "iam",
+      "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "path": "internal/pkg/migration/migrations/000042_transaction_messaging.up.sql",
+      "sha256": "8dc3529348a16c7185cc44970fb5e616b2fe72ea408ea673ce8e05606db26188",
+      "bytes": 1786,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "iam",
+      "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "path": "internal/pkg/migration/migrations/000043_authz_message_protocol.down.sql",
+      "sha256": "2694b1e4f5a245c8de58d6944c2642ce3d00e97824eab0774ba0b547ab90b757",
+      "bytes": 281,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "iam",
+      "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "path": "internal/pkg/migration/migrations/000043_authz_message_protocol.up.sql",
+      "sha256": "7ad3f8c0641bdf50b8db3c62072a77c6bd701aba73b5ecdcb8f873a35b9d277b",
+      "bytes": 1059,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "iam",
+      "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "path": "internal/pkg/migration/migrations/000044_authz_business_operations.down.sql",
+      "sha256": "a629c511f64aef42959ec04ed8119f8cfa7c17ecfdc01ad9299f46f750f32e16",
+      "bytes": 219,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "iam",
+      "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "path": "internal/pkg/migration/migrations/000044_authz_business_operations.up.sql",
+      "sha256": "cce5707ec021decbd40eede58e890ba91c02612600b1302708ebe39d9b3110ce",
+      "bytes": 1517,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "iam",
+      "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "path": "internal/pkg/migration/migrations/000045_native_transaction_limit_notices.down.sql",
+      "sha256": "5c49d85c6dfc567c794945d20ca5fa66db3254292cec43eeb0428aa1572be947",
+      "bytes": 152,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "iam",
+      "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "path": "internal/pkg/migration/migrations/000045_native_transaction_limit_notices.up.sql",
+      "sha256": "0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a",
+      "bytes": 1083,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mongodb/000041_transaction_messaging.down.json",
+      "sha256": "8747eda1f6073b0d2f9e531f32a68399ba1aa13e90d8d5ce4768a9b3587a119b",
+      "bytes": 127,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mongodb/000041_transaction_messaging.up.json",
+      "sha256": "b4eace8013a3d2db2915084d71c67e3cd87bd8a09c7213937d7c692232092b6b",
+      "bytes": 493,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mongodb/000042_business_retry_schedule.down.json",
+      "sha256": "0782c68902b449a08a4df8db815361b6bf882310f20559d304603beac7c06990",
+      "bytes": 152,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mongodb/000042_business_retry_schedule.up.json",
+      "sha256": "aab987b8ada106b3e4208a67b01c8dba6a0c2e6f5793fc7525936c7377bd6c10",
+      "bytes": 537,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mongodb/000043_native_transaction_limit_notices.down.json",
+      "sha256": "57996f0e1f50b75546e862de73793f83b26c45a3dd7500ce91fcc43c6de562ec",
+      "bytes": 145,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mongodb/000043_native_transaction_limit_notices.up.json",
+      "sha256": "d6904ab7c3ab3c4a310314dc7f532eb321679a0e7a31c0b867c11a9280bfc4fa",
+      "bytes": 2122,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mysql/000106_transaction_messaging.down.sql",
+      "sha256": "bc7d6646853e842e2869ca1893c936a6559659c0fd31c842d5c7d49c5a1dd1ed",
+      "bytes": 130,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mysql/000106_transaction_messaging.up.sql",
+      "sha256": "2443a41eabde222d5292f4e997ca7db386945ce70e9e77d9bc896917a2e30246",
+      "bytes": 2338,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mysql/000107_business_retry_schedule.down.sql",
+      "sha256": "efec9b8be18ab3171025f3d30ea16c2cde2a076a17ffc77758cb723fce9c4d9e",
+      "bytes": 140,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mysql/000107_business_retry_schedule.up.sql",
+      "sha256": "963f729f0f91baa0c60a62090b99dd7574c0d08231d2be0939d8927ce4690ea3",
+      "bytes": 1168,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mysql/000108_ai_transaction_command_order.down.sql",
+      "sha256": "dc9e7f8245db968ffd77a1c3f37327f91fd4d7c1d0e315eab9fc8e82c7ef1853",
+      "bytes": 167,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mysql/000108_ai_transaction_command_order.up.sql",
+      "sha256": "cbf491ed8446cb76963c97aeee1d932c08f1f06e91ae49574484987c01ad48f1",
+      "bytes": 274,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mysql/000109_rocketmq_deferred_delivery.down.sql",
+      "sha256": "6e4e7dbcac9664a7068ba87ad3fd4e3f39c8f5edc4a440d7399283d5410089aa",
+      "bytes": 150,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mysql/000109_rocketmq_deferred_delivery.up.sql",
+      "sha256": "d5929a6bb4363c3d04429ba3634ddcb477820529b0caffaf8974da73c0505fc9",
+      "bytes": 673,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mysql/000110_native_transaction_limit_notices.down.sql",
+      "sha256": "5c49d85c6dfc567c794945d20ca5fa66db3254292cec43eeb0428aa1572be947",
+      "bytes": 152,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "internal/pkg/migration/migrations/mysql/000110_native_transaction_limit_notices.up.sql",
+      "sha256": "0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a",
+      "bytes": 1083,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "ai",
+      "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "path": "migrations/versions/0041_transaction_messaging.py",
+      "sha256": "dd27c8eb56581bf9ef78b52a6d4ced763dc8aa6676587b1836ff5dce3f4312f1",
+      "bytes": 2743,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "ai",
+      "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "path": "migrations/versions/0042_transaction_event_receipts.py",
+      "sha256": "6d9e884de4af5b8d3ea99e8be902c3f4c81f317525a790775a93bf8249d7b517",
+      "bytes": 814,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "ai",
+      "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "path": "migrations/versions/0043_native_transaction_limit.py",
+      "sha256": "a891eabcfa3d1032cd579aa5973720b5dc806eeb1398131e17f6716e8ec3d99c",
+      "bytes": 1507,
+      "role": "reviewed_m3_schema_source_not_ddl_authorization"
+    },
+    {
+      "repository": "iam",
+      "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "path": "configs/events-m3.yaml",
+      "sha256": "6ffe5c44a0751576fe59230eeb37496138da321f240421b089ea1dad7fab8bef",
+      "bytes": 631,
+      "role": "final_m3_event_catalog_source"
+    },
+    {
+      "repository": "qs",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "path": "configs/events.yaml",
+      "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+      "bytes": 4407,
+      "role": "final_m3_event_catalog_source"
+    }
+  ],
+  "operator_tools_allowlist": [
+    "start_boundary.py",
+    "cutover_step.py",
+    "runtime_start.py",
+    "nsq_drain_evidence.py",
+    "audit_transaction_limit.py",
+    "render.py",
+    "provision.py",
+    "provision_v2.py",
+    "routes.py"
+  ],
+  "excluded_from_launch_bundle": [
+    "host-observer",
+    "native_recovery.py",
+    "native-resume helpers",
+    "JavaNativeHalfManaged.class",
+    "all image/CI fixture preparation programs"
+  ],
+  "runtime_configuration_frozen": false,
+  "execution_bundle_complete": false,
+  "production_approved": false,
+  "remaining": [
+    "actual host/database UUID and original config identity",
+    "actual owner/store/epoch binding and mounted M3 configuration",
+    "existing worker replica/resource/concurrency readback",
+    "immutable registry or approved archive handoff and target helper match",
+    "combined original protection/restore and actual five-image/C1 startup",
+    "30-minute cutover rehearsal",
+    "independent production105 proof and named final execution approval"
+  ]
+}

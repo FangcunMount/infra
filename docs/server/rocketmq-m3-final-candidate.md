@@ -35,3 +35,7 @@ QS当前runtime镜像没有`qs-migrate-offline`。候选构建从同一固定源
 [40071645211](https://github.com/FangcunMount/infra/actions/runs/40071645211)五镜像的元数据与归档均核验通过；标准配置入口随后发现点号owner被Viper层级重建，IAM148修复已合并、QS440完整CI中。因此首次Go归档不能充当最终候选，需包含修复后重建。原生协议/存储测试直接构造配置，不替代这个文件入口证明。详见[当前候选证据](evidence/rocketmq-m3-candidate-progress-20261024.json)；真实启动、恢复与窗口演练仍未完成。
 
 [修复后候选40074229224](https://github.com/FangcunMount/infra/actions/runs/40074229224)五镜像全部通过，IAM148/QS440已合并且完整tree相同，详见[归档及源码证据](evidence/rocketmq-m3-repaired-image-candidates-20261024.json)。实际IAM组件PR241正在隔离CI，尚未完成T29。
+
+## 候选输入索引与首发工具清单
+
+[候选输入索引](evidence/rocketmq-m3-candidate-input-index-20261024.json)记录5个镜像config/归档摘要、42份精确源码输入（27迁移文件、2宿主事件目录、4资源模板、9工具）及固定repo SHA。工具本地import闭包已核对，仅依赖标准库和清单内模块；首发明确排除后移恢复程序及全部CI夹具，不复制整个工具目录。该索引仅是待审输入，尚未生成最终可执行配置/包，不代替真实宿主/数据库UUID、TLS、worker配额回读或任何具名批准。registry/受审归档交付与目标启动助手的匹配、完整恢复/启动及30分钟窗口仍须验证。
