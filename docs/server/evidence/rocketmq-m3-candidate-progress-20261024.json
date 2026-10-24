@@ -1,0 +1,428 @@
+{
+  "schema": "m3-t29-candidate-progress/v1",
+  "infra_helper": {
+    "pull_request": 238,
+    "head": "21dab3d3edb29e9ae20e479499bcda83be372f56",
+    "merge": "9833d67e631587b908df00e2cc21371403912326",
+    "proof": {
+      "schema": "m3-image-helper-current-sdk/v1",
+      "infra_sha": "21dab3d3edb29e9ae20e479499bcda83be372f56",
+      "checks_succeeded": 10,
+      "reports": [
+        {
+          "report": "rocketmq-complete-sdk-0-23255b3c641b6d9d0ff29baa020a93dff43f390d/rocketmq-complete-sdk.json",
+          "sha256": "9239ca95008afff3780b01fffc260aaa22733418753428d403d0114c243e6701",
+          "passed": 48,
+          "failed": 0,
+          "skipped": 0,
+          "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-complete-sdk-1-23255b3c641b6d9d0ff29baa020a93dff43f390d/rocketmq-complete-sdk.json",
+          "sha256": "3bd36590d5f43192af4bfaa5c3d513a725a925214e963d1f28581618d9f215ac",
+          "passed": 48,
+          "failed": 0,
+          "skipped": 0,
+          "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-m2-go-sdk-23255b3c641b6d9d0ff29baa020a93dff43f390d/rocketmq-m2-go-sdk.json",
+          "sha256": "1d152c1c0fe3f96e68dce669924731c04c320fb5166deea51e91b90bcb617456",
+          "passed": 19,
+          "failed": 0,
+          "skipped": 0,
+          "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-m2-transactions-23255b3c641b6d9d0ff29baa020a93dff43f390d/rocketmq-m2-transactions.json",
+          "sha256": "30436d2f3c9481f7982d04aefbf3b6053d48de3314e0c28fae2930657ee9045e",
+          "passed": 20,
+          "failed": 0,
+          "skipped": 0,
+          "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-m3-resources-23255b3c641b6d9d0ff29baa020a93dff43f390d/rocketmq-m3-resources.json",
+          "sha256": "2d3ca88dbfbd714394ab1838c468bfe4114fdf8cf3bcdf92d8f38c479e2642c8",
+          "passed": 134,
+          "failed": 0,
+          "skipped": 0,
+          "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-native-dlq-audit-23255b3c641b6d9d0ff29baa020a93dff43f390d/rocketmq-native-dlq-audit.json",
+          "sha256": "2f2583ea6e8b7ded55fd2d7a471a118f09d45633c23548bec1bd07bc68e5d672",
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0,
+          "sdk_sha": "8de893b367cc797580799abd8325f41dd62356db",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-packet-faults-0-23255b3c641b6d9d0ff29baa020a93dff43f390d/rocketmq-packet-faults.json",
+          "sha256": "48679a6a142df1e8927522f985680a4c006dc60f53a54e67f187f224f82d8e95",
+          "passed": 46,
+          "failed": 0,
+          "skipped": 0,
+          "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-packet-faults-1-23255b3c641b6d9d0ff29baa020a93dff43f390d/rocketmq-packet-faults.json",
+          "sha256": "2030d49a630a3cc899c3a7730fa5c7fd5bacf2c048452893e20ea4579c90a1b5",
+          "passed": 46,
+          "failed": 0,
+          "skipped": 0,
+          "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-public-sdk-0-23255b3c641b6d9d0ff29baa020a93dff43f390d/rocketmq-public-sdk.json",
+          "sha256": "18823645b8b9aeac482ef776b7114365910f07fcd3335532b4859b833b312dd1",
+          "passed": 41,
+          "failed": 0,
+          "skipped": 0,
+          "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        },
+        {
+          "report": "rocketmq-public-sdk-1-23255b3c641b6d9d0ff29baa020a93dff43f390d/rocketmq-public-sdk.json",
+          "sha256": "f1c97c16e60804a9cf90f0d291757101feddb02bb201b62adb85bbd8debecf73",
+          "passed": 41,
+          "failed": 0,
+          "skipped": 0,
+          "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          }
+        }
+      ],
+      "passed_report_counter_sum": 451,
+      "old_failure_retained": 40068013187,
+      "old_sdk_root_cause_confirmed": false,
+      "image_inventory_run": 40071645211,
+      "t29_complete": false,
+      "production": false
+    }
+  },
+  "first_image_experiment": {
+    "schema": "m3-image-first-inventory/v1",
+    "run": 40071645211,
+    "reports": [
+      {
+        "target": "ai",
+        "report_sha256": "c79f58b6e9bd2e38238a31e06bbb0815d61a5b5a028ad9ac214239597175f35b",
+        "inventory": {
+          "schema": "m3-final-image-inventory/v1",
+          "target": "ai",
+          "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+          "builder_source_sha": "21dab3d3edb29e9ae20e479499bcda83be372f56",
+          "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "production": false,
+          "application_started": false,
+          "registry_published": false,
+          "runtime_ready": false,
+          "cutover_rehearsal_complete": false,
+          "dockerfile_sha256": "a228b397109b1627bee2c2cb66b3d33d3a2c7d4238a726c5b7e1a61503accf8a",
+          "engine_image_id": "sha256:432c7fa8f375bcb11028f22a8f8c0ebaf5cb85eb83864b716e454f0f2e5d09d4",
+          "entrypoint": null,
+          "command": [
+            "/app/.venv/bin/python",
+            "-m",
+            "qs_ai.bootstrap.server"
+          ],
+          "image_user": "app",
+          "rootfs_member_count": 19004,
+          "deferred_tools_absent": true,
+          "runtime_sdk": {
+            "uid": 10001,
+            "version": "0.4.0",
+            "client": "5.1.2",
+            "source": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+          },
+          "image_config_id": "sha256:432c7fa8f375bcb11028f22a8f8c0ebaf5cb85eb83864b716e454f0f2e5d09d4",
+          "archive_sha256": "beeb61371ce5e4d074f989985fb2889fc17efd91ac617a9ba347867096099372",
+          "archive_bytes": 133799321,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "owned_container_absent": true,
+            "owned_image_tag_absent": true,
+            "existing_containers_unchanged": true
+          }
+        }
+      },
+      {
+        "target": "iam",
+        "report_sha256": "46bc9b8dce7cab6cb054e2c93527eaf31c370676b213169a3a6db0dd1052b4bd",
+        "inventory": {
+          "schema": "m3-final-image-inventory/v1",
+          "target": "iam",
+          "source_sha": "8be32adea54ad354257e54122cca923edd00572b",
+          "builder_source_sha": "21dab3d3edb29e9ae20e479499bcda83be372f56",
+          "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "production": false,
+          "application_started": false,
+          "registry_published": false,
+          "runtime_ready": false,
+          "cutover_rehearsal_complete": false,
+          "dockerfile_sha256": "f8385035ea2b03dd4a55a144557d2da2d069cdfe8493ab30fa1353c58531cb72",
+          "engine_image_id": "sha256:5f453f16c717448d1ad32ca3f6272fd7db4e9abde0f223212b9e93ec798f8b72",
+          "entrypoint": [
+            "/app/apiserver"
+          ],
+          "command": [
+            "--config=/app/configs/apiserver.prod.yaml"
+          ],
+          "image_user": "www",
+          "rootfs_member_count": 2196,
+          "deferred_tools_absent": true,
+          "runtime_sdk": {
+            "version": "v0.5.0",
+            "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+            "replace": false
+          },
+          "runtime_binary_sha256": "a2c536a4642acfed623a911aba6dd52604835d1e8074a48428b86496f69785f5",
+          "verified_uid_gid": [
+            2000,
+            2000
+          ],
+          "image_config_id": "sha256:5f453f16c717448d1ad32ca3f6272fd7db4e9abde0f223212b9e93ec798f8b72",
+          "archive_sha256": "f85fdee7c38671f99235925d2db7b02c6268996b0d0a585d84215a031aa698cb",
+          "archive_bytes": 84364475,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "owned_container_absent": true,
+            "owned_image_tag_absent": true,
+            "existing_containers_unchanged": true
+          }
+        }
+      },
+      {
+        "target": "qs-api",
+        "report_sha256": "185bc685a9ce3f9356d9865767f35e73de30143a3f3fd2c32aa38ba3b125d185",
+        "inventory": {
+          "schema": "m3-final-image-inventory/v1",
+          "target": "qs-api",
+          "source_sha": "480a632ad5ab459441425dcccfed1547c4fd84a3",
+          "builder_source_sha": "21dab3d3edb29e9ae20e479499bcda83be372f56",
+          "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "production": false,
+          "application_started": false,
+          "registry_published": false,
+          "runtime_ready": false,
+          "cutover_rehearsal_complete": false,
+          "dockerfile_sha256": "2acb1516b15186ac092c0118b7a1e662bddc87bb920770a802f13acc6c8f4e10",
+          "engine_image_id": "sha256:94a3ca6909d87a4c052e26c1e18a449dc992cd5674c882781bf99da7af9748ac",
+          "entrypoint": [
+            "/app/qs-apiserver"
+          ],
+          "command": null,
+          "image_user": "www",
+          "rootfs_member_count": 1578,
+          "deferred_tools_absent": true,
+          "runtime_sdk": {
+            "version": "v0.5.0",
+            "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+            "replace": false
+          },
+          "runtime_binary_sha256": "f27ec0133b2f13a1efec80ca26d4fe38b116ac6aab946940b91281dceba82301",
+          "verified_uid_gid": [
+            2000,
+            2000
+          ],
+          "offline_tool_sha256": "d7c16464336d9e1d0bc0f1d9cf0d473eec7efb6ac73e73642154c67acc759bf5",
+          "image_config_id": "sha256:94a3ca6909d87a4c052e26c1e18a449dc992cd5674c882781bf99da7af9748ac",
+          "archive_sha256": "11982f5481c090b664dde83c46bbc6795a8d7e823714fd875ea4e05de2d68e5e",
+          "archive_bytes": 73037787,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "owned_container_absent": true,
+            "owned_image_tag_absent": true,
+            "existing_containers_unchanged": true
+          }
+        }
+      },
+      {
+        "target": "qs-collection",
+        "report_sha256": "c1c633766c69b711255f4551ce5bf512a788c8dc85e9b3893e192cab64e53b89",
+        "inventory": {
+          "schema": "m3-final-image-inventory/v1",
+          "target": "qs-collection",
+          "source_sha": "480a632ad5ab459441425dcccfed1547c4fd84a3",
+          "builder_source_sha": "21dab3d3edb29e9ae20e479499bcda83be372f56",
+          "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "production": false,
+          "application_started": false,
+          "registry_published": false,
+          "runtime_ready": false,
+          "cutover_rehearsal_complete": false,
+          "dockerfile_sha256": "45fa166143345e510312cf145a1ab0954d0fe8e4918792dbac18429a40097f30",
+          "engine_image_id": "sha256:4c82d864436f1c19f566bb721e3c7c357e08ec0e6c2686dae840f809e1ac84e8",
+          "entrypoint": [
+            "/app/collection-server"
+          ],
+          "command": null,
+          "image_user": "www",
+          "rootfs_member_count": 1574,
+          "deferred_tools_absent": true,
+          "runtime_sdk": {
+            "version": "v0.5.0",
+            "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+            "replace": false
+          },
+          "runtime_binary_sha256": "974984b76a1e76a23354a6ce330f20e9f201acbbdd332157bf6d243043dc0fc3",
+          "verified_uid_gid": [
+            2000,
+            2000
+          ],
+          "image_config_id": "sha256:4c82d864436f1c19f566bb721e3c7c357e08ec0e6c2686dae840f809e1ac84e8",
+          "archive_sha256": "58d62567c767f4d0cc9de1ffbdf268ff9ba742cc6ffc8ee7608dc02beeb28f90",
+          "archive_bytes": 24879497,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "owned_container_absent": true,
+            "owned_image_tag_absent": true,
+            "existing_containers_unchanged": true
+          }
+        }
+      },
+      {
+        "target": "qs-worker",
+        "report_sha256": "0979ea2d05e433dba363d9e307eac56a8edab21ff0782a21f26a16fe0879d2fe",
+        "inventory": {
+          "schema": "m3-final-image-inventory/v1",
+          "target": "qs-worker",
+          "source_sha": "480a632ad5ab459441425dcccfed1547c4fd84a3",
+          "builder_source_sha": "21dab3d3edb29e9ae20e479499bcda83be372f56",
+          "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+          "production": false,
+          "application_started": false,
+          "registry_published": false,
+          "runtime_ready": false,
+          "cutover_rehearsal_complete": false,
+          "dockerfile_sha256": "57f3148d5950fdef2e35a2714239b1d8fab6e9327b0ee3fa995eba33cd269890",
+          "engine_image_id": "sha256:f8d151b0f946151e7db72104baa209ed57b778749719f6dc328f36089f4d2676",
+          "entrypoint": [
+            "/app/qs-worker"
+          ],
+          "command": [
+            "--config=/app/configs/worker.prod.yaml"
+          ],
+          "image_user": "www",
+          "rootfs_member_count": 1531,
+          "deferred_tools_absent": true,
+          "runtime_sdk": {
+            "version": "v0.5.0",
+            "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+            "replace": false
+          },
+          "runtime_binary_sha256": "1b63cec5c3700bb4ecc68ce1a375c70393e944ff8d6303a43903ea880fe0bd23",
+          "verified_uid_gid": [
+            2000,
+            2000
+          ],
+          "image_config_id": "sha256:f8d151b0f946151e7db72104baa209ed57b778749719f6dc328f36089f4d2676",
+          "archive_sha256": "29174bbd7f402e3d0f5f3b1969e90a5cb57dd1cfb4dd03368c7b9d04fd36b032",
+          "archive_bytes": 20582617,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "cleanup": {
+            "owned_container_absent": true,
+            "owned_image_tag_absent": true,
+            "existing_containers_unchanged": true
+          }
+        }
+      }
+    ],
+    "runtime_started": false,
+    "startup_configuration_defect_found_after_build": true,
+    "go_images_must_be_rebuilt_after_literal_owner_config_fix": true,
+    "t29_complete": false,
+    "production": false
+  },
+  "standard_configuration": {
+    "defect": "Viper AllSettings reconstructs dotted transaction-owner map keys, preventing configured owner startup",
+    "iam": {
+      "pull_request": 148,
+      "head": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "merge": "3200e06e3a8f8f621d4fb70ba04357d300680973",
+      "source_checks_succeeded": 8
+    },
+    "qs": {
+      "pull_request": 440,
+      "head": "d3269bda672b97582edb691ca4f924484c653822",
+      "status": "full CI pending"
+    },
+    "fix_scope": "original map decoding in standard CLI; no SDK protocol, schema, wire or owner-id format change"
+  },
+  "task_complete": false,
+  "production_executed": false,
+  "remaining": [
+    "rebuild Go images containing configuration repair",
+    "freeze actual configuration/resources/execution package",
+    "actual image restore/start and 30-minute rehearsal",
+    "T30 production prerequisites and named approval"
+  ]
+}
