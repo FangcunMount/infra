@@ -197,4 +197,6 @@ func TestMongoSnapshotNative(t *testing.T) {
 			t.Fatal("read-only snapshot changed original facts", e)
 		}
 	})
+
+	t.Run("controlled-governance-storage-not-rpc-proof", func(t *testing.T) { mongoResolutionStorageFixture(t, db, reader, original) })
 }

@@ -36,3 +36,10 @@ Mongo适配显式绑定qs.mongo，固定原client/database的Primary/Majority；
 原主库2秒上界的RC根持有binding共享锁及目标notice行锁，重新读取精确Ref/原库身份/本地终态/正向SDK审计/首次索引证据后，仅UPDATE status/resolved_at/resolution_receipt_sha256。同receipt重复只回读、不刷新首次时间；不同receipt拒绝覆盖。受影响行数不等于提交，Commit报错返回governance Unknown，独立VerifyResolution用新读取边界确认；不补写SDK审计、不修改业务或Outbox、不自动开准入。旧确认时间不要求更新。
 
 三档真实SQL存储fixture使用明确命名的synthetic受审输入，验证锁等待、竞争CAS、幂等/不同receipt、未具正向审计拒绝、原SDK时间与未选索引保留；它不证明批准、实际RPC或提交回复丢失。真正网络故障及完整CLI/治理图仍待C3后续。
+
+
+## Mongo治理CAS存储原语（候选）
+
+Mongo使用独立Primary/Snapshot/Majority根，借用session直接拒绝。先按相同原库UUID/绑定、精确终态/正向SDK审计和目标原notice核验，再条件写同一治理document的三个解除字段；新物理索引仍独立blocked。根内不写binding/执行/witness/业务；caller必须持有具名独占操作锁、排除binding/schema写者，DTO/hash不构成授权。没有WithTransaction callback或手动重试；实际写冲突直接返回，提交错误保留governance Unknown，独立新读Verify判断同receipt结果。
+
+新增固定replica set的受控存储fixture检查真实写冲突、两根竞争、不同/重复receipt、首次SDK与治理时间及未选索引保留。RPC/批准元数据为明确synthetic输入，完整CLI/真实RPC/真实提交回复丢失未据此完成。原只读snapshot不改变，CI收尾改为成功的docker ps查询判定资源不存在，daemon/读取错误不能被记作清理成功。
