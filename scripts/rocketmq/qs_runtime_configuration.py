@@ -61,6 +61,12 @@ def configuration(base, component, database, password, delegated_key):
         c['iam'] = iam_options(c['iam'], identity, sync=component == 'api')
         c['delegated-subject']['current-key'] = delegated_key
     if component == 'api':
+        if c.get('oss', {}).get('enabled'):
+            # The original constructor requires credentials even without an
+            # object request. Keep the feature and budgets, with explicit CI
+            # placeholders and an unreachable nonproduction endpoint.
+            c['oss'].update(endpoint='http://owned-unused-oss.invalid',
+                **{'access-key-id': 'owned-unused-oss-key', 'access-key-secret': 'owned-unused-oss-secret'})
         # The final transaction provider replaces these publishing profiles.
         # The original host correctly refuses selecting both responsibilities.
         c.setdefault('eventing', {})['standard_outbox'] = dict(mongo=False, assessment=False)
