@@ -71,6 +71,25 @@ def inventory_names(archive):
     return names
 
 
+def saved_config(archive, image):
+    # Engine image identity can be a manifest ID. Hash the archived config
+    # itself instead of labelling image-inspect.Id as a config digest.
+    with tarfile.open(archive) as source:
+        manifest = json.load(source.extractfile('manifest.json'))
+        if len(manifest) != 1 or manifest[0].get('RepoTags') != [image]:
+            raise ValueError('exact_single_image_archive_required')
+        name = manifest[0]['Config']
+        if Path(name).is_absolute() or '..' in Path(name).parts:
+            raise ValueError('unsafe_saved_config_path')
+        body = source.extractfile(name).read((1 << 20) + 1)
+        if len(body) > 1 << 20:
+            raise ValueError('saved_config_too_large')
+        config = json.loads(body)
+        if (config.get('os'), config.get('architecture')) != ('linux', 'amd64'):
+            raise ValueError('saved_config_platform_mismatch')
+        return 'sha256:' + hashlib.sha256(body).hexdigest(), config
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', type=Path, required=True)
@@ -113,7 +132,7 @@ def main():
         inspect = json.loads(run(['docker', 'image', 'inspect', image]))[0]
         if (inspect['Os'], inspect['Architecture']) != ('linux', 'amd64'):
             raise ValueError('linux_amd64_required')
-        report['image_config_id'] = inspect['Id']
+        report['engine_image_id'] = inspect['Id']
         report['entrypoint'] = inspect['Config'].get('Entrypoint')
         report['command'] = inspect['Config'].get('Cmd')
         report['image_user'] = inspect['Config']['User']
@@ -163,6 +182,11 @@ def main():
         archive = output / (args.target + '-' + args.source_sha + '.tar.gz')
         raw_archive = output / 'private-image.tar'
         run(['docker', 'save', '--output', str(raw_archive), image])
+        config_id, config = saved_config(raw_archive, image)
+        if any(config['config'].get(key) != inspect['Config'].get(key)
+               for key in ('User', 'Entrypoint', 'Cmd')):
+            raise ValueError('saved_config_differs_from_inspected_image')
+        report['image_config_id'] = config_id
         with archive.open('wb') as stream:
             subprocess.run(['gzip', '-1', '-c', str(raw_archive)], stdout=stream, check=True)
         raw_archive.unlink()

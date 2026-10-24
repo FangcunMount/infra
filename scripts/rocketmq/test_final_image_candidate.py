@@ -1,10 +1,12 @@
 import io
+import hashlib
+import json
 from pathlib import Path
 import tarfile
 import tempfile
 import unittest
 
-from final_image_candidate import GO_SUM, MODULE, check_go_buildinfo, ci_guard, inventory_names
+from final_image_candidate import GO_SUM, MODULE, check_go_buildinfo, ci_guard, inventory_names, saved_config
 
 
 class FinalImageProofTest(unittest.TestCase):
@@ -41,6 +43,25 @@ class FinalImageProofTest(unittest.TestCase):
                     with self.subTest(name=name), self.assertRaises(ValueError):
                         inventory_names(archive)
             self.assertFalse((Path(directory) / 'app').exists())
+
+    def test_config_digest_comes_from_actual_archive_not_engine_manifest_id(self):
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / 'image.tar'
+            config = b'{"os":"linux","architecture":"amd64","config":{"User":"www"}}'
+            for tags in (['m3-image:fixed'], ['other:tag']):
+                manifest = json.dumps([{'Config': 'config.json', 'RepoTags': tags}]).encode()
+                with tarfile.open(archive, 'w') as output:
+                    for name, body in (('manifest.json', manifest), ('config.json', config)):
+                        item = tarfile.TarInfo(name)
+                        item.size = len(body)
+                        output.addfile(item, io.BytesIO(body))
+                if tags == ['m3-image:fixed']:
+                    digest, value = saved_config(archive, 'm3-image:fixed')
+                    self.assertEqual(digest, 'sha256:' + hashlib.sha256(config).hexdigest())
+                    self.assertEqual(value['config']['User'], 'www')
+                else:
+                    with self.assertRaises(ValueError):
+                        saved_config(archive, 'm3-image:fixed')
 
 
 if __name__ == '__main__':
