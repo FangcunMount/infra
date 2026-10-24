@@ -15,6 +15,8 @@ from image_start_fixture import IMAGE_PROVENANCE
 def synthetic_unit_receipt():
     return dict(schema='m3-five-actual-image-startup-trial/v3', passed=15, failed=0, skipped=0,
         workers_prepared={name:True for name in ('worker1','worker2','worker3')},
+        worker_restart_checks=[dict(component=name,cycle=cycle,result={'state':dict(Status='exited',ExitCode=0,OOMKilled=False)})
+            for name in ('worker1','worker2','worker3') for cycle in range(1,4)],
         cases={str(n):True for n in range(15)}, sources=SOURCES, sources_unchanged=True,
         mysql_runtime_ddl_attempts=0,mongo_runtime_ddl_attempts=0,
         mongo_ddl_audit=dict(positive_controls=4,commands=[]),
@@ -61,6 +63,14 @@ class CutoverReceiptAdmissionTest(unittest.TestCase):
         value=synthetic_unit_receipt();value['workers_prepared']['worker3']=False
         with self.assertRaises(RuntimeError):self.check(value)
         value=synthetic_unit_receipt();value['schema']='m3-five-actual-image-startup-trial/v2'
+        with self.assertRaises(RuntimeError):self.check(value)
+
+    def test_incomplete_or_nonzero_restarts_cannot_authorize_cutover(self):
+        value=synthetic_unit_receipt();value['worker_restart_checks'].pop()
+        with self.assertRaises(RuntimeError):self.check(value)
+        value=synthetic_unit_receipt();value['worker_restart_checks'][0]['result']['state']['ExitCode']=2
+        with self.assertRaises(RuntimeError):self.check(value)
+        value=synthetic_unit_receipt();value['worker_restart_checks'][0]['cycle']=4
         with self.assertRaises(RuntimeError):self.check(value)
 
     def test_matching_versions_do_not_replace_frozen_image_identity(self):

@@ -74,6 +74,11 @@ def startup_receipt(path):
             'actual_original_startup_trial_required')
     require(value.get('workers_prepared') == {name:True for name in ('worker1','worker2','worker3')},
             'complete_original_worker_startup_required')
+    restarts = value.get('worker_restart_checks', [])
+    require(len(restarts) == 9 and {(r['component'],r['cycle']) for r in restarts}
+            == {(name,cycle) for name in ('worker1','worker2','worker3') for cycle in range(1,4)}
+            and all(r['result']['state'] == dict(Status='exited',ExitCode=0,OOMKilled=False) for r in restarts),
+            'bounded_actual_worker_restart_evidence_required')
     require(set(value['processes']) == set(COMPONENTS)
             and all(p['state'] == dict(Status='exited', ExitCode=0, OOMKilled=False) for p in value['processes'].values())
             and all(value['cleanup'].get(k) is True for k in ('compose_down_succeeded', 'private_directory_removed', 'existing_containers_unchanged', 'existing_networks_unchanged')),

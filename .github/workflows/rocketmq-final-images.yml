@@ -525,6 +525,9 @@ jobs:
           assert not x['production'] and not x['system_acceptance']
           assert x['combined_cutover_rehearsal_complete']==x['c1_cutover_barrier_exercised']==cutover
           assert x['mongo_ddl_audit']['positive_controls']==4
+          if not cutover:
+            assert len(x['worker_restart_checks'])==9
+            assert all(row['result']['state']==dict(Status='exited',ExitCode=0,OOMKilled=False) for row in x['worker_restart_checks'])
           if cutover:
             assert x['schema']=='m3-five-actual-image-cutover/v1'
             assert x['actual_cutover']['elapsed_seconds']<1800

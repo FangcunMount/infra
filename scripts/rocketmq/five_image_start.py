@@ -148,6 +148,11 @@ def main():
         require(re.fullmatch('[a-z][a-z0-9_]{1,100}', name), 'fixed_case_identifier_required')
         report['cases'][name] = True
         print('M3_IMAGE_CASE ' + name, flush=True)
+    def stop_actual(component):
+        timeout = 210 if component == 'ai' else 60
+        run(['docker', 'stop', '--time', str(timeout), f.applications[component]], timeout=timeout + 15)
+        source = args.sources / ('ai' if component == 'ai' else 'iam' if component == 'iam' else 'qs')
+        return f.diagnostic(component, source)
     try:
         report['infra_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=repo).stdout.strip()
         for name, sha in SOURCES.items():
@@ -309,6 +314,28 @@ def main():
             component = 'worker' + str(index); f.images[component] = f.images['worker']; f.private_dirs[component] = f.private_dirs['worker']
             f.start(component, alias=component, memory='768m', cpus='1')
             f.ready(component, 9092, '/healthz'); case('actual_' + component + '_prepared_http_healthy_original_concurrency48')
+        # Investigate the retained idle worker Exit2 with bounded real-image
+        # restart coverage. Same three slots/48 concurrency, no added workload.
+        # A cutover consumes this independent receipt and starts each role once.
+        if not cutover:
+            report['worker_restart_checks'] = []
+            restart_failed = False
+            f.stage = 'actual_prepared_worker_restart_checks'
+            for cycle in range(1, 4):
+                for component in ('worker3', 'worker2', 'worker1'):
+                    result = stop_actual(component)
+                    report['worker_restart_checks'].append(dict(component=component, cycle=cycle, result=result))
+                    if result['state'] != dict(Status='exited', ExitCode=0, OOMKilled=False):
+                        restart_failed = True
+                        break
+                    name = f.applications[component]
+                    label = run(['docker', 'inspect', name, '--format', '{{index .Config.Labels "com.fangcunmount.m3.fixture"}}']).stdout.strip()
+                    require(label == f.project, 'owned_stopped_worker_required')
+                    run(['docker', 'rm', name]); del f.applications[component]
+                    report['workers_prepared'].pop(component, None)
+                    f.start(component, alias=component, memory='768m', cpus='1')
+                    f.ready(component, 9092, '/healthz')
+                if restart_failed: break
         if cutover:
             report['actual_cutover'] = f.boundary.finish()
             report['c1_cutover_barrier_exercised'] = True
@@ -316,10 +343,7 @@ def main():
         f.stage = 'actual_five_image_shutdown'; report['processes'] = {}
         shutdown_failed = []
         for component in ('worker3', 'worker2', 'worker1', 'collection', 'api', 'ai', 'iam'):
-            timeout = 210 if component == 'ai' else 60
-            run(['docker', 'stop', '--time', str(timeout), f.applications[component]], timeout=timeout + 15)
-            source = args.sources / ('ai' if component == 'ai' else 'iam' if component == 'iam' else 'qs')
-            result = f.diagnostic(component, source); report['processes'][component] = result
+            result = stop_actual(component); report['processes'][component] = result
             if result['state'] != dict(Status='exited', ExitCode=0, OOMKilled=False): shutdown_failed.append(component)
         report['shutdown_failed_components'] = shutdown_failed
         if not shutdown_failed: case('all_seven_actual_processes_shutdown_exit_zero')
@@ -329,6 +353,8 @@ def main():
         report['mongo_runtime_ddl_attempts'] = report['mongo_ddl_audit']['attempts']
         require(int(ddl) == report['mongo_runtime_ddl_attempts'] == 0, 'startup_shutdown_ddl_attempted'); case('actual_all_runtime_start_shutdown_no_ddl_attempts')
         require(not shutdown_failed, 'actual_runtime_shutdown_failed')
+        if not cutover:
+            require(len(report['worker_restart_checks']) == 9 and not restart_failed, 'bounded_worker_restart_checks_failed')
         if cutover: report['combined_cutover_rehearsal_complete'] = True
     except Exception as error:
         report.update(failed=1, failure_stage=f.stage, failure_kind=type(error).__name__)
