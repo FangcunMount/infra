@@ -1,0 +1,255 @@
+{
+  "schema": "m3-t26-final-gates/v1",
+  "infra_head": "5f80675fb6840a4ee044e575dfe2faf49d4deb49",
+  "tested_merge": "181c0d6fdb74c237969585ce45cd7e12589a966a",
+  "checks_succeeded": 15,
+  "regression_reports": [
+    {
+      "report": "rocketmq-complete-sdk-0-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-complete-sdk.json",
+      "sha256": "901c61115ece121166a636d27c5c8c7cbf9882449c8bd38519df843cedb4b391",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-complete-sdk-1-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-complete-sdk.json",
+      "sha256": "df9043346fe50469c69fd20713bad855cae20ca2e23f47db2518522a21aa59bf",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-m2-go-sdk-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-m2-go-sdk.json",
+      "sha256": "f195192ea782cb7f36c7a09f68ca3ae952d30b0dc173cbaf1f87ca3508c4d59e",
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-m2-transactions-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-m2-transactions.json",
+      "sha256": "d999945d8f194f86481af77426f9ea3d103a1ce62c68d902f6d8fa2b5ae25348",
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-m3-resources-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-m3-resources.json",
+      "sha256": "41c6dee2a417c0f3e81036d32fa86ff632e9ce2eee5f28df62e28cb21629f8db",
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "8de893b367cc797580799abd8325f41dd62356db"
+    },
+    {
+      "report": "rocketmq-native-dlq-audit-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-native-dlq-audit.json",
+      "sha256": "f85f281469fce660c10804adc2599402612e09d1d5382943f0c7fef511f70231",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "8de893b367cc797580799abd8325f41dd62356db"
+    },
+    {
+      "report": "rocketmq-packet-faults-0-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-packet-faults.json",
+      "sha256": "f81747109c508ba5acacd10ae89dc7e67eccc042c830cef9c735621be6cb3bbc",
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-packet-faults-1-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-packet-faults.json",
+      "sha256": "5cd64cd484616f5a8344f47488d96f20cff3dca6984b703ee2dc31b6e6401763",
+      "passed": 46,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f"
+    },
+    {
+      "report": "rocketmq-public-sdk-0-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-public-sdk.json",
+      "sha256": "3389ea4b31e68d8ce76a9d2b7bfaa192ed3afc620c8bb4973edfd8394c482b16",
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "d3b23c16e354dd09a812641403029e0cc03abed2"
+    },
+    {
+      "report": "rocketmq-public-sdk-1-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-public-sdk.json",
+      "sha256": "df4ecd8eabe904abe7b05eb9d349a9230c58dea6a4b2bc9902d9e0529512c38e",
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sdk_sha": "d3b23c16e354dd09a812641403029e0cc03abed2"
+    }
+  ],
+  "paired": {
+    "schema": "m3-current-paired-final/v1",
+    "run": 40064061215,
+    "infra_sha": "5f80675fb6840a4ee044e575dfe2faf49d4deb49",
+    "qs_sha": "0a7baa2ee22b4963a75deddf935fa5f6909db6b5",
+    "ai_sha": "01c38784ce93c8c6506fd9848dff35eaeb8aa7dd",
+    "reports": [
+      {
+        "report": "rocketmq-paired-full-0-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-paired.json",
+        "sha256": "4641276645e99a695a0164a0f015159a2114d86f0f8a68562c1d02a3acde720d",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_tests_passed": 7
+      },
+      {
+        "report": "rocketmq-paired-full-1-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-paired.json",
+        "sha256": "a22d0b14107893e8dff71a970bbefc5e18521a21253af7d21eabadc0dd92bf50",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_tests_passed": 7
+      },
+      {
+        "report": "rocketmq-paired-full-2-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-paired.json",
+        "sha256": "391979d1ed771329a1acdcd9ccc568a45768e61143db66bebeea34ebf8c96965",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_tests_passed": 7
+      },
+      {
+        "report": "rocketmq-paired-full-3-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-paired.json",
+        "sha256": "f46842a8fc41a7cf4169bcbc0319127fd687b67b767b678575015b6ce077a8d5",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_tests_passed": 7
+      },
+      {
+        "report": "rocketmq-paired-full-4-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-paired.json",
+        "sha256": "9cc068d65a5dfba32077d82396b02cb8c64521a8de7a6cb8ed5a76b2d1b3025f",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_tests_passed": 7
+      },
+      {
+        "report": "rocketmq-paired-full-5-181c0d6fdb74c237969585ce45cd7e12589a966a/rocketmq-paired.json",
+        "sha256": "ce52cd84ab5d80db0131d38194a7130d14a2c2169fc39448243ae3219b2c431a",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "native_tests_passed": 7
+      }
+    ],
+    "full_profiles": 6,
+    "production_deployed": false,
+    "system_acceptance": false
+  },
+  "reports": 16,
+  "passed": 691,
+  "failed": 0,
+  "skipped": 0,
+  "production_deployed": false,
+  "system_acceptance": false,
+  "merges": {
+    "infra": "bff1b895c461bc2cee9224bc7c85a8fd19929bf0",
+    "qs": "9a20f62ac683a8207fab44b415d7f36ec4c25d7e",
+    "ai": "1b380a29555e6eab9fe1b41bc24f638efe5a627d"
+  }
+}
