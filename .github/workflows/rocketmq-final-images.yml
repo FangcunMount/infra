@@ -243,7 +243,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/iam
-          ref: 954ad9dee2f71a51151b696ec05d5cb90cc65b50
+          ref: ca59dec47fe4e544cd06bf52f9e3c64fbbdad211
           path: .iam-start-source
       - uses: actions/setup-go@v6
         with:
@@ -260,9 +260,9 @@ jobs:
           [[ "$IMAGE_RUN_ID" =~ ^[0-9]{1,20}$ ]]
           mkdir -m 700 .iam-image-candidate
           gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
-            --name "m3-final-image-metadata-iam-954ad9dee2f71a51151b696ec05d5cb90cc65b50-$IMAGE_RUN_ID" --dir .iam-image-candidate
+            --name "m3-final-image-metadata-iam-ca59dec47fe4e544cd06bf52f9e3c64fbbdad211-$IMAGE_RUN_ID" --dir .iam-image-candidate
           gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
-            --name "m3-final-image-archive-iam-954ad9dee2f71a51151b696ec05d5cb90cc65b50-$IMAGE_RUN_ID" --dir .iam-image-candidate
+            --name "m3-final-image-archive-iam-ca59dec47fe4e544cd06bf52f9e3c64fbbdad211-$IMAGE_RUN_ID" --dir .iam-image-candidate
       - name: Verify official archive and build owned Broker
         run: |
           set -euo pipefail
@@ -446,7 +446,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/iam
-          ref: 954ad9dee2f71a51151b696ec05d5cb90cc65b50
+          ref: ca59dec47fe4e544cd06bf52f9e3c64fbbdad211
           path: .five-sources/iam
       - uses: actions/checkout@v6
         with:
@@ -479,7 +479,7 @@ jobs:
           for target in iam qs-api qs-collection qs-worker ai; do
             target_run="$IMAGE_RUN_ID"
             case "$target" in
-              iam) source_sha=954ad9dee2f71a51151b696ec05d5cb90cc65b50 ;;
+              iam) source_sha=ca59dec47fe4e544cd06bf52f9e3c64fbbdad211 ;;
               ai) source_sha=ddff86cad27d03c95dad28490d6cccbc1ce5b15f ;;
               *) source_sha=b75d4a52ec261275a0ffb588eeb31fd6496966d0; target_run="$QS_IMAGE_RUN_ID" ;;
             esac
@@ -549,11 +549,11 @@ jobs:
           import json,os
           x=json.load(open('five-image-start.json'))
           cutover=os.environ['IMAGE_PHASE']=='cutover'
-          expected=18 if cutover else 15
+          expected=19 if cutover else 16
           assert x['passed']==expected and len(x['cases'])==expected and x['failed']==x['skipped']==0
           assert all(x['cases'].values()) and all(x['cleanup'].values()) and x['sources_unchanged']
           assert x['mysql_runtime_ddl_attempts']==x['mongo_runtime_ddl_attempts']==0
-          assert len(x['processes'])==7 and x['original_qs_consumer_count']==1
+          assert len(x['processes'])==8 and x['original_qs_consumer_count']==1
           assert x['workers_prepared']=={name:True for name in ('worker1','worker2','worker3')}
           assert not x['production'] and not x['system_acceptance']
           assert x['combined_cutover_rehearsal_complete']==x['c1_cutover_barrier_exercised']==cutover
@@ -564,7 +564,7 @@ jobs:
           if cutover:
             assert x['schema']=='m3-five-actual-image-cutover/v1'
             assert x['actual_cutover']['elapsed_seconds']<1800
-            assert x['actual_cutover']['actual_processes']==7 and len(x['actual_up_after_marker'])==7
+            assert x['actual_cutover']['actual_processes']==8 and len(x['actual_up_after_marker'])==8
             assert x['offline_pair']['verified'] and x['full_scope_restore']['snapshots_before']==x['full_scope_restore']['snapshots_after']
             assert not x['coordinator_status']['old_data_restore_eligible'] and x['coordinator_status']['first_start_recorded']
             assert not x['production_backup_retention_verified']

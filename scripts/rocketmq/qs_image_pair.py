@@ -18,7 +18,7 @@ from image_start_fixture import OwnedImageFixture, require
 
 QS_SHA = 'b75d4a52ec261275a0ffb588eeb31fd6496966d0'
 QS_HEAD = (110, 44)
-MONGO = 'mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f'
+MONGO = 'mongo@sha256:43fddee7e532a920f3dfdee9e8f4834398c155c26bcb92d790cc1cd3c630fc40'
 GO_SUM = 'h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0='
 
 
@@ -116,6 +116,9 @@ class QSPairFixture(OwnedImageFixture):
         else:
             raise RuntimeError('owned_mongo_primary_budget_exceeded')
         self.report['dependency_image_ids']['mongo'] = self.run(['docker', 'image', 'inspect', MONGO, '--format', '{{.Id}}']).stdout.strip()
+        version=self.mongo('print(db.version())')
+        require(version == '7.0.31', 'actual_production_mongo_version_required')
+        self.report.setdefault('dependency_versions', {})['mongo']=version
 
     def prepare(self, database, profile):
         self.sql('CREATE DATABASE `' + database + '` CHARACTER SET utf8mb4;')

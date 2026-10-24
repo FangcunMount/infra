@@ -21,7 +21,7 @@ from provision_v2 import provision
 from m3_resources import manifest
 from audit_transaction_limit import write_private
 
-IAM_SHA = '954ad9dee2f71a51151b696ec05d5cb90cc65b50'
+IAM_SHA = 'ca59dec47fe4e544cd06bf52f9e3c64fbbdad211'
 
 
 def require(value, stage):
@@ -94,7 +94,7 @@ def fixture_diagnostic(raw):
     value=rows[0]
     require(set(value)=={'phase','kind','server_code'}
             and value['phase'] in {'guard','open_pool','check_empty','gorm','catalog','bootstrap_stager',
-                'migrate_31','migrate_33','migrate_35','migrate_41','bootstrap_31','bootstrap_33','bootstrap_35','bootstrap_41'}
+                'migrate_31','migrate_33','migrate_35','migrate_40','bootstrap_31','bootstrap_33','bootstrap_35','bootstrap_40'}
             and isinstance(value['kind'],str) and re.fullmatch(r'[A-Za-z0-9*._]{1,96}',value['kind'])
             and type(value['server_code']) is int and 0<=value['server_code']<=65535,
             'bounded_fixture_failure_metadata_required')
@@ -107,7 +107,7 @@ def seed_receipt(raw):
     require(len(rows)==1,'exact_controlled_seed_receipt_required')
     value=rows[0]
     require(set(value)=={'schema_version','seed_events_retained','controlled_seed','publication_intents_created','witnesses_created','legacy_drain_claimed'}
-        and value['schema_version']==41 and type(value['seed_events_retained']) is int and 1<=value['seed_events_retained']<=16
+        and value['schema_version']==40 and type(value['seed_events_retained']) is int and 1<=value['seed_events_retained']<=16
         and value['controlled_seed'] is True and all(value[key] is False for key in
             ('publication_intents_created','witnesses_created','legacy_drain_claimed')),'controlled_input_is_not_a_message_or_witness_proof')
     return value
@@ -188,7 +188,7 @@ def main():
         case('exact_repaired_stable_archive_loaded')
         stage='owned_dependencies'
         broker_image='rocketmq-m3-image-start:5.5.1'
-        for dep in ('mysql:8.0.44','redis:7-alpine'): run(['docker','pull',dep],timeout=300)
+        for dep in ('mysql:8.0.36','redis:7-alpine'): run(['docker','pull',dep],timeout=300)
         config=directory/'broker'; data=directory/'data'; data.mkdir()
         accounts={name:dict(username='fixture-'+name,password=secrets.token_hex(32)) for name in ('admin','inner')}
         render(accounts,config,'broker',repo/'components/rocketmq'); (config/'tls').mkdir()
@@ -204,7 +204,7 @@ def main():
         for network in document['networks'].values(): network.pop('name',None); network['internal']=True
         for service in document['services'].values(): service['restart']='no'
         password=secrets.token_hex(32); database='iam_m3_image_'+secrets.token_hex(8)
-        document['services'].update(mysql=dict(image='mysql:8.0.44',environment=dict(MYSQL_ROOT_PASSWORD=password,MYSQL_ROOT_HOST='%'),
+        document['services'].update(mysql=dict(image='mysql:8.0.36',environment=dict(MYSQL_ROOT_PASSWORD=password,MYSQL_ROOT_HOST='%'),
             tmpfs=['/var/lib/mysql'],mem_limit='512m',networks=['rocketmq'],
             healthcheck=dict(test=['CMD-SHELL','MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e "SELECT 1"'],interval='3s',timeout='3s',retries=50)),
             redis=dict(image='redis:7-alpine',networks=['rocketmq']))
@@ -212,9 +212,9 @@ def main():
         compose=['docker','compose','-p',project,'-f',str(compose_file)];started=True
         run(compose+['up','-d','--wait','--wait-timeout','180'],timeout=210)
         report['dependency_image_ids']={name:run(['docker','image','inspect',tag,'--format','{{.Id}}']).stdout.strip()
-             for name,tag in dict(mysql='mysql:8.0.44',redis='redis:7-alpine',rocketmq=broker_image).items()}
+             for name,tag in dict(mysql='mysql:8.0.36',redis='redis:7-alpine',rocketmq=broker_image).items()}
         sql('CREATE DATABASE `'+database+'`;')
-        stage='original_schema41_preparation'
+        stage='original_schema40_preparation'
         prepared=source/'scripts/testing/m3_image_start_fixture'; prepared.mkdir()
         shutil.copyfile(repo/'scripts/rocketmq/image_fixtures/iam_init.go',prepared/'main.go')
         fixture_binary=directory/'prepare-iam'
@@ -228,7 +228,7 @@ def main():
         init_env.write_text('GITHUB_ACTIONS=true\nRUNNER_ENVIRONMENT=github-hosted\n'+
             f'IAM_IMAGE_FIXTURE_DSN=root:{password}@tcp(mysql:3306)/{database}?parseTime=true&multiStatements=true\n')
         init_env.chmod(0o600)
-        stage='original_schema41_execution'
+        stage='original_schema40_execution'
         # Keep the database completely internal; the exact candidate image runs
         # only the mounted CI initializer, not its business entrypoint.
         result=run(['docker','run','--rm','--name',project+'-initializer','--network',network,
@@ -242,7 +242,7 @@ def main():
             report['fixture_failure']=fixture_diagnostic(result.stdout)
             raise RuntimeError('original_fixture_preparation_failed')
         report['controlled_seed']=seed_receipt(result.stdout)
-        case('actual_schema41_migrations_with_controlled_authz_seed')
+        case('actual_schema40_migrations_with_controlled_authz_seed')
         run(['openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1','-subj','/CN=iam-apiserver','-addext','subjectAltName=DNS:iam-apiserver,IP:127.0.0.1',
              '-keyout',str(fixture/'server.key'),'-out',str(fixture/'server.crt')])
         doc=manifest(repo); principal=dict(username='iam-'+secrets.token_hex(8),password=secrets.token_hex(32))
@@ -262,7 +262,7 @@ def main():
         own(2000,2000)
         def start(filename):
             nonlocal app_created
-            run(['docker','run','-d','--name',app,'--network',network,'--memory','512m','--cpus','1',
+            run(['docker','run','-d','--name',app,'--network',network,'--memory','1024m','--cpus','1',
                  '-v',str(fixture)+':/fixture','-v',str(fixture/'keys')+':/app/data/keys',image,'--config=/fixture/'+filename]); app_created=True
         def wait_http(path):
             deadline=time.monotonic()+120
@@ -279,7 +279,7 @@ def main():
             runtime_logs();run(['docker','rm',app]);app_created=False
             require(code=='0','actual_shutdown_not_clean')
         stage='retained_business_snapshot'
-        # Hash all original tables before installing the seven additive objects.
+        # Hash all original tables before installing the eight additive objects from schema40.
         # No source body or SQL dump leaves this private command capture.
         tables=sql(f"SELECT table_name FROM information_schema.tables WHERE table_schema='{database}' AND table_name <> 'schema_migrations' ORDER BY table_name;").splitlines()
         require(tables and all(t.replace('_','').isalnum() for t in tables),'original_business_tables_required')
@@ -306,7 +306,7 @@ def main():
             cli('m3-messaging','--apply','--writers-excluded','--plan','/fixture/'+prefix+'.json','--reviewed-sha256',file_sha(prefix+'.json'))
         install('first-schema')
         cli('m3-messaging-recovery','--restore','--writers-excluded','--pre-start-restore-attested','--protection','/fixture/protection.json','--reviewed-sha256',protection_sha)
-        case('original_runtime_image_limited_restore',sql(f'SELECT version,dirty FROM {database}.schema_migrations;')=='41\t0')
+        case('original_runtime_image_limited_restore',sql(f'SELECT version,dirty FROM {database}.schema_migrations;')=='40\t0')
         case('all_original_business_ddl_and_rows_preserved',retained_digest()==original_digest)
         report['retained_original_tables_sha256']=original_digest
         install('second-schema')

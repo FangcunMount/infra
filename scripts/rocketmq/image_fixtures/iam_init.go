@@ -1,4 +1,4 @@
-// CI-only schema41 and controlled AuthZ seed, never a legacy message drain.
+// CI-only schema40 and controlled AuthZ seed, never a legacy message drain.
 // Bootstrap events are retained in an explicit fixture archive in their source
 // root, without constructing publication intents, witnesses or broker messages.
 // This initializer is never shipped or used by production.
@@ -90,7 +90,7 @@ func prepare() error {
 	}
 	stager := fixtureSeedArchive{}
 	ctx := context.Background()
-	for _, target := range []uint{31, 33, 35, 41} {
+	for _, target := range []uint{31, 33, 35, 40} {
 		preparationStage = fmt.Sprintf("migrate_%d", target)
 		migrationPool, err := open()
 		if err != nil {
@@ -140,7 +140,7 @@ func main() {
 		fmt.Println("IAM_IMAGE_FIXTURE_FAILURE " + string(raw))
 		os.Exit(1)
 	}
-	raw, _ := json.Marshal(map[string]any{"schema_version": 41, "seed_events_retained": seedEvents, "controlled_seed": true,
+	raw, _ := json.Marshal(map[string]any{"schema_version": 40, "seed_events_retained": seedEvents, "controlled_seed": true,
 		"publication_intents_created": false, "witnesses_created": false, "legacy_drain_claimed": false})
 	fmt.Println("IAM_IMAGE_FIXTURE_READY " + string(raw))
 }
