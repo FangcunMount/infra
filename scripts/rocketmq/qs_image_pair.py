@@ -3,6 +3,7 @@
 Preparation component only: does not start business runtimes or authorize cutover.
 """
 import argparse
+import difflib
 import hashlib
 import json
 import os
@@ -18,6 +19,31 @@ from image_start_fixture import OwnedImageFixture, require
 QS_SHA = 'd3269bda672b97582edb691ca4f924484c653822'
 MONGO = 'mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f'
 GO_SUM = 'h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0='
+
+
+def canonical_dump(raw):
+    # MySQL verified bug110825: a recreated column gains an explicit redundant
+    # CHARACTER SET in SHOW CREATE. Keep the original protection bytes; compare
+    # this one syntactic difference only alongside exact information_schema
+    # column metadata. Never rewrite INSERT, comments, collation or values.
+    pattern = re.compile(r'^([ \t]+`[A-Za-z0-9_]+` (?:varchar\([0-9]+\)|char\([0-9]+\)|(?:tiny|medium|long)?text|enum\([^;]*\)|set\([^;]*\))) CHARACTER SET (utf8mb[34]) (COLLATE \2_[a-z0-9_]+.*)$', re.MULTILINE)
+    return pattern.sub(lambda m: m[1] + ' ' + m[3], raw)
+
+
+def dump_difference(before, after):
+    """Diagnostic shape and hashes only; never export SQL/data/comment text."""
+    def line(value):
+        if value.startswith('CREATE TABLE '): kind = 'create_table'
+        elif value.startswith('INSERT INTO '): kind = 'insert_rows'
+        elif value.lstrip().startswith('`'): kind = 'column_definition'
+        elif value.startswith(') '): kind = 'table_options'
+        elif value.startswith('/*!'): kind = 'versioned_directive'
+        else: kind = 'other'
+        return dict(kind=kind, bytes=len(value.encode()), sha256=hashlib.sha256(value.encode()).hexdigest(),
+                    encoding_tokens=sorted(set(re.findall(r'\b(?:utf8mb4|utf8mb3|latin1)(?:_[a-z0-9_]+)?\b', value))) if kind != 'insert_rows' else [])
+    a, b = before.splitlines(), after.splitlines()
+    return [dict(before=[line(v) for v in a[i:j]], after=[line(v) for v in b[k:l]])
+            for op,i,j,k,l in difflib.SequenceMatcher(a=a,b=b,autojunk=False).get_opcodes() if op!='equal'][:16]
 
 
 def initializer_receipt(raw, profile):
@@ -48,6 +74,13 @@ print(JSON.stringify(ordered(JSON.parse(EJSON.stringify(value,{relaxed:false})))
 
 
 class QSPairFixture(OwnedImageFixture):
+    def dump(self, database):
+        # A full database can have seed rows inserted in non-key order. Compare
+        # deterministic original dump output, not physical table scan order.
+        return self.run(self.compose + ['exec', '-T', 'mysql', 'sh', '-c',
+            'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysqldump -uroot --order-by-primary --hex-blob --compact --skip-comments --skip-dump-date --no-tablespaces --set-gtid-purged=OFF --skip-lock-tables --column-statistics=0 "$@"',
+            'owned-protection', database]).stdout
+
     def mongo(self, program):
         return self.run(['docker', 'exec', self.mongo_name, 'mongosh', '--quiet', '--eval', program]).stdout.strip()
 
@@ -95,6 +128,15 @@ class QSPairFixture(OwnedImageFixture):
         self.sql(f'CREATE TABLE `{database}`.fixture_retained_state (id BIGINT PRIMARY KEY,body LONGBLOB NOT NULL); INSERT INTO `{database}`.fixture_retained_state VALUES(1,0x00ff03);')
         self.mongo('db.getSiblingDB(' + json.dumps(database) + ").fixture_retained_state.insertOne({_id:1,body:BinData(0,'AP8D'),attempt:7})")
         sql, original_mongo = self.snapshot(database)
+        def columns():
+            return self.sql("SELECT table_name,ordinal_position,column_name,column_type,is_nullable,IF(column_default IS NULL,'NULL',CONCAT('HEX:',HEX(column_default))),extra,character_set_name,collation_name,HEX(column_comment),generation_expression FROM information_schema.columns WHERE table_schema='" + database + "' ORDER BY table_name,ordinal_position;")
+        original_columns = columns()
+        def mongo_parts():
+            value = json.loads(self.mongo(mongo_snapshot_program(database)))
+            return {hashlib.sha256(c['name'].encode()).hexdigest(): {
+                key: hashlib.sha256(json.dumps(c.get(key), sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+                for key in ('type', 'options', 'uuid', 'indexes', 'documents')} for c in value}
+        before_parts = mongo_parts()
         backup = self.directory / (database + '.sql'); backup.write_text(sql); backup.chmod(0o600)
         archive = '/tmp/' + database + '.archive.gz'
         self.run(['docker', 'exec', self.mongo_name, 'mongodump', '--quiet', '--db', database, '--archive=' + archive, '--gzip'], timeout=120)
@@ -112,7 +154,22 @@ class QSPairFixture(OwnedImageFixture):
         self.sql('SET FOREIGN_KEY_CHECKS=0; USE `' + database + '`;\n' + sql + '\nSET FOREIGN_KEY_CHECKS=1;')
         self.mongo('db.getSiblingDB(' + json.dumps(database) + ').dropDatabase()')
         self.run(['docker', 'exec', self.mongo_name, 'mongorestore', '--quiet', '--archive=' + archive, '--gzip', '--drop', '--preserveUUID', '--nsInclude=' + database + '.*'], timeout=120)
-        require(self.snapshot(database) == (sql, original_mongo), 'full_pair_restore_must_match_original_bytes_and_uuid')
+        after_sql, after_mongo = self.snapshot(database)
+        after_columns = columns()
+        after_parts = mongo_parts()
+        self.report.setdefault('restore_readbacks', {})[database] = dict(
+            mysql_before_sha256=hashlib.sha256(sql.encode()).hexdigest(),
+            mysql_after_sha256=hashlib.sha256(after_sql.encode()).hexdigest(),
+            mysql_difference=dump_difference(sql,after_sql),
+            mysql_original_protection_unmodified=True,
+            mysql_canonical_before_sha256=hashlib.sha256(canonical_dump(sql).encode()).hexdigest(),
+            mysql_canonical_after_sha256=hashlib.sha256(canonical_dump(after_sql).encode()).hexdigest(),
+            mysql_column_metadata_before_sha256=hashlib.sha256(original_columns.encode()).hexdigest(),
+            mysql_column_metadata_after_sha256=hashlib.sha256(after_columns.encode()).hexdigest(),
+            mongo_before_sha256=original_mongo, mongo_after_sha256=after_mongo,
+            mongo_before_parts=before_parts, mongo_after_parts=after_parts)
+        require(canonical_dump(after_sql) == canonical_dump(sql) and original_columns == after_columns
+                and after_mongo == original_mongo, 'full_pair_restore_must_match_original_schema_data_and_uuid')
         return protection
 
 
