@@ -76,3 +76,14 @@ IAM145、QS436、AI221已分别合并；合法resolved历史导入保留首次�
 MySQL条件治理已通过三档各38，Mongo条件治理16及最新84纯契约通过；实际写冲突、并发原根、幂等/不同receipt和首次时间保留分别记账。批准/RPC输入为明确synthetic fixture，治理提交回复丢失仍未由真实网络证明；协调器活步骤校验候选infra214不能单独授权生产。完整进度/报告摘要回链M3总表。
 
 协调器与私有对象原语infra214已由5项完整门禁通过并合并，纯109/三档SQL38/Mongo16均通过；校验只是其中一道门禁，不是生产授权或实际RPC证明。完整CLI与实际MQ/网络恢复仍未关闭。
+
+
+### 私有请求准备 CLI（已合并；恢复执行继续）
+
+infra [PR216](https://github.com/FangcunMount/infra/pull/216)源码c9affdf2合并ddad9fd1，5检查全部成功：纯211、MySQL三档各41、Mongo17项，零失败/跳过、自有资源清理回读。编译后的独立`preview`进程分别读取三种SQL owner和qs.mongo原库，不使用工作区源码入口替代实际二进制。详情与固定原字节摘要进入总表和结构化证据。
+
+`preview`在连接原库前核验0600同UID单硬链接输入和完整manifest，包括未选物理export。原v1指纹不改、不按clientID去重；提取所有本owner事务Topic清单并对fanout去重。新私有请求冻结原库身份、精确canonical Reference、本地终态/首次audit、完整位置与首次notice证据、源码/二进制/配置/manifest/export摘要、双方责任人、随机nonce和30分钟期限；不保存wire、执行token或业务正文，不覆盖旧请求，关闭未完成不能返回成功摘要。
+
+`verify-review`检查双方具名、原协调binding/source bundle、精确请求和期限，返回`execution_authorized=false`。它不检查活动屏障、不执行SDK或native admin、不写治理。批准由工具外独立审核，SHA不是身份认证；此命令成功不允许解除保护。固定发布tx.4/无replace与编译VCS/当前二进制摘要均核验，未冻结构建拒绝。
+
+required CLI输入的物理索引和批准均为synthetic，只证明原库读取及审核边界，不能代替真实MQ/当前RPC/生产批准。先前manifest字段拒绝及本地worktree缺编译VCS的正确拒绝已保留；GitHub干净checkout全部通过，未放宽批准解码或跳过源码门禁。完整短生命周期执行/receipt、真实物理管理、治理提交回复丢失及组合门禁仍待完成，C3/T25/M3计数不变。

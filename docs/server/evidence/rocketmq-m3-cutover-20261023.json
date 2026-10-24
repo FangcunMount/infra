@@ -5393,5 +5393,151 @@
       "actual_rpc_matrix_complete": false,
       "production_authorized": false
     }
+  },
+  "private_recovery_request_cli": {
+    "pr": "https://github.com/FangcunMount/infra/pull/216",
+    "proof": {
+      "source_sha": "c9affdf28eb1e3c1bf3d0fac3b4258380fef861c",
+      "reports": [
+        {
+          "report": {
+            "schema": "m3-native-recovery-mongo/v1",
+            "source_sha": "c9affdf28eb1e3c1bf3d0fac3b4258380fef861c",
+            "test_kind": "owned original Mongo root and SDK/host-schema fixture, not Broker/RPC or production clearance",
+            "passed": 17,
+            "failed": 0,
+            "skipped": 0,
+            "owned_databases_removed": 1,
+            "owned_container_removed": true,
+            "compiled_preview_original_primary": 1,
+            "mongo_version": "7.0.37",
+            "image_id": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+            "raw_report_sha256": "e2314480294cac277df2ad7932efc3bafa92a2361eea3bfa98845e3d61e87785",
+            "valid": true
+          },
+          "summary_sha256": "6ebe538c9aa7c04edaca4774e074bbfcc5d317cb1d3f4eb65e287d6454250c28"
+        },
+        {
+          "report": {
+            "schema": "m3-native-recovery-storage/v1",
+            "source_sha": "c9affdf28eb1e3c1bf3d0fac3b4258380fef861c",
+            "mysql_profile": "8.0.36",
+            "image_id": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+            "test_kind": "owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance",
+            "passed": 41,
+            "failed": 0,
+            "skipped": 0,
+            "owned_databases_removed": 3,
+            "compiled_preview_original_primary": 3,
+            "valid": true,
+            "raw_report_sha256": "579de0a9eb9567f73d692e5d6c656c44528eb43f915380909df895aa578749dd"
+          },
+          "summary_sha256": "f58e47bc0b2779c93650572285fd55e13d69d5d7a7e3c91ed639a1416bc25a27"
+        },
+        {
+          "report": {
+            "schema": "m3-native-recovery-storage/v1",
+            "source_sha": "c9affdf28eb1e3c1bf3d0fac3b4258380fef861c",
+            "mysql_profile": "8.0.44",
+            "image_id": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+            "test_kind": "owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance",
+            "passed": 41,
+            "failed": 0,
+            "skipped": 0,
+            "owned_databases_removed": 3,
+            "compiled_preview_original_primary": 3,
+            "valid": true,
+            "raw_report_sha256": "e3be4c6d5ffb1a3c5a84a068778c82650355d463445762107d068c1a4fa1c3e2"
+          },
+          "summary_sha256": "f3f1e88b069f456a7bc5ccd9c1da907f2a6d721f571d69e987257f576faa547a"
+        },
+        {
+          "report": {
+            "schema": "m3-native-recovery-storage/v1",
+            "source_sha": "c9affdf28eb1e3c1bf3d0fac3b4258380fef861c",
+            "mysql_profile": "8.4",
+            "image_id": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+            "test_kind": "owned MySQL SDK/host-schema fixture, not actual Broker/RPC or production clearance",
+            "passed": 41,
+            "failed": 0,
+            "skipped": 0,
+            "owned_databases_removed": 3,
+            "compiled_preview_original_primary": 3,
+            "valid": true,
+            "raw_report_sha256": "088d407a0da5fc09d820f7b4dadbe0245768b2821b45714ce81c0704e5d4d5b1"
+          },
+          "summary_sha256": "064583125787d71afd4c9f2453849d0133a0508e178a371abad532495d16e74f"
+        },
+        {
+          "report": {
+            "schema": "m3-native-recovery-tool-contracts/v1",
+            "source_sha": "c9affdf28eb1e3c1bf3d0fac3b4258380fef861c",
+            "sdk_version": "v0.5.0-rocketmq-tx.4",
+            "test_kind": "pure contracts, not real RPC or storage recovery",
+            "passed": 211,
+            "failed": 0,
+            "skipped": 0,
+            "packages": 9,
+            "report_sha256": "7ab9d022b3e6f391c9151c641b2ca1501f76fa879b960f2c650b18a868b3b61e",
+            "external_dependencies_started": false,
+            "valid": true
+          },
+          "summary_sha256": "523a9f794c7e026d173542233ab07a2d62ee5286f254d5a3a419fae663ddba72"
+        }
+      ],
+      "ci_runs": [
+        40049301908,
+        40049301899,
+        40049301949
+      ],
+      "check_count": 5,
+      "all_checks_success": true,
+      "production_touched": false,
+      "full_recovery_cli_complete": false,
+      "synthetic_native_index_and_named_approval": true,
+      "local_pure_passed": 211,
+      "local_integration_compilation_only": true,
+      "failures_retained": [
+        {
+          "kind": "first local manifest contract failure",
+          "cause": "accounts contains named hyphenated keys; strict approval decoder rejects them",
+          "fix": "explicit manifest-only named keys, no relaxed approval decoder"
+        },
+        {
+          "kind": "local worktree executable identity refusal",
+          "cause": "fixed Go VCS detection requires a .git directory; worktree .git is a file",
+          "outcome": "refusal retained; GitHub clean checkout VCS-gated build passed, no guard bypass"
+        }
+      ],
+      "compiled_build": {
+        "binary_sha256": "9a83bcf4e1ef7059e030b14b2ded05cae95967b0fe507e9fe61e273da350bc3e",
+        "effectful_commands": false,
+        "schema": "m3-native-recovery-build/v1",
+        "sdk_version": "v0.5.0-rocketmq-tx.4",
+        "source_sha": "c9affdf28eb1e3c1bf3d0fac3b4258380fef861c"
+      },
+      "build_job_log_sha256": "4a8924f5518130d4a16adb0f3520a075d700e261b609c0438eb5aa0154c9c06a",
+      "merge": {
+        "headRefOid": "c9affdf28eb1e3c1bf3d0fac3b4258380fef861c",
+        "mergeCommit": {
+          "oid": "ddad9fd1fd522f12045e363d8d337ef26eed481a"
+        },
+        "state": "MERGED",
+        "mergedAt": "2026-10-24T01:23:12Z"
+      }
+    },
+    "proof_sha256": "2e5e1e70d4fa5a7d3f76757bbe5ce4d808ebe847dcbbd264260168463f3bc51d",
+    "progress": {
+      "m3": "24/36",
+      "t25": "2/4",
+      "c2": "3/4",
+      "c3": "1/3"
+    },
+    "next": [
+      "issued barrier before check-only SDK startup",
+      "actual physical inspection and managed native recheck",
+      "current SDK RPC receipt and governance execution",
+      "real fault and composed cutover gates"
+    ]
   }
 }
