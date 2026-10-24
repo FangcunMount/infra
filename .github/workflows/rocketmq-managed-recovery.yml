@@ -5,6 +5,8 @@ on:
       - tools/rocketmq-native-recovery/**
       - scripts/rocketmq/ci-native-recheck.py
       - scripts/rocketmq/managed_recovery_acceptance.py
+      - scripts/rocketmq/mysql_commit_proxy.py
+      - scripts/rocketmq/test_mysql_commit_proxy.py
       - scripts/rocketmq/probes/native-recheck/**
       - scripts/rocketmq/cutover_step.py
       - .github/workflows/rocketmq-managed-recovery.yml
@@ -17,6 +19,10 @@ jobs:
   published-cli-original-mysql-native-recovery:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [basic, governance_faults]
     steps:
       - uses: actions/checkout@v6
         with:
@@ -50,29 +56,42 @@ jobs:
           distribution: temurin
           java-version: '17'
       - name: Pure fixture guards
-        run: python3 -m unittest discover -s scripts/rocketmq -p test_native_recheck.py
+        run: |
+          python3 -m unittest discover -s scripts/rocketmq -p test_native_recheck.py
+          python3 -m unittest discover -s scripts/rocketmq -p test_mysql_commit_proxy.py
       - name: Fixed Broker archive verification
         run: bash scripts/rocketmq/fetch-release.sh
       - name: Fresh fixed isolated Broker
         run: docker build --no-cache -t rocketmq-managed-recovery:5.5.1 components/rocketmq
       - name: Real exhausted half, compiled CLI, SDK RPC and separate governance approval
+        env:
+          MATRIX_MODE: ${{ matrix.mode }}
         run: |
           set -euo pipefail
           umask 077
+          flags=()
+          if [ "$MATRIX_MODE" = governance_faults ]; then flags+=(--governance-faults); fi
           python3 scripts/rocketmq/ci-native-recheck.py --sdk "$PWD/.sdk-acceptance" \
-            --image rocketmq-managed-recovery:5.5.1 --managed-tool "$RUNNER_TEMP/native-recovery" --report managed-recovery.json
+            --image rocketmq-managed-recovery:5.5.1 --managed-tool "$RUNNER_TEMP/native-recovery" "${flags[@]}" --report managed-recovery.json
       - name: Nonempty zero-skip actual recovery and cleanup
         if: always()
+        env:
+          MATRIX_MODE: ${{ matrix.mode }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json,pathlib
+          import json,os,pathlib
           p=pathlib.Path('managed-recovery.json')
           x=json.loads(p.read_text())
-          assert x['passed']==14 and x['failed']==x['skipped']==0
+          expected=16 if os.environ['MATRIX_MODE']=='governance_faults' else 14
+          assert x['passed']==expected and x['failed']==x['skipped']==0
           proof=x['proof']['managed_recovery']
           assert proof['approved_governance_resolved'] and proof['same_request_reexecution_refused']
           assert proof['actual_sdk_stats']['Stopped'] and proof['private_observations']>0
+          if expected==16:
+            assert len(x['proof']['governance_wire_faults'])==2
+            assert x['proof']['governance_wire_proxy_cleanup']['threads_drained']
+            assert x['proof']['governance_wire_proxy_cleanup']['active']==0
           cleanup=x['cleanup']
           assert cleanup and all(v is True for k,v in cleanup.items() if not k.endswith('_remaining'))
           assert all(v is False for k,v in cleanup.items() if k.endswith('_remaining'))
@@ -81,7 +100,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: managed-recovery-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.run_attempt }}
+          name: managed-recovery-${{ matrix.mode }}-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.run_attempt }}
           path: managed-recovery.json
           if-no-files-found: error
           retention-days: 14
