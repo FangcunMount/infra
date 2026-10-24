@@ -4,6 +4,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import shutil
 import tarfile
@@ -78,6 +79,10 @@ class OwnedImageFixture:
         if result.returncode:
             self.report['failed_command']={'exit_code':result.returncode,'entrypoint':Path(entrypoint).name,
                 'private_output_sha256':hashlib.sha256((result.stdout+result.stderr).encode()).hexdigest()}
+            # The owned QS initializer emits only a phase and Go error type,
+            # never an error message or SQL. Do not export captured log lines.
+            phases=re.findall(r'QS_IMAGE_FAILURE phase=([a-z_]+) kind=([A-Za-z0-9_.*]+)',result.stdout+result.stderr)
+            if phases:self.report['failed_command']['initializer_diagnostic']=[dict(phase=p,kind=k) for p,k in phases[-4:]]
             raise RuntimeError('owned_image_command_failed')
         return result.stdout
 
