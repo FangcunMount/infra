@@ -1746,7 +1746,7 @@ infra [PR210](https://github.com/FangcunMount/infra/pull/210)源码2a947410合�
 | 原MySQL只读snapshot | ☑ 已合并，三档各17项 | 不代替实际Python生产者或MQ恢复 |
 | 原Mongo只读snapshot | ☑ 已合并，固定7.0.37原根10项 | 不代替MQ或生产解除 |
 | 私有请求准备与审核 CLI | ☑ PR216已合并；纯211、MySQL三档各41、Mongo17项通过 | 仅preview/verify-review；真实MQ、RPC receipt及执行批准继续 |
-| 精确治理CAS及未知提交处理 | ☑ PR212/213原语、PR218受审入口已合并 | 实际COMMIT丢回复PR219已通过目标门禁，等待完整CI/合并 |
+| 精确治理CAS及未知提交处理 | ☑ PR212/213原语、PR218受审入口已合并 | PR219已合并；实际COMMIT转发前断流/服务端OK后丢回复门禁均通过 |
 | 具名批准、物理核验和短生命周期CLI | ☑ PR218已合并，实际14项通过 | 四种实际宿主/存储及完整故障矩阵仍由C3-c验证 |
 
 M3继续 **24/36**，T25 **2/4**、C **1/3**、C2 **3/4**、C3 **1/3**，不因组件合并提前勾选父任务。C2全写者/三库组合、C3具名管理与真实矩阵、T25-D组合门禁仍未完成。M2 **24/24**、M4 **0/8**；没有SDK稳定发布、生产DDL/资源/provider/部署、Mac mini规则加载、system或48小时观察。
@@ -1790,3 +1790,14 @@ infra [PR218](https://github.com/FangcunMount/infra/pull/218)源码d86990428a848
 过期请求禁止新副作用，但原先提交未知的治理结果允许只读验证。原始生产者为固定SDK源码探针，在真实原根提交后exit23；不是SIGKILL、四种业务宿主或system。CI Docker exec仅连接精确所属夹具；生产独立Java helper/cgroup及冻结清单仍由T29收口。新receipt包最初出现package级skip的失败已保留并补上真实私有文件边界测试，没有过滤skip。
 
 PR219治理COMMIT前断流与服务端OK后丢回复目标16项已通过，完整CI及合并继续。当前M3 **24/36**、T25 **2/4**、C2 **3/4**、C3 **1/3**；C3父项、三库维护组合与T25-D不提前勾选。没有稳定版发布、生产变更、system或48小时观察。
+
+
+### 2026-10-24：T25-C3 治理提交真实包故障组件闭环
+
+infra [PR219](https://github.com/FangcunMount/infra/pull/219)源码508bebce415b001c0e927e1f7337d6d7f05810bf合并5b7889db8757ff8776766ba14a5808f7a30821de；12检查全部成功，13报告共498项通过，零失败/跳过。候选与tested merge树相同，实际main额外包含独立合并的PR220进度文档，不冒称完整合并tree相同。
+
+[40053474414](https://github.com/FangcunMount/infra/actions/runs/40053474414)基本14项/治理故障16项分别通过。真实MySQL Classic代理只识别治理条件UPDATE所属原事务，COMMIT转发前断流证明未转发；服务端返回OK后断流证明已经提交。两者CLI均单列governance Unknown，Broker CommitConfirmed不被降级或冒充治理确认；fresh Verify核对真实结果，不重启SDK或业务、不改首次audit/index。代理active0、线程真实排空、八项夹具清理回读。旧报告四项清理边界继续单列。首次本地报告聚合因旧SDK success为boolean而拒绝的记录保留，修正为识别既有两种成功编码；没有忽略失败/skip。
+
+实际IAM宿主恢复进入[infra PR221](https://github.com/FangcunMount/infra/pull/221)、[IAM PR146](https://github.com/FangcunMount/iam/pull/146)，本地编译/275纯通过。首轮在路由准备阶段失败，IAM逻辑Topic变更后测试消费组未同步；补全 canonical route/group 及NORMAL发布专用空组契约后重跑。未进入业务的失败保留且八项清理通过。三库C1维护组合也进入独立草稿；两批均不能当作实际通过或合并。
+
+当前M3 **24/36**、T25 **2/4**、C2 **3/4**、C3 **1/3**；原宿主/双存储恢复与完整矩阵、全写者/维护组合、T25-D继续。无稳定发布、生产变更、system或48小时观察。

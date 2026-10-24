@@ -94,3 +94,6 @@ required CLI输入的物理索引和批准均为synthetic，只证明原库读�
 `native-recovery recover`在真实C1 runtime/forward屏障和独立具名批准后，精确原库读取、native inspect、正式tx.4 check-only运行及native resume，等待当前RPC/原正向审计/私有观察，真实Close/Wait后封存receipt。另行`resolve-notice`只处理批准的治理三字段，`verify-resolution`只读核实未知提交；请求过期不授权新副作用，也不妨碍核实已有提交。构造不启动网络，工具不提供业务Sender/Bind或直接补审计入口。
 
 [PR218](https://github.com/FangcunMount/infra/pull/218)的18检查通过并合并4fd354c9，实际14项、纯277、三档SQL各41、Mongo17，详情在总表和结构化证据。原SDK MySQL事实仅提交一次，原索引/首次证据不变。CI原生产者exit23且reviewer为synthetic；完整四业务宿主、全部故障、实际生产批准和system仍未完成。PR219正在完成真实治理COMMIT包故障门禁；C3/T25父任务不勾选。
+
+
+PR219已合并5b7889db：12检查、13报告498项通过，基本14项和真实治理COMMIT包故障16项分别通过。COMMIT未转发与服务端OK后丢回复都保留治理Unknown，由新权威读取确认；不重复SDK/业务、不刷新首次audit。代理真实排空和所属资源清理均回读。实际IAM宿主恢复候选及三库维护组合仍在验证，C3/T25继续未勾选。
