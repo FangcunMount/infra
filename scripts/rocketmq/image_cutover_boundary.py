@@ -38,6 +38,15 @@ def digest(value):
     return value
 
 
+def write_reviewed_start_plan(path, value):
+    raw = _encoded(value)
+    fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    os.fchmod(fd, 0o600)
+    with os.fdopen(fd, 'wb') as stream:
+        stream.write(raw); stream.flush(); os.fsync(stream.fileno())
+    return runtime_start.load(path, hashlib.sha256(raw).hexdigest())
+
+
 def parse_private_hashes(raw, names):
     expected = {'/fixture/' + n for n in names}; result = {}
     for line in raw.splitlines():
@@ -186,8 +195,8 @@ class ActualImageBoundary:
                 compose_sha256=hashlib.sha256(compose_file.read_bytes()).hexdigest(), environment_file=str(environment),
                 environment_sha256=hashlib.sha256(b'').hexdigest(), services=[component],
                 images={component: compose['services'][component]['image']}, instances={component: 1}, ai_host=component == 'ai')
-            plan = self.root / (component + '-actual-start.json'); write_private(plan, value)
-            sha = hashlib.sha256(plan.read_bytes()).hexdigest(); self.plans[component] = runtime_start.load(plan, sha)
+            plan = self.root / (component + '-actual-start.json')
+            self.plans[component] = write_reviewed_start_plan(plan, value)
         self.started = set()
 
     def maintain(self, name, callback):

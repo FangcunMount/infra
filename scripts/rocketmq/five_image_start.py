@@ -11,6 +11,7 @@ import re
 import secrets
 import shutil
 import time
+import traceback
 
 from ai_image_start import AI_SHA, KEY_PROGRAM, OLD_HEAD, PYTHON, messaging as ai_messaging, metrics as ai_metrics
 from audit_transaction_limit import write_private
@@ -292,11 +293,7 @@ def main():
                 collection=dict(alias='qs-collection',memory='320m',cpus='1'))
             specs.update({name:dict(alias=name,memory='768m',cpus='1') for name in ('worker1','worker2','worker3')})
             admin_env = dict(ai_env, QS_AI_DATABASE_URL=f'mysql+asyncmy://root:{f.password}@mysql:3306/{ai_db}')
-            prepare(f,args,dict(iam=iam_db,qs=qs_db,ai=ai_db),admin_env,specs)
-            case('actual_full_scope_restore_before_window')
-            case('original_iam_schema45_and_binding_selected')
-            case('original_qs_dual_binding_verified')
-            case('original_ai_schema43_and_binding_verified')
+            prepare(f,args,dict(iam=iam_db,qs=qs_db,ai=ai_db),admin_env,specs,case)
             case('original_offline_upgrades_inside_single_c1')
         f.stage = 'mongo_runtime_ddl_audit_install'
         install_mongo_audit(f.mongo, qs_db)
@@ -358,6 +355,13 @@ def main():
         if cutover: report['combined_cutover_rehearsal_complete'] = True
     except Exception as error:
         report.update(failed=1, failure_stage=f.stage, failure_kind=type(error).__name__)
+        report['failure_message_sha256'] = hashlib.sha256(str(error).encode()).hexdigest()
+        report['failure_source_frames'] = []
+        for frame in traceback.extract_tb(error.__traceback__):
+            try: relative = Path(frame.filename).resolve().relative_to(repo.resolve())
+            except ValueError: continue
+            report['failure_source_frames'].append(dict(file=str(relative),line=frame.lineno))
+        report['failure_source_frames'] = report['failure_source_frames'][-8:]
         if isinstance(error, AuditError): report['mongo_audit_failure'] = error.audit_diagnostic
         if re.fullmatch(r'[a-z][a-z0-9_]{1,100}', str(error)): report['failure_reason'] = str(error)
         report['processes'] = {}

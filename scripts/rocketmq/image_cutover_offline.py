@@ -82,12 +82,14 @@ def bind_ai(f, environment):
             + (['--writers-excluded'] if action == 'apply' else []), environment=environment)
 
 
-def prepare(f, args, databases, ai_admin_environment, specs):
+def prepare(f, args, databases, ai_admin_environment, specs, record_case):
     trial, trial_sha = startup_receipt(args.startup_receipt)
     require(trial['candidates'] == f.report['candidates']
             and trial['original_qs_consumer_contract'] == f.report['original_qs_consumer_contract'], 'independent_original_startup_evidence_differs')
     f.stage = 'full_scope_pre_window_protection_and_restore'
     protection = FullImageProtection(f, databases); manifest, _ = protection.train()
+    record_case('actual_full_scope_restore_before_window')
+    f.stage = 'original_pre_m3_pair_snapshot'
     snapshot = qs_snapshot(f, databases['qs'])
     scope = {}
     for owner, store in [('iam.mysql', 'iam'), ('qs.mysql', 'qs'), ('qs.mongo', 'qs'), ('ai.mysql', 'ai')]:
@@ -95,10 +97,11 @@ def prepare(f, args, databases, ai_admin_environment, specs):
         scope[owner] = dict(database=databases[store], identity_sha256=identity,
             store_id={'iam.mysql':'isolated-iam-primary','qs.mysql':'isolated-qs-mysql-primary',
                 'qs.mongo':'isolated-qs-mongo-primary','ai.mysql':'isolated-ai-primary'}[owner], writer_epoch='m3-1', route_revision='m3-1')
-    publish_owned_images(f)
+    f.stage = 'owned_registry_handoff'; publish_owned_images(f)
     source_files = ['components/rocketmq/serverd-routes-m3-v2.json'] + ['scripts/rocketmq/' + name + '.py' for name in
         ('start_boundary', 'cutover_step', 'runtime_start', 'nsq_drain_evidence', 'audit_transaction_limit', 'render', 'provision', 'provision_v2', 'routes')]
     bundle_sha = hashlib.sha256(_encoded({name:hashlib.sha256((f.repo / name).read_bytes()).hexdigest() for name in source_files})).hexdigest()
+    f.stage = 'actual_coordinator_initialize'
     boundary = ActualImageBoundary(f, scope=scope, protection_sha256=protection.manifest_sha,
         restore_receipt_sha256=protection.receipt_sha, source_bundle_sha256=bundle_sha, specs=specs)
     f.boundary = boundary
@@ -115,6 +118,7 @@ def prepare(f, args, databases, ai_admin_environment, specs):
             sha = f.once('/usr/bin/sha256sum', [plan], network=False).split()[0]
             f.once('/app/iam-maintenance', ['m3-messaging', '--apply', '--writers-excluded', '--plan', plan, '--reviewed-sha256', sha], environment=env)
     boundary.maintain('original-iam45', iam)
+    record_case('original_iam_schema45_and_binding_selected')
     f.stage = 'original_offline_qs10540_to11044'
     def qs():
         f.select('api'); f.ownership(os.getuid())
@@ -129,10 +133,12 @@ def prepare(f, args, databases, ai_admin_environment, specs):
         f.report['offline_pair'] = result
         bind_qs(f, databases['qs'])
     boundary.maintain('original-qs10540-to11044', qs)
+    record_case('original_qs_dual_binding_verified')
     f.stage = 'original_offline_ai40_to43'
     def ai():
         f.select('ai')
         f.once(PYTHON, ['-m', 'alembic', 'upgrade', 'head'], environment=ai_admin_environment)
         bind_ai(f, ai_admin_environment)
     boundary.maintain('original-ai40-to43', ai)
+    record_case('original_ai_schema43_and_binding_verified')
     return boundary

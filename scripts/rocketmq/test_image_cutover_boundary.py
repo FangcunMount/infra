@@ -1,14 +1,18 @@
 """Receipt admission only; these synthetic unit inputs are never audit evidence."""
 import json
+import hashlib
 from pathlib import Path
 import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from image_cutover_boundary import ActualImageBoundary, COMPONENTS, SOURCES, parse_private_hashes, startup_receipt
-from start_boundary import Boundary, BoundaryError
+from image_cutover_boundary import ActualImageBoundary, COMPONENTS, SOURCES, parse_private_hashes, startup_receipt, write_reviewed_start_plan
+from start_boundary import Boundary, BoundaryError, _encoded
 from test_start_boundary import fixture
+from test_runtime_start import target_fixture
+import runtime_start
+from audit_transaction_limit import write_private
 from image_start_fixture import IMAGE_PROVENANCE
 
 
@@ -28,6 +32,18 @@ def synthetic_unit_receipt():
 
 
 class CutoverReceiptAdmissionTest(unittest.TestCase):
+    def test_generated_plan_is_accepted_by_the_original_canonical_consumer(self):
+        with tempfile.TemporaryDirectory() as root:
+            _,_,value=target_fixture(root)
+            path=Path(root)/'actual-generated-plan.json'
+            self.assertEqual(write_reviewed_start_plan(path,value),value)
+            self.assertEqual(path.read_bytes(),_encoded(value))
+            self.assertEqual(path.stat().st_mode & 0o777,0o600)
+            with self.assertRaises(FileExistsError):write_reviewed_start_plan(path,value)
+            wrong=Path(root)/'report-style-plan.json';write_private(wrong,value)
+            with self.assertRaisesRegex(BoundaryError,'canonical reviewed object'):
+                runtime_start.load(wrong,hashlib.sha256(wrong.read_bytes()).hexdigest())
+
     def test_private_file_hashes_cannot_substitute_similar_paths_or_partial_output(self):
         raw='1'*64+'  /fixture/runtime.json\n'+'2'*64+'  /fixture/routes.json\n'
         self.assertEqual(set(parse_private_hashes(raw,('runtime.json','routes.json'))),{'/fixture/runtime.json','/fixture/routes.json'})
