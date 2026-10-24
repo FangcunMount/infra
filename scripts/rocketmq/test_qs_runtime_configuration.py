@@ -23,6 +23,7 @@ class QSRuntimeConfigurationTest(unittest.TestCase):
         self.assertNotEqual(owners['qs.mysql']['credentials_file'],owners['qs.mongo']['credentials_file'])
         self.assertEqual(c['ai_workflow']['messaging']['rocketmq']['transactions']['qs.mysql'],owners['qs.mysql'])
         self.assertFalse(c['migration']['enabled'])
+        self.assertEqual(c['eventing']['standard_outbox'],{'mongo':False,'assessment':False})
         self.assertEqual(c['cache']['policy_file'],'/app/configs/cache/apiserver.prod.yaml')
         self.assertFalse(c['messaging']['rocketmq']['publish_enabled'])
         self.assertTrue(c['iam']['enabled'])
