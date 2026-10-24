@@ -5539,5 +5539,690 @@
       "current SDK RPC receipt and governance execution",
       "real fault and composed cutover gates"
     ]
+  },
+  "t25_c3_managed_recovery_cli": {
+    "proof": {
+      "source_sha": "d86990428a848a5aa589f15c89fe9e128df03f27",
+      "tested_merge_sha": "6ceed6f4f2c85e69db6519a54d921058ba480e2a",
+      "identical_candidate_and_tested_merge_tree": "b7f833323c4672174745f07f93f653ef0be8ed35",
+      "check_count": 18,
+      "all_checks_success": true,
+      "reports": [
+        {
+          "path": "boundary/cutover-boundary-6ceed6f4f2c85e69db6519a54d921058ba480e2a/cutover-boundary.json",
+          "raw_sha256": "cfd60a9487f349ba3a29423cfbc31bc996a03b109669d5fdb7abeff7d9ab4091",
+          "summary": {
+            "schema": "m3-cutover-boundary-process/v1",
+            "source_sha": "d86990428a848a5aa589f15c89fe9e128df03f27",
+            "passed": 27,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "fixture_empty_before_removal": true,
+              "private_fixture_directory_removed": true
+            }
+          }
+        },
+        {
+          "path": "complete/rocketmq-complete-sdk-0-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-complete-sdk.json",
+          "raw_sha256": "f43e1e2b63df371f7bff7f3e94f7a2d805fe269089f6ac5f44447b43e396d959",
+          "summary": {
+            "version": 1,
+            "batch": "M2-Go-Python-SDK",
+            "image": "sha256:c14568813458e42bd6e054a4570b5fe454e0b118cabe115a659365fc4c5358c2",
+            "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+            "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+            "clients": {
+              "go": "5.1.4",
+              "python": "5.1.2"
+            },
+            "passed": 48,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_sha256": {
+              "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+              "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+              "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+            }
+          }
+        },
+        {
+          "path": "complete/rocketmq-complete-sdk-1-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-complete-sdk.json",
+          "raw_sha256": "0683bfc978e5bdf6f1ad3330e26c4ead0a8fae764274d6ef2532e50538185405",
+          "summary": {
+            "version": 1,
+            "batch": "M2-Go-Python-SDK",
+            "image": "sha256:371bcc2b13ebbecbacb5eb7e4212dac30fecc665977d37fa3f205f77a4298778",
+            "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+            "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+            "clients": {
+              "go": "5.1.4",
+              "python": "5.1.2"
+            },
+            "passed": 48,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_sha256": {
+              "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+              "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+              "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+            }
+          }
+        },
+        {
+          "path": "complete/rocketmq-native-dlq-audit-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-native-dlq-audit.json",
+          "raw_sha256": "f26e2f74cd6a690bbde3bdbe801d38e645103f2bf1890d26b2602f45fd5f8bf3",
+          "summary": {
+            "version": 1,
+            "batch": "M3-native-DLQ-index-audit-isolated",
+            "image": "sha256:de0311fcdbf56267f63bec167a1f408f7616023d4152507472a0ac33d567b1e8",
+            "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+            "mongo_image": null,
+            "clients": {
+              "go": "5.1.4",
+              "python": "5.1.2"
+            },
+            "passed": 8,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_sha256": {
+              "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+              "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+              "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+            }
+          }
+        },
+        {
+          "path": "legacy-native/native-recheck-6ceed6f4f2c85e69db6519a54d921058ba480e2a/native-recheck.json",
+          "raw_sha256": "19c7941b3492dc619ce6fb54ff0c5ab974c93d38ee914f15c7dbaa8beec868f9",
+          "summary": {
+            "schema": "m3-native-recheck-feasibility/v0",
+            "infra_sha": "d86990428a848a5aa589f15c89fe9e128df03f27",
+            "passed": 17,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "broker_parameters_restored": true,
+              "probe_process_groups_drained": true,
+              "compose_down_succeeded": true,
+              "project_containers_remaining": false,
+              "project_networks_remaining": false,
+              "existing_containers_unchanged": true,
+              "existing_networks_unchanged": true,
+              "private_fixture_directory_removed": true
+            }
+          }
+        },
+        {
+          "path": "managed/managed-recovery-d86990428a848a5aa589f15c89fe9e128df03f27-1/managed-recovery.json",
+          "raw_sha256": "26a2442da37f0ca6bff1e410b096e5a1c12e00cc073931ed8f0b3a594b18a651",
+          "summary": {
+            "schema": "m3-native-recheck-feasibility/v0",
+            "infra_sha": "d86990428a848a5aa589f15c89fe9e128df03f27",
+            "passed": 14,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "broker_parameters_restored": true,
+              "probe_process_groups_drained": true,
+              "compose_down_succeeded": true,
+              "project_containers_remaining": false,
+              "project_networks_remaining": false,
+              "existing_containers_unchanged": true,
+              "existing_networks_unchanged": true,
+              "private_fixture_directory_removed": true
+            },
+            "managed_build": {
+              "binary_sha256": "be7f7905aa55143f91fe864010fcd2ec30ee76aa77ff71ea7573b081859f71fd",
+              "effectful_commands": true,
+              "schema": "m3-native-recovery-build/v1",
+              "sdk_version": "v0.5.0-rocketmq-tx.4",
+              "source_sha": "d86990428a848a5aa589f15c89fe9e128df03f27"
+            },
+            "managed_recovery": {
+              "request_sha256": "184889faf20eaf4ca1998f0bba3c9c46a1379c15f1a511fa81c3bebb60061363",
+              "receipt_sha256": "76984efc7431ba19cada22c4d1a48e2e5a046bb3a34e182a7278c14edce05471",
+              "native_index_sha256": "aa5ae3dd52338d19f8c286d0ab97d952f507ccac45e26f46c9a52ab4f24b5fbc",
+              "actual_sdk_stats": {
+                "RecoveryCommitConfirmed": 1,
+                "RecoveryRollbackConfirmed": 0,
+                "RecoveryRPCFailed": 0,
+                "RecoveryAuditRecorded": 1,
+                "RecoveryAuditErrors": 0,
+                "RecoveryAuditUnsupported": 0,
+                "CompletedResults": 0,
+                "HalfPreparedResults": 0,
+                "HalfRejectedResults": 0,
+                "HalfUnknownResults": 0,
+                "LocalCommittedResults": 0,
+                "LocalAbortedResults": 0,
+                "LocalUnknownResults": 0,
+                "FinalCommitResults": 0,
+                "FinalRollbackResults": 0,
+                "FinalUnknownResults": 0,
+                "ActiveSends": 0,
+                "RunningChecks": 0,
+                "QueuedChecks": 0,
+                "CheckRejected": 0,
+                "CheckUnknown": 0,
+                "CheckCommit": 1,
+                "CheckRollback": 0,
+                "InvalidChecks": 0,
+                "DatabaseErrors": 0,
+                "Reconciled": 0,
+                "CallbackErrors": 0,
+                "Ready": false,
+                "Stopping": true,
+                "Stopped": true
+              },
+              "original_counts": {
+                "business": 1,
+                "requests": 1,
+                "executions": 1,
+                "witnesses": 1
+              },
+              "first_primary_audit_preserved": true,
+              "approved_governance_resolved": true,
+              "same_request_reexecution_refused": true,
+              "private_observations": 1,
+              "production": false,
+              "system_acceptance": false,
+              "reviewers": "synthetic fixture",
+              "original_writer": "fixed Go SDK source probe, not IAM business host",
+              "scope": "one iam.mysql terminal commit, not the complete four-host/fault matrix"
+            }
+          }
+        },
+        {
+          "path": "mongo/native-recovery-mongo-d86990428a848a5aa589f15c89fe9e128df03f27/mongo-snapshot-summary.json",
+          "raw_sha256": "acd6f72d948512e34589a179858190af6609567f51ee3306a62adec15bd95d6a",
+          "summary": {
+            "schema": "m3-native-recovery-mongo/v1",
+            "source_sha": "d86990428a848a5aa589f15c89fe9e128df03f27",
+            "mongo_version": "7.0.37",
+            "image_id": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+            "passed": 17,
+            "failed": 0,
+            "skipped": 0,
+            "owned_databases_removed": 1,
+            "owned_container_removed": true,
+            "compiled_preview_original_primary": 1
+          }
+        },
+        {
+          "path": "mysql/native-recovery-mysql-8.0.36-d86990428a848a5aa589f15c89fe9e128df03f27/mysql-snapshot-summary.json",
+          "raw_sha256": "aa93e7334e9fe90d03cfb93cacc4cdb701e9fafd68323922d2c05ea3adf52488",
+          "summary": {
+            "schema": "m3-native-recovery-storage/v1",
+            "source_sha": "d86990428a848a5aa589f15c89fe9e128df03f27",
+            "mysql_profile": "8.0.36",
+            "image_id": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+            "passed": 41,
+            "failed": 0,
+            "skipped": 0,
+            "owned_databases_removed": 3,
+            "compiled_preview_original_primary": 3
+          }
+        },
+        {
+          "path": "mysql/native-recovery-mysql-8.0.44-d86990428a848a5aa589f15c89fe9e128df03f27/mysql-snapshot-summary.json",
+          "raw_sha256": "949306d929a10bdb5a1950f5e376ceee9233e3f9243dfb5bd6e11701c338b717",
+          "summary": {
+            "schema": "m3-native-recovery-storage/v1",
+            "source_sha": "d86990428a848a5aa589f15c89fe9e128df03f27",
+            "mysql_profile": "8.0.44",
+            "image_id": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+            "passed": 41,
+            "failed": 0,
+            "skipped": 0,
+            "owned_databases_removed": 3,
+            "compiled_preview_original_primary": 3
+          }
+        },
+        {
+          "path": "mysql/native-recovery-mysql-8.4-d86990428a848a5aa589f15c89fe9e128df03f27/mysql-snapshot-summary.json",
+          "raw_sha256": "8ed4e1b78bb0353a9b67c84dcd533e1f079c1da8d5a5374823d96ad1d5b2245f",
+          "summary": {
+            "schema": "m3-native-recovery-storage/v1",
+            "source_sha": "d86990428a848a5aa589f15c89fe9e128df03f27",
+            "mysql_profile": "8.4",
+            "image_id": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+            "passed": 41,
+            "failed": 0,
+            "skipped": 0,
+            "owned_databases_removed": 3,
+            "compiled_preview_original_primary": 3
+          }
+        },
+        {
+          "path": "ordinary/rocketmq-m2-go-sdk-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-m2-go-sdk.json",
+          "raw_sha256": "55454ded813fddcef1091f89c365f2a5fb913a601bb9064fb714dceac9fa3f1d",
+          "summary": {
+            "version": 1,
+            "batch": "M2-Go-SDK",
+            "image": "sha256:390b70139377af17d5aa9c5b91beb406498add7db20da171dfbc4ad1b4b33cc3",
+            "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+            "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+            "clients": {
+              "go": "5.1.4",
+              "python": "5.1.2"
+            },
+            "passed": 19,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_sha256": {
+              "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+              "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+              "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+            }
+          }
+        },
+        {
+          "path": "ordinary/rocketmq-m2-transactions-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-m2-transactions.json",
+          "raw_sha256": "f3e54521cebb9e05b8c55a743974ab35d86245144662cdabe8dc20ffa50796f6",
+          "summary": {
+            "version": 1,
+            "batch": "M2-0",
+            "image": "sha256:390b70139377af17d5aa9c5b91beb406498add7db20da171dfbc4ad1b4b33cc3",
+            "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+            "mongo_image": null,
+            "clients": {
+              "go": "5.1.4",
+              "python": "5.1.2"
+            },
+            "passed": 20,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_sha256": {
+              "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+              "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+              "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+            }
+          }
+        },
+        {
+          "path": "packet/rocketmq-packet-faults-0-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-packet-faults.json",
+          "raw_sha256": "23f19cb56f118ec8afce0b5387ef35e3e06136c913cdc6cba4db13c03bcc9bdf",
+          "summary": {
+            "version": 1,
+            "batch": "M2-Go-Python-SDK",
+            "image": "sha256:dd5684beb23ff0a4369628fe736884d79ecf3ec366e4759309855ab0c37d4664",
+            "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+            "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+            "clients": {
+              "go": "5.1.4",
+              "python": "5.1.2"
+            },
+            "passed": 46,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_sha256": {
+              "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+              "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+              "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+            }
+          }
+        },
+        {
+          "path": "packet/rocketmq-packet-faults-1-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-packet-faults.json",
+          "raw_sha256": "e987b8c6329af810ecbccb69be7afab83654529e68ff87f387dde06575cf9b5e",
+          "summary": {
+            "version": 1,
+            "batch": "M2-Go-Python-SDK",
+            "image": "sha256:8a36571454c7c48e61d471da9c48c2a81c24e7697583ab838e6427a1d320ccc1",
+            "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+            "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+            "clients": {
+              "go": "5.1.4",
+              "python": "5.1.2"
+            },
+            "passed": 46,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_sha256": {
+              "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+              "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+              "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+            }
+          }
+        },
+        {
+          "path": "public/rocketmq-public-sdk-0-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-public-sdk.json",
+          "raw_sha256": "74e2c212f4083274413c6c5a92397edc03876225e104d4d4f697d25e82fb3cc9",
+          "summary": {
+            "version": 1,
+            "batch": "M3-T24-source-SDK-positive-recovery-audit",
+            "image": "sha256:e1c4b3db77a8092bbb03f570aecacaed32d3d3a15d73f82963258bcac38d6698",
+            "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+            "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+            "clients": {
+              "go": "5.1.4",
+              "python": "5.1.2"
+            },
+            "passed": 41,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_sha256": {
+              "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+              "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+              "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+            }
+          }
+        },
+        {
+          "path": "public/rocketmq-public-sdk-1-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-public-sdk.json",
+          "raw_sha256": "304ff9731063b3433315453e1f9d87c8f00e3f2149e064042bac56fdcbe169a4",
+          "summary": {
+            "version": 1,
+            "batch": "M3-T24-source-SDK-positive-recovery-audit",
+            "image": "sha256:81f2c7a26b4812bb16e0f5279b6025d1a6bd0b7a62f8237c198316b97cb4909e",
+            "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+            "mongo_image": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+            "clients": {
+              "go": "5.1.4",
+              "python": "5.1.2"
+            },
+            "passed": 41,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_sha256": {
+              "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+              "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+              "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+            }
+          }
+        },
+        {
+          "path": "pure/native-recovery-tool-contracts-d86990428a848a5aa589f15c89fe9e128df03f27/contracts-summary.json",
+          "raw_sha256": "e55860edfabdd7a2ad82001b0daf769b93aeb68911c35c3d64dbd215f69df929",
+          "summary": {
+            "schema": "m3-native-recovery-tool-contracts/v1",
+            "source_sha": "d86990428a848a5aa589f15c89fe9e128df03f27",
+            "passed": 277,
+            "failed": 0,
+            "skipped": 0
+          }
+        },
+        {
+          "path": "resources/rocketmq-m3-resources-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-m3-resources.json",
+          "raw_sha256": "1c9f72699a53cbc0a976ea9b233684cff547f49f3f97dc34bf951e9ab41600c1",
+          "summary": {
+            "version": 1,
+            "batch": "M3-production-candidate-resources-isolated",
+            "image": "sha256:32869f1b0b65f8de80ba59a4b9064d8f87fbac7042ca1fb73a2a0427f1ca4c7f",
+            "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+            "mongo_image": null,
+            "clients": {
+              "go": "5.1.4",
+              "python": "5.1.2"
+            },
+            "passed": 134,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "project_containers_remaining": false,
+              "compose_down_succeeded": true,
+              "probe_process_groups_drained": true,
+              "private_fixture_directory_removed": true
+            },
+            "source_sha256": {
+              "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+              "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+              "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+            }
+          }
+        },
+        {
+          "path": "target/runtime-start-6ceed6f4f2c85e69db6519a54d921058ba480e2a/runtime-start-native.json",
+          "raw_sha256": "d26b18f9f88710a20ab6822afb19594711a70bd7baa0228a354eab3c26ed713e",
+          "summary": {
+            "schema": "m3-target-runtime-start/v1",
+            "source_sha": "d86990428a848a5aa589f15c89fe9e128df03f27",
+            "passed": 17,
+            "failed": 0,
+            "skipped": 0,
+            "cleanup": {
+              "compose_down_succeeded": true,
+              "no_rescue_needed": true,
+              "private_fixture_directory_removed": true,
+              "existing_container_id_set_unchanged": true,
+              "existing_network_id_set_unchanged": true
+            }
+          }
+        }
+      ],
+      "cleanup_variants": {
+        "boundary/cutover-boundary-6ceed6f4f2c85e69db6519a54d921058ba480e2a/cutover-boundary.json": {
+          "keys": [
+            "fixture_empty_before_removal",
+            "private_fixture_directory_removed"
+          ],
+          "network_absence_explicit": false
+        },
+        "complete/rocketmq-complete-sdk-0-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-complete-sdk.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining"
+          ],
+          "network_absence_explicit": false
+        },
+        "complete/rocketmq-complete-sdk-1-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-complete-sdk.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining"
+          ],
+          "network_absence_explicit": false
+        },
+        "complete/rocketmq-native-dlq-audit-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-native-dlq-audit.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining"
+          ],
+          "network_absence_explicit": false
+        },
+        "legacy-native/native-recheck-6ceed6f4f2c85e69db6519a54d921058ba480e2a/native-recheck.json": {
+          "keys": [
+            "broker_parameters_restored",
+            "compose_down_succeeded",
+            "existing_containers_unchanged",
+            "existing_networks_unchanged",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining",
+            "project_networks_remaining"
+          ],
+          "network_absence_explicit": true
+        },
+        "managed/managed-recovery-d86990428a848a5aa589f15c89fe9e128df03f27-1/managed-recovery.json": {
+          "keys": [
+            "broker_parameters_restored",
+            "compose_down_succeeded",
+            "existing_containers_unchanged",
+            "existing_networks_unchanged",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining",
+            "project_networks_remaining"
+          ],
+          "network_absence_explicit": true
+        },
+        "ordinary/rocketmq-m2-go-sdk-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-m2-go-sdk.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining"
+          ],
+          "network_absence_explicit": false
+        },
+        "ordinary/rocketmq-m2-transactions-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-m2-transactions.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining"
+          ],
+          "network_absence_explicit": false
+        },
+        "packet/rocketmq-packet-faults-0-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-packet-faults.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining"
+          ],
+          "network_absence_explicit": false
+        },
+        "packet/rocketmq-packet-faults-1-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-packet-faults.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining"
+          ],
+          "network_absence_explicit": false
+        },
+        "public/rocketmq-public-sdk-0-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-public-sdk.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining"
+          ],
+          "network_absence_explicit": false
+        },
+        "public/rocketmq-public-sdk-1-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-public-sdk.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining"
+          ],
+          "network_absence_explicit": false
+        },
+        "resources/rocketmq-m3-resources-6ceed6f4f2c85e69db6519a54d921058ba480e2a/rocketmq-m3-resources.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "private_fixture_directory_removed",
+            "probe_process_groups_drained",
+            "project_containers_remaining"
+          ],
+          "network_absence_explicit": false
+        },
+        "target/runtime-start-6ceed6f4f2c85e69db6519a54d921058ba480e2a/runtime-start-native.json": {
+          "keys": [
+            "compose_down_succeeded",
+            "existing_container_id_set_unchanged",
+            "existing_network_id_set_unchanged",
+            "no_rescue_needed",
+            "private_fixture_directory_removed"
+          ],
+          "network_absence_explicit": true
+        }
+      },
+      "first_candidate": {
+        "source_sha": "4b2d5a05e44b32af5e27aa918badba33f73b73a5",
+        "actual_managed_cases": 14,
+        "report_sha256": "292f77bad56bbb38a42420924752adbbeff7ce719b7bc20dde5c4c87b13552ae"
+      },
+      "failures_retained": [
+        {
+          "stage": "local required report",
+          "cause": "new receipt package had package-level skip despite cross-package tests",
+          "fix": "added actual private directory/link gate; no skip filtering"
+        },
+        {
+          "stage": "premerge review",
+          "cause": "expiry must prevent new effects but not read-only resolution verification",
+          "fix": "recorded-only load and original receipt verification keep new writes closed"
+        },
+        {
+          "stage": "local report aggregation",
+          "cause": "expected report count was incorrectly guessed as 20",
+          "fix": "measured 19 reports; counts/hashes individually revalidated before merge"
+        }
+      ],
+      "pending": [
+        "four original host/storage recovery matrix",
+        "real governance wire failure gate PR219",
+        "all-writer and three-host maintenance composition",
+        "stable SDK/rebuild/production/system/48h"
+      ],
+      "production_touched": false,
+      "c3_complete": false,
+      "t25_complete": false,
+      "merge": {
+        "sha": "4fd354c96b444ce1fac9da8fa8c158e56e93b3d2",
+        "time": "2026-10-24T02:23:34Z",
+        "pr": 218
+      }
+    },
+    "proof_sha256": "ac5184862942dd1662543d3cb41f2d2c70afc2f5b42285861f254810cf4da5a2",
+    "progress": {
+      "m3": "24/36",
+      "t25": "2/4",
+      "c2": "3/4",
+      "c3": "1/3"
+    }
   }
 }

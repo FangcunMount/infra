@@ -1746,8 +1746,8 @@ infra [PR210](https://github.com/FangcunMount/infra/pull/210)源码2a947410合�
 | 原MySQL只读snapshot | ☑ 已合并，三档各17项 | 不代替实际Python生产者或MQ恢复 |
 | 原Mongo只读snapshot | ☑ 已合并，固定7.0.37原根10项 | 不代替MQ或生产解除 |
 | 私有请求准备与审核 CLI | ☑ PR216已合并；纯211、MySQL三档各41、Mongo17项通过 | 仅preview/verify-review；真实MQ、RPC receipt及执行批准继续 |
-| 精确治理CAS及未知提交处理 | ☐ 继续实施 | 只改status/解除元数据，保留SDK首次审计/原证据 |
-| 具名批准、物理核验和短生命周期CLI | ☐ 未闭环 | 必须经过首次runtime屏障，hash本身不是授权 |
+| 精确治理CAS及未知提交处理 | ☑ PR212/213原语、PR218受审入口已合并 | 实际COMMIT丢回复PR219已通过目标门禁，等待完整CI/合并 |
+| 具名批准、物理核验和短生命周期CLI | ☑ PR218已合并，实际14项通过 | 四种实际宿主/存储及完整故障矩阵仍由C3-c验证 |
 
 M3继续 **24/36**，T25 **2/4**、C **1/3**、C2 **3/4**、C3 **1/3**，不因组件合并提前勾选父任务。C2全写者/三库组合、C3具名管理与真实矩阵、T25-D组合门禁仍未完成。M2 **24/24**、M4 **0/8**；没有SDK稳定发布、生产DDL/资源/provider/部署、Mac mini规则加载、system或48小时观察。
 
@@ -1779,3 +1779,14 @@ infra [PR216](https://github.com/FangcunMount/infra/pull/216)源码c9affdf28eb1e
 首轮纯测试拒绝已有manifest的accounts/连字符账号键，已增加仅供原清单的显式账号名单解析，重复/大小写别名/未知字段仍拒绝，批准文件解码规则未放宽。本地worktree构建因固定Go VCS识别要求`.git`目录而没有VCS标记，`version`正确拒绝，未绕过门禁；GitHub干净checkout的版本构建及实际CLI验证均通过。该差异与首轮失败均保留。
 
 本次完成C3-b的只读请求组件；完整恢复执行、真实物理管理、当前RPC receipt及治理提交/故障矩阵仍待闭环，未勾选父任务。M3仍 **24/36**、T25 **2/4**、C2 **3/4**、C3 **1/3**；M2 **24/24**、M4 **0/8**。下一批接通协调器屏障之后的短生命周期Checker、实际RPC receipt和治理管理，再进入真实MQ/网络组合门禁。SDK稳定发布、生产DDL/资源/provider/部署、system及48小时观察均未执行。
+
+
+### 2026-10-24：T25-C3 受审恢复执行 CLI 组件闭环
+
+infra [PR218](https://github.com/FangcunMount/infra/pull/218)源码d86990428a848a5aa589f15c89fe9e128df03f27合并4fd354c96b444ce1fac9da8fa8c158e56e93b3d2，18检查全部成功，19份报告逐份审计。候选与tested merge tree相同。纯race277、MySQL三档各41、Mongo17、C1进程27、目标启动17及原有SDK/资源/故障回归非空、零失败/跳过；旧报告仅四项清理的边界单列，不冒称所有报告都回读网络消失。
+
+[实际受审恢复门禁40052115699](https://github.com/FangcunMount/infra/actions/runs/40052115699)14项通过：编译二进制经真实C1首个runtime屏障，核验原物理记录，显式native resume后由正式tx.4 check-only SDK完成实际RPC/原审计及本次私有receipt；真实排空后另行独立批准治理解除与fresh Verify。原事实/request/execution/witness仍各1，没有新业务、半消息或Reconcile。原索引和首次正向审计不变，未确认治理不得自动开业务准入。
+
+过期请求禁止新副作用，但原先提交未知的治理结果允许只读验证。原始生产者为固定SDK源码探针，在真实原根提交后exit23；不是SIGKILL、四种业务宿主或system。CI Docker exec仅连接精确所属夹具；生产独立Java helper/cgroup及冻结清单仍由T29收口。新receipt包最初出现package级skip的失败已保留并补上真实私有文件边界测试，没有过滤skip。
+
+PR219治理COMMIT前断流与服务端OK后丢回复目标16项已通过，完整CI及合并继续。当前M3 **24/36**、T25 **2/4**、C2 **3/4**、C3 **1/3**；C3父项、三库维护组合与T25-D不提前勾选。没有稳定版发布、生产变更、system或48小时观察。

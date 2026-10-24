@@ -87,3 +87,10 @@ infra [PR216](https://github.com/FangcunMount/infra/pull/216)源码c9affdf2合�
 `verify-review`检查双方具名、原协调binding/source bundle、精确请求和期限，返回`execution_authorized=false`。它不检查活动屏障、不执行SDK或native admin、不写治理。批准由工具外独立审核，SHA不是身份认证；此命令成功不允许解除保护。固定发布tx.4/无replace与编译VCS/当前二进制摘要均核验，未冻结构建拒绝。
 
 required CLI输入的物理索引和批准均为synthetic，只证明原库读取及审核边界，不能代替真实MQ/当前RPC/生产批准。先前manifest字段拒绝及本地worktree缺编译VCS的正确拒绝已保留；GitHub干净checkout全部通过，未放宽批准解码或跳过源码门禁。完整短生命周期执行/receipt、真实物理管理、治理提交回复丢失及组合门禁仍待完成，C3/T25/M3计数不变。
+
+
+## 受审执行组件已合并：PR218
+
+`native-recovery recover`在真实C1 runtime/forward屏障和独立具名批准后，精确原库读取、native inspect、正式tx.4 check-only运行及native resume，等待当前RPC/原正向审计/私有观察，真实Close/Wait后封存receipt。另行`resolve-notice`只处理批准的治理三字段，`verify-resolution`只读核实未知提交；请求过期不授权新副作用，也不妨碍核实已有提交。构造不启动网络，工具不提供业务Sender/Bind或直接补审计入口。
+
+[PR218](https://github.com/FangcunMount/infra/pull/218)的18检查通过并合并4fd354c9，实际14项、纯277、三档SQL各41、Mongo17，详情在总表和结构化证据。原SDK MySQL事实仅提交一次，原索引/首次证据不变。CI原生产者exit23且reviewer为synthetic；完整四业务宿主、全部故障、实际生产批准和system仍未完成。PR219正在完成真实治理COMMIT包故障门禁；C3/T25父任务不勾选。
