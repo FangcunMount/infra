@@ -6935,5 +6935,52 @@
       "t25": "2/4",
       "c3": "1/3"
     }
+  },
+  "t25_c2_writer_entrypoint_audit_20261024": {
+    "sources": {
+      "iam": {
+        "source_sha": "36456cdf2f1c980a5edeedce2eee44634097a00d",
+        "tracked_file_sha256": {
+          "cmd/iam-maintenance/main.go": "a27453b66c3cbecc4ebea1c5d5033f7ddf3501b44b64fdabdc7f12d4b88796e8",
+          "cmd/iam-maintenance/tenant_retirement.go": "0c1f08bf62c668d87bffc3be7f0e34d00d46dcdc7da0354b73bca2a6ec68ff3c",
+          "cmd/iam-maintenance/reliable_messaging.go": "4d5f3a9d2a39f6f4d351ed8ea292941ea6abe8130854b6125371a0e1ae5119b5",
+          "internal/apiserver/transport/rest/authz/router.go": "addc69f49162f821bd7d2d74057b65a01876ef9bb2e184b25e43e78ef3a1fc3f",
+          "internal/apiserver/transport/grpc/service/authz/scoped_assignment.go": "ba353f8aae4a6e4635da06a91e2faea13c0a37218afd1a7cf38a108477baac74",
+          ".github/workflows/cd.yml": "0ff075f9b2c5670680b22e5a7a8875ca19ab4bb522569d42e0f01868652c06c2"
+        }
+      },
+      "qs": {
+        "source_sha": "83147d8e99e00fd36c57bc2fc4feb193ebe2a844",
+        "tracked_file_sha256": {
+          "internal/worker/process/runtime_bootstrap.go": "d7067d710d9ec5341fd3a37e8a64e0aae4a9fc411a1741caed665872aefe91fb",
+          "internal/worker/process/run.go": "8430b33d6930c2160925033d1550203c3d2dbe397a95066353e166eac695bec8",
+          "internal/apiserver/container/modules/interpretation/ai_workflow_relay.go": "778fb446c9a4d9cebcd00005e94a1616870876b97152d464cc4015354904c7c6",
+          "scripts/maintenance/qs-operator/main.go": "29c74124e66b2a8a5f32606f1be8b379a05bc5fc37de038f28589a0a71845cfa",
+          "scripts/maintenance/qs-ai-messaging/main.go": "7cf77c88f213c153938d4ccd8148649d54722d662f491a8e096aa12bb03f163f"
+        }
+      },
+      "ai": {
+        "source_sha": "05d2db7151d492bec127270d53121396b515f763",
+        "tracked_file_sha256": {
+          "src/qs_ai/bootstrap/server.py": "cb15b49a585cce1f0ae77bf703273fd5a1a05d4985f66ebcabf0e093161462b2",
+          "src/qs_ai/bootstrap/messaging.py": "fea1feb9c21541c51196727bf64512c84f995040b12db253e414c3c4550223ab",
+          "src/qs_ai/bootstrap/lifecycle.py": "27326c4629c3a3b5a57e75270df1c97a6e53f5db700fff62b07c8bc8f1736131",
+          "src/qs_ai/bootstrap/recover_semantic_contract.py": "1a77fd5a6c604b64ff6b4cc4d7197c3d1ce1c245ff44160b3f07199efecccecf",
+          ".github/workflows/deploy.yml": "3b2890bfa20ad734bcd97f3c24d3ea3a2a9e3724c723bb5bf8df908d5e4280bc",
+          ".github/workflows/schema-maintenance.yml": "9c9711d34e7c31aeacdd8fbe8ff11689179bfc02666ee6fd23defafa7bfd452a"
+        }
+      }
+    },
+    "production_processes_inspected": false,
+    "actual_writer_freeze": false,
+    "limits": "source responsibility check only; deployed legacy SHA, all external callers, DB sessions and restart/deploy controls must be verified T29-T33",
+    "findings": [
+      "IAM authorization-migrate is explicit DDL; only frozen C1 maintenance may invoke it",
+      "IAM reliable-messaging currently only readonly preflight; tenant-retirement rejects before DB and is not an active writer",
+      "QS worker consume-only changes hold replay ownership; old hold replayer and new deferred consumer must never own same future plan",
+      "QS operator apply/retire and qs-ai-messaging admission open remain separate controlled maintenance writers",
+      "AI generation/evaluation and legacy mq_relay are separately supervised; disable publish does not prove all background/model writers stopped",
+      "AI AUTO_DEPLOY_ENABLED gates workflow_run only; workflow_dispatch must be separately excluded"
+    ]
   }
 }

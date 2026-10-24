@@ -1801,3 +1801,10 @@ infra [PR219](https://github.com/FangcunMount/infra/pull/219)源码508bebce415b0
 实际IAM宿主恢复进入[infra PR221](https://github.com/FangcunMount/infra/pull/221)、[IAM PR146](https://github.com/FangcunMount/iam/pull/146)，本地编译/275纯通过。首轮在路由准备阶段失败，IAM逻辑Topic变更后测试消费组未同步；补全 canonical route/group 及NORMAL发布专用空组契约后重跑。未进入业务的失败保留且八项清理通过。三库C1维护组合也进入独立草稿；两批均不能当作实际通过或合并。
 
 当前M3 **24/36**、T25 **2/4**、C2 **3/4**、C3 **1/3**；原宿主/双存储恢复与完整矩阵、全写者/维护组合、T25-D继续。无稳定发布、生产变更、system或48小时观察。
+
+
+### 2026-10-24：T25-C2 全写者源码责任复核与维护组合候选
+
+固定IAM36456cdf、QS83147d8e、AI05d2db71复核17份入口/装配/工作流并记录原字节SHA256。补明确IAM显式DDL、只读preflight和已退役入口，QS人工维护/admission与新旧hold所有权，AI监督组件、semantic recovery及手工部署责任。源码核对不证明实际进程或外部caller已停，详见离线维护契约。
+
+[PR222](https://github.com/FangcunMount/infra/pull/222)提供同一C1目录的三库原生维护组合，固定源码/存储/工具、实际宿主迁移绑定及启动后拒绝；本地3项纯契约/静态通过，实际门禁仍运行。进程sentinel不冒充实际业务runtime，夹具保护不冒充生产备份恢复。C2-d/C2与T25均未勾选；M3仍24/36。
