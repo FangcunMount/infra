@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 from paired_acceptance import (
     CORE_CASES, CORE_TEST, FULL_CASES, FULL_TESTS, FLAGS, MARKER,
-    paired_manifest, parse_receipt, read_receipt,
+    SDK_GO_VERSION, SDK_PYTHON_VERSION, paired_manifest, parse_receipt, read_receipt,
 )
 from routes import validate_v2
 
@@ -14,7 +14,7 @@ def receipt(full=False):
     cases = FULL_CASES if full else CORE_CASES
     return dict({k:True for k in FLAGS}, cases={k:True for k in cases},
         passed=len(cases),failed=0,skipped=0,root='original_go_mysql_and_python_sqlalchemy',
-        sdk_go='v0.5.0-rocketmq-tx.2',sdk_python='0.4.0a2',client_python='5.1.2',
+        sdk_go=SDK_GO_VERSION,sdk_python=SDK_PYTHON_VERSION,client_python='5.1.2',
         python='3.11.16',profile='full' if full else 'core',go_phase='ready',
         delivery_errors=[],last_observation=dict(polls=1,payload_calls=0,ack_count=2,operation_status='accepted',projection_version=2,projection_status='queued',ai_payload_reads=0))
 
@@ -74,6 +74,10 @@ class PairedAcceptanceTests(unittest.TestCase):
         self.assertIsNone(read_receipt(raw,full=True))
         self.assertIsNotNone(read_receipt(raw,full=True,sdk_python='0.4.0a3'))
         self.assertIsNone(read_receipt(raw,full=True,sdk_python='0.4.0a4'))
+
+    def test_old_go_module_receipt_cannot_satisfy_current_fixed_profile(self):
+        value=receipt(True);value['sdk_go']='v0.5.0-rocketmq-tx.2'
+        self.assertIsNone(read_receipt(MARKER+json.dumps(value),full=True))
 
     def test_partial_failure_keeps_only_known_bounded_facts(self):
         value = receipt();value['cases']={};value['passed']=0
