@@ -65,3 +65,9 @@ AI [40079069646](https://github.com/FangcunMount/infra/actions/runs/40079069646)
 五镜像/七进程试验PR246使用真实IAM mTLS与AI，原资源及三个48并发worker。首轮7/1/0在QS读取相对缓存策略失败；原配置纯本地复现后修正fixture挂载路径，未改缓存策略/宿主源码，复验40083039784进行中。完整C1/30分钟仍独立待完成。
 
 QS组件PR245已合并e73fe4aa，5个变更文件与受验e67f2eb相同，关联10报告451/0/0。七进程第二轮7/1/0由原事务owner/标准Outbox互斥保护拒绝；f61f189修正最终provider配置，原保护保留，302工具测试通过，40083809501定向验证中。PR246被修订候选取代并关闭；实际启动通过后才冻结新PR及完整CI，不能用前候选通过证明新候选通过。
+
+## Mongo44候选跟进（当前待验收，不是生产执行包）
+
+QS441合并20cd2184，当前镜像源码b75d4a52与main完整tree一致；新三个QS归档来自固定构建器835c/40092281533，原IAM/AI归档复用。Mongo44保留原提交幂等唯一约束并显式离线安装，SQL105前置不变。新双库40093627714为9/9；七进程仍受worker关闭Exit2阻断，未验证完零DDL/完整关闭，原因和恢复演练尚待新试验。
+
+[新44份输入索引](evidence/rocketmq-m3-candidate-input-index-mongo44-20261024.json)与[46成员源审阅包回执](evidence/rocketmq-m3-source-review-packet-mongo44-20261024.json)替代前述旧42份包。当前archive为私有source review，实际目标配置、受审镜像交付、完整C1/30分钟、生产清单及system仍未完成；不能执行或作为具名生产批准。

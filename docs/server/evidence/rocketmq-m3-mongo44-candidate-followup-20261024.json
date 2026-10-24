@@ -1,0 +1,114 @@
+{
+  "schema": "m3-mongo44-candidate-followup/v1",
+  "production": false,
+  "archive_guard_failures": [
+    {
+      "run_id": 40091521437,
+      "report_sha256": "c4c6111519f612282c046738c55f55efdc16ed96bff4eff45a0fef36b31c91ee",
+      "report": {
+        "schema": "m3-qs-image-pair-preparation/v1",
+        "qs_sha": "d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "production": false,
+        "system_acceptance": false,
+        "application_started": false,
+        "combined_cutover_rehearsal_complete": false,
+        "cases": {},
+        "infra_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "failure_stage": "image_verification",
+        "failure_kind": "RuntimeError",
+        "failure_reason": "exact_verified_image_required",
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "private_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        },
+        "source_unchanged": true
+      }
+    },
+    {
+      "run_id": 40091521556,
+      "report_sha256": "a424d583a33ecc56cc945571e6728057e879c2bc2ddb230b3043fc359f5ef1c0",
+      "report": {
+        "schema": "m3-five-actual-image-startup-trial/v2",
+        "passed": 1,
+        "failed": 1,
+        "skipped": 0,
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "c1_cutover_barrier_exercised": false,
+        "cases": {
+          "actual_source_registry_consumers_match_manifest": true
+        },
+        "sources": {
+          "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "qs": "d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7",
+          "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+        },
+        "scope": "actual processes, required IAM/AI and closed SDK owners; worker HTTP/Redis health and catalog consistency, no business or per-worker delivery proof",
+        "infra_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "original_qs_consumer_count": 1,
+        "original_qs_consumer_contract": {
+          "consumers": [
+            {
+              "id": "modelcatalog.hot_rank_projection",
+              "runtime": "apiserver",
+              "event_type": "answersheet.submitted",
+              "topic": "qs.evaluation.lifecycle",
+              "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+              "delivery": "durable_outbox",
+              "outbox_profile": "mongo_domain_events"
+            }
+          ],
+          "schema": "qs-original-consumer-contract/v1",
+          "source_sha": "d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7"
+        },
+        "original_qs_consumer_contract_sha256": "bda8aa3c1bb40c5542373292d38fa041e93433c3ad0ad3cfe45370f51da33077",
+        "candidate": {
+          "target": "iam",
+          "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+          "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+        },
+        "failure_stage": "image_verification",
+        "failure_kind": "RuntimeError",
+        "failure_reason": "exact_verified_image_required",
+        "processes": {},
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "private_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        },
+        "sources_unchanged": true
+      }
+    }
+  ],
+  "builders": [
+    "9833d67e631587b908df00e2cc21371403912326",
+    "835cf766ceffd2694e2e0132bdf2408a2b2d0627"
+  ],
+  "builder_entrypoint_blobs": [
+    "a1331e3a8016d999d2fe6ac05dbc11383d05a6a5",
+    "a1331e3a8016d999d2fe6ac05dbc11383d05a6a5"
+  ],
+  "old_qs_candidate": "d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7",
+  "old_qs_images_run": 40091132429,
+  "original_native_failure": {
+    "run_id": 40091033966,
+    "job_id": 120863564935,
+    "test": "TestM3TransactionSchemaNative/answersheet-submit-index-installed-offline",
+    "actual_conflicting_index": "idx_domain_id",
+    "reason": "Controlled rows omitted existing unique domain_id; different-writer/unkeyed rows collided with that index. No runtime or migration failure inferred."
+  },
+  "corrected_qs_candidate": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+  "correction_source": "5b405d9d82043c9972289f0e9865fc01b2cbdb41",
+  "corrected_build_run": 40092281533,
+  "corrected_ci_run": 40092216856,
+  "corrected_native_passed": false,
+  "followup": "Exact target/source/builder triples, no wildcard; retain archive/config/engine/SDK checks. Native fixture now assigns independent domain IDs and requires duplicate error names the submit index. New fixed-source build/native/CI pending, prior failures unchanged."
+}
