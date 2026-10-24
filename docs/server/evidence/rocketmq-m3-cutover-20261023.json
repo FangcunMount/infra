@@ -2,7 +2,7 @@
   "schema": "m3-cutover-tool-progress/v1",
   "m3_completed": 24,
   "m3_total": 36,
-  "t25_subgates_completed": 2,
+  "t25_subgates_completed": 3,
   "t25_subgates_total": 4,
   "nsq_drain": {
     "pr": "https://github.com/FangcunMount/infra/pull/189",
@@ -7597,11 +7597,14 @@
     "production_operations": false
   },
   "fast_cutover_proposal_20261024": {
-    "status": "pending_user_scope_confirmation",
+    "status": "approved_by_user",
     "document": "../rocketmq-m3-fast-cutover-proposal.md",
     "changes_progress": false,
-    "changes_existing_gate": false,
-    "production_authorized": false
+    "changes_existing_gate": true,
+    "production_authorized": false,
+    "approved_on": "2026-10-24",
+    "approval": "采用尽快上线提案（推荐）",
+    "deferred_ledger": "../rocketmq-native-recovery-followups.md"
   },
   "actual_rollback_recovery_20261024": {
     "source_sha": "11ecf0a678a7726d084391138e3047f17049a67c",
@@ -7620,5 +7623,24 @@
       "rollback": 15
     },
     "scope": "SDK durable Abort fence and actual recovery Rollback RPC; not original business root write-then-rollback"
+  },
+  "approved_launch_scope_review": {
+    "report": "rocketmq-m3-approved-launch-scope-20261024.json",
+    "t25_c_complete_under_approved_scope": true,
+    "original_advanced_recovery_gate_completed": false,
+    "actual_image_inventory_verified": false,
+    "production_operations": false
+  },
+  "deferred_qs_recovery_failure": {
+    "run": 40059571496,
+    "source_sha": "a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907",
+    "report_sha256": "43c6e81d6444f57cfa6e7d04c2723596dfca8bef09e91347d0a1465da858a558",
+    "passed": 22,
+    "failed": 1,
+    "skipped": 0,
+    "failure": "qs_original_dual_owner_managed_recovery",
+    "all_eight_declared_cleanup_readbacks_passed": true,
+    "root_cause_confirmed": false,
+    "status": "deferred_incomplete"
   }
 }
