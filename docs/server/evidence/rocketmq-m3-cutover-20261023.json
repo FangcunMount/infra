@@ -6982,5 +6982,94 @@
       "AI generation/evaluation and legacy mq_relay are separately supervised; disable publish does not prove all background/model writers stopped",
       "AI AUTO_DEPLOY_ENABLED gates workflow_run only; workflow_dispatch must be separately excluded"
     ]
+  },
+  "t25_remaining_candidate_failures_20261024": {
+    "reports": [
+      {
+        "report_sha256": "05e316873c968475b9eb4f996332d20399078065539933eb3307695891d3c00a",
+        "candidate_sha": "b687730d1ac3afc7aabe8595a8adf80ddf996d50",
+        "passed": 1,
+        "failed": 1,
+        "skipped": 0,
+        "failure_stage": "owned_dependencies_start",
+        "cleanup": {
+          "broker_parameters_restored": true,
+          "probe_process_groups_drained": true,
+          "compose_down_succeeded": true,
+          "project_containers_remaining": false,
+          "project_networks_remaining": false,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "private_fixture_directory_removed": true
+        },
+        "progress": null,
+        "scope": "failed development fixture retained, not actual host acceptance"
+      },
+      {
+        "report_sha256": "1419e33105d67898418846664027c6515d10432287802df3ca16bae1a6c4113d",
+        "candidate_sha": "6e609c8d0e0cd3677e015e2cea4a2a5b92177074",
+        "passed": 5,
+        "failed": 1,
+        "skipped": 0,
+        "failure_stage": "pure_java_finite_window",
+        "cleanup": {
+          "broker_parameters_restored": true,
+          "probe_process_groups_drained": true,
+          "compose_down_succeeded": true,
+          "project_containers_remaining": false,
+          "project_networks_remaining": false,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "private_fixture_directory_removed": true
+        },
+        "progress": null,
+        "scope": "failed development fixture retained, not actual host acceptance"
+      },
+      {
+        "report_sha256": "ed5c7390baeedaa6b70e1ca96a9b1b1b44c74d11104d0f2fd6cd31b55bca3e4e",
+        "candidate_sha": "2fb1291cc8f12a64a75f57fa205b853afa81db93",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "failure_stage": "three_host_original_maintenance",
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "project_containers_remaining": false,
+          "project_networks_remaining": false,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true,
+          "private_fixture_directory_removed": true
+        },
+        "progress": {
+          "stage": "ai-maintenance",
+          "completed_steps": [
+            "iam-maintenance",
+            "qs-maintenance",
+            "ai-maintenance"
+          ]
+        },
+        "scope": "failed development fixture retained, not actual host acceptance"
+      }
+    ],
+    "iam_candidates": [
+      "b687730d1ac3afc7aabe8595a8adf80ddf996d50",
+      "6e609c8d0e0cd3677e015e2cea4a2a5b92177074"
+    ],
+    "local_failures": [
+      "unconditional group recomputation rejected publish-only route; guard added and full 275 pure passed before final candidate",
+      "CI host observer initially used unsupported Shutdown method; changed to published Close and all package race/vet passed"
+    ],
+    "current_iam_source": "bee9c5c1a9945922dc4e88631af451babee646ca",
+    "current_infra_host_source": "d741ace8724b7851294f832ffdadb2b5f6b318f0",
+    "current_maintenance_source": "9de0b5024453a1f5d096b7b0260680294aec09b4",
+    "current_gates_complete": false,
+    "superseded_runs_cancel_requested": [
+      40055090408,
+      40055090258,
+      40055090230,
+      40055090147
+    ],
+    "required_current_head_cancelled": false,
+    "production_touched": false
   }
 }
