@@ -136,9 +136,9 @@ def validate_protection_profile(module, protection, runtime, faults, fanout):
         raise RuntimeError('IAM protection requires separate actual runtime without faults/fanout')
     if protection and ('Replace' in module or module.get('Path') != 'github.com/FangcunMount/reliable-messaging'
             or tuple(module.get(k) for k in ('Version', 'Sum', 'GoModSum')) != (
-                'v0.5.0-rocketmq-tx.4', 'h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=',
+                'v0.5.0', 'h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=',
                 'h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')):
-        raise RuntimeError('IAM protection requires exact published tx.4 module and sums')
+        raise RuntimeError('IAM protection requires exact published stable v0.5.0 module and sums')
 
 def host_failure_summary(raw):
     # Fixed classifications only; never copy a driver error, wire or credential.
@@ -196,8 +196,8 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
     validate_protection_profile(module, protection or native_limit, runtime_required, faults, qs_source is not None)
     env['IAM_M3_VERIFY_PROTOCOL_PROTECTION'] = '1' if protection else '0'
-    if (runtime_required or faults) and not (protection or native_limit) and module.get('Version') != 'v0.5.0-rocketmq-tx.2':
-        raise RuntimeError('current IAM runtime proof requires fixed SDK tx.2')
+    if (runtime_required or faults) and not (protection or native_limit) and module.get('Version') != 'v0.5.0':
+        raise RuntimeError('current IAM runtime proof requires fixed stable SDK v0.5.0')
     manifest = iam_manifest(fanout=qs_source is not None)
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4),
                        'password': secrets.token_hex(32)} for role in manifest['accounts']}
