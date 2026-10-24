@@ -1,0 +1,51 @@
+{
+  "schema": "m3-approved-launch-scope/v1",
+  "approved_on": "2026-10-24",
+  "approval": "采用尽快上线提案（推荐）",
+  "sources": {
+    "iam": {
+      "source_sha": "035f94e572290ed3e1b316db45b30d88db399a16",
+      "files": {
+        "build/docker/Dockerfile": "f8385035ea2b03dd4a55a144557d2da2d069cdfe8493ab30fa1353c58531cb72",
+        "internal/apiserver/container/platform/transaction_protection.go": "4392a5d4011ac16fa1354a2b77c1a0ce0ea0dc44f67ecd078bdca9e64c53f145",
+        "internal/apiserver/container/platform/native_limit.go": "70c1ac169691defed166b6ec9cdf19122ee180da97061c523d2d7f390c646e45"
+      }
+    },
+    "qs": {
+      "source_sha": "83147d8e99e00fd36c57bc2fc4feb193ebe2a844",
+      "files": {
+        "build/docker/Dockerfile.qs-apiserver": "2acb1516b15186ac092c0118b7a1e662bddc87bb920770a802f13acc6c8f4e10",
+        "build/docker/Dockerfile.qs-worker": "57f3148d5950fdef2e35a2714239b1d8fab6e9327b0ee3fa995eba33cd269890",
+        "build/docker/Dockerfile.collection-server": "45fa166143345e510312cf145a1ab0954d0fe8e4918792dbac18429a40097f30",
+        "internal/pkg/messagingruntime/transaction_protection.go": "a93fda1ff83886cc279e7e0f4600b03a9c7bcedb36ba518e200a2318eb9df9da",
+        "internal/pkg/messagingruntime/native_limit.go": "494fd2f95730cfca222a718a58092f9e6d1ff0dde05040a7bc08d19820d9c6ca"
+      }
+    },
+    "ai": {
+      "source_sha": "05d2db7151d492bec127270d53121396b515f763",
+      "files": {
+        "Dockerfile": "a228b397109b1627bee2c2cb66b3d33d3a2c7d4238a726c5b7e1a61503accf8a",
+        "src/qs_ai/bootstrap/transaction_protection.py": "30e8c2dc309d2a1d39009849514591a8030e777d8deb3d768048378ddcc97ddc",
+        "src/qs_ai/bootstrap/transaction_observation.py": "a65872f0aec5653fd7efd02b85f45a8288799b30d0a65718ea2ade4e05b532c4"
+      }
+    }
+  },
+  "existing_real_proof": "rocketmq-m3-native-limit-20261023.json",
+  "owners": [
+    "iam.mysql",
+    "qs.mysql",
+    "qs.mongo",
+    "ai.mysql"
+  ],
+  "new_requirement": "Persistent admission seal; no automatic opening; keep Checker/read/audit; named manual repair only",
+  "production_excluded": [
+    "tools/rocketmq-native-recovery/cmd/native-recovery",
+    "tools/rocketmq-native-recovery/cmd/host-observer",
+    "scripts/rocketmq/probes/native-recheck/JavaNativeHalfManaged.java"
+  ],
+  "exclusion_scope": "Unverified manual resume/resolve/observer helper excluded from first production execution bundle; source can remain. T29 must verify actual image/execution inventory.",
+  "packaging_review": "Source recipes only; no image build or container inventory claim",
+  "advanced_recovery_status": "deferred_incomplete",
+  "production_deployed": false,
+  "system_acceptance": false
+}
