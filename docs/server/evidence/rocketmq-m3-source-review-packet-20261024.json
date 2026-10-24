@@ -1,0 +1,10 @@
+{
+  "schema": "m3-source-review-packet/v1",
+  "files": 42,
+  "members": 44,
+  "input_index_sha256": "7a5b5dd22ee6b9178424b367e9c6e3602abac39ce2608d330b20c1553fce5324",
+  "archive_sha256": "39281bd3eb73a6b79f5f6fb13faa25ecc9049f029810baf010092060c8036981",
+  "production_approved": false,
+  "runtime_configuration_frozen": false,
+  "execution_bundle_complete": false
+}

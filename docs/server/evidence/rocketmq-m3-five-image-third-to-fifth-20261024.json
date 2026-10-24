@@ -1,0 +1,1428 @@
+{
+  "schema": "m3-five-image-trial-failure-history/v1",
+  "runs": [
+    {
+      "run_id": 40083809501,
+      "report_sha256": "bdb8fae4b105905d98e0f9caad359428a32a430d539fc037270cf3a71a0bcb61",
+      "report": {
+        "schema": "m3-five-actual-image-startup-trial/v1",
+        "passed": 7,
+        "failed": 1,
+        "skipped": 0,
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "c1_cutover_barrier_exercised": false,
+        "cases": {
+          "all_five_exact_archives_loaded": true,
+          "original_current_qs_pair_prepared": true,
+          "original_qs_dual_binding_verified": true,
+          "original_iam_schema45_and_binding_selected": true,
+          "original_ai_schema43_and_binding_verified": true,
+          "actual_iam_ready_and_paused_checker_live": true,
+          "actual_readonly_ai_ready_and_paused_checker_live": true
+        },
+        "sources": {
+          "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "qs": "d3269bda672b97582edb691ca4f924484c653822",
+          "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+        },
+        "infra_sha": "f61f1893356d147ec722458637a049ce2231abd7",
+        "candidates": {
+          "iam": {
+            "target": "iam",
+            "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+            "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+            "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+          },
+          "qs-api": {
+            "target": "qs-api",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+            "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3"
+          },
+          "qs-collection": {
+            "target": "qs-collection",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+            "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c"
+          },
+          "qs-worker": {
+            "target": "qs-worker",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+            "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc"
+          },
+          "ai": {
+            "target": "ai",
+            "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+            "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+            "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+          }
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "rocketmq": "sha256:dfd793f51ab8914989d558574f6f8c84058dbdfe42ac27f4ba6528d7e4b6b924",
+          "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+        },
+        "resources": {
+          "version": 2,
+          "operations": 52,
+          "typed_topics": 10,
+          "principals": 5,
+          "verified": true
+        },
+        "qs_schema": {
+          "journal_force_used": false,
+          "mongo": 43,
+          "mysql": 110,
+          "original_templates_applied": true,
+          "production": false,
+          "profile": "current",
+          "resources_sha256": "f0ddf4125b7f39435c5cfed88ca7a4bd89be2362bc3bf7d7394c9dc6c82d6812",
+          "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+        },
+        "iam_controlled_seed": {
+          "controlled_seed": true,
+          "legacy_drain_claimed": false,
+          "publication_intents_created": false,
+          "schema_version": 41,
+          "seed_events_retained": 2,
+          "witnesses_created": false
+        },
+        "configuration_sha256": {
+          "iam": "796e4d3a4f577ca71aa98dc943a20c63a169377b1e06f5c0c304a96a94227160",
+          "api": "8fed4550d3fcace4f52c2353a95d5c7db2229287261108a9b15bd5a1d1265f86",
+          "collection": "0ce9f6a1f24eb1b45300eca5befcafa6f26a250409d288c28141ab5b471f8b04",
+          "worker": "ab960ca66ac626cf1317af66185fd0383852c75a914d20e673f01a3d88b202bf"
+        },
+        "runtime_environment_sha256": {
+          "iam": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "ai": "2af6054b3394114a7051984573745c3bc2b2735a0921a100ae273055a561a879",
+          "api": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "actual_runtime_budgets": {
+          "iam": {
+            "memory_bytes": 536870912,
+            "nano_cpus": 1000000000
+          },
+          "ai": {
+            "memory_bytes": 805306368,
+            "nano_cpus": 750000000
+          },
+          "api": {
+            "memory_bytes": 1073741824,
+            "nano_cpus": 2000000000
+          }
+        },
+        "iam_metrics": {
+          "sdk_ready": 1,
+          "sampler_running": 1,
+          "observation_available": 1,
+          "admission_open": 0,
+          "check_workers_limit": 4,
+          "check_queue_limit": 32
+        },
+        "ai_metrics": {
+          "sdk_ready": 1,
+          "sampler_running": 1,
+          "observation_available": 1,
+          "admission_open": 0,
+          "check_workers_limit": 1,
+          "check_queue_limit": 16
+        },
+        "failure_stage": "actual_qs_api_start",
+        "failure_kind": "RuntimeError",
+        "failure_reason": "actual_api_exited",
+        "processes": {
+          "iam": {
+            "private_log_sha256": "84d42b7ef5139143cd414c61989d1a73fdd5ab59cc1b5d6bd2b5c76a82c64467",
+            "state": {
+              "Status": "running",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": false,
+              "permission_denied": false,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": true,
+              "invalid_configuration": true,
+              "panic": false
+            },
+            "source_markers": []
+          },
+          "ai": {
+            "private_log_sha256": "ac9e8e59e6e1681469f93d5b2699fe25acd5f839ae92960d85e1b3d59e1e97e0",
+            "state": {
+              "Status": "running",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": false,
+              "permission_denied": false,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": false,
+              "invalid_configuration": false,
+              "panic": false
+            }
+          },
+          "api": {
+            "private_log_sha256": "76dafb0c7fce7d9a87d91e5258c2fd46346a4a41a06c8bea6e2f2a11442abfc8",
+            "state": {
+              "Status": "exited",
+              "ExitCode": 1,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": true,
+              "permission_denied": true,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": true,
+              "invalid_configuration": true,
+              "panic": false
+            },
+            "source_markers": [
+              {
+                "path": "internal/apiserver/container/assessment_assets.go",
+                "line": 30,
+                "template_sha256": "7e1333f1edb49474214da78ea88edb5c2718b2abfb2551040ceae5282c2795ae"
+              },
+              {
+                "path": "internal/apiserver/infra/objectstorage/aliyunoss/store.go",
+                "line": 77,
+                "template_sha256": "0eb8bbb22df2c9cd830cb4f330b028fa8277b2ea0f1fbecadb1ac5db756ba1a2"
+              }
+            ]
+          }
+        },
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "private_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        },
+        "sources_unchanged": true
+      },
+      "followup": "Missing original OSS constructor credentials; candidate b481000 supplies owned-unused CI credentials and invalid endpoint, retaining asset feature and budgets."
+    },
+    {
+      "run_id": 40084715021,
+      "report_sha256": "2dd5b95bd1604869e379c8d1c15517c94caa329f89239c7d936c6e094b2a3999",
+      "report": {
+        "schema": "m3-five-actual-image-startup-trial/v1",
+        "passed": 7,
+        "failed": 1,
+        "skipped": 0,
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "c1_cutover_barrier_exercised": false,
+        "cases": {
+          "all_five_exact_archives_loaded": true,
+          "original_current_qs_pair_prepared": true,
+          "original_qs_dual_binding_verified": true,
+          "original_iam_schema45_and_binding_selected": true,
+          "original_ai_schema43_and_binding_verified": true,
+          "actual_iam_ready_and_paused_checker_live": true,
+          "actual_readonly_ai_ready_and_paused_checker_live": true
+        },
+        "sources": {
+          "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "qs": "d3269bda672b97582edb691ca4f924484c653822",
+          "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+        },
+        "infra_sha": "b481000378050c5ac4089bb0751f81d9c304a3be",
+        "candidates": {
+          "iam": {
+            "target": "iam",
+            "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+            "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+            "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+          },
+          "qs-api": {
+            "target": "qs-api",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+            "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3"
+          },
+          "qs-collection": {
+            "target": "qs-collection",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+            "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c"
+          },
+          "qs-worker": {
+            "target": "qs-worker",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+            "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc"
+          },
+          "ai": {
+            "target": "ai",
+            "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+            "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+            "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+          }
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "rocketmq": "sha256:1a1f6ac84f12e2a5aa656403de3d093ca795fe8bf966bf1ac61fbbf612a7422a",
+          "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+        },
+        "resources": {
+          "version": 2,
+          "operations": 52,
+          "typed_topics": 10,
+          "principals": 5,
+          "verified": true
+        },
+        "qs_schema": {
+          "journal_force_used": false,
+          "mongo": 43,
+          "mysql": 110,
+          "original_templates_applied": true,
+          "production": false,
+          "profile": "current",
+          "resources_sha256": "f0ddf4125b7f39435c5cfed88ca7a4bd89be2362bc3bf7d7394c9dc6c82d6812",
+          "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+        },
+        "iam_controlled_seed": {
+          "controlled_seed": true,
+          "legacy_drain_claimed": false,
+          "publication_intents_created": false,
+          "schema_version": 41,
+          "seed_events_retained": 2,
+          "witnesses_created": false
+        },
+        "configuration_sha256": {
+          "iam": "e4e38fe87a6d6f8b21bd50bca3629e4affb758d911da03526c1a9396841e5abd",
+          "api": "21b01a400aabe816d4a0b2994e2df33b3a42a92831580e55459fdb73d7da8ec7",
+          "collection": "3cf447b73d362ee3d88b109ff778bae94a3a323f660f129b0a2e862de10f15a5",
+          "worker": "4f7a4d8973fb17977f61feb753de3c8e517ee80d09a381f4cdf42ca32c13b2bd"
+        },
+        "runtime_environment_sha256": {
+          "iam": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "ai": "8dc1649ad79c7b14ed26e631c99f7791aca7a8c698cf574dc01056551cf8f927",
+          "api": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "actual_runtime_budgets": {
+          "iam": {
+            "memory_bytes": 536870912,
+            "nano_cpus": 1000000000
+          },
+          "ai": {
+            "memory_bytes": 805306368,
+            "nano_cpus": 750000000
+          },
+          "api": {
+            "memory_bytes": 1073741824,
+            "nano_cpus": 2000000000
+          }
+        },
+        "iam_metrics": {
+          "sdk_ready": 1,
+          "sampler_running": 1,
+          "observation_available": 1,
+          "admission_open": 0,
+          "check_workers_limit": 4,
+          "check_queue_limit": 32
+        },
+        "ai_metrics": {
+          "sdk_ready": 1,
+          "sampler_running": 1,
+          "observation_available": 1,
+          "admission_open": 0,
+          "check_workers_limit": 1,
+          "check_queue_limit": 16
+        },
+        "failure_stage": "actual_qs_api_start",
+        "failure_kind": "RuntimeError",
+        "failure_reason": "actual_api_exited",
+        "processes": {
+          "iam": {
+            "private_log_sha256": "c54f95fce344df08e9684d7fe6086aef8696f44bcd1c841e1b319058b8441a69",
+            "state": {
+              "Status": "running",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": false,
+              "permission_denied": false,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": true,
+              "invalid_configuration": true,
+              "panic": false
+            },
+            "source_markers": []
+          },
+          "ai": {
+            "private_log_sha256": "5cf4bae47250ebaff14ae530f3d143560a8e8174051928a64996a41712579eda",
+            "state": {
+              "Status": "running",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": false,
+              "permission_denied": false,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": false,
+              "invalid_configuration": false,
+              "panic": false
+            }
+          },
+          "api": {
+            "private_log_sha256": "152e849cd912aee78b5f3f1b651bf31971e9ee8e965ed9b72604d972cb8d4aed",
+            "state": {
+              "Status": "exited",
+              "ExitCode": 1,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": true,
+              "permission_denied": true,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": true,
+              "invalid_configuration": true,
+              "panic": false
+            },
+            "source_markers": [
+              {
+                "path": "internal/apiserver/eventing/subsystem/subsystem.go",
+                "line": 314,
+                "template_sha256": "0ada6581225881337a1a6df00f53b53e2e66d5c90d9e16be7681de0d709eda0b"
+              }
+            ]
+          }
+        },
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "private_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        },
+        "sources_unchanged": true
+      },
+      "followup": "Actual consumer registry required answersheet.submitted on qs.evaluation.lifecycle TRANSACTION qs.mongo; manifest corrected in 131a721 and source-derived contract added."
+    },
+    {
+      "run_id": 40087072418,
+      "report_sha256": "1a110af0fb0356f32cfa6d77aeb31909105ed9c415f83a88710198e091992249",
+      "report": {
+        "schema": "m3-five-actual-image-startup-trial/v2",
+        "passed": 14,
+        "failed": 1,
+        "skipped": 0,
+        "production": false,
+        "system_acceptance": false,
+        "combined_cutover_rehearsal_complete": false,
+        "c1_cutover_barrier_exercised": false,
+        "cases": {
+          "actual_source_registry_consumers_match_manifest": true,
+          "all_five_exact_archives_loaded": true,
+          "original_current_qs_pair_prepared": true,
+          "original_qs_dual_binding_verified": true,
+          "original_iam_schema45_and_binding_selected": true,
+          "original_ai_schema43_and_binding_verified": true,
+          "actual_iam_ready_and_paused_checker_live": true,
+          "actual_readonly_ai_ready_and_paused_checker_live": true,
+          "actual_qs_api_with_iam_ai_and_both_paused_owners": true,
+          "actual_collection_with_required_iam_and_api": true,
+          "actual_worker1_http_healthy_original_concurrency48": true,
+          "actual_worker2_http_healthy_original_concurrency48": true,
+          "actual_worker3_http_healthy_original_concurrency48": true,
+          "all_seven_actual_processes_shutdown_exit_zero": true
+        },
+        "sources": {
+          "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+          "qs": "d3269bda672b97582edb691ca4f924484c653822",
+          "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+        },
+        "scope": "actual processes, required IAM/AI and closed SDK owners; worker HTTP/Redis health and catalog consistency, no business or per-worker delivery proof",
+        "infra_sha": "131a7219526185a14108f495055816501959305f",
+        "original_qs_consumer_count": 1,
+        "original_qs_consumer_contract": {
+          "consumers": [
+            {
+              "id": "modelcatalog.hot_rank_projection",
+              "runtime": "apiserver",
+              "event_type": "answersheet.submitted",
+              "topic": "qs.evaluation.lifecycle",
+              "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+              "delivery": "durable_outbox",
+              "outbox_profile": "mongo_domain_events"
+            }
+          ],
+          "schema": "qs-original-consumer-contract/v1",
+          "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+        },
+        "original_qs_consumer_contract_sha256": "78479bb3233a607e5e7fc8a2e6ab563b3bfebb99c9ced423b2e6b952775f3776",
+        "candidates": {
+          "iam": {
+            "target": "iam",
+            "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+            "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+            "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+          },
+          "qs-api": {
+            "target": "qs-api",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+            "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3"
+          },
+          "qs-collection": {
+            "target": "qs-collection",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+            "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c"
+          },
+          "qs-worker": {
+            "target": "qs-worker",
+            "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+            "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+            "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc"
+          },
+          "ai": {
+            "target": "ai",
+            "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+            "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+            "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+          }
+        },
+        "dependency_image_ids": {
+          "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+          "rocketmq": "sha256:a77e81b1186dea97d6b7e695536cefe019313447430ba384c4a2ce4c03c1f555",
+          "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+          "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+        },
+        "resources": {
+          "version": 2,
+          "operations": 53,
+          "typed_topics": 10,
+          "principals": 5,
+          "verified": true
+        },
+        "qs_schema": {
+          "journal_force_used": false,
+          "mongo": 43,
+          "mysql": 110,
+          "original_templates_applied": true,
+          "production": false,
+          "profile": "current",
+          "resources_sha256": "f0ddf4125b7f39435c5cfed88ca7a4bd89be2362bc3bf7d7394c9dc6c82d6812",
+          "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+        },
+        "iam_controlled_seed": {
+          "controlled_seed": true,
+          "legacy_drain_claimed": false,
+          "publication_intents_created": false,
+          "schema_version": 41,
+          "seed_events_retained": 2,
+          "witnesses_created": false
+        },
+        "configuration_sha256": {
+          "iam": "4009766ec7f0a94b59fd5b18e3c585185856df86f25d31ccd0b01e568c42e763",
+          "api": "ff7304e3c9f848981b4fd0b3f9f80fd2e504aaaea3b6d912532a5e6eaf38cb4c",
+          "collection": "b5c6a11419c22ce22b99b704a37337174490c55ea37c22a3fab6cc824c0dea6c",
+          "worker": "6eb2b9ba110ecb52a66a4b79ea3f9411d9c3518997ae109783c6b7d220eabb2d"
+        },
+        "runtime_environment_sha256": {
+          "iam": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "ai": "c81ff6b731fe31e2bd4e00c4d35c84f739ddb8ee9b630e62a7d0070deeb7e690",
+          "api": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "collection": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "worker1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "worker2": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "worker3": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "actual_runtime_budgets": {
+          "iam": {
+            "memory_bytes": 536870912,
+            "nano_cpus": 1000000000
+          },
+          "ai": {
+            "memory_bytes": 805306368,
+            "nano_cpus": 750000000
+          },
+          "api": {
+            "memory_bytes": 1073741824,
+            "nano_cpus": 2000000000
+          },
+          "collection": {
+            "memory_bytes": 335544320,
+            "nano_cpus": 1000000000
+          },
+          "worker1": {
+            "memory_bytes": 805306368,
+            "nano_cpus": 1000000000
+          },
+          "worker2": {
+            "memory_bytes": 805306368,
+            "nano_cpus": 1000000000
+          },
+          "worker3": {
+            "memory_bytes": 805306368,
+            "nano_cpus": 1000000000
+          }
+        },
+        "iam_metrics": {
+          "sdk_ready": 1,
+          "sampler_running": 1,
+          "observation_available": 1,
+          "admission_open": 0,
+          "check_workers_limit": 4,
+          "check_queue_limit": 32
+        },
+        "ai_metrics": {
+          "sdk_ready": 1,
+          "sampler_running": 1,
+          "observation_available": 1,
+          "admission_open": 0,
+          "check_workers_limit": 1,
+          "check_queue_limit": 16
+        },
+        "qs_metrics": {
+          "qs.mysql": {
+            "sdk_ready": 1,
+            "sampler_running": 1,
+            "observation_available": 1,
+            "admission_open": 0,
+            "check_workers_limit": 2,
+            "check_queue_limit": 16
+          },
+          "qs.mongo": {
+            "sdk_ready": 1,
+            "sampler_running": 1,
+            "observation_available": 1,
+            "admission_open": 0,
+            "check_workers_limit": 2,
+            "check_queue_limit": 16
+          }
+        },
+        "processes": {
+          "iam": {
+            "private_log_sha256": "9b362f537d785018839f66dc5a8c200c474f8f315c077a0295535caf74cdca56",
+            "state": {
+              "Status": "exited",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": false,
+              "permission_denied": false,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": true,
+              "invalid_configuration": true,
+              "panic": false
+            },
+            "source_markers": []
+          },
+          "ai": {
+            "private_log_sha256": "5fb0b2ace5bdddf842dce6847cad1209a8f96f1a25ac2759a4024ca87d87f387",
+            "state": {
+              "Status": "exited",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": false,
+              "permission_denied": false,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": false,
+              "invalid_configuration": false,
+              "panic": false
+            }
+          },
+          "api": {
+            "private_log_sha256": "9231ca790ee06a36c229f7ed08c3deacd4c8386e366495083a70857a7c7d922d",
+            "state": {
+              "Status": "exited",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": true,
+              "permission_denied": true,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": true,
+              "invalid_configuration": true,
+              "panic": false
+            },
+            "source_markers": []
+          },
+          "collection": {
+            "private_log_sha256": "c685e6c15b60fa88e5cb9234e1c86af1f9794a921c736b8fad22305ae9f794dc",
+            "state": {
+              "Status": "exited",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": true,
+              "permission_denied": false,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": true,
+              "invalid_configuration": false,
+              "panic": false
+            },
+            "source_markers": []
+          },
+          "worker1": {
+            "private_log_sha256": "b475d94cff263470a5250a25aa55dc942711a2825a7b3f03a64a26fa9438242c",
+            "state": {
+              "Status": "exited",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": false,
+              "permission_denied": false,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": true,
+              "invalid_configuration": true,
+              "panic": false
+            },
+            "source_markers": []
+          },
+          "worker2": {
+            "private_log_sha256": "bd5cd8dff6a838bcf5e6b1970e315ea52db7a6ec2cc5b6a6e48c291c621aff8d",
+            "state": {
+              "Status": "exited",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": false,
+              "permission_denied": false,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": true,
+              "invalid_configuration": true,
+              "panic": false
+            },
+            "source_markers": []
+          },
+          "worker3": {
+            "private_log_sha256": "b378a40164634bd282c7363594b9c44a963d72466787db7118ddd8a60736e44d",
+            "state": {
+              "Status": "exited",
+              "ExitCode": 0,
+              "OOMKilled": false
+            },
+            "fixed_failure_signals": {
+              "missing_file": false,
+              "policy_read": false,
+              "permission_denied": false,
+              "connection_refused": false,
+              "deadline": false,
+              "certificate_authority": false,
+              "missing_route": true,
+              "invalid_configuration": true,
+              "panic": false
+            },
+            "source_markers": []
+          }
+        },
+        "mysql_runtime_ddl_attempts": 0,
+        "mongo_runtime_ddl_attempts": 1,
+        "failure_stage": "actual_five_image_shutdown",
+        "failure_kind": "RuntimeError",
+        "failure_reason": "startup_shutdown_ddl_attempted",
+        "cleanup": {
+          "compose_down_succeeded": true,
+          "private_directory_removed": true,
+          "existing_containers_unchanged": true,
+          "existing_networks_unchanged": true
+        },
+        "sources_unchanged": true
+      },
+      "followup": "All seven processes started and exited zero; four owner metrics verified closed admission and live Checker. No-DDL gate failed: Mongo count1, MySQL count0. Cause not yet established; bounded projected diagnostics and positive controls added in fd20c59. No gate waived."
+    }
+  ],
+  "resource_followup": {
+    "run_id": 40087075186,
+    "report_sha256": "883933bbb63307578bde06cc4ee9c38b49577ba4f5aab261ac1560223e3fa264",
+    "report": {
+      "version": 1,
+      "batch": "M3-production-candidate-resources-isolated",
+      "project": "rocketmq-m2-3c567aa938f6",
+      "image": "sha256:d4f5081632c2cfe669b165314c65203647bf52e1b928f1a2f540939c8e0bc906",
+      "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "mongo_image": null,
+      "clients": {
+        "go": "5.1.4",
+        "python": "5.1.2"
+      },
+      "cases": {
+        "m3_resources/tls/verified_ca_and_san": true,
+        "m3_resources/tls/wrong_ca": true,
+        "m3_resources/tls/wrong_san": true,
+        "m3_resources/tls/plaintext": true,
+        "m3_resources/tls/verified_control_after_negatives": true,
+        "m3_resources/m3-iam/authentication/before": true,
+        "m3_resources/m3-iam/publish/qs-ai-command": true,
+        "m3_resources/m3-iam/publish/qs-task-transaction": true,
+        "m3_resources/m3-iam/publish/ai-qs-event": true,
+        "m3_resources/m3-iam/publish/qs-evaluation-mongo": true,
+        "m3_resources/m3-iam/publish/iam-sms": true,
+        "m3_resources/m3-iam/type/iam-sms": true,
+        "m3_resources/m3-iam/publish/iam-authz-qs": true,
+        "m3_resources/m3-iam/type/iam-authz-qs": true,
+        "m3_resources/m3-iam/publish/qs-survey-worker": true,
+        "m3_resources/m3-iam/publish/qs-task-normal": true,
+        "m3_resources/m3-iam/publish/qs-ai-ack": true,
+        "m3_resources/m3-iam/publish/qs-evaluation-mysql": true,
+        "m3_resources/m3-iam/subscribe/iam-authz-iam": true,
+        "m3_resources/m3-iam/subscribe/iam-authz-qs": true,
+        "m3_resources/m3-iam/subscribe/qs-survey-worker": true,
+        "m3_resources/m3-iam/subscribe/qs-evaluation-catalog-mongo": true,
+        "m3_resources/m3-iam/subscribe/qs-evaluation-mysql": true,
+        "m3_resources/m3-iam/subscribe/qs-evaluation-mongo": true,
+        "m3_resources/m3-iam/subscribe/qs-task-normal": true,
+        "m3_resources/m3-iam/subscribe/qs-task-transaction": true,
+        "m3_resources/m3-iam/subscribe/qs-ai-command": true,
+        "m3_resources/m3-iam/subscribe/qs-ai-ack": true,
+        "m3_resources/m3-iam/subscribe/ai-qs-event": true,
+        "m3_resources/m3-iam/authentication/after": true,
+        "m3_resources/m3-qs-apiserver/authentication/before": true,
+        "m3_resources/m3-qs-apiserver/publish/qs-ai-command": true,
+        "m3_resources/m3-qs-apiserver/type/qs-ai-command": true,
+        "m3_resources/m3-qs-apiserver/publish/qs-task-transaction": true,
+        "m3_resources/m3-qs-apiserver/type/qs-task-transaction": true,
+        "m3_resources/m3-qs-apiserver/publish/ai-qs-event": true,
+        "m3_resources/m3-qs-apiserver/publish/qs-evaluation-mongo": true,
+        "m3_resources/m3-qs-apiserver/publish/iam-sms": true,
+        "m3_resources/m3-qs-apiserver/publish/iam-authz-qs": true,
+        "m3_resources/m3-qs-apiserver/publish/qs-survey-worker": true,
+        "m3_resources/m3-qs-apiserver/type/qs-survey-worker": true,
+        "m3_resources/m3-qs-apiserver/publish/qs-task-normal": true,
+        "m3_resources/m3-qs-apiserver/type/qs-task-normal": true,
+        "m3_resources/m3-qs-apiserver/publish/qs-ai-ack": true,
+        "m3_resources/m3-qs-apiserver/type/qs-ai-ack": true,
+        "m3_resources/m3-qs-apiserver/publish/qs-evaluation-mysql": true,
+        "m3_resources/m3-qs-apiserver/type/qs-evaluation-mysql": true,
+        "m3_resources/m3-qs-apiserver/subscribe/iam-authz-iam": true,
+        "m3_resources/m3-qs-apiserver/subscribe/iam-authz-qs": true,
+        "m3_resources/m3-qs-apiserver/subscribe/qs-survey-worker": true,
+        "m3_resources/m3-qs-apiserver/subscribe/qs-evaluation-catalog-mongo": true,
+        "m3_resources/m3-qs-apiserver/subscribe/qs-evaluation-mysql": true,
+        "m3_resources/m3-qs-apiserver/subscribe/qs-evaluation-mongo": true,
+        "m3_resources/m3-qs-apiserver/subscribe/qs-task-normal": true,
+        "m3_resources/m3-qs-apiserver/subscribe/qs-task-transaction": true,
+        "m3_resources/m3-qs-apiserver/subscribe/qs-ai-command": true,
+        "m3_resources/m3-qs-apiserver/subscribe/qs-ai-ack": true,
+        "m3_resources/m3-qs-apiserver/subscribe/ai-qs-event": true,
+        "m3_resources/m3-qs-apiserver/authentication/after": true,
+        "m3_resources/m3-qs-worker/authentication/before": true,
+        "m3_resources/m3-qs-worker/publish/qs-ai-command": true,
+        "m3_resources/m3-qs-worker/publish/qs-task-transaction": true,
+        "m3_resources/m3-qs-worker/publish/ai-qs-event": true,
+        "m3_resources/m3-qs-worker/publish/qs-evaluation-mongo": true,
+        "m3_resources/m3-qs-worker/publish/iam-sms": true,
+        "m3_resources/m3-qs-worker/publish/iam-authz-qs": true,
+        "m3_resources/m3-qs-worker/publish/qs-survey-worker": true,
+        "m3_resources/m3-qs-worker/publish/qs-task-normal": true,
+        "m3_resources/m3-qs-worker/publish/qs-ai-ack": true,
+        "m3_resources/m3-qs-worker/publish/qs-evaluation-mysql": true,
+        "m3_resources/m3-qs-worker/subscribe/iam-authz-iam": true,
+        "m3_resources/m3-qs-worker/subscribe/iam-authz-qs": true,
+        "m3_resources/m3-qs-worker/subscribe/qs-survey-worker": true,
+        "m3_resources/m3-qs-worker/subscribe/qs-evaluation-catalog-mongo": true,
+        "m3_resources/m3-qs-worker/subscribe/qs-evaluation-mysql": true,
+        "m3_resources/m3-qs-worker/subscribe/qs-evaluation-mongo": true,
+        "m3_resources/m3-qs-worker/subscribe/qs-task-normal": true,
+        "m3_resources/m3-qs-worker/subscribe/qs-task-transaction": true,
+        "m3_resources/m3-qs-worker/subscribe/qs-ai-command": true,
+        "m3_resources/m3-qs-worker/subscribe/qs-ai-ack": true,
+        "m3_resources/m3-qs-worker/subscribe/ai-qs-event": true,
+        "m3_resources/m3-qs-worker/authentication/after": true,
+        "m3_resources/m3-qs-mongo/authentication/before": true,
+        "m3_resources/m3-qs-mongo/publish/qs-ai-command": true,
+        "m3_resources/m3-qs-mongo/publish/qs-task-transaction": true,
+        "m3_resources/m3-qs-mongo/publish/ai-qs-event": true,
+        "m3_resources/m3-qs-mongo/publish/qs-evaluation-mongo": true,
+        "m3_resources/m3-qs-mongo/type/qs-evaluation-mongo": true,
+        "m3_resources/m3-qs-mongo/publish/iam-sms": true,
+        "m3_resources/m3-qs-mongo/publish/iam-authz-qs": true,
+        "m3_resources/m3-qs-mongo/publish/qs-survey-worker": true,
+        "m3_resources/m3-qs-mongo/publish/qs-task-normal": true,
+        "m3_resources/m3-qs-mongo/publish/qs-ai-ack": true,
+        "m3_resources/m3-qs-mongo/publish/qs-evaluation-mysql": true,
+        "m3_resources/m3-qs-mongo/subscribe/iam-authz-iam": true,
+        "m3_resources/m3-qs-mongo/subscribe/iam-authz-qs": true,
+        "m3_resources/m3-qs-mongo/subscribe/qs-survey-worker": true,
+        "m3_resources/m3-qs-mongo/subscribe/qs-evaluation-catalog-mongo": true,
+        "m3_resources/m3-qs-mongo/subscribe/qs-evaluation-mysql": true,
+        "m3_resources/m3-qs-mongo/subscribe/qs-evaluation-mongo": true,
+        "m3_resources/m3-qs-mongo/subscribe/qs-task-normal": true,
+        "m3_resources/m3-qs-mongo/subscribe/qs-task-transaction": true,
+        "m3_resources/m3-qs-mongo/subscribe/qs-ai-command": true,
+        "m3_resources/m3-qs-mongo/subscribe/qs-ai-ack": true,
+        "m3_resources/m3-qs-mongo/subscribe/ai-qs-event": true,
+        "m3_resources/m3-qs-mongo/authentication/after": true,
+        "m3_resources/m3-ai/authentication/before": true,
+        "m3_resources/m3-ai/publish/qs-ai-command": true,
+        "m3_resources/m3-ai/publish/qs-task-transaction": true,
+        "m3_resources/m3-ai/publish/ai-qs-event": true,
+        "m3_resources/m3-ai/type/ai-qs-event": true,
+        "m3_resources/m3-ai/publish/qs-evaluation-mongo": true,
+        "m3_resources/m3-ai/publish/iam-sms": true,
+        "m3_resources/m3-ai/publish/iam-authz-qs": true,
+        "m3_resources/m3-ai/publish/qs-survey-worker": true,
+        "m3_resources/m3-ai/publish/qs-task-normal": true,
+        "m3_resources/m3-ai/publish/qs-ai-ack": true,
+        "m3_resources/m3-ai/publish/qs-evaluation-mysql": true,
+        "m3_resources/m3-ai/subscribe/iam-authz-iam": true,
+        "m3_resources/m3-ai/subscribe/iam-authz-qs": true,
+        "m3_resources/m3-ai/subscribe/qs-survey-worker": true,
+        "m3_resources/m3-ai/subscribe/qs-evaluation-catalog-mongo": true,
+        "m3_resources/m3-ai/subscribe/qs-evaluation-mysql": true,
+        "m3_resources/m3-ai/subscribe/qs-evaluation-mongo": true,
+        "m3_resources/m3-ai/subscribe/qs-task-normal": true,
+        "m3_resources/m3-ai/subscribe/qs-task-transaction": true,
+        "m3_resources/m3-ai/subscribe/qs-ai-command": true,
+        "m3_resources/m3-ai/subscribe/qs-ai-ack": true,
+        "m3_resources/m3-ai/subscribe/ai-qs-event": true,
+        "m3_resources/m3-ai/authentication/after": true,
+        "m3_resources/conflict/queues": true,
+        "m3_resources/conflict/credentials": true,
+        "m3_resources/conflict/acl": true,
+        "m3_resources/conflict/type": true
+      },
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0,
+      "failure": null,
+      "proof": {
+        "effective_broker_parameters": {
+          "transactionTimeOut": 6000,
+          "transactionCheckInterval": 5000,
+          "transactionCheckMax": 24,
+          "fileReservedTime": 48
+        },
+        "mysql_version": "8.0.36",
+        "m3_resources": {
+          "profile": "full",
+          "full_gate": true,
+          "manifest_sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "active_manifest_sha256": "34d6dc613e8f05b43335bc09c07b20eb457df1a2129720a9bc416a6556989d4d",
+          "phase": "complete",
+          "dependencies_ready": true,
+          "tls_private_output_sha256": "c96360e79aff7786759361be21d4c9651cbd66684370fcefbfa37fff0adeccde",
+          "tls_progress": [
+            "native_started",
+            "tls/verified_ca_and_san",
+            "tls/wrong_ca",
+            "tls/wrong_san",
+            "tls/plaintext",
+            "tls/verified_control_after_negatives"
+          ],
+          "tls_preflight": {
+            "client": "5.1.2",
+            "passed": 5,
+            "failed": 0,
+            "skipped": 0,
+            "cases": {
+              "tls/verified_ca_and_san": "allowed",
+              "tls/wrong_ca": "rejected",
+              "tls/wrong_san": "rejected",
+              "tls/plaintext": "rejected",
+              "tls/verified_control_after_negatives": "allowed"
+            },
+            "scope": "isolated_transport_acl_and_broker_type_only",
+            "denial_path": "direct_signed_send_receive_rpc",
+            "diagnostic": null
+          },
+          "provision": {
+            "version": 2,
+            "operations": 53,
+            "typed_topics": 10,
+            "principals": 5,
+            "verified": true
+          },
+          "idempotent": {
+            "version": 2,
+            "operations": 0,
+            "typed_topics": 10,
+            "principals": 5,
+            "verified": true
+          },
+          "conflicts_refused_without_mutation": [
+            "queues",
+            "credentials",
+            "acl",
+            "type"
+          ],
+          "typed_topics": {
+            "rmq2_t_d5784a735b691b0beda4d5e5d27727b0": "TRANSACTION",
+            "rmq2_t_a52d2c8d9a6ba5229d8c34ff3f828b1e": "NORMAL",
+            "rmq2_t_e093a39dd58a0085979347c160911d22": "NORMAL",
+            "rmq2_t_99b374cae35ddb4c549a513e5b20e6c9": "TRANSACTION",
+            "rmq2_t_f8513086d2e7f2155fb9875c039a1a47": "TRANSACTION",
+            "rmq2_t_e216bf5d9a3bb731db6180efea06365e": "NORMAL",
+            "rmq2_t_50fafcf8477fa156a6f9b46bccac0638": "TRANSACTION",
+            "rmq2_t_3aa191459362e22de17098fb223344b2": "TRANSACTION",
+            "rmq2_t_f605f539fa9db24e69f346d2089f8098": "TRANSACTION",
+            "rmq2_t_9336fe19e37ff6fdb14bd39230c6997b": "TRANSACTION"
+          },
+          "private_output_sha256": "dc2b486ed0072b11dacc20ff2ee3844b0ffed382c94ced03f5ef9901a366ef14",
+          "exit_code": 0,
+          "native_partial": {
+            "client": "5.1.2",
+            "passed": 130,
+            "failed": 0,
+            "skipped": 0,
+            "cases": {
+              "tls/verified_ca_and_san": "allowed",
+              "tls/wrong_ca": "rejected",
+              "tls/wrong_san": "rejected",
+              "tls/plaintext": "rejected",
+              "tls/verified_control_after_negatives": "allowed",
+              "m3-iam/authentication/before": "allowed",
+              "m3-iam/publish/qs-ai-command": 40100,
+              "m3-iam/publish/qs-task-transaction": 40100,
+              "m3-iam/publish/ai-qs-event": 40100,
+              "m3-iam/publish/qs-evaluation-mongo": 40100,
+              "m3-iam/publish/iam-sms": "allowed",
+              "m3-iam/type/iam-sms": 40014,
+              "m3-iam/publish/iam-authz-qs": "allowed",
+              "m3-iam/type/iam-authz-qs": 40014,
+              "m3-iam/publish/qs-survey-worker": 40100,
+              "m3-iam/publish/qs-task-normal": 40100,
+              "m3-iam/publish/qs-ai-ack": 40100,
+              "m3-iam/publish/qs-evaluation-mysql": 40100,
+              "m3-iam/subscribe/iam-authz-iam": "allowed",
+              "m3-iam/subscribe/iam-authz-qs": 40100,
+              "m3-iam/subscribe/qs-survey-worker": 40100,
+              "m3-iam/subscribe/qs-evaluation-catalog-mongo": 40100,
+              "m3-iam/subscribe/qs-evaluation-mysql": 40100,
+              "m3-iam/subscribe/qs-evaluation-mongo": 40100,
+              "m3-iam/subscribe/qs-task-normal": 40100,
+              "m3-iam/subscribe/qs-task-transaction": 40100,
+              "m3-iam/subscribe/qs-ai-command": 40100,
+              "m3-iam/subscribe/qs-ai-ack": 40100,
+              "m3-iam/subscribe/ai-qs-event": 40100,
+              "m3-iam/authentication/after": "allowed",
+              "m3-qs-apiserver/authentication/before": "allowed",
+              "m3-qs-apiserver/publish/qs-ai-command": "allowed",
+              "m3-qs-apiserver/type/qs-ai-command": 40014,
+              "m3-qs-apiserver/publish/qs-task-transaction": "allowed",
+              "m3-qs-apiserver/type/qs-task-transaction": 40014,
+              "m3-qs-apiserver/publish/ai-qs-event": 40100,
+              "m3-qs-apiserver/publish/qs-evaluation-mongo": 40100,
+              "m3-qs-apiserver/publish/iam-sms": 40100,
+              "m3-qs-apiserver/publish/iam-authz-qs": 40100,
+              "m3-qs-apiserver/publish/qs-survey-worker": "allowed",
+              "m3-qs-apiserver/type/qs-survey-worker": 40014,
+              "m3-qs-apiserver/publish/qs-task-normal": "allowed",
+              "m3-qs-apiserver/type/qs-task-normal": 40014,
+              "m3-qs-apiserver/publish/qs-ai-ack": "allowed",
+              "m3-qs-apiserver/type/qs-ai-ack": 40014,
+              "m3-qs-apiserver/publish/qs-evaluation-mysql": "allowed",
+              "m3-qs-apiserver/type/qs-evaluation-mysql": 40014,
+              "m3-qs-apiserver/subscribe/iam-authz-iam": 40100,
+              "m3-qs-apiserver/subscribe/iam-authz-qs": "allowed",
+              "m3-qs-apiserver/subscribe/qs-survey-worker": 40100,
+              "m3-qs-apiserver/subscribe/qs-evaluation-catalog-mongo": "allowed",
+              "m3-qs-apiserver/subscribe/qs-evaluation-mysql": 40100,
+              "m3-qs-apiserver/subscribe/qs-evaluation-mongo": 40100,
+              "m3-qs-apiserver/subscribe/qs-task-normal": 40100,
+              "m3-qs-apiserver/subscribe/qs-task-transaction": 40100,
+              "m3-qs-apiserver/subscribe/qs-ai-command": 40100,
+              "m3-qs-apiserver/subscribe/qs-ai-ack": 40100,
+              "m3-qs-apiserver/subscribe/ai-qs-event": "allowed",
+              "m3-qs-apiserver/authentication/after": "allowed",
+              "m3-qs-worker/authentication/before": "allowed",
+              "m3-qs-worker/publish/qs-ai-command": 40100,
+              "m3-qs-worker/publish/qs-task-transaction": 40100,
+              "m3-qs-worker/publish/ai-qs-event": 40100,
+              "m3-qs-worker/publish/qs-evaluation-mongo": 40100,
+              "m3-qs-worker/publish/iam-sms": 40100,
+              "m3-qs-worker/publish/iam-authz-qs": 40100,
+              "m3-qs-worker/publish/qs-survey-worker": 40100,
+              "m3-qs-worker/publish/qs-task-normal": 40100,
+              "m3-qs-worker/publish/qs-ai-ack": 40100,
+              "m3-qs-worker/publish/qs-evaluation-mysql": 40100,
+              "m3-qs-worker/subscribe/iam-authz-iam": 40100,
+              "m3-qs-worker/subscribe/iam-authz-qs": 40100,
+              "m3-qs-worker/subscribe/qs-survey-worker": "allowed",
+              "m3-qs-worker/subscribe/qs-evaluation-catalog-mongo": 40100,
+              "m3-qs-worker/subscribe/qs-evaluation-mysql": "allowed",
+              "m3-qs-worker/subscribe/qs-evaluation-mongo": "allowed",
+              "m3-qs-worker/subscribe/qs-task-normal": "allowed",
+              "m3-qs-worker/subscribe/qs-task-transaction": "allowed",
+              "m3-qs-worker/subscribe/qs-ai-command": 40100,
+              "m3-qs-worker/subscribe/qs-ai-ack": 40100,
+              "m3-qs-worker/subscribe/ai-qs-event": 40100,
+              "m3-qs-worker/authentication/after": "allowed",
+              "m3-qs-mongo/authentication/before": "allowed",
+              "m3-qs-mongo/publish/qs-ai-command": 40100,
+              "m3-qs-mongo/publish/qs-task-transaction": 40100,
+              "m3-qs-mongo/publish/ai-qs-event": 40100,
+              "m3-qs-mongo/publish/qs-evaluation-mongo": "allowed",
+              "m3-qs-mongo/type/qs-evaluation-mongo": 40014,
+              "m3-qs-mongo/publish/iam-sms": 40100,
+              "m3-qs-mongo/publish/iam-authz-qs": 40100,
+              "m3-qs-mongo/publish/qs-survey-worker": 40100,
+              "m3-qs-mongo/publish/qs-task-normal": 40100,
+              "m3-qs-mongo/publish/qs-ai-ack": 40100,
+              "m3-qs-mongo/publish/qs-evaluation-mysql": 40100,
+              "m3-qs-mongo/subscribe/iam-authz-iam": 40100,
+              "m3-qs-mongo/subscribe/iam-authz-qs": 40100,
+              "m3-qs-mongo/subscribe/qs-survey-worker": 40100,
+              "m3-qs-mongo/subscribe/qs-evaluation-catalog-mongo": 40100,
+              "m3-qs-mongo/subscribe/qs-evaluation-mysql": 40100,
+              "m3-qs-mongo/subscribe/qs-evaluation-mongo": 40100,
+              "m3-qs-mongo/subscribe/qs-task-normal": 40100,
+              "m3-qs-mongo/subscribe/qs-task-transaction": 40100,
+              "m3-qs-mongo/subscribe/qs-ai-command": 40100,
+              "m3-qs-mongo/subscribe/qs-ai-ack": 40100,
+              "m3-qs-mongo/subscribe/ai-qs-event": 40100,
+              "m3-qs-mongo/authentication/after": "allowed",
+              "m3-ai/authentication/before": "allowed",
+              "m3-ai/publish/qs-ai-command": 40100,
+              "m3-ai/publish/qs-task-transaction": 40100,
+              "m3-ai/publish/ai-qs-event": "allowed",
+              "m3-ai/type/ai-qs-event": 40014,
+              "m3-ai/publish/qs-evaluation-mongo": 40100,
+              "m3-ai/publish/iam-sms": 40100,
+              "m3-ai/publish/iam-authz-qs": 40100,
+              "m3-ai/publish/qs-survey-worker": 40100,
+              "m3-ai/publish/qs-task-normal": 40100,
+              "m3-ai/publish/qs-ai-ack": 40100,
+              "m3-ai/publish/qs-evaluation-mysql": 40100,
+              "m3-ai/subscribe/iam-authz-iam": 40100,
+              "m3-ai/subscribe/iam-authz-qs": 40100,
+              "m3-ai/subscribe/qs-survey-worker": 40100,
+              "m3-ai/subscribe/qs-evaluation-catalog-mongo": 40100,
+              "m3-ai/subscribe/qs-evaluation-mysql": 40100,
+              "m3-ai/subscribe/qs-evaluation-mongo": 40100,
+              "m3-ai/subscribe/qs-task-normal": 40100,
+              "m3-ai/subscribe/qs-task-transaction": 40100,
+              "m3-ai/subscribe/qs-ai-command": "allowed",
+              "m3-ai/subscribe/qs-ai-ack": "allowed",
+              "m3-ai/subscribe/ai-qs-event": 40100,
+              "m3-ai/authentication/after": "allowed"
+            },
+            "scope": "isolated_transport_acl_and_broker_type_only",
+            "denial_path": "direct_signed_send_receive_rpc",
+            "diagnostic": null
+          },
+          "native_receipt": {
+            "client": "5.1.2",
+            "passed": 130,
+            "failed": 0,
+            "skipped": 0,
+            "cases": {
+              "tls/verified_ca_and_san": "allowed",
+              "tls/wrong_ca": "rejected",
+              "tls/wrong_san": "rejected",
+              "tls/plaintext": "rejected",
+              "tls/verified_control_after_negatives": "allowed",
+              "m3-iam/authentication/before": "allowed",
+              "m3-iam/publish/qs-ai-command": 40100,
+              "m3-iam/publish/qs-task-transaction": 40100,
+              "m3-iam/publish/ai-qs-event": 40100,
+              "m3-iam/publish/qs-evaluation-mongo": 40100,
+              "m3-iam/publish/iam-sms": "allowed",
+              "m3-iam/type/iam-sms": 40014,
+              "m3-iam/publish/iam-authz-qs": "allowed",
+              "m3-iam/type/iam-authz-qs": 40014,
+              "m3-iam/publish/qs-survey-worker": 40100,
+              "m3-iam/publish/qs-task-normal": 40100,
+              "m3-iam/publish/qs-ai-ack": 40100,
+              "m3-iam/publish/qs-evaluation-mysql": 40100,
+              "m3-iam/subscribe/iam-authz-iam": "allowed",
+              "m3-iam/subscribe/iam-authz-qs": 40100,
+              "m3-iam/subscribe/qs-survey-worker": 40100,
+              "m3-iam/subscribe/qs-evaluation-catalog-mongo": 40100,
+              "m3-iam/subscribe/qs-evaluation-mysql": 40100,
+              "m3-iam/subscribe/qs-evaluation-mongo": 40100,
+              "m3-iam/subscribe/qs-task-normal": 40100,
+              "m3-iam/subscribe/qs-task-transaction": 40100,
+              "m3-iam/subscribe/qs-ai-command": 40100,
+              "m3-iam/subscribe/qs-ai-ack": 40100,
+              "m3-iam/subscribe/ai-qs-event": 40100,
+              "m3-iam/authentication/after": "allowed",
+              "m3-qs-apiserver/authentication/before": "allowed",
+              "m3-qs-apiserver/publish/qs-ai-command": "allowed",
+              "m3-qs-apiserver/type/qs-ai-command": 40014,
+              "m3-qs-apiserver/publish/qs-task-transaction": "allowed",
+              "m3-qs-apiserver/type/qs-task-transaction": 40014,
+              "m3-qs-apiserver/publish/ai-qs-event": 40100,
+              "m3-qs-apiserver/publish/qs-evaluation-mongo": 40100,
+              "m3-qs-apiserver/publish/iam-sms": 40100,
+              "m3-qs-apiserver/publish/iam-authz-qs": 40100,
+              "m3-qs-apiserver/publish/qs-survey-worker": "allowed",
+              "m3-qs-apiserver/type/qs-survey-worker": 40014,
+              "m3-qs-apiserver/publish/qs-task-normal": "allowed",
+              "m3-qs-apiserver/type/qs-task-normal": 40014,
+              "m3-qs-apiserver/publish/qs-ai-ack": "allowed",
+              "m3-qs-apiserver/type/qs-ai-ack": 40014,
+              "m3-qs-apiserver/publish/qs-evaluation-mysql": "allowed",
+              "m3-qs-apiserver/type/qs-evaluation-mysql": 40014,
+              "m3-qs-apiserver/subscribe/iam-authz-iam": 40100,
+              "m3-qs-apiserver/subscribe/iam-authz-qs": "allowed",
+              "m3-qs-apiserver/subscribe/qs-survey-worker": 40100,
+              "m3-qs-apiserver/subscribe/qs-evaluation-catalog-mongo": "allowed",
+              "m3-qs-apiserver/subscribe/qs-evaluation-mysql": 40100,
+              "m3-qs-apiserver/subscribe/qs-evaluation-mongo": 40100,
+              "m3-qs-apiserver/subscribe/qs-task-normal": 40100,
+              "m3-qs-apiserver/subscribe/qs-task-transaction": 40100,
+              "m3-qs-apiserver/subscribe/qs-ai-command": 40100,
+              "m3-qs-apiserver/subscribe/qs-ai-ack": 40100,
+              "m3-qs-apiserver/subscribe/ai-qs-event": "allowed",
+              "m3-qs-apiserver/authentication/after": "allowed",
+              "m3-qs-worker/authentication/before": "allowed",
+              "m3-qs-worker/publish/qs-ai-command": 40100,
+              "m3-qs-worker/publish/qs-task-transaction": 40100,
+              "m3-qs-worker/publish/ai-qs-event": 40100,
+              "m3-qs-worker/publish/qs-evaluation-mongo": 40100,
+              "m3-qs-worker/publish/iam-sms": 40100,
+              "m3-qs-worker/publish/iam-authz-qs": 40100,
+              "m3-qs-worker/publish/qs-survey-worker": 40100,
+              "m3-qs-worker/publish/qs-task-normal": 40100,
+              "m3-qs-worker/publish/qs-ai-ack": 40100,
+              "m3-qs-worker/publish/qs-evaluation-mysql": 40100,
+              "m3-qs-worker/subscribe/iam-authz-iam": 40100,
+              "m3-qs-worker/subscribe/iam-authz-qs": 40100,
+              "m3-qs-worker/subscribe/qs-survey-worker": "allowed",
+              "m3-qs-worker/subscribe/qs-evaluation-catalog-mongo": 40100,
+              "m3-qs-worker/subscribe/qs-evaluation-mysql": "allowed",
+              "m3-qs-worker/subscribe/qs-evaluation-mongo": "allowed",
+              "m3-qs-worker/subscribe/qs-task-normal": "allowed",
+              "m3-qs-worker/subscribe/qs-task-transaction": "allowed",
+              "m3-qs-worker/subscribe/qs-ai-command": 40100,
+              "m3-qs-worker/subscribe/qs-ai-ack": 40100,
+              "m3-qs-worker/subscribe/ai-qs-event": 40100,
+              "m3-qs-worker/authentication/after": "allowed",
+              "m3-qs-mongo/authentication/before": "allowed",
+              "m3-qs-mongo/publish/qs-ai-command": 40100,
+              "m3-qs-mongo/publish/qs-task-transaction": 40100,
+              "m3-qs-mongo/publish/ai-qs-event": 40100,
+              "m3-qs-mongo/publish/qs-evaluation-mongo": "allowed",
+              "m3-qs-mongo/type/qs-evaluation-mongo": 40014,
+              "m3-qs-mongo/publish/iam-sms": 40100,
+              "m3-qs-mongo/publish/iam-authz-qs": 40100,
+              "m3-qs-mongo/publish/qs-survey-worker": 40100,
+              "m3-qs-mongo/publish/qs-task-normal": 40100,
+              "m3-qs-mongo/publish/qs-ai-ack": 40100,
+              "m3-qs-mongo/publish/qs-evaluation-mysql": 40100,
+              "m3-qs-mongo/subscribe/iam-authz-iam": 40100,
+              "m3-qs-mongo/subscribe/iam-authz-qs": 40100,
+              "m3-qs-mongo/subscribe/qs-survey-worker": 40100,
+              "m3-qs-mongo/subscribe/qs-evaluation-catalog-mongo": 40100,
+              "m3-qs-mongo/subscribe/qs-evaluation-mysql": 40100,
+              "m3-qs-mongo/subscribe/qs-evaluation-mongo": 40100,
+              "m3-qs-mongo/subscribe/qs-task-normal": 40100,
+              "m3-qs-mongo/subscribe/qs-task-transaction": 40100,
+              "m3-qs-mongo/subscribe/qs-ai-command": 40100,
+              "m3-qs-mongo/subscribe/qs-ai-ack": 40100,
+              "m3-qs-mongo/subscribe/ai-qs-event": 40100,
+              "m3-qs-mongo/authentication/after": "allowed",
+              "m3-ai/authentication/before": "allowed",
+              "m3-ai/publish/qs-ai-command": 40100,
+              "m3-ai/publish/qs-task-transaction": 40100,
+              "m3-ai/publish/ai-qs-event": "allowed",
+              "m3-ai/type/ai-qs-event": 40014,
+              "m3-ai/publish/qs-evaluation-mongo": 40100,
+              "m3-ai/publish/iam-sms": 40100,
+              "m3-ai/publish/iam-authz-qs": 40100,
+              "m3-ai/publish/qs-survey-worker": 40100,
+              "m3-ai/publish/qs-task-normal": 40100,
+              "m3-ai/publish/qs-ai-ack": 40100,
+              "m3-ai/publish/qs-evaluation-mysql": 40100,
+              "m3-ai/subscribe/iam-authz-iam": 40100,
+              "m3-ai/subscribe/iam-authz-qs": 40100,
+              "m3-ai/subscribe/qs-survey-worker": 40100,
+              "m3-ai/subscribe/qs-evaluation-catalog-mongo": 40100,
+              "m3-ai/subscribe/qs-evaluation-mysql": 40100,
+              "m3-ai/subscribe/qs-evaluation-mongo": 40100,
+              "m3-ai/subscribe/qs-task-normal": 40100,
+              "m3-ai/subscribe/qs-task-transaction": 40100,
+              "m3-ai/subscribe/qs-ai-command": "allowed",
+              "m3-ai/subscribe/qs-ai-ack": "allowed",
+              "m3-ai/subscribe/ai-qs-event": 40100,
+              "m3-ai/authentication/after": "allowed"
+            },
+            "scope": "isolated_transport_acl_and_broker_type_only",
+            "denial_path": "direct_signed_send_receive_rpc",
+            "diagnostic": null
+          },
+          "scope": "reviewed production names in an isolated Broker; production resources and runtime unchanged"
+        }
+      },
+      "failure_diagnostics": null,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "probe_receipts": [
+        {
+          "pid": 5300,
+          "exit_code": 0,
+          "events": [
+            {
+              "event": "exited"
+            }
+          ]
+        },
+        {
+          "pid": 26233,
+          "exit_code": 0,
+          "events": [
+            {
+              "event": "exited"
+            }
+          ]
+        }
+      ],
+      "limits": [
+        "Isolated transport ACL/type/TLS and provisioning proof only",
+        "No production resources, private-network reachability, host startup, system login or business acceptance"
+      ],
+      "source_sha256": {
+        "scripts/rocketmq/txprobe/probe.py": "b5f27e022eecebc64efa39240ef86434e42fbb9a9aa167f399552cdf2f8cfcd0",
+        "scripts/rocketmq/txprobe/pyproject.toml": "6642f4068e06891da5a285613df59fd4e5a8ea3326a3387dc0f77ceef3d33919",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8"
+      },
+      "sdk_source_sha256": {
+        "transport/rocketmq/internal/driver/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "transport/rocketmq/internal/driver/UPSTREAM.json": "f03c5707da004a2a9d6ddff9f278e37fa4c7c1da4eff96c742cddc7a7156a9f5",
+        "transport/rocketmq/internal/driver/UPSTREAM.md": "d1a4e80ee956dc53097160ec0d0fe05c92005164741f3aa17c7866c1161a8a32",
+        "transport/rocketmq/internal/driver/client.go": "5fcf31e8d9b895cb8fce3f36e1a29b008716b77cafb5427c2ab996a72d598a4b",
+        "transport/rocketmq/internal/driver/client_manager.go": "47d8110bd92821831c5f35ac18ca673eabc14cd99c2cbf4b1215dfd760677782",
+        "transport/rocketmq/internal/driver/client_manager_mock.go": "f60e472d5976e0ee2bd95edfc9103a658e6859ece93de038fedb5830c618997d",
+        "transport/rocketmq/internal/driver/client_mock.go": "06317cad9e81b3de1874f091a347f8826d2852b6972f7d21d8a66202316bf8f1",
+        "transport/rocketmq/internal/driver/client_options.go": "dfc39180a3e6e7ff73bef35e2b6c081b8b146e3ff7b28ef3243e9890802d726d",
+        "transport/rocketmq/internal/driver/config.go": "6bb496d157434ae44a5561dfb74954317498e4b1fa6f463ca98c25ae0f891dc1",
+        "transport/rocketmq/internal/driver/conn.go": "ddc881ee0346e83fb442fc0639c979d4c9d6ca3b0e4d080713d1e95259167d48",
+        "transport/rocketmq/internal/driver/conn_options.go": "04f8897abe3b8f0233c8dfc488bb83712aaf7884c0bcec89ca5343d641fafdeb",
+        "transport/rocketmq/internal/driver/consumer.go": "d00714fb983466e5125108f773193bedd46bc02abd3375b54a7dc220cd89e1e7",
+        "transport/rocketmq/internal/driver/consumer_options.go": "412726d80edae989202a3ff08fcb9637e1925562fd479dde5e0e851312ab5604",
+        "transport/rocketmq/internal/driver/consumer_service.go": "5f4a2ac1e26b45f8d890f2f14ad72201a338e3afdf9f702e6e6d1e8b22c63f7f",
+        "transport/rocketmq/internal/driver/error.go": "c431fd3f5f934efb216415d3e0238fa384b6df2c8d9377e565e269c53f78b452",
+        "transport/rocketmq/internal/driver/lite_push_consumer.go": "aab7d261fec9995afd921b1cb28f254873273a03f574685ead2ac453e3fcec0e",
+        "transport/rocketmq/internal/driver/lite_push_consumer_mock.go": "e2e2d8a92371f7b637d60c7e4f927dfa69ca872d0fb684d760b3b139ab139b2c",
+        "transport/rocketmq/internal/driver/lite_push_consumer_options.go": "4e6aaa5f42cf33f805144c3a7e9519429ceec788447eb60a44c9dcb66adcf252",
+        "transport/rocketmq/internal/driver/loadBalancer.go": "afe4e4bacec2b7e2939e606428d24e5b031ef65eb8a93beafb05682eca2cb030",
+        "transport/rocketmq/internal/driver/log.go": "7bbb7e701892676723000a50871507caa0772b1de43ac84669f8f8691f24ecf0",
+        "transport/rocketmq/internal/driver/message.go": "cd6eba5cbde4f68ef17540b7f61523a1b9da559cb4ddcbbbc4ee1351542b65c2",
+        "transport/rocketmq/internal/driver/message_id.go": "6797a1e2a89a78016c4048ce8bc97ab8bc60a55010694b982a14ce7eb0f0e5cc",
+        "transport/rocketmq/internal/driver/message_id_codec.go": "17f7407b417bd8996885bca27c4e2a00dfc8f3bb6c8e2f121f4395fe4b192404",
+        "transport/rocketmq/internal/driver/meter-snapshot.patch": "6ef016fea37d26c6fb68e42be257ac17ed1a2bf4c52cc5aceb031984480ddc5b",
+        "transport/rocketmq/internal/driver/metric.go": "26602085dad817668fc61a8dc068d95235a27acc8e464e3c278c678cb4e85aa5",
+        "transport/rocketmq/internal/driver/metric_snapshot_test.go": "96b01224318f554a34048521a98591605aacd95c7f4b108622a9d47481f33145",
+        "transport/rocketmq/internal/driver/name_resolver.go": "8aaa51e30fdd0cdbe358076eb749ac67cbbc51107a559d729108218498e9fe37",
+        "transport/rocketmq/internal/driver/process_queue.go": "6d51d1a8c44a6c575a2c8ad2155b12e95027872a295cd7df822761604c9ef39f",
+        "transport/rocketmq/internal/driver/producer.go": "c612e515ec7bc22ea740ae0ba4274f76a0f14d7377618c63a786bbe8d1752bb5",
+        "transport/rocketmq/internal/driver/producer_options.go": "6aca132e75aae5558d3fd455e02909730b64302176f0d34be4e12ec9b2e2da57",
+        "transport/rocketmq/internal/driver/publishing_message.go": "b6c06219bae4d0fbc9e961f41d9dd56769d21053b42f6ff1f2629da7c13e3fce",
+        "transport/rocketmq/internal/driver/push_consumer.go": "6e44d25c71a71fa0a78a9daeb3be97568d83ab9404450e892eb3710e2d6d6480",
+        "transport/rocketmq/internal/driver/push_consumer_options.go": "07d936b21a433a641a51f0a17ef549b4bf0c90719e86a29f9d848d1d054a6578",
+        "transport/rocketmq/internal/driver/receive_rate_limiter.go": "7fe507eb88bc008f030e91852ca2d34b680f61add71e1ebb60c62e34cb851716",
+        "transport/rocketmq/internal/driver/recovery-receipt.patch": "e26f3f3fe8bd90be7f14fc321a863835bd73ff24b0c030ed182bb0573b9b2d20",
+        "transport/rocketmq/internal/driver/recovery_receipt_test.go": "bcbef6be377901fcc7e57f016322785367a973b02802bae5434ba42fc4ae3eaa",
+        "transport/rocketmq/internal/driver/rpc-options.patch": "36d11b883260db6e34239945eab069b7939da7114d975455f052b373cca5ea8b",
+        "transport/rocketmq/internal/driver/rpc_client.go": "2a3b6fbcead76c2783eec328ae2a5780ce764cf84bffbadb33c5abfa9377f326",
+        "transport/rocketmq/internal/driver/rpc_client_mock.go": "4c8c6d6af3576fe62824f9759948f5a85dde38ee5c7148c7f81e6a0d04006619",
+        "transport/rocketmq/internal/driver/rpc_client_options.go": "485f4368467c18a31344318f60d98dde43f2044d4493192857ec6f53459705d8",
+        "transport/rocketmq/internal/driver/rpc_options_test.go": "3ff0643718025721e98ad211c1dfac359f260f875ba6668be93fb15fc49604b2",
+        "transport/rocketmq/internal/driver/settings-snapshot.patch": "eb044f4b390fb2c8f6e2d7b5f7bb1ab6d778603addd955885c7338e61090f13f",
+        "transport/rocketmq/internal/driver/settings_snapshot_test.go": "5c035cb112655bf91927a6babe31e60da59da3660f6cda7a1528ab02e2d52e3b",
+        "transport/rocketmq/internal/driver/simple_consumer.go": "56956743825905af9526a955bb52d3945a2abb796713e6aa9107b25a205073a1",
+        "transport/rocketmq/internal/driver/simple_consumer_options.go": "d24c4def53f00b324eb4cea6d498d87e2127f0f65d20ce1e0c48a116aca88f72",
+        "transport/rocketmq/internal/driver/simple_thread_pool.go": "f6e3ec76238822539484d9c0c96b3761741d8adf979f6bf46616012dcf42bd64",
+        "transport/rocketmq/internal/driver/trace.go": "1a480254170cb1d09533ce00e6e696d6868189e560115d5108a28dd8efb3cdf9",
+        "transport/rocketmq/internal/driver/transaction-runtime.patch": "61affa8e1fe5d3f7b58d546c72404698846ebaff8d1eabea269b35620984d771",
+        "transport/rocketmq/internal/driver/transaction.go": "bc94eee19e04793dc994fd52a604aeb5fd84160a4190107f08c4bea9fa781d09",
+        "transport/rocketmq/internal/driver/transaction_bounds_test.go": "60c8011b79bfe569b525207697e5325314c81e8609dd4b2fbbc4a80de95a9f91",
+        "transport/rocketmq/internal/driver/user_agent.go": "74cb4a11296820f6a60c0d390137b40ac1670e57e56825e4cc9d3ca5d616926a",
+        "transport/rocketmq/internal/faultproxy/main.go": "1051678d433bc9d641d64e5c24d0246138adce5363a82f3a81286daaaedf67bf",
+        "transport/rocketmq/internal/faultproxy/packets.go": "645e17aca3894f30a40533dda97b7846a12475ef106cd3505dc912b05ea0701c",
+        "transport/rocketmq/internal/faultproxy/packets_test.go": "aca130340460bef6abf200b3d0c07b00d8bd828994a9342dbcae119c443f9778",
+        "transport/rocketmq/internal/faultproxy/rpc.go": "b0c252d4172d6257bb06225f1f9ff7483aa8a509c60d1d59aa4420f324e5da48",
+        "transport/rocketmq/internal/faultproxy/rpc_test.go": "bedb1508ce29330d5c015404de7077772f417ac389aa09bcc2c8261691b2acbc",
+        "transport/rocketmq/internal/sdkprobe/consumer.go": "2c1dd4b6ddc3828ba01e3fb2bccb0e1243be95929a0cafa3ede78b6574d3a4f9",
+        "transport/rocketmq/internal/sdkprobe/main.go": "6a178543cc20c7891cea94d93037112e927f1dbd0f002292e4beb97d17346fc1",
+        "transport/rocketmq/internal/txprobe/main.go": "ea5572b786829b5c3d1e4bb827c1aa12567956545b29588b09d4f7ef299ab5e4"
+      },
+      "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "resource_harness_sha256": {
+        "scripts/rocketmq/m3_resources.py": "dc1754b54563ce127b1b78391ca2d6c6d400a11480e6d61aac31ad09902bb88f",
+        "scripts/rocketmq/m3_resource_probe.py": "ed52534835cbe9632e5f265ab980de55cd3684b7d0f3ef72ddf348158639732f",
+        "components/rocketmq/serverd-routes-m3-v2.json": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+        "scripts/rocketmq/txprobe/uv.lock": "26e46451991bd928f2236d291904e02d60a44f5b8211910123b99ca764d026a8",
+        "components/rocketmq/Dockerfile": "171d9a7167c3855e15e4384a3bf43b976717b43a281aee03f0acb2064b3aa2bd",
+        "components/rocketmq/entrypoint.sh": "536eb511021a3e89840e07ff39ad52420813bfca52202f3584344f650c246da6",
+        "components/rocketmq/proxy.json.example": "390d28d554c98ccc4da21603eef0b0496bddf75eb76bad603ffd8be982bdc654"
+      },
+      "go_version": "go1.25.12",
+      "go_runtime_patch": "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)",
+      "harness_sha256": {
+        "scripts/rocketmq/ci-transactions.py": "aebc21daf2f1095e86af989b972f6fdaef6566c6c91dfe26732436de5033c9b4",
+        "scripts/rocketmq/render.py": "d2a91207804ca9f85ce15511edfbd1858a087e78141a5bd9668745d8cc72f4dc",
+        "components/rocketmq/docker-compose.yml": "a930c0286ed6749d4926cde886edc44b126a2c03fe67aba3d5bb9604f6258996",
+        "scripts/rocketmq/sdk_acceptance.py": "d89cdec6947464d9293d1f3ddb9bd261af6f0ae185b1842a7d813be43bf4c0c0",
+        "scripts/rocketmq/v2_acceptance.py": "ff986093d2943a0ad98d4aa240739bcf1dedab38704e56ed1f2ce63affd9650f",
+        "scripts/rocketmq/sdk_faults.py": "5f6dc071f3b9f5359b021439299b630053eb8c646c37cd38dc2db77cfc3490b7",
+        "scripts/rocketmq/sdk_limits.py": "422102ce805c2985c80e60d5a0fa0dd291ac5d44f13aa7f451709a94f9d250e1",
+        "scripts/rocketmq/audit_transaction_limit.py": "aa2f8538940034c35e0baf8bbfd328cfe6840442beaf1545e31b52405e3a02e9",
+        "scripts/rocketmq/routes.py": "914e784eb4ad841d6a0ac4b1d83e41454c5269a6cb3c13796e8b3b616cf77e31",
+        "scripts/rocketmq/provision_v2.py": "dd91c82de4a8e632da708aa504f8cabe50cc85115a59f6a8ba87e642542ee31e",
+        "scripts/rocketmq/route_read_probe.py": "474defeb3f2c28753b19bff285b97f41587611793c06f62cf21c2c54e6c791d3",
+        "scripts/rocketmq/failure_diagnostics.py": "e71357ab08fee26165f0c1f74e1dc4f6e833826ced7e8aa349235c434aa84261",
+        "scripts/rocketmq/published_runtime.py": "365f38543d08911917da4d185d500fe5d78e355326b829367876bb9f98d7414a"
+      },
+      "go_probe_sha256": null
+    }
+  },
+  "superseded_review_inputs": {
+    "index": "rocketmq-m3-candidate-input-index-20261024.json",
+    "packet": "rocketmq-m3-source-review-packet-20261024.json",
+    "reason": "Manifest mapping corrected at 131a721. Historical hashes remain unchanged; neither artifact authorizes production execution."
+  },
+  "production": false
+}

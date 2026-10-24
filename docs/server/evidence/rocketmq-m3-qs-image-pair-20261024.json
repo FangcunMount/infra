@@ -1,0 +1,266 @@
+{
+  "schema": "m3-qs-image-pair-audit/v1",
+  "run_id": 40082780271,
+  "report_sha256": "3cf6fc9a86176e722e93f0b07ed00f976611dfd97ea88bcee2adca3ea65fde39",
+  "infra_sha": "e67f2eb30418ce57cf4b8ff5e4580750aa242f40",
+  "passed": 9,
+  "failed": 0,
+  "skipped": 0,
+  "cases": {
+    "exact_qs_collection_archive_loaded": true,
+    "exact_qs_worker_archive_loaded": true,
+    "exact_qs_api_archive_loaded": true,
+    "original_migration_pair_pre_m3": true,
+    "full_mysql_mongo_restore_with_uuid_pre_m3": true,
+    "original_migration_pair_current": true,
+    "full_mysql_mongo_restore_with_uuid_current": true,
+    "original_binding_qs_mysql": true,
+    "original_binding_qs_mongo": true
+  },
+  "restores": [
+    {
+      "profile": "pre_m3",
+      "mysql_raw_equal": false,
+      "mysql_canonical_sha256": "2fc12585a9ae0748b4d643760247836b55ba851d054be225ddcf3c9ac7c3c27d",
+      "mysql_columns_sha256": "6c6356b024476f854092f6f3663c47595b112295952de5ee20d2b7276faae3fc",
+      "mongo_snapshot_sha256": "fb27a10a4d27b0e3890c5dadf6e5aa14fda36f6d2478e7fe20964c3b9ee7d846",
+      "mongo_collection_count": 14,
+      "all_parts_equal": true
+    },
+    {
+      "profile": "current",
+      "mysql_raw_equal": false,
+      "mysql_canonical_sha256": "313549ff62a675849bf4a3588c39d874761583f7836d67a25379d5d29d52ea9f",
+      "mysql_columns_sha256": "dfc5cb8f0c1a2cacd82d7aec98692a0d995816c912acf0ebdb860eaf1eb0d0e6",
+      "mongo_snapshot_sha256": "2c14f08b596a74f22a1efe233cc2ec8c4a4c8a0bd5af37f43288e1cb235923d7",
+      "mongo_collection_count": 21,
+      "all_parts_equal": true
+    }
+  ],
+  "cleanup": {
+    "compose_down_succeeded": true,
+    "private_directory_removed": true,
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true
+  },
+  "sources_unchanged": true,
+  "pre_m3_schema": {
+    "journal_force_used": false,
+    "mongo": 40,
+    "mysql": 105,
+    "original_templates_applied": true,
+    "production": false,
+    "profile": "pre_m3",
+    "resources_sha256": "c37b639804391172b2209f11c7056b4867309a31054af3c5d3f740cd6145b86d",
+    "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+  },
+  "current_schema": {
+    "journal_force_used": false,
+    "mongo": 43,
+    "mysql": 110,
+    "original_templates_applied": true,
+    "production": false,
+    "profile": "current",
+    "resources_sha256": "f0ddf4125b7f39435c5cfed88ca7a4bd89be2362bc3bf7d7394c9dc6c82d6812",
+    "source_sha": "d3269bda672b97582edb691ca4f924484c653822"
+  },
+  "candidates": {
+    "qs-collection": {
+      "target": "qs-collection",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "image_config_id": "sha256:dbcebb7bea62a6be77752d527d6a72783b21d55528f7c80254f7793b551206fa",
+      "archive_sha256": "237d0a4e393862487a9e29e103c8e431fa243ee51dc34ff080d55a7c48306a6c"
+    },
+    "qs-worker": {
+      "target": "qs-worker",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "image_config_id": "sha256:17fda12476fa7c8a82164e04a17cc57aa05a62ed3e06768f0f5aa5fa5757fca4",
+      "archive_sha256": "ed2379ab2aee17d5b4392f1784c324639a4424cc6d3d5c1aa196b4e706571fbc"
+    },
+    "qs-api": {
+      "target": "qs-api",
+      "source_sha": "d3269bda672b97582edb691ca4f924484c653822",
+      "image_config_id": "sha256:65f60f29a2e509c63b07600b3eab1f353529256e8f8e03750bc064b08b9cee2e",
+      "archive_sha256": "c89a884c1739aa17f627359cd870bd4fc6b2ac17ae392baaab7e8e945388caf3"
+    }
+  },
+  "original_offline_tool_sha256": "94de163f78f1bac8cc323338b279c2bf1eb7f2a222a8c05977fce3c5e6ac6d47",
+  "production": false,
+  "t29_complete": false,
+  "mysql_show_create_reference": "https://bugs.mysql.com/bug.php?id=110825",
+  "merge_status": "merged",
+  "pull_request": 245,
+  "merge_sha": "e73fe4aab2b978c73808f6b73f777f8036f613b2",
+  "changed_files_source_merge_equal": [
+    {
+      "path": ".github/workflows/rocketmq-final-images.yml",
+      "sha256": "8b1244cc1878455e1f60744bfd287751910c8bb22f97ce83123c9be242c07520"
+    },
+    {
+      "path": "scripts/rocketmq/image_fixtures/qs_init_test.go",
+      "sha256": "06b9b990c11855b8492df487e68e987819afe1763491df0a48f0a75bd1cf136f"
+    },
+    {
+      "path": "scripts/rocketmq/image_start_fixture.py",
+      "sha256": "79fb25521457dccd41f3ecc47ec5168a4b050c62937c925410a9c1decaab3f2a"
+    },
+    {
+      "path": "scripts/rocketmq/qs_image_pair.py",
+      "sha256": "0a30f5b89cdb6f166e0d835bde543a7f4112cfea4f34e43910dfe616c7053c81"
+    },
+    {
+      "path": "scripts/rocketmq/test_qs_image_pair.py",
+      "sha256": "7868139da9aae12425b18da4c5bbba1163f1c9d0709272efba15f5e4ec050d94"
+    }
+  ],
+  "ci": {
+    "schema": "m3-qs-image-pair-final-gates/v1",
+    "infra_sha": "e67f2eb30418ce57cf4b8ff5e4580750aa242f40",
+    "checks_succeeded": 10,
+    "passed": 451,
+    "failed": 0,
+    "skipped": 0,
+    "reports": [
+      {
+        "report": "rocketmq-complete-sdk-0-f4d497367d1702f192ac68ef79e4874213ba7dd5/rocketmq-complete-sdk.json",
+        "sha256": "90d390a5e5288bb311b97fe119a30f50ef5a5ff869e1ec7dc2037e19680dba19",
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0,
+        "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-complete-sdk-1-f4d497367d1702f192ac68ef79e4874213ba7dd5/rocketmq-complete-sdk.json",
+        "sha256": "436dfdc4ad063ef01ebcb62bb591f2c5a059daf334be576687b20f2ff552ca5b",
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0,
+        "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-m2-go-sdk-f4d497367d1702f192ac68ef79e4874213ba7dd5/rocketmq-m2-go-sdk.json",
+        "sha256": "9eb7bae36571c6ccd211a4dcf67cd3906ea25a115839b06cd94dfa5919e341f7",
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0,
+        "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-m2-transactions-f4d497367d1702f192ac68ef79e4874213ba7dd5/rocketmq-m2-transactions.json",
+        "sha256": "aa94bedb1b3fd37b94bb848850877afcd78c02810ed81b1e8a67283922b86724",
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-m3-resources-f4d497367d1702f192ac68ef79e4874213ba7dd5/rocketmq-m3-resources.json",
+        "sha256": "4943a054d7730ad6f01e5b6f6cb638608710433c438b0194368e305abb5745d5",
+        "passed": 134,
+        "failed": 0,
+        "skipped": 0,
+        "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-native-dlq-audit-f4d497367d1702f192ac68ef79e4874213ba7dd5/rocketmq-native-dlq-audit.json",
+        "sha256": "f95c97cec625cf59db05c9c6742fdbc5d6fc38ce2bd19c90530edf44e4e447f0",
+        "passed": 8,
+        "failed": 0,
+        "skipped": 0,
+        "sdk_sha": null,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-packet-faults-0-f4d497367d1702f192ac68ef79e4874213ba7dd5/rocketmq-packet-faults.json",
+        "sha256": "dddc3371976bb290d0efcfff3ab6b5584b8d29b598979379a1ad53f0d3c2f9a2",
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0,
+        "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-packet-faults-1-f4d497367d1702f192ac68ef79e4874213ba7dd5/rocketmq-packet-faults.json",
+        "sha256": "bfaf58dee49f87c7e40e480a67da46578aeebc8f9fcb96314d19ff6f862e04ab",
+        "passed": 46,
+        "failed": 0,
+        "skipped": 0,
+        "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-public-sdk-0-f4d497367d1702f192ac68ef79e4874213ba7dd5/rocketmq-public-sdk.json",
+        "sha256": "3261d8930a3439e1e8600e75b6bbaf593d2f395454da77a1e3f5fa8ba5d9645f",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "report": "rocketmq-public-sdk-1-f4d497367d1702f192ac68ef79e4874213ba7dd5/rocketmq-public-sdk.json",
+        "sha256": "058ecae1692c2c41392f99bd7efa3a0b858eb62b87e82fafdf55c5ff5ed321ad",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ]
+  }
+}
