@@ -95,7 +95,7 @@ QS441合并20cd2184，当前镜像源码b75d4a52与main完整tree一致；新三
 
 [40103917422](https://github.com/FangcunMount/infra/actions/runs/40103917422)使用原固定五镜像、独立v3启停回执、原维护CLI与唯一协调目录，18/0/0；原范围恢复/不可变交付、四owner Checker/封新写、七进程正常关闭与零运行期DDL逐项通过，[证据](evidence/rocketmq-m3-c1-actual-images-passed-20261024.json)。原生成列/字符集保护保持精确比较；不通过篡改journal、修改成功hash或忽略事实差异取得通过。
 
-当前窗口46.85秒只代表受控数据上的离线维护/启动，不代替生产副本/体量/传输、旧责任排空交接或system。最终配置/执行包仍为未冻结，实际只读核验入口已获准沿用现有SSH；当前入口状态见下节，旧快照只作路径参考。
+当前窗口46.85秒只代表受控数据上的离线维护/启动，不代替生产副本/体量/传输、旧责任排空交接或system。最终配置/执行包仍为未冻结，实际只读核验入口已获准沿用现有SSH；已恢复并完成本次白名单回读，见最新生产核验节，旧快照只作路径参考。
 
 原Go CD脚本已支持显式普通RocketMQ provider/endpoint等选项，但本轮事务owner映射、原事务绑定与分阶段准入以完整M3 JSON及受审环境/命令为准。不能把旧NSQ/provider/Outbox或自动迁移环境变量原样叠在新JSON上；最终参数回读必须核对实际优先级、保留非MQ预算/TLS/存储设置，并分别冻结封新写与验收阶段输入。自动生产CD继续暂停，当前不直接调用旧自动DDL/fallback发布路径。
 
@@ -118,3 +118,47 @@ QS441合并20cd2184，当前镜像源码b75d4a52与main完整tree一致；新三
 | 最终输入与交付 | 原配置及覆盖项私有摘要、封新写/验收/开准入各阶段输入、目标镜像不可变引用、传输与回读、唯一协调目录和具名执行/恢复步骤 | 前置事实取得后冻结；不填CI值 |
 
 连接恢复后先完成以上事实回读，再生成可审阅生产执行清单。当前生产运行快照未取得、`runtime_configuration_frozen=false`、`execution_bundle_complete=false`、`production_approved=false`；T29不打勾。生产DDL/Topic/ACL/provider/部署仍需按最终具名清单确认，system验收及48小时另记。
+
+
+## 2026-10-25：生产只读核验后的实际差异
+
+Tailscale/原SSH入口已恢复。本次经`mac-mini-old` ProxyJump，只读核验serverA/B/C/D及Mac mini；[脱敏回执](evidence/rocketmq-m3-production-readonly-20261025.json)与私有原材料摘要分别保存。serverA/serverD核验前后容器ID、image、启动时间、状态、重启计数及原锁均一致。未执行生产部署、DDL、Topic/ACL/provider变更、排空、采集配置reload或Broker启动。
+
+| 范围 | 实际回读 | 执行包处理 |
+| --- | --- | --- |
+| 业务实例/预算 | serverA为IAM、API、AI及2个collection；serverD为3个worker。IAM1GiB/1CPU、API1GiB/2CPU、AI768MiB/0.75CPU、collection各320MiB/1CPU、worker各768MiB/1CPU；worker并发48 | 保留实际副本、资源与原连接池/预算；旧七进程/IAM512MiB证明不冒充生产八进程 |
+| MySQL | 同一Aliyun RDS 8.0.36；IAM40/clean、QS105/clean、AI0040；均VERIFY_IDENTITY TLS连接成功 | IAM新起点需补原工具支持及镜像演练；QS105实际schema通过，原保护/恢复/业务验收记录仍须定位，不能直接勾选前置 |
+| Mongo | serverC 7.0.31、rs0可写主库，QS40/clean | 现有7.0.37隔离证明保留；补实际7.0.31候选验证，不擅自升级生产Mongo |
+| RocketMQ | 已安装5.5.1；Broker退出143、无OOM，停止时间2026-10-23 21:15:59（北京时间）；NameServer运行；serverD本次可用内存约2GiB | 不将已安装视为健康；停止原因未确认。持久配置48小时保留，实际有效回查参数/ACL因Broker停止未读取；单独冻结恢复步骤并取得具名批准后再操作 |
+| v2资源 | 持久Topic快照未发现`rmq2_` Topic | 由infra在批准的T31显式provision并回读；本次没有创建或转换Topic |
+| NSQ | 活动worker业务/失败订阅当前depth/in-flight/deferred为0；另有444个无客户端授权订阅有消息，channel depth合计4364 | 该合计包含fanout副本，不是4364个独立事件；逐项责任表私有保存，未认定孤儿、未删除/清空，T32另做具名处置 |
+| 监控 | Prometheus/Grafana健康；RocketMQ target down且BrokerUnavailable告警触发；serverD发现文件为空，3个worker target缺失，固定发现SSH探针超时；当前M3协议规则未加载 | 不能勾选监控完成；修复发现入口/加载M3规则另纳入具名变更，不在serverD新增常驻代理 |
+| CD | IAM/QS生产暂停=true、AI自动部署=false | 保持暂停；源码合并不触发生产切换 |
+
+IAM [PR149](https://github.com/FangcunMount/iam/pull/149)仅补离线工具40起点：复用原000041，再执行42–45；40保护独立绑定八个新增对象，41仍保留原审计表在范围外；新增审计有任何记录即拒绝40恢复。模板摘要包含41–45，旧计划需重新导出审核。SDK稳定tag/业务写链不变。本地race/vet/编译/文档/actionlint、三档真实MySQL及8项源码CI已过，PR149正常合并0ce9cb21，证据见总表；该源码补丁不代替新固定镜像和完整候选演练。
+
+本次回读Proxy配置时，输出筛选遗漏导致管理员凭据进入工具结果，已按暴露处理。后续提取仅允许精确字段白名单，公开回执校验不包含该凭据；生产凭据尚未改动，**更换与旧凭据拒绝验证须纳入上线前具名清单**，不能仅改初始化JSON后宣称现存用户已完成更换。
+
+当前仍`runtime_configuration_frozen=false`、`execution_bundle_complete=false`、`production_approved=false`，T29不打勾。下一步先收口IAM40原生/合并，再更新候选镜像、实际Mongo/副本演练和最终配置；Broker/监控恢复、原生参数/授权回读及生产具名变更分别记账。
+
+105原独立上线保护/完成回执已在Mac mini复核，14行原保护与摘要匹配、103/40→105/40和6实例原发布记录保留；原QS台账仍有TaskID正向业务验收未完成，本次不代签。新候选演练使用的Mongo7.0.31固定digest已从原镜像回读为`mongo@sha256:43fddee7e532a920f3dfdee9e8f4834398c155c26bcb92d790cc1cd3c630fc40`，生产镜像未变更。
+
+只读续查确认serverD自身Tailscale同样为`NeedsLogin`、Online=false，控制平面连接被重置、无peer状态；Mac mini固定发现入口100.118.164.39的SSH超时与此一致。已恢复的是MacBook连接，不能据此推定serverD已恢复。该私网恢复需要单独具名操作/合法重新认证，尚未执行，不改公网或监控白名单来绕过。
+
+
+### 待独立确认：仅恢复serverD原Tailnet登录
+
+本清单已准备，**未批准/未执行**。生产只读授权不包含网络状态变更。目标为serverD（82.157.204.239），经Mac mini固定跳板、现有SSH key，以root调用原已安装Tailscale1.104.2；不安装或重启任何服务。原偏好为CorpDNS=false、RouteAll=false、RunSSH=false、NetfilterMode=2（on）、ShieldsUp=false、NoSNAT=false，无advertise routes/exit node；原私有prefs摘要记录在回执中。数字2对on的映射以[该固定版本源码](https://github.com/tailscale/tailscale/blob/v1.104.2/types/preftype/netfiltermode.go)核对，命令flags已用目标机`login --help`只读核对。
+
+批准后先再次比较原偏好和状态；若不符，停止并重新冻结。使用现有控制面和以下显式设置发起合法网页认证（不使用聊天提供的密码/auth key，不删除旧状态）：
+
+```sh
+tailscale login --login-server=https://controlplane.tailscale.com \
+  --accept-dns=false --accept-routes=false --ssh=false --netfilter-mode=on \
+  --snat-subnet-routes=true --shields-up=false --advertise-routes= \
+  --advertise-exit-node=false --exit-node= --timeout=2m
+```
+
+登录链接仅用于用户正常完成现有Tailnet认证。超时/认证失败保留原状态和错误类别，不循环重试、切换控制面、重置状态或改公网白名单。成功后只读回读Running/Online、原100.118.164.39地址、原偏好、原3worker容器/锁及Mac mini固定发现SSH/Prometheus targets；地址或身份变化时停止，不自动改配置/ACL/防火墙。控制面/ACL配置本次不变；认证可能按Tailnet既有策略分配节点身份，不能事先保证原地址保持。
+
+此次恢复清单仅涵盖主机重新认证和回读。Broker启动、管理员凭据更换、v2 Topic/ACL、数据库迁移及M3业务切换仍按各自具名清单处理；该步骤成功不等于T29/T30完成。
