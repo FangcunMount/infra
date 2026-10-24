@@ -71,12 +71,14 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
-          if docker inspect "$NATIVE_NAME" >/dev/null 2>&1; then
-            label=$(docker inspect --format '{{index .Config.Labels "codex.native-owner"}}' "$NATIVE_NAME")
+          owned=$(timeout 10 docker ps --all --quiet --filter "name=^/${NATIVE_NAME}$")
+          if [ -n "$owned" ]; then
+            label=$(docker inspect --format '{{index .Config.Labels "codex.native-owner"}}' "$owned")
             test "$label" = "$NATIVE_OWNER"
-            timeout 30 docker rm --force "$NATIVE_NAME" >/dev/null
+            timeout 30 docker rm --force "$owned" >/dev/null
           fi
-          if docker inspect "$NATIVE_NAME" >/dev/null 2>&1; then exit 1; fi
+          remaining=$(timeout 10 docker ps --all --quiet --filter "name=^/${NATIVE_NAME}$")
+          test -z "$remaining"
           echo true > mongo-container-removed.txt
       - name: Nonempty zero-skip storage report
         if: always()

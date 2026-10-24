@@ -145,14 +145,7 @@ func (s *Mongo) Snapshot(ctx context.Context, l Locator, index [32]byte) (out Sn
 	}
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
-	store, err := txmongo.New(s.db, s.binding)
-	if err != nil {
-		return out, err
-	}
-	if err = store.ValidateSchema(ctx); err != nil {
-		return out, err
-	}
-	identity, err := s.primaryIdentity(ctx)
+	identity, err := s.prepare(ctx)
 	if err != nil {
 		return out, err
 	}
@@ -171,6 +164,22 @@ func (s *Mongo) Snapshot(ctx context.Context, l Locator, index [32]byte) (out Sn
 			out = Snapshot{}
 		}
 	}()
+	return s.snapshotIn(sc, identity, l, index)
+}
+
+func (s *Mongo) prepare(ctx context.Context) ([32]byte, error) {
+	store, err := txmongo.New(s.db, s.binding)
+	if err != nil {
+		return [32]byte{}, err
+	}
+	if err = store.ValidateSchema(ctx); err != nil {
+		return [32]byte{}, err
+	}
+	return s.primaryIdentity(ctx)
+}
+
+// snapshotIn reads only, borrowing this operation's private root session.
+func (s *Mongo) snapshotIn(sc mongo.SessionContext, identity [32]byte, l Locator, index [32]byte) (out Snapshot, err error) {
 	var binding struct {
 		Store  string `bson:"store_id"`
 		Epoch  string `bson:"writer_epoch"`
