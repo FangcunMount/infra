@@ -21,6 +21,7 @@ from routes import physical_topic_v2,consumer_group_v2
 from start_boundary import initialize, _encoded
 from cutover_step import execute, load_step
 from mysql_commit_proxy import MySQLCommitProxy
+from recovery_fixture_store import SQLFixtureStore
 
 
 def require(value,stage):
@@ -116,6 +117,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     source=original or dict(owner="iam.mysql",store_id="sdk-disposable",writer_epoch="sdk-epoch-1",database="txprobe",user="txprobe",
         operation_id="op-"+identity,branch_id="branch-0",fence=1,business_count_sql="SELECT COUNT(*) FROM sdk_business",
         writer="fixed Go SDK source probe, not IAM business host",scope="one iam.mysql terminal commit, not the complete four-host/fault matrix")
+    db=source.get('adapter') or SQLFixtureStore(sql,source['business_count_sql'])
     root=directory/'managed-cli';root.mkdir(mode=0o700)
     def write(name,value):
         path=root/name
@@ -136,8 +138,9 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     # Source fixture installs only its owned governance table explicitly. The
     # CLI's constructor/start/preview never performs schema or binding writes.
     resource=repo/'tools/rocketmq-native-recovery/internal/authority/testdata/iam-000045-governance.sql'
-    require(hashlib.sha256(resource.read_bytes()).hexdigest()=='0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a','frozen_host_governance_schema_required')
-    if original is None:sql(resource.read_text())
+    if original is None:
+        require(hashlib.sha256(resource.read_bytes()).hexdigest()=='0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a','frozen_host_governance_schema_required')
+        sql(resource.read_text())
     owner_manifest=copy.deepcopy(manifest)
     owner_manifest['accounts']={name:dict(owner='',publish=[],subscriptions=[]) for name in
         ('m3-iam','m3-qs-apiserver','m3-qs-worker','m3-qs-mongo','m3-ai')}
@@ -152,7 +155,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     command=[docker,'--host','unix:///var/run/docker.sock','--config',str(docker_config),'exec','-i',broker,*java[java.index('java'):],'NativeHalfManaged']
     native_script.write_text('#!/bin/bash\nset -euo pipefail\nexec '+shlex.join(command)+' < "$1"\n');native_script.chmod(0o600)
     config=dict(schema='m3-native-recovery-config/v1',owner=source['owner'],store_id=source['store_id'],writer_epoch=source['writer_epoch'],
-        database_kind='mysql',database_uri=f"{source['user']}:{password}@tcp(127.0.0.1:{proxy.port if proxy else mysql_port})/{source['database']}",database_name=source['database'],database_ca_pem='',
+        database_kind=source.get('database_kind','mysql'),database_uri=source['database_uri'] if 'database_uri' in source else f"{source['user']}:{password}@tcp(127.0.0.1:{proxy.port if proxy else mysql_port})/{source['database']}",database_name=source['database'],database_ca_pem='',
         endpoint=f'127.0.0.1:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
         native_admin_script=str(native_script),native_admin_script_sha256=hashlib.sha256(native_script.read_bytes()).hexdigest(),
         native_admin_nameserver='nameserver:9876',native_admin_broker='127.0.0.1:10911')
@@ -164,7 +167,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         source_bundle_sha256=source_bundle,data_owner='synthetic-fixture-data-owner',recovery_owner='synthetic-fixture-recovery-owner')
     binding_sha=hashlib.sha256(_encoded(binding)).hexdigest();initialize(op,binding,binding_sha)
     def governed():
-        return sql('SELECT HEX(notice_key),HEX(evidence_sha256),status,IFNULL(HEX(resolution_receipt_sha256),\'\') FROM messaging_native_limit_notices ORDER BY notice_key;')
+        return db.governance()
     def step(arguments,name,kind):
         script=root/(name+'.sh')
         # Actual coordinator-derived env avoids a self-referential script/plan
@@ -216,9 +219,9 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     require(governed()==before,'broker_confirmation_auto_resolved_governance')
     passed('published_sdk_actual_native_recheck_current_rpc_private_receipt_and_true_drain')
     consumer.wait('received',identity,decision=source['wire_hash'] if original else None,timeout=100)
-    require(sql('SELECT ('+source['business_count_sql']+'),(SELECT COUNT(*) FROM rm_tx_request),(SELECT COUNT(*) FROM rm_tx_execution),(SELECT COUNT(*) FROM rm_tx_witness);')=='1\t1\t1\t1','recovery_repeated_business_or_sent_new_half')
+    require(db.counts()=='1\t1\t1\t1','recovery_repeated_business_or_sent_new_half')
     passed('original_consumer_identity_and_one_original_business_root_preserved')
-    first_audit=sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;")
+    first_audit=db.audit()
     require(first_audit.startswith('commit_confirmed\t'),'positive_sdk_primary_audit_required')
     approval['action']='resolve';approval['receipt_sha256']=receipt_sha
     resolve_path,resolve_sha=write('synthetic-resolution-approval.json',approval)
@@ -245,7 +248,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         proof['governance_wire_faults']=list(proxy.events)
     resolved=governed();require("resolved" in resolved and receipt_sha.upper() in resolved,'approved_exact_governance_commit_required')
     step(['verify-resolution',*common_resolve],'verify-original','forward-repair')
-    require(governed()==resolved and first_audit==sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;"),'verification_refreshed_first_evidence_or_sdk_audit')
+    require(governed()==resolved and first_audit==db.audit(),'verification_refreshed_first_evidence_or_sdk_audit')
     passed('independently_reviewed_actual_receipt_resolves_only_governance_and_fresh_verifies')
     # Same request is consumed, even in a newly issued forward-repair step.
     try:step(['recover',*common],'reject-reused-request','forward-repair')

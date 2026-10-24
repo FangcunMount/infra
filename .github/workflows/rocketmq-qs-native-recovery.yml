@@ -1,0 +1,110 @@
+name: RocketMQ QS dual original host native recovery
+on:
+  pull_request:
+    paths:
+      - tools/rocketmq-native-recovery/**
+      - scripts/rocketmq/ci-native-recheck.py
+      - scripts/rocketmq/managed_recovery_acceptance.py
+      - scripts/rocketmq/qs_recovery_acceptance.py
+      - scripts/rocketmq/recovery_fixture_store.py
+      - scripts/rocketmq/test_recovery_fixture_store.py
+      - scripts/rocketmq/test_qs_recovery_acceptance.py
+      - scripts/rocketmq/probes/native-recheck/**
+      - scripts/rocketmq/cutover_step.py
+      - .github/workflows/rocketmq-qs-native-recovery.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  GOTOOLCHAIN: local
+jobs:
+  actual-qs-dual-original-primary-recovery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: tools/rocketmq-native-recovery/go.sum
+      - name: Compile frozen CLI before fixture/checkouts modify build metadata
+        working-directory: tools/rocketmq-native-recovery
+        run: |
+          set -euo pipefail
+          umask 077
+          test -z "$(git status --porcelain)"
+          go build -trimpath -buildvcs=true -ldflags "-X main.sourceSHA=$(git rev-parse HEAD)" -o "$RUNNER_TEMP/native-recovery" ./cmd/native-recovery
+          go build -trimpath -buildvcs=true -o "$RUNNER_TEMP/host-observer" ./cmd/host-observer
+          "$RUNNER_TEMP/native-recovery" version
+          go list -m -json github.com/FangcunMount/reliable-messaging > "$RUNNER_TEMP/native-recovery-module.json"
+          python3 - <<'PY'
+          import json,os
+          x=json.load(open(os.environ['RUNNER_TEMP']+'/native-recovery-module.json'))
+          assert x['Version']=='v0.5.0-rocketmq-tx.4' and not x.get('Replace')
+          assert x['Sum']=='h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI='
+          PY
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 04757bd3212ca961d8eaec22ecd3560101111e18
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: 9301bf8044cd826aa9f34088e4b97899a12618d3
+          path: .qs-acceptance
+      - name: Restore host module and race build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-qs-native-recovery-go1.25.12-race-${{ hashFiles('.qs-acceptance/go.sum') }}
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Pure fixture guards
+        run: |
+          python3 -m unittest discover -s scripts/rocketmq -p test_native_recheck.py
+          python3 -m unittest discover -s scripts/rocketmq -p test_qs_recovery_acceptance.py
+      - name: Fixed Broker archive verification
+        run: bash scripts/rocketmq/fetch-release.sh
+      - name: Fresh fixed isolated Broker
+        run: docker build --no-cache -t rocketmq-managed-recovery:5.5.1 components/rocketmq
+      - name: Real exhausted half, compiled CLI, SDK RPC and separate governance approval
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 scripts/rocketmq/ci-native-recheck.py --sdk "$PWD/.sdk-acceptance" \
+            --image rocketmq-managed-recovery:5.5.1 --managed-tool "$RUNNER_TEMP/native-recovery" --qs-host "$PWD/.qs-acceptance" --host-observer "$RUNNER_TEMP/host-observer" --report qs-native-recovery.json
+      - name: Nonempty exact dual owner recovery and cleanup
+        if: always()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          x=json.load(open('qs-native-recovery.json'))
+          assert x['passed']==23 and x['failed']==x['skipped']==0
+          p=x['proof']
+          assert p['qs_original_host']['source_sha']=='9301bf8044cd826aa9f34088e4b97899a12618d3'
+          assert p['qs_original_host']['receipt']['passed']==7 and p['qs_original_host']['source_clean']
+          assert p['qs_original_host']['owned_databases_removed']
+          assert set(p['qs_owner_recoveries'])=={'qs.mysql','qs.mongo'}
+          for owner,evidence in p['qs_owner_recoveries'].items():
+            r=evidence['managed_recovery']
+            assert r['approved_governance_resolved'] and r['actual_sdk_stats']['RecoveryCommitConfirmed']>0
+            assert r['actual_sdk_stats']['Stopped'] and r['private_observations']>0
+            assert r['original_counts']==dict(business=1,requests=1,executions=1,witnesses=1)
+          assert x['cleanup']==dict(broker_parameters_restored=True,probe_process_groups_drained=True,compose_down_succeeded=True,project_containers_remaining=False,project_networks_remaining=False,existing_containers_unchanged=True,existing_networks_unchanged=True,private_fixture_directory_removed=True)
+          print('actual QS dual original roots: 23 passed, 0 failed, 0 skipped; owned dependencies removed')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: qs-native-recovery-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.run_attempt }}
+          path: qs-native-recovery.json
+          if-no-files-found: error
+          retention-days: 14
