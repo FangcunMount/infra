@@ -12,7 +12,7 @@ import secrets
 import shutil
 import time
 
-from ai_image_start import AI_SHA, KEY_PROGRAM, PYTHON, messaging as ai_messaging, metrics as ai_metrics
+from ai_image_start import AI_SHA, KEY_PROGRAM, OLD_HEAD, PYTHON, messaging as ai_messaging, metrics as ai_metrics
 from audit_transaction_limit import write_private
 from iam_image_start import configuration as iam_configuration, protocol_metrics, seed_receipt, source_failure_markers
 from image_start_fixture import require
@@ -67,7 +67,13 @@ class FiveImageFixture(QSPairFixture):
         command += extra or []
         command += [self.image]
         if component != 'ai': command += ['--config=/fixture/runtime.json']
-        self.run(command); self.applications[component] = name
+        if hasattr(self, 'boundary'):
+            require(not extra, 'no_unfrozen_runtime_extra_flags')
+            require(dict(alias=alias, memory=memory, cpus=cpus, **({'environment': fields} if fields else {}))
+                    == self.boundary.specs[component], 'actual_start_spec_differs_from_frozen_plan')
+            self.boundary.start(component)
+        else:
+            self.run(command); self.applications[component] = name
         actual = json.loads(self.run(['docker', 'inspect', name]).stdout)[0]
         budget = dict(memory_bytes=actual['HostConfig']['Memory'], nano_cpus=actual['HostConfig']['NanoCpus'])
         require(budget == dict(memory_bytes=int(memory.removesuffix('m')) * 1024 * 1024, nano_cpus=int(float(cpus) * 1_000_000_000)), 'actual_runtime_budget_differs')
@@ -116,12 +122,16 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     for key in ('sources', 'candidate', 'qs_initializer', 'iam_initializer', 'consumer_contract', 'report'):
         p.add_argument('--' + key.replace('_', '-'), type=Path, required=True)
+    p.add_argument('--startup-receipt', type=Path)
     args = p.parse_args(); require(not args.report.exists(), 'new_report_required')
+    cutover = args.startup_receipt is not None
     repo = Path(__file__).resolve().parents[2]
     report = dict(schema='m3-five-actual-image-startup-trial/v2', passed=0, failed=0, skipped=0,
                   production=False, system_acceptance=False, combined_cutover_rehearsal_complete=False,
                   c1_cutover_barrier_exercised=False, cases={}, sources=SOURCES,
                   scope='actual processes, required IAM/AI and closed SDK owners; worker HTTP/Redis health and catalog consistency, no business or per-worker delivery proof')
+    if cutover:
+        report.update(schema='m3-five-actual-image-cutover/v1', scope='owned old-schema full restore training, original offline upgrades and actual seven-process C1/30-minute start; no production/system/business claim')
     f = FiveImageFixture(repo, report); run = f.run
     f.applications = {}; f.images = {}; f.private_dirs = {}
     def case(name): report['cases'][name] = True
@@ -175,18 +185,19 @@ def main():
         f.stage = 'original_current_qs_pair'; f.select('api')
         shutil.copyfile(args.qs_initializer, f.private / 'qs-pair-init'); (f.private / 'qs-pair-init').chmod(0o755); f.ownership(2000)
         qs_db = 'qs_m3_image_start_' + secrets.token_hex(6)
-        report['qs_schema'] = f.prepare(qs_db, 'current'); case('original_current_qs_pair_prepared')
+        report['qs_schema'] = f.prepare(qs_db, 'pre_m3' if cutover else 'current'); case('original_pre_m3_qs_pair_prepared' if cutover else 'original_current_qs_pair_prepared')
         env = dict(QS_OFFLINE_MYSQL_DSN=f'root:{f.password}@tcp(mysql:3306)/{qs_db}?parseTime=true', QS_OFFLINE_MONGO_URI='mongodb://mongo:27017/?replicaSet=image-proof')
         common = ['--mysql-database', qs_db, '--mongo-database', qs_db, '--timeout', '30s']
-        for owner in ('qs.mysql', 'qs.mongo'):
-            plan = '/fixture/' + owner + '.json'
-            f.once('/fixture/qs-migrate-offline', common + ['--binding-action', 'preview', '--binding-plan', plan, '--binding-operation-id', 'owned-startup-trial',
-                   '--binding-owner', owner, '--binding-store-id', 'isolated-' + owner.replace('.', '-') + '-primary', '--binding-writer-epoch', 'm3-1'], environment=env)
-            digest = f.once('/usr/bin/sha256sum', [plan], network=False).split()[0]
-            f.once('/fixture/qs-migrate-offline', common + ['--binding-action', 'apply', '--binding-plan', plan, '--binding-reviewed-sha256', digest, '--binding-writers-excluded'], environment=env)
-            verified = json.loads(f.once('/fixture/qs-migrate-offline', common + ['--binding-action', 'verify', '--binding-plan', plan, '--binding-reviewed-sha256', digest], environment=env))
-            require(verified['verified'] is True, 'original_binding_readback_required')
-        case('original_qs_dual_binding_verified')
+        if not cutover:
+            for owner in ('qs.mysql', 'qs.mongo'):
+                plan = '/fixture/' + owner + '.json'
+                f.once('/fixture/qs-migrate-offline', common + ['--binding-action', 'preview', '--binding-plan', plan, '--binding-operation-id', 'owned-startup-trial',
+                       '--binding-owner', owner, '--binding-store-id', 'isolated-' + owner.replace('.', '-') + '-primary', '--binding-writer-epoch', 'm3-1'], environment=env)
+                digest = f.once('/usr/bin/sha256sum', [plan], network=False).split()[0]
+                f.once('/fixture/qs-migrate-offline', common + ['--binding-action', 'apply', '--binding-plan', plan, '--binding-reviewed-sha256', digest, '--binding-writers-excluded'], environment=env)
+                verified = json.loads(f.once('/fixture/qs-migrate-offline', common + ['--binding-action', 'verify', '--binding-plan', plan, '--binding-reviewed-sha256', digest], environment=env))
+                require(verified['verified'] is True, 'original_binding_readback_required')
+            case('original_qs_dual_binding_verified')
         f.ownership(os.getuid())
         f.stage = 'original_iam_schema_and_selection'; f.select('iam')
         iam_db = 'iam_m3_image_start_' + secrets.token_hex(6); f.sql('CREATE DATABASE `' + iam_db + '`;')
@@ -195,24 +206,34 @@ def main():
         env['IAM_IMAGE_FIXTURE_DSN'] = f'root:{f.password}@tcp(mysql:3306)/{iam_db}?parseTime=true&multiStatements=true'
         report['iam_controlled_seed'] = seed_receipt(f.once('/fixture/iam-init', [], environment=env))
         cli_env = {'IAM_APISERVER_MYSQL_' + k: v for k, v in dict(HOST='mysql', PORT='3306', USERNAME='root', PASSWORD=f.password, DATABASE=iam_db, TLS_MODE='disabled').items()}
-        for action in ('schema', 'select'):
-            plan = '/fixture/' + action + '.json'
-            f.once('/app/iam-maintenance', ['m3-messaging', '--action', action, '--store-id', 'isolated-iam-primary', '--writer-epoch', 'm3-1', '--export-plan', plan], environment=cli_env)
-            digest = f.once('/usr/bin/sha256sum', [plan], network=False).split()[0]
-            f.once('/app/iam-maintenance', ['m3-messaging', '--apply', '--writers-excluded', '--plan', plan, '--reviewed-sha256', digest], environment=cli_env)
-        case('original_iam_schema45_and_binding_selected')
+        if not cutover:
+            for action in ('schema', 'select'):
+                plan = '/fixture/' + action + '.json'
+                f.once('/app/iam-maintenance', ['m3-messaging', '--action', action, '--store-id', 'isolated-iam-primary', '--writer-epoch', 'm3-1', '--export-plan', plan], environment=cli_env)
+                digest = f.once('/usr/bin/sha256sum', [plan], network=False).split()[0]
+                f.once('/app/iam-maintenance', ['m3-messaging', '--apply', '--writers-excluded', '--plan', plan, '--reviewed-sha256', digest], environment=cli_env)
+            case('original_iam_schema45_and_binding_selected')
         f.ownership(os.getuid())
         f.stage = 'original_ai_schema_and_binding'; f.select('ai')
         ai_db = 'ai_m3_image_start_' + secrets.token_hex(6); f.sql('CREATE DATABASE `' + ai_db + '`;')
         ai_env = dict(QS_AI_ENVIRONMENT='production', QS_AI_DATABASE_TLS_MODE='DISABLED', HOME='/tmp',
                       QS_AI_DATABASE_URL=f'mysql+asyncmy://root:{f.password}@mysql:3306/{ai_db}', GRPC_DEFAULT_SSL_ROOTS_FILE_PATH='/fixture/mq-ca.crt')
-        f.once(PYTHON, ['-m', 'alembic', 'upgrade', 'head'], environment=ai_env); f.ownership(10001)
-        command = ['-m', 'qs_ai.maintenance.transaction_binding']
-        f.once(PYTHON, command + ['--action', 'preview', '--plan', '/fixture/binding.json', '--operation-id', 'owned-startup-trial', '--store-id', 'isolated-ai-primary', '--writer-epoch', 'm3-1'], environment=ai_env)
-        digest = f.once('/usr/bin/sha256sum', ['/fixture/binding.json'], network=False).split()[0]
-        for action in ('apply', 'verify'):
-            f.once(PYTHON, command + ['--action', action, '--plan', '/fixture/binding.json', '--reviewed-sha256', digest] + (['--writers-excluded'] if action == 'apply' else []), environment=ai_env)
-        case('original_ai_schema43_and_binding_verified')
+        f.once(PYTHON, ['-m', 'alembic', 'upgrade', OLD_HEAD if cutover else 'head'], environment=ai_env); f.ownership(10001)
+        if not cutover:
+            command = ['-m', 'qs_ai.maintenance.transaction_binding']
+            f.once(PYTHON, command + ['--action', 'preview', '--plan', '/fixture/binding.json', '--operation-id', 'owned-startup-trial', '--store-id', 'isolated-ai-primary', '--writer-epoch', 'm3-1'], environment=ai_env)
+            digest = f.once('/usr/bin/sha256sum', ['/fixture/binding.json'], network=False).split()[0]
+            for action in ('apply', 'verify'):
+                f.once(PYTHON, command + ['--action', action, '--plan', '/fixture/binding.json', '--reviewed-sha256', digest] + (['--writers-excluded'] if action == 'apply' else []), environment=ai_env)
+            case('original_ai_schema43_and_binding_verified')
+        if cutover:
+            f.sql(f"""INSERT INTO `{ai_db}`.messaging_outbox
+                (producer,destination,message_id,body_sha256,body,wire,wire_sha256,
+                 topic,kind,organization_id,aggregate_key,aggregate_sequence,ordered,
+                 requires_receipt,stage,attempts,available_at,created_at,error_code)
+                VALUES('qs-ai','qs-server','fixture-held',SHA2(0x00ff03,256),0x00ff03,0x00ff04,
+                 SHA2(0x00ff04,256),'old.fixture',1,7,'fixture-held',1,0,1,'held',7,
+                 UTC_TIMESTAMP(6),UTC_TIMESTAMP(6),'controlled')""")
         # Existing original AI package generates keys; all identities and bytes
         # are frozen before application startup, with no model/provider calls.
         f.ownership(os.getuid()); write_private(f.private / 'credentials.json', accounts['m3-ai'])
@@ -228,7 +249,6 @@ def main():
         f.sql("SET GLOBAL log_output='TABLE'; SET GLOBAL general_log='ON';")
         # Mongo profiler is private and counts attempts; auth is not enabled in
         # this owned fixture, so this is not a production privilege proof.
-        install_mongo_audit(f.mongo, qs_db)
         cfg = iam_configuration(yaml.safe_load((args.sources / 'iam/configs/apiserver.prod.yaml').read_text()), iam_db, passwords['iam'])
         cfg['grpc']['mtls'].update(**{'cert-file': '/fixture/iam-apiserver.crt', 'key-file': '/fixture/iam-apiserver.key', 'ca-file': '/fixture/service-ca.crt'})
         cfg['messaging']['credentials_file'] = '/fixture/iam-credentials.json'
@@ -239,16 +259,31 @@ def main():
             write_private(f.private_dirs[component] / 'runtime.json', cfg)
         for component in ('iam', 'api', 'collection', 'worker'):
             report['configuration_sha256'][component] = hashlib.sha256((f.private_dirs[component] / 'runtime.json').read_bytes()).hexdigest()
-        for component in f.private_dirs:
-            f.select(component); f.ownership(10001 if component == 'ai' else 2000)
-        f.stage = 'actual_iam_with_mtls_start'; f.start('iam', alias='iam-apiserver', memory='512m', cpus='1')
-        f.ready('iam', 9080, '/healthz'); report['iam_metrics'] = f.ready('iam', 9080, '/metrics', protocol_metrics); case('actual_iam_ready_and_paused_checker_live')
-        f.stage = 'actual_readonly_ai_start'
         msg = ai_messaging()
         ai_env.update(QS_AI_DATABASE_URL=f'mysql+asyncmy://ai_runtime:{passwords["ai"]}@mysql:3306/{ai_db}',
             QS_AI_MESSAGING=json.dumps(msg), QS_AI_GRPC=json.dumps(dict(bind_address='0.0.0.0:50061', access_address='qs-apiserver:9090',
                 ca_file='/fixture/service-ca.crt', cert_file='/fixture/ai.crt', key_file='/fixture/ai.key')),
             QS_AI_GENERATION__ENABLED='true', QS_AI_EVALUATION__ENABLED='true', QS_AI_DEEPSEEK_API_KEY='owned-unused-fixture-key', QS_AI_ZHIPU_API_KEY='owned-unused-fixture-key')
+        for component in f.private_dirs:
+            f.select(component); f.ownership(10001 if component == 'ai' else 2000)
+        if cutover:
+            from image_cutover_offline import prepare
+            specs = dict(iam=dict(alias='iam-apiserver',memory='512m',cpus='1'),
+                ai=dict(alias='ai',memory='768m',cpus='0.75',environment=ai_env),
+                api=dict(alias='qs-apiserver',memory='1024m',cpus='2'),
+                collection=dict(alias='qs-collection',memory='320m',cpus='1'))
+            specs.update({name:dict(alias=name,memory='768m',cpus='1') for name in ('worker1','worker2','worker3')})
+            admin_env = dict(ai_env, QS_AI_DATABASE_URL=f'mysql+asyncmy://root:{f.password}@mysql:3306/{ai_db}')
+            prepare(f,args,dict(iam=iam_db,qs=qs_db,ai=ai_db),admin_env,specs)
+            case('actual_full_scope_restore_before_window')
+            case('original_iam_schema45_and_binding_selected')
+            case('original_qs_dual_binding_verified')
+            case('original_ai_schema43_and_binding_verified')
+            case('original_offline_upgrades_inside_single_c1')
+        install_mongo_audit(f.mongo, qs_db)
+        f.stage = 'actual_iam_with_mtls_start'; f.start('iam', alias='iam-apiserver', memory='512m', cpus='1')
+        f.ready('iam', 9080, '/healthz'); report['iam_metrics'] = f.ready('iam', 9080, '/metrics', protocol_metrics); case('actual_iam_ready_and_paused_checker_live')
+        f.stage = 'actual_readonly_ai_start'
         f.start('ai', alias='ai', memory='768m', cpus='0.75', environment=ai_env)
         f.ready('ai', 8000, '/readyz'); report['ai_metrics'] = f.ready('ai', 8000, '/metrics', ai_metrics); case('actual_readonly_ai_ready_and_paused_checker_live')
         f.stage = 'actual_qs_api_start'; f.start('api', alias='qs-apiserver', memory='1024m', cpus='2')
@@ -260,6 +295,10 @@ def main():
             component = 'worker' + str(index); f.images[component] = f.images['worker']; f.private_dirs[component] = f.private_dirs['worker']
             f.start(component, alias=component, memory='768m', cpus='1')
             f.ready(component, 9092, '/healthz'); case('actual_' + component + '_http_healthy_original_concurrency48')
+        if cutover:
+            report['actual_cutover'] = f.boundary.finish()
+            report['c1_cutover_barrier_exercised'] = True
+            case('actual_seven_process_c1_and_thirty_minute_window')
         f.stage = 'actual_five_image_shutdown'; report['processes'] = {}
         for component in ('worker3', 'worker2', 'worker1', 'collection', 'api', 'ai', 'iam'):
             timeout = 210 if component == 'ai' else 60
@@ -273,6 +312,7 @@ def main():
         report['mongo_ddl_audit'] = read_mongo_audit(f.mongo, qs_db)
         report['mongo_runtime_ddl_attempts'] = report['mongo_ddl_audit']['attempts']
         require(int(ddl) == report['mongo_runtime_ddl_attempts'] == 0, 'startup_shutdown_ddl_attempted'); case('actual_all_runtime_start_shutdown_no_ddl_attempts')
+        if cutover: report['combined_cutover_rehearsal_complete'] = True
     except Exception as error:
         report.update(failed=1, failure_stage=f.stage, failure_kind=type(error).__name__)
         if re.fullmatch(r'[a-z][a-z0-9_]{1,100}', str(error)): report['failure_reason'] = str(error)
@@ -281,6 +321,8 @@ def main():
             source = args.sources / ('ai' if component == 'ai' else 'iam' if component == 'iam' else 'qs')
             report['processes'][component] = f.diagnostic(component, source)
     finally:
+        if hasattr(f, 'boundary'):
+            report['coordinator_status'] = f.boundary.status()
         report['passed'] = len(report['cases'])
         try: f.cleanup()
         except Exception: report['failed'] = 1; report.setdefault('failure_stage', 'owned_cleanup')

@@ -127,6 +127,7 @@ class ActualImageBoundary:
     def __init__(self, fixture, *, scope, protection_sha256, restore_receipt_sha256, source_bundle_sha256, specs):
         ci_guard(os.environ)
         self.f = fixture; self.root = fixture.directory; self.directory = self.root / 'actual-cutover'; self.plans = {}
+        self.specs = json.loads(json.dumps(specs))
         require(set(scope) == {'iam.mysql', 'qs.mysql', 'qs.mongo', 'ai.mysql'} and set(specs) == set(COMPONENTS), 'complete_four_store_seven_process_scope_required')
         require(not fixture.applications, 'no_actual_runtime_before_coordinator_required')
         for owner, selected in scope.items():
