@@ -1,0 +1,135 @@
+{
+  "schema": "m3-actual-image-c1-first-failure/v1",
+  "run_id": 40097426163,
+  "report_sha256": "d6cb31605787330f2f62af91a76bf121c964fcb92a3604ca161915291be54391",
+  "report": {
+    "schema": "m3-five-actual-image-cutover/v1",
+    "passed": 3,
+    "failed": 1,
+    "skipped": 0,
+    "production": false,
+    "system_acceptance": false,
+    "combined_cutover_rehearsal_complete": false,
+    "c1_cutover_barrier_exercised": false,
+    "cases": {
+      "actual_source_registry_consumers_match_manifest": true,
+      "all_five_exact_archives_loaded": true,
+      "original_pre_m3_qs_pair_prepared": true
+    },
+    "sources": {
+      "iam": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+      "qs": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+    },
+    "scope": "owned old-schema full restore training, original offline upgrades and actual seven-process C1/30-minute start; no production/system/business claim",
+    "infra_sha": "08821c6dc9ab11ec0fe11ec6fb8a975af60079e0",
+    "original_qs_consumer_count": 1,
+    "original_qs_consumer_contract": {
+      "consumers": [
+        {
+          "id": "modelcatalog.hot_rank_projection",
+          "runtime": "apiserver",
+          "event_type": "answersheet.submitted",
+          "topic": "qs.evaluation.lifecycle",
+          "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+          "delivery": "durable_outbox",
+          "outbox_profile": "mongo_domain_events"
+        }
+      ],
+      "schema": "qs-original-consumer-contract/v1",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "original_qs_consumer_contract_sha256": "f65853c2aee20108a26d53c7e65d4234a5d66235df4440355a48e1d90f883a4a",
+    "candidates": {
+      "iam": {
+        "target": "iam",
+        "source_sha": "954ad9dee2f71a51151b696ec05d5cb90cc65b50",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:bd74af691fb467da4ae805e40afd4fd560ae02bc86142e730a723647d9d10c99",
+        "archive_sha256": "bbb9cdcf58968a39ccef8e30f04dcb653334b813c78f509439567139326eb746"
+      },
+      "qs-api": {
+        "target": "qs-api",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:c1c1093a411dba90bb47ad7dabe8dc50b21a0fed633efef4cb94eeae909886c4",
+        "archive_sha256": "3c2aefb67ea9f50b7acea8d232a05d7ba0296173e75ecf2ebeb3b52bf2dab71b"
+      },
+      "qs-collection": {
+        "target": "qs-collection",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:07e13f2fcd1bd59cdc14a81e0334c73a8b5b7939d235b056254378f939af37ce",
+        "archive_sha256": "a3140df0c4ba98fbefd82f6da06ef4f4cb4867e0eb63fd37cfa91b9ca6cc77cb"
+      },
+      "qs-worker": {
+        "target": "qs-worker",
+        "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+        "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+        "image_config_id": "sha256:98b5b635aa72cae96899a5289dea4aa038bcd25ba1eeebe9f944682f4e3a0d98",
+        "archive_sha256": "907abca7e5b2b410ab4383bead344d2c08d01fac9e0e7ba54fbf00b4eee21b25"
+      },
+      "ai": {
+        "target": "ai",
+        "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+        "builder_source_sha": "9833d67e631587b908df00e2cc21371403912326",
+        "image_config_id": "sha256:1f7b33c49780d0345ed235d87da2fa55a0518fac4088e3c34d85cfaf34cb1849",
+        "archive_sha256": "6b8c584ef4dbbf6821c9cfcbad73c33d78dd76967385021677145a7a8242c4d3"
+      }
+    },
+    "dependency_image_ids": {
+      "mysql": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+      "rocketmq": "sha256:3cc5d91e5a96db52a2edb161b7948e4e4cf6fb28bb3eb712931628aa7f80c7fd",
+      "mongo": "sha256:9fae371f0280c30c40523dbda5edda96be4c8722cd1272d2ac79f699b2d955d3",
+      "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+    },
+    "resources": {
+      "version": 2,
+      "operations": 53,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true
+    },
+    "qs_schema": {
+      "journal_force_used": false,
+      "mongo": 40,
+      "mysql": 105,
+      "original_templates_applied": true,
+      "production": false,
+      "profile": "pre_m3",
+      "resources_sha256": "c37b639804391172b2209f11c7056b4867309a31054af3c5d3f740cd6145b86d",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+    },
+    "iam_controlled_seed": {
+      "controlled_seed": true,
+      "legacy_drain_claimed": false,
+      "publication_intents_created": false,
+      "schema_version": 41,
+      "seed_events_retained": 2,
+      "witnesses_created": false
+    },
+    "configuration_sha256": {
+      "iam": "8f4ecaa247933f740a6c42a024ebff0a707936f48ef603afa7087866cb38c516",
+      "api": "0e756e5bb23f3cfd24f908e937fe8507f12041254ee04ec16092a17e5298eef5",
+      "collection": "0a092b5b954fdc6f174665a83165511b078afb3280d272aa4f7907990694dd01",
+      "worker": "832d86320a8629f57a153fd7a938bca962f59e1843b7fd3185c48e02b749d9bb"
+    },
+    "failure_stage": "full_scope_pre_window_protection_and_restore",
+    "failure_kind": "RuntimeError",
+    "failure_reason": "actual_full_scope_restore_readback_differs",
+    "processes": {},
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    },
+    "sources_unchanged": true
+  },
+  "scope": "Full pre-window protection/restore readback mismatch; no C1 coordinator, original offline upgrade or business runtime started. Cause unresolved; keep equality gate and original protection.",
+  "diagnostic_source": "3260414",
+  "targeted_pure_tests": 6,
+  "retry_run_id": 40098200483,
+  "retry_verified": false,
+  "production": false
+}
