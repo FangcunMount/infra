@@ -7648,5 +7648,21 @@
     "completed": true,
     "original_advanced_recovery_completed": false,
     "production_cutover_completed": false
+  },
+  "current_stable_candidate_20261024": {
+    "t26_infra_pr": 233,
+    "infra_sha": "8e1a5f0e43c7dacd5018df3897e1b56cd203ce59",
+    "ai_pr": 222,
+    "ai_native_candidate": "b0cb329af92bd6914c6cf7907f3ce5d64f509bbe",
+    "ai_source_docs_fix": "01c38784ce93c8c6506fd9848dff35eaeb8aa7dd",
+    "ai_first_ci_failed_before_tests": 40062178263,
+    "sdk_pr": 58,
+    "sdk_candidate_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+    "sdk_storage_run": 40062504946,
+    "sdk_public_run": 40062507903,
+    "sdk_complete_run": 40062511606,
+    "stable_published": false,
+    "host_stable_dependencies_changed": false,
+    "production_operations": false
   }
 }
