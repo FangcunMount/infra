@@ -1,0 +1,102 @@
+{
+  "schema": "m3-five-actual-image-cutover/v1",
+  "passed": 19,
+  "failed": 0,
+  "skipped": 0,
+  "infra_sha": "9b50f474833640d7bc0329458c921a7ffd520074",
+  "sources": {
+    "iam": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+    "qs": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+    "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+  },
+  "dependency_versions": {
+    "mysql": "8.0.36",
+    "mongo": "7.0.31"
+  },
+  "actual_up_after_marker": [
+    "iam",
+    "ai",
+    "api",
+    "collection",
+    "collection2",
+    "worker1",
+    "worker2",
+    "worker3"
+  ],
+  "actual_runtime_budgets": {
+    "iam": {
+      "memory_bytes": 1073741824,
+      "nano_cpus": 1000000000
+    },
+    "ai": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 750000000
+    },
+    "api": {
+      "memory_bytes": 1073741824,
+      "nano_cpus": 2000000000
+    },
+    "collection": {
+      "memory_bytes": 335544320,
+      "nano_cpus": 1000000000
+    },
+    "collection2": {
+      "memory_bytes": 335544320,
+      "nano_cpus": 1000000000
+    },
+    "worker1": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 1000000000
+    },
+    "worker2": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 1000000000
+    },
+    "worker3": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 1000000000
+    }
+  },
+  "actual_cutover": {
+    "coordinator_binding_sha256": "9df4fca6c545755d30a8de7df3169d9afbcd9209189b6a629a49e77be1278477",
+    "actual_processes": 8,
+    "poststart_refused": [
+      "old-full-backup",
+      "poststart-offline"
+    ],
+    "elapsed_seconds": 51.02051730599999,
+    "phase": "runtime_start_returned",
+    "production_authorized": false
+  },
+  "coordinator_status": {
+    "phase": "runtime_start_returned",
+    "old_data_restore_eligible": false,
+    "first_start_recorded": true,
+    "first_start_sha256": "5c2bf8e7fa0510def19304dc4b0da0ed6703741be5472993eb59c5ae7ce05c18"
+  },
+  "cleanup": {
+    "compose_down_succeeded": true,
+    "private_directory_removed": true,
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true
+  },
+  "sources_unchanged": true,
+  "mysql_runtime_ddl_attempts": 0,
+  "mongo_runtime_ddl_attempts": 0,
+  "production": false,
+  "system_acceptance": false,
+  "production_backup_retention_verified": false,
+  "run_id": 40117285915,
+  "run_url": "https://github.com/FangcunMount/infra/actions/runs/40117285915",
+  "workflow_conclusion": "success",
+  "report_sha256": "6a6ea2ed494e1e9400c096193d6234e670df83ad100c3da62268753a169594d9",
+  "startup_run_id": 40114698327,
+  "image_run_id": 40114281101,
+  "fixture_pr": 265,
+  "fixture_merged": false,
+  "full_scope_restore_exact": true,
+  "raw_report_modified": false,
+  "m3_completed_tasks": 28,
+  "m3_total_tasks": 36,
+  "scope": "isolated owned controlled data only; no production deployment, RTO or system claim"
+}

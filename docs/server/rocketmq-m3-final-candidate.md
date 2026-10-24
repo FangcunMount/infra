@@ -167,3 +167,15 @@ tailscale login --login-server=https://controlplane.tailscale.com --hostname=ser
 
 
 2026-10-25 B/C后续完成：用户分别完成网页认证，新回读两台Running/Online且health为空，B100.91.31.24/C100.70.252.103保持。全部非身份prefs、B9/C1容器的ID/镜像/启动时间/状态/重启计数及原锁均一致，实际原私网SSH经Mac mini连通。网络重新认证已完成，[回执](evidence/rocketmq-m3-serverd-tailnet-recovery-20261025.json)保留分阶段结果；M3仍28/36，不代签MQ/DDL/业务切换。
+
+
+## 2026-10-25当前候选：生产40起点与八进程
+
+新五镜像由原builder835cf766/40114281101构建，IAM ca59dec4包含40起点补丁，QS b75d4a52、AI ddff86ca保持既定源码；[五份元数据/SDK/UID/归档核验](evidence/rocketmq-m3-production-image-candidates-20261025.json)全部通过。旧954ad9de镜像与41起点七进程C1只保留其原范围证据，新候选须单独验证。
+
+PR265 a06d500对齐实际MySQL8.0.36、Mongo7.0.31固定digest、IAM1GiB及2 collection；新八进程v4启动回执包括9次原worker启停、实际版本与所有资源预算，原v3/7进程不能准入新C1。实际40114698327正在执行；完整新C1、最终实际配置/执行包及生产批准尚未完成，M3仍28/36。
+
+新候选补充：IAM40实际镜像限定保护/恢复40115705962为8/0/0；八进程启动40114698327为16/0/0。首次新C1 40115824172原生19/0/0且8个实际up/正常退出，但汇总仍写死7，工作流严格计数断言失败；原报告保持原样。计数器已改为已验证启动集合长度并新增红绿回归，待修正head的正式C1/源码门禁，不能将该失败工作流签成通过。
+
+
+修正计数后的[完整C1复验40117285915](https://github.com/FangcunMount/infra/actions/runs/40117285915)工作流success，实际19/0/0、八进程计数一致，受控窗口51.02秒；三MySQL/整Mongo原范围保护恢复摘要一致、首次启动屏障及启动后拒绝覆盖有效，八进程正常退出、运行期DDL为0、清理均通过。[回执](evidence/rocketmq-m3-production-c1-20261025.json)保留原报告摘要；不改写首轮失败。当前永久生产镜像引用、实际配置/执行包及具名批准尚未完成，T29仍进行中；隔离配置哈希不冒充生产配置冻结，受控窗口不等于生产RTO。

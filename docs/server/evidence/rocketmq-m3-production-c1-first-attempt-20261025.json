@@ -1,0 +1,42 @@
+{
+  "schema": "m3-production-c1-attempt/v1",
+  "run_id": 40115824172,
+  "source_sha": "a06d500ce712dbf8abaa6470b23e22eec7877d1c",
+  "run_url": "https://github.com/FangcunMount/infra/actions/runs/40115824172",
+  "workflow_conclusion": "failure",
+  "native_report_passed": 19,
+  "native_report_failed": 0,
+  "native_report_skipped": 0,
+  "report_sha256": "9d00a887d53cb135866385178d4108bbbb3f42023f3124eb0e0fa815220d365c",
+  "actual_processes_declared": 7,
+  "actual_up_names": [
+    "iam",
+    "ai",
+    "api",
+    "collection",
+    "collection2",
+    "worker1",
+    "worker2",
+    "worker3"
+  ],
+  "actual_up_count": 8,
+  "actual_clean_process_count": 8,
+  "raw_report_modified": false,
+  "workflow_assertion_expected": 8,
+  "cause": "legacy hardcoded7 in ActualImageBoundary.finish report counter; workflow correctly requires8",
+  "original_first_start_and_restore_guards_passed": true,
+  "window_elapsed_seconds": 52.49482423400002,
+  "cleanup": {
+    "compose_down_succeeded": true,
+    "private_directory_removed": true,
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true
+  },
+  "sources_unchanged": true,
+  "mysql_runtime_ddl_attempts": 0,
+  "mongo_runtime_ddl_attempts": 0,
+  "production_authorized": false,
+  "system_acceptance": false,
+  "m3_completed_tasks": 28,
+  "m3_total_tasks": 36
+}

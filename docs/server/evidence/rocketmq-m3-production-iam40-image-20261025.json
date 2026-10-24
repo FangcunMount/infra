@@ -1,0 +1,31 @@
+{
+  "schema": "m3-iam-actual-image-start/v1",
+  "passed": 8,
+  "failed": 0,
+  "skipped": 0,
+  "cases": {
+    "exact_repaired_stable_archive_loaded": true,
+    "actual_schema40_migrations_with_controlled_authz_seed": true,
+    "original_runtime_image_limited_restore": true,
+    "all_original_business_ddl_and_rows_preserved": true,
+    "original_schema45_and_binding_selected": true,
+    "actual_standard_config_and_live_paused_owner": true,
+    "actual_transaction_shutdown_exit_zero": true,
+    "real_start_and_shutdown_attempted_no_ddl": true
+  },
+  "cleanup": {
+    "application_absent": true,
+    "compose_down_succeeded": true,
+    "private_fixture_directory_removed": true,
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true,
+    "host_source_unchanged": true
+  },
+  "runtime_ddl_attempts": 0,
+  "run_id": 40115705962,
+  "source_sha": "a06d500ce712dbf8abaa6470b23e22eec7877d1c",
+  "iam_source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+  "report_sha256": "929b586a6d0eb903751f7093d88d58d22dcc76b076b68f6ec2ff60f39b93af28",
+  "runtime_or_business_production_authorized": false,
+  "system_acceptance": false
+}

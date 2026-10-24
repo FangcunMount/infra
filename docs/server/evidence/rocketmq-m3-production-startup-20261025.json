@@ -1,0 +1,471 @@
+{
+  "schema": "m3-production-shaped-startup/v1",
+  "source_sha": "a06d500ce712dbf8abaa6470b23e22eec7877d1c",
+  "run_id": 40114698327,
+  "run_url": "https://github.com/FangcunMount/infra/actions/runs/40114698327",
+  "report_sha256": "8fc677692be3c56d33c35480cd44ead645bb8291f8209e54ef74c9f29a93652e",
+  "passed": 16,
+  "failed": 0,
+  "skipped": 0,
+  "profile": "m3-five-actual-image-startup-trial/v4",
+  "sources": {
+    "iam": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+    "qs": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+    "ai": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+  },
+  "actual_runtime_budgets": {
+    "iam": {
+      "memory_bytes": 1073741824,
+      "nano_cpus": 1000000000
+    },
+    "ai": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 750000000
+    },
+    "api": {
+      "memory_bytes": 1073741824,
+      "nano_cpus": 2000000000
+    },
+    "collection": {
+      "memory_bytes": 335544320,
+      "nano_cpus": 1000000000
+    },
+    "collection2": {
+      "memory_bytes": 335544320,
+      "nano_cpus": 1000000000
+    },
+    "worker1": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 1000000000
+    },
+    "worker2": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 1000000000
+    },
+    "worker3": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 1000000000
+    }
+  },
+  "dependency_versions": {
+    "mysql": "8.0.36",
+    "mongo": "7.0.31"
+  },
+  "processes": {
+    "worker3": {
+      "Status": "exited",
+      "ExitCode": 0,
+      "OOMKilled": false
+    },
+    "worker2": {
+      "Status": "exited",
+      "ExitCode": 0,
+      "OOMKilled": false
+    },
+    "worker1": {
+      "Status": "exited",
+      "ExitCode": 0,
+      "OOMKilled": false
+    },
+    "collection2": {
+      "Status": "exited",
+      "ExitCode": 0,
+      "OOMKilled": false
+    },
+    "collection": {
+      "Status": "exited",
+      "ExitCode": 0,
+      "OOMKilled": false
+    },
+    "api": {
+      "Status": "exited",
+      "ExitCode": 0,
+      "OOMKilled": false
+    },
+    "ai": {
+      "Status": "exited",
+      "ExitCode": 0,
+      "OOMKilled": false
+    },
+    "iam": {
+      "Status": "exited",
+      "ExitCode": 0,
+      "OOMKilled": false
+    }
+  },
+  "worker_restart_checks": [
+    {
+      "component": "worker3",
+      "cycle": 1,
+      "result": {
+        "private_log_sha256": "8bfd44fafcb0aab2535a21c05b6f5ac6581a5ecec81ebd11d7909340389dee25",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker2",
+      "cycle": 1,
+      "result": {
+        "private_log_sha256": "5f5fc035af59a305195b77458aa8f0c8016cbc48fef6ef3229af7222619a4e2f",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker1",
+      "cycle": 1,
+      "result": {
+        "private_log_sha256": "0c9e9b2e58c7b04cbb91593e02556b71554bdfb566c799ca3b62228a61879cca",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker3",
+      "cycle": 2,
+      "result": {
+        "private_log_sha256": "63c47ca73c4d5bfe9d4bddea4caa92f77a41cd22cd9aadf9293234488d079277",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker2",
+      "cycle": 2,
+      "result": {
+        "private_log_sha256": "6ec4f6d3b798c4a9b59ee960a6454addc44f230adfe59ceb876ca86833c3b00d",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker1",
+      "cycle": 2,
+      "result": {
+        "private_log_sha256": "9b250d3cb7a104246d7a7d38742a74c486a0eed6e2eaae53e516ae59f21a0b11",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker3",
+      "cycle": 3,
+      "result": {
+        "private_log_sha256": "e6e64586bf4808e492fc6ad90f084a92ced21f28a018f38f2dcdef2185ea92b3",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker2",
+      "cycle": 3,
+      "result": {
+        "private_log_sha256": "087a6b33f120c09a2cd3d246cc8abeffed591b9d7e80f8f064a50b5a468d369e",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker1",
+      "cycle": 3,
+      "result": {
+        "private_log_sha256": "da8709d7c5fa19f07c69f368eb674c337e41c18459a1f99bb1b6404f9a5c63e4",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    }
+  ],
+  "mysql_runtime_ddl_attempts": 0,
+  "mongo_runtime_ddl_attempts": 0,
+  "mongo_ddl_audit": {
+    "attempts": 0,
+    "commands": [],
+    "positive_controls": 4,
+    "profile_capacity_bytes": 67108864,
+    "command_bodies_exported": false
+  },
+  "cleanup": {
+    "compose_down_succeeded": true,
+    "private_directory_removed": true,
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true
+  },
+  "sources_unchanged": true,
+  "c1_cutover_barrier_exercised": false,
+  "combined_cutover_rehearsal_complete": false,
+  "production": false,
+  "system_acceptance": false,
+  "fixture_pr": 265,
+  "fixture_merged": false
+}
