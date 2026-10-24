@@ -16,7 +16,7 @@ import time
 from audit_transaction_limit import write_private
 from image_start_fixture import OwnedImageFixture, require
 
-QS_SHA = 'd6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7'
+QS_SHA = 'b75d4a52ec261275a0ffb588eeb31fd6496966d0'
 QS_HEAD = (110, 44)
 MONGO = 'mongo@sha256:340c1c56fb10e95cf79ff547f8664b96bc6ead9909bc355238cbf865a9695a6f'
 GO_SUM = 'h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0='

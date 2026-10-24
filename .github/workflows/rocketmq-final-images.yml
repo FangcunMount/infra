@@ -330,7 +330,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7
+          ref: b75d4a52ec261275a0ffb588eeb31fd6496966d0
           path: .qs-pair-source
       - uses: actions/setup-go@v6
         with:
@@ -345,9 +345,9 @@ jobs:
           for target in qs-api qs-collection qs-worker; do
             mkdir -m 700 ".qs-image-candidates/$target"
             gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
-              --name "m3-final-image-metadata-$target-d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7-$IMAGE_RUN_ID" --dir ".qs-image-candidates/$target"
+              --name "m3-final-image-metadata-$target-b75d4a52ec261275a0ffb588eeb31fd6496966d0-$IMAGE_RUN_ID" --dir ".qs-image-candidates/$target"
             gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" \
-              --name "m3-final-image-archive-$target-d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7-$IMAGE_RUN_ID" --dir ".qs-image-candidates/$target"
+              --name "m3-final-image-archive-$target-b75d4a52ec261275a0ffb588eeb31fd6496966d0-$IMAGE_RUN_ID" --dir ".qs-image-candidates/$target"
           done
       - name: Compile owned fixture against unchanged original migration package
         run: |
@@ -358,7 +358,7 @@ jobs:
           cp scripts/rocketmq/image_fixtures/qs_init_test.go "$fixture"
           cd .qs-pair-source
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c -tags=integration \
-            -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7' \
+            -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=b75d4a52ec261275a0ffb588eeb31fd6496966d0' \
             -o "$GITHUB_WORKSPACE/qs-pair-init" ./internal/pkg/migration
           cd "$GITHUB_WORKSPACE"
           test -z "$(readelf -l qs-pair-init | sed -n '/INTERP/p')"
@@ -417,7 +417,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7
+          ref: b75d4a52ec261275a0ffb588eeb31fd6496966d0
           path: .five-sources/qs
       - uses: actions/checkout@v6
         with:
@@ -447,7 +447,7 @@ jobs:
             case "$target" in
               iam) source_sha=954ad9dee2f71a51151b696ec05d5cb90cc65b50 ;;
               ai) source_sha=ddff86cad27d03c95dad28490d6cccbc1ce5b15f ;;
-              *) source_sha=d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7; target_run="$QS_IMAGE_RUN_ID" ;;
+              *) source_sha=b75d4a52ec261275a0ffb588eeb31fd6496966d0; target_run="$QS_IMAGE_RUN_ID" ;;
             esac
             mkdir -m 700 ".five-candidates/$target"
             gh run download "$target_run" --repo "$GITHUB_REPOSITORY" \
@@ -481,9 +481,9 @@ jobs:
           cp scripts/rocketmq/image_fixtures/qs_consumer_contract.go "$consumer_fixture/main.go"
           cd .five-sources/qs
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c -tags=integration \
-            -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7' \
+            -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=b75d4a52ec261275a0ffb588eeb31fd6496966d0' \
             -o "$GITHUB_WORKSPACE/five-qs-init" ./internal/pkg/migration
-          go run -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=d6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7' \
+          go run -ldflags '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit=b75d4a52ec261275a0ffb588eeb31fd6496966d0' \
             ./scripts/testing/m3_consumer_contract > "$GITHUB_WORKSPACE/qs-consumer-contract.txt"
           cd "$GITHUB_WORKSPACE/.five-sources/iam"
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "$GITHUB_WORKSPACE/five-iam-init" ./scripts/testing/m3_five_image_fixture

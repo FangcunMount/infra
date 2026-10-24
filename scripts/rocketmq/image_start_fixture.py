@@ -24,7 +24,7 @@ def require(value, reason):
 IMAGE_PROVENANCE = {
     ('iam', '954ad9dee2f71a51151b696ec05d5cb90cc65b50'): '9833d67e631587b908df00e2cc21371403912326',
     ('ai', 'ddff86cad27d03c95dad28490d6cccbc1ce5b15f'): '9833d67e631587b908df00e2cc21371403912326',
-    **{(target, 'd6fdc2bcda6db5cd84fd3a2f53b782448ac1e0b7'): '835cf766ceffd2694e2e0132bdf2408a2b2d0627'
+    **{(target, 'b75d4a52ec261275a0ffb588eeb31fd6496966d0'): '835cf766ceffd2694e2e0132bdf2408a2b2d0627'
        for target in ('qs-api', 'qs-collection', 'qs-worker')},
 }
 
