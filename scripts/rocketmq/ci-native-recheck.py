@@ -298,7 +298,9 @@ def main():
                 proof['original_abort_stats']=metrics[-1] if metrics else None
                 require(code in (0,1) and metrics and metrics[-1]['Stopped']
                     and metrics[-1]['CompletedResults']==metrics[-1]['HalfPreparedResults']==metrics[-1]['LocalAbortedResults']==1
-                    and metrics[-1]['LocalCommittedResults']==metrics[-1]['ActiveSends']==metrics[-1]['RunningChecks']==metrics[-1]['QueuedChecks']==0
+                    and metrics[-1]['LocalCommittedResults']==metrics[-1]['ActiveSends']==metrics[-1]['RunningChecks']==metrics[-1]['QueuedChecks']==metrics[-1]['DatabaseErrors']==metrics[-1]['HalfUnknownResults']==metrics[-1]['HalfRejectedResults']==0
+                    and metrics[-1]['FinalRollbackResults']+metrics[-1]['FinalUnknownResults']==1
+                    and metrics[-1]['FinalUnknownResults']==int(code==1)
                     and any(e.get('event')=='closed' for e in producer.events),'original_abort_and_actual_drain_required')
             else:producer.finish(expected=23)
         if host:
