@@ -86,3 +86,6 @@ QS441合并20cd2184，当前镜像源码b75d4a52与main完整tree一致；新三
 40095705485准备阶段检查误依赖WARN模板过滤的INFO日志，实际10/1/0、worker仍running；失败保留。08821c6仅在隔离夹具启用原INFO启动日志，生产模板及原预算不变。原生验证通过前不冻结该回执。
 
 生产执行包必须分别绑定封新发布启动、合法system验收及放开新写阶段的原始配置/命令摘要。`publish_enabled=false`没有在线热开关承诺；不能把原生超限resume工具当作正常开准入。若采用重新启动读取启用配置，两份快照及同一协调屏障下的顺序需在首次启动前审阅冻结，并保留真实业务在途/关闭证明。源审阅包不包含这些实际配置，当前`execution_bundle_complete=false`仍有效。
+
+
+生产落点以执行时只读核验为准。[2026-10-19 serverA记录](serverA-tencent-migration.md)与[IAM记录](iam-tencent-servera-migration.md)登记collection为2副本、IAM为1GiB/1CPU；当前隔离组合只运行1个collection角色、IAM512MiB，因此七进程报告只证明该受控规格，不能声称完整生产副本/资源一比一复刻。实际执行清单必须保留原collection副本数及各服务真实预算，并继续保留serverD的三个原worker；不把CI较小规格直接导出为生产配置。原DB版本、Redis落点及主机私有文件也不能照抄这些历史记录。
