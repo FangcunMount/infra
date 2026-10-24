@@ -100,6 +100,11 @@ class FiveImageFixture(QSPairFixture):
         state = json.loads(self.run(['docker', 'inspect', name]).stdout)[0]['State']
         result = dict(private_log_sha256=hashlib.sha256(raw.encode()).hexdigest(),
                       state={k: state[k] for k in ('Status', 'ExitCode', 'OOMKilled')})
+        result['fixed_failure_signals'] = {key: token in raw.lower() for key, token in {
+            'missing_file': 'no such file or directory', 'policy_read': 'cache policy',
+            'permission_denied': 'permission denied', 'connection_refused': 'connection refused',
+            'deadline': 'deadline exceeded', 'certificate_authority': 'unknown authority',
+            'missing_route': 'route', 'invalid_configuration': 'invalid', 'panic': 'panic:'}.items()}
         if component != 'ai': result['source_markers'] = source_failure_markers(raw, source)
         return result
 

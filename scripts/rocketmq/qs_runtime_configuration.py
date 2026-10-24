@@ -37,6 +37,12 @@ def configuration(base, component, database, password, delegated_key):
     require(re.fullmatch(r'qs_m3_image_[a-z0-9_]{1,36}', database), 'owned_database_required')
     require(re.fullmatch('[0-9a-f]{64}', delegated_key), 'owned_delegated_key_required')
     c = copy.deepcopy(base)
+    if c.get('cache', {}).get('policy_file'):
+        policy = c['cache']['policy_file']
+        require(re.fullmatch(r'cache/[a-z-]+\.prod\.yaml', policy), 'original_owned_policy_path_required')
+        # The main file moves to /fixture; keep the exact policy already shipped
+        # in the original image rather than resolving relative to that mount.
+        c['cache']['policy_file'] = '/app/configs/' + policy
     c['insecure'] = {'bind-address': '0.0.0.0', 'bind-port': 8080}
     if 'secure' in c: c['secure']['bind-port'] = 0
     c['redis'].update(host='redis', port=6379, username='', password='')
