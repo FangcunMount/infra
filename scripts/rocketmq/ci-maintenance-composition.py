@@ -76,7 +76,8 @@ def main():
         if dbs:raise RuntimeError('owned_mongo_databases_remain')
         report['proof']['owned_databases_removed']=True
         report['passed']=sum(v['passed'] for v in report['proof']['composition']['reports'].values())+3
-    except Exception:
+    except Exception as error:
+        report['failure_kind']=type(error).__name__ if type(error).__name__ in {'JSONDecodeError','ParseError','RuntimeError','FileNotFoundError','KeyError','CalledProcessError'} else 'unclassified_runtime_failure'
         report['failed']=1;report['failure']=stage
         # No exception text or private host log enters the artifact.
     finally:

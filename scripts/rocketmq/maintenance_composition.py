@@ -77,7 +77,7 @@ def compose(*,repo,iam,qs,ai,directory,mysql_port,password,mongo_uri,run,progres
         progress.setdefault('completed_steps',[]).append(name)
         return state
     def command(argv,out):
-        return '\n'.join('export '+k+'='+shlex.quote(v) for k,v in env.items())+'\n'+shlex.join(argv)+' > '+shlex.quote(str(out))+' 2>&1'
+        return '\n'.join('export '+k+'='+shlex.quote(v) for k,v in env.items())+'\n'+shlex.join(argv)+' > '+shlex.quote(str(out))+' 2> '+shlex.quote(str(out)+'.private.stderr')
     outputs={name:directory/(name+('-raw.xml' if name=='ai' else '-raw.jsonl')) for name in sources}
     # Each original host contract retains its own distinct protection/schema
     # boundary. Sharing a coordinator does not merge its database transactions.
@@ -85,9 +85,11 @@ def compose(*,repo,iam,qs,ai,directory,mysql_port,password,mongo_uri,run,progres
     step('qs-maintenance','pre-start-maintenance',command([go,'test','-race','-tags=integration','-json','-count=1','-timeout=6m','./internal/pkg/migration','-run','^Test(M3InitialBindingCLINative|OfflineNative.*)$'],outputs['qs']),qs)
     # JUnit XML stays separate from captured private raw stdout/stderr.
     step('ai-maintenance','pre-start-maintenance',command([uv,'run','--no-sync','python','-m','pytest','-q','tests/integration/test_transaction_schema.py','tests/integration/test_initial_transaction_binding.py','--junitxml='+str(outputs['ai'])],directory/'ai-private.log'),ai)
-    reports={'iam':go_report(outputs['iam'],{'TestM3MessagingOfflineNative'}),
-        'qs':go_report(outputs['qs'],{'TestM3InitialBindingCLINative','TestOfflineNativeUpgradeAndFreshNoop','TestOfflineNativeSQLPartialFailureRemainsDirty','TestOfflineNativeMongoPartialFailureRemainsDirty'}),
-        'ai':python_report(outputs['ai'])}
+    reports={}
+    for name,required in [('iam',{'TestM3MessagingOfflineNative'}),('qs',{'TestM3InitialBindingCLINative','TestOfflineNativeUpgradeAndFreshNoop','TestOfflineNativeSQLPartialFailureRemainsDirty','TestOfflineNativeMongoPartialFailureRemainsDirty'}),('ai',set())]:
+        progress['stage']='report-'+name
+        reports[name]=python_report(outputs[name]) if name=='ai' else go_report(outputs[name],required)
+        progress.setdefault('reports',{})[name]=reports[name]
     # This is an explicitly labelled process sentinel, not a business runtime.
     marker=directory/'runtime-sentinel'
     step('first-runtime-sentinel','runtime-start','touch '+shlex.quote(str(marker)))
