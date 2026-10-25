@@ -1,0 +1,82 @@
+{
+  "schema": "m3-observation-start-and-ops-closure/v1",
+  "started_at": "2026-10-25T13:48:32.535495+00:00",
+  "started_at_china": "2026-10-25T21:48:32.535495+08:00",
+  "earliest_completion_at": "2026-10-27T13:48:32.535495+00:00",
+  "earliest_completion_at_china": "2026-10-27T21:48:32.535495+08:00",
+  "required_hours": 48,
+  "progress": "33/36",
+  "milestone_M3_6_complete": true,
+  "T34_status": "in_progress",
+  "T34_complete": false,
+  "T35_complete": false,
+  "T36_complete": false,
+  "PR295_merge": "00f10d731b83615b54278f2a1250ef4db2d7d44e",
+  "PR296_merge": "cf7fc1e26d7c005028d3b35322f4b8811849cac4",
+  "CI_checks_successful": 12,
+  "CI_reports": 10,
+  "CI_passed": 451,
+  "CI_failed": 0,
+  "CI_skipped": 0,
+  "CI_cleanup_verified": true,
+  "profile_firewall_tests_per_OS": 15,
+  "profile_firewall_OS_count": 2,
+  "persistent_firewall": {
+    "all_source_CI_success": true,
+    "broker_or_app_restart": false,
+    "global_policy_or_other_chain_changed": false,
+    "live_owned_chain_bytes_unchanged": true,
+    "new_release": "/opt/infra-rocketmq/releases/m3-firewall-f144da7956e5",
+    "old_release_retained": true,
+    "only_runtime_file_changed": "scripts/rocketmq/firewall.sh",
+    "original_lock_metadata_preserved": true,
+    "other_source_files_unchanged": 28,
+    "schema": "m3-firewall-source-persistence/v1",
+    "source_firewall_sha256": "a63af4b9c0d3fb30530125e4bcc12912b1bbe94fd6ea675fa6b4081821756505",
+    "source_merged": true,
+    "source_sha": "f144da7956e56ddc996157712622ab116a81e34d"
+  },
+  "first_readonly_snapshot": {
+    "checked_at": "2026-10-25T13:48:32.579257+00:00",
+    "ok": true,
+    "prometheus_errors": [],
+    "prometheus_ok": true,
+    "public_four_200_TLS": true,
+    "read_only": true,
+    "runtime": {
+      "serverA": {
+        "available_MiB": 6561,
+        "errors": [],
+        "ok": true
+      },
+      "serverD": {
+        "available_MiB": 1283,
+        "errors": [],
+        "ok": true
+      }
+    },
+    "schema": "m3-readonly-observation/v1"
+  },
+  "heartbeat": {
+    "id": "m3-rocketmq-48",
+    "status": "ACTIVE",
+    "interval_minutes": 30,
+    "quiet_while_unchanged": true,
+    "read_only_monitoring": true
+  },
+  "stage4_private_backup": {
+    "bytes": 306233,
+    "members": 468,
+    "mode": "0o600",
+    "sha256": "0661c63bb4afb135afc1ad2e1b9c45aaf914f7cd3fe62eb84ae7db1537c8406a"
+  },
+  "private_evidence_sha256": {
+    "T34-observation-start.private.json": "4a5e9e3f0e6cee0f118fd7b111612944b04c80ef2bb4eaaf94db937af9b88098",
+    "T34-observation-heartbeat.private.json": "50b4cd3065f62fb750f8a675de869ad12a8f470c23f6db52d25e96cc8c8fea2d",
+    "persistent-firewall-installed.private.json": "729b3850fd72934b194c3558b4072b5a06d601b175b72e1c6aceadc9e13c36e6",
+    "PR295-all-CI-success.private.json": "a16e49546152c673ee50646f712c507dee054549fc5a5fc54d221a284c231fa1",
+    "PR295-CI-reports-verified.private.json": "732cff3bfbc5705e770724da8509b6944e2e9c784516dcfbc873abfe9c28ce89",
+    "T34-baseline-public-health.private.json": "8c67d4bdf06c5d58255288ba558ef438cf97ce72e635f39f536c58c0ca731356",
+    "m3_observation_readonly.py": "56c9c5ccdc42ea819c04dc930fcdebbc4aba3562e6d87ad0ab88f0c073a72926"
+  }
+}
