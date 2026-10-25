@@ -1,0 +1,116 @@
+{
+  "schema": "m3-production-config-draft-evidence/v1",
+  "scope": "offline actual file decoder/options validation only; no network, credentials/route file load, host lifecycle or business proof",
+  "phase_names": [
+    "sealed",
+    "acceptance",
+    "open"
+  ],
+  "passed": 18,
+  "failed": 0,
+  "skipped": 0,
+  "actual_readers": [
+    {
+      "host": "IAM",
+      "source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "entry": "app.DecodeOptions and MessagingOptions.ProtocolLimits plus actual app-prefixed env and original default flags",
+      "helper_sha256": "d8624aeae5917861c17422a35613bde30947a64587d49569ed974bb9fd12efa9"
+    },
+    {
+      "host": "QS",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "entry": "app.DecodeOptions with apiserver and worker options; per-owner credentials and budgets plus actual app-prefixed env and original default flags",
+      "helper_sha256": "3f555e43d97205c4b7db751026b8f34cacc321142b6427a99ce24565827fa495"
+    },
+    {
+      "host": "AI",
+      "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "entry": "MessagingOptions.model_validate and released 0.4.0 Limits"
+    }
+  ],
+  "configuration_sha256": {
+    "sealed/iam": "3f47cb3edfa39b2ec16c7653df66014a5805560c149f1c684552c65b3da2bb4a",
+    "sealed/api": "17dab27fe1ccac57041283e07643e514f23c30b4333ec20c676a0c33d047cc07",
+    "sealed/worker-1": "d21de0b51e71618598dc0c0e99244e60aca09cfd98531afdc31bd636f5509386",
+    "sealed/worker-2": "87881b1a19026243e0eb2b316dac0e3a4c5e91e1b3b20e0ad0a70194aea671b5",
+    "sealed/worker-3": "4c5263c3c4816af24142a03bd50bac45272e51158fd012378ab43d6d39b277e2",
+    "sealed/ai-environment": "5d64d77a2fd25686a7df50eb9f4fe747dbb34d7eba6f4fb5bd302855df4f59fb",
+    "acceptance/iam": "ea6c2e05887f995a284aad02d25fc28963c5dc1168eeb184e909b5b5041f83cc",
+    "acceptance/api": "5967588126e8042108d8f58cebc837e99e6a91f2c97784be24837e33313d58d4",
+    "acceptance/worker-1": "6936d771ce1ce9e53015538c1208917b43bf1fad3c8d3368bcdc49e3fdf4bff1",
+    "acceptance/worker-2": "a5e7949a56f231a8ebf4a52a2d9717c91e4236476f2051c0695e204c45604fa2",
+    "acceptance/worker-3": "ef201b69bb531a1f8275bd974508a21dd4afd65ed31db7b765c907bd993c116b",
+    "acceptance/ai-environment": "d8004ad4e2d82a43acae842e10dcb332b2793e3a84db590ab037ff5f0e46990a",
+    "open/iam": "ea6c2e05887f995a284aad02d25fc28963c5dc1168eeb184e909b5b5041f83cc",
+    "open/api": "5967588126e8042108d8f58cebc837e99e6a91f2c97784be24837e33313d58d4",
+    "open/worker-1": "6936d771ce1ce9e53015538c1208917b43bf1fad3c8d3368bcdc49e3fdf4bff1",
+    "open/worker-2": "a5e7949a56f231a8ebf4a52a2d9717c91e4236476f2051c0695e204c45604fa2",
+    "open/worker-3": "ef201b69bb531a1f8275bd974508a21dd4afd65ed31db7b765c907bd993c116b",
+    "open/ai-environment": "d8004ad4e2d82a43acae842e10dcb332b2793e3a84db590ab037ff5f0e46990a"
+  },
+  "non_messaging_configuration_preserved": true,
+  "worker_concurrency": 48,
+  "go_sdk": {
+    "version": "v0.5.0",
+    "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+    "replace": false
+  },
+  "python_sdk": "0.4.0",
+  "production_changed": false,
+  "deployed": false,
+  "fully_validated": false,
+  "remaining": [
+    "exact original command review and final Compose mounts",
+    "exact source catalog mounts",
+    "host identities and binding installation",
+    "final Compose/command/backup scope bundle",
+    "named production cutover gate"
+  ],
+  "initial_file_only_cases": 18,
+  "additional_actual_environment_and_flags_cases": 15,
+  "go_host_environment_priority_verified": true,
+  "corrected_legacy_selector_keys": [
+    "IAM_APISERVER_EVENTS_RELIABLE_MESSAGING_ENABLED",
+    "IAM_APISERVER_NSQ_ENABLED",
+    "IAM_APISERVER_NSQ_CONSUMER_SDK_ENABLED",
+    "QS_WORKER_MESSAGING_PROVIDER"
+  ],
+  "environment_sha256": {
+    "qs-apiserver-sealed-environment.draft.private.json": "b3d7e9e8f2b16da3ea80fde8da445ecb168bef9de739f1e1bdb66c5303408bbf",
+    "iam-apiserver-acceptance-environment.draft.private.json": "f8bb9c58a945e7016711017c2d7b5987447a836664ad3c5d7fd083fdb19de95e",
+    "ai-sealed-environment.draft.private.json": "5d64d77a2fd25686a7df50eb9f4fe747dbb34d7eba6f4fb5bd302855df4f59fb",
+    "ai-open-environment.draft.private.json": "d8004ad4e2d82a43acae842e10dcb332b2793e3a84db590ab037ff5f0e46990a",
+    "qs-worker-runtime-3-sealed-environment.draft.private.json": "7bdb9ee0adfe3c1efda55a5a1bbc0d52ae46e53b71c8feb91a8d0c4382766fc0",
+    "qs-worker-runtime-2-sealed-environment.draft.private.json": "c7a81fc1957c58676ac5a87c251c429cc1d05cf3710cce943cf70cc8e7083554",
+    "qs-worker-runtime-1-sealed-environment.draft.private.json": "cc36a611fc21d07f296f507460f2e712124c8d7a390254b48e3c68bbc8eb3941",
+    "qs-worker-runtime-3-open-environment.draft.private.json": "2390aa40dbd8f7641e5ac7f61bd01b180c7a3b322083bdb457dabaeaa94a8b21",
+    "qs-worker-runtime-2-acceptance-environment.draft.private.json": "b3f18329a880494eb9509d6e5310e8b48765353d611a87e78d28dcc43b470435",
+    "qs-apiserver-open-environment.draft.private.json": "b9b0f1635ba70150da06ef6ebe42ec9137f763a16bc1af290d1791bcdf57068c",
+    "qs-worker-runtime-3-acceptance-environment.draft.private.json": "2390aa40dbd8f7641e5ac7f61bd01b180c7a3b322083bdb457dabaeaa94a8b21",
+    "iam-apiserver-open-environment.draft.private.json": "f8bb9c58a945e7016711017c2d7b5987447a836664ad3c5d7fd083fdb19de95e",
+    "qs-worker-runtime-2-open-environment.draft.private.json": "b3f18329a880494eb9509d6e5310e8b48765353d611a87e78d28dcc43b470435",
+    "qs-worker-runtime-1-open-environment.draft.private.json": "8f2b7a9e14ce425170ff8e41963b9934dbf1811662ce4a87eb2df09a5d95c67b",
+    "ai-acceptance-environment.draft.private.json": "d8004ad4e2d82a43acae842e10dcb332b2793e3a84db590ab037ff5f0e46990a",
+    "qs-worker-runtime-1-acceptance-environment.draft.private.json": "8f2b7a9e14ce425170ff8e41963b9934dbf1811662ce4a87eb2df09a5d95c67b",
+    "qs-apiserver-acceptance-environment.draft.private.json": "b9b0f1635ba70150da06ef6ebe42ec9137f763a16bc1af290d1791bcdf57068c",
+    "iam-apiserver-sealed-environment.draft.private.json": "317d30254978e5abeac05731e29af25a2ab94a9fab4a15cf2c301ef0174ffa41"
+  },
+  "additional_actual_ai_settings_cases": 3,
+  "ai_complete_settings_environment_verified": true,
+  "registry_prestage": {
+    "serverA": "authentication unavailable before any candidate cached; original containers unchanged",
+    "candidate_count": 0,
+    "runtime_started": false,
+    "credential_source": "pending reusable credential file/entrypoint; no credentials requested in chat"
+  },
+  "ca_fingerprint_sha256": "4202089afd53ce8ff73b7bf256fc6cf83d34a7df27a73951036d8676f9dffbee"
+}

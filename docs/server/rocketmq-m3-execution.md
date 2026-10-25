@@ -30,11 +30,11 @@ T25-D 按新首发范围冻结候选并组合验证原 NSQ 排空、未来计划
 
 - 进度：**28/36**；T01–T28完成。T24内部**4/4**：原生超限索引触发原主库持久封新写、同绑定新实例保护和Checker保留已通过真实门禁；三宿主与工具源码均已合并。T25内部**4/4**，已批准首发范围全部完成；高级恢复未完成项独立后移。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
-- 源码/制品：Go v0.5.0、Python 0.4.0已按同一SDK源码1345266固定发布；三库稳定依赖已合并，T29辅助infra253已合并1465a129。此前预发布及T24保护证据保留为历史。生产部署/DDL/Topic/ACL/provider切换、Mac mini生产规则加载、合法system与48小时观察仍未执行。
+- 源码/制品：Go v0.5.0、Python 0.4.0已按同一SDK源码1345266固定发布；三库稳定依赖已合并，T29辅助infra253已合并1465a129。此前预发布及T24保护证据保留为历史。业务runtime部署/业务DDL/Topic/ACL/provider切换、Mac mini生产规则加载、合法system与48小时观察仍未执行。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 2026-10-25最新：用户已批准infra273追加清单；原Broker接回原Docker bridge后健康、零OOM/自动重启。凭据更新前只读ACL快照使用严格provision decoder拒绝无表头输出，已按失败路径仅停Broker（143、计数0），密码及三配置摘要未改。原网络保留、其它容器未变；[第二次实际回执](evidence/rocketmq-m3-broker-network-recovery-attempt-20261025.json)保留失败。用户进一步授权规划执行期间继续类似基础设施恢复和必要修复，无须逐项重复确认。
-- 当前批次：**T01–T28完成，T29内部4/5，M3为28/36**。只读ACL适配与既有严格授权provision校验分开，隔离复验中；下一次启动前做新的完整冷备份和Mac mini副本核验，不复用启动前的旧store。最终有效参数/实际配置/执行包仍须冻结，M3业务切换、system和48小时未开始。
+- 2026-10-25最新：原Broker恢复与管理员轮换已全部完成。infra275精确96073318的12项源码CI通过并合并d91e88c2；隔离16/0/0。新的完整冷备份逐成员核验及Mac mini副本SHA一致后，原CID启动、真实更新管理员、原三inode持久化、一次计划重启及“新成功→旧CODE16→新成功”均通过。原Topic/group/ACL和其它全部容器保持，Broker无OOM/自动重启；Mac mini最终重启后的4个target全部up。[生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json)。用户继续类似恢复的授权已落实，本次没有再次中断确认。
+- 当前批次：**T01–T28完成，T29内部4/5，M3为28/36**。T29-E已取得Broker实际参数，并完成18份生产配置草稿的真实读取、Go实际env/flags15项及AI完整Settings3项验证；仍缺最终Compose/挂载/具名执行包和五镜像在目标机正向回读。serverA镜像预置因无ACR登录态在首个pull认证处停止（0镜像、原容器未变）；已确认既有GitHub Secrets/原Mac mini CD可复用，正在准备受限的仅拉取路径，不要求用户在聊天提供密钥。业务provider继续NSQ，system与48小时未开始。
 
 
 ### T29 当前收口分项（同一正式任务，4/5已完成）
@@ -47,7 +47,7 @@ T25-D 按新首发范围冻结候选并组合验证原 NSQ 排空、未来计划
 | ✅ | T29-B 实际版本/预算与八进程启动 | 40114698327为16/0/0，IAM1GiB、2 collection及3 worker原预算；worker9次启停、零DDL、正常退出及清理通过；IAM40原镜像限定恢复8/0/0 |
 | ✅ | T29-C 原范围保护恢复与唯一首次启动屏障 | 40117285915为19/0/0，三MySQL/整Mongo恢复摘要相同、8进程、屏障与启动后拒绝旧备份覆盖、零DDL/清理通过；受控51.02秒不代表生产RTO；PR265合并5078a893 |
 | ✅ | T29-D 永久镜像交付 | infra267完整10项CI成功后合并c0c2014；IAM150合并008a5abf。实际ACR发布40154076552为5/0/0，原归档直接传输，五config与受验镜像一致且逐个@digest回读通过，私有下载/认证文件清理通过；[固定引用](evidence/rocketmq-m3-acr-publication-20261025.json)，未部署应用 |
-| ☐ | T29-E 实际配置与具名执行包 | 用户已批准269/273并授权继续类似恢复。原网络接回后健康/零自动重启，凭据更新前ACL只读快照失败并仅停Broker，密码未改；修复只读适配、重新完整冷备份后继续。有效参数及最终私有配置/执行包待冻结。[实际第二次回执](evidence/rocketmq-m3-broker-network-recovery-attempt-20261025.json) |
+| ☐ | T29-E 实际配置与具名执行包 | Broker恢复和管理员轮换已完成；实际6000ms/30000ms/15次/48h已读回，原CID/Topic/group/ACL及其它容器保持，最终重启后4个监控target均up。18份配置草稿及真实环境优先级已验证。最终Compose/挂载/具名执行包、镜像在目标机正向回读仍待完成。[生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json) |
 
 ### T23 执行验收（同一正式任务，4/4已完成）
 
@@ -2280,3 +2280,18 @@ infra272精确ac3044f5的11项CI全部成功，正常合并aeb6784175d4e8cd1e274
 用户明确批准infra273。固定385a5e52计划的第二次执行03:47:58 UTC接回原endpoint，03:48:14 Broker健康；无OOM/自动重启。ACL快照调用provision严格decoder，headerless非空输出拒绝，03:48:53按案仅停Broker；未到original_verified/updateUser阶段、计划重启0次，三配置原摘要保持。此次网络恢复成功和整体凭据恢复失败分别记录，不将健康当作密码轮换完成。
 
 用户随后授权“继续按照规划执行，在此期间授权你做上述类似操作”。继续只读审计适配/同范围恢复，无需再次确认；不扩大为业务provider切换、schema或ACL变更。新reader保留所有既有策略/来源/decision，不放宽provision严格校验；固定官方5.5.1 CLI的空ACL返回及真实隔离轮换单独验证。旧冷备份仍保留；因启动可能改变store，下一次先完整冷备份当前store/auth/三配置、逐成员核验及新Mac mini副本，再受控启动。M3仍28/36、T29内部4/5。
+
+
+### 2026-10-25：原Broker恢复与凭据轮换完成；T29-E继续最终执行包
+
+infra275精确96073318056cac8c3f34ea7f053e5e1af26bc7a9的12项检查全部通过，正常合并d91e88c2。新只读adapter不修改provision严格授权解码；真实受限Deny/来源、无ACL、原用户及完整轮换16/0/0、清理全部通过。三次隔离初版失败保留：官方CLI无ACL返回空，但Logback初始化输出污染stdout；只读调用配置NopStatusListener并只接受成功空结果/预期JVM banner，未知输出/认证/网络错误仍拒绝。
+
+原v2网络恢复成功、审计失败保持历史，不覆盖为成功。用户追加继续类似操作授权后，新v3计划639053c3只修只读审计、不再次network connect；完整store/auth/三配置冷备份68文件、逻辑1,733,424,788B，归档58,456,599B（SHA14ec0cb6），逐成员验证和Mac mini新副本核验通过。私有目录0700/文件0600，保留至少30天、未结责任延长且不自动删除。旧备份不删除。一次操作包加载编码错误在导入阶段退出、尚无生产动作；新包全部源码compile和hash检查后才进入备份/启动。
+
+原CID启动健康，真实updateUser成功；三原inode写入/fsync后一次计划重启，新凭据成功、旧明确CODE16、新再次成功。原管理员身份/Super/Enable保持；9用户仅该密码改变，7个普通用户ACL、10 Topic和12 Group语义不变，v2 Topic仍0。原Broker/NameServer/NSQ/三个worker资源及其它容器均保持，无OOM/自动重启。最终启动04:30:14.27030797Z；可用内存1,419,735,040B（约1.32GiB）。Mac mini时间解析器初版不接受8位小数秒，规范为微秒后仍严格要求新抓取；04:34:26 UTC读取Broker和3worker均up/无抓取错误/全为最终重启之后，RocketMQ活动告警为空。仅修验证器，没有变更监控配置。
+
+有效参数实际读回：transactionTimeOut=6000ms、transactionCheckInterval=30000ms、transactionCheckMax=15、fileReservedTime=48h；原值保持，不将配置乘积当恢复SLA。全部阶段见[生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json)；当前配置和新凭据及阶段/CI/监控回执已安全复制至Mac mini v3备份post-rotation目录，不宣称这是新的完整数据库备份。
+
+实际生产配置草稿18/18通过固定IAM/QS/AI原读取类型；Go实际环境和原默认flags15/15、AI完整Settings实际env3/3追加通过。发现并显式改正草稿中worker环境强制NSQ、IAM原NSQ/Relay环境开关；原非消息配置、worker并发48、数据库/模型env保持。Go使用正式v0.5.0且无replace，Python正式0.4.0，不使用旧工作区源码代替固定候选。[草稿回执](evidence/rocketmq-m3-production-config-drafts-20261025.json)只证明离线读取，不证明目标挂载、启动或业务。
+
+serverA仅预拉镜像在首次认证处失败、缓存0，已回读全部原容器完全保持，未启应用、改registry或删除镜像。源已确认现有ALIYUN_ACR_USERNAME/PASSWORD及Mac mini CD临时认证入口；下一步复用受审流程拉取固定digest并清理临时认证，不导出到聊天/公共制品。最终Compose/源catalog挂载、全部配置覆盖、目标镜像回读与具体执行/恢复包仍需收口。因此M3仍28/36、T29内部4/5；业务DDL/Topic/ACL/provider、system及48小时均未开始。

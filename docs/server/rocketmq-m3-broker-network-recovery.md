@@ -1,6 +1,6 @@
 # serverD 原 Docker 网络连接恢复与一次受控重试
 
-状态：**用户已批准并执行；原网络恢复成功，凭据更新前ACL审计失败后仅停Broker，密码未改**。本清单补充已批准的[原恢复清单](rocketmq-m3-broker-recovery.md)，仅增加恢复原有Docker endpoint及一次受控重试；业务切换仍不在范围内。目标与配置摘要、既有network ID/IPAM/labels、NameServer身份、原失败状态和执行代码摘要见[固定v2计划](evidence/rocketmq-m3-broker-network-recovery-plan-20261025.json)。
+状态：**现已由已授权v3后续完成原Broker恢复与管理员轮换；首轮/第二轮失败记录保留**。本清单补充已批准的[原恢复清单](rocketmq-m3-broker-recovery.md)，仅增加恢复原有Docker endpoint及一次受控重试；业务切换仍不在范围内。目标与配置摘要、既有network ID/IPAM/labels、NameServer身份、原失败状态和执行代码摘要见[固定v2计划](evidence/rocketmq-m3-broker-network-recovery-plan-20261025.json)。
 
 ## 原失败事实与已完成保护
 
@@ -47,3 +47,8 @@ network为`rocketmq_rocketmq`、bridge/local、172.22.0.0/16，既有NameServer�
 用户已批准273，固定385a5e52清单实际接回原bridge/原CID并健康（无OOM/自动重启）。后续既有ACL只读快照误用provision严格解析器，headerless输出被拒绝；未调用updateUser或计划内重启，失败路径仅停Broker、保留已恢复网络。三配置摘要保持、其它容器未改。[第二次执行证据](evidence/rocketmq-m3-broker-network-recovery-attempt-20261025.json)。上文“待确认”保留原清单时点，已由本节实际批准及执行结果替代。
 
 用户追加授权规划期间继续类似操作。后续同范围修复单独只读ACL适配（不改变任何授权），并重新完整冷备份当前store/auth/配置及验证Mac mini新副本；不再重复network connect，不复用启动前的旧store快照，不修改Topic/ACL/schema/provider。每轮仍有明确阶段、单次启动/密码更新/计划重启上限和失败停止，历史失败不覆盖。
+
+
+## v3后续已完成
+
+[生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json)记录新的完整冷备份/新Mac mini副本、同范围只读审计修复、原容器健康及真实密码轮换、新/旧/新认证、原ACL/资源保持和最终重启后4个监控target新鲜up。管理员密码已更换，原失败时点“尚未更换”保留历史；此段为当前最终状态。M3仍28/36，业务切换未执行。

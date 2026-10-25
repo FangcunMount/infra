@@ -1,0 +1,110 @@
+{
+  "schema": "m3-existing-acl-audit-validation/v1",
+  "source_sha": "96073318056cac8c3f34ea7f053e5e1af26bc7a9",
+  "pr": "https://github.com/FangcunMount/infra/pull/275",
+  "run_id": 40160690632,
+  "report_sha256": "23f07968c2d2c9ffdede4a48c53e818ae0ffe57163f06cc47816e70388ea15fa",
+  "native": {
+    "production": false,
+    "production_credentials_used": false,
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0,
+    "phases": [
+      "original_verified",
+      "update_user_attempted",
+      "update_user_confirmed",
+      "new_configuration_persisted",
+      "broker_restarted",
+      "new_success_old_denied_new_success"
+    ],
+    "dependency_image_ids": {
+      "mysql": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+      "rocketmq": "sha256:775297f1c51bd6d7e4fff760166facb06e7596e5e08a810ddc3c7908ab3f4053"
+    },
+    "dependency_versions": {
+      "mysql": "8.0.36"
+    },
+    "pending_endpoint_readback": {
+      "rocketmq-m2-image-3837af0c9e08_rocketmq": {
+        "NetworkID": "",
+        "Aliases": [
+          "broker",
+          "rocketmq-m2-image-3837af0c9e08-broker-1"
+        ],
+        "IPAddress": ""
+      }
+    },
+    "cases": {
+      "original_verified": true,
+      "update_user_confirmed": true,
+      "new_configuration_persisted": true,
+      "broker_restarted": true,
+      "new_success_old_denied_new_success": true,
+      "all_config_copies_visible": true,
+      "default_tools_authenticated": true,
+      "original_container_retained": true,
+      "missing_endpoint_blocks_admission": true,
+      "actual_disconnected_mixall_stack_overflow_reproduced": true,
+      "same_original_network_and_container_repaired": true,
+      "reconnected_broker_healthy_without_automatic_restart": true,
+      "restricted_deny_acl_read_without_mutation": true,
+      "authoritative_absent_acl_read": true,
+      "strict_provisioning_guard_retained": true,
+      "existing_users_and_all_acls_preserved_across_rotation": true
+    },
+    "new_success_old_denied_new_success": true,
+    "all_config_copies_persisted": true,
+    "default_tools_authenticated": true,
+    "same_container_after_restart": true,
+    "application_started": false,
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    }
+  },
+  "pure_tests": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0
+  },
+  "failure_history": [
+    {
+      "run_id": 40159907911,
+      "result": "0 passed / 1 failed / 0 skipped",
+      "phase": "before password update",
+      "reason": "existing ACL absence has no table header"
+    },
+    {
+      "run_id": 40160275756,
+      "result": "0 passed / 1 failed / 0 skipped",
+      "phase": "before password update",
+      "reason": "successful null still accompanied by status output"
+    },
+    {
+      "run_id": 40160467871,
+      "result": "0 passed / 1 failed / 0 skipped",
+      "phase": "before password update",
+      "reason": "owned CLI evidence identifies Logback initialization on stdout"
+    }
+  ],
+  "read_only_adapter": {
+    "acl_mutations": false,
+    "strict_provision_decoder_unchanged": true,
+    "logback_status_listener": "NopStatusListener on isolated read-only CLI only",
+    "null_result": "empty successful stdout and only expected JVM JAVA_TOOL_OPTIONS banner on stderr",
+    "unexpected_nonempty_output": "rejected"
+  },
+  "production_recovery": {
+    "plan_sha256": "639053c36d1773f021efcdda0aa6414ea691322a234d2342bc26014cc104de18",
+    "state": "complete: original Broker healthy, password rotated and old credential denied, all 4 monitoring targets freshly up",
+    "password_changed": true,
+    "receipt": "rocketmq-m3-broker-admin-recovery-complete-20261025.json"
+  },
+  "source_ci": "12 applicable checks succeeded at exact 96073318056cac8c3f34ea7f053e5e1af26bc7a9",
+  "merged": true,
+  "source_ci_checks_passed": 12,
+  "merge_sha": "d91e88c2a275cd065860960ed3b36043bd49f10c"
+}
