@@ -1,0 +1,50 @@
+{
+  "acceptance_merge_commit": "dbaaf8ba9f2ee92083628c4b790543b42ca82164",
+  "acceptance_source_commit": "7a8c995813fa6109b381eba0a4cf4348d1715a89",
+  "approval_source": "explicit user reply in this conversation",
+  "data_owner": "yangshujie",
+  "documents": {
+    "rocketmq-m3-production-window.md": "406f340aef5483fd1df6ac33d5e32e961527578b92a916b7bd2bffbd5909df09",
+    "rocketmq-m3-system-acceptance.md": "317de4e633c09cc6058909f4414409e997207fd9ffffdd1fa5ba522601e06cb1"
+  },
+  "executor": "Codex in this conversation via original SSH ingress",
+  "maintenance_started": false,
+  "operation_id": "20261025081841-1",
+  "prewindow_conditions_required": true,
+  "recorded_at_utc": "2026-10-25T08:20:41.055454+00:00",
+  "recovery_owner": "yangshujie",
+  "runtime_start_issued": false,
+  "schema": "m3-final-production-approval/v1",
+  "static_archive_sha256": "c641373ca442f7df65626f0a16846ebae6c957732e936dae9d7044e6fa33b00d",
+  "static_source_commit": "9166fb10fdfc87e822d2ea527b38ac750cfc4236",
+  "user_answer": "批准按两份清单执行",
+  "window_started_at": null,
+  "approval_sha256": "2fa17654f9c7c6e4f3283765372c64d9387bc4a3ecd150f1ac53c1705c2fa081",
+  "private_receipts_mini_copy": {
+    "files": [
+      {
+        "name": "approval.json",
+        "sha256": "2fa17654f9c7c6e4f3283765372c64d9387bc4a3ecd150f1ac53c1705c2fa081"
+      },
+      {
+        "name": "resources.private.out",
+        "sha256": "d210b7e8948d2b8b054085f4a356967123f1ecd0aac7c70bf520d1bf1cf0ace4"
+      },
+      {
+        "name": "monitoring.private.out",
+        "sha256": "22ca9b9d82a266b74b018fbc7ac2d00eb6336ba739aa300e056b717f17cffede"
+      },
+      {
+        "name": "broker-tls-readback.json",
+        "sha256": "69b12061637c76f643dda4e474ee87442d72dfaf1d63319a455cf7b51e0080d3"
+      },
+      {
+        "name": "operator-tools-staged.json",
+        "sha256": "67f18aa352108210d9645ce7534d25c032f67c7fd97703c7598b4b4fab0dfc03"
+      }
+    ],
+    "private_mode": "0700/0600",
+    "retention_days_minimum": 30,
+    "schema": "m3-prewindow-receipts-mini-copy/v1"
+  }
+}
