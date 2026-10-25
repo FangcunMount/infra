@@ -513,6 +513,10 @@ install_component() {
     local dry_run="$4"
     
     log_step "安装组件: $component"
+
+    if [[ "$component" == "nsq" ]]; then
+        bash "${PROJECT_ROOT}/scripts/rocketmq/guard-nsq.sh" "$env_type" || return 1
+    fi
     
     # 验证组件
     if ! validate_component "$component"; then
@@ -1117,6 +1121,11 @@ main() {
         esac
     done
     
+    # Reject retired production selectors before preparing any directories.
+    if [[ "$component" == "nsq" || "$component" == "all" ]]; then
+        bash "${PROJECT_ROOT}/scripts/rocketmq/guard-nsq.sh" "$env_type" || return 1
+    fi
+
     # 更新全局变量
     DEFAULT_COMPOSE_PROJECT="$project"
     DATA_DIR="$data_dir"

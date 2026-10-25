@@ -288,7 +288,7 @@ manage_infra() {
     # No marker is installed on Mac mini development/test dependencies.
     if [[ "$action" == "up" || "$action" == "restart" ]]; then
         if [[ "$component" == "nsq" || "$component" == "all" ]]; then
-            bash "${REPO_ROOT}/scripts/rocketmq/guard-nsq.sh"
+            bash "${REPO_ROOT}/scripts/rocketmq/guard-nsq.sh" "$ENVIRONMENT"
         fi
     fi
 

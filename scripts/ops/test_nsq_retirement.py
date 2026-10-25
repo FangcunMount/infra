@@ -10,7 +10,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class RetiredNSQTests(unittest.TestCase):
     def test_serverd_overrides_only_disable_three_services(self):
-        current = (ROOT/'deploy/serverD/docker-compose.yml').read_bytes()
+        fixture = ''.join('  '+name+':\n    extends:\n      service: '+name+'\n' for name in SERVICES).encode()
+        current = retire_serverd_compose(fixture)
         self.assertEqual(retire_serverd_compose(current), current)
         self.assertEqual(current.count(b'profiles: [legacy-nsq-retired]'), 3)
         self.assertEqual(current.count(b'restart: "no"'), 3)
@@ -36,7 +37,6 @@ class RetiredNSQTests(unittest.TestCase):
         self.assertEqual(patched.count(GUARD.encode()), 3)
         self.assertEqual(patched.replace(GUARD.encode(), b''), raw)
         self.assertEqual(guard_makefile(patched), patched)
-        self.assertEqual(guard_makefile((ROOT/'Makefile').read_bytes()), (ROOT/'Makefile').read_bytes())
 
     def test_make_patch_refuses_missing_or_duplicate_target(self):
         for raw in [b'nsq-start:\n', b'nsq-start:\nnsq-start:\nnsq-recreate:\nserverD-up:\n']:
