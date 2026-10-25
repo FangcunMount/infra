@@ -1,6 +1,6 @@
 # M3 最终候选准备与验收边界
 
-当前有效候选：IAM ca59dec4、QS b75d4a52、AI ddff86ca，五归档已直接发布既有ACR并固定不可变引用。当前生产规格/IAM40/八进程/C1已通过；T29内部4/5。原Broker及管理员轮换已完成，[生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json)记录原CID健康、新成功/旧拒绝/新成功、全部资源/其它容器保持与Mac mini最终重启后4 target up。实际参数已读回；18份配置草稿/实际env优先级已验证，最终Compose/挂载/镜像目标回读及具名执行包尚未冻结。业务切换未执行。下文历史旧候选保留原范围。
+当前有效候选：IAM ca59dec4、QS b75d4a52、AI ddff86ca，五归档已直接发布既有ACR并固定不可变引用。当前生产规格/IAM40/八进程/C1已通过；T29内部4/5。原Broker及管理员轮换已完成，[生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json)记录原CID健康、新成功/旧拒绝/新成功、全部资源/其它容器保持与Mac mini最终重启后4 target up。实际参数、18份配置草稿/实际env优先级已验证；[目标镜像预置5/0/0](evidence/rocketmq-m3-target-image-cache-20261025.json)和[目标Compose三阶段解析15/0/0](evidence/rocketmq-m3-target-compose-validation-20261025.json)通过。未来挂载源/权限、具体执行/保护恢复包尚未冻结；配置尚未安装，业务切换未执行。下文历史旧候选保留原范围。
 
 唯一任务进度见[M3总表](rocketmq-m3-execution.md)。本页细化原T29，不增加任务数。T28正式制品宿主门禁已完成；以下为最终候选准备，不表示T29完成或生产授权。
 

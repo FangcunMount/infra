@@ -1,0 +1,77 @@
+{
+  "schema": "m3-fixed-image-cache-receipt/v1",
+  "plan_sha256": "56152c3d80db3042e7f61f5be39f487e83d69ad94815d8b99bf87091c3af9c19",
+  "operation": "40164455745-1",
+  "passed": 5,
+  "failed": 0,
+  "skipped": 0,
+  "targets": {
+    "serverA": {
+      "target": "serverA",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "cached": {
+        "iam": {
+          "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/iam@sha256:55aec5c5a36072d4e87df9c7b29e51554c12a09064f1f5b60441e3ec2a6e777e",
+          "engine_image_id": "sha256:55aec5c5a36072d4e87df9c7b29e51554c12a09064f1f5b60441e3ec2a6e777e",
+          "source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211"
+        },
+        "qs-api": {
+          "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver@sha256:85ac6f5cd3bc75326f6d827393bf1dab7b9e85f305aaf03acefd3a174faec150",
+          "engine_image_id": "sha256:85ac6f5cd3bc75326f6d827393bf1dab7b9e85f305aaf03acefd3a174faec150",
+          "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+        },
+        "qs-collection": {
+          "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-collection-server@sha256:c4c3584fc5a4b11f20344c9e353ffe17f72203c1dff363dd9729e1053b1fde14",
+          "engine_image_id": "sha256:c4c3584fc5a4b11f20344c9e353ffe17f72203c1dff363dd9729e1053b1fde14",
+          "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+        },
+        "ai": {
+          "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-ai@sha256:38080355322cc342c5b80e06da1ffdbc00549e391824d7be5e54179ea2d45e5b",
+          "engine_image_id": "sha256:38080355322cc342c5b80e06da1ffdbc00549e391824d7be5e54179ea2d45e5b",
+          "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+        }
+      },
+      "runtime_started": false,
+      "old_images_removed": false,
+      "authentication_removed": true,
+      "original_containers_unchanged": true
+    },
+    "serverD": {
+      "target": "serverD",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "cached": {
+        "qs-worker": {
+          "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-worker@sha256:052758537916756515f9897238dcc2c8e2c3c598e997859724345ea2993b2d84",
+          "engine_image_id": "sha256:052758537916756515f9897238dcc2c8e2c3c598e997859724345ea2993b2d84",
+          "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0"
+        }
+      },
+      "runtime_started": false,
+      "old_images_removed": false,
+      "authentication_removed": true,
+      "original_containers_unchanged": true
+    }
+  },
+  "cleanup": {
+    "serverA": true,
+    "serverD": true
+  },
+  "runtime_started": false,
+  "production_business_cutover": false,
+  "complete": true,
+  "publication_cache_run_id": 40164455745,
+  "workflow_source_sha": "31daa27006fa53d54db5fdf518766bc69bd377c7",
+  "workflow_merge_sha": "bb7f01aa4cf0ddac88367b9a58a882cdca87ccba",
+  "workflow_ci_successes": 28,
+  "conditional_nonapplicable_jobs": 1,
+  "infra_source_sha": "5139def111e7084eb777f563421aa6b0f6ec0966",
+  "infra_merge_sha": "ad97236b2904e484dc70b612474652f02ae90f20",
+  "infra_boundary_tests": 4,
+  "extra_cleanup_passed": true,
+  "credentials_supplied_in_chat": false,
+  "existing_ci_secrets_reused": true
+}
