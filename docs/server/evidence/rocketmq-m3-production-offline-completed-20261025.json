@@ -1,0 +1,29 @@
+{
+  "schema": "m3-production-offline-migration-completed/v1",
+  "operation_id": "20261025081841-2",
+  "observed_at": "2026-10-25T11:45:08.653626+00:00",
+  "window_started_at": "2026-10-25T11:35:53Z",
+  "database_targets": {
+    "ai": "0043_native_transaction_limit",
+    "iam": 45,
+    "qs_mongo": 44,
+    "qs_mysql": 110
+  },
+  "owners_verified": [
+    "iam.mysql",
+    "qs.mysql",
+    "qs.mongo",
+    "ai.mysql"
+  ],
+  "same_window_backups": 3,
+  "verified_mini_copies": 3,
+  "all_old_eight_writers_stopped": true,
+  "all_old_business_responsibilities_zero_after_stop": true,
+  "Mongo_business_archive_complete": true,
+  "Mongo_profile_preserved_in_place": true,
+  "Mongo_profile_settings_modified": false,
+  "migration_completed_before_first_start_marker": true,
+  "first_window_failure_preserved": true,
+  "production_business_acceptance": false,
+  "observation_started": false
+}
