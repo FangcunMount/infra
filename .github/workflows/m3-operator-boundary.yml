@@ -1,0 +1,21 @@
+name: M3 operator coordinator boundaries
+on:
+  pull_request:
+    paths:
+      - scripts/ops/m3_operator_step.py
+      - scripts/ops/test_m3_operator_step.py
+      - .github/workflows/m3-operator-boundary.yml
+permissions:
+  contents: read
+jobs:
+  operator-boundary:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - run: python3 -m unittest discover -s scripts/ops -p test_m3_operator_step.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_start_boundary.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_cutover_step.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_runtime_start.py
