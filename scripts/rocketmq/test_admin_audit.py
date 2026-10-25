@@ -23,8 +23,9 @@ class ExistingACLTest(unittest.TestCase):
             def __init__(self,text):self.text=text
             def docker(self,*args,**kwargs):return types.SimpleNamespace(stdout='',stderr=self.text,returncode=0)
         self.assertEqual(read_existing_acl(Admin('MQBrokerException: CODE: 3002 DESC: no policy'),'app')['kind'],'absent')
-        for text in ('RemotingConnectException: timeout','MQBrokerException: CODE: 16 DESC: denied'):
-            with self.assertRaises(RuntimeError):read_existing_acl(Admin(text),'app')
+        self.assertEqual(read_existing_acl(Admin(''),'app'),dict(kind='absent',response='successful_null_acl'))
+        for text in ('unexpected output','RemotingConnectException: timeout','MQBrokerException: CODE: 16 DESC: denied'):
+            with self.assertRaises((RuntimeError,ValueError)):read_existing_acl(Admin(text),'app')
 
 
 if __name__=='__main__':unittest.main()

@@ -63,7 +63,7 @@ def main():
             before_users=audit_admin.users();before_acls=snapshot_existing_acls(audit_admin,before_users)
             require(before_acls[legacy]['kind']=='table' and any(row[-1].lower()=='deny' and row[-2]=='[127.0.0.1]' for row in before_acls[legacy]['rows']),
                     'actual_restricted_deny_snapshot_required')
-            require(before_acls[empty]==dict(kind='absent',remoting_code=3002),'actual_absent_acl_required')
+            require(before_acls[empty]==dict(kind='absent',response='successful_null_acl'),'actual_absent_acl_required')
             try:audit_admin.acl(legacy)
             except RuntimeError:pass
             else:raise ValueError('strict_provision_decoder_was_weakened')

@@ -32,6 +32,11 @@ def read_existing_acl(admin,username):
         return {'kind':'absent','remoting_code':3002}
     if result.returncode or 'Exception' in text or 'command failed' in text:
         raise RuntimeError('private_readonly_acl_rpc_failed')
+    # Pinned GetAclSubCommand returns successfully without printing when the
+    # Broker returns null. RPC/auth failures print Exception/command failed and
+    # are rejected above; a headerless nonempty response is never absence.
+    if not result.stdout.strip() and not result.stderr.strip():
+        return {'kind':'absent','response':'successful_null_acl'}
     return parse_existing_acl(result.stdout,'User:'+username)
 
 
