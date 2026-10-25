@@ -1,0 +1,109 @@
+{
+  "schema": "m3-serverd-broker-recovery-plan/v1",
+  "operation_id": "m3-serverd-broker-admin-20261025-v1",
+  "production_approved": false,
+  "execution_started": false,
+  "host": "serverD",
+  "private_address": "100.118.164.39",
+  "ssh_ingress": "existing personal SSH via mac-mini-old; no GitHub-hosted production SSH",
+  "broker": {
+    "id": "ce02d3e209b1f17dbf9b7544b3629f363fa45e5a80e3766b77295f038e86ccce",
+    "image": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+    "status": "exited",
+    "exit_code": 143,
+    "oom": false,
+    "port_bindings": {
+      "5557/tcp": [
+        {
+          "HostIp": "100.118.164.39",
+          "HostPort": "5557"
+        }
+      ],
+      "8081/tcp": [
+        {
+          "HostIp": "100.118.164.39",
+          "HostPort": "8081"
+        }
+      ]
+    },
+    "memory": 1342177280,
+    "nano_cpus": 1500000000
+  },
+  "configuration_root": "/data/infra/rocketmq/config",
+  "configuration": {
+    "broker.conf": {
+      "sha256": "a466082a24537582bc6261ed786a45bf745fc2637f8dfd512566252cf8911d79",
+      "mode": "0o640",
+      "uid": 3000,
+      "gid": 3000,
+      "inode": 788350,
+      "bytes": 1603
+    },
+    "proxy.json": {
+      "sha256": "28a70ed0634f1f9998a0e520ee6eb787be3aeca2c2442a26d7dea79cc6951ed2",
+      "mode": "0o640",
+      "uid": 3000,
+      "gid": 3000,
+      "inode": 788351,
+      "bytes": 1242
+    },
+    "tools.yml": {
+      "sha256": "000452b0b0d8892cf5b36f9fa0ce157c9ebe81626fd5c35a805d09fc02165df3",
+      "mode": "0o640",
+      "uid": 3000,
+      "gid": 3000,
+      "inode": 788349,
+      "bytes": 101
+    }
+  },
+  "actual_auth_metadata": {
+    "users": {
+      "root": "/data/infra/rocketmq/store/config/users",
+      "files": 8,
+      "logical_bytes": 17326,
+      "tree_sha256": "fa948dc5c3867bdf493f49e11ac460401436fffd4dbdc0db152c7f6452a49867"
+    },
+    "acls": {
+      "root": "/data/infra/rocketmq/store/config/acls",
+      "files": 8,
+      "logical_bytes": 21023,
+      "tree_sha256": "056b42ae290491926d3c4da38d89cda5b7cf97266259b03401a84d5856f5867b"
+    }
+  },
+  "empty_auth_mount_is_not_authoritative": true,
+  "backup_scope": [
+    "store",
+    "auth",
+    "config/broker.conf",
+    "config/proxy.json",
+    "config/tools.yml"
+  ],
+  "private_backup_root": "/data/infra/rocketmq/recovery/m3-broker-admin-20261025-v1",
+  "backup_retention_minimum_days": 30,
+  "rotate_only_existing_admin_password": true,
+  "allowed_config_changes": [
+    "broker.conf:initAuthenticationUser.password",
+    "proxy.json:initAuthenticationUser.password",
+    "tools.yml:secretKey"
+  ],
+  "preserve_admin_identity_type_status": true,
+  "preserve_resources_and_ports": true,
+  "production_business_admission_unchanged": true,
+  "topic_acl_schema_provider_changes": false,
+  "original_workers_untouched": true,
+  "success_requires": [
+    "same_broker_id_and_image",
+    "new_admin_success",
+    "old_admin_explicit_code16",
+    "new_admin_success_again",
+    "all_three_config_copies_match",
+    "enabled_super_identity_preserved",
+    "effective_transaction_parameters_readback",
+    "broker_healthy",
+    "prometheus_target_up",
+    "mem_available_at_least_512MiB",
+    "three_original_workers_unchanged"
+  ],
+  "failure_behavior": "stop only broker; preserve new credential, stage and all original backups; no automatic restoration of exposed credential, auth database or store",
+  "preflight_utc": "2026-10-25T02:07:11.382095+00:00"
+}

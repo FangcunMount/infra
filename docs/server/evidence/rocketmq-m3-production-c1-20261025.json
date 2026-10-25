@@ -93,10 +93,16 @@
   "startup_run_id": 40114698327,
   "image_run_id": 40114281101,
   "fixture_pr": 265,
-  "fixture_merged": false,
+  "fixture_merged": true,
   "full_scope_restore_exact": true,
   "raw_report_modified": false,
   "m3_completed_tasks": 28,
   "m3_total_tasks": 36,
-  "scope": "isolated owned controlled data only; no production deployment, RTO or system claim"
+  "scope": "isolated owned controlled data only; no production deployment, RTO or system claim",
+  "fixture_merge_sha": "5078a89391b458ca933514d750625a1cb5f50983",
+  "fixture_source_checks": {
+    "success": 11,
+    "conditional_not_applicable": 6,
+    "failed": 0
+  }
 }

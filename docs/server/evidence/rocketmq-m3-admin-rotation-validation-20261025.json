@@ -1,0 +1,63 @@
+{
+  "production": false,
+  "production_credentials_used": false,
+  "passed": 8,
+  "failed": 0,
+  "skipped": 0,
+  "phases": [
+    "original_verified",
+    "update_user_attempted",
+    "update_user_confirmed",
+    "new_configuration_persisted",
+    "broker_restarted",
+    "new_success_old_denied_new_success"
+  ],
+  "dependency_image_ids": {
+    "mysql": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+    "rocketmq": "sha256:e51be082966636f791f3817493f1a38a34c3f17613a6d23ed86584f045e0de92"
+  },
+  "dependency_versions": {
+    "mysql": "8.0.36"
+  },
+  "cases": {
+    "original_verified": true,
+    "update_user_confirmed": true,
+    "new_configuration_persisted": true,
+    "broker_restarted": true,
+    "new_success_old_denied_new_success": true,
+    "all_config_copies_visible": true,
+    "default_tools_authenticated": true,
+    "original_container_retained": true
+  },
+  "new_success_old_denied_new_success": true,
+  "all_config_copies_persisted": true,
+  "default_tools_authenticated": true,
+  "same_container_after_restart": true,
+  "application_started": false,
+  "cleanup": {
+    "compose_down_succeeded": true,
+    "private_directory_removed": true,
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true
+  },
+  "schema": "m3-admin-rotation-validation/v1",
+  "run_id": 40153370577,
+  "run_url": "https://github.com/FangcunMount/infra/actions/runs/40153370577",
+  "source_sha": "769060378f74b505dc22cb1fcd3476ed2205dbd9",
+  "report_sha256": "e09291bb62811dee3e6209ba9318fe758a02ba3007a77c0980a6ca26ddefd2bd",
+  "pure_tests": 5,
+  "source_pr": 268,
+  "source_merged": false,
+  "production_rotation_performed": false,
+  "prior_failure": {
+    "run_id": 40153211965,
+    "source_sha": "fe22178e083fd80842f4f583524640bac7653aee",
+    "report_sha256": "0b0956b0f9dfa8ef979b0be015fc7fa296e2cf660dc8ad0c49cbf5c83612cb1a",
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "phases": [],
+    "reason": "exact enum spelling assumption rejected initial existing account; no updateUser attempted; fixed by pinned uppercase enum regression",
+    "original_report_modified": false
+  }
+}
