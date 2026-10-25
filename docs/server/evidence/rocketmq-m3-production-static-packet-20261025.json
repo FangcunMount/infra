@@ -707,10 +707,33 @@
   "dynamic_window_evidence_included": false,
   "production_approved": false,
   "executable_without_window_binding": false,
-  "source_ci_pending": true,
+  "source_ci_pending": false,
   "contains_production_credentials": true,
   "uploaded_to_ci_or_public_storage": false,
   "archive_readback_members_verified": 140,
   "acceptance_open_application_input_bytes_equal_projects": 5,
-  "public_credential_scan_passed": true
+  "public_credential_scan_passed": true,
+  "source_ci": {
+    "head_sha": "9166fb10fdfc87e822d2ea527b38ac750cfc4236",
+    "run_id": 40174586659,
+    "jobs": [
+      "ubuntu-24.04",
+      "macos-15"
+    ],
+    "tests_per_job": 47,
+    "failed": 0,
+    "skipped": 0,
+    "conclusion": "success",
+    "pr": 283,
+    "merge_sha": "976b7a51449bf129d4bcd2f424f0816e0184d816"
+  },
+  "mini_copy": {
+    "schema": "m3-static-packet-mini-copy/v1",
+    "archive_bytes": 9262464,
+    "archive_sha256": "c641373ca442f7df65626f0a16846ebae6c957732e936dae9d7044e6fa33b00d",
+    "private_mode": "0700/0600",
+    "retention_days_minimum": 30,
+    "extracted": false
+  },
+  "source_members_equal_tested_commit": true
 }
