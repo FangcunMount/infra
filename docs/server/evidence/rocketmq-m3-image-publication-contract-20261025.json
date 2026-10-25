@@ -1,0 +1,28 @@
+{
+  "production": false,
+  "production_credentials_used": false,
+  "passed": 4,
+  "failed": 0,
+  "skipped": 0,
+  "config_id": "sha256:402d32dfe3ccc9637340d2ec5bb7858930e2c7029be0f9f25e74ba65b994e92f",
+  "reference": "127.0.0.1:54635/owned/probe@sha256:1f8b7b5769a84885e7f09a3cafc807124b7ed68bcad364d2813ccdf78302a1b1",
+  "compressed_archive_transport_verified": true,
+  "application_started": false,
+  "cleanup": {
+    "owned_container_absent": true,
+    "existing_containers_unchanged": true
+  },
+  "schema": "m3-candidate-publication-contract/v1",
+  "run_id": 40152761293,
+  "run_url": "https://github.com/FangcunMount/infra/actions/runs/40152761293",
+  "source_sha": "89581dca3e8d06a4f69580b18cce78b5d91ca9bc",
+  "report_sha256": "edda2e1e11c766caa34c480ebfbb3465682d750c8f02f3e318d1e64ab86780bb",
+  "pure_tests": 6,
+  "local_all_pure_tests": 344,
+  "infra_pr": 267,
+  "infra_merged": false,
+  "iam_pr": 150,
+  "iam_merged": true,
+  "iam_merge_sha": "008a5abf311d9c699c402964e2c2e162150c4b93",
+  "actual_acr_publication_performed": false
+}
