@@ -1,0 +1,92 @@
+{
+  "execution": {
+    "approval_scope": "user approved additional original Compose endpoint repair and one guarded retry; underlying password scope infra269",
+    "backup": {
+      "automatic_deletion": false,
+      "bytes": 58455997,
+      "file_count": 68,
+      "full_archive_member_bytes_verified": true,
+      "path": "/data/infra/rocketmq/recovery/m3-broker-admin-20261025-v1/cold-backup.tar.gz",
+      "retention_minimum_days": 30,
+      "reused_after_exact_source_verification": true,
+      "sha256": "2912e63fce6008210202347194da48f4356eac38e5c16220c4c2d30ee5874381",
+      "source_manifest_sha256": "0ccfe8ce707fed92c235fbb4dfe8ee683634a0d05436479cca1041bc66307889"
+    },
+    "complete": false,
+    "error_type": "RuntimeError",
+    "failure_broker_stopped": true,
+    "failure_stop_returncode": 0,
+    "mac_mini_backup": {
+      "bytes": 58455997,
+      "command": "verified_backup",
+      "fresh_sha256_verified": true,
+      "host": "macmini-001.local",
+      "observed_at_utc": "2026-10-25T03:47:46.131370+00:00",
+      "receipt_sha256": "d61e76e9d10b04a6421be23ed325be163a2adb5cd15c8d5d5ac7dd09fc89999a",
+      "sha256": "2912e63fce6008210202347194da48f4356eac38e5c16220c4c2d30ee5874381",
+      "source_manifest_verified": true
+    },
+    "network_connect_attempts": 1,
+    "operation_id": "m3-serverd-broker-admin-network-20261025-v2",
+    "phases": [
+      {
+        "phase": "awaiting_fresh_mac_mini_backup_verification",
+        "utc": "2026-10-25T03:47:21.093092+00:00"
+      },
+      {
+        "phase": "fresh_mac_mini_backup_verified",
+        "utc": "2026-10-25T03:47:52.460562+00:00"
+      },
+      {
+        "phase": "original_network_connect_attempted",
+        "utc": "2026-10-25T03:47:58.593661+00:00"
+      },
+      {
+        "phase": "original_network_attachment_prepared",
+        "utc": "2026-10-25T03:47:58.669682+00:00"
+      },
+      {
+        "phase": "original_broker_start_attempted",
+        "utc": "2026-10-25T03:47:58.676597+00:00"
+      },
+      {
+        "phase": "original_broker_healthy",
+        "utc": "2026-10-25T03:48:14.390923+00:00"
+      },
+      {
+        "phase": "recovery_failed",
+        "utc": "2026-10-25T03:48:53.732390+00:00"
+      }
+    ],
+    "plan_sha256": "385a5e5233f5c9d0b97fb5ff838e2c23ff0c199c309471c671a3594ccddce4ed",
+    "production_approved": true,
+    "production_business_cutover": false,
+    "restart_attempts": 0,
+    "schema": "m3-serverd-broker-network-recovery/v2",
+    "start_attempts": 1,
+    "topic_acl_schema_provider_mutations": false
+  },
+  "broker": {
+    "status": "exited",
+    "running": false,
+    "exit_code": 143,
+    "oom": false,
+    "restart_count": 0,
+    "networks": [
+      "rocketmq_rocketmq"
+    ]
+  },
+  "configuration_sha256": {
+    "broker.conf": "a466082a24537582bc6261ed786a45bf745fc2637f8dfd512566252cf8911d79",
+    "proxy.json": "28a70ed0634f1f9998a0e520ee6eb787be3aeca2c2442a26d7dea79cc6951ed2",
+    "tools.yml": "000452b0b0d8892cf5b36f9fa0ce157c9ebe81626fd5c35a805d09fc02165df3"
+  },
+  "schema": "m3-broker-network-recovery-attempt-evidence/v1",
+  "network_attachment_recovered": true,
+  "password_update_attempted": false,
+  "acl_topic_schema_provider_mutations": false,
+  "failure_boundary": "existing ACL read-only snapshot used provisioning decoder and rejected headerless response before updateUser",
+  "continued_recovery_authorized": true,
+  "authorization_basis": "user explicitly approved continuing similar operations during planned execution",
+  "private_source_sha256": "9f728d4d5daa18eae3f6d7d0427b6671e28dba191cd984dfa681a4db1706e305"
+}
