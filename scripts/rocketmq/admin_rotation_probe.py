@@ -33,6 +33,7 @@ def main():
     fixture.image='rocketmq-m3-image-start:5.5.1'
     try:
         fixture.dependencies();broker=fixture.project+'-broker-1'
+        before_id=fixture.run(['docker','inspect',broker,'--format','{{.Id}}']).stdout.strip()
         def call(args,**kwargs):return fixture.run(['docker','exec',broker,*args],**kwargs).stdout
         source={name:call(['cat','/etc/rocketmq/'+name]) for name in ('broker.conf','proxy.json','tools.yml')}
         old,new,changed=prepare(source,secrets.token_hex(32))
@@ -52,7 +53,13 @@ def main():
                persist=persist,restart=restart,checkpoint=report['phases'].append)
         require(all(call(['cat','/etc/rocketmq/'+name])==body for name,body in changed.items()),'new_all_config_copies_not_visible')
         users=Admin(broker).users();require(users[new['username']]==(new['password'],'Super','Enable'),'default_tools_not_rotated')
-        report.update(passed=7,failed=0,new_success_old_denied_new_success=True,
+        after_id=fixture.run(['docker','inspect',broker,'--format','{{.Id}}']).stdout.strip()
+        require(before_id==after_id,'original_container_replaced')
+        cases={phase:phase in report['phases'] for phase in ('original_verified','update_user_confirmed',
+            'new_configuration_persisted','broker_restarted','new_success_old_denied_new_success')}
+        cases.update(all_config_copies_visible=True,default_tools_authenticated=True,original_container_retained=True)
+        require(all(cases.values()),'rotation_phase_evidence_incomplete')
+        report.update(passed=len(cases),failed=0,cases=cases,new_success_old_denied_new_success=True,
             all_config_copies_persisted=True,default_tools_authenticated=True,
             same_container_after_restart=True,application_started=False)
     except Exception as error:
