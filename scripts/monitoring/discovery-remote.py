@@ -12,7 +12,9 @@ def endpoints(containers):
             continue
         name = c['Name'].lstrip('/')
         labels = c['Config'].get('Labels') or {}
-        if name == 'qs-ai':
+        if name == 'iam-apiserver':
+            job, port, instance = 'iam', 9080, 'iam-apiserver:9080'
+        elif name == 'qs-ai':
             job, port, instance = 'qs-ai', 8000, 'qs-ai-api:8000'
         elif labels.get('prometheus.scrape') == 'true':
             job = labels.get('prometheus.job', '')
@@ -23,8 +25,12 @@ def endpoints(containers):
         ip = c['NetworkSettings']['Networks'].get('infra-network', {}).get('IPAddress')
         if not ip or ipaddress.ip_address(ip) not in ipaddress.ip_network('172.20.0.0/24'):
             raise ValueError('monitored container has no expected overlay address')
-        if job not in {'qs-ai', 'qs-apiserver', 'qs-collection-server', 'qs-worker'} or port not in {8000, 8080, 9092}:
+        if job not in {'iam', 'qs-ai', 'qs-apiserver', 'qs-collection-server', 'qs-worker'} or port not in {8000, 8080, 9080, 9092}:
             raise ValueError('unexpected monitoring job or port')
+        if job == 'iam' and (name != 'iam-apiserver' or port != 9080):
+            raise ValueError('unexpected IAM monitoring identity')
+        if job != 'iam' and port == 9080:
+            raise ValueError('IAM port is not a general monitoring endpoint')
         if job == 'qs-apiserver':
             instance = 'qs-apiserver:8080'
         elif job == 'qs-collection-server':

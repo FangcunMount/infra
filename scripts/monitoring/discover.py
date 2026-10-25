@@ -17,10 +17,12 @@ def groups(items, gateway):
         ip = str(ipaddress.ip_address(item['ip']))
         port = int(item['port'])
         job = item['job']
-        if ipaddress.ip_address(ip) not in ipaddress.ip_network('172.20.0.0/24') or port not in {8000, 8080, 9092}:
+        if ipaddress.ip_address(ip) not in ipaddress.ip_network('172.20.0.0/24') or port not in {8000, 8080, 9080, 9092}:
             raise ValueError('unexpected endpoint')
-        if job not in {'qs-ai', 'qs-apiserver', 'qs-collection-server', 'qs-worker'}:
+        if job not in {'iam', 'qs-ai', 'qs-apiserver', 'qs-collection-server', 'qs-worker'}:
             raise ValueError('unexpected job')
+        if (job == 'iam') != (port == 9080) or (job == 'iam' and item['instance'] != 'iam-apiserver:9080'):
+            raise ValueError('unexpected IAM monitoring identity')
         key = (job, item['instance'])
         if key in seen:
             raise ValueError('duplicate monitored instance')

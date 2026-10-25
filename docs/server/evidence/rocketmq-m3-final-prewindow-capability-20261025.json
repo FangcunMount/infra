@@ -1,0 +1,108 @@
+{
+  "schema": "m3-final-prewindow-capability-readback/v1",
+  "observed_at": "2026-10-25T10:05:13.590332+00:00",
+  "m3_completed_tasks": 31,
+  "m3_total_tasks": 36,
+  "maintenance_started": false,
+  "original_maintenance_previews": {
+    "iam": {
+      "read_only": true,
+      "actual_initial_version": 40
+    },
+    "qs": {
+      "read_only": true,
+      "actual_initial_versions": [
+        105,
+        40
+      ],
+      "target_versions": [
+        110,
+        44
+      ]
+    },
+    "ai": {
+      "read_only": true,
+      "actual_initial_version": "0040_module_table_names"
+    }
+  },
+  "host_preflight": {
+    "serverA": {
+      "original_containers_unchanged": true,
+      "frozen_runtime_files_verified": 69,
+      "operator_sources_verified": 2,
+      "backup_free_mib": 154044,
+      "memory_available_mib": 6518
+    },
+    "serverD": {
+      "original_containers_unchanged": true,
+      "frozen_runtime_files_verified": 21,
+      "operator_sources_verified": 2,
+      "backup_free_mib": 24412,
+      "memory_available_mib": 1306
+    },
+    "serverC": {
+      "original_containers_unchanged": true,
+      "operator_sources_verified": 2,
+      "backup_free_mib": 25320,
+      "memory_available_mib": 2429
+    }
+  },
+  "old_responsibilities_read_only": {
+    "active_nsq_business_backlogs": 0,
+    "retained_offline_authz_copies": 4364,
+    "mysql_events": 0,
+    "mysql_transactions_at_sample": 0,
+    "mysql_application_connections_still_live": 14,
+    "mongo_ttl_plan_count": 0,
+    "ai_execution_jobs_done": 35,
+    "ai_completed_sessions": 30,
+    "ai_blocked_sessions_preserved": 7,
+    "ai_delivered_result_rows": 107,
+    "model_invocations_added": 0
+  },
+  "native_mongo_backup_capability": {
+    "passed": true,
+    "empty_collection_only": true,
+    "archive_bytes": 390,
+    "archive_sha256": "58806a802230fffae62b8445234a8e327a70088de58747c923348567b1d518c1",
+    "same_window_protection": false,
+    "authentication_file_removed": true,
+    "initial_database_uri_conflict_retained_as_failure": true,
+    "corrected_authentication_database_explicit": true
+  },
+  "operator_contract": {
+    "isolated_passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "ssh_or_database_calls": 0,
+    "coordinator_context_propagation_verified": true,
+    "initial_missing_context_guard_fixed_before_production": true
+  },
+  "github_secret_context": {
+    "original_user_session_authenticated": true,
+    "isolated_coordinator_home_authentication": false,
+    "planned_resolution": "same durable Boundary with original user keychain context; stdin only",
+    "secrets_changed": false
+  },
+  "monitoring_gap": {
+    "existing_targets": 9,
+    "existing_targets_up": 9,
+    "iam_target_missing": true,
+    "source_patch_in_this_pr": true,
+    "new_discovery_tests": 2,
+    "total_discovery_tests_passed": 7,
+    "production_monitoring_patch_applied": false
+  },
+  "new_business_runtime_started": false,
+  "production_ddl_executed": false,
+  "mysql_credential_rotated": false,
+  "system_new_chain_acceptance": false,
+  "observation_48h_started": false,
+  "private_patient_scope_published": false,
+  "remaining_before_maintenance": [
+    "source CI and private IAM monitoring readback",
+    "finish and freeze one-off operation source closure",
+    "verify original legal sessions and pending form without resubmitting",
+    "then actual W01-W11 within existing approval"
+  ]
+}
