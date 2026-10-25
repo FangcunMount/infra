@@ -1,0 +1,198 @@
+{
+  "approval_scope": "user approved continuing similar infrastructure recovery and necessary fixes; original password scope infra269",
+  "backup": {
+    "automatic_deletion": false,
+    "bytes": 58456599,
+    "file_count": 68,
+    "full_archive_member_bytes_verified": true,
+    "path": "/data/infra/rocketmq/recovery/m3-broker-admin-audit-20261025-v3/cold-backup.tar.gz",
+    "retention_minimum_days": 30,
+    "sha256": "14ec0cb660e9e125817f82f1091f76b5253377220ff666e3520afadc1aa2a702",
+    "source_manifest_sha256": "3eb5c5887f3087cf0c4d875b97b712ef71489b6b205aad9e9ece8c91e20cc2c0"
+  },
+  "broker_after": {
+    "id": "ce02d3e209b1f17dbf9b7544b3629f363fa45e5a80e3766b77295f038e86ccce",
+    "image": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+    "oom": false,
+    "restart_count": 0,
+    "started_at": "2026-10-25T04:30:14.27030797Z",
+    "status": "running"
+  },
+  "complete": true,
+  "effective_parameters": {
+    "fileReservedTime": 48,
+    "transactionCheckInterval": 30000,
+    "transactionCheckMax": 15,
+    "transactionTimeOut": 6000
+  },
+  "mac_mini_backup": {
+    "bytes": 58456599,
+    "command": "verified_backup",
+    "receipt_sha256": "bfa05aa7a3563c04bac5bb77e2c09f33293a37260275b6598ad39e4a6beaf1be",
+    "sha256": "14ec0cb660e9e125817f82f1091f76b5253377220ff666e3520afadc1aa2a702",
+    "source_ci_checks_passed": 12,
+    "source_manifest_sha256": "3eb5c5887f3087cf0c4d875b97b712ef71489b6b205aad9e9ece8c91e20cc2c0",
+    "source_merge_sha": "d91e88c2a275cd065860960ed3b36043bd49f10c",
+    "source_pr": 275,
+    "source_sha": "96073318056cac8c3f34ea7f053e5e1af26bc7a9"
+  },
+  "memory_available_bytes": 1419735040,
+  "monitoring": {
+    "all_scrapes_after_broker_restart": true,
+    "broker_up": true,
+    "command": "verified_monitoring",
+    "receipt_sha256": "378d749d4ab7ccc14f9b468fc7f00cce699dc31cfefefbe3d3e5c008e513924f",
+    "workers_up": 3
+  },
+  "network_connect_attempts": 0,
+  "new_configuration_sha256": {
+    "broker.conf": "f827334be32a8bb5829b6a376ac56c25bb369934e0fd4a5ed02cfc9277a82199",
+    "proxy.json": "e2dc5ebf3b494a63d242b7f0471ae0aa32d80d7f410622b673aaf9860b980305",
+    "tools.yml": "3580d9ad4dbb1af0342ee0010e292953b0a11c66c3dde57348efeaddf1b1260a"
+  },
+  "operation_id": "m3-serverd-broker-admin-audit-20261025-v3",
+  "other_containers_unchanged": true,
+  "passed": true,
+  "phases": [
+    {
+      "phase": "cold_backup_started",
+      "utc": "2026-10-25T04:09:03.411020+00:00"
+    },
+    {
+      "phase": "awaiting_verified_mac_mini_copy",
+      "utc": "2026-10-25T04:09:22.372962+00:00"
+    },
+    {
+      "phase": "mac_mini_backup_verified",
+      "utc": "2026-10-25T04:28:27.648654+00:00"
+    },
+    {
+      "phase": "original_broker_start_attempted",
+      "utc": "2026-10-25T04:28:33.968965+00:00"
+    },
+    {
+      "phase": "original_broker_healthy",
+      "utc": "2026-10-25T04:28:49.740087+00:00"
+    },
+    {
+      "phase": "original_verified",
+      "utc": "2026-10-25T04:29:59.222891+00:00"
+    },
+    {
+      "phase": "update_user_attempted",
+      "utc": "2026-10-25T04:29:59.226093+00:00"
+    },
+    {
+      "phase": "update_user_confirmed",
+      "utc": "2026-10-25T04:30:03.929984+00:00"
+    },
+    {
+      "phase": "new_configuration_persisted",
+      "utc": "2026-10-25T04:30:03.944530+00:00"
+    },
+    {
+      "phase": "original_broker_restart_attempted",
+      "utc": "2026-10-25T04:30:03.983853+00:00"
+    },
+    {
+      "phase": "broker_restarted",
+      "utc": "2026-10-25T04:30:26.715580+00:00"
+    },
+    {
+      "phase": "new_success_old_denied_new_success",
+      "utc": "2026-10-25T04:30:47.032834+00:00"
+    },
+    {
+      "phase": "awaiting_mac_mini_monitoring",
+      "utc": "2026-10-25T04:31:54.662152+00:00"
+    },
+    {
+      "phase": "recovery_complete",
+      "utc": "2026-10-25T04:34:33.592595+00:00"
+    }
+  ],
+  "plan_sha256": "639053c36d1773f021efcdda0aa6414ea691322a234d2342bc26014cc104de18",
+  "production_approved": true,
+  "production_business_cutover": false,
+  "resource_readback": {
+    "explicit_acl_principals": 7,
+    "groups": 12,
+    "principals": 9,
+    "topic_group_acl_unchanged_across_rotation": true,
+    "topics": 10,
+    "v2_topics": 0
+  },
+  "restart_attempts": 1,
+  "schema": "m3-serverd-broker-admin-recovery/v3",
+  "start_attempts": 1,
+  "temporary_auth_directories_removed": true,
+  "topic_acl_schema_provider_mutations": false,
+  "evidence_schema": "m3-broker-admin-recovery-evidence/v3",
+  "operator_report_sha256": "85146ff128c28d70a1a955d885b7909946fb615c5de9dba282aa521bd96b8cea",
+  "source_ci_checks_passed": 12,
+  "source_pr": 275,
+  "source_merge_sha": "d91e88c2a275cd065860960ed3b36043bd49f10c",
+  "monitoring_receipt": {
+    "schema": "m3-broker-recovery-monitoring/v1",
+    "observed_at_utc": "2026-10-25T04:34:26.859085+00:00",
+    "broker_up": true,
+    "workers_up": 3,
+    "all_scrapes_after_broker_restart": true,
+    "targets": [
+      {
+        "job": "qs-worker",
+        "instance": "qs-worker-runtime-3",
+        "health": "up",
+        "error_present": false,
+        "last_scrape_utc": "2026-10-25T04:34:24.496475511Z",
+        "after_broker_restart": true
+      },
+      {
+        "job": "qs-worker",
+        "instance": "qs-worker-runtime-2",
+        "health": "up",
+        "error_present": false,
+        "last_scrape_utc": "2026-10-25T04:34:14.288868756Z",
+        "after_broker_restart": true
+      },
+      {
+        "job": "qs-worker",
+        "instance": "qs-worker-runtime-1",
+        "health": "up",
+        "error_present": false,
+        "last_scrape_utc": "2026-10-25T04:34:25.621881053Z",
+        "after_broker_restart": true
+      },
+      {
+        "job": "rocketmq",
+        "instance": "100.118.164.39:5557",
+        "health": "up",
+        "error_present": false,
+        "last_scrape_utc": "2026-10-25T04:34:15.234926465Z",
+        "after_broker_restart": true
+      }
+    ],
+    "active_rocketmq_alert_names": []
+  },
+  "m3_completed_tasks": 28,
+  "m3_total_tasks": 36,
+  "t29_complete": false,
+  "native_verification": {
+    "run_id": 40160690632,
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0
+  },
+  "monitoring_parser_fix": {
+    "production_configuration_changed": false,
+    "reason": "Mac mini Python rejects fractional timestamps beyond microsecond precision; exact RFC3339 values normalize to microseconds before comparison",
+    "final_restart_freshness_required": true
+  },
+  "post_rotation_private_configuration_copy": {
+    "verified": true,
+    "receipt_sha256": "953ed7b12a79856fb04c9d9598f8ad37585b6499aa31145d6b98f8cc284726de",
+    "dir_mode": "0700",
+    "file_mode": "0600",
+    "full_database_backup": false
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "schema": "m3-serverd-broker-admin-recovery-plan/v3",
+  "operation_id": "m3-serverd-broker-admin-audit-20261025-v3",
+  "production_approved": true,
+  "execution_started": false,
+  "host": "serverD",
+  "private_address": "100.118.164.39",
+  "ssh_ingress": "existing personal SSH via mac-mini-old; no GitHub-hosted production SSH",
+  "broker": {
+    "id": "ce02d3e209b1f17dbf9b7544b3629f363fa45e5a80e3766b77295f038e86ccce",
+    "image": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+    "status": "exited",
+    "exit_code": 143,
+    "oom": false,
+    "port_bindings": {
+      "5557/tcp": [
+        {
+          "HostIp": "100.118.164.39",
+          "HostPort": "5557"
+        }
+      ],
+      "8081/tcp": [
+        {
+          "HostIp": "100.118.164.39",
+          "HostPort": "8081"
+        }
+      ]
+    },
+    "memory": 1342177280,
+    "nano_cpus": 1500000000,
+    "restart_count": 0
+  },
+  "configuration_root": "/data/infra/rocketmq/config",
+  "configuration": {
+    "broker.conf": {
+      "sha256": "a466082a24537582bc6261ed786a45bf745fc2637f8dfd512566252cf8911d79",
+      "mode": "0o640",
+      "uid": 3000,
+      "gid": 3000,
+      "inode": 788350,
+      "bytes": 1603
+    },
+    "proxy.json": {
+      "sha256": "28a70ed0634f1f9998a0e520ee6eb787be3aeca2c2442a26d7dea79cc6951ed2",
+      "mode": "0o640",
+      "uid": 3000,
+      "gid": 3000,
+      "inode": 788351,
+      "bytes": 1242
+    },
+    "tools.yml": {
+      "sha256": "000452b0b0d8892cf5b36f9fa0ce157c9ebe81626fd5c35a805d09fc02165df3",
+      "mode": "0o640",
+      "uid": 3000,
+      "gid": 3000,
+      "inode": 788349,
+      "bytes": 101
+    }
+  },
+  "empty_auth_mount_is_not_authoritative": true,
+  "backup_scope": [
+    "store",
+    "auth",
+    "config/broker.conf",
+    "config/proxy.json",
+    "config/tools.yml"
+  ],
+  "private_backup_root": "/data/infra/rocketmq/recovery/m3-broker-admin-audit-20261025-v3",
+  "backup_retention_minimum_days": 30,
+  "rotate_only_existing_admin_password": true,
+  "allowed_config_changes": [
+    "broker.conf:initAuthenticationUser.password",
+    "proxy.json:initAuthenticationUser.password",
+    "tools.yml:secretKey"
+  ],
+  "preserve_admin_identity_type_status": true,
+  "preserve_resources_and_ports": true,
+  "production_business_admission_unchanged": true,
+  "topic_acl_schema_provider_changes": false,
+  "original_workers_untouched": true,
+  "success_requires": [
+    "same_broker_id_and_image",
+    "new_admin_success",
+    "old_admin_explicit_code16",
+    "new_admin_success_again",
+    "all_three_config_copies_match",
+    "enabled_super_identity_preserved",
+    "effective_transaction_parameters_readback",
+    "broker_healthy",
+    "prometheus_target_up",
+    "mem_available_at_least_512MiB",
+    "three_original_workers_unchanged"
+  ],
+  "failure_behavior": "stop only original Broker; retain repaired original network endpoint if attached, all current credentials, phase and complete backups; no automatic further startup, endpoint disconnect, old password or database restore",
+  "preflight_utc": "execution-time guarded read required",
+  "previous_attempt": "rocketmq-m3-broker-network-recovery-attempt-20261025.json",
+  "existing_network": {
+    "Name": "rocketmq_rocketmq",
+    "Id": "edffac725f5015491bef78c66f31d0a4757f15c1d909f2e1bc1e1c5df492d90d",
+    "Driver": "bridge",
+    "Scope": "local",
+    "Internal": false,
+    "Attachable": false,
+    "Ingress": false,
+    "EnableIPv6": false,
+    "IPAM": {
+      "Driver": "default",
+      "Options": null,
+      "Config": [
+        {
+          "Subnet": "172.22.0.0/16",
+          "Gateway": "172.22.0.1"
+        }
+      ]
+    },
+    "Labels": {
+      "com.docker.compose.config-hash": "f900ca3519de782ab5213725b9b987ef832dffc542d928ccc7723bde80b70c7b",
+      "com.docker.compose.network": "rocketmq",
+      "com.docker.compose.project": "rocketmq",
+      "com.docker.compose.version": "5.1.3"
+    },
+    "Options": {},
+    "containers": {
+      "fdfa8e5d6067d26931f8fca3d8e5abc02c7c8c220d2f2e5a1fd020d2d85c2204": {
+        "Name": "rocketmq-nameserver-1",
+        "IPv4Address": "172.22.0.2/16",
+        "IPv6Address": ""
+      }
+    }
+  },
+  "additional_allowed_change": {
+    "operation": "read-only audit adapter replacement",
+    "network_connect": false,
+    "acl_mutation": false,
+    "normal_principal_mutation": false
+  },
+  "additional_startup_guards": [
+    "exact_original_compose_bridge_and_nameserver",
+    "already_restored_endpoint_required_no_network_mutation",
+    "required_aliases_present_before_start",
+    "nonloopback_container_network_present",
+    "abort_on_first_restarting_or_automatic_restart",
+    "original_image_config_resource_ports_unchanged"
+  ],
+  "retry_limits": {
+    "additional_manual_start": 1,
+    "password_update": 1,
+    "planned_manual_restart_after_update": 1,
+    "automatic_restart_tolerated": 0
+  },
+  "network_repair_guard": {
+    "broker_id": "ce02d3e209b1f17dbf9b7544b3629f363fa45e5a80e3766b77295f038e86ccce",
+    "image": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+    "name": "/rocketmq-broker-1",
+    "config_sha256": "506c3d2055aa91a7a91e476cada8ae8207767483ab3dfae41573f80db15efec2",
+    "host_config_sha256": "96b6c0638e6b6b3355d118b801bcd2cc4b29cafd4c439629326b9b00c8423287",
+    "network_id": "edffac725f5015491bef78c66f31d0a4757f15c1d909f2e1bc1e1c5df492d90d",
+    "network_name": "rocketmq_rocketmq",
+    "network_sha256": "479147786a327458f5b63be952e199cb71b8f28f34e11b4e1193b3d6fa0f4aa8",
+    "nameserver_id": "fdfa8e5d6067d26931f8fca3d8e5abc02c7c8c220d2f2e5a1fd020d2d85c2204"
+  },
+  "nameserver_started_at": "2026-10-23T13:16:11.037996014Z",
+  "nameserver_healthy": true,
+  "broker_stopped": true,
+  "docker_server_version": "29.4.1",
+  "native_validation_run_id": 40160690632,
+  "native_validation_source_sha": "96073318056cac8c3f34ea7f053e5e1af26bc7a9",
+  "operator_sources_sha256": {
+    "admin_clients.py": "55ac36a6cf52365737394c529a329fd12ad0648939383cea52f3a0111640d72d",
+    "admin_audit.py": "0a7f5046721bebac5c309f51054a089aa99c31e7af3830840cb1c2f75c46ab55",
+    "admin_rotation.py": "5df020b034118907a59931be49a5ec01af2a405fa3f3fe6368a9f7dcef9db165",
+    "operator.py": "7ac4119209b11f9089b55f1b81340728d8abf8845cc6793e5ae4601f3f84c48a",
+    "broker_recovery_network.py": "0ddd2260d0713277735e198801a22fc0720f58ffd891f5de983ad3e7cbe0cb88",
+    "provision_v2.py": "dd91c82de4a8e632da708aa504f8cabe50cc85115a59f6a8ba87e642542ee31e",
+    "routes.py": "914e784eb4ad841d6a0ac4b1d83e41454c5269a6cb3c13796e8b3b616cf77e31"
+  },
+  "approval_basis": "user explicitly authorized continuation of similar operations during plan execution",
+  "cold_backup_policy": "fresh complete cold backup of current store/auth/config scope, full member verification and fresh Mac mini copy before startup",
+  "native_validation_gate": "must pass owned existing ACL audit and rotation before startup; no production credentials in CI"
+}

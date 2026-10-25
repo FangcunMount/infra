@@ -1,6 +1,6 @@
 # serverD Broker 恢复与管理员凭据更换：具名执行清单
 
-状态：**已获用户独立批准；首轮启动失败，已按本清单停止原Broker，密码尚未更换**。M3仍28/36；本清单只恢复现有RocketMQ，不批准业务切换。目标、原CID/镜像/资源/私网端口、三个配置文件摘要及实际认证元数据位置见[固定计划](evidence/rocketmq-m3-broker-recovery-plan-20261025.json)。执行前冻结该文件精确SHA-256；任一目标、状态或摘要变化即停止重新审阅。
+状态：**现已由已授权v3后续完成原Broker恢复与管理员轮换；首轮/第二轮失败记录保留**。M3仍28/36；本清单只恢复现有RocketMQ，不批准业务切换。目标、原CID/镜像/资源/私网端口、三个配置文件摘要及实际认证元数据位置见[固定计划](evidence/rocketmq-m3-broker-recovery-plan-20261025.json)。执行前冻结该文件精确SHA-256；任一目标、状态或摘要变化即停止重新审阅。
 
 ## 范围与依据
 
@@ -35,3 +35,8 @@
 完整冷备份/逐文件验证及Mac mini副本摘要核对均完成。首轮一次人工启动后，原策略自动重启11次，日志确认为MixAll本机地址递归StackOverflowError；立即触发失败路径停下原容器。未到原用户校验/密码更新阶段，三配置、整个原冷备份源的字节/元数据及其它容器均保持。[失败回执](evidence/rocketmq-m3-broker-recovery-attempt-20261025.json)保留原阶段和自动重启事实，不签为恢复成功。
 
 只读证据显示，空Docker网络连接在本次执行前已存在，原Compose仍指向rocketmq_rocketmq。漏将空网络列为启动阻断，以及Running=true未拒绝自动重启的门禁缺口均已补充测试。原批准的一次启动边界现已用完；不继续重试，追加恢复原endpoint及受控重试按[新具名清单](rocketmq-m3-broker-network-recovery.md)单独确认。原计划文件及SHA保持原件，批准/执行结果分别记账。
+
+
+## v3后续已完成
+
+[生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json)记录新的完整冷备份/新Mac mini副本、同范围只读审计修复、原容器健康及真实密码轮换、新/旧/新认证、原ACL/资源保持和最终重启后4个监控target新鲜up。管理员密码已更换，原失败时点“尚未更换”保留历史；此段为当前最终状态。M3仍28/36，业务切换未执行。
