@@ -1,0 +1,17 @@
+name: M3 fixed image cache boundaries
+on:
+  pull_request:
+    paths:
+      - scripts/ops/m3_image_cache_*.py
+      - scripts/ops/test_m3_image_cache.py
+      - docs/server/evidence/rocketmq-m3-fixed-image-cache-plan-20261025.json
+      - .github/workflows/m3-image-cache.yml
+permissions:
+  contents: read
+jobs:
+  boundaries:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - run: python3 -m unittest discover -s scripts/ops -p test_m3_image_cache.py
+      - run: python3 -m py_compile scripts/ops/m3_image_cache_target.py scripts/ops/m3_image_cache_runner.py
