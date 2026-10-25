@@ -1,0 +1,63 @@
+{
+  "schema": "m3-mongo-profile-preserved-restore/v1",
+  "passed": 6,
+  "failed": 0,
+  "skipped": 0,
+  "production": false,
+  "system_acceptance": false,
+  "production_profile_setting_changed": false,
+  "cases": {
+    "fixed_actual_version_and_owned_replica_primary": true,
+    "active_profiler_nonempty_and_all_business_types_frozen": true,
+    "whole_database_archive_with_continuing_diagnostic_writes": true,
+    "unknown_object_refused_before_any_business_drop": true,
+    "all_business_documents_indexes_options_and_uuid_exact_after_restore": true,
+    "profiler_settings_uuid_indexes_and_both_generations_preserved": true
+  },
+  "image": "mongo@sha256:43fddee7e532a920f3dfdee9e8f4834398c155c26bcb92d790cc1cd3c630fc40",
+  "infra_sha": "50fc39f8a79fc0890655312afca55ddd444ac826",
+  "source_sha256": {
+    "ci_m3_mongo_protection.py": "f6d35be7486d5ce93daeb1a403c0d6edff2e30eba5e3246e5aa2cbd1469828c0",
+    "m3_mongo_protection.py": "9cc9d733969cf3c5fdf689ae6e7192ae393b58f3970ce89d5abe70f5b9fed451"
+  },
+  "mongo_version": "7.0.31",
+  "tools_version": "mongodump version: 100.16.0",
+  "replica_set": "m3-profile-proof",
+  "business_snapshot_before_sha256": "b686d4a2db4efcbffee1f8c7c41afdb12da6700c99a407732731f650c92bc5a8",
+  "business_snapshot_after_sha256": "b686d4a2db4efcbffee1f8c7c41afdb12da6700c99a407732731f650c92bc5a8",
+  "profile_identity_before_sha256": "8900666caea421ec6dd793b1a8ef01aed943cea512fc74b8994a98e42e061c80",
+  "profile_identity_after_sha256": "8900666caea421ec6dd793b1a8ef01aed943cea512fc74b8994a98e42e061c80",
+  "profile_documents_before": 8,
+  "diagnostic_markers_retained": {
+    "before": 1,
+    "after": 8
+  },
+  "new_migration_object_removed": true,
+  "raw_business_or_profile_documents_exported": false,
+  "selected_database_dropped": false,
+  "live_profile_writes_stopped": false,
+  "cleanup": {
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true,
+    "owned_container_and_network_removed": true,
+    "raw_profile_and_business_archive_removed": true
+  },
+  "workflow_url": "https://github.com/FangcunMount/infra/actions/runs/40187719008",
+  "pull_request_url": "https://github.com/FangcunMount/infra/pull/289",
+  "merge_sha": "56c1ab0b8a03b3c8f17ebe2e7bf52c5a4aa0fcc2",
+  "original_report_sha256": "bf200940835ca1c1c2a62dd7b37c4215a26578bcb00afbad6f6e920a6a0facf0",
+  "pure_contract_tests": {
+    "ubuntu": {
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    "macos": {
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "production_restore_performed": false,
+  "new_production_window_started": false
+}
