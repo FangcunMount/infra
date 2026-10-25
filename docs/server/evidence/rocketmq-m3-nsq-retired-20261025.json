@@ -1,0 +1,65 @@
+{
+  "NSQ_active_connections": 0,
+  "NSQ_listening_ports": 0,
+  "all_CI_success": true,
+  "all_old_source_bytes_backed_up": true,
+  "application_or_Broker_restarted": false,
+  "completed_at": "2026-10-25T14:21:31.151144+00:00",
+  "container_or_volume_deleted": false,
+  "containers": [
+    {
+      "id_sha256": "ae40e4824527e605b483375141b0b23501bd26d028959db5784c8e28e8dcfe14",
+      "name": "nsqd",
+      "original_id_image_and_mounts_retained": true,
+      "restart": "no",
+      "running": false
+    },
+    {
+      "id_sha256": "0aac6593833f662ecf49b47ce80102eaff6f4054b2f54932bdf1375c0ea86fda",
+      "name": "nsqadmin",
+      "original_id_image_and_mounts_retained": true,
+      "restart": "no",
+      "running": false
+    },
+    {
+      "id_sha256": "281ad6eae690ddbc34eab5a8fd973eb0f935a4867a886458429f725c3d1d3da8",
+      "name": "nsqlookupd",
+      "original_id_image_and_mounts_retained": true,
+      "restart": "no",
+      "running": false
+    }
+  ],
+  "data_and_config_bytes_unchanged": true,
+  "data_files_retained": 1519,
+  "data_tree_sha256": "6f72f5614855547ef4bf8d7661846a20c23692065dbe75e66bdc493d5a2171d9",
+  "database_mutated": false,
+  "effective_serverD_manual_profile_and_no_restart": true,
+  "first_immediate_strict_readback_failed_reason_unconfirmed": true,
+  "native_make_start_guard_rejected": true,
+  "original_other_containers_unchanged": true,
+  "original_owned_firewall_unchanged": true,
+  "runtime_mutation_not_repeated_after_failure": true,
+  "schema": "m3-production-nsq-retired/v1",
+  "source_files_sha256": {
+    "/opt/infra/Makefile": "99b5f050c2d46891f1877651296c66bc1348b368a2f4f56b03a6bcd1877d8aa8",
+    "/opt/infra/deploy/serverD/docker-compose.yml": "e14da31adfe05ad7df6f997f5a01580ec720e8d3b3ed09c126063e64bc952021",
+    "/opt/infra/scripts/02-components/compose-manager.sh": "d9538e28e741bc2006599d1c63ff2d6e1e002c9c183c0f10160eab3faec4b7fb",
+    "/opt/infra/scripts/rocketmq/guard-nsq.sh": "0ecd8fb60b3d29fe810ce7a5bd606608a07c0c66f37a74c3c1fc25e38cad1179"
+  },
+  "source_merged": true,
+  "source_sha": "68f282eb52af5a16480e177f987bf8d77cac358b",
+  "subsequent_readonly_exact_fields_verified": true,
+  "private_audit_backup": {
+    "bytes": 43841,
+    "mode": "0o600",
+    "sha256": "b1f169623b006a343c4b21d09e4e2f6107cea47d1a43ed308dac182dad5734ef",
+    "verified": true
+  },
+  "private_evidence_sha256": {
+    "T35-production-retirement.private.json": "03b4e9848e122b29a79f4801842ae3d55f1a9673ec4ccd2b74d57eb41092275c",
+    "T35-pre-retire-serverA-connections-and-assets.private.json": "221ca50f0fb2640e749cc066fb55228131a08e44d8f2e5be1f6cb48cb8e7b629",
+    "T35-pre-retire-serverD-connections-and-assets.private.json": "e39828e7271af68b23d31f414125e9ce266100f61e50ead1c3593dee509f362f",
+    "T35-PR298-CI-success.private.json": "91243af6c118227898b35a07f347ae82daf6e1bc2f76f8c59367d8ade1efcc9f",
+    "T35-PR298-merged.private.json": "cfc63db0c3ec977b775c342fa290884ad540ed790076195277ea409e29dddff6"
+  }
+}

@@ -6,7 +6,7 @@
 
 用户明确指示“可跳过 48 小时观察，继续执行后续规划”。本决定替代下文旧规划、旧执行快照及M4交接中必须等待48h的门禁。T34标为**用户豁免**，保留真实开始与短时检查记录，不伪称观察通过。原36项ID保留；进度分别记录验证完成、用户豁免和待办，不通过删除任务提高完成率。
 
-当前闭环**34/36：33项验证完成＋T34一项用户豁免，T35/T36待完成**。原48h heartbeat已取消，当前八实例/四owner/10 target/公网健康复核通过；继续T35正式NSQ退役与T36生产交付收尾。旧表、卷、容器、wire、备份及未决责任不删除；M4仍0/8。[豁免回执](evidence/rocketmq-m3-observation-waived-20261025.json)。
+当前闭环**36/36：35项验证完成＋T34一项用户豁免，M3完成（按修订范围）**。原48h heartbeat已取消，当前八实例/四owner/10 target/公网健康复核通过；T35正式NSQ退役与T36生产交付收尾已完成；[最终发布索引](rocketmq-m3-production-release.md)绑定实际版本/配置、验收及M4移交。旧表、卷、容器、wire、备份及未决责任不删除；M4仍0/8。[豁免回执](evidence/rocketmq-m3-observation-waived-20261025.json)。
 
 ## 2026-10-22 范围修订：M3 生产切换，M4 清理
 
@@ -40,13 +40,13 @@ T25-D 按新首发范围冻结候选并组合验证原 NSQ 排空、未来计划
 
 ## 当前执行快照
 
-- 进度：**闭环34/36：33项验证完成＋T34用户豁免**；T35/T36待完成。T24内部**4/4**：原生超限索引触发原主库持久封新写、同绑定新实例保护和Checker保留已通过真实门禁；三宿主与工具源码均已合并。T25内部**4/4**，已批准首发范围全部完成；高级恢复未完成项独立后移。
+- 进度：**闭环36/36：35项验证完成＋T34用户豁免**；M3按最新范围完成，未声称48h观察通过。T24内部**4/4**：原生超限索引触发原主库持久封新写、同绑定新实例保护和Checker保留已通过真实门禁；三宿主与工具源码均已合并。T25内部**4/4**，已批准首发范围全部完成；高级恢复未完成项独立后移。
 - 隔离工作区：`/Users/yangshujie/.codex/worktrees/rocketmq-m3/{infra,sdk,iam,qs-server,qs-ai}`，各仓库分支 `codex/rocketmq-m3`；原工作区不改动。
 - 源码/制品：稳定SDK与固定八实例均已部署；IAM45、QS MySQL110/Mongo44、AI0043显式升级及四owner绑定通过；一次MySQL轮换和三库Secrets同步完成。代码/制品、真实部署和合法业务验收分别有回执，不以CI或健康代替业务。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
 - 2026-10-25最新：原Broker恢复与管理员轮换已全部完成。infra275精确96073318的12项源码CI通过并合并d91e88c2；隔离16/0/0。新的完整冷备份逐成员核验及Mac mini副本SHA一致后，原CID启动、真实更新管理员、原三inode持久化、一次计划重启及“新成功→旧CODE16→新成功”均通过。原Topic/group/ACL和其它全部容器保持，Broker无OOM/自动重启；Mac mini最终重启后的4个target全部up。[生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json)。用户继续类似恢复的授权已落实，本次没有再次中断确认。
-- 当前批次：用户已豁免T34的48h等待，原观察定时任务已取消，保留短时快照和真实起点；不将豁免写成观察通过。最新只读检查八实例/四owner/10 target/四公网入口正常，serverD可用1297MiB。T35源码及具名退役清单正在验证；NSQ容器/数据/配置继续保留，自动生产CD保持暂停。
+- 当前批次：**M3已闭环，M4仍0/8**。用户豁免T34，原heartbeat已取消；T35三NSQ容器已停/restart=no、默认Compose不启动/原启动入口拒绝，1519数据文件和配置摘要不变。八业务实例/四owner/10 target/公网复核通过，serverD可用1302MiB，四store无Prepared或确认缺口。三库运行代码已合并main，稳定SDK双tag同1345266，原AI任务done/attempt1和7个旧blocked保持。自动生产CD仍暂停，恢复须按真实profile单独审查。[最终索引](rocketmq-m3-production-release.md)/[闭环回执](evidence/rocketmq-m3-production-closure-20261025.json)。
 
 
 ### T29 收口分项（同一正式任务，5/5已完成）
@@ -232,7 +232,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | M3-4 | 故障与运维 | T21–T25 | ✅ 已完成 | 真实故障及切换工具 |
 | M3-5 | 稳定发布及候选 | T26–T29 | ✅ 已完成 | 正式SDK、五镜像、当前八进程原范围恢复/启动演练、实际配置与静态执行包通过并合并；生产另记 |
 | M3-6 | 生产切换 | T30–T33 | ✅ 已完成 | T30–T33、PR295/296合并、运维持久化与真实业务验收通过 |
-| M3-7 | 生产闭环（T34已获豁免） | T34–T36 | 进行中，T35/T36收尾 | 用户取消48h门禁，保留当前健康/未决证据复核；正式退役NSQ与M4移交后完成 |
+| M3-7 | 生产闭环（T34已获豁免） | T34–T36 | ✅ 按修订范围完成 | T34用户豁免；T35实际退役、T36最终索引/审计/M4移交及本收尾PR合并生效 |
 
 | 完成 | ID | 任务及验收结果 | 状态/证据 |
 | --- | --- | --- | --- |
@@ -270,8 +270,8 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T32 | 排空、交接、同窗口保护及显式离线迁移 | 第二窗口：原八实例停机后责任为0；MySQL/Mongo/NSQ当次保护及mini三副本通过；IAM45、QS110/44、AI0043和四owner绑定验证完成，先于首次启动屏障。[正式回执](evidence/rocketmq-m3-production-offline-completed-20261025.json)。首次profiler失败/恢复证据保留 |
 | ✅ | T33 | 最终镜像/Checker/消费者/system验收及恢复准入 | 2026-10-25 21:36:50核验：新答卷/评分/规则报告、system空角色及双订阅、合法小程序新AI解读通过；新任务attempt1、模型响应记录1、5事件/5ACK与11条精确witness/hash匹配。八实例/四owner/10 target通过，公网已恢复；[证据](evidence/rocketmq-m3-system-ai-acceptance-20261025.json)。运维修正PR295现已合并/持久化；48h归T34单列 |
 | ⏭ | T34 | 连续48小时业务/回执/积压/资源观察 | **用户明确豁免，非观察通过**；保留真实开始/短时检查记录，heartbeat已取消。[豁免回执](evidence/rocketmq-m3-observation-waived-20261025.json) |
-| ☐ | T35 | 旧生产写者/Relay/调度及NSQ活动责任退出，停止并阻止自动重启 | **进行中**：当前状态已复核；仅停三NSQ容器、restart=no及生产启动保护，保留容器/卷/配置和证据，清理移交M4。[具名执行清单](rocketmq-m3-nsq-retirement.md) |
-| ☐ | T36 | M3源码合并、生产发布索引、业务/观察验收与M4具名移交 | 待开始；完整废弃依赖/历史实现审计另属M4-C08 |
+| ✅ | T35 | 旧生产写者/Relay/调度及NSQ活动责任退出，停止并阻止自动重启 | 2026-10-25：PR298四CI通过并合并d069c245；三NSQ容器停/restart=no、无listener/活动连接，原容器/挂载/1519数据文件/配置保持；原其他容器和防火墙不变，8应用复核通过。[退役回执](evidence/rocketmq-m3-nsq-retired-20261025.json) |
+| ✅ | T36 | M3源码合并、生产发布索引、业务验收/T34豁免与M4具名移交 | 2026-10-25：三库/SDK已合并及固定稳定版本、五镜像/八实例、最终四store/业务receipt、CD暂停及M4保护/清理清单已核验；[最终发布索引](rocketmq-m3-production-release.md)/[回执](evidence/rocketmq-m3-production-closure-20261025.json)，状态随本收尾PR合并生效；M4仍0/8 |
 
 依赖：T01→T02→T03→T04→IAM→QS→成对QS/AI→运维故障→稳定SDK/最终候选→生产→观察退役。按表推进，前一接入批次通过其门禁后才进入下一批；源码开发不要求先执行生产105。
 
@@ -2438,3 +2438,18 @@ serverD原infra release复制为m3-firewall-f144da7956e5，仅替换已审查fir
 正式观察从2026-10-25T13:48:32.535495Z（北京时间21:48:32）开始，不能追溯为20:58:39开放时刻。最早2026-10-27T13:48:32.535495Z核验48小时；第一轮readonly快照全部通过，serverD可用1283MiB。每30分钟当前聊天heartbeat，正常只保存私有证据，有异常、需要操作或完成才通知；本机/SSH不可达记录缺口，不能当作无责任或静默通过。通过时间还须核对Prometheus历史、告警、业务receipt及协议/资源，必要时补齐合法有界业务验收，不自动制造模型请求。
 
 正式进度33/36，M3-6完成、M3-7进行中。T35只做了只读盘点：nsqd已停但restart=always；nsqadmin/lookup仍运行，不假称正式退役。48h通过后再按保留边界退出服务/自动重启/活动责任，历史卷/表/备份不删；M4仍0/8。第四阶段468成员私有证据在Mac mini核对摘要/0600。[观察与收口回执](evidence/rocketmq-m3-observation-start-20261025.json)。
+
+
+### 2026-10-25：用户豁免T34，T35/T36闭环，M3按修订范围完成
+
+用户明确要求跳过48h并继续；T34保留为⏭用户豁免，原真实起点和短时检查完整保留，heartbeat已取消，不伪造连续48h通过。计数为35项验证完成＋1项用户豁免＝36项闭环，未删任务或失败记录。
+
+T35源码68f282eb52af5a16480e177f987bf8d77cac358b，双OS各7边界测试、实际Compose手动profile/restart与默认无服务可启动证明、监控回归共4项CI通过，PR298合并d069c245。原部署锁下只更新三NSQ容器restart=no并停仍运行的辅助服务；未重启nsqd或业务/Broker，未rm/down/prune。原Makefile只加3处guard，其他字节保留；原Compose加3服务本地profile/restart覆盖，通用组件/Mac mini开发依赖不变。
+
+初次受控脚本因最小PATH找不到gh，在任何生产动作前失败；改为原用户会话核验已合并SHA后继续，未弱化原协调边界。生产update/stop后首次即时严格字段回读未通过，根因未确认；后续只读精确字段/挂载核验全部一致，未重复运行update/stop。最终原三个容器ID/镜像/挂载、1519数据文件/三个配置摘要及所有其他容器/owned firewall保持；listener与活动连接0，原Make启动真实拒绝。原失败和成功只读回读均保留，协调记录已通过最终只读确认收敛。
+
+T36最终复核：IAM45/QS110/AI0043、Mongo44 clean，MySQL三owner非终态执行和Committed确认缺口均0、Mongo Prepared0；四owner/10 targets与八固定镜像/预算/公网通过，serverD可用1302MiB。AI原新Session completed、Job done/attempt1，5 receipt及原7 blocked保持；未为退役再提交问卷/重做模型。三库运行代码与当前main业务代码一致（差异仅workflow/docs），SDK双稳定tag仍指向1345266且正式Release各9资产。
+
+自动CD仍暂停，provider变量为RocketMQ但发布变量仍封闭，不把这些CI变量冒称当前生产profile；原冻结手工profile继续承担运行。后续CD恢复需将真实profile/owner/路由/worker消费专用规则纳入审核，不属于本次自动开放。M4接收旧代码/配置/资产逐项清理，仍0/8；当前receipt、checkpoint/response、业务调度/幂等、witness及恢复责任明确保护。
+
+T35原源文件及状态审计副本、第五阶段546成员私有证据均在Mac mini验证摘要/0600，历史完整备份保留至少原政策期限。本收尾PR合并后T35/T36及M3-7生效，M3按最新范围完成。[最终发布索引与M4具名移交](rocketmq-m3-production-release.md)。
