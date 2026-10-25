@@ -14,6 +14,8 @@
 
 services:
   nsqlookupd:
+    profiles: [legacy-nsq-retired]
+    restart: "no"
     extends:
       file: ../../components/nsq/docker-compose.yml
       service: nsqlookupd
@@ -21,6 +23,8 @@ services:
       - ../../compose/env/prod/serverD.env
 
   nsqd:
+    profiles: [legacy-nsq-retired]
+    restart: "no"
     extends:
       file: ../../components/nsq/docker-compose.yml
       service: nsqd
@@ -28,6 +32,8 @@ services:
       - ../../compose/env/prod/serverD.env
 
   nsqadmin:
+    profiles: [legacy-nsq-retired]
+    restart: "no"
     extends:
       file: ../../components/nsq/docker-compose.yml
       service: nsqadmin

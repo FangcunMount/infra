@@ -1,0 +1,51 @@
+name: M3 retained NSQ retirement guards
+on:
+  pull_request:
+    paths:
+      - deploy/serverD/docker-compose.yml
+      - scripts/02-components/compose-manager.sh
+      - scripts/rocketmq/guard-nsq.sh
+      - scripts/ops/nsq_retirement.py
+      - scripts/ops/test_nsq_retirement.py
+      - .github/workflows/m3-nsq-retirement.yml
+permissions:
+  contents: read
+jobs:
+  retained-source-guards:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - run: python3 -m unittest discover -s scripts/ops -p test_nsq_retirement.py -v
+      - run: bash -n scripts/02-components/compose-manager.sh scripts/rocketmq/guard-nsq.sh
+  effective-compose:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Verify effective retirement profile and retained generic component
+        run: |
+          mkdir -p compose/env/prod
+          touch compose/env/prod/serverD.env
+          docker compose -p m3-nsq-retired-proof --profile legacy-nsq-retired -f deploy/serverD/docker-compose.yml \
+            config --no-env-resolution --format json > /tmp/m3-retired-compose.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/m3-retired-compose.json'))
+          assert set(d['services'])=={'nsqd','nsqlookupd','nsqadmin'}
+          for s in d['services'].values():
+              assert s['restart']=='no' and s['profiles']==['legacy-nsq-retired']
+              assert s['image']=='nsqio/nsq:v1.3.0'
+          assert any(v['target']=='/data' for v in d['services']['nsqd']['volumes'])
+          print('three retained services: manual profile, no auto restart, data mount retained')
+          PY
+      - name: Default serverD start cannot select retired services
+        run: |
+          set +e
+          docker compose -p m3-nsq-retired-proof -f deploy/serverD/docker-compose.yml up -d --no-build --pull never > /tmp/m3-default-start.out 2>&1
+          result=$?
+          set -e
+          test "$result" -ne 0
+          grep -Fq 'no service selected' /tmp/m3-default-start.out
+          test -z "$(docker ps -aq --filter label=com.docker.compose.project=m3-nsq-retired-proof)"
