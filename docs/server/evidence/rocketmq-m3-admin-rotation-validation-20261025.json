@@ -47,7 +47,7 @@
   "report_sha256": "e09291bb62811dee3e6209ba9318fe758a02ba3007a77c0980a6ca26ddefd2bd",
   "pure_tests": 5,
   "source_pr": 268,
-  "source_merged": false,
+  "source_merged": true,
   "production_rotation_performed": false,
   "prior_failure": {
     "run_id": 40153211965,
@@ -59,5 +59,71 @@
     "phases": [],
     "reason": "exact enum spelling assumption rejected initial existing account; no updateUser attempted; fixed by pinned uppercase enum regression",
     "original_report_modified": false
-  }
+  },
+  "source_merge_sha": "63b5cc0bf6af356f87d4b6542c4df2ba96e4af20",
+  "source_checks_success": 10,
+  "source_checks_failed": 0,
+  "source_checks_pending": 0,
+  "source_checks": [
+    {
+      "name": "acceptance",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40153370559/job/121049453637",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "name": "resources",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40153370576/job/121049453255",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "name": "rotation",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40153370577/job/121049401469",
+      "workflowName": "RocketMQ admin rotation isolated validation"
+    },
+    {
+      "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40153370574/job/121049456908",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40153370584/job/121049453500",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40153370592/job/121049457633",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40153370574/job/121049457105",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40153370584/job/121049453634",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40153370592/job/121049457576",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "name": "native-index-audit",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40153370574/job/121049457109",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    }
+  ]
 }

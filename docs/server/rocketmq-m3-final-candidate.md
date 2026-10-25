@@ -1,5 +1,7 @@
 # M3 最终候选准备与验收边界
 
+当前有效候选：IAM ca59dec4、QS b75d4a52、AI ddff86ca，原五归档已直接发布既有ACR并[固定五份不可变引用](evidence/rocketmq-m3-acr-publication-20261025.json)。IAM40/实际数据库版本/八进程启动与完整C1通过；T29内部4/5。实际配置与执行包尚未冻结，生产Broker恢复按[独立清单](rocketmq-m3-broker-recovery.md)等待确认，业务切换未执行。下文历史七进程/旧候选保留原范围，不替代本次候选。
+
 唯一任务进度见[M3总表](rocketmq-m3-execution.md)。本页细化原T29，不增加任务数。T28正式制品宿主门禁已完成；以下为最终候选准备，不表示T29完成或生产授权。
 
 | 子项 | 当前状态 | 完成证据 |
