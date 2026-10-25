@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import argparse
 from admin_rotation import prepare,rotate,require
 from final_image_candidate import ci_guard
 from image_start_fixture import OwnedImageFixture
@@ -26,6 +27,9 @@ class ScopedAdmin(Admin):
 
 def main():
     ci_guard(os.environ)
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--network-recovery',action='store_true')
+    args=parser.parse_args()
     repo=Path(__file__).resolve().parents[2]
     report=dict(production=False,production_credentials_used=False,passed=0,failed=1,skipped=0,phases=[])
     fixture=OwnedImageFixture(repo,report)
@@ -34,6 +38,10 @@ def main():
     try:
         fixture.dependencies();broker=fixture.project+'-broker-1'
         before_id=fixture.run(['docker','inspect',broker,'--format','{{.Id}}']).stdout.strip()
+        network_cases={}
+        if args.network_recovery:
+            from broker_network_probe import roundtrip
+            network_cases=roundtrip(fixture,broker)
         def call(args,**kwargs):return fixture.run(['docker','exec',broker,*args],**kwargs).stdout
         source={name:call(['cat','/etc/rocketmq/'+name]) for name in ('broker.conf','proxy.json','tools.yml')}
         old,new,changed=prepare(source,secrets.token_hex(32))
@@ -59,6 +67,7 @@ def main():
         cases={phase:phase in report['phases'] for phase in ('original_verified','update_user_confirmed',
             'new_configuration_persisted','broker_restarted','new_success_old_denied_new_success')}
         cases.update(all_config_copies_visible=True,default_tools_authenticated=True,original_container_retained=True)
+        cases.update(network_cases)
         require(all(cases.values()),'rotation_phase_evidence_incomplete')
         report.update(passed=len(cases),failed=0,cases=cases,new_success_old_denied_new_success=True,
             all_config_copies_persisted=True,default_tools_authenticated=True,
