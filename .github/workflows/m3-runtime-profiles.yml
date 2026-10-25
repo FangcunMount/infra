@@ -1,0 +1,22 @@
+name: M3 production profile and local Broker guards
+on:
+  pull_request:
+    paths:
+      - scripts/ops/m3_runtime_profile.py
+      - scripts/ops/test_m3_runtime_profile.py
+      - scripts/rocketmq/firewall.sh
+      - scripts/rocketmq/test_firewall.py
+      - .github/workflows/m3-runtime-profiles.yml
+permissions:
+  contents: read
+jobs:
+  profile-and-firewall:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - run: bash -n scripts/rocketmq/firewall.sh
+      - run: python3 -m unittest discover -s scripts/ops -p test_m3_runtime_profile.py -v
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_firewall.py -v
