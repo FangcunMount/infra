@@ -6,7 +6,7 @@ Prometheus v2.54.1 和 Grafana 11.1.4 在 M2/8GB Mac mini 的独立 Compose 项�
 
 Mac mini 每 30 秒通过受限 SSH 命令读取 serverA、serverD 的运行容器元数据，生成 Prometheus file SD。云端辅助脚本只有被 SSH 调用时才执行，不是常驻代理，不访问应用凭据。专用公钥在 root authorized_keys 中必须限制来源为 mini Tailscale IP，使用 `restrict` 和固定 `command=/usr/local/sbin/infra-monitoring-discovery`。主机密钥单独固定。
 
-`discover.py` 保留原 job/instance/component 标签，动态发现 collection、worker 的全部副本。每个目标经 serverA 原有 Nginx 的 `monitoring.fangcunmount.cn` 虚拟主机代理到 overlay IP 的固定 `/metrics`，只允许 mini 的 Tailscale 来源。容器 extra_hosts 将该域名固定到 serverA 私网地址，不需要公网 DNS；TLS 使用原通配符证书。云端业务容器无需发布新的 metrics 端口。
+`discover.py` 使用原 `iam-apiserver` 身份发现 IAM 9080 的 `/metrics`（job=`iam`），仅从现有私网代理抓取，不新增业务端口或更改应用鉴权。其余保留原 job/instance/component 标签，动态发现 collection、worker 的全部副本。每个目标经 serverA 原有 Nginx 的 `monitoring.fangcunmount.cn` 虚拟主机代理到 overlay IP 的固定 `/metrics`，只允许 mini 的 Tailscale 来源。容器 extra_hosts 将该域名固定到 serverA 私网地址，不需要公网 DNS；TLS 使用原通配符证书。云端业务容器无需发布新的 metrics 端口。
 
 Prometheus 只在 mini loopback 的 19090 发布，Grafana 只在 loopback 的 13000 发布；Tailscale Serve 将两端口转给 tailnet，禁止 Funnel。Grafana 公网域名仍由 serverA 终止 TLS。serverA 的轻量 `prometheus-route` Nginx 仅将现有 `prometheus:9090` 只读查询转到 mini，以兼容已经运行的 API 配置，不采集或存储指标，也不需要重启业务进程。
 

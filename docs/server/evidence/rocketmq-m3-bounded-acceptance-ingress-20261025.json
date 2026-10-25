@@ -70,5 +70,24 @@
     "active_configuration_changed": false,
     "corrected_to": "bounded exact decimal interval in HTTP map"
   },
-  "static_packet_unchanged": true
+  "static_packet_unchanged": true,
+  "source_ci": {
+    "run_id": 40180665775,
+    "run_url": "https://github.com/FangcunMount/infra/actions/runs/40180665775",
+    "source_sha": "9325dae4eb59deed3a7397ddaeb55c2011937d84",
+    "platforms": {
+      "ubuntu-24.04": {
+        "passed": 52,
+        "failed": 0,
+        "skipped": 0
+      },
+      "macos-15": {
+        "passed": 52,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    "pr": 287,
+    "merge_sha": "d1ca240449f08f8563c9e4bc3a9e2760f73a3c2d"
+  }
 }

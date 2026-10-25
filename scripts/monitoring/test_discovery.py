@@ -37,6 +37,21 @@ class DiscoveryTests(unittest.TestCase):
         self.assertEqual(groups[4]['labels']['__metrics_path__'], '/metrics/172.20.0.21/9092')
         self.assertEqual(groups[4]['labels']['job'], 'qs-worker')
 
+    def test_iam_exact_original_identity_is_discovered_without_container_relabel(self):
+        result = remote.endpoints([container('iam-apiserver', '172.20.0.8')])
+        self.assertEqual(result, [{'ip': '172.20.0.8', 'port': 9080, 'job': 'iam', 'instance': 'iam-apiserver:9080'}])
+        self.assertEqual(local.groups(result, '100.85.122.124:443')[0]['labels']['__metrics_path__'], '/metrics/172.20.0.8/9080')
+        self.assertEqual(remote.endpoints([container('iam-apiserver', '172.20.0.8', running=False)]), [])
+        self.assertNotIn('PASSWORD', str(result))
+
+    def test_iam_port_and_identity_cannot_be_reassigned_to_other_jobs(self):
+        for name, job, port in [('other', 'iam', 9080), ('other', 'iam', 8080), ('worker', 'qs-worker', 9080)]:
+            with self.subTest(name=name, job=job, port=port), self.assertRaises(ValueError):
+                remote.endpoints([container(name, '172.20.0.8', job, port)])
+        for job, port, instance in [('iam', 8080, 'iam-apiserver:9080'), ('qs-worker', 9080, 'worker'), ('iam', 9080, 'other')]:
+            with self.subTest(job=job, port=port), self.assertRaises(ValueError):
+                local.groups([{'job': job, 'port': port, 'ip': '172.20.0.8', 'instance': instance}], 'gateway:443')
+
     def test_new_replica_is_discovered_without_static_target_edits(self):
         self.assertEqual(len(remote.endpoints([container('qs-worker-runtime-4', '172.20.0.24', 'qs-worker', 9092)])), 1)
 
