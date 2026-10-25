@@ -1,6 +1,6 @@
 # M3 最终候选准备与验收边界
 
-当前有效候选：IAM ca59dec4、QS b75d4a52、AI ddff86ca，五归档已直接发布既有ACR并固定不可变引用。当前生产规格/IAM40/八进程/C1已通过；T29内部4/5。原Broker及管理员轮换已完成，[生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json)记录原CID健康、新成功/旧拒绝/新成功、全部资源/其它容器保持与Mac mini最终重启后4 target up。实际参数、18份配置草稿/实际env优先级已验证；[目标镜像预置5/0/0](evidence/rocketmq-m3-target-image-cache-20261025.json)和[目标Compose三阶段解析15/0/0](evidence/rocketmq-m3-target-compose-validation-20261025.json)通过。未来挂载源/权限、具体执行/保护恢复包尚未冻结；配置尚未安装，业务切换未执行。下文历史旧候选保留原范围。
+当前有效候选：IAM ca59dec4、QS b75d4a52、AI ddff86ca，正式SDK/五镜像/八进程/完整C1均通过，五镜像已预置。T29内部4/5；最新v2未启用候选含待轮换凭据，实际配置18/18、目标Compose15/15、挂载读取15/15通过。原IAM/QS维护只读、固定备份客户端和三库备份元数据通过；统一协调器入口已核验。用户已接受包含IAM的统一维护窗口，具体保护/恢复及执行包仍待冻结。生产MySQL密码、业务DDL/Topic/ACL/provider、system及48h未执行。下文历史旧候选保留原范围。
 
 唯一任务进度见[M3总表](rocketmq-m3-execution.md)。本页细化原T29，不增加任务数。T28正式制品宿主门禁已完成；以下为最终候选准备，不表示T29完成或生产授权。
 
@@ -201,3 +201,8 @@ PR265 a06d500对齐实际MySQL8.0.36、Mongo7.0.31固定digest、IAM1GiB及2 col
 [生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json)已完成：原5.5.1 CID/image/资源保持，管理员真实轮换、三配置原inode持久化及一次计划重启，新/旧/新认证通过；Topic/group/ACL及其它容器保持。实际回查6000ms/30000ms/15次、消息保留48h；Mac mini最终重启后Broker/3 worker均up。T29-E此项闭环，不变更事务参数。
 
 [实际配置草稿](evidence/rocketmq-m3-production-config-drafts-20261025.json)18/18，Go环境/flags15/15、AI完整Settings3/3。最终还须冻结真实挂载、完整环境和CLI、源catalog文件、三阶段Compose/唯一协调目录、目标固定镜像及原维护/恢复步骤。目标机ACR无持久登录态，首次缓存0且容器未变；复用既有GitHub Secrets和原Mac mini CD临时认证，不要求聊天提供密码。T29仍4/5、M3仍28/36，不能将草稿当执行包。
+
+
+## 统一窗口执行清单（2026-10-25）
+
+当前收口以[具体生产窗口清单](rocketmq-m3-production-window.md)为准，取代上文保持IAM在线的历史要求。Nginx候选实际19/0/0、三MySQL完整活跃只读备份与Mac mini副本均已通过；活跃备份不作为同窗口保护。system会话刷新后已过期，等待用户正常登录。T29仍4/5，静态包与源码CI/合并另记；具体生产变更未获最终批准、未执行。

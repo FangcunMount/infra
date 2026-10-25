@@ -1,0 +1,140 @@
+{
+  "schema": "m3-nginx-inactive-candidates/v1",
+  "passed": 19,
+  "failed": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "case": "actual full configuration syntax closed",
+      "passed": true
+    },
+    {
+      "case": "actual full configuration syntax login-only",
+      "passed": true
+    },
+    {
+      "case": "actual full configuration syntax open",
+      "passed": true
+    },
+    {
+      "case": "closed GET /",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "closed POST /api/v3/authn/login",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "closed POST /api/v4/authz/roles",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "login-only GET /",
+      "status": 204,
+      "passed": true
+    },
+    {
+      "case": "login-only OPTIONS /api/v4/authz/roles",
+      "status": 204,
+      "passed": true
+    },
+    {
+      "case": "login-only POST /api/v3/authn/login",
+      "status": 204,
+      "passed": true
+    },
+    {
+      "case": "login-only POST /api/v3/authn/refresh_token",
+      "status": 204,
+      "passed": true
+    },
+    {
+      "case": "login-only POST /api/v3/authn/verify",
+      "status": 204,
+      "passed": true
+    },
+    {
+      "case": "login-only POST /api/v3/authn/logout",
+      "status": 204,
+      "passed": true
+    },
+    {
+      "case": "login-only POST /api/v3/authn/admin/jwks/keys",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "login-only POST /api/v3/authn/loginX",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "login-only POST /api/v4/authz/roles",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "login-only POST /api/v3/authn/login/../admin",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "login-only DELETE /api/v4/authz/roles",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "open POST /api/v4/authz/roles",
+      "status": 204,
+      "passed": true
+    },
+    {
+      "case": "open POST /bounded-test",
+      "status": 204,
+      "passed": true
+    }
+  ],
+  "phases": [
+    {
+      "phase": "closed",
+      "files": {
+        "iam.fangcunmount.cn.conf": "6569f80368c7c20c789a824607e719f0ef6825d51d63046ca0fc6116f43cf304",
+        "qs.fangcunmount.cn.conf": "ca98f65c836b9a7ae91e569ce1f4e3f3d8a84c3e623a4d30e22538aa131f82ea",
+        "collect.conf": "29ccda8cdac2f5778a170bcbc38b351cd643b5af54025cc20f73f928c5fac441"
+      }
+    },
+    {
+      "phase": "login-only",
+      "files": {
+        "iam.fangcunmount.cn.conf": "d3b7c4ae3704737a1dee3b6984d01df1e07b0dd6607a71c5513bee2f322efec8",
+        "qs.fangcunmount.cn.conf": "ca98f65c836b9a7ae91e569ce1f4e3f3d8a84c3e623a4d30e22538aa131f82ea",
+        "collect.conf": "29ccda8cdac2f5778a170bcbc38b351cd643b5af54025cc20f73f928c5fac441"
+      }
+    },
+    {
+      "phase": "open",
+      "files": {
+        "iam.fangcunmount.cn.conf": "106e753f509424c95469f1e06be1e95631789e7f8a9294d31cce7755eea62e24",
+        "qs.fangcunmount.cn.conf": "26efeedd9f41e913b751f355977635efb8ab693eab179ec47b6f78a9ef85a156",
+        "collect.conf": "bb122f4c320c1f6f9532b0ee232dba4971e26409f63133accb01c8b0b513b8d5"
+      }
+    }
+  ],
+  "original_files_sha256": {
+    "iam.fangcunmount.cn.conf": "106e753f509424c95469f1e06be1e95631789e7f8a9294d31cce7755eea62e24",
+    "qs.fangcunmount.cn.conf": "26efeedd9f41e913b751f355977635efb8ab693eab179ec47b6f78a9ef85a156",
+    "collect.conf": "bb122f4c320c1f6f9532b0ee232dba4971e26409f63133accb01c8b0b513b8d5"
+  },
+  "generator_sha256": "798baee24fb05ae05cefb4459cadf41fa799909644052ae76c2cf8e4299bbd5d",
+  "nginx_image_id": "sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d",
+  "original_containers_unchanged": true,
+  "original_site_files_unchanged": true,
+  "active_configuration_reloaded": false,
+  "application_runtime_started": false,
+  "functional_test_backend": "isolated networkless server returning only 204; no business upstream or credentials",
+  "validation_containers_removed": true,
+  "private_report_sha256": "651cb7ea7357a1133020d9297134e92e1dd05351a301461e5ca1dd9060d3834f"
+}

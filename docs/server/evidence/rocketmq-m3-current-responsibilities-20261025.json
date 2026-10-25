@@ -1,0 +1,181 @@
+{
+  "schema": "m3-current-mysql-responsibilities/v1",
+  "read_only": true,
+  "observed_at_utc": "2026-10-25T06:14:25.823861+00:00",
+  "databases": [
+    {
+      "database": "iam",
+      "tables": [
+        {
+          "name": "domain_event_outbox",
+          "rows": 152,
+          "states": [
+            {
+              "status": "published",
+              "n": 152
+            }
+          ]
+        },
+        {
+          "name": "identity_session_revocation_outbox",
+          "rows": 71619,
+          "states": [
+            {
+              "status": "completed",
+              "n": 71619
+            }
+          ]
+        },
+        {
+          "name": "rm_outbox",
+          "rows": 15,
+          "states": [
+            {
+              "state": "published",
+              "n": 15
+            }
+          ]
+        }
+      ],
+      "database_events": [],
+      "read_only_transaction_rolled_back": true
+    },
+    {
+      "database": "qs",
+      "tables": [
+        {
+          "name": "ai_bridge_events",
+          "rows": 107
+        },
+        {
+          "name": "ai_bridge_request_assessments",
+          "rows": 37
+        },
+        {
+          "name": "ai_bridge_requests",
+          "rows": 37,
+          "states": [
+            {
+              "status": "blocked",
+              "n": 7
+            },
+            {
+              "status": "completed",
+              "n": 30
+            }
+          ]
+        },
+        {
+          "name": "ai_messaging_inbox",
+          "rows": 2755
+        },
+        {
+          "name": "ai_messaging_outbox",
+          "rows": 2806,
+          "states": [
+            {
+              "stage": "confirmed",
+              "n": 2806
+            }
+          ]
+        },
+        {
+          "name": "retry_event_hold",
+          "rows": 0,
+          "states": []
+        },
+        {
+          "name": "rm_outbox",
+          "rows": 78,
+          "states": [
+            {
+              "state": "published",
+              "n": 78
+            }
+          ]
+        }
+      ],
+      "database_events": [],
+      "read_only_transaction_rolled_back": true
+    },
+    {
+      "database": "ai",
+      "tables": [
+        {
+          "name": "interpretation_result_outbox",
+          "rows": 107,
+          "states": [
+            {
+              "mq_owned": 1,
+              "n": 85
+            },
+            {
+              "mq_owned": 0,
+              "n": 22
+            }
+          ]
+        },
+        {
+          "name": "messaging_inbox",
+          "rows": 51
+        },
+        {
+          "name": "messaging_outbox",
+          "rows": 2755,
+          "states": [
+            {
+              "stage": "confirmed",
+              "n": 2755
+            }
+          ]
+        }
+      ],
+      "database_events": [],
+      "read_only_transaction_rolled_back": true
+    }
+  ],
+  "mongo": {
+    "schema": "m3-current-mongo-responsibilities/v1",
+    "read_only": true,
+    "collections": [
+      {
+        "name": "rm_outbox",
+        "count": 76,
+        "states": [
+          {
+            "_id": {
+              "state": "published"
+            },
+            "n": 76
+          }
+        ]
+      }
+    ],
+    "ttl_indexes": [
+      {
+        "collection": "interpretation_catalog_repair_plans",
+        "name": "ttl_catalog_repair_plan",
+        "expireAfterSeconds": 0
+      }
+    ],
+    "data_size": 6423463,
+    "storage_size": 1006448640,
+    "index_size": 449773568
+  },
+  "ttl_freeze_preflight": {
+    "read_only": true,
+    "collection": "interpretation_catalog_repair_plans",
+    "count": 0,
+    "ttl_indexes": [
+      {
+        "name": "ttl_catalog_repair_plan",
+        "key": {
+          "expires_at": 1
+        },
+        "expireAfterSeconds": 0
+      }
+    ]
+  },
+  "cutover_writer_freeze_proven": false,
+  "old_responsibilities_disposed": false
+}

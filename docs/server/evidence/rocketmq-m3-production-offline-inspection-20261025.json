@@ -1,0 +1,34 @@
+{
+  "schema": "m3-production-offline-inspect/v1",
+  "read_only": true,
+  "passed": 1,
+  "failed": 0,
+  "skipped": 0,
+  "binary_sha256": "c654ab9d2b84a7c23d7d25e4389ae1371391b4c13592922fe06fe795c5e50e98",
+  "snapshot": {
+    "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+    "migration_resources_sha256": "42eaf899667ee3347abcf4e6767fb68ac45f2b597b586344e6a0f87cc498020b",
+    "mysql_database": "qs",
+    "mongo_database": "qs",
+    "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+    "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+    "mysql_version": 105,
+    "mongo_version": 40,
+    "target_mysql_version": 110,
+    "target_mongo_version": 44
+  },
+  "original_containers_unchanged": true,
+  "application_started": false,
+  "ddl_executed": false,
+  "network": "infra-network",
+  "entrypoint": "/run/m3-qs-offline",
+  "image": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver@sha256:85ac6f5cd3bc75326f6d827393bf1dab7b9e85f305aaf03acefd3a174faec150",
+  "helper_removed": true,
+  "observed_at_utc": "2026-10-25T06:02:18.391652+00:00",
+  "initial_host_attempt": {
+    "read_only": true,
+    "result": "Mongo service name unavailable outside original Docker network",
+    "ddl_executed": false,
+    "diagnostic_overlay_excluded_from_execution_bundle": true
+  }
+}

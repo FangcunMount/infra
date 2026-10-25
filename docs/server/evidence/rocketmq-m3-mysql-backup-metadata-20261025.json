@@ -1,0 +1,37 @@
+{
+  "schema": "m3-production-mysql-backup-metadata-preflight/v1",
+  "passed": 3,
+  "failed": 0,
+  "skipped": 0,
+  "databases": [
+    {
+      "database": "iam",
+      "ddl_only_sha256": "9382dccfbc66ac98e61b233be33742af14794142d42855df59f9118525812f29",
+      "ddl_only_bytes": 32959,
+      "column_metadata_sha256": "27a5047ac5c99f76732a7c27b8aa40a0318ed59d38b1366472173f565cdf2d08",
+      "column_metadata_rows": 302
+    },
+    {
+      "database": "qs",
+      "ddl_only_sha256": "137ace4a1094853cb2bbf88802034fe8a4559f5126d729cc1ffc35ed5eb23f1b",
+      "ddl_only_bytes": 89068,
+      "column_metadata_sha256": "127c1cd4523183d4805a0827bcd241da06e1aa88784ce07db713af3decfadcaa",
+      "column_metadata_rows": 838
+    },
+    {
+      "database": "ai",
+      "ddl_only_sha256": "fb9f3125f2a378e34dce9f6629f04943f45017f15c7c07570dea416c953b3be6",
+      "ddl_only_bytes": 48262,
+      "column_metadata_sha256": "4b8485652abbe4ec2bbea7f527127dffbcb532e77efd81b0a0adcc68a98c5405",
+      "column_metadata_rows": 341,
+      "original_generated_expression_hashes_match": true
+    }
+  ],
+  "read_only": true,
+  "data_rows_exported": false,
+  "ddl_executed": false,
+  "application_started": false,
+  "actual_client_image_id": "sha256:13ad6357cf92127024960d539310c5fa5b39f44f3ee54f3f8e3990f815854555",
+  "helper_containers_removed": true,
+  "observed_at_utc": "2026-10-25T06:47:07.299109+00:00"
+}

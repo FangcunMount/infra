@@ -1,0 +1,739 @@
+{
+  "schema": "m3-target-assets-evidence/v1",
+  "passed": 15,
+  "failed": 0,
+  "skipped": 0,
+  "targets": [
+    {
+      "schema": "m3-candidate-assets-staged/v1",
+      "host": "serverA",
+      "release": "/opt/fangcun-m3/releases/m3-20261025-v1",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "phase": "docker/sealed",
+          "uid": 2000,
+          "new_files_readable": 6,
+          "existing_bind_sources_present": 8,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "docker/acceptance",
+          "uid": 2000,
+          "new_files_readable": 6,
+          "existing_bind_sources_present": 8,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "docker/open",
+          "uid": 2000,
+          "new_files_readable": 6,
+          "existing_bind_sources_present": 8,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "servera-migrated/sealed",
+          "uid": 2000,
+          "new_files_readable": 8,
+          "existing_bind_sources_present": 12,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "servera-migrated/acceptance",
+          "uid": 2000,
+          "new_files_readable": 8,
+          "existing_bind_sources_present": 12,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "servera-migrated/open",
+          "uid": 2000,
+          "new_files_readable": 8,
+          "existing_bind_sources_present": 12,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "qs-collection/sealed",
+          "uid": 2000,
+          "new_files_readable": 1,
+          "existing_bind_sources_present": 3,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "qs-collection/acceptance",
+          "uid": 2000,
+          "new_files_readable": 1,
+          "existing_bind_sources_present": 3,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "qs-collection/open",
+          "uid": 2000,
+          "new_files_readable": 1,
+          "existing_bind_sources_present": 3,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "qs-ai/sealed",
+          "uid": 10001,
+          "new_files_readable": 3,
+          "existing_bind_sources_present": 8,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "qs-ai/acceptance",
+          "uid": 10001,
+          "new_files_readable": 3,
+          "existing_bind_sources_present": 8,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "qs-ai/open",
+          "uid": 10001,
+          "new_files_readable": 3,
+          "existing_bind_sources_present": 8,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        }
+      ],
+      "files": [
+        {
+          "name": "docker/acceptance/assets/iam-events-m3.yaml",
+          "sha256": "6ffe5c44a0751576fe59230eeb37496138da321f240421b089ea1dad7fab8bef",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/acceptance/assets/m3-iam-credentials.json",
+          "sha256": "ee92edf0a658b87e922284469f8fe152d4597b818b4829408287283ba21922ff",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/acceptance/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/acceptance/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/acceptance/assets/runtime.json",
+          "sha256": "ea6c2e05887f995a284aad02d25fc28963c5dc1168eeb184e909b5b5041f83cc",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/acceptance/compose.json",
+          "sha256": "8950cfbec1d8509d8bbb998464c0c66b77494e5e7491cdd20d790ca26aeb1b68",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/acceptance/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/open/assets/iam-events-m3.yaml",
+          "sha256": "6ffe5c44a0751576fe59230eeb37496138da321f240421b089ea1dad7fab8bef",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/open/assets/m3-iam-credentials.json",
+          "sha256": "ee92edf0a658b87e922284469f8fe152d4597b818b4829408287283ba21922ff",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/open/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/open/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/open/assets/runtime.json",
+          "sha256": "ea6c2e05887f995a284aad02d25fc28963c5dc1168eeb184e909b5b5041f83cc",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/open/compose.json",
+          "sha256": "25dde87face1f566bb399cea6ca4155de16ff21bf3d83f05205f56391596c6d0",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/open/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/sealed/assets/iam-events-m3.yaml",
+          "sha256": "6ffe5c44a0751576fe59230eeb37496138da321f240421b089ea1dad7fab8bef",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/sealed/assets/m3-iam-credentials.json",
+          "sha256": "ee92edf0a658b87e922284469f8fe152d4597b818b4829408287283ba21922ff",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/sealed/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/sealed/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/sealed/assets/runtime.json",
+          "sha256": "3f47cb3edfa39b2ec16c7653df66014a5805560c149f1c684552c65b3da2bb4a",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/sealed/compose.json",
+          "sha256": "e38a125b66801ca535470b4cdd4eac1523a26a8675e6873a362edba7d342633c",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "docker/sealed/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/acceptance/assets/m3-ai-credentials.json",
+          "sha256": "b6529b94fc1681235051bbd504aea8366ffd786352a5d7c7b6f64002d55b630f",
+          "uid": 10001,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/acceptance/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 10001,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/acceptance/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 10001,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/acceptance/compose.json",
+          "sha256": "14f33d783e415665d548492007c5e21ed182ef496ca8a4ebaa1fc819ed44d6ff",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/acceptance/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/open/assets/m3-ai-credentials.json",
+          "sha256": "b6529b94fc1681235051bbd504aea8366ffd786352a5d7c7b6f64002d55b630f",
+          "uid": 10001,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/open/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 10001,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/open/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 10001,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/open/compose.json",
+          "sha256": "cf77a264535ceb12c5333de5c35cd86d35be93cb05c8f2b860d851fa205c1089",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/open/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/sealed/assets/m3-ai-credentials.json",
+          "sha256": "b6529b94fc1681235051bbd504aea8366ffd786352a5d7c7b6f64002d55b630f",
+          "uid": 10001,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/sealed/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 10001,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/sealed/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 10001,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/sealed/compose.json",
+          "sha256": "9decb5d4e37dc1c188405766626d7350a0d36f2468bdb78a2b0ad4393dd74f5f",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-ai/sealed/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-collection/acceptance/assets/runtime.json",
+          "sha256": "2dc362eb7c847332ffbca4014c652a9625ad9b725bca377edf5ca72ad08f4c0f",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-collection/acceptance/compose.json",
+          "sha256": "9b7d82efb5ee5536c9cb0a692d973746989db9e3f048a345b0aa19127aac7578",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-collection/acceptance/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-collection/open/assets/runtime.json",
+          "sha256": "2dc362eb7c847332ffbca4014c652a9625ad9b725bca377edf5ca72ad08f4c0f",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-collection/open/compose.json",
+          "sha256": "af8038b4e8986dbb0148af2a8bc200be403b07852e1e8b9ce132c5b19aa657be",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-collection/open/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-collection/sealed/assets/runtime.json",
+          "sha256": "2dc362eb7c847332ffbca4014c652a9625ad9b725bca377edf5ca72ad08f4c0f",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-collection/sealed/compose.json",
+          "sha256": "ac2f589904e129927835c0c263a9a7b9d71da5bc94e28b19d781827d05eb5142",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-collection/sealed/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/acceptance/assets/m3-qs-apiserver-credentials.json",
+          "sha256": "5478dfd060eb7cf12785236f95ebe5e9efb1823c3d1fcde1d0c04887de5e4894",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/acceptance/assets/m3-qs-mongo-credentials.json",
+          "sha256": "56eb749ad5ff5d96043eba861087a565e4f85a9e6208b72d5c5ce1e4b976d4ac",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/acceptance/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/acceptance/assets/qs-events.yaml",
+          "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/acceptance/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/acceptance/assets/runtime.json",
+          "sha256": "5967588126e8042108d8f58cebc837e99e6a91f2c97784be24837e33313d58d4",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/acceptance/compose.json",
+          "sha256": "ce17f6389b499b8ec477a697ccc1760e654d2101fdfe6308bd6f8498e46184b9",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/acceptance/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/open/assets/m3-qs-apiserver-credentials.json",
+          "sha256": "5478dfd060eb7cf12785236f95ebe5e9efb1823c3d1fcde1d0c04887de5e4894",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/open/assets/m3-qs-mongo-credentials.json",
+          "sha256": "56eb749ad5ff5d96043eba861087a565e4f85a9e6208b72d5c5ce1e4b976d4ac",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/open/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/open/assets/qs-events.yaml",
+          "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/open/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/open/assets/runtime.json",
+          "sha256": "5967588126e8042108d8f58cebc837e99e6a91f2c97784be24837e33313d58d4",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/open/compose.json",
+          "sha256": "47ebec0498221320672519284004947914dda68a8589113bbd9e841aecd20d3f",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/open/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/sealed/assets/m3-qs-apiserver-credentials.json",
+          "sha256": "5478dfd060eb7cf12785236f95ebe5e9efb1823c3d1fcde1d0c04887de5e4894",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/sealed/assets/m3-qs-mongo-credentials.json",
+          "sha256": "56eb749ad5ff5d96043eba861087a565e4f85a9e6208b72d5c5ce1e4b976d4ac",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/sealed/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/sealed/assets/qs-events.yaml",
+          "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/sealed/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/sealed/assets/runtime.json",
+          "sha256": "17dab27fe1ccac57041283e07643e514f23c30b4333ec20c676a0c33d047cc07",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/sealed/compose.json",
+          "sha256": "9d053fe225d9e06da562b5ebbfa1b350d57263bd8477389d0f85c897cedcec7e",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "servera-migrated/sealed/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        }
+      ],
+      "original_containers_unchanged": true,
+      "candidate_files_staged": true,
+      "active_configs_replaced": false,
+      "application_runtime_started": false,
+      "topic_acl_schema_provider_changed": false,
+      "helper_containers_removed": true,
+      "observed_at_utc": "2026-10-25T05:54:31.412044+00:00"
+    },
+    {
+      "schema": "m3-candidate-assets-staged/v1",
+      "host": "serverD",
+      "release": "/opt/fangcun-m3/releases/m3-20261025-v1",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "phase": "qs-worker/sealed",
+          "uid": 2000,
+          "new_files_readable": 7,
+          "existing_bind_sources_present": 5,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "qs-worker/acceptance",
+          "uid": 2000,
+          "new_files_readable": 7,
+          "existing_bind_sources_present": 5,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        },
+        {
+          "phase": "qs-worker/open",
+          "uid": 2000,
+          "new_files_readable": 7,
+          "existing_bind_sources_present": 5,
+          "entrypoint": "/bin/sh",
+          "network": "none",
+          "read_only": true,
+          "business_program_started": false
+        }
+      ],
+      "files": [
+        {
+          "name": "qs-worker/acceptance/assets/m3-qs-worker-credentials.json",
+          "sha256": "3b05d19bb76de476c1a7ed3de17760cf50293b5798ccff8b7063a8b172402e79",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/acceptance/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/acceptance/assets/qs-events.yaml",
+          "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/acceptance/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/acceptance/assets/runtime.json",
+          "sha256": "e1c30de06897a4a56a3094ba7b22751babd413a88be071fbaf93a202104eea58",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/acceptance/compose.json",
+          "sha256": "4b699c2aff037ffccae67ef333de6ec372323a853f2475734dd939fbfdf656c3",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/acceptance/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/open/assets/m3-qs-worker-credentials.json",
+          "sha256": "3b05d19bb76de476c1a7ed3de17760cf50293b5798ccff8b7063a8b172402e79",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/open/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/open/assets/qs-events.yaml",
+          "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/open/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/open/assets/runtime.json",
+          "sha256": "e1c30de06897a4a56a3094ba7b22751babd413a88be071fbaf93a202104eea58",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/open/compose.json",
+          "sha256": "6ca819e3460c11c3dfbc98a9725f9f3a72d66d1d05c2f2e9f842b6c706797547",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/open/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/sealed/assets/m3-qs-worker-credentials.json",
+          "sha256": "3b05d19bb76de476c1a7ed3de17760cf50293b5798ccff8b7063a8b172402e79",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/sealed/assets/mq-ca.crt",
+          "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/sealed/assets/qs-events.yaml",
+          "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/sealed/assets/routes.json",
+          "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/sealed/assets/runtime.json",
+          "sha256": "7480f3914a2fff4209828bb9f800684f6803c79e446026ea2de4f8a6e3bcc80a",
+          "uid": 2000,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/sealed/compose.json",
+          "sha256": "deab30c802ae376656163997b5c34d8cbf0abae83c6708d1d54d265ff875e978",
+          "uid": 0,
+          "mode": "0600"
+        },
+        {
+          "name": "qs-worker/sealed/runtime.env",
+          "sha256": "d09fc3603834993db6b0d7760d45f613680cd2676f4018e5040d1274950b4988",
+          "uid": 0,
+          "mode": "0600"
+        }
+      ],
+      "original_containers_unchanged": true,
+      "candidate_files_staged": true,
+      "active_configs_replaced": false,
+      "application_runtime_started": false,
+      "topic_acl_schema_provider_changed": false,
+      "helper_containers_removed": true,
+      "observed_at_utc": "2026-10-25T05:54:40.531894+00:00"
+    }
+  ],
+  "business_cutover": false,
+  "execution_bundle_complete": false,
+  "helper_source_sha256": "2cfd1ff52d3b62c10f975c7ecb3f0421336fc6a493b57fdc5b59941d64a06cd3"
+}
