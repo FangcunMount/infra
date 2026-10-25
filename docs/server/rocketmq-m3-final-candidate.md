@@ -179,3 +179,16 @@ PR265 a06d500对齐实际MySQL8.0.36、Mongo7.0.31固定digest、IAM1GiB及2 col
 
 
 修正计数后的[完整C1复验40117285915](https://github.com/FangcunMount/infra/actions/runs/40117285915)工作流success，实际19/0/0、八进程计数一致，受控窗口51.02秒；三MySQL/整Mongo原范围保护恢复摘要一致、首次启动屏障及启动后拒绝覆盖有效，八进程正常退出、运行期DDL为0、清理均通过。[回执](evidence/rocketmq-m3-production-c1-20261025.json)保留原报告摘要；不改写首轮失败。当前永久生产镜像引用、实际配置/执行包及具名批准尚未完成，T29仍进行中；隔离配置哈希不冒充生产配置冻结，受控窗口不等于生产RTO。
+
+
+## 2026-10-25：受验五镜像已直接发布现有ACR
+
+[40154076552](https://github.com/FangcunMount/iam/actions/runs/40154076552)为5/0/0，原归档传输、未重建应用；config digest与已验收候选逐个一致，manifest通过不可变引用回读，临时下载/认证文件清理通过。[完整制品回执](evidence/rocketmq-m3-acr-publication-20261025.json)记录五份完整`repo@sha256`，须原样用于最终启动计划，不使用latest或将config/Engine ID冒充registry manifest。T29-D已完成；T29内部4/5，实际配置/执行包、生产批准和业务验收仍另行收口。
+
+| 组件 | ACR仓库（共同前缀`crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/`） | 固定manifest digest |
+| --- | --- | --- |
+| qs-api | `qs-apiserver` | `sha256:85ac6f5cd3bc75326f6d827393bf1dab7b9e85f305aaf03acefd3a174faec150` |
+| qs-collection | `qs-collection-server` | `sha256:c4c3584fc5a4b11f20344c9e353ffe17f72203c1dff363dd9729e1053b1fde14` |
+| iam | `iam` | `sha256:55aec5c5a36072d4e87df9c7b29e51554c12a09064f1f5b60441e3ec2a6e777e` |
+| ai | `qs-ai` | `sha256:38080355322cc342c5b80e06da1ffdbc00549e391824d7be5e54179ea2d45e5b` |
+| qs-worker | `qs-worker` | `sha256:052758537916756515f9897238dcc2c8e2c3c598e997859724345ea2993b2d84` |

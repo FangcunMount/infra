@@ -20,9 +20,81 @@
   "pure_tests": 6,
   "local_all_pure_tests": 344,
   "infra_pr": 267,
-  "infra_merged": false,
+  "infra_merged": true,
   "iam_pr": 150,
   "iam_merged": true,
   "iam_merge_sha": "008a5abf311d9c699c402964e2c2e162150c4b93",
-  "actual_acr_publication_performed": false
+  "actual_acr_publication_performed": true,
+  "infra_merge_sha": "c0c2014af534d6a785a71a26f7c9d33a627bcf20",
+  "infra_source_checks_success": 10,
+  "infra_source_checks_failed": 0,
+  "infra_source_checks_pending": 0,
+  "source_checks": [
+    {
+      "name": "publication-contract",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40152761293/job/121047574173",
+      "workflowName": "M3 candidate archive publication contract"
+    },
+    {
+      "name": "acceptance",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40152761274/job/121047574495",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "name": "resources",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40152761272/job/121047574280",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40152761269/job/121047574413",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40152761307/job/121047574643",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40152761275/job/121047574346",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40152761269/job/121047574277",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40152761307/job/121047574374",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40152761275/job/121047574409",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "name": "native-index-audit",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40152761269/job/121047574480",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    }
+  ],
+  "acr_run_id": 40154076552,
+  "acr_run_url": "https://github.com/FangcunMount/iam/actions/runs/40154076552",
+  "actual_acr_passed": 5,
+  "actual_acr_failed": 0,
+  "actual_acr_skipped": 0,
+  "actual_receipt": "rocketmq-m3-acr-publication-20261025.json"
 }
