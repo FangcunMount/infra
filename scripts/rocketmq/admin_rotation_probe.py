@@ -54,7 +54,15 @@ def main():
         audit_cases={}
         if args.audit_existing_acls:
             from admin_audit import snapshot_existing_acls
-            audit_admin=ScopedAdmin(broker,homes['old']);legacy='owned-restricted-'+secrets.token_hex(6)
+            class OwnedAuditAdmin(ScopedAdmin):
+                def docker(self,*args,**kwargs):
+                    result=super().docker(*args,**kwargs)
+                    if 'getAcl' in args:
+                        # Only owned disposable ACL output: no passwords or production data.
+                        report.setdefault('owned_acl_cli_diagnostics',[]).append(dict(
+                            returncode=result.returncode,stdout=result.stdout[:2000],stderr=result.stderr[:2000]))
+                    return result
+            audit_admin=OwnedAuditAdmin(broker,homes['old']);legacy='owned-restricted-'+secrets.token_hex(6)
             audit_admin('createUser','-u',legacy,'-p',secrets.token_hex(32),'-t','Normal',mutation=True)
             audit_admin('createAcl','-s','User:'+legacy,'-r','Topic:owned-audit-only',
                 '-a','Pub','-i','127.0.0.1','-d','Deny',mutation=True)
