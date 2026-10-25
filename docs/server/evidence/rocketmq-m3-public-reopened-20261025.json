@@ -1,0 +1,64 @@
+{
+  "schema": "m3-public-reopening-under-approved-amendment/v1",
+  "operation_id": "20261025081841-2",
+  "opened_at": "2026-10-25T12:58:39Z",
+  "opened_at_china": "2026-10-25T20:58:39+08:00",
+  "actual_maintenance_seconds": 4966,
+  "original_30minute_target_met": false,
+  "explicit_opening_order_amendment_approved": true,
+  "additional_60minute_limit_approved": true,
+  "public_health": [
+    {
+      "TLS_verified": true,
+      "status": 200,
+      "url": "https://iam.fangcunmount.cn/healthz"
+    },
+    {
+      "TLS_verified": true,
+      "status": 200,
+      "url": "https://iam.fangcunmount.cn/readyz"
+    },
+    {
+      "TLS_verified": true,
+      "status": 200,
+      "url": "https://qs.fangcunmount.cn/healthz"
+    },
+    {
+      "TLS_verified": true,
+      "status": 200,
+      "url": "https://collect.fangcunmount.cn/healthz"
+    }
+  ],
+  "IAM_empty_role_created_and_renamed_once": true,
+  "IAM_policy_versions": [
+    175,
+    176
+  ],
+  "IAM_operations_committed": 2,
+  "IAM_witnesses_commit_confirmed": 2,
+  "test_role_grants": 0,
+  "test_role_assignments": 0,
+  "IAM_and_QS_each_delivered_and_settled": 2,
+  "both_group_lag_ready_inflight": 0,
+  "IAM_loaded_policy_version": 176,
+  "IAM_policy_version_lag": 0,
+  "events_republished": false,
+  "QS_authz_sync_instance_id_binding_corrected": true,
+  "new_fixed_API_config_revision": "m3-20261025-v3/servera-migrated/authz-sync",
+  "API_image_or_owner_epoch_or_resource_changed": false,
+  "original_configs_and_failures_preserved": true,
+  "core_answer_scoring_rule_report_passed": true,
+  "AI_independent_business_case_pending": true,
+  "T33_complete": false,
+  "observation_started": false,
+  "progress": "32/36",
+  "private_evidence_sha256": {
+    "final-opening-order-approved.private.json": "532d03fc23b212598dfdc3b5c2a2a5a562eff8e1243ea56790b386965aef5f45",
+    "additional-60min-approved.private.json": "869b45e6cf2b4461a532cf13113cec891b4c7f83041a2f343a0fe04f754c7695",
+    "IAM-final-empty-role-atomicity-proof.private.json": "1be524424c196e148b55ee384e50be9720ad68c9e1c207ad9035394294e7499c",
+    "IAM-two-subscriber-proof.private.json": "1b94edfe5b912db0d319fd25e081fc2ffdaaf2ae25be86d49033e6262b02026b",
+    "authz-sync-forward-review.json": "fa2cea59784612769644462fc71b9e3bd0f06f462204fd5df42bb317bc1391e3",
+    "authz-sync-final-plan.private.json": "b888c37a558dca5b6c02a7b4013efe617b0e8073705270e33bd804ac56d5806b",
+    "public-reopened-verified.private.json": "8221fc964cce135f5aadf368841c72849c24a0be9dc6e2269b9ea05b8c1e4af8"
+  }
+}
