@@ -23,7 +23,9 @@ def parse_existing_acl(output,subject):
 
 
 def read_existing_acl(admin,username):
-    result=admin.docker('java','-Xms32m','-Xmx128m','-XX:MaxDirectMemorySize=32m',
+    result=admin.docker('java',
+        '-Dlogback.statusListenerClass=org.apache.rocketmq.logging.ch.qos.logback.core.status.NopStatusListener',
+        '-Xms32m','-Xmx128m','-XX:MaxDirectMemorySize=32m',
         '-cp','/opt/rocketmq/conf:/opt/rocketmq/lib/*',
         'org.apache.rocketmq.tools.command.MQAdminStartup','getAcl',
         '-b','127.0.0.1:10911','-s','User:'+username,required=False)
@@ -35,7 +37,9 @@ def read_existing_acl(admin,username):
     # Pinned GetAclSubCommand returns successfully without printing when the
     # Broker returns null. RPC/auth failures print Exception/command failed and
     # are rejected above; a headerless nonempty response is never absence.
-    if not result.stdout.strip() and not result.stderr.strip():
+    if not result.stdout.strip() and all(
+            re.fullmatch(r'Picked up JAVA_TOOL_OPTIONS: [^\r\n]*',line)
+            for line in result.stderr.splitlines() if line.strip()):
         return {'kind':'absent','response':'successful_null_acl'}
     return parse_existing_acl(result.stdout,'User:'+username)
 
