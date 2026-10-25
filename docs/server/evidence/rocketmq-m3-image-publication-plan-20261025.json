@@ -1,0 +1,92 @@
+{
+  "schema": "m3-reviewed-candidate-publication/v1",
+  "registry": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com",
+  "namespace": "fangcunmount",
+  "build": {
+    "run_id": 40114281101,
+    "head_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627"
+  },
+  "startup": {
+    "run_id": 40114698327,
+    "head_sha": "a06d500ce712dbf8abaa6470b23e22eec7877d1c",
+    "report_sha256": "8fc677692be3c56d33c35480cd44ead645bb8291f8209e54ef74c9f29a93652e"
+  },
+  "cutover": {
+    "run_id": 40117285915,
+    "head_sha": "9b50f474833640d7bc0329458c921a7ffd520074",
+    "report_sha256": "6a6ea2ed494e1e9400c096193d6234e670df83ad100c3da62268753a169594d9"
+  },
+  "targets": {
+    "qs-api": {
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+      "image_config_id": "sha256:f49fbd098b0193f3d87f2d957f814fb5ef9c7de7dd37a8eda58b04f1d2475d1d",
+      "archive_sha256": "64bab43d301b2b0c98d2c3bae194fc317e0e7170d69a1e47d69dd8226eb94067",
+      "archive_bytes": 73314798,
+      "inventory_sha256": "a224c4d5bd81a7bb8e9d6a7d65a8fc0f2f4153a18232101fb0330fa27dce34c2",
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "repository": "qs-apiserver"
+    },
+    "qs-collection": {
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+      "image_config_id": "sha256:9dfa4cbb9590f2b01d5dbff33ec1b7d8dfe8124df2c7413a5dc952364b6adac5",
+      "archive_sha256": "7f2766526845ca75e99ce9136a667af606168feaf5d94a48ee9b4967b712cbb7",
+      "archive_bytes": 24926930,
+      "inventory_sha256": "6d436a348d9a99a790fb91c91d7f705f73a867fe9ac4eee75b0da52c3959feff",
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "repository": "qs-collection-server"
+    },
+    "iam": {
+      "source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+      "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+      "image_config_id": "sha256:647c347bb78dddb03283a9d2e966325bb0719458b7340fdc372e749dbe271c19",
+      "archive_sha256": "fae0f834d215329bfdffe075ade07eb40d1c3413ceae3e3b40e49cc3e3459cfa",
+      "archive_bytes": 84807625,
+      "inventory_sha256": "f91630fc6bccae5fcea67916347dc41e052f5e501c75cbd394311ee8f338e9b9",
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "repository": "iam"
+    },
+    "ai": {
+      "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+      "image_config_id": "sha256:b01a2e22fabd091fe77e293f69a1ec8dc8b4da602d4484382bea21eb7b70ed76",
+      "archive_sha256": "2dd4bd1b229ad6886c533f8b19b653893c04f6d7a4806afec0ecd4632c8129f2",
+      "archive_bytes": 133793847,
+      "inventory_sha256": "eaa4d509aa7773500d5d7a166b811e64d52cf195f72ee6d7dae0964b11d34cff",
+      "runtime_sdk": {
+        "uid": 10001,
+        "version": "0.4.0",
+        "client": "5.1.2",
+        "source": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f"
+      },
+      "repository": "qs-ai"
+    },
+    "qs-worker": {
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "builder_source_sha": "835cf766ceffd2694e2e0132bdf2408a2b2d0627",
+      "image_config_id": "sha256:2369768a58b75f3c0a00eaf6aeaaeb69d456aaf92257d38362fce1ce60881a80",
+      "archive_sha256": "feed0f01c4495870226e99e608bfba311b24d1193cfa375c19247ae9298d5dfd",
+      "archive_bytes": 20635115,
+      "inventory_sha256": "a2fc56684d3323cbb19f38ee448e38f69c3b45af0e99fb4c38cb4b764f2685fa",
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "repository": "qs-worker"
+    }
+  }
+}
