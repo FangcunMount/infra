@@ -46,5 +46,18 @@ class RotationTest(unittest.TestCase):
             rotate(old,new,changed,old_admin=Admin(old),new_admin=Admin(new),persist=lambda x:None,
                    restart=lambda:None,checkpoint=lambda x:None)
 
+    def test_actual_uppercase_cli_enums_and_explicit_denial(self):
+        old,new,changed=prepare(original(),'2'*64);events=[]
+        class Admin:
+            def __init__(self,account):self.account=account
+            def users(self):return {'admin':(self.account['password'],'SUPER','ENABLE')}
+            def __call__(self,*args,**kwargs):events.append('update')
+            def raw_users(self):return 'MQBrokerException: CODE: 16 DESC: signature rejected'
+        rotate(old,new,changed,old_admin=Admin(old),new_admin=Admin(new),persist=lambda x:events.append('persist'),
+               restart=lambda:events.append('restart'),checkpoint=events.append)
+        self.assertEqual(events[-1],'new_success_old_denied_new_success')
+        self.assertLess(events.index('update'),events.index('persist'))
+        self.assertLess(events.index('persist'),events.index('restart'))
+
 
 if __name__=='__main__':unittest.main()

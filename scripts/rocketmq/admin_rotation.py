@@ -42,7 +42,8 @@ def rotate(old,new,changed,*,old_admin,new_admin,persist,restart,checkpoint):
     def exact(admin,account):
         rows=admin.users()
         require(account['username'] in rows and rows[account['username']][0]==account['password']
-                and rows[account['username']][1:]==('Super','Enable'),'exact_enabled_super_user_required')
+                and tuple(v.lower() for v in rows[account['username']][1:])==('super','enable'),
+                'exact_enabled_super_user_required')
     exact(old_admin,old)
     checkpoint('original_verified')
     checkpoint('update_user_attempted')

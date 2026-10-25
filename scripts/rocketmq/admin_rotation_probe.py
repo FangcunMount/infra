@@ -52,7 +52,8 @@ def main():
         rotate(old,new,changed,old_admin=ScopedAdmin(broker,homes['old']),new_admin=ScopedAdmin(broker,homes['new']),
                persist=persist,restart=restart,checkpoint=report['phases'].append)
         require(all(call(['cat','/etc/rocketmq/'+name])==body for name,body in changed.items()),'new_all_config_copies_not_visible')
-        users=Admin(broker).users();require(users[new['username']]==(new['password'],'Super','Enable'),'default_tools_not_rotated')
+        users=Admin(broker).users();row=users[new['username']]
+        require(row[0]==new['password'] and tuple(v.lower() for v in row[1:])==('super','enable'),'default_tools_not_rotated')
         after_id=fixture.run(['docker','inspect',broker,'--format','{{.Id}}']).stdout.strip()
         require(before_id==after_id,'original_container_replaced')
         cases={phase:phase in report['phases'] for phase in ('original_verified','update_user_confirmed',
