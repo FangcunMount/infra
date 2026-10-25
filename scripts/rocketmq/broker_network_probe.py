@@ -25,6 +25,9 @@ def roundtrip(fixture,broker):
             and 'StackOverflowError' in raw and raw.count('MixAll.getLocalhostByNetworkInterface')>10,
             'actual_disconnected_mixall_recursion_not_reproduced')
     run(reconnect_arguments(failed,net(),expected))
+    pending=inspect()['NetworkSettings']['Networks']
+    fixture.report['pending_endpoint_readback']={k:{field:v.get(field) for field in
+        ('NetworkID','Aliases','IPAddress')} for k,v in pending.items()}
     require_attached(inspect(),net(),expected)
     run(['docker','start',broker]);deadline=time.monotonic()+180
     while time.monotonic()<deadline:

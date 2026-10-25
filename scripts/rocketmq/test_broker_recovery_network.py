@@ -37,6 +37,18 @@ class NetworkRecoveryTest(unittest.TestCase):
             dict(NetworkID='network-id',Aliases=['broker','original-broker-1'])}
         require_attached(self.container,self.network,self.expected)
 
+    def test_pending_endpoint_is_distinct_from_live_sandbox(self):
+        endpoint=dict(NetworkID='',Aliases=['broker','original-broker-1'])
+        self.container['NetworkSettings']['Networks']={'network-id':endpoint}
+        require_attached(self.container,self.network,self.expected)
+        self.container['State'].update(Status='running',Running=True)
+        with self.assertRaisesRegex(ValueError,'live_original'):
+            require_attached(self.container,self.network,self.expected)
+        endpoint.update(NetworkID='network-id',IPAddress='172.22.0.3')
+        self.container['NetworkSettings']['Networks']={'original_rocketmq':endpoint}
+        self.network['Containers']['broker-id']={}
+        require_attached(self.container,self.network,self.expected)
+
     def test_running_true_does_not_hide_automatic_restart(self):
         self.container['State'].update(Status='running',Running=True)
         for count,restarting in ((11,False),(1,False),(0,True)):

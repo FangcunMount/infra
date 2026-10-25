@@ -46,9 +46,19 @@ def reconnect_arguments(container,network,expected):
 def require_attached(container,network,expected):
     require_identity(container,network,expected)
     actual=container['NetworkSettings']['Networks']
-    require(set(actual)=={network['Name']} and actual[network['Name']]['NetworkID']==network['Id'],
-            'exact_original_endpoint_required_before_start')
-    require({'broker',container['Name'].lstrip('/')}<=set(actual[network['Name']].get('Aliases') or []),
+    if container['State']['Running']:
+        require(set(actual)=={network['Name']} and actual[network['Name']]['NetworkID']==network['Id']
+                and actual[network['Name']].get('IPAddress')
+                and container['Id'] in network['Containers'],'exact_live_original_endpoint_required')
+        endpoint=actual[network['Name']]
+    else:
+        # Docker stores a requested endpoint before starting its sandbox. When
+        # connected by ID, the pending key can be that ID and NetworkID empty.
+        require(len(actual)==1 and next(iter(actual)) in (network['Name'],network['Id']),
+                'exact_original_endpoint_required_before_start')
+        endpoint=next(iter(actual.values()))
+        require(endpoint.get('NetworkID','') in ('',network['Id']),'pending_network_id_conflicts')
+    require({'broker',container['Name'].lstrip('/')}<=set(endpoint.get('Aliases') or []),
             'original_broker_service_aliases_required')
 
 
