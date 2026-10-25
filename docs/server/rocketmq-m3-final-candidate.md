@@ -1,6 +1,6 @@
 # M3 最终候选准备与验收边界
 
-当前有效候选：IAM ca59dec4、QS b75d4a52、AI ddff86ca。**T29已完成，内部5/5，M3为29/36**；正式SDK/五镜像/当前八进程完整C1、v2实际配置、挂载、维护只读及140成员静态包均通过，infra283两OS各47/0/0并合并976b7a51。最终[统一窗口清单](rocketmq-m3-production-window.md)就绪，T30实际基线与最终生产批准另记；生产MySQL密码、业务DDL/Topic/ACL/provider、system及48小时均未执行。下文历史旧候选及当时待办保留原范围。
+当前有效候选：IAM ca59dec4、QS b75d4a52、AI ddff86ca。**T29已完成，内部5/5；当前T30/T31也已完成，M3为31/36**；正式SDK/五镜像/当前八进程完整C1、v2实际配置、挂载、维护只读及140成员静态包均通过，infra283两OS各47/0/0并合并976b7a51。最终[统一窗口清单](rocketmq-m3-production-window.md)就绪，T30最终批准已取得，T31生产v2 Topic/ACL和Mac mini告警已安装回读；生产MySQL密码、业务DDL/provider、system新链路验收及48小时均未执行。下文历史旧候选及当时待办保留原范围。
 
 唯一任务进度见[M3总表](rocketmq-m3-execution.md)。本页细化原T29，不增加任务数。当前T29已按页首及总表完成；下列各日期记录保留当时的范围和状态，不表示生产授权。
 
@@ -209,3 +209,6 @@ PR265 a06d500对齐实际MySQL8.0.36、Mongo7.0.31固定digest、IAM1GiB及2 col
 
 
 2026-10-25当前补充：用户正常登录后已核对后台会话与专用测试记录，[system验收范围](rocketmq-m3-system-acceptance.md)补充具名测试对象及有界数据；上文等待后台登录的记录保留为历史。填写端会话与业务验收未完成，生产批准仍待取得，M3保持29/36。
+
+
+2026-10-25当前生产阶段：两份清单已获用户明确批准；T31原资源安装/回读与Mac mini规则加载完成，见[生产回执](evidence/rocketmq-m3-production-resources-monitoring-20261025.json)。总进度31/36。填写端正常测试身份尚待就绪，维护未开始，业务仍NSQ；上文未取得批准/未安装资源记录只保留其历史范围。

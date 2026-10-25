@@ -1,0 +1,124 @@
+{
+  "schema": "m3-production-resources-and-monitoring/v1",
+  "resources": {
+    "version": 2,
+    "operations": 53,
+    "typed_topics": 10,
+    "principals": 5,
+    "verified": true,
+    "schema": "m3-production-v2-resources/v1",
+    "approval_sha256": "2fa17654f9c7c6e4f3283765372c64d9387bc4a3ecd150f1ac53c1705c2fa081",
+    "old_topics": 10,
+    "old_groups": 12,
+    "old_users": 9,
+    "new_total_users": 14,
+    "original_resources_and_users_unchanged": true,
+    "original_containers_unchanged": true,
+    "business_runtime_started": false,
+    "application_provider_changed": false,
+    "observed_at_utc": "2026-10-25T08:29:38.295038+00:00"
+  },
+  "monitoring": {
+    "schema": "m3-production-monitoring-rules/v1",
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "approval_sha256": "2fa17654f9c7c6e4f3283765372c64d9387bc4a3ecd150f1ac53c1705c2fa081",
+    "rules_sha256": "482b2e78351fdfc541250285e7d18d0bcafa67b849365eea6bc38c03244c6431",
+    "alert_names": [
+      "RocketMQTransactionAdmissionProtected",
+      "RocketMQTransactionCheckerSaturated",
+      "RocketMQTransactionConfirmationObservationAged",
+      "RocketMQTransactionEvidenceUnsafe",
+      "RocketMQTransactionInvalidCheck",
+      "RocketMQTransactionObservationUnavailable",
+      "RocketMQTransactionPreparationExpired",
+      "RocketMQTransactionRecoveryAuditFailure"
+    ],
+    "previous_rules_unchanged": true,
+    "main_config_unchanged": true,
+    "containers_unchanged": true,
+    "reloaded_by": "SIGHUP",
+    "reload_timestamp_before": 1792390549.6244578,
+    "reload_timestamp_after": 1792916856.3079054,
+    "required_targets_up": 4,
+    "grafana_healthy": true,
+    "serverd_collector_added": false,
+    "observed_at_utc": "2026-10-25T08:27:39.466267+00:00"
+  },
+  "tls": {
+    "application_message_sent": false,
+    "observed_at_utc": "2026-10-25T08:31:36.159836+00:00",
+    "peer_der_sha256": "4202089afd53ce8ff73b7bf256fc6cf83d34a7df27a73951036d8676f9dffbee",
+    "schema": "m3-production-broker-tls-readback/v1",
+    "tls_hostname_verified": true,
+    "tls_version": "TLSv1.2"
+  },
+  "operator_tools_staged": [
+    {
+      "database_connected": false,
+      "files": [
+        {
+          "name": "start_boundary.py",
+          "sha256": "2c2b18a4d8b0865f5cb7d6fa81840d7d4f50c7dbc1265d7fa657bb9236f1700c"
+        },
+        {
+          "name": "cutover_step.py",
+          "sha256": "894f27388d1914f7064c49d8c14a05958e77fb5935c1850cbdae7afda85cb7dd"
+        },
+        {
+          "name": "runtime_start.py",
+          "sha256": "e558189ca58bc2d73b71c829d043541eb1ff3ddd9c02f82953a0041c95b1ee23"
+        },
+        {
+          "name": "m3_mysql_credential.py",
+          "sha256": "98949bdd05d58e5d64fd3472f78abff887e1c4b57c56193d1dafbf97ccd2fc11"
+        }
+      ],
+      "host": "serverA",
+      "runtime_started": false,
+      "schema": "m3-frozen-operator-tools-staged/v1",
+      "source_compiled_only": true
+    },
+    {
+      "database_connected": false,
+      "files": [
+        {
+          "name": "start_boundary.py",
+          "sha256": "2c2b18a4d8b0865f5cb7d6fa81840d7d4f50c7dbc1265d7fa657bb9236f1700c"
+        },
+        {
+          "name": "cutover_step.py",
+          "sha256": "894f27388d1914f7064c49d8c14a05958e77fb5935c1850cbdae7afda85cb7dd"
+        },
+        {
+          "name": "runtime_start.py",
+          "sha256": "e558189ca58bc2d73b71c829d043541eb1ff3ddd9c02f82953a0041c95b1ee23"
+        },
+        {
+          "name": "m3_mysql_credential.py",
+          "sha256": "98949bdd05d58e5d64fd3472f78abff887e1c4b57c56193d1dafbf97ccd2fc11"
+        }
+      ],
+      "host": "serverD",
+      "runtime_started": false,
+      "schema": "m3-frozen-operator-tools-staged/v1",
+      "source_compiled_only": true
+    }
+  ],
+  "mysql_secret_locations": {
+    "iam": "repository",
+    "qs-server": "repository",
+    "qs-ai": "repository",
+    "production_environment_override_present": false,
+    "credential_values_read": false,
+    "secrets_modified": false
+  },
+  "business_admission_changed": false,
+  "application_provider": "NSQ",
+  "production_database_schema_changed": false,
+  "shared_mysql_password_rotated": false,
+  "system_rocketmq_business_acceptance_passed": false,
+  "maintenance_started": false,
+  "next_step_requires": "legitimate collector/miniprogram test identity and entry before unified maintenance"
+}
