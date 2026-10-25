@@ -1,0 +1,74 @@
+{
+  "schema": "m3-bounded-operator-gate-validation/v1",
+  "passed": 7,
+  "failed": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "case": "all three actual HTTP/HTTPS configurations",
+      "passed": true
+    },
+    {
+      "case": "allowed",
+      "status": 204,
+      "passed": true
+    },
+    {
+      "case": "allowed_peer_ignores_forwarded_value",
+      "status": 204,
+      "passed": true
+    },
+    {
+      "case": "wrong_peer",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "forwarded_header_cannot_grant",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "future_window",
+      "status": 503,
+      "passed": true
+    },
+    {
+      "case": "expired_window",
+      "status": 503,
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "m3_nginx_gate.py": "798baee24fb05ae05cefb4459cadf41fa799909644052ae76c2cf8e4299bbd5d",
+    "m3_nginx_acceptance_gate.py": "4b4f23c98c6bf3b394a5ec706121d3ee76ce42cdc525344bdd7223c52a00c6b1"
+  },
+  "original_containers_unchanged": true,
+  "original_sites_unchanged": true,
+  "active_nginx_reloaded": false,
+  "application_started": false,
+  "validation_helpers_removed": true,
+  "candidate_is_not_runtime_window_input": true,
+  "window_expiry_max_seconds": 1800,
+  "nginx_image_id": "sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d",
+  "operator_peer_proof": {
+    "exact_peer_count": 1,
+    "actual_established_tcp_peer_confirmed": true,
+    "addresses_recorded_privately": true,
+    "forwarded_header_not_authority": true
+  },
+  "pure_unit_tests": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0
+  },
+  "scope_amendment_sha256": "4836ebc767f73bc1282971229b0a9e422f3445bba82c5f1fb2fabb3ff7aa2ad9",
+  "prepared_form_submitted": false,
+  "maintenance_started": false,
+  "original_failure_retained": {
+    "case": "unsupported numeric comparison in nginx if",
+    "active_configuration_changed": false,
+    "corrected_to": "bounded exact decimal interval in HTTP map"
+  },
+  "static_packet_unchanged": true
+}
