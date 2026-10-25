@@ -41,7 +41,117 @@
     "local_pytest_deselected": 2,
     "deselected_reason": "Two real Docker Compose cases are mandatory in full CI; no local Docker runtime used",
     "mypy_src_files": 454,
-    "status": "full CI pending; not merged or deployed"
+    "status": "Transaction package/preflight source merged; final-only production option cleanup and actual configuration reconstruction remain pending; not deployed",
+    "current_candidate": {
+      "head": "8b9bfeeef3c1756cd31f0af2a9e2e919c56e4544",
+      "local_pytest_passed": 153,
+      "local_pytest_failed": 0,
+      "local_pytest_skipped": 0,
+      "local_pytest_deselected": 2,
+      "full_ci_run": 40209755128,
+      "full_ci_status": "all 12 checks successful; merged",
+      "verified_native_ci_partition": {
+        "mysql": "8.4",
+        "partition": 0,
+        "cases": 1422,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "actual_environment_identity_probe_passed": true,
+        "report_sha256": "1f441abb9f943f6c058cb9d7deed918ce7933da0a76edeed8e7500e6e0f2f50a"
+      },
+      "merge": "20ceaae60df72d0e201a97039aab6f46722fb786",
+      "ci_successful_checks": 12,
+      "pytest_matrix": {
+        "run": 40209755128,
+        "source_sha": "8b9bfeeef3c1756cd31f0af2a9e2e919c56e4544",
+        "partitions": [
+          {
+            "mysql": "8.0.36",
+            "partition": 0,
+            "cases": 1422,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "report_sha256": "2da2056757388d8bbe456c195f77c67c6c72d66bfdc59a8cad4031ad7c79fa23"
+          },
+          {
+            "mysql": "8.0.36",
+            "partition": 1,
+            "cases": 1422,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "report_sha256": "ac2ec2c49513b769a28cae1138beee536cc3d4ebc166b0d33da93c8e04abc194"
+          },
+          {
+            "mysql": "8.0.36",
+            "partition": 2,
+            "cases": 1422,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "report_sha256": "cf0e2ad98870db42b4b7b0b2f3df87b5bccaa70213603565445b6b0a09ad119e"
+          },
+          {
+            "mysql": "8.0.36",
+            "partition": 3,
+            "cases": 1422,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "report_sha256": "21fbb63628296f1c94ac45f6b6700e18890a6e0ec54b9d0d7c0e441c2542c6b6"
+          },
+          {
+            "mysql": "8.4",
+            "partition": 0,
+            "cases": 1422,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "report_sha256": "1f441abb9f943f6c058cb9d7deed918ce7933da0a76edeed8e7500e6e0f2f50a"
+          },
+          {
+            "mysql": "8.4",
+            "partition": 1,
+            "cases": 1422,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "report_sha256": "e602ee1e53a8a46e0f3151b988a6eb40c33160325d713950eec0690ba2a731e1"
+          },
+          {
+            "mysql": "8.4",
+            "partition": 2,
+            "cases": 1422,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "report_sha256": "139f00f9c20ab18bee4e8da40fc86f470abcb77f7d1d0a95e23cff1d7e985b0c"
+          },
+          {
+            "mysql": "8.4",
+            "partition": 3,
+            "cases": 1422,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "report_sha256": "5a059c2ddb85176089c3d94f3369a7d3cd33186863f5fd89ad871b4255cfbb43"
+          }
+        ],
+        "tests_per_mysql": {
+          "8.0.36": 5688,
+          "8.4": 5688
+        },
+        "total_case_executions": 11376,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "duplicates_per_matrix": 0,
+        "same_complete_cases_across_mysql": true
+      },
+      "pytest_aggregate_receipt_sha256": "310dcb63a64da6744c8f085732afd530be3393166b42009e7133be97e4178f25"
+    }
   },
   "qs_worker": {
     "pr": 443,
@@ -59,7 +169,16 @@
       "api_collection_worker_package": "passed",
       "docs_facts_and_hygiene": "passed"
     },
-    "status": "required real Compose/full CI pending; not merged or deployed"
+    "status": "Prior head full CI validation failed; revised contracts and prerequisite included; not merged/deployed",
+    "current_candidate": {
+      "head": "3a5dd847774175fdaf2fe3adaba2d1948f88e62d",
+      "source_baseline": "7e8ebf3adfd0f2c8a7e7a854d0c3d3e4a593e639",
+      "go_test_events_passed": 103,
+      "go_failed": 0,
+      "go_skipped": 0,
+      "prerequisite_pr": 444,
+      "status": "full CI pending; original Compose render passed, final candidate must pass every required gate"
+    }
   },
   "retained_failures": [
     {
@@ -81,6 +200,36 @@
       "id": "qs-registry-fixture-service",
       "reason": "Isolated function fixture omitted SERVICE required by the real metadata entrypoint",
       "disposition": "Model explicit API/worker service; both exact image and worker revision tests pass"
+    },
+    {
+      "id": "ai-route-refusal-now-before-di",
+      "reason": "Shared file reader rejects a wrong owner before the DI sender/schema/channel instead of later runtime assembly",
+      "disposition": "Original negative test now proves zero allocated sender/schema/channel; revised local 153 pass"
+    },
+    {
+      "id": "ai-compose-reescaped-output",
+      "reason": "compose config produces reusable escaped representation, not the actual process environment",
+      "disposition": "Required CI inspects an owned never-started network-none container; MySQL8.4 partition0 1422 tests passed including exact original dollar bytes"
+    },
+    {
+      "id": "qs-compose-long-mount-contract",
+      "reason": "Old Go topology fixture decoded every volume as short string; production now has explicit readonly long syntax",
+      "disposition": "Fixture accepts both syntax forms and preserves existing log/resource/DNS checks; 103 local test events passed"
+    },
+    {
+      "id": "qs-explicit-config-contract",
+      "reason": "Old production fixture assumed default endpoint/relative catalog and actionlint did not declare the new file revision variable",
+      "disposition": "Require missing endpoint rejection, inject only a synthetic address for the contract, preserve explicit final path, extend the variable allowlist; actionlint passes"
+    },
+    {
+      "id": "qs-trusted-file-atime",
+      "reason": "Unchanged trusted reader treated read-induced access time as tampering and could refuse before SSH -G",
+      "disposition": "Independent PR444; real owned-file red reproduction and all nine stable-field tamper refusals pass; no production SSH changes"
+    },
+    {
+      "id": "qs-domain-dotted-owner-render",
+      "reason": "AllSettings expanded qs.mysql/qs.mongo keys in the final domain map during an AI-only overlay",
+      "disposition": "Independent PR445 preserves raw domain subtree; actual Render→app.DecodeOptions red/green with exact original identity and budget"
     }
   ],
   "remaining": [
@@ -192,6 +341,78 @@
       "bytes": 73,
       "sha256": "1818e1781bb3f2d6c501b051bc1da3aae784765ff306f802979a7c686b062071",
       "private": true
+    },
+    {
+      "report": "m4-ai-C06-final-package-regression-v2.xml",
+      "bytes": 38292,
+      "sha256": "891ba68a47b1d6a5d8cd70231e1eb4e999a3822a4238161d46b07c4218f0d9f7",
+      "private": true
+    },
+    {
+      "report": "m4-ai-C06-rerun-failure-1.log",
+      "bytes": 168465,
+      "sha256": "07ca98ff6de858cf6ebcb0de0c95c587ee91f42b899afc02e2c0fd310a96ad26",
+      "private": true
+    },
+    {
+      "report": "m4-ai-C06-rerun-failure-2.log",
+      "bytes": 162039,
+      "sha256": "4f1efe8ac2b2a24bfe2d3615e8ec23ec82c8f8fd04f24da45b9dab12827b0f1f",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-ci-mongo-failure.log",
+      "bytes": 23312,
+      "sha256": "580cc4e504a5ddec0b92f7db574079bfc61d7db9e5b682a02ae5dceb390873d1",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-ci-121216667024.log",
+      "bytes": 22628,
+      "sha256": "d18a9e3180daeb576523fd9605d8ff1e93cace19b21e2e03dafa49b3bfd180f2",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-ci-121216666969.log",
+      "bytes": 2397461,
+      "sha256": "029d043d6c664aea42f874eb0f5397d976558439f320c489c42fb5eade92b6b2",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-mongo-atime-red.out",
+      "bytes": 1004,
+      "sha256": "1e5dc30ab38dd3c6fdc112fbbf1c7a420b6aa58d0f50e83ca18c9f72c232ca66",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-mongo-atime-green.out",
+      "bytes": 134,
+      "sha256": "bfb755a9786fa138f17e4cc7bbb94b7f491f31c17f01267353bb819c3aca8525",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-config-contract-green.jsonl",
+      "bytes": 156196,
+      "sha256": "99265f05628444d96f18bf29f23b768d6575f06f3dbee4d37685727f093df5e8",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-render-baseline.jsonl",
+      "bytes": 13658,
+      "sha256": "01f48d402dc04fd8287777c359a86d804157a59ecf1f50556fdf94aa7442feb7",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-render-red.out",
+      "bytes": 258,
+      "sha256": "d28af36cfa843eac4113cb882e6f3614faf9be1e069ca5d9f875af28f9c5cc88",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-render-green.jsonl",
+      "bytes": 115206,
+      "sha256": "05f7be34b65817129484b20104826ef9b11fecf1b4a12a3e58e9d88273990f09",
+      "private": true
     }
   ],
   "protected": [
@@ -200,5 +421,30 @@
     "No new SDK release",
     "NSQ retained volumes/containers/backups untouched",
     "Development and isolated NSQ remain available"
-  ]
+  ],
+  "updated_at": "2026-10-25T16:28:08.544791+00:00",
+  "qs_trusted_reader": {
+    "pr": 444,
+    "head": "38a1534ebe171832240bd3e53dd431730305a972",
+    "local_tests": {
+      "trusted_file_and_route": 35,
+      "wrapper": 5,
+      "receipt": 9
+    },
+    "native_mongo_ci": "passed; complete source CI passed and merged",
+    "scope": "Exclude read-induced atime only; preserve all nine stable identity fields, host key and exact SSH route",
+    "merge": "d983284ec26e32507e4914bb89fbb575e8f58536",
+    "ci_successful_checks": 32,
+    "conditional_skipped_jobs": 1,
+    "status": "merged; no production SSH configuration changed"
+  },
+  "qs_api_overlay": {
+    "pr": 445,
+    "head": "01f1743dde1329c1c07a5b98f4828d747b57938c",
+    "source_baseline": "816701d007a0dc3a1fe9e9b04596b47e2fe02e74",
+    "go_test_events_passed": 107,
+    "go_failed": 0,
+    "go_skipped": 0,
+    "status": "Source/actual decoder round-trip passed; CI pending; remaining final API packaging not complete"
+  }
 }
