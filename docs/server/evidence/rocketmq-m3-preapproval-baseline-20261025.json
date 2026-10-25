@@ -1,0 +1,375 @@
+{
+  "schema": "m3-preapproval-baseline/v1",
+  "read_only": true,
+  "hosts": [
+    {
+      "host": "serverA",
+      "observed_at_utc": "2026-10-25T07:55:43.116946+00:00",
+      "report_sha256": "af260a6d252082a2a0ae1210ece61666d0d3b2bbe7b7c1c4d6851aa7f7779c40",
+      "locks": [
+        {
+          "inode": 820503,
+          "mode": "0o666",
+          "path": "/var/lib/fangcun-image-retention/deploy.lock"
+        },
+        {
+          "inode": 400122,
+          "mode": "0o600",
+          "path": "/opt/qs-ai/deploy.lock"
+        }
+      ],
+      "memory_available_mib": 6562,
+      "running_containers": [
+        {
+          "config_sha256": "9a37e7d2834a314b3dacb9d6ce8dc0abdc0b81e3f9dc0a530e3d7c368956742f",
+          "health": "healthy",
+          "host_config_sha256": "f32cc3327fbb550f101f22dab240f693e6951f450393f3594377838b748e2a6c",
+          "id": "2e1acaa0acdb35ca3856c1c7c291f46c6c086f22b110a534748c45cf7e1b24b0",
+          "image": "sha256:57a47a713f336d84f6ba48fac7c0f229c38318ed16115071b20b7e7bcabdfbf5",
+          "image_reference": "sha256:57a47a713f336d84f6ba48fac7c0f229c38318ed16115071b20b7e7bcabdfbf5",
+          "memory": 1073741824,
+          "name": "/iam-apiserver",
+          "nano_cpus": 1000000000,
+          "oom": false,
+          "project": "docker",
+          "restarts": 0,
+          "running": true,
+          "service": "iam-apiserver",
+          "started": "2026-10-19T15:09:05.156073402Z"
+        },
+        {
+          "config_sha256": "2f05e42ae3bb61f6a98898cd51c6e2a43f03431c62bb956a8847f421616b9071",
+          "health": "healthy",
+          "host_config_sha256": "d0b2b89ac760e3d1e5d8c4676e00dafaa5cce829c5da7976d369d1327b5edddf",
+          "id": "2d79a2f4150cd34896cd1ce5f133bb5052ca270c11e371819a7bc0663cc4a354",
+          "image": "sha256:b0f51841f84e4dd798286fd1c8629303fd0b619ca351af26b26db76896f00932",
+          "image_reference": "sha256:b0f51841f84e4dd798286fd1c8629303fd0b619ca351af26b26db76896f00932",
+          "memory": 335544320,
+          "name": "/qs-collection-server-2",
+          "nano_cpus": 1000000000,
+          "oom": false,
+          "project": "qs-collection",
+          "restarts": 0,
+          "running": true,
+          "service": "server",
+          "started": "2026-10-19T15:11:31.091547874Z"
+        },
+        {
+          "config_sha256": "f5814e3d95731a428d7ceee7c1cd770bb4a0127d0c3c37c20077b7951d068d97",
+          "health": "healthy",
+          "host_config_sha256": "d0b2b89ac760e3d1e5d8c4676e00dafaa5cce829c5da7976d369d1327b5edddf",
+          "id": "7a9ccb1e7e85a05755e8bf55e274387197121f467f19cb937a33d311a75167b9",
+          "image": "sha256:b0f51841f84e4dd798286fd1c8629303fd0b619ca351af26b26db76896f00932",
+          "image_reference": "sha256:b0f51841f84e4dd798286fd1c8629303fd0b619ca351af26b26db76896f00932",
+          "memory": 335544320,
+          "name": "/qs-collection-server-1",
+          "nano_cpus": 1000000000,
+          "oom": false,
+          "project": "qs-collection",
+          "restarts": 0,
+          "running": true,
+          "service": "server",
+          "started": "2026-10-19T15:10:54.416424821Z"
+        },
+        {
+          "config_sha256": "96c67295713e6d19ce58004ea0d69bff1da4df0b57fba83bc3718a7a349b4622",
+          "health": "healthy",
+          "host_config_sha256": "001cae71102ec8f6d677aab1b1718d68d1876e72b25f6ebf8298329032d90ab5",
+          "id": "2fe8dc429fbc32b2f9ec9a2a2e0dd505d30c30308c72696f1262bd3d2a0b6fa3",
+          "image": "sha256:72c13c69cfa4ed68c9eeeba81c72bff678f02b803a7ddc3d5aac2205ae7cfbdd",
+          "image_reference": "sha256:72c13c69cfa4ed68c9eeeba81c72bff678f02b803a7ddc3d5aac2205ae7cfbdd",
+          "memory": 1073741824,
+          "name": "/qs-apiserver",
+          "nano_cpus": 2000000000,
+          "oom": false,
+          "project": "servera-migrated",
+          "restarts": 0,
+          "running": true,
+          "service": "qs-apiserver",
+          "started": "2026-10-19T15:09:37.30204824Z"
+        },
+        {
+          "config_sha256": "068e9a1314d2c020b65879853518b2e048e20e85cd35783f4b22b770c5e806da",
+          "health": "healthy",
+          "host_config_sha256": "2f76d929c080f74db6f5ac24385af32ff5f134af3166842dd0ebc68902387293",
+          "id": "7bb71fbe76222abd2ca737174bb0a6f12de7e42b838ae071405ee5e6ba982cf2",
+          "image": "sha256:35902a73acfcb0d3169110a28bf1fef95bbe3c1e3a8f38666ec973a8d262fcd3",
+          "image_reference": "sha256:35902a73acfcb0d3169110a28bf1fef95bbe3c1e3a8f38666ec973a8d262fcd3",
+          "memory": 805306368,
+          "name": "/qs-ai",
+          "nano_cpus": 750000000,
+          "oom": false,
+          "project": "qs-ai",
+          "restarts": 0,
+          "running": true,
+          "service": "qs-ai",
+          "started": "2026-10-19T10:39:56.889668772Z"
+        },
+        {
+          "config_sha256": "d744fe1df4e612504115b14716e66c84cfa65cdea08b914a576ec20cf295c093",
+          "health": null,
+          "host_config_sha256": "55934f51d6135cc8fa986a0f2ef6b0450083bf9a915ee1d3908e069425345ecd",
+          "id": "5b7db6baafaed456674c2348bc4355ce17afa595a1680bb3b4f315e86c348e6e",
+          "image": "sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d",
+          "image_reference": "nginx:1.27",
+          "memory": 33554432,
+          "name": "/prometheus-route",
+          "nano_cpus": 100000000,
+          "oom": false,
+          "project": "monitoring-route",
+          "restarts": 0,
+          "running": true,
+          "service": "prometheus-route",
+          "started": "2026-10-19T06:19:50.80310569Z"
+        },
+        {
+          "config_sha256": "93cb03245c257ce4f243ce6577b51e23655b1edfafa39b7c0f2e84f826a2a694",
+          "health": "healthy",
+          "host_config_sha256": "58fd0120095a5ae15d0c59de05b771e0fadbedea31eb6fb86c90984f1458d118",
+          "id": "8d9f2f4d1a9cf85d4f51497897eff0b545676ff8eb479f595beee9d969b6d18e",
+          "image": "sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d",
+          "image_reference": "nginx:1.27",
+          "memory": 134217728,
+          "name": "/nginx",
+          "nano_cpus": 500000000,
+          "oom": false,
+          "project": "servera",
+          "restarts": 0,
+          "running": true,
+          "service": "nginx",
+          "started": "2026-10-19T06:19:45.01648985Z"
+        }
+      ],
+      "nginx_original_sha256": {
+        "collect.conf": "bb122f4c320c1f6f9532b0ee232dba4971e26409f63133accb01c8b0b513b8d5",
+        "iam.fangcunmount.cn.conf": "106e753f509424c95469f1e06be1e95631789e7f8a9294d31cce7755eea62e24",
+        "qs.fangcunmount.cn.conf": "26efeedd9f41e913b751f355977635efb8ab693eab179ec47b6f78a9ef85a156"
+      }
+    },
+    {
+      "host": "serverD",
+      "observed_at_utc": "2026-10-25T07:55:46.520152+00:00",
+      "report_sha256": "caa0a4e7c2b680ed744a6e3a2b4722ce5d0341c9188baa84ff1e1fafa2b4a91b",
+      "locks": [
+        {
+          "inode": 23606,
+          "mode": "0o666",
+          "path": "/var/lib/fangcun-image-retention/deploy.lock"
+        }
+      ],
+      "memory_available_mib": 1317,
+      "running_containers": [
+        {
+          "config_sha256": "9f8893e95cc1eec421d16a8709b0a916259f3f09b25ce959a4c060cb05f8009b",
+          "health": null,
+          "host_config_sha256": "f6e62821083b61ab2ed9d6ae9e0e8ae45e7bf705f4d652399a006cab08245d52",
+          "id": "67472ecba9b238600721d1b6b4edb8c889bc4e41454b4ee95112ddcd58ee66b1",
+          "image": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+          "image_reference": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+          "memory": 805306368,
+          "name": "/qs-worker-runtime-3",
+          "nano_cpus": 1000000000,
+          "oom": false,
+          "project": "qs-worker",
+          "restarts": 0,
+          "running": true,
+          "service": "runtime",
+          "started": "2026-10-19T15:10:38.248111345Z"
+        },
+        {
+          "config_sha256": "305f81c7e7fe3e20e9d2ff89c1c44dd0bfc24b1a01f79590b3247ec38418112c",
+          "health": null,
+          "host_config_sha256": "a5719016889b93ef9b8126ebfba2af1744aa3ec867fc578ef9df3773bc60e7dc",
+          "id": "3523a3a7eaa607be9e6d503266446ecef26390281c3153e85a396ac83a175c91",
+          "image": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+          "image_reference": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+          "memory": 805306368,
+          "name": "/qs-worker-runtime-2",
+          "nano_cpus": 1000000000,
+          "oom": false,
+          "project": "qs-worker",
+          "restarts": 0,
+          "running": true,
+          "service": "runtime",
+          "started": "2026-10-19T15:10:28.265099554Z"
+        },
+        {
+          "config_sha256": "e55b9d9358f0e0210794238bd2e1dd199f954198acf2ee7063b13a64be271e63",
+          "health": null,
+          "host_config_sha256": "a5719016889b93ef9b8126ebfba2af1744aa3ec867fc578ef9df3773bc60e7dc",
+          "id": "5a5981cca6dc5e09cb685db33a9b5ffce9d179fd29e16c3ba3cd780d95d0b1b4",
+          "image": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+          "image_reference": "sha256:6a495795a99668c08fa579c7647001414e5a912809a72414ecc9024004548fd1",
+          "memory": 805306368,
+          "name": "/qs-worker-runtime-1",
+          "nano_cpus": 1000000000,
+          "oom": false,
+          "project": "qs-worker",
+          "restarts": 0,
+          "running": true,
+          "service": "runtime",
+          "started": "2026-10-19T15:10:17.22467278Z"
+        },
+        {
+          "config_sha256": "b94398bc59eefcfaa100bbb7c59523b3b2f57f37f3d2bee5c2d8430b7936b54a",
+          "health": "healthy",
+          "host_config_sha256": "c98410bdfb79dcea43c78c6269493638212323fdd5fb7e5ec0e1fd155fbf95ca",
+          "id": "ce02d3e209b1f17dbf9b7544b3629f363fa45e5a80e3766b77295f038e86ccce",
+          "image": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+          "image_reference": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+          "memory": 1342177280,
+          "name": "/rocketmq-broker-1",
+          "nano_cpus": 1500000000,
+          "oom": false,
+          "project": "rocketmq",
+          "restarts": 0,
+          "running": true,
+          "service": "broker",
+          "started": "2026-10-25T04:30:14.27030797Z"
+        },
+        {
+          "config_sha256": "7759ac4549e6879a91c1180b1f234b860d3340dcb0e1fc050e3ae32cc8b8f851",
+          "health": "healthy",
+          "host_config_sha256": "f8a3c363b1eaa45fa844e230bcb67d4fc25e3f0b15c1ba0e2a7f1b9a3a174bb7",
+          "id": "fdfa8e5d6067d26931f8fca3d8e5abc02c7c8c220d2f2e5a1fd020d2d85c2204",
+          "image": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+          "image_reference": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+          "memory": 402653184,
+          "name": "/rocketmq-nameserver-1",
+          "nano_cpus": 250000000,
+          "oom": false,
+          "project": "rocketmq",
+          "restarts": 0,
+          "running": true,
+          "service": "nameserver",
+          "started": "2026-10-23T13:16:11.037996014Z"
+        },
+        {
+          "config_sha256": "05c9f36a30a1ec59936cf056d2337bc375360e83fee425631d160363110d572e",
+          "health": "healthy",
+          "host_config_sha256": "a67487200e5e4661f5347852df28b8fd40bd116cb8dcc3aa67ff94e67218dd8c",
+          "id": "da1e8f080eb078b1f07ca814de116b5f2678207456a9ebf56c88defef36937fd",
+          "image": "sha256:1a369c146af71bc95c25d54b375a2b98452478c1eaf4e85f8fcb01da20f2c78a",
+          "image_reference": "nsqio/nsq:v1.3.0",
+          "memory": 536870912,
+          "name": "/nsqd",
+          "nano_cpus": 1000000000,
+          "oom": false,
+          "project": "serverd",
+          "restarts": 0,
+          "running": true,
+          "service": "nsqd",
+          "started": "2026-08-14T04:51:40.086292366Z"
+        },
+        {
+          "config_sha256": "700db806e94fc0b9993013ebb44cd93e17b0f77377b2be516222bea80724f7d4",
+          "health": "healthy",
+          "host_config_sha256": "b089080f72ca887904bbff2a74b6936077bb7f806d77552a3d4cfef6f6f6442e",
+          "id": "51d85cfb78490c8ef8eee3342637fdfcebabba59443e574c8bcb9e3fe2012907",
+          "image": "sha256:1a369c146af71bc95c25d54b375a2b98452478c1eaf4e85f8fcb01da20f2c78a",
+          "image_reference": "nsqio/nsq:v1.3.0",
+          "memory": 100663296,
+          "name": "/nsqadmin",
+          "nano_cpus": 50000000,
+          "oom": false,
+          "project": "serverd",
+          "restarts": 0,
+          "running": true,
+          "service": "nsqadmin",
+          "started": "2026-08-14T04:53:32.582006835Z"
+        },
+        {
+          "config_sha256": "1087b33fd2cf6ea8c63895399807e99deece67e2705deeaf98636e7e8e4266f3",
+          "health": "healthy",
+          "host_config_sha256": "ab3f324b340492be1e2855405a3c5df2881f2d929903cec27765ce2df1c4d040",
+          "id": "eafa38f74f29359604104bea59916af6474d014846330c827cb4a93d85c8e428",
+          "image": "sha256:1a369c146af71bc95c25d54b375a2b98452478c1eaf4e85f8fcb01da20f2c78a",
+          "image_reference": "nsqio/nsq:v1.3.0",
+          "memory": 100663296,
+          "name": "/nsqlookupd",
+          "nano_cpus": 50000000,
+          "oom": false,
+          "project": "serverd",
+          "restarts": 0,
+          "running": true,
+          "service": "nsqlookupd",
+          "started": "2026-08-14T04:50:56.211770004Z"
+        }
+      ],
+      "nginx_original_sha256": {}
+    },
+    {
+      "host": "serverC",
+      "observed_at_utc": "2026-10-25T07:55:48.231268+00:00",
+      "report_sha256": "ca7cf5ba150604523d2f284b8cfad0280d3572085ea63492f288a6c6e7ac6f96",
+      "locks": [],
+      "memory_available_mib": 2425,
+      "running_containers": [
+        {
+          "config_sha256": "53270bacb2f843cf63527086e55842347cd76e29a58c30609b19e4a4c122da7e",
+          "health": "healthy",
+          "host_config_sha256": "9c67f24032ce73d68155cbd10a8a561779f22ecb934e0b3334b1cc02ff916a6a",
+          "id": "a4ec7b35cedb69ed262b343a71d0e5b6403bb32e9e5dac176fdf191e22860523",
+          "image": "sha256:43fddee7e532a920f3dfdee9e8f4834398c155c26bcb92d790cc1cd3c630fc40",
+          "image_reference": "mongo:7",
+          "memory": 3221225472,
+          "name": "/mongo",
+          "nano_cpus": 3000000000,
+          "oom": false,
+          "project": "serverc",
+          "restarts": 0,
+          "running": true,
+          "service": "mongo",
+          "started": "2026-08-14T04:50:56.213329187Z"
+        }
+      ],
+      "nginx_original_sha256": {}
+    }
+  ],
+  "mysql": {
+    "heads": {
+      "ai": [
+        [
+          "0040_module_table_names"
+        ]
+      ],
+      "database_event_count": 0,
+      "iam": [
+        [
+          40,
+          0
+        ]
+      ],
+      "qs": [
+        [
+          105,
+          0
+        ]
+      ]
+    },
+    "password_changed": false,
+    "read_only": true,
+    "schema": "m3-preapproval-mysql-heads/v1"
+  },
+  "mongo": {
+    "migrations": [
+      {
+        "dirty": false,
+        "version": 40
+      }
+    ],
+    "primary": true,
+    "read_only": true,
+    "replica_set": "rs0",
+    "schema": "m3-preapproval-mongo-readonly/v1",
+    "ttl_plan_count": 0,
+    "version": "7.0.31"
+  },
+  "cd": {
+    "iam_production_deploy_paused": true,
+    "qs_production_deploy_paused": true,
+    "ai_auto_deploy_enabled": false
+  },
+  "production_approved": false,
+  "system_business_acceptance": false
+}
