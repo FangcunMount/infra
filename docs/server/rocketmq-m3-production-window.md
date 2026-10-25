@@ -1,6 +1,6 @@
 # M3 统一维护窗口执行清单
 
-当前状态：**用户已批准本清单与验收范围；T30/T31完成。T32首次窗口因Mongo profiler恢复前提不足已中止并恢复旧服务，补充验证完成前不执行下一窗口。** 用户已接受最长30分钟内IAM登录/鉴权与QS/AI共同暂停。本清单将实际候选、保护范围和恢复边界收敛为一次生产操作；[唯一进度总表](rocketmq-m3-execution.md)继续分别记录源码、部署、system验收与48小时观察。原规划中“窗口内IAM持续在线”由本次决定取代。
+当前状态：**用户已批准本清单与验收范围；T30/T31完成。T32首次窗口因Mongo profiler恢复前提不足已中止并恢复旧服务，专项恢复验证已通过，实际基线与新执行包冻结后再进入下一窗口。** 用户已接受最长30分钟内IAM登录/鉴权与QS/AI共同暂停。本清单将实际候选、保护范围和恢复边界收敛为一次生产操作；[唯一进度总表](rocketmq-m3-execution.md)继续分别记录源码、部署、system验收与48小时观察。原规划中“窗口内IAM持续在线”由本次决定取代。
 
 ## 固定目标与变更
 
@@ -94,3 +94,6 @@ T30将本清单、已冻结静态包摘要、原基线和全部差异提交一�
 [Mongo官方说明](https://www.mongodb.com/docs/manual/tutorial/backup-and-restore-tools/)及[工具实现](https://github.com/mongodb/mongo-tools/blob/master/mongorestore/filepath.go)明确：标准恢复不导入`system.profile`文档。原整库DROP恢复配方暂停使用。修正方向是在业务写者冻结后保留整库逻辑归档，恢复时只重建已审核的全部业务集合；诊断集合、UUID/配置/既有记录原位保留，不更改profiler级别、阈值或采样率。只允许这一精确诊断例外，其他未知系统集合/新增集合仍拒绝。业务BSON、索引、options及UUID必须逐项相同，诊断日志按现有capped政策继续记录，不承诺倒回T0。
 
 新增模块只生成计划，不能连接数据库或授权恢复；完整有持续profiling写入的7.0.31/Tools100.16.0隔离证明、源CI、清理和新操作冻结通过前，该方法不进入生产步骤。固定业务镜像、17份迁移和SDK制品保持。下一窗口必须重读实际CID/StartedAt/队列/库身份及版本，使用新的操作ID；旧窗口不重置、不复用首启动目录。
+
+
+专项实现已通过[固定镜像真实CI](https://github.com/FangcunMount/infra/actions/runs/40187719008)：6/6真实、Ubuntu/macOS各7/7纯契约，源码由[PR289](https://github.com/FangcunMount/infra/pull/289)合并。[验收记录](evidence/rocketmq-m3-profile-preserved-proof-20261025.json)明确诊断文档保留原位并继续自然增长，不执行`dropDatabase`，不更改profiler设置。生产恢复仅在原首次启动屏障之前，按原业务集合清单与审核迁移新增对象精确选择；未知集合/诊断身份漂移在任何删除之前拒绝。整库逻辑归档作为保护资产保留，`mongorestore --drop --preserveUUID --nsInclude=qs.* --nsExclude=qs.system.profile`仅恢复全部业务集合。首次维护失败记录继续保留，下一窗口使用独立操作ID、最新基线和当次停写保护。
