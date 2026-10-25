@@ -169,7 +169,7 @@
       "api_collection_worker_package": "passed",
       "docs_facts_and_hygiene": "passed"
     },
-    "status": "Independent candidate all 33 checks passed; combination with latest main verified locally; exact final candidate CI pending",
+    "status": "Consumer-only deployment source and final combined candidate fully verified and merged; actual materials/reconstruction still pending in C06-D; production CD paused",
     "current_candidate": {
       "head": "3a5dd847774175fdaf2fe3adaba2d1948f88e62d",
       "source_baseline": "7e8ebf3adfd0f2c8a7e7a854d0c3d3e4a593e639",
@@ -177,7 +177,7 @@
       "go_failed": 0,
       "go_skipped": 0,
       "prerequisite_pr": 444,
-      "status": "full CI pending; original Compose render passed, final candidate must pass every required gate"
+      "status": "Independent 3a5dd847 candidate passed 33 checks; superseded by merged combined candidate"
     },
     "independent_ci": {
       "head": "3a5dd847774175fdaf2fe3adaba2d1948f88e62d",
@@ -198,7 +198,14 @@
         "scripts/cd/README-AI-MQ-PREFLIGHT.md"
       ],
       "conflict_resolution": "both reviewed source/document changes retained; actual product files did not conflict",
-      "status": "complete CI rerun pending before merge"
+      "status": "all final candidate checks passed and merged; no production deployment",
+      "merge": "2c2133d71f7d544c42bc1ee5668039e0fb7b7e7d",
+      "ci_run": 40212566834,
+      "ci_successful_checks": 29,
+      "conditional_skipped_jobs": 1,
+      "conditional_skipped_names": [
+        "Docs & API Generated Sync"
+      ]
     }
   },
   "retained_failures": [
@@ -449,7 +456,7 @@
     "NSQ retained volumes/containers/backups untouched",
     "Development and isolated NSQ remain available"
   ],
-  "updated_at": "2026-10-25T16:45:04.776793+00:00",
+  "updated_at": "2026-10-25T16:55:41.870247+00:00",
   "qs_trusted_reader": {
     "pr": 444,
     "head": "38a1534ebe171832240bd3e53dd431730305a972",
