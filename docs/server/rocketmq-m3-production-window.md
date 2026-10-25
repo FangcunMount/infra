@@ -1,0 +1,78 @@
+# M3 统一维护窗口执行清单
+
+当前状态：**待最终生产批准，不是执行授权。** 用户已接受最长30分钟内IAM登录/鉴权与QS/AI共同暂停。本清单将实际候选、保护范围和恢复边界收敛为一次生产操作；[唯一进度总表](rocketmq-m3-execution.md)继续分别记录源码、部署、system验收与48小时观察。原规划中“窗口内IAM持续在线”由本次决定取代。
+
+## 固定目标与变更
+
+| 主机 / 项目 / 服务 | 实例与资源 | 固定候选 |
+| --- | --- | --- |
+| serverA / docker / iam-apiserver | 1；1GiB、1CPU，UID2000 | IAM `ca59dec47fe4e544cd06bf52f9e3c64fbbdad211` |
+| serverA / servera-migrated / qs-apiserver | 1；1GiB、2CPU，UID2000 | QS `b75d4a52ec261275a0ffb588eeb31fd6496966d0` |
+| serverA / qs-collection / server | 2；各320MiB、1CPU，UID2000 | 同QS源码 |
+| serverA / qs-ai / qs-ai | 1；768MiB、0.75CPU，UID10001，关闭预算210秒 | AI `ddff86cad27d03c95dad28490d6cccbc1ce5b15f` |
+| serverD / qs-worker / runtime | 3；各768MiB、1CPU，并发48，UID2000 | 同QS源码 |
+| serverC / mongo | 原7.0.31、rs0和容器不替换 | 仅保护/迁移所选`qs`库 |
+| serverD / RocketMQ | 原5.5.1 Docker Broker/Proxy、网络/端口/资源保持 | 显式安装M3 v2资源与最小账号权限 |
+| macmini-001 / Prometheus | 保留现有发现、抓取与Grafana | 安装8条M3事务告警并回读 |
+
+五镜像使用[已发布不可变digest](evidence/rocketmq-m3-acr-publication-20261025.json)，目标[已预置](evidence/rocketmq-m3-target-image-cache-20261025.json)。配置为`m3-20261025-v2`，目标根`/opt/fangcun-m3/releases/m3-20261025-v2`；各项目`sealed/acceptance/open`目录中的Compose、环境和assets均逐文件冻结。18项真实读取、15项Compose、15项原UID挂载读取已经通过，生产尚未启用。
+
+DDL仅由原宿主维护入口执行：[17份增量资源](evidence/rocketmq-m3-incremental-migration-inputs-20261025.json)，IAM40→45，QS105/40→110/44，AI0040→0043_native_transaction_limit。不执行down、force、journal修正、自动seed或全目录脚本。SDK Go v0.5.0 / Python0.4.0、owner/store/epoch/revision与[配置回执](evidence/rocketmq-m3-v2-production-candidate-configs-20261025.json)一致。
+
+此次还包含一次共享MySQL应用账号自身密码轮换：新凭据已在未启用候选内冻结；[受审工具](rocketmq-m3-mysql-credential-rotation.md)真实TLS验证通过，用户确认仅上述服务使用该账号。不会在文档、命令参数、CI日志或公开制品中填写凭据。三库部署`MYSQL_PASSWORD` Secret通过stdin同步，生产CD继续暂停。
+
+## 窗口前完成，不占停机时间
+
+1. 再次只读核对镜像/原容器、三个数据库UUID及账号、Mongo rs0、clean版本、原锁inode、CD暂停、serverD可用内存≥512MiB、Broker及worker监控。配置或身份漂移时重新冻结，不带着不明差异进入窗口。
+2. `route_revision=m3-1`的12项路由、5个最小权限账号显式provision并读回；资源冲突立即拒绝。安装Mac mini告警并校验配置、reload/readback；此时业务仍NSQ、候选准入仍关。T31单独记账，不能提前打勾。
+3. 使用唯一MacBook协调入口，经原Mac mini SSH跳板到A/C/D；两跳关闭agent forwarding。保留原A/D部署锁和A的AI锁，不复制SSH私钥、不建立第二协调目录。实际SSH_AUTH_SOCK发生变化须重新冻结本地受审脚本。
+4. system正常登录与测试组织在停机前备妥。现有浏览器页面已因会话过期回到登录页，正在等待用户正常登录；未取得会话前不把system列为通过，不在窗口内临时重置密码或冒充身份。
+5. 静态包只包括受审源文件、原维护二进制、精确配置、Nginx候选和命令配方。实际T0、停写证据、保护摘要、期限和维护批准文件在真实事实发生后生成。最终生产批准须明确授权在本清单范围内填写这些事实字段，模板或空摘要不能直接运行。
+
+预窗口三MySQL活跃只读快照为518,498,844B、压缩75,067,274B，读取40.29秒、含压缩45.31秒，Mac mini副本摘要一致。它只用于体量和传输准备，**不替代同窗口停写保护，也不授予恢复权**。完整当前档位隔离C1为19/0/0；51.02秒是受控数据耗时，不是生产恢复SLA。
+
+## 具名步骤与停止条件
+
+| 顺序 / 任务 | 执行动作与真实证据 | 不满足时 |
+| --- | --- | --- |
+| W01 / T32 | 记录入口关闭T0；在A只替换`iam.fangcunmount.cn.conf`、`qs.fangcunmount.cn.conf`、`collect.conf`为已验证closed字节，先`nginx -t`再reload，实际登录/写入口503。其他域名和内部gRPC保持 | 还未停业务时恢复这三个原文件；保留失败材料 |
+| W02 / T32 | 不接收新业务；旧八进程继续沿NSQ收敛在途和回执，查询有效订阅depth/backend/in-flight/deferred及Outbox、未来计划；不重放业务、不调用模型补发 | 不能证明排空/责任交接则不做DDL；关闭窗口或具名延长，不能以修改状态伪装排空 |
+| W03 / T32 | 依次有界停止原AI、两个Collection、API、三个Worker及IAM；保留容器、卷、配置、镜像。核对实际进程退出和MySQL在途事务/连接、Mongo业务活动。三库EVENT为空；唯一TTL集合`interpretation_catalog_repair_plans`必须重新证明为空 | 有未知后台写者或非空TTL集合即停止；不临时关闭全局TTL或宣称容器stop等于数据库无在途 |
+| W04 / T32 | 用固定8.0.36客户端对iam/qs/ai作同一冻结边界内完整逻辑备份，含routines/events/triggers/原列元数据；serverC对整个qs库mongodump含索引/UUID。完成旧NSQ卷冷保护，相关服务停机后取一致副本。三类保护均0700/0600、保留≥30天、Mac mini副本逐摘要核验 | 没有完整、可核验保护或窗口余量不足，不进入迁移 |
+| W05 / T32 | 记录真实freeze/protection/responsibility摘要，绑定已通过的当前档位完整恢复与启动receipt；初始化唯一持久Boundary。原批准摘要、执行包摘要、数据/恢复负责人绑定该操作 | 禁止虚构恢复耗时、复制CI数据库身份、将预窗口活跃快照填为停写保护 |
+| W06 / T32 | 原IAM maintenance导出schema计划→核对→apply；再导出select计划→核对→apply。原QS工具消费一次性批准，105/40→110/44，再分别preview/apply/verify两个owner。原AI Alembic upgrade head，再原binding preview/apply/verify。各步经同一Boundary维护步骤并持原宿主锁 | 失败/未知保持全停；只读核对实际DDL与服务器活动，禁止删consumed marker重试或自动接管dirty |
+| W07 / T33 | 生成且fsync第一启动标记，**在任何新业务启动及密码SET语句之前**。在serverA以原AI固定镜像的Python/asyncmy0.2.14执行受审工具，借用原TLS CA和infra-network，轮换一次共享MySQL密码；新连接成功、旧连接明确1045，核对plugin/grants不变；同步三库部署Secrets | 结果未知只verify；不再次apply、不改回已暴露密码；启动标记后进入前向恢复边界 |
+| W08 / T33 | 经原`runtime_start.py`固定digest、`--pull never --no-build --no-deps --wait`启动五项目共八实例sealed；核对四owner Checker、资源、实际Topic/DB绑定、健康和指标，消费者已就绪，新事务准入仍关闭 | 不把容器健康充当业务验收；保持入口503，以当前事实修复 |
+| W09 / T33 | 经同一协调器逐项目使用acceptance配置启用事务发布，公网三入口保持关闭；等待全部八实例稳定、Checker/消费者连接。仅IAM可按已验收login-only配置允许正常system登录/刷新和读取，其授权写仍关闭 | 任一owner/队列/资源不满足即封该owner新写，保留Checker；不自动回NSQ/Outbox |
+| W10 / T33 | system合法会话沿原应用接口执行有界用例；逐项核对业务事实、witness、消息消费和receipt，以及IAM自身/QS双订阅。使用明确测试组织与用例，不重做历史7个blocked AI请求 | 无会话/组织、用例失败、证据不足即保持维护；不以探针或替代身份打勾 |
+| W11 / T33 | 所有验收通过，恢复三个原Nginx文件、语法验证/reload和公网读取，恢复准入。**保留已验证的acceptance配置及容器**，不为目录名称再重启一轮；open目录仅是受验同语义备选，不自动启用 | 最终生产配置索引明确记录acceptance路径，禁止记录成未启用open路径 |
+| W12 / T34–36 | 开始连续48小时观察；旧生产发布/消费/Relay责任已退出。按T35退出NSQ服务/自动重启及部署责任，保留旧卷、表、wire、历史工具与保护资产 | 观察不足48h不能完成M3；清理由M4负责 |
+
+时间预算：W01–03最多6分钟；W04–05最多5分钟；W06最多5分钟；W07–09最多5分钟；W10–11预留9分钟。分项是计划截止点，不是新的恢复SLA。进入不可逆第一启动前须有至少9分钟实际验收余量，并检查原迁移工具要求的恢复/启动预留；达不到即不启动。到30分钟仍未满足，记录超时、保持安全状态并明确告知，不能为了时间开入口或覆盖新事实。维护前提早封长耗时业务，无法在窗口前收敛时改期。
+
+## 原维护命令配方
+
+以下仅是原入口的固定参数顺序，凭据从受限文件传给子进程环境。运行时私有计划的摘要由实际导出文件计算，不允许占位摘要或脚本自签授权。原维护工具自己记录schema/身份/单次消费，不用自写SQL绕过。
+
+| 原入口 | 固定参数与执行归属 |
+| --- | --- |
+| IAM镜像 `/app/iam-maintenance` | `m3-messaging --action schema --store-id production-iam-mysql-primary --writer-epoch m3-1 --export-plan <私有新文件> --timeout 30s`；apply用`m3-messaging --apply --writers-excluded --plan <原文件> --reviewed-sha256 <实际摘要>`；schema完成后单独导出`--action select`再apply |
+| QS附件 `qs-migrate-offline` | 原二进制SHA `c654ab9d2b84a7c23d7d25e4389ae1371391b4c13592922fe06fe795c5e50e98`；`--mysql-database qs --mongo-database qs --timeout 10m --apply --approval-file <原批准> --approval-sha256 <实际摘要>`，原API镜像、infra-network、原MySQL TLS/CA与Mongo URI。维护附件不进入业务镜像 |
+| QS两个binding | 公共`--mysql-database qs --mongo-database qs --timeout 30s`；preview另加`--binding-action preview --binding-plan <新文件> --binding-operation-id <本次ID> --binding-owner qs.mysql或qs.mongo --binding-store-id production-qs-mysql-primary或production-qs-mongo-primary --binding-writer-epoch m3-1`；apply/verify用原文件与`--binding-reviewed-sha256`，仅apply加`--binding-writers-excluded` |
+| AI原镜像Python | `-m alembic upgrade head`；`-m qs_ai.maintenance.transaction_binding --action preview --plan <新文件> --operation-id <本次ID> --store-id production-ai-mysql-primary --writer-epoch m3-1`；apply/verify带`--reviewed-sha256`，仅apply加`--writers-excluded`。`QS_AI_RELEASE_SHA`精确ddff86ca完整SHA |
+| Broker | 原`provision.py --container <已冻结原Broker名> --project rocketmq --manifest <12路由原字节> --credentials <0600账号文件>`；完整preflight冲突即拒绝，不修改既有Topic类型/既有账号凭据 |
+| 启动与恢复 | 操作端`m3_operator_step.py --plan <精确步骤> --reviewed-sha256 <独立摘要> --execute`；目标端`runtime_start.py --plan <目标步骤> --reviewed-sha256 <独立摘要> --execute --coordinated-start-already-issued`。首启动后恢复入口必须拒绝；不以原CI fixture替代生产助手 |
+
+## 原范围恢复和责任处置
+
+第一启动标记不存在时，且完成实际服务器活动核验，可按本清单批准范围恢复**iam、qs、ai三完整MySQL库与Mongo整个qs库**；恢复前删除所选库再载入，避免新增M3对象残留。MySQL原备份保留，派生文件仅对已核验AI0040两个生成列表达式做受限字面量修正；每次必须匹配该次备份与完整列元数据摘要，所有业务INSERT和其余DDL字节保持。以utf8mb4恢复，规范化比较只限已知MySQL显示差异，核对原DDL/列/数据与Mongo文档/索引/UUID。恢复失败保持全停，不重启旧程序试运气。已通过的完整C1证明原方法，不把本次备份声称为已经实地恢复过。
+
+第一启动标记存在后，即使新容器没ready、密码轮换失败或步骤进程退出，也不允许旧全量备份覆盖当前事实。保留配置与实际数据库，封新写、保持Checker、具名排障并使用兼容修复镜像。禁止直接翻provider、换事件ID、重做模型调用或自动删除未决证据。此界限保守包含密码轮换，避免新连接/Secret责任与旧恢复混淆。
+
+444个无客户端授权channel含4364份fanout副本，只有`iam.authz.version`/`.v2`缓存失效消息；并非4364个独立业务事件。最终批准须明确：保留全部消息/卷，不清空/ACK/删除，以新IAM与QS从权威版本加载并分别验证实时fanout后退出这些旧缓存订阅的在线责任。其它业务队列、Outbox、未来计划和回执不能据此豁免排空；新发现未结责任则阻断。QS现有7个blocked AI请求、历史result_outbox/first wire/receipt保持原样，不授权重试或模型调用。
+
+自动生产CD保持IAM/QS暂停、AI自动部署关闭，待生产事实与新配置部署通路另行审核后恢复。M3任务勾选不表示自动恢复CD；NSQ历史资产保留也不表示仍有活动业务责任。
+
+## 最终批准范围
+
+T30将本清单、已冻结静态包摘要、原基线和全部差异提交一次具名确认。确认涵盖T31资源/告警、W01–11、限定原范围恢复、一次MySQL轮换及Secrets同步、旧授权缓存订阅责任交接；实际T0与同窗口摘要仅按真实事实填入私有执行计划。身份/版本/资源不符、额外DDL、额外数据删除、越界恢复或未知责任均超出本清单。测试批准、预置和“类似基础设施操作”授权不代替这次业务生产批准。

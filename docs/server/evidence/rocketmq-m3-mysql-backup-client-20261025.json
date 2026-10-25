@@ -1,0 +1,21 @@
+{
+  "schema": "m3-mysql-backup-client-cache/v3",
+  "source_reference": "mysql@sha256:65ce0889751900d2dd5fc5aa5a5fb59073d401fc43df2eae6bd6afb18e7626dd",
+  "source_config_digest": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+  "archive_descriptor_digest": "sha256:13ad6357cf92127024960d539310c5fa5b39f44f3ee54f3f8e3990f815854555",
+  "target_image_id": "sha256:13ad6357cf92127024960d539310c5fa5b39f44f3ee54f3f8e3990f815854555",
+  "local_tool_tag": "m3-mysql-client:8.0.36-65ce08897519",
+  "archive_sha256": "e70cb70a33bbcde5051948737714209929cfbbb0942cdfeeb671382d59a719f5",
+  "actual_version": "mysqldump  Ver 8.0.36 for Linux on x86_64 (MySQL Community Server - GPL)",
+  "source_config_and_all_layers_verified": true,
+  "passed": 1,
+  "failed": 0,
+  "skipped": 0,
+  "database_daemon_started": false,
+  "application_started": false,
+  "original_containers_unchanged": true,
+  "registry_or_network_configuration_changed": false,
+  "transport": "official image via fixed GitHub archive and original Mini SSH ingress",
+  "initial_failure": "target containerd store reports OCI manifest ID rather than classic config ID; no version probe or application startup occurred before strict identity refusal",
+  "observed_at_utc": "2026-10-25T06:38:44.221115+00:00"
+}

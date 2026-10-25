@@ -4,6 +4,10 @@ on:
     paths:
       - scripts/ops/m3_operator_step.py
       - scripts/ops/test_m3_operator_step.py
+      - scripts/ops/m3_nginx_gate.py
+      - scripts/ops/test_m3_nginx_gate.py
+      - scripts/ops/m3_mysql_restore_sql.py
+      - scripts/ops/test_m3_mysql_restore_sql.py
       - .github/workflows/m3-operator-boundary.yml
 permissions:
   contents: read
@@ -16,6 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: python3 -m unittest discover -s scripts/ops -p test_m3_operator_step.py
+      - run: python3 -m unittest discover -s scripts/ops -p test_m3_nginx_gate.py
+      - run: python3 -m unittest discover -s scripts/ops -p test_m3_mysql_restore_sql.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_start_boundary.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_cutover_step.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_runtime_start.py

@@ -1,0 +1,30 @@
+{
+  "schema": "m3-production-iam-schema-preview/v1",
+  "passed": 1,
+  "failed": 0,
+  "skipped": 0,
+  "read_only": true,
+  "plan_sha256": "649f9583e3b4a6366dcad1bef224618da3ee625c7e19b3bd95abb41c3005a96c",
+  "plan": {
+    "schema": "iam-m3-offline/v1",
+    "action": "schema",
+    "store_id": "production-iam-mysql-primary",
+    "writer_epoch": "m3-1",
+    "migration_digest": "e362663d159f41eee80f327cd5405f1b0b504603481a853514607ad756ab1434",
+    "before": {
+      "database": "iam",
+      "server_uuid": "83df0988-3e1b-11f1-b09e-00163e3ab5b1",
+      "version": 40,
+      "version_ddl_sha256": "e663736774931e5f988b7fa72a0849fa725ae3ba97f083df404b676d64b616ee",
+      "objects": null,
+      "binding": null,
+      "selection": null,
+      "legacy_pending": false
+    }
+  },
+  "original_containers_unchanged": true,
+  "helper_removed": true,
+  "ddl_executed": false,
+  "application_started": false,
+  "observed_at_utc": "2026-10-25T06:11:59.913884+00:00"
+}

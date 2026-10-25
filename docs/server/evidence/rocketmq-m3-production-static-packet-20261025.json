@@ -1,0 +1,716 @@
+{
+  "schema": "m3-production-static-packet-receipt/v1",
+  "operation": "m3-20261025-v2",
+  "members": 140,
+  "index_sha256": "282ade31affe42fb6ca3923cec9e8311d006a28ed3ec3499a62f97de781f453c",
+  "archive_sha256": "c641373ca442f7df65626f0a16846ebae6c957732e936dae9d7044e6fa33b00d",
+  "archive_bytes": 9262464,
+  "files": [
+    {
+      "path": "bin/qs-migrate-offline",
+      "sha256": "c654ab9d2b84a7c23d7d25e4389ae1371391b4c13592922fe06fe795c5e50e98",
+      "bytes": 25215160
+    },
+    {
+      "path": "migration-review/ai/migrations/versions/0041_transaction_messaging.py",
+      "sha256": "dd27c8eb56581bf9ef78b52a6d4ced763dc8aa6676587b1836ff5dce3f4312f1",
+      "bytes": 2743
+    },
+    {
+      "path": "migration-review/ai/migrations/versions/0042_transaction_event_receipts.py",
+      "sha256": "6d9e884de4af5b8d3ea99e8be902c3f4c81f317525a790775a93bf8249d7b517",
+      "bytes": 814
+    },
+    {
+      "path": "migration-review/ai/migrations/versions/0043_native_transaction_limit.py",
+      "sha256": "a891eabcfa3d1032cd579aa5973720b5dc806eeb1398131e17f6716e8ec3d99c",
+      "bytes": 1507
+    },
+    {
+      "path": "migration-review/iam/internal/pkg/migration/migrations/000041_message_failure_audit.up.sql",
+      "sha256": "d78bc9d154e62460dd6f996622bcded47294cd5a92ec648cd3342b254e0eed50",
+      "bytes": 1172
+    },
+    {
+      "path": "migration-review/iam/internal/pkg/migration/migrations/000042_transaction_messaging.up.sql",
+      "sha256": "8dc3529348a16c7185cc44970fb5e616b2fe72ea408ea673ce8e05606db26188",
+      "bytes": 1786
+    },
+    {
+      "path": "migration-review/iam/internal/pkg/migration/migrations/000043_authz_message_protocol.up.sql",
+      "sha256": "7ad3f8c0641bdf50b8db3c62072a77c6bd701aba73b5ecdcb8f873a35b9d277b",
+      "bytes": 1059
+    },
+    {
+      "path": "migration-review/iam/internal/pkg/migration/migrations/000044_authz_business_operations.up.sql",
+      "sha256": "cce5707ec021decbd40eede58e890ba91c02612600b1302708ebe39d9b3110ce",
+      "bytes": 1517
+    },
+    {
+      "path": "migration-review/iam/internal/pkg/migration/migrations/000045_native_transaction_limit_notices.up.sql",
+      "sha256": "0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a",
+      "bytes": 1083
+    },
+    {
+      "path": "migration-review/qs/internal/pkg/migration/migrations/mongodb/000041_transaction_messaging.up.json",
+      "sha256": "b4eace8013a3d2db2915084d71c67e3cd87bd8a09c7213937d7c692232092b6b",
+      "bytes": 493
+    },
+    {
+      "path": "migration-review/qs/internal/pkg/migration/migrations/mongodb/000042_business_retry_schedule.up.json",
+      "sha256": "aab987b8ada106b3e4208a67b01c8dba6a0c2e6f5793fc7525936c7377bd6c10",
+      "bytes": 537
+    },
+    {
+      "path": "migration-review/qs/internal/pkg/migration/migrations/mongodb/000043_native_transaction_limit_notices.up.json",
+      "sha256": "d6904ab7c3ab3c4a310314dc7f532eb321679a0e7a31c0b867c11a9280bfc4fa",
+      "bytes": 2122
+    },
+    {
+      "path": "migration-review/qs/internal/pkg/migration/migrations/mongodb/000044_answersheet_submit_intent_index.up.json",
+      "sha256": "b78bd987e0c17974e2cfcff992653c3120dc473dff8fc5b7d3e06735abd7cc6c",
+      "bytes": 331
+    },
+    {
+      "path": "migration-review/qs/internal/pkg/migration/migrations/mysql/000106_transaction_messaging.up.sql",
+      "sha256": "2443a41eabde222d5292f4e997ca7db386945ce70e9e77d9bc896917a2e30246",
+      "bytes": 2338
+    },
+    {
+      "path": "migration-review/qs/internal/pkg/migration/migrations/mysql/000107_business_retry_schedule.up.sql",
+      "sha256": "963f729f0f91baa0c60a62090b99dd7574c0d08231d2be0939d8927ce4690ea3",
+      "bytes": 1168
+    },
+    {
+      "path": "migration-review/qs/internal/pkg/migration/migrations/mysql/000108_ai_transaction_command_order.up.sql",
+      "sha256": "cbf491ed8446cb76963c97aeee1d932c08f1f06e91ae49574484987c01ad48f1",
+      "bytes": 274
+    },
+    {
+      "path": "migration-review/qs/internal/pkg/migration/migrations/mysql/000109_rocketmq_deferred_delivery.up.sql",
+      "sha256": "d5929a6bb4363c3d04429ba3634ddcb477820529b0caffaf8974da73c0505fc9",
+      "bytes": 673
+    },
+    {
+      "path": "migration-review/qs/internal/pkg/migration/migrations/mysql/000110_native_transaction_limit_notices.up.sql",
+      "sha256": "0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a",
+      "bytes": 1083
+    },
+    {
+      "path": "nginx/closed/collect.conf",
+      "sha256": "29ccda8cdac2f5778a170bcbc38b351cd643b5af54025cc20f73f928c5fac441",
+      "bytes": 7803
+    },
+    {
+      "path": "nginx/closed/iam.fangcunmount.cn.conf",
+      "sha256": "6569f80368c7c20c789a824607e719f0ef6825d51d63046ca0fc6116f43cf304",
+      "bytes": 3725
+    },
+    {
+      "path": "nginx/closed/qs.fangcunmount.cn.conf",
+      "sha256": "ca98f65c836b9a7ae91e569ce1f4e3f3d8a84c3e623a4d30e22538aa131f82ea",
+      "bytes": 5567
+    },
+    {
+      "path": "nginx/login-only/collect.conf",
+      "sha256": "29ccda8cdac2f5778a170bcbc38b351cd643b5af54025cc20f73f928c5fac441",
+      "bytes": 7803
+    },
+    {
+      "path": "nginx/login-only/iam.fangcunmount.cn.conf",
+      "sha256": "d3b7c4ae3704737a1dee3b6984d01df1e07b0dd6607a71c5513bee2f322efec8",
+      "bytes": 4161
+    },
+    {
+      "path": "nginx/login-only/qs.fangcunmount.cn.conf",
+      "sha256": "ca98f65c836b9a7ae91e569ce1f4e3f3d8a84c3e623a4d30e22538aa131f82ea",
+      "bytes": 5567
+    },
+    {
+      "path": "nginx/open/collect.conf",
+      "sha256": "bb122f4c320c1f6f9532b0ee232dba4971e26409f63133accb01c8b0b513b8d5",
+      "bytes": 7705
+    },
+    {
+      "path": "nginx/open/iam.fangcunmount.cn.conf",
+      "sha256": "106e753f509424c95469f1e06be1e95631789e7f8a9294d31cce7755eea62e24",
+      "bytes": 3627
+    },
+    {
+      "path": "nginx/open/qs.fangcunmount.cn.conf",
+      "sha256": "26efeedd9f41e913b751f355977635efb8ab693eab179ec47b6f78a9ef85a156",
+      "bytes": 5469
+    },
+    {
+      "path": "operator/dependencies.json",
+      "sha256": "69dda8d1795df936da7bfdeb2217aabeba4abe817911487d49d88b2b439cccf5",
+      "bytes": 9051
+    },
+    {
+      "path": "operator/mysql-ca-chain.pem",
+      "sha256": "2dc6de20eab8451cc779001466f42b5ed05e554bbf479de6f194c35a1bfbc436",
+      "bytes": 157498
+    },
+    {
+      "path": "operator/ssh-prefix.private.sh",
+      "sha256": "77ec5b1462e9ed66718e16ad34f1ba04d29517e88cecabdcf166ade04b9a17a6",
+      "bytes": 133
+    },
+    {
+      "path": "private-material/accounts.draft.private.json",
+      "sha256": "178f0bae6ccf03ed6aa1dfa013dd3b10ad92551ff4ae0d9020c00ff55ff3543b",
+      "bytes": 706
+    },
+    {
+      "path": "private-material/mysql-rotation-material.private.json",
+      "sha256": "bc5a89f6cf1ed48e3a67722ccc120b0231d02efb78efa5fc826c16beac828927",
+      "bytes": 464
+    },
+    {
+      "path": "releases/serverA/docker/acceptance/assets/iam-events-m3.yaml",
+      "sha256": "6ffe5c44a0751576fe59230eeb37496138da321f240421b089ea1dad7fab8bef",
+      "bytes": 631
+    },
+    {
+      "path": "releases/serverA/docker/acceptance/assets/m3-iam-credentials.json",
+      "sha256": "ee92edf0a658b87e922284469f8fe152d4597b818b4829408287283ba21922ff",
+      "bytes": 108
+    },
+    {
+      "path": "releases/serverA/docker/acceptance/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverA/docker/acceptance/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverA/docker/acceptance/assets/runtime.json",
+      "sha256": "ea6c2e05887f995a284aad02d25fc28963c5dc1168eeb184e909b5b5041f83cc",
+      "bytes": 6501
+    },
+    {
+      "path": "releases/serverA/docker/acceptance/compose.json",
+      "sha256": "ee6998e60eca020d92f4bc63d9411e4e51c71370f475cd474cc453db722c7a48",
+      "bytes": 5703
+    },
+    {
+      "path": "releases/serverA/docker/acceptance/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/docker/open/assets/iam-events-m3.yaml",
+      "sha256": "6ffe5c44a0751576fe59230eeb37496138da321f240421b089ea1dad7fab8bef",
+      "bytes": 631
+    },
+    {
+      "path": "releases/serverA/docker/open/assets/m3-iam-credentials.json",
+      "sha256": "ee92edf0a658b87e922284469f8fe152d4597b818b4829408287283ba21922ff",
+      "bytes": 108
+    },
+    {
+      "path": "releases/serverA/docker/open/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverA/docker/open/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverA/docker/open/assets/runtime.json",
+      "sha256": "ea6c2e05887f995a284aad02d25fc28963c5dc1168eeb184e909b5b5041f83cc",
+      "bytes": 6501
+    },
+    {
+      "path": "releases/serverA/docker/open/compose.json",
+      "sha256": "1d32a08c8b92d8bc1970cefed5c6bc92f9889349ef3b608430b3e0c80666e7e5",
+      "bytes": 5691
+    },
+    {
+      "path": "releases/serverA/docker/open/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/docker/sealed/assets/iam-events-m3.yaml",
+      "sha256": "6ffe5c44a0751576fe59230eeb37496138da321f240421b089ea1dad7fab8bef",
+      "bytes": 631
+    },
+    {
+      "path": "releases/serverA/docker/sealed/assets/m3-iam-credentials.json",
+      "sha256": "ee92edf0a658b87e922284469f8fe152d4597b818b4829408287283ba21922ff",
+      "bytes": 108
+    },
+    {
+      "path": "releases/serverA/docker/sealed/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverA/docker/sealed/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverA/docker/sealed/assets/runtime.json",
+      "sha256": "3f47cb3edfa39b2ec16c7653df66014a5805560c149f1c684552c65b3da2bb4a",
+      "bytes": 6502
+    },
+    {
+      "path": "releases/serverA/docker/sealed/compose.json",
+      "sha256": "68ade175048e848a0f0c6b33b76e4fb4e32038dc289d49d1a60b10378615cb3b",
+      "bytes": 5696
+    },
+    {
+      "path": "releases/serverA/docker/sealed/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/qs-ai/acceptance/assets/m3-ai-credentials.json",
+      "sha256": "b6529b94fc1681235051bbd504aea8366ffd786352a5d7c7b6f64002d55b630f",
+      "bytes": 107
+    },
+    {
+      "path": "releases/serverA/qs-ai/acceptance/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverA/qs-ai/acceptance/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverA/qs-ai/acceptance/compose.json",
+      "sha256": "6f67f7f06dac946689e32768aaba4cb6821487cb004876fd39590371ddd4429e",
+      "bytes": 6572
+    },
+    {
+      "path": "releases/serverA/qs-ai/acceptance/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/qs-ai/open/assets/m3-ai-credentials.json",
+      "sha256": "b6529b94fc1681235051bbd504aea8366ffd786352a5d7c7b6f64002d55b630f",
+      "bytes": 107
+    },
+    {
+      "path": "releases/serverA/qs-ai/open/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverA/qs-ai/open/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverA/qs-ai/open/compose.json",
+      "sha256": "a36a03584f8cfd5ee58fe8da033d9fe4c80eb65244d548ee60063ebdb59304b8",
+      "bytes": 6566
+    },
+    {
+      "path": "releases/serverA/qs-ai/open/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/qs-ai/sealed/assets/m3-ai-credentials.json",
+      "sha256": "b6529b94fc1681235051bbd504aea8366ffd786352a5d7c7b6f64002d55b630f",
+      "bytes": 107
+    },
+    {
+      "path": "releases/serverA/qs-ai/sealed/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverA/qs-ai/sealed/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverA/qs-ai/sealed/compose.json",
+      "sha256": "4e0a55506578155c1d06bfa70551440ce14f3e841e070290e9bc5740dd905079",
+      "bytes": 6569
+    },
+    {
+      "path": "releases/serverA/qs-ai/sealed/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/qs-collection/acceptance/assets/runtime.json",
+      "sha256": "2dc362eb7c847332ffbca4014c652a9625ad9b725bca377edf5ca72ad08f4c0f",
+      "bytes": 5729
+    },
+    {
+      "path": "releases/serverA/qs-collection/acceptance/compose.json",
+      "sha256": "e9286247a4207de955e35f327feaf92e72ddec07fdc973fb54c2f6f911b3b0a6",
+      "bytes": 3732
+    },
+    {
+      "path": "releases/serverA/qs-collection/acceptance/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/qs-collection/open/assets/runtime.json",
+      "sha256": "2dc362eb7c847332ffbca4014c652a9625ad9b725bca377edf5ca72ad08f4c0f",
+      "bytes": 5729
+    },
+    {
+      "path": "releases/serverA/qs-collection/open/compose.json",
+      "sha256": "33632187e673c73875401a8b8818a001cfeb724ba41eb66b9e4af99e73331de3",
+      "bytes": 3726
+    },
+    {
+      "path": "releases/serverA/qs-collection/open/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/qs-collection/sealed/assets/runtime.json",
+      "sha256": "2dc362eb7c847332ffbca4014c652a9625ad9b725bca377edf5ca72ad08f4c0f",
+      "bytes": 5729
+    },
+    {
+      "path": "releases/serverA/qs-collection/sealed/compose.json",
+      "sha256": "289819dc064baca7bd085f438f572f4556eab507ecddda853a3cb026b1877f2e",
+      "bytes": 3728
+    },
+    {
+      "path": "releases/serverA/qs-collection/sealed/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/servera-migrated/acceptance/assets/m3-qs-apiserver-credentials.json",
+      "sha256": "5478dfd060eb7cf12785236f95ebe5e9efb1823c3d1fcde1d0c04887de5e4894",
+      "bytes": 117
+    },
+    {
+      "path": "releases/serverA/servera-migrated/acceptance/assets/m3-qs-mongo-credentials.json",
+      "sha256": "56eb749ad5ff5d96043eba861087a565e4f85a9e6208b72d5c5ce1e4b976d4ac",
+      "bytes": 113
+    },
+    {
+      "path": "releases/serverA/servera-migrated/acceptance/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverA/servera-migrated/acceptance/assets/qs-events.yaml",
+      "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+      "bytes": 4407
+    },
+    {
+      "path": "releases/serverA/servera-migrated/acceptance/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverA/servera-migrated/acceptance/assets/runtime.json",
+      "sha256": "5967588126e8042108d8f58cebc837e99e6a91f2c97784be24837e33313d58d4",
+      "bytes": 16856
+    },
+    {
+      "path": "releases/serverA/servera-migrated/acceptance/compose.json",
+      "sha256": "4fc744e355a96b54165e65e1efc399f5b8587c3c7ede629d782c1c7b850fe409",
+      "bytes": 8036
+    },
+    {
+      "path": "releases/serverA/servera-migrated/acceptance/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/servera-migrated/open/assets/m3-qs-apiserver-credentials.json",
+      "sha256": "5478dfd060eb7cf12785236f95ebe5e9efb1823c3d1fcde1d0c04887de5e4894",
+      "bytes": 117
+    },
+    {
+      "path": "releases/serverA/servera-migrated/open/assets/m3-qs-mongo-credentials.json",
+      "sha256": "56eb749ad5ff5d96043eba861087a565e4f85a9e6208b72d5c5ce1e4b976d4ac",
+      "bytes": 113
+    },
+    {
+      "path": "releases/serverA/servera-migrated/open/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverA/servera-migrated/open/assets/qs-events.yaml",
+      "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+      "bytes": 4407
+    },
+    {
+      "path": "releases/serverA/servera-migrated/open/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverA/servera-migrated/open/assets/runtime.json",
+      "sha256": "5967588126e8042108d8f58cebc837e99e6a91f2c97784be24837e33313d58d4",
+      "bytes": 16856
+    },
+    {
+      "path": "releases/serverA/servera-migrated/open/compose.json",
+      "sha256": "a6aa6ade61a643afe49668717f4e94636d4b78179d4c7fad2bcd357bf08149fa",
+      "bytes": 8018
+    },
+    {
+      "path": "releases/serverA/servera-migrated/open/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverA/servera-migrated/sealed/assets/m3-qs-apiserver-credentials.json",
+      "sha256": "5478dfd060eb7cf12785236f95ebe5e9efb1823c3d1fcde1d0c04887de5e4894",
+      "bytes": 117
+    },
+    {
+      "path": "releases/serverA/servera-migrated/sealed/assets/m3-qs-mongo-credentials.json",
+      "sha256": "56eb749ad5ff5d96043eba861087a565e4f85a9e6208b72d5c5ce1e4b976d4ac",
+      "bytes": 113
+    },
+    {
+      "path": "releases/serverA/servera-migrated/sealed/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverA/servera-migrated/sealed/assets/qs-events.yaml",
+      "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+      "bytes": 4407
+    },
+    {
+      "path": "releases/serverA/servera-migrated/sealed/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverA/servera-migrated/sealed/assets/runtime.json",
+      "sha256": "17dab27fe1ccac57041283e07643e514f23c30b4333ec20c676a0c33d047cc07",
+      "bytes": 16859
+    },
+    {
+      "path": "releases/serverA/servera-migrated/sealed/compose.json",
+      "sha256": "d78056ed9d468df8a39a5e127115778c7ba67e398d17276c521c954bbd45d135",
+      "bytes": 8025
+    },
+    {
+      "path": "releases/serverA/servera-migrated/sealed/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverD/qs-worker/acceptance/assets/m3-qs-worker-credentials.json",
+      "sha256": "3b05d19bb76de476c1a7ed3de17760cf50293b5798ccff8b7063a8b172402e79",
+      "bytes": 114
+    },
+    {
+      "path": "releases/serverD/qs-worker/acceptance/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverD/qs-worker/acceptance/assets/qs-events.yaml",
+      "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+      "bytes": 4407
+    },
+    {
+      "path": "releases/serverD/qs-worker/acceptance/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverD/qs-worker/acceptance/assets/runtime.json",
+      "sha256": "e1c30de06897a4a56a3094ba7b22751babd413a88be071fbaf93a202104eea58",
+      "bytes": 4374
+    },
+    {
+      "path": "releases/serverD/qs-worker/acceptance/compose.json",
+      "sha256": "43d541121aa87169c1711291934865a8c2d481b7ecf0f38ed0332fd17c57d610",
+      "bytes": 5173
+    },
+    {
+      "path": "releases/serverD/qs-worker/acceptance/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverD/qs-worker/open/assets/m3-qs-worker-credentials.json",
+      "sha256": "3b05d19bb76de476c1a7ed3de17760cf50293b5798ccff8b7063a8b172402e79",
+      "bytes": 114
+    },
+    {
+      "path": "releases/serverD/qs-worker/open/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverD/qs-worker/open/assets/qs-events.yaml",
+      "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+      "bytes": 4407
+    },
+    {
+      "path": "releases/serverD/qs-worker/open/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverD/qs-worker/open/assets/runtime.json",
+      "sha256": "e1c30de06897a4a56a3094ba7b22751babd413a88be071fbaf93a202104eea58",
+      "bytes": 4374
+    },
+    {
+      "path": "releases/serverD/qs-worker/open/compose.json",
+      "sha256": "68e5eae4f691cb2346cd77a4ee6f9bb4705d60274c339016d884c9f7d1639a87",
+      "bytes": 5155
+    },
+    {
+      "path": "releases/serverD/qs-worker/open/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "releases/serverD/qs-worker/sealed/assets/m3-qs-worker-credentials.json",
+      "sha256": "3b05d19bb76de476c1a7ed3de17760cf50293b5798ccff8b7063a8b172402e79",
+      "bytes": 114
+    },
+    {
+      "path": "releases/serverD/qs-worker/sealed/assets/mq-ca.crt",
+      "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "bytes": 1562
+    },
+    {
+      "path": "releases/serverD/qs-worker/sealed/assets/qs-events.yaml",
+      "sha256": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+      "bytes": 4407
+    },
+    {
+      "path": "releases/serverD/qs-worker/sealed/assets/routes.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "releases/serverD/qs-worker/sealed/assets/runtime.json",
+      "sha256": "7480f3914a2fff4209828bb9f800684f6803c79e446026ea2de4f8a6e3bcc80a",
+      "bytes": 4375
+    },
+    {
+      "path": "releases/serverD/qs-worker/sealed/compose.json",
+      "sha256": "d3bb12d154c05a11faeed4324d175be2cf1326a1c22c9df26966e7bfe33c5b1d",
+      "bytes": 5162
+    },
+    {
+      "path": "releases/serverD/qs-worker/sealed/runtime.env",
+      "sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+      "bytes": 31
+    },
+    {
+      "path": "review/mysql-credential-rotation.md",
+      "sha256": "99c3d7e2e6ec03bc84ee2c10d7074aeb199df9febfd8676c53508f5c7d1787d4",
+      "bytes": 3553
+    },
+    {
+      "path": "review/production-window.md",
+      "sha256": "406f340aef5483fd1df6ac33d5e32e961527578b92a916b7bd2bffbd5909df09",
+      "bytes": 14175
+    },
+    {
+      "path": "source/components/prometheus/rules/rocketmq-transactions.yml",
+      "sha256": "482b2e78351fdfc541250285e7d18d0bcafa67b849365eea6bc38c03244c6431",
+      "bytes": 4503
+    },
+    {
+      "path": "source/components/rocketmq/serverd-routes-m3-v2.json",
+      "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+      "bytes": 5468
+    },
+    {
+      "path": "source/scripts/ops/m3_mysql_credential.py",
+      "sha256": "98949bdd05d58e5d64fd3472f78abff887e1c4b57c56193d1dafbf97ccd2fc11",
+      "bytes": 8565
+    },
+    {
+      "path": "source/scripts/ops/m3_mysql_restore_sql.py",
+      "sha256": "c06ff6a6101ed38b53d2a296ed8aab519f15279b23dc7398552b20a04390b2bd",
+      "bytes": 4847
+    },
+    {
+      "path": "source/scripts/ops/m3_nginx_gate.py",
+      "sha256": "798baee24fb05ae05cefb4459cadf41fa799909644052ae76c2cf8e4299bbd5d",
+      "bytes": 1405
+    },
+    {
+      "path": "source/scripts/ops/m3_operator_step.py",
+      "sha256": "fbf3708dea394e29634ee583b2c62167ebabda6f584818e156986f7ca742259d",
+      "bytes": 3063
+    },
+    {
+      "path": "source/scripts/rocketmq/audit_transaction_limit.py",
+      "sha256": "aa2f8538940034c35e0baf8bbfd328cfe6840442beaf1545e31b52405e3a02e9",
+      "bytes": 4168
+    },
+    {
+      "path": "source/scripts/rocketmq/cutover_step.py",
+      "sha256": "894f27388d1914f7064c49d8c14a05958e77fb5935c1850cbdae7afda85cb7dd",
+      "bytes": 10097
+    },
+    {
+      "path": "source/scripts/rocketmq/nsq_drain_evidence.py",
+      "sha256": "b31f48f155ec1e493aae71cf2214e8331e13ea4c3550db2e9e0b8b1ee9aeb778",
+      "bytes": 8530
+    },
+    {
+      "path": "source/scripts/rocketmq/provision.py",
+      "sha256": "39e7048ed5fdf7ef488cdc826361b94a225b061cdc522277e5f36c36237dc08b",
+      "bytes": 4324
+    },
+    {
+      "path": "source/scripts/rocketmq/provision_v2.py",
+      "sha256": "dd91c82de4a8e632da708aa504f8cabe50cc85115a59f6a8ba87e642542ee31e",
+      "bytes": 10576
+    },
+    {
+      "path": "source/scripts/rocketmq/render.py",
+      "sha256": "d2a91207804ca9f85ce15511edfbd1858a087e78141a5bd9668745d8cc72f4dc",
+      "bytes": 2561
+    },
+    {
+      "path": "source/scripts/rocketmq/routes.py",
+      "sha256": "914e784eb4ad841d6a0ac4b1d83e41454c5269a6cb3c13796e8b3b616cf77e31",
+      "bytes": 6521
+    },
+    {
+      "path": "source/scripts/rocketmq/runtime_start.py",
+      "sha256": "e558189ca58bc2d73b71c829d043541eb1ff3ddd9c02f82953a0041c95b1ee23",
+      "bytes": 8402
+    },
+    {
+      "path": "source/scripts/rocketmq/start_boundary.py",
+      "sha256": "2c2b18a4d8b0865f5cb7d6fa81840d7d4f50c7dbc1265d7fa657bb9236f1700c",
+      "bytes": 12238
+    }
+  ],
+  "local_import_closure_verified": true,
+  "all_private_modes": true,
+  "dynamic_window_evidence_included": false,
+  "production_approved": false,
+  "executable_without_window_binding": false,
+  "source_ci_pending": true,
+  "contains_production_credentials": true,
+  "uploaded_to_ci_or_public_storage": false,
+  "archive_readback_members_verified": 140,
+  "acceptance_open_application_input_bytes_equal_projects": 5,
+  "public_credential_scan_passed": true
+}

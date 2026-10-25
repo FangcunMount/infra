@@ -1,0 +1,143 @@
+{
+  "schema": "m3-production-incremental-migration-inputs/v1",
+  "files": [
+    {
+      "repository": "iam",
+      "source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+      "path": "internal/pkg/migration/migrations/000041_message_failure_audit.up.sql",
+      "sha256": "d78bc9d154e62460dd6f996622bcded47294cd5a92ec648cd3342b254e0eed50",
+      "bytes": 1172
+    },
+    {
+      "repository": "iam",
+      "source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+      "path": "internal/pkg/migration/migrations/000042_transaction_messaging.up.sql",
+      "sha256": "8dc3529348a16c7185cc44970fb5e616b2fe72ea408ea673ce8e05606db26188",
+      "bytes": 1786
+    },
+    {
+      "repository": "iam",
+      "source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+      "path": "internal/pkg/migration/migrations/000043_authz_message_protocol.up.sql",
+      "sha256": "7ad3f8c0641bdf50b8db3c62072a77c6bd701aba73b5ecdcb8f873a35b9d277b",
+      "bytes": 1059
+    },
+    {
+      "repository": "iam",
+      "source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+      "path": "internal/pkg/migration/migrations/000044_authz_business_operations.up.sql",
+      "sha256": "cce5707ec021decbd40eede58e890ba91c02612600b1302708ebe39d9b3110ce",
+      "bytes": 1517
+    },
+    {
+      "repository": "iam",
+      "source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+      "path": "internal/pkg/migration/migrations/000045_native_transaction_limit_notices.up.sql",
+      "sha256": "0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a",
+      "bytes": 1083
+    },
+    {
+      "repository": "qs",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "path": "internal/pkg/migration/migrations/mongodb/000041_transaction_messaging.up.json",
+      "sha256": "b4eace8013a3d2db2915084d71c67e3cd87bd8a09c7213937d7c692232092b6b",
+      "bytes": 493
+    },
+    {
+      "repository": "qs",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "path": "internal/pkg/migration/migrations/mongodb/000042_business_retry_schedule.up.json",
+      "sha256": "aab987b8ada106b3e4208a67b01c8dba6a0c2e6f5793fc7525936c7377bd6c10",
+      "bytes": 537
+    },
+    {
+      "repository": "qs",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "path": "internal/pkg/migration/migrations/mongodb/000043_native_transaction_limit_notices.up.json",
+      "sha256": "d6904ab7c3ab3c4a310314dc7f532eb321679a0e7a31c0b867c11a9280bfc4fa",
+      "bytes": 2122
+    },
+    {
+      "repository": "qs",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "path": "internal/pkg/migration/migrations/mongodb/000044_answersheet_submit_intent_index.up.json",
+      "sha256": "b78bd987e0c17974e2cfcff992653c3120dc473dff8fc5b7d3e06735abd7cc6c",
+      "bytes": 331
+    },
+    {
+      "repository": "qs",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "path": "internal/pkg/migration/migrations/mysql/000106_transaction_messaging.up.sql",
+      "sha256": "2443a41eabde222d5292f4e997ca7db386945ce70e9e77d9bc896917a2e30246",
+      "bytes": 2338
+    },
+    {
+      "repository": "qs",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "path": "internal/pkg/migration/migrations/mysql/000107_business_retry_schedule.up.sql",
+      "sha256": "963f729f0f91baa0c60a62090b99dd7574c0d08231d2be0939d8927ce4690ea3",
+      "bytes": 1168
+    },
+    {
+      "repository": "qs",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "path": "internal/pkg/migration/migrations/mysql/000108_ai_transaction_command_order.up.sql",
+      "sha256": "cbf491ed8446cb76963c97aeee1d932c08f1f06e91ae49574484987c01ad48f1",
+      "bytes": 274
+    },
+    {
+      "repository": "qs",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "path": "internal/pkg/migration/migrations/mysql/000109_rocketmq_deferred_delivery.up.sql",
+      "sha256": "d5929a6bb4363c3d04429ba3634ddcb477820529b0caffaf8974da73c0505fc9",
+      "bytes": 673
+    },
+    {
+      "repository": "qs",
+      "source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "path": "internal/pkg/migration/migrations/mysql/000110_native_transaction_limit_notices.up.sql",
+      "sha256": "0d0df3ac8dcc10ebbe9e735ee0a8da600f0eefb3cdc6f33da276c975500e0e5a",
+      "bytes": 1083
+    },
+    {
+      "repository": "ai",
+      "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "path": "migrations/versions/0041_transaction_messaging.py",
+      "sha256": "dd27c8eb56581bf9ef78b52a6d4ced763dc8aa6676587b1836ff5dce3f4312f1",
+      "bytes": 2743
+    },
+    {
+      "repository": "ai",
+      "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "path": "migrations/versions/0042_transaction_event_receipts.py",
+      "sha256": "6d9e884de4af5b8d3ea99e8be902c3f4c81f317525a790775a93bf8249d7b517",
+      "bytes": 814
+    },
+    {
+      "repository": "ai",
+      "source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "path": "migrations/versions/0043_native_transaction_limit.py",
+      "sha256": "a891eabcfa3d1032cd579aa5973720b5dc806eeb1398131e17f6716e8ec3d99c",
+      "bytes": 1507
+    }
+  ],
+  "production_ddl_executed": false,
+  "heads": {
+    "iam": {
+      "initial": 40,
+      "target": 45
+    },
+    "qs_mysql": {
+      "initial": 105,
+      "target": 110
+    },
+    "qs_mongo": {
+      "initial": 40,
+      "target": 44
+    },
+    "ai": {
+      "initial": "0040_module_table_names",
+      "target": "0043_native_transaction_limit"
+    }
+  }
+}

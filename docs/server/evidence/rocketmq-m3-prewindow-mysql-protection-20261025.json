@@ -1,0 +1,52 @@
+{
+  "schema": "m3-prewindow-readonly-mysql-snapshot/v1",
+  "passed": 1,
+  "failed": 0,
+  "skipped": 0,
+  "databases": [
+    "iam",
+    "qs",
+    "ai"
+  ],
+  "dump_seconds": 40.29,
+  "total_seconds": 45.312,
+  "raw_bytes": 518498844,
+  "raw_sha256": "59e61205195e2c5bdad65e3914681e7db58bd95e4bea274388985a5b4f4d7519",
+  "archive_bytes": 75067274,
+  "archive_sha256": "8c104306cce70174abe06d5b193930e89a4dff4e9f00db72973581c4395d289b",
+  "client_image_id": "sha256:13ad6357cf92127024960d539310c5fa5b39f44f3ee54f3f8e3990f815854555",
+  "original_containers_unchanged": true,
+  "read_only": true,
+  "live_writers_frozen": false,
+  "same_window_cutover_protection": false,
+  "restoration_authorized": false,
+  "application_started": false,
+  "production_data_uploaded_to_ci": false,
+  "storage_mode": "root directory 0700; files 0600; retain at least 30 days",
+  "observed_at_utc": "2026-10-25T07:02:12.905720+00:00",
+  "mini_copy": {
+    "schema": "m3-prewindow-mysql-copy/v1",
+    "archive_sha256": "8c104306cce70174abe06d5b193930e89a4dff4e9f00db72973581c4395d289b",
+    "archive_bytes": 75067274,
+    "read_only_live_snapshot": true,
+    "same_window_cutover_protection": false,
+    "restore_authorized": false,
+    "private_mode": "0700/0600",
+    "retention_days_minimum": 30,
+    "observed_at_utc": "2026-10-25T07:28:40.267621+00:00"
+  },
+  "restore_byte_derivation": {
+    "schema": "m3-mysql-restore-byte-derivation/v1",
+    "source_sha256": "59e61205195e2c5bdad65e3914681e7db58bd95e4bea274388985a5b4f4d7519",
+    "column_metadata_sha256": "4b8485652abbe4ec2bbea7f527127dffbcb532e77efd81b0a0adcc68a98c5405",
+    "output_sha256": "6ea1d611f09e600335289562ba9e65cecb2b9dc0c4e393e32481ede3179b3729",
+    "output_bytes": 518498848,
+    "known_literal_replacements": 2,
+    "database": "ai",
+    "database_connected": false,
+    "restoration_authorized": false,
+    "prewindow_live_snapshot": true,
+    "same_window_cutover_protection": false,
+    "source_tool_sha256": "c06ff6a6101ed38b53d2a296ed8aab519f15279b23dc7398552b20a04390b2bd"
+  }
+}

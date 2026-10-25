@@ -1,0 +1,70 @@
+{
+  "schema": "m3-production-monitoring-route-preflight/v1",
+  "mini": {
+    "schema": "m3-monitoring-discovery-shape/v1",
+    "discover_sha256": "fd658644240747855d63c9a5910586eed2a903fc3e298e6fe1969e59e20dc333",
+    "sources": [
+      {
+        "name": "serverA",
+        "host": "100.74.123.45"
+      },
+      {
+        "name": "serverD",
+        "host": "100.118.164.39"
+      }
+    ],
+    "gateway": "monitoring.fangcunmount.cn:443",
+    "targets": {
+      "serverA.json": 4,
+      "serverD.json": 3
+    }
+  },
+  "gateway": {
+    "schema": "m3-monitor-gateway-shape/v1",
+    "host": "serverA",
+    "config_sha256": "fe293e5a7b2e057fba24f661818bad543ae2dfaed7f81f51621ca2a390a799ea",
+    "dynamic_metrics_proxy": true,
+    "dynamic_metrics_location": true,
+    "serverd_collector_added": false,
+    "configuration_changed": false
+  },
+  "serverd": {
+    "host": "serverD",
+    "nginx_containers": [],
+    "native_nginx": null,
+    "discovery_files": [
+      {
+        "path": "/usr/local/sbin/infra-monitoring-discovery",
+        "sha256": "4463fd9dc178b3be24ce245688bc9db776123c238c31e4fc45bf32d3a180702c"
+      }
+    ]
+  },
+  "operator_ssh": {
+    "schema": "m3-operator-ssh-preflight/v2",
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "cases": [
+      {
+        "target": "serverA",
+        "passed": true,
+        "script_sha256": "cd8446ac2f6c7007ecc353732fa97198c439aeaf43547896a851cfacb2732aed"
+      },
+      {
+        "target": "serverD",
+        "passed": true,
+        "script_sha256": "1c6a6906f53e85e6ec87a79d1d0f28dc8a755149d7fe12099152115a7b2e3e58"
+      }
+    ],
+    "same_sanitized_environment_as_reviewed_script_runner": true,
+    "local_agent_explicitly_bound_in_reviewed_script": true,
+    "agent_forwarding_on_both_hops": false,
+    "production_key_copied": false,
+    "mutation": false,
+    "first_attempt": {
+      "default_environment_omits_local_agent": "authentication refused before remote operation"
+    }
+  },
+  "new_serverd_agent": false,
+  "monitoring_configuration_changed": false
+}
