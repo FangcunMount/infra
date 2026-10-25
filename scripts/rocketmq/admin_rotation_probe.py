@@ -29,6 +29,7 @@ def main():
     ci_guard(os.environ)
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--network-recovery',action='store_true')
+    parser.add_argument('--audit-existing-acls',action='store_true')
     args=parser.parse_args()
     repo=Path(__file__).resolve().parents[2]
     report=dict(production=False,production_credentials_used=False,passed=0,failed=1,skipped=0,phases=[])
@@ -50,6 +51,23 @@ def main():
             home='/tmp/m3-rotate-'+secrets.token_hex(8);homes[kind]=home
             fixture.run(['docker','exec','-i',broker,'bash','-ec',
                 'umask 077; mkdir -p "$1/conf"; cat > "$1/conf/tools.yml"','owned-auth',home],stdin=body)
+        audit_cases={}
+        if args.audit_existing_acls:
+            from admin_audit import snapshot_existing_acls
+            audit_admin=ScopedAdmin(broker,homes['old']);legacy='owned-restricted-'+secrets.token_hex(6)
+            audit_admin('createUser','-u',legacy,'-p',secrets.token_hex(32),'-t','Normal',mutation=True)
+            audit_admin('createAcl','-s','User:'+legacy,'-r','Topic:owned-audit-only',
+                '-a','Pub','-i','127.0.0.1','-d','Deny',mutation=True)
+            empty='owned-no-policy-'+secrets.token_hex(6)
+            audit_admin('createUser','-u',empty,'-p',secrets.token_hex(32),'-t','Normal',mutation=True)
+            before_users=audit_admin.users();before_acls=snapshot_existing_acls(audit_admin,before_users)
+            require(before_acls[legacy]['kind']=='table' and any(row[-1].lower()=='deny' and row[-2]=='[127.0.0.1]' for row in before_acls[legacy]['rows']),
+                    'actual_restricted_deny_snapshot_required')
+            require(before_acls[empty]==dict(kind='absent',remoting_code=3002),'actual_absent_acl_required')
+            try:audit_admin.acl(legacy)
+            except RuntimeError:pass
+            else:raise ValueError('strict_provision_decoder_was_weakened')
+            audit_cases.update(restricted_deny_acl_read_without_mutation=True,authoritative_absent_acl_read=True,strict_provisioning_guard_retained=True)
         def persist(files):
             for name,body in files.items():
                 # Write the existing inode: production has a separate tools.yml bind mount.
@@ -64,10 +82,18 @@ def main():
         require(row[0]==new['password'] and tuple(v.lower() for v in row[1:])==('super','enable'),'default_tools_not_rotated')
         after_id=fixture.run(['docker','inspect',broker,'--format','{{.Id}}']).stdout.strip()
         require(before_id==after_id,'original_container_replaced')
+        if args.audit_existing_acls:
+            after_acls=snapshot_existing_acls(Admin(broker),users)
+            require(after_acls==before_acls,'existing_acl_audit_changed_across_rotation')
+            for username,prior in before_users.items():
+                expected=(new['password'],*prior[1:]) if username==old['username'] else prior
+                require(users[username]==expected,'unapproved_existing_user_change')
+            audit_cases['existing_users_and_all_acls_preserved_across_rotation']=True
         cases={phase:phase in report['phases'] for phase in ('original_verified','update_user_confirmed',
             'new_configuration_persisted','broker_restarted','new_success_old_denied_new_success')}
         cases.update(all_config_copies_visible=True,default_tools_authenticated=True,original_container_retained=True)
         cases.update(network_cases)
+        cases.update(audit_cases)
         require(all(cases.values()),'rotation_phase_evidence_incomplete')
         report.update(passed=len(cases),failed=0,cases=cases,new_success_old_denied_new_success=True,
             all_config_copies_persisted=True,default_tools_authenticated=True,

@@ -1,0 +1,31 @@
+name: RocketMQ existing ACL audit and rotation
+on:
+  pull_request:
+    paths:
+      - scripts/rocketmq/admin_audit.py
+      - scripts/rocketmq/test_admin_audit.py
+      - scripts/rocketmq/admin_rotation_probe.py
+      - .github/workflows/rocketmq-admin-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_admin_audit.py
+      - name: Build verified official owned Broker
+        run: |
+          bash scripts/rocketmq/fetch-release.sh
+          docker build -t rocketmq-m3-image-start:5.5.1 components/rocketmq
+      - name: Existing restricted ACLs, absence, network recovery and password rotation
+        run: python3 scripts/rocketmq/admin_rotation_probe.py --network-recovery --audit-existing-acls
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m3-admin-audit-${{ github.run_id }}
+          path: admin-rotation-probe.json
+          if-no-files-found: error
+          retention-days: 30
