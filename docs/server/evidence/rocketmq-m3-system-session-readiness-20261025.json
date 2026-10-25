@@ -1,0 +1,32 @@
+{
+  "schema": "m3-system-session-readiness/v1",
+  "observed_at_utc": "2026-10-25T08:08:23.118483+00:00",
+  "user_reported_login_account": "system",
+  "browser_origin": "https://operating.fangcunmount.cn",
+  "visible_profile_user_id": "10001",
+  "visible_roles": [
+    "platform_admin",
+    "iam_admin",
+    "qs:admin"
+  ],
+  "session_ui_authenticated": true,
+  "credential_values_read_or_exported": false,
+  "personal_contact_fields_recorded": false,
+  "candidate_store": {
+    "code": "AUTHZ-TEST-A-20260911",
+    "name": "授权验收专用门店A"
+  },
+  "production_write_performed": false,
+  "m3_business_acceptance_passed": false,
+  "final_production_approval_obtained": false,
+  "candidate_testee": {
+    "id": "636816114449396270",
+    "label": "AUTHZ验收20260911-related",
+    "existing_assessment_count": 4,
+    "observed_existing_plan_model": "SNAP-IV量表（18项）"
+  },
+  "plan_form_inspected_only": true,
+  "plan_enrollment_submitted": false,
+  "collector_session_verified": false,
+  "production_approval_pending": true
+}

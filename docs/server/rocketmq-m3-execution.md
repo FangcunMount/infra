@@ -259,7 +259,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T27 | 同SDK SHA的稳定Go/Python发布、摘要/锁/receipt | 2026-10-24；Go v0.5.0/Python0.4.0同源码1345266，PR58/59已合并；双Release各9资产重新下载/digest核验、234模块文件及wheel/sdist各114纯测试；[发布证明](evidence/rocketmq-m3-stable-release-20261024.json) |
 | ✅ | T28 | 三库正式稳定制品、重新安装及非空零跳过完整门禁 | 2026-10-24；IAM147 713f83b2/QS439 3b0774f9/AI223 404323f7，实际tree均与源码CI候选相同；infra236 68b25ece，20检查通过、正式制品与宿主完整门禁收口；[证据](evidence/rocketmq-m3-stable-adoption-20261024.json) |
 | ✅ | T29 | 固定最终镜像/配置/资源、恢复/启动及30分钟演练 | 2026-10-25；内部5/5，当前五镜像/八进程C1 19/0/0，配置18/18、Compose15/15、挂载15/15、入口19/19与140成员静态包通过；infra283两OS各47/0/0并合并976b7a51。受控51.02秒不作生产SLA，动态保护/生产批准另记。[候选](rocketmq-m3-final-candidate.md)/[具名清单](rocketmq-m3-production-window.md) |
-| ☐ | T30 | 105前置、真实库/运行基线及具名生产清单 | 进行中：原105保护/恢复/发布及PL-R007移交范围已核对，最新A/C/D运行、原锁/资源与三MySQL40/105/0040只读回读；完整具名清单已就绪，待system会话/测试组织及具体用例就绪后提交最终业务生产批准。TaskID移交仍未代签验收 |
+| ☐ | T30 | 105前置、真实库/运行基线及具名生产清单 | 进行中：原105保护/恢复/发布及PL-R007移交范围已核对，最新A/C/D运行、原锁/资源与三MySQL40/105/0040只读回读；完整具名清单已就绪，system会话已核对；门店A专用受试者及有界用例见[system验收范围](rocketmq-m3-system-acceptance.md)，等待最终具名批准。填写端合法入口另在停机前核验；TaskID移交仍未代签验收 |
 | ☐ | T31 | 回读生产v2资源/配置与Mac mini告警，保持封准入 | 待开始 |
 | ☐ | T32 | 排空、交接、同窗口保护及显式离线迁移 | 待开始 |
 | ☐ | T33 | 最终镜像/Checker/消费者/system验收及恢复准入 | 待开始 |
@@ -2333,3 +2333,10 @@ infra283精确9166fb10在40174586659的Ubuntu/macOS各47项、0失败/跳过，�
 T30继续按原批准机制收口。最新serverA/C/D均只读回读，原锁inode/资源保持，三个worker并发和资源未变；serverD可用内存约1317MiB、Broker健康/无OOM/无重启。三MySQL真实head仍40/105/0040、clean、无EVENT，密码未改；部署暂停仍IAM/QS=true、AI自动部署=false。最终业务DDL/provider/生产启动尚未获批准，不以统一窗口选择或基础设施类似操作授权替代。system正常登录和测试组织仍待用户输入；业务验收及48小时观察未开始。
 
 Mongo最新只读核对7.0.31/rs0可写主库、40/clean，唯一TTL计划集合仍为空；同窗口停写后还须复核。全部最新主机/数据库/暂停状态见[生产批准前基线](evidence/rocketmq-m3-preapproval-baseline-20261025.json)，不以本次只读基线代替实际冻结证据。
+
+
+### 2026-10-25：system正常登录已核对，T30具名验收范围待批准
+
+用户回复“已登录”，Chrome最新后台会话可正常读取；资料页用户10001及管理员角色与system声明一致。未读取/导出令牌、cookie、密码、浏览器存储或联系方式。后台发现门店A的既有专用受试者AUTHZ验收20260911-related（636816114449396270）、4份测评及原SNAP-IV18计划，拟仅对该测试对象新增有界验收数据，不改真实受试者、旧测评及门店/医生关系。
+
+[验收补充清单](rocketmq-m3-system-acceptance.md)明确：一空角色创建/名称更新、一份专用单轮计划/Task及一份新答卷、四owner事实/witness和QS↔AI回执核对，不发送对外验收通知、不重做旧模型。只读打开的加入计划表单已取消，未点击确认、未提交新业务。后台登录不等于填写端已登录，批准后先在窗口前核验合法填写入口；不满足不开始维护。[脱敏会话准备证据](evidence/rocketmq-m3-system-session-readiness-20261025.json)不构成业务验收。T30最终生产批准尚未取得，进度保持29/36，业务仍NSQ、生产密码/DDL/Topic/ACL/provider未改。
