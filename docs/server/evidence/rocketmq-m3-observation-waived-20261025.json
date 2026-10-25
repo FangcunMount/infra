@@ -1,0 +1,19 @@
+{
+  "M4_cleanup_not_executed": true,
+  "T34_status": "waived_by_user",
+  "actual_elapsed_seconds_at_waiver": 1330,
+  "data_or_backups_deletion_authorized": false,
+  "fresh_eight_runtime_four_owner_ten_targets_and_public_checks_passed": true,
+  "monitor_heartbeat_status": "DELETED",
+  "next_tasks": [
+    "T35",
+    "T36"
+  ],
+  "not_observation_pass": true,
+  "original_start": "2026-10-25T13:48:32.535495+00:00",
+  "recorded_at": "2026-10-25T14:10:43.469262+00:00",
+  "required_48h_completed": false,
+  "schema": "m3-user-waived-observation/v1",
+  "user_instruction": "可跳过 48 小时观察，继续执行后续规划",
+  "private_evidence_sha256": "b83ede28960a2b89c34978f51f9815e3215a191a8068f15e06d445ef81695cc4"
+}

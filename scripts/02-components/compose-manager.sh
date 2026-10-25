@@ -283,7 +283,15 @@ manage_infra() {
     local component="${2:-all}"
     
     log_step "管理基础设施: $action $component (环境: $ENVIRONMENT)"
-    
+
+    # A production RocketMQ marker blocks legacy NSQ resurrection, including all.
+    # No marker is installed on Mac mini development/test dependencies.
+    if [[ "$action" == "up" || "$action" == "restart" ]]; then
+        if [[ "$component" == "nsq" || "$component" == "all" ]]; then
+            bash "${REPO_ROOT}/scripts/rocketmq/guard-nsq.sh"
+        fi
+    fi
+
     # 检查基础设施状态
     if [[ "$action" == "up" && "$component" != "core" ]]; then
         ensure_infrastructure
