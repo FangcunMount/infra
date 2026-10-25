@@ -1,0 +1,146 @@
+{
+  "schema": "m3-production-closure-under-approved-waiver/v1",
+  "recorded_at": "2026-10-25T14:29:09.264007+00:00",
+  "total_tasks": 36,
+  "verified_tasks": 35,
+  "user_waived_tasks": [
+    "T34"
+  ],
+  "closed_tasks": 36,
+  "48h_observation_passed": false,
+  "observation_automation_deleted": true,
+  "system_business_acceptance_passed": true,
+  "production_NSQ_runtime_retired": true,
+  "old_NSQ_data_containers_config_and_backups_retained": true,
+  "M4_progress": "0/8",
+  "production_CD_resumed": false,
+  "repositories": [
+    {
+      "CD_flags": {
+        "IAM_MESSAGING_PROVIDER": "rocketmq",
+        "PRODUCTION_DEPLOY_PAUSED": "true",
+        "ROCKETMQ_PUBLISH_ENABLED": "false"
+      },
+      "current_main": "008a5abf311d9c699c402964e2c2e162150c4b93",
+      "deployed_source_merged": true,
+      "deployed_source_sha": "ca59dec47fe4e544cd06bf52f9e3c64fbbdad211",
+      "only_workflow_or_doc_differences": [
+        ".github/workflows/rocketmq-m3-candidate-publication.yml"
+      ],
+      "repo": "iam",
+      "runtime_source_matches_current_main": true
+    },
+    {
+      "CD_flags": {
+        "MESSAGING_PROVIDER": "rocketmq",
+        "PRODUCTION_DEPLOY_PAUSED": "true",
+        "ROCKETMQ_PUBLISH_ENABLED": "false"
+      },
+      "current_main": "bb7f01aa4cf0ddac88367b9a58a882cdca87ccba",
+      "deployed_source_merged": true,
+      "deployed_source_sha": "b75d4a52ec261275a0ffb588eeb31fd6496966d0",
+      "only_workflow_or_doc_differences": [
+        ".github/workflows/README.md",
+        ".github/workflows/rocketmq-m3-image-cache.yml",
+        "docs/document-closure.json"
+      ],
+      "repo": "qs-server",
+      "runtime_source_matches_current_main": true
+    },
+    {
+      "CD_flags": {
+        "AUTO_DEPLOY_ENABLED": "false"
+      },
+      "current_main": "404323f7f840541cf9d8e032e9fb26ac1f890187",
+      "deployed_source_merged": true,
+      "deployed_source_sha": "ddff86cad27d03c95dad28490d6cccbc1ce5b15f",
+      "only_workflow_or_doc_differences": [],
+      "repo": "qs-ai",
+      "runtime_source_matches_current_main": true
+    },
+    {
+      "CD_flags": {},
+      "current_main": "067bc80b8be9ed73d16ec680484d8ca694088eda",
+      "deployed_source_merged": true,
+      "deployed_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "repo": "reliable-messaging"
+    }
+  ],
+  "stable_releases": [
+    {
+      "tag": "v0.5.0",
+      "sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "draft": false,
+      "prerelease": false,
+      "url": "https://github.com/FangcunMount/reliable-messaging/releases/tag/v0.5.0",
+      "assets": 9
+    },
+    {
+      "tag": "python/v0.4.0",
+      "sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+      "draft": false,
+      "prerelease": false,
+      "url": "https://github.com/FangcunMount/reliable-messaging/releases/tag/python/v0.4.0",
+      "assets": 9
+    }
+  ],
+  "final_sql_metadata": [
+    "iam_head\t45\t0",
+    "qs_head\t110\t0",
+    "ai_head\t0043_native_transaction_limit",
+    "iam_nonterminal\t0",
+    "qs_nonterminal\t0",
+    "ai_nonterminal\t0",
+    "iam_confirmation_gap\t0",
+    "qs_confirmation_gap\t0",
+    "ai_confirmation_gap\t0",
+    "AI_new_session\tcompleted\t1",
+    "AI_new_job\tdone\t1\t1",
+    "AI_old_blocked_sessions\t7",
+    "AI_receipts\t5"
+  ],
+  "final_mongo_metadata": {
+    "dirty": false,
+    "prepared_executions": 0,
+    "read_only": true,
+    "version": 44
+  },
+  "last_runtime_check": {
+    "checked_at": "2026-10-25T14:21:54.585966+00:00",
+    "ok": true,
+    "prometheus_errors": [],
+    "prometheus_ok": true,
+    "public_four_200_TLS": true,
+    "read_only": true,
+    "runtime": {
+      "serverA": {
+        "available_MiB": 6535,
+        "errors": [],
+        "ok": true
+      },
+      "serverD": {
+        "available_MiB": 1302,
+        "errors": [],
+        "ok": true
+      }
+    },
+    "schema": "m3-readonly-observation/v1",
+    "start_sha256": "4a5e9e3f0e6cee0f118fd7b111612944b04c80ef2bb4eaaf94db937af9b88098"
+  },
+  "source_PR298_merge": "d069c245d702f1ad661ba9a313aef309d5b2571b",
+  "private_evidence_backup": {
+    "bytes": 482745,
+    "members": 546,
+    "mode": "0o600",
+    "sha256": "25dac7c92a40d5028d5567fe9c8b49f557e61198f230c9d223158508f772fa20"
+  },
+  "private_evidence_sha256": {
+    "T34-user-waiver.private.json": "b83ede28960a2b89c34978f51f9815e3215a191a8068f15e06d445ef81695cc4",
+    "T35-production-retirement.private.json": "03b4e9848e122b29a79f4801842ae3d55f1a9673ec4ccd2b74d57eb41092275c",
+    "T35-retirement-evidence-mini-copy.json": "ac8fb986d19dd0827484ef9d131831cfd1fb6d05115aadd0d3556b2d435492e2",
+    "T36-runtime-source-parity.private.json": "1e87a15d6b018f86be66607e3b157786811f17ac9998a76cc3fe0166cb2e69af",
+    "T36-final-readonly-protocol-and-receipt-facts-v2.private.json": "fb138db3c29c4c1d7f5122f0db4d8dc01098b970c671d34b63764acae6f41890",
+    "T36-final-Mongo-head-and-protocol-facts.private.json": "336f702443a65f1e2a8b964e57a0968ef54e695fd3344714800b18d4b45f64e6",
+    "T36-stable-tag-and-release-audit.private.json": "84739276595b31b636a7121e94f2762f391977731f3e688a2c61955748a29c46"
+  }
+}
