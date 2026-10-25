@@ -1,0 +1,37 @@
+name: M3 Mongo profiler preservation
+on:
+  pull_request:
+    paths:
+      - scripts/ops/m3_mongo_protection.py
+      - scripts/ops/test_m3_mongo_protection.py
+      - scripts/ops/ci_m3_mongo_protection.py
+      - .github/workflows/m3-mongo-protection.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pure-contract:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - run: python3 -m unittest discover -s scripts/ops -p test_m3_mongo_protection.py -v
+  actual-mongo-restore:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Actual nonempty profile and complete business restoration
+        run: python3 scripts/ops/ci_m3_mongo_protection.py --output "$RUNNER_TEMP/m3-profile-report.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m3-profile-preservation-report
+          path: ${{ runner.temp }}/m3-profile-report.json
+          if-no-files-found: error
