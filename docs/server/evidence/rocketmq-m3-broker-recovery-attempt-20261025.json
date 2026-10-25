@@ -1,0 +1,135 @@
+{
+  "schema": "m3-serverd-broker-recovery-attempt/v1",
+  "operation_id": "m3-serverd-broker-admin-20261025-v1",
+  "approved_by_user": true,
+  "approved_plan_sha256": "56d0c8c01af17aefedb4a97df1a8179a8dca37e23756a952d2204c31f618d3a5",
+  "result": "failed_stopped",
+  "manual_start_attempts": 1,
+  "manual_restart_attempts": 0,
+  "automatic_restarts_observed": 11,
+  "password_update_attempted": false,
+  "broker_after": {
+    "id": "ce02d3e209b1f17dbf9b7544b3629f363fa45e5a80e3766b77295f038e86ccce",
+    "image": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+    "state": {
+      "Status": "exited",
+      "Running": false,
+      "OOMKilled": false,
+      "ExitCode": 1,
+      "StartedAt": "2026-10-25T03:04:51.533799388Z",
+      "FinishedAt": "2026-10-25T03:04:52.73902986Z"
+    },
+    "restart_count": 11
+  },
+  "failure_stop_confirmed": true,
+  "original_configuration_sha256": {
+    "broker.conf": "a466082a24537582bc6261ed786a45bf745fc2637f8dfd512566252cf8911d79",
+    "proxy.json": "28a70ed0634f1f9998a0e520ee6eb787be3aeca2c2442a26d7dea79cc6951ed2",
+    "tools.yml": "000452b0b0d8892cf5b36f9fa0ce157c9ebe81626fd5c35a805d09fc02165df3"
+  },
+  "cold_backup": {
+    "automatic_deletion": false,
+    "bytes": 58455997,
+    "file_count": 68,
+    "full_archive_member_bytes_verified": true,
+    "path": "/data/infra/rocketmq/recovery/m3-broker-admin-20261025-v1/cold-backup.tar.gz",
+    "retention_minimum_days": 30,
+    "sha256": "2912e63fce6008210202347194da48f4356eac38e5c16220c4c2d30ee5874381",
+    "source_manifest_sha256": "0ccfe8ce707fed92c235fbb4dfe8ee683634a0d05436479cca1041bc66307889"
+  },
+  "mac_mini_backup": {
+    "receipt": {
+      "schema": "m3-broker-cold-backup-copy/v1",
+      "host": "macmini-001.local",
+      "path": "/Users/yangshujie/backups/infra/rocketmq/m3-broker-admin-20261025-v1/cold-backup.tar.gz",
+      "sha256": "2912e63fce6008210202347194da48f4356eac38e5c16220c4c2d30ee5874381",
+      "bytes": 58455997,
+      "mode": "0o600",
+      "verified": true,
+      "retention_minimum_days": 30,
+      "automatic_deletion": false,
+      "observed_at_utc": "2026-10-25T03:01:44.214367+00:00"
+    },
+    "receipt_sha256": "9870c97320eaccbb784c227757198a54d1469e7bf6110b7ea8ea8c88aeb4a2b4"
+  },
+  "cold_backup_source_still_exact": true,
+  "other_containers_unchanged": true,
+  "network_before_start": {
+    "host_network_mode": "rocketmq_rocketmq",
+    "attached_networks": [],
+    "network_id": "edffac725f5015491bef78c66f31d0a4757f15c1d909f2e1bc1e1c5df492d90d"
+  },
+  "stack_overflow_error_present": true,
+  "mixall_recursion_frame_count": 1497,
+  "private_docker_log_sha256": "64bad4f49e962c3a61729d0ff8bb35f904f69233f18e26203d085b82f35d9af0",
+  "operator_sha256": "70813b6dbfec4656c53e3bc17166fed39148429e105c26def25f55c8ecd5a93b",
+  "phases": [
+    {
+      "phase": "cold_backup_started",
+      "utc": "2026-10-25T02:56:48.888918+00:00"
+    },
+    {
+      "phase": "awaiting_verified_mac_mini_copy",
+      "utc": "2026-10-25T02:57:06.985487+00:00"
+    },
+    {
+      "phase": "mac_mini_backup_verified",
+      "utc": "2026-10-25T03:02:46.879477+00:00"
+    },
+    {
+      "phase": "original_broker_start_attempted",
+      "utc": "2026-10-25T03:02:54.120970+00:00"
+    },
+    {
+      "phase": "recovery_failed",
+      "utc": "2026-10-25T03:05:40.989599+00:00"
+    }
+  ],
+  "original_plan_failure_preserved": true,
+  "production_business_cutover": false,
+  "m3_completed_tasks": 28,
+  "m3_total_tasks": 36,
+  "t29_subitems_completed": 4,
+  "t29_total_subitems": 5,
+  "monitoring_after_failure": {
+    "observed_at_utc": "2026-10-25T03:34:44.018883+00:00",
+    "targets": [
+      {
+        "job": "qs-worker",
+        "host": "monitoring.fangcunmount.cn",
+        "port": 443,
+        "health": "up",
+        "error_present": false,
+        "instance": "qs-worker-runtime-2",
+        "last_scrape": "2026-10-25T03:34:29.250901972Z"
+      },
+      {
+        "job": "qs-worker",
+        "host": "monitoring.fangcunmount.cn",
+        "port": 443,
+        "health": "up",
+        "error_present": false,
+        "instance": "qs-worker-runtime-1",
+        "last_scrape": "2026-10-25T03:34:40.583460296Z"
+      },
+      {
+        "job": "qs-worker",
+        "host": "monitoring.fangcunmount.cn",
+        "port": 443,
+        "health": "up",
+        "error_present": false,
+        "instance": "qs-worker-runtime-3",
+        "last_scrape": "2026-10-25T03:34:39.459465629Z"
+      },
+      {
+        "job": "rocketmq",
+        "host": "100.118.164.39",
+        "port": 5557,
+        "health": "down",
+        "error_present": true,
+        "instance": "100.118.164.39:5557",
+        "last_scrape": "2026-10-25T03:34:30.197403097Z"
+      }
+    ]
+  }
+}
