@@ -1,13 +1,13 @@
 {
   "schema": "rocketmq-m4-c06-progress-v1",
   "recorded_at": "2026-10-25T15:56:19.152827+00:00",
-  "scope": "Source and isolated verification only; no M4 production installation or data deletion",
+  "scope": "Source/isolated validation and production read-only input inventory; no M4 installation, data/schema mutation or business request",
   "formal_progress": {
     "completed": 1,
     "total": 8
   },
   "c06_subgates": {
-    "completed": 1,
+    "completed": 2,
     "total": 4
   },
   "infra": {
@@ -41,7 +41,7 @@
     "local_pytest_deselected": 2,
     "deselected_reason": "Two real Docker Compose cases are mandatory in full CI; no local Docker runtime used",
     "mypy_src_files": 454,
-    "status": "Transaction package/preflight source merged; final-only production option cleanup and actual configuration reconstruction remain pending; not deployed",
+    "status": "Transaction binding/preflight and final-only production target cleanup merged; actual complete configuration reconstruction remains C06-D; not deployed",
     "current_candidate": {
       "head": "8b9bfeeef3c1756cd31f0af2a9e2e919c56e4544",
       "local_pytest_passed": 153,
@@ -151,7 +151,8 @@
         "same_complete_cases_across_mysql": true
       },
       "pytest_aggregate_receipt_sha256": "310dcb63a64da6744c8f085732afd530be3393166b42009e7133be97e4178f25"
-    }
+    },
+    "final_only_candidate_ref": "ai_final_only"
   },
   "qs_worker": {
     "pr": 443,
@@ -258,12 +259,36 @@
       "id": "qs-domain-dotted-owner-render",
       "reason": "AllSettings expanded qs.mysql/qs.mongo keys in the final domain map during an AI-only overlay",
       "disposition": "Independent PR445 preserves raw domain subtree; actual Render→app.DecodeOptions red/green with exact original identity and budget"
+    },
+    {
+      "id": "ai-final-production-red",
+      "reason": "The original packager accepted missing/normal-only bindings and the host reached Docker with these targets",
+      "disposition": "16 final-mode refusal cases pass; final guard retained"
+    },
+    {
+      "id": "ai-final-ci-prepare-fixtures",
+      "reason": "CI 40214998195 found test_cd_prepare fixtures overwrote the valid MQ configuration or omitted the reviewed final binding",
+      "disposition": "Prepared/pinned rollback fixtures retain image/CA/schema/key/drift guards; local387 pass; corrected fullCI40215982232 12checks and11406executions pass; old source CI superseded by GitHub automatic cancellation, no production workflow cancelled"
+    },
+    {
+      "id": "qs-api-package-red",
+      "reason": "Original API package accepted absent identities/changed fanout and could replace the existing package before parameter rejection",
+      "disposition": "Early final binding validation; negative sentinel tests and actual decoder pass"
+    },
+    {
+      "id": "qs-api-package-docs-spacing",
+      "reason": "docs hygiene rejected an extra blank line in the maintained deployment page",
+      "disposition": "Whitespace fixed; full88/hygiene/facts gate passes"
+    },
+    {
+      "id": "m4-config-input-shapes",
+      "reason": "Initial read-only input collector handled Go nested owners but not Python outer messaging.transactions; raw duration comparison also differed for equivalent Go nanosecond/YAML string representations",
+      "disposition": "Retain initial captures; repeat read-only capture for both layouts and compare duration units only; all original identity bytes preserved"
     }
   ],
   "remaining": [
-    "QS API dual-owner/AI bridge/IAM subscription packaging",
-    "AI final-only production option cleanup",
-    "Actual original identities, private asset paths and all eight role reconstruction",
+    "QS API final AI bridge consistency and complete host replacement preflight",
+    "Actual private asset versions/permissions, missing-material refusal and all eight role reconstruction",
     "C02-C05 runtime/reader and retained responsibility cleanup",
     "C07 approved retention/disposition and C08 complete regression"
   ],
@@ -447,6 +472,216 @@
       "bytes": 271372,
       "sha256": "2861076713898439b3b57724bc0e0249d9fc7d9a6f486bccbb615304138dc775",
       "private": true
+    },
+    {
+      "report": "M4-C06-D-identities-20261025T172228-b9fd5c.private.json",
+      "bytes": 7310,
+      "sha256": "06969ebd1aa5a0646cdc98104b7aee0d4302d241a690c0efcd9a146733fedf97",
+      "private": true
+    },
+    {
+      "report": "M4-C06-D-identities-20261025T172354-d1ec62.private.json",
+      "bytes": 7593,
+      "sha256": "93958d27d48ef2043ce822b0c7fc54fd5e85c066c29edd675a946da9b62261ce",
+      "private": true
+    },
+    {
+      "report": "M4-C06-D-inputs-20261025T172113-58be25.private.json",
+      "bytes": 18026,
+      "sha256": "935a0fca8aa70153196ebaed7d2b7f6d96c09c08a9de38cabf9b2e0539e8feec",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-ci-40214998195-8.4-1-full.log",
+      "bytes": 172268,
+      "sha256": "9ef6c335839db9b8d09932dc9e0cec67c9a48b5433682edfd9a986e1dd0adbca",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-ci-40214998195-8.4-1.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-green.xml",
+      "bytes": 2734,
+      "sha256": "76e42029ca06c1faf677641dc427c1c846974078df1b3d8b4009783bc0a75c49",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-red.xml",
+      "bytes": 23908,
+      "sha256": "28dbec4095b65a77c4635c56d56f71b639a8a7d4cb85021198b6438c9e0887be",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-1.log",
+      "bytes": 5857,
+      "sha256": "9752cba4575b204cb73df4d7faf6be55784bf8bfc942675078282270f0a4387f",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-1.xml",
+      "bytes": 40524,
+      "sha256": "6d09577e326a2c09278069d6110e597f79c2bc90e0b94cc754b4e481cf2ce725",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-2.log",
+      "bytes": 194,
+      "sha256": "78e9fc30d6a591b08fed05907f31f66d8a49b2c0843bf3e23f70641ce35917e4",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-2.xml",
+      "bytes": 33469,
+      "sha256": "a465658381e4ac1a26ad66b962cd18db92dfc4f481c1632528ffc2329f46115a",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-3.log",
+      "bytes": 1117,
+      "sha256": "ff810de6f2dbc4ca86752c93abc0fe32807156f894d10e0b16ee3ec20565e7f7",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-3.xml",
+      "bytes": 57216,
+      "sha256": "a596756e0158320a1327256db81d2ce3609cba335d520dfa600cab984713235e",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-4.log",
+      "bytes": 354,
+      "sha256": "b81e5983b38776d1908a317d68121685fdbbdc796db0ad87cecfb3eb05b95b7c",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-4.xml",
+      "bytes": 56613,
+      "sha256": "8e391c84b276f5bc976ec36aa571d639858de05225047d40bc8afcb317330fe5",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-5.log",
+      "bytes": 2113,
+      "sha256": "b5693a921457264c8a4372e747e7594cfb1efb5150a9b2402d0ddf2c082205d6",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-5.xml",
+      "bytes": 73555,
+      "sha256": "ffed1bf44aa7c7b983d6540932daa71ec8fa777779fb16520d97f8a5dabc09f6",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-6.log",
+      "bytes": 515,
+      "sha256": "306d780f4b7c0a4a71ba684fa5704bd2d9cd92bb9e545c94e417b9e8714ff257",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-regression-6.xml",
+      "bytes": 72253,
+      "sha256": "0948e26f26676bedfc32c67c893cc304feff26d78a6e57ae04d442904d29d4c4",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-stale-ci-force-cancel.json",
+      "bytes": 328,
+      "sha256": "b5e0c3a4290907228b9b306cad0183fd17c5cffda35ed32bbcd744b322128c92",
+      "private": true
+    },
+    {
+      "report": "m4-original-configured-identity-preview-20261026.private.json",
+      "bytes": 1379,
+      "sha256": "78f40b014a1aaf829f8f708b69020b8cedd98d780fa1f553ec171cbdc89109da",
+      "private": true
+    },
+    {
+      "report": "m4-source-batch-runtime-readonly-20261026.log",
+      "bytes": 420,
+      "sha256": "3163f6b8c51973566a975da8b0ddbbc113f649c2a43b92d71d0d2155c46b585d",
+      "private": true
+    },
+    {
+      "report": "qs-api-package-docs-1.log",
+      "bytes": 184,
+      "sha256": "20cbba0e66b594c3e61e8bc68ec1f3336680a3525df525c9d0355c7eccebf192",
+      "private": true
+    },
+    {
+      "report": "qs-api-package-docs-2.log",
+      "bytes": 469,
+      "sha256": "b0bfbb2a91b5523a1948ef9a4c42ae4e936bc4555aba2e5c3c2934fa7aad4f9d",
+      "private": true
+    },
+    {
+      "report": "qs-api-package-docs-3.log",
+      "bytes": 598,
+      "sha256": "cf361c3bf3a807894ab1f856a7db0dfcc0b82ba30eebb750dce043da5c756310",
+      "private": true
+    },
+    {
+      "report": "qs-api-package-green-1.log",
+      "bytes": 57,
+      "sha256": "416b112d07cbe9cd90256916c378c118c5aec4f22dfd9111eaf8379a373ef4a7",
+      "private": true
+    },
+    {
+      "report": "qs-api-package-red.log",
+      "bytes": 1414,
+      "sha256": "f0ab90d93305967985ff3e8aaecd1f7df10e349689dad41f9ea93a9edd1ed8fb",
+      "private": true
+    },
+    {
+      "report": "qs-api-package-regression-1.jsonl",
+      "bytes": 316860,
+      "sha256": "87d355e56cd1f0884509ed9db38f176baa6724d2681b7566c54a1034669ebe52",
+      "private": true
+    },
+    {
+      "report": "qs-api-package-regression-2.jsonl",
+      "bytes": 320870,
+      "sha256": "72cf46d772734bd573db02f2d46d6b61d75ee0478fd133228715c9291b81b447",
+      "private": true
+    },
+    {
+      "report": "qs-api-package-shell-1.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "private": true
+    },
+    {
+      "report": "qs-api-package-shell-2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "private": true
+    },
+    {
+      "report": "ai-final-mode-ci-225-checks.json",
+      "bytes": 1662,
+      "sha256": "d2f5bb71ea9dd8b9155e9a533c20f2bbf3b527e6a1f95c7b6360f5fb8d6cfa1e",
+      "private": true
+    },
+    {
+      "report": "qs-api-package-ci-446-checks.json",
+      "bytes": 4516,
+      "sha256": "8e34ab8015efa4c7221df87068b3f3bf7d6e789afccfbc2aaf5fff9753af6947",
+      "private": true
+    },
+    {
+      "report": "ai-final-ci-40215982232-all/aggregate-receipt.json",
+      "bytes": 3026,
+      "sha256": "5ec2a5e6466ac461be637963cdbe1eef98cdfa381524b15ac07d963f864dcb24",
+      "private": true
+    },
+    {
+      "report": "M4-C06-D-transports-20261025T173858-4c653d.private.json",
+      "bytes": 5942,
+      "sha256": "b884694179a9f2618745b69a9024b7dd55e58db3c4c5dbf8e3e4a67e51388436",
+      "private": true
     }
   ],
   "protected": [
@@ -456,7 +691,7 @@
     "NSQ retained volumes/containers/backups untouched",
     "Development and isolated NSQ remain available"
   ],
-  "updated_at": "2026-10-25T16:55:41.870247+00:00",
+  "updated_at": "2026-10-25T17:42:02.426809+00:00",
   "qs_trusted_reader": {
     "pr": 444,
     "head": "38a1534ebe171832240bd3e53dd431730305a972",
@@ -483,5 +718,178 @@
     "merge": "0c83378e2a65eaa60e0429b751a5af8f85d334b4",
     "ci_successful_checks": 32,
     "conditional_skipped_jobs": 1
-  }
+  },
+  "ai_final_only": {
+    "pr": 225,
+    "source_sha": "30c625385abde8f42832bae80dd593d610037177",
+    "fixture_sha": "f61925b5f075494f017e45900fdbdce3ac3f148c",
+    "head": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+    "local_pytest_passed": 387,
+    "local_failed": 0,
+    "local_skipped": 0,
+    "local_deselected": 10,
+    "deselected_reason": "Compose-specific cases remain required in complete CI; no local Docker container runtime used",
+    "docs_tests_passed": 12,
+    "mypy_src_files": 454,
+    "complete_ci_run": 40215982232,
+    "status": "12 complete CI checks successful; source merged; actual material reconstruction remains C06-D; not deployed",
+    "ci_provenance": {
+      "head_sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+      "tested_checkout_sha": "08457bc49346df99fdc0b14e799924765fd161f1",
+      "same_tree_sha": "a5a36ad493ea420e6ce7e7b4ee7823e99c834579",
+      "tested_checkout_parents": [
+        "20ceaae60df72d0e201a97039aab6f46722fb786",
+        "b2c1015beb292c22ff6ed48ea011f5b88fd1e732"
+      ],
+      "head_and_tested_checkout_tree_identical": true,
+      "merged_tree_sha": "a5a36ad493ea420e6ce7e7b4ee7823e99c834579"
+    },
+    "merge": "eaa22cd92828d7f1c0286339e620c6c087763e0c",
+    "ci_successful_checks": 12,
+    "pytest_matrix": {
+      "run": 40215982232,
+      "head_sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+      "tested_checkout_sha": "08457bc49346df99fdc0b14e799924765fd161f1",
+      "same_tree_sha": "a5a36ad493ea420e6ce7e7b4ee7823e99c834579",
+      "unique_cases_per_mysql": 5703,
+      "total_executions": 11406,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "same_unique_junit_case_sets": true,
+      "actual_environment_dollar_case_per_mysql": {
+        "8.0.36": 1,
+        "8.4": 1
+      },
+      "partitions": [
+        {
+          "mysql": "8.0.36",
+          "partition": 0,
+          "cases": 1426,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "xml_sha256": "376e6a2fc6040bb046ee9ea9fd6a7fa750a3b73b2955e02c6664a1ee079f6435",
+          "manifest_sha256": "f03137d6aac0338210158368a7e10432378b793679777e217a201c0636c181e3"
+        },
+        {
+          "mysql": "8.0.36",
+          "partition": 1,
+          "cases": 1426,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "xml_sha256": "0d49afc8227b1076e19a6a11ad4401d222e90231ef5f8f0af5ce2e7ab05ab644",
+          "manifest_sha256": "56f5c4e50126e96cab48a94685134d95dd096729b06dae5e05069113d79ed1c9"
+        },
+        {
+          "mysql": "8.0.36",
+          "partition": 2,
+          "cases": 1426,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "xml_sha256": "c1c7c54ce86b6cf756f49f20e5bf8f53327a7ef42374dd07b9b171156cfede10",
+          "manifest_sha256": "90c3437f2db770d4cf6faf2028f81c84038fb2061deaaf77b3dce9b3c78daa60"
+        },
+        {
+          "mysql": "8.0.36",
+          "partition": 3,
+          "cases": 1425,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "xml_sha256": "acd51effa2132c93440a945eef1d26c35de2cfaea329c243f589114ebabd4884",
+          "manifest_sha256": "69a01a643fb1e63f9b1f7284c8ef6b327858636cf8e64be2cf40759a96983ccf"
+        },
+        {
+          "mysql": "8.4",
+          "partition": 0,
+          "cases": 1426,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "xml_sha256": "6e368bc9c119fc6792c747cb75da085f5fdbe77be73278399fc5fcaabde9cf62",
+          "manifest_sha256": "c29aeb0ec079ad0bcae8f4a21ca19a4e9475305869d8b3a3c325845256f174d7"
+        },
+        {
+          "mysql": "8.4",
+          "partition": 1,
+          "cases": 1426,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "xml_sha256": "53c64d998f0eefbf56ba82cbf8e6f9707693a5a782609526e17f430bbb9c8ac6",
+          "manifest_sha256": "880f009eced8816e9c43e5e5114dd8c07de8ad09f35a62c3e45337a150b22578"
+        },
+        {
+          "mysql": "8.4",
+          "partition": 2,
+          "cases": 1426,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "xml_sha256": "1014146543996d34481a70d656ecba0052d18cf047af8d961fe11369a3fb7b7a",
+          "manifest_sha256": "2fcae9212603a5f96ea91843722733907944817cbd19328d2c25633a59d6e139"
+        },
+        {
+          "mysql": "8.4",
+          "partition": 3,
+          "cases": 1425,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "xml_sha256": "2f5fd48ef51bd4269632f5ab9fcc94521cf02da2c476c5eb0635922fe1aebf38",
+          "manifest_sha256": "47c12401fb341d46a44a317fbd49d55798a57169b28fb2842c8ed456c2f0b1ae"
+        }
+      ]
+    }
+  },
+  "qs_api_package": {
+    "pr": 446,
+    "source_sha": "7893e9a1c1adaad703bcac432ba5546b4c8a2953",
+    "head": "cf715f6d0363be227733d1336d308d18a9eea6cd",
+    "local_go_test_events_passed": 249,
+    "local_failed": 0,
+    "local_skipped": 0,
+    "docs_tests_passed": 88,
+    "shell_package_cases": "API/collection/consumer-only worker and Redis TLS refusal",
+    "status": "source package merged; complete API host/AI bridge/private material reconstruction remains pending; not deployed",
+    "merge": "5480895b8a3f7a11f06489f8b2ccbeea585fcf39",
+    "ci_successful_checks": 29,
+    "conditional_skipped_jobs": 1
+  },
+  "c06_d_readonly_inputs": {
+    "roles": 8,
+    "owners_configured": 4,
+    "actual_mount_inventory_sha256": "935a0fca8aa70153196ebaed7d2b7f6d96c09c08a9de38cabf9b2e0539e8feec",
+    "configured_identity_inventory_sha256": "93958d27d48ef2043ce822b0c7fc54fd5e85c066c29edd675a946da9b62261ce",
+    "identity_preview_sha256": "78f40b014a1aaf829f8f708b69020b8cedd98d780fa1f553ec171cbdc89109da",
+    "new_candidate_reconstruction_complete": false,
+    "installed": false,
+    "transport_file_instances": 19,
+    "transport_files_sha256": "b884694179a9f2618745b69a9024b7dd55e58db3c4c5dbf8e3e4a67e51388436"
+  },
+  "production_readonly_refresh": {
+    "checked_at": "2026-10-25T17:16:53.367260+00:00",
+    "app_instances_healthy": 8,
+    "owners_ready": 4,
+    "monitor_targets_up": 10,
+    "public_health_200_tls": 4,
+    "serverD_available_MiB": 1236,
+    "restarts_or_writes": false,
+    "is_48h_observation": false,
+    "automatic_cd_paused": {
+      "IAM": true,
+      "QS": true,
+      "AI": true
+    },
+    "ai_pause_flag_name": "AUTO_DEPLOY_ENABLED",
+    "raw_pause_values": {
+      "PRODUCTION_DEPLOY_PAUSED_IAM": "true",
+      "PRODUCTION_DEPLOY_PAUSED_QS": "true",
+      "AUTO_DEPLOY_ENABLED_AI": "false"
+    }
+  },
+  "raw_report_policy": "Raw stdout can be empty; it is not case-count evidence. Required structured Go/JUnit/shard reports are nonempty and separately counted."
 }
