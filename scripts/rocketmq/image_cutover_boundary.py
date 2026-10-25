@@ -1,6 +1,6 @@
 """CI-only actual-image C1 adapter; no production inputs or authorization.
 
-The caller must supply real protection/restore evidence and frozen seven-process
+The caller must supply real protection/restore evidence and frozen eight-process
 specifications. This adapter neither migrates nor restores any database.
 """
 from datetime import datetime, timezone
@@ -22,7 +22,7 @@ from image_start_fixture import IMAGE_PROVENANCE, require
 import runtime_start
 from start_boundary import Boundary, BoundaryError, _encoded, initialize
 
-COMPONENTS = ('iam', 'ai', 'api', 'collection', 'worker1', 'worker2', 'worker3')
+COMPONENTS = ('iam', 'ai', 'api', 'collection', 'collection2', 'worker1', 'worker2', 'worker3')
 IMAGE_TARGETS = dict(iam='iam', ai='ai', api='qs-api', collection='qs-collection', worker='qs-worker')
 RUNTIME_INPUTS = {
     'iam': ('runtime.json', 'routes.json', 'mq-ca.crt', 'service-ca.crt', 'iam-apiserver.crt', 'iam-apiserver.key', 'iam-credentials.json'),
@@ -72,9 +72,9 @@ def private_input_hashes(fixture):
 def startup_receipt(path):
     raw = path.read_bytes(); require(len(raw) < 1024 * 1024, 'bounded_startup_receipt_required')
     value = json.loads(raw)
-    require(value['schema'] == 'm3-five-actual-image-startup-trial/v3'
-            and (value['passed'], value['failed'], value['skipped']) == (15, 0, 0)
-            and len(value['cases']) == 15 and all(v is True for v in value['cases'].values())
+    require(value['schema'] == 'm3-five-actual-image-startup-trial/v4'
+            and (value['passed'], value['failed'], value['skipped']) == (16, 0, 0)
+            and len(value['cases']) == 16 and all(v is True for v in value['cases'].values())
             and value['sources'] == SOURCES and value['sources_unchanged'] is True
             and value['mysql_runtime_ddl_attempts'] == value['mongo_runtime_ddl_attempts'] == 0
             and value['mongo_ddl_audit']['positive_controls'] == 4
@@ -92,6 +92,11 @@ def startup_receipt(path):
             and all(p['state'] == dict(Status='exited', ExitCode=0, OOMKilled=False) for p in value['processes'].values())
             and all(value['cleanup'].get(k) is True for k in ('compose_down_succeeded', 'private_directory_removed', 'existing_containers_unchanged', 'existing_networks_unchanged')),
             'all_actual_processes_and_cleanup_required')
+    expected_budgets = {name:dict(memory_bytes=memory*1024*1024,nano_cpus=int(cpu*1_000_000_000))
+        for name,memory,cpu in (('iam',1024,1),('ai',768,0.75),('api',1024,2),
+            ('collection',320,1),('collection2',320,1),('worker1',768,1),('worker2',768,1),('worker3',768,1))}
+    require(value.get('actual_runtime_budgets') == expected_budgets, 'actual_production_replica_and_resource_budgets_required')
+    require(value.get('dependency_versions') == dict(mysql='8.0.36',mongo='7.0.31'), 'actual_production_database_versions_required')
     require(set(value['candidates']) == set(IMAGE_TARGETS.values()), 'all_five_actual_candidates_required')
     for target, candidate in value['candidates'].items():
         source = SOURCES['iam' if target == 'iam' else 'ai' if target == 'ai' else 'qs']
@@ -150,7 +155,7 @@ class ActualImageBoundary:
         self.window_started_wall = datetime.now(timezone.utc)
         self.f = fixture; self.root = fixture.directory; self.directory = self.root / 'actual-cutover'; self.plans = {}
         self.specs = json.loads(json.dumps(specs))
-        require(set(scope) == {'iam.mysql', 'qs.mysql', 'qs.mongo', 'ai.mysql'} and set(specs) == set(COMPONENTS), 'complete_four_store_seven_process_scope_required')
+        require(set(scope) == {'iam.mysql', 'qs.mysql', 'qs.mongo', 'ai.mysql'} and set(specs) == set(COMPONENTS), 'complete_four_store_eight_process_scope_required')
         require(not fixture.applications, 'no_actual_runtime_before_coordinator_required')
         for owner, selected in scope.items():
             require(isinstance(selected, dict) and set(selected) == {'database', 'identity_sha256', 'store_id', 'writer_epoch', 'route_revision'}, 'exact_selected_store_identity_required')
@@ -175,7 +180,7 @@ class ActualImageBoundary:
         compose = dict(services={}, networks={'owned': dict(external=True, name=fixture.network)})
         for component in COMPONENTS:
             spec = specs[component]
-            image_component = 'worker' if component.startswith('worker') else component
+            image_component = 'worker' if component.startswith('worker') else 'collection' if component == 'collection2' else component
             reference = fixture.images[image_component]
             require(runtime_start.IMAGE.fullmatch(reference), 'immutable_owned_image_required')
             private = fixture.private_dirs[image_component]
@@ -231,7 +236,7 @@ class ActualImageBoundary:
         self.f.applications[component] = self.f.project + '-' + component
 
     def finish(self):
-        require(self.started == set(COMPONENTS), 'all_seven_actual_starts_required')
+        require(self.started == set(COMPONENTS), 'all_eight_actual_starts_required')
         require(time.monotonic() - self.window_started < 1800, 'actual_thirty_minute_window_exceeded')
         refused = []
         with Boundary(self.directory, self.binding_sha) as operation:
@@ -243,7 +248,7 @@ class ActualImageBoundary:
             status = operation.status()
             require(not status['old_data_restore_eligible'], 'old_restore_eligibility_must_remain_closed')
         require(all(Path(p).stat().st_ino == inode for p, inode in self.lock_inodes.items()), 'owned_lock_inode_changed')
-        return dict(coordinator_binding_sha256=self.binding_sha, actual_processes=7, poststart_refused=refused,
+        return dict(coordinator_binding_sha256=self.binding_sha, actual_processes=len(self.started), poststart_refused=refused,
             elapsed_seconds=time.monotonic() - self.window_started, phase=status['phase'], production_authorized=False)
 
     def status(self):
