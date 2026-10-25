@@ -1,0 +1,204 @@
+{
+  "schema": "rocketmq-m4-c06-progress-v1",
+  "recorded_at": "2026-10-25T15:56:19.152827+00:00",
+  "scope": "Source and isolated verification only; no M4 production installation or data deletion",
+  "formal_progress": {
+    "completed": 1,
+    "total": 8
+  },
+  "c06_subgates": {
+    "completed": 1,
+    "total": 4
+  },
+  "infra": {
+    "pr": 301,
+    "head": "778ffec5d3026b333bc7001e26f9d77baadbbc25",
+    "merge": "06fa8bbfd0d1309a859af524542549e76bbeb1ba",
+    "ci_successful_checks": 35,
+    "status": "merged; C06-A complete",
+    "progress_pr": 302,
+    "progress_merge": "862be1c45d8da62453b5cab61474f28d2bc27115"
+  },
+  "iam": {
+    "pr": 151,
+    "head": "c5641f76b5ca4a4dc14fe8490ac21966fe0b5748",
+    "merge": "30e6327bff83ec09d11a6c04e8e9f9268832df34",
+    "ci_successful_checks": 8,
+    "local_go_test_events_passed": 140,
+    "local_go_failed": 0,
+    "local_go_skipped": 0,
+    "post_merge_cd_run": 40208708651,
+    "image_build": "success",
+    "production_deploy": "skipped",
+    "status": "IAM C06-B component merged; actual material paths and full reconstruction pending"
+  },
+  "ai": {
+    "pr": 224,
+    "head": "9719a6f8c8b9dcbaa89bf8fce710bc9ac6ed541e",
+    "local_pytest_passed": 149,
+    "local_pytest_failed": 0,
+    "local_pytest_skipped": 0,
+    "local_pytest_deselected": 2,
+    "deselected_reason": "Two real Docker Compose cases are mandatory in full CI; no local Docker runtime used",
+    "mypy_src_files": 454,
+    "status": "full CI pending; not merged or deployed"
+  },
+  "qs_worker": {
+    "pr": 443,
+    "head": "8a4501dca5495a013d88dea721b6f4a7ce1b664d",
+    "source_baseline": "4d871f4974e95186f50071590a8bec88e60cbade",
+    "local_go_test_events_passed": 32,
+    "local_go_failed": 0,
+    "local_go_skipped": 0,
+    "regressions": {
+      "ai_release": 14,
+      "registry": 4,
+      "retention": 16,
+      "deploy_lock": 6,
+      "network_static_guard": "passed",
+      "api_collection_worker_package": "passed",
+      "docs_facts_and_hygiene": "passed"
+    },
+    "status": "required real Compose/full CI pending; not merged or deployed"
+  },
+  "retained_failures": [
+    {
+      "id": "iam-compose-normalized-false",
+      "reason": "Normalized Compose JSON omits create_host_path=false; original test indexed a missing key",
+      "disposition": "Use effective false semantics; explicit source false retained; rerun passed in PR151"
+    },
+    {
+      "id": "ai-compose-normalized-scalar",
+      "reason": "Compose represents memory/cpu as strings; original test compared numeric types",
+      "disposition": "Explicit numeric comparison; actual 768MiB/0.75CPU unchanged; full CI rerun pending"
+    },
+    {
+      "id": "qs-catalog-classification",
+      "reason": "Actual QS loader rejects an invented transaction delivery classification; current transaction adapter reuses durable_outbox",
+      "disposition": "Uncommitted invented catalog removed; current catalog and reliable event set retained; decoder test passed"
+    },
+    {
+      "id": "qs-registry-fixture-service",
+      "reason": "Isolated function fixture omitted SERVICE required by the real metadata entrypoint",
+      "disposition": "Model explicit API/worker service; both exact image and worker revision tests pass"
+    }
+  ],
+  "remaining": [
+    "QS API dual-owner/AI bridge/IAM subscription packaging",
+    "AI final-only production option cleanup",
+    "Actual original identities, private asset paths and all eight role reconstruction",
+    "C02-C05 runtime/reader and retained responsibility cleanup",
+    "C07 approved retention/disposition and C08 complete regression"
+  ],
+  "raw_reports": [
+    {
+      "report": "m4-iam-C06-package-baseline.jsonl",
+      "bytes": 41954,
+      "sha256": "9f1bc3e48de7ca297b9bf5242c492e91cbe194a52f7b0128049974f4291f7a70",
+      "private": true
+    },
+    {
+      "report": "m4-iam-C06-transaction-red.out",
+      "bytes": 359,
+      "sha256": "84ca7beb3de7c955dab4a7c3c331f2b9f8a181947d91350d8fd28bc1362f2127",
+      "private": true
+    },
+    {
+      "report": "m4-iam-C06-package-race-final.jsonl",
+      "bytes": 137332,
+      "sha256": "78eefd52534e2472de0f0bd7ae72f30081c7a441153add7797649eaa756262f7",
+      "private": true
+    },
+    {
+      "report": "m4-iam-C06-compose-ci-failure.log",
+      "bytes": 12583,
+      "sha256": "72dedb6f6d53a080ab13b6ea287007cc136339abd80b4de37e53488f12708ff6",
+      "private": true
+    },
+    {
+      "report": "m4-ai-C06-final-package-regression.xml",
+      "bytes": 37633,
+      "sha256": "55cc8bdf62128783767cf0366a91a0efde8d058a9d20124065bfec33121cde73",
+      "private": true
+    },
+    {
+      "report": "m4-ai-C06-route-preflight-red.out",
+      "bytes": 12491,
+      "sha256": "9fe889716c632de5cff547b822f738ddf30a0294617136d845ab275e2516e1fc",
+      "private": true
+    },
+    {
+      "report": "m4-ai-C06-binding-ci-failure.log",
+      "bytes": 161239,
+      "sha256": "b4dafbb5d28644fdbb6678a9e3211f2c7c2bcbb18df5cd9f0a51f7941a432359",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-worker-package-red.out",
+      "bytes": 1270,
+      "sha256": "c0357fd7c664265fab8c5ce983534681bcc298200c6b3cbb40b9e4a805a1cca3",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-worker-package-green.jsonl",
+      "bytes": 7038,
+      "sha256": "f2c4addb1054c5b8a02b3058f0c46debbc7851ac764a513f3227eaeceb58700a",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-worker-race-final.jsonl",
+      "bytes": 43925,
+      "sha256": "c4f6648f56264f07fcbdd008892e62d0d5ee6fda4cee8f5490cf6fc5420d2259",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-registry-regression.out",
+      "bytes": 805,
+      "sha256": "1164f060fd1cc57282a51efa52e2879a0bdf6abbfbabf46886431858c4ca41b9",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-registry-regression-green.out",
+      "bytes": 102,
+      "sha256": "948f69787b5f707a7efaaf637109b01fd30f4e9a6fa3ad37c81c238ec6c7215d",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-package-regression.out",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-ai-release-regression.out",
+      "bytes": 2586,
+      "sha256": "1f220cc7bbae2cc03e285dad9910299c8938b4d58be7e654a4c6b79982c00856",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-retention-regression.out",
+      "bytes": 115,
+      "sha256": "e99e9dcfb2cc454775d532dee5cf99ea85295938e649de72c869726bdde1dbef",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-lock-regression.out",
+      "bytes": 104,
+      "sha256": "9108e9e5e1d9a750228610a4d4ed4a7e08b035b32eede818ba75cf0b583c8435",
+      "private": true
+    },
+    {
+      "report": "m4-qs-C06-network-regression-final.out",
+      "bytes": 73,
+      "sha256": "1818e1781bb3f2d6c501b051bc1da3aae784765ff306f802979a7c686b062071",
+      "private": true
+    }
+  ],
+  "protected": [
+    "Production runtime/Broker/database unchanged in this batch",
+    "Production CD stays paused",
+    "No new SDK release",
+    "NSQ retained volumes/containers/backups untouched",
+    "Development and isolated NSQ remain available"
+  ]
+}
