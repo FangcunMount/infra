@@ -40,7 +40,7 @@ T25-D 按新首发范围冻结候选并组合验证原 NSQ 排空、未来计划
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
 - 2026-10-25最新：原Broker恢复与管理员轮换已全部完成。infra275精确96073318的12项源码CI通过并合并d91e88c2；隔离16/0/0。新的完整冷备份逐成员核验及Mac mini副本SHA一致后，原CID启动、真实更新管理员、原三inode持久化、一次计划重启及“新成功→旧CODE16→新成功”均通过。原Topic/group/ACL和其它全部容器保持，Broker无OOM/自动重启；Mac mini最终重启后的4个target全部up。[生产恢复回执](evidence/rocketmq-m3-broker-admin-recovery-complete-20261025.json)。用户继续类似恢复的授权已落实，本次没有再次中断确认。
-- 当前批次：**32/36，生产入口仍处于维护，T33未完成**。三库升级/四owner绑定、一次MySQL轮换及三库Secrets同步已完成。原锁适配和worker本机私网连接修正后，封写阶段实际四owner/10目标曾全部就绪；验收配置误将消费专用worker的发布开关置true，触发旧Outbox保护并重启。修正已准备但未执行，维护延长确认待用户回复；未开放入口、未提交问卷、未开始48小时观察。[当前回执](evidence/rocketmq-m3-startup-repair-pending-20261025.json)。
+- 当前批次：**32/36，T33进行中，公网仍维护**。用户批准首轮延长后已修正worker消费专用配置；正确网络命名空间下三worker健康/就绪均200、无重启，四owner及10目标就绪。用户本次唯一新答卷已核对V2提交、evaluated/Outcome和generated报告的事务证据。报告为factor-scoring规则报告，不触发AI；IAM空角色/双订阅与独立AI业务仍未通过。已提出先完成IAM再开放、AI开放后继续的顺序调整，未获批准前不执行；T33及48小时观察不提前打勾。[本次验收证据](evidence/rocketmq-m3-system-answer-core-20261025.json)。
 
 
 ### T29 收口分项（同一正式任务，5/5已完成）
@@ -262,7 +262,7 @@ v2 route_revision=m3-1，四 owner 使用精确 DB/账号/Topic 绑定；NORMAL 
 | ✅ | T30 | 105前置、真实库/运行基线及具名生产清单 | 2026-10-25；用户明确“批准按两份清单执行”，原105范围/PL-R007移交、主机/双库clean基线及固定配置已核对；[批准回执](evidence/rocketmq-m3-production-approval-20261025.json)。批准含窗口前有界准备，填写端身份未就绪前不得停写；不代签TaskID移交或业务验收 |
 | ✅ | T31 | 回读生产v2资源/配置与Mac mini告警，保持封准入 | 2026-10-25；原provision完成53操作、10 Topic/5账号并严格回读，旧10 Topic/12 Group/9用户保持、总用户14；v2配置90文件已验证预置未启用。Mac mini8告警7项实际核验通过、HUP后旧规则/配置/容器保持、4必要target up，私网TLS指纹匹配。[生产证据](evidence/rocketmq-m3-production-resources-monitoring-20261025.json)。新业务runtime未启动、旧NSQ准入未变 |
 | ✅ | T32 | 排空、交接、同窗口保护及显式离线迁移 | 第二窗口：原八实例停机后责任为0；MySQL/Mongo/NSQ当次保护及mini三副本通过；IAM45、QS110/44、AI0043和四owner绑定验证完成，先于首次启动屏障。[正式回执](evidence/rocketmq-m3-production-offline-completed-20261025.json)。首次profiler失败/恢复证据保留 |
-| ☐ | T33 | 最终镜像/Checker/消费者/system验收及恢复准入 | **受阻，等待维护延长确认**：封写阶段曾10/10就绪；验收配置误开worker发布导致旧Outbox保护拒绝，已准备消费专用配置修正但未执行。入口仍维护、system/问卷/观察未开始 |
+| ☐ | T33 | 最终镜像/Checker/消费者/system验收及恢复准入 | **进行中，剩余门禁调整待确认**：worker消费专用修正后正确网络下3/3健康就绪、4owner/10目标通过；唯一新V2答卷、评分/Outcome、规则报告及事务证据已核对。IAM空角色/双订阅、独立AI业务和恢复入口未完成，观察未开始 |
 | ☐ | T34 | 连续48小时业务/回执/积压/资源观察 | 待开始 |
 | ☐ | T35 | 旧生产写者/Relay/调度及NSQ活动责任退出，停止并阻止自动重启 | 待开始；保留容器/卷/配置和证据，代码及物理资产清理移交M4-C02/C06/C07 |
 | ☐ | T36 | M3源码合并、生产发布索引、业务/观察验收与M4具名移交 | 待开始；完整废弃依赖/历史实现审计另属M4-C08 |
@@ -2388,3 +2388,12 @@ Mongo官方工具不恢复`system.profile`文档，原“删除整qs库再导入
 原serverD转发链拒绝本机worker专用Docker桥到私网Broker8081的连接；增加仅该既有专用网桥/精确私网目标/8081的规则，其余原规则和5557均保持。封写阶段已实际验证四owner就绪、10/10监控up，不能把这份历史采样冒充后续验收就绪。
 
 切换验收配置后发现第二个准备错误：worker的`messaging.rocketmq.publish_enabled`被统一置true，而已冻结职责为只消费。原宿主正确拒绝使用旧Outbox wire publisher处理事务路由。逐项比较配置，仅这一boolean不同；已准备复用此前验证通过的消费专用配置，镜像/数据库/资源/事务owner均不变，尚未执行。问卷未提交，没有借故补发事件或重做模型。原30分钟已到，已请求用户确认延长15分钟；未收到答复不视为批准，也不开放未经业务验收的入口。当前T33不勾选，M3保持32/36，48小时观察未开始。
+
+
+### T33：worker修正与真实新答卷核心验收通过；剩余开放顺序待确认
+
+用户明确批准将首轮维护延至20:20:53。实际沿原Boundary部署已有、已冻结的消费专用worker配置（publish_enabled=false、无事务owner），不更换镜像、数据库或原3副本/768MiB/1CPU/并发48预算。严格检查首次因从宿主直连Swarm Overlay地址而失败；实际进程无重启，改从对应进程网络命名空间检查后3台healthz/readyz均200，四owner就绪、10目标up，原失败证据保留。不得把这个探针错误写成修正后worker仍崩溃。
+
+基于明确延长批准，临时验收例外按实际激活时间和批准截止生成，原T0未重置；其已到期，公网未恢复。用户沿原合法小程序回复“已提交”，操作器未代交、未重复提交。精确原DomainID关联一份V2新答卷、evaluated Assessment、一个Outcome和一个generated报告；提交及报告生成均有新事务证据，QS MySQL两项Committed/CommitConfirmed记录另有私有只读证据。初始按created_at查不到，是原BaseDocument写零时间导致，已改用DomainID/原提交证据核验，未修改数据；该时间字段异常留作后续审计候选。
+
+该报告的builder为factor-scoring，QS/AI新档案为0，故不冒称AI链路通过。IAM角色管理页已由正常system会话打开，仅填一份空角色表单，尚未确认创建、未赋权或分配。为缩短停机，已提出“从用户确认起最多再维护10分钟，IAM空角色/双订阅通过后恢复入口，AI独立用例开放后继续”的具名顺序修订，替代此前固定20:30:53请求；这是待批准提案，不是已有授权。未获答复前不执行新的入口开放，T33不勾选、48小时不开始。
