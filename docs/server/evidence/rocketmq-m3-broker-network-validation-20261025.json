@@ -59,7 +59,7 @@
   "run_url": "https://github.com/FangcunMount/infra/actions/runs/40157748699",
   "source_sha": "ac3044f5dba8c79946b57e679b63f5b34ce663d7",
   "source_pr": 272,
-  "source_merged": false,
+  "source_merged": true,
   "report_sha256": "634c4ff3580e19b0760e05e7c8c0cca0ff182ba6182e0c54b0a01bf204b7548e",
   "pure_guard_tests": 4,
   "all_pure_tests": 353,
@@ -73,5 +73,77 @@
     "reason": "missing-network failure reproduced; stopped pending endpoint NetworkID is empty until sandbox startup; prestart guard incorrectly required live ID",
     "report_sha256": "5e1f170c841b8a8a5823f05c5570961784ebbbb6244ba1058733c0a9b73aa70c",
     "original_report_modified": false
-  }
+  },
+  "source_merge_sha": "aeb6784175d4e8cd1e274e1308896b878957be9f",
+  "source_checks_success": 11,
+  "source_checks_failed": 0,
+  "source_checks_pending": 0,
+  "source_checks": [
+    {
+      "name": "acceptance",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748763/job/121062853843",
+      "workflowName": "RocketMQ Docker acceptance"
+    },
+    {
+      "name": "resources",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748727/job/121062850079",
+      "workflowName": "RocketMQ M3 final resource candidate"
+    },
+    {
+      "name": "rotation",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748706/job/121062655232",
+      "workflowName": "RocketMQ admin rotation isolated validation"
+    },
+    {
+      "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748673/job/121062850769",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "name": "recovery",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748699/job/121062654974",
+      "workflowName": "RocketMQ missing endpoint recovery validation"
+    },
+    {
+      "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748700/job/121062853686",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "name": "sdk (1.25.9, 3.11, mysql:8.0.36)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748705/job/121062852108",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748673/job/121062850757",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    },
+    {
+      "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748700/job/121062853884",
+      "workflowName": "RocketMQ packet transaction faults"
+    },
+    {
+      "name": "sdk (1.25.12, 3.13, mysql:8.4)",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748705/job/121062852345",
+      "workflowName": "RocketMQ public transaction SDK"
+    },
+    {
+      "name": "native-index-audit",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/FangcunMount/infra/actions/runs/40157748673/job/121062850773",
+      "workflowName": "RocketMQ complete transaction acceptance"
+    }
+  ]
 }

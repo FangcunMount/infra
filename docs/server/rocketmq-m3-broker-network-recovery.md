@@ -35,7 +35,7 @@ network为`rocketmq_rocketmq`、bridge/local、172.22.0.0/16，既有NameServer�
 
 ## 验证与失败边界
 
-[隔离真实验证](evidence/rocketmq-m3-broker-network-validation-20261025.json)40157748699为**12/0/0**：确实断开原fixture网络并复现MixAll栈溢出，再接回同一bridge/原CID，验证健康、无自动重启并完成原密码更换全链。4项新增纯契约及合计353纯测试通过。首轮隔离验证在接回后的停机prepared endpoint校验失败，已区分prepared/live后复验；原失败保留。infra272其余源码CI/合并待完成，全部通过并合并后才允许执行。
+[隔离真实验证](evidence/rocketmq-m3-broker-network-validation-20261025.json)40157748699为**12/0/0**：确实断开原fixture网络并复现MixAll栈溢出，再接回同一bridge/原CID，验证健康、无自动重启并完成原密码更换全链。4项新增纯契约及合计353纯测试通过。首轮隔离验证在接回后的停机prepared endpoint校验失败，已区分prepared/live后复验；原失败保留。infra272精确ac3044f5的11项源码CI全部成功，已正常合并aeb67841；代码/验证门禁已具备，生产网络修复和再次启动仍等待追加具名批准。
 
 本次新增connect和第二次人工启动超出infra269原清单的一次启动/失败即停边界，因此需要追加具名确认。CI和测试成功均不代替生产批准。
 

@@ -33,7 +33,7 @@ T25-D 按新首发范围冻结候选并组合验证原 NSQ 排空、未来计划
 - 源码/制品：Go v0.5.0、Python 0.4.0已按同一SDK源码1345266固定发布；三库稳定依赖已合并，T29辅助infra253已合并1465a129。此前预发布及T24保护证据保留为历史。生产部署/DDL/Topic/ACL/provider切换、Mac mini生产规则加载、合法system与48小时观察仍未执行。
 - 生产前置：QS MySQL 105（旧 Task entry_token 退役）须独立完成原有保护、恢复及验收。源码开发不受阻；T30 及后续生产任务受此门禁约束，不把 105 上线伪装成本批完成项。
 - 运行事实使用执行时的只读核验，不从 main、CI 或部署文档推断生产已升级。
-- 2026-10-25最新：五种受验镜像已固定发布既有ACR，交付与源码门禁已合并。用户批准269原Broker恢复后，完整冷备份和Mac mini副本核对已完成；一次人工启动因原容器预存空Docker网络而失败并发生11次自动重启，现已按案停止，未更换密码。冷备份源、三配置和其它容器保持。新增原Docker endpoint修复/受控重试清单待追加确认，隔离修复链12/0/0通过，源码其余CI/合并另收口。
+- 2026-10-25最新：五种受验镜像已固定发布既有ACR，交付与源码门禁已合并。用户批准269原Broker恢复后，完整冷备份和Mac mini副本核对已完成；一次人工启动因原容器预存空Docker网络而失败并发生11次自动重启，现已按案停止，未更换密码。冷备份源、三配置和其它容器保持。新增原Docker endpoint修复/受控重试清单待追加确认，隔离修复链12/0/0和完整11项源码CI已通过，infra272已合并；追加生产网络修复/重试待确认。
 - 当前批次：**T01–T28完成，T29内部4/5，M3为28/36**。五镜像/实际八进程/完整C1与ACR交付均已核验。T29-E仍待Broker有效参数和最终实际配置/执行包；原批准恢复首轮已安全停止，追加Docker原网络修复需按新清单确认。M3业务切换、system及48小时未开始。
 
 
@@ -2266,3 +2266,10 @@ infra268精确76906037的10项CI全部成功，已正常合并63b5cc0b；原真�
 直接原因是原容器在本次操作前已无任何Docker endpoint，而HostConfig.NetworkMode仍指原rocketmq_rocketmq，NameServer在原bridge健康；何时/为何endpoint丢失未知。启动前未阻断空网络、健康等待未拒绝Running=true的Restarting/计数递增，是本次执行守卫遗漏；infra272新增这两个门禁，只生成对原停机CID/原既有bridge的连接命令，不隐式修复生产。
 
 [隔离复验40157748699](evidence/rocketmq-m3-broker-network-validation-20261025.json)实际12/0/0：复现断网栈溢出→原CID/网络修复健康→真实密码更换全链，4新增/总353纯契约通过。首次隔离接回后的prepared endpoint校验失败保留，区分prepared/live后复验；其它源码CI/合并仍待收口。[新具名清单](rocketmq-m3-broker-network-recovery.md)追加Docker network connect和一次人工重试，超出原单次启动/失败即停边界，尚未执行，须追加确认。M3仍28/36、T29内部4/5；未进行业务切换/DDL/Topic/ACL/provider变更或system/48小时。
+
+
+#### 原网络修复代码与门禁已收口，等待追加具名批准
+
+infra272精确ac3044f5的11项CI全部成功，正常合并aeb6784175d4e8cd1e274e1308896b878957be9f；12/0/0真实断网复现/原endpoint恢复/真实密码更换链及353纯测试保留，[证据](evidence/rocketmq-m3-broker-network-validation-20261025.json)回填精确检查和合并状态。实际v1失败与两份完整冷备份均保留，首次隔离prepared/live校验失败也保留。
+
+新v2[固定计划](evidence/rocketmq-m3-broker-network-recovery-plan-20261025.json)SHA-256为`385a5e5233f5c9d0b97fb5ff838e2c23ff0c199c309471c671a3594ccddce4ed`，明确原bridge/CID/aliases、代码指纹和备份复用条件。生产尚未执行network connect或第二次人工启动；Broker停机、原密码未改，三个worker最后回读仍up。原269授权只覆盖一次启动及失败停止，追加动作须按新具名清单确认。M3仍28/36、T29内部4/5。
