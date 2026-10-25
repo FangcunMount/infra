@@ -1,0 +1,32 @@
+name: RocketMQ admin rotation isolated validation
+on:
+  pull_request:
+    paths:
+      - scripts/rocketmq/admin_rotation.py
+      - scripts/rocketmq/test_admin_rotation.py
+      - scripts/rocketmq/admin_rotation_probe.py
+      - .github/workflows/rocketmq-admin-rotation.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rotation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pure drift, unknown result and failure contracts
+        run: python3 -m unittest discover -s scripts/rocketmq -p test_admin_rotation.py
+      - name: Verify pinned official 5.5.1 archive and build owned Broker
+        run: |
+          bash scripts/rocketmq/fetch-release.sh
+          docker build -t rocketmq-m3-image-start:5.5.1 components/rocketmq
+      - name: Actual admin rotation, restart and fresh old credential rejection
+        run: python3 scripts/rocketmq/admin_rotation_probe.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m3-admin-rotation-${{ github.run_id }}
+          path: admin-rotation-probe.json
+          if-no-files-found: error
+          retention-days: 30
