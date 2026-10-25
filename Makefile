@@ -241,7 +241,7 @@ help: ## 显示帮助信息
 	@echo "   $(CYAN)serverA-up/down$(RESET)      ServerA 服务栈管理"
 	@echo "   $(CYAN)serverB-up/down$(RESET)      ServerB 服务栈管理"
 	@echo "   $(CYAN)serverC-up/down$(RESET)      ServerC 服务栈管理"
-	@echo "   $(CYAN)serverD-up/down$(RESET)      ServerD 服务栈管理"
+	@echo "   $(CYAN)rocketmq-up/stop$(RESET)      ServerD RocketMQ 独立栈管理"
 	@echo "   $(CYAN)server-info$(RESET)          显示当前服务器架构"
 	@echo ""
 	@echo "$(YELLOW)💡 使用 'make help-all' 查看完整命令列表$(RESET)"
@@ -608,7 +608,7 @@ port-check: ## 检查端口占用 (PORT=端口号)
 # ==============================================================================
 # 2. 基础设施初始化
 # ==============================================================================
-.PHONY: init init-serverA init-serverB init-serverC init-serverD init-macmini install install-all-silent up down restart status ps
+.PHONY: init init-serverA init-serverB init-serverC init-macmini install install-all-silent up down restart status ps
 
 init: ## 初始化基础设施 (网络+卷)
 	$(call info_msg,初始化基础设施网络和卷...)
@@ -629,11 +629,6 @@ init-serverC: ## 在 ServerC 上初始化卷，跳过网络创建 (worker, Mongo
 	$(call info_msg,初始化 ServerC 卷，跳过网络创建...)
 	@INIT_TARGET=serverC SKIP_NETWORK=true $(INFRA_SCRIPT) create
 	$(call success_msg,ServerC 初始化完成)
-
-init-serverD: ## 在 ServerD 上初始化卷，跳过网络创建 (manager, NSQ 节点)
-	$(call info_msg,初始化 ServerD 卷，跳过网络创建...)
-	@INIT_TARGET=serverD SKIP_NETWORK=true $(INFRA_SCRIPT) create
-	$(call success_msg,ServerD 初始化完成)
 
 init-macmini: ## 在 Mac mini Docker Desktop 创建本地 infra-network
 	$(call info_msg,初始化 Mac mini Docker 网络...)
@@ -830,40 +825,23 @@ redis-test: ## 测试 Redis 功能
 # ==============================================================================
 # 3. 组件管理 - NSQ
 # ==============================================================================
-.PHONY: nsq-start nsq-stop nsq-restart nsq-recreate nsq-logs nsq-status nsq-admin nsq-policy-verify
+.PHONY: nsq-start nsq-stop nsq-restart nsq-logs nsq-status nsq-admin nsq-policy-verify
 .PHONY: nsq-shell nsq-lookupd-logs nsq-admin-logs nsq-topics nsq-stats
 
 nsq-start: ## 启动 NSQ
-	@bash scripts/rocketmq/guard-nsq.sh
+	@bash scripts/rocketmq/guard-nsq.sh "$(ENV)"
 	@cd $(COMPONENTS_DIR)/nsq && docker compose --env-file ../../$(ENV_FILE_D) up -d
 	$(call success_msg,NSQ 已启动)
 
 nsq-policy-verify: ## 静态校验生产 NSQD 至少拥有 1 CPU/512MiB
 	@bash $(UTILS_SCRIPTS)/verify-nsq-resource-budget.sh
 
-nsq-recreate: nsq-policy-verify ## 使用 serverD 栈原地重建 NSQD，使资源约束生效
-	@bash scripts/rocketmq/guard-nsq.sh
-	@existing_project="$$(docker inspect nsqd --format '{{ index .Config.Labels "com.docker.compose.project" }}' 2>/dev/null || true)"; \
-	if [ -n "$$existing_project" ] && [ "$$existing_project" != "serverd" ]; then \
-		echo "$(RED)NSQD 当前属于 Compose project '$$existing_project'，预期为 'serverd'；为避免误删容器已停止$(RESET)" >&2; \
-		echo "请先确认: docker inspect nsqd --format '{{ json .Config.Labels }}'" >&2; \
-		exit 2; \
-	fi
-	@docker compose \
-		--env-file compose/env/prod/serverD.env \
-		-f deploy/serverD/docker-compose.yml \
-		config >/dev/null
-	@docker compose \
-		--env-file compose/env/prod/serverD.env \
-		-f deploy/serverD/docker-compose.yml \
-		up -d --no-deps --force-recreate nsqd
-	$(call success_msg,NSQD 已通过 serverD Compose project 原地重建)
-
 nsq-stop: ## 停止 NSQ
 	@docker stop nsqd nsqlookupd nsqadmin 2>/dev/null || true
 
-nsq-restart: nsq-stop nsq-start ## 重启 NSQ
-	@bash scripts/rocketmq/guard-nsq.sh
+nsq-restart: ## 仅开发/隔离依赖重启 NSQ
+	@bash scripts/rocketmq/guard-nsq.sh "$(ENV)"
+	@$(MAKE) nsq-stop nsq-start ENV="$(ENV)"
 
 nsq-logs: ## 查看 NSQd 日志
 	@docker logs -f --tail=$(LOG_LINES) nsqd
@@ -1131,7 +1109,7 @@ disk-usage: ## Docker 磁盘使用
 .PHONY: mysql-rds-proxy-verify mysql-rds-proxy-recreate mysql-rds-proxy-status
 .PHONY: serverB-up serverB-down serverB-logs serverB-status serverB-destroy serverB-rebuild
 .PHONY: serverC-up serverC-down serverC-logs serverC-status serverC-destroy serverC-rebuild
-.PHONY: serverD-up serverD-down serverD-logs serverD-status serverD-destroy serverD-rebuild
+.PHONY:
 .PHONY: serverD-monitoring-up serverD-monitoring-down serverD-monitoring-logs serverD-monitoring-status serverD-monitoring-restart
 .PHONY: server-info validate-cloud-env
 
@@ -1240,14 +1218,6 @@ serverC-destroy: ## 销毁 ServerC 所有容器、卷和数据 (危险!)
 
 serverC-rebuild: serverC-destroy serverC-up ## 完全重建 ServerC (销毁后重建)
 
-serverD-up: ## 启动 ServerD 消息服务栈 (NSQ)
-	@bash scripts/rocketmq/guard-nsq.sh
-	$(call section_title,启动 ServerD (4C4G))
-	$(call ensure_infra_network_visible)
-	@$(MAKE) init-serverD
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env up -d
-	$(call success_msg,ServerD 服务已启动)
-
 # Compatibility names fail explicitly rather than resurrect monitoring on serverD.
 serverD-monitoring-up serverD-monitoring-down serverD-monitoring-logs serverD-monitoring-status serverD-monitoring-restart:
 	@echo "Monitoring moved to the old Mac mini; use make monitoring-up/status there." >&2
@@ -1262,30 +1232,6 @@ monitoring-status: ## 查看旧 Mac mini 监控栈
 	@bash scripts/monitoring/manage.sh status
 monitoring-discover: ## 从旧 Mac mini 刷新云端逐实例采集目标
 	@bash scripts/monitoring/manage.sh discover
-
-serverD-down: ## 停止 ServerD 服务栈
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env down
-
-serverD-logs: ## 查看 ServerD 日志
-	@cd deploy/serverD && docker compose --env-file ../../compose/env/prod/serverD.env logs -f --tail=$(LOG_LINES)
-
-serverD-status: ## 查看 ServerD 状态
-	@docker ps --filter "label=infra.host=serverD" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-
-serverD-destroy: ## 销毁 ServerD 所有容器、卷和数据 (危险!)
-	@echo "$(RED)$(BOLD)⚠️  警告: 此操作将销毁 ServerD 的 NSQ / Prometheus / Grafana 数据！$(RESET)"
-	@echo "$(RED)   - 停止并删除容器: nsqlookupd, nsqd, nsqadmin, prometheus, grafana$(RESET)"
-	@echo "$(RED)   - 删除旧版 Docker 卷(如存在): infra_nsq_data, infra_prometheus_data, infra_grafana_data$(RESET)"
-	@echo "$(RED)   - 删除数据目录: /data/infra/nsq/*, /data/infra/prometheus/*, /data/infra/grafana/*, /data/logs/nsq/*$(RESET)"
-	@echo ""
-	@read -p "确认销毁所有数据? 输入 'DESTROY' 继续: " confirm && [ "$$confirm" = "DESTROY" ] || (echo "已取消"; exit 1)
-	$(call section_title,销毁 ServerD 数据)
-	@docker rm -f nsqlookupd nsqd nsqadmin prometheus grafana 2>/dev/null || true
-	@docker volume rm infra_nsq_data infra_prometheus_data infra_grafana_data 2>/dev/null || true
-	@rm -rf /data/infra/nsq/* /data/infra/prometheus/* /data/infra/grafana/* /data/logs/nsq/* 2>/dev/null || true
-	$(call success_msg,ServerD 数据已销毁)
-
-serverD-rebuild: serverD-destroy serverD-up ## 完全重建 ServerD (销毁后重建)
 
 server-info: ## 显示当前服务器架构
 	$(call section_title,当前基础设施架构)

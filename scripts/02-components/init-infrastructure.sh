@@ -479,6 +479,17 @@ main() {
         exit 1
     fi
     
+    # The old initializer copies/chowns retained NSQ/monitoring assets. It must
+    # never run mutations on serverD or any already-cut-over RocketMQ host.
+    if [[ "$operation" != "status" ]]; then
+        if [[ "$INIT_TARGET" == "serverD" ]] ||
+           { [[ -f "${MESSAGING_PROVIDER_MARKER:-/data/infra/messaging-provider}" ]] &&
+             [[ "$(cat "${MESSAGING_PROVIDER_MARKER:-/data/infra/messaging-provider}")" == "rocketmq" ]]; }; then
+            echo 'Legacy initializer is retired on RocketMQ hosts; use the reviewed RocketMQ release.' >&2
+            return 1
+        fi
+    fi
+
     # 对于需要 Docker 的操作，验证配置
     if [[ "$operation" != "status" ]] && [[ "$dry_run" != "true" ]]; then
         if ! validate_config; then
