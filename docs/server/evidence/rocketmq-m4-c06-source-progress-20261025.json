@@ -169,7 +169,7 @@
       "api_collection_worker_package": "passed",
       "docs_facts_and_hygiene": "passed"
     },
-    "status": "Prior head full CI validation failed; revised contracts and prerequisite included; not merged/deployed",
+    "status": "Independent candidate all 33 checks passed; combination with latest main verified locally; exact final candidate CI pending",
     "current_candidate": {
       "head": "3a5dd847774175fdaf2fe3adaba2d1948f88e62d",
       "source_baseline": "7e8ebf3adfd0f2c8a7e7a854d0c3d3e4a593e639",
@@ -178,6 +178,27 @@
       "go_skipped": 0,
       "prerequisite_pr": 444,
       "status": "full CI pending; original Compose render passed, final candidate must pass every required gate"
+    },
+    "independent_ci": {
+      "head": "3a5dd847774175fdaf2fe3adaba2d1948f88e62d",
+      "run": 40210328628,
+      "successful_checks": 33,
+      "conditional_skipped_jobs": 1,
+      "status": "all reported independent candidate checks passed"
+    },
+    "combined_candidate": {
+      "head": "ddf5eb4d68165b42af37e283346cbefb72d2db2a",
+      "source_baseline": "ea17805fd1ad66ff310a8b96bc5d395308f1b034",
+      "go_test_events_passed": 210,
+      "go_failed": 0,
+      "go_skipped": 0,
+      "merged_main": "0c83378e2a65eaa60e0429b751a5af8f85d334b4",
+      "conflicts_resolved": [
+        "docs/document-closure.json",
+        "scripts/cd/README-AI-MQ-PREFLIGHT.md"
+      ],
+      "conflict_resolution": "both reviewed source/document changes retained; actual product files did not conflict",
+      "status": "complete CI rerun pending before merge"
     }
   },
   "retained_failures": [
@@ -413,6 +434,12 @@
       "bytes": 115206,
       "sha256": "05f7be34b65817129484b20104826ef9b11fecf1b4a12a3e58e9d88273990f09",
       "private": true
+    },
+    {
+      "report": "m4-qs-C06-combined-config-green.jsonl",
+      "bytes": 271372,
+      "sha256": "2861076713898439b3b57724bc0e0249d9fc7d9a6f486bccbb615304138dc775",
+      "private": true
     }
   ],
   "protected": [
@@ -422,7 +449,7 @@
     "NSQ retained volumes/containers/backups untouched",
     "Development and isolated NSQ remain available"
   ],
-  "updated_at": "2026-10-25T16:28:08.544791+00:00",
+  "updated_at": "2026-10-25T16:45:04.776793+00:00",
   "qs_trusted_reader": {
     "pr": 444,
     "head": "38a1534ebe171832240bd3e53dd431730305a972",
@@ -445,6 +472,9 @@
     "go_test_events_passed": 107,
     "go_failed": 0,
     "go_skipped": 0,
-    "status": "Source/actual decoder round-trip passed; CI pending; remaining final API packaging not complete"
+    "status": "merged; raw domain owner preservation complete; final API packaging and assets remain pending",
+    "merge": "0c83378e2a65eaa60e0429b751a5af8f85d334b4",
+    "ci_successful_checks": 32,
+    "conditional_skipped_jobs": 1
   }
 }

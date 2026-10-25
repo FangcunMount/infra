@@ -71,7 +71,7 @@ M4 完成要求八项闭环、相关变更合并、必要制品发布、清理�
 | ✅ | C06-A infra旧生产入口 | 已删除源码中的旧serverD NSQ Compose、旧Make初始化/启停/销毁/重建及生产专用recreate；生产NSQ/all安装和启动/重启、RocketMQ主机旧initializer在副作用前拒绝。通用开发NSQ保留。新红绿入口保护7项＋原有界patch/marker7项、监控7项及migration/proxy本地回归通过；[PR301](https://github.com/FangcunMount/infra/pull/301)源码778ffec5d3026b333bc7001e26f9d77baadbbc25、35项CI全部成功，合并06fa8bbfd0d1309a859af524542549e76bbeb1ba。未安装生产源码，无数据/容器删除 |
 | ☐ | C06-B IAM/QS最终配置 | 收敛旧NSQ CD参数，补齐事务owner/route/catalog/预算和固定只读挂载；API IAM订阅必须精确，worker消费专用不启owner/发布；真实配置加载/包内容证明待完成 |
 | ☐ | C06-C AI最终配置 | 事务绑定/七文件/同版本校验、原美元字节及最终owner/type/revision预检已实现；[PR224](https://github.com/FangcunMount/qs-ai/pull/224)候选8b9bfeeef3c1756cd31f0af2a9e2e919c56e4544的12项CI全过，合并20ceaae60df72d0e201a97039aab6f46722fb786；两档MySQL各5688用例，合计11376执行/0失败/0错误/0跳过，实际Docker环境字节证明通过。首轮失败保留。最终生产入口只接受事务绑定仍待收敛，实际私有材料/完整重建留C06-D；未部署 |
-| ☐ | C06-D 配置可重建及收口 | 最终受验源码完整CI、实际配置/八角色重建证明、原预算/私网SSH/锁与保护资产边界、全部PR合并；自动CD仍按具名审核单独恢复 |
+| ☐ | C06-D 配置可重建及收口 | 最终受验源码完整CI、实际原绑定/私有文件版本、缺失材料在替换前拒绝及八角色重建证明、原预算/私网SSH/锁与保护资产边界、全部PR合并；自动CD仍按具名审核单独恢复 |
 
 2026-10-25 C06-A当前为源码/本地验证阶段：历史M3-NSQ首次退役的Compose验证改用有界fixture保留原语义，新增实际旧入口无副作用保护；当前流水线验证源码已移除生产栈、通用dev Compose仍可渲染，不启动任何容器。原M3报告/提交不改写。
 
@@ -87,8 +87,8 @@ C06-B IAM CI首轮失败保留：实际Compose规范化JSON省略 `create_host_p
 | 组件 | 源码/验证 | 生产状态 |
 | --- | --- | --- |
 | IAM | ✅ PR151已合并；8项CI成功，真实配置与Compose验证通过；140个本地Go测试事件/0失败/0跳过 | CD主线构建成功，Deploy to Production明确skipped；新资产目录和原绑定重建仍待核验 |
-| QS worker | ☐ [PR443](https://github.com/FangcunMount/qs-server/pull/443)候选3a5dd847774175fdaf2fe3adaba2d1948f88e62d：消费专用、无owner、48并发、固定三个只读文件已实现；103个Go/race测试事件及原CD/锁/镜像保护回归通过；真实Compose已通过，最终候选完整CI待完成 | 未部署；当前三worker和配额保持 |
-| QS API/AI bridge/IAM订阅 | ☐ [PR445](https://github.com/FangcunMount/qs-server/pull/445)领域点号owner保留修复已实现、107个Go/race测试事件通过；完整CI待完成。最终双owner、原账户分离和精确fanout身份的全部CD配置重建仍待收敛 | 自动CD继续暂停 |
+| QS worker | ☐ [PR443](https://github.com/FangcunMount/qs-server/pull/443)候选3a5dd847774175fdaf2fe3adaba2d1948f88e62d：消费专用、无owner、48并发、固定三个只读文件已实现；103个Go/race测试事件及原CD/锁/镜像保护回归通过；真实Compose已通过，独立候选33项检查通过；与最新main组合为ddf5eb4d68165b42af37e283346cbefb72d2db2a，五包race 210测试事件通过，组合候选完整CI待完成 | 未部署；当前三worker和配额保持 |
+| QS API/AI bridge/IAM订阅 | ☐ [PR445](https://github.com/FangcunMount/qs-server/pull/445)领域点号owner保留修复已通过32项检查并合并0c83378e2a65eaa60e0429b751a5af8f85d334b4，107个Go/race测试事件通过。最终双owner、原账户分离和精确fanout身份的全部CD配置重建仍待收敛 | 自动CD继续暂停 |
 
 2026-10-25 C06配置批次：[本地验证/源码/失败历史receipt](evidence/rocketmq-m4-c06-source-progress-20261025.json)。IAM合并与镜像构建、AI/QS候选和CI、实际生产部署分别记账。QS现行 `durable_outbox` 事件分类仍被事务订阅使用，不因命名删除；尝试不受支持的新分类被真实loader拒绝，已在提交前恢复现行协议，失败报告保留。原NSQ资产及备份未处置，M4总进度仍1/8、C06内部1/4。
 
@@ -101,3 +101,6 @@ API配置子批[PR445](https://github.com/FangcunMount/qs-server/pull/445)，候
 
 
 2026-10-26 合并记录：AI PR224在12项CI全成功后合并20ceaae60df72d0e201a97039aab6f46722fb786；8个JUnit分片已下载复核，两档MySQL各5688项、合计11376执行/0失败/0错误/0跳过，各自无重复且覆盖集合相同。原153项本地及两项真实Compose的证据边界分别保留。SSH读取前置PR444的32项检查成功（另1条件job未触发），已合并d983284ec26e32507e4914bb89fbb575e8f58536。QS worker/API overlay仍待各自完整CI；源码合并不打开生产CD，不代表C06已完成。
+
+
+2026-10-26 API overlay PR445的32项检查成功（另1条件job未触发），已合并0c83378e2a65eaa60e0429b751a5af8f85d334b4。Worker独立候选3a5dd847774175fdaf2fe3adaba2d1948f88e62d的33项检查全过（另1条件job未触发）；同步最新main仅两份文档/源码基线冲突，已同时保留worker与renderer的受验修改。组合候选ddf5eb4d68165b42af37e283346cbefb72d2db2a，源码基线ea17805fd，五包race 210测试事件/0失败/0跳过与文档/actionlint通过，完整CI重新验证后才合并。自动CD继续暂停；实际原绑定、只读材料版本/权限、缺材料于替换前拒绝及八角色完整重建均未提前打勾。
