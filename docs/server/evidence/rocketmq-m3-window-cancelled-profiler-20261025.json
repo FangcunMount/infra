@@ -1,0 +1,61 @@
+{
+  "schema": "m3-window-cancelled-before-ddl/v1",
+  "operation_id": "20261025081841-1",
+  "started_at": "2026-10-25T10:38:17Z",
+  "original_ingress_restored_at": "2026-10-25T10:45:41Z",
+  "maintenance_seconds": 444,
+  "old_eight_same_container_ids_and_images_resumed": true,
+  "public_health": [
+    {
+      "domain": "iam.fangcunmount.cn",
+      "path": "/healthz",
+      "status": 200,
+      "tls_verified": true
+    },
+    {
+      "domain": "qs.fangcunmount.cn",
+      "path": "/healthz",
+      "status": 200,
+      "tls_verified": true
+    },
+    {
+      "domain": "collect.fangcunmount.cn",
+      "path": "/health",
+      "status": 200,
+      "tls_verified": true
+    }
+  ],
+  "m3_ddl_executed": false,
+  "mysql_password_rotated": false,
+  "repository_secrets_changed": false,
+  "new_m3_runtime_started": false,
+  "database_restore_executed": false,
+  "prepared_answer_submitted_by_agent": false,
+  "blocking_condition": {
+    "mongo_profiler_level": 1,
+    "business_outbox_active": 0,
+    "mongo_ttl_plan_count": 0,
+    "current_backup_restore_flow_does_not_prove_profile_preservation": true
+  },
+  "raw_helper_receipt_clarification": {
+    "file": "cancelled-before-ddl.json",
+    "overbroad_field": "database_not_modified_by_operation",
+    "meaning_superseded": "No explicit M3 DDL/business mutation was executed. Autonomous profiler writes and normal resumed legacy runtime activity are not asserted unchanged."
+  },
+  "next_window_requires_new_operation_id_and_fresh_facts": true,
+  "m3_completed_tasks": 31,
+  "m3_total_tasks": 36,
+  "monitoring_targets_up": 10,
+  "profiler_baseline": {
+    "level": 1,
+    "slowms": 100,
+    "sampleRate": 1,
+    "mongo_version": "7.0.31",
+    "tools_version": "100.16.0"
+  },
+  "operator_closure_sha256": "542572498832da2d34f68ca628571ffe28f408a7cb33b01c9eba494a916c3d9e",
+  "operator_supplement_sha256": "57abe10a54d8ba3266736ef24df52838d28c721e3d09a08d6beb9aa359156612",
+  "attempt_status": "cancelled_before_backup_ddl_and_first_runtime",
+  "original_failed_after_stop_check_retained": true,
+  "source_and_business_acceptance_separate": true
+}
