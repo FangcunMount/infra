@@ -1,0 +1,181 @@
+{
+  "schema": "m3-target-compose-validation-evidence/v1",
+  "passed": 15,
+  "failed": 0,
+  "skipped": 0,
+  "targets": [
+    {
+      "schema": "m3-target-compose-validation/v1",
+      "host": "serverA",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "input": "docker/sealed/compose.json",
+          "compose_sha256": "e38a125b66801ca535470b4cdd4eac1523a26a8675e6873a362edba7d342633c",
+          "rendered_sha256": "a56ad6dcfbdf6a3da8e58f6c415e0c9fdd2f18de2a9a18398e1fdbc761972ca4",
+          "instances": 1,
+          "memory_bytes_per_instance": 1073741824,
+          "nano_cpus_per_instance": 1000000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "docker/acceptance/compose.json",
+          "compose_sha256": "8950cfbec1d8509d8bbb998464c0c66b77494e5e7491cdd20d790ca26aeb1b68",
+          "rendered_sha256": "ae9719a6e0654f50d1990368fdbd4cdf44a025c1416526fb2dff22badca10039",
+          "instances": 1,
+          "memory_bytes_per_instance": 1073741824,
+          "nano_cpus_per_instance": 1000000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "docker/open/compose.json",
+          "compose_sha256": "25dde87face1f566bb399cea6ca4155de16ff21bf3d83f05205f56391596c6d0",
+          "rendered_sha256": "b8372f749c767db27c3882bf26b83b0f1017bcfdb87737cda64cd2998add4b78",
+          "instances": 1,
+          "memory_bytes_per_instance": 1073741824,
+          "nano_cpus_per_instance": 1000000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "servera-migrated/sealed/compose.json",
+          "compose_sha256": "9d053fe225d9e06da562b5ebbfa1b350d57263bd8477389d0f85c897cedcec7e",
+          "rendered_sha256": "a823d0f71444f58b0e89f26f090b7a3b0d27ae08ae6c4eb0e86263e0f3949514",
+          "instances": 1,
+          "memory_bytes_per_instance": 1073741824,
+          "nano_cpus_per_instance": 2000000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "servera-migrated/acceptance/compose.json",
+          "compose_sha256": "ce17f6389b499b8ec477a697ccc1760e654d2101fdfe6308bd6f8498e46184b9",
+          "rendered_sha256": "9c5bc9bbe1e30eb123534ec319a16c5172ba86d47f451df900b73da29068f0ae",
+          "instances": 1,
+          "memory_bytes_per_instance": 1073741824,
+          "nano_cpus_per_instance": 2000000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "servera-migrated/open/compose.json",
+          "compose_sha256": "47ebec0498221320672519284004947914dda68a8589113bbd9e841aecd20d3f",
+          "rendered_sha256": "74388d7c39e887f5d116850652db309405998d9849829b481a8ca4fa7b7087cb",
+          "instances": 1,
+          "memory_bytes_per_instance": 1073741824,
+          "nano_cpus_per_instance": 2000000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "qs-ai/sealed/compose.json",
+          "compose_sha256": "9decb5d4e37dc1c188405766626d7350a0d36f2468bdb78a2b0ad4393dd74f5f",
+          "rendered_sha256": "dd8eede220cdfaec276fdd2d60c45298d4f88dc05c9b258141546eb911af92fe",
+          "instances": 1,
+          "memory_bytes_per_instance": 805306368,
+          "nano_cpus_per_instance": 750000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "qs-ai/acceptance/compose.json",
+          "compose_sha256": "14f33d783e415665d548492007c5e21ed182ef496ca8a4ebaa1fc819ed44d6ff",
+          "rendered_sha256": "d3cd9d201f200c2454f39955068d04d2442d954159e4ea41e58eb2a9aea09ae8",
+          "instances": 1,
+          "memory_bytes_per_instance": 805306368,
+          "nano_cpus_per_instance": 750000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "qs-ai/open/compose.json",
+          "compose_sha256": "cf77a264535ceb12c5333de5c35cd86d35be93cb05c8f2b860d851fa205c1089",
+          "rendered_sha256": "b8e83bc31864e9af06067b08fd45e345fab00c698edd5501352f0b0f9967bbd2",
+          "instances": 1,
+          "memory_bytes_per_instance": 805306368,
+          "nano_cpus_per_instance": 750000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "qs-collection/sealed/compose.json",
+          "compose_sha256": "ac2f589904e129927835c0c263a9a7b9d71da5bc94e28b19d781827d05eb5142",
+          "rendered_sha256": "b5c13b52d489d2186d3d84fb52a90ac3e4c2870ee589afe60cb1f68bde174d5c",
+          "instances": 2,
+          "memory_bytes_per_instance": 335544320,
+          "nano_cpus_per_instance": 1000000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "qs-collection/acceptance/compose.json",
+          "compose_sha256": "9b7d82efb5ee5536c9cb0a692d973746989db9e3f048a345b0aa19127aac7578",
+          "rendered_sha256": "d2d9b837bbdba5eca243645aab1db43c5ee99627b19108a9401650ba5c9cc7a5",
+          "instances": 2,
+          "memory_bytes_per_instance": 335544320,
+          "nano_cpus_per_instance": 1000000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "qs-collection/open/compose.json",
+          "compose_sha256": "af8038b4e8986dbb0148af2a8bc200be403b07852e1e8b9ce132c5b19aa657be",
+          "rendered_sha256": "71709e6fc04030add90d3f01843b758256ca60a9be96fc9114003a5071031ca1",
+          "instances": 2,
+          "memory_bytes_per_instance": 335544320,
+          "nano_cpus_per_instance": 1000000000,
+          "exact_environment_and_mounts_preserved": true
+        }
+      ],
+      "dollar_mode": "compose-escaped",
+      "original_containers_unchanged": true,
+      "runtime_started": false,
+      "production_configs_installed": false,
+      "future_bind_sources_verified": false,
+      "scope": "actual target Compose parsing and exact model/env/resource/mount-path comparison only"
+    },
+    {
+      "schema": "m3-target-compose-validation/v1",
+      "host": "serverD",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "input": "qs-worker/sealed/compose.json",
+          "compose_sha256": "deab30c802ae376656163997b5c34d8cbf0abae83c6708d1d54d265ff875e978",
+          "rendered_sha256": "54dbda562bd21e270d29b5353a7801195045221dc098fff05d4c8d748afee013",
+          "instances": 3,
+          "memory_bytes_per_instance": 805306368,
+          "nano_cpus_per_instance": 1000000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "qs-worker/acceptance/compose.json",
+          "compose_sha256": "4b699c2aff037ffccae67ef333de6ec372323a853f2475734dd939fbfdf656c3",
+          "rendered_sha256": "ab0feccee9770597f76197f6c2a867a0bc70e20c7037e427c3c176b0c1603855",
+          "instances": 3,
+          "memory_bytes_per_instance": 805306368,
+          "nano_cpus_per_instance": 1000000000,
+          "exact_environment_and_mounts_preserved": true
+        },
+        {
+          "input": "qs-worker/open/compose.json",
+          "compose_sha256": "6ca819e3460c11c3dfbc98a9725f9f3a72d66d1d05c2f2e9f842b6c706797547",
+          "rendered_sha256": "eeb021ae922772784fc0eeb2a1c98f525eb81fe826e69a956818268c8aaa5874",
+          "instances": 3,
+          "memory_bytes_per_instance": 805306368,
+          "nano_cpus_per_instance": 1000000000,
+          "exact_environment_and_mounts_preserved": true
+        }
+      ],
+      "dollar_mode": "compose-escaped",
+      "original_containers_unchanged": true,
+      "runtime_started": false,
+      "production_configs_installed": false,
+      "future_bind_sources_verified": false,
+      "scope": "actual target Compose parsing and exact model/env/resource/mount-path comparison only"
+    }
+  ],
+  "initial_failure": {
+    "scope": "readonly validation only; no runtime/config installation",
+    "reason": "Compose omits explicit false read_only in normalized JSON; checker initially assumed key present",
+    "retained_private_attempt": "m3-compose-readonly-20261025-v1",
+    "fixed_semantics": "missing read_only means false; exact same effective setting required"
+  },
+  "production_runtime_started": false,
+  "full_execution_bundle_complete": false
+}
