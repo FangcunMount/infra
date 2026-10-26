@@ -18,6 +18,8 @@ def run():
         owned = Path(temporary).resolve()
         sources = owned / 'sources'
         sources.mkdir(mode=0o700)
+        plans = owned / 'plans'
+        plans.mkdir(mode=0o700)
         lock = owned / 'deploy.lock'
         lock.write_bytes(b'original lock inode and bytes')
         lock.chmod(0o666)
@@ -71,6 +73,13 @@ def run():
             assert verified['status'] == 'verified' and verified['read_only'] and not verified['activated']
             assert before == {str(p): (p.stat().st_ino, p.stat().st_mtime_ns) for p in destination.rglob('*') if p.is_file()}
             cases.append(role + '-readonly-target-check-under-original-parent-lock-without-sources')
+            raw=(json.dumps(plan,indent=2)+'\n').encode()
+            plan_path=plans/(m.sha(raw)+'.json');plan_path.write_bytes(raw);plan_path.chmod(0o600)
+            with patch.object(m,'LOCK',lock),m.deployment_lock():
+                discovered=m.verify_installed(role=role,revision=plan['revision'],host=plan['host'],root=owned/'output',plan_root=plans)
+            assert discovered==verified
+            assert before == {str(p):(p.stat().st_ino,p.stat().st_mtime_ns) for p in destination.rglob('*') if p.is_file()}
+            cases.append(role+'-root-receipt-resolves-reviewed-formatted-plan-under-parent-lock')
         assert lock_before == (lock.stat().st_ino, lock.read_bytes(), lock.stat().st_mode, lock.stat().st_mtime_ns)
         cases.append('shared-lock-inode-content-mode-mtime-preserved')
         with patch.object(m, 'LOCK', lock), m.deployment_lock():

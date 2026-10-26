@@ -19,6 +19,7 @@ import tempfile
 BASE = Path('/var/lib/fangcun-m4-materials')
 LEGACY_BASE = Path('/data/infra')
 LOCK = Path('/var/lib/fangcun-image-retention/deploy.lock')
+PLANS = Path('/var/lib/fangcun-m4/material-plans')
 ROLES = {
     'iam': ('serverA', 'iam-messaging', 2000),
     'qs-api': ('serverA', 'qs-server-messaging', 2000),
@@ -179,6 +180,43 @@ def verify_staged(plan, *, role, revision, root=BASE, uid=0, gid=None):
             'read_only': True}
 
 
+def verify_installed(*, role, revision, host, root=BASE, plan_root=PLANS, uid=0, gid=None):
+    """Resolve the original reviewed plan from a root-owned target receipt.
+
+    Receipt plan IDs use canonical JSON; the immutable plan filename hashes its
+    original bytes. Bound the search and verify both, including formatted plans.
+    This is read-only and never depends on retired source files.
+    """
+    require(role in ROLES and host == ROLES[role][0]
+            and isinstance(revision, str) and REVISION.fullmatch(revision), 'verification_identity')
+    gid = ROLES[role][2] if gid is None else gid
+    destination = root / ROLES[role][1] / 'versions' / revision
+    for parent in (root.parent, root, destination.parent.parent, destination.parent, destination):
+        safe_directory(parent, uid)
+    receipt_path = destination / RECEIPT
+    info = receipt_path.lstat()
+    require(stat.S_ISREG(info.st_mode) and info.st_uid == uid and info.st_gid == gid
+            and stat.S_IMODE(info.st_mode) == 0o440, 'receipt_identity')
+    receipt = json.loads(read_file(receipt_path, 32768), object_pairs_hook=unique)
+    wanted = receipt.get('plan_sha256')
+    require(isinstance(wanted, str) and HASH.fullmatch(wanted), 'receipt_plan_hash')
+    for parent in (plan_root.parent, plan_root):
+        safe_directory(parent, uid)
+    plans = sorted(plan_root.iterdir())
+    require(0 < len(plans) <= 128, 'reviewed_plan_count')
+    for path in plans:
+        require(path.suffix == '.json' and HASH.fullmatch(path.stem), 'reviewed_plan_filename')
+        info = path.lstat()
+        require(stat.S_ISREG(info.st_mode) and info.st_uid == uid
+                and stat.S_IMODE(info.st_mode) == 0o600, 'reviewed_plan_identity')
+        raw = read_file(path, 32768)
+        require(sha(raw) == path.stem, 'reviewed_plan_raw_hash')
+        plan = json.loads(raw, object_pairs_hook=unique)
+        if sha(encoded(plan)) == wanted:
+            return verify_staged(plan, role=role, revision=revision, root=root, uid=uid, gid=gid)
+    raise Refused('reviewed_plan_missing')
+
+
 def stage(plan, *, apply=False, root=BASE, uid=0, gid=None, source_roots=None):
     """Test parameters are Python-only; the production CLI cannot override them."""
     files = validate(plan)
@@ -265,16 +303,26 @@ def deployment_lock():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--plan', type=Path, required=True)
-    parser.add_argument('--expected-sha256', required=True)
+    parser.add_argument('--plan', type=Path)
+    parser.add_argument('--expected-sha256')
     parser.add_argument('--host', choices=('serverA', 'serverD'), required=True)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--apply', action='store_true')
     mode.add_argument('--verify-staged', action='store_true')
+    mode.add_argument('--verify-installed', action='store_true')
     parser.add_argument('--expect-role', choices=tuple(ROLES))
     parser.add_argument('--expect-revision')
     args = parser.parse_args()
-    require(os.geteuid() == 0 and HASH.fullmatch(args.expected_sha256), 'root_and_reviewed_plan_required')
+    require(os.geteuid() == 0, 'root_required')
+    if args.verify_installed:
+        require(args.plan is None and args.expected_sha256 is None
+                and args.expect_role is not None and args.expect_revision is not None,
+                'installed_verification_arguments')
+        print(json.dumps(verify_installed(role=args.expect_role, revision=args.expect_revision,
+                                         host=args.host), sort_keys=True))
+        return
+    require(args.plan is not None and isinstance(args.expected_sha256, str)
+            and HASH.fullmatch(args.expected_sha256), 'reviewed_plan_required')
     raw = read_file(args.plan, 32768)
     require(sha(raw) == args.expected_sha256, 'plan_hash')
     plan = json.loads(raw, object_pairs_hook=unique)
