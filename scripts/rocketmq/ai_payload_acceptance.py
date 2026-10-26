@@ -46,7 +46,9 @@ SDK = dict(sdk_version='0.4.0a2',
     sdk_sha256='570822f9ed51eee25001624858d30b7433468eb7da59e34348289c50a37cabb2')
 
 
-def parse_native(output, junit):
+def parse_native(output, junit, *, sdk_version="0.4.0a2"):
+    if sdk_version not in {"0.4.0a2", "0.4.0"}:
+        raise ValueError("exact reviewed SDK profile required")
     lines = [line.split(MARKER, 1)[1] for line in output.splitlines() if MARKER + '{' in line]
     if len(lines) != 1:
         raise ValueError('one exact current payload receipt required')
@@ -60,7 +62,7 @@ def parse_native(output, junit):
             or any(type(v) is not int for v in value['rpc_servers'].values())
             or any(value[k] is not True for k in FLAGS)
             or value['root'] != 'original_mysql_sqlalchemy'
-            or (value['sdk'], value['client']) != ('0.4.0a2', '5.1.2')
+            or (value['sdk'], value['client']) != (sdk_version, '5.1.2')
             or not isinstance(value['python'], str)
             or re.fullmatch(r'3\.(?:11|13)\.\d{1,3}', value['python']) is None):
         raise ValueError('current payload proof incomplete or outside scope')
@@ -109,7 +111,10 @@ def main():
     parser.add_argument('--mysql', choices=('8.0.36', '8.0.44', '8.4.11'), required=True)
     parser.add_argument('--python', choices=('3.11', '3.13'), required=True)
     parser.add_argument('--report', type=Path, required=True)
+    parser.add_argument('--stable', action='store_true', help='Use the M4 stable published SDK profile')
     args = parser.parse_args()
+    from paired_acceptance import SDK_PYTHON_VERSION, SDK_SHA256
+    sdk = dict(sdk_version=SDK_PYTHON_VERSION, sdk_url=f"https://github.com/FangcunMount/reliable-messaging/releases/download/python/v{SDK_PYTHON_VERSION}/fangcun_reliable_messaging-{SDK_PYTHON_VERSION}-py3-none-any.whl", sdk_sha256=SDK_SHA256) if args.stable else SDK
     os.umask(0o077)
     source = args.source.resolve()
     report = dict(version=1, batch='T19-current-payload-original-MySQL-and-mTLS',
@@ -138,8 +143,8 @@ def main():
             installed_in_prefix=Path(reliable_messaging.__file__).resolve().is_relative_to(sys.prefix),
             package_file=reliable_messaging.__file__,
             direct_url=json.loads(distribution.read_text('direct_url.json') or '{}'))
-        validate_host_runtime(runtime, SDK, args.python)
-        wheel_hash = validate_host_sdk_lock(tomllib.loads((source / 'uv.lock').read_text()), SDK)
+        validate_host_runtime(runtime, sdk, args.python)
+        wheel_hash = validate_host_sdk_lock(tomllib.loads((source / 'uv.lock').read_text()), sdk)
         report.update(source_sha=sha, python_runtime=runtime, locked_sdk_archive_sha256=wheel_hash,
             lock_sha256=hashlib.sha256((source / 'uv.lock').read_bytes()).hexdigest(),
             test_source_sha256=hashlib.sha256((source / FILE).read_bytes()).hexdigest(),
@@ -179,7 +184,7 @@ def main():
                           diagnostics=diagnostics(junit.read_text(), tests=TESTS))
         if result.returncode or not junit.exists():
             raise RuntimeError('required current payload native gate failed')
-        report['native'] = parse_native(log.read_text(), junit.read_text())
+        report['native'] = parse_native(log.read_text(), junit.read_text(), sdk_version=sdk['sdk_version'])
         phase = 'owned_row_cleanup'
         report.update(asyncio.run(storage_receipt(url)))
         if report['mysql_version'] != args.mysql or any(report['remaining_rows'].values()):

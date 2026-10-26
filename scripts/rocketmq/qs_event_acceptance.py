@@ -39,12 +39,13 @@ def event_manifest():
     return manifest
 
 
-def parse_event_receipt(output):
+def parse_event_receipt(output, *, current_only=False):
+    expected = (CASES - {"legacy_command_receipt_compatible"}) | {"legacy_command_receipt_rejected"} if current_only else CASES
     receipts = [json.loads(line.split('M3_QS_AI_EVENT_RECEIPT ', 1)[1])
                 for line in output.splitlines() if 'M3_QS_AI_EVENT_RECEIPT {' in line]
-    if (len(receipts) != 1 or receipts[0].get('passed') != len(CASES)
+    if (len(receipts) != 1 or receipts[0].get('passed') != len(expected)
             or receipts[0].get('failed') != 0 or receipts[0].get('skipped') != 0
-            or set(receipts[0].get('cases', {})) != CASES
+            or set(receipts[0].get('cases', {})) != expected
             or any(value is not True for value in receipts[0]['cases'].values())
             or receipts[0].get('root') != 'original_mysql_sql'
             or any(receipts[0].get(key) is not True for key in (
@@ -103,7 +104,7 @@ def run_qs_event_host(source, directory, broker, project, grpc_port, mysql_port,
         r'transaction_event_broker_integration_test\.go:(\d+)', raw)))[:32]
     if result.returncode:
         raise RuntimeError('actual QS event host acceptance failed (private output withheld)')
-    proof['native_receipt'] = parse_event_receipt(result.stdout)
+    proof['native_receipt'] = parse_event_receipt(result.stdout, current_only=os.environ.get("QS_M4_CURRENT_READERS") == "1")
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('QS source changed during native acceptance')

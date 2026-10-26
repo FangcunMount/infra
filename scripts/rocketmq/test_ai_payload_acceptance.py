@@ -59,6 +59,16 @@ class CurrentPayloadGate(unittest.TestCase):
             with self.subTest(damage=damage), self.assertRaises(ValueError):
                 parse_native(output(value), ET.tostring(suite))
 
+    def test_stable_archive_requires_explicit_profile_and_preserves_all_cases(self):
+        value,suite=proof()
+        value['sdk']='0.4.0'
+        self.assertEqual(parse_native(output(value),ET.tostring(suite),sdk_version='0.4.0')['passed'],15)
+        with self.assertRaises(ValueError):
+            parse_native(output(value),ET.tostring(suite))
+        value['sdk']='0.4.0a2'
+        with self.assertRaises(ValueError):
+            parse_native(output(value),ET.tostring(suite),sdk_version='0.4.0')
+
     def test_service_publish_must_be_exact_loopback(self):
         expected = [{'HostIp': '127.0.0.1', 'HostPort': '3306'}]
         self.assertEqual(validate_mysql_binding(json.dumps({'3306/tcp': expected})), expected)
