@@ -1,0 +1,330 @@
+{
+  "schema": "rocketmq-m4-c06-final-preflight/v1",
+  "recorded_on": "2026-10-26",
+  "tasks": [
+    "C06-B04",
+    "C06-B05"
+  ],
+  "repository": "FangcunMount/qs-server",
+  "candidate_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+  "pull_request": "https://github.com/FangcunMount/qs-server/pull/447",
+  "ci": {
+    "source_workflow_run": "https://github.com/FangcunMount/qs-server/actions/runs/40272008342",
+    "native_workflow_run": "https://github.com/FangcunMount/qs-server/actions/runs/40272008109",
+    "full_source_ci": "passed",
+    "merge_status": "merged",
+    "merge_sha": "25318edf88982be040639202295d1966cec72437",
+    "merged_at": "2026-10-26T05:13:52Z",
+    "successful_checks": 29,
+    "conditional_untriggered_jobs": [
+      "Docs & API Generated Sync"
+    ],
+    "checks": [
+      {
+        "name": "delivery (8.0.36)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Production worker package (Compose)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Analyze (go)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "original-mysql-root (8.0.36)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "mysql-audit",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "delivery (8.4)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "original-mysql-root (8.0.44)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "original-mysql-root (8.4.11)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "images (qs-apiserver)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Run Tests",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "images (collection-server)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "MySQL Native Metadata and Readiness",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "MongoDB Authenticated Native Metadata",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Action audit MySQL JSON lifecycle",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "AuthZ committed version two-process MySQL",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Actor Store MySQL Transactions",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Seeddata Retirement and Current Runtime E2E",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Lint Code",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Layer Boundaries (depguard)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Deployment Contracts",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Security Scan (Advisory)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Maintainability Scan (Advisory)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Tier 1 Test Policy",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Docs Hygiene & Facts",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Docs & API Generated Sync",
+        "status": "COMPLETED",
+        "conclusion": "SKIPPED"
+      },
+      {
+        "name": "QS-03 original effect recovery after actual broker loss",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "QS-05/06 original business effects after actual broker loss",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Build Applications (apiserver)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Build Applications (collection)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Build Applications (worker)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS"
+      }
+    ]
+  },
+  "native_image": {
+    "source_sha": "6728f09f5685f10ed03c7a1c7656ca6c9c49728c",
+    "image_id": "sha256:6b2427e4f820f4ddfe66891c28fefc57c20d6c1086fc8fee34d886ca1f073ada",
+    "passed": 10,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "case_ids": [
+      "actual-image-final-binding-and-four-transport-files",
+      "same-image-frozen-config-revalidated",
+      "missing-mongo-credential",
+      "world-readable-mongo-credential",
+      "mutable-mongo-symlink",
+      "duplicate-broker-principal",
+      "canonical-but-wrong-event-owner",
+      "missing-iam-transaction-route",
+      "missing-jose-key",
+      "restored-owned-fixtures-reuse-original-release"
+    ],
+    "offline": true,
+    "network": "none",
+    "normal_application_started": false,
+    "production": false,
+    "metadata_sha256": "1ceff785deca2c4224396d443e1e0ccc532adca24e3e16b21fa7f8fbd56e2b24"
+  },
+  "test_checkout": {
+    "sha": "6728f09f5685f10ed03c7a1c7656ca6c9c49728c",
+    "candidate_tree": "93744ca06e359b8a3e95cb36f587c13ca1108f4d",
+    "checkout_tree": "93744ca06e359b8a3e95cb36f587c13ca1108f4d",
+    "candidate_is_checkout_parent": true
+  },
+  "local_validation": {
+    "six_package_go_race": {
+      "passed_events": 271,
+      "failed": 0,
+      "skipped": 0
+    },
+    "python_host_release": {
+      "passed": 17,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "three_service_packages": "passed",
+    "golangci_lint": "0 issues",
+    "actionlint": "passed",
+    "docs": {
+      "unit_tests": 88,
+      "hygiene_files": 211,
+      "active_facts_documents": 165,
+      "passed": true
+    },
+    "synthetic_fixture_generation": {
+      "passed": true,
+      "material_mounts": 8,
+      "native_image_executed_locally": false
+    }
+  },
+  "real_mysql_delivery": {
+    "8.0.36": {
+      "passed_cases": 1053,
+      "required_mq_cases": 70,
+      "failed": 0,
+      "skipped_cases": 0
+    },
+    "8.4": {
+      "passed_cases": 1053,
+      "required_mq_cases": 70,
+      "failed": 0,
+      "skipped_cases": 0
+    }
+  },
+  "retained_negative_history": [
+    "Go red19 events: conflicts were accepted before final policy",
+    "Python red2 host refusal cases before final host schema",
+    "docs first check rejected two unreviewed changed source links; corrected after review"
+  ],
+  "private_reports_sha256": {
+    "go-baseline.jsonl": {
+      "sha256": "3bba8fcfc07b2c4e2c0a09a7f18db2754bd82809f568dae532f8e421b49ef0dc",
+      "bytes": 33684
+    },
+    "go-final-red.jsonl": {
+      "sha256": "ba12dffc530cfb910e639f7af194cbd66d243c9f78315224daab515befd425f0",
+      "bytes": 29247
+    },
+    "go-final-green-1.jsonl": {
+      "sha256": "72132c7ec9e281e297694d697261232644fa70394c8fc938b48deb71955568c3",
+      "bytes": 23533
+    },
+    "go-config-green-2.jsonl": {
+      "sha256": "7c34918fc20f5724135748340734305a3baa1e7b5961e851dd0730ec86416711",
+      "bytes": 57042
+    },
+    "go-regression-3.jsonl": {
+      "sha256": "606cd7095072d7e0d9da91b25fa08830924142f761e14d312a93335b78e8b66f",
+      "bytes": 347499
+    },
+    "python-host-red.log": {
+      "sha256": "74904914d5cdc65642d05c8ee56928798451f29b8ce1c51ea4e0b58b93d3fcaa",
+      "bytes": 1259
+    },
+    "python-host-green-2.log": {
+      "sha256": "992ecf907636692a7ca93ce1639860434ccb9843a394a446d23138a3ba9c6334",
+      "bytes": 3003
+    },
+    "package-shell-green-1.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "docs-check.log": {
+      "sha256": "1dd74faf258ce6f0b0c38d71691db65896fc93f79ad68b48364c2d1549dbdfab",
+      "bytes": 903
+    },
+    "docs-check-2.log": {
+      "sha256": "524d82f5b69c91baacbc2735fec97e2f87a9a3af65e7b2fb426dbdbe7020e235",
+      "bytes": 598
+    },
+    "docs-check-final.log": {
+      "sha256": "9d3fee43d13b808d67ae6a98141c7386c09a0a73e048a3f15ba578a3a153ca47",
+      "bytes": 598
+    },
+    "ci-delivery-8.0.36.log": {
+      "sha256": "9f264707a49b0901bb4ab9d04acda004ff63ea71cf13d3317796ef319f1181d1",
+      "bytes": 85900
+    },
+    "ci-delivery-8.4.log": {
+      "sha256": "2c6ab5873989156815b064aceacb6bd30ab750846f444a895992c49fd1426d1a",
+      "bytes": 83336
+    },
+    "native-image/final-transaction-preflight.json": {
+      "sha256": "30e7dc80cdb99cab7667014b7be35dac2a1265dff1ccb1b0afa90b2e50cb03e9",
+      "bytes": 816
+    },
+    "ci-final-checks.json": {
+      "sha256": "53b8d94caab73e5a9beed83ea17020b207b0e2119167fe5f9d49673a7e39b0f8",
+      "bytes": 11520
+    }
+  },
+  "production": {
+    "deployed": false,
+    "fixed_root_tool_installed": false,
+    "private_materials_installed": false,
+    "runtime_changed": false,
+    "schema_changed": false,
+    "business_data_read": false,
+    "business_or_model_invocation": false,
+    "asset_deletion": false,
+    "CD_remains_paused": true,
+    "pause_last_readback": "2026-10-26 immediately before source merge; true"
+  },
+  "remaining_existing_gate": "C06-D original binding/materials/eight-role rebuild and merge; C08 final cleanup candidate deployment separately",
+  "implementation_sha": "848b02475c8dbe72a87039e8f41131ef0f311d40",
+  "source_baseline_sha": "7e68e733d2e70dfaed5962002a6c491c35ca8c78",
+  "merge_is_not_production_deployment": true
+}
