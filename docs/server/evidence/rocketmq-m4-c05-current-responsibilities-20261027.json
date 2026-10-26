@@ -1,0 +1,150 @@
+{
+  "schema": "m4-c05-current-business-responsibility/v1",
+  "recorded_on": "2026-10-27",
+  "tasks": [
+    "C05-02",
+    "C05-03"
+  ],
+  "effective_on_merge": true,
+  "qs": {
+    "pr": 453,
+    "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+    "merge_sha": "11c106aa283bcd1e3f442da928985b3744fe54e8",
+    "checks_successful": 29,
+    "conditional_generated_docs_not_triggered": 1,
+    "native_run": 40346489150,
+    "native_source_sha": "96a2c26b72e124a99ed6acc9449442dff909ed1c",
+    "current_runtime_and_native_test_tree_identical_to_final": true
+  },
+  "ai": {
+    "source_sha": "be5e806eedb73d92936c70fb7e5f9762e4bf2f91",
+    "merge_sha": "f83472c79cb71dfd761b9e65c2c78b6343a207ac",
+    "pr": 230,
+    "source_ci_run": 40344048458,
+    "full_tests_per_mysql": 5668,
+    "full_tests_total": 11336,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "nonempty_recovery_tests": {
+      "8.4": {
+        "test_new_business_receipt_and_original_history_share_ack_commit_and_rollback": 2,
+        "test_held_and_stored_receipts_are_retained_without_reopening_completed_delivery": 1,
+        "test_actual_candidate_graph_both_stages_without_legacy_hook": 1,
+        "test_exact_aborted_finalization_reuses_first_wire_question_identity_and_original_root": 4,
+        "test_prepared_finalization_is_not_retry_permission": 1,
+        "test_late_finalization_retry_cannot_overtake_current_winner": 1,
+        "test_competing_original_input_refuses_half_preparation_or_new_fence": 1,
+        "test_model_response_survives_reclaim_without_redispatch": 1,
+        "test_unacknowledged_dispatch_cannot_be_resent_or_overwritten_after_reclaim": 1,
+        "test_restart_between_workflow_return_and_business_commit": 1
+      },
+      "8.0.36": {
+        "test_new_business_receipt_and_original_history_share_ack_commit_and_rollback": 2,
+        "test_held_and_stored_receipts_are_retained_without_reopening_completed_delivery": 1,
+        "test_actual_candidate_graph_both_stages_without_legacy_hook": 1,
+        "test_exact_aborted_finalization_reuses_first_wire_question_identity_and_original_root": 4,
+        "test_prepared_finalization_is_not_retry_permission": 1,
+        "test_late_finalization_retry_cannot_overtake_current_winner": 1,
+        "test_competing_original_input_refuses_half_preparation_or_new_fence": 1,
+        "test_model_response_survives_reclaim_without_redispatch": 1,
+        "test_unacknowledged_dispatch_cannot_be_resent_or_overwritten_after_reclaim": 1,
+        "test_restart_between_workflow_return_and_business_commit": 1
+      }
+    },
+    "scope": "real MySQL business graph with controlled gateway invocation counters; no live provider/model claim"
+  },
+  "minimum_decoupling": [
+    "AI current Inbox/decision/technical ledger separated from publication queue; seven current methods and sequence/fixture declarations retained by AST",
+    "AI current state history and business ACK still use interpretation_result_outbox; no field/table destruction",
+    "QS current MessagingStore has no publication Outbox; current operations/archive/Inbox/first ACK and witness retained",
+    "QS runtime summary reads current operation/archive/committed branch metadata instead of legacy publish table; contradiction remains unknown",
+    "retained command_attempts field explicitly unavailable via command_attempts_available=false; never a provider invocation budget",
+    "IAM authorization operation/protocol CAS and independent Redis session revocation worker remain current"
+  ],
+  "preserved": [
+    "all original roots, exact witness/Checker and first wire/identity",
+    "retry schedule authorization/due/attempt and original execution claim",
+    "current receipt/Inbox/projection and immutable payload",
+    "model response/checkpoint/artifact/original provider_result_unknown governance",
+    "current read-only legacy asset audits and protected schema/index history"
+  ],
+  "prior_current_native_reference": "rocketmq-m4-c04-final-protocol-20261026.json",
+  "future_dispatch_proof": {
+    "run": 40344887552,
+    "profiles": 3,
+    "facts_each": 41,
+    "dispatch_runtime_source_unchanged": true,
+    "real_MySQL_and_Mongo": true
+  },
+  "reports": [
+    {
+      "path": "native/m4-current-qs-readers-8.0.36-96a2c26b72e124a99ed6acc9449442dff909ed1c-40346489150/m4-current-qs-command.json",
+      "facts": 15,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true,
+      "sha256": "72eb01abecbd77f1c0475fdf543121d4e80630b52ca197be4c2958b530a171c9"
+    },
+    {
+      "path": "native/m4-current-qs-readers-8.0.36-96a2c26b72e124a99ed6acc9449442dff909ed1c-40346489150/m4-current-qs-event.json",
+      "facts": 17,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true,
+      "sha256": "60f3f5bb5ac5ae932d00e39a9d7a1b80f5bead9c8950dca02da32465d5017631"
+    },
+    {
+      "path": "native/m4-current-qs-readers-8.0.44-96a2c26b72e124a99ed6acc9449442dff909ed1c-40346489150/m4-current-qs-command.json",
+      "facts": 15,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true,
+      "sha256": "821bc7ca87a423a4f0e0d3b65f56f8734b9f9ac915ce1e395c7fa0c5d25e05d6"
+    },
+    {
+      "path": "native/m4-current-qs-readers-8.0.44-96a2c26b72e124a99ed6acc9449442dff909ed1c-40346489150/m4-current-qs-event.json",
+      "facts": 17,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true,
+      "sha256": "5f280fc4cb0f3f7972b32b585cee8b05c9939d3b86535b9985c0bd53d3cec52d"
+    },
+    {
+      "path": "native/m4-current-qs-readers-8.4.11-96a2c26b72e124a99ed6acc9449442dff909ed1c-40346489150/m4-current-qs-command.json",
+      "facts": 15,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true,
+      "sha256": "6f4e86512ad206da09dd1fc02d4a64cc0e8310146ecdc69721b8e9dfab0051f6"
+    },
+    {
+      "path": "native/m4-current-qs-readers-8.4.11-96a2c26b72e124a99ed6acc9449442dff909ed1c-40346489150/m4-current-qs-event.json",
+      "facts": 17,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true,
+      "sha256": "04d9d43c301f02666d6f5e7aade1210238b9ae67bcdcc263031e76c987848152"
+    }
+  ],
+  "failure_history": [
+    {
+      "kind": "new runtime read regression",
+      "evidence": "SQLmock red before current metadata read, actual native GetRuntime/RuntimeBacklog and Prepared evidence refusal added"
+    },
+    {
+      "kind": "CI lint",
+      "detail": "mock db.Close return not checked",
+      "fixed_by": "explicit deferred close in source test; final 29 checks passed"
+    }
+  ],
+  "production": {
+    "deployed": false,
+    "DDL": false,
+    "physical_assets_deleted": false,
+    "old_business_replayed": false,
+    "model_called": false,
+    "credentials_rotated": false,
+    "CD_resumed": false
+  }
+}
