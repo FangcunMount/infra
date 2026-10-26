@@ -55,7 +55,7 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
-          sudo -n env GITHUB_ACTIONS=true RUNNER_ENVIRONMENT=github-hosted GITHUB_SHA="$EXPECTED_SOURCE" RUNNER_TEMP="$RUNNER_TEMP" \
+          sudo -n unshare --mount --propagation private env GITHUB_ACTIONS=true RUNNER_ENVIRONMENT=github-hosted GITHUB_SHA="$EXPECTED_SOURCE" RUNNER_TEMP="$RUNNER_TEMP" \
             python3 scripts/ops/ci_m4_host_guard.py --sources "$GITHUB_WORKSPACE/.host-sources"
       - name: Nonempty complete evidence and owned cleanup
         if: always()

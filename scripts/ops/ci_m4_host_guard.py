@@ -37,6 +37,7 @@ def main():
     args=parser.parse_args()
     assert os.geteuid()==0 and os.environ.get('GITHUB_ACTIONS')=='true'
     assert os.environ.get('RUNNER_ENVIRONMENT')=='github-hosted' and sys.platform=='linux'
+    assert os.readlink('/proc/self/ns/mnt')!=os.readlink('/proc/1/ns/mnt')
     caller=int(os.environ['SUDO_UID']);assert caller>0
     caller_gid=pwd.getpwuid(caller).pw_gid;caller_name=pwd.getpwuid(caller).pw_name
     root=Path(__file__).resolve().parents[2]
@@ -47,10 +48,18 @@ def main():
     report=dict(schema='m4-host-material-guard/v1',source_sha=os.environ['GITHUB_SHA'],
                 operator_sha256=digest,passed=0,failed=0,errors=0,skipped=0,cases=[],
                 production=False,application_started=False,network_clients_started=False,sources={})
-    current_case='owned_setup';owned=None;created=[]
+    current_case='owned_setup';owned=None;created=[];private_opt=False
+    original_opt=Path('/opt').stat()
     try:
         owned=Path(tempfile.mkdtemp(prefix='m4-host-guard-',dir=os.environ['RUNNER_TEMP'])).resolve()
         owned.chmod(0o755)
+        # Hosted runners make /opt world-writable. Keep the real production guard
+        # intact; bind only an owned immutable ancestor inside our private mount
+        # namespace. Never chmod or chown the original /opt.
+        immutable_opt=owned/'private-opt';immutable_opt.mkdir(mode=0o755);immutable_opt.chmod(0o755)
+        subprocess.run(['/usr/bin/mount','--bind',str(immutable_opt),'/opt'],check=True,capture_output=True)
+        private_opt=True
+        report['private_mount_namespace']=True
         identity=(str(owned)+'\n').encode()
         tool=TOOL_ROOT/'material-tools'/(digest+'.py')
         for p in namespaces:
@@ -213,7 +222,13 @@ m.material_preflight(Path(sys.argv[2]));Path(sys.argv[3]).write_text('would-migr
                 assert p.is_dir() and not p.is_symlink() and (p/'.ci-owned').read_bytes()==identity
                 shutil.rmtree(p)
             except Exception:clean=False
-        if owned is not None:
+        if private_opt:
+            try:
+                subprocess.run(['/usr/bin/umount','/opt'],check=True,capture_output=True)
+                info=Path('/opt').stat()
+                clean=clean and (info.st_ino,info.st_uid,info.st_mode)==(original_opt.st_ino,original_opt.st_uid,original_opt.st_mode)
+            except Exception:clean=False
+        if owned is not None and clean:
             shutil.rmtree(owned);clean=clean and not owned.exists()
         report['owned_cleanup_complete']=clean and all(not p.exists() for p in created)
         if not report['owned_cleanup_complete']:report['failed']=report['errors']=1
