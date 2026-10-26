@@ -32,3 +32,12 @@ class QSCommandAcceptanceTest(unittest.TestCase):
             with self.subTest(bad=bad[:80]):
                 with self.assertRaises(RuntimeError):
                     parse_command_receipt(bad)
+
+    def test_current_contract_is_explicit_and_refuses_historical_success_proof(self):
+        old = self.output()
+        new = old.replace("nonempty_legacy_operation_compatible", "nonempty_legacy_operation_rejected")
+        self.assertEqual(parse_command_receipt(new, current_only=True)['passed'], len(CASES))
+        with self.assertRaises(RuntimeError):
+            parse_command_receipt(old, current_only=True)
+        with self.assertRaises(RuntimeError):
+            parse_command_receipt(new)

@@ -1,0 +1,195 @@
+name: M4 current archive readers and receipt roots
+on:
+  workflow_dispatch:
+    inputs:
+      ai_ref:
+        description: Exact current payload host source SHA
+        type: string
+        required: true
+        default: 354e3465ef91b23ee7d5ade966a11b28089e059c
+      qs_ref:
+        description: Exact QS current-reader candidate
+        type: string
+        required: true
+        default: bb8e20e38562b31c6e9b01de99250e1eb70a6f16
+      full_matrix:
+        description: Frozen-candidate six-profile gate; development uses one
+        type: boolean
+        default: false
+  pull_request:
+    paths: ['scripts/rocketmq/ai_payload_acceptance.py', 'scripts/rocketmq/test_ai_payload_acceptance.py', 'scripts/rocketmq/qs_command_acceptance.py', 'scripts/rocketmq/qs_event_acceptance.py', '.github/workflows/m4-current-readers.yml']
+permissions:
+  contents: read
+concurrency:
+  group: m4-current-readers-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  current-mysql-mtls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON((github.event_name == 'pull_request' || inputs.full_matrix) && '[{"python":"3.11","mysql":"8.0.36","name":"py311-mysql8036"},{"python":"3.11","mysql":"8.0.44","name":"py311-mysql8044"},{"python":"3.11","mysql":"8.4.11","name":"py311-mysql8411"},{"python":"3.13","mysql":"8.0.36","name":"py313-mysql8036"},{"python":"3.13","mysql":"8.0.44","name":"py313-mysql8044"},{"python":"3.13","mysql":"8.4.11","name":"py313-mysql8411"}]' || '[{"python":"3.11","mysql":"8.0.36","name":"py311-mysql8036"}]') }}
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql }}
+        env:
+          MYSQL_DATABASE: qs_ai_t19
+          MYSQL_USER: qs_ai_t19
+          MYSQL_PASSWORD: isolated_t19
+          MYSQL_ROOT_PASSWORD: isolated_t19_root
+        options: >-
+          --publish 127.0.0.1:3306:3306
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pisolated_t19_root --silent"
+          --health-interval=5s --health-timeout=3s --health-retries=30
+    env:
+      QS_AI_DATABASE_URL: mysql+asyncmy://qs_ai_t19:isolated_t19@127.0.0.1:3306/qs_ai_t19
+      QS_AI_TEST_MYSQL_DSN: mysql://qs_ai_t19:isolated_t19@127.0.0.1:3306/qs_ai_t19
+      QS_AI_T19_MIGRATION_DATABASE_URL: mysql+asyncmy://root:isolated_t19_root@127.0.0.1:3306/qs_ai_t19
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-ai
+          ref: ${{ inputs.ai_ref || '354e3465ef91b23ee7d5ade966a11b28089e059c' }}
+          path: .ai-acceptance
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: ${{ matrix.python }}
+      - name: Verify strict native IDs and exact source
+        env:
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '354e3465ef91b23ee7d5ade966a11b28089e059c' }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .ai-acceptance rev-parse HEAD)" = "$EXPECTED_AI_SHA"
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_ai_payload_acceptance.py' -v
+      - name: Install fixed locked host and SDK
+        working-directory: .ai-acceptance
+        run: uv sync --locked
+      - name: Required current original MySQL and mTLS RPC gate
+        env:
+          EXPECTED_AI_SHA: ${{ inputs.ai_ref || '354e3465ef91b23ee7d5ade966a11b28089e059c' }}
+          MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
+        run: |
+          set -euo pipefail
+          QS_AI_T19_MYSQL_IMAGE_ID="$(docker inspect --format '{{.Image}}' "$MYSQL_CONTAINER_ID")"
+          QS_AI_T19_MYSQL_PORTS="$(docker inspect --format '{{json .NetworkSettings.Ports}}' "$MYSQL_CONTAINER_ID")"
+          export QS_AI_T19_MYSQL_IMAGE_ID QS_AI_T19_MYSQL_PORTS
+          cd .ai-acceptance
+          uv run python ../scripts/rocketmq/ai_payload_acceptance.py --source "$PWD" \
+            --stable --expected-source "$EXPECTED_AI_SHA" --mysql '${{ matrix.mysql }}' --python '${{ matrix.python }}' \
+            --report "$GITHUB_WORKSPACE/rocketmq-ai-current-payload.json"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m4-current-ai-payload-${{ matrix.name }}-${{ github.sha }}
+          path: rocketmq-ai-current-payload.json
+          if-no-files-found: error
+          retention-days: 14
+
+  qs-current:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: ['8.0.36', '8.0.44', '8.4.11']
+    env:
+      QS_M4_CURRENT_READERS: '1'
+      QS_SHA: ${{ inputs.qs_ref || 'bb8e20e38562b31c6e9b01de99250e1eb70a6f16' }}
+      INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.INFRA_SHA }}
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ env.QS_SHA }}
+          path: .qs-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 1345266aa0e864c46de5d1e3e3c939dd8002a890
+          path: .sdk-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Exact sources stable SDK and strict current rejection proof
+        run: |
+          set -euo pipefail
+          [[ "$QS_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git -C .qs-acceptance rev-parse HEAD)" = "$QS_SHA"
+          python3 -m unittest discover -s scripts/rocketmq -p test_qs_command_acceptance.py
+          python3 -m unittest discover -s scripts/rocketmq -p test_qs_event_acceptance.py
+          go -C .qs-acceptance list -m -json github.com/FangcunMount/reliable-messaging > "$RUNNER_TEMP/current-sdk.json"
+          python3 - "$RUNNER_TEMP/current-sdk.json" <<'PYCODE'
+          import json,sys
+          sys.path.insert(0,'scripts/rocketmq')
+          from host_sdk_contract import stable_module_matches
+          assert stable_module_matches(json.load(open(sys.argv[1])))
+          PYCODE
+      - name: Build isolated fixed Broker
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-m4-readers:5.5.1 components/rocketmq
+      - name: Current command operation payload and original receipt roots
+        run: |
+          set -euo pipefail
+          umask 077
+          docker ps -aq | sort > "$RUNNER_TEMP/containers-before"
+          docker network ls --no-trunc -q | sort > "$RUNNER_TEMP/networks-before"
+          for kind in command event; do
+            python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
+              "--qs-${kind}-host" "$PWD/.qs-acceptance" --image rocketmq-m4-readers:5.5.1 \
+              --mysql-image 'mysql:${{ matrix.mysql }}' --report "m4-current-qs-${kind}.json"
+          done
+          docker ps -aq | sort > "$RUNNER_TEMP/containers-after"
+          docker network ls --no-trunc -q | sort > "$RUNNER_TEMP/networks-after"
+          cmp "$RUNNER_TEMP/containers-before" "$RUNNER_TEMP/containers-after"
+          cmp "$RUNNER_TEMP/networks-before" "$RUNNER_TEMP/networks-after"
+      - name: Strict receipts current source and complete cleanup
+        if: always()
+        run: |
+          python3 - <<'PYCODE'
+          import hashlib,json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts/rocketmq')
+          from host_sdk_contract import STABLE_MODULE
+          from qs_command_acceptance import CASES as COMMAND
+          from qs_event_acceptance import CASES as EVENT
+          profiles={
+            'command': (COMMAND-{'nonempty_legacy_operation_compatible'})|{'nonempty_legacy_operation_rejected'},
+            'event': (EVENT-{'legacy_command_receipt_compatible'})|{'legacy_command_receipt_rejected'},
+          }
+          summaries=[]
+          for kind,expected in profiles.items():
+            p=Path(f'm4-current-qs-{kind}.json');r=json.loads(p.read_text());h=r['proof'][f'qs_{kind}_host'];n=h['native_receipt']
+            assert r['passed']==len(r['cases']) and all(r['cases'].values()) and r['failed']==r['skipped']==0
+            assert h['source_sha']==os.environ['QS_SHA'] and h['source_clean_after']
+            assert h['sdk_module']==STABLE_MODULE
+            assert n['cases']=={k:True for k in expected} and n['passed']==len(expected) and n['failed']==n['skipped']==0
+            assert r['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,probe_process_groups_drained=True,private_fixture_directory_removed=True)
+            summaries.append(dict(kind=kind,sha256=hashlib.sha256(p.read_bytes()).hexdigest(),passed=r['passed'],host_cases=n['passed'],failed=0,skipped=0))
+          Path('m4-current-qs-summary.json').write_text(json.dumps(dict(qs_sha=os.environ['QS_SHA'],infra_sha=os.environ['INFRA_SHA'],profiles=summaries,production=False),indent=2)+'\n')
+          PYCODE
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m4-current-qs-readers-${{ matrix.mysql }}-${{ env.QS_SHA }}-${{ github.run_id }}
+          path: m4-current-qs-*.json
+          if-no-files-found: error
+          retention-days: 14
