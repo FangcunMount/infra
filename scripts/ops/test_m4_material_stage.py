@@ -145,6 +145,60 @@ class MaterialStageTests(unittest.TestCase):
         self.destination().parent.chmod(0o750)
         self.assertEqual(self.verify()['status'],'verified')
 
+    def install_plan(self, plan=None):
+        plan=self.plan if plan is None else plan
+        self.plans=self.directory/'plans';self.plans.mkdir(mode=0o700,exist_ok=True)
+        raw=(json.dumps(plan,indent=2)+'\n').encode()
+        path=self.plans/(m.sha(raw)+'.json');path.write_bytes(raw);path.chmod(0o600)
+        return path
+
+    def discover(self, **changes):
+        args=dict(role=self.plan['role'],revision=self.plan['revision'],host=self.plan['host'],
+                  root=self.root,plan_root=self.plans,uid=self.uid,gid=self.gid)
+        args.update(changes)
+        return m.verify_installed(**args)
+
+    def test_installed_verification_resolves_formatted_original_plan_without_sources(self):
+        self.stage();plan_path=self.install_plan()
+        self.assertNotEqual(plan_path.stem,m.sha(m.encoded(self.plan)))
+        for row in self.plan['files']:Path(row['source']).unlink()
+        with patch.object(m,'deployment_lock') as lock:
+            self.assertEqual(self.discover()['status'],'verified')
+        lock.assert_not_called()
+
+    def test_installed_verification_refuses_wrong_identity_and_missing_plan(self):
+        self.stage();path=self.install_plan()
+        for changes in (dict(host='serverD'),dict(role='worker'),dict(revision='m4-wrong')):
+            with self.subTest(changes=changes),self.assertRaises((m.Refused,OSError)):
+                self.discover(**changes)
+        path.unlink()
+        with self.assertRaises(m.Refused):self.discover()
+
+    def test_installed_verification_requires_root_plan_mode_hash_and_non_symlink(self):
+        self.stage();path=self.install_plan();original=path.read_bytes()
+        for defect in ('mode','bytes','symlink'):
+            if defect=='mode':path.chmod(0o640)
+            elif defect=='bytes':path.write_bytes(original+b' ')
+            else:path.unlink();path.symlink_to(Path(self.plan['files'][0]['source']))
+            with self.subTest(defect=defect),self.assertRaises((m.Refused,OSError)):self.discover()
+            if path.exists() or path.is_symlink():path.unlink()
+            path.write_bytes(original);path.chmod(0o600)
+        self.assertEqual(self.discover()['status'],'verified')
+
+    def test_installed_verification_is_bounded_before_reading_plan_bodies(self):
+        self.stage();self.install_plan()
+        for i in range(128):
+            p=self.plans/(f'{i:064x}'+'.json');p.write_bytes(b'x');p.chmod(0o600)
+        with self.assertRaisesRegex(m.Refused,'reviewed_plan_count'):self.discover()
+
+    def test_installed_verification_does_not_trust_tampered_target_receipt(self):
+        self.stage();self.install_plan()
+        p=self.destination()/m.RECEIPT;raw=p.read_bytes();value=json.loads(raw)
+        value['plan_sha256']='b'*64;p.chmod(0o600);p.write_bytes(m.encoded(value));p.chmod(0o440)
+        with self.assertRaisesRegex(m.Refused,'reviewed_plan_missing'):self.discover()
+        p.chmod(0o600);p.write_bytes(raw);p.chmod(0o440)
+        self.assertEqual(self.discover()['status'],'verified')
+
     def test_wrong_role_host_revision_or_incomplete_files_refused_before_creation(self):
         for key, value in [('role', 'unknown'), ('host', 'serverD'), ('revision', '../active'), ('revision', 'old-m3'), ('files', []), ('source_receipt_sha256', 'not-a-hash')]:
             with self.subTest(key=key, value=value):
