@@ -1,6 +1,6 @@
 # M4 八角色配置重建边界
 
-本文细化既有 C06-D 的输入与验证对象，不新增任务或门禁。进度只在 [M4总表](rocketmq-m4-execution.md)维护。2026-10-26 已完成生产输入、四owner权威数据库binding及原材料的只读核对；**尚未完成最终候选重建、文件安装或部署**。
+本文细化既有 C06-D 的输入与验证对象，不新增任务或门禁。进度只在 [M4总表](rocketmq-m4-execution.md)维护。2026-10-26 已完成生产输入、四owner权威数据库binding及原材料的只读核对；**已预置未激活版本材料；尚未完成八实例最终候选重建和业务部署**。
 
 ## 固定角色与资源
 
@@ -27,7 +27,7 @@
 
 ## 文件与入口验证
 
-IAM新源路径为 `/data/infra/iam-messaging/versions/<revision>/rocketmq/`；worker为 `/data/infra/qs-worker-messaging/versions/<revision>/rocketmq/`。这些路径是受验源码的目标，**不能推断生产已安装**。QS/AI继续使用各自既有受限版本目录，保持原JOSE文件；API的Mongo凭据挂载与AI桥接一致性预检已在QS PR447实现，并通过真实标准镜像的十项离线验证；生产新工具与版本材料尚未安装。
+早期打包源码以 `/data/infra/...` 为来源。D02实际预览后，最终新材料来源固定为 `/var/lib/fangcun-m4-materials/{iam-messaging,qs-server-messaging,qs-ai-messaging,qs-worker-messaging}/versions/<revision>/`，四角色已预置未激活版本；D03/D04须同步三库宿主路径合同。QS/AI保留原JOSE文件名与bytes；API的Mongo凭据挂载与AI桥接一致性预检已在QS PR447实现，并通过真实标准镜像的十项离线验证；生产新工具与版本材料尚未安装。
 
 重建沿现有C06-D门禁执行：逐个绑定确切源码/镜像、原身份、实际文件摘要与Unix身份/权限，再由真实宿主decoder、离线镜像预检和Compose核对有效配置。缺失、符号链接、权限变化、混合revision、错误owner/路由或预算必须在配置同步、停止或替换运行服务之前拒绝；生产固定root工具只能由已安装的审核摘要选择，不能执行上传目录中的任意root Python。
 
@@ -39,7 +39,7 @@ IAM新源路径为 `/data/infra/iam-messaging/versions/<revision>/rocketmq/`；w
 
 输入元数据覆盖8角色的实际挂载、配置摘要、只读属性及文件身份。首版采集器只读取Go嵌套事务字段，随后补齐Python外层 `messaging.transactions` 并重新只读采集；旧报告保留，不把扫描器缺字段解释为运行owner缺失。初次预算直接比较遇到Go纳秒与YAML时长表示差异，规范单位后相同；失败历史和修正均保留。
 
-API完整主机预检已有源码与真实离线镜像证据，完整CI/合并单独见总表。C06-D01已核对四owner权威绑定、八角色19处MQ/8处JOSE文件与五个Broker主体指纹、原UID/资源和worker48并发；[证据](evidence/rocketmq-m4-c06-original-bindings-20261026.json)不包含秘密正文。剩余C06-D依次为：实际私有材料版本及权限准备、五种服务八实例隔离重建、材料故障于替换前拒绝、冻结配置契约与全部PR合并。API单镜像预检不冒充八实例启动、四owner真实回查或生产验收。详细报告只发布摘要，原始证据保存在0700目录、0600文件中，索引见 [C06证据receipt](evidence/rocketmq-m4-c06-source-progress-20261025.json)。本批没有业务写入、模型调用、DDL、凭据轮换、服务重启或历史资产删除。
+API完整主机预检已有源码与真实离线镜像证据，完整CI/合并单独见总表。C06-D01已核对四owner权威绑定、八角色19处MQ/8处JOSE文件与五个Broker主体指纹、原UID/资源和worker48并发；[证据](evidence/rocketmq-m4-c06-original-bindings-20261026.json)不包含秘密正文。D02已完成版本材料预置并回读；剩余C06-D依次为：三库宿主路径合同联动、五种服务八实例隔离重建、材料故障于替换前拒绝、冻结配置契约与全部PR合并。API单镜像预检不冒充八实例启动、四owner真实回查或生产验收。详细报告只发布摘要，原始证据保存在0700目录、0600文件中，索引见 [C06证据receipt](evidence/rocketmq-m4-c06-source-progress-20261025.json)。本批没有业务写入、模型调用、DDL、凭据轮换、服务重启或历史资产删除。
 
 ## C06-D02：新增版本材料，保留活动配置
 
@@ -61,3 +61,5 @@ API完整主机预检已有源码与真实离线镜像证据，完整CI/合并�
 新材料预置不表示C06-D03八实例重建、D04部署入口保护或C08生产发布已完成。
 
 D02首次目标机预览在任何材料复制前拒绝旧根目录：serverA/serverD的 `/data`、serverD的 `/data/infra` 由UID2000持有。新版本根改为 `/var/lib/fangcun-m4-materials`，保持原有严格root所有/不可被其他用户写入的检查，不更改旧目录权限。原 `/data/infra/...` 与M3 profile仅作为已冻结、摘要校验的只读source。新的receipt固定material_root；八角色重建与最终CD须同步该宿主来源路径，容器内约定不变，此路径联动仍纳入C06-D03/D04/D05。旧工具/计划与失败日志保留，未复制/激活材料。
+
+2026-10-26 D02生产材料结果：[完整receipt](evidence/rocketmq-m4-c06-versioned-materials-20261026.json)。四角色21份原文件、27处挂载引用的 `m4-c06-20261026-v1` 已预置且再次只读验证；runtime fingerprint、current指针和原锁相同。新版本未激活，旧原材料及目录不变。新宿主来源路径尚须在三库CD/重建联动后冻结，不能恢复自动部署。
