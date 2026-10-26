@@ -85,6 +85,66 @@ class MaterialStageTests(unittest.TestCase):
         self.assertEqual(self.stage()['status'], 'already-staged')
         self.assertEqual(before, {p: (p.stat().st_ino, p.stat().st_mtime_ns) for p in paths})
 
+    def verify(self, plan=None, **changes):
+        plan = self.plan if plan is None else plan
+        values = dict(role=plan['role'], revision=plan['revision'], root=self.root,
+                      uid=self.uid, gid=self.gid)
+        values.update(changes)
+        return m.verify_staged(plan, **values)
+
+    def test_readonly_verification_survives_removal_of_retained_source_files(self):
+        self.stage()
+        paths = [p for p in self.destination().rglob('*') if p.is_file()]
+        before = {p: (p.stat().st_ino, p.stat().st_mtime_ns, p.stat().st_ctime_ns, p.read_bytes()) for p in paths}
+        for row in self.plan['files']:
+            Path(row['source']).unlink()
+        with patch.object(m, 'deployment_lock') as lock:
+            result = self.verify()
+        lock.assert_not_called()
+        self.assertEqual(result['status'], 'verified')
+        self.assertTrue(result['read_only'])
+        self.assertFalse(result['activated'])
+        self.assertEqual(before, {p: (p.stat().st_ino, p.stat().st_mtime_ns, p.stat().st_ctime_ns, p.read_bytes()) for p in paths})
+
+    def test_readonly_missing_target_or_wrong_identity_never_creates_anything(self):
+        with self.assertRaises((m.Refused,OSError)):
+            self.verify()
+        self.assertFalse(self.root.exists())
+        self.stage()
+        for changes in (dict(role='worker'),dict(revision='m4-wrong'),dict(role='unknown')):
+            with self.subTest(changes=changes),self.assertRaises(m.Refused):
+                self.verify(**changes)
+        self.assertEqual(sorted(p.name for p in self.destination().parent.iterdir()), [self.plan['revision']])
+
+    def test_readonly_verification_refuses_bad_files_modes_and_symlinks(self):
+        self.stage()
+        path=self.destination()/'rocketmq/credentials.json'
+        raw=path.read_bytes()
+        for defect in ('missing','bytes','world-readable','symlink'):
+            with self.subTest(defect=defect):
+                path.chmod(0o600)
+                if defect=='missing':path.unlink()
+                elif defect=='bytes':path.write_bytes(raw+b'bad');path.chmod(0o440)
+                elif defect=='world-readable':path.chmod(0o444)
+                else:path.unlink();path.symlink_to(Path(self.plan['files'][0]['source']))
+                with self.assertRaises((m.Refused,OSError)):
+                    self.verify()
+                if path.exists() or path.is_symlink():path.unlink()
+                path.write_bytes(raw);path.chmod(0o440)
+        self.assertEqual(self.verify()['status'],'verified')
+
+    def test_readonly_verification_requires_unchanged_receipt_and_safe_ancestors(self):
+        self.stage()
+        receipt=self.destination()/m.RECEIPT
+        raw=receipt.read_bytes();receipt.chmod(0o600)
+        changed=json.loads(raw);changed['role']='worker';receipt.write_bytes(m.encoded(changed));receipt.chmod(0o440)
+        with self.assertRaises(m.Refused):self.verify()
+        receipt.chmod(0o600);receipt.write_bytes(raw);receipt.chmod(0o440)
+        self.destination().parent.chmod(0o770)
+        with self.assertRaises(m.Refused):self.verify()
+        self.destination().parent.chmod(0o750)
+        self.assertEqual(self.verify()['status'],'verified')
+
     def test_wrong_role_host_revision_or_incomplete_files_refused_before_creation(self):
         for key, value in [('role', 'unknown'), ('host', 'serverD'), ('revision', '../active'), ('revision', 'old-m3'), ('files', []), ('source_receipt_sha256', 'not-a-hash')]:
             with self.subTest(key=key, value=value):

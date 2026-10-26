@@ -62,6 +62,15 @@ def run():
             assert second['status'] == 'already-staged'
             assert before == {str(p): (p.stat().st_ino, p.stat().st_mtime_ns) for p in destination.rglob('*') if p.is_file()}
             cases.append(role + '-exact-repeat-does-not-rewrite')
+            # Deployment hooks already own this same lock. Verification must
+            # not recursively acquire it or depend on retained M3 sources.
+            for row in files:
+                Path(row['source']).unlink()
+            with patch.object(m, 'LOCK', lock), m.deployment_lock():
+                verified = m.verify_staged(plan, role=role, revision=plan['revision'], root=owned / 'output')
+            assert verified['status'] == 'verified' and verified['read_only'] and not verified['activated']
+            assert before == {str(p): (p.stat().st_ino, p.stat().st_mtime_ns) for p in destination.rglob('*') if p.is_file()}
+            cases.append(role + '-readonly-target-check-under-original-parent-lock-without-sources')
         assert lock_before == (lock.stat().st_ino, lock.read_bytes(), lock.stat().st_mode, lock.stat().st_mtime_ns)
         cases.append('shared-lock-inode-content-mode-mtime-preserved')
         with patch.object(m, 'LOCK', lock), m.deployment_lock():
