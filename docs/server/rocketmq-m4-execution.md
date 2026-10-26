@@ -77,7 +77,7 @@ M4 完成要求八项闭环、相关变更合并、必要制品发布、清理�
 | ID | 状态 | 子任务 | 必达验收 |
 | --- | --- | --- | --- |
 | C02-01 | ✅ 已完成 | IAM旧provider/Outbox/Relay装配退出 | 2026-10-26；[IAM PR154](https://github.com/FangcunMount/iam/pull/154)候选9203ad1802da2cf07daaf380a7c3613930b52134以11项完整CI通过并合并0420222b7a3f3861d6769919926010e5a67a0aa2；三档MySQL各16项required源码原生、35项宿主存储/HTTP（含子用例）及22项Broker场景均0失败/跳过，真实IAM双实例/QS订阅及同进程新owner关闭/Checker通过。旧装配/自动Topic创建和旧NSQ镜像workflow退出，3脚本6组无副作用拒绝；原事务/业务/Redis职责不改。[范围与替代映射](rocketmq-m4-iam-runtime-cleanup.md)/[完整receipt](evidence/rocketmq-m4-c02-iam-runtime-20261026.json)。随PR321合并生效；未部署 |
-| C02-02 | ☐ 待开始 | QS旧NSQ及扫描发布装配退出 | 领域事件不启动旧发布Relay；到期dispatcher、业务重试授权、消费幂等及NORMAL通知保持 |
+| C02-02 | ☐ 进行中 | QS旧NSQ及扫描发布装配退出 | [QS PR450](https://github.com/FangcunMount/qs-server/pull/450)固定ff9217ca954a8500ac43ff92a2fb7b4d44339ae4；264项相关race、374项infra工具单测通过。[infra PR322](https://github.com/FangcunMount/infra/pull/322)执行三档MySQL的真实双owner/worker/到期dispatch验收，待CI及合并后勾选；[范围与替代映射](rocketmq-m4-qs-runtime-cleanup.md)。到期dispatcher、业务重试授权、消费幂等及NORMAL通知保持；未部署 |
 | C02-03 | ☐ 待开始 | AI旧NSQ/MQRelay/M1装配退出 | 最终事务路径唯一；原根提交归属、终态恢复、取消/关闭保持，恢复不增加模型调用 |
 | C02-04 | ☐ 待开始 | 三库入口与生命周期回归 | 旧选择明确拒绝；空闲Checker、真实在途、启动失败清理和有界关闭通过 |
 
