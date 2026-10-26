@@ -1,0 +1,36 @@
+name: M4 immutable material staging
+on:
+  pull_request:
+    paths:
+      - scripts/ops/m4_material_stage.py
+      - scripts/ops/test_m4_material_stage.py
+      - scripts/ops/ci_m4_material_stage.py
+      - .github/workflows/m4-material-stage.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-and-unix-proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Required source failure protections
+        run: python3 -m unittest discover -s scripts/ops -p test_m4_material_stage.py -v
+      - name: Required real root, ordinary UID and shared-lock proof
+        env:
+          EXPECTED_SOURCE: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -Eeuo pipefail
+          umask 077
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE"
+          sudo -n env GITHUB_ACTIONS=true GITHUB_SHA="$EXPECTED_SOURCE" RUNNER_TEMP="$RUNNER_TEMP" \
+            python3 scripts/ops/ci_m4_material_stage.py
+      - uses: actions/upload-artifact@v7
+        with:
+          name: m4-material-stage-native-${{ github.event.pull_request.head.sha || github.sha }}
+          path: m4-material-stage-native.json
+          if-no-files-found: error
+          retention-days: 14

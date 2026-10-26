@@ -40,3 +40,22 @@ IAM新源路径为 `/data/infra/iam-messaging/versions/<revision>/rocketmq/`；w
 输入元数据覆盖8角色的实际挂载、配置摘要、只读属性及文件身份。首版采集器只读取Go嵌套事务字段，随后补齐Python外层 `messaging.transactions` 并重新只读采集；旧报告保留，不把扫描器缺字段解释为运行owner缺失。初次预算直接比较遇到Go纳秒与YAML时长表示差异，规范单位后相同；失败历史和修正均保留。
 
 API完整主机预检已有源码与真实离线镜像证据，完整CI/合并单独见总表。C06-D01已核对四owner权威绑定、八角色19处MQ/8处JOSE文件与五个Broker主体指纹、原UID/资源和worker48并发；[证据](evidence/rocketmq-m4-c06-original-bindings-20261026.json)不包含秘密正文。剩余C06-D依次为：实际私有材料版本及权限准备、五种服务八实例隔离重建、材料故障于替换前拒绝、冻结配置契约与全部PR合并。API单镜像预检不冒充八实例启动、四owner真实回查或生产验收。详细报告只发布摘要，原始证据保存在0700目录、0600文件中，索引见 [C06证据receipt](evidence/rocketmq-m4-c06-source-progress-20261025.json)。本批没有业务写入、模型调用、DDL、凭据轮换、服务重启或历史资产删除。
+
+## C06-D02：新增版本材料，保留活动配置
+
+受限工具 `scripts/ops/m4_material_stage.py` 只把已冻结的原MQ/JOSE bytes复制到四个角色的
+`/data/infra/<role>-messaging/versions/m4-.../` 新目录。API共8份、AI共7份、IAM和worker
+各3份，合计21份不同文件；三个worker共享一个材料版本，对应八实例的27处文件引用。
+原source的摘要、长度、UID/GID及mode全部校验后才允许创建目录；复制完成前再次核对source。
+新文件root所有、角色GID只读（0440），版本目录0750；现有父目录、原文件及current指针不修改。
+版本已存在时必须摘要、收据、权限和文件集合完全相同，只读复核后返回，不覆盖原版本。
+
+工具默认仅预览，显式 `--apply` 才写新版本；CLI固定目标根目录、角色、主机和GID，
+没有目标目录覆盖参数。生产调用必须root、固定审核工具SHA、私有具名plan及其精确SHA；
+复用原共享部署锁，锁缺失/符号链接/权限变化/占用均拒绝，不创建或替换锁inode。
+工具不轮换凭据、不生成身份或密钥，不修改sudo规则、准入、运行配置，不调用Docker/数据库/Broker。
+复制故障只清理本次私有暂存和仍为空的新父目录，已发布的版本及历史资产继续保留。
+
+本批源码先运行本地14项故障保护和required Linux root/普通UID/共享锁的19项真实权限验证，
+全部通过并合并后才预置生产新版本。生产root工具/私有plan/版本材料安装分别留receipt；
+新材料预置不表示C06-D03八实例重建、D04部署入口保护或C08生产发布已完成。
