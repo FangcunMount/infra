@@ -1,0 +1,325 @@
+{
+  "schema": "rocketmq-m4-c06-config-contract/v1",
+  "recorded_on": "2026-10-26",
+  "task": "C06-D05",
+  "status": "frozen-source-contract-effective-on-PR320-merge",
+  "scope": "source-configuration-contract; final cleanup images and production acceptance belong to C08",
+  "material_root": "/var/lib/fangcun-m4-materials",
+  "revision": "m4-c06-20261026-v1",
+  "roles": {
+    "iam": {
+      "host": "serverA",
+      "revision": "m4-c06-20261026-v1",
+      "source": "/var/lib/fangcun-m4-materials/iam-messaging/versions/m4-c06-20261026-v1",
+      "files": 3,
+      "receipt_sha256": "2901f3867976a1d3323d5aff951681e5155fa6376b61fe0de8a7a93c29bd7533",
+      "uid": 0,
+      "gid": 2000,
+      "file_mode": "0440",
+      "directory_mode": "0750"
+    },
+    "qs-api": {
+      "host": "serverA",
+      "revision": "m4-c06-20261026-v1",
+      "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1",
+      "files": 8,
+      "receipt_sha256": "2d356452dd054f3383c9006a6d0452f1d7fa7f97913efcc62c86e5a058d0a079",
+      "uid": 0,
+      "gid": 2000,
+      "file_mode": "0440",
+      "directory_mode": "0750"
+    },
+    "ai": {
+      "host": "serverA",
+      "revision": "m4-c06-20261026-v1",
+      "source": "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1",
+      "files": 7,
+      "receipt_sha256": "3d2914a1a717bb8b17e722d15ab02df01ca9502375bcc6baa1dbcfc201a80689",
+      "uid": 0,
+      "gid": 10001,
+      "file_mode": "0440",
+      "directory_mode": "0750"
+    },
+    "worker": {
+      "host": "serverD",
+      "revision": "m4-c06-20261026-v1",
+      "source": "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-c06-20261026-v1",
+      "files": 3,
+      "receipt_sha256": "100bdade84e77859f490e15480002cb3d93d2a5c65fdff1dcc01463de2a6f2c2",
+      "uid": 0,
+      "gid": 2000,
+      "file_mode": "0440",
+      "directory_mode": "0750"
+    }
+  },
+  "operator": {
+    "source": "scripts/ops/m4_material_stage.py",
+    "sha256": "36f3046ed453dfbf8beae684269c94d1a6db0abaa23de51e09d41e462c6a3d5c",
+    "path": "/opt/fangcun-m4/material-tools/36f3046ed453dfbf8beae684269c94d1a6db0abaa23de51e09d41e462c6a3d5c.py",
+    "uid": 0,
+    "mode": "0555",
+    "private_plan_root": "/var/lib/fangcun-m4/material-plans",
+    "private_plan_mode": "0600",
+    "mode_argument": "--verify-installed",
+    "read_only": true,
+    "depends_on_retired_sources": false,
+    "reacquires_parent_lock": false
+  },
+  "references": [
+    {
+      "path": "rocketmq-m4-c06-original-bindings-20261026.json",
+      "sha256": "23897d9982b92a18887d5c03d89d3a836740ba80abddad96a520809b8111c757"
+    },
+    {
+      "path": "rocketmq-m4-c06-versioned-materials-20261026.json",
+      "sha256": "25431950cd27415c1ecfff32cb39dd4ee82006609860f78fb8dad37628b444f2"
+    },
+    {
+      "path": "rocketmq-m4-c06-root-material-paths-20261026.json",
+      "sha256": "a6479c92fdaca987efa3f89c9e6b81ce728f6851568aef9798295c262224e2db"
+    },
+    {
+      "path": "rocketmq-m4-c06-eight-instance-rebuild-20261026.json",
+      "sha256": "a93f474e17c64a8ed9ec16003f17f605386b8729c919d63874e1af259e50bf5b"
+    },
+    {
+      "path": "rocketmq-m4-c06-host-guard-20261026.json",
+      "sha256": "bacd7f44b338a24edc897195b80887ec268b74300c518d93c5521cc01d00aab8"
+    }
+  ],
+  "isolated_stage_images": [
+    {
+      "target": "qs-worker",
+      "source_sha": "d20436edb363c17f0b177126aebe43a44bc5e082",
+      "archive_sha256": "b4d41c68e2f6ad57380a132dc89efa25151da63377a5498e0ad7cdcaebca423a",
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "engine_image_id": "sha256:d0888564b761369959cefc23442af2e874864606942341a79398d805418a42ac"
+    },
+    {
+      "target": "qs-api",
+      "source_sha": "d20436edb363c17f0b177126aebe43a44bc5e082",
+      "archive_sha256": "8b0ce9f24d7b9b8928c758b691db4de71a8087ccab38662ba171d02191b468ba",
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "engine_image_id": "sha256:5f54c9c9afa9ba619c9d8407c601f7ac65ffd4c769839e897b90d221efc6b84c"
+    },
+    {
+      "target": "iam",
+      "source_sha": "48182c39424573060fda0e27ed6670d2b326f42d",
+      "archive_sha256": "d72e823dbe144d1e8ce2ceed955dc3de88b5452c67163a460caba66d1a9e3eed",
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "engine_image_id": "sha256:3e076fd5592f6fbda90f4a5ac25070ef58fd3780c8f0400a0bd396cc0f43b876"
+    },
+    {
+      "target": "ai",
+      "source_sha": "61ef88ac95800dfd3c0c90fd56c102f7c0e77e8f",
+      "archive_sha256": "dbb3a6fc916332daf8011b1f24647948f115ab8faf466b55e416d11bbcf10869",
+      "runtime_sdk": {
+        "uid": 10001,
+        "version": "0.4.0",
+        "client": "5.1.2",
+        "source": "61ef88ac95800dfd3c0c90fd56c102f7c0e77e8f"
+      },
+      "engine_image_id": "sha256:1c2587d18d9999f286749f38597afb7d73dc2adffe2d6abf35126f5ed1fb5a2f"
+    },
+    {
+      "target": "qs-collection",
+      "source_sha": "d20436edb363c17f0b177126aebe43a44bc5e082",
+      "archive_sha256": "80925d524c62a449041e19ed2bd359021d9c53e926bfcb7b8c5b54d699b0ad52",
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "engine_image_id": "sha256:520bdde2c0e175e2e709b750d720205c22f1c1df8343afd3bfc0a2d32a71ef08"
+    }
+  ],
+  "stage_image_scope": "D03 proof only; not final cleanup release candidates",
+  "immutable_original_bindings": {
+    "owners": [
+      "iam.mysql",
+      "qs.mysql",
+      "qs.mongo",
+      "ai.mysql"
+    ],
+    "route_revision": "m3-1",
+    "store_and_epoch": "original exact bytes per D01 private authoritative receipt; never regenerated",
+    "limits": {
+      "branches": 16,
+      "db_seconds": 2,
+      "rpc_seconds": 5,
+      "lease_seconds": 60,
+      "maintenance_interval_seconds": 5
+    },
+    "owner_budgets": {
+      "iam.mysql": {
+        "sends": 8,
+        "workers": 4,
+        "queue": 32,
+        "scan": 100
+      },
+      "qs.mysql": {
+        "sends": 4,
+        "workers": 2,
+        "queue": 16,
+        "scan": 50
+      },
+      "qs.mongo": {
+        "sends": 4,
+        "workers": 2,
+        "queue": 16,
+        "scan": 50
+      },
+      "ai.mysql": {
+        "sends": 4,
+        "workers": 1,
+        "queue": 16,
+        "scan": 100
+      }
+    }
+  },
+  "application_instances": [
+    {
+      "role": "iam",
+      "count": 1,
+      "memory_mib": 1024,
+      "cpus": 1,
+      "uid": 2000,
+      "gid": 2000
+    },
+    {
+      "role": "qs-api",
+      "count": 1,
+      "memory_mib": 1024,
+      "cpus": 2,
+      "uid": 2000,
+      "gid": 2000
+    },
+    {
+      "role": "collection",
+      "count": 2,
+      "memory_mib": 320,
+      "cpus": 1,
+      "uid": 2000,
+      "gid": 2000,
+      "transaction_owners": [],
+      "mq_materials": 0
+    },
+    {
+      "role": "ai",
+      "count": 1,
+      "memory_mib": 768,
+      "cpus": 0.75,
+      "uid": 10001,
+      "gid": 10001,
+      "max_in_flight": 1
+    },
+    {
+      "role": "worker",
+      "count": 3,
+      "memory_mib": 768,
+      "cpus": 1,
+      "uid": 2000,
+      "gid": 2000,
+      "transaction_owners": [],
+      "publish_enabled": false,
+      "business_concurrency_each": 48
+    }
+  ],
+  "production": {
+    "new_operator_installed": false,
+    "installed_D02_operator_sha256": "bd8d0c0d0a925703130936e1cd05361801aad0bcd6b25bf2c74f73187fec89c4",
+    "versioned_materials_staged": true,
+    "versioned_materials_activated": false,
+    "new_host_tools_activated": false,
+    "application_deployed": false,
+    "automatic_CD_resumed": false,
+    "installation_and_activation_task": "C08-03/C08-04 before final deployment; fail closed until reviewed tool installation and normal-user readback succeed"
+  },
+  "before_final_deployment": [
+    "fresh actual material/DB binding/host budget readback",
+    "install this digest-selected root tool without changing original tool, receipt, plans, pointers or deployment lock",
+    "normal deploy-user read-only verification under the existing lock on serverA iam/qs-api/ai and serverD worker",
+    "C08 final source/image/config/material digests and production execution/recovery checklist",
+    "keep automatic CD paused until explicit final status is recorded"
+  ],
+  "protected": [
+    "current Inbox/receipt/first wire/first ACK",
+    "retry authorization/due/attempt",
+    "model response/checkpoint/artifact",
+    "transaction witness/Checker/native notices",
+    "Redis revocation and business schedulers",
+    "old containers/volumes/backups within retention",
+    "Mac mini development NSQ and SDK general compatibility"
+  ],
+  "forbidden": [
+    "bypass preflight or weaken root ancestor modes",
+    "change original store/epoch on restart",
+    "restore old full backup over new facts after runtime start",
+    "activate NSQ or publishing Relay as automatic fallback",
+    "generic prune or garbage collection"
+  ],
+  "completion_pr": "https://github.com/FangcunMount/infra/pull/320",
+  "completed_effective_on_merge": true,
+  "repositories": {
+    "iam": {
+      "pr": "https://github.com/FangcunMount/iam/pull/153",
+      "source_sha": "88cae2df3aca4858688d97af11bd0768871d6e97",
+      "merge_sha": "ece67552793eee849d035b514d4be672eb4c3c8a",
+      "merged_at": "2026-10-26T09:12:18Z",
+      "state": "MERGED",
+      "checks_success": 8,
+      "conditional_jobs_not_triggered": [],
+      "checks_receipt_sha256": "fc43525810a82325f777e461ccdc23bfd8a44575592de69868015a3b9e079016",
+      "check_urls": [
+        "https://github.com/FangcunMount/iam/actions/runs/40296886265",
+        "https://github.com/FangcunMount/iam/actions/runs/40296893876"
+      ]
+    },
+    "qs-server": {
+      "pr": "https://github.com/FangcunMount/qs-server/pull/449",
+      "source_sha": "92d58eaa75377d0030e8e549c16f942bf08f510c",
+      "merge_sha": "2844fe9d48f0372d277047fdc8572d5e86250639",
+      "merged_at": "2026-10-26T09:23:05Z",
+      "state": "MERGED",
+      "checks_success": 29,
+      "conditional_jobs_not_triggered": [
+        "Docs & API Generated Sync"
+      ],
+      "checks_receipt_sha256": "32150b4f0ae1115653afd192ef50af9552ec3f2d9ebcceb50dd5325117bfd221",
+      "check_urls": [
+        "https://github.com/FangcunMount/qs-server/actions/runs/40297080746",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40297086620",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40297086630",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40297086633",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40297086653"
+      ]
+    },
+    "qs-ai": {
+      "pr": "https://github.com/FangcunMount/qs-ai/pull/227",
+      "source_sha": "494dcdef6989270cf17dd7cc599b908c33ebe2b5",
+      "merge_sha": "ec61f7e636128e425c9474b8aea7eb032acc26bd",
+      "merged_at": "2026-10-26T09:34:02Z",
+      "state": "MERGED",
+      "checks_success": 12,
+      "conditional_jobs_not_triggered": [],
+      "checks_receipt_sha256": "94e3f616f215adc93a93eb8350784656393a3cd58b89d80dddbf502f9edb5e66",
+      "check_urls": [
+        "https://github.com/FangcunMount/qs-ai/actions/runs/40298349026"
+      ]
+    }
+  },
+  "host_guard_native_run": "https://github.com/FangcunMount/infra/actions/runs/40298403925",
+  "root_tool_installed_in_production": false
+}
