@@ -135,6 +135,9 @@ m.material_preflight(Path(sys.argv[2]));Path(sys.argv[3]).write_text('would-migr
                 report['private_failure_output_sha256']=hashlib.sha256(result.stdout+result.stderr).hexdigest()
                 report['unexpected_exit_code']=result.returncode
                 # Only fixed error labels, never source bytes or child command output.
+                report['tool_metadata']=[dict(path=str(p),uid=p.lstat().st_uid,mode=oct(p.lstat().st_mode&0o777)) for p in (tool,*tool.parents) if p.exists()]
+                report['tool_resolves_exactly']=tool.resolve()==tool
+                report['tool_digest_matches']=hashlib.sha256(tool.read_bytes()).hexdigest()==digest
                 report['failure_signals']=[label for label in (
                     'Reviewed material tool unavailable', 'Installed materials not verified',
                     'M4 material staging refused', 'Invalid frozen messaging file revision',
