@@ -2,7 +2,7 @@
   "schema": "rocketmq-m4-c06-config-contract/v1",
   "recorded_on": "2026-10-26",
   "task": "C06-D05",
-  "status": "candidate-awaiting-host-ci-and-merges",
+  "status": "frozen-source-contract-effective-on-PR320-merge",
   "scope": "source-configuration-contract; final cleanup images and production acceptance belong to C08",
   "material_root": "/var/lib/fangcun-m4-materials",
   "revision": "m4-c06-20261026-v1",
@@ -81,6 +81,10 @@
     {
       "path": "rocketmq-m4-c06-eight-instance-rebuild-20261026.json",
       "sha256": "a93f474e17c64a8ed9ec16003f17f605386b8729c919d63874e1af259e50bf5b"
+    },
+    {
+      "path": "rocketmq-m4-c06-host-guard-20261026.json",
+      "sha256": "bacd7f44b338a24edc897195b80887ec268b74300c518d93c5521cc01d00aab8"
     }
   ],
   "isolated_stage_images": [
@@ -265,5 +269,57 @@
     "restore old full backup over new facts after runtime start",
     "activate NSQ or publishing Relay as automatic fallback",
     "generic prune or garbage collection"
-  ]
+  ],
+  "completion_pr": "https://github.com/FangcunMount/infra/pull/320",
+  "completed_effective_on_merge": true,
+  "repositories": {
+    "iam": {
+      "pr": "https://github.com/FangcunMount/iam/pull/153",
+      "source_sha": "88cae2df3aca4858688d97af11bd0768871d6e97",
+      "merge_sha": "ece67552793eee849d035b514d4be672eb4c3c8a",
+      "merged_at": "2026-10-26T09:12:18Z",
+      "state": "MERGED",
+      "checks_success": 8,
+      "conditional_jobs_not_triggered": [],
+      "checks_receipt_sha256": "fc43525810a82325f777e461ccdc23bfd8a44575592de69868015a3b9e079016",
+      "check_urls": [
+        "https://github.com/FangcunMount/iam/actions/runs/40296886265",
+        "https://github.com/FangcunMount/iam/actions/runs/40296893876"
+      ]
+    },
+    "qs-server": {
+      "pr": "https://github.com/FangcunMount/qs-server/pull/449",
+      "source_sha": "92d58eaa75377d0030e8e549c16f942bf08f510c",
+      "merge_sha": "2844fe9d48f0372d277047fdc8572d5e86250639",
+      "merged_at": "2026-10-26T09:23:05Z",
+      "state": "MERGED",
+      "checks_success": 29,
+      "conditional_jobs_not_triggered": [
+        "Docs & API Generated Sync"
+      ],
+      "checks_receipt_sha256": "32150b4f0ae1115653afd192ef50af9552ec3f2d9ebcceb50dd5325117bfd221",
+      "check_urls": [
+        "https://github.com/FangcunMount/qs-server/actions/runs/40297080746",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40297086620",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40297086630",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40297086633",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40297086653"
+      ]
+    },
+    "qs-ai": {
+      "pr": "https://github.com/FangcunMount/qs-ai/pull/227",
+      "source_sha": "494dcdef6989270cf17dd7cc599b908c33ebe2b5",
+      "merge_sha": "ec61f7e636128e425c9474b8aea7eb032acc26bd",
+      "merged_at": "2026-10-26T09:34:02Z",
+      "state": "MERGED",
+      "checks_success": 12,
+      "conditional_jobs_not_triggered": [],
+      "checks_receipt_sha256": "94e3f616f215adc93a93eb8350784656393a3cd58b89d80dddbf502f9edb5e66",
+      "check_urls": [
+        "https://github.com/FangcunMount/qs-ai/actions/runs/40298349026"
+      ]
+    }
+  },
+  "host_guard_native_run": "https://github.com/FangcunMount/infra/actions/runs/40298403925",
+  "root_tool_installed_in_production": false
 }
