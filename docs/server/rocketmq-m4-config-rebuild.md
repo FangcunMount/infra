@@ -44,7 +44,7 @@ API完整主机预检已有源码与真实离线镜像证据，完整CI/合并�
 ## C06-D02：新增版本材料，保留活动配置
 
 受限工具 `scripts/ops/m4_material_stage.py` 只把已冻结的原MQ/JOSE bytes复制到四个角色的
-`/data/infra/<role>-messaging/versions/m4-.../` 新目录。API共8份、AI共7份、IAM和worker
+`/var/lib/fangcun-m4-materials/<role>-messaging/versions/m4-.../` 新目录。API共8份、AI共7份、IAM和worker
 各3份，合计21份不同文件；三个worker共享一个材料版本，对应八实例的27处文件引用。
 原source的摘要、长度、UID/GID及mode全部校验后才允许创建目录；复制完成前再次核对source。
 新文件root所有、角色GID只读（0440），版本目录0750；现有父目录、原文件及current指针不修改。
@@ -59,3 +59,5 @@ API完整主机预检已有源码与真实离线镜像证据，完整CI/合并�
 本批源码先运行本地14项故障保护和required Linux root/普通UID/共享锁的19项真实权限验证，
 全部通过并合并后才预置生产新版本。生产root工具/私有plan/版本材料安装分别留receipt；
 新材料预置不表示C06-D03八实例重建、D04部署入口保护或C08生产发布已完成。
+
+D02首次目标机预览在任何材料复制前拒绝旧根目录：serverA/serverD的 `/data`、serverD的 `/data/infra` 由UID2000持有。新版本根改为 `/var/lib/fangcun-m4-materials`，保持原有严格root所有/不可被其他用户写入的检查，不更改旧目录权限。原 `/data/infra/...` 与M3 profile仅作为已冻结、摘要校验的只读source。新的receipt固定material_root；八角色重建与最终CD须同步该宿主来源路径，容器内约定不变，此路径联动仍纳入C06-D03/D04/D05。旧工具/计划与失败日志保留，未复制/激活材料。

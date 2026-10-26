@@ -16,7 +16,8 @@ import shutil
 import stat
 import tempfile
 
-BASE = Path('/data/infra')
+BASE = Path('/var/lib/fangcun-m4-materials')
+LEGACY_BASE = Path('/data/infra')
 LOCK = Path('/var/lib/fangcun-image-retention/deploy.lock')
 ROLES = {
     'iam': ('serverA', 'iam-messaging', 2000),
@@ -111,10 +112,10 @@ def validate(plan):
     return declarations(plan['role'], plan['files'])
 
 
-def expected_receipt(plan, files, uid, gid):
+def expected_receipt(plan, files, uid, gid, material_root):
     return dict(schema='m4-material-receipt/v1', plan_sha256=sha(encoded(plan)), role=plan['role'],
                 host=plan['host'], revision=plan['revision'], source_receipt_sha256=plan['source_receipt_sha256'],
-                uid=uid, gid=gid, file_mode='0440', directory_mode='0750',
+                material_root=str(material_root), uid=uid, gid=gid, file_mode='0440', directory_mode='0750',
                 files=[{k: row[k] for k in ('target', 'sha256', 'bytes')} for row in files], activated=False)
 
 
@@ -161,9 +162,9 @@ def stage(plan, *, apply=False, root=BASE, uid=0, gid=None, source_roots=None):
     files = validate(plan)
     role = plan['role']
     gid = ROLES[role][2] if gid is None else gid
-    source_roots = (Path('/opt/fangcun-m3/releases'), BASE / ROLES[role][1] / 'versions') if source_roots is None else tuple(source_roots)
+    source_roots = (Path('/opt/fangcun-m3/releases'), LEGACY_BASE / ROLES[role][1] / 'versions', BASE / ROLES[role][1] / 'versions') if source_roots is None else tuple(source_roots)
     destination = root / ROLES[role][1] / 'versions' / plan['revision']
-    receipt = expected_receipt(plan, files, uid, gid)
+    receipt = expected_receipt(plan, files, uid, gid, root)
     require(not destination.is_symlink(), 'destination_symlink')
     safe_directory(root.parent, uid)
     # Validate every source before creating even a parent directory.
@@ -182,9 +183,9 @@ def stage(plan, *, apply=False, root=BASE, uid=0, gid=None, source_roots=None):
             safe_directory(parent, uid)
     if destination.exists():
         verify_directory(destination, receipt, uid, gid)
-        return {'status': 'already-staged', 'role': role, 'revision': plan['revision'], 'receipt_sha256': sha(encoded(receipt)), 'activated': False}
+        return {'status': 'already-staged', 'role': role, 'revision': plan['revision'], 'material_root': str(root), 'receipt_sha256': sha(encoded(receipt)), 'activated': False}
     if not apply:
-        return {'status': 'ready', 'role': role, 'revision': plan['revision'], 'files': len(files), 'activated': False}
+        return {'status': 'ready', 'role': role, 'revision': plan['revision'], 'material_root': str(root), 'files': len(files), 'activated': False}
     created = []
     temporary = None
     try:
@@ -218,7 +219,7 @@ def stage(plan, *, apply=False, root=BASE, uid=0, gid=None, source_roots=None):
         finally:
             os.close(descriptor)
         verify_directory(destination, receipt, uid, gid)
-        return {'status': 'staged', 'role': role, 'revision': plan['revision'], 'files': len(files), 'receipt_sha256': sha(encoded(receipt)), 'activated': False}
+        return {'status': 'staged', 'role': role, 'revision': plan['revision'], 'material_root': str(root), 'files': len(files), 'receipt_sha256': sha(encoded(receipt)), 'activated': False}
     finally:
         if temporary is not None:
             shutil.rmtree(temporary)  # Only this call's private temporary directory.

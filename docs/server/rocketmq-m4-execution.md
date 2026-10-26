@@ -233,3 +233,5 @@ C06-B04/B05已形成[QS PR447](https://github.com/FangcunMount/qs-server/pull/44
 2026-10-26 C06-D01完成：沿固定Mac mini SSH入口只读核对三个MySQL和一个Mongo权威binding，与当前配置原store/epoch按字节相同。MySQL借用镜像实际Python依赖建立独立短连接、显式READ ONLY及ROLLBACK；Mongo只读majority元数据，不读业务正文。再次冻结八实例/27处文件引用（19 MQ+8 JOSE）、五个Broker主体指纹及原Unix身份/预算，三个worker仍48并发。初版配置嵌套假设和解释器选择失败均保留，未据此改生产。随本PR合并后 **12/38**、C06内部仍 **3/4**，正式仍 **1/8**；D02开始准备版本材料，不修改活动运行配置。
 
 2026-10-26 C06-D02源码开始：受限材料预置工具只新增不可变版本，固定四角色路径和Unix身份，不切换current/运行配置。14项本地源文件/路径/权限/原资产/复制故障保护及原7项退役入口回归通过；required Linux root/普通UID/共享锁19项待CI。D02保持进行中，未执行生产材料写入，当前12/38不变。
+
+2026-10-26 D02目标机首轮预览拒绝应用UID2000拥有的 `/data` 祖先目录，生产尚无材料复制/激活。保留该失败，新增版本根调整为root控制的 `/var/lib/fangcun-m4-materials`；严格目录保护不放宽，不改旧目录/运行配置/共享锁。新根与receipt联动重新验证后才预置；三库最终CD来源路径将在D03/D04/D05同步，D02仍进行中、12/38不变。
