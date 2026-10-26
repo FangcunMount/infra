@@ -6,6 +6,7 @@ import os
 import re
 import secrets
 
+from host_sdk_contract import stable_module_matches
 from iam_acceptance import host_failure_summary, retain_private_host_output
 from m3_resources import manifest
 from provision_v2 import provision, Admin
@@ -89,7 +90,7 @@ def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'], cwd=source, env=env).stdout)
-    if module.get('Replace') or module.get('Version') != 'v0.5.0-rocketmq-tx.2' or not module.get('Sum'):
+    if not stable_module_matches(module) and (module.get('Replace') or module.get('Version') != 'v0.5.0-rocketmq-tx.2' or not module.get('Sum')):
         raise RuntimeError('fixed published worker SDK without replace required')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
     # Retain ALL canonical worker subscriptions; fixture producer only supplies
