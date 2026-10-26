@@ -27,7 +27,7 @@
 
 ## 文件与入口验证
 
-早期打包源码以 `/data/infra/...` 为来源。D02实际预览后，最终新材料来源固定为 `/var/lib/fangcun-m4-materials/{iam-messaging,qs-server-messaging,qs-ai-messaging,qs-worker-messaging}/versions/<revision>/`，四角色已预置未激活版本；D03/D04须同步三库宿主路径合同。QS/AI保留原JOSE文件名与bytes；API的Mongo凭据挂载与AI桥接一致性预检已在QS PR447实现，并通过真实标准镜像的十项离线验证；生产新工具与版本材料尚未安装。
+早期打包源码以 `/data/infra/...` 为来源。D02实际预览后，最终新材料来源固定为 `/var/lib/fangcun-m4-materials/{iam-messaging,qs-server-messaging,qs-ai-messaging,qs-worker-messaging}/versions/<revision>/`，四角色已预置未激活版本；D03路径合同已由IAM PR152、QS PR448、AI PR226通过完整CI并合并。QS/AI保留原JOSE文件名与bytes；API的Mongo凭据挂载与AI桥接一致性预检已在QS PR447实现，并在PR448标准镜像重新通过十项离线验证。生产仅安装了D02固定材料工具、私有计划及未激活版本材料；三库新CD发布工具与运行配置尚未启用。
 
 重建沿现有C06-D门禁执行：逐个绑定确切源码/镜像、原身份、实际文件摘要与Unix身份/权限，再由真实宿主decoder、离线镜像预检和Compose核对有效配置。缺失、符号链接、权限变化、混合revision、错误owner/路由或预算必须在配置同步、停止或替换运行服务之前拒绝；生产固定root工具只能由已安装的审核摘要选择，不能执行上传目录中的任意root Python。
 
@@ -63,3 +63,5 @@ API完整主机预检已有源码与真实离线镜像证据，完整CI/合并�
 D02首次目标机预览在任何材料复制前拒绝旧根目录：serverA/serverD的 `/data`、serverD的 `/data/infra` 由UID2000持有。新版本根改为 `/var/lib/fangcun-m4-materials`，保持原有严格root所有/不可被其他用户写入的检查，不更改旧目录权限。原 `/data/infra/...` 与M3 profile仅作为已冻结、摘要校验的只读source。新的receipt固定material_root；八角色重建与最终CD须同步该宿主来源路径，容器内约定不变，此路径联动仍纳入C06-D03/D04/D05。旧工具/计划与失败日志保留，未复制/激活材料。
 
 2026-10-26 D02生产材料结果：[完整receipt](evidence/rocketmq-m4-c06-versioned-materials-20261026.json)。四角色21份原文件、27处挂载引用的 `m4-c06-20261026-v1` 已预置且再次只读验证；runtime fingerprint、current指针和原锁相同。新版本未激活，旧原材料及目录不变。新宿主来源路径尚须在三库CD/重建联动后冻结，不能恢复自动部署。
+
+2026-10-26 D03来源路径合同已合并：[源码/完整CI/报告receipt](evidence/rocketmq-m4-c06-root-material-paths-20261026.json)。阶段构建固定IAM 48182c39424573060fda0e27ed6670d2b326f42d、QS d20436edb363c17f0b177126aebe43a44bc5e082、AI 61ef88ac95800dfd3c0c90fd56c102f7c0e77e8f；仅生成隔离候选制品。现有M3固定镜像的旧启动报告不作为本轮重建证明；新八实例必须使用本轮源码的实际打包/decoder、root来源文件及原角色预算完成启动与关闭。D03在真实重建通过前保持进行中。

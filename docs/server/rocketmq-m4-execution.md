@@ -119,7 +119,7 @@ M4 完成要求八项闭环、相关变更合并、必要制品发布、清理�
 | C06-C | ✅ 已完成 | AI最终事务部署入口 | 缺失/禁用/NSQ/M1目标拒绝；七文件、原身份及预算通过；PR225/12项CI/11406执行0失败错误跳过 |
 | C06-D01 | ✅ 已完成 | 实际原绑定和材料冻结 | 2026-10-26；四owner的原数据库binding逐字节一致；MySQL只读事务/TLS、Mongo primary/majority；八实例/19处MQ+8处JOSE/5个主体指纹、只读挂载/Unix可读性、原UID/资源与worker48并发通过；[完整摘要/失败历史](evidence/rocketmq-m4-c06-original-bindings-20261026.json)。[PR310](https://github.com/FangcunMount/infra/pull/310)已合并df5a1c0abbce5727ad0bb72440445f7eb8297b96；原D01仅只读核对 |
 | C06-D02 | ✅ 已完成 | 版本化部署材料准备 | 2026-10-26；PR311/312源码及14源测试+19真实Unix/锁验证通过；原21份材料预置到root控制的新版本，回读四角色完全一致，8实例/活动指针/原锁不变、未激活。[完整SHA/CI/生产材料receipt](evidence/rocketmq-m4-c06-versioned-materials-20261026.json)；本PR合并后生效，不冒充运行版部署 |
-| C06-D03 | 🔄 进行中 | 隔离环境八实例重建 | 五种服务八实例真实启动，四owner/订阅/Checker/TLS和原资源预算正确 |
+| C06-D03 | 🔄 进行中 | 隔离环境八实例重建 | 三库新root来源路径已通过完整CI并合并（IAM152、QS448、AI226），[源码/报告receipt](evidence/rocketmq-m4-c06-root-material-paths-20261026.json)；五种服务八实例真实启动、四owner/订阅/Checker/TLS与原预算仍待证明，不能以路径测试代替 |
 | C06-D04 | ☐ 待开始 | 材料错误于替换前拒绝证明 | 缺失/符号链接/权限/revision/owner/路由错误先于同步或停止；仅隔离环境注入故障 |
 | C06-D05 | ☐ 待开始 | 合并和冻结C06配置契约 | 必需CI、PR合并、阶段镜像与材料摘要齐全；后续最终发布可复用配置契约 |
 
@@ -237,3 +237,7 @@ C06-B04/B05已形成[QS PR447](https://github.com/FangcunMount/qs-server/pull/44
 2026-10-26 D02目标机首轮预览拒绝应用UID2000拥有的 `/data` 祖先目录，生产尚无材料复制/激活。保留该失败，新增版本根调整为root控制的 `/var/lib/fangcun-m4-materials`；严格目录保护不放宽，不改旧目录/运行配置/共享锁。新根与receipt联动重新验证后才预置；三库最终CD来源路径将在D03/D04/D05同步，D02仍进行中、12/38不变。
 
 2026-10-26 C06-D02完成：PR311候选39d210dc9edd48485d1438523d6c7464e48a5c05合并62a841fcd52e5e59a51bfa868402d0b161f89ee6；首次目标预览拒绝UID2000祖先目录，未复制/激活材料。PR312候选4f516c811bb293479edfdb223643f532d62c876d重新通过14源测试与19 Linux原生权限/锁用例后合并38d724421c2fb7996d253ba55f5c2ecac47a574a，采用独立root目录 `/var/lib/fangcun-m4-materials`，严格保护不放宽、旧目录不变。已预置 `m4-c06-20261026-v1` 的21份原材料，四角色回读均already-staged且完全一致；八实例fingerprint/活动指针/共享锁不变。新增root工具和私有计划、未激活材料分别留证，无业务部署/DB变更/凭据轮换/模型调用/旧资产删除。随本进度PR合并，当前 **13/38**、C06仍 **3/4**、正式仍 **1/8**。下一步D03联动三库宿主来源路径与八实例隔离重建，CD仍暂停。
+
+2026-10-26 C06-D03路径合同子批：[IAM PR152](https://github.com/FangcunMount/iam/pull/152)通过8项检查后合并48182c39424573060fda0e27ed6670d2b326f42d；[QS PR448](https://github.com/FangcunMount/qs-server/pull/448)通过29项检查后合并d20436edb363c17f0b177126aebe43a44bc5e082（另1项条件Docs同步未触发），标准镜像10项离线预检通过；[AI PR226](https://github.com/FangcunMount/qs-ai/pull/226)通过12项检查后合并61ef88ac95800dfd3c0c90fd56c102f7c0e77e8f，八份JUnit报告已下载核对，两档MySQL各5703项、合计11406执行/0失败/0错误/0跳过，组内无重复、两档用例集合一致。QS/AI实际CI checkout与候选及合并源码树相同。三库宿主材料来源统一为root控制的新根，容器内约定保持；AI首轮打包器/主机路径不一致及本地无Docker daemon的失败保留，实际容器用例经完整托管CI通过，不启动MacBook Docker补测。[完整receipt](evidence/rocketmq-m4-c06-root-material-paths-20261026.json)。
+
+已按三库合并SHA发起[五类阶段镜像构建](https://github.com/FangcunMount/infra/actions/runs/40282528557)，只用于隔离重建，不推送生产registry或启动生产业务。八实例实际重建、全宿主D04保护和D05契约冻结未完成，**13/38、C06 3/4、正式1/8均不变**；源码合并未恢复自动CD、未激活材料或变更运行实例。
