@@ -26,8 +26,8 @@ M3 必须先完成最终新链路、旧责任处置、停止旧生产组件及sy
 | --- | --- | --- | --- |
 | ✅ | C01 | 接收M3发布/T34用户豁免/旧责任处置记录；逐项冻结代码、服务、表、字段、卷、配置及明确保护对象 | 2026-10-25；源码97c4551、PR300已合并c56448a27ec0e7dfeb8b830306b0ba097a019544；四仓库独立worktree、18责任单元/699去重源码摘要、46表466列/9Mongo集合只读元数据、Go目标/Python31/infra7门禁0跳过与当前8实例健康通过；[清单](rocketmq-m4-inventory.md)/[证据](evidence/rocketmq-m4-c01-inventory-20261025.json)。无生产/数据变更；随本盘点PR合并生效 |
 | ✅ | C02 | 删除三库已停用的生产NSQ provider及发布型Outbox/Relay运行入口、旧启动分支和无调用代码 | 2026-10-26；三库最终运行装配均已合并，三库汇总/真实故障门禁通过；[汇总receipt](evidence/rocketmq-m4-c02-runtime-aggregate-20261026.json)。隔离旧helper与读取清理归C03/C04/C05，未部署 |
-| ☐ | C03 | 删除旧Payload/ACK/Operation reader fallback、历史格式互通与恢复兼容分支 | 进行中；QS PR451/AI PR229实现最终读取和缺档案ACK拒绝，源码CI与infra真实依赖门禁待完成。保留新协议RPC/鉴权/receipt |
-| ☐ | C04 | 删除未投产的宿主中间协议及对应孤立夹具/临时工具，收敛最终协议文档 | 进行中；IAM PR155待完整CI，AI/QS按职责小批清理；来自T18，不开发中间协议迁移器，不移动已发布tag |
+| ✅ | C03 | 删除旧Payload/ACK/Operation reader fallback、历史格式互通与恢复兼容分支 | 2026-10-26；4/4叶子、QS PR451/AI PR229/infra PR329及PR331已合并，正式SDK下完整原生矩阵通过。[receipt](evidence/rocketmq-m4-c03-current-readers-20261026.json)。保留新协议RPC/鉴权/receipt；未部署 |
+| ☐ | C04 | 删除未投产的宿主中间协议及对应孤立夹具/临时工具，收敛最终协议文档 | 进行中；IAM PR155通过10项CI并合并4609d4542d9303130ab94ed67593d0a69d0d010d；AI PR230/QS PR452待最终完整CI和原生门禁。来自T18，不开发中间协议迁移器，不移动已发布tag |
 | ☐ | C05 | 梳理旧命名下仍承担当前receipt/调度/业务历史的职责，保留或最小解耦，再移除确定废弃字段/依赖 | 进行中：C05-01责任映射完成；C05-02最小解耦/C05-03非空恢复未完成。不得整表删除当前事实，不以大规模改名作为完成门禁 |
 | ✅ | C06 | 删除旧生产NSQ部署/CD/自动启动/环境变量/监控及恢复脚本入口，核验新配置可完整重建 | 2026-10-26；12/12叶子、4/4门禁通过，八实例重建18项与四角色真实权限拒绝50项通过；三库主机保护完整CI并合并，配置契约随PR320合并冻结。[宿主保护证据](evidence/rocketmq-m4-c06-host-guard-20261026.json)/[固定契约](evidence/rocketmq-m4-c06-config-contract-20261026.json)。生产新工具/宿主保护安装和材料激活留C08，自动CD仍暂停、开发依赖保留 |
 | ☐ | C07 | 按保留期限及具名清单处置旧容器/卷/表/镜像/备份；执行前核对未决责任及保护资产，完成后回读验证 | 待开始；没有批准的对象保持保留，不执行泛化prune或自动GC |
@@ -96,14 +96,14 @@ M4 完成要求八项闭环、相关变更合并、必要制品发布、清理�
 | --- | --- | --- | --- |
 | C04-01 | ☐ 进行中 | 无当前责任维护入口退出 | 核对CLI/Make/Docker/workflow/运维调用后删除；当前恢复诊断能力保持 |
 | C04-02 | ☐ 进行中 | 中间夹具和临时互通测试清理 | 删除项有用途与最终协议覆盖映射；原报告及SDK通用兼容/开发依赖保留 |
-| C04-03 | ☐ 待开始 | 当前操作文档收敛 | 当前命令指向有效入口；旧操作归档或失效，链接、命令及源码基线验证通过 |
+| C04-03 | ☐ 进行中 | 当前操作文档收敛 | 当前命令指向有效入口；旧操作归档或失效，链接、命令及源码基线验证通过 |
 
 ### C05：当前业务责任与废弃依赖（1/3）
 
 | ID | 状态 | 子任务 | 必达验收 |
 | --- | --- | --- | --- |
 | C05-01 | ✅ 已完成 | 保留/删除/最小解耦职责映射 | 2026-10-26；[11项责任/26份源码摘要及冻结SHA](evidence/rocketmq-m4-c05-responsibilities-20261026.json)、[当前调用与最小解耦边界](rocketmq-m4-inventory.md#c05-01当前责任与最小解耦映射2026-10-26)已核对；[PR308](https://github.com/FangcunMount/infra/pull/308)已合并c212b93f3111eb8e715890cce257efc33c5b5fcd，源码2b3f7f4ab2efd3bbedf49b51d77c1692d2264bc3。未删除代码/字段，不提前完成C05-02/03 |
-| C05-02 | ☐ 待开始 | 必要解耦和废弃依赖清理 | 当前事实与标识保持；不做大规模改名，物理字段处置归C07 |
+| C05-02 | ☐ 进行中 | 必要解耦和废弃依赖清理 | 当前事实与标识保持；不做大规模改名，物理字段处置归C07 |
 | C05-03 | ☐ 待开始 | 非空事实与确定性恢复证明 | 档案、回执、未来计划和response/checkpoint可处理；不增加attempt或业务/模型执行授权 |
 
 ### C06：部署配置与重建（12/12；门禁4/4）
@@ -270,3 +270,12 @@ C06-B04/B05已形成[QS PR447](https://github.com/FangcunMount/qs-server/pull/44
 
 
 2026-10-26 C03闭环：QS PR451（29项成功、1条件Docs未触发）、AI PR229（12项成功，两档各5725测试/11450执行零失败错误跳过）、infra PR329（25项成功）已合并。当前QS三档各command15/event17事实、AI六档各15 MySQL+mTLS测试/21事实、当前配对六档各5测试/25事实通过，固定SDK/源码/镜像摘要与清理已核对；[完整receipt](evidence/rocketmq-m4-c03-current-readers-20261026.json)保留先红后绿、非required本地缺依赖skip及docs修正边界。进度记录合并后24/38、C03 4/4、父任务4/8、M4-1 21/26、C06 4/4；无生产部署/DDL/业务模型调用/资产删除，CD暂停。C04已独立推进[IAM PR155](https://github.com/FangcunMount/iam/pull/155)的旧切换工具/无生产调用Relay清理，72本地测试通过，完整CI尚未完成，不提前勾选C04/C05。
+
+
+2026-10-26 C04三库源码子批：IAM [PR155](https://github.com/FangcunMount/iam/pull/155)的旧切换CLI/维护包及孤立探针已退出，72项本地race、原事务原生门禁和10项完整CI通过，合并4609d4542d9303130ab94ed67593d0a69d0d010d。当前原根授权维护、首次空库bootstrap、会话撤销和全部schema/历史材料保留。
+
+AI [PR230](https://github.com/FangcunMount/qs-ai/pull/230)拆出当前Inbox/决策/技术失败与evaluation sequence声明，移除旧MQRelay、StateEventRecorder编排、mutating handoff及旧协议夹具；result_outbox当前state/ACK和模型response/checkpoint不变。158项本地目标测试、类型/文档检查通过；六档原生故障和六档MySQL+mTLS当前读取已在a83候选通过，后续仅CI/文档与旧测试参数修正，最终be5e806eedb73d92936c70fb7e5f9762e4bf2f91重新绑定完整源码及原生验收，尚未合并。M7残留文件路径、workflow源码摘要和三个旧decide测试参数的失败均保留，不恢复旧生产实现来迎合退役测试。
+
+QS [PR452](https://github.com/FangcunMount/qs-server/pull/452)候选2a56f956edac647e822a953a38b8c7dba042e7d6移除旧NSQ/中间普通消息Relay、Stage/ACK rearm/旧正文helper、不可达标准Outbox组合器及孤立探针；保留原业务guard、当前事务receiver、负向历史ID排除、只读资产审计与离线预检。真实拒绝场景直接SQL预置历史事实，不调用退役写者。当前领域目录分类名保持，存储契约改为最终owner/显式迁移证据；旧SDK通用兼容和开发依赖留在明确隔离范围。本地8包783项race通过，7项既有可选数据库用例跳过，明确不作为required；88项文档检查器、全仓integration标签仅编译、文档事实/链接及发布工具通过，正式CI/原生门禁待完成。
+
+C04仍0/3、C05仍1/3、总计24/38、父任务4/8；不把源码候选计为完成。修正本页父表C03的旧“待CI”文字，使之与已合并的4/4叶子/receipt一致。生产CD继续暂停；没有M4部署、生产工具安装/材料激活、DDL、历史资产删除、消息补发或模型调用。
