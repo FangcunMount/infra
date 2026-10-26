@@ -1,0 +1,315 @@
+{
+  "schema": "rocketmq-m4-c06-versioned-materials/v1",
+  "recorded_on": "2026-10-26",
+  "task": "C06-D02",
+  "completed": true,
+  "source": {
+    "initial_source_sha": "39d210dc9edd48485d1438523d6c7464e48a5c05",
+    "initial_pr": "https://github.com/FangcunMount/infra/pull/311",
+    "initial_merge_sha": "62a841fcd52e5e59a51bfa868402d0b161f89ee6",
+    "final_source_sha": "4f516c811bb293479edfdb223643f532d62c876d",
+    "final_pr": "https://github.com/FangcunMount/infra/pull/312",
+    "final_merge_sha": "38d724421c2fb7996d253ba55f5c2ecac47a574a",
+    "operator_sha256": "bd8d0c0d0a925703130936e1cd05361801aad0bcd6b25bf2c74f73187fec89c4"
+  },
+  "CI": {
+    "initial_run": "https://github.com/FangcunMount/infra/actions/runs/40276239898",
+    "final_run": "https://github.com/FangcunMount/infra/actions/runs/40277980959",
+    "source_failure_protection_tests": 14,
+    "real_linux_unix_and_lock_cases": 19,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "final_native_report": {
+      "schema": "m4-material-stage-native/v1",
+      "source_sha": "4f516c811bb293479edfdb223643f532d62c876d",
+      "passed": 19,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "case_ids": [
+        "iam-root-stages-exact-bytes-with-original-role-gid",
+        "iam-ordinary-runtime-reads-but-cannot-write",
+        "iam-foreign-uid-cannot-read",
+        "iam-exact-repeat-does-not-rewrite",
+        "qs-api-root-stages-exact-bytes-with-original-role-gid",
+        "qs-api-ordinary-runtime-reads-but-cannot-write",
+        "qs-api-foreign-uid-cannot-read",
+        "qs-api-exact-repeat-does-not-rewrite",
+        "ai-root-stages-exact-bytes-with-original-role-gid",
+        "ai-ordinary-runtime-reads-but-cannot-write",
+        "ai-foreign-uid-cannot-read",
+        "ai-exact-repeat-does-not-rewrite",
+        "worker-root-stages-exact-bytes-with-original-role-gid",
+        "worker-ordinary-runtime-reads-but-cannot-write",
+        "worker-foreign-uid-cannot-read",
+        "worker-exact-repeat-does-not-rewrite",
+        "shared-lock-inode-content-mode-mtime-preserved",
+        "busy-shared-lock-refused-without-wait-or-replacement",
+        "only-owned-temporary-fixture-cleaned"
+      ],
+      "production": false,
+      "network_used": false,
+      "fixture_cleaned": true
+    },
+    "original_retired_entrypoint_regression_tests": 7
+  },
+  "material_root": "/var/lib/fangcun-m4-materials",
+  "revision": "m4-c06-20261026-v1",
+  "material_files": 21,
+  "MQ_JOSE_mount_references": 27,
+  "hosts": {
+    "serverA": {
+      "active_pointers_unchanged": true,
+      "apply": true,
+      "credentials_rotated": false,
+      "host": "serverA",
+      "materials_activated": false,
+      "metadata_operator_and_private_plan_installed": true,
+      "operator_sha256": "bd8d0c0d0a925703130936e1cd05361801aad0bcd6b25bf2c74f73187fec89c4",
+      "results": [
+        {
+          "activated": false,
+          "files": 3,
+          "material_root": "/var/lib/fangcun-m4-materials",
+          "receipt_sha256": "2901f3867976a1d3323d5aff951681e5155fa6376b61fe0de8a7a93c29bd7533",
+          "revision": "m4-c06-20261026-v1",
+          "role": "iam",
+          "status": "staged"
+        },
+        {
+          "activated": false,
+          "files": 8,
+          "material_root": "/var/lib/fangcun-m4-materials",
+          "receipt_sha256": "2d356452dd054f3383c9006a6d0452f1d7fa7f97913efcc62c86e5a058d0a079",
+          "revision": "m4-c06-20261026-v1",
+          "role": "qs-api",
+          "status": "staged"
+        },
+        {
+          "activated": false,
+          "files": 7,
+          "material_root": "/var/lib/fangcun-m4-materials",
+          "receipt_sha256": "3d2914a1a717bb8b17e722d15ab02df01ca9502375bcc6baa1dbcfc201a80689",
+          "revision": "m4-c06-20261026-v1",
+          "role": "ai",
+          "status": "staged"
+        }
+      ],
+      "runtime_changed": false,
+      "runtime_instances_unchanged": 5,
+      "runtime_snapshot": [
+        {
+          "config_sha256": "e2521610d33a67d81ae6e90bf910b46203817c71d61f926413871d9126329df3",
+          "host_config_sha256": "dc4e360d879f4fe036af8ad50511aef05625cd44445839d9a1eee53438fbe6b6",
+          "id": "ab8e45fea815c778c1b36f7a455decb07fdae5dd688bf8a1f212ee1a8da5edb6",
+          "image": "sha256:55aec5c5a36072d4e87df9c7b29e51554c12a09064f1f5b60441e3ec2a6e777e",
+          "name": "iam-apiserver",
+          "restarts": 0,
+          "started": "2026-10-25T12:02:34.862474921Z"
+        },
+        {
+          "config_sha256": "17564438794b4967444a2fe10201d59898c711a7cbfb53ddc886b6c3fed40717",
+          "host_config_sha256": "36b075f8638690022b49a40fd0f94e9183d34d53c2118a3db82fc71a9d13f3b8",
+          "id": "0b92e2b9ffe5a157031ce0a382d69da59bf0fb130f5e10eb1ea454374208634d",
+          "image": "sha256:38080355322cc342c5b80e06da1ffdbc00549e391824d7be5e54179ea2d45e5b",
+          "name": "qs-ai",
+          "restarts": 0,
+          "started": "2026-10-25T12:02:46.985535999Z"
+        },
+        {
+          "config_sha256": "560a30ac7f1120b8e16467ea08211ef4eefb7b089b89a3a6f7f8895613216d20",
+          "host_config_sha256": "faf26a97b53f74d6b0d6c8083a8d6e68c6aef0b2b2b9af588dfa34bd42b5204e",
+          "id": "7079deb5f7389578075174c706650493ffa1f538b04679ed4d05aa638a027117",
+          "image": "sha256:85ac6f5cd3bc75326f6d827393bf1dab7b9e85f305aaf03acefd3a174faec150",
+          "name": "qs-apiserver",
+          "restarts": 0,
+          "started": "2026-10-25T12:55:35.127418977Z"
+        },
+        {
+          "config_sha256": "e9f9be4e0791f3e743f3de993f79a25d3257f2adf4111183e55a4a89291b10be",
+          "host_config_sha256": "a3e8cb524f0606f59fd06a12802022d396ccdb52999e085b35d54da1b53f5d18",
+          "id": "7d27c0475d7afde8519bb2af4e5ef26c631de97a794f487c854b80099435b3f3",
+          "image": "sha256:c4c3584fc5a4b11f20344c9e353ffe17f72203c1dff363dd9729e1053b1fde14",
+          "name": "qs-collection-server-1",
+          "restarts": 0,
+          "started": "2026-10-25T12:03:21.238767227Z"
+        },
+        {
+          "config_sha256": "f1c4278ad6bb75b1137f0b5a27eb1962c9a383026669ba5641b289f9561fd359",
+          "host_config_sha256": "7cc3551767617c3eff3c0b55ed2738f61355017e8bd77f3046da1b3e92c88e55",
+          "id": "884091c2766bf414d6e15afcbf3b4b24ea1be0d8779e3227b731f673718af60b",
+          "image": "sha256:c4c3584fc5a4b11f20344c9e353ffe17f72203c1dff363dd9729e1053b1fde14",
+          "name": "qs-collection-server-2",
+          "restarts": 0,
+          "started": "2026-10-25T12:03:20.814323335Z"
+        }
+      ],
+      "runtime_snapshot_sha256": "f7765fd8081fca7a355bfab80bc66414e95ecee197d5f4d58bff347b48580659",
+      "shared_lock_inode_unchanged": true
+    },
+    "serverD": {
+      "active_pointers_unchanged": true,
+      "apply": true,
+      "credentials_rotated": false,
+      "host": "serverD",
+      "materials_activated": false,
+      "metadata_operator_and_private_plan_installed": true,
+      "operator_sha256": "bd8d0c0d0a925703130936e1cd05361801aad0bcd6b25bf2c74f73187fec89c4",
+      "results": [
+        {
+          "activated": false,
+          "files": 3,
+          "material_root": "/var/lib/fangcun-m4-materials",
+          "receipt_sha256": "100bdade84e77859f490e15480002cb3d93d2a5c65fdff1dcc01463de2a6f2c2",
+          "revision": "m4-c06-20261026-v1",
+          "role": "worker",
+          "status": "staged"
+        }
+      ],
+      "runtime_changed": false,
+      "runtime_instances_unchanged": 3,
+      "runtime_snapshot": [
+        {
+          "config_sha256": "a3f4a48e127b38d0f9e19dc631624f8f5172e5b604ea25d7860c50408324c9e1",
+          "host_config_sha256": "171d706f690c70d0783303e88b71ff342beb297e2b918cd8b2cd8d5aa9d52121",
+          "id": "cca69a14cc72ee2f883006e27f44c3301c0d432e74758565bbd740fab26da214",
+          "image": "sha256:052758537916756515f9897238dcc2c8e2c3c598e997859724345ea2993b2d84",
+          "name": "qs-worker-runtime-1",
+          "restarts": 0,
+          "started": "2026-10-25T12:13:11.081978958Z"
+        },
+        {
+          "config_sha256": "fbc4a7da0534d5059e0f6c56528feba8985e85de37097c0fef2702087d577547",
+          "host_config_sha256": "aac882c6a5a2266ab6a8db8506eee60cde1780a056277c85d76f4678fcdb1ded",
+          "id": "0de435bfb04d061072fc2b46e26eae84d3564e1d058231aebd4fd3db257047d7",
+          "image": "sha256:052758537916756515f9897238dcc2c8e2c3c598e997859724345ea2993b2d84",
+          "name": "qs-worker-runtime-2",
+          "restarts": 0,
+          "started": "2026-10-25T12:13:11.689534229Z"
+        },
+        {
+          "config_sha256": "138826f90e7ce497661f038af5697710b82eeea3f376df484ad53b0bdf7e7a82",
+          "host_config_sha256": "6ea3e956118b0107104ff635ae6a9068e188037439a3752fed5706c6016619c6",
+          "id": "8ecdd5a00eec7b7ab6137756a135159a0dadf4271456af4d255ada1471686911",
+          "image": "sha256:052758537916756515f9897238dcc2c8e2c3c598e997859724345ea2993b2d84",
+          "name": "qs-worker-runtime-3",
+          "restarts": 0,
+          "started": "2026-10-25T12:13:12.35573232Z"
+        }
+      ],
+      "runtime_snapshot_sha256": "44883d7515ab052a71ad6477e60d773295836e2b576899b33b8a52261cdfcda7",
+      "shared_lock_inode_unchanged": true
+    }
+  },
+  "readback": {
+    "all_four_roles_existing_immutable_revision_exactly_verified": true,
+    "runtime_fingerprint_equal_before_apply_and_after_readback": true,
+    "original_active_pointers_unchanged": true,
+    "original_lock_inode_unchanged": true,
+    "new_files_root_owned_role_gid_readonly": "0440",
+    "new_version_directories": "0750"
+  },
+  "scope": {
+    "operator_and_private_plans_installed": true,
+    "inactive_material_versions_prepared": true,
+    "current_pointer_activated": false,
+    "runtime_configuration_changed": false,
+    "business_runtime_deployed": false,
+    "database_or_schema_changed": false,
+    "credentials_rotated": false,
+    "keys_or_store_identity_regenerated": false,
+    "business_or_model_invocation": false,
+    "legacy_materials_deleted": false,
+    "CD_resumed": false
+  },
+  "retained_failure": {
+    "first_preview_refused_before_material_copy": true,
+    "reason": "UID2000 owns /data on both hosts and /data/infra on serverD; strict root-owned ancestor check rejected",
+    "resolution": "new independent root-owned material namespace; original directory owners/modes retained",
+    "old_operator_and_logs_retained": true
+  },
+  "private_evidence_sha256": {
+    "material-stage-preview-20261026T060854-d8826b.private.json": {
+      "sha256": "5ccbddb30b480c49f2bd82842ef51ffac1394000b3a55ddc9cfd1c5588cacf89",
+      "bytes": 5047
+    },
+    "material-stage-applied-20261026T061033-65f02e.private.json": {
+      "sha256": "fed33eb2e8d1d6e84ae2702a5a2e22e2e3c4501db61f53e4525b8f0e1b623209",
+      "bytes": 5384
+    },
+    "material-stage-preview-20261026T061202-fcbbf3.private.json": {
+      "sha256": "5c0914bc9a37cc1600f60dcd3ce9727558ab2f40605054a66b0cb19c8955b5f1",
+      "bytes": 5379
+    },
+    "m4-material-stage-native.json": {
+      "sha256": "69abd597f68e41391400d3e5a1aaeec39b501d295c55496c1e3dd7264e6638c8",
+      "bytes": 1181
+    },
+    "stage_original_materials.py": {
+      "sha256": "4bf8c08a228b71d456dd3f4a775dc3ee1b9efcd04adb2b505c3fe37b5252ac8c",
+      "bytes": 8139
+    },
+    "stage_original_materials.first-preview-failed.py": {
+      "sha256": "5a50e9213c699b64d261ecd4adcd9b7a309bc240768ad10dd4be214e9e01d502",
+      "bytes": 7397
+    },
+    "material-stage-unit-symlink.log": {
+      "sha256": "157166b0adfb1102a324d563187f10e8f921d5cc5538880750e0987a6a87aa1e",
+      "bytes": 2491
+    },
+    "material-stage-private-root-unit.log": {
+      "sha256": "6a84c3d959580d74113e24055025cfb1c35bbee56f67b43062fe204df78e544e",
+      "bytes": 2491
+    },
+    "retired-entrypoint-regression.log": {
+      "sha256": "1de26f481ba034f817b004689fa5222d65b4cd0eca598c843c6a169876a6cd2b",
+      "bytes": 1378
+    },
+    "packet-index.private.json": {
+      "sha256": "e0e17fb1915b6b27b1a87bd8efa36bd0ae1d8e3c44f35887989e0ba2884132ee",
+      "bytes": 1481
+    },
+    "qs-api.plan.private.json": {
+      "sha256": "6e13fe060eda336f0b38083f0b4f2259a2a526f8ad2c375f148ad009592afa24",
+      "bytes": 3013
+    },
+    "ai.plan.private.json": {
+      "sha256": "573d0c708229b04d7ba0dfae0e3d86bbbdc984f59ff717d8b0798e96c266b4d6",
+      "bytes": 2592
+    },
+    "worker.plan.private.json": {
+      "sha256": "4bf384bcdb73572bdf9c6e7a3e1f8aca1d06b15d688b16aa19341ec0d0315969",
+      "bytes": 1233
+    },
+    "iam.plan.private.json": {
+      "sha256": "b013042318c2450a24fc752d034bcc8d437aaa7d7bc91a6d3364d5332d2f216e",
+      "bytes": 1227
+    },
+    "original-config-inputs.private.json": {
+      "sha256": "c5143602043583649a51da0e1b296a1e8cb382122c08485376411670d6735319",
+      "bytes": 4215
+    },
+    "M4-C06-D02-preview-serverA-20261026T055637-987077.private.out": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "M4-C06-D02-preview-serverA-20261026T055637-987077.private.err": {
+      "sha256": "737faafff61ce53aaf33cafcf6270d82b1de233b3fd1db322f3bbe88565c5c62",
+      "bytes": 146
+    },
+    "M4-C06-D02-parent-metadata-20261026T060057-e701f9-serverD.private.json": {
+      "sha256": "e21a04aa285da21c0ea77ab8ec33ede5918c4f39881949b39d0189a933ae3fb1",
+      "bytes": 688
+    },
+    "M4-C06-D02-parent-metadata-20261026T060057-e701f9-serverA.private.json": {
+      "sha256": "4d645daacf576bd5420f5e1a424489a88dc27c1054f270bd7993a116aa9fe155",
+      "bytes": 866
+    }
+  },
+  "remaining_existing_tasks": [
+    "C06-D03: update actual host source path contract and rebuild all eight instances in isolated environment",
+    "C06-D04: bad-material rejection before all deployment replacements",
+    "C06-D05: merge/freeze final configuration contract; production deployment remains C08"
+  ]
+}
