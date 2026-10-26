@@ -157,6 +157,28 @@ def write_new(path, raw, uid, gid):
         os.fsync(stream.fileno())
 
 
+def verify_staged(plan, *, role, revision, root=BASE, uid=0, gid=None):
+    """Read only the installed revision; callable under a parent's deploy lock.
+
+    Source files are provenance in the reviewed plan, not a runtime dependency.
+    No copy, mkdir, flock, pointer update or activation occurs in this path.
+    Python-only root/UID/GID overrides keep tests inside their owned directory.
+    """
+    files = validate(plan)
+    require(role in ROLES and plan['role'] == role and plan['revision'] == revision,
+            'expected_role_or_revision')
+    gid = ROLES[role][2] if gid is None else gid
+    destination = root / ROLES[role][1] / 'versions' / revision
+    receipt = expected_receipt(plan, files, uid, gid, root)
+    for parent in (root.parent, root, destination.parent.parent, destination.parent):
+        safe_directory(parent, uid)
+    verify_directory(destination, receipt, uid, gid)
+    return {'status': 'verified', 'role': role, 'host': plan['host'],
+            'revision': revision, 'material_root': str(root),
+            'receipt_sha256': sha(encoded(receipt)), 'activated': False,
+            'read_only': True}
+
+
 def stage(plan, *, apply=False, root=BASE, uid=0, gid=None, source_roots=None):
     """Test parameters are Python-only; the production CLI cannot override them."""
     files = validate(plan)
@@ -246,13 +268,25 @@ def main():
     parser.add_argument('--plan', type=Path, required=True)
     parser.add_argument('--expected-sha256', required=True)
     parser.add_argument('--host', choices=('serverA', 'serverD'), required=True)
-    parser.add_argument('--apply', action='store_true')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--apply', action='store_true')
+    mode.add_argument('--verify-staged', action='store_true')
+    parser.add_argument('--expect-role', choices=tuple(ROLES))
+    parser.add_argument('--expect-revision')
     args = parser.parse_args()
     require(os.geteuid() == 0 and HASH.fullmatch(args.expected_sha256), 'root_and_reviewed_plan_required')
     raw = read_file(args.plan, 32768)
     require(sha(raw) == args.expected_sha256, 'plan_hash')
     plan = json.loads(raw, object_pairs_hook=unique)
     require(plan['host'] == args.host, 'host')
+    if args.verify_staged:
+        require(args.expect_role is not None and args.expect_revision is not None,
+                'explicit_verification_identity_required')
+        print(json.dumps(verify_staged(plan, role=args.expect_role,
+                                      revision=args.expect_revision), sort_keys=True))
+        return
+    require(args.expect_role is None and args.expect_revision is None,
+            'verification_identity_without_mode')
     with deployment_lock():
         print(json.dumps(stage(plan, apply=args.apply), sort_keys=True))
 
