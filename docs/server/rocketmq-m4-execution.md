@@ -333,3 +333,6 @@ C08审计补正：[QS PR454](https://github.com/FangcunMount/qs-server/pull/454)
 [完整候选冻结回执](evidence/rocketmq-m4-c08-final-freeze-20261027.json)记录全部路径/摘要及失败历史。最新只读回读八实例的镜像、配置、开始/重启、UID/GID及预算与操作前相同，原部署锁元数据保持；A五实例healthy、D三worker HTTP ready，可用1215MiB；Prometheus/Grafana200、10target全up；四库head/owner原字节保持且clean。生产CD仍暂停，没有维护、业务部署、DDL、Topic/ACL/凭据轮换、模型调用或资产删除。
 
 C08-03仍需收敛最后的维护/入口、实际在途及前向恢复执行包；C08-04必须使用合法system会话做真实业务验收，当前尚未收到会话已就绪回复。既有Mac锁定/无Qlume会话的快照不冒充当前业务验收；在入口准备好之前不关闭公众服务。C08-05待实际部署与回归后完成索引，不提前结项。
+
+
+C08-03继续准备：原生产Nginx镜像对三站点的original/closed非活动副本分别真实syntax检查通过（2/0），活动文件原摘要/inode/权限和Nginx身份保持、未reload或关闭公众入口。[入口receipt](evidence/rocketmq-m4-c08-inactive-ingress-20261027.json)保留只读TLS/临时缓存检查的失败与修正，仅在无发布端口的临时syntax进程中使用原证书读取权限和tmpfs，未改生产安全配置。未伪造验收来源或T0。刚重新检查的UI仍返回Mac锁定、Chrome无Qlume会话；待用户正常解锁/login后收敛实际执行包并进入C08-04。C08-03不提前勾选，总数仍35/38。

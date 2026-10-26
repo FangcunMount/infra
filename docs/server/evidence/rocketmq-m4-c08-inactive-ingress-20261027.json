@@ -1,0 +1,94 @@
+{
+  "acceptance_peer_or_times_fabricated": false,
+  "active_files_changed": false,
+  "active_nginx_unchanged": true,
+  "host": "serverA",
+  "maintenance_started": false,
+  "operator_sha256": "4d0d2badd099e7ac630a3076d5f6043e2855102cad614cc2875447f6f8612b54",
+  "original_nginx_image": "sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d",
+  "reload": false,
+  "renderer_sha256": "798baee24fb05ae05cefb4459cadf41fa799909644052ae76c2cf8e4299bbd5d",
+  "root": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/ingress",
+  "sites": [
+    {
+      "closed_sha256": "6569f80368c7c20c789a824607e719f0ef6825d51d63046ca0fc6116f43cf304",
+      "gid": 2000,
+      "mode": "0o644",
+      "name": "iam.fangcunmount.cn.conf",
+      "original_inode": 400263,
+      "original_sha256": "106e753f509424c95469f1e06be1e95631789e7f8a9294d31cce7755eea62e24",
+      "uid": 2000
+    },
+    {
+      "closed_sha256": "ca98f65c836b9a7ae91e569ce1f4e3f3d8a84c3e623a4d30e22538aa131f82ea",
+      "gid": 2000,
+      "mode": "0o644",
+      "name": "qs.fangcunmount.cn.conf",
+      "original_inode": 400244,
+      "original_sha256": "26efeedd9f41e913b751f355977635efb8ab693eab179ec47b6f78a9ef85a156",
+      "uid": 2000
+    },
+    {
+      "closed_sha256": "29ccda8cdac2f5778a170bcbc38b351cd643b5af54025cc20f73f928c5fac441",
+      "gid": 2000,
+      "mode": "0o644",
+      "name": "collect.conf",
+      "original_inode": 400265,
+      "original_sha256": "bb122f4c320c1f6f9532b0ee232dba4971e26409f63133accb01c8b0b513b8d5",
+      "uid": 2000
+    }
+  ],
+  "syntax_proofs": [
+    {
+      "active_reload": false,
+      "added_capabilities": [
+        "DAC_OVERRIDE for readonly existing certificates",
+        "CHOWN for disposable tmpfs cache only"
+      ],
+      "exit_code": 0,
+      "phase": "original",
+      "published_ports": 0,
+      "read_only_mounts": true,
+      "stderr_sha256": "c1d95d6441adac8d73265f026042743581500b1133052abc44ed98cf52bb6618",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "active_reload": false,
+      "added_capabilities": [
+        "DAC_OVERRIDE for readonly existing certificates",
+        "CHOWN for disposable tmpfs cache only"
+      ],
+      "exit_code": 0,
+      "phase": "closed",
+      "published_ports": 0,
+      "read_only_mounts": true,
+      "stderr_sha256": "c1d95d6441adac8d73265f026042743581500b1133052abc44ed98cf52bb6618",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "schema": "m4-c08-inactive-ingress/v1",
+  "recorded_on": "2026-10-27",
+  "task": "C08-03",
+  "task_complete": false,
+  "private_report": {
+    "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/ingress-staged-20261026T184208-f0fdd4.private.json",
+    "sha256": "cea7e3b628ec319c742e868f640f68094dde05017a389449a8c10bf5170cd916"
+  },
+  "remaining": [
+    "fresh legal system session and actual connection peers",
+    "actual T0/deadline and bounded operator exception",
+    "final in-flight and executable forward-recovery coordination"
+  ],
+  "failure_history": [
+    {
+      "scope": "disposable syntax checker only",
+      "reason": "strict dropped capabilities could not read existing private TLS files",
+      "resolution": "original host TLS permissions unchanged; add DAC_OVERRIDE only to isolated readonly checker"
+    },
+    {
+      "scope": "disposable syntax checker only",
+      "reason": "nginx cache required writable /tmp and cache-directory chown",
+      "resolution": "owned tmpfs /tmp plus CHOWN capability for disposable cache; all host mounts remain read-only"
+    }
+  ]
+}

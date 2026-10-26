@@ -38,6 +38,12 @@
 
 新包保留原四owner的publish=true，worker始终false且无owner，由外部维护入口阻止新业务；本次不先冻结closed API后再改同SHA配置。未来API binding指针已准备，原活动`/data/infra`指针不变；原生冻结按QS源码SHA不可改写。普通deploy实际调用、重复冻结和三组错误参数拒绝均已通过，原sudo规则保持。
 
+## 维护入口副本已验证（C08-03未完成）
+
+serverA原`nginx`镜像sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d已实际验证原始/closed两种三站点组合，两个`nginx -t`均退出0。[非活动入口receipt](evidence/rocketmq-m4-c08-inactive-ingress-20261027.json)固定`/data/apps/nginx-configs`下`iam.fangcunmount.cn.conf`、`qs.fangcunmount.cn.conf`、`collect.conf`的原/closed摘要、inode及权限；副本在固定release目录的`ingress/original`和`ingress/closed`。测试容器无发布端口、原主机挂载只读，缓存/日志写入临时tmpfs，完成即清理；未reload或更改原Nginx/站点。
+
+本次真实关闭时须再次核对这三个原文件及Nginx身份，保持原inode/owner/mode写入已冻结closed字节，先全量syntax检查再reload并核对实际503。首次应用启动前若需撤销本次维护，只恢复本次原始三文件并验证/reload，不触及数据库或旧M3运行状态。首次M4启动后业务恢复采用前向修复，不能把恢复HTTP入口当成允许回退旧业务/数据。system来源、实际T0/期限和有界验收例外只能在合法会话就绪后记录；没有用测试地址/时间冒充生产事实。实际在途/停止与启动协调仍待收敛，本节不构成开窗口授权或C08-03完成。
+
 ## 窗口前门禁
 
 1. 最终源码/依赖CI、当前实际宿主故障和五归档验证通过；稳定SDK Go0.5.0/Python0.4.0及wheel摘要保持。最终八实例实际启动/关闭、零DDL、原预算、全部清理通过。
