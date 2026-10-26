@@ -1,0 +1,411 @@
+{
+  "schema": "m4-c04-final-protocol-cleanup/v1",
+  "recorded_on": "2026-10-26",
+  "task_leaves": [
+    "C04-01",
+    "C04-02",
+    "C04-03"
+  ],
+  "completion_effective_on_merge": true,
+  "repositories": {
+    "iam": {
+      "pr": 155,
+      "source_sha": "eed2cec7a4283177422588ad511d29b69e004546",
+      "merge_sha": "4609d4542d9303130ab94ed67593d0a69d0d010d",
+      "successful_checks": 10,
+      "local_race": 72
+    },
+    "qs": {
+      "pr": 452,
+      "source_sha": "3bf8ba8686b192db43d7ddadc355b97567a8fb95",
+      "implementation_sha": "2ba6b6580615c4016474575bb8427ebdf87a3133",
+      "merge_sha": "8287cba94a1889984f64b22c431bd058096bb010",
+      "successful_checks": 29,
+      "conditional_generated_docs_not_triggered": 1,
+      "local_tests_passed": 783,
+      "local_optional_database_skips": 7,
+      "local_skips_not_required_acceptance": true,
+      "docs_checker_tests": 88
+    },
+    "ai": {
+      "pr": 230,
+      "source_sha": "be5e806eedb73d92936c70fb7e5f9762e4bf2f91",
+      "merge_sha": "f83472c79cb71dfd761b9e65c2c78b6343a207ac",
+      "successful_checks": 14,
+      "tests_per_mysql": 5668,
+      "total_tests": 11336,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source_tree": "19388c6259ca8b980a737d1fe76126f5ff878be6",
+      "ci_revision": "4f3f4d72154875c82c1d2b09c5cf3e4484d495b8",
+      "source_ci_run": 40344048458
+    }
+  },
+  "native_runs": [
+    {
+      "run": 40344887552,
+      "profiles": 3,
+      "scope": "current API/worker/original due dispatch",
+      "source_qs": "2a56f956edac647e822a953a38b8c7dba042e7d6",
+      "runtime_tree_identical_to_final": true,
+      "per_profile_facts": {
+        "api": 13,
+        "worker": 11,
+        "dispatch": 41
+      }
+    },
+    {
+      "run": 40344895969,
+      "profiles": 9,
+      "scope": "3 QS original roots and 6 current AI MySQL/mTLS profiles",
+      "source_qs": "2a56f956edac647e822a953a38b8c7dba042e7d6",
+      "source_ai": "be5e806eedb73d92936c70fb7e5f9762e4bf2f91",
+      "per_qs_profile": {
+        "command_facts": 15,
+        "event_facts": 17
+      },
+      "per_ai_profile": {
+        "tests": 15,
+        "facts": 21
+      }
+    },
+    {
+      "run": 40347895716,
+      "profiles": 6,
+      "scope": "final-source paired roots, real producer/Broker process faults",
+      "source_qs": "3bf8ba8686b192db43d7ddadc355b97567a8fb95",
+      "source_ai": "be5e806eedb73d92936c70fb7e5f9762e4bf2f91",
+      "per_profile": {
+        "tests": 7,
+        "facts": 40
+      }
+    }
+  ],
+  "reports": [
+    {
+      "kind": "native-runtime",
+      "path": "native-runtime/m4-qs-runtime-8.0.36-2a56f956edac647e822a953a38b8c7dba042e7d6-40344887552/m4-qs-api.json",
+      "sha256": "c503a3c2d0e5d33f8def4a1be2fcbf79be29669e507028d2153da47588d95b6e",
+      "passed_facts": 13,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-runtime",
+      "path": "native-runtime/m4-qs-runtime-8.0.36-2a56f956edac647e822a953a38b8c7dba042e7d6-40344887552/m4-qs-dispatch.json",
+      "sha256": "e4ae7de21aef0ecd36dcbc8cc9c4a42db568f8b91e974a182203601501e4d4fd",
+      "passed_facts": 41,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-runtime",
+      "path": "native-runtime/m4-qs-runtime-8.0.36-2a56f956edac647e822a953a38b8c7dba042e7d6-40344887552/m4-qs-worker.json",
+      "sha256": "e8d518e07eb75353b975d671f5eec8e52af069b2f8d02d1745a01eaf56d43661",
+      "passed_facts": 11,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-runtime",
+      "path": "native-runtime/m4-qs-runtime-8.0.44-2a56f956edac647e822a953a38b8c7dba042e7d6-40344887552/m4-qs-api.json",
+      "sha256": "2f31c97da8e9cc2583b330b5912e842aba5f4966e30bd69cdf64ef38a1fd2b65",
+      "passed_facts": 13,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-runtime",
+      "path": "native-runtime/m4-qs-runtime-8.0.44-2a56f956edac647e822a953a38b8c7dba042e7d6-40344887552/m4-qs-dispatch.json",
+      "sha256": "991147fc3cc23259ff30b53d7b5a787b87d7d5219a6e3575e1de80d253520f87",
+      "passed_facts": 41,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-runtime",
+      "path": "native-runtime/m4-qs-runtime-8.0.44-2a56f956edac647e822a953a38b8c7dba042e7d6-40344887552/m4-qs-worker.json",
+      "sha256": "1333cc5ca212611a7b6603781a9cc9555f5cede80534d4d332d39348b0acbeb1",
+      "passed_facts": 11,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-runtime",
+      "path": "native-runtime/m4-qs-runtime-8.4.11-2a56f956edac647e822a953a38b8c7dba042e7d6-40344887552/m4-qs-api.json",
+      "sha256": "4ccabb9a32db29058a25c487ac45cf1af44b449961adc2c903324ee60cf5a906",
+      "passed_facts": 13,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-runtime",
+      "path": "native-runtime/m4-qs-runtime-8.4.11-2a56f956edac647e822a953a38b8c7dba042e7d6-40344887552/m4-qs-dispatch.json",
+      "sha256": "448bb89ced205bf6a2ac153b39641d831dd3f0588af345944657afb34a275902",
+      "passed_facts": 41,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-runtime",
+      "path": "native-runtime/m4-qs-runtime-8.4.11-2a56f956edac647e822a953a38b8c7dba042e7d6-40344887552/m4-qs-worker.json",
+      "sha256": "d5dbc41df2c68cab621396048abf87c33fcb3c518a922c7cd8c32cdeb53fa253",
+      "passed_facts": 11,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-ai-payload-py311-mysql8036-d5d0cdf3e9ab8e4bbdf2dd405399c3afae64886e/rocketmq-ai-current-payload.json",
+      "sha256": "8f97f1d5246e056fd90b3258f758f4b55c985413df18e62d0712a87be4a62462",
+      "passed_tests": 15,
+      "passed_facts": 21,
+      "failed": 0,
+      "skipped": 0,
+      "owned_rows_zero": true,
+      "private_evidence_removed": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-ai-payload-py311-mysql8044-d5d0cdf3e9ab8e4bbdf2dd405399c3afae64886e/rocketmq-ai-current-payload.json",
+      "sha256": "e340bf760b65f2e7d27ba55728b2e5e6d294d6de55927d0dcd3178b7f7481f5e",
+      "passed_tests": 15,
+      "passed_facts": 21,
+      "failed": 0,
+      "skipped": 0,
+      "owned_rows_zero": true,
+      "private_evidence_removed": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-ai-payload-py311-mysql8411-d5d0cdf3e9ab8e4bbdf2dd405399c3afae64886e/rocketmq-ai-current-payload.json",
+      "sha256": "7d394db881e752ee0234e175be7af9cfd65da26315daafd719def7f8f3f7b1f1",
+      "passed_tests": 15,
+      "passed_facts": 21,
+      "failed": 0,
+      "skipped": 0,
+      "owned_rows_zero": true,
+      "private_evidence_removed": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-ai-payload-py313-mysql8036-d5d0cdf3e9ab8e4bbdf2dd405399c3afae64886e/rocketmq-ai-current-payload.json",
+      "sha256": "3de03609b9b257876edf40518cabb9c83a8fb9be071337730c4274700bd8ec0b",
+      "passed_tests": 15,
+      "passed_facts": 21,
+      "failed": 0,
+      "skipped": 0,
+      "owned_rows_zero": true,
+      "private_evidence_removed": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-ai-payload-py313-mysql8044-d5d0cdf3e9ab8e4bbdf2dd405399c3afae64886e/rocketmq-ai-current-payload.json",
+      "sha256": "6f9b9c239ded2e61ed6c3b1b6291ff493f54e26dd4ef66604d676b947566693c",
+      "passed_tests": 15,
+      "passed_facts": 21,
+      "failed": 0,
+      "skipped": 0,
+      "owned_rows_zero": true,
+      "private_evidence_removed": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-ai-payload-py313-mysql8411-d5d0cdf3e9ab8e4bbdf2dd405399c3afae64886e/rocketmq-ai-current-payload.json",
+      "sha256": "6ff54b159c7cf018d4421eaa60ad7027cd797d7fe70cbdafaa3624e1e2aa1d93",
+      "passed_tests": 15,
+      "passed_facts": 21,
+      "failed": 0,
+      "skipped": 0,
+      "owned_rows_zero": true,
+      "private_evidence_removed": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-qs-readers-8.0.36-2a56f956edac647e822a953a38b8c7dba042e7d6-40344895969/m4-current-qs-command.json",
+      "sha256": "19fc9d81faacff075722966749014f57686d1ca2504fd6fd48b91704352d1203",
+      "passed_facts": 15,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-qs-readers-8.0.36-2a56f956edac647e822a953a38b8c7dba042e7d6-40344895969/m4-current-qs-event.json",
+      "sha256": "3012ee2d7771ea040600d7fad4b73bb08f1bf32092ba9cc91f89efa14ed3b40b",
+      "passed_facts": 17,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-qs-readers-8.0.44-2a56f956edac647e822a953a38b8c7dba042e7d6-40344895969/m4-current-qs-command.json",
+      "sha256": "f522e3d9a5fb75ca1c7931b3e57061affb6496b0c1861f60cdebdfe891efd0a9",
+      "passed_facts": 15,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-qs-readers-8.0.44-2a56f956edac647e822a953a38b8c7dba042e7d6-40344895969/m4-current-qs-event.json",
+      "sha256": "b6894d1e481a1e621dcbe91b5cf8eada8e33e2340e8a566149f30752796fc176",
+      "passed_facts": 17,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-qs-readers-8.4.11-2a56f956edac647e822a953a38b8c7dba042e7d6-40344895969/m4-current-qs-command.json",
+      "sha256": "11af252f6b622b8ce4b6c046ced72321a1e3c54b8117ca0989ba1dedc3bad26b",
+      "passed_facts": 15,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-readers",
+      "path": "native-readers/m4-current-qs-readers-8.4.11-2a56f956edac647e822a953a38b8c7dba042e7d6-40344895969/m4-current-qs-event.json",
+      "sha256": "efc8b2a4a64d26026569d0a2d951417d920d97e175fde471ea62d3e2d7d13bc2",
+      "passed_facts": 17,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-paired",
+      "path": "native-paired/m4-ai-runtime-3.11-8.0.36-be5e806eedb73d92936c70fb7e5f9762e4bf2f91-40347895716/m4-ai-native.json",
+      "sha256": "bf4a21d728ff8b74a8bea2385ab7653a18b0ad7adbff73f2b1eb0746d4b42804",
+      "passed_facts": 40,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-paired",
+      "path": "native-paired/m4-ai-runtime-3.11-8.0.44-be5e806eedb73d92936c70fb7e5f9762e4bf2f91-40347895716/m4-ai-native.json",
+      "sha256": "fdab3c5f38a59d8941da835dd20cd143df73e32be31d28894bf0ea3be28714e2",
+      "passed_facts": 40,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-paired",
+      "path": "native-paired/m4-ai-runtime-3.11-8.4.11-be5e806eedb73d92936c70fb7e5f9762e4bf2f91-40347895716/m4-ai-native.json",
+      "sha256": "869e2c3b0d12b7e2653e79cf9641dd9c3725ecc49559fcae4c8a9daf41feb2a6",
+      "passed_facts": 40,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-paired",
+      "path": "native-paired/m4-ai-runtime-3.13-8.0.36-be5e806eedb73d92936c70fb7e5f9762e4bf2f91-40347895716/m4-ai-native.json",
+      "sha256": "a4b67acb9bda8169bf072e56b46be228125f63c438e3c67d80c6803c9e328780",
+      "passed_facts": 40,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-paired",
+      "path": "native-paired/m4-ai-runtime-3.13-8.0.44-be5e806eedb73d92936c70fb7e5f9762e4bf2f91-40347895716/m4-ai-native.json",
+      "sha256": "46fe7e16f874877f7e91c4cbc80e14466b201d013b05bd885f206224a4c91965",
+      "passed_facts": 40,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    },
+    {
+      "kind": "native-paired",
+      "path": "native-paired/m4-ai-runtime-3.13-8.4.11-be5e806eedb73d92936c70fb7e5f9762e4bf2f91-40347895716/m4-ai-native.json",
+      "sha256": "ec814fbcf9276c6cd43722b83e13788a68a4c129c5d10d260f4ac6460be5d2ce",
+      "passed_facts": 40,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup_complete": true
+    }
+  ],
+  "coverage_mapping": [
+    {
+      "retired": "IAM old cutover/publisher maintenance commands and M6 probes",
+      "replacement": "retired-command refusal before dependencies; current authorization/CAS/original-root maintenance/lifecycle CI",
+      "protected": "first empty bootstrap, schema history, authz operations/protocol guard, Redis session revocation"
+    },
+    {
+      "retired": "QS publication-only Stage, old operation/payload fixture readers and NSQ probes",
+      "replacement": "current command root/order/reader tests plus 3 native command profiles; old identities directly seeded and rejected",
+      "protected": "first ID/time/wire, original business guard, operations/archive, negative old identity exclusion"
+    },
+    {
+      "retired": "QS Outbox event settlement, ACK rearm and isolated relay/budget tests",
+      "replacement": "current event original-root/exact receipt/first ACK tests; 3 event and 6 paired fault profiles",
+      "protected": "Inbox/projection/business receipt/technical failure/current ACK/witness/no-model-redo"
+    },
+    {
+      "retired": "QS old payload fixture and unreachable standard Outbox/channel factories",
+      "replacement": "6 actual MySQL/mTLS profiles, final owner refusal, 3 API/worker/original due-dispatch profiles",
+      "protected": "RPC authentication/hash/Prepared refusal, consumer idempotency/shared budget, retry due/attempt/authorization"
+    },
+    {
+      "retired": "AI MQRelay, StateEventRecorder orchestration, mutating handoff and nontransactional fixtures",
+      "replacement": "current roots, full 5668 tests per MySQL and 6 paired/6 mTLS native profiles",
+      "protected": "seven current store methods, sequence declaration and ten fixture functions preserved by AST; current result_outbox state/ACK and response/checkpoint recovery"
+    }
+  ],
+  "preserved": [
+    "all migration history/schema",
+    "published Go v0.5.0 / Python 0.4.0 SDK",
+    "current Inbox/receipt/first wire/ACK",
+    "future authorization/due/attempt and original scheduling",
+    "AI response/checkpoint/artifact/original invocation responsibility",
+    "SDK generic NSQ compatibility and explicitly isolated development/tests",
+    "read-only asset audit/current admission/offline image and material preflight"
+  ],
+  "failure_history": [
+    {
+      "scope": "AI source",
+      "failures": [
+        "retired M7 workflow paths",
+        "workflow document digest",
+        "three old nontransactional decide parameters"
+      ],
+      "resolution": "14 checks and all 11336 full tests passed"
+    },
+    {
+      "scope": "QS source",
+      "failures": [
+        "removed field/helper arguments",
+        "document contract/anchors",
+        "independently tagged paired probe still initialized removed Store field"
+      ],
+      "resolution": "early tagged compile added; final 29 checks and six paired fault profiles passed"
+    },
+    {
+      "scope": "C05 follow-on",
+      "note": "runtime summary reader fix remains separate PR453; C04 does not claim C05 complete"
+    }
+  ],
+  "production": {
+    "application_deployed": false,
+    "root_tool_installed": false,
+    "materials_activated": false,
+    "schema_changed": false,
+    "business_or_model_reexecuted": false,
+    "physical_assets_deleted": false,
+    "automatic_CD_resumed": false
+  }
+}
