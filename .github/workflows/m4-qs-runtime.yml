@@ -4,6 +4,14 @@ on:
     paths:
       - scripts/rocketmq/host_sdk_contract.py
       - scripts/rocketmq/test_host_sdk_contract.py
+      - scripts/rocketmq/qs_runtime_acceptance.py
+      - scripts/rocketmq/test_qs_runtime_acceptance.py
+      - scripts/rocketmq/qs_worker_acceptance.py
+      - scripts/rocketmq/test_qs_worker_acceptance.py
+      - scripts/rocketmq/qs_retry_dispatch_acceptance.py
+      - scripts/rocketmq/test_qs_retry_dispatch_acceptance.py
+      - scripts/rocketmq/qs_report_acceptance.py
+      - scripts/rocketmq/ci-transactions.py
       - .github/workflows/m4-qs-runtime.yml
   workflow_dispatch:
     inputs:
@@ -27,7 +35,7 @@ jobs:
     env:
       GOWORK: 'off'
       GOTOOLCHAIN: local
-      QS_SHA: ${{ inputs.qs_ref || 'ff9217ca954a8500ac43ff92a2fb7b4d44339ae4' }}
+      QS_SHA: ${{ inputs.qs_ref || 'fd9a843236b0d660045f33209a281aec15dc0553' }}
       INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v6
