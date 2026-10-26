@@ -1,0 +1,510 @@
+{
+  "schema": "rocketmq-m4-c06-eight-instance-rebuild/v1",
+  "recorded_on": "2026-10-26",
+  "task": "C06-D03",
+  "completed": true,
+  "source": {
+    "pr": "https://github.com/FangcunMount/infra/pull/315",
+    "source_sha": "012d1ce4fa24d115a1ad01eb063407cb8c52ef99",
+    "state": "merged",
+    "merge_sha": "c0c0818d50aecfe53cad270230c96407f7b1bdf5"
+  },
+  "build": {
+    "url": "https://github.com/FangcunMount/infra/actions/runs/40282528557",
+    "builder_source_sha": "edb6087ecf260bc7706ffc9fa823b802d94facbd",
+    "conclusion": "success",
+    "inventories": [
+      {
+        "target": "qs-worker",
+        "source_sha": "d20436edb363c17f0b177126aebe43a44bc5e082",
+        "builder_source_sha": "edb6087ecf260bc7706ffc9fa823b802d94facbd",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "archive_bytes": 20633467,
+        "archive_sha256": "b4d41c68e2f6ad57380a132dc89efa25151da63377a5498e0ad7cdcaebca423a",
+        "runtime_sdk": {
+          "version": "v0.5.0",
+          "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "replace": false
+        },
+        "engine_image_id": "sha256:d0888564b761369959cefc23442af2e874864606942341a79398d805418a42ac",
+        "image_config_id": "sha256:d0888564b761369959cefc23442af2e874864606942341a79398d805418a42ac",
+        "dockerfile_sha256": "57f3148d5950fdef2e35a2714239b1d8fab6e9327b0ee3fa995eba33cd269890",
+        "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "verified_uid_gid": [
+          2000,
+          2000
+        ]
+      },
+      {
+        "target": "qs-api",
+        "source_sha": "d20436edb363c17f0b177126aebe43a44bc5e082",
+        "builder_source_sha": "edb6087ecf260bc7706ffc9fa823b802d94facbd",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "archive_bytes": 73588063,
+        "archive_sha256": "8b0ce9f24d7b9b8928c758b691db4de71a8087ccab38662ba171d02191b468ba",
+        "runtime_sdk": {
+          "version": "v0.5.0",
+          "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "replace": false
+        },
+        "engine_image_id": "sha256:5f54c9c9afa9ba619c9d8407c601f7ac65ffd4c769839e897b90d221efc6b84c",
+        "image_config_id": "sha256:5f54c9c9afa9ba619c9d8407c601f7ac65ffd4c769839e897b90d221efc6b84c",
+        "dockerfile_sha256": "2acb1516b15186ac092c0118b7a1e662bddc87bb920770a802f13acc6c8f4e10",
+        "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "verified_uid_gid": [
+          2000,
+          2000
+        ]
+      },
+      {
+        "target": "iam",
+        "source_sha": "48182c39424573060fda0e27ed6670d2b326f42d",
+        "builder_source_sha": "edb6087ecf260bc7706ffc9fa823b802d94facbd",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "archive_bytes": 84813511,
+        "archive_sha256": "d72e823dbe144d1e8ce2ceed955dc3de88b5452c67163a460caba66d1a9e3eed",
+        "runtime_sdk": {
+          "version": "v0.5.0",
+          "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "replace": false
+        },
+        "engine_image_id": "sha256:3e076fd5592f6fbda90f4a5ac25070ef58fd3780c8f0400a0bd396cc0f43b876",
+        "image_config_id": "sha256:3e076fd5592f6fbda90f4a5ac25070ef58fd3780c8f0400a0bd396cc0f43b876",
+        "dockerfile_sha256": "f8385035ea2b03dd4a55a144557d2da2d069cdfe8493ab30fa1353c58531cb72",
+        "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "verified_uid_gid": [
+          2000,
+          2000
+        ]
+      },
+      {
+        "target": "ai",
+        "source_sha": "61ef88ac95800dfd3c0c90fd56c102f7c0e77e8f",
+        "builder_source_sha": "edb6087ecf260bc7706ffc9fa823b802d94facbd",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "archive_bytes": 133781992,
+        "archive_sha256": "dbb3a6fc916332daf8011b1f24647948f115ab8faf466b55e416d11bbcf10869",
+        "runtime_sdk": {
+          "uid": 10001,
+          "version": "0.4.0",
+          "client": "5.1.2",
+          "source": "61ef88ac95800dfd3c0c90fd56c102f7c0e77e8f"
+        },
+        "engine_image_id": "sha256:1c2587d18d9999f286749f38597afb7d73dc2adffe2d6abf35126f5ed1fb5a2f",
+        "image_config_id": "sha256:1c2587d18d9999f286749f38597afb7d73dc2adffe2d6abf35126f5ed1fb5a2f",
+        "dockerfile_sha256": "a228b397109b1627bee2c2cb66b3d33d3a2c7d4238a726c5b7e1a61503accf8a",
+        "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890"
+      },
+      {
+        "target": "qs-collection",
+        "source_sha": "d20436edb363c17f0b177126aebe43a44bc5e082",
+        "builder_source_sha": "edb6087ecf260bc7706ffc9fa823b802d94facbd",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "archive_bytes": 24925848,
+        "archive_sha256": "80925d524c62a449041e19ed2bd359021d9c53e926bfcb7b8c5b54d699b0ad52",
+        "runtime_sdk": {
+          "version": "v0.5.0",
+          "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "replace": false
+        },
+        "engine_image_id": "sha256:520bdde2c0e175e2e709b750d720205c22f1c1df8343afd3bfc0a2d32a71ef08",
+        "image_config_id": "sha256:520bdde2c0e175e2e709b750d720205c22f1c1df8343afd3bfc0a2d32a71ef08",
+        "dockerfile_sha256": "45fa166143345e510312cf145a1ab0954d0fe8e4918792dbac18429a40097f30",
+        "expected_sdk_source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+        "verified_uid_gid": [
+          2000,
+          2000
+        ]
+      }
+    ],
+    "registry_published": false,
+    "production": false
+  },
+  "local": {
+    "contract_and_protection_tests": 46,
+    "failed": 0,
+    "skipped": 0,
+    "actionlint": true,
+    "diff_check": true,
+    "actual_source_compose_projection": true,
+    "docker_started": false,
+    "actual_go_codec": {
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "database_or_broker_clients_started": false,
+      "before_log_sha256": "931b71bc92635ad35c864748ca56c5517f00f4e8adcb7cc7b7cccb7fbfdeff02",
+      "after_log_sha256": "3b22b83727f4ebbdf0a83458aaf6cf920407f88b882597c228c8f76580752a48"
+    }
+  },
+  "failure_history": {
+    "first_run": {
+      "id": 40284074805,
+      "source_sha": "784e23988699eb41fd4c68bb2d6414ec21470d8f",
+      "conclusion": "failure",
+      "passed": 6,
+      "failed": 1,
+      "failure": "owned fixture selected nonexistent qs-worker Compose service; actual key is runtime",
+      "application_started": false,
+      "cleanup_all_true": true,
+      "report_sha256": "dbb1531a3e5204f6e3ee230f3cbfa36b554a6f279cf63a585b7996e8fcefacf4"
+    },
+    "obsolete_run": {
+      "id": 40284990665,
+      "source_sha": "7339c9523f48c24d0cfd2f37d16686dff08e6f5b",
+      "action": "cancel requested after the same service-key defect was fixed in a newer source; isolated ephemeral hosted runner only",
+      "validation_counted": false,
+      "actual_status": {
+        "conclusion": "cancelled",
+        "status": "completed"
+      }
+    },
+    "candidate_run": {
+      "id": 40285386186,
+      "source_sha": "a6774c208cc55c13ea962e833097e9f3e5e89686",
+      "status": "failure; recorded in native_api_rejection"
+    },
+    "native_api_rejection": {
+      "run": 40285386186,
+      "source_sha": "a6774c208cc55c13ea962e833097e9f3e5e89686",
+      "passed": 7,
+      "failed": 1,
+      "failure_stage": "actual_m4_packagers_and_synthetic_materials",
+      "report_sha256": "282d82c78f817b6cbc392d0b34191786859bb2a84146c7c4585c5ffece9fd19f",
+      "application_started": false,
+      "cleanup": {
+        "compose_down_succeeded": true,
+        "private_directory_removed": true,
+        "existing_containers_unchanged": true,
+        "existing_networks_unchanged": true,
+        "owned_m4_material_root_removed": true
+      },
+      "confirmed_codec_cause": "Go Binding encoding/json requires duration nanoseconds; YAML strings failed actual Decode",
+      "corrected": "convert only four fixed duration budget fields in bridge JSON; preserve domain YAML/owner identity; actual Go codec moved before dependency containers"
+    }
+  },
+  "first_failed_report": {
+    "sha256": "dbb1531a3e5204f6e3ee230f3cbfa36b554a6f279cf63a585b7996e8fcefacf4",
+    "passed": 6,
+    "failed": 1,
+    "failure_stage": "actual_m4_packagers_and_synthetic_materials",
+    "failure_kind": "KeyError",
+    "cause": "fixture used qs-worker service key; actual source Compose key is runtime; fixed and source projection moved before container work",
+    "application_started": false,
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true,
+      "owned_m4_material_root_removed": true
+    }
+  },
+  "native": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/40287252113",
+    "completed": true,
+    "conclusion": "success",
+    "report_sha256": "bd8616b21eb5fde4db4dc138e9e9e9488004bc36aa963069a04371f564d36c5b",
+    "go_codec_report_sha256": "80580264799f8df9fbbb2118395d7ea9609069c08f0df9b378662b8031d95603",
+    "go_codec": {
+      "case_ids": [
+        "actual_decode",
+        "actual_final_binding",
+        "actual_final_render"
+      ],
+      "failed": 0,
+      "network": false,
+      "passed": 3,
+      "schema": "m4-actual-go-binding-codec/v1",
+      "skipped": 0,
+      "source_sha": "d20436edb363c17f0b177126aebe43a44bc5e082"
+    },
+    "evidence": {
+      "infra_sha": "012d1ce4fa24d115a1ad01eb063407cb8c52ef99",
+      "sources": {
+        "iam": "48182c39424573060fda0e27ed6670d2b326f42d",
+        "qs": "d20436edb363c17f0b177126aebe43a44bc5e082",
+        "ai": "61ef88ac95800dfd3c0c90fd56c102f7c0e77e8f"
+      },
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "cases": {
+        "actual_source_registry_consumers_match_manifest": true,
+        "all_five_exact_archives_loaded": true,
+        "original_current_qs_pair_prepared": true,
+        "original_qs_dual_binding_verified": true,
+        "original_iam_schema45_and_binding_selected": true,
+        "original_ai_schema43_and_binding_verified": true,
+        "actual_three_source_packagers_and_root_owned_twenty_one_material_files": true,
+        "actual_current_api_host_freeze_and_native_preflight_repeated": true,
+        "actual_iam_ready_and_paused_checker_live": true,
+        "actual_readonly_ai_ready_and_paused_checker_live": true,
+        "actual_qs_api_with_iam_ai_and_both_paused_owners": true,
+        "actual_collection_with_required_iam_and_api": true,
+        "actual_second_collection_with_original_replica_budget": true,
+        "actual_worker1_prepared_http_healthy_original_concurrency48": true,
+        "actual_worker2_prepared_http_healthy_original_concurrency48": true,
+        "actual_worker3_prepared_http_healthy_original_concurrency48": true,
+        "all_eight_actual_processes_shutdown_exit_zero": true,
+        "actual_all_runtime_start_shutdown_no_ddl_attempts": true
+      },
+      "actual_runtime_budgets": {
+        "iam": {
+          "memory_bytes": 1073741824,
+          "nano_cpus": 1000000000
+        },
+        "ai": {
+          "memory_bytes": 805306368,
+          "nano_cpus": 750000000
+        },
+        "api": {
+          "memory_bytes": 1073741824,
+          "nano_cpus": 2000000000
+        },
+        "collection": {
+          "memory_bytes": 335544320,
+          "nano_cpus": 1000000000
+        },
+        "collection2": {
+          "memory_bytes": 335544320,
+          "nano_cpus": 1000000000
+        },
+        "worker1": {
+          "memory_bytes": 805306368,
+          "nano_cpus": 1000000000
+        },
+        "worker2": {
+          "memory_bytes": 805306368,
+          "nano_cpus": 1000000000
+        },
+        "worker3": {
+          "memory_bytes": 805306368,
+          "nano_cpus": 1000000000
+        }
+      },
+      "actual_runtime_unix_identity": {
+        "iam": [
+          2000,
+          2000
+        ],
+        "ai": [
+          10001,
+          10001
+        ],
+        "api": [
+          2000,
+          2000
+        ],
+        "collection": [
+          2000,
+          2000
+        ],
+        "collection2": [
+          2000,
+          2000
+        ],
+        "worker1": [
+          2000,
+          2000
+        ],
+        "worker2": [
+          2000,
+          2000
+        ],
+        "worker3": [
+          2000,
+          2000
+        ]
+      },
+      "iam_metrics": {
+        "sdk_ready": 1,
+        "sampler_running": 1,
+        "observation_available": 1,
+        "admission_open": 0,
+        "check_workers_limit": 4,
+        "check_queue_limit": 32
+      },
+      "qs_metrics": {
+        "qs.mysql": {
+          "sdk_ready": 1,
+          "sampler_running": 1,
+          "observation_available": 1,
+          "admission_open": 0,
+          "check_workers_limit": 2,
+          "check_queue_limit": 16
+        },
+        "qs.mongo": {
+          "sdk_ready": 1,
+          "sampler_running": 1,
+          "observation_available": 1,
+          "admission_open": 0,
+          "check_workers_limit": 2,
+          "check_queue_limit": 16
+        }
+      },
+      "ai_metrics": {
+        "sdk_ready": 1,
+        "sampler_running": 1,
+        "observation_available": 1,
+        "admission_open": 0,
+        "check_workers_limit": 1,
+        "check_queue_limit": 16
+      },
+      "m4_material_stage": {
+        "file_mode": "0440",
+        "files": 21,
+        "production": false,
+        "revision": "m4-owned-f57b3c6fbfa3",
+        "root_uid": 0
+      },
+      "actual_source_worker_concurrency": 48,
+      "workers_prepared": {
+        "worker3": true,
+        "worker2": true,
+        "worker1": true
+      },
+      "mysql_runtime_ddl_attempts": 0,
+      "mongo_runtime_ddl_attempts": 0,
+      "dependency_image_ids": {
+        "mysql": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "rocketmq": "sha256:070a217b191f2660e76b075a8a42b9fc10eea70b6a5b822c865be8d293d27e50",
+        "mongo": "sha256:faa77adca8915c6672577288a0a20db7d666de0c872cb2465daea6fd0082e274",
+        "redis": "sha256:4df5c34dc41256fc4ed293482cb34281e17d133077e9aa3c6a87fda60a356c65"
+      },
+      "dependency_versions": {
+        "mysql": "8.0.36",
+        "mongo": "7.0.31"
+      },
+      "cleanup": {
+        "compose_down_succeeded": true,
+        "private_directory_removed": true,
+        "existing_containers_unchanged": true,
+        "existing_networks_unchanged": true,
+        "owned_m4_material_root_removed": true
+      },
+      "sources_unchanged": true,
+      "production": false,
+      "system_acceptance": false,
+      "combined_cutover_rehearsal_complete": false
+    },
+    "process_count": 8,
+    "all_processes_exit_zero_without_oom": true,
+    "worker_restart_checks": 9,
+    "worker_restart_checks_all_exit_zero": true,
+    "material_mount_counts": {
+      "iam": 3,
+      "ai": 7,
+      "api": 8,
+      "collection": 0,
+      "collection2": 0,
+      "worker1": 3,
+      "worker2": 3,
+      "worker3": 3
+    }
+  },
+  "production": {
+    "application_deployed": false,
+    "versioned_materials_activated": false,
+    "database_changed": false,
+    "credentials_rotated": false,
+    "business_or_model_called": false,
+    "old_assets_deleted": false,
+    "automatic_cd_resumed": false
+  },
+  "private_evidence": "/Users/yangshujie/.local/state/fangcun-m4/20261026-c06-rebuild",
+  "CI": {
+    "checks_success": 13,
+    "conditional_jobs_not_triggered": [
+      "mongo-audit",
+      "images",
+      "iam-start",
+      "ai-start",
+      "qs-pair",
+      "five-start"
+    ],
+    "checks_receipt_sha256": "dd29e29c54a2a6c22777b2d1a1c8136232292074917be1173c575f349ccc669f",
+    "urls": [
+      "https://github.com/FangcunMount/infra/actions/runs/40287252031",
+      "https://github.com/FangcunMount/infra/actions/runs/40287252036",
+      "https://github.com/FangcunMount/infra/actions/runs/40287252053",
+      "https://github.com/FangcunMount/infra/actions/runs/40287252054",
+      "https://github.com/FangcunMount/infra/actions/runs/40287252057",
+      "https://github.com/FangcunMount/infra/actions/runs/40287252058",
+      "https://github.com/FangcunMount/infra/actions/runs/40287252113"
+    ]
+  },
+  "D04_foundation": {
+    "task_completed": false,
+    "pr": "https://github.com/FangcunMount/infra/pull/316",
+    "source_sha": "5e12934e2acce531714fa1532ebcf71af54c4d68",
+    "merge_sha": "2f05980469b1c316263875ed1aafb6740452a4ad",
+    "CI": "https://github.com/FangcunMount/infra/actions/runs/40289126508",
+    "source_tests_passed": 18,
+    "retired_entrypoint_regression_tests_passed": 7,
+    "native_report_sha256": "8a262f8269554ba7dbcbc495069678689bcd12516eb4aba3b7529ea0d8caceb5",
+    "native_report": {
+      "schema": "m4-material-stage-native/v1",
+      "source_sha": "5e12934e2acce531714fa1532ebcf71af54c4d68",
+      "passed": 23,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "case_ids": [
+        "iam-root-stages-exact-bytes-with-original-role-gid",
+        "iam-ordinary-runtime-reads-but-cannot-write",
+        "iam-foreign-uid-cannot-read",
+        "iam-exact-repeat-does-not-rewrite",
+        "iam-readonly-target-check-under-original-parent-lock-without-sources",
+        "qs-api-root-stages-exact-bytes-with-original-role-gid",
+        "qs-api-ordinary-runtime-reads-but-cannot-write",
+        "qs-api-foreign-uid-cannot-read",
+        "qs-api-exact-repeat-does-not-rewrite",
+        "qs-api-readonly-target-check-under-original-parent-lock-without-sources",
+        "ai-root-stages-exact-bytes-with-original-role-gid",
+        "ai-ordinary-runtime-reads-but-cannot-write",
+        "ai-foreign-uid-cannot-read",
+        "ai-exact-repeat-does-not-rewrite",
+        "ai-readonly-target-check-under-original-parent-lock-without-sources",
+        "worker-root-stages-exact-bytes-with-original-role-gid",
+        "worker-ordinary-runtime-reads-but-cannot-write",
+        "worker-foreign-uid-cannot-read",
+        "worker-exact-repeat-does-not-rewrite",
+        "worker-readonly-target-check-under-original-parent-lock-without-sources",
+        "shared-lock-inode-content-mode-mtime-preserved",
+        "busy-shared-lock-refused-without-wait-or-replacement",
+        "only-owned-temporary-fixture-cleaned"
+      ],
+      "production": false,
+      "network_used": false,
+      "fixture_cleaned": true
+    },
+    "production_tool_installed": false,
+    "host_deploy_hooks_integrated": false
+  },
+  "progress_after_receipt_merge": {
+    "leaf": {
+      "complete": 14,
+      "total": 38
+    },
+    "C06": {
+      "complete": 10,
+      "total": 12,
+      "gates_complete": 3,
+      "gates_total": 4
+    },
+    "parent": {
+      "complete": 1,
+      "total": 8
+    }
+  }
+}

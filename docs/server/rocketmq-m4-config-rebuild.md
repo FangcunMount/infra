@@ -1,6 +1,6 @@
 # M4 八角色配置重建边界
 
-本文细化既有 C06-D 的输入与验证对象，不新增任务或门禁。进度只在 [M4总表](rocketmq-m4-execution.md)维护。2026-10-26 已完成生产输入、四owner权威数据库binding及原材料的只读核对；**已预置未激活版本材料；尚未完成八实例最终候选重建和业务部署**。
+本文细化既有 C06-D 的输入与验证对象，不新增任务或门禁。进度只在 [M4总表](rocketmq-m4-execution.md)维护。2026-10-26 已完成生产输入、四owner权威数据库binding及原材料的只读核对；**已预置未激活版本材料，并完成本批八实例隔离配置重建；宿主部署保护接入、配置契约冻结及生产业务部署仍待后续**。
 
 ## 固定角色与资源
 
@@ -39,7 +39,7 @@
 
 输入元数据覆盖8角色的实际挂载、配置摘要、只读属性及文件身份。首版采集器只读取Go嵌套事务字段，随后补齐Python外层 `messaging.transactions` 并重新只读采集；旧报告保留，不把扫描器缺字段解释为运行owner缺失。初次预算直接比较遇到Go纳秒与YAML时长表示差异，规范单位后相同；失败历史和修正均保留。
 
-API完整主机预检已有源码与真实离线镜像证据，完整CI/合并单独见总表。C06-D01已核对四owner权威绑定、八角色19处MQ/8处JOSE文件与五个Broker主体指纹、原UID/资源和worker48并发；[证据](evidence/rocketmq-m4-c06-original-bindings-20261026.json)不包含秘密正文。D02已完成版本材料预置并回读；剩余C06-D依次为：三库宿主路径合同联动、五种服务八实例隔离重建、材料故障于替换前拒绝、冻结配置契约与全部PR合并。API单镜像预检不冒充八实例启动、四owner真实回查或生产验收。详细报告只发布摘要，原始证据保存在0700目录、0600文件中，索引见 [C06证据receipt](evidence/rocketmq-m4-c06-source-progress-20261025.json)。本批没有业务写入、模型调用、DDL、凭据轮换、服务重启或历史资产删除。
+API完整主机预检已有源码与真实离线镜像证据，完整CI/合并单独见总表。C06-D01已核对四owner权威绑定、八角色19处MQ/8处JOSE文件与五个Broker主体指纹、原UID/资源和worker48并发；[证据](evidence/rocketmq-m4-c06-original-bindings-20261026.json)不包含秘密正文。D02已完成版本材料预置并回读，D03已完成三库宿主路径联动及八实例隔离重建；当前剩余材料故障在全部宿主同步/停止前拒绝及D05配置契约冻结。独立启动报告不替代生产部署、真实业务回查故障矩阵或system验收。详细报告只发布摘要，原始证据保存在0700目录、0600文件中，索引见 [C06证据receipt](evidence/rocketmq-m4-c06-source-progress-20261025.json)。本批生产侧没有业务写入、模型调用、DDL、凭据轮换、服务重启或历史资产删除；隔离环境显式安装schema的证据另记D03。
 
 ## C06-D02：新增版本材料，保留活动配置
 
@@ -65,3 +65,17 @@ D02首次目标机预览在任何材料复制前拒绝旧根目录：serverA/ser
 2026-10-26 D02生产材料结果：[完整receipt](evidence/rocketmq-m4-c06-versioned-materials-20261026.json)。四角色21份原文件、27处挂载引用的 `m4-c06-20261026-v1` 已预置且再次只读验证；runtime fingerprint、current指针和原锁相同。新版本未激活，旧原材料及目录不变。新宿主来源路径尚须在三库CD/重建联动后冻结，不能恢复自动部署。
 
 2026-10-26 D03来源路径合同已合并：[源码/完整CI/报告receipt](evidence/rocketmq-m4-c06-root-material-paths-20261026.json)。阶段构建固定IAM 48182c39424573060fda0e27ed6670d2b326f42d、QS d20436edb363c17f0b177126aebe43a44bc5e082、AI 61ef88ac95800dfd3c0c90fd56c102f7c0e77e8f；仅生成隔离候选制品。现有M3固定镜像的旧启动报告不作为本轮重建证明；新八实例必须使用本轮源码的实际打包/decoder、root来源文件及原角色预算完成启动与关闭。D03在真实重建通过前保持进行中。
+
+## C06-D03：当前源码八实例重建已通过
+
+[PR315](https://github.com/FangcunMount/infra/pull/315)以候选012d1ce4fa24d115a1ad01eb063407cb8c52ef99通过13项源码/原生CI后合并。沿用上述三个合并SHA生成的确切五镜像档案，复用原隔离fixture的数据库与mTLS准备；IAM/QS实际renderer、QS实际主机冻结工具及普通镜像原生预检、AI实际绑定打包器和Compose共同产生配置。与M3旧固定来源分开记录，不改写旧报告。
+
+本轮在独立GitHub-hosted Docker环境生成21份合成文件，按原GID设置root所有、0440，并在八实例实际容器内验证27处MQ/JOSE只读挂载、真实UID/GID、原CPU/内存预算、四owner Checker及三个worker48并发。18项检查全部通过，八实例Exit0/无OOM，worker额外9次重启Exit0；MySQL/Mongo运行期DDL为0，旧有容器/网络不变，本轮文件、容器与网络完整清理。原生报告SHA、制品digest、metric及失败历史见[完整receipt](evidence/rocketmq-m4-c06-eight-instance-rebuild-20261026.json)。没有发送生产事件、调用模型或进行system验收。
+
+首次worker服务键映射和第二次Go绑定JSON时长编码错误均在启动应用前失败，隔离清理通过。Go绑定JSON使用纳秒数，YAML/viper配置保留等价时长字符串；仅转换四个固定预算，不规范化原store/epoch。实际源码投影和Go Decode/ValidateFinalBinding/RenderFinal三项检查现已前移到依赖容器启动前，全部通过；不以mock代替原生预检。
+
+## C06-D04：只读材料校验基础已合并，宿主接入进行中
+
+PR316新增 `--verify-staged --expect-role ... --expect-revision ...`。该root入口以审核计划校验已安装目标的完整收据、角色、版本、文件集合、hash、UID/GID和权限；缺失版本直接拒绝。原始来源目录只用于首次预置，不作为普通部署的持续依赖，避免清理旧M3资产后破坏新配置。
+
+验证不创建/复制文件、不激活指针、不再次获取部署锁，允许父CD流程持有原锁时调用；原预览/apply仍保留锁和不可变预置语义。18项源保护、7项旧入口回归及23项真实Linux UID/锁验证通过并合并。这个新入口尚未安装生产，也尚未接到IAM、QS、AI主机部署流程；D04的同步/停止前完整拒绝矩阵和D05冻结仍未完成，不能据此解除CD暂停。
