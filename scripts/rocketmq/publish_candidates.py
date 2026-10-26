@@ -83,11 +83,11 @@ def validate_reports(plan, startup, cutover):
                 'reviewed_candidate_differs_from_native_images')
 
 
-def verify_archive(directory, target, row):
+def verify_archive(directory, target, row, *, reviewed_builder=None):
     metadata = directory / 'image-inventory.json'
     require(sha256(metadata) == row['inventory_sha256'], 'image_inventory_changed')
     value = json.loads(metadata.read_bytes())
-    verified_image_inventory(value, target, row['source_sha'])
+    verified_image_inventory(value, target, row['source_sha'], reviewed_builder=reviewed_builder)
     require(all(value[k] == row[k] for k in ('builder_source_sha','image_config_id','archive_sha256',
                 'archive_bytes','runtime_sdk')), 'reviewed_inventory_differs')
     require(value['expected_sdk_source_sha'] == '1345266aa0e864c46de5d1e3e3c939dd8002a890',

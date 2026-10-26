@@ -1,9 +1,13 @@
-name: M3 candidate archive publication contract
+name: Reviewed candidate archive publication contracts
 on:
   pull_request:
     paths:
       - scripts/rocketmq/publish_candidates.py
       - scripts/rocketmq/test_publish_candidates.py
+      - scripts/rocketmq/m4_publish_candidates.py
+      - scripts/rocketmq/test_m4_publish_candidates.py
+      - docs/server/evidence/rocketmq-m4-image-publication-plan-20261027.json
+      - docs/server/evidence/rocketmq-m4-c08-eight-instance-native-20261027.json
       - scripts/rocketmq/candidate_publication_probe.py
       - docs/server/evidence/rocketmq-m3-image-publication-plan-20261025.json
       - .github/workflows/rocketmq-image-publication.yml
@@ -17,7 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Pure failure and evidence contracts
-        run: python3 -m unittest discover -s scripts/rocketmq -p test_publish_candidates.py
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s scripts/rocketmq -p test_publish_candidates.py
+          python3 -m unittest discover -s scripts/rocketmq -p test_m4_publish_candidates.py
       - name: Install transport tool in isolated runner only
         run: sudo apt-get update -qq && sudo apt-get install -y skopeo
       - name: Exercise exact compressed archive transport on owned loopback registry

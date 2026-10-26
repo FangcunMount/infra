@@ -31,7 +31,7 @@ M3 必须先完成最终新链路、旧责任处置、停止旧生产组件及sy
 | ✅ | C05 | 梳理旧命名下仍承担当前receipt/调度/业务历史的职责，保留或最小解耦，再移除确定废弃字段/依赖 | 2026-10-27；3/3闭环。AI当前存储与发布职责已拆分并保留state/ACK/history；QS PR453完整29项CI后合并11c106aa283bcd1e3f442da928985b3744fe54e8，当前摘要改读Committed档案/witness。三档原根及两档MySQL非空确定性恢复通过；[receipt](evidence/rocketmq-m4-c05-current-responsibilities-20261027.json)；无生产数据/模型动作 |
 | ✅ | C06 | 删除旧生产NSQ部署/CD/自动启动/环境变量/监控及恢复脚本入口，核验新配置可完整重建 | 2026-10-26；12/12叶子、4/4门禁通过，八实例重建18项与四角色真实权限拒绝50项通过；三库主机保护完整CI并合并，配置契约随PR320合并冻结。[宿主保护证据](evidence/rocketmq-m4-c06-host-guard-20261026.json)/[固定契约](evidence/rocketmq-m4-c06-config-contract-20261026.json)。生产新工具/宿主保护安装和材料激活留C08，自动CD仍暂停、开发依赖保留 |
 | ✅ | C07 | 按保留期限及具名清单处置旧容器/卷/表/镜像/备份；执行前核对未决责任及保护资产，完成后回读验证 | 2026-10-26；4/4政策保留闭环：三容器/1519文件/三配置保持，三份Mac mini归档完整流式可读、原摘要/0600一致。46 SQL表/9 Mongo集合具名登记；保留至2026-11-25后复核，当前/未决事实不自动过期。[台账](rocketmq-m4-retained-assets.md)/[receipt](evidence/rocketmq-m4-c07-retention-20261026.json)。无物理删除，随本PR合并生效 |
-| ☐ | C08 | 完成废弃依赖/文档审计、清理后新链路回归、源码合并与清理发布索引，关闭8项任务 | 待开始；来自M3 T36的全面清理部分 |
+| ☐ | C08 | 完成废弃依赖/文档审计、清理后新链路回归、源码合并与清理发布索引，关闭8项任务 | 进行中；最终五镜像已构建，八实例18项/codec3项通过并由PR335合并；固定ACR发布、主机工具安装、受控部署及真实system回归待完成 |
 
 执行顺序为 C01 → C02–C06 按实际依赖小批推进 → C07 → C08。某类不存在可删除对象时，先提供盘点与保留理由，再按“核验无需操作”记录，不能仅为提高进度打勾。
 
@@ -298,3 +298,9 @@ C08同时准备隔离五类候选：首次构建40351033230仅为候选，QS后�
 实际三档原command根/current view/Prepared拒绝验证通过，受验路径与最终1f38源码一致；AI两档各5668测试、其中10类非空receipt/history/确定性finalization/reclaim/不重派发恢复逐项核对，全部0失败错误跳过。模型计数来自受控gateway，不宣称付费在线模型验收；原未来dispatch三档41事实受验路径未变。完整来源见[C05 receipt](evidence/rocketmq-m4-c05-current-responsibilities-20261027.json)。
 
 随本PR合并，C01—C07闭环，当前 **33/38、7/8**，M4-1为26/26完成。剩余C08五项：PR335新增明确当前候选/同builder及八实例隔离重建，原C06固定历史profile不改；最终IAMfixture不再调用已退役切换CLI，而只在空的GitHub隔离数据库中显式迁移/安装当前绑定。合法system会话已请求用户准备；继续镜像/重建与部署清单工作。尚未安装生产新工具、激活材料、部署M4镜像、执行DDL或新模型调用，不恢复自动CD，不重置48h观察门禁。
+
+### C08推进记录（2026-10-27）
+
+最终候选由[独立清单](../../components/rocketmq/m4-final-image-candidates.json)冻结；[PR335](https://github.com/FangcunMount/infra/pull/335)固定6f7532cca8e85ecb317e8f4896b2a02965f5c712全部检查结束无失败后合并09c1d8984a22a7c6b9135f26b0e568ac54944a50。[真实八实例报告](evidence/rocketmq-m4-c08-eight-instance-native-20261027.json)为18项、零失败/跳过、八实例Exit0、零DDL及完整清理；[实际Go codec](evidence/rocketmq-m4-c08-binding-codec-20261027.json)3项通过。原C06阶段候选另行验证，未替换其历史默认值/证据。
+
+五类镜像已构建，不等于已上传ACR或部署。M4发布采用独立18项报告profile，复用既有传输校验/不可变摘要回读及IAM既有生产环境凭据；不重建应用、不移动SDK标签、不弱化M3完整切换门禁。最终依赖审计、精确生产清单/同协议恢复、root工具安装和system真实业务回归尚未完成，C08五项均不提前勾选。合法system会话待用户解锁并正常登录；其余准备继续。
