@@ -70,7 +70,7 @@ class FiveImageFixture(QSPairFixture):
         if hasattr(self, 'runtime_mounts'):
             role = 'worker' if component.startswith('worker') else 'collection' if component.startswith('collection') else component
             for mount in self.runtime_mounts.get(role, []):
-                require(mount['read_only'] is True and mount['bind']['create_host_path'] is False,
+                require(mount['read_only'] is True and mount.get('bind', {}).get('create_host_path', False) is False,
                         'immutable_rebuild_mount_required')
                 command += ['--mount', 'type=bind,src=' + mount['source'] + ',dst=' + mount['target'] + ',readonly']
         command += [self.image]

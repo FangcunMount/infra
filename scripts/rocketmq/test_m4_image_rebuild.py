@@ -4,6 +4,9 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from types import SimpleNamespace
+
+from five_image_start import FiveImageFixture
 
 from m4_image_rebuild import BUILDER_SHA, SOURCES, bridge_binding, compose_material_mounts, owner_limits
 from m4_owned_materials import FILES, owned_fixture, validate_plan
@@ -80,6 +83,31 @@ class M4RebuildContractTest(unittest.TestCase):
         self.assertEqual(binding['rocketmq']['transactions'],{'qs.mysql':owner})
         self.assertEqual(binding['binding_revision'],'m4-owned-abc')
         self.assertFalse(binding['publish_enabled'])
+
+    def test_real_start_keeps_compose_omitted_false_binds_noncreating_and_readonly(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw)
+            for bind in ({}, {'create_host_path':False}):
+                f=FiveImageFixture.__new__(FiveImageFixture)
+                f.directory=root; f.private_dirs={'api':root}; f.images={'api':'owned-image'}
+                f.project='owned'; f.network='owned'; f.label='owned'; f.report={}; f.applications={}
+                mount=dict(source='/var/lib/fangcun-m4-materials/fixture/credentials.json',
+                           target='/app/configs/rocketmq/credentials.json',read_only=True,bind=bind)
+                f.runtime_mounts={'api':[mount]};commands=[]
+                def run(args,**kw):
+                    commands.append(args)
+                    if args[:2]==['docker','inspect']:
+                        value=[dict(Config={'User':'www'},HostConfig={'Memory':1024*1024*1024,'NanoCpus':2000000000},
+                                    Mounts=[dict(Source=mount['source'],Destination=mount['target'],RW=False)])]
+                        return SimpleNamespace(stdout=json.dumps(value))
+                    return SimpleNamespace(stdout='2000' if args[:2]==['docker','exec'] else 'owned')
+                f.run=run
+                f.start('api',alias='api',memory='1024m',cpus='2')
+                launch=commands[0]
+                self.assertIn('type=bind,src='+mount['source']+',dst='+mount['target']+',readonly',launch)
+                self.assertEqual(f.report['actual_runtime_unix_identity']['api'],[2000,2000])
+                mount['bind']={'create_host_path':True}
+                with self.assertRaises(RuntimeError):f.start('api',alias='api',memory='1024m',cpus='2')
 
 
 if __name__ == '__main__':unittest.main()
