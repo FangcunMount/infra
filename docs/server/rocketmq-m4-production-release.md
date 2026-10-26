@@ -1,14 +1,14 @@
 # M4 最终生产发布清单与恢复边界
 
-**准备中，尚未执行应用部署，不能据本草稿开启维护。** C01—C07源码和政策保留闭环；最终候选、生产执行、system回归及发布索引归C08，唯一状态见[M4总表](rocketmq-m4-execution.md)。自动生产CD继续暂停。
+**候选已冻结；生产执行包仍在收敛，尚未部署应用，不能据本草稿开启维护。** C01—C07源码和政策保留闭环；最终候选、生产执行、system回归及发布索引归C08，唯一状态见[M4总表](rocketmq-m4-execution.md)。自动生产CD继续暂停。
 
 ## 当前准备和待冻结项
 
 - IAM候选4609d4542d9303130ab94ed67593d0a69d0d010d、QS候选1f38f583d43c9faf4601a5df9f3f82b764e6547d均已合并且运行输入冻结；后续仅文档/workflow提交不冒充镜像代码变化。
 - C08审计发现AI还安装SDK的NSQ extra及无调用的CI NSQ服务；[AI PR231](https://github.com/FangcunMount/qs-ai/pull/231)移除它们。候选b00cf3a2f30deffa99e9bf71aa1b6177c651c23c已通过14项完整CI、两档各5668用例、真实依赖及重新构建/八实例验证。此前f83472c7的AI镜像仅为阶段证据，不作为最终发布。
-- [归档发布器](rocketmq-m4-final-candidate.md#固定归档发布)仅传输固定归档、预检全部目标tag不存在并回读不可变manifest/config摘要。最终v2发布计划和18项报告已绑定AI依赖修正；旧计划禁止进入最终生产发布。ACR执行仍待最终infra合并及IAM workflow固定新SHA/摘要。
+- [归档发布器](rocketmq-m4-final-candidate.md#固定归档发布)仅传输固定归档、预检全部目标tag不存在并回读不可变manifest/config摘要。最终v2发布计划和18项报告已绑定AI依赖修正；旧计划禁止进入最终生产发布。[正式发布40371739428](https://github.com/FangcunMount/iam/actions/runs/40371739428)已通过5/0/0；IAM工作流d2291007、infra传输dd65adab已固定并合并。原始[发布receipt](evidence/rocketmq-m4-c08-acr-publication-20261027.json)不包含部署。
 - [主机准备回执](evidence/rocketmq-m4-c08-host-preflight-20261027.json)记录固定只读材料工具安装、四角色普通部署用户正向校验及8项错误绑定拒绝。该回执是当时快照；随后[API原生冻结工具](evidence/rocketmq-m4-c08-api-tool-install-20261027.json)已固定安装，尚未调用、激活材料或部署应用。
-- 生产启动前还须冻结五类ACR不可变引用、全部归档/镜像config ID、最终配置/环境/21份材料摘要、API原生预检工具与唯一执行目录、实际准入和停止/恢复命令、system最小用例。缺任何一项不开始维护。
+- [最终候选冻结receipt](evidence/rocketmq-m4-c08-final-freeze-20261027.json)已固定五类ACR引用、归档/config/云端engine ID、五项目Compose/环境/21材料及API正式离线预检。尚需冻结实际维护入口、在途检查/停止/前向恢复执行和system最小用例。缺任何一项不开始维护。
 
 ## 具名目标和保持项
 
@@ -22,13 +22,35 @@
 
 本批不执行DDL或数据迁移；实际目标仍IAM45、QS MySQL110/Mongo44、AI0043_native_transaction_limit。原store、writer epoch、m3-1路由、Topic/ACL、TLS、数据库凭据、Redis位置、Broker参数、监控位置、端口和网络不变。MQ/JOSE仅改为已核验版本文件的只读挂载，不重新生成密钥。保护全部当前/前序/pin/容器引用镜像、原指针及部署锁inode；不调用任何镜像清理或保留策略的apply。
 
+## 已冻结的应用参数（尚未执行）
+
+固定目录`/opt/fangcun-m4/releases/m4-c08-20261027-v1`。下表各Compose、同目录`runtime.env`、主配置/事件文件及镜像完整摘要均由[receipt](evidence/rocketmq-m4-c08-final-freeze-20261027.json)逐项绑定；API最终主配置由正式原生工具生成，不能拿`base-compose.json`运行。
+
+| 主机 / 目录 | 原project | service / 副本 | 最终Compose |
+| --- | --- | --- | --- |
+| A / `iam` | `docker` | `iam-apiserver` / 1 | `iam/compose.json` |
+| A / `ai` | `qs-ai` | `qs-ai` / 1 | `ai/compose.json` |
+| A / `qs-api` | `servera-migrated` | `qs-apiserver` / 1 | `qs-api/compose.json` |
+| D / `qs-worker` | `qs-worker` | `runtime` / 3 | `qs-worker/compose.json` |
+| A / `qs-collection` | `qs-collection` | `server` / 2 | `qs-collection/compose.json` |
+
+未来启动只能在协调器核对维护/排空和精确文件摘要、持有原锁后，使用原project、上述Compose与env文件，以及`up -d --no-build --no-deps --pull never --wait --wait-timeout 60`和固定service/副本。A还须保持原AI部署锁；D三个worker另查真实HTTP ready，不能用没有Docker healthcheck推断失败或通过。精确可执行协调步骤、T0/期限和验收来源仍待C08-03完成，不能直接据此参数表开窗口。
+
+新包保留原四owner的publish=true，worker始终false且无owner，由外部维护入口阻止新业务；本次不先冻结closed API后再改同SHA配置。未来API binding指针已准备，原活动`/data/infra`指针不变；原生冻结按QS源码SHA不可改写。普通deploy实际调用、重复冻结和三组错误参数拒绝均已通过，原sudo规则保持。
+
+## 维护入口副本已验证（C08-03未完成）
+
+serverA原`nginx`镜像sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d已实际验证原始/closed两种三站点组合，两个`nginx -t`均退出0。[非活动入口receipt](evidence/rocketmq-m4-c08-inactive-ingress-20261027.json)固定`/data/apps/nginx-configs`下`iam.fangcunmount.cn.conf`、`qs.fangcunmount.cn.conf`、`collect.conf`的原/closed摘要、inode及权限；副本在固定release目录的`ingress/original`和`ingress/closed`。测试容器无发布端口、原主机挂载只读，缓存/日志写入临时tmpfs，完成即清理；未reload或更改原Nginx/站点。
+
+本次真实关闭时须再次核对这三个原文件及Nginx身份，保持原inode/owner/mode写入已冻结closed字节，先全量syntax检查再reload并核对实际503。首次应用启动前若需撤销本次维护，只恢复本次原始三文件并验证/reload，不触及数据库或旧M3运行状态。首次M4启动后业务恢复采用前向修复，不能把恢复HTTP入口当成允许回退旧业务/数据。system来源、实际T0/期限和有界验收例外只能在合法会话就绪后记录；没有用测试地址/时间冒充生产事实。实际在途/停止与启动协调仍待收敛，本节不构成开窗口授权或C08-03完成。
+
 ## 窗口前门禁
 
 1. 最终源码/依赖CI、当前实际宿主故障和五归档验证通过；稳定SDK Go0.5.0/Python0.4.0及wheel摘要保持。最终八实例实际启动/关闭、零DDL、原预算、全部清理通过。
 2. 从实际主库只读回读四owner的原字节binding及clean heads，不用SDK binding schema_version代替宿主迁移head；核对八实例身份/资源/重启和worker HTTP ready。serverD可用内存至少512MiB；不足或出现OOM/非预期重启则停止。
-3. 固定新镜像先拉取到主机并核对image config ID；保留原镜像。调用固定root材料验证器，核对已安装的精确审核API原生冻结工具；仅授权固定源码/镜像、基路径和UID/GID。普通部署用户实际原生预检成功、重复冻结一致且错误输入在替换前拒绝后，才能准备启动。
+3. 固定新镜像已通过原归档在主机离线预置：两主机ACR读取鉴权拒绝，未复制CI凭据；必须核对真实保存config SHA、rootfs及关键配置，再使用冻结的实际engine ID，不能把该ID误当作ACR manifest。保留原镜像。调用固定root材料验证器，核对已安装的精确审核API原生冻结工具；仅授权固定源码/镜像、基路径和UID/GID。普通部署用户实际原生预检成功、重复冻结一致且错误输入在替换前拒绝后，才能准备启动。
 4. 原私有配置、环境、挂载、网络与服务身份在原主机内冻结，不将凭据或原wire导出。新包以真实Compose解码回读，并逐字段比对原owner/预算、只读材料、服务证书、监听及下游地址。root工具、sudo规则、计划和源码均绑定精确摘要；保留原版本。
-5. system合法会话与门店A最小验收入口就绪。当前Mac锁定且Chrome没有Qlume会话，已请求用户正常登录。不能用管理员令牌、替代身份或数据库探针代签system验收；入口未准备好不进入维护。
+5. system合法会话与门店A最小验收入口就绪。上次核验Mac锁定且Chrome没有Qlume会话，已请求用户正常登录，尚未收到就绪回复。不能用管理员令牌、替代身份或数据库探针代签system验收；入口未准备好不进入维护。
 6. 核对AI真实在途、已有模型调用/checkpoint和未来调度责任。需要额外等待时留在窗口前；不为清理强杀模型、重置attempt、重做unknown或重新投递旧消息。
 
 ## 受控执行顺序

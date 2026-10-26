@@ -1,0 +1,55 @@
+{
+  "schema": "m4-candidate-publication/v1",
+  "plan_sha256": "b9db919dafeba3266f5ff7156b8eb219bb955689039cb506060f90cbd56715f9",
+  "registry_write_attempted": true,
+  "published": {
+    "iam": {
+      "tag": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/iam:m4-candidate-40371739428-1-4609d4542d93",
+      "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/iam@sha256:453af5e1f6a9549eaac11cd0262afed5d0b5d6ac902572432417fa5812641b8d",
+      "image_config_id": "sha256:671cb04bdc5cd5cdc821387d0269eb1ca004afed8b38fd8d9cc655f0dac99602",
+      "archive_sha256": "3014f06a284faaf80af538a8d4528543ca5cbc7146dc1ccb7612ad80f514ccee",
+      "source_sha": "4609d4542d9303130ab94ed67593d0a69d0d010d"
+    },
+    "ai": {
+      "tag": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-ai:m4-candidate-40371739428-1-b00cf3a2f30d",
+      "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-ai@sha256:c21503888616ceeb3e20d8acb8a31c3562abbfd6e23704b34c94a33fd1a42752",
+      "image_config_id": "sha256:ad91ea3eea2a7c3e8b6ca6abce4f029411e1a5503cb6dd4473c804f1e1a2d926",
+      "archive_sha256": "a0f3bf7a3ca3c12f859c3ec47e6c8e5d89bd6edab069147abab11aea1ebfd4cd",
+      "source_sha": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c"
+    },
+    "qs-api": {
+      "tag": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver:m4-candidate-40371739428-1-1f38f583d43c",
+      "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver@sha256:9609f87094a427f57e1b9f974e1a7cc5b45f8b35ebfd28d198cfda69c36767b7",
+      "image_config_id": "sha256:46dc36d5d3063abebeb456e21dd7b66443d50fc553c95ac452a99e03c5b9749f",
+      "archive_sha256": "abe2c944beeb2f3b89d6fe50defa4618a8753ac2607ebcaceed527e8f64d3d84",
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d"
+    },
+    "qs-collection": {
+      "tag": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-collection-server:m4-candidate-40371739428-1-1f38f583d43c",
+      "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-collection-server@sha256:82924c13875e2b64555ca7c20bfa55ba1ebf7dc0088464051e8e793eb9d954f7",
+      "image_config_id": "sha256:37fa29a1a1b6a788187979755600add27d11414371972d1cbae21c9e85f8073b",
+      "archive_sha256": "e68ebfd32f4438c22c74c7fca515b4a0fcfef788c6c94076ddbfc3270d520733",
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d"
+    },
+    "qs-worker": {
+      "tag": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-worker:m4-candidate-40371739428-1-1f38f583d43c",
+      "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-worker@sha256:8349646398ed378ddac04a5542d6f13206f9db7ee932511ae732855bacf29f8b",
+      "image_config_id": "sha256:9e2ecfd5c30d9170fa7a3990968e31f3c6c7c9708dc6e940fc9f65dfe0f0eaa5",
+      "archive_sha256": "b0602da48596961957cdccfb1245bf5c59a7f2975bb50bb667b5f6ede3cf5890",
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d"
+    }
+  },
+  "complete": true,
+  "passed": 5,
+  "failed": 0,
+  "skipped": 0,
+  "application_started": false,
+  "production_business_cutover": false,
+  "application_rebuilt": false,
+  "publication_run_id": "40371739428",
+  "publication_attempt": "1",
+  "all_source_evidence_verified": true,
+  "preflight_complete": true,
+  "current_target": null,
+  "private_downloads_removed": true
+}

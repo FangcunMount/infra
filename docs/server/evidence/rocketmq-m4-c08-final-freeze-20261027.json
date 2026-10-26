@@ -1,0 +1,683 @@
+{
+  "schema": "m4-c08-final-candidate-freeze/v1",
+  "recorded_on": "2026-10-27",
+  "task": "C08-02",
+  "implementation_verified": true,
+  "publication": {
+    "run": 40371739428,
+    "workflow_source": "d22910071e8e5d21fb411b7c0856c18d8d2aefc6",
+    "transport_source": "dd65adabc3de65d863b52d64e5f85d9e5a47bc32",
+    "transport_merge": "a58a6e9aebc42087f1c97534a547a10df6400e8a",
+    "receipt": "rocketmq-m4-c08-acr-publication-20261027.json",
+    "receipt_sha256": "7537dd4d313085a7313a373cb0f82a501b5483fd110bb9935384b5318cd44145",
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "application_rebuilt": false,
+    "applications_started": false
+  },
+  "source_and_native_gates": "rocketmq-m4-c08-final-audit-20261027.json",
+  "preload": {
+    "hosts": {
+      "serverA": {
+        "active_configuration_changed": false,
+        "applications_started": false,
+        "credentials_changed": false,
+        "deployment_lock_metadata_unchanged": true,
+        "host": "serverA",
+        "images_deleted": false,
+        "private_archives_retained": true,
+        "registry_pulled": false,
+        "rows": [
+          {
+            "actual_engine_image_id": "sha256:b121e97fc20bf3bd8e8b550a89df8920ec348afd1e5af0bb632acc7e615ae67f",
+            "actual_saved_config_id": "sha256:671cb04bdc5cd5cdc821387d0269eb1ca004afed8b38fd8d9cc655f0dac99602",
+            "already_loaded": true,
+            "archive_sha256": "3014f06a284faaf80af538a8d4528543ca5cbc7146dc1ccb7612ad80f514ccee",
+            "execution_reference": "sha256:b121e97fc20bf3bd8e8b550a89df8920ec348afd1e5af0bb632acc7e615ae67f",
+            "image_config_id": "sha256:671cb04bdc5cd5cdc821387d0269eb1ca004afed8b38fd8d9cc655f0dac99602",
+            "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/iam@sha256:453af5e1f6a9549eaac11cd0262afed5d0b5d6ac902572432417fa5812641b8d",
+            "root_archive": "/var/lib/fangcun-m4/image-preload/3014f06a284faaf80af538a8d4528543ca5cbc7146dc1ccb7612ad80f514ccee.tar.gz",
+            "rootfs_and_critical_configuration_match": true,
+            "source_sha": "4609d4542d9303130ab94ed67593d0a69d0d010d",
+            "target": "iam"
+          },
+          {
+            "actual_engine_image_id": "sha256:501125199a976747ad6febafada18ffc2fa1025504d93b179daa30301bc44d55",
+            "actual_saved_config_id": "sha256:46dc36d5d3063abebeb456e21dd7b66443d50fc553c95ac452a99e03c5b9749f",
+            "already_loaded": false,
+            "archive_sha256": "abe2c944beeb2f3b89d6fe50defa4618a8753ac2607ebcaceed527e8f64d3d84",
+            "execution_reference": "sha256:501125199a976747ad6febafada18ffc2fa1025504d93b179daa30301bc44d55",
+            "image_config_id": "sha256:46dc36d5d3063abebeb456e21dd7b66443d50fc553c95ac452a99e03c5b9749f",
+            "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver@sha256:9609f87094a427f57e1b9f974e1a7cc5b45f8b35ebfd28d198cfda69c36767b7",
+            "root_archive": "/var/lib/fangcun-m4/image-preload/abe2c944beeb2f3b89d6fe50defa4618a8753ac2607ebcaceed527e8f64d3d84.tar.gz",
+            "rootfs_and_critical_configuration_match": true,
+            "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+            "target": "qs-api"
+          },
+          {
+            "actual_engine_image_id": "sha256:97506c3aca75905423b6ad8bd96c234c19f2e8fd52bd25e8acfc9d6935ed576f",
+            "actual_saved_config_id": "sha256:37fa29a1a1b6a788187979755600add27d11414371972d1cbae21c9e85f8073b",
+            "already_loaded": false,
+            "archive_sha256": "e68ebfd32f4438c22c74c7fca515b4a0fcfef788c6c94076ddbfc3270d520733",
+            "execution_reference": "sha256:97506c3aca75905423b6ad8bd96c234c19f2e8fd52bd25e8acfc9d6935ed576f",
+            "image_config_id": "sha256:37fa29a1a1b6a788187979755600add27d11414371972d1cbae21c9e85f8073b",
+            "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-collection-server@sha256:82924c13875e2b64555ca7c20bfa55ba1ebf7dc0088464051e8e793eb9d954f7",
+            "root_archive": "/var/lib/fangcun-m4/image-preload/e68ebfd32f4438c22c74c7fca515b4a0fcfef788c6c94076ddbfc3270d520733.tar.gz",
+            "rootfs_and_critical_configuration_match": true,
+            "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+            "target": "qs-collection"
+          },
+          {
+            "actual_engine_image_id": "sha256:927c6cea9c0551be4d026bf53e27e4521a45d4bd9c4b36e848f097657db0ab14",
+            "actual_saved_config_id": "sha256:ad91ea3eea2a7c3e8b6ca6abce4f029411e1a5503cb6dd4473c804f1e1a2d926",
+            "already_loaded": false,
+            "archive_sha256": "a0f3bf7a3ca3c12f859c3ec47e6c8e5d89bd6edab069147abab11aea1ebfd4cd",
+            "execution_reference": "sha256:927c6cea9c0551be4d026bf53e27e4521a45d4bd9c4b36e848f097657db0ab14",
+            "image_config_id": "sha256:ad91ea3eea2a7c3e8b6ca6abce4f029411e1a5503cb6dd4473c804f1e1a2d926",
+            "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-ai@sha256:c21503888616ceeb3e20d8acb8a31c3562abbfd6e23704b34c94a33fd1a42752",
+            "root_archive": "/var/lib/fangcun-m4/image-preload/a0f3bf7a3ca3c12f859c3ec47e6c8e5d89bd6edab069147abab11aea1ebfd4cd.tar.gz",
+            "rootfs_and_critical_configuration_match": true,
+            "source_sha": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c",
+            "target": "ai"
+          }
+        ],
+        "runtime_unchanged": 5,
+        "transport": "original verified archive; fixed engine ID bound to published manifest/config"
+      },
+      "serverD": {
+        "active_configuration_changed": false,
+        "applications_started": false,
+        "chunk_receipts": [
+          {
+            "bytes": 1048576,
+            "offset": 11750400,
+            "sha256": "b3093e72a7a8be38ace5ca2bf9daf54a5395f07ce74dd8b7c89d9775b070fb49"
+          },
+          {
+            "bytes": 1048576,
+            "offset": 12798976,
+            "sha256": "a2f52d08ce7cfda3777614e8d8b79fd1c1ee27c0b3c3be4ebc04f732e3227085"
+          },
+          {
+            "bytes": 1048576,
+            "offset": 13847552,
+            "sha256": "54aed2ecab4ad596deefeb8c1a210167384599d84e49fc72dbb9c4b17b8c22f3"
+          },
+          {
+            "bytes": 1048576,
+            "offset": 14896128,
+            "sha256": "9cb53cbbed2e518892bb54ca934bae545d16284152430e559ad651aef2e426a9"
+          },
+          {
+            "bytes": 1048576,
+            "offset": 15944704,
+            "sha256": "0e4db6af819fc4e79d6eedd6f75d83640501cd709ed483620caf70eeda0148a5"
+          },
+          {
+            "bytes": 1048576,
+            "offset": 16993280,
+            "sha256": "e5a9fc4880e52de9acd3dc00359fb20ba502d4aef4a3fc71a9b18abac4fd0976"
+          },
+          {
+            "bytes": 1048576,
+            "offset": 18041856,
+            "sha256": "10a7676c540ab11585cd8d872299bc0c72c8ffb49e94ccebe9f36aba02362ce8"
+          },
+          {
+            "bytes": 1048576,
+            "offset": 19090432,
+            "sha256": "a3c07c2945803f8fa3a342afdf5666c93b834880b8f620086f6eabc3a1cb562d"
+          },
+          {
+            "bytes": 439849,
+            "offset": 20139008,
+            "sha256": "7e0fd9decd4940907d5424521b05eff0f87cf4be62e1cdd1313b3cf9099f1d7d"
+          }
+        ],
+        "credentials_changed": false,
+        "deployment_lock_metadata_unchanged": true,
+        "host": "serverD",
+        "images_deleted": false,
+        "private_archives_retained": true,
+        "registry_pulled": false,
+        "rows": [
+          {
+            "actual_engine_image_id": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+            "actual_saved_config_id": "sha256:9e2ecfd5c30d9170fa7a3990968e31f3c6c7c9708dc6e940fc9f65dfe0f0eaa5",
+            "already_loaded": false,
+            "archive_sha256": "b0602da48596961957cdccfb1245bf5c59a7f2975bb50bb667b5f6ede3cf5890",
+            "execution_reference": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+            "image_config_id": "sha256:9e2ecfd5c30d9170fa7a3990968e31f3c6c7c9708dc6e940fc9f65dfe0f0eaa5",
+            "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-worker@sha256:8349646398ed378ddac04a5542d6f13206f9db7ee932511ae732855bacf29f8b",
+            "root_archive": "/var/lib/fangcun-m4/image-preload/b0602da48596961957cdccfb1245bf5c59a7f2975bb50bb667b5f6ede3cf5890.tar.gz",
+            "rootfs_and_critical_configuration_match": true,
+            "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+            "target": "qs-worker"
+          }
+        ],
+        "runtime_unchanged": 3,
+        "transfer_receipt": {
+          "bytes": 20578857,
+          "sha256": "b0602da48596961957cdccfb1245bf5c59a7f2975bb50bb667b5f6ede3cf5890",
+          "verified": true
+        },
+        "transport": "original verified archive; fixed engine ID bound to published manifest/config"
+      }
+    },
+    "registry_reads": "denied on both hosts; no credential copied or changed",
+    "registry_pulled": false,
+    "execution_identity": "actual immutable cloud-engine ID; exact docker-save config hash + full rootfs diff IDs + critical configuration equal the tested archive; ACR manifest remains separately recorded"
+  },
+  "runtime_bundles": {
+    "serverA": {
+      "active_configuration_changed": false,
+      "applications_started": false,
+      "apply": true,
+      "binding_pointer_changed": false,
+      "credentials_exported": false,
+      "host": "serverA",
+      "inactive_only": true,
+      "production_DDL": false,
+      "rows": [
+        {
+          "API_final_render_claimed": true,
+          "actual_compose_decoded": true,
+          "assets_sha256": {
+            "events.yaml": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+            "source.json": "3525aa7958945a91ab319b34b4f6154eec8cd7c40099785b05b670d0789782af"
+          },
+          "compose_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-api/compose.json",
+          "compose_sha256": "00e911b172d887900cb581fa1fdf536a6bd444f81c53b08d0a9f566a418de3df",
+          "effective_environment_sha256": "c5e540063bfd38de08ec49be633471efd5fae63f39f3e7b60263ea8818701107",
+          "environment_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-api/runtime.env",
+          "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+          "execution_image": "sha256:501125199a976747ad6febafada18ffc2fa1025504d93b179daa30301bc44d55",
+          "original_compose_sha256": "485c2750c613dafb5858b390d8d0aa03f8272af3825753136ae078968a13f57d",
+          "original_environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+          "project": "servera-migrated",
+          "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver@sha256:9609f87094a427f57e1b9f974e1a7cc5b45f8b35ebfd28d198cfda69c36767b7",
+          "replicas": 1,
+          "role": "qs-api",
+          "service": "qs-apiserver",
+          "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+          "native_base_config_sha256": "3525aa7958945a91ab319b34b4f6154eec8cd7c40099785b05b670d0789782af",
+          "native_rendered_config_sha256": "28cd777cc8e5af3ab87465e0ff497d1930cc024b46d5a3ba90f7ae334915ab38"
+        },
+        {
+          "API_final_render_claimed": false,
+          "actual_compose_decoded": true,
+          "assets_sha256": {
+            "runtime.json": "a2aa8f0c50cf57369c7ba2c5efc69d043d59880152d3b0c821912b06268945bb"
+          },
+          "compose_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-collection/compose.json",
+          "compose_sha256": "c5867d51f29a138ed129faa8a19c9e5ecc5ac52c1cf6122daddeaaa1660a6269",
+          "effective_environment_sha256": "7ba1b35d631b2057a81efa7ec6f9ca9ef995f9ac737856d35bf095f5054635b1",
+          "environment_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-collection/runtime.env",
+          "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+          "execution_image": "sha256:97506c3aca75905423b6ad8bd96c234c19f2e8fd52bd25e8acfc9d6935ed576f",
+          "original_compose_sha256": "e9286247a4207de955e35f327feaf92e72ddec07fdc973fb54c2f6f911b3b0a6",
+          "original_environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+          "project": "qs-collection",
+          "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-collection-server@sha256:82924c13875e2b64555ca7c20bfa55ba1ebf7dc0088464051e8e793eb9d954f7",
+          "replicas": 2,
+          "role": "qs-collection",
+          "service": "server",
+          "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d"
+        },
+        {
+          "API_final_render_claimed": false,
+          "actual_compose_decoded": true,
+          "assets_sha256": {},
+          "compose_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/ai/compose.json",
+          "compose_sha256": "b7899a69192b11be991dd57e50c1464bd854c430345cb2518492c46da5c6f8b6",
+          "effective_environment_sha256": "9da4062dcf4b4a904791dff9375f112610b834e894c2127ed7031c45036e8def",
+          "environment_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/ai/runtime.env",
+          "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+          "execution_image": "sha256:927c6cea9c0551be4d026bf53e27e4521a45d4bd9c4b36e848f097657db0ab14",
+          "original_compose_sha256": "6f67f7f06dac946689e32768aaba4cb6821487cb004876fd39590371ddd4429e",
+          "original_environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+          "project": "qs-ai",
+          "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-ai@sha256:c21503888616ceeb3e20d8acb8a31c3562abbfd6e23704b34c94a33fd1a42752",
+          "replicas": 1,
+          "role": "ai",
+          "service": "qs-ai",
+          "source_sha": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c"
+        },
+        {
+          "API_final_render_claimed": false,
+          "actual_compose_decoded": true,
+          "assets_sha256": {
+            "events.yaml": "6ffe5c44a0751576fe59230eeb37496138da321f240421b089ea1dad7fab8bef",
+            "runtime.json": "4d30a6d7ede64141f9732a354a7024c61c344fdbd2027ca22bc753d7c4e04145"
+          },
+          "compose_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/iam/compose.json",
+          "compose_sha256": "ed39cd36e0011602b3500990308c9edfca6c5d1929c6adacde7a3e87e6dee8c3",
+          "effective_environment_sha256": "715f3490066181588d40d11b71e195b0c90f82efb9882bc99e7eea925d17cb7d",
+          "environment_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/iam/runtime.env",
+          "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+          "execution_image": "sha256:b121e97fc20bf3bd8e8b550a89df8920ec348afd1e5af0bb632acc7e615ae67f",
+          "original_compose_sha256": "ee6998e60eca020d92f4bc63d9411e4e51c71370f475cd474cc453db722c7a48",
+          "original_environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+          "project": "docker",
+          "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/iam@sha256:453af5e1f6a9549eaac11cd0262afed5d0b5d6ac902572432417fa5812641b8d",
+          "replicas": 1,
+          "role": "iam",
+          "service": "iam-apiserver",
+          "source_sha": "4609d4542d9303130ab94ed67593d0a69d0d010d"
+        }
+      ],
+      "runtime_unchanged": 5
+    },
+    "serverD": {
+      "active_configuration_changed": false,
+      "applications_started": false,
+      "apply": true,
+      "binding_pointer_changed": false,
+      "credentials_exported": false,
+      "host": "serverD",
+      "inactive_only": true,
+      "production_DDL": false,
+      "rows": [
+        {
+          "API_final_render_claimed": false,
+          "actual_compose_decoded": true,
+          "assets_sha256": {
+            "events.yaml": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+            "runtime.json": "38c8364c5a3a9cb9168c47cd7677888319610d78d1d12cee8685db768b5e869c"
+          },
+          "compose_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-worker/compose.json",
+          "compose_sha256": "a161b70dda11cc8a6d8b4592c758c7d3bf8efb427e28fc4943d70fe3b3b6a6e5",
+          "effective_environment_sha256": "6fcc41e1194250af62d238c3197f862e29c150815e1f5d3d0f5a75b213691115",
+          "environment_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-worker/runtime.env",
+          "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+          "execution_image": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+          "original_compose_sha256": "d3bb12d154c05a11faeed4324d175be2cf1326a1c22c9df26966e7bfe33c5b1d",
+          "original_environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+          "project": "qs-worker",
+          "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-worker@sha256:8349646398ed378ddac04a5542d6f13206f9db7ee932511ae732855bacf29f8b",
+          "replicas": 3,
+          "role": "qs-worker",
+          "service": "runtime",
+          "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d"
+        }
+      ],
+      "runtime_unchanged": 3
+    }
+  },
+  "API_actual_native_freeze": {
+    "active_configuration_changed": false,
+    "applications_started": false,
+    "base_config_sha256": "3525aa7958945a91ab319b34b4f6154eec8cd7c40099785b05b670d0789782af",
+    "compose_file": "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-api/compose.json",
+    "compose_sha256": "00e911b172d887900cb581fa1fdf536a6bd444f81c53b08d0a9f566a418de3df",
+    "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+    "final_transaction_binding": true,
+    "host": "serverA",
+    "image_id": "sha256:501125199a976747ad6febafada18ffc2fa1025504d93b179daa30301bc44d55",
+    "native_metadata_sha256": "86c0cc2e3ae2c3d3e4e186f59b3ed3bb766b8f64b5d08a0440cda5bdaf92efee",
+    "native_result": {
+      "binding_revision": "m4-c06-20261026-v1",
+      "binding_sha256": "ef633b4ef01f24a01748a5402ea812941b3063d4dc60d2d0a7b23778ddcd55b1",
+      "compose_file": "/opt/qs-server/qs-apiserver/ai-mq-releases/1f38f583d43c9faf4601a5df9f3f82b764e6547d/compose.json",
+      "image_id": "sha256:501125199a976747ad6febafada18ffc2fa1025504d93b179daa30301bc44d55",
+      "preflight": "passed",
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d"
+    },
+    "new_future_binding_pointer": {
+      "already_existed": true,
+      "path": "/var/lib/fangcun-m4-materials/qs-server-messaging/current.json",
+      "sha256": "39828899a87a164d87d6fdf4455d8b19805309457b90bf27ed26ae6962603ce9"
+    },
+    "offline": true,
+    "operator_sha256": "4a03e608359f6828d668a117cfcea9b077afc317f98b074a9d58e245c06ee9e8",
+    "ordinary_deployer_preflight": true,
+    "previous_rules_unchanged": true,
+    "production_DDL": false,
+    "public_key_fingerprints": {
+      "ai.encrypt.mq-ai-20261004": "06c4f35201744247573a5e0615adc951f727a57cda8c191d30617b5e4db31f8e",
+      "ai.sign.mq-ai-20261004": "6594d9ee2d1fd961589452e87dce3750dbcda23a60fee873e8656044227b52dc",
+      "qs.encrypt.mq-ai-20261004": "1d06ca183ed3d692c6163800222ace7bca25f5deac76c877b4d921bdfe4597fd",
+      "qs.sign.mq-ai-20261004": "5571779d61a28e87fff8132574e1026700070c8ff727afc860f255e717e83786"
+    },
+    "rendered_config_sha256": "28cd777cc8e5af3ab87465e0ff497d1930cc024b46d5a3ba90f7ae334915ab38",
+    "repeated_freeze_equal": true,
+    "runtime_unchanged": 5,
+    "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+    "sudo_rule_sha256": "1bec352e6de5bdeedee23226234bbda99fd0d1189ba49c383b3a03dd044ad5db",
+    "tool_sha256": "ce8b2112bd2669efa14ae34880a6f6462e38d629a4a17ff9673936b70b359bb3",
+    "transport_files_sha256": {
+      "ca.crt": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+      "credentials.json": "5478dfd060eb7cf12785236f95ebe5e9efb1823c3d1fcde1d0c04887de5e4894",
+      "mongo-credentials.json": "56eb749ad5ff5d96043eba861087a565e4f85a9e6208b72d5c5ce1e4b976d4ac",
+      "routes.json": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3"
+    },
+    "wrong_arguments_denied": 3,
+    "protected_image_ids_count": 34
+  },
+  "materials": {
+    "hosts": {
+      "serverA": {
+        "applications_started": false,
+        "frozen_roles": 4,
+        "host": "serverA",
+        "logical_mount_references": 18,
+        "material_files": {
+          "/var/lib/fangcun-m4-materials/iam-messaging/versions/m4-c06-20261026-v1/rocketmq/ca.crt": {
+            "bytes": 1562,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/iam-messaging/versions/m4-c06-20261026-v1/rocketmq/credentials.json": {
+            "bytes": 108,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "ee92edf0a658b87e922284469f8fe152d4597b818b4829408287283ba21922ff",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/iam-messaging/versions/m4-c06-20261026-v1/rocketmq/routes.json": {
+            "bytes": 5468,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/ai.encrypt.mq-ai-20261004.json": {
+            "bytes": 245,
+            "gid": 10001,
+            "mode": "0o440",
+            "sha256": "225729a5bcb4817310023ebb7bb086fb1467ac2446630a02b0d2c6ec98dda8d1",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/ai.sign.mq-ai-20261004.json": {
+            "bytes": 233,
+            "gid": 10001,
+            "mode": "0o440",
+            "sha256": "f5627366690277d4545da08bfab119e9033abcb9819d6c189f7510892e85ff2f",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/qs.encrypt.mq-ai-20261004.json": {
+            "bytes": 225,
+            "gid": 10001,
+            "mode": "0o440",
+            "sha256": "e01b6c9f38cf28473b87598aaac91da857d055a38d67b32246d103cb517d6a55",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/qs.sign.mq-ai-20261004.json": {
+            "bytes": 213,
+            "gid": 10001,
+            "mode": "0o440",
+            "sha256": "a42500d9818ca22cf2fa6b3b01b14800eaca269b717a53233a0099a8fc3f613e",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/rocketmq/ca.crt": {
+            "bytes": 1562,
+            "gid": 10001,
+            "mode": "0o440",
+            "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/rocketmq/credentials.json": {
+            "bytes": 107,
+            "gid": 10001,
+            "mode": "0o440",
+            "sha256": "b6529b94fc1681235051bbd504aea8366ffd786352a5d7c7b6f64002d55b630f",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/rocketmq/routes.json": {
+            "bytes": 5468,
+            "gid": 10001,
+            "mode": "0o440",
+            "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/ai.encrypt.mq-ai-20261004.json": {
+            "bytes": 225,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "7098603ade994a301fed99966852afddb434ac65bad9edf8ed29d4c47168c97a",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/ai.sign.mq-ai-20261004.json": {
+            "bytes": 213,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "b08110b2e226a0dd358c5a9beb09f32697e4d430aea46a99ff26838152534b55",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/qs.encrypt.mq-ai-20261004.json": {
+            "bytes": 245,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "0debe07787cc2b8e02c1245c2d746bed0c9011bf51e2ba7147852077399bd5c1",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/qs.sign.mq-ai-20261004.json": {
+            "bytes": 233,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "a930af2d1ae26f12c55e8df5000bf84389869ed36bc7cbc67094ec07f0b706a0",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/rocketmq/ca.crt": {
+            "bytes": 1562,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/rocketmq/credentials.json": {
+            "bytes": 117,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "5478dfd060eb7cf12785236f95ebe5e9efb1823c3d1fcde1d0c04887de5e4894",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/rocketmq/mongo-credentials.json": {
+            "bytes": 113,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "56eb749ad5ff5d96043eba861087a565e4f85a9e6208b72d5c5ce1e4b976d4ac",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/rocketmq/routes.json": {
+            "bytes": 5468,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+            "uid": 0
+          }
+        },
+        "ordinary_deploy_checks": [
+          {
+            "activated": false,
+            "host": "serverA",
+            "material_root": "/var/lib/fangcun-m4-materials",
+            "read_only": true,
+            "receipt_sha256": "2901f3867976a1d3323d5aff951681e5155fa6376b61fe0de8a7a93c29bd7533",
+            "revision": "m4-c06-20261026-v1",
+            "role": "iam",
+            "status": "verified"
+          },
+          {
+            "activated": false,
+            "host": "serverA",
+            "material_root": "/var/lib/fangcun-m4-materials",
+            "read_only": true,
+            "receipt_sha256": "2d356452dd054f3383c9006a6d0452f1d7fa7f97913efcc62c86e5a058d0a079",
+            "revision": "m4-c06-20261026-v1",
+            "role": "qs-api",
+            "status": "verified"
+          },
+          {
+            "activated": false,
+            "host": "serverA",
+            "material_root": "/var/lib/fangcun-m4-materials",
+            "read_only": true,
+            "receipt_sha256": "3d2914a1a717bb8b17e722d15ab02df01ca9502375bcc6baa1dbcfc201a80689",
+            "revision": "m4-c06-20261026-v1",
+            "role": "ai",
+            "status": "verified"
+          }
+        ],
+        "read_only": true
+      },
+      "serverD": {
+        "applications_started": false,
+        "frozen_roles": 1,
+        "host": "serverD",
+        "logical_mount_references": 9,
+        "material_files": {
+          "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-c06-20261026-v1/rocketmq/ca.crt": {
+            "bytes": 1562,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-c06-20261026-v1/rocketmq/credentials.json": {
+            "bytes": 114,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "3b05d19bb76de476c1a7ed3de17760cf50293b5798ccff8b7063a8b172402e79",
+            "uid": 0
+          },
+          "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-c06-20261026-v1/rocketmq/routes.json": {
+            "bytes": 5468,
+            "gid": 2000,
+            "mode": "0o440",
+            "sha256": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3",
+            "uid": 0
+          }
+        },
+        "ordinary_deploy_checks": [
+          {
+            "activated": false,
+            "host": "serverD",
+            "material_root": "/var/lib/fangcun-m4-materials",
+            "read_only": true,
+            "receipt_sha256": "100bdade84e77859f490e15480002cb3d93d2a5c65fdff1dcc01463de2a6f2c2",
+            "revision": "m4-c06-20261026-v1",
+            "role": "worker",
+            "status": "verified"
+          }
+        ],
+        "read_only": true
+      }
+    },
+    "operator_sha256": "8dd19b4f05ba4385a4fb92ac3213482d1091324a86b78dba15606f5f7c99c09b",
+    "schema": "m4-frozen-material-closure/v1"
+  },
+  "authoritative_heads": {
+    "iam_mysql": 45,
+    "qs_mysql": 110,
+    "qs_mongo": 44,
+    "ai_mysql": "0043_native_transaction_limit",
+    "all_clean": true,
+    "original_owner_store_epoch_bytes_match": true
+  },
+  "live_readback": {
+    "instances": 8,
+    "original_image_config_start_restart_UID_GID_budgets_unchanged": true,
+    "original_deployment_lock_metadata_unchanged": true,
+    "serverA_healthy": 5,
+    "serverD_HTTP_ready": 3,
+    "serverD_available_mib": 1215,
+    "prometheus_and_grafana_HTTP": 200,
+    "monitoring_targets_up": 10
+  },
+  "production": {
+    "inactive_new_bundle_written": true,
+    "new_future_API_binding_pointer_created": true,
+    "original_active_binding_pointer_replaced": false,
+    "original_materials_changed": false,
+    "applications_deployed": false,
+    "maintenance_started": false,
+    "DDL": false,
+    "Topic_ACL_or_owner_epoch_changed": false,
+    "credentials_rotated": false,
+    "model_or_business_invoked": false,
+    "legacy_assets_deleted": false,
+    "automatic_CD_resumed": false
+  },
+  "automatic_CD": {
+    "iam_PRODUCTION_DEPLOY_PAUSED": true,
+    "qs_PRODUCTION_DEPLOY_PAUSED": true,
+    "ai_AUTO_DEPLOY_ENABLED": false
+  },
+  "remaining_gates": [
+    "C08-03 final window/ingress execution and forward-recovery packet; actual-time and legal-session facts not fabricated",
+    "C08-04 controlled eight-instance deployment and legal system business acceptance",
+    "C08-05 final publication index and closure"
+  ],
+  "failure_history": [
+    {
+      "scope": "archive tag assumption",
+      "result": "rejected before Docker load; exact original verified RepoTag used"
+    },
+    {
+      "scope": "Docker backend engine ID portability",
+      "result": "IAM load retained but never started; full saved config hash/rootfs/critical fields proved; no tag overwrite"
+    },
+    {
+      "scope": "worker bulk SSH/SFTP transfer",
+      "result": "timeouts; original partial prefix verified, bounded chunks and final full archive hash passed; network settings unchanged"
+    },
+    {
+      "scope": "Compose resource JSON representation",
+      "result": "inactive API bundle only; string mem_limit normalized to integer and exact budgets passed"
+    },
+    {
+      "scope": "native sudoers colon syntax",
+      "result": "temporary rule rejected by visudo before installation; escaped exact image argument then whole sudoers passed"
+    },
+    {
+      "scope": "Compose user representation",
+      "result": "offline native freeze already passed; final report guard corrected to exact current Config.User and all resource checks; no app replacement"
+    }
+  ],
+  "evidence": {
+    "serverA_preload": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/preloaded-serverA-20261026T181926-b02c6c.private.json",
+      "sha256": "273e19c9d68d46bd9633b8367ffac86ff9f164e96a4532b122048104346a80e1"
+    },
+    "serverD_preload": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/preloaded-serverD-20261026T182818-774dbd.private.json",
+      "sha256": "871020a5f7aadf84f3eec4093aa55aae15ecc22053a7a97664a107b62860c559"
+    },
+    "serverA_bundle": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/bundle-applied-20261026T182433-fcac2a.private.json",
+      "sha256": "123fffe2052234c47be44ec241e8d9852bdbbeb098adf50b870a569f7830afe0"
+    },
+    "serverD_bundle": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/bundle-applied-20261026T183142-8c009d.private.json",
+      "sha256": "6645a9e312bf655499267351b4fca65c0e14c4296f906a64b2ad39420996b48d"
+    },
+    "API_native": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/api-native-frozen-20261026T182717-2cbd6b.private.json",
+      "sha256": "a76e5a5e5c48449cd18dea0f95c1be8041691badda95d8f5e18a96a3370b9930"
+    },
+    "materials": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/frozen-materials-20261026T183316-5bf7ed.private.json",
+      "sha256": "e5d88ca40921743e36ca21f31c29ffac88fe3dc03c4a6fc96ae249b8f0623616"
+    },
+    "runtime_after": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/runtime-baseline-20261026T183223-c55620.private.json",
+      "sha256": "5a352e4ac41c6d0f4f3ec5ff091b6a134e4a3e18b89377f437ba404228ddcc45"
+    },
+    "heads": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/heads-bindings-20261026T183223-ae9b96.private.json",
+      "sha256": "4e5116fae3d0a920bf0c61dc378f15518b26453669a854a72b87f6c822b19c19"
+    },
+    "monitoring": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/monitoring-20261026T183223-905327.private.json",
+      "sha256": "37312d5d3c8952f16d08cbab4187c7fe515338637107929ce463f2134da39409"
+    },
+    "worker_HTTP": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/worker-ready-20261026T183223-abc280.private.json",
+      "sha256": "a3f6ef60cea99b2b526b8682abd376d3c35c584135321140adc91d5fdd034ca5"
+    }
+  }
+}
