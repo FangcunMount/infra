@@ -123,7 +123,7 @@ def api_configuration(source, config, revision):
     return bridge_binding(config['messaging']['rocketmq'], revision)
 
 
-def configure(f, args, ai_env, case):
+def configure(f, args, ai_env, case, *, expected_qs_sha=None):
     f.stage = 'actual_m4_packagers_and_synthetic_materials'
     revision = 'm4-owned-' + f.project.rsplit('-', 1)[1]
     sources = f.directory / 'm4-material-source'; sources.mkdir(mode=0o700)
@@ -189,7 +189,7 @@ def configure(f, args, ai_env, case):
     # Actual host freeze tool -> ordinary native preflight image -> output config.
     # Repeat freezes the exact same image/config again, without syncing/stopping.
     native = root_action(f, 'api', '--source', str(args.sources / 'qs'), '--image', f.images['api'])
-    require(native['result']['source_sha'] == SOURCES['qs'] and native['native_metadata']['final_transaction_binding'] is True,
+    require(native['result']['source_sha'] == (expected_qs_sha or SOURCES['qs']) and native['native_metadata']['final_transaction_binding'] is True,
             'actual_current_api_final_preflight_required')
     f.runtime_mounts['api'] = native['volumes']
     f.report['m4_api_native_preflight'] = native

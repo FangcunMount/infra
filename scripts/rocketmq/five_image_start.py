@@ -151,13 +151,21 @@ def main():
         p.add_argument('--' + key.replace('_', '-'), type=Path, required=True)
     p.add_argument('--startup-receipt', type=Path)
     p.add_argument('--m4-rebuild', action='store_true')
+    p.add_argument('--m4-candidate', type=Path)
     args = p.parse_args(); require(not args.report.exists(), 'new_report_required')
     cutover = args.startup_receipt is not None
     require(not (cutover and args.m4_rebuild), 'm4_is_not_an_old_cutover_receipt')
+    require(args.m4_candidate is None or (args.m4_rebuild and not cutover), 'final_candidate_is_current_m4_only')
+    final_manifest = None
+    final_digest = None
     sources = SOURCES
     reviewed_builder = None
     if args.m4_rebuild:
         from m4_image_rebuild import SOURCES as sources, BUILDER_SHA as reviewed_builder
+        if args.m4_candidate is not None:
+            from m4_final_image_candidates import read
+            final_manifest, final_digest = read(args.m4_candidate)
+            sources, reviewed_builder = final_manifest['sources'], final_manifest['builder_sha']
     repo = Path(__file__).resolve().parents[2]
     report = dict(schema='m3-five-actual-image-startup-trial/v4', passed=0, failed=0, skipped=0,
                   production=False, system_acceptance=False, combined_cutover_rehearsal_complete=False,
@@ -168,6 +176,8 @@ def main():
     if args.m4_rebuild:
         report.update(schema='m4-eight-instance-config-rebuild/v1',
                       scope='current merged source, actual production messaging packagers, root-owned versioned files and eight real runtimes; no business/system/production claim')
+    if final_manifest is not None:
+        report.update(final_candidate_manifest_sha256=final_digest, final_candidate_image_runs=final_manifest['image_runs'], final_candidate=True)
     f = FiveImageFixture(repo, report); run = f.run
     f.qs_source_sha = sources['qs']
     f.applications = {}; f.images = {}; f.private_dirs = {}
@@ -249,14 +259,18 @@ def main():
         shutil.copyfile(args.iam_initializer, f.private / 'iam-init'); (f.private / 'iam-init').chmod(0o755); f.ownership(2000)
         env = {k: os.environ[k] for k in ('GITHUB_ACTIONS', 'RUNNER_ENVIRONMENT')}
         env['IAM_IMAGE_FIXTURE_DSN'] = f'root:{f.password}@tcp(mysql:3306)/{iam_db}?parseTime=true&multiStatements=true'
-        report['iam_controlled_seed'] = seed_receipt(f.once('/fixture/iam-init', [], environment=env))
+        if final_manifest is not None:
+            env['IAM_IMAGE_FIXTURE_MODE'] = 'm4-final'
+        report['iam_controlled_seed'] = seed_receipt(f.once('/fixture/iam-init', [], environment=env), expected_schema=45 if final_manifest is not None else 40)
         cli_env = {'IAM_APISERVER_MYSQL_' + k: v for k, v in dict(HOST='mysql', PORT='3306', USERNAME='root', PASSWORD=f.password, DATABASE=iam_db, TLS_MODE='disabled').items()}
-        if not cutover:
+        if not cutover and final_manifest is None:
             for action in ('schema', 'select'):
                 plan = '/fixture/' + action + '.json'
                 f.once('/app/iam-maintenance', ['m3-messaging', '--action', action, '--store-id', 'isolated-iam-primary', '--writer-epoch', 'm3-1', '--export-plan', plan], environment=cli_env)
                 digest = f.once('/usr/bin/sha256sum', [plan], network=False).split()[0]
                 f.once('/app/iam-maintenance', ['m3-messaging', '--apply', '--writers-excluded', '--plan', plan, '--reviewed-sha256', digest], environment=cli_env)
+            case('original_iam_schema45_and_binding_selected')
+        elif final_manifest is not None:
             case('original_iam_schema45_and_binding_selected')
         f.ownership(os.getuid())
         f.stage = 'original_ai_schema_and_binding'; f.select('ai')
@@ -311,7 +325,7 @@ def main():
             QS_AI_GENERATION__ENABLED='true', QS_AI_EVALUATION__ENABLED='true', QS_AI_DEEPSEEK_API_KEY='owned-unused-fixture-key', QS_AI_ZHIPU_API_KEY='owned-unused-fixture-key')
         if args.m4_rebuild:
             from m4_image_rebuild import configure
-            configure(f, args, ai_env, case)
+            configure(f, args, ai_env, case, expected_qs_sha=sources['qs'])
             for component in ('iam', 'api', 'collection', 'worker'):
                 report['configuration_sha256'][component] = hashlib.sha256((f.private_dirs[component] / 'runtime.json').read_bytes()).hexdigest()
         for component in f.private_dirs:
