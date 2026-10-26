@@ -1,0 +1,76 @@
+name: M4 real host material refusal
+on:
+  pull_request:
+    paths:
+      - scripts/ops/ci_m4_host_guard.py
+      - scripts/ops/m4_material_guard.sh
+      - scripts/ops/m4_material_gate_test.py
+      - scripts/ops/m4_material_stage.py
+      - .github/workflows/m4-host-material-guard.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: m4-host-material-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  real-host-refusal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      IAM_SHA: 88cae2df3aca4858688d97af11bd0768871d6e97
+      QS_SHA: 92d58eaa75377d0030e8e549c16f942bf08f510c
+      AI_SHA: c4c94cb8815bf7dd810567fdeb7507bd3f84fb01
+      EXPECTED_SOURCE: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.EXPECTED_SOURCE }}
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/iam
+          ref: ${{ env.IAM_SHA }}
+          path: .host-sources/iam
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ env.QS_SHA }}
+          path: .host-sources/qs
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-ai
+          ref: ${{ env.AI_SHA }}
+          path: .host-sources/ai
+      - name: Exact clean reviewed source and no-skip host call-order tests
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE"
+          test "$(git -C .host-sources/iam rev-parse HEAD)" = "$IAM_SHA"
+          test "$(git -C .host-sources/qs rev-parse HEAD)" = "$QS_SHA"
+          test "$(git -C .host-sources/ai rev-parse HEAD)" = "$AI_SHA"
+          python3 .host-sources/iam/scripts/cd/test_material_gate.py -v
+          python3 .host-sources/qs/scripts/cd/test_material_gate.py -v
+          python3 -m unittest discover -s scripts/ops -p test_m4_material_stage.py -v
+      - name: Actual deploy user, installed root CLI and isolated fault matrix
+        run: |
+          set -euo pipefail
+          umask 077
+          sudo -n env GITHUB_ACTIONS=true RUNNER_ENVIRONMENT=github-hosted GITHUB_SHA="$EXPECTED_SOURCE" RUNNER_TEMP="$RUNNER_TEMP" \
+            python3 scripts/ops/ci_m4_host_guard.py --sources "$GITHUB_WORKSPACE/.host-sources"
+      - name: Nonempty complete evidence and owned cleanup
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          x=json.load(open('m4-host-material-guard.json'))
+          assert x['passed']==len(x['cases'])==50 and len(set(x['cases']))==50
+          assert x['failed']==x['errors']==x['skipped']==0 and x['owned_cleanup_complete']
+          assert not any(x[k] for k in ('production','application_started','network_clients_started'))
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m4-host-material-guard-${{ github.run_id }}-${{ github.run_attempt }}
+          path: m4-host-material-guard.json
+          if-no-files-found: error
+          retention-days: 14
