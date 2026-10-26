@@ -123,6 +123,21 @@ def api_configuration(source, config, revision):
     return bridge_binding(config['messaging']['rocketmq'], revision)
 
 
+def final_python_dependencies(f):
+    """Read the real ordinary image; once returns text, not a process object."""
+    f.select('ai')
+    value = json.loads(f.once('/app/.venv/bin/python', ['-c',
+        'import importlib.metadata as m,importlib.util as u,json; '
+        'import reliable_messaging.protected,reliable_messaging.rocketmq_transaction,qs_ai.bootstrap.messaging; '
+        'print(json.dumps(dict(sdk=m.version("fangcun-reliable-messaging"),'
+        'nsq_absent=u.find_spec("nsq") is None,tornado_absent=u.find_spec("tornado") is None,'
+        'current_imports=True)))'], network=False,
+        environment={'PYTHONDONTWRITEBYTECODE': '1'}))
+    require(value == dict(sdk='0.4.0', nsq_absent=True, tornado_absent=True, current_imports=True),
+            'current_image_retired_python_clients_must_be_absent')
+    return value
+
+
 def configure(f, args, ai_env, case, *, expected_qs_sha=None):
     f.stage = 'actual_m4_packagers_and_synthetic_materials'
     revision = 'm4-owned-' + f.project.rsplit('-', 1)[1]

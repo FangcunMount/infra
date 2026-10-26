@@ -8,8 +8,8 @@ import unittest
 from m4_publish_candidates import destinations, load_plan, retrieve, validate_report
 
 ROOT = Path(__file__).resolve().parents[2]
-PLAN = ROOT / 'docs/server/evidence/rocketmq-m4-image-publication-plan-20261027.json'
-REPORT = ROOT / 'docs/server/evidence/rocketmq-m4-c08-eight-instance-native-20261027.json'
+PLAN = ROOT / 'docs/server/evidence/rocketmq-m4-image-publication-plan-20261027-v2.json'
+REPORT = ROOT / 'docs/server/evidence/rocketmq-m4-c08-final-eight-instance-native-20261027.json'
 
 
 class M4PublicationTest(unittest.TestCase):
@@ -42,7 +42,7 @@ class M4PublicationTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / 'report.json'
             for kind in ('seven-process', 'failed-case', 'skip', 'unclean-exit', 'runtime-ddl',
-                         'source', 'candidate', 'archive', 'worker-budget', 'cleanup', 'production'):
+                         'source', 'candidate', 'archive', 'worker-budget', 'cleanup', 'retired-client', 'production'):
                 value = copy.deepcopy(original)
                 if kind == 'seven-process': del value['processes']['worker3']
                 elif kind == 'failed-case': value['cases'][next(iter(value['cases']))] = False
@@ -54,6 +54,7 @@ class M4PublicationTest(unittest.TestCase):
                 elif kind == 'archive': value['candidates']['iam']['image_config_id'] = 'sha256:' + '0' * 64
                 elif kind == 'worker-budget': value['actual_source_worker_concurrency'] = 49
                 elif kind == 'cleanup': value['cleanup']['private_directory_removed'] = False
+                elif kind == 'retired-client': value['final_python_dependencies']['nsq_absent'] = False
                 else: value['production'] = True
                 path.write_text(json.dumps(value))
                 plan = copy.deepcopy(self.plan)

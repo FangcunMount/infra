@@ -211,6 +211,9 @@ def main():
                 require(hashlib.sha256(tool.read_bytes()).hexdigest() == metadata['offline_tool_sha256'], 'original_companion_required')
                 shutil.copyfile(tool, private / 'qs-migrate-offline'); (private / 'qs-migrate-offline').chmod(0o755)
         report['candidates'] = candidates; report.pop('candidate'); case('all_five_exact_archives_loaded')
+        if final_manifest is not None:
+            from m4_image_rebuild import final_python_dependencies
+            report['final_python_dependencies'] = final_python_dependencies(f)
         f.select('api'); f.dependencies(); f.mongo_dependencies()
         run(['docker', 'pull', 'redis:7-alpine'], timeout=300)
         run(['docker', 'run', '-d', '--name', f.project + '-redis', '--label', f.label, '--network', f.network, '--network-alias', 'redis',

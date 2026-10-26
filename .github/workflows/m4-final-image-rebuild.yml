@@ -45,7 +45,7 @@ jobs:
       - name: Exact provenance and no-side-effect fixture protection
         run: |
           set -euo pipefail
-          for test in test_m4_final_image_candidates.py test_m4_image_rebuild.py test_iam_image_start.py test_image_start_provenance.py test_qs_image_pair.py test_qs_consumer_contract.py; do
+          for test in test_m4_final_image_candidates.py test_m4_final_python_dependencies.py test_m4_image_rebuild.py test_iam_image_start.py test_image_start_provenance.py test_qs_image_pair.py test_qs_consumer_contract.py; do
             uv run --no-project --with pyyaml==6.0.2 python -m unittest discover -s scripts/rocketmq -p "$test"
           done
   eight-instances:
@@ -211,6 +211,7 @@ jobs:
           assert x['schema']=='m4-eight-instance-config-rebuild/v1'
           assert x['final_candidate'] is True and x['final_candidate_image_runs']['qs-api']=='40352408582'
           assert x['passed']==len(x['cases'])==18 and x['failed']==x['skipped']==0
+          assert x['final_python_dependencies']==dict(sdk='0.4.0',nsq_absent=True,tornado_absent=True,current_imports=True)
           assert all(x['cases'].values()) and all(x['cleanup'].values()) and x['sources_unchanged']
           assert len(x['actual_material_mounts'])==len(x['actual_runtime_budgets'])==len(x['processes'])==8
           assert x['m4_material_stage']['files']==21 and x['actual_source_worker_concurrency']==48

@@ -12,6 +12,8 @@ C08后续门禁：完整源CI与合并、候选实际重建和失败恢复步骤
 
 ## 固定归档发布
 
-[本次发布计划](evidence/rocketmq-m4-image-publication-plan-20261027.json)固定两个成功构建run、最终18项启动报告原始摘要、五份inventory/归档/config ID和稳定SDK；三库源码分别为IAM4609d454、QS1f38f583、AIf83472c7。独立`m4_publish_candidates.py`在任何Registry写入前回读成功run、完整报告及全部归档，再复用原TLS传输和不可变manifest/config核验。所有目标tag先检查未占用，不覆盖M3/稳定tag；传输失败保留current_target未知状态，不把失败当成不存在。
+[本次发布计划](evidence/rocketmq-m4-image-publication-plan-20261027-v2.json)固定两个成功构建run、最终18项启动报告原始摘要、五份inventory/归档/config ID和稳定SDK；三库源码分别为IAM4609d454、QS1f38f583、AIb00cf3a2。独立`m4_publish_candidates.py`在任何Registry写入前回读成功run、完整报告及全部归档，再复用原TLS传输和不可变manifest/config核验。所有目标tag先检查未占用，不覆盖M3/稳定tag；传输失败保留current_target未知状态，不把失败当成不存在。
 
 实际执行从IAM既有`production`环境读取原ACR Secrets，检查显式审核main SHA及生产CD暂停；infra不新增/复制凭据。它只发布原归档，既不重新build，也不部署。旧`publish_candidates.py`默认仍执行原M3 C1合同，仅为新profile显式借用归档校验的reviewed_builder参数。真实拥有的回环Registry传输检查继续在GitHub runner运行，本机不启动Docker。
+
+最终依赖审计另行移除了AI的NSQ extra与无调用CI服务，原stage f83472c7归档不发布。新AI b00cf3a2构建40362760742，后续48789cdf仅改测试/CI/closure，全部Docker COPY/构建输入逐项相同；14项完整CI及两档各5668用例通过后源码已合并。最终[18项八实例证明](evidence/rocketmq-m4-c08-final-eight-instance-native-20261027.json)由40365407657执行，还在实际镜像内验证了pynsq/tornado不存在和当前导入有效；3项Go codec、零DDL/全部退出清理通过。首次夹具错误及错误旧profile不计通过，均保留于[审计](evidence/rocketmq-m4-c08-final-audit-20261027.json)。发布必须使用v2计划，并将IAM workflow固定到承载该计划的已合并infra源码；旧阶段计划禁止用于最终生产候选。

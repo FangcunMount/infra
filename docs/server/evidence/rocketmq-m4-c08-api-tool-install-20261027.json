@@ -1,0 +1,41 @@
+{
+  "schema": "m4-c08-api-native-tool-install/v1",
+  "recorded_on": "2026-10-27",
+  "source_runtime_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+  "result": {
+    "all_tool_ancestors_root_owned_nonwritable": true,
+    "ancestor_changed": {
+      "gid": 2001,
+      "mode_unchanged": "0755",
+      "new_uid": 0,
+      "old_uid": 1002,
+      "path": "/opt/qs-server",
+      "recursive": false
+    },
+    "applications_deployed": false,
+    "host": "serverA",
+    "materials_activated": false,
+    "mode": "0555",
+    "original_lock_metadata_unchanged": true,
+    "runtime_unchanged": 5,
+    "sudoers_changed": false,
+    "tool_invoked": false,
+    "tool_path": "/opt/qs-server/qs-apiserver/ai-mq-tools/ce8b2112bd2669efa14ae34880a6f6462e38d629a4a17ff9673936b70b359bb3.py",
+    "tool_sha256": "ce8b2112bd2669efa14ae34880a6f6462e38d629a4a17ff9673936b70b359bb3"
+  },
+  "evidence": {
+    "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/api-native-tool-installed-20261026T171050-281541.private.json",
+    "sha256": "813bcab77829fff3cfecc5517c313b1d6f35fb3df68e4a09573718c88d12976c"
+  },
+  "scope": "immutable offline tool installed; not invoked, no sudo API execution grant, binding/current pointer activation, runtime replacement or business acceptance",
+  "permission_review": {
+    "exact_ancestor": "/opt/qs-server",
+    "before_uid": 1002,
+    "after_uid": 0,
+    "gid_unchanged": 2001,
+    "mode_unchanged": "0755",
+    "recursive": false,
+    "reason": "reviewed root interpreter tool must not reside under a deploy-user-owned replaceable ancestor",
+    "standard_deployment_directory_creation": "existing remote-deploy.sh uses the existing sudo mkdir path; application/config/log ownership below ancestor preserved"
+  }
+}
