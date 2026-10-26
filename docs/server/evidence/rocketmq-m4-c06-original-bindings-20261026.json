@@ -1,0 +1,243 @@
+{
+  "schema": "rocketmq-m4-c06-original-binding/v1",
+  "recorded_on": "2026-10-26",
+  "task": "C06-D01",
+  "completed": true,
+  "read_only": true,
+  "scope": "authoritative owner metadata and original eight-role material freeze, not rebuild or installation",
+  "authority": {
+    "mysql": {
+      "bindings": [
+        {
+          "binding_matches_original_config_bytes": true,
+          "database_name_sha256": "351573d8d5d08010146c74bbec7ad56d9b6aea43eca703848e0a56045f27ee93",
+          "identity_sha256": "48d992cbd58c0d2a22a8e23ec49221249444d71efcfabba3550c644fcda0ec60",
+          "owner": "qs.mysql",
+          "read_only_transaction": true,
+          "schema_version": 1,
+          "tls": "VERIFY_IDENTITY"
+        },
+        {
+          "binding_matches_original_config_bytes": true,
+          "database_name_sha256": "32e83e92d45d71f69dcf9d214688f0375542108631b45d344e5df2eb91c11566",
+          "identity_sha256": "04b876404efce9c923a9566d03f7ba0b4c27e175388bed3bdd57b9abfbb19358",
+          "owner": "ai.mysql",
+          "read_only_transaction": true,
+          "schema_version": 1,
+          "tls": "VERIFY_IDENTITY"
+        },
+        {
+          "binding_matches_original_config_bytes": true,
+          "database_name_sha256": "d457e3a99392a03f47057f50ac1cbc5d0365131575477971bf85177a0c0fed22",
+          "identity_sha256": "800f1b64fa1f575061febe45e4807b241190b0feef2a286ff78045a0f264602b",
+          "owner": "iam.mysql",
+          "read_only_transaction": true,
+          "schema_version": 1,
+          "tls": "VERIFY_IDENTITY"
+        }
+      ],
+      "business_rows_read": 0,
+      "queried_table": "rm_tx_binding",
+      "read_only": true
+    },
+    "mongo": {
+      "binding_matches_original_config_bytes": true,
+      "business_documents_read": 0,
+      "identity_sha256": "38a157c117b252865a625de30ebd39820092fc5c1d6b7d9d35923d32df77dedc",
+      "owner": "qs.mongo",
+      "primary": true,
+      "queried_collection": "rm_tx_binding",
+      "read_concern": "majority",
+      "read_only": true,
+      "schema_version": 1,
+      "server_version": "7.0.31"
+    },
+    "qs_bridge_same_original_mysql": true
+  },
+  "original_input_freeze": {
+    "role_count": 8,
+    "roles": [
+      {
+        "name": "qs-apiserver",
+        "runtime_uid": 2000,
+        "runtime_gid": 2000,
+        "memory": 1073741824,
+        "nanocpus": 2000000000,
+        "worker_concurrency": null,
+        "configured_owners": [
+          "qs.mongo",
+          "qs.mysql"
+        ]
+      },
+      {
+        "name": "qs-collection-server-2",
+        "runtime_uid": 2000,
+        "runtime_gid": 2000,
+        "memory": 335544320,
+        "nanocpus": 1000000000,
+        "worker_concurrency": null,
+        "configured_owners": []
+      },
+      {
+        "name": "qs-collection-server-1",
+        "runtime_uid": 2000,
+        "runtime_gid": 2000,
+        "memory": 335544320,
+        "nanocpus": 1000000000,
+        "worker_concurrency": null,
+        "configured_owners": []
+      },
+      {
+        "name": "qs-ai",
+        "runtime_uid": 10001,
+        "runtime_gid": 10001,
+        "memory": 805306368,
+        "nanocpus": 750000000,
+        "worker_concurrency": null,
+        "configured_owners": [
+          "ai.mysql"
+        ]
+      },
+      {
+        "name": "iam-apiserver",
+        "runtime_uid": 2000,
+        "runtime_gid": 2000,
+        "memory": 1073741824,
+        "nanocpus": 1000000000,
+        "worker_concurrency": null,
+        "configured_owners": [
+          "iam.mysql"
+        ]
+      },
+      {
+        "name": "qs-worker-runtime-1",
+        "runtime_uid": 2000,
+        "runtime_gid": 2000,
+        "memory": 805306368,
+        "nanocpus": 1000000000,
+        "worker_concurrency": 48,
+        "configured_owners": []
+      },
+      {
+        "name": "qs-worker-runtime-2",
+        "runtime_uid": 2000,
+        "runtime_gid": 2000,
+        "memory": 805306368,
+        "nanocpus": 1000000000,
+        "worker_concurrency": 48,
+        "configured_owners": []
+      },
+      {
+        "name": "qs-worker-runtime-3",
+        "runtime_uid": 2000,
+        "runtime_gid": 2000,
+        "memory": 805306368,
+        "nanocpus": 1000000000,
+        "worker_concurrency": 48,
+        "configured_owners": []
+      }
+    ],
+    "MQ_file_instances": 19,
+    "JOSE_file_instances": 8,
+    "distinct_broker_principals": 5,
+    "all_material_files_immutable_version_paths": true,
+    "all_material_files_read_only_and_runtime_readable": true,
+    "private_keys_no_world_access": true,
+    "workers_original_concurrency": 48,
+    "configured_identity_and_sources_equal_original_snapshot": true,
+    "original_protocol_budgets_reuse_verified_preview": true
+  },
+  "source_references": {
+    "infra": "14c6e8bb0e5272120e124b551f7c6b4fe29167f2",
+    "iam": "30e6327bff83ec09d11a6c04e8e9f9268832df34",
+    "qs": "25318edf88982be040639202295d1966cec72437",
+    "ai": "eaa22cd92828d7f1c0286339e620c6c087763e0c"
+  },
+  "private_evidence_sha256": {
+    "authoritative-bindings-20261026T052108-2d3bc2.private.json": {
+      "sha256": "b089e88cc150976b15a8b86d29ed24259e8654a1a3932d8a5314837c8e116b67",
+      "bytes": 1918
+    },
+    "all-original-materials-20261026T052446-b256e3.private.json": {
+      "sha256": "2d5fa9386e96b7bfa278abcdcf69c35b8dcd2adda5f60bf5d23f378ee68ac1f6",
+      "bytes": 14559
+    },
+    "all-original-materials-20261026T052607-bacc2e.private.json": {
+      "sha256": "b9c652cb7917948295c5c1bec20b21b1d1b230146cdc5610bf1a8a06b4d6064d",
+      "bytes": 15370
+    },
+    "read_authoritative_bindings.py": {
+      "sha256": "ffbe6bd66ef97080f28472e3f451dab11bba8686eb6625a017ef2fd8b48b66a4",
+      "bytes": 9048
+    },
+    "read_authoritative_bindings.first-failed.py": {
+      "sha256": "129d7fb1fbb812c542aaae73def4dddd21d8718d6c39cbecd9e9719d631f73e5",
+      "bytes": 8317
+    },
+    "read_authoritative_bindings.second-failed.py": {
+      "sha256": "5755fccea763f1226d4ef24b1fad4a4eeb0e36c424d1c5c3090b7491f266b9b7",
+      "bytes": 8392
+    },
+    "read_authoritative_bindings.third-failed.py": {
+      "sha256": "b08d402031ceb316c9bd8ba2c94b609bf646ff7a5a4ddc512d15e4104e2783fd",
+      "bytes": 8872
+    },
+    "read_all_original_materials.py": {
+      "sha256": "545ce960c1d22e48496c5f80ba28a3e3fdd5fc85c2321349c63d6f801630ed09",
+      "bytes": 6153
+    },
+    "M4-C06-D-identities-20261026T052234-9d6b03.private.json": {
+      "sha256": "4ac654dff01397886f2c41b277e48a7e22263545f48a7d3248bdc63e787915d8",
+      "bytes": 7593
+    },
+    "M4-C06-D-inputs-20261026T052234-0afc41.private.json": {
+      "sha256": "8617a90b871bd634a8a7f985e06c4a439782b7a42ac480cd018655fb4330077b",
+      "bytes": 18026
+    },
+    "m4-original-configured-identity-preview-20261026.private.json": {
+      "sha256": "78f40b014a1aaf829f8f708b69020b8cedd98d780fa1f553ec171cbdc89109da",
+      "bytes": 1379
+    },
+    "window_execute.py": {
+      "sha256": "368adf455fea2f4027586c71fdc0fa38bf701617e1f11c4736e4f05ecef2650b",
+      "bytes": 12551
+    },
+    "M4-C06-D01-binding-A-20261026T051848-f44df4.private.out": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "M4-C06-D01-binding-A-20261026T051848-f44df4.private.err": {
+      "sha256": "2e26a9bbbf52ffe207cd30b9ae693999512e12d8792d9251a9e27a31324d8638",
+      "bytes": 96
+    },
+    "M4-C06-D01-binding-A-20261026T051924-bb9e59.private.out": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "M4-C06-D01-binding-A-20261026T051924-bb9e59.private.err": {
+      "sha256": "628079159e7d2b01fe69d86d56a68c11e3738c7e22c1802231d96362c5bd37f1",
+      "bytes": 145
+    },
+    "M4-C06-D01-binding-A-20261026T052029-c967d0.private.out": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "M4-C06-D01-binding-A-20261026T052029-c967d0.private.err": {
+      "sha256": "a8893b63c09065ccf2d701ed2f2bfdd4aab56a4085d6ba21408f6974491b7bf1",
+      "bytes": 172
+    }
+  },
+  "retained_failures": [
+    "initial reader assumed nested transport for IAM; rejected before SQL stage",
+    "two checker invocations did not complete using global Python; fixed to the actual image /app/.venv/bin/python; diagnostics remain withheld",
+    "all original failed scripts and output/error files retained; no database fact rewritten"
+  ],
+  "production_state_changed": false,
+  "business_records_read": false,
+  "DDL_executed": false,
+  "credentials_rotated": false,
+  "new_materials_installed": false,
+  "root_tool_installed": false,
+  "rebuild_or_business_acceptance_claimed": false,
+  "next_existing_task": "C06-D02 versioned material preparation; preserve original active runtime and deployment lock"
+}
