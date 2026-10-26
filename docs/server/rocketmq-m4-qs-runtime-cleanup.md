@@ -1,6 +1,6 @@
 # M4 QS API/worker 生产消息装配清理
 
-本文记录C02-02范围及替代证明；进度仅由[M4总表](rocketmq-m4-execution.md)维护。验收源码为[QS PR450](https://github.com/FangcunMount/qs-server/pull/450)的`9850d15f0fdc385ca8c5a6dd30e394145ee7a89c`；[infra PR322](https://github.com/FangcunMount/infra/pull/322)提供真实依赖验收。当前待CI，不计完成；源码合并与最终镜像/生产部署分别记账。
+本文记录C02-02范围及替代证明；进度仅由[M4总表](rocketmq-m4-execution.md)维护。验收源码为[QS PR450](https://github.com/FangcunMount/qs-server/pull/450)的`9850d15f0fdc385ca8c5a6dd30e394145ee7a89c`；[infra PR322](https://github.com/FangcunMount/infra/pull/322)提供真实依赖验收。实现、门禁与源码合并已完成；最终镜像/生产部署分别记账。
 
 ## 当前唯一装配
 
@@ -33,4 +33,10 @@ Worker在资源准备及运行装配入口均拒绝NSQ、发布模式与任何�
 
 报告夹具漏装现行Mongo43治理schema，原保护正确封闭准入；现只在隔离夹具显式安装并核对原生读取，专项14项通过。第二轮两档各65项通过，8.4的worker第二输入在60秒等待处超时；恢复实例尚未经过与暂停实例相同的接收就绪屏障，原诊断还在恢复清理后读取暂停实例。现补齐相同屏障并在清理前读取活跃实例，保留全部五个物理输入、共享1与原60秒断言；三档worker专项各11项通过。此结论不扩展为生产延迟/SLA或SDK吞吐保证。
 
-完整最终矩阵仍待通过；[receipt](evidence/rocketmq-m4-c02-qs-runtime-20261026.json)保留失败、源码、SDK、原始报告摘要和清理结果。中间FD源码的29项CI与当前9850候选CI分别记录，不能混称。当前代码尚未合并或部署，完成数仍17/38。
+以下为合并前记录；最终结果见下一节。[receipt](evidence/rocketmq-m4-c02-qs-runtime-20261026.json)保留失败、源码、SDK、原始报告摘要和清理结果。中间FD源码的29项CI与当前9850候选CI分别记录，不能混称。当时尚未合并或部署，完成数维持17/38；此历史记录不覆盖最终状态。
+
+## 完成证据
+
+[QS PR450](https://github.com/FangcunMount/qs-server/pull/450)29项CI通过后合并`ca1158ca472d42e7c58e067e170b116364b1d8ea`；[infra PR322](https://github.com/FangcunMount/infra/pull/322)15项CI全通过后合并`18ad52057dbf3859198b9a9e274da333330df443`。最终[矩阵40314640918](https://github.com/FangcunMount/infra/actions/runs/40314640918)三档各65项通过：双owner13、worker11、原到期dispatch41，零失败/跳过，九报告和三汇总身份/摘要及完整清理已核对。所有宿主实际使用固定稳定Go SDK v0.5.0及原内容摘要，没有本地replace。源码CI只有生成文档条件job未触发，非用例跳过。
+
+[完整receipt](evidence/rocketmq-m4-c02-qs-runtime-20261026.json)分开记录FF本地、FD中间源码和9850最终源码、两轮失败、专项复验、全矩阵及合并。C02-02进度记录合并后为18/38、C02 2/4；C02父任务尚未完成。没有生产部署或业务验收，最终镜像与部署归C08。
