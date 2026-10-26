@@ -1,0 +1,586 @@
+{
+  "schema": "fangcun-m4-c02-ai-runtime/v1",
+  "recorded_on": "2026-10-26",
+  "task": "C02-03",
+  "completed": true,
+  "source": {
+    "baseline": "ec61f7e636128e425c9474b8aea7eb032acc26bd",
+    "implementation": "880e218cada37d13317c070928614df51264d0e7",
+    "candidate": "9a48509e777b4b0a819308dd05b7db7fff9af42f",
+    "pr": "https://github.com/FangcunMount/qs-ai/pull/228",
+    "merge": "a2f192733312fef591bb9be24e5e3892e470420e",
+    "merged_at": "2026-10-26T13:00:13Z",
+    "candidate_and_ci_tree": "57b9b066c6da0c1730be0e213b2b2cfcc5083851"
+  },
+  "CI": {
+    "run": "https://github.com/FangcunMount/qs-ai/actions/runs/40324335333",
+    "successful_checks": 12,
+    "tests_per_mysql": 5724,
+    "total_executions": 11448,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "shards": [
+      {
+        "artifact": "tests-8.0.36-0-attempt-1",
+        "sha256": "71b1db76f6bd4366029c9db980f642b2e06eea5a018281d8501efb85203f1ad2",
+        "xml_sha256": "b4e8cb029fe6dd014bf9559c847a5916dc5237031f113608b78f8d663a181a59",
+        "revision": "fb5eee38f572d4dd89f75223f5fff3c71a438aaa",
+        "mysql": "8.0.36",
+        "index": 0,
+        "collected": 5724,
+        "selected": 1431,
+        "passed": 1431,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.0.36-1-attempt-1",
+        "sha256": "284ab457382669a7a35baad9a525d7ce021a64aa1577d7e62d4c204e5314c516",
+        "xml_sha256": "a01679d8a920160e13488873f3f17bab6d3f57ca56cf3eff98eec509eacb388b",
+        "revision": "fb5eee38f572d4dd89f75223f5fff3c71a438aaa",
+        "mysql": "8.0.36",
+        "index": 1,
+        "collected": 5724,
+        "selected": 1431,
+        "passed": 1431,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.0.36-2-attempt-1",
+        "sha256": "9ceed304c3112f850c256fa53bf5204c416ade9a9bd85035a5e21662cfda23d2",
+        "xml_sha256": "32c7f9560690f0092d531c70df9bae9dea507bfb39ed6d8dc09f201a108f88d2",
+        "revision": "fb5eee38f572d4dd89f75223f5fff3c71a438aaa",
+        "mysql": "8.0.36",
+        "index": 2,
+        "collected": 5724,
+        "selected": 1431,
+        "passed": 1431,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.0.36-3-attempt-1",
+        "sha256": "75379b531a5566efa487b8efff57a65174e39c5450ed394349607df68e408f56",
+        "xml_sha256": "751d69b987c1c9d4308a71684c25f80858b8e0e7ea54f00d9d3da3665fcf4ec4",
+        "revision": "fb5eee38f572d4dd89f75223f5fff3c71a438aaa",
+        "mysql": "8.0.36",
+        "index": 3,
+        "collected": 5724,
+        "selected": 1431,
+        "passed": 1431,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.4-0-attempt-1",
+        "sha256": "1c39c4d0af1ca52cf50e539e609e6d6a299c05dc9761c946c9d7601a351a4cd4",
+        "xml_sha256": "3e0d8b5883b207ec49d59be65c130fb9d153b06dc663772f7b6ae4eca24acac0",
+        "revision": "fb5eee38f572d4dd89f75223f5fff3c71a438aaa",
+        "mysql": "8.4",
+        "index": 0,
+        "collected": 5724,
+        "selected": 1431,
+        "passed": 1431,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.4-1-attempt-1",
+        "sha256": "91a4d1195e18d537b3ad06b40609e2ce3a6ac9fb6a312ae26d1f8caa84f70f9a",
+        "xml_sha256": "42c3b880f5d9b1ac5cc11e5deb6798c21427f19ed02a292da2573efcf74c75b0",
+        "revision": "fb5eee38f572d4dd89f75223f5fff3c71a438aaa",
+        "mysql": "8.4",
+        "index": 1,
+        "collected": 5724,
+        "selected": 1431,
+        "passed": 1431,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.4-2-attempt-1",
+        "sha256": "9ed3faf2a7456a0d64de8b6bc62fdabc368a38cb31b911b90bb630c19fd161cf",
+        "xml_sha256": "f75e53f89838b0036fba5f73ed2da1f90755411542d4578de84bb09f725ccbfe",
+        "revision": "fb5eee38f572d4dd89f75223f5fff3c71a438aaa",
+        "mysql": "8.4",
+        "index": 2,
+        "collected": 5724,
+        "selected": 1431,
+        "passed": 1431,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.4-3-attempt-1",
+        "sha256": "1d24c14d1ba9bc220f766a5cca303abb7dfba818b7d0a3c7f59ae24e41696e7c",
+        "xml_sha256": "c64c9a77b81cc22d1fb2a0e1a5cecb867ec3b4ee26d645662d8f33092a119bcd",
+        "revision": "fb5eee38f572d4dd89f75223f5fff3c71a438aaa",
+        "mysql": "8.4",
+        "index": 3,
+        "collected": 5724,
+        "selected": 1431,
+        "passed": 1431,
+        "failed": 0,
+        "skipped": 0
+      }
+    ],
+    "coverage": "Each database: four disjoint shards cover the complete collected set; XML counters zero failure/error/skip. CI virtual merge tree exactly matches reviewed candidate."
+  },
+  "native": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/40325144474",
+    "pr": "https://github.com/FangcunMount/infra/pull/326",
+    "workflow_sha": "7cf42e6c6fae8366aab4ecff07bd83008e35cc04",
+    "merge": "8c798db7c5f71c968740e6f0bcb7e5179392e811",
+    "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+    "profiles": [
+      {
+        "artifact": "m4-ai-runtime-3.11-8.0.36-9a48509e777b4b0a819308dd05b7db7fff9af42f-40325144474",
+        "report_sha256": "52cce1d20942dd90fd87cb29009f34756b6f191cf2d9b57b198339e22e3b2efa",
+        "summary_sha256": "1494fe790bb9548f5a8a497520022efb765085e5f75581a0fde6b466af38ce21",
+        "broker_digest": "sha256:471d4bcb48ae4b4268ff25848e6d69fe4e827db6fc3c290aebb0481cbf00d918",
+        "mysql_digest": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        },
+        "python": "3.11.16",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests": 5,
+        "cases": {
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "python_client": "5.1.2",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "artifact": "m4-ai-runtime-3.11-8.0.44-9a48509e777b4b0a819308dd05b7db7fff9af42f-40325144474",
+        "report_sha256": "a2080cba51eefb7494174d6a4e00dd25c2bba6b5ef957be8585e15a17f5aceda",
+        "summary_sha256": "e0d7951342e57d1baf4a73df2577bbe123d68f7aaa3a044df81ce7b33dd6e061",
+        "broker_digest": "sha256:68808839e958d219fc830707faecab2de8993633f09f273c9f440ac7d853501f",
+        "mysql_digest": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        },
+        "python": "3.11.16",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests": 5,
+        "cases": {
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "python_client": "5.1.2",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "artifact": "m4-ai-runtime-3.11-8.4.11-9a48509e777b4b0a819308dd05b7db7fff9af42f-40325144474",
+        "report_sha256": "a03cab50642a98de763d6679b5ee101167422e15f7acbde9b6ed5de25629338a",
+        "summary_sha256": "9e074e6b47526a19774676865b577294a218b576d13d91e8922bc95de3a09290",
+        "broker_digest": "sha256:9b81fac0ec495307a656220d21905a765b86db5fda3a2c1e1894112f35eb4153",
+        "mysql_digest": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        },
+        "python": "3.11.16",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests": 5,
+        "cases": {
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "python_client": "5.1.2",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "artifact": "m4-ai-runtime-3.13-8.0.36-9a48509e777b4b0a819308dd05b7db7fff9af42f-40325144474",
+        "report_sha256": "ec58b425893f0d4fc5496f66f51d0f870b49fb9246c15816c6cfd59d617c07d9",
+        "summary_sha256": "ee258705977e425f0fa36b477a7139889d19036aefde118c144c6f3026968506",
+        "broker_digest": "sha256:7d040f37a746bd9ff0cb5a14b05ac8547633d8d8fbca9e672b9defaabdd03488",
+        "mysql_digest": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        },
+        "python": "3.13.15",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests": 5,
+        "cases": {
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "python_client": "5.1.2",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "artifact": "m4-ai-runtime-3.13-8.0.44-9a48509e777b4b0a819308dd05b7db7fff9af42f-40325144474",
+        "report_sha256": "40c2dc6da7fe9588e79fbb9fd0c52342eaf161a8e4b52118f76d4876912167ed",
+        "summary_sha256": "6c41b9428128373556f5185b08b62c1602fe1df8f835e9b499d65f26b883fd2e",
+        "broker_digest": "sha256:1cf69d1ecf7c9384f5cd6d22096fe2f60b5eac9f4f7e8f765e109ebe4d6c7fd3",
+        "mysql_digest": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        },
+        "python": "3.13.15",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests": 5,
+        "cases": {
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "python_client": "5.1.2",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      },
+      {
+        "artifact": "m4-ai-runtime-3.13-8.4.11-9a48509e777b4b0a819308dd05b7db7fff9af42f-40325144474",
+        "report_sha256": "da0634a9ce8fff3e1a0cec7849559b3c02083864480a39e3d5488efa5ae6ea9f",
+        "summary_sha256": "d9b18f76c03e2ad7cab06baaa1dfb9a16abd73322c6be4658368f677fea9dd53",
+        "broker_digest": "sha256:76addec6ef831903d3d5fdce08294cd36dbd780093479008307f6f817495b9e2",
+        "mysql_digest": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "clients": {
+          "go": "5.1.4",
+          "python": "5.1.2"
+        },
+        "python": "3.13.15",
+        "passed": 25,
+        "failed": 0,
+        "skipped": 0,
+        "native_tests": 5,
+        "cases": {
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "go_sdk": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "python_sdk": "0.4.0",
+        "python_client": "5.1.2",
+        "wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1"
+      }
+    ],
+    "scope": "Actual default AI receivers, paired Go QS components, original business/archive/witness roots and real isolated Broker/MySQL; synthetic read-side source. No public HTTP/system/real-provider/packet-fault claim."
+  },
+  "local": {
+    "targeted_tests": 82,
+    "failed": 0,
+    "skipped": 0,
+    "junit_sha256": "536f01790a8a77c1559f93839ed90dca552ba692fa09f7102c3750f3e6f30ec7",
+    "ruff": true,
+    "mypy_source_files": 454,
+    "docs": {
+      "markdown": 75,
+      "links": 1395,
+      "errors": 0
+    },
+    "unchanged_critical_functions": {
+      "baseline": "ec61f7e636128e425c9474b8aea7eb032acc26bd",
+      "unchanged_ast": {
+        "src/qs_ai/bootstrap/messaging.py": {
+          "run_transactions": "aa0e97a3dc07c968d9042d5657eb2d57ded96d4ffddb82b2e39fb9e0959989d9",
+          "halt_transactions": "070b1192d69640839f51ebe2ea4cd52d4063841e71fb268e31086cfa8e43b5ed",
+          "consume": "b6768ab7c0ba1c6f1b69892f9a65cd83fad0bed9aa7e80c5b139310892957678",
+          "halt_subscriber": "20f7540d371357a0cb64a45a52f86a8a963d3e0de2d04f619f8dce93afb5cb02",
+          "close": "c58d3f5260085fbdf906c9357ba415c37afae815be09d7b4824125ba1d1ee793",
+          "_close_transactions": "46225dc3d0f04361d5478b399fd42b443523aa38133374b6980a707653701cf3"
+        },
+        "src/qs_ai/bootstrap/server.py": {
+          "run_grpc": "2ef22757283152434d24d8de68cd11d3bc6a2cf47a2c7645d25a64d6ed26020a",
+          "stop_grpc": "ea8051455406e79a185daefbf5eddc70e0b2451b066a0a38d46dc126e522c660",
+          "generate": "06724d29d2efc716535fd4114616a5a198d9d007977de6c24e41c3e38343e998",
+          "evaluate": "325abb491c2da6db4fa4dd167e6c26914c04d268c6d081d6457ca0b44f7ab66b",
+          "expire_diagnostics": "b02866499ecb49de4624bf992227738abb70f5cf713d620a8a92fcdc8e291139",
+          "run_http": "915ff7b97b609322437f6c7fc0c729d89ba5e22d563e7a05c5fe0b2b708f9414",
+          "stop_http": "79a966fd2a5d7a603a94888073d05bb3f0e3ac964a2e0be0e673528fdd5bf94e"
+        }
+      }
+    }
+  },
+  "failure_history": [
+    {
+      "stage": "retired-profile red",
+      "expected": true,
+      "log_sha256": "664ed5ef64e33ea010d4fc877e0121cb539d412cb15b7c84b09c7f1d98c17a4f",
+      "resolution": "Eight characterization cases green after final-only guard"
+    },
+    {
+      "stage": "old runtime fixtures",
+      "failures": 22,
+      "passed": 37,
+      "log_sha256": "bb861454c5dff6e76ed0938e00a66bbf8f427f1eec3fb8f2955ff3a5d50af108",
+      "resolution": "Update retired publisher/relay fixtures to current transaction owner/session assembly; preserve original pool, cancellation, partial-start and listener assertions"
+    },
+    {
+      "stage": "documentation",
+      "failures": 92,
+      "log_sha256": "efec2705a40bb3bf07782bd4ca23555e9af717329a3c0acede8d60dadd804c69",
+      "resolution": "Refresh changed-source hashes; semantic AST gate follows shared final-profile guard. Sixteen docs tests include damaged guard/owner/order rejection. Four mixed historical runtime pages explicitly needs_review, C04 pending."
+    },
+    {
+      "stage": "documentation links",
+      "failures": 2,
+      "resolution": "Renamed README heading anchors corrected. This is a recorded observation; original intermediate stdout was overwritten, no raw failure artifact claimed."
+    }
+  ],
+  "retired": [
+    "Production NSQ/NORMAL-only publisher selection and MQRelay component",
+    "Old NSQ image/bootstrap workflow .github/workflows/ai-messaging.yml",
+    "Single obsolete real NSQ bootstrap integration case",
+    "smoke_single_process.py fails closed with exit 2 before external calls"
+  ],
+  "retained": [
+    "Current result_outbox ACK/state history and frozen archive, first wire, receipt/Inbox",
+    "Root transaction ownership, witness/Checker and bounded shutdown; model checkpoints/responses/attempt authorization",
+    "Generic SDK, isolated lower legacy storage tests and development NSQ",
+    "Historical tools/reader branches pending C03/C04; physical assets pending C07"
+  ],
+  "production": {
+    "deployed": false,
+    "DDL": false,
+    "SSH": false,
+    "model_calls": false,
+    "asset_deletion": false,
+    "AUTO_DEPLOY_ENABLED": false,
+    "checked_before_merge": true,
+    "final_image_startup": "C08, not implied by image import/config rejection"
+  },
+  "completion_progress": {
+    "leaves": "19/38",
+    "C02": "3/4",
+    "M4_1": "16/26",
+    "parents": "2/8",
+    "C06_gates": "4/4",
+    "effective_when": "This progress PR is merged"
+  },
+  "next": {
+    "task": "C02-04",
+    "status": "in_progress",
+    "current_iam_qs_run": "https://github.com/FangcunMount/infra/actions/runs/40326990299",
+    "current_qs_ai_fault_run": "https://github.com/FangcunMount/infra/actions/runs/40326981798"
+  }
+}
