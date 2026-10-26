@@ -119,6 +119,19 @@ class MaterialStageTests(unittest.TestCase):
         plan['files'][0]['source'] = str(parent_link / Path(self.plan['files'][0]['source']).name)
         with self.assertRaises(m.Refused):
             self.stage(plan)
+        allowed_link = self.sources / 'allowed-alias'
+        allowed_link.symlink_to(self.sources, target_is_directory=True)
+        plan['files'][0]['source'] = str(allowed_link / Path(self.plan['files'][0]['source']).name)
+        with self.assertRaises(m.Refused):
+            self.stage(plan)  # A symlink inside the allowed source scope also fails.
+        source = Path(self.plan['files'][0]['source'])
+        saved = source.with_name('saved-source.json')
+        source.rename(saved)
+        source.symlink_to(saved)
+        with self.assertRaises(m.Refused):
+            self.stage()
+        source.unlink()
+        saved.rename(source)
         self.assertFalse(self.root.exists())
 
     def test_missing_source_and_byte_or_permission_drift_refused_before_creation(self):
