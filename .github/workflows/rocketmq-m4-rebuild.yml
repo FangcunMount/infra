@@ -78,6 +78,17 @@ jobs:
         with:
           version: '0.12.13'
           python-version: '3.13'
+      - name: Actual source mount contract before compiling or starting containers
+        run: |
+          set -euo pipefail
+          uv run --no-project --with pyyaml==6.0.2 python - <<'PY'
+          from pathlib import Path
+          import sys
+          sys.path.insert(0,'scripts/rocketmq')
+          from m4_image_rebuild import projected_mounts
+          value=projected_mounts(Path('.five-sources/iam'),Path('.five-sources/qs'),'m4-owned-check')
+          assert len(value['iam'])==len(value['worker'])==3 and not value['collection']
+          PY
       - name: Exact successful reviewed build and five archives
         run: |
           set -euo pipefail

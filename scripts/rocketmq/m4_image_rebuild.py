@@ -60,6 +60,16 @@ def compose_material_mounts(source, service, variable, revision, role):
     return result
 
 
+def projected_mounts(iam_source, qs_source, revision):
+    return {
+        'iam': compose_material_mounts(iam_source / 'build/docker/docker-compose.prod.yml',
+            'iam-apiserver', 'ROCKETMQ_BINDING_REVISION', revision, 'iam'),
+        'worker': compose_material_mounts(qs_source / 'build/docker/docker-compose.prod.yml',
+            'runtime', 'ROCKETMQ_WORKER_BINDING_REVISION', revision, 'worker'),
+        'collection': [],
+    }
+
+
 def owner_limits(workers, queue, batch, *, sends=4, python=False):
     return dict(sends=sends, branches=16, check_workers=workers, check_queue=queue,
                 reconcile_batch=batch, check_timeout=2 if python else '2s',
@@ -151,12 +161,9 @@ def configure(f, args, ai_env, case):
     require(json.loads(ai_env['QS_AI_MESSAGING']) == {k:v for k,v in ai_binding.items() if k!='binding_revision'},
             'actual_compose_ai_binding_bytes_differ')
     write_private(f.directory / 'm4-plan.json', plan)
+    f.runtime_mounts = projected_mounts(args.sources / 'iam', args.sources / 'qs', revision)
+    f.runtime_mounts['ai'] = ai_service['volumes']
     f.report['m4_material_stage'] = root_action(f, 'stage'); f.m4_materials = True
-    f.runtime_mounts = {
-        'iam': compose_material_mounts(args.sources / 'iam/build/docker/docker-compose.prod.yml', 'iam-apiserver', 'ROCKETMQ_BINDING_REVISION', revision, 'iam'),
-        'worker': compose_material_mounts(args.sources / 'qs/build/docker/docker-compose.prod.yml', 'qs-worker', 'ROCKETMQ_WORKER_BINDING_REVISION', revision, 'worker'),
-        'ai': ai_service['volumes'], 'collection': [],
-    }
     case('actual_three_source_packagers_and_root_owned_twenty_one_material_files')
     # Actual host freeze tool -> ordinary native preflight image -> output config.
     # Repeat freezes the exact same image/config again, without syncing/stopping.
