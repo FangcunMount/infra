@@ -304,3 +304,13 @@ C08同时准备隔离五类候选：首次构建40351033230仅为候选，QS后�
 最终候选由[独立清单](../../components/rocketmq/m4-final-image-candidates.json)冻结；[PR335](https://github.com/FangcunMount/infra/pull/335)固定6f7532cca8e85ecb317e8f4896b2a02965f5c712全部检查结束无失败后合并09c1d8984a22a7c6b9135f26b0e568ac54944a50。[真实八实例报告](evidence/rocketmq-m4-c08-eight-instance-native-20261027.json)为18项、零失败/跳过、八实例Exit0、零DDL及完整清理；[实际Go codec](evidence/rocketmq-m4-c08-binding-codec-20261027.json)3项通过。原C06阶段候选另行验证，未替换其历史默认值/证据。
 
 五类镜像已构建，不等于已上传ACR或部署。M4发布采用独立18项报告profile，复用既有传输校验/不可变摘要回读及IAM既有生产环境凭据；不重建应用、不移动SDK标签、不弱化M3完整切换门禁。最终依赖审计、精确生产清单/同协议恢复、root工具安装和system真实业务回归尚未完成，C08五项均不提前勾选。合法system会话待用户解锁并正常登录；其余准备继续。
+
+### C08主机与最终依赖补充（2026-10-27）
+
+[固定材料工具主机准备](evidence/rocketmq-m4-c08-host-preflight-20261027.json)已实际完成：新36f3046e工具root/0555安装到A/D，四角色root与普通deploy正向校验、8项错误host/revision拒绝通过；原工具/规则保留。八实例镜像/配置/启动/重启/资源及原锁元数据前后相同，三worker实际HTTP ready；serverD可用内存1220MiB。未启用材料或部署应用，API原生冻结工具仍待安装，自动CD仍暂停。
+
+实际原主库只读回读：IAM45/QS MySQL110/Mongo44/AI0043_native_transaction_limit，均clean，四owner原字节binding匹配；私有报告摘要f1408d7704e69ca38bb834c401258247b5cd7d58fa4fac160e3a018c8e82f798，无业务/模型调用。
+
+C08审计补正：[QS PR454](https://github.com/FangcunMount/qs-server/pull/454)将当前阅读入口指向最终协议，旧四页显式标历史参考；[AI PR231](https://github.com/FangcunMount/qs-ai/pull/231)移除无调用的NSQ extra及CI服务，原wheel/SDK版本、JOSE和所有业务源码保持。离线锁仅移除pynsq/tornado，本地实际同步后当前导入有效且两客户端不存在，41项纯合同通过（9项跨语言用例明确未在本机执行，等待required CI）。需重新构建并验证AI候选；此前f83472c7镜像和发布计划为阶段材料，禁止作为最终生产包调度。
+
+总表仍33/38、7/8，C08最终审计/制品/执行与真实system门禁未完成，不提前勾选。完整发布器PR337已通过10项CI后合并；其传输合同可复用，但必须重新固定最终AI归档和新启动报告。

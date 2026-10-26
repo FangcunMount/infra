@@ -1,0 +1,110 @@
+{
+  "schema": "m4-c08-host-preflight/v1",
+  "recorded_on": "2026-10-27",
+  "completed_leaf_tasks": [],
+  "operator": {
+    "sha256": "36f3046ed453dfbf8beae684269c94d1a6db0abaa23de51e09d41e462c6a3d5c",
+    "hosts": [
+      "serverA",
+      "serverD"
+    ],
+    "root_owned": true,
+    "mode": "0555",
+    "previous_operator_retained": true
+  },
+  "original_material_revision": "m4-c06-20261026-v1",
+  "material_root_verifications": 4,
+  "ordinary_deploy_verifications": 4,
+  "wrong_host_revision_refusals": 8,
+  "sudoers": {
+    "host": "serverA",
+    "path": "/etc/sudoers.d/fangcun-m4-material-verify",
+    "sha256": "0f38041eca36850d02c267b33ddfa432ee1195f476367b257dc6d3f6a78261cb",
+    "exact_readonly_commands": 3,
+    "existing_rules_preserved": true,
+    "no_arbitrary_interpreter_permission": true
+  },
+  "runtime": {
+    "instances": 8,
+    "identity_config_image_start_restart_resources_unchanged": true,
+    "original_deploy_lock_metadata_unchanged": true,
+    "serverA_docker_healthy": 5,
+    "serverD_workers_HTTP_ready": 3,
+    "serverD_workers_have_docker_healthcheck": false,
+    "serverD_memory_available_mib": 1220,
+    "source": "actual bounded read-only host and worker HTTP queries"
+  },
+  "failure_history": [
+    {
+      "scope": "initial serverA deployment-user verification",
+      "refused_roles": [
+        "iam",
+        "qs-api",
+        "ai"
+      ],
+      "reason": "new reviewed exact read-only command was absent from existing sudoers",
+      "resolved": "three exact fixed-tool/fixed-host/fixed-role/fixed-revision rules; existing rules preserved; positive and negative checks then passed"
+    }
+  ],
+  "production": {
+    "root_material_operator_installed": true,
+    "limited_readonly_sudo_installed": true,
+    "materials_activated": false,
+    "API_immutable_native_freeze_tool_installed": false,
+    "applications_deployed": false,
+    "automatic_CD_resumed": false,
+    "DDL": false,
+    "credentials_rotated": false,
+    "business_or_model_invoked": false,
+    "old_assets_deleted": false
+  },
+  "evidence": {
+    "before": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/runtime-baseline-20261026T163524-60e9e6.private.json",
+      "sha256": "09adae0bee2a4bf2707039fa20ac337843431c0df26fb5caa56c493c1e91b234"
+    },
+    "after": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/runtime-baseline-20261026T164637-d4db17.private.json",
+      "sha256": "5cfdc8e2e5316157e0e2532b1f7376b07f025f7536603e479285d34fb6781982"
+    },
+    "operator_install": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/operator-applied-20261026T163816-bd38a3.private.json",
+      "sha256": "b6c446a73bf5dd4915f81b621aed0cd564af6903f8df1cc2235c3cc69a08bae7"
+    },
+    "servera_exact_sudo": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/servera-exact-sudo-20261026T163937-6cd132.private.json",
+      "sha256": "e087c2c8ee4a6738cb4db1274a4c2bb7a744d84c5b7e8fd533077c4400a0a744"
+    },
+    "worker_ready": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/worker-ready-20261026T164917-05680c.private.json",
+      "sha256": "b5fc26813d15463c6e22b3eb19ac62b5305574cf197c0cb319ae5583a1f1c9d4"
+    },
+    "current_heads_bindings": {
+      "path": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/heads-bindings-20261026T165301-3f26d2.private.json",
+      "sha256": "f1408d7704e69ca38bb834c401258247b5cd7d58fa4fac160e3a018c8e82f798"
+    }
+  },
+  "scope": "host preparation only; not final image freeze, native API freeze, production deployment or system acceptance",
+  "authoritative_heads": {
+    "qs.mysql": {
+      "head": 110,
+      "clean": true,
+      "binding_matches_original_bytes": true
+    },
+    "ai.mysql": {
+      "head": "0043_native_transaction_limit",
+      "clean": true,
+      "binding_matches_original_bytes": true
+    },
+    "iam.mysql": {
+      "head": 45,
+      "clean": true,
+      "binding_matches_original_bytes": true
+    },
+    "qs.mongo": {
+      "head": 44,
+      "clean": true,
+      "binding_matches_original_bytes": true
+    }
+  }
+}

@@ -211,6 +211,7 @@ jobs:
           assert x['schema']=='m4-eight-instance-config-rebuild/v1'
           assert x['final_candidate'] is True and x['final_candidate_image_runs']['qs-api']=='40352408582'
           assert x['passed']==len(x['cases'])==18 and x['failed']==x['skipped']==0
+          assert x['final_python_dependencies']==dict(sdk='0.4.0',nsq_absent=True,tornado_absent=True,current_imports=True)
           assert all(x['cases'].values()) and all(x['cleanup'].values()) and x['sources_unchanged']
           assert len(x['actual_material_mounts'])==len(x['actual_runtime_budgets'])==len(x['processes'])==8
           assert x['m4_material_stage']['files']==21 and x['actual_source_worker_concurrency']==48

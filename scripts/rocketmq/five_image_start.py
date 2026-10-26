@@ -211,6 +211,20 @@ def main():
                 require(hashlib.sha256(tool.read_bytes()).hexdigest() == metadata['offline_tool_sha256'], 'original_companion_required')
                 shutil.copyfile(tool, private / 'qs-migrate-offline'); (private / 'qs-migrate-offline').chmod(0o755)
         report['candidates'] = candidates; report.pop('candidate'); case('all_five_exact_archives_loaded')
+        if final_manifest is not None:
+            # Query the actual final image, not the runner environment or lock.
+            # The frozen C06 profile does not enter this current-only gate.
+            f.select('ai')
+            proof = json.loads(f.once(PYTHON, ['-c',
+                'import importlib.metadata as m,importlib.util as u,json; '
+                'import reliable_messaging.protected,reliable_messaging.rocketmq_transaction,qs_ai.bootstrap.messaging; '
+                'print(json.dumps(dict(sdk=m.version("fangcun-reliable-messaging"),'
+                'nsq_absent=u.find_spec("nsq") is None,tornado_absent=u.find_spec("tornado") is None,'
+                'current_imports=True)))'], network=False,
+                environment={'PYTHONDONTWRITEBYTECODE': '1'}).stdout)
+            require(proof == dict(sdk='0.4.0', nsq_absent=True, tornado_absent=True, current_imports=True),
+                    'current_image_retired_python_clients_must_be_absent')
+            report['final_python_dependencies'] = proof
         f.select('api'); f.dependencies(); f.mongo_dependencies()
         run(['docker', 'pull', 'redis:7-alpine'], timeout=300)
         run(['docker', 'run', '-d', '--name', f.project + '-redis', '--label', f.label, '--network', f.network, '--network-alias', 'redis',
