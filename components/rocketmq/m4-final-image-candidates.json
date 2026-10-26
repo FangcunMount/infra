@@ -1,0 +1,23 @@
+{
+  "schema": "m4-final-image-candidates/v1",
+  "sources": {
+    "iam": "4609d4542d9303130ab94ed67593d0a69d0d010d",
+    "qs": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+    "ai": "f83472c79cb71dfd761b9e65c2c78b6343a207ac"
+  },
+  "builder_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+  "image_runs": {
+    "iam": "40351033230",
+    "ai": "40351033230",
+    "qs-api": "40352408582",
+    "qs-collection": "40352408582",
+    "qs-worker": "40352408582"
+  },
+  "sdk": {
+    "go": "v0.5.0",
+    "python": "0.4.0",
+    "source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890"
+  },
+  "production": false,
+  "scope": "isolated final cleanup candidate rebuild; production and system acceptance recorded separately"
+}

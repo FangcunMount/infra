@@ -101,13 +101,14 @@ def fixture_diagnostic(raw):
     return value
 
 
-def seed_receipt(raw):
+def seed_receipt(raw, *, expected_schema=40):
+    require(type(expected_schema) is int and expected_schema in (40,45),'reviewed_fixture_schema_required')
     prefix='IAM_IMAGE_FIXTURE_READY '
     rows=[json.loads(line[len(prefix):]) for line in raw.splitlines() if line.startswith(prefix)]
     require(len(rows)==1,'exact_controlled_seed_receipt_required')
     value=rows[0]
     require(set(value)=={'schema_version','seed_events_retained','controlled_seed','publication_intents_created','witnesses_created','legacy_drain_claimed'}
-        and value['schema_version']==40 and type(value['seed_events_retained']) is int and 1<=value['seed_events_retained']<=16
+        and value['schema_version']==expected_schema and type(value['seed_events_retained']) is int and 1<=value['seed_events_retained']<=16
         and value['controlled_seed'] is True and all(value[key] is False for key in
             ('publication_intents_created','witnesses_created','legacy_drain_claimed')),'controlled_input_is_not_a_message_or_witness_proof')
     return value
