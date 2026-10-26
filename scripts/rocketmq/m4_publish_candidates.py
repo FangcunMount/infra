@@ -61,6 +61,7 @@ def validate_report(plan, path):
     candidate = plan['candidate']
     require(value['schema'] == 'm4-eight-instance-config-rebuild/v1'
             and value['final_candidate'] is True
+            and value['final_python_dependencies'] == dict(sdk='0.4.0', nsq_absent=True, tornado_absent=True, current_imports=True)
             and value['final_candidate_manifest_sha256'] == plan['candidate_sha256']
             and value['final_candidate_image_runs'] == candidate['image_runs']
             and value['sources'] == candidate['sources']

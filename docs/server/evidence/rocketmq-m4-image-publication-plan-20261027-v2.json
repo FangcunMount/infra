@@ -1,0 +1,107 @@
+{
+  "schema": "m4-reviewed-candidate-publication/v1",
+  "candidate": {
+    "schema": "m4-final-image-candidates/v1",
+    "sources": {
+      "iam": "4609d4542d9303130ab94ed67593d0a69d0d010d",
+      "qs": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "ai": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c"
+    },
+    "builder_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+    "image_runs": {
+      "iam": "40351033230",
+      "ai": "40362760742",
+      "qs-api": "40352408582",
+      "qs-collection": "40352408582",
+      "qs-worker": "40352408582"
+    },
+    "sdk": {
+      "go": "v0.5.0",
+      "python": "0.4.0",
+      "source_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890"
+    },
+    "production": false,
+    "scope": "isolated final cleanup candidate rebuild; production and system acceptance recorded separately"
+  },
+  "candidate_sha256": "a3bbf4610ae20c8501d28e19f30487e0bf88fc27b495ac9ee13e16a3dd414c51",
+  "registry": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com",
+  "namespace": "fangcunmount",
+  "startup": {
+    "run_id": 40365407657,
+    "head_sha": "2093c26c056fa0a91d30cd276216d2c509d936db",
+    "report_sha256": "6bf4faf3eace080e9f097d497187a637c3f350d1716e670beb3f01ac69e548f6"
+  },
+  "targets": {
+    "iam": {
+      "source_sha": "4609d4542d9303130ab94ed67593d0a69d0d010d",
+      "builder_source_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+      "image_config_id": "sha256:671cb04bdc5cd5cdc821387d0269eb1ca004afed8b38fd8d9cc655f0dac99602",
+      "archive_sha256": "3014f06a284faaf80af538a8d4528543ca5cbc7146dc1ccb7612ad80f514ccee",
+      "archive_bytes": 84630118,
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "repository": "iam",
+      "inventory_sha256": "cf647d3ed4586cac62551c5ba8b8dc1bba13b93e204d860689e79941582dbfef"
+    },
+    "ai": {
+      "source_sha": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c",
+      "builder_source_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+      "image_config_id": "sha256:ad91ea3eea2a7c3e8b6ca6abce4f029411e1a5503cb6dd4473c804f1e1a2d926",
+      "archive_sha256": "a0f3bf7a3ca3c12f859c3ec47e6c8e5d89bd6edab069147abab11aea1ebfd4cd",
+      "archive_bytes": 131582801,
+      "runtime_sdk": {
+        "uid": 10001,
+        "version": "0.4.0",
+        "client": "5.1.2",
+        "source": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c"
+      },
+      "repository": "qs-ai",
+      "inventory_sha256": "72291b69189c9d9c46fefdf99b10f9f3da56d80f29eb680fd58dcd9428ba4511"
+    },
+    "qs-api": {
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "builder_source_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+      "image_config_id": "sha256:46dc36d5d3063abebeb456e21dd7b66443d50fc553c95ac452a99e03c5b9749f",
+      "archive_sha256": "abe2c944beeb2f3b89d6fe50defa4618a8753ac2607ebcaceed527e8f64d3d84",
+      "archive_bytes": 73419755,
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "repository": "qs-apiserver",
+      "inventory_sha256": "82b56495a62632ebd2dfae7577004ff17b7b11ba8951fcb177a2732ca2f4827d"
+    },
+    "qs-collection": {
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "builder_source_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+      "image_config_id": "sha256:37fa29a1a1b6a788187979755600add27d11414371972d1cbae21c9e85f8073b",
+      "archive_sha256": "e68ebfd32f4438c22c74c7fca515b4a0fcfef788c6c94076ddbfc3270d520733",
+      "archive_bytes": 24929665,
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "repository": "qs-collection-server",
+      "inventory_sha256": "5e23e34ed0a8d4c14c4dd88c2c7e6f7fe3a83ed229d6d0c3302bff7e77e8c264"
+    },
+    "qs-worker": {
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "builder_source_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+      "image_config_id": "sha256:9e2ecfd5c30d9170fa7a3990968e31f3c6c7c9708dc6e940fc9f65dfe0f0eaa5",
+      "archive_sha256": "b0602da48596961957cdccfb1245bf5c59a7f2975bb50bb667b5f6ede3cf5890",
+      "archive_bytes": 20578857,
+      "runtime_sdk": {
+        "version": "v0.5.0",
+        "sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+        "replace": false
+      },
+      "repository": "qs-worker",
+      "inventory_sha256": "c7b006abd76a7edd39c26434670a85bcefab341fc12643b9a27dd6954c855f08"
+    }
+  }
+}

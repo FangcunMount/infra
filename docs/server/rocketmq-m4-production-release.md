@@ -5,9 +5,9 @@
 ## 当前准备和待冻结项
 
 - IAM候选4609d4542d9303130ab94ed67593d0a69d0d010d、QS候选1f38f583d43c9faf4601a5df9f3f82b764e6547d均已合并且运行输入冻结；后续仅文档/workflow提交不冒充镜像代码变化。
-- C08审计发现AI还安装SDK的NSQ extra及无调用的CI NSQ服务；[AI PR231](https://github.com/FangcunMount/qs-ai/pull/231)移除它们。候选b00cf3a2f30deffa99e9bf71aa1b6177c651c23c须通过完整CI、真实依赖及重新构建/八实例验证。此前f83472c7的AI镜像仅为阶段证据，不作为最终发布。
-- [归档发布器](rocketmq-m4-final-candidate.md#固定归档发布)仅传输固定归档、预检全部目标tag不存在并回读不可变manifest/config摘要。当前发布计划/18项报告尚未绑定上述AI依赖修正，禁止调度旧计划进入最终生产发布；完成后更新固定IAM发布workflow的infra SHA和计划摘要。
-- [主机准备回执](evidence/rocketmq-m4-c08-host-preflight-20261027.json)记录固定只读材料工具安装、四角色普通部署用户正向校验及8项错误绑定拒绝。它不表示API原生冻结工具已安装、材料已激活或应用已部署。
+- C08审计发现AI还安装SDK的NSQ extra及无调用的CI NSQ服务；[AI PR231](https://github.com/FangcunMount/qs-ai/pull/231)移除它们。候选b00cf3a2f30deffa99e9bf71aa1b6177c651c23c已通过14项完整CI、两档各5668用例、真实依赖及重新构建/八实例验证。此前f83472c7的AI镜像仅为阶段证据，不作为最终发布。
+- [归档发布器](rocketmq-m4-final-candidate.md#固定归档发布)仅传输固定归档、预检全部目标tag不存在并回读不可变manifest/config摘要。最终v2发布计划和18项报告已绑定AI依赖修正；旧计划禁止进入最终生产发布。ACR执行仍待最终infra合并及IAM workflow固定新SHA/摘要。
+- [主机准备回执](evidence/rocketmq-m4-c08-host-preflight-20261027.json)记录固定只读材料工具安装、四角色普通部署用户正向校验及8项错误绑定拒绝。该回执是当时快照；随后[API原生冻结工具](evidence/rocketmq-m4-c08-api-tool-install-20261027.json)已固定安装，尚未调用、激活材料或部署应用。
 - 生产启动前还须冻结五类ACR不可变引用、全部归档/镜像config ID、最终配置/环境/21份材料摘要、API原生预检工具与唯一执行目录、实际准入和停止/恢复命令、system最小用例。缺任何一项不开始维护。
 
 ## 具名目标和保持项
@@ -26,7 +26,7 @@
 
 1. 最终源码/依赖CI、当前实际宿主故障和五归档验证通过；稳定SDK Go0.5.0/Python0.4.0及wheel摘要保持。最终八实例实际启动/关闭、零DDL、原预算、全部清理通过。
 2. 从实际主库只读回读四owner的原字节binding及clean heads，不用SDK binding schema_version代替宿主迁移head；核对八实例身份/资源/重启和worker HTTP ready。serverD可用内存至少512MiB；不足或出现OOM/非预期重启则停止。
-3. 固定新镜像先拉取到主机并核对image config ID；保留原镜像。调用固定root材料验证器，安装精确审核的API原生冻结工具；仅授权固定源码/镜像、基路径和UID/GID。普通部署用户实际原生预检成功、重复冻结一致且错误输入在替换前拒绝后，才能准备启动。
+3. 固定新镜像先拉取到主机并核对image config ID；保留原镜像。调用固定root材料验证器，核对已安装的精确审核API原生冻结工具；仅授权固定源码/镜像、基路径和UID/GID。普通部署用户实际原生预检成功、重复冻结一致且错误输入在替换前拒绝后，才能准备启动。
 4. 原私有配置、环境、挂载、网络与服务身份在原主机内冻结，不将凭据或原wire导出。新包以真实Compose解码回读，并逐字段比对原owner/预算、只读材料、服务证书、监听及下游地址。root工具、sudo规则、计划和源码均绑定精确摘要；保留原版本。
 5. system合法会话与门店A最小验收入口就绪。当前Mac锁定且Chrome没有Qlume会话，已请求用户正常登录。不能用管理员令牌、替代身份或数据库探针代签system验收；入口未准备好不进入维护。
 6. 核对AI真实在途、已有模型调用/checkpoint和未来调度责任。需要额外等待时留在窗口前；不为清理强杀模型、重置attempt、重做unknown或重新投递旧消息。

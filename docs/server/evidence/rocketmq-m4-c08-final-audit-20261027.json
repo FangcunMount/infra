@@ -1,0 +1,329 @@
+{
+  "schema": "m4-c08-final-dependency-document-audit/v1",
+  "recorded_on": "2026-10-27",
+  "task": "C08-01",
+  "implementation_verified": true,
+  "audit_scope": "C01 responsibility inventory + C02-C06 final roots/contracts + exact remaining dependency/document/CD paths; not a claim that every historical page describes current runtime",
+  "source": {
+    "iam_runtime": "4609d4542d9303130ab94ed67593d0a69d0d010d",
+    "qs_runtime": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+    "qs_current_docs": {
+      "pr": 454,
+      "head": "49fe9c884708d43492750b29ce9d8e2f10fc20bf",
+      "merge": "8296eb9c9d0278c44510dfc37a7bcaba55825478",
+      "checks_success": 29,
+      "conditional_docs_sync_not_triggered": true
+    },
+    "ai_runtime_package": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c",
+    "ai_full_source_gate": "48789cdf5d52269221a67ff016d8fec9e5a59ff5",
+    "ai_merge": "570bfde7a5b494b38fbe3c948ce89cee467ae8b4",
+    "ai_pr": 231,
+    "ai_ci_success": 14
+  },
+  "dependencies": {
+    "go": "v0.5.0",
+    "python": "0.4.0",
+    "sdk_source": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+    "python_wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1",
+    "only_removed_packages": [
+      "pynsq",
+      "tornado"
+    ],
+    "all_other_locked_package_versions_sources_and_hashes_unchanged": true,
+    "current_JOSE_and_transaction_imports_work_without_removed_clients": true,
+    "actual_final_image_absence_proved": true,
+    "stable_tags_or_assets_changed": false
+  },
+  "image_and_gate_identity": {
+    "tested_candidate": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c",
+    "test_fixture_fix": "48789cdf5d52269221a67ff016d8fec9e5a59ff5",
+    "all_Docker_COPY_and_build_inputs_equal": true,
+    "compared_paths": [
+      "Dockerfile",
+      ".dockerignore",
+      "pyproject.toml",
+      "uv.lock",
+      "README.md",
+      "src",
+      "configs",
+      "integrations",
+      "alembic.ini",
+      "migrations"
+    ],
+    "remaining_differences": [
+      ".github/workflows/ci.yml",
+      "tests/test_mq_deployment.py",
+      "docs/document-closure.json"
+    ],
+    "image_rebuild_for_test_only_fix_not_required": true
+  },
+  "source_CI": {
+    "run": 40365286942,
+    "profiles": {
+      "8.0.36": 5668,
+      "8.4": 5668
+    },
+    "junit": [
+      {
+        "file": "source-final/tests-8.0.36-0-attempt-1/shard-8.0.36-0.xml",
+        "sha256": "1f1a67bd7f87ef27d59f52d89cb584390b3957f6607ff0d43ef4807a7fe08b6a",
+        "testcases": 1417
+      },
+      {
+        "file": "source-final/tests-8.0.36-1-attempt-1/shard-8.0.36-1.xml",
+        "sha256": "daea7c6ea2b7ab0978d0188d0a8dd7d114b3b0034c2f20510cb616df4cd1a11d",
+        "testcases": 1417
+      },
+      {
+        "file": "source-final/tests-8.0.36-2-attempt-1/shard-8.0.36-2.xml",
+        "sha256": "a9399a57bc1b08348c2bb66e2b4452f26eb596baaab0498685c3791d1e72ce36",
+        "testcases": 1417
+      },
+      {
+        "file": "source-final/tests-8.0.36-3-attempt-1/shard-8.0.36-3.xml",
+        "sha256": "635f05be97951812175cb9f435aa2d130e4181ffcb7397fa675033bcc06deb7a",
+        "testcases": 1417
+      },
+      {
+        "file": "source-final/tests-8.4-0-attempt-1/shard-8.4-0.xml",
+        "sha256": "4f4c37070149179fbbf4832290aa088ba04d92ffa63b18b5a1e1ddf19958f004",
+        "testcases": 1417
+      },
+      {
+        "file": "source-final/tests-8.4-1-attempt-1/shard-8.4-1.xml",
+        "sha256": "e79ffa9bab91c7edfa0de8238d36cb0e6c10d0cb08d1adf5e6454f4751965e4e",
+        "testcases": 1417
+      },
+      {
+        "file": "source-final/tests-8.4-2-attempt-1/shard-8.4-2.xml",
+        "sha256": "cad9a4a549f385c06bef53834fe15dd5d18027e835cc112389f7c585732156c0",
+        "testcases": 1417
+      },
+      {
+        "file": "source-final/tests-8.4-3-attempt-1/shard-8.4-3.xml",
+        "sha256": "852bcf9865aa84537371f650e240695eb816d941ac1f0404f4826724dddd4cd1",
+        "testcases": 1417
+      }
+    ],
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "source_junit_profile_count": 2,
+    "shards": 8
+  },
+  "native": {
+    "paired_run": 40362768497,
+    "current_readers_run": 40364509388,
+    "strict_reports": [
+      {
+        "path": "readers/m4-current-ai-payload-py311-mysql8036-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-ai-current-payload.json",
+        "sha256": "777aa76e768b1271c545af7af719fe503e5dd4522973461ba1e84b6c29d54e03",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-ai-payload-py311-mysql8044-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-ai-current-payload.json",
+        "sha256": "621159fa5a64cb90a9a4584e7a3a6fba2dab423411c66dad087938a4d6e5e0b4",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-ai-payload-py311-mysql8411-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-ai-current-payload.json",
+        "sha256": "09807043282f5a35429dea23aa6551e9e5acf767567f18d7cb89f279204e7bbe",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-ai-payload-py313-mysql8036-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-ai-current-payload.json",
+        "sha256": "345e17a1fae0f6ac13d8fce539644031dacab4db60a886a637ecee52df6f0ed0",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-ai-payload-py313-mysql8044-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-ai-current-payload.json",
+        "sha256": "59746600487c252778eeb9d9c534357e198088d9436bdeca7ab5d8cf12c098ee",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-ai-payload-py313-mysql8411-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-ai-current-payload.json",
+        "sha256": "98608f262f139b792d0e181474e902eb88ae5ede6ac61d43e5de69afa020eb63",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-qs-readers-8.0.36-1f38f583d43c9faf4601a5df9f3f82b764e6547d-40364509388/m4-current-qs-command.json",
+        "sha256": "12a8d88f91fbea79d447161eb2fc3469dbf85af6e5af815ba2b730a87f915db8",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-qs-readers-8.0.36-1f38f583d43c9faf4601a5df9f3f82b764e6547d-40364509388/m4-current-qs-event.json",
+        "sha256": "cfc4825e4ac521f5e31fa7d5837c155a5431fce0840527e146ea4e0d21195fc9",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-qs-readers-8.0.44-1f38f583d43c9faf4601a5df9f3f82b764e6547d-40364509388/m4-current-qs-command.json",
+        "sha256": "65fce8cf32769cab2e7ad93eef807d0b3a62d19696fa3c3140dea88aadcb0feb",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-qs-readers-8.0.44-1f38f583d43c9faf4601a5df9f3f82b764e6547d-40364509388/m4-current-qs-event.json",
+        "sha256": "060122ff9013323672f4c43ae07c64390bddfc10e9fd1755b2e1e9a9f95a5b95",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-qs-readers-8.4.11-1f38f583d43c9faf4601a5df9f3f82b764e6547d-40364509388/m4-current-qs-command.json",
+        "sha256": "b80ab0e9dd8ec7aea4d547097b937599f7d7563793e434f4a3e498891ae81efe",
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "readers/m4-current-qs-readers-8.4.11-1f38f583d43c9faf4601a5df9f3f82b764e6547d-40364509388/m4-current-qs-event.json",
+        "sha256": "d061e59cd2d73e7b482a25ff117eb4b931c7f04f2123b6a9687d97cabd7c54f5",
+        "passed": 17,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "paired/rocketmq-paired-full-0-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-paired.json",
+        "sha256": "93643dce583acd67a41571bba497cf60cbe28ee700dce3c08cd47c3d3730e165",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "paired/rocketmq-paired-full-1-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-paired.json",
+        "sha256": "9fe1943897cfc0fc9f249d4a48b1a32c7c70435ed0958f423b1e7707d043c5f2",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "paired/rocketmq-paired-full-2-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-paired.json",
+        "sha256": "f0c3d71c305f0ad29888ae1651d5bd3d2717ef24ef4750e313548dd54f7b6917",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "paired/rocketmq-paired-full-3-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-paired.json",
+        "sha256": "e73cbed608a28e97c467bbc44b71572c536fc72db498b547aab50e7f12f05f84",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "paired/rocketmq-paired-full-4-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-paired.json",
+        "sha256": "396d3aa9c8ffa1f42c35bd0d9f8808fa49215db0a3797324fc41fe5c61a5b590",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "path": "paired/rocketmq-paired-full-5-09c1d8984a22a7c6b9135f26b0e568ac54944a50/rocketmq-paired.json",
+        "sha256": "9789968aae05f47e85bdfaf37d7eec225da6b33654af333c81ec2762ac82e7c8",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0
+      }
+    ],
+    "reports": 18,
+    "paired_profiles": 6,
+    "native_tests_per_paired_profile": 7,
+    "paired_facts_per_profile": 40,
+    "ai_current_payload_profiles": 6,
+    "ai_tests_per_profile": 15,
+    "ai_facts_per_profile": 21,
+    "qs_command_and_event_profiles": 3,
+    "qs_command_facts_per_profile": 15,
+    "qs_event_facts_per_profile": 17,
+    "failed": 0,
+    "skipped": 0
+  },
+  "current_docs": {
+    "qs_authority": "docs/03-\u57fa\u7840\u8bbe\u65bd/event/README.md plus 10/20/30",
+    "qs_four_phase_pages": "explicit historical scope + archive_candidate, existing evidence/gaps retained",
+    "qs_docs_checker_tests": 88,
+    "ai_docs_pages": 75,
+    "ai_links": 1270,
+    "AI_README_stable_runtime_corrected": true
+  },
+  "retained_exceptions": [
+    {
+      "item": "Published SDK generic NSQ packages / Go transitive declarations",
+      "reason": "other hosts and isolated generic compatibility; no current IAM/QS/AI production selection; published SDK unchanged"
+    },
+    {
+      "item": "Catalog durable_outbox/Profile names and fits_nsq conservative wire helper",
+      "reason": "current business routing classification / first-wire size contract, not a producer scan or NSQ runtime; no wire rewrite"
+    },
+    {
+      "item": "AI result_outbox, Inbox/receipt/first wire, future retry and model checkpoint",
+      "reason": "active business responsibility and unknown-result governance, not retired publication transport"
+    },
+    {
+      "item": "Original migration/schema/backup and historical phase documents",
+      "reason": "audit and retained-asset responsibility; no current fallback, full backup restore, execution or deletion authority"
+    },
+    {
+      "item": "Mac mini development NSQ / isolated SDK fixtures",
+      "reason": "explicitly outside production NSQ retirement"
+    }
+  ],
+  "failure_history": [
+    {
+      "run": 40362474723,
+      "kind": "two shard-2 tests depended on removed NSQ image cache only for stopped Compose environment-byte inspection",
+      "resolved": "original owned MySQL image ID; create/inspect/remove only, no start; final full 11336 source cases passed"
+    },
+    {
+      "run": 40362774649,
+      "kind": "wrong legacy prerelease payload profile rejected stable SDK before native database tests",
+      "resolved": "existing M4 stable current-readers profile 40364509388, no gate weakening"
+    },
+    {
+      "run": 40364261912,
+      "kind": "new image dependency proof treated once text as process object; 2 setup facts before dependency startup, all owned cleanup passed",
+      "resolved": "text contract fixed with two pure boundary tests; final 18-case real-image run 40365407657 passed"
+    }
+  ],
+  "actual_image_gate": {
+    "run": 40365407657,
+    "passed": 18,
+    "codec_passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "runtime_DDL": 0,
+    "all_eight_exit_zero": true
+  },
+  "production": {
+    "application_deployed": false,
+    "root_operators_prepared": true,
+    "registry_published": false,
+    "system_acceptance": false,
+    "automatic_CD_resumed": false
+  },
+  "source_receipts": [
+    "rocketmq-m4-c01-inventory-20261025.json",
+    "rocketmq-m4-c02-runtime-aggregate-20261026.json",
+    "rocketmq-m4-c03-current-readers-20261026.json",
+    "rocketmq-m4-c04-final-protocol-20261026.json",
+    "rocketmq-m4-c05-current-responsibilities-20261027.json",
+    "rocketmq-m4-c06-config-contract-20261026.json"
+  ]
+}

@@ -1,0 +1,1284 @@
+{
+  "schema": "m4-eight-instance-config-rebuild/v1",
+  "passed": 18,
+  "failed": 0,
+  "skipped": 0,
+  "production": false,
+  "system_acceptance": false,
+  "combined_cutover_rehearsal_complete": false,
+  "c1_cutover_barrier_exercised": false,
+  "cases": {
+    "actual_source_registry_consumers_match_manifest": true,
+    "all_five_exact_archives_loaded": true,
+    "original_current_qs_pair_prepared": true,
+    "original_qs_dual_binding_verified": true,
+    "original_iam_schema45_and_binding_selected": true,
+    "original_ai_schema43_and_binding_verified": true,
+    "actual_three_source_packagers_and_root_owned_twenty_one_material_files": true,
+    "actual_current_api_host_freeze_and_native_preflight_repeated": true,
+    "actual_iam_ready_and_paused_checker_live": true,
+    "actual_readonly_ai_ready_and_paused_checker_live": true,
+    "actual_qs_api_with_iam_ai_and_both_paused_owners": true,
+    "actual_collection_with_required_iam_and_api": true,
+    "actual_second_collection_with_original_replica_budget": true,
+    "actual_worker1_prepared_http_healthy_original_concurrency48": true,
+    "actual_worker2_prepared_http_healthy_original_concurrency48": true,
+    "actual_worker3_prepared_http_healthy_original_concurrency48": true,
+    "all_eight_actual_processes_shutdown_exit_zero": true,
+    "actual_all_runtime_start_shutdown_no_ddl_attempts": true
+  },
+  "sources": {
+    "iam": "4609d4542d9303130ab94ed67593d0a69d0d010d",
+    "qs": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+    "ai": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c"
+  },
+  "scope": "current merged source, actual production messaging packagers, root-owned versioned files and eight real runtimes; no business/system/production claim",
+  "final_candidate_manifest_sha256": "a3bbf4610ae20c8501d28e19f30487e0bf88fc27b495ac9ee13e16a3dd414c51",
+  "final_candidate_image_runs": {
+    "iam": "40351033230",
+    "ai": "40362760742",
+    "qs-api": "40352408582",
+    "qs-collection": "40352408582",
+    "qs-worker": "40352408582"
+  },
+  "final_candidate": true,
+  "infra_sha": "2093c26c056fa0a91d30cd276216d2c509d936db",
+  "original_qs_consumer_count": 1,
+  "original_qs_consumer_contract": {
+    "consumers": [
+      {
+        "id": "modelcatalog.hot_rank_projection",
+        "runtime": "apiserver",
+        "event_type": "answersheet.submitted",
+        "topic": "qs.evaluation.lifecycle",
+        "channel": "qs-apiserver-modelcatalog-hot-rank-v1",
+        "delivery": "durable_outbox",
+        "outbox_profile": "mongo_domain_events"
+      }
+    ],
+    "schema": "qs-original-consumer-contract/v1",
+    "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d"
+  },
+  "original_qs_consumer_contract_sha256": "319417d7d0df4504a2e8321cdfc312be76bc5a09914090e67376fc4b12f25a30",
+  "candidates": {
+    "iam": {
+      "target": "iam",
+      "source_sha": "4609d4542d9303130ab94ed67593d0a69d0d010d",
+      "builder_source_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+      "image_config_id": "sha256:671cb04bdc5cd5cdc821387d0269eb1ca004afed8b38fd8d9cc655f0dac99602",
+      "archive_sha256": "3014f06a284faaf80af538a8d4528543ca5cbc7146dc1ccb7612ad80f514ccee"
+    },
+    "qs-api": {
+      "target": "qs-api",
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "builder_source_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+      "image_config_id": "sha256:46dc36d5d3063abebeb456e21dd7b66443d50fc553c95ac452a99e03c5b9749f",
+      "archive_sha256": "abe2c944beeb2f3b89d6fe50defa4618a8753ac2607ebcaceed527e8f64d3d84"
+    },
+    "qs-collection": {
+      "target": "qs-collection",
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "builder_source_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+      "image_config_id": "sha256:37fa29a1a1b6a788187979755600add27d11414371972d1cbae21c9e85f8073b",
+      "archive_sha256": "e68ebfd32f4438c22c74c7fca515b4a0fcfef788c6c94076ddbfc3270d520733"
+    },
+    "qs-worker": {
+      "target": "qs-worker",
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "builder_source_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+      "image_config_id": "sha256:9e2ecfd5c30d9170fa7a3990968e31f3c6c7c9708dc6e940fc9f65dfe0f0eaa5",
+      "archive_sha256": "b0602da48596961957cdccfb1245bf5c59a7f2975bb50bb667b5f6ede3cf5890"
+    },
+    "ai": {
+      "target": "ai",
+      "source_sha": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c",
+      "builder_source_sha": "569f2c8a6db83f2e75c7b2c18318952411c3c20d",
+      "image_config_id": "sha256:ad91ea3eea2a7c3e8b6ca6abce4f029411e1a5503cb6dd4473c804f1e1a2d926",
+      "archive_sha256": "a0f3bf7a3ca3c12f859c3ec47e6c8e5d89bd6edab069147abab11aea1ebfd4cd"
+    }
+  },
+  "final_python_dependencies": {
+    "sdk": "0.4.0",
+    "nsq_absent": true,
+    "tornado_absent": true,
+    "current_imports": true
+  },
+  "dependency_image_ids": {
+    "mysql": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+    "rocketmq": "sha256:6dfe19a300381ed99553710d2d0bf37f8f8edf72c44e4f78d3b3c43fc925e93d",
+    "mongo": "sha256:faa77adca8915c6672577288a0a20db7d666de0c872cb2465daea6fd0082e274",
+    "redis": "sha256:98c6ca8f397f86e469be752c3e7ed5eb8b17f2479840cb69a2e413037038e9f4"
+  },
+  "dependency_versions": {
+    "mysql": "8.0.36",
+    "mongo": "7.0.31"
+  },
+  "resources": {
+    "version": 2,
+    "operations": 53,
+    "typed_topics": 10,
+    "principals": 5,
+    "verified": true
+  },
+  "qs_schema": {
+    "journal_force_used": false,
+    "mongo": 44,
+    "mysql": 110,
+    "original_templates_applied": true,
+    "production": false,
+    "profile": "current",
+    "resources_sha256": "42eaf899667ee3347abcf4e6767fb68ac45f2b597b586344e6a0f87cc498020b",
+    "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d"
+  },
+  "iam_controlled_seed": {
+    "controlled_seed": true,
+    "legacy_drain_claimed": false,
+    "publication_intents_created": false,
+    "schema_version": 45,
+    "seed_events_retained": 2,
+    "witnesses_created": false
+  },
+  "configuration_sha256": {
+    "iam": "409246e60e149ce2fe2d61f9f27d609f2333d3231ce3ababecf36ec68ab1f4a7",
+    "api": "41678f59171e8c0532a1d9bdef3c9ec2e6118e73dcdc114aea8e8a72bf22d937",
+    "collection": "d8ce26491d6ad88f59acfc59da4d31d074e4c12ae9ea8e2f3ddc3d9a48a3886e",
+    "worker": "700da226f94c2bc556271a96394515e1080adf6fd3f51a42f18967fec531f8cf"
+  },
+  "actual_source_worker_concurrency": 48,
+  "m4_material_stage": {
+    "file_mode": "0440",
+    "files": 21,
+    "production": false,
+    "revision": "m4-owned-acd22241f253",
+    "root_uid": 0
+  },
+  "m4_api_native_preflight": {
+    "native_metadata": {
+      "binding_file_sha256": "67d0e1f31e5de4430ef11784a2d8ab16897192b73864c6866da591b733a7b83a",
+      "binding_revision": "m4-owned-acd22241f253",
+      "binding_sha256": "eb618a1595f4a7e2de3dbfb7c520e9590d75402be3c57c0dc3e772f7c2625aac",
+      "compose_sha256": "65f7688b97eebb646335bb9a70b5ff8286d75437755b6e7aaaafb62c87b1bf2d",
+      "final_transaction_binding": true,
+      "image_id": "sha256:46dc36d5d3063abebeb456e21dd7b66443d50fc553c95ac452a99e03c5b9749f",
+      "offline": true,
+      "public_key_fingerprints": {
+        "ai.encrypt.fixture": "2be1cb28a8faf642faf8e95562fb14b40e8ba18cd035e16cb59be269d915fcbd",
+        "ai.sign.fixture": "1287d29a0ba63de859b1a66444ebc552c6f784f0c0015567776ad337d7961743",
+        "qs.encrypt.fixture": "eeabaf16ea5a2ae61cf738b58281d5409d072ac9536701544ab5a04e34365998",
+        "qs.sign.fixture": "b5fa058093c82783bab16bf7d9a71364d7ad207248a63b7146d883a92d168072"
+      },
+      "rendered_config_sha256": "41678f59171e8c0532a1d9bdef3c9ec2e6118e73dcdc114aea8e8a72bf22d937",
+      "source_config_sha256": "24f8e0971945d1dc134da1a7a190458317154e4fb0cf7fd06f08ac65b02f3d4c",
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "transport_files_sha256": {
+        "ca.crt": "0a5647e6c7527418575d0870bb73c126e969b0149fd3380fd0939772cc0cc8f2",
+        "credentials.json": "e879af5abfa849f405ac8b47420c83d62e294a7e23865e29179fec866ea14941",
+        "mongo-credentials.json": "3563433e605eaae95fa1389ba40513deaf48e4ef0fe5f2287390eaec715340b1",
+        "routes.json": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3"
+      }
+    },
+    "rendered_sha256": "41678f59171e8c0532a1d9bdef3c9ec2e6118e73dcdc114aea8e8a72bf22d937",
+    "result": {
+      "binding_revision": "m4-owned-acd22241f253",
+      "binding_sha256": "eb618a1595f4a7e2de3dbfb7c520e9590d75402be3c57c0dc3e772f7c2625aac",
+      "compose_file": "/tmp/m3-image-start-2jhmiz45/actual-api-releases/1f38f583d43c9faf4601a5df9f3f82b764e6547d/compose.json",
+      "image_id": "sha256:46dc36d5d3063abebeb456e21dd7b66443d50fc553c95ac452a99e03c5b9749f",
+      "preflight": "passed",
+      "protected_image_ids": [
+        "sha256:46dc36d5d3063abebeb456e21dd7b66443d50fc553c95ac452a99e03c5b9749f"
+      ],
+      "source_sha": "1f38f583d43c9faf4601a5df9f3f82b764e6547d"
+    },
+    "volumes": [
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/tmp/m3-image-start-2jhmiz45/actual-api-releases/1f38f583d43c9faf4601a5df9f3f82b764e6547d/apiserver.json",
+        "target": "/app/configs/apiserver.prod.yaml",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/qs.sign.fixture.json",
+        "target": "/run/qs-server-jose/qs.sign.fixture.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/ai.encrypt.fixture.json",
+        "target": "/run/qs-server-jose/ai.encrypt.fixture.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/qs.encrypt.fixture.json",
+        "target": "/run/qs-server-jose/qs.encrypt.fixture.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/ai.sign.fixture.json",
+        "target": "/run/qs-server-jose/ai.sign.fixture.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/rocketmq/credentials.json",
+        "target": "/app/configs/rocketmq/credentials.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/rocketmq/mongo-credentials.json",
+        "target": "/app/configs/rocketmq/mongo-credentials.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/rocketmq/ca.crt",
+        "target": "/app/configs/rocketmq/ca.crt",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/rocketmq/routes.json",
+        "target": "/app/configs/rocketmq/routes.json",
+        "type": "bind"
+      }
+    ]
+  },
+  "runtime_environment_sha256": {
+    "iam": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ai": "54b1d4668100fbe66edaf0aa9a924dbd0cc606fcef7abfde9671645d9f667568",
+    "api": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collection": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collection2": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "worker1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "worker2": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "worker3": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "actual_runtime_budgets": {
+    "iam": {
+      "memory_bytes": 1073741824,
+      "nano_cpus": 1000000000
+    },
+    "ai": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 750000000
+    },
+    "api": {
+      "memory_bytes": 1073741824,
+      "nano_cpus": 2000000000
+    },
+    "collection": {
+      "memory_bytes": 335544320,
+      "nano_cpus": 1000000000
+    },
+    "collection2": {
+      "memory_bytes": 335544320,
+      "nano_cpus": 1000000000
+    },
+    "worker1": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 1000000000
+    },
+    "worker2": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 1000000000
+    },
+    "worker3": {
+      "memory_bytes": 805306368,
+      "nano_cpus": 1000000000
+    }
+  },
+  "actual_runtime_unix_identity": {
+    "iam": [
+      2000,
+      2000
+    ],
+    "ai": [
+      10001,
+      10001
+    ],
+    "api": [
+      2000,
+      2000
+    ],
+    "collection": [
+      2000,
+      2000
+    ],
+    "collection2": [
+      2000,
+      2000
+    ],
+    "worker1": [
+      2000,
+      2000
+    ],
+    "worker2": [
+      2000,
+      2000
+    ],
+    "worker3": [
+      2000,
+      2000
+    ]
+  },
+  "actual_material_mounts": {
+    "iam": [
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/iam-messaging/versions/m4-owned-acd22241f253/rocketmq/credentials.json",
+        "target": "/etc/iam/rocketmq/credentials.json",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/iam-messaging/versions/m4-owned-acd22241f253/rocketmq/ca.crt",
+        "target": "/etc/iam/rocketmq/ca.crt",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/iam-messaging/versions/m4-owned-acd22241f253/rocketmq/routes.json",
+        "target": "/etc/iam/rocketmq/routes.json",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      }
+    ],
+    "ai": [
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-owned-acd22241f253/ai.encrypt.fixture.json",
+        "target": "/run/qs-ai-jose/ai.encrypt.fixture.json",
+        "read_only": true,
+        "bind": {}
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-owned-acd22241f253/ai.sign.fixture.json",
+        "target": "/run/qs-ai-jose/ai.sign.fixture.json",
+        "read_only": true,
+        "bind": {}
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-owned-acd22241f253/qs.encrypt.fixture.json",
+        "target": "/run/qs-ai-jose/qs.encrypt.fixture.json",
+        "read_only": true,
+        "bind": {}
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-owned-acd22241f253/qs.sign.fixture.json",
+        "target": "/run/qs-ai-jose/qs.sign.fixture.json",
+        "read_only": true,
+        "bind": {}
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-owned-acd22241f253/rocketmq/credentials.json",
+        "target": "/run/qs-ai-rocketmq/credentials.json",
+        "read_only": true,
+        "bind": {}
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-owned-acd22241f253/rocketmq/ca.crt",
+        "target": "/run/qs-ai-rocketmq/ca.crt",
+        "read_only": true,
+        "bind": {}
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-owned-acd22241f253/rocketmq/routes.json",
+        "target": "/run/qs-ai-rocketmq/routes.json",
+        "read_only": true,
+        "bind": {}
+      }
+    ],
+    "api": [
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/tmp/m3-image-start-2jhmiz45/actual-api-releases/1f38f583d43c9faf4601a5df9f3f82b764e6547d/apiserver.json",
+        "target": "/app/configs/apiserver.prod.yaml",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/qs.sign.fixture.json",
+        "target": "/run/qs-server-jose/qs.sign.fixture.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/ai.encrypt.fixture.json",
+        "target": "/run/qs-server-jose/ai.encrypt.fixture.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/qs.encrypt.fixture.json",
+        "target": "/run/qs-server-jose/qs.encrypt.fixture.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/ai.sign.fixture.json",
+        "target": "/run/qs-server-jose/ai.sign.fixture.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/rocketmq/credentials.json",
+        "target": "/app/configs/rocketmq/credentials.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/rocketmq/mongo-credentials.json",
+        "target": "/app/configs/rocketmq/mongo-credentials.json",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/rocketmq/ca.crt",
+        "target": "/app/configs/rocketmq/ca.crt",
+        "type": "bind"
+      },
+      {
+        "bind": {
+          "create_host_path": false
+        },
+        "read_only": true,
+        "source": "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-owned-acd22241f253/rocketmq/routes.json",
+        "target": "/app/configs/rocketmq/routes.json",
+        "type": "bind"
+      }
+    ],
+    "collection": [],
+    "collection2": [],
+    "worker1": [
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-owned-acd22241f253/rocketmq/credentials.json",
+        "target": "/etc/qs-worker/rocketmq/credentials.json",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-owned-acd22241f253/rocketmq/ca.crt",
+        "target": "/etc/qs-worker/rocketmq/ca.crt",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-owned-acd22241f253/rocketmq/routes.json",
+        "target": "/etc/qs-worker/rocketmq/routes.json",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      }
+    ],
+    "worker2": [
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-owned-acd22241f253/rocketmq/credentials.json",
+        "target": "/etc/qs-worker/rocketmq/credentials.json",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-owned-acd22241f253/rocketmq/ca.crt",
+        "target": "/etc/qs-worker/rocketmq/ca.crt",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-owned-acd22241f253/rocketmq/routes.json",
+        "target": "/etc/qs-worker/rocketmq/routes.json",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      }
+    ],
+    "worker3": [
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-owned-acd22241f253/rocketmq/credentials.json",
+        "target": "/etc/qs-worker/rocketmq/credentials.json",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-owned-acd22241f253/rocketmq/ca.crt",
+        "target": "/etc/qs-worker/rocketmq/ca.crt",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      },
+      {
+        "type": "bind",
+        "source": "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-owned-acd22241f253/rocketmq/routes.json",
+        "target": "/etc/qs-worker/rocketmq/routes.json",
+        "read_only": true,
+        "bind": {
+          "create_host_path": false
+        }
+      }
+    ]
+  },
+  "iam_metrics": {
+    "sdk_ready": 1,
+    "sampler_running": 1,
+    "observation_available": 1,
+    "admission_open": 0,
+    "check_workers_limit": 4,
+    "check_queue_limit": 32
+  },
+  "ai_metrics": {
+    "sdk_ready": 1,
+    "sampler_running": 1,
+    "observation_available": 1,
+    "admission_open": 0,
+    "check_workers_limit": 1,
+    "check_queue_limit": 16
+  },
+  "qs_metrics": {
+    "qs.mysql": {
+      "sdk_ready": 1,
+      "sampler_running": 1,
+      "observation_available": 1,
+      "admission_open": 0,
+      "check_workers_limit": 2,
+      "check_queue_limit": 16
+    },
+    "qs.mongo": {
+      "sdk_ready": 1,
+      "sampler_running": 1,
+      "observation_available": 1,
+      "admission_open": 0,
+      "check_workers_limit": 2,
+      "check_queue_limit": 16
+    }
+  },
+  "workers_prepared": {
+    "worker3": true,
+    "worker2": true,
+    "worker1": true
+  },
+  "worker_restart_checks": [
+    {
+      "component": "worker3",
+      "cycle": 1,
+      "result": {
+        "private_log_sha256": "b231b45f13e35733e34982720a72bcf3748c823f201cc50cd6e6174f6d303359",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker2",
+      "cycle": 1,
+      "result": {
+        "private_log_sha256": "401648876d5a0dbc2bf6d47067a298c737eb49468e6b83a36e65d4eb32ec38f1",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker1",
+      "cycle": 1,
+      "result": {
+        "private_log_sha256": "d9fdbfc759b8e378a38f6207132b57184ae6a5322c486f1f405a822a0bdb0cd3",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker3",
+      "cycle": 2,
+      "result": {
+        "private_log_sha256": "ffa68e39d6473f706c39bbcdf4aed37d6c67d0e5ab145d2a2247b5e51c6ce12e",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker2",
+      "cycle": 2,
+      "result": {
+        "private_log_sha256": "b8ca6983b1fc271c7abeaaac539321826badfa39cc1e857a686e34ad51301427",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker1",
+      "cycle": 2,
+      "result": {
+        "private_log_sha256": "406059d3874f456ce1cfc000e23de1b41c67f54280cb6007db923ea62b6aa194",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker3",
+      "cycle": 3,
+      "result": {
+        "private_log_sha256": "8185714fab736db9974c7cc95219b1ebdd62703d345c3965913ff4976142f8eb",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker2",
+      "cycle": 3,
+      "result": {
+        "private_log_sha256": "321dbfd52c8d9f69f0ff50abb99a28431c894e6f69530ca53e343ab36b82c2f5",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    },
+    {
+      "component": "worker1",
+      "cycle": 3,
+      "result": {
+        "private_log_sha256": "c0be2619c26c40374739fb06cc7dbcfedef003a71e655430c365b5b2bc6583e2",
+        "state": {
+          "Status": "exited",
+          "ExitCode": 0,
+          "OOMKilled": false
+        },
+        "fixed_failure_signals": {
+          "missing_file": false,
+          "policy_read": false,
+          "permission_denied": false,
+          "connection_refused": false,
+          "deadline": false,
+          "certificate_authority": false,
+          "missing_route": true,
+          "invalid_configuration": true,
+          "panic": false
+        },
+        "source_markers": [],
+        "go_termination": {
+          "signal_presence": {
+            "runtime_fatal": false,
+            "concurrent_map": false,
+            "out_of_memory": false,
+            "deadlock": false,
+            "context_cancelled": true,
+            "shutdown_deadline": false,
+            "segmentation_violation": false,
+            "quit_signal": false
+          },
+          "go_frames": [],
+          "error_log_sites": [],
+          "raw_messages_exported": false
+        }
+      }
+    }
+  ],
+  "processes": {
+    "worker3": {
+      "private_log_sha256": "f1dcc76112be4bd0e0c90d974cea31098ab640bea7bda0fd8ba2c0549561d114",
+      "state": {
+        "Status": "exited",
+        "ExitCode": 0,
+        "OOMKilled": false
+      },
+      "fixed_failure_signals": {
+        "missing_file": false,
+        "policy_read": false,
+        "permission_denied": false,
+        "connection_refused": false,
+        "deadline": false,
+        "certificate_authority": false,
+        "missing_route": true,
+        "invalid_configuration": true,
+        "panic": false
+      },
+      "source_markers": [],
+      "go_termination": {
+        "signal_presence": {
+          "runtime_fatal": false,
+          "concurrent_map": false,
+          "out_of_memory": false,
+          "deadlock": false,
+          "context_cancelled": true,
+          "shutdown_deadline": false,
+          "segmentation_violation": false,
+          "quit_signal": false
+        },
+        "go_frames": [],
+        "error_log_sites": [],
+        "raw_messages_exported": false
+      }
+    },
+    "worker2": {
+      "private_log_sha256": "f7de138e572148d186df8505430095d9eb3da3b5536249a07c85a3c346a426ea",
+      "state": {
+        "Status": "exited",
+        "ExitCode": 0,
+        "OOMKilled": false
+      },
+      "fixed_failure_signals": {
+        "missing_file": false,
+        "policy_read": false,
+        "permission_denied": false,
+        "connection_refused": false,
+        "deadline": false,
+        "certificate_authority": false,
+        "missing_route": true,
+        "invalid_configuration": true,
+        "panic": false
+      },
+      "source_markers": [],
+      "go_termination": {
+        "signal_presence": {
+          "runtime_fatal": false,
+          "concurrent_map": false,
+          "out_of_memory": false,
+          "deadlock": false,
+          "context_cancelled": true,
+          "shutdown_deadline": false,
+          "segmentation_violation": false,
+          "quit_signal": false
+        },
+        "go_frames": [],
+        "error_log_sites": [],
+        "raw_messages_exported": false
+      }
+    },
+    "worker1": {
+      "private_log_sha256": "e286d40d2b527d1939a91b3d9d65974287626cbaad2dddfbca80eec66d75b5dd",
+      "state": {
+        "Status": "exited",
+        "ExitCode": 0,
+        "OOMKilled": false
+      },
+      "fixed_failure_signals": {
+        "missing_file": false,
+        "policy_read": false,
+        "permission_denied": false,
+        "connection_refused": false,
+        "deadline": false,
+        "certificate_authority": false,
+        "missing_route": true,
+        "invalid_configuration": true,
+        "panic": false
+      },
+      "source_markers": [],
+      "go_termination": {
+        "signal_presence": {
+          "runtime_fatal": false,
+          "concurrent_map": false,
+          "out_of_memory": false,
+          "deadlock": false,
+          "context_cancelled": true,
+          "shutdown_deadline": false,
+          "segmentation_violation": false,
+          "quit_signal": false
+        },
+        "go_frames": [],
+        "error_log_sites": [],
+        "raw_messages_exported": false
+      }
+    },
+    "collection2": {
+      "private_log_sha256": "9feea36aa21d278c2f5a4de6d8c3d9a900e9e745d6ef84d72bc93673764d5073",
+      "state": {
+        "Status": "exited",
+        "ExitCode": 0,
+        "OOMKilled": false
+      },
+      "fixed_failure_signals": {
+        "missing_file": false,
+        "policy_read": true,
+        "permission_denied": false,
+        "connection_refused": false,
+        "deadline": false,
+        "certificate_authority": false,
+        "missing_route": true,
+        "invalid_configuration": false,
+        "panic": false
+      },
+      "source_markers": [],
+      "go_termination": {
+        "signal_presence": {
+          "runtime_fatal": false,
+          "concurrent_map": false,
+          "out_of_memory": false,
+          "deadlock": false,
+          "context_cancelled": false,
+          "shutdown_deadline": false,
+          "segmentation_violation": false,
+          "quit_signal": false
+        },
+        "go_frames": [],
+        "error_log_sites": [],
+        "raw_messages_exported": false
+      }
+    },
+    "collection": {
+      "private_log_sha256": "1858a77f9804fbb811eabd8a6ef175906aa0b69f108794638ce9b63c3ba6a301",
+      "state": {
+        "Status": "exited",
+        "ExitCode": 0,
+        "OOMKilled": false
+      },
+      "fixed_failure_signals": {
+        "missing_file": false,
+        "policy_read": true,
+        "permission_denied": false,
+        "connection_refused": false,
+        "deadline": false,
+        "certificate_authority": false,
+        "missing_route": true,
+        "invalid_configuration": false,
+        "panic": false
+      },
+      "source_markers": [],
+      "go_termination": {
+        "signal_presence": {
+          "runtime_fatal": false,
+          "concurrent_map": false,
+          "out_of_memory": false,
+          "deadlock": false,
+          "context_cancelled": false,
+          "shutdown_deadline": false,
+          "segmentation_violation": false,
+          "quit_signal": false
+        },
+        "go_frames": [],
+        "error_log_sites": [],
+        "raw_messages_exported": false
+      }
+    },
+    "api": {
+      "private_log_sha256": "f075afd0c673e2127622c155b10cf5fdc8ace9011c4ec4fc1ae67f78e7eb49b9",
+      "state": {
+        "Status": "exited",
+        "ExitCode": 0,
+        "OOMKilled": false
+      },
+      "fixed_failure_signals": {
+        "missing_file": false,
+        "policy_read": true,
+        "permission_denied": true,
+        "connection_refused": false,
+        "deadline": false,
+        "certificate_authority": false,
+        "missing_route": true,
+        "invalid_configuration": true,
+        "panic": false
+      },
+      "source_markers": [],
+      "go_termination": {
+        "signal_presence": {
+          "runtime_fatal": false,
+          "concurrent_map": false,
+          "out_of_memory": false,
+          "deadlock": false,
+          "context_cancelled": true,
+          "shutdown_deadline": false,
+          "segmentation_violation": false,
+          "quit_signal": false
+        },
+        "go_frames": [],
+        "error_log_sites": [],
+        "raw_messages_exported": false
+      }
+    },
+    "ai": {
+      "private_log_sha256": "486b5bbf9d533e8571e91b5f251274adfb20b74aba6a4befb7dca1f78c723ecb",
+      "state": {
+        "Status": "exited",
+        "ExitCode": 0,
+        "OOMKilled": false
+      },
+      "fixed_failure_signals": {
+        "missing_file": false,
+        "policy_read": false,
+        "permission_denied": false,
+        "connection_refused": false,
+        "deadline": false,
+        "certificate_authority": false,
+        "missing_route": false,
+        "invalid_configuration": false,
+        "panic": false
+      }
+    },
+    "iam": {
+      "private_log_sha256": "11a5acda2787b3ca8e73068070cfdbb18371692549bcfc5d69746a41ff99e652",
+      "state": {
+        "Status": "exited",
+        "ExitCode": 0,
+        "OOMKilled": false
+      },
+      "fixed_failure_signals": {
+        "missing_file": false,
+        "policy_read": false,
+        "permission_denied": false,
+        "connection_refused": false,
+        "deadline": false,
+        "certificate_authority": false,
+        "missing_route": true,
+        "invalid_configuration": true,
+        "panic": false
+      },
+      "source_markers": [],
+      "go_termination": {
+        "signal_presence": {
+          "runtime_fatal": false,
+          "concurrent_map": false,
+          "out_of_memory": false,
+          "deadlock": false,
+          "context_cancelled": false,
+          "shutdown_deadline": false,
+          "segmentation_violation": false,
+          "quit_signal": false
+        },
+        "go_frames": [],
+        "error_log_sites": [],
+        "raw_messages_exported": false
+      }
+    }
+  },
+  "shutdown_failed_components": [],
+  "mysql_runtime_ddl_attempts": 0,
+  "mongo_ddl_audit": {
+    "attempts": 0,
+    "commands": [],
+    "positive_controls": 4,
+    "profile_capacity_bytes": 67108864,
+    "command_bodies_exported": false
+  },
+  "mongo_runtime_ddl_attempts": 0,
+  "cleanup": {
+    "compose_down_succeeded": true,
+    "private_directory_removed": true,
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true,
+    "owned_m4_material_root_removed": true
+  },
+  "sources_unchanged": true
+}

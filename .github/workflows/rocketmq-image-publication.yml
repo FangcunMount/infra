@@ -6,8 +6,8 @@ on:
       - scripts/rocketmq/test_publish_candidates.py
       - scripts/rocketmq/m4_publish_candidates.py
       - scripts/rocketmq/test_m4_publish_candidates.py
-      - docs/server/evidence/rocketmq-m4-image-publication-plan-20261027.json
-      - docs/server/evidence/rocketmq-m4-c08-eight-instance-native-20261027.json
+      - docs/server/evidence/rocketmq-m4-image-publication-plan-20261027-v2.json
+      - docs/server/evidence/rocketmq-m4-c08-final-eight-instance-native-20261027.json
       - scripts/rocketmq/candidate_publication_probe.py
       - docs/server/evidence/rocketmq-m3-image-publication-plan-20261025.json
       - .github/workflows/rocketmq-image-publication.yml
