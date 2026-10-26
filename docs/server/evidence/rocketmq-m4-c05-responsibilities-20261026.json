@@ -1,0 +1,231 @@
+{
+  "schema": "rocketmq-m4-c05-responsibilities/v1",
+  "recorded_on": "2026-10-26",
+  "task": "C05-01",
+  "scope": "source responsibility mapping only",
+  "repositories": {
+    "iam": {
+      "sha": "30e6327bff83ec09d11a6c04e8e9f9268832df34"
+    },
+    "qs-server": {
+      "sha": "5c322de8d47756e4de374ff399c3c2af08e57d39"
+    },
+    "qs-ai": {
+      "sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732"
+    }
+  },
+  "responsibility_units": 11,
+  "mapping": "../rocketmq-m4-inventory.md#c05-01当前责任与最小解耦映射2026-10-26",
+  "source_files": [
+    {
+      "repo": "iam",
+      "source_sha": "30e6327bff83ec09d11a6c04e8e9f9268832df34",
+      "path": "internal/apiserver/infra/mysql/uow/authz/planned.go",
+      "bytes": 9530,
+      "sha256": "74c3209b1d6458e9bb1c0e5d78b3e8ab322d47be7ed1b1747a9b4cfe32574752"
+    },
+    {
+      "repo": "iam",
+      "source_sha": "30e6327bff83ec09d11a6c04e8e9f9268832df34",
+      "path": "internal/apiserver/infra/mysql/uow/authz/business_operation.go",
+      "bytes": 9922,
+      "sha256": "20b2662143c4926f45865b4db49a23d086edb7eb421637fbc34271b54ca3bb39"
+    },
+    {
+      "repo": "iam",
+      "source_sha": "30e6327bff83ec09d11a6c04e8e9f9268832df34",
+      "path": "internal/apiserver/infra/mysql/uow/authz/transaction.go",
+      "bytes": 7853,
+      "sha256": "822535205bea82f63f9a58828ac4e2c0800949bb240290dfc8f3357d03217936"
+    },
+    {
+      "repo": "iam",
+      "source_sha": "30e6327bff83ec09d11a6c04e8e9f9268832df34",
+      "path": "internal/apiserver/infra/mysql/messageprotocol/selection.go",
+      "bytes": 2840,
+      "sha256": "f6e6d3fa876888f42474fced81e4e9f347a1f71c1c10b1c1ba390373ab1c1cd7"
+    },
+    {
+      "repo": "iam",
+      "source_sha": "30e6327bff83ec09d11a6c04e8e9f9268832df34",
+      "path": "internal/apiserver/infra/mysql/sessionrevocation/store.go",
+      "bytes": 4864,
+      "sha256": "9c1bd86596716eda9c4918ab0c1009712bf1156843a42c689d755d03aad1be54"
+    },
+    {
+      "repo": "iam",
+      "source_sha": "30e6327bff83ec09d11a6c04e8e9f9268832df34",
+      "path": "internal/apiserver/container/identity/module.go",
+      "bytes": 4147,
+      "sha256": "24de1489bf76e70802669a48129e3e5c9d5a73597a6f342e955c0b95ef861890"
+    },
+    {
+      "repo": "iam",
+      "source_sha": "30e6327bff83ec09d11a6c04e8e9f9268832df34",
+      "path": "internal/apiserver/container/readiness.go",
+      "bytes": 5584,
+      "sha256": "ad17f36de8398605db8c327c149fc0a98a62074e0c5005f964688b49a5c4544c"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/apiserver/process/retry_dispatch.go",
+      "bytes": 1688,
+      "sha256": "9da9c8660dbd0de3b8bb609b3def7544813e9173695ca7fd9dc490151930161d"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/apiserver/infra/mysql/retryschedule/dispatch.go",
+      "bytes": 3127,
+      "sha256": "44af8a01b5305b2d9b5596b8e78bcbe36d62d4c80d6e3143c7550602420ecf55"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/apiserver/infra/mongo/retryschedule/dispatch.go",
+      "bytes": 3535,
+      "sha256": "f605e31a4ececae42360dd61fc521afd4c58d400d049acbcf18128499fc63df1"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/worker/handlers/retry_authorization.go",
+      "bytes": 618,
+      "sha256": "e353f0fa98df0fbcd14107107bc2c3a6ab638a9335ef8b8408958d98fc3e5b9e"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/apiserver/infra/mongo/interpretation/retry_authorization.go",
+      "bytes": 2369,
+      "sha256": "d74248b7c567d690bc56d1722a41dc05471721812208d340c8970af01ade2c57"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/apiserver/infra/mongo/answersheet/transaction_store.go",
+      "bytes": 10414,
+      "sha256": "3df5165abcf1ff494c3d90dbb9ad1bb70c38518f9d638fe40b0b521e3e369035"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/apiserver/infra/mysql/aibridge/transaction_archive.go",
+      "bytes": 10057,
+      "sha256": "c79f3224ea93e8d7708aa638bc0e4fa630d4b31924cf52743e2224b018ca68af"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/apiserver/infra/mysql/aibridge/transaction_command_reader.go",
+      "bytes": 8565,
+      "sha256": "7d54b695cae34f4a272bcf8ea4571fc688ba644afc9e3bee11d5c04655219de9"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/apiserver/infra/mysql/aibridge/transaction_event_receipt.go",
+      "bytes": 1530,
+      "sha256": "10ec795f53499971ace1e801daad627c0631c7dac83a5a69f502977ab4c6b95e"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/apiserver/infra/mysql/aibridge/transaction_event_root.go",
+      "bytes": 5715,
+      "sha256": "b7754f41230f872e673fe3fc24e7b714c4e490a557f020745f7e5663bdceecae"
+    },
+    {
+      "repo": "qs-server",
+      "source_sha": "5c322de8d47756e4de374ff399c3c2af08e57d39",
+      "path": "internal/apiserver/infra/mysql/aibridge/messaging_reader.go",
+      "bytes": 1076,
+      "sha256": "1d6165c947e4c2a9b906fb27b407cdd07709860926ae802272340ed91d152e60"
+    },
+    {
+      "repo": "qs-ai",
+      "source_sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+      "path": "src/qs_ai/infrastructure/persistence/mysql/transaction_receipts.py",
+      "bytes": 6381,
+      "sha256": "a6301ab47e7ae72610d72c3a04cec6201cd495904a2870388bae3356a0b2c990"
+    },
+    {
+      "repo": "qs-ai",
+      "source_sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+      "path": "src/qs_ai/infrastructure/persistence/mysql/transaction_archive.py",
+      "bytes": 7770,
+      "sha256": "5df3aad825e6199abff142f86165c313ab8e2395f4d46acfbff0aff56c068071"
+    },
+    {
+      "repo": "qs-ai",
+      "source_sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+      "path": "src/qs_ai/infrastructure/persistence/mysql/result_outbox.py",
+      "bytes": 2561,
+      "sha256": "ef7adb436a988accf23ab1d0b6b9399361f8b4ea7d9aaf289c7e01b864983381"
+    },
+    {
+      "repo": "qs-ai",
+      "source_sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+      "path": "src/qs_ai/infrastructure/persistence/mysql/runtime.py",
+      "bytes": 11885,
+      "sha256": "29b9c52546e1aa0ebc2e18f54a2b35f868d77734be07288e83b6d1aeec982030"
+    },
+    {
+      "repo": "qs-ai",
+      "source_sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+      "path": "src/qs_ai/infrastructure/persistence/mysql/interpretation_finalization_claim.py",
+      "bytes": 5197,
+      "sha256": "f1beb2123a2c9daa86c227ac26fe0d65ddae08b3f65ea17e19a57d82f5bbb01e"
+    },
+    {
+      "repo": "qs-ai",
+      "source_sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+      "path": "src/qs_ai/infrastructure/persistence/mysql/evaluation_finalization.py",
+      "bytes": 8272,
+      "sha256": "641c07ba0e70d73ed7f02d24cb4d7abfdd1c75b0ad45aabed73d6c858df18104"
+    },
+    {
+      "repo": "qs-ai",
+      "source_sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+      "path": "src/qs_ai/infrastructure/persistence/mysql/evaluation_checkpoints.py",
+      "bytes": 3429,
+      "sha256": "199e04c35f16b35bec8133bb3c2d50ab491a0ca26873fd29620eaf2dbe553ecc"
+    },
+    {
+      "repo": "qs-ai",
+      "source_sha": "b2c1015beb292c22ff6ed48ea011f5b88fd1e732",
+      "path": "src/qs_ai/application/execution/generation.py",
+      "bytes": 5252,
+      "sha256": "64c0a2a6732df119b207a5342cecbc66fae97317907444b2112e461f66b87fd7"
+    }
+  ],
+  "classification": {
+    "retain": [
+      "IAM operation journal/CAS/root witness/protocol barrier",
+      "IAM Redis session revocation worker and outbox",
+      "QS retry due/attempt/authorization/frozen dispatch",
+      "QS answer/report/score original facts and V2 evidence",
+      "QS archive/operation/inbox/first ACK/receipt/first wire",
+      "AI state history/result_outbox current ACK fields and receipts",
+      "AI committed archives/first wire/payload authorization",
+      "AI model response/checkpoint/artifact/invocation/finalization",
+      "four owners exact SDK witness/Checker/native protections"
+    ],
+    "remove_after_own_task_proof": [
+      "C02: inactive NSQ/publishing Outbox/Relay assemblies",
+      "C03: missing-current-archive legacy payload/operation/ACK fallback",
+      "C04: unneeded cutover/intermediate tools"
+    ],
+    "minimal_decoupling": [
+      "AI TransactionMessagingStore inherits mixed legacy MessagingStore; preserve current state/history verification before removing missing-archive fallback",
+      "QS standardoutbox mixes old publishing and governance; preserve scheduling and business retry authorization"
+    ]
+  },
+  "physical_deletion_authorized": false,
+  "production_changed": false,
+  "business_data_read": false,
+  "new_runtime_or_business_acceptance_claimed": false,
+  "C05_02_implementation_complete": false,
+  "C05_03_nonempty_recovery_validation_complete": false
+}

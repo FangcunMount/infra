@@ -47,3 +47,30 @@ Mac mini继续是固定生产SSH入口和监控位置；保留8实例原镜像/�
 ## 接下来的批次
 
 C01只完成盘点冻结，父清理任务不因此提前打勾。优先C06：先移除infra旧生产入口，随后逐仓收敛最终事务配置渲染/挂载、worker消费专用和IAM订阅；再运行实际配置重建门禁。C02–C05随后以单一宿主的小批进入，每批先保护最终协议、当前数据/业务及模型请求次数；C07按保留边界处理，C08做清理后的最终回归。
+
+## C05-01：当前责任与最小解耦映射（2026-10-26）
+
+复核使用 IAM main `30e6327bff83ec09d11a6c04e8e9f9268832df34`、QS 最终预检候选
+`5c322de8d47756e4de374ff399c3c2af08e57d39`、AI 已合并候选
+`b2c1015beb292c22ff6ed48ea011f5b88fd1e732`。本节只确认责任和后续删除边界，
+没有改业务代码、读取业务正文、执行DDL或删除数据；逐文件摘要见
+[C05责任证据](evidence/rocketmq-m4-c05-responsibilities-20261026.json)。
+
+| 责任 | 当前实际调用/事实 | 判断及后续边界 |
+| --- | --- | --- |
+| IAM授权操作 | `PlannedUnitOfWork.withBusinessOperation` 先查 operation journal，再冻结授权/版本/结果；`TransactionUnitOfWork.LocalExecutor` 先 BindGORM、校验 protocol，再提交事实/精确事件/witness | 保留 `iam_authz_operations`、CAS、原根事务、精确结果与权限查询。仅删除没有当前调用的旧发布装配，不能以SDK状态替代业务操作回执 |
+| IAM协议身份 | `ReadPlan` 与本地执行均调用 `messageprotocol.RequireTransaction`，锁定原store/epoch/m3-1 | `iam_authz_message_protocol`仍是当前写入屏障，不能连同outbox分支整表删除；离线旧切换工具在C04单独核对 |
+| IAM会话撤销 | Identity模块创建 `sessionrevocation.Store/Worker`；Stage保存用户版本，Claim/Complete/Fail推进Redis撤销责任，readiness读取未完成增龄 | 保留 `identity_session_revocation_outbox` 及worker、重试/完成事实；它不属于本次退出的Broker发布队列 |
+| QS未来重试 | API `buildRetryDispatchStart`启动双存储dispatcher；MySQL/Mongo `GuardDispatch/MarkDispatched`校验冻结计划、原root、版本与dispatch证据；worker传递原retry授权 | 保留 `qs_retry_schedule`、Mongo调度集合、NextAttemptAt/attempt/授权及原冻结事件。旧Outbox扫描/Replay与调度分开删除；历史handoff工具归C04，不新增授权或提前到期 |
+| QS答卷与领域事实 | `RocketMQSubmissionStore.CreateDurably`在原Mongo事务提交答卷/幂等/证据，`confirmSubmission`核对精确SDK证明；报告/评分保留Run、Outcome、Generation及重试授权guard | 保留202持久化证明、嵌入V2事件和全部业务状态；缺记录/提交未知不能返回假成功或重新运行评分。旧publisher stager仅按C02逐入口退出 |
+| QS命令档案与Operation | `TransactionArchive.Put/ReadCommitted/Payload`保存首次wire并核验精确Reference；`TransactionCommands.operation/pendingOperation`读取业务receipt和未决原请求 | 保留 `ai_messaging_archive/operations`、原ID/密文、租户/主体/收件方/hash及Prepared不可公开。只移除 `MessagingReader` 和 command reader 中通向旧Outbox的fallback；无档案也不授权业务重试 |
+| QS收到AI事件及首次ACK | `TransactionEvents.eventRoot`在原root内锁定Inbox、投影与首次ACK档案并提交witness；`transactionCommandReceipt`验证原命令身份，不自行commit或发送ACK | 保留Inbox、首个ACK/receipt、原根提交归属和消费幂等。C03删除旧互通时不能绕过Prepared/损坏证据拒绝或重新Seal |
+| AI状态历史与业务ACK | `stage_state`按session/version写首个state历史，再交recorder；`TransactionMessagingStore._confirm_event`锁读 `interpretation_result_outbox`、校验exact state，再写 `event_receipts`，STORED才更新delivered | 保留该表当前event_id/session/version/payload/mq_owned/delivered等字段及历史查询；`legacy`局部变量不表示整段可删。仅将“无新档案→super.confirm_event”拆出删除，当前状态核验/锁顺序不变 |
+| AI正文档案 | `TransactionArchive.read_committed/payload`校验owner、first_wire、Reference、committed witness与收件方；`ArchivePayloadReader`仅在None时调用旧reader | 保留最终档案、首次wire和正文鉴权；C03移除None fallback，Prepared/矛盾证据仍拒绝。`MessagingStore`混合业务ACK与旧队列职责，须先最小解耦，不能整类删除 |
+| AI模型与终态恢复 | `DurableGeneration._execute`复用response_received；dispatched/unknown保持provider_result_unknown。finalization claim、evaluation checkpoint/response为后续确定性落库输入 | 保留execution jobs/model_calls、response/checkpoint/artifact、原invocation和终态计划。删除MQRelay不得重做provider或改变attempt；非空恢复的实际执行证明仍归C05-03 |
+| 事务协议及保护 | 四owner的rm_tx_*、精确witness/guard/Checker与native notices仍承担当前一致性和准入保护 | 全部保留，不自动清理未决证据，不改SDK已发布制品；高级人工超限工具仍是独立R01—R03台账 |
+
+本批可删除候选分为旧运行装配（C02）、缺记录后的历史reader/确认fallback（C03）、
+旧离线切换/中间协议工具（C04）。上述候选仍须在对应任务中完成调用与测试覆盖迁移，
+本映射不把候选记成已删除。暂未发现可仅凭名称直接删除的当前业务字段；物理字段/表处置
+归C07，未获具名授权的对象默认保留。C05-02落实必要解耦，C05-03另做非空事实与恢复验证。
