@@ -1,0 +1,559 @@
+{
+  "schema": "m4-c07-policy-retention/v1",
+  "recorded_on": "2026-10-26",
+  "status": "implementation_and_readback_complete_effective_on_merge",
+  "task_leaves": [
+    "C07-01",
+    "C07-02",
+    "C07-03",
+    "C07-04"
+  ],
+  "disposition": "retain_under_policy",
+  "minimum_retention_days": 30,
+  "earliest_disposition_review_at": "2026-11-25T15:19:18.474487+00:00",
+  "automatic_deletion": false,
+  "physical_deletion_authorized": false,
+  "data_and_recovery_owner": "M3 named production data owner",
+  "execution_owner": "infra production maintainer",
+  "next_trigger": "After not-before and all unsettled responsibility is closed, re-inventory exact objects and protection dependencies before any separately scoped physical disposition",
+  "nsq": {
+    "containers": [
+      {
+        "id_sha256": "ae40e4824527e605b483375141b0b23501bd26d028959db5784c8e28e8dcfe14",
+        "image_id": "sha256:1a369c146af71bc95c25d54b375a2b98452478c1eaf4e85f8fcb01da20f2c78a",
+        "name": "nsqd",
+        "original_mounts_preserved": true,
+        "restart": "no",
+        "running": false
+      },
+      {
+        "id_sha256": "0aac6593833f662ecf49b47ce80102eaff6f4054b2f54932bdf1375c0ea86fda",
+        "image_id": "sha256:1a369c146af71bc95c25d54b375a2b98452478c1eaf4e85f8fcb01da20f2c78a",
+        "name": "nsqadmin",
+        "original_mounts_preserved": true,
+        "restart": "no",
+        "running": false
+      },
+      {
+        "id_sha256": "281ad6eae690ddbc34eab5a8fd973eb0f935a4867a886458429f725c3d1d3da8",
+        "image_id": "sha256:1a369c146af71bc95c25d54b375a2b98452478c1eaf4e85f8fcb01da20f2c78a",
+        "name": "nsqlookupd",
+        "original_mounts_preserved": true,
+        "restart": "no",
+        "running": false
+      }
+    ],
+    "data_path": "/data/infra/nsq/data",
+    "data_files": 1519,
+    "data_bytes": 155529092,
+    "data_tree_sha256": "6f72f5614855547ef4bf8d7661846a20c23692065dbe75e66bdc493d5a2171d9",
+    "config_sha256": {
+      "/data/infra/nsq/nsqadmin.conf": "d146b277ed3612622859ff7aa083f4892b0e8ec742840aa7e7386d3755223f3c",
+      "/data/infra/nsq/nsqd.conf": "ca39084e0b48101227ca5c8445bdbbea6943e38c667b166853061ec3c0ad7eea",
+      "/data/infra/nsq/nsqlookupd.conf": "246aece9455a7b6c639f9fbf240fb7abed5522ddc5f8ac61c4f0da01d0f07ffb"
+    },
+    "source_backup_path": "/var/lib/fangcun-m3/windows/20261025081841-2/T35-retirement",
+    "source_backups": [
+      {
+        "bytes": 80974,
+        "name": "0-original.private.bytes",
+        "sha256": "6c2d2f8604182edd9ade4c53bfb9f121def16d3680abdc1d54c0661616d2b055"
+      },
+      {
+        "bytes": 1232,
+        "name": "1-original.private.bytes",
+        "sha256": "1ad7111f33abb42431f6c03f4a9156ff24ccba619c287e539668ee18bd0f9546"
+      },
+      {
+        "bytes": 16632,
+        "name": "2-original.private.bytes",
+        "sha256": "e752cc5220a89b3e5faed89ddeab6656f85c64e948fd8713868134a45098ad3d"
+      }
+    ],
+    "pre_state_sha256": "314e6048782073771dfb5a62f6a399ec67f9436502a1fa03860b47a4f6f66e5a",
+    "offline_authz_channels": 444,
+    "offline_historical_copies": 4364,
+    "not_business_replay_authorization": true,
+    "listeners_and_connections": 0
+  },
+  "backup_copies": [
+    {
+      "archive_members": 14,
+      "bytes": 69492461,
+      "extracted": false,
+      "host": "serverA",
+      "location": "backups/infra/rocketmq/m3-production-window-20261025081841-2/serverA-protection.tar.gz",
+      "mode": "0600",
+      "original_digest_matches": true,
+      "readable_payload_bytes": 75534449,
+      "regular_files": 13,
+      "sha256": "2482d8dfc815b6e83050ad6491abcb7b7e2e9fe4251dbece17975d3a3a214b74"
+    },
+    {
+      "archive_members": 8,
+      "bytes": 1799558,
+      "extracted": false,
+      "host": "serverC",
+      "location": "backups/infra/rocketmq/m3-production-window-20261025081841-2/serverC-protection.tar.gz",
+      "mode": "0600",
+      "original_digest_matches": true,
+      "readable_payload_bytes": 7804730,
+      "regular_files": 8,
+      "sha256": "d2c6fc7426f1ceb04f5648acca3e1c2ab99456ffa4ac88868107c32875a9dfe1"
+    },
+    {
+      "archive_members": 6,
+      "bytes": 25259064,
+      "extracted": false,
+      "host": "serverD",
+      "location": "backups/infra/rocketmq/m3-production-window-20261025081841-2/serverD-protection.tar.gz",
+      "mode": "0600",
+      "original_digest_matches": true,
+      "readable_payload_bytes": 25858698,
+      "regular_files": 6,
+      "sha256": "a7f14362492b6dc7de9d799e661c8bbf82e5652e35f21dc313bedd5c579c634f"
+    }
+  ],
+  "retained_sql_objects": [
+    {
+      "store_alias": "ai",
+      "table": "execution_jobs",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "execution_model_calls",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "interpretation_artifacts",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "interpretation_result_outbox",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "interpretation_runs",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "interpretation_sessions",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "messaging_archive",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "messaging_evaluation_sequences",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "messaging_event_receipts",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "messaging_inbox",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "messaging_native_limit_notices",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "messaging_observations",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "messaging_outbox",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "messaging_quarantine",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "rm_tx_binding",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "rm_tx_execution",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "rm_tx_request",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "ai",
+      "table": "rm_tx_witness",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "iam",
+      "table": "domain_event_outbox",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "iam",
+      "table": "iam_authz_message_protocol",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "iam",
+      "table": "iam_authz_operations",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "iam",
+      "table": "identity_session_revocation_outbox",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "iam",
+      "table": "messaging_native_limit_notices",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "iam",
+      "table": "rm_outbox",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "iam",
+      "table": "rm_tx_binding",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "iam",
+      "table": "rm_tx_execution",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "iam",
+      "table": "rm_tx_request",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "iam",
+      "table": "rm_tx_witness",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "ai_messaging_admission",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "ai_messaging_aggregates",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "ai_messaging_archive",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "ai_messaging_evaluation_states",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "ai_messaging_failures",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "ai_messaging_inbox",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "ai_messaging_observations",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "ai_messaging_operations",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "ai_messaging_outbox",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "ai_messaging_quarantine",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "messaging_native_limit_notices",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "qs_retry_schedule",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "qs_retry_schedule_schema",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "rm_outbox",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "rm_tx_binding",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "rm_tx_execution",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "rm_tx_request",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store_alias": "qs",
+      "table": "rm_tx_witness",
+      "disposition": "retain_all_columns_no_DDL",
+      "source": "C01 schema-only inventory"
+    }
+  ],
+  "retained_mongo_objects": [
+    {
+      "store": "qs.mongo",
+      "collection": "answersheets",
+      "disposition": "retain_all_documents_indexes_options_and_UUID",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store": "qs.mongo",
+      "collection": "interpret_report_artifacts",
+      "disposition": "retain_all_documents_indexes_options_and_UUID",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store": "qs.mongo",
+      "collection": "interpretation_report_templates",
+      "disposition": "retain_all_documents_indexes_options_and_UUID",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store": "qs.mongo",
+      "collection": "report_generations",
+      "disposition": "retain_all_documents_indexes_options_and_UUID",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store": "qs.mongo",
+      "collection": "report_query_catalog",
+      "disposition": "retain_all_documents_indexes_options_and_UUID",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store": "qs.mongo",
+      "collection": "rm_outbox",
+      "disposition": "retain_all_documents_indexes_options_and_UUID",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store": "qs.mongo",
+      "collection": "rm_tx_binding",
+      "disposition": "retain_all_documents_indexes_options_and_UUID",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store": "qs.mongo",
+      "collection": "rm_tx_execution",
+      "disposition": "retain_all_documents_indexes_options_and_UUID",
+      "source": "C01 schema-only inventory"
+    },
+    {
+      "store": "qs.mongo",
+      "collection": "rm_tx_request",
+      "disposition": "retain_all_documents_indexes_options_and_UUID",
+      "source": "C01 schema-only inventory"
+    }
+  ],
+  "current_protected_stores": [
+    {
+      "store": "iam.mysql",
+      "objects": [
+        "rm_tx_binding",
+        "rm_tx_request",
+        "rm_tx_execution",
+        "rm_tx_witness",
+        "iam_authz_operations",
+        "iam_authz_message_protocol",
+        "messaging_native_limit_notices",
+        "identity_session_revocation_outbox"
+      ],
+      "columns": "all",
+      "reason": "Current witness/guard/idempotency/policy operation and Redis session responsibility"
+    },
+    {
+      "store": "qs.mysql",
+      "objects": [
+        "rm_tx_binding",
+        "rm_tx_request",
+        "rm_tx_execution",
+        "rm_tx_witness",
+        "ai_messaging_archive",
+        "ai_messaging_operations",
+        "ai_messaging_inbox",
+        "qs_retry_schedule",
+        "qs_retry_schedule_schema",
+        "messaging_native_limit_notices"
+      ],
+      "columns": "all",
+      "reason": "Original command identity, first ACK, business decision, scheduling authorization and transaction proofs"
+    },
+    {
+      "store": "qs.mongo",
+      "objects": [
+        "rm_tx_binding",
+        "rm_tx_request",
+        "rm_tx_execution",
+        "answersheets",
+        "interpret_report_artifacts",
+        "report_generations",
+        "report_query_catalog",
+        "interpretation_report_templates"
+      ],
+      "columns": "all including embedded event/witness references",
+      "reason": "Original answer/report business fact and Mongo root transaction evidence"
+    },
+    {
+      "store": "ai.mysql",
+      "objects": [
+        "rm_tx_binding",
+        "rm_tx_request",
+        "rm_tx_execution",
+        "rm_tx_witness",
+        "messaging_archive",
+        "messaging_event_receipts",
+        "messaging_inbox",
+        "interpretation_result_outbox",
+        "interpretation_sessions",
+        "interpretation_runs",
+        "interpretation_artifacts",
+        "execution_jobs",
+        "execution_model_calls",
+        "messaging_native_limit_notices"
+      ],
+      "columns": "all",
+      "reason": "Current business ACK/state history, no-model-redo inputs, current inbox/receipt/transaction proofs"
+    }
+  ],
+  "current_or_unsettled_objects_expire": false,
+  "images_and_tools": {
+    "policy": "retain current, previous, pins, all container-referenced images, original tools/plans/locks and rollback custody; no prune or GC",
+    "current_before_M4": "C06 config contract and M3 production release index",
+    "final_M4": "C08 separately freezes final candidates; not deployed by this receipt"
+  },
+  "restore_boundary": {
+    "first_new_runtime_barrier_remains": true,
+    "old_full_backup_must_not_cover_new_facts": true,
+    "restores_performed": false,
+    "forward_fix_and_original_business_authorization_required": true,
+    "backup_readability_is_not_new_production_restore_approval": true
+  },
+  "readback": {
+    "asset_checked_at": "2026-10-26T15:15:30.039272+00:00",
+    "backup_checked_at": "2026-10-26T15:19:18.474487+00:00",
+    "all_container_runtime_unchanged_during_read": true,
+    "all_archive_payloads_read_without_extraction": true,
+    "all_digests_and_permissions_match": true,
+    "production_changed": false,
+    "database_connected": false,
+    "model_called": false,
+    "live_business_rows_queried": false,
+    "backup_payload_streamed_and_discarded": true
+  },
+  "evidence": {
+    "private_assets_sha256": "a5c47b82db7b7a0ee7e4f9b6407595924c47ef1874599457cfdd839e10aae095",
+    "private_backups_sha256": "8550450677166ee64c8ee9178da4b5c134a131f327ba86b3857d70d79256f28c",
+    "audit_source_sha256": {
+      "scripts/ops/m4_retained_nsq_readonly.py": "41c7b45f6e480b06c6c645f44c5d6925988d43fc1c92182afd4ba264b91cf44d",
+      "scripts/ops/m4_retained_backup_readonly.py": "f145da8ed57567f829d597d2d7aec185746b8415c5e60422b0a6b73b07aa7035"
+    },
+    "references": [
+      "rocketmq-m4-c01-inventory-20261025.json",
+      "rocketmq-m3-nsq-retired-20261025.json",
+      "rocketmq-m4-c06-config-contract-20261026.json"
+    ]
+  }
+}
