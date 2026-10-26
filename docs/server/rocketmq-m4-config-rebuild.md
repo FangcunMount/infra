@@ -27,7 +27,7 @@
 
 ## 文件与入口验证
 
-IAM新源路径为 `/data/infra/iam-messaging/versions/<revision>/rocketmq/`；worker为 `/data/infra/qs-worker-messaging/versions/<revision>/rocketmq/`。这些路径是受验源码的目标，**不能推断生产已安装**。QS/AI继续使用各自既有受限版本目录，保持原JOSE文件；API还需完成Mongo凭据挂载与AI桥接一致性预检。
+IAM新源路径为 `/data/infra/iam-messaging/versions/<revision>/rocketmq/`；worker为 `/data/infra/qs-worker-messaging/versions/<revision>/rocketmq/`。这些路径是受验源码的目标，**不能推断生产已安装**。QS/AI继续使用各自既有受限版本目录，保持原JOSE文件；API的Mongo凭据挂载与AI桥接一致性预检已在QS PR447实现，并通过真实标准镜像的十项离线验证；生产新工具与版本材料尚未安装。
 
 重建沿现有C06-D门禁执行：逐个绑定确切源码/镜像、原身份、实际文件摘要与Unix身份/权限，再由真实宿主decoder、离线镜像预检和Compose核对有效配置。缺失、符号链接、权限变化、混合revision、错误owner/路由或预算必须在配置同步、停止或替换运行服务之前拒绝；生产固定root工具只能由已安装的审核摘要选择，不能执行上传目录中的任意root Python。
 
@@ -39,4 +39,4 @@ IAM新源路径为 `/data/infra/iam-messaging/versions/<revision>/rocketmq/`；w
 
 输入元数据覆盖8角色的实际挂载、配置摘要、只读属性及文件身份。首版采集器只读取Go嵌套事务字段，随后补齐Python外层 `messaging.transactions` 并重新只读采集；旧报告保留，不把扫描器缺字段解释为运行owner缺失。初次预算直接比较遇到Go纳秒与YAML时长表示差异，规范单位后相同；失败历史和修正均保留。
 
-剩余既有工作是API完整主机预检、实际私有材料版本及权限验证、缺材料于替换前拒绝、最终八角色配置/镜像重建，以及对应CI和源码合并。详细报告只发布摘要，原始证据保存在0700目录、0600文件中，索引见 [C06证据receipt](evidence/rocketmq-m4-c06-source-progress-20261025.json)。本批没有业务写入、模型调用、DDL、凭据轮换、服务重启或历史资产删除。
+API完整主机预检已有源码与真实离线镜像证据，完整CI/合并单独见总表。剩余C06-D依次为：权威数据库绑定与原配置身份核对、实际私有材料版本及权限准备、五种服务八实例隔离重建、材料故障于替换前拒绝、冻结配置契约与全部PR合并。API单镜像预检不冒充八实例启动、四owner真实回查或生产验收。详细报告只发布摘要，原始证据保存在0700目录、0600文件中，索引见 [C06证据receipt](evidence/rocketmq-m4-c06-source-progress-20261025.json)。本批没有业务写入、模型调用、DDL、凭据轮换、服务重启或历史资产删除。
