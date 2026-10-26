@@ -45,7 +45,7 @@ jobs:
       - name: Exact provenance and no-side-effect fixture protection
         run: |
           set -euo pipefail
-          for test in test_m4_final_image_candidates.py test_m4_image_rebuild.py test_iam_image_start.py test_image_start_provenance.py test_qs_image_pair.py test_qs_consumer_contract.py; do
+          for test in test_m4_final_image_candidates.py test_m4_final_python_dependencies.py test_m4_image_rebuild.py test_iam_image_start.py test_image_start_provenance.py test_qs_image_pair.py test_qs_consumer_contract.py; do
             uv run --no-project --with pyyaml==6.0.2 python -m unittest discover -s scripts/rocketmq -p "$test"
           done
   eight-instances:
