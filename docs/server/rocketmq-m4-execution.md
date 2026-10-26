@@ -138,8 +138,8 @@ C06-B由B01—B05汇总，C06-D由D01—D05汇总。既有源码完成不表示�
 
 | ID | 状态 | 子任务 | 必达验收 |
 | --- | --- | --- | --- |
-| C08-01 | ✅ 已完成 | 最终依赖和文档审计 | 2026-10-27；QS PR454/AI PR231完整CI后合并，实际移除AI旧客户端依赖/无调用CI服务，当前文档与历史范围明确；保留5组例外有责任依据。两档各5668源码用例、18份真实报告及最终八实例18/codec3验证通过；[完整审计与失败历史](evidence/rocketmq-m4-c08-final-audit-20261027.json)。制品/部署/业务另计，随本进度PR合并生效 |
-| C08-02 | ✅ 已完成 | 最终应用候选冻结 | 2026-10-27；[ACR run40371739428](https://github.com/FangcunMount/iam/actions/runs/40371739428)5/0/0；五类原归档在A/D预置，真实保存config/rootfs/关键配置相同、实际engine ID与ACR摘要分记。五项目Compose及环境/原21份材料的27处挂载冻结，API正式离线原生预检/重复冻结/3错误参数拒绝通过；[完整receipt](evidence/rocketmq-m4-c08-final-freeze-20261027.json)。稳定SDK不变、未部署/维护；随本进度PR合并生效 |
+| C08-01 | ✅ 已完成 | 最终依赖和文档审计 | 2026-10-27；QS PR454/AI PR231完整CI后合并，实际移除AI旧客户端依赖/无调用CI服务，当前文档与历史范围明确；保留5组例外有责任依据。两档各5668源码用例、18份真实报告及最终八实例18/codec3验证通过；[完整审计与失败历史](evidence/rocketmq-m4-c08-final-audit-20261027.json)。制品/部署/业务另计，infra PR338已合并a58a6e9aebc42087f1c97534a547a10df6400e8a |
+| C08-02 | ✅ 已完成 | 最终应用候选冻结 | 2026-10-27；[ACR run40371739428](https://github.com/FangcunMount/iam/actions/runs/40371739428)5/0/0；五类原归档在A/D预置，真实保存config/rootfs/关键配置相同、实际engine ID与ACR摘要分记。五项目Compose及环境/原21份材料的27处挂载冻结，API正式离线原生预检/重复冻结/3错误参数拒绝通过；[完整receipt](evidence/rocketmq-m4-c08-final-freeze-20261027.json)。稳定SDK不变、未部署/维护；由[infra PR339](https://github.com/FangcunMount/infra/pull/339)记账，合并后生效 |
 | C08-03 | ☐ 进行中 | 生产执行与恢复演练 | 八实例/准入/关闭/启动/兼容恢复边界明确，实际配置与候选重建一致 |
 | C08-04 | ☐ 待开始 | 受控部署与真实业务回归 | 回读逐实例版本/健康；合法最小用例核对业务事实/witness/消费/receipt，恢复重投不增模型调用 |
 | C08-05 | ☐ 待开始 | 发布索引及任务闭环 | 八父任务门禁满足，合并/镜像/部署/业务/资产/CD最终状态分别记账 |
