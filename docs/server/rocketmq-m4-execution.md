@@ -301,6 +301,6 @@ C08同时准备隔离五类候选：首次构建40351033230仅为候选，QS后�
 
 ### C08推进记录（2026-10-27）
 
-最终候选由[独立清单](../../components/rocketmq/m4-final-image-candidates.json)冻结；[PR335](https://github.com/FangcunMount/infra/pull/335)固定6f7532cca8e85ecb317e8f4896b2a02965f5c712全部检查结束无失败后合并09c1d892（完整SHA以GitHub合并记录为准）。[真实八实例报告](evidence/rocketmq-m4-c08-eight-instance-native-20261027.json)为18项、零失败/跳过、八实例Exit0、零DDL及完整清理；[实际Go codec](evidence/rocketmq-m4-c08-binding-codec-20261027.json)3项通过。原C06阶段候选另行验证，未替换其历史默认值/证据。
+最终候选由[独立清单](../../components/rocketmq/m4-final-image-candidates.json)冻结；[PR335](https://github.com/FangcunMount/infra/pull/335)固定6f7532cca8e85ecb317e8f4896b2a02965f5c712全部检查结束无失败后合并09c1d8984a22a7c6b9135f26b0e568ac54944a50。[真实八实例报告](evidence/rocketmq-m4-c08-eight-instance-native-20261027.json)为18项、零失败/跳过、八实例Exit0、零DDL及完整清理；[实际Go codec](evidence/rocketmq-m4-c08-binding-codec-20261027.json)3项通过。原C06阶段候选另行验证，未替换其历史默认值/证据。
 
 五类镜像已构建，不等于已上传ACR或部署。M4发布采用独立18项报告profile，复用既有传输校验/不可变摘要回读及IAM既有生产环境凭据；不重建应用、不移动SDK标签、不弱化M3完整切换门禁。最终依赖审计、精确生产清单/同协议恢复、root工具安装和system真实业务回归尚未完成，C08五项均不提前勾选。合法system会话待用户解锁并正常登录；其余准备继续。
