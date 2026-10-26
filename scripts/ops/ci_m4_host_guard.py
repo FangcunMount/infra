@@ -134,6 +134,21 @@ m.material_preflight(Path(sys.argv[2]));Path(sys.argv[3]).write_text('would-migr
             if (result.returncode==0)!=accepted or marker.exists()!=accepted:
                 report['private_failure_output_sha256']=hashlib.sha256(result.stdout+result.stderr).hexdigest()
                 report['unexpected_exit_code']=result.returncode
+                # Only fixed error labels, never source bytes or child command output.
+                report['failure_signals']=[label for label in (
+                    'Reviewed material tool unavailable', 'Installed materials not verified',
+                    'M4 material staging refused', 'Invalid frozen messaging file revision',
+                    'Invalid material revision', 'Permission denied', 'unbound variable',
+                    'a password is required', 'not allowed to execute')
+                    if label.encode() in result.stderr]
+                try:
+                    m.verify_installed(role=role,revision=REVISION,host=m.ROLES[role][0])
+                    report['direct_fixture_verification']='verified'
+                except m.Refused as error:
+                    code=str(error)
+                    report['direct_fixture_verification']=code if re.fullmatch('[a-z_]{1,64}',code) else 'refused'
+                except Exception as error:
+                    report['direct_fixture_verification']=type(error).__name__
                 raise AssertionError('host_material_boundary_failed')
             report['cases'].append(current_case)
         @contextlib.contextmanager
