@@ -1,0 +1,285 @@
+{
+  "schema": "rocketmq-m4-c06-root-material-paths/v1",
+  "recorded_on": "2026-10-26",
+  "task": "C06-D03",
+  "completed": false,
+  "completed_subscope": "three host deployment source path contracts merged; actual eight-process reconstruction remains pending",
+  "material_root": "/var/lib/fangcun-m4-materials",
+  "repositories": {
+    "iam": {
+      "pr": "https://github.com/FangcunMount/iam/pull/152",
+      "source_sha": "2b3e3eb8448adcad3f36f154552cb48d569701b5",
+      "merge_sha": "48182c39424573060fda0e27ed6670d2b326f42d",
+      "state": "MERGED",
+      "checks_success": 8,
+      "conditional_jobs_not_triggered": [],
+      "checks_receipt_sha256": "36c6c76eea60540e750ed3ca4e5d317fe4269551c2c52a95a76f40c1a7c6fe8b",
+      "check_urls": [
+        "https://github.com/FangcunMount/iam/actions/runs/40279972161",
+        "https://github.com/FangcunMount/iam/actions/runs/40279973922"
+      ]
+    },
+    "qs-server": {
+      "pr": "https://github.com/FangcunMount/qs-server/pull/448",
+      "source_sha": "9bdf099f06b391ce2dd1c8704d2fa15a5a149409",
+      "merge_sha": "d20436edb363c17f0b177126aebe43a44bc5e082",
+      "state": "MERGED",
+      "checks_success": 29,
+      "conditional_jobs_not_triggered": [
+        "Docs & API Generated Sync"
+      ],
+      "checks_receipt_sha256": "5ab6abd318c3145c5e61c67d23697a2333b3d23d93f0ff2970ed625f89b1e5c1",
+      "check_urls": [
+        "https://github.com/FangcunMount/qs-server/actions/runs/40280623057",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40280624125",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40280624158",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40280624187",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40280624240"
+      ]
+    },
+    "qs-ai": {
+      "pr": "https://github.com/FangcunMount/qs-ai/pull/226",
+      "source_sha": "8d0d226c77af2910c7c2564d5fd8ccf0384f3c7f",
+      "merge_sha": "61ef88ac95800dfd3c0c90fd56c102f7c0e77e8f",
+      "state": "MERGED",
+      "checks_success": 12,
+      "conditional_jobs_not_triggered": [],
+      "checks_receipt_sha256": "01ef3871081ade613885a06b366b83be29109cae0a8d07ed2195dcbc0f3ae671",
+      "check_urls": [
+        "https://github.com/FangcunMount/qs-ai/actions/runs/40280625195"
+      ]
+    }
+  },
+  "source_provenance": {
+    "qs": {
+      "qs_ci": {
+        "sha": "244987a74f6fd02d563ddec7c8a2a5cb29ac6c65",
+        "tree": "20bc81c4d319cdc8df39847b2e29c45a6e83fb94",
+        "parents": [
+          "25318edf88982be040639202295d1966cec72437",
+          "9bdf099f06b391ce2dd1c8704d2fa15a5a149409"
+        ]
+      },
+      "qs_candidate": {
+        "sha": "9bdf099f06b391ce2dd1c8704d2fa15a5a149409",
+        "tree": "20bc81c4d319cdc8df39847b2e29c45a6e83fb94",
+        "parents": [
+          "d9e4f41b074f1c5e5b36e4d74e5d9efdbbddc22e"
+        ]
+      },
+      "qs_merge": {
+        "sha": "d20436edb363c17f0b177126aebe43a44bc5e082",
+        "tree": "20bc81c4d319cdc8df39847b2e29c45a6e83fb94",
+        "parents": [
+          "25318edf88982be040639202295d1966cec72437",
+          "9bdf099f06b391ce2dd1c8704d2fa15a5a149409"
+        ]
+      }
+    },
+    "ai": {
+      "ai_ci": {
+        "sha": "58976d103abe5df194c3ade019f3dec28f8919b0",
+        "tree": "b8e7bb9cc5468ceeaa3c2be555518c5f344df447",
+        "parents": [
+          "eaa22cd92828d7f1c0286339e620c6c087763e0c",
+          "8d0d226c77af2910c7c2564d5fd8ccf0384f3c7f"
+        ]
+      },
+      "ai_candidate": {
+        "sha": "8d0d226c77af2910c7c2564d5fd8ccf0384f3c7f",
+        "tree": "b8e7bb9cc5468ceeaa3c2be555518c5f344df447",
+        "parents": [
+          "231ab32e0add7f7136a378d6ab8725e96e9f2164"
+        ]
+      },
+      "ai_merge": {
+        "sha": "61ef88ac95800dfd3c0c90fd56c102f7c0e77e8f",
+        "tree": "b8e7bb9cc5468ceeaa3c2be555518c5f344df447",
+        "parents": [
+          "eaa22cd92828d7f1c0286339e620c6c087763e0c",
+          "8d0d226c77af2910c7c2564d5fd8ccf0384f3c7f"
+        ]
+      }
+    }
+  },
+  "qs_standard_image_offline_preflight": {
+    "source_sha": "244987a74f6fd02d563ddec7c8a2a5cb29ac6c65",
+    "image_id": "sha256:f42ff46fd936821b8aa49942905ca1e5b146d03c7decfad53f809672c71cfc82",
+    "passed": 10,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "case_ids": [
+      "actual-image-final-binding-and-four-transport-files",
+      "same-image-frozen-config-revalidated",
+      "missing-mongo-credential",
+      "world-readable-mongo-credential",
+      "mutable-mongo-symlink",
+      "duplicate-broker-principal",
+      "canonical-but-wrong-event-owner",
+      "missing-iam-transaction-route",
+      "missing-jose-key",
+      "restored-owned-fixtures-reuse-original-release"
+    ],
+    "offline": true,
+    "network": "none",
+    "normal_application_started": false,
+    "production": false,
+    "metadata_sha256": "c372d1eb9f99024f2351291a9e10922d3cdd83ef77e4a194831710a65f669ca3"
+  },
+  "ai_full_ci": {
+    "reports": [
+      {
+        "artifact": "tests-8.0.36-0-attempt-1",
+        "file": "shard-8.0.36-0.xml",
+        "sha256": "294173a51e48d84b392aefd2393341abd74758dff4e67e6698129faacaf0c5d9",
+        "passed": 1426,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.0.36-1-attempt-1",
+        "file": "shard-8.0.36-1.xml",
+        "sha256": "075ebc0d845876e5772d8a7c2c8ce2ddb7fe7233bc8c2146f491a667d2973c37",
+        "passed": 1426,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.0.36-2-attempt-1",
+        "file": "shard-8.0.36-2.xml",
+        "sha256": "38de183b71d90a91230c1d5e028e37ce7f69b611ea405713e1045560e0426345",
+        "passed": 1426,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.0.36-3-attempt-1",
+        "file": "shard-8.0.36-3.xml",
+        "sha256": "b295c02be4aeb68a48b1f29ffc8b77764d04dee367e66156712c03dbecabd141",
+        "passed": 1425,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.4-0-attempt-1",
+        "file": "shard-8.4-0.xml",
+        "sha256": "b2fa6e24728d8ebe73c79a9dfc7228283a827dab73096eef2cc8aa256f709775",
+        "passed": 1426,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.4-1-attempt-1",
+        "file": "shard-8.4-1.xml",
+        "sha256": "d594a905b3f5c0d030a11d7a6133dd551ebcdabdfdc0b287b1aa864576ddb919",
+        "passed": 1426,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.4-2-attempt-1",
+        "file": "shard-8.4-2.xml",
+        "sha256": "d08ec37b0f8c79f8fde4f9c7fc0745cd0dd311b69be864ae48e91d51d61132e1",
+        "passed": 1426,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "artifact": "tests-8.4-3-attempt-1",
+        "file": "shard-8.4-3.xml",
+        "sha256": "da4dcdb492146fd44d6ce3db8d3e185ede759b343a7e463942274d88be42ad15",
+        "passed": 1425,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "database_case_counts": {
+      "8.0.36": 5703,
+      "8.4": 5703
+    },
+    "total_executions": 11406,
+    "same_test_set": true,
+    "duplicate_cases": 0,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "local_validation": {
+    "iam": {
+      "go_race_packages": [
+        "./scripts/cd",
+        "./internal/apiserver/options"
+      ],
+      "passed": true,
+      "docs_facts_passed": true
+    },
+    "qs": {
+      "host_tests_passed": 17,
+      "go_race_packages": [
+        "./scripts/cd",
+        "./internal/apiserver/maintenance/aimessagingbinding"
+      ],
+      "go_race_passed": true,
+      "docs_tests_passed": 88
+    },
+    "ai": {
+      "last_selected_pytest": {
+        "passed": 109,
+        "failed": 1,
+        "failure": "actual Docker engine case: local daemon unavailable; no daemon or container started"
+      },
+      "docs_tests_passed": 75,
+      "links_checked": 1394,
+      "failure_history_retained": [
+        "initial path contract mismatch between packager and host guard; both updated before complete CI",
+        "initial and final local Docker engine dependency failures retained; the actual case passed in hosted complete CI"
+      ]
+    }
+  },
+  "candidate_build": {
+    "url": "https://github.com/FangcunMount/infra/actions/runs/40282528557",
+    "builder_source_sha": "edb6087ecf260bc7706ffc9fa823b802d94facbd",
+    "targets": [
+      "iam",
+      "qs-api",
+      "qs-collection",
+      "qs-worker",
+      "ai"
+    ],
+    "status_at_recording": "queued",
+    "completed": false,
+    "production": false,
+    "registry_published": false,
+    "business_acceptance": false
+  },
+  "production": {
+    "runtime_deployed": false,
+    "materials_activated": false,
+    "current_pointers_changed": false,
+    "database_changed": false,
+    "credentials_rotated": false,
+    "model_invoked": false,
+    "old_assets_deleted": false,
+    "automatic_cd_resumed": false,
+    "pause_flags": {
+      "iam_PRODUCTION_DEPLOY_PAUSED": "true",
+      "qs_PRODUCTION_DEPLOY_PAUSED": "true",
+      "ai_AUTO_DEPLOY_ENABLED": "false"
+    }
+  },
+  "remaining": [
+    "eight actual isolated instances using current source and real package/configuration entrypoints",
+    "C06-D04 failure before configuration sync/stop for all affected hosts",
+    "C06-D05 merged configuration contract and fixed stage image/material receipts"
+  ],
+  "private_receipt_directory": "/Users/yangshujie/.local/state/fangcun-m4/20261026-c06-bindings/path-contract-ci"
+}
