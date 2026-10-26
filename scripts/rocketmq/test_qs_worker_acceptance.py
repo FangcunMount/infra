@@ -30,6 +30,8 @@ class WorkerRuntimeReceiptTest(unittest.TestCase):
         value=dict(phase='paused_delivery', active=1, waiting=0, holds=0, evidence=0,
                    query_failed=False, consume_outcomes={'hold_failed': 1}, transport_errors={'deadline': 1}, sdk_stack_sites={'subscriber:170': 1}, sdk_stack_truncated=False)
         self.assertEqual(worker_failure_diagnostics('M3_WORKER_DIAGNOSTIC '+json.dumps(value)), value)
+        active=dict(value, phase='active_delivery')
+        self.assertEqual(worker_failure_diagnostics('M3_WORKER_DIAGNOSTIC '+json.dumps(active)),active)
         self.assertIsNone(worker_failure_diagnostics(''))
         for bad in (dict(value, wire='forbidden'),dict(value, phase='arbitrary'),dict(value, active=True),
                     dict(value, consume_outcomes={'identity-label': 1}),dict(value, holds=-1),dict(value,sdk_stack_sites={'raw-body':1}),dict(value,sdk_stack_sites={'subscriber:170':100}),dict(value, transport_errors={'raw-error': 1}),dict(value, transport_errors={'other': 9}),

@@ -35,7 +35,7 @@ jobs:
     env:
       GOWORK: 'off'
       GOTOOLCHAIN: local
-      QS_SHA: ${{ inputs.qs_ref || 'fd9a843236b0d660045f33209a281aec15dc0553' }}
+      QS_SHA: ${{ inputs.qs_ref || '9850d15f0fdc385ca8c5a6dd30e394145ee7a89c' }}
       INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v6
