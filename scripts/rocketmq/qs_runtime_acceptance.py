@@ -5,6 +5,7 @@ import os
 import re
 import secrets
 
+from host_sdk_contract import stable_module_matches
 from iam_acceptance import host_failure_summary
 from m3_resources import manifest
 from provision_v2 import Admin, provision
@@ -41,6 +42,8 @@ PROTECTION_MODULE = ('v0.5.0-rocketmq-tx.4', 'h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8
 
 
 def validate_module(module, protection=False):
+    if stable_module_matches(module):
+        return
     if 'Replace' in module or module.get('Path') != 'github.com/FangcunMount/reliable-messaging':
         raise RuntimeError('fixed published QS SDK without replacement required')
     if protection:
