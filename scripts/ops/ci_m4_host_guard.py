@@ -80,7 +80,7 @@ def main():
             report['sources'][name]=sha
         iam=args.sources/'iam';qs=args.sources/'qs';ai=args.sources/'ai'
         guard=(iam/'scripts/cd/material-guard.sh').read_bytes()
-        assert guard==(qs/'scripts/cd/material-guard.sh').read_bytes()
+        assert guard==(qs/'scripts/cd/material-guard.sh').read_bytes()==(root/'scripts/ops/m4_material_guard.sh').read_bytes()
         assert ('M4_MATERIAL_TOOL_SHA256='+digest).encode() in guard
         assert ('MATERIAL_TOOL_SHA256 = "'+digest+'"').encode() in (ai/'deploy/serverA/deploy.py').read_bytes()
         iam_main=(iam/'scripts/cd/remote-deploy.sh').read_text().split('acquire_image_deploy_lock\n',1)[1]

@@ -20,7 +20,7 @@ jobs:
     env:
       IAM_SHA: 88cae2df3aca4858688d97af11bd0768871d6e97
       QS_SHA: 92d58eaa75377d0030e8e549c16f942bf08f510c
-      AI_SHA: c4c94cb8815bf7dd810567fdeb7507bd3f84fb01
+      AI_SHA: 494dcdef6989270cf17dd7cc599b908c33ebe2b5
       EXPECTED_SOURCE: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v6
