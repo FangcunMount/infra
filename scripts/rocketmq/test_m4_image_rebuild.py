@@ -80,7 +80,10 @@ class M4RebuildContractTest(unittest.TestCase):
         domain=dict(endpoint='broker:8081',transactions={'qs.mysql':owner,'qs.mongo':{'store_id':'other'}},publish_enabled=False)
         original=copy.deepcopy(domain);binding=bridge_binding(domain,'m4-owned-abc')
         self.assertEqual(domain,original)
-        self.assertEqual(binding['rocketmq']['transactions'],{'qs.mysql':owner})
+        expected=copy.deepcopy(owner)
+        expected['limits'].update(check_timeout=2_000_000_000,rpc_timeout=5_000_000_000,
+                                  lease=60_000_000_000,reconcile_interval=5_000_000_000)
+        self.assertEqual(binding['rocketmq']['transactions'],{'qs.mysql':expected})
         self.assertEqual(binding['binding_revision'],'m4-owned-abc')
         self.assertFalse(binding['publish_enabled'])
 

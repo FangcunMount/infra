@@ -9,6 +9,7 @@ on:
       - scripts/rocketmq/image_start_fixture.py
       - scripts/rocketmq/qs_image_pair.py
       - scripts/rocketmq/qs_consumer_contract.py
+      - scripts/rocketmq/image_fixtures/m4_binding_codec.go
       - .github/workflows/rocketmq-m4-rebuild.yml
   workflow_dispatch:
 permissions:
@@ -113,6 +114,38 @@ jobs:
             gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "m3-final-image-metadata-$target-$source_sha-$IMAGE_RUN_ID" --dir ".five-candidates/$target"
             gh run download "$IMAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "m3-final-image-archive-$target-$source_sha-$IMAGE_RUN_ID" --dir ".five-candidates/$target"
           done
+      - name: Actual Go binding codec before database or Broker containers
+        run: |
+          set -euo pipefail
+          umask 077
+          uv run --no-project --with pyyaml==6.0.2 python - <<'PY'
+          import json,sys,os,subprocess
+          from pathlib import Path
+          import yaml
+          sys.path.insert(0,'scripts/rocketmq')
+          from m4_image_rebuild import api_configuration
+          from qs_runtime_configuration import configuration
+          from audit_transaction_limit import write_private
+          source=Path('.five-sources/qs').resolve()
+          root=Path('.m4-codec').resolve();root.mkdir(mode=0o700)
+          base=configuration(yaml.safe_load((source/'configs/apiserver.prod.yaml').read_text()),'api','qs_m3_image_codec','synthetic-only','d'*64)
+          binding=api_configuration(source,base,'m4-owned-codec')
+          write_private(root/'base.json',base);write_private(root/'binding.json',binding)
+          d=source/'scripts/testing/m4_binding_codec';d.mkdir();f=d/'main.go'
+          code=Path('scripts/rocketmq/image_fixtures/m4_binding_codec.go').read_bytes()
+          try:
+              f.write_bytes(code)
+              with Path('m4-binding-codec.json').open('x') as output:
+                  subprocess.run(['go','run','-ldflags','-X github.com/FangcunMount/qs-server/pkg/version.GitCommit='+os.environ['QS_SHA'],
+                      './scripts/testing/m4_binding_codec',str(root/'binding.json'),str(root/'base.json')],cwd=source,stdout=output,check=True)
+          finally:
+              if f.exists():
+                  assert f.read_bytes()==code
+                  f.unlink()
+              d.rmdir()
+          x=json.loads(Path('m4-binding-codec.json').read_bytes())
+          assert x['source_sha']==os.environ['QS_SHA'] and x['passed']==3 and x['failed']==x['skipped']==0
+          PY
       - name: Compile original current-schema and consumer registry fixtures
         run: |
           set -euo pipefail
@@ -170,6 +203,8 @@ jobs:
         if: always()
         with:
           name: m4-eight-instance-rebuild-${{ github.run_id }}-${{ github.run_attempt }}
-          path: m4-eight-instance-rebuild.json
+          path: |
+            m4-eight-instance-rebuild.json
+            m4-binding-codec.json
           if-no-files-found: error
           retention-days: 14

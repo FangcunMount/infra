@@ -36,6 +36,12 @@ def root_action(f, action, *extra):
         f.report['m4_root_failure'] = dict(action=action, exit_code=result.returncode,
             private_output_sha256=hashlib.sha256((result.stdout + result.stderr).encode()).hexdigest(),
             fixed_reasons=reasons[-2:])
+        try:
+            diagnostic = json.loads(result.stdout)
+            if set(diagnostic) == {'schema','failure_kind','source_frames'} and diagnostic['schema'] == 'm4-owned-helper-failure/v1':
+                f.report['m4_root_failure']['diagnostic'] = diagnostic
+        except (ValueError,TypeError):
+            pass
         raise RuntimeError('owned_m4_root_action_failed')
     return json.loads(result.stdout)
 
@@ -87,12 +93,34 @@ def replace_fixture_config(path, value):
 def bridge_binding(domain, revision):
     transport = copy.deepcopy(domain)
     transport['transactions'] = {'qs.mysql': transport['transactions']['qs.mysql']}
+    # Binding JSON is decoded by encoding/json: Go durations are nanoseconds.
+    # YAML/viper duration strings remain in the domain configuration. Convert
+    # only the fixed budget; do not normalize StoreID, epoch or message bytes.
+    limits = transport['transactions']['qs.mysql']['limits']
+    for field, text, nanos in [('check_timeout','2s',2_000_000_000),
+                              ('rpc_timeout','5s',5_000_000_000),
+                              ('lease','60s',60_000_000_000),
+                              ('reconcile_interval','5s',5_000_000_000)]:
+        require(limits[field] == text or (type(limits[field]) is int and limits[field] == nanos),
+                'actual_bridge_fixed_duration_required')
+        limits[field] = nanos
     return dict(binding_revision=revision, enabled=True, provider='rocketmq', publish_enabled=False,
                 rocketmq=transport, max_in_flight=1,
                 signing_key_file='/run/qs-server-jose/qs.sign.fixture.json',
                 decrypt_key_files={'qs.encrypt.fixture': '/run/qs-server-jose/qs.encrypt.fixture.json'},
                 ai_signer_files={'ai.sign.fixture': '/run/qs-server-jose/ai.sign.fixture.json'},
                 ai_recipient_key_file='/run/qs-server-jose/ai.encrypt.fixture.json')
+
+
+def api_configuration(source, config, revision):
+    renderer = load(source / 'scripts/cd/render-api-messaging.py', 'actual_qs_messaging_renderer')
+    env = dict(MESSAGING_PROVIDER='rocketmq', ROCKETMQ_ENDPOINT='broker:8081', ROCKETMQ_INSTANCE_ID='qs-apiserver-1',
+               ROCKETMQ_PUBLISH_ENABLED='false', ROCKETMQ_MYSQL_STORE_ID='isolated-qs-mysql-primary',
+               ROCKETMQ_MYSQL_WRITER_EPOCH='m3-1', ROCKETMQ_MONGO_STORE_ID='isolated-qs-mongo-primary', ROCKETMQ_MONGO_WRITER_EPOCH='m3-1')
+    config['messaging'] = renderer.production_binding(env)
+    subscription = copy.deepcopy(config['messaging']['rocketmq']); subscription.update(transactions={}, publish_enabled=False)
+    config['iam']['authz-sync'].update(provider='rocketmq', rocketmq=subscription)
+    return bridge_binding(config['messaging']['rocketmq'], revision)
 
 
 def configure(f, args, ai_env, case):
@@ -124,14 +152,7 @@ def configure(f, args, ai_env, case):
         ROCKETMQ_STORE_ID='isolated-iam-primary', ROCKETMQ_WRITER_EPOCH='m3-1', ROCKETMQ_PUBLISH_ENABLED='false'))
     replace_fixture_config(iam_path, iam)
     api_path = f.private_dirs['api'] / 'runtime.json'; api = json.loads(api_path.read_bytes())
-    api_renderer = load(args.sources / 'qs/scripts/cd/render-api-messaging.py', 'actual_qs_messaging_renderer')
-    env = dict(MESSAGING_PROVIDER='rocketmq', ROCKETMQ_ENDPOINT='broker:8081', ROCKETMQ_INSTANCE_ID='qs-apiserver-1',
-               ROCKETMQ_PUBLISH_ENABLED='false', ROCKETMQ_MYSQL_STORE_ID='isolated-qs-mysql-primary',
-               ROCKETMQ_MYSQL_WRITER_EPOCH='m3-1', ROCKETMQ_MONGO_STORE_ID='isolated-qs-mongo-primary', ROCKETMQ_MONGO_WRITER_EPOCH='m3-1')
-    api['messaging'] = api_renderer.production_binding(env)
-    subscription = copy.deepcopy(api['messaging']['rocketmq']); subscription.update(transactions={}, publish_enabled=False)
-    api['iam']['authz-sync'].update(provider='rocketmq', rocketmq=subscription)
-    plan['api_binding'] = bridge_binding(api['messaging']['rocketmq'], revision)
+    plan['api_binding'] = api_configuration(args.sources / 'qs', api, revision)
     replace_fixture_config(api_path, api)
     worker_path = f.private_dirs['worker'] / 'runtime.json'; worker = json.loads(worker_path.read_bytes())
     import yaml

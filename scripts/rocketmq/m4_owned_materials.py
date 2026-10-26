@@ -12,6 +12,8 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
+import traceback
 
 from final_image_candidate import ci_guard
 
@@ -159,4 +161,18 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as error:
+        # Export types and source locations only, never exception messages,
+        # command output, credential bytes, configuration or SQL.
+        frames = []
+        workspace = Path(os.environ.get('GITHUB_WORKSPACE', '/nonexistent')).resolve()
+        for frame in traceback.extract_tb(error.__traceback__):
+            try:
+                relative = Path(frame.filename).resolve().relative_to(workspace)
+            except ValueError:
+                continue
+            frames.append(dict(file=str(relative), line=frame.lineno))
+        print(json.dumps(dict(schema='m4-owned-helper-failure/v1', failure_kind=type(error).__name__, source_frames=frames[-8:])))
+        sys.exit(1)
