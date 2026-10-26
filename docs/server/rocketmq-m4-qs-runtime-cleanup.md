@@ -1,6 +1,6 @@
 # M4 QS API/worker 生产消息装配清理
 
-本文记录C02-02范围及替代证明；进度仅由[M4总表](rocketmq-m4-execution.md)维护。验收源码为[QS PR450](https://github.com/FangcunMount/qs-server/pull/450)的`ff9217ca954a8500ac43ff92a2fb7b4d44339ae4`；[infra PR322](https://github.com/FangcunMount/infra/pull/322)提供真实依赖验收。当前待CI，不计完成；源码合并与最终镜像/生产部署分别记账。
+本文记录C02-02范围及替代证明；进度仅由[M4总表](rocketmq-m4-execution.md)维护。验收源码为[QS PR450](https://github.com/FangcunMount/qs-server/pull/450)的`9850d15f0fdc385ca8c5a6dd30e394145ee7a89c`；[infra PR322](https://github.com/FangcunMount/infra/pull/322)提供真实依赖验收。当前待CI，不计完成；源码合并与最终镜像/生产部署分别记账。
 
 ## 当前唯一装配
 
@@ -28,3 +28,9 @@ Worker在资源准备及运行装配入口均拒绝NSQ、发布模式与任何�
 - `run-retired-outbox-contracts.sh`固定不可变历史源码，继续隔离验证旧存储契约，不属于生产启动入口。
 
 本地264项相关race通过且零失败/跳过；integration tags仅编译，不替代真实依赖。infra工具374项单测通过；actionlint和docs-check通过。真实三档门禁结果与合并信息在完成后补入receipt。本批无SSH、生产部署、生产DDL、凭据轮换、业务/模型调用或资产处置；生产CD保持暂停。
+
+## 验证进度与失败保留
+
+报告夹具漏装现行Mongo43治理schema，原保护正确封闭准入；现只在隔离夹具显式安装并核对原生读取，专项14项通过。第二轮两档各65项通过，8.4的worker第二输入在60秒等待处超时；恢复实例尚未经过与暂停实例相同的接收就绪屏障，原诊断还在恢复清理后读取暂停实例。现补齐相同屏障并在清理前读取活跃实例，保留全部五个物理输入、共享1与原60秒断言；三档worker专项各11项通过。此结论不扩展为生产延迟/SLA或SDK吞吐保证。
+
+完整最终矩阵仍待通过；[receipt](evidence/rocketmq-m4-c02-qs-runtime-20261026.json)保留失败、源码、SDK、原始报告摘要和清理结果。中间FD源码的29项CI与当前9850候选CI分别记录，不能混称。当前代码尚未合并或部署，完成数仍17/38。

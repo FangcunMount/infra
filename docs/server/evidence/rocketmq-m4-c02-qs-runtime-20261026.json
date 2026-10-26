@@ -1,0 +1,929 @@
+{
+  "schema": "rocketmq-m4-c02-qs-runtime/v1",
+  "completed": false,
+  "local": {
+    "targeted_race_passed": 264,
+    "targeted_race_failed": 0,
+    "targeted_race_skipped": 0,
+    "infra_harness_unit_passed": 374,
+    "retired_script_argument_cases": 2,
+    "retired_script_external_calls": 0,
+    "integration_tags_compile_only": true,
+    "docs_check": true,
+    "actionlint": true,
+    "source_sha": "ff9217ca954a8500ac43ff92a2fb7b4d44339ae4"
+  },
+  "evidence_sha256": {
+    "red-retirement.log": "036ea5a9a9fe3ec4c3490f8440bd8d8aec36736aa3dc99f2325884837ec3bb15",
+    "target-first.jsonl": "e274c5b2a9a023f5a44014c47e193fbbdfaaeb869b52a945485bd2eb9cc6ed12",
+    "target-final.jsonl": "9e401a4942438e56426628cc7d071d062d0408eb3d132fa5d120a623da48aac0",
+    "target-second.jsonl": "467bdcd334235659b9a6a0f5e72d5249987b7dbaf092d3d3425cf8879dd748d8",
+    "infra-harness-unit.log": "dabbfc25c295c749fdeee6a8ed157edd51cb9ec01067c39529ff50210a0e0132"
+  },
+  "limits": [
+    "Current host-component/real dependency acceptance; no complete production/system or throughput claim",
+    "Real Broker SIGKILL/restart is distinct from producer process-exit proof",
+    "Worker native fixture concurrency is separate from unchanged production concurrency 48",
+    "Legacy isolated helper/reader/schema cleanup remains assigned to C03/C04/C05/C07",
+    "Final images/deployment/business acceptance belong C08"
+  ],
+  "recorded_on": "2026-10-26",
+  "task": "C02-02",
+  "source": {
+    "pr": "https://github.com/FangcunMount/qs-server/pull/450",
+    "baseline": "2844fe9d48f0372d277047fdc8572d5e86250639",
+    "source_sha": "9850d15f0fdc385ca8c5a6dd30e394145ee7a89c",
+    "merge_sha": null,
+    "deleted_files_sha256": {
+      "internal/apiserver/process/standard_event_fair_scan_m4_integration_test.go": "c8d776bf6a084c76b8b1a5a6f1190bd5da3cf68d146b17f1d8ccf2d74b3e94e9",
+      "internal/apiserver/process/standard_event_subsystem_m4_integration_test.go": "025517313c96606dfa8d9ac8ae2ba32178f66ba9ccf3e3a054e39cd6001f4ea3"
+    }
+  },
+  "failure_history": [
+    {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/40308950093",
+      "infra_sha": "16464fb383b8c315183658246b3b817861904b94",
+      "qs_sha": "ff9217ca954a8500ac43ff92a2fb7b4d44339ae4",
+      "conclusion": "failure",
+      "cause": "Report probe installed retry schema but omitted current Mongo native-limit governance migration 43. Owner startup retained Checker while admission protection refused the first reservation.",
+      "fix_sha": "d5ca8d518d358d60753cde734afbdec1ec77bfe2",
+      "fix": "Explicitly install the original migration in the owned fixture, verify authoritative native-limit read, and report early safe error classifications; production guard unchanged.",
+      "profiles": [
+        {
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_runtime_actual_shutdown_and_owned_cleanup": true,
+            "qs_runtime_default_dual_owner_start_full_idle_topics": true,
+            "qs_runtime_explicit_original_schema_no_constructor_ddl": true,
+            "qs_runtime_fresh_paused_instance_actual_broker_checker_commits": true,
+            "qs_runtime_frozen_protocol_inputs_before_roots": true,
+            "qs_runtime_idempotent_observer_preserves_first_wire": true,
+            "qs_runtime_local_committed_final_unknown_both_owners": true,
+            "qs_runtime_original_mysql_and_mongo_facts_witness_atomic": true,
+            "qs_runtime_owner_budget_and_callback_observation": true,
+            "qs_runtime_prepared_halves_hidden_before_original_roots": true,
+            "qs_runtime_real_broker_sigkill_after_commit_before_final_rpc": true,
+            "qs_runtime_real_inflight_close_retains_original_dependencies": true,
+            "qs_runtime_wrong_reference_unknown_without_changed_facts": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.36-ff9217ca954a8500ac43ff92a2fb7b4d44339ae4-40308950093/m4-qs-api.json",
+          "sha256": "007d7fcbc2c0f62b5149bfa26bea14c548421b5102cbd13df8cbb7bb09f86c7b"
+        },
+        {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "failure": "RuntimeError: actual QS report host acceptance failed (private output withheld)",
+          "cases": {},
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.36-ff9217ca954a8500ac43ff92a2fb7b4d44339ae4-40308950093/m4-qs-dispatch.json",
+          "sha256": "6206f8aeb5c78d38a5f736e913a06cd759aa893a9f96165d5b62d8f99b99d082",
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [
+              "TestM3ReportTerminalBrokerHost"
+            ],
+            "assertion_lines": [
+              261
+            ]
+          }
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_deferred_mysql_component_broken_first_link_rolls_back_new_physical_evidence": true,
+            "qs_deferred_mysql_component_durable_eight_attempt_budget_and_one_manual_delivery": true,
+            "qs_deferred_mysql_component_exact_wire_duplicate_and_legacy_refusal": true,
+            "qs_deferred_mysql_component_explicit_schema_required": true,
+            "qs_deferred_mysql_component_real_child_kill_retains_attempt_and_frozen_wire": true,
+            "qs_deferred_mysql_component_real_expiry_new_claim_blocks_old_owner": true,
+            "qs_deferred_mysql_component_sql_lock_budget_does_not_grant_execution": true,
+            "qs_worker_runtime_actual_broker_paused_delivery_preserves_first_wire": true,
+            "qs_worker_runtime_explicit_schema_before_subscription": true,
+            "qs_worker_runtime_original_dispatcher_and_shared_execution_budget": true,
+            "qs_worker_runtime_real_broker_handler_drain_retains_grpc_until_return": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.36-ff9217ca954a8500ac43ff92a2fb7b4d44339ae4-40308950093/m4-qs-worker.json",
+          "sha256": "c652e040a301fc98405fc4a1c6df4527423bd568eed371657026400cd56cb506"
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_runtime_actual_shutdown_and_owned_cleanup": true,
+            "qs_runtime_default_dual_owner_start_full_idle_topics": true,
+            "qs_runtime_explicit_original_schema_no_constructor_ddl": true,
+            "qs_runtime_fresh_paused_instance_actual_broker_checker_commits": true,
+            "qs_runtime_frozen_protocol_inputs_before_roots": true,
+            "qs_runtime_idempotent_observer_preserves_first_wire": true,
+            "qs_runtime_local_committed_final_unknown_both_owners": true,
+            "qs_runtime_original_mysql_and_mongo_facts_witness_atomic": true,
+            "qs_runtime_owner_budget_and_callback_observation": true,
+            "qs_runtime_prepared_halves_hidden_before_original_roots": true,
+            "qs_runtime_real_broker_sigkill_after_commit_before_final_rpc": true,
+            "qs_runtime_real_inflight_close_retains_original_dependencies": true,
+            "qs_runtime_wrong_reference_unknown_without_changed_facts": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.44-ff9217ca954a8500ac43ff92a2fb7b4d44339ae4-40308950093/m4-qs-api.json",
+          "sha256": "1d31b5ed4376f360af7bb4a7f7e467fd6d162ac55acd2ab301eab73f6c8f456d"
+        },
+        {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "failure": "RuntimeError: actual QS report host acceptance failed (private output withheld)",
+          "cases": {},
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.44-ff9217ca954a8500ac43ff92a2fb7b4d44339ae4-40308950093/m4-qs-dispatch.json",
+          "sha256": "89bb94b7cc059efad60c5932b793267da14e215a9f42f7a29829df38851d2ce1",
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [
+              "TestM3ReportTerminalBrokerHost"
+            ],
+            "assertion_lines": [
+              261
+            ]
+          }
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_deferred_mysql_component_broken_first_link_rolls_back_new_physical_evidence": true,
+            "qs_deferred_mysql_component_durable_eight_attempt_budget_and_one_manual_delivery": true,
+            "qs_deferred_mysql_component_exact_wire_duplicate_and_legacy_refusal": true,
+            "qs_deferred_mysql_component_explicit_schema_required": true,
+            "qs_deferred_mysql_component_real_child_kill_retains_attempt_and_frozen_wire": true,
+            "qs_deferred_mysql_component_real_expiry_new_claim_blocks_old_owner": true,
+            "qs_deferred_mysql_component_sql_lock_budget_does_not_grant_execution": true,
+            "qs_worker_runtime_actual_broker_paused_delivery_preserves_first_wire": true,
+            "qs_worker_runtime_explicit_schema_before_subscription": true,
+            "qs_worker_runtime_original_dispatcher_and_shared_execution_budget": true,
+            "qs_worker_runtime_real_broker_handler_drain_retains_grpc_until_return": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.44-ff9217ca954a8500ac43ff92a2fb7b4d44339ae4-40308950093/m4-qs-worker.json",
+          "sha256": "c8afdd619330e55fa16374d163705c97239d37a7da9c858f3e9c6d4e313e5692"
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_runtime_actual_shutdown_and_owned_cleanup": true,
+            "qs_runtime_default_dual_owner_start_full_idle_topics": true,
+            "qs_runtime_explicit_original_schema_no_constructor_ddl": true,
+            "qs_runtime_fresh_paused_instance_actual_broker_checker_commits": true,
+            "qs_runtime_frozen_protocol_inputs_before_roots": true,
+            "qs_runtime_idempotent_observer_preserves_first_wire": true,
+            "qs_runtime_local_committed_final_unknown_both_owners": true,
+            "qs_runtime_original_mysql_and_mongo_facts_witness_atomic": true,
+            "qs_runtime_owner_budget_and_callback_observation": true,
+            "qs_runtime_prepared_halves_hidden_before_original_roots": true,
+            "qs_runtime_real_broker_sigkill_after_commit_before_final_rpc": true,
+            "qs_runtime_real_inflight_close_retains_original_dependencies": true,
+            "qs_runtime_wrong_reference_unknown_without_changed_facts": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.4.11-ff9217ca954a8500ac43ff92a2fb7b4d44339ae4-40308950093/m4-qs-api.json",
+          "sha256": "c270a4a41aba95f275f1f4c7bae48b454ea5833c561ab450dfab9405bf1ee52a"
+        },
+        {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "failure": "RuntimeError: actual QS report host acceptance failed (private output withheld)",
+          "cases": {},
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.4.11-ff9217ca954a8500ac43ff92a2fb7b4d44339ae4-40308950093/m4-qs-dispatch.json",
+          "sha256": "e8990bed6a97a50a31df43e05671befc0c4364ce66a6648f2ad349668a12e0ba",
+          "diagnostics": {
+            "build_failed": false,
+            "test_timeout": false,
+            "race_reports": 0,
+            "race_frames": [],
+            "failed_tests": [
+              "TestM3ReportTerminalBrokerHost"
+            ],
+            "assertion_lines": [
+              261
+            ]
+          }
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_deferred_mysql_component_broken_first_link_rolls_back_new_physical_evidence": true,
+            "qs_deferred_mysql_component_durable_eight_attempt_budget_and_one_manual_delivery": true,
+            "qs_deferred_mysql_component_exact_wire_duplicate_and_legacy_refusal": true,
+            "qs_deferred_mysql_component_explicit_schema_required": true,
+            "qs_deferred_mysql_component_real_child_kill_retains_attempt_and_frozen_wire": true,
+            "qs_deferred_mysql_component_real_expiry_new_claim_blocks_old_owner": true,
+            "qs_deferred_mysql_component_sql_lock_budget_does_not_grant_execution": true,
+            "qs_worker_runtime_actual_broker_paused_delivery_preserves_first_wire": true,
+            "qs_worker_runtime_explicit_schema_before_subscription": true,
+            "qs_worker_runtime_original_dispatcher_and_shared_execution_budget": true,
+            "qs_worker_runtime_real_broker_handler_drain_retains_grpc_until_return": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.4.11-ff9217ca954a8500ac43ff92a2fb7b4d44339ae4-40308950093/m4-qs-worker.json",
+          "sha256": "939a6a5476d702a1a5b7ba584f724d6315ab0f128cfd8b10ad63c34a8e64edd5"
+        }
+      ]
+    },
+    {
+      "type": "local_fixture_regression",
+      "description": "Initial targeted race run retained two worker setup-failure tests on retired NSQ defaults. Fixtures were changed to valid final consume-only configuration so original pool cleanup assertions execute again; final 264 cases passed.",
+      "evidence_sha256": "e274c5b2a9a023f5a44014c47e193fbbdfaaeb869b52a945485bd2eb9cc6ed12"
+    },
+    {
+      "type": "documentation_gate",
+      "description": "After source commits docs-check correctly rejected stale global source baseline. Only the declared baseline and explicitly unchanged aligned migration docs were rebound after checks; current runtime docs remain needs_review.",
+      "latest_corrected_source": "d5ca8d518d358d60753cde734afbdec1ec77bfe2"
+    },
+    {
+      "run": "https://github.com/FangcunMount/infra/actions/runs/40311974256",
+      "infra_sha": "3542dbf0281097972773f550b523d7e08b050db9",
+      "qs_sha": "fd9a843236b0d660045f33209a281aec15dc0553",
+      "profile": "worker/mysql8.4.11",
+      "failure": "Second committed seed did not enter shared dispatch waiting budget within unchanged 60-second observation. Native Broker offset=2, consumer offset=1, inflight=0. Original diagnostic inspected paused instance after active cleanup, so it cannot prove active worker state.",
+      "diagnostics": {
+        "build_failed": false,
+        "test_timeout": false,
+        "race_reports": 0,
+        "race_frames": [],
+        "failed_tests": [
+          "TestM3WorkerRocketMQRuntime"
+        ],
+        "assertion_lines": [
+          88,
+          356
+        ],
+        "worker_state": {
+          "active": 0,
+          "consume_outcomes": {
+            "held": 1
+          },
+          "evidence": 1,
+          "holds": 1,
+          "phase": "paused_delivery",
+          "query_failed": false,
+          "sdk_stack_sites": {},
+          "sdk_stack_truncated": false,
+          "transport_errors": {},
+          "waiting": 0
+        },
+        "seed_topic_offsets": [
+          {
+            "queue": 0,
+            "min_offset": 0,
+            "max_offset": 2
+          }
+        ],
+        "seed_consumer_progress": [
+          {
+            "queue": 0,
+            "broker_offset": 2,
+            "consumer_offset": 1,
+            "diff": 1,
+            "inflight": 0
+          }
+        ]
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "sha256": "efc59d5b471335407a95d4b8cba7586ee5ca31f9e16d53926fe74b16b3b5dbf2",
+      "change": "Await actual successful receives for restarted consumer before second seed; capture live active instance before owned cleanup. All five physical inputs, shared limit one and 60-second assertion unchanged. Root cause verification remains pending the targeted/full reruns.",
+      "fixture_change_sha": "19cf0214fd56e140e361b25eff8150054a8ef35b",
+      "live_diagnostic_change_sha": "f232e634680b9d7751a03625631909c9b6e6e8f4",
+      "profiles": [
+        {
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_runtime_actual_shutdown_and_owned_cleanup": true,
+            "qs_runtime_default_dual_owner_start_full_idle_topics": true,
+            "qs_runtime_explicit_original_schema_no_constructor_ddl": true,
+            "qs_runtime_fresh_paused_instance_actual_broker_checker_commits": true,
+            "qs_runtime_frozen_protocol_inputs_before_roots": true,
+            "qs_runtime_idempotent_observer_preserves_first_wire": true,
+            "qs_runtime_local_committed_final_unknown_both_owners": true,
+            "qs_runtime_original_mysql_and_mongo_facts_witness_atomic": true,
+            "qs_runtime_owner_budget_and_callback_observation": true,
+            "qs_runtime_prepared_halves_hidden_before_original_roots": true,
+            "qs_runtime_real_broker_sigkill_after_commit_before_final_rpc": true,
+            "qs_runtime_real_inflight_close_retains_original_dependencies": true,
+            "qs_runtime_wrong_reference_unknown_without_changed_facts": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.36-fd9a843236b0d660045f33209a281aec15dc0553-40311974256/m4-qs-api.json",
+          "sha256": "984fd0104318259b4bb3ef798bdb6132deb3063cde5daaee3866cb25f833c42d"
+        },
+        {
+          "passed": 41,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_retry_dispatch_evaluation_closed_admission_no_business": true,
+            "qs_retry_dispatch_evaluation_constructor_no_ddl": true,
+            "qs_retry_dispatch_evaluation_exact_frozen_result_recovery": true,
+            "qs_retry_dispatch_evaluation_half_hidden_until_original_outcome_root": true,
+            "qs_retry_dispatch_evaluation_request_cas_wire_and_witness": true,
+            "qs_retry_dispatch_evaluation_request_duplicate_first_wire": true,
+            "qs_retry_dispatch_evaluation_failure_original_root_and_witness": true,
+            "qs_retry_dispatch_evaluation_failure_redelivery_no_extra_attempt_or_input_call": true,
+            "qs_retry_dispatch_evaluation_future_retry_retains_due_authorization_and_wire": true,
+            "qs_retry_dispatch_report_closed_admission_no_business": true,
+            "qs_retry_dispatch_report_committed_reply_discard_recovery": true,
+            "qs_retry_dispatch_report_constructor_no_ddl": true,
+            "qs_retry_dispatch_report_duplicate_first_artifact": true,
+            "qs_retry_dispatch_report_future_retry_preserved": true,
+            "qs_retry_dispatch_report_half_invisible": true,
+            "qs_retry_dispatch_report_native_callback_reentry": true,
+            "qs_retry_dispatch_report_new_instance_exact_recovery": true,
+            "qs_retry_dispatch_report_no_new_publish_outbox": true,
+            "qs_retry_dispatch_report_original_failure_witness": true,
+            "qs_retry_dispatch_report_original_success_witness_wire": true,
+            "qs_retry_dispatch_report_root_abort_atomic": true,
+            "qs_retry_dispatch_report_stale_claim_cannot_commit": true,
+            "qs_retry_dispatch_report_v2_authority_audit": true,
+            "qs_retry_dispatch_qs.mysql_automatic_pause_before_reservation": true,
+            "qs_retry_dispatch_qs.mysql_explicit_retry_same_plan_new_fence": true,
+            "qs_retry_dispatch_qs.mysql_first_wire_and_dispatch_witness": true,
+            "qs_retry_dispatch_qs.mysql_no_business_attempt_or_input_repeat": true,
+            "qs_retry_dispatch_qs.mysql_no_half_before_real_due": true,
+            "qs_retry_dispatch_qs.mysql_old_aborted_evidence_retained": true,
+            "qs_retry_dispatch_qs.mysql_real_root_abort_witness": true,
+            "qs_retry_dispatch_qs.mysql_repeat_dispatch_is_empty": true,
+            "qs_retry_dispatch_qs.mysql_scan_does_not_retry_aborted": true,
+            "qs_retry_dispatch_qs.mongo_automatic_pause_before_reservation": true,
+            "qs_retry_dispatch_qs.mongo_explicit_retry_same_plan_new_fence": true,
+            "qs_retry_dispatch_qs.mongo_first_wire_and_dispatch_witness": true,
+            "qs_retry_dispatch_qs.mongo_no_business_attempt_or_input_repeat": true,
+            "qs_retry_dispatch_qs.mongo_no_half_before_real_due": true,
+            "qs_retry_dispatch_qs.mongo_old_aborted_evidence_retained": true,
+            "qs_retry_dispatch_qs.mongo_real_root_abort_witness": true,
+            "qs_retry_dispatch_qs.mongo_repeat_dispatch_is_empty": true,
+            "qs_retry_dispatch_qs.mongo_scan_does_not_retry_aborted": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.36-fd9a843236b0d660045f33209a281aec15dc0553-40311974256/m4-qs-dispatch.json",
+          "sha256": "01328a97e7474ceaea99377ec93c44ed4d4c47d4bd83807b524b5d92288d9d54"
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_deferred_mysql_component_broken_first_link_rolls_back_new_physical_evidence": true,
+            "qs_deferred_mysql_component_durable_eight_attempt_budget_and_one_manual_delivery": true,
+            "qs_deferred_mysql_component_exact_wire_duplicate_and_legacy_refusal": true,
+            "qs_deferred_mysql_component_explicit_schema_required": true,
+            "qs_deferred_mysql_component_real_child_kill_retains_attempt_and_frozen_wire": true,
+            "qs_deferred_mysql_component_real_expiry_new_claim_blocks_old_owner": true,
+            "qs_deferred_mysql_component_sql_lock_budget_does_not_grant_execution": true,
+            "qs_worker_runtime_actual_broker_paused_delivery_preserves_first_wire": true,
+            "qs_worker_runtime_explicit_schema_before_subscription": true,
+            "qs_worker_runtime_original_dispatcher_and_shared_execution_budget": true,
+            "qs_worker_runtime_real_broker_handler_drain_retains_grpc_until_return": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.36-fd9a843236b0d660045f33209a281aec15dc0553-40311974256/m4-qs-worker.json",
+          "sha256": "471502362900c8079f4f9790532c7fbc18d16181d735fc28ab424e624a81c80a"
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_runtime_actual_shutdown_and_owned_cleanup": true,
+            "qs_runtime_default_dual_owner_start_full_idle_topics": true,
+            "qs_runtime_explicit_original_schema_no_constructor_ddl": true,
+            "qs_runtime_fresh_paused_instance_actual_broker_checker_commits": true,
+            "qs_runtime_frozen_protocol_inputs_before_roots": true,
+            "qs_runtime_idempotent_observer_preserves_first_wire": true,
+            "qs_runtime_local_committed_final_unknown_both_owners": true,
+            "qs_runtime_original_mysql_and_mongo_facts_witness_atomic": true,
+            "qs_runtime_owner_budget_and_callback_observation": true,
+            "qs_runtime_prepared_halves_hidden_before_original_roots": true,
+            "qs_runtime_real_broker_sigkill_after_commit_before_final_rpc": true,
+            "qs_runtime_real_inflight_close_retains_original_dependencies": true,
+            "qs_runtime_wrong_reference_unknown_without_changed_facts": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.44-fd9a843236b0d660045f33209a281aec15dc0553-40311974256/m4-qs-api.json",
+          "sha256": "62b1e1b4868f354001de4afeff4a490c2501bcfe2ca2d4856174cb51b9cbd59b"
+        },
+        {
+          "passed": 41,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_retry_dispatch_evaluation_closed_admission_no_business": true,
+            "qs_retry_dispatch_evaluation_constructor_no_ddl": true,
+            "qs_retry_dispatch_evaluation_exact_frozen_result_recovery": true,
+            "qs_retry_dispatch_evaluation_half_hidden_until_original_outcome_root": true,
+            "qs_retry_dispatch_evaluation_request_cas_wire_and_witness": true,
+            "qs_retry_dispatch_evaluation_request_duplicate_first_wire": true,
+            "qs_retry_dispatch_evaluation_failure_original_root_and_witness": true,
+            "qs_retry_dispatch_evaluation_failure_redelivery_no_extra_attempt_or_input_call": true,
+            "qs_retry_dispatch_evaluation_future_retry_retains_due_authorization_and_wire": true,
+            "qs_retry_dispatch_report_closed_admission_no_business": true,
+            "qs_retry_dispatch_report_committed_reply_discard_recovery": true,
+            "qs_retry_dispatch_report_constructor_no_ddl": true,
+            "qs_retry_dispatch_report_duplicate_first_artifact": true,
+            "qs_retry_dispatch_report_future_retry_preserved": true,
+            "qs_retry_dispatch_report_half_invisible": true,
+            "qs_retry_dispatch_report_native_callback_reentry": true,
+            "qs_retry_dispatch_report_new_instance_exact_recovery": true,
+            "qs_retry_dispatch_report_no_new_publish_outbox": true,
+            "qs_retry_dispatch_report_original_failure_witness": true,
+            "qs_retry_dispatch_report_original_success_witness_wire": true,
+            "qs_retry_dispatch_report_root_abort_atomic": true,
+            "qs_retry_dispatch_report_stale_claim_cannot_commit": true,
+            "qs_retry_dispatch_report_v2_authority_audit": true,
+            "qs_retry_dispatch_qs.mysql_automatic_pause_before_reservation": true,
+            "qs_retry_dispatch_qs.mysql_explicit_retry_same_plan_new_fence": true,
+            "qs_retry_dispatch_qs.mysql_first_wire_and_dispatch_witness": true,
+            "qs_retry_dispatch_qs.mysql_no_business_attempt_or_input_repeat": true,
+            "qs_retry_dispatch_qs.mysql_no_half_before_real_due": true,
+            "qs_retry_dispatch_qs.mysql_old_aborted_evidence_retained": true,
+            "qs_retry_dispatch_qs.mysql_real_root_abort_witness": true,
+            "qs_retry_dispatch_qs.mysql_repeat_dispatch_is_empty": true,
+            "qs_retry_dispatch_qs.mysql_scan_does_not_retry_aborted": true,
+            "qs_retry_dispatch_qs.mongo_automatic_pause_before_reservation": true,
+            "qs_retry_dispatch_qs.mongo_explicit_retry_same_plan_new_fence": true,
+            "qs_retry_dispatch_qs.mongo_first_wire_and_dispatch_witness": true,
+            "qs_retry_dispatch_qs.mongo_no_business_attempt_or_input_repeat": true,
+            "qs_retry_dispatch_qs.mongo_no_half_before_real_due": true,
+            "qs_retry_dispatch_qs.mongo_old_aborted_evidence_retained": true,
+            "qs_retry_dispatch_qs.mongo_real_root_abort_witness": true,
+            "qs_retry_dispatch_qs.mongo_repeat_dispatch_is_empty": true,
+            "qs_retry_dispatch_qs.mongo_scan_does_not_retry_aborted": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.44-fd9a843236b0d660045f33209a281aec15dc0553-40311974256/m4-qs-dispatch.json",
+          "sha256": "d66b24827d8df951000269484cafefdf5446a526cb5a1b006ded2adc6b2c7c50"
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_deferred_mysql_component_broken_first_link_rolls_back_new_physical_evidence": true,
+            "qs_deferred_mysql_component_durable_eight_attempt_budget_and_one_manual_delivery": true,
+            "qs_deferred_mysql_component_exact_wire_duplicate_and_legacy_refusal": true,
+            "qs_deferred_mysql_component_explicit_schema_required": true,
+            "qs_deferred_mysql_component_real_child_kill_retains_attempt_and_frozen_wire": true,
+            "qs_deferred_mysql_component_real_expiry_new_claim_blocks_old_owner": true,
+            "qs_deferred_mysql_component_sql_lock_budget_does_not_grant_execution": true,
+            "qs_worker_runtime_actual_broker_paused_delivery_preserves_first_wire": true,
+            "qs_worker_runtime_explicit_schema_before_subscription": true,
+            "qs_worker_runtime_original_dispatcher_and_shared_execution_budget": true,
+            "qs_worker_runtime_real_broker_handler_drain_retains_grpc_until_return": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.0.44-fd9a843236b0d660045f33209a281aec15dc0553-40311974256/m4-qs-worker.json",
+          "sha256": "e5df564f748f8cb7ad84ad2710ebabad065a7d5e81122463795fa61b275b921c"
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0,
+          "failure": null,
+          "cases": {
+            "qs_runtime_actual_shutdown_and_owned_cleanup": true,
+            "qs_runtime_default_dual_owner_start_full_idle_topics": true,
+            "qs_runtime_explicit_original_schema_no_constructor_ddl": true,
+            "qs_runtime_fresh_paused_instance_actual_broker_checker_commits": true,
+            "qs_runtime_frozen_protocol_inputs_before_roots": true,
+            "qs_runtime_idempotent_observer_preserves_first_wire": true,
+            "qs_runtime_local_committed_final_unknown_both_owners": true,
+            "qs_runtime_original_mysql_and_mongo_facts_witness_atomic": true,
+            "qs_runtime_owner_budget_and_callback_observation": true,
+            "qs_runtime_prepared_halves_hidden_before_original_roots": true,
+            "qs_runtime_real_broker_sigkill_after_commit_before_final_rpc": true,
+            "qs_runtime_real_inflight_close_retains_original_dependencies": true,
+            "qs_runtime_wrong_reference_unknown_without_changed_facts": true
+          },
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.4.11-fd9a843236b0d660045f33209a281aec15dc0553-40311974256/m4-qs-api.json",
+          "sha256": "7d7fac239be7e0bf7a821c7a48ff7bc717514b494c9fe32ca3302937d90c72e4"
+        },
+        {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "failure": "RuntimeError: actual worker runtime native acceptance failed; private output withheld",
+          "cases": {},
+          "cleanup": {
+            "project_containers_remaining": false,
+            "compose_down_succeeded": true,
+            "probe_process_groups_drained": true,
+            "private_fixture_directory_removed": true
+          },
+          "path": "m4-qs-runtime-8.4.11-fd9a843236b0d660045f33209a281aec15dc0553-40311974256/m4-qs-worker.json",
+          "sha256": "efc59d5b471335407a95d4b8cba7586ee5ca31f9e16d53926fe74b16b3b5dbf2"
+        }
+      ],
+      "conclusion": "failure; MySQL8.0.36 and8.0.44 full65-case profiles passed, MySQL8.4.11 worker observation failed and prevented dispatch profile admission"
+    }
+  ],
+  "native": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/40314640918",
+    "infra_sha": "854af825ca7a2d17a781e8f0f5a76a5402b4f55a",
+    "qs_sha": "9850d15f0fdc385ca8c5a6dd30e394145ee7a89c",
+    "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+    "conclusion": "pending"
+  },
+  "production": {
+    "deployed": false,
+    "ddl_executed": false,
+    "credentials_rotated": false,
+    "business_or_model_invoked": false,
+    "historical_assets_deleted": false,
+    "ssh_used": false,
+    "local_docker_used": false,
+    "cd_resumed": false
+  },
+  "fixture_fix_only_paths": [
+    "docs/document-closure.json",
+    "internal/apiserver/container/internal/transaction/m3_report_broker_integration_test.go",
+    "internal/worker/process/rocketmq_native_integration_test.go"
+  ],
+  "report_fix_diagnostic": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/40312079561",
+    "conclusion": "success",
+    "qs_sha": "fd9a843236b0d660045f33209a281aec15dc0553",
+    "fixture_sdk_source_sha": "bfaae2b82ee0d1229b8c965fce472cdf5dec486f",
+    "actual_host_sdk_module": {
+      "Path": "github.com/FangcunMount/reliable-messaging",
+      "Version": "v0.5.0",
+      "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+      "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+    },
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0,
+    "cases": {
+      "qs_report_closed_admission_no_business": true,
+      "qs_report_committed_reply_discard_recovery": true,
+      "qs_report_constructor_no_ddl": true,
+      "qs_report_duplicate_first_artifact": true,
+      "qs_report_future_retry_preserved": true,
+      "qs_report_half_invisible": true,
+      "qs_report_native_callback_reentry": true,
+      "qs_report_new_instance_exact_recovery": true,
+      "qs_report_no_new_publish_outbox": true,
+      "qs_report_original_failure_witness": true,
+      "qs_report_original_success_witness_wire": true,
+      "qs_report_root_abort_atomic": true,
+      "qs_report_stale_claim_cannot_commit": true,
+      "qs_report_v2_authority_audit": true
+    },
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "sha256": "cba3a3dba97519ee40616da4c66305f8426b991e5c198cc901024e384f66a719",
+    "limits": "Focused report host diagnosis on existing main workflow; fixed stable fixture-SDK full matrix remains the completion gate."
+  },
+  "CI": {
+    "source_sha": "9850d15f0fdc385ca8c5a6dd30e394145ee7a89c",
+    "conclusion": "pending"
+  },
+  "worker_fix_diagnostic": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/40314636452",
+    "conclusion": "success",
+    "infra_sha": "854af825ca7a2d17a781e8f0f5a76a5402b4f55a",
+    "qs_sha": "9850d15f0fdc385ca8c5a6dd30e394145ee7a89c",
+    "profiles": [
+      {
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "qs_deferred_mysql_component_broken_first_link_rolls_back_new_physical_evidence": true,
+          "qs_deferred_mysql_component_durable_eight_attempt_budget_and_one_manual_delivery": true,
+          "qs_deferred_mysql_component_exact_wire_duplicate_and_legacy_refusal": true,
+          "qs_deferred_mysql_component_explicit_schema_required": true,
+          "qs_deferred_mysql_component_real_child_kill_retains_attempt_and_frozen_wire": true,
+          "qs_deferred_mysql_component_real_expiry_new_claim_blocks_old_owner": true,
+          "qs_deferred_mysql_component_sql_lock_budget_does_not_grant_execution": true,
+          "qs_worker_runtime_actual_broker_paused_delivery_preserves_first_wire": true,
+          "qs_worker_runtime_explicit_schema_before_subscription": true,
+          "qs_worker_runtime_original_dispatcher_and_shared_execution_budget": true,
+          "qs_worker_runtime_real_broker_handler_drain_retains_grpc_until_return": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "path": "rocketmq-qs-retry-0-1.25.12-854af825ca7a2d17a781e8f0f5a76a5402b4f55a/rocketmq-qs-retry.json",
+        "sha256": "47a02db6bb6dd71de5fb2d771d043869e3546962192819875181bf74f8bcdba6",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "mysql_version": "8.0.36",
+        "fixture_sdk_source_sha": "8de893b367cc797580799abd8325f41dd62356db",
+        "actual_host_sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "worker_native_receipt": {
+          "cases": {
+            "actual_broker_paused_delivery_preserves_first_wire": true,
+            "explicit_schema_before_subscription": true,
+            "original_dispatcher_and_shared_execution_budget": true,
+            "real_broker_handler_drain_retains_grpc_until_return": true
+          },
+          "complete_apiserver_not_claimed": true,
+          "failed": 0,
+          "fixture_observation_budget_ms": 60000,
+          "fixture_shared_limit": 1,
+          "owned_database_dropped": true,
+          "owned_runtime_drained": true,
+          "passed": 4,
+          "paused_observation_ms": 14902,
+          "provider_not_called": true,
+          "scope": "actual worker container/runtime/Broker/MySQL with loopback business RPC fixture",
+          "skipped": 0,
+          "source_sha": "9850d15f0fdc385ca8c5a6dd30e394145ee7a89c",
+          "system_login_not_claimed": true
+        }
+      },
+      {
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "qs_deferred_mysql_component_broken_first_link_rolls_back_new_physical_evidence": true,
+          "qs_deferred_mysql_component_durable_eight_attempt_budget_and_one_manual_delivery": true,
+          "qs_deferred_mysql_component_exact_wire_duplicate_and_legacy_refusal": true,
+          "qs_deferred_mysql_component_explicit_schema_required": true,
+          "qs_deferred_mysql_component_real_child_kill_retains_attempt_and_frozen_wire": true,
+          "qs_deferred_mysql_component_real_expiry_new_claim_blocks_old_owner": true,
+          "qs_deferred_mysql_component_sql_lock_budget_does_not_grant_execution": true,
+          "qs_worker_runtime_actual_broker_paused_delivery_preserves_first_wire": true,
+          "qs_worker_runtime_explicit_schema_before_subscription": true,
+          "qs_worker_runtime_original_dispatcher_and_shared_execution_budget": true,
+          "qs_worker_runtime_real_broker_handler_drain_retains_grpc_until_return": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "path": "rocketmq-qs-retry-1-1.25.12-854af825ca7a2d17a781e8f0f5a76a5402b4f55a/rocketmq-qs-retry.json",
+        "sha256": "25962506db67a0bbda99c0917ce8c7d5aad29ff569abb468c38bcb31a97b2be4",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "mysql_version": "8.0.44",
+        "fixture_sdk_source_sha": "8de893b367cc797580799abd8325f41dd62356db",
+        "actual_host_sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "worker_native_receipt": {
+          "cases": {
+            "actual_broker_paused_delivery_preserves_first_wire": true,
+            "explicit_schema_before_subscription": true,
+            "original_dispatcher_and_shared_execution_budget": true,
+            "real_broker_handler_drain_retains_grpc_until_return": true
+          },
+          "complete_apiserver_not_claimed": true,
+          "failed": 0,
+          "fixture_observation_budget_ms": 60000,
+          "fixture_shared_limit": 1,
+          "owned_database_dropped": true,
+          "owned_runtime_drained": true,
+          "passed": 4,
+          "paused_observation_ms": 29778,
+          "provider_not_called": true,
+          "scope": "actual worker container/runtime/Broker/MySQL with loopback business RPC fixture",
+          "skipped": 0,
+          "source_sha": "9850d15f0fdc385ca8c5a6dd30e394145ee7a89c",
+          "system_login_not_claimed": true
+        }
+      },
+      {
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "qs_deferred_mysql_component_broken_first_link_rolls_back_new_physical_evidence": true,
+          "qs_deferred_mysql_component_durable_eight_attempt_budget_and_one_manual_delivery": true,
+          "qs_deferred_mysql_component_exact_wire_duplicate_and_legacy_refusal": true,
+          "qs_deferred_mysql_component_explicit_schema_required": true,
+          "qs_deferred_mysql_component_real_child_kill_retains_attempt_and_frozen_wire": true,
+          "qs_deferred_mysql_component_real_expiry_new_claim_blocks_old_owner": true,
+          "qs_deferred_mysql_component_sql_lock_budget_does_not_grant_execution": true,
+          "qs_worker_runtime_actual_broker_paused_delivery_preserves_first_wire": true,
+          "qs_worker_runtime_explicit_schema_before_subscription": true,
+          "qs_worker_runtime_original_dispatcher_and_shared_execution_budget": true,
+          "qs_worker_runtime_real_broker_handler_drain_retains_grpc_until_return": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "path": "rocketmq-qs-retry-2-1.25.12-854af825ca7a2d17a781e8f0f5a76a5402b4f55a/rocketmq-qs-retry.json",
+        "sha256": "4aa76678ecf652d1496ce83006495a3c2275df2426998616a192c2395e227e53",
+        "mysql_image": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "mysql_version": "8.4.11",
+        "fixture_sdk_source_sha": "8de893b367cc797580799abd8325f41dd62356db",
+        "actual_host_sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "worker_native_receipt": {
+          "cases": {
+            "actual_broker_paused_delivery_preserves_first_wire": true,
+            "explicit_schema_before_subscription": true,
+            "original_dispatcher_and_shared_execution_budget": true,
+            "real_broker_handler_drain_retains_grpc_until_return": true
+          },
+          "complete_apiserver_not_claimed": true,
+          "failed": 0,
+          "fixture_observation_budget_ms": 60000,
+          "fixture_shared_limit": 1,
+          "owned_database_dropped": true,
+          "owned_runtime_drained": true,
+          "passed": 4,
+          "paused_observation_ms": 29826,
+          "provider_not_called": true,
+          "scope": "actual worker container/runtime/Broker/MySQL with loopback business RPC fixture",
+          "skipped": 0,
+          "source_sha": "9850d15f0fdc385ca8c5a6dd30e394145ee7a89c",
+          "system_login_not_claimed": true
+        }
+      }
+    ],
+    "limits": "Same five inputs, shared fixture budget one, original 60-second assertions. Source runtime/SDK unchanged; standalone workflow uses its old fixture SDK checkout while actual host consumes exact stable module."
+  },
+  "source_ci_history": [
+    {
+      "source_sha": "fd9a843236b0d660045f33209a281aec15dc0553",
+      "successful_checks": 29,
+      "conditional_jobs_not_triggered": [
+        "Docs & API Generated Sync"
+      ],
+      "check_urls": [
+        "https://github.com/FangcunMount/qs-server/actions/runs/40311855331",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40311863441",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40311863462",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40311863468",
+        "https://github.com/FangcunMount/qs-server/actions/runs/40311863625"
+      ],
+      "checks_receipt_sha256": "eff61b79afa814135e9b746d2a2cbf18ff17d4a1c294ea3a114067abc17c8429",
+      "source_native_mysql": [
+        {
+          "profile": "evaluation-original-root-8.0.36-56128180e97380d8eb61828bf12f6f3e182ace9f",
+          "passed_with_subtests": 6,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "c38c7de79fe33b61a48e7f189861901891e384623e33270f8482b991bd1edbed"
+        },
+        {
+          "profile": "evaluation-original-root-8.0.44-56128180e97380d8eb61828bf12f6f3e182ace9f",
+          "passed_with_subtests": 6,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "20dde83f3fcfd5e903ffe26f6745e93fd6796990f3981231e9c1f07a534ba395"
+        },
+        {
+          "profile": "evaluation-original-root-8.4.11-56128180e97380d8eb61828bf12f6f3e182ace9f",
+          "passed_with_subtests": 6,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "cf3defc4463aaaf3fc6e7a9f68faf3e5d711f4459e3b4fa6cd8460306339bbe4"
+        }
+      ]
+    }
+  ]
+}
