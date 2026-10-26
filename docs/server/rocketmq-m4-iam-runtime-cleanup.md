@@ -1,6 +1,6 @@
 # M4 IAM 生产消息装配清理
 
-本文记录C02-01的源码范围、替代证明和保留责任；状态与进度只由[M4总表](rocketmq-m4-execution.md)维护。候选IAM PR154固定为9203ad1802da2cf07daaf380a7c3613930b52134。源码合并不代表最终镜像、生产部署或业务验收。
+本文记录C02-01的源码范围、替代证明和保留责任；状态与进度只由[M4总表](rocketmq-m4-execution.md)维护。IAM PR154验收源码固定为9203ad1802da2cf07daaf380a7c3613930b52134。源码合并不代表最终镜像、生产部署或业务验收。
 
 ## 当前唯一装配
 
@@ -40,6 +40,10 @@
 - 历史Outbox的只读未决检查、原表/卷/迁移和备份；后续职责解耦与资产处置分别归C05/C07。
 - SDK通用NSQ兼容与Mac mini开发依赖。宿主内部孤立SDK helper、旧维护/历史reader与残余测试工具由C03/C04/C05收口，本批不将其误算为当前生产装配。旧MaintenanceStager仍调用RequireOutbox，当前transaction协议数据库会拒绝标准Outbox写入，不能绕开原协议屏障。
 
-本批本地237项相关race通过，1项MySQL并发条件用例未在MacBook启动数据库，改由required原生MySQL执行。三旧脚本的六组参数/副作用边界通过；源码、文档、完整CI、原生报告和合并SHA由最终receipt关联。没有SSH、生产部署、DDL、凭据轮换、业务/模型调用或历史资产删除；IAM/QS暂停与AI自动CD关闭保持。
+本批本地237项相关race通过，1项MySQL并发条件用例未在MacBook启动数据库，改由required原生MySQL执行。三旧脚本的六组参数/副作用边界通过；源码、文档、完整CI、原生报告和合并SHA由最终receipt关联。没有SSH、生产部署、生产DDL、凭据轮换、业务/模型调用或历史资产删除；IAM/QS暂停与AI自动CD关闭保持。
 
-当前候选完整11项CI通过；三档MySQL各原生原生迁移/维护/CLI/受管Assignment并发验证通过，零失败/跳过；真实Broker/owner关闭/fanout矩阵仍以最终receipt为准，不提前计为完成。
+
+
+## 完成证据
+
+[IAM PR154](https://github.com/FangcunMount/iam/pull/154)已合并0420222b7a3f3861d6769919926010e5a67a0aa2，完整11项CI通过；registry发布条件job未触发，不是用例skip。三档源码MySQL门禁各16顶层命名用例通过。[原生矩阵40303004302](https://github.com/FangcunMount/infra/actions/runs/40303004302)三档各35项存储/HTTP用例（含子用例）与22项Broker场景通过，零失败/跳过，所有自有容器、进程组和私有夹具完整清理，原有容器保持。本批owner恢复明确为同进程新实例；原生SDK另有Go/Python真实进程退出回查，不能混成IAM全进程SIGKILL证明。固定SHA、六份原生报告摘要、删除源码摘要及保护范围见[完整receipt](evidence/rocketmq-m4-c02-iam-runtime-20261026.json)。C02-01随infra PR321合并完成，生产应用保持原版。

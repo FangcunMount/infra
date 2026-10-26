@@ -1,0 +1,549 @@
+{
+  "schema": "rocketmq-m4-c02-iam-runtime/v1",
+  "recorded_on": "2026-10-26",
+  "task": "C02-01",
+  "completed": true,
+  "source": {
+    "pr": "https://github.com/FangcunMount/iam/pull/154",
+    "baseline": "ece67552793eee849d035b514d4be672eb4c3c8a",
+    "source_sha": "9203ad1802da2cf07daaf380a7c3613930b52134",
+    "merge_sha": "0420222b7a3f3861d6769919926010e5a67a0aa2",
+    "merged_at": "2026-10-26T10:08:20Z",
+    "state": "MERGED",
+    "deleted_files_sha256": {
+      ".github/workflows/reliable-messaging-m6-image-handoff.yml": "a72f06c71506661b4d10884f0b22d2444c2989b688dc290b8e2fa10c71d3e17c",
+      "cmd/iam-maintenance/reliable_messaging_bootstrap_test.go": "ca6f7f61da5fb9a4b9db41cd95f858a722d8725f464a4fd38f063ce99132b9a8",
+      "internal/apiserver/container/authz/reliable_messaging_business_test.go": "03174f3d9002cd1eeeeddcc79c53c400d4900be34c77022f36d998a3c68963dc",
+      "internal/apiserver/container/platform/reliable_eventing.go": "f6be984f1d7f6d43d3e48789b3cd38cca052a317343a0a7a8c8c31aa797ffcf4",
+      "internal/apiserver/container/platform/rocketmq.go": "32123473b98ff75850a39efd5170af3510b65f39d18719d92e10c8cad03023fd",
+      "internal/apiserver/infra/authz/integration/reliable_messaging_wiring_test.go": "31cc093853b3d6e5ab2992301a3584c4ab4593e9038fee6ad9b34d852d034bba"
+    }
+  },
+  "CI": {
+    "successful_checks": 11,
+    "conditional_jobs_not_triggered": [
+      "Publish reviewed primary image to unique GHCR tag"
+    ],
+    "checks_receipt_sha256": "eba7728bb4a4d3f06c1191c0d795babd38d1e3a13a3ec6f783fce11aa6d8eb90",
+    "check_urls": [
+      "https://github.com/FangcunMount/iam/actions/runs/40302893201",
+      "https://github.com/FangcunMount/iam/actions/runs/40302897211",
+      "https://github.com/FangcunMount/iam/actions/runs/40302897318",
+      "https://github.com/FangcunMount/iam/actions/runs/40302897346",
+      "https://github.com/FangcunMount/iam/actions/runs/40302897348"
+    ],
+    "source_native_mysql": [
+      {
+        "profile": "m3-schema-mysql-8.0.36",
+        "named_tests": 16,
+        "failed": 0,
+        "skipped": 0,
+        "logs": {
+          "m3-maintenance.log": "f07b5bd6f45206967e214914a3ca16b3878ce019d99d5eae3ccdfa35b70eed97",
+          "m3-schema.log": "81b8b70d5baa6b90fd0072da77f459d212147f411f1600e9dc147d4a0f5d7373",
+          "m4-concurrency.log": "111b6caee4b7faced040e99e541d6b3d989eff54ab67c4832f765a6540669f5a",
+          "m3-offline.log": "da141d2a88ac9903cf7abfac888183408f1547a8bb3b036c898952a3052d3215"
+        }
+      },
+      {
+        "profile": "m3-schema-mysql-8.0.44",
+        "named_tests": 16,
+        "failed": 0,
+        "skipped": 0,
+        "logs": {
+          "m3-maintenance.log": "12d3164ce7f0d569e1cc5850818b4d29dc1a4bd9680ed4ccafd6c1e7dd17072d",
+          "m3-schema.log": "1cbd8d1bde10232be8428602926af4a6c74ad8231b8d024f17a260f26694590f",
+          "m4-concurrency.log": "8c60937ce2e39dbf4dbde5803c4f482ffa8d63bc26293f027a9cf5acae28834d",
+          "m3-offline.log": "3fd799d1b652697464cf33d8fa87e9197d484e091334eb20a29a745c438a5575"
+        }
+      },
+      {
+        "profile": "m3-schema-mysql-8.4",
+        "named_tests": 16,
+        "failed": 0,
+        "skipped": 0,
+        "logs": {
+          "m3-maintenance.log": "e1f78646155b0e9a0f0ad1704bc39e8516ff727aedb13a6b6967663c9da56068",
+          "m3-schema.log": "d2aed070bf7360d6ae93f2f2d63639b7c2605d619169b9671239d3f231b3b7ec",
+          "m4-concurrency.log": "241c0711d5952a35edd6d5697ef065e06cf1ebfc7890335b169b7d10eaef8a2d",
+          "m3-offline.log": "68b354af7c6fffcb1d9b37d1fe1279ce14b34eaef9818aaca0d7459c29220c2e"
+        }
+      }
+    ]
+  },
+  "local": {
+    "race_test_passed": 237,
+    "race_test_failed": 0,
+    "conditional_mysql_test_skipped": 1,
+    "conditional_test": "TestReplaceManagedAssignmentsMySQLConcurrentLinearization",
+    "conditional_test_covered_by_required_native_CI": true,
+    "retired_proof_scripts": 3,
+    "script_argument_cases": 6,
+    "script_external_calls": 0,
+    "retired_tag_compile_only": true,
+    "docs_hygiene": true,
+    "docs_facts": true,
+    "docs_release_classification_tests": 3,
+    "actionlint": true
+  },
+  "native": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/40303004302",
+    "workflow_sha": "4c6e51496ff5becff20e7d86df79c6f4402a9211",
+    "iam_sha": "9203ad1802da2cf07daaf380a7c3613930b52134",
+    "qs_sha": "2844fe9d48f0372d277047fdc8572d5e86250639",
+    "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+    "conclusion": "success",
+    "broker_profiles": [
+      {
+        "path": "native-final/rocketmq-iam-host-1-4c6e51496ff5becff20e7d86df79c6f4402a9211/rocketmq-iam-host.json",
+        "sha256": "e4e2b376b09dbc56ece84cc360397d3984bf2bddbd640306f4be1f20f2b7f908",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "mysql_version": "8.0.44",
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "go_untrusted_ca_rejected": true,
+          "go_half_invisible_then_commit_visible": true,
+          "go_rollback_invisible": true,
+          "go_new_process_real_backcheck": true,
+          "go_real_commit_response_discarded": true,
+          "go_db_failure_is_unknown": true,
+          "go_other_owner_witness_cannot_commit": true,
+          "go_wrong_owner_acl_denied": true,
+          "python_untrusted_ca_rejected": true,
+          "python_half_invisible_then_commit_visible": true,
+          "python_rollback_invisible": true,
+          "python_new_process_real_backcheck": true,
+          "python_real_commit_response_discarded": true,
+          "python_db_failure_is_unknown": true,
+          "python_other_owner_witness_cannot_commit": true,
+          "python_wrong_owner_acl_denied": true,
+          "go_to_python_cross_process_recovery": true,
+          "python_to_go_cross_process_recovery": true,
+          "iam_host_actual_sdk_original_root_and_application": true,
+          "iam_two_instances_and_qs_separate_business_subscription": true,
+          "finite_unknown_moves_to_native_discard_topic": true,
+          "exact_committed_identity_set": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "native_receipt": {
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0,
+          "half_invisible": true,
+          "commit_wire_and_witness": true,
+          "application_entry": true,
+          "rollback_hidden": true,
+          "business_result_atomic": true
+        },
+        "runtime_receipt": {
+          "business_executions": 1,
+          "cases": {
+            "actual_owner_start": true,
+            "actual_stop_retains_host_pool": true,
+            "inflight_root_shutdown_incomplete_retains_pool": true,
+            "late_commit_once_with_witness": true,
+            "new_owner_fresh_exact_checker": true,
+            "paused_owner_keeps_checker_and_seals_writes": true
+          },
+          "failed": 0,
+          "full_api_process_fault_or_system_not_claimed": true,
+          "passed": 6,
+          "scope": "actual IAM owner lifecycle and original root; in-process only",
+          "skipped": 0,
+          "source_sha": "9203ad1802da2cf07daaf380a7c3613930b52134"
+        },
+        "qs_fanout": {
+          "source_sha": "2844fe9d48f0372d277047fdc8572d5e86250639",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0",
+            "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "receipt": {
+            "iam_instances": 2,
+            "iam_revocation_observed": true,
+            "qs_notification_received": true,
+            "qs_both_subjects_evicted": true,
+            "qs_primary_proof_verified": true,
+            "qs_subscriber_drained": true,
+            "failed": 0,
+            "skipped": 0
+          },
+          "source_clean_after": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "path": "native-final/rocketmq-iam-host-2-4c6e51496ff5becff20e7d86df79c6f4402a9211/rocketmq-iam-host.json",
+        "sha256": "34ae4fec390901ec39ae6c374ba4a5fe98d8be9158d52d2589e842dc895701f1",
+        "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+        "mysql_version": "8.4.13",
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "go_untrusted_ca_rejected": true,
+          "go_half_invisible_then_commit_visible": true,
+          "go_rollback_invisible": true,
+          "go_new_process_real_backcheck": true,
+          "go_real_commit_response_discarded": true,
+          "go_db_failure_is_unknown": true,
+          "go_other_owner_witness_cannot_commit": true,
+          "go_wrong_owner_acl_denied": true,
+          "python_untrusted_ca_rejected": true,
+          "python_half_invisible_then_commit_visible": true,
+          "python_rollback_invisible": true,
+          "python_new_process_real_backcheck": true,
+          "python_real_commit_response_discarded": true,
+          "python_db_failure_is_unknown": true,
+          "python_other_owner_witness_cannot_commit": true,
+          "python_wrong_owner_acl_denied": true,
+          "go_to_python_cross_process_recovery": true,
+          "python_to_go_cross_process_recovery": true,
+          "iam_host_actual_sdk_original_root_and_application": true,
+          "iam_two_instances_and_qs_separate_business_subscription": true,
+          "finite_unknown_moves_to_native_discard_topic": true,
+          "exact_committed_identity_set": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "native_receipt": {
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0,
+          "half_invisible": true,
+          "commit_wire_and_witness": true,
+          "application_entry": true,
+          "rollback_hidden": true,
+          "business_result_atomic": true
+        },
+        "runtime_receipt": {
+          "business_executions": 1,
+          "cases": {
+            "actual_owner_start": true,
+            "actual_stop_retains_host_pool": true,
+            "inflight_root_shutdown_incomplete_retains_pool": true,
+            "late_commit_once_with_witness": true,
+            "new_owner_fresh_exact_checker": true,
+            "paused_owner_keeps_checker_and_seals_writes": true
+          },
+          "failed": 0,
+          "full_api_process_fault_or_system_not_claimed": true,
+          "passed": 6,
+          "scope": "actual IAM owner lifecycle and original root; in-process only",
+          "skipped": 0,
+          "source_sha": "9203ad1802da2cf07daaf380a7c3613930b52134"
+        },
+        "qs_fanout": {
+          "source_sha": "2844fe9d48f0372d277047fdc8572d5e86250639",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0",
+            "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "receipt": {
+            "iam_instances": 2,
+            "iam_revocation_observed": true,
+            "qs_notification_received": true,
+            "qs_both_subjects_evicted": true,
+            "qs_primary_proof_verified": true,
+            "qs_subscriber_drained": true,
+            "failed": 0,
+            "skipped": 0
+          },
+          "source_clean_after": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "path": "native-final/rocketmq-iam-host-0-4c6e51496ff5becff20e7d86df79c6f4402a9211/rocketmq-iam-host.json",
+        "sha256": "8ca0c48275bb9c3c8829af651b1280ecdf2933db455200f3c1190f77047bc47f",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "mysql_version": "8.0.36",
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "go_untrusted_ca_rejected": true,
+          "go_half_invisible_then_commit_visible": true,
+          "go_rollback_invisible": true,
+          "go_new_process_real_backcheck": true,
+          "go_real_commit_response_discarded": true,
+          "go_db_failure_is_unknown": true,
+          "go_other_owner_witness_cannot_commit": true,
+          "go_wrong_owner_acl_denied": true,
+          "python_untrusted_ca_rejected": true,
+          "python_half_invisible_then_commit_visible": true,
+          "python_rollback_invisible": true,
+          "python_new_process_real_backcheck": true,
+          "python_real_commit_response_discarded": true,
+          "python_db_failure_is_unknown": true,
+          "python_other_owner_witness_cannot_commit": true,
+          "python_wrong_owner_acl_denied": true,
+          "go_to_python_cross_process_recovery": true,
+          "python_to_go_cross_process_recovery": true,
+          "iam_host_actual_sdk_original_root_and_application": true,
+          "iam_two_instances_and_qs_separate_business_subscription": true,
+          "finite_unknown_moves_to_native_discard_topic": true,
+          "exact_committed_identity_set": true
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "native_receipt": {
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0,
+          "half_invisible": true,
+          "commit_wire_and_witness": true,
+          "application_entry": true,
+          "rollback_hidden": true,
+          "business_result_atomic": true
+        },
+        "runtime_receipt": {
+          "business_executions": 1,
+          "cases": {
+            "actual_owner_start": true,
+            "actual_stop_retains_host_pool": true,
+            "inflight_root_shutdown_incomplete_retains_pool": true,
+            "late_commit_once_with_witness": true,
+            "new_owner_fresh_exact_checker": true,
+            "paused_owner_keeps_checker_and_seals_writes": true
+          },
+          "failed": 0,
+          "full_api_process_fault_or_system_not_claimed": true,
+          "passed": 6,
+          "scope": "actual IAM owner lifecycle and original root; in-process only",
+          "skipped": 0,
+          "source_sha": "9203ad1802da2cf07daaf380a7c3613930b52134"
+        },
+        "qs_fanout": {
+          "source_sha": "2844fe9d48f0372d277047fdc8572d5e86250639",
+          "sdk_module": {
+            "Path": "github.com/FangcunMount/reliable-messaging",
+            "Version": "v0.5.0",
+            "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+            "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+          },
+          "receipt": {
+            "iam_instances": 2,
+            "iam_revocation_observed": true,
+            "qs_notification_received": true,
+            "qs_both_subjects_evicted": true,
+            "qs_primary_proof_verified": true,
+            "qs_subscriber_drained": true,
+            "failed": 0,
+            "skipped": 0
+          },
+          "source_clean_after": true
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "storage_HTTP_profiles": [
+      {
+        "path": "native-final/iam-native-root-0-4c6e51496ff5becff20e7d86df79c6f4402a9211/receipt.json",
+        "sha256": "7912358c1b39581c935dfc35b91107ac4232d32d21480540b39dff6c0d1af347",
+        "mysql_version": "8.0.36",
+        "tests": {
+          "pass": 35,
+          "fail": 0,
+          "skip": 0
+        },
+        "required_named_tests": [
+          "TestM3PlannedPolicyNative",
+          "TestM3TransactionMaintenanceConditionRetirement",
+          "TestM3TransactionMaintenanceOperationsCatalog",
+          "TestM3TransactionMaintenanceReviewerScope",
+          "TestM3TransactionMaintenanceRoleModel",
+          "TestM3TransactionMaintenanceScope",
+          "TestM3TransactionSchemaNative",
+          "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+          "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+          "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+          "TestPlannedRoleModelPreviewApplyAndCompensation",
+          "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+        ],
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        },
+        "existing_containers_unchanged": true
+      },
+      {
+        "path": "native-final/iam-native-root-1-4c6e51496ff5becff20e7d86df79c6f4402a9211/receipt.json",
+        "sha256": "05fe0bfcfbac7f26753a5af0c4a2571efbe10316f5eb8d41d1cd8307ca0790d0",
+        "mysql_version": "8.0.44",
+        "tests": {
+          "pass": 35,
+          "fail": 0,
+          "skip": 0
+        },
+        "required_named_tests": [
+          "TestM3PlannedPolicyNative",
+          "TestM3TransactionMaintenanceConditionRetirement",
+          "TestM3TransactionMaintenanceOperationsCatalog",
+          "TestM3TransactionMaintenanceReviewerScope",
+          "TestM3TransactionMaintenanceRoleModel",
+          "TestM3TransactionMaintenanceScope",
+          "TestM3TransactionSchemaNative",
+          "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+          "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+          "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+          "TestPlannedRoleModelPreviewApplyAndCompensation",
+          "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+        ],
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        },
+        "existing_containers_unchanged": true
+      },
+      {
+        "path": "native-final/iam-native-root-2-4c6e51496ff5becff20e7d86df79c6f4402a9211/receipt.json",
+        "sha256": "38097c5e365c9ebf50224e9d707afb31fe388054a54443ae1ab349adc9a2fbad",
+        "mysql_version": "8.4.13",
+        "tests": {
+          "pass": 35,
+          "fail": 0,
+          "skip": 0
+        },
+        "required_named_tests": [
+          "TestM3PlannedPolicyNative",
+          "TestM3TransactionMaintenanceConditionRetirement",
+          "TestM3TransactionMaintenanceOperationsCatalog",
+          "TestM3TransactionMaintenanceReviewerScope",
+          "TestM3TransactionMaintenanceRoleModel",
+          "TestM3TransactionMaintenanceScope",
+          "TestM3TransactionSchemaNative",
+          "TestPlannedCatalogPreviewsNoopAndRejectsDrift",
+          "TestPlannedRetirementPreservesReceiptAndRollbackBoundaries",
+          "TestPlannedReviewerScopeRetainsCredentialsOutsideFrozenInput",
+          "TestPlannedRoleModelPreviewApplyAndCompensation",
+          "TestPlannedScopeCopiesMappingAndPreservesCompensation"
+        ],
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        },
+        "existing_containers_unchanged": true
+      }
+    ],
+    "production": false,
+    "full_API_process_SIGKILL_or_system_acceptance_claimed": false
+  },
+  "unchanged_protected_sources": {
+    "source_sha": "9203ad1802da2cf07daaf380a7c3613930b52134",
+    "baseline": "ece67552793eee849d035b514d4be672eb4c3c8a",
+    "unchanged_protected_paths": [
+      "go.mod",
+      "go.sum",
+      "scripts/cd",
+      "configs",
+      "build/docker",
+      "internal/apiserver/infra/mysql/uow/authz",
+      "internal/apiserver/infra/mysql/authzoperation",
+      "internal/apiserver/infra/mysql/messageprotocol",
+      "internal/apiserver/infra/mysql/messagefailure",
+      "internal/apiserver/container/platform/transaction_eventing.go",
+      "internal/apiserver/container/authz/policy_sync.go"
+    ],
+    "unchanged_revocation_directories": [
+      "internal/apiserver/application/identity/sessionrevocation",
+      "internal/apiserver/infra/mysql/sessionrevocation"
+    ],
+    "config_contract": "C06-D05 reuses identical CD/config/Docker inputs; runtime assembly intentionally changes, final image is C08",
+    "production": false
+  },
+  "acceptance_mapping": "See ../rocketmq-m4-iam-runtime-cleanup.md; no replacement claim for intentionally retired NSQ/schema40 rollback behavior",
+  "retained": {
+    "transaction_and_operation_journal": true,
+    "first_wire_and_exact_policy_version": true,
+    "checker_and_original_binding": true,
+    "current_RocketMQ_failure_audit": true,
+    "identity_Redis_revocation_outbox": true,
+    "readonly_historical_unresolved_work_guard": true,
+    "logical_subscription_and_worker_budgets_unchanged": true,
+    "SDK_general_NSQ_compatibility_and_Mac_mini_development": true
+  },
+  "remaining": {
+    "C02": "QS/AI runtime and three-host aggregate",
+    "C03_C04_C05": "isolated host SDK helpers, old reader/maintenance/tools and necessary business decoupling; not active production assembly",
+    "C07": "historical physical retention/disposal",
+    "C08": "final cleaned images, installed host tool/configuration and controlled production/business acceptance"
+  },
+  "failure_and_supersession_history": [
+    {
+      "kind": "expected red before implementation",
+      "source": "ece67552793eee849d035b514d4be672eb4c3c8a",
+      "scope": "retired selection and proof-script side-effect tests",
+      "evidence": "red-refusal.log and red-script-refusal.log"
+    },
+    {
+      "kind": "documentation verification failure corrected",
+      "scope": "two deleted-source links",
+      "result": "current transaction source links replace removed Relay assembler"
+    },
+    {
+      "kind": "scope correction before final gate",
+      "source_sha": "fa79cfd1b8f65034a6ae10bc32ed0a32feb36edd",
+      "description": "Initial CI revealed active old NSQ image-handoff workflow. Retired workflow/script, kept original current transaction tests and restarted exact final candidate validation.",
+      "superseded_infra_run": "40302679249",
+      "superseded_source_runs": [
+        "40302679759",
+        "40302679809"
+      ],
+      "superseded_runs_not_counted_as_acceptance": true
+    }
+  ],
+  "production": {
+    "SSH_used": false,
+    "application_deployed": false,
+    "database_DDL": false,
+    "credentials_rotated": false,
+    "business_or_model_called": false,
+    "old_assets_deleted": false,
+    "automatic_CD_resumed": false
+  },
+  "progress_effective_on_PR321_merge": {
+    "leaf_completed": 17,
+    "leaf_total": 38,
+    "parent_completed": 2,
+    "parent_total": 8,
+    "C02_leaf_completed": 1,
+    "C02_leaf_total": 4,
+    "C06_gates": "4/4"
+  },
+  "private_evidence": "/Users/yangshujie/.local/state/fangcun-m4/20261026-c02-iam"
+}
