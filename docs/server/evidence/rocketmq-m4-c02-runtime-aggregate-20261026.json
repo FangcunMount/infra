@@ -1,0 +1,1027 @@
+{
+  "schema": "fangcun-m4-c02-runtime-aggregate/v1",
+  "recorded_on": "2026-10-26",
+  "task": "C02-04",
+  "completed": true,
+  "sources": {
+    "iam": "0420222b7a3f3861d6769919926010e5a67a0aa2",
+    "qs": "ca1158ca472d42e7c58e067e170b116364b1d8ea",
+    "ai": "a2f192733312fef591bb9be24e5e3892e470420e",
+    "infra": "8c798db7c5f71c968740e6f0bcb7e5179392e811",
+    "sdk": "1345266aa0e864c46de5d1e3e3c939dd8002a890"
+  },
+  "iam_qs": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/40326990299",
+    "broker_profiles": [
+      {
+        "artifact": "rocketmq-iam-host-0-8c798db7c5f71c968740e6f0bcb7e5179392e811",
+        "sha256": "4da50ae8047cc1efd355e11e54e57a42e35e6938366fa8c4597a144edac6f863",
+        "broker_digest": "sha256:7cd07246a834877f821d7e3260dffb4bbee883ecac5fa09260d8ea2e16adcf0b",
+        "mysql_digest": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "mysql_version": "8.0.36",
+        "passed_facts": 22,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "go_untrusted_ca_rejected": true,
+          "go_half_invisible_then_commit_visible": true,
+          "go_rollback_invisible": true,
+          "go_new_process_real_backcheck": true,
+          "go_real_commit_response_discarded": true,
+          "go_db_failure_is_unknown": true,
+          "go_other_owner_witness_cannot_commit": true,
+          "go_wrong_owner_acl_denied": true,
+          "python_untrusted_ca_rejected": true,
+          "python_half_invisible_then_commit_visible": true,
+          "python_rollback_invisible": true,
+          "python_new_process_real_backcheck": true,
+          "python_real_commit_response_discarded": true,
+          "python_db_failure_is_unknown": true,
+          "python_other_owner_witness_cannot_commit": true,
+          "python_wrong_owner_acl_denied": true,
+          "go_to_python_cross_process_recovery": true,
+          "python_to_go_cross_process_recovery": true,
+          "iam_host_actual_sdk_original_root_and_application": true,
+          "iam_two_instances_and_qs_separate_business_subscription": true,
+          "finite_unknown_moves_to_native_discard_topic": true,
+          "exact_committed_identity_set": true
+        },
+        "runtime_receipt": {
+          "business_executions": 1,
+          "cases": {
+            "actual_owner_start": true,
+            "actual_stop_retains_host_pool": true,
+            "inflight_root_shutdown_incomplete_retains_pool": true,
+            "late_commit_once_with_witness": true,
+            "new_owner_fresh_exact_checker": true,
+            "paused_owner_keeps_checker_and_seals_writes": true
+          },
+          "failed": 0,
+          "full_api_process_fault_or_system_not_claimed": true,
+          "passed": 6,
+          "scope": "actual IAM owner lifecycle and original root; in-process only",
+          "skipped": 0,
+          "source_sha": "0420222b7a3f3861d6769919926010e5a67a0aa2"
+        },
+        "fanout": {
+          "iam_instances": 2,
+          "iam_revocation_observed": true,
+          "qs_notification_received": true,
+          "qs_both_subjects_evicted": true,
+          "qs_primary_proof_verified": true,
+          "qs_subscriber_drained": true,
+          "failed": 0,
+          "skipped": 0
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "rocketmq-iam-host-1-8c798db7c5f71c968740e6f0bcb7e5179392e811",
+        "sha256": "fff970bb6f2a8f62c07d50239de41b163f43ab0fafd493308ba7b5d62821e823",
+        "broker_digest": "sha256:d5db75138c49896ab9832fd428835c9202b0e92a7a32dcf5fa22ea76da7d3d6b",
+        "mysql_digest": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "mysql_version": "8.0.44",
+        "passed_facts": 22,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "go_untrusted_ca_rejected": true,
+          "go_half_invisible_then_commit_visible": true,
+          "go_rollback_invisible": true,
+          "go_new_process_real_backcheck": true,
+          "go_real_commit_response_discarded": true,
+          "go_db_failure_is_unknown": true,
+          "go_other_owner_witness_cannot_commit": true,
+          "go_wrong_owner_acl_denied": true,
+          "python_untrusted_ca_rejected": true,
+          "python_half_invisible_then_commit_visible": true,
+          "python_rollback_invisible": true,
+          "python_new_process_real_backcheck": true,
+          "python_real_commit_response_discarded": true,
+          "python_db_failure_is_unknown": true,
+          "python_other_owner_witness_cannot_commit": true,
+          "python_wrong_owner_acl_denied": true,
+          "go_to_python_cross_process_recovery": true,
+          "python_to_go_cross_process_recovery": true,
+          "iam_host_actual_sdk_original_root_and_application": true,
+          "iam_two_instances_and_qs_separate_business_subscription": true,
+          "finite_unknown_moves_to_native_discard_topic": true,
+          "exact_committed_identity_set": true
+        },
+        "runtime_receipt": {
+          "business_executions": 1,
+          "cases": {
+            "actual_owner_start": true,
+            "actual_stop_retains_host_pool": true,
+            "inflight_root_shutdown_incomplete_retains_pool": true,
+            "late_commit_once_with_witness": true,
+            "new_owner_fresh_exact_checker": true,
+            "paused_owner_keeps_checker_and_seals_writes": true
+          },
+          "failed": 0,
+          "full_api_process_fault_or_system_not_claimed": true,
+          "passed": 6,
+          "scope": "actual IAM owner lifecycle and original root; in-process only",
+          "skipped": 0,
+          "source_sha": "0420222b7a3f3861d6769919926010e5a67a0aa2"
+        },
+        "fanout": {
+          "iam_instances": 2,
+          "iam_revocation_observed": true,
+          "qs_notification_received": true,
+          "qs_both_subjects_evicted": true,
+          "qs_primary_proof_verified": true,
+          "qs_subscriber_drained": true,
+          "failed": 0,
+          "skipped": 0
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "rocketmq-iam-host-2-8c798db7c5f71c968740e6f0bcb7e5179392e811",
+        "sha256": "c951d795675aec47c1257fbc08487a04017a35946494f53a24765b25e1b4a3a9",
+        "broker_digest": "sha256:2bd564aeb22f0cb2b08289c7c0298f4358e1859b6933415104af5459e6fd97d9",
+        "mysql_digest": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+        "mysql_version": "8.4.13",
+        "passed_facts": 22,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "go_untrusted_ca_rejected": true,
+          "go_half_invisible_then_commit_visible": true,
+          "go_rollback_invisible": true,
+          "go_new_process_real_backcheck": true,
+          "go_real_commit_response_discarded": true,
+          "go_db_failure_is_unknown": true,
+          "go_other_owner_witness_cannot_commit": true,
+          "go_wrong_owner_acl_denied": true,
+          "python_untrusted_ca_rejected": true,
+          "python_half_invisible_then_commit_visible": true,
+          "python_rollback_invisible": true,
+          "python_new_process_real_backcheck": true,
+          "python_real_commit_response_discarded": true,
+          "python_db_failure_is_unknown": true,
+          "python_other_owner_witness_cannot_commit": true,
+          "python_wrong_owner_acl_denied": true,
+          "go_to_python_cross_process_recovery": true,
+          "python_to_go_cross_process_recovery": true,
+          "iam_host_actual_sdk_original_root_and_application": true,
+          "iam_two_instances_and_qs_separate_business_subscription": true,
+          "finite_unknown_moves_to_native_discard_topic": true,
+          "exact_committed_identity_set": true
+        },
+        "runtime_receipt": {
+          "business_executions": 1,
+          "cases": {
+            "actual_owner_start": true,
+            "actual_stop_retains_host_pool": true,
+            "inflight_root_shutdown_incomplete_retains_pool": true,
+            "late_commit_once_with_witness": true,
+            "new_owner_fresh_exact_checker": true,
+            "paused_owner_keeps_checker_and_seals_writes": true
+          },
+          "failed": 0,
+          "full_api_process_fault_or_system_not_claimed": true,
+          "passed": 6,
+          "scope": "actual IAM owner lifecycle and original root; in-process only",
+          "skipped": 0,
+          "source_sha": "0420222b7a3f3861d6769919926010e5a67a0aa2"
+        },
+        "fanout": {
+          "iam_instances": 2,
+          "iam_revocation_observed": true,
+          "qs_notification_received": true,
+          "qs_both_subjects_evicted": true,
+          "qs_primary_proof_verified": true,
+          "qs_subscriber_drained": true,
+          "failed": 0,
+          "skipped": 0
+        },
+        "sdk_module": {
+          "Path": "github.com/FangcunMount/reliable-messaging",
+          "Version": "v0.5.0",
+          "Sum": "h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=",
+          "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "storage_profiles": [
+      {
+        "artifact": "iam-native-root-0-8c798db7c5f71c968740e6f0bcb7e5179392e811",
+        "sha256": "b069c356af592944113c4b5d266d586602d4325a55e5ed9d0d36dd1ba47e8c31",
+        "source_sha": "0420222b7a3f3861d6769919926010e5a67a0aa2",
+        "mysql_version": "8.0.36",
+        "tests": {
+          "pass": 35,
+          "fail": 0,
+          "skip": 0
+        },
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        }
+      },
+      {
+        "artifact": "iam-native-root-1-8c798db7c5f71c968740e6f0bcb7e5179392e811",
+        "sha256": "d9b86fc31c29fd9bc039f45280775f10702b7e1d84633804b40580931d6540a6",
+        "source_sha": "0420222b7a3f3861d6769919926010e5a67a0aa2",
+        "mysql_version": "8.0.44",
+        "tests": {
+          "pass": 35,
+          "fail": 0,
+          "skip": 0
+        },
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        }
+      },
+      {
+        "artifact": "iam-native-root-2-8c798db7c5f71c968740e6f0bcb7e5179392e811",
+        "sha256": "df5a2c42f1a76f59a1a68988ec40cb118a12eb1264c2506fd2f2d0072bd763bb",
+        "source_sha": "0420222b7a3f3861d6769919926010e5a67a0aa2",
+        "mysql_version": "8.4.13",
+        "tests": {
+          "pass": 35,
+          "fail": 0,
+          "skip": 0
+        },
+        "cleanup": {
+          "owned_containers_remaining": false,
+          "private_fixture_removed": true
+        }
+      }
+    ]
+  },
+  "qs_ai": {
+    "run": "https://github.com/FangcunMount/infra/actions/runs/40326981798",
+    "profiles": [
+      {
+        "artifact": "m4-ai-runtime-3.11-8.0.36-a2f192733312fef591bb9be24e5e3892e470420e-40326981798",
+        "sha256": "22ace8f2a45f87d98f234dadfea41b3e35b7975c6645e7b6e86bb772789f5571",
+        "broker_digest": "sha256:03d95a8767c0c4c74526710fe9a987d70822021c4097f23b8181b980d5fe9f7f",
+        "mysql_digest": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "python": "3.11.16",
+        "tests": 7,
+        "passed_facts": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "paired_half_ack_before_actual_mq_disconnect": true,
+          "paired_old_local_committed_final_unknown": true,
+          "paired_producer_sigkill_exit_negative9": true,
+          "paired_same_primary_epoch_readonly_resume_no_new_half": true,
+          "paired_new_paused_broker_commit_callback": true,
+          "paired_same_first_command_wire_after_resume": true,
+          "paired_recovered_pair_receipt_state_ack_without_model": true,
+          "paired_ai_half_prepared_before_broker_kill": true,
+          "paired_actual_final_rpc_unknown_after_committed_root": true,
+          "paired_broker_sigkill_and_same_container_restart": true,
+          "paired_broker_recheck_original_ai_first_wire": true,
+          "paired_pair_both_business_acks_without_executor_replay": true,
+          "paired_no_additional_model_or_old_business_executor": true,
+          "paired_recovered_process_resources_drained": true,
+          "paired_broker_fault_resources_drained": true,
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "fault_proof": {
+          "qs_sigkill": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": -9,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_loss": 1,
+            "proxy_stopped_before_root_release": true,
+            "original_root_lock_wait_observed": true,
+            "old_exit_code": -9,
+            "distinct_producer_pid": true,
+            "old_seals": 1,
+            "recovered_completed_results": 0,
+            "recovered_half_prepared": 0,
+            "recovered_broker_commit_checks": 1,
+            "original_wire_unchanged": true,
+            "final_recovered_seals": 2,
+            "provider_invocations": 0
+          },
+          "broker_restart": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": 0,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_kill": 2,
+            "local_calls_before_kill": 0,
+            "qs_consumer_restarted": true,
+            "original_go_local_results": 1,
+            "old_go_seals": 1,
+            "recovered_go_half_before_open": 0,
+            "recovered_go_results_before_open": 0,
+            "original_go_wire_preserved": true,
+            "distinct_go_pid": true,
+            "local_calls": 1,
+            "half_prepared": 2,
+            "actual_final_unknown": 2,
+            "pending_calls": 0,
+            "checks_drained_before_restart": true,
+            "original_host_failed_and_drained": true,
+            "recovered_committed_references": 2,
+            "recovered_half_prepared": 0,
+            "recovered_completed_results": 0,
+            "new_host_runtime": true,
+            "broker_commit_checks": 2,
+            "final_recovered_go_seals": 2,
+            "checker_callback_errors": 0,
+            "provider_invocations": 0
+          }
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "m4-ai-runtime-3.11-8.0.44-a2f192733312fef591bb9be24e5e3892e470420e-40326981798",
+        "sha256": "fb39ca59a04a8d9d8ca6660003335914bfa71509b69f05c2f23233cf456e9a59",
+        "broker_digest": "sha256:1b651a0c81d5fedb9d35aecbed28bfb95fb8a03f143ddabdc9d84ea3cdc163d8",
+        "mysql_digest": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "python": "3.11.16",
+        "tests": 7,
+        "passed_facts": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "paired_half_ack_before_actual_mq_disconnect": true,
+          "paired_old_local_committed_final_unknown": true,
+          "paired_producer_sigkill_exit_negative9": true,
+          "paired_same_primary_epoch_readonly_resume_no_new_half": true,
+          "paired_new_paused_broker_commit_callback": true,
+          "paired_same_first_command_wire_after_resume": true,
+          "paired_recovered_pair_receipt_state_ack_without_model": true,
+          "paired_ai_half_prepared_before_broker_kill": true,
+          "paired_actual_final_rpc_unknown_after_committed_root": true,
+          "paired_broker_sigkill_and_same_container_restart": true,
+          "paired_broker_recheck_original_ai_first_wire": true,
+          "paired_pair_both_business_acks_without_executor_replay": true,
+          "paired_no_additional_model_or_old_business_executor": true,
+          "paired_recovered_process_resources_drained": true,
+          "paired_broker_fault_resources_drained": true,
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "fault_proof": {
+          "qs_sigkill": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": -9,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_loss": 1,
+            "proxy_stopped_before_root_release": true,
+            "original_root_lock_wait_observed": true,
+            "old_exit_code": -9,
+            "distinct_producer_pid": true,
+            "old_seals": 1,
+            "recovered_completed_results": 0,
+            "recovered_half_prepared": 0,
+            "recovered_broker_commit_checks": 1,
+            "original_wire_unchanged": true,
+            "final_recovered_seals": 2,
+            "provider_invocations": 0
+          },
+          "broker_restart": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": 0,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_kill": 2,
+            "local_calls_before_kill": 0,
+            "qs_consumer_restarted": true,
+            "original_go_local_results": 1,
+            "old_go_seals": 1,
+            "recovered_go_half_before_open": 0,
+            "recovered_go_results_before_open": 0,
+            "original_go_wire_preserved": true,
+            "distinct_go_pid": true,
+            "local_calls": 1,
+            "half_prepared": 2,
+            "actual_final_unknown": 2,
+            "pending_calls": 0,
+            "checks_drained_before_restart": true,
+            "original_host_failed_and_drained": true,
+            "recovered_committed_references": 2,
+            "recovered_half_prepared": 0,
+            "recovered_completed_results": 0,
+            "new_host_runtime": true,
+            "broker_commit_checks": 2,
+            "final_recovered_go_seals": 2,
+            "checker_callback_errors": 0,
+            "provider_invocations": 0
+          }
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "m4-ai-runtime-3.11-8.4.11-a2f192733312fef591bb9be24e5e3892e470420e-40326981798",
+        "sha256": "82df5edcfd2831768e8451c4c8a473d2056abe295dc14e28f295163d0aaec73b",
+        "broker_digest": "sha256:12e508b988c2598ecd78de4d170d9d0b2b01f12b3bbc9faa461b8ec5192af674",
+        "mysql_digest": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "python": "3.11.16",
+        "tests": 7,
+        "passed_facts": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "paired_half_ack_before_actual_mq_disconnect": true,
+          "paired_old_local_committed_final_unknown": true,
+          "paired_producer_sigkill_exit_negative9": true,
+          "paired_same_primary_epoch_readonly_resume_no_new_half": true,
+          "paired_new_paused_broker_commit_callback": true,
+          "paired_same_first_command_wire_after_resume": true,
+          "paired_recovered_pair_receipt_state_ack_without_model": true,
+          "paired_ai_half_prepared_before_broker_kill": true,
+          "paired_actual_final_rpc_unknown_after_committed_root": true,
+          "paired_broker_sigkill_and_same_container_restart": true,
+          "paired_broker_recheck_original_ai_first_wire": true,
+          "paired_pair_both_business_acks_without_executor_replay": true,
+          "paired_no_additional_model_or_old_business_executor": true,
+          "paired_recovered_process_resources_drained": true,
+          "paired_broker_fault_resources_drained": true,
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "fault_proof": {
+          "qs_sigkill": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": -9,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_loss": 1,
+            "proxy_stopped_before_root_release": true,
+            "original_root_lock_wait_observed": true,
+            "old_exit_code": -9,
+            "distinct_producer_pid": true,
+            "old_seals": 1,
+            "recovered_completed_results": 0,
+            "recovered_half_prepared": 0,
+            "recovered_broker_commit_checks": 1,
+            "original_wire_unchanged": true,
+            "final_recovered_seals": 2,
+            "provider_invocations": 0
+          },
+          "broker_restart": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": 0,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_kill": 2,
+            "local_calls_before_kill": 0,
+            "qs_consumer_restarted": true,
+            "original_go_local_results": 1,
+            "old_go_seals": 1,
+            "recovered_go_half_before_open": 0,
+            "recovered_go_results_before_open": 0,
+            "original_go_wire_preserved": true,
+            "distinct_go_pid": true,
+            "local_calls": 1,
+            "half_prepared": 2,
+            "actual_final_unknown": 2,
+            "pending_calls": 0,
+            "checks_drained_before_restart": true,
+            "original_host_failed_and_drained": true,
+            "recovered_committed_references": 2,
+            "recovered_half_prepared": 0,
+            "recovered_completed_results": 0,
+            "new_host_runtime": true,
+            "broker_commit_checks": 2,
+            "final_recovered_go_seals": 2,
+            "checker_callback_errors": 0,
+            "provider_invocations": 0
+          }
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "m4-ai-runtime-3.13-8.0.36-a2f192733312fef591bb9be24e5e3892e470420e-40326981798",
+        "sha256": "aeeac84f953c6a2a01132f451d6dcaa0bfb1bc63dafe262a0a9e63dee301bad4",
+        "broker_digest": "sha256:db641cc2786b6021b2ea2b77905678e374775a887c93e706491c8cd4b55be724",
+        "mysql_digest": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "python": "3.13.15",
+        "tests": 7,
+        "passed_facts": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "paired_half_ack_before_actual_mq_disconnect": true,
+          "paired_old_local_committed_final_unknown": true,
+          "paired_producer_sigkill_exit_negative9": true,
+          "paired_same_primary_epoch_readonly_resume_no_new_half": true,
+          "paired_new_paused_broker_commit_callback": true,
+          "paired_same_first_command_wire_after_resume": true,
+          "paired_recovered_pair_receipt_state_ack_without_model": true,
+          "paired_ai_half_prepared_before_broker_kill": true,
+          "paired_actual_final_rpc_unknown_after_committed_root": true,
+          "paired_broker_sigkill_and_same_container_restart": true,
+          "paired_broker_recheck_original_ai_first_wire": true,
+          "paired_pair_both_business_acks_without_executor_replay": true,
+          "paired_no_additional_model_or_old_business_executor": true,
+          "paired_recovered_process_resources_drained": true,
+          "paired_broker_fault_resources_drained": true,
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "fault_proof": {
+          "qs_sigkill": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": -9,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_loss": 1,
+            "proxy_stopped_before_root_release": true,
+            "original_root_lock_wait_observed": true,
+            "old_exit_code": -9,
+            "distinct_producer_pid": true,
+            "old_seals": 1,
+            "recovered_completed_results": 0,
+            "recovered_half_prepared": 0,
+            "recovered_broker_commit_checks": 1,
+            "original_wire_unchanged": true,
+            "final_recovered_seals": 2,
+            "provider_invocations": 0
+          },
+          "broker_restart": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": 0,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_kill": 2,
+            "local_calls_before_kill": 0,
+            "qs_consumer_restarted": true,
+            "original_go_local_results": 1,
+            "old_go_seals": 1,
+            "recovered_go_half_before_open": 0,
+            "recovered_go_results_before_open": 0,
+            "original_go_wire_preserved": true,
+            "distinct_go_pid": true,
+            "local_calls": 1,
+            "half_prepared": 2,
+            "actual_final_unknown": 2,
+            "pending_calls": 0,
+            "checks_drained_before_restart": true,
+            "original_host_failed_and_drained": true,
+            "recovered_committed_references": 2,
+            "recovered_half_prepared": 0,
+            "recovered_completed_results": 0,
+            "new_host_runtime": true,
+            "broker_commit_checks": 2,
+            "final_recovered_go_seals": 2,
+            "checker_callback_errors": 0,
+            "provider_invocations": 0
+          }
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "m4-ai-runtime-3.13-8.0.44-a2f192733312fef591bb9be24e5e3892e470420e-40326981798",
+        "sha256": "dec9bac0dd1698cea60dca0bd90036a5e6adb5c07b302ec6dd9ebd9719f509af",
+        "broker_digest": "sha256:1ccc923e52e32cbef12a480ca6e471e5d4ea01d7350af0c3d33cba1fcdac6bbf",
+        "mysql_digest": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "python": "3.13.15",
+        "tests": 7,
+        "passed_facts": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "paired_half_ack_before_actual_mq_disconnect": true,
+          "paired_old_local_committed_final_unknown": true,
+          "paired_producer_sigkill_exit_negative9": true,
+          "paired_same_primary_epoch_readonly_resume_no_new_half": true,
+          "paired_new_paused_broker_commit_callback": true,
+          "paired_same_first_command_wire_after_resume": true,
+          "paired_recovered_pair_receipt_state_ack_without_model": true,
+          "paired_ai_half_prepared_before_broker_kill": true,
+          "paired_actual_final_rpc_unknown_after_committed_root": true,
+          "paired_broker_sigkill_and_same_container_restart": true,
+          "paired_broker_recheck_original_ai_first_wire": true,
+          "paired_pair_both_business_acks_without_executor_replay": true,
+          "paired_no_additional_model_or_old_business_executor": true,
+          "paired_recovered_process_resources_drained": true,
+          "paired_broker_fault_resources_drained": true,
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "fault_proof": {
+          "qs_sigkill": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": -9,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_loss": 1,
+            "proxy_stopped_before_root_release": true,
+            "original_root_lock_wait_observed": true,
+            "old_exit_code": -9,
+            "distinct_producer_pid": true,
+            "old_seals": 1,
+            "recovered_completed_results": 0,
+            "recovered_half_prepared": 0,
+            "recovered_broker_commit_checks": 1,
+            "original_wire_unchanged": true,
+            "final_recovered_seals": 2,
+            "provider_invocations": 0
+          },
+          "broker_restart": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": 0,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_kill": 2,
+            "local_calls_before_kill": 0,
+            "qs_consumer_restarted": true,
+            "original_go_local_results": 1,
+            "old_go_seals": 1,
+            "recovered_go_half_before_open": 0,
+            "recovered_go_results_before_open": 0,
+            "original_go_wire_preserved": true,
+            "distinct_go_pid": true,
+            "local_calls": 1,
+            "half_prepared": 2,
+            "actual_final_unknown": 2,
+            "pending_calls": 0,
+            "checks_drained_before_restart": true,
+            "original_host_failed_and_drained": true,
+            "recovered_committed_references": 2,
+            "recovered_half_prepared": 0,
+            "recovered_completed_results": 0,
+            "new_host_runtime": true,
+            "broker_commit_checks": 2,
+            "final_recovered_go_seals": 2,
+            "checker_callback_errors": 0,
+            "provider_invocations": 0
+          }
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "m4-ai-runtime-3.13-8.4.11-a2f192733312fef591bb9be24e5e3892e470420e-40326981798",
+        "sha256": "13021621b1537bb4196ee6571053a21d8b71294aa00a6c72418d34d7c5ea0330",
+        "broker_digest": "sha256:87fd1f3b53c63778637717f1905f65c736051420f9028fb4ff6d27246ba11df8",
+        "mysql_digest": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+        "python": "3.13.15",
+        "tests": 7,
+        "passed_facts": 40,
+        "failed": 0,
+        "skipped": 0,
+        "cases": {
+          "paired_half_ack_before_actual_mq_disconnect": true,
+          "paired_old_local_committed_final_unknown": true,
+          "paired_producer_sigkill_exit_negative9": true,
+          "paired_same_primary_epoch_readonly_resume_no_new_half": true,
+          "paired_new_paused_broker_commit_callback": true,
+          "paired_same_first_command_wire_after_resume": true,
+          "paired_recovered_pair_receipt_state_ack_without_model": true,
+          "paired_ai_half_prepared_before_broker_kill": true,
+          "paired_actual_final_rpc_unknown_after_committed_root": true,
+          "paired_broker_sigkill_and_same_container_restart": true,
+          "paired_broker_recheck_original_ai_first_wire": true,
+          "paired_pair_both_business_acks_without_executor_replay": true,
+          "paired_no_additional_model_or_old_business_executor": true,
+          "paired_recovered_process_resources_drained": true,
+          "paired_broker_fault_resources_drained": true,
+          "paired_actual_ai_default_receivers_and_idle_checker": true,
+          "paired_actual_go_command_and_event_runtime": true,
+          "paired_no_legacy_relay": true,
+          "paired_actual_qs_service_and_command_root": true,
+          "paired_actual_qs_receipt_state_and_first_ack_roots": true,
+          "paired_actual_ai_admission_archive_and_witness": true,
+          "paired_first_command_and_ack_wire_cross_language": true,
+          "paired_actual_ai_business_receipts_and_history": true,
+          "paired_no_new_publish_outbox_or_model_call": true,
+          "paired_owned_processes_rpc_and_private_files_closed": true,
+          "paired_duplicate_original_command_no_new_seal": true,
+          "paired_duplicate_event_uses_first_ack": true,
+          "paired_duplicate_ack_keeps_first_receipt": true,
+          "paired_cross_language_first_wire_unchanged": true,
+          "paired_duplicate_delivery_does_not_authorize_business_retry": true,
+          "paired_actual_go_large_command_body_rpc": true,
+          "paired_actual_ai_large_state_body_rpc": true,
+          "paired_wrong_peer_mtls_denied_both_hosts": true,
+          "paired_wrong_reference_never_serves_body_both_hosts": true,
+          "paired_interpretation_cancel_original_roots": true,
+          "paired_cancel_duplicate_no_new_event": true,
+          "paired_cancel_no_provider_or_attempt_change": true,
+          "paired_evaluation_start_original_roots": true,
+          "paired_evaluation_cancel_original_roots": true,
+          "paired_evaluation_receipt_state_ack_sequence": true
+        },
+        "fault_proof": {
+          "qs_sigkill": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": -9,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_loss": 1,
+            "proxy_stopped_before_root_release": true,
+            "original_root_lock_wait_observed": true,
+            "old_exit_code": -9,
+            "distinct_producer_pid": true,
+            "old_seals": 1,
+            "recovered_completed_results": 0,
+            "recovered_half_prepared": 0,
+            "recovered_broker_commit_checks": 1,
+            "original_wire_unchanged": true,
+            "final_recovered_seals": 2,
+            "provider_invocations": 0
+          },
+          "broker_restart": {
+            "resources": {
+              "closed": true,
+              "private_files_removed": true,
+              "original_exit_code": 0,
+              "replacement_exit_codes": [
+                0
+              ]
+            },
+            "half_prepared_before_kill": 2,
+            "local_calls_before_kill": 0,
+            "qs_consumer_restarted": true,
+            "original_go_local_results": 1,
+            "old_go_seals": 1,
+            "recovered_go_half_before_open": 0,
+            "recovered_go_results_before_open": 0,
+            "original_go_wire_preserved": true,
+            "distinct_go_pid": true,
+            "local_calls": 1,
+            "half_prepared": 2,
+            "actual_final_unknown": 2,
+            "pending_calls": 0,
+            "checks_drained_before_restart": true,
+            "original_host_failed_and_drained": true,
+            "recovered_committed_references": 2,
+            "recovered_half_prepared": 0,
+            "recovered_completed_results": 0,
+            "new_host_runtime": true,
+            "broker_commit_checks": 2,
+            "final_recovered_go_seals": 2,
+            "checker_callback_errors": 0,
+            "provider_invocations": 0
+          }
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ]
+  },
+  "qs_runtime_regression": {
+    "receipt": "rocketmq-m4-c02-qs-runtime-20261026.json",
+    "run": "https://github.com/FangcunMount/infra/actions/runs/40314640918",
+    "source_tree_unchanged": true,
+    "per_mysql": {
+      "api": 13,
+      "worker": 11,
+      "dispatch": 41
+    },
+    "scope": "Actual dual-owner runtime, original roots, worker shared in-flight drain and due dispatch; loopback business RPC fixture."
+  },
+  "source_CI_receipts": [
+    "rocketmq-m4-c02-iam-runtime-20261026.json",
+    "rocketmq-m4-c02-qs-runtime-20261026.json",
+    "rocketmq-m4-c02-ai-runtime-20261026.json"
+  ],
+  "acceptance_mapping": {
+    "retired_choices": "Three current roots reject obsolete selections before resources; source CIs and root-specific receipts.",
+    "idle_checkers": "IAM same-process fresh owner and paused runtime; actual QS dual owners; AI default receiver and paired restart callbacks.",
+    "real_inflight": "IAM original-root shutdown incomplete retains host pool; QS active worker handler and original-root close retain dependencies. AI accepted business drain uses controlled coroutine; real fixed SDK subscriber executor pending call covered by source test_transaction_transport_lifecycle.",
+    "partial_start_and_bounded_close": "Root-specific tests preserve cleanup, pending RPC capacity and repeated Close/Wait; AI fake transaction-owner paths are not renamed actual Broker faults.",
+    "process_faults": "Actual QS producer SIGKILL and Broker SIGKILL/restart verified against current pair, no fresh business execution/provider invocation."
+  },
+  "limits": [
+    "Not full eight-image startup, public HTTP, system login, production deployment or throughput acceptance.",
+    "AI controlled owner shutdown tests and real SDK subscriber executor test are distinct from paired Broker/process faults.",
+    "Remaining isolated legacy assemblies/helpers, old readers and tools are C03/C04/C05, not claimed deleted by C02."
+  ],
+  "production": {
+    "changed": false,
+    "CD_paused": true,
+    "data_deleted": false,
+    "model_called": false
+  },
+  "progress": {
+    "leaves": "20/38",
+    "parents": "3/8",
+    "C02": "4/4",
+    "M4_1": "17/26",
+    "C06_gates": "4/4",
+    "effective_when": "This progress record merges"
+  }
+}
