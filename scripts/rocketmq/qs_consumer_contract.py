@@ -6,18 +6,18 @@ from qs_image_pair import QS_SHA
 from routes import permissions_v2
 
 
-def parse_contract(raw):
+def parse_contract(raw, *, source_sha=QS_SHA):
     rows=[line.removeprefix('QS_CONSUMER_CONTRACT ') for line in raw.splitlines() if line.startswith('QS_CONSUMER_CONTRACT ')]
     require(len(rows)==1 and len(rows[0])<32768,'one_original_consumer_contract_required')
     value=json.loads(rows[0])
     require(set(value)=={'schema','source_sha','consumers'} and value['schema']=='qs-original-consumer-contract/v1'
-        and value['source_sha']==QS_SHA and isinstance(value['consumers'],list) and 0<len(value['consumers'])<=32,
+        and value['source_sha']==source_sha and isinstance(value['consumers'],list) and 0<len(value['consumers'])<=32,
         'actual_fixed_qs_consumer_registry_required')
     return value
 
 
-def validate_manifest(document,contract):
-    require(contract['source_sha']==QS_SHA,'original_qs_source_required')
+def validate_manifest(document,contract, *, source_sha=QS_SHA):
+    require(contract['source_sha']==source_sha,'original_qs_source_required')
     grants=document['accounts']['m3-qs-apiserver'];subscribed=set(grants['subscriptions'])
     permissions=permissions_v2(document,grants);seen=set()
     for row in contract['consumers']:

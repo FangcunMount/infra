@@ -47,12 +47,12 @@ def dump_difference(before, after):
             for op,i,j,k,l in difflib.SequenceMatcher(a=a,b=b,autojunk=False).get_opcodes() if op!='equal'][:16]
 
 
-def initializer_receipt(raw, profile):
+def initializer_receipt(raw, profile, *, source_sha=QS_SHA):
     rows = [line.removeprefix('QS_IMAGE_INIT ') for line in raw.splitlines() if line.startswith('QS_IMAGE_INIT ')]
     require(len(rows) == 1, 'one_original_initializer_receipt_required')
     value = json.loads(rows[0])
     heads = (105, 40) if profile == 'pre_m3' else QS_HEAD
-    require(value['source_sha'] == QS_SHA and value['profile'] == profile
+    require(value['source_sha'] == source_sha and value['profile'] == profile
             and (value['mysql'], value['mongo']) == heads
             and re.fullmatch('[0-9a-f]{64}', value['resources_sha256'])
             and value['original_templates_applied'] is True
@@ -127,7 +127,7 @@ class QSPairFixture(OwnedImageFixture):
                            QS_IMAGE_MYSQL_DSN=f'root:{self.password}@tcp(mysql:3306)/{database}?parseTime=true',
                            QS_IMAGE_MONGO_URI='mongodb://mongo:27017/?replicaSet=image-proof')
         result = self.once('/fixture/qs-pair-init', ['-test.run=^TestM3ImagePreparePair$', '-test.v', '-test.timeout=6m'], environment=environment, timeout=375)
-        return initializer_receipt(result, profile)
+        return initializer_receipt(result, profile, source_sha=getattr(self, 'qs_source_sha', QS_SHA))
 
     def snapshot(self, database):
         sql = self.dump(database)

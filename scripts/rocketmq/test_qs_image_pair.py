@@ -47,6 +47,15 @@ class QSPairImageContractTest(unittest.TestCase):
         self.assertEqual(initializer_receipt('QS_IMAGE_INIT ' + json.dumps(value), 'pre_m3'), value)
         with self.assertRaises(RuntimeError): initializer_receipt('QS_IMAGE_INIT ' + json.dumps(value), 'current')
 
+    def test_new_current_source_requires_explicit_identity_without_changing_old_default(self):
+        value = dict(source_sha='a'*40, profile='current', mysql=110, mongo=44,
+                     resources_sha256='c'*64, original_templates_applied=True,
+                     journal_force_used=False, production=False)
+        raw = 'QS_IMAGE_INIT ' + json.dumps(value)
+        self.assertEqual(initializer_receipt(raw, 'current', source_sha='a'*40), value)
+        with self.assertRaises(RuntimeError): initializer_receipt(raw, 'current')
+        with self.assertRaises(RuntimeError): initializer_receipt(raw, 'current', source_sha='b'*40)
+
     def test_mongo_snapshot_retains_uuid_indexes_and_canonical_binary_documents(self):
         program = mongo_snapshot_program('qs_m3_image_owned_1')
         for required in ('c.info.uuid', 'getIndexes()', 'EJSON.stringify', 'relaxed:false', 'Object.keys(v).sort()', 'sort({_id:1})'):

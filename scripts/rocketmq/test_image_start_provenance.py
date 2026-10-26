@@ -44,3 +44,18 @@ class ImageProvenanceTest(unittest.TestCase):
             verified_image_inventory(self.fixture(target,source,builder),'qs-api',source)
         with self.assertRaises(RuntimeError):
             verified_image_inventory(self.fixture(target,'a'*40,builder),target,'a'*40)
+
+    def test_new_rehearsal_requires_explicit_reviewed_builder_not_inventory_claim(self):
+        source, builder = 'a'*40, 'b'*40
+        value = self.fixture('qs-api', source, builder)
+        with self.assertRaises(RuntimeError):
+            verified_image_inventory(value, 'qs-api', source)
+        verified_image_inventory(value, 'qs-api', source, reviewed_builder=builder)
+        for altered in (dict(builder_source_sha='c'*40), dict(source_sha='c'*40),
+                        dict(target='iam'), dict(failed=1), dict(skipped=1), dict(cleanup={})):
+            bad=copy.deepcopy(value); bad.update(altered)
+            with self.subTest(altered=altered), self.assertRaises(RuntimeError):
+                verified_image_inventory(bad, 'qs-api', source, reviewed_builder=builder)
+        for bad in ('', 'b'*39, '../unreviewed', 'B'*40):
+            with self.assertRaises(RuntimeError):
+                verified_image_inventory(value, 'qs-api', source, reviewed_builder=bad)

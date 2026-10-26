@@ -67,6 +67,12 @@ class FiveImageFixture(QSPairFixture):
         if component == 'iam': command += ['-v', str(self.private / 'keys') + ':/app/data/keys']
         if component == 'ai': command += ['--read-only', '--tmpfs', '/tmp:rw,noexec,nosuid,size=64m', '--security-opt', 'no-new-privileges:true', '--cap-drop', 'ALL']
         command += extra or []
+        if hasattr(self, 'runtime_mounts'):
+            role = 'worker' if component.startswith('worker') else 'collection' if component.startswith('collection') else component
+            for mount in self.runtime_mounts.get(role, []):
+                require(mount['read_only'] is True and mount['bind']['create_host_path'] is False,
+                        'immutable_rebuild_mount_required')
+                command += ['--mount', 'type=bind,src=' + mount['source'] + ',dst=' + mount['target'] + ',readonly']
         command += [self.image]
         if component != 'ai': command += ['--config=/fixture/runtime.json']
         if hasattr(self, 'boundary'):
@@ -80,6 +86,16 @@ class FiveImageFixture(QSPairFixture):
         budget = dict(memory_bytes=actual['HostConfig']['Memory'], nano_cpus=actual['HostConfig']['NanoCpus'])
         require(budget == dict(memory_bytes=int(memory.removesuffix('m')) * 1024 * 1024, nano_cpus=int(float(cpus) * 1_000_000_000)), 'actual_runtime_budget_differs')
         self.report.setdefault('actual_runtime_budgets', {})[component] = budget
+        if hasattr(self, 'runtime_mounts'):
+            identity = [int(self.run(['docker', 'exec', name, 'id', flag]).stdout.strip()) for flag in ('-u', '-g')]
+            require(identity == ([10001, 10001] if component == 'ai' else [2000, 2000]),
+                    'actual_rebuild_unix_identity_differs')
+            self.report.setdefault('actual_runtime_unix_identity', {})[component] = identity
+            observed = {(v['Source'], v['Destination']): v['RW'] for v in actual['Mounts']}
+            for mount in self.runtime_mounts.get(role, []):
+                require(observed.get((mount['source'], mount['target'])) is False,
+                        'actual_rebuild_readonly_mount_differs')
+            self.report.setdefault('actual_material_mounts', {})[component] = self.runtime_mounts.get(role, [])
         return name
 
     def http(self, component, port, path):
@@ -134,40 +150,50 @@ def main():
     for key in ('sources', 'candidate', 'qs_initializer', 'iam_initializer', 'consumer_contract', 'report'):
         p.add_argument('--' + key.replace('_', '-'), type=Path, required=True)
     p.add_argument('--startup-receipt', type=Path)
+    p.add_argument('--m4-rebuild', action='store_true')
     args = p.parse_args(); require(not args.report.exists(), 'new_report_required')
     cutover = args.startup_receipt is not None
+    require(not (cutover and args.m4_rebuild), 'm4_is_not_an_old_cutover_receipt')
+    sources = SOURCES
+    reviewed_builder = None
+    if args.m4_rebuild:
+        from m4_image_rebuild import SOURCES as sources, BUILDER_SHA as reviewed_builder
     repo = Path(__file__).resolve().parents[2]
     report = dict(schema='m3-five-actual-image-startup-trial/v4', passed=0, failed=0, skipped=0,
                   production=False, system_acceptance=False, combined_cutover_rehearsal_complete=False,
-                  c1_cutover_barrier_exercised=False, cases={}, sources=SOURCES,
+                  c1_cutover_barrier_exercised=False, cases={}, sources=sources,
                   scope='actual processes, required IAM/AI and closed SDK owners; completed worker startup phase, HTTP/Redis and catalog consistency; no business or per-worker delivery proof')
     if cutover:
         report.update(schema='m3-five-actual-image-cutover/v1', scope='owned old-schema full restore training, original offline upgrades and actual eight-process C1/30-minute start; no production/system/business claim')
+    if args.m4_rebuild:
+        report.update(schema='m4-eight-instance-config-rebuild/v1',
+                      scope='current merged source, actual production messaging packagers, root-owned versioned files and eight real runtimes; no business/system/production claim')
     f = FiveImageFixture(repo, report); run = f.run
+    f.qs_source_sha = sources['qs']
     f.applications = {}; f.images = {}; f.private_dirs = {}
     def case(name):
         require(re.fullmatch('[a-z][a-z0-9_]{1,100}', name), 'fixed_case_identifier_required')
         report['cases'][name] = True
         print('M3_IMAGE_CASE ' + name, flush=True)
     def stop_actual(component):
-        timeout = 210 if component == 'ai' else 60
+        timeout = 210 if component == 'ai' else 510 if args.m4_rebuild and component != 'iam' else 60
         run(['docker', 'stop', '--time', str(timeout), f.applications[component]], timeout=timeout + 15)
         source = args.sources / ('ai' if component == 'ai' else 'iam' if component == 'iam' else 'qs')
         return f.diagnostic(component, source)
     try:
         report['infra_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=repo).stdout.strip()
-        for name, sha in SOURCES.items():
+        for name, sha in sources.items():
             require(run(['git', 'rev-parse', 'HEAD'], cwd=args.sources / name).stdout.strip() == sha
                     and not run(['git', 'status', '--porcelain'], cwd=args.sources / name).stdout, 'exact_clean_source_required')
         document = manifest(repo)
-        contract = parse_contract(args.consumer_contract.read_text())
-        report['original_qs_consumer_count'] = validate_manifest(document, contract)
+        contract = parse_contract(args.consumer_contract.read_text(), source_sha=sources['qs'])
+        report['original_qs_consumer_count'] = validate_manifest(document, contract, source_sha=sources['qs'])
         report['original_qs_consumer_contract'] = contract
         report['original_qs_consumer_contract_sha256'] = hashlib.sha256(args.consumer_contract.read_bytes()).hexdigest()
         case('actual_source_registry_consumers_match_manifest')
         candidates = {}
-        for component, target, sha in [('iam', 'iam', IAM_SHA), ('api', 'qs-api', QS_SHA), ('collection', 'qs-collection', QS_SHA), ('worker', 'qs-worker', QS_SHA), ('ai', 'ai', AI_SHA)]:
-            metadata = f.load(args.candidate / target, target, sha)
+        for component, target, sha in [('iam', 'iam', sources['iam']), ('api', 'qs-api', sources['qs']), ('collection', 'qs-collection', sources['qs']), ('worker', 'qs-worker', sources['qs']), ('ai', 'ai', sources['ai'])]:
+            metadata = f.load(args.candidate / target, target, sha, reviewed_builder=reviewed_builder)
             f.images[component] = f.image; candidates[target] = report['candidate']
             private = f.directory / component; private.mkdir(mode=0o700); f.private_dirs[component] = private
             if component == 'api':
@@ -283,6 +309,11 @@ def main():
             QS_AI_MESSAGING=json.dumps(msg), QS_AI_GRPC=json.dumps(dict(bind_address='0.0.0.0:50061', access_address='qs-apiserver:9090',
                 ca_file='/fixture/service-ca.crt', cert_file='/fixture/ai.crt', key_file='/fixture/ai.key')),
             QS_AI_GENERATION__ENABLED='true', QS_AI_EVALUATION__ENABLED='true', QS_AI_DEEPSEEK_API_KEY='owned-unused-fixture-key', QS_AI_ZHIPU_API_KEY='owned-unused-fixture-key')
+        if args.m4_rebuild:
+            from m4_image_rebuild import configure
+            configure(f, args, ai_env, case)
+            for component in ('iam', 'api', 'collection', 'worker'):
+                report['configuration_sha256'][component] = hashlib.sha256((f.private_dirs[component] / 'runtime.json').read_bytes()).hexdigest()
         for component in f.private_dirs:
             f.select(component); f.ownership(10001 if component == 'ai' else 2000)
         if cutover:
@@ -380,7 +411,15 @@ def main():
         report['passed'] = len(report['cases'])
         try: f.cleanup()
         except Exception: report['failed'] = 1; report.setdefault('failure_stage', 'owned_cleanup')
-        report['sources_unchanged'] = all(not run(['git', 'status', '--porcelain'], cwd=args.sources / name).stdout for name in SOURCES)
+        if getattr(f, 'm4_materials', False):
+            try:
+                from m4_image_rebuild import root_action
+                root_action(f, 'cleanup')
+                report.setdefault('cleanup', {})['owned_m4_material_root_removed'] = True
+            except Exception:
+                report['failed'] = 1
+                report.setdefault('cleanup', {})['owned_m4_material_root_removed'] = False
+        report['sources_unchanged'] = all(not run(['git', 'status', '--porcelain'], cwd=args.sources / name).stdout for name in sources)
         if not report['sources_unchanged']: report['failed'] = 1
         write_private(args.report, report)
     return int(report['failed'] != 0)

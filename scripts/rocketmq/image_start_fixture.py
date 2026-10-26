@@ -29,8 +29,12 @@ IMAGE_PROVENANCE = {
 }
 
 
-def verified_image_inventory(value, target, source_sha):
-    expected = IMAGE_PROVENANCE.get((target, source_sha))
+def verified_image_inventory(value, target, source_sha, *, reviewed_builder=None):
+    # A new rehearsal supplies its reviewed builder from source, never from the
+    # downloaded inventory. Historical M3 callers keep their original allowlist.
+    require(reviewed_builder is None or re.fullmatch('[0-9a-f]{40}', reviewed_builder),
+            'exact_reviewed_builder_required')
+    expected = reviewed_builder if reviewed_builder is not None else IMAGE_PROVENANCE.get((target, source_sha))
     require(expected is not None and value['target'] == target and value['source_sha'] == source_sha
         and (value['passed'], value['failed'], value['skipped']) == (1, 0, 0)
         and value['builder_source_sha'] == expected and value['deferred_tools_absent']
@@ -66,9 +70,9 @@ class OwnedImageFixture:
     def ids(self,kind):
         return set(self.run(['docker','ps','-aq'] if kind=='containers' else ['docker','network','ls','-q']).stdout.split())
 
-    def load(self, candidate, target, source_sha):
+    def load(self, candidate, target, source_sha, *, reviewed_builder=None):
         value=json.loads((candidate/'image-inventory.json').read_text())
-        verified_image_inventory(value, target, source_sha)
+        verified_image_inventory(value, target, source_sha, reviewed_builder=reviewed_builder)
         files=list(candidate.glob('*.tar.gz'));require(len(files)==1,'one_image_archive_required')
         archive=files[0];require(sha256(archive)==value['archive_sha256'],'archive_digest_differs')
         with tarfile.open(archive) as source:
