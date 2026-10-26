@@ -1,0 +1,152 @@
+name: M4 AI final transaction runtime
+on:
+  pull_request:
+    paths:
+      - .github/workflows/m4-ai-runtime.yml
+      - scripts/rocketmq/paired_acceptance.py
+      - scripts/rocketmq/paired_fault_acceptance.py
+      - scripts/rocketmq/ai_admission_acceptance.py
+      - scripts/rocketmq/ci-transactions.py
+  workflow_dispatch:
+    inputs:
+      ai_ref:
+        description: Exact reviewed AI source SHA
+        type: string
+        required: true
+        default: 9a48509e777b4b0a819308dd05b7db7fff9af42f
+      qs_ref:
+        description: Exact reviewed QS source SHA
+        type: string
+        required: true
+        default: ca1158ca472d42e7c58e067e170b116364b1d8ea
+      faults:
+        description: Include the separate paired process and Broker fault gate
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: m4-ai-runtime-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.13']
+        mysql: ['8.0.36', '8.0.44', '8.4.11']
+    env:
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+      AI_SHA: ${{ inputs.ai_ref || '9a48509e777b4b0a819308dd05b7db7fff9af42f' }}
+      QS_SHA: ${{ inputs.qs_ref || 'ca1158ca472d42e7c58e067e170b116364b1d8ea' }}
+      INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      QS_M3_PAIRED_PROFILE: full
+      QS_AI_ACCEPTANCE_PYTHON: ${{ matrix.python }}
+      WITH_FAULTS: ${{ inputs.faults || false }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.INFRA_SHA }}
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 1345266aa0e864c46de5d1e3e3c939dd8002a890
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ env.QS_SHA }}
+          path: .qs-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-ai
+          ref: ${{ env.AI_SHA }}
+          path: .ai-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: ${{ matrix.python }}
+      - name: Exact reviewed sources and stable published SDK locks
+        run: |
+          set -euo pipefail
+          [[ "$AI_SHA" =~ ^[a-f0-9]{40}$ && "$QS_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$INFRA_SHA"
+          test "$(git -C .ai-acceptance rev-parse HEAD)" = "$AI_SHA"
+          test "$(git -C .qs-acceptance rev-parse HEAD)" = "$QS_SHA"
+          test "$(git -C .sdk-acceptance rev-parse HEAD)" = 1345266aa0e864c46de5d1e3e3c939dd8002a890
+          python3 -m unittest discover -s scripts/rocketmq -p test_paired_acceptance.py
+          python3 -m unittest discover -s scripts/rocketmq -p test_paired_fault_acceptance.py
+          go -C .qs-acceptance list -m -json github.com/FangcunMount/reliable-messaging > "$RUNNER_TEMP/m4-go-sdk.json"
+          python3 - "$RUNNER_TEMP/m4-go-sdk.json" <<'PY'
+          import json,sys,tomllib
+          from pathlib import Path
+          sys.path.insert(0,'scripts/rocketmq')
+          from host_sdk_contract import stable_module_matches
+          from ai_admission_acceptance import acceptance_profile,validate_host_sdk_lock
+          assert stable_module_matches(json.load(open(sys.argv[1])))
+          profile=acceptance_profile('paired')
+          assert profile['sdk_version']=='0.4.0' and len(profile['tests'])==5
+          assert validate_host_sdk_lock(tomllib.loads(Path('.ai-acceptance/uv.lock').read_text()),profile)=='f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1'
+          PY
+      - name: Build verified isolated RocketMQ 5.5.1
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-m4-ai:5.5.1 components/rocketmq
+      - name: Actual default AI receivers paired original roots and first wire
+        run: |
+          set -euo pipefail
+          umask 077
+          docker ps -aq | sort > "$RUNNER_TEMP/m4-containers-before"
+          docker network ls --no-trunc -q | sort > "$RUNNER_TEMP/m4-networks-before"
+          export QS_M3_PAIRED_SOURCE="$PWD/.qs-acceptance"
+          args=()
+          if [[ "$WITH_FAULTS" == true ]]; then
+            export QS_AI_ACCEPTANCE_KIND=paired_faults
+            args+=(--paired-host-faults)
+          else
+            export QS_AI_ACCEPTANCE_KIND=paired
+          fi
+          python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
+            --ai-admission-host "$PWD/.ai-acceptance" --image rocketmq-m4-ai:5.5.1 \
+            --mysql-image 'mysql:${{ matrix.mysql }}' --report m4-ai-native.json "${args[@]}"
+          docker ps -aq | sort > "$RUNNER_TEMP/m4-containers-after"
+          docker network ls --no-trunc -q | sort > "$RUNNER_TEMP/m4-networks-after"
+          cmp "$RUNNER_TEMP/m4-containers-before" "$RUNNER_TEMP/m4-containers-after"
+          cmp "$RUNNER_TEMP/m4-networks-before" "$RUNNER_TEMP/m4-networks-after"
+      - name: Exact receipts zero skip and complete owned cleanup
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json,os,hashlib,sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts/rocketmq')
+          from host_sdk_contract import STABLE_MODULE
+          p=Path('m4-ai-native.json');r=json.loads(p.read_text());h=r['proof']['paired_host']
+          expected=40 if os.environ['WITH_FAULTS']=='true' else 25
+          assert r['passed']==len(r['cases'])==expected and all(r['cases'].values())
+          assert r['failed']==r['skipped']==0
+          assert r['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,probe_process_groups_drained=True,private_fixture_directory_removed=True)
+          assert r['sdk_sha']=='1345266aa0e864c46de5d1e3e3c939dd8002a890'
+          assert h['source_sha']==os.environ['AI_SHA'] and h['source_clean_after']
+          assert h['paired_qs']['source_sha']==os.environ['QS_SHA'] and h['paired_qs']['sdk_module']==STABLE_MODULE
+          assert h['python_runtime']['sdk']=='0.4.0' and h['python_runtime']['client']=='5.1.2'
+          assert h['python_runtime']['installed_in_prefix']
+          assert h['locked_sdk_archive_sha256']=='f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1'
+          summary=dict(ai_sha=os.environ['AI_SHA'],qs_sha=os.environ['QS_SHA'],infra_sha=os.environ['INFRA_SHA'],passed=r['passed'],failed=0,skipped=0,sha256=hashlib.sha256(p.read_bytes()).hexdigest(),production=False,system_acceptance=False)
+          Path('m4-ai-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m4-ai-runtime-${{ matrix.python }}-${{ matrix.mysql }}-${{ env.AI_SHA }}-${{ github.run_id }}
+          path: m4-ai-*.json
+          if-no-files-found: error
+          retention-days: 14
