@@ -36,3 +36,14 @@ class OriginalConsumerContractTest(unittest.TestCase):
         self.assertEqual(parse_contract(raw),self.contract)
         for bad in ('',raw+'\n'+raw,raw.replace(self.contract['source_sha'],'0'*40)):
             with self.assertRaises(RuntimeError):parse_contract(bad)
+
+    def test_new_rehearsal_keeps_exact_source_and_original_route_checks(self):
+        contract=copy.deepcopy(self.contract);contract['source_sha']='a'*40
+        raw='QS_CONSUMER_CONTRACT '+json.dumps(contract)
+        self.assertEqual(parse_contract(raw,source_sha='a'*40),contract)
+        self.assertEqual(validate_manifest(self.document,contract,source_sha='a'*40),1)
+        with self.assertRaises(RuntimeError):parse_contract(raw)
+        with self.assertRaises(RuntimeError):validate_manifest(self.document,contract)
+        with self.assertRaises(RuntimeError):parse_contract(raw,source_sha='b'*40)
+        bad=copy.deepcopy(self.document);bad['accounts']['m3-qs-apiserver']['subscriptions']=[]
+        with self.assertRaises(RuntimeError):validate_manifest(bad,contract,source_sha='a'*40)
