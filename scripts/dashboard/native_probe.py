@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import secrets
 import subprocess
@@ -145,7 +146,9 @@ def main():
             logs=fixture.run(compose+['logs','--no-color','--tail','100'],required=False).stdout
             # Only fixed diagnostic classes, never configuration or credentials.
             report['diagnostics']={key:key in logs for key in ('OutOfMemoryError','Permission denied',
-                'UnsupportedClassVersionError','UnknownHostException','SSLHandshakeException','Connection refused')}
+                'Read-only file system','UnsupportedClassVersionError','UnknownHostException',
+                'SSLHandshakeException','Connection refused','Unable to start web server')}
+            report['exception_classes']=sorted(set(re.findall(r'\b[A-Za-z_][\w.]*(?:Exception|Error)\b',logs)))
             report['private_log_sha256']=hashlib.sha256(logs.encode()).hexdigest()
         raise RuntimeError('owned_dashboard_validation_failed') from None
     finally:
