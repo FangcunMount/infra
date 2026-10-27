@@ -1,0 +1,115 @@
+{
+  "schema": "readable-subgate-progress/v1",
+  "date": "2026-10-28",
+  "completed_tasks": 6,
+  "total_tasks": 16,
+  "ai_completed_matrices": 5,
+  "ai_total_matrices": 6,
+  "ai_run": 40535268126,
+  "ai_reports": [
+    {
+      "artifact": "readable-ai-state-1-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "117ebeae999e61dd26de5fad083c5dedfea3ce0f2245248353c0290defdd107f",
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "profile": "state",
+      "checks_passed": 148,
+      "pytest_passed": 55,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "artifact": "readable-ai-admission-0-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "1685dd430ddce8e390fb2bc6543e82180d2d95c580e082cbdbbf19576c8651f1",
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "profile": "admission",
+      "checks_passed": 15,
+      "pytest_passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "artifact": "readable-ai-admission-3-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "e726de57c41600b7d015d65165e801bcb0791a632557360e3945957026b6ae1d",
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "profile": "admission",
+      "checks_passed": 15,
+      "pytest_passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "artifact": "readable-ai-finalization-2-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "b526625708e836ebcca087cc33f3c99fdbc80adeacd4f9c188d7d89b91d0faf6",
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "profile": "finalization",
+      "checks_passed": 32,
+      "pytest_passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "artifact": "readable-ai-finalization-5-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "10957cff2e4b2028a0ee76310cf917da5b49f929797cca0fb89039a2260e3adc",
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "profile": "finalization",
+      "checks_passed": 32,
+      "pytest_passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    }
+  ],
+  "retirement": {
+    "run": 40545493089,
+    "report_sha256": "8889d1400ec79df5cdbd338bf9b5ae62aa818c86ebbe0af858e97a8c37075a64",
+    "passed": 138,
+    "failed": 0,
+    "skipped": 0,
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "cases": {
+      "named_old_acl_only": true,
+      "named_group_preserves_retry_dlq": true,
+      "named_topic_removed_from_broker_and_nameserver": true,
+      "all_other_resources_preserved": true
+    },
+    "production_responsibility_proof": false
+  },
+  "qs_latest_native_run": 40551016815,
+  "history_native_run": 40547695960,
+  "production_changed": false,
+  "cd_changed": false
+}

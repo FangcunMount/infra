@@ -40,11 +40,11 @@
 | ✅ | T04 | Python SDK 对应能力与生命周期保持 | 2026-10-27：Python48/0/0、ruff/mypy通过；历史不注册、生命周期/取消和原wire通过；SDK PR60已合并d719b6fb，10个PR CI全过 |
 | ✅ | T05 | 跨语言真实 Broker 验收与固定 SDK 预发布 | 2026-10-27：SDK5c2e3cd，两个公开SDK矩阵各31/0/0、存活恢复5/0/0；三档存储各29/0/0、两档Python源码与wheel各159/0/0；Go v0.6.0-rc.1 / Python0.5.0rc1已发布，18资产重新下载校验；[发布证明](evidence/rocketmq-readable-names-prerelease-20261027.json) |
 | ✅ | T06 | IAM 授权事务、普通消息、幂等查询与双订阅接入 | 2026-10-27：IAM9b9bb9f1 / QS1c2eccc3，正式RC依赖；168本地测试包、11源码CI；三档MySQL真实readable根事务/双IAM及QS fanout各22/0/0，[证据](evidence/rocketmq-readable-names-iam-fanout-20261027.json)。IAM PR160为草稿未合并；infra PR354全部65项CI成功后已合并54387b9 |
-| ☐ | T07 | QS API/collection/worker 双存储与合并订阅接入 | [QS PR455](https://github.com/FangcunMount/qs-server/pull/455)草稿，893f52a9；正式RC依赖、382测试包和定向race通过。原生到期dispatch夹具已改为宿主可信计划读取器；旧readable运行40533972139的Task两档通过、答卷MySQL8.0.36在本地事务前等待失败，保留失败/清理证据。已补提前返回诊断，[infra PR356](https://github.com/FangcunMount/infra/pull/356)新head2680732重新执行四入口×三档；尚未通过完整门禁 |
-| ☐ | T08 | AI command/receipt/state/ACK 及正文安全接入 | [AI PR232](https://github.com/FangcunMount/qs-ai/pull/232)草稿aae96db：4318本地非依赖单元通过、1290明确排除；452源码mypy及文档通过。后续源CI发现三个SQL模拟Runtime缺routing，7045671已补齐显式夹具，39项仅收集、SQL重验中。原生回执/receiver/独立worker夹具补齐实际可信路由，[infra PR357](https://github.com/FangcunMount/infra/pull/357)运行40535268126中finalization/Python3.11/MySQL8.0.36已32/0/0并完成清理，其余档待完成。旧readable state/admission失败及取消记录保留，不计作成功 |
-| ☐ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | 进行中：[IAM PR161](https://github.com/FangcunMount/iam/pull/161)、[QS PR456](https://github.com/FangcunMount/qs-server/pull/456)、[AI PR233](https://github.com/FangcunMount/qs-ai/pull/233)均为叠加草稿；历史记录精确路由验证，旧Aborted在申请新fence前拒绝，原计划/wire不改写。本地IAM168、QS383测试包及定向race、AI4320非依赖单元通过；1290 AI依赖场景明确排除。QS最新80e92e386补齐原未来写入器可信读取器，四包race通过；infra PR362在固定59a5bfe2源上新增历史deferred实际MySQL两档，要求原7项+新4项，尚待运行。AI历史源62f3aa3合入SQL夹具修正。跨路由Replan纯协议与真实存储CAS分别有证明，尚不等同宿主完整真实切换验收；未来计划/deferred组合门禁待补齐 |
-| ☐ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | 进行中：[infra PR359](https://github.com/FangcunMount/infra/pull/359)草稿aed3f2b，405本地测试与actionlint通过；既有五账号保留精确旧新并集、漂移拒绝、幂等；真实134项资源/ACL/TLS验证40540910673已134/0/0、清理通过。CD配置路径/不可变材料及原开关已只读核对，未暂停或改写。infra PR361已实现只读具名退役审核和仅限owned空资源的删除语义专项（5f86bfd），414本地测试/actionlint通过，实际138项组合验收待执行；生产责任采集、锁内复核和删除仍未完成 |
-| ☐ | T11 | 最终宿主端到端、故障与维护/恢复演练 | 待开始 |
+| ☐ | T07 | QS API/collection/worker 双存储与合并订阅接入 | [QS PR455](https://github.com/FangcunMount/qs-server/pull/455)草稿2149b4a2：正式RC，382测试包及定向race已通过。答卷真实失败40541357738确认是隔离夹具漏装线上既有Mongo治理schema43，导致host admission_closed；仅补显式安装/原生读取/Ready检查，生产无DDL。最新infra PR356/6079d1c、运行40551016815重验四入口×三档。保留此前失败、取消及完整清理证据，未打勾 |
+| ☐ | T08 | AI command/receipt/state/ACK 及正文安全接入 | [AI PR232](https://github.com/FangcunMount/qs-ai/pull/232)草稿7045671，三个SQL模拟Runtime已补显式routing，39项仅收集，源SQL CI待完成；此前4318纯单元/1290排除、mypy452通过。infra PR357/820896a运行40535268126已有5/6档成功：state/Python3.11、admission两档、finalization两档，全部0失败/跳过且清理；最后state/Python3.13待完成。真实源AAE生产代码未被夹具修正改变 |
+| ☐ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | [IAM PR161](https://github.com/FangcunMount/iam/pull/161)、[QS PR456](https://github.com/FangcunMount/qs-server/pull/456)、[AI PR233](https://github.com/FangcunMount/qs-ai/pull/233)均为草稿；QS最新d97853af为历史deferred新增只读边界，旧路由不授权新HoldDelivery，原未来写入器使用owner可信codec。该候选本地383测试包/7574测试通过、60项外部依赖选配测试跳过（不是required native通过）；四包race通过。IAM168包、AI4320纯单元及452 mypy分别已有证明。infra PR362/241f05c运行40547695960在固定d97853af上要求两档各12项（原7+历史5），未完成；跨路由Replan纯协议与真实存储CAS分别记录，不冒充完整宿主切换 |
+| ☐ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | infra PR359全部13项CI成功、已合并cacfdae0；真实精确旧新并集134/0/0、清理通过。PR361/5f86bfd具名退役审核及owned空资源删除专项已138/0/0：撤旧权限、指定Group/Topic、Broker/NameServer回读与retry/DLQ保留均通过；414本地单元通过，剩余源CI待完成。CD不可变材料/原开关只读核对；未应用生产资源或暂停CD，生产责任采集与窗口配置包仍待冻结 |
+| ☐ | T11 | 最终宿主端到端、故障与维护/恢复演练 | 准备中：[infra PR364](https://github.com/FangcunMount/infra/pull/364)提供独立readable-rc1镜像依赖/清单/归档校验及手动构建入口，412本地单元和actionlint通过；原M3/M4默认SDK门禁保持。尚未dispatch镜像构建，八实例启动/切换/故障及发布器适配待完成；没有把构建或只读归档检查标为演练通过 |
 | ☐ | T12 | 稳定 SDK、三库正式依赖及固定镜像重新安装验收 | 待开始 |
 | ☐ | T13 | 生产核验、暂停 CD、预置资源权限及冻结清单 | 待开始 |
 | ☐ | T14 | 维护内排空旧责任、切换八实例与新订阅/Checker 验证 | 待开始 |
@@ -52,6 +52,16 @@
 | ☐ | T16 | 按责任清零清理旧资源、恢复 CD、合并发布索引 | 待开始 |
 
 每项勾选须实现及必须验证均通过，附完成时间、源码SHA、报告/CI/PR；合并、发布、部署、业务验收分别记账。里程碑须所属任务完成、相关PR合并及门禁通过才完成；失败不删除，未结责任不改状态隐藏。
+
+## 进行中子门禁（不增加16项总数）
+
+| 任务 | 已验证 | 尚未通过的完整门禁 |
+|---|---|---|
+| T07 | 固定RC源码/路由接入；真实失败已定位并保留 | 修复后的12档真实QS矩阵及最终源码CI |
+| T08 | 5/6档真实readable矩阵；每档非空、0失败/跳过、清理通过 | 最后一档state/Python3.13及最新源SQL CI |
+| T09 | 三库历史读保护；旧fence与新HoldDelivery拒绝；Go最新全量/定向验证 | 两档原MySQL历史消费、未来计划与完整切换闭环 |
+| T10 | ✅ 精确旧新并集134项；✅ 具名空资源删除138项；PR359已合并 | PR361剩余CI/合并、生产责任观察及窗口配置清单 |
+| T11 | 固定SDK镜像profile/协调归档验证及手动构建入口 | 镜像实际构建、八实例启动/真实故障/切换恢复演练 |
 
 ## 生产切换及删除门禁
 
@@ -88,3 +98,5 @@
 - 2026-10-28：总进度仍6/16，T07/T08等待真实门禁；T09三库历史保护已实现并分别通过本地验证，T10精确旧新ACL过渡/134项真实专项已启动。旧QS答卷失败为进入原事务前等待，新增提前返回诊断，不降低验收标准；旧评价/报告夹具原先显式使用legacy reader已修正。已取消本分支被新head取代的作业以释放队列，取消不计成功。三库源码保持草稿，CD、生产资源、数据库和容器未改变。
 
 - 2026-10-28：ACL过渡真实专项40540910673为134/0/0，原五账号旧新精确并集、幂等、130项原生ACL/TLS及四冲突控制通过，清理完整。AI finalization首档40535268126为32/0/0，实际独立进程恢复及清理通过，其余五档待完成；T08不勾选。PR361加入空资源具名删除/回读验证（生产拒绝），414本地测试通过、native138项未执行完成。历史deferred的实际MySQL两档由PR362执行，源码39项SQL夹具只做收集不冒充运行。SDK PR64只修正预发布状态的过期说明。总进度仍6/16；生产/CD/DDL/凭据/业务容器未变更。
+
+- 2026-10-28：保持6/16。PR359以13项CI全通过合并cacfdae0，134项ACL准备及138项具名删除均在隔离环境通过且清理完整。AI真实矩阵5/6档通过；各报告分别记录pytest数量与验收计数，不将二者混作独立测试数。QS答卷失败由缺失既有治理schema43引发的准入关闭确认，仅修复隔离夹具并固定2149b4a2重验，无生产DDL。历史deferred收紧为既有记录恢复只读权限，d97853af全量383包/7574通过，60本机外部依赖选配测试跳过已披露；required native仍须独立0跳过。镜像profile/来源校验PR364已准备，未构建/发布/部署。自动CD开关、业务数据库及生产容器未变更。
