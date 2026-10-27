@@ -17,9 +17,10 @@ def client():
 
 
 def request(session, base, path, data=None, *, csrf=True):
-    body = None if data is None else urllib.parse.urlencode(data).encode()
+    body = None if data is None else json.dumps(data,separators=(',',':')).encode()
     headers={}
     if data is not None:
+        headers['Content-Type']='application/json'
         headers['Origin']=base
         if csrf:
             status, token=request(session,base,'/rocketmq-dashboard/csrf-token')
