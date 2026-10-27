@@ -871,6 +871,7 @@ def main():
                 import importlib.util
                 specification = importlib.util.spec_from_file_location('owned_pop_controls', repo / 'scripts/ops/readable_pop_controls.py')
                 controls = importlib.util.module_from_spec(specification); specification.loader.exec_module(controls)
+                proof['readable_pop_controls_source_sha256'] = hashlib.sha256((repo / 'scripts/ops/readable_pop_controls.py').read_bytes()).hexdigest()
                 proof['readable_pop_controls'] = {}
                 pop_observe = controls.OwnedPopControls(run, admin, broker, project, sdk_manifest,
                     proof['readable_pop_controls'], passed)

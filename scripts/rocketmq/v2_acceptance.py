@@ -127,6 +127,7 @@ def shared_budget(start, passed, *, language, observe=None):
     subscription='sdk-shared-'+suffix
     observer=start(language,'shared-consume',revision=revision,subscription=subscription)
     observer.wait('ready')
+    if observe is not None: observe('subscribed', language)
     expected=set()
     for storage,mode in (('mysql','send'),('mongo','send'),('mysql','normal')):
         identity='shared-'+suffix+'-'+('normal' if mode=='normal' else storage)

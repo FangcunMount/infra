@@ -56,6 +56,8 @@ jobs:
         with:
           version: '0.12.13'
           python-version: ${{ matrix.python }}
+      - name: POP metadata fail-closed contracts
+        run: python3 -m unittest discover -s scripts/ops -p test_readable_pop_controls.py
       - name: Naming contracts
         run: python3 -m unittest discover -s scripts/rocketmq -p 'test_routes*.py'
       - name: Build verified isolated Broker
@@ -70,12 +72,37 @@ jobs:
           options=()
           if [[ "$READABLE_PROFILE" == live-recovery ]]; then
             options=(--sdk-python-live-recovery)
-          elif [[ "$READABLE_PROFILE" != public ]]; then
+          elif [[ "$READABLE_PROFILE" == public ]]; then
+            options=(--sdk-pop-drain-controls)
+          else
             exit 1
           fi
           python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python --readable-routes \
             "${options[@]}" --sdk "$PWD/.sdk-acceptance" --image rocketmq-readable:5.5.1 \
             --mysql-image '${{ matrix.mysql }}' --report rocketmq-readable-sdk.json
+      - name: Require complete original matrix and future-checkpoint controls
+        if: always()
+        env:
+          READABLE_PROFILE: ${{ matrix.profile }}
+        run: |
+          python3 - <<'PYPROOF'
+          import json,os
+          x=json.load(open('rocketmq-readable-sdk.json'))
+          expected=5 if os.environ['READABLE_PROFILE']=='live-recovery' else 35
+          assert x['passed']==len(x['cases'])==expected and x['failed']==x['skipped']==0
+          assert all(x['cases'].values())
+          assert x['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,
+              probe_process_groups_drained=True,private_fixture_directory_removed=True)
+          if os.environ['READABLE_PROFILE']=='public':
+              controls=x['proof']['readable_pop_controls']
+              assert set(controls)=={'go','python'}
+              for name,row in controls.items():
+                  assert row['held']['timing']>0 and row['held']['timer_series_present']
+                  assert row['closed']['offset_buffer']==row['closed']['checkpoint_buffer']==row['closed']['timing']==0
+                  assert row['closed']['timer_series_present']
+                  for suffix in ('_held_future_checkpoint_blocks_drain','_acked_and_closed_responsibility_zero'):
+                      assert x['cases']['readable_pop_'+name+suffix] is True
+          PYPROOF
       - uses: actions/upload-artifact@v7
         if: always()
         with:

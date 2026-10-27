@@ -108,24 +108,26 @@ class OwnedPopControls:
         raise RuntimeError('native_pop_control_budget_exceeded')
 
     def __call__(self, stage, language):
-        require(language in ('sdk-go', 'sdk-python') and stage in ('baseline', 'held', 'closed'), 'fixed_pop_control_stage_required')
+        require(language in ('sdk-go', 'sdk-python') and stage in ('baseline', 'subscribed', 'held', 'closed'), 'fixed_pop_control_stage_required')
         suffix = 'go' if language == 'sdk-go' else 'python'
         record = self.proof.setdefault(suffix, {})
         require(stage not in record, 'duplicate_pop_control_stage')
         if stage == 'baseline':
             record[stage] = self.wait(lambda v: zero(v, timing_required=self.observed_timer),
                                       required=self.observed_timer, budget=90)
-        elif stage == 'held':
+        elif stage == 'subscribed':
             require('baseline' in record, 'pop_baseline_required')
             routes = [row for row in self.manifest['routes'] if row['subscription'] == 'sdk-shared-' + suffix]
             groups = {row['consumer_group'] for row in routes}
             require(len(groups) == 1, 'one_actual_shared_pop_group_required')
             raw = self.admin('consumerConnection', '-g', next(iter(groups)))
             require(re.search(r'^ConsumeType: CONSUME_ACTIVELY$', raw, re.MULTILINE), 'actual_grpc_simple_consumer_required')
+            record[stage] = dict(consume_type='CONSUME_ACTIVELY', connection_sha256=hashlib.sha256(raw.encode()).hexdigest())
+        elif stage == 'held':
+            require('subscribed' in record, 'registered_pop_subscriber_required')
             record[stage] = self.wait(lambda v: v['timing'] is not None and v['timing'] > 0,
                                       required=False, budget=25)
             self.observed_timer = True
-            record['connection_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
             self.passed('readable_pop_' + suffix + '_held_future_checkpoint_blocks_drain')
         else:
             require('held' in record and self.observed_timer, 'positive_future_checkpoint_control_required')
