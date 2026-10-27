@@ -1,0 +1,42 @@
+{
+  "schema": "readable-historical-consumption-native-evidence/v1",
+  "run_id": 40547695960,
+  "url": "https://github.com/FangcunMount/infra/actions/runs/40547695960",
+  "infra_head": "241f05c16580570a0d034f8254edf8e8e5eb33c4",
+  "merged_main": "33808532cfe3c434b34f21f8176d8675cc360a65",
+  "source_checks_success": 17,
+  "matrices": [
+    {
+      "artifact": "readable-history-0-7f45c659b67950441405d18b0a4ef90888728a26",
+      "report_sha256": "7eadf3f56a8d4391cdcbe2eb4531426a46a7ca992995b31ae833dc7f969546d1",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "source_sha": "d97853affcb04cbca9885c0f5009ba9c6ea772ee",
+      "profile": "original7+readable-history5"
+    },
+    {
+      "artifact": "readable-history-1-7f45c659b67950441405d18b0a4ef90888728a26",
+      "report_sha256": "57fd2f74f750e75b65b70296c62a4e4fcc518d4a74cb9846df9424b0393358b0",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "source_sha": "d97853affcb04cbca9885c0f5009ba9c6ea772ee",
+      "profile": "original7+readable-history5"
+    }
+  ],
+  "production_changed": false,
+  "scope": "two actual disposable MySQL matrices; no Broker or full host cutover claim"
+}
