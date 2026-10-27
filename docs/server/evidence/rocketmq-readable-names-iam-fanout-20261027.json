@@ -1,0 +1,203 @@
+{
+  "task": "T06",
+  "run": "https://github.com/FangcunMount/infra/actions/runs/40520162928",
+  "iam_pr": "https://github.com/FangcunMount/iam/pull/160",
+  "harness_pr": "https://github.com/FangcunMount/infra/pull/354",
+  "matrix": [
+    {
+      "matrix": "readable-iam-0-bd4a2dd8d49e0fcbcac0799b4976667de392e504",
+      "source_sha": "9b9bb9f12842b6f58705ea3d29eb094cc8cab078",
+      "qs_source_sha": "1c2eccc32d37eb7a1af3b03ed53e62a7aae04a38",
+      "sdk_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.6.0-rc.1",
+        "Sum": "h1:kGWE8og29Er3UYYaNzPgaXj/T/2ltmQJrb+/iI4+nGo=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "manifest_version": 3,
+      "naming_scheme": "readable-v1",
+      "manifest_sha256": "d0ddbe5c9fd0755aa1d2a07e63bcd3502bfe52cfe48126b1b05178a6ffa894e2",
+      "cases": {
+        "go_untrusted_ca_rejected": true,
+        "go_half_invisible_then_commit_visible": true,
+        "go_rollback_invisible": true,
+        "go_new_process_real_backcheck": true,
+        "go_real_commit_response_discarded": true,
+        "go_db_failure_is_unknown": true,
+        "go_other_owner_witness_cannot_commit": true,
+        "go_wrong_owner_acl_denied": true,
+        "python_untrusted_ca_rejected": true,
+        "python_half_invisible_then_commit_visible": true,
+        "python_rollback_invisible": true,
+        "python_new_process_real_backcheck": true,
+        "python_real_commit_response_discarded": true,
+        "python_db_failure_is_unknown": true,
+        "python_other_owner_witness_cannot_commit": true,
+        "python_wrong_owner_acl_denied": true,
+        "go_to_python_cross_process_recovery": true,
+        "python_to_go_cross_process_recovery": true,
+        "iam_host_actual_sdk_original_root_and_application": true,
+        "iam_two_instances_and_qs_separate_business_subscription": true,
+        "finite_unknown_moves_to_native_discard_topic": true,
+        "exact_committed_identity_set": true
+      },
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "fanout_receipt": {
+        "iam_instances": 2,
+        "iam_revocation_observed": true,
+        "qs_notification_received": true,
+        "qs_both_subjects_evicted": true,
+        "qs_primary_proof_verified": true,
+        "qs_subscriber_drained": true,
+        "failed": 0,
+        "skipped": 0
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "report_sha256": "977c8c27e3d33e2349a75df8417901ff34edeb995ace2948cbc77b83413b527a",
+      "images": {
+        "image": "sha256:e8b86bbf99a241a319654d56ae6e4d54d594a7417bd4ad73351429318f5c29bb",
+        "mysql_image": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "mongo_image": null
+      }
+    },
+    {
+      "matrix": "readable-iam-1-bd4a2dd8d49e0fcbcac0799b4976667de392e504",
+      "source_sha": "9b9bb9f12842b6f58705ea3d29eb094cc8cab078",
+      "qs_source_sha": "1c2eccc32d37eb7a1af3b03ed53e62a7aae04a38",
+      "sdk_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.6.0-rc.1",
+        "Sum": "h1:kGWE8og29Er3UYYaNzPgaXj/T/2ltmQJrb+/iI4+nGo=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "manifest_version": 3,
+      "naming_scheme": "readable-v1",
+      "manifest_sha256": "d0ddbe5c9fd0755aa1d2a07e63bcd3502bfe52cfe48126b1b05178a6ffa894e2",
+      "cases": {
+        "go_untrusted_ca_rejected": true,
+        "go_half_invisible_then_commit_visible": true,
+        "go_rollback_invisible": true,
+        "go_new_process_real_backcheck": true,
+        "go_real_commit_response_discarded": true,
+        "go_db_failure_is_unknown": true,
+        "go_other_owner_witness_cannot_commit": true,
+        "go_wrong_owner_acl_denied": true,
+        "python_untrusted_ca_rejected": true,
+        "python_half_invisible_then_commit_visible": true,
+        "python_rollback_invisible": true,
+        "python_new_process_real_backcheck": true,
+        "python_real_commit_response_discarded": true,
+        "python_db_failure_is_unknown": true,
+        "python_other_owner_witness_cannot_commit": true,
+        "python_wrong_owner_acl_denied": true,
+        "go_to_python_cross_process_recovery": true,
+        "python_to_go_cross_process_recovery": true,
+        "iam_host_actual_sdk_original_root_and_application": true,
+        "iam_two_instances_and_qs_separate_business_subscription": true,
+        "finite_unknown_moves_to_native_discard_topic": true,
+        "exact_committed_identity_set": true
+      },
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "fanout_receipt": {
+        "iam_instances": 2,
+        "iam_revocation_observed": true,
+        "qs_notification_received": true,
+        "qs_both_subjects_evicted": true,
+        "qs_primary_proof_verified": true,
+        "qs_subscriber_drained": true,
+        "failed": 0,
+        "skipped": 0
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "report_sha256": "6c9056193727720fdc5dec78395dc1be64c94e0c62143f4499e341e5792bc51d",
+      "images": {
+        "image": "sha256:8e6f98161917ed6fc81667ab0079cc210c7af2e27f15380155103cddcfe53411",
+        "mysql_image": "sha256:e645fd9ffc4fc6745702d8c0068326b8707251166fdf11c80e8f52a609d19d1d",
+        "mongo_image": null
+      }
+    },
+    {
+      "matrix": "readable-iam-2-bd4a2dd8d49e0fcbcac0799b4976667de392e504",
+      "source_sha": "9b9bb9f12842b6f58705ea3d29eb094cc8cab078",
+      "qs_source_sha": "1c2eccc32d37eb7a1af3b03ed53e62a7aae04a38",
+      "sdk_module": {
+        "Path": "github.com/FangcunMount/reliable-messaging",
+        "Version": "v0.6.0-rc.1",
+        "Sum": "h1:kGWE8og29Er3UYYaNzPgaXj/T/2ltmQJrb+/iI4+nGo=",
+        "GoModSum": "h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I="
+      },
+      "manifest_version": 3,
+      "naming_scheme": "readable-v1",
+      "manifest_sha256": "d0ddbe5c9fd0755aa1d2a07e63bcd3502bfe52cfe48126b1b05178a6ffa894e2",
+      "cases": {
+        "go_untrusted_ca_rejected": true,
+        "go_half_invisible_then_commit_visible": true,
+        "go_rollback_invisible": true,
+        "go_new_process_real_backcheck": true,
+        "go_real_commit_response_discarded": true,
+        "go_db_failure_is_unknown": true,
+        "go_other_owner_witness_cannot_commit": true,
+        "go_wrong_owner_acl_denied": true,
+        "python_untrusted_ca_rejected": true,
+        "python_half_invisible_then_commit_visible": true,
+        "python_rollback_invisible": true,
+        "python_new_process_real_backcheck": true,
+        "python_real_commit_response_discarded": true,
+        "python_db_failure_is_unknown": true,
+        "python_other_owner_witness_cannot_commit": true,
+        "python_wrong_owner_acl_denied": true,
+        "go_to_python_cross_process_recovery": true,
+        "python_to_go_cross_process_recovery": true,
+        "iam_host_actual_sdk_original_root_and_application": true,
+        "iam_two_instances_and_qs_separate_business_subscription": true,
+        "finite_unknown_moves_to_native_discard_topic": true,
+        "exact_committed_identity_set": true
+      },
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "fanout_receipt": {
+        "iam_instances": 2,
+        "iam_revocation_observed": true,
+        "qs_notification_received": true,
+        "qs_both_subjects_evicted": true,
+        "qs_primary_proof_verified": true,
+        "qs_subscriber_drained": true,
+        "failed": 0,
+        "skipped": 0
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "report_sha256": "d41eca3b639737a5f811fde298c0610062b2959a2e95944c1781e63cb9f9809d",
+      "images": {
+        "image": "sha256:ea16016f53c9eeb653c2e3e0dad0935e9d296eabfa29e35e60e933f2b51af4d2",
+        "mysql_image": "sha256:b35575a03e5327131916eb8d39222c4c89590881fb44ed69b5814910e5fefa34",
+        "mongo_image": null
+      }
+    }
+  ],
+  "source_merged": false,
+  "production_changed": false,
+  "system_acceptance": false,
+  "limits": [
+    "This closes task implementation and named verification; infra PR354 remaining regression/merge and IAM source merge are separately tracked."
+  ]
+}
