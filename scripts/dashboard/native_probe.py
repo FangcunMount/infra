@@ -27,6 +27,7 @@ def main():
     address_added=False
     firewall_added=False
     try:
+        report['stage']='owned_address'
         # Deliberately advertise host address, exactly as production does. The
         # relay is necessary; direct service DNS alone cannot pass this test.
         existing=fixture.run(['ip','-j','address','show']).stdout
@@ -35,16 +36,19 @@ def main():
         address_added=True
         original=fixtures.render
         fixtures.render=lambda accounts,output,advertised,templates: original(accounts,output,host,templates)
+        report['stage']='broker_dependencies'
         fixture.dependencies()
         broker=fixture.project+'-broker-1'
         before=json.loads(fixture.run(['docker','inspect',broker]).stdout)[0]
         ui=dict(username='dashboard-admin',password=secrets.token_hex(32))
         account=dict(username='dashboard-management',password=secrets.token_hex(32))
         admin=Admin(broker)
+        report['stage']='dedicated_broker_identity'
         admin('createUser','-u',account['username'],'-p',account['password'],'-t','Super',mutation=True)
         row=admin.users()[account['username']]
         assert row[0]==account['password'] and tuple(x.lower() for x in row[1:])==('super','enable'), 'dedicated_identity_not_confirmed'
         cfg=fixture.directory/'dashboard'
+        report['stage']='private_configuration'
         render(cfg,ui,account,(fixture.private/'mq-ca.crt').read_bytes())
         fixture.run(['sudo','chown','-R','10001:10001',str(cfg)])
         env=dict(os.environ,DASHBOARD_CONFIG_ROOT=str(cfg),DASHBOARD_BIND_IP=host,
@@ -59,19 +63,28 @@ def main():
         file=fixture.directory/'dashboard-compose.json'
         file.write_text(json.dumps(doc));file.chmod(0o600)
         compose=['docker','compose','-p',fixture.project+'-dashboard','-f',str(file)]
+        report['stage']='fixed_image_pull'
         fixture.run(compose+['pull'],timeout=300)
-        fixture.run(['sudo','python3',str(REPO/'scripts/dashboard/firewall.py'),
-            '--bind-ip',host,'--network',fixture.network])
+        report['stage']='scoped_firewall'
+        firewall=fixture.run(['sudo','python3',str(REPO/'scripts/dashboard/firewall.py'),
+            '--bind-ip',host,'--network',fixture.network],required=False)
+        if firewall.returncode:
+            # This command has only addresses/network names, no credentials.
+            report['firewall_diagnostic']=firewall.stderr[-2000:]
+            raise RuntimeError('firewall_install_failed')
         firewall_added=True
+        report['stage']='dashboard_start'
         fixture.run(compose+['up','-d'],timeout=120)
         base='http://127.0.0.1:'+str(port)
         deadline=time.monotonic()+150
+        report['stage']='dashboard_readiness'
         while True:
             try:
                 if request(client(),base,'/login/check.query')[0]==200:break
             except (OSError,ValueError):pass
             if time.monotonic()>deadline:raise RuntimeError('dashboard_start_timeout')
             time.sleep(2)
+        report['stage']='authenticated_acceptance'
         cases=verify(base,ui)
         cases['scoped_firewall_applied']=True
         # Foreign Docker bridge cannot use the new host management relay.
@@ -87,6 +100,7 @@ def main():
         cases['nonroot_readonly_no_oom']=all(r['Config']['User']=='10001:10001' and
             r['HostConfig']['ReadonlyRootfs'] and not r['State']['OOMKilled'] and r['RestartCount']==0 for r in rows)
         assert all(cases.values()), 'acceptance_incomplete'
+        report['stage']='complete'
         report.update(passed=len(cases),failed=0,cases=cases,
             broker_version='5.5.1',dashboard_version='2.1.0',
             images=[dict(id=r['Image'],reference=r['Config']['Image']) for r in rows],

@@ -18,7 +18,7 @@
 - Broker 对外仍宣告 `100.118.164.39:10911`。网关透明转发原 TLS 到 `broker:10911`；DOCKER-USER 新增独立目标规则，只允许 Broker bridge 访问该管理端口。原 8081/5557 防火墙链保持。
 - UI 使用上游 file 登录模式，独立用户名/随机密码；Broker 连接使用另一个专用 Super 身份，因界面承担 MQ 管理职责。原 infra 管理员与应用账号不复用、不轮换。UI 登录身份与 Broker 身份分离；所有管理动作具备该专用 Broker 身份的权限。
 - 不采用上游 ACL 登录模式：2.1.0 的按用户池没有完整沿用 TLS 配置；采用全局 TLS 管理池及独立 UI 认证，并通过实际 Broker 验证。
-- TLS 使用现有 Broker 公共 CA，保持 ACL2/TLS 强制；不把服务器私钥交给 Dashboard。
+- Dashboard 管理客户端强制 TLS，保持原 ACL2 与业务 gRPC TLS 配置。只读核验发现现网 remoting 与业务 gRPC 使用不同证书；管理信任包固定 SSH 核对后的 NameServer/Broker 实际公开证书指纹，变化即拒绝安装。不把服务器私钥交给 Dashboard，不关闭证书验证，也不为本次安装修改原进程的 TLS 配置。
 - 关闭 Dashboard 定期统计采集，保留 Prometheus/Grafana 在 Mac mini。验收不发送消息、重放、重置位点、删除 Topic 或触发模型。
 
 ## 运维及恢复

@@ -9,6 +9,8 @@ import secrets
 import subprocess
 import sys
 import time
+import socket
+import ssl
 
 from config import render
 from acceptance import client, request, verify
@@ -44,6 +46,30 @@ def private(path, value):
 def memory():
     return int(next(row.split()[1] for row in Path('/proc/meminfo').read_text().splitlines()
         if row.startswith('MemAvailable:')))//1024
+
+
+def remoting_trust(rows):
+    # These are the actual existing remoting identities, read over approved SSH
+    # before this install, not the separate gRPC certificate in config/tls.
+    expected={
+        'rocketmq-nameserver-1': ('9876','143b8cb48221ac38d882e11d4a5fc5655686a40097d6d52902567cc1e0331720'),
+        'rocketmq-broker-1': ('10911','d002b180a1357022765ab28cf0fb68ad6281a64d8247083fc5dd044cca976892'),
+    }
+    certificates=[]
+    for row in rows:
+        name=row['Name'].lstrip('/')
+        port,digest=expected[name]
+        host=row['NetworkSettings']['Networks'][NETWORK]['IPAddress']
+        # Discovery is authenticated by SSH + frozen fingerprints. It is never
+        # used by the Dashboard client, which receives the exact pinned bundle.
+        context=ssl._create_unverified_context()
+        with socket.create_connection((host,int(port)),timeout=5) as sock:
+            with context.wrap_socket(sock,server_hostname=name) as tls:
+                der=tls.getpeercert(binary_form=True)
+        if hashlib.sha256(der).hexdigest()!=digest:
+            raise RuntimeError('existing_remoting_certificate_changed')
+        certificates.append(ssl.DER_cert_to_PEM_cert(der).encode())
+    return b''.join(certificates)
 
 
 def main():
@@ -87,9 +113,11 @@ def main():
             raise RuntimeError('existing_principal_changed')
         if after_users[account['username']][0]!=account['password']:
             raise RuntimeError('dedicated_identity_not_confirmed')
+        ca=remoting_trust(before)
         config=ROOT/'private'
         if not config.exists():
-            render(config,accounts['ui'],account,Path('/data/infra/rocketmq/config/tls/server.crt').read_bytes())
+            render(config,accounts['ui'],account,ca)
+        if (config/'ca.crt').read_bytes()!=ca:raise RuntimeError('remoting_trust_bundle_conflict')
         if config.stat().st_mode&0o077:raise RuntimeError('unsafe_config_directory')
         for path in [config,*config.iterdir()]:os.chown(path,10001,10001)
         firewall=install(BIND,NETWORK)
