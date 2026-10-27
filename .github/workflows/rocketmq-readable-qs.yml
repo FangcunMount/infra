@@ -1,0 +1,78 @@
+name: RocketMQ readable QS original business roots
+on:
+  pull_request:
+    paths: ['scripts/rocketmq/readable_host_acceptance.py', 'scripts/rocketmq/test_readable_host_acceptance.py', 'scripts/rocketmq/qs_answer_acceptance.py', 'scripts/rocketmq/qs_evaluation_acceptance.py', 'scripts/rocketmq/qs_report_acceptance.py', 'scripts/rocketmq/qs_task_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-readable-qs.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  GOTOOLCHAIN: local
+concurrency:
+  group: rocketmq-readable-qs-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  business:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [answer, evaluation, report, task]
+        mysql: ['mysql:8.0.36', 'mysql:8.0.44', 'mysql:8.4']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 5c2e3cd155e67c0f766e93bf95238b16fc219b5f
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: 1c2eccc32d37eb7a1af3b03ed53e62a7aae04a38
+          path: .qs-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-acceptance/go.sum
+      - name: Validate fixture and isolated Broker
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-readable-qs:5.5.1 components/rocketmq
+      - name: Actual host original root under readable routes
+        env:
+          PROFILE: ${{ matrix.profile }}
+          MYSQL_IMAGE: ${{ matrix.mysql }}
+          GOWORK: 'off'
+          GOFLAGS: '-mod=readonly'
+        run: |
+          set -euo pipefail
+          python3 scripts/rocketmq/ci-transactions.py --readable-hosts \
+            --sdk "$PWD/.sdk-acceptance" "--qs-${PROFILE}-host" "$PWD/.qs-acceptance" \
+            --image rocketmq-readable-qs:5.5.1 --mysql-image "$MYSQL_IMAGE" \
+            --report readable-qs-host.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          data = json.loads(Path('readable-qs-host.json').read_text())
+          host = data['proof']['qs_' + os.environ['PROFILE'] + '_host']
+          assert data['passed'] > 0 and data['failed'] == data['skipped'] == 0
+          assert host['manifest_version'] == 3 and host['naming_scheme'] == 'readable-v1'
+          assert host['sdk_module']['Version'] == 'v0.6.0-rc.1'
+          assert host['source_sha'] == '1c2eccc32d37eb7a1af3b03ed53e62a7aae04a38'
+          assert host['source_clean_after']
+          assert host['native_receipt']['passed'] > 0
+          assert host['native_receipt']['failed'] == host['native_receipt']['skipped'] == 0
+          assert data['cleanup'] == dict(project_containers_remaining=False,
+              compose_down_succeeded=True, probe_process_groups_drained=True,
+              private_fixture_directory_removed=True)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: readable-qs-${{ matrix.profile }}-${{ strategy.job-index }}-${{ github.sha }}
+          path: readable-qs-host.json
+          if-no-files-found: error
+          retention-days: 14
