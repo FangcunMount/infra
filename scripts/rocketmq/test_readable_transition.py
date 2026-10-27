@@ -121,6 +121,31 @@ class ReadableTransitionTest(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         provision('unused', self.new, self.accounts, previous=self.old)
 
+    def test_owned_native_profile_uses_complete_readable_manifest_and_original_roles(self):
+        from m3_resources import resource_documents, expected_cases
+        current, previous, path = resource_documents(ROOT, 'full', True)
+        self.assertEqual(current, self.new)
+        self.assertEqual(previous, self.old)
+        self.assertEqual(path, 'components/rocketmq/serverd-routes-readable-v3.json')
+        self.assertEqual(len(expected_cases(current)), 130)
+        with self.assertRaises(ValueError):
+            resource_documents(ROOT, 'bootstrap', True)
+        legacy, previous, _ = resource_documents(ROOT, 'full', False)
+        self.assertEqual(legacy, self.old)
+        self.assertIsNone(previous)
+
+    def test_negative_sentinels_keep_exact_selected_naming_codec(self):
+        from m3_resources import conflict_route
+        from routes import validate
+        for document in (self.old, self.new):
+            candidate = copy.deepcopy(document)
+            row = conflict_route(document, 'never-create', 'infra.m3.never-created', 'NORMAL')
+            candidate['routes'].append(row)
+            candidate['accounts']['m3-iam']['publish'].append(row['id'])
+            validate(candidate)
+            self.assertEqual(row.get('naming_scheme', ''),
+                             'readable-v1' if document['version'] == 3 else '')
+
     def test_manifest_digest_is_stable_and_any_reviewed_change_is_detectable(self):
         self.assertEqual(len(digest(self.new)), 64)
         self.assertEqual(digest(self.new), digest(copy.deepcopy(self.new)))
