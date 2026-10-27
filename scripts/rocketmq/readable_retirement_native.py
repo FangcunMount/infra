@@ -1,4 +1,4 @@
-"""Deletion semantics proof for newly created, empty CI resources only.
+"""Deletion semantics proof for selected empty CI resources only.
 
 This is deliberately not a production retirement executor. It requires the
 owned loopback fixture, complete successful native resource acceptance, exact
@@ -78,8 +78,8 @@ def run_owned_retirement(container, project, previous, current, accounts, receip
         group = next(r['consumer_group'] for r in previous['routes'] if r.get('consumer_group'))
         offsets = command(admin, 'topicStatus', '-n', 'nameserver:9876', '-t', topic)
         empty_topic(offsets)
-        # Newly created, empty sentinel Topics make accidental retry/DLQ cleanup
-        # observable. They belong only to this isolated project.
+        # Classic/v1 empty sentinels plus a real unselected v2 retry responsibility
+        # make accidental cleanup observable inside this isolated project only.
         unselected_topic = next(r['physical_topic'] for r in previous['routes'] if r['physical_topic'] != topic)
         from pop_retry_sentinel import receipt as sentinel_receipt, MARKER
         import json
@@ -140,7 +140,7 @@ def run_owned_retirement(container, project, previous, current, accounts, receip
             membership_sha256=hashlib.sha256(membership.encode()).hexdigest(),
             offsets_sha256=hashlib.sha256(offsets.encode()).hexdigest(),
             before_metadata_sha256=digest(before), after_metadata_sha256=digest(after),
-            scope='newly created empty CI resources only; no production responsibility proof or authorization')
+            scope='selected empty owned CI resources only; unselected actual POP v2 responsibility retained; no production authorization')
     finally:
         for name in ('topic.json', 'subscriptionGroup.json'):
             admin.docker('rm', '-f', '--', snapshot + '/' + name, required=False)
