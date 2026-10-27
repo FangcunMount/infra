@@ -1,0 +1,31 @@
+name: RocketMQ Dashboard private deployment validation
+on:
+  pull_request:
+    paths:
+      - components/rocketmq-dashboard/**
+      - scripts/dashboard/**
+      - .github/workflows/rocketmq-dashboard.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dashboard:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Compile operational scripts
+        run: python3 -m compileall -q scripts/dashboard
+      - name: Build verified official Broker 5.5.1 for owned environment
+        run: |
+          bash scripts/rocketmq/fetch-release.sh
+          docker build -t rocketmq-m3-image-start:5.5.1 components/rocketmq
+      - name: Actual TLS, ACL, independent login and private relay
+        run: python3 scripts/dashboard/native_probe.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: dashboard-${{ github.run_id }}
+          path: dashboard-probe.json
+          if-no-files-found: error
+          retention-days: 30

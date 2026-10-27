@@ -1,0 +1,32 @@
+# serverD RocketMQ Dashboard
+
+目标：在 serverD 增加 Tailscale 私网管理界面，由 infra 管理，不重建或重启现有 Broker、NameServer 和 worker。
+
+| 状态 | 任务 | 验收 |
+|---|---|---|
+| ✅ | 生产只读基线与版本核对 | 2.1.0 正式版、固定 amd64 digest；18082/10911 空闲 |
+| ☐ | 隔离原生验证 | Broker 5.5.1、TLS enforcing、ACL2；默认/错误/匿名登录拒绝，独立登录后管理查询成功 |
+| ☐ | 部署与权限 | 独立 Compose、独立 UI/Broker 身份、私网入口、RPC 仅 Broker bridge；原容器不重启 |
+| ☐ | 运行验收及记录 | Topic/消费组/集群只读查询、退出会话失效、余量至少 512 MiB、原业务监控正常 |
+
+## 固定构成与入口
+
+- Dashboard 2.1.0：`apacherocketmq/rocketmq-dashboard:2.1.0@sha256:81fbd0f5d82c79a50899b48bf18449ee1c52e1deb0246999a90291c786fbeabb`；官方镜像 JRE 17。
+- NGINX 1.30.6-alpine：`sha256:84ed8c0dd296c188bfc24ed506f46589e9285fb0b11cf3a04d91d524d3067e11`。
+- 入口 `http://100.118.164.39:18082`，仅 Tailscale；不新增公网入口或 DNS。
+- 独立项目 `rocketmq-dashboard`，复用外部 `rocketmq_rocketmq` 网络，512 MiB/0.5 CPU + 48 MiB/0.1 CPU，非 root、只读根目录、日志轮转。
+- Broker 对外仍宣告 `100.118.164.39:10911`。网关透明转发原 TLS 到 `broker:10911`；DOCKER-USER 新增独立目标规则，只允许 Broker bridge 访问该管理端口。原 8081/5557 防火墙链保持。
+- UI 使用上游 file 登录模式，独立用户名/随机密码；Broker 连接使用另一个专用 Super 身份，因界面承担 MQ 管理职责。原 infra 管理员与应用账号不复用、不轮换。UI 登录身份与 Broker 身份分离；所有管理动作具备该专用 Broker 身份的权限。
+- 不采用上游 ACL 登录模式：2.1.0 的按用户池没有完整沿用 TLS 配置；采用全局 TLS 管理池及独立 UI 认证，并通过实际 Broker 验证。
+- TLS 使用现有 Broker 公共 CA，保持 ACL2/TLS 强制；不把服务器私钥交给 Dashboard。
+- 关闭 Dashboard 定期统计采集，保留 Prometheus/Grafana 在 Mac mini。验收不发送消息、重放、重置位点、删除 Topic 或触发模型。
+
+## 运维及恢复
+
+私密配置位于 `/data/infra/rocketmq-dashboard/private`，目录 0700/文件 0600，属容器 UID 10001；凭据交付文件由 root 0600 保存，禁止进入 Git、日志或会话正文。渲染/启动不执行数据库 DDL。
+
+先安装 `scripts/dashboard/firewall.py` 的两个目标规则，再启动独立项目；使用原部署锁 `/var/lib/fangcun-image-retention/deploy.lock`，不改锁 inode 或权限。启动后用 `scripts/dashboard/acceptance.py` 验证登录、集群、Topic、消费组及登出。
+
+停止/回退仅执行该项目 `docker compose down`（不带 `-v`），保留私密配置及专用身份供诊断。不得执行原 RocketMQ 项目的 down/up、删除原网络/存储、变更业务 owner 或 worker 资源。Docker daemon 重启后应在重新开放管理入口前重装本独立防火墙规则；Compose 保持私网地址绑定。
+
+源码与版本依据：[Dashboard 2.1.0](https://github.com/apache/rocketmq-dashboard/releases/tag/rocketmq-dashboard-2.1.0)、[固定源码](https://github.com/apache/rocketmq-dashboard/tree/a013c8fad163122713b0bd2db3d73b3bf0db373e)、[NGINX](https://nginx.org/)。部署与 CI 证据将在验收后附加。
