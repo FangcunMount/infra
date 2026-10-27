@@ -22,6 +22,7 @@ def install(bind_ip, network):
         raise ValueError('invalid bridge name')
     # Atomic replacement of this chain only, including on Docker restart.
     rules=['*filter', ':'+CHAIN+' - [0:0]', '-F '+CHAIN,
+        f'-A {CHAIN} -p tcp -i lo -s {bind_ip}/32 -j ACCEPT',
         f'-A {CHAIN} -p tcp -m conntrack --ctorigdstport 18082 -i tailscale0 -s 100.64.0.0/10 -j ACCEPT',
         f'-A {CHAIN} -p tcp -m conntrack --ctorigdstport 10911 -i {bridge} -s {subnet} -j ACCEPT',
         f'-A {CHAIN} -p tcp -j REJECT --reject-with tcp-reset', 'COMMIT', '']
@@ -34,7 +35,13 @@ def install(bind_ip, network):
         rule=['-p','tcp','-m','conntrack','--ctorigdst',bind_ip,'--ctorigdstport',port,'-j',CHAIN]
         if run('-C','DOCKER-USER',*rule,required=False).returncode:
             run('-I','DOCKER-USER','1',*rule)
+        # Docker's userland proxy can receive host-bound traffic through INPUT
+        # without crossing DOCKER-USER. Protect that path as well as DNAT.
+        local=['-p','tcp','-d',bind_ip,'--dport',port,'-j',CHAIN]
+        if run('-C','INPUT',*local,required=False).returncode:
+            run('-I','INPUT','1',*local)
     return dict(private_bind=bind_ip,ui_tailscale_only=True,rpc_broker_bridge_only=True,
+        trusted_host_self_check=True,dnat_and_userland_proxy_protected=True,
         existing_firewall_chains_preserved=True)
 
 

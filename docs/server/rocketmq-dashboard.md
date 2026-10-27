@@ -15,7 +15,7 @@
 - NGINX 1.30.6-alpine：`sha256:84ed8c0dd296c188bfc24ed506f46589e9285fb0b11cf3a04d91d524d3067e11`。
 - 入口 `http://100.118.164.39:18082`，仅 Tailscale；不新增公网入口或 DNS。
 - 独立项目 `rocketmq-dashboard`，复用外部 `rocketmq_rocketmq` 网络，512 MiB/0.5 CPU + 48 MiB/0.1 CPU，非 root、只读根目录、日志轮转。
-- Broker 对外仍宣告 `100.118.164.39:10911`。网关透明转发原 TLS 到 `broker:10911`；DOCKER-USER 新增独立目标规则，只允许 Broker bridge 访问该管理端口。原 8081/5557 防火墙链保持。
+- Broker 对外仍宣告 `100.118.164.39:10911`。网关透明转发原 TLS 到 `broker:10911`；DOCKER-USER 与 INPUT 新增两个端口的独立目标规则，覆盖 DNAT 和 Docker userland proxy 路径。管理 RPC 只允许 Broker bridge，网页只允许 Tailscale；同时允许宿主经自身 Tailscale 地址做本机检查。原 8081/5557 防火墙链保持。
 - UI 使用上游 file 登录模式，独立用户名/随机密码；Broker 连接使用另一个专用 Super 身份，因界面承担 MQ 管理职责。原 infra 管理员与应用账号不复用、不轮换。UI 登录身份与 Broker 身份分离；所有管理动作具备该专用 Broker 身份的权限。
 - 保留镜像实际包含的 Spring Security CSRF：经 `/rocketmq-dashboard/csrf-token` 取得 token/cookie，再提交 **JSON** 及 X-XSRF-TOKEN；实际 LoginController 参数带有 `@RequestBody`，不同于标签源码中的表单接口。缺 token 的写请求必须 403。Spring Security 的组件内部身份使用同一 UI 账号，避免生成临时密码进入日志。验收请求携带真实入口 Origin，不关闭 CORS/CSRF。
 - 不采用上游 ACL 登录模式：2.1.0 的按用户池没有完整沿用 TLS 配置；采用全局 TLS 管理池及独立 UI 认证，并通过实际 Broker 验证。

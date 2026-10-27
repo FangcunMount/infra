@@ -188,6 +188,8 @@ def main():
             for port in ('18082','10911'):
                 fixture.run(['sudo','iptables','-D','DOCKER-USER','-p','tcp','-m','conntrack',
                     '--ctorigdst',host,'--ctorigdstport',port,'-j','INFRA-MQ-DASH'])
+                fixture.run(['sudo','iptables','-D','INPUT','-p','tcp','-d',host,
+                    '--dport',port,'-j','INFRA-MQ-DASH'])
             fixture.run(['sudo','iptables','-F','INFRA-MQ-DASH'])
             fixture.run(['sudo','iptables','-X','INFRA-MQ-DASH'])
         if address_added:fixture.run(['sudo','ip','address','del',host+'/32','dev','lo'])
