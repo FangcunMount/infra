@@ -1,0 +1,85 @@
+name: RocketMQ readable IAM and QS business fanout
+on:
+  pull_request:
+    paths: ['scripts/rocketmq/iam_acceptance.py', 'scripts/rocketmq/test_iam_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-readable-hosts.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-readable-hosts-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  iam:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: ['mysql:8.0.36', 'mysql:8.0.44', 'mysql:8.4']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 5c2e3cd155e67c0f766e93bf95238b16fc219b5f
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/iam
+          ref: 9b9bb9f12842b6f58705ea3d29eb094cc8cab078
+          path: .iam-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: 1c2eccc32d37eb7a1af3b03ed53e62a7aae04a38
+          path: .qs-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: |
+            .iam-acceptance/go.sum
+            .qs-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Validate fixture and isolated Broker
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_iam_acceptance.py'
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-readable-host:5.5.1 components/rocketmq
+      - name: Actual IAM original root and independent IAM/QS subscriptions
+        env:
+          GOWORK: 'off'
+          GOFLAGS: '-mod=readonly'
+        run: |
+          set -euo pipefail
+          python3 scripts/rocketmq/ci-transactions.py --readable-hosts \
+            --sdk "$PWD/.sdk-acceptance" --iam-host "$PWD/.iam-acceptance" \
+            --iam-fanout-qs "$PWD/.qs-acceptance" --iam-operation-results \
+            --image rocketmq-readable-host:5.5.1 --mysql-image '${{ matrix.mysql }}' \
+            --report readable-iam-host.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('readable-iam-host.json').read_text())
+          host = data['proof']['iam_host']
+          assert data['passed'] > 0 and data['failed'] == data['skipped'] == 0
+          assert host['manifest_version'] == 3 and host['naming_scheme'] == 'readable-v1'
+          assert host['sdk_module']['Version'] == 'v0.6.0-rc.1'
+          assert host['sdk_module'] == host['qs_fanout']['sdk_module']
+          assert host['source_sha'] == '9b9bb9f12842b6f58705ea3d29eb094cc8cab078'
+          assert host['qs_fanout']['source_sha'] == '1c2eccc32d37eb7a1af3b03ed53e62a7aae04a38'
+          assert host['source_clean_after'] and host['qs_fanout']['source_clean_after']
+          assert data['cleanup'] == dict(project_containers_remaining=False,
+              compose_down_succeeded=True, probe_process_groups_drained=True,
+              private_fixture_directory_removed=True)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: readable-iam-${{ strategy.job-index }}-${{ github.sha }}
+          path: readable-iam-host.json
+          if-no-files-found: error
+          retention-days: 14

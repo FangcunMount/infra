@@ -146,3 +146,19 @@ class IAMProtectionReceiptTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class ReadableManifestTest(unittest.TestCase):
+    def test_readable_business_fanout_has_exact_single_topic_and_four_groups(self):
+        from iam_acceptance import iam_manifest
+        from routes import validate
+        value = iam_manifest(fanout=True, readable=True)
+        validate(value)
+        self.assertEqual(value['version'], 3)
+        self.assertEqual({r['physical_topic'] for r in value['routes']},
+                         {'iam-authz-version-v2--tx--iam-mysql--m3-1'})
+        self.assertEqual(len({r['consumer_group'] for r in value['routes']}), 4)
+        self.assertTrue(all(r['naming_scheme'] == 'readable-v1' for r in value['routes']))
+        legacy = iam_manifest(fanout=True)
+        self.assertEqual(legacy['version'], 2)
+        self.assertTrue(all(r['physical_topic'].startswith('rmq2_t_') for r in legacy['routes']))
+        self.assertEqual(value['accounts'], legacy['accounts'])
