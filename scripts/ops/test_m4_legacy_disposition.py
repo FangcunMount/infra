@@ -43,4 +43,15 @@ class Guards(unittest.TestCase):
     def test_current_sql_stores_excluded(self):
         for owner,table in [('ai','interpretation_result_outbox'),('iam','identity_session_revocation_outbox'),('qs','ai_messaging_inbox'),('qs','rm_tx_witness')]:self.assertNotIn((owner,table),d.SQL_QUEUES)
     def test_queue_state_allowlist(self):self.assertEqual(set(d.SQL_QUEUES.values()),{('status','published'),('state','published'),('stage','confirmed')})
+    def nsq(self):
+        return dict(operation=d.OP,authorization='user-20261027-dispose-now',kind='nsq',host='serverD',data_tree_sha256='6f72f5614855547ef4bf8d7661846a20c23692065dbe75e66bdc493d5a2171d9',containers=[dict(name=n,image=d.NSQ_IMAGE,running=False,restart='no') for n in sorted(d.NSQ_NAMES)],configs=[dict(path='/data/infra/nsq/'+n+'.conf') for n in sorted(d.NSQ_NAMES)])
+    def test_running_nsq_refused(self):
+        p=self.nsq();p['containers'][0]['running']=True
+        with self.assertRaises(ValueError):d.validate_plan(p)
+    def test_non_nsq_image_refused(self):
+        p=self.nsq();p['containers'][0]['image']='sha256:current-app'
+        with self.assertRaises(ValueError):d.validate_plan(p)
+    def test_non_nsq_config_refused(self):
+        p=self.nsq();p['configs'][0]['path']='/data/infra/rocketmq/broker.conf'
+        with self.assertRaises(ValueError):d.validate_plan(p)
 if __name__=='__main__':unittest.main()
