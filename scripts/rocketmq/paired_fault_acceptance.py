@@ -37,7 +37,7 @@ def bounded_int(value, minimum=0, maximum=1024):
     return type(value) is int and minimum <= value <= maximum
 
 
-def parse_receipt(output, junit, ai_sha, qs_sha, *, full, sdk_python=SDK_PYTHON_VERSION):
+def parse_receipt(output, junit, ai_sha, qs_sha, *, full, sdk_python=SDK_PYTHON_VERSION, sdk_go=None):
     marker = 'M3_PAIRED_FAULT_RECEIPT '
     lines = [line.split(marker, 1)[1] for line in output.splitlines() if marker + '{' in line]
     if len(lines) != 1 or len(lines[0]) > 16384:
@@ -89,7 +89,8 @@ def parse_receipt(output, junit, ai_sha, qs_sha, *, full, sdk_python=SDK_PYTHON_
         raise RuntimeError('native paired fault tests empty, substituted, failed or skipped')
     combined = dict(r['cases'])
     if full:
-        baseline = read_receipt(output,full=True,marker='M3_PAIRED_BASELINE_RECEIPT ',sdk_python=sdk_python)
+        baseline = read_receipt(output,full=True,marker='M3_PAIRED_BASELINE_RECEIPT ',sdk_python=sdk_python,
+            **({'sdk_go': sdk_go} if sdk_go is not None else {}))
         if baseline is None:
             raise RuntimeError('mandatory baseline paired regression incomplete')
         combined.update(baseline['cases'])
@@ -187,7 +188,7 @@ def run_profile(source,directory,env,command,run,proof,native_runner,broker_faul
             ('rocketmq_paired_host.py','rocketmq_paired_faults.py'),
             TESTS | (FULL_TESTS if full else frozenset()))
         partial = read_receipt(raw,full=full,partial=True,marker='M3_PAIRED_BASELINE_RECEIPT ',
-            sdk_python=config['sdk_python_version'])
+            sdk_python=config['sdk_python_version'],sdk_go=config['sdk_go_version'])
         if partial is not None:
             proof['partial_baseline_receipt'] = partial
         fault_partial = read_partial_receipt(raw,proof['source_sha'],proof['paired_qs']['source_sha'])
@@ -195,7 +196,7 @@ def run_profile(source,directory,env,command,run,proof,native_runner,broker_faul
             proof['partial_fault_receipt'] = fault_partial
         raise RuntimeError('actual paired host fault failed; private output withheld')
     proof['junit_sha256'] = hashlib.sha256(junit.read_bytes()).hexdigest()
-    receipt = parse_receipt(raw,junit.read_text(),proof['source_sha'],proof['paired_qs']['source_sha'],full=full,sdk_python=config['sdk_python_version'])
+    receipt = parse_receipt(raw,junit.read_text(),proof['source_sha'],proof['paired_qs']['source_sha'],full=full,sdk_python=config['sdk_python_version'],sdk_go=config['sdk_go_version'])
     proof['native_receipt'] = receipt
     proof['native_tests_passed'] = 7 if full else 2
     for current, expected in ((source,proof['source_sha']),

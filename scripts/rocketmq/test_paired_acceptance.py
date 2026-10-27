@@ -79,6 +79,18 @@ class PairedAcceptanceTests(unittest.TestCase):
         value=receipt(True);value['sdk_go']='v0.5.0-rocketmq-tx.2'
         self.assertIsNone(read_receipt(MARKER+json.dumps(value),full=True))
 
+    def test_readable_receipt_cannot_pass_legacy_gate_and_requires_both_fixed_versions(self):
+        value=receipt(True)
+        value.update(sdk_go='v0.6.0-rc.1',sdk_python='0.5.0rc1')
+        raw=MARKER+json.dumps(value)
+        native=xml(FULL_TESTS)
+        with self.assertRaises(RuntimeError):parse_receipt(raw,native,full=True)
+        for go,python in [('v0.5.0','0.5.0rc1'),('v0.6.0-rc.1','0.4.0')]:
+            with self.subTest(go=go,python=python),self.assertRaises(RuntimeError):
+                parse_receipt(raw,native,full=True,sdk_go=go,sdk_python=python)
+        self.assertEqual(parse_receipt(raw,native,full=True,sdk_go='v0.6.0-rc.1',
+            sdk_python='0.5.0rc1')['passed'],25)
+
     def test_partial_failure_keeps_only_known_bounded_facts(self):
         value = receipt();value['cases']={};value['passed']=0
         value['failed']=1;value['go_phase']='owner_start'

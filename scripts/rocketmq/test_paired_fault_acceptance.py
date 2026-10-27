@@ -50,6 +50,17 @@ class PairedFaultAcceptanceTests(unittest.TestCase):
             self.assertEqual(len(result['combined_cases']),40 if full else 15)
         with self.assertRaises(RuntimeError):parse_receipt(output(receipt()),xml(),AI,QS,full=True)
 
+    def test_readable_fault_receipt_requires_original_full_baseline_with_both_new_versions(self):
+        base=baseline(True);base.update(sdk_go='v0.6.0-rc.1',sdk_python='0.5.0rc1')
+        raw=output(receipt(True))+'\nM3_PAIRED_BASELINE_RECEIPT '+json.dumps(base)
+        with self.assertRaises(RuntimeError):parse_receipt(raw,xml(True),AI,QS,full=True)
+        with self.assertRaises(RuntimeError):parse_receipt(raw,xml(True),AI,QS,full=True,sdk_python='0.5.0rc1')
+        result=parse_receipt(raw,xml(True),AI,QS,full=True,sdk_python='0.5.0rc1',sdk_go='v0.6.0-rc.1')
+        self.assertEqual(len(result['combined_cases']),40)
+        base['sdk_go']='v0.5.0'
+        raw=output(receipt(True))+'\nM3_PAIRED_BASELINE_RECEIPT '+json.dumps(base)
+        with self.assertRaises(RuntimeError):parse_receipt(raw,xml(True),AI,QS,full=True,sdk_python='0.5.0rc1',sdk_go='v0.6.0-rc.1')
+
     def test_failed_skipped_empty_and_substituted_native_rejected(self):
         for tag in ('failure','error','skipped'):
             root=ET.fromstring(xml());ET.SubElement(root[0],tag)
