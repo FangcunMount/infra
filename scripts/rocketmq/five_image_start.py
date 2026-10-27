@@ -152,10 +152,15 @@ def main():
     p.add_argument('--startup-receipt', type=Path)
     p.add_argument('--m4-rebuild', action='store_true')
     p.add_argument('--m4-candidate', type=Path)
+    p.add_argument('--readable-candidate', type=Path)
     args = p.parse_args(); require(not args.report.exists(), 'new_report_required')
     cutover = args.startup_receipt is not None
     require(not (cutover and args.m4_rebuild), 'm4_is_not_an_old_cutover_receipt')
     require(args.m4_candidate is None or (args.m4_rebuild and not cutover), 'final_candidate_is_current_m4_only')
+    readable = args.readable_candidate is not None
+    require(not readable or (not cutover and not args.m4_rebuild and args.m4_candidate is None),
+            'readable_startup_is_separate_from_frozen_m3_m4_cutover')
+    rebuild = args.m4_rebuild or readable
     final_manifest = None
     final_digest = None
     sources = SOURCES
@@ -167,6 +172,11 @@ def main():
             final_manifest, final_digest = read(args.m4_candidate)
             sources, reviewed_builder = final_manifest['sources'], final_manifest['builder_sha']
     repo = Path(__file__).resolve().parents[2]
+    if readable:
+        from readable_image_candidates import read
+        final_manifest, final_digest = read(args.readable_candidate, repo / 'components/rocketmq/serverd-routes-readable-v3.json')
+        require(final_manifest['go_identity'] == dict(uid=2000, gid=2000), 'original_startup_unix_identity_required')
+        sources, reviewed_builder = final_manifest['sources'], final_manifest['builder_sha']
     report = dict(schema='m3-five-actual-image-startup-trial/v4', passed=0, failed=0, skipped=0,
                   production=False, system_acceptance=False, combined_cutover_rehearsal_complete=False,
                   c1_cutover_barrier_exercised=False, cases={}, sources=sources,
@@ -178,7 +188,17 @@ def main():
                       scope='current merged source, actual production messaging packagers, root-owned versioned files and eight real runtimes; no business/system/production claim')
     if final_manifest is not None:
         report.update(final_candidate_manifest_sha256=final_digest, final_candidate_image_runs=final_manifest['image_runs'], final_candidate=True)
-    f = FiveImageFixture(repo, report); run = f.run
+    fixture_type = FiveImageFixture
+    if readable:
+        from readable_image_start import ReadableImageLoader
+        class ReadableFixture(ReadableImageLoader, FiveImageFixture):
+            pass
+        fixture_type = ReadableFixture
+        report.update(schema='readable-eight-instance-startup/v1', sdk_profile=final_manifest['sdk_profile'],
+            scope='actual readable-only eight-process startup/shutdown and production configuration packagers; no old/new cutover, business or system claim')
+    f = fixture_type(repo, report); run = f.run
+    if readable:
+        f.readable_candidate = final_manifest
     f.qs_source_sha = sources['qs']
     f.applications = {}; f.images = {}; f.private_dirs = {}
     def case(name):
@@ -186,7 +206,7 @@ def main():
         report['cases'][name] = True
         print('M3_IMAGE_CASE ' + name, flush=True)
     def stop_actual(component):
-        timeout = 210 if component == 'ai' else 510 if args.m4_rebuild and component != 'iam' else 60
+        timeout = 210 if component == 'ai' else 510 if rebuild and component != 'iam' else 60
         run(['docker', 'stop', '--time', str(timeout), f.applications[component]], timeout=timeout + 15)
         source = args.sources / ('ai' if component == 'ai' else 'iam' if component == 'iam' else 'qs')
         return f.diagnostic(component, source)
@@ -196,6 +216,10 @@ def main():
             require(run(['git', 'rev-parse', 'HEAD'], cwd=args.sources / name).stdout.strip() == sha
                     and not run(['git', 'status', '--porcelain'], cwd=args.sources / name).stdout, 'exact_clean_source_required')
         document = manifest(repo)
+        if readable:
+            from readable_image_start import prepare_candidates
+            document = json.loads((repo / 'components/rocketmq/serverd-routes-readable-v3.json').read_bytes())
+            prepare_candidates(final_manifest, args.candidate)
         contract = parse_contract(args.consumer_contract.read_text(), source_sha=sources['qs'])
         report['original_qs_consumer_count'] = validate_manifest(document, contract, source_sha=sources['qs'])
         report['original_qs_consumer_contract'] = contract
@@ -212,8 +236,12 @@ def main():
                 shutil.copyfile(tool, private / 'qs-migrate-offline'); (private / 'qs-migrate-offline').chmod(0o755)
         report['candidates'] = candidates; report.pop('candidate'); case('all_five_exact_archives_loaded')
         if final_manifest is not None:
-            from m4_image_rebuild import final_python_dependencies
-            report['final_python_dependencies'] = final_python_dependencies(f)
+            if readable:
+                from readable_image_start import python_dependencies
+                report['final_python_dependencies'] = python_dependencies(f)
+            else:
+                from m4_image_rebuild import final_python_dependencies
+                report['final_python_dependencies'] = final_python_dependencies(f)
         f.select('api'); f.dependencies(); f.mongo_dependencies()
         run(['docker', 'pull', 'redis:7-alpine'], timeout=300)
         run(['docker', 'run', '-d', '--name', f.project + '-redis', '--label', f.label, '--network', f.network, '--network-alias', 'redis',
@@ -326,7 +354,7 @@ def main():
             QS_AI_MESSAGING=json.dumps(msg), QS_AI_GRPC=json.dumps(dict(bind_address='0.0.0.0:50061', access_address='qs-apiserver:9090',
                 ca_file='/fixture/service-ca.crt', cert_file='/fixture/ai.crt', key_file='/fixture/ai.key')),
             QS_AI_GENERATION__ENABLED='true', QS_AI_EVALUATION__ENABLED='true', QS_AI_DEEPSEEK_API_KEY='owned-unused-fixture-key', QS_AI_ZHIPU_API_KEY='owned-unused-fixture-key')
-        if args.m4_rebuild:
+        if rebuild:
             from m4_image_rebuild import configure
             configure(f, args, ai_env, case, expected_qs_sha=sources['qs'])
             for component in ('iam', 'api', 'collection', 'worker'):

@@ -1,0 +1,124 @@
+name: RocketMQ readable isolated image candidates
+on:
+  pull_request:
+    paths:
+      - scripts/rocketmq/final_image_candidate.py
+      - scripts/rocketmq/image_sdk_profile.py
+      - scripts/rocketmq/test_image_sdk_profile.py
+      - scripts/rocketmq/test_final_image_candidate.py
+      - scripts/rocketmq/readable_image_candidates.py
+      - scripts/rocketmq/test_readable_image_candidates.py
+      - .github/workflows/rocketmq-readable-images.yml
+  workflow_dispatch:
+    inputs:
+      iam_sha:
+        description: Exact reviewed IAM source SHA; no production deployment
+        type: string
+        required: true
+      qs_sha:
+        description: Exact reviewed QS source SHA; all three images share this source
+        type: string
+        required: true
+      ai_sha:
+        description: Exact reviewed AI source SHA
+        type: string
+        required: true
+      run_uid:
+        description: Reviewed existing Go runtime UID
+        type: string
+        default: '2000'
+      run_gid:
+        description: Reviewed existing Go runtime GID
+        type: string
+        default: '2000'
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-readable-images-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_image_sdk_profile.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_final_image_candidate.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_readable_image_candidates.py
+  images:
+    if: github.event_name == 'workflow_dispatch'
+    needs: contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {target: iam, repository: iam}
+          - {target: qs-api, repository: qs-server}
+          - {target: qs-collection, repository: qs-server}
+          - {target: qs-worker, repository: qs-server}
+          - {target: ai, repository: qs-ai}
+    env:
+      SOURCE_SHA: ${{ matrix.repository == 'iam' && inputs.iam_sha || matrix.repository == 'qs-server' && inputs.qs_sha || inputs.ai_sha }}
+      TARGET: ${{ matrix.target }}
+      RUN_UID: ${{ inputs.run_uid }}
+      RUN_GID: ${{ inputs.run_gid }}
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v6
+      - name: Require exact reviewed source and nonroot identity
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$RUN_UID" =~ ^[1-9][0-9]*$ && "$RUN_GID" =~ ^[1-9][0-9]*$ ]]
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/${{ matrix.repository }}
+          ref: ${{ env.SOURCE_SHA }}
+          path: .image-source
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache: false
+      - name: Build original Dockerfile with exact published readable SDK
+        run: |
+          set -euo pipefail
+          python3 scripts/rocketmq/final_image_candidate.py --source "$PWD/.image-source" \
+            --source-sha "$SOURCE_SHA" --target "$TARGET" --output "$PWD/.image-candidate" \
+            --sdk-profile readable-rc1 --run-uid "$RUN_UID" --run-gid "$RUN_GID"
+      - name: Verify candidate identity and owned cleanup
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          x = json.loads(Path('.image-candidate/image-inventory.json').read_text())
+          assert x['schema'] == 'readable-final-image-inventory/v1'
+          assert x['sdk_profile'] == 'readable-rc1' and not x['stable_release']
+          assert x['expected_sdk_source_sha'] == '5c2e3cd155e67c0f766e93bf95238b16fc219b5f'
+          assert x['source_sha'] == os.environ['SOURCE_SHA']
+          assert x['passed'] == 1 and x['failed'] == x['skipped'] == 0
+          assert x['archive_bytes'] > 0 and x['deferred_tools_absent']
+          assert all(x['cleanup'].values())
+          assert not any(x[k] for k in ('production', 'registry_published', 'application_started',
+                                        'runtime_ready', 'cutover_rehearsal_complete'))
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: readable-image-metadata-${{ matrix.target }}-${{ env.SOURCE_SHA }}-${{ github.run_id }}
+          path: .image-candidate/image-inventory.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        with:
+          name: readable-image-archive-${{ matrix.target }}-${{ env.SOURCE_SHA }}-${{ github.run_id }}
+          path: |
+            .image-candidate/*.tar.gz
+            .image-candidate/qs-migrate-offline
+          include-hidden-files: true
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14

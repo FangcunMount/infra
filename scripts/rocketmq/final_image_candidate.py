@@ -10,8 +10,10 @@ import subprocess
 import tarfile
 import uuid
 
+from image_sdk_profile import PROFILES, sdk_profile, verify_readable_python_lock
+
 MODULE = 'github.com/FangcunMount/reliable-messaging'
-GO_SUM = 'h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0='
+GO_SUM = sdk_profile('m3-stable')['go_sum']
 TARGETS = {
     'iam': ('build/docker/Dockerfile', '/app/apiserver'),
     'qs-api': ('build/docker/Dockerfile.qs-apiserver', '/app/qs-apiserver'),
@@ -45,13 +47,15 @@ def run(args, *, cwd=None, env=None, timeout=1200):
     return result.stdout
 
 
-def check_go_buildinfo(raw):
+def check_go_buildinfo(raw, *, profile='m3-stable'):
+    expected = sdk_profile(profile)
     rows = [line.split() for line in raw.splitlines()]
     deps = [row for row in rows if len(row) >= 2 and row[:2] == ['dep', MODULE]]
-    if len(deps) != 1 or deps[0][2:] != ['v0.5.0', GO_SUM] or any(
+    if len(deps) != 1 or deps[0][2:] != [expected['go'], expected['go_sum']] or any(
             row and row[0] == '=>' for row in rows):
-        raise ValueError('runtime_binary_requires_exact_stable_module_without_replace')
-    return {'version': 'v0.5.0', 'sum': GO_SUM, 'replace': False}
+        raise ValueError('runtime_binary_requires_exact_stable_module_without_replace' if profile == 'm3-stable'
+                         else 'runtime_binary_requires_exact_readable_candidate_module_without_replace')
+    return {'version': expected['go'], 'sum': expected['go_sum'], 'replace': False}
 
 
 def inventory_names(archive):
@@ -98,7 +102,9 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--run-uid', type=int, default=2000)
     parser.add_argument('--run-gid', type=int, default=2000)
+    parser.add_argument('--sdk-profile', choices=tuple(PROFILES), default='m3-stable')
     args = parser.parse_args()
+    expected_sdk = sdk_profile(args.sdk_profile)
     ci_guard(os.environ)
     if not re.fullmatch('[0-9a-f]{40}', args.source_sha):
         raise ValueError('exact_source_sha_required')
@@ -108,6 +114,9 @@ def main():
     if (run(['git', 'rev-parse', 'HEAD'], cwd=source).strip() != args.source_sha
             or run(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=source)):
         raise ValueError('fixed_clean_source_required')
+    python_lock = None
+    if args.target == 'ai' and args.sdk_profile != 'm3-stable':
+        python_lock = verify_readable_python_lock((source / 'uv.lock').read_text(), args.sdk_profile)
     output = args.output.resolve()
     output.mkdir(mode=0o700, parents=True, exist_ok=False)
     os.umask(0o077)
@@ -121,10 +130,13 @@ def main():
     original = run(['docker', 'ps', '-aq']).split()
     report = {'schema': 'm3-final-image-inventory/v1', 'target': args.target,
               'source_sha': args.source_sha, 'builder_source_sha': builder_sha,
-              'expected_sdk_source_sha': '1345266aa0e864c46de5d1e3e3c939dd8002a890',
+              'expected_sdk_source_sha': expected_sdk['source_sha'],
               'production': False,
               'application_started': False, 'registry_published': False,
               'runtime_ready': False, 'cutover_rehearsal_complete': False}
+    if args.sdk_profile != 'm3-stable':
+        report.update(schema='readable-final-image-inventory/v1', sdk_profile=args.sdk_profile,
+                      stable_release=False, python_source_lock=python_lock)
     try:
         dockerfile, binary = TARGETS[args.target]
         report['dockerfile_sha256'] = sha256(source / dockerfile)
@@ -156,7 +168,7 @@ def main():
             target = output / 'private-runtime-binary'
             run(['docker', 'cp', container + ':' + binary, str(target)])
             raw = run(['go', 'version', '-m', str(target)])
-            report['runtime_sdk'] = check_go_buildinfo(raw)
+            report['runtime_sdk'] = check_go_buildinfo(raw, profile=args.sdk_profile)
             if args.source_sha not in raw:
                 raise ValueError('runtime_binary_source_ldflags_missing')
             report['runtime_binary_sha256'] = sha256(target)
@@ -174,7 +186,7 @@ def main():
             proof = json.loads(run(['docker', 'run', '--rm', '--network', 'none',
                                    '--read-only', '--tmpfs', '/tmp', '--entrypoint',
                                    '/app/.venv/bin/python', image, '-I', '-c', code]))
-            if proof != dict(uid=10001, version='0.4.0', client='5.1.2', source=args.source_sha):
+            if proof != dict(uid=10001, version=expected_sdk['python'], client='5.1.2', source=args.source_sha):
                 raise ValueError('python_image_provenance_mismatch')
             report['runtime_sdk'] = proof
         if args.target == 'qs-api':
