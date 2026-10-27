@@ -1,0 +1,33 @@
+{
+  "schema": "readable-pop-record-audit-evidence/v1",
+  "recorded_on": "2026-10-28",
+  "decoder_file": "scripts/ops/readable_pop_record.py",
+  "decoder_sha256": "21601fe623070b3d652f5b59b151454eb242c3e61f20f8036965d56bc4167b32",
+  "local_unit_cases": 4,
+  "official_551_sources": {
+    "MessageDecoder": "713f9405ea9e70eb3beb587de3ab55527b39cb2a",
+    "MessageSysFlag": "bf60602145dbd202c0dd3134f470a9b4ecf78e9e",
+    "PopCheckPoint": "803ebc689571c5d8b5214992599d2426826d956a",
+    "AckMsg": "f722c123ea0aa742c1eb940679d02e567cac1f9b"
+  },
+  "production_readonly_inspection": {
+    "fixed_system_topic_only": true,
+    "records_read": 1,
+    "kind": "ack",
+    "record_sha256": "33161d8047b1b2b0396d655a429d0b8d04c2c7763cb5d5cd887ef3308d74f9b3",
+    "metadata_sha256": "10096fa261bb254a2414b426fb42d7f01b9ed31f0ac9ec7b5f17822ab44c52cb",
+    "metadata_field_count": 7,
+    "private_report_sha256": "073e11392e13f35385fa31a8163da6478a9f0d6d039d56ec1b7b1607303fb48f",
+    "broker_unchanged": true,
+    "mutation_operations": 0,
+    "no_file_writes_in_broker": true
+  },
+  "production_changed": false,
+  "drain_proven": false,
+  "all_queues_audited": false,
+  "remaining": [
+    "all exact revive tail ranges and retry/protocol/receipt observations",
+    "isolated held-message and recovery controls",
+    "fresh frozen maintenance evidence"
+  ]
+}
