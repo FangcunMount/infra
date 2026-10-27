@@ -74,7 +74,12 @@ def main():
             raise RuntimeError('firewall_install_failed')
         firewall_added=True
         report['stage']='dashboard_start'
-        fixture.run(compose+['up','-d'],timeout=120)
+        started=fixture.run(compose+['up','-d'],timeout=120,required=False)
+        if started.returncode:
+            # Compose arguments contain no credentials: private values are
+            # mounted files, not environment values or command-line arguments.
+            report['compose_diagnostic']=started.stderr[-3000:]
+            raise RuntimeError('dashboard_compose_start_failed')
         base='http://127.0.0.1:'+str(port)
         deadline=time.monotonic()+150
         report['stage']='dashboard_readiness'
