@@ -1,5 +1,6 @@
 """Version1 canonical logical/physical route bindings, independent of SDKs."""
 import hashlib
+import re
 import struct
 
 
@@ -12,6 +13,8 @@ def consumer_group(topic, subscription):
 
 
 def validate(manifest):
+    if manifest.get("version") == 3:
+        return validate_v3(manifest)
     if manifest.get("version") == 2:
         return validate_v2(manifest)
     if manifest.get("version") != 1 or not manifest.get("routes"):
@@ -65,10 +68,10 @@ def consumer_group_v2(topic, subscription):
     return "rmq2_g_" + _digest_v2(b"rmq-group-v2\0", (_field_v2(topic, 255), _field_v2(subscription, 255)))
 
 
-def validate_v2(manifest):
-    if manifest.get("version") != 2 or not manifest.get("routes"):
+def validate_v2(manifest, *, readable=False):
+    if manifest.get("version") != (3 if readable else 2) or not manifest.get("routes"):
         raise ValueError("nonempty v2 manifest required")
-    ids, identities, physical = {}, set(), {}
+    ids, identities, physical, groups = {}, set(), {}, {}
     for route in manifest["routes"]:
         identity = (route["topic"], route.get("subscription", ""), route["message_type"],
                     route["owner"], route["route_revision"])
@@ -79,13 +82,19 @@ def validate_v2(manifest):
         identities.add(identity)
         if route["message_type"] == "TRANSACTION" and route["owner"] not in OWNERS:
             raise ValueError("unreviewed transaction store owner")
-        expected = physical_topic_v2(route["topic"], route["message_type"], route["owner"], route["route_revision"])
-        expected_group = consumer_group_v2(route["topic"], route["subscription"]) if route.get("subscription") else ""
+        if route.get("naming_scheme", "") != ("readable-v1" if readable else ""):
+            raise ValueError("explicit reviewed naming scheme required")
+        topic_name = physical_topic_v3 if readable else physical_topic_v2
+        group_name = consumer_group_v3 if readable else consumer_group_v2
+        expected = topic_name(route["topic"], route["message_type"], route["owner"], route["route_revision"])
+        expected_group = group_name(route["topic"], route["subscription"]) if route.get("subscription") else ""
         if route["physical_topic"] != expected or route.get("consumer_group", "") != expected_group:
             raise ValueError("noncanonical v2 physical route or group")
         identity_topic = (route["topic"], route["message_type"], route["owner"], route["route_revision"])
         if physical.setdefault(expected, identity_topic) != identity_topic:
             raise ValueError("physical topic collision")
+        if expected_group and groups.setdefault(expected_group, (route["topic"], route["subscription"])) != (route["topic"], route["subscription"]):
+            raise ValueError("consumer group collision")
     for role, grants in manifest.get("accounts", {}).items():
         if role in ("admin", "inner") or not role:
             raise ValueError("application role required")
@@ -107,6 +116,43 @@ def validate_v2(manifest):
     groups = manifest.get("group_options", {})
     if set(groups) != {"retry_queue_nums"} or type(groups["retry_queue_nums"]) is not int or not 1 <= groups["retry_queue_nums"] <= 128:
         raise ValueError("explicit bounded retry queues required")
+
+
+def _readable_field(value):
+    if not isinstance(value, str) or not re.fullmatch(r"[a-z0-9]+(?:[.-][a-z0-9]+)*", value):
+        raise ValueError("readable fields require lowercase single-separated tokens")
+    return value.replace(".", "-")
+
+
+def _readable_name(*fields):
+    name = "--".join(_readable_field(v) for v in fields)
+    if len(name.encode()) > 64:
+        raise ValueError("readable resource exceeds 64 bytes")
+    return name
+
+
+def physical_topic_v3(topic, message_type, owner, revision):
+    if message_type not in ("NORMAL", "TRANSACTION"):
+        raise ValueError("NORMAL or TRANSACTION required")
+    return _readable_name(topic, "normal" if message_type == "NORMAL" else "tx", owner, revision)
+
+
+def consumer_group_v3(topic, subscription):
+    return _readable_name(topic, subscription)
+
+
+def validate_v3(manifest):
+    validate_v2(manifest, readable=True)
+    history = manifest.get("historical_routes", [])
+    if not isinstance(history, list):
+        raise ValueError("historical route list required")
+    if history:
+        validate_v2({**manifest, "version": 2, "routes": history, "accounts": {}})
+        for field in ("physical_topic", "consumer_group"):
+            current = {r[field] for r in manifest["routes"] if r.get(field)}
+            previous = {r[field] for r in history if r.get(field)}
+            if current & previous:
+                raise ValueError("active and historical resources overlap")
 
 
 def permissions_v2(manifest, grants):
