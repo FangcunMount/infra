@@ -1,0 +1,277 @@
+{
+  "schema": "m4-c08-production-deployment/v1",
+  "recorded_on": "2026-10-27",
+  "task": "C08-04",
+  "implementation_and_business_verified": true,
+  "progress": {
+    "leaves": 37,
+    "total": 38,
+    "parents": 7,
+    "parent_total": 8,
+    "C08": "4/5",
+    "pending": [
+      "C08-05"
+    ]
+  },
+  "window": {
+    "operation_id": "20261027-c08-v3",
+    "binding_sha256": "6ab5ccfd8ecc7962a74f3c59937d274763706bb57b0f019ac89ae3da6222158c",
+    "started_at": "2026-10-27T01:05:31.969116+00:00",
+    "deadline_epoch": 1793064931,
+    "public_reopened_at": "2026-10-27T01:22:52.706324+00:00",
+    "duration_seconds": 1041.706,
+    "extended": false,
+    "first_start_barrier_retained": true,
+    "old_eight_stopped_cleanly": true,
+    "restored_original_HTTP_files": true,
+    "temporary_acceptance_exception_removed": true
+  },
+  "runtime": {
+    "serverA": {
+      "ai": [
+        {
+          "config_sha256": "e97e842cc2ec0b0d57a9c46ead94a24b38dde46f28c8e5600fd7f67ebe16e318",
+          "container_id": "4fe3d667ad5fa02657fdc4338d849d4f48b9836f93fb7898514fd2a434f2e031",
+          "gid": 10001,
+          "health": "healthy",
+          "hostconfig_sha256": "68a07064d02a631cd1313bc685d981a038c70dda8c7260d7b2a9589462cf6abd",
+          "image_id": "sha256:927c6cea9c0551be4d026bf53e27e4521a45d4bd9c4b36e848f097657db0ab14",
+          "memory_bytes": 805306368,
+          "name": "qs-ai",
+          "nano_cpus": 750000000,
+          "restarts": 0,
+          "started_at": "2026-10-27T01:06:53.926964555Z",
+          "uid": 10001
+        }
+      ],
+      "iam": [
+        {
+          "config_sha256": "c8c6b598c2d9425f58ef71b4b914e5409fab6a5c13c5be637f3edb17e00b1a4d",
+          "container_id": "69e972a82fb3d94b4be5c9ca675daeaf591fde81f1aee615c17e384db0a3abf0",
+          "gid": 2000,
+          "health": "healthy",
+          "hostconfig_sha256": "065df914d7b7fac2cbcdf845173e4343e340a4b0581f4b908852e5ce49adf99c",
+          "image_id": "sha256:b121e97fc20bf3bd8e8b550a89df8920ec348afd1e5af0bb632acc7e615ae67f",
+          "memory_bytes": 1073741824,
+          "name": "iam-apiserver",
+          "nano_cpus": 1000000000,
+          "restarts": 0,
+          "started_at": "2026-10-27T01:06:46.149789388Z",
+          "uid": 2000
+        }
+      ],
+      "qs-api": [
+        {
+          "config_sha256": "31702d0e46918416e0abb8c61ce3ccf5e5e574bdb44a215b10112d4da52a25d9",
+          "container_id": "76ea9cbbd7501131987a80c407745f0dfc5214b71e66bc8cf4ec702187997866",
+          "gid": 2000,
+          "health": "healthy",
+          "hostconfig_sha256": "06d146adc5c2a3ef951d5e32dce5f6960bffe14a00ba81e653b44fed33d388a9",
+          "image_id": "sha256:501125199a976747ad6febafada18ffc2fa1025504d93b179daa30301bc44d55",
+          "memory_bytes": 1073741824,
+          "name": "qs-apiserver",
+          "nano_cpus": 2000000000,
+          "restarts": 0,
+          "started_at": "2026-10-27T01:08:26.594981929Z",
+          "uid": 2000
+        }
+      ],
+      "qs-collection": [
+        {
+          "config_sha256": "1f57c16b1a25d671dc7673033e9fcfcd02452b6a2e68c89329baf3551815f532",
+          "container_id": "b0442507bbb4653f63185593b256cd51c65ca5e98e5d5edf79c12f14c9358d44",
+          "gid": 2000,
+          "health": "healthy",
+          "hostconfig_sha256": "38e16c44130f42f2010e7028e9b15e321be0babeabf6f03017fbc2c46ceb7116",
+          "image_id": "sha256:97506c3aca75905423b6ad8bd96c234c19f2e8fd52bd25e8acfc9d6935ed576f",
+          "memory_bytes": 335544320,
+          "name": "qs-collection-server-1",
+          "nano_cpus": 1000000000,
+          "restarts": 0,
+          "started_at": "2026-10-27T01:08:46.991116576Z",
+          "uid": 2000
+        },
+        {
+          "config_sha256": "7c716c33b8b8b85119275fda9f0ef46b65bd43320aca8c62edd3e3790671ec4e",
+          "container_id": "2c684a6be1220cf9c7fbed680709843bcad85d94d806289586862256274224a6",
+          "gid": 2000,
+          "health": "healthy",
+          "hostconfig_sha256": "7278cb6f6cf0e71ede881c1043d152a4ea84c684bf3581568fae7611055e4084",
+          "image_id": "sha256:97506c3aca75905423b6ad8bd96c234c19f2e8fd52bd25e8acfc9d6935ed576f",
+          "memory_bytes": 335544320,
+          "name": "qs-collection-server-2",
+          "nano_cpus": 1000000000,
+          "restarts": 0,
+          "started_at": "2026-10-27T01:08:46.526467997Z",
+          "uid": 2000
+        }
+      ]
+    },
+    "serverD": {
+      "qs-worker": [
+        {
+          "config_sha256": "86b17a92bfd245349a07bcb309d876bc4bb63baee05cbe8b1a31dd0e0f06640d",
+          "container_id": "f1b3c2f47acef809c28e42788b4071016bb1cb27ec7f7f8d703b4faa1607de2c",
+          "gid": 2000,
+          "health": "HTTP ready",
+          "hostconfig_sha256": "0ba8891dc9e12b2b6ede35de44b0b685ffb39842cf91655fe945ad0a1c5efc9b",
+          "image_id": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+          "memory_bytes": 805306368,
+          "name": "qs-worker-runtime-1",
+          "nano_cpus": 1000000000,
+          "restarts": 0,
+          "started_at": "2026-10-27T01:08:41.215658711Z",
+          "uid": 2000
+        },
+        {
+          "config_sha256": "dfc54910cc60d5de3078e00362b8a5b06559f0f7a299094f5def2464224d0c93",
+          "container_id": "6368fb8f730394e9763aaa087b5bc2e08879e28a1ed04bf17771e30a21e1ea3b",
+          "gid": 2000,
+          "health": "HTTP ready",
+          "hostconfig_sha256": "1def4820cd1c39c5481b70555c120c5ae39ed9390ba93dae931c016ae71e1c70",
+          "image_id": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+          "memory_bytes": 805306368,
+          "name": "qs-worker-runtime-2",
+          "nano_cpus": 1000000000,
+          "restarts": 0,
+          "started_at": "2026-10-27T01:08:40.278650695Z",
+          "uid": 2000
+        },
+        {
+          "config_sha256": "ea25dc984a5cfd253f808c44ce7a1d04a74b7ed0b1c22b3c0e8c5d7079fcc492",
+          "container_id": "19dd1606a7671b3c9b9c31e8ba8621d300196a667b08ba9c828f8334310a22cd",
+          "gid": 2000,
+          "health": "HTTP ready",
+          "hostconfig_sha256": "b698199f00e5a1cebb933e2ad71ffa6b09e00d0c64c2cf4b75dcb92e9a5b75b2",
+          "image_id": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+          "memory_bytes": 805306368,
+          "name": "qs-worker-runtime-3",
+          "nano_cpus": 1000000000,
+          "restarts": 0,
+          "started_at": "2026-10-27T01:08:41.86784186Z",
+          "uid": 2000
+        }
+      ]
+    }
+  },
+  "post_reopen": {
+    "public_HTTPS_200": 4,
+    "TLS_verified": true,
+    "heads": {
+      "iam_mysql": 45,
+      "qs_mysql": 110,
+      "qs_mongo": 44,
+      "ai": "0043_native_transaction_limit"
+    },
+    "four_original_owner_bindings_preserved": true,
+    "all_eight_running": true,
+    "restarts": 0,
+    "OOM": false,
+    "worker_HTTP_ready": 3,
+    "original_worker_concurrency_each": 48,
+    "worker_publish": false,
+    "all_four_owners_ready": true,
+    "protection_or_native_limit_active": false,
+    "all_ten_targets_up": true,
+    "serverD_available_MiB": 1218,
+    "original_resource_UID_GID_budgets_preserved": true
+  },
+  "business": {
+    "AI_events": 4,
+    "AI_receipt_state_ACK": true,
+    "QS_business_ACKs": 4,
+    "QS_commands": 1,
+    "answer_score_report": true,
+    "exact_committed_business_witnesses": 13,
+    "iam_dual_subscription": true,
+    "new_answer": 1,
+    "new_artifacts": 1,
+    "new_empty_unassigned_role": 1,
+    "new_interpretation_operation": 1,
+    "new_job_attempt": 1,
+    "new_model_calls": 1,
+    "old_blocked_sessions_preserved": 7,
+    "old_model_jobs_sessions_checkpoints_unchanged": true,
+    "old_requests_replayed": false,
+    "passed": true,
+    "schema": "m4-c08-business-acceptance/v1",
+    "verified_at": "2026-10-27T01:22:44.419560+00:00"
+  },
+  "retained_assets": {
+    "NSQ_containers_stopped": 3,
+    "restart": "no",
+    "NSQ_active_listeners_or_connections": 0,
+    "NSQ_files": 1519,
+    "NSQ_tree_sha256": "6f72f5614855547ef4bf8d7661846a20c23692065dbe75e66bdc493d5a2171d9",
+    "original_config_and_backups_preserved": true,
+    "physical_deletions": 0,
+    "review_not_before": "2026-11-25"
+  },
+  "automatic_CD": {
+    "iam_PRODUCTION_DEPLOY_PAUSED": true,
+    "qs_PRODUCTION_DEPLOY_PAUSED": true,
+    "AI_AUTO_DEPLOY_ENABLED": false
+  },
+  "unchanged": {
+    "DDL": true,
+    "credentials": true,
+    "Topic_ACL": true,
+    "writer_epoch": true,
+    "Redis": true,
+    "Broker_image_parameters_and_process": true,
+    "model_retry_authorization": true
+  },
+  "known_preexisting_issue": {
+    "scope": "IAM selected-role grant-detail read",
+    "status": "open; observed before M4 runtime deployment",
+    "message": "UI grant-detail read displays server error; new empty role, zero grants/members, policy CAS/witness and IAM/QS fanout independently proved. No extra permission mutations."
+  },
+  "failure_history": [
+    {
+      "scope": "QS API start transport",
+      "reason": "SSH disconnected before candidate start reached host",
+      "handling": "read actual stopped original state, then retry exact same frozen candidate; no business replay"
+    },
+    {
+      "scope": "native mini-program automation",
+      "reason": "AX submit click did not trigger request",
+      "handling": "UI and authoritative reads showed no submission; user submitted exactly once and started exactly one new interpretation"
+    },
+    {
+      "scope": "read-only evidence helper",
+      "reason": "initial aggregation used wrong collection/aggregate correlation and relaxed numeric IDs",
+      "handling": "original failed/partial receipts retained; corrected exact-ID and string-ID proof passed before public reopen"
+    },
+    {
+      "scope": "read-only retained-assets helper",
+      "reason": "first wrapper assumed NSQ key in original pre-state",
+      "handling": "read actual keys; independent container/config proof and full original 1519-file manifest recheck passed; no asset mutations"
+    }
+  ],
+  "private_evidence_sha256": {
+    "closed.private.json": "84a908572aac5320426e9ee7bd29bf3f4027f110830b2b19862461c748e82f92",
+    "open-serverA-20261027T012248-d223dc.private.json": "5eb52284f9c2839a9d98cafaafec1a317eea1fbb5d29ffd551c8ecb4a030fcc4",
+    "business-acceptance-verified.private.json": "f8c25615a60c0a3162b35514c904a2b314298837b042bc17d830a1031cc2153f",
+    "public-reopened-20261027T012328.private.json": "f60ed5749f282e0eccf0dffc18803baea8276ec9511fe52627acee986396476b",
+    "heads-bindings-20261027T012310-f74aa5.private.json": "b519add1f1a2e2a4f0c1bae6ea5a248ff4c6801cd451cf7a13d0d2ac9d6b9099",
+    "runtime-baseline-20261027T012311-0f162b.private.json": "38132bccc02eb7169c124543b1e88dbf6d1acc1930dea01fd1450eec017e94b0",
+    "owner-ready-20261027T012204-b85758.private.json": "e80ada6ecbc320052ab666d08f2dd12f5a477f435262f1feb6c53b10fe13e2bc",
+    "monitoring-20261027T012355-bc1930.private.json": "d10b5d62d2b7b8b73e8d2f86968b77b10875a0a110430441479bf80da8b3e537",
+    "worker-ready-20261027T012312-f8eec6.private.json": "a4b893fd5af751b46deb2f6e45e2cf6f4907ac523db09cbf71baac0a2e32ef97",
+    "retained-final-20261027T012038.private.json": "973538ca17c183b53c7209dc1a4cbb28accac555f23244b33f201e4a47e3f510",
+    "retained-tree-final-20261027T012410.private.json": "9c239bba3d17cfc23fb4ac6259df7b847741b960d908c75cf3848458bf044776",
+    "serverA-status.private.json": "2a47368bd927cb71eae458e9097bf6c4e9ffb22bebaa498bb2d86951d6b13578",
+    "serverD-status.private.json": "2faf8ea5979334fbf2a36d9398555d89df3565cd596d216af4a7dc76bb13a454"
+  },
+  "public_data_policy": "No answers, interpretation text, model payload, wire, credentials or private contact details exported",
+  "M3_T34_observation": "user waived; not performed or claimed passed",
+  "source_merge_state": "operational source already merged through infra PR343; this receipt effective on its own PR merge",
+  "production_actions_not_performed": {
+    "DDL": false,
+    "credential_Topic_ACL_rotation": false,
+    "Broker_restart": false,
+    "old_message_or_model_replay": false,
+    "asset_physical_deletion": false,
+    "automatic_CD_resume": false
+  }
+}
