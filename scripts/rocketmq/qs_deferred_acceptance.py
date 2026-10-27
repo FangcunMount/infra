@@ -17,7 +17,7 @@ CASES = frozenset((
 SCOPE = 'original MySQL deferred consumption, real lease/lock/process boundaries; controlled callback failures'
 HISTORY_CASES = frozenset(('active_subscriptions_exclude_history',
     'missing_history_does_not_spend_attempt', 'original_wire_and_transport_identity_retained',
-    'completed_history_not_republished'))
+    'completed_history_not_republished', 'historical_input_cannot_create_hold'))
 
 
 def parse_history_receipt(output):
