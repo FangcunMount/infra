@@ -1,0 +1,275 @@
+{
+  "schema": "m4-c08-production-window-ready/v1",
+  "recorded_on": "2026-10-27",
+  "task": "C08-03",
+  "implementation_verified": true,
+  "application_sources_unchanged": true,
+  "source": {
+    "PRs": [
+      340,
+      341,
+      342
+    ],
+    "final_source": "a77aa01b6d7ca71bf60fbe5f355c8cfc2c995e0a",
+    "final_merge": "f8c061a342efab9faef971b864663db6770a7890",
+    "final_CI_run": 40429156660,
+    "CI_profiles": [
+      "ubuntu-24.04",
+      "macos-15"
+    ],
+    "tests_per_profile": 27,
+    "failed": 0,
+    "skipped": 0,
+    "M3_registry_digest_guard_unchanged": true
+  },
+  "fixed_packet": {
+    "operation_id": "20261027-c08-v3",
+    "local_directory": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-window-v3",
+    "binding_sha256": "6ab5ccfd8ecc7962a74f3c59937d274763706bb57b0f019ac89ae3da6222158c",
+    "source_closure_sha256": "0e35887713602f83b819efd75173079600b812a42cd8eb724c9134bf5942305e",
+    "source_closure": {
+      "ops/m3_nginx_acceptance_gate.py": "4b4f23c98c6bf3b394a5ec706121d3ee76ce42cdc525344bdd7223c52a00c6b1",
+      "ops/m3_nginx_gate.py": "798baee24fb05ae05cefb4459cadf41fa799909644052ae76c2cf8e4299bbd5d",
+      "ops/m4_runtime_start.py": "10ee032d83435bbe9059411d0f2728bff5790a6a4981eed4967e4aac61e5db6b",
+      "rocketmq/cutover_step.py": "894f27388d1914f7064c49d8c14a05958e77fb5935c1850cbdae7afda85cb7dd",
+      "rocketmq/runtime_start.py": "e558189ca58bc2d73b71c829d043541eb1ff3ddd9c02f82953a0041c95b1ee23",
+      "rocketmq/start_boundary.py": "2c2b18a4d8b0865f5cb7d6fa81840d7d4f50c7dbc1265d7fa657bb9236f1700c"
+    },
+    "target_operator_sha256": "c325cf97c2f19fc2f9c75f257822b5d58de5b4d6311255de5a573d87c6b853e9",
+    "local_coordinator_sha256": "abf279a94bd8e7fd78f7913bf3b8cdbbef7ecb24dc3ed2b0486475986371538d",
+    "local_coordinator": "/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/window_execute_v3.py",
+    "root_target_source": "rocketmq-m4-c08-window-operator-20261027.py.txt",
+    "hosts": {
+      "serverA": {
+        "actual_offline_CLI_previews": 4,
+        "applications_started": false,
+        "binding_sha256": "6ab5ccfd8ecc7962a74f3c59937d274763706bb57b0f019ac89ae3da6222158c",
+        "host": "serverA",
+        "maintenance_started": false,
+        "original_locks": {
+          "/opt/qs-ai/deploy.lock": {
+            "device": 64770,
+            "gid": 2001,
+            "inode": 400122,
+            "mode": "0o600",
+            "uid": 1002
+          },
+          "/var/lib/fangcun-image-retention/deploy.lock": {
+            "device": 64770,
+            "gid": 0,
+            "inode": 820503,
+            "mode": "0o666",
+            "uid": 0
+          }
+        },
+        "original_runtime_unchanged": 5,
+        "plans": {
+          "ai": {
+            "assets": {
+              "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/ai.encrypt.mq-ai-20261004.json": "225729a5bcb4817310023ebb7bb086fb1467ac2446630a02b0d2c6ec98dda8d1",
+              "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/ai.sign.mq-ai-20261004.json": "f5627366690277d4545da08bfab119e9033abcb9819d6c189f7510892e85ff2f",
+              "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/qs.encrypt.mq-ai-20261004.json": "e01b6c9f38cf28473b87598aaac91da857d055a38d67b32246d103cb517d6a55",
+              "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/qs.sign.mq-ai-20261004.json": "a42500d9818ca22cf2fa6b3b01b14800eaca269b717a53233a0099a8fc3f613e",
+              "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/rocketmq/ca.crt": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+              "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/rocketmq/credentials.json": "b6529b94fc1681235051bbd504aea8366ffd786352a5d7c7b6f64002d55b630f",
+              "/var/lib/fangcun-m4-materials/qs-ai-messaging/versions/m4-c06-20261026-v1/rocketmq/routes.json": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3"
+            },
+            "compose_sha256": "b7899a69192b11be991dd57e50c1464bd854c430345cb2518492c46da5c6f8b6",
+            "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+            "image_id": "sha256:927c6cea9c0551be4d026bf53e27e4521a45d4bd9c4b36e848f097657db0ab14",
+            "ordinary_gid": 10001,
+            "ordinary_uid": 10001,
+            "path": "/var/lib/fangcun-m4/windows/20261027-c08-v3/ai-start.json",
+            "replicas": 1,
+            "sha256": "9eaf9ebe0c30ac217e070c77854d73952dc476d4923ccb6c1c7fdeb03995461f"
+          },
+          "iam": {
+            "assets": {
+              "/opt/fangcun-m4/releases/m4-c08-20261027-v1/iam/assets/events.yaml": "6ffe5c44a0751576fe59230eeb37496138da321f240421b089ea1dad7fab8bef",
+              "/opt/fangcun-m4/releases/m4-c08-20261027-v1/iam/assets/runtime.json": "4d30a6d7ede64141f9732a354a7024c61c344fdbd2027ca22bc753d7c4e04145",
+              "/var/lib/fangcun-m4-materials/iam-messaging/versions/m4-c06-20261026-v1/rocketmq/ca.crt": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+              "/var/lib/fangcun-m4-materials/iam-messaging/versions/m4-c06-20261026-v1/rocketmq/credentials.json": "ee92edf0a658b87e922284469f8fe152d4597b818b4829408287283ba21922ff",
+              "/var/lib/fangcun-m4-materials/iam-messaging/versions/m4-c06-20261026-v1/rocketmq/routes.json": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3"
+            },
+            "compose_sha256": "ed39cd36e0011602b3500990308c9edfca6c5d1929c6adacde7a3e87e6dee8c3",
+            "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+            "image_id": "sha256:b121e97fc20bf3bd8e8b550a89df8920ec348afd1e5af0bb632acc7e615ae67f",
+            "ordinary_gid": 2000,
+            "ordinary_uid": 2000,
+            "path": "/var/lib/fangcun-m4/windows/20261027-c08-v3/iam-start.json",
+            "replicas": 1,
+            "sha256": "d56d9d3d5d86dfa712e21a22b7836faf8bd0800b814c1371a824f996f3afbd26"
+          },
+          "qs-api": {
+            "assets": {
+              "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-api/assets/events.yaml": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+              "/opt/qs-server/qs-apiserver/ai-mq-releases/1f38f583d43c9faf4601a5df9f3f82b764e6547d/apiserver.json": "28cd777cc8e5af3ab87465e0ff497d1930cc024b46d5a3ba90f7ae334915ab38",
+              "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/ai.encrypt.mq-ai-20261004.json": "7098603ade994a301fed99966852afddb434ac65bad9edf8ed29d4c47168c97a",
+              "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/ai.sign.mq-ai-20261004.json": "b08110b2e226a0dd358c5a9beb09f32697e4d430aea46a99ff26838152534b55",
+              "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/qs.encrypt.mq-ai-20261004.json": "0debe07787cc2b8e02c1245c2d746bed0c9011bf51e2ba7147852077399bd5c1",
+              "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/qs.sign.mq-ai-20261004.json": "a930af2d1ae26f12c55e8df5000bf84389869ed36bc7cbc67094ec07f0b706a0",
+              "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/rocketmq/ca.crt": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+              "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/rocketmq/credentials.json": "5478dfd060eb7cf12785236f95ebe5e9efb1823c3d1fcde1d0c04887de5e4894",
+              "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/rocketmq/mongo-credentials.json": "56eb749ad5ff5d96043eba861087a565e4f85a9e6208b72d5c5ce1e4b976d4ac",
+              "/var/lib/fangcun-m4-materials/qs-server-messaging/versions/m4-c06-20261026-v1/rocketmq/routes.json": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3"
+            },
+            "compose_sha256": "00e911b172d887900cb581fa1fdf536a6bd444f81c53b08d0a9f566a418de3df",
+            "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+            "image_id": "sha256:501125199a976747ad6febafada18ffc2fa1025504d93b179daa30301bc44d55",
+            "ordinary_gid": 2000,
+            "ordinary_uid": 2000,
+            "path": "/var/lib/fangcun-m4/windows/20261027-c08-v3/qs-api-start.json",
+            "replicas": 1,
+            "sha256": "b359415390b8a544250677c5b70ba21b08e22bd62eee4eb16ddff7cb33215447"
+          },
+          "qs-collection": {
+            "assets": {
+              "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-collection/assets/runtime.json": "a2aa8f0c50cf57369c7ba2c5efc69d043d59880152d3b0c821912b06268945bb"
+            },
+            "compose_sha256": "c5867d51f29a138ed129faa8a19c9e5ecc5ac52c1cf6122daddeaaa1660a6269",
+            "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+            "image_id": "sha256:97506c3aca75905423b6ad8bd96c234c19f2e8fd52bd25e8acfc9d6935ed576f",
+            "ordinary_gid": 2000,
+            "ordinary_uid": 2000,
+            "path": "/var/lib/fangcun-m4/windows/20261027-c08-v3/qs-collection-start.json",
+            "replicas": 2,
+            "sha256": "ba813e65f448215b31ce6632a2a10778c0d32fbad800501c0a3965c21f0aaa12"
+          }
+        },
+        "source_closure_sha256": "0e35887713602f83b819efd75173079600b812a42cd8eb724c9134bf5942305e",
+        "tool_root": "/opt/fangcun-m4/window-tools/0e35887713602f83b819efd75173079600b812a42cd8eb724c9134bf5942305e",
+        "window_root": "/var/lib/fangcun-m4/windows/20261027-c08-v3"
+      },
+      "serverD": {
+        "actual_offline_CLI_previews": 1,
+        "applications_started": false,
+        "binding_sha256": "6ab5ccfd8ecc7962a74f3c59937d274763706bb57b0f019ac89ae3da6222158c",
+        "host": "serverD",
+        "maintenance_started": false,
+        "original_locks": {
+          "/var/lib/fangcun-image-retention/deploy.lock": {
+            "device": 64514,
+            "gid": 0,
+            "inode": 23606,
+            "mode": "0o666",
+            "uid": 0
+          }
+        },
+        "original_runtime_unchanged": 3,
+        "plans": {
+          "qs-worker": {
+            "assets": {
+              "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-worker/assets/events.yaml": "e6340c49295c81d600667c51deede03e9b35e0b8c6d7fe677f08cc6fc9f1e9b8",
+              "/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-worker/assets/runtime.json": "38c8364c5a3a9cb9168c47cd7677888319610d78d1d12cee8685db768b5e869c",
+              "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-c06-20261026-v1/rocketmq/ca.crt": "23ea737a748c22e0bac394bed449b7765281429a3cc643527b6574e40aeca31c",
+              "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-c06-20261026-v1/rocketmq/credentials.json": "3b05d19bb76de476c1a7ed3de17760cf50293b5798ccff8b7063a8b172402e79",
+              "/var/lib/fangcun-m4-materials/qs-worker-messaging/versions/m4-c06-20261026-v1/rocketmq/routes.json": "8773e13b98140de9dc5ccbdf1aa3bd0393849f77cc1a7480ae68dd8f9aaadfa3"
+            },
+            "compose_sha256": "a161b70dda11cc8a6d8b4592c758c7d3bf8efb427e28fc4943d70fe3b3b6a6e5",
+            "environment_sha256": "fe533f2eab23f9e78793cc2a1db7af6cfe87272ca883e9c2246eb6ef002ec1de",
+            "image_id": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+            "ordinary_gid": 2000,
+            "ordinary_uid": 2000,
+            "path": "/var/lib/fangcun-m4/windows/20261027-c08-v3/qs-worker-start.json",
+            "replicas": 3,
+            "sha256": "106663a509f0d1a8f5b1fc5c353772a5039cdf4c37ffecbd03d3f5ef2a32d3e6"
+          }
+        },
+        "source_closure_sha256": "0e35887713602f83b819efd75173079600b812a42cd8eb724c9134bf5942305e",
+        "tool_root": "/opt/fangcun-m4/window-tools/0e35887713602f83b819efd75173079600b812a42cd8eb724c9134bf5942305e",
+        "window_root": "/var/lib/fangcun-m4/windows/20261027-c08-v3"
+      }
+    }
+  },
+  "actual_host_proofs": {
+    "projects": 5,
+    "ordinary_UID_GID_processes": 10,
+    "offline_CLI_previews": 5,
+    "original_runtime_unchanged": 8,
+    "original_deploy_AI_locks_retained": true,
+    "existing_AI_lock": {
+      "uid": 1002,
+      "gid": 2001,
+      "mode": "0o600",
+      "inode": 400122
+    },
+    "ingress_original_closed_syntax_processes": 2,
+    "actual_TCP_peer_correlated": true,
+    "peer_values_exported": false
+  },
+  "legal_acceptance": {
+    "system_actor_id": "10001",
+    "visible_profile_verified": true,
+    "user_confirmed_new_questionnaire_prepared": true,
+    "scope": {
+      "external_reminders": 0,
+      "extra_evaluations": 0,
+      "new_SNAP_IV_18_answer": 1,
+      "new_empty_unassigned_role": 1,
+      "new_interpretation_operation": 1,
+      "old_requests_replayed": 0
+    },
+    "old_requests_replayed": false,
+    "external_reminders": false
+  },
+  "quiescence": {
+    "private_report_sha256": "ea86d268ff6e0943763175e1eafcc1c902c0cec4afd6a85dad56929063e9542f",
+    "unresolved_protocol_prepared": 0,
+    "AI_jobs": {
+      "done": 37,
+      "queued": 0,
+      "leased": 0
+    },
+    "model_calls": {
+      "response_received": 35,
+      "active": 0,
+      "unknown": 0
+    },
+    "blocked_sessions": 7,
+    "evaluation_active_checkpoints": 0,
+    "identity_fingerprint": "a2a2f3165334e8f2beb2d32ff30c0f81d7ca47e51a967b193e400c4de7a92221",
+    "preserve_all_old_facts": true
+  },
+  "boundaries": {
+    "window_seconds": 1800,
+    "actual_T0_not_yet_created": true,
+    "acceptance_reserve_seconds": 540,
+    "first_start_marker_persistent": true,
+    "host_maintenance_sites": 3,
+    "temporary_acceptance_uses_exact_verified_TCP_peers": true,
+    "normal_TLS_and_application_authentication_preserved": true,
+    "before_first_M4_start": "only restore this operation HTTP files / original stopped container identities if required; no DB restore",
+    "after_first_M4_start": "same immutable candidate forward repair only; preserve every fact",
+    "rehearsal": "existing actual eight-image startup/close/zero-DDL proof and native process/Broker recovery plus new M4 failure guards; no production fault injection"
+  },
+  "failure_history": [
+    {
+      "operation": "v1 preparation",
+      "reason": "original AI lock belongs to deploy, not root",
+      "result": "original lock preserved; exact original metadata validated; no maintenance or app start"
+    },
+    {
+      "operation": "v2 preparation",
+      "reason": "www/app aliases rejected by numeric-only assumption; duplicate local evidence filename refused",
+      "result": "aliases plus true id proofs added, previous evidence retained; no maintenance or app start"
+    }
+  ],
+  "production": {
+    "maintenance_started": false,
+    "applications_deployed": false,
+    "DDL": false,
+    "credential_or_Topic_ACL_change": false,
+    "model_or_business_invoked": false,
+    "automatic_CD_resumed": false
+  },
+  "progress": {
+    "leaves_completed": 36,
+    "total": 38,
+    "parent_completed": 7,
+    "parent_total": 8,
+    "remaining": [
+      "C08-04",
+      "C08-05"
+    ]
+  }
+}

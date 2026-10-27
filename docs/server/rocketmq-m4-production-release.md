@@ -1,6 +1,6 @@
 # M4 最终生产发布清单与恢复边界
 
-**候选已冻结；生产执行包仍在收敛，尚未部署应用，不能据本草稿开启维护。** C01—C07源码和政策保留闭环；最终候选、生产执行、system回归及发布索引归C08，唯一状态见[M4总表](rocketmq-m4-execution.md)。自动生产CD继续暂停。
+**候选及唯一v3执行包已冻结；尚未开始维护或部署。按本页、具名包和实际门禁受控执行。** C01—C07源码和政策保留闭环；最终候选、生产执行、system回归及发布索引归C08，唯一状态见[M4总表](rocketmq-m4-execution.md)。自动生产CD继续暂停。
 
 ## 当前准备和待冻结项
 
@@ -8,7 +8,7 @@
 - C08审计发现AI还安装SDK的NSQ extra及无调用的CI NSQ服务；[AI PR231](https://github.com/FangcunMount/qs-ai/pull/231)移除它们。候选b00cf3a2f30deffa99e9bf71aa1b6177c651c23c已通过14项完整CI、两档各5668用例、真实依赖及重新构建/八实例验证。此前f83472c7的AI镜像仅为阶段证据，不作为最终发布。
 - [归档发布器](rocketmq-m4-final-candidate.md#固定归档发布)仅传输固定归档、预检全部目标tag不存在并回读不可变manifest/config摘要。最终v2发布计划和18项报告已绑定AI依赖修正；旧计划禁止进入最终生产发布。[正式发布40371739428](https://github.com/FangcunMount/iam/actions/runs/40371739428)已通过5/0/0；IAM工作流d2291007、infra传输dd65adab已固定并合并。原始[发布receipt](evidence/rocketmq-m4-c08-acr-publication-20261027.json)不包含部署。
 - [主机准备回执](evidence/rocketmq-m4-c08-host-preflight-20261027.json)记录固定只读材料工具安装、四角色普通部署用户正向校验及8项错误绑定拒绝。该回执是当时快照；随后[API原生冻结工具](evidence/rocketmq-m4-c08-api-tool-install-20261027.json)已固定安装，尚未调用、激活材料或部署应用。
-- [最终候选冻结receipt](evidence/rocketmq-m4-c08-final-freeze-20261027.json)已固定五类ACR引用、归档/config/云端engine ID、五项目Compose/环境/21材料及API正式离线预检。尚需冻结实际维护入口、在途检查/停止/前向恢复执行和system最小用例。缺任何一项不开始维护。
+- [最终候选冻结receipt](evidence/rocketmq-m4-c08-final-freeze-20261027.json)已固定五类ACR引用、归档/config/云端engine ID、五项目Compose/环境/21材料及API正式离线预检。[v3包](evidence/rocketmq-m4-c08-window-ready-20261027.json)已冻结维护/停止/启动/前向恢复与最小system用例；实际T0仅在门禁复核后创建。
 
 ## 具名目标和保持项
 
@@ -34,15 +34,15 @@
 | D / `qs-worker` | `qs-worker` | `runtime` / 3 | `qs-worker/compose.json` |
 | A / `qs-collection` | `qs-collection` | `server` / 2 | `qs-collection/compose.json` |
 
-未来启动只能在协调器核对维护/排空和精确文件摘要、持有原锁后，使用原project、上述Compose与env文件，以及`up -d --no-build --no-deps --pull never --wait --wait-timeout 60`和固定service/副本。A还须保持原AI部署锁；D三个worker另查真实HTTP ready，不能用没有Docker healthcheck推断失败或通过。精确可执行协调步骤、T0/期限和验收来源仍待C08-03完成，不能直接据此参数表开窗口。
+未来启动只能在协调器核对维护/排空和精确文件摘要、持有原锁后，使用原project、上述Compose与env文件，以及`up -d --no-build --no-deps --pull never --wait --wait-timeout 60`和固定service/副本。A还须保持原AI部署锁；D三个worker另查真实HTTP ready，不能用没有Docker healthcheck推断失败或通过。精确协调包及来源见下节；必须由同一入口填写真实T0/期限，不能直接绕过门禁执行参数表。
 
 新包保留原四owner的publish=true，worker始终false且无owner，由外部维护入口阻止新业务；本次不先冻结closed API后再改同SHA配置。未来API binding指针已准备，原活动`/data/infra`指针不变；原生冻结按QS源码SHA不可改写。普通deploy实际调用、重复冻结和三组错误参数拒绝均已通过，原sudo规则保持。
 
-## 维护入口副本已验证（C08-03未完成）
+## 维护入口和C08-03门禁已验证
 
 serverA原`nginx`镜像sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d已实际验证原始/closed两种三站点组合，两个`nginx -t`均退出0。[非活动入口receipt](evidence/rocketmq-m4-c08-inactive-ingress-20261027.json)固定`/data/apps/nginx-configs`下`iam.fangcunmount.cn.conf`、`qs.fangcunmount.cn.conf`、`collect.conf`的原/closed摘要、inode及权限；副本在固定release目录的`ingress/original`和`ingress/closed`。测试容器无发布端口、原主机挂载只读，缓存/日志写入临时tmpfs，完成即清理；未reload或更改原Nginx/站点。
 
-本次真实关闭时须再次核对这三个原文件及Nginx身份，保持原inode/owner/mode写入已冻结closed字节，先全量syntax检查再reload并核对实际503。首次应用启动前若需撤销本次维护，只恢复本次原始三文件并验证/reload，不触及数据库或旧M3运行状态。首次M4启动后业务恢复采用前向修复，不能把恢复HTTP入口当成允许回退旧业务/数据。system来源、实际T0/期限和有界验收例外只能在合法会话就绪后记录；没有用测试地址/时间冒充生产事实。实际在途/停止与启动协调仍待收敛，本节不构成开窗口授权或C08-03完成。
+本次真实关闭时须再次核对这三个原文件及Nginx身份，保持原inode/owner/mode写入已冻结closed字节，先全量syntax检查再reload并核对实际503。首次应用启动前若需撤销本次维护，只恢复本次原始三文件并验证/reload，不触及数据库或旧M3运行状态。首次M4启动后业务恢复采用前向修复，不能把恢复HTTP入口当成允许回退旧业务/数据。system来源、实际T0/期限和有界验收例外只能在合法会话就绪后记录；没有用测试地址/时间冒充生产事实。实际在途/停止与启动协调已由下节v3包冻结；仍须复核真实门禁。
 
 ## 窗口前门禁
 
@@ -50,12 +50,29 @@ serverA原`nginx`镜像sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34
 2. 从实际主库只读回读四owner的原字节binding及clean heads，不用SDK binding schema_version代替宿主迁移head；核对八实例身份/资源/重启和worker HTTP ready。serverD可用内存至少512MiB；不足或出现OOM/非预期重启则停止。
 3. 固定新镜像已通过原归档在主机离线预置：两主机ACR读取鉴权拒绝，未复制CI凭据；必须核对真实保存config SHA、rootfs及关键配置，再使用冻结的实际engine ID，不能把该ID误当作ACR manifest。保留原镜像。调用固定root材料验证器，核对已安装的精确审核API原生冻结工具；仅授权固定源码/镜像、基路径和UID/GID。普通部署用户实际原生预检成功、重复冻结一致且错误输入在替换前拒绝后，才能准备启动。
 4. 原私有配置、环境、挂载、网络与服务身份在原主机内冻结，不将凭据或原wire导出。新包以真实Compose解码回读，并逐字段比对原owner/预算、只读材料、服务证书、监听及下游地址。root工具、sudo规则、计划和源码均绑定精确摘要；保留原版本。
-5. system合法会话与门店A最小验收入口就绪。上次核验Mac锁定且Chrome没有Qlume会话，已请求用户正常登录，尚未收到就绪回复。不能用管理员令牌、替代身份或数据库探针代签system验收；入口未准备好不进入维护。
+5. system合法会话与门店A最小验收入口就绪。用户已正常登录，页面核对actor10001，且已准备新答卷等待一次提交。不能用管理员令牌、替代身份或数据库探针代签system验收；入口未准备好不进入维护。
 6. 核对AI真实在途、已有模型调用/checkpoint和未来调度责任。需要额外等待时留在窗口前；不为清理强杀模型、重置attempt、重做unknown或重新投递旧消息。
+
+## 唯一v3执行入口
+
+[receipt](evidence/rocketmq-m4-c08-window-ready-20261027.json)冻结唯一操作`20261027-c08-v3`及全部摘要。实际目标[源码副本](evidence/rocketmq-m4-c08-window-operator-20261027.py.txt)与本地协调器`/Users/yangshujie/.local/state/fangcun-m4/20261027-c08-runtime/window_execute_v3.py`的摘要必须与binding相同。目标状态目录`/var/lib/fangcun-m4/windows/20261027-c08-v3`；v1/v2仅保留失败证据、禁止执行。
+
+| 顺序 | 同一协调入口参数 | 实际门禁 |
+| --- | --- | --- |
+| 1 | `close --host serverA` | 原Nginx/三文件/原锁匹配，写入已验closed字节；实际503后保存T0/期限 |
+| 2 | 原quiescence只读入口 | Prepared/queued/leased/活动模型为0，旧blocked及模型身份保持 |
+| 3 | `stop --host serverD --role qs-worker`；A依次`ai`、`qs-collection`、`qs-api`、`iam` | 只停止原ID/配置，原锁覆盖，真实Exit0；不假称ShutdownIncomplete已结束 |
+| 4 | A `start --role iam`、`ai`、`qs-api`；D `start --role qs-worker`；A `start --role qs-collection` | `--host`明确A/D；持久首启动标记先于命令，固定image/参数，无build/pull/deps；保留9分钟验收余量 |
+| 5 | `status --host serverA`、`status --host serverD` | 八实例kernel UID/GID/资源/image/health，D三HTTP ready；四owner保护另读 |
+| 6 | `acceptance --host serverA` | 同T0期限内仅实际TCP来源通过维护503；正常TLS/应用登录保持 |
+| 7 | system业务用例及精确只读关联 | 一个新空角色无grant/member并验证双订阅；一次新答卷→评分/报告；一次新解读业务操作→receipt/state/ACK；旧任务不重试 |
+| 8 | `open --host serverA --business-proof <本次实际私有证据>` | 三项真实证据通过后恢复本次原始三站点字节并test/reload，不伪造proof |
+
+五项目CLI默认预览与十次普通镜像id探针已在实机通过；原锁owner/inode/mode、www/app别名及原预算保持。源CI两系统各27项覆盖漂移/锁互斥/失败不回退；真实八实例关闭、零DDL及进程/Broker恢复沿最终native报告，不在生产注入故障。用户已授权按M4自动处理同类操作；本次不增加数据库、凭据或路由变更。
 
 ## 受控执行顺序
 
-窗口目标不超过30分钟。精确命令、截止时间和恢复清单尚待最终候选绑定；未冻结前本节仅定义顺序。
+窗口目标不超过30分钟。v3包创建真实T0和1800秒期限；启动前至少剩540秒验收预算。未知结果保留标记并前向修复，不重置T0。
 
 1. 通过既有维护入口封闭新业务写入，IAM登录一并维护；允许已接受工作沿当前事务协议收敛。保留读证据和Checker，不把开关、取消或lease当作回滚证明。
 2. 记录未决责任、当前准入revision及实际在途；等待真实任务排空。关闭失败或ShutdownIncomplete不得假称已停止，也不提前关闭DB/loop。
