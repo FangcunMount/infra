@@ -60,8 +60,11 @@ def verify(base, credentials):
     if not accepted(login):
         error=AssertionError('independent_login_failed')
         message=str(login[1].get('errMsg',''))
+        redacted=message.replace(credentials['password'],'[redacted]')
+        redacted=re.sub(r'\b[0-9a-fA-F]{32,}\b|\b[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\b','[redacted]',redacted)
         error.diagnostics=dict(http_status=login[0],app_status=login[1].get('status'),
             response_fields=sorted(login[1]),
+            error_message_redacted=redacted[:700],
             bad_credentials='Bad username or password' in message,
             error_classes=sorted(set(re.findall(r'\b[A-Za-z_][\w.]*(?:Exception|Error)\b',message))))
         raise error
