@@ -44,7 +44,7 @@ def finalization_manifest():
     return manifest
 
 
-def read_receipt(output):
+def read_receipt(output, *, sdk_version='0.4.0a2'):
     lines = [line.split(_MARKER, 1)[1] for line in output.splitlines() if _MARKER + '{' in line]
     if len(lines) != 1:
         return None
@@ -57,15 +57,15 @@ def read_receipt(output):
             or any(v is not True for v in value['cases'].values())
             or any(type(value[k]) is not int or not 0 <= value[k] <= 100 for k in ('passed', 'failed', 'skipped'))
             or value['passed'] != len(value['cases']) or value['root'] != 'original_mysql_sqlalchemy'
-            or value['sdk'] != '0.4.0a2' or value['client'] != '5.1.2'
+            or value['sdk'] != sdk_version or value['client'] != '5.1.2'
             or re.fullmatch(r'3\.(?:11|13)\.\d{1,3}', value['python']) is None
             or any(type(value[k]) is not bool for k in _FLAGS)):
         return None
     return value
 
 
-def parse_receipt(output, junit):
-    value = read_receipt(output)
+def parse_receipt(output, junit, *, sdk_version='0.4.0a2'):
+    value = read_receipt(output, sdk_version=sdk_version)
     if (value is None or set(value['cases']) != CASES
             or value['failed'] != 0 or value['skipped'] != 0
             or any(value[k] is not True for k in _FLAGS)):
