@@ -25,4 +25,4 @@ IAM/QS的PRODUCTION_DEPLOY_PAUSED均为false，AI的AUTO_DEPLOY_ENABLED为true�
 
 清理后原八实例ID/镜像与0重启/OOM保持；四owner/10目标、4项公网TLS200及clean schema heads通过，D可用1216MiB。原36模型/38 jobs/7 blocked及checkpoint的完整身份快照逐项相同。原C07/M4发布receipt是历史证据，不改写；本页及本次receipt说明最新追加结果。
 
-IAM角色详情问题已完成[只读交接](iam-role-detail-handoff-20261027.md)，尚未修复或部署。
+IAM角色详情的[只读交接](iam-role-detail-handoff-20261027.md)保留原快照；后续已完成[修复及生产验收](iam-role-details-read-fix.md)，源码/CI、实际CD及system页面分别留证。首次实际CD暴露的旧锁sudo调用已由IAM PR159修正，无sudo扩权或锁inode重建。

@@ -19,7 +19,7 @@
 - 用户已豁免原等待期，NSQ三容器/专属镜像/1519文件/三配置、11份具名旧保护备份及5882条旧发布终态记录已清理；必要结构、当前业务证据与其他镜像保护保持。见[最新资产台账](rocketmq-m4-retained-assets.md)。
 - 当前Inbox/receipt、首次wire/ACK、模型response/checkpoint、消费幂等、业务重试/未来调度与witness/Checker继续承担责任。
 - IAM/QS的`PRODUCTION_DEPLOY_PAUSED=false`；AI的`AUTO_DEPLOY_ENABLED=true`。已按实际运行基线补齐配置，未额外触发新生产部署。
-- 既存IAM角色授权详情读取出现服务端错误，单独登记为未解决；本轮空角色创建、零grant/member、策略原子提交和双订阅有独立证据，未假称详情接口通过。
+- 后续IAM角色详情读取已于2026-10-27独立修复上线，见[修复及生产验收](iam-role-details-read-fix.md)；PR158改用明确只读边界，PR159修正原锁复用，最终运行55193a9d、CD及system页面验收通过。原M4创建/双订阅receipt不改写为读取证明。
 - R01—R03高级原生超限恢复见[独立台账](rocketmq-native-recovery-followups.md)，PL-R007/008保留原移交；均不冒充已完成。M3 T34沿用用户豁免，未进行或声称48小时观察通过。
 - 首启动屏障继续有效；不得使用旧全量备份覆盖当前事实，不切回NSQ/Outbox、不补发旧消息或重做模型。后续修复使用精确候选及原证据前向处理。
 

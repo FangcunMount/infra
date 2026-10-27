@@ -1,0 +1,374 @@
+{
+  "schema": "iam-role-details-read-fix/v1",
+  "recorded_on": "2026-10-27",
+  "source": {
+    "baseline": "d22910071e8e5d21fb411b7c0856c18d8d2aefc6",
+    "fix": "89834032e6ba9df8ecd569389d3930b749c5827e",
+    "pr": "https://github.com/FangcunMount/iam/pull/158",
+    "merge": "f1bfef3d5e712e3188b42eee6885201d9591e767"
+  },
+  "production_before": {
+    "runtime_source": "4609d4542d9303130ab94ed67593d0a69d0d010d",
+    "container_id": "69e972a82fb3d94b4be5c9ca675daeaf591fde81f1aee615c17e384db0a3abf0",
+    "engine_id": "sha256:b121e97fc20bf3bd8e8b550a89df8920ec348afd1e5af0bb632acc7e615ae67f",
+    "restarts": 0,
+    "grants": {
+      "http_status": 500,
+      "business_code": 1,
+      "request_id": "req-1793069954114-ahj5rlt0"
+    },
+    "assignments": {
+      "http_status": 200,
+      "business_code": 200,
+      "data": [],
+      "request_id": "req-1793069954115-a8667n1x"
+    },
+    "counts": {
+      "acceptance_grants": 0,
+      "acceptance_members": 0,
+      "authz_assignments": 256,
+      "authz_permission_grants": 137,
+      "iam_authz_operations": 3,
+      "policy_version": 177,
+      "prepared_witness": 0,
+      "rm_outbox": 0,
+      "rm_tx_execution": 3,
+      "rm_tx_witness": 3
+    }
+  },
+  "production_error_evidence_limit": "grants 500 and code 1 correlated with request_id; service logs omit underlying error text; exact planned-UOW rejection is established by source and real module assembly regression, not an original production error-text log",
+  "local_validation": {
+    "pre_fix_real_module_http": {
+      "http_status": 500,
+      "business_code": 1
+    },
+    "post_fix_native_mysql": {
+      "version": "8.0.46",
+      "race": true,
+      "passed": true
+    },
+    "full_race_packages_passed": 167,
+    "full_vet_passed": true,
+    "scoped_golangci_passed": true,
+    "full_golangci": "3 existing errcheck issues in unchanged scripts/testing/m6_nsq_ack_drop_proxy/main.go",
+    "test_mysql": "owned isolated container on Mac mini, removed with its anonymous volume after verification",
+    "logs": {
+      "red": {
+        "sha256": "2538e071bf003c89446c232e6f068bcdf4aacc16d9487c7549692cf5cad3232c"
+      },
+      "green_native": {
+        "sha256": "4f0c9e0b2559a5659ecb3f9651b37d69e6a8d8706e31f410b0280d64471f7cc0"
+      },
+      "full_race": {
+        "sha256": "c58e4aef0a9c8ad37be03a1dc218ca26914c18f2b257a528466aa37a6630093d"
+      },
+      "scoped_lint": {
+        "sha256": "e92606b0bf483111dff0a120c315ea165821348f31365020e2468a0059095c47"
+      },
+      "full_vet": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "full_lint_existing_errors": {
+        "sha256": "f31214a46142588db7cef59a5d5d8539b78db017f202037935141a555305b3fe"
+      }
+    }
+  },
+  "audit_probe": {
+    "source_sha256": "14eda1f78d65105e929ba1b732425d13c255f7acc555c1ba446f165fabf4e39b",
+    "binary_sha256": "64e9c50f8bf14ed159195a399306f839f6966ab988536a03faee44c2df517519",
+    "boundary": "existing runtime config/environment and TLS factory; single read-only repeatable-read transaction; count-only output; no credentials exported"
+  },
+  "ci": {
+    "run": 40442294361,
+    "status": "success",
+    "pr_checks_passed": 9,
+    "concurrency_run": 40442294336,
+    "codeql_run": 40442292275,
+    "matrix": {
+      "8.0.36": {
+        "role_details_read_passed": true,
+        "passed": 34,
+        "failed": 0,
+        "skipped": 0,
+        "log_sha256": "9e868c0fdfd5c497ff4ba0cdb34e894dedf08de48715f5546363905d74280cca"
+      },
+      "8.0.44": {
+        "role_details_read_passed": true,
+        "passed": 34,
+        "failed": 0,
+        "skipped": 0,
+        "log_sha256": "4e33ee04ef8ed36194ad16e83c17647cdda0e3c0ee3d02caf6c762f67499e5b3"
+      },
+      "8.4": {
+        "role_details_read_passed": true,
+        "passed": 34,
+        "failed": 0,
+        "skipped": 0,
+        "log_sha256": "27084d4a39c4113d173a82deb7960e866cd34b447b1ec5b3c64ef1e2ac39b52d"
+      }
+    },
+    "main_run": 40442777226,
+    "main_status": "success"
+  },
+  "deployment": {
+    "status": "success",
+    "run": 40443279869,
+    "source_sha": "f1bfef3d5e712e3188b42eee6885201d9591e767",
+    "trigger": "original workflow_run after successful main CI",
+    "deployment_switch_changed_by_this_fix": false,
+    "preflight_lock_inode": 820503,
+    "preflight_lock_owner": "root:root",
+    "preflight_lock_mode": "0666",
+    "preflight_lock_busy": false,
+    "attempts": [
+      {
+        "run": 40443279869,
+        "source_sha": "f1bfef3d5e712e3188b42eee6885201d9591e767",
+        "image_build": "success",
+        "deployment": "failed",
+        "failed_at": "2026-10-27T11:21:42+08:00",
+        "reason": "restricted deploy sudo does not authorize touch of existing deploy.lock; old script selected generic sudo after sudo -n true",
+        "runtime_replaced": false,
+        "log_sha256": "ca5466403d72807fa2d607b368fa90c9476ec031ffe0afc94511679379b7b40a"
+      }
+    ],
+    "final_run": 40445323798,
+    "final_source_sha": "55193a9d8f43baf00e67ff51a407ca8ee43dbcad",
+    "completed_at": "2026-10-27T11:43:41+08:00",
+    "readiness_passed_at": "2026-10-27T11:43:40+08:00",
+    "log_sha256": "c06c623e4a72357a5ea164455900624455be58a9a1b3e9788f35bab302fd5591",
+    "optional_retention_cleanup": {
+      "status": "skipped",
+      "reason": "trusted host helper missing, untrusted or differs; original guard refused cleanup",
+      "sudo_rules_or_trusted_helper_changed": false
+    }
+  },
+  "page_acceptance": {
+    "status": "passed",
+    "session": "existing legitimate system session; no token/cookie exported",
+    "empty_role": {
+      "grants": {
+        "http_status": 200,
+        "business_code": 200,
+        "data": []
+      },
+      "assignments": {
+        "http_status": 200,
+        "business_code": 200,
+        "data": []
+      }
+    },
+    "existing_role_qs_admin": {
+      "grants_http_status": 200,
+      "assignments_http_status": 200,
+      "grant_count_in_ui": 1,
+      "member_count_in_ui": 2,
+      "member_table_data_rows": 2,
+      "business_code_note": "UI lists rendered successfully; only empty-role response bodies were separately retained as code/data evidence"
+    },
+    "rapid_switch": {
+      "sequence": [
+        "empty acceptance role",
+        "qs:admin",
+        "empty acceptance role"
+      ],
+      "final_role": "empty acceptance role",
+      "final_grant_count": 0,
+      "final_member_count": 0,
+      "network_observation": "14 GET requests for role grants/assignments displayed HTTP 200; no error toast",
+      "passed": true
+    },
+    "sanitized_service_requests": [
+      {
+        "timestamp": "2026-10-27 11:45:05.420",
+        "request_id": "req-1793072705420-b96e3rpu",
+        "path": "/api/v4/authz/roles/1/grants",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:45:05.420",
+        "request_id": "req-1793072705420-mf7eqrz1",
+        "path": "/api/v4/authz/roles/1/assignments",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:45:51.185",
+        "request_id": "req-1793072751185-8p0b5t4a",
+        "path": "/api/v4/authz/roles/1/grants",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:45:51.185",
+        "request_id": "req-1793072751185-2p0ustmm",
+        "path": "/api/v4/authz/roles/1/assignments",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:46:03.380",
+        "request_id": "req-1793072763380-6waj2i2m",
+        "path": "/api/v4/authz/roles/613485615253565998/assignments",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:46:03.380",
+        "request_id": "req-1793072763380-ta02b77s",
+        "path": "/api/v4/authz/roles/613485615253565998/grants",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:47:27.680",
+        "request_id": "req-1793072847680-lbah0beh",
+        "path": "/api/v4/authz/roles/643463205334561326/grants",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:47:27.680",
+        "request_id": "req-1793072847680-xu9rq7mg",
+        "path": "/api/v4/authz/roles/643463205334561326/assignments",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:47:44.245",
+        "request_id": "req-1793072864245-q7r58ucj",
+        "path": "/api/v4/authz/roles/613485615186457134/assignments",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:47:44.245",
+        "request_id": "req-1793072864245-pac4z48q",
+        "path": "/api/v4/authz/roles/613485615186457134/grants",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:52:16.038",
+        "request_id": "req-1793073136038-n25z70p0",
+        "path": "/api/v4/authz/roles/613485615169679918/grants",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:52:16.038",
+        "request_id": "req-1793073136038-cp3yxww0",
+        "path": "/api/v4/authz/roles/613485615169679918/assignments",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:52:16.924",
+        "request_id": "req-1793073136924-h2mltsp3",
+        "path": "/api/v4/authz/roles/613485615186457134/grants",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:52:16.924",
+        "request_id": "req-1793073136924-9ghjb5gi",
+        "path": "/api/v4/authz/roles/613485615186457134/assignments",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:52:42.964",
+        "request_id": "req-1793073162964-pxxi0wry",
+        "path": "/api/v4/authz/roles/643463205334561326/grants",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:52:42.964",
+        "request_id": "req-1793073162964-lqoeyhom",
+        "path": "/api/v4/authz/roles/643463205334561326/assignments",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:52:43.335",
+        "request_id": "req-1793073163335-lo0a7u5w",
+        "path": "/api/v4/authz/roles/613485615186457134/grants",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:52:43.335",
+        "request_id": "req-1793073163335-jgibeou9",
+        "path": "/api/v4/authz/roles/613485615186457134/assignments",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:52:43.789",
+        "request_id": "req-1793073163789-njka64se",
+        "path": "/api/v4/authz/roles/643463205334561326/grants",
+        "message": "HTTP Request Started"
+      },
+      {
+        "timestamp": "2026-10-27 11:52:43.789",
+        "request_id": "req-1793073163789-468dxvq2",
+        "path": "/api/v4/authz/roles/643463205334561326/assignments",
+        "message": "HTTP Request Started"
+      }
+    ],
+    "new_http_error_events": [],
+    "screenshot_sha256": "62536c894edfb2d69ba6cb67036d26e803ef85dd5b63c9a354132ec27fadd3c5",
+    "screenshot": "iam-role-details-accepted-20261027.jpg"
+  },
+  "cd_boundary_fix": {
+    "pr": "https://github.com/FangcunMount/iam/pull/159",
+    "source": "ea9255c54a21aeb84c41a7d5e1401a81b920dad9",
+    "local_kernel_lock_tests": 5,
+    "existing_retention_tests": 17,
+    "material_tests": 4,
+    "go_deployment_package_passed": true,
+    "actual_deploy_user_check": {
+      "host": "serverA",
+      "user": "deploy",
+      "original_lock_inode": 820503,
+      "mode": "0666",
+      "uid": 0,
+      "size": 0,
+      "mtime_epoch": 1792406202,
+      "metadata_unchanged": true,
+      "competitor_refused": true,
+      "sudo_rules_changed": false
+    },
+    "ci": 40444285095,
+    "merge": "55193a9d8f43baf00e67ff51a407ca8ee43dbcad",
+    "ci_status": "success",
+    "pr_checks_passed": 8,
+    "script_sha256": "1497d44a202678f1b1eb0b7a51ba0a624d26210bdbb6b6b90abcac7dcf52dcef",
+    "main_ci": 40444830331,
+    "main_ci_status": "success",
+    "business_go_diff_from_role_fix_empty": true
+  },
+  "non_iam_serverA_before": {
+    "qs-collection-server-2": "2c684a6be1220cf9c7fbed680709843bcad85d94d806289586862256274224a6",
+    "qs-collection-server-1": "b0442507bbb4653f63185593b256cd51c65ca5e98e5d5edf79c12f14c9358d44",
+    "qs-apiserver": "76ea9cbbd7501131987a80c407745f0dfc5214b71e66bc8cf4ec702187997866",
+    "qs-ai": "4fe3d667ad5fa02657fdc4338d849d4f48b9836f93fb7898514fd2a434f2e031",
+    "prometheus-route": "5b7db6baafaed456674c2348bc4355ce17afa595a1680bb3b4f315e86c348e6e",
+    "nginx": "8d9f2f4d1a9cf85d4f51497897eff0b545676ff8eb479f595beee9d969b6d18e"
+  },
+  "production_after": {
+    "runtime_source": "55193a9d8f43baf00e67ff51a407ca8ee43dbcad",
+    "container_id": "1f929905b701e9870badaddcd9928450a5bf299441fc5a478d45b77d0beb5fa1",
+    "engine_id": "sha256:d5e51ec9bef40a609251ba35068b89374e5e1caa5124b53f4aab22151552ea97",
+    "image_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/iam:55193a9d8f43baf00e67ff51a407ca8ee43dbcad",
+    "binary_git_commit": "55193a9d8f43baf00e67ff51a407ca8ee43dbcad",
+    "uid_gid": "2000:2000",
+    "memory_bytes": 1073741824,
+    "nano_cpus": 1000000000,
+    "restart_count": 0,
+    "oom_killed": false,
+    "docker_health": "healthy",
+    "public_healthz": 200,
+    "public_readyz": 200,
+    "counts": {
+      "acceptance_grants": 0,
+      "acceptance_members": 0,
+      "authz_assignments": 256,
+      "authz_permission_grants": 137,
+      "iam_authz_operations": 3,
+      "policy_version": 177,
+      "prepared_witness": 0,
+      "rm_outbox": 0,
+      "rm_tx_execution": 3,
+      "rm_tx_witness": 3
+    },
+    "counts_equal_before": true,
+    "shared_lock_inode": 820503,
+    "shared_lock_mode": "0666",
+    "non_iam_serverA_container_ids_unchanged": true
+  }
+}
