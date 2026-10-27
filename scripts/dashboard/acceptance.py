@@ -45,4 +45,4 @@ def verify(base, credentials):
     return dict(login_required=True,anonymous_inventory_denied=True,default_login_denied=True,
         wrong_password_denied=True,independent_login=True,tls_authenticated_cluster=True,
         topics_read=True,consumer_groups_read=True,logout_revokes_session=True,
-        message_mutations=False)
+        no_message_mutations=True)
