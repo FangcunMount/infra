@@ -51,6 +51,57 @@ def single_cluster(output):
         raise RuntimeError('owned single Broker membership differs')
 
 
+def retry_v2_parameter(raw):
+    rows = re.findall(r'^\s*enableRetryTopicV2\s*=\s*(true|false)\s*$', raw, re.MULTILINE)
+    if len(rows) != 1:
+        raise RuntimeError('one authoritative POP retry setting required')
+    return rows[0] == 'true'
+
+
+def generate_owned_pop_v2(container, project, invoke):
+    # Internal v2 retry creation is disabled by the pinned Broker default. Enable
+    # only inside this verified disposable project, retain until revive creates
+    # its resource, then restore the effective original setting before deletion.
+    import os
+    from final_image_candidate import ci_guard
+    ci_guard(os.environ)
+    if not re.fullmatch(r'rocketmq-m2-[0-9a-f]{12}', project):
+        raise RuntimeError('owned isolated POP control project required')
+    identity = subprocess.run(['docker', 'inspect', '--format',
+        '{{index .Config.Labels "com.docker.compose.project"}}', container],
+        capture_output=True, text=True, timeout=15)
+    if identity.returncode or identity.stdout.strip() != project:
+        raise RuntimeError('owned isolated POP control Broker differs')
+    admin = Admin(container)
+    before = retry_v2_parameter(admin('getBrokerConfig'))
+    snapshot = '/tmp/readable-pop-control-' + secrets.token_hex(6)
+    admin.docker('mkdir', '-m', '700', snapshot)
+    try:
+        if not before:
+            command(admin, 'updateBrokerConfig', '-b', '127.0.0.1:10911',
+                '-k', 'enableRetryTopicV2', '-v', 'true', success='update broker config success, ')
+        if not retry_v2_parameter(admin('getBrokerConfig')):
+            raise RuntimeError('owned POP v2 control setting not effective')
+        row = invoke()
+        deadline = time.monotonic() + 90
+        while row['retry_topic'] not in admin.metadata(snapshot)['topicConfigTable']:
+            if time.monotonic() >= deadline:
+                raise RuntimeError('actual POP v2 retry was not created by Broker revive')
+            time.sleep(1)
+    finally:
+        try:
+            if not before:
+                command(admin, 'updateBrokerConfig', '-b', '127.0.0.1:10911',
+                    '-k', 'enableRetryTopicV2', '-v', 'false', success='update broker config success, ')
+            if retry_v2_parameter(admin('getBrokerConfig')) != before:
+                raise RuntimeError('owned original POP v2 setting not restored')
+        finally:
+            for name in ('topic.json', 'subscriptionGroup.json'):
+                admin.docker('rm', '-f', '--', snapshot + '/' + name, required=False)
+            admin.docker('rmdir', snapshot, required=False)
+    return row, dict(before=before, during=True, after=before, restored=True, production=False)
+
+
 def run_owned_retirement(container, project, previous, current, accounts, receipt, *, pop_v2_sentinel=None):
     validate_transition(previous, current)
     if (not re.fullmatch(r'rocketmq-m2-[0-9a-f]{12}', project)

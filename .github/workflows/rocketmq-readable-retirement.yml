@@ -71,6 +71,9 @@ jobs:
           generated=retirement['pop_v2_generation']
           assert generated['received']==1 and generated['ack_calls']==0 and generated['clients_closed']
           assert generated['retry_topic'] in retirement['retained_sentinels']
+          control=proof['pop_v2_control']
+          assert control['during'] and control['restored'] and control['before']==control['after']
+          assert control['production'] is False
           assert data['cleanup'] == dict(project_containers_remaining=False,
               compose_down_succeeded=True, probe_process_groups_drained=True,
               private_fixture_directory_removed=True)

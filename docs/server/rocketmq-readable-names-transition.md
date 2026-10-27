@@ -57,7 +57,7 @@
 
 增强运行40560478215失败保留：5.5.1的`updateTopic`按TopicValidator拒绝内部POP v2名称中的`+`，因此不能通过普通建Topic命令制造此哨兵。此失败发生在所选旧资源删除之前，owned环境已完整清理；不是生产故障，也不是删除成功。
 
-修正为真正的POP路径：在原隔离项目中复用已有可读NORMAL survey输入、原发布/订阅账号及最小权限，只发布一次随机的合成运输正文；真实SimpleConsumer取到这一条后不ACK并关闭所有本地客户端，由Broker revive自然生成`%RETRY%<group>+<topic>`。此未选中的retry责任贯穿后续具名删除并核对保留；不修改TopicValidator、Broker开关、账号或凭据，不向生产发送消息。
+修正为真正的POP路径：在原隔离项目中复用已有可读NORMAL survey输入、原发布/订阅账号及最小权限，只发布一次随机的合成运输正文；真实SimpleConsumer取到这一条后不ACK并关闭所有本地客户端，由Broker revive自然生成`%RETRY%<group>+<topic>`。此未选中的retry责任贯穿后续具名删除并核对保留；不修改TopicValidator、生产Broker开关、账号或凭据，不向生产发送消息。固定5.5.1默认未启用POP v2；仅在已核验GitHub-hosted/owned容器标签的隔离项目中临时启用，待真实revive生成后，在任何删除前恢复并回读原值，报告分别记录before/during/after/restored。
 
 classic retry/DLQ及POP v1哨兵继续由原管理入口创建；新增原生v2哨兵必须存在于真实metadata后才允许开始删除。最终仍要求四个哨兵全部保留、其他metadata/ACL不变、原138项与清理通过；修正后真实运行尚未完成。原生v2的合成未ACK责任只随其owned Compose环境整体退出，不被表述为生产责任已清零。
 
