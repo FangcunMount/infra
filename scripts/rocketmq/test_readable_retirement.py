@@ -24,6 +24,7 @@ class ReadableRetirementTest(unittest.TestCase):
             broker='127.0.0.1:10911', nameserver='nameserver:9876',
             cluster_masters=['127.0.0.1:10911'], old_runtimes_stopped=True,
             new_business_accepted=True, history_mapping_preserved=True,
+            broker_topic_names=sorted({r['physical_topic'] for r in self.old['routes'] + self.new['routes']}),
             resources={name: dict.fromkeys(COUNTERS, 0) | {'export_sha256': 'a' * 64}
                        for name in self.selected})
 
@@ -73,6 +74,19 @@ class ReadableRetirementTest(unittest.TestCase):
         self.assertEqual(result['retained'], keep)
         self.assertTrue(all(c[c.index('-r') + 1] == self.selected[0]
                             for c in result['commands'] if c[0] == 'deleteAcl'))
+
+    def test_missing_metadata_and_pop_retry_cascade_are_rejected_even_with_zero_counters(self):
+        topic = next(r.removeprefix('Topic:') for r in self.selected if r.startswith('Topic:'))
+        original = list(self.evidence['broker_topic_names'])
+        for names in (None, [], original + [original[0]],
+                      [name for name in original if name != topic],
+                      original + ['%RETRY%unselected-group_' + topic],
+                      original + ['%RETRY%unselected-group+' + topic]):
+            self.evidence['broker_topic_names'] = names
+            with self.subTest(names=names), self.assertRaises(ValueError):
+                self.plan()
+        self.evidence['broker_topic_names'] = original + ['%RETRY%other-group+other-topic']
+        self.plan()
 
     def test_wildcards_active_system_unknown_and_duplicate_selection_reject(self):
         for selected in ([], ['Topic:*'], ['Topic:RMQ_SYS_TRANS_HALF_TOPIC'],

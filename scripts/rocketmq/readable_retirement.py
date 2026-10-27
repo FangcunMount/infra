@@ -34,6 +34,15 @@ def resources(manifest):
             | {'Group:' + r['consumer_group'] for r in manifest['routes'] if r.get('consumer_group')})
 
 
+def pop_retry_companions(topic, topic_names):
+    # This scans only to PROTECT resources. It never selects anything for deletion.
+    # Broker 5.5.1 may cascade deleteTopic to both POP retry naming formats.
+    return sorted(name for name in topic_names if name.startswith('%RETRY%')
+                  and any(name.endswith(separator + topic)
+                          and len(name) > len('%RETRY%') + len(separator + topic)
+                          for separator in ('_', '+')))
+
+
 def plan_retirement(previous, current, subjects, selected, evidence, now):
     validate_transition(previous, current)
     require(isinstance(subjects, dict) and set(subjects) == set(previous['accounts']),
@@ -61,6 +70,16 @@ def plan_retirement(previous, current, subjects, selected, evidence, now):
             and evidence.get('new_business_accepted') is True
             and evidence.get('history_mapping_preserved') is True,
             'runtime, business acceptance and historical evidence prerequisites required')
+    names = evidence.get('broker_topic_names')
+    require(isinstance(names, list) and 0 < len(names) <= 10000
+            and all(isinstance(name, str) and name and len(name.encode()) <= 255 for name in names)
+            and len(set(names)) == len(names), 'complete fresh Broker Topic metadata required')
+    for resource in selected:
+        if resource.startswith('Topic:'):
+            topic = resource.removeprefix('Topic:')
+            require(topic in names, 'selected Topic missing from authoritative metadata')
+            require(not pop_retry_companions(topic, names),
+                    'selected Topic has protected POP retry companions')
     observations = evidence.get('resources')
     require(isinstance(observations, dict) and set(observations) == set(selected),
             'one complete observation for every selected object required')

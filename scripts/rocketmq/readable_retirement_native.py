@@ -79,7 +79,10 @@ def run_owned_retirement(container, project, previous, current, accounts, receip
         empty_topic(offsets)
         # Newly created, empty sentinel Topics make accidental retry/DLQ cleanup
         # observable. They belong only to this isolated project.
-        sentinels = ['%RETRY%' + group, '%DLQ%' + group]
+        unselected_topic = next(r['physical_topic'] for r in previous['routes'] if r['physical_topic'] != topic)
+        sentinels = ['%RETRY%' + group, '%DLQ%' + group,
+                     '%RETRY%' + group + '_' + unselected_topic,
+                     '%RETRY%' + group + '+' + unselected_topic]
         if any(name in metadata['topicConfigTable'] for name in sentinels):
             raise RuntimeError('owned sentinel already exists')
         for name in sentinels:
@@ -91,6 +94,10 @@ def run_owned_retirement(container, project, previous, current, accounts, receip
                 if resource in acls[account['username']]:
                     admin('deleteAcl', '-s', 'User:' + account['username'], '-r', resource, mutation=True)
         admin('deleteSubGroup', '-g', group, '-r', 'true', mutation=True)
+        from readable_retirement import pop_retry_companions
+        live = admin.metadata(snapshot)
+        if pop_retry_companions(topic, live['topicConfigTable']):
+            raise RuntimeError('owned selected Topic has protected POP retry companions')
         single_cluster(command(admin, 'clusterList', '-n', 'nameserver:9876'))
         raw = command(admin, 'deleteTopic', '-n', 'nameserver:9876', '-c', 'FangcunMount', '-t', topic,
                       success=f'delete topic [{topic}] from NameServer success.')

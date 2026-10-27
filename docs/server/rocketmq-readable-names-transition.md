@@ -42,3 +42,12 @@
 ### 既有 CD 材料链路兼容
 
 既有 `m4_material_stage` 继续负责不可变材料，不生成或解释 Topic/Group 名称。新增真实 v3 清单的四角色回归：活动和历史映射逐字节进入原只读版本文件，原 credentials/JOSE 来源字节保留，重复 stage 不改写，verify 只读且不激活 current 指针。该工具24项本地测试通过；宿主 CD 配置仍使用原路径、身份、epoch 和部署锁。最终镜像下的实际解码及原配置打包器启动由独立 T11 入口验证，不把纯材料测试等同于生产部署。
+
+
+### POP 重试伴随删除保护
+
+追加核对5.5.1 `AdminBrokerProcessor.deleteTopic`：当 `clearRetryTopicWhenDeleteTopic` 启用时，Broker可能连带清理与该Topic关联的POP v1/v2重试Topic。仅确认CLI使用具名Topic仍不足以证明删除范围。
+
+离线审核现在要求完整新鲜Broker Topic名称快照；发现所选Topic存在任意`%RETRY%<group>_<topic>`或`%RETRY%<group>+<topic>`伴随资源，即拒绝生成删除清单，不修改Broker开关，也不把伴随对象隐含纳入删除范围。原138项隔离报告只验证classic retry/DLQ sentinel；增强专项增加未选Topic上的POP v1/v2 sentinel并核验全部保留，尚待真实CI。旧报告继续保留，不将它表述为已覆盖所有POP伴随删除。
+
+上游：[AdminBrokerProcessor](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/broker/src/main/java/org/apache/rocketmq/broker/processor/AdminBrokerProcessor.java)，核对blob `876a72fa29cce1f92addd94b332168ebcacd0b77`。
