@@ -8,7 +8,7 @@ import re
 import secrets
 import subprocess
 
-from routes import permissions_v2, validate_v2
+from routes import permissions_v2, validate
 
 
 class Admin:
@@ -149,7 +149,9 @@ def preflight(manifest, accounts, metadata, users, acls):
 
 
 def provision(container, manifest, accounts):
-    validate_v2(manifest)
+    if manifest.get('version') not in (2, 3):
+        raise ValueError('typed manifest version2 or version3 required')
+    validate(manifest)
     admin = Admin(container)
     # Shared by cooperating infra invocations, including different host clients.
     # A stale lock is refused; this tool never steals/deletes another invocation's lock.
@@ -180,7 +182,7 @@ def provision(container, manifest, accounts):
                       for role in manifest.get("accounts", {})}
         if any(preflight(manifest, accounts, after, final_users, final_acls)):
             raise RuntimeError("post-provision readback differs from reviewed resources")
-        return {"version": 2, "operations": admin.operations, "typed_topics": len(desired_topics(manifest)),
+        return {"version": manifest['version'], "operations": admin.operations, "typed_topics": len(desired_topics(manifest)),
                 "principals": len(manifest.get("accounts", {})), "verified": True}
     except RuntimeError as error:
         # All RuntimeError strings in this module are authored fixed diagnostics;

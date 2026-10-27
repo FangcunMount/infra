@@ -191,6 +191,7 @@ def main():
     parser.add_argument("--mysql-image", default="mysql:8.0.36")
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
+    parser.add_argument("--readable-routes", action="store_true", help="owned public SDK v3 naming fixture; never production")
     parser.add_argument("--m3-resources", action="store_true", help="isolated final M3 manifest/ACL/type/TLS proof only; no production changes")
     parser.add_argument("--native-dlq-audit", action="store_true", help="isolated native DLQ and index-only audit; no host/DB/business acceptance")
     parser.add_argument("--iam-host", type=Path, help="exact IAM checkout; require actual host SDK/Broker acceptance in the owned fixture")
@@ -233,6 +234,10 @@ def main():
     parser.add_argument("--paired-host-faults", action="store_true", help="explicit paired MQ/process/Broker physical fault profile")
     parser.add_argument("--sdk-python-live-recovery", action="store_true", help="source-candidate Python producer survives actual owned Broker SIGKILL")
     args = parser.parse_args()
+    if args.readable_routes and (not args.sdk_api_go or not args.sdk_api_python or any((args.m3_resources,
+            args.iam_host,args.qs_answer_host,args.qs_evaluation_host,args.qs_report_host,args.qs_task_host,
+            args.qs_command_host,args.qs_event_host,args.ai_admission_host,args.sdk_recovery_audit))):
+        parser.error("readable routes require the isolated public Go/Python SDK fixture")
     if args.sdk_recovery_audit:
         from sdk_recovery_audit import validate_options
         try:
@@ -461,7 +466,7 @@ def main():
         logical_owner, inputs, owner_routes = owner, [], []
         group = "m2-tx-consumer"
         if is_sdk:
-            from routes import consumer_group_v2
+            from routes import consumer_group_v2, consumer_group_v3
             if sdk_manifest is None:
                 raise RuntimeError("required typed fixture manifest not provisioned")
             logical_owner = "iam.mysql" if storage == "mysql" else "qs.mongo"
@@ -472,7 +477,7 @@ def main():
                 raise RuntimeError("fixture owner/type/revision route ambiguous or missing")
             topic = topic or matches[0]["physical_topic"]
             subscription = subscription or ("sdk-" + storage + "-observer")
-            group = consumer_group_v2("sdk.logical", subscription)
+            group = (consumer_group_v3 if args.readable_routes else consumer_group_v2)("sdk.logical", subscription)
             physical_inputs = ([r for r in sdk_manifest["routes"] if r.get("subscription") == subscription]
                                if mode == "shared-consume" else matches)
             inputs = [{k: v for k, v in r.items() if k != "id"} for r in physical_inputs]
@@ -480,7 +485,8 @@ def main():
                                  ("owner-a" if storage == "mysql" else "owner-b"))
             account = accounts[role]
             owner_routes = [{"topic":r["topic"],"physical_topic":r["physical_topic"],
-                             "route_revision":r["route_revision"]} for r in sdk_manifest["routes"]
+                             "route_revision":r["route_revision"],
+                             **({'naming_scheme':r['naming_scheme']} if r.get('naming_scheme') else {})} for r in sdk_manifest["routes"]
                             if r["owner"] == logical_owner and r["message_type"] == "TRANSACTION"]
         else:
             account = accounts[owner]
@@ -815,7 +821,7 @@ def main():
             if proof["mongo_version"] != "7.0.37":
                 raise RuntimeError("required Mongo version differs")
             from v2_acceptance import setup
-            sdk_manifest, proof["routing_v2"] = setup(repo,sdk,broker,project,accounts,directory,admin,run,passed)
+            sdk_manifest, proof["routing_v2"] = setup(repo,sdk,broker,project,accounts,directory,admin,run,passed,readable=args.readable_routes)
             # Explicit HOST fixture installation precedes authorization tests;
             # constructors and Start still never install schema. Run v2 owner
             # negatives before the longer positive SDK/fault suites.
@@ -828,7 +834,7 @@ def main():
                          "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
             if args.sdk_python_live_recovery:
                 from broker_fault_control import OwnedBrokerFault
-                from python_live_recovery import CASE, SETUP_CASES, run_live_recovery
+                from python_live_recovery import required_cases, run_live_recovery
                 proof['python_live_recovery'] = {}
                 control = OwnedBrokerFault(run,broker,project,
                     lambda: broker_parameters(admin('getBrokerConfig')),effective)
@@ -836,7 +842,7 @@ def main():
                     [r['physical_topic'] for r in sdk_manifest['routes']
                      if r['owner']=='iam.mysql' and r['route_revision']=='sdk-v2'
                      and r['message_type']=='TRANSACTION'])
-                if set(cases) != SETUP_CASES | {CASE}:
+                if set(cases) != required_cases(args.readable_routes):
                     raise RuntimeError('source SDK live recovery profile incomplete or substituted')
                 return
             from v2_acceptance import denied_owners, shared_budget

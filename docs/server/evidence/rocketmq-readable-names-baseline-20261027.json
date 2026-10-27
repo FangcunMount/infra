@@ -1,0 +1,133 @@
+{
+  "schema": "rocketmq-readable-names-baseline/v1",
+  "checked_at": "2026-10-27T12:38:41.107849+00:00",
+  "sources": {
+    "sdk": "067bc80b8be9ed73d16ec680484d8ca694088eda",
+    "infra": "2c5821a939a3fca09f8151ff08e2d3753f2fb711",
+    "iam": "55193a9d8f43baf00e67ff51a407ca8ee43dbcad",
+    "qs-server": "8296eb9c9d0278c44510dfc37a7bcaba55825478",
+    "qs-ai": "570bfde7a5b494b38fbe3c948ce89cee467ae8b4"
+  },
+  "read_only": true,
+  "production_changed": false,
+  "broker_mutations": 0,
+  "current_topics": 10,
+  "current_groups": 9,
+  "online_consumers": 15,
+  "old_hash_topics": 10,
+  "old_hash_groups": 12,
+  "sql_protocol": {
+    "iam.mysql": {
+      "rm_tx_execution": {
+        "committed": 3
+      },
+      "rm_tx_witness": {
+        "committed": 3
+      }
+    },
+    "qs.mysql": {
+      "deferred_count": 0,
+      "future_retry": {},
+      "rm_tx_execution": {
+        "committed": 32
+      },
+      "rm_tx_witness": {
+        "committed": 32
+      }
+    },
+    "ai.mysql": {
+      "rm_tx_execution": {
+        "committed": 16
+      },
+      "rm_tx_witness": {
+        "committed": 21
+      }
+    }
+  },
+  "mongo_protocol": {
+    "qs_retry_schedule": [],
+    "rm_tx_execution": [
+      {
+        "_id": "committed",
+        "n": 6
+      }
+    ]
+  },
+  "accounts_with_acl": 12,
+  "business_runtime": {
+    "serverA": [
+      {
+        "name": "qs-apiserver",
+        "id": "76ea9cbbd7501131987a80c407745f0dfc5214b71e66bc8cf4ec702187997866",
+        "image": "sha256:501125199a976747ad6febafada18ffc2fa1025504d93b179daa30301bc44d55",
+        "memory": 1073741824,
+        "cpu": 2000000000,
+        "health": "healthy"
+      },
+      {
+        "name": "qs-collection-server-2",
+        "id": "2c684a6be1220cf9c7fbed680709843bcad85d94d806289586862256274224a6",
+        "image": "sha256:97506c3aca75905423b6ad8bd96c234c19f2e8fd52bd25e8acfc9d6935ed576f",
+        "memory": 335544320,
+        "cpu": 1000000000,
+        "health": "healthy"
+      },
+      {
+        "name": "qs-collection-server-1",
+        "id": "b0442507bbb4653f63185593b256cd51c65ca5e98e5d5edf79c12f14c9358d44",
+        "image": "sha256:97506c3aca75905423b6ad8bd96c234c19f2e8fd52bd25e8acfc9d6935ed576f",
+        "memory": 335544320,
+        "cpu": 1000000000,
+        "health": "healthy"
+      },
+      {
+        "name": "qs-ai",
+        "id": "4fe3d667ad5fa02657fdc4338d849d4f48b9836f93fb7898514fd2a434f2e031",
+        "image": "sha256:927c6cea9c0551be4d026bf53e27e4521a45d4bd9c4b36e848f097657db0ab14",
+        "memory": 805306368,
+        "cpu": 750000000,
+        "health": "healthy"
+      },
+      {
+        "name": "iam-apiserver",
+        "id": "1f929905b701e9870badaddcd9928450a5bf299441fc5a478d45b77d0beb5fa1",
+        "image": "sha256:d5e51ec9bef40a609251ba35068b89374e5e1caa5124b53f4aab22151552ea97",
+        "memory": 1073741824,
+        "cpu": 1000000000,
+        "health": "healthy"
+      }
+    ],
+    "serverD": [
+      {
+        "name": "qs-worker-runtime-1",
+        "id": "f1b3c2f47acef809c28e42788b4071016bb1cb27ec7f7f8d703b4faa1607de2c",
+        "image": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+        "memory": 805306368,
+        "cpu": 1000000000,
+        "health": null
+      },
+      {
+        "name": "qs-worker-runtime-2",
+        "id": "6368fb8f730394e9763aaa087b5bc2e08879e28a1ed04bf17771e30a21e1ea3b",
+        "image": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+        "memory": 805306368,
+        "cpu": 1000000000,
+        "health": null
+      },
+      {
+        "name": "qs-worker-runtime-3",
+        "id": "19dd1606a7671b3c9b9c31e8ba8621d300196a667b08ba9c828f8334310a22cd",
+        "image": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+        "memory": 805306368,
+        "cpu": 1000000000,
+        "health": null
+      }
+    ]
+  },
+  "private_evidence_sha256": {
+    "protocol_acl": "687c852807ad8e1c34502cf414b220069f913be6edfa07f219bdcb998e59e320",
+    "dashboard": "ff2378da91ecde5227e4d42f049ab80982a913c9a6321b3e30e8abbceac83e3d",
+    "runtime": "4ee5a1179c1d3ef76da4c7e3561a09166fe20298e24d2b023e2f20fb7b96c97d"
+  },
+  "cutover_or_deletion_authorized_by_snapshot": false
+}

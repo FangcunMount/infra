@@ -5,6 +5,15 @@ from pathlib import Path
 import unittest
 
 class PythonLiveRecoveryProfileTest(unittest.TestCase):
+    def test_case_identity_is_exact_for_each_naming_scheme(self):
+        from python_live_recovery import CASE, SETUP_CASES, required_cases
+        self.assertEqual(required_cases(), SETUP_CASES | {CASE})
+        readable = required_cases(True)
+        self.assertEqual(len(readable), 5)
+        self.assertIn('v3_go_python_infra_exact_route_vectors', readable)
+        self.assertNotIn('v2_go_python_infra_exact_route_vectors', readable)
+        self.assertEqual(readable - {'v3_go_python_infra_exact_route_vectors'},
+                         required_cases() - {'v2_go_python_infra_exact_route_vectors'})
     def test_missing_public_sdk_profiles_and_mixed_host_are_rejected_pre_fixture(self):
         script=Path(__file__).with_name('ci-transactions.py')
         for extra in ([],['--sdk-api-go'],['--sdk-api-go','--sdk-api-python','--ai-admission-host','/missing'],

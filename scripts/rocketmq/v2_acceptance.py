@@ -6,16 +6,25 @@ import secrets
 import time
 
 from provision_v2 import Admin
-from routes import consumer_group_v2, physical_topic_v2, validate
+from routes import consumer_group_v2, physical_topic_v2, consumer_group_v3, physical_topic_v3, validate
 
 
-def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed, *, fixture_manifest=None):
-    vectors = repo / 'components/rocketmq/routing-v2-vectors.json'
-    if vectors.read_bytes() != (sdk / 'contracts/rocketmq-routing-v2.json').read_bytes():
+def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed, *, fixture_manifest=None, readable=False):
+    version = 3 if readable else 2
+    vectors = repo / f'components/rocketmq/routing-v{version}-vectors.json'
+    if vectors.read_bytes() != (sdk / f'contracts/rocketmq-routing-v{version}.json').read_bytes():
         raise RuntimeError('SDK/infra canonical route vectors differ')
-    passed('v2_go_python_infra_exact_route_vectors')
+    passed(f'v{version}_go_python_infra_exact_route_vectors')
     manifest = (json.loads((repo / 'components/rocketmq/test-routes-v2.json').read_text())
                 if fixture_manifest is None else copy.deepcopy(fixture_manifest))
+    topic_name = physical_topic_v3 if readable else physical_topic_v2
+    group_name = consumer_group_v3 if readable else consumer_group_v2
+    if readable:
+        manifest['version'] = 3
+        for route in manifest['routes']:
+            route['naming_scheme'] = 'readable-v1'
+            route['physical_topic'] = topic_name(route['topic'],route['message_type'],route['owner'],route['route_revision'])
+            route['consumer_group'] = group_name(route['topic'],route['subscription']) if route.get('subscription') else ''
     validate(manifest)
     secret = directory / 'sdk-v2-credentials.json'
     secret.write_text(json.dumps(accounts)); secret.chmod(0o600)
@@ -36,8 +45,9 @@ def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed, *
         for name, revision in (('conflict','negative-existing-type'),('candidate','negative-never-create')):
             route = {'id':name,'topic':'sdk.logical','subscription':'sdk-type-conflict',
                      'message_type':'TRANSACTION','owner':'iam.mysql','route_revision':revision,
-                     'physical_topic':physical_topic_v2('sdk.logical','TRANSACTION','iam.mysql',revision),
-                     'consumer_group':consumer_group_v2('sdk.logical','sdk-type-conflict')}
+                     'physical_topic':topic_name('sdk.logical','TRANSACTION','iam.mysql',revision),
+                     'consumer_group':group_name('sdk.logical','sdk-type-conflict')}
+            if readable:route['naming_scheme']='readable-v1'
             conflict['routes'].append(route)
         conflict['accounts']={'owner-a':{'owner':'iam.mysql','publish':['conflict','candidate'],'subscriptions':[]}}
         admin('updateTopic','-t',conflict['routes'][0]['physical_topic'],'-r','1','-w','1',
@@ -74,7 +84,8 @@ def setup(repo, sdk, broker, project, accounts, directory, admin, run, passed, *
         if provision(bad_queues).returncode == 0 or reader.metadata(snapshot_dir) != before:
             raise RuntimeError('existing queue configuration overwritten')
         passed('v2_existing_configuration_conflict_refused')
-        proof={'route_vectors_sha256':hashlib.sha256(vectors.read_bytes()).hexdigest(),
+        proof={'manifest_version':version,'naming_scheme':'readable-v1' if readable else 'hash-v2',
+               'route_vectors_sha256':hashlib.sha256(vectors.read_bytes()).hexdigest(),
                'manifest_sha256':hashlib.sha256((repo/'components/rocketmq/test-routes-v2.json').read_bytes()).hexdigest(),
                'effective_manifest_sha256':hashlib.sha256(json.dumps(manifest,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
                'provision_receipt':receipt,'idempotent_operations':0,

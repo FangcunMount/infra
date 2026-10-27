@@ -1,0 +1,31 @@
+{
+  "schema": "rocketmq-readable-sdk-local/v1",
+  "sdk_sha": "6b93f7321731b010040bae07b4311435f2da11eb",
+  "checked_at": "2026-10-27T12:46:42.156948+00:00",
+  "go_make_check": {
+    "passed": true,
+    "gates": [
+      "docs",
+      "fmt",
+      "private_driver_source",
+      "vet",
+      "full_unit",
+      "race"
+    ]
+  },
+  "python": {
+    "passed": 48,
+    "failed": 0,
+    "skipped": 0,
+    "ruff": true,
+    "mypy": true,
+    "junit_sha256": "424263b971b1b5d93b8532bafb32638c7b6f2322faaa56d776ee564131ddaadc"
+  },
+  "infra_unit": {
+    "passed": 395,
+    "failed": 0,
+    "skipped": 0
+  },
+  "integration_or_release_or_production": false,
+  "source_pr": "https://github.com/FangcunMount/reliable-messaging/pull/60"
+}
