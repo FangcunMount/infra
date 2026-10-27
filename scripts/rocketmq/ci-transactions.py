@@ -892,6 +892,7 @@ def main():
                 from sdk_recovery_audit import run as run_recovery_audit
                 proof['recovery_rpc_audit'] = run_recovery_audit(start,passed,sql,mongo_command)
             required_cases = (31 if args.sdk_api_python else 19) + ((15 if args.sdk_api_python else 9) if args.sdk_faults else 0) + ((2 if args.sdk_api_python else 1) if args.sdk_limits else 0)
+            required_cases += 4 if args.sdk_pop_drain_controls else 0
             if len(cases) != required_cases + (10 if args.sdk_recovery_audit else 0):
                 raise RuntimeError("required public SDK case count differs")
             return
