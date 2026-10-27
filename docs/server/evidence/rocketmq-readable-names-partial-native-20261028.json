@@ -1,0 +1,57 @@
+{
+  "schema": "readable-partial-native-proof/v1",
+  "date": "2026-10-28",
+  "proof": {
+    "transition": {
+      "report_sha256": "5409447eec6cea947a68e9831f13f70284e1e15662ae9cbe123fae483772365e",
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "run": 40540910673,
+      "manifest_version": 3,
+      "phase": "complete",
+      "provision": {
+        "version": 3,
+        "operations": 48,
+        "typed_topics": 10,
+        "principals": 5,
+        "verified": true,
+        "transition": {
+          "previous_manifest_sha256": "34d6dc613e8f05b43335bc09c07b20eb457df1a2129720a9bc416a6556989d4d",
+          "manifest_sha256": "f89e6158c424408326af13a1549f3494b89677d74027141c6485212f903665fd",
+          "phase": "resources_and_union_acl_prepared",
+          "credential_rotation": false,
+          "retirement_completed": false,
+          "business_acceptance": false
+        }
+      },
+      "native_passed": 130
+    },
+    "ai_finalization": {
+      "report_sha256": "b526625708e836ebcca087cc33f3c99fdbc80adeacd4f9c188d7d89b91d0faf6",
+      "passed": 32,
+      "failed": 0,
+      "skipped": 0,
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "run": 40535268126,
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "manifest_version": 3,
+      "source_clean_after": true
+    }
+  },
+  "completed_tasks": 6,
+  "total_tasks": 16,
+  "production_changed": false,
+  "business_acceptance": false
+}
