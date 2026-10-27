@@ -29,14 +29,14 @@
 
 ## POP 排空证据
 
-5.5.1 的消费 lag 计算依赖在线 Group 的 `CONSUME_POP` 类型、POP buffer offset和in-flight计数；消费者离线后可能没有序列或按普通类型计算。**必须先在旧消费者在线时取证，再停旧实例；缺指标不能填写0。**
+5.5.1 的消费 lag 计算依赖在线 Group 的 `CONSUME_POP` 类型、POP buffer offset和in-flight计数；消费者离线后可能没有序列或按普通类型计算。**必须先在旧消费者在线时取证，再停旧实例；缺指标不能填写0。** 追加实际核验：9个Group的15个客户端均为`CONSUME_ACTIVELY`，与固定Proxy对gRPC SimpleConsumer的登记行为一致；普通三项gauge的零值不能单独作为POP排空证明。
 
 本轮只读可达性核验已成功取得11组消费输入的lag/in-flight/ready序列，以及6个已导出的业务半消息序列，当前值均0。这仅证明监控可用，不是停写后的最终排空或删除证明。
 
 维护中的两次有界观察须同时核对：
 
 1. 旧业务准入、模型/评分/报告新任务和到期dispatcher已封闭；已接受工作可以沿旧链路完成。
-2. 9个旧Group实际在线POP连接、完整订阅及实例数；逐 `(Topic, Group)` 检查 `rocketmq_consumer_lag_messages`、`rocketmq_consumer_inflight_messages`、`rocketmq_consumer_ready_messages`。任何缺失、重复、非整数、非零或查询错误均保持未排空。
+2. 9个旧Group实际在线连接、真实类型、完整订阅及实例数（保留本批ACTIVELY基线，不强改为POP）；逐 `(Topic, Group)` 检查 `rocketmq_consumer_lag_messages`、`rocketmq_consumer_inflight_messages`、`rocketmq_consumer_ready_messages`。任何缺失、重复、非整数、非零或查询错误均保持未排空。还须读取不依赖Group类型的POP offset/checkpoint buffer及所有revive队列；当前只读快照两种buffer为0、8个revive队列各有1条。原生revive gauge虽带milliseconds后缀，底层lag方法返回记录数；不能将其忽略或直接解释成业务在途，须核对其精确记录及真实故障控制后再冻结排空判据。
 3. 精确读取旧原生/PUSH及POP v1/v2 retry、DLQ元数据与责任；`is_retry=true` 没导出时，必须用对应重试对象不存在或实际队列空证据解释，不能将缺序列直接当0。记录broker dispatch落后及实际事务参数。
 4. 四owner权威事务记录：Prepared/Unknown、确认缺口、未跟踪分支、矛盾、原生超限责任；业务receipt/Inbox/ACK、deferred及未来计划责任。Committed本地状态不能独自证明最终确认。
 5. 导出Topic/Group配置、ACL、offset/POP观察、协议及业务责任摘要。停旧实例后保留最终快照，绝不把旧offset复制到新Topic。
@@ -52,3 +52,5 @@
 新链路尚无execution、半消息或消费事实时，按演练恢复兼容旧配置与镜像；本次没有数据库升级，不需要执行旧全量数据库恢复。出现新责任或不能排除新提交后，封新写并前向修复；不翻回旧provider、不换事件ID、不重做模型。30分钟到期不能静默延长。
 
 业务验收及开放后30分钟检查通过后，逐对象复核并按具名清单撤旧权限、清理责任清零资源和回读Broker/NameServer/Dashboard；保留系统/half/op、未结retry/DLQ、历史数据库证据及未清零对象的责任清单。恢复原CD状态，完成发布索引和16项闭环。不新增48小时观察。
+
+固定Proxy来源：[ClientActivity](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/v2/client/ClientActivity.java)，blob `abc23a53a3e8bf384027ef211ceecd6bf99f8065`；独立POP指标来源：[PopMetricsManager](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/broker/src/main/java/org/apache/rocketmq/broker/metrics/PopMetricsManager.java)，blob `36a256f2e91a1af008a403be136a377188ae9215`。当前补充核验不授权改Broker参数、暂停业务或删除消息。
