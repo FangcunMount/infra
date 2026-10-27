@@ -115,7 +115,7 @@ def parse_admission_receipt(output, junit):
     return parse_host_receipt(output, junit)
 
 
-def acceptance_profile(kind):
+def _base_acceptance_profile(kind):
     if kind == 'admission':
         return dict(name=kind, sdk_version='0.4.0a1', sdk_url=SDK_URL, sdk_sha256=None, file='rocketmq_admission_host.py', manifest=admission_manifest,
                     partial=read_partial_receipt, parse=parse_admission_receipt, tests=TESTS,
@@ -163,6 +163,17 @@ def acceptance_profile(kind):
         from paired_acceptance import profile
         return profile()
     raise RuntimeError('explicit known AI acceptance profile required')
+
+
+def acceptance_profile(kind):
+    profile = _base_acceptance_profile(kind)
+    mode = os.environ.get('QS_AI_READABLE_ROUTES', '0')
+    if mode == '0':
+        return profile
+    if mode != '1' or kind not in ('admission', 'state', 'finalization'):
+        raise RuntimeError('readable AI acceptance requires an explicit supported standalone profile')
+    from ai_readable_acceptance import readable_profile
+    return readable_profile(kind, profile)
 
 
 def host_failure_diagnostics(raw, filename, tests):
@@ -214,6 +225,10 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
         raise RuntimeError('fixed AI acceptance Python compatibility profile required')
     command = ['uv', 'run', '--locked', '--python', python, '--group', 'maintenance']
     manifest = profile['manifest']()
+    if profile.get('readable'):
+        proof['manifest_version'] = manifest['version']
+        proof['naming_scheme'] = 'readable-v1'
+        proof['manifest_sha256'] = hashlib.sha256(json.dumps(manifest, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     accounts = {role: {'username': 'ai-' + role + '-' + secrets.token_hex(4), 'password': secrets.token_hex(32)}
                 for role in manifest['accounts']}
     proof['provision'] = provision(broker, manifest, accounts)
