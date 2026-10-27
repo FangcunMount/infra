@@ -27,6 +27,6 @@
 
 先安装 `scripts/dashboard/firewall.py` 的两个目标规则，再启动独立项目；使用原部署锁 `/var/lib/fangcun-image-retention/deploy.lock`，不改锁 inode 或权限。启动后用 `scripts/dashboard/acceptance.py` 验证登录、集群、Topic、消费组及登出。
 
-停止/回退仅执行该项目 `docker compose down`（不带 `-v`），保留私密配置及专用身份供诊断。不得执行原 RocketMQ 项目的 down/up、删除原网络/存储、变更业务 owner 或 worker 资源。Docker daemon 重启后应在重新开放管理入口前重装本独立防火墙规则；Compose 保持私网地址绑定。
+停止/回退仅执行该项目 `docker compose down`（不带 `-v`），保留私密配置及专用身份供诊断。不得执行原 RocketMQ 项目的 down/up、删除原网络/存储、变更业务 owner 或 worker 资源。独立 `rocketmq-dashboard-firewall.service` 随 Docker 重启重新安装本项目规则；Compose 始终保持私网地址绑定。安装脚本为 `scripts/dashboard/deploy.py --expected-broker-id <冻结的原容器ID>`，版本化源码安装在本项目目录中，不覆盖原 Broker 源码或配置。
 
 源码与版本依据：[Dashboard 2.1.0](https://github.com/apache/rocketmq-dashboard/releases/tag/rocketmq-dashboard-2.1.0)、[固定源码](https://github.com/apache/rocketmq-dashboard/tree/a013c8fad163122713b0bd2db3d73b3bf0db373e)、[NGINX](https://nginx.org/)。部署与 CI 证据将在验收后附加。

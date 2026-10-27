@@ -23,10 +23,16 @@ def main():
     fixture=fixtures.OwnedImageFixture(REPO,report)
     fixture.image='rocketmq-m3-image-start:5.5.1'
     compose=None
+    host='100.118.164.39'
+    address_added=False
+    firewall_added=False
     try:
         # Deliberately advertise host address, exactly as production does. The
         # relay is necessary; direct service DNS alone cannot pass this test.
-        host=json.loads(fixture.run(['docker','network','inspect','bridge']).stdout)[0]['IPAM']['Config'][0]['Gateway']
+        existing=fixture.run(['ip','-j','address','show']).stdout
+        assert host not in existing, 'owned_test_address_conflict'
+        fixture.run(['sudo','ip','address','add',host+'/32','dev','lo'])
+        address_added=True
         original=fixtures.render
         fixtures.render=lambda accounts,output,advertised,templates: original(accounts,output,host,templates)
         fixture.dependencies()
@@ -53,6 +59,9 @@ def main():
         file.write_text(json.dumps(doc));file.chmod(0o600)
         compose=['docker','compose','-p',fixture.project+'-dashboard','-f',str(file)]
         fixture.run(compose+['pull'],timeout=300)
+        fixture.run(['sudo','python3',str(REPO/'scripts/dashboard/firewall.py'),
+            '--bind-ip',host,'--network',fixture.network])
+        firewall_added=True
         fixture.run(compose+['up','-d'],timeout=120)
         base='http://127.0.0.1:'+str(port)
         deadline=time.monotonic()+150
@@ -63,6 +72,11 @@ def main():
             if time.monotonic()>deadline:raise RuntimeError('dashboard_start_timeout')
             time.sleep(2)
         cases=verify(base,ui)
+        cases['scoped_firewall_applied']=True
+        # Foreign Docker bridge cannot use the new host management relay.
+        rejected=fixture.run(['docker','run','--rm','--network','bridge','--entrypoint','bash',
+            fixture.image,'-c','timeout 3 bash -c "exec 3<>/dev/tcp/'+host+'/10911"'],required=False)
+        cases['foreign_bridge_rpc_rejected']=rejected.returncode!=0
         current=json.loads(fixture.run(['docker','inspect',broker]).stdout)[0]
         cases['broker_not_recreated_or_restarted']=(current['Id']==before['Id'] and
             current['State']['StartedAt']==before['State']['StartedAt'])
@@ -88,6 +102,13 @@ def main():
         raise RuntimeError('owned_dashboard_validation_failed') from None
     finally:
         if compose:fixture.run(compose+['down','-v','--remove-orphans'],required=False,timeout=120)
+        if firewall_added:
+            for port in ('18082','10911'):
+                fixture.run(['sudo','iptables','-D','DOCKER-USER','-p','tcp','-m','conntrack',
+                    '--ctorigdst',host,'--ctorigdstport',port,'-j','INFRA-MQ-DASH'])
+            fixture.run(['sudo','iptables','-F','INFRA-MQ-DASH'])
+            fixture.run(['sudo','iptables','-X','INFRA-MQ-DASH'])
+        if address_added:fixture.run(['sudo','ip','address','del',host+'/32','dev','lo'])
         fixture.run(['sudo','chown','-R',str(os.getuid())+':'+str(os.getgid()),str(fixture.directory)],required=False)
         fixture.cleanup()
         Path('dashboard-probe.json').write_text(json.dumps(report,indent=2)+'\n')

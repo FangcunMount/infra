@@ -126,7 +126,8 @@ WantedBy=multi-user.target
             after=inspect([BROKER,'rocketmq-nameserver-1'])
             cases['original_mq_not_restarted']=all(a['Id']==b['Id'] and a['State']['StartedAt']==b['State']['StartedAt'] for a,b in zip(before,after))
             cases['memory_headroom']=memory()>=512
-            cases['existing_users_unchanged']=all(admin.users().get(name)==value for name,value in users.items())
+            final_users=admin.users()
+            cases['existing_users_unchanged']=all(final_users.get(name)==value for name,value in users.items())
             if not all(cases.values()):raise RuntimeError('production_acceptance_incomplete')
             receipt=dict(passed=len(cases),failed=0,skipped=0,cases=cases,firewall=firewall,
                 url=base,memory_available_mib=memory(),credentials_file=str(credential_path),
