@@ -14,7 +14,9 @@ def request(session, base, path, data=None):
     body = None if data is None else urllib.parse.urlencode(data).encode()
     try:
         with session.open(base+path, data=body, timeout=20) as response:
-            return response.status, json.load(response)
+            try: value=json.load(response)
+            except ValueError: value={'non_json': True}
+            return response.status, value
     except urllib.error.HTTPError as error:
         try: value=json.load(error)
         except ValueError: value={}
