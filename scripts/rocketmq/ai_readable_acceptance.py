@@ -47,6 +47,15 @@ def readable_profile(kind, original):
         from ai_finalization_acceptance import parse_receipt, read_receipt
         profile['partial'] = lambda output: read_receipt(output, sdk_version=VERSION)
         profile['parse'] = lambda output, junit: parse_receipt(output, junit, sdk_version=VERSION)
-    else:
+    elif kind == 'paired':
+        import os
+        from paired_acceptance import parse_receipt, read_receipt
+        from readable_host_acceptance import MODULE
+        full = os.environ.get('QS_M3_PAIRED_PROFILE', 'core') == 'full'
+        profile['partial'] = lambda output: read_receipt(output, full=full, partial=True,
+            sdk_python=VERSION, sdk_go=MODULE['Version'])
+        profile['parse'] = lambda output, junit: parse_receipt(output, junit, full=full,
+            sdk_python=VERSION, sdk_go=MODULE['Version'])
+    elif kind != 'paired_faults':
         raise ValueError('supported named readable AI profile required')
     return profile

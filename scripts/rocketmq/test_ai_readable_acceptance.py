@@ -10,14 +10,15 @@ from routes import validate
 
 class AIReadableTest(unittest.TestCase):
     def test_profiles_freeze_same_actual_test_ids_and_strict_sdk(self):
-        for kind in ('admission', 'state', 'finalization'):
+        for kind in ('admission', 'state', 'finalization', 'paired', 'paired_faults'):
             with self.subTest(kind=kind):
                 with patch.dict(os.environ, QS_AI_READABLE_ROUTES='0'):
                     original = acceptance_profile(kind)
                 frozen = copy.deepcopy(original['manifest']())
                 with patch.dict(os.environ, QS_AI_READABLE_ROUTES='1'):
                     current = acceptance_profile(kind)
-                self.assertEqual(current['tests'], original['tests'])
+                if kind != 'paired_faults':
+                    self.assertEqual(current['tests'], original['tests'])
                 self.assertEqual(current['file'], original['file'])
                 self.assertEqual(current['sdk_version'], '0.5.0rc1')
                 self.assertEqual(current['sdk_url'], URL)
@@ -30,9 +31,25 @@ class AIReadableTest(unittest.TestCase):
                 self.assertTrue(all(r['naming_scheme'] == 'readable-v1' for r in manifest['routes']))
                 self.assertEqual(original['manifest'](), frozen)
                 self.assertEqual(manifest, complete_manifest(original['manifest']))
-                self.assertIsNone(current['partial'](''))
-                with self.assertRaises(RuntimeError):
-                    current['parse']('', '<testsuite/>')
+                if kind != 'paired_faults':
+                    self.assertIsNone(current['partial'](''))
+                    with self.assertRaises(RuntimeError):
+                        current['parse']('', '<testsuite/>')
+
+    def test_paired_profiles_keep_exact_owners_and_cannot_claim_empty_native_results(self):
+        from paired_acceptance import FULL_CASES
+        from test_paired_acceptance import receipt,xml
+        from paired_acceptance import MARKER,FULL_TESTS
+        import json
+        with patch.dict(os.environ, QS_AI_READABLE_ROUTES='1',QS_M3_PAIRED_PROFILE='full'):
+            current=acceptance_profile('paired')
+        manifest=current['manifest']()
+        self.assertEqual(set(manifest['accounts']),{'ai','qs'})
+        self.assertEqual(len(manifest['routes']),3)
+        value=receipt(True);value.update(sdk_go='v0.6.0-rc.1',sdk_python='0.5.0rc1')
+        self.assertEqual(set(current['parse'](MARKER+json.dumps(value),xml(FULL_TESTS))['cases']),FULL_CASES)
+        value['sdk_go']='v0.5.0'
+        with self.assertRaises(RuntimeError):current['parse'](MARKER+json.dumps(value),xml(FULL_TESTS))
 
     def test_fixed_released_wheel_is_mandatory(self):
         with patch.dict(os.environ, QS_AI_READABLE_ROUTES='1'):
@@ -50,6 +67,6 @@ class AIReadableTest(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 acceptance_profile('admission')
         with patch.dict(os.environ, QS_AI_READABLE_ROUTES='1'):
-            for kind in ('protection', 'native_limit', 'paired', 'db_faults'):
+            for kind in ('protection', 'native_limit', 'db_faults'):
                 with self.assertRaises(RuntimeError):
                     acceptance_profile(kind)

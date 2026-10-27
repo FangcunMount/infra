@@ -170,8 +170,8 @@ def acceptance_profile(kind):
     mode = os.environ.get('QS_AI_READABLE_ROUTES', '0')
     if mode == '0':
         return profile
-    if mode != '1' or kind not in ('admission', 'state', 'finalization'):
-        raise RuntimeError('readable AI acceptance requires an explicit supported standalone profile')
+    if mode != '1' or kind not in ('admission', 'state', 'finalization', 'paired', 'paired_faults'):
+        raise RuntimeError('readable AI acceptance requires an explicit supported named profile')
     from ai_readable_acceptance import readable_profile
     return readable_profile(kind, profile)
 
@@ -258,7 +258,7 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     if profile['name'] in ('paired','paired_faults'):
         from paired_acceptance import prepare_qs
         extra = prepare_qs(Path(os.environ['QS_M3_PAIRED_SOURCE']), directory, project,
-                           mysql_port, password, run, proof)
+                           mysql_port, password, run, proof, readable=profile.get('readable', False))
         private_data = json.loads(private_config.read_text())
         private_data.update(extra)
         if profile["name"] == "paired_faults":

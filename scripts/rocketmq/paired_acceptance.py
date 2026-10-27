@@ -89,7 +89,7 @@ def paired_manifest():
     return manifest
 
 
-def read_receipt(output, *, full=False, partial=False, marker=MARKER, sdk_python=SDK_PYTHON_VERSION):
+def read_receipt(output, *, full=False, partial=False, marker=MARKER, sdk_python=SDK_PYTHON_VERSION, sdk_go=SDK_GO_VERSION):
     lines = [line.split(marker,1)[1] for line in output.splitlines() if marker+'{' in line]
     if len(lines) != 1 or len(lines[0]) > 16384:
         return None
@@ -102,7 +102,7 @@ def read_receipt(output, *, full=False, partial=False, marker=MARKER, sdk_python
             or any(value[k] is not True for k in FLAGS)
             or value['root'] != 'original_go_mysql_and_python_sqlalchemy'
             or (value['sdk_go'],value['sdk_python'],value['client_python']) != (
-                SDK_GO_VERSION,sdk_python,'5.1.2')
+                sdk_go,sdk_python,'5.1.2')
             or value['profile'] != ('full' if full else 'core')
             or not isinstance(value['delivery_errors'],list)
             or any(not isinstance(v,str) or v not in DELIVERY_ERRORS for v in value['delivery_errors'])
@@ -124,8 +124,8 @@ def read_receipt(output, *, full=False, partial=False, marker=MARKER, sdk_python
     return value
 
 
-def parse_receipt(output, junit, *, full=False):
-    value = read_receipt(output,full=full)
+def parse_receipt(output, junit, *, full=False, sdk_python=SDK_PYTHON_VERSION, sdk_go=SDK_GO_VERSION):
+    value = read_receipt(output,full=full,sdk_python=sdk_python,sdk_go=sdk_go)
     tests = FULL_TESTS if full else {CORE_TEST}
     cases = list(ET.fromstring(junit).iter('testcase'))
     if (value is None or len(cases) != len(tests) or {c.get('name') for c in cases} != tests
@@ -153,7 +153,7 @@ def profile():
             + '; actual Go QS/Python AI default consumers and original roots; synthetic read-side source, no real provider/public HTTP/system or packet-fault claim')
 
 
-def prepare_qs(source,directory,project,mysql_port,password,run,proof):
+def prepare_qs(source,directory,project,mysql_port,password,run,proof, *, readable=False):
     source = source.resolve()
     if (not (source/'go.mod').is_file()
             or run(['git','status','--porcelain'],cwd=source).stdout.strip()):
@@ -163,8 +163,13 @@ def prepare_qs(source,directory,project,mysql_port,password,run,proof):
         raise ValueError('exact paired QS source required')
     env = dict(os.environ,GOWORK='off',GOFLAGS='-mod=readonly')
     module = json.loads(run(['go','list','-m','-json','github.com/FangcunMount/reliable-messaging'],cwd=source,env=env).stdout)
-    if (module.get('Replace') or module.get('Version') != SDK_GO_VERSION or module.get('Sum') != SDK_GO_SUM
-            or module.get('GoModSum') != 'h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I='):
+    expected = dict(Version=SDK_GO_VERSION, Sum=SDK_GO_SUM,
+                    GoModSum='h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')
+    if readable:
+        from readable_host_acceptance import MODULE
+        expected = MODULE
+    if ('Replace' in module or module.get('Path') != 'github.com/FangcunMount/reliable-messaging'
+            or any(module.get(key) != value for key,value in expected.items())):
         raise ValueError('fixed published QS host SDK required')
     go_version = run(['go','version'],cwd=source,env=env).stdout.strip()
     if re.match(r'go version go1\.25\.12(?: |$)',go_version) is None:
@@ -178,6 +183,6 @@ def prepare_qs(source,directory,project,mysql_port,password,run,proof):
         helper_source_sha256=hashlib.sha256((source/'tests/m3_ai_paired_probe/main.go').read_bytes()).hexdigest(),
         helper_binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest())
     return dict(qs_source=str(source),qs_source_sha=sha,qs_binary=str(binary),
-        qs_sdk_module=module,sdk_go_version=SDK_GO_VERSION,qs_dsn=f'root:{password}@tcp(127.0.0.1:{mysql_port})/?parseTime=true',
+        qs_sdk_module=module,sdk_go_version=expected['Version'],qs_dsn=f'root:{password}@tcp(127.0.0.1:{mysql_port})/?parseTime=true',
         project=project,private_directory=str(directory),
         paired_profile=os.environ.get('QS_M3_PAIRED_PROFILE','core'))

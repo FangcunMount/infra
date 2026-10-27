@@ -1,0 +1,128 @@
+name: RocketMQ readable paired host faults
+on:
+  pull_request:
+    paths:
+      - scripts/rocketmq/paired_acceptance.py
+      - scripts/rocketmq/paired_fault_acceptance.py
+      - scripts/rocketmq/ai_readable_acceptance.py
+      - scripts/rocketmq/ai_admission_acceptance.py
+      - scripts/rocketmq/test_ai_readable_acceptance.py
+      - scripts/rocketmq/test_paired_acceptance.py
+      - .github/workflows/rocketmq-readable-paired.yml
+  workflow_dispatch:
+    inputs:
+      qs_ref:
+        description: Exact reviewed QS source SHA
+        type: string
+        required: true
+      ai_ref:
+        description: Exact reviewed AI source SHA with paired v3 fixture
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-readable-paired-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - name: Preserve legacy versions and enforce exact readable receipt
+        run: |
+          set -euo pipefail
+          for test in test_ai_readable_acceptance.py test_paired_acceptance.py test_paired_fault_acceptance.py; do
+            python3 -m unittest discover -s scripts/rocketmq -p "$test"
+          done
+  paired:
+    if: github.event_name == 'workflow_dispatch'
+    needs: contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {python: '3.11', mysql: 'mysql:8.0.36'}
+          - {python: '3.13', mysql: 'mysql:8.4'}
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      GOFLAGS: -mod=readonly
+      QS_REF: ${{ inputs.qs_ref }}
+      AI_REF: ${{ inputs.ai_ref }}
+      QS_AI_READABLE_ROUTES: '1'
+      QS_M3_PAIRED_PROFILE: full
+      QS_AI_ACCEPTANCE_KIND: paired_faults
+      QS_AI_ACCEPTANCE_PYTHON: ${{ matrix.python }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 5c2e3cd155e67c0f766e93bf95238b16fc219b5f
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ inputs.qs_ref }}
+          path: .qs-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-ai
+          ref: ${{ inputs.ai_ref }}
+          path: .ai-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: ${{ matrix.python }}
+      - name: Exact source and actual paired probe compilation before private dependencies
+        run: |
+          set -euo pipefail
+          [[ "$QS_REF" =~ ^[0-9a-f]{40}$ && "$AI_REF" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .qs-acceptance rev-parse HEAD)" = "$QS_REF"
+          test "$(git -C .ai-acceptance rev-parse HEAD)" = "$AI_REF"
+          cd .qs-acceptance
+          go build -p 1 -race -tags=m3_ai_paired -o "$RUNNER_TEMP/readable-paired-probe" ./tests/m3_ai_paired_probe
+      - name: Build pinned isolated Broker
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-readable-paired:5.5.1 components/rocketmq
+      - name: Original roots and actual process network Broker faults
+        run: |
+          set -euo pipefail
+          export QS_M3_PAIRED_SOURCE="$PWD/.qs-acceptance"
+          python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
+            --ai-admission-host "$PWD/.ai-acceptance" --paired-host-faults \
+            --image rocketmq-readable-paired:5.5.1 --mysql-image '${{ matrix.mysql }}' \
+            --report rocketmq-readable-paired.json
+      - name: Require both real faults and complete original paired baseline
+        if: always()
+        run: |
+          python3 - <<'PYPROOF'
+          import json,os
+          x=json.load(open('rocketmq-readable-paired.json'))
+          assert x['passed']==len(x['cases'])==40 and x['failed']==x['skipped']==0
+          assert all(x['cases'].values())
+          p=x['proof']['paired_host']
+          assert p['source_sha']==os.environ['AI_REF'] and p['paired_qs']['source_sha']==os.environ['QS_REF']
+          assert p['manifest_version']==3 and p['naming_scheme']=='readable-v1'
+          assert p['native_tests_passed']==7 and p['source_clean_after'] and p['paired_qs']['source_clean_after']
+          assert p['paired_qs']['sdk_module']['Version']=='v0.6.0-rc.1'
+          assert p['python_runtime']['sdk']=='0.5.0rc1'
+          assert x['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,
+              probe_process_groups_drained=True,private_fixture_directory_removed=True)
+          PYPROOF
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: readable-paired-${{ strategy.job-index }}-${{ github.sha }}
+          path: rocketmq-readable-paired.json
+          if-no-files-found: error
