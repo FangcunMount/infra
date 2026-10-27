@@ -6,6 +6,8 @@ on:
       - scripts/rocketmq/image_sdk_profile.py
       - scripts/rocketmq/test_image_sdk_profile.py
       - scripts/rocketmq/test_final_image_candidate.py
+      - scripts/rocketmq/readable_image_candidates.py
+      - scripts/rocketmq/test_readable_image_candidates.py
       - .github/workflows/rocketmq-readable-images.yml
   workflow_dispatch:
     inputs:
@@ -42,6 +44,7 @@ jobs:
       - uses: actions/checkout@v6
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_image_sdk_profile.py
       - run: python3 -m unittest discover -s scripts/rocketmq -p test_final_image_candidate.py
+      - run: python3 -m unittest discover -s scripts/rocketmq -p test_readable_image_candidates.py
   images:
     if: github.event_name == 'workflow_dispatch'
     needs: contracts
