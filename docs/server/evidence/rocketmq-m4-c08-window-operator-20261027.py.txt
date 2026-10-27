@@ -1,0 +1,105 @@
+import datetime,hashlib,importlib.util,json,os,re,stat,subprocess,sys,time,urllib.request,urllib.error,uuid
+from pathlib import Path
+a=json.load(sys.stdin);assert os.geteuid()==0 and a['host'] in {'serverA','serverD'};root=Path('/var/lib/fangcun-m4/windows/20261027-c08-v3');D=['/usr/bin/docker','--host','unix:///var/run/docker.sock']
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def encoded(v):return json.dumps(v,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()
+def read(p):
+ p=Path(p);s=p.lstat();assert p.resolve()==p and stat.S_ISREG(s.st_mode) and 0<s.st_size<=1048576;return p.read_bytes()
+def put(p,v):
+ raw=v if isinstance(v,bytes) else encoded(v);fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
+ with os.fdopen(fd,'wb') as f:f.write(raw);f.flush();os.fsync(f.fileno())
+def run(args,timeout=40):
+ p=subprocess.run(args,capture_output=True,timeout=timeout)
+ if p.returncode!=0:
+  put(root/('command-failure-'+uuid.uuid4().hex+'.private.err'),p.stderr);raise AssertionError('fixed M4 command refused; preserve private evidence')
+ return p.stdout
+binding=json.loads(read(root/'binding.json'));assert sha(read(root/'binding.json'))==a['binding_sha256'] and binding['operation_id']=='20261027-c08-v3'
+assert binding['target_operator_sha256']==a['operator_sha256']
+tools=Path('/opt/fangcun-m4/window-tools')/binding['source_closure_sha256'];sys.path.insert(0,str(tools/'rocketmq'));sys.path.insert(0,str(tools/'ops'))
+for name,digest in a['source_closure'].items():assert sha(read(tools/name))==digest
+import m4_runtime_start as target
+hostroles=['iam','ai','qs-api','qs-collection'] if a['host']=='serverA' else ['qs-worker']
+plans={role:target.load(root/(role+'-start.json'),a['plans'][role]['sha256']) for role in hostroles}
+first=plans[hostroles[0]];action=a['action'];now=int(time.time());event=root/(action+'-'+str(now)+'-'+uuid.uuid4().hex[:6]+'.json')
+def inspect(names):return json.loads(run(D+['inspect',*names]))
+def active_window():
+ path=root/'window-start.json';v=json.loads(read(path));assert v['binding_sha256']==a['binding_sha256'] and v['started_epoch']<=time.time()<v['deadline_epoch'],'actual M4 window expired';return v
+
+def runtime(role):
+ plan=plans[role];ids=run(target.compose(plan,'ps','--all','--quiet',plan['services'][0])).decode().split();assert len(ids)==plan['instances'][plan['services'][0]]
+ rows=inspect(ids);_,project,service,count,engine,memory,cpus,uid=target.ROLES[role];result=[]
+ for r in rows:
+  assert r['State']['Running'] and not r['State']['OOMKilled'] and r['Image']=='sha256:'+engine and r['Config']['Image']=='sha256:'+engine
+  assert r['HostConfig']['Memory']==memory and r['HostConfig']['NanoCpus']==int(cpus*1000000000)
+  assert r['Config']['Labels']['com.docker.compose.project']==project and r['Config']['Labels']['com.docker.compose.service']==service
+  assert r['State'].get('Health',{}).get('Status','none') in {'healthy','none'}
+  status=dict(x.split(':',1) for x in (Path('/proc')/str(r['State']['Pid'])/'status').read_text().splitlines() if ':' in x);assert int(status['Uid'].split()[1])==int(status['Gid'].split()[1])==uid
+  if role=='qs-worker':
+   body=run(D+['exec',r['Id'],'wget','-qO-','-T','3','http://127.0.0.1:9092/readyz']);assert json.loads(body)['status']=='ready'
+  result.append(dict(name=r['Name'].lstrip('/'),container_id=r['Id'],image_id=r['Image'],started_at=r['State']['StartedAt'],restarts=r['RestartCount'],uid=uid,gid=uid,memory_bytes=memory,nano_cpus=int(cpus*1000000000),health=r['State'].get('Health',{}).get('Status','HTTP ready' if role=='qs-worker' else 'none'),config_sha256=sha(encoded(r['Config'])),hostconfig_sha256=sha(encoded(r['HostConfig']))))
+ return result
+
+if action=='close':
+ assert a['host']=='serverA' and not (root/'window-start.json').exists() and not (root/'first-start-issued.json').exists()
+ with target.deployment_locks(first):
+  nginx=inspect(['nginx'])[0];assert nginx['Id']==a['nginx_id'] and nginx['Image']==a['nginx_image'] and nginx['State']['Running']
+  for row in a['sites']:
+   p=Path('/data/apps/nginx-configs')/row['name'];s=p.lstat();assert p.resolve()==p and s.st_ino==row['original_inode'] and s.st_uid==row['uid'] and s.st_gid==row['gid'] and oct(stat.S_IMODE(s.st_mode))==row['mode'] and sha(read(p))==row['original_sha256']
+  started=int(time.time());v=dict(binding_sha256=a['binding_sha256'],started_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),started_epoch=started,deadline_epoch=started+1800,phase='close-issued');put(root/'window-start.json',v)
+  for row in a['sites']:
+   p=Path('/data/apps/nginx-configs')/row['name'];raw=read(Path('/opt/fangcun-m4/releases/m4-c08-20261027-v1/ingress/closed')/row['name']);assert sha(raw)==row['closed_sha256']
+   with p.open('r+b') as f:f.write(raw);f.truncate();f.flush();os.fsync(f.fileno())
+  run(D+['exec','nginx','nginx','-t']);run(D+['exec','nginx','nginx','-s','reload'])
+  results=[]
+  for row in a['sites']:
+   original=read(Path('/opt/fangcun-m4/releases/m4-c08-20261027-v1/ingress/original')/row['name']).decode();domain=re.search(r'server_name\s+(\S+)',original).group(1).rstrip(';');request=urllib.request.Request('http://127.0.0.1/healthz',headers={'Host':domain})
+   class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self,*args,**kwargs):return None
+   opener=urllib.request.build_opener(NoRedirect())
+   for attempt in range(10):
+    try:response=opener.open(request,timeout=2);code=response.status
+    except urllib.error.HTTPError as e:code=e.code
+    if code==503:break
+    time.sleep(.2)
+   assert code==503;results.append(dict(site=row['name'],status=code))
+  v.update(phase='closed',checks=results,confirmed_at=datetime.datetime.now(datetime.timezone.utc).isoformat());put(root/'closed.json',v);put(event,v);print(json.dumps(v))
+elif action=='stop':
+ role=a['role'];assert role in plans and not (root/'first-start-issued.json').exists();closed=a['closed_receipt'];assert closed['phase']=='closed' and closed['binding_sha256']==a['binding_sha256'] and time.time()<closed['deadline_epoch']
+ if not (root/'window-start.json').exists():put(root/'window-start.json',{k:v for k,v in closed.items() if k not in {'checks','confirmed_at'}})
+ baseline=json.loads(read(root/'original-runtime.private.json'));plan=plans[role];selected=[r for r in baseline if r['Config']['Labels']['com.docker.compose.project']==plan['project'] and r['Config']['Labels']['com.docker.compose.service']==plan['services'][0]];assert len(selected)==sum(plan['instances'].values())
+ with target.deployment_locks(plan):
+  ids=[]
+  for old in selected:
+   r=inspect([old['Id']])[0];assert r['Image']==old['Image'] and sha(encoded(r['Config']))==sha(encoded(old['Config'])) and sha(encoded(r['HostConfig']))==sha(encoded(old['HostConfig']));ids.append(r['Id'])
+  put(event,dict(phase='stop-issued',role=role,containers=ids,binding_sha256=a['binding_sha256']))
+  run(D+['stop','--time','210' if role=='ai' else '90',*ids],timeout=230)
+  rows=inspect(ids);assert all(not r['State']['Running'] and r['State']['Pid']==0 and r['State']['ExitCode']==0 for r in rows),'old runtime did not exit cleanly'
+  result=dict(role=role,phase='stopped',containers=[dict(id=r['Id'],exit_code=r['State']['ExitCode']) for r in rows],binding_sha256=a['binding_sha256']);put(root/('stopped-'+role+'.json'),result);print(json.dumps(result))
+elif action=='start':
+ role=a['role'];assert role in plans;v=active_window();assert v['deadline_epoch']-time.time()>540,'preserve actual acceptance budget';assert (root/('stopped-'+role+'.json')).exists()
+ if not (root/'first-start-issued.json').exists():put(root/'first-start-issued.json',dict(at=datetime.datetime.now(datetime.timezone.utc).isoformat(),role=role,binding_sha256=a['binding_sha256']))
+ put(event,dict(phase='runtime-start-issued',role=role,binding_sha256=a['binding_sha256']))
+ args=['/usr/bin/python3','-I',str(tools/'ops/m4_runtime_start.py'),'--plan',str(root/(role+'-start.json')),'--reviewed-sha256',a['plans'][role]['sha256'],'--execute','--coordinated-start-already-issued']
+ result=json.loads(run(args,timeout=180));assert result['status']=='m4_runtime_verified';rows=runtime(role);result=dict(role=role,phase='runtime-verified',rows=rows,binding_sha256=a['binding_sha256']);put(root/('started-'+role+'-'+uuid.uuid4().hex[:6]+'.json'),result);print(json.dumps(result))
+elif action=='status':
+ result=dict(host=a['host'],roles={role:runtime(role) for role in hostroles},binding_sha256=a['binding_sha256'],observed_at=datetime.datetime.now(datetime.timezone.utc).isoformat());put(event,result);print(json.dumps(result))
+elif action in {'acceptance','open'}:
+ assert a['host']=='serverA';v=active_window();assert (root/'first-start-issued.json').exists()
+ if action=='acceptance':
+  for role in hostroles:runtime(role)
+  d=a['worker_status'];assert d['binding_sha256']==a['binding_sha256'] and len(d['roles']['qs-worker'])==3
+  peers=json.loads(read(root/'peers.private.json'));assert 1<=len(peers)<=4
+ else:
+  proof=a['business_evidence'];assert proof['actor_id']=='10001' and proof['passed'] is True and proof['iam_dual_subscription'] and proof['answer_score_report'] and proof['AI_receipt_state_ACK']
+  put(root/'business-evidence.json',proof)
+ with target.deployment_locks(first):
+  from m3_nginx_acceptance_gate import render
+  changed=[]
+  for row,site in zip(a['sites'],['iam','qs','collect']):
+   p=Path('/data/apps/nginx-configs')/row['name'];s=p.lstat();assert p.resolve()==p and s.st_ino==row['original_inode'] and s.st_uid==row['uid'] and s.st_gid==row['gid'] and oct(stat.S_IMODE(s.st_mode))==row['mode']
+   original=read(Path('/opt/fangcun-m4/releases/m4-c08-20261027-v1/ingress/original')/row['name']);assert sha(original)==row['original_sha256']
+   raw=render(original.decode(),site,peers,v['started_epoch'],v['deadline_epoch']).encode() if action=='acceptance' else original
+   with p.open('r+b') as f:f.write(raw);f.truncate();f.flush();os.fsync(f.fileno())
+   changed.append(dict(name=row['name'],sha256=sha(raw)))
+  run(D+['exec','nginx','nginx','-t']);run(D+['exec','nginx','nginx','-s','reload']);result=dict(phase=action,changed=changed,binding_sha256=a['binding_sha256'],deadline_epoch=v['deadline_epoch'],observed_at=datetime.datetime.now(datetime.timezone.utc).isoformat());put(event,result);put(root/(action+'.json'),result);print(json.dumps(result))
+else:raise AssertionError('unsupported M4 action')
