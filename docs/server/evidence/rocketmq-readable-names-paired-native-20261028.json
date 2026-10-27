@@ -1,0 +1,41 @@
+{
+  "schema": "readable-paired-native/v1",
+  "run": 40567171604,
+  "infra_source": "ec664c01f101bda94d176ac3b0e65bff175646e9",
+  "qs_source": "eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b",
+  "ai_source": "42bda2aa2b2956f9d7adfad6bc27b2b61aeb753d",
+  "matrices": [
+    {
+      "artifact": "readable-paired-0-ec664c01f101bda94d176ac3b0e65bff175646e9",
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "actual_pytest": 7,
+      "report_sha256": "f99cc5bbe27e285c1b76a5a9004124ccb73a7e6555e05e2992c32a57c256c844",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    },
+    {
+      "artifact": "readable-paired-1-ec664c01f101bda94d176ac3b0e65bff175646e9",
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "actual_pytest": 7,
+      "report_sha256": "93c1674485fac7f72d31d3115d0fc6b7c6ff235c8e899115e67c8e786060294f",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      }
+    }
+  ],
+  "production": false,
+  "system_acceptance": false,
+  "real_provider": false,
+  "cutover_rehearsal": false
+}
