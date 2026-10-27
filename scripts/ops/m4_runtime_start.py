@@ -6,22 +6,28 @@ migrate, select another provider, stop a service, or restore business data.
 The single operator records maintenance and its first-start barrier separately.
 """
 import argparse
+import contextlib
+import fcntl
 import hashlib
 import json
+import os
 from pathlib import Path
 import platform
 import re
 import socket
+import stat
 import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "rocketmq"))
 
-from cutover_step import deployment_locks, private_bytes, reviewed
+from cutover_step import private_bytes, reviewed
 from runtime_start import DOCKER, SOCKET, command, compose, verify_config, verify_running
 from start_boundary import BoundaryError
 
 ROOT = Path('/opt/fangcun-m4/releases/m4-c08-20261027-v1')
+GLOBAL_LOCK = '/var/lib/fangcun-image-retention/deploy.lock'
+AI_LOCK = '/opt/qs-ai/deploy.lock'
 # host, project, service, replicas, actual frozen engine ID, bytes, CPUs, UID/GID
 ROLES = {
     'iam': ('serverA', 'docker', 'iam-apiserver', 1,
@@ -41,7 +47,7 @@ def load(path, digest, *, root=ROOT):
     value = reviewed(path, digest)
     fields = {'schema', 'coordinator_binding_sha256', 'role', 'host', 'project',
               'directory', 'compose_file', 'compose_sha256', 'environment_file',
-              'environment_sha256', 'services', 'images', 'instances', 'ai_host', 'assets'}
+              'environment_sha256', 'services', 'images', 'instances', 'ai_host', 'assets', 'locks'}
     if set(value) != fields or value['schema'] != 'm4-c08-runtime-start/v1' or value['role'] not in ROLES:
         raise BoundaryError('exact M4 C08 plan required')
     role = value['role']; host, project, service, count, image, *_ = ROLES[role]
@@ -51,6 +57,16 @@ def load(path, digest, *, root=ROOT):
             or value['ai_host'] is not (host == 'serverA')
             or re.fullmatch('[a-f0-9]{64}', value['coordinator_binding_sha256']) is None):
         raise BoundaryError('frozen M4 target or budget differs')
+    expected_locks = {GLOBAL_LOCK, AI_LOCK} if host == 'serverA' else {GLOBAL_LOCK}
+    if not isinstance(value['locks'], dict) or set(value['locks']) != expected_locks:
+        raise BoundaryError('exact original M4 lock set required')
+    for filename, identity in value['locks'].items():
+        if (not isinstance(identity, dict) or set(identity) != {'inode', 'device', 'uid', 'gid', 'mode'}
+                or any(type(identity[k]) is not int or identity[k] < 0 for k in ('inode', 'device', 'uid', 'gid'))
+                or identity['inode'] == 0
+                or (filename == GLOBAL_LOCK and (identity['uid'] != 0 or identity['mode'] != '0o666'))
+                or (filename == AI_LOCK and identity != {**identity, 'uid': 1002, 'gid': 2001, 'mode': '0o600'})):
+            raise BoundaryError('original M4 lock metadata differs')
     directory = root / role
     for name, suffix in [('directory', ''), ('compose_file', 'compose.json'), ('environment_file', 'runtime.env')]:
         expected = directory / suffix if suffix else directory
@@ -72,6 +88,29 @@ def load(path, digest, *, root=ROOT):
     return value
 
 
+@contextlib.contextmanager
+def deployment_locks(plan):
+    """Respect the original deploy-owned AI lock without changing its owner/mode."""
+    def identity(info):
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+            raise BoundaryError('original M4 lock is not a single regular file')
+        return dict(inode=info.st_ino, device=info.st_dev, uid=info.st_uid,
+                    gid=info.st_gid, mode=oct(stat.S_IMODE(info.st_mode)))
+    paths = [GLOBAL_LOCK, AI_LOCK] if plan['ai_host'] else [GLOBAL_LOCK]
+    with contextlib.ExitStack() as stack:
+        for path in paths:
+            if identity(Path(path).lstat()) != plan['locks'][path]:
+                raise BoundaryError('original M4 lock changed before open')
+            fd = os.open(path, os.O_RDWR | os.O_NOFOLLOW | os.O_NONBLOCK)
+            stack.callback(os.close, fd)
+            if identity(os.fstat(fd)) != plan['locks'][path]:
+                raise BoundaryError('original M4 lock changed during open')
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        yield
+        if any(identity(Path(path).lstat()) != plan['locks'][path] for path in paths):
+            raise BoundaryError('original M4 lock changed during execution')
+
+
 def verify_budget(plan, raw):
     verify_config(plan, raw)
     service = json.loads(raw)['services'][plan['services'][0]]
@@ -85,7 +124,7 @@ def verify_budget(plan, raw):
 def execute(plan):
     if platform.system() != 'Linux' or socket.gethostname() != plan['host']:
         raise BoundaryError('actual M4 target differs')
-    with deployment_locks(plan['ai_host']):
+    with deployment_locks(plan):
         # Material/configuration drift after lock acquisition fails before Docker up.
         for key in ('compose', 'environment'):
             if hashlib.sha256(private_bytes(plan[key + '_file'], 1 << 20)).hexdigest() != plan[key + '_sha256']:

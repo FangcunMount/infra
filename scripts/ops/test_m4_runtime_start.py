@@ -2,8 +2,10 @@ import contextlib
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import tempfile
+import stat
 import unittest
 from unittest.mock import patch
 
@@ -25,7 +27,10 @@ def fixture(root, role='iam'):
                 environment_file=str(directory / 'runtime.env'),
                 environment_sha256=private(directory / 'runtime.env', b''),
                 services=[service], images={service: 'sha256:' + image}, instances={service: count},
-                ai_host=host == 'serverA', assets={str(assets): asset_hash})
+                ai_host=host == 'serverA', assets={str(assets): asset_hash},
+                locks={target.GLOBAL_LOCK: dict(inode=1, device=1, uid=0, gid=0, mode='0o666')})
+    if host == 'serverA':
+        plan['locks'][target.AI_LOCK] = dict(inode=2, device=1, uid=1002, gid=2001, mode='0o600')
     path = directory / 'plan.json'; digest = private(path, _encoded(plan))
     return path, digest, plan
 
@@ -119,6 +124,31 @@ class M4RuntimeStartTest(unittest.TestCase):
             path, _, plan = target_fixture(root)
             plan['images']['fixture'] = 'sha256:' + '2' * 64
             with self.assertRaises(BoundaryError): original.load(path, private(path, _encoded(plan)))
+
+    def test_original_lock_metadata_is_required_and_wrong_owner_or_set_refused(self):
+        with tempfile.TemporaryDirectory() as root:
+            for mutation in ('missing', 'owner', 'mode'):
+                path, _, plan = fixture(root)
+                if mutation == 'missing': del plan['locks'][target.AI_LOCK]
+                if mutation == 'owner': plan['locks'][target.AI_LOCK]['uid'] = 0
+                if mutation == 'mode': plan['locks'][target.AI_LOCK]['mode'] = '0o666'
+                with self.assertRaises(BoundaryError):
+                    target.load(path, private(path, _encoded(plan)), root=Path(root).resolve())
+
+    def test_real_flock_conflict_and_inode_drift_preserve_original_lock(self):
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root).resolve() / 'owned.lock'; private(path, b'')
+            s = path.stat(); identity = dict(inode=s.st_ino, device=s.st_dev, uid=s.st_uid,
+                                            gid=s.st_gid, mode=oct(stat.S_IMODE(s.st_mode)))
+            plan = dict(ai_host=False, locks={str(path): identity})
+            with patch.object(target, 'GLOBAL_LOCK', str(path)):
+                with target.deployment_locks(plan):
+                    with self.assertRaises(BlockingIOError):
+                        with target.deployment_locks(plan): self.fail('busy lock acquired')
+                self.assertEqual(path.stat().st_ino, s.st_ino)
+                plan['locks'][str(path)]['inode'] += 1
+                with self.assertRaises(BoundaryError):
+                    with target.deployment_locks(plan): self.fail('changed lock acquired')
 
 
 if __name__ == '__main__':
