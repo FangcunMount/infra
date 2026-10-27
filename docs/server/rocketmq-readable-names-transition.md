@@ -38,3 +38,7 @@
 `ROCKETMQ_READABLE_RETIREMENT=1` 仅在完整 owned readable transition 档启用。先要求130项真实ACL/TLS门禁及精确旧新并集通过，再校验隔离Compose项目、单Broker成员和实际空Topic offset；逐个撤销所选旧权限、删除一个旧Group和一个旧Topic。专门创建的空retry/DLQ sentinel必须保留；其他旧/新资源及权限逐项比较，NameServer Topic列表回读确认删除。
 
 这只验证新建空测试资源上的CLI语义，不证明生产责任已清零，也不授权生产删除。专项CI预算45分钟，独立于生产维护上限30分钟。生产观察需在旧POP消费者仍在线时取得，不能把指标缺失或普通consumer offset差值单独当作POP不可见责任为零；之后停旧运行时前还须核对宿主协议、业务回执及调度责任。
+
+### 既有 CD 材料链路兼容
+
+既有 `m4_material_stage` 继续负责不可变材料，不生成或解释 Topic/Group 名称。新增真实 v3 清单的四角色回归：活动和历史映射逐字节进入原只读版本文件，原 credentials/JOSE 来源字节保留，重复 stage 不改写，verify 只读且不激活 current 指针。该工具24项本地测试通过；宿主 CD 配置仍使用原路径、身份、epoch 和部署锁。最终镜像下的实际解码及原配置打包器启动由独立 T11 入口验证，不把纯材料测试等同于生产部署。
