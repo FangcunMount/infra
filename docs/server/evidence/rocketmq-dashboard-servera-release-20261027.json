@@ -1,0 +1,249 @@
+{
+  "schema": "rocketmq-dashboard-servera-release/v1",
+  "source_sha": "df69d53b7b1cd480acf04c8969668e9b53678062",
+  "source_pr": "https://github.com/FangcunMount/infra/pull/350",
+  "completed_utc": "2026-10-27T05:52:42.395095+00:00",
+  "url": "https://mq.fangcunmount.cn",
+  "ci": {
+    "url": "https://github.com/FangcunMount/infra/actions/runs/40454910407",
+    "passed": 31,
+    "failed": 0,
+    "skipped": 0,
+    "cases": {
+      "cold_backup_after_stop": true,
+      "broker_same_image_resources_config_mounts": true,
+      "broker_native_private_port": true,
+      "broker_users_and_inventory_preserved": true,
+      "normal_client_acls_survive_recreation": true,
+      "original_mapping_recovery_uses_current_store": true,
+      "native_mapping_reapplied_without_store_restore": true,
+      "normal_client_acls_survive_recovery": true,
+      "login_required": true,
+      "csrf_required": true,
+      "secure_https_session": true,
+      "anonymous_inventory_denied": true,
+      "default_login_denied": true,
+      "wrong_password_denied": true,
+      "independent_login": true,
+      "tls_authenticated_cluster": true,
+      "topics_read": true,
+      "consumer_groups_read": true,
+      "logout_revokes_session": true,
+      "no_message_mutations": true,
+      "browser_javascript_assets_load": true,
+      "http_redirects_https": true,
+      "wrong_ca_denied_with_valid_https_session": true,
+      "failed_management_host_can_close_503": true,
+      "https_virtual_host_restores_without_restart": true,
+      "foreign_bridge_10911_denied": true,
+      "foreign_bridge_18082_denied": true,
+      "no_serverd_nginx_service": true,
+      "dashboard_nonroot_readonly_bounded": true,
+      "nameserver_not_restarted": true,
+      "exact_official_jar": true
+    },
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    }
+  },
+  "backend": {
+    "backup": {
+      "bytes": 1787688960,
+      "files": 82,
+      "path": "/data/infra/rocketmq-dashboard/native-transition/20261027T052951/broker-before-native.tar",
+      "sha256": "6c6bebd23b81a9d8cdbaf220a444e581ffe68bf3a13306dc9abc06449b7184ca",
+      "store_restored": false
+    },
+    "broker_after": "9ed29110036730ee1a87033b8e184f85f128454f2f0a75893822ef3caf821fbb",
+    "broker_before": "ce02d3e209b1f17dbf9b7544b3629f363fa45e5a80e3766b77295f038e86ccce",
+    "broker_image": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+    "cases": {
+      "acls_preserved": true,
+      "broker_native_port_only": true,
+      "broker_runtime_preserved": true,
+      "current_store_retained": true,
+      "dashboard_nonroot_readonly": true,
+      "inventory_preserved": true,
+      "nameserver_unchanged": true,
+      "no_dashboard_oom": true,
+      "original_config_unchanged": true,
+      "original_firewall_unchanged": true,
+      "serverd_nginx_removed": true,
+      "users_preserved": true,
+      "workers_unchanged": true
+    },
+    "certificate_fingerprints": {
+      "rocketmq-broker-1": "4e8a678baa062f75fadae14373c2c210d5ecb4a7a696ada6b493a31cd59acec7",
+      "rocketmq-nameserver-1": "143b8cb48221ac38d882e11d4a5fc5655686a40097d6d52902567cc1e0331720"
+    },
+    "dashboard": "01752a09dd57b855dcb0273d66367a58a39422f7464e9264e64ed8766ebd4855",
+    "dashboard_config": "/data/infra/rocketmq-dashboard/native-transition/20261027T052951/dashboard-private",
+    "failed": 0,
+    "firewall": {
+      "dnat_and_userland_proxy_protected": true,
+      "existing_firewall_chains_preserved": true,
+      "private_bind": "100.118.164.39",
+      "rpc_broker_bridge_only": true,
+      "trusted_host_self_check": true,
+      "ui_servera_only": true,
+      "web_ingress_source": "100.74.123.45"
+    },
+    "passed": 13,
+    "skipped": 0,
+    "source_sha": "df69d53b7b1cd480acf04c8969668e9b53678062",
+    "store_restored": false,
+    "https_acceptance_pending_at_backend_phase": true
+  },
+  "https": {
+    "cases": {
+      "anonymous_inventory_denied": true,
+      "consumer_groups_read": true,
+      "csrf_required": true,
+      "default_login_denied": true,
+      "exact_mq_virtual_host": true,
+      "independent_login": true,
+      "login_required": true,
+      "logout_revokes_session": true,
+      "nginx_not_restarted": true,
+      "no_message_mutations": true,
+      "original_virtual_hosts_unchanged": true,
+      "secure_https_session": true,
+      "tls_authenticated_cluster": true,
+      "topics_read": true,
+      "wrong_password_denied": true
+    },
+    "certificate": "/data/ssl/certs/fangcunmount.cn.crt",
+    "credentials_written_to_servera": false,
+    "failed": 0,
+    "nginx_id": "8d9f2f4d1a9cf85d4f51497897eff0b545676ff8eb479f595beee9d969b6d18e",
+    "passed": 15,
+    "skipped": 0,
+    "source_sha": "df69d53b7b1cd480acf04c8969668e9b53678062",
+    "url": "https://mq.fangcunmount.cn",
+    "virtual_host_sha256": "d513fd57c0e03f7a94199e4f691cd062dbc3ad8aa2c919596668962042a7477d"
+  },
+  "broker_stop_to_healthy_seconds": 48.298,
+  "network": {
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "foreign_bridge_10911_denied": true,
+    "foreign_bridge_18082_denied": true
+  },
+  "runtime": {
+    "containers": [
+      {
+        "cpu_limit": 1500000000,
+        "id": "9ed29110036730ee1a87033b8e184f85f128454f2f0a75893822ef3caf821fbb",
+        "image": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+        "memory_limit": 1342177280,
+        "name": "/rocketmq-broker-1",
+        "oom": false,
+        "ports": {
+          "10911/tcp": [
+            {
+              "HostIp": "100.118.164.39",
+              "HostPort": "10911"
+            }
+          ],
+          "5557/tcp": [
+            {
+              "HostIp": "100.118.164.39",
+              "HostPort": "5557"
+            }
+          ],
+          "8081/tcp": [
+            {
+              "HostIp": "100.118.164.39",
+              "HostPort": "8081"
+            }
+          ]
+        },
+        "restarts": 0
+      },
+      {
+        "cpu_limit": 250000000,
+        "id": "fdfa8e5d6067d26931f8fca3d8e5abc02c7c8c220d2f2e5a1fd020d2d85c2204",
+        "image": "sha256:6387937671866c6ca6c973b8e5df649ce101463e95f4e300c5455b2975bf3353",
+        "memory_limit": 402653184,
+        "name": "/rocketmq-nameserver-1",
+        "oom": false,
+        "ports": {},
+        "restarts": 0
+      },
+      {
+        "cpu_limit": 500000000,
+        "id": "01752a09dd57b855dcb0273d66367a58a39422f7464e9264e64ed8766ebd4855",
+        "image": "sha256:81fbd0f5d82c79a50899b48bf18449ee1c52e1deb0246999a90291c786fbeabb",
+        "memory_limit": 536870912,
+        "name": "/rocketmq-dashboard-dashboard-1",
+        "oom": false,
+        "ports": {
+          "8082/tcp": [
+            {
+              "HostIp": "100.118.164.39",
+              "HostPort": "18082"
+            }
+          ]
+        },
+        "restarts": 0
+      },
+      {
+        "cpu_limit": 1000000000,
+        "id": "f1b3c2f47acef809c28e42788b4071016bb1cb27ec7f7f8d703b4faa1607de2c",
+        "image": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+        "memory_limit": 805306368,
+        "name": "/qs-worker-runtime-1",
+        "oom": false,
+        "ports": {},
+        "restarts": 0
+      },
+      {
+        "cpu_limit": 1000000000,
+        "id": "6368fb8f730394e9763aaa087b5bc2e08879e28a1ed04bf17771e30a21e1ea3b",
+        "image": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+        "memory_limit": 805306368,
+        "name": "/qs-worker-runtime-2",
+        "oom": false,
+        "ports": {},
+        "restarts": 0
+      },
+      {
+        "cpu_limit": 1000000000,
+        "id": "19dd1606a7671b3c9b9c31e8ba8621d300196a667b08ba9c828f8334310a22cd",
+        "image": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+        "memory_limit": 805306368,
+        "name": "/qs-worker-runtime-3",
+        "oom": false,
+        "ports": {},
+        "restarts": 0
+      }
+    ],
+    "memory_available_mib": 1129,
+    "serverd_nginx_containers": []
+  },
+  "external": {
+    "public_dns_a": "154.8.167.1",
+    "public_tls_verified": true,
+    "login_page_rendered_in_browser": true,
+    "javascript_mime": "text/javascript",
+    "javascript_sha256": "6950a7c291b8af6a1ac065f35882a2222e9d9d90edad094b25945100825d3af8",
+    "api_base": "window.location.origin",
+    "four_original_https_sites_200": true
+  },
+  "health": {
+    "three_workers_ready": true,
+    "four_owners_ready": true,
+    "all_ten_existing_targets_up": true,
+    "admission_open": true,
+    "admission_protected": false
+  },
+  "active_state": "/data/infra/rocketmq-dashboard/active-native.json",
+  "actual_ingress_receipt_sha256": "da4a249cc19444e445bd0a38bd04c59d76b2b3c3fefea6baf51b1c73fb8ba86d",
+  "secrets_included": false,
+  "business_messages_published_by_this_operation": false,
+  "store_restored": false
+}

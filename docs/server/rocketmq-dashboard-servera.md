@@ -1,17 +1,19 @@
 # RocketMQ Dashboard：serverA HTTPS 与 serverD 原生 RPC
 
-用户已选择：serverA 现有 Nginx 提供 `https://mq.fangcunmount.cn`；Dashboard 保留 serverD，管理 RPC 直达 serverD 原生私网端口；移除 serverD Nginx。
+**状态：已上线，执行与验收 6/6。** [完整发布证据](evidence/rocketmq-dashboard-servera-release-20261027.json)。
+
+用户已选择并已完成：serverA 现有 Nginx 提供 `https://mq.fangcunmount.cn`；Dashboard 保留 serverD，管理 RPC 直达 serverD 原生私网端口；移除 serverD Nginx。
 
 原私网方案已完成：源码 [infra #348](https://github.com/FangcunMount/infra/pull/348) 已合并；隔离 19/19、实际部署 15/15；原 Broker/NameServer 未重启，三个 worker 与四 owner 就绪、10 个监控目标 up。[原方案部署证据](evidence/rocketmq-dashboard-private-prototype-20261027.json) 不代表本次新拓扑已经完成。
 
 | 完成 | 任务 | 验收标准及进度 |
 |---|---|---|
 | ✅ | S01 冻结实际运行基线 | Broker 原容器 `ce02d3e209b1…`，镜像 `638793767186…`；原 Compose `73384d115bc1…`，只叠加原生端口；serverA 现有通配符证书覆盖 mq |
-| ☐ | S02 原生端口与入口实现 | 原镜像/命令/环境/资源/挂载/账号不变；仅 Broker 新增 Tailscale 10911，Dashboard 直映射 18082；A 代理 HTTPS，正确转发 Origin/协议及 Secure cookie；D 无 Nginx |
-| ☐ | S03 隔离重建与恢复验证 | 真实 Broker 重建、存储与账号保留、冷备份校验、原配置恢复路径；HTTPS 登录/CSRF/TLS/错误 CA、其他 Docker 网络拒绝；非空、零跳过 |
-| ☐ | S04 受控生产转换 | 具名原容器/源码摘要检查、原部署锁、冷备份 fsync、首次启动标记；仅重建 Broker 与 Dashboard；A Nginx 语法验证后 reload，原业务容器不重启 |
-| ☐ | S05 域名与真实验收 | mq A 记录指向 serverA；实际证书/跳转/前端资源/登录/管理查询通过；原站点、worker、owner、监控恢复正常；D Nginx 容器退出 |
-| ☐ | S06 收尾 | 源码/证据合并、活动配置与恢复命令索引、私密 UI 凭据文件交付；逐项打勾 |
+| ✅ | S02 原生端口与入口实现 | 原镜像/命令/环境/资源/挂载/账号不变；Broker 直映射10911、Dashboard直映射18082；A HTTPS/Secure cookie生效，D Nginx已移除 |
+| ✅ | S03 隔离重建与恢复验证 | 首批26/26；最终候选31/31、0失败0跳过：真实重建/恢复、账号与普通ACL、冷备、HTTPS/CSRF/错误CA、前端资源、503关闭恢复与跨bridge拒绝 |
+| ✅ | S04 受控生产转换 | 生产后端13/13；持锁、1.79GB冷备fsync、首次启动标记；Broker停止至健康48.298秒。仅Broker/Dashboard重建，NameServer与worker不重启 |
+| ✅ | S05 域名与真实验收 | 用户DNS已核对；实际HTTPS15/15、生产跨bridge拒绝2/2；浏览器登录页正常、JS MIME正确；原4个HTTPS站点200、3worker/4owner/10目标正常 |
+| ✅ | S06 收尾 | 源码#350已合并；本收尾提交记录活动配置/恢复命令及证据；UI凭据以本机0600文件交付，不含Broker凭据 |
 
 ## 已核对的边界
 
@@ -33,4 +35,41 @@
 
 ## 隔离验证记录
 
-首批候选 `5f87e319ffd90f3f22ba153f9f28bc3fb16b792d` 已通过 [26/0/0 原生验证](https://github.com/FangcunMount/infra/actions/runs/40453913111)，包含 Broker 真实重建、原映射恢复、当前存储复用、HTTPS/Secure cookie/CSRF、严格 TLS 和跨 bridge 拒绝。生产工具与前端静态资源、关闭/恢复入口门禁补齐后，再对最终候选完整重跑；本记录不提前勾选 S03。
+首批候选 `5f87e319ffd90f3f22ba153f9f28bc3fb16b792d` 已通过 [26/0/0 原生验证](https://github.com/FangcunMount/infra/actions/runs/40453913111)，包含 Broker 真实重建、原映射恢复、当前存储复用、HTTPS/Secure cookie/CSRF、严格 TLS 和跨 bridge 拒绝。最终源码候选 `b49afa3cf1e6d309728b219320aee370446f3a2d` 已完成 [31/0/0 完整验证](https://github.com/FangcunMount/infra/actions/runs/40454910407)，并合并为 `df69d53b7b1cd480acf04c8969668e9b53678062`（[PR #350](https://github.com/FangcunMount/infra/pull/350)）。相关测试包括前端静态资源、正常账号ACL、503关闭与恢复；测试环境清理全部通过。
+
+## 当前活动配置
+
+| 对象 | 活动位置 / 身份 |
+|---|---|
+| 公开入口 | `https://mq.fangcunmount.cn` → serverA `154.8.167.1` |
+| serverA vhost | `/data/apps/nginx-configs/mq.fangcunmount.cn.conf`；SHA256 `d513fd57c0e03f7a94199e4f691cd062dbc3ad8aa2c919596668962042a7477d` |
+| serverA HTTPS 回执 | `/data/infra/rocketmq-dashboard/ingress/20261027T054003.json`；实际文件 SHA256 `da4a249cc19444e445bd0a38bd04c59d76b2b3c3fefea6baf51b1c73fb8ba86d` |
+| 版本化源码（A、D） | `/data/infra/rocketmq-dashboard/source/df69d53b7b1cd480acf04c8969668e9b53678062` |
+| serverD 活动索引 | `/data/infra/rocketmq-dashboard/active-native.json`，含组合命令、Dashboard 环境、公开入口和收尾回执 |
+| serverD 操作目录 | `/data/infra/rocketmq-dashboard/native-transition/20261027T052951`；`state.json` 已 complete，`receipt.json` 保留后端阶段原始13项验证，`closure.json` 链接后续HTTPS验证 |
+| Broker 新容器 | `9ed29110036730ee1a87033b8e184f85f128454f2f0a75893822ef3caf821fbb`；原镜像 `638793767186…`、1280 MiB / 1.5 CPU |
+| Dashboard 新容器 | `01752a09dd57b855dcb0273d66367a58a39422f7464e9264e64ed8766ebd4855`；512 MiB / 0.5 CPU，UID10001、只读根目录 |
+| Dashboard 私密配置 | 操作目录中的 `dashboard-private`，0700 / 文件0600，UID10001；HTTPS Secure cookie 与严格管理证书验证 |
+| 独立账号 | UI 用户 `dashboard-admin`；serverD `/data/infra/rocketmq-dashboard/credentials.json` 仅root可读。交付只导出UI账号，不导出Broker管理凭据 |
+| 防火墙 | `rocketmq-dashboard-firewall.service` 使用本次版本源码；D 18082仅A的 `100.74.123.45`，10911仅MQ bridge及本机；保留原8081/5557链 |
+| 当前恢复资产 | 操作目录中的 `broker-before-native.tar`，1787688960字节、82文件；SHA256 `6c6bebd23b81a9d8cdbaf220a444e581ffe68bf3a13306dc9abc06449b7184ca`；未恢复过store |
+
+末次回读：serverD 可用内存1129 MiB；Broker、NameServer、Dashboard及三个worker均无OOM/非预期重启。NameServer与worker身份保持；四owner准入开启、保护未触发，10个原监控目标均up。Broker重连期曾出现一次未就绪的监控读取，随后完整重读通过，失败材料保留。原四个HTTPS站点均200；serverA原vhost字节及Nginx容器身份保持。
+
+## 日常维护与受限恢复
+
+Broker 的活动定义是**原始Compose加本次override**。只运行原始Compose会移除10911映射；请使用活动索引中的组合命令。下述示例在serverD运行，需持原部署锁：
+
+```sh
+sudo docker compose \
+  --env-file /etc/infra/rocketmq/runtime.env -p rocketmq \
+  -f /opt/infra-rocketmq/releases/73384d115bc1734e6589fb18064777e0f3dfcf0c/components/rocketmq/docker-compose.yml \
+  -f /data/infra/rocketmq-dashboard/native-transition/20261027T052951/native-rpc.override.json \
+  up -d --no-deps --pull never broker
+```
+
+受限恢复组合保存在操作目录的 `commands.private.json`：原Compose加 `recovery.override.json`，继续使用**当前store**恢复原端口和gRPC服务。当前冷备不用于日常回退覆盖，不删除事务证据，不重发历史业务，不修改业务数据库或消费位点。仅管理入口失败时关闭mq vhost为503并前向修复，不重启健康Broker。
+
+本次沿用原进程的remoting TLS配置，其管理证书由进程生成；**以后重启或重建Broker/NameServer，需要重新核对管理证书并更新Dashboard信任包**。业务gRPC的固定证书不因此更换。以serverD的可信Docker控制面为准，核对原项目、镜像和容器身份；通过版本化源码中的 `native_transition.trust_bundle` 取得新证书，原子更新活动配置的 `ca.crt`（UID10001、0600），再只重启Dashboard。不得打开TLS测试信任或关闭证书校验来恢复界面。更新后的信任指纹另写维护回执，保留本次原始证据。
+
+所有Topic、Group、ACL及位点变更继续纳入infra管理并核对消息类型/owner；本次实际验收只查询管理信息，没有发布业务消息、重放、重置位点或调用模型。Prometheus/Grafana继续位于Mac mini，serverD未新增采集代理。

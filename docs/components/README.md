@@ -1,5 +1,7 @@
 # 组件总览
 
+> 2026-10-27：RocketMQ Dashboard 已通过 serverA HTTPS 上线，地址为 [mq.fangcunmount.cn](https://mq.fangcunmount.cn)。Dashboard 与原生 RPC 位于 serverD，serverD 无 Nginx；活动配置、维护与恢复命令见[执行及运行索引](../server/rocketmq-dashboard-servera.md)。
+
 > 2026-10-18 起，监控运行在旧 Mac mini；当前操作以[监控部署说明](../../deploy/mac-mini/README.md)为准。下文 serverD 启动命令及历史拓扑不再适用。
 
 本文档描述当前生产拓扑下，各基础组件部署在哪里、由哪个仓库维护。
