@@ -45,7 +45,7 @@
 | ☐ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | [IAM PR161](https://github.com/FangcunMount/iam/pull/161)、[QS PR456](https://github.com/FangcunMount/qs-server/pull/456)、[AI PR233](https://github.com/FangcunMount/qs-ai/pull/233)均为草稿；QS最新d97853af为历史deferred新增只读边界，旧路由不授权新HoldDelivery，原未来写入器使用owner可信codec。该候选本地383测试包/7574测试通过、60项外部依赖选配测试跳过（不是required native通过）；四包race通过。IAM168包、AI4320纯单元及452 mypy分别已有证明。infra PR362/241f05c运行40547695960在固定d97853af上要求两档各12项（原7+历史5），未完成；跨路由Replan纯协议与真实存储CAS分别记录，不冒充完整宿主切换 |
 | ☐ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | infra PR359全部13项CI成功、已合并cacfdae0；真实精确旧新并集134/0/0、清理通过。PR361/5f86bfd具名退役审核及owned空资源删除专项已138/0/0：撤旧权限、指定Group/Topic、Broker/NameServer回读与retry/DLQ保留均通过；414本地单元通过，剩余源CI待完成。CD不可变材料/原开关只读核对；未应用生产资源或暂停CD，具体生产责任观察及实例配置清单交由T13冻结 |
 | ☐ | T11 | 最终宿主端到端、故障与维护/恢复演练 | 准备中：[infra PR364](https://github.com/FangcunMount/infra/pull/364)提供独立readable-rc1镜像依赖/清单/归档校验及手动构建入口，412本地单元和actionlint通过；原M3/M4默认SDK门禁保持。尚未dispatch镜像构建，八实例启动入口已补齐（严格可读清单、原配置打包器和暂停Checker/关闭检查，416项本地验证），实际启动/切换/故障及发布器适配待完成；没有把构建或只读归档检查标为演练通过 |
-| ☐ | T12 | 稳定 SDK、三库正式依赖及固定镜像重新安装验收 | 待开始 |
+| ☐ | T12 | 稳定 SDK、三库正式依赖及固定镜像重新安装验收 | 准备中：SDK草稿PR65/8d99c8b只改版本/项目lock及说明，make check、Python检查通过；候选wheel/sdist独立安装各128/0/0，16份实现及43项外部lock不变。[候选证明](evidence/rocketmq-readable-names-stable-candidate-20261028.json)。未合并/发布稳定版、未修改宿主正式依赖或生产镜像；等待宿主RC门禁与精确最终SHA门禁 |
 | ☐ | T13 | 生产核验、暂停 CD、预置资源权限及冻结清单 | 待开始 |
 | ☐ | T14 | 维护内排空旧责任、切换八实例与新订阅/Checker 验证 | 待开始 |
 | ☐ | T15 | 合法 system/新答卷/新 AI 验收及开放后 30 分钟检查 | 待开始 |
@@ -102,3 +102,5 @@
 - 2026-10-28：保持6/16。PR359以13项CI全通过合并cacfdae0，134项ACL准备及138项具名删除均在隔离环境通过且清理完整。AI真实矩阵5/6档通过；各报告分别记录pytest数量与验收计数，不将二者混作独立测试数。QS答卷失败由缺失既有治理schema43引发的准入关闭确认，仅修复隔离夹具并固定2149b4a2重验，无生产DDL。历史deferred收紧为既有记录恢复只读权限，d97853af全量383包/7574通过，60本机外部依赖选配测试跳过已披露；required native仍须独立0跳过。镜像profile/来源校验PR364已准备，未构建/发布/部署。自动CD开关、业务数据库及生产容器未变更。
 
 - 2026-10-28：AI六档真实readable宿主矩阵全部通过：170项实际pytest、390项组合报告检查分别记账，0失败/跳过且全部清理，T08保留最新源SQL CI门禁。PR364/8ff56cd已提供独立readable八实例启动入口，416项本地验证通过，尚无镜像或真实启动结果。已取消7项被新源码取代的旧PR作业，取消不计通过；当前候选必需门禁保留。稳定版本提交开始准备，未发布，生产/CD/数据库及容器未变更。
+
+- 2026-10-28：T12提前完成稳定候选准备，SDK PR65/8d99c8b；make check/ruff/mypy通过，候选wheel/sdist各独立安装128项纯测试通过。30项integration显式排除、NSQ集成文件未在MacBook执行；实现和外部依赖不变。没有发布tag或Release，T12未完成、总进度仍6/16。

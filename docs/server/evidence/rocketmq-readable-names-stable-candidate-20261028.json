@@ -1,0 +1,67 @@
+{
+  "schema": "readable-stable-candidate-preparation/v1",
+  "source_sha": "8d99c8b2dbf0fafd83eacf4d12e543c202f794c0",
+  "sdk_pr": "https://github.com/FangcunMount/reliable-messaging/pull/65",
+  "go_planned_version": "v0.6.0",
+  "python_candidate_version": "0.5.0",
+  "formally_published": false,
+  "source_merged": false,
+  "host_stable_adoption": false,
+  "production_changed": false,
+  "local_make_check": true,
+  "ruff_check": true,
+  "ruff_format": true,
+  "mypy_source_files": 16,
+  "pure_source_tests": {
+    "passed": 128,
+    "failed": 0,
+    "skipped": 0,
+    "explicit_integration_deselected": 30,
+    "nsq_integration_file_excluded": true
+  },
+  "external_python_lock_entries_unchanged": 43,
+  "implementation_bytes_match_prerelease": "5c2e3cd155e67c0f766e93bf95238b16fc219b5f",
+  "candidate_installs": [
+    {
+      "schema": "readable-stable-candidate-local-install/v1",
+      "source_sha": "8d99c8b2dbf0fafd83eacf4d12e543c202f794c0",
+      "kind": "wheel",
+      "asset": "fangcun_reliable_messaging-0.5.0-py3-none-any.whl",
+      "asset_sha256": "ec45c2d493e74607bd8fac7644cb1005d8e21fe9f961aa6c73bffcd90b6ba0f3",
+      "installed_version": "0.5.0",
+      "source_files_equal": 16,
+      "passed": 128,
+      "failed": 0,
+      "skipped": 0,
+      "integration_cases_explicitly_excluded": true,
+      "editable": false,
+      "workspace_sdk_import": false,
+      "formally_published": false,
+      "junit_sha256": "d7141924d595876b85cb6e9e1dc3999ac731a884ec2f6a05e2c0a70021c37ffe"
+    },
+    {
+      "schema": "readable-stable-candidate-local-install/v1",
+      "source_sha": "8d99c8b2dbf0fafd83eacf4d12e543c202f794c0",
+      "kind": "sdist",
+      "asset": "fangcun_reliable_messaging-0.5.0.tar.gz",
+      "asset_sha256": "fd69c0835ea37929e1d1d09dc3c6bc1b55bd06656baf4ecffff0ac8fed5515c6",
+      "installed_version": "0.5.0",
+      "source_files_equal": 16,
+      "passed": 128,
+      "failed": 0,
+      "skipped": 0,
+      "integration_cases_explicitly_excluded": true,
+      "editable": false,
+      "workspace_sdk_import": false,
+      "formally_published": false,
+      "junit_sha256": "e614de23b592fac284bf2dc5fa651019839d3792dbb04fd79d9663d88b495d84"
+    }
+  ],
+  "remaining": [
+    "latest host prerelease source and native gates",
+    "exact merged candidate SHA checks",
+    "stable publication and redownload/install",
+    "host stable dependencies and final images",
+    "production cutover and business acceptance"
+  ]
+}
