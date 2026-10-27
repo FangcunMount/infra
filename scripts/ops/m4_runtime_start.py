@@ -116,7 +116,7 @@ def verify_budget(plan, raw):
     service = json.loads(raw)['services'][plan['services'][0]]
     *_, memory, cpus, uid = ROLES[plan['role']]
     if (int(service.get('mem_limit', 0)) != memory or float(service.get('cpus', 0)) != cpus
-            or service.get('user') not in {str(uid), f'{uid}:{uid}'}
+            or service.get('user') not in {str(uid), f'{uid}:{uid}', 'app' if plan['role'] == 'ai' else 'www'}
             or any(re.search(r'(^|_)NSQ(D|_|$)', key) for key in service.get('environment', {}))):
         raise BoundaryError('M4 runtime resource or retired environment differs')
 

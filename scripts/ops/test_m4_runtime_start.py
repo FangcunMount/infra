@@ -119,6 +119,15 @@ class M4RuntimeStartTest(unittest.TestCase):
                 with self.assertRaises(BoundaryError): target.execute(plan)
                 run.assert_not_called()
 
+    def test_original_named_runtime_accounts_are_allowed_but_other_names_are_not(self):
+        with tempfile.TemporaryDirectory() as root:
+            for role, alias in [('qs-api', 'www'), ('qs-worker', 'www'), ('ai', 'app')]:
+                _, _, plan = fixture(root, role); value = config(plan)
+                value['services'][plan['services'][0]]['user'] = alias
+                target.verify_budget(plan, json.dumps(value))
+                value['services'][plan['services'][0]]['user'] = 'nobody'
+                with self.assertRaises(BoundaryError): target.verify_budget(plan, json.dumps(value))
+
     def test_original_m3_registry_digest_guard_still_rejects_engine_only_id(self):
         with tempfile.TemporaryDirectory() as root:
             path, _, plan = target_fixture(root)
