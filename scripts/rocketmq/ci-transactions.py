@@ -629,6 +629,8 @@ def main():
                 passed('m3_resources/'+name)
             for name in proof['m3_resources']['conflicts_refused_without_mutation']:
                 passed('m3_resources/conflict/'+name)
+            for name in proof['m3_resources'].get('retirement_fixture', {}).get('cases', {}):
+                passed('m3_resources/owned_empty_retirement/' + name)
             return
         if args.ai_admission_host:
             from ai_admission_acceptance import run_ai_admission_host

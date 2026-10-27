@@ -32,3 +32,9 @@
 选定对象必须同时证明活动写者、消费者、积压、in-flight、不可见重试、未决事务、Broker绑定计划、待回执、未处置死信和原生超限责任均为零。未选中的旧资源在报告中明确保留。命令始终只撤销单个旧resource权限、在具体Broker上删除Group并显式清理已导出的offset、逐Topic清理Broker及NameServer；不生成retry/DLQ或历史数据库删除命令。
 
 报告通过独占创建写入0600文件。`execution_authorized=false`始终保持：输入观察的真实性、现有部署锁下的实时复核、执行后的Broker/NameServer/Dashboard回读和隔离删除演练仍是后续执行器门禁，不能用该离线报告替代。
+
+### 隔离删除语义专项
+
+`ROCKETMQ_READABLE_RETIREMENT=1` 仅在完整 owned readable transition 档启用。先要求130项真实ACL/TLS门禁及精确旧新并集通过，再校验隔离Compose项目、单Broker成员和实际空Topic offset；逐个撤销所选旧权限、删除一个旧Group和一个旧Topic。专门创建的空retry/DLQ sentinel必须保留；其他旧/新资源及权限逐项比较，NameServer Topic列表回读确认删除。
+
+这只验证新建空测试资源上的CLI语义，不证明生产责任已清零，也不授权生产删除。专项CI预算45分钟，独立于生产维护上限30分钟。生产观察需在旧POP消费者仍在线时取得，不能把指标缺失或普通consumer offset差值单独当作POP不可见责任为零；之后停旧运行时前还须核对宿主协议、业务回执及调度责任。
