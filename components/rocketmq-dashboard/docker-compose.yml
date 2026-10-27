@@ -39,6 +39,7 @@ services:
       driver: json-file
       options: {max-size: 10m, max-file: "3"}
   gateway:
+    depends_on: [dashboard]
     image: nginx:1.30.6-alpine@sha256:84ed8c0dd296c188bfc24ed506f46589e9285fb0b11cf3a04d91d524d3067e11
     platform: linux/amd64
     user: "10001:10001"
