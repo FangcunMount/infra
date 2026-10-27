@@ -108,8 +108,27 @@ def desired_topics(manifest):
             "message_type": r["message_type"]} for r in manifest["routes"]}
 
 
-def preflight(manifest, accounts, metadata, users, acls):
+def preflight(manifest, accounts, metadata, users, acls, *, previous=None):
     """Returns only missing resources. All conflicts abort before any mutation."""
+    old_permissions = None
+    if previous is not None:
+        from readable_transition import validate_transition
+        old_permissions = validate_transition(previous, manifest)
+        if set(accounts) != set(manifest['accounts']):
+            raise ValueError('exact reviewed existing application accounts required')
+        # Existing old resources are a required baseline, never repaired or
+        # recreated silently by preparation of their replacements.
+        for topic, expected in desired_topics(previous).items():
+            actual = metadata['topicConfigTable'].get(topic)
+            if (actual is None or any(actual.get(key) != expected[key]
+                    for key in ('readQueueNums', 'writeQueueNums', 'perm'))
+                    or actual.get('attributes', {}).get('message.type') != expected['message_type']):
+                raise RuntimeError('prior topic baseline missing or changed')
+        for group in {r['consumer_group'] for r in previous['routes'] if r.get('consumer_group')}:
+            actual = metadata['subscriptionGroupTable'].get(group)
+            if (actual is None or actual.get('retryQueueNums') != previous['group_options']['retry_queue_nums']
+                    or actual.get('consumeEnable') is not True):
+                raise RuntimeError('prior group baseline missing or changed')
     missing_topics, missing_groups, missing_users, missing_acls = [], [], [], []
     for topic, expected in desired_topics(manifest).items():
         actual = metadata["topicConfigTable"].get(topic)
@@ -135,11 +154,18 @@ def preflight(manifest, accounts, metadata, users, acls):
         usernames.add(username); passwords.add(password)
         existing = users.get(username)
         if existing is None:
+            if previous is not None:
+                raise RuntimeError('prior application principal missing; creation refused')
             missing_users.append(role)
         elif existing[0] != password or existing[1].lower() != "normal" or existing[2].lower() != "enable":
             raise RuntimeError("existing principal differs; credential rotation refused")
         desired = permissions_v2(manifest, grants)
         current = acls.get(username, {})
+        if old_permissions is not None:
+            from readable_transition import merged_permissions
+            desired = merged_permissions(manifest, role, old_permissions)
+            if any(current.get(resource) != actions for resource, actions in old_permissions[role].items()):
+                raise RuntimeError('prior application ACL missing or changed')
         if any(resource not in desired or actions != desired[resource] for resource, actions in current.items()):
             raise RuntimeError("existing principal ACL exceeds or conflicts with reviewed grants")
         for resource, actions in desired.items():
@@ -148,10 +174,13 @@ def preflight(manifest, accounts, metadata, users, acls):
     return missing_topics, missing_groups, missing_users, missing_acls
 
 
-def provision(container, manifest, accounts):
+def provision(container, manifest, accounts, *, previous=None):
     if manifest.get('version') not in (2, 3):
         raise ValueError('typed manifest version2 or version3 required')
     validate(manifest)
+    if previous is not None:
+        from readable_transition import validate_transition
+        validate_transition(previous, manifest)
     admin = Admin(container)
     # Shared by cooperating infra invocations, including different host clients.
     # A stale lock is refused; this tool never steals/deletes another invocation's lock.
@@ -164,7 +193,7 @@ def provision(container, manifest, accounts):
         metadata, users = admin.metadata(directory), admin.users()
         acls = {a["username"]: admin.acl(a["username"]) for role, a in accounts.items()
                 if role in manifest.get("accounts", {}) and a["username"] in users}
-        topics, groups, principals, grants = preflight(manifest, accounts, metadata, users, acls)
+        topics, groups, principals, grants = preflight(manifest, accounts, metadata, users, acls, previous=previous)
         for topic, expected in topics:
             admin("updateTopic", "-t", topic, "-r", str(expected["readQueueNums"]),
                   "-w", str(expected["writeQueueNums"]), "-p", str(expected["perm"]),
@@ -180,10 +209,16 @@ def provision(container, manifest, accounts):
         after, final_users = admin.metadata(directory), admin.users()
         final_acls = {accounts[role]["username"]: admin.acl(accounts[role]["username"])
                       for role in manifest.get("accounts", {})}
-        if any(preflight(manifest, accounts, after, final_users, final_acls)):
+        if any(preflight(manifest, accounts, after, final_users, final_acls, previous=previous)):
             raise RuntimeError("post-provision readback differs from reviewed resources")
-        return {"version": manifest['version'], "operations": admin.operations, "typed_topics": len(desired_topics(manifest)),
-                "principals": len(manifest.get("accounts", {})), "verified": True}
+        result = {"version": manifest['version'], "operations": admin.operations, "typed_topics": len(desired_topics(manifest)),
+                  "principals": len(manifest.get("accounts", {})), "verified": True}
+        if previous is not None:
+            from readable_transition import digest
+            result['transition'] = dict(previous_manifest_sha256=digest(previous),
+                manifest_sha256=digest(manifest), phase='resources_and_union_acl_prepared',
+                credential_rotation=False, retirement_completed=False, business_acceptance=False)
+        return result
     except RuntimeError as error:
         # All RuntimeError strings in this module are authored fixed diagnostics;
         # never interpolate captured stdout, credentials or argv here.
