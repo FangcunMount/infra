@@ -10,7 +10,7 @@ def fixture(*, tag='ack', body=None, version=1, flags=0, topic=TOPIC):
     body = json.dumps(body if body is not None else dict(c='private-group', t='private-topic', ao=3)).encode()
     properties = ('TAGS\x01' + tag + '\x02').encode()
     raw = (struct.pack('>iIiiqqI', -626843481 if version == 1 else -626843477,
-                       zlib.crc32(body), 0, 0, 7, 123, flags)
+                       zlib.crc32(body) & 0x7fffffff, 0, 0, 7, 123, flags)
            + bytes(8 + (20 if flags & 16 else 8) + 8 + (20 if flags & 32 else 8) + 4 + 8)
            + struct.pack('>i', len(body)) + body
            + struct.pack('>B' if version == 1 else '>H', len(topic.encode())) + topic.encode()
@@ -39,6 +39,16 @@ class ReadablePopRecordTest(unittest.TestCase):
         for count in (True, -1, 128, None, '1'):
             with self.subTest(count=count), self.assertRaises(ValueError):
                 self.decode(fixture(tag='ck', body=dict(n=count)))
+
+    def test_native_crc_uses_exact_high_bit_mask_and_rejects_unsigned_variant(self):
+        body = next(dict(c='private-group', value=n) for n in range(100)
+                    if zlib.crc32(json.dumps(dict(c='private-group', value=n)).encode()) & 0x80000000)
+        raw = fixture(body=body)
+        self.decode(raw)
+        wrong = bytearray(raw)
+        wrong[8:12] = struct.pack('>I', zlib.crc32(json.dumps(body).encode()))
+        with self.assertRaisesRegex(ValueError, 'crc_differs'):
+            self.decode(bytes(wrong))
 
     def test_missing_checkpoint_count_and_consistent_size_truncation_are_unknown(self):
         with self.assertRaises(ValueError):

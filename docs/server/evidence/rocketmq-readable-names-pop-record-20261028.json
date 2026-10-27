@@ -2,32 +2,50 @@
   "schema": "readable-pop-record-audit-evidence/v1",
   "recorded_on": "2026-10-28",
   "decoder_file": "scripts/ops/readable_pop_record.py",
-  "decoder_sha256": "21601fe623070b3d652f5b59b151454eb242c3e61f20f8036965d56bc4167b32",
-  "local_unit_cases": 4,
+  "decoder_sha256": "18468c765e271f3f4ce8e9814f2c4e9a3adabe34f13d86aed4e7b54f63e616a6",
+  "local_unit_cases": 5,
   "official_551_sources": {
     "MessageDecoder": "713f9405ea9e70eb3beb587de3ab55527b39cb2a",
     "MessageSysFlag": "bf60602145dbd202c0dd3134f470a9b4ecf78e9e",
     "PopCheckPoint": "803ebc689571c5d8b5214992599d2426826d956a",
-    "AckMsg": "f722c123ea0aa742c1eb940679d02e567cac1f9b"
+    "AckMsg": "f722c123ea0aa742c1eb940679d02e567cac1f9b",
+    "UtilAll": "e44f71589c0701ed3ce8dd6fc6944795d1e37718"
   },
   "production_readonly_inspection": {
     "fixed_system_topic_only": true,
-    "records_read": 1,
-    "kind": "ack",
-    "record_sha256": "33161d8047b1b2b0396d655a429d0b8d04c2c7763cb5d5cd887ef3308d74f9b3",
-    "metadata_sha256": "10096fa261bb254a2414b426fb42d7f01b9ed31f0ac9ec7b5f17822ab44c52cb",
-    "metadata_field_count": 7,
-    "private_report_sha256": "073e11392e13f35385fa31a8163da6478a9f0d6d039d56ec1b7b1607303fb48f",
+    "queues_read": 8,
+    "records_read": 8,
+    "kinds": {
+      "ack": 8
+    },
+    "record_sha256": [
+      "33161d8047b1b2b0396d655a429d0b8d04c2c7763cb5d5cd887ef3308d74f9b3",
+      "a87959a967cdbeb827ac788b2825b6689905303eb4e2a7adaf0b1350f430b400",
+      "d5278acff4f005abbf3530d89bff16a0fca23d160732afdba9554c9391e9285f",
+      "f0d0a8f3c6305300bca4d970da303be43a00c80598879f9a521c67d54607ad9c",
+      "90b36672480a2a4ad780238be15c68e98f27726d86331ac75ecf3da6ba3c5c54",
+      "9b4c106c5f2d98662632265ed78ab0f0f1e4f3f585bffb427fc8b0aef97a9e7e",
+      "b4d9f1791ea69b9dfe73a65a49471c242cec5f212076bcb404cd664620c52fe6",
+      "54dd9db09d36d79b335ad854b0da334d7f08c07d13999b0a0b1385a310298308"
+    ],
+    "private_report_sha256": "d3948b5a3bcd392453eebdac7b05464dabeac9114371ae769fe1988eabe11f1b",
+    "first_export_sha256": "d93166acc8a320b8569e380a3be9facee41d05be858f6ed23ae695ed1e4db0e0",
+    "second_export_sha256": "24e2717a7b4c69321ad070fe675c269b7a25abb3db0fcd52504902abd4fb3ac8",
+    "metadata_stable": true,
     "broker_unchanged": true,
     "mutation_operations": 0,
     "no_file_writes_in_broker": true
   },
   "production_changed": false,
   "drain_proven": false,
-  "all_queues_audited": false,
+  "all_queues_audited": true,
   "remaining": [
     "all exact revive tail ranges and retry/protocol/receipt observations",
     "isolated held-message and recovery controls",
     "fresh frozen maintenance evidence"
+  ],
+  "failure_history": [
+    "Dashboard readonly view returned app status -1; not counted as successful inspection",
+    "Initial full audit used unsigned CRC32; fixed to pinned UtilAll high-bit mask, added regression and reread all eight queues"
   ]
 }

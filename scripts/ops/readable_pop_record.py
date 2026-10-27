@@ -54,7 +54,8 @@ def inspect_record(raw, *, queue, queue_offset, physical_offset):
     size = number('i')
     require(0 < size <= 16384, 'bounded_system_metadata_required')
     body = take(size)
-    require(zlib.crc32(body) & 0xffffffff == crc, 'system_metadata_crc_differs')
+    # RocketMQ 5.5.1 UtilAll.crc32 masks the high bit (not unsigned CRC32).
+    require(zlib.crc32(body) & 0x7fffffff == crc, 'system_metadata_crc_differs')
     topic = take(number('B' if version == 1 else 'H'))
     require(topic == TOPIC.encode(), 'business_record_refused')
     properties = take(number('H')).decode('utf-8')
