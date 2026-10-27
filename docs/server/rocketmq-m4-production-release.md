@@ -1,6 +1,31 @@
-# M4 最终生产发布清单与恢复边界
+# M4 最终生产发布索引与恢复边界
 
-**候选及唯一v3执行包已冻结；尚未开始维护或部署。按本页、具名包和实际门禁受控执行。** C01—C07源码和政策保留闭环；最终候选、生产执行、system回归及发布索引归C08，唯一状态见[M4总表](rocketmq-m4-execution.md)。自动生产CD继续暂停。
+**M4清理后的最终八实例已上线，system及新答卷/新AI业务回归通过，公共入口于2026-10-27 09:22:52恢复。** 维护从09:05:31开始，约17分21秒，无延期。M4任务38/38、父任务8/8；最终文档PR合并后全部闭环。唯一进度见[M4总表](rocketmq-m4-execution.md)，精确身份和摘要见[最终release receipt](evidence/rocketmq-m4-final-release-20261027.json)。自动生产CD保持暂停。
+
+## 源码、制品、部署与业务
+
+| 层次 | 已验证结果 | 权威证据 |
+| --- | --- | --- |
+| 应用源码/依赖 | IAM `4609d4542d9303130ab94ed67593d0a69d0d010d`；QS `1f38f583d43c9faf4601a5df9f3f82b764e6547d`；AI `b00cf3a2f30deffa99e9bf71aa1b6177c651c23c`；各库已合并，最终源码/原生矩阵通过 | [最终审计](evidence/rocketmq-m4-c08-final-audit-20261027.json) |
+| 稳定SDK | Go v0.5.0 / Python0.4.0；源码`1345266aa0e864c46de5d1e3e3c939dd8002a890`，wheel摘要与正式依赖保持；M4未改tag或制品 | [依赖/摘要](evidence/rocketmq-m4-final-release-20261027.json) |
+| 镜像发布 | 五类固定ACR镜像；run40371739428为5/0/0。云端离线engine ID、原始config/rootfs与ACR manifest分别记录，未复制CI凭据 | [发布receipt](evidence/rocketmq-m4-c08-acr-publication-20261027.json)/[冻结receipt](evidence/rocketmq-m4-c08-final-freeze-20261027.json) |
+| 运维源码 | PR340—343已合并；固定启动/原锁/维护边界Linux及macOS各27项通过，run40429156660。最后索引PR只修改文档/receipt，不重建应用 | [执行包](evidence/rocketmq-m4-c08-window-ready-20261027.json) |
+| 真实部署 | serverA五实例、serverD三worker按原预算/UID/GID运行；健康/HTTP ready、0重启、无OOM；四owner就绪、10监控目标up，D可用1218MiB | [实际部署](evidence/rocketmq-m4-c08-production-deployment-20261027.json) |
+| 真实业务 | 合法system空角色与IAM/QS双订阅；用户本轮新答卷→评分→规则报告；一次新解读、一次模型调用、4个AI事件/首次ACK及13条业务witness全部对齐；旧模型任务未变化 | [业务汇总与私有证据摘要](evidence/rocketmq-m4-c08-production-deployment-20261027.json) |
+| 公共入口/数据 | 原三站点字节/inode/权限恢复，临时验收例外移除；公网4项TLS200。未执行DDL、凭据/Topic/ACL/Redis变更或Broker重启 | [恢复回读](evidence/rocketmq-m4-c08-production-deployment-20261027.json) |
+
+## 保留责任和独立后续项
+
+- NSQ三容器保持停止、restart=no、无监听/活动连接；1519个文件及原配置/备份完整摘要一致。历史表、卷、镜像及备份按[C07台账](rocketmq-m4-retained-assets.md)保留，最早2026-11-25复核；没有物理删除或自动GC，未决事实不自动过期。
+- 当前Inbox/receipt、首次wire/ACK、模型response/checkpoint、消费幂等、业务重试/未来调度与witness/Checker继续承担责任。保留旧名称的当前业务记录不等于旧Relay仍运行。
+- IAM、QS的`PRODUCTION_DEPLOY_PAUSED=true`；AI的`AUTO_DEPLOY_ENABLED=false`。本批没有恢复自动生产CD。
+- 既存IAM角色授权详情读取出现服务端错误，单独登记为未解决；本轮空角色创建、零grant/member、策略原子提交和双订阅有独立证据，未假称详情接口通过。
+- R01—R03高级原生超限恢复见[独立台账](rocketmq-native-recovery-followups.md)，PL-R007/008保留原移交；均不冒充已完成。M3 T34沿用用户豁免，未进行或声称48小时观察通过。
+- 首启动屏障继续有效；不得使用旧全量备份覆盖当前事实，不切回NSQ/Outbox、不补发旧消息或重做模型。后续修复使用精确候选及原证据前向处理。
+
+## 已执行冻结清单（历史快照）
+
+以下内容保留执行前的具名清单与恢复约束，其中“尚未”“未来”指执行前快照；当前结果以上方发布索引及2026-10-27实际receipt为准。旧v3窗口已经完成，不得复用原T0/例外或直接重跑部署；后续变更需重新冻结执行清单。
 
 ## 当前准备和待冻结项
 

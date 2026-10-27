@@ -1,0 +1,198 @@
+{
+  "schema": "m4-final-release-index/v1",
+  "recorded_on": "2026-10-27",
+  "task": "C08-05",
+  "progress": {
+    "leaves": 38,
+    "total": 38,
+    "parents": 8,
+    "parent_total": 8,
+    "C08": "5/5",
+    "milestones": [
+      "M4-P",
+      "M4-1",
+      "M4-2"
+    ]
+  },
+  "effective_after": "this documentation PR merged into main; no new application changes or production operations in this PR",
+  "C08_04_source_commit": "e3ce7d4f38c2c5798d0203a481351cbb7a27d917",
+  "operations_source_PRs": [
+    340,
+    341,
+    342,
+    343
+  ],
+  "operations_gate": {
+    "run": 40429156660,
+    "profiles": [
+      "ubuntu-24.04",
+      "macos-15"
+    ],
+    "tests_per_profile": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "dependencies": {
+    "go": "v0.5.0",
+    "python": "0.4.0",
+    "sdk_source": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+    "python_wheel_sha256": "f236674c3de81970af923992d337e2903d05ddbb401a735aad443d482ec95dc1",
+    "only_removed_packages": [
+      "pynsq",
+      "tornado"
+    ],
+    "all_other_locked_package_versions_sources_and_hashes_unchanged": true,
+    "current_JOSE_and_transaction_imports_work_without_removed_clients": true,
+    "actual_final_image_absence_proved": true,
+    "stable_tags_or_assets_changed": false
+  },
+  "images": [
+    {
+      "role": "iam",
+      "host": "serverA",
+      "replicas": 1,
+      "runtime_source": "4609d4542d9303130ab94ed67593d0a69d0d010d",
+      "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/iam@sha256:453af5e1f6a9549eaac11cd0262afed5d0b5d6ac902572432417fa5812641b8d",
+      "published_config_id": "sha256:671cb04bdc5cd5cdc821387d0269eb1ca004afed8b38fd8d9cc655f0dac99602",
+      "archive_sha256": "3014f06a284faaf80af538a8d4528543ca5cbc7146dc1ccb7612ad80f514ccee",
+      "cloud_engine_id": "sha256:b121e97fc20bf3bd8e8b550a89df8920ec348afd1e5af0bb632acc7e615ae67f",
+      "running_containers": [
+        "iam-apiserver"
+      ]
+    },
+    {
+      "role": "ai",
+      "host": "serverA",
+      "replicas": 1,
+      "runtime_source": "b00cf3a2f30deffa99e9bf71aa1b6177c651c23c",
+      "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-ai@sha256:c21503888616ceeb3e20d8acb8a31c3562abbfd6e23704b34c94a33fd1a42752",
+      "published_config_id": "sha256:ad91ea3eea2a7c3e8b6ca6abce4f029411e1a5503cb6dd4473c804f1e1a2d926",
+      "archive_sha256": "a0f3bf7a3ca3c12f859c3ec47e6c8e5d89bd6edab069147abab11aea1ebfd4cd",
+      "cloud_engine_id": "sha256:927c6cea9c0551be4d026bf53e27e4521a45d4bd9c4b36e848f097657db0ab14",
+      "running_containers": [
+        "qs-ai"
+      ]
+    },
+    {
+      "role": "qs-api",
+      "host": "serverA",
+      "replicas": 1,
+      "runtime_source": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver@sha256:9609f87094a427f57e1b9f974e1a7cc5b45f8b35ebfd28d198cfda69c36767b7",
+      "published_config_id": "sha256:46dc36d5d3063abebeb456e21dd7b66443d50fc553c95ac452a99e03c5b9749f",
+      "archive_sha256": "abe2c944beeb2f3b89d6fe50defa4618a8753ac2607ebcaceed527e8f64d3d84",
+      "cloud_engine_id": "sha256:501125199a976747ad6febafada18ffc2fa1025504d93b179daa30301bc44d55",
+      "running_containers": [
+        "qs-apiserver"
+      ]
+    },
+    {
+      "role": "qs-collection",
+      "host": "serverA",
+      "replicas": 2,
+      "runtime_source": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-collection-server@sha256:82924c13875e2b64555ca7c20bfa55ba1ebf7dc0088464051e8e793eb9d954f7",
+      "published_config_id": "sha256:37fa29a1a1b6a788187979755600add27d11414371972d1cbae21c9e85f8073b",
+      "archive_sha256": "e68ebfd32f4438c22c74c7fca515b4a0fcfef788c6c94076ddbfc3270d520733",
+      "cloud_engine_id": "sha256:97506c3aca75905423b6ad8bd96c234c19f2e8fd52bd25e8acfc9d6935ed576f",
+      "running_containers": [
+        "qs-collection-server-1",
+        "qs-collection-server-2"
+      ]
+    },
+    {
+      "role": "qs-worker",
+      "host": "serverD",
+      "replicas": 3,
+      "runtime_source": "1f38f583d43c9faf4601a5df9f3f82b764e6547d",
+      "published_reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-worker@sha256:8349646398ed378ddac04a5542d6f13206f9db7ee932511ae732855bacf29f8b",
+      "published_config_id": "sha256:9e2ecfd5c30d9170fa7a3990968e31f3c6c7c9708dc6e940fc9f65dfe0f0eaa5",
+      "archive_sha256": "b0602da48596961957cdccfb1245bf5c59a7f2975bb50bb667b5f6ede3cf5890",
+      "cloud_engine_id": "sha256:85112ee36afa391ab4ad063213aa1f35a37a4b7197522358776731b5d8025971",
+      "running_containers": [
+        "qs-worker-runtime-1",
+        "qs-worker-runtime-2",
+        "qs-worker-runtime-3"
+      ]
+    }
+  ],
+  "publication": {
+    "run": 40371739428,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0
+  },
+  "production": {
+    "eight_fixed_instances_deployed": true,
+    "all_four_owners_ready": true,
+    "system_business_acceptance_passed": true,
+    "public_entry_restored": true,
+    "maintenance_seconds": 1041.706,
+    "database_migration_executed": false,
+    "Topic_ACL_credential_change": false,
+    "automatic_CD_resumed": false
+  },
+  "retention": {
+    "NSQ_containers_stopped": 3,
+    "restart": "no",
+    "NSQ_active_listeners_or_connections": 0,
+    "NSQ_files": 1519,
+    "NSQ_tree_sha256": "6f72f5614855547ef4bf8d7661846a20c23692065dbe75e66bdc493d5a2171d9",
+    "original_config_and_backups_preserved": true,
+    "physical_deletions": 0,
+    "review_not_before": "2026-11-25"
+  },
+  "automatic_CD": {
+    "iam_PRODUCTION_DEPLOY_PAUSED": true,
+    "qs_PRODUCTION_DEPLOY_PAUSED": true,
+    "AI_AUTO_DEPLOY_ENABLED": false
+  },
+  "protected_current_responsibilities": [
+    "original root transaction witness and Checker",
+    "current Inbox receipt and first ACK",
+    "first wire/signatures/encryption",
+    "model response/checkpoint and unknown-governance",
+    "consumer idempotency",
+    "business retry authorization and due schedules",
+    "current state/ACK/history records whose legacy table names remain"
+  ],
+  "remaining_outside_M4": [
+    {
+      "item": "R01-R03 advanced native-limit recovery",
+      "scope": "existing separate followup ledger, not a new M4 completion requirement"
+    },
+    {
+      "item": "PL-R007/008",
+      "scope": "existing independent handoff, no claim of completion"
+    },
+    {
+      "item": "retained assets physical disposition",
+      "scope": "not before 2026-11-25 review, no automatic expiry/GC; pending facts remain protected"
+    },
+    {
+      "item": "IAM role-grant detail read",
+      "scope": "preexisting UI/server error; recorded open without claiming endpoint passed"
+    },
+    {
+      "item": "automatic production CD resume",
+      "scope": "still paused; separate reviewed operation"
+    }
+  ],
+  "M3_T34": "user waiver retained; no 48-hour observation performed or claimed",
+  "evidence_sha256": {
+    "rocketmq-m4-c08-final-audit-20261027.json": "5946c95e188b444937527adeda58b496eebb344d90677b91e4da981ea1fe039e",
+    "rocketmq-m4-c08-acr-publication-20261027.json": "7537dd4d313085a7313a373cb0f82a501b5483fd110bb9935384b5318cd44145",
+    "rocketmq-m4-c08-final-freeze-20261027.json": "5e789088d5b24064dd450900b9da6278a0b30d1e12509c2b5d563f4184277e1a",
+    "rocketmq-m4-c08-window-ready-20261027.json": "596bc3d30f5090a6bdbfb6362cd2f31a2b3005257b48f8d6fc42c5367e9caef5",
+    "rocketmq-m4-c08-production-deployment-20261027.json": "b606340d5272129ebb47b3ef4875a04023d2c99c1aa786ed12e51f60489c2adf",
+    "rocketmq-m4-c07-retention-20261026.json": "7905607d8daa680da7536e283accf54d94d455bbd791f5f811ac86b0b2fff14a"
+  },
+  "receipt_paths": [
+    "rocketmq-m4-c08-final-audit-20261027.json",
+    "rocketmq-m4-c08-acr-publication-20261027.json",
+    "rocketmq-m4-c08-final-freeze-20261027.json",
+    "rocketmq-m4-c08-window-ready-20261027.json",
+    "rocketmq-m4-c08-production-deployment-20261027.json",
+    "rocketmq-m4-c07-retention-20261026.json"
+  ]
+}
