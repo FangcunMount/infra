@@ -27,3 +27,19 @@ class DeferredReceiptTest(unittest.TestCase):
             with self.subTest(bad=bad[:80]):
                 with self.assertRaises(RuntimeError):
                     parse_deferred_receipt(bad, 'a' * 40)
+
+class ReadableDeferredReceiptTest(unittest.TestCase):
+    def test_nonempty_exact_history_requires_real_test_and_cleanup(self):
+        from qs_deferred_acceptance import HISTORY_CASES, parse_history_receipt
+        receipt = dict(passed=4, failed=0, skipped=0, cases=dict.fromkeys(HISTORY_CASES, True),
+                       broker_not_claimed=True, owned_database_dropped=True)
+        output = 'READABLE_DEFERRED_HISTORY_RECEIPT ' + json.dumps(receipt) + '\n--- PASS: TestReadableDeferredHistoryNative (1.00s)\n'
+        self.assertEqual(parse_history_receipt(output), receipt)
+        for wrong in ('', output + output, output.replace('--- PASS:', '--- SKIP:'),
+                      output.replace('"failed": 0', '"failed": 1'),
+                      output.replace('"skipped": 0', '"skipped": 1'),
+                      output.replace('"passed": 4', '"passed": 0'),
+                      output.replace('"owned_database_dropped": true', '"owned_database_dropped": false'),
+                      output + '\nWARNING: DATA RACE'):
+            with self.assertRaises(RuntimeError):
+                parse_history_receipt(wrong)

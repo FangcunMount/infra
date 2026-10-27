@@ -1,0 +1,76 @@
+name: RocketMQ readable passive historical delivery
+on:
+  pull_request:
+    paths: ['scripts/rocketmq/qs_deferred_acceptance.py', 'scripts/rocketmq/test_qs_deferred_acceptance.py', '.github/workflows/rocketmq-readable-history.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-readable-history-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  historical-delivery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: ['mysql:8.0.36', 'mysql:8.4']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 5c2e3cd155e67c0f766e93bf95238b16fc219b5f
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: 59a5bfe207afb09aa2c90ce485949bd3e7d38ee8
+          path: .qs-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-acceptance/go.sum
+      - name: Validate fixture and build owned Broker
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-readable-history:5.5.1 components/rocketmq
+      - name: Original MySQL delivery under active and passive route maps
+        env:
+          QS_READABLE_HISTORY_REQUIRED: '1'
+          MYSQL_IMAGE: ${{ matrix.mysql }}
+          GOWORK: 'off'
+          GOFLAGS: '-mod=readonly'
+        run: |
+          set -euo pipefail
+          python3 scripts/rocketmq/ci-transactions.py \
+            --sdk "$PWD/.sdk-acceptance" --qs-deferred-consumer-host "$PWD/.qs-acceptance" \
+            --image rocketmq-readable-history:5.5.1 --mysql-image "$MYSQL_IMAGE" \
+            --report readable-history.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('readable-history.json').read_text())
+          proof = data['proof']['qs_deferred_consumer_host']
+          assert data['passed'] == 11 and data['failed'] == data['skipped'] == 0
+          assert proof['source_sha'] == '59a5bfe207afb09aa2c90ce485949bd3e7d38ee8'
+          assert proof['source_clean_after']
+          assert proof['sdk_module']['Version'] == 'v0.6.0-rc.1'
+          assert proof['native_receipt']['passed'] == 11
+          assert proof['legacy_native_receipt']['passed'] == 7
+          assert proof['readable_history_receipt']['passed'] == 4
+          assert proof['readable_history_receipt']['broker_not_claimed']
+          assert data['cleanup'] == dict(project_containers_remaining=False,
+              compose_down_succeeded=True, probe_process_groups_drained=True,
+              private_fixture_directory_removed=True)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: readable-history-${{ strategy.job-index }}-${{ github.sha }}
+          path: readable-history.json
+          if-no-files-found: error
+          retention-days: 14

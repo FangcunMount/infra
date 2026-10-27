@@ -15,6 +15,24 @@ CASES = frozenset((
     'real_child_kill_retains_attempt_and_frozen_wire',
 ))
 SCOPE = 'original MySQL deferred consumption, real lease/lock/process boundaries; controlled callback failures'
+HISTORY_CASES = frozenset(('active_subscriptions_exclude_history',
+    'missing_history_does_not_spend_attempt', 'original_wire_and_transport_identity_retained',
+    'completed_history_not_republished'))
+
+
+def parse_history_receipt(output):
+    rows = [json.loads(line.split('READABLE_DEFERRED_HISTORY_RECEIPT ', 1)[1])
+            for line in output.splitlines() if 'READABLE_DEFERRED_HISTORY_RECEIPT {' in line]
+    if (len(rows) != 1 or rows[0].get('passed') != len(HISTORY_CASES)
+            or rows[0].get('failed') != 0 or rows[0].get('skipped') != 0
+            or set(rows[0].get('cases', {})) != HISTORY_CASES
+            or any(value is not True for value in rows[0]['cases'].values())
+            or rows[0].get('broker_not_claimed') is not True
+            or rows[0].get('owned_database_dropped') is not True
+            or not re.search(r'--- PASS: TestReadableDeferredHistoryNative \(', output)
+            or re.search(r'--- (?:FAIL|SKIP):|WARNING: DATA RACE', output)):
+        raise RuntimeError('readable historical delivery receipt incomplete, failed or skipped')
+    return rows[0]
 
 
 def parse_deferred_receipt(output, expected_source):
@@ -47,13 +65,20 @@ def run_qs_deferred_host(source, directory, project, mysql_port, password, run, 
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('published fixed SDK without replace required')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
+    history = os.environ.get('QS_READABLE_HISTORY_REQUIRED', '0')
+    if history not in ('0', '1'):
+        raise RuntimeError('explicit readable history profile required')
+    if history == '1' and module['Version'] != 'v0.6.0-rc.1':
+        raise RuntimeError('readable history requires the fixed published SDK candidate')
     env.update({'QS_M3_FIXTURE_PROJECT': project,
                 'QS_M3_DEFERRED_DSN': f'root:{password}@tcp(127.0.0.1:{mysql_port})/?parseTime=true'})
     if native_runner is None:
         raise RuntimeError('owned native process-group runner required')
+    pattern = ('^(TestRocketMQDeferredNative|TestReadableDeferredHistoryNative)$'
+               if history == '1' else '^TestRocketMQDeferredNative$')
     result = native_runner(['go', 'test', '-p', '1', '-race', '-tags=integration,m3_deferred_consumer',
                   '-count=1', '-timeout=3m', '-v', './internal/worker/integration/messaging',
-                  '-run', '^TestRocketMQDeferredNative$'], cwd=source, env=env, timeout=360, required=False)
+                  '-run', pattern], cwd=source, env=env, timeout=360, required=False)
     raw = result.stdout + result.stderr
     capture = directory / 'qs-deferred-host-private.log'
     capture.write_text(raw); capture.chmod(0o600)
@@ -66,6 +91,15 @@ def run_qs_deferred_host(source, directory, project, mysql_port, password, run, 
     if result.returncode:
         raise RuntimeError('actual deferred MySQL acceptance failed (private output withheld)')
     proof['native_receipt'] = parse_deferred_receipt(result.stdout, proof['source_sha'])
+    if history == '1':
+        proof['legacy_native_receipt'] = proof['native_receipt']
+        proof['readable_history_receipt'] = parse_history_receipt(result.stdout)
+        cases = dict(proof['native_receipt']['cases'])
+        cases.update({'readable_history_' + key: value
+                      for key, value in proof['readable_history_receipt']['cases'].items()})
+        proof['native_receipt'] = dict(passed=len(cases), failed=0, skipped=0, cases=cases,
+            scope='original MySQL deferred delivery plus explicit passive readable history',
+            broker_not_claimed=True, system_login_not_claimed=True)
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('QS source changed during deferred acceptance')
