@@ -1,0 +1,87 @@
+{
+  "schema": "readable-ai-six-matrix-evidence/v1",
+  "recorded_on": "2026-10-28",
+  "run_id": 40535268126,
+  "url": "https://github.com/FangcunMount/infra/actions/runs/40535268126",
+  "infra_sha": "820896a779b9a3378f1c1bc47d5e6ba890f1fc48",
+  "sdk_sha": "5c2e3cd155e67c0f766e93bf95238b16fc219b5f",
+  "matrices": [
+    {
+      "artifact": "readable-ai-admission-0-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "1685dd430ddce8e390fb2bc6543e82180d2d95c580e082cbdbbf19576c8651f1",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "pytest_passed": 8,
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "manifest_version": 3,
+      "naming_scheme": "readable-v1",
+      "cleanup": true
+    },
+    {
+      "artifact": "readable-ai-admission-3-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "e726de57c41600b7d015d65165e801bcb0791a632557360e3945957026b6ae1d",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "pytest_passed": 8,
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "manifest_version": 3,
+      "naming_scheme": "readable-v1",
+      "cleanup": true
+    },
+    {
+      "artifact": "readable-ai-finalization-2-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "b526625708e836ebcca087cc33f3c99fdbc80adeacd4f9c188d7d89b91d0faf6",
+      "passed": 32,
+      "failed": 0,
+      "skipped": 0,
+      "pytest_passed": 22,
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "manifest_version": 3,
+      "naming_scheme": "readable-v1",
+      "cleanup": true
+    },
+    {
+      "artifact": "readable-ai-finalization-5-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "10957cff2e4b2028a0ee76310cf917da5b49f929797cca0fb89039a2260e3adc",
+      "passed": 32,
+      "failed": 0,
+      "skipped": 0,
+      "pytest_passed": 22,
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "manifest_version": 3,
+      "naming_scheme": "readable-v1",
+      "cleanup": true
+    },
+    {
+      "artifact": "readable-ai-state-1-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "117ebeae999e61dd26de5fad083c5dedfea3ce0f2245248353c0290defdd107f",
+      "passed": 148,
+      "failed": 0,
+      "skipped": 0,
+      "pytest_passed": 55,
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "manifest_version": 3,
+      "naming_scheme": "readable-v1",
+      "cleanup": true
+    },
+    {
+      "artifact": "readable-ai-state-4-37ad16c738fa500234a50f22ccd0ff149c8db3fa",
+      "report_sha256": "a7090833f728951b7d8cb6fbb56c298877c1c232d042cce8d5796fcf1da009ca",
+      "passed": 148,
+      "failed": 0,
+      "skipped": 0,
+      "pytest_passed": 55,
+      "source_sha": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+      "manifest_version": 3,
+      "naming_scheme": "readable-v1",
+      "cleanup": true
+    }
+  ],
+  "pytest_total": 170,
+  "report_check_total": 390,
+  "counts_are_separate": true,
+  "production_changed": false,
+  "host_source_ci_pending": true
+}
