@@ -1,0 +1,33 @@
+{
+  "schema": "readable-ai-source-gate/v1",
+  "task": "T08",
+  "completed_local_date": "2026-10-28",
+  "candidate_source": "62f3aa3225249f291cdde7d09f1d809edbd9d398",
+  "source_run": 40543071317,
+  "url": "https://github.com/FangcunMount/qs-ai/actions/runs/40543071317",
+  "source_checks": {
+    "passed": 12,
+    "failed": 0,
+    "pending": 0,
+    "scope": [
+      "eight actual SQL profiles",
+      "image",
+      "two retirement backup and restore profiles",
+      "complete test coverage"
+    ]
+  },
+  "native_evidence": "rocketmq-readable-names-ai-native-20261028.json",
+  "native_source": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6",
+  "native_matrices": 6,
+  "native_actual_pytest": 170,
+  "native_report_checks": 390,
+  "native_failed": 0,
+  "native_skipped": 0,
+  "source_and_native_shas_distinct": true,
+  "parent_pr232_old_head_coverage": "pending, not claimed passed",
+  "pr232_merged": false,
+  "pr233_merged": false,
+  "production_deployed": false,
+  "system_acceptance": false,
+  "scope": "standalone admission/state/finalization and source gates; paired Broker/process faults belong to T11"
+}
