@@ -159,6 +159,7 @@ def main():
             source_sha=os.environ.get('GITHUB_SHA'),production_credentials_used=False)
     except Exception as error:
         report['error_type']=type(error).__name__
+        if hasattr(error,'diagnostics'):report['acceptance_diagnostics']=error.diagnostics
         if isinstance(error,AssertionError):report['error_code']=str(error)
         if compose:
             ids=fixture.run(compose+['ps','-aq'],required=False).stdout.split()

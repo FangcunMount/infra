@@ -1,6 +1,7 @@
 """Read-only Dashboard authentication and inventory acceptance; no message bodies."""
 import http.cookiejar
 import json
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -46,7 +47,15 @@ def verify(base, credentials):
             assert urllib.parse.urlsplit(target).netloc==urllib.parse.urlsplit(base).netloc, 'login_redirect_loses_public_origin'
     assert not accepted(request(session,base,'/login/login.do',dict(username='admin',password='admin'))), 'default_login_allowed'
     assert not accepted(request(session,base,'/login/login.do',dict(username=credentials['username'],password='incorrect'))), 'wrong_password_allowed'
-    assert accepted(request(session,base,'/login/login.do',credentials)), 'independent_login_failed'
+    login=request(session,base,'/login/login.do',credentials)
+    if not accepted(login):
+        error=AssertionError('independent_login_failed')
+        message=str(login[1].get('errMsg',''))
+        error.diagnostics=dict(http_status=login[0],app_status=login[1].get('status'),
+            response_fields=sorted(login[1]),
+            bad_credentials='Bad username or password' in message,
+            error_classes=sorted(set(re.findall(r'\b[A-Za-z_][\w.]*(?:Exception|Error)\b',message))))
+        raise error
     results={path:request(session,base,path) for path in paths}
     assert all(accepted(row) and row[1].get('data') for row in results.values()), 'authenticated_inventory_failed'
     # Only counts/booleans leave this function; no cluster/topic payloads.
