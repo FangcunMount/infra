@@ -834,7 +834,7 @@ def main():
                          "--extra", "rocketmq", "--extra", "nsq"], timeout=180)
             if args.sdk_python_live_recovery:
                 from broker_fault_control import OwnedBrokerFault
-                from python_live_recovery import CASE, SETUP_CASES, run_live_recovery
+                from python_live_recovery import required_cases, run_live_recovery
                 proof['python_live_recovery'] = {}
                 control = OwnedBrokerFault(run,broker,project,
                     lambda: broker_parameters(admin('getBrokerConfig')),effective)
@@ -842,7 +842,7 @@ def main():
                     [r['physical_topic'] for r in sdk_manifest['routes']
                      if r['owner']=='iam.mysql' and r['route_revision']=='sdk-v2'
                      and r['message_type']=='TRANSACTION'])
-                if set(cases) != SETUP_CASES | {CASE}:
+                if set(cases) != required_cases(args.readable_routes):
                     raise RuntimeError('source SDK live recovery profile incomplete or substituted')
                 return
             from v2_acceptance import denied_owners, shared_budget

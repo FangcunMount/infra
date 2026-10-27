@@ -10,6 +10,13 @@ SETUP_CASES=frozenset(('v2_go_python_infra_exact_route_vectors',
     'v2_existing_configuration_conflict_refused'))
 
 
+def required_cases(readable=False):
+    setup = SETUP_CASES
+    if readable:
+        setup = (setup - {'v2_go_python_infra_exact_route_vectors'}) | {'v3_go_python_infra_exact_route_vectors'}
+    return setup | {CASE}
+
+
 
 TELEMETRY_FIELDS=frozenset(('pending_settings','settings_closing','settings_writes',
     'settings_failures','settings_skipped','heartbeat_ok','heartbeat_missing','heartbeat_errors',

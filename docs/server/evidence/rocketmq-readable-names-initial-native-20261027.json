@@ -1,0 +1,54 @@
+{
+  "schema": "rocketmq-readable-initial-native/v1",
+  "ci": "https://github.com/FangcunMount/infra/actions/runs/40506474433",
+  "reports": [
+    {
+      "report_sha256": "805bf7de26ff0e64612882422df685613326eab3db69ab9a039246c821d941c6",
+      "sdk_sha": "6b93f7321731b010040bae07b4311435f2da11eb",
+      "passed": 5,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: source SDK live recovery profile incomplete or substituted",
+      "cases": {
+        "v3_go_python_infra_exact_route_vectors": true,
+        "v2_existing_type_conflict_refuses_all_resource_mutations": true,
+        "v2_idempotent_typed_resources_and_minimum_owner_acls": true,
+        "v2_existing_configuration_conflict_refused": true,
+        "public_python_surviving_producer_broker_sigkill_real_checks": true
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "live_recovery_passed": true
+    },
+    {
+      "report_sha256": "257a9eb648e2bff88072ec64f9e69bb0a0bb94e84ad388f308bd7a3d7525d743",
+      "sdk_sha": "6b93f7321731b010040bae07b4311435f2da11eb",
+      "passed": 5,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "RuntimeError: source SDK live recovery profile incomplete or substituted",
+      "cases": {
+        "v3_go_python_infra_exact_route_vectors": true,
+        "v2_existing_type_conflict_refuses_all_resource_mutations": true,
+        "v2_idempotent_typed_resources_and_minimum_owner_acls": true,
+        "v2_existing_configuration_conflict_refused": true,
+        "public_python_surviving_producer_broker_sigkill_real_checks": true
+      },
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "live_recovery_passed": true
+    }
+  ],
+  "root_cause": "live profile expected v2 vector case name while readable fixture correctly reported v3",
+  "correction": "version-specific exact case set plus distinct public and live-recovery profiles",
+  "full_gate_passed": false,
+  "production_changed": false
+}
