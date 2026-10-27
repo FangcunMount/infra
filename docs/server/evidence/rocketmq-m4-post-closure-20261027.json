@@ -166,7 +166,8 @@
     "AI_jobs": 38,
     "blocked_sessions": 7,
     "old_model_job_session_checkpoint_identity_snapshot_unchanged": true,
-    "models_replayed": false
+    "models_replayed": false,
+    "worker_HTTP_ready": 3
   },
   "IAM_detail_issue": {
     "status": "unfixed; independent read-only handoff",
@@ -201,7 +202,8 @@
     "followup-old-queues-qs-20261027T030400-61c327.private.json": "d057605f4806fe5856f6b07aea3ece3ba0aa715ed6a104ff805c8e3b5ee5b761",
     "followup-old-queues-ai-20261027T030403-d0693e.private.json": "574c0a9d2d1da21c364820c473f3b9a2fae1e8c3d627e8991bbfada7c0572771",
     "followup-mongo-after-purge-20261027T030357-5c9fa2.private.json": "4bb0cfae59a0fe7b101a799df7001735208d74afcdc3e53e41a3c072c3305cb6",
-    "CD-state-20261027T030546.private.json": "776e837f254396ca58248d42c4af4e4dc70f0f81739fdd405ba5b6235bcc3dcf"
+    "CD-state-20261027T030546.private.json": "776e837f254396ca58248d42c4af4e4dc70f0f81739fdd405ba5b6235bcc3dcf",
+    "worker-ready-20261027T030817-31cf9b.private.json": "400869460eb97da89259f54bc3056e947651504eb83c5a9ab23169778f5937df"
   },
   "old_C07_and_M4_release_JSON_receipts_unchanged": true
 }
