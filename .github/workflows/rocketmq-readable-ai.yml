@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-ai
-          ref: 1c5648b94f289b95cc9e44b809e5e9272d7d7234
+          ref: f8f6d2a24800f27d35e9f8132b674b74afdfe904
           path: .ai-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -84,7 +84,7 @@ jobs:
           assert host['manifest_version'] == 3 and host['naming_scheme'] == 'readable-v1'
           assert host['python_runtime']['sdk'] == '0.5.0rc1'
           assert host['locked_sdk_archive_sha256'] == 'bcee737b8cac54ca0a5a486aa126b9a7323ee980e526006fcd2e4b5763be4f92'
-          assert host['source_sha'] == '1c5648b94f289b95cc9e44b809e5e9272d7d7234'
+          assert host['source_sha'] == 'f8f6d2a24800f27d35e9f8132b674b74afdfe904'
           assert host['source_clean_after']
           assert host['native_receipt']['passed'] > 0
           assert host['native_receipt']['failed'] == host['native_receipt']['skipped'] == 0
