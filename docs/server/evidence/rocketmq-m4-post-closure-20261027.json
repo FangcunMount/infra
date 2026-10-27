@@ -1,0 +1,207 @@
+{
+  "schema": "m4-post-closure-disposition-cd/v1",
+  "recorded_on": "2026-10-27",
+  "authorization": "User explicitly waived historical-asset wait and authorized production CD resume on 2026-10-27; current or unsettled responsibilities remain protected",
+  "tasks": {
+    "F01": "completed",
+    "F02": "completed"
+  },
+  "source": {
+    "PR": 346,
+    "head": "c96e88ed27a6db893f3e5a87f41952df323dc6d0",
+    "merge": "96ee5db9e329bf62520b1a74117862c8887da68b",
+    "CI": 40441598746,
+    "profiles": [
+      "ubuntu-24.04",
+      "macos-15"
+    ],
+    "tests_per_profile": 15,
+    "failed": 0,
+    "skipped": 0
+  },
+  "legacy_assets": {
+    "data_bytes": 155529092,
+    "data_files": 1519,
+    "kind": "nsq",
+    "named_volumes_deleted": 0,
+    "other_runtime_unchanged": true,
+    "removed_configs": 3,
+    "removed_containers": 3,
+    "removed_image": "sha256:1a369c146af71bc95c25d54b375a2b98452478c1eaf4e85f8fcb01da20f2c78a"
+  },
+  "legacy_data": {
+    "MySQL": [
+      {
+        "database": "iam",
+        "deleted_rows": 152,
+        "old_identity_state_sha256": "5084e1b12aaca445298e99427c7e539670953ab0f59bb458c952dc7ba103f89f",
+        "remaining_rows": 0,
+        "structure_preserved": true,
+        "table": "domain_event_outbox",
+        "terminal_state": "published"
+      },
+      {
+        "database": "iam",
+        "deleted_rows": 15,
+        "old_identity_state_sha256": "1416afbaccdb017d8ca7bac7ed876e46e8cda73979a8638034256630d7ce06c1",
+        "remaining_rows": 0,
+        "structure_preserved": true,
+        "table": "rm_outbox",
+        "terminal_state": "published"
+      },
+      {
+        "database": "qs",
+        "deleted_rows": 78,
+        "old_identity_state_sha256": "dad69d319f8c1174f85ade9299dec65b91911651cfd03dc013dab8e3f3cfb7f2",
+        "remaining_rows": 0,
+        "structure_preserved": true,
+        "table": "rm_outbox",
+        "terminal_state": "published"
+      },
+      {
+        "database": "qs",
+        "deleted_rows": 2806,
+        "old_identity_state_sha256": "6b8b4fd245965558a080465b900fcbcf3ee6456da595322b8efa86c1f8a7e26a",
+        "remaining_rows": 0,
+        "structure_preserved": true,
+        "table": "ai_messaging_outbox",
+        "terminal_state": "confirmed"
+      },
+      {
+        "database": "ai",
+        "deleted_rows": 2755,
+        "old_identity_state_sha256": "f68721e7d7cae87685ee78b8cc2f9c9ba406051e42e7a05cafee1ff866f73dbb",
+        "remaining_rows": 0,
+        "structure_preserved": true,
+        "table": "messaging_outbox",
+        "terminal_state": "confirmed"
+      }
+    ],
+    "MySQL_deleted_rows": 5806,
+    "Mongo_deleted_documents": 76,
+    "Mongo_UUID_indexes_preserved": true,
+    "remaining_retired_queue_records": 0,
+    "required_structures_retained": true,
+    "reason": "Current startup, handoff and observation readers still query these schemas; DROP would break current responsibilities",
+    "DDL": false,
+    "protected_Inbox_receipt_first_ACK_wire_archive_witness_retry_model_facts_preserved": true
+  },
+  "backups": {
+    "deleted_files": 11,
+    "deleted_bytes": 1331413483,
+    "by_host": {
+      "serverA": {
+        "files": 4,
+        "bytes": 1181558117,
+        "file_digests": [
+          "4b3988f1ff46fd4202e67861441bc9ba4610658f8aa2d6de1451910d4067d6ec",
+          "8560c5e5b014b40f039788ca6dc9e5aae3f46593b75536af7558b18b2564501b",
+          "69e5e5b92ce55b22a5cafd6ac4be6ef789ccdb98f27c7161ff8f8c3806dce5f1",
+          "2482d8dfc815b6e83050ad6491abcb7b7e2e9fe4251dbece17975d3a3a214b74"
+        ]
+      },
+      "serverC": {
+        "files": 2,
+        "bytes": 2774544,
+        "file_digests": [
+          "9a852ceeebb8ea40a7f39e746e53999d8e334f4bff740c595f18a77b6d3bf0d2",
+          "d2c6fc7426f1ceb04f5648acca3e1c2ab99456ffa4ac88868107c32875a9dfe1"
+        ]
+      },
+      "serverD": {
+        "files": 2,
+        "bytes": 50529739,
+        "file_digests": [
+          "e5c745a5191484186d60572624cb6d484540b9d65d55074c1215dc05019901e6",
+          "a7f14362492b6dc7de9d799e661c8bbf82e5652e35f21dc313bedd5c579c634f"
+        ]
+      },
+      "mac-mini-old": {
+        "files": 3,
+        "bytes": 96551083,
+        "file_digests": [
+          "2482d8dfc815b6e83050ad6491abcb7b7e2e9fe4251dbece17975d3a3a214b74",
+          "d2c6fc7426f1ceb04f5648acca3e1c2ab99456ffa4ac88868107c32875a9dfe1",
+          "a7f14362492b6dc7de9d799e661c8bbf82e5652e35f21dc313bedd5c579c634f"
+        ]
+      }
+    },
+    "all_named_paths_confirmed_absent": true,
+    "audit_metadata_original_tools_locks_and_current_materials_retained": true
+  },
+  "images": {
+    "retired_NSQ_image_deleted": true,
+    "only_its_three_stopped_containers_referenced_it": true,
+    "current_previous_pinned_and_other_container_images_not_deleted": true,
+    "global_prune": false
+  },
+  "CD": {
+    "configuration_variables_changed": 17,
+    "resume_flags_changed": 3,
+    "iam_PRODUCTION_DEPLOY_PAUSED": false,
+    "qs_PRODUCTION_DEPLOY_PAUSED": false,
+    "AI_AUTO_DEPLOY_ENABLED": true,
+    "current_renderers_match_all_active_bindings": true,
+    "AI_read_only_mounts": 7,
+    "QS_image_source": "tarball",
+    "reason": "Use existing verified archive transport while cloud ACR read login remains unavailable; preserve exact source/image and host preflight",
+    "repo_and_environment_values_read_back": true,
+    "organization_admin_API_unavailable_403": true,
+    "organization_permissions_not_expanded": true,
+    "new_deployment_triggered": false,
+    "next_trigger": "Future successful main CI under each existing deployment workflow",
+    "final_fresh_readback_exactly_matches_all_21_config_values_and_three_flags": true
+  },
+  "postcheck": {
+    "eight_runtime_identities_and_images_unchanged": true,
+    "restarts": 0,
+    "OOM": false,
+    "four_owners_ready": true,
+    "Prepared": 0,
+    "ten_targets_up": true,
+    "public_TLS_200": 4,
+    "host_schema_heads_unchanged": true,
+    "serverD_available_MiB": 1216,
+    "AI_model_calls": 36,
+    "AI_jobs": 38,
+    "blocked_sessions": 7,
+    "old_model_job_session_checkpoint_identity_snapshot_unchanged": true,
+    "models_replayed": false
+  },
+  "IAM_detail_issue": {
+    "status": "unfixed; independent read-only handoff",
+    "confirmed_code_defect": "ListByRole calls WithinTx; injected PlannedUnitOfWork.WithinTx returns ErrWritePlanRequired without callback",
+    "runtime_request_log_correlation": "still needed",
+    "source_or_permissions_modified": false
+  },
+  "failure_history": [
+    "Initial organization metadata API refused missing admin:org; no permission expansion",
+    "macOS temporary test path included symlink; test canonicalized without weakening guard",
+    "Private CD preparation syntax then system Python SQLAlchemy mismatch corrected before any configuration mutation; verified using existing project environment"
+  ],
+  "private_evidence_sha256": {
+    "serverD-nsq-result.private.json": "22c36e27c466c8f38ea42a1d83307cf717c49085460f3e499f18439de72e5700",
+    "sql-purge-20261027T030114.private.json": "1ad3b102f3a81f3483b5c5a3b1312bbdad0ac332f95b8034bbd7bcc05976ab38",
+    "mongo-purge-20261027T030144.private.json": "31f84e5374e10ceaa3b1bfa36460d6ea5e5b3dbfc876052d820541b1ee2496df",
+    "asset-absence-20261027T030355.private.json": "506fd0a61ee7f3f393bc6f4ec1ecb4ece85ccb100c0755c03bfd80548297ee7f",
+    "cd-configuration-result.private.json": "4788fe8d234faccfed80cc26859d75c162790a39dac32862e7eb319ae4e94df9",
+    "cd-resume-result.private.json": "1ec6d924ab27d01f4c71577554c106e877bb290e45a1cc5be51579fe2ff9bd7d",
+    "serverA-archives-result.private.json": "de6c2a9532b62015800a467e5842248f2c4157dfcad30f9481368e7b10ee44b2",
+    "serverC-archives-result.private.json": "f8abe9b3c39b092ed71887bbef4fcd23e7125dc3c5fef46c42c1a39cebfe684b",
+    "serverD-archives-result.private.json": "80f608b394d71554e1d9873e372545fd6fcbf514ff996691bb4889be510f98c0",
+    "mac-mini-old-archives-result.private.json": "bcd47940699a610bb00f5e3cbc189d62b096b77bc649bedb4e1fa66a543a87c3",
+    "runtime-baseline-20261027T030324-66f7aa.private.json": "90c7fabebd8826323d68ed40054ebdf689c460b850fc4bffe60bab06a88883a9",
+    "runtime-baseline-20261027T024731-6de3f9.private.json": "231560f11c6b10e51ad415e88a3b8d52f96d8fc89b250de9be241f7d4c4be687",
+    "quiescence-20261027T030324-18c23b.private.json": "d27af807608ea264943a7f894b12d726f9957f1ada4b625f3ec5f113fbb3e7af",
+    "quiescence-20261027T024731-d764d9.private.json": "50784cd1f30bb6edc1dbb18ecc5a66d0369292afdfc496603ed4ab08f06ed01d",
+    "owner-ready-20261027T030324-1f3278.private.json": "e80ada6ecbc320052ab666d08f2dd12f5a477f435262f1feb6c53b10fe13e2bc",
+    "heads-bindings-20261027T030324-25c948.private.json": "b9357f974087c33d501dcccd0f771a125b7d3ef7dafbdee3ac00813693aa8a5b",
+    "public-reopened-20261027T030324.private.json": "ff4176a13167d2f4755997f43896e45cc73bb35002fbfd1ddd5495674f594a19",
+    "followup-old-queues-iam-20261027T030356-ff2b76.private.json": "27548db29dfb8a9a7aa4199bf62c63a480a40bc6e641214d138eb6552dabbd0e",
+    "followup-old-queues-qs-20261027T030400-61c327.private.json": "d057605f4806fe5856f6b07aea3ece3ba0aa715ed6a104ff805c8e3b5ee5b761",
+    "followup-old-queues-ai-20261027T030403-d0693e.private.json": "574c0a9d2d1da21c364820c473f3b9a2fae1e8c3d627e8991bbfada7c0572771",
+    "followup-mongo-after-purge-20261027T030357-5c9fa2.private.json": "4bb0cfae59a0fe7b101a799df7001735208d74afcdc3e53e41a3c072c3305cb6",
+    "CD-state-20261027T030546.private.json": "776e837f254396ca58248d42c4af4e4dc70f0f81739fdd405ba5b6235bcc3dcf"
+  },
+  "old_C07_and_M4_release_JSON_receipts_unchanged": true
+}
