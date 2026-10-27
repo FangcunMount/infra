@@ -24,8 +24,8 @@
 
 | 里程碑 | 任务 | 状态 | 完成门禁 |
 |---|---|---|---|
-| N-P 基线与命名 | T01–T02 | 实现与验证完成，待合并 | 完整盘点、旧新映射及规则冻结 |
-| N-SDK 双语言路由 | T03–T05 | 实现、验证及预发布完成，infra文档待合并 | 双语言契约和真实SDK通过、预发布 |
+| N-P 基线与命名 | T01–T02 | ✅ 已完成 | 完整盘点、旧新映射及规则冻结 |
+| N-SDK 双语言路由 | T03–T05 | ✅ 已完成 | 双语言契约和真实SDK通过、预发布 |
 | N-HOST 三库接入 | T06–T09 | 待开始 | 业务、历史读取和调度保持 |
 | N-VERIFY 演练与发布 | T10–T12 | 待开始 | ACL/完整故障演练/正式制品通过 |
 | N-PROD 切换与退役 | T13–T16 | 待开始 | system及新业务验收、退役闭环 |
@@ -34,13 +34,13 @@
 
 | 完成 | ID | 内容 | 状态与证据 |
 |---|---|---|---|
-| ✅ | T01 | 建立总表、独立工作区、完整 SHA 基线及生产责任盘点 | 2026-10-27：五库完整SHA与八实例/12 ACL主体/协议及调度只读盘点通过；[基线证据](evidence/rocketmq-readable-names-baseline-20261027.json)，源码待提交/合并 |
-| ✅ | T02 | 冻结十个 Topic、九个 Group、v3 manifest 与共享向量，验证命名冲突 | 2026-10-27：v3命名4项、v2回归3项通过；12路由/10Topic/9Group；共享向量已提供，待合并 |
+| ✅ | T01 | 建立总表、独立工作区、完整 SHA 基线及生产责任盘点 | 2026-10-27：五库完整SHA与八实例/12 ACL主体/协议及调度只读盘点通过；[基线证据](evidence/rocketmq-readable-names-baseline-20261027.json)，infra PR352已合并5d6c4294 |
+| ✅ | T02 | 冻结十个 Topic、九个 Group、v3 manifest 与共享向量，验证命名冲突 | 2026-10-27：v3命名4项、v2回归3项通过；12路由/10Topic/9Group；共享向量已提供；infra PR352已合并5d6c4294 |
 | ✅ | T03 | Go SDK 命名方案、可信路由解析和活动/历史边界 | 2026-10-27：make check完整通过；活动/历史隔离、Aborted显式Replan及原wire保护通过；[本地证据](evidence/rocketmq-readable-names-sdk-local-20261027.json)，SDK PR60已合并d719b6fb，10个PR CI全过 |
 | ✅ | T04 | Python SDK 对应能力与生命周期保持 | 2026-10-27：Python48/0/0、ruff/mypy通过；历史不注册、生命周期/取消和原wire通过；SDK PR60已合并d719b6fb，10个PR CI全过 |
 | ✅ | T05 | 跨语言真实 Broker 验收与固定 SDK 预发布 | 2026-10-27：SDK5c2e3cd，两个公开SDK矩阵各31/0/0、存活恢复5/0/0；三档存储各29/0/0、两档Python源码与wheel各159/0/0；Go v0.6.0-rc.1 / Python0.5.0rc1已发布，18资产重新下载校验；[发布证明](evidence/rocketmq-readable-names-prerelease-20261027.json) |
-| ☐ | T06 | IAM 授权事务、普通消息、幂等查询与双订阅接入 | 本地实现中：五包race通过；等待固定预发布依赖与真实双订阅重验 |
-| ☐ | T07 | QS API/collection/worker 双存储与合并订阅接入 | 本地实现中：options、共享owner及答卷codec通过；AI桥接/调度/deferred未完成 |
+| ☐ | T06 | IAM 授权事务、普通消息、幂等查询与双订阅接入 | 源码草稿[ IAM PR160 ](https://github.com/FangcunMount/iam/pull/160)，9b9bb9f1：正式RC模块、GOWORK=off下168测试包及审计/命名race通过；真实可读双订阅仍待重验 |
+| ☐ | T07 | QS API/collection/worker 双存储与合并订阅接入 | 源码草稿[ QS PR455 ](https://github.com/FangcunMount/qs-server/pull/455)，最新1c2eccc3：正式RC模块382测试包与定向race通过；原事务无runtime夹具补齐显式路由，三档真实MySQL重验中 |
 | ☐ | T08 | AI command/receipt/state/ACK 及正文安全接入 | 待开始 |
 | ☐ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | 待开始 |
 | ☐ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | 待开始 |
@@ -78,3 +78,5 @@
 - 2026-10-27：SDK PR61已合并bfe6dba5，候选996e34cd两档源码与独立wheel各159/0/0、制品逐字节一致；实际readable存活Producer恢复专项5/5。完整公开SDK首档29通过后NORMAL探针缺命名方案而失败，失败和清理证据见[报告](evidence/rocketmq-readable-names-public-native-retry-20261027.json)。SDK PR62仅修正探针为复用manifest Inputs，新候选5c2e3cd；T05未完成、版本未发布。IAM五包race通过；QS可信owner解析、MySQL/Mongo私有计划与答卷路由本地通过，仍属接入开发，不标成宿主完整验收。生产未变更。
 
 - 2026-10-27：T05完成，总进度5/16。SDK PR62已合并eebdf1c5，两个固定预发布tag同指5c2e3cd；完整公开SDK两档各31、恢复专项5、存储三档各29、Python两档源码/安装wheel各159，均0失败/跳过且清理通过。每Release9资产均重新下载并核对GitHub digest；Go模块193份Go源码/模块文件等同源码，模块缓存三个race包通过；wheel/sdist各128纯测试通过，本地31项真实依赖明确排除，真实证明由CI承担。IAM本地168、QS382测试包通过；当前正在用正式Go tag、GOWORK=off且mod=readonly重新验收。三库源码尚未合并或部署；生产未变更。
+
+- 2026-10-27：infra PR352在62项CI全成功后合并为5d6c4294；SDK发布证明PR63合并e1d8b589，N-P/N-SDK闭环。IAM PR160（9b9bb9f1）、QS PR455（1c2eccc3）为草稿，未合并或触发生产切换。QS初次CI四项失败保留：文档source_baseline过旧、三档MySQL原事务夹具未注入受信路由；已拆开计划路由与runtime生命周期并更新文档源码基线，当前等待真实CI重验。T06/T07继续未完成。自动生产CD配置、数据库、MQ资源和业务容器未改变。
