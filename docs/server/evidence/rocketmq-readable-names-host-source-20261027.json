@@ -1,0 +1,50 @@
+{
+  "recorded_on": "2026-10-27",
+  "scope": "source and local units only; no database/Docker/native/system or deployment claim",
+  "ai_source_sha": "f8f6d2a24800f27d35e9f8132b674b74afdfe904",
+  "ai_source_pr": "https://github.com/FangcunMount/qs-ai/pull/232",
+  "source_pr_state": "draft_unmerged",
+  "local_regression": {
+    "source_sha": "1f26192136cf094fed12fcc6d067cbc1590cc4e6",
+    "passed": 4313,
+    "failed": 0,
+    "skipped": 0,
+    "deselected": 1290,
+    "excluded_files": [
+      "tests/test_mq_deployment.py",
+      "tests/test_schema_refactor_control.py"
+    ],
+    "excluded_markers": [
+      "integration",
+      "interop"
+    ],
+    "not_full_required_ci": true,
+    "log_sha256": "1d5d16b2e423f9b74c9946c70de8f12815c4e68ad84a9eff394462b8cd00324d"
+  },
+  "focused_current_native_readers": {
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0,
+    "log_sha256": "96b4072effba2cb39fc96efcd37dcdd55098e55ff481a92279b0aad48550ced1"
+  },
+  "static_checks": {
+    "mypy_source_files": 452,
+    "ruff_passed": true,
+    "document_local_links": 1272,
+    "document_errors": 0
+  },
+  "native_collection": {
+    "collected": 105,
+    "executed": false
+  },
+  "ci": {
+    "qs_readable_pr": "https://github.com/FangcunMount/infra/pull/356",
+    "qs_readable_run": "https://github.com/FangcunMount/infra/actions/runs/40528385939",
+    "ai_readable_pr": "https://github.com/FangcunMount/infra/pull/357",
+    "status": "queued_or_running_not_passed"
+  },
+  "production_changed": false,
+  "cd_flags_changed": false,
+  "ddl_executed": false,
+  "sdk_stable_released": false
+}
