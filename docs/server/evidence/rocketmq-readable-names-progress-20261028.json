@@ -1,0 +1,28 @@
+{
+  "schema": "rocketmq-readable-names-progress/v1",
+  "date": "2026-10-28",
+  "completed": 6,
+  "total": 16,
+  "source": {
+    "iam_history": "91aee79cbc1b192c5879625103d7b9cbd389b15b",
+    "qs_history": "e03968a90177241263d93125878688ffda119c06",
+    "ai_history": "e361440a13109523d5e214f46c48080cafcca557",
+    "qs_current": "893f52a9db409a7b5304ff83f116f585b53a3994",
+    "ai_current": "aae96dbe9b89b7960c53bbdd51690ded16ab49a6"
+  },
+  "local": {
+    "iam_tested_packages": 168,
+    "qs_history_tested_packages": 383,
+    "ai_pure_tests": 4320,
+    "ai_dependency_deselected": 1290,
+    "infra_transition_unit": 405
+  },
+  "pending_native": {
+    "qs": 40541357738,
+    "ai": 40535268126,
+    "transition": 40540910673
+  },
+  "production_changed": false,
+  "cd_changed": false,
+  "task_gate_complete": false
+}
