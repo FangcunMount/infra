@@ -1,0 +1,57 @@
+name: RocketMQ readable route SDK acceptance
+on:
+  pull_request:
+    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '.github/workflows/rocketmq-readable-routes.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-readable-routes-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  readable:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - go: '1.25.9'
+            python: '3.11'
+            mysql: 'mysql:8.0.36'
+          - go: '1.25.12'
+            python: '3.13'
+            mysql: 'mysql:8.4'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 6b93f7321731b010040bae07b4311435f2da11eb
+          path: .sdk-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: .sdk-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: ${{ matrix.python }}
+      - name: Naming contracts
+        run: python3 -m unittest discover -s scripts/rocketmq -p 'test_routes*.py'
+      - name: Build verified isolated Broker
+        run: |
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-readable:5.5.1 components/rocketmq
+      - name: Real public Go/Python SDK with readable resources
+        run: |
+          python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python --readable-routes \
+            --sdk-python-live-recovery --sdk "$PWD/.sdk-acceptance" --image rocketmq-readable:5.5.1 \
+            --mysql-image '${{ matrix.mysql }}' --report rocketmq-readable-sdk.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rocketmq-readable-${{ strategy.job-index }}-${{ github.sha }}
+          path: rocketmq-readable-sdk.json
+          if-no-files-found: error
+          retention-days: 14

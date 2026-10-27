@@ -1,6 +1,6 @@
 # RocketMQ 可读资源命名执行总表
 
-**当前进度：2/16。** 本表是本批唯一进度总表；M2/M3/M4 原计数保持。
+**当前进度：4/16。** 本表是本批唯一进度总表；M2/M3/M4 原计数保持。
 
 ## 已确认契约
 
@@ -36,9 +36,9 @@
 |---|---|---|---|
 | ✅ | T01 | 建立总表、独立工作区、完整 SHA 基线及生产责任盘点 | 2026-10-27：五库完整SHA与八实例/12 ACL主体/协议及调度只读盘点通过；[基线证据](evidence/rocketmq-readable-names-baseline-20261027.json)，源码待提交/合并 |
 | ✅ | T02 | 冻结十个 Topic、九个 Group、v3 manifest 与共享向量，验证命名冲突 | 2026-10-27：v3命名4项、v2回归3项通过；12路由/10Topic/9Group；共享向量已提供，待合并 |
-| ☐ | T03 | Go SDK 命名方案、可信路由解析和活动/历史边界 | 进行中：解析/适配与显式Replan单测已实现，等待完整本地门禁和CI |
-| ☐ | T04 | Python SDK 对应能力与生命周期保持 | 进行中：解析/适配与历史隔离已实现，生命周期/类型检查验证中 |
-| ☐ | T05 | 跨语言真实 Broker 验收与固定 SDK 预发布 | 待开始 |
+| ✅ | T03 | Go SDK 命名方案、可信路由解析和活动/历史边界 | 2026-10-27：make check完整通过；活动/历史隔离、Aborted显式Replan及原wire保护通过；[本地证据](evidence/rocketmq-readable-names-sdk-local-20261027.json)，SDK PR60待CI/合并 |
+| ✅ | T04 | Python SDK 对应能力与生命周期保持 | 2026-10-27：Python48/0/0、ruff/mypy通过；历史不注册、生命周期/取消和原wire通过；SDK PR60待CI/合并 |
+| ☐ | T05 | 跨语言真实 Broker 验收与固定 SDK 预发布 | 进行中：隔离v3真实SDK流水线已实现，SDK固定6b93f732；原SDK CI和本项真实验收待通过 |
 | ☐ | T06 | IAM 授权事务、普通消息、幂等查询与双订阅接入 | 待开始 |
 | ☐ | T07 | QS API/collection/worker 双存储与合并订阅接入 | 待开始 |
 | ☐ | T08 | AI command/receipt/state/ACK 及正文安全接入 | 待开始 |
@@ -70,3 +70,5 @@
 - 2026-10-27：接受规划，完成五库独立worktree与main SHA冻结；基线测试及生产只读盘点进行中。生产未修改。
 
 - 2026-10-27：T01、T02完成，2/16。协议快照SQL/Mongo均Committed，当前未来计划/deferred为0；10旧版Topic/12旧版Group已登记，未宣称可删除。T03/T04进行中。此前中断未产生生产变更。
+
+- 2026-10-27：T03/T04实现及本地必需验证完成，4/16；SDK PR60、infra PR352已提交。Go make check/48 Python/395 infra纯测试通过；真实Broker与发布未完成，生产未变更。
