@@ -7,10 +7,12 @@ import argparse
 CHAIN='INFRA-MQ-DASH'
 
 
-def install(bind_ip, network):
+def install(bind_ip, network, web_source='100.74.123.45'):
     address=ipaddress.IPv4Address(bind_ip)
     if address not in ipaddress.ip_network('100.64.0.0/10'):
         raise ValueError('Tailscale bind required')
+    if ipaddress.IPv4Address(web_source) not in ipaddress.ip_network('100.64.0.0/10'):
+        raise ValueError('Tailscale ingress source required')
     value=json.loads(subprocess.check_output(['docker','network','inspect',network]))[0]
     if value['Driver']!='bridge' or len(value['IPAM']['Config'])!=1:
         raise ValueError('single owned Broker bridge required')
@@ -23,7 +25,7 @@ def install(bind_ip, network):
     # Atomic replacement of this chain only, including on Docker restart.
     rules=['*filter', ':'+CHAIN+' - [0:0]', '-F '+CHAIN,
         f'-A {CHAIN} -p tcp -i lo -s {bind_ip}/32 -j ACCEPT',
-        f'-A {CHAIN} -p tcp -m conntrack --ctorigdstport 18082 -i tailscale0 -s 100.64.0.0/10 -j ACCEPT',
+        f'-A {CHAIN} -p tcp -m conntrack --ctorigdstport 18082 -i tailscale0 -s {web_source}/32 -j ACCEPT',
         f'-A {CHAIN} -p tcp -m conntrack --ctorigdstport 10911 -i {bridge} -s {subnet} -j ACCEPT',
         f'-A {CHAIN} -p tcp -j REJECT --reject-with tcp-reset', 'COMMIT', '']
     result=subprocess.run(['iptables-restore','--wait','10','--noflush'],
@@ -40,7 +42,7 @@ def install(bind_ip, network):
         local=['-p','tcp','-d',bind_ip,'--dport',port,'-j',CHAIN]
         if run('-C','INPUT',*local,required=False).returncode:
             run('-I','INPUT','1',*local)
-    return dict(private_bind=bind_ip,ui_tailscale_only=True,rpc_broker_bridge_only=True,
+    return dict(private_bind=bind_ip,web_ingress_source=web_source,ui_servera_only=True,rpc_broker_bridge_only=True,
         trusted_host_self_check=True,dnat_and_userland_proxy_protected=True,
         existing_firewall_chains_preserved=True)
 
@@ -49,5 +51,6 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--bind-ip',required=True)
     parser.add_argument('--network',default='rocketmq_rocketmq')
+    parser.add_argument('--web-source',default='100.74.123.45')
     args=parser.parse_args()
-    print(json.dumps(install(args.bind_ip,args.network)))
+    print(json.dumps(install(args.bind_ip,args.network,args.web_source)))
