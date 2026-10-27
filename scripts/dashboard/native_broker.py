@@ -100,7 +100,9 @@ def add_native_port(before, original_compose, overlay, backup_directory, bind_ip
     checkpoint('native_start_issued')
     run(command+['up','-d','--no-deps','--pull','never','broker'],timeout=100)
     after=healthy(name)
-    if critical(after)!=critical(before):raise RuntimeError('unapproved_broker_runtime_drift')
+    old,new=critical(before),critical(after)
+    if old!=new:
+        raise RuntimeError('unapproved_broker_runtime_drift:'+','.join(key for key in old if old[key]!=new[key]))
     expected={**ports(before),'10911/tcp':[(bind_ip,'10911')]}
     if ports(after)!=expected:raise RuntimeError('unapproved_broker_port_drift')
     if after['Id']==before['Id']:raise RuntimeError('broker_not_recreated')

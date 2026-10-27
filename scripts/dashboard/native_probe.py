@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import secrets
 import shutil
@@ -14,6 +15,7 @@ sys.path.insert(0,str(REPO/'scripts/rocketmq'))
 from final_image_candidate import ci_guard
 import image_start_fixture as fixtures
 from provision_v2 import Admin
+from admin_audit import snapshot_existing_acls
 from config import render
 from acceptance import accepted,client,request,verify
 from native_broker import add_native_port,critical,healthy,inspect,override,ports,run
@@ -59,7 +61,11 @@ def main():
         admin('createUser','-u',account['username'],'-p',account['password'],'-t','Super',mutation=True)
         admin('updateTopic','-t','owned-dashboard-inventory','-r','1','-w','1','-a','+message.type=NORMAL',mutation=True)
         admin('updateSubGroup','-g','owned-dashboard-inventory',mutation=True)
+        normal='owned-dashboard-client'
+        admin('createUser','-u',normal,'-p',secrets.token_hex(32),'-t','Normal',mutation=True)
+        admin('createAcl','-s','User:'+normal,'-r','Topic:owned-dashboard-inventory','-a','Pub,Get','-d','Allow',mutation=True)
         users=admin.users()
+        acls=snapshot_existing_acls(admin,users)
         metadata=admin.metadata('/tmp/owned-dashboard-before')
         before=inspect(broker)
         fixture.run(['python3',str(REPO/'scripts/dashboard/firewall.py'),'--bind-ip',HOST,'--network',fixture.network])
@@ -73,6 +79,7 @@ def main():
         cases['broker_same_image_resources_config_mounts']=critical(candidate)==critical(before)
         cases['broker_native_private_port']=ports(candidate)=={**ports(before),'10911/tcp':[(HOST,'10911')]}
         cases['broker_users_and_inventory_preserved']=admin.users()==users and admin.metadata('/tmp/owned-dashboard-after')==metadata
+        cases['normal_client_acls_survive_recreation']=snapshot_existing_acls(admin,users)==acls
         report['stage']='current_store_recovery_drill'
         recovery=fixture.directory/'recovery.json'
         recovery.write_text(json.dumps(dict(services=dict(broker=dict(hostname=before['Config']['Hostname'])))))
@@ -82,6 +89,7 @@ def main():
         fixture.run([*fixture.compose,'-f',str(overlay),'up','-d','--no-deps','--pull','never','broker'],timeout=150)
         candidate=healthy(broker)
         cases['native_mapping_reapplied_without_store_restore']=critical(candidate)==critical(before) and admin.users()==users
+        cases['normal_client_acls_survive_recovery']=snapshot_existing_acls(admin,users)==acls
         report['stage']='dashboard_and_https_ingress'
         cfg=fixture.directory/'dashboard';render(cfg,ui,account,(fixture.private/'mq-ca.crt').read_bytes())
         fixture.run(['chown','-R','10001:10001',str(cfg)])
@@ -128,6 +136,15 @@ def main():
         wait_http(base,crt);wait_http(bad_base,crt)
         report['stage']='https_authenticated_acceptance'
         cases.update(verify(base,ui,crt))
+        with client(crt).open(base+'/',timeout=20) as response:html=response.read().decode()
+        assets=re.findall(r'<script[^>]+src="([^"]+)"',html)
+        assert assets,'browser_javascript_asset_required'
+        from urllib.parse import urljoin
+        for asset in assets:
+            with client(crt).open(urljoin(base,asset),timeout=20) as response:
+                assert response.status==200 and response.headers.get_content_type() in ('application/javascript','text/javascript','application/x-javascript'),'browser_javascript_mime_failed'
+                assert len(response.read())>100,'browser_javascript_empty'
+        cases['browser_javascript_assets_load']=True
         redirect=request(client(crt),'http://localhost','/')[0]
         cases['http_redirects_https']=redirect==301
         session=client(crt)
@@ -136,6 +153,20 @@ def main():
         control=client(crt)
         assert accepted(request(control,base,'/login/login.do',ui)) and accepted(request(control,base,'/topic/list.query')),'trusted_control_failed'
         cases['wrong_ca_denied_with_valid_https_session']=True
+        closed=(REPO/'components/rocketmq-dashboard/server-a-closed.conf').read_text().replace('mq.fangcunmount.cn','localhost').replace('listen 80;','listen 127.0.0.1:80;').replace('listen 443 ssl;','listen 127.0.0.1:443 ssl;')
+        (front_cfg/'good.conf').write_text(closed)
+        fixture.run(['docker','exec',front,'nginx','-t','-c','/front/nginx.conf'])
+        fixture.run(['docker','exec',front,'nginx','-c','/front/nginx.conf','-s','reload'])
+        deadline=time.monotonic()+15
+        while request(client(crt),base,'/')[0]!=503:
+            assert time.monotonic()<deadline,'closed_virtual_host_not_503'
+            time.sleep(.5)
+        cases['failed_management_host_can_close_503']=True
+        (front_cfg/'good.conf').write_text(good)
+        fixture.run(['docker','exec',front,'nginx','-t','-c','/front/nginx.conf'])
+        fixture.run(['docker','exec',front,'nginx','-c','/front/nginx.conf','-s','reload'])
+        wait_http(base,crt)
+        cases['https_virtual_host_restores_without_restart']=True
         for port in (10911,18082):
             denied=fixture.run(['docker','run','--rm','--network','bridge','--entrypoint','bash',fixture.image,
                 '-c',f'timeout 3 bash -c "exec 3<>/dev/tcp/{HOST}/{port}"'],required=False)
@@ -154,7 +185,7 @@ def main():
             ingress_image=INGRESS,backup=backup,store_restored=False)
     except Exception as error:
         report['error_type']=type(error).__name__
-        if isinstance(error,AssertionError):report['error_code']=str(error)
+        if isinstance(error,(AssertionError,RuntimeError)):report['error_code']=str(error)
         if hasattr(error,'diagnostics'):report['acceptance_diagnostics']=error.diagnostics
         if front:
             logs=fixture.run(['docker','logs','--tail','30',front],required=False)

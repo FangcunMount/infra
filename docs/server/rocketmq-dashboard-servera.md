@@ -21,7 +21,7 @@
 - 10911 仅在 D 的 Tailscale 地址映射，允许本机及 MQ bridge；18082 仅允许 serverA 的 Tailscale 来源及本机检查。INPUT 和 DOCKER-USER 两条路径都保护。
 - 保持原 Broker 镜像、TLS/ACL、配置文件、store/auth 挂载、用户/Topic/Group、业务 DB 与协议 owner/epoch；不重放消息、不改消费位点、不重做模型。
 - Dashboard 使用已验证的固定官方镜像 digest（标签 2.1.0，实际 JAR 2.1.1-SNAPSHOT）；JSON + CSRF 与独立账号保持。新 Broker 管理证书经 SSH 和容器身份核对后更新信任包。
-- mq 当前 DNS 为 NXDOMAIN；serverA 已有可用阿里云 DNS 凭据入口，凭据不进入 Git 或日志。DNS 写入前再次预查同名记录，冲突拒绝覆盖。
+- 用户已添加 mq A 记录；独立公共 DNS 查询确认其指向 `154.8.167.1`。本次不调用 DNS 写接口，不使用阿里云密钥。
 
 ## 执行与恢复顺序
 
@@ -30,3 +30,7 @@
 确认原存储及账号加载、gRPC/指标和 worker/owner 重连后，使用新管理证书启动直接映射的 Dashboard；serverA 安装单独 vhost，`nginx -t` 后 reload；经实际 HTTPS 验证后配置 DNS。记录短暂 MQ 重连区间，不把未知结果认定为回滚，不补发消息。
 
 首次新 Broker 启动标记之前可以使用经验证的冷备份；发出启动命令后，恢复必须继续使用**当前 store**与同一镜像，禁止旧冷备覆盖新消息。若 Broker 启动失败，按原 Compose、原环境、当前 store 恢复 gRPC 服务；若仅 Dashboard/域名失败，保留健康 Broker，前向修复管理入口，不回滚业务数据。备份及证据作为本次恢复资产保留。
+
+## 隔离验证记录
+
+首批候选 `5f87e319ffd90f3f22ba153f9f28bc3fb16b792d` 已通过 [26/0/0 原生验证](https://github.com/FangcunMount/infra/actions/runs/40453913111)，包含 Broker 真实重建、原映射恢复、当前存储复用、HTTPS/Secure cookie/CSRF、严格 TLS 和跨 bridge 拒绝。生产工具与前端静态资源、关闭/恢复入口门禁补齐后，再对最终候选完整重跑；本记录不提前勾选 S03。

@@ -1,13 +1,15 @@
-# serverD RocketMQ Dashboard
+# serverD RocketMQ Dashboard（私网原型记录）
+
+> 原方案已完成隔离 19/19、生产 15/15；用户随后选择移除 serverD Nginx。当前实施与验收以 [serverA HTTPS / serverD 原生 RPC 执行表](rocketmq-dashboard-servera.md) 为准。下面保留原方案的已验证事实，不作为新拓扑部署命令。
 
 目标：在 serverD 增加 Tailscale 私网管理界面，由 infra 管理，不重建或重启现有 Broker、NameServer 和 worker。
 
 | 状态 | 任务 | 验收 |
 |---|---|---|
-| ✅ | 生产只读基线与版本核对 | 2.1.0 正式版、固定 amd64 digest；18082/10911 空闲 |
-| ☐ | 隔离原生验证 | Broker 5.5.1、TLS enforcing、ACL2；默认/错误/匿名登录拒绝，独立登录后管理查询成功 |
-| ☐ | 部署与权限 | 独立 Compose、独立 UI/Broker 身份、私网入口、RPC 仅 Broker bridge；原容器不重启 |
-| ☐ | 运行验收及记录 | Topic/消费组/集群只读查询、退出会话失效、余量至少 512 MiB、原业务监控正常 |
+| ✅ | 生产只读基线与版本核对 | 固定官方镜像及实际 JAR；原检查时 18082/10911 空闲 |
+| ✅ | 隔离原生验证 | Broker 5.5.1、TLS enforcing、ACL2；默认/错误/匿名登录拒绝，独立登录后管理查询成功 |
+| ✅ | 部署与权限 | 独立 Compose、独立 UI/Broker 身份、私网入口、RPC 仅 Broker bridge；原容器不重启 |
+| ✅ | 运行验收及记录 | Topic/消费组/集群只读查询、退出会话失效、余量至少 512 MiB、原业务监控正常 |
 
 ## 固定构成与入口
 
@@ -28,6 +30,6 @@
 
 先安装 `scripts/dashboard/firewall.py` 的两个目标规则，再启动独立项目；使用原部署锁 `/var/lib/fangcun-image-retention/deploy.lock`，不改锁 inode 或权限。启动后用 `scripts/dashboard/acceptance.py` 验证登录、集群、Topic、消费组及登出。
 
-停止/回退仅执行该项目 `docker compose down`（不带 `-v`），保留私密配置及专用身份供诊断。不得执行原 RocketMQ 项目的 down/up、删除原网络/存储、变更业务 owner 或 worker 资源。独立 `rocketmq-dashboard-firewall.service` 随 Docker 重启重新安装本项目规则；Compose 始终保持私网地址绑定。安装脚本为 `scripts/dashboard/deploy.py --expected-broker-id <冻结的原容器ID>`，版本化源码安装在本项目目录中，不覆盖原 Broker 源码或配置。
+停止/回退仅执行该项目 `docker compose down`（不带 `-v`），保留私密配置及专用身份供诊断。不得执行原 RocketMQ 项目的 down/up、删除原网络/存储、变更业务 owner 或 worker 资源。独立 `rocketmq-dashboard-firewall.service` 随 Docker 重启重新安装本项目规则；Compose 始终保持私网地址绑定。原安装源码保留于 #348；当前使用 `scripts/dashboard/native_transition.py` 与 `scripts/dashboard/ingress.py`，版本化源码安装在本项目目录中，不覆盖原 Broker 源码或配置。
 
 源码与版本依据：[Dashboard 2.1.0](https://github.com/apache/rocketmq-dashboard/releases/tag/rocketmq-dashboard-2.1.0)、[固定源码](https://github.com/apache/rocketmq-dashboard/tree/a013c8fad163122713b0bd2db3d73b3bf0db373e)、[NGINX](https://nginx.org/)。部署与 CI 证据将在验收后附加。
