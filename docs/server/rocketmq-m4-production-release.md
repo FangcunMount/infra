@@ -1,6 +1,6 @@
 # M4 最终生产发布索引与恢复边界
 
-**M4清理后的最终八实例已上线，system及新答卷/新AI业务回归通过，公共入口于2026-10-27 09:22:52恢复。** 维护从09:05:31开始，约17分21秒，无延期。M4任务38/38、父任务8/8；最终文档PR合并后全部闭环。唯一进度见[M4总表](rocketmq-m4-execution.md)，精确身份和摘要见[最终release receipt](evidence/rocketmq-m4-final-release-20261027.json)。自动生产CD保持暂停。
+**M4清理后的最终八实例已上线，system及新答卷/新AI业务回归通过，公共入口于2026-10-27 09:22:52恢复。** 维护从09:05:31开始，约17分21秒，无延期。M4任务38/38、父任务8/8；收尾[PR344](https://github.com/FangcunMount/infra/pull/344)已合并，全部闭环。唯一进度见[M4总表](rocketmq-m4-execution.md)，精确身份和摘要见[最终release receipt](evidence/rocketmq-m4-final-release-20261027.json)。自动生产CD保持暂停。
 
 ## 源码、制品、部署与业务
 
