@@ -54,6 +54,27 @@ def parse_answer_receipt(output):
     return receipts[0]
 
 
+def answer_failure_signals(raw):
+    # Only authored fixed labels are exportable; never forward captured values.
+    markers = {
+        'root_wait_timeout': 'half preparation did not reach host',
+        'returned_before_root': 'submission returned before original root',
+        'admission_closed': 'transaction admission closed',
+        'sender_admission_unavailable': 'transaction sender admission unavailable',
+        'invalid_plan': 'invalid frozen transaction plan',
+        'binding_mismatch': 'transaction binding mismatch',
+        'all_halves_not_prepared': 'all half messages must be confirmed before local execution',
+        'half_audit_failed': 'half_audit_failed',
+        'business_binding_differs': 'frozen submission business binding differs',
+        'input_conflict': 'transaction idempotency key has different business input',
+        'deadline': 'context deadline exceeded',
+        'unavailable': 'code = Unavailable',
+        'permission_denied': 'code = PermissionDenied',
+        'unauthenticated': 'code = Unauthenticated',
+    }
+    return sorted(label for label, marker in markers.items() if marker in raw)
+
+
 def run_qs_answer_host(source, directory, broker, project, grpc_port, mongo_port, ca, run, proof, private_log=None, *, faults=False, native_runner=None, proxy_start=None, readable=False):
     source = source.resolve()
     if not (source / 'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
@@ -107,6 +128,7 @@ def run_qs_answer_host(source, directory, broker, project, grpc_port, mongo_port
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
     proof['diagnostics'] = host_failure_summary(raw)
+    proof['diagnostics']['signals'] = answer_failure_signals(raw)
     proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'm3_answersheet_broker_integration_test\.go:(\d+)', raw)))[:32]
     if private_log is not None:
         retain_private_host_output(private_log, raw)
