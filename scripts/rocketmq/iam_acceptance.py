@@ -7,10 +7,10 @@ import secrets
 from pathlib import Path
 
 from provision_v2 import provision
-from routes import consumer_group_v2, physical_topic_v2, validate_v2
+from routes import consumer_group_v2, physical_topic_v2, consumer_group_v3, physical_topic_v3, validate
 
 
-def iam_manifest(fanout=False):
+def iam_manifest(fanout=False, *, readable=False):
     topic, subscription = 'iam.authz.version.v2', 'iam-m3-native-observer'
     route = {'id': 'iam-native', 'topic': topic, 'subscription': subscription,
              'message_type': 'TRANSACTION', 'owner': 'iam.mysql', 'route_revision': 'm3-1',
@@ -29,7 +29,13 @@ def iam_manifest(fanout=False):
             result['routes'].append(dict(route, id=identifier, subscription=subscription,
                                          consumer_group=consumer_group_v2(topic, subscription)))
             result['accounts'][role] = {'publish': [], 'subscriptions': [identifier]}
-    validate_v2(result)
+    if readable:
+        result['version'] = 3
+        for row in result['routes']:
+            row['naming_scheme'] = 'readable-v1'
+            row['physical_topic'] = physical_topic_v3(row['topic'], row['message_type'], row['owner'], row['route_revision'])
+            row['consumer_group'] = consumer_group_v3(row['topic'], row['subscription'])
+    validate(result)
     return result
 
 
@@ -167,7 +173,7 @@ def retain_private_host_output(path, raw):
         stream.write(raw)
 
 
-def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, require_business_result=False, qs_source=None, *, faults=False, native_runner=None, proxy_start=None, read_parameters=None):
+def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, require_business_result=False, qs_source=None, *, faults=False, native_runner=None, proxy_start=None, read_parameters=None, readable=False):
     source = source.resolve()
     if not (source / 'go.mod').is_file():
         raise RuntimeError('required exact IAM source checkout missing')
@@ -198,7 +204,17 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     env['IAM_M3_VERIFY_PROTOCOL_PROTECTION'] = '1' if protection else '0'
     if (runtime_required or faults) and not (protection or native_limit) and module.get('Version') != 'v0.5.0':
         raise RuntimeError('current IAM runtime proof requires fixed stable SDK v0.5.0')
-    manifest = iam_manifest(fanout=qs_source is not None)
+    if readable:
+        if runtime_required or faults or protection or native_limit or qs_source is None:
+            raise RuntimeError('readable IAM profile requires separate original-root/business fanout acceptance')
+        if tuple(module.get(k) for k in ('Version','Sum','GoModSum')) != (
+                'v0.6.0-rc.1','h1:kGWE8og29Er3UYYaNzPgaXj/T/2ltmQJrb+/iI4+nGo=',
+                'h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I='):
+            raise RuntimeError('readable IAM profile requires exact published prerelease module and sums')
+    manifest = iam_manifest(fanout=qs_source is not None, readable=readable)
+    proof['manifest_version'] = manifest['version']
+    proof['naming_scheme'] = 'readable-v1' if readable else 'hashed-v2'
+    proof['manifest_sha256'] = hashlib.sha256(json.dumps(manifest,sort_keys=True,separators=(',',':')).encode()).hexdigest()
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4),
                        'password': secrets.token_hex(32)} for role in manifest['accounts']}
     proof['provision'] = provision(broker, manifest, accounts)

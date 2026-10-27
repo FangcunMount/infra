@@ -233,7 +233,12 @@ def main():
     parser.add_argument("--qs-command-host-faults", action="store_true", help="actual QS command original MySQL COMMIT TCP faults")
     parser.add_argument("--paired-host-faults", action="store_true", help="explicit paired MQ/process/Broker physical fault profile")
     parser.add_argument("--sdk-python-live-recovery", action="store_true", help="source-candidate Python producer survives actual owned Broker SIGKILL")
+    parser.add_argument("--readable-hosts", action="store_true", help="separate published-SDK IAM/QS readable business fanout fixture")
     args = parser.parse_args()
+    if args.readable_hosts and (not args.iam_host or not args.iam_fanout_qs or args.readable_routes
+            or args.sdk_api_go or args.sdk_api_python or args.iam_host_faults
+            or os.environ.get('ROCKETMQ_IAM_RUNTIME_REQUIRED','0') != '0'):
+        parser.error("readable host proof requires isolated IAM/QS business fanout without SDK/raw/runtime mixtures")
     if args.readable_routes and (not args.sdk_api_go or not args.sdk_api_python or any((args.m3_resources,
             args.iam_host,args.qs_answer_host,args.qs_evaluation_host,args.qs_report_host,args.qs_task_host,
             args.qs_command_host,args.qs_event_host,args.ai_admission_host,args.sdk_recovery_audit))):
@@ -995,7 +1000,7 @@ def main():
             from iam_acceptance import run_iam_host
             proof['iam_host'] = {}
             run_iam_host(args.iam_host, directory, broker, project, grpc_port, mysql_port,
-                         mysql_password, ca, run, proof['iam_host'], args.iam_private_log, args.iam_operation_results, args.iam_fanout_qs, native_runner=owned_native_run, read_parameters=broker_parameters)
+                         mysql_password, ca, run, proof['iam_host'], args.iam_private_log, args.iam_operation_results, args.iam_fanout_qs, native_runner=owned_native_run, read_parameters=broker_parameters, readable=args.readable_hosts)
             passed('iam_host_actual_sdk_original_root_and_application')
             if 'native_limit_receipt' in proof['iam_host']:
                 for name in proof['iam_host']['native_limit_receipt']['cases']:
