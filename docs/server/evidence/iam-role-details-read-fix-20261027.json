@@ -112,8 +112,8 @@
   },
   "deployment": {
     "status": "success",
-    "run": 40443279869,
-    "source_sha": "f1bfef3d5e712e3188b42eee6885201d9591e767",
+    "run": 40445323798,
+    "source_sha": "55193a9d8f43baf00e67ff51a407ca8ee43dbcad",
     "trigger": "original workflow_run after successful main CI",
     "deployment_switch_changed_by_this_fix": false,
     "preflight_lock_inode": 820503,
@@ -130,10 +130,17 @@
         "reason": "restricted deploy sudo does not authorize touch of existing deploy.lock; old script selected generic sudo after sudo -n true",
         "runtime_replaced": false,
         "log_sha256": "ca5466403d72807fa2d607b368fa90c9476ec031ffe0afc94511679379b7b40a"
+      },
+      {
+        "run": 40445323798,
+        "source_sha": "55193a9d8f43baf00e67ff51a407ca8ee43dbcad",
+        "image_build": "success",
+        "deployment": "success",
+        "runtime_replaced": true,
+        "liveness_http": 200,
+        "readiness_http": 200
       }
     ],
-    "final_run": 40445323798,
-    "final_source_sha": "55193a9d8f43baf00e67ff51a407ca8ee43dbcad",
     "completed_at": "2026-10-27T11:43:41+08:00",
     "readiness_passed_at": "2026-10-27T11:43:40+08:00",
     "log_sha256": "c06c623e4a72357a5ea164455900624455be58a9a1b3e9788f35bab302fd5591",
