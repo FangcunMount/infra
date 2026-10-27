@@ -6,8 +6,13 @@ import urllib.parse
 import urllib.request
 
 
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
 def client():
-    return urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+    return urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()),NoRedirect())
 
 
 def request(session, base, path, data=None):
@@ -20,6 +25,7 @@ def request(session, base, path, data=None):
     except urllib.error.HTTPError as error:
         try: value=json.load(error)
         except ValueError: value={}
+        if error.headers.get('Location'):value['redirect_location']=error.headers['Location']
         return error.code, value
 
 
@@ -33,7 +39,11 @@ def verify(base, credentials):
     assert status==200 and check['data']['loginRequired'] and not check['data']['logined'], 'login_not_enforced'
     paths=['/cluster/list.query','/topic/list.query','/consumer/groupList.query']
     for path in paths:
-        assert not accepted(request(session,base,path)), 'anonymous_inventory_allowed'
+        response=request(session,base,path)
+        assert not accepted(response), 'anonymous_inventory_allowed'
+        if 'redirect_location' in response[1]:
+            target=urllib.parse.urljoin(base,response[1]['redirect_location'])
+            assert urllib.parse.urlsplit(target).netloc==urllib.parse.urlsplit(base).netloc, 'login_redirect_loses_public_origin'
     assert not accepted(request(session,base,'/login/login.do',dict(username='admin',password='admin'))), 'default_login_allowed'
     assert not accepted(request(session,base,'/login/login.do',dict(username=credentials['username'],password='incorrect'))), 'wrong_password_allowed'
     assert accepted(request(session,base,'/login/login.do',credentials)), 'independent_login_failed'
