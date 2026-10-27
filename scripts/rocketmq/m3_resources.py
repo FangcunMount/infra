@@ -270,20 +270,6 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
     if retirement_mode == '1':
         from readable_retirement_native import run_owned_retirement
         proof['phase'] = 'owned_empty_retirement'
-        from pop_retry_sentinel import route_and_roles, receipt as sentinel_receipt
-        sentinel_route, _, _ = route_and_roles(json.loads(config.read_bytes()))
-        def create_sentinel():
-            native = run([*argv[:argv.index('python') + 1],
-                str(repo / 'scripts/rocketmq/pop_retry_sentinel.py'), '--config', str(config),
-                '--project', project], cwd=repo, env=env, timeout=90, required=False)
-            if native.returncode:
-                proof['pop_sentinel_exit_code'] = native.returncode
-                proof['pop_sentinel_output_sha256'] = hashlib.sha256((native.stdout + native.stderr).encode()).hexdigest()
-                raise RuntimeError('owned actual POP sentinel failed; private output withheld')
-            return sentinel_receipt(native.stdout, sentinel_route)
-        from readable_retirement_native import generate_owned_pop_v2
-        sentinel, proof['pop_v2_control'] = generate_owned_pop_v2(broker, project, create_sentinel)
         proof['retirement_fixture'] = run_owned_retirement(
-            broker, project, previous_document, document, accounts, proof['native_receipt'],
-            pop_v2_sentinel=sentinel)
+            broker, project, previous_document, document, accounts, proof['native_receipt'])
         proof['phase'] = 'complete'

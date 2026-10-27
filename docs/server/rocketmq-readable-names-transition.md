@@ -62,3 +62,12 @@
 classic retry/DLQ及POP v1哨兵继续由原管理入口创建；新增原生v2哨兵必须存在于真实metadata后才允许开始删除。最终仍要求四个哨兵全部保留、其他metadata/ACL不变、原138项与清理通过；修正后真实运行尚未完成。原生v2的合成未ACK责任只随其owned Compose环境整体退出，不被表述为生产责任已清零。
 
 源码依据：[5.5.1 TopicValidator](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/common/src/main/java/org/apache/rocketmq/common/topic/TopicValidator.java)、[5.5.1 PopReviveService](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/broker/src/main/java/org/apache/rocketmq/broker/processor/PopReviveService.java)。
+
+
+## 发布范围收敛及保留的失败实验
+
+40569602431在生成内部POP v2资源时超时，发生于任何旧资源删除前，原130项ACL/TLS/type验证及清理分别保留。该实验尚未证明生成或保留v2，因此不再作为生产删除的授权依据，也不表述为通过；源码和实验控制单元继续保留以供独立排查。
+
+发布门禁保持原138项，使用实际classic retry、DLQ和POP v1三项哨兵证明无关资源保留；旧的二哨兵报告不冒充三哨兵结果，新的真实重验仍必需。生产审核在任何删除前读取完整metadata，发现所选Topic有任一POP v1或v2伴随名称就直接拒绝，相关Topic/Group及责任留在清单，T16不能因此勾选完成。此边界由缺失/重复metadata、两种名称、非零/未知责任及错误对象的拒绝测试保护。
+
+发布路径不再临时修改任何Broker开关，也不制造未ACK消息；没有用该未完成实验放宽原计划的清零、导出、锁或回读门禁。真实v2生成实验与其参数恢复函数仅供隔离研究，不进入生产执行包。

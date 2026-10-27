@@ -132,20 +132,12 @@ def run_owned_retirement(container, project, previous, current, accounts, receip
         # Classic/v1 empty sentinels plus a real unselected v2 retry responsibility
         # make accidental cleanup observable inside this isolated project only.
         unselected_topic = next(r['physical_topic'] for r in previous['routes'] if r['physical_topic'] != topic)
-        from pop_retry_sentinel import receipt as sentinel_receipt, MARKER
-        import json
-        sentinel_route = next(r for r in current['routes'] if r['topic'] == 'qs.survey.lifecycle'
-                              and r['message_type'] == 'NORMAL' and r.get('subscription') == 'qs-worker')
-        sentinel_receipt(MARKER + json.dumps(pop_v2_sentinel), sentinel_route)
-        pop_v2_topic = pop_v2_sentinel['retry_topic']
-        # '+' is reserved to internal POP creation and rejected by updateTopic.
-        # Require the actual revive path from a real unacked delivery instead.
-        deadline = time.monotonic() + 90
-        while pop_v2_topic not in metadata['topicConfigTable']:
-            if time.monotonic() >= deadline:
-                raise RuntimeError('actual POP v2 retry was not created by Broker revive')
-            time.sleep(1)
-            metadata = admin.metadata(snapshot)
+        # The production reviewer refuses every selected Topic that has a POP
+        # companion. Its safety does not depend on synthesizing internal v2
+        # metadata with a disabled-by-default Broker feature. Keep the failed
+        # owned v2-generation experiment separate from this deletion contract.
+        if pop_v2_sentinel is not None:
+            raise RuntimeError('experimental POP v2 generation is not retirement authorization')
         sentinels = ['%RETRY%' + group, '%DLQ%' + group,
                      '%RETRY%' + group + '_' + unselected_topic]
         if any(name in metadata['topicConfigTable'] for name in sentinels):
@@ -186,12 +178,12 @@ def run_owned_retirement(container, project, previous, current, accounts, receip
         return dict(passed=4, failed=0, skipped=0, cases=dict(
             named_old_acl_only=True, named_group_preserves_retry_dlq=True,
             named_topic_removed_from_broker_and_nameserver=True, all_other_resources_preserved=True),
-            selected_topic=topic, selected_group=group, retained_sentinels=sentinels + [pop_v2_topic],
-            pop_v2_generation=pop_v2_sentinel,
+            selected_topic=topic, selected_group=group, retained_sentinels=sentinels,
+            sentinel_scope='actual classic retry, DLQ and POP v1; no native v2 preservation claim',
             membership_sha256=hashlib.sha256(membership.encode()).hexdigest(),
             offsets_sha256=hashlib.sha256(offsets.encode()).hexdigest(),
             before_metadata_sha256=digest(before), after_metadata_sha256=digest(after),
-            scope='selected empty owned CI resources only; unselected actual POP v2 responsibility retained; no production authorization')
+            scope='selected empty owned CI resources only; actual classic and v1 sentinels retained, all selected POP companions refused; no production authorization')
     finally:
         for name in ('topic.json', 'subscriptionGroup.json'):
             admin.docker('rm', '-f', '--', snapshot + '/' + name, required=False)
