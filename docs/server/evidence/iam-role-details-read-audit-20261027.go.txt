@@ -1,0 +1,72 @@
+package main
+
+import (
+	"context"
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+	"time"
+
+	dbbase "github.com/FangcunMount/component-base/pkg/database"
+	"github.com/spf13/viper"
+)
+
+func audit() error {
+	cfg := viper.New()
+	cfg.SetConfigFile("/app/configs/apiserver.prod.yaml")
+	if cfg.ReadInConfig() != nil {
+		return fmt.Errorf("runtime config unavailable")
+	}
+	get := func(key string) string {
+		if value, ok := os.LookupEnv("IAM_APISERVER_MYSQL_" + strings.ToUpper(strings.ReplaceAll(key, "-", "_"))); ok {
+			return value
+		}
+		return cfg.GetString("mysql." + key)
+	}
+	if get("database") != "iam" || get("tls-mode") != "VERIFY_IDENTITY" {
+		return fmt.Errorf("unexpected database or TLS mode")
+	}
+	connector, err := dbbase.NewMySQLConnector(&dbbase.MySQLConfig{Host: get("host"), Username: get("username"), Password: get("password"), Database: get("database"), TLSMode: get("tls-mode"), TLSCAFile: get("tls-ca-file"), Location: "UTC"})
+	if err != nil {
+		return fmt.Errorf("database connector rejected")
+	}
+	pool := sql.OpenDB(connector)
+	defer pool.Close()
+	pool.SetMaxOpenConns(1)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	tx, err := pool.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelRepeatableRead})
+	if err != nil {
+		return fmt.Errorf("read-only transaction unavailable")
+	}
+	defer tx.Rollback()
+	counts := map[string]int64{}
+	for _, table := range []string{"rm_tx_execution", "rm_tx_witness", "rm_outbox", "iam_authz_operations", "authz_permission_grants", "authz_assignments"} {
+		var n int64
+		if tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM "+table).Scan(&n) != nil {
+			return fmt.Errorf("count unavailable: %s", table)
+		}
+		counts[table] = n
+	}
+	for key, query := range map[string]string{
+		"policy_version":     "SELECT policy_version FROM authz_policy_versions WHERE id=1",
+		"acceptance_grants":  "SELECT COUNT(*) FROM authz_permission_grants WHERE role_id=643463205334561326 AND revoked_at IS NULL",
+		"acceptance_members": "SELECT COUNT(*) FROM authz_assignments WHERE role_id=643463205334561326",
+		"prepared_witness":   "SELECT COUNT(*) FROM rm_tx_witness WHERE state='prepared'",
+	} {
+		var n int64
+		if tx.QueryRowContext(ctx, query).Scan(&n) != nil {
+			return fmt.Errorf("snapshot unavailable: %s", key)
+		}
+		counts[key] = n
+	}
+	return json.NewEncoder(os.Stdout).Encode(counts)
+}
+func main() {
+	if err := audit(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}

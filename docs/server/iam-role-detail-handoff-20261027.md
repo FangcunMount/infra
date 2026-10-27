@@ -1,5 +1,7 @@
 # IAM 角色授权详情读取错误：独立 session 交接
 
+> 本文保留交接时的未修复快照。2026-10-27后续已完成[源码修复、CI、生产部署与system验收](iam-role-details-read-fix.md)；当前状态以该修复报告及独立receipt为准。
+
 结论：已发现一条确定的代码缺陷路径，与生产页面现象吻合。角色授权查询仍调用 `WithinTx`，而当前事务模式注入的 `PlannedUnitOfWork.WithinTx` 无条件拒绝，返回 `ErrWritePlanRequired`。应先用实际请求/日志或真实装配测试闭环确认，不把静态分析直接写成生产根因已验证。当前尚未修复、未部署修复。
 
 ## 已观察事实
