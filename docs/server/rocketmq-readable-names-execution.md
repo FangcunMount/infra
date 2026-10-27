@@ -42,9 +42,9 @@
 | ✅ | T06 | IAM 授权事务、普通消息、幂等查询与双订阅接入 | 2026-10-27：IAM9b9bb9f1 / QS1c2eccc3，正式RC依赖；168本地测试包、11源码CI；三档MySQL真实readable根事务/双IAM及QS fanout各22/0/0，[证据](evidence/rocketmq-readable-names-iam-fanout-20261027.json)。IAM PR160为草稿未合并；infra PR354全部65项CI成功后已合并54387b9 |
 | ✅ | T07 | QS API/collection/worker 双存储与合并订阅接入 | 2026-10-28：四入口×三档真实readable矩阵40551016815全部12档成功，固定QS2149b4a2、每档0失败/跳过且完整清理；[完整证据](evidence/rocketmq-readable-names-qs-complete-20261028.json)。源码PR455适用29项CI成功（未选择API同步job为N/A），infra PR356全77项成功并合并；早期schema43夹具遗漏与旧成对编译失败保留，后者失败项重跑后六档成功。宿主PR455/456继续草稿，未部署 |
 | ✅ | T08 | AI command/receipt/state/ACK 及正文安全接入 | 2026-10-28：六档readable宿主验证170项实际pytest/390项报告检查，0失败/跳过且清理；[原生证据](evidence/rocketmq-readable-names-ai-native-20261028.json)。最新合并历史接入候选62f3aa3的源码CI运行40543071317全部12项成功（8档SQL、镜像、2档退役备份恢复、完整coverage）。[源码门禁](evidence/rocketmq-readable-names-ai-source-gate-20261028.json)。原生固定aae96db与最新源码的范围分别记录；父PR232旧head剩余coverage待完成、子PR233仍草稿，未合并/部署。独立成对故障及v3夹具PR234属于T11，未借此标为完成 |
-| ☐ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | 历史消费两档各12项已通过并清理，证据及旧失败保留。三库历史保护与跨路由Replan纯协议/真实存储CAS分别记录；最新宿主源码CI范围分别记录。新增[PR378](https://github.com/FangcunMount/infra/pull/378)/6e75dc26，在正式RC与readable-v1上复用原评价/报告及双存储到期dispatcher，要求两档各41项，运行40592268913尚未通过；不把纯计划证明当作完整宿主跨路由切换。宿主PR161/456/233仍草稿，未部署 |
-| ☐ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | 精确旧新ACL并集134项及CD四角色v3只读材料24项已通过；PR359已合并cacfdae0。PR361/56449c19保留逐对象删除及完整POP伴随资源拒绝保护，任何伴随资源都会阻止相关Topic删除；新原生138项验证classic retry/DLQ/POP v1三哨兵保留，运行40591335989尚未通过。v2生成实验两次失败保留，不计入发布授权或冒充v2原生保留证据；423项本地MQ验证通过。无生产资源/CD变更 |
-| ☐ | T11 | 最终宿主端到端、故障与维护/恢复演练 | 五类固定RC镜像40566443986全部成功，固定IAM91aee79/QSeb0e6dc/AI62f3aa3、原始归档和v3配置摘要；PR364已合并3b4fefdd。成对真实退出/Broker重启两档各40报告检查/7条pytest通过且清理，PR373已合并；[证据](evidence/rocketmq-readable-names-paired-native-20261028.json)。八实例独立启动40590486947待通过；[PR380](https://github.com/FangcunMount/infra/pull/380)/e6a97973提供同候选v2→v3实际切换、容器启动失败及持久化边界/前向修复，432本地测试通过，真实演练未执行。[PR379](https://github.com/FangcunMount/infra/pull/379)提供固定归档发布适配并拒绝RC，未写入Registry。[候选准备证据](evidence/rocketmq-readable-names-runtime-preparation-20261028.json)。完整T11未完成 |
+| ☐ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | 历史消费两档各12项及三库历史读/首次wire保护已通过。未来readable调度运行40592268913首档MySQL8.0.36为41/0/0，8.4待完成；[PR382](https://github.com/FangcunMount/infra/pull/382)新增原QS MySQL Committer+实际Broker跨路由Replan专项，原9项+新5项，运行40601996951尚未通过；428项本地MQ与原宿主race编译通过，编译不算原生执行。宿主PR161/456/233仍草稿，未部署 |
+| ☐ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | 精确旧新ACL134项及CD四角色只读材料24项已通过；PR359已合并。最新退役运行40591335989在PR361/56449c19上138/0/0且清理完整，实际classic retry/DLQ/POP v1三哨兵保留，逐对象删除及POP伴随拒绝保护通过；[原生证据](evidence/rocketmq-readable-names-runtime-verified-20261028.json)。v2生成实验失败保留且不进入发布授权路径，不宣称v2原生保留验证成功。当前源码回归CI及合并未完成，T10暂不勾选；无生产资源/CD变更 |
+| ☐ | T11 | 最终宿主端到端、故障与维护/恢复演练 | 五类固定RC镜像40566443986成功；八实例实际启动40590486947为18/0/0，原预算/Unix身份、只读材料、Checker、九次worker关闭/重启、无运行时DDL及完整清理通过，候选PR376全部12项CI成功并合并110db063。POP两档各35项及live恢复5项全部通过并清理；[原生证据](evidence/rocketmq-readable-names-runtime-verified-20261028.json)。成对退出/Broker重启两档各40检查/7条pytest已通过。旧新实际切换/失败前向修复运行40601520508已启动但未通过，完整T11未完成；发布适配PR379仍待源码CI，未写Registry |
 | ☐ | T12 | 稳定 SDK、三库正式依赖及固定镜像重新安装验收 | SDK候选8d99c8b的12项源码CI、三档真实存储各29项、公开readable两档各31项/live恢复5项已通过并清理；wheel/sdist独立安装各128项，SDK实现及43项外部依赖不变。[原生证据](evidence/rocketmq-readable-names-stable-native-20261028.json)。精确候选门禁PR369已合并aa93624f；SDK PR65仍草稿，未发布稳定版、宿主仍RC，等待RC完整切换门禁及正式制品/最终镜像重验 |
 | ☐ | T13 | 生产核验、暂停 CD、预置资源权限及冻结清单 | 待开始 |
 | ☐ | T14 | 维护内排空旧责任、切换八实例与新订阅/Checker 验证 | 待开始 |
@@ -59,9 +59,9 @@
 |---|---|---|
 | T07 | ✅ 四入口×三档12档真实验收；✅ 最新适用29项源码CI；infra PR356已合并 | 实现与验证已完成；宿主PR455/456待协调合并及后续固定正式依赖 |
 | T08 | ✅ 六档真实readable矩阵；✅ 最新62f3aa3全部12项源码CI，含完整coverage | 实现与验证已完成；PR232/233协调合并及后续T11/T12/T14分别记账 |
-| T09 | 三库历史读/首次wire保护；✅ 两档MySQL历史消费各12项；Replan纯契约与原生存储CAS分开证明 | readable未来调度两档各41项运行40592268913待完成；完整跨路由切换不以纯测试替代 |
-| T10 | ✅ 精确并集134项及CD材料24项；✅ 旧classic哨兵138项 | PR361最新三哨兵/POP伴随删除拒绝保护138项native及当前源码CI待完成；v2生成实验不计成功 |
-| T11 | ✅ 五个RC镜像；✅ 两档成对真实退出/Broker重启；八实例/切换与发布适配已实现 | 独立八实例启动40590486947、旧新实际切换/失败前向恢复尚未通过；POP控制第二档待完成 |
+| T09 | ✅ 历史消费12×2；✅ 未来调度8.0.36首档41项；跨路由Replan原宿主实际验证已实现 | 未来调度8.4及Replan原生两档14项运行待完成；源码/生产状态分开记录 |
+| T10 | ✅ 精确并集134项、CD材料24项；✅ 最新三哨兵138项及完整清理 | 当前PR361剩余源码回归CI和合并；v2生成实验不计成功 |
+| T11 | ✅ 五个RC镜像；✅ 八实例启动18项/候选PR376合并；✅ POP35/35/5；✅ 成对真实故障 | 旧新实际切换/失败前向修复40601520508待通过；发布适配源码CI尚未完成 |
 
 ## 生产切换及删除门禁
 
@@ -120,3 +120,5 @@
 - 2026-10-28：POP控制40566337005新增四项均实际通过，但内部末尾仍按31项而失败，251631a仅修正显式控制后的总数35；旧失败与清理保留，待真实重验。AI夹具PR234源码CI因唯一文档source-baseline-drift失败，2e142f0补审阅摘要、本地文档0错误，源码重验待完成。退役v2生成实验超时保持失败并退出发布授权路径；生产删除仍拒绝任何POP伴随资源，新三哨兵138项真实重验未通过，不勾选T10。
 
 - 2026-10-28：继续推进T09–T12，保持8/16。未来readable调度PR378/6e75dc26运行40592268913待完成；固定发布适配PR379/0093caf4已提交，432本地MQ测试通过，生产路径拒绝RC且无Registry写入；兼容v2→v3实际八实例切换/失败前向恢复PR380/e6a97973已提交，同样432本地测试及actionlint通过，须先取得独立启动40590486947成功receipt才能执行。SDK候选门禁PR369及系统记录只读审计PR370已合并aa93624f/45bfee7f。生产CD、容器、数据库和MQ资源未改变。
+
+- 2026-10-28：实际回读并下载原始报告：八实例启动18/0/0、POP公开35/35及live恢复5项、具名退役138项全部成功且隔离依赖清理完整，原始摘要已登记。候选PR376以12项源码CI成功合并110db063；当前生产CD开关只读仍为IAM/QS false、AI true，未暂停或合并宿主代码。切换演练40601520508和显式跨路由宿主Replan40601996951已启动；未来调度首档41项通过、第二档待完成。总数保持8/16，T09/T10/T11各自剩余完整门禁不省略。

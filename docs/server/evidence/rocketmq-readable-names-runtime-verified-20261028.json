@@ -1,0 +1,224 @@
+{
+  "schema": "readable-owned-runtime-gates/v1",
+  "date": "2026-10-28",
+  "production_changed": false,
+  "cd_changed": false,
+  "stable_sdk_published": false,
+  "registry_write_attempted": false,
+  "scope": "owned native validation; no business/system or production cutover claim",
+  "startup": {
+    "run": 40590486947,
+    "workflow": ".github/workflows/rocketmq-readable-startup.yml",
+    "event": "workflow_dispatch",
+    "source_sha": "1826f36d4da48e2127c5c1efcd29a832eb339dc2",
+    "report_sha256": "5ce74c465afcd299e1cad3f9bf446a74fb1a39783fc2faf5e9dadf9c3e65e1d6",
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0,
+    "candidate_sha256": "2c477e9d28af6a2f0fd9531ef6eff620966137965df92f52f2ac37c11e5060a9",
+    "sources": {
+      "iam": "91aee79cbc1b192c5879625103d7b9cbd389b15b",
+      "qs": "eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b",
+      "ai": "62f3aa3225249f291cdde7d09f1d809edbd9d398"
+    },
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true,
+      "owned_m4_material_root_removed": true
+    },
+    "all_eight_exit_zero": true,
+    "mysql_ddl": 0,
+    "mongo_ddl": 0
+  },
+  "retirement": {
+    "run": 40591335989,
+    "event": "pull_request",
+    "head_sha": "56449c197410471067ab03a5070417e2e1b06cab",
+    "artifact": "readable-retirement-c6d8b71db6e5d4313fc18668d00685cb7c8aaace",
+    "report_sha256": "c79ed4cdc7c9d2245a674e5c408306a2926f61188b33e9e9af7338bb7446d609",
+    "passed": 138,
+    "failed": 0,
+    "skipped": 0,
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "receipt": {
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "cases": {
+        "named_old_acl_only": true,
+        "named_group_preserves_retry_dlq": true,
+        "named_topic_removed_from_broker_and_nameserver": true,
+        "all_other_resources_preserved": true
+      },
+      "selected_topic": "rmq2_t_d5784a735b691b0beda4d5e5d27727b0",
+      "selected_group": "rmq2_g_caea451c856c9d070c4d98937cf3d455",
+      "retained_sentinels": [
+        "%RETRY%rmq2_g_caea451c856c9d070c4d98937cf3d455",
+        "%DLQ%rmq2_g_caea451c856c9d070c4d98937cf3d455",
+        "%RETRY%rmq2_g_caea451c856c9d070c4d98937cf3d455_rmq2_t_a52d2c8d9a6ba5229d8c34ff3f828b1e"
+      ],
+      "sentinel_scope": "actual classic retry, DLQ and POP v1; no native v2 preservation claim",
+      "membership_sha256": "fea7c7a245f544846e562de4dfb68a3e0d8cd92ce3e9e3ead9da0e7bbdeee173",
+      "offsets_sha256": "0a75b5a3f3bd6c276fa827530273f285929ce2f46d5f910d6caca14a1ae5d9a6",
+      "before_metadata_sha256": "6bcc4f04291420ccca218761d84108cdf5e24ba5280fd4e88350be3a21ddc10e",
+      "after_metadata_sha256": "a0a2653cd924c55a8ad4d6b3b3c363c91ad384a3d81e7572e2671c642f32626f",
+      "scope": "selected empty owned CI resources only; actual classic and v1 sentinels retained, all selected POP companions refused; no production authorization"
+    },
+    "scope": "selected empty owned resources and actual classic retry/DLQ/POPv1 sentinels; any selected Topic POP companion refuses deletion; no native v2 preservation claim"
+  },
+  "pop_controls": {
+    "run": 40590402733,
+    "event": "pull_request",
+    "head_sha": "251631a525e609b76304edc2480e6edd47ff3379",
+    "profiles": [
+      {
+        "artifact": "rocketmq-readable-0-6de7345738dfcaafdbb3cfd127eeb2932ae2b99e",
+        "report_sha256": "90491e8c6271da1d79458bb98a5f1cecb44fed659e283d4addae2958366e7d8e",
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "case_ids": [
+          "public_go_mongo_exact_business_and_wire_set",
+          "public_go_mongo_half_then_commit",
+          "public_go_mongo_half_then_rollback",
+          "public_go_mongo_new_instance_crash-committed",
+          "public_go_mongo_new_instance_crash-prepared",
+          "public_go_mysql_exact_business_and_wire_set",
+          "public_go_mysql_half_then_commit",
+          "public_go_mysql_half_then_rollback",
+          "public_go_mysql_new_instance_crash-committed",
+          "public_go_mysql_new_instance_crash-prepared",
+          "public_go_real_database_outage_unknown_then_recovery",
+          "public_go_same_process_client_isolation",
+          "public_go_untrusted_ca_startup_really_drained",
+          "public_python_cross_language_exact_business_and_wire_set",
+          "public_python_half_then_commit",
+          "public_python_half_then_rollback",
+          "public_python_real_database_outage_unknown_then_recovery",
+          "public_python_same_process_client_isolation",
+          "public_python_untrusted_ca_startup_really_drained",
+          "public_sdk-go_to_sdk-python_crash-committed",
+          "public_sdk-python_to_sdk-go_crash-committed",
+          "public_sdk-python_to_sdk-python_crash-committed",
+          "public_sdk-python_to_sdk-python_crash-prepared",
+          "readable_pop_go_acked_and_closed_responsibility_zero",
+          "readable_pop_go_held_future_checkpoint_blocks_drain",
+          "readable_pop_python_acked_and_closed_responsibility_zero",
+          "readable_pop_python_held_future_checkpoint_blocks_drain",
+          "v2_existing_configuration_conflict_refused",
+          "v2_existing_type_conflict_refuses_all_resource_mutations",
+          "v2_idempotent_typed_resources_and_minimum_owner_acls",
+          "v2_sdk-go_three_physical_inputs_share_two_handler_budget",
+          "v2_sdk-go_wrong_owner_broker_denied_without_business",
+          "v2_sdk-python_three_physical_inputs_share_two_handler_budget",
+          "v2_sdk-python_wrong_owner_broker_denied_without_business",
+          "v3_go_python_infra_exact_route_vectors"
+        ],
+        "source_sha256": "b6f1c25c7f7fc34f516c409ba060b04485fdb8adc5f2ab7236e222a1e2dfb8b3"
+      },
+      {
+        "artifact": "rocketmq-readable-1-6de7345738dfcaafdbb3cfd127eeb2932ae2b99e",
+        "report_sha256": "ff443d62f7ac42c3220241d28dc3083d333368a9d82d0fe6d066b551fd50da8a",
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "case_ids": [
+          "public_go_mongo_exact_business_and_wire_set",
+          "public_go_mongo_half_then_commit",
+          "public_go_mongo_half_then_rollback",
+          "public_go_mongo_new_instance_crash-committed",
+          "public_go_mongo_new_instance_crash-prepared",
+          "public_go_mysql_exact_business_and_wire_set",
+          "public_go_mysql_half_then_commit",
+          "public_go_mysql_half_then_rollback",
+          "public_go_mysql_new_instance_crash-committed",
+          "public_go_mysql_new_instance_crash-prepared",
+          "public_go_real_database_outage_unknown_then_recovery",
+          "public_go_same_process_client_isolation",
+          "public_go_untrusted_ca_startup_really_drained",
+          "public_python_cross_language_exact_business_and_wire_set",
+          "public_python_half_then_commit",
+          "public_python_half_then_rollback",
+          "public_python_real_database_outage_unknown_then_recovery",
+          "public_python_same_process_client_isolation",
+          "public_python_untrusted_ca_startup_really_drained",
+          "public_sdk-go_to_sdk-python_crash-committed",
+          "public_sdk-python_to_sdk-go_crash-committed",
+          "public_sdk-python_to_sdk-python_crash-committed",
+          "public_sdk-python_to_sdk-python_crash-prepared",
+          "readable_pop_go_acked_and_closed_responsibility_zero",
+          "readable_pop_go_held_future_checkpoint_blocks_drain",
+          "readable_pop_python_acked_and_closed_responsibility_zero",
+          "readable_pop_python_held_future_checkpoint_blocks_drain",
+          "v2_existing_configuration_conflict_refused",
+          "v2_existing_type_conflict_refuses_all_resource_mutations",
+          "v2_idempotent_typed_resources_and_minimum_owner_acls",
+          "v2_sdk-go_three_physical_inputs_share_two_handler_budget",
+          "v2_sdk-go_wrong_owner_broker_denied_without_business",
+          "v2_sdk-python_three_physical_inputs_share_two_handler_budget",
+          "v2_sdk-python_wrong_owner_broker_denied_without_business",
+          "v3_go_python_infra_exact_route_vectors"
+        ],
+        "source_sha256": "b6f1c25c7f7fc34f516c409ba060b04485fdb8adc5f2ab7236e222a1e2dfb8b3"
+      },
+      {
+        "artifact": "rocketmq-readable-2-6de7345738dfcaafdbb3cfd127eeb2932ae2b99e",
+        "report_sha256": "126375c6adbc5ea30891799c54573f8245a9f2a0ff7b3a32a075b84df419d462",
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        },
+        "case_ids": [
+          "public_python_surviving_producer_broker_sigkill_real_checks",
+          "v2_existing_configuration_conflict_refused",
+          "v2_existing_type_conflict_refuses_all_resource_mutations",
+          "v2_idempotent_typed_resources_and_minimum_owner_acls",
+          "v3_go_python_infra_exact_route_vectors"
+        ],
+        "source_sha256": null
+      }
+    ],
+    "previous_count_failure_retained": 40566337005,
+    "production_drain_not_claimed": true
+  },
+  "pending": {
+    "compatible_cutover": {
+      "run": 40601520508,
+      "sha": "e6a97973ee9ad37c24242b591e19d7ddcacc1e5e",
+      "complete": false
+    },
+    "host_replan": {
+      "pr": 382,
+      "run": 40601996951,
+      "complete": false
+    },
+    "future_dispatch": {
+      "run": 40592268913,
+      "complete": false
+    }
+  }
+}
