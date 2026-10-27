@@ -14,7 +14,7 @@ from final_image_candidate import ci_guard
 import image_start_fixture as fixtures
 from provision_v2 import Admin
 from config import render
-from acceptance import client, request, verify
+from acceptance import accepted, client, request, verify
 
 
 def main():
@@ -86,6 +86,34 @@ def main():
             time.sleep(2)
         report['stage']='authenticated_acceptance'
         cases=verify(base,ui)
+        report['stage']='untrusted_certificate_rejection'
+        bad_ca=fixture.directory/'untrusted.crt'
+        fixture.run(['openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1',
+            '-subj','/CN=not-the-broker','-keyout',str(fixture.directory/'untrusted.key'),'-out',str(bad_ca)])
+        bad_cfg=fixture.directory/'untrusted-dashboard'
+        render(bad_cfg,ui,account,bad_ca.read_bytes())
+        fixture.run(['sudo','chown','-R','10001:10001',str(bad_cfg)])
+        bad_name=fixture.project+'-untrusted';bad_port=fixture.port()
+        service=doc['services']['dashboard']
+        fixture.run(['docker','run','-d','--name',bad_name,'--label',fixture.label,
+            '--network',fixture.network,'--user','10001:10001','--read-only','--memory','512m',
+            '--tmpfs','/tmp:rw,nosuid,size=67108864,uid=10001,gid=10001',
+            '-v',str(bad_cfg)+':/run/dashboard:ro','-p','127.0.0.1:'+str(bad_port)+':8082',
+            '--entrypoint','java',service['image'],*service['command']])
+        bad_base='http://127.0.0.1:'+str(bad_port);deadline=time.monotonic()+120
+        while True:
+            try:
+                if request(client(),bad_base,'/login/check.query')[0]==200:break
+            except (OSError,ValueError):pass
+            if time.monotonic()>deadline:raise RuntimeError('untrusted_dashboard_start_timeout')
+            time.sleep(2)
+        session=client()
+        assert accepted(request(session,bad_base,'/login/login.do',ui)), 'untrusted_test_login_failed'
+        assert not accepted(request(session,bad_base,'/topic/list.query')), 'untrusted_ca_accepted'
+        logs=fixture.run(['docker','logs',bad_name]).stdout+fixture.run(['docker','logs',bad_name]).stderr
+        cases['untrusted_ca_rejected']=any(marker in logs for marker in ('SSLHandshakeException','PKIX','certificate_unknown'))
+        fixture.run(['docker','rm','-f',bad_name])
+        report['stage']='resource_and_network_acceptance'
         cases['scoped_firewall_applied']=True
         # Foreign Docker bridge cannot use the new host management relay.
         rejected=fixture.run(['docker','run','--rm','--network','bridge','--entrypoint','bash',
