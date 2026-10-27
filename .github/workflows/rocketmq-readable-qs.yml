@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: 893f52a9db409a7b5304ff83f116f585b53a3994
+          ref: 2149b4a2dd873ef16bb09f5ad0f1a60faeb53149
           path: .qs-acceptance
       - uses: actions/setup-go@v6
         with:
@@ -61,7 +61,7 @@ jobs:
           assert data['passed'] > 0 and data['failed'] == data['skipped'] == 0
           assert host['manifest_version'] == 3 and host['naming_scheme'] == 'readable-v1'
           assert host['sdk_module']['Version'] == 'v0.6.0-rc.1'
-          assert host['source_sha'] == '893f52a9db409a7b5304ff83f116f585b53a3994'
+          assert host['source_sha'] == '2149b4a2dd873ef16bb09f5ad0f1a60faeb53149'
           assert host['source_clean_after']
           assert host['native_receipt']['passed'] > 0
           assert host['native_receipt']['failed'] == host['native_receipt']['skipped'] == 0
