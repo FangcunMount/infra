@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
-          ref: 996e34cde72c210bc29123f05c9286ecb14f2355
+          ref: 5c2e3cd155e67c0f766e93bf95238b16fc219b5f
           path: .sdk-acceptance
       - uses: actions/setup-go@v6
         with:

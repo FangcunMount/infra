@@ -25,7 +25,7 @@
 | 里程碑 | 任务 | 状态 | 完成门禁 |
 |---|---|---|---|
 | N-P 基线与命名 | T01–T02 | 实现与验证完成，待合并 | 完整盘点、旧新映射及规则冻结 |
-| N-SDK 双语言路由 | T03–T05 | 待开始 | 双语言契约和真实SDK通过、预发布 |
+| N-SDK 双语言路由 | T03–T05 | 进行中：T03/T04已合并，T05重验 | 双语言契约和真实SDK通过、预发布 |
 | N-HOST 三库接入 | T06–T09 | 待开始 | 业务、历史读取和调度保持 |
 | N-VERIFY 演练与发布 | T10–T12 | 待开始 | ACL/完整故障演练/正式制品通过 |
 | N-PROD 切换与退役 | T13–T16 | 待开始 | system及新业务验收、退役闭环 |
@@ -38,9 +38,9 @@
 | ✅ | T02 | 冻结十个 Topic、九个 Group、v3 manifest 与共享向量，验证命名冲突 | 2026-10-27：v3命名4项、v2回归3项通过；12路由/10Topic/9Group；共享向量已提供，待合并 |
 | ✅ | T03 | Go SDK 命名方案、可信路由解析和活动/历史边界 | 2026-10-27：make check完整通过；活动/历史隔离、Aborted显式Replan及原wire保护通过；[本地证据](evidence/rocketmq-readable-names-sdk-local-20261027.json)，SDK PR60已合并d719b6fb，10个PR CI全过 |
 | ✅ | T04 | Python SDK 对应能力与生命周期保持 | 2026-10-27：Python48/0/0、ruff/mypy通过；历史不注册、生命周期/取消和原wire通过；SDK PR60已合并d719b6fb，10个PR CI全过 |
-| ☐ | T05 | 跨语言真实 Broker 验收与固定 SDK 预发布 | 进行中：隔离v3真实SDK流水线已实现，SDK固定6b93f732；原SDK CI和本项真实验收待通过 |
-| ☐ | T06 | IAM 授权事务、普通消息、幂等查询与双订阅接入 | 待开始 |
-| ☐ | T07 | QS API/collection/worker 双存储与合并订阅接入 | 待开始 |
+| ☐ | T05 | 跨语言真实 Broker 验收与固定 SDK 预发布 | 进行中：SDK PR60/61已合并；两档Python源码/wheel各159通过且资产摘要相同；真实存活恢复专项5/5通过；完整public首档29通过后NORMAL探针命名字段遗漏失败，SDK PR62修正，候选5c2e3cd重验，尚未发布 |
+| ☐ | T06 | IAM 授权事务、普通消息、幂等查询与双订阅接入 | 本地实现中：五包race通过；等待固定预发布依赖与真实双订阅重验 |
+| ☐ | T07 | QS API/collection/worker 双存储与合并订阅接入 | 本地实现中：options、共享owner及答卷codec通过；AI桥接/调度/deferred未完成 |
 | ☐ | T08 | AI command/receipt/state/ACK 及正文安全接入 | 待开始 |
 | ☐ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | 待开始 |
 | ☐ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | 待开始 |
@@ -74,3 +74,5 @@
 - 2026-10-27：T03/T04实现及本地必需验证完成，4/16；SDK PR60、infra PR352已提交。Go make check/48 Python/395 infra纯测试通过；真实Broker与发布未完成，生产未变更。
 
 - 2026-10-27：SDK PR60已合并d719b6fb，10个PR CI通过。初次双档真实v3验收各5通过/1失败：真实Python存活Producer在Broker SIGKILL后回查与消费通过，报告旧v2用例名断言失败；[失败证据](evidence/rocketmq-readable-names-initial-native-20261027.json)保留。已修正命名断言并将完整public与live恢复分三档独立验收，固定预发布候选SDK996e34cd（PR61）；T05仍未完成。IAM仅本地接入开发，正式固定依赖重验未完成，T06不打勾。生产未变更。
+
+- 2026-10-27：SDK PR61已合并bfe6dba5，候选996e34cd两档源码与独立wheel各159/0/0、制品逐字节一致；实际readable存活Producer恢复专项5/5。完整公开SDK首档29通过后NORMAL探针缺命名方案而失败，失败和清理证据见[报告](evidence/rocketmq-readable-names-public-native-retry-20261027.json)。SDK PR62仅修正探针为复用manifest Inputs，新候选5c2e3cd；T05未完成、版本未发布。IAM五包race通过；QS可信owner解析、MySQL/Mongo私有计划与答卷路由本地通过，仍属接入开发，不标成宿主完整验收。生产未变更。
