@@ -51,3 +51,14 @@
 离线审核现在要求完整新鲜Broker Topic名称快照；发现所选Topic存在任意`%RETRY%<group>_<topic>`或`%RETRY%<group>+<topic>`伴随资源，即拒绝生成删除清单，不修改Broker开关，也不把伴随对象隐含纳入删除范围。原138项隔离报告只验证classic retry/DLQ sentinel；增强专项增加未选Topic上的POP v1/v2 sentinel并核验全部保留，尚待真实CI。旧报告继续保留，不将它表述为已覆盖所有POP伴随删除。
 
 上游：[AdminBrokerProcessor](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/broker/src/main/java/org/apache/rocketmq/broker/processor/AdminBrokerProcessor.java)，核对blob `876a72fa29cce1f92addd94b332168ebcacd0b77`。
+
+
+## POP v2 保护夹具的真实生成路径
+
+增强运行40560478215失败保留：5.5.1的`updateTopic`按TopicValidator拒绝内部POP v2名称中的`+`，因此不能通过普通建Topic命令制造此哨兵。此失败发生在所选旧资源删除之前，owned环境已完整清理；不是生产故障，也不是删除成功。
+
+修正为真正的POP路径：在原隔离项目中复用已有可读NORMAL survey输入、原发布/订阅账号及最小权限，只发布一次随机的合成运输正文；真实SimpleConsumer取到这一条后不ACK并关闭所有本地客户端，由Broker revive自然生成`%RETRY%<group>+<topic>`。此未选中的retry责任贯穿后续具名删除并核对保留；不修改TopicValidator、Broker开关、账号或凭据，不向生产发送消息。
+
+classic retry/DLQ及POP v1哨兵继续由原管理入口创建；新增原生v2哨兵必须存在于真实metadata后才允许开始删除。最终仍要求四个哨兵全部保留、其他metadata/ACL不变、原138项与清理通过；修正后真实运行尚未完成。原生v2的合成未ACK责任只随其owned Compose环境整体退出，不被表述为生产责任已清零。
+
+源码依据：[5.5.1 TopicValidator](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/common/src/main/java/org/apache/rocketmq/common/topic/TopicValidator.java)、[5.5.1 PopReviveService](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/broker/src/main/java/org/apache/rocketmq/broker/processor/PopReviveService.java)。

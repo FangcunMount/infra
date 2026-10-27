@@ -8,6 +8,7 @@ import hashlib
 import re
 import secrets
 import subprocess
+import time
 
 from provision_v2 import Admin, preflight
 from readable_transition import digest, validate_transition
@@ -50,7 +51,7 @@ def single_cluster(output):
         raise RuntimeError('owned single Broker membership differs')
 
 
-def run_owned_retirement(container, project, previous, current, accounts, receipt):
+def run_owned_retirement(container, project, previous, current, accounts, receipt, *, pop_v2_sentinel=None):
     validate_transition(previous, current)
     if (not re.fullmatch(r'rocketmq-m2-[0-9a-f]{12}', project)
             or receipt.get('failed') != 0 or receipt.get('skipped') != 0
@@ -80,9 +81,22 @@ def run_owned_retirement(container, project, previous, current, accounts, receip
         # Newly created, empty sentinel Topics make accidental retry/DLQ cleanup
         # observable. They belong only to this isolated project.
         unselected_topic = next(r['physical_topic'] for r in previous['routes'] if r['physical_topic'] != topic)
+        from pop_retry_sentinel import receipt as sentinel_receipt, MARKER
+        import json
+        sentinel_route = next(r for r in current['routes'] if r['topic'] == 'qs.survey.lifecycle'
+                              and r['message_type'] == 'NORMAL' and r.get('subscription') == 'qs-worker')
+        sentinel_receipt(MARKER + json.dumps(pop_v2_sentinel), sentinel_route)
+        pop_v2_topic = pop_v2_sentinel['retry_topic']
+        # '+' is reserved to internal POP creation and rejected by updateTopic.
+        # Require the actual revive path from a real unacked delivery instead.
+        deadline = time.monotonic() + 90
+        while pop_v2_topic not in metadata['topicConfigTable']:
+            if time.monotonic() >= deadline:
+                raise RuntimeError('actual POP v2 retry was not created by Broker revive')
+            time.sleep(1)
+            metadata = admin.metadata(snapshot)
         sentinels = ['%RETRY%' + group, '%DLQ%' + group,
-                     '%RETRY%' + group + '_' + unselected_topic,
-                     '%RETRY%' + group + '+' + unselected_topic]
+                     '%RETRY%' + group + '_' + unselected_topic]
         if any(name in metadata['topicConfigTable'] for name in sentinels):
             raise RuntimeError('owned sentinel already exists')
         for name in sentinels:
@@ -121,7 +135,8 @@ def run_owned_retirement(container, project, previous, current, accounts, receip
         return dict(passed=4, failed=0, skipped=0, cases=dict(
             named_old_acl_only=True, named_group_preserves_retry_dlq=True,
             named_topic_removed_from_broker_and_nameserver=True, all_other_resources_preserved=True),
-            selected_topic=topic, selected_group=group, retained_sentinels=sentinels,
+            selected_topic=topic, selected_group=group, retained_sentinels=sentinels + [pop_v2_topic],
+            pop_v2_generation=pop_v2_sentinel,
             membership_sha256=hashlib.sha256(membership.encode()).hexdigest(),
             offsets_sha256=hashlib.sha256(offsets.encode()).hexdigest(),
             before_metadata_sha256=digest(before), after_metadata_sha256=digest(after),

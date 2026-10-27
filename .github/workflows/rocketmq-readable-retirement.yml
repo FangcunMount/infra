@@ -1,7 +1,7 @@
 name: RocketMQ readable named empty resource retirement
 on:
   pull_request:
-    paths: ['scripts/rocketmq/provision_v2.py', 'scripts/rocketmq/readable_transition.py', 'scripts/rocketmq/test_readable_transition.py', 'scripts/rocketmq/m3_resources.py', 'components/rocketmq/serverd-routes-readable-v3.json', 'scripts/rocketmq/readable_retirement_native.py', 'scripts/rocketmq/test_readable_retirement_native.py', '.github/workflows/rocketmq-readable-retirement.yml']
+    paths: ['scripts/rocketmq/provision_v2.py', 'scripts/rocketmq/readable_transition.py', 'scripts/rocketmq/test_readable_transition.py', 'scripts/rocketmq/m3_resources.py', 'components/rocketmq/serverd-routes-readable-v3.json', 'scripts/rocketmq/readable_retirement_native.py', 'scripts/rocketmq/pop_retry_sentinel.py', 'scripts/rocketmq/test_pop_retry_sentinel.py', 'scripts/rocketmq/test_readable_retirement_native.py', '.github/workflows/rocketmq-readable-retirement.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -67,7 +67,10 @@ jobs:
           retirement = proof['retirement_fixture']
           assert retirement['passed'] == 4 and retirement['failed'] == retirement['skipped'] == 0
           assert all(retirement['cases'].values())
-          assert len(retirement['retained_sentinels']) == 2
+          assert len(retirement['retained_sentinels']) == 4
+          generated=retirement['pop_v2_generation']
+          assert generated['received']==1 and generated['ack_calls']==0 and generated['clients_closed']
+          assert generated['retry_topic'] in retirement['retained_sentinels']
           assert data['cleanup'] == dict(project_containers_remaining=False,
               compose_down_succeeded=True, probe_process_groups_drained=True,
               private_fixture_directory_removed=True)
