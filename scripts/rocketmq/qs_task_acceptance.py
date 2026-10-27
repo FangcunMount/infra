@@ -6,6 +6,7 @@ import re
 import secrets
 
 from provision_v2 import provision
+from readable_host_acceptance import readable_manifest, record_readable_fixture
 from routes import consumer_group_v2, physical_topic_v2, validate_v2
 from iam_acceptance import host_failure_summary, retain_private_host_output
 
@@ -17,7 +18,7 @@ CASES = frozenset(('constructor_no_ddl', 'half_invisible', 'original_task_witnes
                    'original_write_abort_atomic', 'stale_schedule_cannot_commit', 'flag_off_retains_original_execution'))
 
 
-def task_manifest():
+def task_manifest(*, readable=False):
     topic, subscription = 'qs.plan.task', 'qs-m3-task-observer'
     route = {'id': 'qs-task-native', 'topic': topic, 'subscription': subscription,
              'message_type': 'TRANSACTION', 'owner': 'qs.mysql', 'route_revision': 'm3-1',
@@ -42,7 +43,7 @@ def task_manifest():
         manifest['accounts']['qs-normal-' + suffix] = {'publish': [], 'subscriptions': [
             identity for identity in normal_ids if identity.endswith('-' + suffix)]}
     validate_v2(manifest)
-    return manifest
+    return readable_manifest(manifest) if readable else manifest
 
 
 def parse_task_receipt(output):
@@ -61,7 +62,7 @@ def parse_task_receipt(output):
     return receipts[0]
 
 
-def run_qs_task_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None):
+def run_qs_task_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, *, readable=False):
     source = source.resolve()
     if not (source / 'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS host source required')
@@ -71,7 +72,9 @@ def run_qs_task_host(source, directory, broker, project, grpc_port, mysql_port, 
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('fixed published SDK without local replace required')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
-    manifest = task_manifest()
+    manifest = task_manifest(readable=readable)
+    if readable:
+        record_readable_fixture(module, manifest, proof)
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4), 'password': secrets.token_hex(32)}
                 for role in manifest['accounts']}
     proof['provision'] = provision(broker, manifest, accounts)

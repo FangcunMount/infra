@@ -6,6 +6,7 @@ import re
 import secrets
 
 from provision_v2 import provision
+from readable_host_acceptance import readable_manifest, record_readable_fixture
 from routes import consumer_group_v2, physical_topic_v2, validate_v2
 from iam_acceptance import host_failure_summary, retain_private_host_output
 
@@ -20,7 +21,7 @@ CASES = EVALUATION_CASES | FAILURE_CASES
 
 
 
-def evaluation_manifest():
+def evaluation_manifest(*, readable=False):
     topic, subscription = 'qs.evaluation.lifecycle', 'qs-m3-evaluation-observer'
     route = {'id': 'qs-evaluation-native', 'topic': topic, 'subscription': subscription,
              'message_type': 'TRANSACTION', 'owner': 'qs.mysql', 'route_revision': 'm3-1',
@@ -37,7 +38,7 @@ def evaluation_manifest():
     manifest['accounts']['qs-failure-producer'] = {'owner': 'qs.mysql', 'publish': [failure['id']], 'subscriptions': []}
     manifest['accounts']['qs-failure-observer'] = {'publish': [], 'subscriptions': [failure['id']]}
     validate_v2(manifest)
-    return manifest
+    return readable_manifest(manifest) if readable else manifest
 
 
 def parse_evaluation_receipt(output):
@@ -79,7 +80,7 @@ def parse_host_receipt(output):
                 failure_entry=failure)
 
 
-def run_qs_evaluation_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None):
+def run_qs_evaluation_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, *, readable=False):
     source = source.resolve()
     if not (source / 'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS host source required')
@@ -89,7 +90,9 @@ def run_qs_evaluation_host(source, directory, broker, project, grpc_port, mysql_
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('fixed published SDK without local replace required')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
-    manifest = evaluation_manifest()
+    manifest = evaluation_manifest(readable=readable)
+    if readable:
+        record_readable_fixture(module, manifest, proof)
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4), 'password': secrets.token_hex(32)}
                 for role in manifest['accounts']}
     proof['provision'] = provision(broker, manifest, accounts)

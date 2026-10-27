@@ -6,6 +6,7 @@ import re
 import secrets
 
 from provision_v2 import provision
+from readable_host_acceptance import readable_manifest, record_readable_fixture
 from routes import consumer_group_v2, physical_topic_v2, validate_v2
 from iam_acceptance import host_failure_summary, retain_private_host_output
 
@@ -21,7 +22,7 @@ CASES = frozenset((
     'mixed_protocol_marker_rejected'))
 
 
-def answer_manifest():
+def answer_manifest(*, readable=False):
     topic, subscription = 'qs.evaluation.lifecycle', 'qs-m3-answer-observer'
     route = {'id': 'qs-answer-native', 'topic': topic, 'subscription': subscription,
              'message_type': 'TRANSACTION', 'owner': 'qs.mongo', 'route_revision': 'm3-1',
@@ -33,7 +34,7 @@ def answer_manifest():
                 'accounts': {'qs-answer-producer': {'owner': 'qs.mongo', 'publish': [route['id']], 'subscriptions': []},
                              'qs-answer-observer': {'publish': [], 'subscriptions': [route['id']]}}}
     validate_v2(manifest)
-    return manifest
+    return readable_manifest(manifest) if readable else manifest
 
 
 def parse_answer_receipt(output):
@@ -53,7 +54,28 @@ def parse_answer_receipt(output):
     return receipts[0]
 
 
-def run_qs_answer_host(source, directory, broker, project, grpc_port, mongo_port, ca, run, proof, private_log=None, *, faults=False, native_runner=None, proxy_start=None):
+def answer_failure_signals(raw):
+    # Only authored fixed labels are exportable; never forward captured values.
+    markers = {
+        'root_wait_timeout': 'half preparation did not reach host',
+        'returned_before_root': 'submission returned before original root',
+        'admission_closed': 'transaction admission closed',
+        'sender_admission_unavailable': 'transaction sender admission unavailable',
+        'invalid_plan': 'invalid frozen transaction plan',
+        'binding_mismatch': 'transaction binding mismatch',
+        'all_halves_not_prepared': 'all half messages must be confirmed before local execution',
+        'half_audit_failed': 'half_audit_failed',
+        'business_binding_differs': 'frozen submission business binding differs',
+        'input_conflict': 'transaction idempotency key has different business input',
+        'deadline': 'context deadline exceeded',
+        'unavailable': 'code = Unavailable',
+        'permission_denied': 'code = PermissionDenied',
+        'unauthenticated': 'code = Unauthenticated',
+    }
+    return sorted(label for label, marker in markers.items() if marker in raw)
+
+
+def run_qs_answer_host(source, directory, broker, project, grpc_port, mongo_port, ca, run, proof, private_log=None, *, faults=False, native_runner=None, proxy_start=None, readable=False):
     source = source.resolve()
     if not (source / 'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS host source required')
@@ -63,9 +85,13 @@ def run_qs_answer_host(source, directory, broker, project, grpc_port, mongo_port
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('fixed published SDK without local replace required')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
+    if readable and faults:
+        raise RuntimeError('readable host uses a separate non-fault fixture')
     if faults and module.get('Version') != 'v0.5.0-rocketmq-tx.2':
         raise RuntimeError('original AnswerSheet faults require fixed SDK tx.2')
-    manifest = answer_manifest()
+    manifest = answer_manifest(readable=readable)
+    if readable:
+        record_readable_fixture(module, manifest, proof)
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4), 'password': secrets.token_hex(32)}
                 for role in manifest['accounts']}
     proof['provision'] = provision(broker, manifest, accounts)
@@ -102,6 +128,7 @@ def run_qs_answer_host(source, directory, broker, project, grpc_port, mongo_port
     proof['private_output_sha256'] = hashlib.sha256(raw.encode()).hexdigest()
     proof['exit_code'] = result.returncode
     proof['diagnostics'] = host_failure_summary(raw)
+    proof['diagnostics']['signals'] = answer_failure_signals(raw)
     proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'm3_answersheet_broker_integration_test\.go:(\d+)', raw)))[:32]
     if private_log is not None:
         retain_private_host_output(private_log, raw)

@@ -6,6 +6,7 @@ import re
 import secrets
 
 from provision_v2 import provision
+from readable_host_acceptance import readable_manifest, record_readable_fixture
 from routes import consumer_group_v2, physical_topic_v2, validate_v2
 from iam_acceptance import host_failure_summary, retain_private_host_output
 
@@ -18,7 +19,7 @@ CASES = frozenset((
     'closed_admission_no_business', 'v2_authority_audit'))
 
 
-def report_manifest():
+def report_manifest(*, readable=False):
     topic, subscription = 'qs.evaluation.lifecycle', 'qs-m3-report-observer'
     route = {'id': 'qs-report-native', 'topic': topic, 'subscription': subscription,
              'message_type': 'TRANSACTION', 'owner': 'qs.mongo', 'route_revision': 'm3-1',
@@ -30,7 +31,7 @@ def report_manifest():
                 'accounts': {'qs-report-producer': {'owner': 'qs.mongo', 'publish': [route['id']], 'subscriptions': []},
                              'qs-report-observer': {'publish': [], 'subscriptions': [route['id']]}}}
     validate_v2(manifest)
-    return manifest
+    return readable_manifest(manifest) if readable else manifest
 
 
 def parse_report_receipt(output):
@@ -50,7 +51,7 @@ def parse_report_receipt(output):
     return receipts[0]
 
 
-def run_qs_report_host(source, directory, broker, project, grpc_port, mongo_port, ca, run, proof, private_log=None):
+def run_qs_report_host(source, directory, broker, project, grpc_port, mongo_port, ca, run, proof, private_log=None, *, readable=False):
     source = source.resolve()
     if not (source / 'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS host source required')
@@ -60,7 +61,9 @@ def run_qs_report_host(source, directory, broker, project, grpc_port, mongo_port
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('fixed published SDK without local replace required')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
-    manifest = report_manifest()
+    manifest = report_manifest(readable=readable)
+    if readable:
+        record_readable_fixture(module, manifest, proof)
     accounts = {role: {'username': 'm3-' + role + '-' + secrets.token_hex(4), 'password': secrets.token_hex(32)}
                 for role in manifest['accounts']}
     proof['provision'] = provision(broker, manifest, accounts)

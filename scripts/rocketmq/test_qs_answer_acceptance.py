@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from qs_answer_acceptance import CASES, answer_manifest, parse_answer_receipt
+from qs_answer_acceptance import CASES, answer_manifest, parse_answer_receipt, answer_failure_signals
 from routes import permissions_v2
 
 
@@ -28,3 +28,10 @@ class QSAnswerAcceptanceTest(unittest.TestCase):
                     output.replace('actual_protobuf_service_over_bufconn', 'fake_service')):
             with self.assertRaises(RuntimeError):
                 parse_answer_receipt(bad)
+
+    def test_failure_signals_export_only_fixed_labels(self):
+        private = 'secret-body-tenant-token'
+        raw = private + '\nsubmission returned before original root\ncontext deadline exceeded: ' + private
+        self.assertEqual(answer_failure_signals(raw), ['deadline', 'returned_before_root'])
+        self.assertNotIn(private, json.dumps(answer_failure_signals(raw)))
+        self.assertEqual(answer_failure_signals(private), [])
