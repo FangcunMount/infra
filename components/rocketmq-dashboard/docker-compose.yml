@@ -1,0 +1,66 @@
+name: rocketmq-dashboard
+services:
+  dashboard:
+    image: apacherocketmq/rocketmq-dashboard:2.1.0@sha256:81fbd0f5d82c79a50899b48bf18449ee1c52e1deb0246999a90291c786fbeabb
+    platform: linux/amd64
+    user: "10001:10001"
+    init: true
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    cpus: 0.5
+    pids_limit: 256
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=67108864,uid=10001,gid=10001"]
+    entrypoint: [java]
+    command:
+      - -Xms64m
+      - -Xmx224m
+      - -XX:MaxMetaspaceSize=128m
+      - -XX:MaxDirectMemorySize=32m
+      - -Xss256k
+      - -XX:ActiveProcessorCount=1
+      - -XX:+ExitOnOutOfMemoryError
+      - -Duser.home=/tmp
+      - -Dtls.enable=true
+      - -Dtls.test.mode.enable=false
+      - -Dtls.client.authServer=true
+      - -Dtls.client.trustCertPath=/run/dashboard/ca.crt
+      - -Drocketmq.namesrv.addr=nameserver:9876
+      - -Dcom.rocketmq.sendMessageWithVIPChannel=false
+      - -jar
+      - /rocketmq-dashboard.jar
+      - --spring.config.additional-location=file:/run/dashboard/application.yml
+    volumes:
+      - ${DASHBOARD_CONFIG_ROOT:?private rendered configuration required}:/run/dashboard:ro
+    networks: [broker]
+    logging: &logging
+      driver: json-file
+      options: {max-size: 10m, max-file: "3"}
+  gateway:
+    depends_on: [dashboard]
+    image: nginx:1.30.6-alpine@sha256:84ed8c0dd296c188bfc24ed506f46589e9285fb0b11cf3a04d91d524d3067e11
+    platform: linux/amd64
+    user: "10001:10001"
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 48m
+    cpus: 0.1
+    pids_limit: 64
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=8388608,uid=10001,gid=10001"]
+    entrypoint: [nginx]
+    command: [-c, /etc/nginx/dashboard.conf, -g, "daemon off;"]
+    ports:
+      - ${DASHBOARD_BIND_IP:?Tailscale IPv4 required}:18082:8082
+      - ${DASHBOARD_BIND_IP:?Tailscale IPv4 required}:10911:10911
+    volumes:
+      - ./nginx.conf:/etc/nginx/dashboard.conf:ro
+    networks: [broker]
+    logging: *logging
+networks:
+  broker:
+    external: true
+    name: ${DASHBOARD_BROKER_NETWORK:-rocketmq_rocketmq}
