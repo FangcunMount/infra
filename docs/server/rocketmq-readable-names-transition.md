@@ -24,3 +24,11 @@
 已核对5.5.1上游实现：`deleteSubGroup`使用具体Broker的`-b`分支，不能使用会连带删除重试/DLQ Topic的`-c`分支；offset清理须在导出后明确指定。`deleteTopic`使用具名cluster并同时清理Broker/NameServer路由，执行前必须重新核对cluster成员仍为冻结的目标。`deleteAcl`始终指定单个具名resource，不能省略资源而删除整个ACL。实际退役工具和真实隔离验收尚未完成，不能据此文档执行删除。
 
 来源：[DeleteSubscriptionGroupCommand](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/tools/src/main/java/org/apache/rocketmq/tools/command/consumer/DeleteSubscriptionGroupCommand.java)、[DeleteTopicSubCommand](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/tools/src/main/java/org/apache/rocketmq/tools/command/topic/DeleteTopicSubCommand.java)、[DeleteAclSubCommand](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/tools/src/main/java/org/apache/rocketmq/tools/command/auth/DeleteAclSubCommand.java)。上游blob分别为`44113e32de68dde45c8f5c1e6991806a941b9963`、`bdee33c52f5153160a9b4b34b73784362ae1c998`、`a3553e0cb39b9a23b8c9c58563fd97042319f1d9`；不以CLI名称推断删除范围。
+
+### 只读退役清单生成
+
+`scripts/rocketmq/readable_retirement.py` 仅离线生成具名命令供审核，不调用Docker、SSH或MQ，不授权执行。输入为冻结的旧/新manifest、五个既有账号的用户名映射、逐个选定的旧对象，以及15秒内取得的完整责任观察。它拒绝通配符、重复/新/未知对象、缺失计数、非整数或非零责任、缺少导出摘要、集群成员漂移及未通过业务验收。
+
+选定对象必须同时证明活动写者、消费者、积压、in-flight、不可见重试、未决事务、Broker绑定计划、待回执、未处置死信和原生超限责任均为零。未选中的旧资源在报告中明确保留。命令始终只撤销单个旧resource权限、在具体Broker上删除Group并显式清理已导出的offset、逐Topic清理Broker及NameServer；不生成retry/DLQ或历史数据库删除命令。
+
+报告通过独占创建写入0600文件。`execution_authorized=false`始终保持：输入观察的真实性、现有部署锁下的实时复核、执行后的Broker/NameServer/Dashboard回读和隔离删除演练仍是后续执行器门禁，不能用该离线报告替代。
