@@ -24,9 +24,12 @@ def install(bind_ip, network):
     rules=['*filter', ':'+CHAIN+' - [0:0]', '-F '+CHAIN,
         f'-A {CHAIN} -p tcp -m conntrack --ctorigdstport 18082 -i tailscale0 -s 100.64.0.0/10 -j ACCEPT',
         f'-A {CHAIN} -p tcp -m conntrack --ctorigdstport 10911 -i {bridge} -s {subnet} -j ACCEPT',
-        f'-A {CHAIN} -j REJECT --reject-with tcp-reset', 'COMMIT', '']
-    subprocess.run(['iptables-restore','--wait','10','--noflush'],
-        input='\n'.join(rules).encode(),capture_output=True,check=True)
+        f'-A {CHAIN} -p tcp -j REJECT --reject-with tcp-reset', 'COMMIT', '']
+    result=subprocess.run(['iptables-restore','--wait','10','--noflush'],
+        input='\n'.join(rules).encode(),capture_output=True)
+    if result.returncode:
+        # Only this fixed, credential-free ruleset reaches iptables-restore.
+        raise RuntimeError('scoped_rules_rejected: '+result.stderr.decode()[-1000:])
     for port in ('18082','10911'):
         rule=['-p','tcp','-m','conntrack','--ctorigdst',bind_ip,'--ctorigdstport',port,'-j',CHAIN]
         if run('-C','DOCKER-USER',*rule,required=False).returncode:
