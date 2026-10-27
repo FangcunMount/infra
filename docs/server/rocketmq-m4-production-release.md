@@ -1,6 +1,6 @@
 # M4 最终生产发布索引与恢复边界
 
-**M4清理后的最终八实例已上线，system及新答卷/新AI业务回归通过，公共入口于2026-10-27 09:22:52恢复。** 维护从09:05:31开始，约17分21秒，无延期。M4任务38/38、父任务8/8；收尾[PR344](https://github.com/FangcunMount/infra/pull/344)已合并，全部闭环。唯一进度见[M4总表](rocketmq-m4-execution.md)，精确身份和摘要见[最终release receipt](evidence/rocketmq-m4-final-release-20261027.json)。自动生产CD保持暂停。
+**M4清理后的最终八实例已上线，system及新答卷/新AI业务回归通过，公共入口于2026-10-27 09:22:52恢复。** 维护从09:05:31开始，约17分21秒，无延期。M4任务38/38、父任务8/8；收尾[PR344](https://github.com/FangcunMount/infra/pull/344)已合并，全部闭环。唯一进度见[M4总表](rocketmq-m4-execution.md)，精确身份和摘要见[最终release receipt](evidence/rocketmq-m4-final-release-20261027.json)。自动生产CD已按用户追加授权恢复，历史资产处置也已完成，详见[追加操作总表](rocketmq-m4-post-closure.md)。
 
 ## 源码、制品、部署与业务
 
@@ -16,9 +16,9 @@
 
 ## 保留责任和独立后续项
 
-- NSQ三容器保持停止、restart=no、无监听/活动连接；1519个文件及原配置/备份完整摘要一致。历史表、卷、镜像及备份按[C07台账](rocketmq-m4-retained-assets.md)保留，最早2026-11-25复核；没有物理删除或自动GC，未决事实不自动过期。
-- 当前Inbox/receipt、首次wire/ACK、模型response/checkpoint、消费幂等、业务重试/未来调度与witness/Checker继续承担责任。保留旧名称的当前业务记录不等于旧Relay仍运行。
-- IAM、QS的`PRODUCTION_DEPLOY_PAUSED=true`；AI的`AUTO_DEPLOY_ENABLED=false`。本批没有恢复自动生产CD。
+- 用户已豁免原等待期，NSQ三容器/专属镜像/1519文件/三配置、11份具名旧保护备份及5882条旧发布终态记录已清理；必要结构、当前业务证据与其他镜像保护保持。见[最新资产台账](rocketmq-m4-retained-assets.md)。
+- 当前Inbox/receipt、首次wire/ACK、模型response/checkpoint、消费幂等、业务重试/未来调度与witness/Checker继续承担责任。
+- IAM/QS的`PRODUCTION_DEPLOY_PAUSED=false`；AI的`AUTO_DEPLOY_ENABLED=true`。已按实际运行基线补齐配置，未额外触发新生产部署。
 - 既存IAM角色授权详情读取出现服务端错误，单独登记为未解决；本轮空角色创建、零grant/member、策略原子提交和双订阅有独立证据，未假称详情接口通过。
 - R01—R03高级原生超限恢复见[独立台账](rocketmq-native-recovery-followups.md)，PL-R007/008保留原移交；均不冒充已完成。M3 T34沿用用户豁免，未进行或声称48小时观察通过。
 - 首启动屏障继续有效；不得使用旧全量备份覆盖当前事实，不切回NSQ/Outbox、不补发旧消息或重做模型。后续修复使用精确候选及原证据前向处理。

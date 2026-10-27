@@ -2,7 +2,7 @@
 
 本文件只维护 RocketMQ M4 的**当前最终状态：38/38子任务、8/8父任务、三个里程碑全部完成，C06门禁4/4通过**。八个最终生产实例已部署，合法system及新答卷/新AI业务验收通过，公共入口已恢复。收尾[PR344](https://github.com/FangcunMount/infra/pull/344)于2026-10-27 09:27（北京时间）合并，该收尾合并提交为`9a73fa3c78d8a135afb9795b581d278674a1f8a7`。
 
-阶段计数、失败及执行过程全部移至[历史执行记录](rocketmq-m4-execution-history.md)；历史内容不再混在当前任务表中。完整镜像、部署和验收证据见[最终发布索引](rocketmq-m4-production-release.md)。M2保持24/24，M3及其48小时观察豁免见[M3总表](rocketmq-m3-execution.md)。
+阶段计数、失败及执行过程全部移至[历史执行记录](rocketmq-m4-execution-history.md)；历史内容不再混在当前任务表中。完整镜像、部署和验收证据见[最终发布索引](rocketmq-m4-production-release.md)。用户随后授权的历史资产处置与自动CD恢复也已完成，最新结果见[追加操作总表](rocketmq-m4-post-closure.md)。M2保持24/24，M3及其48小时观察豁免见[M3总表](rocketmq-m3-execution.md)。
 
 ## 目标与执行边界
 
@@ -31,9 +31,9 @@ M3 必须先完成最终新链路、旧责任处置、停止旧生产组件及sy
 | ✅ | C03 | 删除旧Payload/ACK/Operation reader fallback、历史格式互通与恢复兼容分支 | 2026-10-26；4/4叶子、QS PR451/AI PR229/infra PR329及PR331已合并，正式SDK下完整原生矩阵通过。[receipt](evidence/rocketmq-m4-c03-current-readers-20261026.json)。保留新协议RPC/鉴权/receipt，最终版本已随C08部署并回归 |
 | ✅ | C04 | 删除未投产的宿主中间协议及对应孤立夹具/临时工具，收敛最终协议文档 | 2026-10-26；3/3完成，IAM PR155、QS PR452、AI PR230均完整CI通过并合并；三档API/worker/dispatch、三档QS原根、六档AI/mTLS及六档最终成对故障通过。[完整receipt/替代映射](evidence/rocketmq-m4-c04-final-protocol-20261026.json)。当前责任解耦已由C05完成，最终版本已随C08部署并回归 |
 | ✅ | C05 | 梳理旧命名下仍承担当前receipt/调度/业务历史的职责，保留或最小解耦，再移除确定废弃字段/依赖 | 2026-10-27；3/3闭环。AI当前存储与发布职责已拆分并保留state/ACK/history；QS PR453完整29项CI后合并11c106aa283bcd1e3f442da928985b3744fe54e8，当前摘要改读Committed档案/witness。三档原根及两档MySQL非空确定性恢复通过；[receipt](evidence/rocketmq-m4-c05-current-responsibilities-20261027.json)；无生产数据/模型动作 |
-| ✅ | C06 | 删除旧生产NSQ部署/CD/自动启动/环境变量/监控及恢复脚本入口，核验新配置可完整重建 | 2026-10-26；12/12叶子、4/4门禁通过，八实例重建18项与四角色真实权限拒绝50项通过；三库主机保护完整CI并合并，配置契约随PR320合并冻结。[宿主保护证据](evidence/rocketmq-m4-c06-host-guard-20261026.json)/[固定契约](evidence/rocketmq-m4-c06-config-contract-20261026.json)。生产固定工具、宿主保护及材料启用已随C08完成；自动CD仍暂停，开发依赖保留 |
-| ✅ | C07 | 按保留期限及具名清单处置旧容器/卷/表/镜像/备份；执行前核对未决责任及保护资产，完成后回读验证 | 2026-10-26；4/4政策保留闭环：三容器/1519文件/三配置保持，三份Mac mini归档完整流式可读、原摘要/0600一致。46 SQL表/9 Mongo集合具名登记；保留至2026-11-25后复核，当前/未决事实不自动过期。[台账](rocketmq-m4-retained-assets.md)/[receipt](evidence/rocketmq-m4-c07-retention-20261026.json)。无物理删除，已合并记账 |
-| ✅ | C08 | 完成废弃依赖/文档审计、清理后新链路回归、源码合并与清理发布索引，关闭8项任务 | 2026-10-27；5/5，最终8实例部署、合法system/新答卷/新AI实际回归、公共入口恢复及资产保留通过；[最终索引](rocketmq-m4-production-release.md)/[机器可读receipt](evidence/rocketmq-m4-final-release-20261027.json)。PR344已合并，8/8父任务与全部里程碑闭环；自动CD保持暂停 |
+| ✅ | C06 | 删除旧生产NSQ部署/CD/自动启动/环境变量/监控及恢复脚本入口，核验新配置可完整重建 | 2026-10-26；12/12叶子、4/4门禁通过，八实例重建18项与四角色真实权限拒绝50项通过；三库主机保护完整CI并合并，配置契约随PR320合并冻结。[宿主保护证据](evidence/rocketmq-m4-c06-host-guard-20261026.json)/[固定契约](evidence/rocketmq-m4-c06-config-contract-20261026.json)。生产固定工具、宿主保护及材料启用已随C08完成；自动CD已由追加操作恢复，开发依赖保留 |
+| ✅ | C07 | 按具名清单处置旧资产并保护当前事实 | 初验政策保留证据已合并；2026-10-27用户豁免等待后，退役NSQ三容器/专属镜像/1519文件/三配置、11份旧备份及5882条旧发布终态记录均清理完成；必要表结构与当前证据保护。见[最新资产台账](rocketmq-m4-retained-assets.md)/[追加receipt](evidence/rocketmq-m4-post-closure-20261027.json) |
+| ✅ | C08 | 完成废弃依赖/文档审计、清理后新链路回归、源码合并与清理发布索引，关闭8项任务 | 2026-10-27；5/5，最终8实例部署、合法system/新答卷/新AI实际回归、公共入口恢复及资产保留通过；[最终索引](rocketmq-m4-production-release.md)/[机器可读receipt](evidence/rocketmq-m4-final-release-20261027.json)。PR344已合并，8/8父任务与全部里程碑闭环；自动CD已由追加操作恢复 |
 
 执行顺序为 C01 → C02–C06 按实际依赖小批推进 → C07 → C08。某类不存在可删除对象时，先提供盘点与保留理由，再按“核验无需操作”记录，不能仅为提高进度打勾。
 
@@ -123,7 +123,7 @@ M4 完成要求八项闭环、相关变更合并、必要制品发布、清理�
 | C06-D02 | ✅ 已完成 | 版本化部署材料准备 | 2026-10-26；PR311/312源码及14源测试+19真实Unix/锁验证通过；原21份材料预置到root控制的新版本，回读四角色完全一致，当时8实例/活动指针/原锁不变；材料随后在C08以冻结的只读挂载启用，原活动指针保持。[完整SHA/CI/生产材料receipt](evidence/rocketmq-m4-c06-versioned-materials-20261026.json)；已合并记账，不冒充运行版部署 |
 | C06-D03 | ✅ 已完成 | 隔离环境八实例重建 | 2026-10-26；[PR315](https://github.com/FangcunMount/infra/pull/315)候选012d1ce4fa24d115a1ad01eb063407cb8c52ef99通过13项CI后合并c0c0818d50aecfe53cad270230c96407f7b1bdf5。真实五镜像/八实例18项、Go实际codec3项、四owner/只读27处材料挂载/原预算、零DDL及全部关闭/清理通过；三个worker另9次重启Exit0。首轮服务键及JSON时长失败保留；[完整receipt](evidence/rocketmq-m4-c06-eight-instance-rebuild-20261026.json) |
 | C06-D04 | ✅ 已完成 | 材料错误于替换前拒绝证明 | 2026-10-26；PR318/319及IAM153、QS449、AI227已合并。四角色50项实际部署用户/root工具/Unix权限与锁验证全部通过，23源保护+27真实Linux基础回归、IAM8/QS29/AI12完整CI通过；AI两档MySQL共11428执行/0失败错误跳过。[完整SHA、报告和失败历史](evidence/rocketmq-m4-c06-host-guard-20261026.json)。不依赖旧来源、不重建锁或切指针，生产固定新工具及宿主保护已由C08安装验证 |
-| C06-D05 | ✅ 已完成 | 合并和冻结C06配置契约 | 2026-10-26；[固定契约](evidence/rocketmq-m4-c06-config-contract-20261026.json)关联D01—D04、四材料收据、五阶段镜像、八实例预算、固定工具与三库完整SHA/CI/合并；随PR320合并生效。D04未改运行源码/镜像输入，最终清理镜像、生产工具安装及逐角色回读/启用已由C08完成，自动CD仍暂停 |
+| C06-D05 | ✅ 已完成 | 合并和冻结C06配置契约 | 2026-10-26；[固定契约](evidence/rocketmq-m4-c06-config-contract-20261026.json)关联D01—D04、四材料收据、五阶段镜像、八实例预算、固定工具与三库完整SHA/CI/合并；随PR320合并生效。D04未改运行源码/镜像输入，最终清理镜像、生产工具安装及逐角色回读/启用已由C08完成，自动CD已由追加操作恢复 |
 
 C06-B由B01—B05汇总，C06-D由D01—D05汇总。源码/隔离重建与生产部署分别取证；C08已完成最终材料启用和生产部署。详细输入见[八实例重建边界](rocketmq-m4-config-rebuild.md)。C06阶段只验证配置/部署入口；清理后的最终镜像由C08重新冻结。
 
@@ -131,10 +131,10 @@ C06-B由B01—B05汇总，C06-D由D01—D05汇总。源码/隔离重建与生产
 
 | ID | 状态 | 子任务 | 必达验收 |
 | --- | --- | --- | --- |
-| C07-01 | ✅ 已完成 | 具名处置清单冻结 | 2026-10-26；具名三容器/配置/数据、三归档、46 SQL表/9 Mongo集合及全部当前保护对象冻结；位置/用途/原责任/政策均见[台账](rocketmq-m4-retained-assets.md) |
-| C07-02 | ✅ 已完成 | 保护副本与恢复边界核对 | 2026-10-26；三份Mac mini保护归档原摘要/字节/0600一致，完整流式读完普通文件而不解包；原源码副本与退役pre-state可读。首启动屏障与禁止旧全量覆盖新事实保持；[receipt](evidence/rocketmq-m4-c07-retention-20261026.json) |
-| C07-03 | ✅ 已完成 | 到期处置或政策保留登记 | 2026-10-26；采用政策保留；实际回读三NSQ停止/restart=no、1519文件及原配置/挂载不变，无监听/活动连接，读取前后容器运行身份一致；不删除或清理资产 |
-| C07-04 | ✅ 已完成 | 资产责任台账闭环 | 2026-10-26；具名数据/恢复及infra维护责任、最早2026-11-25复核时间、原未决责任/依赖保护与独立处置触发条件齐全；当前事实/未决证据不自动过期，无自动GC；已合并闭环 |
+| C07-01 | ✅ 已完成 | 具名处置清单冻结 | 原盘点及保护对象已冻结；10月27日追加范围固定旧窗口11份备份、退役NSQ及五SQL表/Mongo队列终态数据，当前表/未决事实明确排除。见[最新资产台账](rocketmq-m4-retained-assets.md) |
+| C07-02 | ✅ 已完成 | 保护副本与恢复边界核对 | 初验归档可读及原摘要证明保持于旧receipt；10月27日按用户授权删除具名旧保护副本，保留审计元数据。首启动屏障与禁止旧全量覆盖新事实继续有效。见[追加receipt](evidence/rocketmq-m4-post-closure-20261027.json) |
+| C07-03 | ✅ 已完成 | 到期处置或政策保留登记 | 原保留期已由用户明确豁免；具名资产删除和旧发布终态清理已完成并回读不存在/剩余0。原目录为bind挂载，无独立命名卷；未执行DROP、泛化prune或当前业务数据删除 |
+| C07-04 | ✅ 已完成 | 资产责任台账闭环 | 最新具名范围、删除结果及保护对象已写入[资产台账](rocketmq-m4-retained-assets.md)和追加receipt；不再等待11月25日。当前事实/未决证据不自动过期，原历史receipt保持 |
 
 ### C08：最终候选与生产闭环（5/5）
 
@@ -143,7 +143,7 @@ C06-B由B01—B05汇总，C06-D由D01—D05汇总。源码/隔离重建与生产
 | C08-01 | ✅ 已完成 | 最终依赖和文档审计 | 2026-10-27；QS PR454/AI PR231完整CI后合并，实际移除AI旧客户端依赖/无调用CI服务，当前文档与历史范围明确；保留5组例外有责任依据。两档各5668源码用例、18份真实报告及最终八实例18/codec3验证通过；[完整审计与失败历史](evidence/rocketmq-m4-c08-final-audit-20261027.json)。制品/部署/业务另计，infra PR338已合并a58a6e9aebc42087f1c97534a547a10df6400e8a |
 | C08-02 | ✅ 已完成 | 最终应用候选冻结 | 2026-10-27；[ACR run40371739428](https://github.com/FangcunMount/iam/actions/runs/40371739428)5/0/0；五类原归档在A/D预置，真实保存config/rootfs/关键配置相同、实际engine ID与ACR摘要分记。五项目Compose及环境/原21份材料的27处挂载冻结，API正式离线原生预检/重复冻结/3错误参数拒绝通过；[完整receipt](evidence/rocketmq-m4-c08-final-freeze-20261027.json)。稳定SDK不变；最终八实例已按本候选部署，实际验收见C08-04；由[infra PR339](https://github.com/FangcunMount/infra/pull/339)记账，已合并记账 |
 | C08-03 | ✅ 已完成 | 生产执行与恢复演练 | 2026-10-27；PR340/341/342合并、最终Linux/macOS各27项通过；五项目真实CLI预览及10次普通镜像UID/GID检查、原锁/材料/入口验证通过。实际在途零、7 blocked保护；唯一v3包、首启动屏障及仅前向恢复冻结。[执行包receipt](evidence/rocketmq-m4-c08-window-ready-20261027.json)/[精确目标源码](evidence/rocketmq-m4-c08-window-operator-20261027.py.txt)。源包已由PR343合并，实际窗口和部署已由C08-04完成 |
-| C08-04 | ✅ 已完成 | 受控部署与真实业务回归 | 2026-10-27；09:05:31—09:22:52统一维护，8实例固定镜像健康/0重启；system空角色及双订阅、新答卷→评分/规则报告、新AI解读/4事件及ACK全部通过，13条业务witness精确Committed，旧模型事实未变。[实际部署receipt](evidence/rocketmq-m4-c08-production-deployment-20261027.json)。四HTTPS200/10目标up、D可用1218MiB，CD仍暂停；已合并记账 |
+| C08-04 | ✅ 已完成 | 受控部署与真实业务回归 | 2026-10-27；09:05:31—09:22:52统一维护，8实例固定镜像健康/0重启；system空角色及双订阅、新答卷→评分/规则报告、新AI解读/4事件及ACK全部通过，13条业务witness精确Committed，旧模型事实未变。[实际部署receipt](evidence/rocketmq-m4-c08-production-deployment-20261027.json)。四HTTPS200/10目标up、D可用1218MiB，CD已由追加操作恢复；已合并记账 |
 | C08-05 | ✅ 已完成 | 发布索引及任务闭环 | 2026-10-27；[正式发布索引](rocketmq-m4-production-release.md)分记源码/依赖、ACR/engine、实际部署、业务、保留及CD；[receipt](evidence/rocketmq-m4-final-release-20261027.json)绑定C08-04源码e3ce7d4f38c2c5798d0203a481351cbb7a27d917及全部阶段摘要。文档JSON/链接/38项一致性检查通过，PR344已合并，M4正式闭环；未覆盖失败或历史快照 |
 <!-- M4 leaf tasks end -->
 
@@ -168,12 +168,12 @@ M4正式任务已全部完成。以下事项按原决定保留或独立跟进，
 
 | 事项 | 当前状态及责任边界 |
 | --- | --- |
-| 历史表、卷、镜像及备份 | 政策保留，最早2026-11-25复核；未决事实不自动过期，不执行自动删除。见[资产台账](rocketmq-m4-retained-assets.md) |
-| 自动生产CD | IAM/QS暂停开关为true，AI自动部署为false；本批未恢复自动CD |
+| 历史资产处置 | 用户已豁免等待期；具名资产及终态数据清理完成，当前事实/必要结构继续保护。见[资产台账](rocketmq-m4-retained-assets.md) |
+| 自动生产CD | 已恢复：IAM/QS暂停开关false，AI自动部署true；事务绑定及发布准入与当前运行基线一致，未额外触发新部署 |
 | IAM角色授权详情读取 | 既存服务端错误单独登记，未冒充该接口验收通过；本轮空角色创建及双订阅有独立证据 |
 | R01—R03、PL-R007/008 | 沿用原独立移交；高级原生超限恢复见[后续台账](rocketmq-native-recovery-followups.md) |
 | M3的48小时观察 | 用户已豁免，未执行或声称通过，不重新设为M4门禁 |
 
 ## 历史过程与证据
 
-[历史执行记录](rocketmq-m4-execution-history.md)保存原始C06内部批次、早期“进行中/未部署”快照、全部失败历史以及C08逐项推进记录。历史计数不代表当前状态；本页38项子任务为唯一当前进度表。原始JSON receipt及其摘要未改写。
+[历史执行记录](rocketmq-m4-execution-history.md)保存原始C06内部批次、早期“进行中/未部署”快照、全部失败历史以及C08逐项推进记录。历史计数不代表当前状态；本页38项子任务为唯一当前进度表。原始JSON receipt及其摘要未改写。追加处置以独立receipt记账。
