@@ -44,7 +44,7 @@
 | ☐ | T08 | AI command/receipt/state/ACK 及正文安全接入 | [AI PR232](https://github.com/FangcunMount/qs-ai/pull/232)草稿7045671，三个SQL模拟Runtime已补显式routing，此前39项仅收集；最新M7 MySQL两档已成功，剩余源码分区待完成；此前4318纯单元/1290排除、mypy452通过。infra PR357/820896a运行40535268126六档均成功：state/admission/finalization各Python3.11/MySQL8.0.36和Python3.13/MySQL8.4，170项实际pytest与390项报告检查分别记账，全部0失败/跳过且清理；[六档证据](evidence/rocketmq-readable-names-ai-native-20261028.json)，最新源码SQL CI仍待完成。真实矩阵固定源码aae96db，后续夹具修正未改变该生产代码 |
 | ☐ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | [IAM PR161](https://github.com/FangcunMount/iam/pull/161)、[QS PR456](https://github.com/FangcunMount/qs-server/pull/456)、[AI PR233](https://github.com/FangcunMount/qs-ai/pull/233)均为草稿；QS最新d97853af为历史deferred新增只读边界，旧路由不授权新HoldDelivery，原未来写入器使用owner可信codec。该候选本地383测试包/7574测试通过、60项外部依赖选配测试跳过（不是required native通过）；四包race通过。IAM168包、AI4320纯单元及452 mypy分别已有证明。infra PR362/241f05c运行40547695960在固定d97853af上要求两档各12项（原7+历史5），均0失败/跳过且清理；PR362全部17项CI成功，已合并33808532，[证明](evidence/rocketmq-readable-names-history-native-20261028.json)。当前QS历史候选eb0e6dca已合入schema43原生夹具，文档通过、3包仅做integration编译；未来调度矩阵及最新三库源码CI仍待完成；跨路由Replan纯协议与真实存储CAS分别记录，不冒充完整宿主切换 |
 | ☐ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | infra PR359全部13项CI成功、已合并cacfdae0；真实精确旧新并集134/0/0、清理通过。PR361现为141970f：此前5f86bfd专项138/0/0验证classic retry/DLQ sentinel保留；新核对Broker deleteTopic在clearRetryTopicWhenDeleteTopic=true时可能伴随删除POP retry，已增加完整元数据/伴随资源拒绝保护，并扩展POP v1/v2 sentinel，增强native仍待完成。415项本地MQ单元通过，既有CD四角色真实v3材料复制/历史映射/源字节/不激活边界24项通过；剩余源CI待完成。原CD开关只读核对；未应用生产资源或暂停CD，具体生产责任观察及实例配置清单交由T13冻结 |
-| ☐ | T11 | 最终宿主端到端、故障与维护/恢复演练 | 准备中：[infra PR364](https://github.com/FangcunMount/infra/pull/364)提供独立readable-rc1镜像依赖/清单/归档校验及手动构建入口，412本地单元和actionlint通过；原M3/M4默认SDK门禁保持。尚未dispatch镜像构建，八实例启动入口已补齐（严格可读清单、原配置打包器和暂停Checker/关闭检查，416项本地验证），实际启动/切换/故障及发布器适配待完成；没有把构建或只读归档检查标为演练通过 |
+| ☐ | T11 | 最终宿主端到端、故障与维护/恢复演练 | 准备中：[infra PR364](https://github.com/FangcunMount/infra/pull/364)提供独立readable-rc1镜像依赖/清单/归档校验及手动构建入口，412本地单元和actionlint通过；原M3/M4默认SDK门禁保持。2026-10-28已dispatch隔离镜像构建40566443986（五镜像，尚无成功结果）；八实例启动入口已补齐（严格可读清单、原配置打包器和暂停Checker/关闭检查，416项本地验证），实际启动/切换/故障及发布器适配待完成；没有把构建或只读归档检查标为演练通过 |
 | ☐ | T12 | 稳定 SDK、三库正式依赖及固定镜像重新安装验收 | 准备中：SDK草稿PR65/8d99c8b只改版本/项目lock及说明，make check、Python检查通过；候选wheel/sdist独立安装各128/0/0，16份实现及43项外部lock不变。[候选证明](evidence/rocketmq-readable-names-stable-candidate-20261028.json)。未合并/发布稳定版、未修改宿主正式依赖或生产镜像；等待宿主RC门禁与精确最终SHA门禁 |
 | ☐ | T13 | 生产核验、暂停 CD、预置资源权限及冻结清单 | 待开始 |
 | ☐ | T14 | 维护内排空旧责任、切换八实例与新订阅/Checker 验证 | 待开始 |
@@ -61,7 +61,7 @@
 | T08 | ✅ 六档真实readable矩阵；170项pytest、390项报告检查分别记录，0失败/跳过、清理通过 | 最新源SQL CI |
 | T09 | 三库历史读保护；旧fence与新HoldDelivery拒绝；Go最新全量/定向验证；✅ 两档原MySQL历史消费各12项 | 未来计划、最新三库源码CI及完整切换闭环 |
 | T10 | ✅ 精确旧新并集134项；✅ 具名空资源删除138项（classic sentinel）；PR359已合并 | ✅ CD四角色v3只读材料24项；PR361新增POP伴随删除保护的native及剩余CI/合并 |
-| T11 | 固定SDK镜像profile/协调归档验证及手动构建入口 | 镜像实际构建、八实例启动/真实故障/切换恢复演练 |
+| T11 | 固定SDK镜像profile/协调归档验证及手动构建入口 | 镜像实际构建、八实例启动/真实故障/切换恢复演练；见PR372/373与40566443986（均待真实结果） |
 
 ## 生产切换及删除门禁
 
@@ -106,3 +106,7 @@
 - 2026-10-28：T12提前完成稳定候选准备，SDK PR65/8d99c8b；make check/ruff/mypy通过，候选wheel/sdist各独立安装128项纯测试通过。30项integration显式排除、NSQ集成文件未在MacBook执行；实现和外部依赖不变。没有发布tag或Release，T12未完成、总进度仍6/16。
 
 - 2026-10-28：保持6/16。历史消费两档各12项成功且清理，PR362全部17项CI通过并合并33808532。QS答卷8.0.44/评价8.4/报告8.4三档成功，未将部分成功打勾。SDK文档PR64全部CI通过并合并c40509e；稳定候选8d99c8b的三档存储40562961443及精确可读SDK矩阵40563448176已启动（infra PR369），未发布稳定版。PR361新增POP伴随删除保护，旧138项仅覆盖classic sentinel，增强验证待完成。生产只读确认9Group/15客户端ACTIVELY，普通零指标不能单独证明POP排空；8个revive尾部各一条ACK已精确只读核对，进度稳定、Broker未变更，仍不作为封写后的完整排空（工具草稿PR370、窗口草稿PR368）。生产资源、CD、数据库与业务容器未改变。
+
+- 2026-10-28：接续执行，保持6/16。进度证据PR371已合并a2c5835；新增[POP控制PR372](https://github.com/FangcunMount/infra/pull/372)，409项MQ纯测试、4项POP边界通过，精确稳定候选8d99c8b的真实控制运行40566337005待完成；原public31项加4项持有/确认后责任检查，live恢复独立5项。实际生产只读核验显示8条revive尾记录均为ACK，但此结论不替代封写后的完整排空，未宣称生产责任为零。
+- 2026-10-28：固定IAM91aee79/QSeb0e6dc/AI62f3aa3源码，运行40566443986开始五类隔离RC镜像构建；未推生产registry、未运行八实例、未修改生产。新增[成对故障PR373](https://github.com/FangcunMount/infra/pull/373)，保留原五条基线+两条真实故障/40项报告检查，并同时验证两个可读RC版本；405项本地MQ测试、actionlint及实际QS race探针编译通过。AI夹具[PR234](https://github.com/FangcunMount/qs-ai/pull/234)只保留v3文件版本，7条pytest仅完成收集，真实门禁待执行。
+- 2026-10-28：保留旧版成对回归40551016733中的编译失败；同一冻结旧源码b75d4a52本地race编译通过，尚不足以判断CI故障原因。其余5档仍运行/排队，GitHub不允许对未结束的运行重试；未取消、豁免或记作通过。当前生产CD、业务容器、资源、数据库和凭据均未改变。

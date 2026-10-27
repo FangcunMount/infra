@@ -1,0 +1,48 @@
+{
+  "schema": "readable-resumed-implementation-evidence/v1",
+  "local_date": "2026-10-28",
+  "task_progress": "6/16",
+  "production_changed": false,
+  "cd_changed": false,
+  "pop_controls": {
+    "pr": 372,
+    "source_sha": "b1660f56853d5df6f7eb1c33843c4300aa5cfc77",
+    "local_mq_tests": 409,
+    "local_ops_tests": 4,
+    "native_run": 40566337005,
+    "native_result": "pending",
+    "exact_sdk_sha": "8d99c8b2dbf0fafd83eacf4d12e543c202f794c0"
+  },
+  "image_build": {
+    "run": 40566443986,
+    "builder_sha": "8ff56cd143041acc0bd9d8182240fdea7a447dc3",
+    "sources": {
+      "iam": "91aee79cbc1b192c5879625103d7b9cbd389b15b",
+      "qs": "eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b",
+      "ai": "62f3aa3225249f291cdde7d09f1d809edbd9d398"
+    },
+    "result": "pending",
+    "registry_published": false,
+    "startup_passed": false
+  },
+  "readable_pair": {
+    "infra_pr": 373,
+    "ai_pr": 234,
+    "ai_source_sha": "42bda2aa2b2956f9d7adfad6bc27b2b61aeb753d",
+    "local_mq_tests": 405,
+    "local_qs_probe_race_compile": "passed",
+    "pytest_collected_only": 7,
+    "native_result": "not passed",
+    "scope": "original five paired baseline tests plus two real fault tests, 40 report checks; no system or real provider claim"
+  },
+  "retained_failure": {
+    "run": 40551016733,
+    "job": 122355124460,
+    "profile": "original stable paired Python3.11 MySQL8.0.36",
+    "failed_before_native_tests": "go build, raw output withheld",
+    "same_old_source_local_race_compile": "passed",
+    "ci_root_cause": "not established",
+    "retry": "rejected by GitHub while other jobs in same run active",
+    "cleanup": true
+  }
+}
