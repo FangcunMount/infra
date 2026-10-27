@@ -42,7 +42,8 @@ def main():
         account=dict(username='dashboard-management',password=secrets.token_hex(32))
         admin=Admin(broker)
         admin('createUser','-u',account['username'],'-p',account['password'],'-t','Super',mutation=True)
-        assert admin.users()[account['username']]==(account['password'],'Super','Enable')
+        row=admin.users()[account['username']]
+        assert row[0]==account['password'] and tuple(x.lower() for x in row[1:])==('super','enable'), 'dedicated_identity_not_confirmed'
         cfg=fixture.directory/'dashboard'
         render(cfg,ui,account,(fixture.private/'mq-ca.crt').read_bytes())
         fixture.run(['sudo','chown','-R','10001:10001',str(cfg)])
