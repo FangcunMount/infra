@@ -1,6 +1,6 @@
 # serverD RocketMQ Dashboard（私网原型记录）
 
-> 原方案已完成隔离 19/19、生产 15/15；用户随后选择移除 serverD Nginx。当前实施与验收以 [serverA HTTPS / serverD 原生 RPC 执行表](rocketmq-dashboard-servera.md) 为准。下面保留原方案的已验证事实，不作为新拓扑部署命令。
+> 原方案已完成隔离 19/19、生产 15/15；用户随后选择移除 serverD Nginx。新方案已上线，当前运行与验收以 [serverA HTTPS / serverD 原生 RPC 执行表](rocketmq-dashboard-servera.md) 为准。下面保留原方案的已验证事实，不作为新拓扑部署命令。
 
 目标：在 serverD 增加 Tailscale 私网管理界面，由 infra 管理，不重建或重启现有 Broker、NameServer 和 worker。
 
