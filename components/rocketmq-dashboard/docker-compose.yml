@@ -12,7 +12,7 @@ services:
     mem_limit: 512m
     cpus: 0.5
     pids_limit: 256
-    tmpfs: [/tmp:rw,noexec,nosuid,size=67108864,uid=10001,gid=10001]
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=67108864,uid=10001,gid=10001"]
     entrypoint: [java]
     command:
       - -Xms64m
@@ -49,7 +49,7 @@ services:
     mem_limit: 48m
     cpus: 0.1
     pids_limit: 64
-    tmpfs: [/tmp:rw,noexec,nosuid,size=8388608,uid=10001,gid=10001]
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=8388608,uid=10001,gid=10001"]
     entrypoint: [nginx]
     command: [-c, /etc/nginx/dashboard.conf, -g, "daemon off;"]
     ports:

@@ -58,7 +58,7 @@ def main():
         doc.pop('name',None)
         # Only browser ingress differs from production: loopback, random port.
         port=fixture.port()
-        doc['services']['gateway']['ports'][0].update(host_ip='127.0.0.1',published=str(port))
+        next(row for row in doc['services']['gateway']['ports'] if row['target']==8082).update(host_ip='127.0.0.1',published=str(port))
         for value in doc['services'].values():value['restart']='no'
         file=fixture.directory/'dashboard-compose.json'
         file.write_text(json.dumps(doc));file.chmod(0o600)
