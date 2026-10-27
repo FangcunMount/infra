@@ -39,9 +39,9 @@
 | ✅ | T03 | Go SDK 命名方案、可信路由解析和活动/历史边界 | 2026-10-27：make check完整通过；活动/历史隔离、Aborted显式Replan及原wire保护通过；[本地证据](evidence/rocketmq-readable-names-sdk-local-20261027.json)，SDK PR60已合并d719b6fb，10个PR CI全过 |
 | ✅ | T04 | Python SDK 对应能力与生命周期保持 | 2026-10-27：Python48/0/0、ruff/mypy通过；历史不注册、生命周期/取消和原wire通过；SDK PR60已合并d719b6fb，10个PR CI全过 |
 | ✅ | T05 | 跨语言真实 Broker 验收与固定 SDK 预发布 | 2026-10-27：SDK5c2e3cd，两个公开SDK矩阵各31/0/0、存活恢复5/0/0；三档存储各29/0/0、两档Python源码与wheel各159/0/0；Go v0.6.0-rc.1 / Python0.5.0rc1已发布，18资产重新下载校验；[发布证明](evidence/rocketmq-readable-names-prerelease-20261027.json) |
-| ✅ | T06 | IAM 授权事务、普通消息、幂等查询与双订阅接入 | 2026-10-27：IAM9b9bb9f1 / QS1c2eccc3，正式RC依赖；168本地测试包、11源码CI；三档MySQL真实readable根事务/双IAM及QS fanout各22/0/0，[证据](evidence/rocketmq-readable-names-iam-fanout-20261027.json)。IAM PR160为草稿未合并；infra PR354其余回归/合并另计 |
-| ☐ | T07 | QS API/collection/worker 双存储与合并订阅接入 | 源码草稿[ QS PR455 ](https://github.com/FangcunMount/qs-server/pull/455)，最新1c2eccc3：正式RC模块382测试包与定向race通过；原事务无runtime夹具补齐显式路由，三档真实MySQL重验中 |
-| ☐ | T08 | AI command/receipt/state/ACK 及正文安全接入 | 本地准备中：固定wheel0.5.0rc1，仅SDK依赖版本改变；v3配置/构造45项、ruff/mypy通过。command/ACK、状态计划及历史边界仍在实现，未提交生产 |
+| ✅ | T06 | IAM 授权事务、普通消息、幂等查询与双订阅接入 | 2026-10-27：IAM9b9bb9f1 / QS1c2eccc3，正式RC依赖；168本地测试包、11源码CI；三档MySQL真实readable根事务/双IAM及QS fanout各22/0/0，[证据](evidence/rocketmq-readable-names-iam-fanout-20261027.json)。IAM PR160为草稿未合并；infra PR354全部65项CI成功后已合并54387b9 |
+| ☐ | T07 | QS API/collection/worker 双存储与合并订阅接入 | 源码草稿[ QS PR455 ](https://github.com/FangcunMount/qs-server/pull/455)，最新1c2eccc3：正式RC模块382测试包与定向race通过；原事务无runtime夹具补齐显式路由，全部适用源码CI已通过；[infra PR356](https://github.com/FangcunMount/infra/pull/356)新增可读资源四入口×三档真实验证，排队/执行中，未冒充通过 |
+| ☐ | T08 | AI command/receipt/state/ACK 及正文安全接入 | 源码已提交草稿[AI PR232](https://github.com/FangcunMount/qs-ai/pull/232)，f8f6d2a：command/ACK及解释/评估状态统一可信路由；4313本地非依赖单元、当前23项定向、452源码mypy与文档通过；[本地证据](evidence/rocketmq-readable-names-host-source-20261027.json)。原生105项仅收集，infra PR357新增真实readable档，尚未验收通过/合并/部署 |
 | ☐ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | 待开始 |
 | ☐ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | 待开始 |
 | ☐ | T11 | 最终宿主端到端、故障与维护/恢复演练 | 待开始 |
@@ -82,3 +82,5 @@
 - 2026-10-27：infra PR352在62项CI全成功后合并为5d6c4294；SDK发布证明PR63合并e1d8b589，N-P/N-SDK闭环。IAM PR160（9b9bb9f1）、QS PR455（1c2eccc3）为草稿，未合并或触发生产切换。QS初次CI四项失败保留：文档source_baseline过旧、三档MySQL原事务夹具未注入受信路由；已拆开计划路由与runtime生命周期并更新文档源码基线，当前等待真实CI重验。T06/T07继续未完成。自动生产CD配置、数据库、MQ资源和业务容器未改变。
 
 - 2026-10-27：T06专项验收完成，总进度6/16；三档真实隔离验收各22/0/0，两个IAM实例撤权、QS通知与两主体缓存驱逐及primary证明通过，全部清理。IAM源码CI11成功；QS修复后的全部适用CI通过（未选择的API生成同步job为N/A），原事务三档失败已修复并保留旧记录。宿主PR160/455继续为草稿，未合并；infra PR354其余回归待完成。AI仅固定SDK/config基础45项通过，业务路由尚未完工。生产/CD/数据库与容器保持未变更。
+
+- 2026-10-27：infra PR354全部65项CI成功并合并54387b9。QS readable四入口×三档由PR356执行；AI command/ACK/状态与原生夹具路由接入已提交草稿PR232，4313本地非依赖单元通过，当前定向23/0/0、mypy452及文档75份/1272链接通过。AI原生105项仅收集，独立readable admission/state/five-path finalization由PR357验证。总进度保留6/16，T07/T08等待实际门禁；保留本地旧夹具/缺依赖的失败记录，未把缺运行环境用例记为通过。宿主PR均未合并，生产/CD/DDL/容器保持未变更。
