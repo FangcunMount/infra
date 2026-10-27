@@ -102,6 +102,7 @@ def main():
             time.sleep(2)
         report['stage']='authenticated_acceptance'
         cases=verify(base,ui)
+        report['cases']=cases
         report['stage']='untrusted_certificate_rejection'
         bad_ca=fixture.directory/'untrusted.crt'
         fixture.run(['openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1',
@@ -127,7 +128,14 @@ def main():
         assert accepted(request(session,bad_base,'/login/login.do',ui)), 'untrusted_test_login_failed'
         assert not accepted(request(session,bad_base,'/topic/list.query')), 'untrusted_ca_accepted'
         logs=fixture.run(['docker','logs',bad_name]).stdout+fixture.run(['docker','logs',bad_name]).stderr
-        cases['untrusted_ca_rejected']=any(marker in logs for marker in ('SSLHandshakeException','PKIX','certificate_unknown'))
+        report['untrusted_tls_error_visible_in_stdout']=any(marker in logs for marker in ('SSLHandshakeException','PKIX','certificate_unknown'))
+        # Acceptance is the actual denied request, not the logging destination
+        # chosen by the shaded RocketMQ client. Recheck the valid-CA control.
+        control=client()
+        assert accepted(request(control,base,'/login/login.do',ui)), 'trusted_control_login_failed'
+        assert accepted(request(control,base,'/topic/list.query')), 'trusted_control_query_failed'
+        cases['untrusted_ca_rejected']=True
+        cases['trusted_ca_control_remains_healthy']=True
         fixture.run(['docker','rm','-f',bad_name])
         report['stage']='resource_and_network_acceptance'
         cases['scoped_firewall_applied']=True
