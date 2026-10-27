@@ -1,0 +1,26 @@
+name: M4 frozen local runtime start boundaries
+on:
+  pull_request:
+    paths:
+      - scripts/ops/m4_runtime_start.py
+      - scripts/ops/test_m4_runtime_start.py
+      - scripts/rocketmq/runtime_start.py
+      - scripts/rocketmq/cutover_step.py
+      - .github/workflows/m4-runtime-window.yml
+permissions:
+  contents: read
+jobs:
+  frozen-runtime:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: M4 fixed local engine targets and unchanged M3 contracts
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s scripts/ops -p test_m4_runtime_start.py -v
+          python3 -m unittest discover -s scripts/rocketmq -p test_runtime_start.py -v
+          python3 -m unittest discover -s scripts/ops -p test_m3_nginx_gate.py -v
+          python3 -m unittest discover -s scripts/ops -p test_m3_nginx_acceptance_gate.py -v
