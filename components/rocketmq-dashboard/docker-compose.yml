@@ -24,6 +24,8 @@ services:
       - -XX:+ExitOnOutOfMemoryError
       - -Duser.home=/tmp
       - -Dtls.enable=true
+      - -Dtls.test.mode.enable=false
+      - -Dtls.client.authServer=true
       - -Dtls.client.trustCertPath=/run/dashboard/ca.crt
       - -Drocketmq.namesrv.addr=nameserver:9876
       - -Dcom.rocketmq.sendMessageWithVIPChannel=false
