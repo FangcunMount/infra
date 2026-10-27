@@ -37,6 +37,16 @@ def main():
         address_added=True
         original=fixtures.render
         fixtures.render=lambda accounts,output,advertised,templates: original(accounts,output,host,templates)
+        original_write=fixtures.write_private
+        def write_fixture(path, value):
+            if path.name=='compose.json':
+                # Production uses a regular bridge. An internal-only bridge
+                # suppresses host port publication on current Docker Engine.
+                # All browser/dependency ports remain loopback-bound; the RPC
+                # address is a runner-local dummy /32, not a production route.
+                for network in value['networks'].values():network['internal']=False
+            return original_write(path,value)
+        fixtures.write_private=write_fixture
         report['stage']='broker_dependencies'
         fixture.dependencies()
         broker=fixture.project+'-broker-1'
@@ -143,6 +153,14 @@ def main():
         report['error_type']=type(error).__name__
         if isinstance(error,AssertionError):report['error_code']=str(error)
         if compose:
+            ids=fixture.run(compose+['ps','-aq'],required=False).stdout.split()
+            if ids:
+                rows=json.loads(fixture.run(['docker','inspect',*ids]).stdout)
+                report['container_diagnostics']=[dict(name=r['Name'],running=r['State']['Running'],
+                    exit_code=r['State']['ExitCode'],oom=r['State']['OOMKilled'],
+                    ports=r['NetworkSettings']['Ports']) for r in rows]
+            # NGINX has no credentials and access logging is disabled.
+            report['gateway_diagnostic']=fixture.run(compose+['logs','--no-color','--tail','20','gateway'],required=False).stdout[-3000:]
             logs=fixture.run(compose+['logs','--no-color','--tail','100'],required=False).stdout
             # Only fixed diagnostic classes, never configuration or credentials.
             report['diagnostics']={key:key in logs for key in ('OutOfMemoryError','Permission denied',
