@@ -20,8 +20,9 @@ def render(directory, ui, broker, ca):
     directory = Path(directory)
     directory.mkdir(mode=0o700, parents=True, exist_ok=False)
     config = {
-        'server': {'port': 8082, 'servlet': {'session': {'timeout': '30m',
-            'cookie': {'http-only': True, 'same-site': 'strict'}}}},
+        'server': {'port': 8082, 'forward-headers-strategy': 'framework',
+            'servlet': {'session': {'timeout': '30m',
+            'cookie': {'http-only': True, 'same-site': 'strict', 'secure': True}}}},
         # The pinned official image also carries Spring Security for actuator.
         # Explicit credentials prevent its generated password entering logs.
         'spring': {'security': {'user': {'name': ui['username'],

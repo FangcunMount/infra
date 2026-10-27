@@ -1,0 +1,22 @@
+{
+  "phase": "private-prototype-before-serverA-transition",
+  "source_sha": "beb97ab029dc070a24b87df32802ddc7ebf921b6",
+  "source_pr": "https://github.com/FangcunMount/infra/pull/348",
+  "ci": "https://github.com/FangcunMount/infra/actions/runs/40451319519",
+  "isolated": {
+    "passed": 19,
+    "failed": 0,
+    "skipped": 0
+  },
+  "production": {
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0,
+    "memory_available_mib": 941,
+    "broker_nameserver_not_restarted": true,
+    "three_workers_ready": true,
+    "four_owners_ready": true,
+    "ten_monitoring_targets_up": true
+  },
+  "decision": "Replace serverD NGINX with native Broker port mapping; serverA terminates HTTPS; no Broker recreation yet."
+}
