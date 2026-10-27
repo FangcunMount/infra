@@ -11,12 +11,13 @@
 
 ## 固定构成与入口
 
-- Dashboard 2.1.0：`apacherocketmq/rocketmq-dashboard:2.1.0@sha256:81fbd0f5d82c79a50899b48bf18449ee1c52e1deb0246999a90291c786fbeabb`；官方镜像 JRE 17。
+- 官方 Dashboard 镜像标签 2.1.0：`apacherocketmq/rocketmq-dashboard:2.1.0@sha256:81fbd0f5d82c79a50899b48bf18449ee1c52e1deb0246999a90291c786fbeabb`；JRE 17。**实际内置 Maven 版本为 2.1.1-SNAPSHOT**，不能将标签源码等同于镜像内容。已直接核对固定镜像 JAR SHA256 `98125ee1496edbab776e1374f3566f81a2dfb5e0fba0a12c468acbc21b468a73` 及实际 SecurityConfig/登录接口；验收绑定实际镜像与 JAR。
 - NGINX 1.30.6-alpine：`sha256:84ed8c0dd296c188bfc24ed506f46589e9285fb0b11cf3a04d91d524d3067e11`。
 - 入口 `http://100.118.164.39:18082`，仅 Tailscale；不新增公网入口或 DNS。
 - 独立项目 `rocketmq-dashboard`，复用外部 `rocketmq_rocketmq` 网络，512 MiB/0.5 CPU + 48 MiB/0.1 CPU，非 root、只读根目录、日志轮转。
 - Broker 对外仍宣告 `100.118.164.39:10911`。网关透明转发原 TLS 到 `broker:10911`；DOCKER-USER 新增独立目标规则，只允许 Broker bridge 访问该管理端口。原 8081/5557 防火墙链保持。
 - UI 使用上游 file 登录模式，独立用户名/随机密码；Broker 连接使用另一个专用 Super 身份，因界面承担 MQ 管理职责。原 infra 管理员与应用账号不复用、不轮换。UI 登录身份与 Broker 身份分离；所有管理动作具备该专用 Broker 身份的权限。
+- 保留镜像实际包含的 Spring Security CSRF：经 `/rocketmq-dashboard/csrf-token` 取得 token/cookie，再提交表单及 X-XSRF-TOKEN；缺 token 的写请求必须 403。Spring Security 的组件内部身份使用同一 UI 账号，避免生成临时密码进入日志。验收请求携带真实入口 Origin，不关闭 CORS/CSRF。
 - 不采用上游 ACL 登录模式：2.1.0 的按用户池没有完整沿用 TLS 配置；采用全局 TLS 管理池及独立 UI 认证，并通过实际 Broker 验证。
 - Dashboard 管理客户端强制 TLS，保持原 ACL2 与业务 gRPC TLS 配置。只读核验发现现网 remoting 与业务 gRPC 使用不同证书；管理信任包固定 SSH 核对后的 NameServer/Broker 实际公开证书指纹，变化即拒绝安装。不把服务器私钥交给 Dashboard，不关闭证书验证，也不为本次安装修改原进程的 TLS 配置。
 - 关闭 Dashboard 定期统计采集，保留 Prometheus/Grafana 在 Mac mini。验收不发送消息、重放、重置位点、删除 Topic 或触发模型。

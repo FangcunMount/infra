@@ -22,6 +22,10 @@ def render(directory, ui, broker, ca):
     config = {
         'server': {'port': 8082, 'servlet': {'session': {'timeout': '30m',
             'cookie': {'http-only': True, 'same-site': 'strict'}}}},
+        # The pinned official image also carries Spring Security for actuator.
+        # Explicit credentials prevent its generated password entering logs.
+        'spring': {'security': {'user': {'name': ui['username'],
+            'password': ui['password'], 'roles': 'ADMIN'}}},
         'logging': {'config': 'file:/run/dashboard/logback.xml'},
         'rocketmq': {'config': {'namesrvAddrs': ['nameserver:9876'],
             'isVIPChannel': 'false', 'timeoutMillis': 5000,

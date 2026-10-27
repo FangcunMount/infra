@@ -16,10 +16,18 @@ def client():
     return urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()),NoRedirect())
 
 
-def request(session, base, path, data=None):
+def request(session, base, path, data=None, *, csrf=True):
     body = None if data is None else urllib.parse.urlencode(data).encode()
+    headers={}
+    if data is not None:
+        headers['Origin']=base
+        if csrf:
+            status, token=request(session,base,'/rocketmq-dashboard/csrf-token')
+            assert status==200 and token.get('data',{}).get('token'), 'csrf_bootstrap_failed'
+            headers[token['data']['headerName']]=token['data']['token']
+    req=urllib.request.Request(base+path,data=body,headers=headers)
     try:
-        with session.open(base+path, data=body, timeout=20) as response:
+        with session.open(req, timeout=20) as response:
             try: value=json.load(response)
             except ValueError: value={'non_json': True}
             return response.status, value
@@ -45,6 +53,7 @@ def verify(base, credentials):
         if 'redirect_location' in response[1]:
             target=urllib.parse.urljoin(base,response[1]['redirect_location'])
             assert urllib.parse.urlsplit(target).netloc==urllib.parse.urlsplit(base).netloc, 'login_redirect_loses_public_origin'
+    assert request(session,base,'/login/login.do',credentials,csrf=False)[0]==403, 'csrf_not_enforced'
     assert not accepted(request(session,base,'/login/login.do',dict(username='admin',password='admin'))), 'default_login_allowed'
     assert not accepted(request(session,base,'/login/login.do',dict(username=credentials['username'],password='incorrect'))), 'wrong_password_allowed'
     login=request(session,base,'/login/login.do',credentials)
@@ -61,7 +70,7 @@ def verify(base, credentials):
     # Only counts/booleans leave this function; no cluster/topic payloads.
     assert accepted(request(session,base,'/login/logout.do',{})), 'logout_failed'
     assert not accepted(request(session,base,paths[0])), 'logout_did_not_revoke_session'
-    return dict(login_required=True,anonymous_inventory_denied=True,default_login_denied=True,
+    return dict(login_required=True,csrf_required=True,anonymous_inventory_denied=True,default_login_denied=True,
         wrong_password_denied=True,independent_login=True,tls_authenticated_cluster=True,
         topics_read=True,consumer_groups_read=True,logout_revokes_session=True,
         no_message_mutations=True)

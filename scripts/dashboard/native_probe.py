@@ -148,13 +148,17 @@ def main():
             current['State']['StartedAt']==before['State']['StartedAt'])
         ids=fixture.run(compose+['ps','-q']).stdout.split()
         rows=json.loads(fixture.run(['docker','inspect',*ids]).stdout)
+        app=next(r for r in rows if r['Config']['Image'].startswith('apacherocketmq/'))
+        jar=fixture.run(['docker','exec',app['Id'],'sha256sum','/rocketmq-dashboard.jar']).stdout.split()[0]
+        cases['exact_official_application_jar']=jar=='98125ee1496edbab776e1374f3566f81a2dfb5e0fba0a12c468acbc21b468a73'
         cases['resource_caps_enforced']=sorted(r['HostConfig']['Memory'] for r in rows)==[48*1024**2,512*1024**2]
         cases['nonroot_readonly_no_oom']=all(r['Config']['User']=='10001:10001' and
             r['HostConfig']['ReadonlyRootfs'] and not r['State']['OOMKilled'] and r['RestartCount']==0 for r in rows)
         assert all(cases.values()), 'acceptance_incomplete'
         report['stage']='complete'
         report.update(passed=len(cases),failed=0,cases=cases,
-            broker_version='5.5.1',dashboard_version='2.1.0',
+            broker_version='5.5.1',dashboard_image_tag='2.1.0',dashboard_application_version='2.1.1-SNAPSHOT',
+            dashboard_jar_sha256=jar,
             images=[dict(id=r['Image'],reference=r['Config']['Image']) for r in rows],
             source_sha=os.environ.get('GITHUB_SHA'),production_credentials_used=False)
     except Exception as error:
