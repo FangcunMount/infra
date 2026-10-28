@@ -1,14 +1,14 @@
 # 可读资源镜像的固定 SDK 校验
 
-此工具支持 T11/T12 的镜像准备；尚未构建、发布或部署新镜像，进度见[执行总表](rocketmq-readable-names-execution.md)。
+T11/T12 的固定镜像构建、正式 SDK 校验、八实例启动、配置切换与 ACR 发布已通过；生产部署尚未执行，进度见[执行总表](rocketmq-readable-names-execution.md)。
 
 `final_image_candidate.py --sdk-profile readable-rc1` 明确选择已发布的 Go `v0.6.0-rc.1` / Python `0.5.0rc1`，SDK源码固定为`5c2e3cd155e67c0f766e93bf95238b16fc219b5f`。Go运行二进制必须包含精确版本和module sum且没有replace；Python源lock必须指向精确公开wheel URL及SHA256，镜像内安装版本、客户端5.1.2和应用源码标识仍须吻合。
 
-默认`m3-stable`继续执行原M3/M4的Go0.5.0/Python0.4.0校验；二者不能相互替代。可读候选使用独立`readable-final-image-inventory/v1`报告，明确`stable_release=false`，不能交给旧M4发布验收器充当稳定版证明。稳定SDK发布后，必须依据正式tag、重新下载制品及校验receipt增加独立固定profile；当前没有浮动或未发布的稳定profile。
+默认`m3-stable`继续执行原M3/M4的Go0.5.0/Python0.4.0校验。可读候选使用独立`readable-final-image-inventory/v1`报告：`readable-rc1` 的 `stable_release=false`，正式 `readable-stable` 的 `stable_release=true`。正式 profile 固定 Go `v0.6.0`、Python `0.5.0`、共同源码 `559c735b2ceb11827ffbbd1279808b4164bba3d1` 及正式 wheel 摘要；各 profile 不能互换，也不能交给旧 M4 验收器冒充其候选。stable_release 只表示 SDK 发布级别，生产部署状态单独记录。
 
-所有Docker操作仍由既有GitHub-hosted Linux guard限制，不在MacBook执行。该校验仅证明镜像依赖与来源，不替代八实例启动、配置/预算、真实业务、故障或生产验收；独立构建入口已提供，只在workflow_dispatch时构建五个镜像，不自动发布registry或部署；尚未发起构建。启动验收及发布器接入仍待完成。
+所有Docker操作仍由既有GitHub-hosted Linux guard限制，不在MacBook执行。该校验仅证明镜像依赖与来源，不替代八实例启动、配置/预算、真实业务、故障或生产验收；独立构建入口已提供，只在workflow_dispatch时构建五个镜像，不自动发布registry或部署；五镜像协调构建40631048872已经完成，独立启动40631849982通过18/0/0。
 
-`readable_image_candidates.py`提供独立候选清单与只读归档验证。五个镜像须来自同一协调构建，绑定三库源码、builder SHA、Go UID/GID、v3路由文件原字节摘要，以及每个inventory/归档/config摘要与大小。读取归档时验证实际config及非root用户，不解压、不加载或启动镜像。旧M4 inventory、旧SDK、replace、错误源码、缺清理或不完整证明均拒绝。当前只提供构建与来源校验，八实例启动/切换/故障及registry发布仍未接入，不能作为上线证明。
+`readable_image_candidates.py`提供独立候选清单与只读归档验证。五个镜像须来自同一协调构建，绑定三库源码、builder SHA、Go UID/GID、v3路由文件原字节摘要，以及每个inventory/归档/config摘要与大小。读取归档时验证实际config及非root用户，不解压、不加载或启动镜像。旧M4 inventory、旧SDK、replace、错误源码、缺清理或不完整证明均拒绝。固定清单为 `components/rocketmq/readable-image-candidates-stable1-20261028.json`，与已测原归档和已发布不可变摘要对应；生产上线与业务验收仍单独记账。
 
 ## 八实例启动入口
 
@@ -16,4 +16,4 @@
 
 `.github/workflows/rocketmq-readable-startup.yml` 的 PR 入口只运行契约。手动真实启动必须指定仓库内已审核并提交的 `components/rocketmq/readable-image-candidates-*.json`，下载其唯一成功协调构建的五份原始归档，检查构建 workflow 身份，再运行真实启动。
 
-该入口尚未执行；没有实际镜像清单、没有启动或生产结果。启动报告不能标记旧新切换、业务或 system 验收通过，T11 的切换/故障和 T12 的正式版本仍有独立门禁。旧 M3/M4 默认 SDK、报告及历史候选保持原门禁。
+实际18项启动、同归档25项配置切换及五镜像发布证明已纳入[发布索引](evidence/rocketmq-readable-names-t12-release-20261028.json)。启动报告本身不标记配置切换、业务或 system 验收；每层证据独立核验。当前没有生产运行或 system 结果，旧 M3/M4 默认 SDK、报告及历史候选保持原门禁。

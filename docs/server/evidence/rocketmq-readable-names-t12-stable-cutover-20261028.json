@@ -1,0 +1,95 @@
+{
+  "run_id": 40666942387,
+  "url": "https://github.com/FangcunMount/infra/actions/runs/40666942387",
+  "head_sha": "e34df93fdf54c8984e1b5284eef36f91e2ee199c",
+  "report_sha256": "a701d0d101e4f44869c561ab18633859357d2ebf1b04bbd043164f221bc5e7ec",
+  "candidate_sha256": "cdd46f1c74bbf4e347130d2b9b162260f57172d5f17a9dedc5c92dc9cc39b943",
+  "startup_receipt_sha256": "847292683fa33ad71073d92f67ee17719b6b8af8e979528427f4bb41fe4874ca",
+  "passed": 25,
+  "failed": 0,
+  "skipped": 0,
+  "elapsed_seconds": 31.454766758999995,
+  "cleanup": {
+    "compose_down_succeeded": true,
+    "private_directory_removed": true,
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true,
+    "owned_m4_material_root_removed": true
+  },
+  "production": false,
+  "system_acceptance": false,
+  "schema": "readable-t12-stable-cutover/v1",
+  "startup_run_id": 40631849982,
+  "image_build_run_id": 40631048872,
+  "source_sha": "e34df93fdf54c8984e1b5284eef36f91e2ee199c",
+  "resources": {
+    "version": 3,
+    "operations": 48,
+    "typed_topics": 10,
+    "principals": 5,
+    "verified": true,
+    "readback": {
+      "attempts": 1,
+      "observations": [
+        {
+          "attempt": 1,
+          "missing_counts": {
+            "topics": 0,
+            "groups": 0,
+            "principals": 0,
+            "grants": 0
+          }
+        }
+      ],
+      "mutation_retry_attempted": false
+    },
+    "transition": {
+      "previous_manifest_sha256": "34d6dc613e8f05b43335bc09c07b20eb457df1a2129720a9bc416a6556989d4d",
+      "manifest_sha256": "f89e6158c424408326af13a1549f3494b89677d74027141c6485212f903665fd",
+      "phase": "resources_and_union_acl_prepared",
+      "credential_rotation": false,
+      "retirement_completed": false,
+      "business_acceptance": false
+    }
+  },
+  "old_resources": {
+    "version": 2,
+    "operations": 53,
+    "typed_topics": 10,
+    "principals": 5,
+    "verified": true,
+    "readback": {
+      "attempts": 1,
+      "observations": [
+        {
+          "attempt": 1,
+          "missing_counts": {
+            "topics": 0,
+            "groups": 0,
+            "principals": 0,
+            "grants": 0
+          }
+        }
+      ],
+      "mutation_retry_attempted": false
+    }
+  },
+  "same_four_binding_hashes": true,
+  "empty_topic_count": 20,
+  "failed_start_exit_code": 125,
+  "poststart_refused": [
+    "old-config",
+    "normal-retry"
+  ],
+  "all_eight_shutdown_zero": true,
+  "worker_concurrency": 48,
+  "runtime_ddl": {
+    "mysql": 0,
+    "mongo": 0
+  },
+  "c1_data_restore_exercised": false,
+  "real_provider_invocation_claimed": false,
+  "scope": "owned empty compatible-v2/readable-v3 configuration switch, same exact images; not a production maintenance window or business acceptance",
+  "first_readback_complete": true,
+  "prior_missing_grant_cause": "not confirmed; previous2/1 failures and original report hashes remain recorded"
+}

@@ -1,7 +1,7 @@
 {
   "schema": "readable-t12-release/v1",
-  "status": "in_progress",
-  "progress": "11/16",
+  "status": "completed",
+  "progress": "12/16",
   "sdk_candidate": "8d99c8b2dbf0fafd83eacf4d12e543c202f794c0",
   "sdk_merged_source": "559c735b2ceb11827ffbbd1279808b4164bba3d1",
   "sdk_source_tree": "eeea67d214c244ab307e67648ca229d46b921c46",
@@ -12,7 +12,7 @@
   "python_version_planned": "0.5.0",
   "sdk_published": true,
   "host_dependencies_stable": true,
-  "final_stable_images_verified": false,
+  "final_stable_images_verified": true,
   "production_cutover": false,
   "cd_pause": {
     "scope": "repository auto-CD only; public business admission and runtime unchanged",
@@ -39,7 +39,8 @@
         "paused": "false",
         "environment_override": false
       }
-    ]
+    ],
+    "restore_task": "T16"
   },
   "exact_merged_source_gates": {
     "source": 40625815623,
@@ -209,6 +210,19 @@
       "conditional_na": 0,
       "method": "squash",
       "production_runtime_changed": false
+    },
+    {
+      "repo": "infra",
+      "pr": 392,
+      "reviewed_source_sha": "e34df93fdf54c8984e1b5284eef36f91e2ee199c",
+      "merged_source_sha": "c538f2958df409fa5be9539abd53e4d302982898",
+      "merged_at": "2026-10-28T10:18:41Z",
+      "url": "https://github.com/FangcunMount/infra/pull/392",
+      "checks": 29,
+      "successful": 21,
+      "conditional_na": 8,
+      "method": "merge",
+      "production_runtime_changed": false
     }
   ],
   "host_merge_ancestry": [
@@ -272,7 +286,7 @@
       "probe_process_groups_drained": true,
       "private_fixture_directory_removed": true
     },
-    "retest": "planned one original failed-job comparison after complete workflow status; no successful job rerun",
+    "retest": "One original failed-job comparison completed; original failure retained; successful jobs not rerun",
     "comparison": {
       "run_id": 40628929057,
       "original_job_id": 122620460691,
@@ -308,5 +322,312 @@
     "go12512_race_repetitions": 20,
     "make_check": "passed",
     "source_ci_successes": 12
-  }
+  },
+  "completed_at": "2026-10-28T10:22:55.316843+00:00",
+  "registry_images_published": true,
+  "system_acceptance": false,
+  "stable_cutover": {
+    "run_id": 40666942387,
+    "url": "https://github.com/FangcunMount/infra/actions/runs/40666942387",
+    "head_sha": "e34df93fdf54c8984e1b5284eef36f91e2ee199c",
+    "report_sha256": "a701d0d101e4f44869c561ab18633859357d2ebf1b04bbd043164f221bc5e7ec",
+    "candidate_sha256": "cdd46f1c74bbf4e347130d2b9b162260f57172d5f17a9dedc5c92dc9cc39b943",
+    "startup_receipt_sha256": "847292683fa33ad71073d92f67ee17719b6b8af8e979528427f4bb41fe4874ca",
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "elapsed_seconds": 31.454766758999995,
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true,
+      "owned_m4_material_root_removed": true
+    },
+    "production": false,
+    "system_acceptance": false,
+    "schema": "readable-t12-stable-cutover/v1",
+    "startup_run_id": 40631849982,
+    "image_build_run_id": 40631048872,
+    "source_sha": "e34df93fdf54c8984e1b5284eef36f91e2ee199c",
+    "resources": {
+      "version": 3,
+      "operations": 48,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true,
+      "readback": {
+        "attempts": 1,
+        "observations": [
+          {
+            "attempt": 1,
+            "missing_counts": {
+              "topics": 0,
+              "groups": 0,
+              "principals": 0,
+              "grants": 0
+            }
+          }
+        ],
+        "mutation_retry_attempted": false
+      },
+      "transition": {
+        "previous_manifest_sha256": "34d6dc613e8f05b43335bc09c07b20eb457df1a2129720a9bc416a6556989d4d",
+        "manifest_sha256": "f89e6158c424408326af13a1549f3494b89677d74027141c6485212f903665fd",
+        "phase": "resources_and_union_acl_prepared",
+        "credential_rotation": false,
+        "retirement_completed": false,
+        "business_acceptance": false
+      }
+    },
+    "old_resources": {
+      "version": 2,
+      "operations": 53,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true,
+      "readback": {
+        "attempts": 1,
+        "observations": [
+          {
+            "attempt": 1,
+            "missing_counts": {
+              "topics": 0,
+              "groups": 0,
+              "principals": 0,
+              "grants": 0
+            }
+          }
+        ],
+        "mutation_retry_attempted": false
+      }
+    },
+    "same_four_binding_hashes": true,
+    "empty_topic_count": 20,
+    "failed_start_exit_code": 125,
+    "poststart_refused": [
+      "old-config",
+      "normal-retry"
+    ],
+    "all_eight_shutdown_zero": true,
+    "worker_concurrency": 48,
+    "runtime_ddl": {
+      "mysql": 0,
+      "mongo": 0
+    },
+    "c1_data_restore_exercised": false,
+    "real_provider_invocation_claimed": false,
+    "scope": "owned empty compatible-v2/readable-v3 configuration switch, same exact images; not a production maintenance window or business acceptance",
+    "first_readback_complete": true,
+    "prior_missing_grant_cause": "not confirmed; previous2/1 failures and original report hashes remain recorded"
+  },
+  "image_publication": {
+    "schema": "readable-t12-verified-image-publication/v1",
+    "publication_run_id": 40671160248,
+    "url": "https://github.com/FangcunMount/iam/actions/runs/40671160248",
+    "workflow_sha": "8f297a77520151d2789671d912bf18cd52e833eb",
+    "infra_sha": "c538f2958df409fa5be9539abd53e4d302982898",
+    "plan_sha256": "b3e6267dea1f4d488b9c0850cf9a2f0317ab6e217db1bc44ce643b602a460283",
+    "report_sha256": "e1f002063f4e442aa66f42f8b567308966986f8db505a7b009c42a58a6873f6c",
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "published": {
+      "iam": {
+        "tag": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/iam:readable-candidate-40671160248-1-6f59ec34ee73",
+        "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/iam@sha256:7d94320ba564460b0559e859dfbab28ad933d1ff2ce7af67894340593e9af9a0",
+        "image_config_id": "sha256:28933f61ee9fd84366eb843b08c214bfc95afe706a729f3d69758f94a3633b82",
+        "archive_sha256": "f5a59d880c58eda36327f3a7b1b1cedfa58bc4c56e417da4cba8108461e3f78e",
+        "source_sha": "6f59ec34ee73991984fcc630b6c0dbe54a377cbe"
+      },
+      "qs-api": {
+        "tag": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver:readable-candidate-40671160248-1-f783f4047329",
+        "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver@sha256:e678a08434ebdc5b0efa304a36bec9599340d63dcbfa209eb64fa57940b329cf",
+        "image_config_id": "sha256:802776e44900c57cda90f7139482c1578b06fe9191817a72e332fa308f238ca1",
+        "archive_sha256": "abce4878285afd8210c41d1cb4ae03f91c6446260556287cccbce326372d33f5",
+        "source_sha": "f783f40473295dbcd70c7de4f11d25a61d1876c0"
+      },
+      "qs-collection": {
+        "tag": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-collection-server:readable-candidate-40671160248-1-f783f4047329",
+        "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-collection-server@sha256:5b6749071045366db98e2bf9d5e8f3c6d1e1b80208249edf1defac18ead2b83e",
+        "image_config_id": "sha256:de3232e477bddb239b499b3da013af0cd069fd8c82bb46cbbdf263f2db56c91f",
+        "archive_sha256": "c7c58a358bb0d486875ed634ba34128040db912904ef45658ad32915faf53e4f",
+        "source_sha": "f783f40473295dbcd70c7de4f11d25a61d1876c0"
+      },
+      "qs-worker": {
+        "tag": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-worker:readable-candidate-40671160248-1-f783f4047329",
+        "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-worker@sha256:b637bd1a84a4657b8452332d72629288c54665d9e0bd7faf5d1a1757dd9a72b6",
+        "image_config_id": "sha256:3cefe5392b19d016b4a50349a43598701c91f669f9eef0995620e85924ec37c8",
+        "archive_sha256": "4b79918d713e9e74058f66e00e3e8a4d776ba3ede6f11e332284b238aa5fe5e7",
+        "source_sha": "f783f40473295dbcd70c7de4f11d25a61d1876c0"
+      },
+      "ai": {
+        "tag": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-ai:readable-candidate-40671160248-1-9dce206643d1",
+        "reference": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-ai@sha256:f89ac5e371587425d0d2060c6a6afd47ae95f801477fdbcc6d76aa902683227d",
+        "image_config_id": "sha256:439783ccf7fa0c66cd9b358b580ee7de70217125f879267d750c09bceeb90001",
+        "archive_sha256": "ad1d570b283482414044a0a1bb9a5b6b02838d449e92eda2b06db2c1f32b6c11",
+        "source_sha": "9dce206643d11afc33e27b72ef4429c0e5537e7a"
+      }
+    },
+    "stable_sdk": {
+      "source_sha": "559c735b2ceb11827ffbbd1279808b4164bba3d1",
+      "go": "v0.6.0",
+      "python": "0.5.0",
+      "wheel_sha256": "6fe1fbf0635d3e2f8ba2f10c12474c39c939ee656f20df7784928f8bd92e88b8",
+      "tags_match": true
+    },
+    "all_source_evidence_verified": true,
+    "immutable_registry_readback_verified": true,
+    "all_tag_targets_were_absent_before_first_write": true,
+    "application_rebuilt": false,
+    "application_started": false,
+    "production_business_cutover": false,
+    "private_downloads_removed": true
+  },
+  "candidate": {
+    "path": "components/rocketmq/readable-image-candidates-stable1-20261028.json",
+    "sha256": "cdd46f1c74bbf4e347130d2b9b162260f57172d5f17a9dedc5c92dc9cc39b943"
+  },
+  "merged_source_ci": [
+    {
+      "repository": "iam",
+      "merged_sha": "8f297a77520151d2789671d912bf18cd52e833eb",
+      "runs": [
+        {
+          "id": 40630813260,
+          "name": "CI",
+          "path": ".github/workflows/ci.yml",
+          "head_sha": "8f297a77520151d2789671d912bf18cd52e833eb",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/iam/actions/runs/40630813260"
+        },
+        {
+          "id": 40630813130,
+          "name": "MySQL Concurrency Tests",
+          "path": ".github/workflows/concurrency-tests.yml",
+          "head_sha": "8f297a77520151d2789671d912bf18cd52e833eb",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/iam/actions/runs/40630813130"
+        }
+      ]
+    },
+    {
+      "repository": "qs-server",
+      "merged_sha": "dc98c2caabae74961c874eb052ccc69d3827ae17",
+      "runs": [
+        {
+          "id": 40631017062,
+          "name": "RocketMQ evaluation original MySQL root",
+          "path": ".github/workflows/rocketmq-evaluation-root.yml",
+          "head_sha": "dc98c2caabae74961c874eb052ccc69d3827ae17",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/qs-server/actions/runs/40631017062"
+        },
+        {
+          "id": 40631016973,
+          "name": "AI bridge MySQL",
+          "path": ".github/workflows/ai-bridge.yml",
+          "head_sha": "dc98c2caabae74961c874eb052ccc69d3827ae17",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/qs-server/actions/runs/40631016973"
+        },
+        {
+          "id": 40631016956,
+          "name": "CI",
+          "path": ".github/workflows/ci.yml",
+          "head_sha": "dc98c2caabae74961c874eb052ccc69d3827ae17",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/qs-server/actions/runs/40631016956"
+        },
+        {
+          "id": 40631016951,
+          "name": "RocketMQ host failure audit",
+          "path": ".github/workflows/rocketmq-audit.yml",
+          "head_sha": "dc98c2caabae74961c874eb052ccc69d3827ae17",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/qs-server/actions/runs/40631016951"
+        }
+      ]
+    },
+    {
+      "repository": "qs-ai",
+      "merged_sha": "c8c52e7ead4f8c601bdb437bc85a86786b3619a3",
+      "runs": [
+        {
+          "id": 40631949283,
+          "name": "M7 messaging perimeter",
+          "path": ".github/workflows/m7-messaging.yml",
+          "head_sha": "c8c52e7ead4f8c601bdb437bc85a86786b3619a3",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/qs-ai/actions/runs/40631949283"
+        },
+        {
+          "id": 40631949301,
+          "name": "checks",
+          "path": ".github/workflows/ci.yml",
+          "head_sha": "c8c52e7ead4f8c601bdb437bc85a86786b3619a3",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/qs-ai/actions/runs/40631949301"
+        }
+      ]
+    },
+    {
+      "repository": "reliable-messaging",
+      "merged_sha": "ac14fdbe4118ce6b33c18dc0e56f8163b313a922",
+      "runs": [
+        {
+          "id": 40631960988,
+          "name": "Isolated infrastructure",
+          "path": ".github/workflows/integration.yml",
+          "head_sha": "ac14fdbe4118ce6b33c18dc0e56f8163b313a922",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/reliable-messaging/actions/runs/40631960988"
+        },
+        {
+          "id": 40631960893,
+          "name": "SDK checks",
+          "path": ".github/workflows/ci.yml",
+          "head_sha": "ac14fdbe4118ce6b33c18dc0e56f8163b313a922",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/reliable-messaging/actions/runs/40631960893"
+        },
+        {
+          "id": 40631960997,
+          "name": "Python messaging SDK",
+          "path": ".github/workflows/python.yml",
+          "head_sha": "ac14fdbe4118ce6b33c18dc0e56f8163b313a922",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/FangcunMount/reliable-messaging/actions/runs/40631960997"
+        }
+      ]
+    }
+  ],
+  "remaining": [
+    "T13 fresh production read-only inventory and reviewed resource preparation",
+    "T14 bounded coordinated production switch",
+    "T15 legitimate system, new answer and AI acceptance plus30min checks",
+    "T16 per-object responsibility-zero retirement and restore original automatic CD"
+  ]
 }

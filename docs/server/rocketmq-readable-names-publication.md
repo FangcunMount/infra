@@ -1,15 +1,15 @@
 # 可读候选镜像的固定发布
 
-属于T11/T12准备，尚未发布稳定SDK或生产镜像。[唯一进度总表](rocketmq-readable-names-execution.md)。
+T12 已完成：Go `v0.6.0`、Python `0.5.0`、三库正式接入及五份固定镜像均已发布并验证。[唯一进度总表](rocketmq-readable-names-execution.md)；[发布索引](evidence/rocketmq-readable-names-t12-release-20261028.json)；[五镜像摘要](evidence/rocketmq-readable-names-t12-image-publication-20261028.json)。生产运行切换、system 验收与旧资源退役仍属于 T13–T16，自动 CD 继续暂停。
 
-独立`readable_publish_candidates.py`复用原M3/M4的TLS Registry运输与manifest/config digest回读，不改写旧发布器或冻结的旧证据。它不构建镜像、不启动应用、不做DDL或业务切换。
+`readable_publish_candidates.py` 复用原 M3/M4 的 TLS Registry 运输与 manifest/config digest 回读，不改写旧发布器或历史证据。它不构建镜像、不启动应用、不执行 DDL 或业务切换。
 
-发布前逐项核验：原始计划摘要、现有固定ACR与五个仓库、全部精确源码与归档、固定v3路由摘要、成功的原构建workflow和实际八实例18项启动workflow。native报告必须原始摘要一致、八实例预算/身份/只读挂载/退出/无运行时DDL/完整清理全部通过；五份inventory与归档在任何Registry写入前复核，未选镜像或未经测试的归档不可混入。
+发布前逐项核验：原始计划摘要、现有固定 ACR 与五个仓库、全部精确源码与归档、固定 v3 路由摘要、成功的原构建 workflow 和实际八实例 18 项启动 workflow。原生报告必须摘要一致，八实例预算、身份、只读挂载、退出、无运行时 DDL 和完整清理全部通过；五份 inventory 与归档在任何 Registry 写入前复核。T12 还独立完成同五份归档的 25 项切换与前向修复验证；该空输入配置演练不代表生产排空、数据库恢复或业务验收。
 
-RC计划可离线审阅，但执行路径在任何Registry写入前拒绝RC。稳定profile只能在真实发布后由源码固定其Go/Python版本、共同源码SHA和wheel摘要；还要回读两个轻量tag及官方非预发布Release，Python实际资产URL和GitHub digest须匹配。当前只有readable-rc1，故现阶段生产发布路径不能通过；没有预填未发布的hash。
+RC 计划可离线审阅，执行路径在任何 Registry 写入前拒绝 RC。`readable-stable` 固定 Go/Python 版本、共同源码 `559c735b2ceb11827ffbbd1279808b4164bba3d1` 与 wheel 摘要；回读两个轻量 tag 及官方非预发布 Release，核对实际资产 URL 和 GitHub digest。稳定 tag 与已发布资产不移动、不覆盖。
 
-五目标tag都先核对未占用；新tag使用`readable-candidate-<run>-<attempt>-<source>`，不覆盖M3/M4或稳定tag。网络/认证/标签查询失败直接保留失败；运输失败保留current_target及已发布精确对象，不能当作目标不存在或自动回滚。
+五个目标 tag 均先核对未占用。新 tag 使用 `readable-candidate-<run>-<attempt>-<source>`，不覆盖原有对象。网络、认证、标签查询失败直接保留失败；运输失败保留 current_target 及已发布精确对象，不能当作目标不存在、自动回滚或盲目整批重试。发布后验证 config 等同已测归档，再按不可变 `repository@sha256:…` 回读 manifest 原字节。
 
-读取或发布的receipt仅含源码/制品摘要和阶段，不含凭据/正文；运行报告0600，临时下载由owned目录清理。原运输实现不变，因此纯契约证明与其既有原生loopback运输证明分别记账；本轮尚无实际新Registry写入。
+receipt 只含源码、制品摘要和阶段，不含凭据、正文；运行报告0600，临时下载由所属目录清理。执行只允许 GitHub-hosted Linux 隔离 runner，凭据借用现有 IAM 手动 workflow 的 ACR Secrets，通过 stdin 写入临时0600 authfile，并在结束后移除；MacBook 不启动 Docker。
 
-命令需要已审阅的计划与独立digest、私密authfile、只在GitHub-hosted隔离runner执行。生产部署仍要T11切换演练及T13冻结清单，镜像发布结果不授权恢复公众准入或删除旧资源。
+已冻结的输入计划为 [stable1](evidence/rocketmq-readable-image-publication-plan-stable1-20261028.json)，其字节保持不变。镜像入库不会恢复公众准入、更新生产容器、授权删除旧资源或恢复自动 CD；这些分别在 T13–T16 执行并记账。

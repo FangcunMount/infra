@@ -1,6 +1,6 @@
 {
   "schema": "readable-t12-cutover-investigation/v1",
-  "status": "diagnostic_candidate_not_yet_native_verified",
+  "status": "native_candidate_verified_prior_intermittent_cause_unconfirmed",
   "production_changed": false,
   "image_archives_rebuilt": false,
   "candidate_sha256": "cdd46f1c74bbf4e347130d2b9b162260f57172d5f17a9dedc5c92dc9cc39b943",
@@ -107,6 +107,31 @@
     "complete_exact_union_required": true,
     "conflict_or_original_responsibility_drift": "immediate refusal; never reread to mask conflict",
     "observations_retained_on_success_and_failure": true,
-    "native_result": "pending; no claim of confirmed Broker root cause"
+    "native_result": {
+      "run_id": 40666942387,
+      "passed": 25,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "a701d0d101e4f44869c561ab18633859357d2ebf1b04bbd043164f221bc5e7ec",
+      "source_sha": "e34df93fdf54c8984e1b5284eef36f91e2ee199c",
+      "first_readback_complete": true,
+      "extra_read_rounds_exercised": false,
+      "delayed_visibility_semantics": "unit-tested; successful native run did not exercise an incomplete first read",
+      "missing_grant_root_cause": "not confirmed; no write retry or SDK transport fix claimed"
+    },
+    "local_fixture_contracts_passed": 476
+  },
+  "source_merge": {
+    "repo": "infra",
+    "pr": 392,
+    "reviewed_source_sha": "e34df93fdf54c8984e1b5284eef36f91e2ee199c",
+    "merged_source_sha": "c538f2958df409fa5be9539abd53e4d302982898",
+    "merged_at": "2026-10-28T10:18:41Z",
+    "url": "https://github.com/FangcunMount/infra/pull/392",
+    "checks": 29,
+    "successful": 21,
+    "conditional_na": 8,
+    "method": "merge",
+    "production_runtime_changed": false
   }
 }
