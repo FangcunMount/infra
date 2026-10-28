@@ -72,13 +72,16 @@ func TestReadableCrossRouteReplanBrokerHost(t *testing.T) {
 		require.NotNil(t, value.RocketMQ)
 		return value
 	}
+	t.Log("READABLE_REPLAN_STAGE configuration")
 	producer, observer := load("QS_M3_PRODUCER_CONFIG"), load("QS_M3_OBSERVER_CONFIG")
 	identity := producer.RocketMQ.Transactions[owner]
 	_, err = pool.ExecContext(t.Context(), "INSERT INTO rm_tx_binding VALUES(?,?,?,1)", []byte(owner), []byte(identity.StoreID), []byte(identity.WriterEpoch))
 	require.NoError(t, err)
 	const topic = "qs.evaluation.lifecycle"
+	t.Log("READABLE_REPLAN_STAGE construct_owner")
 	c, err := New(db, &producer, fixtureResolver{}, []string{topic})
 	require.NoError(t, err)
+	t.Log("READABLE_REPLAN_STAGE start_owner")
 	require.NoError(t, c.Runtime().Start(t.Context()))
 	t.Cleanup(func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
@@ -94,18 +97,24 @@ func TestReadableCrossRouteReplanBrokerHost(t *testing.T) {
 	require.NoError(t, err)
 	candidate, err := transaction.NewPlan(input)
 	require.NoError(t, err)
+	t.Log("READABLE_REPLAN_STAGE reserve_old")
 	previous, err := c.store.Reserve(t.Context(), transaction.RequestFor(old), old, transaction.ReserveOptions{Lease: time.Minute})
 	require.NoError(t, err)
 	require.True(t, previous.Acquired)
 	authorization := transaction.ReplanAuthorization{Previous: previous.Execution, Candidate: candidate}
+	t.Log("READABLE_REPLAN_STAGE refuse_unknown")
 	_, err = c.store.Replan(t.Context(), authorization, transaction.ReserveOptions{Lease: time.Minute})
 	require.ErrorIs(t, err, transaction.ErrStaleExecution)
 	cases := map[string]bool{"old_unknown_replan_refused_without_business": true}
+	t.Log("READABLE_REPLAN_STAGE refuse_historical_retry")
 	_, err = c.RetryAborted(t.Context(), previous.Execution, transaction.ReserveOptions{Lease: time.Minute})
 	require.ErrorIs(t, err, shared.ErrHistoricalExecution)
 	cases["historical_ordinary_retry_refused"] = true
+	t.Log("READABLE_REPLAN_STAGE abort_old")
 	_, err = c.store.Abort(t.Context(), previous.Execution)
 	require.NoError(t, err)
+	t.Log("READABLE_REPLAN_STAGE replan")
+	require.Equal(t, transaction.LocalAborted, c.Confirm(t.Context(), previous.Execution))
 	next, err := c.store.Replan(t.Context(), authorization, transaction.ReserveOptions{Lease: time.Minute})
 	require.NoError(t, err)
 	require.True(t, next.Acquired)
@@ -113,13 +122,19 @@ func TestReadableCrossRouteReplanBrokerHost(t *testing.T) {
 	require.NotEqual(t, old.Digest(), candidate.Digest())
 	require.Equal(t, old.Input().Branches[0].Wire, candidate.Input().Branches[0].Wire)
 	require.Equal(t, old.Input().Branches[0].Message, candidate.Input().Branches[0].Message)
+	t.Log("READABLE_REPLAN_STAGE verify_artifacts")
 	for _, p := range []transaction.FrozenPlan{old, candidate} {
 		body, err := c.Artifact(p)
 		require.NoError(t, err)
 		require.Equal(t, request.Artifact, body)
 	}
-	require.Equal(t, transaction.LocalAborted, c.Confirm(t.Context(), previous.Execution))
+	// Confirm intentionally follows only the active execution after Replan.
+	require.Equal(t, transaction.LocalUnknown, c.Confirm(t.Context(), previous.Execution))
+	for _, ref := range previous.Execution.References() {
+		require.Equal(t, transaction.Rollback, (transaction.StoreChecker{Store: c.store}).Check(t.Context(), ref), "exact old witness remains Aborted")
+	}
 	cases["explicit_aborted_replan_retains_wire_and_prior_evidence"] = true
+	t.Log("READABLE_REPLAN_STAGE start_consumer")
 	config, err := observer.RocketMQ.Load([]string{topic}, 2, 5*time.Second)
 	require.NoError(t, err)
 	consumer, err := rocketmq.NewSubscriber(rocketmq.SubscriberConfig{Config: config, MaxAttempts: 3, InvisibleDuration: 15 * time.Second, HandlerTimeout: 5 * time.Second, RetryDelay: time.Second})
@@ -145,6 +160,7 @@ func TestReadableCrossRouteReplanBrokerHost(t *testing.T) {
 		return nil
 	}, func(context.Context, transport.Failure) error { return fmt.Errorf("owned replan delivery failed") }))
 	var calls atomic.Int32
+	t.Log("READABLE_REPLAN_STAGE commit")
 	result, err := c.Commit(t.Context(), next.Execution, func(ctx context.Context) error {
 		calls.Add(1)
 		tx, err := hostmysql.RequireTx(ctx)
@@ -155,6 +171,7 @@ func TestReadableCrossRouteReplanBrokerHost(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Equal(t, transaction.LocalCommitted, result.Local)
+	t.Log("READABLE_REPLAN_STAGE consume")
 	select {
 	case m := <-received:
 		require.Equal(t, want, m.ID)
@@ -167,8 +184,13 @@ func TestReadableCrossRouteReplanBrokerHost(t *testing.T) {
 	require.NoError(t, pool.QueryRowContext(t.Context(), "SELECT COUNT(*) FROM replan_fact").Scan(&count))
 	require.Equal(t, 1, count)
 	require.Equal(t, transaction.LocalCommitted, c.Confirm(t.Context(), next.Execution))
-	require.Equal(t, transaction.LocalAborted, c.Confirm(t.Context(), previous.Execution))
+	// Confirm intentionally follows only the active execution after Replan.
+	require.Equal(t, transaction.LocalUnknown, c.Confirm(t.Context(), previous.Execution))
+	for _, ref := range previous.Execution.References() {
+		require.Equal(t, transaction.Rollback, (transaction.StoreChecker{Store: c.store}).Check(t.Context(), ref), "exact old witness remains Aborted")
+	}
 	cases["actual_readable_publish_original_root_and_one_effect"] = true
+	t.Log("READABLE_REPLAN_STAGE refuse_committed")
 	input.OperationID += "-forbidden"
 	forbidden, err := transaction.NewPlan(input)
 	require.NoError(t, err)

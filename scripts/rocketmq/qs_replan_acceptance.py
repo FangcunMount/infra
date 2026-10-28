@@ -12,6 +12,24 @@ from routes import validate
 CASES = frozenset(('old_unknown_replan_refused_without_business', 'historical_ordinary_retry_refused',
     'explicit_aborted_replan_retains_wire_and_prior_evidence', 'actual_readable_publish_original_root_and_one_effect',
     'committed_replan_refused_no_duplicate_execution'))
+STAGES = frozenset(('configuration', 'construct_owner', 'start_owner', 'reserve_old', 'refuse_unknown',
+    'refuse_historical_retry', 'abort_old', 'replan', 'verify_artifacts', 'start_consumer', 'commit',
+    'consume', 'refuse_committed'))
+
+
+def diagnostics(raw):
+    """Only reviewed stage names, source line numbers and fixed classifications."""
+    result = host_failure_summary(raw)
+    result['assertion_lines'] = sorted(set(int(n) for n in re.findall(
+        r'readable_owned_replan_test\.go:(\d+)', raw)))[:32]
+    result['stages'] = [stage for stage in re.findall(r'READABLE_REPLAN_STAGE ([a-z_]+)',raw)
+                        if stage in STAGES][-32:]
+    result['error_classes'] = [key for key,text in (
+        ('invalid_plan','invalid frozen transaction plan'),
+        ('binding','transaction owner, store identity or epoch mismatch'),
+        ('stale_execution','transaction execution is not owned or no longer prepared'),
+        ('missing_table','Error 1146'),('access_denied','Error 1045')) if text in raw]
+    return result
 
 
 def enabled(environment, readable):
@@ -62,7 +80,7 @@ def run_replan(source, directory, route_path, environment, run, proof):
         raw = result.stdout + result.stderr
         log = directory/'readable-replan-private.log';log.write_text(raw);log.chmod(0o600)
         detail.update(exit_code=result.returncode,private_output_sha256=hashlib.sha256(raw.encode()).hexdigest(),
-                      diagnostics=host_failure_summary(raw))
+                      diagnostics=diagnostics(raw))
         if result.returncode:raise RuntimeError('actual_readable_replan_failed_private_output_withheld')
         detail['native_receipt'] = receipt(raw,proof['source_sha'])
     finally:
@@ -74,4 +92,4 @@ def run_replan(source, directory, route_path, environment, run, proof):
         if not detail['source_clean_after']:raise RuntimeError('host_source_changed_during_replan')
     base = proof['native_receipt']
     cases = dict(base['cases'], **{'route_replan_'+k:v for k,v in detail['native_receipt']['cases'].items()})
-    proof['native_receipt'] = dict(passed=len(cases),failed=0,skipped=0,cases=cases)
+    proof['native_receipt'] = dict(base,passed=len(cases),failed=0,skipped=0,cases=cases)
