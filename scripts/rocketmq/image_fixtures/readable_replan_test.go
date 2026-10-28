@@ -6,6 +6,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -17,6 +18,7 @@ import (
 
 	shared "github.com/FangcunMount/qs-server/internal/apiserver/eventing/transactionplan"
 	hostmysql "github.com/FangcunMount/qs-server/internal/pkg/database/mysql"
+	"github.com/FangcunMount/qs-server/internal/pkg/messagingruntime"
 	"github.com/FangcunMount/qs-server/internal/pkg/options"
 	"github.com/FangcunMount/reliable-messaging/transaction"
 	"github.com/FangcunMount/reliable-messaging/transport"
@@ -169,6 +171,40 @@ func TestReadableCrossRouteReplanBrokerHost(t *testing.T) {
 		}
 		return tx.Exec("INSERT INTO replan_fact VALUES(?)", []byte(want)).Error
 	})
+	// Never serialize Result, Execution or an error: they contain capabilities,
+	// wire identities or service addresses. The harness applies a second allowlist.
+	state := map[string]any{"local": result.Local, "business_calls": calls.Load(),
+		"lease_expired":    !time.Now().Before(next.Execution.LeaseUntil),
+		"ready":            c.Runtime().Stats().Ready,
+		"admission_closed": errors.Is(err, messagingruntime.ErrTransactionAdmissionClosed),
+		"stale_execution":  errors.Is(err, transaction.ErrStaleExecution),
+		"binding_error":    errors.Is(err, transaction.ErrBinding),
+		"invalid_plan":     errors.Is(err, transaction.ErrInvalidPlan),
+		"root_required":    errors.Is(err, transaction.ErrTransactionRequired),
+		"schema_error":     errors.Is(err, transaction.ErrSchema),
+		"deadline":         errors.Is(err, context.DeadlineExceeded),
+		"canceled":         errors.Is(err, context.Canceled)}
+	protection := c.Runtime().ProtectionStats()
+	state["protection"] = map[string]any{"available": protection.Available, "fresh": protection.Fresh,
+		"protected": protection.Protected, "reason": protection.Reason}
+	var dbError *driver.MySQLError
+	if errors.As(err, &dbError) {
+		state["mysql_number"] = int(dbError.Number)
+	}
+	branches := make([]map[string]any, 0, len(result.Branches))
+	for _, branch := range result.Branches {
+		code := "unclassified"
+		for _, fixed := range []string{"", "half_unknown", "half_rejected_grpc_permission_denied", "half_rejected_grpc_unauthenticated", "invalid_half_receipt", "half_audit_failed", "final_audit_failed"} {
+			if branch.ErrorCode == fixed {
+				code = fixed
+			}
+		}
+		branches = append(branches, map[string]any{"half": branch.Half, "final": branch.Final, "code": code})
+	}
+	state["branches"] = branches
+	diagnostic, diagnosticErr := json.Marshal(state)
+	require.NoError(t, diagnosticErr)
+	fmt.Println("READABLE_REPLAN_COMMIT_STATE " + string(diagnostic))
 	require.NoError(t, err)
 	require.Equal(t, transaction.LocalCommitted, result.Local)
 	t.Log("READABLE_REPLAN_STAGE consume")

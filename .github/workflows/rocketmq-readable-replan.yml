@@ -9,6 +9,10 @@ on:
         type: string
         required: true
         default: eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b
+      diagnostic_only:
+        description: One MySQL profile for diagnosis; never completes the required two-profile gate
+        type: boolean
+        default: false
 permissions:
   contents: read
 env:
@@ -42,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mysql: ['mysql:8.0.36', 'mysql:8.4']
+        mysql: ${{ fromJSON(inputs.diagnostic_only && '["mysql:8.0.36"]' || '["mysql:8.0.36", "mysql:8.4"]') }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
@@ -70,6 +74,7 @@ jobs:
           QS_M3_READABLE_REPLAN: '1'
           QS_REF: ${{ inputs.qs_ref || 'eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b' }}
           MYSQL_IMAGE: ${{ matrix.mysql }}
+          DIAGNOSTIC_ONLY: ${{ inputs.diagnostic_only }}
           GOWORK: 'off'
           GOFLAGS: '-mod=readonly'
         run: |
@@ -83,7 +88,11 @@ jobs:
           python3 - <<'PY'
           import json, os
           from pathlib import Path
-          data = json.loads(Path('readable-qs-host.json').read_text())
+          path = Path('readable-qs-host.json')
+          data = json.loads(path.read_text())
+          data['validation_scope'] = ('diagnostic_single_profile_not_release_gate'
+              if os.environ['DIAGNOSTIC_ONLY']=='true' else 'required_two_profile_matrix')
+          path.write_text(json.dumps(data, indent=2)+'\n')
           host = data['proof']['qs_evaluation_host']
           assert data['passed']==len(data['cases'])==14 and data['failed']==data['skipped']==0
           assert host['source_sha']==os.environ['QS_REF'] and host['source_clean_after']

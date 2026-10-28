@@ -49,11 +49,17 @@ class ReadableCIPolicyTest(unittest.TestCase):
         self.assertEqual(native['needs'],'contracts')
         self.assertNotIn('if',jobs['contracts'])
         self.assertIs(native['strategy']['fail-fast'],False)
-        self.assertEqual(native['strategy']['matrix']['mysql'],['mysql:8.0.36','mysql:8.4'])
+        events=value.get('on',value.get(True))
+        self.assertIs(events['workflow_dispatch']['inputs']['diagnostic_only']['default'],False)
+        matrix=native['strategy']['matrix']['mysql']
+        self.assertIn('inputs.diagnostic_only',matrix)
+        self.assertIn("|| '[\"mysql:8.0.36\", \"mysql:8.4\"]'",matrix)
+        self.assertIn("&& '[\"mysql:8.0.36\"]'",matrix)
         command=next(s['run'] for s in native['steps'] if s.get('name')=='Actual host original root under readable routes')
         self.assertIn("data['passed']==len(data['cases'])==14",command)
         self.assertIn("replan['native_receipt']['passed']==5",command)
         self.assertIn("data['failed']==data['skipped']==0",command)
+        self.assertIn('diagnostic_single_profile_not_release_gate',command)
 
     def test_future_keeps_full_native_matrix_without_pr_double_dispatch(self):
         root=Path(__file__).resolve().parents[2]

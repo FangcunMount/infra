@@ -1,10 +1,31 @@
 import json
 import unittest
 
-from qs_replan_acceptance import CASES, diagnostics, enabled, receipt
+from qs_replan_acceptance import CASES, commit_states, diagnostics, enabled, receipt
 
 
 class QSReplanAcceptanceTest(unittest.TestCase):
+    def test_commit_diagnostics_are_allowlisted_and_bounded_even_for_forged_error_lines(self):
+        value=dict(local='unknown',business_calls=0,ready=False,admission_closed=True,
+            lease_expired=False, mysql_number=1146,
+            protection=dict(available=True,fresh=True,protected=True,reason='metadata_conflict',wire='SECRET'),
+            branches=[dict(half='not_attempted',final='not_attempted',code='',reference='SECRET')],
+            execution_token='SECRET',error='SECRET')
+        raw='READABLE_REPLAN_COMMIT_STATE '+json.dumps(value)
+        state=commit_states(raw)[0]
+        self.assertTrue(state['admission_closed']);self.assertEqual(state['mysql_number'],1146)
+        self.assertEqual(state['protection'],dict(available=True,fresh=True,protected=True,reason='metadata_conflict'))
+        self.assertEqual(state['branches'],[dict(half='not_attempted',final='not_attempted',code='')])
+        self.assertNotIn('SECRET',json.dumps(state))
+        for key in ('local','business_calls','ready','mysql_number'):value[key]='SECRET'
+        value['protection']['reason']=['SECRET']
+        value['branches']=[dict(half='SECRET',final=[],code='SECRET',error='SECRET')]*32
+        bad='READABLE_REPLAN_COMMIT_STATE '+json.dumps(value)
+        states=commit_states('\n'.join([bad]*8))
+        self.assertEqual(len(states),4);self.assertEqual(len(states[0]['branches']),16)
+        self.assertNotIn('SECRET',json.dumps(states))
+        self.assertEqual(commit_states('READABLE_REPLAN_COMMIT_STATE []\nREADABLE_REPLAN_COMMIT_STATE broken'),[])
+
     def test_failure_diagnostics_preserve_exact_lines_and_fixed_stages_without_runtime_contents(self):
         raw = ('/private/source/readable_owned_replan_test.go:146: READABLE_REPLAN_STAGE replan\n'
                'Error Trace: /private/source/readable_owned_replan_test.go:152\n'

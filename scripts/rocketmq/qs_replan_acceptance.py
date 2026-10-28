@@ -15,6 +15,45 @@ CASES = frozenset(('old_unknown_replan_refused_without_business', 'historical_or
 STAGES = frozenset(('configuration', 'construct_owner', 'start_owner', 'reserve_old', 'refuse_unknown',
     'refuse_historical_retry', 'abort_old', 'replan', 'verify_artifacts', 'start_consumer', 'commit',
     'consume', 'refuse_committed'))
+PROTECTION_REASONS = frozenset(('', 'native_transaction_limit', 'invalid_check', 'binding_conflict',
+    'observation_unavailable', 'invalid_observation', 'metadata_conflict', 'confirmation_age_unavailable',
+    'committed_half_unobserved', 'confirmation_gap', 'preparation_expired', 'checker_saturated'))
+
+
+def commit_states(raw):
+    """Parse fixed classifications only, even if an untrusted error mimics a record."""
+    states=[]
+    for line in raw.splitlines():
+        if not line.startswith('READABLE_REPLAN_COMMIT_STATE '):continue
+        try:value=json.loads(line.removeprefix('READABLE_REPLAN_COMMIT_STATE '))
+        except (ValueError,TypeError):continue
+        if not isinstance(value,dict):continue
+        state={key:value[key] for key in ('lease_expired','ready','admission_closed','stale_execution',
+            'binding_error','invalid_plan','root_required','schema_error','deadline','canceled')
+            if type(value.get(key)) is bool}
+        if value.get('local') in ('not_started','committed','aborted','unknown'):state['local']=value['local']
+        for key,maximum in (('business_calls',16),('mysql_number',65535)):
+            if type(value.get(key)) is int and 0<=value[key]<=maximum:state[key]=value[key]
+        protection=value.get('protection')
+        if isinstance(protection,dict):
+            safe={key:protection[key] for key in ('available','fresh','protected') if type(protection.get(key)) is bool}
+            if isinstance(protection.get('reason'),str) and protection['reason'] in PROTECTION_REASONS:safe['reason']=protection['reason']
+            state['protection']=safe
+        branches=value.get('branches')
+        if isinstance(branches,list):
+            safe=[]
+            for branch in branches[:16]:
+                if not isinstance(branch,dict):continue
+                row={}
+                for key,allowed in (('half',('not_attempted','prepared','rejected','unknown')),
+                    ('final',('not_attempted','commit_confirmed','rollback_confirmed','unknown')),
+                    ('code',('', 'unclassified','half_unknown','half_rejected_grpc_permission_denied',
+                             'half_rejected_grpc_unauthenticated','invalid_half_receipt','half_audit_failed','final_audit_failed'))):
+                    if isinstance(branch.get(key),str) and branch[key] in allowed:row[key]=branch[key]
+                safe.append(row)
+            state['branches']=safe
+        states.append(state)
+    return states[-4:]
 
 
 def diagnostics(raw):
@@ -30,6 +69,7 @@ def diagnostics(raw):
         ('binding','transaction owner, store identity or epoch mismatch'),
         ('stale_execution','transaction execution is not owned or no longer prepared'),
         ('missing_table','Error 1146'),('access_denied','Error 1045')) if text in raw]
+    result['commit_states'] = commit_states(raw)
     return result
 
 
@@ -70,7 +110,8 @@ def run_replan(source, directory, route_path, environment, run, proof):
     code = fixture.read_bytes()
     proof['route_replan'] = detail = dict(fixture_sha256=hashlib.sha256(code).hexdigest(),
         original_route_sha256=hashlib.sha256(original).hexdigest(),source_sha=proof['source_sha'],
-        production=False,system_acceptance=False)
+        production=False,system_acceptance=False,
+        diagnostic_only=environment.get('DIAGNOSTIC_ONLY')=='true')
     try:
         target.write_bytes(code)
         route_path.write_text(json.dumps(manifest));route_path.chmod(0o600)
