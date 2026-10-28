@@ -106,6 +106,23 @@ class ReadableRuntimeTest(unittest.TestCase):
             v = json.loads(config(plan)); v['services']['other'] = {}
             with self.assertRaises(BoundaryError): target.verify_budget(plan, json.dumps(v))
 
+    def test_only_exact_existing_external_assets_are_borrowed_and_never_modified(self):
+        with tempfile.TemporaryDirectory() as value:
+            root = Path(value).resolve() / 'release'; root.mkdir()
+            path, _, plan = fixture(root)
+            external = root.parent / 'existing-tls.key'
+            expected = private(external, b'original-tls-bytes')
+            external.chmod(0o440)
+            plan['assets'][str(external)] = expected
+            digest = private(path, json.dumps(plan).encode())
+            with self.assertRaises(BoundaryError): target.load(path, digest, root=root)
+            with patch.object(target, 'EXTERNAL_ASSETS', {external}):
+                target.load(path, digest, root=root)
+                self.assertEqual(external.read_bytes(), b'original-tls-bytes')
+                self.assertEqual(external.stat().st_mode & 0o777, 0o440)
+                external.chmod(0o666)
+                with self.assertRaises(BoundaryError): target.load(path, digest, root=root)
+
     def test_cli_offline_and_execute_attestation_never_grants_approval(self):
         with patch.object(target, 'load', return_value={}), patch.object(target, 'execute') as start:
             args = ['--plan', '/unused', '--reviewed-sha256', '1' * 64]
