@@ -29,13 +29,24 @@ ROLES = {
     'ai': ('serverA', 'qs-ai', 'qs-ai', 1, 768 << 20, 750000000, 10001),
     'qs-worker': ('serverD', 'qs-worker', 'runtime', 3, 768 << 20, 1000000000, 2000),
 }
+EXTERNAL_ASSETS = {
+    Path('/data/infra/ssl/mysql/ca-chain.pem'),
+    Path('/data/infra/ssl/redis/ca-chain.pem'),
+    Path('/data/infra/ssl/grpc/ca/ca-chain.crt'),
+    Path('/data/infra/ssl/grpc/server/iam-apiserver.crt'),
+    Path('/data/infra/ssl/grpc/server/iam-apiserver.key'),
+    Path('/data/infra/ssl/grpc/server/qs-ai-fullchain.crt'),
+    Path('/data/infra/ssl/grpc/server/qs-ai.key'),
+    Path('/opt/fangcun-m4/releases/m4-c08-20261027-v1/qs-api/assets/events.yaml'),
+}
 
 
-def read(path, *, private=False):
+def read(path, *, private=False, owners=None):
     p = Path(path)
     info = p.lstat()
     if (p.resolve() != p or not stat.S_ISREG(info.st_mode) or info.st_nlink != 1
-            or info.st_uid != os.geteuid() or not 0 < info.st_size <= 1048576
+            or info.st_uid not in (owners if owners is not None else {os.geteuid()})
+            or not 0 < info.st_size <= 1048576
             or info.st_mode & 0o022
             or (private and stat.S_IMODE(info.st_mode) != 0o600)):
         raise BoundaryError('reviewed regular input required')
@@ -115,9 +126,11 @@ def load(path, digest, *, root=ROOT):
             raise BoundaryError('frozen configuration differs')
     for filename, expected in plan['assets'].items():
         p = Path(filename)
-        if (not p.is_absolute() or not any(p.is_relative_to(base) for base in
+        allowed = p in EXTERNAL_ASSETS or any(p.is_relative_to(base) for base in
                 (root, Path('/var/lib/fangcun-m4-materials'), Path('/opt/qs-server/qs-apiserver/ai-mq-releases')))
-                or hashlib.sha256(read(p)).hexdigest() != expected):
+        owners = {os.geteuid(), 2000, 10001} if p in EXTERNAL_ASSETS else None
+        if (not p.is_absolute() or not allowed
+                or hashlib.sha256(read(p, owners=owners)).hexdigest() != expected):
             raise BoundaryError('frozen material differs')
     return plan
 
