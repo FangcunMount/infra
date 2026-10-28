@@ -81,6 +81,8 @@ def parse_host_receipt(output):
 
 
 def run_qs_evaluation_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, private_log=None, *, readable=False):
+    from qs_replan_acceptance import enabled
+    replan = enabled(os.environ, readable)
     source = source.resolve()
     if not (source / 'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS host source required')
@@ -139,3 +141,6 @@ def run_qs_evaluation_host(source, directory, broker, project, grpc_port, mysql_
     proof['scope'] = ('real RocketMQ and original MySQL application submission/outcome roots; '
                       'deterministic input fixture, not system/production; '
                       'failure engine keeps original future schedule; no provider, packet loss, SIGKILL or T13 handoff claim')
+    if replan:
+        from qs_replan_acceptance import run_replan
+        run_replan(source, directory, routes, env, run, proof)

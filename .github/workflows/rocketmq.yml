@@ -2,10 +2,23 @@ name: RocketMQ Docker acceptance
 # AI finalization tools run their own required host gate; shared changes retain this matrix.
 on:
   pull_request:
-    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '!scripts/rocketmq/ai_finalization_*', '!scripts/rocketmq/test_ai_finalization_*', '.github/workflows/rocketmq.yml']
-  push:
-    branches: [main]
-    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '!scripts/rocketmq/ai_finalization_*', '!scripts/rocketmq/test_ai_finalization_*', '.github/workflows/rocketmq.yml']
+    paths:
+      - "components/rocketmq/**"
+      - "scripts/rocketmq/**"
+      - "!scripts/rocketmq/ai_finalization_*"
+      - "!scripts/rocketmq/test_ai_finalization_*"
+      - "!scripts/rocketmq/qs_replan_acceptance.py"
+      - "!scripts/rocketmq/test_qs_replan_acceptance.py"
+      - "!scripts/rocketmq/image_fixtures/readable_replan_test.go"
+      - "!scripts/rocketmq/test_readable_ci_policy.py"
+      - "!scripts/rocketmq/readable_publish_candidates.py"
+      - "!scripts/rocketmq/test_readable_publish_candidates.py"
+      - "!scripts/rocketmq/readable_cutover.py"
+      - "!scripts/rocketmq/readable_cutover_materials.py"
+      - "!scripts/rocketmq/readable_cutover_receipt.py"
+      - "!scripts/rocketmq/test_readable_cutover_materials.py"
+      - "!scripts/rocketmq/test_readable_cutover_receipt.py"
+      - ".github/workflows/rocketmq.yml"
   workflow_dispatch:
     inputs:
       sdk_ref:
