@@ -18,7 +18,7 @@ from audit_transaction_limit import write_private
 from iam_image_start import configuration as iam_configuration, protocol_metrics, seed_receipt, source_failure_markers
 from image_start_fixture import require
 from m3_resources import manifest
-from provision_v2 import provision
+from provision_v2 import ProvisionReadbackError, provision
 from qs_image_pair import QSPairFixture, QS_SHA
 from qs_runtime_configuration import configuration as qs_configuration
 from qs_consumer_contract import parse_contract, validate_manifest
@@ -463,6 +463,8 @@ def main():
             report['failure_source_frames'].append(dict(file=str(relative),line=frame.lineno))
         report['failure_source_frames'] = report['failure_source_frames'][-8:]
         if isinstance(error, AuditError): report['mongo_audit_failure'] = error.audit_diagnostic
+        if isinstance(error, ProvisionReadbackError):
+            report['resource_readback_failure'] = error.audit_diagnostic
         if re.fullmatch(r'[a-z][a-z0-9_]{1,100}', str(error)): report['failure_reason'] = str(error)
         report['processes'] = {}
         for component in f.applications:
