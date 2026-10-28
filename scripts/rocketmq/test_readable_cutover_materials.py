@@ -56,3 +56,16 @@ class ReadableCutoverMaterialsTest(unittest.TestCase):
     def test_phase_and_project_cannot_select_arbitrary_root(self):
         for project,phase in [('production','active'),(PROJECT,'../other'),(PROJECT,'current')]:
             with self.assertRaises(RuntimeError):revision(project,phase)
+
+    def test_actual_compose_readonly_ai_mount_may_omit_false_create_host_path(self):
+        original='m4-owned-aabbccddeeff'
+        source=str(BASE/ROLES['ai'][0]/'versions'/original/'rocketmq/routes.json')
+        # Actual Compose output supplies bind={} for these AI file mounts.
+        # FiveImageFixture still uses Docker --mount, which never creates a
+        # missing host path. Explicit create=true and foreign revisions fail.
+        mounts=dict(ai=[dict(source=source,target='/run/qs-ai-rocketmq/routes.json',read_only=True,bind={})])
+        result=rebase_mounts(mounts,original,revision(PROJECT,'compat'))
+        self.assertIn('/versions/readable-compat-aabbccddeeff/',result['ai'][0]['source'])
+        self.assertEqual(mounts['ai'][0]['source'],source)
+        mounts['ai'][0]['bind']['create_host_path']=True
+        with self.assertRaises(RuntimeError):rebase_mounts(mounts,original,revision(PROJECT,'compat'))

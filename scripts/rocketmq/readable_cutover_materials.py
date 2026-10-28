@@ -63,7 +63,7 @@ def rebase_mounts(mounts, original, target):
         after=str(BASE/ROLES[role][0]/'versions'/target)
         for value in values:
             source=value['source']
-            require(value.get('read_only') is True and value.get('bind',{}).get('create_host_path') is False
+            require(value.get('read_only') is True and value.get('bind',{}).get('create_host_path',False) is False
                     and (source==before or source.startswith(before+'/')),'original_readonly_version_mount_required')
             value['source']=after+source[len(before):]
     return result
