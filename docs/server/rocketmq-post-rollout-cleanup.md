@@ -1,6 +1,6 @@
 # RocketMQ 批次完成后的 Actions 与临时库清理
 
-截至 2026-10-28 23:45（北京时间）：**18 个过时 workflow 已删除并合并 main；另 5 个无源码的失效注册入口已停用。数据库完成 dbadmin 全实例核验，尚未执行 DROP。**
+截至 2026-10-29（北京时间）：**18 个过时 workflow 已删除并合并 main；另 5 个无源码的失效注册入口已停用。用户具名批准的 14 个临时库已删除并完成回读，原生产备份保留。**
 
 本次不改变 M2/M3/M4 或可读命名迁移的完成计数。代码合并、Actions 注册状态、自动部署、数据库删除分别记账。
 
@@ -21,48 +21,50 @@ Sonar workflow 和 `sonar-project.properties` 已删除；QS 仓库专用 `SONAR
 
 本地验证：四库 `actionlint`；infra 476 项契约测试；IAM 文档事实/卫生检查；QS 88 项文档测试及完整 `docs-check`；AI 25 项 schema transport/当前 CD 边界测试，75 个 Markdown 的文档检查均通过。未在 MacBook 启动 Docker 集成依赖。
 
-## 全实例数据库核验与待执行处置
+## 全实例数据库核验与已完成处置
 
 使用 DataGrip 中既有 dbadmin 连接完成只读核验，与应用连接的实例身份一致。全实例共 25 个 schema；其中 15 个为 10 月 8 日旧 AI 数据表迁移的备份、失败副本或演练目标。应用账号最初只能看到部分 schema，不能据此得出“没有临时库”的结论。
 
-| 精确 schema | 表数 | Alembic head | 当前处置 |
+| 精确 schema | 表数 | Alembic head | 最终处置 |
 |---|---:|---|---|
-| `ai_backup_dbrefactor_20261008` | 54 | 0038 | 原生产备份，保留期例外需明确选择 |
-| `ai_backup_probe_dbrefactor_20261008` | 0 | — | 待执行时确认 |
-| `ai_failed_789955ac857a` | 44 | 0040 | 待执行时确认 |
-| `ai_failed_dbfollowup_20261008_def29f6044cc7757` | 0 | — | 待执行时确认 |
-| `ai_failed_e293b5a44cce` | 54 | 0038 | 待执行时确认 |
-| `ai_failed_rehearsal_dbrefactor_20261008` | 0 | — | 待执行时确认 |
-| `ai_failed_rehearsal_f4f27e221b35` | 0 | — | 待执行时确认 |
-| `ai_refactor_dbrefactor_20261008` | 0 | — | 待执行时确认 |
-| `ai_refactor_followup_f4f27e221b35` | 44 | 0040 | 待执行时确认 |
-| `ai_refactor_probe_dbrefactor_20261008` | 0 | — | 待执行时确认 |
-| `ai_refactor_prompt_16fbf8f263c94da3be4c9826d9843d2a` | 44 | 0040 | 待执行时确认 |
-| `ai_refactor_rehearsal_dbrefactor_20261008` | 54 | 0038 | 待执行时确认 |
-| `ai_rollback_dbfollowup_20261008_def29f6044cc7757` | 54 | 0038 | 待执行时确认 |
-| `ai_rollback_rehearsal_dbrefactor_20261008` | 0 | — | 待执行时确认 |
-| `ai_rollback_rehearsal_f4f27e221b35` | 54 | 0038 | 待执行时确认 |
+| `ai_backup_dbrefactor_20261008` | 54 | 0038 | 原生产备份，用户明确保留 |
+| `ai_backup_probe_dbrefactor_20261008` | 0 | — | ✅ 已删除并回读不存在 |
+| `ai_failed_789955ac857a` | 44 | 0040 | ✅ 已删除并回读不存在 |
+| `ai_failed_dbfollowup_20261008_def29f6044cc7757` | 0 | — | ✅ 已删除并回读不存在 |
+| `ai_failed_e293b5a44cce` | 54 | 0038 | ✅ 已删除并回读不存在 |
+| `ai_failed_rehearsal_dbrefactor_20261008` | 0 | — | ✅ 已删除并回读不存在 |
+| `ai_failed_rehearsal_f4f27e221b35` | 0 | — | ✅ 已删除并回读不存在 |
+| `ai_refactor_dbrefactor_20261008` | 0 | — | ✅ 已删除并回读不存在 |
+| `ai_refactor_followup_f4f27e221b35` | 44 | 0040 | ✅ 已删除并回读不存在 |
+| `ai_refactor_probe_dbrefactor_20261008` | 0 | — | ✅ 已删除并回读不存在 |
+| `ai_refactor_prompt_16fbf8f263c94da3be4c9826d9843d2a` | 44 | 0040 | ✅ 已删除并回读不存在 |
+| `ai_refactor_rehearsal_dbrefactor_20261008` | 54 | 0038 | ✅ 已删除并回读不存在 |
+| `ai_rollback_dbfollowup_20261008_def29f6044cc7757` | 54 | 0038 | ✅ 已删除并回读不存在 |
+| `ai_rollback_rehearsal_dbrefactor_20261008` | 0 | — | ✅ 已删除并回读不存在 |
+| `ai_rollback_rehearsal_f4f27e221b35` | 54 | 0038 | ✅ 已删除并回读不存在 |
 
 15 个对象均验证无活动连接、跨库外键、events、routines 或 triggers；当前生产 `ai` 的 head 为 `0043_native_transaction_limit`。不以 schema 名称或空表作为唯一删除依据。
 
-推荐批次为上表中除原生产备份外的 **14 个临时库**，涉及 348 张旧快照表及 7 个空 schema。`ai_backup_dbrefactor_20261008` 在原迁移记录中的最早删除时间为 **2026-11-07T11:54:59.530182Z**；全部 15 个删除必须明确豁免该备份保留期。永久删除通过 DataGrip 执行，按电脑工具要求在实际动作前确认，SQL 已具名准备但尚未执行。
+用户选择“删除14个临时库，保留该生产备份”，已执行上表中除原生产备份外的 **14 个临时库**删除，涉及 348 张旧快照表及 7 个空 schema。`ai_backup_dbrefactor_20261008` 在原迁移记录中的最早删除时间为 **2026-11-07T11:54:59.530182Z**；本次没有豁免保留期。收到动作时确认后，通过 DataGrip 既有 dbadmin 控制台执行具名 SQL；执行前再次确认实例身份一致、15 个候选均无活动连接、跨库外键、events、routines 或 triggers。
 
 保护对象：`ai`（51 表）、`iam`（30）、`qs`（67）、`miniblog`（13）、`statistic_db`（3），以及所有系统 schema 和 `__recycle_bin__`。`statistic_db` 含实际广告统计数据，不属于本次临时库；应用库内部仍被 schema、历史读取或恢复使用的 Outbox/证据表不在本次删除范围。没有删除存储过程、生产业务记录、事务 witness、备份文件或 Docker 卷。
 
-删除动作后必须回读全目录、受保护库与当前 AI head，再记录实际删除数及未完成对象。网络结果不明确时先回读，不盲目重放 DROP。
+删除后完整目录由 25 个 schema 降至 11 个，14 个白名单对象剩余为 0；保留备份仍有 54 张表且 head 为 `0038_messaging_observations`。五个业务库表数保持 51/30/67/13/3，生产 AI head 仍为 `0043_native_transaction_limit`。12 项只读验收实际值全部匹配期望值，IAM/QS/collection 公网健康接口全部 HTTP 200。没有重放 DROP。
+
+[脱敏删除回执](../evidence/2026-10-29-post-rocketmq-database-retirement.json)记录精确名单、验收结果、私有原始证据摘要。DataGrip 自建控制台最后仅保留只读验收 SQL，其他用户控制台未修改。备份保留是本次最终处置，不作为待删除任务或自动定时删除授权。
 
 ## 自动部署与运行核验：独立于清理完成
 
 未修改自动生产 CD 的开关，也未手工重派任何部署。清理合并触发的原 main CI/CD 按既有链路运行。
 
 - IAM main CI 通过，但 [自动部署 #40715072424](https://github.com/FangcunMount/iam/actions/runs/40715072424) 在远端 `remote-deploy.sh` 返回 1；镜像构建成功。当前日志只定位到 CA 校验之后，尚不能断言具体根因；已独立只读验证本机安装的 IAM material receipt 正常。禁止将此项写为部署成功或用盲目重跑掩盖失败。
-- QS [自动部署 #40717756139](https://github.com/FangcunMount/qs-server/actions/runs/40717756139) 已完成计划阶段，三镜像构建进行中；AI main checks 进行中。最终结果需继续回读。
+- QS [自动部署 #40717756139](https://github.com/FangcunMount/qs-server/actions/runs/40717756139) 已完成并失败；AI [main checks #40717738533](https://github.com/FangcunMount/qs-ai/actions/runs/40717738533) 已通过。这些部署结果与本次数据库清理分别记账，未手工重跑。
 - 八个业务容器回读均 `running`、restart count 为 0；serverA 五个容器为 `healthy`，三个 worker 未配置 Docker healthcheck。IAM、QS、collection 公网 `/healthz` 均为 HTTP 200。
 - Mac mini Prometheus 实际目录当前只有 5 个目标，三个 worker 采集超时，四 owner 指标未出现。原“10 目标全 up”脚本因此失败，不能当作通过。Broker 与 Prometheus 自身目标为 up；这说明监控覆盖需独立跟进，不证明 worker 业务异常，也没有修改生产采集或网络配置。
 
 ## 证据
 
-本次私有执行目录为 `~/.local/state/rocketmq-post-rollout-cleanup-20261028`，权限 0700，敏感核验和 UI 证据文件为 0600；不提交凭据或原业务正文。包括源码选择/完整 SHA、GitHub 运行及合并回执、18 个删除注册状态、5 个停用回执、dbadmin preflight/version AX 记录、具名 SQL 和审核截图。数据库删除回执尚未产生。
+本次私有执行目录为 `~/.local/state/rocketmq-post-rollout-cleanup-20261028`，权限 0700，敏感核验和 UI 证据文件为 0600；不提交凭据或原业务正文。包括源码选择/完整 SHA、GitHub 运行及合并回执、18 个删除注册状态、5 个停用回执、dbadmin preflight/version AX 记录、具名 SQL 和审核截图。数据库具名删除与 12 项验收的私有回执、完整目录结果和完成截图已保存，脱敏摘要随仓库提交。
 
 下文保留动手前的分析快照；其中“应用账号可见元数据”和后续全实例盘点分别反映当时的证据范围。
 

@@ -1,0 +1,106 @@
+{
+  "schema": "post-rocketmq-database-retirement/v1",
+  "client_date": "2026-10-29",
+  "approval_scope": "delete_14_named_temporary_schemas_keep_production_backup",
+  "deleted_schemas": [
+    "ai_backup_probe_dbrefactor_20261008",
+    "ai_failed_789955ac857a",
+    "ai_failed_dbfollowup_20261008_def29f6044cc7757",
+    "ai_failed_e293b5a44cce",
+    "ai_failed_rehearsal_dbrefactor_20261008",
+    "ai_failed_rehearsal_f4f27e221b35",
+    "ai_refactor_dbrefactor_20261008",
+    "ai_refactor_followup_f4f27e221b35",
+    "ai_refactor_probe_dbrefactor_20261008",
+    "ai_refactor_prompt_16fbf8f263c94da3be4c9826d9843d2a",
+    "ai_refactor_rehearsal_dbrefactor_20261008",
+    "ai_rollback_dbfollowup_20261008_def29f6044cc7757",
+    "ai_rollback_rehearsal_dbrefactor_20261008",
+    "ai_rollback_rehearsal_f4f27e221b35"
+  ],
+  "deleted_schema_count": 14,
+  "remaining_schema_count": 11,
+  "retained_backup": "ai_backup_dbrefactor_20261008",
+  "retained_backup_earliest_delete_at": "2026-11-07T11:54:59.530182Z",
+  "checks": [
+    {
+      "check": "retired_schemas_remaining",
+      "actual": "0",
+      "expected": "0",
+      "passed": true
+    },
+    {
+      "check": "total_schemas",
+      "actual": "11",
+      "expected": "11",
+      "passed": true
+    },
+    {
+      "check": "retained_backup_tables",
+      "actual": "54",
+      "expected": "54",
+      "passed": true
+    },
+    {
+      "check": "ai_tables",
+      "actual": "51",
+      "expected": "51",
+      "passed": true
+    },
+    {
+      "check": "iam_tables",
+      "actual": "30",
+      "expected": "30",
+      "passed": true
+    },
+    {
+      "check": "qs_tables",
+      "actual": "67",
+      "expected": "67",
+      "passed": true
+    },
+    {
+      "check": "miniblog_tables",
+      "actual": "13",
+      "expected": "13",
+      "passed": true
+    },
+    {
+      "check": "statistic_tables",
+      "actual": "3",
+      "expected": "3",
+      "passed": true
+    },
+    {
+      "check": "production_ai_head",
+      "actual": "0043_native_transaction_limit",
+      "expected": "0043_native_transaction_limit",
+      "passed": true
+    },
+    {
+      "check": "retained_backup_head",
+      "actual": "0038_messaging_observations",
+      "expected": "0038_messaging_observations",
+      "passed": true
+    }
+  ],
+  "identity_verified": true,
+  "dbadmin_used": true,
+  "artifacts_sha256": {
+    "approved-database-selection.private.json": "be4d62e520c69d68f9047ba5c6a6ba16f6c6ccca10267c7f834a6ba51478cd04",
+    "approved-execution.sql": "93bb8a27ad20ab091e38f1473d77c626840145bbf34794c48020ccf1204d699b",
+    "dbadmin-predelete-recheck.ax.txt": "a55117ba87c9541c4b05b099e2f4f641e55f132d7ee9bc10d591cd6764565ad5",
+    "dbadmin-drop-result.ax.txt": "4b355537f1febd4db64ae75bcd254c002fc901006c4c2343dcaeb16a96001b9c",
+    "dbadmin-postdelete-proof.ax.txt": "345a3fa4de87071346e24ac5ac7a483eec008ff594ffaa8eeeb3fa2be41224d7",
+    "database-retirement-completed.png": "c23e5dc619bd2ab73c5498192c7e37e3b55f312b8327c094013d48959b638193",
+    "postdelete-public-health.private.json": "94a2aefd8ee7a151618cfc060a4e36edc82fb50f7df4fd2c9fac8a3740b305ee"
+  },
+  "private_receipt_sha256": "c0da1b1997c5c89b591cce3ad2231ae0be55854c05cef6b574b7373f4a0d6700",
+  "public_health_status": {
+    "iam": 200,
+    "qs": 200,
+    "collection": 200
+  },
+  "production_data_or_witness_mutation": false,
+  "broker_or_runtime_configuration_change": false
+}
