@@ -1,0 +1,178 @@
+{
+  "schema": "readable-T14-production-cutover/v1",
+  "verified_at": "2026-10-28T12:45:33.193268+00:00",
+  "binding_sha256": "49b19cd6cf86f456afc2e410ed79b6222f63c771cf391b6ee334abe868dd1b09",
+  "tasks": {
+    "T14": "complete",
+    "T15": "business accepted; post-open checks pending",
+    "T16": "preparing; no retirement yet"
+  },
+  "window": {
+    "started_epoch": 1793189690,
+    "opened_epoch": 1793191243.0086935,
+    "unavailable_seconds": 1553.009,
+    "deadline_epoch": 1793191490,
+    "upper_bound_met": true,
+    "post_open_check_due_epoch": 1793193043.0086935
+  },
+  "runtime": {
+    "serverA": {
+      "ai": {
+        "phase": "acceptance",
+        "rows": [
+          {
+            "cpu": 750000000,
+            "health": "healthy",
+            "id": "30162d96dea893ab2f2ed53882d7a6af464bb8e109f790e50ba25ae47ee5eb89",
+            "image": "sha256:a14f5fd4823cfda040de3aff9b1de6327df0644666758e924db2364393c31734",
+            "memory": 805306368,
+            "name": "qs-ai",
+            "restarts": 0
+          }
+        ]
+      },
+      "iam": {
+        "phase": "acceptance",
+        "rows": [
+          {
+            "cpu": 1000000000,
+            "health": "healthy",
+            "id": "2d5d7f29526367943bb0e2d798b7d396702a0ce1d46e5f4778b2fb61206264ed",
+            "image": "sha256:450f5c5872a247f04053116fbfb04ccd440315c4f3ed0fe9bd0353b2ed25b04b",
+            "memory": 1073741824,
+            "name": "iam-apiserver",
+            "restarts": 0
+          }
+        ]
+      },
+      "qs-api": {
+        "phase": "open",
+        "rows": [
+          {
+            "cpu": 2000000000,
+            "health": "healthy",
+            "id": "4fe7da1909161660aaaf00fb45926ea38a78cec781035f0587670e10fc71d91a",
+            "image": "sha256:5940b75bae8eff01b6649584450fe86665ac4e185a643aae17539d7ea05de4e2",
+            "memory": 1073741824,
+            "name": "qs-apiserver",
+            "restarts": 0
+          }
+        ]
+      },
+      "qs-collection": {
+        "phase": "closed",
+        "rows": [
+          {
+            "cpu": 1000000000,
+            "health": "healthy",
+            "id": "ee73c47ab8a750a18aee638cbaca67b15f477dce9ca94caacc871689deb351e8",
+            "image": "sha256:d139bfe81bba7fce5af87a69444d0b24fed0848aa66d3dff2251f6dd32fd0846",
+            "memory": 335544320,
+            "name": "qs-collection-server-1",
+            "restarts": 0
+          },
+          {
+            "cpu": 1000000000,
+            "health": "healthy",
+            "id": "63264e2c77a09c64199eb6c9337fe5012d4d5b71669bff6887e475291edb873c",
+            "image": "sha256:d139bfe81bba7fce5af87a69444d0b24fed0848aa66d3dff2251f6dd32fd0846",
+            "memory": 335544320,
+            "name": "qs-collection-server-2",
+            "restarts": 0
+          }
+        ]
+      }
+    },
+    "serverD": {
+      "qs-worker": {
+        "phase": "closed",
+        "rows": [
+          {
+            "cpu": 1000000000,
+            "health": "HTTP ready",
+            "id": "f00c72472bd6aa9cdd0db9e18b97f090e0c6f9d674e17989ae8352b5f8d79bd2",
+            "image": "sha256:b637bd1a84a4657b8452332d72629288c54665d9e0bd7faf5d1a1757dd9a72b6",
+            "memory": 805306368,
+            "name": "qs-worker-runtime-1",
+            "restarts": 0
+          },
+          {
+            "cpu": 1000000000,
+            "health": "HTTP ready",
+            "id": "f2324d481d51859eb63f46ee1675b141913e218c04fb02659e3804d2062ce31f",
+            "image": "sha256:b637bd1a84a4657b8452332d72629288c54665d9e0bd7faf5d1a1757dd9a72b6",
+            "memory": 805306368,
+            "name": "qs-worker-runtime-2",
+            "restarts": 0
+          },
+          {
+            "cpu": 1000000000,
+            "health": "HTTP ready",
+            "id": "ee0bc1496201f75d1d9512b5d488c21ec2f9b5125be52558b614c833c2b7c21f",
+            "image": "sha256:b637bd1a84a4657b8452332d72629288c54665d9e0bd7faf5d1a1757dd9a72b6",
+            "memory": 805306368,
+            "name": "qs-worker-runtime-3",
+            "restarts": 0
+          }
+        ]
+      }
+    }
+  },
+  "old_instances_clean_exit_zero": 8,
+  "new_groups": 9,
+  "new_clients": 15,
+  "Checker_owners": 4,
+  "budgets_changed": false,
+  "configured_closed_gate_observed": true,
+  "final_owner_admission": 1,
+  "offsets_copied": false,
+  "business": {
+    "passed": true,
+    "actor_id": "10001",
+    "iam_dual_subscription": true,
+    "answer_score_report": true,
+    "AI_receipt_state_ACK": true,
+    "new_answer": 1,
+    "new_interpretation_operation": 1,
+    "new_model_calls": 1,
+    "new_job_attempt": 1,
+    "exact_committed_business_witnesses": 13,
+    "old_model_jobs_sessions_checkpoints_unchanged": true,
+    "old_requests_replayed": false
+  },
+  "IAM": {
+    "new_empty_unassigned_role": 1,
+    "version_before": 177,
+    "version_after": 178,
+    "two_groups_each_delivered_and_settled": 1,
+    "Committed_FinalConfirmed_witness": 1
+  },
+  "public_HTTPS_health": {
+    "iam": 200,
+    "qs": 200,
+    "collect": 200,
+    "TLS_verified": true
+  },
+  "production_DDL": false,
+  "credentials_rotated": false,
+  "Broker_restarted": false,
+  "CD_paused": true,
+  "preserved_failures": [
+    {
+      "failure": "first release-path mismatch refused before ingress changed"
+    },
+    {
+      "failure": "QS environment overrode JSON admission flag",
+      "public_ingress_during_issue": "503",
+      "correction": "same-image exact environment forward repair; actual gate zero verified"
+    }
+  ],
+  "evidence_sha256": {
+    "final-drain.private.json": "581653093f7870307ee74d3e2d54977ac3d4379b523a077e7165d33400e75697",
+    "business-acceptance-verified.private.json": "66518f8057856ad2b2a151ff941c1663fbf3b6e89dd9971a9e5302d43f1cbd04",
+    "open-serverA-20261028T124039-825f49.private.json": "3b5bbc3fd0decbc1480f616fcc50343c3044c59b35c7d2d6c71b6afcd695293c",
+    "forward-QS-gate-20261028T123254-2268b9.private.json": "afa15bac32eab207c8f3ce9ae78e53913aadad43737795058045253b68774e7e",
+    "new-pop-connections-20261028T122938.private.json": "c806264242a047d658f8fef94ceea3d99c8523d68b88ca6dd1416519d446d229",
+    "owner-ready-20261028T123306-311b3a.private.json": "01f461528fc1cc4a0428f5ee2318be63fe2c8f45b9e4045c533f2fbe18793ec0"
+  }
+}
