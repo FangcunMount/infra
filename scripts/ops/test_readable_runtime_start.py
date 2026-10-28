@@ -6,6 +6,8 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import subprocess
+import sys
 import unittest
 from unittest.mock import patch
 
@@ -56,6 +58,12 @@ def config(plan):
 
 
 class ReadableRuntimeTest(unittest.TestCase):
+    def test_real_isolated_cli_imports_without_PYTHONPATH_or_worktree_imports(self):
+        result = subprocess.run([sys.executable, '-I', str(Path(target.__file__).resolve()), '--help'],
+                                capture_output=True, timeout=10, cwd='/')
+        self.assertEqual(result.returncode, 0, result.stderr.decode())
+        self.assertIn(b'--reviewed-sha256', result.stdout)
+
     def test_all_roles_and_phases_load_exact_pretty_bytes_and_readonly_assets(self):
         with tempfile.TemporaryDirectory() as value:
             root = Path(value).resolve()

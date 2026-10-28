@@ -16,6 +16,7 @@ import stat
 import subprocess
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'rocketmq'))
 from m4_runtime_start import AI_LOCK, GLOBAL_LOCK, deployment_locks
 from runtime_start import DOCKER, SOCKET, command, compose, verify_config, verify_running
