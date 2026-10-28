@@ -49,5 +49,6 @@
       "owned_m4_material_root_removed": true
     }
   },
-  "original_guard_tests": 17
+  "original_guard_tests": 17,
+  "readonly_mount_fix": "Omitted create_host_path is false for owned readonly Compose mounts; explicit true, writable and foreign revision remain refused"
 }
