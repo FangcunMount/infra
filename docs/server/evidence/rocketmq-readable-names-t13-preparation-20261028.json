@@ -1,0 +1,82 @@
+{
+  "schema": "readable-t13-preparation/v1",
+  "date": "2026-10-28",
+  "task": "T13",
+  "status": "in_progress",
+  "task_completed": false,
+  "production_business_switched": false,
+  "maintenance_started": false,
+  "production_preparation": {
+    "topics_created": 10,
+    "groups_created": 9,
+    "exact_acl_grants_added": 29,
+    "application_principals_created": 0,
+    "credential_rotations": 0,
+    "material_files_staged": 21,
+    "active_material_pointers_changed": false,
+    "images_cached_and_verified": 5,
+    "runtime_phase_configs_verified": 16,
+    "native_QS_API_cases": {
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "original_runtime_instances_unchanged": 8,
+    "DDL": false,
+    "Broker_restart": false
+  },
+  "responsibility_snapshot": {
+    "committed_executions": 57,
+    "witnesses": 62,
+    "contradictions": 0,
+    "missing_witnesses": 0,
+    "future_retries": 0,
+    "deferred_consumption": 0,
+    "final_maintenance_drain": false
+  },
+  "preparation_failures_preserved": [
+    "owned worker archive transport incomplete; no archive claimed ready",
+    "Docker image save by pulled digest omitted referenced config; original immutable manifest, archive config/RootFS and inert executable used as separate proof",
+    "native renderer removed unsupported outer publish_enabled; actual supported nested publish flag unchanged",
+    "local verifier baseline variable shadow fixed; final four native cases and sixteen phase checks passed"
+  ],
+  "remaining_before_maintenance": [
+    "reviewed coordinator/start adapter and pre-start original configuration restore inputs",
+    "fresh CD/resource/empty-topic/owner/monitor and memory checks",
+    "exact maintenance/deadline/forward-repair packet and acceptance peer"
+  ],
+  "evidence": {
+    "resources": {
+      "sha256": "47f104873bbbe810d521da11a273d39ee3a3888a1a30e3b6023d153a2263d8c7",
+      "private_basename": "t13-resource-apply-20261028T110524-db34b6.private.json"
+    },
+    "materials_A": {
+      "sha256": "d297447d57d12d9f56e03dcba69b78f71687e8f5c1465f68debd144718e1be16",
+      "private_basename": "t13-staged-materials-serverA-20261028T105101-15ae75.private.json"
+    },
+    "materials_D": {
+      "sha256": "2fc36c98a96fa347856fe2f3ea2ea07554e7f13e53e98728b4f11d980e23df7c",
+      "private_basename": "t13-staged-materials-serverD-20261028T105759-b35385.private.json"
+    },
+    "images_A": {
+      "sha256": "563aa985a250e93d825875d145a69d48dcc9c9429cedc82c9766992ea3153641",
+      "private_basename": "t13-preloaded-serverA-20261028T103911-030b9d.private.json"
+    },
+    "images_D": {
+      "sha256": "d8920057083d10179ef6baceda138aa11183653474b1b16a4e9233f63799e147",
+      "private_basename": "t13-preloaded-serverD-verified-20261028T110450-94debe.private.json"
+    },
+    "native_api": {
+      "sha256": "e30d2bb2698e9e1ab1bd5525f0b7c7df9f85ca6b2b3e307023fa97d1f517e74b",
+      "private_basename": "t13-native-api-preflight-20261028T114314-b25f27.private.json"
+    },
+    "phase_configs": {
+      "sha256": "7eaa4f36581d77e176fe12a143571927bff6f0c889cee0a969c52df037f617fd",
+      "private_basename": "t13-runtime-phase-verification-20261028T114449-2dab93.private.json"
+    },
+    "protocol": {
+      "sha256": "dca264cc29a9fc178db38526b2d8c43f00225f0822fcd5dd5d023bb8a52b5c6f",
+      "private_basename": "t13-authoritative-stages-20261028T104121-654507.private.json"
+    }
+  }
+}
