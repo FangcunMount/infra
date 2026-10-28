@@ -1,8 +1,8 @@
 {
   "schema": "readable-t11-cutover-verification/v1",
-  "progress": "10/16",
+  "progress": "11/16",
   "task": "T11",
-  "status": "in_progress",
+  "status": "complete",
   "source_sha": "306555623dca73afae3d760193fa26ce0dd605d1",
   "pr": 380,
   "native_run": 40623026549,
@@ -50,5 +50,106 @@
     }
   },
   "original_guard_tests": 17,
-  "readonly_mount_fix": "Omitted create_host_path is false for owned readonly Compose mounts; explicit true, writable and foreign revision remain refused"
+  "readonly_mount_fix": "Omitted create_host_path is false for owned readonly Compose mounts; explicit true, writable and foreign revision remain refused",
+  "native_result": {
+    "conclusion": "success",
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "report_sha256": "42ab8e5c543140099753ae989625c76bb9877ba1079227520d9c108a03138a66",
+    "infra_sha": "306555623dca73afae3d760193fa26ce0dd605d1",
+    "sources": {
+      "iam": "91aee79cbc1b192c5879625103d7b9cbd389b15b",
+      "qs": "eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b",
+      "ai": "62f3aa3225249f291cdde7d09f1d809edbd9d398"
+    },
+    "candidate_manifest_sha256": "2c477e9d28af6a2f0fd9531ef6eff620966137965df92f52f2ac37c11e5060a9",
+    "startup_receipt_sha256": "5ce74c465afcd299e1cad3f9bf446a74fb1a39783fc2faf5e9dadf9c3e65e1d6",
+    "elapsed_seconds": 25.073104780999984,
+    "within_target": true,
+    "target_seconds": 900,
+    "upper_seconds": 1800,
+    "same_four_bindings": true,
+    "bindings": {
+      "iam.mysql": {
+        "binding_sha256": "d7540f1d4fd8708de5e21b59acdb937c2b875703696abbe57d3b1a902aa60cbb",
+        "protocol_rows": 0
+      },
+      "qs.mysql": {
+        "binding_sha256": "f55f47753e1f0923d33e1104b4a66f7a27bda4f7af0a2182c176fa854a8d3949",
+        "protocol_rows": 0
+      },
+      "ai.mysql": {
+        "binding_sha256": "09e80d7e4b43238173979d0e0b77d6525a4fb7d535225b04324dd7fd5bd6ba32",
+        "protocol_rows": 0
+      },
+      "qs.mongo": {
+        "binding_sha256": "0d2d80db657d8009168f578979218e57485d4fe19c1e96ba8dd729bdf5c012bc",
+        "protocol_rows": 0
+      }
+    },
+    "empty_old_new_inputs": 20,
+    "actual_failed_start": {
+      "exit_code": 125,
+      "output_sha256": "806873a6d5d2cf8537f453ba20a193593a836ae77fa349833522bf5f4ff9940a"
+    },
+    "poststart_refused": [
+      "old-config",
+      "normal-retry"
+    ],
+    "coordinator_status": {
+      "phase": "runtime_start_returned",
+      "runtime_may_have_started": true,
+      "old_data_restore_eligible": false,
+      "cutover_authorized": false
+    },
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true,
+      "owned_m4_material_root_removed": true
+    },
+    "production": false,
+    "system_acceptance": false,
+    "original_production_images_tested": false,
+    "real_provider": false,
+    "c1_data_restore": false,
+    "runtime_mysql_ddl_attempts": 0,
+    "runtime_mongo_ddl_attempts": 0,
+    "budgets_and_unix_identities_preserved": true,
+    "all_eight_final_exit_zero": true
+  },
+  "other_required_gates": [
+    {
+      "file": "rocketmq-readable-names-runtime-verified-20261028.json",
+      "sha256": "1ccdf5f02537eec4bd378e9d5dd71de3dfea430ae5ff9e941712a9affbcbfc31",
+      "scope": "keep this evidence original source, count and scope; no aggregate count substitution"
+    },
+    {
+      "file": "rocketmq-readable-names-paired-native-20261028.json",
+      "sha256": "ff18aaa934abf444b43dd0b98177107ab657241a8d5a42e5b885cde2009004b8",
+      "scope": "keep this evidence original source, count and scope; no aggregate count substitution"
+    },
+    {
+      "file": "rocketmq-readable-names-qs-complete-20261028.json",
+      "sha256": "62343dd13a9aeea798d6a136cd4745eda8100c7334edb8ca652bb607698897a9",
+      "scope": "keep this evidence original source, count and scope; no aggregate count substitution"
+    },
+    {
+      "file": "rocketmq-readable-names-iam-fanout-20261027.json",
+      "sha256": "674aecdaba984fcd1ca86514425c32685fd30c84fc53566fce0cc841b646eb0b",
+      "scope": "keep this evidence original source, count and scope; no aggregate count substitution"
+    },
+    {
+      "file": "rocketmq-readable-names-ai-native-20261028.json",
+      "sha256": "25e1b634ae85784c7852704cf129ac356c4359f388b6d945668c9545be244444",
+      "scope": "keep this evidence original source, count and scope; no aggregate count substitution"
+    }
+  ],
+  "completed_at": "2026-10-28T11:11:31+08:00",
+  "source_checks_success": 19,
+  "source_nonselected_jobs": 8,
+  "source_pr_merged": true,
+  "merge_sha": "a6d419e0b89ac7458eb915d368c59cdbca8211c4"
 }
