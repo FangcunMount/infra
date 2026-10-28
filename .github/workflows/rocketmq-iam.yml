@@ -1,5 +1,39 @@
 name: RocketMQ IAM original host transaction
 on:
+  workflow_call:
+    inputs:
+      infra_ref:
+        description: Exact infra source SHA for the fixture and scripts
+        type: string
+        required: true
+      iam_ref:
+        description: Exact IAM candidate source SHA
+        type: string
+        required: true
+      qs_ref:
+        type: string
+        required: false
+        default: ''
+      profile:
+        type: string
+        required: false
+        default: development
+      runtime:
+        type: boolean
+        required: false
+        default: false
+      protection:
+        type: boolean
+        required: false
+        default: false
+      native_limit:
+        type: boolean
+        required: false
+        default: false
+      faults:
+        type: boolean
+        required: false
+        default: false
   workflow_dispatch:
     inputs:
       iam_ref:
@@ -51,6 +85,9 @@ jobs:
         mysql: ${{ fromJSON(inputs.profile == 'development' && '["mysql:8.0.36"]' || '["mysql:8.0.36","mysql:8.0.44","mysql:8.4"]') }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/infra
+          ref: ${{ inputs.infra_ref || github.sha }}
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/reliable-messaging
@@ -78,18 +115,34 @@ jobs:
           python-version: '3.13'
       - name: Verify exact candidate and source harness
         env:
+          EXPECTED_INFRA_SHA: ${{ inputs.infra_ref || github.sha }}
           EXPECTED_IAM_SHA: ${{ inputs.iam_ref || '8be32adea54ad354257e54122cca923edd00572b' }}
           EXPECTED_QS_SHA: ${{ inputs.qs_ref }}
+          TEST_PROFILE: ${{ inputs.profile || 'full' }}
+          MYSQL_IMAGE: ${{ matrix.mysql }}
           INVALID_FAULT_PROFILE: ${{ ((inputs.faults == true && (inputs.runtime == true || inputs.qs_ref != '')) || (inputs.protection == true && (inputs.runtime != true || inputs.faults == true || inputs.qs_ref != '')) || (inputs.native_limit == true && (inputs.runtime != true || inputs.protection == true || inputs.faults == true || inputs.qs_ref != ''))) && '1' || '0' }}
         run: |
           set -euo pipefail
           test "$INVALID_FAULT_PROFILE" = 0
+          [[ "$EXPECTED_INFRA_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$EXPECTED_INFRA_SHA"
+          [[ "$TEST_PROFILE" = development || "$TEST_PROFILE" = full ]]
           [[ "$EXPECTED_IAM_SHA" =~ ^[0-9a-f]{40}$ ]]
           test "$(git -C .iam-acceptance rev-parse HEAD)" = "$EXPECTED_IAM_SHA"
           if [[ -n "$EXPECTED_QS_SHA" ]]; then
             [[ "$EXPECTED_QS_SHA" =~ ^[0-9a-f]{40}$ ]]
             test "$(git -C .qs-acceptance rev-parse HEAD)" = "$EXPECTED_QS_SHA"
           fi
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          run = lambda *args: subprocess.check_output(args, text=True).strip()
+          record = dict(infra_sha=os.environ['EXPECTED_INFRA_SHA'],
+              iam_sha=os.environ['EXPECTED_IAM_SHA'], qs_sha=os.environ.get('EXPECTED_QS_SHA') or None,
+              fixture_sdk_sha=run('git','-C','.sdk-acceptance','rev-parse','HEAD'),
+              profile=os.environ['TEST_PROFILE'], mysql_image=os.environ['MYSQL_IMAGE'])
+          Path(os.environ['RUNNER_TEMP'],'iam-candidate.json').write_text(json.dumps(record,indent=2)+'\n')
+          PY
           python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py' -v
 
       - name: Required original roots and HTTP on fixed native MySQL
@@ -126,11 +179,31 @@ jobs:
           python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
             --iam-host "$PWD/.iam-acceptance" --iam-operation-results --image rocketmq-iam:5.5.1 \
             --mysql-image "$MYSQL_IMAGE" --report rocketmq-iam-host.json "${fanout_args[@]}"
+      - name: Verify host receipt and fixture cleanup
+        env:
+          EXPECTED_IAM_SHA: ${{ inputs.iam_ref || '8be32adea54ad354257e54122cca923edd00572b' }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          data = json.loads(Path('rocketmq-iam-host.json').read_text())
+          host = data['proof']['iam_host']
+          assert data['passed'] > 0 and data['failed'] == data['skipped'] == 0
+          assert host['source_sha'] == os.environ['EXPECTED_IAM_SHA']
+          assert host['source_clean_after'] and host['exit_code'] == 0
+          receipt = host['native_receipt']
+          assert receipt['passed'] > 0 and receipt['failed'] == receipt['skipped'] == 0
+          assert data['cleanup'] == dict(project_containers_remaining=False,
+              compose_down_succeeded=True, probe_process_groups_drained=True,
+              private_fixture_directory_removed=True)
+          PY
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: rocketmq-iam-host-${{ strategy.job-index }}-${{ github.sha }}
-          path: rocketmq-iam-host.json
+          path: |
+            rocketmq-iam-host.json
+            ${{ runner.temp }}/iam-candidate.json
           if-no-files-found: error
           retention-days: 14
 
