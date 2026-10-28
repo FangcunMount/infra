@@ -1,0 +1,52 @@
+{
+  "schema": "readable-T15-business-and-observation/v1",
+  "verified_at": "2026-10-28T13:21:21.746739+00:00",
+  "business_accepted": true,
+  "observation": {
+    "all_expected_values": true,
+    "end_epoch": 1793193043.0086935,
+    "minimum_samples_per_series": 121,
+    "owner_series": 44,
+    "owners": [
+      "ai.mysql",
+      "iam.mysql",
+      "qs.mongo",
+      "qs.mysql"
+    ],
+    "read_only": true,
+    "schema": "readable-post-open-range/v1",
+    "seconds": 1800,
+    "start_epoch": 1793191243.0086935,
+    "targets": 10
+  },
+  "runtime_instances": 8,
+  "runtime_unexpected_restarts": 0,
+  "no_OOM": true,
+  "serverD_available_memory_bytes": 882847744,
+  "public_ingress_restored": true,
+  "business": {
+    "legal_system_actor": "10001",
+    "new_empty_unassigned_role": 1,
+    "policy_version": 178,
+    "IAM_and_QS_fanout_groups": 2,
+    "new_answer": 1,
+    "score_rows": 5,
+    "rule_report_generated": true,
+    "new_AI_operation": 1,
+    "model_calls": 1,
+    "job_attempt": 1,
+    "AI_events": 4,
+    "business_ACKs": 4,
+    "business_committed_witnesses": 13,
+    "IAM_committed_witnesses": 1,
+    "first_wire_verified": true,
+    "old_model_facts_unchanged": true
+  },
+  "source_evidence_sha256": {
+    "post-open-range-20261028T131607.private.json": "47c6d7bd27dd62d5e27afe676425f8d2b373abc273893e7251535c098d10387e",
+    "t15-post-open-resources.private.json": "43f263b6228a8c2bf9ddd49012f13c73e084ce304214540f0478e0946ae81395",
+    "business-acceptance-verified.private.json": "66518f8057856ad2b2a151ff941c1663fbf3b6e89dd9971a9e5302d43f1cbd04"
+  },
+  "old_resources_deleted": false,
+  "automatic_CD_restored": false
+}
