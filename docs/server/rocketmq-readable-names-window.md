@@ -75,3 +75,22 @@
 估时按 T13 约1.5–3小时、T14约10–20分钟、T15约35–45分钟、T16约45–90分钟安排。整体顺利约4–6小时，按一个工作日预留；包括镜像拉取、API往返及文档/廉价CI收尾，不包括等待用户登录/填写或外部故障修复。T14与T15的受限验收合计目标15分钟、上限30分钟，开放后30分钟检查不占停机时间。任何阶段不能证明剩余步骤能在截止前安全完成，就在开始维护前重新安排；到期不静默延长。
 
 实际未决事务、未结回执、配置漂移、离线主机、拉取失败或受保护POP伴随资源可能增加时间。尤其存在相关retry伴随资源时，既有工具会拒绝删除对应旧Topic；须明确保留与处置责任，T16继续未完成，不能按前缀清理或通过改表掩盖。不为压缩日程降低清零、真实业务或有限恢复边界门禁。本次不新增48小时观察，也不因改名增加DDL、凭据轮换、Broker重启或完整重型矩阵重复运行。
+
+## 2026-10-28 具名执行冻结
+
+T13已完成，以下为实际目标机预览后的执行包，详见[冻结证据](evidence/rocketmq-readable-names-t13-final-freeze-20261028.json)。T14维护尚未开始。五个固定镜像沿用T12发布摘要；八实例项目、服务、数量、CPU/内存及worker并发仍为本页原表。运行包为 `readable-20261028-v2`，材料版本 `m4-readable-20261028-v1`，命名 `readable-v1`；数据库绑定、凭据、writer epoch与事务 `m3-1` 均保持。
+
+执行包 `20261028-v5` 已绑定控制器源码、七模块源码闭包、21项精确计划和原部署锁身份。serverA 17项、serverD 4项实际Compose与隔离Python CLI预览全部通过。每项具体路径、SHA、engine ID、数量均列在冻结证据中；执行时再次按原字节摘要和部署锁核对。旧QS排空阶段固定原运行镜像与原v2材料，只暂停plan scheduler和automatic retry；最终open恢复原开关。新closed阶段四owner发布准入关闭但Checker继续启动；worker保持不发布。acceptance仅对实际TCP与唯一浏览器请求共同核实的固定验收来源开放，截止为维护起点加1800秒。
+
+实际Broker保持5.5.1；回读参数transactionTimeOut=6000ms、transactionCheckInterval=30000ms、transactionCheckMax=15、fileReservedTime=48h，不据此推导恢复SLA。临窗内存仍须至少512MiB。当前57项执行及62项witness均Committed且最终确认，无矛盾、缺失witness、未来重试或deferred；40个AI job完成、38个model call取得响应、35个session完成及7个blocked保留。这是T13快照，不能代替T14最终排空。
+
+固定步骤：
+
+1. 封闭IAM、QS、collection三个Nginx业务入口并持久化实际起点/30分钟截止。用兼容原QS镜像进入old-drain，暂停自主调度；旧消费者与Checker继续处理已接受责任。
+2. 完成两次在线消费/half/POP观察，检查所有八个revive队列的精确尾记录、retry/DLQ、业务回执、四owner权威证据及模型身份。新十个Topic再次证明为空。不能证明责任清零则在新启动前恢复原配置，不复制offset或补发旧业务。
+3. 顺序停止AI、collection、worker、IAM、QS原实例，要求实际退出0；保存最终身份及责任快照。首次候选命令前先持久化跨主机SDK边界，目标机也写首次启动标记。启动固定closed候选，验证九个新Group/四owner Checker及原预算，再让IAM、QS、AI进入acceptance。
+4. 仅创建一个空且无成员/授权的 `mq-readable-20261028-acceptance` 测试角色，验证精确策略版本、witness与IAM/QS双订阅。舒杰已准备的新SNAP-IV只提交一次；评分/报告成功后只创建一次新解读，核对command、receipt/state、业务ACK、首次wire和模型调用事实。旧任务不重试。
+5. 验收通过后仅将QS切到open以恢复原调度，再恢复原入口；开放后检查30分钟。自动CD此时仍暂停，待T16将活动材料指针、QS/worker精确发布参数和三库CD绑定更新为同一新材料版本、完成只读/离线打包核验后恢复原开关。
+6. T16逐对象导出并证明旧v2十Topic/九Group及旧v1十Topic/十二Group责任为零后退役。无活动连接、普通或不可见重试、半消息、未结回执和需Broker恢复的计划才可删；保护系统、half/op、retry/DLQ及历史数据库证据。无法清零的对象保持未完成。
+
+恢复仅涉及固定镜像与配置，无DDL、凭据轮换或数据库全量恢复。首次新候选命令发出前可启动各角色original计划并恢复原入口；全局或任一目标机首次新启动标记存在后均禁止此路径，封新写并前向修复。原部署锁、AI锁属主/模式、镜像保留责任、Broker/NameServer/Dashboard进程均保持。目标15分钟，上限30分钟；超过上限必须另行确认，验收准入到期自动503。已准备的system会话与新答卷不是已通过的业务验收。
