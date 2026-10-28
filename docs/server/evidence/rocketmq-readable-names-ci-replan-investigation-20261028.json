@@ -1,0 +1,96 @@
+{
+  "schema": "readable-ci-replan-investigation/v1",
+  "date": "2026-10-28",
+  "progress": "9/16",
+  "production_changed": false,
+  "cd_changed": false,
+  "source_gates": [
+    {
+      "pr": 361,
+      "sha": "56449c197410471067ab03a5070417e2e1b06cab",
+      "successful_checks": 80,
+      "merge_sha": "2e6fdc0c1014dc1dc582ec0823d8a596c73d5c7c"
+    },
+    {
+      "pr": 372,
+      "sha": "251631a525e609b76304edc2480e6edd47ff3379",
+      "successful_checks": 65,
+      "merge_sha": "c1986c556603d41e50ffbae19edfcbf55b5a1bce"
+    },
+    {
+      "pr": 378,
+      "sha": "6e75dc26db044a8d6ac6527b8bf146b5db28136f",
+      "successful_checks": 20,
+      "merge_sha": "b2b60b2da0911874c4ac08b38e4fe33965311174"
+    },
+    {
+      "pr": 379,
+      "sha": "0093caf44915256cf9d2c61862e09f95ebe6283f",
+      "successful_checks": 13,
+      "merge_sha": "3fce802481c497470dfd477b8df997e0d25f9424"
+    }
+  ],
+  "future_dispatch": {
+    "run": 40592268913,
+    "complete": true,
+    "profiles": [
+      {
+        "artifact": "readable-future-1-6e75dc26db044a8d6ac6527b8bf146b5db28136f",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "f08ed1eac352b061f06ccc8f3c70e4d16ddaa1db1119aa4914198addcc63c0df",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "readable-future-0-6e75dc26db044a8d6ac6527b8bf146b5db28136f",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "8dd8f6c631f5c435f822d0811151556088e0b2231a05598b72fafdfeab6730bb",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ]
+  },
+  "replan_first_failure": {
+    "run": 40601996951,
+    "source_sha": "a79b21e3a2146e8e052c0caa4f8eb532c613d5c0",
+    "attempt": 1,
+    "failed_profiles": 2,
+    "baseline_each_passed": 9,
+    "cleanup": true,
+    "finding": "fixture called active-only host Confirm after Replan moved the active reference; retained old state requires precise StoreChecker/References",
+    "failed_raw_assertion_not_retained": true,
+    "original_report_sha256s": [
+      "be40d6d116971c5bb3316132979c200bba3be74ee5b43275490764fc9c56d5f2",
+      "a77cbd9260fd546e63b4571bedf5051147df7f18869a6f776c5181dab4e877e5"
+    ]
+  },
+  "fixed_candidate": {
+    "pr": 382,
+    "sha": "ff56aaf7b70f8c4c723fc9f10c4bd2cbf717930e",
+    "local_unit_passed": 460,
+    "host_race_compilation": true,
+    "actionlint": true,
+    "native_run": 40607318654,
+    "native_complete": false
+  },
+  "ci_policy": {
+    "native_replan_and_future_manual_only": true,
+    "narrowed_general_workflows": 6,
+    "global_pure_contracts": true,
+    "merged_main_native_automatic_duplicate_removed": true,
+    "full_final_candidate_gates_retained": true,
+    "merged": false
+  }
+}
