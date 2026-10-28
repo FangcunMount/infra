@@ -1,7 +1,7 @@
 {
   "schema": "readable-ci-replan-investigation/v1",
   "date": "2026-10-28",
-  "progress": "9/16",
+  "progress": "10/16",
   "production_changed": false,
   "cd_changed": false,
   "source_gates": [
@@ -103,7 +103,22 @@
     "global_pure_contracts": true,
     "merged_main_native_automatic_duplicate_removed": true,
     "full_final_candidate_gates_retained": true,
-    "merged": false
+    "merged": true,
+    "merge_sha": "59b385a231038438bc69fce76bafe70b42e07612",
+    "required_default_native_profiles": 2,
+    "diagnostic_option_not_release_gate": true,
+    "merged_push_readback": {
+      "source_sha": "59b385a231038438bc69fce76bafe70b42e07612",
+      "observed_workflows": [
+        {
+          "run": 40620203338,
+          "name": "RocketMQ fixture and CI contracts",
+          "event": "push",
+          "conclusion": "success"
+        }
+      ],
+      "generic_broker_native_duplicate": false
+    }
   },
   "diagnostic_candidate": {
     "sha": "0aaa1a7623549fcdb8197e3fde68f256d8ddd74d",
@@ -149,11 +164,181 @@
     "full_native_run": 40610527887,
     "diagnostic_only": false,
     "profiles": [
-      "mysql:8.0.36",
-      "mysql:8.4"
+      {
+        "artifact": "readable-replan-0-6c0b89eb520f207f4a024cdcdbb017f40ff743f5",
+        "report_sha256": "e28d23346dbf214b0c4ba90eb561d09a1205261d1db798ac62935c0e9174588d",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "replan_cases": {
+          "actual_readable_publish_original_root_and_one_effect": true,
+          "committed_replan_refused_no_duplicate_execution": true,
+          "explicit_aborted_replan_retains_wire_and_prior_evidence": true,
+          "historical_ordinary_retry_refused": true,
+          "old_unknown_replan_refused_without_business": true
+        },
+        "commit_state": {
+          "lease_expired": false,
+          "ready": true,
+          "admission_closed": false,
+          "stale_execution": false,
+          "binding_error": false,
+          "invalid_plan": false,
+          "root_required": false,
+          "schema_error": false,
+          "deadline": false,
+          "canceled": false,
+          "local": "committed",
+          "business_calls": 1,
+          "protection": {
+            "available": true,
+            "fresh": true,
+            "protected": false,
+            "reason": ""
+          },
+          "branches": [
+            {
+              "half": "prepared",
+              "final": "commit_confirmed",
+              "code": ""
+            }
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "readable-replan-1-6c0b89eb520f207f4a024cdcdbb017f40ff743f5",
+        "report_sha256": "cbe52f58f78bc5a8be51cf1961a272b5feee36dbc28a181615110943f29c26f9",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "replan_cases": {
+          "actual_readable_publish_original_root_and_one_effect": true,
+          "committed_replan_refused_no_duplicate_execution": true,
+          "explicit_aborted_replan_retains_wire_and_prior_evidence": true,
+          "historical_ordinary_retry_refused": true,
+          "old_unknown_replan_refused_without_business": true
+        },
+        "commit_state": {
+          "lease_expired": false,
+          "ready": true,
+          "admission_closed": false,
+          "stale_execution": false,
+          "binding_error": false,
+          "invalid_plan": false,
+          "root_required": false,
+          "schema_error": false,
+          "deadline": false,
+          "canceled": false,
+          "local": "committed",
+          "business_calls": 1,
+          "protection": {
+            "available": true,
+            "fresh": true,
+            "protected": false,
+            "reason": ""
+          },
+          "branches": [
+            {
+              "half": "prepared",
+              "final": "commit_confirmed",
+              "code": ""
+            }
+          ]
+        },
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
     ],
     "native_dispatches": 1,
-    "result": "in_progress",
-    "accepted": false
+    "result": "success",
+    "accepted": true,
+    "accepted_native": true,
+    "full_native_complete": true,
+    "all_source_checks_complete": true,
+    "successful_source_checks": 29,
+    "non_applicable_pr_native_jobs": 2,
+    "merge_sha": "59b385a231038438bc69fce76bafe70b42e07612"
+  },
+  "completed_at": "2026-10-28T10:19:34+08:00",
+  "source_regression_history": {
+    "run": 40610509741,
+    "source": "6c0b89eb520f207f4a024cdcdbb017f40ff743f5",
+    "job": 122560628164,
+    "first_attempt": "MySQL8.0.36:29 passed then shared subscriber receive timeout; producer 3+3+3 confirmed; observed 8/9; other profile41 passed",
+    "cause": "liveness timeout; exact underlying cause not proven",
+    "reason_for_one_failed_job_retest": "bounded reproducibility check after retained report review; exact SDK and harness source unchanged; no successful job or Replan rerun",
+    "reports": [
+      {
+        "artifact": "rocketmq-public-sdk-1-8e805c2a16993966f364ece6e9ca0e0e242e3f6d",
+        "sha256": "2e132729bb733896972731a795c4c6d37e8d08f5dc5ac5c00fda9f2eb6197908",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "rocketmq-public-sdk-0-8e805c2a16993966f364ece6e9ca0e0e242e3f6d",
+        "sha256": "bdf0143d5298c0bb41962d91c28eaf683d1b987d9f7c4074c5fdd984a42077de",
+        "passed": 29,
+        "failed": 1,
+        "skipped": 0,
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ],
+    "retest_count": 1,
+    "retest_status": "success",
+    "unchanged_other_profile_not_rerun": true,
+    "replan_not_rerun": true,
+    "attempt": 2,
+    "original_failure_retained": true,
+    "underlying_timeout_cause_resolved": false,
+    "final_reports": [
+      {
+        "artifact": "rocketmq-public-sdk-0-8e805c2a16993966f364ece6e9ca0e0e242e3f6d",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "f16642a89efbcaab6cb9490ef5dba7785a8b9c9dd9ef0c8c07a60c7ac22a39ab",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      },
+      {
+        "artifact": "rocketmq-public-sdk-1-8e805c2a16993966f364ece6e9ca0e0e242e3f6d",
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "report_sha256": "2e132729bb733896972731a795c4c6d37e8d08f5dc5ac5c00fda9f2eb6197908",
+        "cleanup": {
+          "project_containers_remaining": false,
+          "compose_down_succeeded": true,
+          "probe_process_groups_drained": true,
+          "private_fixture_directory_removed": true
+        }
+      }
+    ]
   }
 }
