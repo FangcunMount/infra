@@ -1,5 +1,6 @@
 """T13 actual due dispatch over the original evaluation/report host entrypoints."""
 import json
+import os
 import re
 
 from qs_evaluation_acceptance import run_qs_evaluation_host
@@ -28,15 +29,27 @@ def parse_dispatch_receipt(output, owner):
     return receipts[0]
 
 
+def readable_future_mode(env):
+    mode = env.get('QS_M3_READABLE_FUTURE', '0')
+    if mode not in ('0', '1'):
+        raise ValueError('explicit owned readable future profile required')
+    if mode == '1':
+        from final_image_candidate import ci_guard
+        ci_guard(env)
+    return mode == '1'
+
+
 def run_qs_retry_dispatch_host(source, directory, broker, project, grpc_port, mysql_port, mongo_port, password, ca, run, proof):
+    readable = readable_future_mode(os.environ)
     proof['evaluation'], proof['report'] = {}, {}
-    run_qs_evaluation_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof['evaluation'])
+    run_qs_evaluation_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof['evaluation'], readable=readable)
     evaluation = parse_dispatch_receipt((directory / 'qs-evaluation-host-private.log').read_text(), 'qs.mysql')
-    run_qs_report_host(source, directory, broker, project, grpc_port, mongo_port, ca, run, proof['report'])
+    run_qs_report_host(source, directory, broker, project, grpc_port, mongo_port, ca, run, proof['report'], readable=readable)
     report = parse_dispatch_receipt((directory / 'qs-report-host-private.log').read_text(), 'qs.mongo')
     if proof['evaluation']['source_sha'] != proof['report']['source_sha']:
         raise RuntimeError('paired due dispatch used different source revisions')
     proof['source_sha'] = proof['evaluation']['source_sha']
+    proof['readable'] = readable
     proof['dispatch_receipts'] = {'qs.mysql': evaluation, 'qs.mongo': report}
     cases = {}
     for domain in ('evaluation', 'report'):
