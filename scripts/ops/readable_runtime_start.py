@@ -77,11 +77,18 @@ def load(path, digest, *, root=ROOT):
             or type(plan['instances'][service]) is not int or plan['ai_host'] is not (host == 'serverA')
             or plan['resources'] != dict(memory=memory, nano_cpus=cpu, uid=uid)
             or set(plan['images']) != {service}
-            or not re.fullmatch('sha256:[a-f0-9]{64}', plan['images'][service])
-            or not re.fullmatch('[a-f0-9]{40}', plan['source_sha'])
+            or not re.fullmatch('sha256:[a-f0-9]{64}', plan['images'][service])):
+        raise BoundaryError('fixed host, image identity or budget differs')
+    if plan['phase'] == 'original':
+        # Recovery pins the actual original engine object, not an inferred
+        # registry/config identity on engines using the containerd image store.
+        if (any(plan[key] is not None for key in ('source_sha', 'image_config_id', 'published_reference'))
+                or set(plan['original_images']) != {plan['images'][service]}):
+            raise BoundaryError('exact original runtime required')
+    elif (not re.fullmatch('[a-f0-9]{40}', plan['source_sha'])
             or not re.fullmatch('sha256:[a-f0-9]{64}', plan['image_config_id'])
             or not re.fullmatch('[a-z0-9][a-z0-9._:/-]{0,450}@sha256:[a-f0-9]{64}', plan['published_reference'])):
-        raise BoundaryError('fixed host, image identity or budget differs')
+        raise BoundaryError('published candidate identity required')
     directory = root / plan['phase'] / role
     if (plan['directory'] != str(directory) or Path(path).parent != directory
             or Path(plan['compose_file']).parent != directory

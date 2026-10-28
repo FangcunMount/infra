@@ -42,6 +42,9 @@ def fixture(root, role='iam', phase='closed'):
                 resources=dict(memory=memory, nano_cpus=cpu, uid=uid))
     if host == 'serverA':
         plan['locks'][target.AI_LOCK] = dict(inode=2, device=1, uid=1002, gid=2001, mode='0o600')
+    if phase == 'original':
+        plan.update(source_sha=None, image_config_id=None, published_reference=None)
+        plan['images'] = {service: plan['original_images'][0]}
     path = directory / 'start.json'
     return path, private(path, json.dumps(plan, indent=2).encode()), plan
 
