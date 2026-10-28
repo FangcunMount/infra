@@ -11,7 +11,7 @@ class QSReplanAcceptanceTest(unittest.TestCase):
                'Expected: "aborted" Actual: "unknown" password=synthetic-secret wire=DO-NOT-EXPORT\n'
                'READABLE_REPLAN_STAGE unreviewed_secret\n--- FAIL: TestReadableCrossRouteReplanBrokerHost (0.1s)')
         result=diagnostics(raw)
-        self.assertEqual(result['assertion_lines'],[146,152])
+        self.assertEqual(result['assertion_lines'],[152])
         self.assertEqual(result['stages'],['replan'])
         self.assertEqual(result['failed_tests'],['TestReadableCrossRouteReplanBrokerHost'])
         serialized=json.dumps(result)

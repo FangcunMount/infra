@@ -34,6 +34,9 @@ class ReadableCIPolicyTest(unittest.TestCase):
         contracts=yaml.safe_load((root/'.github/workflows/rocketmq-contracts.yml').read_text())
         events=contracts.get('on',contracts.get(True))
         self.assertTrue(selected(events['pull_request']['paths'],'scripts/rocketmq/qs_replan_acceptance.py'))
+        self.assertEqual(events['push']['branches'],['main'])
+        broker=yaml.safe_load((root/'.github/workflows/rocketmq.yml').read_text())
+        self.assertNotIn('push',broker.get('on',broker.get(True)))
         command=contracts['jobs']['contracts']['steps'][-1]['run']
         self.assertIn("-p 'test_*.py'",command)
         self.assertNotIn('docker',command)
@@ -50,4 +53,16 @@ class ReadableCIPolicyTest(unittest.TestCase):
         command=next(s['run'] for s in native['steps'] if s.get('name')=='Actual host original root under readable routes')
         self.assertIn("data['passed']==len(data['cases'])==14",command)
         self.assertIn("replan['native_receipt']['passed']==5",command)
+        self.assertIn("data['failed']==data['skipped']==0",command)
+
+    def test_future_keeps_full_native_matrix_without_pr_double_dispatch(self):
+        root=Path(__file__).resolve().parents[2]
+        value=yaml.safe_load((root/'.github/workflows/rocketmq-readable-future.yml').read_text())
+        native=value['jobs']['business']
+        self.assertEqual(native['if'],"github.event_name == 'workflow_dispatch'")
+        self.assertEqual(native['needs'],'contracts')
+        self.assertNotIn('if',value['jobs']['contracts'])
+        self.assertEqual(native['strategy']['matrix']['mysql'],['mysql:8.0.36','mysql:8.4'])
+        command=next(s['run'] for s in native['steps'] if s.get('name')=='Actual host original root under readable routes')
+        self.assertIn("data['passed']==len(data['cases'])==41",command)
         self.assertIn("data['failed']==data['skipped']==0",command)

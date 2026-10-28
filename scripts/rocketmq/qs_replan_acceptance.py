@@ -20,11 +20,12 @@ STAGES = frozenset(('configuration', 'construct_owner', 'start_owner', 'reserve_
 def diagnostics(raw):
     """Only reviewed stage names, source line numbers and fixed classifications."""
     result = host_failure_summary(raw)
+    assertion_output = '\n'.join(line for line in raw.splitlines() if 'READABLE_REPLAN_STAGE' not in line)
     result['assertion_lines'] = sorted(set(int(n) for n in re.findall(
-        r'readable_owned_replan_test\.go:(\d+)', raw)))[:32]
+        r'readable_owned_replan_test\.go:(\d+)', assertion_output)))[:32]
     result['stages'] = [stage for stage in re.findall(r'READABLE_REPLAN_STAGE ([a-z_]+)',raw)
                         if stage in STAGES][-32:]
-    result['error_classes'] = [key for key,text in (
+    result['error_markers'] = [key for key,text in (
         ('invalid_plan','invalid frozen transaction plan'),
         ('binding','transaction owner, store identity or epoch mismatch'),
         ('stale_execution','transaction execution is not owned or no longer prepared'),
