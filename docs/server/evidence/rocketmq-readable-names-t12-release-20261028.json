@@ -1,0 +1,69 @@
+{
+  "schema": "readable-t12-release/v1",
+  "status": "in_progress",
+  "progress": "11/16",
+  "sdk_candidate": "8d99c8b2dbf0fafd83eacf4d12e543c202f794c0",
+  "sdk_merged_source": "559c735b2ceb11827ffbbd1279808b4164bba3d1",
+  "sdk_source_tree": "eeea67d214c244ab307e67648ca229d46b921c46",
+  "candidate_tree_equal": true,
+  "sdk_pr": 65,
+  "sdk_source_merged": true,
+  "go_version_planned": "v0.6.0",
+  "python_version_planned": "0.5.0",
+  "sdk_published": false,
+  "host_dependencies_stable": false,
+  "final_stable_images_verified": false,
+  "production_cutover": false,
+  "cd_pause": {
+    "scope": "repository auto-CD only; public business admission and runtime unchanged",
+    "original_snapshot_sha256": "39067bcf97e3a8595c93a2387194bbaa0df8f495aa8567efcc37647639115dff",
+    "rows": [
+      {
+        "repository": "iam",
+        "variable": "PRODUCTION_DEPLOY_PAUSED",
+        "original": "false",
+        "paused": "true",
+        "environment_override": false
+      },
+      {
+        "repository": "qs-server",
+        "variable": "PRODUCTION_DEPLOY_PAUSED",
+        "original": "false",
+        "paused": "true",
+        "environment_override": false
+      },
+      {
+        "repository": "qs-ai",
+        "variable": "AUTO_DEPLOY_ENABLED",
+        "original": "true",
+        "paused": "false",
+        "environment_override": false
+      }
+    ]
+  },
+  "exact_merged_source_gates": {
+    "source": 40625815623,
+    "infrastructure": 40625815639,
+    "python": 40625815742,
+    "storage": 40626058319,
+    "readable": 40626062382,
+    "faults_and_finite_window": 40626066814
+  },
+  "python_candidate": {
+    "source_run": 40625815742,
+    "matrix_source_tests": [
+      159,
+      159
+    ],
+    "matrix_installed_wheel_tests": [
+      159,
+      159
+    ],
+    "failed": 0,
+    "skipped": 0,
+    "assets_equal_across_profiles": true,
+    "wheel_sha256": "6fe1fbf0635d3e2f8ba2f10c12474c39c939ee656f20df7784928f8bd92e88b8",
+    "sdist_sha256": "4acbdddad91448d64993ec0b081b7064b64ce2a5248c75b40a67354109173821",
+    "formally_published": false
+  }
+}
