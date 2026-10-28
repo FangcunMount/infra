@@ -81,6 +81,11 @@ def validate_startup(value, candidate, digest):
     require(all(value.get(k) is False for k in ('production', 'system_acceptance',
                 'combined_cutover_rehearsal_complete', 'c1_cutover_barrier_exercised')),
             'startup_cannot_claim_business_or_cutover')
+    return validate_runtime(value, candidate)
+
+
+def validate_runtime(value, candidate):
+    """Shared actual runtime evidence; callers separately enforce scope and cases."""
     components = {'iam', 'ai', 'api', 'collection', 'collection2', 'worker1', 'worker2', 'worker3'}
     for key in ('actual_material_mounts', 'actual_runtime_budgets', 'actual_runtime_unix_identity', 'processes'):
         require(set(value.get(key, {})) == components, 'all_eight_original_instances_required')
