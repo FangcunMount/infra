@@ -67,6 +67,28 @@ class MaterialStageTests(unittest.TestCase):
                     self.assertEqual(copied.stat().st_mode & 0o777, 0o440)
                 self.assertEqual(destination.stat().st_mode & 0o777, 0o750)
 
+    def test_readable_manifest_and_history_are_copied_as_original_bytes_for_all_roles(self):
+        raw = (Path(__file__).resolve().parents[2] / 'components/rocketmq/serverd-routes-readable-v3.json').read_bytes()
+        document = json.loads(raw)
+        self.assertEqual(document['version'], 3)
+        self.assertTrue(document['historical_routes'])
+        for role in m.ROLES:
+            with self.subTest(role=role):
+                plan = self.make_plan(role)
+                row = next(row for row in plan['files'] if row['target'] == 'rocketmq/routes.json')
+                source = Path(row['source'])
+                source.write_bytes(raw)
+                row.update(sha256=m.sha(raw), bytes=len(raw))
+                before = {Path(row['source']): Path(row['source']).read_bytes() for row in plan['files']}
+                self.assertEqual(self.stage(plan)['status'], 'staged')
+                target = self.destination(plan) / 'rocketmq/routes.json'
+                self.assertEqual(target.read_bytes(), raw)
+                self.assertEqual(json.loads(target.read_bytes())['historical_routes'], document['historical_routes'])
+                self.assertEqual(self.verify(plan)['status'], 'verified')
+                self.assertEqual(self.stage(plan)['status'], 'already-staged')
+                self.assertEqual(before, {path: path.read_bytes() for path in before})
+                self.assertFalse((self.destination(plan).parent.parent / 'current.json').exists())
+
     def test_existing_pointer_source_bytes_and_permissions_are_unchanged(self):
         base = self.destination().parent.parent
         base.mkdir(parents=True)

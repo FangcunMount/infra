@@ -24,3 +24,50 @@
 已核对5.5.1上游实现：`deleteSubGroup`使用具体Broker的`-b`分支，不能使用会连带删除重试/DLQ Topic的`-c`分支；offset清理须在导出后明确指定。`deleteTopic`使用具名cluster并同时清理Broker/NameServer路由，执行前必须重新核对cluster成员仍为冻结的目标。`deleteAcl`始终指定单个具名resource，不能省略资源而删除整个ACL。实际退役工具和真实隔离验收尚未完成，不能据此文档执行删除。
 
 来源：[DeleteSubscriptionGroupCommand](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/tools/src/main/java/org/apache/rocketmq/tools/command/consumer/DeleteSubscriptionGroupCommand.java)、[DeleteTopicSubCommand](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/tools/src/main/java/org/apache/rocketmq/tools/command/topic/DeleteTopicSubCommand.java)、[DeleteAclSubCommand](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/tools/src/main/java/org/apache/rocketmq/tools/command/auth/DeleteAclSubCommand.java)。上游blob分别为`44113e32de68dde45c8f5c1e6991806a941b9963`、`bdee33c52f5153160a9b4b34b73784362ae1c998`、`a3553e0cb39b9a23b8c9c58563fd97042319f1d9`；不以CLI名称推断删除范围。
+
+### 只读退役清单生成
+
+`scripts/rocketmq/readable_retirement.py` 仅离线生成具名命令供审核，不调用Docker、SSH或MQ，不授权执行。输入为冻结的旧/新manifest、五个既有账号的用户名映射、逐个选定的旧对象，以及15秒内取得的完整责任观察。它拒绝通配符、重复/新/未知对象、缺失计数、非整数或非零责任、缺少导出摘要、集群成员漂移及未通过业务验收。
+
+选定对象必须同时证明活动写者、消费者、积压、in-flight、不可见重试、未决事务、Broker绑定计划、待回执、未处置死信和原生超限责任均为零。未选中的旧资源在报告中明确保留。命令始终只撤销单个旧resource权限、在具体Broker上删除Group并显式清理已导出的offset、逐Topic清理Broker及NameServer；不生成retry/DLQ或历史数据库删除命令。
+
+报告通过独占创建写入0600文件。`execution_authorized=false`始终保持：输入观察的真实性、现有部署锁下的实时复核、执行后的Broker/NameServer/Dashboard回读和隔离删除演练仍是后续执行器门禁，不能用该离线报告替代。
+
+### 隔离删除语义专项
+
+`ROCKETMQ_READABLE_RETIREMENT=1` 仅在完整 owned readable transition 档启用。先要求130项真实ACL/TLS门禁及精确旧新并集通过，再校验隔离Compose项目、单Broker成员和实际空Topic offset；逐个撤销所选旧权限、删除一个旧Group和一个旧Topic。专门创建的空retry/DLQ sentinel必须保留；其他旧/新资源及权限逐项比较，NameServer Topic列表回读确认删除。
+
+这只验证新建空测试资源上的CLI语义，不证明生产责任已清零，也不授权生产删除。专项CI预算45分钟，独立于生产维护上限30分钟。生产观察需在旧POP消费者仍在线时取得，不能把指标缺失或普通consumer offset差值单独当作POP不可见责任为零；之后停旧运行时前还须核对宿主协议、业务回执及调度责任。
+
+### 既有 CD 材料链路兼容
+
+既有 `m4_material_stage` 继续负责不可变材料，不生成或解释 Topic/Group 名称。新增真实 v3 清单的四角色回归：活动和历史映射逐字节进入原只读版本文件，原 credentials/JOSE 来源字节保留，重复 stage 不改写，verify 只读且不激活 current 指针。该工具24项本地测试通过；宿主 CD 配置仍使用原路径、身份、epoch 和部署锁。最终镜像下的实际解码及原配置打包器启动由独立 T11 入口验证，不把纯材料测试等同于生产部署。
+
+
+### POP 重试伴随删除保护
+
+追加核对5.5.1 `AdminBrokerProcessor.deleteTopic`：当 `clearRetryTopicWhenDeleteTopic` 启用时，Broker可能连带清理与该Topic关联的POP v1/v2重试Topic。仅确认CLI使用具名Topic仍不足以证明删除范围。
+
+离线审核现在要求完整新鲜Broker Topic名称快照；发现所选Topic存在任意`%RETRY%<group>_<topic>`或`%RETRY%<group>+<topic>`伴随资源，即拒绝生成删除清单，不修改Broker开关，也不把伴随对象隐含纳入删除范围。原138项隔离报告只验证classic retry/DLQ sentinel；增强专项增加未选Topic上的POP v1/v2 sentinel并核验全部保留，尚待真实CI。旧报告继续保留，不将它表述为已覆盖所有POP伴随删除。
+
+上游：[AdminBrokerProcessor](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/broker/src/main/java/org/apache/rocketmq/broker/processor/AdminBrokerProcessor.java)，核对blob `876a72fa29cce1f92addd94b332168ebcacd0b77`。
+
+
+## POP v2 保护夹具的真实生成路径
+
+增强运行40560478215失败保留：5.5.1的`updateTopic`按TopicValidator拒绝内部POP v2名称中的`+`，因此不能通过普通建Topic命令制造此哨兵。此失败发生在所选旧资源删除之前，owned环境已完整清理；不是生产故障，也不是删除成功。
+
+修正为真正的POP路径：在原隔离项目中复用已有可读NORMAL survey输入、原发布/订阅账号及最小权限，只发布一次随机的合成运输正文；真实SimpleConsumer取到这一条后不ACK并关闭所有本地客户端，由Broker revive自然生成`%RETRY%<group>+<topic>`。此未选中的retry责任贯穿后续具名删除并核对保留；不修改TopicValidator、生产Broker开关、账号或凭据，不向生产发送消息。固定5.5.1默认未启用POP v2；仅在已核验GitHub-hosted/owned容器标签的隔离项目中临时启用，待真实revive生成后，在任何删除前恢复并回读原值，报告分别记录before/during/after/restored。
+
+classic retry/DLQ及POP v1哨兵继续由原管理入口创建；新增原生v2哨兵必须存在于真实metadata后才允许开始删除。最终仍要求四个哨兵全部保留、其他metadata/ACL不变、原138项与清理通过；修正后真实运行尚未完成。原生v2的合成未ACK责任只随其owned Compose环境整体退出，不被表述为生产责任已清零。
+
+源码依据：[5.5.1 TopicValidator](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/common/src/main/java/org/apache/rocketmq/common/topic/TopicValidator.java)、[5.5.1 PopReviveService](https://github.com/apache/rocketmq/blob/rocketmq-all-5.5.1/broker/src/main/java/org/apache/rocketmq/broker/processor/PopReviveService.java)。
+
+
+## 发布范围收敛及保留的失败实验
+
+40569602431在生成内部POP v2资源时超时，发生于任何旧资源删除前，原130项ACL/TLS/type验证及清理分别保留。该实验尚未证明生成或保留v2，因此不再作为生产删除的授权依据，也不表述为通过；源码和实验控制单元继续保留以供独立排查。
+
+发布门禁保持原138项，使用实际classic retry、DLQ和POP v1三项哨兵证明无关资源保留；旧的二哨兵报告不冒充三哨兵结果，新的真实重验仍必需。生产审核在任何删除前读取完整metadata，发现所选Topic有任一POP v1或v2伴随名称就直接拒绝，相关Topic/Group及责任留在清单，T16不能因此勾选完成。此边界由缺失/重复metadata、两种名称、非零/未知责任及错误对象的拒绝测试保护。
+
+发布路径不再临时修改任何Broker开关，也不制造未ACK消息；没有用该未完成实验放宽原计划的清零、导出、锁或回读门禁。真实v2生成实验与其参数恢复函数仅供隔离研究，不进入生产执行包。
