@@ -78,7 +78,7 @@
 
 ## 2026-10-28 具名执行冻结
 
-T13已完成，以下为实际目标机预览后的执行包，详见[冻结证据](evidence/rocketmq-readable-names-t13-final-freeze-20261028.json)。T14维护尚未开始。五个固定镜像沿用T12发布摘要；八实例项目、服务、数量、CPU/内存及worker并发仍为本页原表。运行包为 `readable-20261028-v2`，材料版本 `m4-readable-20261028-v1`，命名 `readable-v1`；数据库绑定、凭据、writer epoch与事务 `m3-1` 均保持。
+T13已完成，以下为实际目标机预览后的执行包，详见[冻结证据](evidence/rocketmq-readable-names-t13-final-freeze-20261028.json)。以下保留T13冻结时的输入；T14–T16实际结果见文末闭环记录。五个固定镜像沿用T12发布摘要；八实例项目、服务、数量、CPU/内存及worker并发仍为本页原表。运行包为 `readable-20261028-v2`，材料版本 `m4-readable-20261028-v1`，命名 `readable-v1`；数据库绑定、凭据、writer epoch与事务 `m3-1` 均保持。
 
 执行包 `20261028-v6` 已绑定控制器源码、七模块源码闭包、21项精确计划和原部署锁身份。serverA 17项、serverD 4项实际Compose与隔离Python CLI预览全部通过。每项具体路径、SHA、engine ID、数量均列在冻结证据中；执行时再次按原字节摘要和部署锁核对。旧QS排空阶段固定原运行镜像与原v2材料，只暂停plan scheduler和automatic retry；最终open恢复原开关。新closed阶段四owner发布准入关闭但Checker继续启动；worker保持不发布。acceptance仅对实际TCP与唯一浏览器请求共同核实的固定验收来源开放，截止为维护起点加1800秒。
 
@@ -94,3 +94,7 @@ T13已完成，以下为实际目标机预览后的执行包，详见[冻结证�
 6. T16逐对象导出并证明旧v2十Topic/九Group及旧v1十Topic/十二Group责任为零后退役。无活动连接、普通或不可见重试、半消息、未结回执和需Broker恢复的计划才可删；保护系统、half/op、retry/DLQ及历史数据库证据。无法清零的对象保持未完成。
 
 恢复仅涉及固定镜像与配置，无DDL、凭据轮换或数据库全量恢复。首次新候选命令发出前可启动各角色original计划并恢复原入口；全局或任一目标机首次新启动标记存在后均禁止此路径，封新写并前向修复。原部署锁、AI锁属主/模式、镜像保留责任、Broker/NameServer/Dashboard进程均保持。目标15分钟，上限30分钟；超过上限必须另行确认，验收准入到期自动503。已准备的system会话与新答卷不是已通过的业务验收。
+
+## 2026-10-28 实际执行闭环
+
+T13–T16全部完成，唯一总表为16/16。实际维护20:14:50–20:40:43（北京时间），25分53秒，未超过30分钟；system、新答卷/新AI及开放后30分钟检查通过。已具名退役20旧Topic、21旧Group、58旧授权及单独清零的压测POP重试Topic，Broker/NameServer/已登录Dashboard回读一致；系统/half/op、账号与历史数据库证据保留。原自动CD开关已恢复，活动材料为m4-readable-20261028-v1，锁和镜像保留规则不变。[最终生产索引](evidence/rocketmq-readable-names-t16-closure-20261028.json)。本节是实际结果；前文清单和估时作为原冻结记录保留。
