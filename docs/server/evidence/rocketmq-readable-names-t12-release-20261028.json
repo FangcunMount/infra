@@ -11,7 +11,7 @@
   "go_version_planned": "v0.6.0",
   "python_version_planned": "0.5.0",
   "sdk_published": true,
-  "host_dependencies_stable": false,
+  "host_dependencies_stable": true,
   "final_stable_images_verified": false,
   "production_cutover": false,
   "cd_pause": {
@@ -131,5 +131,182 @@
     },
     "scope": "Pure post-download installation regression; native exact-source matrices recorded separately",
     "receipt_sha256": "0dacd7bed80dad4817be16c990d566ea2d9e0729c74cd5e3e1794680121bf52c"
+  },
+  "host_runtime_deployed": false,
+  "final_stable_images_built": true,
+  "image_build_run": 40631048872,
+  "stable_startup": {
+    "run_id": 40631849982,
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0,
+    "report_sha256": "847292683fa33ad71073d92f67ee17719b6b8af8e979528427f4bb41fe4874ca",
+    "plan_path": "docs/server/evidence/rocketmq-readable-image-publication-plan-stable1-20261028.json",
+    "plan_sha256": "b3e6267dea1f4d488b9c0850cf9a2f0317ab6e217db1bc44ce643b602a460283"
+  },
+  "source_merges": [
+    {
+      "repo": "infra",
+      "pr": 391,
+      "reviewed_source_sha": "5e3c3a1756a1b73d36104440a79e868f1393be6c",
+      "merged_source_sha": "d977fa032536bedaf5f542fd544aedb3a27c4373",
+      "merged_at": "2026-10-28T04:32:26Z",
+      "url": "https://github.com/FangcunMount/infra/pull/391",
+      "checks": 27,
+      "successful": 18,
+      "conditional_na": 9,
+      "method": "merge",
+      "production_runtime_changed": false
+    },
+    {
+      "repo": "iam",
+      "pr": 162,
+      "reviewed_source_sha": "6f59ec34ee73991984fcc630b6c0dbe54a377cbe",
+      "merged_source_sha": "8f297a77520151d2789671d912bf18cd52e833eb",
+      "merged_at": "2026-10-28T04:10:20Z",
+      "url": "https://github.com/FangcunMount/iam/pull/162",
+      "checks": 12,
+      "successful": 11,
+      "conditional_na": 1,
+      "method": "merge",
+      "production_runtime_changed": false
+    },
+    {
+      "repo": "qs-server",
+      "pr": 457,
+      "reviewed_source_sha": "f783f40473295dbcd70c7de4f11d25a61d1876c0",
+      "merged_source_sha": "dc98c2caabae74961c874eb052ccc69d3827ae17",
+      "merged_at": "2026-10-28T04:12:29Z",
+      "url": "https://github.com/FangcunMount/qs-server/pull/457",
+      "checks": 30,
+      "successful": 29,
+      "conditional_na": 1,
+      "method": "merge",
+      "production_runtime_changed": false
+    },
+    {
+      "repo": "qs-ai",
+      "pr": 235,
+      "reviewed_source_sha": "9dce206643d11afc33e27b72ef4429c0e5537e7a",
+      "merged_source_sha": "c8c52e7ead4f8c601bdb437bc85a86786b3619a3",
+      "merged_at": "2026-10-28T04:22:20Z",
+      "url": "https://github.com/FangcunMount/qs-ai/pull/235",
+      "checks": 14,
+      "successful": 14,
+      "conditional_na": 0,
+      "method": "merge",
+      "production_runtime_changed": false
+    },
+    {
+      "repo": "reliable-messaging",
+      "pr": 66,
+      "reviewed_source_sha": "585e9a3e7e27f939741efb5f0d6f6c7d1d87d2c2",
+      "merged_source_sha": "ac14fdbe4118ce6b33c18dc0e56f8163b313a922",
+      "merged_at": "2026-10-28T04:22:28Z",
+      "url": "https://github.com/FangcunMount/reliable-messaging/pull/66",
+      "checks": 12,
+      "successful": 12,
+      "conditional_na": 0,
+      "method": "squash",
+      "production_runtime_changed": false
+    }
+  ],
+  "host_merge_ancestry": [
+    {
+      "repository": "iam",
+      "reviewed_source_sha": "6f59ec34ee73991984fcc630b6c0dbe54a377cbe",
+      "merged_source_sha": "8f297a77520151d2789671d912bf18cd52e833eb",
+      "tree": "eb52de37f9b490959ead5916ff96259d6847f7b9",
+      "exact_reviewed_image_source_is_merged_ancestor": true,
+      "whole_tree_equal": true
+    },
+    {
+      "repository": "qs-server",
+      "reviewed_source_sha": "f783f40473295dbcd70c7de4f11d25a61d1876c0",
+      "merged_source_sha": "dc98c2caabae74961c874eb052ccc69d3827ae17",
+      "tree": "ec785b2ccb00033d07338748422a953d60a1277f",
+      "exact_reviewed_image_source_is_merged_ancestor": true,
+      "whole_tree_equal": true
+    },
+    {
+      "repository": "qs-ai",
+      "reviewed_source_sha": "9dce206643d11afc33e27b72ef4429c0e5537e7a",
+      "merged_source_sha": "c8c52e7ead4f8c601bdb437bc85a86786b3619a3",
+      "tree": "f70c43311201b44acbdad12780d954538e623a33",
+      "exact_reviewed_image_source_is_merged_ancestor": true,
+      "whole_tree_equal": true
+    }
+  ],
+  "existing_shared_receive_failure": {
+    "schema": "readable-t12-existing-sdk-receive-failure/v1",
+    "run": 40628929057,
+    "job": 122620460691,
+    "attempt": 1,
+    "infra_source": "5e3c3a1756a1b73d36104440a79e868f1393be6c",
+    "sdk_source": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+    "passed": 29,
+    "failed": 1,
+    "skipped": 0,
+    "stage": "v2 shared public Go subscriber: third Mongo branch not observed within90 seconds",
+    "expected_shared_ids": 9,
+    "observed_shared_ids": 8,
+    "producer_result": "both MySQL and Mongo senders reported three Committed / CommitConfirmed branches and clean shutdown; NORMAL sender closed cleanly",
+    "root_cause": "Unresolved; failure occurred in the preexisting SDK v0.5.0 shared subscriber test, before image construction or publication. No subscriber/fixture code or deadlines were changed.",
+    "prior_same_scope_evidence": "T09 execution ledger retained an earlier SDK shared receive timeout and one failed-job retest; exact receipt remains linked in the existing CI investigation",
+    "current_stable_sdk_gates": {
+      "source": "559c735b2ceb11827ffbbd1279808b4164bba3d1",
+      "readable": 40626062382,
+      "faults": 40626066814,
+      "passed": [
+        35,
+        35,
+        5,
+        48,
+        48
+      ]
+    },
+    "report_sha256": "0a82cc23fb81fc26bc512ff765ceff878f6b0173e9ddd87f133f55059e80dbf1",
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "retest": "planned one original failed-job comparison after complete workflow status; no successful job rerun",
+    "comparison": {
+      "run_id": 40628929057,
+      "original_job_id": 122620460691,
+      "original_attempt": 1,
+      "scope": "only the failed original job; no successful profile/index reruns",
+      "reason": "retained precise shared receive8/9 timeout and unchanged fixture/consumer source; root cause remains unresolved",
+      "phase": "comparison_passed",
+      "requested_at": "2026-10-28T04:09:54.212581+00:00",
+      "attempt": 2,
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "report_sha256": "953fe90c7e6c8e1d917cba171d5f6ddb4e976156e26aed7379e525e1f9125d28",
+      "cleanup": {
+        "project_containers_remaining": false,
+        "compose_down_succeeded": true,
+        "probe_process_groups_drained": true,
+        "private_fixture_directory_removed": true
+      },
+      "root_cause": "unresolved; single comparison is not a claimed root-cause fix"
+    }
+  },
+  "sdk_post_release_test_fix": {
+    "failed_run": 40629147482,
+    "failed_job": 122621155086,
+    "observed_remote_commands": 198,
+    "expected_minimum": 200,
+    "cause": "Test stopped client after local Send, before peer observation",
+    "correction": "Test-only bounded server-observation barrier; runtime and published assets unchanged",
+    "fixed_source_sha": "585e9a3e7e27f939741efb5f0d6f6c7d1d87d2c2",
+    "merged_source_sha": "ac14fdbe4118ce6b33c18dc0e56f8163b313a922",
+    "go1259_race_repetitions": 20,
+    "go12512_race_repetitions": 20,
+    "make_check": "passed",
+    "source_ci_successes": 12
   }
 }
