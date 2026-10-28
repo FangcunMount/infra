@@ -4,11 +4,52 @@ Uses pinned 5.5.1 exportMetadata/listUser/getAcl formats. Existing resource or
 principal conflicts are refused; no implicit type conversion/credential rotation.
 """
 import json
+import hashlib
 import re
 import secrets
 import subprocess
+import time
 
 from routes import permissions_v2, validate
+
+
+class ProvisionReadbackError(RuntimeError):
+    """Bounded, nonsecret evidence; never carries raw metadata or credentials."""
+    def __init__(self, missing, observations=None):
+        super().__init__('provision_readback_incomplete')
+        topics, groups, users, grants = missing
+        names = dict(topics=[row[0] for row in topics], groups=groups, principals=users,
+                     grants=[role + ':' + resource for role, resource, _ in grants])
+        self.audit_diagnostic = {
+            'code': 'provision_readback_incomplete',
+            'missing_counts': {key: len(rows) for key, rows in names.items()},
+            'missing_identity_sha256': {
+                key: [hashlib.sha256(name.encode()).hexdigest() for name in sorted(rows)[:256]]
+                for key, rows in names.items()},
+            'identity_hashes_truncated': any(len(rows) > 256 for rows in names.values()),
+            'mutation_retry_attempted': False,
+        }
+        if observations is not None:
+            self.audit_diagnostic['observations'] = observations
+
+
+def verify_readback(admin, directory, manifest, accounts, *, previous=None):
+    """At most three authoritative read rounds; never retry a mutation or conflict."""
+    observations = []
+    for attempt in range(1, 4):
+        after, users = admin.metadata(directory), admin.users()
+        acls = {accounts[role]['username']: admin.acl(accounts[role]['username'])
+                for role in manifest.get('accounts', {})}
+        # Conflicts, missing original responsibilities and credential drift raise
+        # immediately. Only incomplete new-resource visibility can be reread.
+        missing = preflight(manifest, accounts, after, users, acls, previous=previous)
+        observations.append(dict(attempt=attempt, missing_counts={
+            key: len(rows) for key, rows in zip(('topics', 'groups', 'principals', 'grants'), missing)}))
+        if not any(missing):
+            return dict(attempts=attempt, observations=observations, mutation_retry_attempted=False)
+        if attempt < 3:
+            time.sleep(1)
+    raise ProvisionReadbackError(missing, observations)
 
 
 class Admin:
@@ -206,19 +247,17 @@ def provision(container, manifest, accounts, *, previous=None):
         for role, resource, actions in grants:
             admin("createAcl", "-s", "User:" + accounts[role]["username"], "-r", resource,
                   "-a", ",".join(sorted(actions)), "-d", "Allow", mutation=True)
-        after, final_users = admin.metadata(directory), admin.users()
-        final_acls = {accounts[role]["username"]: admin.acl(accounts[role]["username"])
-                      for role in manifest.get("accounts", {})}
-        if any(preflight(manifest, accounts, after, final_users, final_acls, previous=previous)):
-            raise RuntimeError("post-provision readback differs from reviewed resources")
+        readback = verify_readback(admin, directory, manifest, accounts, previous=previous)
         result = {"version": manifest['version'], "operations": admin.operations, "typed_topics": len(desired_topics(manifest)),
-                  "principals": len(manifest.get("accounts", {})), "verified": True}
+                  "principals": len(manifest.get("accounts", {})), "verified": True, "readback": readback}
         if previous is not None:
             from readable_transition import digest
             result['transition'] = dict(previous_manifest_sha256=digest(previous),
                 manifest_sha256=digest(manifest), phase='resources_and_union_acl_prepared',
                 credential_rotation=False, retirement_completed=False, business_acceptance=False)
         return result
+    except ProvisionReadbackError:
+        raise
     except RuntimeError as error:
         # All RuntimeError strings in this module are authored fixed diagnostics;
         # never interpolate captured stdout, credentials or argv here.

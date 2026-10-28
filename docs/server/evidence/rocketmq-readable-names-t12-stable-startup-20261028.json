@@ -1,0 +1,147 @@
+{
+  "schema": "readable-t12-stable-startup/v1",
+  "sdk": {
+    "profile": "readable-stable",
+    "go": "v0.6.0",
+    "python": "0.5.0",
+    "source_sha": "559c735b2ceb11827ffbbd1279808b4164bba3d1"
+  },
+  "candidate_path": "components/rocketmq/readable-image-candidates-stable1-20261028.json",
+  "candidate_sha256": "cdd46f1c74bbf4e347130d2b9b162260f57172d5f17a9dedc5c92dc9cc39b943",
+  "candidate": {
+    "schema": "readable-image-candidates/v1",
+    "sdk_profile": "readable-stable",
+    "sources": {
+      "iam": "6f59ec34ee73991984fcc630b6c0dbe54a377cbe",
+      "qs": "f783f40473295dbcd70c7de4f11d25a61d1876c0",
+      "ai": "9dce206643d11afc33e27b72ef4429c0e5537e7a"
+    },
+    "builder_sha": "5e3c3a1756a1b73d36104440a79e868f1393be6c",
+    "image_runs": {
+      "iam": "40631048872",
+      "qs-api": "40631048872",
+      "qs-collection": "40631048872",
+      "qs-worker": "40631048872",
+      "ai": "40631048872"
+    },
+    "images": {
+      "iam": {
+        "archive_sha256": "f5a59d880c58eda36327f3a7b1b1cedfa58bc4c56e417da4cba8108461e3f78e",
+        "image_config_id": "sha256:28933f61ee9fd84366eb843b08c214bfc95afe706a729f3d69758f94a3633b82",
+        "archive_bytes": 84700661,
+        "inventory_sha256": "9e67f89e91db5107a63dabcab8aae0fdca136b4470f3e12f5fffeaf857e6bb40"
+      },
+      "qs-api": {
+        "archive_sha256": "abce4878285afd8210c41d1cb4ae03f91c6446260556287cccbce326372d33f5",
+        "image_config_id": "sha256:802776e44900c57cda90f7139482c1578b06fe9191817a72e332fa308f238ca1",
+        "archive_bytes": 73456627,
+        "inventory_sha256": "b97e7434d697d9a66bf55efa5cf59f913373171e2ff28597cc6fccbfe0ce5714"
+      },
+      "qs-collection": {
+        "archive_sha256": "c7c58a358bb0d486875ed634ba34128040db912904ef45658ad32915faf53e4f",
+        "image_config_id": "sha256:de3232e477bddb239b499b3da013af0cd069fd8c82bb46cbbdf263f2db56c91f",
+        "archive_bytes": 24934339,
+        "inventory_sha256": "7fa3127173d30cfef900357fbc4364e693616f96bb5cb33d3de12021abbef98e"
+      },
+      "qs-worker": {
+        "archive_sha256": "4b79918d713e9e74058f66e00e3e8a4d776ba3ede6f11e332284b238aa5fe5e7",
+        "image_config_id": "sha256:3cefe5392b19d016b4a50349a43598701c91f669f9eef0995620e85924ec37c8",
+        "archive_bytes": 20594382,
+        "inventory_sha256": "d79a7bce772beabb56fb9ed12690cdbffdff42bb3878e16a057af62dd0a67788"
+      },
+      "ai": {
+        "archive_sha256": "ad1d570b283482414044a0a1bb9a5b6b02838d449e92eda2b06db2c1f32b6c11",
+        "image_config_id": "sha256:439783ccf7fa0c66cd9b358b580ee7de70217125f879267d750c09bceeb90001",
+        "archive_bytes": 131881612,
+        "inventory_sha256": "d015ee8f5dda03131ae1aab0d55aa6d81a8b2d688acd7a6fecce35e60c64671e"
+      }
+    },
+    "go_identity": {
+      "uid": 2000,
+      "gid": 2000
+    },
+    "routes_sha256": "f03420a8832f842f49fead15570e1c8acf2fe99d34a1bba194d5e501962207a5",
+    "production": false
+  },
+  "source_merge_proof": [
+    {
+      "repository": "iam",
+      "reviewed_source_sha": "6f59ec34ee73991984fcc630b6c0dbe54a377cbe",
+      "merged_source_sha": "8f297a77520151d2789671d912bf18cd52e833eb",
+      "tree": "eb52de37f9b490959ead5916ff96259d6847f7b9",
+      "exact_reviewed_image_source_is_merged_ancestor": true,
+      "whole_tree_equal": true
+    },
+    {
+      "repository": "qs-server",
+      "reviewed_source_sha": "f783f40473295dbcd70c7de4f11d25a61d1876c0",
+      "merged_source_sha": "dc98c2caabae74961c874eb052ccc69d3827ae17",
+      "tree": "ec785b2ccb00033d07338748422a953d60a1277f",
+      "exact_reviewed_image_source_is_merged_ancestor": true,
+      "whole_tree_equal": true
+    },
+    {
+      "repository": "qs-ai",
+      "reviewed_source_sha": "9dce206643d11afc33e27b72ef4429c0e5537e7a",
+      "merged_source_sha": "c8c52e7ead4f8c601bdb437bc85a86786b3619a3",
+      "tree": "f70c43311201b44acbdad12780d954538e623a33",
+      "exact_reviewed_image_source_is_merged_ancestor": true,
+      "whole_tree_equal": true
+    }
+  ],
+  "image_run": 40631048872,
+  "image_job_results": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0
+  },
+  "startup": {
+    "run_id": 40631849982,
+    "url": "https://github.com/FangcunMount/infra/actions/runs/40631849982",
+    "head_sha": "9acb100f1a5771b3ec74aceb80a91bc91e0d4b81",
+    "report_sha256": "847292683fa33ad71073d92f67ee17719b6b8af8e979528427f4bb41fe4874ca",
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0,
+    "cases": {
+      "actual_source_registry_consumers_match_manifest": true,
+      "all_five_exact_archives_loaded": true,
+      "original_current_qs_pair_prepared": true,
+      "original_qs_dual_binding_verified": true,
+      "original_iam_schema45_and_binding_selected": true,
+      "original_ai_schema43_and_binding_verified": true,
+      "actual_three_source_packagers_and_root_owned_twenty_one_material_files": true,
+      "actual_current_api_host_freeze_and_native_preflight_repeated": true,
+      "actual_iam_ready_and_paused_checker_live": true,
+      "actual_readonly_ai_ready_and_paused_checker_live": true,
+      "actual_qs_api_with_iam_ai_and_both_paused_owners": true,
+      "actual_collection_with_required_iam_and_api": true,
+      "actual_second_collection_with_original_replica_budget": true,
+      "actual_worker1_prepared_http_healthy_original_concurrency48": true,
+      "actual_worker2_prepared_http_healthy_original_concurrency48": true,
+      "actual_worker3_prepared_http_healthy_original_concurrency48": true,
+      "all_eight_actual_processes_shutdown_exit_zero": true,
+      "actual_all_runtime_start_shutdown_no_ddl_attempts": true
+    },
+    "source_worker_concurrency": 48,
+    "mysql_runtime_ddl_attempts": 0,
+    "mongo_runtime_ddl_attempts": 0,
+    "all8_processes_exited_zero": true,
+    "sources_unchanged": true,
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true,
+      "owned_m4_material_root_removed": true
+    }
+  },
+  "publication_plan": {
+    "path": "docs/server/evidence/rocketmq-readable-image-publication-plan-stable1-20261028.json",
+    "sha256": "b3e6267dea1f4d488b9c0850cf9a2f0317ab6e217db1bc44ce643b602a460283"
+  },
+  "cutover_rehearsal": "not yet completed; separate25-case gate required",
+  "registry_published": false,
+  "production_runtime_changed": false,
+  "system_acceptance": false
+}

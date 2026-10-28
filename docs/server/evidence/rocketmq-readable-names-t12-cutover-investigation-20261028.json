@@ -1,0 +1,112 @@
+{
+  "schema": "readable-t12-cutover-investigation/v1",
+  "status": "diagnostic_candidate_not_yet_native_verified",
+  "production_changed": false,
+  "image_archives_rebuilt": false,
+  "candidate_sha256": "cdd46f1c74bbf4e347130d2b9b162260f57172d5f17a9dedc5c92dc9cc39b943",
+  "cutover_failure": {
+    "run_id": 40633232646,
+    "attempt": 1,
+    "source_sha": "9acb100f1a5771b3ec74aceb80a91bc91e0d4b81",
+    "passed": 2,
+    "failed": 1,
+    "skipped": 0,
+    "failure_stage": "owned_dependencies",
+    "failure_message_sha256": "79a026c241d7d7db8331bfe3a576a28639ce447b4ec1a2f19ce46cb3b4de0693",
+    "decoded_authored_error": "v2 provision: post-provision readback differs from reviewed resources",
+    "old_resource_preparation": {
+      "version": 2,
+      "operations": 53,
+      "typed_topics": 10,
+      "principals": 5,
+      "verified": true
+    },
+    "business_application_started": false,
+    "report_sha256": "d1ef4d67fa0b14289004c62870fa8947f9564c4e1a14aa4cf831a9fbccc2aff5",
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    },
+    "root_cause": "Exact missing resource category not present in the original report; no claim of a Broker/runtime fix"
+  },
+  "sdk_audit_failure": {
+    "run_id": 40633316700,
+    "job_id": 122634483238,
+    "attempt": 1,
+    "sdk_sha": "1345266aa0e864c46de5d1e3e3c939dd8002a890",
+    "passed": 33,
+    "failed": 1,
+    "skipped": 0,
+    "failure": "RuntimeError: probe ended before received",
+    "stage": "positive recovery audit sdk-python to sdk-python mysql commit; consumer26722 exited1 after grpc_Unknown notification",
+    "report_sha256": "35257c654b45d32b561c882221325f1e3f427157779bf6b860483474b1c99d85",
+    "cleanup": {
+      "project_containers_remaining": false,
+      "compose_down_succeeded": true,
+      "probe_process_groups_drained": true,
+      "private_fixture_directory_removed": true
+    },
+    "root_cause": "Consumer probe terminated on a transport error; underlying cause not confirmed. No subscriber or timeout change"
+  },
+  "diagnostic_change": {
+    "scope": "Only bounded counts and hashed missing identities from failed strict resource readback",
+    "write_retries_added": 0,
+    "readback_retries_added": 0,
+    "acceptance_relaxed": false,
+    "credentials_or_raw_metadata_exported": false,
+    "local_tests": "missing topic/group/ACL rejects without repeated mutation and without credential disclosure; complete readback still verifies"
+  },
+  "classified_failure": {
+    "run_id": 40663138181,
+    "source_sha": "22634f53a8a0858e5cdc6f992b0c39eeaf00000b",
+    "passed": 2,
+    "failed": 1,
+    "skipped": 0,
+    "report_sha256": "62f27c596f0fa8b218da983876eb73e1c06805852399dffb3c46c386a7192c21",
+    "diagnostic": {
+      "code": "provision_readback_incomplete",
+      "missing_counts": {
+        "topics": 0,
+        "groups": 0,
+        "principals": 0,
+        "grants": 1
+      },
+      "missing_identity_sha256": {
+        "topics": [],
+        "groups": [],
+        "principals": [],
+        "grants": [
+          "789c7e4aee00251b44b2bc96959b6a6b6a177ddc30e1aaaf38854fb155bcc70c"
+        ]
+      },
+      "identity_hashes_truncated": false,
+      "mutation_retry_attempted": false
+    },
+    "decoded_missing": {
+      "role": "m3-qs-mongo",
+      "resource": "Topic:qs-evaluation-lifecycle--tx--qs-mongo--m3-1",
+      "actions": [
+        "Get",
+        "Pub"
+      ],
+      "new_resource_only": true
+    },
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    }
+  },
+  "confirmation_change": {
+    "maximum_authoritative_read_rounds": 3,
+    "delay_seconds_between_incomplete_rounds": 1,
+    "mutation_retries": 0,
+    "complete_exact_union_required": true,
+    "conflict_or_original_responsibility_drift": "immediate refusal; never reread to mask conflict",
+    "observations_retained_on_success_and_failure": true,
+    "native_result": "pending; no claim of confirmed Broker root cause"
+  }
+}
