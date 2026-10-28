@@ -44,22 +44,26 @@ class ProvisionReadbackTest(unittest.TestCase):
             def users(self): return users
             def acl(self, username):
                 value = copy.deepcopy(acls[username])
-                if self.reads > 1 and missing == 'grants' and username == next(iter(acls)):
+                if (self.reads > 1 and missing == 'grants' or self.reads == 2 and missing == 'delayed_grant') and username == next(iter(acls)):
                     del value[next(iter(value))]
+                if self.reads > 1 and missing == 'conflict':
+                    value['Topic:*'] = {'Pub', 'Get'}
                 return value
         return manifest, accounts, Admin()
 
     def test_missing_resources_fail_without_repeating_mutations_or_exporting_secrets(self):
         for missing in ('topics', 'groups', 'grants'):
             manifest, accounts, admin = self.fixture(missing)
-            with self.subTest(missing=missing), patch('provision_v2.Admin', return_value=admin):
+            with self.subTest(missing=missing), patch('provision_v2.Admin', return_value=admin), patch('provision_v2.time.sleep') as sleep:
                 with self.assertRaises(ProvisionReadbackError) as caught:
                     provision('unused', manifest, accounts)
                 audit = caught.exception.audit_diagnostic
                 self.assertEqual(audit['missing_counts'][missing], 1)
                 self.assertEqual(sum(audit['missing_counts'].values()), 1)
                 self.assertEqual(admin.operations, 1)
-                self.assertEqual(admin.reads, 2)
+                self.assertEqual(admin.reads, 4)
+                self.assertEqual(sleep.call_count, 2)
+                self.assertEqual(len(audit['observations']), 3)
                 self.assertIs(audit['mutation_retry_attempted'], False)
                 encoded = json.dumps(audit)
                 for account in accounts.values():
@@ -73,3 +77,24 @@ class ProvisionReadbackTest(unittest.TestCase):
         self.assertIs(result['verified'], True)
         self.assertEqual(result['operations'], 1)
         self.assertEqual(admin.reads, 2)
+
+    def test_delayed_read_visibility_must_converge_without_a_second_mutation(self):
+        manifest, accounts, admin = self.fixture('delayed_grant')
+        with patch('provision_v2.Admin', return_value=admin), patch('provision_v2.time.sleep') as sleep:
+            result = provision('unused', manifest, accounts)
+        self.assertIs(result['verified'], True)
+        self.assertEqual(admin.operations, 1)
+        self.assertEqual(admin.reads, 3)
+        self.assertEqual(sleep.call_count, 1)
+        self.assertEqual(result['readback']['attempts'], 2)
+        self.assertEqual(result['readback']['observations'][0]['missing_counts']['grants'], 1)
+        self.assertEqual(sum(result['readback']['observations'][-1]['missing_counts'].values()), 0)
+
+    def test_conflicting_snapshot_is_refused_without_waiting_for_a_later_snapshot(self):
+        manifest, accounts, admin = self.fixture('conflict')
+        with patch('provision_v2.Admin', return_value=admin), patch('provision_v2.time.sleep') as sleep:
+            with self.assertRaisesRegex(RuntimeError, 'exceeds or conflicts'):
+                provision('unused', manifest, accounts)
+        self.assertEqual(admin.operations, 1)
+        self.assertEqual(admin.reads, 2)
+        sleep.assert_not_called()

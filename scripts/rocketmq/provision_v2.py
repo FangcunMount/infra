@@ -8,13 +8,14 @@ import hashlib
 import re
 import secrets
 import subprocess
+import time
 
 from routes import permissions_v2, validate
 
 
 class ProvisionReadbackError(RuntimeError):
     """Bounded, nonsecret evidence; never carries raw metadata or credentials."""
-    def __init__(self, missing):
+    def __init__(self, missing, observations=None):
         super().__init__('provision_readback_incomplete')
         topics, groups, users, grants = missing
         names = dict(topics=[row[0] for row in topics], groups=groups, principals=users,
@@ -28,6 +29,27 @@ class ProvisionReadbackError(RuntimeError):
             'identity_hashes_truncated': any(len(rows) > 256 for rows in names.values()),
             'mutation_retry_attempted': False,
         }
+        if observations is not None:
+            self.audit_diagnostic['observations'] = observations
+
+
+def verify_readback(admin, directory, manifest, accounts, *, previous=None):
+    """At most three authoritative read rounds; never retry a mutation or conflict."""
+    observations = []
+    for attempt in range(1, 4):
+        after, users = admin.metadata(directory), admin.users()
+        acls = {accounts[role]['username']: admin.acl(accounts[role]['username'])
+                for role in manifest.get('accounts', {})}
+        # Conflicts, missing original responsibilities and credential drift raise
+        # immediately. Only incomplete new-resource visibility can be reread.
+        missing = preflight(manifest, accounts, after, users, acls, previous=previous)
+        observations.append(dict(attempt=attempt, missing_counts={
+            key: len(rows) for key, rows in zip(('topics', 'groups', 'principals', 'grants'), missing)}))
+        if not any(missing):
+            return dict(attempts=attempt, observations=observations, mutation_retry_attempted=False)
+        if attempt < 3:
+            time.sleep(1)
+    raise ProvisionReadbackError(missing, observations)
 
 
 class Admin:
@@ -225,14 +247,9 @@ def provision(container, manifest, accounts, *, previous=None):
         for role, resource, actions in grants:
             admin("createAcl", "-s", "User:" + accounts[role]["username"], "-r", resource,
                   "-a", ",".join(sorted(actions)), "-d", "Allow", mutation=True)
-        after, final_users = admin.metadata(directory), admin.users()
-        final_acls = {accounts[role]["username"]: admin.acl(accounts[role]["username"])
-                      for role in manifest.get("accounts", {})}
-        missing = preflight(manifest, accounts, after, final_users, final_acls, previous=previous)
-        if any(missing):
-            raise ProvisionReadbackError(missing)
+        readback = verify_readback(admin, directory, manifest, accounts, previous=previous)
         result = {"version": manifest['version'], "operations": admin.operations, "typed_topics": len(desired_topics(manifest)),
-                  "principals": len(manifest.get("accounts", {})), "verified": True}
+                  "principals": len(manifest.get("accounts", {})), "verified": True, "readback": readback}
         if previous is not None:
             from readable_transition import digest
             result['transition'] = dict(previous_manifest_sha256=digest(previous),

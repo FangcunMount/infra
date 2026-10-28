@@ -57,5 +57,56 @@
     "acceptance_relaxed": false,
     "credentials_or_raw_metadata_exported": false,
     "local_tests": "missing topic/group/ACL rejects without repeated mutation and without credential disclosure; complete readback still verifies"
+  },
+  "classified_failure": {
+    "run_id": 40663138181,
+    "source_sha": "22634f53a8a0858e5cdc6f992b0c39eeaf00000b",
+    "passed": 2,
+    "failed": 1,
+    "skipped": 0,
+    "report_sha256": "62f27c596f0fa8b218da983876eb73e1c06805852399dffb3c46c386a7192c21",
+    "diagnostic": {
+      "code": "provision_readback_incomplete",
+      "missing_counts": {
+        "topics": 0,
+        "groups": 0,
+        "principals": 0,
+        "grants": 1
+      },
+      "missing_identity_sha256": {
+        "topics": [],
+        "groups": [],
+        "principals": [],
+        "grants": [
+          "789c7e4aee00251b44b2bc96959b6a6b6a177ddc30e1aaaf38854fb155bcc70c"
+        ]
+      },
+      "identity_hashes_truncated": false,
+      "mutation_retry_attempted": false
+    },
+    "decoded_missing": {
+      "role": "m3-qs-mongo",
+      "resource": "Topic:qs-evaluation-lifecycle--tx--qs-mongo--m3-1",
+      "actions": [
+        "Get",
+        "Pub"
+      ],
+      "new_resource_only": true
+    },
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true
+    }
+  },
+  "confirmation_change": {
+    "maximum_authoritative_read_rounds": 3,
+    "delay_seconds_between_incomplete_rounds": 1,
+    "mutation_retries": 0,
+    "complete_exact_union_required": true,
+    "conflict_or_original_responsibility_drift": "immediate refusal; never reread to mask conflict",
+    "observations_retained_on_success_and_failure": true,
+    "native_result": "pending; no claim of confirmed Broker root cause"
   }
 }
