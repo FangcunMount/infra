@@ -136,7 +136,7 @@ def main():
               'runtime_ready': False, 'cutover_rehearsal_complete': False}
     if args.sdk_profile != 'm3-stable':
         report.update(schema='readable-final-image-inventory/v1', sdk_profile=args.sdk_profile,
-                      stable_release=False, python_source_lock=python_lock)
+                      stable_release=expected_sdk.get('stable_release', False), python_source_lock=python_lock)
     try:
         dockerfile, binary = TARGETS[args.target]
         report['dockerfile_sha256'] = sha256(source / dockerfile)

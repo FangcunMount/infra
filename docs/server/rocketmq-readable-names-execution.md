@@ -45,7 +45,7 @@
 | ✅ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | 2026-10-28：历史消费12×2、未来调度41×2、真实宿主Replan14/0/0×2及完整清理通过；固定QS eb0e6dcaa、SDK v0.6.0-rc.1、infra候选6c0b89eb，原ID/wire、旧witness、回调仅一次和拒绝非法重做均通过。两处夹具错误及通用SDK首次超时保留，[证据](evidence/rocketmq-readable-names-ci-replan-investigation-20261028.json)。PR382以29项适用源码CI成功合并59b385a2；SDK失败作业单次复验41/0/0，成功档和Replan不重跑，未声明超时根因已解决。生产未变更 |
 | ✅ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | 2026-10-28：精确旧新ACL134项、CD四角色只读材料24项、最新具名退役138/0/0及完整清理通过。PR361/56449c19全部80项源码CI成功并合并2e6fdc0c；PR359已合并。实际classic retry/DLQ/POP v1三哨兵保留，POP伴随资源拒绝保护完整；v2生成实验失败保留且不进入删除授权路径。[原生证据](evidence/rocketmq-readable-names-runtime-verified-20261028.json)、[源码门禁与排查](evidence/rocketmq-readable-names-ci-replan-investigation-20261028.json)。实现及验证完成；生产预置/删除仍由T13/T16分别记账 |
 | ✅ | T11 | ✅ 固定RC镜像与独立18项启动、POP35/35/5、成对真实故障、完整切换25/0/0及全部19项适用源码CI；PR380已合并 | 本项组合门禁完成；空输入配置恢复不表示数据库恢复或生产业务验收，正式候选重验及T14/T15分别记账 |
-| ☐ | T12 | 稳定 SDK、三库正式依赖及固定镜像重新安装验收 | 进行中：SDK PR65已合并559c735b，完整tree与已验证8d99c8b候选一致；对合并SHA补齐发布门禁，Python源码/wheel两档各159项且制品一致、存储三档成功，真实Broker/故障门禁进行中。IAM/QS的`PRODUCTION_DEPLOY_PAUSED=true`、AI的`AUTO_DEPLOY_ENABLED=false`，原值已保存并回读，现有业务不受影响。尚未创建稳定tag/Release、未升级正式宿主依赖或发布最终镜像；[跟踪证据](evidence/rocketmq-readable-names-t12-release-20261028.json)，T12未勾选 |
+| ☐ | T12 | 稳定 SDK、三库正式依赖及固定镜像重新安装验收 | 进行中：SDK Go v0.6.0/Python0.5.0稳定版已发布，两tag同559c735b、18资产摘要核验通过；合并SHA全部源码/真实门禁通过，存储29×3、readable35/35/5、故障48×2零失败/跳过。正式下载Go193文件一致/62 race、wheel和sdist各16文件一致/128纯测试。三库正式依赖及最终稳定镜像正在推进，CD保持暂停，生产运行未切换。[跟踪证据](evidence/rocketmq-readable-names-t12-release-20261028.json)，T12未勾选 |
 | ☐ | T13 | 生产核验、暂停 CD、预置资源权限及冻结清单 | 待开始 |
 | ☐ | T14 | 维护内排空旧责任、切换八实例与新订阅/Checker 验证 | 待开始 |
 | ☐ | T15 | 合法 system/新答卷/新 AI 验收及开放后 30 分钟检查 | 待开始 |
@@ -138,3 +138,5 @@
 - 2026-10-28：T11完成，总进度11/16。原始切换报告40623026549已下载并用严格验收器校验：25/0/0、源码3065556、与独立18项启动同一固定候选、四原绑定保持、20旧新输入为空、实际Docker启动故障125及持久化边界拒绝旧配置/普通重试、具名前向修复成功。配置切换与恢复计时25.073秒<900秒目标，不代表生产排空和system验收总时长；八实例退出0、原预算/Unix身份、三个worker并发48、运行时DDL0和五项清理全部通过。PR380全部19项适用源码CI成功并合并a6d419e0，8项非选中作业N/A；原生25项零跳过。与既有宿主业务、POP及成对真实故障证据组合完成T11，不将此单一空输入试验冒充生产或数据库恢复。首轮16/1、第二轮18/1错误与修复、实际保护器回归均保留。生产/CD/业务库/凭据/容器/Registry未改，下一项为T12。
 
 - 2026-10-28：开始T12，总进度11/16。核对三库仓库/production变量无覆盖且无在途部署，保存原值后将IAM/QS PRODUCTION_DEPLOY_PAUSED设为true、AI AUTO_DEPLOY_ENABLED设为false并回读；只暂停未来自动CD，未停止服务或封业务。SDK PR65以12项原候选源码CI成功合并559c735b，tree与8d99c8b完全一致。正式发布前按合并SHA重新绑定源码、两档159源码/wheel、三档存储及完整Broker门禁，各专项只派发一次；SDK稳定tag/Release、正式宿主依赖和最终镜像仍待验证。
+
+- 2026-10-28：T12稳定SDK已正式发布，Go v0.6.0和Python0.5.0两个tag均固定559c735b。精确合并SHA源码、存储、readable与完整故障门禁全部通过；18份正式资产摘要核对通过，下载Go模块62 race、wheel/sdist各128纯测试通过。新增infra不可变readable-stable profile及RC/稳定制品替换拒绝保护，472项本地MQ工具测试通过；三库正式依赖/最终镜像尚未完成，保持11/16和CD暂停，生产容器与消息责任未变更。

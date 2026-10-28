@@ -10,7 +10,7 @@
   "sdk_source_merged": true,
   "go_version_planned": "v0.6.0",
   "python_version_planned": "0.5.0",
-  "sdk_published": false,
+  "sdk_published": true,
   "host_dependencies_stable": false,
   "final_stable_images_verified": false,
   "production_cutover": false,
@@ -64,6 +64,72 @@
     "assets_equal_across_profiles": true,
     "wheel_sha256": "6fe1fbf0635d3e2f8ba2f10c12474c39c939ee656f20df7784928f8bd92e88b8",
     "sdist_sha256": "4acbdddad91448d64993ec0b081b7064b64ce2a5248c75b40a67354109173821",
-    "formally_published": false
+    "formally_published": true
+  },
+  "sdk_stable_versions": {
+    "go": "v0.6.0",
+    "python": "0.5.0"
+  },
+  "exact_merged_source_gates_status": "all selected source/native gates succeeded; required test reports nonempty and zero failures/skips",
+  "native_passed": {
+    "storage": [
+      29,
+      29,
+      29
+    ],
+    "readable": [
+      35,
+      35,
+      5
+    ],
+    "faults_and_finite_window": [
+      48,
+      48
+    ]
+  },
+  "releases": [
+    {
+      "tag": "v0.6.0",
+      "url": "https://github.com/FangcunMount/reliable-messaging/releases/tag/v0.6.0",
+      "assets": 9,
+      "server_asset_digests_verified": true,
+      "source_sha": "559c735b2ceb11827ffbbd1279808b4164bba3d1"
+    },
+    {
+      "tag": "python/v0.5.0",
+      "url": "https://github.com/FangcunMount/reliable-messaging/releases/tag/python/v0.5.0",
+      "assets": 9,
+      "server_asset_digests_verified": true,
+      "source_sha": "559c735b2ceb11827ffbbd1279808b4164bba3d1"
+    }
+  ],
+  "published_installation": {
+    "go": {
+      "version": "v0.6.0",
+      "sum": "h1:ncfphXuTE6JtSH9wJTxakZxkLxic4uws15L5dRvYrg0=",
+      "race_tests": 62,
+      "source_files_equal": 193,
+      "replace": false
+    },
+    "python_wheel": {
+      "version": "0.5.0",
+      "passed": 128,
+      "failed": 0,
+      "skipped": 0,
+      "source_files_equal": 16,
+      "editable": false,
+      "workspace_import": false
+    },
+    "python_sdist": {
+      "version": "0.5.0",
+      "passed": 128,
+      "failed": 0,
+      "skipped": 0,
+      "source_files_equal": 16,
+      "editable": false,
+      "workspace_import": false
+    },
+    "scope": "Pure post-download installation regression; native exact-source matrices recorded separately",
+    "receipt_sha256": "0dacd7bed80dad4817be16c990d566ea2d9e0729c74cd5e3e1794680121bf52c"
   }
 }
