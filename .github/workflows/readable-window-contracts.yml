@@ -1,10 +1,10 @@
 name: Readable production window contracts
 on:
   pull_request:
-    paths: ['scripts/ops/readable_runtime_start.py', 'scripts/ops/test_readable_runtime_start.py', 'scripts/ops/m4_runtime_start.py', 'scripts/rocketmq/runtime_start.py', '.github/workflows/readable-window-contracts.yml']
+    paths: ['scripts/ops/readable_runtime_start.py', 'scripts/ops/test_readable_runtime_start.py', 'scripts/ops/readable_legacy_retirement.py', 'scripts/ops/test_readable_legacy_retirement.py', 'scripts/ops/m4_runtime_start.py', 'scripts/rocketmq/runtime_start.py', '.github/workflows/readable-window-contracts.yml']
   push:
     branches: [main]
-    paths: ['scripts/ops/readable_runtime_start.py', 'scripts/ops/test_readable_runtime_start.py', 'scripts/ops/m4_runtime_start.py', 'scripts/rocketmq/runtime_start.py', '.github/workflows/readable-window-contracts.yml']
+    paths: ['scripts/ops/readable_runtime_start.py', 'scripts/ops/test_readable_runtime_start.py', 'scripts/ops/readable_legacy_retirement.py', 'scripts/ops/test_readable_legacy_retirement.py', 'scripts/ops/m4_runtime_start.py', 'scripts/rocketmq/runtime_start.py', '.github/workflows/readable-window-contracts.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -28,4 +28,4 @@ jobs:
       - name: Production start boundary and original lock contracts without Docker
         env:
           PYTHONPATH: scripts/ops:scripts/rocketmq
-        run: python -m unittest test_readable_runtime_start test_m4_runtime_start test_runtime_start
+        run: python -m unittest test_readable_runtime_start test_m4_runtime_start test_runtime_start test_readable_legacy_retirement test_readable_retirement
