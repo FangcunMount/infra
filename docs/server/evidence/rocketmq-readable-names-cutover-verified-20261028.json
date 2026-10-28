@@ -3,12 +3,12 @@
   "progress": "10/16",
   "task": "T11",
   "status": "in_progress",
-  "source_sha": "6a5f8b245309ce53f4a0b3378a465c1cb43ac4ca",
+  "source_sha": "306555623dca73afae3d760193fa26ce0dd605d1",
   "pr": 380,
-  "native_run": 40620758621,
+  "native_run": 40623026549,
   "native_dispatches": 1,
-  "local_contracts": 7,
-  "local_mq_tests": 468,
+  "local_contracts": 8,
+  "local_mq_tests": 469,
   "actionlint": true,
   "candidate_path": "components/rocketmq/readable-image-candidates-rc1-20261028.json",
   "startup_run": 40590486947,
@@ -28,9 +28,26 @@
       "owned_m4_material_root_removed": true
     }
   },
-  "fix": "Treat omitted create_host_path as false on owned immutable readonly Compose mount; Docker --mount and explicit forbidden settings unchanged",
+  "fix": "Use the original offline maintenance API for the configuration-only restore adapter; do not modify the terminal database-restore guard. Test real adapter against the real persistent guard.",
   "scope": "exact compatible RC candidate images and empty inputs; prestart config restore and poststart forward repair; no production/system/provider acceptance",
   "production_changed": false,
   "cd_changed": false,
-  "registry_writes": false
+  "registry_writes": false,
+  "second_failure": {
+    "source_sha": "6a5f8b245309ce53f4a0b3378a465c1cb43ac4ca",
+    "run": 40620758621,
+    "passed": 18,
+    "failed": 1,
+    "skipped": 0,
+    "report_sha256": "47430bbdd9c09fc0ab3663388ca5d5dd0b97e00f3da7a5726344e2c32d6e6bca",
+    "finding": "configuration restore used the terminal data-restore guard; following maintenance correctly refused before first runtime start",
+    "cleanup": {
+      "compose_down_succeeded": true,
+      "private_directory_removed": true,
+      "existing_containers_unchanged": true,
+      "existing_networks_unchanged": true,
+      "owned_m4_material_root_removed": true
+    }
+  },
+  "original_guard_tests": 17
 }
