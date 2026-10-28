@@ -153,6 +153,7 @@ def main():
     p.add_argument('--m4-rebuild', action='store_true')
     p.add_argument('--m4-candidate', type=Path)
     p.add_argument('--readable-candidate', type=Path)
+    p.add_argument('--readable-cutover-startup', type=Path)
     args = p.parse_args(); require(not args.report.exists(), 'new_report_required')
     cutover = args.startup_receipt is not None
     require(not (cutover and args.m4_rebuild), 'm4_is_not_an_old_cutover_receipt')
@@ -160,6 +161,8 @@ def main():
     readable = args.readable_candidate is not None
     require(not readable or (not cutover and not args.m4_rebuild and args.m4_candidate is None),
             'readable_startup_is_separate_from_frozen_m3_m4_cutover')
+    readable_switch = args.readable_cutover_startup is not None
+    require(not readable_switch or readable, 'readable_switch_requires_explicit_readable_candidate')
     rebuild = args.m4_rebuild or readable
     final_manifest = None
     final_digest = None
@@ -177,6 +180,9 @@ def main():
         final_manifest, final_digest = read(args.readable_candidate, repo / 'components/rocketmq/serverd-routes-readable-v3.json')
         require(final_manifest['go_identity'] == dict(uid=2000, gid=2000), 'original_startup_unix_identity_required')
         sources, reviewed_builder = final_manifest['sources'], final_manifest['builder_sha']
+        if readable_switch:
+            from readable_cutover_receipt import read_startup
+            prior, prior_digest = read_startup(args.readable_cutover_startup, final_manifest, final_digest)
     report = dict(schema='m3-five-actual-image-startup-trial/v4', passed=0, failed=0, skipped=0,
                   production=False, system_acceptance=False, combined_cutover_rehearsal_complete=False,
                   c1_cutover_barrier_exercised=False, cases={}, sources=sources,
@@ -196,6 +202,10 @@ def main():
         fixture_type = ReadableFixture
         report.update(schema='readable-eight-instance-startup/v1', sdk_profile=final_manifest['sdk_profile'],
             scope='actual readable-only eight-process startup/shutdown and production configuration packagers; no old/new cutover, business or system claim')
+        if readable_switch:
+            report.update(schema='readable-eight-instance-cutover/v1',
+                startup_receipt_sha256=prior_digest,
+                scope='same exact candidate images with compatible v2 then active v3, actual material switching, partial start failure and forward repair; controlled empty stores only, no original old production image/business/system claim')
     f = fixture_type(repo, report); run = f.run
     if readable:
         f.readable_candidate = final_manifest
@@ -250,7 +260,12 @@ def main():
         # Resource types and the five exact accounts come from the current
         # reviewed manifest. No fixture superuser is used by an application.
         accounts = {role: dict(username='owned-' + secrets.token_hex(8), password=secrets.token_hex(32)) for role in document['accounts']}
-        report['resources'] = provision(f.project + '-broker-1', document, accounts)
+        if readable_switch:
+            old_document=json.loads((repo/'components/rocketmq/serverd-routes-m3-v2.json').read_bytes())
+            report['readable_old_resources']=provision(f.project+'-broker-1',old_document,accounts)
+            report['resources']=provision(f.project+'-broker-1',document,accounts,previous=old_document)
+        else:
+            report['resources'] = provision(f.project + '-broker-1', document, accounts)
         tls = f.directory / 'service-tls'; tls.mkdir(mode=0o700)
         run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1', '-subj', '/CN=owned-service-ca',
              '-keyout', str(tls / 'service-ca.key'), '-out', str(tls / 'service-ca.crt')])
@@ -413,6 +428,11 @@ def main():
                     f.start(component, alias=component, memory='768m', cpus='1')
                     f.ready(component, 9092, '/healthz')
                 if restart_failed: break
+        if readable_switch:
+            from readable_cutover import run as run_readable_cutover
+            f.stage='actual_readable_compatible_route_switch'
+            run_readable_cutover(f,args,ai_env,dict(iam=iam_db,qs=qs_db,ai=ai_db),stop_actual,case)
+            report['combined_cutover_rehearsal_complete']=True
         if cutover:
             report['actual_cutover'] = f.boundary.finish()
             report['c1_cutover_barrier_exercised'] = True
