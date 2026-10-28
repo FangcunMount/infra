@@ -147,6 +147,19 @@ def verify_budget(plan, raw):
             or entry.get('user') not in {str(uid), f'{uid}:{uid}', 'app' if uid == 10001 else 'www'}
             or any(re.search(r'(^|_)NSQ(D|_|$)', key) for key in entry.get('environment', {}))):
         raise BoundaryError('runtime budget or retired environment differs')
+    if plan['role'] == 'qs-api' and plan['phase'] != 'original':
+        # Viper environment bindings override the rendered main configuration.
+        # A correct JSON flag alone does not prove the effective host gate.
+        expected = 'false' if plan['phase'] == 'closed' else 'true'
+        value = entry.get('environment', {}).get('QS_APISERVER_MESSAGING_ROCKETMQ_PUBLISH_ENABLED')
+        if value is not None and value != expected:
+            raise BoundaryError('QS environment overrides the frozen admission phase')
+        if plan['phase'] in {'closed', 'acceptance', 'old-drain'}:
+            for key in ('QS_APISERVER_PLAN_SCHEDULER_ENABLE',
+                        'QS_APISERVER_SYSTEM_GOVERNANCE_RETRY_AUTOMATIC_RETRY_ENABLED'):
+                value = entry.get('environment', {}).get(key)
+                if value is not None and value != 'false':
+                    raise BoundaryError('QS environment overrides the paused scheduler')
 
 
 def execute(plan, path, digest):

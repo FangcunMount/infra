@@ -131,6 +131,24 @@ class ReadableRuntimeTest(unittest.TestCase):
                 external.chmod(0o666)
                 with self.assertRaises(BoundaryError): target.load(path, digest, root=root)
 
+    def test_effective_QS_environment_cannot_override_closed_admission_or_paused_schedulers(self):
+        with tempfile.TemporaryDirectory() as value:
+            root = Path(value).resolve()
+            for phase in ('closed', 'acceptance', 'open', 'old-drain'):
+                _, _, plan = fixture(root, 'qs-api', phase)
+                document = json.loads(config(plan)); environment = document['services']['qs-apiserver']['environment']
+                expected = 'false' if phase == 'closed' else 'true'
+                environment['QS_APISERVER_MESSAGING_ROCKETMQ_PUBLISH_ENABLED'] = expected
+                target.verify_budget(plan, json.dumps(document))
+                environment['QS_APISERVER_MESSAGING_ROCKETMQ_PUBLISH_ENABLED'] = 'true' if expected == 'false' else 'false'
+                with self.assertRaises(BoundaryError): target.verify_budget(plan, json.dumps(document))
+                environment['QS_APISERVER_MESSAGING_ROCKETMQ_PUBLISH_ENABLED'] = expected
+                if phase != 'open':
+                    for key in ('QS_APISERVER_PLAN_SCHEDULER_ENABLE', 'QS_APISERVER_SYSTEM_GOVERNANCE_RETRY_AUTOMATIC_RETRY_ENABLED'):
+                        environment[key] = 'true'
+                        with self.assertRaises(BoundaryError): target.verify_budget(plan, json.dumps(document))
+                        environment[key] = 'false'
+
     def test_cli_offline_and_execute_attestation_never_grants_approval(self):
         with patch.object(target, 'load', return_value={}), patch.object(target, 'execute') as start:
             args = ['--plan', '/unused', '--reviewed-sha256', '1' * 64]
