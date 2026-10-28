@@ -1,6 +1,6 @@
 # RocketMQ 可读资源命名执行总表
 
-**当前进度：7/16。** 本表是本批唯一进度总表；M2/M3/M4 原计数保持。
+**当前进度：10/16。** 本表是本批唯一进度总表；M2/M3/M4 原计数保持。
 
 ## 已确认契约
 
@@ -26,8 +26,8 @@
 |---|---|---|---|
 | N-P 基线与命名 | T01–T02 | ✅ 已完成 | 完整盘点、旧新映射及规则冻结 |
 | N-SDK 双语言路由 | T03–T05 | ✅ 已完成 | 双语言契约和真实SDK通过、预发布 |
-| N-HOST 三库接入 | T06–T09 | 进行中：T06、T08专项通过，源码待协调合并 | 业务、历史读取和调度保持 |
-| N-VERIFY 演练与发布 | T10–T12 | 进行中：T10精确权限并集与隔离验证 | ACL/完整故障演练/正式制品通过 |
+| N-HOST 三库接入 | T06–T09 | 进行中：T06–T09已验证，宿主待协调合并 | 业务、历史读取和调度保持 |
+| N-VERIFY 演练与发布 | T10–T12 | 进行中：T10已完成，T11/T12等待完整门禁 | ACL/完整故障演练/正式制品通过 |
 | N-PROD 切换与退役 | T13–T16 | 待开始 | system及新业务验收、退役闭环 |
 
 ## 任务
@@ -40,12 +40,12 @@
 | ✅ | T04 | Python SDK 对应能力与生命周期保持 | 2026-10-27：Python48/0/0、ruff/mypy通过；历史不注册、生命周期/取消和原wire通过；SDK PR60已合并d719b6fb，10个PR CI全过 |
 | ✅ | T05 | 跨语言真实 Broker 验收与固定 SDK 预发布 | 2026-10-27：SDK5c2e3cd，两个公开SDK矩阵各31/0/0、存活恢复5/0/0；三档存储各29/0/0、两档Python源码与wheel各159/0/0；Go v0.6.0-rc.1 / Python0.5.0rc1已发布，18资产重新下载校验；[发布证明](evidence/rocketmq-readable-names-prerelease-20261027.json) |
 | ✅ | T06 | IAM 授权事务、普通消息、幂等查询与双订阅接入 | 2026-10-27：IAM9b9bb9f1 / QS1c2eccc3，正式RC依赖；168本地测试包、11源码CI；三档MySQL真实readable根事务/双IAM及QS fanout各22/0/0，[证据](evidence/rocketmq-readable-names-iam-fanout-20261027.json)。IAM PR160为草稿未合并；infra PR354全部65项CI成功后已合并54387b9 |
-| ☐ | T07 | QS API/collection/worker 双存储与合并订阅接入 | [QS PR455](https://github.com/FangcunMount/qs-server/pull/455)草稿2149b4a2：正式RC，382测试包及定向race已通过。答卷真实失败40541357738确认是隔离夹具漏装线上既有Mongo治理schema43，导致host admission_closed；仅补显式安装/原生读取/Ready检查，生产无DDL。最新infra PR356/6079d1c、运行40551016815重验四入口×三档：目前答卷/MySQL8.0.44、评价/MySQL8.4、报告/MySQL8.4三档成功，均0失败/跳过且清理；[部分证明](evidence/rocketmq-readable-names-qs-partial-20261028.json)，其余9档待完成。保留此前失败、取消及完整清理证据，未打勾 |
+| ✅ | T07 | QS API/collection/worker 双存储与合并订阅接入 | 2026-10-28：四入口×三档真实readable矩阵40551016815全部12档成功，固定QS2149b4a2、每档0失败/跳过且完整清理；[完整证据](evidence/rocketmq-readable-names-qs-complete-20261028.json)。源码PR455适用29项CI成功（未选择API同步job为N/A），infra PR356全77项成功并合并；早期schema43夹具遗漏与旧成对编译失败保留，后者失败项重跑后六档成功。宿主PR455/456继续草稿，未部署 |
 | ✅ | T08 | AI command/receipt/state/ACK 及正文安全接入 | 2026-10-28：六档readable宿主验证170项实际pytest/390项报告检查，0失败/跳过且清理；[原生证据](evidence/rocketmq-readable-names-ai-native-20261028.json)。最新合并历史接入候选62f3aa3的源码CI运行40543071317全部12项成功（8档SQL、镜像、2档退役备份恢复、完整coverage）。[源码门禁](evidence/rocketmq-readable-names-ai-source-gate-20261028.json)。原生固定aae96db与最新源码的范围分别记录；父PR232旧head剩余coverage待完成、子PR233仍草稿，未合并/部署。独立成对故障及v3夹具PR234属于T11，未借此标为完成 |
-| ☐ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | [IAM PR161](https://github.com/FangcunMount/iam/pull/161)、[QS PR456](https://github.com/FangcunMount/qs-server/pull/456)、[AI PR233](https://github.com/FangcunMount/qs-ai/pull/233)均为草稿；QS最新d97853af为历史deferred新增只读边界，旧路由不授权新HoldDelivery，原未来写入器使用owner可信codec。该候选本地383测试包/7574测试通过、60项外部依赖选配测试跳过（不是required native通过）；四包race通过。IAM168包、AI4320纯单元及452 mypy分别已有证明。infra PR362/241f05c运行40547695960在固定d97853af上要求两档各12项（原7+历史5），均0失败/跳过且清理；PR362全部17项CI成功，已合并33808532，[证明](evidence/rocketmq-readable-names-history-native-20261028.json)。当前QS历史候选eb0e6dca已合入schema43原生夹具，文档通过、3包仅做integration编译；未来调度矩阵及最新三库源码CI仍待完成；跨路由Replan纯协议与真实存储CAS分别记录，不冒充完整宿主切换 |
-| ☐ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | infra PR359全部13项CI成功、已合并cacfdae0；真实精确旧新并集134/0/0、清理通过。PR361现为141970f：此前5f86bfd专项138/0/0验证classic retry/DLQ sentinel保留；新核对Broker deleteTopic在clearRetryTopicWhenDeleteTopic=true时可能伴随删除POP retry，已增加完整元数据/伴随资源拒绝保护，并扩展POP v1/v2 sentinel，增强native仍待完成。415项本地MQ单元通过，既有CD四角色真实v3材料复制/历史映射/源字节/不激活边界24项通过；剩余源CI待完成。原CD开关只读核对；未应用生产资源或暂停CD，具体生产责任观察及实例配置清单交由T13冻结 |
-| ☐ | T11 | 最终宿主端到端、故障与维护/恢复演练 | 准备中：[infra PR364](https://github.com/FangcunMount/infra/pull/364)提供独立readable-rc1镜像依赖/清单/归档校验及手动构建入口，412本地单元和actionlint通过；原M3/M4默认SDK门禁保持。2026-10-28已dispatch隔离镜像构建40566443986（五镜像，尚无成功结果）；八实例启动入口已补齐（严格可读清单、原配置打包器和暂停Checker/关闭检查，416项本地验证），实际启动/切换/故障及发布器适配待完成；没有把构建或只读归档检查标为演练通过 |
-| ☐ | T12 | 稳定 SDK、三库正式依赖及固定镜像重新安装验收 | 准备中：SDK草稿PR65/8d99c8b只改版本/项目lock及说明，make check、Python检查通过；候选wheel/sdist独立安装各128/0/0，16份实现及43项外部lock不变。[候选证明](evidence/rocketmq-readable-names-stable-candidate-20261028.json)。未合并/发布稳定版、未修改宿主正式依赖或生产镜像；等待宿主RC门禁与精确最终SHA门禁 |
+| ✅ | T09 | 历史事实、未来调度、deferred consumption 与显式 Replan | 2026-10-28：历史消费12×2、未来调度41×2、真实宿主Replan14/0/0×2及完整清理通过；固定QS eb0e6dcaa、SDK v0.6.0-rc.1、infra候选6c0b89eb，原ID/wire、旧witness、回调仅一次和拒绝非法重做均通过。两处夹具错误及通用SDK首次超时保留，[证据](evidence/rocketmq-readable-names-ci-replan-investigation-20261028.json)。PR382以29项适用源码CI成功合并59b385a2；SDK失败作业单次复验41/0/0，成功档和Replan不重跑，未声明超时根因已解决。生产未变更 |
+| ✅ | T10 | infra 新资源、精确 ACL、CD 配置及具名退役工具 | 2026-10-28：精确旧新ACL134项、CD四角色只读材料24项、最新具名退役138/0/0及完整清理通过。PR361/56449c19全部80项源码CI成功并合并2e6fdc0c；PR359已合并。实际classic retry/DLQ/POP v1三哨兵保留，POP伴随资源拒绝保护完整；v2生成实验失败保留且不进入删除授权路径。[原生证据](evidence/rocketmq-readable-names-runtime-verified-20261028.json)、[源码门禁与排查](evidence/rocketmq-readable-names-ci-replan-investigation-20261028.json)。实现及验证完成；生产预置/删除仍由T13/T16分别记账 |
+| ☐ | T11 | 最终宿主端到端、故障与维护/恢复演练 | 五类固定RC镜像40566443986成功；八实例实际启动40590486947为18/0/0，原预算/Unix身份、只读材料、Checker、九次worker关闭/重启、无运行时DDL及完整清理通过，候选PR376全部12项CI成功并合并110db063。POP两档各35项及live恢复5项全部通过并清理；[原生证据](evidence/rocketmq-readable-names-runtime-verified-20261028.json)。成对退出/Broker重启两档各40检查/7条pytest已通过。旧新实际切换/失败前向修复运行40601520508已启动但未通过，完整T11未完成；POP控制PR372全部65项CI成功合并c1986c55，发布适配PR379全部13项CI成功合并3fce8024；未写Registry。|
+| ☐ | T12 | 稳定 SDK、三库正式依赖及固定镜像重新安装验收 | SDK候选8d99c8b的12项源码CI、三档真实存储各29项、公开readable两档各31项/live恢复5项已通过并清理；wheel/sdist独立安装各128项，SDK实现及43项外部依赖不变。[原生证据](evidence/rocketmq-readable-names-stable-native-20261028.json)。精确候选门禁PR369已合并aa93624f；SDK PR65仍草稿，未发布稳定版、宿主仍RC，等待RC完整切换门禁及正式制品/最终镜像重验 |
 | ☐ | T13 | 生产核验、暂停 CD、预置资源权限及冻结清单 | 待开始 |
 | ☐ | T14 | 维护内排空旧责任、切换八实例与新订阅/Checker 验证 | 待开始 |
 | ☐ | T15 | 合法 system/新答卷/新 AI 验收及开放后 30 分钟检查 | 待开始 |
@@ -57,11 +57,11 @@
 
 | 任务 | 已验证 | 尚未通过的完整门禁 |
 |---|---|---|
-| T07 | 固定RC源码/路由接入；真实失败已定位并保留 | 修复后12档中已有3档成功；剩余9档及最终源码CI |
+| T07 | ✅ 四入口×三档12档真实验收；✅ 最新适用29项源码CI；infra PR356已合并 | 实现与验证已完成；宿主PR455/456待协调合并及后续固定正式依赖 |
 | T08 | ✅ 六档真实readable矩阵；✅ 最新62f3aa3全部12项源码CI，含完整coverage | 实现与验证已完成；PR232/233协调合并及后续T11/T12/T14分别记账 |
-| T09 | 三库历史读保护；旧fence与新HoldDelivery拒绝；Go最新全量/定向验证；✅ 两档原MySQL历史消费各12项 | 未来计划、最新三库源码CI及完整切换闭环 |
-| T10 | ✅ 精确旧新并集134项；✅ 具名空资源删除138项（classic sentinel）；PR359已合并 | ✅ CD四角色v3只读材料24项；PR361新增POP伴随删除保护的native及剩余CI/合并 |
-| T11 | 固定SDK镜像profile/协调归档验证及手动构建入口 | 镜像实际构建、八实例启动/真实故障/切换恢复演练；见PR372/373与40566443986（均待真实结果） |
+| T09 | ✅ 历史12×2、未来41×2、真实Replan14×2；✅ 29项适用源码CI，PR382合并59b385a2；旧失败保留 | 本项实现及验证完成；宿主合并、稳定制品和生产切换分项记账 |
+| T10 | ✅ 134项ACL、24项材料、138项具名退役；✅ 全部80项源码CI并合并PR361 | 本项实现与验证完成；生产变更和实际删除仍在T13/T16 |
+| T11 | ✅ 五个RC镜像；✅ 八实例启动18项/候选PR376合并；✅ POP35/35/5；✅ 成对真实故障 | 旧新实际切换/失败前向修复40601520508未通过；发布适配PR379已以13项源码CI成功合并，未写Registry |
 
 ## 生产切换及删除门禁
 
@@ -113,3 +113,20 @@
 
 - 2026-10-28：T08完成，总进度7/16。最新AI历史接入候选62f3aa3全部12项源码CI成功，结合原六档实际宿主门禁分别登记；父PR232在较早7045671上的重复coverage仍排队，不将它表述为成功。宿主PR仍草稿、生产CD保持，N-HOST里程碑尚未完成。
 - 2026-10-28：增强退役运行40560478215失败，已在删除前停止且完整清理；普通管理入口不能创建含`+`的POP v2内部名称。PR361/741da4d改为真实SimpleConsumer持有一条owned NORMAL运输消息，不ACK、关闭本地客户端，由Broker revive生成未选中的v2哨兵，保持四哨兵与原138项门禁；418纯测试通过，真实重验待完成，T10不勾选。成对真实故障运行40567171604已启动，未通过；五类镜像40566443986仍待结果。
+
+- 2026-10-28：T07完成，总进度8/16；完整QS四入口×三档均通过并清理，源码PR455适用29项成功，infra PR356以77项成功合并。宿主仍草稿且CD未暂停，无生产切换。
+- 2026-10-28：T11新增原生证据：成对故障40567171604两档各40报告检查/7条实际pytest，原生产者退出、Broker重启及首次wire/receipt/state/ACK通过且清理；实际模型、system及八实例切换不在此结果内。[证据](evidence/rocketmq-readable-names-paired-native-20261028.json)。五类固定RC镜像40566443986全部构建成功并清理，已以[PR376](https://github.com/FangcunMount/infra/pull/376)固定原始清单，八实例真实启动40590486947已启动，尚未通过。
+- 2026-10-28：稳定SDK候选8d99c8b的源码12项CI、三档存储各29项、公开readable两档各31及live恢复5项全部成功；[证据](evidence/rocketmq-readable-names-stable-native-20261028.json)。T12仍未完成，尚未发布稳定tag或改宿主正式依赖。
+- 2026-10-28：POP控制40566337005新增四项均实际通过，但内部末尾仍按31项而失败，251631a仅修正显式控制后的总数35；旧失败与清理保留，待真实重验。AI夹具PR234源码CI因唯一文档source-baseline-drift失败，2e142f0补审阅摘要、本地文档0错误，源码重验待完成。退役v2生成实验超时保持失败并退出发布授权路径；生产删除仍拒绝任何POP伴随资源，新三哨兵138项真实重验未通过，不勾选T10。
+
+- 2026-10-28：继续推进T09–T12，保持8/16。未来readable调度PR378/6e75dc26运行40592268913待完成；固定发布适配PR379/0093caf4已提交，432本地MQ测试通过，生产路径拒绝RC且无Registry写入；兼容v2→v3实际八实例切换/失败前向恢复PR380/e6a97973已提交，同样432本地测试及actionlint通过，须先取得独立启动40590486947成功receipt才能执行。SDK候选门禁PR369及系统记录只读审计PR370已合并aa93624f/45bfee7f。生产CD、容器、数据库和MQ资源未改变。
+
+- 2026-10-28：实际回读并下载原始报告：八实例启动18/0/0、POP公开35/35及live恢复5项、具名退役138项全部成功且隔离依赖清理完整，原始摘要已登记。候选PR376以12项源码CI成功合并110db063；当前生产CD开关只读仍为IAM/QS false、AI true，未暂停或合并宿主代码。切换演练40601520508和显式跨路由宿主Replan40601996951已启动；未来调度首档41项通过、第二档待完成。总数保持8/16，T09/T10/T11各自剩余完整门禁不省略。
+
+- 2026-10-28：T10完成，总进度9/16。PR361/372/378/379分别以80/65/20/13项源码CI全成功合并；未来调度原始报告41×2已下载校验，生产/CD未改变。Replan原专项两档失败保留，定位夹具将活动执行确认误作历史终态读取；修正候选ff56aaf7增加精确旧witness检查及脱敏诊断，460本地测试/原宿主race编译/actionlint通过，单次完整矩阵40607318654待通过。PR382同时收敛PR+手动重复原生派发、六个通用工作流无关夹具触发及main合并后重复Broker验证，最终完整候选门禁不变；该CI策略尚未合并，不宣称已全局生效。
+
+- 2026-10-28：继续优先排查Replan并收敛派发。ff56两档都通过旧witness检查后在Commit失败；无PR的单档诊断0aaa1a76/40609414407证实half Prepared、业务回调一次、健康准入及MySQL1136，原因是夹具GORM将字节切片展开为多值。修正为单字符串和显式列，实际GORM无网络构造器复现旧/新绑定行为通过，461本地MQ测试及原宿主race编译通过。候选6c0b89eb/PR382完整双档40610527887只派发一次，T09仍未完成，总数9/16。旧ff56的29项源码CI全成功；当前候选CI另行记录。无生产/CD/数据库/凭据/容器或Registry变更。
+
+- 2026-10-28：T09完成，总进度10/16。候选6c0b89eb的完整Replan双档40610527887各14/0/0并完整清理，真实本地Committed+Broker CommitConfirmed、原wire消费、旧Aborted witness及业务回调一次均通过。源码通用旧SDK共享消费首轮29项后8/9超时，报告审阅后仅复验失败作业一次；复验41/0/0且清理完整，另一个成功档及Replan未重跑，超时根因未据此宣称修复。PR382全部29项适用源码CI成功并合并59b385a2；2个PR原生job按规则N/A，最终双档专项零跳过。CI收敛已进入main：专项PR只跑契约、重型矩阵具名一次派发、六个通用工作流精确排除独立夹具、main保留廉价契约而不重复通用Broker任务，最终候选完整门禁不变。生产/CD/业务库/凭据/容器/Registry未变更。
+
+- 2026-10-28：回读CI收敛合并SHA 59b385a2后的main push，仅产生廉价契约运行40620203338并成功；未重复启动通用Broker原生任务。此回读与29项PR源码检查、完整双档Replan专项分别记账。

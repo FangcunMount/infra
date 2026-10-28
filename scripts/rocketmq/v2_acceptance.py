@@ -120,12 +120,14 @@ def denied_owners(start, sql, mongo_command, passed, *, python):
         passed('v2_'+language+'_wrong_owner_broker_denied_without_business')
 
 
-def shared_budget(start, passed, *, language):
+def shared_budget(start, passed, *, language, observe=None):
     suffix='go' if language=='sdk-go' else 'python'
+    if observe is not None: observe('baseline', language)
     revision='sdk-v2-shared-'+suffix
     subscription='sdk-shared-'+suffix
     observer=start(language,'shared-consume',revision=revision,subscription=subscription)
     observer.wait('ready')
+    if observe is not None: observe('subscribed', language)
     expected=set()
     for storage,mode in (('mysql','send'),('mongo','send'),('mysql','normal')):
         identity='shared-'+suffix+'-'+('normal' if mode=='normal' else storage)
@@ -148,6 +150,7 @@ def shared_budget(start, passed, *, language):
     entered=[e for e in observer.events if e.get('event')=='handler_enter']
     if len(entered)!=2 or any(e.get('event')=='received' for e in observer.events):
         raise RuntimeError('physical input split amplified the shared in-flight budget')
+    if observe is not None: observe('held', language)
     observer.send('release')
     for identity in sorted(expected):
         observer.wait('received',identity,timeout=90)
@@ -158,4 +161,5 @@ def shared_budget(start, passed, *, language):
     observed={e['id'] for e in observer.events if e.get('event')=='received'}
     if observed!=expected:
         raise RuntimeError('unexpected original ID/wire across typed physical inputs')
+    if observe is not None: observe('closed', language)
     passed('v2_'+language+'_three_physical_inputs_share_two_handler_budget')

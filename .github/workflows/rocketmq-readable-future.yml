@@ -1,0 +1,107 @@
+name: RocketMQ readable future dispatch roots
+on:
+  pull_request:
+    paths: ['scripts/rocketmq/qs_retry_dispatch_acceptance.py', 'scripts/rocketmq/test_qs_retry_dispatch_acceptance.py', '.github/workflows/rocketmq-readable-future.yml']
+  workflow_dispatch:
+    inputs:
+      qs_ref:
+        description: Exact reviewed source with trusted active and historical plan readers
+        type: string
+        required: true
+        default: eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b
+permissions:
+  contents: read
+env:
+  GOTOOLCHAIN: local
+concurrency:
+  group: rocketmq-readable-future-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Future responsibility and native dispatch contracts
+        run: |
+          set -euo pipefail
+          for test in test_qs_retry_dispatch_acceptance.py test_readable_ci_policy.py; do
+            uv run --no-project --with pyyaml==6.0.2 python -m unittest discover -s scripts/rocketmq -p "$test"
+          done
+  business:
+    if: github.event_name == 'workflow_dispatch'
+    needs: contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: ['mysql:8.0.36', 'mysql:8.4']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 5c2e3cd155e67c0f766e93bf95238b16fc219b5f
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ inputs.qs_ref || 'eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b' }}
+          path: .qs-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-acceptance/go.sum
+      - name: Validate fixture and isolated Broker
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-readable-qs:5.5.1 components/rocketmq
+      - name: Actual host original root under readable routes
+        env:
+          QS_M3_READABLE_FUTURE: '1'
+          QS_REF: ${{ inputs.qs_ref || 'eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b' }}
+          MYSQL_IMAGE: ${{ matrix.mysql }}
+          GOWORK: 'off'
+          GOFLAGS: '-mod=readonly'
+        run: |
+          set -euo pipefail
+          [[ "$QS_REF" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C .qs-acceptance rev-parse HEAD)" = "$QS_REF"
+          python3 scripts/rocketmq/ci-transactions.py \
+            --sdk "$PWD/.sdk-acceptance" --qs-retry-dispatch-host "$PWD/.qs-acceptance" \
+            --image rocketmq-readable-qs:5.5.1 --mysql-image "$MYSQL_IMAGE" \
+            --report readable-qs-host.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          data = json.loads(Path('readable-qs-host.json').read_text())
+          host = data['proof']['qs_retry_dispatch_host']
+          assert data['passed']==len(data['cases'])==41 and data['failed']==data['skipped']==0
+          assert host['readable'] and host['source_sha']==os.environ['QS_REF']
+          for component in ('evaluation','report'):
+              row=host[component]
+              assert row['manifest_version']==3 and row['naming_scheme']=='readable-v1'
+              assert row['sdk_module']['Version']=='v0.6.0-rc.1' and row['source_clean_after']
+              assert row['native_receipt']['failed']==row['native_receipt']['skipped']==0
+          for row in host['dispatch_receipts'].values():
+              assert row['passed']==len(row['cases'])==9 and row['failed']==row['skipped']==0
+          assert data['cleanup'] == dict(project_containers_remaining=False,
+              compose_down_succeeded=True, probe_process_groups_drained=True,
+              private_fixture_directory_removed=True)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: readable-future-${{ strategy.job-index }}-${{ github.sha }}
+          path: readable-qs-host.json
+          if-no-files-found: error
+          retention-days: 14

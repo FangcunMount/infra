@@ -1,7 +1,21 @@
 name: RocketMQ M3 final resource candidate
 on:
   pull_request:
-    paths: ['components/rocketmq/**', 'scripts/rocketmq/**', '.github/workflows/rocketmq-m3-resources.yml']
+    paths:
+      - "components/rocketmq/**"
+      - "scripts/rocketmq/**"
+      - "!scripts/rocketmq/qs_replan_acceptance.py"
+      - "!scripts/rocketmq/test_qs_replan_acceptance.py"
+      - "!scripts/rocketmq/image_fixtures/readable_replan_test.go"
+      - "!scripts/rocketmq/test_readable_ci_policy.py"
+      - "!scripts/rocketmq/readable_publish_candidates.py"
+      - "!scripts/rocketmq/test_readable_publish_candidates.py"
+      - "!scripts/rocketmq/readable_cutover.py"
+      - "!scripts/rocketmq/readable_cutover_materials.py"
+      - "!scripts/rocketmq/readable_cutover_receipt.py"
+      - "!scripts/rocketmq/test_readable_cutover_materials.py"
+      - "!scripts/rocketmq/test_readable_cutover_receipt.py"
+      - ".github/workflows/rocketmq-m3-resources.yml"
   workflow_dispatch:
     inputs:
       profile:

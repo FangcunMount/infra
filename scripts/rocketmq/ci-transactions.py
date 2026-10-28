@@ -191,6 +191,7 @@ def main():
     parser.add_argument("--mysql-image", default="mysql:8.0.36")
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
+    parser.add_argument("--sdk-pop-drain-controls", action="store_true", help="owned readable public SDK held/future-CK/settled metrics controls; never production")
     parser.add_argument("--readable-routes", action="store_true", help="owned public SDK v3 naming fixture; never production")
     parser.add_argument("--m3-resources", action="store_true", help="isolated final M3 manifest/ACL/type/TLS proof only; no production changes")
     parser.add_argument("--native-dlq-audit", action="store_true", help="isolated native DLQ and index-only audit; no host/DB/business acceptance")
@@ -251,6 +252,11 @@ def main():
             args.iam_host,args.qs_answer_host,args.qs_evaluation_host,args.qs_report_host,args.qs_task_host,
             args.qs_command_host,args.qs_event_host,args.ai_admission_host,args.sdk_recovery_audit))):
         parser.error("readable routes require the isolated public Go/Python SDK fixture")
+    if args.sdk_pop_drain_controls:
+        if not args.readable_routes or args.sdk_python_live_recovery or args.sdk_faults or args.sdk_limits:
+            parser.error('POP drain controls require the standalone readable public SDK profile')
+        from final_image_candidate import ci_guard
+        ci_guard(os.environ)
     if args.sdk_recovery_audit:
         from sdk_recovery_audit import validate_options
         try:
@@ -637,6 +643,8 @@ def main():
                 passed('m3_resources/'+name)
             for name in proof['m3_resources']['conflicts_refused_without_mutation']:
                 passed('m3_resources/conflict/'+name)
+            for name in proof['m3_resources'].get('retirement_fixture', {}).get('cases', {}):
+                passed('m3_resources/owned_empty_retirement/' + name)
             return
         if args.ai_admission_host:
             from ai_admission_acceptance import run_ai_admission_host
@@ -868,9 +876,18 @@ def main():
             if args.sdk_api_python:
                 from sdk_acceptance import run_python_sdk
                 run_python_sdk(start, passed, sql, pause_mysql, wrong_ca)
-            shared_budget(start,passed,language="sdk-go")
+            pop_observe = None
+            if args.sdk_pop_drain_controls:
+                import importlib.util
+                specification = importlib.util.spec_from_file_location('owned_pop_controls', repo / 'scripts/ops/readable_pop_controls.py')
+                controls = importlib.util.module_from_spec(specification); specification.loader.exec_module(controls)
+                proof['readable_pop_controls_source_sha256'] = hashlib.sha256((repo / 'scripts/ops/readable_pop_controls.py').read_bytes()).hexdigest()
+                proof['readable_pop_controls'] = {}
+                pop_observe = controls.OwnedPopControls(run, admin, broker, project, sdk_manifest,
+                    proof['readable_pop_controls'], passed)
+            shared_budget(start,passed,language="sdk-go",observe=pop_observe)
             if args.sdk_api_python:
-                shared_budget(start,passed,language="sdk-python")
+                shared_budget(start,passed,language="sdk-python",observe=pop_observe)
             if args.sdk_faults:
                 from sdk_faults import run_faults
                 run(["go", "build", "-o", str(directory / "fault-proxy"),
@@ -885,6 +902,7 @@ def main():
                 from sdk_recovery_audit import run as run_recovery_audit
                 proof['recovery_rpc_audit'] = run_recovery_audit(start,passed,sql,mongo_command)
             required_cases = (31 if args.sdk_api_python else 19) + ((15 if args.sdk_api_python else 9) if args.sdk_faults else 0) + ((2 if args.sdk_api_python else 1) if args.sdk_limits else 0)
+            required_cases += 4 if args.sdk_pop_drain_controls else 0
             if len(cases) != required_cases + (10 if args.sdk_recovery_audit else 0):
                 raise RuntimeError("required public SDK case count differs")
             return

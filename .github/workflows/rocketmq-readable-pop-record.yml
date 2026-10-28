@@ -1,0 +1,25 @@
+name: RocketMQ readable system record audit contracts
+on:
+  pull_request:
+    paths:
+      - scripts/ops/readable_pop_record.py
+      - scripts/ops/test_readable_pop_record.py
+      - .github/workflows/rocketmq-readable-pop-record.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  metadata-contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Fixed system scope, CRC, versions, locations and private output boundary
+        run: python3 -m unittest discover -s scripts/ops -p test_readable_pop_record.py

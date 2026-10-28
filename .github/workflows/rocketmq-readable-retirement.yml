@@ -1,0 +1,86 @@
+name: RocketMQ readable named empty resource retirement
+on:
+  pull_request:
+    paths: ['scripts/rocketmq/provision_v2.py', 'scripts/rocketmq/readable_transition.py', 'scripts/rocketmq/test_readable_transition.py', 'scripts/rocketmq/m3_resources.py', 'components/rocketmq/serverd-routes-readable-v3.json', 'scripts/rocketmq/readable_retirement_native.py', 'scripts/rocketmq/pop_retry_sentinel.py', 'scripts/rocketmq/test_pop_retry_sentinel.py', 'scripts/rocketmq/test_readable_retirement_native.py', '.github/workflows/rocketmq-readable-retirement.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: rocketmq-readable-retirement-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  resource-transition:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 5c2e3cd155e67c0f766e93bf95238b16fc219b5f
+          path: .sdk-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .sdk-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Validate exact transition and preflight refusals
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-readable-transition:5.5.1 components/rocketmq
+      - name: Existing subjects and exact old/new ACL union on real Broker
+        env:
+          ROCKETMQ_READABLE_TRANSITION: '1'
+          ROCKETMQ_READABLE_RETIREMENT: '1'
+          ROCKETMQ_M3_RESOURCE_PROFILE: full
+        run: |
+          set -euo pipefail
+          python3 scripts/rocketmq/ci-transactions.py --m3-resources \
+            --sdk "$PWD/.sdk-acceptance" --image rocketmq-readable-transition:5.5.1 \
+            --report readable-transition.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('readable-transition.json').read_text())
+          proof = data['proof']['m3_resources']
+          assert data['passed'] == 138 and data['failed'] == data['skipped'] == 0
+          assert proof['full_gate'] and proof['readable_transition']
+          assert proof['manifest_version'] == 3
+          assert proof['previous_provision']['version'] == 2
+          assert proof['previous_provision']['typed_topics'] == 10
+          assert proof['provision']['version'] == 3 and proof['provision']['principals'] == 5
+          transition = proof['provision']['transition']
+          assert transition['manifest_sha256'] == proof['active_manifest_sha256']
+          assert transition['phase'] == 'resources_and_union_acl_prepared'
+          assert not transition['credential_rotation']
+          assert not transition['retirement_completed'] and not transition['business_acceptance']
+          assert proof['idempotent']['operations'] == 0
+          assert proof['native_receipt']['passed'] == 130
+          assert proof['native_receipt']['failed'] == proof['native_receipt']['skipped'] == 0
+          assert set(proof['conflicts_refused_without_mutation']) == {'queues', 'credentials', 'acl', 'type'}
+          assert proof['conflict_controls_use_separate_principals']
+          retirement = proof['retirement_fixture']
+          assert retirement['passed'] == 4 and retirement['failed'] == retirement['skipped'] == 0
+          assert all(retirement['cases'].values())
+          assert len(retirement['retained_sentinels']) == 3
+          group=retirement['selected_group']
+          assert '%RETRY%'+group in retirement['retained_sentinels']
+          assert '%DLQ%'+group in retirement['retained_sentinels']
+          assert any(name.startswith('%RETRY%'+group+'_') for name in retirement['retained_sentinels'])
+          assert retirement['sentinel_scope']=='actual classic retry, DLQ and POP v1; no native v2 preservation claim'
+          assert data['cleanup'] == dict(project_containers_remaining=False,
+              compose_down_succeeded=True, probe_process_groups_drained=True,
+              private_fixture_directory_removed=True)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: readable-retirement-${{ github.sha }}
+          path: readable-transition.json
+          if-no-files-found: error
+          retention-days: 14

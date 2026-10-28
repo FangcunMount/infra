@@ -1,0 +1,108 @@
+{
+  "schema": "readable-rc-runtime-preparation/v1",
+  "date": "2026-10-28",
+  "production_changed": false,
+  "cd_changed": false,
+  "stable_sdk_published": false,
+  "images_run": 40566443986,
+  "images_complete": true,
+  "images": {
+    "ai": {
+      "target": "ai",
+      "source_sha": "62f3aa3225249f291cdde7d09f1d809edbd9d398",
+      "builder_source_sha": "8ff56cd143041acc0bd9d8182240fdea7a447dc3",
+      "archive_sha256": "bec45897bb73fda3e8a5ce19b16e393240568fe487131899d8fe6bbcb1db06bb",
+      "archive_bytes": 131859429,
+      "image_config_id": "sha256:f414c5d369932582efc5f0c83e23f5524ba6f147d5c5eed25772e3b1e5c021bd",
+      "runtime_sdk": {
+        "uid": 10001,
+        "version": "0.5.0rc1",
+        "client": "5.1.2",
+        "source": "62f3aa3225249f291cdde7d09f1d809edbd9d398"
+      },
+      "inventory_sha256": "98930bb2409cbe4144278cc16d29e676b1cec27f83b1cc77e7ae1b39824a7000"
+    },
+    "iam": {
+      "target": "iam",
+      "source_sha": "91aee79cbc1b192c5879625103d7b9cbd389b15b",
+      "builder_source_sha": "8ff56cd143041acc0bd9d8182240fdea7a447dc3",
+      "archive_sha256": "108d2690193350da23e5eca4e22f20654c2092d6e7280c74dd48cf29e09d2292",
+      "archive_bytes": 84704127,
+      "image_config_id": "sha256:f0f048e9842795d55dc3602f56fbbd07def6679984a0ab82dd0146f8f82cfa53",
+      "runtime_sdk": {
+        "version": "v0.6.0-rc.1",
+        "sum": "h1:kGWE8og29Er3UYYaNzPgaXj/T/2ltmQJrb+/iI4+nGo=",
+        "replace": false
+      },
+      "inventory_sha256": "3750f5ba7515175b1e5755c919fc86d5a355f9f2d876dc2bd28ea673ea63c5e9"
+    },
+    "qs-api": {
+      "target": "qs-api",
+      "source_sha": "eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b",
+      "builder_source_sha": "8ff56cd143041acc0bd9d8182240fdea7a447dc3",
+      "archive_sha256": "5353a40c73797ce17461dc5311047a7d34e1a0775ca337fff5f89c3d575b64d9",
+      "archive_bytes": 73465760,
+      "image_config_id": "sha256:57b0e989a1410be1ab25d98be422247ba740123762dca7a2d45b7734f7cae90c",
+      "runtime_sdk": {
+        "version": "v0.6.0-rc.1",
+        "sum": "h1:kGWE8og29Er3UYYaNzPgaXj/T/2ltmQJrb+/iI4+nGo=",
+        "replace": false
+      },
+      "inventory_sha256": "d4502c5d3b710d424dfee2feb3a53836dd49d55b482f27178d964b48c5c7b912"
+    },
+    "qs-collection": {
+      "target": "qs-collection",
+      "source_sha": "eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b",
+      "builder_source_sha": "8ff56cd143041acc0bd9d8182240fdea7a447dc3",
+      "archive_sha256": "cb661b9fcb3910c44617e7cfe33605ae64dc273ee0ce458ac59e965fb944c05a",
+      "archive_bytes": 24925109,
+      "image_config_id": "sha256:48b9f396c070942bcb48c13849fb4893ff901c1e326ccb6a4118a9fd121ec1a8",
+      "runtime_sdk": {
+        "version": "v0.6.0-rc.1",
+        "sum": "h1:kGWE8og29Er3UYYaNzPgaXj/T/2ltmQJrb+/iI4+nGo=",
+        "replace": false
+      },
+      "inventory_sha256": "459cf9f49f255f16207d22b8af692d5544e3b2a3ed1f195a8b85675ecc3a60a2"
+    },
+    "qs-worker": {
+      "target": "qs-worker",
+      "source_sha": "eb0e6dcaa83e594f786f53ab5957c1213a3b3a4b",
+      "builder_source_sha": "8ff56cd143041acc0bd9d8182240fdea7a447dc3",
+      "archive_sha256": "b482e5f25a5b8fe13d31a48fac1e5ee2d79ea72b34d487111cb12961a6da040e",
+      "archive_bytes": 20586299,
+      "image_config_id": "sha256:d65b11164b1d466d550776895026030e424948321826ba9a165c51f01cf0373a",
+      "runtime_sdk": {
+        "version": "v0.6.0-rc.1",
+        "sum": "h1:kGWE8og29Er3UYYaNzPgaXj/T/2ltmQJrb+/iI4+nGo=",
+        "replace": false
+      },
+      "inventory_sha256": "f6d987040edba94e718ec768e5ef5f59258871363fdd11c04083e8cf75560b79"
+    }
+  },
+  "independent_startup": {
+    "run": 40590486947,
+    "status": "pending",
+    "complete": false
+  },
+  "future_dispatch": {
+    "run": 40592268913,
+    "sha": "6e75dc26db044a8d6ac6527b8bf146b5db28136f",
+    "required_per_profile": 41,
+    "complete": false
+  },
+  "compatible_cutover": {
+    "pr": 380,
+    "sha": "e6a97973ee9ad37c24242b591e19d7ddcacc1e5e",
+    "local_unit_passed": 432,
+    "required_native_cases": 25,
+    "complete": false,
+    "scope": "same candidate v2/v3 controlled empty inputs; no original production images or business claim"
+  },
+  "publication": {
+    "pr": 379,
+    "sha": "0093caf44915256cf9d2c61862e09f95ebe6283f",
+    "local_unit_passed": 432,
+    "registry_write_attempted": false,
+    "rc_rejected": true
+  }
+}
