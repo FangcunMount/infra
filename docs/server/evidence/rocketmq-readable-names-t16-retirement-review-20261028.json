@@ -1,0 +1,51 @@
+{
+  "schema": "readable-t16-retirement-review/v1",
+  "status": "in_progress",
+  "task_complete": false,
+  "source_review_pr": "https://github.com/FangcunMount/infra/pull/401",
+  "source_review_merge": "9555fa39842febd1af0a5869a6fb12cfcae6a423",
+  "source_CI": "https://github.com/FangcunMount/infra/actions/runs/40694717393",
+  "source_tests_per_python_job": 40,
+  "named_old_topics": 20,
+  "named_old_groups": 21,
+  "named_old_grants": 58,
+  "separately_reviewed_POP_retry": {
+    "topic": "%RETRY%rmq_g_20aee8339a0e5eafae6251380422e81a_rmq_t_d851347a24e205a0841c975fa981488e",
+    "parent": "rmq_t_d851347a24e205a0841c975fa981488e",
+    "group": "rmq_g_20aee8339a0e5eafae6251380422e81a",
+    "native_broker_offset": 16,
+    "native_consumer_offset": 16,
+    "native_diff": 0,
+    "native_inflight": 0,
+    "action": "separate exact retirement after ACL quarantine; parent guard remains unchanged"
+  },
+  "evidence": {
+    "full_topic_metadata_count": 45,
+    "full_group_metadata_count": 38,
+    "native_old_queue_rows": 59,
+    "missing_progress_rows": 0,
+    "old_groups_authoritatively_offline": 21,
+    "old_MySQL_witnesses_committed_final_confirmed": 56,
+    "pending_business_receipts": 0,
+    "future_retry": 0,
+    "deferred": 0,
+    "all_eight_revive_tails": "ACK only; combined with zero global POP/checkpoint/offset/timing observations"
+  },
+  "runtime": "public ingress open; four owners and ten targets healthy",
+  "CD": {
+    "binding_revision": "m4-readable-20261028-v1",
+    "MQ_entries_verified": 8,
+    "serverA_material_roles_verified": 3,
+    "QS_current_selector_verified": true,
+    "automatic_CD": "still paused"
+  },
+  "frozen_private_packet_sha256": "11a67e9a344cd28a5bcf8875d931b862e651427c79a8e0917dcbaf41a6e229e3",
+  "destructive_execution": "finite exact list; original deploy lock; per-operation intent/RPC/readback; no automatic mutation retry",
+  "pending": [
+    "finish exact old retirement",
+    "Broker NameServer authenticated Dashboard readback",
+    "worker staged materials final check",
+    "restore three original CD flags",
+    "final documentation merge"
+  ]
+}
