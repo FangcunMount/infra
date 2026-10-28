@@ -1,0 +1,55 @@
+{
+  "schema": "readable-image-candidates/v1",
+  "sdk_profile": "readable-stable",
+  "sources": {
+    "iam": "6f59ec34ee73991984fcc630b6c0dbe54a377cbe",
+    "qs": "f783f40473295dbcd70c7de4f11d25a61d1876c0",
+    "ai": "9dce206643d11afc33e27b72ef4429c0e5537e7a"
+  },
+  "builder_sha": "5e3c3a1756a1b73d36104440a79e868f1393be6c",
+  "image_runs": {
+    "iam": "40631048872",
+    "qs-api": "40631048872",
+    "qs-collection": "40631048872",
+    "qs-worker": "40631048872",
+    "ai": "40631048872"
+  },
+  "images": {
+    "iam": {
+      "archive_sha256": "f5a59d880c58eda36327f3a7b1b1cedfa58bc4c56e417da4cba8108461e3f78e",
+      "image_config_id": "sha256:28933f61ee9fd84366eb843b08c214bfc95afe706a729f3d69758f94a3633b82",
+      "archive_bytes": 84700661,
+      "inventory_sha256": "9e67f89e91db5107a63dabcab8aae0fdca136b4470f3e12f5fffeaf857e6bb40"
+    },
+    "qs-api": {
+      "archive_sha256": "abce4878285afd8210c41d1cb4ae03f91c6446260556287cccbce326372d33f5",
+      "image_config_id": "sha256:802776e44900c57cda90f7139482c1578b06fe9191817a72e332fa308f238ca1",
+      "archive_bytes": 73456627,
+      "inventory_sha256": "b97e7434d697d9a66bf55efa5cf59f913373171e2ff28597cc6fccbfe0ce5714"
+    },
+    "qs-collection": {
+      "archive_sha256": "c7c58a358bb0d486875ed634ba34128040db912904ef45658ad32915faf53e4f",
+      "image_config_id": "sha256:de3232e477bddb239b499b3da013af0cd069fd8c82bb46cbbdf263f2db56c91f",
+      "archive_bytes": 24934339,
+      "inventory_sha256": "7fa3127173d30cfef900357fbc4364e693616f96bb5cb33d3de12021abbef98e"
+    },
+    "qs-worker": {
+      "archive_sha256": "4b79918d713e9e74058f66e00e3e8a4d776ba3ede6f11e332284b238aa5fe5e7",
+      "image_config_id": "sha256:3cefe5392b19d016b4a50349a43598701c91f669f9eef0995620e85924ec37c8",
+      "archive_bytes": 20594382,
+      "inventory_sha256": "d79a7bce772beabb56fb9ed12690cdbffdff42bb3878e16a057af62dd0a67788"
+    },
+    "ai": {
+      "archive_sha256": "ad1d570b283482414044a0a1bb9a5b6b02838d449e92eda2b06db2c1f32b6c11",
+      "image_config_id": "sha256:439783ccf7fa0c66cd9b358b580ee7de70217125f879267d750c09bceeb90001",
+      "archive_bytes": 131881612,
+      "inventory_sha256": "d015ee8f5dda03131ae1aab0d55aa6d81a8b2d688acd7a6fecce35e60c64671e"
+    }
+  },
+  "go_identity": {
+    "uid": 2000,
+    "gid": 2000
+  },
+  "routes_sha256": "f03420a8832f842f49fead15570e1c8acf2fe99d34a1bba194d5e501962207a5",
+  "production": false
+}
