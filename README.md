@@ -21,6 +21,9 @@ make help
 # 每台新服务器先执行交互式 Linux 初始化
 make server-init
 
+# 在目标 Linux 服务器独立新增一个用户（按需加 INIT_USER_ARGS=--sudo）
+make init-user USERNAME=alice
+
 # 从 Mac 一键准备临时 K6 压测机（远端不需要预先 clone infra）
 make perf-runner-init-remote PERF_RUNNER_HOST=root@203.0.113.10
 

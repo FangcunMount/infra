@@ -54,6 +54,10 @@ LOG_LINES := 100
 INFRA_NETWORK_MTU ?= 1280
 INFRA_OVERLAY_OVERHEAD ?= 50
 
+# 单用户初始化（避免使用当前登录账户的 USER 环境变量）
+USERNAME ?=
+INIT_USER_ARGS ?=
+
 # 独立压测机初始化（不加入生产 Swarm）
 PERF_RUNNER_SYNC_CONFIG ?= .perf-runner-sync.mk
 -include $(PERF_RUNNER_SYNC_CONFIG)
@@ -200,6 +204,7 @@ help: ## 显示帮助信息
 	@echo "$(MAGENTA)0. 服务器初始化$(RESET)"
 	@echo "   $(CYAN)server-init$(RESET)          交互式 Linux 初始化"
 	@echo "   $(CYAN)server-init-users$(RESET)    创建/维护用户账户 (root/yangshujie/deploy/www)"
+	@echo "   $(CYAN)server-init-user$(RESET)     独立新增用户 (USERNAME=alice INIT_USER_ARGS=--sudo)，别名 init-user"
 	@echo "   $(CYAN)server-install-docker$(RESET) 安装 Docker 和 Compose"
 	@echo "   $(CYAN)perf-runner-init-remote$(RESET) 从本机一键初始化独立压测机"
 	@echo "   $(CYAN)perf-runner-check-remote$(RESET) 校验独立压测机"
@@ -312,7 +317,7 @@ help-all: ## 显示所有命令
 # ==============================================================================
 # 0. 服务器初始化
 # ==============================================================================
-.PHONY: server-init server-init-users server-install-docker server-setup-deploy-ssh server-tune
+.PHONY: server-init server-init-users server-init-user init-user server-install-docker server-setup-deploy-ssh server-tune
 .PHONY: perf-runner-init perf-runner-check perf-runner-init-remote perf-runner-check-remote perf-runner-sync
 .PHONY: perf-runner-sync-config-remote perf-runner-verify
 
@@ -323,6 +328,12 @@ server-init: ## 交互式 Linux 初始化 (用户/Docker/调优/deploy SSH/VPN)
 server-init-users: ## 初始化服务器用户账户 (root/yangshujie/deploy/www)
 	$(call info_msg,初始化服务器用户账户...)
 	@sudo bash $(SERVER_SCRIPTS)/init-users.sh
+
+init-user: server-init-user ## 独立新增用户 (server-init-user 的别名)
+
+server-init-user: ## 独立新增用户 (USERNAME=alice INIT_USER_ARGS="--sudo --non-interactive")
+	$(call require_param,USERNAME,make server-init-user USERNAME=alice)
+	@sudo bash $(SERVER_SCRIPTS)/init-user.sh --username "$(USERNAME)" $(INIT_USER_ARGS)
 
 server-install-docker: ## 安装 Docker Engine 和 Compose
 	$(call info_msg,安装 Docker...)

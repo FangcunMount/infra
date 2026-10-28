@@ -84,6 +84,28 @@ sudo bash scripts/00-server/init-users.sh
 - 创建 `/var/www`、`/srv/apps`、`/var/log/apps`、`/data/infra`、`/data/logs`
 - 写入 `/opt/infra/.env` 的 `WWW_UID/WWW_GID` 和 `APP_UID/APP_GID`，默认固定为 `2000:2000`
 
+### 独立新增用户
+
+在目标 Linux 服务器的 infra 仓库中执行：
+
+```bash
+# 新增普通登录用户，交互式设置密码
+make init-user USERNAME=alice
+
+# 同一功能的 server 前缀入口；显式授予 sudo/wheel 权限
+make server-init-user USERNAME=alice INIT_USER_ARGS=--sudo
+
+# 非交互创建，随后另行设置密码或 SSH 公钥
+make init-user USERNAME=alice INIT_USER_ARGS="--sudo --non-interactive"
+
+# 直接执行脚本
+sudo bash scripts/00-server/init-user.sh --username alice --sudo
+```
+
+该入口仅新增指定用户、同名主组，以及 `/home/alice` 下的 `workspace`、`bin` 和基础 `.bashrc`。默认不授予 sudo 权限，不加入 docker 组；`--sudo` 使用系统现有的 sudo/wheel 管理组。用户名已存在、同名用户组已存在或 home 路径已存在时，脚本报错退出，不接管已有账户或目录。
+
+此操作不执行四类用户的批量维护，不修改 deploy sudoers、运行时 UID/GID、`/opt/infra/.env` 或共享业务目录。`--non-interactive` 跳过密码设置，不会自动配置 SSH 公钥；登录前需另行配置密码或公钥。
+
 ### `/data` 挂载目录约定
 
 | 宿主机路径 | 属主建议 | 用途 |

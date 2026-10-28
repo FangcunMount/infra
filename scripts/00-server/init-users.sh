@@ -41,8 +41,6 @@ handle_error() {
     exit 1
 }
 
-trap 'handle_error $LINENO' ERR
-
 show_help() {
     cat <<EOF
 Linux 用户初始化脚本
@@ -603,6 +601,7 @@ verify_setup() {
 }
 
 main() {
+    trap 'handle_error $LINENO' ERR
     parse_args "$@"
     check_root
     detect_os
@@ -646,4 +645,6 @@ main() {
 EOF
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    main "$@"
+fi
