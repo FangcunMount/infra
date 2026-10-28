@@ -20,13 +20,37 @@ class ImageSDKProfileTest(unittest.TestCase):
             check_go_buildinfo(f"dep\t{MODULE}\t{new['go']}\t{new['go_sum']}\n")
 
     def test_unknown_or_unpublished_profile_is_not_a_floating_version(self):
-        for name in ('readable-stable', 'main', 'latest', 'v0.6.0', '', None):
+        for name in ('readable-unpublished', 'main', 'latest', 'v0.6.0', '', None):
             with self.subTest(name=name), self.assertRaises(ValueError):
                 sdk_profile(name)
         value = sdk_profile('readable-rc1')
         value['source_sha'] = 'b' * 40
         self.assertEqual(sdk_profile('readable-rc1')['source_sha'],
                          '5c2e3cd155e67c0f766e93bf95238b16fc219b5f')
+
+    def test_published_stable_and_rc_binaries_cannot_substitute_each_other(self):
+        for name, other in (('readable-stable', 'readable-rc1'), ('readable-rc1', 'readable-stable')):
+            expected, wrong = sdk_profile(name), sdk_profile(other)
+            raw = f"binary\n\tdep\t{MODULE}\t{expected['go']}\t{expected['go_sum']}\n"
+            self.assertEqual(check_go_buildinfo(raw, profile=name)['version'], expected['go'])
+            for changed in (raw.replace(expected['go'], wrong['go']),
+                            raw.replace(expected['go_sum'], wrong['go_sum'])):
+                with self.subTest(profile=name), self.assertRaises(ValueError):
+                    check_go_buildinfo(changed, profile=name)
+        self.assertIs(sdk_profile('readable-stable')['stable_release'], True)
+
+    def test_stable_lock_rejects_rc_and_unverified_repacked_wheel(self):
+        stable, rc = sdk_profile('readable-stable'), sdk_profile('readable-rc1')
+        def lock(expected):
+            return ('[[package]]\nname="fangcun-reliable-messaging"\nversion=' + json.dumps(expected['python'])
+                    + '\nsource={url=' + json.dumps(expected['wheel_url']) + '}\nwheels=[{url='
+                    + json.dumps(expected['wheel_url']) + ',hash=' + json.dumps('sha256:' + expected['wheel_sha256']) + '}]\n')
+        raw = lock(stable)
+        self.assertEqual(verify_readable_python_lock(raw, 'readable-stable')['version'], '0.5.0')
+        for changed in (lock(rc), raw.replace(stable['wheel_sha256'], 'b' * 64),
+                        raw.replace(stable['wheel_url'], rc['wheel_url'])):
+            with self.assertRaises(ValueError):
+                verify_readable_python_lock(changed, 'readable-stable')
 
     def test_python_lock_requires_the_exact_published_archive_and_checksum(self):
         expected = sdk_profile('readable-rc1')

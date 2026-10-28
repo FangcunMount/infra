@@ -65,7 +65,7 @@ class ReadableImageCandidatesTest(unittest.TestCase):
 
     def test_legacy_floating_uncoordinated_or_incomplete_candidate_is_rejected(self):
         for field, wrong in (('schema', 'm4-final-image-candidates/v1'), ('sdk_profile', 'm3-stable'),
-                             ('sdk_profile', 'readable-stable'), ('builder_sha', 'main'),
+                             ('sdk_profile', 'readable-unpublished'), ('builder_sha', 'main'),
                              ('go_identity', dict(uid=0, gid=2000)), ('production', True)):
             changed = copy.deepcopy(self.value); changed[field] = wrong
             with self.subTest(field=field), self.assertRaises(ValueError):
@@ -78,6 +78,23 @@ class ReadableImageCandidatesTest(unittest.TestCase):
             raw = json.dumps(changed).encode()
             if damage == 'duplicate_json': raw = raw[:-1] + b',"production":false}'
             with self.subTest(damage=damage), self.assertRaises(ValueError): parse(raw)
+
+    def test_stable_inventory_requires_the_published_stable_sdk_on_all_targets(self):
+        rc_value = copy.deepcopy(self.value)
+        rc_rows = {target: self.inventory(target) for target in TARGETS}
+        self.value['sdk_profile'] = 'readable-stable'
+        self.profile = sdk_profile('readable-stable')
+        self.assertEqual(parse(json.dumps(self.value).encode()), self.value)
+        for target in TARGETS:
+            row = self.inventory(target)
+            row.update(sdk_profile='readable-stable', stable_release=True)
+            self.assertEqual(validate_inventory(self.value, target, row), row)
+            for candidate, invalid in ((self.value, rc_rows[target]), (rc_value, row)):
+                with self.subTest(target=target), self.assertRaises(ValueError):
+                    validate_inventory(candidate, target, invalid)
+            row['stable_release'] = False
+            with self.assertRaises(ValueError):
+                validate_inventory(self.value, target, row)
 
     def test_routes_are_frozen_by_original_file_bytes(self):
         with tempfile.TemporaryDirectory() as directory:

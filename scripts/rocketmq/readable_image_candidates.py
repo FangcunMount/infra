@@ -84,7 +84,7 @@ def validate_inventory(candidate, target, inventory):
             and inventory.get('expected_sdk_source_sha') == expected['source_sha']
             and inventory.get('source_sha') == candidate['sources'][role]
             and inventory.get('builder_source_sha') == candidate['builder_sha']
-            and inventory.get('stable_release') is False, 'readable_image_source_or_profile_differs')
+            and inventory.get('stable_release') is expected.get('stable_release', False), 'readable_image_source_or_profile_differs')
     for field in ('production', 'registry_published', 'application_started', 'runtime_ready',
                   'cutover_rehearsal_complete'):
         require(inventory.get(field) is False, 'inventory_is_not_startup_or_production_acceptance')

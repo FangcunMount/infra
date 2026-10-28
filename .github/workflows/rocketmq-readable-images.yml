@@ -23,6 +23,11 @@ on:
         description: Exact reviewed AI source SHA
         type: string
         required: true
+      sdk_profile:
+        description: Explicit immutable published SDK profile; unknown or unpublished profiles fail closed
+        type: choice
+        options: [readable-rc1, readable-stable]
+        default: readable-rc1
       run_uid:
         description: Reviewed existing Go runtime UID
         type: string
@@ -64,6 +69,7 @@ jobs:
       TARGET: ${{ matrix.target }}
       RUN_UID: ${{ inputs.run_uid }}
       RUN_GID: ${{ inputs.run_gid }}
+      SDK_PROFILE: ${{ inputs.sdk_profile || 'readable-rc1' }}
       GOWORK: 'off'
       GOTOOLCHAIN: local
     steps:
@@ -87,16 +93,20 @@ jobs:
           set -euo pipefail
           python3 scripts/rocketmq/final_image_candidate.py --source "$PWD/.image-source" \
             --source-sha "$SOURCE_SHA" --target "$TARGET" --output "$PWD/.image-candidate" \
-            --sdk-profile readable-rc1 --run-uid "$RUN_UID" --run-gid "$RUN_GID"
+            --sdk-profile "$SDK_PROFILE" --run-uid "$RUN_UID" --run-gid "$RUN_GID"
       - name: Verify candidate identity and owned cleanup
         run: |
           python3 - <<'PY'
-          import json, os
+          import json, os, sys
           from pathlib import Path
+          sys.path.insert(0,'scripts/rocketmq')
+          from image_sdk_profile import sdk_profile
+          expected=sdk_profile(os.environ['SDK_PROFILE'])
           x = json.loads(Path('.image-candidate/image-inventory.json').read_text())
           assert x['schema'] == 'readable-final-image-inventory/v1'
-          assert x['sdk_profile'] == 'readable-rc1' and not x['stable_release']
-          assert x['expected_sdk_source_sha'] == '5c2e3cd155e67c0f766e93bf95238b16fc219b5f'
+          assert x['sdk_profile'] == os.environ['SDK_PROFILE']
+          assert x['stable_release'] is expected.get('stable_release',False)
+          assert x['expected_sdk_source_sha'] == expected['source_sha']
           assert x['source_sha'] == os.environ['SOURCE_SHA']
           assert x['passed'] == 1 and x['failed'] == x['skipped'] == 0
           assert x['archive_bytes'] > 0 and x['deferred_tools_absent']

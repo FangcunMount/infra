@@ -5,6 +5,14 @@ PROFILES = {
         'source_sha': '1345266aa0e864c46de5d1e3e3c939dd8002a890',
         'go_sum': 'h1:JUayISCwmVwrLbHfLvgiOo3jr3Dxs7JfWeF3/Br45O0=',
     },
+    'readable-stable': {
+        'go': 'v0.6.0', 'python': '0.5.0',
+        'source_sha': '559c735b2ceb11827ffbbd1279808b4164bba3d1',
+        'go_sum': 'h1:ncfphXuTE6JtSH9wJTxakZxkLxic4uws15L5dRvYrg0=',
+        'wheel_url': 'https://github.com/FangcunMount/reliable-messaging/releases/download/python/v0.5.0/fangcun_reliable_messaging-0.5.0-py3-none-any.whl',
+        'wheel_sha256': '6fe1fbf0635d3e2f8ba2f10c12474c39c939ee656f20df7784928f8bd92e88b8',
+        'stable_release': True,
+    },
     'readable-rc1': {
         'go': 'v0.6.0-rc.1', 'python': '0.5.0rc1',
         'source_sha': '5c2e3cd155e67c0f766e93bf95238b16fc219b5f',
