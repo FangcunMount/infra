@@ -26,10 +26,10 @@
     "skipped": 0
   },
   "window": {
-    "operation_id": "20261028-v5",
-    "binding_sha256": "c049a8c334df081fe19b2d32b39ff396a4d6fa17818c9544b07ea2c111dc0193",
-    "coordinator_source_sha256": "f996cbbbd5e8762251184e31c98ccaa87058bc76784abf401f53cdde30811ae6",
-    "target_operator_sha256": "f12e844c522b4e9019332d2715dc969fe31fe67d992651de657a57ca49a1ce93",
+    "operation_id": "20261028-v6",
+    "binding_sha256": "49b19cd6cf86f456afc2e410ed79b6222f63c771cf391b6ee334abe868dd1b09",
+    "coordinator_source_sha256": "57dad5aac4060c488f9b2b71790b36e66fa1af093f93eed62e65738d2ad5eada",
+    "target_operator_sha256": "7ae3cb71c5e8b037cc7dc5a7842648914a7a9eb8ea1246225589e123394444fd",
     "source_closure_sha256": "fbcd145d2ad5e5c15a1d1da530bb8ecba49ad581f45f186ed40e5860c23548b0",
     "source_closure": {
       "ops/m3_nginx_acceptance_gate.py": "4b4f23c98c6bf3b394a5ec706121d3ee76ce42cdc525344bdd7223c52a00c6b1",
@@ -264,7 +264,7 @@
   },
   "evidence": {
     "prepared_packet": {
-      "sha256": "1a47280741cfb098de318bd75c378c9990d41d97189bfbd28d8578dc9b9d3d93"
+      "sha256": "1f0258701bb550fd4bdde1b19908a7723527784ed4a7a2a6eca5e8f34113c250"
     },
     "empty_new_topics": {
       "basename": "new-topics-empty-20261028T115913-3634a5.private.json",
@@ -310,5 +310,53 @@
     "v3 isolated CLI import rejected before start",
     "v4 worker historical event mount rejected; exact original bytes now copied into owned phase assets"
   ],
-  "no_failed_packet_started_business_runtime": true
+  "no_failed_packet_started_business_runtime": true,
+  "superseded_window": {
+    "operation_id": "20261028-v5",
+    "binding_sha256": "c049a8c334df081fe19b2d32b39ff396a4d6fa17818c9544b07ea2c111dc0193",
+    "coordinator_source_sha256": "f996cbbbd5e8762251184e31c98ccaa87058bc76784abf401f53cdde30811ae6",
+    "target_operator_sha256": "f12e844c522b4e9019332d2715dc969fe31fe67d992651de657a57ca49a1ce93",
+    "source_closure_sha256": "fbcd145d2ad5e5c15a1d1da530bb8ecba49ad581f45f186ed40e5860c23548b0",
+    "source_closure": {
+      "ops/m3_nginx_acceptance_gate.py": "4b4f23c98c6bf3b394a5ec706121d3ee76ce42cdc525344bdd7223c52a00c6b1",
+      "ops/m3_nginx_gate.py": "798baee24fb05ae05cefb4459cadf41fa799909644052ae76c2cf8e4299bbd5d",
+      "ops/m4_runtime_start.py": "10ee032d83435bbe9059411d0f2728bff5790a6a4981eed4967e4aac61e5db6b",
+      "ops/readable_runtime_start.py": "635f2f79daca29079f37bfdad4c803fa07f6698614bfcf6fcc264594f3efd5ba",
+      "rocketmq/cutover_step.py": "894f27388d1914f7064c49d8c14a05958e77fb5935c1850cbdae7afda85cb7dd",
+      "rocketmq/runtime_start.py": "e558189ca58bc2d73b71c829d043541eb1ff3ddd9c02f82953a0041c95b1ee23",
+      "rocketmq/start_boundary.py": "2c2b18a4d8b0865f5cb7d6fa81840d7d4f50c7dbc1265d7fa657bb9236f1700c"
+    },
+    "seconds_maximum": 1800,
+    "release": "/opt/fangcun-readable-names/releases/readable-20261028-v2",
+    "global_first_start_barrier": true,
+    "original_configuration_restore_only_before_first_new_start": true,
+    "after_first_new_start": "forward repair only; never restore business data",
+    "owner_admission_closed_until_all_new_consumers_and_Checkers_verified": true
+  },
+  "failed_close_before_ingress_changed": {
+    "operation_id": "20261028-v5",
+    "source_failure": "controller release path differed from verified runtime release",
+    "active_ingress_files_unchanged": true,
+    "applications_stopped": 0,
+    "new_runtime_attempted": false,
+    "state_receipt_sha256": "382bdfd0ff0ff0a1a737f95aa4aa199a8ce77006afaf28ed9a238f673b68031d",
+    "new_controller_previews_required": 2
+  },
+  "refrozen_at": "2026-10-28T12:12:58.815327+00:00",
+  "controller_read_only_previews": {
+    "serverA": {
+      "sha256": "623218df029adca3a0a235a2f8d3f069818a614c5a545dcd7ddc923cfc113cde",
+      "coordinator_paths_verified": true,
+      "host": "serverA",
+      "maintenance_started": false,
+      "original_runtime_unchanged": 5
+    },
+    "serverD": {
+      "sha256": "ae020a2448b7448134f84a9504e15c87efbd95fabc26cb1431eed2d33b0ce86c",
+      "coordinator_paths_verified": true,
+      "host": "serverD",
+      "maintenance_started": false,
+      "original_runtime_unchanged": 3
+    }
+  }
 }

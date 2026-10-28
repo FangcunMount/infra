@@ -80,7 +80,7 @@
 
 T13已完成，以下为实际目标机预览后的执行包，详见[冻结证据](evidence/rocketmq-readable-names-t13-final-freeze-20261028.json)。T14维护尚未开始。五个固定镜像沿用T12发布摘要；八实例项目、服务、数量、CPU/内存及worker并发仍为本页原表。运行包为 `readable-20261028-v2`，材料版本 `m4-readable-20261028-v1`，命名 `readable-v1`；数据库绑定、凭据、writer epoch与事务 `m3-1` 均保持。
 
-执行包 `20261028-v5` 已绑定控制器源码、七模块源码闭包、21项精确计划和原部署锁身份。serverA 17项、serverD 4项实际Compose与隔离Python CLI预览全部通过。每项具体路径、SHA、engine ID、数量均列在冻结证据中；执行时再次按原字节摘要和部署锁核对。旧QS排空阶段固定原运行镜像与原v2材料，只暂停plan scheduler和automatic retry；最终open恢复原开关。新closed阶段四owner发布准入关闭但Checker继续启动；worker保持不发布。acceptance仅对实际TCP与唯一浏览器请求共同核实的固定验收来源开放，截止为维护起点加1800秒。
+执行包 `20261028-v6` 已绑定控制器源码、七模块源码闭包、21项精确计划和原部署锁身份。serverA 17项、serverD 4项实际Compose与隔离Python CLI预览全部通过。每项具体路径、SHA、engine ID、数量均列在冻结证据中；执行时再次按原字节摘要和部署锁核对。旧QS排空阶段固定原运行镜像与原v2材料，只暂停plan scheduler和automatic retry；最终open恢复原开关。新closed阶段四owner发布准入关闭但Checker继续启动；worker保持不发布。acceptance仅对实际TCP与唯一浏览器请求共同核实的固定验收来源开放，截止为维护起点加1800秒。
 
 实际Broker保持5.5.1；回读参数transactionTimeOut=6000ms、transactionCheckInterval=30000ms、transactionCheckMax=15、fileReservedTime=48h，不据此推导恢复SLA。临窗内存仍须至少512MiB。当前57项执行及62项witness均Committed且最终确认，无矛盾、缺失witness、未来重试或deferred；40个AI job完成、38个model call取得响应、35个session完成及7个blocked保留。这是T13快照，不能代替T14最终排空。
 
