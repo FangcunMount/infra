@@ -1,0 +1,31 @@
+name: Readable production window contracts
+on:
+  pull_request:
+    paths: ['scripts/ops/readable_runtime_start.py', 'scripts/ops/test_readable_runtime_start.py', 'scripts/ops/m4_runtime_start.py', 'scripts/rocketmq/runtime_start.py', '.github/workflows/readable-window-contracts.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/ops/readable_runtime_start.py', 'scripts/ops/test_readable_runtime_start.py', 'scripts/ops/m4_runtime_start.py', 'scripts/rocketmq/runtime_start.py', '.github/workflows/readable-window-contracts.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: readable-window-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        python: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Production start boundary and original lock contracts without Docker
+        env:
+          PYTHONPATH: scripts/ops:scripts/rocketmq
+        run: python -m unittest test_readable_runtime_start test_m4_runtime_start test_runtime_start
