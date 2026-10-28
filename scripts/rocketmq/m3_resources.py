@@ -122,6 +122,9 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
     if transition_mode not in ('0', '1'):
         raise ValueError('explicit readable resource transition profile required')
     document, previous_document, source_manifest = resource_documents(repo, profile, transition_mode == '1')
+    retirement_mode = os.environ.get('ROCKETMQ_READABLE_RETIREMENT', '0')
+    if retirement_mode not in ('0', '1') or (retirement_mode == '1' and previous_document is None):
+        raise ValueError('owned retirement requires the full readable resource transition')
     proof['profile']=profile
     proof['full_gate']=False
     proof['readable_transition'] = previous_document is not None
@@ -264,3 +267,9 @@ def run_resources(repo, directory, broker, project, grpc_port, ca, run, native_r
     if previous_document is not None:
         proof['scope'] += '; original five subjects retain exact old/new union, conflict controls use distinct new-only subjects'
         proof['credential_rotation'] = False
+    if retirement_mode == '1':
+        from readable_retirement_native import run_owned_retirement
+        proof['phase'] = 'owned_empty_retirement'
+        proof['retirement_fixture'] = run_owned_retirement(
+            broker, project, previous_document, document, accounts, proof['native_receipt'])
+        proof['phase'] = 'complete'
