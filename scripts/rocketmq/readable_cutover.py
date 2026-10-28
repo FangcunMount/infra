@@ -36,6 +36,15 @@ PORTS = dict(iam=9080,ai=8000,api=8080,collection=8080,collection2=8080,worker1=
 def digest(value):return hashlib.sha256(_encoded(value)).hexdigest()
 
 
+def prepare_active_configuration(operation, select):
+    # Configuration-only restoration is offline maintenance. The data restore
+    # API intentionally closes normal starts permanently; never use or weaken it
+    # for this route selector rehearsal.
+    operation.maintain_before_start('select-active-before-restore',lambda:select('active'))
+    operation.maintain_before_start('restore-compatible-config',lambda:select('compat'))
+    operation.maintain_before_start('select-final-active',lambda:select('active'))
+
+
 def root_action(f,action,*,phase=None,source=None):
     ci_guard(os.environ)
     allowed=('GITHUB_ACTIONS','RUNNER_OS','RUNNER_ENVIRONMENT','GITHUB_RUN_ID','GITHUB_RUN_ATTEMPT','GITHUB_WORKSPACE')
@@ -158,9 +167,7 @@ def run(f,args,ai_env,databases,stop_actual,case):
     binding_sha=digest(binding);initialize(operation_dir,binding,binding_sha)
     refused=[]
     with Boundary(operation_dir,binding_sha) as operation:
-        operation.maintain_before_start('select-active-before-restore',lambda:select('active'))
-        operation.restore_before_start('restore-compatible-config',lambda:select('compat'))
-        operation.maintain_before_start('select-final-active',lambda:select('active'))
+        prepare_active_configuration(operation,select)
         case('actual_prestart_compatible_configuration_restore')
         remove_all()
         def initial_start():
@@ -183,7 +190,7 @@ def run(f,args,ai_env,databases,stop_actual,case):
         except ExpectedFailure:pass
         else:raise RuntimeError('owned_start_fault_not_observed')
         def forbidden():raise AssertionError('forbidden callback executed')
-        for name,callback in [('old-config',lambda:operation.restore_before_start('forbidden-old-route',forbidden)),
+        for name,callback in [('old-config',lambda:operation.maintain_before_start('forbidden-old-route',forbidden)),
                               ('normal-retry',lambda:operation.start('forbidden-normal-retry',forbidden))]:
             try:callback()
             except BoundaryError:refused.append(name)

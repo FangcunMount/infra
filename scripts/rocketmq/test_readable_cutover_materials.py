@@ -1,12 +1,34 @@
 import copy
+from pathlib import Path
+import tempfile
 import unittest
 
+from readable_cutover import digest, prepare_active_configuration
 from readable_cutover_materials import BASE, ROLES, COMPONENTS, documents, rebase_mounts, revision, stopped_instances
+from start_boundary import Boundary, BoundaryError, initialize
 
 PROJECT='rocketmq-m2-image-aabbccddeeff'
 
 
 class ReadableCutoverMaterialsTest(unittest.TestCase):
+    def test_actual_config_restore_adapter_preserves_first_start_and_data_restore_protection(self):
+        with tempfile.TemporaryDirectory() as root:
+            directory=Path(root)/'operation'
+            binding=dict(schema='m3-start-boundary/v1',operation_id='owned-config-restore',directory=str(directory),
+                scope_sha256='1'*64,protection_sha256='2'*64,restore_receipt_sha256='3'*64,
+                source_bundle_sha256='4'*64,data_owner='owned-ci',recovery_owner='owned-ci')
+            signature=digest(binding);initialize(directory,binding,signature)
+            calls=[]
+            with Boundary(directory,signature) as operation:
+                prepare_active_configuration(operation,calls.append)
+                self.assertEqual(calls,['active','compat','active'])
+                self.assertFalse(operation.status()['runtime_may_have_started'])
+                operation.start('first-runtime',lambda:calls.append('start'))
+                self.assertTrue(operation.status()['runtime_may_have_started'])
+                with self.assertRaises(BoundaryError):prepare_active_configuration(operation,calls.append)
+                with self.assertRaises(BoundaryError):operation.restore_before_start('forbidden-data-restore',lambda:calls.append('unsafe'))
+                self.assertEqual(calls,['active','compat','active','start'])
+
     def rows(self):
         return [dict(Name='/'+PROJECT+'-'+k,Config=dict(Labels={'com.fangcunmount.m3.fixture':PROJECT}),
             State=dict(Status='exited',Running=False,ExitCode=0,OOMKilled=False)) for k in COMPONENTS]
