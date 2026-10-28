@@ -1,0 +1,105 @@
+{
+  "schema": "readable-production-closure/v1",
+  "completed_at": "2026-10-28T14:16:48.011682+00:00",
+  "progress": "16/16",
+  "source": {
+    "SDK_stable_sha": "559c735b2ceb11827ffbbd1279808b4164bba3d1",
+    "Go": "v0.6.0",
+    "Python": "0.5.0",
+    "retirement_review_merge": "9555fa39842febd1af0a5869a6fb12cfcae6a423",
+    "retirement_review_CI": "https://github.com/FangcunMount/infra/actions/runs/40694717393",
+    "progress_merge": "d7dcc6ccef3a636aa8280f20c25734cc03b3bc37",
+    "closing_record": "authoritative after this documentation commit is merged to main"
+  },
+  "runtime": {
+    "fixed_instances": 8,
+    "fixed_images": 5,
+    "business_topics": 10,
+    "business_groups": 9,
+    "owners": 4,
+    "unexpected_restarts": 0,
+    "OOM": false,
+    "serverD_available_memory_MiB": 916,
+    "public_HTTPS_statuses": {
+      "collect.fangcunmount.cn": 200,
+      "iam.fangcunmount.cn": 200,
+      "qs.fangcunmount.cn": 200
+    },
+    "Broker_NameServer_Dashboard_restart_issued": false,
+    "DDL": false,
+    "credential_rotation": false,
+    "offset_copy": false,
+    "message_replay": false,
+    "model_redo": false
+  },
+  "retirement": {
+    "old_business_topics_deleted": 20,
+    "old_consumer_groups_deleted": 21,
+    "old_exact_grants_deleted": 58,
+    "separately_drained_POP_retry_deleted": 1,
+    "native_mutations": 100,
+    "new_exact_grants_remaining": 29,
+    "Broker_topics_remaining": 24,
+    "Broker_groups_remaining": 17,
+    "protected_system_topics_remaining": 14,
+    "protected_system_groups_remaining": 8,
+    "unresolved_old_objects": [],
+    "Broker_NameServer_authenticated_Dashboard_readbacks": true,
+    "account_type_status_unchanged": true,
+    "history_database_evidence_preserved": true,
+    "default_POP_parent_guard_not_relaxed": true,
+    "prefix_deletion": false,
+    "automatic_mutation_retries": 0
+  },
+  "CD": {
+    "restored": {
+      "iam": {
+        "PRODUCTION_DEPLOY_PAUSED": "false"
+      },
+      "qs-ai": {
+        "AUTO_DEPLOY_ENABLED": "true"
+      },
+      "qs-server": {
+        "PRODUCTION_DEPLOY_PAUSED": "false"
+      }
+    },
+    "MQ_config_entries_verified": 8,
+    "material_files_verified": 21,
+    "binding_revision": "m4-readable-20261028-v1",
+    "QS_selector_sha256": "316ff62c700c9bde253f032675cf2b7af3216bc0caab8ea0c618b974bfbc1fec",
+    "new_deployment_forced": false,
+    "original_locks_and_image_retention_preserved": true
+  },
+  "acceptance": "rocketmq-readable-names-t15-acceptance-20261028.json",
+  "maintenance_seconds": 1553.009,
+  "new_48_hour_gate": false,
+  "retained_failed_preflights": [
+    {
+      "attempt": "retirement-v1",
+      "stage": "missing read-only audit module before execution",
+      "native_mutations": 0
+    },
+    {
+      "attempt": "retirement-v2",
+      "stage": "host role selector before lock/RPC",
+      "native_mutations": 0
+    }
+  ],
+  "Dashboard_readback_correction": {
+    "observed": "Topic list was current; Group list retained 21 old names and omitted nine new names",
+    "action": "authenticated /consumer/group.refresh.all once; list and Broker metadata re-read",
+    "container_restart": false,
+    "Broker_mutation": false,
+    "official_source": "https://github.com/apache/rocketmq-dashboard/blob/rocketmq-dashboard-2.1.0/src/main/java/org/apache/rocketmq/dashboard/service/impl/ConsumerServiceImpl.java#L533"
+  },
+  "CD_readback_correction": "GitHub variables inventory paginated to 100; final exact values and original flags read back; no blind mutation retry",
+  "private_evidence_sha256": {
+    "t16-retirement-receipt.private.json": "2a84ca443279c3eff7d3ed0785ca1556184e0a598d919f3db125fe7996886054",
+    "t16-final-readback-20261028T141535.private.json": "e05c8791d4045081b3a3829f9d5927a57070f5969a84df84f9b73aa330eacd28",
+    "t16-CD-resumed-20261028T141630.private.json": "a12213c53c69407fb6249c9ad143b9ee41528a413bcd48b5ca129801dbf3669b",
+    "t16-final-health-20261028T141230.private.json": "a1f7bdf44247bc844f753e9bc986adb5dff936119228dee0747bf6433b2734d3",
+    "t16-retirement-packet-v3.private.json": "11a67e9a344cd28a5bcf8875d931b862e651427c79a8e0917dcbaf41a6e229e3",
+    "t16-CD-pointer-activated-20261028T133500.private.json": "2854bb6ced512c5f198edb7f6e06f469f1c1cf584ba41ab77f56471f7c075c48",
+    "t16-db-clearance-20261028T133512.private.json": "dabf164222f9858a3de5354fcad0a7ae35b1417e4ae7a6c41de5c631081a2596"
+  }
+}

@@ -1,6 +1,6 @@
 # 可读候选镜像的固定发布
 
-T12 已完成：Go `v0.6.0`、Python `0.5.0`、三库正式接入及五份固定镜像均已发布并验证。[唯一进度总表](rocketmq-readable-names-execution.md)；[发布索引](evidence/rocketmq-readable-names-t12-release-20261028.json)；[五镜像摘要](evidence/rocketmq-readable-names-t12-image-publication-20261028.json)。生产运行切换、system 验收与旧资源退役仍属于 T13–T16，自动 CD 继续暂停。
+T12 已完成：Go `v0.6.0`、Python `0.5.0`、三库正式接入及五份固定镜像均已发布并验证。[唯一进度总表](rocketmq-readable-names-execution.md)；[发布索引](evidence/rocketmq-readable-names-t12-release-20261028.json)；[五镜像摘要](evidence/rocketmq-readable-names-t12-image-publication-20261028.json)。T13–T16也已完成：五固定镜像/八实例已上线，合法system、新答卷及新AI与30分钟开放后检查通过，旧资源具名退役且自动CD恢复。[最终生产索引](evidence/rocketmq-readable-names-t16-closure-20261028.json)。
 
 `readable_publish_candidates.py` 复用原 M3/M4 的 TLS Registry 运输与 manifest/config digest 回读，不改写旧发布器或历史证据。它不构建镜像、不启动应用、不执行 DDL 或业务切换。
 
