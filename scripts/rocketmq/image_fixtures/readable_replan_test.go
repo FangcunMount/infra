@@ -169,7 +169,8 @@ func TestReadableCrossRouteReplanBrokerHost(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		return tx.Exec("INSERT INTO replan_fact VALUES(?)", []byte(want)).Error
+		// Bind one string value; GORM expands a byte slice inside VALUES(?).
+		return tx.Exec("INSERT INTO replan_fact(id) VALUES (?)", want).Error
 	})
 	// Never serialize Result, Execution or an error: they contain capabilities,
 	// wire identities or service addresses. The harness applies a second allowlist.
