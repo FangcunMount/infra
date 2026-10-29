@@ -33,6 +33,8 @@
 
 事件告警只使用 bounded labels：`source/mode/topic/event_type/outcome`、`relay`、`service`、`store/status`。不要把 `event_id`、`aggregate_id`、error message 写进 label。
 
+标准 Outbox 报告真实状态 `pending`、`retry_wait`、`publishing`、`quarantined`。最老消息年龄规则覆盖前三种可恢复状态，并继续覆盖旧链路的 `failed`；`quarantined` 持续五分钟则单独告警，要求按原消息身份与业务状态人工分类，不能自动重放。旧链路的 `failed` 积压告警保留。规则只负责在 Prometheus 中触发；Alertmanager 邮件接线、值守人和实际送达须另行验收。
+
 ### M5-05 最佳努力副作用
 
 `QSBestEffortSideEffectFailure` 监测 `qs_worker_best_effort_side_effect_total{result=~"call_failed|response_rejected"}` 在最近五分钟内是否增加，按事件类型和结果分别告警。问卷／量表二维码后处理若报告 `not_configured`，同样告警：发布后应可定位这一未执行的后处理。`task.completed/expired/canceled` 三条外围通知的 `not_configured` 保留在指标和 Worker 警告日志中，因通知目标是否应配置尚需逐环境审核，暂不据此告警；切流前必须核对各环境的预期接收方。`task.opened` 主动提醒有独立的可靠意图设计。`call_succeeded` 仅表示当前外部调用未报错，不证明用户收件；`task.expired` 的 `missed_open_window` 抑制不是失败。
