@@ -1,0 +1,32 @@
+rule_files:
+  - ../rules/rocketmq-transactions.yml
+evaluation_interval: 1m
+tests:
+  - name: business wait alerts require a successful current sample
+    interval: 1m
+    input_series:
+      - series: qs_server_ai_mq_oldest_awaiting_command_receipt_seconds
+        values: '600 600 600 600 600 600 600'
+      - series: qs_server_ai_mq_observation_available
+        values: '0 0 0 0 0 0 0'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: QSCommandReceiptDelayed
+        exp_alerts: []
+  - name: pending command business receipts alert after five minutes
+    interval: 1m
+    input_series:
+      - series: qs_server_ai_mq_oldest_awaiting_command_receipt_seconds
+        values: '600 600 600 600 600 600 600'
+      - series: qs_server_ai_mq_observation_available
+        values: '1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: QSCommandReceiptDelayed
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              subsystem: messaging
+            exp_annotations:
+              summary: QS commands are awaiting AI admission receipts
+              description: Inspect the current business receipt and consumer state. Broker confirmation alone does not complete this responsibility.

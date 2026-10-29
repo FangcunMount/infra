@@ -48,13 +48,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (store, status) (qs:event_outbox_backlog:current)",
-          "legendFormat": "{{store}} / {{status}}",
+          "expr": "reliable_messaging_transaction_observation_available",
+          "legendFormat": "{{owner}} {{instance}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Backlog By Store / Status",
+      "title": "Transaction observation available",
       "type": "timeseries"
     },
     {
@@ -70,7 +70,7 @@
             "lineWidth": 1,
             "showPoints": "never"
           },
-          "unit": "s"
+          "unit": "short"
         },
         "overrides": []
       },
@@ -99,13 +99,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "max by (store, status) (qs:event_outbox_oldest_age_seconds:max)",
-          "legendFormat": "{{store}} / {{status}}",
+          "expr": "reliable_messaging_transaction_confirmation_gap_branches",
+          "legendFormat": "{{owner}} {{instance}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Oldest Unfinished Age",
+      "title": "Transaction confirmation observation gaps",
       "type": "timeseries"
     },
     {
@@ -121,7 +121,7 @@
             "lineWidth": 1,
             "showPoints": "never"
           },
-          "unit": "ops"
+          "unit": "short"
         },
         "overrides": []
       },
@@ -150,13 +150,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (relay, outcome) (qs:event_outbox_outcome:rate5m)",
-          "legendFormat": "{{relay}} / {{outcome}}",
+          "expr": "qs_server_ai_mq_awaiting_command_receipts",
+          "legendFormat": "{{owner}} {{instance}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Relay Outcome Rate",
+      "title": "Commands awaiting AI admission receipts",
       "type": "timeseries"
     },
     {
@@ -172,7 +172,7 @@
             "lineWidth": 1,
             "showPoints": "never"
           },
-          "unit": "ops"
+          "unit": "short"
         },
         "overrides": []
       },
@@ -201,13 +201,115 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (store) (qs:event_outbox_status_scrape_failures:rate5m)",
-          "legendFormat": "{{store}}",
+          "expr": "qs_ai_mq_pending_interpretation_receipts",
+          "legendFormat": "{{owner}} {{instance}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Status Scrape Failures",
+      "title": "Interpretation states awaiting QS ACK",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "qs_server_ai_mq_oldest_awaiting_command_receipt_seconds",
+          "legendFormat": "{{owner}} {{instance}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Oldest command receipt wait",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "showPoints": "never"
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "qs_ai_mq_oldest_pending_interpretation_receipt_seconds",
+          "legendFormat": "{{owner}} {{instance}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Oldest interpretation receipt wait",
       "type": "timeseries"
     }
   ],
@@ -215,15 +317,15 @@
   "schemaVersion": 39,
   "tags": [
     "qs",
-    "event",
-    "outbox"
+    "event"
   ],
   "time": {
     "from": "now-6h",
     "to": "now"
   },
   "timezone": "",
-  "title": "QS Event Outbox",
-  "uid": "event-outbox",
-  "version": 1
+  "title": "QS Event Transactions",
+  "uid": "event-transactions",
+  "version": 1,
+  "description": "Transaction confirmation and business receipt observations are separate. Missing samples mean unavailable, not zero backlog."
 }
