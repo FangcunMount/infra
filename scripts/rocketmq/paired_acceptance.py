@@ -167,7 +167,12 @@ def prepare_qs(source,directory,project,mysql_port,password,run,proof, *, readab
                     GoModSum='h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')
     if readable:
         from readable_host_acceptance import MODULE
-        expected = MODULE
+        from image_sdk_profile import sdk_profile
+        selected = os.environ.get('QS_AI_READABLE_SDK_PROFILE', 'readable-rc1')
+        if selected not in ('readable-rc1', 'readable-stable'):
+            raise ValueError('explicit readable paired SDK profile required')
+        fixed = sdk_profile(selected)
+        expected = dict(Version=fixed['go'], Sum=fixed['go_sum'], GoModSum=MODULE['GoModSum'])
     if ('Replace' in module or module.get('Path') != 'github.com/FangcunMount/reliable-messaging'
             or any(module.get(key) != value for key,value in expected.items())):
         raise ValueError('fixed published QS host SDK required')

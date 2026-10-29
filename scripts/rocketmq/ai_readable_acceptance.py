@@ -29,8 +29,17 @@ def complete_manifest(factory):
 
 
 def readable_profile(kind, original):
+    import os
+    from image_sdk_profile import sdk_profile
     from ai_admission_acceptance import CASES, TESTS, parse_host_receipt, read_host_receipt
-    profile = dict(original, readable=True, sdk_version=VERSION, sdk_url=URL, sdk_sha256=SHA256,
+    selected = os.environ.get('QS_AI_READABLE_SDK_PROFILE', 'readable-rc1')
+    if selected not in ('readable-rc1', 'readable-stable') or (
+            selected == 'readable-stable' and kind not in ('paired', 'paired_faults')):
+        raise RuntimeError('explicit supported paired readable SDK profile required')
+    fixed = sdk_profile(selected)
+    version = fixed['python']
+    profile = dict(original, readable=True, sdk_version=version,
+                   sdk_url=fixed['wheel_url'], sdk_sha256=fixed['wheel_sha256'],
                    manifest=lambda: complete_manifest(original['manifest']))
     if kind == 'admission':
         profile['partial'] = lambda output: read_host_receipt(output, sdk_version=VERSION)
@@ -50,12 +59,11 @@ def readable_profile(kind, original):
     elif kind == 'paired':
         import os
         from paired_acceptance import parse_receipt, read_receipt
-        from readable_host_acceptance import MODULE
         full = os.environ.get('QS_M3_PAIRED_PROFILE', 'core') == 'full'
         profile['partial'] = lambda output: read_receipt(output, full=full, partial=True,
-            sdk_python=VERSION, sdk_go=MODULE['Version'])
+            sdk_python=version, sdk_go=fixed['go'])
         profile['parse'] = lambda output, junit: parse_receipt(output, junit, full=full,
-            sdk_python=VERSION, sdk_go=MODULE['Version'])
+            sdk_python=version, sdk_go=fixed['go'])
     elif kind != 'paired_faults':
         raise ValueError('supported named readable AI profile required')
     return profile

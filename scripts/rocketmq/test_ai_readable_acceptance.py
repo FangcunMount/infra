@@ -9,6 +9,36 @@ from routes import validate
 
 
 class AIReadableTest(unittest.TestCase):
+    def test_stable_pair_uses_reviewed_wheel_and_rejects_rc_receipts(self):
+        import json
+        from image_sdk_profile import sdk_profile
+        from paired_acceptance import FULL_TESTS, MARKER
+        from test_paired_acceptance import receipt, xml
+        fixed = sdk_profile('readable-stable')
+        with patch.dict(os.environ, QS_AI_READABLE_ROUTES='1',
+                        QS_AI_READABLE_SDK_PROFILE='readable-stable', QS_M3_PAIRED_PROFILE='full'):
+            current = acceptance_profile('paired')
+            fault = acceptance_profile('paired_faults')
+            for kind in ('admission', 'state', 'finalization'):
+                with self.assertRaises(RuntimeError):
+                    acceptance_profile(kind)
+        for profile in (current, fault):
+            self.assertEqual(profile['sdk_version'], fixed['python'])
+            self.assertEqual(profile['sdk_sha256'], fixed['wheel_sha256'])
+            package = dict(name='fangcun-reliable-messaging', version=fixed['python'],
+                source={'url': fixed['wheel_url']},
+                wheels=[dict(url=fixed['wheel_url'], hash='sha256:' + fixed['wheel_sha256'])])
+            self.assertEqual(validate_host_sdk_lock({'package': [package]}, profile), fixed['wheel_sha256'])
+        value = receipt(True)
+        value.update(sdk_go=fixed['go'], sdk_python=fixed['python'])
+        self.assertEqual(current['parse'](MARKER + json.dumps(value), xml(FULL_TESTS))['passed'], 25)
+        value.update(sdk_go='v0.6.0-rc.1', sdk_python='0.5.0rc1')
+        with self.assertRaises(RuntimeError):
+            current['parse'](MARKER + json.dumps(value), xml(FULL_TESTS))
+        with patch.dict(os.environ, QS_AI_READABLE_ROUTES='1', QS_AI_READABLE_SDK_PROFILE='latest'):
+            with self.assertRaises(RuntimeError):
+                acceptance_profile('paired')
+
     def test_profiles_freeze_same_actual_test_ids_and_strict_sdk(self):
         for kind in ('admission', 'state', 'finalization', 'paired', 'paired_faults'):
             with self.subTest(kind=kind):
