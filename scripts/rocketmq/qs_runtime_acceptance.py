@@ -116,6 +116,9 @@ def runtime_manifest(repo, recovery=False):
     value['routes'] = [r for r in value['routes'] if r['id'] in wanted]
     value['accounts'] = {'m3-qs-apiserver': mysql, 'm3-qs-mongo': document, 'm3-qs-worker': worker}
     validate_v2(value)
+    if recovery:
+        from readable_host_acceptance import readable_manifest
+        return readable_manifest(value)
     return value
 
 
@@ -197,6 +200,9 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
     accounts = {role: {'username': 'runtime-' + secrets.token_hex(5), 'password': secrets.token_hex(32)}
                 for role in document['accounts']}
     proof['provision'] = provision(broker, document, accounts)
+    if recovery:
+        proof['manifest_version'] = document['version']
+        proof['naming_scheme'] = 'readable-v1'
     routes = directory/'qs-owner-runtime-routes.json'; routes.write_text(json.dumps(document)); routes.chmod(0o600)
     credentials = {}
     for role, value in accounts.items():
@@ -259,7 +265,8 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         if proof['parameters_before_native']['transactionTimeOut'] != 60000:
             raise RuntimeError('owned first-check window not effective')
         package, test, budget = ('./internal/apiserver/integration/runtimeclosure', '^TestM3HostRetirementRecovery$', '10m') if recovery else ('./internal/apiserver/container', '^TestM3DefaultOwnerRuntime$', '5m')
-        result = native_runner(['go', 'test', '-race', '-p', '1', '-tags=integration,m3_host_runtime', '-count=1',
+        linker = ['-ldflags', '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit='+proof['source_sha']] if recovery else []
+        result = native_runner(['go', 'test', '-race', '-p', '1', '-tags=integration,m3_host_runtime', '-count=1'] + linker + [
                     '-timeout='+budget, '-v', package, '-run', test],
                     cwd=source, env=env, timeout=720 if recovery else 480, required=False)
         output = result.stdout+result.stderr

@@ -21,6 +21,18 @@ class CurrentRecoveryReceiptTest(unittest.TestCase):
                 row=dict(RECOVERY_MODULE);row[field]='wrong'
                 with self.assertRaises(RuntimeError):validate_recovery_module(row)
 
+    def test_current_profile_uses_readable_routes_and_full_worker_subscriptions(self):
+        from pathlib import Path
+        from qs_runtime_acceptance import runtime_manifest
+        from m3_resources import manifest
+        root=Path(__file__).resolve().parents[2]
+        current=runtime_manifest(root, recovery=True)
+        self.assertEqual(current['version'], 3)
+        self.assertTrue(all(r['naming_scheme']=='readable-v1' for r in current['routes']))
+        required=set(manifest(root)['accounts']['m3-qs-worker']['subscriptions'])
+        self.assertTrue(required <= set(current['accounts']['m3-qs-worker']['subscriptions']))
+        self.assertIn('qs-recovery-hotrank', current['accounts']['m3-qs-worker']['subscriptions'])
+
     def test_complete_current_source_receipt(self):
         self.assertEqual(parse_recovery_receipt(self.output(self.receipt()), 'a'*40)['passed'], 14)
 
