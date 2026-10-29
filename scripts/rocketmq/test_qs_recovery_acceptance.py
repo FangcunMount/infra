@@ -11,7 +11,8 @@ class CurrentRecoveryReceiptTest(unittest.TestCase):
                     owned_databases_dropped=True, no_existing_storage=True,
                     no_production=True, worker_pids_distinct=True,
                     processing_lease_observed=True, processing_lease_ttl_ms=299000,
-                    proxy_routes_ready=True, proxy_routes_checked=8)
+                    proxy_routes_ready=True, proxy_routes_checked=8, api_lease_recovery_started=True,
+                    api_lease_recovery_drained=True, report_claim_observed=True, report_lease_ttl_ms=299000)
 
     def output(self, value, tail=''):
         return 'M3C_QS_RECOVERY_RECEIPT '+json.dumps(value)+'\n--- PASS: TestM3HostRetirementRecovery (1s)\n'+tail
@@ -39,7 +40,7 @@ class CurrentRecoveryReceiptTest(unittest.TestCase):
         self.assertEqual(parse_recovery_receipt(self.output(self.receipt()), 'a'*40)['passed'], 14)
 
     def test_missing_or_false_physical_boundaries_rejected(self):
-        for field in ('proxy_routes_ready', 'processing_lease_observed', 'real_redis', 'broker_sigkill', 'worker_sigkill', 'worker_pids_distinct', 'owned_databases_dropped'):
+        for field in ('api_lease_recovery_started', 'api_lease_recovery_drained', 'report_claim_observed', 'proxy_routes_ready', 'processing_lease_observed', 'real_redis', 'broker_sigkill', 'worker_sigkill', 'worker_pids_distinct', 'owned_databases_dropped'):
             with self.subTest(field=field):
                 row=self.receipt(); row[field]=False
                 with self.assertRaises(RuntimeError):parse_recovery_receipt(self.output(row), 'a'*40)
@@ -49,6 +50,11 @@ class CurrentRecoveryReceiptTest(unittest.TestCase):
             with self.subTest(routes=value):
                 row=self.receipt();row['proxy_routes_checked']=value
                 with self.assertRaises(RuntimeError):parse_recovery_receipt(self.output(row), 'a'*40)
+
+    def test_actual_report_claim_ttl_is_required_and_bounded(self):
+        for value in (None, True, 0, -1, 300001):
+            row=self.receipt();row['report_lease_ttl_ms']=value
+            with self.assertRaises(RuntimeError):parse_recovery_receipt(self.output(row), 'a'*40)
 
     def test_actual_lease_ttl_is_required_and_bounded(self):
         for value in (None, True, 0, -1, 300001):
