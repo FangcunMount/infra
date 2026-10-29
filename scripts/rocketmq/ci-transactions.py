@@ -467,6 +467,8 @@ def main():
         # Full application schema on tmpfs exceeds the protocol-only 512MiB
         # startup budget in the managed executor (recorded native OOM).
         spec["services"]["mysql"]["mem_limit"] = "1g"
+        # mongosh health checks plus WiredTiger/tmpfs also exceeded512MiB.
+        spec["services"]["mongo"]["mem_limit"] = "1g"
         redis_port = port()
         redis_pin = "redis:7.4.2-alpine"
         run(["docker", "pull", redis_pin], timeout=300)
