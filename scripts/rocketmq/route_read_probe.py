@@ -60,7 +60,10 @@ async def main(args):
             value=receipt(response,config['topic'],attempt)
             if response.status.code==Code.OK or response.status.code!=Code.TOPIC_NOT_FOUND:break
             if attempt<10:await asyncio.sleep(2)
-        print('TXPROBE '+json.dumps(dict(event='proxy_route',id=args.id,decision=json.dumps(value))),flush=True)
+        output='TXPROBE '+json.dumps(dict(event='proxy_route',id=args.id,decision=json.dumps(value)))
+        if getattr(args,'require_ready',False):
+            parse_output(output,config['topic'])
+        print(output,flush=True)
     finally:
         await channel.close()
 
@@ -70,6 +73,7 @@ if __name__=='__main__':
     parser.add_argument('--config',type=Path,required=True)
     parser.add_argument('--mode',choices=['route-read'],required=True)
     parser.add_argument('--id',default='')
+    parser.add_argument('--require-ready',action='store_true')
     try:
         asyncio.run(main(parser.parse_args()))
     except Exception:

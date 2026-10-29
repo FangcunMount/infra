@@ -35,7 +35,7 @@ def parse_recovery_receipt(output, source):
     if len(rows) != 1:
         raise RuntimeError('one actual host retirement receipt required')
     value = rows[0]
-    flags = ('processing_lease_observed', 'real_redis', 'broker_sigkill', 'worker_sigkill', 'controlled_provider',
+    flags = ('proxy_routes_ready', 'processing_lease_observed', 'real_redis', 'broker_sigkill', 'worker_sigkill', 'controlled_provider',
              'owned_databases_dropped', 'no_existing_storage', 'no_production')
     if (value.get('source_sha') != source or value.get('passed') != len(CASES)
             or value.get('failed') != 0 or value.get('skipped') != 0
@@ -45,6 +45,8 @@ def parse_recovery_receipt(output, source):
             or value.get('worker_pids_distinct') is not True
             or type(value.get('processing_lease_ttl_ms')) is not int
             or not 0 < value['processing_lease_ttl_ms'] <= 300000
+            or type(value.get('proxy_routes_checked')) is not int
+            or not 1 <= value['proxy_routes_checked'] <= 128
             or not re.search(r'--- PASS: TestM3HostRetirementRecovery \(', output)
             or re.search(r'--- (?:SKIP|FAIL):|WARNING: DATA RACE', output)):
         raise RuntimeError('current recovery proof incomplete, wrong source, failed or skipped')

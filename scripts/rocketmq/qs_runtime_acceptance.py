@@ -4,6 +4,7 @@ import json
 import os
 import re
 import secrets
+import sys
 
 from host_sdk_contract import stable_module_matches
 from iam_acceptance import host_failure_summary, retain_private_host_output
@@ -183,7 +184,7 @@ def runtime_diagnostics(output):
 
 
 def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_port, mongo_port,
-                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False, native_limit=False, recovery=False, redis_port=None, recovery_private_log=None):
+                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False, native_limit=False, recovery=False, redis_port=None, recovery_private_log=None, recovery_sdk=None, recovery_uv="uv"):
     source = source.resolve()
     if not (source/'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS default runtime source required')
@@ -223,6 +224,15 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
     if recovery:
         if not redis_port or protection or native_limit:
             raise RuntimeError('standalone recovery requires owned Redis')
+        if recovery_sdk is None or not (recovery_sdk/'python/uv.lock').is_file():
+            raise RuntimeError('exact locked SDK Python project required for read-only Proxy route probe')
+        route_environment = directory/'recovery-route-python'
+        route_env = dict(env, UV_PROJECT_ENVIRONMENT=str(route_environment))
+        run([recovery_uv, 'run', '--locked', '--project', str(recovery_sdk/'python'),
+             '--extra', 'rocketmq', '--python', sys.executable, 'python', '-c',
+             'import grpc; import rocketmq'], cwd=source, env=route_env, timeout=240)
+        env['QS_M3_RECOVERY_ROUTE_PROBE'] = json.dumps([
+            str(route_environment/'bin/python'), str(repo/'scripts/rocketmq/route_read_probe.py')])
         tools = {}
         for name, package in (('hotrank-day-rebuild', './scripts/oneoff/hotrank_day_rebuild'),
                               ('answersheet-gap-recover', './scripts/oneoff/answersheet_gap_recover')):

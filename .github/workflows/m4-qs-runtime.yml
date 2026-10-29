@@ -10,6 +10,7 @@ on:
       - scripts/rocketmq/test_qs_worker_acceptance.py
       - scripts/rocketmq/qs_retry_dispatch_acceptance.py
       - scripts/rocketmq/test_qs_retry_dispatch_acceptance.py
+      - scripts/rocketmq/route_read_probe.py
       - scripts/rocketmq/qs_recovery_acceptance.py
       - scripts/rocketmq/test_qs_recovery_acceptance.py
       - scripts/rocketmq/qs_report_acceptance.py
@@ -138,7 +139,7 @@ jobs:
     env:
       GOWORK: 'off'
       GOTOOLCHAIN: local
-      QS_SHA: ${{ inputs.recovery_qs_ref || '313a18c0b906c7948695152032e4e1e82b58e155' }}
+      QS_SHA: ${{ inputs.recovery_qs_ref || 'c50c72c95efba58f44f0e9e7d60ab077b7e2b07b' }}
       SDK_SHA: 559c735b2ceb11827ffbbd1279808b4164bba3d1
       INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
@@ -226,8 +227,9 @@ jobs:
           validate_recovery_module(proof['sdk_module'])
           assert receipt['passed']==len(CASES) and receipt['failed']==receipt['skipped']==0
           assert set(receipt['cases'])==CASES and all(receipt['cases'].values())
-          for flag in ('processing_lease_observed','real_redis','broker_sigkill','worker_sigkill','controlled_provider','worker_pids_distinct','owned_databases_dropped','no_existing_storage','no_production'):
+          for flag in ('proxy_routes_ready','processing_lease_observed','real_redis','broker_sigkill','worker_sigkill','controlled_provider','worker_pids_distinct','owned_databases_dropped','no_existing_storage','no_production'):
               assert receipt[flag] is True
+          assert type(receipt['proxy_routes_checked']) is int and 1 <= receipt['proxy_routes_checked'] <= 128
           assert type(receipt['processing_lease_ttl_ms']) is int and 0 < receipt['processing_lease_ttl_ms'] <= 300000
           Path('m3c-summary.json').write_text(json.dumps(dict(source_sha=os.environ['QS_SHA'],infra_sha=os.environ['INFRA_SHA'],sdk_sha=os.environ['SDK_SHA'],required_cases=len(CASES),report_sha256=hashlib.sha256(p.read_bytes()).hexdigest(),production=False,existing_storage=False),indent=2)+'\n')
           PY

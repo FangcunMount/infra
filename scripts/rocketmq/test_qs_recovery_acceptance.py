@@ -10,7 +10,8 @@ class CurrentRecoveryReceiptTest(unittest.TestCase):
                     broker_sigkill=True, worker_sigkill=True, controlled_provider=True,
                     owned_databases_dropped=True, no_existing_storage=True,
                     no_production=True, worker_pids_distinct=True,
-                    processing_lease_observed=True, processing_lease_ttl_ms=299000)
+                    processing_lease_observed=True, processing_lease_ttl_ms=299000,
+                    proxy_routes_ready=True, proxy_routes_checked=8)
 
     def output(self, value, tail=''):
         return 'M3C_QS_RECOVERY_RECEIPT '+json.dumps(value)+'\n--- PASS: TestM3HostRetirementRecovery (1s)\n'+tail
@@ -38,9 +39,15 @@ class CurrentRecoveryReceiptTest(unittest.TestCase):
         self.assertEqual(parse_recovery_receipt(self.output(self.receipt()), 'a'*40)['passed'], 14)
 
     def test_missing_or_false_physical_boundaries_rejected(self):
-        for field in ('processing_lease_observed', 'real_redis', 'broker_sigkill', 'worker_sigkill', 'worker_pids_distinct', 'owned_databases_dropped'):
+        for field in ('proxy_routes_ready', 'processing_lease_observed', 'real_redis', 'broker_sigkill', 'worker_sigkill', 'worker_pids_distinct', 'owned_databases_dropped'):
             with self.subTest(field=field):
                 row=self.receipt(); row[field]=False
+                with self.assertRaises(RuntimeError):parse_recovery_receipt(self.output(row), 'a'*40)
+
+    def test_actual_proxy_route_coverage_is_required(self):
+        for value in (None, True, 0, 129):
+            with self.subTest(routes=value):
+                row=self.receipt();row['proxy_routes_checked']=value
                 with self.assertRaises(RuntimeError):parse_recovery_receipt(self.output(row), 'a'*40)
 
     def test_actual_lease_ttl_is_required_and_bounded(self):

@@ -780,7 +780,7 @@ def main():
                     mysql_port, mongo_port, mysql_password, ca, run, proof['qs_runtime_host'],
                     owned_native_run, repo, broker_parameters, protection=args.qs_protocol_protection, native_limit=args.qs_native_limit,
                     recovery=bool(args.qs_recovery_host), redis_port=redis_port,
-                    recovery_private_log=args.qs_recovery_private_log)
+                    recovery_private_log=args.qs_recovery_private_log, recovery_sdk=sdk, recovery_uv=args.python)
                 if args.qs_native_limit:
                     for name in proof['qs_runtime_host']['native_limit_receipt']['cases']:
                         passed('qs_native_limit_' + name)
