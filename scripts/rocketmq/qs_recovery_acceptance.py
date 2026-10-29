@@ -2,6 +2,15 @@
 import json
 import re
 
+RECOVERY_MODULE = dict(Path='github.com/FangcunMount/reliable-messaging', Version='v0.6.0',
+    Sum='h1:ncfphXuTE6JtSH9wJTxakZxkLxic4uws15L5dRvYrg0=',
+    GoModSum='h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')
+
+
+def validate_recovery_module(module):
+    if not isinstance(module, dict) or 'Replace' in module or any(module.get(k) != v for k, v in RECOVERY_MODULE.items()):
+        raise RuntimeError('current retirement recovery requires exact published SDK0.6.0 and original module sums')
+
 CASES = frozenset((
     'original_transaction_roots_without_relay',
     'real_redis_current_day_cli_rebuild_and_repeat',

@@ -1,6 +1,6 @@
 import json
 import unittest
-from qs_recovery_acceptance import CASES, parse_recovery_receipt
+from qs_recovery_acceptance import CASES, RECOVERY_MODULE, parse_recovery_receipt, validate_recovery_module
 
 
 class CurrentRecoveryReceiptTest(unittest.TestCase):
@@ -13,6 +13,13 @@ class CurrentRecoveryReceiptTest(unittest.TestCase):
 
     def output(self, value, tail=''):
         return 'M3C_QS_RECOVERY_RECEIPT '+json.dumps(value)+'\n--- PASS: TestM3HostRetirementRecovery (1s)\n'+tail
+
+    def test_published_module_is_exact_without_replacement(self):
+        validate_recovery_module(dict(RECOVERY_MODULE))
+        for field in ('Path', 'Version', 'Sum', 'GoModSum', 'Replace'):
+            with self.subTest(field=field):
+                row=dict(RECOVERY_MODULE);row[field]='wrong'
+                with self.assertRaises(RuntimeError):validate_recovery_module(row)
 
     def test_complete_current_source_receipt(self):
         self.assertEqual(parse_recovery_receipt(self.output(self.receipt()), 'a'*40)['passed'], 14)

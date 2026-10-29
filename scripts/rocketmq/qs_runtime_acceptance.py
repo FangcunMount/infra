@@ -187,7 +187,11 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'], cwd=source, env=env).stdout)
-    validate_module(module, protection or native_limit)
+    if recovery:
+        from qs_recovery_acceptance import validate_recovery_module
+        validate_recovery_module(module)
+    else:
+        validate_module(module, protection or native_limit)
     proof['sdk_module'] = {k: module.get(k) for k in ('Path', 'Version', 'Sum', 'GoModSum')}
     document = runtime_manifest(repo, recovery=recovery)
     accounts = {role: {'username': 'runtime-' + secrets.token_hex(5), 'password': secrets.token_hex(32)}
