@@ -73,3 +73,31 @@ class CurrentRecoveryReceiptTest(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
+class RecoveryDiagnosticTest(unittest.TestCase):
+    def sample(self):
+        return dict(stage='failure', ensure_calls=2, reminder_visits=[True]*4, provider_calls=4,
+            assessment_read_ok=True, assessments=[dict(status='evaluated',count=1)], run_read_ok=True,
+            runs=[dict(status='succeeded',attempt=1,disposition='',lease_expired=True)],
+            dead_letter_read_ok=True, dead_letters=[dict(event_type='evaluation.outcome.committed',attempt=8,disposition='manual_required')],
+            hold_read_ok=True, held_deliveries=None, redis_read_ok=True, worker_lock_pttl_ms=0,
+            mongo={k:dict(count=0,statuses=[],expired_leases=0,read_ok=True) for k in ('report_generations','interpretation_runs','interpret_report_artifacts')})
+
+    def test_fixed_states_only_private_output_ignored(self):
+        from qs_recovery_acceptance import recovery_diagnostics
+        value=self.sample()
+        self.assertEqual(recovery_diagnostics('private log without marker'), [])
+        self.assertEqual(recovery_diagnostics('M3C_COMPLETION_DIAGNOSTIC '+json.dumps(value)),[value])
+
+    def test_refuse_free_text_unbounded_unknown_or_duplicate_records(self):
+        from qs_recovery_acceptance import recovery_diagnostics
+        for change in (dict(raw_error='private DSN'),dict(ensure_calls=True),dict(stage='private'),
+                       dict(worker_lock_pttl_ms=300001),dict(reminder_visits=[True]),
+                       dict(dead_letters=[dict(event_type='credentials://private',attempt=1,disposition='')]),
+                       dict(runs=[dict(status='running',attempt=1,disposition='',lease_expired='true')]),
+                       dict(mongo={})): 
+            with self.subTest(change=change):
+                with self.assertRaises(RuntimeError):
+                    recovery_diagnostics('M3C_COMPLETION_DIAGNOSTIC '+json.dumps(dict(self.sample(),**change)))
+        output='M3C_COMPLETION_DIAGNOSTIC '+json.dumps(self.sample())
+        with self.assertRaises(RuntimeError):recovery_diagnostics(output+'\n'+output)

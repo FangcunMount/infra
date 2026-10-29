@@ -29,6 +29,45 @@ CASES = frozenset((
 ))
 
 
+def recovery_diagnostics(output):
+    """Export only bounded, fixed-schema technical states of owned fixtures."""
+    result = []
+    label = lambda v: isinstance(v, str) and bool(re.fullmatch(r'[a-z0-9_.]{0,80}', v))
+    number = lambda v: type(v) is int and 0 <= v <= 2147483647
+    def rows(value, schema):
+        return value is None or (isinstance(value, list) and len(value) <= 10 and all(
+            isinstance(row, dict) and set(row) == set(schema) and all(check(row[k]) for k, check in schema.items()) for row in value))
+    for line in output.splitlines():
+        if not line.startswith('M3C_COMPLETION_DIAGNOSTIC '):
+            continue
+        try:
+            v = json.loads(line.removeprefix('M3C_COMPLETION_DIAGNOSTIC '))
+        except ValueError:
+            raise RuntimeError('invalid fixed recovery diagnostic') from None
+        flags = {'assessment_read_ok', 'run_read_ok', 'dead_letter_read_ok', 'hold_read_ok', 'redis_read_ok'}
+        fields = flags | {'stage', 'ensure_calls', 'reminder_visits', 'provider_calls', 'assessments', 'runs', 'dead_letters', 'held_deliveries', 'worker_lock_pttl_ms', 'mongo'}
+        if (not isinstance(v, dict) or set(v) != fields or v['stage'] not in {'before_report', 'failure'}
+                or any(type(v[k]) is not bool for k in flags)
+                or not number(v['ensure_calls']) or not number(v['provider_calls'])
+                or not isinstance(v['reminder_visits'], list) or len(v['reminder_visits']) != 4 or any(type(x) is not bool for x in v['reminder_visits'])
+                or type(v['worker_lock_pttl_ms']) is not int or not -2 <= v['worker_lock_pttl_ms'] <= 300000
+                or not rows(v['assessments'], {'status':label,'count':number})
+                or not rows(v['runs'], {'status':label,'attempt':number,'disposition':label,'lease_expired':lambda x:type(x) is bool})
+                or not rows(v['dead_letters'], {'event_type':label,'attempt':number,'disposition':label})
+                or not rows(v['held_deliveries'], {'status':label,'attempt':number,'disposition':label})
+                or not isinstance(v['mongo'], dict) or set(v['mongo']) != {'report_generations','interpretation_runs','interpret_report_artifacts'}):
+            raise RuntimeError('unsafe or incomplete fixed recovery diagnostic')
+        for m in v['mongo'].values():
+            if (not isinstance(m, dict) or set(m) != {'count','statuses','expired_leases','read_ok'}
+                    or type(m['read_ok']) is not bool or not number(m['count']) or not number(m['expired_leases'])
+                    or not isinstance(m['statuses'], list) or len(m['statuses']) > 10 or not all(label(x) for x in m['statuses'])):
+                raise RuntimeError('unsafe fixed recovery collection diagnostic')
+        if len(result) >= 2 or any(r['stage'] == v['stage'] for r in result):
+            raise RuntimeError('duplicate fixed recovery diagnostic')
+        result.append(v)
+    return result
+
+
 def parse_recovery_receipt(output, source):
     rows = [json.loads(line.removeprefix('M3C_QS_RECOVERY_RECEIPT '))
             for line in output.splitlines() if line.startswith('M3C_QS_RECOVERY_RECEIPT ')]

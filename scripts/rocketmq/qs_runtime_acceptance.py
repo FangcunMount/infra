@@ -288,6 +288,9 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         proof['diagnostics'] = host_failure_summary(output)
         proof['diagnostics']['assertion_lines'] = sorted(set(map(int, re.findall(r'(?:owner_runtime_native|rocketmq_recovery_m3c)_integration_test\.go:(\d+)', output))))[:32]
         proof['diagnostics']['owner_runtime'] = runtime_diagnostics(output)
+        if recovery:
+            from qs_recovery_acceptance import recovery_diagnostics
+            proof['diagnostics']['recovery_completion'] = recovery_diagnostics(output)
         if result.returncode:
             raise RuntimeError('actual default QS owners failed; private output withheld')
         if recovery:
