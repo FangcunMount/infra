@@ -140,7 +140,7 @@ jobs:
     env:
       GOWORK: 'off'
       GOTOOLCHAIN: local
-      QS_SHA: ${{ inputs.recovery_qs_ref || 'c50c72c95efba58f44f0e9e7d60ab077b7e2b07b' }}
+      QS_SHA: ${{ inputs.recovery_qs_ref || 'c5ce12401bf3462c87822354b3d9ed047c48a697' }}
       SDK_SHA: 559c735b2ceb11827ffbbd1279808b4164bba3d1
       INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
