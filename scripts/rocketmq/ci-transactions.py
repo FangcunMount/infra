@@ -1380,7 +1380,7 @@ def main():
                 'Controlled IAM identity and notification HTTP provider; no production/system login or AI quality claim',
                 'Operator response loss and post-freeze interruption are controlled; Worker and Broker exits are actual SIGKILL',
                 'Standalone API daemon/startup/deployment and existing-storage retirement are not claimed']
-        report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
+        report["go_runtime_patch"] = ("published SDK0.6.0 with its embedded v5.1.4 RPC/TLS driver" if args.qs_recovery_host else "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)")
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
                                               repo / "components/rocketmq/docker-compose.yml", repo / "scripts/rocketmq/sdk_acceptance.py",
