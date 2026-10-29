@@ -1378,7 +1378,8 @@ def main():
             report['qs_recovery_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_recovery_acceptance.py').read_bytes()).hexdigest()
             report['limits'] = ['Real owned RocketMQ/MySQL/Mongo/Redis, production Worker process root and original application services',
                 'Controlled IAM identity and notification HTTP provider; no production/system login or AI quality claim',
-                'Operator response loss and post-freeze interruption are controlled; Worker and Broker exits are actual SIGKILL',
+                'Operator response loss, frozen interruption, original Mongo claim post-commit pause and late report RPC delay are controlled; Worker and Broker exits are actual SIGKILL',
+                'Production-default Evaluation/Interpretation lease runners use real leader locks and original lease durations; negative-only omission is never an accepted profile',
                 'Standalone API daemon/startup/deployment and existing-storage retirement are not claimed']
         report["go_runtime_patch"] = ("published SDK0.6.0 with its embedded v5.1.4 RPC/TLS driver" if args.qs_recovery_host else "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)")
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
