@@ -57,7 +57,7 @@ jobs:
       GOFLAGS: -mod=readonly
       # PR acceptance freezes the coordinated M2 hosts, without merging or deploying.
       QS_REF: ${{ inputs.qs_ref || '527aa628712a4b32a0d2edcbf84eccd19c51f215' }}
-      AI_REF: ${{ inputs.ai_ref || 'c54abc5798a296e6226aa4007073ea06a331d3d1' }}
+      AI_REF: ${{ inputs.ai_ref || '8ce8e8d23e7e9bc4666319afeda84557e98a870d' }}
       QS_AI_READABLE_ROUTES: '1'
       QS_AI_READABLE_SDK_PROFILE: ${{ inputs.sdk_profile || 'readable-stable' }}
       QS_M3_PAIRED_PROFILE: full
