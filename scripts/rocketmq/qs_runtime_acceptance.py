@@ -276,7 +276,7 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         proof['native_output_sha256'] = hashlib.sha256(output.encode()).hexdigest()
         proof['native_exit_code'] = result.returncode
         proof['diagnostics'] = host_failure_summary(output)
-        proof['diagnostics']['assertion_lines'] = sorted(set(map(int, re.findall(r'owner_runtime_native_integration_test\.go:(\d+)', output))))[:32]
+        proof['diagnostics']['assertion_lines'] = sorted(set(map(int, re.findall(r'(?:owner_runtime_native|rocketmq_recovery_m3c)_integration_test\.go:(\d+)', output))))[:32]
         proof['diagnostics']['owner_runtime'] = runtime_diagnostics(output)
         if result.returncode:
             raise RuntimeError('actual default QS owners failed; private output withheld')
