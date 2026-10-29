@@ -10,6 +10,7 @@ on:
       - scripts/rocketmq/test_qs_worker_acceptance.py
       - scripts/rocketmq/qs_retry_dispatch_acceptance.py
       - scripts/rocketmq/test_qs_retry_dispatch_acceptance.py
+      - scripts/rocketmq/test_python_live_recovery.py
       - scripts/rocketmq/route_read_probe.py
       - scripts/rocketmq/qs_recovery_acceptance.py
       - scripts/rocketmq/test_qs_recovery_acceptance.py
@@ -172,6 +173,7 @@ jobs:
           test "$(git -C .qs-recovery rev-parse HEAD)" = "$QS_SHA"
           test "$(git -C .sdk-recovery rev-parse HEAD)" = "$SDK_SHA"
           python3 -m unittest discover -s scripts/rocketmq -p 'test_qs*acceptance.py' -v
+          python3 -m unittest discover -s scripts/rocketmq -p test_python_live_recovery.py -v
           go -C .qs-recovery list -m -json github.com/FangcunMount/reliable-messaging > "$RUNNER_TEMP/m3c-sdk.json"
           python3 - "$RUNNER_TEMP/m3c-sdk.json" <<'PY'
           import json,sys
