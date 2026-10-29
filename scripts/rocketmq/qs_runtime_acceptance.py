@@ -6,7 +6,7 @@ import re
 import secrets
 
 from host_sdk_contract import stable_module_matches
-from iam_acceptance import host_failure_summary
+from iam_acceptance import host_failure_summary, retain_private_host_output
 from m3_resources import manifest
 from provision_v2 import Admin, provision
 from routes import validate_v2
@@ -180,7 +180,7 @@ def runtime_diagnostics(output):
 
 
 def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_port, mongo_port,
-                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False, native_limit=False, recovery=False, redis_port=None):
+                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False, native_limit=False, recovery=False, redis_port=None, recovery_private_log=None):
     source = source.resolve()
     if not (source/'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS default runtime source required')
@@ -260,6 +260,8 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
                     cwd=source, env=env, timeout=720 if recovery else 480, required=False)
         output = result.stdout+result.stderr
         private = directory/'qs-owner-runtime-private.log'; private.write_text(output); private.chmod(0o600)
+        if recovery_private_log is not None:
+            retain_private_host_output(recovery_private_log, output)
         proof['native_output_sha256'] = hashlib.sha256(output.encode()).hexdigest()
         proof['native_exit_code'] = result.returncode
         proof['diagnostics'] = host_failure_summary(output)

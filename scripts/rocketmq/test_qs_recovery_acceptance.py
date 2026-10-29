@@ -1,0 +1,42 @@
+import json
+import unittest
+from qs_recovery_acceptance import CASES, parse_recovery_receipt
+
+
+class CurrentRecoveryReceiptTest(unittest.TestCase):
+    def receipt(self):
+        return dict(source_sha='a'*40, passed=len(CASES), failed=0, skipped=0,
+                    cases={k: True for k in CASES}, real_redis=True,
+                    broker_sigkill=True, worker_sigkill=True, controlled_provider=True,
+                    owned_databases_dropped=True, no_existing_storage=True,
+                    no_production=True, worker_pids_distinct=True)
+
+    def output(self, value, tail=''):
+        return 'M3C_QS_RECOVERY_RECEIPT '+json.dumps(value)+'\n--- PASS: TestM3HostRetirementRecovery (1s)\n'+tail
+
+    def test_complete_current_source_receipt(self):
+        self.assertEqual(parse_recovery_receipt(self.output(self.receipt()), 'a'*40)['passed'], 14)
+
+    def test_missing_or_false_physical_boundaries_rejected(self):
+        for field in ('real_redis', 'broker_sigkill', 'worker_sigkill', 'worker_pids_distinct', 'owned_databases_dropped'):
+            with self.subTest(field=field):
+                row=self.receipt(); row[field]=False
+                with self.assertRaises(RuntimeError):parse_recovery_receipt(self.output(row), 'a'*40)
+
+    def test_wrong_source_missing_case_and_old_receipt_rejected(self):
+        for change in ('source', 'case', 'old'):
+            with self.subTest(change=change):
+                row=self.receipt()
+                if change=='source':row['source_sha']='b'*40
+                if change=='case':row['cases'].pop(next(iter(CASES)))
+                output=self.output(row)
+                if change=='old':output=output.replace('M3C_QS_RECOVERY_RECEIPT ', 'M3_QS_DEFAULT_OWNER_RECEIPT ')
+                with self.assertRaises(RuntimeError):parse_recovery_receipt(output, 'a'*40)
+
+    def test_skipped_failed_duplicate_or_race_output_rejected(self):
+        for suffix in ('--- SKIP: hidden (1s)', '--- FAIL: hidden (1s)', 'WARNING: DATA RACE', self.output(self.receipt())):
+            with self.subTest(suffix=suffix[:20]):
+                with self.assertRaises(RuntimeError):parse_recovery_receipt(self.output(self.receipt(), suffix), 'a'*40)
+
+
+if __name__=='__main__':unittest.main()

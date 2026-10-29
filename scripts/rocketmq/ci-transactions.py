@@ -236,7 +236,10 @@ def main():
     parser.add_argument("--sdk-python-live-recovery", action="store_true", help="source-candidate Python producer survives actual owned Broker SIGKILL")
     parser.add_argument("--readable-hosts", action="store_true", help="separate published-SDK readable IAM fanout or QS original-root fixture")
     parser.add_argument("--qs-recovery-host", type=Path, help="host retirement M3-C: real business recovery, Redis, Broker and Worker restart")
+    parser.add_argument("--qs-recovery-private-log", type=Path, help="new0600 diagnostic in an owned0700 local directory; never upload")
     args = parser.parse_args()
+    if args.qs_recovery_private_log and not args.qs_recovery_host:
+        parser.error("private recovery diagnostics require the explicit recovery profile")
     if args.qs_recovery_host:
         if any((args.qs_runtime_host, args.qs_protocol_protection, args.qs_native_limit)):
             parser.error("current recovery requires its standalone runtime profile")
@@ -461,6 +464,9 @@ def main():
             spec['services']['mongo']['command'] += ['--setParameter', 'enableTestCommands=1']
     redis_port = None
     if args.qs_recovery_host:
+        # Full application schema on tmpfs exceeds the protocol-only 512MiB
+        # startup budget in the managed executor (recorded native OOM).
+        spec["services"]["mysql"]["mem_limit"] = "1g"
         redis_port = port()
         redis_pin = "redis:7.4.2-alpine"
         run(["docker", "pull", redis_pin], timeout=300)
@@ -771,7 +777,8 @@ def main():
                 run_qs_runtime_host(args.qs_runtime_host, directory, broker, project, grpc_port,
                     mysql_port, mongo_port, mysql_password, ca, run, proof['qs_runtime_host'],
                     owned_native_run, repo, broker_parameters, protection=args.qs_protocol_protection, native_limit=args.qs_native_limit,
-                    recovery=bool(args.qs_recovery_host), redis_port=redis_port)
+                    recovery=bool(args.qs_recovery_host), redis_port=redis_port,
+                    recovery_private_log=args.qs_recovery_private_log)
                 if args.qs_native_limit:
                     for name in proof['qs_runtime_host']['native_limit_receipt']['cases']:
                         passed('qs_native_limit_' + name)
