@@ -18,4 +18,19 @@ class StableHostModule(unittest.TestCase):
             self.assertFalse(stable_module_matches(candidate))
             with self.assertRaises(RuntimeError):validate_module(candidate)
 
+class PublishedRotationPatch(unittest.TestCase):
+    def test_patch_release_is_separate_from_frozen_v05_contract(self):
+        from host_sdk_contract import ROTATION_MODULE, validate_rotation_module
+        validate_rotation_module(dict(ROTATION_MODULE))
+        self.assertFalse(stable_module_matches(ROTATION_MODULE))
+        with self.assertRaises(RuntimeError):validate_rotation_module(STABLE_MODULE)
+
+    def test_missing_wrong_fields_and_all_replace_values_fail(self):
+        from host_sdk_contract import ROTATION_MODULE, validate_rotation_module
+        for k in ROTATION_MODULE:
+            for v in ({x:y for x,y in ROTATION_MODULE.items() if x != k},dict(ROTATION_MODULE, **{k:'wrong'})):
+                with self.assertRaises(RuntimeError):validate_rotation_module(v)
+        for v in (None, {}, 'local'):
+            with self.assertRaises(RuntimeError):validate_rotation_module(dict(ROTATION_MODULE,Replace=v))
+
 if __name__=='__main__':unittest.main()

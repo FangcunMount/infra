@@ -1,9 +1,40 @@
 import json
 import unittest
+import tempfile
 from pathlib import Path
-from qs_worker_acceptance import CASES, SCOPE, parse_worker_receipt, worker_failure_diagnostics, worker_manifest
+from qs_worker_acceptance import CASES, SCOPE, parse_worker_receipt, physical_receive_diagnostics, worker_failure_diagnostics, worker_manifest
 
 class WorkerRuntimeReceiptTest(unittest.TestCase):
+    def test_physical_rpc_diagnostics_are_bounded_aliases_not_payloads_or_errors(self):
+        document = dict(routes=[dict(id='qs-evaluation-mysql',physical_topic='physical-fixture')])
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);directory=root/'probe-owned-client';directory.mkdir()
+            log=directory/'rocketmq_client_go.log'
+            log.write_text(
+                '2026-10-30T04:00:00.000Z\tDEBUG\tdriver/rpc_client.go:176\treceiveMessage request: physical-fixture SECRET-WIRE\n'
+                '2026-10-30T04:00:07.500Z\tDEBUG\tdriver/simple_consumer.go:242\treceiveMessage response: status:{code:MESSAGE_NOT_FOUND message:"SECRET-ERROR"}\n'
+                '2026-10-30T04:00:07.600Z\tDEBUG\tdriver/rpc_client.go:160\tendTransaction request: SECRET-TRANSACTION\n'
+                '2026-10-30T04:00:08.000Z\tDEBUG\tdriver/rpc_client.go:176\treceiveMessage request: unknown-physical SECRET-IDENTITY\n'
+                '2026-10-30T04:00:09.000Z\tDEBUG\tdriver/simple_consumer.go:242\treceiveMessage response: status:{code:OK}\n')
+            value=physical_receive_diagnostics(root,document)
+            self.assertTrue(value['available']);self.assertFalse(value['truncated'])
+            self.assertEqual(value['events'],[dict(ms=0,kind='receive_start',input='qs-evaluation-mysql'),dict(ms=7500,kind='receive_status',input='qs-evaluation-mysql',status='empty'),dict(ms=7600,kind='transaction_end_rpc')])
+            self.assertNotIn('SECRET',json.dumps(value));self.assertNotIn('physical-fixture',json.dumps(value))
+            log.write_text('invalid\tDEBUG\tfile\treceiveMessage request: physical-fixture\n')
+            self.assertFalse(physical_receive_diagnostics(root,document)['available'])
+            log.write_text('2026-10-30T04:00:00Z\tDEBUG\tfile\treceiveMessage request: physical-fixture\n'*300)
+            value=physical_receive_diagnostics(root,document)
+            self.assertTrue(value['truncated']);self.assertEqual(len(value['events']),256)
+
+    def test_physical_rpc_missing_and_untrusted_route_aliases_are_not_exported(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            self.assertFalse(physical_receive_diagnostics(root,dict(routes=[]))['available'])
+            directory=root/'probe-owned-client';directory.mkdir()
+            (directory/'rocketmq_client_go.log').write_text('2026-10-30T04:00:00Z\tDEBUG\tfile\treceiveMessage request: physical\n')
+            value=physical_receive_diagnostics(root,dict(routes=[dict(id='SECRET-ALIAS',physical_topic='physical')]))
+            self.assertFalse(value['available']);self.assertNotIn('SECRET',json.dumps(value))
+
     def output(self):
         receipt = dict(source_sha='a'*40, passed=len(CASES), failed=0, skipped=0,
                        cases={case: True for case in CASES}, scope=SCOPE,

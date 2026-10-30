@@ -100,7 +100,7 @@ class Probe:
         self.client_logs = directory / (Path(self.log.name).stem + "-client")
         self.client_logs.mkdir(mode=0o700)
         env = dict(env, **{'rocketmq.client.logRoot': str(self.client_logs),
-                          'rocketmq.client.logLevel': 'error'})
+                          'rocketmq.client.logLevel': 'debug' if env.get('QS_WORKER_RECEIVE_DIAGNOSTICS') == '1' else 'error'})
         self.process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=self.log, text=True, env=env, bufsize=1,
                                         start_new_session=True, cwd=cwd)
@@ -237,7 +237,15 @@ def main():
     parser.add_argument("--readable-hosts", action="store_true", help="separate published-SDK readable IAM fanout or QS original-root fixture")
     parser.add_argument("--qs-recovery-host", type=Path, help="host retirement M3-C: real business recovery, Redis, Broker and Worker restart")
     parser.add_argument("--qs-recovery-private-log", type=Path, help="new0600 diagnostic in an owned0700 local directory; never upload")
+    parser.add_argument("--qs-receive-rotation-candidate", action="store_true", help="exact published Go rotation patch; only explicit Worker or M3-C adoption")
     args = parser.parse_args()
+    if args.qs_receive_rotation_candidate:
+        from host_sdk_contract import ROTATION_SDK_SHA
+        if not ((args.qs_deferred_consumer_host and args.qs_deferred_kind == 'worker') or args.qs_recovery_host):
+            parser.error('rotation candidate requires explicit Worker or M3-C profile')
+        if run(['git', 'rev-parse', 'HEAD'], cwd=args.sdk).stdout.strip() != ROTATION_SDK_SHA:
+            parser.error('rotation candidate SDK source is not the exact reviewed revision')
+
     if args.qs_recovery_private_log and not args.qs_recovery_host:
         parser.error("private recovery diagnostics require the explicit recovery profile")
     if args.qs_recovery_host:
@@ -635,7 +643,7 @@ def main():
                 from qs_worker_acceptance import run_qs_worker_host
                 run_qs_worker_host(args.qs_deferred_consumer_host, directory, broker, project, grpc_port,
                                    mysql_port, mysql_password, ca, run, proof['qs_deferred_consumer_host'],
-                                   owned_native_run, repo, args.qs_deferred_consumer_private_log)
+                                   owned_native_run, repo, args.qs_deferred_consumer_private_log, rotation_candidate=args.qs_receive_rotation_candidate)
                 # Same exact QS candidate also proves its immutable SQL/lease/
                 # SIGKILL component boundary; keep that narrower receipt separate.
                 from qs_deferred_acceptance import run_qs_deferred_host
@@ -780,7 +788,8 @@ def main():
                     mysql_port, mongo_port, mysql_password, ca, run, proof['qs_runtime_host'],
                     owned_native_run, repo, broker_parameters, protection=args.qs_protocol_protection, native_limit=args.qs_native_limit,
                     recovery=bool(args.qs_recovery_host), redis_port=redis_port,
-                    recovery_private_log=args.qs_recovery_private_log, recovery_sdk=sdk, recovery_uv=args.python)
+                    recovery_private_log=args.qs_recovery_private_log, recovery_sdk=sdk, recovery_uv=args.python,
+                    rotation_candidate=args.qs_receive_rotation_candidate)
                 if args.qs_native_limit:
                     for name in proof['qs_runtime_host']['native_limit_receipt']['cases']:
                         passed('qs_native_limit_' + name)
@@ -1381,7 +1390,8 @@ def main():
                 'Operator response loss, frozen interruption, original Mongo claim post-commit pause and late report RPC delay are controlled; Worker and Broker exits are actual SIGKILL',
                 'Production-default Evaluation/Interpretation lease runners use real leader locks and original lease durations; negative-only omission is never an accepted profile',
                 'Standalone API daemon/startup/deployment and existing-storage retirement are not claimed']
-        report["go_runtime_patch"] = ("published SDK0.6.0 with its embedded v5.1.4 RPC/TLS driver" if args.qs_recovery_host else "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)")
+        report["go_runtime_patch"] = ("published Go v0.6.1 with input rotation correction; host adoption proof" if args.qs_receive_rotation_candidate else
+            ("published SDK0.6.0 with its embedded v5.1.4 RPC/TLS driver" if args.qs_recovery_host else "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"))
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
                                               repo / "components/rocketmq/docker-compose.yml", repo / "scripts/rocketmq/sdk_acceptance.py",

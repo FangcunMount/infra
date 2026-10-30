@@ -107,3 +107,24 @@ class RecoveryDiagnosticTest(unittest.TestCase):
                     recovery_diagnostics('M3C_COMPLETION_DIAGNOSTIC '+json.dumps(dict(self.sample(),**change)))
         output='M3C_COMPLETION_DIAGNOSTIC '+json.dumps(self.sample())
         with self.assertRaises(RuntimeError):recovery_diagnostics(output+'\n'+output)
+
+
+class GateDiagnosticTest(unittest.TestCase):
+    def value(self):
+        return dict(worker='replacement',truncated=False,counts=dict.fromkeys(
+            ('contention_retry','wait_started','wait_completed','wait_cancelled','wait_exhausted','ensure_failed','processed'),0))
+    def parse(self,v):
+        from qs_recovery_acceptance import recovery_gate_diagnostics
+        return recovery_gate_diagnostics('M3C_WORKER_GATE_DIAGNOSTIC '+json.dumps(v))
+    def test_fixed_counts_only(self):
+        self.assertEqual(self.parse(self.value()),[self.value()])
+    def test_private_fields_wrong_types_and_unbounded_counts_fail(self):
+        for value in [dict(self.value(),raw='PRIVATE'),dict(self.value(),worker='PRIVATE'),dict(self.value(),truncated=0),dict(self.value(),counts={'raw-error':1})]:
+            with self.assertRaises(RuntimeError):self.parse(value)
+        for count in (-1,10001,True):
+            value=self.value();value['counts']['contention_retry']=count
+            with self.assertRaises(RuntimeError):self.parse(value)
+    def test_duplicate_workers_rejected(self):
+        from qs_recovery_acceptance import recovery_gate_diagnostics
+        line='M3C_WORKER_GATE_DIAGNOSTIC '+json.dumps(self.value())
+        with self.assertRaises(RuntimeError):recovery_gate_diagnostics(line+'\n'+line)

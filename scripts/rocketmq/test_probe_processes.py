@@ -45,6 +45,21 @@ class ProbeProcessTest(unittest.TestCase):
 
 
 class ProbeCursorTest(unittest.TestCase):
+    def test_worker_debug_flag_keeps_logs_in_the_owned_private_directory(self):
+        for flag, expected in ((None, 'error'), ('1', 'debug'), ('true', 'error')):
+            with self.subTest(flag=flag), tempfile.TemporaryDirectory() as directory:
+                env=dict(os.environ)
+                env.pop('QS_WORKER_RECEIVE_DIAGNOSTICS',None)
+                if flag is not None:env['QS_WORKER_RECEIVE_DIAGNOSTICS']=flag
+                env['rocketmq.client.logRoot']='untrusted-parent-path'
+                code="import os,json;print('TXPROBE '+json.dumps({'event':'logging','level':os.getenv('rocketmq.client.logLevel'),'root':os.getenv('rocketmq.client.logRoot')}),flush=True)"
+                probe=harness.Probe([sys.executable,'-c',code],Path(directory),env)
+                self.addCleanup(probe.close)
+                value=probe.wait('logging',timeout=5)
+                self.assertEqual(value['level'],expected)
+                self.assertEqual(value['root'],str(probe.client_logs))
+                probe.finish();self.assertTrue(probe.close())
+
     def test_second_control_reply_cannot_reuse_a_prior_stats_event(self):
         with tempfile.TemporaryDirectory() as directory:
             code = """import sys,json
