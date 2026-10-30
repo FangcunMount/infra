@@ -83,4 +83,12 @@ for uid in ('event-overview', 'event-transactions'):
     matches = valid and actual.get('title') == expected.get('title') and panels(actual.get('panels', [])) == panels(expected.get('panels', []))
     report['dashboards'][uid] = dict(status=status, anonymous_status=anonymous_status,
         authentication=authentication, api_verified=valid, frozen_panel_model_matches=matches)
+status, _ = read('http://127.0.0.1:13000/api/dashboards/uid/event-outbox')
+anonymous_status = status
+authentication = 'anonymous'
+if status == 401:
+    status, _ = configured_dashboard('event-outbox')
+    authentication = 'existing_grafana_runtime_account'
+report['retired_dashboards'] = {'event-outbox': dict(status=status, anonymous_status=anonymous_status,
+    authentication=authentication, removed=status == 404)}
 Path('monitoring-observation.json').write_text(json.dumps(report, indent=2) + '\n')
