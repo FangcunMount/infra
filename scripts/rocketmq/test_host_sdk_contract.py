@@ -18,8 +18,8 @@ class StableHostModule(unittest.TestCase):
             self.assertFalse(stable_module_matches(candidate))
             with self.assertRaises(RuntimeError):validate_module(candidate)
 
-class RotationCandidate(unittest.TestCase):
-    def test_exact_candidate_is_separate_from_stable(self):
+class PublishedRotationPatch(unittest.TestCase):
+    def test_patch_release_is_separate_from_frozen_v05_contract(self):
         from host_sdk_contract import ROTATION_MODULE, validate_rotation_module
         validate_rotation_module(dict(ROTATION_MODULE))
         self.assertFalse(stable_module_matches(ROTATION_MODULE))

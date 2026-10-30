@@ -237,7 +237,7 @@ def main():
     parser.add_argument("--readable-hosts", action="store_true", help="separate published-SDK readable IAM fanout or QS original-root fixture")
     parser.add_argument("--qs-recovery-host", type=Path, help="host retirement M3-C: real business recovery, Redis, Broker and Worker restart")
     parser.add_argument("--qs-recovery-private-log", type=Path, help="new0600 diagnostic in an owned0700 local directory; never upload")
-    parser.add_argument("--qs-receive-rotation-candidate", action="store_true", help="explicit immutable downloaded Go candidate; only Worker or M3-C, never stable acceptance")
+    parser.add_argument("--qs-receive-rotation-candidate", action="store_true", help="exact published Go rotation patch; only explicit Worker or M3-C adoption")
     args = parser.parse_args()
     if args.qs_receive_rotation_candidate:
         from host_sdk_contract import ROTATION_SDK_SHA
@@ -1390,7 +1390,7 @@ def main():
                 'Operator response loss, frozen interruption, original Mongo claim post-commit pause and late report RPC delay are controlled; Worker and Broker exits are actual SIGKILL',
                 'Production-default Evaluation/Interpretation lease runners use real leader locks and original lease durations; negative-only omission is never an accepted profile',
                 'Standalone API daemon/startup/deployment and existing-storage retirement are not claimed']
-        report["go_runtime_patch"] = ("downloaded Go rotation review candidate, embedded v5.1.4 driver; not stable release acceptance" if args.qs_receive_rotation_candidate else
+        report["go_runtime_patch"] = ("published Go v0.6.1 with input rotation correction; host adoption proof" if args.qs_receive_rotation_candidate else
             ("published SDK0.6.0 with its embedded v5.1.4 RPC/TLS driver" if args.qs_recovery_host else "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"))
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",

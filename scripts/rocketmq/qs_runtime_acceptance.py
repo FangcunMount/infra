@@ -194,7 +194,7 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
     if rotation_candidate:
         from host_sdk_contract import validate_rotation_module
         validate_rotation_module(module)
-        proof['sdk_adoption_scope'] = 'downloaded review candidate; not a stable release'
+        proof['sdk_adoption_scope'] = 'published Go v0.6.1; host adoption candidate'
     elif recovery:
         from qs_recovery_acceptance import validate_recovery_module
         validate_recovery_module(module)

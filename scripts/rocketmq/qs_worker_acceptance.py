@@ -153,7 +153,7 @@ def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port
     if rotation_candidate:
         from host_sdk_contract import validate_rotation_module
         validate_rotation_module(module)
-        proof['sdk_adoption_scope'] = 'downloaded review candidate; not a stable release'
+        proof['sdk_adoption_scope'] = 'published Go v0.6.1; host adoption candidate'
     elif not stable_module_matches(module) and (module.get('Replace') or module.get('Version') != 'v0.5.0-rocketmq-tx.2' or not module.get('Sum')):
         raise RuntimeError('fixed published worker SDK without replace required')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
