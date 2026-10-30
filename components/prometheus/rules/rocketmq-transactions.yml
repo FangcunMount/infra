@@ -2,6 +2,15 @@ groups:
 - name: rocketmq-transactions
   interval: 30s
   rules:
+  - alert: BusinessReceiptObservationUnavailable
+    expr: (qs_server_ai_mq_observation_available == 0) or (qs_ai_mq_observation_available == 0)
+    for: 2m
+    labels:
+      severity: warning
+      subsystem: messaging
+    annotations:
+      summary: Current business receipt observation is unavailable
+      description: Inspect the database reader before interpreting receipt backlog. A failed sample is not an empty queue.
   - alert: RocketMQTransactionObservationUnavailable
     expr: (reliable_messaging_transaction_observation_available == 0) or (reliable_messaging_transaction_observation_fresh
       == 0)
@@ -10,8 +19,8 @@ groups:
       subsystem: messaging
     annotations:
       summary: Transaction protocol observation unavailable
-      description: New sends must remain paused. Inspect the primary-store binding, sampler and actual in-flight
-        work; failed reads do not mean zero responsibility.
+      description: New sends must remain paused. Inspect the primary-store binding, sampler and actual in-flight work; failed
+        reads do not mean zero responsibility.
     for: 2m
   - alert: RocketMQTransactionConfirmationObservationAged
     expr: (reliable_messaging_transaction_oldest_confirmation_observation_age_seconds >= 120) and (reliable_messaging_transaction_confirmation_gap_branches
@@ -21,8 +30,8 @@ groups:
       subsystem: messaging
     annotations:
       summary: Transaction confirmation audit gap exceeds warning age
-      description: Inspect exact original witnesses and positive recovery RPC audits. This is observation debt,
-        not exact Broker backlog or permission to rerun business.
+      description: Inspect exact original witnesses and positive recovery RPC audits. This is observation debt, not exact
+        Broker backlog or permission to rerun business.
   - alert: RocketMQTransactionPreparationExpired
     expr: (reliable_messaging_transaction_prepared_expiry_age_seconds >= 120) and (reliable_messaging_transaction_preparing_executions
       > 0) and (reliable_messaging_transaction_observation_fresh == 1)
@@ -31,8 +40,8 @@ groups:
       subsystem: messaging
     annotations:
       summary: Transaction preparation remains expired
-      description: Inspect exact execution and bounded abort maintenance. Lease expiry alone is not rollback evidence
-        or permission to repeat the executor.
+      description: Inspect exact execution and bounded abort maintenance. Lease expiry alone is not rollback evidence or permission
+        to repeat the executor.
   - alert: RocketMQTransactionAdmissionProtected
     expr: reliable_messaging_transaction_admission_protected == 1
     labels:
@@ -40,19 +49,19 @@ groups:
       subsystem: messaging
     annotations:
       summary: Transaction owner admission protection latched
-      description: Retain Checker and primary dependencies. Resolve exact responsibility, record a matching generation
-        and named review, then explicitly restore admission; do not switch providers.
+      description: Retain Checker and primary dependencies. Resolve exact responsibility, record a matching generation and
+        named review, then explicitly restore admission; do not switch providers.
   - alert: RocketMQTransactionCheckerSaturated
     expr: ((reliable_messaging_transaction_running_checks + reliable_messaging_transaction_queued_checks) >= (reliable_messaging_transaction_check_workers_limit
-      + reliable_messaging_transaction_check_queue_limit)) and (reliable_messaging_transaction_check_workers_limit
-      > 0) and (reliable_messaging_transaction_sdk_stopping == 0)
+      + reliable_messaging_transaction_check_queue_limit)) and (reliable_messaging_transaction_check_workers_limit > 0) and
+      (reliable_messaging_transaction_sdk_stopping == 0)
     labels:
       severity: critical
       subsystem: messaging
     annotations:
       summary: Transaction Checker capacity continuously saturated
-      description: Preserve the existing shared owner budget and still-running work. Inspect database and RPC completion
-        before reviewing protection; cancellation does not release actual capacity.
+      description: Preserve the existing shared owner budget and still-running work. Inspect database and RPC completion before
+        reviewing protection; cancellation does not release actual capacity.
     for: 2m
   - alert: RocketMQTransactionEvidenceUnsafe
     expr: (reliable_messaging_transaction_metadata_conflicts > 0) or (reliable_messaging_transaction_unaged_confirmation_gap_branches
@@ -62,8 +71,8 @@ groups:
       subsystem: messaging
     annotations:
       summary: Transaction protocol evidence requires review
-      description: Refuse new owner executions and inspect exact persistent binding and witnesses. Do not synthesize
-        a positive confirmation or discard unclassified evidence.
+      description: Refuse new owner executions and inspect exact persistent binding and witnesses. Do not synthesize a positive
+        confirmation or discard unclassified evidence.
   - alert: RocketMQTransactionRecoveryAuditFailure
     expr: increase(reliable_messaging_transaction_recovery_audits_total{outcome=~"error|unsupported"}[5m]) > 0
     labels:
@@ -71,8 +80,8 @@ groups:
       subsystem: messaging
     annotations:
       summary: Transaction positive recovery audit failed
-      description: A Broker acknowledgement and audit persistence are separate. Keep the original reference and
-        terminal evidence; use named recovery rather than business or model replay.
+      description: A Broker acknowledgement and audit persistence are separate. Keep the original reference and terminal evidence;
+        use named recovery rather than business or model replay.
   - alert: RocketMQTransactionInvalidCheck
     expr: increase(reliable_messaging_transaction_checks_total{outcome="invalid"}[5m]) > 0
     labels:
@@ -80,5 +89,25 @@ groups:
       subsystem: messaging
     annotations:
       summary: Transaction owner rejected invalid recovery evidence
-      description: Inspect owner, route, wire hash and primary binding; retain Checker. Review only the matching
-        protection generation with fresh authoritative evidence.
+      description: Inspect owner, route, wire hash and primary binding; retain Checker. Review only the matching protection
+        generation with fresh authoritative evidence.
+  - alert: QSCommandReceiptDelayed
+    expr: (qs_server_ai_mq_oldest_awaiting_command_receipt_seconds > 300) and (qs_server_ai_mq_observation_available == 1)
+    for: 5m
+    labels:
+      severity: warning
+      subsystem: messaging
+    annotations:
+      summary: QS commands are awaiting AI admission receipts
+      description: Inspect the current business receipt and consumer state. Broker confirmation alone does not complete this
+        responsibility.
+  - alert: AIInterpretationReceiptDelayed
+    expr: (qs_ai_mq_oldest_pending_interpretation_receipt_seconds > 300) and (qs_ai_mq_observation_available == 1)
+    for: 5m
+    labels:
+      severity: warning
+      subsystem: messaging
+    annotations:
+      summary: AI interpretation states are awaiting QS business ACKs
+      description: Inspect the current business receipt and consumer state. Broker confirmation alone does not complete this
+        responsibility.

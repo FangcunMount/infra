@@ -1,0 +1,97 @@
+rule_files:
+  - ../rules/rocketmq-transactions.yml
+evaluation_interval: 1m
+tests:
+  - name: business wait alerts require a successful current sample
+    interval: 1m
+    input_series:
+      - series: qs_server_ai_mq_oldest_awaiting_command_receipt_seconds
+        values: '600 600 600 600 600 600 600'
+      - series: qs_server_ai_mq_observation_available
+        values: '0 0 0 0 0 0 0'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: QSCommandReceiptDelayed
+        exp_alerts: []
+  - name: pending command business receipts alert after five minutes
+    interval: 1m
+    input_series:
+      - series: qs_server_ai_mq_oldest_awaiting_command_receipt_seconds
+        values: '600 600 600 600 600 600 600'
+      - series: qs_server_ai_mq_observation_available
+        values: '1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: QSCommandReceiptDelayed
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              subsystem: messaging
+            exp_annotations:
+              summary: QS commands are awaiting AI admission receipts
+              description: Inspect the current business receipt and consumer state. Broker confirmation alone does not complete this responsibility.
+
+  - name: interpretation ACK wait is independent from command admission
+    interval: 1m
+    input_series:
+      - series: qs_ai_mq_oldest_pending_interpretation_receipt_seconds{job="qs-ai",instance="ai:8080"}
+        values: '600 600 600 600 600 600 600'
+      - series: qs_ai_mq_observation_available{job="qs-ai",instance="ai:8080"}
+        values: '1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: AIInterpretationReceiptDelayed
+        exp_alerts:
+          - exp_labels:
+              job: qs-ai
+              instance: ai:8080
+              severity: warning
+              subsystem: messaging
+            exp_annotations:
+              summary: AI interpretation states are awaiting QS business ACKs
+              description: Inspect the current business receipt and consumer state. Broker confirmation alone does not complete this responsibility.
+  - name: unavailable snapshots alert per instance without claiming delayed business
+    interval: 1m
+    input_series:
+      - series: qs_server_ai_mq_observation_available{job="qs-apiserver",instance="qs:9090"}
+        values: '0 0 0 0 0 0 0'
+      - series: qs_ai_mq_observation_available{job="qs-ai",instance="ai:8080"}
+        values: '0 0 0 0 0 0 0'
+      - series: qs_ai_mq_oldest_pending_interpretation_receipt_seconds{job="qs-ai",instance="ai:8080"}
+        values: '600 600 600 600 600 600 600'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: BusinessReceiptObservationUnavailable
+        exp_alerts:
+          - exp_labels:
+              job: qs-apiserver
+              instance: qs:9090
+              severity: warning
+              subsystem: messaging
+            exp_annotations:
+              summary: Current business receipt observation is unavailable
+              description: Inspect the database reader before interpreting receipt backlog. A failed sample is not an empty queue.
+          - exp_labels:
+              job: qs-ai
+              instance: ai:8080
+              severity: warning
+              subsystem: messaging
+            exp_annotations:
+              summary: Current business receipt observation is unavailable
+              description: Inspect the database reader before interpreting receipt backlog. A failed sample is not an empty queue.
+      - eval_time: 6m
+        alertname: AIInterpretationReceiptDelayed
+        exp_alerts: []
+  - name: one instance cannot provide another instance's availability
+    interval: 1m
+    input_series:
+      - series: qs_ai_mq_oldest_pending_interpretation_receipt_seconds{job="qs-ai",instance="ai-1:8080"}
+        values: '600 600 600 600 600 600 600'
+      - series: qs_ai_mq_observation_available{job="qs-ai",instance="ai-1:8080"}
+        values: '0 0 0 0 0 0 0'
+      - series: qs_ai_mq_observation_available{job="qs-ai",instance="ai-2:8080"}
+        values: '1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: AIInterpretationReceiptDelayed
+        exp_alerts: []

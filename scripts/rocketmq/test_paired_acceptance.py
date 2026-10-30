@@ -1,6 +1,11 @@
 import copy
 import json
+import os
+from pathlib import Path
+from types import SimpleNamespace
+import tempfile
 import unittest
+from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 from paired_acceptance import (
@@ -27,6 +32,38 @@ def xml(names):
 
 
 class PairedAcceptanceTests(unittest.TestCase):
+    def test_stable_qs_profile_still_requires_exact_published_module(self):
+        from image_sdk_profile import sdk_profile
+        from paired_acceptance import prepare_qs
+        from readable_host_acceptance import MODULE
+        fixed = sdk_profile('readable-stable')
+        module = dict(Path='github.com/FangcunMount/reliable-messaging',
+            Version=fixed['go'], Sum=fixed['go_sum'], GoModSum=MODULE['GoModSum'])
+        with tempfile.TemporaryDirectory() as tmp, patch.dict(os.environ,
+                QS_AI_READABLE_SDK_PROFILE='readable-stable'):
+            root = Path(tmp)
+            (root/'go.mod').write_text('module fixture\n')
+            helper = root/'tests/m3_ai_paired_probe/main.go'
+            helper.parent.mkdir(parents=True)
+            helper.write_text('package main\n')
+            def run(argv, **kwargs):
+                output = ''
+                if argv[:3] == ['git','rev-parse','HEAD']: output = 'a'*40
+                elif argv[:3] == ['go','list','-m']: output = json.dumps(module)
+                elif argv == ['go','version']: output = 'go version go1.25.12 linux/amd64'
+                elif argv[:2] == ['go','build']: (root/'qs-paired-host').write_bytes(b'fixture')
+                return SimpleNamespace(stdout=output)
+            proof = {}
+            value = prepare_qs(root,root,'rocketmq-m2-fixture',3306,'fixture',run,proof,readable=True)
+            self.assertEqual(value['sdk_go_version'], fixed['go'])
+            self.assertEqual(proof['paired_qs']['sdk_module'], module)
+            for key, bad in [('Sum','wrong'),('Version','v0.6.0-rc.1'),('Replace',{})]:
+                before = dict(module)
+                module[key] = bad
+                with self.assertRaises(ValueError):
+                    prepare_qs(root,root,'rocketmq-m2-fixture',3306,'fixture',run,{},readable=True)
+                module.clear(); module.update(before)
+
     def test_core_and_full_remain_distinct_exact_gates(self):
         self.assertEqual(len(CORE_CASES),10)
         self.assertEqual(len(FULL_CASES),25)
