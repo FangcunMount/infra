@@ -86,6 +86,8 @@ jobs:
           cache-dependency-path: .qs-acceptance/go.sum
       - uses: astral-sh/setup-uv@v6
         with:
+          # Probes own and remove their caches; this setup cache is unused.
+          enable-cache: false
           version: '0.12.13'
           python-version: '3.13'
       - name: Exact source and published stable SDK without replacement
@@ -209,6 +211,8 @@ jobs:
           cache-dependency-path: .qs-recovery/go.sum
       - uses: astral-sh/setup-uv@v6
         with:
+          # Probes own and remove their caches; this setup cache is unused.
+          enable-cache: false
           version: '0.12.13'
           python-version: '3.13'
       - name: Exact current retirement source and published SDK
@@ -344,6 +348,8 @@ jobs:
           cache-dependency-path: .qs-acceptance/go.sum
       - uses: astral-sh/setup-uv@v6
         with:
+          # Probes own and remove their caches; this setup cache is unused.
+          enable-cache: false
           version: '0.12.13'
           python-version: '3.13'
       - name: Exact candidate source and published SDK v0.6.1 without replacement
@@ -437,6 +443,8 @@ jobs:
           cache-dependency-path: .qs-recovery/go.sum
       - uses: astral-sh/setup-uv@v6
         with:
+          # Probes own and remove their caches; this setup cache is unused.
+          enable-cache: false
           version: '0.12.13'
           python-version: '3.13'
       - name: Exact current retirement source and published SDK v0.6.1
