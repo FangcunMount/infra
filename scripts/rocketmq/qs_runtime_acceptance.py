@@ -295,6 +295,8 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         if recovery:
             from qs_recovery_acceptance import recovery_diagnostics
             proof['diagnostics']['recovery_completion'] = recovery_diagnostics(output)
+            from qs_recovery_acceptance import recovery_gate_diagnostics
+            proof['diagnostics']['recovery_gate'] = recovery_gate_diagnostics(output)
         if result.returncode:
             raise RuntimeError('actual default QS owners failed; private output withheld')
         if recovery:

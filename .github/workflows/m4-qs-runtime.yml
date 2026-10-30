@@ -19,6 +19,10 @@ on:
       - .github/workflows/m4-qs-runtime.yml
   workflow_dispatch:
     inputs:
+      rotation_recovery_only:
+        description: Run only the explicit rotation recovery profile
+        type: boolean
+        default: false
       rotation_candidate:
         description: Explicit downloaded input-rotation review candidate; not stable-release acceptance
         type: boolean
@@ -249,7 +253,7 @@ jobs:
           retention-days: 14
 
   rotation-worker:
-    if: ${{ inputs.rotation_candidate }}
+    if: ${{ inputs.rotation_candidate && !inputs.rotation_recovery_only }}
     name: rotation-worker (${{ matrix.profile }}, ${{ matrix.mysql }})
     runs-on: ubuntu-24.04
     timeout-minutes: 45
@@ -367,7 +371,7 @@ jobs:
     env:
       GOWORK: 'off'
       GOTOOLCHAIN: local
-      QS_SHA: 8bc89187fc6ec56b3b100aa144e6c40691faa097
+      QS_SHA: ea0c57b4eebb4350d34ebe553b966f7fc80abc68
       SDK_SHA: 48dfcdafbf29b44e99a5ac8b1ae01e5173138560
       INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
