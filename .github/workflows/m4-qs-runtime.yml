@@ -250,16 +250,32 @@ jobs:
 
   rotation-worker:
     if: ${{ inputs.rotation_candidate }}
+    name: rotation-worker (${{ matrix.profile }}, ${{ matrix.mysql }})
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        mysql: ['8.0.36', '8.0.44', '8.4.11']
+        include:
+          - mysql: '8.0.36'
+            profile: current
+            qs: 8bc89187fc6ec56b3b100aa144e6c40691faa097
+          - mysql: '8.0.44'
+            profile: current
+            qs: 8bc89187fc6ec56b3b100aa144e6c40691faa097
+          - mysql: '8.4.11'
+            profile: current
+            qs: 8bc89187fc6ec56b3b100aa144e6c40691faa097
+          - mysql: '8.0.44'
+            profile: legacy
+            qs: 6df9efccdbe5a0dc954003cdc42cafcd9e001830
+          - mysql: '8.4.11'
+            profile: legacy
+            qs: 6df9efccdbe5a0dc954003cdc42cafcd9e001830
     env:
       GOWORK: 'off'
       GOTOOLCHAIN: local
-      QS_SHA: 8bc89187fc6ec56b3b100aa144e6c40691faa097
+      QS_SHA: ${{ matrix.qs }}
       INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v6
