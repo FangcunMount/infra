@@ -2,6 +2,7 @@
 import datetime
 import json
 from pathlib import Path
+import subprocess
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -29,6 +30,33 @@ def read(url):
         return type(error).__name__, None
 
 
+def configured_dashboard(uid):
+    # Use the already configured account inside Grafana. No credential is read
+    # into this process, stored, logged, reset or exported from the container.
+    script = r'''
+if [ -z "${GF_SECURITY_ADMIN_USER:-}" ] || [ -z "${GF_SECURITY_ADMIN_PASSWORD:-}" ]; then exit 64; fi
+basic=$(printf '%s:%s' "$GF_SECURITY_ADMIN_USER" "$GF_SECURITY_ADMIN_PASSWORD" | base64 | tr -d '\r\n')
+exec wget -qO- -T 5 --header="Authorization: Basic $basic" "http://127.0.0.1:3000/api/dashboards/uid/$1"
+'''
+    try:
+        result = subprocess.run(['docker', 'exec', 'grafana', 'sh', '-c', script, 'sh', uid],
+                                capture_output=True, text=True, timeout=10)
+        if result.returncode == 0:
+            return 200, json.loads(result.stdout)
+        return ('configured_auth_unavailable' if result.returncode == 64 else 'configured_auth_failed'), None
+    except (OSError, ValueError, subprocess.SubprocessError) as error:
+        return type(error).__name__, None
+
+
+def panels(model):
+    result = []
+    for panel in model:
+        result.append(dict(id=panel.get('id'), title=panel.get('title'), type=panel.get('type'),
+                           targets=[dict(refId=t.get('refId'), expr=t.get('expr')) for t in panel.get('targets', [])]))
+        result.extend(panels(panel.get('panels', [])))
+    return sorted(result, key=lambda item: (item['id'] is None, item['id'] or 0))
+
+
 report = dict(read_only=True, database_operations=False, configuration_changed=False,
               observed_at=datetime.datetime.now(datetime.timezone.utc).isoformat(), queries={}, dashboards={})
 for name, query in QUERIES.items():
@@ -40,6 +68,15 @@ for name, query in QUERIES.items():
         if k in ('owner', 'job')}, value=s['value']) for s in samples])
 for uid in ('event-overview', 'event-transactions'):
     status, body = read('http://127.0.0.1:13000/api/dashboards/uid/' + uid)
+    anonymous_status = status
+    authentication = 'anonymous'
+    if status == 401:
+        status, body = configured_dashboard(uid)
+        authentication = 'existing_grafana_runtime_account'
     valid = status == 200 and body is not None and body.get('dashboard', {}).get('uid') == uid
-    report['dashboards'][uid] = dict(status=status, api_verified=valid)
+    expected = json.loads(Path('components/grafana/dashboards/'+uid+'.json').read_text())
+    actual = body.get('dashboard', {}) if valid else {}
+    matches = valid and actual.get('title') == expected.get('title') and panels(actual.get('panels', [])) == panels(expected.get('panels', []))
+    report['dashboards'][uid] = dict(status=status, anonymous_status=anonymous_status,
+        authentication=authentication, api_verified=valid, frozen_panel_model_matches=matches)
 Path('monitoring-observation.json').write_text(json.dumps(report, indent=2) + '\n')
