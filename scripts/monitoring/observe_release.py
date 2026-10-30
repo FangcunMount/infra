@@ -2,6 +2,7 @@
 import datetime
 import json
 from pathlib import Path
+import re
 import subprocess
 import urllib.error
 import urllib.parse
@@ -36,14 +37,17 @@ def configured_dashboard(uid):
     script = r'''
 if [ -z "${GF_SECURITY_ADMIN_USER:-}" ] || [ -z "${GF_SECURITY_ADMIN_PASSWORD:-}" ]; then exit 64; fi
 basic=$(printf '%s:%s' "$GF_SECURITY_ADMIN_USER" "$GF_SECURITY_ADMIN_PASSWORD" | base64 | tr -d '\r\n')
-exec wget -qO- -T 5 --header="Authorization: Basic $basic" "http://127.0.0.1:3000/api/dashboards/uid/$1"
+exec wget -SO- -T 5 --header="Authorization: Basic $basic" "http://127.0.0.1:3000/api/dashboards/uid/$1"
 '''
     try:
         result = subprocess.run(['docker', 'exec', 'grafana', 'sh', '-c', script, 'sh', uid],
                                 capture_output=True, text=True, timeout=10)
         if result.returncode == 0:
             return 200, json.loads(result.stdout)
-        return ('configured_auth_unavailable' if result.returncode == 64 else 'configured_auth_failed'), None
+        codes = re.findall(r'HTTP/\S+\s+(\d{3})', result.stderr)
+        if codes:
+            return int(codes[-1]), None
+        return ('configured_auth_unavailable' if result.returncode == 64 else 'configured_auth_execution_failed'), None
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         return type(error).__name__, None
 
