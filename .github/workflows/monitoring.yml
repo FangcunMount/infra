@@ -9,7 +9,7 @@ on:
     inputs:
       operation:
         type: choice
-        options: [validate, assets-dry-run, assets-apply]
+        options: [validate, assets-dry-run, assets-apply, observe]
         default: validate
       expected_state:
         description: 'Exact state hash from assets-dry-run; required for apply'
@@ -38,7 +38,7 @@ jobs:
             -v /tmp/monitoring-targets:/etc/prometheus/targets:ro \
             prom/prometheus:v2.54.1 check config /etc/prometheus/prometheus.yml
   release-assets:
-    if: github.event_name == 'workflow_dispatch' && inputs.operation != 'validate'
+    if: github.event_name == 'workflow_dispatch' && inputs.operation != 'validate' && inputs.operation != 'observe'
     runs-on:
       group: qlume
       labels: [self-hosted, macOS, ARM64]
@@ -61,5 +61,22 @@ jobs:
         with:
           name: monitoring-assets-${{ inputs.operation }}-${{ github.run_id }}
           path: monitoring-assets-receipt.json
+          if-no-files-found: error
+          retention-days: 90
+
+  observe:
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'observe'
+    runs-on:
+      group: qlume
+      labels: [self-hosted, macOS, ARM64]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read existing transaction and business receipt metrics
+        run: python3 scripts/monitoring/observe_release.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: monitoring-observation-${{ github.run_id }}
+          path: monitoring-observation.json
           if-no-files-found: error
           retention-days: 90
