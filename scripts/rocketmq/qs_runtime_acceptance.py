@@ -4,9 +4,10 @@ import json
 import os
 import re
 import secrets
+import sys
 
 from host_sdk_contract import stable_module_matches
-from iam_acceptance import host_failure_summary
+from iam_acceptance import host_failure_summary, retain_private_host_output
 from m3_resources import manifest
 from provision_v2 import Admin, provision
 from routes import validate_v2
@@ -99,15 +100,26 @@ def parse_native_limit_receipt(output, source):
 SCOPE = 'default QS dual-owner lifecycle, actual Broker restart and next-instance Checker; protocol fixture facts'
 
 
-def runtime_manifest(repo):
+def runtime_manifest(repo, recovery=False):
     value = manifest(repo)
     mysql = dict(value['accounts']['m3-qs-apiserver'], subscriptions=[])
     document = dict(value['accounts']['m3-qs-mongo'])
     worker = {'publish': [], 'subscriptions': ['qs-evaluation-mysql', 'qs-evaluation-mongo']}
+    if recovery:
+        from routes import consumer_group_v2
+        worker = dict(value['accounts']['m3-qs-worker'])
+        hot = dict(next(r for r in value['routes'] if r['id'] == 'qs-evaluation-mongo'))
+        hot.update(id='qs-recovery-hotrank', subscription='qs-apiserver-modelcatalog-hot-rank-v1',
+                   consumer_group=consumer_group_v2(hot['topic'], 'qs-apiserver-modelcatalog-hot-rank-v1'))
+        value['routes'].append(hot)
+        worker['subscriptions'] = list(worker['subscriptions']) + [hot['id']]
     wanted = set(mysql['publish']) | set(document['publish']) | set(worker['subscriptions'])
     value['routes'] = [r for r in value['routes'] if r['id'] in wanted]
     value['accounts'] = {'m3-qs-apiserver': mysql, 'm3-qs-mongo': document, 'm3-qs-worker': worker}
     validate_v2(value)
+    if recovery:
+        from readable_host_acceptance import readable_manifest
+        return readable_manifest(value)
     return value
 
 
@@ -172,19 +184,26 @@ def runtime_diagnostics(output):
 
 
 def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_port, mongo_port,
-                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False, native_limit=False):
+                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False, native_limit=False, recovery=False, redis_port=None, recovery_private_log=None, recovery_sdk=None, recovery_uv="uv"):
     source = source.resolve()
     if not (source/'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS default runtime source required')
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'], cwd=source, env=env).stdout)
-    validate_module(module, protection or native_limit)
+    if recovery:
+        from qs_recovery_acceptance import validate_recovery_module
+        validate_recovery_module(module)
+    else:
+        validate_module(module, protection or native_limit)
     proof['sdk_module'] = {k: module.get(k) for k in ('Path', 'Version', 'Sum', 'GoModSum')}
-    document = runtime_manifest(repo)
+    document = runtime_manifest(repo, recovery=recovery)
     accounts = {role: {'username': 'runtime-' + secrets.token_hex(5), 'password': secrets.token_hex(32)}
                 for role in document['accounts']}
     proof['provision'] = provision(broker, document, accounts)
+    if recovery:
+        proof['manifest_version'] = document['version']
+        proof['naming_scheme'] = 'readable-v1'
     routes = directory/'qs-owner-runtime-routes.json'; routes.write_text(json.dumps(document)); routes.chmod(0o600)
     credentials = {}
     for role, value in accounts.items():
@@ -202,6 +221,28 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         QS_M3_HOST_DSN=f'root:{password}@tcp(127.0.0.1:{mysql_port})/?parseTime=true',
         QS_M3_HOST_MONGO_URI=f'mongodb://127.0.0.1:{mongo_port}/?replicaSet=sdk-proof&directConnection=true',
         QS_M3_HOST_OPTIONS=str(opts), QS_M3_HOST_OBSERVER_OPTIONS=str(observer))
+    if recovery:
+        if not redis_port or protection or native_limit:
+            raise RuntimeError('standalone recovery requires owned Redis')
+        if recovery_sdk is None or not (recovery_sdk/'python/uv.lock').is_file():
+            raise RuntimeError('exact locked SDK Python project required for read-only Proxy route probe')
+        route_environment = directory/'recovery-route-python'
+        route_env = dict(env, UV_PROJECT_ENVIRONMENT=str(route_environment))
+        run([recovery_uv, 'run', '--locked', '--project', str(recovery_sdk/'python'),
+             '--extra', 'rocketmq', '--python', sys.executable, 'python', '-c',
+             'import grpc; import rocketmq'], cwd=source, env=route_env, timeout=240)
+        env['QS_M3_RECOVERY_ROUTE_PROBE'] = json.dumps([
+            str(route_environment/'bin/python'), str(repo/'scripts/rocketmq/route_read_probe.py')])
+        tools = {}
+        for name, package in (('hotrank-day-rebuild', './scripts/oneoff/hotrank_day_rebuild'),
+                              ('answersheet-gap-recover', './scripts/oneoff/answersheet_gap_recover')):
+            path = directory/name
+            run(['go', 'build', '-o', str(path), package], cwd=source, env=env, timeout=240)
+            tools[name] = str(path)
+        env.update(QS_M3_RECOVERY_REDIS=f'127.0.0.1:{redis_port}',
+            QS_M3_RECOVERY_CERT=str(ca), QS_M3_RECOVERY_KEY=str(directory/'fault-server.key'),
+            QS_M3_RECOVERY_HOTRANK=tools['hotrank-day-rebuild'],
+            QS_M3_RECOVERY_ANSWERSHEET=tools['answersheet-gap-recover'])
     if protection:
         env['QS_M3_VERIFY_PROTOCOL_PROTECTION'] = '1'
     else:
@@ -233,19 +274,30 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         proof['parameters_before_native'] = read_parameters(admin('getBrokerConfig'))
         if proof['parameters_before_native']['transactionTimeOut'] != 60000:
             raise RuntimeError('owned first-check window not effective')
-        result = native_runner(['go', 'test', '-race', '-p', '1', '-tags=integration,m3_host_runtime', '-count=1',
-                    '-timeout=5m', '-v', './internal/apiserver/container', '-run', '^TestM3DefaultOwnerRuntime$'],
-                    cwd=source, env=env, timeout=480, required=False)
+        package, test, budget = ('./internal/apiserver/integration/runtimeclosure', '^TestM3HostRetirementRecovery$', '10m') if recovery else ('./internal/apiserver/container', '^TestM3DefaultOwnerRuntime$', '5m')
+        linker = ['-ldflags', '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit='+proof['source_sha']] if recovery else []
+        result = native_runner(['go', 'test', '-race', '-p', '1', '-tags=integration,m3_host_runtime', '-count=1'] + linker + [
+                    '-timeout='+budget, '-v', package, '-run', test],
+                    cwd=source, env=env, timeout=720 if recovery else 480, required=False)
         output = result.stdout+result.stderr
         private = directory/'qs-owner-runtime-private.log'; private.write_text(output); private.chmod(0o600)
+        if recovery_private_log is not None:
+            retain_private_host_output(recovery_private_log, output)
         proof['native_output_sha256'] = hashlib.sha256(output.encode()).hexdigest()
         proof['native_exit_code'] = result.returncode
         proof['diagnostics'] = host_failure_summary(output)
-        proof['diagnostics']['assertion_lines'] = sorted(set(map(int, re.findall(r'owner_runtime_native_integration_test\.go:(\d+)', output))))[:32]
+        proof['diagnostics']['assertion_lines'] = sorted(set(map(int, re.findall(r'(?:owner_runtime_native|rocketmq_recovery_m3c)_integration_test\.go:(\d+)', output))))[:32]
         proof['diagnostics']['owner_runtime'] = runtime_diagnostics(output)
+        if recovery:
+            from qs_recovery_acceptance import recovery_diagnostics
+            proof['diagnostics']['recovery_completion'] = recovery_diagnostics(output)
         if result.returncode:
             raise RuntimeError('actual default QS owners failed; private output withheld')
-        proof['native_receipt'] = parse_runtime_receipt(output, proof['source_sha'])
+        if recovery:
+            from qs_recovery_acceptance import parse_recovery_receipt
+            proof['native_receipt'] = parse_recovery_receipt(output, proof['source_sha'])
+        else:
+            proof['native_receipt'] = parse_runtime_receipt(output, proof['source_sha'])
         if protection:
             proof['protection_receipt'] = parse_protection_receipt(output, proof['source_sha'])
         if native_limit:
@@ -264,4 +316,4 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
     proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
     if not proof['source_clean_after']:
         raise RuntimeError('QS source changed during native default owner proof')
-    proof['scope'] = SCOPE
+    proof['scope'] = ('host retirement recovery; original business services, owned RocketMQ/MySQL/Mongo/Redis and actual Worker process restart; controlled IAM/provider, no production/system login' if recovery else SCOPE)

@@ -10,6 +10,10 @@ on:
       - scripts/rocketmq/test_qs_worker_acceptance.py
       - scripts/rocketmq/qs_retry_dispatch_acceptance.py
       - scripts/rocketmq/test_qs_retry_dispatch_acceptance.py
+      - scripts/rocketmq/test_python_live_recovery.py
+      - scripts/rocketmq/route_read_probe.py
+      - scripts/rocketmq/qs_recovery_acceptance.py
+      - scripts/rocketmq/test_qs_recovery_acceptance.py
       - scripts/rocketmq/qs_report_acceptance.py
       - scripts/rocketmq/ci-transactions.py
       - .github/workflows/m4-qs-runtime.yml
@@ -19,6 +23,10 @@ on:
         description: Exact reviewed QS source SHA
         type: string
         required: true
+      recovery_qs_ref:
+        description: Optional exact host retirement M3-C QS SHA
+        type: string
+        required: false
 permissions:
   contents: read
 concurrency:
@@ -122,5 +130,115 @@ jobs:
         with:
           name: m4-qs-runtime-${{ matrix.mysql }}-${{ env.QS_SHA }}-${{ github.run_id }}
           path: m4-qs-*.json
+          if-no-files-found: error
+          retention-days: 14
+
+  host-retirement-recovery:
+    if: github.event_name == 'pull_request' || inputs.recovery_qs_ref != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+      QS_SHA: ${{ inputs.recovery_qs_ref || '032b2387659ca59bf7c5946b5f346c6d4303864c' }}
+      SDK_SHA: 559c735b2ceb11827ffbbd1279808b4164bba3d1
+      INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.INFRA_SHA }}
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: ${{ env.SDK_SHA }}
+          path: .sdk-recovery
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ env.QS_SHA }}
+          path: .qs-recovery
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-recovery/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Exact current retirement source and published SDK
+        run: |
+          set -euo pipefail
+          [[ "$QS_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$INFRA_SHA"
+          test "$(git -C .qs-recovery rev-parse HEAD)" = "$QS_SHA"
+          test "$(git -C .sdk-recovery rev-parse HEAD)" = "$SDK_SHA"
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_qs*acceptance.py' -v
+          python3 -m unittest discover -s scripts/rocketmq -p test_python_live_recovery.py -v
+          go -C .qs-recovery list -m -json github.com/FangcunMount/reliable-messaging > "$RUNNER_TEMP/m3c-sdk.json"
+          python3 - "$RUNNER_TEMP/m3c-sdk.json" <<'PY'
+          import json,sys
+          sys.path.insert(0,'scripts/rocketmq')
+          from qs_recovery_acceptance import validate_recovery_module
+          validate_recovery_module(json.load(open(sys.argv[1])))
+          PY
+      - name: Build verified owned RocketMQ 5.5.1
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          env -u DOCKER_CONTEXT -u DOCKER_TLS -u DOCKER_TLS_VERIFY -u DOCKER_CERT_PATH \
+            docker --host=unix:///var/run/docker.sock build --no-cache \
+            -t rocketmq-retirement-m3c:5.5.1 components/rocketmq
+      - name: Actual Worker and Broker SIGKILL original redelivery and real Redis
+        run: |
+          set -euo pipefail
+          umask 077
+          local_docker() {
+            env -u DOCKER_CONTEXT -u DOCKER_TLS -u DOCKER_TLS_VERIFY -u DOCKER_CERT_PATH \
+              docker --host=unix:///var/run/docker.sock "$@"
+          }
+          local_docker ps -aq | sort > "$RUNNER_TEMP/m3c-containers-before"
+          local_docker network ls --no-trunc -q | sort > "$RUNNER_TEMP/m3c-networks-before"
+          env -u DOCKER_CONTEXT -u DOCKER_TLS -u DOCKER_TLS_VERIFY -u DOCKER_CERT_PATH \
+            DOCKER_HOST=unix:///var/run/docker.sock \
+            python3 scripts/rocketmq/ci-transactions.py \
+            --sdk "$PWD/.sdk-recovery" --image rocketmq-retirement-m3c:5.5.1 \
+            --mysql-image mysql:8.0.36 --qs-recovery-host "$PWD/.qs-recovery" \
+            --report m3c-recovery.json
+          local_docker ps -aq | sort > "$RUNNER_TEMP/m3c-containers-after"
+          local_docker network ls --no-trunc -q | sort > "$RUNNER_TEMP/m3c-networks-after"
+          cmp "$RUNNER_TEMP/m3c-containers-before" "$RUNNER_TEMP/m3c-containers-after"
+          cmp "$RUNNER_TEMP/m3c-networks-before" "$RUNNER_TEMP/m3c-networks-after"
+      - name: Require current source zero skip business proof and owned cleanup
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts/rocketmq')
+          from qs_recovery_acceptance import CASES,validate_recovery_module
+          p=Path('m3c-recovery.json');x=json.loads(p.read_text())
+          assert x['batch']=='host-retirement-M3-C-current-recovery'
+          assert x['passed']>0 and x['failed']==x['skipped']==0
+          assert len(x['cases'])==x['passed'] and all(x['cases'].values())
+          assert x['sdk_sha']==os.environ['SDK_SHA']
+          assert x['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,probe_process_groups_drained=True,private_fixture_directory_removed=True)
+          proof=x['proof']['qs_runtime_host'];receipt=proof['native_receipt']
+          assert proof['source_sha']==receipt['source_sha']==os.environ['QS_SHA']
+          assert proof['source_clean_after'] and proof['native_exit_code']==0
+          assert proof['manifest_version']==3 and proof['naming_scheme']=='readable-v1'
+          validate_recovery_module(proof['sdk_module'])
+          assert receipt['passed']==len(CASES) and receipt['failed']==receipt['skipped']==0
+          assert set(receipt['cases'])==CASES and all(receipt['cases'].values())
+          for flag in ('proxy_routes_ready','processing_lease_observed','real_redis','broker_sigkill','worker_sigkill','controlled_provider','worker_pids_distinct','owned_databases_dropped','no_existing_storage','no_production'):
+              assert receipt[flag] is True
+          assert type(receipt['proxy_routes_checked']) is int and 1 <= receipt['proxy_routes_checked'] <= 128
+          assert type(receipt['processing_lease_ttl_ms']) is int and 0 < receipt['processing_lease_ttl_ms'] <= 300000
+          Path('m3c-summary.json').write_text(json.dumps(dict(source_sha=os.environ['QS_SHA'],infra_sha=os.environ['INFRA_SHA'],sdk_sha=os.environ['SDK_SHA'],required_cases=len(CASES),report_sha256=hashlib.sha256(p.read_bytes()).hexdigest(),production=False,existing_storage=False),indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: host-retirement-m3c-${{ env.QS_SHA }}-${{ github.run_id }}
+          path: m3c-*.json
           if-no-files-found: error
           retention-days: 14

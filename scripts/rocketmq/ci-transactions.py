@@ -235,7 +235,15 @@ def main():
     parser.add_argument("--paired-host-faults", action="store_true", help="explicit paired MQ/process/Broker physical fault profile")
     parser.add_argument("--sdk-python-live-recovery", action="store_true", help="source-candidate Python producer survives actual owned Broker SIGKILL")
     parser.add_argument("--readable-hosts", action="store_true", help="separate published-SDK readable IAM fanout or QS original-root fixture")
+    parser.add_argument("--qs-recovery-host", type=Path, help="host retirement M3-C: real business recovery, Redis, Broker and Worker restart")
+    parser.add_argument("--qs-recovery-private-log", type=Path, help="new0600 diagnostic in an owned0700 local directory; never upload")
     args = parser.parse_args()
+    if args.qs_recovery_private_log and not args.qs_recovery_host:
+        parser.error("private recovery diagnostics require the explicit recovery profile")
+    if args.qs_recovery_host:
+        if any((args.qs_runtime_host, args.qs_protocol_protection, args.qs_native_limit)):
+            parser.error("current recovery requires its standalone runtime profile")
+        args.qs_runtime_host = args.qs_recovery_host
     if args.readable_hosts:
         qs_profiles = (args.qs_answer_host, args.qs_evaluation_host, args.qs_report_host, args.qs_task_host)
         iam_profile = bool(args.iam_host and args.iam_fanout_qs)
@@ -454,6 +462,21 @@ def main():
                             "interval": "3s", "timeout": "5s", "retries": 40}}
         if args.qs_answer_host or args.qs_report_host or args.qs_retry_dispatch_host:
             spec['services']['mongo']['command'] += ['--setParameter', 'enableTestCommands=1']
+    redis_port = None
+    if args.qs_recovery_host:
+        # Full application schema on tmpfs exceeds the protocol-only 512MiB
+        # startup budget in the managed executor (recorded native OOM).
+        spec["services"]["mysql"]["mem_limit"] = "1g"
+        # mongosh health checks plus WiredTiger/tmpfs also exceeded512MiB.
+        spec["services"]["mongo"]["mem_limit"] = "1g"
+        redis_port = port()
+        redis_pin = "redis:7.4.2-alpine"
+        run(["docker", "pull", redis_pin], timeout=300)
+        redis_image = run(["docker", "image", "inspect", redis_pin, "--format", "{{.Id}}"]).stdout.strip()
+        spec["services"]["redis"] = {"image": redis_image, "ports": [f"127.0.0.1:{redis_port}:6379"],
+            "networks": ["rocketmq"], "mem_limit": "128m", "cpus": 1, "restart": "no",
+            "command": ["redis-server", "--save", "", "--appendonly", "no"],
+            "healthcheck": {"test": ["CMD", "redis-cli", "ping"], "interval": "3s", "timeout": "3s", "retries": 30}}
     compose_file = directory / "compose.json"
     compose_file.write_text(json.dumps(spec)); compose_file.chmod(0o600)
     compose = ["docker", "compose", "-p", project, "-f", str(compose_file)]
@@ -755,7 +778,9 @@ def main():
                 proof['qs_runtime_host'] = {}
                 run_qs_runtime_host(args.qs_runtime_host, directory, broker, project, grpc_port,
                     mysql_port, mongo_port, mysql_password, ca, run, proof['qs_runtime_host'],
-                    owned_native_run, repo, broker_parameters, protection=args.qs_protocol_protection, native_limit=args.qs_native_limit)
+                    owned_native_run, repo, broker_parameters, protection=args.qs_protocol_protection, native_limit=args.qs_native_limit,
+                    recovery=bool(args.qs_recovery_host), redis_port=redis_port,
+                    recovery_private_log=args.qs_recovery_private_log, recovery_sdk=sdk, recovery_uv=args.python)
                 if args.qs_native_limit:
                     for name in proof['qs_runtime_host']['native_limit_receipt']['cases']:
                         passed('qs_native_limit_' + name)
@@ -1348,7 +1373,15 @@ def main():
             report['limits'] = ['Actual QS command store/original MySQL root; initial seal, plan, operation and first wire preserved',
                 'Completed SDK execution count is not presented as a measured database callback count',
                 'No full API daemon, paired AI receiver, producer SIGKILL, Broker restart, provider, system or production claim']
-        report["go_runtime_patch"] = "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)"
+        if args.qs_recovery_host:
+            report['batch'] = 'host-retirement-M3-C-current-recovery'
+            report['qs_recovery_harness_sha256'] = hashlib.sha256((repo / 'scripts/rocketmq/qs_recovery_acceptance.py').read_bytes()).hexdigest()
+            report['limits'] = ['Real owned RocketMQ/MySQL/Mongo/Redis, production Worker process root and original application services',
+                'Controlled IAM identity and notification HTTP provider; no production/system login or AI quality claim',
+                'Operator response loss, frozen interruption, original Mongo claim post-commit pause and late report RPC delay are controlled; Worker and Broker exits are actual SIGKILL',
+                'Production-default Evaluation/Interpretation lease runners use real leader locks and original lease durations; negative-only omission is never an accepted profile',
+                'Standalone API daemon/startup/deployment and existing-storage retirement are not claimed']
+        report["go_runtime_patch"] = ("published SDK0.6.0 with its embedded v5.1.4 RPC/TLS driver" if args.qs_recovery_host else "v5.1.4 + per-client RPC/TLS options (SDK private snapshot)")
         report["harness_sha256"] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in (Path(__file__).resolve(), repo / "scripts/rocketmq/render.py",
                                               repo / "components/rocketmq/docker-compose.yml", repo / "scripts/rocketmq/sdk_acceptance.py",
