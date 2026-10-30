@@ -6,8 +6,19 @@ on:
     branches: [main]
     paths: ['components/monitoring/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
   workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        options: [validate, assets-dry-run, assets-apply]
+        default: validate
+      expected_state:
+        description: 'Exact state hash from assets-dry-run; required for apply'
+        required: false
 permissions:
   contents: read
+concurrency:
+  group: macmini-monitoring-assets
+  cancel-in-progress: false
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -26,3 +37,29 @@ jobs:
             -v "$PWD/components/prometheus/rules:/etc/prometheus/rules:ro" \
             -v /tmp/monitoring-targets:/etc/prometheus/targets:ro \
             prom/prometheus:v2.54.1 check config /etc/prometheus/prometheus.yml
+  release-assets:
+    if: github.event_name == 'workflow_dispatch' && inputs.operation != 'validate'
+    runs-on:
+      group: qlume
+      labels: [self-hosted, macOS, ARM64]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Inspect or apply frozen M2 assets on the actual monitoring host
+        env:
+          OPERATION: ${{ inputs.operation }}
+          EXPECTED_STATE: ${{ inputs.expected_state }}
+        run: |
+          if [ "$OPERATION" = assets-dry-run ]; then
+            python3 scripts/monitoring/release_assets.py dry-run
+          else
+            python3 scripts/monitoring/release_assets.py apply --expected-state "$EXPECTED_STATE"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: monitoring-assets-${{ inputs.operation }}-${{ github.run_id }}
+          path: monitoring-assets-receipt.json
+          if-no-files-found: error
+          retention-days: 90
