@@ -38,3 +38,9 @@ serverD 原卷和停机归档作为本次迁移回滚副本保留，不因迁移
 ## 验收
 
 区分配置/单元测试、容器 health、真实逐实例抓取、历史数据和 Grafana 登录/人工面板验收。预期基线为 3 worker、2 collection、1 API、1 AI、1 Prometheus 自监控；副本变化后以实时发现为准。测试既有 readiness/federate 和 API 查询路径，并确认 gateway 从其他来源被拒绝。检查其他容器 ID、启动时间及挂载未改变。
+
+## M2/M3 监控配置收口
+
+当前发布只更新冻结于 `bcb5a32501f39ae5b0463a9316c11e3c548f7a01` 的两个规则文件、Overview／Transactions 仪表盘，并移除旧 `event-outbox.json`。使用现有 monitoring 工作流的 `assets-dry-run` 先核对实际 `macmini-001.local`、项目和挂载、原 provisioner、真实 promtool 及当前配置哈希；`assets-apply` 必须带同一 `expected_state`，且在业务服务更新完成后执行。
+
+更新前备份五个候选路径，使用原子文件替换，向现有 Prometheus 发送 HUP 并核验重载时间和已加载规则身份。验证失败恢复原文件。Grafana 沿用原文件 provisioner；不替换镜像、不读取凭据、不操作监控数据卷或数据库。制品只证明配置文件／规则加载和健康状态，`dashboard_api_verified=false` 明确保留后台认证接口的独立验收边界。服务数据、TSDB、Grafana SQLite 和其他配置不属于本次复制清单。
