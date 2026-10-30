@@ -4,6 +4,7 @@ on:
     paths:
       - scripts/00-server/servera-access.py
       - scripts/00-server/test_servera_access.py
+      - scripts/00-server/test_servera_qs_mq_policy.py
       - deploy/serverA/sudoers/**
       - .github/workflows/servera-access.yml
   push:
@@ -11,6 +12,7 @@ on:
     paths:
       - scripts/00-server/servera-access.py
       - scripts/00-server/test_servera_access.py
+      - scripts/00-server/test_servera_qs_mq_policy.py
       - deploy/serverA/sudoers/**
       - .github/workflows/servera-access.yml
 permissions:
@@ -21,6 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Validate permission boundaries and rollback
-        run: python3 -m unittest discover -s scripts/00-server -p 'test_servera_access.py' -v
+        run: python3 -m unittest discover -s scripts/00-server -p 'test_servera_*.py' -v
       - name: Validate sudoers syntax without installing
-        run: sudo visudo -cf deploy/serverA/sudoers/fangcun-m4-readable-material-verify
+        run: |
+          sudo visudo -cf deploy/serverA/sudoers/fangcun-m4-readable-material-verify
+          sudo visudo -cf deploy/serverA/sudoers/fangcun-qs-mq-preflight-3b8a931
