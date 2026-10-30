@@ -143,14 +143,18 @@ def physical_receive_diagnostics(directory, document):
 
 
 def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port, password, ca,
-                       run, proof, native_runner, repo, private_log=None):
+                       run, proof, native_runner, repo, private_log=None, *, rotation_candidate=False):
     source = source.resolve()
     if not (source / 'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS worker source required')
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'], cwd=source, env=env).stdout)
-    if not stable_module_matches(module) and (module.get('Replace') or module.get('Version') != 'v0.5.0-rocketmq-tx.2' or not module.get('Sum')):
+    if rotation_candidate:
+        from host_sdk_contract import validate_rotation_module
+        validate_rotation_module(module)
+        proof['sdk_adoption_scope'] = 'downloaded review candidate; not a stable release'
+    elif not stable_module_matches(module) and (module.get('Replace') or module.get('Version') != 'v0.5.0-rocketmq-tx.2' or not module.get('Sum')):
         raise RuntimeError('fixed published worker SDK without replace required')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
     # Retain ALL canonical worker subscriptions; fixture producer only supplies

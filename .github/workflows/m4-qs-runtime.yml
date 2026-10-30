@@ -19,6 +19,10 @@ on:
       - .github/workflows/m4-qs-runtime.yml
   workflow_dispatch:
     inputs:
+      rotation_candidate:
+        description: Explicit downloaded input-rotation review candidate; not stable-release acceptance
+        type: boolean
+        default: false
       qs_ref:
         description: Exact reviewed QS source SHA
         type: string
@@ -34,6 +38,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   native:
+    if: ${{ !inputs.rotation_candidate }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
@@ -134,7 +139,7 @@ jobs:
           retention-days: 14
 
   host-retirement-recovery:
-    if: github.event_name == 'pull_request' || inputs.recovery_qs_ref != ''
+    if: ${{ !inputs.rotation_candidate && (github.event_name == 'pull_request' || inputs.recovery_qs_ref != '') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -239,6 +244,213 @@ jobs:
         if: always()
         with:
           name: host-retirement-m3c-${{ env.QS_SHA }}-${{ github.run_id }}
+          path: m3c-*.json
+          if-no-files-found: error
+          retention-days: 14
+
+  rotation-worker:
+    if: ${{ inputs.rotation_candidate }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: ['8.0.36', '8.0.44', '8.4.11']
+    env:
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+      QS_SHA: 8bc89187fc6ec56b3b100aa144e6c40691faa097
+      INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.INFRA_SHA }}
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 48dfcdafbf29b44e99a5ac8b1ae01e5173138560
+          path: .sdk-acceptance
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ env.QS_SHA }}
+          path: .qs-acceptance
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-acceptance/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Exact candidate source and downloaded module without replacement
+        run: |
+          set -euo pipefail
+          [[ "$QS_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$INFRA_SHA"
+          test "$(git -C .qs-acceptance rev-parse HEAD)" = "$QS_SHA"
+          test "$(git -C .sdk-acceptance rev-parse HEAD)" = 48dfcdafbf29b44e99a5ac8b1ae01e5173138560
+          python3 -m unittest discover -s scripts/rocketmq -p test_host_sdk_contract.py -v
+          go -C .qs-acceptance list -m -json github.com/FangcunMount/reliable-messaging > "$RUNNER_TEMP/m4-sdk.json"
+          python3 - "$RUNNER_TEMP/m4-sdk.json" <<'PY'
+          import json,sys
+          sys.path.insert(0,'scripts/rocketmq')
+          from host_sdk_contract import validate_rotation_module
+          validate_rotation_module(json.load(open(sys.argv[1])))
+          PY
+      - name: Build verified isolated RocketMQ 5.5.1
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-m4-qs:5.5.1 components/rocketmq
+      - name: Required actual Worker paused and active delivery
+        env:
+          MYSQL_IMAGE: mysql:${{ matrix.mysql }}
+        run: |
+          set -euo pipefail
+          umask 077
+          docker ps -aq | sort > "$RUNNER_TEMP/m4-containers-before"
+          docker network ls --no-trunc -q | sort > "$RUNNER_TEMP/m4-networks-before"
+          python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk-acceptance" \
+            --image rocketmq-m4-qs:5.5.1 --mysql-image "$MYSQL_IMAGE" \
+            --qs-deferred-consumer-host "$PWD/.qs-acceptance" --qs-deferred-kind worker \
+            --report m4-qs-worker.json --qs-receive-rotation-candidate
+          docker ps -aq | sort > "$RUNNER_TEMP/m4-containers-after"
+          docker network ls --no-trunc -q | sort > "$RUNNER_TEMP/m4-networks-after"
+          cmp "$RUNNER_TEMP/m4-containers-before" "$RUNNER_TEMP/m4-containers-after"
+          cmp "$RUNNER_TEMP/m4-networks-before" "$RUNNER_TEMP/m4-networks-after"
+      - name: Nonempty zero skip complete reports
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json,os,hashlib
+          from pathlib import Path
+          rows=[]
+          for name in ('worker',):
+              p=Path('m4-qs-'+name+'.json');x=json.loads(p.read_text())
+              assert x['passed']==11 and x['failed']==x['skipped']==0
+              assert x['passed']==len(x['cases']) and all(x['cases'].values())
+              assert x['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,probe_process_groups_drained=True,private_fixture_directory_removed=True)
+              assert x['sdk_sha']=='48dfcdafbf29b44e99a5ac8b1ae01e5173138560'
+              rows.append(dict(profile=name,passed=x['passed'],sha256=hashlib.sha256(p.read_bytes()).hexdigest()))
+          Path('m4-qs-summary.json').write_text(json.dumps(dict(source_sha=os.environ['QS_SHA'],infra_sha=os.environ['INFRA_SHA'],profiles=rows,production=False,system_acceptance=False),indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rotation-worker-${{ matrix.mysql }}-${{ env.QS_SHA }}-${{ github.run_id }}
+          path: m4-qs-*.json
+          if-no-files-found: error
+          retention-days: 14
+
+
+  rotation-recovery:
+    if: ${{ inputs.rotation_candidate }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+      QS_SHA: 8bc89187fc6ec56b3b100aa144e6c40691faa097
+      SDK_SHA: 48dfcdafbf29b44e99a5ac8b1ae01e5173138560
+      INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.INFRA_SHA }}
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: ${{ env.SDK_SHA }}
+          path: .sdk-recovery
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ env.QS_SHA }}
+          path: .qs-recovery
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs-recovery/go.sum
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.13'
+          python-version: '3.13'
+      - name: Exact current retirement source and downloaded review module
+        run: |
+          set -euo pipefail
+          [[ "$QS_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$INFRA_SHA"
+          test "$(git -C .qs-recovery rev-parse HEAD)" = "$QS_SHA"
+          test "$(git -C .sdk-recovery rev-parse HEAD)" = "$SDK_SHA"
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_qs*acceptance.py' -v
+          python3 -m unittest discover -s scripts/rocketmq -p test_python_live_recovery.py -v
+          go -C .qs-recovery list -m -json github.com/FangcunMount/reliable-messaging > "$RUNNER_TEMP/m3c-sdk.json"
+          python3 - "$RUNNER_TEMP/m3c-sdk.json" <<'PY'
+          import json,sys
+          sys.path.insert(0,'scripts/rocketmq')
+          from host_sdk_contract import validate_rotation_module
+          validate_rotation_module(json.load(open(sys.argv[1])))
+          PY
+      - name: Build verified owned RocketMQ 5.5.1
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          env -u DOCKER_CONTEXT -u DOCKER_TLS -u DOCKER_TLS_VERIFY -u DOCKER_CERT_PATH \
+            docker --host=unix:///var/run/docker.sock build --no-cache \
+            -t rocketmq-retirement-m3c:5.5.1 components/rocketmq
+      - name: Actual Worker and Broker SIGKILL original redelivery and real Redis
+        run: |
+          set -euo pipefail
+          umask 077
+          local_docker() {
+            env -u DOCKER_CONTEXT -u DOCKER_TLS -u DOCKER_TLS_VERIFY -u DOCKER_CERT_PATH \
+              docker --host=unix:///var/run/docker.sock "$@"
+          }
+          local_docker ps -aq | sort > "$RUNNER_TEMP/m3c-containers-before"
+          local_docker network ls --no-trunc -q | sort > "$RUNNER_TEMP/m3c-networks-before"
+          env -u DOCKER_CONTEXT -u DOCKER_TLS -u DOCKER_TLS_VERIFY -u DOCKER_CERT_PATH \
+            DOCKER_HOST=unix:///var/run/docker.sock \
+            python3 scripts/rocketmq/ci-transactions.py \
+            --sdk "$PWD/.sdk-recovery" --image rocketmq-retirement-m3c:5.5.1 \
+            --mysql-image mysql:8.0.36 --qs-receive-rotation-candidate --qs-recovery-host "$PWD/.qs-recovery" \
+            --report m3c-recovery.json
+          local_docker ps -aq | sort > "$RUNNER_TEMP/m3c-containers-after"
+          local_docker network ls --no-trunc -q | sort > "$RUNNER_TEMP/m3c-networks-after"
+          cmp "$RUNNER_TEMP/m3c-containers-before" "$RUNNER_TEMP/m3c-containers-after"
+          cmp "$RUNNER_TEMP/m3c-networks-before" "$RUNNER_TEMP/m3c-networks-after"
+      - name: Require current source zero skip business proof and owned cleanup
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts/rocketmq')
+          from qs_recovery_acceptance import CASES
+          from host_sdk_contract import validate_rotation_module
+          p=Path('m3c-recovery.json');x=json.loads(p.read_text())
+          assert x['batch']=='host-retirement-M3-C-current-recovery'
+          assert x['passed']>0 and x['failed']==x['skipped']==0
+          assert len(x['cases'])==x['passed'] and all(x['cases'].values())
+          assert x['sdk_sha']==os.environ['SDK_SHA']
+          assert x['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,probe_process_groups_drained=True,private_fixture_directory_removed=True)
+          proof=x['proof']['qs_runtime_host'];receipt=proof['native_receipt']
+          assert proof['source_sha']==receipt['source_sha']==os.environ['QS_SHA']
+          assert proof['source_clean_after'] and proof['native_exit_code']==0
+          assert proof['manifest_version']==3 and proof['naming_scheme']=='readable-v1'
+          validate_rotation_module(proof['sdk_module'])
+          assert receipt['passed']==len(CASES) and receipt['failed']==receipt['skipped']==0
+          assert set(receipt['cases'])==CASES and all(receipt['cases'].values())
+          for flag in ('proxy_routes_ready','processing_lease_observed','real_redis','broker_sigkill','worker_sigkill','controlled_provider','worker_pids_distinct','owned_databases_dropped','no_existing_storage','no_production'):
+              assert receipt[flag] is True
+          assert type(receipt['proxy_routes_checked']) is int and 1 <= receipt['proxy_routes_checked'] <= 128
+          assert type(receipt['processing_lease_ttl_ms']) is int and 0 < receipt['processing_lease_ttl_ms'] <= 300000
+          Path('m3c-summary.json').write_text(json.dumps(dict(source_sha=os.environ['QS_SHA'],infra_sha=os.environ['INFRA_SHA'],sdk_sha=os.environ['SDK_SHA'],required_cases=len(CASES),report_sha256=hashlib.sha256(p.read_bytes()).hexdigest(),production=False,existing_storage=False),indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: rotation-recovery-${{ env.QS_SHA }}-${{ github.run_id }}
           path: m3c-*.json
           if-no-files-found: error
           retention-days: 14
