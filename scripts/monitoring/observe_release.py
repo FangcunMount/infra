@@ -37,7 +37,7 @@ def configured_dashboard(uid):
     script = r'''
 if [ -z "${GF_SECURITY_ADMIN_USER:-}" ] || [ -z "${GF_SECURITY_ADMIN_PASSWORD:-}" ]; then exit 64; fi
 basic=$(printf '%s:%s' "$GF_SECURITY_ADMIN_USER" "$GF_SECURITY_ADMIN_PASSWORD" | base64 | tr -d '\r\n')
-exec wget -SO- -T 5 --header="Authorization: Basic $basic" "http://127.0.0.1:3000/api/dashboards/uid/$1"
+exec wget -SO- -T 5 --header="Authorization: Basic $basic" --header="X-Grafana-Org-Id: 1" "http://127.0.0.1:3000/api/dashboards/uid/$1"
 '''
     try:
         result = subprocess.run(['docker', 'exec', 'grafana', 'sh', '-c', script, 'sh', uid],
@@ -91,4 +91,18 @@ if status == 401:
     authentication = 'existing_grafana_runtime_account'
 report['retired_dashboards'] = {'event-outbox': dict(status=status, anonymous_status=anonymous_status,
     authentication=authentication, removed=status == 404)}
+# Only public provisioning paths; no private environment files or raw logs.
+report['grafana_public_files'] = {}
+for public_path in ('/etc/grafana/provisioning', '/etc/grafana/provisioning/dashboards',
+                    '/etc/grafana/provisioning/dashboards/dashboards.yml',
+                    '/var/lib/grafana/dashboards', '/var/lib/grafana/dashboards/event-overview.json',
+                    '/var/lib/grafana/dashboards/event-transactions.json'):
+    metadata = subprocess.run(['docker', 'exec', 'grafana', 'stat', '-c', '%a %u %g', public_path],
+                              capture_output=True, text=True, timeout=10)
+    readable = subprocess.run(['docker', 'exec', 'grafana', 'test', '-r', public_path],
+                              capture_output=True, timeout=10)
+    value = metadata.stdout.strip()
+    report['grafana_public_files'][public_path] = dict(readable=readable.returncode == 0,
+        mode_uid_gid=value if re.fullmatch(r'[0-7]{3,4} [0-9]+ [0-9]+', value) else None)
+report['grafana_provider_org_id'] = 1
 Path('monitoring-observation.json').write_text(json.dumps(report, indent=2) + '\n')
