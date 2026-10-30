@@ -100,7 +100,7 @@ class Probe:
         self.client_logs = directory / (Path(self.log.name).stem + "-client")
         self.client_logs.mkdir(mode=0o700)
         env = dict(env, **{'rocketmq.client.logRoot': str(self.client_logs),
-                          'rocketmq.client.logLevel': 'error'})
+                          'rocketmq.client.logLevel': 'debug' if env.get('QS_WORKER_RECEIVE_DIAGNOSTICS') == '1' else 'error'})
         self.process = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=self.log, text=True, env=env, bufsize=1,
                                         start_new_session=True, cwd=cwd)

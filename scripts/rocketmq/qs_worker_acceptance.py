@@ -5,6 +5,7 @@ import math
 import os
 import re
 import secrets
+from datetime import datetime
 
 from host_sdk_contract import stable_module_matches
 from iam_acceptance import host_failure_summary, retain_private_host_output
@@ -82,6 +83,65 @@ def worker_manifest(repo):
     return value
 
 
+def physical_receive_diagnostics(directory, document):
+    """Bounded timing/aliases only; raw SDK payloads and identities stay private."""
+    allowed = {'qs-survey-worker', 'qs-evaluation-mysql', 'qs-evaluation-mongo',
+               'qs-task-normal', 'qs-task-transaction'}
+    aliases = {r['physical_topic']: r['id'] for r in document['routes'] if r['id'] in allowed}
+    paths = sorted(directory.glob('probe-*-client/rocketmq_client_go.log*'))
+    events = []
+    truncated = len(paths) > 4
+    for path in paths[:4]:
+        if path.is_symlink():
+            truncated = True
+            continue
+        with path.open('rb') as stream:
+            raw = stream.read(4 * 1024 * 1024 + 1)
+        truncated |= len(raw) > 4 * 1024 * 1024
+        active = None
+        for line in raw[:4 * 1024 * 1024].decode(errors='replace').splitlines():
+            parts = line.split('\t', 3)
+            if len(parts) != 4 or parts[1] != 'DEBUG':
+                continue
+            try:
+                at = datetime.fromisoformat(parts[0]).timestamp()
+            except (ValueError, OverflowError):
+                continue
+            if not math.isfinite(at):
+                continue
+            message = parts[3]
+            row = None
+            if message.startswith('receiveMessage request:'):
+                active = None
+                found = [alias for physical, alias in aliases.items() if physical in message]
+                if len(found) == 1:
+                    active = found[0]
+                    row = dict(at=at, kind='receive_start', input=active)
+            elif message.startswith('receiveMessage response: status:') and active:
+                code = re.search(r'\bcode:\s*(OK|MESSAGE_NOT_FOUND)\b', message)
+                row = dict(at=at, kind='receive_status', input=active,
+                           status={'OK': 'ok', 'MESSAGE_NOT_FOUND': 'empty'}.get(code[1] if code else '', 'other'))
+            elif message.startswith('endTransaction request:'):
+                # RPC observation, not a replacement for the original commit proof.
+                row = dict(at=at, kind='transaction_end_rpc')
+            if row is not None:
+                if len(events) >= 256:
+                    truncated = True
+                    break
+                events.append(row)
+    events.sort(key=lambda row: row['at'])
+    origin = events[0]['at'] if events else 0
+    result = []
+    for row in events:
+        elapsed = round((row['at'] - origin) * 1000)
+        if not 0 <= elapsed <= 86400000:
+            truncated = True
+            continue
+        result.append(dict(ms=elapsed, **{key: value for key, value in row.items() if key != 'at'}))
+    return dict(available=bool(result), truncated=bool(truncated), events=result,
+                scope='private SDK RPC timing; no business success or per-input readiness claim')
+
+
 def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port, password, ca,
                        run, proof, native_runner, repo, private_log=None):
     source = source.resolve()
@@ -115,6 +175,7 @@ def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port
         path.write_text(json.dumps(config)); path.chmod(0o600); paths[role] = path
     logs = directory / 'worker-native-client-logs'; logs.mkdir(mode=0o700)
     env.update({'QS_M3_FIXTURE_PROJECT': project,
+                'QS_WORKER_RECEIVE_DIAGNOSTICS': '1',
                 'QS_M3_WORKER_DSN': f'root:{password}@tcp(127.0.0.1:{mysql_port})/?parseTime=true',
                 'QS_M3_WORKER_CONFIG': str(paths['m3-qs-worker']),
                 'QS_M3_WORKER_PRODUCER_CONFIG': str(paths['m3-qs-apiserver']),
@@ -130,6 +191,10 @@ def run_qs_worker_host(source, directory, broker, project, grpc_port, mysql_port
     proof['exit_code'] = result.returncode
     proof['diagnostics'] = host_failure_summary(raw)
     proof['diagnostics']['worker_state'] = worker_failure_diagnostics(raw)
+    try:
+        proof['diagnostics']['physical_receive'] = physical_receive_diagnostics(directory, document)
+    except OSError:
+        proof['diagnostics']['physical_receive'] = {'available': False, 'read_failed': True}
     proof['diagnostics']['assertion_lines'] = sorted(set(int(n) for n in re.findall(r'rocketmq_native_integration_test\.go:(\d+)', raw)))[:32]
     if private_log is not None:
         retain_private_host_output(private_log, raw)
