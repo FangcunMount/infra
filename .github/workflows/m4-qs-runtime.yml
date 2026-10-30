@@ -371,7 +371,7 @@ jobs:
     env:
       GOWORK: 'off'
       GOTOOLCHAIN: local
-      QS_SHA: ea0c57b4eebb4350d34ebe553b966f7fc80abc68
+      QS_SHA: ff7fa76b0489976fe740e2b80702203de1b37b5f
       SDK_SHA: 48dfcdafbf29b44e99a5ac8b1ae01e5173138560
       INFRA_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
@@ -457,6 +457,12 @@ jobs:
           proof=x['proof']['qs_runtime_host'];receipt=proof['native_receipt']
           assert proof['source_sha']==receipt['source_sha']==os.environ['QS_SHA']
           assert proof['source_clean_after'] and proof['native_exit_code']==0
+          gates=proof['diagnostics']['recovery_gate']
+          assert len(gates)==2 and not any(v['truncated'] for v in gates)
+          replacement=next(v['counts'] for v in gates if v['worker']=='replacement')
+          assert replacement['wait_started']>=1 and replacement['wait_completed']>=1
+          assert replacement['contention_retry']==replacement['wait_exhausted']==0
+
           assert proof['manifest_version']==3 and proof['naming_scheme']=='readable-v1'
           validate_rotation_module(proof['sdk_module'])
           assert receipt['passed']==len(CASES) and receipt['failed']==receipt['skipped']==0
