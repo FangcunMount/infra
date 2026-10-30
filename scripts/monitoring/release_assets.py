@@ -119,7 +119,7 @@ def main():
     current = state(root)
     report = dict(host=socket.gethostname(), source_sha=REVISION, before=current,
                   expected_state_sha256=state_hash(current), desired={n: digest(b) for n, b in payload.items()},
-                  applied=False, database_mutated=False, dashboard_api_verified=False)
+                  applied=False, direct_database_operations=False, dashboard_api_verified=False)
     if args.operation == 'apply':
         expected_rules = {Path(n).stem: set(re.findall(r'^\s+- (?:record|alert): (.+)$', b.decode(), re.M))
                           for n, b in payload.items() if n.endswith('.yml')}
