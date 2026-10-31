@@ -1119,7 +1119,7 @@
         }
       ]
     },
-    "merge_release_readiness": "core code merged and native proven; fixed1073 images published and receipts verified; final maintenance transport CI/actual rights and concrete approved production window remain",
+    "merge_release_readiness": "core474 and maintenance transport475 merged with successful exact main CI; fixed1073 images and candidate native proof retained. Protocol476 final/native CI, actual staged transport and direct primary reads, concrete frozen window/restore route and final approval remain.",
     "core_delivery": {
       "PR": 474,
       "candidate": "1b6f8debf053919ee803c3f35607072cc48b3b28",
@@ -1136,7 +1136,7 @@
     "maintenance_transport_delivery": {
       "PR": 475,
       "source": "71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8",
-      "status": "draft; final CI41198019711 running",
+      "status": "merged; exact main CI success; production staging remains unexecuted",
       "local_contract_tests": 15,
       "native_job": 124524476566,
       "native_run": 41196795025,
@@ -1272,6 +1272,14 @@
           "no_database_connections": true,
           "owned_containers_removed": true
         }
+      },
+      "candidate_source": "71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8",
+      "merged_main": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6",
+      "main_CI": {
+        "run": 41201613827,
+        "status": "success",
+        "exact_source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6",
+        "production_rollout": false
       }
     },
     "fixed_images_preparation": {
@@ -1360,6 +1368,46 @@
         "production_deployment": false,
         "database_mutation": false
       }
+    },
+    "responsible_people": {
+      "data_owner": "shujie",
+      "recovery_owner": "shujie",
+      "source": "Explicit user response in this task",
+      "existing_database_write_approval": false
+    },
+    "protocol_observation_delivery": {
+      "PR": 476,
+      "status": "draft; independently reconstructed remote candidate requires its own CI/native proof",
+      "branch": "codex/host-retirement-m5-protocol-proof-remote-20261031",
+      "source": "55f7c8d7c108ebecdcd55c3b99d76e5745954dbc",
+      "code_source": "32627920429d8fda3bf42cac6cd609c2958a72ce",
+      "base": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6",
+      "CI": 41202693972,
+      "CI_status": "running",
+      "native_required_mysql_versions": [
+        110,
+        111
+      ],
+      "native_required_mongo_version": 44,
+      "existing_SDK_and_host_readers_reused": true,
+      "readonly_option": true,
+      "broker_pending_or_freeze_approval": false,
+      "local_original": {
+        "source": "bf059e5906362b7f27e79acacd70239ae0054480",
+        "branch": "codex/host-retirement-m5-protocol-proof-20261031",
+        "worktree": "/workspace/qlume-env/worktrees/host-retirement-m5-qs-protocol-proof",
+        "pushed": false,
+        "race_packages": "passed before disconnection",
+        "Python_contracts_passed": 14,
+        "integration_tag_compilation": "passed; native not executed locally",
+        "docs_unit_tests": 88,
+        "docs_hygiene": "passed",
+        "final_docs_facts": "unknown after disconnection",
+        "uncommitted_docs_manifest": true,
+        "actual_byte_export_available": false
+      },
+      "remote_candidate_is_local_byte_export": false,
+      "production_observation_performed": false
     }
   },
   "existing_database_operator_mutation": false,
@@ -1380,6 +1428,21 @@
     "local_private_key_not_published": true,
     "QS_CD_last_verified": "disabled_manually",
     "existing_database_operator_mutation": false,
-    "local_worktree_remote_docs_fast_forwarded": true
+    "local_worktree_remote_docs_fast_forwarded": true,
+    "current": {
+      "environment_id": "ccarenv_b64_Y2NhcmVudl85ODU4OTIzNGYxZTA4MTkxOTU2ZWNlOTcxOTdiNGE4Yw",
+      "executor": "unavailable; unified exec transport disconnected, subsequent session polling rejected",
+      "platform_status_API": "reports running/connected with current observations; not proof of working command channel",
+      "retained_provider_diagnostics": "not_found",
+      "root_cause": "unverified",
+      "last_local_worktree_and_private_key_preserved": true,
+      "remote_repository_and_CI_access": "working",
+      "user_recovery_UI_action_required": "none requested; no verified recovery entry",
+      "local_source_export_pending": true,
+      "production_maintenance_container_created": false,
+      "business_service_stopped": false,
+      "existing_database_operator_mutation": false,
+      "QS_CD_last_verified": "disabled_manually before disconnect; no enable action by this task"
+    }
   }
 }
