@@ -131,7 +131,7 @@ def process_startup_diagnostics(output):
             raise RuntimeError('invalid startup diagnostic') from None
         if (not isinstance(value, dict) or set(value) != {'role', 'phase', 'stage', 'reason', 'exit_code'}
                 or value['role'] not in {'api', 'collection', 'worker'}
-                or value['phase'] not in {'startup_exit', 'health_deadline'}
+                or value['phase'] not in {'startup_exit', 'health_deadline', 'drain_exit', 'drain_deadline'}
                 or value['stage'] not in {'unknown', 'resources', 'container', 'integrations', 'transports', 'runtime', 'shutdown'}
                 or value['reason'] not in {'process_exit', 'owned_namespace', 'compiled_source', 'schema_pair', 'iam', 'database'}
                 or type(value['exit_code']) is not int or not -1 <= value['exit_code'] <= 255

@@ -143,6 +143,11 @@ class ProcessStartupDiagnosticTest(unittest.TestCase):
         self.assertEqual(self.parse(self.value()), [self.value()])
         self.assertEqual(process_startup_diagnostics('private child output'), [])
 
+    def test_drain_failure_keeps_exact_role_and_bounded_phase(self):
+        for phase in ('drain_exit', 'drain_deadline'):
+            value = dict(self.value(), role='worker', phase=phase, stage='shutdown')
+            self.assertEqual(self.parse(value), [value])
+
     def test_private_values_types_and_duplicates_are_rejected(self):
         from qs_recovery_acceptance import process_startup_diagnostics
         for change in (dict(raw='PRIVATE'), dict(role='PRIVATE'), dict(reason='PRIVATE'),
