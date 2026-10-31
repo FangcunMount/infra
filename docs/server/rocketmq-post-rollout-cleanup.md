@@ -98,3 +98,7 @@ Sonar workflow 和 `sonar-project.properties` 已删除；QS 仓库专用 `SONAR
 | qs-server | `sonar.yml`, `rocketmq-m3-image-cache.yml`, `m5-authz-ephemeral-postcheck.yml`, `m5-authz-outage-preflight.yml` |
 | qs-ai | `schema-followup.yml`, `schema-maintenance.yml` |
 | infra | `rocketmq-final-images.yml`, `rocketmq-m4-rebuild.yml`, `m4-final-image-rebuild.yml`, `rocketmq-readable-images.yml`, `rocketmq-readable-startup.yml`, `rocketmq-readable-cutover.yml`, `rocketmq-image-publication.yml`, `rocketmq-readable-publication.yml` |
+
+## 宿主工程退役后续
+
+2026-10-31 启动的[宿主工程 M4/M5](./rocketmq-host-retirement-m4-m5.md)单独核对发布型 Relay/NSQ 代码和旧发布表。本文此前批准的 14 个临时库删除及备份保留决定，不能作为删除六个候选业务存储对象或其历史记录的授权；两批完成计数分开。
