@@ -164,7 +164,7 @@
         "version": 111,
         "target": "qs.mysql.ai_messaging_outbox",
         "transition": "110/44 ->111/44",
-        "source": "62b76c87b8b3e3462c2882c543a6598763b81909",
+        "source": "f27aaf9d5dfbdced1f27952e360ee4576f5d58f3",
         "PR": 474,
         "status": "draft; final combined source62 CI pending; no production execution",
         "scope": "Only empty target, bound paired driver, same-session WRITE lock, no unreviewed programs/dependencies, complete cleanup; controlled original restoration only."
@@ -734,7 +734,7 @@
       },
       "canonical_final_source_readonly_preview": {
         "run": 41189888018,
-        "status": "reader and all four owner jobs success; original snapshot conditional skip; artifact raw digest/content verification pending executor reconnect",
+        "status": "reader and four owner jobs success; QS originalDDL/emptyEOF/complete ledger plus canonical binary bytes verified",
         "artifacts": [
           {
             "id": 13038786528,
@@ -761,7 +761,30 @@
             "name": "messaging-retirement-iam.mysql-41189888018",
             "GitHub_digest": "sha256:791872597d228261877c4eee992d3fee41e7b12008c93edb8557bd47a4679e7d"
           }
-        ]
+        ],
+        "verified_materials": {
+          "source": "62b76c87b8b3e3462c2882c543a6598763b81909",
+          "workflow_run": 41189888018,
+          "actual_original_ledger_matches_native": true,
+          "raw_artifact_digests_verified": true,
+          "offline_binary_sha256": "56bce16b918c7ec08980d5cfbe00cd7b7f408670512a6b98d0a5ff99826dd49c",
+          "snapshot": {
+            "source_sha": "62b76c87b8b3e3462c2882c543a6598763b81909",
+            "migration_resources_sha256": "b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de",
+            "mysql_database": "qs",
+            "mongo_database": "qs",
+            "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+            "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+            "mysql_version": 110,
+            "mongo_version": 44,
+            "target_mysql_version": 111,
+            "target_mongo_version": 44
+          },
+          "transaction_released": true,
+          "pool_released": true,
+          "production_mutation": false,
+          "production_approval": false
+        }
       },
       "native_migration_gate": {
         "job": 124504272788,
@@ -775,8 +798,10 @@
           "id": 13038083772,
           "GitHub_digest": "sha256:147f1dc0347638c43ebbde996a55979d666ecf7252db1277587bdb686fdbd52a"
         },
-        "artifact_content_verification": "pending executor reconnect"
-      }
+        "artifact_content_verification": "passed: ZIP raw digests and JSON receipt; native exact0900 ledger matches actual exported ledger, all three interrupted cases passed"
+      },
+      "prior_final_source": "62b76c87b8b3e3462c2882c543a6598763b81909",
+      "current_diagnostic_source": "f27aaf9d5dfbdced1f27952e360ee4576f5d58f3"
     },
     "read_only_probe_merged_main": "36846135cf6def4b80ff2d374886660dbda6d6db",
     "read_only_probe_main_CI": {
@@ -905,8 +930,25 @@
         "exact_cause": "unverified; no encrypted child trace produced",
         "artifact_id": 13038816575,
         "artifact_zip_digest_reported_by_GitHub": "sha256:25d0269479805652f7eaa93408db98683adaecfe786bf820e38e6d8eeb0db1ba",
-        "download_and_raw_digest_verification": "pending; executor unavailable",
-        "accepted": false
+        "download_and_raw_digest_verification": "passed",
+        "accepted": false,
+        "failed_assertion_lines": [
+          406,
+          1258
+        ],
+        "test_timeout": false,
+        "race_reports": 0,
+        "actual_phase_confirmed": "all three roots reached health/concurrent liveness; nonzero exit asserted during ordered SIGTERM drain",
+        "exact_process_and_exit_cause": "unknown; old diagnostic lacked drain failure capture"
+      },
+      "next_diagnostic_run": {
+        "source": "f27aaf9d5dfbdced1f27952e360ee4576f5d58f3",
+        "infra_source": "d257361abaaba2227a3c1432847c7cac0007c106",
+        "run": 41191118955,
+        "status": "running; no fix or acceptance claimed",
+        "local_Go_tagged_child_tests": "passed",
+        "local_recovery_protocol_tests_passed": 17,
+        "change": "add role/drain_exit/drain_deadline and encrypted owned trace without changing exit-zero assertion or30s budget"
       }
     },
     "pending_restore_rehearsal": {
@@ -1048,7 +1090,7 @@
   ],
   "execution_continuity": {
     "environment_id": "ccarenv_b64_Y2NhcmVudl85ODU4OTIzNGYxZTA4MTkxOTU2ZWNlOTcxOTdiNGE4Yw",
-    "status": "executor reconnected, completed material verification and pushed combined source62/maintenance plan; then reported unavailable again. Remote Actions remain running. Need reconnect before artifact decryption/download validation and final image/maintenance assembly.",
+    "status": "reconnected; helper/tool hashes verified; downloaded original failure and exact-ledger native plus canonical readonly materials",
     "latest_pushed_qs_startup_source": "62b76c87b8b3e3462c2882c543a6598763b81909",
     "local_private_key_not_published": true,
     "QS_CD_last_verified": "disabled_manually",
