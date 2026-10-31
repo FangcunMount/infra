@@ -1,0 +1,1685 @@
+{
+  "schema_version": 1,
+  "milestone_namespace": "host-engineering-retirement-M4-M5",
+  "observed_on": "2026-10-31",
+  "user_timezone": "Asia/Shanghai",
+  "evidence_classes": {
+    "current_confirmation": "Git/source, immutable image and live read-only runtime/monitoring evidence read in this continuation.",
+    "historical_verification": "Earlier exact-source CI/native results are retained at their original runs; not rerun for sudoers installation.",
+    "pending": "Original-body export/restore, writer exclusion, reference/business closure and fresh/upgrade retirement validation do not become complete from publication counts."
+  },
+  "m4": {
+    "application_rollout_verified": true,
+    "sources": {
+      "qs-server": {
+        "candidate": "b5710295dab29cb7034ff72b1ce78d9b023f533c",
+        "main": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc"
+      },
+      "iam": {
+        "candidate": "efa44661a6304daa419097a7f35005e99c582e41",
+        "main": "7cd2b02ef6f917fbab19e204431abce79ea76a85",
+        "native_host_source": "df64582068cb2ab0729717f7449c9bffe8d1be28",
+        "later_changes": "workflow/test/README only; all Go/module/migrations identical"
+      },
+      "infra": {
+        "candidate": "28852938f8c8ad5a1a659cdeb918c9cb4b4774dd",
+        "main": "1b9edc646ae903c24319f798dd3a6aac3a250db4"
+      }
+    },
+    "images": {
+      "iam": {
+        "sha": "7cd2b02ef6f917fbab19e204431abce79ea76a85",
+        "digest": "sha256:34c678649eb78437db13b3ad10b3994d04254c19a4218c2c426726faf5112dfc",
+        "config": "sha256:60e6e8df32b82bf0a772c347190e4d52298653314c52749e6db1d8d0d5af7df2",
+        "registry_verified": true,
+        "build_run": 41169075612
+      },
+      "qs-worker": {
+        "sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+        "digest": "sha256:ae7f6d5fe260dcffc1a97011a1c68a2ce6b410ed8460b55ee1c75d25ed26ce6d",
+        "config": "sha256:d78f573c6c15fc543b2761ef6bc83af568d21ade25bebe8d6c134e31dc438a53",
+        "registry_verified": true,
+        "build_run": 41169342664
+      },
+      "qs-collection-server": {
+        "sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+        "digest": "sha256:21fe0619dfb8f037b6382c4bf9508d871be01d87547a5da5839325beeccf4e96",
+        "config": "sha256:e2c0aeb16bf8928e0162bc1793efa0fa7e9995d8a5b1d7148e73c2ed293982bb",
+        "registry_verified": true,
+        "build_run": 41169342664
+      },
+      "qs-apiserver": {
+        "sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+        "digest": "sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b",
+        "config": "sha256:84f5920ba8808ad11edcb198f038301e0dc09086cf1f6a008f3433d9028f0b69",
+        "registry_verified": true,
+        "build_run": 41169342664
+      }
+    },
+    "deployment_runs": {
+      "iam": 41170095659,
+      "api": 41174333853,
+      "worker": 41174549350,
+      "collection": 41174988540
+    },
+    "runtime_snapshot": 41175362334,
+    "monitoring_snapshot": 41175364496,
+    "replicas": {
+      "iam": 1,
+      "qs-apiserver": 1,
+      "qs-worker": 3,
+      "qs-collection-server": 2,
+      "qs-ai": 1,
+      "qs-operating-system": 1
+    },
+    "owner_observation_available": {
+      "qs.mongo": 1,
+      "qs.mysql": 1,
+      "iam.mysql": 1,
+      "ai.mysql": 1
+    },
+    "owner_observation_fresh": {
+      "qs.mongo": 1,
+      "qs.mysql": 1,
+      "iam.mysql": 1,
+      "ai.mysql": 1
+    },
+    "owner_admission_protected": {
+      "qs.mongo": 0,
+      "qs.mysql": 0,
+      "iam.mysql": 0,
+      "ai.mysql": 0
+    },
+    "qs_business_observation_available": {
+      "value": 0
+    },
+    "qs_pending_metric_present": false,
+    "ai_business_observation_available": {
+      "value": 1
+    },
+    "ai_business_ack_waiting": {
+      "value": 0
+    },
+    "retired_dashboard_removed": true,
+    "controller_followup": {
+      "pr": 473,
+      "source": "a453a1f6547aeb56e758a983bbd502fdaf2535da",
+      "CI": "success",
+      "merged": true,
+      "main": "249dc6839e9772df239d1e1c5f78e1aeeb5be2b8",
+      "pr_CI": {
+        "passed": 29,
+        "conditional_skipped": 1
+      },
+      "main_CI": 41176526595,
+      "main_CI_passed": 29,
+      "main_conditional_skipped": 1
+    },
+    "validation_boundary": [
+      "Worker has no Docker health declaration; explicit readiness and process/binary identity were verified.",
+      "IAM OCI revision label absent; exact reported binary Git commit and immutable image binding were verified.",
+      "M2 full historical business acceptance remains open; missing QS count is not zero."
+    ],
+    "deployment_workflows_restored": {
+      "qs-server": "active",
+      "iam": "active",
+      "qs-ai": "active",
+      "qs-operating-system": "active"
+    },
+    "post_restore_active_deploy_runs": [],
+    "deployment_workflows_restored_scope": "All four restored after completed M4 main CI; subsequent M5 QS freeze is recorded separately under m5, not a current claim that all workflows remain active."
+  },
+  "historical_verification": [
+    {
+      "run": 41165627459,
+      "scope": "QS M3-C, exact b5710295 source, published Go v0.6.1,14 mandatory cases passed/0failed/0skipped",
+      "not_rerun_here": true
+    },
+    {
+      "run": 41166146030,
+      "scope": "Exact IAM df645820/QS b5710295 native transaction/fanout matrix, actual MySQL8.0.36/8.0.44/8.4.13; all passed, no full IAM process-fault/system claim",
+      "not_rerun_here": true
+    },
+    {
+      "run": 41150741066,
+      "scope": "Earlier QS51 original publisher-anchor evidence gaps; no new cohort count or terminal proof inferred here",
+      "not_rerun_here": true
+    }
+  ],
+  "m5": {
+    "read_only_probe_pr": 472,
+    "read_only_probe_source": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+    "probe_CI": {
+      "passed": 29,
+      "conditional_skipped": 1,
+      "run": 41177750904,
+      "native_mysql_job": 124468718607,
+      "native_mongo_job": 124468718488
+    },
+    "production_read_only_run": 41178025856,
+    "production_drop_allowed": false,
+    "new_retirement_migrations": [
+      {
+        "repository": "qs-server",
+        "version": 111,
+        "target": "qs.mysql.ai_messaging_outbox",
+        "transition": "110/44 ->111/44",
+        "source": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+        "PR": 474,
+        "status": "core code/CI merged; live DB remains unchanged; maintenance delivery/window approval pending",
+        "scope": "Only empty target, bound paired driver, same-session WRITE lock, no unreviewed programs/dependencies, complete cleanup; controlled original restoration only."
+      }
+    ],
+    "objects": [
+      {
+        "owner": "iam.mysql",
+        "object": "domain_event_outbox",
+        "status": "hold",
+        "current_dependencies": [
+          "internal/apiserver/container/platform/transaction_handoff.go",
+          "internal/apiserver/infra/mysql/eventoutbox/standard_status.go",
+          "internal/apiserver/process/database.go",
+          "internal/apiserver/infra/mysql/eventoutbox/bootstrap_stager.go"
+        ],
+        "reason": "Runtime liability/readiness reads remain. Fresh migration 33/35 still writes historical bootstrap notifications; removing the writer would break initialization/upgrade.",
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": {
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "7e947bebe62ec42840164c75fe12ea9106799629bc560afd9c4958775e9f952a",
+          "inventory_complete": true,
+          "pool_released": true,
+          "table": {
+            "name": "domain_event_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "727776184b625d699359c20ecbf7da7d0c799c46c0d085c7b13da4c87d6dd8ce",
+            "publication_closed_state": "published"
+          },
+          "schema_head": 45,
+          "schema_dirty": false,
+          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+          "observed_at": "2026-10-31T06:50:17.778011226Z",
+          "transaction_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false,
+        "earlier_read_only_metadata_receipt": {
+          "workflow_run": 41175524009,
+          "owner": "iam.mysql",
+          "observed_at": "2026-10-31T06:13:29.73776366Z",
+          "source_sha": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "6bd675081a00e9825e92d691abe2b53257ed0a93123d5ba293a097d4ef10cde5",
+          "table": {
+            "name": "domain_event_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "727776184b625d699359c20ecbf7da7d0c799c46c0d085c7b13da4c87d6dd8ce",
+            "publication_closed_state": "published"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "read_only_receipt_history": [
+          {
+            "workflow_run": 41176790709,
+            "owner": "iam.mysql",
+            "observed_at": "2026-10-31T06:31:43.298532454Z",
+            "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+            "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+            "mysql_version": "8.0.36",
+            "receipt_sha256": "ff83eb83e11f8054f8c123fabf2b25d33daa6ac9cada79221c4dfdc674c418c2",
+            "table": {
+              "name": "domain_event_outbox",
+              "available": true,
+              "rows": 0,
+              "publication_closed_rows": 0,
+              "other_or_null_state_rows": 0,
+              "null_state_rows": 0,
+              "show_create_table_sha256": "727776184b625d699359c20ecbf7da7d0c799c46c0d085c7b13da4c87d6dd8ce",
+              "publication_closed_state": "published"
+            },
+            "transaction_released": true,
+            "pool_released": true
+          }
+        ]
+      },
+      {
+        "owner": "iam.mysql",
+        "object": "rm_outbox",
+        "status": "hold",
+        "current_dependencies": [
+          "internal/apiserver/container/platform/transaction_handoff.go",
+          "internal/apiserver/infra/mysql/eventoutbox/standard_status.go",
+          "internal/apiserver/infra/mysql/eventoutbox/reliable_preflight.go"
+        ],
+        "reason": "Startup/readiness and retained responsibility inspection still require the table.",
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": {
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "7e947bebe62ec42840164c75fe12ea9106799629bc560afd9c4958775e9f952a",
+          "inventory_complete": true,
+          "pool_released": true,
+          "table": {
+            "name": "rm_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "a0a4b4b3152204dbbebbf80f6ed1f924155ed7715e5f5b39a542cae76fd7655b",
+            "publication_closed_state": "published"
+          },
+          "schema_head": 45,
+          "schema_dirty": false,
+          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+          "observed_at": "2026-10-31T06:50:17.778011226Z",
+          "transaction_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false,
+        "earlier_read_only_metadata_receipt": {
+          "workflow_run": 41175524009,
+          "owner": "iam.mysql",
+          "observed_at": "2026-10-31T06:13:29.73776366Z",
+          "source_sha": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "6bd675081a00e9825e92d691abe2b53257ed0a93123d5ba293a097d4ef10cde5",
+          "table": {
+            "name": "rm_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "a0a4b4b3152204dbbebbf80f6ed1f924155ed7715e5f5b39a542cae76fd7655b",
+            "publication_closed_state": "published"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "read_only_receipt_history": [
+          {
+            "workflow_run": 41176790709,
+            "owner": "iam.mysql",
+            "observed_at": "2026-10-31T06:31:43.298532454Z",
+            "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+            "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+            "mysql_version": "8.0.36",
+            "receipt_sha256": "ff83eb83e11f8054f8c123fabf2b25d33daa6ac9cada79221c4dfdc674c418c2",
+            "table": {
+              "name": "rm_outbox",
+              "available": true,
+              "rows": 0,
+              "publication_closed_rows": 0,
+              "other_or_null_state_rows": 0,
+              "null_state_rows": 0,
+              "show_create_table_sha256": "a0a4b4b3152204dbbebbf80f6ed1f924155ed7715e5f5b39a542cae76fd7655b",
+              "publication_closed_state": "published"
+            },
+            "transaction_released": true,
+            "pool_released": true
+          }
+        ]
+      },
+      {
+        "owner": "qs.mysql",
+        "object": "rm_outbox",
+        "status": "hold",
+        "current_dependencies": [
+          "internal/apiserver/infra/mysql/evaluation/consistency_event_reference.go",
+          "internal/apiserver/maintenance/originaleffect/source.go",
+          "internal/apiserver/infra/mysql/standardoutbox/gap_recovery.go"
+        ],
+        "reason": "Canonical standard-reference and reverse consistency audits, retained original-effect recovery and historical governance still read original records.",
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": {
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "4f2001008207752cfecc3cec949fe8e0f176830fcac449d23894591eeb7f3d46",
+          "inventory_complete": true,
+          "pool_released": true,
+          "table": {
+            "name": "rm_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "79ce61b7d913153e15f8761f03695e4115fa10c334aebfb6e5ae52e6aad36e7c",
+            "publication_closed_state": "published"
+          },
+          "schema_head": 110,
+          "schema_dirty": false,
+          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+          "observed_at": "2026-10-31T06:50:12.981590761Z",
+          "transaction_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false,
+        "earlier_read_only_metadata_receipt": {
+          "workflow_run": 41175524009,
+          "owner": "qs.mysql",
+          "observed_at": "2026-10-31T06:13:40.165780441Z",
+          "source_sha": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "bf332b673dabcba3eaa066aa778d4a877644dfaed2ea5ff32319f89254e0a4c6",
+          "table": {
+            "name": "rm_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "79ce61b7d913153e15f8761f03695e4115fa10c334aebfb6e5ae52e6aad36e7c",
+            "publication_closed_state": "published"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "read_only_receipt_history": [
+          {
+            "workflow_run": 41176790709,
+            "owner": "qs.mysql",
+            "observed_at": "2026-10-31T06:31:41.54744576Z",
+            "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+            "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+            "mysql_version": "8.0.36",
+            "receipt_sha256": "3546e6cf011005db8f9ee959e51cab5578dde29399d40b09f7d5189b0fef4e9c",
+            "table": {
+              "name": "rm_outbox",
+              "available": true,
+              "rows": 0,
+              "publication_closed_rows": 0,
+              "other_or_null_state_rows": 0,
+              "null_state_rows": 0,
+              "show_create_table_sha256": "79ce61b7d913153e15f8761f03695e4115fa10c334aebfb6e5ae52e6aad36e7c",
+              "publication_closed_state": "published"
+            },
+            "transaction_released": true,
+            "pool_released": true
+          }
+        ]
+      },
+      {
+        "owner": "qs.mysql",
+        "object": "ai_messaging_outbox",
+        "status": "candidate_after_M4_deployment_and_evidence",
+        "current_dependencies": [
+          "scripts/maintenance/qs-ai-messaging/audit.go"
+        ],
+        "m4_candidate_change": "M4 QS application is deployed and independently verified; AI bridge current preflight no longer requires the old publishing table. This does not close liabilities or authorize DROP.",
+        "reason": "No source finding authorizes data loss. Retained body references, unconfirmed responsibilities, export integrity and rollback compatibility require live read-only evidence.",
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": {
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "4f2001008207752cfecc3cec949fe8e0f176830fcac449d23894591eeb7f3d46",
+          "inventory_complete": true,
+          "pool_released": true,
+          "table": {
+            "name": "ai_messaging_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+            "publication_closed_state": "confirmed"
+          },
+          "schema_head": 110,
+          "schema_dirty": false,
+          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+          "observed_at": "2026-10-31T06:50:12.981590761Z",
+          "transaction_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false,
+        "earlier_read_only_metadata_receipt": {
+          "workflow_run": 41175524009,
+          "owner": "qs.mysql",
+          "observed_at": "2026-10-31T06:13:40.165780441Z",
+          "source_sha": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "bf332b673dabcba3eaa066aa778d4a877644dfaed2ea5ff32319f89254e0a4c6",
+          "table": {
+            "name": "ai_messaging_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+            "publication_closed_state": "confirmed"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "read_only_receipt_history": [
+          {
+            "workflow_run": 41176790709,
+            "owner": "qs.mysql",
+            "observed_at": "2026-10-31T06:31:41.54744576Z",
+            "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+            "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+            "mysql_version": "8.0.36",
+            "receipt_sha256": "3546e6cf011005db8f9ee959e51cab5578dde29399d40b09f7d5189b0fef4e9c",
+            "table": {
+              "name": "ai_messaging_outbox",
+              "available": true,
+              "rows": 0,
+              "publication_closed_rows": 0,
+              "other_or_null_state_rows": 0,
+              "null_state_rows": 0,
+              "show_create_table_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+              "publication_closed_state": "confirmed"
+            },
+            "transaction_released": true,
+            "pool_released": true
+          }
+        ]
+      },
+      {
+        "owner": "qs.mongo",
+        "object": "rm_outbox",
+        "status": "hold",
+        "current_dependencies": [
+          "internal/apiserver/infra/modelcatalog/hotrank/source.go",
+          "internal/apiserver/infra/answersheetgap/scanner.go",
+          "internal/apiserver/infra/mongo/mongoconsistency/standard_event_audit.go",
+          "internal/apiserver/infra/mongo/standardoutbox/replay.go"
+        ],
+        "reason": "Version-1 accepted answers, mixed historical/current hot-rank reconstruction and historical audit/recovery depend on exact original records.",
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": {
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "9822b09ad44664a457747a2f2030da90f6b8ddde4b73aad3e53a7587a3568d32",
+          "inventory_complete": true,
+          "pool_released": true,
+          "schema_head": 44,
+          "rows": 0,
+          "publication_closed_rows": 0,
+          "other_or_null_state_rows": 0,
+          "database_binding_sha256": "0315f466f7520275652102c82397269f7d45e29328fc513d12b49b1bb7adfd81",
+          "collection_catalog_sha256": "f9a36dfe955fabbf874f955067d059b8d660fa5c3ff5edb349b09baf4e5c3fac",
+          "count_read_concern": "snapshot",
+          "observed_at": "2026-10-31T06:50:26.81261398Z",
+          "cursors_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false
+      },
+      {
+        "owner": "ai.mysql",
+        "object": "messaging_outbox",
+        "status": "hold_until_exact_versioned_runtime_layout_and_liability_review",
+        "current_dependencies": [
+          "src/qs_ai/maintenance/schema_layout.py",
+          "src/qs_ai/maintenance/messaging_audit.py",
+          "src/qs_ai/infrastructure/persistence/mysql/messaging.py",
+          "src/qs_ai/bootstrap/server.py",
+          "src/qs_ai/bootstrap/database_check.py",
+          "src/qs_ai/maintenance/transaction_binding.py",
+          "src/qs_ai/maintenance/schema_refactor/validation.py",
+          "src/qs_ai/maintenance/schema_refactor/v0038.py"
+        ],
+        "reason": "Current 0043 application startup and release/transaction preflight call require_runtime_schema; its exact full v0038->0040 table set still includes messaging_outbox. A new versioned runtime layout and maintenance compatibility are required. Do not weaken exact layout validation or edit frozen historical layouts.",
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": {
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "9cc7e73a055cdd5634d1a8c8c504b87a75a754c4aa235a47dad9a5bb07e023b7",
+          "inventory_complete": true,
+          "pool_released": true,
+          "schema_heads": [
+            "0043_native_transaction_limit"
+          ],
+          "rows": 0,
+          "truncated": false
+        },
+        "read_only_attempts": [
+          {
+            "workflow_run": 41175524009,
+            "conclusion": "failure",
+            "valid_receipt_available": false,
+            "presence": null,
+            "rows": null,
+            "cause": "unknown; classified diagnostic follow-up pending"
+          },
+          {
+            "workflow_run": 41176427602,
+            "source": "21098c2189e750bb152582082e960b1fee6e2720",
+            "valid_receipt_available": true,
+            "complete": false,
+            "error_phase": "imports",
+            "error_type": "ModuleNotFoundError",
+            "database_query_started": false,
+            "rows": null,
+            "resolution": "Use deployed application /app/.venv/bin/python and UID10001:10001; exact deployed Dockerfile verified. Final source e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04 read-only run41176790709 pending."
+          },
+          {
+            "workflow_run": 41176790709,
+            "conclusion": "success",
+            "valid_receipt_available": true,
+            "complete": true,
+            "queries_executed": true,
+            "rows": 0,
+            "application_interpreter_and_UID_corrected": true
+          }
+        ],
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false,
+        "read_only_receipt_history": [
+          {
+            "workflow_run": 41176790709,
+            "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+            "schema_heads": [
+              "0043_native_transaction_limit"
+            ],
+            "inventory_complete": true,
+            "available": true,
+            "total": 0,
+            "truncated": false,
+            "pool_released": true,
+            "transaction_released": null,
+            "receipt_sha256": "6b3b7970fd604f6a8b1ac80ca0b6997de2e793601aa284db3d8093c1332f94de",
+            "application_image_source": "f9f24abdf98535295c4e3d223675ef6be62115e2"
+          }
+        ]
+      }
+    ],
+    "fresh_iam_validation_boundary": {
+      "source": "internal/pkg/migration/transaction_broker_host_integration_test.go",
+      "fixture_behavior": "After current full fresh migration, native Broker fixture explicitly truncates owned generated seed notifications from both old publication tables. This is isolated fixture cleanup, not production evidence or a retirement acceptance.",
+      "fresh_install_legacy_responsibility_retirement_proven": false
+    },
+    "publication_count_does_not_prove": [
+      "current schema heads",
+      "business and original-reference closure",
+      "absence of current or rollback readers/writers",
+      "original body export and tested restoration",
+      "fresh and upgrade retirement compatibility"
+    ],
+    "ai_preserved_observed_counts": {
+      "result_outbox": {
+        "physical_table": "interpretation_result_outbox",
+        "rows": 125,
+        "available": true,
+        "truncated": false
+      },
+      "ai_messaging_inbox": {
+        "physical_table": "messaging_inbox",
+        "rows": 57,
+        "available": true,
+        "truncated": false
+      }
+    },
+    "ai_read_only_run": 41176790709,
+    "all_five_sql_publication_candidates_currently_empty": true,
+    "production_read_only_run_conclusion": "success",
+    "production_read_only_previous_run": 41175524009,
+    "mongo_inventory_extension_status": "Authenticated native selectors and exact-source production snapshot count passed; schema44 and zero rows, not retirement permission.",
+    "all_six_original_candidates_observed_empty": true,
+    "candidate_native_first_source": {
+      "source": "d9e27a8d3c255ff962326a54459c8218f2c5691b",
+      "execution_source_merge": "5c1fbc86906a9542a6ab11692e5455114fb9c8d5",
+      "run": 41181173777,
+      "job": 124478701331,
+      "native_selected_case_passed": true,
+      "overall_CI": "superseded incomplete run cancelled",
+      "original_and_restored_fixture_ddl_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+      "matches_actual_original_table_structure_hash": true,
+      "is_production_backup_or_restore": false
+    },
+    "final_candidate_checks": {
+      "source": "62b76c87b8b3e3462c2882c543a6598763b81909",
+      "CI": 41189873668,
+      "CI_status": "in progress; 15 job successes in main workflow at last read, two running, one original conditional skip; associated workflows separate",
+      "actual_readonly_offline_preview_run": 41183082546,
+      "preview_status": "passed",
+      "native_guard_previous_source": "704ee8ddb82b3094a2b469b4f5506cfb274521c4",
+      "native_guard_run": 41182284431,
+      "native_guard_job": 124481965592,
+      "native_guard_status": "passed",
+      "native_artifact_sha256": "3fe9c0f4d36458e0e14a56be854ee4864ea864405872a879d7b9c97d1d7ce9fd",
+      "M3C14_run": 41182295905,
+      "M3C14_source": "704ee8ddb82b3094a2b469b4f5506cfb274521c4",
+      "M3C14_job": 124482146313,
+      "M3C14_passed": 14,
+      "M3C14_failed": 0,
+      "M3C14_skipped": 0,
+      "M3C14_artifact_sha256": "8cd7665594b5114c64157bf2ee158235f542d55540283bcc88ec7e1a4799c0ea",
+      "production_go_modules_configs_and_migrations_identical_to_new_candidate": true,
+      "equivalence_is_not_new_execution": true,
+      "controlled_provider_and_iam": true,
+      "full_Collection_or_system_login_claimed": false,
+      "offline_preview": {
+        "read_only_requested": true,
+        "inventory_complete": true,
+        "mutation": false,
+        "source_sha": "d3c977740cdb2e063fde0db49dcc05bfca6cbfe2",
+        "binary_sha256": "c80049fd1d0b1ec9fc8d28444b6e004a8c3f48eba0e8e147f738b6d3887e9913",
+        "workflow_run": "41183082546",
+        "snapshot": {
+          "source_sha": "d3c977740cdb2e063fde0db49dcc05bfca6cbfe2",
+          "migration_resources_sha256": "b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de",
+          "mysql_database": "qs",
+          "mongo_database": "qs",
+          "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+          "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+          "mysql_version": 110,
+          "mongo_version": 44,
+          "target_mysql_version": 111,
+          "target_mongo_version": 44
+        },
+        "read_only": true
+      },
+      "M3C14_overall_workflow": "cancelled after required current host job success and verified artifact download; remaining automatically included historical controls not counted as passed",
+      "M3C14_exactly_tested_scope": "Production business Container/API gRPC services and real Worker process; controlled IAM/provider, no complete production HTTP/Collection or system login acceptance",
+      "latest_change_from_verified_preview": "Only workflow output grouping and documentation source attribution; canonical executor source unchanged. Read-only preview remains attributed to d3c977740cdb2e063fde0db49dcc05bfca6cbfe2.",
+      "prior_green_base": {
+        "source": "51323979c7ee38b5288f5a3422209f7589cef5dc",
+        "run": 41183644869,
+        "checks_passed": 29,
+        "conditional_skipped": 1
+      },
+      "prior_green_candidate": {
+        "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+        "run": 41186437005,
+        "passed": 29,
+        "conditional_skipped": 1
+      },
+      "canonical_final_source_readonly_preview": {
+        "run": 41189888018,
+        "status": "reader and four owner jobs success; QS originalDDL/emptyEOF/complete ledger plus canonical binary bytes verified",
+        "artifacts": [
+          {
+            "id": 13038786528,
+            "name": "messaging-retirement-ai.mysql-41189888018",
+            "GitHub_digest": "sha256:ad47efaefb71e1bde8b9d51bc38b297e698632ca445835d75eee0ab692418489"
+          },
+          {
+            "id": 13038766674,
+            "name": "messaging-retirement-qs.mysql-41189888018",
+            "GitHub_digest": "sha256:23aab3dafa0ae0f59254e941e86387e16a0c82be39e51de9e6b0d50cbf019900"
+          },
+          {
+            "id": 13038542136,
+            "name": "messaging-retirement-qs.mongo-41189888018",
+            "GitHub_digest": "sha256:6ff6f1bc9bad52b6ec2cda5bd0ae052732f5ca59487eb6f5868e1c54b41ebbed"
+          },
+          {
+            "id": 13038516915,
+            "name": "messaging-retirement-reader-41189888018",
+            "GitHub_digest": "sha256:bad7a11920bb90dc63a1b6b63cc12eeba44dd1972b3cdc6ca99d7dd8266c115d"
+          },
+          {
+            "id": 13038452401,
+            "name": "messaging-retirement-iam.mysql-41189888018",
+            "GitHub_digest": "sha256:791872597d228261877c4eee992d3fee41e7b12008c93edb8557bd47a4679e7d"
+          }
+        ],
+        "verified_materials": {
+          "source": "62b76c87b8b3e3462c2882c543a6598763b81909",
+          "workflow_run": 41189888018,
+          "actual_original_ledger_matches_native": true,
+          "raw_artifact_digests_verified": true,
+          "offline_binary_sha256": "56bce16b918c7ec08980d5cfbe00cd7b7f408670512a6b98d0a5ff99826dd49c",
+          "snapshot": {
+            "source_sha": "62b76c87b8b3e3462c2882c543a6598763b81909",
+            "migration_resources_sha256": "b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de",
+            "mysql_database": "qs",
+            "mongo_database": "qs",
+            "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+            "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+            "mysql_version": 110,
+            "mongo_version": 44,
+            "target_mysql_version": 111,
+            "target_mongo_version": 44
+          },
+          "transaction_released": true,
+          "pool_released": true,
+          "production_mutation": false,
+          "production_approval": false
+        }
+      },
+      "native_migration_gate": {
+        "job": 124504272788,
+        "conclusion": "success",
+        "log": "required native selectors RUN/PASS; zero SKIP",
+        "exact_ledger_recovery_artifact": {
+          "id": 13038831601,
+          "GitHub_digest": "sha256:732c8f555d176aafb1defea8b448f24cd1e3bca4b3d6b09f3bdc5ba35edc979c"
+        },
+        "guard_artifact": {
+          "id": 13038083772,
+          "GitHub_digest": "sha256:147f1dc0347638c43ebbde996a55979d666ecf7252db1277587bdb686fdbd52a"
+        },
+        "artifact_content_verification": "passed: ZIP raw digests and JSON receipt; native exact0900 ledger matches actual exported ledger, all three interrupted cases passed"
+      },
+      "prior_final_source": "62b76c87b8b3e3462c2882c543a6598763b81909",
+      "current_diagnostic_source": "f27aaf9d5dfbdced1f27952e360ee4576f5d58f3"
+    },
+    "read_only_probe_merged_main": "36846135cf6def4b80ff2d374886660dbda6d6db",
+    "read_only_probe_main_CI": {
+      "run": 41183134769,
+      "status": "success",
+      "checks_passed": 29,
+      "conditional_skipped": 1
+    },
+    "production_QS_CD_state": "disabled_manually; current M4 service images unchanged",
+    "actual_original_empty_EOF_materials": {
+      "run": 41181671449,
+      "source": "e7702fbb0ab27a49c16efd212fda400653b6909d",
+      "sql_owner": "qs.mysql",
+      "schema_pair": [
+        110,
+        44
+      ],
+      "original_DDL_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+      "original_jsonl_bytes": 0,
+      "original_jsonl_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "private_artifact_zip_sha256": "0294cd8aef379a512f5dd88cb2873ef290d96241e7b138e8d3b0b8a25797d83c",
+      "same_bytes_as_successful_native_restore": true,
+      "actual_production_restore_or_write_exclusion_proven": false,
+      "latest_run": 41183082546,
+      "latest_source": "d3c977740cdb2e063fde0db49dcc05bfca6cbfe2"
+    },
+    "retained_historical_CI_failures": [
+      {
+        "run": 41181440743,
+        "source": "e7702fbb0ab27a49c16efd212fda400653b6909d",
+        "failed_jobs": [
+          "Actor Store MySQL Transactions",
+          "Lint Code"
+        ],
+        "cause": "Actor fixture bypassed guarded paired driver using raw SQL; lint QF1001 DeMorgan. Full-chain assertions moved intact into canonical owned paired native gate; production guard retained. Both jobs passed at704."
+      },
+      {
+        "run": 41183086959,
+        "source": "d3c977740cdb2e063fde0db49dcc05bfca6cbfe2",
+        "failed_job": "Deployment Contracts",
+        "cause": "Required hosted actionlint/ShellCheck SC2129 for three independent GITHUB_OUTPUT redirects; only grouped redirect changed. Local actionlint did not have ShellCheck; hosted gate was not bypassed."
+      }
+    ],
+    "latest_inventory": {
+      "run": 41183082546,
+      "source_sha": "d3c977740cdb2e063fde0db49dcc05bfca6cbfe2",
+      "all_four_owner_jobs": "success",
+      "all_six_candidates_still_empty": true,
+      "artifacts_raw_digest_verified": true,
+      "retirement_or_writer_freeze_claimed": false,
+      "preserved_AI_result_rows": 125,
+      "preserved_AI_inbox_rows": 57
+    },
+    "concrete_execution_preparation": {
+      "scope": "m5_qs_empty_ai_publisher",
+      "exact_transition": [
+        110,
+        44,
+        111,
+        44
+      ],
+      "objects_deleted": [
+        "qs.mysql.ai_messaging_outbox"
+      ],
+      "all_other_candidates_retained": true,
+      "writers_frozen": false,
+      "production_apply_approved": false,
+      "startup_receipt_for_complete_process_set": "pending; existing native business/Worker proof is narrower",
+      "material_retention_days_minimum": 30,
+      "new_main_images": "pending fixed source and digest",
+      "fallback": "Before first new runtime start, stop on any dirty/unknown/partial result. Re-read actual server operation/schema, retain original approval and consumed marker, restore only reviewed original empty target structure and exact paired metadata under separately reviewed recovery; no automatic force/down/overwrite. M4 fixed images remain live until an approved window."
+    },
+    "pending_startup_fixture": {
+      "source": "2379189182ba70fe353663628efbf40bf36e2a03",
+      "infra_source": "9255279b25da10f4bd09ff80c0f1e9149d87c8a1",
+      "run": 41189393198,
+      "status": "resolved: exact1031 positive native14/full process roots and signal drain verified; prior failures retained",
+      "previous_failures": [
+        {
+          "source": "47b7e1d6ba5da163fc0c15141188851b78d110a8",
+          "run": 41184781027,
+          "cause": "Owned fixture namespace prefix mismatch; corrected strict actual allocator prefix",
+          "accepted": false
+        },
+        {
+          "source": "8183cc283f2db81728ad7b47027b6cb4d5c0a2f3",
+          "run": 41186033788,
+          "cause": "API resources process exit1; no timeout/race; retained as failure",
+          "accepted": false
+        },
+        {
+          "source": "ab54875261c05c278575668346051ddb69bd6522",
+          "infra_source": "4c2e3c4ffb7b14d3b5852e24aec537f24f707803",
+          "run": 41188135344,
+          "job": 124499150678,
+          "accepted": false,
+          "cause": "Verified encrypted owned child diagnostic: MySQL1045 access denied. Public Options JSON intentionally excludes password; private fixture failed to transport existing owned secret.",
+          "diagnostic_zip_sha256": "16e80467958ac96a092f4f62eaf24d50c55632cb8c272fc9c6a895529505eb43",
+          "proof_zip_sha256": "da2ce6de6fde370e218dd30dc4c0a42be4a5e4e3cfeecbee4fd8445c7ef263bf",
+          "plaintext_sha256": "1634483ce31bcb37e71b74809009e83b702d08154ac587ef0ea92bc26208a846",
+          "private_trace_not_published": true
+        }
+      ],
+      "corrections": [
+        "Private0600 configuration transports existing owned DSN and validates loopback/database/user binding; public option password redaction unchanged. Deterministic serialization regression passed locally.",
+        "Recovery-only API principal receives exact hot-rank topic/group subscription; publisher scope unchanged and Mongo publication forbidden; protocol regression passed locally."
+      ],
+      "not_yet_merged_into_474": false,
+      "assembled_candidate": "62b76c87b8b3e3462c2882c543a6598763b81909",
+      "earlier_native_to_candidate_equivalence": {
+        "source": "2379189182ba70fe353663628efbf40bf36e2a03",
+        "candidate": "62b76c87b8b3e3462c2882c543a6598763b81909",
+        "production_runtime_source_configs_modules_migrations_identical": true,
+        "runtimeclosure_fixtures_identical": true,
+        "changed_scope": "workflow/docs and original-ledger export/recovery tests",
+        "not_a_new_execution": true
+      },
+      "job": 124503617012,
+      "current_failure": {
+        "source": "2379189182ba70fe353663628efbf40bf36e2a03",
+        "infra_source": "9255279b25da10f4bd09ff80c0f1e9149d87c8a1",
+        "run": 41189393198,
+        "job": 124503617012,
+        "job_conclusion": "failure",
+        "failure": "actual default QS owners failed; private output withheld",
+        "exact_cause": "unverified; no encrypted child trace produced",
+        "artifact_id": 13038816575,
+        "artifact_zip_digest_reported_by_GitHub": "sha256:25d0269479805652f7eaa93408db98683adaecfe786bf820e38e6d8eeb0db1ba",
+        "download_and_raw_digest_verification": "passed",
+        "accepted": false,
+        "failed_assertion_lines": [
+          406,
+          1258
+        ],
+        "test_timeout": false,
+        "race_reports": 0,
+        "actual_phase_confirmed": "all three roots reached health/concurrent liveness; nonzero exit asserted during ordered SIGTERM drain",
+        "exact_process_and_exit_cause": "unknown; old diagnostic lacked drain failure capture"
+      },
+      "next_diagnostic_run": {
+        "source": "f27aaf9d5dfbdced1f27952e360ee4576f5d58f3",
+        "infra_source": "d257361abaaba2227a3c1432847c7cac0007c106",
+        "run": 41191118955,
+        "status": "failed and diagnosed; fixture correction in isolated prototype",
+        "local_Go_tagged_child_tests": "passed",
+        "local_recovery_protocol_tests_passed": 17,
+        "change": "add role/drain_exit/drain_deadline and encrypted owned trace without changing exit-zero assertion or30s budget",
+        "source_review_hypothesis": {
+          "fact": "Worker initializeRuntime starts metrics server before subscribing handlers; POSIX signal manager starts later in preparedServer.Run",
+          "implication": "redis.summary.ready alone does not prove Worker has entered its drainable runtime",
+          "cause_confirmed": false,
+          "production_or_fixture_fix_implemented": false
+        },
+        "job": 124507944467,
+        "job_conclusion": "failure",
+        "report_artifact": {
+          "id": 13039730097,
+          "GitHub_digest": "sha256:215909e3557f713df14f7e3193021ddf4e828a509511365592df5e6d27cba213"
+        },
+        "encrypted_trace_artifact": {
+          "id": 13038704697,
+          "GitHub_digest": "sha256:0e06d1c4ae503182f8a8a2b9ccc6d5106da6bcaef223e567d64440208ac841d7"
+        },
+        "download_digest_and_decryption_verified": true,
+        "exact_process_and_cause": "unverified until retained report/private trace inspected",
+        "exact_process_and_exit_cause": "Worker drain_exit code-1. Verified decrypted child has no real Worker online or received-shutdown-signal marker, no panic/race/DB error. Redis metrics server was online during subscription preparation; fixture sent SIGTERM before entering preparedServer.Run/signal registration."
+      },
+      "next_positive_run": {
+        "source": "1031b88a2d64c10637ea1a606bb42c69da62b5fc",
+        "infra_source": "d257361abaaba2227a3c1432847c7cac0007c106",
+        "run": 41193062385,
+        "status": "success full workflow and required host job; ZIP/receipt verified",
+        "change": "Only fixture requires Redis ready AND existing actual Worker online log before SIGTERM; production runtime, SDK, budgets, exit-zero and14cases unchanged",
+        "local_tagged_tests": "passed",
+        "docs_facts": "passed",
+        "artifact_id": 13039733611,
+        "raw_zip_sha256": "85500c0590ec1066b72fffb9beaee430dd7909832a81e98100e9a1a20778422d",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "actual_three_roots_ready_and_drained": true,
+        "startup_and_drain_seconds": 6,
+        "retained_fact_counts_unchanged": true,
+        "typed_options_not_CLI_or_system_login": true,
+        "production_execution": false
+      }
+    },
+    "pending_restore_rehearsal": {
+      "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+      "branch": "codex/host-retirement-m5-restore-proof-20261031",
+      "worktree": "/workspace/qlume-env/worktrees/host-retirement-m5-qs-evidence",
+      "status": "passed native paired gate at exact75; fixture-only, no production restore/approval",
+      "scope": "Only independently reviewed original empty structure plus complete captured ledger transaction replay, not numeric Force/dirty clearing. Runtime-started/material/identity/nonempty guards; old110/44 compatibility. Fixture-only helper, not installed production repair entrypoint.",
+      "native_run": 41186437005,
+      "artifact_id": 13037482247,
+      "artifact_zip_sha256": "028b6127d699e43e0f67a6f431ecfe42c91e8c28e80f3c3b4d7ca1af7c037f71",
+      "passed_cases": [
+        "dirty_before_ddl",
+        "dirty_after_drop",
+        "clean_before_runtime"
+      ],
+      "elapsed_milliseconds": [
+        21,
+        29,
+        30
+      ],
+      "generic_force_or_down_used": false,
+      "original_fixture_ledger_DDL_sha256": "e8a8a3b64da558083735d5f908a14e0842dacd5a0343f72e1e381b3049c1da80",
+      "actual_original_ledger_DDL_sha256": "e663736774931e5f988b7fa72a0849fa725ae3ba97f083df404b676d64b616ee",
+      "actual_DDL_equivalence": "previous fixture collation differs; added owned exact0900 ledger replay regression at QS e28be8761; native pending"
+    },
+    "startup_diagnostics_PR": {
+      "PR": 418,
+      "source": "d257361abaaba2227a3c1432847c7cac0007c106",
+      "local_protocol_tests_passed": 75,
+      "status": "draft; full existing PR CI pending",
+      "scope": "Bounded startup classification; optional encrypted fixture trace; recovery-only precise API hotrank subscription",
+      "merged": true,
+      "main": "3452f456fbabc8851270d4a8acb571f56ef8f20f",
+      "checks_passed": 25,
+      "conditional_skipped": 1,
+      "main_contracts_run": 41193756726,
+      "main_contracts": "success"
+    },
+    "complete_ledger_read_only_export": {
+      "run": 41189102683,
+      "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+      "all_four_owner_jobs": "success",
+      "snapshot_job": "conditional skipped",
+      "archive_download_and_content_verification": "passed",
+      "qs_mysql_artifact": {
+        "id": 13038650189,
+        "digest": "sha256:e72325eda74e5401ea6f6e37f1d3eddd3b873c8570071676fe604c9bd662b382"
+      },
+      "is_production_restore_or_mutation": false,
+      "verified_materials": {
+        "workflow_run": 41189102683,
+        "source_sha": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+        "actual_read_only_export_verified": true,
+        "target_rows": 0,
+        "target_DDL_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+        "body_wire_jsonl_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "original_complete_ledger": {
+          "original_ddl": "CREATE TABLE `schema_migrations` (\n  `version` bigint NOT NULL,\n  `dirty` tinyint(1) NOT NULL,\n  PRIMARY KEY (`version`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci",
+          "show_create_table_sha256": "e663736774931e5f988b7fa72a0849fa725ae3ba97f083df404b676d64b616ee",
+          "rows": [
+            {
+              "version": 110,
+              "dirty": false
+            }
+          ]
+        },
+        "offline_binary_sha256": "98fc144f8cd0e4cf84300e74f61d5d621781df4b6155159eb79a83162405d160",
+        "offline_snapshot": {
+          "source_sha": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+          "migration_resources_sha256": "b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de",
+          "mysql_database": "qs",
+          "mongo_database": "qs",
+          "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+          "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+          "mysql_version": 110,
+          "mongo_version": 44,
+          "target_mysql_version": 111,
+          "target_mongo_version": 44
+        },
+        "writers_excluded": false,
+        "production_apply_approved": false,
+        "production_restoration_proven": false
+      },
+      "artifacts": [
+        {
+          "artifact_id": 13038650189,
+          "owner": "qs.mysql",
+          "zip_sha256": "e72325eda74e5401ea6f6e37f1d3eddd3b873c8570071676fe604c9bd662b382",
+          "files": [
+            "messaging-retirement-original-ai-publisher.sql",
+            "messaging-retirement-original-ai-publisher.jsonl",
+            "messaging-retirement-offline-preview.json",
+            "messaging-retirement-inventory.json"
+          ]
+        },
+        {
+          "artifact_id": 13038286162,
+          "owner": "ai.mysql",
+          "zip_sha256": "e5600eef3dcfe71f4323fd63dd4121f618f449ff45ba71eb8cdf9095ebd6d151",
+          "files": [
+            "messaging-retirement-inventory.json"
+          ]
+        },
+        {
+          "artifact_id": 13038088867,
+          "owner": "iam.mysql",
+          "zip_sha256": "7ebd52f699e726d718b805c7c8a6991a5002fa0d78afed5c7ea62e675486ceda",
+          "files": [
+            "messaging-retirement-inventory.json"
+          ]
+        },
+        {
+          "artifact_id": 13037912480,
+          "owner": "reader",
+          "zip_sha256": "24718ed9e656a670abdb1c150128d36bccedff9b3aebc7c9beffe80faaf92067",
+          "files": [
+            "messaging-retirement-inventory",
+            "qs-migrate-offline",
+            "messaging-retirement-mongo-inventory"
+          ]
+        },
+        {
+          "artifact_id": 13037887664,
+          "owner": "qs.mongo",
+          "zip_sha256": "7e609a58873b03e0156e8e3bac50696ec9817b331143be557d3475aebfb6a32c",
+          "files": [
+            "messaging-retirement-inventory.json"
+          ]
+        }
+      ]
+    },
+    "merge_release_readiness": "core474, transport475 and protocol476 merged with successful exact main CI; fixed1073 images retained. Actual staged transport/live primary reads, qualified writer freeze and owner exit, concrete operator restore route and final database approval remain blocked/unexecuted.",
+    "core_delivery": {
+      "PR": 474,
+      "candidate": "1b6f8debf053919ee803c3f35607072cc48b3b28",
+      "merged_main": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+      "candidate_checks": {
+        "passed": 29,
+        "conditional_skipped": 1
+      },
+      "main_CI": 41195675199,
+      "main_CI_status": "success",
+      "production_database_execution": false,
+      "deployment": false
+    },
+    "maintenance_transport_delivery": {
+      "PR": 475,
+      "source": "71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8",
+      "status": "merged; exact main CI success; production staging remains unexecuted",
+      "local_contract_tests": 15,
+      "native_job": 124524476566,
+      "native_run": 41196795025,
+      "native_artifact": 13040813646,
+      "native_zip_sha256": "a1aeb5c0d9a154546103162759b78cc8e0bb7978d0cc76844dd38e1baf4a99f6",
+      "native_execution_merge_sha": "9846b5c5767a4a7e335da15b8224bf189f1302ff",
+      "native_zip_and_report_verified": true,
+      "no_DB_connections_or_application_runtime_in_smoke": true,
+      "production_staging_performed": false,
+      "readonly_actual_permission_preflight": 41198015973,
+      "preflight_status": "success; original ZIP and report verified, no stage/DB/runtime freeze",
+      "first_failure": {
+        "run": 41196326278,
+        "job": 124523116425,
+        "cause": "optional Docker inspect discarded nonzero exit, possible truthy JSON[]; corrected status and owned native source namespace",
+        "not_passed": true
+      },
+      "code_source": "6090af5226d9096da1107b7eb8cc16c805393e72",
+      "corrected_production_preflight": 41197780799,
+      "actual_preflight_failure": {
+        "run": 41197177504,
+        "source": "51be9ec9f89b6fb0b788aa4253dba164acd39497",
+        "serverA_B_old_snapshot": "sudo password required for root Python invocation",
+        "maintenance": "unclassified refusal; source now has bounded categories and existing private sudo mode",
+        "stage": false,
+        "database_queried": false
+      },
+      "previous_candidate_full_CI": {
+        "source": "51be9ec9f89b6fb0b788aa4253dba164acd39497",
+        "run": 41196795025,
+        "status": "success",
+        "final_candidate_revalidation": "pending"
+      },
+      "production_preflight": {
+        "run": 41198015973,
+        "job": 124528018859,
+        "source": "71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8",
+        "conclusion": "success",
+        "artifact_id": 13041289357,
+        "raw_zip_sha256": "da415a3c006ec4ebdb8048ce322ac9c3f8adaa02fd2e4112fcc8ed1effea7b7a",
+        "raw_zip_and_report_verified": true,
+        "report": {
+          "application_started": false,
+          "container_created": false,
+          "database_environment_names": [
+            "QS_APISERVER_MONGODB_DATABASE",
+            "QS_APISERVER_MONGODB_HOST",
+            "QS_APISERVER_MONGODB_MAX_CONNECTING",
+            "QS_APISERVER_MONGODB_MAX_CONN_IDLE_TIME",
+            "QS_APISERVER_MONGODB_MAX_POOL_SIZE",
+            "QS_APISERVER_MONGODB_MIN_POOL_SIZE",
+            "QS_APISERVER_MONGODB_PASSWORD",
+            "QS_APISERVER_MONGODB_USERNAME",
+            "QS_APISERVER_MYSQL_DATABASE",
+            "QS_APISERVER_MYSQL_HOST",
+            "QS_APISERVER_MYSQL_PASSWORD",
+            "QS_APISERVER_MYSQL_TLS_CA_FILE",
+            "QS_APISERVER_MYSQL_TLS_MODE",
+            "QS_APISERVER_MYSQL_USERNAME"
+          ],
+          "database_mutation": false,
+          "database_queried": false,
+          "maintenance_container": "qs-m5-maintenance-41198015973-1",
+          "network": "infra-network",
+          "read_only_preflight": true,
+          "runtime_frozen": false,
+          "source_container_id": "baabe9101fb7d0066c184fa11d941904b44e9f649d83200299137514a1e9f0d3",
+          "source_image_id": "sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b",
+          "source_was_running": true
+        }
+      },
+      "preflight_failures": [
+        {
+          "run_id": 41197177504,
+          "source_sha": "51be9ec9f89b6fb0b788aa4253dba164acd39497",
+          "conclusion": "failure",
+          "snapshot_serverA": "sudo_password_required",
+          "snapshot_serverB": "sudo_password_required",
+          "snapshot_serverD": "success",
+          "maintenance": "unclassified_refusal",
+          "container_created": false,
+          "database_queried": false,
+          "database_mutation": false
+        },
+        {
+          "run_id": 41197780799,
+          "source_sha": "db797644ef58feb17142281a3f31d7ac807c0d7c",
+          "conclusion": "failure",
+          "category": "source_identity_mismatch",
+          "cause": "Input was OCI config digest84f592..., while original Docker snapshot actual container Image is4185fd...; exact guard correctly refused",
+          "correct_actual_image_id": "sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b",
+          "container_created": false,
+          "database_queried": false,
+          "database_mutation": false
+        },
+        {
+          "run_id": 41197851868,
+          "source_sha": "db797644ef58feb17142281a3f31d7ac807c0d7c",
+          "conclusion": "failure",
+          "category": "source_network_ambiguous",
+          "source_image_matched": true,
+          "reason": "single-network fixture assumption disagreed with production Compose dual infra-network+qs-network contract",
+          "container_created": false,
+          "database_queried": false,
+          "database_mutation": false
+        }
+      ],
+      "superseded_full_CI": {
+        "run": 41197784005,
+        "state": "cancelled after source network correction; not passed"
+      },
+      "final_candidate_native": {
+        "candidate_source": "71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8",
+        "execution_merge_sha": "6144cb64ae272ffbda503b3ff9796a497196cd80",
+        "run": 41198019711,
+        "job": 124528027136,
+        "artifact_id": 13041334522,
+        "raw_zip_sha256": "6c7ad3eb2606835d54cd9cb6a9bf2ffb45bc77c78b87658fbf408465c3d19265",
+        "zip_and_report_verified": true,
+        "report": {
+          "fixture_only": true,
+          "source_sha": "6144cb64ae272ffbda503b3ff9796a497196cd80",
+          "base_image": "alpine@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1",
+          "source_image_id": "sha256:49058c1b6f53a8a56271fd2e371ba72cb5a8c89ff334f6522e304191ed0036f7",
+          "stopped_source_supported": true,
+          "application_not_started": true,
+          "private_env_preserved": true,
+          "image_healthcheck_disabled": true,
+          "original_private_marker_preserved": true,
+          "unrelated_secret_not_copied": true,
+          "borrowed_mounts_read_only": true,
+          "existing_operation_refused": true,
+          "no_database_connections": true,
+          "owned_containers_removed": true
+        }
+      },
+      "candidate_source": "71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8",
+      "merged_main": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6",
+      "main_CI": {
+        "run": 41201613827,
+        "status": "success",
+        "exact_source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6",
+        "production_rollout": false
+      },
+      "main_workflow_runs": [
+        {
+          "run": 41201613892,
+          "name": "AI bridge MySQL",
+          "conclusion": "success",
+          "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
+        },
+        {
+          "run": 41201613857,
+          "name": "RocketMQ host failure audit",
+          "conclusion": "success",
+          "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
+        },
+        {
+          "run": 41201614009,
+          "name": "RocketMQ evaluation original MySQL root",
+          "conclusion": "success",
+          "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
+        },
+        {
+          "run": 41201613827,
+          "name": "CI",
+          "conclusion": "success",
+          "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
+        },
+        {
+          "run": 41201613488,
+          "name": "Code Quality: Push on main",
+          "conclusion": "success",
+          "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
+        }
+      ],
+      "current_main_native_raw_verification": {
+        "artifact_id": 13044116748,
+        "sha256": "eb2cb19326e1ed863f913c01ffa64abc09846cff271bf1258c41f56bc1b9d038",
+        "raw_zip_and_report_verified": true,
+        "kind": "transport",
+        "source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399"
+      }
+    },
+    "fixed_images_preparation": {
+      "source": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+      "main_push_CI_success": true,
+      "build_only_run": 41197059223,
+      "status": "success",
+      "operation": "build",
+      "deploy_disabled_by_operation": true,
+      "workflow_entry_reenabled_only_for_dispatch_and_immediately_disabled": true,
+      "no_active_main_CI_or_deploy_before_dispatch": true,
+      "unexpected_automatic_runs_found": false,
+      "final_QS_CD_state": "disabled_manually",
+      "new_service_rollout": false,
+      "receipts_raw_zip_verified": true,
+      "receipt_manifest_config_ids_verified": true,
+      "all_deployment_jobs": "skipped",
+      "verified_build_result": {
+        "observed_at": "2026-10-31T11:39:23.746785+00:00",
+        "run_id": 41197059223,
+        "source_sha": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+        "conclusion": "success",
+        "deployment_jobs_skipped": true,
+        "cd_workflow_state": "disabled_manually",
+        "receipts": [
+          {
+            "source_sha": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+            "service": "apiserver",
+            "platform": "linux/amd64",
+            "registries": [
+              {
+                "repository": "ghcr.io/fangcunmount/qs-apiserver",
+                "digest": "sha256:16388fa75526c76baa035445685aadfc00c7faf8855f8d995b1db14e5f6d0e5d",
+                "image_id": "sha256:ebafafcb9e7551a7b16579bb007fe0f952c59b429c21fb342dae495460707a53"
+              },
+              {
+                "repository": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver",
+                "digest": "sha256:da470ab045c68deadc0f6a38ceafe696e90e30fb3246500e04db0b2854c5d139",
+                "image_id": "sha256:ebafafcb9e7551a7b16579bb007fe0f952c59b429c21fb342dae495460707a53"
+              }
+            ],
+            "deployment_verified": false
+          },
+          {
+            "source_sha": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+            "service": "worker",
+            "platform": "linux/amd64",
+            "registries": [
+              {
+                "repository": "ghcr.io/fangcunmount/qs-worker",
+                "digest": "sha256:fb1b366ed2dc99abe2bd4b94b76400057d77e7bbeca0b0da3c4f43644cb3d449",
+                "image_id": "sha256:d0a5017de2f1cd708738440d16e836d4ef3f4f1b23ed33ea0011215e2edd145a"
+              },
+              {
+                "repository": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-worker",
+                "digest": "sha256:99991b9f59abdcb6800a1f8d9627c52fe410b2c01178df9bf5de58ea81f0328d",
+                "image_id": "sha256:d0a5017de2f1cd708738440d16e836d4ef3f4f1b23ed33ea0011215e2edd145a"
+              }
+            ],
+            "deployment_verified": false
+          },
+          {
+            "source_sha": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+            "service": "collection",
+            "platform": "linux/amd64",
+            "registries": [
+              {
+                "repository": "ghcr.io/fangcunmount/qs-collection-server",
+                "digest": "sha256:1ab3ee5be10d0b4cf124a9b9ce3934018af296faf5a38848a0c72020f45144b2",
+                "image_id": "sha256:03a0590ebc6a9ea6389a98fc0ddc8914904fddae6ee01bba30e5a71671db14f6"
+              },
+              {
+                "repository": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-collection-server",
+                "digest": "sha256:bd7c284c09ab707f23f94a302f57ec013409c4ffc37cda29b51e012b7038d98b",
+                "image_id": "sha256:03a0590ebc6a9ea6389a98fc0ddc8914904fddae6ee01bba30e5a71671db14f6"
+              }
+            ],
+            "deployment_verified": false
+          }
+        ],
+        "raw_artifact_sha256": {
+          "13040459707.zip": "98c569db186df16bcc2dd1804f70d275768dc7d818223179490a18c94e934757",
+          "13040398212.zip": "3cbec68c375f2c796df37b755100f3985d97949fd7d906085415fc729593cae7",
+          "13040752956.zip": "a0bd901ef2fa8eb2ef47d69fb5a4c163a1302210eb56a1978b570e80c620e4a8"
+        },
+        "production_deployment": false,
+        "database_mutation": false
+      }
+    },
+    "responsible_people": {
+      "data_owner": "shujie",
+      "recovery_owner": "shujie",
+      "source": "Explicit user response in this task",
+      "existing_database_write_approval": false
+    },
+    "protocol_observation_delivery": {
+      "PR": 476,
+      "status": "merged; exact candidate and main CI success; production verification not executed",
+      "branch": "codex/host-retirement-m5-protocol-proof-remote-20261031",
+      "source": "38d9419dd810f8e1a846fd72ee5999d0b7957f90",
+      "code_source": "32627920429d8fda3bf42cac6cd609c2958a72ce",
+      "base": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6",
+      "CI": 41202978415,
+      "CI_status": "candidate and exact merged main success",
+      "native_required_mysql_versions": [
+        110,
+        111
+      ],
+      "native_required_mongo_version": 44,
+      "existing_SDK_and_host_readers_reused": true,
+      "readonly_option": true,
+      "broker_pending_or_freeze_approval": false,
+      "local_original": {
+        "source": "bf059e5906362b7f27e79acacd70239ae0054480",
+        "branch": "codex/host-retirement-m5-protocol-proof-20261031",
+        "worktree": "/workspace/qlume-env/worktrees/host-retirement-m5-qs-protocol-proof",
+        "pushed": false,
+        "race_packages": "passed before disconnection",
+        "Python_contracts_passed": 14,
+        "integration_tag_compilation": "passed; native not executed locally",
+        "docs_unit_tests": 88,
+        "docs_hygiene": "passed",
+        "final_docs_facts": "unknown after disconnection",
+        "uncommitted_docs_manifest": true,
+        "actual_byte_export_available": false,
+        "source_backup_exported": true,
+        "source_backup": {
+          "bundle_sha256": "26d2b52672925c44c3c5f9849de77fe94ac5e7ba925e1e9ecdd44ab8b3915ae9",
+          "source_members": 12,
+          "dirty_docs_included": true,
+          "bundle_verified": true,
+          "worktree_unchanged": true,
+          "archive": "/workspace/library-files/m5-macbook-handoff-20261031T140038Z.tar.gz",
+          "archive_sha256": "ebe10ce38a61dbb766d87ef11a77f84386d59e5e2caa321e523a14760b7a7892",
+          "private_keys_included": false
+        }
+      },
+      "remote_candidate_is_local_byte_export": false,
+      "production_observation_performed": false,
+      "current_native": {
+        "candidate": "38d9419dd810f8e1a846fd72ee5999d0b7957f90",
+        "run": 41202978415,
+        "job": 124542314662,
+        "required_pair_step": "success",
+        "mysql_versions": [
+          110,
+          111
+        ],
+        "mongo_version": 44,
+        "artifact_id": 13043815736,
+        "github_reported_zip_sha256": "92fd194b2982f66bcfe385a4b7578c11ded55c16cd581426d3ed88c1d1e5bb60",
+        "raw_zip_verified": false,
+        "companion_job_checkout_merge_sha": "eaa3eaa79f5d82a6c07fce4356efad16edb64dc1",
+        "actual_native_job_checkout_merge_sha": "eaa3eaa79f5d82a6c07fce4356efad16edb64dc1",
+        "required_top_and_both_cases_run_and_pass": true,
+        "elapsed_seconds": 9.68,
+        "native_job_conclusion": "success",
+        "case_seconds": {
+          "mysql110_mongo44": 4.76,
+          "mysql111_mongo44": 4.92
+        }
+      },
+      "initial_native": {
+        "run": 41202693972,
+        "job": 124541475898,
+        "candidate": "55f7c8d7c108ebecdcd55c3b99d76e5745954dbc",
+        "execution_merge": "b62b42b2f557c9062e94553869938e85d8a7fc16",
+        "required_pair_step": "success",
+        "artifact_id": 13043665417,
+        "github_reported_zip_sha256": "1df5b8aea6270a45b726a51ba3eb1cad6cf37a3450b76c27a51e7dfb9359f8d1",
+        "raw_zip_verified": false
+      },
+      "retained_CI_failure": {
+        "run": 41202693972,
+        "source": "55f7c8d7c108ebecdcd55c3b99d76e5745954dbc",
+        "job": 124541476207,
+        "cause": "two affected README source review records stale after source/CI changes",
+        "fixed_at": "38d9419dd810f8e1a846fd72ee5999d0b7957f90",
+        "gates_weakened": false
+      },
+      "merged_main": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+      "candidate_checks": {
+        "success": 29,
+        "original_conditional_skipped": 1,
+        "failed": 0
+      },
+      "main_CI": {
+        "run": 41204413865,
+        "status": "success",
+        "exact_source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+        "checks_success": 29,
+        "original_conditional_skipped": 1,
+        "failed": 0,
+        "workflows": [
+          {
+            "run": 41204413884,
+            "name": "RocketMQ host failure audit",
+            "conclusion": "success"
+          },
+          {
+            "run": 41204413966,
+            "name": "RocketMQ evaluation original MySQL root",
+            "conclusion": "success"
+          },
+          {
+            "run": 41204414322,
+            "name": "Code Quality: Push on main",
+            "conclusion": "success"
+          },
+          {
+            "run": 41204413876,
+            "name": "AI bridge MySQL",
+            "conclusion": "success"
+          },
+          {
+            "run": 41204413865,
+            "name": "CI",
+            "conclusion": "success"
+          }
+        ]
+      },
+      "main_native": {
+        "source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+        "run": 41204413865,
+        "job": 124546468677,
+        "log_read": true,
+        "top_and_two_cases_passed": true,
+        "log_lines": [
+          "2026-10-31T13:17:27.7259508Z === RUN   TestSchemaPairNativeM5ProtocolReadOnly",
+          "2026-10-31T13:17:27.7259887Z === RUN   TestSchemaPairNativeM5ProtocolReadOnly/110",
+          "2026-10-31T13:17:27.7260259Z === RUN   TestSchemaPairNativeM5ProtocolReadOnly/111",
+          "2026-10-31T13:17:27.7260660Z --- PASS: TestSchemaPairNativeM5ProtocolReadOnly (10.79s)",
+          "2026-10-31T13:17:27.7261142Z     --- PASS: TestSchemaPairNativeM5ProtocolReadOnly/110 (5.41s)",
+          "2026-10-31T13:17:27.7261631Z     --- PASS: TestSchemaPairNativeM5ProtocolReadOnly/111 (5.38s)"
+        ],
+        "elapsed_seconds": 10.79,
+        "case_seconds": {
+          "mysql110_mongo44": 5.41,
+          "mysql111_mongo44": 5.38
+        },
+        "artifact_id": 13043972930,
+        "github_reported_zip_sha256": "sha256:b9240018efa34f35fd1a742f522c7ac8c2e4eccca5b0e5f3beca5caa65b83fe3",
+        "raw_zip_verified": true,
+        "scope": "owned real MySQL/Mongo; no Broker/business runtime or production acceptance",
+        "raw_zip_and_report_verified_at": "2026-10-31T14:04:00.763898+00:00"
+      }
+    },
+    "production_window_eligibility": {
+      "qualified": false,
+      "production_apply_approved": false,
+      "data_owner": "shujie",
+      "recovery_owner": "shujie",
+      "batch": {
+        "only_drop": "qs.mysql.ai_messaging_outbox",
+        "mysql_pair": [
+          110,
+          111
+        ],
+        "mongo_version": 44,
+        "other_five_candidates": "retain"
+      },
+      "source_qualified_shutdown": {
+        "reviewed_source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+        "call_order": [
+          "processShutdown.Close invokes Container.StopEventAdmission",
+          "Subsystem.StopAdmission calls runtime.SetAdmission(false); Checker remains live",
+          "runtime hooks and HTTP/gRPC drain precede authz-sync/container cleanup",
+          "container drains modules/subsystem before publishers and database pools"
+        ],
+        "sources": [
+          "internal/apiserver/process/shutdown_context.go",
+          "internal/apiserver/process/lifecycle.go",
+          "internal/apiserver/container/lifecycle.go",
+          "internal/apiserver/eventing/subsystem/transactions.go",
+          "internal/pkg/messagingruntime/transaction_lifecycle.go"
+        ],
+        "operational_pause_only_HTTP_entrypoint": "not implemented by this delivery; do not pretend an in-process method is a deployed maintenance API",
+        "observation_does_not_certify_inflight_business_or_freeze": true
+      },
+      "next_readonly_steps": [
+        "Export original local bf059e draft and uncommitted docs before syncing recovered workspace; remote candidate is independent",
+        "Require successful exact merged main CI and preserve deployment freeze",
+        "Explicitly stage only the existing idle maintenance transport from reviewed running Docker Image4185fd..., verify its operation/source/image/RO mounts and healthcheck NONE",
+        "Run original110/44 material inventory and canonical schema/protocol reads through validated owned container; compare actual DB identities, resource hash and binding hashes",
+        "Nonzero/unavailable protocol data or unexpected source/runtime must stop qualification; do not reconcile/rewrite receipts or infer Broker backlog"
+      ],
+      "legacy_inventory_boundary": "Combined original-material inventory deliberately requires original110/44 and legacy table existence. It is not a post111 verifier; standalone canonical protocol CLI supports111/44, and post-start live metrics are separate.",
+      "still_required_before_database_approval": [
+        "Actual staged transport and fresh database reads; currently unexecuted",
+        "Concrete ingress/scheduler/manual-writer exclusion and business/in-flight provider qualification; QS business observation gap and51 historical anchors are not zero",
+        "Actual owner drain/exit evidence plus direct primary observation with unknowns rejected",
+        "Same-window original DDL, empty EOF, complete original ledger, retained-asset baselines, identities and protection hashes",
+        "Concrete reviewed operator restoration route; current original-ledger replay remains test-only and is not an installed production restore API",
+        "First-new-runtime boundary review; M4 image rejects111 and cannot be presented as a post-start rollback"
+      ],
+      "budgets": {
+        "normal_window_minutes": 30,
+        "startup_reserve_seconds": 900,
+        "recovery_window_minutes": 60,
+        "protection_retention_days": 30
+      },
+      "runtime_frozen": false,
+      "approval_file_created": false,
+      "production_maintenance_container_created": false,
+      "existing_database_operator_mutation": false
+    }
+  },
+  "existing_database_operator_mutation": false,
+  "sdk_public_capabilities_deleted": false,
+  "preserve": [
+    "ai.mysql.interpretation_result_outbox",
+    "iam.mysql.identity_session_revocation_outbox",
+    "transaction execution/guard/witness",
+    "archive and original immutable wire",
+    "inbox and idempotency receipts",
+    "first business ACK and business history",
+    "authorized retry/hold schedules"
+  ],
+  "execution_continuity": {
+    "environment_id": "ccarenv_b64_Y2NhcmVudl85ODU4OTIzNGYxZTA4MTkxOTU2ZWNlOTcxOTdiNGE4Yw",
+    "status": "execution channel restored and currently usable; no UI recovery operation needed",
+    "latest_pushed_qs_startup_source": "62b76c87b8b3e3462c2882c543a6598763b81909",
+    "local_private_key_not_published": true,
+    "QS_CD_last_verified": "disabled_manually",
+    "existing_database_operator_mutation": false,
+    "local_worktree_remote_docs_fast_forwarded": true,
+    "current": {
+      "environment_id": "ccarenv_b64_Y2NhcmVudl85ODU4OTIzNGYxZTA4MTkxOTU2ZWNlOTcxOTdiNGE4Yw",
+      "executor": "command channel restored; uname=Linux, cwd=/workspace; this is not the user MacBook",
+      "platform_status_API": "reports running/connected with current observations; not proof of working command channel",
+      "retained_provider_diagnostics": "not_found",
+      "root_cause": "unverified",
+      "last_local_worktree_and_private_key_preserved": true,
+      "remote_repository_and_CI_access": "working",
+      "user_recovery_UI_action_required": "none requested; no verified recovery entry",
+      "local_source_export_pending": false,
+      "production_maintenance_container_created": false,
+      "business_service_stopped": false,
+      "existing_database_operator_mutation": false,
+      "QS_CD_last_verified": "disabled_manually before disconnect; no enable action by this task",
+      "last_command_probe": "No usable execution environment is available; no command executed",
+      "last_local_state_confirmed_before_disconnect": true,
+      "worktree_and_private_key_after_disconnect": "not re-readable; retain original workspace",
+      "local_sync_rule": "Export original bf059e commit/possible last-attempt edits and dirty docs before any sync; do not reset or overwrite",
+      "new_main_source_without_production_deploy_run": {
+        "source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+        "observed_at": "2026-10-31T13:29:12Z",
+        "production_deploy_run_found": false
+      },
+      "last_local_state_confirmed_after_recovery": {
+        "head": "bf059e5906362b7f27e79acacd70239ae0054480",
+        "dirty": [
+          "docs/document-closure.json"
+        ],
+        "untracked_count": 0
+      },
+      "source_backup_verified": true,
+      "private_key_in_source_backup": false,
+      "macbook_execution": "requires a local Codex task opened on the MacBook repository; no direct MacBook execution channel in this conversation",
+      "QS_CD_current_verified": "disabled_manually",
+      "observed_at": "2026-10-31T14:04:00.763898+00:00"
+    }
+  }
+}
