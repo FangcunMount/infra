@@ -10,7 +10,7 @@ QS #474（main `1073f0c19c4991d80d9752f7fb69c395ae7590df`）和infra #418已合�
 
 #475候选Docker原生artifact13041334522原ZIP `6c7ad3eb2606835d54cd9cb6a9bf2ffb45bc77c78b87658fbf408465c3d19265` 及内容已核验，执行于CI合并源码 `6144cb64ae272ffbda503b3ff9796a497196cd80`。ServerA只读预检 [41198015973](https://github.com/FangcunMount/qs-server/actions/runs/41198015973) 成功，artifact13041289357原ZIP `da415a3c006ec4ebdb8048ce322ac9c3f8adaa02fd2e4112fcc8ed1effea7b7a` 及内容已核验。源容器Docker `.Image=sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b` 与OCI config84f592...分开记录。预检没有stage、数据库查询、停写或恢复证明；旧失败全部保留。
 
-只读协议观察 [QS #476](https://github.com/FangcunMount/qs-server/pull/476) 已合并为 `be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399`，候选 `38d9419dd810f8e1a846fd72ee5999d0b7957f90` 的29项CI成功、1项原条件跳过。最终运行 [41202978415](https://github.com/FangcunMount/qs-server/actions/runs/41202978415/job/124542314662) 的原生日志已回读：110/44与111/44两子用例均RUN/PASS、无跳过，合计9.68秒，实际checkout为 `eaa3eaa79f5d82a6c07fce4356efad16edb64dc1`；保留非零责任、原行/文档不变及缺失/损坏binding不可用均经过实际断言。artifact13043815736的GitHub摘要为 `92fd194b2982f66bcfe385a4b7578c11ded55c16cd581426d3ed88c1d1e5bb60`，原ZIP字节仍待恢复执行连接后核验。精确main CI41204413865在运行，尚不能称main验收完成。
+只读协议观察 [QS #476](https://github.com/FangcunMount/qs-server/pull/476) 已合并为 `be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399`，候选 `38d9419dd810f8e1a846fd72ee5999d0b7957f90` 的29项CI成功、1项原条件跳过。最终运行 [41202978415](https://github.com/FangcunMount/qs-server/actions/runs/41202978415/job/124542314662) 的原生日志已回读：110/44与111/44两子用例均RUN/PASS、无跳过，合计9.68秒，实际checkout为 `eaa3eaa79f5d82a6c07fce4356efad16edb64dc1`；保留非零责任、原行/文档不变及缺失/损坏binding不可用均经过实际断言。artifact13043815736的GitHub摘要为 `92fd194b2982f66bcfe385a4b7578c11ded55c16cd581426d3ed88c1d1e5bb60`，原ZIP字节仍待恢复执行连接后核验。精确main CI [41204413865](https://github.com/FangcunMount/qs-server/actions/runs/41204413865) 已成功，合并提交全部29项CI成功、1项原条件跳过。main原生110/44与111/44均实际RUN/PASS，日志checkout为be2e4e8d，合计10.79秒；main artifact13043972930的GitHub摘要 `b9240018efa34f35fd1a742f522c7ac8c2e4eccca5b0e5f3beca5caa65b83fe3` 已记录，原ZIP字节待验证。未观察到此合并提交的Production Deploy运行。
 
 首候选55f7的CI文档失败已保留：仅两份受影响README的源码核对记录过期，在核对实际Go/CI改动后于38d941修正；未放宽门禁。原云环境本地草稿 `bf059e5906362b7f27e79acacd70239ae0054480` 的本地race、14项脚本、集成标签编译与文档结果单独保留；源码未推送，最后docs-facts结果及断线后工作树须复读。独立远端候选不是原本地提交的字节导出，不移签其本地证据。恢复工作区后先保全原提交和未提交文档再同步，不reset或覆盖。
 
@@ -144,3 +144,10 @@ QS CD禁用时仅构建返回422的失败已保留。只为派发build短暂启�
 原组合清单明确要求110/44及原发布表存在，用于捕获原材料，不能在111上把缺表签为空表。独立canonical协议CLI支持111/44；删除后核验还须独立的当前schema/保留资产读取与新runtime指标。此前原DDL/完整账本恢复只是隔离测试seam，尚无被本任务认可的已安装生产恢复入口。不得将旧M4镜像视为111后的回退版本。
 
 本批正常窗口30分钟、启动至少预留15分钟，恢复窗口60分钟、保护材料至少保留30天。当前未停生产写者、未创建维护容器或批准文件、未执行SQL111。本页仍是准备与证据记录，不是生产写入批准。
+
+## 下次接续的具体顺序
+
+1. 恢复可用执行连接后，先检查原bf059e工作树的实际HEAD/dirty，导出该未推送提交和未提交文档；保留原私钥及现场，不能用普通clone或reset替代保全。独立远端工具代码已经main be2e4e8d，GitHub CI已绿。
+2. 验证发布冻结及固定执行源码，显式创建/核实空闲维护容器，随后以独立只读捕获核当前原版本对、身份、原DDL/完整账本/空EOF与两个QS owner协议状态；现有生产从未执行该stage或新协议读。
+3. 再收口业务入口/调度/人工写者及在途业务/owner排空，完成实际保护材料与生产恢复执行路线。未决/冲突/不可用不签零，旧快照不签新窗口。
+4. 在这些资格具备后提交首批具体审查；当前不生成可消费批准，不执行SQL111、Force/down或任何旧账本回放，不提前部署新应用。首批只退役空QS ai_messaging_outbox，其余五对象仍保留。
