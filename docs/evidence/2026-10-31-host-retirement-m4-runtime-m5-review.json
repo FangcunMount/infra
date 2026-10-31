@@ -1119,7 +1119,7 @@
         }
       ]
     },
-    "merge_release_readiness": "core code merged and native proven; maintenance transport full CI/actual rights, fixed image digests and concrete approved production window remain",
+    "merge_release_readiness": "core code merged and native proven; fixed1073 images published and receipts verified; final maintenance transport CI/actual rights and concrete approved production window remain",
     "core_delivery": {
       "PR": 474,
       "candidate": "1b6f8debf053919ee803c3f35607072cc48b3b28",
@@ -1135,9 +1135,9 @@
     },
     "maintenance_transport_delivery": {
       "PR": 475,
-      "source": "51be9ec9f89b6fb0b788aa4253dba164acd39497",
-      "status": "draft; full CI pending",
-      "local_contract_tests": 14,
+      "source": "71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8",
+      "status": "draft; final CI41198019711 running",
+      "local_contract_tests": 15,
       "native_job": 124524476566,
       "native_run": 41196795025,
       "native_artifact": 13040813646,
@@ -1146,27 +1146,195 @@
       "native_zip_and_report_verified": true,
       "no_DB_connections_or_application_runtime_in_smoke": true,
       "production_staging_performed": false,
-      "readonly_actual_permission_preflight": 41197177504,
-      "preflight_status": "queued after build; no stage flag",
+      "readonly_actual_permission_preflight": 41198015973,
+      "preflight_status": "success; original ZIP and report verified, no stage/DB/runtime freeze",
       "first_failure": {
         "run": 41196326278,
         "job": 124523116425,
         "cause": "optional Docker inspect discarded nonzero exit, possible truthy JSON[]; corrected status and owned native source namespace",
         "not_passed": true
+      },
+      "code_source": "6090af5226d9096da1107b7eb8cc16c805393e72",
+      "corrected_production_preflight": 41197780799,
+      "actual_preflight_failure": {
+        "run": 41197177504,
+        "source": "51be9ec9f89b6fb0b788aa4253dba164acd39497",
+        "serverA_B_old_snapshot": "sudo password required for root Python invocation",
+        "maintenance": "unclassified refusal; source now has bounded categories and existing private sudo mode",
+        "stage": false,
+        "database_queried": false
+      },
+      "previous_candidate_full_CI": {
+        "source": "51be9ec9f89b6fb0b788aa4253dba164acd39497",
+        "run": 41196795025,
+        "status": "success",
+        "final_candidate_revalidation": "pending"
+      },
+      "production_preflight": {
+        "run": 41198015973,
+        "job": 124528018859,
+        "source": "71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8",
+        "conclusion": "success",
+        "artifact_id": 13041289357,
+        "raw_zip_sha256": "da415a3c006ec4ebdb8048ce322ac9c3f8adaa02fd2e4112fcc8ed1effea7b7a",
+        "raw_zip_and_report_verified": true,
+        "report": {
+          "application_started": false,
+          "container_created": false,
+          "database_environment_names": [
+            "QS_APISERVER_MONGODB_DATABASE",
+            "QS_APISERVER_MONGODB_HOST",
+            "QS_APISERVER_MONGODB_MAX_CONNECTING",
+            "QS_APISERVER_MONGODB_MAX_CONN_IDLE_TIME",
+            "QS_APISERVER_MONGODB_MAX_POOL_SIZE",
+            "QS_APISERVER_MONGODB_MIN_POOL_SIZE",
+            "QS_APISERVER_MONGODB_PASSWORD",
+            "QS_APISERVER_MONGODB_USERNAME",
+            "QS_APISERVER_MYSQL_DATABASE",
+            "QS_APISERVER_MYSQL_HOST",
+            "QS_APISERVER_MYSQL_PASSWORD",
+            "QS_APISERVER_MYSQL_TLS_CA_FILE",
+            "QS_APISERVER_MYSQL_TLS_MODE",
+            "QS_APISERVER_MYSQL_USERNAME"
+          ],
+          "database_mutation": false,
+          "database_queried": false,
+          "maintenance_container": "qs-m5-maintenance-41198015973-1",
+          "network": "infra-network",
+          "read_only_preflight": true,
+          "runtime_frozen": false,
+          "source_container_id": "baabe9101fb7d0066c184fa11d941904b44e9f649d83200299137514a1e9f0d3",
+          "source_image_id": "sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b",
+          "source_was_running": true
+        }
+      },
+      "preflight_failures": [
+        {
+          "run_id": 41197177504,
+          "source_sha": "51be9ec9f89b6fb0b788aa4253dba164acd39497",
+          "conclusion": "failure",
+          "snapshot_serverA": "sudo_password_required",
+          "snapshot_serverB": "sudo_password_required",
+          "snapshot_serverD": "success",
+          "maintenance": "unclassified_refusal",
+          "container_created": false,
+          "database_queried": false,
+          "database_mutation": false
+        },
+        {
+          "run_id": 41197780799,
+          "source_sha": "db797644ef58feb17142281a3f31d7ac807c0d7c",
+          "conclusion": "failure",
+          "category": "source_identity_mismatch",
+          "cause": "Input was OCI config digest84f592..., while original Docker snapshot actual container Image is4185fd...; exact guard correctly refused",
+          "correct_actual_image_id": "sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b",
+          "container_created": false,
+          "database_queried": false,
+          "database_mutation": false
+        },
+        {
+          "run_id": 41197851868,
+          "source_sha": "db797644ef58feb17142281a3f31d7ac807c0d7c",
+          "conclusion": "failure",
+          "category": "source_network_ambiguous",
+          "source_image_matched": true,
+          "reason": "single-network fixture assumption disagreed with production Compose dual infra-network+qs-network contract",
+          "container_created": false,
+          "database_queried": false,
+          "database_mutation": false
+        }
+      ],
+      "superseded_full_CI": {
+        "run": 41197784005,
+        "state": "cancelled after source network correction; not passed"
       }
     },
     "fixed_images_preparation": {
       "source": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
       "main_push_CI_success": true,
       "build_only_run": 41197059223,
-      "status": "building",
+      "status": "success",
       "operation": "build",
       "deploy_disabled_by_operation": true,
       "workflow_entry_reenabled_only_for_dispatch_and_immediately_disabled": true,
       "no_active_main_CI_or_deploy_before_dispatch": true,
       "unexpected_automatic_runs_found": false,
       "final_QS_CD_state": "disabled_manually",
-      "new_service_rollout": false
+      "new_service_rollout": false,
+      "receipts_raw_zip_verified": true,
+      "receipt_manifest_config_ids_verified": true,
+      "all_deployment_jobs": "skipped",
+      "verified_build_result": {
+        "observed_at": "2026-10-31T11:39:23.746785+00:00",
+        "run_id": 41197059223,
+        "source_sha": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+        "conclusion": "success",
+        "deployment_jobs_skipped": true,
+        "cd_workflow_state": "disabled_manually",
+        "receipts": [
+          {
+            "source_sha": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+            "service": "apiserver",
+            "platform": "linux/amd64",
+            "registries": [
+              {
+                "repository": "ghcr.io/fangcunmount/qs-apiserver",
+                "digest": "sha256:16388fa75526c76baa035445685aadfc00c7faf8855f8d995b1db14e5f6d0e5d",
+                "image_id": "sha256:ebafafcb9e7551a7b16579bb007fe0f952c59b429c21fb342dae495460707a53"
+              },
+              {
+                "repository": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-apiserver",
+                "digest": "sha256:da470ab045c68deadc0f6a38ceafe696e90e30fb3246500e04db0b2854c5d139",
+                "image_id": "sha256:ebafafcb9e7551a7b16579bb007fe0f952c59b429c21fb342dae495460707a53"
+              }
+            ],
+            "deployment_verified": false
+          },
+          {
+            "source_sha": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+            "service": "worker",
+            "platform": "linux/amd64",
+            "registries": [
+              {
+                "repository": "ghcr.io/fangcunmount/qs-worker",
+                "digest": "sha256:fb1b366ed2dc99abe2bd4b94b76400057d77e7bbeca0b0da3c4f43644cb3d449",
+                "image_id": "sha256:d0a5017de2f1cd708738440d16e836d4ef3f4f1b23ed33ea0011215e2edd145a"
+              },
+              {
+                "repository": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-worker",
+                "digest": "sha256:99991b9f59abdcb6800a1f8d9627c52fe410b2c01178df9bf5de58ea81f0328d",
+                "image_id": "sha256:d0a5017de2f1cd708738440d16e836d4ef3f4f1b23ed33ea0011215e2edd145a"
+              }
+            ],
+            "deployment_verified": false
+          },
+          {
+            "source_sha": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+            "service": "collection",
+            "platform": "linux/amd64",
+            "registries": [
+              {
+                "repository": "ghcr.io/fangcunmount/qs-collection-server",
+                "digest": "sha256:1ab3ee5be10d0b4cf124a9b9ce3934018af296faf5a38848a0c72020f45144b2",
+                "image_id": "sha256:03a0590ebc6a9ea6389a98fc0ddc8914904fddae6ee01bba30e5a71671db14f6"
+              },
+              {
+                "repository": "crpi-x3r4i68cpfmwtcll.cn-beijing.personal.cr.aliyuncs.com/fangcunmount/qs-collection-server",
+                "digest": "sha256:bd7c284c09ab707f23f94a302f57ec013409c4ffc37cda29b51e012b7038d98b",
+                "image_id": "sha256:03a0590ebc6a9ea6389a98fc0ddc8914904fddae6ee01bba30e5a71671db14f6"
+              }
+            ],
+            "deployment_verified": false
+          }
+        ],
+        "raw_artifact_sha256": {
+          "13040459707.zip": "98c569db186df16bcc2dd1804f70d275768dc7d818223179490a18c94e934757",
+          "13040398212.zip": "3cbec68c375f2c796df37b755100f3985d97949fd7d906085415fc729593cae7",
+          "13040752956.zip": "a0bd901ef2fa8eb2ef47d69fb5a4c163a1302210eb56a1978b570e80c620e4a8"
+        },
+        "production_deployment": false,
+        "database_mutation": false
+      }
     }
   },
   "existing_database_operator_mutation": false,
