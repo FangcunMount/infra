@@ -219,6 +219,7 @@ def main():
     parser.add_argument("--qs-native-limit", action="store_true", help="actual SYS native limit -> durable original-primary host deny, restart and live Checker")
     parser.add_argument("--qs-protocol-protection", action="store_true", help="requires actual QS runtime, published tx.4, current observation guard and real recovery audit")
     parser.add_argument("--qs-runtime-host", type=Path, help="exact QS checkout; actual default dual owners, original stores and owned Broker restart/Checker")
+    parser.add_argument("--qs-owner-drain", action="store_true", help="also require actual standalone paused-owner CLI; separate current runtime profile")
     parser.add_argument("--qs-retry-store-host", type=Path, help="exact QS checkout; original dual-store future authorization atomicity only")
     parser.add_argument("--qs-deferred-consumer-host", type=Path, help="exact QS checkout; current deferred-consumer original MySQL/lease/process proof, no Broker claim")
     parser.add_argument("--qs-deferred-kind", choices=("mysql", "worker"), default="mysql", help="worker includes actual Broker/runtime and loopback business RPC fixture")
@@ -239,6 +240,8 @@ def main():
     parser.add_argument("--qs-recovery-private-log", type=Path, help="new0600 diagnostic in an owned0700 local directory; never upload")
     parser.add_argument("--qs-receive-rotation-candidate", action="store_true", help="exact published Go rotation patch; only explicit Worker or M3-C adoption")
     args = parser.parse_args()
+    if args.qs_owner_drain and (not args.qs_runtime_host or args.qs_recovery_host or args.qs_native_limit or args.qs_protocol_protection):
+        parser.error('owner drain requires the separate current QS runtime profile')
     if args.qs_receive_rotation_candidate:
         from host_sdk_contract import ROTATION_SDK_SHA
         if not ((args.qs_deferred_consumer_host and args.qs_deferred_kind == 'worker') or args.qs_recovery_host):
@@ -789,7 +792,7 @@ def main():
                     owned_native_run, repo, broker_parameters, protection=args.qs_protocol_protection, native_limit=args.qs_native_limit,
                     recovery=bool(args.qs_recovery_host), redis_port=redis_port,
                     recovery_private_log=args.qs_recovery_private_log, recovery_sdk=sdk, recovery_uv=args.python,
-                    rotation_candidate=args.qs_receive_rotation_candidate)
+                    rotation_candidate=args.qs_receive_rotation_candidate, owner_drain=args.qs_owner_drain)
                 if args.qs_native_limit:
                     for name in proof['qs_runtime_host']['native_limit_receipt']['cases']:
                         passed('qs_native_limit_' + name)

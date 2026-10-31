@@ -65,6 +65,18 @@ class RuntimeProfileIsolationTest(unittest.TestCase):
             self.assertEqual(result.returncode, 2)
             self.assertIn('default QS owner runtime is a separate required profile', result.stderr)
 
+class OwnerDrainReceiptTest(unittest.TestCase):
+    def test_requires_actual_cli_complete_flags_and_no_skip(self):
+        from qs_runtime_acceptance import OWNER_DRAIN_FLAGS,parse_owner_drain_receipt
+        value=dict(source_sha='a'*40,passed=8,failed=0,skipped=0,owner_count=2,
+            production_or_system_acceptance=False,**{k:True for k in OWNER_DRAIN_FLAGS})
+        output='M5_QS_OWNER_DRAIN_CLI_RECEIPT '+json.dumps(value)+'\n--- PASS: TestM5OwnerDrainCLI (30s)'
+        self.assertEqual(parse_owner_drain_receipt(output,'a'*40)['passed'],8)
+        for bad in ['',output+'\n'+output,output.replace('"actual_CLI": true','"actual_CLI": false'),
+                    output.replace('"skipped": 0','"skipped": 1'),output.replace('a'*40,'b'*40),
+                    output+'\nWARNING: DATA RACE',output+'\n--- SKIP: missing (1s)',output+'\n--- FAIL: another_required_test (1s)']:
+            with self.assertRaises(RuntimeError):parse_owner_drain_receipt(bad,'a'*40)
+
 
 class DefaultRuntimeDiagnosticTest(unittest.TestCase):
     def sample(self):

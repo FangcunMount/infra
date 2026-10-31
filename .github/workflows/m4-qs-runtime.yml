@@ -19,6 +19,10 @@ on:
       - .github/workflows/m4-qs-runtime.yml
   workflow_dispatch:
     inputs:
+      owner_drain_qs_ref:
+        description: Optional exact M5 source; additional separate current SDK CLI proof
+        type: string
+        required: false
       rotation_recovery_only:
         description: Run only the explicit rotation recovery profile
         type: boolean
@@ -45,6 +49,12 @@ concurrency:
   group: m4-qs-runtime-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  owner-drain:
+    if: ${{ inputs.owner_drain_qs_ref != '' }}
+    uses: ./.github/workflows/m5-owner-drain.yml
+    with:
+      qs_ref: ${{ inputs.owner_drain_qs_ref }}
+
   native:
     if: ${{ !inputs.rotation_candidate }}
     runs-on: ubuntu-24.04

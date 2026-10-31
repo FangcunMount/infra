@@ -1,0 +1,73 @@
+name: M5 paused owner drain CLI
+on:
+  workflow_call:
+    inputs:
+      qs_ref:
+        description: Exact reviewed QS owner-drain source
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      qs_ref:
+        description: Exact reviewed QS owner-drain source
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: ${{ inputs.qs_ref }}
+          path: .qs
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/reliable-messaging
+          ref: 48dfcdafbf29b44e99a5ac8b1ae01e5173138560
+          path: .sdk
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.12'
+          cache-dependency-path: .qs/go.sum
+      - name: Exact source and harness contracts
+        env:
+          QS_SHA: ${{ inputs.qs_ref }}
+        run: |
+          set -euo pipefail
+          [[ "$QS_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$(git -C .qs rev-parse HEAD)" = "$QS_SHA"
+          test "$(git -C .sdk rev-parse HEAD)" = 48dfcdafbf29b44e99a5ac8b1ae01e5173138560
+          python3 -m unittest discover -s scripts/rocketmq -p test_qs_runtime_acceptance.py -v
+      - name: Build verified owned Broker
+        run: |
+          set -euo pipefail
+          bash scripts/rocketmq/fetch-release.sh
+          docker build --no-cache -t rocketmq-m5-owner-drain:5.5.1 components/rocketmq
+      - name: Required original owners and actual CLI recovery
+        run: |
+          set -euo pipefail
+          python3 scripts/rocketmq/ci-transactions.py --sdk "$PWD/.sdk" \
+            --image rocketmq-m5-owner-drain:5.5.1 --mysql-image mysql:8.0.36 \
+            --qs-runtime-host "$PWD/.qs" --qs-owner-drain --report m5-owner-drain.json
+          python3 - <<'PY'
+          import json
+          x=json.load(open('m5-owner-drain.json'))
+          p=x['proof']['qs_runtime_host']['owner_drain_receipt']
+          assert (p['passed'],p['failed'],p['skipped'])==(8,0,0)
+          assert x['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,probe_process_groups_drained=True,private_fixture_directory_removed=True)
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: m5-owner-drain-${{ github.run_id }}
+          path: m5-owner-drain.json
+          if-no-files-found: error
+          retention-days: 30
