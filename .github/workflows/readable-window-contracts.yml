@@ -1,10 +1,11 @@
 name: Readable production window contracts
 on:
   pull_request:
-    paths: ['scripts/ops/readable_runtime_start.py', 'scripts/ops/test_readable_runtime_start.py', 'scripts/ops/readable_legacy_retirement.py', 'scripts/ops/test_readable_legacy_retirement.py', 'scripts/ops/m4_runtime_start.py', 'scripts/rocketmq/runtime_start.py', '.github/workflows/readable-window-contracts.yml']
+    # Existing contracts also validate the shared release cleanup entrypoint.
+    paths: ['scripts/ops/readable_runtime_start.py', 'scripts/ops/test_readable_runtime_start.py', 'scripts/ops/readable_legacy_retirement.py', 'scripts/ops/test_readable_legacy_retirement.py', 'scripts/ops/m4_runtime_start.py', 'scripts/rocketmq/runtime_start.py', 'scripts/ops/install-image-retention.sh', 'scripts/ops/test_image_retention*', 'scripts/ops/fixtures/retention-installer.Dockerfile', '.github/workflows/readable-window-contracts.yml']
   push:
     branches: [main]
-    paths: ['scripts/ops/readable_runtime_start.py', 'scripts/ops/test_readable_runtime_start.py', 'scripts/ops/readable_legacy_retirement.py', 'scripts/ops/test_readable_legacy_retirement.py', 'scripts/ops/m4_runtime_start.py', 'scripts/rocketmq/runtime_start.py', '.github/workflows/readable-window-contracts.yml']
+    paths: ['scripts/ops/readable_runtime_start.py', 'scripts/ops/test_readable_runtime_start.py', 'scripts/ops/readable_legacy_retirement.py', 'scripts/ops/test_readable_legacy_retirement.py', 'scripts/ops/m4_runtime_start.py', 'scripts/rocketmq/runtime_start.py', 'scripts/ops/install-image-retention.sh', 'scripts/ops/test_image_retention*', 'scripts/ops/fixtures/retention-installer.Dockerfile', '.github/workflows/readable-window-contracts.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,6 +13,36 @@ concurrency:
   group: readable-window-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  image-retention:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: FangcunMount/qs-server
+          ref: 4f45c1b26edd73773a6f702a58d6efb377c4af25
+          path: .retention-source
+      - name: Exact reviewed helper and policy regression
+        run: |
+          echo '53ec1f1e093aca37ad671a50d37203b87757f2daea7f78d03e96df7c51474324  .retention-source/scripts/cd/image-retention.py' | sha256sum -c -
+          python3 .retention-source/scripts/cd/test_image_retention.py
+          bash -n scripts/ops/install-image-retention.sh scripts/ops/test_image_retention_installer_native.sh
+      - name: Real isolated image preview, deletion and recovery protection
+        run: |
+          docker pull redis:7.4.2-alpine
+          python3 scripts/ops/test_image_retention_native.py --helper .retention-source/scripts/cd/image-retention.py
+      - name: Real visudo and three host installation boundaries
+        run: |
+          context=$(mktemp -d "$RUNNER_TEMP/retention-installer.XXXXXX")
+          trap 'rm -f "$context/install.sh" "$context/image-retention.py"; rmdir "$context"' EXIT
+          cp scripts/ops/install-image-retention.sh "$context/install.sh"
+          cp .retention-source/scripts/cd/image-retention.py "$context/image-retention.py"
+          docker build -f scripts/ops/fixtures/retention-installer.Dockerfile -t "retention-installer-native:$GITHUB_RUN_ID" "$context"
+          bash scripts/ops/test_image_retention_installer_native.sh "retention-installer-native:$GITHUB_RUN_ID"
+      - name: Remove owned test image only
+        if: always()
+        run: docker image rm --no-prune "retention-installer-native:$GITHUB_RUN_ID" || true
   contracts:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
