@@ -106,7 +106,7 @@ OWNER_DRAIN_FLAGS = frozenset(('actual_CLI', 'actual_Broker_unknown_final_and_re
 def parse_owner_drain_receipt(output, source):
     rows = [json.loads(line.split('M5_QS_OWNER_DRAIN_CLI_RECEIPT ', 1)[1])
             for line in output.splitlines() if line.startswith('M5_QS_OWNER_DRAIN_CLI_RECEIPT ')]
-    if len(rows) != 1 or not re.search(r'--- PASS: TestM5OwnerDrainCLI \(', output) or '--- SKIP:' in output or 'WARNING: DATA RACE' in output:
+    if len(rows) != 1 or not re.search(r'--- PASS: TestM5OwnerDrainCLI \(', output) or re.search(r'--- (?:SKIP|FAIL):|WARNING: DATA RACE', output):
         raise RuntimeError('actual zero-skip owner drain CLI required')
     value = rows[0]
     if (set(value) != OWNER_DRAIN_FLAGS | {'source_sha','passed','failed','skipped','owner_count','production_or_system_acceptance'}
@@ -300,7 +300,13 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         if owner_drain:
             if recovery or protection or native_limit:
                 raise RuntimeError('separate owner drain profile required')
-            test, budget = '^(TestM3DefaultOwnerRuntime|TestM5OwnerDrainCLI)$', '10m'
+            # Run the original consumer proof before the CLI-only owner proof.
+            # The latter deliberately commits messages without a business
+            # subscriber. Go file registration order would otherwise let those
+            # committed fixture messages reach the original pre-commit observer.
+            # Both proofs remain mandatory; never interpret that contamination
+            # as visibility of the original uncommitted halves.
+            test, budget = '^TestM3DefaultOwnerRuntime$', '5m'
         linker = ['-ldflags', '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit='+proof['source_sha']] if recovery else []
         result = native_runner(['go', 'test', '-race', '-p', '1', '-tags=integration,m3_host_runtime', '-count=1'] + linker + [
                     '-timeout='+budget, '-v', package, '-run', test],
@@ -327,7 +333,19 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         else:
             proof['native_receipt'] = parse_runtime_receipt(output, proof['source_sha'])
         if owner_drain:
-            proof['owner_drain_receipt'] = parse_owner_drain_receipt(output, proof['source_sha'])
+            drain_result = native_runner(['go', 'test', '-race', '-p', '1', '-tags=integration,m3_host_runtime',
+                '-count=1', '-timeout=10m', '-v', './internal/apiserver/container', '-run', '^TestM5OwnerDrainCLI$'],
+                cwd=source, env=env, timeout=720, required=False)
+            drain_output = drain_result.stdout + drain_result.stderr
+            drain_private = directory/'qs-owner-drain-cli-private.log'
+            drain_private.write_text(drain_output); drain_private.chmod(0o600)
+            proof['owner_drain_native_output_sha256'] = hashlib.sha256(drain_output.encode()).hexdigest()
+            proof['owner_drain_native_exit_code'] = drain_result.returncode
+            proof['owner_drain_diagnostics'] = host_failure_summary(drain_output)
+            proof['owner_drain_diagnostics']['assertion_lines'] = sorted(set(map(int, re.findall(r'owner_drain_cli_native_test\.go:(\d+)', drain_output))))[:32]
+            if drain_result.returncode:
+                raise RuntimeError('actual standalone QS owner drain CLI failed; private output withheld')
+            proof['owner_drain_receipt'] = parse_owner_drain_receipt(drain_output, proof['source_sha'])
         if protection:
             proof['protection_receipt'] = parse_protection_receipt(output, proof['source_sha'])
         if native_limit:
