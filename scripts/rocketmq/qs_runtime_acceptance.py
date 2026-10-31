@@ -112,6 +112,9 @@ def runtime_manifest(repo, recovery=False):
         hot.update(id='qs-recovery-hotrank', subscription='qs-apiserver-modelcatalog-hot-rank-v1',
                    consumer_group=consumer_group_v2(hot['topic'], 'qs-apiserver-modelcatalog-hot-rank-v1'))
         value['routes'].append(hot)
+        # The actual API root consumes its hot-rank group. The old observer
+        # companion still needs the same route during the fourteen recovery cases.
+        mysql['subscriptions'] = list(mysql['subscriptions']) + [hot['id']]
         worker['subscriptions'] = list(worker['subscriptions']) + [hot['id']]
     wanted = set(mysql['publish']) | set(document['publish']) | set(worker['subscriptions'])
     value['routes'] = [r for r in value['routes'] if r['id'] in wanted]

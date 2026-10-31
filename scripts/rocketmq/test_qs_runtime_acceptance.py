@@ -29,6 +29,17 @@ class DefaultRuntimeReceiptTest(unittest.TestCase):
             with self.subTest(bad=bad[:60]):
                 with self.assertRaises(RuntimeError): parse_runtime_receipt(bad, 'a'*40)
 
+    def test_recovery_grants_actual_api_only_its_original_hotrank_subscription(self):
+        value=runtime_manifest(Path(__file__).resolve().parents[2], recovery=True)
+        self.assertEqual(value['accounts']['m3-qs-apiserver']['subscriptions'], ['qs-recovery-hotrank'])
+        self.assertEqual(value['accounts']['m3-qs-worker']['publish'], [])
+        rows={r['id']:r for r in value['routes']}
+        hot=rows['qs-recovery-hotrank'];permissions=permissions_v2(value,value['accounts']['m3-qs-apiserver'])
+        self.assertIn('Sub', permissions['Topic:'+hot['physical_topic']])
+        self.assertNotIn('Pub', permissions['Topic:'+hot['physical_topic']])
+        self.assertIn('Sub', permissions['Group:'+hot['consumer_group']])
+        self.assertIn('qs-recovery-hotrank', value['accounts']['m3-qs-worker']['subscriptions'])
+
     def test_full_owner_topic_registration_and_consume_only_observer(self):
         value = runtime_manifest(Path(__file__).resolve().parents[2])
         self.assertEqual(set(value['accounts']), {'m3-qs-apiserver', 'm3-qs-mongo', 'm3-qs-worker'})
