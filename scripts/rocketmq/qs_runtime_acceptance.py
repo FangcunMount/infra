@@ -290,13 +290,17 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         proof['native_output_sha256'] = hashlib.sha256(output.encode()).hexdigest()
         proof['native_exit_code'] = result.returncode
         proof['diagnostics'] = host_failure_summary(output)
-        proof['diagnostics']['assertion_lines'] = sorted(set(map(int, re.findall(r'(?:owner_runtime_native|rocketmq_recovery_m3c)_integration_test\.go:(\d+)', output))))[:32]
+        proof['diagnostics']['assertion_lines'] = sorted(set(map(int, re.findall(r'(?:(?:owner_runtime_native|rocketmq_recovery_m3c)_integration|post_retirement_process_startup_m5)_test\.go:(\d+)', output))))[:32]
         proof['diagnostics']['owner_runtime'] = runtime_diagnostics(output)
         if recovery:
             from qs_recovery_acceptance import recovery_diagnostics
             proof['diagnostics']['recovery_completion'] = recovery_diagnostics(output)
             from qs_recovery_acceptance import recovery_gate_diagnostics
             proof['diagnostics']['recovery_gate'] = recovery_gate_diagnostics(output)
+            from qs_recovery_acceptance import process_startup_diagnostics
+            startup = process_startup_diagnostics(output)
+            if startup:
+                proof['diagnostics']['process_startup'] = startup
         if result.returncode:
             raise RuntimeError('actual default QS owners failed; private output withheld')
         if recovery:
