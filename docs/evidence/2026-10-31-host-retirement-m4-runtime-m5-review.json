@@ -1247,6 +1247,31 @@
       "superseded_full_CI": {
         "run": 41197784005,
         "state": "cancelled after source network correction; not passed"
+      },
+      "final_candidate_native": {
+        "candidate_source": "71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8",
+        "execution_merge_sha": "6144cb64ae272ffbda503b3ff9796a497196cd80",
+        "run": 41198019711,
+        "job": 124528027136,
+        "artifact_id": 13041334522,
+        "raw_zip_sha256": "6c7ad3eb2606835d54cd9cb6a9bf2ffb45bc77c78b87658fbf408465c3d19265",
+        "zip_and_report_verified": true,
+        "report": {
+          "fixture_only": true,
+          "source_sha": "6144cb64ae272ffbda503b3ff9796a497196cd80",
+          "base_image": "alpine@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1",
+          "source_image_id": "sha256:49058c1b6f53a8a56271fd2e371ba72cb5a8c89ff334f6522e304191ed0036f7",
+          "stopped_source_supported": true,
+          "application_not_started": true,
+          "private_env_preserved": true,
+          "image_healthcheck_disabled": true,
+          "original_private_marker_preserved": true,
+          "unrelated_secret_not_copied": true,
+          "borrowed_mounts_read_only": true,
+          "existing_operation_refused": true,
+          "no_database_connections": true,
+          "owned_containers_removed": true
+        }
       }
     },
     "fixed_images_preparation": {

@@ -8,7 +8,7 @@
 
 QS固定1073三镜像的仅构建运行 [41197059223](https://github.com/FangcunMount/qs-server/actions/runs/41197059223) 成功，原始三ZIP及源码/平台/两仓库digest与config-ID对应关系已核验，全部部署步骤跳过，CD已恢复 `disabled_manually`。详细身份见JSON，不把发布制品等同于运行版本。
 
-维护入口 #475 当前源码 `71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8`，本地15项脚本与88项文档门禁测试通过，最终CI41198019711仍在运行。ServerA只读权限预检 [41198015973](https://github.com/FangcunMount/qs-server/actions/runs/41198015973) 已通过，artifact13041289357 ZIP `da415a3c006ec4ebdb8048ce322ac9c3f8adaa02fd2e4112fcc8ed1effea7b7a` 与内容均核验。它核实原容器 `.Image=sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b`、固定数据库网络和sudo Docker权限；不创建容器、不查询数据库、不证明停写或恢复资格。原镜像OCI config84f592...不能代替主机Docker容器Image。前三次预检失败及旧候选取消均单独保留。
+维护入口 #475 当前源码 `71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8`，本地15项脚本与88项文档门禁测试通过，最终CI41198019711仍在运行，其中required Docker原生job124528027136已通过，artifact13041334522原ZIP摘要 `6c7ad3eb2606835d54cd9cb6a9bf2ffb45bc77c78b87658fbf408465c3d19265` 与内容已核验，实际CI合并执行源码 `6144cb64ae272ffbda503b3ff9796a497196cd80`。ServerA只读权限预检 [41198015973](https://github.com/FangcunMount/qs-server/actions/runs/41198015973) 已通过，artifact13041289357 ZIP `da415a3c006ec4ebdb8048ce322ac9c3f8adaa02fd2e4112fcc8ed1effea7b7a` 与内容均核验。它核实原容器 `.Image=sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b`、固定数据库网络和sudo Docker权限；不创建容器、不查询数据库、不证明停写或恢复资格。原镜像OCI config84f592...不能代替主机Docker容器Image。前三次预检失败及旧候选取消均单独保留。
 
 尚待：最终维护入口CI、实际维护运输/数据库只读复验、生产事务排空与完整停写、同窗口材料/保留资产和具体恢复执行路线、具名责任人与可消费批准。首批仍只涉及空 `qs.mysql.ai_messaging_outbox`，其余五对象保留。SQL111及上线须在这些边界可审查后另行批准；本页不是批准。
 
