@@ -1280,7 +1280,39 @@
         "status": "success",
         "exact_source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6",
         "production_rollout": false
-      }
+      },
+      "main_workflow_runs": [
+        {
+          "run": 41201613892,
+          "name": "AI bridge MySQL",
+          "conclusion": "success",
+          "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
+        },
+        {
+          "run": 41201613857,
+          "name": "RocketMQ host failure audit",
+          "conclusion": "success",
+          "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
+        },
+        {
+          "run": 41201614009,
+          "name": "RocketMQ evaluation original MySQL root",
+          "conclusion": "success",
+          "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
+        },
+        {
+          "run": 41201613827,
+          "name": "CI",
+          "conclusion": "success",
+          "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
+        },
+        {
+          "run": 41201613488,
+          "name": "Code Quality: Push on main",
+          "conclusion": "success",
+          "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
+        }
+      ]
     },
     "fixed_images_preparation": {
       "source": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
@@ -1379,11 +1411,11 @@
       "PR": 476,
       "status": "draft; independently reconstructed remote candidate requires its own CI/native proof",
       "branch": "codex/host-retirement-m5-protocol-proof-remote-20261031",
-      "source": "55f7c8d7c108ebecdcd55c3b99d76e5745954dbc",
+      "source": "38d9419dd810f8e1a846fd72ee5999d0b7957f90",
       "code_source": "32627920429d8fda3bf42cac6cd609c2958a72ce",
       "base": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6",
-      "CI": 41202693972,
-      "CI_status": "running",
+      "CI": 41202978415,
+      "CI_status": "docs/lint and required real110/44+111/44 protocol step passed; full CI running",
       "native_required_mysql_versions": [
         110,
         111
@@ -1407,7 +1439,40 @@
         "actual_byte_export_available": false
       },
       "remote_candidate_is_local_byte_export": false,
-      "production_observation_performed": false
+      "production_observation_performed": false,
+      "current_native": {
+        "candidate": "38d9419dd810f8e1a846fd72ee5999d0b7957f90",
+        "run": 41202978415,
+        "job": 124542314662,
+        "required_pair_step": "success",
+        "mysql_versions": [
+          110,
+          111
+        ],
+        "mongo_version": 44,
+        "artifact_id": 13043815736,
+        "github_reported_zip_sha256": "92fd194b2982f66bcfe385a4b7578c11ded55c16cd581426d3ed88c1d1e5bb60",
+        "raw_zip_verified": false,
+        "companion_job_checkout_merge_sha": "eaa3eaa79f5d82a6c07fce4356efad16edb64dc1"
+      },
+      "initial_native": {
+        "run": 41202693972,
+        "job": 124541475898,
+        "candidate": "55f7c8d7c108ebecdcd55c3b99d76e5745954dbc",
+        "execution_merge": "b62b42b2f557c9062e94553869938e85d8a7fc16",
+        "required_pair_step": "success",
+        "artifact_id": 13043665417,
+        "github_reported_zip_sha256": "1df5b8aea6270a45b726a51ba3eb1cad6cf37a3450b76c27a51e7dfb9359f8d1",
+        "raw_zip_verified": false
+      },
+      "retained_CI_failure": {
+        "run": 41202693972,
+        "source": "55f7c8d7c108ebecdcd55c3b99d76e5745954dbc",
+        "job": 124541476207,
+        "cause": "two affected README source review records stale after source/CI changes",
+        "fixed_at": "38d9419dd810f8e1a846fd72ee5999d0b7957f90",
+        "gates_weakened": false
+      }
     }
   },
   "existing_database_operator_mutation": false,
