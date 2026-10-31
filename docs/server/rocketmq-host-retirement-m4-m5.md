@@ -4,7 +4,7 @@
 
 ## 本轮证据与范围
 
-[依赖清单](../evidence/2026-10-31-host-retirement-m5-dependencies.json)逐项绑定六仓最新 main 源码。它是本轮源码核对，不是现网表存在性、数据计数或责任关闭证明。生产运行、此前 M3-C 14 项通过和 51 条历史操作的审计结果继续归属原报告，本轮未重跑这些生产核验。
+[依赖清单](../evidence/2026-10-31-host-retirement-m5-dependencies.json)逐项绑定六仓最新 main 源码。它是本轮源码核对，不是现网表存在性、数据计数或责任关闭证明。初始清单不包含生产核验；本轮新增的实际部署与只读结果见[运行与逐对象复核](../evidence/2026-10-31-host-retirement-m4-runtime-m5-review.json)。此前 M3-C 14 项通过和 51 条历史操作的审计结果继续归属原运行，不因本次回读而重标为重跑。
 
 M4 候选为 [QS #471](https://github.com/FangcunMount/qs-server/pull/471)、[IAM #173](https://github.com/FangcunMount/iam/pull/173)，精确提交见依赖清单。候选修改 QS/IAM：迁出无运输/数据库所有权的消息映射、wire、Reference/指纹校验；删除当前宿主的 NSQ 双提供者分支、无调用的标准 Profile/Relay 执行装配。旧 Stager/NSQ 回归仅在明确的历史测试夹具或固定历史源码中运行。三个 QS 进程与 IAM 可执行文件的实际依赖图不得链接 NSQ、发布型 Relay 或测试夹具；不删除 SDK 的公开兼容能力。
 
@@ -25,7 +25,7 @@ QS 当前恢复继续使用既有 `m4-qs-runtime.yml` 的 `recovery_qs_ref`，�
 | qs.mysql / rm_outbox | 保留；结果证据、反向一致性和历史恢复仍依赖 | 保全原 Reference/wire 并替代所有当前读取，不能把表缺失当作空表 |
 | qs.mysql / ai_messaging_outbox | M4 部署后才可继续候选核验 | 未确认记录、正文引用与历史证据完整导出；验证旧回退镜像的 schema 依赖 |
 | qs.mongo / rm_outbox | 保留；v1 答卷/混合热榜/一致性及历史恢复仍依赖 | 提供同等原文证据读取路径并完成历史与当前混合场景验收 |
-| ai.mysql / messaging_outbox | 当前发布器已退出，仍为候选 | 旧责任/正文导出、维护审计与后续 Alembic head 兼容、回退下限 |
+| ai.mysql / messaging_outbox | 保留；当前 0043 启动及发布预检要求其存在 | 追加新版本 schema/layout，保持严格校验；旧责任/正文导出、维护兼容及回退下限 |
 
 候选不是执行清单。保留 `interpretation_result_outbox`、`identity_session_revocation_outbox`、原事务 execution/guard/witness、archive、Inbox、receipt/业务 ACK、业务历史及调度。表名含 outbox 不构成删除理由。
 
@@ -43,3 +43,13 @@ QS 当前恢复继续使用既有 `m4-qs-runtime.yml` 的 `recovery_qs_ref`，�
 QS 51 条缺原 command 发布事务锚点的历史操作，不能由 Inbox 字节一致、admission receipt 或后置业务投影补成原 witness。不能填造档案、重做模型、清空 ACK/业务历史或批量标记 retired 来使 M5 门禁变绿。它们是否与某个具体候选对象相关，须按精确引用单独证明，不能简单推导“全部可删”或“所有对象永久不能删”。
 
 M4/M5 验证结果按通过、失败、跳过、未执行记录；源码、CI、镜像、实际运行和业务验收分开登记。当前依赖清单没有生产删除回执，也没有新增删除迁移。
+
+## 2026-10-31 运行与只读复核
+
+M4 的 IAM、QS API、Worker 三副本及 Collection 两副本已按固定镜像部署；独立快照运行 [41175362334](https://github.com/FangcunMount/qs-server/actions/runs/41175362334) 与监控观察 [41175364496](https://github.com/FangcunMount/infra/actions/runs/41175364496) 验证九个业务容器的镜像/源码和显式就绪。四个事务 owner 的观测可用且新鲜，准入保护均为 0；这不代表业务责任已关闭。QS 业务观测不可用、待处理计数缺失，不能解释为零；AI 业务观测可用且 ACK 等待为 0。
+
+Worker 与 Collection 首次部署后的治理步骤分别因 Prometheus 尚未出现指标族失败。新鲜公网回读确认完整副本数后，只重跑失败治理步骤通过，未再次部署应用。[QS #473](https://github.com/FangcunMount/qs-server/pull/473) 将指标族出现条件放进既有就绪重试循环；保持原预算、阈值和失败条件，候选仍须最终 CI 与合并后验证。
+
+只读运行 [41175524009](https://github.com/FangcunMount/qs-server/actions/runs/41175524009) 在独立有界只读事务中确认 IAM 两张、QS MySQL 两张候选表均存在且各为 0 行，事务与连接池释放均成功，完整身份及结构哈希见 JSON。AI 分支失败且未留下有效回执，数量与原因未知；Mongo 尚未读取。以上不包含写入、清空、迁移或删除，不证明业务/引用关闭、正文备份恢复、无写者或回退兼容。
+
+IAM 原生 Broker 夹具在独立新库完整迁移后，显式清理其生成的旧发布表种子通知；该历史测试结果不能当作“新建库已无旧初始化责任”的退役验收。AI 当前已部署源码的严格运行时 schema 校验仍要求旧 `messaging_outbox`：必须新增有版本的布局与升级路径，不能修改冻结旧布局或放宽集合校验以允许缺表。

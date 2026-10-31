@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "milestone_namespace": "host-engineering-retirement-M4-M5",
+  "observed_on": "2026-10-31",
+  "user_timezone": "Asia/Shanghai",
+  "evidence_classes": {
+    "current_confirmation": "Git/source, immutable image and live read-only runtime/monitoring evidence read in this continuation.",
+    "historical_verification": "Earlier exact-source CI/native results are retained at their original runs; not rerun for sudoers installation.",
+    "pending": "Original-body export/restore, writer exclusion, reference/business closure and fresh/upgrade retirement validation do not become complete from publication counts."
+  },
+  "m4": {
+    "application_rollout_verified": true,
+    "sources": {
+      "qs-server": {
+        "candidate": "b5710295dab29cb7034ff72b1ce78d9b023f533c",
+        "main": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc"
+      },
+      "iam": {
+        "candidate": "efa44661a6304daa419097a7f35005e99c582e41",
+        "main": "7cd2b02ef6f917fbab19e204431abce79ea76a85",
+        "native_host_source": "df64582068cb2ab0729717f7449c9bffe8d1be28",
+        "later_changes": "workflow/test/README only; all Go/module/migrations identical"
+      },
+      "infra": {
+        "candidate": "28852938f8c8ad5a1a659cdeb918c9cb4b4774dd",
+        "main": "1b9edc646ae903c24319f798dd3a6aac3a250db4"
+      }
+    },
+    "images": {
+      "iam": {
+        "sha": "7cd2b02ef6f917fbab19e204431abce79ea76a85",
+        "digest": "sha256:34c678649eb78437db13b3ad10b3994d04254c19a4218c2c426726faf5112dfc",
+        "config": "sha256:60e6e8df32b82bf0a772c347190e4d52298653314c52749e6db1d8d0d5af7df2",
+        "registry_verified": true,
+        "build_run": 41169075612
+      },
+      "qs-worker": {
+        "sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+        "digest": "sha256:ae7f6d5fe260dcffc1a97011a1c68a2ce6b410ed8460b55ee1c75d25ed26ce6d",
+        "config": "sha256:d78f573c6c15fc543b2761ef6bc83af568d21ade25bebe8d6c134e31dc438a53",
+        "registry_verified": true,
+        "build_run": 41169342664
+      },
+      "qs-collection-server": {
+        "sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+        "digest": "sha256:21fe0619dfb8f037b6382c4bf9508d871be01d87547a5da5839325beeccf4e96",
+        "config": "sha256:e2c0aeb16bf8928e0162bc1793efa0fa7e9995d8a5b1d7148e73c2ed293982bb",
+        "registry_verified": true,
+        "build_run": 41169342664
+      },
+      "qs-apiserver": {
+        "sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+        "digest": "sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b",
+        "config": "sha256:84f5920ba8808ad11edcb198f038301e0dc09086cf1f6a008f3433d9028f0b69",
+        "registry_verified": true,
+        "build_run": 41169342664
+      }
+    },
+    "deployment_runs": {
+      "iam": 41170095659,
+      "api": 41174333853,
+      "worker": 41174549350,
+      "collection": 41174988540
+    },
+    "runtime_snapshot": 41175362334,
+    "monitoring_snapshot": 41175364496,
+    "replicas": {
+      "iam": 1,
+      "qs-apiserver": 1,
+      "qs-worker": 3,
+      "qs-collection-server": 2,
+      "qs-ai": 1,
+      "qs-operating-system": 1
+    },
+    "owner_observation_available": {
+      "qs.mongo": 1.0,
+      "qs.mysql": 1.0,
+      "iam.mysql": 1.0,
+      "ai.mysql": 1.0
+    },
+    "owner_observation_fresh": {
+      "qs.mongo": 1.0,
+      "qs.mysql": 1.0,
+      "iam.mysql": 1.0,
+      "ai.mysql": 1.0
+    },
+    "owner_admission_protected": {
+      "qs.mongo": 0.0,
+      "qs.mysql": 0.0,
+      "iam.mysql": 0.0,
+      "ai.mysql": 0.0
+    },
+    "qs_business_observation_available": {
+      "value": 0.0
+    },
+    "qs_pending_metric_present": false,
+    "ai_business_observation_available": {
+      "value": 1.0
+    },
+    "ai_business_ack_waiting": {
+      "value": 0.0
+    },
+    "retired_dashboard_removed": true,
+    "controller_followup": {
+      "pr": 473,
+      "source": "a453a1f6547aeb56e758a983bbd502fdaf2535da",
+      "CI": "pending",
+      "merged": false
+    },
+    "validation_boundary": [
+      "Worker has no Docker health declaration; explicit readiness and process/binary identity were verified.",
+      "IAM OCI revision label absent; exact reported binary Git commit and immutable image binding were verified.",
+      "M2 full historical business acceptance remains open; missing QS count is not zero."
+    ]
+  },
+  "historical_verification": [
+    {
+      "run": 41165627459,
+      "scope": "QS M3-C, exact b5710295 source, published Go v0.6.1,14 mandatory cases passed/0failed/0skipped",
+      "not_rerun_here": true
+    },
+    {
+      "run": 41166146030,
+      "scope": "Exact IAM df645820/QS b5710295 native transaction/fanout matrix, actual MySQL8.0.36/8.0.44/8.4.13; all passed, no full IAM process-fault/system claim",
+      "not_rerun_here": true
+    },
+    {
+      "run": 41150741066,
+      "scope": "Earlier QS51 original publisher-anchor evidence gaps; no new cohort count or terminal proof inferred here",
+      "not_rerun_here": true
+    }
+  ],
+  "m5": {
+    "read_only_probe_pr": 472,
+    "read_only_probe_source": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+    "probe_CI": {
+      "passed": 29,
+      "conditional_skipped": 1
+    },
+    "production_read_only_run": 41175524009,
+    "production_drop_allowed": false,
+    "new_retirement_migrations": [],
+    "objects": [
+      {
+        "owner": "iam.mysql",
+        "object": "domain_event_outbox",
+        "status": "hold",
+        "current_dependencies": [
+          "internal/apiserver/container/platform/transaction_handoff.go",
+          "internal/apiserver/infra/mysql/eventoutbox/standard_status.go",
+          "internal/apiserver/process/database.go",
+          "internal/apiserver/infra/mysql/eventoutbox/bootstrap_stager.go"
+        ],
+        "reason": "Runtime liability/readiness reads remain. Fresh migration 33/35 still writes historical bootstrap notifications; removing the writer would break initialization/upgrade.",
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": {
+          "workflow_run": 41175524009,
+          "owner": "iam.mysql",
+          "observed_at": "2026-10-31T06:13:29.73776366Z",
+          "source_sha": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "6bd675081a00e9825e92d691abe2b53257ed0a93123d5ba293a097d4ef10cde5",
+          "table": {
+            "name": "domain_event_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "727776184b625d699359c20ecbf7da7d0c799c46c0d085c7b13da4c87d6dd8ce",
+            "publication_closed_state": "published"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false
+      },
+      {
+        "owner": "iam.mysql",
+        "object": "rm_outbox",
+        "status": "hold",
+        "current_dependencies": [
+          "internal/apiserver/container/platform/transaction_handoff.go",
+          "internal/apiserver/infra/mysql/eventoutbox/standard_status.go",
+          "internal/apiserver/infra/mysql/eventoutbox/reliable_preflight.go"
+        ],
+        "reason": "Startup/readiness and retained responsibility inspection still require the table.",
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": {
+          "workflow_run": 41175524009,
+          "owner": "iam.mysql",
+          "observed_at": "2026-10-31T06:13:29.73776366Z",
+          "source_sha": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "6bd675081a00e9825e92d691abe2b53257ed0a93123d5ba293a097d4ef10cde5",
+          "table": {
+            "name": "rm_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "a0a4b4b3152204dbbebbf80f6ed1f924155ed7715e5f5b39a542cae76fd7655b",
+            "publication_closed_state": "published"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false
+      },
+      {
+        "owner": "qs.mysql",
+        "object": "rm_outbox",
+        "status": "hold",
+        "current_dependencies": [
+          "internal/apiserver/infra/mysql/evaluation/consistency_event_reference.go",
+          "internal/apiserver/maintenance/originaleffect/source.go",
+          "internal/apiserver/infra/mysql/standardoutbox/gap_recovery.go"
+        ],
+        "reason": "Canonical standard-reference and reverse consistency audits, retained original-effect recovery and historical governance still read original records.",
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": {
+          "workflow_run": 41175524009,
+          "owner": "qs.mysql",
+          "observed_at": "2026-10-31T06:13:40.165780441Z",
+          "source_sha": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "bf332b673dabcba3eaa066aa778d4a877644dfaed2ea5ff32319f89254e0a4c6",
+          "table": {
+            "name": "rm_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "79ce61b7d913153e15f8761f03695e4115fa10c334aebfb6e5ae52e6aad36e7c",
+            "publication_closed_state": "published"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false
+      },
+      {
+        "owner": "qs.mysql",
+        "object": "ai_messaging_outbox",
+        "status": "candidate_after_M4_deployment_and_evidence",
+        "current_dependencies": [
+          "scripts/maintenance/qs-ai-messaging/audit.go"
+        ],
+        "m4_candidate_change": "M4 QS application is deployed and independently verified; AI bridge current preflight no longer requires the old publishing table. This does not close liabilities or authorize DROP.",
+        "reason": "No source finding authorizes data loss. Retained body references, unconfirmed responsibilities, export integrity and rollback compatibility require live read-only evidence.",
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": {
+          "workflow_run": 41175524009,
+          "owner": "qs.mysql",
+          "observed_at": "2026-10-31T06:13:40.165780441Z",
+          "source_sha": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "bf332b673dabcba3eaa066aa778d4a877644dfaed2ea5ff32319f89254e0a4c6",
+          "table": {
+            "name": "ai_messaging_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+            "publication_closed_state": "confirmed"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false
+      },
+      {
+        "owner": "qs.mongo",
+        "object": "rm_outbox",
+        "status": "hold",
+        "current_dependencies": [
+          "internal/apiserver/infra/modelcatalog/hotrank/source.go",
+          "internal/apiserver/infra/answersheetgap/scanner.go",
+          "internal/apiserver/infra/mongo/mongoconsistency/standard_event_audit.go",
+          "internal/apiserver/infra/mongo/standardoutbox/replay.go"
+        ],
+        "reason": "Version-1 accepted answers, mixed historical/current hot-rank reconstruction and historical audit/recovery depend on exact original records.",
+        "production_presence_verified_this_round": false,
+        "production_unfinished_count": null,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": null
+      },
+      {
+        "owner": "ai.mysql",
+        "object": "messaging_outbox",
+        "status": "hold_until_exact_versioned_runtime_layout_and_liability_review",
+        "current_dependencies": [
+          "src/qs_ai/maintenance/schema_layout.py",
+          "src/qs_ai/maintenance/messaging_audit.py",
+          "src/qs_ai/infrastructure/persistence/mysql/messaging.py",
+          "src/qs_ai/bootstrap/server.py",
+          "src/qs_ai/bootstrap/database_check.py",
+          "src/qs_ai/maintenance/transaction_binding.py",
+          "src/qs_ai/maintenance/schema_refactor/validation.py",
+          "src/qs_ai/maintenance/schema_refactor/v0038.py"
+        ],
+        "reason": "Current 0043 application startup and release/transaction preflight call require_runtime_schema; its exact full v0038->0040 table set still includes messaging_outbox. A new versioned runtime layout and maintenance compatibility are required. Do not weaken exact layout validation or edit frozen historical layouts.",
+        "production_presence_verified_this_round": false,
+        "production_unfinished_count": null,
+        "drop_authorized": false,
+        "ddl_prepared": false,
+        "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
+        "read_only_metadata_receipt": null,
+        "read_only_attempt": {
+          "workflow_run": 41175524009,
+          "conclusion": "failure",
+          "valid_receipt_available": false,
+          "presence": null,
+          "rows": null,
+          "cause": "unknown; classified diagnostic follow-up pending"
+        }
+      }
+    ],
+    "fresh_iam_validation_boundary": {
+      "source": "internal/pkg/migration/transaction_broker_host_integration_test.go",
+      "fixture_behavior": "After current full fresh migration, native Broker fixture explicitly truncates owned generated seed notifications from both old publication tables. This is isolated fixture cleanup, not production evidence or a retirement acceptance.",
+      "fresh_install_legacy_responsibility_retirement_proven": false
+    },
+    "publication_count_does_not_prove": [
+      "current schema heads",
+      "business and original-reference closure",
+      "absence of current or rollback readers/writers",
+      "original body export and tested restoration",
+      "fresh and upgrade retirement compatibility"
+    ]
+  },
+  "existing_database_operator_mutation": false,
+  "sdk_public_capabilities_deleted": false,
+  "preserve": [
+    "ai.mysql.interpretation_result_outbox",
+    "iam.mysql.identity_session_revocation_outbox",
+    "transaction execution/guard/witness",
+    "archive and original immutable wire",
+    "inbox and idempotency receipts",
+    "first business ACK and business history",
+    "authorized retry/hold schedules"
+  ]
+}
