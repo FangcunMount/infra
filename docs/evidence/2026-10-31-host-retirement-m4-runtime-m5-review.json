@@ -1119,7 +1119,7 @@
         }
       ]
     },
-    "merge_release_readiness": "core474 and maintenance transport475 merged with successful exact main CI; fixed1073 images and candidate native proof retained. Protocol476 final/native CI, actual staged transport and direct primary reads, concrete frozen window/restore route and final approval remain.",
+    "merge_release_readiness": "core474, transport475 and protocol476 merged with successful exact main CI; fixed1073 images retained. Actual staged transport/live primary reads, qualified writer freeze and owner exit, concrete operator restore route and final database approval remain blocked/unexecuted.",
     "core_delivery": {
       "PR": 474,
       "candidate": "1b6f8debf053919ee803c3f35607072cc48b3b28",
@@ -1409,13 +1409,13 @@
     },
     "protocol_observation_delivery": {
       "PR": 476,
-      "status": "merged; candidate full checks29success/1original conditional skip; exact main CI pending",
+      "status": "merged; exact candidate and main CI success; production verification not executed",
       "branch": "codex/host-retirement-m5-protocol-proof-remote-20261031",
       "source": "38d9419dd810f8e1a846fd72ee5999d0b7957f90",
       "code_source": "32627920429d8fda3bf42cac6cd609c2958a72ce",
       "base": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6",
       "CI": 41202978415,
-      "CI_status": "success on candidate; main CI running",
+      "CI_status": "candidate and exact merged main success",
       "native_required_mysql_versions": [
         110,
         111
@@ -1489,8 +1489,62 @@
       },
       "main_CI": {
         "run": 41204413865,
-        "status": "running",
-        "exact_source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399"
+        "status": "success",
+        "exact_source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+        "checks_success": 29,
+        "original_conditional_skipped": 1,
+        "failed": 0,
+        "workflows": [
+          {
+            "run": 41204413884,
+            "name": "RocketMQ host failure audit",
+            "conclusion": "success"
+          },
+          {
+            "run": 41204413966,
+            "name": "RocketMQ evaluation original MySQL root",
+            "conclusion": "success"
+          },
+          {
+            "run": 41204414322,
+            "name": "Code Quality: Push on main",
+            "conclusion": "success"
+          },
+          {
+            "run": 41204413876,
+            "name": "AI bridge MySQL",
+            "conclusion": "success"
+          },
+          {
+            "run": 41204413865,
+            "name": "CI",
+            "conclusion": "success"
+          }
+        ]
+      },
+      "main_native": {
+        "source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+        "run": 41204413865,
+        "job": 124546468677,
+        "log_read": true,
+        "top_and_two_cases_passed": true,
+        "log_lines": [
+          "2026-10-31T13:17:27.7259508Z === RUN   TestSchemaPairNativeM5ProtocolReadOnly",
+          "2026-10-31T13:17:27.7259887Z === RUN   TestSchemaPairNativeM5ProtocolReadOnly/110",
+          "2026-10-31T13:17:27.7260259Z === RUN   TestSchemaPairNativeM5ProtocolReadOnly/111",
+          "2026-10-31T13:17:27.7260660Z --- PASS: TestSchemaPairNativeM5ProtocolReadOnly (10.79s)",
+          "2026-10-31T13:17:27.7261142Z     --- PASS: TestSchemaPairNativeM5ProtocolReadOnly/110 (5.41s)",
+          "2026-10-31T13:17:27.7261631Z     --- PASS: TestSchemaPairNativeM5ProtocolReadOnly/111 (5.38s)"
+        ],
+        "elapsed_seconds": 10.79,
+        "case_seconds": {
+          "mysql110_mongo44": 5.41,
+          "mysql111_mongo44": 5.38
+        },
+        "artifact_id": 13043972930,
+        "github_reported_zip_sha256": "sha256:b9240018efa34f35fd1a742f522c7ac8c2e4eccca5b0e5f3beca5caa65b83fe3",
+        "raw_zip_verified": false,
+        "scope": "owned real MySQL/Mongo; no Broker/business runtime or production acceptance"
       }
     },
     "production_window_eligibility": {
@@ -1585,7 +1639,16 @@
       "production_maintenance_container_created": false,
       "business_service_stopped": false,
       "existing_database_operator_mutation": false,
-      "QS_CD_last_verified": "disabled_manually before disconnect; no enable action by this task"
+      "QS_CD_last_verified": "disabled_manually before disconnect; no enable action by this task",
+      "last_command_probe": "No usable execution environment is available; no command executed",
+      "last_local_state_confirmed_before_disconnect": true,
+      "worktree_and_private_key_after_disconnect": "not re-readable; retain original workspace",
+      "local_sync_rule": "Export original bf059e commit/possible last-attempt edits and dirty docs before any sync; do not reset or overwrite",
+      "new_main_source_without_production_deploy_run": {
+        "source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+        "observed_at": "2026-10-31T13:28:00Z",
+        "production_deploy_run_found": false
+      }
     }
   }
 }
