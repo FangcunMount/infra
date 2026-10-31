@@ -677,7 +677,7 @@
     "final_candidate_checks": {
       "source": "62b76c87b8b3e3462c2882c543a6598763b81909",
       "CI": 41189873668,
-      "CI_status": "pending",
+      "CI_status": "in progress; 15 job successes in main workflow at last read, two running, one original conditional skip; associated workflows separate",
       "actual_readonly_offline_preview_run": 41183082546,
       "preview_status": "passed",
       "native_guard_previous_source": "704ee8ddb82b3094a2b469b4f5506cfb274521c4",
@@ -734,7 +734,48 @@
       },
       "canonical_final_source_readonly_preview": {
         "run": 41189888018,
-        "status": "four owner jobs running; reader success; not yet verified"
+        "status": "reader and all four owner jobs success; original snapshot conditional skip; artifact raw digest/content verification pending executor reconnect",
+        "artifacts": [
+          {
+            "id": 13038786528,
+            "name": "messaging-retirement-ai.mysql-41189888018",
+            "GitHub_digest": "sha256:ad47efaefb71e1bde8b9d51bc38b297e698632ca445835d75eee0ab692418489"
+          },
+          {
+            "id": 13038766674,
+            "name": "messaging-retirement-qs.mysql-41189888018",
+            "GitHub_digest": "sha256:23aab3dafa0ae0f59254e941e86387e16a0c82be39e51de9e6b0d50cbf019900"
+          },
+          {
+            "id": 13038542136,
+            "name": "messaging-retirement-qs.mongo-41189888018",
+            "GitHub_digest": "sha256:6ff6f1bc9bad52b6ec2cda5bd0ae052732f5ca59487eb6f5868e1c54b41ebbed"
+          },
+          {
+            "id": 13038516915,
+            "name": "messaging-retirement-reader-41189888018",
+            "GitHub_digest": "sha256:bad7a11920bb90dc63a1b6b63cc12eeba44dd1972b3cdc6ca99d7dd8266c115d"
+          },
+          {
+            "id": 13038452401,
+            "name": "messaging-retirement-iam.mysql-41189888018",
+            "GitHub_digest": "sha256:791872597d228261877c4eee992d3fee41e7b12008c93edb8557bd47a4679e7d"
+          }
+        ]
+      },
+      "native_migration_gate": {
+        "job": 124504272788,
+        "conclusion": "success",
+        "log": "required native selectors RUN/PASS; zero SKIP",
+        "exact_ledger_recovery_artifact": {
+          "id": 13038831601,
+          "GitHub_digest": "sha256:732c8f555d176aafb1defea8b448f24cd1e3bca4b3d6b09f3bdc5ba35edc979c"
+        },
+        "guard_artifact": {
+          "id": 13038083772,
+          "GitHub_digest": "sha256:147f1dc0347638c43ebbde996a55979d666ecf7252db1277587bdb686fdbd52a"
+        },
+        "artifact_content_verification": "pending executor reconnect"
       }
     },
     "read_only_probe_merged_main": "36846135cf6def4b80ff2d374886660dbda6d6db",
@@ -812,7 +853,7 @@
       "source": "2379189182ba70fe353663628efbf40bf36e2a03",
       "infra_source": "9255279b25da10f4bd09ff80c0f1e9149d87c8a1",
       "run": 41189393198,
-      "status": "host retirement job running; no startup acceptance yet",
+      "status": "failed required host job; no acceptance; precise failed stage pending report download after executor reconnect",
       "previous_failures": [
         {
           "source": "47b7e1d6ba5da163fc0c15141188851b78d110a8",
@@ -852,6 +893,20 @@
         "runtimeclosure_fixtures_identical": true,
         "changed_scope": "workflow/docs and original-ledger export/recovery tests",
         "not_a_new_execution": true
+      },
+      "job": 124503617012,
+      "current_failure": {
+        "source": "2379189182ba70fe353663628efbf40bf36e2a03",
+        "infra_source": "9255279b25da10f4bd09ff80c0f1e9149d87c8a1",
+        "run": 41189393198,
+        "job": 124503617012,
+        "job_conclusion": "failure",
+        "failure": "actual default QS owners failed; private output withheld",
+        "exact_cause": "unverified; no encrypted child trace produced",
+        "artifact_id": 13038816575,
+        "artifact_zip_digest_reported_by_GitHub": "sha256:25d0269479805652f7eaa93408db98683adaecfe786bf820e38e6d8eeb0db1ba",
+        "download_and_raw_digest_verification": "pending; executor unavailable",
+        "accepted": false
       }
     },
     "pending_restore_rehearsal": {
@@ -977,7 +1032,8 @@
           ]
         }
       ]
-    }
+    },
+    "merge_release_readiness": "blocked by failed full startup/native gate and pending artifact verification; maintain draft and QS release freeze"
   },
   "existing_database_operator_mutation": false,
   "sdk_public_capabilities_deleted": false,
