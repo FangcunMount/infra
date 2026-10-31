@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "milestone_namespace": "host-engineering-retirement-M4-M5",
+  "observed_on": "2026-10-31",
+  "evidence_class": "source-confirmed-only",
+  "sources": {
+    "qs-server": "f77bd0feb3a3559c0a1bfc5493451ae0fba25c5d",
+    "iam": "bec748b1e8ae486208b1ecaceda991c910d6cae4",
+    "qs-ai": "e71118903e3cdc794337ace6a73f51f6f86c3f4c",
+    "infra": "64d763462add176037e7fe55da7fa54175bb0bba",
+    "qs-operating-system": "bc22d966392380883f0756716636a00428e53276",
+    "reliable-messaging": "bcfb01ae1008c4c704fcb016708f5891a462be9a"
+  },
+  "m4_candidate_heads": {
+    "qs-server": "b5710295dab29cb7034ff72b1ce78d9b023f533c",
+    "iam": "df64582068cb2ab0729717f7449c9bffe8d1be28"
+  },
+  "m4_deployment_verified": false,
+  "m5_production_execution_allowed": false,
+  "existing_database_mutation": false,
+  "objects": [
+    {
+      "owner": "iam.mysql",
+      "object": "domain_event_outbox",
+      "status": "hold",
+      "current_dependencies": [
+        "internal/apiserver/container/platform/transaction_handoff.go",
+        "internal/apiserver/infra/mysql/eventoutbox/standard_status.go",
+        "internal/apiserver/process/database.go",
+        "internal/apiserver/infra/mysql/eventoutbox/bootstrap_stager.go"
+      ],
+      "reason": "Runtime liability/readiness reads remain. Fresh migration 33/35 still writes historical bootstrap notifications; removing the writer would break initialization/upgrade.",
+      "production_presence_verified_this_round": false,
+      "production_unfinished_count": null,
+      "drop_authorized": false,
+      "ddl_prepared": false
+    },
+    {
+      "owner": "iam.mysql",
+      "object": "rm_outbox",
+      "status": "hold",
+      "current_dependencies": [
+        "internal/apiserver/container/platform/transaction_handoff.go",
+        "internal/apiserver/infra/mysql/eventoutbox/standard_status.go",
+        "internal/apiserver/infra/mysql/eventoutbox/reliable_preflight.go"
+      ],
+      "reason": "Startup/readiness and retained responsibility inspection still require the table.",
+      "production_presence_verified_this_round": false,
+      "production_unfinished_count": null,
+      "drop_authorized": false,
+      "ddl_prepared": false
+    },
+    {
+      "owner": "qs.mysql",
+      "object": "rm_outbox",
+      "status": "hold",
+      "current_dependencies": [
+        "internal/apiserver/infra/mysql/evaluation/consistency_event_reference.go",
+        "internal/apiserver/maintenance/originaleffect/source.go",
+        "internal/apiserver/infra/mysql/standardoutbox/gap_recovery.go"
+      ],
+      "reason": "Canonical standard-reference and reverse consistency audits, retained original-effect recovery and historical governance still read original records.",
+      "production_presence_verified_this_round": false,
+      "production_unfinished_count": null,
+      "drop_authorized": false,
+      "ddl_prepared": false
+    },
+    {
+      "owner": "qs.mysql",
+      "object": "ai_messaging_outbox",
+      "status": "candidate_after_M4_deployment_and_evidence",
+      "current_dependencies": [
+        "scripts/maintenance/qs-ai-messaging/audit.go"
+      ],
+      "m4_candidate_change": "Current bridge schema preflight no longer requires the old publishing table; exact candidate CI/deployment remains to be verified.",
+      "reason": "No source finding authorizes data loss. Retained body references, unconfirmed responsibilities, export integrity and rollback compatibility require live read-only evidence.",
+      "production_presence_verified_this_round": false,
+      "production_unfinished_count": null,
+      "drop_authorized": false,
+      "ddl_prepared": false
+    },
+    {
+      "owner": "qs.mongo",
+      "object": "rm_outbox",
+      "status": "hold",
+      "current_dependencies": [
+        "internal/apiserver/infra/modelcatalog/hotrank/source.go",
+        "internal/apiserver/infra/answersheetgap/scanner.go",
+        "internal/apiserver/infra/mongo/mongoconsistency/standard_event_audit.go",
+        "internal/apiserver/infra/mongo/standardoutbox/replay.go"
+      ],
+      "reason": "Version-1 accepted answers, mixed historical/current hot-rank reconstruction and historical audit/recovery depend on exact original records.",
+      "production_presence_verified_this_round": false,
+      "production_unfinished_count": null,
+      "drop_authorized": false,
+      "ddl_prepared": false
+    },
+    {
+      "owner": "ai.mysql",
+      "object": "messaging_outbox",
+      "status": "candidate_after_M4_deployment_and_evidence",
+      "current_dependencies": [
+        "src/qs_ai/maintenance/schema_layout.py",
+        "src/qs_ai/maintenance/messaging_audit.py",
+        "src/qs_ai/infrastructure/persistence/mysql/messaging.py"
+      ],
+      "reason": "Current MessagingStore does not publish through this table. Historical layout/audit still retain its declaration and records; next schema head, export and responsibility evidence are unresolved.",
+      "production_presence_verified_this_round": false,
+      "production_unfinished_count": null,
+      "drop_authorized": false,
+      "ddl_prepared": false
+    }
+  ],
+  "preserve": [
+    "ai.mysql.interpretation_result_outbox",
+    "iam.mysql.identity_session_revocation_outbox",
+    "transaction execution/guard/witness",
+    "archive and original immutable wire",
+    "inbox and idempotency receipts",
+    "first business ACK and business history",
+    "authorized retry/hold schedules"
+  ],
+  "cross_cutting_blocks": [
+    "M4 candidate full CI and controlled deployment are pending.",
+    "The 51 previously audited QS operations still lack original publisher anchors; prior evidence is historical, not rerun here. Do not fabricate Commit, clear history or bulk-retire them.",
+    "Previously frozen rollback images may still require candidate tables. A new compatible rollback floor must be tested before DDL.",
+    "No production presence/closed-responsibility/export proof has been collected for this M5 batch."
+  ],
+  "candidate_pull_requests": {
+    "qs-server": "https://github.com/FangcunMount/qs-server/pull/471",
+    "iam": "https://github.com/FangcunMount/iam/pull/173"
+  }
+}

@@ -146,6 +146,15 @@ def validate_protection_profile(module, protection, runtime, faults, fanout):
                 'h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')):
         raise RuntimeError('IAM protection requires exact published stable v0.5.0 module and sums')
 
+def validate_published_current_profile(module, enabled, runtime, faults, protection, native_limit, readable):
+    if not enabled:
+        return
+    if not runtime or faults or protection or native_limit or readable:
+        raise RuntimeError('published-current IAM requires separate runtime/fanout acceptance')
+    from host_sdk_contract import validate_rotation_module
+    validate_rotation_module(module)
+
+
 def host_failure_summary(raw):
     # Fixed classifications only; never copy a driver error, wire or credential.
     return {'build_failed': '[build failed]' in raw,
@@ -193,6 +202,10 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     if native_flag not in ('0', '1') or (native_flag == '1' and protection):
         raise RuntimeError('explicit separate IAM native limit profile required')
     native_limit = native_flag == '1'
+    published_flag = os.environ.get('ROCKETMQ_IAM_PUBLISHED_CURRENT', '0')
+    if published_flag not in ('0', '1'):
+        raise RuntimeError('explicit published-current IAM profile flag required')
+    published_current = published_flag == '1'
 
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'],
@@ -200,9 +213,12 @@ def run_iam_host(source, directory, broker, project, grpc_port, mysql_port, pass
     if module.get('Replace') or not module.get('Version') or not module.get('Sum'):
         raise RuntimeError('IAM must use its pinned downloaded SDK without replace')
     proof['sdk_module'] = {key: module.get(key) for key in ('Path', 'Version', 'Sum', 'GoModSum')}
+    validate_published_current_profile(module, published_current, runtime_required, faults, protection, native_limit, readable)
+    if published_current:
+        proof['published_current_sdk_profile'] = True
     validate_protection_profile(module, protection or native_limit, runtime_required, faults, qs_source is not None)
     env['IAM_M3_VERIFY_PROTOCOL_PROTECTION'] = '1' if protection else '0'
-    if (runtime_required or faults) and not (protection or native_limit) and module.get('Version') != 'v0.5.0':
+    if (runtime_required or faults) and not (protection or native_limit or published_current) and module.get('Version') != 'v0.5.0':
         raise RuntimeError('current IAM runtime proof requires fixed stable SDK v0.5.0')
     if readable:
         if runtime_required or faults or protection or native_limit or qs_source is None:

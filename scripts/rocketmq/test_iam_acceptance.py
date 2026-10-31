@@ -8,6 +8,19 @@ from routes import permissions_v2
 
 
 class IAMAcceptanceTest(unittest.TestCase):
+    def test_current_published_profile_requires_exact_module_and_runtime(self):
+        from host_sdk_contract import ROTATION_MODULE
+        from iam_acceptance import validate_published_current_profile, validate_protection_profile
+        validate_published_current_profile(dict(ROTATION_MODULE), True, True, False, False, False, False)
+        for changes in ({'Replace': {}}, {'Sum': 'wrong'}, {'Version': 'v0.5.0'}, {'GoModSum': 'wrong'}):
+            with self.subTest(changes=changes), self.assertRaises(RuntimeError):
+                validate_published_current_profile(dict(ROTATION_MODULE, **changes), True, True, False, False, False, False)
+        for flags in ((False,False,False,False,False), (True,True,False,False,False), (True,False,True,False,False), (True,False,False,True,False), (True,False,False,False,True)):
+            with self.subTest(flags=flags), self.assertRaises(RuntimeError):
+                validate_published_current_profile(dict(ROTATION_MODULE), True, *flags)
+        with self.assertRaises(RuntimeError):
+            validate_protection_profile(dict(ROTATION_MODULE), True, True, False, False)
+
     def test_failure_summary_never_exports_runtime_content(self):
         raw = ('--- FAIL: TestM3ActualBrokerHost (1s)\n'
                ' transaction_broker_host_integration_test.go:143: private token wire\n'
