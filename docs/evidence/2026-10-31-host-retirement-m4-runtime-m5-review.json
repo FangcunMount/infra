@@ -945,7 +945,7 @@
         "source": "f27aaf9d5dfbdced1f27952e360ee4576f5d58f3",
         "infra_source": "d257361abaaba2227a3c1432847c7cac0007c106",
         "run": 41191118955,
-        "status": "running; executor again unavailable; bounded role/exit result can still be read remotely, private trace decryption needs original workspace",
+        "status": "required host job failed; diagnostic report and encrypted child trace available, need original executor to download/hash/decrypt",
         "local_Go_tagged_child_tests": "passed",
         "local_recovery_protocol_tests_passed": 17,
         "change": "add role/drain_exit/drain_deadline and encrypted owned trace without changing exit-zero assertion or30s budget",
@@ -954,7 +954,19 @@
           "implication": "redis.summary.ready alone does not prove Worker has entered its drainable runtime",
           "cause_confirmed": false,
           "production_or_fixture_fix_implemented": false
-        }
+        },
+        "job": 124507944467,
+        "job_conclusion": "failure",
+        "report_artifact": {
+          "id": 13039730097,
+          "GitHub_digest": "sha256:215909e3557f713df14f7e3193021ddf4e828a509511365592df5e6d27cba213"
+        },
+        "encrypted_trace_artifact": {
+          "id": 13038704697,
+          "GitHub_digest": "sha256:0e06d1c4ae503182f8a8a2b9ccc6d5106da6bcaef223e567d64440208ac841d7"
+        },
+        "download_digest_and_decryption_verified": false,
+        "exact_process_and_cause": "unverified until retained report/private trace inspected"
       }
     },
     "pending_restore_rehearsal": {
@@ -1081,7 +1093,7 @@
         }
       ]
     },
-    "merge_release_readiness": "blocked by failed full startup/native gate and pending artifact verification; maintain draft and QS release freeze"
+    "merge_release_readiness": "blocked: new full runtime gate failed; exact cause and fix pending; do not merge/deploy/execute existing DB retirement"
   },
   "existing_database_operator_mutation": false,
   "sdk_public_capabilities_deleted": false,
