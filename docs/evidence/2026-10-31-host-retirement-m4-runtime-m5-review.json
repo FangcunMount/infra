@@ -1624,6 +1624,271 @@
       "approval_file_created": false,
       "production_maintenance_container_created": false,
       "existing_database_operator_mutation": false
+    },
+    "local_continuation_readonly_20261031": {
+      "actual_execution_host": "user MacBook Darwin; production read via reviewed Actions, later direct SSH read-only at154.8.167.1 and82.157.204.239",
+      "source_sha": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+      "preflight_run": 41209522987,
+      "stage_run": 41209612364,
+      "readonly_run": 41209690150,
+      "all_raw_zip_and_members_verified": true,
+      "snapshot": {
+        "source_sha": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+        "migration_resources_sha256": "b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de",
+        "mysql_database": "qs",
+        "mongo_database": "qs",
+        "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+        "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+        "mysql_version": 110,
+        "mongo_version": 44,
+        "target_mysql_version": 111,
+        "target_mongo_version": 44
+      },
+      "objects": [
+        {
+          "owner": "iam.mysql",
+          "object": "domain_event_outbox",
+          "rows": 0,
+          "DDL_matches_prior": true,
+          "database_binding_matches_prior": true
+        },
+        {
+          "owner": "iam.mysql",
+          "object": "rm_outbox",
+          "rows": 0,
+          "DDL_matches_prior": true,
+          "database_binding_matches_prior": true
+        },
+        {
+          "owner": "qs.mysql",
+          "object": "rm_outbox",
+          "rows": 0,
+          "DDL_matches_prior": true,
+          "database_binding_matches_prior": true
+        },
+        {
+          "owner": "qs.mysql",
+          "object": "ai_messaging_outbox",
+          "rows": 0,
+          "DDL_matches_prior": true,
+          "database_binding_matches_prior": true
+        },
+        {
+          "owner": "qs.mongo",
+          "object": "rm_outbox",
+          "rows": 0,
+          "catalog_matches_prior": true,
+          "database_binding_matches_prior": true
+        },
+        {
+          "owner": "ai.mysql",
+          "object": "messaging_outbox",
+          "rows": 0
+        }
+      ],
+      "target_DDL_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+      "original_complete_ledger": {
+        "original_ddl": "CREATE TABLE `schema_migrations` (\n  `version` bigint NOT NULL,\n  `dirty` tinyint(1) NOT NULL,\n  PRIMARY KEY (`version`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci",
+        "show_create_table_sha256": "e663736774931e5f988b7fa72a0849fa725ae3ba97f083df404b676d64b616ee",
+        "rows": [
+          {
+            "version": 110,
+            "dirty": false
+          }
+        ]
+      },
+      "body_wire_EOF_bytes": 0,
+      "protocol_observation": {
+        "phase": "complete",
+        "read_only": true,
+        "available": true,
+        "mutation": false,
+        "runtime_frozen": false,
+        "broker_pending_known": false,
+        "no_observed_unresolved": true,
+        "snapshot": {
+          "source_sha": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+          "migration_resources_sha256": "b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de",
+          "mysql_database": "qs",
+          "mongo_database": "qs",
+          "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+          "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+          "mysql_version": 110,
+          "mongo_version": 44,
+          "target_mysql_version": 111,
+          "target_mongo_version": 44
+        },
+        "qs_mysql": {
+          "owner": "qs.mysql",
+          "binding_sha256": "d85f832307acedf8e381b4a3af9a1424fd4b320fc983f28aa8e6a21bf4f45aef",
+          "protocol": {
+            "AsOf": "2026-10-31T14:25:20.365268Z",
+            "ReservedExecutions": 0,
+            "PreparingExecutions": 0,
+            "PreparedExpiryAgeSeconds": 0,
+            "ConfirmationGapBranches": 0,
+            "OldestConfirmationObservationAgeSeconds": 0,
+            "UnagedConfirmationGapBranches": 0,
+            "UntrackedAbortedBranches": 0,
+            "UnobservedCommittedBranches": 0,
+            "MetadataConflicts": 0
+          },
+          "native_limit_active": false,
+          "no_observed_unresolved": true
+        },
+        "qs_mongo": {
+          "owner": "qs.mongo",
+          "binding_sha256": "d0995f881d9d7f1a9878d522cbe31acb80c9a662df2212c48c7bf5094a957dbf",
+          "protocol": {
+            "AsOf": "2026-10-31T14:25:20.39Z",
+            "ReservedExecutions": 0,
+            "PreparingExecutions": 0,
+            "PreparedExpiryAgeSeconds": 0,
+            "ConfirmationGapBranches": 0,
+            "OldestConfirmationObservationAgeSeconds": 0,
+            "UnagedConfirmationGapBranches": 0,
+            "UntrackedAbortedBranches": 0,
+            "UnobservedCommittedBranches": 0,
+            "MetadataConflicts": 0
+          },
+          "native_limit_active": false,
+          "no_observed_unresolved": true
+        }
+      },
+      "AI_preserved_counts": {
+        "interpretation_result_outbox": 125,
+        "messaging_inbox": 57
+      },
+      "maintenance_container": "qs-m5-maintenance-41209612364-1",
+      "runtime_frozen": false,
+      "business_service_stopped": false,
+      "existing_database_operator_mutation": false
+    },
+    "execution_package_review_20261031_local": {
+      "document": "docs/server/rocketmq-host-retirement-m5-execution-package.md",
+      "machine_packet": "docs/evidence/2026-10-31-host-retirement-m5-execution-package.json",
+      "review_ready": true,
+      "execution_ready": false,
+      "gates": [
+        {
+          "id": "G01",
+          "state": "blocked",
+          "need": "independent verified quiesce of API new admission and schedulers with last owner/Checker alive; no deployed API established"
+        },
+        {
+          "id": "G02",
+          "state": "pending_window",
+          "need": "actual producer/consumer/provider drain and primary activity/autonomous expiry exclusion"
+        },
+        {
+          "id": "G03",
+          "state": "blocked",
+          "need": "final be2e runtime images, local fixed caches and111-compatible forward recovery candidate;1073 registry build is historical separate source"
+        },
+        {
+          "id": "G04",
+          "state": "pending_window",
+          "need": "same-window original materials and complete retained asset catalog/baselines within budget"
+        },
+        {
+          "id": "G05",
+          "state": "blocked",
+          "need": "review and isolated native rehearsal of actual fixed client recovery route; prior Go test seam is not this transport"
+        },
+        {
+          "id": "G06",
+          "state": "pending_review",
+          "need": "independent explicit production stop/apply/recovery/start authorization; this package cannot be consumed as approval"
+        },
+        {
+          "id": "G04a",
+          "state": "blocked",
+          "need": "reviewed complete retained-asset readonly exporter/encoding/permissions/budgets; existing inventory is narrower"
+        }
+      ],
+      "recovery_route": {
+        "mode": "reviewed manual SQL session in fixed Python asyncmy client; separate future authorization",
+        "client_image": "sha256:18a39e862a82bfb9b503a3dd93639688bc45016caa2c7f1bf9081953b4523fa0",
+        "client_source": "f9f24abdf98535295c4e3d223675ef6be62115e2",
+        "python": "3.11.18",
+        "asyncmy": "0.2.14",
+        "dependency_import_probe": "passed at UIDs10001 and2000, CA readable at2000; no database connection",
+        "maintenance_container_created": false,
+        "installed_production_restore_API": false,
+        "native_actual_transport_rehearsal_passed": false,
+        "before_start": [
+          "inspect server activity and interrupted exact111 state",
+          "restore only captured original empty table if absent; verify exact DDL/zeroEOF",
+          "compare all retained asset baselines",
+          "last: transactionally replay complete original one-row ledger under independent review",
+          "canonical verify clean110/44 before original M4 start"
+        ],
+        "after_start": [
+          "keep111",
+          "preserve new facts",
+          "use reviewed111-compatible forward image/patch",
+          "never replay original110 ledger"
+        ],
+        "client_UID": "2000:2000"
+      },
+      "data_owner": "shujie",
+      "recovery_owner": "shujie",
+      "published_to_PR417": false,
+      "production_apply_approved": false,
+      "production_SQL111_executed": false,
+      "production_runtime_stopped": false,
+      "production_database_restored": false,
+      "last_readonly_host_snapshots": {
+        "serverA": "2026-10-31T14:47:09.139416+00:00",
+        "serverD": "2026-10-31T14:47:09.935217+00:00"
+      },
+      "validation": {
+        "local_existing_unit_tests": {
+          "operator": 5,
+          "start_boundary": 17,
+          "nginx_render": 4,
+          "failed": 0
+        },
+        "chosen_boundary_route_fixture": {
+          "fixture_only": true,
+          "actual_database_or_SSH_called": false,
+          "synthetic_hashes_used_only_in_owned_fixture": true,
+          "checks": [
+            "apply_unknown_retains_failed",
+            "failed_apply_cannot_start",
+            "separate_R1_repair_returns_startable",
+            "marker_durable_before_start_callback",
+            "all_old_restore_paths_refused_after_start"
+          ],
+          "passed": 5,
+          "production_restore_or_approval": false
+        },
+        "JSON_scope_and_local_link_checks": "passed",
+        "git_diff_check": "passed",
+        "new_CI_run": false,
+        "production_restore_transport_acceptance": false,
+        "final_runtime_comparison": [
+          {
+            "host": "serverA",
+            "first_read": "2026-10-31T14:47:09.139416+00:00",
+            "last_read": "2026-10-31T15:01:04.930399+00:00",
+            "all_selected_containers_and_config_unchanged": true,
+            "nginx_files_unchanged": true,
+            "unordered_mounts_compared_by_unique_destination": true
+          },
+          {
+            "host": "serverD",
+            "first_read": "2026-10-31T14:47:09.935217+00:00",
+            "last_read": "2026-10-31T15:01:04.223466+00:00",
+            "all_selected_containers_and_config_unchanged": true,
+            "nginx_files_unchanged": true,
+            "unordered_mounts_compared_by_unique_destination": true
+          }
+        ],
+        "initial_comparison_refusal": "raw Docker mount enumeration order differed; raw evidence preserved, unique destinations normalized; no runtime delta",
+        "final_CD_state": "disabled_manually",
+        "validated_at": "2026-10-31T15:02:20.001300+00:00"
+      }
     }
   },
   "existing_database_operator_mutation": false,

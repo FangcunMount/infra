@@ -159,3 +159,11 @@ QS CD禁用时仅构建返回422的失败已保留。只为派发build短暂启�
 本轮补做main两份原始ZIP和JSON内容校验：协议观察artifact13043972930（b9240018...）、维护传输artifact13044116748（eb2cb193...），均与GitHub摘要及be2e源码一致，完整摘要见JSON。CI测试结果仍归属既有41204413865，没有重跑冒签。候选旧ZIP的未验记录保持原归属；本轮主线制品已核验。
 
 当前远端main实读be2e4e8d，QS CD实读disabled_manually。未创建生产维护容器、未停业务、未执行SQL111。若选择本机，在MacBook用Codex打开本地Qlume仓库，从main接续，读取handoff.json及本PR记录，先做维护入口/现库只读复验；真实集成继续沿用既有CI。
+
+## MacBook 实际接续与执行包审查稿
+
+上述“未创建维护容器”保留为原云交接时点。本地接续后，精确be2e的preflight41209522987与stage41209612364成功，已创建空闲维护容器`qs-m5-maintenance-41209612364-1`；未启动业务或停现有服务。[现库只读41209690150](https://github.com/FangcunMount/qs-server/actions/runs/41209690150)的reader/四owner全部成功，五份原ZIP及成员已本地校验。六候选仍为空、QS110/44，目标原DDL/完整账本/空EOF及双库身份与旧记录相符；两QS owner协议可用、未决项为零，runtime_frozen与broker_pending_known仍false。该结果不升级为停写或Broker排空。
+
+本轮已形成[具体执行包审查稿](rocketmq-host-retirement-m5-execution-package.md)与[结构化包](../evidence/2026-10-31-host-retirement-m5-execution-package.json)，覆盖原六实例/当前Compose与镜像、独立暂停和最后owner退出条件、同窗口材料清单/保留资产差异白名单、单一首启动屏障、R0取消/R1首启动前原材料恢复/R2启动后前向修复、时间预算及逐步停止点。实际A/D只读复核发现原M4固定启动器的镜像/项目已过时，不能复用。
+
+当前review_ready=true、execution_ready=false：独立暂停能力、最终新镜像/111前向恢复候选、完整保留资产只读基线命令及实际固定客户端恢复演练仍阻断生产执行。恢复路线已选定为独立固定Python/asyncmy SQL会话，UID2000依赖和CA可读性探测成功，未连接数据库，不以旧Go测试seam冒充生产入口。当前仍保持发布冻结，未停业务、未执行SQL111/账本回放或创建可消费批准；事务凭证、业务历史、ACK和调度全部保留。执行包和新增记录目前仅在本地独立工作树，尚未推送至远端#417。
