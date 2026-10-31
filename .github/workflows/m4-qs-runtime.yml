@@ -35,6 +35,10 @@ on:
         description: Optional exact host retirement M3-C QS SHA
         type: string
         required: false
+      recovery_diagnostic_public_cert:
+        description: Optional public recipient certificate for encrypted owned startup evidence; never a private key
+        type: string
+        required: false
 permissions:
   contents: read
 concurrency:
@@ -239,9 +243,15 @@ jobs:
             docker --host=unix:///var/run/docker.sock build --no-cache \
             -t rocketmq-retirement-m3c:5.5.1 components/rocketmq
       - name: Actual Worker and Broker SIGKILL original redelivery and real Redis
+        env:
+          QS_M5_DIAGNOSTIC_PUBLIC_CERT: ${{ inputs.recovery_diagnostic_public_cert }}
+          QS_M5_DIAGNOSTIC_DIRECTORY: ${{ runner.temp }}/m5-startup-diagnostics-${{ github.run_id }}
         run: |
           set -euo pipefail
           umask 077
+          if [ -n "$QS_M5_DIAGNOSTIC_PUBLIC_CERT" ]; then
+            install -d -m 0700 "$QS_M5_DIAGNOSTIC_DIRECTORY"
+          fi
           local_docker() {
             env -u DOCKER_CONTEXT -u DOCKER_TLS -u DOCKER_TLS_VERIFY -u DOCKER_CERT_PATH \
               docker --host=unix:///var/run/docker.sock "$@"
@@ -298,6 +308,19 @@ jobs:
           path: m3c-*.json
           if-no-files-found: error
           retention-days: 14
+
+      - uses: actions/upload-artifact@v7
+        if: always() && inputs.recovery_diagnostic_public_cert != ''
+        with:
+          name: encrypted-owned-startup-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/m5-startup-diagnostics-${{ github.run_id }}/*.p7m
+            ${{ runner.temp }}/m5-startup-diagnostics-${{ github.run_id }}/*.json
+          if-no-files-found: ignore
+          retention-days: 3
+      - name: Remove owned encrypted diagnostic transport directory
+        if: always() && inputs.recovery_diagnostic_public_cert != ''
+        run: rm -rf -- "${RUNNER_TEMP:?}/m5-startup-diagnostics-${GITHUB_RUN_ID:?}"
 
   rotation-worker:
     if: ${{ github.event_name == 'pull_request' || (inputs.rotation_candidate && !inputs.rotation_recovery_only) }}
