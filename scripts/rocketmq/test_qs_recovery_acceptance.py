@@ -128,27 +128,3 @@ class GateDiagnosticTest(unittest.TestCase):
         from qs_recovery_acceptance import recovery_gate_diagnostics
         line='M3C_WORKER_GATE_DIAGNOSTIC '+json.dumps(self.value())
         with self.assertRaises(RuntimeError):recovery_gate_diagnostics(line+'\n'+line)
-
-
-class ProcessStartupDiagnosticTest(unittest.TestCase):
-    def value(self):
-        return dict(role='api', phase='startup_exit', stage='resources', reason='schema_pair', exit_code=1)
-
-    def parse(self, value):
-        from qs_recovery_acceptance import process_startup_diagnostics
-        return process_startup_diagnostics('M5_PROCESS_STARTUP_DIAGNOSTIC '+json.dumps(value))
-
-    def test_fixed_technical_labels_and_private_lines(self):
-        from qs_recovery_acceptance import process_startup_diagnostics
-        self.assertEqual(self.parse(self.value()), [self.value()])
-        self.assertEqual(process_startup_diagnostics('private child output'), [])
-
-    def test_private_values_types_and_duplicates_are_rejected(self):
-        from qs_recovery_acceptance import process_startup_diagnostics
-        for change in (dict(raw='PRIVATE'), dict(role='PRIVATE'), dict(reason='PRIVATE'),
-                       dict(stage='PRIVATE'), dict(phase='PRIVATE'), dict(exit_code=True), dict(exit_code=256)):
-            with self.subTest(change=change), self.assertRaises(RuntimeError):
-                self.parse(dict(self.value(), **change))
-        line='M5_PROCESS_STARTUP_DIAGNOSTIC '+json.dumps(self.value())
-        with self.assertRaises(RuntimeError):
-            process_startup_diagnostics(line+'\n'+line)

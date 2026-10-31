@@ -114,28 +114,3 @@ def recovery_gate_diagnostics(output):
             raise RuntimeError('unsafe or incomplete gate diagnostic')
         rows.append(value)
     return rows
-
-
-def process_startup_diagnostics(output):
-    """Bounded public technical labels; never retain a child's private text."""
-    result = []
-    for line in output.splitlines():
-        if not line.startswith('M5_PROCESS_STARTUP_DIAGNOSTIC '):
-            continue
-        raw = line.removeprefix('M5_PROCESS_STARTUP_DIAGNOSTIC ')
-        if len(raw) > 512:
-            raise RuntimeError('startup diagnostic exceeds bound')
-        try:
-            value = json.loads(raw)
-        except ValueError:
-            raise RuntimeError('invalid startup diagnostic') from None
-        if (not isinstance(value, dict) or set(value) != {'role', 'phase', 'stage', 'reason', 'exit_code'}
-                or value['role'] not in {'api', 'collection', 'worker'}
-                or value['phase'] not in {'startup_exit', 'health_deadline'}
-                or value['stage'] not in {'unknown', 'resources', 'container', 'integrations', 'transports', 'runtime', 'shutdown'}
-                or value['reason'] not in {'process_exit', 'owned_namespace', 'compiled_source', 'schema_pair', 'iam', 'database'}
-                or type(value['exit_code']) is not int or not -1 <= value['exit_code'] <= 255
-                or len(result) >= 3 or any(x['role'] == value['role'] for x in result)):
-            raise RuntimeError('unsafe or duplicate startup diagnostic')
-        result.append(value)
-    return result

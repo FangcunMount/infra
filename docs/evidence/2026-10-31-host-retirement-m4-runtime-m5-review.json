@@ -164,9 +164,9 @@
         "version": 111,
         "target": "qs.mysql.ai_messaging_outbox",
         "transition": "110/44 ->111/44",
-        "source": "51323979c7ee38b5288f5a3422209f7589cef5dc",
+        "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
         "PR": 474,
-        "status": "draft candidate; no production execution",
+        "status": "draft; appended startup/original-ledger/recovery native gates pending; no production execution",
         "scope": "Only empty target, bound paired driver, same-session WRITE lock, no unreviewed programs/dependencies, complete cleanup; controlled original restoration only."
       }
     ],
@@ -675,9 +675,9 @@
       "is_production_backup_or_restore": false
     },
     "final_candidate_checks": {
-      "source": "51323979c7ee38b5288f5a3422209f7589cef5dc",
-      "CI": 41183644869,
-      "CI_status": "pending; corrected ShellCheck output grouping only",
+      "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+      "CI": 41186437005,
+      "CI_status": "pending",
       "actual_readonly_offline_preview_run": 41183082546,
       "preview_status": "passed",
       "native_guard_previous_source": "704ee8ddb82b3094a2b469b4f5506cfb274521c4",
@@ -719,12 +719,22 @@
       },
       "M3C14_overall_workflow": "cancelled after required current host job success and verified artifact download; remaining automatically included historical controls not counted as passed",
       "M3C14_exactly_tested_scope": "Production business Container/API gRPC services and real Worker process; controlled IAM/provider, no complete production HTTP/Collection or system login acceptance",
-      "latest_change_from_verified_preview": "Only workflow output grouping and documentation source attribution; canonical executor source unchanged. Read-only preview remains attributed to d3c977740cdb2e063fde0db49dcc05bfca6cbfe2."
+      "latest_change_from_verified_preview": "Only workflow output grouping and documentation source attribution; canonical executor source unchanged. Read-only preview remains attributed to d3c977740cdb2e063fde0db49dcc05bfca6cbfe2.",
+      "checks_passed": 29,
+      "conditional_skipped": 1,
+      "prior_green_base": {
+        "source": "51323979c7ee38b5288f5a3422209f7589cef5dc",
+        "run": 41183644869,
+        "checks_passed": 29,
+        "conditional_skipped": 1
+      }
     },
     "read_only_probe_merged_main": "36846135cf6def4b80ff2d374886660dbda6d6db",
     "read_only_probe_main_CI": {
       "run": 41183134769,
-      "status": "pending"
+      "status": "success",
+      "checks_passed": 29,
+      "conditional_skipped": 1
     },
     "production_QS_CD_state": "disabled_manually; current M4 service images unchanged",
     "actual_original_empty_EOF_materials": {
@@ -789,6 +799,30 @@
       "material_retention_days_minimum": 30,
       "new_main_images": "pending fixed source and digest",
       "fallback": "Before first new runtime start, stop on any dirty/unknown/partial result. Re-read actual server operation/schema, retain original approval and consumed marker, restore only reviewed original empty target structure and exact paired metadata under separately reviewed recovery; no automatic force/down/overwrite. M4 fixed images remain live until an approved window."
+    },
+    "pending_startup_fixture": {
+      "source": "8183cc283f2db81728ad7b47027b6cb4d5c0a2f3",
+      "infra_source": "50da5ca0a2a1d5a4f977e0bbdec7155acab855e2",
+      "run": 41186033788,
+      "job": 124493032356,
+      "status": "running; no native startup pass claimed",
+      "previous_failed_source": "47b7e1d6ba5da163fc0c15141188851b78d110a8",
+      "previous_failed_run": 41184781027,
+      "deterministic_fixture_conflict": "allocator uses qs_runtime_closure_<digits>; new wrapper required substring test before entering root. Corrected strict prefix and reused existing exact-SHA race binary. Earlier run failed and remains unaccepted."
+    },
+    "pending_restore_rehearsal": {
+      "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+      "branch": "codex/host-retirement-m5-restore-proof-20261031",
+      "worktree": "/workspace/qlume-env/worktrees/host-retirement-m5-qs-evidence",
+      "status": "local ordinary units/tag compile/docs passed; required paired native gate and original complete-ledger read-only native export pending",
+      "scope": "Only independently reviewed original empty structure plus complete captured ledger transaction replay, not numeric Force/dirty clearing. Runtime-started/material/identity/nonempty guards; old110/44 compatibility. Fixture-only helper, not installed production repair entrypoint."
+    },
+    "startup_diagnostics_PR": {
+      "PR": 418,
+      "source": "8cde8fd174ae3aa981464db63dc9d79cdba162ae",
+      "matching_original_infra_code_source": "50da5ca0a2a1d5a4f977e0bbdec7155acab855e2",
+      "local_protocol_tests_passed": 74,
+      "status": "draft, final CI pending; split from documentation-only417"
     }
   },
   "existing_database_operator_mutation": false,
