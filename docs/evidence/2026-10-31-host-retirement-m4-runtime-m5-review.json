@@ -164,9 +164,9 @@
         "version": 111,
         "target": "qs.mysql.ai_messaging_outbox",
         "transition": "110/44 ->111/44",
-        "source": "f27aaf9d5dfbdced1f27952e360ee4576f5d58f3",
+        "source": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
         "PR": 474,
-        "status": "draft; final combined source62 CI pending; no production execution",
+        "status": "core code/CI merged; live DB remains unchanged; maintenance delivery/window approval pending",
         "scope": "Only empty target, bound paired driver, same-session WRITE lock, no unreviewed programs/dependencies, complete cleanup; controlled original restoration only."
       }
     ],
@@ -878,7 +878,7 @@
       "source": "2379189182ba70fe353663628efbf40bf36e2a03",
       "infra_source": "9255279b25da10f4bd09ff80c0f1e9149d87c8a1",
       "run": 41189393198,
-      "status": "failed required host job; no acceptance; precise failed stage pending report download after executor reconnect",
+      "status": "resolved: exact1031 positive native14/full process roots and signal drain verified; prior failures retained",
       "previous_failures": [
         {
           "source": "47b7e1d6ba5da163fc0c15141188851b78d110a8",
@@ -973,10 +973,20 @@
         "source": "1031b88a2d64c10637ea1a606bb42c69da62b5fc",
         "infra_source": "d257361abaaba2227a3c1432847c7cac0007c106",
         "run": 41193062385,
-        "status": "running; no positive acceptance claimed",
+        "status": "success full workflow and required host job; ZIP/receipt verified",
         "change": "Only fixture requires Redis ready AND existing actual Worker online log before SIGTERM; production runtime, SDK, budgets, exit-zero and14cases unchanged",
         "local_tagged_tests": "passed",
-        "docs_facts": "passed"
+        "docs_facts": "passed",
+        "artifact_id": 13039733611,
+        "raw_zip_sha256": "85500c0590ec1066b72fffb9beaee430dd7909832a81e98100e9a1a20778422d",
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0,
+        "actual_three_roots_ready_and_drained": true,
+        "startup_and_drain_seconds": 6,
+        "retained_fact_counts_unchanged": true,
+        "typed_options_not_CLI_or_system_login": true,
+        "production_execution": false
       }
     },
     "pending_restore_rehearsal": {
@@ -1005,10 +1015,16 @@
     },
     "startup_diagnostics_PR": {
       "PR": 418,
-      "source": "9255279b25da10f4bd09ff80c0f1e9149d87c8a1",
+      "source": "d257361abaaba2227a3c1432847c7cac0007c106",
       "local_protocol_tests_passed": 75,
       "status": "draft; full existing PR CI pending",
-      "scope": "Bounded startup classification; optional encrypted fixture trace; recovery-only precise API hotrank subscription"
+      "scope": "Bounded startup classification; optional encrypted fixture trace; recovery-only precise API hotrank subscription",
+      "merged": true,
+      "main": "3452f456fbabc8851270d4a8acb571f56ef8f20f",
+      "checks_passed": 25,
+      "conditional_skipped": 1,
+      "main_contracts_run": 41193756726,
+      "main_contracts": "success"
     },
     "complete_ledger_read_only_export": {
       "run": 41189102683,
@@ -1103,7 +1119,55 @@
         }
       ]
     },
-    "merge_release_readiness": "blocked: new full runtime gate failed; exact cause and fix pending; do not merge/deploy/execute existing DB retirement"
+    "merge_release_readiness": "core code merged and native proven; maintenance transport full CI/actual rights, fixed image digests and concrete approved production window remain",
+    "core_delivery": {
+      "PR": 474,
+      "candidate": "1b6f8debf053919ee803c3f35607072cc48b3b28",
+      "merged_main": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+      "candidate_checks": {
+        "passed": 29,
+        "conditional_skipped": 1
+      },
+      "main_CI": 41195675199,
+      "main_CI_status": "success",
+      "production_database_execution": false,
+      "deployment": false
+    },
+    "maintenance_transport_delivery": {
+      "PR": 475,
+      "source": "51be9ec9f89b6fb0b788aa4253dba164acd39497",
+      "status": "draft; full CI pending",
+      "local_contract_tests": 14,
+      "native_job": 124524476566,
+      "native_run": 41196795025,
+      "native_artifact": 13040813646,
+      "native_zip_sha256": "a1aeb5c0d9a154546103162759b78cc8e0bb7978d0cc76844dd38e1baf4a99f6",
+      "native_execution_merge_sha": "9846b5c5767a4a7e335da15b8224bf189f1302ff",
+      "native_zip_and_report_verified": true,
+      "no_DB_connections_or_application_runtime_in_smoke": true,
+      "production_staging_performed": false,
+      "readonly_actual_permission_preflight": 41197177504,
+      "preflight_status": "queued after build; no stage flag",
+      "first_failure": {
+        "run": 41196326278,
+        "job": 124523116425,
+        "cause": "optional Docker inspect discarded nonzero exit, possible truthy JSON[]; corrected status and owned native source namespace",
+        "not_passed": true
+      }
+    },
+    "fixed_images_preparation": {
+      "source": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
+      "main_push_CI_success": true,
+      "build_only_run": 41197059223,
+      "status": "building",
+      "operation": "build",
+      "deploy_disabled_by_operation": true,
+      "workflow_entry_reenabled_only_for_dispatch_and_immediately_disabled": true,
+      "no_active_main_CI_or_deploy_before_dispatch": true,
+      "unexpected_automatic_runs_found": false,
+      "final_QS_CD_state": "disabled_manually",
+      "new_service_rollout": false
+    }
   },
   "existing_database_operator_mutation": false,
   "sdk_public_capabilities_deleted": false,
@@ -1118,7 +1182,7 @@
   ],
   "execution_continuity": {
     "environment_id": "ccarenv_b64_Y2NhcmVudl85ODU4OTIzNGYxZTA4MTkxOTU2ZWNlOTcxOTdiNGE4Yw",
-    "status": "command channel restored after user message; original workspace/key survived. No UI recovery button or configuration change used. Verified/decrypted original retained artifacts.",
+    "status": "execution channel restored and currently usable; no UI recovery operation needed",
     "latest_pushed_qs_startup_source": "62b76c87b8b3e3462c2882c543a6598763b81909",
     "local_private_key_not_published": true,
     "QS_CD_last_verified": "disabled_manually",
