@@ -29,7 +29,9 @@ if [[ "$mode" == --preview ]]; then
   rules
   exit 0
 fi
-[[ $(id -u) == 0 && $(hostname -s) == "$host" && $(id -u "$deploy_account") != 0 ]]
+[[ $(id -u) == 0 && $(hostname -s) == "$host" ]]
+deploy_uid=$(id -u "$deploy_account")
+[[ "$deploy_uid" =~ ^[0-9]+$ && "$deploy_uid" != 0 ]]
 visudo -c >/dev/null
 lock=/var/lib/fangcun-image-retention/deploy.lock
 [[ ! -L "$lock" && $(readlink -f "$lock") == "$lock" && -f "$lock" ]]

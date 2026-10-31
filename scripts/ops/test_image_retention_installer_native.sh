@@ -17,6 +17,10 @@ lock=/var/lib/fangcun-image-retention/deploy.lock
 before=$(stat -c %i "$lock")
 bash /work/install.sh "$host" deploy /work/image-retention.py
 test ! -e /usr/local/libexec/fangcun/image-retention.py
+if bash /work/install.sh "$host" missing_deploy_user /work/image-retention.py --apply; then exit 94; fi
+test ! -e /usr/local/libexec/fangcun/image-retention.py
+if bash /work/install.sh "$host" root /work/image-retention.py --apply; then exit 95; fi
+test ! -e /usr/local/libexec/fangcun/image-retention.py
 bash /work/install.sh "$host" deploy /work/image-retention.py --apply
 test "$(stat -c %i "$lock")" = "$before"
 test "$(stat -c %u:%a /usr/local/libexec/fangcun/image-retention.py)" = 0:755
@@ -28,6 +32,6 @@ cp /work/image-retention.py /work/wrong.py
 echo changed >> /work/wrong.py
 if bash /work/install.sh "$host" deploy /work/wrong.py --apply; then exit 92; fi
 if bash /work/install.sh "$wrong" deploy /work/image-retention.py --apply; then exit 93; fi
-echo "PASS $host preview/install/idempotence/inode/exact-policy/generic-python-denial/hash/host"
+echo "PASS $host preview/install/idempotence/inode/exact-policy/generic-python-denial/hash/host/missing-user/root-user"
 NATIVE
 done
