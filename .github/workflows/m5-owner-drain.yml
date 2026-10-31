@@ -1,5 +1,11 @@
 name: M5 paused owner drain CLI
 on:
+  workflow_call:
+    inputs:
+      qs_ref:
+        description: Exact reviewed QS owner-drain source
+        type: string
+        required: true
   workflow_dispatch:
     inputs:
       qs_ref:

@@ -209,7 +209,7 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
     env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly')
     module = json.loads(run(['go', 'list', '-m', '-json', 'github.com/FangcunMount/reliable-messaging'], cwd=source, env=env).stdout)
-    if rotation_candidate:
+    if rotation_candidate or owner_drain:
         from host_sdk_contract import validate_rotation_module
         validate_rotation_module(module)
         proof['sdk_adoption_scope'] = 'published Go v0.6.1; host adoption candidate'
