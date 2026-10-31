@@ -16,7 +16,7 @@ QS #474（main `1073f0c19c4991d80d9752f7fb69c395ae7590df`）和infra #418已合�
 
 数据责任人与恢复责任人均为用户指定的 **shujie**；这不是现有数据库写入批准。尚待协议观察最终CI、实际维护运输/数据库只读复验、事务排空/完整停写、同窗口保护与具体恢复执行路线，以及最终可消费批准。首批只涉及空 `qs.mysql.ai_messaging_outbox`，其余五对象保留。
 
-云执行器再次不可用，命令端报transport disconnected/unavailable；平台状态API仍报running/connected，不据此宣称命令可用。retained诊断为not_found，根因待核实。本任务不要求用户寻找未经确认的恢复入口，原工作区保留；仓库接口和GitHub CI仍可继续工作。
+此前执行器发生transport disconnected/unavailable，平台状态API仍报running/connected，retained诊断为not_found，根因未核实。本轮实际命令已恢复，确认执行位置仍为Linux `/workspace`，并非用户MacBook。原bf059e提交、未提交文档和12个变动源码文件已导出并逐文件校验，工作树未改变；主线be2e为继续工作的源码，备份不覆盖main。MacBook执行须在本机仓库启动本地Codex任务，当前对话没有直接操作MacBook的执行通道。
 
 ## 本轮证据与范围
 
@@ -151,3 +151,11 @@ QS CD禁用时仅构建返回422的失败已保留。只为派发build短暂启�
 2. 验证发布冻结及固定执行源码，显式创建/核实空闲维护容器，随后以独立只读捕获核当前原版本对、身份、原DDL/完整账本/空EOF与两个QS owner协议状态；现有生产从未执行该stage或新协议读。
 3. 再收口业务入口/调度/人工写者及在途业务/owner排空，完成实际保护材料与生产恢复执行路线。未决/冲突/不可用不签零，旧快照不签新窗口。
 4. 在这些资格具备后提交首批具体审查；当前不生成可消费批准，不执行SQL111、Force/down或任何旧账本回放，不提前部署新应用。首批只退役空QS ai_messaging_outbox，其余五对象仍保留。
+
+## MacBook 接续与本轮新增校验
+
+源码保全包 `/workspace/library-files/m5-macbook-handoff-20261031T140038Z.tar.gz` 已完成读回校验，SHA256 `ebe10ce38a61dbb766d87ef11a77f84386d59e5e2caa321e523a14760b7a7892`。内含原bf059e增量bundle、工作树/索引patch、12个当前变动源码文件及逐文件哈希、handoff.json。增量bundle要求已有bd5db2e4基线；当前main be2e已包含该基线。原诊断私钥留在原云工作区，不在源码包内。
+
+本轮补做main两份原始ZIP和JSON内容校验：协议观察artifact13043972930（b9240018...）、维护传输artifact13044116748（eb2cb193...），均与GitHub摘要及be2e源码一致，完整摘要见JSON。CI测试结果仍归属既有41204413865，没有重跑冒签。候选旧ZIP的未验记录保持原归属；本轮主线制品已核验。
+
+当前远端main实读be2e4e8d，QS CD实读disabled_manually。未创建生产维护容器、未停业务、未执行SQL111。若选择本机，在MacBook用Codex打开本地Qlume仓库，从main接续，读取handoff.json及本PR记录，先做维护入口/现库只读复验；真实集成继续沿用既有CI。
