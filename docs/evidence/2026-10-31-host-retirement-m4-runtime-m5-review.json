@@ -73,32 +73,32 @@
       "qs-operating-system": 1
     },
     "owner_observation_available": {
-      "qs.mongo": 1.0,
-      "qs.mysql": 1.0,
-      "iam.mysql": 1.0,
-      "ai.mysql": 1.0
+      "qs.mongo": 1,
+      "qs.mysql": 1,
+      "iam.mysql": 1,
+      "ai.mysql": 1
     },
     "owner_observation_fresh": {
-      "qs.mongo": 1.0,
-      "qs.mysql": 1.0,
-      "iam.mysql": 1.0,
-      "ai.mysql": 1.0
+      "qs.mongo": 1,
+      "qs.mysql": 1,
+      "iam.mysql": 1,
+      "ai.mysql": 1
     },
     "owner_admission_protected": {
-      "qs.mongo": 0.0,
-      "qs.mysql": 0.0,
-      "iam.mysql": 0.0,
-      "ai.mysql": 0.0
+      "qs.mongo": 0,
+      "qs.mysql": 0,
+      "iam.mysql": 0,
+      "ai.mysql": 0
     },
     "qs_business_observation_available": {
-      "value": 0.0
+      "value": 0
     },
     "qs_pending_metric_present": false,
     "ai_business_observation_available": {
-      "value": 1.0
+      "value": 1
     },
     "ai_business_ack_waiting": {
-      "value": 0.0
+      "value": 0
     },
     "retired_dashboard_removed": true,
     "controller_followup": {
@@ -166,7 +166,7 @@
         "transition": "110/44 ->111/44",
         "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
         "PR": 474,
-        "status": "draft; appended startup/original-ledger/recovery native gates pending; no production execution",
+        "status": "draft; candidate 75 CI and fixture-only original-ledger recovery passed; full startup correction 237 pending; no production execution",
         "scope": "Only empty target, bound paired driver, same-session WRITE lock, no unreviewed programs/dependencies, complete cleanup; controlled original restoration only."
       }
     ],
@@ -677,7 +677,7 @@
     "final_candidate_checks": {
       "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
       "CI": 41186437005,
-      "CI_status": "pending",
+      "CI_status": "success",
       "actual_readonly_offline_preview_run": 41183082546,
       "preview_status": "passed",
       "native_guard_previous_source": "704ee8ddb82b3094a2b469b4f5506cfb274521c4",
@@ -801,28 +801,81 @@
       "fallback": "Before first new runtime start, stop on any dirty/unknown/partial result. Re-read actual server operation/schema, retain original approval and consumed marker, restore only reviewed original empty target structure and exact paired metadata under separately reviewed recovery; no automatic force/down/overwrite. M4 fixed images remain live until an approved window."
     },
     "pending_startup_fixture": {
-      "source": "8183cc283f2db81728ad7b47027b6cb4d5c0a2f3",
-      "infra_source": "50da5ca0a2a1d5a4f977e0bbdec7155acab855e2",
-      "run": 41186033788,
-      "job": 124493032356,
-      "status": "running; no native startup pass claimed",
-      "previous_failed_source": "47b7e1d6ba5da163fc0c15141188851b78d110a8",
-      "previous_failed_run": 41184781027,
-      "deterministic_fixture_conflict": "allocator uses qs_runtime_closure_<digits>; new wrapper required substring test before entering root. Corrected strict prefix and reused existing exact-SHA race binary. Earlier run failed and remains unaccepted."
+      "source": "2379189182ba70fe353663628efbf40bf36e2a03",
+      "infra_source": "9255279b25da10f4bd09ff80c0f1e9149d87c8a1",
+      "run": 41189393198,
+      "status": "dispatched; no jobs returned at latest read, not passed",
+      "previous_failures": [
+        {
+          "source": "47b7e1d6ba5da163fc0c15141188851b78d110a8",
+          "run": 41184781027,
+          "cause": "Owned fixture namespace prefix mismatch; corrected strict actual allocator prefix",
+          "accepted": false
+        },
+        {
+          "source": "8183cc283f2db81728ad7b47027b6cb4d5c0a2f3",
+          "run": 41186033788,
+          "cause": "API resources process exit1; no timeout/race; retained as failure",
+          "accepted": false
+        },
+        {
+          "source": "ab54875261c05c278575668346051ddb69bd6522",
+          "infra_source": "4c2e3c4ffb7b14d3b5852e24aec537f24f707803",
+          "run": 41188135344,
+          "job": 124499150678,
+          "accepted": false,
+          "cause": "Verified encrypted owned child diagnostic: MySQL1045 access denied. Public Options JSON intentionally excludes password; private fixture failed to transport existing owned secret.",
+          "diagnostic_zip_sha256": "16e80467958ac96a092f4f62eaf24d50c55632cb8c272fc9c6a895529505eb43",
+          "proof_zip_sha256": "da2ce6de6fde370e218dd30dc4c0a42be4a5e4e3cfeecbee4fd8445c7ef263bf",
+          "plaintext_sha256": "1634483ce31bcb37e71b74809009e83b702d08154ac587ef0ea92bc26208a846",
+          "private_trace_not_published": true
+        }
+      ],
+      "corrections": [
+        "Private0600 configuration transports existing owned DSN and validates loopback/database/user binding; public option password redaction unchanged. Deterministic serialization regression passed locally.",
+        "Recovery-only API principal receives exact hot-rank topic/group subscription; publisher scope unchanged and Mongo publication forbidden; protocol regression passed locally."
+      ],
+      "not_yet_merged_into_474": true
     },
     "pending_restore_rehearsal": {
       "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
       "branch": "codex/host-retirement-m5-restore-proof-20261031",
       "worktree": "/workspace/qlume-env/worktrees/host-retirement-m5-qs-evidence",
-      "status": "local ordinary units/tag compile/docs passed; required paired native gate and original complete-ledger read-only native export pending",
-      "scope": "Only independently reviewed original empty structure plus complete captured ledger transaction replay, not numeric Force/dirty clearing. Runtime-started/material/identity/nonempty guards; old110/44 compatibility. Fixture-only helper, not installed production repair entrypoint."
+      "status": "passed native paired gate at exact75; fixture-only, no production restore/approval",
+      "scope": "Only independently reviewed original empty structure plus complete captured ledger transaction replay, not numeric Force/dirty clearing. Runtime-started/material/identity/nonempty guards; old110/44 compatibility. Fixture-only helper, not installed production repair entrypoint.",
+      "native_run": 41186437005,
+      "artifact_id": 13037482247,
+      "artifact_zip_sha256": "028b6127d699e43e0f67a6f431ecfe42c91e8c28e80f3c3b4d7ca1af7c037f71",
+      "passed_cases": [
+        "dirty_before_ddl",
+        "dirty_after_drop",
+        "clean_before_runtime"
+      ],
+      "elapsed_milliseconds": [
+        21,
+        29,
+        30
+      ],
+      "generic_force_or_down_used": false
     },
     "startup_diagnostics_PR": {
       "PR": 418,
-      "source": "8cde8fd174ae3aa981464db63dc9d79cdba162ae",
-      "matching_original_infra_code_source": "50da5ca0a2a1d5a4f977e0bbdec7155acab855e2",
-      "local_protocol_tests_passed": 74,
-      "status": "draft, final CI pending; split from documentation-only417"
+      "source": "9255279b25da10f4bd09ff80c0f1e9149d87c8a1",
+      "local_protocol_tests_passed": 75,
+      "status": "draft; full existing PR CI pending",
+      "scope": "Bounded startup classification; optional encrypted fixture trace; recovery-only precise API hotrank subscription"
+    },
+    "complete_ledger_read_only_export": {
+      "run": 41189102683,
+      "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+      "all_four_owner_jobs": "success",
+      "snapshot_job": "conditional skipped",
+      "archive_download_and_content_verification": "pending after cloud execution disconnected",
+      "qs_mysql_artifact": {
+        "id": 13038650189,
+        "digest": "sha256:e72325eda74e5401ea6f6e37f1d3eddd3b873c8570071676fe604c9bd662b382"
+      },
+      "is_production_restore_or_mutation": false
     }
   },
   "existing_database_operator_mutation": false,
@@ -835,5 +888,13 @@
     "inbox and idempotency receipts",
     "first business ACK and business history",
     "authorized retry/hold schedules"
-  ]
+  ],
+  "execution_continuity": {
+    "environment_id": "ccarenv_b64_Y2NhcmVudl85ODU4OTIzNGYxZTA4MTkxOTU2ZWNlOTcxOTdiNGE4Yw",
+    "status": "unavailable; exec-server transport disconnected during continuation; GitHub Actions remain independent",
+    "latest_pushed_qs_startup_source": "2379189182ba70fe353663628efbf40bf36e2a03",
+    "local_private_key_not_published": true,
+    "QS_CD_last_verified": "disabled_manually",
+    "existing_database_operator_mutation": false
+  }
 }
