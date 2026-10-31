@@ -1,6 +1,6 @@
 # M5 首批执行包：空 QS AI 发布表
 
-本包已形成具体审查稿，**尚不具备生产执行资格**。本轮仅做本地编排、源码核对与生产只读观察；没有停业务、切换入口、执行 SQL111、回放账本或启动新 runtime。数据责任人、恢复责任人均为 **shujie**。
+本包已形成具体执行审查稿，**实际窗口门禁尚未通过，不可开始停写/SQL111**。用户随后明确要求“继续执行，直至 M5 完成发布”，本任务据此继续完成隔离验证、固定制品及真实窗口；这是目标授权，不能代替当次事实、机器可消费批准或首次启动屏障。数据责任人、恢复责任人均为 **shujie**。截至2026-11-01 01:55 CST，业务、入口和数据库保持原状。
 
 唯一拟删除对象为 `qs.mysql.ai_messaging_outbox`，转换为 `110/44 → 111/44`。另五候选继续保留；事务 execution/guard/witness、原 wire/archive、Inbox、业务 ACK、历史及重试/hold/调度全部保留。此文、附属 JSON 和命令样式均不是 `qs_schema_pair_offline_upgrade` 批准，不生成可消费批准文件。
 
@@ -10,12 +10,13 @@
 
 | 门禁 | 当前结论 | 关闭方式 |
 | --- | --- | --- |
-| G01 独立暂停 | 阻断。没有已确认可独立关闭 API 新事务准入/全部调度并保持最后 owner/Checker 存活的已部署运维入口 | 先独立交付/验证该机制；保持原预算、无新增业务发送，不把进程内方法伪装成 HTTP 接口。部署或修改在线配置另行授权 |
-| G03 发布/恢复镜像 | 阻断。最终 be2e runtime 三镜像和同111兼容的前向恢复候选尚未在目标主机固定 | 在不解冻 CD 的独立构建/制品流程中补齐来源、digest、config ID、本地 engine ID、配置、原生/启动证明；没有获批替代入口则保持阻断 |
-| G04a 完整保留资产基线 | 阻断。既有清单没有导出全部保留资产的确定性全量内容基线 | 先审定只读导出命令、类型保真编码、全量覆盖、实际权限和耗时预算；只在真实W06获取同窗口材料 |
-| G05 实际恢复运输 | 阻断。本文选定固定 Python/asyncmy 客户端路线，依赖探测成功，但该实际运输还没有真实隔离恢复回执 | 用同镜像/UID/TLS/材料格式演练中断、拒绝和提交未知；审核原账本回放字节、耗时和首启动屏障后再关闭 |
+| G01 独立暂停 | 原生13+9项已通过；最终forward扩展与真实交接待完成。已实现原配置/身份绑定、关闭新发送的独立维护owner候选；生产尚未注册 | 先独立交付/验证该机制；保持原预算、无新增业务发送，不把进程内方法伪装成 HTTP 接口。选定独立维护owner接管最后Checker；实现和真实原生验证见下文，未通过前不停止原owner |
+| G03 发布/恢复镜像 | 阻断。最终受核main runtime三镜像和同111兼容的前向恢复候选尚未在目标主机固定 | 在不解冻 CD 的独立构建/制品流程中补齐来源、digest、config ID、本地 engine ID、配置、原生/启动证明；没有获批替代入口则保持阻断 |
+| G04a 完整保留资产基线 | 真实隔离已通过，生产只读预算复验进行中。QS #477已补齐完整SQL列/BSON多重集基线及原材料导出候选；真实隔离和生产只读耗时仍待通过 | 先审定只读导出命令、类型保真编码、全量覆盖、实际权限和耗时预算；只在真实W06获取同窗口材料 |
+| G07 服务器DDL/锁观察 | 既有管理员路径与实际只读110观测已通过；窗口逐步重读待执行 | 使用固定m5-activity-admin入口取得14项独立观测；不擅自扩大权限、不把时点零值视为冻结 |
+| G05 实际恢复运输 | 真实独立Go CLI隔离验证已通过；最终main绑定及生产材料待执行。生产路线改选同一Go维护二进制的独立原状恢复入口；原Python依赖探测只保留历史归属 | 用同镜像/UID/TLS/材料格式演练中断、拒绝和提交未知；审核原账本回放字节、耗时和首启动屏障后再关闭 |
 
-G02 实际排空/自主过期与 G04 同窗口保护必须在未来真实窗口取得，当前不能预填通过。G06 要求独立批准停写、迁移、必要恢复及新 runtime 启动；负责人具名不等于批准以上动作。任一门禁缺失即不进入维护窗口。包内有缺口不会自动放宽标准。
+G02 实际排空/自主过期与 G04 同窗口保护必须在未来真实窗口取得，当前不能预填通过。G06已有继续至发布的用户目标授权，实际停写、迁移、必要恢复和新runtime启动仍须把当次事实绑定到独立受控步骤；不再重复询问目标授权，也不提前签发可消费批准。G07现业务账号1142的原记录保留；已通过既有管理员Secret/可信SSH路径取得有效观测，未GRANT或激活角色。窗口必须重新读取，不把历史观察作为停写证据。任一门禁缺失即不进入维护窗口。包内有缺口不会自动放宽标准。
 
 ## 2. 已固定的源码、只读事实与现网对象
 
@@ -73,16 +74,16 @@ A/D两个持续受控的操作会话分别持有既有 `/var/lib/fangcun-image-r
 
 当前API配置实读启用 `plan_scheduler`（含missed expiration）、`statistics_sync`、`evaluation_consistency_audit`、`evaluation_lease_recovery`、`interpretation_lease_recovery`、`report_catalog_audit` 和modelcatalog消费者，手动动作也启用；migration.enabled=false/autoseed=false。不能据此假定API静止。
 
-未来步骤顺序（每行均需要独立执行授权，本轮全部未执行）：
+执行顺序（用户已授权推进至发布；各步仍须实际事实与独立步骤回执，当前全部未执行）：
 
 | 步骤 | 动作 | 通过条件/停止点 |
 | --- | --- | --- |
 | W00 | 复读精确源码/镜像/配置/六实例/维护容器，持原锁；排除所有人工/自动发布与其他写者 | G01/G03/G05关闭；身份漂移、未知调用者或原材料不可读立即停止，T0不开始 |
 | W01 | 持久记录T0；只替换A的QS与Collection两站点为独立审定closed字节；nginx -t成功才reload | 真实HTTP/HTTPS新请求503；其他域名/TLS和原内部排空依赖保持；失败恢复两份原字节并验证，不停服务 |
-| W02 | 执行G01已审定的独立暂停，关闭新业务准入与全部相关调度；保持最后owner/Checker、DB池、既有在途业务/provider资源 | 具体入口/回执/实际源码缺失就拒绝W02，不能用SIGTERM替代独立暂停 |
+| W02 | 先启动固定Go维护owner，使用原配置/双库/原binding、关闭新发送；验证两个真实Checker已注册且观测可用新鲜 | 原API仍运行；记录重叠资源/并发上界，不修改每实例或Broker预算；失败保留原owner，不进入停止步骤 |
 | W03 | 有界排空Collection/Worker的已接受请求/handler，先结束生产方与消费者的新工作，再优雅退出这五个原实例 | 保持API owner与必要RPC存活；不使用自动SIGKILL的默认10秒stop、rm、down、改规模或purge。任何非零退出/超时不签排空 |
-| W04 | 连续取得原主库协议、活owner技术状态、在途业务/provider、Broker回查和直接主库活动回执 | 两owner所有未决项/年龄为零，native-limit=false；active_sends/running_checks/queued_checks为零，observation可用新鲜；在途业务/provider明确终结。间隔/稳定期按G01实测并在审查中固定，不能猜一个轮询次数替代证明 |
-| W05 | 只有W04通过且没有新写路径后，才对原API发优雅关停；保留所有依赖直到真实工作完成 | 原API成功退出、无重生/残留连接/任务；直接主库再读零未决。SDK/宿主退出和DB事实都需证据。失败仍不进入DDL；按R0退出窗口 |
+| W04 | 在维护Checker已接管且五实例成功退出后，优雅停止原API及其全部调度/业务入口；维护owner保留原DB池和Checker | 原API退出0，正常业务/provider回调终结；超时/失败不强杀、不签排空；直接主库、实际SDK及正常退出分别取得回执 |
+| W05 | 维护owner持续完成原Broker确认/回查；真实排除全部业务写者后，提交绑定真实停写回执的独立stop.json | 主库全部未决/年龄零、native-limit=false、SDK在途/运行/排队零且可用新鲜；仅在实际SDK与进程成功退出后捕获静态保护。SIGTERM/deadline本身不关闭最后Checker；失败保留其依赖并走R0受控移交 |
 | W06 | 确认六实例均停止、无旁路与自主事实变化，捕获第5节同窗口完整材料 | 任何未知、缺失、冲突、截断、预算不足均取消本次迁移；不清理记录造零 |
 | W07 | shujie完成具体审查后，另行生成一次性0600批准，重新核过期/源码/身份/资源与剩余900秒启动预留 | 本包自身不提供批准；首次尝试/未知回执和消费标记永远保留 |
 | W08 | 在原维护容器内仅执行固定qs-migrate-offline的`--apply --approval-file --approval-sha256`入口 | 仅SQL111的目标WRITE锁内完整COUNT=0才删除；Mongo44不变。非零/未知立即R1；不重试DROP/Force/down |
@@ -119,6 +120,16 @@ API/Worker代码中的关停回调有30秒等待及失败exit1语义；Docker St
 原清单入口可以产出目标DDL/EOF/完整SQL账本和canonical预览，但**没有覆盖以上全部保留资产内容基线**。W06前须补齐受审的只读全量基线导出命令、权限、确定性编码、实际行数/大小和有界预算；超预算取消窗口，不能偷偷缩样。这里定义的是验收要求，不宣称导出器已安装或材料已取得。
 
 ## 6. 已选定的生产恢复运输与会话约束
+
+当前路线为[QS #477](https://github.com/FangcunMount/qs-server/pull/477)候选`7f8390c74aec46954d3fd2578e32dd06629400d3`中的同一个静态Go维护二进制，最终生产必须重绑定合并main、实际原生CI、二进制摘要与同窗口材料。aa1387b79的真实CLI门禁已通过；最终候选完整CI及forward owner扩展仍待通过，未通过不使用。原迁移资源字节保持不变。
+
+- 同窗口只读：`--retained-baseline --timeout=2m`两次完整覆盖SQL所有列和原BSON/所有定义；预算或非空业务TTL集合失败，不截断。`--capture-original-operation`输出原目标DDL、完整单行110/clean账本及完整基线，0600保存原字节。
+- 中断只读：`--restore-original=<私有原材料> --restore-original-sha256=<原字节摘要> --timeout=2m`读取实际111 dirty/clean或原110，复核所有保留资产。目标、账本两个阶段白名单之外任何变化拒绝；Mongo44从不回放。
+- R1实际动作另加`--restore-apply --restore-approval-file --restore-approval-sha256`。独立批准kind为`qs_m5_original_empty_restore`，绑定实际state/原材料/源码/停写及首启动边界/审查回执、shujie双责任和至多一小时恢复预算。重新实读后独占消费；只恢复缺失的精确原空表，再校验保留资产，SERIALIZABLE根内锁定完整实际111单行并回放捕获的完整原110/clean单行。
+- DDL部分成功、事务失败、commit未知分别保留；不自动重试、不清dirty。新增真实隔离CLI覆盖三中断、首次启动/停写及事实变化拒绝、实际INSERT权限失败后DELETE回滚。外层仍负责服务器活动/排他和`pre-start-repair`，启动后只准111前向路线。
+- 原维护容器UID2000、借用挂载只读、原VERIFY_IDENTITY/CA及显式QS库不变；无业务Container/调度/新发送。登记同一版本原生CI与实际耗时后再关闭G05。独立批准格式及全部字段以QS类型为准，不从本文生成占位批准。
+
+### 6a. 历史Python候选探测（未被当前路线采用）
 
 本包选用独立、固定客户端会话，不把测试函数搬到生产。客户端基于A已有镜像 `sha256:18a39e862a82bfb9b503a3dd93639688bc45016caa2c7f1bf9081953b4523fa0`，源码f9f24ab…，入口`/app/.venv/bin/python`，Python3.11.18/asyncmy0.2.14；本轮在实际镜像内以UID2000只导入依赖并核CA可读，未连接数据库。未来由受审脚本创建独立客户端容器，替换原应用入口；不在运行AI业务进程内恢复。
 
@@ -178,7 +189,7 @@ R2没有已安装通用“恢复API”。其具体可用候选必须在G03固定
 
 本轮附加尝试读取A `http://127.0.0.1:19090/metrics`被对端关闭，无有效回执；不解释成技术状态为零。最终受审metrics/业务读取端点与授权方法须以实际部署配置和成功原始回读固定，不能臆造该端点可用。
 
-## 9. 本轮交付、验证与接续
+## 9. 初始审查轮交付、验证与接续（23:02历史记录）
 
 本轮产物为本文件、结构化JSON、私有A/D只读快照、原/closed候选、既有41209690150原ZIP与校验清单、本地完整审查归档。原仓库main均未覆盖；infra独立分支`codex/m5-execution-review-local-20261031`，当前尚未推送或修改远端#417。
 
@@ -187,3 +198,31 @@ R2没有已安装通用“恢复API”。其具体可用候选必须在G03固定
 本地额外验证现有屏障/适配器/入口渲染26项单测全部通过（5+17+4）。另用任务独占临时目录实际执行本包所选状态组合的5项断言：apply未知→failed、failed拒绝start、独立R1 repair→maintenance_returned、start前持久标记、start后拒绝所有旧恢复路径，全部通过；回调仅本地空操作/受控失败，没有SSH或数据库调用，不计为G05实际恢复运输验收。生产恢复脚本、保护材料和业务验收仍未提升状态。
 
 下一工作批次已经明确：先解决G01的运维能力与成功业务/技术观测入口、G03固定制品、G05实际客户端隔离证明及W06全量只读基线命令；这些准备可以继续在隔离环境完成。然后提交具名停机/数据库执行审查。当前不请求开始维护窗口，也不解冻发布。
+
+
+## 10. 2026-11-01 继续至发布的进展
+
+QS #477补齐维护owner、完整保留基线/原材料、独立恢复CLI及不解冻CD的固定镜像构建入口。候选本地race、集成编译、docs-facts/hygiene及actionlint已通过；精确CI41219365688与原生Broker/独立CLI run41219211994仍在运行。后者源为QS c62621ded4fb2ff1c2aa5284076c97496a5b4ae7、infra18b6a67ae222126e0f337ec15317ef0724155994，不冒充后续main验收。仅取消了本任务被新提交取代的旧QS CI，取消不计通过；最终全部必需门禁保留。
+
+00:22–00:23只读复查A/D六实例仍为原a792、running且无重启；00:26独立原TLS/身份只读事务显示57条当前operations均accepted/rejected，awaiting/held为0，但原事务锚点缺失仍为51，原观测仍不可用，不补造witness。QS Inbox2780条stored、quarantine0；原MySQL未观察到其他InnoDB事务，7个所见会话均Sleep。该结果是未停写时点的分类，不能作为停写证据或完整历史关闭。
+
+独立探针读取performance_schema.metadata_locks返回MySQL1142，现库版本8.0.36且performance_schema=1；不能签无metadata锁或DDL。已请求现有管理员/只读诊断配置路径，不更改数据库权限。调度/提醒分类按当前notification源码的confirmed/rejected/suppressed/reviewed及pending/claimed/sending/manual_required分别解释；最初探针使用通用terminal列表误将confirmed计入“external call not generic terminal”，原输出和失败谓词保留，不能因此宣称存在一个活动调用或修改该记录。原一次confirmed投递、frozen批次与三suppressed批次均保留，frozen是批次冻结身份，不代表仍在发送。
+
+成功技术读取端点已核为A `http://127.0.0.1:8081/metrics`；原19090是gRPC映射，失败保留原归属。原两owner sdk_ready=1、active/running/queued为0，正式业务观测仍不可用。没有停业务、reload、SQL111、恢复、应用首次启动或CD启用。只在既有idle维护容器内放入并执行固定只读诊断二进制，私有原源码/二进制/回执按SHA256保全；没有新维护容器或业务写操作。
+
+关停命令语义已核对[Docker官方说明](https://docs.docker.com/reference/cli/docker/container/stop/)：`docker stop --timeout=-1`让daemon无限等待，不由daemon超时强杀。生产仍须核当前CLI支持该参数、原StopSignal和实际退出；操作者超时/断线不等于服务已停，失败不进入SQL111。原有默认10秒stop不采用。
+
+首次原生CLI run41219211994失败原消费者fixture line564；已保全ZIP并核对SHA256。修正为先独立运行全部原13项、再运行独立CLI8项，run41220540652绑定QS657734fba/infra92c92a7，真实结果待回读。没有改业务代码、SDK或半消息不可见断言，第一次失败不重标为通过。
+
+生产顺序的原生门禁进一步固定为9项：维护CLI真实注册时，两个原SDK仍须ready；原SDK正常停止后维护SDK继续ready，再证明未决时信号拒绝退出及实际Broker正向审计/SDK进程退出。源码审查QS549ad91a9/infrae760d25，真实新回执未通过前不关闭G01。先跑原消费者13项，再跑独立CLI9项；8项旧回执不能消费为新9项资格。
+
+00:45隔离Nginx第三次验证通过完整配置。前两次分别因人为cap-drop导致原私钥不可读、只读scratch缺少/tmp缓存写目录而失败，原结果均保全；验证环境改为实际原用户/capabilities和独占tmpfs，未改主机证书权限。三个独占验证容器均已自行移除，原Nginx进程、两个线上文件字节和原restart时刻均保持，无reload。
+
+
+### 01:55实际验证更新
+
+- 原生owner交接run41222119780已通过：原13项、实际独立CLI9项（包含原owner仍ready时注册维护owner）全部成功，无skip。原ZIP SHA256为`ac9e2304d535b2b14f0ab21da8e955cee951b74c83416456bbc9d5222919b250`，QS源25a4b36b999568806f73335b8824a588f9865338、infra源e760d25a1c279fe7d6f5bac5995801db89d15f10；不冒充后续forward111扩展资格。
+- aa1387b79 CI41225761018中真实完整保留基线、三中断独立原材料恢复CLI、权限拒绝后事务回滚及原有schema-pair/协议110/111门禁均成功；该次整体Run Tests因新增只读任务未登记在固定16任务契约中失败。最终候选将固定17任务全部纳入operation/database互斥和pre-checkout门禁，不放宽业务/DDL断言；本地configcontract race已通过。
+- 既有管理员元数据profile41222747868成功；独立M5活动入口41225913119成功读取同一canonical MySQL身份及clean110，7个QS会话，active/事务/修改事务/metadata granted/pending/启用EVENT均0。14项读取非原子、freeze_verified=false；凭据经既有Secret与私有SSH信封，不导出凭据、不GRANT。CI的真实持锁与pending ALTER正向观测也通过。此读数不证明停写。
+- 新增显式`--owner-drain-forward`只接受clean111/44，默认原owner仍只认110/44，dirty111拒绝。R2可在新API异常时先注册111兼容Checker再做业务runtime前向替换；不回放旧账本。最终候选7f8390c74，独立扩展run41227966209待回读。
+- infra e760d25全部84个实际检查成功、2个原条件skip，无失败。最终镜像、现库全量只读预算、同窗口保护、真实排空/迁移/启动仍未执行。
