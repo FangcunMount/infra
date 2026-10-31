@@ -61,7 +61,7 @@ jobs:
           import json
           x=json.load(open('m5-owner-drain.json'))
           p=x['proof']['qs_runtime_host']['owner_drain_receipt']
-          assert (p['passed'],p['failed'],p['skipped'])==(8,0,0)
+          assert (p['passed'],p['failed'],p['skipped'])==(9,0,0)
           assert x['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,probe_process_groups_drained=True,private_fixture_directory_removed=True)
           PY
       - uses: actions/upload-artifact@v7

@@ -101,7 +101,8 @@ SCOPE = 'default QS dual-owner lifecycle, actual Broker restart and next-instanc
 
 OWNER_DRAIN_FLAGS = frozenset(('actual_CLI', 'actual_Broker_unknown_final_and_recovery',
     'unresolved_signal_stop_refused', 'no_new_halves', 'original_business_facts_single',
-    'original110_44_retained', 'actual_SDK_and_process_exit', 'config_and_pair_bound'))
+    'original110_44_retained', 'actual_SDK_and_process_exit', 'config_and_pair_bound',
+    'live_original_overlap_before_old_close'))
 
 def parse_owner_drain_receipt(output, source):
     rows = [json.loads(line.split('M5_QS_OWNER_DRAIN_CLI_RECEIPT ', 1)[1])
@@ -112,7 +113,7 @@ def parse_owner_drain_receipt(output, source):
     if (set(value) != OWNER_DRAIN_FLAGS | {'source_sha','passed','failed','skipped','owner_count','production_or_system_acceptance'}
             or value['source_sha'] != source or any(value[k] is not True for k in OWNER_DRAIN_FLAGS)
             or any(type(value[k]) is not int for k in ('passed','failed','skipped','owner_count'))
-            or (value['passed'],value['failed'],value['skipped'],value['owner_count']) != (8,0,0,2)
+            or (value['passed'],value['failed'],value['skipped'],value['owner_count']) != (9,0,0,2)
             or value['production_or_system_acceptance'] is not False):
         raise RuntimeError('owner drain CLI proof incomplete or wrong source/scope')
     return value
