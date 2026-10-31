@@ -945,7 +945,7 @@
         "source": "f27aaf9d5dfbdced1f27952e360ee4576f5d58f3",
         "infra_source": "d257361abaaba2227a3c1432847c7cac0007c106",
         "run": 41191118955,
-        "status": "required host job failed; diagnostic report and encrypted child trace available, need original executor to download/hash/decrypt",
+        "status": "failed and diagnosed; fixture correction in isolated prototype",
         "local_Go_tagged_child_tests": "passed",
         "local_recovery_protocol_tests_passed": 17,
         "change": "add role/drain_exit/drain_deadline and encrypted owned trace without changing exit-zero assertion or30s budget",
@@ -965,8 +965,18 @@
           "id": 13038704697,
           "GitHub_digest": "sha256:0e06d1c4ae503182f8a8a2b9ccc6d5106da6bcaef223e567d64440208ac841d7"
         },
-        "download_digest_and_decryption_verified": false,
-        "exact_process_and_cause": "unverified until retained report/private trace inspected"
+        "download_digest_and_decryption_verified": true,
+        "exact_process_and_cause": "unverified until retained report/private trace inspected",
+        "exact_process_and_exit_cause": "Worker drain_exit code-1. Verified decrypted child has no real Worker online or received-shutdown-signal marker, no panic/race/DB error. Redis metrics server was online during subscription preparation; fixture sent SIGTERM before entering preparedServer.Run/signal registration."
+      },
+      "next_positive_run": {
+        "source": "1031b88a2d64c10637ea1a606bb42c69da62b5fc",
+        "infra_source": "d257361abaaba2227a3c1432847c7cac0007c106",
+        "run": 41193062385,
+        "status": "running; no positive acceptance claimed",
+        "change": "Only fixture requires Redis ready AND existing actual Worker online log before SIGTERM; production runtime, SDK, budgets, exit-zero and14cases unchanged",
+        "local_tagged_tests": "passed",
+        "docs_facts": "passed"
       }
     },
     "pending_restore_rehearsal": {
@@ -1108,7 +1118,7 @@
   ],
   "execution_continuity": {
     "environment_id": "ccarenv_b64_Y2NhcmVudl85ODU4OTIzNGYxZTA4MTkxOTU2ZWNlOTcxOTdiNGE4Yw",
-    "status": "executor again unavailable; all code and latest verified receipts pushed; user asked how to restore, UI recovery guidance provided; no token/secret requested",
+    "status": "command channel restored after user message; original workspace/key survived. No UI recovery button or configuration change used. Verified/decrypted original retained artifacts.",
     "latest_pushed_qs_startup_source": "62b76c87b8b3e3462c2882c543a6598763b81909",
     "local_private_key_not_published": true,
     "QS_CD_last_verified": "disabled_manually",
