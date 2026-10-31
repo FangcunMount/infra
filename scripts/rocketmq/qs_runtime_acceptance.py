@@ -99,6 +99,24 @@ def parse_native_limit_receipt(output, source):
 
 SCOPE = 'default QS dual-owner lifecycle, actual Broker restart and next-instance Checker; protocol fixture facts'
 
+OWNER_DRAIN_FLAGS = frozenset(('actual_CLI', 'actual_Broker_unknown_final_and_recovery',
+    'unresolved_signal_stop_refused', 'no_new_halves', 'original_business_facts_single',
+    'original110_44_retained', 'actual_SDK_and_process_exit', 'config_and_pair_bound'))
+
+def parse_owner_drain_receipt(output, source):
+    rows = [json.loads(line.split('M5_QS_OWNER_DRAIN_CLI_RECEIPT ', 1)[1])
+            for line in output.splitlines() if line.startswith('M5_QS_OWNER_DRAIN_CLI_RECEIPT ')]
+    if len(rows) != 1 or not re.search(r'--- PASS: TestM5OwnerDrainCLI \(', output) or '--- SKIP:' in output or 'WARNING: DATA RACE' in output:
+        raise RuntimeError('actual zero-skip owner drain CLI required')
+    value = rows[0]
+    if (set(value) != OWNER_DRAIN_FLAGS | {'source_sha','passed','failed','skipped','owner_count','production_or_system_acceptance'}
+            or value['source_sha'] != source or any(value[k] is not True for k in OWNER_DRAIN_FLAGS)
+            or any(type(value[k]) is not int for k in ('passed','failed','skipped','owner_count'))
+            or (value['passed'],value['failed'],value['skipped'],value['owner_count']) != (8,0,0,2)
+            or value['production_or_system_acceptance'] is not False):
+        raise RuntimeError('owner drain CLI proof incomplete or wrong source/scope')
+    return value
+
 
 def runtime_manifest(repo, recovery=False):
     value = manifest(repo)
@@ -184,7 +202,7 @@ def runtime_diagnostics(output):
 
 
 def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_port, mongo_port,
-                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False, native_limit=False, recovery=False, redis_port=None, recovery_private_log=None, recovery_sdk=None, recovery_uv="uv", rotation_candidate=False):
+                        password, ca, run, proof, native_runner, repo, read_parameters, protection=False, native_limit=False, recovery=False, redis_port=None, recovery_private_log=None, recovery_sdk=None, recovery_uv="uv", rotation_candidate=False, owner_drain=False):
     source = source.resolve()
     if not (source/'go.mod').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean QS default runtime source required')
@@ -279,10 +297,14 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
         if proof['parameters_before_native']['transactionTimeOut'] != 60000:
             raise RuntimeError('owned first-check window not effective')
         package, test, budget = ('./internal/apiserver/integration/runtimeclosure', '^TestM3HostRetirementRecovery$', '10m') if recovery else ('./internal/apiserver/container', '^TestM3DefaultOwnerRuntime$', '5m')
+        if owner_drain:
+            if recovery or protection or native_limit:
+                raise RuntimeError('separate owner drain profile required')
+            test, budget = '^(TestM3DefaultOwnerRuntime|TestM5OwnerDrainCLI)$', '10m'
         linker = ['-ldflags', '-X github.com/FangcunMount/qs-server/pkg/version.GitCommit='+proof['source_sha']] if recovery else []
         result = native_runner(['go', 'test', '-race', '-p', '1', '-tags=integration,m3_host_runtime', '-count=1'] + linker + [
                     '-timeout='+budget, '-v', package, '-run', test],
-                    cwd=source, env=env, timeout=720 if recovery else 480, required=False)
+                    cwd=source, env=env, timeout=720 if (recovery or owner_drain) else 480, required=False)
         output = result.stdout+result.stderr
         private = directory/'qs-owner-runtime-private.log'; private.write_text(output); private.chmod(0o600)
         if recovery_private_log is not None:
@@ -304,6 +326,8 @@ def run_qs_runtime_host(source, directory, broker, project, grpc_port, mysql_por
             proof['native_receipt'] = parse_recovery_receipt(output, proof['source_sha'])
         else:
             proof['native_receipt'] = parse_runtime_receipt(output, proof['source_sha'])
+        if owner_drain:
+            proof['owner_drain_receipt'] = parse_owner_drain_receipt(output, proof['source_sha'])
         if protection:
             proof['protection_receipt'] = parse_protection_receipt(output, proof['source_sha'])
         if native_limit:
