@@ -104,8 +104,14 @@
     "controller_followup": {
       "pr": 473,
       "source": "a453a1f6547aeb56e758a983bbd502fdaf2535da",
-      "CI": "pending",
-      "merged": false
+      "CI": "main CI pending",
+      "merged": true,
+      "main": "249dc6839e9772df239d1e1c5f78e1aeeb5be2b8",
+      "pr_CI": {
+        "passed": 29,
+        "conditional_skipped": 1
+      },
+      "main_CI": 41176526595
     },
     "validation_boundary": [
       "Worker has no Docker health declaration; explicit readiness and process/binary identity were verified.",
@@ -132,12 +138,17 @@
   ],
   "m5": {
     "read_only_probe_pr": 472,
-    "read_only_probe_source": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+    "read_only_probe_source": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
     "probe_CI": {
-      "passed": 29,
-      "conditional_skipped": 1
+      "status": "pending",
+      "workflow_run": 41176791391,
+      "earlier_exact_source_results": {
+        "source": "26214bd78e78a4512c2e101cd9d56854c5972e52",
+        "passed": 29,
+        "conditional_skipped": 1
+      }
     },
-    "production_read_only_run": 41175524009,
+    "production_read_only_run": 41176790709,
     "production_drop_allowed": false,
     "new_retirement_migrations": [],
     "objects": [
@@ -158,6 +169,30 @@
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
         "read_only_metadata_receipt": {
+          "workflow_run": 41176790709,
+          "owner": "iam.mysql",
+          "observed_at": "2026-10-31T06:31:43.298532454Z",
+          "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "ff83eb83e11f8054f8c123fabf2b25d33daa6ac9cada79221c4dfdc674c418c2",
+          "table": {
+            "name": "domain_event_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "727776184b625d699359c20ecbf7da7d0c799c46c0d085c7b13da4c87d6dd8ce",
+            "publication_closed_state": "published"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false,
+        "earlier_read_only_metadata_receipt": {
           "workflow_run": 41175524009,
           "owner": "iam.mysql",
           "observed_at": "2026-10-31T06:13:29.73776366Z",
@@ -177,10 +212,7 @@
           },
           "transaction_released": true,
           "pool_released": true
-        },
-        "publication_state_count_only": true,
-        "business_and_reference_closure_verified": false,
-        "original_body_export_restore_verified": false
+        }
       },
       {
         "owner": "iam.mysql",
@@ -198,6 +230,30 @@
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
         "read_only_metadata_receipt": {
+          "workflow_run": 41176790709,
+          "owner": "iam.mysql",
+          "observed_at": "2026-10-31T06:31:43.298532454Z",
+          "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "ff83eb83e11f8054f8c123fabf2b25d33daa6ac9cada79221c4dfdc674c418c2",
+          "table": {
+            "name": "rm_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "a0a4b4b3152204dbbebbf80f6ed1f924155ed7715e5f5b39a542cae76fd7655b",
+            "publication_closed_state": "published"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false,
+        "earlier_read_only_metadata_receipt": {
           "workflow_run": 41175524009,
           "owner": "iam.mysql",
           "observed_at": "2026-10-31T06:13:29.73776366Z",
@@ -217,10 +273,7 @@
           },
           "transaction_released": true,
           "pool_released": true
-        },
-        "publication_state_count_only": true,
-        "business_and_reference_closure_verified": false,
-        "original_body_export_restore_verified": false
+        }
       },
       {
         "owner": "qs.mysql",
@@ -238,6 +291,30 @@
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
         "read_only_metadata_receipt": {
+          "workflow_run": 41176790709,
+          "owner": "qs.mysql",
+          "observed_at": "2026-10-31T06:31:41.54744576Z",
+          "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "3546e6cf011005db8f9ee959e51cab5578dde29399d40b09f7d5189b0fef4e9c",
+          "table": {
+            "name": "rm_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "79ce61b7d913153e15f8761f03695e4115fa10c334aebfb6e5ae52e6aad36e7c",
+            "publication_closed_state": "published"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false,
+        "earlier_read_only_metadata_receipt": {
           "workflow_run": 41175524009,
           "owner": "qs.mysql",
           "observed_at": "2026-10-31T06:13:40.165780441Z",
@@ -257,10 +334,7 @@
           },
           "transaction_released": true,
           "pool_released": true
-        },
-        "publication_state_count_only": true,
-        "business_and_reference_closure_verified": false,
-        "original_body_export_restore_verified": false
+        }
       },
       {
         "owner": "qs.mysql",
@@ -277,6 +351,30 @@
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
         "read_only_metadata_receipt": {
+          "workflow_run": 41176790709,
+          "owner": "qs.mysql",
+          "observed_at": "2026-10-31T06:31:41.54744576Z",
+          "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+          "mysql_version": "8.0.36",
+          "receipt_sha256": "3546e6cf011005db8f9ee959e51cab5578dde29399d40b09f7d5189b0fef4e9c",
+          "table": {
+            "name": "ai_messaging_outbox",
+            "available": true,
+            "rows": 0,
+            "publication_closed_rows": 0,
+            "other_or_null_state_rows": 0,
+            "null_state_rows": 0,
+            "show_create_table_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+            "publication_closed_state": "confirmed"
+          },
+          "transaction_released": true,
+          "pool_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false,
+        "earlier_read_only_metadata_receipt": {
           "workflow_run": 41175524009,
           "owner": "qs.mysql",
           "observed_at": "2026-10-31T06:13:40.165780441Z",
@@ -296,10 +394,7 @@
           },
           "transaction_released": true,
           "pool_released": true
-        },
-        "publication_state_count_only": true,
-        "business_and_reference_closure_verified": false,
-        "original_body_export_restore_verified": false
+        }
       },
       {
         "owner": "qs.mongo",
@@ -334,20 +429,59 @@
           "src/qs_ai/maintenance/schema_refactor/v0038.py"
         ],
         "reason": "Current 0043 application startup and release/transaction preflight call require_runtime_schema; its exact full v0038->0040 table set still includes messaging_outbox. A new versioned runtime layout and maintenance compatibility are required. Do not weaken exact layout validation or edit frozen historical layouts.",
-        "production_presence_verified_this_round": false,
-        "production_unfinished_count": null,
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
         "drop_authorized": false,
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
-        "read_only_metadata_receipt": null,
-        "read_only_attempt": {
-          "workflow_run": 41175524009,
-          "conclusion": "failure",
-          "valid_receipt_available": false,
-          "presence": null,
-          "rows": null,
-          "cause": "unknown; classified diagnostic follow-up pending"
-        }
+        "read_only_metadata_receipt": {
+          "workflow_run": 41176790709,
+          "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+          "schema_heads": [
+            "0043_native_transaction_limit"
+          ],
+          "inventory_complete": true,
+          "available": true,
+          "total": 0,
+          "truncated": false,
+          "pool_released": true,
+          "transaction_released": null,
+          "receipt_sha256": "6b3b7970fd604f6a8b1ac80ca0b6997de2e793601aa284db3d8093c1332f94de",
+          "application_image_source": "f9f24abdf98535295c4e3d223675ef6be62115e2"
+        },
+        "read_only_attempts": [
+          {
+            "workflow_run": 41175524009,
+            "conclusion": "failure",
+            "valid_receipt_available": false,
+            "presence": null,
+            "rows": null,
+            "cause": "unknown; classified diagnostic follow-up pending"
+          },
+          {
+            "workflow_run": 41176427602,
+            "source": "21098c2189e750bb152582082e960b1fee6e2720",
+            "valid_receipt_available": true,
+            "complete": false,
+            "error_phase": "imports",
+            "error_type": "ModuleNotFoundError",
+            "database_query_started": false,
+            "rows": null,
+            "resolution": "Use deployed application /app/.venv/bin/python and UID10001:10001; exact deployed Dockerfile verified. Final source e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04 read-only run41176790709 pending."
+          },
+          {
+            "workflow_run": 41176790709,
+            "conclusion": "success",
+            "valid_receipt_available": true,
+            "complete": true,
+            "queries_executed": true,
+            "rows": 0,
+            "application_interpreter_and_UID_corrected": true
+          }
+        ],
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false
       }
     ],
     "fresh_iam_validation_boundary": {
@@ -361,7 +495,25 @@
       "absence of current or rollback readers/writers",
       "original body export and tested restoration",
       "fresh and upgrade retirement compatibility"
-    ]
+    ],
+    "ai_preserved_observed_counts": {
+      "result_outbox": {
+        "physical_table": "interpretation_result_outbox",
+        "rows": 125,
+        "available": true,
+        "truncated": false
+      },
+      "ai_messaging_inbox": {
+        "physical_table": "messaging_inbox",
+        "rows": 57,
+        "available": true,
+        "truncated": false
+      }
+    },
+    "ai_read_only_run": 41176790709,
+    "all_five_sql_publication_candidates_currently_empty": true,
+    "production_read_only_run_conclusion": "success",
+    "production_read_only_previous_run": 41175524009
   },
   "existing_database_operator_mutation": false,
   "sdk_public_capabilities_deleted": false,

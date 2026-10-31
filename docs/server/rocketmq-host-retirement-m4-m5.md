@@ -48,8 +48,8 @@ M4/M5 验证结果按通过、失败、跳过、未执行记录；源码、CI、
 
 M4 的 IAM、QS API、Worker 三副本及 Collection 两副本已按固定镜像部署；独立快照运行 [41175362334](https://github.com/FangcunMount/qs-server/actions/runs/41175362334) 与监控观察 [41175364496](https://github.com/FangcunMount/infra/actions/runs/41175364496) 验证九个业务容器的镜像/源码和显式就绪。四个事务 owner 的观测可用且新鲜，准入保护均为 0；这不代表业务责任已关闭。QS 业务观测不可用、待处理计数缺失，不能解释为零；AI 业务观测可用且 ACK 等待为 0。
 
-Worker 与 Collection 首次部署后的治理步骤分别因 Prometheus 尚未出现指标族失败。新鲜公网回读确认完整副本数后，只重跑失败治理步骤通过，未再次部署应用。[QS #473](https://github.com/FangcunMount/qs-server/pull/473) 将指标族出现条件放进既有就绪重试循环；保持原预算、阈值和失败条件，候选仍须最终 CI 与合并后验证。
+Worker 与 Collection 首次部署后的治理步骤分别因 Prometheus 尚未出现指标族失败。新鲜公网回读确认完整副本数后，只重跑失败治理步骤通过，未再次部署应用。[QS #473](https://github.com/FangcunMount/qs-server/pull/473) 将指标族出现条件放进既有就绪重试循环；保持原预算、阈值和失败条件，候选 29 项 CI 通过、1 项条件跳过，已合并到 `249dc683…`；main CI 仍待完成，业务镜像保持不变。
 
-只读运行 [41175524009](https://github.com/FangcunMount/qs-server/actions/runs/41175524009) 在独立有界只读事务中确认 IAM 两张、QS MySQL 两张候选表均存在且各为 0 行，事务与连接池释放均成功，完整身份及结构哈希见 JSON。AI 分支失败且未留下有效回执，数量与原因未知；Mongo 尚未读取。以上不包含写入、清空、迁移或删除，不证明业务/引用关闭、正文备份恢复、无写者或回退兼容。
+只读运行 [41175524009](https://github.com/FangcunMount/qs-server/actions/runs/41175524009) 在独立有界只读事务中确认 IAM 两张、QS MySQL 两张候选表均存在且各为 0 行，事务与连接池释放均成功，完整身份及结构哈希见 JSON。AI 初次分支失败且未留下有效回执；分类复验确认探针在导入阶段因基础解释器缺少应用依赖而停止，尚未查询数据库。已改用镜像启动解释器与应用 UID，最终只读运行 [41176790709](https://github.com/FangcunMount/qs-server/actions/runs/41176790709) 的审计步骤成功，完整回执确认 `0043_native_transaction_limit` 与 `messaging_outbox=0`。同一最终源码下 IAM/QS 四张表复验仍各 0 行，三个 owner 作业全部成功。结果历史 `interpretation_result_outbox=125`、Inbox=57，均保持原状；Mongo 尚未读取。以上不包含写入、清空、迁移或删除，不证明业务/引用关闭、正文备份恢复、无写者或回退兼容。
 
 IAM 原生 Broker 夹具在独立新库完整迁移后，显式清理其生成的旧发布表种子通知；该历史测试结果不能当作“新建库已无旧初始化责任”的退役验收。AI 当前已部署源码的严格运行时 schema 校验仍要求旧 `messaging_outbox`：必须新增有版本的布局与升级路径，不能修改冻结旧布局或放宽集合校验以允许缺表。
