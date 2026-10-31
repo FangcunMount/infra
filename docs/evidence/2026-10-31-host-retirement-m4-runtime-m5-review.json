@@ -164,9 +164,9 @@
         "version": 111,
         "target": "qs.mysql.ai_messaging_outbox",
         "transition": "110/44 ->111/44",
-        "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+        "source": "62b76c87b8b3e3462c2882c543a6598763b81909",
         "PR": 474,
-        "status": "draft; candidate 75 CI and fixture-only original-ledger recovery passed; full startup correction 237 pending; no production execution",
+        "status": "draft; final combined source62 CI pending; no production execution",
         "scope": "Only empty target, bound paired driver, same-session WRITE lock, no unreviewed programs/dependencies, complete cleanup; controlled original restoration only."
       }
     ],
@@ -675,9 +675,9 @@
       "is_production_backup_or_restore": false
     },
     "final_candidate_checks": {
-      "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
-      "CI": 41186437005,
-      "CI_status": "success",
+      "source": "62b76c87b8b3e3462c2882c543a6598763b81909",
+      "CI": 41189873668,
+      "CI_status": "pending",
       "actual_readonly_offline_preview_run": 41183082546,
       "preview_status": "passed",
       "native_guard_previous_source": "704ee8ddb82b3094a2b469b4f5506cfb274521c4",
@@ -720,13 +720,21 @@
       "M3C14_overall_workflow": "cancelled after required current host job success and verified artifact download; remaining automatically included historical controls not counted as passed",
       "M3C14_exactly_tested_scope": "Production business Container/API gRPC services and real Worker process; controlled IAM/provider, no complete production HTTP/Collection or system login acceptance",
       "latest_change_from_verified_preview": "Only workflow output grouping and documentation source attribution; canonical executor source unchanged. Read-only preview remains attributed to d3c977740cdb2e063fde0db49dcc05bfca6cbfe2.",
-      "checks_passed": 29,
-      "conditional_skipped": 1,
       "prior_green_base": {
         "source": "51323979c7ee38b5288f5a3422209f7589cef5dc",
         "run": 41183644869,
         "checks_passed": 29,
         "conditional_skipped": 1
+      },
+      "prior_green_candidate": {
+        "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+        "run": 41186437005,
+        "passed": 29,
+        "conditional_skipped": 1
+      },
+      "canonical_final_source_readonly_preview": {
+        "run": 41189888018,
+        "status": "four owner jobs running; reader success; not yet verified"
       }
     },
     "read_only_probe_merged_main": "36846135cf6def4b80ff2d374886660dbda6d6db",
@@ -804,7 +812,7 @@
       "source": "2379189182ba70fe353663628efbf40bf36e2a03",
       "infra_source": "9255279b25da10f4bd09ff80c0f1e9149d87c8a1",
       "run": 41189393198,
-      "status": "dispatched; no jobs returned at latest read, not passed",
+      "status": "host retirement job running; no startup acceptance yet",
       "previous_failures": [
         {
           "source": "47b7e1d6ba5da163fc0c15141188851b78d110a8",
@@ -835,7 +843,16 @@
         "Private0600 configuration transports existing owned DSN and validates loopback/database/user binding; public option password redaction unchanged. Deterministic serialization regression passed locally.",
         "Recovery-only API principal receives exact hot-rank topic/group subscription; publisher scope unchanged and Mongo publication forbidden; protocol regression passed locally."
       ],
-      "not_yet_merged_into_474": true
+      "not_yet_merged_into_474": false,
+      "assembled_candidate": "62b76c87b8b3e3462c2882c543a6598763b81909",
+      "earlier_native_to_candidate_equivalence": {
+        "source": "2379189182ba70fe353663628efbf40bf36e2a03",
+        "candidate": "62b76c87b8b3e3462c2882c543a6598763b81909",
+        "production_runtime_source_configs_modules_migrations_identical": true,
+        "runtimeclosure_fixtures_identical": true,
+        "changed_scope": "workflow/docs and original-ledger export/recovery tests",
+        "not_a_new_execution": true
+      }
     },
     "pending_restore_rehearsal": {
       "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
@@ -975,8 +992,8 @@
   ],
   "execution_continuity": {
     "environment_id": "ccarenv_b64_Y2NhcmVudl85ODU4OTIzNGYxZTA4MTkxOTU2ZWNlOTcxOTdiNGE4Yw",
-    "status": "cloud executor reconnected; helper/tool integrity and offline regressions passed; strict doctor retains known unrestricted-vs-required-restricted network failure",
-    "latest_pushed_qs_startup_source": "2379189182ba70fe353663628efbf40bf36e2a03",
+    "status": "executor reconnected, completed material verification and pushed combined source62/maintenance plan; then reported unavailable again. Remote Actions remain running. Need reconnect before artifact decryption/download validation and final image/maintenance assembly.",
+    "latest_pushed_qs_startup_source": "62b76c87b8b3e3462c2882c543a6598763b81909",
     "local_private_key_not_published": true,
     "QS_CD_last_verified": "disabled_manually",
     "existing_database_operator_mutation": false,
