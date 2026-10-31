@@ -696,5 +696,16 @@
     "infra-current-unit-tests.log": "3850b382b65749e1de2ea02bb5e156a4dc7d7395f557642d42fb63f1a8d5fab2",
     "superseded-owner-native-cancellations-20261101.json": "385e4ebec2a6cb323127f0f04b4769144ca82af315e513eb1881772d8deba6b9",
     "m5-admin-activity-41225913119.json": "b3d5e4c47eef69a15ec14ccc690c03c6643496bf708c0714a6dc5ac0434f9f44"
+  },
+  "historical_review_snapshot": true,
+  "snapshot_superseded_by": "2026-11-01-host-retirement-m5-production-release.json",
+  "production_release_current": {
+    "status": "published",
+    "source": "4620d11e2cffbc4b67b43965812cff3340f0be43",
+    "versions": [
+      111,
+      44
+    ],
+    "automatic_cd": "disabled_manually"
   }
 }
