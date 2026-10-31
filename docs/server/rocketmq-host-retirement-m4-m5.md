@@ -4,13 +4,17 @@
 
 ## 当前交付状态
 
-云执行连接已恢复，原工作区和诊断私钥保留，无需用户寻找恢复入口。QS #474（main `1073f0c19c4991d80d9752f7fb69c395ae7590df`）和 infra #418 已合并，main CI 通过；原生14项及三个实际进程启动/排空通过，结果仍归属各自精确执行源码。生产仍运行M4，本轮没有停止应用、创建维护容器或修改现有数据库。
+QS #474（main `1073f0c19c4991d80d9752f7fb69c395ae7590df`）和infra #418已合并，main CI通过；14项原生运行及三个实际进程启动/排空通过，结果保留各自执行源码归属。维护入口 #475 已合并为 `bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6`，候选29项成功、1项原条件跳过，精确main CI [41201613827](https://github.com/FangcunMount/qs-server/actions/runs/41201613827) 成功。生产仍运行M4，本轮未停业务、未创建维护容器、未修改现有数据库。
 
-QS固定1073三镜像的仅构建运行 [41197059223](https://github.com/FangcunMount/qs-server/actions/runs/41197059223) 成功，原始三ZIP及源码/平台/两仓库digest与config-ID对应关系已核验，全部部署步骤跳过，CD已恢复 `disabled_manually`。详细身份见JSON，不把发布制品等同于运行版本。
+固定1073三镜像的仅构建运行 [41197059223](https://github.com/FangcunMount/qs-server/actions/runs/41197059223) 成功，三份原始ZIP、源码/平台及两仓库digest/config-ID对应已核验，全部部署步骤跳过。QS CD最后实读为 `disabled_manually`，之后本任务未启用它；发布制品不等于实际运行版本。
 
-维护入口 #475 当前源码 `71e054f4b65d2ad1a1ea9fcdc5d83845af584cd8`，本地15项脚本与88项文档门禁测试通过，最终CI41198019711仍在运行，其中required Docker原生job124528027136已通过，artifact13041334522原ZIP摘要 `6c7ad3eb2606835d54cd9cb6a9bf2ffb45bc77c78b87658fbf408465c3d19265` 与内容已核验，实际CI合并执行源码 `6144cb64ae272ffbda503b3ff9796a497196cd80`。ServerA只读权限预检 [41198015973](https://github.com/FangcunMount/qs-server/actions/runs/41198015973) 已通过，artifact13041289357 ZIP `da415a3c006ec4ebdb8048ce322ac9c3f8adaa02fd2e4112fcc8ed1effea7b7a` 与内容均核验。它核实原容器 `.Image=sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b`、固定数据库网络和sudo Docker权限；不创建容器、不查询数据库、不证明停写或恢复资格。原镜像OCI config84f592...不能代替主机Docker容器Image。前三次预检失败及旧候选取消均单独保留。
+#475候选Docker原生artifact13041334522原ZIP `6c7ad3eb2606835d54cd9cb6a9bf2ffb45bc77c78b87658fbf408465c3d19265` 及内容已核验，执行于CI合并源码 `6144cb64ae272ffbda503b3ff9796a497196cd80`。ServerA只读预检 [41198015973](https://github.com/FangcunMount/qs-server/actions/runs/41198015973) 成功，artifact13041289357原ZIP `da415a3c006ec4ebdb8048ce322ac9c3f8adaa02fd2e4112fcc8ed1effea7b7a` 及内容已核验。源容器Docker `.Image=sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b` 与OCI config84f592...分开记录。预检没有stage、数据库查询、停写或恢复证明；旧失败全部保留。
 
-尚待：最终维护入口CI、实际维护运输/数据库只读复验、生产事务排空与完整停写、同窗口材料/保留资产和具体恢复执行路线、具名责任人与可消费批准。首批仍只涉及空 `qs.mysql.ai_messaging_outbox`，其余五对象保留。SQL111及上线须在这些边界可审查后另行批准；本页不是批准。
+后续只读协议观察草稿 [QS #476](https://github.com/FangcunMount/qs-server/pull/476) 当前独立远端源码 `55f7c8d7c108ebecdcd55c3b99d76e5745954dbc`、代码基线 `32627920429d8fda3bf42cac6cd609c2958a72ce`。它复用SDK原主库观察和宿主native-limit读取，不发消息或修改数据库，要求既有CI真实运行110/44及111/44，保留非零、缺失/损坏显示不可用，不能代替Broker/ACK/停写批准。CI41202693972正在运行，文档门禁失败待修，真实原生验收未完成。原云环境本地草稿 `bf059e5906362b7f27e79acacd70239ae0054480` 的本地race/脚本/编译结果单独保留；其源码未推送，最终docs-facts结果未知。远端候选经已审代码重新整理，含额外阶段诊断，不是原本地提交的字节导出，不沿用本地绿结果。
+
+数据责任人与恢复责任人均为用户指定的 **shujie**；这不是现有数据库写入批准。尚待协议观察最终CI、实际维护运输/数据库只读复验、事务排空/完整停写、同窗口保护与具体恢复执行路线，以及最终可消费批准。首批只涉及空 `qs.mysql.ai_messaging_outbox`，其余五对象保留。
+
+云执行器再次不可用，命令端报transport disconnected/unavailable；平台状态API仍报running/connected，不据此宣称命令可用。retained诊断为not_found，根因待核实。本任务不要求用户寻找未经确认的恢复入口，原工作区保留；仓库接口和GitHub CI仍可继续工作。
 
 ## 本轮证据与范围
 
