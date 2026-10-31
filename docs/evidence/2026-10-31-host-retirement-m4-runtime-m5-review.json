@@ -1646,7 +1646,7 @@
       "local_sync_rule": "Export original bf059e commit/possible last-attempt edits and dirty docs before any sync; do not reset or overwrite",
       "new_main_source_without_production_deploy_run": {
         "source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
-        "observed_at": "2026-10-31T13:28:00Z",
+        "observed_at": "2026-10-31T13:29:12Z",
         "production_deploy_run_found": false
       }
     }
