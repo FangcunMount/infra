@@ -1312,7 +1312,14 @@
           "conclusion": "success",
           "source": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6"
         }
-      ]
+      ],
+      "current_main_native_raw_verification": {
+        "artifact_id": 13044116748,
+        "sha256": "eb2cb19326e1ed863f913c01ffa64abc09846cff271bf1258c41f56bc1b9d038",
+        "raw_zip_and_report_verified": true,
+        "kind": "transport",
+        "source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399"
+      }
     },
     "fixed_images_preparation": {
       "source": "1073f0c19c4991d80d9752f7fb69c395ae7590df",
@@ -1436,7 +1443,18 @@
         "docs_hygiene": "passed",
         "final_docs_facts": "unknown after disconnection",
         "uncommitted_docs_manifest": true,
-        "actual_byte_export_available": false
+        "actual_byte_export_available": false,
+        "source_backup_exported": true,
+        "source_backup": {
+          "bundle_sha256": "26d2b52672925c44c3c5f9849de77fe94ac5e7ba925e1e9ecdd44ab8b3915ae9",
+          "source_members": 12,
+          "dirty_docs_included": true,
+          "bundle_verified": true,
+          "worktree_unchanged": true,
+          "archive": "/workspace/library-files/m5-macbook-handoff-20261031T140038Z.tar.gz",
+          "archive_sha256": "ebe10ce38a61dbb766d87ef11a77f84386d59e5e2caa321e523a14760b7a7892",
+          "private_keys_included": false
+        }
       },
       "remote_candidate_is_local_byte_export": false,
       "production_observation_performed": false,
@@ -1543,8 +1561,9 @@
         },
         "artifact_id": 13043972930,
         "github_reported_zip_sha256": "sha256:b9240018efa34f35fd1a742f522c7ac8c2e4eccca5b0e5f3beca5caa65b83fe3",
-        "raw_zip_verified": false,
-        "scope": "owned real MySQL/Mongo; no Broker/business runtime or production acceptance"
+        "raw_zip_verified": true,
+        "scope": "owned real MySQL/Mongo; no Broker/business runtime or production acceptance",
+        "raw_zip_and_report_verified_at": "2026-10-31T14:04:00.763898+00:00"
       }
     },
     "production_window_eligibility": {
@@ -1628,14 +1647,14 @@
     "local_worktree_remote_docs_fast_forwarded": true,
     "current": {
       "environment_id": "ccarenv_b64_Y2NhcmVudl85ODU4OTIzNGYxZTA4MTkxOTU2ZWNlOTcxOTdiNGE4Yw",
-      "executor": "unavailable; unified exec transport disconnected, subsequent session polling rejected",
+      "executor": "command channel restored; uname=Linux, cwd=/workspace; this is not the user MacBook",
       "platform_status_API": "reports running/connected with current observations; not proof of working command channel",
       "retained_provider_diagnostics": "not_found",
       "root_cause": "unverified",
       "last_local_worktree_and_private_key_preserved": true,
       "remote_repository_and_CI_access": "working",
       "user_recovery_UI_action_required": "none requested; no verified recovery entry",
-      "local_source_export_pending": true,
+      "local_source_export_pending": false,
       "production_maintenance_container_created": false,
       "business_service_stopped": false,
       "existing_database_operator_mutation": false,
@@ -1648,7 +1667,19 @@
         "source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
         "observed_at": "2026-10-31T13:29:12Z",
         "production_deploy_run_found": false
-      }
+      },
+      "last_local_state_confirmed_after_recovery": {
+        "head": "bf059e5906362b7f27e79acacd70239ae0054480",
+        "dirty": [
+          "docs/document-closure.json"
+        ],
+        "untracked_count": 0
+      },
+      "source_backup_verified": true,
+      "private_key_in_source_backup": false,
+      "macbook_execution": "requires a local Codex task opened on the MacBook repository; no direct MacBook execution channel in this conversation",
+      "QS_CD_current_verified": "disabled_manually",
+      "observed_at": "2026-10-31T14:04:00.763898+00:00"
     }
   }
 }
