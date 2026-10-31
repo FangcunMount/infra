@@ -104,20 +104,30 @@
     "controller_followup": {
       "pr": 473,
       "source": "a453a1f6547aeb56e758a983bbd502fdaf2535da",
-      "CI": "main CI pending",
+      "CI": "success",
       "merged": true,
       "main": "249dc6839e9772df239d1e1c5f78e1aeeb5be2b8",
       "pr_CI": {
         "passed": 29,
         "conditional_skipped": 1
       },
-      "main_CI": 41176526595
+      "main_CI": 41176526595,
+      "main_CI_passed": 29,
+      "main_conditional_skipped": 1
     },
     "validation_boundary": [
       "Worker has no Docker health declaration; explicit readiness and process/binary identity were verified.",
       "IAM OCI revision label absent; exact reported binary Git commit and immutable image binding were verified.",
       "M2 full historical business acceptance remains open; missing QS count is not zero."
-    ]
+    ],
+    "deployment_workflows_restored": {
+      "qs-server": "active",
+      "iam": "active",
+      "qs-ai": "active",
+      "qs-operating-system": "active"
+    },
+    "post_restore_active_deploy_runs": [],
+    "deployment_workflows_restored_scope": "All four restored after completed M4 main CI; subsequent M5 QS freeze is recorded separately under m5, not a current claim that all workflows remain active."
   },
   "historical_verification": [
     {
@@ -138,19 +148,28 @@
   ],
   "m5": {
     "read_only_probe_pr": 472,
-    "read_only_probe_source": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+    "read_only_probe_source": "7d6f2daa510576a117a4e531e75bbe00f6096154",
     "probe_CI": {
-      "status": "pending",
-      "workflow_run": 41176791391,
-      "earlier_exact_source_results": {
-        "source": "26214bd78e78a4512c2e101cd9d56854c5972e52",
-        "passed": 29,
-        "conditional_skipped": 1
-      }
+      "passed": 29,
+      "conditional_skipped": 1,
+      "run": 41177750904,
+      "native_mysql_job": 124468718607,
+      "native_mongo_job": 124468718488
     },
-    "production_read_only_run": 41176790709,
+    "production_read_only_run": 41178025856,
     "production_drop_allowed": false,
-    "new_retirement_migrations": [],
+    "new_retirement_migrations": [
+      {
+        "repository": "qs-server",
+        "version": 111,
+        "target": "qs.mysql.ai_messaging_outbox",
+        "transition": "110/44 ->111/44",
+        "source": "51323979c7ee38b5288f5a3422209f7589cef5dc",
+        "PR": 474,
+        "status": "draft candidate; no production execution",
+        "scope": "Only empty target, bound paired driver, same-session WRITE lock, no unreviewed programs/dependencies, complete cleanup; controlled original restoration only."
+      }
+    ],
     "objects": [
       {
         "owner": "iam.mysql",
@@ -169,13 +188,11 @@
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
         "read_only_metadata_receipt": {
-          "workflow_run": 41176790709,
-          "owner": "iam.mysql",
-          "observed_at": "2026-10-31T06:31:43.298532454Z",
-          "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
-          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
-          "mysql_version": "8.0.36",
-          "receipt_sha256": "ff83eb83e11f8054f8c123fabf2b25d33daa6ac9cada79221c4dfdc674c418c2",
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "7e947bebe62ec42840164c75fe12ea9106799629bc560afd9c4958775e9f952a",
+          "inventory_complete": true,
+          "pool_released": true,
           "table": {
             "name": "domain_event_outbox",
             "available": true,
@@ -186,8 +203,11 @@
             "show_create_table_sha256": "727776184b625d699359c20ecbf7da7d0c799c46c0d085c7b13da4c87d6dd8ce",
             "publication_closed_state": "published"
           },
-          "transaction_released": true,
-          "pool_released": true
+          "schema_head": 45,
+          "schema_dirty": false,
+          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+          "observed_at": "2026-10-31T06:50:17.778011226Z",
+          "transaction_released": true
         },
         "publication_state_count_only": true,
         "business_and_reference_closure_verified": false,
@@ -212,7 +232,30 @@
           },
           "transaction_released": true,
           "pool_released": true
-        }
+        },
+        "read_only_receipt_history": [
+          {
+            "workflow_run": 41176790709,
+            "owner": "iam.mysql",
+            "observed_at": "2026-10-31T06:31:43.298532454Z",
+            "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+            "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+            "mysql_version": "8.0.36",
+            "receipt_sha256": "ff83eb83e11f8054f8c123fabf2b25d33daa6ac9cada79221c4dfdc674c418c2",
+            "table": {
+              "name": "domain_event_outbox",
+              "available": true,
+              "rows": 0,
+              "publication_closed_rows": 0,
+              "other_or_null_state_rows": 0,
+              "null_state_rows": 0,
+              "show_create_table_sha256": "727776184b625d699359c20ecbf7da7d0c799c46c0d085c7b13da4c87d6dd8ce",
+              "publication_closed_state": "published"
+            },
+            "transaction_released": true,
+            "pool_released": true
+          }
+        ]
       },
       {
         "owner": "iam.mysql",
@@ -230,13 +273,11 @@
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
         "read_only_metadata_receipt": {
-          "workflow_run": 41176790709,
-          "owner": "iam.mysql",
-          "observed_at": "2026-10-31T06:31:43.298532454Z",
-          "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
-          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
-          "mysql_version": "8.0.36",
-          "receipt_sha256": "ff83eb83e11f8054f8c123fabf2b25d33daa6ac9cada79221c4dfdc674c418c2",
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "7e947bebe62ec42840164c75fe12ea9106799629bc560afd9c4958775e9f952a",
+          "inventory_complete": true,
+          "pool_released": true,
           "table": {
             "name": "rm_outbox",
             "available": true,
@@ -247,8 +288,11 @@
             "show_create_table_sha256": "a0a4b4b3152204dbbebbf80f6ed1f924155ed7715e5f5b39a542cae76fd7655b",
             "publication_closed_state": "published"
           },
-          "transaction_released": true,
-          "pool_released": true
+          "schema_head": 45,
+          "schema_dirty": false,
+          "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+          "observed_at": "2026-10-31T06:50:17.778011226Z",
+          "transaction_released": true
         },
         "publication_state_count_only": true,
         "business_and_reference_closure_verified": false,
@@ -273,7 +317,30 @@
           },
           "transaction_released": true,
           "pool_released": true
-        }
+        },
+        "read_only_receipt_history": [
+          {
+            "workflow_run": 41176790709,
+            "owner": "iam.mysql",
+            "observed_at": "2026-10-31T06:31:43.298532454Z",
+            "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+            "database_binding_sha256": "81c11a112b0dc874859b1a6164694a836760cae4d273c035b55873681d852fba",
+            "mysql_version": "8.0.36",
+            "receipt_sha256": "ff83eb83e11f8054f8c123fabf2b25d33daa6ac9cada79221c4dfdc674c418c2",
+            "table": {
+              "name": "rm_outbox",
+              "available": true,
+              "rows": 0,
+              "publication_closed_rows": 0,
+              "other_or_null_state_rows": 0,
+              "null_state_rows": 0,
+              "show_create_table_sha256": "a0a4b4b3152204dbbebbf80f6ed1f924155ed7715e5f5b39a542cae76fd7655b",
+              "publication_closed_state": "published"
+            },
+            "transaction_released": true,
+            "pool_released": true
+          }
+        ]
       },
       {
         "owner": "qs.mysql",
@@ -291,13 +358,11 @@
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
         "read_only_metadata_receipt": {
-          "workflow_run": 41176790709,
-          "owner": "qs.mysql",
-          "observed_at": "2026-10-31T06:31:41.54744576Z",
-          "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
-          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
-          "mysql_version": "8.0.36",
-          "receipt_sha256": "3546e6cf011005db8f9ee959e51cab5578dde29399d40b09f7d5189b0fef4e9c",
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "4f2001008207752cfecc3cec949fe8e0f176830fcac449d23894591eeb7f3d46",
+          "inventory_complete": true,
+          "pool_released": true,
           "table": {
             "name": "rm_outbox",
             "available": true,
@@ -308,8 +373,11 @@
             "show_create_table_sha256": "79ce61b7d913153e15f8761f03695e4115fa10c334aebfb6e5ae52e6aad36e7c",
             "publication_closed_state": "published"
           },
-          "transaction_released": true,
-          "pool_released": true
+          "schema_head": 110,
+          "schema_dirty": false,
+          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+          "observed_at": "2026-10-31T06:50:12.981590761Z",
+          "transaction_released": true
         },
         "publication_state_count_only": true,
         "business_and_reference_closure_verified": false,
@@ -334,7 +402,30 @@
           },
           "transaction_released": true,
           "pool_released": true
-        }
+        },
+        "read_only_receipt_history": [
+          {
+            "workflow_run": 41176790709,
+            "owner": "qs.mysql",
+            "observed_at": "2026-10-31T06:31:41.54744576Z",
+            "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+            "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+            "mysql_version": "8.0.36",
+            "receipt_sha256": "3546e6cf011005db8f9ee959e51cab5578dde29399d40b09f7d5189b0fef4e9c",
+            "table": {
+              "name": "rm_outbox",
+              "available": true,
+              "rows": 0,
+              "publication_closed_rows": 0,
+              "other_or_null_state_rows": 0,
+              "null_state_rows": 0,
+              "show_create_table_sha256": "79ce61b7d913153e15f8761f03695e4115fa10c334aebfb6e5ae52e6aad36e7c",
+              "publication_closed_state": "published"
+            },
+            "transaction_released": true,
+            "pool_released": true
+          }
+        ]
       },
       {
         "owner": "qs.mysql",
@@ -351,13 +442,11 @@
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
         "read_only_metadata_receipt": {
-          "workflow_run": 41176790709,
-          "owner": "qs.mysql",
-          "observed_at": "2026-10-31T06:31:41.54744576Z",
-          "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
-          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
-          "mysql_version": "8.0.36",
-          "receipt_sha256": "3546e6cf011005db8f9ee959e51cab5578dde29399d40b09f7d5189b0fef4e9c",
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "4f2001008207752cfecc3cec949fe8e0f176830fcac449d23894591eeb7f3d46",
+          "inventory_complete": true,
+          "pool_released": true,
           "table": {
             "name": "ai_messaging_outbox",
             "available": true,
@@ -368,8 +457,11 @@
             "show_create_table_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
             "publication_closed_state": "confirmed"
           },
-          "transaction_released": true,
-          "pool_released": true
+          "schema_head": 110,
+          "schema_dirty": false,
+          "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+          "observed_at": "2026-10-31T06:50:12.981590761Z",
+          "transaction_released": true
         },
         "publication_state_count_only": true,
         "business_and_reference_closure_verified": false,
@@ -394,7 +486,30 @@
           },
           "transaction_released": true,
           "pool_released": true
-        }
+        },
+        "read_only_receipt_history": [
+          {
+            "workflow_run": 41176790709,
+            "owner": "qs.mysql",
+            "observed_at": "2026-10-31T06:31:41.54744576Z",
+            "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+            "database_binding_sha256": "6911871908251b35887f95823d63a13eb34ac9eb66d68adbc9fad728cd3ae45c",
+            "mysql_version": "8.0.36",
+            "receipt_sha256": "3546e6cf011005db8f9ee959e51cab5578dde29399d40b09f7d5189b0fef4e9c",
+            "table": {
+              "name": "ai_messaging_outbox",
+              "available": true,
+              "rows": 0,
+              "publication_closed_rows": 0,
+              "other_or_null_state_rows": 0,
+              "null_state_rows": 0,
+              "show_create_table_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+              "publication_closed_state": "confirmed"
+            },
+            "transaction_released": true,
+            "pool_released": true
+          }
+        ]
       },
       {
         "owner": "qs.mongo",
@@ -407,12 +522,30 @@
           "internal/apiserver/infra/mongo/standardoutbox/replay.go"
         ],
         "reason": "Version-1 accepted answers, mixed historical/current hot-rank reconstruction and historical audit/recovery depend on exact original records.",
-        "production_presence_verified_this_round": false,
-        "production_unfinished_count": null,
+        "production_presence_verified_this_round": true,
+        "production_unfinished_count": 0,
         "drop_authorized": false,
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
-        "read_only_metadata_receipt": null
+        "read_only_metadata_receipt": {
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "9822b09ad44664a457747a2f2030da90f6b8ddde4b73aad3e53a7587a3568d32",
+          "inventory_complete": true,
+          "pool_released": true,
+          "schema_head": 44,
+          "rows": 0,
+          "publication_closed_rows": 0,
+          "other_or_null_state_rows": 0,
+          "database_binding_sha256": "0315f466f7520275652102c82397269f7d45e29328fc513d12b49b1bb7adfd81",
+          "collection_catalog_sha256": "f9a36dfe955fabbf874f955067d059b8d660fa5c3ff5edb349b09baf4e5c3fac",
+          "count_read_concern": "snapshot",
+          "observed_at": "2026-10-31T06:50:26.81261398Z",
+          "cursors_released": true
+        },
+        "publication_state_count_only": true,
+        "business_and_reference_closure_verified": false,
+        "original_body_export_restore_verified": false
       },
       {
         "owner": "ai.mysql",
@@ -435,19 +568,16 @@
         "ddl_prepared": false,
         "source_review_basis": "M4 reviewed/merged application sources; preserves earlier inventory in its original file.",
         "read_only_metadata_receipt": {
-          "workflow_run": 41176790709,
-          "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+          "workflow_run": 41178025856,
+          "source_sha": "7d6f2daa510576a117a4e531e75bbe00f6096154",
+          "receipt_sha256": "9cc7e73a055cdd5634d1a8c8c504b87a75a754c4aa235a47dad9a5bb07e023b7",
+          "inventory_complete": true,
+          "pool_released": true,
           "schema_heads": [
             "0043_native_transaction_limit"
           ],
-          "inventory_complete": true,
-          "available": true,
-          "total": 0,
-          "truncated": false,
-          "pool_released": true,
-          "transaction_released": null,
-          "receipt_sha256": "6b3b7970fd604f6a8b1ac80ca0b6997de2e793601aa284db3d8093c1332f94de",
-          "application_image_source": "f9f24abdf98535295c4e3d223675ef6be62115e2"
+          "rows": 0,
+          "truncated": false
         },
         "read_only_attempts": [
           {
@@ -481,7 +611,24 @@
         ],
         "publication_state_count_only": true,
         "business_and_reference_closure_verified": false,
-        "original_body_export_restore_verified": false
+        "original_body_export_restore_verified": false,
+        "read_only_receipt_history": [
+          {
+            "workflow_run": 41176790709,
+            "source_sha": "e0bd2be0b7ee1f4c8c6adc0e84bf420cc5990e04",
+            "schema_heads": [
+              "0043_native_transaction_limit"
+            ],
+            "inventory_complete": true,
+            "available": true,
+            "total": 0,
+            "truncated": false,
+            "pool_released": true,
+            "transaction_released": null,
+            "receipt_sha256": "6b3b7970fd604f6a8b1ac80ca0b6997de2e793601aa284db3d8093c1332f94de",
+            "application_image_source": "f9f24abdf98535295c4e3d223675ef6be62115e2"
+          }
+        ]
       }
     ],
     "fresh_iam_validation_boundary": {
@@ -513,7 +660,136 @@
     "ai_read_only_run": 41176790709,
     "all_five_sql_publication_candidates_currently_empty": true,
     "production_read_only_run_conclusion": "success",
-    "production_read_only_previous_run": 41175524009
+    "production_read_only_previous_run": 41175524009,
+    "mongo_inventory_extension_status": "Authenticated native selectors and exact-source production snapshot count passed; schema44 and zero rows, not retirement permission.",
+    "all_six_original_candidates_observed_empty": true,
+    "candidate_native_first_source": {
+      "source": "d9e27a8d3c255ff962326a54459c8218f2c5691b",
+      "execution_source_merge": "5c1fbc86906a9542a6ab11692e5455114fb9c8d5",
+      "run": 41181173777,
+      "job": 124478701331,
+      "native_selected_case_passed": true,
+      "overall_CI": "superseded incomplete run cancelled",
+      "original_and_restored_fixture_ddl_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+      "matches_actual_original_table_structure_hash": true,
+      "is_production_backup_or_restore": false
+    },
+    "final_candidate_checks": {
+      "source": "51323979c7ee38b5288f5a3422209f7589cef5dc",
+      "CI": 41183644869,
+      "CI_status": "pending; corrected ShellCheck output grouping only",
+      "actual_readonly_offline_preview_run": 41183082546,
+      "preview_status": "passed",
+      "native_guard_previous_source": "704ee8ddb82b3094a2b469b4f5506cfb274521c4",
+      "native_guard_run": 41182284431,
+      "native_guard_job": 124481965592,
+      "native_guard_status": "passed",
+      "native_artifact_sha256": "3fe9c0f4d36458e0e14a56be854ee4864ea864405872a879d7b9c97d1d7ce9fd",
+      "M3C14_run": 41182295905,
+      "M3C14_source": "704ee8ddb82b3094a2b469b4f5506cfb274521c4",
+      "M3C14_job": 124482146313,
+      "M3C14_passed": 14,
+      "M3C14_failed": 0,
+      "M3C14_skipped": 0,
+      "M3C14_artifact_sha256": "8cd7665594b5114c64157bf2ee158235f542d55540283bcc88ec7e1a4799c0ea",
+      "production_go_modules_configs_and_migrations_identical_to_new_candidate": true,
+      "equivalence_is_not_new_execution": true,
+      "controlled_provider_and_iam": true,
+      "full_Collection_or_system_login_claimed": false,
+      "offline_preview": {
+        "read_only_requested": true,
+        "inventory_complete": true,
+        "mutation": false,
+        "source_sha": "d3c977740cdb2e063fde0db49dcc05bfca6cbfe2",
+        "binary_sha256": "c80049fd1d0b1ec9fc8d28444b6e004a8c3f48eba0e8e147f738b6d3887e9913",
+        "workflow_run": "41183082546",
+        "snapshot": {
+          "source_sha": "d3c977740cdb2e063fde0db49dcc05bfca6cbfe2",
+          "migration_resources_sha256": "b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de",
+          "mysql_database": "qs",
+          "mongo_database": "qs",
+          "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+          "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+          "mysql_version": 110,
+          "mongo_version": 44,
+          "target_mysql_version": 111,
+          "target_mongo_version": 44
+        },
+        "read_only": true
+      },
+      "M3C14_overall_workflow": "cancelled after required current host job success and verified artifact download; remaining automatically included historical controls not counted as passed",
+      "M3C14_exactly_tested_scope": "Production business Container/API gRPC services and real Worker process; controlled IAM/provider, no complete production HTTP/Collection or system login acceptance",
+      "latest_change_from_verified_preview": "Only workflow output grouping and documentation source attribution; canonical executor source unchanged. Read-only preview remains attributed to d3c977740cdb2e063fde0db49dcc05bfca6cbfe2."
+    },
+    "read_only_probe_merged_main": "36846135cf6def4b80ff2d374886660dbda6d6db",
+    "read_only_probe_main_CI": {
+      "run": 41183134769,
+      "status": "pending"
+    },
+    "production_QS_CD_state": "disabled_manually; current M4 service images unchanged",
+    "actual_original_empty_EOF_materials": {
+      "run": 41181671449,
+      "source": "e7702fbb0ab27a49c16efd212fda400653b6909d",
+      "sql_owner": "qs.mysql",
+      "schema_pair": [
+        110,
+        44
+      ],
+      "original_DDL_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+      "original_jsonl_bytes": 0,
+      "original_jsonl_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "private_artifact_zip_sha256": "0294cd8aef379a512f5dd88cb2873ef290d96241e7b138e8d3b0b8a25797d83c",
+      "same_bytes_as_successful_native_restore": true,
+      "actual_production_restore_or_write_exclusion_proven": false,
+      "latest_run": 41183082546,
+      "latest_source": "d3c977740cdb2e063fde0db49dcc05bfca6cbfe2"
+    },
+    "retained_historical_CI_failures": [
+      {
+        "run": 41181440743,
+        "source": "e7702fbb0ab27a49c16efd212fda400653b6909d",
+        "failed_jobs": [
+          "Actor Store MySQL Transactions",
+          "Lint Code"
+        ],
+        "cause": "Actor fixture bypassed guarded paired driver using raw SQL; lint QF1001 DeMorgan. Full-chain assertions moved intact into canonical owned paired native gate; production guard retained. Both jobs passed at704."
+      },
+      {
+        "run": 41183086959,
+        "source": "d3c977740cdb2e063fde0db49dcc05bfca6cbfe2",
+        "failed_job": "Deployment Contracts",
+        "cause": "Required hosted actionlint/ShellCheck SC2129 for three independent GITHUB_OUTPUT redirects; only grouped redirect changed. Local actionlint did not have ShellCheck; hosted gate was not bypassed."
+      }
+    ],
+    "latest_inventory": {
+      "run": 41183082546,
+      "source_sha": "d3c977740cdb2e063fde0db49dcc05bfca6cbfe2",
+      "all_four_owner_jobs": "success",
+      "all_six_candidates_still_empty": true,
+      "artifacts_raw_digest_verified": true,
+      "retirement_or_writer_freeze_claimed": false,
+      "preserved_AI_result_rows": 125,
+      "preserved_AI_inbox_rows": 57
+    },
+    "concrete_execution_preparation": {
+      "scope": "m5_qs_empty_ai_publisher",
+      "exact_transition": [
+        110,
+        44,
+        111,
+        44
+      ],
+      "objects_deleted": [
+        "qs.mysql.ai_messaging_outbox"
+      ],
+      "all_other_candidates_retained": true,
+      "writers_frozen": false,
+      "production_apply_approved": false,
+      "startup_receipt_for_complete_process_set": "pending; existing native business/Worker proof is narrower",
+      "material_retention_days_minimum": 30,
+      "new_main_images": "pending fixed source and digest",
+      "fallback": "Before first new runtime start, stop on any dirty/unknown/partial result. Re-read actual server operation/schema, retain original approval and consumed marker, restore only reviewed original empty target structure and exact paired metadata under separately reviewed recovery; no automatic force/down/overwrite. M4 fixed images remain live until an approved window."
+    }
   },
   "existing_database_operator_mutation": false,
   "sdk_public_capabilities_deleted": false,
