@@ -1,0 +1,603 @@
+{
+  "generated_at": "2026-10-31T08:43:37.245210+08:00",
+  "scope": "M2/M3 deployed frozen images and incomplete release closeout; no M4/M5 acceptance",
+  "deployment_complete": true,
+  "full_M2_business_acceptance_complete": false,
+  "this_round_confirmed": {
+    "service_snapshot_run": 41150432808,
+    "services": [
+      {
+        "name": "qs-ai",
+        "source_sha": "f9f24abdf98535295c4e3d223675ef6be62115e2",
+        "image_id": "sha256:18a39e862a82bfb9b503a3dd93639688bc45016caa2c7f1bf9081953b4523fa0",
+        "running": true,
+        "ready": true,
+        "health": "healthy",
+        "host": "serverA",
+        "observed_at": "2026-10-31T00:29:48.820897+00:00"
+      },
+      {
+        "name": "qs-collection-server-1",
+        "source_sha": "3b8a931e2451e38602e8b26bc623bf8d37a69878",
+        "image_id": "sha256:174bdb37268121ed81b317722869b5b5fca39d61988d8331e4d114596c03c056",
+        "running": true,
+        "ready": true,
+        "health": "healthy",
+        "host": "serverA",
+        "observed_at": "2026-10-31T00:29:48.820897+00:00"
+      },
+      {
+        "name": "qs-collection-server-2",
+        "source_sha": "3b8a931e2451e38602e8b26bc623bf8d37a69878",
+        "image_id": "sha256:174bdb37268121ed81b317722869b5b5fca39d61988d8331e4d114596c03c056",
+        "running": true,
+        "ready": true,
+        "health": "healthy",
+        "host": "serverA",
+        "observed_at": "2026-10-31T00:29:48.820897+00:00"
+      },
+      {
+        "name": "qs-apiserver",
+        "source_sha": "3b8a931e2451e38602e8b26bc623bf8d37a69878",
+        "image_id": "sha256:821cfa3613e12d6ab39c469c45c9d959e1184a8277efb61070c9fcfc369df47d",
+        "running": true,
+        "ready": true,
+        "health": "healthy",
+        "host": "serverA",
+        "observed_at": "2026-10-31T00:29:48.820897+00:00"
+      },
+      {
+        "name": "iam-apiserver",
+        "source_sha": null,
+        "image_id": "sha256:46930b3677e96a7de18b907ae3e1a9e6fe1559f71398e78af33f023a4039c3fd",
+        "running": true,
+        "ready": true,
+        "health": "healthy",
+        "host": "serverA",
+        "observed_at": "2026-10-31T00:29:48.820897+00:00"
+      },
+      {
+        "name": "nginx",
+        "source_sha": null,
+        "image_id": "sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d",
+        "running": true,
+        "ready": null,
+        "health": "healthy",
+        "host": "serverA",
+        "observed_at": "2026-10-31T00:29:48.820897+00:00"
+      },
+      {
+        "name": "qs-operating-system",
+        "source_sha": "31aeb87afe24c11df505c6a9e48c017d175a96a0",
+        "image_id": "sha256:6cb564aab2c1961129051ebea4a82c81e89b0b694165f7473092b6a9b62433bd",
+        "running": true,
+        "ready": null,
+        "health": "healthy",
+        "host": "serverB",
+        "observed_at": "2026-10-31T00:29:46.329083+00:00"
+      },
+      {
+        "name": "qs-worker-runtime-3",
+        "source_sha": "3b8a931e2451e38602e8b26bc623bf8d37a69878",
+        "image_id": "sha256:511d750af70bcca1206c691d57317a5d88a782b25a940df6f0d70b7c124d49dc",
+        "running": true,
+        "ready": true,
+        "health": null,
+        "host": "serverD",
+        "observed_at": "2026-10-31T00:29:47.328770+00:00"
+      },
+      {
+        "name": "qs-worker-runtime-1",
+        "source_sha": "3b8a931e2451e38602e8b26bc623bf8d37a69878",
+        "image_id": "sha256:511d750af70bcca1206c691d57317a5d88a782b25a940df6f0d70b7c124d49dc",
+        "running": true,
+        "ready": true,
+        "health": null,
+        "host": "serverD",
+        "observed_at": "2026-10-31T00:29:47.328770+00:00"
+      },
+      {
+        "name": "qs-worker-runtime-2",
+        "source_sha": "3b8a931e2451e38602e8b26bc623bf8d37a69878",
+        "image_id": "sha256:511d750af70bcca1206c691d57317a5d88a782b25a940df6f0d70b7c124d49dc",
+        "running": true,
+        "ready": true,
+        "health": null,
+        "host": "serverD",
+        "observed_at": "2026-10-31T00:29:47.328770+00:00"
+      }
+    ],
+    "monitoring_observation_run": 41151331507,
+    "monitoring": {
+      "read_only": true,
+      "database_operations": false,
+      "configuration_changed": false,
+      "observed_at": "2026-10-31T00:39:34.611355+00:00",
+      "queries": {
+        "targets": {
+          "query": "count by (job) (up)",
+          "status": 200,
+          "available": true,
+          "present": true,
+          "samples": [
+            {
+              "labels": {
+                "job": "prometheus"
+              },
+              "value": [
+                1793407174.619,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "job": "rocketmq"
+              },
+              "value": [
+                1793407174.619,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "job": "qs-worker"
+              },
+              "value": [
+                1793407174.619,
+                "3"
+              ]
+            },
+            {
+              "labels": {
+                "job": "qs-apiserver"
+              },
+              "value": [
+                1793407174.619,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "job": "iam"
+              },
+              "value": [
+                1793407174.619,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "job": "qs-ai"
+              },
+              "value": [
+                1793407174.619,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "job": "qs-collection-server"
+              },
+              "value": [
+                1793407174.619,
+                "2"
+              ]
+            }
+          ]
+        },
+        "targets_up": {
+          "query": "sum by (job) (up)",
+          "status": 200,
+          "available": true,
+          "present": true,
+          "samples": [
+            {
+              "labels": {
+                "job": "prometheus"
+              },
+              "value": [
+                1793407174.624,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "job": "rocketmq"
+              },
+              "value": [
+                1793407174.624,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "job": "qs-worker"
+              },
+              "value": [
+                1793407174.624,
+                "3"
+              ]
+            },
+            {
+              "labels": {
+                "job": "qs-apiserver"
+              },
+              "value": [
+                1793407174.624,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "job": "iam"
+              },
+              "value": [
+                1793407174.624,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "job": "qs-ai"
+              },
+              "value": [
+                1793407174.624,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "job": "qs-collection-server"
+              },
+              "value": [
+                1793407174.624,
+                "2"
+              ]
+            }
+          ]
+        },
+        "qs_business_observation": {
+          "query": "min(qs_server_ai_mq_observation_available)",
+          "status": 200,
+          "available": true,
+          "present": true,
+          "samples": [
+            {
+              "labels": {},
+              "value": [
+                1793407174.627,
+                "0"
+              ]
+            }
+          ]
+        },
+        "ai_business_observation": {
+          "query": "min(qs_ai_mq_observation_available)",
+          "status": 200,
+          "available": true,
+          "present": true,
+          "samples": [
+            {
+              "labels": {},
+              "value": [
+                1793407174.629,
+                "1"
+              ]
+            }
+          ]
+        },
+        "qs_awaiting_admission": {
+          "query": "sum(qs_server_ai_mq_awaiting_command_receipts)",
+          "status": 200,
+          "available": true,
+          "present": false,
+          "samples": []
+        },
+        "ai_awaiting_business_ack": {
+          "query": "sum(qs_ai_mq_pending_interpretation_receipts)",
+          "status": 200,
+          "available": true,
+          "present": true,
+          "samples": [
+            {
+              "labels": {},
+              "value": [
+                1793407174.633,
+                "0"
+              ]
+            }
+          ]
+        },
+        "transaction_observation": {
+          "query": "min by (owner) (reliable_messaging_transaction_observation_available)",
+          "status": 200,
+          "available": true,
+          "present": true,
+          "samples": [
+            {
+              "labels": {
+                "owner": "qs.mongo"
+              },
+              "value": [
+                1793407174.635,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "owner": "qs.mysql"
+              },
+              "value": [
+                1793407174.635,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "owner": "iam.mysql"
+              },
+              "value": [
+                1793407174.635,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "owner": "ai.mysql"
+              },
+              "value": [
+                1793407174.635,
+                "1"
+              ]
+            }
+          ]
+        },
+        "transaction_fresh": {
+          "query": "min by (owner) (reliable_messaging_transaction_observation_fresh)",
+          "status": 200,
+          "available": true,
+          "present": true,
+          "samples": [
+            {
+              "labels": {
+                "owner": "qs.mongo"
+              },
+              "value": [
+                1793407174.636,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "owner": "qs.mysql"
+              },
+              "value": [
+                1793407174.636,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "owner": "iam.mysql"
+              },
+              "value": [
+                1793407174.636,
+                "1"
+              ]
+            },
+            {
+              "labels": {
+                "owner": "ai.mysql"
+              },
+              "value": [
+                1793407174.636,
+                "1"
+              ]
+            }
+          ]
+        },
+        "transaction_protection": {
+          "query": "max by (owner) (reliable_messaging_transaction_admission_protected)",
+          "status": 200,
+          "available": true,
+          "present": true,
+          "samples": [
+            {
+              "labels": {
+                "owner": "qs.mongo"
+              },
+              "value": [
+                1793407174.638,
+                "0"
+              ]
+            },
+            {
+              "labels": {
+                "owner": "qs.mysql"
+              },
+              "value": [
+                1793407174.638,
+                "0"
+              ]
+            },
+            {
+              "labels": {
+                "owner": "iam.mysql"
+              },
+              "value": [
+                1793407174.638,
+                "0"
+              ]
+            },
+            {
+              "labels": {
+                "owner": "ai.mysql"
+              },
+              "value": [
+                1793407174.638,
+                "0"
+              ]
+            }
+          ]
+        }
+      },
+      "dashboards": {
+        "event-overview": {
+          "status": 200,
+          "anonymous_status": 401,
+          "authentication": "existing_grafana_runtime_account",
+          "api_verified": true,
+          "frozen_panel_model_matches": true
+        },
+        "event-transactions": {
+          "status": 200,
+          "anonymous_status": 401,
+          "authentication": "existing_grafana_runtime_account",
+          "api_verified": true,
+          "frozen_panel_model_matches": true
+        }
+      },
+      "retired_dashboards": {
+        "event-outbox": {
+          "status": 404,
+          "anonymous_status": 401,
+          "authentication": "existing_grafana_runtime_account",
+          "removed": true
+        }
+      },
+      "grafana_public_files": {
+        "/etc/grafana/provisioning": {
+          "readable": true,
+          "mode_uid_gid": "755 472 0"
+        },
+        "/etc/grafana/provisioning/dashboards": {
+          "readable": true,
+          "mode_uid_gid": "755 472 0"
+        },
+        "/etc/grafana/provisioning/dashboards/dashboards.yml": {
+          "readable": true,
+          "mode_uid_gid": "644 472 0"
+        },
+        "/var/lib/grafana/dashboards": {
+          "readable": true,
+          "mode_uid_gid": "755 472 0"
+        },
+        "/var/lib/grafana/dashboards/event-overview.json": {
+          "readable": true,
+          "mode_uid_gid": "644 472 0"
+        },
+        "/var/lib/grafana/dashboards/event-transactions.json": {
+          "readable": true,
+          "mode_uid_gid": "644 472 0"
+        }
+      },
+      "grafana_provider_org_id": 1
+    },
+    "historical_fact_audit_run": 41150741066,
+    "historical_fact_audit": {
+      "available": false,
+      "category": "ledger_evidence_integrity",
+      "classification_available": true,
+      "elapsed_ms": 69,
+      "evidence_counts": {
+        "active_operations": 57,
+        "archive_missing": 51,
+        "archive_present_without_anchor": 0,
+        "execution_missing": 51,
+        "execution_not_committed": 0,
+        "reference_mismatch": 0,
+        "unproven_created_on_or_after_20261028": 0,
+        "witness_missing": 51,
+        "witness_not_committed": 0
+      },
+      "historical_classification_available": true,
+      "historical_cohort_sha256": "76a5260d862fdbfb4759d56c41dbf1a58b1518ab788426eded212b1d2991d6cc",
+      "historical_evidence_counts": {
+        "admission_accepted": 47,
+        "admission_held": 0,
+        "admission_rejected": 4,
+        "admission_unsettled": 0,
+        "archive_missing": 51,
+        "matching_legacy_publication": 0,
+        "matching_legacy_publication_confirmed": 0
+      },
+      "historical_fact_audit_available": true,
+      "historical_fact_counts": {
+        "evaluation_state_present": 22,
+        "receipt_matches_stored_inbox": 51,
+        "receipt_metadata_present": 51,
+        "rows": 51,
+        "terminal_workflow_projection_with_event_version": 23,
+        "workflow_projection_present": 29
+      },
+      "historical_kind_decisions": {
+        "1": {
+          "accepted": 28,
+          "rejected": 1
+        },
+        "4": {
+          "accepted": 18
+        },
+        "5": {
+          "accepted": 1,
+          "rejected": 3
+        }
+      },
+      "mutation": false,
+      "read_only": true
+    },
+    "worker_retention_counterfactual": {
+      "original": {
+        "failed": "Current image has unrecognized aliases; refusing cleanup"
+      },
+      "repaired": {
+        "accepted_current": true,
+        "candidate_count": 0,
+        "all_container_images_protected": true
+      }
+    },
+    "local_retention_native": {
+      "native_docker": true,
+      "network": false,
+      "database": false,
+      "dry_run_no_mutation": true,
+      "digest_alias_reproduced": false,
+      "stopped_reference_protected": true,
+      "explicit_rollback_after_bootstrap_protected": true,
+      "unknown_repository_untouched": true,
+      "container_state_unchanged": true,
+      "removed_owned_tags": 2,
+      "status": "passed"
+    },
+    "local_installer_native": "all three isolated host profiles passed real visudo; preview/no install; install/idempotence/original lock inode; exact command allowed; generic Python denied; wrong helper/host refused",
+    "helper_sha256": "53ec1f1e093aca37ad671a50d37203b87757f2daea7f78d03e96df7c51474324",
+    "node_helper_status": {
+      "serverA": "absent; new fixed Python command is outside current allowed policy",
+      "serverB": "different installed helper; new isolated invocation not granted by old fixed-helper rule",
+      "serverD": "absent; existing administrator sudo policy is available"
+    },
+    "production_workflows": "all four active; variables and production services unchanged in this closeout"
+  },
+  "historically_verified": {
+    "M3_C": "Previously recorded full14-case native RocketMQ/Worker restart, redelivery, realRedis and business idempotency validation. The complete14-case suite was not rerun in this resume segment; current mainCI runs are separately recorded. No production chaos was run.",
+    "SDK": "Previously published Go v0.6.1 and formal host dependency updates; no new SDK release in this resume segment"
+  },
+  "pending": [
+    "Full four-repository PR CI and subsequent exact main CI",
+    "Trusted helper installation, bounded sudo policy and actual preview/apply on production nodes",
+    "Original transaction evidence for 51 historical commands; matched admission and projections do not replace original commit proof"
+  ],
+  "constraints": {
+    "operator_production_DB_migration": false,
+    "operator_production_DB_deletion": false,
+    "business_replay": false,
+    "production_Broker_chaos_or_restart": false,
+    "preserve_transaction_history_ACK_and_scheduling": true,
+    "additional_M4_M5_implementation": false
+  },
+  "retained_local_failures": [
+    "First native fixture saved by image ID, so manifest RepoTags was null; corrected tag selection",
+    "Second native fixture import rejected repository@digest RepoTags on classic local engine; production containerd inventory is tested separately",
+    "Initial local QS document check failed only stale source baselines; final baseline corrected without altering verification rules"
+  ]
+}
