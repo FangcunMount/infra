@@ -1,0 +1,700 @@
+{
+  "schema": "m5-empty-ai-publisher-review-package/v1",
+  "kind": "review_only_not_offline_approval",
+  "created_at": "2026-10-31T14:52:00.034207+00:00",
+  "review_ready": true,
+  "execution_ready": false,
+  "production_apply_approved": false,
+  "data_owner": "shujie",
+  "recovery_owner": "shujie",
+  "operator_scope_this_task": "User explicitly instructed continue through M5 release; actual production gates/receipts and exact one-use machine approvals remain required. No repeated goal permission requested.",
+  "source": {
+    "qs_main": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+    "infra_PR417_head": "6ddbb851280a3f2f59778441b90e7fcc187a8cba",
+    "qs_maintenance_candidate": "7f8390c74aec46954d3fd2578e32dd06629400d3",
+    "infra_owner_proof_candidate": "e760d25a1c279fe7d6f5bac5995801db89d15f10",
+    "qs_maintenance_candidate_source_review": "549ad91a9cfd25e98aaf430cb9dd034601979ecf"
+  },
+  "scope": {
+    "only_drop": "qs.mysql.ai_messaging_outbox",
+    "initial_pair": [
+      110,
+      44
+    ],
+    "target_pair": [
+      111,
+      44
+    ],
+    "other_five_candidates": "retain",
+    "protected": [
+      "transaction execution/guard/witness",
+      "archive and original immutable wire",
+      "Inbox/idempotency receipts",
+      "business ACK and business history",
+      "authorized retry/hold schedules"
+    ],
+    "forbidden": [
+      "Force/down",
+      "dirty clearing",
+      "batch retired marking",
+      "queue purge",
+      "old ledger replay after any business runtime start"
+    ]
+  },
+  "baseline_readonly_run": 41209690150,
+  "snapshot": {
+    "source_sha": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+    "migration_resources_sha256": "b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de",
+    "mysql_database": "qs",
+    "mongo_database": "qs",
+    "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+    "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+    "mysql_version": 110,
+    "mongo_version": 44,
+    "target_mysql_version": 111,
+    "target_mongo_version": 44
+  },
+  "offline_binary_sha256": "8ab07b2616c65fba6ad8f9c6f21777e3a2568ecc93cc131664a4255c001cb0ac",
+  "maintenance_container": {
+    "name": "qs-m5-maintenance-41209612364-1",
+    "id": "d281c02c94821efba06013e36a8fca561e8c502e076a812dddbf5d387da91720",
+    "image_id": "sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b",
+    "UID": "2000:2000",
+    "stage_run": 41209612364,
+    "application_started": false
+  },
+  "live_runtime_observed_at": {
+    "serverA": "2026-10-31T14:47:09.139416+00:00",
+    "serverD": "2026-10-31T14:47:09.935217+00:00"
+  },
+  "six_QS_instances": [
+    {
+      "host": "serverA",
+      "name": "qs-collection-server-1",
+      "id": "13491d805fd009d0552397efd96e4a18d7e59b97e26edf0daa1e985a64f8327d",
+      "image_id": "sha256:21fe0619dfb8f037b6382c4bf9508d871be01d87547a5da5839325beeccf4e96",
+      "source_sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+      "status": "running",
+      "restart_count": 0,
+      "stop_timeout": null,
+      "restart_policy": {
+        "Name": "unless-stopped",
+        "MaximumRetryCount": 0
+      },
+      "compose": {
+        "com.docker.compose.project": "qs-collection",
+        "com.docker.compose.project.config_files": "/tmp/qs-deploy-collection-3715621/docker-compose.prod.yml",
+        "com.docker.compose.project.working_dir": "/tmp/qs-deploy-collection-3715621",
+        "com.docker.compose.service": "server"
+      },
+      "configs": []
+    },
+    {
+      "host": "serverA",
+      "name": "qs-collection-server-2",
+      "id": "26993344f3ace2d1cb0752a8522dd5bfd79dafb7823ebe5db13c7d9fec7095aa",
+      "image_id": "sha256:21fe0619dfb8f037b6382c4bf9508d871be01d87547a5da5839325beeccf4e96",
+      "source_sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+      "status": "running",
+      "restart_count": 0,
+      "stop_timeout": null,
+      "restart_policy": {
+        "Name": "unless-stopped",
+        "MaximumRetryCount": 0
+      },
+      "compose": {
+        "com.docker.compose.project": "qs-collection",
+        "com.docker.compose.project.config_files": "/tmp/qs-deploy-collection-3715621/docker-compose.prod.yml",
+        "com.docker.compose.project.working_dir": "/tmp/qs-deploy-collection-3715621",
+        "com.docker.compose.service": "server"
+      },
+      "configs": []
+    },
+    {
+      "host": "serverA",
+      "name": "qs-apiserver",
+      "id": "baabe9101fb7d0066c184fa11d941904b44e9f649d83200299137514a1e9f0d3",
+      "image_id": "sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b",
+      "source_sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+      "status": "running",
+      "restart_count": 0,
+      "stop_timeout": 510,
+      "restart_policy": {
+        "Name": "unless-stopped",
+        "MaximumRetryCount": 0
+      },
+      "compose": {
+        "com.docker.compose.project": "qs-deploy-apiserver-3703660",
+        "com.docker.compose.project.config_files": "/tmp/qs-deploy-apiserver-3703660/docker-compose.prod.yml,/opt/qs-server/qs-apiserver/ai-mq-releases/a792c60162d2cb8435b5a9c7e04ecf963330c7dc/compose.json",
+        "com.docker.compose.project.working_dir": "/tmp/qs-deploy-apiserver-3703660",
+        "com.docker.compose.service": "qs-apiserver"
+      },
+      "configs": [
+        {
+          "path": "/opt/qs-server/qs-apiserver/ai-mq-releases/a792c60162d2cb8435b5a9c7e04ecf963330c7dc/apiserver.json",
+          "sha256": "dffc348f4673c2215c5907819b218a637a67b20d7dc0b3650dbf731dd5b009f6",
+          "boolean_flags": {
+            ".ai_workflow.enabled": true,
+            ".ai_workflow.management.enabled": true,
+            ".ai_workflow.messaging.rocketmq.publish_enabled": true,
+            ".ai_workflow.messaging.enabled": true,
+            ".assessment_assets.enabled": true,
+            ".backpressure.iam.enabled": true,
+            ".backpressure.mongo.enabled": true,
+            ".backpressure.mysql.enabled": true,
+            ".delegated-subject.enabled": true,
+            ".evaluation_consistency_audit.enable": true,
+            ".evaluation_lease_recovery.enable": true,
+            ".eventing.consumers.modelcatalog-hot-rank.enabled": true,
+            ".eventing.standard_outbox.assessment": false,
+            ".eventing.standard_outbox.mongo": false,
+            ".grpc.acl.enabled": true,
+            ".grpc.audit.enabled": false,
+            ".grpc.auth.enabled": false,
+            ".grpc.enable-health-check": true,
+            ".grpc.enable-reflection": false,
+            ".grpc.insecure": false,
+            ".grpc.mtls.enable-auto-reload": true,
+            ".grpc.mtls.enabled": true,
+            ".grpc.mtls.require-client-cert": true,
+            ".iam.authz-sync.enabled": true,
+            ".iam.authz-sync.ephemeral-nsq": false,
+            ".iam.authz-sync.rocketmq.publish_enabled": false,
+            ".iam.authz-version-guard.enabled": true,
+            ".iam.enable-metrics": true,
+            ".iam.enable-tracing": true,
+            ".iam.enabled": true,
+            ".iam.grpc.keepalive-permit-without-stream": false,
+            ".iam.grpc.tls.enabled": true,
+            ".iam.grpc-enabled": true,
+            ".iam.jwks-enabled": true,
+            ".iam.jwt.force-remote-verification": false,
+            ".iam.profile-link-cache.enabled": true,
+            ".iam.user-cache.enabled": true,
+            ".interpretation_lease_recovery.enable": true,
+            ".lock_lease.renewal_enabled": true,
+            ".log.compress": true,
+            ".log.development": false,
+            ".log.disable-caller": true,
+            ".log.disable-stacktrace": true,
+            ".log.enable-color": false,
+            ".log.enable-level-output": true,
+            ".log.enable-time-rotation": true,
+            ".messaging.enabled": true,
+            ".messaging.rocketmq.publish_enabled": true,
+            ".migration.autoseed": false,
+            ".migration.enabled": false,
+            ".mongo_consistency_audit.enable": false,
+            ".mongodb.direct-connection": false,
+            ".mongodb.enable-logger": true,
+            ".mongodb.log-command-detail": true,
+            ".mongodb.log-reply-detail": false,
+            ".mongodb.log-started": false,
+            ".mongodb.ssl-allow-invalid-hostnames": false,
+            ".mongodb.ssl-insecure-skip-verify": false,
+            ".mongodb.use-ssl": false,
+            ".oss.enabled": true,
+            ".oss.use-cname": false,
+            ".oss.use-internal-endpoint": true,
+            ".plan_scheduler.enable": true,
+            ".plan_scheduler.missed_expiration_enabled": true,
+            ".rate_limit.enabled": true,
+            ".redis.enable-cluster": false,
+            ".redis.use-ssl": false,
+            ".redis_runtime.families.business_rank.allow_fallback_default": true,
+            ".redis_runtime.families.lock_lease.allow_fallback_default": true,
+            ".redis_runtime.families.meta_hotset.allow_fallback_default": true,
+            ".redis_runtime.families.object_view.allow_fallback_default": true,
+            ".redis_runtime.families.ops_runtime.allow_fallback_default": true,
+            ".redis_runtime.families.query_result.allow_fallback_default": true,
+            ".redis_runtime.families.query_result.allow_warmup": true,
+            ".redis_runtime.families.sdk_token.allow_fallback_default": true,
+            ".redis_runtime.families.static_meta.allow_fallback_default": true,
+            ".redis_runtime.families.static_meta.allow_warmup": true,
+            ".report_catalog_audit.enable": true,
+            ".server.healthz": true,
+            ".server.metrics": true,
+            ".server.profiling": true,
+            ".signaling.redis.enabled": true,
+            ".statistics_sync.enable": true,
+            ".system_governance.prometheus.enabled": true,
+            ".system_governance.resilience.release_lock": false,
+            ".system_governance.resilience.tune_rate_limit": false,
+            ".system_governance.retry.manual_actions_enabled": true
+          }
+        }
+      ]
+    },
+    {
+      "host": "serverD",
+      "name": "qs-worker-runtime-2",
+      "id": "bad509ce0a51764c5a0b200d83a747f90ace47eaaf0ff4c6983f7d69eb418569",
+      "image_id": "sha256:ae7f6d5fe260dcffc1a97011a1c68a2ce6b410ed8460b55ee1c75d25ed26ce6d",
+      "source_sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+      "status": "running",
+      "restart_count": 0,
+      "stop_timeout": 510,
+      "restart_policy": {
+        "Name": "unless-stopped",
+        "MaximumRetryCount": 0
+      },
+      "compose": {
+        "com.docker.compose.project": "qs-worker",
+        "com.docker.compose.project.config_files": "/tmp/qs-deploy-worker-3146535/docker-compose.prod.yml",
+        "com.docker.compose.project.working_dir": "/tmp/qs-deploy-worker-3146535",
+        "com.docker.compose.service": "runtime"
+      },
+      "configs": []
+    },
+    {
+      "host": "serverD",
+      "name": "qs-worker-runtime-1",
+      "id": "0b6715e9f4b493d2e73c1d5e67d313ed11938edc4947153cfb4b55709daba5e9",
+      "image_id": "sha256:ae7f6d5fe260dcffc1a97011a1c68a2ce6b410ed8460b55ee1c75d25ed26ce6d",
+      "source_sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+      "status": "running",
+      "restart_count": 0,
+      "stop_timeout": 510,
+      "restart_policy": {
+        "Name": "unless-stopped",
+        "MaximumRetryCount": 0
+      },
+      "compose": {
+        "com.docker.compose.project": "qs-worker",
+        "com.docker.compose.project.config_files": "/tmp/qs-deploy-worker-3146535/docker-compose.prod.yml",
+        "com.docker.compose.project.working_dir": "/tmp/qs-deploy-worker-3146535",
+        "com.docker.compose.service": "runtime"
+      },
+      "configs": []
+    },
+    {
+      "host": "serverD",
+      "name": "qs-worker-runtime-3",
+      "id": "a4a95e31ddf367b49e8479553f8a4e61b4cf13715599edda3e1b7a5be25f8309",
+      "image_id": "sha256:ae7f6d5fe260dcffc1a97011a1c68a2ce6b410ed8460b55ee1c75d25ed26ce6d",
+      "source_sha": "a792c60162d2cb8435b5a9c7e04ecf963330c7dc",
+      "status": "running",
+      "restart_count": 0,
+      "stop_timeout": 510,
+      "restart_policy": {
+        "Name": "unless-stopped",
+        "MaximumRetryCount": 0
+      },
+      "compose": {
+        "com.docker.compose.project": "qs-worker",
+        "com.docker.compose.project.config_files": "/tmp/qs-deploy-worker-3146535/docker-compose.prod.yml",
+        "com.docker.compose.project.working_dir": "/tmp/qs-deploy-worker-3146535",
+        "com.docker.compose.service": "runtime"
+      },
+      "configs": []
+    }
+  ],
+  "ingress": [
+    {
+      "host": "serverA",
+      "path": "/data/apps/nginx-configs/qs.fangcunmount.cn.conf",
+      "original_sha256": "26efeedd9f41e913b751f355977635efb8ab693eab179ec47b6f78a9ef85a156",
+      "closed_sha256": "ca98f65c836b9a7ae91e569ce1f4e3f3d8a84c3e623a4d30e22538aa131f82ea",
+      "mode": "0o644",
+      "uid": 2000,
+      "gid": 2000,
+      "original_copy": "ingress/original/qs.fangcunmount.cn.conf",
+      "closed_copy": "ingress/closed/qs.fangcunmount.cn.conf",
+      "active_changed": false,
+      "inactive_nginx_syntax_verified_this_task": false
+    },
+    {
+      "host": "serverA",
+      "path": "/data/apps/nginx-configs/collect.conf",
+      "original_sha256": "bb122f4c320c1f6f9532b0ee232dba4971e26409f63133accb01c8b0b513b8d5",
+      "closed_sha256": "29ccda8cdac2f5778a170bcbc38b351cd643b5af54025cc20f73f928c5fac441",
+      "mode": "0o644",
+      "uid": 1002,
+      "gid": 2001,
+      "original_copy": "ingress/original/collect.conf",
+      "closed_copy": "ingress/closed/collect.conf",
+      "active_changed": false,
+      "inactive_nginx_syntax_verified_this_task": false
+    }
+  ],
+  "budgets": {
+    "normal_window_seconds": 1800,
+    "startup_reserve_seconds": 900,
+    "recovery_seconds": 3600,
+    "retention_days_minimum": 30,
+    "execute_before_T0_plus_seconds": 900,
+    "deadline_not_started": true
+  },
+  "same_window": {
+    "window_started_at": null,
+    "operation_id": null,
+    "runtime_frozen": false,
+    "freeze_receipt_sha256": null,
+    "protection_manifest_sha256": null,
+    "restore_receipt_sha256": null,
+    "startup_receipt_sha256": null,
+    "first_runtime_marker": null,
+    "approval_file": null
+  },
+  "recovery_route": {
+    "mode": "same fixed Go offline maintenance binary; separate exact original empty-target/full-ledger approval; outer pre-start-repair boundary",
+    "source": "657734fba69ab0cc6fb9edec584dd8c5d5617da7",
+    "client_UID": "2000:2000",
+    "TLS": "original VERIFY_IDENTITY/CA and explicit canonical QS pair",
+    "original_export": "--capture-original-operation, timeout<=2m, complete full retained hashes + original empty target DDL and full one-row ledger110/clean",
+    "inspection": "--restore-original/--restore-original-sha256 default readonly; known interrupted111 dirty/clean or complete original110; all retained assets exact",
+    "apply": "separate --restore-apply/--restore-approval-file/--restore-approval-sha256; kind qs_m5_original_empty_restore; bound actual state/material/source/receipts; one hour recovery budget; one-use",
+    "before_start": [
+      "actual host exclusion/server activity and durable no-first-start boundary",
+      "reread all original material/approval/retained facts before exclusive consume",
+      "restore only missing exact original empty target; no IF NOT EXISTS or overwrite",
+      "reverify all retained facts; serializable full actual111 ledger lock and captured whole110 row replay",
+      "transaction rollback/DDL partial/commit unknown retained; no automatic retry",
+      "independent full original object equality and110/44 before original M4 start"
+    ],
+    "after_start": [
+      "keep111",
+      "preserve new facts",
+      "reviewed111-compatible forward image/patch only",
+      "never replay original110 ledger"
+    ],
+    "native_actual_transport_rehearsal_passed": false,
+    "production_restore_executed": false
+  },
+  "gates": [
+    {
+      "id": "G01",
+      "state": "original_native_pass_forward_and_live_pending",
+      "need": "original13+CLI9 true original overlap passed41222119780; final forward extension and live handoff pending"
+    },
+    {
+      "id": "G02",
+      "state": "pending_window",
+      "need": "actual producer/consumer/provider drain and primary activity/autonomous expiry exclusion"
+    },
+    {
+      "id": "G03",
+      "state": "pending_CI_and_build",
+      "need": "exact successful main immutable images plus111-compatible forward candidate; separate no-deploy/no-latest build workflow, original CD remains disabled"
+    },
+    {
+      "id": "G04",
+      "state": "pending_window",
+      "need": "same-window original materials and complete retained asset catalog/baselines within budget"
+    },
+    {
+      "id": "G05",
+      "state": "native_CLI_pass_final_source_binding_pending",
+      "need": "actual original-export/restore CLI three states, refusal and real INSERT permission rollback passed41225761018; final main artifact and production original material pending"
+    },
+    {
+      "id": "G06",
+      "state": "goal_authorized_pending_actual_receipts",
+      "need": "user requested continue through release; bind actual window/material/image/review/first-start facts to independent controlled machine approval, no placeholder approval"
+    },
+    {
+      "id": "G04a",
+      "state": "native_pass_live_budget_pending",
+      "need": "complete full typedSQL/BSON multiset real native passed41225761018; production readonly budget and TTL qualification pending"
+    },
+    {
+      "id": "G07",
+      "state": "existing_admin_positive_control_and_actual_read_pass_window_pending",
+      "need": "no grants/roles modified; existing admin profile41222747868, actual clean110 readonly14query sample41225913119 complete; native lock positive control passed; window fresh reads still required"
+    }
+  ],
+  "actual_actions_this_task": {
+    "stopped_business": false,
+    "SQL111_executed": false,
+    "restored_database": false,
+    "started_new_runtime": false,
+    "nginx_reloaded": false,
+    "CD_enabled": false,
+    "protected_records_modified": false
+  },
+  "private_material_root": "/Users/yangshujie/.codex/m5/20261031-local-continuation/execution-package",
+  "local_evidence_retention": "no automatic cleanup; at least30days after eventual acceptance and longer while responsibility open",
+  "expected_changes": {
+    "SQL111_success": {
+      "qs.mysql.ai_messaging_outbox": "absent",
+      "qs.mysql.schema_migrations": "exact one row111,false"
+    },
+    "R1_before_ledger_replay": "original empty target restored; known interrupted111 row retained until final transaction",
+    "R1_verified": "exact original110,false and full original target restored",
+    "all_other_protected_assets": "exact original structure/content; Mongo44 head unchanged"
+  },
+  "coordinator": {
+    "initialize": "only afterW06 with actual same-window protection hash",
+    "pre_W06_abort": "durable cancelled/restart-issued record; permanently cancel operation; no database restoration",
+    "host_locks": "original inode held throughout window by controlled A/D sessions; interruption stops progression",
+    "deployed_this_task": false,
+    "apply_and_verify": "W08+W09 one pre-start-maintenance; no success until allpostchecks pass",
+    "R1": "independent one-use pre-start-repair only from maintenance_failed/issued; exact restore+110/44verification before maintenance_returned",
+    "pre_start_restore_selected": false
+  },
+  "failed_readonly_probe": {
+    "endpoint": "serverA http://127.0.0.1:19090/metrics",
+    "result": "RemoteDisconnected; no valid metrics receipt",
+    "zero_or_drain_inferred": false
+  },
+  "private_raw_hashes": {
+    "serverA": "2d6d56aa81adc92809045f9131e3a6aee4e6f2b0ae000e9397e2b2facc61a8ca",
+    "serverD": "143a504b7d554aa006d0d1fa38634bf1bac1be83f40f9f4b8ace224a73b86d74"
+  },
+  "validation": {
+    "local_existing_unit_tests": {
+      "operator": 5,
+      "start_boundary": 17,
+      "nginx_render": 4,
+      "failed": 0
+    },
+    "chosen_boundary_route_fixture": {
+      "fixture_only": true,
+      "actual_database_or_SSH_called": false,
+      "synthetic_hashes_used_only_in_owned_fixture": true,
+      "checks": [
+        "apply_unknown_retains_failed",
+        "failed_apply_cannot_start",
+        "separate_R1_repair_returns_startable",
+        "marker_durable_before_start_callback",
+        "all_old_restore_paths_refused_after_start"
+      ],
+      "passed": 5,
+      "production_restore_or_approval": false
+    },
+    "JSON_scope_and_local_link_checks": "passed",
+    "git_diff_check": "passed",
+    "new_CI_run": false,
+    "production_restore_transport_acceptance": false,
+    "final_runtime_comparison": [
+      {
+        "host": "serverA",
+        "first_read": "2026-10-31T14:47:09.139416+00:00",
+        "last_read": "2026-10-31T15:01:04.930399+00:00",
+        "all_selected_containers_and_config_unchanged": true,
+        "nginx_files_unchanged": true,
+        "unordered_mounts_compared_by_unique_destination": true
+      },
+      {
+        "host": "serverD",
+        "first_read": "2026-10-31T14:47:09.935217+00:00",
+        "last_read": "2026-10-31T15:01:04.223466+00:00",
+        "all_selected_containers_and_config_unchanged": true,
+        "nginx_files_unchanged": true,
+        "unordered_mounts_compared_by_unique_destination": true
+      }
+    ],
+    "initial_comparison_refusal": "raw Docker mount enumeration order differed; raw evidence preserved, unique destinations normalized; no runtime delta",
+    "final_CD_state": "disabled_manually",
+    "validated_at": "2026-10-31T15:02:20.001300+00:00",
+    "latest_infra_rocketmq_unit_suite": {
+      "passed": 499,
+      "failed": 0,
+      "elapsed_seconds": 18.25,
+      "actual_Broker_or_production_claimed": false
+    },
+    "infra_e760_checks": {
+      "success": 84,
+      "skipped_conditional": 2,
+      "failure": 0,
+      "run": 41221780410
+    }
+  },
+  "recovery_route_history": [
+    {
+      "mode": "reviewed manual SQL session in fixed Python asyncmy client; separate future authorization",
+      "client_image": "sha256:18a39e862a82bfb9b503a3dd93639688bc45016caa2c7f1bf9081953b4523fa0",
+      "client_source": "f9f24abdf98535295c4e3d223675ef6be62115e2",
+      "python": "3.11.18",
+      "asyncmy": "0.2.14",
+      "dependency_import_probe": "passed at UIDs10001 and2000, CA readable at2000; no database connection",
+      "maintenance_container_created": false,
+      "installed_production_restore_API": false,
+      "native_actual_transport_rehearsal_passed": false,
+      "before_start": [
+        "inspect server activity and interrupted exact111 state",
+        "restore only captured original empty table if absent; verify exact DDL/zeroEOF",
+        "compare all retained asset baselines",
+        "last: transactionally replay complete original one-row ledger under independent review",
+        "canonical verify clean110/44 before original M4 start"
+      ],
+      "after_start": [
+        "keep111",
+        "preserve new facts",
+        "use reviewed111-compatible forward image/patch",
+        "never replay original110 ledger"
+      ],
+      "client_UID": "2000:2000"
+    }
+  ],
+  "continuation_2026_11_01": {
+    "goal_authorization_quote": "继续执行，直至 M5 完成发布",
+    "release_complete": false,
+    "CD_last_read": "disabled_manually",
+    "actual_runtime": "original a792, all six running, zero restarts at00:22-00:23CST",
+    "current_business_readonly": {
+      "identity_matches": true,
+      "operations": 57,
+      "all_current_decisions": "accepted/rejected",
+      "awaiting": 0,
+      "held": 0,
+      "original_anchor_missing": 51,
+      "historic_closed": false,
+      "QS_inbox_stored": 2780,
+      "quarantine": 0,
+      "visible_other_innodb_transactions": 0,
+      "visible_QS_sessions": "7 Sleep; not proof of global writer exclusion",
+      "metadata_lock_query": "unavailable1142",
+      "autonomous_schema_programs": {
+        "event": 0,
+        "trigger": 0,
+        "routine": 0
+      },
+      "retry_schedule_and_retry_hold": "empty at observation",
+      "reminder_delivery": "one confirmed; original record retained",
+      "reminder_batches": "one frozen and three suppressed; frozen is fixed identity, not an active send",
+      "runtime_frozen": false
+    },
+    "probe_v2_predicate_note": "Generic terminal list incorrectly includes confirmed in nonterminal projection; raw report retained, not interpreted as an active provider call. Formal notification states/source reviewed separately. No record changed.",
+    "metrics": {
+      "url": "http://127.0.0.1:8081/metrics",
+      "response": "200",
+      "owner_sdk_ready": {
+        "qs.mysql": 1,
+        "qs.mongo": 1
+      },
+      "active_running_queued": "0 for both owners",
+      "QS_business_observation_available": 0,
+      "earlier19090_failure_retained": true
+    },
+    "native_runs": {
+      "QS_full_CI": 41219365688,
+      "owner_CLI_first": {
+        "run": 41219211994,
+        "result": "failed original pre-commit observer at line564; combined Go order allows prior CLI committed fixture messages into shared consumer route; no production action",
+        "artifact": 13049014275,
+        "zip_sha256": "1bd8f26dcec18e7d664125744f95c96b5f480120d7afd1993383e11c0469008d",
+        "partial_CLI_pass_not_claimed": true
+      },
+      "owner_CLI_ordered_retry": {
+        "run": 41220540652,
+        "state": "cancelled as superseded before qualification; not passed",
+        "QS_source": "657734fba69ab0cc6fb9edec584dd8c5d5617da7",
+        "infra_source": "92c92a718c9a790af5bfb11eab2980589dfe65d1"
+      },
+      "QS_latest_full_CI": 41221031152,
+      "owner_CLI_retry_751": {
+        "run": 41221356227,
+        "QS_source": "7510040e3a2b3e1b8c7af6aff586ae7a92441dfd",
+        "infra_source": "92c92a718c9a790af5bfb11eab2980589dfe65d1",
+        "state": "superseded pending nine-field overlap proof"
+      },
+      "owner_original_overlap_pass": {
+        "run": 41222119780,
+        "artifact": 13051136918,
+        "zip_sha256": "ac9e2304d535b2b14f0ab21da8e955cee951b74c83416456bbc9d5222919b250",
+        "QS_source": "25a4b36b999568806f73335b8824a588f9865338",
+        "infra_source": "e760d25a1c279fe7d6f5bac5995801db89d15f10",
+        "original_passed": 13,
+        "CLI_passed": 9,
+        "failed": 0,
+        "skipped": 0,
+        "covers_forward111_extension": false
+      },
+      "QS_aa_CI": {
+        "run": 41225761018,
+        "native_retained_restore_cli_protocol": "success",
+        "native_admin_actual_lock_and_pending_alter": "success",
+        "overall": "Run Tests failed fixed job inventory16 vs new17; all operation exclusions retained and updated, local race passed"
+      },
+      "forward_owner_candidate": {
+        "run": 41227966209,
+        "QS_source": "7f8390c74aec46954d3fd2578e32dd06629400d3",
+        "state": "pending"
+      }
+    },
+    "production_changes": "only private diagnostic binary files in existing idle maintenance container; no new container, application/config/gate change or DB mutation",
+    "lint_failure": {
+      "run": 41219365688,
+      "job": 124590506889,
+      "result": "three unchecked close/hash-writer results; fixed under6c927948; local race/lint/docs gates pass; latest7510040e CI pending, no weakening"
+    },
+    "nginx_inactive_syntax": {
+      "attempt1": "refused private-key read after artificial cap drop; no live change",
+      "attempt2": "syntax ok, readonly scratch cache directory refused; no live change",
+      "attempt3": "passed full current image/config composition with actual source read privileges and private scratch tmpfs",
+      "result": "nginx -t successful",
+      "source_image": "sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d",
+      "live_files_unchanged": true,
+      "reload_performed": false,
+      "owned_validation_containers_remaining": false
+    },
+    "live_overlap_native_requirement": {
+      "mandatory_flags": 9,
+      "source_review": "549ad91a9cfd25e98aaf430cb9dd034601979ecf",
+      "sequence": [
+        "real original roots committed, Broker final reply unavailable",
+        "original SDKs remain live during actual independent CLI registration against same primaries",
+        "CLI Ready and original SDK Ready observed together",
+        "original SDKs normal successful stop; CLI stays Ready with unresolved responsibility",
+        "SIGTERM/stop cannot close last unresolved CLI owners",
+        "release actual Broker checks; positive audit/no repeated business root/wire stable; actual SDK and process exit"
+      ],
+      "actual_pass_pending": true
+    },
+    "admin_activity": {
+      "complete": true,
+      "connection_released": true,
+      "database_released": true,
+      "error_category": "none",
+      "expected_target_hash": "8249a6ecd31f7c85b5efccf757138700a0c0eecc8fe792a77153b6dadf524a16",
+      "failure_stage": "none",
+      "format_version": 1,
+      "freeze_verified": false,
+      "m5_activity_only": true,
+      "measurements": {
+        "counts": {
+          "qs_active_threads": 0,
+          "qs_enabled_events": 0,
+          "qs_metadata_locks_granted": 0,
+          "qs_metadata_locks_pending": 0,
+          "qs_modifying_transactions": 0,
+          "qs_threads": 7,
+          "qs_transactions": 0
+        },
+        "mysql_dirty": false,
+        "mysql_version": 110,
+        "sampled_at_epoch_microseconds": 1793468649112617
+      },
+      "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+      "observations_atomic": false,
+      "query_count": 14,
+      "read_only": true,
+      "run_id": "41225913119-1",
+      "source_sha": "aa1387b7951f015c52d3a00cd56d7f4246f5247b",
+      "source_target_hash": "8249a6ecd31f7c85b5efccf757138700a0c0eecc8fe792a77153b6dadf524a16"
+    },
+    "admin_profile_run": 41222747868
+  },
+  "current_private_raw_hashes": {
+    "current-business-readonly-20261101.json": "a8c9e6645860905d0e1ae7ed0f14513b3b4dde1cb2e6089d03c8145abb7d44ca",
+    "current-metrics-20261101.json": "d723a0f7f42a1b5e58e0d8cd06bf6cfe3cfab7da972bf64b2517aa92ee021a0e",
+    "infra-419-readable-failed.zip": "58a3f2f13693749687f83d410f7a159395fe3d025feb3dd77ee0e3d5813c6f80",
+    "current-business-readonly.go": "20433b2b30af99262349d8f4da76e3cf32c975247fcea3baa0debbfc96caa21b",
+    "serverD-20261101-readonly.json": "ae62741745a6ded0c022838dff7448ea4bad98a12cab1de4ecf1555bea1b518e",
+    "m5-owner-drain-41219211994.zip": "1bd8f26dcec18e7d664125744f95c96b5f480120d7afd1993383e11c0469008d",
+    "current-business-readonly-v2-20261101.json": "c6096a0ac4f6cb12d40b33e3907f7d836ab19c763aa734d693caa3531d5db269",
+    "superseded-qs-ci-cancellation-20261101.json": "a307191fca18e9af546d61f9e6364205601575bac5ce7fe60a0e176c19fde987",
+    "current-business-readonly-v2.go": "78491c62f3aa4cc78d19e1fc29a8fb198b6122c5c485bdc2426e521fa1edbb17",
+    "serverA-20261101-readonly.json": "ba0a08277c105d14bb46d5f6ff4beb21d127f45598e982d18552a8394a9fdce4",
+    "nginx-inactive-syntax-20261101.json": "aa1e308728053b8bd1c98292642623091bd9b9948c37c5f6f742772cbb570f3b",
+    "superseded-qs-657-ci-cancelled-20261101.json": "a3af95616a03fd79f5f2815989cdc9b4b342a64b2d4cef7470ae0965888b565b",
+    "nginx-inactive-syntax-20261101-attempt3.json": "e00e9a951a65d8de13a7519d999d5c03d9b303960bd6510e94389c28b5410385",
+    "nginx_inactive_validate.py": "8f08c897e2462ab46bd7018d7802fd08b7f8fadf3e1d00b8d1d92066a44ef54a",
+    "nginx-inactive-syntax-20261101-attempt2.json": "0f458ab7877ab8e381c561cf56f8b7ee510fea20a1915055bf81f977c0424bf0",
+    "nginx_inactive_validate_attempt3.py": "119f0c6e5ea5f031c690689034d39432ed8d1ddbad311663fcf7945929aa8fec",
+    "infra-current-unit-tests.log": "3850b382b65749e1de2ea02bb5e156a4dc7d7395f557642d42fb63f1a8d5fab2",
+    "superseded-owner-native-cancellations-20261101.json": "385e4ebec2a6cb323127f0f04b4769144ca82af315e513eb1881772d8deba6b9",
+    "m5-admin-activity-41225913119.json": "b3d5e4c47eef69a15ec14ccc690c03c6643496bf708c0714a6dc5ac0434f9f44"
+  }
+}

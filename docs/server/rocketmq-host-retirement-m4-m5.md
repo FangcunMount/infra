@@ -2,9 +2,25 @@
 
 2026-10-31 开始实施。本文的 M4/M5 是宿主工程退役，与此前 infra RocketMQ 迁移的同名阶段分开计数。M1–M3 的代码/上线记录不等于 M2 所有历史业务证据已验收，也不自动批准删除数据库对象。
 
+## 当前交付状态
+
+QS #474（main `1073f0c19c4991d80d9752f7fb69c395ae7590df`）和infra #418已合并，main CI通过；14项原生运行及三个实际进程启动/排空通过，结果保留各自执行源码归属。维护入口 #475 已合并为 `bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6`，候选29项成功、1项原条件跳过，精确main CI [41201613827](https://github.com/FangcunMount/qs-server/actions/runs/41201613827) 成功。生产仍运行M4，本轮未停业务、未创建维护容器、未修改现有数据库。
+
+固定1073三镜像的仅构建运行 [41197059223](https://github.com/FangcunMount/qs-server/actions/runs/41197059223) 成功，三份原始ZIP、源码/平台及两仓库digest/config-ID对应已核验，全部部署步骤跳过。QS CD最后实读为 `disabled_manually`，之后本任务未启用它；发布制品不等于实际运行版本。
+
+#475候选Docker原生artifact13041334522原ZIP `6c7ad3eb2606835d54cd9cb6a9bf2ffb45bc77c78b87658fbf408465c3d19265` 及内容已核验，执行于CI合并源码 `6144cb64ae272ffbda503b3ff9796a497196cd80`。ServerA只读预检 [41198015973](https://github.com/FangcunMount/qs-server/actions/runs/41198015973) 成功，artifact13041289357原ZIP `da415a3c006ec4ebdb8048ce322ac9c3f8adaa02fd2e4112fcc8ed1effea7b7a` 及内容已核验。源容器Docker `.Image=sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b` 与OCI config84f592...分开记录。预检没有stage、数据库查询、停写或恢复证明；旧失败全部保留。
+
+只读协议观察 [QS #476](https://github.com/FangcunMount/qs-server/pull/476) 已合并为 `be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399`，候选 `38d9419dd810f8e1a846fd72ee5999d0b7957f90` 的29项CI成功、1项原条件跳过。最终运行 [41202978415](https://github.com/FangcunMount/qs-server/actions/runs/41202978415/job/124542314662) 的原生日志已回读：110/44与111/44两子用例均RUN/PASS、无跳过，合计9.68秒，实际checkout为 `eaa3eaa79f5d82a6c07fce4356efad16edb64dc1`；保留非零责任、原行/文档不变及缺失/损坏binding不可用均经过实际断言。artifact13043815736的GitHub摘要为 `92fd194b2982f66bcfe385a4b7578c11ded55c16cd581426d3ed88c1d1e5bb60`，原ZIP字节仍待恢复执行连接后核验。精确main CI [41204413865](https://github.com/FangcunMount/qs-server/actions/runs/41204413865) 已成功，合并提交全部29项CI成功、1项原条件跳过。main原生110/44与111/44均实际RUN/PASS，日志checkout为be2e4e8d，合计10.79秒；main artifact13043972930的GitHub摘要 `b9240018efa34f35fd1a742f522c7ac8c2e4eccca5b0e5f3beca5caa65b83fe3` 已记录，原ZIP字节待验证。未观察到此合并提交的Production Deploy运行。
+
+首候选55f7的CI文档失败已保留：仅两份受影响README的源码核对记录过期，在核对实际Go/CI改动后于38d941修正；未放宽门禁。原云环境本地草稿 `bf059e5906362b7f27e79acacd70239ae0054480` 的本地race、14项脚本、集成标签编译与文档结果单独保留；源码未推送，最后docs-facts结果及断线后工作树须复读。独立远端候选不是原本地提交的字节导出，不移签其本地证据。恢复工作区后先保全原提交和未提交文档再同步，不reset或覆盖。
+
+数据责任人与恢复责任人均为用户指定的 **shujie**；这不是现有数据库写入批准。尚待协议观察最终CI、实际维护运输/数据库只读复验、事务排空/完整停写、同窗口保护与具体恢复执行路线，以及最终可消费批准。首批只涉及空 `qs.mysql.ai_messaging_outbox`，其余五对象保留。
+
+此前执行器发生transport disconnected/unavailable，平台状态API仍报running/connected，retained诊断为not_found，根因未核实。本轮实际命令已恢复，确认执行位置仍为Linux `/workspace`，并非用户MacBook。原bf059e提交、未提交文档和12个变动源码文件已导出并逐文件校验，工作树未改变；主线be2e为继续工作的源码，备份不覆盖main。MacBook执行须在本机仓库启动本地Codex任务，当前对话没有直接操作MacBook的执行通道。
+
 ## 本轮证据与范围
 
-[依赖清单](../evidence/2026-10-31-host-retirement-m5-dependencies.json)逐项绑定六仓最新 main 源码。它是本轮源码核对，不是现网表存在性、数据计数或责任关闭证明。生产运行、此前 M3-C 14 项通过和 51 条历史操作的审计结果继续归属原报告，本轮未重跑这些生产核验。
+[依赖清单](../evidence/2026-10-31-host-retirement-m5-dependencies.json)逐项绑定六仓最新 main 源码。它是本轮源码核对，不是现网表存在性、数据计数或责任关闭证明。初始清单不包含生产核验；本轮新增的实际部署与只读结果见[运行与逐对象复核](../evidence/2026-10-31-host-retirement-m4-runtime-m5-review.json)。此前 M3-C 14 项通过和 51 条历史操作的审计结果继续归属原运行，不因本次回读而重标为重跑。
 
 M4 候选为 [QS #471](https://github.com/FangcunMount/qs-server/pull/471)、[IAM #173](https://github.com/FangcunMount/iam/pull/173)，精确提交见依赖清单。候选修改 QS/IAM：迁出无运输/数据库所有权的消息映射、wire、Reference/指纹校验；删除当前宿主的 NSQ 双提供者分支、无调用的标准 Profile/Relay 执行装配。旧 Stager/NSQ 回归仅在明确的历史测试夹具或固定历史源码中运行。三个 QS 进程与 IAM 可执行文件的实际依赖图不得链接 NSQ、发布型 Relay 或测试夹具；不删除 SDK 的公开兼容能力。
 
@@ -23,9 +39,9 @@ QS 当前恢复继续使用既有 `m4-qs-runtime.yml` 的 `recovery_qs_ref`，�
 | iam.mysql / domain_event_outbox | 保留；启动/就绪及新建库迁移仍依赖 | 收口原历史责任检查与 bootstrap 升级路径；验证新建库不遗失通知责任 |
 | iam.mysql / rm_outbox | 保留；启动/就绪及责任审计仍依赖 | 当前检查与迁移后 schema 的兼容方案；逐条责任关闭/原文保全 |
 | qs.mysql / rm_outbox | 保留；结果证据、反向一致性和历史恢复仍依赖 | 保全原 Reference/wire 并替代所有当前读取，不能把表缺失当作空表 |
-| qs.mysql / ai_messaging_outbox | M4 部署后才可继续候选核验 | 未确认记录、正文引用与历史证据完整导出；验证旧回退镜像的 schema 依赖 |
+| qs.mysql / ai_messaging_outbox | M4 已部署；原表零行及原 DDL/空流已核验，SQL111 候选 PR #474 | 最终 CI、固定执行器/镜像与只读预览、具体维护窗口和回退边界审查；其余五对象保留 |
 | qs.mongo / rm_outbox | 保留；v1 答卷/混合热榜/一致性及历史恢复仍依赖 | 提供同等原文证据读取路径并完成历史与当前混合场景验收 |
-| ai.mysql / messaging_outbox | 当前发布器已退出，仍为候选 | 旧责任/正文导出、维护审计与后续 Alembic head 兼容、回退下限 |
+| ai.mysql / messaging_outbox | 保留；当前 0043 启动及发布预检要求其存在 | 追加新版本 schema/layout，保持严格校验；旧责任/正文导出、维护兼容及回退下限 |
 
 候选不是执行清单。保留 `interpretation_result_outbox`、`identity_session_revocation_outbox`、原事务 execution/guard/witness、archive、Inbox、receipt/业务 ACK、业务历史及调度。表名含 outbox 不构成删除理由。
 
@@ -42,4 +58,112 @@ QS 当前恢复继续使用既有 `m4-qs-runtime.yml` 的 `recovery_qs_ref`，�
 
 QS 51 条缺原 command 发布事务锚点的历史操作，不能由 Inbox 字节一致、admission receipt 或后置业务投影补成原 witness。不能填造档案、重做模型、清空 ACK/业务历史或批量标记 retired 来使 M5 门禁变绿。它们是否与某个具体候选对象相关，须按精确引用单独证明，不能简单推导“全部可删”或“所有对象永久不能删”。
 
-M4/M5 验证结果按通过、失败、跳过、未执行记录；源码、CI、镜像、实际运行和业务验收分开登记。当前依赖清单没有生产删除回执，也没有新增删除迁移。
+M4/M5 验证结果按通过、失败、跳过、未执行记录；源码、CI、镜像、实际运行和业务验收分开登记。原始依赖清单没有生产删除回执。本轮已追加尚未执行的 SQL111 候选，仅处理空 `qs.mysql.ai_messaging_outbox`；普通 down 拒绝，保留原 DDL/空流及独立恢复证明，失败可能留下 dirty111，不能自动 force。
+
+## 2026-10-31 运行与只读复核
+
+M4 的 IAM、QS API、Worker 三副本及 Collection 两副本已按固定镜像部署；独立快照运行 [41175362334](https://github.com/FangcunMount/qs-server/actions/runs/41175362334) 与监控观察 [41175364496](https://github.com/FangcunMount/infra/actions/runs/41175364496) 验证九个业务容器的镜像/源码和显式就绪。四个事务 owner 的观测可用且新鲜，准入保护均为 0；这不代表业务责任已关闭。QS 业务观测不可用、待处理计数缺失，不能解释为零；AI 业务观测可用且 ACK 等待为 0。
+
+Worker 与 Collection 首次部署后的治理步骤分别因 Prometheus 尚未出现指标族失败。新鲜公网回读确认完整副本数后，只重跑失败治理步骤通过，未再次部署应用。[QS #473](https://github.com/FangcunMount/qs-server/pull/473) 将指标族出现条件放进既有就绪重试循环；保持原预算、阈值和失败条件，候选 29 项 CI 通过、1 项条件跳过，已合并到 `249dc683…`；main 同样 29 项检查通过、1 项条件跳过。M4 收口时四仓发布工作流恢复 active，核实无额外部署，业务镜像保持不变；随后 M5 准备再次冻结 QS 工作流，当前状态见下文。
+
+只读运行 [41175524009](https://github.com/FangcunMount/qs-server/actions/runs/41175524009) 在独立有界只读事务中确认 IAM 两张、QS MySQL 两张候选表均存在且各为 0 行，事务与连接池释放均成功，完整身份及结构哈希见 JSON。AI 初次分支失败且未留下有效回执；分类复验确认探针在导入阶段因基础解释器缺少应用依赖而停止，尚未查询数据库。已改用镜像启动解释器与应用 UID，最终只读运行 [41176790709](https://github.com/FangcunMount/qs-server/actions/runs/41176790709) 的审计步骤成功，完整回执确认 `0043_native_transaction_limit` 与 `messaging_outbox=0`。同一最终源码下 IAM/QS 四张表复验仍各 0 行，三个 owner 作业全部成功。结果历史 `interpretation_result_outbox=125`、Inbox=57，均保持原状；Mongo 尚未读取。以上不包含写入、清空、迁移或删除，不证明业务/引用关闭、正文备份恢复、无写者或回退兼容。
+
+IAM 原生 Broker 夹具在独立新库完整迁移后，显式清理其生成的旧发布表种子通知；该历史测试结果不能当作“新建库已无旧初始化责任”的退役验收。AI 当前已部署源码的严格运行时 schema 校验仍要求旧 `messaging_outbox`：必须新增有版本的布局与升级路径，不能修改冻结旧布局或放宽集合校验以允许缺表。
+
+最终只读运行 [41178025856](https://github.com/FangcunMount/qs-server/actions/runs/41178025856) 在 `7d6f2daa…` 四个 owner 全部成功：六张候选表/集合均为零行，IAM MySQL45、QS MySQL110、QS Mongo44、AI0043；MySQL head 均 clean。该 source 的29项 CI通过、1项原条件跳过；认证 Mongo 两个 required selector 和新增 MySQL head负向场景均实际通过且零跳过。数量和版本证据不关闭现有读取/初始化/schema依赖。
+
+首批候选 [QS #474](https://github.com/FangcunMount/qs-server/pull/474) 仅追加 SQL111，退出 QS 空 `ai_messaging_outbox`，使用既有配对驱动和窄批准范围 `110/44 → 111/44`。其余五对象保留。首版原生隔离用例完成锁内零行/拒绝非空、原 DDL恢复、触发器和锁竞争控制；原/恢复结构哈希与实际旧表结构哈希相同。它是夹具恢复证明，未证明真实导出或生产回退。后续追加依赖视图保护、原始材料及完整进程证明，结果按下文精确源码分别记录；具体生产执行包仍待完成，当前没有生产迁移或删表回执。
+
+## 当前首批代码与运行证据
+
+M4 已按固定镜像上线并独立回读，控制器跟进 #473 main CI 通过。只读工具 #472 已合并为 `36846135cf6def4b80ff2d374886660dbda6d6db`，合并前29项检查通过、1项原条件跳过；合并后 main CI41183134769 同样29项通过、1项原条件跳过。QS 自动发布当前以 workflow disabled_manually 冻结，IAM/AI/后台保持原状态，线上继续固定 M4 镜像。
+
+#474 原基线 `51323979c7ee38b5288f5a3422209f7589cef5dc` 已通过29项检查、1项原条件跳过；追加完整原账本材料、三进程启动和恢复演练后，最新草稿 `75f567a8dc6697b0929c72cbafe5368b93a1002f` 的最终 CI41186437005 已完成29项通过、1项原条件跳过。现网默认只读离线预览已在 `d3c977740cdb2e063fde0db49dcc05bfca6cbfe2` / run41183082546 成功，二进制摘要 `c80049fd1d0b1ec9fc8d28444b6e004a8c3f48eba0e8e147f738b6d3887e9913` 与归档原字节一致；实际110/44、目标111/44、资源摘要 `b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de`。最后仅修正身份输出重定向的 ShellCheck SC2129，执行器源码不变。前一源码 `704ee8ddb82b3094a2b469b4f5506cfb274521c4` 的完整 CI、原生 MySQL 删除/恢复保护和14项 M3-C 当前业务恢复均已通过。生产 Go、module、配置及迁移资源逐字相同；与该已验证源码等价的范围仅为既有生产业务输入；75另加完整账本/恢复/启动夹具，其新增行为另行验证。此等价核对不冒充候选上的新14项执行；业务证明使用受控 IAM/provider，不宣称完整 Collection 或生产系统登录。实际原 DDL 哈希与隔离成功恢复哈希相同，仍不表示生产恢复或停写已发生。具体结果、失败记录和原运行归属见运行复核 JSON。
+
+首批生产写执行仍未批准。完整进程集合的隔离启动回执、固定新 main 镜像、真实停写与同窗口重读/材料责任尚未完成，不能用受控业务测试替填这些字段。原执行器的私有批准、一次消费、30天材料保留、30分钟窗口及首个 runtime 启动提交点规则保持。
+
+新增进程夹具首轮47b7 / run41184781027失败：原分配器的 qs_runtime_closure 数字后缀与新增包装要求 test 字样发生确定冲突。严格前缀修正后8183 / run41186033788仍在 API resources 失败。随后ab548 / run41188135344的加密私有诊断确认 MySQL1045认证错误：公开 Options JSON按设计省略密码，新子进程夹具丢失该字段。两次运行均不计验收通过。诊断代码拆为独立 #418，本 #417保持文档与证据范围；源码行号和固定技术标签可公开，原私有子进程输出不上传。新材料另要求保全实际完整两列版本账本原 DDL/单行原值；恢复只演练独立审定的原账本事务回放，不是 Force/按数字改版本或清 dirty。
+
+
+## 历史继续点与环境中断（后续结果见当前交付）
+
+75的原生配对恢复已通过：dirty_before_ddl、dirty_after_drop、clean_before_runtime三种中断均使用夹具先前捕获的原表结构及完整原账本事务回放，未调用Force/down。原生空表保护与恢复两份归档的哈希见JSON；21/29/30毫秒是隔离演练耗时，不是生产恢复承诺。
+
+完整账本只读导出 run41189102683（75源码）的四个 owner 作业成功；归档下载和完整内容校验仍待执行，不能把作业成功等同于已核验原始账本内容。
+
+最新启动修正已推送为 `2379189182ba70fe353663628efbf40bf36e2a03`：仅通过0600私有配置传递并校验既有隔离DSN，保留生产Options JSON密码脱敏；#418源码 `9255279b25da10f4bd09ff80c0f1e9149d87c8a1` 增加API自身热榜组的精确订阅，禁止其发布Mongo事务主题，75项本地协议测试通过。原生 run41189393198已派发，最新回读尚未返回作业，未记为通过。该QS修正尚未合入#474；通过后仍需整理最终候选并重跑完整CI。
+
+云执行环境随后报告 unavailable、exec-server连接中断。代码修正已推送，GitHub Actions不依赖本地连接继续运行；私有诊断密钥仍留在原环境，不上传。QS发布工作流最近一次核实为 disabled_manually，现有M4应用镜像和数据库未由M5修改。恢复连接后先核实工作区与远端差异（本文和JSON已通过GitHub接口追加提交），再下载校验原始材料、回读原生结果及完成最终发布/恢复包。首批仍仅考虑QS空ai_messaging_outbox，其余五对象保留；现有数据库写执行须待具体执行包审查。
+
+## 首批维护执行包（准备中，未授权写执行）
+
+云环境已恢复连接；固定 helper/工具摘要和离线自检回归通过。strict doctor 仍因实际 unrestricted 与原要求 restricted 的网络策略不同而失败，不称整体环境全绿。QS 候选已合并启动修正及现网原账本结构演练为 `62b76c87b8b3e3462c2882c543a6598763b81909`，完整 CI41189873668、最终只读预览41189888018待结果。完整三进程原生证明先在237918源/run41189393198执行，后续源码差异及新执行结果须另行登记。
+
+只读 run41189102683 的五份 ZIP 原字节摘要、目标原 DDL/空流、完整原账本及执行器原二进制均已下载核验。目标原 DDL 为 `1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da`，正文/原 wire 为零字节 EOF；原账本为完整单行 `version=110,dirty=false`，原 DDL 摘要为 `e663736774931e5f988b7fa72a0849fa725ae3ba97f083df404b676d64b616ee`。此前75的恢复夹具使用另一默认 collation，不能移签为现网账本原样恢复；62b76补成相同0900结构并在原生门禁强制核对，结果待CI。以上材料是只读时点事实，不能代替同一维护窗口停写后的重新捕获。
+
+本批唯一对象为 `qs.mysql.ai_messaging_outbox`；只允许 `110/44 → 111/44`，资源摘要 `b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de`。选中库均为 `qs`；MySQL身份摘要 `833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32`、Mongo集群摘要 `318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d` 必须在窗口再次一致。最终批准另绑定合并后main源码、实际执行器摘要、三服务新镜像digest、全部回执摘要，不能把候选SHA或占位值带入生产批准。
+
+维护顺序：
+
+1. 完成完整CI、实际原生恢复/三进程启动及main CI；固定新镜像和执行器，不启动新runtime。保持QS CD冻结，查明所有本次目标的人工/自动写者。具名数据与恢复责任人、同窗口材料私有位置和至少30天保留期须在最终审查中确认。
+2. 从T0计时，阻断QS外部写入口、调度和可能调用QS的重试/维护入口。先排空并停止Worker/Collection，API事务owner继续存活以完成在途本地提交、Broker确认和回查；以当前持久凭证/回查及技术观察分别证明未决事务已排空，不能用业务ACK或旧发布表零行代替。观测缺失、prepared/待确认或不确定的在途事务不得被当作零，也不停止最后的owner。确认排空后才停止全部API，核实无遗留进程/连接/后台任务、无第二个发布器或迁移器。Broker保持运行，禁止关闭回查或修改预算以配合停机。列出自主过期和调度的实际作用范围并证明不会修改本批保护材料。停写/排空未成立则不迁移，恢复原M4服务。
+3. 在冻结持续有效的情况下，用固定工具重新捕获同窗口原DDL、完整原账本、零行/空EOF、库身份、依赖可见性和所有保留资产的实际基线。任何非空、未知状态、缺失/冲突、身份/结构/版本漂移均停止，不清理记录或更新材料为成功。
+4. 审查原始材料、责任和冻结回执后，才生成一次性0600文件批准；scope为 `m5_qs_empty_ai_publisher`，两个目标版本来自固定执行器默认只读输出。保留批准原文/摘要及消费标记；不自动生成通过证据或复用旧批准。迁移前再次检查到期和剩余预算。
+5. 仅调用现有 `qs-migrate-offline --apply` 的批准入口，执行SQL111。它在同一受控SQL连接上获得目标WRITE锁，锁内完整COUNT仅为零时删除这一表；Mongo44不变。DDL/连接/超时异常立即停止，保留真实dirty/操作状态，不重试DROP或Force/down。
+6. 先独立回读clean111/44、目标确实缺失及保留资产，核准首个新runtime启动提交点；再按API就绪→Worker/Collection的原部署入口发布固定新镜像，保持迁移关闭。核实六个QS副本（API1、Worker3、Collection2）的镜像、源码、ready、事务owner/消费者及当前业务指标；读取失败仍为不可用，不能用QS缺失计数或51条历史锚点缺口签零责任。
+7. 完成后归档全过程回执和实际耗时，再恢复外部入口与QS正常发布。IAM、AI和后台本批无新应用代码，不重复部署；监控与保留资产继续核对。本批成功也不代表另五对象已可删除或M2全部历史业务验收已关闭。
+
+正常窗口仍上限30分钟，批准至少预留15分钟给启动/回读，未达到执行资格时退出而非延长窗口。恢复预算仍上限60分钟；隔离毫秒级恢复测量不构成生产RTO/RPO承诺。
+
+回退边界：在首个新runtime启动之前，若DDL/版本结果不确定，保持全部写者停止，先核实服务器实际活动和部分DDL状态。在独立审查的原材料恢复中仅重建原空表、核对完整原账本结构/身份及保留资产，最后以受控事务回放已捕获的完整原单行；不得通用Force、手清dirty或仅按数字改head。只有原clean110/44和完整原对象核验成功，才允许恢复已固定的M4镜像。首个新runtime命令之后禁止回放旧账本/覆盖新事实，也不能在111上启动只认110的M4镜像；保持111并以前向修复恢复服务。最终main镜像及同111兼容候选须在批准前列清，不能声称旧M4镜像是跨启动点的兼容回退。
+
+恢复连接后的继续点：最新代码/维护材料已推送；执行环境再次 unavailable。最终候选仍为62b76，完整CI/完整启动/最终源码只读预览继续通过GitHub回读；尚未形成可消费生产批准。事务owner停机前的未决事务/Broker回查排空证据是维护窗口资格，不由此前发布表零行或业务ACK结果推断。
+
+
+## 历史联合运行失败（保留当时的草稿与待验状态）
+
+`2379189182ba70fe353663628efbf40bf36e2a03` / infra9255279 的 [41189393198](https://github.com/FangcunMount/infra/actions/runs/41189393198/job/124503617012) 必需host作业失败；公开输出仅为 `actual default QS owners failed; private output withheld`，未生成加密子进程日志。具体失败阶段、是否超时及根因均待原报告内容校验，不能沿用上一轮1045或猜测新原因。报告artifact13038816575，GitHub记录ZIP摘要 `25d0269479805652f7eaa93408db98683adaecfe786bf820e38e6d8eeb0db1ba`；执行环境不可用，尚未下载核验。这次失败不算14项或完整启动通过，也不推翻各自独立通过的源码CI/原生迁移测试。
+
+最终62候选的原生迁移门禁job124504272788已成功，日志确认required native selectors RUN/PASS、zero SKIP；相同0900账本恢复报告artifact13038831601和空表保护artifact13038083772的GitHub摘要见JSON，内容及原字节校验仍待恢复执行连接。最终只读预览41189888018的reader与四个owner作业成功，1项原snapshot分支跳过；同样不能把状态成功替代归档内容校验。主CI其余作业仍在收尾，M5整体未验收，#474/#417/#418保持草稿，QS发布保持冻结，未执行现有数据库迁移/删除。
+
+
+## 核心交付及维护入口的当前结果
+
+QS #474已合并为 `1073f0c19c4991d80d9752f7fb69c395ae7590df`，候选29项CI通过、1项原条件跳过，main CI41195675199也已通过。infra #418已合并为 `3452f456fbabc8851270d4a8acb571f56ef8f20f`，候选25项通过、1项原条件跳过，main合同运行41193756726通过。这里只完成代码交付，现有数据库未执行SQL111，生产仍运行M4镜像。
+
+最后关停失败已由f27加密日志校验/解密定位：Worker的Redis治理端点先于订阅与信号管理器启动，夹具在尚未进入真实Run时发送SIGTERM。只增加等待现有Worker online标记，保留30秒、成功退出断言及14case。精确源码1031b88a2d64c10637ea1a606bb42c69da62b5fc的原生运行41193062385完整成功，14通过/0失败/0跳过；真实Broker/Worker SIGKILL、原消息重投、真实Redis和业务效果无重复。实际三个process根同时就绪并成功排空，共6秒，保留事实计数及原报告身份未变。ZIP原字节摘要85500c0590ec1066b72fffb9beaee430dd7909832a81e98100e9a1a20778422d已核验。最终候选1b6仅追加文档，原生事实仍归属1031；typed options与受控IAM/provider不冒充生产CLI/系统登录。之前失败全部保留。
+
+停机窗口不能继续依赖API容器里的docker exec。独立QS #475补齐固定原镜像/数据库环境/只读挂载的维护运输，固定UID2000、关闭原入口/健康命令，保留已有操作及私有消费标记。原候选51be与db797的原生Docker制品均已校验，保留实际CI合并执行源码，不能将其重标为当前源码验收。当前候选、CI及实际只读预检以本文开头和JSON为准。
+
+QS CD禁用时仅构建返回422的失败已保留。只为派发build短暂启用并立即恢复冻结的操作已经结束，三个1073镜像已构建和核验，没有应用部署。维护流程的生产owner排空、完整冻结、同窗口保护/批准/恢复及首个新runtime提交点仍需独立验证和审查。
+
+## 维护窗口资格的当前边界
+
+源码关停顺序已复核到be2e：`processShutdown.Close` 先经 `Container.StopEventAdmission → Subsystem.StopAdmission → SetAdmission(false)` 关闭宿主事务准入并保留Checker；随后运行hook、排空HTTP/gRPC、停止authz同步、清理模块/子系统，最后关闭publisher和数据库池。进程内能力不是已部署的独立运维HTTP入口，当前没有从只读报告自动调用它的控制器。实际入口、调度/人工写者、在途业务/provider和原owner退出仍需窗口资格证明，不能只以元数据零值签停写；原51条历史锚点及QS业务观测不可用也未关闭。
+
+原组合清单明确要求110/44及原发布表存在，用于捕获原材料，不能在111上把缺表签为空表。独立canonical协议CLI支持111/44；删除后核验还须独立的当前schema/保留资产读取与新runtime指标。此前原DDL/完整账本恢复只是隔离测试seam，尚无被本任务认可的已安装生产恢复入口。不得将旧M4镜像视为111后的回退版本。
+
+本批正常窗口30分钟、启动至少预留15分钟，恢复窗口60分钟、保护材料至少保留30天。当前未停生产写者、未创建维护容器或批准文件、未执行SQL111。本页仍是准备与证据记录，不是生产写入批准。
+
+## 下次接续的具体顺序
+
+1. 恢复可用执行连接后，先检查原bf059e工作树的实际HEAD/dirty，导出该未推送提交和未提交文档；保留原私钥及现场，不能用普通clone或reset替代保全。独立远端工具代码已经main be2e4e8d，GitHub CI已绿。
+2. 验证发布冻结及固定执行源码，显式创建/核实空闲维护容器，随后以独立只读捕获核当前原版本对、身份、原DDL/完整账本/空EOF与两个QS owner协议状态；现有生产从未执行该stage或新协议读。
+3. 再收口业务入口/调度/人工写者及在途业务/owner排空，完成实际保护材料与生产恢复执行路线。未决/冲突/不可用不签零，旧快照不签新窗口。
+4. 在这些资格具备后提交首批具体审查；当前不生成可消费批准，不执行SQL111、Force/down或任何旧账本回放，不提前部署新应用。首批只退役空QS ai_messaging_outbox，其余五对象仍保留。
+
+## MacBook 接续与本轮新增校验
+
+源码保全包 `/workspace/library-files/m5-macbook-handoff-20261031T140038Z.tar.gz` 已完成读回校验，SHA256 `ebe10ce38a61dbb766d87ef11a77f84386d59e5e2caa321e523a14760b7a7892`。内含原bf059e增量bundle、工作树/索引patch、12个当前变动源码文件及逐文件哈希、handoff.json。增量bundle要求已有bd5db2e4基线；当前main be2e已包含该基线。原诊断私钥留在原云工作区，不在源码包内。
+
+本轮补做main两份原始ZIP和JSON内容校验：协议观察artifact13043972930（b9240018...）、维护传输artifact13044116748（eb2cb193...），均与GitHub摘要及be2e源码一致，完整摘要见JSON。CI测试结果仍归属既有41204413865，没有重跑冒签。候选旧ZIP的未验记录保持原归属；本轮主线制品已核验。
+
+当前远端main实读be2e4e8d，QS CD实读disabled_manually。未创建生产维护容器、未停业务、未执行SQL111。若选择本机，在MacBook用Codex打开本地Qlume仓库，从main接续，读取handoff.json及本PR记录，先做维护入口/现库只读复验；真实集成继续沿用既有CI。
+
+## MacBook 实际接续与执行包审查稿
+
+上述“未创建维护容器”保留为原云交接时点。本地接续后，精确be2e的preflight41209522987与stage41209612364成功，已创建空闲维护容器`qs-m5-maintenance-41209612364-1`；未启动业务或停现有服务。[现库只读41209690150](https://github.com/FangcunMount/qs-server/actions/runs/41209690150)的reader/四owner全部成功，五份原ZIP及成员已本地校验。六候选仍为空、QS110/44，目标原DDL/完整账本/空EOF及双库身份与旧记录相符；两QS owner协议可用、未决项为零，runtime_frozen与broker_pending_known仍false。该结果不升级为停写或Broker排空。
+
+本轮已形成[具体执行包审查稿](rocketmq-host-retirement-m5-execution-package.md)与[结构化包](../evidence/2026-10-31-host-retirement-m5-execution-package.json)，覆盖原六实例/当前Compose与镜像、独立暂停和最后owner退出条件、同窗口材料清单/保留资产差异白名单、单一首启动屏障、R0取消/R1首启动前原材料恢复/R2启动后前向修复、时间预算及逐步停止点。实际A/D只读复核发现原M4固定启动器的镜像/项目已过时，不能复用。
+
+当前review_ready=true、execution_ready=false：独立暂停能力、最终新镜像/111前向恢复候选、完整保留资产只读基线命令及实际固定客户端恢复演练仍阻断生产执行。恢复路线已选定为独立固定Python/asyncmy SQL会话，UID2000依赖和CA可读性探测成功，未连接数据库，不以旧Go测试seam冒充生产入口。当前仍保持发布冻结，未停业务、未执行SQL111/账本回放或创建可消费批准；事务凭证、业务历史、ACK和调度全部保留。执行包和新增记录目前仅在本地独立工作树，尚未推送至远端#417。
