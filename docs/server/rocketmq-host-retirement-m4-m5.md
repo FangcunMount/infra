@@ -10,7 +10,9 @@ QS #474（main `1073f0c19c4991d80d9752f7fb69c395ae7590df`）和infra #418已合�
 
 #475候选Docker原生artifact13041334522原ZIP `6c7ad3eb2606835d54cd9cb6a9bf2ffb45bc77c78b87658fbf408465c3d19265` 及内容已核验，执行于CI合并源码 `6144cb64ae272ffbda503b3ff9796a497196cd80`。ServerA只读预检 [41198015973](https://github.com/FangcunMount/qs-server/actions/runs/41198015973) 成功，artifact13041289357原ZIP `da415a3c006ec4ebdb8048ce322ac9c3f8adaa02fd2e4112fcc8ed1effea7b7a` 及内容已核验。源容器Docker `.Image=sha256:4185fd2487b8539dbb2d7882056068042f21dc8a4c5327247c46021ce9ae574b` 与OCI config84f592...分开记录。预检没有stage、数据库查询、停写或恢复证明；旧失败全部保留。
 
-后续只读协议观察草稿 [QS #476](https://github.com/FangcunMount/qs-server/pull/476) 当前独立远端源码 `55f7c8d7c108ebecdcd55c3b99d76e5745954dbc`、代码基线 `32627920429d8fda3bf42cac6cd609c2958a72ce`。它复用SDK原主库观察和宿主native-limit读取，不发消息或修改数据库，要求既有CI真实运行110/44及111/44，保留非零、缺失/损坏显示不可用，不能代替Broker/ACK/停写批准。CI41202693972正在运行，文档门禁失败待修，真实原生验收未完成。原云环境本地草稿 `bf059e5906362b7f27e79acacd70239ae0054480` 的本地race/脚本/编译结果单独保留；其源码未推送，最终docs-facts结果未知。远端候选经已审代码重新整理，含额外阶段诊断，不是原本地提交的字节导出，不沿用本地绿结果。
+只读协议观察 [QS #476](https://github.com/FangcunMount/qs-server/pull/476) 已合并为 `be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399`，候选 `38d9419dd810f8e1a846fd72ee5999d0b7957f90` 的29项CI成功、1项原条件跳过。最终运行 [41202978415](https://github.com/FangcunMount/qs-server/actions/runs/41202978415/job/124542314662) 的原生日志已回读：110/44与111/44两子用例均RUN/PASS、无跳过，合计9.68秒，实际checkout为 `eaa3eaa79f5d82a6c07fce4356efad16edb64dc1`；保留非零责任、原行/文档不变及缺失/损坏binding不可用均经过实际断言。artifact13043815736的GitHub摘要为 `92fd194b2982f66bcfe385a4b7578c11ded55c16cd581426d3ed88c1d1e5bb60`，原ZIP字节仍待恢复执行连接后核验。精确main CI41204413865在运行，尚不能称main验收完成。
+
+首候选55f7的CI文档失败已保留：仅两份受影响README的源码核对记录过期，在核对实际Go/CI改动后于38d941修正；未放宽门禁。原云环境本地草稿 `bf059e5906362b7f27e79acacd70239ae0054480` 的本地race、14项脚本、集成标签编译与文档结果单独保留；源码未推送，最后docs-facts结果及断线后工作树须复读。独立远端候选不是原本地提交的字节导出，不移签其本地证据。恢复工作区后先保全原提交和未提交文档再同步，不reset或覆盖。
 
 数据责任人与恢复责任人均为用户指定的 **shujie**；这不是现有数据库写入批准。尚待协议观察最终CI、实际维护运输/数据库只读复验、事务排空/完整停写、同窗口保护与具体恢复执行路线，以及最终可消费批准。首批只涉及空 `qs.mysql.ai_messaging_outbox`，其余五对象保留。
 
@@ -134,3 +136,11 @@ QS #474已合并为 `1073f0c19c4991d80d9752f7fb69c395ae7590df`，候选29项CI�
 停机窗口不能继续依赖API容器里的docker exec。独立QS #475补齐固定原镜像/数据库环境/只读挂载的维护运输，固定UID2000、关闭原入口/健康命令，保留已有操作及私有消费标记。原候选51be与db797的原生Docker制品均已校验，保留实际CI合并执行源码，不能将其重标为当前源码验收。当前候选、CI及实际只读预检以本文开头和JSON为准。
 
 QS CD禁用时仅构建返回422的失败已保留。只为派发build短暂启用并立即恢复冻结的操作已经结束，三个1073镜像已构建和核验，没有应用部署。维护流程的生产owner排空、完整冻结、同窗口保护/批准/恢复及首个新runtime提交点仍需独立验证和审查。
+
+## 维护窗口资格的当前边界
+
+源码关停顺序已复核到be2e：`processShutdown.Close` 先经 `Container.StopEventAdmission → Subsystem.StopAdmission → SetAdmission(false)` 关闭宿主事务准入并保留Checker；随后运行hook、排空HTTP/gRPC、停止authz同步、清理模块/子系统，最后关闭publisher和数据库池。进程内能力不是已部署的独立运维HTTP入口，当前没有从只读报告自动调用它的控制器。实际入口、调度/人工写者、在途业务/provider和原owner退出仍需窗口资格证明，不能只以元数据零值签停写；原51条历史锚点及QS业务观测不可用也未关闭。
+
+原组合清单明确要求110/44及原发布表存在，用于捕获原材料，不能在111上把缺表签为空表。独立canonical协议CLI支持111/44；删除后核验还须独立的当前schema/保留资产读取与新runtime指标。此前原DDL/完整账本恢复只是隔离测试seam，尚无被本任务认可的已安装生产恢复入口。不得将旧M4镜像视为111后的回退版本。
+
+本批正常窗口30分钟、启动至少预留15分钟，恢复窗口60分钟、保护材料至少保留30天。当前未停生产写者、未创建维护容器或批准文件、未执行SQL111。本页仍是准备与证据记录，不是生产写入批准。
