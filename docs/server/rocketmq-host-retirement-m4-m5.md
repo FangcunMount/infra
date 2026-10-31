@@ -2,7 +2,13 @@
 
 2026-10-31 开始实施。本文的 M4/M5 是宿主工程退役，与此前 infra RocketMQ 迁移的同名阶段分开计数。M1–M3 的代码/上线记录不等于 M2 所有历史业务证据已验收，也不自动批准删除数据库对象。
 
-## 当前交付状态
+## 2026-11-01 当前交付状态
+
+M5 首批已在 03:58:04 CST 受控发布：QS main `4620d11e2cffbc4b67b43965812cff3340f0be43`，clean 111/44，API1/Worker3/Collection2 就绪，原入口恢复、公网 HTTPS 健康 200；自动 CD 仍 `disabled_manually`。仅删除原空 `qs.mysql.ai_messaging_outbox`；另五对象、事务凭证、原文、ACK、历史和调度均保留。完整启动前后内容比较通过，51 条历史锚点缺口仍未关闭。
+
+以[实际生产发布回执](rocketmq-host-retirement-m5-production-release.md)和[结构化回执](../evidence/2026-11-01-host-retirement-m5-production-release.json)为当前事实。下文为原阶段记录，保留较早“未执行”、失败及证据归属，不能作为重复执行或回放旧材料的许可。
+
+## 2026-10-31 准备阶段交付状态（历史）
 
 QS #474（main `1073f0c19c4991d80d9752f7fb69c395ae7590df`）和infra #418已合并，main CI通过；14项原生运行及三个实际进程启动/排空通过，结果保留各自执行源码归属。维护入口 #475 已合并为 `bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6`，候选29项成功、1项原条件跳过，精确main CI [41201613827](https://github.com/FangcunMount/qs-server/actions/runs/41201613827) 成功。生产仍运行M4，本轮未停业务、未创建维护容器、未修改现有数据库。
 

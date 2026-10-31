@@ -1946,5 +1946,16 @@
       "QS_CD_current_verified": "disabled_manually",
       "observed_at": "2026-10-31T14:04:00.763898+00:00"
     }
+  },
+  "production_release_2026_11_01": {
+    "status": "published",
+    "evidence": "2026-11-01-host-retirement-m5-production-release.json",
+    "only_removed": "empty qs.mysql.ai_messaging_outbox",
+    "versions": [
+      111,
+      44
+    ],
+    "other_five_and_history_retained": true,
+    "historical_missing_anchors": 51
   }
 }
