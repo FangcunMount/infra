@@ -1409,13 +1409,13 @@
     },
     "protocol_observation_delivery": {
       "PR": 476,
-      "status": "draft; independently reconstructed remote candidate requires its own CI/native proof",
+      "status": "merged; candidate full checks29success/1original conditional skip; exact main CI pending",
       "branch": "codex/host-retirement-m5-protocol-proof-remote-20261031",
       "source": "38d9419dd810f8e1a846fd72ee5999d0b7957f90",
       "code_source": "32627920429d8fda3bf42cac6cd609c2958a72ce",
       "base": "bd5db2e4fdf5cb74172b140bfdad2db990b6d2f6",
       "CI": 41202978415,
-      "CI_status": "docs/lint and required real110/44+111/44 protocol step passed; full CI running",
+      "CI_status": "success on candidate; main CI running",
       "native_required_mysql_versions": [
         110,
         111
@@ -1453,7 +1453,15 @@
         "artifact_id": 13043815736,
         "github_reported_zip_sha256": "92fd194b2982f66bcfe385a4b7578c11ded55c16cd581426d3ed88c1d1e5bb60",
         "raw_zip_verified": false,
-        "companion_job_checkout_merge_sha": "eaa3eaa79f5d82a6c07fce4356efad16edb64dc1"
+        "companion_job_checkout_merge_sha": "eaa3eaa79f5d82a6c07fce4356efad16edb64dc1",
+        "actual_native_job_checkout_merge_sha": "eaa3eaa79f5d82a6c07fce4356efad16edb64dc1",
+        "required_top_and_both_cases_run_and_pass": true,
+        "elapsed_seconds": 9.68,
+        "native_job_conclusion": "success",
+        "case_seconds": {
+          "mysql110_mongo44": 4.76,
+          "mysql111_mongo44": 4.92
+        }
       },
       "initial_native": {
         "run": 41202693972,
@@ -1472,7 +1480,77 @@
         "cause": "two affected README source review records stale after source/CI changes",
         "fixed_at": "38d9419dd810f8e1a846fd72ee5999d0b7957f90",
         "gates_weakened": false
+      },
+      "merged_main": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+      "candidate_checks": {
+        "success": 29,
+        "original_conditional_skipped": 1,
+        "failed": 0
+      },
+      "main_CI": {
+        "run": 41204413865,
+        "status": "running",
+        "exact_source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399"
       }
+    },
+    "production_window_eligibility": {
+      "qualified": false,
+      "production_apply_approved": false,
+      "data_owner": "shujie",
+      "recovery_owner": "shujie",
+      "batch": {
+        "only_drop": "qs.mysql.ai_messaging_outbox",
+        "mysql_pair": [
+          110,
+          111
+        ],
+        "mongo_version": 44,
+        "other_five_candidates": "retain"
+      },
+      "source_qualified_shutdown": {
+        "reviewed_source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+        "call_order": [
+          "processShutdown.Close invokes Container.StopEventAdmission",
+          "Subsystem.StopAdmission calls runtime.SetAdmission(false); Checker remains live",
+          "runtime hooks and HTTP/gRPC drain precede authz-sync/container cleanup",
+          "container drains modules/subsystem before publishers and database pools"
+        ],
+        "sources": [
+          "internal/apiserver/process/shutdown_context.go",
+          "internal/apiserver/process/lifecycle.go",
+          "internal/apiserver/container/lifecycle.go",
+          "internal/apiserver/eventing/subsystem/transactions.go",
+          "internal/pkg/messagingruntime/transaction_lifecycle.go"
+        ],
+        "operational_pause_only_HTTP_entrypoint": "not implemented by this delivery; do not pretend an in-process method is a deployed maintenance API",
+        "observation_does_not_certify_inflight_business_or_freeze": true
+      },
+      "next_readonly_steps": [
+        "Export original local bf059e draft and uncommitted docs before syncing recovered workspace; remote candidate is independent",
+        "Require successful exact merged main CI and preserve deployment freeze",
+        "Explicitly stage only the existing idle maintenance transport from reviewed running Docker Image4185fd..., verify its operation/source/image/RO mounts and healthcheck NONE",
+        "Run original110/44 material inventory and canonical schema/protocol reads through validated owned container; compare actual DB identities, resource hash and binding hashes",
+        "Nonzero/unavailable protocol data or unexpected source/runtime must stop qualification; do not reconcile/rewrite receipts or infer Broker backlog"
+      ],
+      "legacy_inventory_boundary": "Combined original-material inventory deliberately requires original110/44 and legacy table existence. It is not a post111 verifier; standalone canonical protocol CLI supports111/44, and post-start live metrics are separate.",
+      "still_required_before_database_approval": [
+        "Actual staged transport and fresh database reads; currently unexecuted",
+        "Concrete ingress/scheduler/manual-writer exclusion and business/in-flight provider qualification; QS business observation gap and51 historical anchors are not zero",
+        "Actual owner drain/exit evidence plus direct primary observation with unknowns rejected",
+        "Same-window original DDL, empty EOF, complete original ledger, retained-asset baselines, identities and protection hashes",
+        "Concrete reviewed operator restoration route; current original-ledger replay remains test-only and is not an installed production restore API",
+        "First-new-runtime boundary review; M4 image rejects111 and cannot be presented as a post-start rollback"
+      ],
+      "budgets": {
+        "normal_window_minutes": 30,
+        "startup_reserve_seconds": 900,
+        "recovery_window_minutes": 60,
+        "protection_retention_days": 30
+      },
+      "runtime_frozen": false,
+      "approval_file_created": false,
+      "production_maintenance_container_created": false,
+      "existing_database_operator_mutation": false
     }
   },
   "existing_database_operator_mutation": false,
