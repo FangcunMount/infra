@@ -856,7 +856,10 @@
         29,
         30
       ],
-      "generic_force_or_down_used": false
+      "generic_force_or_down_used": false,
+      "original_fixture_ledger_DDL_sha256": "e8a8a3b64da558083735d5f908a14e0842dacd5a0343f72e1e381b3049c1da80",
+      "actual_original_ledger_DDL_sha256": "e663736774931e5f988b7fa72a0849fa725ae3ba97f083df404b676d64b616ee",
+      "actual_DDL_equivalence": "previous fixture collation differs; added owned exact0900 ledger replay regression at QS e28be8761; native pending"
     },
     "startup_diagnostics_PR": {
       "PR": 418,
@@ -870,12 +873,93 @@
       "source": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
       "all_four_owner_jobs": "success",
       "snapshot_job": "conditional skipped",
-      "archive_download_and_content_verification": "pending after cloud execution disconnected",
+      "archive_download_and_content_verification": "passed",
       "qs_mysql_artifact": {
         "id": 13038650189,
         "digest": "sha256:e72325eda74e5401ea6f6e37f1d3eddd3b873c8570071676fe604c9bd662b382"
       },
-      "is_production_restore_or_mutation": false
+      "is_production_restore_or_mutation": false,
+      "verified_materials": {
+        "workflow_run": 41189102683,
+        "source_sha": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+        "actual_read_only_export_verified": true,
+        "target_rows": 0,
+        "target_DDL_sha256": "1950d488e5e83afdacce15b2bc47fb1126a9d622519c5da3a3b8bbaf672735da",
+        "body_wire_jsonl_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "original_complete_ledger": {
+          "original_ddl": "CREATE TABLE `schema_migrations` (\n  `version` bigint NOT NULL,\n  `dirty` tinyint(1) NOT NULL,\n  PRIMARY KEY (`version`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci",
+          "show_create_table_sha256": "e663736774931e5f988b7fa72a0849fa725ae3ba97f083df404b676d64b616ee",
+          "rows": [
+            {
+              "version": 110,
+              "dirty": false
+            }
+          ]
+        },
+        "offline_binary_sha256": "98fc144f8cd0e4cf84300e74f61d5d621781df4b6155159eb79a83162405d160",
+        "offline_snapshot": {
+          "source_sha": "75f567a8dc6697b0929c72cbafe5368b93a1002f",
+          "migration_resources_sha256": "b8c09d87a02432f9c4f01fdbf01d7fa2dd7ecbf3ebdaf3576b2e61f02e7ea6de",
+          "mysql_database": "qs",
+          "mongo_database": "qs",
+          "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+          "mongo_cluster_sha256": "318f0d870223acb5a967888e425ee93650567cf1260d5023081889286966762d",
+          "mysql_version": 110,
+          "mongo_version": 44,
+          "target_mysql_version": 111,
+          "target_mongo_version": 44
+        },
+        "writers_excluded": false,
+        "production_apply_approved": false,
+        "production_restoration_proven": false
+      },
+      "artifacts": [
+        {
+          "artifact_id": 13038650189,
+          "owner": "qs.mysql",
+          "zip_sha256": "e72325eda74e5401ea6f6e37f1d3eddd3b873c8570071676fe604c9bd662b382",
+          "files": [
+            "messaging-retirement-original-ai-publisher.sql",
+            "messaging-retirement-original-ai-publisher.jsonl",
+            "messaging-retirement-offline-preview.json",
+            "messaging-retirement-inventory.json"
+          ]
+        },
+        {
+          "artifact_id": 13038286162,
+          "owner": "ai.mysql",
+          "zip_sha256": "e5600eef3dcfe71f4323fd63dd4121f618f449ff45ba71eb8cdf9095ebd6d151",
+          "files": [
+            "messaging-retirement-inventory.json"
+          ]
+        },
+        {
+          "artifact_id": 13038088867,
+          "owner": "iam.mysql",
+          "zip_sha256": "7ebd52f699e726d718b805c7c8a6991a5002fa0d78afed5c7ea62e675486ceda",
+          "files": [
+            "messaging-retirement-inventory.json"
+          ]
+        },
+        {
+          "artifact_id": 13037912480,
+          "owner": "reader",
+          "zip_sha256": "24718ed9e656a670abdb1c150128d36bccedff9b3aebc7c9beffe80faaf92067",
+          "files": [
+            "messaging-retirement-inventory",
+            "qs-migrate-offline",
+            "messaging-retirement-mongo-inventory"
+          ]
+        },
+        {
+          "artifact_id": 13037887664,
+          "owner": "qs.mongo",
+          "zip_sha256": "7e609a58873b03e0156e8e3bac50696ec9817b331143be557d3475aebfb6a32c",
+          "files": [
+            "messaging-retirement-inventory.json"
+          ]
+        }
+      ]
     }
   },
   "existing_database_operator_mutation": false,
@@ -891,10 +975,11 @@
   ],
   "execution_continuity": {
     "environment_id": "ccarenv_b64_Y2NhcmVudl85ODU4OTIzNGYxZTA4MTkxOTU2ZWNlOTcxOTdiNGE4Yw",
-    "status": "unavailable; exec-server transport disconnected during continuation; GitHub Actions remain independent",
+    "status": "cloud executor reconnected; helper/tool integrity and offline regressions passed; strict doctor retains known unrestricted-vs-required-restricted network failure",
     "latest_pushed_qs_startup_source": "2379189182ba70fe353663628efbf40bf36e2a03",
     "local_private_key_not_published": true,
     "QS_CD_last_verified": "disabled_manually",
-    "existing_database_operator_mutation": false
+    "existing_database_operator_mutation": false,
+    "local_worktree_remote_docs_fast_forwarded": true
   }
 }
