@@ -32,168 +32,29 @@
     "original_target_DDL_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff"
   },
   "candidate": {
-    "PR": "https://github.com/FangcunMount/qs-ai/pull/246",
-    "source_sha": "abc700ff00666617e4355a991343c66c2e3523cf",
-    "draft": false,
+    "PRs": [
+      "https://github.com/FangcunMount/qs-ai/pull/246",
+      "https://github.com/FangcunMount/qs-ai/pull/248"
+    ],
+    "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
     "merged": true,
+    "draft": false,
     "production_deployed": false,
-    "original43_migration_files_byte_equal": true,
-    "source_preservation_receipt_sha256": "8523cc0c501d43c4d57733e887b1e57fa6a828560e95a3f31cec1edf0b7f6180",
-    "full_CI": {
-      "run": 41281012903,
-      "status": "success",
-      "all_checks_success": true,
-      "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012903",
-      "jobs": [
-        {
-          "name": "Retirement backup and restore (8.4)",
-          "conclusion": "success"
-        },
-        {
-          "name": "verify (8.0.36, 1)",
-          "conclusion": "success"
-        },
-        {
-          "name": "verify (8.4, 1)",
-          "conclusion": "success"
-        },
-        {
-          "name": "verify (8.4, 2)",
-          "conclusion": "success"
-        },
-        {
-          "name": "verify (8.4, 3)",
-          "conclusion": "success"
-        },
-        {
-          "name": "verify (8.0.36, 0)",
-          "conclusion": "success"
-        },
-        {
-          "name": "verify (8.4, 0)",
-          "conclusion": "success"
-        },
-        {
-          "name": "image",
-          "conclusion": "success"
-        },
-        {
-          "name": "Retirement backup and restore (8.0.36)",
-          "conclusion": "success"
-        },
-        {
-          "name": "verify (8.0.36, 3)",
-          "conclusion": "success"
-        },
-        {
-          "name": "verify (8.0.36, 2)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Complete test coverage",
-          "conclusion": "success"
-        }
-      ]
+    "main_full_CI": {
+      "run": 41310278495,
+      "event": "push",
+      "branch": "main",
+      "success": 12
     },
-    "m7_CI": {
-      "run": 41281012842,
-      "status": "success",
-      "checks_success": 2,
-      "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012842",
-      "jobs": [
-        {
-          "name": "m7 (8.0.36)",
-          "conclusion": "success"
-        },
-        {
-          "name": "m7 (8.4)",
-          "conclusion": "success"
-        }
-      ]
+    "main_M7": {
+      "run": 41310404873,
+      "event": "workflow_dispatch",
+      "branch": "main",
+      "success": 2
     },
     "all_checks_success": 14,
-    "local_targeted_tests_passed": 37,
-    "local_static": "Ruff/format, mypy455 files, docs76files1281links passed",
-    "historical_PR_source_qualification": {
-      "source_sha": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
-      "full_CI": {
-        "run": 41281012903,
-        "status": "success",
-        "all_checks_success": true,
-        "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012903",
-        "jobs": [
-          {
-            "name": "Retirement backup and restore (8.4)",
-            "conclusion": "success"
-          },
-          {
-            "name": "verify (8.0.36, 1)",
-            "conclusion": "success"
-          },
-          {
-            "name": "verify (8.4, 1)",
-            "conclusion": "success"
-          },
-          {
-            "name": "verify (8.4, 2)",
-            "conclusion": "success"
-          },
-          {
-            "name": "verify (8.4, 3)",
-            "conclusion": "success"
-          },
-          {
-            "name": "verify (8.0.36, 0)",
-            "conclusion": "success"
-          },
-          {
-            "name": "verify (8.4, 0)",
-            "conclusion": "success"
-          },
-          {
-            "name": "image",
-            "conclusion": "success"
-          },
-          {
-            "name": "Retirement backup and restore (8.0.36)",
-            "conclusion": "success"
-          },
-          {
-            "name": "verify (8.0.36, 3)",
-            "conclusion": "success"
-          },
-          {
-            "name": "verify (8.0.36, 2)",
-            "conclusion": "success"
-          },
-          {
-            "name": "Complete test coverage",
-            "conclusion": "success"
-          }
-        ]
-      },
-      "m7_CI": {
-        "run": 41281012842,
-        "status": "success",
-        "checks_success": 2,
-        "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012842",
-        "jobs": [
-          {
-            "name": "m7 (8.0.36)",
-            "conclusion": "success"
-          },
-          {
-            "name": "m7 (8.4)",
-            "conclusion": "success"
-          }
-        ]
-      }
-    },
-    "main_CI_runs": [
-      41303650216,
-      41303650098
-    ],
-    "main_CI_success": 14
+    "original43_and0044_migration_files_unchanged_since_abc700f": true,
+    "source_change_scope": "subscriber lifecycle plus focused tests/docs; no migration, model, transaction or protocol data changes"
   },
   "release_freeze": {
     "schema": "ai-246-release-freeze/v1",
@@ -207,7 +68,7 @@
     "deployment_dispatched": false
   },
   "live_qualification": {
-    "captured_at": "2026-11-01T06:31:31.701855+00:00",
+    "captured_at": "2026-11-01T13:39:20.373065+00:00",
     "state": "43_intact",
     "head": "0043_native_transaction_limit",
     "frozen": false,
@@ -217,14 +78,14 @@
     "retained_tables": 49,
     "retained_rows": 8502,
     "retained_bytes": 91768306,
-    "snapshot_sha256": "1079e7871ec49b4ba1396d57668f1c06c7e0e5d44454bef837cf8cbdf126751c",
+    "snapshot_sha256": "c349610b24433a5f96fc6df25229e323985a4f50e3630e2f7a08a11347a097c4",
     "transaction_released": true,
     "pool_released": true,
     "fingerprints_are_backup": false,
-    "elapsed_seconds": 16.604,
+    "elapsed_seconds": 18.268,
     "two_live_snapshots_retained_identical": true,
     "continuous_no_write_claimed": false,
-    "observer_source": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
+    "observer_source": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
     "runtime_source": "f9f24abdf98535295c4e3d223675ef6be62115e2",
     "retained_baseline": {
       "evaluation_checkpoints": {
@@ -1011,7 +872,8 @@
       "head": "0043_native_transaction_limit",
       "writers_excluded": false,
       "execution_approval": false
-    }
+    },
+    "comparison_receipt_sha256": "78c72bdc81d19526e06eaa4407080261164b899b88cd97489fbdb748aada7953"
   },
   "actual_runtime": {
     "source": "f9f24abdf98535295c4e3d223675ef6be62115e2",
@@ -1022,8 +884,14 @@
     "OOMKilled": false,
     "StopTimeout": 210,
     "current_release": "f9f24abdf98535295c4e3d223675ef6be62115e2-41108077901-1",
-    "final_observed_at": "2026-11-01T06:42:07.365102+00:00",
-    "source_image_start_and_mounts_unchanged": true
+    "final_observed_at": "2026-11-01T13:53:19.170859+00:00",
+    "source_image_start_and_mounts_unchanged": true,
+    "final_image_preparation_and_offline_load_unchanged": true,
+    "forward_offline_readback_at": "2026-11-01T13:43:07.868561+00:00",
+    "final_live_schema": "0043_native_transaction_limit",
+    "healthy": true,
+    "started_at": "2026-10-30T18:37:03.255198256Z",
+    "state_unchanged": true
   },
   "database_review_context": {
     "global_session_visibility": true,
@@ -1085,79 +953,86 @@
       ],
       "freeze_proof": false
     },
-    "negative_permission_read_receipt_sha256": "159159fffa3327834e77907870210440ff2c3a28daed1d86d886c3c45c80a689"
+    "negative_permission_read_receipt_sha256": "159159fffa3327834e77907870210440ff2c3a28daed1d86d886c3c45c80a689",
+    "scope": "historical/current application account; administrator observation is separately bound and does not change this account grants"
   },
   "native_qualification": {
-    "schema": "ai246-native-window-qualification/v1",
-    "source_sha": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
-    "CI_run": 41281012903,
-    "production_executed": false,
-    "proof": [
-      {
-        "mysql": "8.0.36",
-        "native_cases": 21,
-        "seconds": 48.611999999999995,
-        "artifact_id": 13072669254,
-        "artifact_sha256": "55a7c1377c8da0816681eff5cade03e5b9291f11fc069ede4d4c94010cee23c8",
-        "xml_sha256": "017e9f05e946d84069ceabd40ad11b21e33dde1abbebeb58728e68171fe1deb8",
-        "names": [
-          "test_fresh_head_install_and_current_metadata_agree",
-          "test_existing_store_without_review_never_changes_native_or_old_rows",
-          "test_nonempty_publisher_refuses_after_review_before_consumption",
-          "test_reviewed_upgrade_preserves_all_retained_rows_and_refuses_replay",
-          "test_pre_drop_failure_keeps_consumed_marker_and_original_store",
-          "test_unknown_ddl_result_converges_forward_without_replaying_drop",
-          "test_forward_recovery_refuses_unproved_original_state[retained_bytes]",
-          "test_forward_recovery_refuses_unproved_original_state[retained_schema]",
-          "test_forward_recovery_refuses_unproved_original_state[missing_original_marker]",
-          "test_forward_recovery_refuses_unproved_original_state[wrong_database]",
-          "test_forward_recovery_refuses_unproved_original_state[business_reopened]",
-          "test_original_production_empty_target_ddl_restores_only_in_isolated_mysql",
-          "test_capture_cli_is_readonly_and_releases_owned_pool",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-none]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-archive_rejected]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-witness_rejected]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-client_reply_discarded]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-none]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-archive_rejected]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-witness_rejected]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
-        ]
-      },
-      {
-        "mysql": "8.4",
-        "native_cases": 21,
-        "seconds": 57.115,
-        "artifact_id": 13073262697,
-        "artifact_sha256": "21ee5fdc60f9ca4fb88795525f69208734c5d06f49c3149878c9d3f9740c5c2f",
-        "xml_sha256": "1cf60e3d6f2f571b405834bf37e9c244b6d753ba1dfdfd31c5a0b2b91420485a",
-        "names": [
-          "test_fresh_head_install_and_current_metadata_agree",
-          "test_existing_store_without_review_never_changes_native_or_old_rows",
-          "test_nonempty_publisher_refuses_after_review_before_consumption",
-          "test_reviewed_upgrade_preserves_all_retained_rows_and_refuses_replay",
-          "test_pre_drop_failure_keeps_consumed_marker_and_original_store",
-          "test_unknown_ddl_result_converges_forward_without_replaying_drop",
-          "test_forward_recovery_refuses_unproved_original_state[retained_bytes]",
-          "test_forward_recovery_refuses_unproved_original_state[retained_schema]",
-          "test_forward_recovery_refuses_unproved_original_state[missing_original_marker]",
-          "test_forward_recovery_refuses_unproved_original_state[wrong_database]",
-          "test_forward_recovery_refuses_unproved_original_state[business_reopened]",
-          "test_original_production_empty_target_ddl_restores_only_in_isolated_mysql",
-          "test_capture_cli_is_readonly_and_releases_owned_pool",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-none]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-archive_rejected]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-witness_rejected]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-client_reply_discarded]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-none]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-archive_rejected]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-witness_rejected]",
-          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
-        ]
-      }
-    ],
-    "candidate_restore_qualification_receipt_sha256": "52a7b9a566ec6cb48eef4345475bf01f887fa407b5ffa86342c172fe0f05e688",
-    "production44_image_binding_qualified": false
+    "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+    "receipt": {
+      "schema": "ai246-native-window-qualification/v1",
+      "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+      "CI_run": 41310278495,
+      "production_executed": false,
+      "proof": [
+        {
+          "mysql": "8.0.36",
+          "native_cases": 21,
+          "seconds": 68.653,
+          "artifact_id": 13084758837,
+          "artifact_sha256": "7cb955313aa731aa45a0ce867725c0ff5376527ab962b500418b939fb5046b2f",
+          "xml_sha256": "8abc66f4698949b4612177e25d650734b026a76cad6c1742b69f690f72c2be5f",
+          "names": [
+            "test_fresh_head_install_and_current_metadata_agree",
+            "test_existing_store_without_review_never_changes_native_or_old_rows",
+            "test_nonempty_publisher_refuses_after_review_before_consumption",
+            "test_reviewed_upgrade_preserves_all_retained_rows_and_refuses_replay",
+            "test_pre_drop_failure_keeps_consumed_marker_and_original_store",
+            "test_unknown_ddl_result_converges_forward_without_replaying_drop",
+            "test_forward_recovery_refuses_unproved_original_state[retained_bytes]",
+            "test_forward_recovery_refuses_unproved_original_state[retained_schema]",
+            "test_forward_recovery_refuses_unproved_original_state[missing_original_marker]",
+            "test_forward_recovery_refuses_unproved_original_state[wrong_database]",
+            "test_forward_recovery_refuses_unproved_original_state[business_reopened]",
+            "test_original_production_empty_target_ddl_restores_only_in_isolated_mysql",
+            "test_capture_cli_is_readonly_and_releases_owned_pool",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-none]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-archive_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-witness_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-client_reply_discarded]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-none]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-archive_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-witness_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
+          ]
+        },
+        {
+          "mysql": "8.4",
+          "native_cases": 21,
+          "seconds": 44.365,
+          "artifact_id": 13085187211,
+          "artifact_sha256": "a55593eb1714034168ff70d1d98850d76b2d9018ae43574b391a732a9c2f298d",
+          "xml_sha256": "20582490db15343b9d3d51c3870bba63d4a0cd9a68f98ab0dfc7c7a4b0fda22f",
+          "names": [
+            "test_fresh_head_install_and_current_metadata_agree",
+            "test_existing_store_without_review_never_changes_native_or_old_rows",
+            "test_nonempty_publisher_refuses_after_review_before_consumption",
+            "test_reviewed_upgrade_preserves_all_retained_rows_and_refuses_replay",
+            "test_pre_drop_failure_keeps_consumed_marker_and_original_store",
+            "test_unknown_ddl_result_converges_forward_without_replaying_drop",
+            "test_forward_recovery_refuses_unproved_original_state[retained_bytes]",
+            "test_forward_recovery_refuses_unproved_original_state[retained_schema]",
+            "test_forward_recovery_refuses_unproved_original_state[missing_original_marker]",
+            "test_forward_recovery_refuses_unproved_original_state[wrong_database]",
+            "test_forward_recovery_refuses_unproved_original_state[business_reopened]",
+            "test_original_production_empty_target_ddl_restores_only_in_isolated_mysql",
+            "test_capture_cli_is_readonly_and_releases_owned_pool",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-none]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-archive_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-witness_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-client_reply_discarded]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-none]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-archive_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-witness_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
+          ]
+        }
+      ]
+    },
+    "receipt_sha256": "760352992ef550ea3349af2531c117c4b25619362df9b1448efd9f37d9d8aebc",
+    "candidate_restore_qualification_receipt_sha256": "e7f2409a7c2ea99114758c67b8c5dd0695df1cc09c7fc7c244861c426bee6390",
+    "restore_receipt_public": "docs/evidence/2026-11-01-ai246-main44-restore-qualification.json",
+    "production44_image_binding_qualified": true,
+    "production_executed": false
   },
   "protection_contract": {
     "schema": "ai-publisher-protection/v1",
@@ -1237,17 +1112,90 @@
     }
   ],
   "immutable_execution_bindings": {
-    "qualified_main_sha": null,
-    "main_CI": null,
-    "candidate_registry_digest": null,
-    "candidate_engine_image_id": null,
-    "candidate_archive_sha256": null,
-    "candidate_prepared_receipt_sha256": null,
-    "forward44_source_sha": null,
-    "forward44_registry_digest": null,
-    "forward44_archive_sha256": null,
-    "forward44_actual_image_startup_qualification": null,
-    "status": "blocking_not_filled_from_PR_ephemeral_image_or_old43"
+    "qualified_main_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+    "main_CI": {
+      "checks": 41310278495,
+      "M7": 41310404873,
+      "success": 14
+    },
+    "candidate_registry_digest": "sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e",
+    "candidate_engine_image_id": "sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e",
+    "candidate_config_sha256": "sha256:a0eba52391dd24273ef2437cec10d224913e31a484a1c8b0294dd1f71882130c",
+    "candidate_archive_sha256": "9042ce559f7d3bcb6df19915972830d566b1c60e8eeb0abd1ba9050cf8434507",
+    "candidate_archive_bytes": 117694528,
+    "candidate_prepared_release": "c6359b441de48fde5b295529fe9c10f50e4c53f5-41311879954-1",
+    "candidate_prepared_receipt_sha256": "85774c306fba46159d408a0a545fbb6a6625616653eb815321de5e5c650eb3ae",
+    "candidate_private_ServerA_copy": {
+      "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+      "archive_sha256": "9042ce559f7d3bcb6df19915972830d566b1c60e8eeb0abd1ba9050cf8434507",
+      "archive_bytes": 117694528,
+      "directory": "/var/lib/fangcun-m5-protection/followthrough-20261101/ai246-production44-c635",
+      "ServerA_private_readback_verified": true,
+      "fsynced": true,
+      "root_owned": true,
+      "directory_mode": "0700",
+      "file_mode": "0600",
+      "minimum_retention_days": 30,
+      "extend_unresolved": true,
+      "automatic_cleanup": false,
+      "production_activation": false,
+      "observed_at": "2026-11-01T13:44:27.221717+00:00"
+    },
+    "candidate_archive_two_copy": {
+      "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+      "archive_sha256": "9042ce559f7d3bcb6df19915972830d566b1c60e8eeb0abd1ba9050cf8434507",
+      "bytes": 117694528,
+      "image_config_sha256": "sha256:a0eba52391dd24273ef2437cec10d224913e31a484a1c8b0294dd1f71882130c",
+      "registry_digest": "sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e",
+      "ServerA_engine_image_id": "sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e",
+      "MacBook_readback_verified": true,
+      "ServerA_readback_verified": true,
+      "actual_archive_config_and_layers_verified": true,
+      "fsynced": true,
+      "production_deployed": false
+    },
+    "forward44_source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+    "forward44_registry_digest": "sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e",
+    "forward44_config_sha256": "sha256:a0eba52391dd24273ef2437cec10d224913e31a484a1c8b0294dd1f71882130c",
+    "forward44_ServerA_loaded_engine_id": "sha256:b68cfe164b829a5b542dc2ebc0c5f9fad19ce88dc33dedd42528313ca6f81b97",
+    "forward44_archive_sha256": "1256b4781619aa866b1c3a023a76c9b3db2280b935826049f934a50439d7a180",
+    "forward44_archive_bytes": 131626551,
+    "forward44_offline_load_and_two_copy": {
+      "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+      "registry_digest": "sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e",
+      "archive_sha256": "1256b4781619aa866b1c3a023a76c9b3db2280b935826049f934a50439d7a180",
+      "archive_bytes": 131626551,
+      "image_config_sha256": "sha256:a0eba52391dd24273ef2437cec10d224913e31a484a1c8b0294dd1f71882130c",
+      "archive_tag": "ai44-qualified:c6359b441de4-2716d57c",
+      "ServerA_loaded_engine_image_id": "sha256:b68cfe164b829a5b542dc2ebc0c5f9fad19ce88dc33dedd42528313ca6f81b97",
+      "ServerA_archive_config_layers_readback_verified": true,
+      "offline_docker_load_verified": true,
+      "existing_containers_and_runtime_unchanged": true,
+      "fsynced": true,
+      "root_owned": true,
+      "directory_mode": "0700",
+      "file_mode": "0600",
+      "minimum_retention_days": 30,
+      "extend_unresolved": true,
+      "automatic_cleanup": false,
+      "production_activation": false,
+      "production_DDL": false,
+      "code_recovery_scope": "same44 code restart/config repair; unknown code fault requires newly reviewed44 patch",
+      "observed_at": "2026-11-01T13:43:07.868561+00:00",
+      "MacBook_archive_config_layers_readback_verified": true
+    },
+    "forward44_actual_image_startup_qualification": {
+      "run": 41311886021,
+      "receipt_sha256": "e65fe8237df577a8b9d73397767c19deb6b28b92255048e3a168a9614d357ece",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0,
+      "environment": "isolated hosted Linux; production not started"
+    },
+    "qualification_workflow_source_sha": "abeb9119c6e9436197f99b7d96a2ea2087f6b40f",
+    "qualification_infra_source_sha": "678681b647d11b75b2edb080ecea7aa5c8e3c174",
+    "status": "qualified_prepare_only; production_execution_not_authorized",
+    "recovery_code_scope": "same44 code independent offline archives for restart/config repair; unknown code defect requires new reviewed44 patch, not43 or fullbackup replay"
   },
   "database_execution_review": {
     "state": "not_issued",
@@ -1258,64 +1206,64 @@
       {
         "id": "DB01",
         "requirement": "single empty target, exact43 source and strict44 layout; other49 protected",
-        "state": "source_and_live_qualification_passed; window_recheck_required"
+        "state": "live_complete43_empty_original_target_all49_identical; same_window_recheck_required"
       },
       {
         "id": "DB02",
         "requirement": "exact main and immutable44 candidate/forward images, real startup and offline archive qualification",
-        "state": "blocking_actual44_drain_failure; prepared_abc700f_not_qualified; AI248_new_candidate_pending"
+        "state": "qualified_exact_main14_CI_and_actual_immutable44_13_cases; both_archives_two_copy_and_offline_load_verified; production_not_started"
       },
       {
         "id": "DB03",
         "requirement": "all writer scopes excluded;210s no-error drain, zero active/unknown roots/calls; persistent pending preserved",
-        "state": "window_pending_not_attempted"
+        "state": "window_pending_not_attempted; isolated_paused_shutdown_is_not_production_active_work_drain"
       },
       {
         "id": "DB04",
         "requirement": "fresh frozen snapshot plus original target/ledger and49 complete fingerprints; actual backup/PITR review",
-        "state": "window_pending_not_generated"
+        "state": "window_pending_not_generated; production_complete_backup_PITR_recoverability_not_proved"
       },
       {
         "id": "DB05",
         "requirement": "two-copy readback and durable approval consumption; minimum30days retention",
-        "state": "review_originals_protected; window_originals_pending"
+        "state": "review_originals_and_images_protected; fresh_window_originals_and_consumption_pending"
       },
       {
         "id": "DB06",
         "requirement": "original production empty DDL actual restore plus realDROP unknown-ledger strict forward tests on both MySQL versions",
-        "state": "native_passed21_each; production44_image_binding_pending"
+        "state": "exact_main_native21_each_on8.0.36_and8.4_plus_actual44_image13_passed; current_restore_receipt_bound"
       },
       {
         "id": "DB07",
         "requirement": "fixed operator identity/permissions and usable sessions/transactions/metadata lock/external dependency visibility",
-        "state": "administrator_AI_scope_readonly_passed24_queries; actual_operator_and_window_resample_required"
+        "state": "AI_admin_visibility_and_readonly_executor_qualified; actual_DDL_operator_identity_scope_and_fresh_W04_exclusion_still_required"
       },
       {
         "id": "DB08",
         "requirement": "only literal target DROP; bounded lock and current v2 approval, no ordinary app migration",
-        "state": "implemented_native_qualified; approval_not_issued"
+        "state": "source_and_native_qualified; production_approval_not_issued_or_consumed"
       },
       {
         "id": "DB09",
         "requirement": "R0 beforeDDL; F1 only approved ledger forward beforebusiness; F2/F3 preserve allnew44 facts",
-        "state": "implemented_and_reviewable; actualforward_image_pending"
+        "state": "R0_and_F1_native_qualified; F2_F3_same44_offline_restart_config_route_qualified; code_fault_requires_new44_patch_review"
       },
       {
         "id": "DB10",
         "requirement": "first-business-start barrier, one runtime, commitunknown inspection and no43/fullbackup replay",
-        "state": "review_plan_present; actualwindow_not_started"
+        "state": "review_plan_and_durable_boundary_source_qualified; actual_window_business_reopen_not_issued"
       }
     ]
   },
   "steps": [
     {
       "id": "W00",
-      "status": "review_plan_only",
+      "status": "completed_build_and_offline_prepare_only",
       "production_executed": false
     },
     {
       "id": "W01",
-      "status": "review_plan_only",
+      "status": "static_package_reviewable; no_production_signoff",
       "production_executed": false
     },
     {
@@ -1385,7 +1333,20 @@
       "build",
       "prepare"
     ],
-    "production_activation": false
+    "production_activation": false,
+    "build_only_runs": [
+      41305184442,
+      41311659072
+    ],
+    "prepare_only_runs": [
+      41305814053,
+      41311879954
+    ],
+    "isolated_qualification_runs": [
+      41306319525,
+      41308014765,
+      41311886021
+    ]
   },
   "retained_other_scope": {
     "IAM_two_objects": "retained",
@@ -1467,16 +1428,34 @@
     "frozen_database_backup_claimed": false,
     "database_execution_approval": false
   },
-  "last_updated_at": "2026-11-01T13:19:08.852792+00:00",
+  "last_updated_at": "2026-11-01T13:52:11.341299+00:00",
   "release_freeze_final": {
-    "schema": "ai246-final-release-freeze/v1",
-    "observed_at": "2026-11-01T06:41:40.268876+00:00",
+    "schema": "ai246-final-preparation-freeze-runtime/v1",
+    "observed_at": "2026-11-01T13:53:19.170859+00:00",
     "AI_AUTO_DEPLOY_ENABLED": "false",
     "QS_Production_Deploy": "disabled_manually",
-    "active_AI_deploy_runs": [],
-    "deployment_dispatched": false,
+    "active_AI_release_workflows": [],
+    "actual_runtime": {
+      "source": "f9f24abdf98535295c4e3d223675ef6be62115e2",
+      "container_id": "f2f43c57a332352c78111b6c3faa2014da768dfaf94ab8afa8c7b1ec5658a004",
+      "engine_image_id": "sha256:18a39e862a82bfb9b503a3dd93639688bc45016caa2c7f1bf9081953b4523fa0",
+      "running": true,
+      "healthy": true,
+      "restart_count": 0,
+      "OOMKilled": false,
+      "started_at": "2026-10-30T18:37:03.255198256Z",
+      "current_release": "f9f24abdf98535295c4e3d223675ef6be62115e2-41108077901-1",
+      "state_unchanged": true
+    },
+    "qualified_source": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+    "production_activation": false,
     "business_stopped": false,
-    "production_DDL_executed": false
+    "production_DDL": false,
+    "business_DML": false,
+    "production_approval_issued_or_consumed": false,
+    "receipt_sha256": "16ff3954d97c0122f9b02c2bb4c8d39ea968510e4e5886470a2e4e09805fae6c",
+    "automatic_main_followup_run": 41311618873,
+    "automatic_main_followup_state": "skipped"
   },
   "stable_originals_copy": {
     "directory": "/var/lib/fangcun-m5-protection/followthrough-20261101/ai246-review-90e64f3",
@@ -1492,10 +1471,10 @@
   "administrator_readonly_inventory": {
     "path": "docs/evidence/2026-11-01-ai246-administrator-readonly.sql",
     "sha256": "c2ab35d7016c7959808988b1f2bcb196bc20213591813314fc7acf25aa21c1a7",
-    "production_executor_qualified": true,
-    "production_run": true,
+    "production_executor_qualified": false,
+    "production_run": false,
     "read_only_or_transaction_control_statements": 11,
-    "qualified_replacement": "QS#479 ai-activity-admin fixed AI route; successful run41307710356; SQL inventory remains planning-only"
+    "qualified_replacement": "SQL file remains inventory only; QS#479 typed Go executor observed AI successfully in runs41307710356 and41312407017"
   },
   "postcheck_contract": {
     "verify_exit0": "retained comparison only; never migration/start approval",
@@ -1510,9 +1489,9 @@
   "administrator_observation": {
     "PR": "https://github.com/FangcunMount/qs-server/pull/479",
     "source_sha": "7899ffce168bac0097b733dd874ab97d87f10db0",
-    "run": 41307710356,
-    "url": "https://github.com/FangcunMount/qs-server/actions/runs/41307710356",
-    "receipt_sha256": "2e3f607a44a0ffd5300b6ad42550d41c6531f293b555bd662dbcf6726febe30a",
+    "run": 41312407017,
+    "url": "https://github.com/FangcunMount/qs-server/actions/runs/41312407017",
+    "receipt_sha256": "5c3b7b15c28594f2be63eb707fc89f22731d2b45f5c023a8fdaf1daba818cd9c",
     "receipt": {
       "ai_activity_only": true,
       "complete": true,
@@ -1541,7 +1520,7 @@
           "target_view_dependencies": 0
         },
         "global_metadata_grants_verified": true,
-        "sampled_at_epoch_microseconds": 1793536943232351,
+        "sampled_at_epoch_microseconds": 1793540473260492,
         "schema_head": "0043_native_transaction_limit",
         "target_ddl_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff",
         "target_present": true,
@@ -1551,7 +1530,7 @@
       "observations_atomic": false,
       "query_count": 24,
       "read_only": true,
-      "run_id": "41307710356-1",
+      "run_id": "41312407017-1",
       "source_sha": "7899ffce168bac0097b733dd874ab97d87f10db0",
       "source_target_hash": "83cd3186bd7de27e6a5b5aa0effbb3c5673274f65cd5d4635f36fed7304a5463"
     },
@@ -1576,7 +1555,10 @@
         "view_dependency_detected": true
       },
       "native_receipt_sha256": "d908ad9170b7d831c9e1636a09ac5cbcf09a623a05bba3f0246080d188ebef05"
-    }
+    },
+    "executor_qualified": true,
+    "production_readonly_run": true,
+    "receipt_public": "docs/evidence/2026-11-01-ai246-administrator-observation.json"
   },
   "rejected_prepared_image44": {
     "source_sha": "abc700ff00666617e4355a991343c66c2e3523cf",
@@ -1827,7 +1809,7 @@
     "local_lifecycle_passed": 26,
     "local_docs_retired_boundaries_passed": 24,
     "static": "Ruff/format/mypy pass",
-    "full_CI": "PR12_and_manual_M7_two_passed; exact_main_full_pending",
+    "full_CI": "exact_main12_plus_M7two_success",
     "new_immutable_main_candidate": "pending",
     "M7": {
       "run": 41309046783,
@@ -1843,7 +1825,10 @@
       "jobs_success": 12
     },
     "exact_main_CI": 41310278495,
-    "exact_main_M7": 41310404873
+    "exact_main_M7": 41310404873,
+    "exact_main_success": 14,
+    "actual_image_qualification_run": 41311886021,
+    "actual_image_cases": 13
   },
   "qualification_harness": {
     "PR": "https://github.com/FangcunMount/infra/pull/425",
@@ -1947,6 +1932,325 @@
     },
     "sha256": "760352992ef550ea3349af2531c117c4b25619362df9b1448efd9f37d9d8aebc",
     "historical_PR_receipt_not_relabelled": true,
-    "actual_image_qualification_pending": true
-  }
+    "actual_image_qualification_pending": false
+  },
+  "historical_246_source_qualification": {
+    "PR": "https://github.com/FangcunMount/qs-ai/pull/246",
+    "source_sha": "abc700ff00666617e4355a991343c66c2e3523cf",
+    "draft": false,
+    "merged": true,
+    "production_deployed": false,
+    "original43_migration_files_byte_equal": true,
+    "source_preservation_receipt_sha256": "8523cc0c501d43c4d57733e887b1e57fa6a828560e95a3f31cec1edf0b7f6180",
+    "full_CI": {
+      "run": 41281012903,
+      "status": "success",
+      "all_checks_success": true,
+      "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012903",
+      "jobs": [
+        {
+          "name": "Retirement backup and restore (8.4)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.0.36, 1)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.4, 1)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.4, 2)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.4, 3)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.0.36, 0)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.4, 0)",
+          "conclusion": "success"
+        },
+        {
+          "name": "image",
+          "conclusion": "success"
+        },
+        {
+          "name": "Retirement backup and restore (8.0.36)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.0.36, 3)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.0.36, 2)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete test coverage",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "m7_CI": {
+      "run": 41281012842,
+      "status": "success",
+      "checks_success": 2,
+      "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012842",
+      "jobs": [
+        {
+          "name": "m7 (8.0.36)",
+          "conclusion": "success"
+        },
+        {
+          "name": "m7 (8.4)",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "all_checks_success": 14,
+    "local_targeted_tests_passed": 37,
+    "local_static": "Ruff/format, mypy455 files, docs76files1281links passed",
+    "historical_PR_source_qualification": {
+      "source_sha": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
+      "full_CI": {
+        "run": 41281012903,
+        "status": "success",
+        "all_checks_success": true,
+        "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012903",
+        "jobs": [
+          {
+            "name": "Retirement backup and restore (8.4)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 1)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 1)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 2)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 3)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 0)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 0)",
+            "conclusion": "success"
+          },
+          {
+            "name": "image",
+            "conclusion": "success"
+          },
+          {
+            "name": "Retirement backup and restore (8.0.36)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 3)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 2)",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete test coverage",
+            "conclusion": "success"
+          }
+        ]
+      },
+      "m7_CI": {
+        "run": 41281012842,
+        "status": "success",
+        "checks_success": 2,
+        "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012842",
+        "jobs": [
+          {
+            "name": "m7 (8.0.36)",
+            "conclusion": "success"
+          },
+          {
+            "name": "m7 (8.4)",
+            "conclusion": "success"
+          }
+        ]
+      }
+    },
+    "main_CI_runs": [
+      41303650216,
+      41303650098
+    ],
+    "main_CI_success": 14
+  },
+  "historical_native_qualification": {
+    "schema": "ai246-native-window-qualification/v1",
+    "source_sha": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
+    "CI_run": 41281012903,
+    "production_executed": false,
+    "proof": [
+      {
+        "mysql": "8.0.36",
+        "native_cases": 21,
+        "seconds": 48.611999999999995,
+        "artifact_id": 13072669254,
+        "artifact_sha256": "55a7c1377c8da0816681eff5cade03e5b9291f11fc069ede4d4c94010cee23c8",
+        "xml_sha256": "017e9f05e946d84069ceabd40ad11b21e33dde1abbebeb58728e68171fe1deb8",
+        "names": [
+          "test_fresh_head_install_and_current_metadata_agree",
+          "test_existing_store_without_review_never_changes_native_or_old_rows",
+          "test_nonempty_publisher_refuses_after_review_before_consumption",
+          "test_reviewed_upgrade_preserves_all_retained_rows_and_refuses_replay",
+          "test_pre_drop_failure_keeps_consumed_marker_and_original_store",
+          "test_unknown_ddl_result_converges_forward_without_replaying_drop",
+          "test_forward_recovery_refuses_unproved_original_state[retained_bytes]",
+          "test_forward_recovery_refuses_unproved_original_state[retained_schema]",
+          "test_forward_recovery_refuses_unproved_original_state[missing_original_marker]",
+          "test_forward_recovery_refuses_unproved_original_state[wrong_database]",
+          "test_forward_recovery_refuses_unproved_original_state[business_reopened]",
+          "test_original_production_empty_target_ddl_restores_only_in_isolated_mysql",
+          "test_capture_cli_is_readonly_and_releases_owned_pool",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-none]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-archive_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-witness_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-client_reply_discarded]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-none]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-archive_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-witness_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
+        ]
+      },
+      {
+        "mysql": "8.4",
+        "native_cases": 21,
+        "seconds": 57.115,
+        "artifact_id": 13073262697,
+        "artifact_sha256": "21ee5fdc60f9ca4fb88795525f69208734c5d06f49c3149878c9d3f9740c5c2f",
+        "xml_sha256": "1cf60e3d6f2f571b405834bf37e9c244b6d753ba1dfdfd31c5a0b2b91420485a",
+        "names": [
+          "test_fresh_head_install_and_current_metadata_agree",
+          "test_existing_store_without_review_never_changes_native_or_old_rows",
+          "test_nonempty_publisher_refuses_after_review_before_consumption",
+          "test_reviewed_upgrade_preserves_all_retained_rows_and_refuses_replay",
+          "test_pre_drop_failure_keeps_consumed_marker_and_original_store",
+          "test_unknown_ddl_result_converges_forward_without_replaying_drop",
+          "test_forward_recovery_refuses_unproved_original_state[retained_bytes]",
+          "test_forward_recovery_refuses_unproved_original_state[retained_schema]",
+          "test_forward_recovery_refuses_unproved_original_state[missing_original_marker]",
+          "test_forward_recovery_refuses_unproved_original_state[wrong_database]",
+          "test_forward_recovery_refuses_unproved_original_state[business_reopened]",
+          "test_original_production_empty_target_ddl_restores_only_in_isolated_mysql",
+          "test_capture_cli_is_readonly_and_releases_owned_pool",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-none]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-archive_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-witness_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-client_reply_discarded]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-none]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-archive_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-witness_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
+        ]
+      }
+    ],
+    "candidate_restore_qualification_receipt_sha256": "52a7b9a566ec6cb48eef4345475bf01f887fa407b5ffa86342c172fe0f05e688",
+    "production44_image_binding_qualified": false
+  },
+  "historical_administrator_observation": {
+    "PR": "https://github.com/FangcunMount/qs-server/pull/479",
+    "source_sha": "7899ffce168bac0097b733dd874ab97d87f10db0",
+    "run": 41307710356,
+    "url": "https://github.com/FangcunMount/qs-server/actions/runs/41307710356",
+    "receipt_sha256": "2e3f607a44a0ffd5300b6ad42550d41c6531f293b555bd662dbcf6726febe30a",
+    "receipt": {
+      "ai_activity_only": true,
+      "complete": true,
+      "connection_released": true,
+      "database_released": true,
+      "error_category": "none",
+      "expected_target_hash": "83cd3186bd7de27e6a5b5aa0effbb3c5673274f65cd5d4635f36fed7304a5463",
+      "failure_stage": "none",
+      "format_version": 1,
+      "freeze_verified": false,
+      "measurements": {
+        "counts": {
+          "ai_active_threads": 0,
+          "ai_enabled_events": 0,
+          "ai_metadata_locks_granted": 0,
+          "ai_metadata_locks_pending": 0,
+          "ai_modifying_transactions": 0,
+          "ai_routines": 0,
+          "ai_threads": 4,
+          "ai_transactions": 0,
+          "ai_triggers": 0,
+          "ai_views": 0,
+          "global_metadata_locks_pending": 0,
+          "target_external_foreign_keys": 0,
+          "target_incoming_foreign_keys": 0,
+          "target_view_dependencies": 0
+        },
+        "global_metadata_grants_verified": true,
+        "sampled_at_epoch_microseconds": 1793536943232351,
+        "schema_head": "0043_native_transaction_limit",
+        "target_ddl_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff",
+        "target_present": true,
+        "target_rows": 0
+      },
+      "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+      "observations_atomic": false,
+      "query_count": 24,
+      "read_only": true,
+      "run_id": "41307710356-1",
+      "source_sha": "7899ffce168bac0097b733dd874ab97d87f10db0",
+      "source_target_hash": "83cd3186bd7de27e6a5b5aa0effbb3c5673274f65cd5d4635f36fed7304a5463"
+    },
+    "window_resample_required": true,
+    "writer_exclusion_proved": false,
+    "current_executor_grants_changed": false,
+    "exact_main_CI": {
+      "run": 41307558019,
+      "status": "success",
+      "jobs_success": 20,
+      "original_conditional_skips": 1,
+      "native_fixture_receipt": {
+        "actual43_and44_observed_without_observer_writes": true,
+        "actual_pending_metadata_lock_and_DDL_observed": true,
+        "fixture_only": true,
+        "nonzero_not_freeze": true,
+        "original_binary_fact_and_ledger_preserved": true,
+        "passed": true,
+        "production_or_system_acceptance": false,
+        "restricted_visibility_refused": true,
+        "source_sha": "7899ffce168bac0097b733dd874ab97d87f10db0",
+        "view_dependency_detected": true
+      },
+      "native_receipt_sha256": "d908ad9170b7d831c9e1636a09ac5cbcf09a623a05bba3f0246080d188ebef05"
+    }
+  },
+  "prior_live_qualification": {
+    "captured_at": "2026-11-01T06:31:31.701855+00:00",
+    "snapshot_sha256": "1079e7871ec49b4ba1396d57668f1c06c7e0e5d44454bef837cf8cbdf126751c",
+    "observer_source": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
+    "runtime_source": "f9f24abdf98535295c4e3d223675ef6be62115e2"
+  },
+  "remaining_execution_requirements": [
+    "fresh actual writer inventory/exclusion and210s no-error production drain; retain Broker pending and all history",
+    "same-window frozen original target/ledger/all49 fingerprints and independently qualified complete backup/PITR route",
+    "fresh actual DDL operator/privilege review and W04 AI administrator observation",
+    "two-copy current-window materials and independent bounded production review/consumption; durable first-business-start barrier"
+  ]
 }
