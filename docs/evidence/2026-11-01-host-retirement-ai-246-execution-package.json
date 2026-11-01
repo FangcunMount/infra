@@ -10,7 +10,7 @@
     "originals_retained": true
   },
   "recorded_at": "2026-11-01T06:34:00.249278+00:00",
-  "status": "prepared_for_review",
+  "status": "preparation_gates_qualified; production_execution_No-Go",
   "execution_authorized": false,
   "user_scope": {
     "keep_release_frozen": true,
@@ -1428,7 +1428,7 @@
     "frozen_database_backup_claimed": false,
     "database_execution_approval": false
   },
-  "last_updated_at": "2026-11-01T13:52:11.341299+00:00",
+  "last_updated_at": "2026-11-01T14:01:42.688167+00:00",
   "release_freeze_final": {
     "schema": "ai246-final-preparation-freeze-runtime/v1",
     "observed_at": "2026-11-01T13:53:19.170859+00:00",
@@ -2252,5 +2252,35 @@
     "same-window frozen original target/ledger/all49 fingerprints and independently qualified complete backup/PITR route",
     "fresh actual DDL operator/privilege review and W04 AI administrator observation",
     "two-copy current-window materials and independent bounded production review/consumption; durable first-business-start barrier"
-  ]
+  ],
+  "review_material_protection_current": {
+    "archive_sha256": "025c3296773cbca2bd3ad4fb21539c49b9092c91a4672efeec05d81ddf1fb6f3",
+    "archive_bytes": 262238611,
+    "original_members_verified": 139,
+    "servera_readback_verified": true,
+    "fsynced": true,
+    "root_owned": true,
+    "directory_mode": "0700",
+    "file_mode": "0600",
+    "minimum_retention_days": 30,
+    "extend_unresolved": true,
+    "automatic_cleanup": false,
+    "production_activation": false,
+    "database_execution_approval": false,
+    "MacBook_readback_verified": true,
+    "recorded_at": "2026-11-01T14:00:32.259770+00:00",
+    "receipt_external_to_archive": true,
+    "copy_receipt_sha256": "c298363faff2d243f7440ac1a4bf622839085f9246cb1b8d012915917ec0c0b4",
+    "copy_receipt_also_two_copies": true,
+    "raw_ZIP_CRC_verified": 31,
+    "source_and_package_snapshot": "execution-package-qualified-da65 plus incremental source bundles; final archive copy receipt external",
+    "archive_contains_prior_failed_image_for_audit_only": true,
+    "qualified_image_archives_protected_separately": true,
+    "qualified_image_archive_sha256": [
+      "9042ce559f7d3bcb6df19915972830d566b1c60e8eeb0abd1ba9050cf8434507",
+      "1256b4781619aa866b1c3a023a76c9b3db2280b935826049f934a50439d7a180"
+    ],
+    "frozen_database_backup_claimed": false,
+    "production_execution_approval": false
+  }
 }
