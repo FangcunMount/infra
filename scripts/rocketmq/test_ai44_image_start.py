@@ -1,6 +1,6 @@
 import copy
 import unittest
-from ai44_image_start import CMD, verify_registry_identity
+from ai44_image_start import CMD, verify_registry_identity, lifecycle_diagnostics
 
 SOURCE='a'*40
 REF='registry.invalid/owned/qs-ai@sha256:'+'b'*64
@@ -22,4 +22,10 @@ class Registry44IdentityTests(unittest.TestCase):
         for ref,source in [('registry.invalid/owned/qs-ai:latest',SOURCE),(REF,'main'),(REF.replace('registry.invalid','other.invalid'),SOURCE)]:
             with self.assertRaises(RuntimeError):verify_registry_identity(image(),ref,source)
 
+    def test_diagnostics_never_export_arbitrary_log_fields_or_component_values(self):
+        import json
+        raw='private-driver-secret\n'+json.dumps(dict(event='drain_timeout',component='private-account-secret',level='WARNING',password='private-password-secret'))
+        value=lifecycle_diagnostics(raw)
+        self.assertEqual(value,[dict(event='drain_timeout',component='other',level='WARNING')])
+        self.assertNotIn('secret',str(value))
 if __name__=='__main__':unittest.main()

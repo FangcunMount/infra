@@ -87,6 +87,18 @@ def load_registry(fixture, reference, source, output):
     return proof
 
 
+
+def lifecycle_diagnostics(raw):
+    events={'component_starting','service_ready','service_failed','service_draining','drain_timeout','component_stopped','component_stopped_with_error','transaction_shutdown_incomplete','startup_or_runtime_failure'}
+    components={'qs-ai','grpc','generation','evaluation','diagnostic_retention','mq_transactions','mq_subscriber_0','mq_subscriber_1','http'}
+    result=[]
+    for line in raw.splitlines():
+        try:value=json.loads(line)
+        except ValueError:continue
+        if isinstance(value,dict) and value.get('event') in events:
+            result.append(dict(event=value['event'],component=value['component'] if value.get('component') in components else 'other',level=value.get('level') if value.get('level') in {'INFO','WARNING','ERROR','CRITICAL'} else 'other'))
+    return result[-64:]
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source',type=Path,required=True)
@@ -168,10 +180,14 @@ def main():
                 time.sleep(1)
             else:raise RuntimeError('actual_ai_ready_budget_exceeded')
             case(suffix+'_actual_readonly44_ready_and_checker_live')
+            stop_started=time.monotonic()
             run(['docker','stop','--time','210',app],timeout=225)
+            report[suffix+'_shutdown_seconds']=round(time.monotonic()-stop_started,3)
             state=json.loads(run(['docker','inspect',app]).stdout)[0]['State']
             private=run(['docker','logs',app],required=False);raw=private.stdout+private.stderr
             report[suffix+'_private_log_sha256']=hashlib.sha256(raw.encode()).hexdigest()
+            report[suffix+'_process_state']={k:state[k] for k in ('Status','ExitCode','OOMKilled')}
+            report[suffix+'_lifecycle']=lifecycle_diagnostics(raw)
             require(not any(name in raw for name in ('drain_timeout','transaction_shutdown_incomplete','component_stopped_with_error')),'actual_ai_drain_incomplete')
             case(suffix+'_graceful_zero_exit_no_oom',state['Status']=='exited' and state['ExitCode']==0 and not state['OOMKilled'])
         start_stop('candidate')
