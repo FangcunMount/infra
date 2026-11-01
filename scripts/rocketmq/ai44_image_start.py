@@ -69,6 +69,7 @@ def load_registry(fixture, reference, source, output):
             and runtime['direct_url']['url'] == expected['wheel_url']
             and payload['matched'] is True,
             'actual_locked_image_sdk_required')
+    fixture.ownership(os.getuid())  # Later owned dependency provisioning writes new private fixtures.
     archive = output/'ai44-forward-image.tar.gz'
     raw_tar = output/'owned-image.tar'
     fixture.run(['docker', 'save', '--output', str(raw_tar), fixture.image], timeout=300)
