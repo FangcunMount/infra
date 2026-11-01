@@ -1,0 +1,28 @@
+name: AI backup and execution-account contracts
+on:
+  pull_request:
+    paths:
+      - scripts/mysql/ai_account_observe.py
+      - scripts/mysql/ai_backup_material.py
+      - scripts/mysql/ai_execution_account.py
+      - scripts/mysql/test_ai_backup_material.py
+      - scripts/mysql/test_ai_execution_account.py
+      - .github/workflows/ai-backup-account-contracts.yml
+  push:
+    branches: [main]
+    paths:
+      - scripts/mysql/ai_account_observe.py
+      - scripts/mysql/ai_backup_material.py
+      - scripts/mysql/ai_execution_account.py
+      - scripts/mysql/test_ai_backup_material.py
+      - scripts/mysql/test_ai_execution_account.py
+      - .github/workflows/ai-backup-account-contracts.yml
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: python3 -B -m unittest discover -s scripts/mysql -p 'test_ai_*.py'
+      - run: python3 -m py_compile scripts/mysql/ai_account_observe.py scripts/mysql/ai_backup_material.py scripts/mysql/ai_execution_account.py

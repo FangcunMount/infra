@@ -1,0 +1,29 @@
+{
+  "schema": "ai-publisher-restore-qualification/v1",
+  "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+  "table_ddl_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff",
+  "isolated": true,
+  "restored_rows": 0,
+  "ddl_roundtrip_equal": true,
+  "retained_unchanged": true,
+  "head43_to44_passed": true,
+  "unknown_ddl_convergence_passed": true,
+  "evidence_sha256": "760352992ef550ea3349af2531c117c4b25619362df9b1448efd9f37d9d8aebc",
+  "native_MySQL": [
+    "8.0.36",
+    "8.4"
+  ],
+  "cases_each": 21,
+  "CI_run": 41310278495,
+  "candidate_only": true,
+  "production_approval": false,
+  "actual_production44_image_startup_qualified": true,
+  "qualification_environment": "owned GitHub-hosted isolated database and Broker; production not started",
+  "actual_image_qualification_run": 41311886021,
+  "actual_image_qualification_sha256": "e65fe8237df577a8b9d73397767c19deb6b28b92255048e3a168a9614d357ece",
+  "registry_digest": "sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e",
+  "image_config_sha256": "sha256:a0eba52391dd24273ef2437cec10d224913e31a484a1c8b0294dd1f71882130c",
+  "actual_image_cases": 13,
+  "production_business_started": false,
+  "production_backup_or_PITR_qualified": false
+}

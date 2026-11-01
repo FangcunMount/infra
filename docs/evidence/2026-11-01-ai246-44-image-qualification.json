@@ -1,0 +1,296 @@
+{
+  "schema": "ai246-actual-registry-image44-qualification/v1",
+  "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+  "production": false,
+  "system_acceptance": false,
+  "model_or_upstream_requests_exercised": false,
+  "passed": 13,
+  "failed": 0,
+  "skipped": 0,
+  "cases": {
+    "exact_registry_digest_source_config_and_installed_sdk": true,
+    "actual_original_image_installs_full44_without_legacy_table": true,
+    "actual44_initial_binding_cli_verified": true,
+    "actual_full44_restore_preserves_binary_fact_binding_and_ledger": true,
+    "candidate_actual_readonly44_ready_and_checker_live": true,
+    "candidate_graceful_zero_exit_no_oom": true,
+    "original_binary_fact_preserved_after_candidate_start": true,
+    "new_fact_retained_before_forward_start": true,
+    "forward_actual_readonly44_ready_and_checker_live": true,
+    "forward_graceful_zero_exit_no_oom": true,
+    "forward_start_keeps_all_original_and_new_facts_without_restore": true,
+    "both_actual_starts_and_shutdowns_attempt_no_DDL": true,
+    "no_model_call_dispatched": true
+  },
+  "scope": "owned44 full restore and paused full-runtime/Checker starts before and after retained new fixture facts; no43 replay",
+  "infra_sha": "678681b647d11b75b2edb080ecea7aa5c8e3c174",
+  "candidate": {
+    "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+    "registry_digest": "sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e",
+    "engine_image_id": "sha256:a0eba52391dd24273ef2437cec10d224913e31a484a1c8b0294dd1f71882130c",
+    "image_config_id": "sha256:a0eba52391dd24273ef2437cec10d224913e31a484a1c8b0294dd1f71882130c",
+    "archive_sha256": "1256b4781619aa866b1c3a023a76c9b3db2280b935826049f934a50439d7a180",
+    "archive_bytes": 131626551,
+    "archive_tag": "ai44-qualified:c6359b441de4-2716d57c",
+    "sdk": "0.5.0",
+    "client": "5.1.2",
+    "uid": 10001,
+    "wheel_sha256": "6fe1fbf0635d3e2f8ba2f10c12474c39c939ee656f20df7784928f8bd92e88b8",
+    "installed_sdk_files_verified": 19,
+    "shared_production_and_recovery_code": true
+  },
+  "dependency_image_ids": {
+    "mysql": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+    "rocketmq": "sha256:dafaeac10b2ee7e9afc5160e8422f1f093474d30498bd5c0a41e6bc3d4383022"
+  },
+  "dependency_versions": {
+    "mysql": "8.0.36"
+  },
+  "original44_full_protection_sha256": "e3875d409fbc8c63b6026411306196cc6378151057c05dd7b896a6bf3bff26ec",
+  "resource_provision": {
+    "version": 2,
+    "operations": 12,
+    "typed_topics": 3,
+    "principals": 1,
+    "verified": true,
+    "readback": {
+      "attempts": 1,
+      "observations": [
+        {
+          "attempt": 1,
+          "missing_counts": {
+            "topics": 0,
+            "groups": 0,
+            "principals": 0,
+            "grants": 0
+          }
+        }
+      ],
+      "mutation_retry_attempted": false
+    }
+  },
+  "runtime_environment_sha256": "bf0a4fba6f4e44b84fb34598ac990b064ec3c9177d353060bd10d06da9d7c1e2",
+  "candidate_paused_metrics": {
+    "sdk_ready": 1,
+    "sampler_running": 1,
+    "observation_available": 1,
+    "admission_open": 0,
+    "check_workers_limit": 1,
+    "check_queue_limit": 16
+  },
+  "candidate_shutdown_seconds": 5.037,
+  "candidate_private_log_sha256": "f973a0a454971c283a9f7ce781eaa4b53ac3b4e988b914bdabf7a4d5110a2e9f",
+  "candidate_process_state": {
+    "Status": "exited",
+    "ExitCode": 0,
+    "OOMKilled": false
+  },
+  "candidate_lifecycle": [
+    {
+      "event": "component_starting",
+      "component": "grpc",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "generation",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "evaluation",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "mq_transactions",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "mq_subscriber_0",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "mq_subscriber_1",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "diagnostic_retention",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "http",
+      "level": "INFO"
+    },
+    {
+      "event": "service_ready",
+      "component": "qs-ai",
+      "level": "INFO"
+    },
+    {
+      "event": "service_draining",
+      "component": "qs-ai",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "generation",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "evaluation",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "diagnostic_retention",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "grpc",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "mq_subscriber_0",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "mq_subscriber_1",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "mq_transactions",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "http",
+      "level": "INFO"
+    }
+  ],
+  "forward_paused_metrics": {
+    "sdk_ready": 1,
+    "sampler_running": 1,
+    "observation_available": 1,
+    "admission_open": 0,
+    "check_workers_limit": 1,
+    "check_queue_limit": 16
+  },
+  "forward_shutdown_seconds": 4.766,
+  "forward_private_log_sha256": "85d97d44ec5eba41cd48d0336a802081a8dd9a803c3fa1370cc32f4f6a98c62a",
+  "forward_process_state": {
+    "Status": "exited",
+    "ExitCode": 0,
+    "OOMKilled": false
+  },
+  "forward_lifecycle": [
+    {
+      "event": "component_starting",
+      "component": "grpc",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "generation",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "evaluation",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "mq_transactions",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "mq_subscriber_0",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "mq_subscriber_1",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "diagnostic_retention",
+      "level": "INFO"
+    },
+    {
+      "event": "component_starting",
+      "component": "http",
+      "level": "INFO"
+    },
+    {
+      "event": "service_ready",
+      "component": "qs-ai",
+      "level": "INFO"
+    },
+    {
+      "event": "service_draining",
+      "component": "qs-ai",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "diagnostic_retention",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "generation",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "evaluation",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "grpc",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "mq_subscriber_1",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "mq_subscriber_0",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "mq_transactions",
+      "level": "INFO"
+    },
+    {
+      "event": "component_stopped",
+      "component": "http",
+      "level": "INFO"
+    }
+  ],
+  "runtime_DDL_attempts": 0,
+  "cleanup": {
+    "compose_down_succeeded": true,
+    "private_directory_removed": true,
+    "existing_containers_unchanged": true,
+    "existing_networks_unchanged": true,
+    "owned_image_alias_absent": true
+  },
+  "source_unchanged": true
+}
