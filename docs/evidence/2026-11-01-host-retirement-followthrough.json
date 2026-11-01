@@ -391,5 +391,6 @@
     "bytes": 357062
   },
   "actual_canary_addendum": "docs/evidence/2026-11-01-host-retirement-real-canary.json",
-  "actual_canary_addendum_note": "Earlier preparation facts retain their recorded time; final actual one-case acceptance and main CI in linked addendum"
+  "actual_canary_addendum_note": "Earlier preparation facts retain their recorded time; final actual one-case acceptance and main CI in linked addendum",
+  "AI_empty_publisher_candidate_review": "docs/evidence/2026-11-01-host-retirement-ai-empty-publisher-review.json"
 }
