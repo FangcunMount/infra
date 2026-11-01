@@ -69,3 +69,5 @@
 20项定向纯测试覆盖HEX/NULL/字符集/JSON、生成列与DEFAULT_GENERATED、未知转义/表达式拒绝、SHA与私有文件/网络边界、直接权限/角色拒绝和既有切库边界；实际恢复与新连接完整复核另有真实数据原件。原始备份仅在MacBook/ServerA0700目录、0600文件保留，至少30天且未结延期；SQL诊断、前两次失败、两次完整成功以及代码/镜像来源原件不删除。自有datadir在root私有父目录下保留原MySQL文件权限，未触碰既有卷、旧备份或其他四候选对象。
 
 15:30:14UTC最终现库只读仍完整43、目标0行、全部49保留表指纹与备份相同；原f9容器healthy/restart0/原启动时间，AI自动发布false、QS工作流disabled_manually。未停生产业务、未执行生产DDL/DML、未签发/消费生产批准，M5尚未生产发布。
+
+审查收口：精确提交`e6ff4a553b3a30173fafc90d7fc7267acf7ce5ca`的[CI41322507227](https://github.com/FangcunMount/infra/actions/runs/41322507227)成功，20项测试和编译通过，原始日志ZIP CRC通过。66份新审查原件及索引归档259,408字节，SHA256 `7a2b8111c9e512357032955e5bfe96346534c7a050af6f93281953a6b1cde54b`，MacBook/ServerA两地逐成员回读/SHA/fsync通过；真实备份与官方MySQL镜像单独保留。归档复制回执外置并同样两地保存，不声称收录于自身归档。15:46:07UTC再次实读AI自动发布false、QS disabled_manually、原f9 healthy/restart0/原启动时间。DB05仅剩真实窗口材料和批准持久消费；本轮未发出生产执行批准。

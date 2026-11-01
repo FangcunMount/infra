@@ -1230,7 +1230,7 @@
       {
         "id": "DB05",
         "requirement": "two-copy readback and durable approval consumption; minimum30days retention",
-        "state": "actual_backup_two_copy_verified; current_review_originals_protection_in_progress; future_window_materials_and_consumption_pending"
+        "state": "actual_full_backup_and_66_current_review_originals_two_copy_readback_fsync_verified; fresh_window_materials_and_durable_consumption_pending"
       },
       {
         "id": "DB06",
@@ -2459,5 +2459,136 @@
     "production_backup_overwritten": false,
     "cloud_instance_created": false,
     "credentials_history_ACK_scheduling_deleted": false
+  },
+  "backup_account_review_originals_protection": {
+    "archive_sha256": "7a2b8111c9e512357032955e5bfe96346534c7a050af6f93281953a6b1cde54b",
+    "archive_bytes": 259408,
+    "original_members_verified": 66,
+    "servera_readback_verified": true,
+    "fsynced": true,
+    "root_owned": true,
+    "directory_mode": "0700",
+    "file_mode": "0600",
+    "minimum_retention_days": 30,
+    "extend_unresolved": true,
+    "automatic_cleanup": false,
+    "production_activation": false,
+    "database_execution_approval": false,
+    "MacBook_readback_verified": true,
+    "recorded_at": "2026-11-01T15:45:40.204399+00:00",
+    "receipt_external_to_archive": true,
+    "receipt_sha256": "04b33daf736a3b9ada66d4806ba9cf6aeee6f8e26c964e74c3aa471ef9808e0d",
+    "copy_receipt_external_to_archive": true,
+    "copy_receipt_also_two_copies": true,
+    "real_backup_separately_two_copy_verified": true,
+    "official_mysql_image_separately_retained": true,
+    "raw_CI_ZIP_CRC_verified": true,
+    "protected_review_head": "e6ff4a553b3a30173fafc90d7fc7267acf7ce5ca"
+  },
+  "backup_account_contract_CI": {
+    "run_id": 41322507227,
+    "head_sha": "e6ff4a553b3a30173fafc90d7fc7267acf7ce5ca",
+    "conclusion": "success",
+    "tests": 20,
+    "source_compile": "passed",
+    "raw_logs_ZIP_CRC_verified": true,
+    "URL": "https://github.com/FangcunMount/infra/actions/runs/41322507227"
+  },
+  "backup_account_review_close_freeze_readback": {
+    "schema": "ai246-final-preparation-freeze-runtime/v1",
+    "observed_at": "2026-11-01T15:46:07.012623+00:00",
+    "AI_AUTO_DEPLOY_ENABLED": "false",
+    "QS_Production_Deploy": "disabled_manually",
+    "active_AI_release_workflows": [],
+    "recent_release_workflows": [
+      {
+        "conclusion": "success",
+        "databaseId": 41311879954,
+        "event": "workflow_dispatch",
+        "headSha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 41311659072,
+        "event": "workflow_dispatch",
+        "headSha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "databaseId": 41311618873,
+        "event": "workflow_run",
+        "headSha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 41305814053,
+        "event": "workflow_dispatch",
+        "headSha": "abc700ff00666617e4355a991343c66c2e3523cf",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 41305184442,
+        "event": "workflow_dispatch",
+        "headSha": "abc700ff00666617e4355a991343c66c2e3523cf",
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "databaseId": 41304826665,
+        "event": "workflow_run",
+        "headSha": "abc700ff00666617e4355a991343c66c2e3523cf",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 41108077901,
+        "event": "workflow_dispatch",
+        "headSha": "a26dd8cec3605145d8abd7f2bfcd0c3756281b19",
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "databaseId": 41098705022,
+        "event": "workflow_dispatch",
+        "headSha": "932b21dc5484c29ad226286c7ddf40653ed24fca",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 41096369314,
+        "event": "workflow_dispatch",
+        "headSha": "932b21dc5484c29ad226286c7ddf40653ed24fca",
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "databaseId": 41068807659,
+        "event": "workflow_run",
+        "headSha": "932b21dc5484c29ad226286c7ddf40653ed24fca",
+        "status": "completed"
+      }
+    ],
+    "actual_runtime": {
+      "source": "f9f24abdf98535295c4e3d223675ef6be62115e2",
+      "container_id": "f2f43c57a332352c78111b6c3faa2014da768dfaf94ab8afa8c7b1ec5658a004",
+      "engine_image_id": "sha256:18a39e862a82bfb9b503a3dd93639688bc45016caa2c7f1bf9081953b4523fa0",
+      "running": true,
+      "healthy": true,
+      "restart_count": 0,
+      "OOMKilled": false,
+      "started_at": "2026-10-30T18:37:03.255198256Z",
+      "current_release": "f9f24abdf98535295c4e3d223675ef6be62115e2-41108077901-1",
+      "state_unchanged": true
+    },
+    "qualified_source": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+    "production_activation": false,
+    "business_stopped": false,
+    "production_DDL": false,
+    "business_DML": false,
+    "production_approval_issued_or_consumed": false
   }
 }
