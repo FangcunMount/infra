@@ -1,0 +1,1270 @@
+{
+  "schema": "host-retirement-ai246-execution-package/v1",
+  "intermediate_native_qualification": {
+    "source_sha": "d389a6bbaec7b025312c44c063b2d1b33307d297",
+    "native_cases_each": 20,
+    "full_CI": 41280288769,
+    "full_CI_conclusion": "cancelled after later boundary hardening; not final qualification",
+    "m7_CI": 41280288758,
+    "m7_conclusion": "success",
+    "originals_retained": true
+  },
+  "recorded_at": "2026-11-01T06:34:00.249278+00:00",
+  "status": "prepared_for_review",
+  "execution_authorized": false,
+  "user_scope": {
+    "keep_release_frozen": true,
+    "stop_production_business": false,
+    "production_DDL": false,
+    "preserve_all_credentials_history_ACK_scheduling": true
+  },
+  "owners": {
+    "data": "shujie",
+    "recovery": "shujie"
+  },
+  "target": {
+    "store": "ai.mysql",
+    "table": "messaging_outbox",
+    "only_expected_DDL": "DROP TABLE messaging_outbox",
+    "initial_head": "0043_native_transaction_limit",
+    "target_head": "0044_empty_publisher",
+    "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+    "original_target_DDL_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff"
+  },
+  "candidate": {
+    "PR": "https://github.com/FangcunMount/qs-ai/pull/246",
+    "source_sha": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
+    "draft": true,
+    "merged": false,
+    "production_deployed": false,
+    "original43_migration_files_byte_equal": true,
+    "source_preservation_receipt_sha256": "8523cc0c501d43c4d57733e887b1e57fa6a828560e95a3f31cec1edf0b7f6180",
+    "full_CI": {
+      "run": 41281012903,
+      "status": "in_progress",
+      "all_checks_success": false
+    },
+    "m7_CI": {
+      "run": 41281012842,
+      "status": "success",
+      "checks_success": 2
+    }
+  },
+  "release_freeze": {
+    "schema": "ai-246-release-freeze/v1",
+    "observed_at": "2026-11-01T06:01:27.939274+00:00",
+    "AI_before": "true",
+    "AI_after": "false",
+    "QS_automatic_CD": "disabled_manually",
+    "active_AI_deploy_runs": [],
+    "business_stopped": false,
+    "database_mutated": false,
+    "deployment_dispatched": false
+  },
+  "live_qualification": {
+    "captured_at": "2026-11-01T06:31:31.701855+00:00",
+    "state": "43_intact",
+    "head": "0043_native_transaction_limit",
+    "frozen": false,
+    "writers_excluded": false,
+    "execution_approval": false,
+    "target_rows": 0,
+    "retained_tables": 49,
+    "retained_rows": 8502,
+    "retained_bytes": 91768306,
+    "snapshot_sha256": "1079e7871ec49b4ba1396d57668f1c06c7e0e5d44454bef837cf8cbdf126751c",
+    "transaction_released": true,
+    "pool_released": true,
+    "fingerprints_are_backup": false,
+    "elapsed_seconds": 16.604,
+    "two_live_snapshots_retained_identical": true,
+    "continuous_no_write_claimed": false,
+    "observer_source": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
+    "runtime_source": "f9f24abdf98535295c4e3d223675ef6be62115e2",
+    "retained_baseline": {
+      "evaluation_checkpoints": {
+        "columns": [
+          "run_id",
+          "version",
+          "checkpoint_json"
+        ],
+        "data_bytes": 1666,
+        "ddl_sha256": "abf5f48a9c2da73bc422ec8d1ee192f08cef9abc6eeb3d77fe72e5fec78c8960",
+        "rows": 39,
+        "rows_sha256": "c3500d73d4618b8f672f42fa704cd52cf134d095c12883b14b1b6b1ee3a8c1c5"
+      },
+      "evaluation_completions": {
+        "columns": [
+          "kind",
+          "run_id",
+          "execution_id",
+          "invocation_id",
+          "case_id",
+          "slot_ordinal",
+          "execution_ordinal",
+          "candidate_id",
+          "candidate_json",
+          "evidence_json",
+          "result_json",
+          "raw_output",
+          "normalized_output",
+          "gen_candidate_key",
+          "gen_case_key",
+          "gen_slot_key",
+          "sem_candidate_key"
+        ],
+        "data_bytes": 37494313,
+        "ddl_sha256": "dc043a77f1c887664cc70aa888452ecfd101ecd53e3298f9dfdc254f0967faa7",
+        "rows": 2536,
+        "rows_sha256": "a2c1acd2181ba830c27e350465e9c460989492d66d49b58161eb126c0b920136"
+      },
+      "evaluation_dispatches": {
+        "columns": [
+          "run_id",
+          "invocation_id",
+          "execution_id",
+          "kind",
+          "case_id",
+          "slot_ordinal",
+          "candidate_id",
+          "checkpoint_json"
+        ],
+        "data_bytes": 1627160,
+        "ddl_sha256": "85ba121560ca5c71459c9c62f9e4a92ca60675549ecb1ad1cca8262e0b01ca40",
+        "rows": 2536,
+        "rows_sha256": "22d6bb8b8b9e272e2225e1bd654b2287c17c3501bdb0cec3bca1bf6e7070a6b6"
+      },
+      "evaluation_response_receipts": {
+        "columns": [
+          "run_id",
+          "invocation_id",
+          "execution_id",
+          "claim_version",
+          "definition_json",
+          "sha256"
+        ],
+        "data_bytes": 36039681,
+        "ddl_sha256": "44f58c3634d7e764a06b4a6f283dc4f7307bb2359f4c9e4f55359b16833f95b1",
+        "rows": 1842,
+        "rows_sha256": "d661853089db17da17cec2b7e05a3fd57d5c062d67547c4464b5888d1c346e3c"
+      },
+      "evaluation_runs": {
+        "columns": [
+          "run_id",
+          "execution_mode",
+          "organization_id",
+          "requested_by",
+          "definition_json",
+          "progress_json",
+          "frozen_execution_policy_fingerprint",
+          "frozen_execution_policy_json"
+        ],
+        "data_bytes": 3749606,
+        "ddl_sha256": "087aed1998970939d1b39a60a98cfbd5493d051c70883502752ac09258195a92",
+        "rows": 39,
+        "rows_sha256": "77927511255c191c4842d48c92f7fd7465f5f605c36bbf9df84fa878ecbbb6c5"
+      },
+      "evaluation_slot_claims": {
+        "columns": [
+          "run_id",
+          "case_id",
+          "slot_ordinal",
+          "version",
+          "checkpoint_json"
+        ],
+        "data_bytes": 0,
+        "ddl_sha256": "f0128c604b82e14b00073236193804670dc64339f472e1e264360728978957b3",
+        "rows": 0,
+        "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "evaluation_suites": {
+        "columns": [
+          "suite_id",
+          "suite_version",
+          "fingerprint",
+          "definition_json",
+          "command_id",
+          "organization_id",
+          "operator_user_id",
+          "receipt_json",
+          "receipt_sha256",
+          "source_ref",
+          "imported_by",
+          "contracts_json",
+          "contracts_sha256"
+        ],
+        "data_bytes": 2807485,
+        "ddl_sha256": "0645894cfce0b05d0a70b83b00b0859ee60680ec864e2c427f6b8f2a6e1bb099",
+        "rows": 43,
+        "rows_sha256": "1b0e129cccbbf595f1842172ad3f934c79e17ad6014a092f141d35e98f5ad599"
+      },
+      "execution_configurations": {
+        "columns": [
+          "session_id",
+          "evidence_set_id",
+          "evidence_fingerprint",
+          "publication_id",
+          "publication_sha256",
+          "pointer_version",
+          "selector_query"
+        ],
+        "data_bytes": 16373,
+        "ddl_sha256": "34b334488bfae6ac856861c1dbb7205d16ff6d55586e316760335b718e9a122c",
+        "rows": 43,
+        "rows_sha256": "6ed825e56cf103e9477b5abbb38642928516c3cea21b3079b88d7950a5771ca4"
+      },
+      "execution_jobs": {
+        "columns": [
+          "id",
+          "run_id",
+          "session_id",
+          "status",
+          "available_at",
+          "lease_until",
+          "fence_token",
+          "attempt",
+          "answer",
+          "skipped",
+          "question_id"
+        ],
+        "data_bytes": 7014,
+        "ddl_sha256": "6f86e673edcf1e195ffac95f3a39bf6e5953e915bd4f78b76f658c525ff6f8fa",
+        "rows": 42,
+        "rows_sha256": "7c15bbe4241a1dd859da53deaee10e617d28220c951cb1b9f96006b2a6dac150"
+      },
+      "execution_leases": {
+        "columns": [
+          "thread_id",
+          "fence",
+          "expires_at"
+        ],
+        "data_bytes": 2646,
+        "ddl_sha256": "c8f4dd48c2aad3279d5c6e8816531ae2e89e5f52fc5599236e1d6ef892ed6abf",
+        "rows": 42,
+        "rows_sha256": "41c3e1bd0a55c39a855cafa0a337535a83d80c02f82814eedb0a5b29b3275a75"
+      },
+      "execution_model_calls": {
+        "columns": [
+          "run_id",
+          "invocation_id",
+          "fence_token",
+          "status",
+          "request_json",
+          "response_json",
+          "failure_code",
+          "created_at",
+          "created_at_utc"
+        ],
+        "data_bytes": 2426044,
+        "ddl_sha256": "d14df836340e476c6fe7053a3bb8f41afcac9c8b22287607d56f88c1234703f7",
+        "rows": 40,
+        "rows_sha256": "a22ee2ef9c51b9f9e2835292dd6f1caf2f487f251c467a62308789dde8ba9a84"
+      },
+      "execution_participant_retries": {
+        "columns": [
+          "organization_id",
+          "command_id",
+          "session_id",
+          "request_id",
+          "source_run_id",
+          "run_id",
+          "operator_user_id",
+          "expected_version",
+          "reason",
+          "accepted_unknown_risk",
+          "source_failure_code",
+          "frozen_request_json",
+          "receipt",
+          "created_at"
+        ],
+        "data_bytes": 0,
+        "ddl_sha256": "14a3fd126a9be3919a4ef043412f5b6b73e34e7221f973fcf6f94bd7c8d4af0d",
+        "rows": 0,
+        "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "governance_asset_versions": {
+        "columns": [
+          "asset_row_id",
+          "asset_kind",
+          "owner_organization_id",
+          "asset_id",
+          "version",
+          "fingerprint",
+          "body_format",
+          "body_bytes",
+          "package_sha256",
+          "source_ref",
+          "imported_by",
+          "created_at",
+          "native_id_key",
+          "scoped_id_key",
+          "profile_id_key",
+          "catalog_version_key"
+        ],
+        "data_bytes": 1039861,
+        "ddl_sha256": "1fd1023e53eeb2148c1d68bbc6454b7dfd56ede77309044fea912a1bf4ab8216",
+        "rows": 166,
+        "rows_sha256": "eb924373045dbf6cec64b03ef2f537420e5e164ef1da2e39c4392a5034a01895"
+      },
+      "governance_draft_heads": {
+        "columns": [
+          "draft_row_id",
+          "draft_kind",
+          "organization_id",
+          "draft_id",
+          "revision",
+          "prompt_draft_id_key",
+          "semantic_draft_id_key"
+        ],
+        "data_bytes": 3191,
+        "ddl_sha256": "5b5592b32a86337fcd8ed3f5249a595690354549853252cfc9df9e5c8d5e5df0",
+        "rows": 39,
+        "rows_sha256": "1d2b55856083b411f50489e6326c894bc65780739c26cd4c8dc3628a1534cac5"
+      },
+      "governance_draft_versions": {
+        "columns": [
+          "draft_row_id",
+          "revision",
+          "draft_kind",
+          "organization_id",
+          "snapshot_bytes",
+          "snapshot_sha256",
+          "command_id",
+          "operator_user_id",
+          "request_bytes",
+          "prompt_command_id_key"
+        ],
+        "data_bytes": 1801679,
+        "ddl_sha256": "c08cc188d136de2cb73f07f2852bec8a0a1e5b169e4150f5fa71534dfcf15c96",
+        "rows": 102,
+        "rows_sha256": "c36c4b77a11598001fbd50def3d62d634ab709ef309abcb9266671ae5e90d069"
+      },
+      "governance_profile_registrations": {
+        "columns": [
+          "command_id",
+          "organization_id",
+          "operator_user_id",
+          "profile_id",
+          "profile_version",
+          "receipt_json",
+          "receipt_sha256"
+        ],
+        "data_bytes": 433868,
+        "ddl_sha256": "37e78e7bd7e24e8310be1b2f46fd459ce3b976c9609f7cc4eb97b0312c56736f",
+        "rows": 37,
+        "rows_sha256": "87b2ae99ea667b2c25447e2c1852882a87996adde12624d30d6197be87f80aad"
+      },
+      "governance_prompt_draft_freezes": {
+        "columns": [
+          "command_id",
+          "draft_id",
+          "organization_id",
+          "operator_user_id",
+          "receipt_json",
+          "receipt_sha256"
+        ],
+        "data_bytes": 36467,
+        "ddl_sha256": "34465769480429a70a45b4d3111f7b8f257f8e36fa64a5065c346cd4e9550a9a",
+        "rows": 37,
+        "rows_sha256": "913d2261ab86ec12e0be2cf7a49e2d25eb1df67029edc2bfb68313f15d8bcb29"
+      },
+      "governance_semantic_draft_commands": {
+        "columns": [
+          "organization_id",
+          "command_id",
+          "operator_user_id",
+          "draft_id",
+          "request_json",
+          "receipt_json",
+          "receipt_sha256"
+        ],
+        "data_bytes": 21693,
+        "ddl_sha256": "3149d4e7831b93461e72e792c7d7897a0f51a0849fa858b1f0fb6219871ce48f",
+        "rows": 3,
+        "rows_sha256": "d7dc4c99d6ac61708f284c1db91b9d5c7359d5b5076c954e6e7d9c8f6108c508"
+      },
+      "governance_solution_commands": {
+        "columns": [
+          "command_id",
+          "solution_id",
+          "organization_id",
+          "operator_user_id",
+          "request_json",
+          "receipt_json",
+          "receipt_sha256"
+        ],
+        "data_bytes": 1679934,
+        "ddl_sha256": "aed639781f7cbe9f70bab10f96ad50c8d7ade56fd2c989fe078ea19ed4bd8917",
+        "rows": 127,
+        "rows_sha256": "9c78d1f7a199a1b8b72c7c5d2e3970e65747545df892e7f45db83432a602f5d8"
+      },
+      "governance_solutions": {
+        "columns": [
+          "solution_id",
+          "organization_id",
+          "revision",
+          "draft_id",
+          "state_json",
+          "state_sha256"
+        ],
+        "data_bytes": 404821,
+        "ddl_sha256": "f20e75e54c87cf6634a3d97a6ad6aeb8a92fbe49245747602d23988392fb6d46",
+        "rows": 35,
+        "rows_sha256": "d28fb0389611c49384c0778d204c4aec060ae3145cadfd74134725d246d90cc6"
+      },
+      "interpretation_artifacts": {
+        "columns": [
+          "id",
+          "session_id",
+          "run_id",
+          "payload",
+          "created_at"
+        ],
+        "data_bytes": 292117,
+        "ddl_sha256": "bb0154931242042f89725c3ee2ed645ab0d20dfd13aea629710de9ab2619acf2",
+        "rows": 37,
+        "rows_sha256": "d6a2d36a2cfec0fcade2f36175bfe8adcf6be100cf623da41e08babd2963a7b5"
+      },
+      "interpretation_clarifications": {
+        "columns": [
+          "id",
+          "session_id",
+          "question_seq",
+          "text",
+          "can_skip",
+          "answer",
+          "skipped",
+          "answered_by",
+          "answered_at"
+        ],
+        "data_bytes": 0,
+        "ddl_sha256": "b1757ff3feeb7a3d43e8284cf99b024362ee20ae015a0c8c338d3d9c3aad13e5",
+        "rows": 0,
+        "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "interpretation_evidence_sets": {
+        "columns": [
+          "id",
+          "session_id",
+          "fingerprint",
+          "schema_version",
+          "items",
+          "frozen_at"
+        ],
+        "data_bytes": 209933,
+        "ddl_sha256": "5d881845f5913cbe192ea1cf099c47fdce382d51a0697faf6666c5da9547e370",
+        "rows": 44,
+        "rows_sha256": "ef8f4b21b88132a1a1838a51c0a58223b15dda40beda86e0541d3be3ee8c52ac"
+      },
+      "interpretation_idempotency_requests": {
+        "columns": [
+          "scope_hash",
+          "key",
+          "request_hash",
+          "response",
+          "created_at"
+        ],
+        "data_bytes": 14434,
+        "ddl_sha256": "1c85d685f6b63b4c7dacb865660cb565b8048cc553a01326e41889c2d328ed35",
+        "rows": 44,
+        "rows_sha256": "1fecfc1841dd4682d0df7ea274dde6e4d5b07fc98246aac84bcac8a3476c7b15"
+      },
+      "interpretation_result_outbox": {
+        "columns": [
+          "event_id",
+          "session_id",
+          "version",
+          "payload",
+          "delivered",
+          "mq_owned",
+          "attempts",
+          "created_at",
+          "delivered_at",
+          "available_at"
+        ],
+        "data_bytes": 385999,
+        "ddl_sha256": "064fcaf915c1fc40e7b88506e5d7fe6b6e8d1926a64c99ecd4bc211bd1d47c17",
+        "rows": 128,
+        "rows_sha256": "ff045840a22f7adfdacc9752f0cc61e410a21d18799ff116c21ed85a4949cfa4"
+      },
+      "interpretation_runs": {
+        "columns": [
+          "id",
+          "session_id",
+          "session_version",
+          "status",
+          "checkpoint_ref"
+        ],
+        "data_bytes": 3594,
+        "ddl_sha256": "bcf7abc500ceef6600ca2038d878e8983c7213335e6881650f951955cdc29d82",
+        "rows": 44,
+        "rows_sha256": "654dbacf64de1bbf7b5f204bdd837775db4cf03fb48c86fec1602abb598cab29"
+      },
+      "interpretation_sessions": {
+        "columns": [
+          "id",
+          "request_id",
+          "org_id",
+          "owner_subject_id",
+          "testee_id",
+          "assessment_ids",
+          "goal",
+          "status",
+          "version",
+          "active_run_id",
+          "current_question_id",
+          "evidence_set_id",
+          "workflow_version",
+          "failure_code",
+          "created_at",
+          "updated_at",
+          "created_at_utc",
+          "updated_at_utc"
+        ],
+        "data_bytes": 15859,
+        "ddl_sha256": "1c28803d1aa3b4e782e931fa8ad4244d0f4503d63d16d1d3143bf0fc1003377e",
+        "rows": 44,
+        "rows_sha256": "8dc439477b1371594398d656c59d6218cc9d3a824c56b1ac9d0174095f9efc69"
+      },
+      "messaging_archive": {
+        "columns": [
+          "producer",
+          "destination",
+          "message_id",
+          "organization_id",
+          "frozen_payload",
+          "first_wire",
+          "execution_key",
+          "branch_key",
+          "reference"
+        ],
+        "data_bytes": 358044,
+        "ddl_sha256": "c7b0605ebba10354409b263fff3234818aa01dc1f2117a5a336b1d30a2d81077",
+        "rows": 29,
+        "rows_sha256": "b29e77516666bf1bda069665d4d6360e57241705749aba4b4184d065e295256f"
+      },
+      "messaging_evaluation_sequences": {
+        "columns": [
+          "run_id",
+          "sequence",
+          "version"
+        ],
+        "data_bytes": 792,
+        "ddl_sha256": "f678d1c906a959ba72bd1bd0e1fc352e44877dc570591bdef260367d8874bf1e",
+        "rows": 19,
+        "rows_sha256": "2c0883c14557e2c8350177a8a42bff516e5415b869230881afd1472249e5b1c5"
+      },
+      "messaging_event_receipts": {
+        "columns": [
+          "producer",
+          "ack_id",
+          "event_id",
+          "organization_id",
+          "header",
+          "body",
+          "outcome",
+          "recorded_at"
+        ],
+        "data_bytes": 16008,
+        "ddl_sha256": "95ddd51ce46154deccc494a69c306cf4747c36f6fd80c3c561ec78797d9ddeb3",
+        "rows": 29,
+        "rows_sha256": "96cbe491938126fb47b1e7392ef43d43aa4f21504e43b49b4fcc88735ab7f31e"
+      },
+      "messaging_inbox": {
+        "columns": [
+          "producer",
+          "message_id",
+          "destination",
+          "body_sha256",
+          "body",
+          "wire_sha256",
+          "kind",
+          "aggregate_key",
+          "reservation_token",
+          "decision",
+          "receipt_id",
+          "received_at"
+        ],
+        "data_bytes": 178226,
+        "ddl_sha256": "6d995ba0ade6b20aaf3eac99f41392084932cd233dc0f763136db50389724796",
+        "rows": 58,
+        "rows_sha256": "a4ba8c110b58bdf7b1d77598096c8a4624a8b462e86d9f6dccae951235e3f2e9"
+      },
+      "messaging_native_limit_notices": {
+        "columns": [
+          "notice_key",
+          "owner",
+          "store_id",
+          "writer_epoch",
+          "route_revision",
+          "native_index_sha256",
+          "evidence_sha256",
+          "status",
+          "schema_version",
+          "recorded_at",
+          "resolved_at",
+          "resolution_receipt_sha256"
+        ],
+        "data_bytes": 0,
+        "ddl_sha256": "b5aa790c2db16c4379abb47afeb6dbea5e1f64f85f4a824e8c129dcb06d36b0c",
+        "rows": 0,
+        "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "messaging_observations": {
+        "columns": [
+          "kind",
+          "recorded_count",
+          "recording_since",
+          "last_observed_at"
+        ],
+        "data_bytes": 426,
+        "ddl_sha256": "3e06ec2e75c19dba84bc681d8a5267db3bd71e7819ac0f23f04cc3aee7fffec2",
+        "rows": 8,
+        "rows_sha256": "536e0d0a98c61cc84b41bfb1639496f2bb7049f2c9cb7a6b42b265259a40bf10"
+      },
+      "messaging_quarantine": {
+        "columns": [
+          "wire_sha256",
+          "wire",
+          "code",
+          "logical_producer",
+          "logical_message_id",
+          "logical_body_sha256",
+          "attempts",
+          "first_seen_at",
+          "last_seen_at"
+        ],
+        "data_bytes": 0,
+        "ddl_sha256": "bcf4ca0d0706698e4e02bf6ed5498100c7ff04b1989050deab83f53c8940ab33",
+        "rows": 0,
+        "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "operations_runtime_milestones": {
+        "columns": [
+          "session_id",
+          "dedupe_key",
+          "run_id",
+          "kind",
+          "invocation_id",
+          "attempt",
+          "occurred_at",
+          "expires_at"
+        ],
+        "data_bytes": 21327,
+        "ddl_sha256": "cff76735c9234368319763d210ad01c07a6739c399e8868a210c792f8c790e08",
+        "rows": 101,
+        "rows_sha256": "d53047ec44281e83a20f4055fbbc29b1d6898530d74189d425be2c9d5996ec94"
+      },
+      "publication_changes": {
+        "columns": [
+          "command_id",
+          "selector_key",
+          "version",
+          "organization_id",
+          "operator_user_id",
+          "request_json",
+          "receipt_json"
+        ],
+        "data_bytes": 9227,
+        "ddl_sha256": "dae29b302e5cf0278b386e712f7d1c6c9d05e48e071c597f4f712858aeeeb603",
+        "rows": 5,
+        "rows_sha256": "4742e90361fee42cbb5d317c75430956b9a4bb2d34841e52b7a7f8a24f15055b"
+      },
+      "publication_pointers": {
+        "columns": [
+          "selector_key",
+          "selector_json",
+          "version",
+          "active_publication_id",
+          "changed_at"
+        ],
+        "data_bytes": 815,
+        "ddl_sha256": "b00a98b0a6c6eb0d3a2cddd4209aed8fd3b3e5f98efb89e260db4bfe7116b14f",
+        "rows": 3,
+        "rows_sha256": "f174aa13257a96abc7dcd097d8dcfcc511f2022ca5867109a8b3c01f7e48aac9"
+      },
+      "publication_records": {
+        "columns": [
+          "publication_id",
+          "selector_key",
+          "run_id",
+          "run_version",
+          "organization_id",
+          "content_json",
+          "content_sha256"
+        ],
+        "data_bytes": 75076,
+        "ddl_sha256": "a177cfb3326079321aa20fadd4aaa61044b78aaddbb4d99fb2586e83f6070939",
+        "rows": 5,
+        "rows_sha256": "3c4c71a8fd1b2fef91213dafacde02c590e7ee750ed6c41a0f3350f3ca104352"
+      },
+      "quota_evaluation_admission_locks": {
+        "columns": [
+          "organization_id"
+        ],
+        "data_bytes": 1,
+        "ddl_sha256": "6256f79f8f7411a271bcc640725f61577744eefd24a94345485c5723c614d559",
+        "rows": 1,
+        "rows_sha256": "bf3c1205c73d659df93d47c29639d24f48b0baf8c71c8012b6553f3af80c7aaf"
+      },
+      "quota_evaluation_capacity_reservations": {
+        "columns": [
+          "quota_snapshot",
+          "run_id",
+          "organization_id",
+          "budget_day",
+          "provider_calls",
+          "daily_limit",
+          "requested_by",
+          "reserved_at"
+        ],
+        "data_bytes": 41156,
+        "ddl_sha256": "bc7045e21ebada2f45db02b8fe46b66c7046132b86acc57a8e8631ae1041674b",
+        "rows": 38,
+        "rows_sha256": "ce7d6484731a7a95c5a76303eed8b28bfe81bdec0091662de07c976f265fa8e9"
+      },
+      "quota_organization_commands": {
+        "columns": [
+          "organization_id",
+          "command_id",
+          "operator_user_id",
+          "request_json",
+          "receipt_json",
+          "receipt_sha256"
+        ],
+        "data_bytes": 0,
+        "ddl_sha256": "5aea9d756c26c79dafbffd2aff2e802ab77ffca8e5ac09d4ddcd85ebda0bf4e2",
+        "rows": 0,
+        "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "quota_organization_pointers": {
+        "columns": [
+          "organization_id",
+          "revision"
+        ],
+        "data_bytes": 0,
+        "ddl_sha256": "785601474a4220525955ccc2f3fe17adf8d12564cf1e4ee73d67818f10031c2b",
+        "rows": 0,
+        "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "quota_organization_versions": {
+        "columns": [
+          "organization_id",
+          "revision",
+          "definition_json",
+          "definition_sha256",
+          "operator_user_id",
+          "reason",
+          "created_at"
+        ],
+        "data_bytes": 0,
+        "ddl_sha256": "6fcdc98e60cdac22a42d74f361a5059316438047db1342fe144e95604b7890ec",
+        "rows": 0,
+        "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "quota_participant_admission_locks": {
+        "columns": [
+          "organization_id"
+        ],
+        "data_bytes": 1,
+        "ddl_sha256": "1861106830e24380a85041f9938820389d9900b73c10544662350f6f3bbbe092",
+        "rows": 1,
+        "rows_sha256": "bf3c1205c73d659df93d47c29639d24f48b0baf8c71c8012b6553f3af80c7aaf"
+      },
+      "quota_participant_capacity_reservations": {
+        "columns": [
+          "quota_snapshot",
+          "run_id",
+          "session_id",
+          "organization_id",
+          "subject_id",
+          "assessment_ids",
+          "budget_day",
+          "reserved_at",
+          "active",
+          "acquired_at",
+          "released_at"
+        ],
+        "data_bytes": 47460,
+        "ddl_sha256": "ef3c7db74d8ba3f673a41ec9438afddb762474358cf02191ffc5bbb95ac17c9e",
+        "rows": 42,
+        "rows_sha256": "675910adaf37f5deb44bee790ecbec8bdbb78661bf3c603e91d1b2ad9fd4a5d5"
+      },
+      "rm_tx_binding": {
+        "columns": [
+          "owner",
+          "store_id",
+          "writer_epoch",
+          "schema_version"
+        ],
+        "data_bytes": 40,
+        "ddl_sha256": "aca5418a613d4fd6ebd75929e35274d66b3a8abffce3e36e9af17fe7eb7895d9",
+        "rows": 1,
+        "rows_sha256": "7367baa4ddd678e6b9b3dabab124be815f559bf6f4c2bd8d54be1fd4b8a047c8"
+      },
+      "rm_tx_execution": {
+        "columns": [
+          "execution_key",
+          "request_key",
+          "owner",
+          "operation_id",
+          "writer_epoch",
+          "fence",
+          "token",
+          "plan",
+          "state",
+          "lease_until",
+          "guard_version",
+          "prepare_started"
+        ],
+        "data_bytes": 476485,
+        "ddl_sha256": "25c202b7be8c84f5e2345022d79c7ce79bb2794901d9ea1fb4f6cf859f40682d",
+        "rows": 22,
+        "rows_sha256": "fceb9fedfe8d936b93968f4cb4ef4907655a06691662318cb468c3f777438f25"
+      },
+      "rm_tx_request": {
+        "columns": [
+          "request_key",
+          "owner",
+          "scope",
+          "idempotency_key",
+          "input_hash",
+          "active_execution"
+        ],
+        "data_bytes": 4384,
+        "ddl_sha256": "d62b3be6fcb26d97d91b08b0b011c70a1c0fc5112d0d32e9736b7171e6c3c474",
+        "rows": 22,
+        "rows_sha256": "d54f594ff0212731520c586b4656f849a26396bd0e18174fd6d2573d6d014fc7"
+      },
+      "rm_tx_witness": {
+        "columns": [
+          "execution_key",
+          "branch_key",
+          "reference",
+          "state",
+          "broker_message_id",
+          "broker_transaction_id",
+          "half_outcome",
+          "final_outcome",
+          "half_error_code",
+          "final_error_code",
+          "half_recorded_at",
+          "final_recorded_at"
+        ],
+        "data_bytes": 23400,
+        "ddl_sha256": "916dfca380ae40aaf8442bb55c424fb7895db01e8cef378edc61be53fef524af",
+        "rows": 29,
+        "rows_sha256": "803476c647acebad2fccf83dc1b8263d4cbe068640f314dcacc1e647cbbe2c25"
+      }
+    }
+  },
+  "actual_runtime": {
+    "source": "f9f24abdf98535295c4e3d223675ef6be62115e2",
+    "container_id": "f2f43c57a332352c78111b6c3faa2014da768dfaf94ab8afa8c7b1ec5658a004",
+    "engine_image_id": "sha256:18a39e862a82bfb9b503a3dd93639688bc45016caa2c7f1bf9081953b4523fa0",
+    "restart_count": 0,
+    "running": true,
+    "OOMKilled": false,
+    "StopTimeout": 210,
+    "current_release": "f9f24abdf98535295c4e3d223675ef6be62115e2-41108077901-1"
+  },
+  "database_review_context": {
+    "global_session_visibility": true,
+    "global_dependency_visibility": "not established by PROCESS privilege; independently review all incoming references",
+    "current_account_scope": "existing PROCESS/replication-read privileges plus broad ai/iam/qs and statistic_db privileges; no grant/revoke performed",
+    "visible_sessions": 20,
+    "binlog_enabled": true,
+    "binlog_expire_seconds": 2592000,
+    "PITR_recoverability_proved": false,
+    "activity_observations": {
+      "metadata_locks": {
+        "available": false,
+        "mysql_code": 1142
+      },
+      "transactions": {
+        "available": true,
+        "count": 0
+      },
+      "same_database_threads": {
+        "available": false,
+        "mysql_code": 1142
+      }
+    },
+    "PROCESS_does_not_prove_global_dependency_visibility": true,
+    "metadata_locks_and_PFS_threads_mysql_error": 1142,
+    "live_drain_snapshot": {
+      "state_groups": {
+        "rm_tx_execution": [
+          [
+            "b'committed'",
+            22
+          ]
+        ],
+        "rm_tx_witness": [
+          [
+            "b'committed'",
+            29
+          ]
+        ],
+        "execution_jobs": [
+          [
+            "done",
+            42
+          ]
+        ],
+        "execution_model_calls": [
+          [
+            "response_received",
+            40
+          ]
+        ]
+      },
+      "transaction_outcomes": [
+        [
+          "b'prepared'",
+          "b'commit_confirmed'",
+          29
+        ]
+      ],
+      "freeze_proof": false
+    }
+  },
+  "native_qualification": {
+    "schema": "ai246-native-window-qualification/v1",
+    "source_sha": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
+    "CI_run": 41281012903,
+    "production_executed": false,
+    "proof": [
+      {
+        "mysql": "8.0.36",
+        "native_cases": 21,
+        "seconds": 48.611999999999995,
+        "artifact_id": 13072669254,
+        "artifact_sha256": "55a7c1377c8da0816681eff5cade03e5b9291f11fc069ede4d4c94010cee23c8",
+        "xml_sha256": "017e9f05e946d84069ceabd40ad11b21e33dde1abbebeb58728e68171fe1deb8",
+        "names": [
+          "test_fresh_head_install_and_current_metadata_agree",
+          "test_existing_store_without_review_never_changes_native_or_old_rows",
+          "test_nonempty_publisher_refuses_after_review_before_consumption",
+          "test_reviewed_upgrade_preserves_all_retained_rows_and_refuses_replay",
+          "test_pre_drop_failure_keeps_consumed_marker_and_original_store",
+          "test_unknown_ddl_result_converges_forward_without_replaying_drop",
+          "test_forward_recovery_refuses_unproved_original_state[retained_bytes]",
+          "test_forward_recovery_refuses_unproved_original_state[retained_schema]",
+          "test_forward_recovery_refuses_unproved_original_state[missing_original_marker]",
+          "test_forward_recovery_refuses_unproved_original_state[wrong_database]",
+          "test_forward_recovery_refuses_unproved_original_state[business_reopened]",
+          "test_original_production_empty_target_ddl_restores_only_in_isolated_mysql",
+          "test_capture_cli_is_readonly_and_releases_owned_pool",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-none]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-archive_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-witness_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-client_reply_discarded]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-none]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-archive_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-witness_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
+        ]
+      },
+      {
+        "mysql": "8.4",
+        "native_cases": 21,
+        "seconds": 57.115,
+        "artifact_id": 13073262697,
+        "artifact_sha256": "21ee5fdc60f9ca4fb88795525f69208734c5d06f49c3149878c9d3f9740c5c2f",
+        "xml_sha256": "1cf60e3d6f2f571b405834bf37e9c244b6d753ba1dfdfd31c5a0b2b91420485a",
+        "names": [
+          "test_fresh_head_install_and_current_metadata_agree",
+          "test_existing_store_without_review_never_changes_native_or_old_rows",
+          "test_nonempty_publisher_refuses_after_review_before_consumption",
+          "test_reviewed_upgrade_preserves_all_retained_rows_and_refuses_replay",
+          "test_pre_drop_failure_keeps_consumed_marker_and_original_store",
+          "test_unknown_ddl_result_converges_forward_without_replaying_drop",
+          "test_forward_recovery_refuses_unproved_original_state[retained_bytes]",
+          "test_forward_recovery_refuses_unproved_original_state[retained_schema]",
+          "test_forward_recovery_refuses_unproved_original_state[missing_original_marker]",
+          "test_forward_recovery_refuses_unproved_original_state[wrong_database]",
+          "test_forward_recovery_refuses_unproved_original_state[business_reopened]",
+          "test_original_production_empty_target_ddl_restores_only_in_isolated_mysql",
+          "test_capture_cli_is_readonly_and_releases_owned_pool",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-none]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-archive_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-witness_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-client_reply_discarded]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-none]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-archive_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-witness_rejected]",
+          "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
+        ]
+      }
+    ]
+  },
+  "protection_contract": {
+    "schema": "ai-publisher-protection/v1",
+    "budget": {
+      "bytes": 134217728,
+      "rows": 20000,
+      "seconds": 60
+    },
+    "codec": "mysql-binary-null-length-rowhash-sorted/v1",
+    "original_target": "complete SHOW CREATE and actual empty rows; nonempty refuses",
+    "ledger": "complete original definition and exact single43 row",
+    "retained": "all49 owned business/protocol definitions and raw-byte multiset fingerprints, including witnesses/model responses/ACK/scheduling",
+    "frozen_capture_requires": "fresh owner-attested exact writer scope exclusion; live capture never promotes itself",
+    "durability": "owned0700 persistent host-mounted directory; owned0600 files; O_EXCL consumption with file and parent fsync before mutation",
+    "copies": [
+      "MacBook private",
+      "ServerA root private"
+    ],
+    "retention": "minimum30days and extend unresolved; no automatic cleanup",
+    "full_business_backup": "fingerprints are not backup; independent complete backup/PITR qualification remains required review material"
+  },
+  "same_window_outputs": [
+    {
+      "name": "window-inventory.json",
+      "status": "not_generated",
+      "sha256": null
+    },
+    {
+      "name": "writers.json",
+      "status": "not_generated",
+      "sha256": null
+    },
+    {
+      "name": "frozen.json",
+      "status": "not_generated",
+      "sha256": null
+    },
+    {
+      "name": "target-original.sql",
+      "status": "not_generated",
+      "sha256": null
+    },
+    {
+      "name": "empty-target-eof",
+      "status": "not_generated",
+      "sha256": null
+    },
+    {
+      "name": "ledger-original.json",
+      "status": "not_generated",
+      "sha256": null
+    },
+    {
+      "name": "two-copy-readback.json",
+      "status": "not_generated",
+      "sha256": null
+    },
+    {
+      "name": "review.json",
+      "status": "not_generated",
+      "sha256": null
+    },
+    {
+      "name": "review.json.consumed",
+      "status": "not_generated",
+      "sha256": null
+    },
+    {
+      "name": "after.json",
+      "status": "not_generated",
+      "sha256": null
+    },
+    {
+      "name": "review.json.business-reopen-issued",
+      "status": "not_generated",
+      "sha256": null
+    }
+  ],
+  "immutable_execution_bindings": {
+    "qualified_main_sha": null,
+    "main_CI": null,
+    "candidate_registry_digest": null,
+    "candidate_engine_image_id": null,
+    "candidate_archive_sha256": null,
+    "candidate_prepared_receipt_sha256": null,
+    "forward44_source_sha": null,
+    "forward44_registry_digest": null,
+    "forward44_archive_sha256": null,
+    "forward44_actual_image_startup_qualification": null,
+    "status": "blocking_not_filled_from_PR_ephemeral_image_or_old43"
+  },
+  "database_execution_review": {
+    "state": "not_issued",
+    "review_sha256": null,
+    "expires_at": null,
+    "consumed": false,
+    "gates": [
+      {
+        "id": "DB01",
+        "requirement": "single empty target, exact43 source and strict44 layout; other49 protected",
+        "state": "source_and_live_qualification_passed; window_recheck_required"
+      },
+      {
+        "id": "DB02",
+        "requirement": "exact main and immutable44 candidate/forward images, real startup and offline archive qualification",
+        "state": "blocking_pending"
+      },
+      {
+        "id": "DB03",
+        "requirement": "all writer scopes excluded;210s no-error drain, zero active/unknown roots/calls; persistent pending preserved",
+        "state": "window_pending_not_attempted"
+      },
+      {
+        "id": "DB04",
+        "requirement": "fresh frozen snapshot plus original target/ledger and49 complete fingerprints; actual backup/PITR review",
+        "state": "window_pending_not_generated"
+      },
+      {
+        "id": "DB05",
+        "requirement": "two-copy readback and durable approval consumption; minimum30days retention",
+        "state": "review_originals_protected; window_originals_pending"
+      },
+      {
+        "id": "DB06",
+        "requirement": "original production empty DDL actual restore plus realDROP unknown-ledger strict forward tests on both MySQL versions",
+        "state": "native_passed21_each; production44_image_binding_pending"
+      },
+      {
+        "id": "DB07",
+        "requirement": "fixed operator identity/permissions and usable sessions/transactions/metadata lock/external dependency visibility",
+        "state": "session_context_observed; administrator_lock_and_dependency_scope_pending"
+      },
+      {
+        "id": "DB08",
+        "requirement": "only literal target DROP; bounded lock and current v2 approval, no ordinary app migration",
+        "state": "implemented_native_qualified; approval_not_issued"
+      },
+      {
+        "id": "DB09",
+        "requirement": "R0 beforeDDL; F1 only approved ledger forward beforebusiness; F2/F3 preserve allnew44 facts",
+        "state": "implemented_and_reviewable; actualforward_image_pending"
+      },
+      {
+        "id": "DB10",
+        "requirement": "first-business-start barrier, one runtime, commitunknown inspection and no43/fullbackup replay",
+        "state": "review_plan_present; actualwindow_not_started"
+      }
+    ]
+  },
+  "steps": [
+    {
+      "id": "W00",
+      "status": "review_plan_only",
+      "production_executed": false
+    },
+    {
+      "id": "W01",
+      "status": "review_plan_only",
+      "production_executed": false
+    },
+    {
+      "id": "W02",
+      "status": "review_plan_only",
+      "production_executed": false
+    },
+    {
+      "id": "W03",
+      "status": "review_plan_only",
+      "production_executed": false
+    },
+    {
+      "id": "W04",
+      "status": "review_plan_only",
+      "production_executed": false
+    },
+    {
+      "id": "W05",
+      "status": "review_plan_only",
+      "production_executed": false
+    },
+    {
+      "id": "W06",
+      "status": "review_plan_only",
+      "production_executed": false
+    },
+    {
+      "id": "W07",
+      "status": "review_plan_only",
+      "production_executed": false
+    },
+    {
+      "id": "W08",
+      "status": "review_plan_only",
+      "production_executed": false
+    },
+    {
+      "id": "W09",
+      "status": "review_plan_only",
+      "production_executed": false
+    },
+    {
+      "id": "W10",
+      "status": "review_plan_only",
+      "production_executed": false
+    }
+  ],
+  "recovery_routes": {
+    "R0": "beforeDDL cancel and reverify intact43, then separately audited single runtime reopen; old approval invalid forever",
+    "F1": "43 ledger + absent target + complete44 physical layout + identical retained baseline; original consumed and new independent forward approval; only one conditional43-to44 UPDATE",
+    "F1_unknown_commit": "retain both consumed receipts; new readonly inspection;44 verifies only,43pending requires fresh independent review, never replay same approval",
+    "F2": "strict44 application failure; approved immutable44 forward image/config, require-existing, single runtime boundary",
+    "durable_reopen_boundary": "original review path + .business-reopen-issued; EXCL/fsync before start command; migration/reconcile permanently refuse its existence, even failed/unknown startup",
+    "F3": "after business reopen issued or any new fact:44compatible forward repair only; no originalledger/fullbackup replay",
+    "otherwise": "stop and preserve state; no automatic DDL, stamp, oldtable rebuild or model retry"
+  },
+  "production_actions_this_turn": {
+    "AI_auto_deploy_changed_true_to_false": true,
+    "business_stopped": false,
+    "production_DDL": false,
+    "business_DML": false,
+    "deployment_dispatched": false,
+    "credentials_history_ACK_scheduling_deleted": false,
+    "production_approval_issued_or_consumed": false
+  },
+  "retained_other_scope": {
+    "IAM_two_objects": "retained",
+    "QS_two_rm_outbox": "retained",
+    "historical51": "retained; no native witness fabricated; responsibility unresolved",
+    "QS111_44": "no ledger replay or SQL111 rerun",
+    "independent_native_limit_recovery": "separate unresolved scope"
+  },
+  "private_originals_sha256": {
+    "activity-readonly.json": "159159fffa3327834e77907870210440ff2c3a28daed1d86d886c3c45c80a689",
+    "capture-activity-readonly.py": "8b0ad71312d7380003582a8346088fd5e52229511438cfa8d4be0b1b05f03abc",
+    "capture-drain-readiness.py": "b7251e202858855a3a5340a4c7c244c6378583e3e867d0ded2cebb4a7a849e8e",
+    "capture-live-final.py": "30fbdbc45d1e4bed41f675fe744d04364246afc5e634d06108fbe67351b736e6",
+    "capture-live.py": "4576d8d1a8f1c0069a76ad866691018175865d8d22da4f62672cd45c525e58a2",
+    "capture-review-context.py": "e976067679a20a70f2bc4cb936abe552d9c51a6f893e3feaf6ceed175dc5acc0",
+    "drain-readiness-live.json": "0a9d0717e291f41fa8c8ba0c7bebca4dcddb6ad4e0de24baabf52999618cabf7",
+    "freeze-readback.json": "406c22a4d173e3aa3443ee4b0d02628fc54f482d521bcc8def07227f56b8ff3b",
+    "live-capture.json": "b454161fae0ddc541792fab17b18be075511a7b5c8bc8680a861aaded5e5ef70",
+    "live-final-capture.json": "1079e7871ec49b4ba1396d57668f1c06c7e0e5d44454bef837cf8cbdf126751c",
+    "native-qualification-90e64f3.json": "623d8a9d922fd576b3f69fa7a1a07f9552dd1ac7f7b65884fc43f1ece5b4fbe5",
+    "native-qualification.json": "76455c9bc93551efbf57c6ca0917377ee7ef07fe3270a32f314ddbd9c4475633",
+    "publisher-material-executed.py": "944fe96ba8f4578e03d1a7d3be4a0a2f6e7f2cbdc7405db01c08515c08f2086c",
+    "publisher-window-8.0.36-90e64f3.xml": "017e9f05e946d84069ceabd40ad11b21e33dde1abbebeb58728e68171fe1deb8",
+    "publisher-window-8.0.36-90e64f3.zip": "55a7c1377c8da0816681eff5cade03e5b9291f11fc069ede4d4c94010cee23c8",
+    "publisher-window-8.0.36.xml": "6712d3f844a38e165f7ce18840666697b0dd03d3eb58bdf0261ec9a3e5301325",
+    "publisher-window-8.0.36.zip": "4db53813fd3c63f2926645cdcb5f7dd2505320b1e366f5155f2bfcbcdee292f1",
+    "publisher-window-8.4-90e64f3.xml": "1cf60e3d6f2f571b405834bf37e9c244b6d753ba1dfdfd31c5a0b2b91420485a",
+    "publisher-window-8.4-90e64f3.zip": "21ee5fdc60f9ca4fb88795525f69208734c5d06f49c3149878c9d3f9740c5c2f",
+    "publisher-window-8.4.xml": "c0ddf5d8167f779b30643a894e05de15bf50de87b6c71f9933df0edda9a4f951",
+    "publisher-window-8.4.zip": "73426211a9796e178db4bd93b263ebcd63d37f345e722301f388903f6d2a3494",
+    "qs-ai-246-review-90e64f3.bundle": "0c3139b562f25f24b6e7a1ba50114d173f3e5639ec7038919db0c06708cff4d5",
+    "qualify-final-native.py": "7395d55d7ded5d0dcf8257f309619758b45bcf06782c8d180d5724ea1029651c",
+    "readonly-probe-executed.py": "b21754f3bd53f4a82df58dfba336885b358672b0431127c6747980f3eb2de139",
+    "render-final-package.py": "d18df24abeee8f69e5d9b06fcdbae92d9ffde5d9caafe3fb9eec29a5096151bb",
+    "render-package.py": "883bb88672869978f41c7fd63a77a665c4d945672aa09f989b62727916b7d171",
+    "review-context.json": "fc579d55a4176a1835c7a62b295530d2c03c09d53345782f30686c2ac77437e7",
+    "source-preservation-90e64f3.json": "8523cc0c501d43c4d57733e887b1e57fa6a828560e95a3f31cec1edf0b7f6180",
+    "source-preservation.json": "233688ae957491417339231c1211beae4ae200bd1432be7559f3fc811536d995",
+    "two-live-snapshots-comparison.json": "aedf612d18e3cc4db27a098f4230639df803f0c8f42c3a346f0db57a17c2113d"
+  },
+  "review_material_protection": {
+    "archive_sha256": null,
+    "readback_verified": false,
+    "frozen_database_backup_claimed": false,
+    "database_execution_approval": false
+  }
+}
