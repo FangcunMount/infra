@@ -1,0 +1,258 @@
+{
+  "schema": "host-retirement-F04-source-review/v1",
+  "recorded_at": "2026-11-01T05:32:50.322692+00:00",
+  "owners": {
+    "data": "shujie",
+    "recovery": "shujie"
+  },
+  "candidate": {
+    "PR": "https://github.com/FangcunMount/qs-ai/pull/246",
+    "head": "30b74ae2d5e9afe2655b68a3dfa07eb863ecc126",
+    "draft": true,
+    "merged": false,
+    "production_release": false,
+    "target_head": "0044_empty_publisher",
+    "existing43_migrations_unchanged": true,
+    "exact_CI": [
+      {
+        "id": 41276255898,
+        "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41276255898",
+        "head": "30b74ae2d5e9afe2655b68a3dfa07eb863ecc126",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "name": "image",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 2)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 3)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 1)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 0)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 0)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 1)",
+            "conclusion": "success"
+          },
+          {
+            "name": "Retirement backup and restore (8.0.36)",
+            "conclusion": "success"
+          },
+          {
+            "name": "Retirement backup and restore (8.4)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 3)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 2)",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete test coverage",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "id": 41276255890,
+        "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41276255890",
+        "head": "30b74ae2d5e9afe2655b68a3dfa07eb863ecc126",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "name": "m7 (8.4)",
+            "conclusion": "success"
+          },
+          {
+            "name": "m7 (8.0.36)",
+            "conclusion": "success"
+          }
+        ]
+      }
+    ],
+    "local_focused_tests_passed": 33,
+    "local_full_unit_passed": 4462,
+    "local_engine_case": "unavailable: Mac Docker daemon stopped; actual engine evidence supplied by hosted complete partitions, no skip added",
+    "all_checks_success": 14
+  },
+  "actual_AI_runtime": {
+    "source": "f9f24abdf98535295c4e3d223675ef6be62115e2",
+    "repository_main": "e71118903e3cdc794337ace6a73f51f6f86c3f4c",
+    "application_migrations_dependencies_equal_main": true,
+    "schema_head": "0043_native_transaction_limit",
+    "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+    "target_ddl_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff",
+    "observed_at": "2026-11-01T04:53:07.739086+00:00",
+    "protected_counts": {
+      "messaging_outbox": 0,
+      "interpretation_result_outbox": 128,
+      "execution_model_calls": 40,
+      "messaging_inbox": 58,
+      "messaging_event_receipts": 29,
+      "messaging_archive": 29,
+      "rm_tx_binding": 1,
+      "rm_tx_request": 22,
+      "rm_tx_execution": 22,
+      "rm_tx_witness": 29,
+      "messaging_native_limit_notices": 0
+    },
+    "transaction_and_pool_released": true
+  },
+  "retained_AI_facts": {
+    "model_calls": {
+      "rows": 40,
+      "all_rows_identical_since_real_canary": true
+    },
+    "result_outbox": {
+      "rows": 128,
+      "all_rows_identical_since_real_canary": true
+    },
+    "ai_messaging_inbox": {
+      "rows": 58,
+      "all_rows_identical_since_real_canary": true
+    }
+  },
+  "historical51": {
+    "cohort_sha256": "76a5260d862fdbfb4759d56c41dbf1a58b1518ab788426eded212b1d2991d6cc",
+    "counts": {
+      "kind=1 decision=accepted workflow=completed terminal=True evaluation_state=False": 23,
+      "kind=4 decision=accepted workflow=absent terminal=False evaluation_state=True": 18,
+      "kind=1 decision=accepted workflow=blocked terminal=False evaluation_state=False": 5,
+      "kind=5 decision=rejected workflow=absent terminal=False evaluation_state=True": 3,
+      "kind=1 decision=rejected workflow=blocked terminal=False evaluation_state=False": 1,
+      "kind=5 decision=accepted workflow=absent terminal=False evaluation_state=True": 1
+    },
+    "original_publisher_confirmed": 51,
+    "receipt_matches_current_inbox": 51,
+    "accepted": 47,
+    "rejected": 4,
+    "native_witness_backfilled": false,
+    "business_responsibility_closed": false,
+    "global_integrity_guard_changed": false
+  },
+  "observation_gap": {
+    "window_cst": "2026-11-01 10:27-10:31 inclusive minutes",
+    "prometheus_requests_in_original_nginx_log": 112,
+    "HTTP200": 111,
+    "HTTP499": 1,
+    "max_upstream_seconds": 0.141,
+    "max_request_seconds": 0.14,
+    "agent_class": {
+      "prometheus": 112
+    },
+    "raw_excerpt_sha256": "4b0a6160e6120d619d0b2428301163585ed5639665484b94b84509819215b5e9",
+    "raw_excerpt_bytes": 17552,
+    "upstream_address_correlation": "current same-source container addresses; original log lacks Host, not complete historical topology proof",
+    "root_cause": "unconfirmed; sampled backend responses existed, collector scheduling/network common path still to distinguish",
+    "continuous_business_availability_claimed": false,
+    "clock_or_network_configuration_changed": false
+  },
+  "release_controls": {
+    "QS_automatic_CD": "disabled_manually",
+    "AI_AUTO_DEPLOY_ENABLED": "true",
+    "AI_candidate_kept_draft_and_unmerged": true,
+    "production_business_stopped": false,
+    "production_DDL_executed": false,
+    "all_five_remaining_objects_retained": true,
+    "new_execution_approval_issued": false
+  },
+  "remaining_execution_gates": [
+    "freeze AI automatic deploy before any main merge/release preparation",
+    "exact main immutable production candidate and44-compatible forward image",
+    "same-window writer exclusion/drain and original target/ledger/protected fact material",
+    "actual original target restore and unknown-DDL forward convergence review",
+    "specific production database execution review; current snapshot is live, not frozen"
+  ],
+  "diagnostic_failures_retained": [
+    "main-vs-runtime image binding refused before SQL; rebound to actualf9 runtime",
+    "old current-layout tests queried retired publisher; replaced with exact44 physical absence",
+    "two retained43/adapter fixtures were incorrectly given44 checks; exact original assertions restored; full CI rerun at new head"
+  ],
+  "private_original_sha256": {
+    "ai-current-readonly.json": "792a01f364eb182f5f4cad23346e48803645d3947def85f6ee65307e58ebe1bf",
+    "ai-current-readonly.json.attempt1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ai-current-readonly.stderr.attempt1": "ac45f41b84f5f7903b2f0e0a971871deafcd85cb989783a139c0f536cf8179a3",
+    "ai-protected-facts-proof.json": "9473962c472c1fa861bff70eea7483e707b6e633def95667be195f093a0b6e59",
+    "historical-classification-private.json": "34d3bd4dd44d55e08a8e918192516bb507795a7556dcfad32b9db215392035fc",
+    "historical-reader-binding.json": "84bbc939a4e357031ff66446583fa65b5221c5bd060c55a92ec20fa8537f8aff",
+    "nginx-gap-correlated.json": "882a01d1a67367d873ffde4a891a86841d837af39f5242b3207f61a1a41099aa",
+    "nginx-excerpt-binding.json": "5350c50e2460dc8f00d132f40d1763041ac3ac6bd127316d0b8c4136f8916de6",
+    "nginx-gap-original-private.log": "4b0a6160e6120d619d0b2428301163585ed5639665484b94b84509819215b5e9",
+    "candidate-bundle-30b74ae2.json": "cc179d27e1929cfde665c6c0be0b6d8f2d6e6d8a8929038f30be7ee4f1a18b1f",
+    "source-byte-protection-30b74ae2.json": "6b7ddaf4efe99610cc28a91998930de65a48878b51c7cb2814b961ca9f872268",
+    "ci-41274703481-failed.log": "bbf90fa4ced9554dcf62050fbfcc13795cfb862c22b01147f4149a5be67b87f7",
+    "ci-41275308557-job124756268770-failed.log": "faa938cbf715709bd85e2cc87348a126b67a08c80efecc1c3de0b6f87ea73929",
+    "ci-41276255898-final.json": "c4b3a49142de194565a8aaa1535cbf73423d4f0be36236dae127f91af16c2afe",
+    "ci-41276255890-final.json": "b19ca19c3e5f122b9cd487b38c2ef1498b81027c12435d5cc59a77afbf3b03d3",
+    "ci-41276255898-success.log": "4951713d53f121e27e75fd97f43652ee7f3098c3aa598b97f0f87324c298ea28",
+    "ci-41276255890-success.log": "a177e5858a484d9aa1de0ec2b0d27590aac2ab86a65fdfd5e63f1212ca897215",
+    "ai-final-live-readonly.json": "01b93df4aba8c441b9d8965d0b924c96c522beebe5b507cab1fd52c046cebeaa"
+  },
+  "final_live_readonly_recheck": {
+    "schema": "ai-empty-publisher-fresh-readonly/v1",
+    "observed_at": "2026-11-01T05:35:07.910893+00:00",
+    "read_only": true,
+    "writers_excluded": false,
+    "drop_authorized": false,
+    "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+    "head": "0043_native_transaction_limit",
+    "target_ddl_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff",
+    "counts": {
+      "messaging_outbox": 0,
+      "interpretation_result_outbox": 128,
+      "execution_model_calls": 40,
+      "messaging_inbox": 58,
+      "messaging_event_receipts": 29,
+      "messaging_archive": 29,
+      "rm_tx_binding": 1,
+      "rm_tx_request": 22,
+      "rm_tx_execution": 22,
+      "rm_tx_witness": 29,
+      "messaging_native_limit_notices": 0
+    },
+    "transaction_released": true,
+    "complete": true,
+    "pool_released": true
+  },
+  "last_updated_at": "2026-11-01T05:35:07.933046+00:00",
+  "protected_material": {
+    "preliminary_v1": {
+      "bytes": 382610,
+      "sha256": "ce7f96e213e9f1a689b428dc1fb32e0b0df6ed88bf429a5a223d8ae1637a270e",
+      "contains_final_full_CI": false
+    },
+    "completed_v2": {
+      "bytes": 1025747,
+      "sha256": "5783bd0f3233995fef5262f35b65fd44f8f9e72612eae473fae137cf23f23323",
+      "contains_final_full_CI": true
+    },
+    "copies": [
+      "MacBook private",
+      "ServerA root private"
+    ],
+    "readback_verified": true,
+    "fsynced": true,
+    "directory_mode": "0700",
+    "file_mode": "0600",
+    "retention": "minimum30days; extend unclosed; no automatic cleanup",
+    "frozen_database_backup_claimed": false,
+    "database_execution_approval": false
+  }
+}
