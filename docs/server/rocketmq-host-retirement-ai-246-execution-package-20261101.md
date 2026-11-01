@@ -1,6 +1,6 @@
 # AI #246 同窗口保护、44前向恢复与数据库执行审查包
 
-**结论：本包提交具体执行审查，当前执行为No-Go。** AI #246仍为Draft，生产仍43；用户本轮明确要求保持发布冻结、不实际停业务、不执行生产DDL。没有签发或消费生产批准。数据责任人、恢复责任人均为shujie。源码工具、原生资格、现场只读事实和未来窗口材料分别绑定，未发生的窗口回执保持待生成。
+**结论：本包提交具体执行审查，当前执行为No-Go。** AI #246已仅合并源码（main `abc700ff00666617e4355a991343c66c2e3523cf`、精确main CI14项成功），生产仍43；用户本轮明确要求保持发布冻结、不实际停业务、不执行生产DDL。没有签发或消费生产批准。数据责任人、恢复责任人均为shujie。源码工具、原生资格、现场只读事实和未来窗口材料分别绑定，未发生的窗口回执保持待生成。
 
 入口：[结构化执行包](../evidence/2026-11-01-host-retirement-ai-246-execution-package.json)、[AI #246](https://github.com/FangcunMount/qs-ai/pull/246)、[上一轮审查](rocketmq-host-retirement-ai-empty-publisher-review-20261101.md)。本包只处理`ai.mysql.messaging_outbox`，其余四个候选、所有业务/模型历史、事务凭证、Inbox、ACK、archive、治理和调度记录全部保留。QS已发布的111/44不回放110；AI本包不执行SQL111。
 
@@ -9,14 +9,14 @@
 | 项目 | 本轮实证 | 对执行的意义 |
 | --- | --- | --- |
 | 发布冻结 | 06:01UTC将AI AUTO_DEPLOY_ENABLED从true改false并回读；QS Production Deploy仍disabled_manually；无正在执行的AI发布 | 阻止自动发布；人工入口仍须窗口排除，不能单凭变量宣称停写 |
-| 实际AI | f9f24abdf98535295c4e3d223675ef6be62115e2；原容器f2f43c57…仍healthy、restart0、StopTimeout210秒 | 没有停机/替换；main e711与运行镜像身份分开记录 |
+| 实际AI | f9f24abdf98535295c4e3d223675ef6be62115e2；原容器f2f43c57…仍healthy、restart0、StopTimeout210秒 | 没有停机/替换；main abc700f与运行镜像身份分开记录 |
 | 只读全量复验 | 2026-11-01 06:13:17UTC；完整43，目标0行，另49表8,502行/91,768,306原字段字节 | REPEATABLE READ只读一致快照，逐表定义/列顺序/内容指纹；不是停写备份 |
 | 数据库身份 | `04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3` | 由server_uuid和DATABASE原值的固定JSON编码散列，窗口重读 |
 | 原目标DDL | `a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff` | 生产SHOW CREATE原字节已捕获；只有结构，无业务内容；精确DDL进入两种原生MySQL隔离恢复 |
 | 权限及可见性 | 当前连接有PROCESS/复制读取以及ai/iam/qs等schema广泛权限，实读20会话；不读取SQL INFO；未GRANT/REVOKE | 可观察跨会话但不能据此宣称所有写者已排除。最终审查必须固定实际执行账户与权限边界，不在当前准备工作中改权限 |
 | 恢复基础 | log_bin=true、binlog_expire_logs_seconds=2592000 | 只证明30天保留配置，不证明完整备份链、PITR实际可恢复或RTO |
-| 锁观察权限 | 当前连接实读INNODB_TRX为0；metadata_locks和PFS threads均返回1142 | **执行阻断**。PROCESS只证明会话可见性，不证明全局依赖/锁可见；需固定AI库范围管理员只读观察，不借用仅QS范围旧回执 |
-| 不可变生产/前向制品 | 尚未绑定main候选、ACR digest、engine/config ID、archive SHA与目标宿主准备回执 | **执行阻断**。PR构建/临时合并SHA和原43镜像均不能填成44生产恢复镜像 |
+| AI管理员锁观察 | QS #479受核入口以main7899ffce执行24条只读查询，AI身份/全局权限验证、完整43/原DDL/空表及14项计数完成，连接与database均释放 | 此前应用账户1142仍留存。新管理员时点观察已补齐，窗口须重采且独立排除写者；未改权限、未KILL会话 |
+| 不可变生产/前向制品 | abc700f已按ACR digest构建并prepare，离线原件两地回读一致；实际隔离44恢复/启动通过，排空出现订阅停止错误 | **执行阻断**。严格排空门槛未放宽；AI #248修复待完整CI及新的不可变main镜像资格，当前prepared镜像不填合格前向恢复 |
 | 窗口与审批 | 未停写、未生成frozen保护/实际writer排除回执、未签发production review/forward review | **执行阻断**。当前材料仅可审查，不得把live.json改名为frozen.json |
 
 关键保留计数：model_calls40、result_outbox128、Inbox58、业务ACK29、archive29、binding1、request22、execution22、witness29、native_limit_notices0。49表原件还覆盖评测completion/dispatch/response、lease/job、publication和quota调度；摘要比较覆盖全表，不能仅用这些计数替代。51条历史旧协议责任仍独立保留，未补造事务锚点或清零指标。
@@ -56,7 +56,7 @@ writer回执是shujie对原始入口清单/实际停机与排空证据的批准�
 
 | 步骤 | 具体动作、命令及产物 | 预算与停止点 |
 | --- | --- | --- |
-| W00 | 复验冻结与无在途deploy；固定受核main、main CI、完整工具字节清单。仅`operation=build`构建主线ACR，再以`operation=prepare`固定候选和另审44前向镜像/离线archive；核schema_policy=require-existing | 准备工作可独立审查；不得调用deploy/rollback。当前尚未合并/构建，不预填digest |
+| W00 | 复验冻结与无在途deploy；固定受核main、main CI、完整工具字节清单。仅`operation=build`构建主线ACR，再以`operation=prepare`固定候选和另审44前向镜像/离线archive；核schema_policy=require-existing | 准备工作可独立审查；不得调用deploy/rollback。当前abc700f已构建/prepare但未通过严格排空，AI #248新候选待核定，禁止启用 |
 | W01 | 审查完整写者/准入/事务排空方案、实际执行账户、原库身份、目标DDL及唯一DROP范围；审查隔离恢复和44前向启动资格；签收准备材料 | 任一制品/权限/路径不明，No-Go，不进入窗口 |
 | W02 | 新operation取现有锁，复验完整容器/镜像/配置，记录冻结、入口清单、Broker持久待办及PITR/备份资格；记录取消/恢复责任人 | 受审协调准备期；本轮不创建真实window或批准 |
 | W03 | 关闭AI新准入，按上表停claim/排空；原owner保留至业务/ACK完成。只对核验ID执行正常停止，记录前后状态及日志 | 210秒；任何超时/强杀/未决/新实例取消DDL |
@@ -113,7 +113,7 @@ writer回执是shujie对原始入口清单/实际停机与排空证据的批准�
 
 ## 最新源码与原生资格绑定
 
-AI246当前审查源码`90e64f36737de60f9148ba0169eeadf3bce6f8c4`，43份原迁移与e711逐字相同；未合并/未发布。最新专项MySQL8.0.36/8.4各21项成功，包含首次重开标记拒绝，原ZIP/JUnit已逐字下载校验。两份原生专项耗时分别48.612/57.115秒（这是整组测试耗时，不是生产RTO）。完整矩阵与M7结果以结构化包的精确run状态为准，不把已通过的专项或前一中间HEAD当作最终完整CI。
+AI246原PR审查源码`90e64f36737de60f9148ba0169eeadf3bce6f8c4`，43份原迁移与e711逐字相同；现已仅合并源码至main abc700f，未发布。最新专项MySQL8.0.36/8.4各21项成功，包含首次重开标记拒绝，原ZIP/JUnit已逐字下载校验。两份原生专项耗时分别48.612/57.115秒（这是整组测试耗时，不是生产RTO）。完整矩阵与M7结果以结构化包的精确run状态为准，不把已通过的专项或前一中间HEAD当作最终完整CI。
 
 最新现场只读复验时间06:31:31UTC，执行代码与候选publisher_material逐字一致，经原f9业务容器UID10001的stdin运行，没有创建新业务/维护容器或安装候选。16.604秒完成、事务/池释放；43、原DDL空表、49表8,502行/91,768,306字节与06:13两次快照的全部定义/内容指纹相同。两时点一致不能证明期间停写或连续无变化。原采集脚本、实际stdin代码和原JSON全部私有保全。
 
@@ -130,3 +130,19 @@ DB07的[管理员只读查询清单](../evidence/2026-11-01-ai246-administrator-
 
 
 完整审查原件归档2,745,835字节，SHA256为`9ec4eebcf3be7e90e447ee79769f73f785c6c6160c12a69e340a446027537518`，包含56份原件及索引，MacBook/ServerA两份逐成员回读与fsync一致；复制回执另存两处，SHA256为`55b9151f7b2f3ab23f7678fba53f33d7a5d5c0e96d603de40fb7e735bfc95619`。目录0700、文件0600，至少30天且未结责任延期，无自动清理。归档保护源码增量bundle、实执行采集代码、生产只读/权限原件、原目标/ledger、原生ZIP/JUnit及完整/取消CI原日志；复制回执在归档完成后产生，作为外部签收，不伪称位于其自身归档内。该包不是同窗口数据库备份，也不是生产执行批准。
+
+
+## 管理员只读观察补充（2026-11-01）
+
+[QS #479](https://github.com/FangcunMount/qs-server/pull/479)已仅合并源码；[生产只读run41307710356](https://github.com/FangcunMount/qs-server/actions/runs/41307710356)成功，精确源码`7899ffce168bac0097b733dd874ab97d87f10db0`。固定AI传输身份`83cd3186…`与固定原库身份`04f11940…`分别校验。采样为完整43、目标存在且0行、原DDL摘要不变；AI会话4、活跃会话/事务/修改事务0、已授予/待授予AI元数据锁0、全局待授予元数据锁0、AI event/trigger/routine/view及目标入向/外向FK/视图依赖均0。全局SELECT/SHOW VIEW/TRIGGER/EVENT权限和PFS映射经过独立验证；24条查询完成并完整释放，只输出固定计数及摘要。原安全回执逐字SHA和全部字段已进入结构化包。
+
+`freeze_verified=false`、`observations_atomic=false`保持原值；上述零值不是连续锁观察、全局停写或无动态SQL的证明。实际DDL执行账户、人工/主机/CI旁路仍逐项审查；正式W04须重新执行同一固定AI入口并结合实际writer排除材料。原应用账户1142未被覆盖，旧QS范围回执也没有借用为AI证据。
+
+
+## 实际44镜像排空发现与修复审查
+
+abc700f生产镜像固定digest `sha256:d848a92f5cff63c9eb25a9f4a59b6db5a484d5d9d78bab236ce9b03344e16727`，实际config ID `sha256:cd956b7802ae42b980fdf4239484080fd13f99e6f2b86074302ac6970d906032`，离线archive SHA `d2da50421c15b0246442730fe7cba4ab25dc9c8bdabb25a19d8a6c69fc4e3773`、117,693,641字节。build-only41305184442与prepare-only41305814053成功，ServerA原业务容器未替换。registry manifest digest、宿主engine ID和config SHA分别记录，不互相冒充。
+
+[首次实际验证41306319525](https://github.com/FangcunMount/qs-ai/actions/runs/41306319525)与[带诊断复验41308014765](https://github.com/FangcunMount/qs-ai/actions/runs/41308014765)均未通过严格排空。后者证明实际默认CMD、UID10001/只读根/完整44备份恢复/原二进制ACK、真实SDK/Checker与paused readiness已通过；约4.998秒退出0且无OOM，但两个mq_subscriber记录component_stopped_with_error。退出0不能替代本包无错误排空条件，因此没有生成合格前向镜像原件。失败回执/完整CI原日志保留。
+
+[AI #248](https://github.com/FangcunMount/qs-ai/pull/248)将主动Stop成功与固定SDK0.5.0的无cause停止通知衔接；真实传输cause、提前退出、取消和Stop失败仍失败，通用监督器/原严格镜像资格检查未放宽。受控driver仅替代网络启动/阻塞调用，真实固定SDK wait/stop方法验证；26项生命周期、24项文档与退役边界以及Ruff/format/mypy通过。它仍须完整CI、精确main资格、新digest构建/prepare和两次实际44启动及排空后，才可填DB02/DB06/DB09。当前旧prepared镜像保留为失败候选证据。

@@ -33,9 +33,9 @@
   },
   "candidate": {
     "PR": "https://github.com/FangcunMount/qs-ai/pull/246",
-    "source_sha": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
-    "draft": true,
-    "merged": false,
+    "source_sha": "abc700ff00666617e4355a991343c66c2e3523cf",
+    "draft": false,
+    "merged": true,
     "production_deployed": false,
     "original43_migration_files_byte_equal": true,
     "source_preservation_receipt_sha256": "8523cc0c501d43c4d57733e887b1e57fa6a828560e95a3f31cec1edf0b7f6180",
@@ -113,7 +113,87 @@
     },
     "all_checks_success": 14,
     "local_targeted_tests_passed": 37,
-    "local_static": "Ruff/format, mypy455 files, docs76files1281links passed"
+    "local_static": "Ruff/format, mypy455 files, docs76files1281links passed",
+    "historical_PR_source_qualification": {
+      "source_sha": "90e64f36737de60f9148ba0169eeadf3bce6f8c4",
+      "full_CI": {
+        "run": 41281012903,
+        "status": "success",
+        "all_checks_success": true,
+        "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012903",
+        "jobs": [
+          {
+            "name": "Retirement backup and restore (8.4)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 1)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 1)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 2)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 3)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 0)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.4, 0)",
+            "conclusion": "success"
+          },
+          {
+            "name": "image",
+            "conclusion": "success"
+          },
+          {
+            "name": "Retirement backup and restore (8.0.36)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 3)",
+            "conclusion": "success"
+          },
+          {
+            "name": "verify (8.0.36, 2)",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete test coverage",
+            "conclusion": "success"
+          }
+        ]
+      },
+      "m7_CI": {
+        "run": 41281012842,
+        "status": "success",
+        "checks_success": 2,
+        "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012842",
+        "jobs": [
+          {
+            "name": "m7 (8.0.36)",
+            "conclusion": "success"
+          },
+          {
+            "name": "m7 (8.4)",
+            "conclusion": "success"
+          }
+        ]
+      }
+    },
+    "main_CI_runs": [
+      41303650216,
+      41303650098
+    ],
+    "main_CI_success": 14
   },
   "release_freeze": {
     "schema": "ai-246-release-freeze/v1",
@@ -1183,7 +1263,7 @@
       {
         "id": "DB02",
         "requirement": "exact main and immutable44 candidate/forward images, real startup and offline archive qualification",
-        "state": "blocking_pending"
+        "state": "blocking_actual44_drain_failure; prepared_abc700f_not_qualified; AI248_new_candidate_pending"
       },
       {
         "id": "DB03",
@@ -1208,7 +1288,7 @@
       {
         "id": "DB07",
         "requirement": "fixed operator identity/permissions and usable sessions/transactions/metadata lock/external dependency visibility",
-        "state": "session_context_observed; administrator_lock_and_dependency_scope_pending"
+        "state": "administrator_AI_scope_readonly_passed24_queries; actual_operator_and_window_resample_required"
       },
       {
         "id": "DB08",
@@ -1382,7 +1462,7 @@
     "frozen_database_backup_claimed": false,
     "database_execution_approval": false
   },
-  "last_updated_at": "2026-11-01T06:48:57.732713+00:00",
+  "last_updated_at": "2026-11-01T12:56:32.843635+00:00",
   "release_freeze_final": {
     "schema": "ai246-final-release-freeze/v1",
     "observed_at": "2026-11-01T06:41:40.268876+00:00",
@@ -1407,9 +1487,10 @@
   "administrator_readonly_inventory": {
     "path": "docs/evidence/2026-11-01-ai246-administrator-readonly.sql",
     "sha256": "c2ab35d7016c7959808988b1f2bcb196bc20213591813314fc7acf25aa21c1a7",
-    "production_executor_qualified": false,
-    "production_run": false,
-    "read_only_or_transaction_control_statements": 11
+    "production_executor_qualified": true,
+    "production_run": true,
+    "read_only_or_transaction_control_statements": 11,
+    "qualified_replacement": "QS#479 ai-activity-admin fixed AI route; successful run41307710356; SQL inventory remains planning-only"
   },
   "postcheck_contract": {
     "verify_exit0": "retained comparison only; never migration/start approval",
@@ -1420,5 +1501,309 @@
       "pool_released"
     ],
     "independent_JSON_check_required": true
+  },
+  "administrator_observation": {
+    "PR": "https://github.com/FangcunMount/qs-server/pull/479",
+    "source_sha": "7899ffce168bac0097b733dd874ab97d87f10db0",
+    "run": 41307710356,
+    "url": "https://github.com/FangcunMount/qs-server/actions/runs/41307710356",
+    "receipt_sha256": "2e3f607a44a0ffd5300b6ad42550d41c6531f293b555bd662dbcf6726febe30a",
+    "receipt": {
+      "ai_activity_only": true,
+      "complete": true,
+      "connection_released": true,
+      "database_released": true,
+      "error_category": "none",
+      "expected_target_hash": "83cd3186bd7de27e6a5b5aa0effbb3c5673274f65cd5d4635f36fed7304a5463",
+      "failure_stage": "none",
+      "format_version": 1,
+      "freeze_verified": false,
+      "measurements": {
+        "counts": {
+          "ai_active_threads": 0,
+          "ai_enabled_events": 0,
+          "ai_metadata_locks_granted": 0,
+          "ai_metadata_locks_pending": 0,
+          "ai_modifying_transactions": 0,
+          "ai_routines": 0,
+          "ai_threads": 4,
+          "ai_transactions": 0,
+          "ai_triggers": 0,
+          "ai_views": 0,
+          "global_metadata_locks_pending": 0,
+          "target_external_foreign_keys": 0,
+          "target_incoming_foreign_keys": 0,
+          "target_view_dependencies": 0
+        },
+        "global_metadata_grants_verified": true,
+        "sampled_at_epoch_microseconds": 1793536943232351,
+        "schema_head": "0043_native_transaction_limit",
+        "target_ddl_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff",
+        "target_present": true,
+        "target_rows": 0
+      },
+      "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+      "observations_atomic": false,
+      "query_count": 24,
+      "read_only": true,
+      "run_id": "41307710356-1",
+      "source_sha": "7899ffce168bac0097b733dd874ab97d87f10db0",
+      "source_target_hash": "83cd3186bd7de27e6a5b5aa0effbb3c5673274f65cd5d4635f36fed7304a5463"
+    },
+    "window_resample_required": true,
+    "writer_exclusion_proved": false,
+    "current_executor_grants_changed": false
+  },
+  "rejected_prepared_image44": {
+    "source_sha": "abc700ff00666617e4355a991343c66c2e3523cf",
+    "build_run": 41305184442,
+    "build_receipt": {
+      "source_sha": "abc700ff00666617e4355a991343c66c2e3523cf",
+      "image_digest": "sha256:d848a92f5cff63c9eb25a9f4a59b6db5a484d5d9d78bab236ce9b03344e16727",
+      "status": "build_completed",
+      "deployment_verified": false
+    },
+    "prepare_run": 41305814053,
+    "prepared_receipt": {
+      "archive_sha256": "d2da50421c15b0246442730fe7cba4ab25dc9c8bdabb25a19d8a6c69fc4e3773",
+      "compose_sha256": "86159f9c3d7efa7e2323aa1b1dc94dcab8de441c50b73a635905436767d25451",
+      "expected_heads": [
+        "0044_empty_publisher"
+      ],
+      "image_id": "sha256:d848a92f5cff63c9eb25a9f4a59b6db5a484d5d9d78bab236ce9b03344e16727",
+      "manifest_sha256": "436ffc5f33de8a6904f03896fa847d13c6143da4735859cb51982c98e4d335b0",
+      "prepared": true,
+      "registry_digest": "sha256:d848a92f5cff63c9eb25a9f4a59b6db5a484d5d9d78bab236ce9b03344e16727",
+      "release": "abc700ff00666617e4355a991343c66c2e3523cf-41305814053-1",
+      "release_id": "abc700ff00666617e4355a991343c66c2e3523cf-41305814053-1",
+      "revision": "abc700ff00666617e4355a991343c66c2e3523cf",
+      "runtime_sha256": "95c54aa186a83c24e5a9c8e6120f9a0948b59b5e9de43dfa77c8d698af1307c4",
+      "source_image_id": "sha256:d848a92f5cff63c9eb25a9f4a59b6db5a484d5d9d78bab236ce9b03344e16727",
+      "version": 1
+    },
+    "two_copy_archive": {
+      "source_sha": "abc700ff00666617e4355a991343c66c2e3523cf",
+      "archive_sha256": "d2da50421c15b0246442730fe7cba4ab25dc9c8bdabb25a19d8a6c69fc4e3773",
+      "bytes": 117693641,
+      "MacBook_readback_verified": true,
+      "ServerA_readback_verified": true,
+      "fsynced": true,
+      "production_deployed": false
+    },
+    "qualification_failed_runs": [
+      41306319525,
+      41308014765
+    ],
+    "latest_failure_receipt_sha256": "85436c4ef2d5d26ec3ed0f4462ecb51225f182cfb555cad7186cd912ec6782ab",
+    "latest_failure": {
+      "schema": "ai246-actual-registry-image44-qualification/v1",
+      "source_sha": "abc700ff00666617e4355a991343c66c2e3523cf",
+      "production": false,
+      "system_acceptance": false,
+      "model_or_upstream_requests_exercised": false,
+      "passed": 5,
+      "failed": 1,
+      "skipped": 0,
+      "cases": {
+        "exact_registry_digest_source_config_and_installed_sdk": true,
+        "actual_original_image_installs_full44_without_legacy_table": true,
+        "actual44_initial_binding_cli_verified": true,
+        "actual_full44_restore_preserves_binary_fact_binding_and_ledger": true,
+        "candidate_actual_readonly44_ready_and_checker_live": true
+      },
+      "scope": "owned44 full restore and paused full-runtime/Checker starts before and after retained new fixture facts; no43 replay",
+      "infra_sha": "62fabe0267dc27dbb9852c401838a716dae6924c",
+      "candidate": {
+        "source_sha": "abc700ff00666617e4355a991343c66c2e3523cf",
+        "registry_digest": "sha256:d848a92f5cff63c9eb25a9f4a59b6db5a484d5d9d78bab236ce9b03344e16727",
+        "engine_image_id": "sha256:cd956b7802ae42b980fdf4239484080fd13f99e6f2b86074302ac6970d906032",
+        "image_config_id": "sha256:cd956b7802ae42b980fdf4239484080fd13f99e6f2b86074302ac6970d906032",
+        "archive_sha256": "801d336b2a5b242797f43e5ad3853104d6da71678f51a78c43d770e462738c9d",
+        "archive_bytes": 131616118,
+        "archive_tag": "ai44-qualified:abc700ff0066-1bb209f2",
+        "sdk": "0.5.0",
+        "client": "5.1.2",
+        "uid": 10001,
+        "wheel_sha256": "6fe1fbf0635d3e2f8ba2f10c12474c39c939ee656f20df7784928f8bd92e88b8",
+        "installed_sdk_files_verified": 19,
+        "shared_production_and_recovery_code": true
+      },
+      "dependency_image_ids": {
+        "mysql": "sha256:f5f171121fa3e572eb30770e3c9a6ca240e822fdaea4e2f44882de402c8ce9d4",
+        "rocketmq": "sha256:d2dcbdd7f35df0cf708f2b17c6fad3b5fece5f8c5db7aa91adf479551b92c787"
+      },
+      "dependency_versions": {
+        "mysql": "8.0.36"
+      },
+      "original44_full_protection_sha256": "3ce46cd11f821418c3c37fffc0374c3aff61f682a8d196accd41abd8ee50ad5a",
+      "resource_provision": {
+        "version": 2,
+        "operations": 12,
+        "typed_topics": 3,
+        "principals": 1,
+        "verified": true,
+        "readback": {
+          "attempts": 1,
+          "observations": [
+            {
+              "attempt": 1,
+              "missing_counts": {
+                "topics": 0,
+                "groups": 0,
+                "principals": 0,
+                "grants": 0
+              }
+            }
+          ],
+          "mutation_retry_attempted": false
+        }
+      },
+      "runtime_environment_sha256": "9b102e2ad96efcede8101d6265bbe4091d00707f62c2bf1f7dc561e893fd1e61",
+      "candidate_paused_metrics": {
+        "sdk_ready": 1,
+        "sampler_running": 1,
+        "observation_available": 1,
+        "admission_open": 0,
+        "check_workers_limit": 1,
+        "check_queue_limit": 16
+      },
+      "candidate_shutdown_seconds": 4.998,
+      "candidate_private_log_sha256": "820bea47597ccb49f54f66458bd09fcdc8ab965d21d6fc1aa1c1effb7ebdbf60",
+      "candidate_process_state": {
+        "Status": "exited",
+        "ExitCode": 0,
+        "OOMKilled": false
+      },
+      "candidate_lifecycle": [
+        {
+          "event": "component_starting",
+          "component": "grpc",
+          "level": "INFO"
+        },
+        {
+          "event": "component_starting",
+          "component": "generation",
+          "level": "INFO"
+        },
+        {
+          "event": "component_starting",
+          "component": "evaluation",
+          "level": "INFO"
+        },
+        {
+          "event": "component_starting",
+          "component": "mq_transactions",
+          "level": "INFO"
+        },
+        {
+          "event": "component_starting",
+          "component": "mq_subscriber_0",
+          "level": "INFO"
+        },
+        {
+          "event": "component_starting",
+          "component": "mq_subscriber_1",
+          "level": "INFO"
+        },
+        {
+          "event": "component_starting",
+          "component": "diagnostic_retention",
+          "level": "INFO"
+        },
+        {
+          "event": "component_starting",
+          "component": "http",
+          "level": "INFO"
+        },
+        {
+          "event": "service_ready",
+          "component": "qs-ai",
+          "level": "INFO"
+        },
+        {
+          "event": "service_draining",
+          "component": "qs-ai",
+          "level": "INFO"
+        },
+        {
+          "event": "component_stopped",
+          "component": "diagnostic_retention",
+          "level": "INFO"
+        },
+        {
+          "event": "component_stopped",
+          "component": "generation",
+          "level": "INFO"
+        },
+        {
+          "event": "component_stopped",
+          "component": "evaluation",
+          "level": "INFO"
+        },
+        {
+          "event": "component_stopped",
+          "component": "grpc",
+          "level": "INFO"
+        },
+        {
+          "event": "component_stopped_with_error",
+          "component": "mq_subscriber_1",
+          "level": "ERROR"
+        },
+        {
+          "event": "component_stopped_with_error",
+          "component": "mq_subscriber_0",
+          "level": "ERROR"
+        },
+        {
+          "event": "component_stopped",
+          "component": "mq_subscriber_1",
+          "level": "INFO"
+        },
+        {
+          "event": "component_stopped",
+          "component": "mq_subscriber_0",
+          "level": "INFO"
+        },
+        {
+          "event": "component_stopped",
+          "component": "mq_transactions",
+          "level": "INFO"
+        },
+        {
+          "event": "component_stopped",
+          "component": "http",
+          "level": "INFO"
+        }
+      ],
+      "failure_stage": "actual44_candidate_paused_start",
+      "failure_kind": "RuntimeError",
+      "failure_reason": "actual_ai_drain_incomplete",
+      "failed_private_logs_sha256": [
+        "820bea47597ccb49f54f66458bd09fcdc8ab965d21d6fc1aa1c1effb7ebdbf60"
+      ],
+      "source_frames": [],
+      "cleanup": {
+        "compose_down_succeeded": true,
+        "private_directory_removed": true,
+        "existing_containers_unchanged": true,
+        "existing_networks_unchanged": true,
+        "owned_image_alias_absent": true
+      },
+      "source_unchanged": true
+    },
+    "production_execution_qualified": false,
+    "retain_originals": true,
+    "reason": "actual pinned SDK wait/Stop lifecycle incompatibility; strict drain gate retained; AI#248 pending source CI and new immutable main build"
+  },
+  "subscriber_drain_fix": {
+    "PR": "https://github.com/FangcunMount/qs-ai/pull/248",
+    "source_sha": "961f26b7cef89df2f37cbc25854eb990305217d0",
+    "production_deployed": false,
+    "local_lifecycle_passed": 26,
+    "local_docs_retired_boundaries_passed": 24,
+    "static": "Ruff/format/mypy pass",
+    "full_CI": "pending",
+    "new_immutable_main_candidate": "pending"
   }
 }
