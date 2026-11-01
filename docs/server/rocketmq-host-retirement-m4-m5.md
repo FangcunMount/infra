@@ -6,6 +6,8 @@
 
 M5 首批已在 03:58:04 CST 受控发布：QS main `4620d11e2cffbc4b67b43965812cff3340f0be43`，clean 111/44，API1/Worker3/Collection2 就绪，原入口恢复、公网 HTTPS 健康 200；自动 CD 仍 `disabled_manually`。仅删除原空 `qs.mysql.ai_messaging_outbox`；另五对象、事务凭证、原文、ACK、历史和调度均保留。完整启动前后内容比较通过，51 条历史锚点缺口仍未关闭。
 
+发布后基线、51条旧协议原发布证据找回、监控采集缺口及下一批任务见[2026-11-01实际推进记录](rocketmq-host-retirement-followthrough-20261101.md)。历史旧发布confirmed不补成当前事务witness，QS自动CD继续冻结。
+
 以[实际生产发布回执](rocketmq-host-retirement-m5-production-release.md)和[结构化回执](../evidence/2026-11-01-host-retirement-m5-production-release.json)为当前事实。下文为原阶段记录，保留较早“未执行”、失败及证据归属，不能作为重复执行或回放旧材料的许可。
 
 ## 2026-10-31 准备阶段交付状态（历史）
