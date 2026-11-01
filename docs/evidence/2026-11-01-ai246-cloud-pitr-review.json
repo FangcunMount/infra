@@ -1,0 +1,22 @@
+{
+  "schema": "ai-cloud-PITR-review/v1",
+  "log_bin": true,
+  "configured_local_binlog_retention_seconds": 2592000,
+  "SQL_log_inventory_readable": true,
+  "visible_SQL_log_files": 2,
+  "private_SQL_log_inventory_sha256": "2f4e40fe5ff284107b75a25732ae57e7a819736d9d8d320aa6fe8b1a4c3fec99",
+  "cloud_control_plane_access_configured": false,
+  "cloud_backup_set_ids_or_status_verified": false,
+  "cloud_log_backup_continuity_verified": false,
+  "earliest_latest_restore_time_verified": false,
+  "actual_cloud_PITR_restore_exercised": false,
+  "qualified": false,
+  "selected_for_M5": false,
+  "alternative_qualified": "actual full logical backup restore; fresh frozen-window capture still required",
+  "next_evidence": [
+    "cloud RDS backup/log policy and successful full backup identifiers",
+    "continuous archived logs and available restore interval covering reviewed window",
+    "restore to isolated target and verify full metadata, original rows and recovery point"
+  ],
+  "automatic_cloud_provisioning_or_billing": false
+}

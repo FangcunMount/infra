@@ -4,6 +4,14 @@
 
 入口：[结构化执行包](../evidence/2026-11-01-host-retirement-ai-246-execution-package.json)、[AI #246](https://github.com/FangcunMount/qs-ai/pull/246)、[上一轮审查](rocketmq-host-retirement-ai-empty-publisher-review-20261101.md)。本包只处理`ai.mysql.messaging_outbox`，其余四个候选、所有业务/模型历史、事务凭证、Inbox、ACK、archive、治理和调度记录全部保留。QS已发布的111/44不回放110；AI本包不执行SQL111。
 
+## 最新补充：实际全备恢复与执行账户已完成技术审查
+
+[备份/账户资格说明](rocketmq-host-retirement-ai-backup-account-qualification-20261101.md)及[真实全备恢复回执](../evidence/2026-11-01-ai246-real-backup-restore-qualification.json)、[实际执行账户回执](../evidence/2026-11-01-ai246-execution-account-review.json)、[云PITR范围记录](../evidence/2026-11-01-ai246-cloud-pitr-review.json)为本轮当前结论。
+
+AI当前全库51表/404列元数据/8,503行（含原ledger29字节；49保留表8,502行），91,768,335原字段字节已一致只读导出。26,704,524字节归档SHA `58a8625f5a56ff5607388766851ce2a546fdb4f21b410abda4d46680ebe9eae4`，在无网络、无生产连接配置的新MySQL8.0.36中实际恢复；完整表定义、原列元数据和全部字段指纹相同，新连接复验再次通过。备份体只保存在MacBook/ServerA私有目录，未上传GitHub或CI。
+
+本批DB04选择已实测的完整逻辑备份路线；云PITR未取得云备份集、日志链/时间范围及实际恢复证据，未验收、未纳入通过项。当前全备`frozen=false`，不能替代未来窗口的新冻结备份。实际准备镜像也已在独立数据库网络、UID10001和VERIFY_IDENTITY下读回同一账户/权限；该账户范围较宽，最终独立执行审查须明示接受其范围，或另审替代账户，本轮没有GRANT/REVOKE。
+
 ## 当前镜像与剩余执行门槛
 
 准备材料已补齐：[管理员原回执](../evidence/2026-11-01-ai246-administrator-observation.json)、[实际不可变44镜像资格](../evidence/2026-11-01-ai246-44-image-qualification.json)、[当前源码恢复资格](../evidence/2026-11-01-ai246-main44-restore-qualification.json)。精确main检查[41310278495](https://github.com/FangcunMount/qs-ai/actions/runs/41310278495)12项、[M7 41310404873](https://github.com/FangcunMount/qs-ai/actions/runs/41310404873)两项成功。恢复专项两种MySQL各21项；[实际镜像41311886021](https://github.com/FangcunMount/qs-ai/actions/runs/41311886021)13项成功、0失败、0跳过，含完整44隔离备份恢复、真实SDK/Checker、只读根两次启动/无错误排空、首启动后新增ACK与旧二进制事实保留、启动全过程0 DDL/0模型请求。两个关闭耗时5.037/4.766秒仅属空闲且准入暂停的隔离实例，不是生产活跃工作排空或RTO证明。
@@ -23,9 +31,9 @@
 | 剩余门槛 | 尚须取得的实际材料 |
 | --- | --- |
 | DB03 | 完整写者/旁路库存、真实准入关闭和210秒无错误排空，原事务/调用无active或unknown；Broker待办和历史保留 |
-| DB04 | 同窗口frozen保护、原目标/完整ledger/49表原件及独立完整备份或PITR可恢复性资格；binlog30天配置和隔离fixture恢复均不能替代 |
+| DB04 | 同窗口frozen保护、原目标/完整ledger/49表原件及当次新全备。真实全备恢复方法已通过，当前live备份不能替代窗口材料，云PITR未纳入本批路线 |
 | DB05/DB08 | 当次保护材料二地回读、原执行UID持久消费目录、shujie独立签发的当前有界生产review及SHA；现有模板不可消费 |
-| DB07/DB10 | 固定实际DDL执行账户/权限、当次W04管理员重采及writer排除签收；先写首次业务重开屏障后才发启动命令 |
+| DB07/DB10 | 实际准备镜像账户/权限/独立网络已实读；当次W04须重采并明确签收较宽账户范围及writer排除，先写首次业务重开屏障后才发启动命令 |
 
 最新管理员[41312407017](https://github.com/FangcunMount/qs-server/actions/runs/41312407017)再次成功：24条只读、完整43/原DDL空表、会话4、活跃/事务/修改事务/AI锁/全局待锁及目标依赖均0，原库身份相同且连接完整释放。`freeze_verified=false`、`observations_atomic=false`保留原值；这些时点观察不证明已停写。
 
@@ -39,7 +47,7 @@
 | 数据库身份 | `04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3` | 由server_uuid和DATABASE原值的固定JSON编码散列，窗口重读 |
 | 原目标DDL | `a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff` | 生产SHOW CREATE原字节已捕获；只有结构，无业务内容；精确DDL进入两种原生MySQL隔离恢复 |
 | 权限及可见性 | 当前连接有PROCESS/复制读取以及ai/iam/qs等schema广泛权限，实读20会话；不读取SQL INFO；未GRANT/REVOKE | 可观察跨会话但不能据此宣称所有写者已排除。最终审查必须固定实际执行账户与权限边界，不在当前准备工作中改权限 |
-| 恢复基础 | log_bin=true、binlog_expire_logs_seconds=2592000 | 只证明30天保留配置，不证明完整备份链、PITR实际可恢复或RTO |
+| 恢复基础 | log_bin=true、binlog_expire_logs_seconds=2592000 | 只证明SQL日志配置；本轮已补真实全备实际隔离恢复，仍不证明云PITR链或生产RTO |
 | AI管理员锁观察 | QS #479受核入口以main7899ffce执行24条只读查询，AI身份/全局权限验证、完整43/原DDL/空表及14项计数完成，连接与database均释放 | 此前应用账户1142仍留存。新管理员时点观察已补齐，窗口须重采且独立排除写者；未改权限、未KILL会话 |
 | 不可变生产/恢复制品 | c6359b4固定ACR digest完成build-only和prepare-only；实际镜像13项通过，两个离线archive两地回读，恢复副本在ServerA实际离线load | 准备资格已补齐。独立archive同为受核44代码，适用于重启/配置修复；代码缺陷仍须另审新44补丁。未启动生产44 |
 | 窗口与审批 | 未停写、未生成frozen保护/实际writer排除回执、未签发production review/forward review | **执行阻断**。当前材料仅可审查，不得把live.json改名为frozen.json |
@@ -192,3 +200,8 @@ AI #248已仅合并源码至`c6359b441de48fde5b295529fe9c10f50e4c53f5`；PR完�
 本轮最终原件归档262,238,611字节，SHA `025c3296773cbca2bd3ad4fb21539c49b9092c91a4672efeec05d81ddf1fb6f3`，包含139个原件/脚本成员及索引。MacBook与ServerA逐成员SHA/长度、整包回读与fsync一致，31份已取得原始ZIP的CRC通过；0700目录/0600文件，至少30天且未结责任延期，无自动清理。当前两份合格镜像archive按上表独立保全，旧失败镜像原件只用于审计，不列恢复候选。归档包含da65审查包快照、精确main/管理员/资格/失败与取消CI原日志、实际采集代码、两版MySQL原ZIP/XML及带明确基线的增量bundle；归档复制回执和本段的最终保全声明在归档完成后产生，作为外部签收，不声称包含于自身归档。复制回执也已另存两地，其SHA见结构化包。
 
 DB01/DB02/DB06的静态与隔离资格、AI管理员观察能力和44离线恢复制品均已补齐；DB03/DB04及DB05/DB07/DB08/DB10中依赖真实窗口、实际账户、冻结保护/备份PITR与独立批准的部分继续No-Go。未停生产业务、未执行生产DDL/DML、未签发或消费生产批准，事务凭证、历史、ACK、调度和Broker待办均未因本包修改/删除。当前发布继续冻结；M5生产发布没有完成。
+
+
+## 本轮备份/账户后的现库与冻结
+
+15:30:14UTC新只读快照16.624秒完成，仍完整43/原目标0行、49保留表8,502行/91,768,306字节，全部定义和内容指纹与实际备份及前次只读相同；原JSON SHA `9931f6fadd57b5a9755b9fcabd93e76c8d6afd1a2510f51a6be2e7f2ea2bf18f`，事务/池均释放。15:29:56UTC发布控制仍AI=false、QS=disabled_manually，原f9容器healthy/restart0/原启动时间，未切换业务。云PITR继续未验收；本批采用完整备份路径。剩余No-Go限于真实停写排空、当前窗口冻结保护与新备份、账户/网络/GRANTS当次复核和独立执行批准，不能由本轮live材料提前填成通过。

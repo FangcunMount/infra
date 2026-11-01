@@ -68,7 +68,7 @@
     "deployment_dispatched": false
   },
   "live_qualification": {
-    "captured_at": "2026-11-01T13:39:20.373065+00:00",
+    "captured_at": "2026-11-01T15:30:14.612327+00:00",
     "state": "43_intact",
     "head": "0043_native_transaction_limit",
     "frozen": false,
@@ -78,11 +78,11 @@
     "retained_tables": 49,
     "retained_rows": 8502,
     "retained_bytes": 91768306,
-    "snapshot_sha256": "c349610b24433a5f96fc6df25229e323985a4f50e3630e2f7a08a11347a097c4",
+    "snapshot_sha256": "9931f6fadd57b5a9755b9fcabd93e76c8d6afd1a2510f51a6be2e7f2ea2bf18f",
     "transaction_released": true,
     "pool_released": true,
     "fingerprints_are_backup": false,
-    "elapsed_seconds": 18.268,
+    "elapsed_seconds": 16.624,
     "two_live_snapshots_retained_identical": true,
     "continuous_no_write_claimed": false,
     "observer_source": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
@@ -884,7 +884,7 @@
     "OOMKilled": false,
     "StopTimeout": 210,
     "current_release": "f9f24abdf98535295c4e3d223675ef6be62115e2-41108077901-1",
-    "final_observed_at": "2026-11-01T13:53:19.170859+00:00",
+    "final_observed_at": "2026-11-01T15:29:56.759320+00:00",
     "source_image_start_and_mounts_unchanged": true,
     "final_image_preparation_and_offline_load_unchanged": true,
     "forward_offline_readback_at": "2026-11-01T13:43:07.868561+00:00",
@@ -954,7 +954,11 @@
       "freeze_proof": false
     },
     "negative_permission_read_receipt_sha256": "159159fffa3327834e77907870210440ff2c3a28daed1d86d886c3c45c80a689",
-    "scope": "historical/current application account; administrator observation is separately bound and does not change this account grants"
+    "scope": "historical/current application account; administrator observation is separately bound and does not change this account grants",
+    "full_logical_backup_recoverability_proved": true,
+    "selected_backup_or_PITR_route": "qualified full logical backup; cloud PITR excluded",
+    "actual_prepared_executor_review_completed": true,
+    "actual_executor_is_minimum_privilege": false
   },
   "native_qualification": {
     "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
@@ -1052,7 +1056,7 @@
       "ServerA root private"
     ],
     "retention": "minimum30days and extend unresolved; no automatic cleanup",
-    "full_business_backup": "fingerprints are not backup; independent complete backup/PITR qualification remains required review material"
+    "full_business_backup": "actual51-table consistent snapshot backup restored and verified in isolated MySQL; current live pointT is not frozen-window backup; no production restore authorization"
   },
   "same_window_outputs": [
     {
@@ -1221,12 +1225,12 @@
       {
         "id": "DB04",
         "requirement": "fresh frozen snapshot plus original target/ledger and49 complete fingerprints; actual backup/PITR review",
-        "state": "window_pending_not_generated; production_complete_backup_PITR_recoverability_not_proved"
+        "state": "actual51table_full_backup_restore_qualified; cloudPITR_not_qualified_not_selected; fresh_samewindow_frozen_backup_still_required"
       },
       {
         "id": "DB05",
         "requirement": "two-copy readback and durable approval consumption; minimum30days retention",
-        "state": "review_originals_and_images_protected; fresh_window_originals_and_consumption_pending"
+        "state": "actual_backup_two_copy_verified; current_review_originals_protection_in_progress; future_window_materials_and_consumption_pending"
       },
       {
         "id": "DB06",
@@ -1236,7 +1240,7 @@
       {
         "id": "DB07",
         "requirement": "fixed operator identity/permissions and usable sessions/transactions/metadata lock/external dependency visibility",
-        "state": "AI_admin_visibility_and_readonly_executor_qualified; actual_DDL_operator_identity_scope_and_fresh_W04_exclusion_still_required"
+        "state": "actual_prepared44_UID10001_independent_network_principal_grants_TLS_and_writable_primary_readonly_verified; wide_account_explicit; fresh_window_recheck_and_owner_execution_signoff_required"
       },
       {
         "id": "DB08",
@@ -1428,10 +1432,10 @@
     "frozen_database_backup_claimed": false,
     "database_execution_approval": false
   },
-  "last_updated_at": "2026-11-01T14:01:42.688167+00:00",
+  "last_updated_at": "2026-11-01T15:39:44.754102+00:00",
   "release_freeze_final": {
     "schema": "ai246-final-preparation-freeze-runtime/v1",
-    "observed_at": "2026-11-01T13:53:19.170859+00:00",
+    "observed_at": "2026-11-01T15:29:56.759320+00:00",
     "AI_AUTO_DEPLOY_ENABLED": "false",
     "QS_Production_Deploy": "disabled_manually",
     "active_AI_release_workflows": [],
@@ -1452,10 +1456,7 @@
     "business_stopped": false,
     "production_DDL": false,
     "business_DML": false,
-    "production_approval_issued_or_consumed": false,
-    "receipt_sha256": "16ff3954d97c0122f9b02c2bb4c8d39ea968510e4e5886470a2e4e09805fae6c",
-    "automatic_main_followup_run": 41311618873,
-    "automatic_main_followup_state": "skipped"
+    "production_approval_issued_or_consumed": false
   },
   "stable_originals_copy": {
     "directory": "/var/lib/fangcun-m5-protection/followthrough-20261101/ai246-review-90e64f3",
@@ -2248,10 +2249,10 @@
     "runtime_source": "f9f24abdf98535295c4e3d223675ef6be62115e2"
   },
   "remaining_execution_requirements": [
-    "fresh actual writer inventory/exclusion and210s no-error production drain; retain Broker pending and all history",
-    "same-window frozen original target/ledger/all49 fingerprints and independently qualified complete backup/PITR route",
-    "fresh actual DDL operator/privilege review and W04 AI administrator observation",
-    "two-copy current-window materials and independent bounded production review/consumption; durable first-business-start barrier"
+    "actual writer inventory/exclusion and210s no-error production drain; all original pending/history preserved",
+    "same-window frozen protection AND fresh full backup with fingerprints equal to that window, using qualified method; live pointT backup must not be renamed frozen",
+    "fresh W04 administrator observation and actual execution principal/grants/network/TLS recheck; explicitly approve known wide account scope or separately review replacement",
+    "two-copy current-window material and independent bounded execution review/consumption; first-business-start barrier before command"
   ],
   "review_material_protection_current": {
     "archive_sha256": "025c3296773cbca2bd3ad4fb21539c49b9092c91a4672efeec05d81ddf1fb6f3",
@@ -2282,5 +2283,181 @@
     ],
     "frozen_database_backup_claimed": false,
     "production_execution_approval": false
+  },
+  "real_production_backup_qualification": {
+    "schema": "ai-real-full-backup-restore-qualification/v1",
+    "data_owner": "shujie",
+    "recovery_owner": "shujie",
+    "selected_M5_recovery_protection": "full logical consistent snapshot backup; cloud PITR not selected",
+    "source_is_live_production": true,
+    "restore_target_is_owned_network_none": true,
+    "restore_target_has_source_connection_credentials": false,
+    "archive_sha256": "58a8625f5a56ff5607388766851ce2a546fdb4f21b410abda4d46680ebe9eae4",
+    "archive_bytes": 26704524,
+    "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+    "source_version": "8.0.36",
+    "head": "0043_native_transaction_limit",
+    "tables": 51,
+    "column_metadata_entries": 404,
+    "rows": 8503,
+    "retained_tables": 49,
+    "retained_rows": 8502,
+    "raw_field_bytes": 91768335,
+    "retained_raw_field_bytes": 91768306,
+    "target_rows": 0,
+    "source_snapshot_at": "2026-11-01T14:33:50.566109+00:00",
+    "capture_seconds": 19.361,
+    "capture_code_sha256": "81854f33b08f2c53a13094b9ab0c557607d7abcbc4a000fff90b01cf57c3b19b",
+    "restore_code_sha256": "022f0863412fdafefa362930c8344ea4a40daeb2948cc3de15dde5c8aa39e73d",
+    "restored_identity": "f33aad8fd02296e1e06600150909bd1d7dbb32863f7383c7e7061ad8cfc444a9",
+    "all_definitions_columns_and_field_fingerprints_identical": true,
+    "restore_seconds": 42.001,
+    "new_connection_verify_seconds": 24.272,
+    "full_new_connection_recheck": true,
+    "archive_sha_verified_before_and_after_recovery": true,
+    "source_capture_path_AST_unchanged_in_current_code": true,
+    "snapshot_complete_sha256": "2776c691590ee799673ad86110d121049067fe7114aa86f8e16d62e23fb21bd8",
+    "capture_receipt_sha256": "15705a6262b1336c8a6003c1ce4908426dd50e4f101c2a07f00da653b52c3e8d",
+    "restore_receipt_sha256": "812a4d19bd62031582fa851af8f73f44befdb1501884fdb0746f62cd30f86d3d",
+    "two_copy": {
+      "archive_sha256": "58a8625f5a56ff5607388766851ce2a546fdb4f21b410abda4d46680ebe9eae4",
+      "archive_bytes": 26704524,
+      "MacBook_readback_verified": true,
+      "ServerA_readback_verified": true,
+      "file_mode": "0600",
+      "directory_mode": "0700",
+      "fsynced": true,
+      "minimum_retention_days": 30,
+      "extend_unresolved": true,
+      "automatic_cleanup": false,
+      "private_real_data": true,
+      "production_restore_authorized": false
+    },
+    "original_containers_unchanged": true,
+    "original_AI_unchanged": true,
+    "owned_datadirs_retained_private": true,
+    "actual_business_runtime_started": false,
+    "production_DDL": false,
+    "production_DML": false,
+    "frozen": false,
+    "production_execution_approval": false,
+    "cloud_PITR_qualified": false,
+    "scope": "pointT actual backup recovery qualification; no production restore authorization or post-reopen old-backup replay"
+  },
+  "actual_execution_account_review": {
+    "schema": "ai-actual-execution-account-review/v1",
+    "complete": true,
+    "capabilities": {
+      "read_all_ai": true,
+      "drop_target_capability": true,
+      "update_ledger_capability": true
+    },
+    "required_capabilities_present": true,
+    "current_roles": "NONE",
+    "partial_revokes": false,
+    "grants_sha256": "0f2be53777c287113419b682e6029cc2f21b0d708dc757f6b4794b6d2a851249",
+    "ai_schema_all_privileges": true,
+    "global_privileges": [
+      "PROCESS",
+      "REPLICATION CLIENT",
+      "REPLICATION SLAVE",
+      "XA_RECOVER_ADMIN"
+    ],
+    "other_scope_count": 15,
+    "other_scope_fingerprints": [
+      "416ac6003672925ed173e07a786401303d6cfda00958e50cc17377d5ec99afdc",
+      "420dc2c840c8a93b530e6921bc63aee64a3e1bd0b6b6b195549ec9447edacffd",
+      "468b4f0c56360528694b66c1d3827b861162c6aa019db5a2b346f68b0256e626",
+      "84abdaa9dcfe26d83d2351f3cb72c64dbb1b0a9d56c0f379c2941ccd2271b491",
+      "a440da1f5b295499f61501e9574a62433689574d7b5b7c9d5a11727795e205d0",
+      "a511db10ad998662a1ce536d6831060c6da46389354ed09d13a9e8990353ab8c",
+      "a57cd4165db3ca56ee13441be7a37d789c3bee727d36de4199c88db85798ec2c",
+      "aa12bd26fd0b3ca045d2bc44efef02a73e38140e25c77c37d06e27726d72826f",
+      "ab49fcc6d09b364f71336e9b15b5f37ff369d802102729271e51650c5d4cb829",
+      "b5f89eeea1cbf07e7e0aa48f23efc7a8a9727219742598ccca97841dc1170b7f",
+      "be1063b5bc5ed67408b72ea06f5d07edecd2b38ce3ac61f8ef4e9bdb938e2b7c",
+      "daa2197f28f0f2cf860157ea7a347cd65f5156aeda2364e285e382d4b1f729f1",
+      "de10ab03e6cafeeef6cc0dd65ce00add420508278d75ff0f85616b64f3881cb7",
+      "e1cc11a1d378a2bcff4729a934beabe77a692ccfb1171afc4f373eabd04590b8",
+      "f2ce6447c77a779c772cb9937dee36d6a7b65c38d9c7fb5afe866161d4dbb25d"
+    ],
+    "grant_option": false,
+    "least_privilege_account": false,
+    "source_privileges_changed": false,
+    "production_DDL_tested": false,
+    "execution_authorized": false,
+    "observed_at": "2026-11-01T15:23:47.396859+00:00",
+    "principal_sha256": "eca7fff1f06f2f57d814a6f7ef4a964480fe97efeefd8447ff8c4a3a9bbe880a",
+    "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+    "actual_prepared_image": "sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e",
+    "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+    "observer_uid": 10001,
+    "independent_database_network_id": "m3tfd5h9sp5d1xmzht0ey0oql",
+    "requires_running_f9_namespace": false,
+    "client_tls_mode": "VERIFY_IDENTITY",
+    "only_public_CA_mounted": true,
+    "server_readonly": 0,
+    "server_super_readonly": 0,
+    "diagnostic_session_readonly": 1,
+    "transaction_released": true,
+    "pool_released": true,
+    "other_schema_all_privileges": [
+      "iam.*",
+      "qs.*",
+      "statistic_db.*"
+    ],
+    "mysql_table_select_scopes": [
+      "mysql.func",
+      "mysql.general_log",
+      "mysql.help_category",
+      "mysql.help_keyword",
+      "mysql.help_relation",
+      "mysql.help_topic",
+      "mysql.slow_log",
+      "mysql.time_zone",
+      "mysql.time_zone_leap_second",
+      "mysql.time_zone_name",
+      "mysql.time_zone_transition",
+      "mysql.time_zone_transition_type"
+    ],
+    "raw_observation_sha256": "5d559d32cc477f13a0de03d491c40b721baf97a76322e3b56953648548fd76f6",
+    "observer_code_sha256": "4e7f33793cd8dc10e8b858dd92a50184fa85565d0a3395e4e0a2f20dffc3fae7",
+    "review_code_sha256": "c0468015ebcc7810184ba44685fd762c6403681085dac1386d52bddc5c5eb143",
+    "production_permission_changed": false,
+    "production_model_or_SDK_started": false,
+    "owner_execution_scope_signoff": "required in independent production review; existing wide account is not minimum privilege"
+  },
+  "cloud_PITR_review": {
+    "schema": "ai-cloud-PITR-review/v1",
+    "log_bin": true,
+    "configured_local_binlog_retention_seconds": 2592000,
+    "SQL_log_inventory_readable": true,
+    "visible_SQL_log_files": 2,
+    "private_SQL_log_inventory_sha256": "2f4e40fe5ff284107b75a25732ae57e7a819736d9d8d320aa6fe8b1a4c3fec99",
+    "cloud_control_plane_access_configured": false,
+    "cloud_backup_set_ids_or_status_verified": false,
+    "cloud_log_backup_continuity_verified": false,
+    "earliest_latest_restore_time_verified": false,
+    "actual_cloud_PITR_restore_exercised": false,
+    "qualified": false,
+    "selected_for_M5": false,
+    "alternative_qualified": "actual full logical backup restore; fresh frozen-window capture still required",
+    "next_evidence": [
+      "cloud RDS backup/log policy and successful full backup identifiers",
+      "continuous archived logs and available restore interval covering reviewed window",
+      "restore to isolated target and verify full metadata, original rows and recovery point"
+    ],
+    "automatic_cloud_provisioning_or_billing": false
+  },
+  "backup_account_production_actions": {
+    "source_consistent_readonly_backup": true,
+    "source_permission_changed": false,
+    "only_owned_network_none_restore_DDL": true,
+    "production_DDL": false,
+    "production_DML": false,
+    "business_stopped": false,
+    "production_backup_overwritten": false,
+    "cloud_instance_created": false,
+    "credentials_history_ACK_scheduling_deleted": false
   }
 }
