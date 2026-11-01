@@ -1,0 +1,21 @@
+name: AI44 immutable image qualification contracts
+on:
+  pull_request:
+    paths:
+      - scripts/rocketmq/ai44_image_start.py
+      - scripts/rocketmq/test_ai44_image_start.py
+      - .github/workflows/ai44-image-contracts.yml
+  push:
+    branches: [main]
+    paths:
+      - scripts/rocketmq/ai44_image_start.py
+      - scripts/rocketmq/test_ai44_image_start.py
+      - .github/workflows/ai44-image-contracts.yml
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: python3 -B -m unittest discover -s scripts/rocketmq -p test_ai44_image_start.py
