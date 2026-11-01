@@ -1380,7 +1380,12 @@
     "business_DML": false,
     "deployment_dispatched": false,
     "credentials_history_ACK_scheduling_deleted": false,
-    "production_approval_issued_or_consumed": false
+    "production_approval_issued_or_consumed": false,
+    "release_workflow_operations": [
+      "build",
+      "prepare"
+    ],
+    "production_activation": false
   },
   "retained_other_scope": {
     "IAM_two_objects": "retained",
@@ -1462,7 +1467,7 @@
     "frozen_database_backup_claimed": false,
     "database_execution_approval": false
   },
-  "last_updated_at": "2026-11-01T12:56:32.843635+00:00",
+  "last_updated_at": "2026-11-01T13:19:08.852792+00:00",
   "release_freeze_final": {
     "schema": "ai246-final-release-freeze/v1",
     "observed_at": "2026-11-01T06:41:40.268876+00:00",
@@ -1552,7 +1557,26 @@
     },
     "window_resample_required": true,
     "writer_exclusion_proved": false,
-    "current_executor_grants_changed": false
+    "current_executor_grants_changed": false,
+    "exact_main_CI": {
+      "run": 41307558019,
+      "status": "success",
+      "jobs_success": 20,
+      "original_conditional_skips": 1,
+      "native_fixture_receipt": {
+        "actual43_and44_observed_without_observer_writes": true,
+        "actual_pending_metadata_lock_and_DDL_observed": true,
+        "fixture_only": true,
+        "nonzero_not_freeze": true,
+        "original_binary_fact_and_ledger_preserved": true,
+        "passed": true,
+        "production_or_system_acceptance": false,
+        "restricted_visibility_refused": true,
+        "source_sha": "7899ffce168bac0097b733dd874ab97d87f10db0",
+        "view_dependency_detected": true
+      },
+      "native_receipt_sha256": "d908ad9170b7d831c9e1636a09ac5cbcf09a623a05bba3f0246080d188ebef05"
+    }
   },
   "rejected_prepared_image44": {
     "source_sha": "abc700ff00666617e4355a991343c66c2e3523cf",
@@ -1803,7 +1827,126 @@
     "local_lifecycle_passed": 26,
     "local_docs_retired_boundaries_passed": 24,
     "static": "Ruff/format/mypy pass",
-    "full_CI": "pending",
-    "new_immutable_main_candidate": "pending"
+    "full_CI": "PR12_and_manual_M7_two_passed; exact_main_full_pending",
+    "new_immutable_main_candidate": "pending",
+    "M7": {
+      "run": 41309046783,
+      "status": "success",
+      "jobs_success": 2,
+      "source_sha": "961f26b7cef89df2f37cbc25854eb990305217d0",
+      "production": false
+    },
+    "merged_source_only": true,
+    "merge_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+    "PR_full_CI": {
+      "run": 41308643839,
+      "jobs_success": 12
+    },
+    "exact_main_CI": 41310278495,
+    "exact_main_M7": 41310404873
+  },
+  "qualification_harness": {
+    "PR": "https://github.com/FangcunMount/infra/pull/425",
+    "merged_source_only": true,
+    "main_sha": "678681b647d11b75b2edb080ecea7aa5c8e3c174",
+    "reviewed_head_sha": "62fabe0267dc27dbb9852c401838a716dae6924c",
+    "PR_CI_jobs_success": 14,
+    "relevant_files_byte_equal_after_merge": true,
+    "production_activation": false
+  },
+  "preparation_stage1_protection": {
+    "archive_sha256": "5e40b800d18dd80946138fa9419432d7c8e0ece8c1c6bf712729a22556a63e77",
+    "archive_bytes": 8736556,
+    "original_members_verified": 52,
+    "servera_readback_verified": true,
+    "fsynced": true,
+    "root_owned": true,
+    "directory_mode": "0700",
+    "file_mode": "0600",
+    "minimum_retention_days": 30,
+    "extend_unresolved": true,
+    "automatic_cleanup": false,
+    "production_activation": false,
+    "database_execution_approval": false,
+    "MacBook_readback_verified": true,
+    "recorded_at": "2026-11-01T13:03:08.452521+00:00",
+    "receipt_external_to_archive": true,
+    "receipt_sha256": "671854afce60c6ec6eb7d4eb8e0fc4fa94060439be95c0d050affe38d39d14cb",
+    "raw_CI_ZIP_CRC_verified": 12
+  },
+  "fixed_main_native_qualification": {
+    "receipt": {
+      "schema": "ai246-native-window-qualification/v1",
+      "source_sha": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+      "CI_run": 41310278495,
+      "production_executed": false,
+      "proof": [
+        {
+          "mysql": "8.0.36",
+          "native_cases": 21,
+          "seconds": 68.653,
+          "artifact_id": 13084758837,
+          "artifact_sha256": "7cb955313aa731aa45a0ce867725c0ff5376527ab962b500418b939fb5046b2f",
+          "xml_sha256": "8abc66f4698949b4612177e25d650734b026a76cad6c1742b69f690f72c2be5f",
+          "names": [
+            "test_fresh_head_install_and_current_metadata_agree",
+            "test_existing_store_without_review_never_changes_native_or_old_rows",
+            "test_nonempty_publisher_refuses_after_review_before_consumption",
+            "test_reviewed_upgrade_preserves_all_retained_rows_and_refuses_replay",
+            "test_pre_drop_failure_keeps_consumed_marker_and_original_store",
+            "test_unknown_ddl_result_converges_forward_without_replaying_drop",
+            "test_forward_recovery_refuses_unproved_original_state[retained_bytes]",
+            "test_forward_recovery_refuses_unproved_original_state[retained_schema]",
+            "test_forward_recovery_refuses_unproved_original_state[missing_original_marker]",
+            "test_forward_recovery_refuses_unproved_original_state[wrong_database]",
+            "test_forward_recovery_refuses_unproved_original_state[business_reopened]",
+            "test_original_production_empty_target_ddl_restores_only_in_isolated_mysql",
+            "test_capture_cli_is_readonly_and_releases_owned_pool",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-none]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-archive_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-witness_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-client_reply_discarded]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-none]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-archive_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-witness_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
+          ]
+        },
+        {
+          "mysql": "8.4",
+          "native_cases": 21,
+          "seconds": 44.365,
+          "artifact_id": 13085187211,
+          "artifact_sha256": "a55593eb1714034168ff70d1d98850d76b2d9018ae43574b391a732a9c2f298d",
+          "xml_sha256": "20582490db15343b9d3d51c3870bba63d4a0cd9a68f98ab0dfc7c7a4b0fda22f",
+          "names": [
+            "test_fresh_head_install_and_current_metadata_agree",
+            "test_existing_store_without_review_never_changes_native_or_old_rows",
+            "test_nonempty_publisher_refuses_after_review_before_consumption",
+            "test_reviewed_upgrade_preserves_all_retained_rows_and_refuses_replay",
+            "test_pre_drop_failure_keeps_consumed_marker_and_original_store",
+            "test_unknown_ddl_result_converges_forward_without_replaying_drop",
+            "test_forward_recovery_refuses_unproved_original_state[retained_bytes]",
+            "test_forward_recovery_refuses_unproved_original_state[retained_schema]",
+            "test_forward_recovery_refuses_unproved_original_state[missing_original_marker]",
+            "test_forward_recovery_refuses_unproved_original_state[wrong_database]",
+            "test_forward_recovery_refuses_unproved_original_state[business_reopened]",
+            "test_original_production_empty_target_ddl_restores_only_in_isolated_mysql",
+            "test_capture_cli_is_readonly_and_releases_owned_pool",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-none]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-archive_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-witness_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[-client_reply_discarded]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-none]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-archive_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-witness_rejected]",
+            "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
+          ]
+        }
+      ]
+    },
+    "sha256": "760352992ef550ea3349af2531c117c4b25619362df9b1448efd9f37d9d8aebc",
+    "historical_PR_receipt_not_relabelled": true,
+    "actual_image_qualification_pending": true
   }
 }

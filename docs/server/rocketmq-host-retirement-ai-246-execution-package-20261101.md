@@ -146,3 +146,10 @@ abc700f生产镜像固定digest `sha256:d848a92f5cff63c9eb25a9f4a59b6db5a484d5d9
 [首次实际验证41306319525](https://github.com/FangcunMount/qs-ai/actions/runs/41306319525)与[带诊断复验41308014765](https://github.com/FangcunMount/qs-ai/actions/runs/41308014765)均未通过严格排空。后者证明实际默认CMD、UID10001/只读根/完整44备份恢复/原二进制ACK、真实SDK/Checker与paused readiness已通过；约4.998秒退出0且无OOM，但两个mq_subscriber记录component_stopped_with_error。退出0不能替代本包无错误排空条件，因此没有生成合格前向镜像原件。失败回执/完整CI原日志保留。
 
 [AI #248](https://github.com/FangcunMount/qs-ai/pull/248)将主动Stop成功与固定SDK0.5.0的无cause停止通知衔接；真实传输cause、提前退出、取消和Stop失败仍失败，通用监督器/原严格镜像资格检查未放宽。受控driver仅替代网络启动/阻塞调用，真实固定SDK wait/stop方法验证；26项生命周期、24项文档与退役边界以及Ruff/format/mypy通过。它仍须完整CI、精确main资格、新digest构建/prepare和两次实际44启动及排空后，才可填DB02/DB06/DB09。当前旧prepared镜像保留为失败候选证据。
+
+
+## 修复合并后的精确主线核验
+
+AI #248已仅合并源码至`c6359b441de48fde5b295529fe9c10f50e4c53f5`；PR完整checks41308643839的12项及同源码M7 41309046783的两项成功。精确main CI41310278495的原目标DDL恢复与前向专项已在MySQL8.0.36/8.4各21项通过，原ZIP/XML按当前main重新取得并校验，没有把90e64f3的旧回执重标为当前资格。完整main CI及M7 41310404873仍独立等待，构建仅在精确push CI成功后运行build-only；新不可变镜像仍未填合格。
+
+未来writer回执的`candidate_image_digest`按源码契约使用不带`sha256:`前缀的64位十六进制；原registry digest仍以`sha256:…`格式另存并相互核对。模板所有源码/镜像/窗口/有效期未知字段保持null，TEMPLATE schema不能消费为生产批准。
