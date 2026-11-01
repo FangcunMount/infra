@@ -185,13 +185,17 @@
     }
   },
   "production_canary": {
-    "status": "prepared_not_submitted",
-    "scope": "one user-designated already-filled SNAP-IV18; no answer edits, no historical replay or notification recipients",
-    "user_current_legal_client_confirmed": true,
-    "UI_transport": "AX readable but click frame/window errors; user asked bring normal window forward",
-    "task_replacement_or_synthetic_identity": false,
-    "record_kind": "Preparation snapshot retained from PR421; current completion in actual_canary_addendum",
-    "current_status": "completed_one_case_in_addendum"
+    "status": "completed_one_real_case",
+    "acceptance_receipt": "docs/evidence/2026-11-01-host-retirement-real-canary.json",
+    "previous_preparation_snapshot": {
+      "status": "prepared_not_submitted",
+      "scope": "one user-designated already-filled SNAP-IV18; no answer edits, no historical replay or notification recipients",
+      "user_current_legal_client_confirmed": true,
+      "UI_transport": "AX readable but click frame/window errors; user asked bring normal window forward",
+      "task_replacement_or_synthetic_identity": false,
+      "record_kind": "Preparation snapshot retained from PR421; current completion in actual_canary_addendum",
+      "current_status": "completed_one_case_in_addendum"
+    }
   },
   "remaining_five": {
     "iam.mysql.domain_event_outbox": "retain; bootstrap33/35 and current transaction_handoff/readiness dependencies",
