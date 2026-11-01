@@ -41,14 +41,79 @@
     "source_preservation_receipt_sha256": "8523cc0c501d43c4d57733e887b1e57fa6a828560e95a3f31cec1edf0b7f6180",
     "full_CI": {
       "run": 41281012903,
-      "status": "in_progress",
-      "all_checks_success": false
+      "status": "success",
+      "all_checks_success": true,
+      "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012903",
+      "jobs": [
+        {
+          "name": "Retirement backup and restore (8.4)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.0.36, 1)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.4, 1)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.4, 2)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.4, 3)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.0.36, 0)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.4, 0)",
+          "conclusion": "success"
+        },
+        {
+          "name": "image",
+          "conclusion": "success"
+        },
+        {
+          "name": "Retirement backup and restore (8.0.36)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.0.36, 3)",
+          "conclusion": "success"
+        },
+        {
+          "name": "verify (8.0.36, 2)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete test coverage",
+          "conclusion": "success"
+        }
+      ]
     },
     "m7_CI": {
       "run": 41281012842,
       "status": "success",
-      "checks_success": 2
-    }
+      "checks_success": 2,
+      "url": "https://github.com/FangcunMount/qs-ai/actions/runs/41281012842",
+      "jobs": [
+        {
+          "name": "m7 (8.0.36)",
+          "conclusion": "success"
+        },
+        {
+          "name": "m7 (8.4)",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "all_checks_success": 14,
+    "local_targeted_tests_passed": 37,
+    "local_static": "Ruff/format, mypy455 files, docs76files1281links passed"
   },
   "release_freeze": {
     "schema": "ai-246-release-freeze/v1",
@@ -856,6 +921,16 @@
         "rows": 29,
         "rows_sha256": "803476c647acebad2fccf83dc1b8263d4cbe068640f314dcacc1e647cbbe2c25"
       }
+    },
+    "original_materials": {
+      "classification": "live-readonly-prequalification-not-frozen-window",
+      "target_DDL_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff",
+      "target_empty_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ledger_sha256": "9ac62bf9e5e58b9db908f10295a516d8728d34853e23370e06f32cade7c4283c",
+      "rows": 0,
+      "head": "0043_native_transaction_limit",
+      "writers_excluded": false,
+      "execution_approval": false
     }
   },
   "actual_runtime": {
@@ -866,7 +941,9 @@
     "running": true,
     "OOMKilled": false,
     "StopTimeout": 210,
-    "current_release": "f9f24abdf98535295c4e3d223675ef6be62115e2-41108077901-1"
+    "current_release": "f9f24abdf98535295c4e3d223675ef6be62115e2-41108077901-1",
+    "final_observed_at": "2026-11-01T06:42:07.365102+00:00",
+    "source_image_start_and_mounts_unchanged": true
   },
   "database_review_context": {
     "global_session_visibility": true,
@@ -927,7 +1004,8 @@
         ]
       ],
       "freeze_proof": false
-    }
+    },
+    "negative_permission_read_receipt_sha256": "159159fffa3327834e77907870210440ff2c3a28daed1d86d886c3c45c80a689"
   },
   "native_qualification": {
     "schema": "ai246-native-window-qualification/v1",
@@ -997,7 +1075,9 @@
           "test_held_root_uses_actual_inbox_archive_and_witness_atomically[isolated-v2-local-proof-client_reply_discarded]"
         ]
       }
-    ]
+    ],
+    "candidate_restore_qualification_receipt_sha256": "52a7b9a566ec6cb48eef4345475bf01f887fa407b5ffa86342c172fe0f05e688",
+    "production44_image_binding_qualified": false
   },
   "protection_contract": {
     "schema": "ai-publisher-protection/v1",
@@ -1236,12 +1316,25 @@
     "capture-live-final.py": "30fbdbc45d1e4bed41f675fe744d04364246afc5e634d06108fbe67351b736e6",
     "capture-live.py": "4576d8d1a8f1c0069a76ad866691018175865d8d22da4f62672cd45c525e58a2",
     "capture-review-context.py": "e976067679a20a70f2bc4cb936abe552d9c51a6f893e3feaf6ceed175dc5acc0",
+    "ci-final-checks.json": "117d8112323ea89b5ef5b762be841aba85131b442ca36a753165058babb77c72",
+    "ci-final-checks.logs.zip": "bd3617309c768f52fd9e47d3b1ee28ebfd297cd9d8b6183b12cda23297065a95",
+    "ci-final-m7.json": "55054c4724660e4a410d34736b62168a18be1145c567a539663ee674a7c3c2f8",
+    "ci-final-m7.logs.zip": "622c5cc4937c2ef5b34ed5dcc280e2b4376938a7c0878b84661656f9da994c13",
+    "ci-intermediate-checks.json": "279055f22692dd76db2b320b7e570ce32f3ba45cc6dbf987804e5b991b6d74a4",
+    "ci-intermediate-checks.logs.zip": "dd6d7d3f2847a2c13c56906fdd2677265effebf5b65f5a3faa490abbb2cbdbc7",
+    "collect-ci.py": "5d8b5b207bdac5af4a32f00e08391d3fecb596e34b34e368b71fc11a044b556a",
     "drain-readiness-live.json": "0a9d0717e291f41fa8c8ba0c7bebca4dcddb6ad4e0de24baabf52999618cabf7",
+    "freeze-final-readback.json": "edc737283854e8a16c0d6af8d17569b35bc764f3d959dc7a60703219eeabb33c",
     "freeze-readback.json": "406c22a4d173e3aa3443ee4b0d02628fc54f482d521bcc8def07227f56b8ff3b",
     "live-capture.json": "b454161fae0ddc541792fab17b18be075511a7b5c8bc8680a861aaded5e5ef70",
     "live-final-capture.json": "1079e7871ec49b4ba1396d57668f1c06c7e0e5d44454bef837cf8cbdf126751c",
+    "live-original-ledger.json": "9ac62bf9e5e58b9db908f10295a516d8728d34853e23370e06f32cade7c4283c",
+    "live-original-materials.json": "05fc17823854913ba5919aaf10f825c9f4063454fe2c4b7fba8e642c72228fcb",
+    "live-original-target.sql": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff",
+    "live-target-empty.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "native-qualification-90e64f3.json": "623d8a9d922fd576b3f69fa7a1a07f9552dd1ac7f7b65884fc43f1ece5b4fbe5",
     "native-qualification.json": "76455c9bc93551efbf57c6ca0917377ee7ef07fe3270a32f314ddbd9c4475633",
+    "protect-stable-originals.py": "274bd0bfd41a804cf4052945a23f4193b78d9d1080c180bf37d0ee78b6016d21",
     "publisher-material-executed.py": "944fe96ba8f4578e03d1a7d3be4a0a2f6e7f2cbdc7405db01c08515c08f2086c",
     "publisher-window-8.0.36-90e64f3.xml": "017e9f05e946d84069ceabd40ad11b21e33dde1abbebeb58728e68171fe1deb8",
     "publisher-window-8.0.36-90e64f3.zip": "55a7c1377c8da0816681eff5cade03e5b9291f11fc069ede4d4c94010cee23c8",
@@ -1256,15 +1349,76 @@
     "readonly-probe-executed.py": "b21754f3bd53f4a82df58dfba336885b358672b0431127c6747980f3eb2de139",
     "render-final-package.py": "d18df24abeee8f69e5d9b06fcdbae92d9ffde5d9caafe3fb9eec29a5096151bb",
     "render-package.py": "883bb88672869978f41c7fd63a77a665c4d945672aa09f989b62727916b7d171",
+    "restore-qualification-90e64f3.json": "52a7b9a566ec6cb48eef4345475bf01f887fa407b5ffa86342c172fe0f05e688",
     "review-context.json": "fc579d55a4176a1835c7a62b295530d2c03c09d53345782f30686c2ac77437e7",
+    "runtime-final-readonly-attempt2.json": "46c0091c09e84741c852e7fd607fd393ce341c3ce3a4b2acd372a2cfb53a6139",
+    "runtime-final-readonly.json": "46c0091c09e84741c852e7fd607fd393ce341c3ce3a4b2acd372a2cfb53a6139",
+    "runtime-readback-diagnostic.json": "4bb62024ae068d2e4463bc2464522e9a68e40aa834a4c0e401a48b8c55a34dd3",
     "source-preservation-90e64f3.json": "8523cc0c501d43c4d57733e887b1e57fa6a828560e95a3f31cec1edf0b7f6180",
     "source-preservation.json": "233688ae957491417339231c1211beae4ae200bd1432be7559f3fc811536d995",
-    "two-live-snapshots-comparison.json": "aedf612d18e3cc4db27a098f4230639df803f0c8f42c3a346f0db57a17c2113d"
+    "stable-originals-servera-readback.json": "990955c820a09454f82c1dc89604ffc4cfaca4ce148a3aba272733ad0356d9a0",
+    "two-live-snapshots-comparison.json": "aedf612d18e3cc4db27a098f4230639df803f0c8f42c3a346f0db57a17c2113d",
+    "complete-review-two-copy-readback.json": "55b9151f7b2f3ab23f7678fba53f33d7a5d5c0e96d603de40fb7e735bfc95619",
+    "complete-originals-index.json": "13904106aade06d7d96e406034f3acc327e95a9e284a7c0f0c9a6139a6fa7b7a"
   },
   "review_material_protection": {
-    "archive_sha256": null,
-    "readback_verified": false,
+    "archive_sha256": "9ec4eebcf3be7e90e447ee79769f73f785c6c6160c12a69e340a446027537518",
+    "archive_bytes": 2745835,
+    "original_members_verified": 56,
+    "copies": [
+      "MacBook private",
+      "ServerA root private"
+    ],
+    "readback_verified": true,
+    "fsynced": true,
+    "directory_mode": "0700",
+    "file_mode": "0600",
+    "minimum_retention_days": 30,
+    "extend_unresolved": true,
+    "automatic_cleanup": false,
+    "copy_receipt_sha256": "55b9151f7b2f3ab23f7678fba53f33d7a5d5c0e96d603de40fb7e735bfc95619",
+    "copy_receipt_also_two_copies": true,
+    "copy_receipt_external_to_archive": true,
     "frozen_database_backup_claimed": false,
     "database_execution_approval": false
+  },
+  "last_updated_at": "2026-11-01T06:48:57.732713+00:00",
+  "release_freeze_final": {
+    "schema": "ai246-final-release-freeze/v1",
+    "observed_at": "2026-11-01T06:41:40.268876+00:00",
+    "AI_AUTO_DEPLOY_ENABLED": "false",
+    "QS_Production_Deploy": "disabled_manually",
+    "active_AI_deploy_runs": [],
+    "deployment_dispatched": false,
+    "business_stopped": false,
+    "production_DDL_executed": false
+  },
+  "stable_originals_copy": {
+    "directory": "/var/lib/fangcun-m5-protection/followthrough-20261101/ai246-review-90e64f3",
+    "files": 32,
+    "readback_verified": true,
+    "fsynced": true,
+    "directory_mode": "0700",
+    "file_mode": "0600",
+    "root_owned": true,
+    "business_or_database_changed": false,
+    "recorded_at": "2026-11-01T06:38:59.000724+00:00"
+  },
+  "administrator_readonly_inventory": {
+    "path": "docs/evidence/2026-11-01-ai246-administrator-readonly.sql",
+    "sha256": "c2ab35d7016c7959808988b1f2bcb196bc20213591813314fc7acf25aa21c1a7",
+    "production_executor_qualified": false,
+    "production_run": false,
+    "read_only_or_transaction_control_statements": 11
+  },
+  "postcheck_contract": {
+    "verify_exit0": "retained comparison only; never migration/start approval",
+    "required_state": "44_complete",
+    "required_flags": [
+      "retained_identical",
+      "transaction_released",
+      "pool_released"
+    ],
+    "independent_JSON_check_required": true
   }
 }

@@ -74,6 +74,7 @@ writer回执是shujie对原始入口清单/实际停机与排空证据的批准�
 /app/.venv/bin/python -m qs_ai.maintenance.publisher_window capture --operation-id <operation> --writer-receipt /run/m5/writers.json --writer-sha256 <writers原件SHA> --output /run/m5/frozen.json
 /app/.venv/bin/alembic -x empty_publisher_review=/run/m5/review.json -x reviewed_sha256=<review原件SHA> upgrade 0044_empty_publisher
 /app/.venv/bin/python -m qs_ai.maintenance.publisher_window verify --baseline /run/m5/frozen.json --baseline-sha256 <frozen原件SHA> --output /run/m5/after.json
+/app/.venv/bin/python -c 'import json; from pathlib import Path; p=json.loads(Path("/run/m5/after.json").read_text()); raise SystemExit(0 if p["state"] == "44_complete" and p["retained_identical"] is True and p["transaction_released"] is True and p["pool_released"] is True else 2)'
 ```
 
 ## 恢复决策表与未知结果
@@ -120,3 +121,12 @@ AI246当前审查源码`90e64f36737de60f9148ba0169eeadf3bce6f8c4`，43份原迁�
 
 
 DB07的[管理员只读查询清单](../evidence/2026-11-01-ai246-administrator-readonly.sql)固定AI库范围，列出身份/完整ledger、全会话/事务/前台thread、AI或全局metadata锁、目标入向FK、trigger和event，不读取SQL INFO、routine定义或业务正文。它是下一步管理员运输/权限审查的查询清单，未包装成已验收的生产执行器；当前连接1142原件保留，未来必须独立校验管理员可见范围、deadline、AI身份和完整释放。动态SQL/视图/旁路入口仍按写者清单审查，不能凭查询返回0填writer排除。
+
+
+`verify`的职责是保留对象比较，单凭其exit0不代表迁移完成；W08必须执行上述独立JSON断言`state=44_complete`并签收strict44缺表和全部保留一致，43完整/43缺表均不能进入重开。原43取消路线使用独立R0复验，不借用W08的44重开资格。
+
+
+最终精确HEAD90e64f3的[完整checks41281012903](https://github.com/FangcunMount/qs-ai/actions/runs/41281012903)12项和[M7 41281012842](https://github.com/FangcunMount/qs-ai/actions/runs/41281012842)2项全部success，共14项，包含8完整分区与覆盖汇总、两种旧工具备份恢复、受限镜像及两种M7。前一d389完整run在加入重开屏障后取消，原日志ZIP保留，不作最终资格。当前本地37项针对性测试、Ruff/format、mypy455源文件及76文档/1281链接检查通过。正式main/最终生产44镜像仍需独立资格，PR临时镜像不填生产digest。
+
+
+完整审查原件归档2,745,835字节，SHA256为`9ec4eebcf3be7e90e447ee79769f73f785c6c6160c12a69e340a446027537518`，包含56份原件及索引，MacBook/ServerA两份逐成员回读与fsync一致；复制回执另存两处，SHA256为`55b9151f7b2f3ab23f7678fba53f33d7a5d5c0e96d603de40fb7e735bfc95619`。目录0700、文件0600，至少30天且未结责任延期，无自动清理。归档保护源码增量bundle、实执行采集代码、生产只读/权限原件、原目标/ledger、原生ZIP/JUnit及完整/取消CI原日志；复制回执在归档完成后产生，作为外部签收，不伪称位于其自身归档内。该包不是同窗口数据库备份，也不是生产执行批准。
