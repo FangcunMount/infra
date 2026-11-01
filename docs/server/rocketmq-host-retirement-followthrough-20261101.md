@@ -16,7 +16,7 @@
 
 历史核对沿用原诊断源码160db8aa的固定SELECT和集合摘要算法，新增精确数据库身份、事务/连接池释放验证及私有哈希成员；移除对已删除ai_messaging_outbox的查询。原Go读取路径在同一主库只读REPEATABLE READ事务中完成；私有诊断CLI不进入生产业务装配。
 
-原始来源为Mac mini保留的2026-10-25预窗口只读诊断dump。完整gzip SHA256 `8c104306cce70174abe06d5b193930e89a4dff4e9f00db72973581c4395d289b`、75067274字节，与[原归档回执](evidence/rocketmq-m3-prewindow-mysql-protection-20261025.json)逐字匹配。完整流读取/CRC结束后，仅解析QS目标表，所有SQL均未执行；正文/wire仅在进程中验哈希，不进入公开台账。
+原始来源为Mac mini保留的2026-10-25预窗口只读诊断dump。完整gzip SHA256 `8c104306cce70174abe06d5b193930e89a4dff4e9f00db72973581c4395d289b`、75067274字节，与[原归档回执](evidence/rocketmq-m3-prewindow-mysql-protection-20261025.json)逐字匹配。完整流读取/CRC结束后，仅解析QS目标表，dump中的SQL均未执行；正文/wire仅在进程中验哈希，不进入公开台账。
 
 ## 当前职责与依赖
 
