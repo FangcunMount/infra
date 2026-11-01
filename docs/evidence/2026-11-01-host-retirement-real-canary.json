@@ -1,0 +1,189 @@
+{
+  "schema": "host-retirement-real-canary-closeout/v1",
+  "observed_at": "2026-11-01T04:31:52.872645+00:00",
+  "runtime_source": "4620d11e2cffbc4b67b43965812cff3340f0be43",
+  "controller_main": "5fa0c1f51af2482b13a2c5a66c57a25edb4f7376",
+  "versions": [
+    111,
+    44
+  ],
+  "automatic_cd": "disabled_manually",
+  "normal_submissions": 1,
+  "normal_deep_requests": 1,
+  "answers_edited": false,
+  "accepted": true,
+  "answer_sheet_original_native_scan": "assessment_present",
+  "assessment_status": "evaluated",
+  "outcome_original_native_proof": "Commit",
+  "runtime_checkpoint": "succeeded",
+  "standard_report_generated_and_UI_rendered": true,
+  "new_command_original_native_proof": "Commit",
+  "AI_receipt": "accepted",
+  "AI_session_version": 4,
+  "AI_session_status": "completed",
+  "AI_provider_response_persisted": true,
+  "deep_artifact_persisted_and_UI_rendered": true,
+  "AI_outgoing_original_native_proofs": 4,
+  "QS_stored_inbox_for_this_case": 4,
+  "matched_original_business_ACK": 4,
+  "historical_cohort_unchanged": true,
+  "historical_current_witness_missing": 51,
+  "old_AI_facts_retained": {
+    "model_calls": {
+      "old_rows": 39,
+      "all_old_rows_identical": true,
+      "new_rows": 1
+    },
+    "result_outbox": {
+      "old_rows": 125,
+      "all_old_rows_identical": true,
+      "new_rows": 3
+    },
+    "ai_messaging_inbox": {
+      "old_rows": 57,
+      "all_old_rows_identical": true,
+      "new_rows": 1
+    }
+  },
+  "full_QS_baseline": {
+    "objects": 87,
+    "unchanged_objects": 64,
+    "changed_objects": 23,
+    "changed_definitions": {
+      "tables": 3,
+      "only_AUTO_INCREMENT_advanced": true,
+      "exact_before_hash_reconstructed_offline": true
+    },
+    "cross_store_atomic": false,
+    "runtime_frozen": false
+  },
+  "plan_path": {
+    "origin_ref": "self_service",
+    "explicit_task_ID_in_submission": false,
+    "existing_opened_task_auto_matched": true,
+    "task_completed_and_bound_to_this_assessment": true,
+    "task_entry_or_reminder_delivery_acceptance_proved": false
+  },
+  "remaining_five_objects_retained": true,
+  "no_DDL_or_historical_replay": true,
+  "limits": [
+    "One named production case; no capacity or all-model acceptance",
+    "Existing opened task matched through current source behavior; no task-entry or reminder-send proof",
+    "Historical51 missing native anchors unchanged; legacy proof does not replace witnesses",
+    "Two earlier Prometheus scrape gaps remain unclosed; no continuous availability claim",
+    "No automatic CD unfreeze or other5-object deletion"
+  ],
+  "owners": {
+    "data": "shujie",
+    "recovery": "shujie"
+  },
+  "main_ci": {
+    "observed_at": "2026-11-01T04:28:29.278807+00:00",
+    "runs": [
+      {
+        "id": 41271612235,
+        "name": "RocketMQ evaluation original MySQL root",
+        "head_sha": "5fa0c1f51af2482b13a2c5a66c57a25edb4f7376",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/FangcunMount/qs-server/actions/runs/41271612235"
+      },
+      {
+        "id": 41271612186,
+        "name": "RocketMQ host failure audit",
+        "head_sha": "5fa0c1f51af2482b13a2c5a66c57a25edb4f7376",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/FangcunMount/qs-server/actions/runs/41271612186"
+      },
+      {
+        "id": 41271612255,
+        "name": "Code Quality: Push on main",
+        "head_sha": "5fa0c1f51af2482b13a2c5a66c57a25edb4f7376",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/FangcunMount/qs-server/actions/runs/41271612255"
+      },
+      {
+        "id": 41271612187,
+        "name": "AI bridge MySQL",
+        "head_sha": "5fa0c1f51af2482b13a2c5a66c57a25edb4f7376",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/FangcunMount/qs-server/actions/runs/41271612187"
+      },
+      {
+        "id": 41271612231,
+        "name": "CI",
+        "head_sha": "5fa0c1f51af2482b13a2c5a66c57a25edb4f7376",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/FangcunMount/qs-server/actions/runs/41271612231"
+      }
+    ]
+  },
+  "freeze_readback": {
+    "id": 267679020,
+    "name": "Production Deploy",
+    "state": "disabled_manually",
+    "path": ".github/workflows/cd.yml",
+    "observed_at": "2026-11-01T04:28:30.510882+00:00"
+  },
+  "protected_addendum": {
+    "bytes": 602010,
+    "sha256": "a07f9aeca2c6a308230051fddc06b838dfccb424f8c17e4d4855270bab837312",
+    "copies": [
+      "MacBook private0700/0600",
+      "ServerA root0700/0600"
+    ],
+    "readback_verified": true,
+    "fsynced": true,
+    "contains_actual_canary": true,
+    "retention": "minimum30days; extend unclosed; no auto cleanup"
+  },
+  "runtime_final": {
+    "servera": {
+      "observed_at": "2026-11-01T04:31:34.121999+00:00",
+      "ready_instances": 3,
+      "same_source_and_original_instances": true,
+      "restart_zero_and_no_OOM": true
+    },
+    "serverd": {
+      "observed_at": "2026-11-01T04:31:33.626459+00:00",
+      "ready_instances": 3,
+      "same_source_and_original_instances": true,
+      "restart_zero_and_no_OOM": true
+    }
+  },
+  "private_receipt_sha256": {
+    "canary-accepted-private.json": "5fe411edcc48b731d092ae01999b8128f0b1e7e4e0ed6072ee711bd8d124661a",
+    "canary-lineage-private.json": "c32d19c83f597a211d408a770ed7d825aaa6d1d19488b42f75f3679692709362",
+    "canary-first-submit-issued.json": "f4e28b1e6c7cd6f166299a3fd0a6a0eff3a443ba0ad7371d68eab7238414b454",
+    "canary-submit-continuation-reviewed.json": "dfa8f333193bff45ae99acb4d135a62beed7dd6644b574e2685b96934a81be2a",
+    "canary-deep-request-issued.json": "eb947f9425226cdbf27b21e7ba0106ab9f9f7d6ae92bb040e275e3f75b09829d",
+    "canary-deep-submitted-private.json": "76d15f022367165312c11ae6ff1445722c0968084888cb783e1a3a1072c9f833",
+    "canary-deep-UI-result.json": "791e4c513c4250d76053b85179804a8face83b76d72ccb258ab31dcb67e79e5a",
+    "canary-native-readonly-result.json": "088d0fa17323338879f657cb6808637c82f1ea095567b3afd7a8f60c63b19985",
+    "canary-native-reader-binding.json": "ad77cb4577cc9427d1e986f7a4ba37f271228181b90ee6d698a34a7bce757b3c",
+    "canary-chain-readonly-result.json": "e2bad81b0811bed377fabed62a9abb7d99e821ab3ae4c9f78ef51cfe22b12463",
+    "canary-chain-v2-readonly-result.json": "98c5dd33feb7603b55aae1e510a2586f4213532e15be4f485e7d2cadbefa91dd",
+    "canary-chain-v2-reader-binding.json": "4b70923179f0e31412f1db890633d5d8453e41deba34742c8787c5cd33bb80ee",
+    "canary-ai-after-private.json": "687a1a901fb1accf49587ae2bbb9c6e1477f8568b90e184d88e0b8461a099e43",
+    "canary-ai-lineage-private.json": "b27427a1553e044843c95159ad552cb4e635295fff5cdd51d00fd0615d6cfd72",
+    "canary-retained-diff-private.json": "7a931886ea1ce118eaa69778ddb2cd1d714023fe7a89585ac6f32340f836681a",
+    "canary-ddl-drift-proof-private.json": "cae456e796e6e76ed25842fc76d7c08cac638ad7a6c776b3d79c78c44d2d8580",
+    "canary-after-history-private.json": "d69417f73864836df63276ad5e97a5129f5267da614bc0c58dc5fe1584888c17",
+    "canary-after-retained.json": "3bac410fe254bb5116d087b2e138eb2c56c6a40b4fa15611312ab7f5598595e6",
+    "canary-closeout-validated.json": "258e5752dc54de9b05b903023f136fbbdd24b37bd404eb1bf424b8a7234f5b51",
+    "canary-addendum-manifest.json": "5bf7c8b407521a69323034490b35016aa009716814f953b4370a8b4491438e26",
+    "main-ci-final.json": "4f1a434eb08eb4794996b735da94d1b89554b71252f9a8907e1e696c17accc60",
+    "cd-freeze-canary-final.json": "e9a658ac0c1abab1ffe7f42b1c99030841ba2e2b7f0d8148e2ccc3a0dbd3b996",
+    "servera-canary-final.json": "978d881605259a640d7313210e9f02dc79177e82a52c68dad361b42992226dad",
+    "serverd-canary-final.json": "02e4a2db4d1f08848150b5e006389a0fc3cdf573dab94d4e1713f5be5e01cb4b"
+  },
+  "diagnostic_attempts_retained": {
+    "first_native_install": "default helper UID could not chown; corrected explicitroot for binary ownership only; no business writes",
+    "first_chain_reader": "query referenced nonexistent aggregate_sequence and compared envelope payload hash to body hash; retained failure; v2 uses actual schema and canonical archive decoder; no data correction or retry"
+  },
+  "AI_model_call_records_added": 1
+}

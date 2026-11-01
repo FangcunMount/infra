@@ -178,8 +178,10 @@
     "main_ci": {
       "run": 41271612231,
       "head": "5fa0c1f51af2482b13a2c5a66c57a25edb4f7376",
-      "status": "in_progress_at_this_commit",
-      "result_not_claimed": true
+      "status": "completed",
+      "result_not_claimed": false,
+      "conclusion": "success",
+      "previous_PR421_observation": "in_progress; no result claimed at that earlier commit"
     }
   },
   "production_canary": {
@@ -187,7 +189,9 @@
     "scope": "one user-designated already-filled SNAP-IV18; no answer edits, no historical replay or notification recipients",
     "user_current_legal_client_confirmed": true,
     "UI_transport": "AX readable but click frame/window errors; user asked bring normal window forward",
-    "task_replacement_or_synthetic_identity": false
+    "task_replacement_or_synthetic_identity": false,
+    "record_kind": "Preparation snapshot retained from PR421; current completion in actual_canary_addendum",
+    "current_status": "completed_one_case_in_addendum"
   },
   "remaining_five": {
     "iam.mysql.domain_event_outbox": "retain; bootstrap33/35 and current transaction_handoff/readiness dependencies",
@@ -381,5 +385,7 @@
     },
     "sha256": "47fe9fcd21314c4c580d97d4c27b874d09760ccba0558c2cd21919f4a7ac2f4a",
     "bytes": 357062
-  }
+  },
+  "actual_canary_addendum": "docs/evidence/2026-11-01-host-retirement-real-canary.json",
+  "actual_canary_addendum_note": "Earlier preparation facts retain their recorded time; final actual one-case acceptance and main CI in linked addendum"
 }
