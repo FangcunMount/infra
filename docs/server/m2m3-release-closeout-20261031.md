@@ -3,6 +3,8 @@
 这是宿主工程退役计划的 M2/M3 发布记录；不能与此前 infra 同名阶段混用完成计数。
 应用冻结镜像已经上线；**不代表 M2 全量业务观测及发布清理已验收**。
 
+2026-11-01续查已找回原预窗口只读dump，并逐条核对51份历史旧协议发布记录及原正文/wire哈希；原dump与原回执摘要一致，当前集合未变。该结果不补造当前事务凭证、不关闭全部业务责任，详见[后续实际推进记录](rocketmq-host-retirement-followthrough-20261101.md)。下文10月31日观察保留原日期和归属。
+
 ## 本轮确认
 
 - [三节点快照](https://github.com/FangcunMount/qs-server/actions/runs/41150432808)：北京时间 08:25 左右，IAM、QS API、两份 Collection、三份 Worker、AI、后台共九个业务容器仍绑定原冻结版本。后台按 Docker healthy 检查；八个服务副本另有显式 ready 证明。

@@ -1,0 +1,385 @@
+{
+  "schema": "host-retirement-followthrough/v1",
+  "recorded_on": "2026-11-01",
+  "owners": {
+    "data": "shujie",
+    "recovery": "shujie"
+  },
+  "production_runtime_source": "4620d11e2cffbc4b67b43965812cff3340f0be43",
+  "versions": [
+    111,
+    44
+  ],
+  "automatic_cd": "disabled_manually",
+  "fresh_observation": {
+    "serverA": "2026-11-01T03:36:44.679619+00:00",
+    "serverD": "2026-11-01T03:36:21.950622+00:00",
+    "six_actual_instances_ready": true,
+    "all_original_ids_images_and_source_unchanged": true,
+    "all_restart_zero_and_no_oom": true,
+    "original_six_stopped_exit0": true,
+    "original_restart_policy": "unless-stopped",
+    "target_plan_and_mount_assets_verified": true,
+    "same_window_archive_sha256": "ae42573b25cfdd15d5b2f76ef0496cea07332dce0a195d261c33c8791367d794",
+    "current_up_targets": 10,
+    "current_QS_runtime_ready": 6,
+    "current_transaction_owners_available_fresh": 4,
+    "current_owner_protected": 0,
+    "current_AI_business_ACK_waiting": 0,
+    "continuous_green_claimed": false,
+    "pre_canary_full_baseline": {
+      "objects": 87,
+      "rows_documents": 408280,
+      "only_change_since_poststart": "answering_start55->56; all other86 definitions/full hashes identical",
+      "read_only": true,
+      "runtime_frozen": false
+    }
+  },
+  "historical_audit": {
+    "evidence_counts": {
+      "active_operations": 57,
+      "archive_missing": 51,
+      "execution_missing": 51,
+      "witness_missing": 51
+    },
+    "historical_cohort_sha256": "76a5260d862fdbfb4759d56c41dbf1a58b1518ab788426eded212b1d2991d6cc",
+    "historical_fact_audit_available": true,
+    "historical_fact_counts": {
+      "evaluation_state_present": 22,
+      "receipt_matches_stored_inbox": 51,
+      "receipt_metadata_present": 51,
+      "rows": 51,
+      "terminal_workflow_projection_with_event_version": 23,
+      "workflow_projection_present": 29
+    },
+    "historical_kind_decisions": {
+      "1": {
+        "accepted": 28,
+        "rejected": 1
+      },
+      "4": {
+        "accepted": 18
+      },
+      "5": {
+        "accepted": 1,
+        "rejected": 3
+      }
+    },
+    "historical_responsibility_closed": false,
+    "mutation": false,
+    "mysql_identity_sha256": "833eb55bdcba767dc66f0b02da8315f5ba1fc7c52848fc517edb4a5bd4bf7b32",
+    "observed_at": "2026-11-01T03:42:31.200028611Z",
+    "pool_closed": true,
+    "read_only": true,
+    "runtime_frozen": false,
+    "schema": "m2-original-history-readonly/v1",
+    "transaction_released": true
+  },
+  "retained_source_audit": {
+    "schema": "m2-retained-dump-readonly/v1",
+    "bytes": 75067274,
+    "sha256": "8c104306cce70174abe06d5b193930e89a4dff4e9f00db72973581c4395d289b",
+    "sql_executed": false,
+    "rows_exported": false,
+    "frozen_snapshot_claimed": false,
+    "selected_tables": {
+      "ai_messaging_operations": 51,
+      "ai_messaging_outbox": 2806
+    },
+    "max_line_bytes": 1046165,
+    "counts": {
+      "operation_found": 51,
+      "row_digest_matches_current": 51,
+      "publication_found": 51,
+      "publication_matches_operation": 51,
+      "publication_body_hash_valid": 51,
+      "publication_wire_hash_valid": 51
+    },
+    "matches_original_20261025_manifest": true,
+    "original_manifest": "docs/server/evidence/rocketmq-m3-prewindow-mysql-protection-20261025.json",
+    "all_51_publication_stage": "confirmed"
+  },
+  "retained_original_copy": {
+    "schema": "m2-retained-original-copy/v1",
+    "observed_at": "2026-11-01T03:47:20Z",
+    "source_host": "mac-mini-old",
+    "source_path": "/Users/yangshujie/backups/infra/rocketmq/m3-mysql-preflight-20261025-v1/three-mysql-live-snapshot.sql.gz",
+    "local_copy": "/Users/yangshujie/.codex/m5/followthrough/20261101-postrelease/three-mysql-live-snapshot.original-20261025.sql.gz",
+    "bytes": 75067274,
+    "sha256": "8c104306cce70174abe06d5b193930e89a4dff4e9f00db72973581c4395d289b",
+    "readback_verified": true,
+    "fsynced": true,
+    "source_modified": false,
+    "retention": "minimum30days; extend while historical responsibilities unclosed; no auto cleanup",
+    "snapshot_kind": "historical live readonly diagnostic; not frozen backup, production replay or restored-original transaction proof"
+  },
+  "historical_classification": {
+    "cohort_created_min": "2026-10-04 07:11:14.299840",
+    "cohort_created_max": "2026-10-20 02:55:56.503460",
+    "legacy_publication_confirmed": 51,
+    "original_operation_digest_matches_current": 51,
+    "original_body_and_wire_hashes_valid": 51,
+    "retained_snapshot_has_rm_tx_or_command_archive_tables": false,
+    "evidence_semantics": "Historical publisher confirmed and matched original row/body/wire; not current transaction committed proof or end-user/model completion",
+    "current_transaction_proof_backfilled": false,
+    "current_metric_integrity_guard_changed": false,
+    "historical_responsibility_closed": false,
+    "prior_window_backups": "11 named M3 window copies deleted under explicit2026-10-27 disposition; this separate preflight diagnostic remains. No assumption all historical backups retained; no deletion replay."
+  },
+  "observation_gap": {
+    "queried_start_utc": "2026-10-31T19:58:04Z",
+    "step_seconds": 60,
+    "sum_up_samples": 461,
+    "sum_up_zero_sample_utc": [
+      "2026-11-01T02:28:04Z",
+      "2026-11-01T02:30:04Z"
+    ],
+    "runtime_and_owner_series_samples": 459,
+    "available_runtime_ready_values": [
+      6
+    ],
+    "available_owner_fresh_values": [
+      4
+    ],
+    "prometheus_self_up_during_gap": true,
+    "remote_IAM_QS_AI_worker_collection_Broker_up_zero_at_gap": true,
+    "prometheus_host": "macmini-001.local",
+    "prometheus_container": {
+      "id": "7d551ead7a7c85e9a33035deac7d9ef19b5454e88fac993682fb744a7b19188b",
+      "started_at": "2026-10-19T06:15:49.162760629Z",
+      "restart_count": 0,
+      "oom_killed": false,
+      "image": "sha256:f6639335d34a77d9d9db382b92eeb7fc00934be8eae81dbc03b31cfe90411a94"
+    },
+    "prometheus_logs_during_gap": "empty",
+    "power_sleep_event_in_gap": "not observed in queried pmset output",
+    "root_cause": "unconfirmed; common scrape/transport interruption is hypothesis, not production availability conclusion",
+    "no_configuration_budget_network_changes": true,
+    "remote_scrape_max_seconds": "each remote job about10 seconds; Prometheus self max0.033 seconds",
+    "mac_unified_log": "Docker network path checks observed; no log proving root cause"
+  },
+  "snapshot_fix": {
+    "PR": "https://github.com/FangcunMount/qs-server/pull/478",
+    "source": "3175ea51e1bb1259e3df5a361717926dab874278",
+    "actual_serverA_M5_instances": 3,
+    "actual_serverD_M5_instances": 3,
+    "tests_passed": 3,
+    "no_credentials_exported": true,
+    "first_CI_docs_baseline_drift": "retained; corrected at1748f1539 without gate relaxation",
+    "merged": true,
+    "PR_checks_success": 29,
+    "PR_checks_conditional_skip": 1,
+    "CI_run": 41270491919,
+    "reviewed_head": "1748f15394371171ed48f52942002a67927ad214",
+    "production_runtime_unchanged": true,
+    "main_merge": "5fa0c1f51af2482b13a2c5a66c57a25edb4f7376",
+    "first_failed_run": 41270252911,
+    "first_failed_docs_job": 124741393428,
+    "main_ci": {
+      "run": 41271612231,
+      "head": "5fa0c1f51af2482b13a2c5a66c57a25edb4f7376",
+      "status": "in_progress_at_this_commit",
+      "result_not_claimed": true
+    }
+  },
+  "production_canary": {
+    "status": "prepared_not_submitted",
+    "scope": "one user-designated already-filled SNAP-IV18; no answer edits, no historical replay or notification recipients",
+    "user_current_legal_client_confirmed": true,
+    "UI_transport": "AX readable but click frame/window errors; user asked bring normal window forward",
+    "task_replacement_or_synthetic_identity": false
+  },
+  "remaining_five": {
+    "iam.mysql.domain_event_outbox": "retain; bootstrap33/35 and current transaction_handoff/readiness dependencies",
+    "iam.mysql.rm_outbox": "retain; current transaction_handoff/readiness and liability reads",
+    "qs.mysql.rm_outbox": "retain; original-effect and reverse consistency readers",
+    "qs.mongo.rm_outbox": "retain; v1 and mixed-day hotrank/answersheet historical source readers",
+    "ai.mysql.messaging_outbox": "retain; fixed0043 handoff/layout and complete schema validation"
+  },
+  "source_reviews": {
+    "qs": "4620d11e2cffbc4b67b43965812cff3340f0be43",
+    "iam": "7cd2b02ef6f917fbab19e204431abce79ea76a85",
+    "ai": "e71118903e3cdc794337ace6a73f51f6f86c3f4c"
+  },
+  "preserve": [
+    "transaction execution/guard/witness",
+    "first immutable wire/archive",
+    "business receipt/ACK/history",
+    "retry/hold/schedule",
+    "all remaining five objects"
+  ],
+  "private_receipt_hashes": {
+    "canary-before-retained.json": "d595f9bf242f47431e2903de948bd80bc654d4f956951f3d1344d38aca96059e",
+    "canary-before-retained.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "historical-audit-160db8.py": "b8afbcca32215abad36fa7dc2899367d992d5f70f887ea92af9dff5f97ad8aa6",
+    "history-probe-source-binding.json": "f352df2297031d16bc7436427ee42c4a344c591f4bfc15f4af83227c5525ffb4",
+    "inspect_retained_dump.py": "ce3dfc79036261797f0f528241ed4a69cd6697ae43d911c0d1233c29de310e7b",
+    "m2-current-history-private.json": "cad99ce37c31d3ac83825786f152c4a537bb5efb14627986c1a45d06313133d7",
+    "m2-current-history.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m2-original-history-readonly": "9fdce3fd4b83d61e624cc702cbeb5c02cfe77a9cfefd92bf55fd8e64f360fa71",
+    "m2-original-history-readonly.go": "967b59d95a3c9877ac407172128fdfe34b76a989821f9b6e508611bd0a4b9e8c",
+    "macmini-prometheus-gap-private.json": "33cc0b2158bd353e668796208fe4fad21b8c4a60cf8defc9686f4011859c2b77",
+    "macmini-prometheus-gap.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mq_observation_inspect.go": "ed894314e02442c785f172128ee5ee03561ad95618ed48d4eded4dfdd846798a",
+    "observe_target.py": "5e99e96d6a52a4025204f1ecbd23996e2d48eaf4a1c1059b10fdeb561d3756e0",
+    "original-snapshot-copy-receipt.json": "30e1e49bc2ff26749fd1919677460bf475ca1af33f4084ef01998b0784177559",
+    "previous-diagnostic-snapshot.py": "eced7ec1725883b23c98dada7b5cf473a89fa082fd642157f9925436317d39ac",
+    "previous-run-snapshot.sh": "cfed17316f347cf1a0fb24fa46c134fe13fd53ea3848a9ed54bf40264f3632f9",
+    "prometheus-gap-detail.json": "1cab6c25be2c13b3cc66992a19a2b4256a94c4467b387a3cc526d63783980aff",
+    "prometheus-readonly.json": "bc86782f9470449ad04d18a213bf06c470fe1d0b2eb5dae59b40b2da38ce8e54",
+    "prometheus-readonly.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "retained-dump-audit-private.json": "50ad85a7ca563a129cb2a8331eddf86c99ef6935d2f170e0ab2027fcdc340719",
+    "retained-dump-audit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "servera-backup-catalog.json": "3217ea64290130204261cd44614353e5e13380615809d47d77247de4481d024b",
+    "servera-patched-release-snapshot.json": "019cd8d3f5e8901a70707e65258f2962eab6e0a64837bda64ba96b13eb6805f5",
+    "servera-patched-release-snapshot.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "servera.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "servera.stderr.attempt1": "1c25e8b62490b9a2d4efbc912e1bf21539111cfe603a68fcab414c059fd3650e",
+    "servera.stdout": "82ce5205e6bfd997cb7307381a771e12c88fa6af608a81c878bad5c28d7e322f",
+    "servera.stdout.attempt1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "serverb-prometheus-gap-private.json": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "serverb-prometheus-gap-v2-private.json": "7659999cb863965f8d0306a8a1a09c93b85eedbecb37fbbdef1ad3abcf9d2a23",
+    "serverb-prometheus-gap-v2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "serverb-prometheus-gap.stderr": "9b3a3b7a78f239c4473bb193476b1a860c91f1c2b4fab9c7639eceea414a60fb",
+    "serverd-patched-release-snapshot.json": "b616ba4d7115575a636dbe4fea43b1e429736bb96c3371410477b61d2942f278",
+    "serverd-patched-release-snapshot.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "serverd.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "serverd.stdout": "fd6eaf43405fb6716b6513856c6a2c29e4eb490609608a88f32efc3fddb2a4f3",
+    "ai.mysql-current-readonly.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "canary-reader-binding.json": "00c52c622fdc636a03420b8e4f9b648e03658e59978f222c03aaf2581924e955",
+    "canary-sql-before.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "iam.mysql-current-readonly.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "iam.mysql-current-readonly.json": "050db77da6acfff74d53bb6d06f4f785cc0b50c2e45a2d38b836867a3b7f3863",
+    "ai.mysql-current-readonly.json": "6474d09f88e6e40f810d24a1534b390300c310f46009ebc96af8c788d91332f1",
+    "canary-sql-readonly": "ae6a017f1b7790ca11f7f2ade26b12d989200fe74771cd7fd2a8424562cf3f2b",
+    "canary-sql-readonly.go": "05b7e0dfcb552a298030fcdc97ed37721a9c18e4ccf540151cdf0747661ea1d1",
+    "canary-sql-before-private.json": "f8d361958e84473f9b829c695ce3376de9d8214d5c0e709f2c8e8a844ee2d432",
+    "macmini-gap-unified-log.private.txt": "ff608806cad8e55f7cd405f0541ad53ffd868ffb8ff094cede206ba5e370595a",
+    "qs478-merged-pr.json": "db96605d81d2ce6590c9690bad212536b3ac877f4ee7b424952f2732a6e86bdb",
+    "private-material-manifest.json": "7c75a6ce0827fcc9d4f1482f93da403bf23e28b2c61eb08538e799906d46eb4c",
+    "receipt-archive-copies.json": "2d246fd1affa214f7bdac56930beb5b872d6bd0f1a3adcc39cf6e49850a427dc",
+    "cd-freeze-final.json": "39a14b869ac613442922c2c621c03e21b602b766b8e520aa07551df8e25c4f4b",
+    "macmini-gap-vpn-log.private.txt": "5823fbfec9436119a8578f14b84ef0cc7b951d5540c41d2f67cd96bc28d33e1e"
+  },
+  "remaining_five_fresh_readonly": {
+    "iam": {
+      "observed_at": "2026-11-01T04:00:44.270996962Z",
+      "reader_source": "be2e4e8d7fe5a9cb5be3763ac51e64bc3fe00399",
+      "schema_head": 45,
+      "dirty": false,
+      "transaction_released": true,
+      "pool_released": true,
+      "tables": [
+        {
+          "name": "domain_event_outbox",
+          "available": true,
+          "rows": 0,
+          "publication_closed_rows": 0,
+          "other_or_null_state_rows": 0,
+          "null_state_rows": 0,
+          "show_create_table_sha256": "727776184b625d699359c20ecbf7da7d0c799c46c0d085c7b13da4c87d6dd8ce",
+          "publication_closed_state": "published"
+        },
+        {
+          "name": "rm_outbox",
+          "available": true,
+          "rows": 0,
+          "publication_closed_rows": 0,
+          "other_or_null_state_rows": 0,
+          "null_state_rows": 0,
+          "show_create_table_sha256": "a0a4b4b3152204dbbebbf80f6ed1f924155ed7715e5f5b39a542cae76fd7655b",
+          "publication_closed_state": "published"
+        }
+      ]
+    },
+    "ai": {
+      "schema_heads": [
+        "0043_native_transaction_limit"
+      ],
+      "complete": true,
+      "pool_released": true,
+      "outer_transaction_release_field": null,
+      "sections": {
+        "result_outbox": {
+          "table_exists": true,
+          "physical_table": "interpretation_result_outbox",
+          "available": true,
+          "total": 125
+        },
+        "ai_messaging_outbox": {
+          "table_exists": true,
+          "physical_table": "messaging_outbox",
+          "available": true,
+          "total": 0
+        },
+        "ai_messaging_inbox": {
+          "table_exists": true,
+          "physical_table": "messaging_inbox",
+          "available": true,
+          "total": 57
+        },
+        "ai_messaging_quarantine": {
+          "table_exists": true,
+          "physical_table": "messaging_quarantine",
+          "available": true,
+          "total": 0
+        },
+        "model_calls": {
+          "table_exists": true,
+          "physical_table": "execution_model_calls",
+          "available": true,
+          "total": 39
+        },
+        "evaluation_dispatches": {
+          "table_exists": true,
+          "physical_table": "evaluation_dispatches",
+          "available": true,
+          "total": 2536
+        },
+        "evaluation_generation_completions": {
+          "table_exists": true,
+          "physical_table": "evaluation_completions",
+          "available": true,
+          "total": 1300
+        },
+        "evaluation_semantic_completions": {
+          "table_exists": true,
+          "physical_table": "evaluation_completions",
+          "available": true,
+          "total": 1236
+        }
+      }
+    },
+    "qs": {
+      "observed_at": "2026-11-01T03:54:38.769106475Z",
+      "mysql_rm_outbox": {
+        "kind": "BASE TABLE",
+        "definition_sha256": "fab10aedac75e113eff8a953962cc75344988065b454a34b96c6aaad1d5cfa4e",
+        "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rows": 0
+      },
+      "mongo_rm_outbox": {
+        "kind": "collection",
+        "definition_sha256": "f43317d874d026a3494776dcbaf35aa5f4f36324b2f9b84cf526b73619730dd8",
+        "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rows": 0
+      }
+    },
+    "freeze": false,
+    "drop_authorized": false
+  },
+  "private_receipt_archive": {
+    "schema": "host-retirement-followthrough-archive-copies/v1",
+    "local": "/Users/yangshujie/.codex/m5/followthrough/20261101-postrelease-evidence-v1.tar.gz",
+    "local_readback_fsynced": true,
+    "serverA": {
+      "path": "/var/lib/fangcun-m5-protection/followthrough-20261101/postrelease-evidence-v1.tar.gz",
+      "bytes": 357062,
+      "sha256": "47fe9fcd21314c4c580d97d4c27b874d09760ccba0558c2cd21919f4a7ac2f4a",
+      "readback_verified": true,
+      "fsynced": true
+    },
+    "sha256": "47fe9fcd21314c4c580d97d4c27b874d09760ccba0558c2cd21919f4a7ac2f4a",
+    "bytes": 357062
+  }
+}
