@@ -1,0 +1,69 @@
+name: ai-logging
+services:
+  storage-init:
+    profiles: [storage]
+    image: busybox:1.37.0
+    command: [sh, -c, "chown 10001:10001 /loki"]
+    volumes: [loki_data:/loki]
+    network_mode: none
+  loki:
+    profiles: [storage]
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+    image: grafana/loki:3.6.0
+    command: [-config.file=/etc/loki/config.yaml]
+    restart: unless-stopped
+    volumes:
+      - ./loki.yaml:/etc/loki/config.yaml:ro
+      - loki_data:/loki
+    networks: [logs]
+    mem_limit: 512m
+    cpus: '0.5'
+    logging: &rotation
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}
+  gateway:
+    profiles: [storage]
+    image: nginx:1.27.5
+    restart: unless-stopped
+    ports:
+      - ${LOGS_BIND_IP:?Set the restricted ingress IP}:18443:8443
+    volumes:
+      - ./gateway.conf:/etc/nginx/nginx.conf:ro
+      - ${LOGS_SERVER_CERT_DIR:?Set logs server certificate directory}:/certs:ro
+    networks: [logs]
+    mem_limit: 64m
+    depends_on: [loki]
+    logging: *rotation
+  collector:
+    profiles: [collector]
+    image: timberio/vector:0.49.0-debian
+    container_name: ${LOGS_COLLECTOR_NAME:?Set host-specific collector name}
+    networks: [backend]
+    command: [--config, /etc/vector/rendered/vector.yaml, --watch-config]
+    restart: unless-stopped
+    stop_grace_period: 60s
+    extra_hosts:
+      - "ai-logs.svc:${LOGS_GATEWAY_IP:?Set restricted gateway address}"
+    environment:
+      LOKI_ENDPOINT: ${LOKI_ENDPOINT:?Set the TLS gateway origin}
+    volumes:
+      - ${LOGS_RENDERED_CONFIG_DIR:?Set generated configuration directory}:/etc/vector/rendered:ro
+      - /var/lib/docker/containers:/logs:ro
+      - vector_data:/var/lib/vector
+      - ${LOGS_CLIENT_CERT_DIR:?Set collector certificate directory}:/certs:ro
+    mem_limit: 256m
+    cpus: '0.25'
+    logging: *rotation
+
+networks:
+  backend:
+    name: infra-network
+    external: true
+  logs:
+    name: ai-logs
+    internal: true
+volumes:
+  loki_data:
+  vector_data:

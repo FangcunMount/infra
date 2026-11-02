@@ -20,6 +20,15 @@ scrape_configs:
     static_configs:
       - targets: ["qs-ai-api:8000"]
 
+  - job_name: ai-log-collector
+    static_configs:
+      - targets: ["ai-log-collector-serverA:9598"]
+        labels:
+          host: serverA
+      - targets: ["ai-log-collector-serverD:9598"]
+        labels:
+          host: serverD
+
   - job_name: qs-apiserver
     metrics_path: /metrics
     static_configs:
