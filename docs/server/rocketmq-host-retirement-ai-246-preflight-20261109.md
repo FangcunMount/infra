@@ -35,3 +35,11 @@
 下次先处理集中采集或签收直读方案，完成账户范围及窗口授权签收，再进入 W02–W03。当前尚无真实排空、当次冻结保护、执行批准、消费或业务重开回执。事务凭证、历史、ACK、调度和 Broker 持久待办均在保留范围内。
 
 [集中采集诊断与固定直读方案](rocketmq-host-retirement-ai-246-observability-20261109.md)记录后续双向握手证据、具名端点实跑及独立签收栏。
+
+F02 已补两份源码草稿。QS 在同一个有界只读查询中单独报告观测到的事务锚点缺失或冲突数量，原业务回执阻断语义保留。MySQL 8.4.13 隔离用例实际覆盖完整锚点、缺档案、见证冲突及后续查询失败。对应面板以独立时序展示计数，缺样保持为空。上线需分别签收和受控发布，51 条私有历史分类继续待数据责任人签收。[QS #480](https://github.com/FangcunMount/qs-server/pull/480) · [infra #426](https://github.com/FangcunMount/infra/pull/426)
+
+F05 在 IAM `7cd2b02` 的空 MySQL 8.4.13 隔离库实际通过完整迁移与 bootstrap 测试。最终 clean 45，`domain_event_outbox` 有两条 `iam.authz.version_changed.v2` pending，`rm_outbox` 为 0。下一批先为全新库的两个授权版本通知补持久替代路径及可验证通知效果，再替换当前 handoff 和 readiness 的旧表读取。升级、历史审计与其他对象的依赖仍分别验证。F06 热榜、答卷缺口、原效果、MySQL 和 Mongo 调度交接五个包的定向测试通过，作为替代路径的改动基线。
+
+F07 原工作流处于禁用状态。隔离分支以 `a5cc2c9` 为固定历史夹具，仅调整派发入口和诊断保留。首轮 checkout 缺少比较所需 Git 对象，在夹具启动前失败。补齐精确对象后，字节比较通过并进入实际 Broker／双存储步骤，结果以该运行的报告为准。[F07 复现](https://github.com/FangcunMount/infra/actions/runs/42628757978)
+
+并行源代码和隔离原件另有 10 份、11,334 字节，SHA256 `4871bf543d95a965f730d4994dc4a640045c67138fff9bbaf4edc67a83285410`。MacBook／ServerA 两地逐成员回读和 fsync 通过。
