@@ -70,7 +70,8 @@ def install_java_helper(repo, directory, broker, project, run, proof):
     libraries, classes = directory/'java-lib', directory/'java-classes'; libraries.mkdir(); classes.mkdir()
     run(['docker', 'cp', broker+':/opt/rocketmq/lib/.', str(libraries)], timeout=60)
     run(['javac', '--release', '17', '-g:none', '-cp', str(libraries/'*'), '-d', str(classes),
-         str(java_source/'NativeHalfRecheck.java'), str(java_source/'NativeHalfWindowTest.java'), str(java_source/'NativeHalfManaged.java')])
+         str(java_source/'NativeHalfIdentity.java'), str(java_source/'NativeHalfRecheck.java'),
+         str(java_source/'NativeHalfWindowTest.java'), str(java_source/'NativeHalfManaged.java')])
     proof['java_compiler'] = run(['javac', '-version']).stdout.strip()
     container_java = '/tmp/native-recheck-'+secrets.token_hex(8)
     run(['docker', 'exec', broker, 'mkdir', '-m', '700', container_java])
