@@ -139,6 +139,27 @@ jobs:
           QS_AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' python3 scripts/rocketmq/ci-transactions.py \
             --sdk "$PWD/.sdk-acceptance" --ai-admission-host "$PWD/.ai-acceptance" \
             --image rocketmq-ai-state:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-state.json
+      - name: Seal the exact exercised execution image
+        if: inputs.execution_image == true
+        run: |
+          set -euo pipefail
+          umask 077
+          image="$(cat "$RUNNER_TEMP/recovery-image.id")"
+          jq -e --arg image "$image" '.proof.ai_state_host.original_native.execution_image.image_id == $image' rocketmq-ai-state.json
+          docker image save --output "$RUNNER_TEMP/exercised-recovery-image.tar" "$image"
+          python3 tools/rocketmq-native-recovery/image/verify-archive.py "$RUNNER_TEMP/exercised-recovery-image.tar" \
+            --source "$GITHUB_SHA" --image "$image" > "$RUNNER_TEMP/exercised-recovery-image.json"
+          gzip -1 "$RUNNER_TEMP/exercised-recovery-image.tar"
+      - uses: actions/upload-artifact@v7
+        if: inputs.execution_image == true
+        with:
+          name: isolated-exercised-recovery-image-${{ strategy.job-index }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/exercised-recovery-image.tar.gz
+            ${{ runner.temp }}/exercised-recovery-image.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
       - uses: actions/upload-artifact@v7
         if: always()
         with:
