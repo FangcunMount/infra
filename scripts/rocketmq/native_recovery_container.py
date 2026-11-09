@@ -19,6 +19,7 @@ from start_boundary import Boundary, BoundaryError, _digest, _encoded, _json, _p
 
 DOCKER = ('/usr/bin/docker', '--host', 'unix:///var/run/docker.sock')
 NATIVE = '/opt/native-recovery/native-recovery'
+ADMIN_SCRIPT = '/run/native-recovery/native-admin.sh'
 COMMANDS = {'recover', 'resolve-notice', 'verify-resolution'}
 INPUTS = ('config', 'manifest', 'export', 'request', 'approval')
 PRIVATE_FILE_LIMIT = 65536
@@ -74,13 +75,14 @@ def arguments(plan, env):
     java = private_directory(material / 'java')
     tls = private_directory(java / 'tls')
     if ({p.name for p in material.iterdir()} != {name + '.json' for name in INPUTS} | {'java'} or
-            {p.name for p in java.iterdir()} != {'tls', 'tools.yml'} or
+            {p.name for p in java.iterdir()} != {'tls', 'tools.yml', 'native-admin.sh'} or
             {p.name for p in tls.iterdir()} != {'server.crt'}):
         raise BoundaryError('unexpected mounted materials')
-    if not isinstance(plan['java'], dict) or set(plan['java']) != {'tools', 'ca'}:
+    if not isinstance(plan['java'], dict) or set(plan['java']) != {'tools', 'ca', 'admin_script'}:
         raise BoundaryError('reviewed Java inputs required')
     input_digest(java / 'tools.yml', plan['java']['tools'])
     input_digest(tls / 'server.crt', plan['java']['ca'])
+    input_digest(java / 'native-admin.sh', plan['java']['admin_script'])
     expected = set(INPUTS) if action == 'recover' else set(INPUTS) | {'receipt'}
     if not isinstance(plan['inputs'], dict) or set(plan['inputs']) != expected:
         raise BoundaryError('exact reviewed native inputs required')
@@ -99,6 +101,10 @@ def arguments(plan, env):
             digest = item
         input_digest(path, digest)
         cli += ['--' + name, str(path), '--' + name + '-sha', digest]
+    config = _json(private_bytes(material / 'config.json', PRIVATE_FILE_LIMIT))
+    if not isinstance(config, dict) or (config.get('native_admin_script'), config.get('native_admin_script_sha256')) != (
+            ADMIN_SCRIPT, plan['java']['admin_script']):
+        raise BoundaryError('reviewed configuration must select the mounted native admin script')
     return directory, material, java, step_sha, cli
 
 

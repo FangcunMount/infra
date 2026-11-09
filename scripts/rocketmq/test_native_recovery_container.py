@@ -26,14 +26,18 @@ class NativeRecoveryContainerTest(unittest.TestCase):
             path.mkdir(mode=0o700)
         self.fd = os.open(self.operation, os.O_RDONLY | os.O_DIRECTORY)
         self.addCleanup(os.close, self.fd)
-        hashes = {key: self.write(self.inputs / (key + '.json')) for key in runner.INPUTS}
+        hashes = {key: self.write(self.inputs / (key + '.json')) for key in runner.INPUTS if key != 'config'}
+        admin_sha = self.write(self.java / 'native-admin.sh')
+        hashes['config'] = self.write(self.inputs / 'config.json', _encoded({
+            'native_admin_script': runner.ADMIN_SCRIPT, 'native_admin_script_sha256': admin_sha}))
         self.plan = {
             'schema': 'm3-native-recovery-container/v1', 'command': 'recover',
             'directory': str(self.operation), 'host': socket.gethostname(),
             'image_id': 'sha256:' + '1' * 64, 'source_sha': 'a' * 40,
             'network_id': '2' * 64, 'network_name': 'owned-fixture', 'binding_sha256': '3' * 64,
             'step': 'recover-original', 'inputs': hashes,
-            'java': {'tools': self.write(self.java / 'tools.yml'), 'ca': self.write(self.java / 'tls' / 'server.crt')},
+            'java': {'admin_script': admin_sha, 'tools': self.write(self.java / 'tools.yml'),
+                     'ca': self.write(self.java / 'tls' / 'server.crt')},
         }
         self.step_sha = '4' * 64
         self.cid = '5' * 64
@@ -43,8 +47,8 @@ class NativeRecoveryContainerTest(unittest.TestCase):
             'M3_COORDINATOR_STEP': self.plan['step'], 'M3_COORDINATOR_STEP_PLAN_SHA256': self.step_sha,
         }
 
-    def write(self, path):
-        path.write_bytes(b'fixture\n')
+    def write(self, path, raw=b'fixture\n'):
+        path.write_bytes(raw)
         path.chmod(0o600)
         return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -83,6 +87,13 @@ class NativeRecoveryContainerTest(unittest.TestCase):
         extra.unlink()
         (self.inputs / 'approval.json').write_text('changed')
         with self.assertRaises(BoundaryError):
+            runner.arguments(self.plan, self.env)
+
+    def test_refuses_admin_script_outside_readonly_material_even_with_matching_digest(self):
+        self.plan['inputs']['config'] = self.write(self.inputs / 'config.json', _encoded({
+            'native_admin_script': str(self.operation / 'native-admin.sh'),
+            'native_admin_script_sha256': self.plan['java']['admin_script']}))
+        with self.assertRaisesRegex(BoundaryError, 'mounted native admin script'):
             runner.arguments(self.plan, self.env)
 
     def test_requires_live_lock_and_matching_reviewed_step(self):

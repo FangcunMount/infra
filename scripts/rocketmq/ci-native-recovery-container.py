@@ -15,6 +15,7 @@ import tempfile
 import uuid
 
 from cutover_step import execute, load_step
+from native_recovery_container import ADMIN_SCRIPT
 from start_boundary import Boundary, BoundaryError, _digest, _encoded, initialize
 
 
@@ -35,8 +36,11 @@ def worker(root, image, source, network, name):
     inputs.mkdir(mode=0o700)
     java = inputs / 'java'
     (java / 'tls').mkdir(mode=0o700, parents=True)
+    admin_sha = write(java / 'native-admin.sh', Path(__file__).with_name('managed-java.sh').read_bytes())
     hashes = {key: write(inputs / (key + '.json'), b'{}\n')
-              for key in ('config', 'manifest', 'export', 'request', 'approval')}
+              for key in ('manifest', 'export', 'request', 'approval')}
+    hashes['config'] = write(inputs / 'config.json', _encoded({
+        'native_admin_script': ADMIN_SCRIPT, 'native_admin_script_sha256': admin_sha}))
     named = hashlib.sha256(b'isolated-linux-launcher-refusal').hexdigest()
     binding = dict(schema='m3-start-boundary/v1', operation_id='linux-launcher-fixture', directory=str(op),
                    scope_sha256=named, protection_sha256=named, restore_receipt_sha256=named,
@@ -46,7 +50,7 @@ def worker(root, image, source, network, name):
     plan = dict(schema='m3-native-recovery-container/v1', command='recover', directory=str(op),
                 host=socket.gethostname(), image_id=image, source_sha=source, network_id=network,
                 network_name=name, binding_sha256=binding_sha, step='fixture-refuses-invalid-review',
-                inputs=hashes, java={'tools': write(java / 'tools.yml', b'{}\n'),
+                inputs=hashes, java={'admin_script': admin_sha, 'tools': write(java / 'tools.yml', b'{}\n'),
                                      'ca': write(java / 'tls' / 'server.crt', b'fixture only\n')})
     plan_path = root / 'container-plan.json'
     plan_sha = write(plan_path, _encoded(plan))
@@ -106,6 +110,9 @@ def fixture(image, source):
                 dest = code / filename
                 shutil.copyfile(Path(__file__).with_name(filename), dest)
                 dest.chmod(0o444)
+            script = Path(__file__).resolve().parents[2] / 'tools/rocketmq-native-recovery/image/managed-java.sh'
+            shutil.copyfile(script, code / script.name)
+            (code / script.name).chmod(0o444)
             run(['/usr/bin/sudo', '-n', '/usr/bin/chown', '3000:3000', str(material)])
             try:
                 args = ['/usr/bin/sudo', '-n', '/usr/bin/setpriv', '--reuid=3000', '--regid=3000',
