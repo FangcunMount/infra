@@ -116,9 +116,11 @@ jobs:
           cp components/rocketmq/rocketmq.zip "$context/"
           cp "$RUNNER_TEMP/native-recovery" "$context/"
           digest="$(sha256sum "$context/native-recovery" | cut -d' ' -f1)"
-          docker build --platform linux/amd64 --network none \
+          tag="f07-recovery-fixture:$GITHUB_SHA"
+          docker build --platform linux/amd64 --network none -t "$tag" \
             --build-arg SOURCE_SHA="$GITHUB_SHA" --build-arg CLI_SHA256="$digest" \
-            --iidfile "$RUNNER_TEMP/recovery-image.id" "$context"
+            "$context"
+          docker image inspect "$tag" --format '{{.Id}}' > "$RUNNER_TEMP/recovery-image.id"
       - name: Required worker, governance, SDK and original state roots
         env:
           QS_AI_NATIVE_ORIGIN: ${{ inputs.native_origin == true && 'true' || 'false' }}
@@ -131,7 +133,8 @@ jobs:
             export QS_AI_NATIVE_RECOVERY_BIN="$RUNNER_TEMP/native-recovery"
           fi
           if [[ "$QS_AI_EXECUTION_IMAGE" == true ]]; then
-            export QS_AI_NATIVE_RECOVERY_IMAGE="$(cat "$RUNNER_TEMP/recovery-image.id")"
+            QS_AI_NATIVE_RECOVERY_IMAGE="$(cat "$RUNNER_TEMP/recovery-image.id")"
+            export QS_AI_NATIVE_RECOVERY_IMAGE
           fi
           QS_AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' python3 scripts/rocketmq/ci-transactions.py \
             --sdk "$PWD/.sdk-acceptance" --ai-admission-host "$PWD/.ai-acceptance" \
