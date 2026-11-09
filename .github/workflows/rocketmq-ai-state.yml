@@ -77,7 +77,7 @@ jobs:
           docker build --no-cache -t rocketmq-ai-state:5.5.1 components/rocketmq
       - name: Required worker, governance, SDK and original state roots
         env:
-          QS_AI_NATIVE_ORIGIN: ${{ inputs.native_origin == true }}
+          QS_AI_NATIVE_ORIGIN: ${{ inputs.native_origin == true && 'true' || 'false' }}
           QS_AI_ACCEPTANCE_KIND: ${{ inputs.native_limit == true && 'native_limit' || inputs.protection == true && 'protection' || 'state' }}
         run: |
           set -euo pipefail
