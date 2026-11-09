@@ -226,7 +226,7 @@ AI 源码 `c6359b441de48fde5b295529fe9c10f50e4c53f5` 和 Python SDK 0.5.0 在 My
 
 独立故障发生器用已发布 Go SDK tx.4 在自有库准备一个半消息，Broker 执行两次未知回查并产生一条 `TRANS_CHECK_MAX_TIME_TOPIC` 索引。只读导出未读取正文，SHA256 `230be2eeb5615eb7d4cb6fc20c8d10dae56d4761362f6abdb7ca3716d832c1e9`。AI 默认装配在其原主库幂等导入，当前和替换实例均拒绝打开准入，不产生新半消息。Checker 保持就绪，原事实及见证保持一致。故障发生器业务调用和最终确认调用均为零，原 Broker 参数、进程和隔离资源清理核对通过。发生器与 AI 业务根分属两个库，AI 同一原根的 Broker 超限、具名解除和应用重开继续单独验证。
 
-运行元数据、报告、日志 ZIP 及源码增量 bundle 等 8 份原件归档 71,488 字节，SHA256 `815fd6b40919619607610c8b9002105880d1947bed45a82d0b5d612d19d99b86`，MacBook 与 ServerA 逐成员读回并完成持久化校验。相同源码已派发完整兼容矩阵，结果待验。[完整矩阵](https://github.com/FangcunMount/infra/actions/runs/42668593248)
+运行元数据、报告、日志 ZIP 及源码增量 bundle 等 8 份原件归档 71,488 字节，SHA256 `815fd6b40919619607610c8b9002105880d1947bed45a82d0b5d612d19d99b86`，MacBook 与 ServerA 逐成员读回并完成持久化校验。相同源码的完整兼容矩阵已完成。Python 3.11.16、3.13.15 与 MySQL 8.0.36、8.0.44、8.4.11 的六个组合各有 156 项报告检查通过，零失败、零跳过。逐组核对真实 SYS 索引、8 项原生阻断证明、SDK 身份、原 Broker 参数及隔离清理。14 份原件归档 341,455 字节，SHA256 `32378a3ef065ea800f76013510f9d1e706d9b3f783a92c5382068645e5e9d484`，两地逐成员读回并完成持久化校验。夹具源码已提交草稿审查。[完整矩阵](https://github.com/FangcunMount/infra/actions/runs/42668593248) · [infra #428](https://github.com/FangcunMount/infra/pull/428)
 
 ### 2026-11-10 F07 恢复工具稳定 SDK 候选
 
