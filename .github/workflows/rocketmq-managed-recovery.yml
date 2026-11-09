@@ -15,7 +15,9 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Require exact historical fixture code outside workflow
-        run: git diff --exit-code a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907 HEAD -- . ':(exclude).github/workflows/rocketmq-managed-recovery.yml'
+        run: |
+          git fetch --no-tags --depth=1 origin a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907
+          git diff --exit-code a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907 HEAD -- . ':(exclude).github/workflows/rocketmq-managed-recovery.yml'
       - uses: actions/setup-go@v6
         with:
           go-version: '1.25.12'
