@@ -241,3 +241,9 @@ MySQL 8.0.36、8.0.44、8.4 三档原库夹具各通过 41 项，MongoDB 7.0.37 
 隔离夹具 `d7a113aa8835ab0d86f0fbbc40298d1cac38b0bc` 调用 AI `c6359b441de48fde5b295529fe9c10f50e4c53f5` 的实际预检 Worker、SQLAlchemy 原根和发布 Python SDK 0.5.0。在本机 Python 3.11.3、MySQL 8.4.13、RocketMQ 5.5.1 完成 3 项报告检查，零失败、零跳过。实际半消息和见证落库后，只断开夹具 Broker 的网络。原业务根提交一次，Sender 报告最终确认未知并排空。重连后按原消息键取得一条真实 SYS 索引，原库幂等导入后保持阻断。原 Reference、半消息身份及已归档报文字节一致；未调用模型。Broker 参数、容器和网络清理通过。该轮覆盖 AI 同根超限和原库阻断，稳定 CLI 的具名解除、原报文消费与宿主重开仍待同一窗口实跑。
 
 两次 GitHub 派发均在任何作业启动前报平台内部错误，无测试报告。MacBook 本机实跑独立完成。15 份证据含本机报告、源码 bundle 和两次远端运行记录，归档 19,763 字节，SHA256 `71a38e4190d0094b5d5b778909c7d88526f93a32c525adaf221cc3d313c0b202`，两地逐成员读回并完成持久化校验。派发环境值改为显式字符串，夹具逻辑未变。精确提交 `da537b6fb2d557027cfc8e1c3697a9becae511d2` 的远端 Python 3.13.15／MySQL 8.0.36 复验通过 3 项，零失败、零跳过。独立读回一条原消息的 SYS 索引，原库见证、归档和阻断与本机结果一致。该轮 6 份原件归档 52,998 字节，SHA256 `5cba0738c60332f058c56379649d2632ad0081eab3e20c144d3dc38ed43ddbdb`，两地逐成员读回并完成持久化校验。[首轮远端记录](https://github.com/FangcunMount/infra/actions/runs/42672489410) · [远端复验](https://github.com/FangcunMount/infra/actions/runs/42673680768)
+
+### 2026-11-10 F07 同根受管恢复串联
+
+AI 原业务根夹具接入固定 Go SDK v0.6.1 的正式恢复 CLI、现有 Java 原生助手和协调器。恢复步骤先复核精确阻断通知，再走隔离的具名批准、首次运行屏障、真实 Broker 回查与 Go Checker 排空。之后才启动暂停准入的 AI 替换 owner，继续验证原报文、Broker ACK、独立解除与宿主具名重开。
+
+首轮本机和 Linux 远端均在 CLI 预览前因夹具 MySQL 输出末尾的空字段被拒，原库阻断保留。修正回执读取后，远端越过该门槛并完成 CLI 恢复步骤，随后等待 AI 原报文回读时子进程退出。尚无原报文消费、ACK、解除或重开通过回执。本机修正版到达协调器后按 Linux 限制拒绝，保留该执行约束。两轮均复核 Broker 参数与隔离清理。24 份原件归档 144,063 字节，SHA256 `e2accc551ec1853432fa40fe9f02527200c88f913f9bf51d0f3a37b2c1d0b607`，MacBook 与 ServerA 逐成员读回并完成持久化校验。加入精确启动、锁存、原报文与 ACK 检查点后已发起远端复验。[首轮](https://github.com/FangcunMount/infra/actions/runs/42675094489) · [修正轮](https://github.com/FangcunMount/infra/actions/runs/42675332845) · [诊断复验](https://github.com/FangcunMount/infra/actions/runs/42676582713)
