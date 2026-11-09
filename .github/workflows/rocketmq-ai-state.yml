@@ -121,6 +121,16 @@ jobs:
             --build-arg SOURCE_SHA="$GITHUB_SHA" --build-arg CLI_SHA256="$digest" \
             "$context"
           docker image inspect "$tag" --format '{{.Id}}' > "$RUNNER_TEMP/recovery-image.id"
+      - name: Exercise the actual Linux coordinator and recovery container entrypoint
+        if: inputs.execution_image == true
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 scripts/rocketmq/ci-native-recovery-container.py \
+            --image "$(cat "$RUNNER_TEMP/recovery-image.id")" --source "$GITHUB_SHA" \
+            > "$RUNNER_TEMP/native-container-coordinator.json"
+          jq -e '.linux_coordinator and .failed_before_native_effect and .owned_fixture_cleaned' \
+            "$RUNNER_TEMP/native-container-coordinator.json"
       - name: Required worker, governance, SDK and original state roots
         env:
           QS_AI_NATIVE_ORIGIN: ${{ inputs.native_origin == true && 'true' || 'false' }}
@@ -157,6 +167,7 @@ jobs:
           path: |
             ${{ runner.temp }}/exercised-recovery-image.tar.gz
             ${{ runner.temp }}/exercised-recovery-image.json
+            ${{ runner.temp }}/native-container-coordinator.json
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
