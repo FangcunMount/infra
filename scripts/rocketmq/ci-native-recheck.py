@@ -16,7 +16,7 @@ from audit_transaction_limit import export, write_private
 from render import render
 from routes import consumer_group_v2
 from v2_acceptance import setup
-from managed_recovery_acceptance import accept as managed_accept, fixture_manifest as managed_manifest
+from managed_recovery_acceptance import accept as managed_accept, fixture_manifest as managed_manifest, install_java_helper
 
 SDK_SHA = '04757bd3212ca961d8eaec22ecd3560101111e18'
 PARAMETERS = {'transactionTimeOut': 6000, 'transactionCheckInterval': 5000,
@@ -183,26 +183,7 @@ def main():
             env=dict(os.environ, GOWORK='off', GOTOOLCHAIN='local'), timeout=300)
         proof['go_binary_sha256'] = hashlib.sha256(binary.read_bytes()).hexdigest()
         stage = 'java_compile'
-        java_source = repo/'scripts/rocketmq/probes/native-recheck'
-        libraries, classes = directory/'java-lib', directory/'java-classes'; libraries.mkdir(); classes.mkdir()
-        run(['docker', 'cp', broker+':/opt/rocketmq/lib/.', str(libraries)], timeout=60)
-        run(['javac', '--release', '17', '-g:none', '-cp', str(libraries/'*'), '-d', str(classes),
-             str(java_source/'NativeHalfRecheck.java'), str(java_source/'NativeHalfWindowTest.java'), str(java_source/'NativeHalfManaged.java')])
-        proof['java_compiler'] = run(['javac', '-version']).stdout.strip()
-        container_java = '/tmp/native-recheck-'+secrets.token_hex(8)
-        run(['docker', 'exec', broker, 'mkdir', '-m', '700', container_java])
-        # javac inherits the fixture's umask077. Only these public bytecode files
-        # are copied; make them readable by the fixed nonroot Broker JVM.
-        stage = 'owned_java_classes_install'
-        for public_class in classes.glob('*.class'): public_class.chmod(0o644)
-        classes.chmod(0o755)
-        run(['docker', 'cp', str(classes)+'/.', broker+':'+container_java])
-        run(['docker', 'exec', '--user', '0', broker, 'chown', '-R', '3000:3000', container_java])
-        run(['docker', 'exec', broker, 'chmod', '700', container_java])
-        java = ['docker', 'exec', '-i', '-e', 'GITHUB_ACTIONS=true', '-e', 'M3_NATIVE_RECHECK_PROJECT='+project,
-                broker, 'java', '-Xms32m', '-Xmx128m', '-XX:MaxDirectMemorySize=32m',
-                '-Djava.io.tmpdir='+container_java, '-Drocketmq.client.logRoot='+container_java+'/logs',
-                '-cp', '/opt/rocketmq/conf:/opt/rocketmq/lib/*:'+container_java]
+        java = install_java_helper(repo, directory, broker, project, run, proof)
         stage = 'pure_java_finite_window'
         window_process = run(java+['NativeHalfWindowTest'], required=False)
         proof['pure_java_exit_code'] = window_process.returncode

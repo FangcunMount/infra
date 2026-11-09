@@ -9,6 +9,7 @@ import copy
 import hashlib
 import json
 import os
+import secrets
 from pathlib import Path
 import shlex
 import shutil
@@ -62,6 +63,29 @@ def safe_failure(directory):
             if selected:
                 result.append(selected)
     return result[:16]
+
+
+def install_java_helper(repo, directory, broker, project, run, proof):
+    java_source = repo/'scripts/rocketmq/probes/native-recheck'
+    libraries, classes = directory/'java-lib', directory/'java-classes'; libraries.mkdir(); classes.mkdir()
+    run(['docker', 'cp', broker+':/opt/rocketmq/lib/.', str(libraries)], timeout=60)
+    run(['javac', '--release', '17', '-g:none', '-cp', str(libraries/'*'), '-d', str(classes),
+         str(java_source/'NativeHalfRecheck.java'), str(java_source/'NativeHalfWindowTest.java'), str(java_source/'NativeHalfManaged.java')])
+    proof['java_compiler'] = run(['javac', '-version']).stdout.strip()
+    container_java = '/tmp/native-recheck-'+secrets.token_hex(8)
+    run(['docker', 'exec', broker, 'mkdir', '-m', '700', container_java])
+    # javac inherits the fixture's umask077. Only these public bytecode files
+    # are copied; make them readable by the fixed nonroot Broker JVM.
+    for public_class in classes.glob('*.class'): public_class.chmod(0o644)
+    classes.chmod(0o755)
+    run(['docker', 'cp', str(classes)+'/.', broker+':'+container_java])
+    run(['docker', 'exec', '--user', '0', broker, 'chown', '-R', '3000:3000', container_java])
+    run(['docker', 'exec', broker, 'chmod', '700', container_java])
+    java = ['docker', 'exec', '-i', '-e', 'GITHUB_ACTIONS=true', '-e', 'M3_NATIVE_RECHECK_PROJECT='+project,
+            broker, 'java', '-Xms32m', '-Xmx128m', '-XX:MaxDirectMemorySize=32m',
+            '-Djava.io.tmpdir='+container_java, '-Drocketmq.client.logRoot='+container_java+'/logs',
+            '-cp', '/opt/rocketmq/conf:/opt/rocketmq/lib/*:'+container_java]
+    return java
 
 
 def fixture_manifest(repo,*,iam=False):

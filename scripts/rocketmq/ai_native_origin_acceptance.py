@@ -10,8 +10,59 @@ from audit_transaction_limit import export
 from provision_v2 import Admin
 
 
+class OriginalConsumer:
+    def __init__(self, native, identity, wire_sha256):
+        self.native = native
+        self.identity = identity
+        self.wire_sha256 = wire_sha256
+
+    def wait(self, event, identity, decision, *, timeout):
+        if (event, identity, decision) != ('received', self.identity, self.wire_sha256):
+            raise RuntimeError('exact original AI consumer identity required')
+        self.native.send('observe')
+        if self.native.wait('observed', timeout=timeout) != {
+            'event': 'observed', 'wire_sha256': self.wire_sha256,
+        }:
+            raise RuntimeError('original AI consumer did not read back the first wire')
+
+
+def run_managed(managed, directory, broker, project, run, native, proof,
+                half, closed, index, evidence_path):
+    from managed_recovery_acceptance import accept, install_java_helper
+
+    repo = Path(__file__).resolve().parents[2]
+    java = install_java_helper(repo, directory, broker, project, run, proof)
+    identity = half['key']
+    original = dict(owner='ai.mysql', store_id=half['store_id'], writer_epoch='m3-1',
+                    database=managed['schema'], user='root', operation_id=half['operation_id'],
+                    branch_id=half['branch_id'], fence=half['fence'], wire_hash=closed['wire_sha256'],
+                    business_count_sql="SELECT COUNT(*) FROM evaluation_runs WHERE run_id='"
+                    + half['run_id'] + "' AND JSON_EXTRACT(progress_json,'$.preflight.evaluated_at') IS NOT NULL",
+                    writer='actual AI evaluation preflight SQLAlchemy root',
+                    scope='one owned original AI commit, approved native recheck and named host reopen')
+    def sql(statement):
+        return run(['docker', 'exec', '-i', '-e', 'MYSQL_PWD=' + managed['password'],
+                    project + '-mysql-1', 'mysql', '-uroot', '--batch', '--skip-column-names',
+                    original['database']], stdin=statement).stdout.rstrip('\r\n')
+
+    proof['stage'] = 'managed_original_recovery'
+    cases = {}
+    accept(repo=repo, binary=managed['binary'], broker=broker, project=project, directory=directory,
+           manifest=managed['manifest'], route=managed['route'], account=managed['account'],
+           grpc_port=managed['grpc_port'], mysql_port=managed['mysql_port'], password=managed['password'],
+           ca=managed['ca'], java=java, identity=identity, index_path=evidence_path,
+           index=index, sql=sql, run=run, consumer=OriginalConsumer(native, identity, original['wire_hash']),
+           passed=lambda name: cases.update({name: True}), proof=proof, original=original)
+    proof['stage'] = 'named_ai_reopen'
+    native.send('verify')
+    if native.wait('reopened', timeout=60) != {'event': 'reopened', 'original_wire_preserved': True, 'no_new_half': True}:
+        raise RuntimeError('named original AI owner reopening proof required')
+    cases['named_ai_reopen_keeps_first_witness_and_sends_no_new_half'] = True
+    return cases
+
+
 def run_origin(source, directory, broker, project, command, env, run, native_runner,
-               read_parameters, proof, evidence_path):
+               read_parameters, proof, evidence_path, *, managed=None):
     if not project.startswith('rocketmq-m2-') or directory.stat().st_mode & 0o077:
         raise RuntimeError('owned private AI origin fixture required')
     admin = Admin(broker)
@@ -26,10 +77,19 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
     proof['case_sha256'] = hashlib.sha256(test_file.read_bytes()).hexdigest()
     proof['stage'] = 'configuration'
 
+    cases = {}
+
     def supervise(native):
         proof['stage'] = 'original_half'
         half = native.wait('half', timeout=90)
-        if set(half) != {'event', 'key'} or not re.fullmatch(r'[A-Za-z0-9_.:-]{1,128}', half['key']):
+        identity_fields = {'key'}
+        if managed:
+            identity_fields |= {'operation_id', 'branch_id', 'store_id', 'run_id'}
+        expected_fields = identity_fields | ({'fence'} if managed else set()) | {'event'}
+        if set(half) != expected_fields or not all(
+            isinstance(half[field], str) and re.fullmatch(r'[A-Za-z0-9_.:-]{1,128}', half[field])
+            for field in identity_fields
+        ) or (managed and (type(half['fence']) is not int or not 0 < half['fence'] < 2**63)):
             raise RuntimeError('bounded original message identity required')
         proof['stage'] = 'commit_without_broker'
         run(['docker', 'network', 'disconnect', network, broker])
@@ -61,6 +121,12 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
         native.send('record')
         if native.wait('blocked', timeout=35) != {'event': 'blocked', 'evidence_sha256': digest}:
             raise RuntimeError('exact original native notice required')
+        if managed:
+            admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', str(before['transactionCheckMax']))
+            if read_parameters(admin('getBrokerConfig')) != before:
+                raise RuntimeError('original Broker budget required before recovery')
+            cases.update(run_managed(managed, directory, broker, project, run, native,
+                                     proof, half, closed, index, evidence_path))
 
     try:
         admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', '2')
@@ -70,7 +136,7 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
         junit = directory / 'ai-native-origin-private.xml'
         result = native_runner([*command, 'python', '-m', 'pytest', '-q', '-s',
                                  '-c', str(source / 'pyproject.toml'), str(test_file), '--junitxml=' + str(junit)],
-                                cwd=source, env=env, timeout=355,
+                                cwd=source, env=env, timeout=800 if managed else 355,
                                 prefix='AI_NATIVE_ORIGIN ', supervise=supervise)
         if result.returncode or not junit.is_file():
             raise RuntimeError('isolated original AI host acceptance failed')
@@ -84,4 +150,4 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
         raise RuntimeError('isolated Broker parameters were not restored')
     proof['stage'] = 'verified'
     return {'cases': {'actual_ai_original_root': True, 'same_root_sys_limit': True,
-                      'original_notice_keeps_witness': True}}
+                      'original_notice_keeps_witness': True, **cases}}

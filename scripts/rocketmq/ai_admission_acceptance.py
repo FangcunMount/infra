@@ -241,12 +241,16 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     proof['provision'] = provision(broker, manifest, accounts)
     native_data = {}
     native_origin = os.environ.get('QS_AI_NATIVE_ORIGIN') == 'true'
+    managed_binary = os.environ.get('QS_AI_NATIVE_RECOVERY_BIN')
+    if managed_binary and (not native_origin or not Path(managed_binary).is_absolute()
+                           or not os.access(managed_binary, os.X_OK)):
+        raise RuntimeError('managed recovery requires an exact executable in the owned origin fixture')
     if native_origin:
         if (profile['name'] != 'native_limit' or proof['source_sha'] != STABLE_NATIVE_AI_SOURCE
                 or read_parameters is None or native_runner is None):
             raise RuntimeError('exact stable AI native origin fixture required')
         evidence_path = directory / 'ai-native-origin-index.json'
-        native_data = dict(native_origin_evidence=str(evidence_path))
+        native_data = dict(native_origin_evidence=str(evidence_path), native_origin_managed=bool(managed_binary))
     elif profile['name'] == 'native_limit':
         if read_parameters is None or native_runner is None:
             raise RuntimeError('owned native limit supervisor and parameter parser required')
@@ -295,8 +299,15 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     if native_origin:
         from ai_native_origin_acceptance import run_origin
         proof['original_native'] = {}
+        managed = None
+        if managed_binary:
+            route = next(row for row in manifest['routes'] if row['owner'] == 'ai.mysql')
+            managed = dict(binary=Path(managed_binary), schema=schema, manifest=manifest, route=route,
+                           account=accounts['ai'], grpc_port=grpc_port, mysql_port=mysql_port,
+                           password=password, ca=ca)
         proof['native_receipt'] = run_origin(source, directory, broker, project, command, env, run,
-                                             native_runner, read_parameters, proof['original_native'], evidence_path)
+                                             native_runner, read_parameters, proof['original_native'],
+                                             evidence_path, managed=managed)
         proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
         if not proof['source_clean_after']:
             raise RuntimeError('AI source changed during native origin acceptance')

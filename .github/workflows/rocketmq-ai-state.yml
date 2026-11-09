@@ -19,6 +19,10 @@ on:
         description: Trace the exact AI original root to its own SYS index in native_limit mode
         type: boolean
         default: false
+      managed_original:
+        description: Run stable Go recovery and named AI reopen on the same original root
+        type: boolean
+        default: false
       profile:
         description: Development is one interpreter/MySQL; full is required for final gate
         type: choice
@@ -67,9 +71,27 @@ jobs:
           set -euo pipefail
           test '${{ inputs.protection == true && inputs.native_limit == true }}' != true
           test '${{ inputs.native_origin == true && inputs.native_limit != true }}' != true
+          test '${{ inputs.managed_original == true && inputs.native_origin != true }}' != true
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
           test "$(git -C .ai-acceptance rev-parse HEAD)" = "$EXPECTED_AI_SHA"
           python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
+      - uses: actions/setup-java@v5
+        if: inputs.managed_original == true
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile exact clean stable recovery CLI
+        if: inputs.managed_original == true
+        run: |
+          set -euo pipefail
+          umask 077
+          git clone --quiet --shared --no-checkout . "$RUNNER_TEMP/clean-native-recovery"
+          git -C "$RUNNER_TEMP/clean-native-recovery" checkout --quiet --detach "$GITHUB_SHA"
+          cd "$RUNNER_TEMP/clean-native-recovery/tools/rocketmq-native-recovery"
+          test -z "$(git status --porcelain)"
+          GOWORK=off GOFLAGS=-mod=readonly go build -trimpath -buildvcs=true \
+            -ldflags "-X main.sourceSHA=$GITHUB_SHA" -o "$RUNNER_TEMP/native-recovery" ./cmd/native-recovery
+          "$RUNNER_TEMP/native-recovery" version
       - name: Build verified isolated Broker
         run: |
           set -euo pipefail
@@ -78,9 +100,13 @@ jobs:
       - name: Required worker, governance, SDK and original state roots
         env:
           QS_AI_NATIVE_ORIGIN: ${{ inputs.native_origin == true && 'true' || 'false' }}
+          QS_AI_MANAGED_ORIGINAL: ${{ inputs.managed_original == true && 'true' || 'false' }}
           QS_AI_ACCEPTANCE_KIND: ${{ inputs.native_limit == true && 'native_limit' || inputs.protection == true && 'protection' || 'state' }}
         run: |
           set -euo pipefail
+          if [[ "$QS_AI_MANAGED_ORIGINAL" == true ]]; then
+            export QS_AI_NATIVE_RECOVERY_BIN="$RUNNER_TEMP/native-recovery"
+          fi
           QS_AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' python3 scripts/rocketmq/ci-transactions.py \
             --sdk "$PWD/.sdk-acceptance" --ai-admission-host "$PWD/.ai-acceptance" \
             --image rocketmq-ai-state:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-state.json
