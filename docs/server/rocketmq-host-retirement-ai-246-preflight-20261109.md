@@ -1,6 +1,6 @@
 # 2026-11-09 AI #246 入窗复验
 
-**当前决定为 No-Go。** 账户、制品、材料比较、Worker 就绪与四 owner 的服务端观测均已复验。11 月 10 日 03:22 集中采集有一个缺口，03:52 结束的缺口后范围 121 点通过。03:28 具名直读两轮通过，使用前仍待独立签收。窗口前须再取新鲜证据。真实窗口尚待授权和现场签收。AI 自动发布关闭，QS 生产发布工作流仍手动禁用。各项现场签收留空。[窗口签收清单](rocketmq-host-retirement-ai-246-window-signoff.md)
+**当前决定为 No-Go。** 账户、制品、材料比较、Worker 就绪与四 owner 的服务端观测均已复验。11 月 10 日 03:22 集中采集有一个缺口，最新 04:07 结束的连续范围 121 点通过。03:28 具名直读两轮通过，使用前仍待独立签收。窗口前须再取新鲜证据。真实窗口尚待授权和现场签收。AI 自动发布关闭，QS 生产发布工作流仍手动禁用。各项现场签收留空。[窗口签收清单](rocketmq-host-retirement-ai-246-window-signoff.md)
 
 | 项目 | 本轮实际证据 | 判定 |
 | --- | --- | --- |
@@ -279,3 +279,12 @@ infra `ad523a83287da1fa02bd4cf477917bd1c5b5013e` 构建的 Linux/amd64 镜像 `s
 同次镜像封存复验 `946e680dee130865f980e53ea077554f042f7a16` 再次完成 11 项，零失败、零跳过。实际运行镜像 ID `sha256:4cfbd689d44d8cb8e078fc19964ec22d97b81697f4bdc62e54395b7b8e5c822e` 与导出配置一致，OCI manifest 为 `sha256:47a8b2e37e08352341590000a974689e29903ebbd20defbe6083ca500880411b`，逐层校验 10 层。原 Docker tar 430,721,536 字节，SHA256 `d3fb5df5011e2aec7fa92783ff99a933bb5a9e8b1b7774ae91d1b22f261367d8`。下载后独立重算一致，MacBook 按原 ID 加载，断网运行的 CLI 构建回执与 runner 完全一致。含完整镜像的 14 份原件归档 243,197,044 字节，SHA256 `96a89da223b7e6a6503b68666df8778fa38e0704050716deaf43f4817028714a`，两地逐成员读回并完成持久化校验。源码草稿叠加 #429 的工具合约门槛，执行与打包文件和已验资格提交一致。仍待具名生产网络、协调器、凭据与独立执行审查。[精确回执](https://github.com/FangcunMount/infra/actions/runs/42687076391) · [镜像草稿 #430](https://github.com/FangcunMount/infra/pull/430)
 
 QS #485 的首次 Docs Hygiene & Facts 因文档源码绑定仍指向旧版本失败。仅更新文档绑定后，`300cc67e1d7e8cc535d7c669a701f58e489ef2ec` 的本机 `make docs-check` 与远端文档检查通过。双原库隔离结果继续精确引用 `50a4f890cf1f539aa18c8749e8cf7ab28aa8852f`，该测试文件与文档提交一致。[QS #485](https://github.com/FangcunMount/qs-server/pull/485)
+
+
+### 2026-11-10 入窗前审查索引
+
+04:07 复验受核 QS main `7899ffce168bac0097b733dd874ab97d87f10db0` 的管理员入口。工作流从派发到开工 7 秒、到完成 50 秒，供窗口排程参考。实读 24 条查询、原库完整 43、唯一目标仍在且 0 行、原目标 DDL 相同。活动线程、AI 事务、修改事务、待授予锁、已授予 AI 锁和依赖阻断均为零，仍见 4 个 AI 连接。管理员观察 `observations_atomic=false`、`freeze_verified=false`，现场须复查每个允许保留的会话。[管理员只读复验](https://github.com/FangcunMount/qs-server/actions/runs/42689857263)
+
+准备镜像以 UID 10001、原独立数据库网络、公共 CA 和 VERIFY_IDENTITY 再次实读相同原库身份、principal 和完整 GRANTS。全库读、目标 DROP、LOCK TABLES 及 ledger UPDATE 的能力齐备，诊断事务和连接池均释放。原运行容器前后不变。实际账户权限仍较宽，保留独立接受或专用账户复验的决定。两地重新读回固定生产 44、前向 44 及历史 43 全备原件，三个 SHA 和字节数均与原资格一致，历史备份保留 `frozen=false`。
+
+北京时间 03:37:30–04:07:30 的集中采集九项检查各 121 点通过。AI 自动发布关闭且无在途部署，QS 生产发布工作流仍手动禁用。入窗前索引 SHA256 `b7836bb575e64409cf881086ef3113cd4d7c73b45d964730fcdf2095c169c683`，21 份私有原件共 43,073 字节，SHA256 `e2006b7d40e40bfae0e62215c6378dff1154ad22153bb7b411a5122c96183cae`，两地逐成员读回并完成持久化校验。索引保持 `prepared_for_review`、`execution_authorized=false`，待独立决定见[预约前签收栏](rocketmq-host-retirement-ai-246-window-signoff.md#预约前的独立审查)。
