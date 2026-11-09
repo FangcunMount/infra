@@ -15,6 +15,7 @@ import shlex
 import shutil
 import socket
 import struct
+import tempfile
 import time
 
 from audit_transaction_limit import export, write_private
@@ -22,6 +23,7 @@ from routes import physical_topic_v2,consumer_group_v2
 from start_boundary import initialize, _encoded
 from cutover_step import execute, load_step
 from mysql_commit_proxy import MySQLCommitProxy
+from native_recovery_container import ADMIN_SCRIPT
 
 
 def require(value,stage):
@@ -137,22 +139,38 @@ def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_po
     require(image is None or (original and original['owner']=='ai.mysql' and not governance_faults),
             'execution_image_requires_owned_original_ai_profile')
     proxy=MySQLCommitProxy(mysql_port).start() if governance_faults else None
+    temporary = None
+    coordinated = None
     try:
+        if os.environ.get('QS_AI_COORDINATED_IMAGE') == 'true':
+            require(image is not None, 'owned execution image required for Linux coordinator')
+            from ci_coordinated_recovery import CoordinatedRecovery
+            temporary = tempfile.TemporaryDirectory(prefix='f07-coordinated-image-', dir='/tmp')
+            coordinated = CoordinatedRecovery(Path(temporary.name), repo, broker, project, image, proof, run)
         return _accept(repo=repo,binary=binary,broker=broker,project=project,directory=directory,manifest=manifest,route=route,account=account,
             grpc_port=grpc_port,mysql_port=mysql_port,password=password,ca=ca,java=java,identity=identity,index_path=index_path,index=index,
-            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original,terminal=terminal,image=image)
+            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original,terminal=terminal,image=image,
+            coordinated=coordinated)
     finally:
-        if proxy is not None:
-            proof['governance_wire_proxy_cleanup']=proxy.close()
+        try:
+            if coordinated:
+                coordinated.cleanup()
+        finally:
+            if temporary:
+                temporary.cleanup()
+            if proxy is not None:
+                proof['governance_wire_proxy_cleanup']=proxy.close()
 
 
 def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original,terminal,image):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original,terminal,image,coordinated=None):
     expected=terminal_expectation(terminal)
     source=original or dict(owner="iam.mysql",store_id="sdk-disposable",writer_epoch="sdk-epoch-1",database="txprobe",user="txprobe",
         operation_id="op-"+identity,branch_id="branch-0",fence=1,business_count_sql="SELECT COUNT(*) FROM sdk_business",
         writer="fixed Go SDK source probe, not IAM business host",scope="one iam.mysql terminal "+terminal+", not the complete four-host/fault matrix")
-    root=directory/'managed-cli';root.mkdir(mode=0o700)
+    root = coordinated.root if coordinated else directory / 'managed-cli'
+    if not coordinated:
+        root.mkdir(mode=0o700)
     def write(name,value):
         path=root/name
         write_private(path,value)
@@ -169,6 +187,8 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         command=[docker,'--host','unix:///var/run/docker.sock','--config',str(docker_config),'exec','-i',broker,*java[java.index('java'):],'NativeHalfManaged']
         native_script.write_text('#!/bin/bash\nset -euo pipefail\nexec '+shlex.join(command)+' < "$1"\n')
     native_script.chmod(0o600)
+    if coordinated:
+        coordinated.stage_java(directory / 'managed-java-material', native_script)
     def call(arguments,*,success=True):
         proof['managed_last_cli']=str(arguments[0])
         result=run([*cli,*map(str,arguments)],required=False,timeout=225)
@@ -193,9 +213,9 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     database_endpoint = 'mysql:3306' if image else f'127.0.0.1:{proxy.port if proxy else mysql_port}'
     config=dict(schema='m3-native-recovery-config/v1',owner=source['owner'],store_id=source['store_id'],writer_epoch=source['writer_epoch'],
         database_kind='mysql',database_uri=f"{source['user']}:{password}@tcp({database_endpoint})/{source['database']}",database_name=source['database'],database_ca_pem='',
-        endpoint=f'127.0.0.1:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
-        native_admin_script=str(native_script),native_admin_script_sha256=hashlib.sha256(native_script.read_bytes()).hexdigest(),
-        native_admin_nameserver='nameserver:9876',native_admin_broker='127.0.0.1:10911')
+        endpoint=f'{"broker" if coordinated else "127.0.0.1"}:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
+        native_admin_script=ADMIN_SCRIPT if coordinated else str(native_script),native_admin_script_sha256=hashlib.sha256(native_script.read_bytes()).hexdigest(),
+        native_admin_nameserver='nameserver:9876',native_admin_broker='172.31.80.10:10911' if coordinated else '127.0.0.1:10911')
     config_path,config_sha=write('original-config.json',config)
     source_inputs = dict(source=version['source_sha'], binary=version['binary_sha256'], config=config_sha, manifest=manifest_sha)
     if image:
@@ -212,13 +232,24 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         script=root/(name+'.sh')
         # Actual coordinator-derived env avoids a self-referential script/plan
         # hash. Go revalidates the live binding/state/marker/reviewed plan.
-        args=shlex.join([*cli,*map(str,arguments)])
-        script.write_text('#!/bin/bash\nset -euo pipefail\n'+args+' --directory "$M3_COORDINATOR_DIRECTORY" --binding-sha "$M3_COORDINATOR_BINDING_SHA256" --step "$M3_COORDINATOR_STEP" --step-plan-sha "$M3_COORDINATOR_STEP_PLAN_SHA256"\n');script.chmod(0o600)
+        host = socket.gethostname()
+        if coordinated:
+            args = coordinated.plan_command(arguments, op, binding_sha, name, host)
+        else:
+            args = shlex.join([*cli, *map(str, arguments)])
+            args += ' --directory "$M3_COORDINATOR_DIRECTORY" --binding-sha "$M3_COORDINATOR_BINDING_SHA256" --step "$M3_COORDINATOR_STEP" --step-plan-sha "$M3_COORDINATOR_STEP_PLAN_SHA256"'
+        script.write_text('#!/bin/bash\nset -euo pipefail\n' + args + '\n')
+        script.chmod(0o600)
         plan=dict(schema='m3-cutover-step/v1',directory=str(op),binding_sha256=binding_sha,host=socket.gethostname(),step=name,kind=kind,
             script=str(script),script_sha256=hashlib.sha256(script.read_bytes()).hexdigest(),cwd=str(root),timeout_seconds=240)
         path=root/(name+'-plan.json');path.write_bytes(_encoded(plan));path.chmod(0o600)
-        digest=hashlib.sha256(path.read_bytes()).hexdigest();loaded,raw=load_step(path,digest)
-        try:execute(loaded,raw,digest)
+        digest=hashlib.sha256(path.read_bytes()).hexdigest()
+        try:
+            if coordinated:
+                coordinated.execute(path, digest, op)
+            else:
+                loaded,raw=load_step(path,digest)
+                execute(loaded,raw,digest)
         except Exception:
             proof['managed_failure_diagnostics']=safe_failure(op)
             raise

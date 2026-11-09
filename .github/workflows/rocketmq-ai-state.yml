@@ -27,6 +27,10 @@ on:
         description: Run the exact managed AI recovery through its isolated Linux execution image
         type: boolean
         default: false
+      coordinated_image:
+        description: Use the actual Linux coordinator and named bridge for recovery and resolution
+        type: boolean
+        default: false
       profile:
         description: Development is one interpreter/MySQL; full is required for final gate
         type: choice
@@ -77,6 +81,7 @@ jobs:
           test '${{ inputs.native_origin == true && inputs.native_limit != true }}' != true
           test '${{ inputs.managed_original == true && inputs.native_origin != true }}' != true
           test '${{ inputs.execution_image == true && inputs.managed_original != true }}' != true
+          test '${{ inputs.coordinated_image == true && inputs.execution_image != true }}' != true
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
           test "$(git -C .ai-acceptance rev-parse HEAD)" = "$EXPECTED_AI_SHA"
           python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
@@ -135,6 +140,7 @@ jobs:
         env:
           QS_AI_NATIVE_ORIGIN: ${{ inputs.native_origin == true && 'true' || 'false' }}
           QS_AI_EXECUTION_IMAGE: ${{ inputs.execution_image == true && 'true' || 'false' }}
+          QS_AI_COORDINATED_IMAGE: ${{ inputs.coordinated_image == true && 'true' || 'false' }}
           QS_AI_MANAGED_ORIGINAL: ${{ inputs.managed_original == true && 'true' || 'false' }}
           QS_AI_ACCEPTANCE_KIND: ${{ inputs.native_limit == true && 'native_limit' || inputs.protection == true && 'protection' || 'state' }}
         run: |
@@ -149,6 +155,11 @@ jobs:
           QS_AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' python3 scripts/rocketmq/ci-transactions.py \
             --sdk "$PWD/.sdk-acceptance" --ai-admission-host "$PWD/.ai-acceptance" \
             --image rocketmq-ai-state:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-state.json
+          if [[ "$QS_AI_COORDINATED_IMAGE" == true ]]; then
+            jq -e '.proof.ai_state_host.original_native |
+              (.coordinated_image_steps | length) == 3 and .coordinated_image_cleanup and
+              .ai_reopen.broker_ack and .ai_reopen.no_new_half' rocketmq-ai-state.json
+          fi
       - name: Seal the exact exercised execution image
         if: inputs.execution_image == true
         run: |
