@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 
 import pytest
+from reliable_messaging.rocketmq import RocketMQSubscriber
 from reliable_messaging.transaction import Decision, FinalOutcome, LocalOutcome, StoreChecker, execution_key
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -38,6 +39,33 @@ async def read_witness(host, execution):
                         execution.writer_epoch, execution.fence)
     async with host.tx.open() as db:
         return (await db.execute(select(witness).where(witness.c.execution_key == key))).mappings().one()
+
+
+async def start_recovery_observer(broker, branch):
+    # A receive RPC interrupted by the owned Broker disconnection ends its
+    # poller. Reuse the same authenticated handler, binding and group after
+    # reconnect with a fresh subscriber, before the Go Checker can confirm.
+    previous = broker.observer
+    observer = RocketMQSubscriber(
+        previous.config, previous.route.topic, previous.route.subscription,
+        handler=previous.handler, failed_handler=previous.failed_handler,
+        invalid_handler=previous.invalid_handler, retry_cap=1,
+    )
+    broker.resources.push_async_callback(observer.stop, grace_seconds=20)
+    await observer.start()
+    loop = asyncio.get_running_loop()
+    acknowledged = asyncio.Event()
+    actual_ack = observer._driver.client.ack
+
+    def ack(raw, *args, **kwargs):
+        result = actual_ack(raw, *args, **kwargs)
+        if bytes(raw.body) == branch.wire:
+            loop.call_soon_threadsafe(acknowledged.set)
+        return result
+
+    observer._driver.client.ack = ack
+    emit("recovery_observer_started")
+    return acknowledged
 
 
 async def verify_reopen(broker, config, sessions, native, execution, after, branch, acknowledged, tmp_path):
@@ -105,6 +133,9 @@ async def verify_reopen(broker, config, sessions, native, execution, after, bran
 
 
 async def test_original_ai_root_reaches_native_limit(broker, required_broker, tmp_path):
+    managed = required_broker.get("native_origin_managed") is True
+    if managed:
+        await broker.observer.stop(grace_seconds=20)
     broker.runtime.pause = True
     task = asyncio.create_task(broker.worker.once())
     try:
@@ -119,19 +150,7 @@ async def test_original_ai_root_reaches_native_limit(broker, required_broker, tm
         assert before["broker_message_id"] and before["broker_transaction_id"]
         assert not broker.messages
         metadata = {}
-        managed = required_broker.get("native_origin_managed") is True
         if managed:
-            loop = asyncio.get_running_loop()
-            acknowledged = asyncio.Event()
-            actual_ack = broker.observer._driver.client.ack
-
-            def ack(raw, *args, **kwargs):
-                result = actual_ack(raw, *args, **kwargs)
-                if bytes(raw.body) == branch.wire:
-                    loop.call_soon_threadsafe(acknowledged.set)
-                return result
-
-            broker.observer._driver.client.ack = ack
             metadata = dict(
                 operation_id=execution.plan.operation_id, branch_id=branch.branch_id,
                 fence=execution.fence, store_id=broker.host.store.binding.store_id,
@@ -173,6 +192,8 @@ async def test_original_ai_root_reaches_native_limit(broker, required_broker, tm
         assert await native.read_native_limit()
         assert await read_witness(broker.host, execution) == after
         assert not broker.messages
+        if managed:
+            acknowledged = await start_recovery_observer(broker, branch)
         emit("blocked", evidence_sha256=evidence.digest.hex())
         if managed:
             await verify_reopen(broker, required_broker, sessions, native, execution, after, branch, acknowledged, tmp_path)

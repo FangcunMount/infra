@@ -133,7 +133,7 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
             supervise_original(native)
         except Exception:
             native.drain()
-            allowed = {'replacement_started', 'replacement_blocked', 'first_wire_seen', 'observed'}
+            allowed = {'recovery_observer_started', 'replacement_started', 'replacement_blocked', 'first_wire_seen', 'observed'}
             proof['ai_consumer_checkpoints'] = [
                 event['event'] for event in native.events if event.get('event') in allowed
             ]
