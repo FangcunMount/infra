@@ -10,10 +10,19 @@ import time
 from audit_transaction_limit import export,write_private
 from iam_recovery_acceptance import require
 from managed_recovery_acceptance import accept as managed_accept
-from qs_runtime_acceptance import runtime_manifest,validate_module
+from qs_runtime_acceptance import runtime_manifest
 from recovery_fixture_store import MongoFixtureStore
 
-SOURCE='aa6d2f0bc897a587ca6317d3774e5ddfe3d5b238'
+SOURCE='50a4f890cf1f539aa18c8749e8cf7ab28aa8852f'
+MODULE = dict(Path='github.com/FangcunMount/reliable-messaging', Version='v0.6.1',
+              Sum='h1:mHj1tReMGHu979OuC/XhFAk13dxsgqTDygZs2WdqVwY=',
+              GoModSum='h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')
+
+
+def validate_recovery_module(module):
+    require(isinstance(module, dict) and 'Replace' not in module
+            and all(module.get(key) == value for key, value in MODULE.items()),
+            'fixed_stable_published_qs_sdk_required')
 
 
 def metadata(value):
@@ -37,7 +46,7 @@ def accept(*,source,repo,binary,observer_binary,broker,project,directory,manifes
            accounts,java,mongo,sql_for,run,common,probes,admin,read_parameters,parameters,passed,proof):
     require(run(['git','rev-parse','HEAD'],cwd=source).stdout.strip()==SOURCE and not run(['git','status','--porcelain'],cwd=source).stdout,'fixed_clean_original_qs_source_required')
     env=dict(os.environ,GOWORK='off',GOTOOLCHAIN='local',GOFLAGS='-mod=readonly')
-    module=json.loads(run(['go','list','-m','-json','github.com/FangcunMount/reliable-messaging'],cwd=source,env=env).stdout);validate_module(module,True)
+    module=json.loads(run(['go','list','-m','-json','github.com/FangcunMount/reliable-messaging'],cwd=source,env=env).stdout);validate_recovery_module(module)
     root=directory/'qs-native-recovery';root.mkdir(mode=0o700)
     def write(name,value):path=root/name;write_private(path,value);return path
     routes=write('routes.json',manifest)

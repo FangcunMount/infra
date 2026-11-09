@@ -1,4 +1,4 @@
-name: Isolated F07 QS historical recovery reproduction
+name: Isolated F07 current QS dual-owner native recovery
 on:
   workflow_dispatch:
 permissions:
@@ -7,27 +7,23 @@ env:
   GOTOOLCHAIN: local
 jobs:
   actual-qs-dual-original-primary-recovery:
-    if: github.ref_name == 'codex/f07-qs-native-recovery-repro-20261109' && github.event_name == 'workflow_dispatch'
+    if: github.ref_name == 'codex/f07-qs-current-native-20261110' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - name: Require exact historical fixture code outside workflow
+      - name: Validate exact fixture identity and Mongo cleanup query
         run: |
-          git fetch --no-tags --depth=1 origin a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907
-          git diff --exit-code a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907 HEAD -- . ':(exclude).github/workflows/rocketmq-managed-recovery.yml' ':(exclude)scripts/rocketmq/qs_recovery_acceptance.py'
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           python3 - <<'PY'
           import ast
           from pathlib import Path
           import subprocess
-          path='scripts/rocketmq/qs_recovery_acceptance.py'
-          original=subprocess.check_output(['git','show','a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907:'+path])
-          fixed=original.replace(b"9301bf8044cd826aa9f34088e4b97899a12618d3",b"aa6d2f0bc897a587ca6317d3774e5ddfe3d5b238")
-          old=b'.filter(x=>x.startsWith("qs_m3_host_"))))'
-          assert fixed.count(old)==1 and Path(path).read_bytes()==fixed.replace(old,old[:-1])
-          tree=ast.parse(Path(path).read_text())
+          path=Path('scripts/rocketmq/qs_recovery_acceptance.py')
+          tree=ast.parse(path.read_text())
           (query,)=[n.value for n in ast.walk(tree) if isinstance(n,ast.Constant) and isinstance(n.value,str)
                     and n.value.startswith('JSON.stringify(db.adminCommand')]
           subprocess.run(['node','--check'],input=query,text=True,check=True)
@@ -60,13 +56,13 @@ jobs:
       - uses: actions/checkout@v6
         with:
           repository: FangcunMount/qs-server
-          ref: aa6d2f0bc897a587ca6317d3774e5ddfe3d5b238
+          ref: 50a4f890cf1f539aa18c8749e8cf7ab28aa8852f
           path: .qs-acceptance
       - name: Require QS assertion-only fixture change
         working-directory: .qs-acceptance
         run: |
-          git fetch --no-tags --depth=1 origin 9301bf8044cd826aa9f34088e4b97899a12618d3
-          git diff --exit-code 9301bf8044cd826aa9f34088e4b97899a12618d3 HEAD -- . ':(exclude)internal/apiserver/container/owner_runtime_native_integration_test.go'
+          git fetch --no-tags --depth=1 origin 7899ffce168bac0097b733dd874ab97d87f10db0
+          git diff --exit-code 7899ffce168bac0097b733dd874ab97d87f10db0 HEAD -- . ':(exclude)internal/apiserver/container/owner_runtime_native_integration_test.go'
       - name: Restore host module and race build cache
         uses: actions/cache@v4
         with:
@@ -97,21 +93,23 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json
+          import json,os
           x=json.load(open('qs-native-recovery.json'))
           import re
           stage=x.get('failure')
           if not isinstance(stage,str) or not re.fullmatch(r'[a-zA-Z0-9_.:-]{1,120}',stage):
             stage=None
           cases={k:v for k,v in x.get('cases',{}).items() if re.fullmatch(r'[a-zA-Z0-9_.:-]{1,160}',k) and v in ('pass','fail','skip')}
-          print(json.dumps(dict(fixture_sha='a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907',passed=x.get('passed'),failed=x.get('failed'),skipped=x.get('skipped'),failure_stage=stage,cases=cases,cleanup=x.get('cleanup')),sort_keys=True),flush=True)
+          print(json.dumps(dict(fixture_sha=os.environ['GITHUB_SHA'],passed=x.get('passed'),failed=x.get('failed'),skipped=x.get('skipped'),failure_stage=stage,cases=cases,cleanup=x.get('cleanup')),sort_keys=True),flush=True)
           assert x['passed']==23 and x['failed']==x['skipped']==0
           p=x['proof']
-          assert p['qs_original_host']['source_sha']=='aa6d2f0bc897a587ca6317d3774e5ddfe3d5b238'
+          assert p['qs_original_host']['source_sha']=='50a4f890cf1f539aa18c8749e8cf7ab28aa8852f'
           assert p['qs_original_host']['receipt']['passed']==7 and p['qs_original_host']['source_clean']
           assert p['qs_original_host']['owned_databases_removed']
           assert set(p['qs_owner_recoveries'])=={'qs.mysql','qs.mongo'}
           for owner,evidence in p['qs_owner_recoveries'].items():
+            assert evidence['managed_cli_build']['sdk_version']=='v0.6.1'
+            assert evidence['managed_cli_build']['source_sha']==os.environ['GITHUB_SHA']
             r=evidence['managed_recovery']
             assert r['approved_governance_resolved'] and r['actual_sdk_stats']['RecoveryCommitConfirmed']>0
             assert r['actual_sdk_stats']['Stopped'] and r['private_observations']>0
