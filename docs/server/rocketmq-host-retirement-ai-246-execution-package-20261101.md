@@ -6,7 +6,7 @@
 
 ## 最新补充：实际全备恢复与执行账户已完成技术审查
 
-2026-11-09 的[入窗复验](rocketmq-host-retirement-ai-246-preflight-20261109.md)补齐当前库版本、运行身份、实际账户、制品与隔离串联证据。当前 Worker 显式就绪及四 owner 采集仍待复验，生产窗口维持 No-Go。
+2026-11-09 的[入窗复验](rocketmq-host-retirement-ai-246-preflight-20261109.md)补齐当前库版本、运行身份、实际账户、制品与隔离串联证据。三 Worker 就绪和四 owner 服务端样本已直读，集中采集仍异常，窗口授权及等价证据仍待签收，生产窗口维持 No-Go。
 
 [备份/账户资格说明](rocketmq-host-retirement-ai-backup-account-qualification-20261101.md)及[真实全备恢复回执](../evidence/2026-11-01-ai246-real-backup-restore-qualification.json)、[实际执行账户回执](../evidence/2026-11-01-ai246-execution-account-review.json)、[云PITR范围记录](../evidence/2026-11-01-ai246-cloud-pitr-review.json)为本轮当前结论。
 

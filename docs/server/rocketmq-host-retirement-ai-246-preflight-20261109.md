@@ -1,14 +1,14 @@
 # 2026-11-09 AI #246 入窗复验
 
-**当前决定为 No-Go。** 账户、制品和材料比较已复验，当前 Prometheus 采集及四个事务 owner 的可用性和新鲜度仍待核实。真实窗口尚待授权和现场签收。AI 自动发布关闭，QS 生产发布工作流仍手动禁用。各项现场签收留空。[窗口签收清单](rocketmq-host-retirement-ai-246-window-signoff.md)
+**当前决定为 No-Go。** 账户、制品、材料比较、Worker 就绪与四 owner 的服务端观测均已复验。Prometheus 集中采集仍异常，直读方案待独立审查签收。真实窗口尚待授权和现场签收。AI 自动发布关闭，QS 生产发布工作流仍手动禁用。各项现场签收留空。[窗口签收清单](rocketmq-host-retirement-ai-246-window-signoff.md)
 
 | 项目 | 本轮实际证据 | 判定 |
 | --- | --- | --- |
-| QS 六实例 | ServerA 的 API 和两个 Collection 与首批发布的容器 ID、镜像一致，均健康、重启 0。ServerD 三份 Worker 的容器 ID 和镜像与首批一致，均 running。三台快照的 A/B 分支因 sudo 认证失败，A 由现有个人只读入口补齐。D 快照未提供显式 readiness。 | 运行身份通过，Worker 当前就绪仍待证。[快照运行](https://github.com/FangcunMount/qs-server/actions/runs/42625037809) |
-| QS 与 AI 现库 | 原受核 QS 维护容器内以 UID 2000 使用受限探针，实读 clean 111/44 与两库原身份。AI 管理员复验 24 条查询，原 43、原 DDL、目标 0 行及全局可见性均成立，锁、事务及依赖相关阻断计数为 0。 | 只读现库通过，观察回执保持 `freeze_verified=false`、`observations_atomic=false`。[AI 管理员复验](https://github.com/FangcunMount/qs-server/actions/runs/42625038784) |
+| QS 六实例 | ServerA 的 API 和两个 Collection 与首批发布的容器 ID、镜像一致，均健康、重启 0。ServerD 三份 Worker 的容器 ID 和镜像与首批一致，均 running，具名实例两轮 `/readyz` 均为 200。三台快照的 A/B 分支因 sudo 认证失败，A 由现有个人只读入口补齐。 | 六实例身份及本轮健康／就绪通过。[快照运行](https://github.com/FangcunMount/qs-server/actions/runs/42625037809) |
+| QS 与 AI 现库 | 原受核 QS 维护容器内以 UID 2000 使用受限探针，实读 clean 111/44 与两库原身份。探针构建工作树为 `1319d4c`，所用迁移、TLS 及依赖文件与受核 QS main `7899ffc` 一致。AI 管理员复验 24 条查询，原 43、原 DDL、目标 0 行及全局可见性均成立，锁、事务及依赖相关阻断计数为 0。 | 只读现库通过，观察回执保持 `freeze_verified=false`、`observations_atomic=false`。[AI 管理员复验](https://github.com/FangcunMount/qs-server/actions/runs/42625038784) |
 | AI 重启 | 同一个 f9 容器重启计数为 1。北京时间 11 月 8 日 04:13:07 记录 `service_failed` 并开始 drain，两个订阅组件退出报错，04:13:10 记录 RuntimeError，04:13:23 再次 ready。当前健康。日志没有保留初始失败原因。 | 后续正常停机须按 W03 单独取得无错误排空证据。 |
 | AI 持久状态 | 原库一致性只读时点实读 22 条执行和 29 条见证均 committed，42 个作业均 done，40 次模型调用均 response_received，待业务 ACK 及 held 命令均 0，事务及连接池释放。 | 当前持久状态已核对，真实窗口复验仍待签收。 |
-| 当前采集 | 通过现有 Prometheus 路径得到部分 `up` 样本，四 owner available/fresh/protected 及 QS/AI 业务观察查询缺样。后续目标列表超时，后续 HTTP 请求报错。11 月 1 日两处远端抓取共同失败的历史样本再次可查，Prometheus 自身当时仍 up。 | 采集根因和当前连续可观测性未确认。入窗前须取得三 Worker 的实际就绪及四 owner 的连续有效样本，或由独立审查签收现有受权入口提供的等价证据。 |
+| 当前采集 | 通过现有 Prometheus 路径得到部分 `up` 样本，四 owner available/fresh/protected 及 QS/AI 业务观察查询缺样。后续目标列表超时，后续 HTTP 请求报错。11 月 1 日两处远端抓取共同失败的历史样本再次可查，Prometheus 自身当时仍 up。北京时间 21:39–21:40 分别直读 QS、AI 和 IAM 应用指标，四 owner 各两次均 available/fresh=1、protected=0。 | 服务端观测已取得，集中采集根因及连续可观测性未确认。入窗前恢复集中采集并核对，或由独立审查签收具名端点直读作为窗口等价证据。 |
 | 固定 44 制品 | MacBook 和 ServerA 分别重新读取生产与离线前向归档，两份原 SHA 均一致。AI main 仍为 `c6359b441de48fde5b295529fe9c10f50e4c53f5`，预备镜像保持 `sha256:e6afea10…d9470e`。 | 制品字节复验通过。 |
 | 实际执行账户 | 使用准备镜像、实际 UID 10001、独立数据库网络、仅公共 CA 和 VERIFY_IDENTITY 完成只读复验。principal 和完整 GRANTS 与原资格相同，直接授予全库读取、目标 DROP、锁表和 ledger UPDATE 能力。前两次旧协调脚本的重启计数断言拒绝，最终验证把计数固定为当前实测值并核对运行实例在探针前后相同。 | 技术范围通过。较宽账户仍待独立审查明确签收，窗口内重新采集。 |
 
@@ -30,4 +30,6 @@
 
 本轮 41 份私有原件及索引归档为 25,078,168 字节，SHA256 `16c7be85e28a0265f13aa8e75c3223c29beb020fa174264fdc84808b0af5b168`。MacBook 和 ServerA 两地回读、逐成员校验及 fsync 完成，复制回执外置并两地保存。至少保留 30 天，未结延期。实际全备与不可变镜像继续独立保全。
 
-下次先取得 Worker 就绪和四 owner 的当前观测证据，完成独立账户范围及窗口授权签收，再进入 W02–W03。当前尚无真实排空、当次冻结保护、执行批准、消费或业务重开回执。事务凭证、历史、ACK、调度和 Broker 持久待办均在保留范围内。
+追加直读和 CI 原件归档为 15,542 字节、7 份原件及索引，SHA256 `3edd5744f0661998b3deff8dff069ca22e5fc0a96c3d8c4fc2549a9c12d91971`。两地逐成员读回和 fsync 完成。精确提交 `d9aae078e07602bb265bbf118331e10ce12345dc` 的合同 CI 25 项测试和编译通过，原始日志 ZIP CRC 通过。[合同 CI](https://github.com/FangcunMount/infra/actions/runs/42627299329)
+
+下次先处理集中采集或签收直读方案，完成账户范围及窗口授权签收，再进入 W02–W03。当前尚无真实排空、当次冻结保护、执行批准、消费或业务重开回执。事务凭证、历史、ACK、调度和 Broker 持久待办均在保留范围内。
