@@ -19,6 +19,8 @@
 
 14:58 UTC 并行比较 Tailscale 发现探针、WireGuard 内的 TSMP、ICMP 和 TCP 22。ServerA 的 24 个探针全通过。ServerD 前三轮四种探针全通过，后三轮四种探针全部超时，成功的发现探针均经中继。同期 Linux 守护进程日志有中继相关记录，现有分类未证实连接重建原因。ServerD 这三轮故障发生在 SSH 之前，仍待定位故障端和传输段。W00 的集中采集验收继续待签收。
 
+北京时间 11 月 9 日 23:33:30 至 11 月 10 日 00:03:30，再次在 Mac mini 的本机 Prometheus 查询 121 个评估点。23:56:15 ServerA 五个目标、ServerD 三个 Worker 和 Broker 同时保有时序但抓取失败，四个 owner 的可用、新鲜及保护样本同时缺失。末点各目标恢复，四个 owner 均可用、新鲜且未保护。Worker 和 Broker 分别有 2 和 6 个点未达到目标。原查询、按固定脚本指标名复验的同窗结果和两地保护回执已保留。集中采集连续性仍不满足 W00，直读方案仍待独立签收。
+
 ## W00 应用端直读候选
 
 [固定直读脚本](../../scripts/monitoring/m5_window_direct_observe.py)在 ServerA 已有 `qs-ai` 容器内以 UID 10001 执行，只对三个具名 Worker 的 `/readyz` 和 QS、AI、IAM 的固定 `/metrics` 发 GET。两轮间隔 15 秒，脚本预算 45 秒。拒绝跳转、代理和缺失、重复或异常 owner 样本。任一 Worker 非 200，或任一 owner 的 available/fresh 非 1、protected 非 0，结果失败。
