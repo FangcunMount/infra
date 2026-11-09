@@ -49,8 +49,8 @@ jobs:
           python3 - <<'PY'
           import json,os
           x=json.load(open(os.environ['RUNNER_TEMP']+'/native-recovery-module.json'))
-          assert x['Version']=='v0.5.0-rocketmq-tx.4' and not x.get('Replace')
-          assert x['Sum']=='h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI='
+          assert x['Version']=='v0.6.1' and not x.get('Replace')
+          assert x['Sum']=='h1:mHj1tReMGHu979OuC/XhFAk13dxsgqTDygZs2WdqVwY='
           PY
       - uses: actions/checkout@v6
         with:

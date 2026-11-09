@@ -133,7 +133,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         return value
     version=call(['version'])
     require(version['source_sha']==run(['git','rev-parse','HEAD'],cwd=repo).stdout.strip()
-            and version['sdk_version']=='v0.5.0-rocketmq-tx.4' and version['effectful_commands'] is True,'fixed_published_cli_build_required')
+            and version['sdk_version']=='v0.6.1' and version['effectful_commands'] is True,'fixed_published_cli_build_required')
     proof['managed_cli_build']=version
     # Source fixture installs only its owned governance table explicitly. The
     # CLI's constructor/start/preview never performs schema or binding writes.
