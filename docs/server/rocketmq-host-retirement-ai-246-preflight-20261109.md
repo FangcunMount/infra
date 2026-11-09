@@ -46,8 +46,10 @@ IAM 测试夹具 `a416f59dae78c8b3b28350d1690a5a10e7c395df` 在空 MySQL 8.4.13 
 
 F07 原工作流处于禁用状态。隔离分支以 `a5cc2c9` 为固定历史夹具，首轮 checkout 缺少比较所需 Git 对象，在夹具启动前失败。补齐后原生复现为 **22 通过、1 失败、0 跳过**，两种原存储已实际完成恢复，原生清理检查通过。末项失败位于历史 QS `9301bf8` 的 `owner_runtime_native_integration_test.go:735`。夹具以暂停准入启动替换 owner，断言却要求 `Stats.Ready=true`，而固定源码把该字段与写入准入取交集。历史报告和日志已两地保全，归档 SHA256 `b2f09de5c38a6fc8d2d056d192436267e8e11ff8bd61dac92101495b6bfe2385`。[F07 失败复现](https://github.com/FangcunMount/infra/actions/runs/42628757978)
 
-历史 QS 夹具 `aa6d2f0` 只修改该断言：真实 Start 后验证两个暂停 owner 的观察器运行且样本可用新鲜，新写 Reserve 拒绝、无新半消息，Close 后两个 owner 均停止。带集成标签编译通过。原生重验保持 23 项、原实跑和清理断言，并校验两仓仅包含精确的夹具／派发变更。重验结果待该运行签收。[F07 修正后原生重验](https://github.com/FangcunMount/infra/actions/runs/42631372602)
+历史 QS 夹具 `aa6d2f0` 只修改该断言。第二轮宿主子测试正常退出，7 项通过，0 失败、0 跳过、0 race 报告。两种原存储均记录具名解除和一次实际 SDK 提交确认，业务、请求、执行和见证各保留 1 条。暂停替换 owner 正常排空。整轮仍为 **22 通过、1 失败、0 跳过**，未签发独立清理复核结果。报告、运行元数据、日志 ZIP 和保全脚本在两地逐成员读回并 fsync，归档 56,834 字节，SHA256 `93e52c00471c652dbfcc4e79bdf91f86e5343e2beeb7129747c35d064cbaf59b`。[F07 第二轮原生报告](https://github.com/FangcunMount/infra/actions/runs/42631372602)
+
+第二轮末段的 Mongo 清理复核表达式多一个右括号，原表达式通过 `node --check` 复现语法错误。隔离派发 `7f281b9d8e935620f8e80a5a71edfdbaf80675d1` 移除该括号并加语法预检，原 9 项夹具测试通过。仍要求 23 项原生通过、零失败零跳过，以及观察器退出、两库删除、源码洁净和隔离资源清理全部通过。第三轮已派发，待结果签收。[F07 第三轮原生重验](https://github.com/FangcunMount/infra/actions/runs/42633443737)
 
 并行源代码和隔离原件另有 10 份、11,334 字节，SHA256 `4871bf543d95a965f730d4994dc4a640045c67138fff9bbaf4edc67a83285410`。MacBook／ServerA 两地逐成员回读和 fsync 通过。
 
-F07 的 AI 原生测试入口已经核对。历史 `native_limit` 配置固定 Python SDK `0.4.0a4`，AI `c635` 使用 `0.5.0`。AI 现有隔离用例验证 SQLAlchemy 原库原生拒绝及重开保护，具名解除和业务根读回还需同一原根的实跑。R03 用独立 Go 模块文件将恢复工具临时指向稳定 SDK `v0.6.1`，13 个 Go 包编译通过。后续还需验证执行器版本绑定、R01/R02 原生故障矩阵和正式制品。
+F07 的 AI 原生测试入口已经核对。历史 `native_limit` 配置固定 Python SDK `0.4.0a4`，AI `c635` 使用 `0.5.0`。AI 现有隔离用例验证 SQLAlchemy 原库原生拒绝及重开保护，具名解除和业务根读回还需同一原根的实跑。R03 用独立 Go 模块文件将恢复工具临时指向稳定 SDK `v0.6.1`，13 个 Go 包编译通过，279 项普通测试全部通过。测试报告 SHA256 `5d19a82e6e8b8192f409f738fcbba87a34926296e508b4f83edc8caa00ddcd4e`。后续还需验证执行器版本绑定、R01/R02 原生故障矩阵和正式制品。
