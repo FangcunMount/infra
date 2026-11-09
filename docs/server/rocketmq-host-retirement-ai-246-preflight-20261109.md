@@ -68,6 +68,10 @@ IAM #174 的 9 项检查通过，#175 精确源码 CI 的 7 项通过。隔离�
 
 冷启动续跑、规范消息组合验证、源码 bundle 和 W00 分层探测共 21 份原件，归档 16,183 字节，SHA256 `59e52ec073417f369a5c4d49f2ed9ee736c37b7d8914609a6663d6acef1c8866`，两地逐成员读回并 fsync。
 
+隔离夹具 `bc86686e7c2ee1b78eeb645e52b10fbff935c718` 复用既有 `schema_migrations` MySQL advisory lock，把持锁、迁移驱动、GORM 钩子和阶段记录绑定到同一个物理连接。持锁期间，另一会话的原 `RunTo` 在原锁处拒绝。六个钩子前后真实 `KILL CONNECTION` 用例中，旧会话均未跨过当前 schema 阶段，新会话由原阶段记录恢复至 clean 45，原已提交的消息字节保持一致。六个受控报错用例及身份、非空未认领库和 dirty ledger 的拒绝用例同时复验通过。正式迁移入口尚未接入。正式实现需保留未认领已有库的升级路径，并明确首个身份记录创建中断时的只读判定和重试边界。Broker 投递与通知效果仍需独立实跑。
+
+同会话验证的报告、日志、源码增量 bundle 等 5 份原件归档为 8,553 字节，SHA256 `57ccf20d4e36b3aec424b31f3d1e78e4bbfcd95c03afb2ee9814cd614f2cc7e8`，两地逐成员读回并 fsync。
+
 F07 原工作流处于禁用状态。隔离分支以 `a5cc2c9` 为固定历史夹具，首轮 checkout 缺少比较所需 Git 对象，在夹具启动前失败。补齐后原生复现为 **22 通过、1 失败、0 跳过**，两种原存储已实际完成恢复，原生清理检查通过。末项失败位于历史 QS `9301bf8` 的 `owner_runtime_native_integration_test.go:735`。夹具以暂停准入启动替换 owner，断言却要求 `Stats.Ready=true`，而固定源码把该字段与写入准入取交集。历史报告和日志已两地保全，归档 SHA256 `b2f09de5c38a6fc8d2d056d192436267e8e11ff8bd61dac92101495b6bfe2385`。[F07 失败复现](https://github.com/FangcunMount/infra/actions/runs/42628757978)
 
 历史 QS 夹具 `aa6d2f0` 只修改该断言。第二轮宿主子测试正常退出，7 项通过，0 失败、0 跳过、0 race 报告。两种原存储均记录具名解除和一次实际 SDK 提交确认，业务、请求、执行和见证各保留 1 条。暂停替换 owner 正常排空。整轮仍为 **22 通过、1 失败、0 跳过**，未签发独立清理复核结果。报告、运行元数据、日志 ZIP 和保全脚本在两地逐成员读回并 fsync，归档 56,834 字节，SHA256 `93e52c00471c652dbfcc4e79bdf91f86e5343e2beeb7129747c35d064cbaf59b`。[F07 第二轮原生报告](https://github.com/FangcunMount/infra/actions/runs/42631372602)
