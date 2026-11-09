@@ -19,11 +19,18 @@ jobs:
           git fetch --no-tags --depth=1 origin a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907
           git diff --exit-code a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907 HEAD -- . ':(exclude).github/workflows/rocketmq-managed-recovery.yml' ':(exclude)scripts/rocketmq/qs_recovery_acceptance.py'
           python3 - <<'PY'
+          import ast
           from pathlib import Path
           import subprocess
           path='scripts/rocketmq/qs_recovery_acceptance.py'
           original=subprocess.check_output(['git','show','a5cc2c92e9ccc2acf0abfe7b048dfdd185edf907:'+path])
-          assert Path(path).read_bytes()==original.replace(b"9301bf8044cd826aa9f34088e4b97899a12618d3",b"aa6d2f0bc897a587ca6317d3774e5ddfe3d5b238")
+          fixed=original.replace(b"9301bf8044cd826aa9f34088e4b97899a12618d3",b"aa6d2f0bc897a587ca6317d3774e5ddfe3d5b238")
+          old=b'.filter(x=>x.startsWith("qs_m3_host_"))))'
+          assert fixed.count(old)==1 and Path(path).read_bytes()==fixed.replace(old,old[:-1])
+          tree=ast.parse(Path(path).read_text())
+          (query,)=[n.value for n in ast.walk(tree) if isinstance(n,ast.Constant) and isinstance(n.value,str)
+                    and n.value.startswith('JSON.stringify(db.adminCommand')]
+          subprocess.run(['node','--check'],input=query,text=True,check=True)
           PY
       - uses: actions/setup-go@v6
         with:

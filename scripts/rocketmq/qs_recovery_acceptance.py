@@ -114,7 +114,7 @@ def accept(*,source,repo,binary,observer_binary,broker,project,directory,manifes
     proof['qs_original_host']['receipt']=expected
     observer.send('stop');observer.wait('closed');observer.finish()
     require(sql_for('mysql')("SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name LIKE 'qs_m3_host_%';")=='0','owned_original_qs_mysql_database_remains')
-    require(json.loads(mongo('JSON.stringify(db.adminCommand({listDatabases:1,nameOnly:true}).databases.map(x=>x.name).filter(x=>x.startsWith("qs_m3_host_"))))'))==[],'owned_original_qs_mongo_database_remains')
+    require(json.loads(mongo('JSON.stringify(db.adminCommand({listDatabases:1,nameOnly:true}).databases.map(x=>x.name).filter(x=>x.startsWith("qs_m3_host_")))'))==[],'owned_original_qs_mongo_database_remains')
     require(not run(['git','status','--porcelain'],cwd=source).stdout,'original_qs_source_changed')
     proof['qs_original_host'].update(source_clean=True,owned_databases_removed=True)
     passed('actual_qs_both_original_stores_resolved_paused_replacement_drained_and_owned_databases_removed')
