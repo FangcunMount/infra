@@ -235,3 +235,9 @@ AI 源码 `c6359b441de48fde5b295529fe9c10f50e4c53f5` 和 Python SDK 0.5.0 在 My
 同一源码的 Linux/amd64 恢复 CLI SHA256 为 `1518f898404cc0cbc134801b6183f228e7b7e0adafb43562aceafd47a6ff40f5`。真实 Broker 的受管提交 14 项、回滚 15 项和治理故障 16 项均通过，零失败、零跳过。治理用例覆盖真实 MySQL COMMIT 前后丢回执，独立批准后仅解除精确通知，复验保留首次审计且拒绝重复消费。历史固定 IAM 宿主 `bee9c5c1a9945922dc4e88631af451babee646ca` 实际断开 Broker 网络时提交一次原 GORM 根，恢复 CLI 完成同库读回、实际 SDK 回查和指定治理解除，替换 owner 仍以暂停准入启动。该路径 15 项通过，业务、请求、执行、见证各一条保留。恢复路径的 Broker 参数、进程、容器和网络清理均通过。
 
 MySQL 8.0.36、8.0.44、8.4 三档原库夹具各通过 41 项，MongoDB 7.0.37 副本集通过 17 项。四份报告均零失败、零跳过，编译 CLI 原库预览与各自清理通过。34 份原件归档 338,793 字节，SHA256 `a6188259ba52dbe24b746bac40cdee9ceac94d0435dfcb0ba41d7bfbf814a401`，MacBook 与 ServerA 逐成员回读并完成持久化校验。源码已提交草稿审查，正式发布、生产执行封装、当前 QS 双存储和 AI 同根恢复仍待签收。[MySQL 原库](https://github.com/FangcunMount/infra/actions/runs/42668846743) · [Mongo 原库](https://github.com/FangcunMount/infra/actions/runs/42668846597) · [infra #427](https://github.com/FangcunMount/infra/pull/427)
+
+### 2026-11-10 F07 AI 原业务根的真实超限
+
+隔离夹具 `d7a113aa8835ab0d86f0fbbc40298d1cac38b0bc` 调用 AI `c6359b441de48fde5b295529fe9c10f50e4c53f5` 的实际预检 Worker、SQLAlchemy 原根和发布 Python SDK 0.5.0。在本机 Python 3.11.3、MySQL 8.4.13、RocketMQ 5.5.1 完成 3 项报告检查，零失败、零跳过。实际半消息和见证落库后，只断开夹具 Broker 的网络。原业务根提交一次，Sender 报告最终确认未知并排空。重连后按原消息键取得一条真实 SYS 索引，原库幂等导入后保持阻断。原 Reference、半消息身份及已归档报文字节一致；未调用模型。Broker 参数、容器和网络清理通过。该轮覆盖 AI 同根超限和原库阻断，稳定 CLI 的具名解除、原报文消费与宿主重开仍待同一窗口实跑。
+
+两次 GitHub 派发均在任何作业启动前报平台内部错误，无测试报告。MacBook 本机实跑独立完成。15 份证据含本机报告、源码 bundle 和两次远端运行记录，归档 19,763 字节，SHA256 `71a38e4190d0094b5d5b778909c7d88526f93a32c525adaf221cc3d313c0b202`，两地逐成员读回并完成持久化校验。派发环境值改为显式字符串后已启动下一轮远端复验，夹具逻辑未变。[首轮远端记录](https://github.com/FangcunMount/infra/actions/runs/42672489410) · [远端复验](https://github.com/FangcunMount/infra/actions/runs/42673680768)
