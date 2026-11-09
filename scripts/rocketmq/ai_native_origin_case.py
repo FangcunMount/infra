@@ -39,7 +39,7 @@ async def read_witness(host, execution):
         return (await db.execute(select(witness).where(witness.c.execution_key == key))).mappings().one()
 
 
-async def verify_reopen(broker, config, sessions, native, execution, after, branch, tmp_path):
+async def verify_reopen(broker, config, sessions, native, execution, after, branch, acknowledged, tmp_path):
     # The stable Go checker has already drained; now start a fresh, paused AI owner.
     credentials, routes = tmp_path / "credentials.json", tmp_path / "routes.json"
     credentials.write_text(json.dumps(config["ai"]))
@@ -66,7 +66,8 @@ async def verify_reopen(broker, config, sessions, native, execution, after, bran
             replacement.review_protection(blocked["generation"], "fixture-before-resolution")
         await broker.complete()
         assert broker.messages == {branch.message.message_id: branch.wire_hash.hex()}
-        emit("observed", wire_sha256=branch.wire_hash.hex())
+        await asyncio.wait_for(acknowledged.wait(), timeout=20)
+        emit("observed", wire_sha256=branch.wire_hash.hex(), broker_ack=True)
         await receive("verify", timeout=350)
         assert not await native.read_native_limit()
         async with asyncio.timeout(25):
@@ -115,6 +116,17 @@ async def test_original_ai_root_reaches_native_limit(broker, required_broker, tm
         metadata = {}
         managed = required_broker.get("native_origin_managed") is True
         if managed:
+            loop = asyncio.get_running_loop()
+            acknowledged = asyncio.Event()
+            actual_ack = broker.observer._driver.client.ack
+
+            def ack(raw, *args, **kwargs):
+                result = actual_ack(raw, *args, **kwargs)
+                if bytes(raw.body) == branch.wire:
+                    loop.call_soon_threadsafe(acknowledged.set)
+                return result
+
+            broker.observer._driver.client.ack = ack
             metadata = dict(
                 operation_id=execution.plan.operation_id, branch_id=branch.branch_id,
                 fence=execution.fence, store_id=broker.host.store.binding.store_id,
@@ -158,7 +170,7 @@ async def test_original_ai_root_reaches_native_limit(broker, required_broker, tm
         assert not broker.messages
         emit("blocked", evidence_sha256=evidence.digest.hex())
         if managed:
-            await verify_reopen(broker, required_broker, sessions, native, execution, after, branch, tmp_path)
+            await verify_reopen(broker, required_broker, sessions, native, execution, after, branch, acknowledged, tmp_path)
     finally:
         broker.runtime.release.set()
         await asyncio.gather(task, return_exceptions=True)

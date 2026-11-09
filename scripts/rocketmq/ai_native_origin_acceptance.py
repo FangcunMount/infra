@@ -21,7 +21,7 @@ class OriginalConsumer:
             raise RuntimeError('exact original AI consumer identity required')
         self.native.send('observe')
         if self.native.wait('observed', timeout=timeout) != {
-            'event': 'observed', 'wire_sha256': self.wire_sha256,
+            'event': 'observed', 'wire_sha256': self.wire_sha256, 'broker_ack': True,
         }:
             raise RuntimeError('original AI consumer did not read back the first wire')
 
@@ -43,7 +43,7 @@ def run_managed(managed, directory, broker, project, run, native, proof,
     def sql(statement):
         return run(['docker', 'exec', '-i', '-e', 'MYSQL_PWD=' + managed['password'],
                     project + '-mysql-1', 'mysql', '-uroot', '--batch', '--skip-column-names',
-                    original['database']], stdin=statement).stdout.rstrip('\r\n')
+                    original['database']], stdin=statement).stdout.strip()
 
     proof['stage'] = 'managed_original_recovery'
     cases = {}
