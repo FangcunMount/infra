@@ -79,7 +79,7 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
 
     cases = {}
 
-    def supervise(native):
+    def supervise_original(native):
         proof['stage'] = 'original_half'
         half = native.wait('half', timeout=90)
         identity_fields = {'key'}
@@ -127,6 +127,26 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
                 raise RuntimeError('original Broker budget required before recovery')
             cases.update(run_managed(managed, directory, broker, project, run, native,
                                      proof, half, closed, index, evidence_path))
+
+    def supervise(native):
+        try:
+            supervise_original(native)
+        except Exception:
+            native.drain()
+            allowed = {'replacement_started', 'replacement_blocked', 'first_wire_seen', 'observed'}
+            proof['ai_consumer_checkpoints'] = [
+                event['event'] for event in native.events if event.get('event') in allowed
+            ]
+            native.log.flush()
+            raw = Path(native.log.name).read_text(errors='replace')
+            proof['ai_case_assertion_lines'] = sorted({
+                int(line) for line in re.findall(r'ai_native_origin_case[.]py:(\d+):', raw)
+            })
+            proof['ai_exception_types'] = sorted(set(re.findall(
+                r'^E[ \t]+(AssertionError|AttributeError|RuntimeError|TimeoutError|ValueError|ValidationError)\b',
+                raw, re.MULTILINE,
+            )))
+            raise
 
     try:
         admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', '2')

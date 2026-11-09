@@ -12,12 +12,13 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from qs_ai.bootstrap.transaction_messaging import TransactionAdmissionClosed, make_transaction_sender
 from qs_ai.bootstrap.transaction_protection import ProtocolProtectionError
+from qs_ai.config import MessagingOptions
 from qs_ai.infrastructure.persistence.mysql.native_limit import MySQLNativeLimits
 from qs_ai.infrastructure.persistence.mysql.transaction_schema import witness
 from qs_ai.infrastructure.workflow_transport.native_limit import parse_native_limit_evidence
 from tests.integration.rocketmq_state_host import (
     broker, host, keys, kit, original, requested, required_broker,
-    default_transport_settings, required_disposable_primary, setup_run,
+    required_disposable_primary, setup_run,
 )
 
 pytestmark = pytest.mark.integration
@@ -46,17 +47,19 @@ async def verify_reopen(broker, config, sessions, native, execution, after, bran
     routes.write_text(json.dumps({"version": 2, "routes": config["routes"]}))
     for path in (credentials, routes):
         path.chmod(0o600)
-    # The transaction factory only reads credentials, routes and CA. Key files
-    # are consumed by the separate host subscriber assembly already under test.
-    unused_keys = dict.fromkeys(("ai.sign", "qs.encrypt", "ai.encrypt", "qs.sign"), "unused")
-    settings = default_transport_settings(
-        broker.host.kit.dsn, broker.host.store.binding, config, unused_keys,
-        credentials, routes, paused=True,
+    binding = broker.host.store.binding
+    options = MessagingOptions(
+        provider="rocketmq", publish_enabled=False,
+        rocketmq=dict(endpoint=config["endpoint"], credentials_file=str(credentials),
+                      routes_file=str(routes), ca_file=config["ca_file"]),
+        transactions={"ai.mysql": dict(store_id=binding.store_id, writer_epoch=binding.writer_epoch,
+                                       route_revision="m3-1")},
     )
-    replacement = make_transaction_sender(settings.messaging, sessions)
+    replacement = make_transaction_sender(options, sessions)
     try:
         await receive("observe", timeout=350)
         await replacement.start()
+        emit("replacement_started")
         blocked = replacement.protection_stats()
         assert blocked["fresh"] and blocked["native_limit_active"]
         assert replacement._sender.stats()["ready"]
@@ -64,7 +67,9 @@ async def verify_reopen(broker, config, sessions, native, execution, after, bran
             replacement.set_admission(True)
         with pytest.raises(ProtocolProtectionError):
             replacement.review_protection(blocked["generation"], "fixture-before-resolution")
+        emit("replacement_blocked")
         await broker.complete()
+        emit("first_wire_seen")
         assert broker.messages == {branch.message.message_id: branch.wire_hash.hex()}
         await asyncio.wait_for(acknowledged.wait(), timeout=20)
         emit("observed", wire_sha256=branch.wire_hash.hex(), broker_ack=True)
