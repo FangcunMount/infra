@@ -231,3 +231,7 @@ AI 源码 `c6359b441de48fde5b295529fe9c10f50e4c53f5` 和 Python SDK 0.5.0 在 My
 ### 2026-11-10 F07 恢复工具稳定 SDK 候选
 
 隔离候选 `4e3453fe6a47cfc3c33388e8fe7325dbf8d69112` 固定正式 CLI 的 Go SDK v0.6.1、模块摘要和无 replace 约束，保留干净源码、二进制摘要、原屏障及独立审批检查。Go 普通测试 279 项通过，三个 Python 夹具测试组共 16 项通过。关联 worktree 的本地构建缺 VCS 元数据，CLI 按约束拒绝。独立干净检出的 Darwin/arm64 二进制 SHA256 `f5cde44a75dcc3916d5918afe016fed6a76ed3aff42dbb1b4747fa7a2f30a6c9`，实际 `version` 读回精确源码、稳定 SDK 和二进制摘要。受管恢复的提交、回滚、治理故障，以及 IAM 真实原主库路径已分别派发隔离 CI，正式执行镜像、Java helper 和生产封装仍待签收。[受管恢复](https://github.com/FangcunMount/infra/actions/runs/42668066330) · [IAM 原库恢复](https://github.com/FangcunMount/infra/actions/runs/42668066222)
+
+同一源码的 Linux/amd64 恢复 CLI SHA256 为 `1518f898404cc0cbc134801b6183f228e7b7e0adafb43562aceafd47a6ff40f5`。真实 Broker 的受管提交 14 项、回滚 15 项和治理故障 16 项均通过，零失败、零跳过。治理用例覆盖真实 MySQL COMMIT 前后丢回执，独立批准后仅解除精确通知，复验保留首次审计且拒绝重复消费。历史固定 IAM 宿主 `bee9c5c1a9945922dc4e88631af451babee646ca` 实际断开 Broker 网络时提交一次原 GORM 根，恢复 CLI 完成同库读回、实际 SDK 回查和指定治理解除，替换 owner 仍以暂停准入启动。该路径 15 项通过，业务、请求、执行、见证各一条保留。恢复路径的 Broker 参数、进程、容器和网络清理均通过。
+
+MySQL 8.0.36、8.0.44、8.4 三档原库夹具各通过 41 项，MongoDB 7.0.37 副本集通过 17 项。四份报告均零失败、零跳过，编译 CLI 原库预览与各自清理通过。34 份原件归档 338,793 字节，SHA256 `a6188259ba52dbe24b746bac40cdee9ceac94d0435dfcb0ba41d7bfbf814a401`，MacBook 与 ServerA 逐成员回读并完成持久化校验。源码已提交草稿审查，正式发布、生产执行封装、当前 QS 双存储和 AI 同根恢复仍待签收。[MySQL 原库](https://github.com/FangcunMount/infra/actions/runs/42668846743) · [Mongo 原库](https://github.com/FangcunMount/infra/actions/runs/42668846597) · [infra #427](https://github.com/FangcunMount/infra/pull/427)
