@@ -115,7 +115,11 @@ def parse_admission_receipt(output, junit):
     return parse_host_receipt(output, junit)
 
 
-def _base_acceptance_profile(kind):
+STABLE_NATIVE_AI_SOURCE = 'c6359b441de48fde5b295529fe9c10f50e4c53f5'
+STABLE_NATIVE_SDK_SHA256 = '6fe1fbf0635d3e2f8ba2f10c12474c39c939ee656f20df7784928f8bd92e88b8'
+
+
+def _base_acceptance_profile(kind, ai_source_sha):
     if kind == 'admission':
         return dict(name=kind, sdk_version='0.4.0a1', sdk_url=SDK_URL, sdk_sha256=None, file='rocketmq_admission_host.py', manifest=admission_manifest,
                     partial=read_partial_receipt, parse=parse_admission_receipt, tests=TESTS,
@@ -131,12 +135,15 @@ def _base_acceptance_profile(kind):
     if kind == 'native_limit':
         from ai_state_acceptance import CASES as STATE_CASES, TESTS as STATE_TESTS, FOCUS_CASES, state_manifest
         cases = STATE_CASES | NATIVE_LIMIT_CASES
-        return dict(name=kind, sdk_version='0.4.0a4', sdk_url=SDK_URL.replace('0.4.0a1', '0.4.0a4'),
-                    sdk_sha256='d2aa5fee9979dee43f9e5151026400bf730bf03ab29e7d0ba29536f3c6d4d471',
+        stable = ai_source_sha == STABLE_NATIVE_AI_SOURCE
+        sdk_version = '0.5.0' if stable else '0.4.0a4'
+        sdk_sha = STABLE_NATIVE_SDK_SHA256 if stable else 'd2aa5fee9979dee43f9e5151026400bf730bf03ab29e7d0ba29536f3c6d4d471'
+        return dict(name=kind, sdk_version=sdk_version, sdk_url=SDK_URL.replace('0.4.0a1', sdk_version),
+                    sdk_sha256=sdk_sha,
                     file='rocketmq_state_host.py', manifest=state_manifest,
                     focus_cases=FOCUS_CASES | NATIVE_LIMIT_CASES,
-                    partial=lambda output: read_host_receipt(output, marker='M3_AI_STATE_RECEIPT', cases=cases, sdk_version='0.4.0a4'),
-                    parse=lambda output, junit: parse_host_receipt(output, junit, marker='M3_AI_STATE_RECEIPT', cases=cases, tests=STATE_TESTS, sdk_version='0.4.0a4'),
+                    partial=lambda output: read_host_receipt(output, marker='M3_AI_STATE_RECEIPT', cases=cases, sdk_version=sdk_version),
+                    parse=lambda output, junit: parse_host_receipt(output, junit, marker='M3_AI_STATE_RECEIPT', cases=cases, tests=STATE_TESTS, sdk_version=sdk_version),
                     tests=STATE_TESTS,
                     scope='actual AI native SYS audit, original-primary durable deny, live/default DI and next configured-open owner; idle Checker readiness, no new callback/provider/system claim')
     if kind == 'protection':
@@ -165,8 +172,8 @@ def _base_acceptance_profile(kind):
     raise RuntimeError('explicit known AI acceptance profile required')
 
 
-def acceptance_profile(kind):
-    profile = _base_acceptance_profile(kind)
+def acceptance_profile(kind, ai_source_sha=None):
+    profile = _base_acceptance_profile(kind, ai_source_sha)
     mode = os.environ.get('QS_AI_READABLE_ROUTES', '0')
     if mode == '0':
         return profile
@@ -212,11 +219,11 @@ def validate_host_runtime(runtime, profile, python):
 
 
 def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, *, fault_tools=None, native_runner=None, proxy_start=None, broker_fault=None, read_parameters=None):
-    profile = acceptance_profile(os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission'))
     source = source.resolve()
     if not (source / 'pyproject.toml').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean AI host source required')
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
+    profile = acceptance_profile(os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission'), proof['source_sha'])
     proof['host_profile'] = profile['name']
     proof['lock_sha256'] = hashlib.sha256((source / 'uv.lock').read_bytes()).hexdigest()
     proof['locked_sdk_archive_sha256'] = validate_host_sdk_lock(tomllib.loads((source / 'uv.lock').read_text()), profile)
