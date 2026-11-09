@@ -76,3 +76,9 @@ ssh -o BatchMode=yes servera 'sudo -n docker exec -i --user 10001:10001 qs-ai /a
 ### 05:48 Broker 单轮缺口
 
 北京时间 05:35:45–06:05:45 的本机 Prometheus 复验中，九项各 121 点通过，Broker 抓取有 1 点失败。05:48:00 Broker 抓取耗时 10.003 秒并报 down，四个 owner 样本齐全。05:48:15 下一点恢复。ServerD 原 Broker 仍运行，启动时刻为 10 月 27 日，重启计数为 0。同期 ServerD Tailscale 日志未提供可归因的传输记录。此样本走独立 Broker 入口，应用网关和 Broker 两个缺口分别保留。查询、Broker 身份和日志摘要已纳入双地归档，SHA256 `b099b68c4748dd8c0361df275b77c4207cda8c916f05523432400a3c37cff6be`。
+
+### 06:12–06:13 应用与 Broker 同轮直读补件
+
+应用端沿用原脚本。另从 ServerD 本机运行 [Broker 直读脚本](../../scripts/monitoring/m5_window_broker_observe.py)，向原 5557 指标入口发固定 GET，核对唯一具名 Broker permission 样本。两轮分别在北京时间 06:12:53 和 06:13:08–09 发起，与应用轮次相差 0.437、0.486 秒。两轮三份 Worker 就绪和四个 owner 均通过，Broker 均为 HTTP 200 且报告预期值 6。原 Broker、六个 QS 实例和 AI 容器的完整身份前后相同。
+
+Broker 脚本 SHA256 为 `3de30551d6acaf4cb7824124dc55d6a0b37b455d19d50ae679c6d8016e312e96`，回执为 `15c88ac86679bebd85b9196d7583ce0f9269d8a54b49b5bfc6e46a83debc9c9f`。应用回执为 `e818d7fdd557cbdc67e94ea907698e85c54d9782540bb5f78522107234685749`。19 份原件归档 10,144 字节，SHA256 `690761e42b402af200097f927441014d72de999ef558b63a265ba9b573f6a823`，两地逐成员读回并完成持久化校验。Broker 回执只覆盖指标端点和本次观察，保留 `broker_pending_verified=false`。若独立审查采用本补件，临窗按相同端点、Broker 身份和两轮时间对应关系重采。W03 仍逐项签收在途 ACK 和持久待办。
