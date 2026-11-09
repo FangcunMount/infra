@@ -13,7 +13,7 @@ from managed_recovery_acceptance import accept as managed_accept
 from qs_runtime_acceptance import runtime_manifest,validate_module
 from recovery_fixture_store import MongoFixtureStore
 
-SOURCE='9301bf8044cd826aa9f34088e4b97899a12618d3'
+SOURCE='aa6d2f0bc897a587ca6317d3774e5ddfe3d5b238'
 
 
 def metadata(value):
