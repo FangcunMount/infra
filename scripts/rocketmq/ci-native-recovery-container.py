@@ -101,6 +101,7 @@ def fixture(image, source):
             material.mkdir(mode=0o700)
             code = directory / 'code'
             code.mkdir(mode=0o755)
+            code.chmod(0o755)  # The workflow has a private umask; UID 3000 must traverse only this code directory.
             for filename in (Path(__file__).name, 'native_recovery_container.py', 'cutover_step.py', 'start_boundary.py'):
                 dest = code / filename
                 shutil.copyfile(Path(__file__).with_name(filename), dest)
@@ -110,7 +111,10 @@ def fixture(image, source):
                 args = ['/usr/bin/sudo', '-n', '/usr/bin/setpriv', '--reuid=3000', '--regid=3000',
                         '--groups=' + str(daemon.st_gid), '/usr/bin/python3', str(code / Path(__file__).name),
                         '--worker', str(material), image, source, network, name]
-                proof = json.loads(run(args))
+                try:
+                    proof = json.loads(run(args))
+                except subprocess.CalledProcessError as error:
+                    raise RuntimeError('isolated worker failed: ' + error.stderr[-1200:].strip()) from None
                 cid = _digest(proof['container_id'])
                 container, = json.loads(run([*docker, 'container', 'inspect', cid]))
                 assert container['Image'] == image and container['Config']['User'] == '3000:3000'
