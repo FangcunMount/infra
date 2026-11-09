@@ -28,8 +28,8 @@ filippo.io/edwards25519 v1.1.0/go.mod h1:BxyFTGdWcka3PhytdK4V28tE5sGfRvvvRV7EaN4
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/FangcunMount/reliable-messaging v0.5.0-rocketmq-tx.4 h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=
-github.com/FangcunMount/reliable-messaging v0.5.0-rocketmq-tx.4/go.mod h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=
+github.com/FangcunMount/reliable-messaging v0.6.1 h1:mHj1tReMGHu979OuC/XhFAk13dxsgqTDygZs2WdqVwY=
+github.com/FangcunMount/reliable-messaging v0.6.1/go.mod h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 github.com/apache/rocketmq-clients/golang/v5 v5.1.4 h1:fGUbM4wpf3G/4UKxpQq7zg1h8eQdCpwcgxvChFJnr+I=
 github.com/apache/rocketmq-clients/golang/v5 v5.1.4/go.mod h1:qg/POLGOcuU33gPbi2yA6Ak4kTPydBBamrQU+bl0WMU=
