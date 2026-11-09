@@ -1,7 +1,10 @@
 import json
 import unittest
 
-from ai_admission_acceptance import CASES, TESTS, admission_manifest, parse_admission_receipt, read_partial_receipt
+from ai_admission_acceptance import (
+    CASES, TESTS, STABLE_NATIVE_AI_SOURCE, STABLE_NATIVE_SDK_SHA256, acceptance_profile,
+    admission_manifest, parse_admission_receipt, read_partial_receipt, validate_host_sdk_lock,
+)
 
 
 class AIAdmissionAcceptanceTests(unittest.TestCase):
@@ -17,6 +20,25 @@ class AIAdmissionAcceptanceTests(unittest.TestCase):
 
     def junit(self):
         return '<testsuites><testsuite>' + ''.join(f'<testcase name="{name}"/>' for name in sorted(TESTS)) + '</testsuite></testsuites>'
+
+    def test_native_stable_wheel_is_bound_to_exact_ai_source(self):
+        stable = acceptance_profile('native_limit', STABLE_NATIVE_AI_SOURCE)
+        historical = acceptance_profile('native_limit', 'a' * 40)
+        self.assertEqual(stable['sdk_version'], '0.5.0')
+        self.assertEqual(stable['sdk_sha256'], STABLE_NATIVE_SDK_SHA256)
+        self.assertEqual(historical['sdk_version'], '0.4.0a4')
+        self.assertEqual(stable['focus_cases'], historical['focus_cases'])
+        self.assertEqual(acceptance_profile('protection', STABLE_NATIVE_AI_SOURCE)['sdk_version'], '0.4.0a4')
+        wheel = {'url': stable['sdk_url'], 'hash': 'sha256:' + STABLE_NATIVE_SDK_SHA256}
+        locked = {'package': [{'name': 'fangcun-reliable-messaging', 'version': '0.5.0',
+                               'source': {'url': stable['sdk_url']}, 'wheels': [wheel]}]}
+        self.assertEqual(validate_host_sdk_lock(locked, stable), STABLE_NATIVE_SDK_SHA256)
+        for profile in (historical, acceptance_profile('protection', STABLE_NATIVE_AI_SOURCE)):
+            with self.assertRaises(RuntimeError):
+                validate_host_sdk_lock(locked, profile)
+        wheel['hash'] = 'sha256:' + '0' * 64
+        with self.assertRaises(RuntimeError):
+            validate_host_sdk_lock(locked, stable)
 
     def test_owner_scoped_manifest_preserves_all_three_distinct_roles(self):
         manifest = admission_manifest()

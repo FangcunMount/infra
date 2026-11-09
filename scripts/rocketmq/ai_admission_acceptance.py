@@ -115,7 +115,11 @@ def parse_admission_receipt(output, junit):
     return parse_host_receipt(output, junit)
 
 
-def _base_acceptance_profile(kind):
+STABLE_NATIVE_AI_SOURCE = 'c6359b441de48fde5b295529fe9c10f50e4c53f5'
+STABLE_NATIVE_SDK_SHA256 = '6fe1fbf0635d3e2f8ba2f10c12474c39c939ee656f20df7784928f8bd92e88b8'
+
+
+def _base_acceptance_profile(kind, ai_source_sha):
     if kind == 'admission':
         return dict(name=kind, sdk_version='0.4.0a1', sdk_url=SDK_URL, sdk_sha256=None, file='rocketmq_admission_host.py', manifest=admission_manifest,
                     partial=read_partial_receipt, parse=parse_admission_receipt, tests=TESTS,
@@ -131,12 +135,15 @@ def _base_acceptance_profile(kind):
     if kind == 'native_limit':
         from ai_state_acceptance import CASES as STATE_CASES, TESTS as STATE_TESTS, FOCUS_CASES, state_manifest
         cases = STATE_CASES | NATIVE_LIMIT_CASES
-        return dict(name=kind, sdk_version='0.4.0a4', sdk_url=SDK_URL.replace('0.4.0a1', '0.4.0a4'),
-                    sdk_sha256='d2aa5fee9979dee43f9e5151026400bf730bf03ab29e7d0ba29536f3c6d4d471',
+        stable = ai_source_sha == STABLE_NATIVE_AI_SOURCE
+        sdk_version = '0.5.0' if stable else '0.4.0a4'
+        sdk_sha = STABLE_NATIVE_SDK_SHA256 if stable else 'd2aa5fee9979dee43f9e5151026400bf730bf03ab29e7d0ba29536f3c6d4d471'
+        return dict(name=kind, sdk_version=sdk_version, sdk_url=SDK_URL.replace('0.4.0a1', sdk_version),
+                    sdk_sha256=sdk_sha,
                     file='rocketmq_state_host.py', manifest=state_manifest,
                     focus_cases=FOCUS_CASES | NATIVE_LIMIT_CASES,
-                    partial=lambda output: read_host_receipt(output, marker='M3_AI_STATE_RECEIPT', cases=cases, sdk_version='0.4.0a4'),
-                    parse=lambda output, junit: parse_host_receipt(output, junit, marker='M3_AI_STATE_RECEIPT', cases=cases, tests=STATE_TESTS, sdk_version='0.4.0a4'),
+                    partial=lambda output: read_host_receipt(output, marker='M3_AI_STATE_RECEIPT', cases=cases, sdk_version=sdk_version),
+                    parse=lambda output, junit: parse_host_receipt(output, junit, marker='M3_AI_STATE_RECEIPT', cases=cases, tests=STATE_TESTS, sdk_version=sdk_version),
                     tests=STATE_TESTS,
                     scope='actual AI native SYS audit, original-primary durable deny, live/default DI and next configured-open owner; idle Checker readiness, no new callback/provider/system claim')
     if kind == 'protection':
@@ -165,8 +172,8 @@ def _base_acceptance_profile(kind):
     raise RuntimeError('explicit known AI acceptance profile required')
 
 
-def acceptance_profile(kind):
-    profile = _base_acceptance_profile(kind)
+def acceptance_profile(kind, ai_source_sha=None):
+    profile = _base_acceptance_profile(kind, ai_source_sha)
     mode = os.environ.get('QS_AI_READABLE_ROUTES', '0')
     if mode == '0':
         return profile
@@ -212,11 +219,11 @@ def validate_host_runtime(runtime, profile, python):
 
 
 def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, *, fault_tools=None, native_runner=None, proxy_start=None, broker_fault=None, read_parameters=None):
-    profile = acceptance_profile(os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission'))
     source = source.resolve()
     if not (source / 'pyproject.toml').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean AI host source required')
     proof['source_sha'] = run(['git', 'rev-parse', 'HEAD'], cwd=source).stdout.strip()
+    profile = acceptance_profile(os.environ.get('QS_AI_ACCEPTANCE_KIND', 'admission'), proof['source_sha'])
     proof['host_profile'] = profile['name']
     proof['lock_sha256'] = hashlib.sha256((source / 'uv.lock').read_bytes()).hexdigest()
     proof['locked_sdk_archive_sha256'] = validate_host_sdk_lock(tomllib.loads((source / 'uv.lock').read_text()), profile)
@@ -233,7 +240,18 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
                 for role in manifest['accounts']}
     proof['provision'] = provision(broker, manifest, accounts)
     native_data = {}
-    if profile['name'] == 'native_limit':
+    native_origin = os.environ.get('QS_AI_NATIVE_ORIGIN') == 'true'
+    managed_binary = os.environ.get('QS_AI_NATIVE_RECOVERY_BIN')
+    if managed_binary and (not native_origin or not Path(managed_binary).is_absolute()
+                           or not os.access(managed_binary, os.X_OK)):
+        raise RuntimeError('managed recovery requires an exact executable in the owned origin fixture')
+    if native_origin:
+        if (profile['name'] != 'native_limit' or proof['source_sha'] != STABLE_NATIVE_AI_SOURCE
+                or read_parameters is None or native_runner is None):
+            raise RuntimeError('exact stable AI native origin fixture required')
+        evidence_path = directory / 'ai-native-origin-index.json'
+        native_data = dict(native_origin_evidence=str(evidence_path), native_origin_managed=bool(managed_binary))
+    elif profile['name'] == 'native_limit':
         if read_parameters is None or native_runner is None:
             raise RuntimeError('owned native limit supervisor and parameter parser required')
         from native_limit_acceptance import create_native_limit
@@ -278,6 +296,22 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     runtime = json.loads(info)
     validate_host_runtime(runtime, profile, python)
     proof['python_runtime'] = runtime
+    if native_origin:
+        from ai_native_origin_acceptance import run_origin
+        proof['original_native'] = {}
+        managed = None
+        if managed_binary:
+            route = next(row for row in manifest['routes'] if row['owner'] == 'ai.mysql')
+            managed = dict(binary=Path(managed_binary), schema=schema, manifest=manifest, route=route,
+                           account=accounts['ai'], grpc_port=grpc_port, mysql_port=mysql_port,
+                           password=password, ca=ca)
+        proof['native_receipt'] = run_origin(source, directory, broker, project, command, env, run,
+                                             native_runner, read_parameters, proof['original_native'],
+                                             evidence_path, managed=managed)
+        proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
+        if not proof['source_clean_after']:
+            raise RuntimeError('AI source changed during native origin acceptance')
+        return
     if profile['name'] == 'paired_faults':
         from paired_fault_acceptance import run_profile
         run_profile(source,directory,env,command,run,proof,native_runner,broker_fault)

@@ -28,6 +28,11 @@ import (
 // A working-tree string or an unversioned build must not claim a release SHA.
 var sourceSHA string
 
+const (
+	fixedSDKVersion = "v0.6.1"
+	fixedSDKSum     = "h1:mHj1tReMGHu979OuC/XhFAk13dxsgqTDygZs2WdqVwY="
+)
+
 var errCommand = errors.New("native recovery rejected or incomplete; inspect private evidence before any retry")
 
 func identity() ([32]byte, error) {
@@ -39,7 +44,7 @@ func identity() ([32]byte, error) {
 	fixed := false
 	for _, d := range info.Deps {
 		if d.Path == "github.com/FangcunMount/reliable-messaging" {
-			fixed = d.Version == "v0.5.0-rocketmq-tx.4" && d.Sum == "h1:PflI1oWRjU4RFKvpi8WE/8ICI/1IUp8q8EOsbW1DXCI=" && d.Replace == nil
+			fixed = d.Version == fixedSDKVersion && d.Sum == fixedSDKSum && d.Replace == nil
 		}
 	}
 	if !fixed {
@@ -110,7 +115,7 @@ func run(ctx context.Context, args []string, out, diagnostics io.Writer) error {
 		if err != nil {
 			return errCommand
 		}
-		return json.NewEncoder(out).Encode(map[string]any{"schema": "m3-native-recovery-build/v1", "source_sha": sourceSHA, "binary_sha256": hex.EncodeToString(sum[:]), "sdk_version": "v0.5.0-rocketmq-tx.4", "effectful_commands": true})
+		return json.NewEncoder(out).Encode(map[string]any{"schema": "m3-native-recovery-build/v1", "source_sha": sourceSHA, "binary_sha256": hex.EncodeToString(sum[:]), "sdk_version": fixedSDKVersion, "effectful_commands": true})
 	case "preview":
 		config, manifest, export, selection := fileFlags(f, "config"), fileFlags(f, "manifest"), fileFlags(f, "export"), fileFlags(f, "selection")
 		output := f.String("output", "", "new request file under an existing private 0700 directory")
