@@ -72,6 +72,10 @@ IAM #174 的 9 项检查通过，#175 精确源码 CI 的 7 项通过。隔离�
 
 同会话验证的报告、日志、源码增量 bundle 等 5 份原件归档为 8,553 字节，SHA256 `57ccf20d4e36b3aec424b31f3d1e78e4bbfcd95c03afb2ee9814cd614f2cc7e8`，两地逐成员读回并 fsync。
 
+IAM #176 精确候选 `315524293d16500a31536dd9325923700db45ead` 将同会话方案接入启动迁移入口。新空库在原锁下用一条 InnoDB `CREATE TABLE ... SELECT` 写入首个认领记录，保存实际库名与服务器 UUID。普通 `Run` 和 `RunTo` 拒绝越过未完成的认领，未认领已有版本沿原升级。阶段 31 与原事务共同记录进度，33 和 35 复用原回执。RocketMQ 事务启动的禁用 DDL 策略和已发布 SQL 字节保留。当前候选仍使用原通知写入路径。[IAM #176](https://github.com/FangcunMount/iam/pull/176) · [MySQL 原子 DDL 说明](https://dev.mysql.com/doc/refman/8.0/en/atomic-ddl.html)
+
+MySQL 8.4.13 与 8.0.36 各通过九个进程迁移入口用例。覆盖首次认领后和 31、33、35 钩子前后的七个中断点，拒绝错位服务器身份和普通迁移跳过，另实测阶段 35 提交后真断连及未认领已有库升级。续跑至 clean 45 后原通知 ID 和正文摘要保持一致。五个定向 Go 包和文档事实检查通过。原件含源码 bundle，共 16 份，归档 22,246 字节，SHA256 `e44213e830e147d127db5c5a82943ecfe4cfe6c8fdc5a8eaee963b4701536dce`，两地逐成员读回并 fsync。完整 Broker 投递与授权通知验收继续独立推进。
+
 F07 原工作流处于禁用状态。隔离分支以 `a5cc2c9` 为固定历史夹具，首轮 checkout 缺少比较所需 Git 对象，在夹具启动前失败。补齐后原生复现为 **22 通过、1 失败、0 跳过**，两种原存储已实际完成恢复，原生清理检查通过。末项失败位于历史 QS `9301bf8` 的 `owner_runtime_native_integration_test.go:735`。夹具以暂停准入启动替换 owner，断言却要求 `Stats.Ready=true`，而固定源码把该字段与写入准入取交集。历史报告和日志已两地保全，归档 SHA256 `b2f09de5c38a6fc8d2d056d192436267e8e11ff8bd61dac92101495b6bfe2385`。[F07 失败复现](https://github.com/FangcunMount/infra/actions/runs/42628757978)
 
 历史 QS 夹具 `aa6d2f0` 只修改该断言。第二轮宿主子测试正常退出，7 项通过，0 失败、0 跳过、0 race 报告。两种原存储均记录具名解除和一次实际 SDK 提交确认，业务、请求、执行和见证各保留 1 条。暂停替换 owner 正常排空。整轮仍为 **22 通过、1 失败、0 跳过**，未签发独立清理复核结果。报告、运行元数据、日志 ZIP 和保全脚本在两地逐成员读回并 fsync，归档 56,834 字节，SHA256 `93e52c00471c652dbfcc4e79bdf91f86e5343e2beeb7129747c35d064cbaf59b`。[F07 第二轮原生报告](https://github.com/FangcunMount/infra/actions/runs/42631372602)
