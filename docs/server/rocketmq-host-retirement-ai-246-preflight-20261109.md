@@ -36,7 +36,11 @@
 
 [集中采集诊断与固定直读方案](rocketmq-host-retirement-ai-246-observability-20261109.md)记录后续双向握手证据、具名端点实跑及独立签收栏。
 
-F02 已补两份源码草稿。QS 在同一个有界只读查询中单独报告观测到的事务锚点缺失或冲突数量，原业务回执阻断语义保留。MySQL 8.4.13 隔离用例实际覆盖完整锚点、缺档案、见证冲突及后续查询失败。对应面板以独立时序展示计数，缺样保持为空。上线需分别签收和受控发布，51 条私有历史分类继续待数据责任人签收。[QS #480](https://github.com/FangcunMount/qs-server/pull/480) · [infra #426](https://github.com/FangcunMount/infra/pull/426)
+追加复验覆盖 ServerA/B/D 的实际 `deploy` 账户与同一固定清理器。A 的四条授权、B 的单条授权精确匹配，交叉服务和任意 Python 的列权检查均拒绝。D 的 Worker 专用规则存在，同时另有 `NOPASSWD: ALL`，有效权限仍允许交叉服务和任意 Python。B/D 以实际账户仅执行预览，候选分别为 0 和 1，运行及停止容器引用均在保留集，前后镜像、容器、卷、部署锁和清理状态文件相同。D 的账户收口和候选处置资格须单独审查。集中采集与清理器复验共 26 份原件，归档 17,391 字节，SHA256 `76a952c4da2860e3f0f4ff7c0896875692c3a94087afe089bef5a4ecc714859f`，MacBook 与 ServerA 逐成员读回并 fsync。
+
+M1 复验发现 `make check-infra` 仍经历史 `all` 检查访问 NSQ，导致无 NSQ 的 `make run-all` 和 `make quick-start` 在进程启动前失败。QS 草稿 `2ecee7169` 将标准入口指向 MySQL、Redis、MongoDB 数据预检，保留显式历史探测。定向回归覆盖缺 NSQ、三种数据依赖拒绝和历史入口，文档门禁已通过。完整开发启动还需在隔离环境验证 Proxy、TLS、路由、owner、真实进程和业务链路。[QS #481](https://github.com/FangcunMount/qs-server/pull/481)
+
+F02 已补两份源码草稿。QS 在同一个有界只读查询中单独报告观测到的事务锚点缺失或冲突数量，原业务回执阻断语义保留。MySQL 8.4.13 隔离用例实际覆盖完整锚点、缺档案、见证冲突及后续查询失败。对应面板以独立时序展示计数，缺样保持为空。QS 草稿精确提交 `f4706861ccf56d9b53c68559ce052586f1e11b0d` 共 29 项检查成功、1 项按条件跳过，含当前运行时 E2E。上线需分别签收和受控发布，51 条私有历史分类继续待数据责任人签收。[QS #480](https://github.com/FangcunMount/qs-server/pull/480) · [infra #426](https://github.com/FangcunMount/infra/pull/426)
 
 F05 在 IAM `7cd2b02` 的空 MySQL 8.4.13 隔离库实际通过完整迁移与 bootstrap 测试。最终 clean 45，`domain_event_outbox` 有两条 `iam.authz.version_changed.v2` pending，`rm_outbox` 为 0。下一批先为全新库的两个授权版本通知补持久替代路径及可验证通知效果，再替换当前 handoff 和 readiness 的旧表读取。升级、历史审计与其他对象的依赖仍分别验证。F06 热榜、答卷缺口、原效果、MySQL 和 Mongo 调度交接五个包的定向测试通过，作为替代路径的改动基线。
 
