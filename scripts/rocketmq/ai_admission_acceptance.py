@@ -240,7 +240,14 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
                 for role in manifest['accounts']}
     proof['provision'] = provision(broker, manifest, accounts)
     native_data = {}
-    if profile['name'] == 'native_limit':
+    native_origin = os.environ.get('QS_AI_NATIVE_ORIGIN') == 'true'
+    if native_origin:
+        if (profile['name'] != 'native_limit' or proof['source_sha'] != STABLE_NATIVE_AI_SOURCE
+                or read_parameters is None or native_runner is None):
+            raise RuntimeError('exact stable AI native origin fixture required')
+        evidence_path = directory / 'ai-native-origin-index.json'
+        native_data = dict(native_origin_evidence=str(evidence_path))
+    elif profile['name'] == 'native_limit':
         if read_parameters is None or native_runner is None:
             raise RuntimeError('owned native limit supervisor and parameter parser required')
         from native_limit_acceptance import create_native_limit
@@ -285,6 +292,15 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
     runtime = json.loads(info)
     validate_host_runtime(runtime, profile, python)
     proof['python_runtime'] = runtime
+    if native_origin:
+        from ai_native_origin_acceptance import run_origin
+        proof['original_native'] = {}
+        proof['native_receipt'] = run_origin(source, directory, broker, project, command, env, run,
+                                             native_runner, read_parameters, proof['original_native'], evidence_path)
+        proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
+        if not proof['source_clean_after']:
+            raise RuntimeError('AI source changed during native origin acceptance')
+        return
     if profile['name'] == 'paired_faults':
         from paired_fault_acceptance import run_profile
         run_profile(source,directory,env,command,run,proof,native_runner,broker_fault)
