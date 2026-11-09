@@ -28,6 +28,7 @@ def review(grants, roles, partial_revokes):
     read=scopes.get('*.*',set())|scopes.get('ai.*',set())
     requirements=dict(read_all_ai='SELECT' in read or 'ALL PRIVILEGES' in read,
                       drop_target_capability=allowed('DROP','messaging_outbox'),
+                      lock_target_capability='LOCK TABLES' in read or 'ALL PRIVILEGES' in read,
                       update_ledger_capability=allowed('UPDATE','alembic_version'))
     other=[s for s in scopes if s not in {'*.*','ai.*'} and not s.startswith('ai.')]
     return dict(schema='ai-execution-account-capability/v1',complete=True,capabilities=requirements,

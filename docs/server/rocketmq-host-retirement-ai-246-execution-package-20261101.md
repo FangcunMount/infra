@@ -6,6 +6,8 @@
 
 ## 最新补充：实际全备恢复与执行账户已完成技术审查
 
+2026-11-09 的[入窗复验](rocketmq-host-retirement-ai-246-preflight-20261109.md)补齐当前库版本、运行身份、实际账户、制品与隔离串联证据。当前 Worker 显式就绪及四 owner 采集仍待复验，生产窗口维持 No-Go。
+
 [备份/账户资格说明](rocketmq-host-retirement-ai-backup-account-qualification-20261101.md)及[真实全备恢复回执](../evidence/2026-11-01-ai246-real-backup-restore-qualification.json)、[实际执行账户回执](../evidence/2026-11-01-ai246-execution-account-review.json)、[云PITR范围记录](../evidence/2026-11-01-ai246-cloud-pitr-review.json)为本轮当前结论。
 
 AI当前全库51表/404列元数据/8,503行（含原ledger29字节；49保留表8,502行），91,768,335原字段字节已一致只读导出。26,704,524字节归档SHA `58a8625f5a56ff5607388766851ce2a546fdb4f21b410abda4d46680ebe9eae4`，在无网络、无生产连接配置的新MySQL8.0.36中实际恢复；完整表定义、原列元数据和全部字段指纹相同，新连接复验再次通过。备份体只保存在MacBook/ServerA私有目录，未上传GitHub或CI。

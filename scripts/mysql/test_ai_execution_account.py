@@ -12,6 +12,12 @@ class AccountReview(unittest.TestCase):
  def test_table_only_select_is_not_full_schema_read(self):
   r=m.review(['GRANT SELECT, DROP ON `ai`.`messaging_outbox` TO `u`@`%`','GRANT UPDATE ON `ai`.`alembic_version` TO `u`@`%`'],'NONE',0)
   self.assertFalse(r['capabilities']['read_all_ai'])
+ def test_migration_account_requires_lock_tables_as_well_as_drop(self):
+  grants=['GRANT SELECT ON `ai`.* TO `u`@`%`','GRANT DROP ON `ai`.`messaging_outbox` TO `u`@`%`',
+          'GRANT UPDATE ON `ai`.`alembic_version` TO `u`@`%`']
+  self.assertFalse(m.review(grants,'NONE',0)['required_capabilities_present'])
+  grants.append('GRANT LOCK TABLES ON `ai`.* TO `u`@`%`')
+  self.assertTrue(m.review(grants,'NONE',0)['required_capabilities_present'])
  def test_roles_partial_revokes_and_unknown_shapes_refused(self):
   for roles,revokes,grants in [('r',0,['GRANT ALL PRIVILEGES ON `ai`.* TO `u`@`%`']),('NONE',1,['GRANT ALL PRIVILEGES ON `ai`.* TO `u`@`%`']),('NONE',0,['REVOKE DROP ON `ai`.* FROM `u`@`%`'])]:
    with self.assertRaises(ValueError):m.review(grants,roles,revokes)
