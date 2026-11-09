@@ -167,3 +167,11 @@ QS MySQL #482 精确提交 `26f288d9f114a6ba188d4281418d76f963b3d91b` 的四个 
 同一个 CLI 制品 SHA256 为 `83806e1061f54a99ab7be9855ac929cc5b17767498c4652e65eac0c473556f52`。MySQL 8.0.36、8.4.13 各通过 3 项，MongoDB 7.0.37 副本集通过 23 项，含原现库盘点、原交接与重试、两种显式存档读取和原物理对象缺席时拒绝。文档门禁与定向 lint 通过。生产账号、实际存档和物理退役仍按对象分别审查。Mongo 治理与重放仍待收口。
 
 同批 W00 集中采集和两轮直读均通过，六个 QS 实例及原 AI 容器身份与前次一致。34 份原件和源码增量 bundle 共 29,939 字节，归档 SHA256 `28878993beb42139b1e4d2fc222cbb8f3afdb34e0d2e11400ca6a2665caf3aee`，MacBook 与 ServerA 逐成员回读并完成持久化校验。实际窗口、账户权限接受和独立执行批准仍待签收。
+
+### 2026-11-10 F06 解释重试历史审计与原效果读取
+
+QS #484 精确提交 `8a58d096409e5a6a74591d58bc5e67d0b5bb39a4` 接入解释重试的审计和恢复 inspect。原集合在场时仍读取原集合，缺一行仍作为缺证据。只在原集合缺席时使用固定存档，并前后核对 UUID。审计要求存档具有以 `message_id` 开头的索引。恢复 inspect 在同一快照核对 Run、Generation、后继缺席、原 BSON 身份、报文、指纹及发布确认。历史 NSQ apply 始终要求物理原集合，只有存档时在写入恢复日志前拒绝。[QS #484](https://github.com/FangcunMount/qs-server/pull/484) · [精确提交 CI](https://github.com/FangcunMount/qs-server/actions/runs/42660636437)
+
+MongoDB 7.0.37 副本集 3 个原生用例通过，验证存档前后分类、原报文和恢复指纹一致，以及原集合缺行、无存档索引、存档篡改和两源缺失的拒绝。普通 Go 测试、文档事实门禁、定向 lint 和三个生产入口依赖图通过。8 份原件及增量 bundle 共 24,292 字节，SHA256 `c62d0662f0ee018ad38fbbc59c29f23f84823d85728554ca3bec5a5ce7c64412`，MacBook 与 ServerA 逐成员读回并完成持久化校验。
+
+实际生产三个命令的依赖图不含旧 Mongo `standardoutbox` 治理与重放包，生产子系统的 `Outboxes()` 返回空。生产解释事务仍含历史 v1 future intent 的 Outbox append 分支。当前失败构造器生成 v2；成功构造器无 future intent；执行分支仍要求取得 reservation，且冻结 artifact 与当前输入逐字节一致。剩余门槛是按实际 owner 状态核对旧冻结计划，覆盖已提交、未决、回滚及重启的真实根验证，再审查该历史写分支退役。原冻结计划、SDK 凭证、历史报文、ACK、调度和 Broker 待办继续保留。
