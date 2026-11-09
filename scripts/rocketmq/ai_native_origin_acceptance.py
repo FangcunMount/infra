@@ -55,8 +55,10 @@ def run_managed(managed, directory, broker, project, run, native, proof,
            passed=lambda name: cases.update({name: True}), proof=proof, original=original)
     proof['stage'] = 'named_ai_reopen'
     native.send('verify')
-    if native.wait('reopened', timeout=60) != {'event': 'reopened', 'original_wire_preserved': True, 'no_new_half': True}:
+    reopened = native.wait('reopened', timeout=60)
+    if reopened != {'event': 'reopened', 'original_wire_preserved': True, 'no_new_half': True}:
         raise RuntimeError('named original AI owner reopening proof required')
+    proof['ai_reopen'] = dict(named=True, same_wire=True, broker_ack=True, no_new_half=True)
     cases['named_ai_reopen_keeps_first_witness_and_sends_no_new_half'] = True
     return cases
 
@@ -160,8 +162,9 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
                                 prefix='AI_NATIVE_ORIGIN ', supervise=supervise)
         if result.returncode or not junit.is_file():
             raise RuntimeError('isolated original AI host acceptance failed')
-        cases = ElementTree.parse(junit).findall('.//testcase')
-        if len(cases) != 1 or cases[0].get('name') != 'test_original_ai_root_reaches_native_limit' or any(cases[0].find(tag) is not None for tag in ('failure', 'error', 'skipped')):
+        test_cases = ElementTree.parse(junit).findall('.//testcase')
+        if (len(test_cases) != 1 or test_cases[0].get('name') != 'test_original_ai_root_reaches_native_limit'
+                or any(test_cases[0].find(tag) is not None for tag in ('failure', 'error', 'skipped'))):
             raise RuntimeError('one actual AI original case must pass without skip')
     finally:
         admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', str(before['transactionCheckMax']))
