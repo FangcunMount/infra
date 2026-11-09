@@ -48,9 +48,16 @@ class NativeRecoveryContainerTest(unittest.TestCase):
         path.chmod(0o600)
         return hashlib.sha256(path.read_bytes()).hexdigest()
 
-    def run_container(self, step_sha=None):
-        runner.run_container(self.fd, self.plan, self.operation, self.inputs, self.java,
+    def run_container(self, step_sha=None, plan=None):
+        runner.run_container(self.fd, plan or self.plan, self.operation, self.inputs, self.java,
                              step_sha or self.step_sha, ['recover'], (), time.monotonic() + 230)
+
+    def terminal(self, step_sha, cid, code):
+        return dict(Id=cid, Name='/native-container-' + step_sha, Image=self.plan['image_id'], RestartCount=0,
+                    Config={'Labels': {'native.recovery.step': step_sha}},
+                    NetworkSettings={'Networks': {'fixture': {'NetworkID': self.plan['network_id']}}},
+                    State=dict(Status='exited', Running=False, ExitCode=code, OOMKilled=False,
+                               StartedAt='2026-01-01T00:00:00Z', FinishedAt='2026-01-01T00:00:01Z'))
 
     def test_plan_builds_only_fixed_command_and_mounts(self):
         directory, material, java, step_sha, cli = runner.arguments(self.plan, self.env)
@@ -96,6 +103,8 @@ class NativeRecoveryContainerTest(unittest.TestCase):
         self.assertIn(self.operation / 'state.json', protected)
         with self.assertRaises(BoundaryError):
             runner.require_issued(self.fd, self.plan | {'step': 'different'}, self.operation, step_sha)
+        with self.assertRaises(BoundaryError):
+            runner.require_issued(self.fd, self.plan | {'prior_terminal': {}}, self.operation, step_sha)
 
     def test_timeout_retains_identity_and_refuses_a_second_launch(self):
         with patch.object(runner, 'docker', side_effect=[self.cid, '', subprocess.TimeoutExpired('wait', 1)]) as daemon:
@@ -103,7 +112,7 @@ class NativeRecoveryContainerTest(unittest.TestCase):
                 self.run_container()
             self.assertEqual(daemon.call_args_list[1].args[0], ['start', self.cid])
             with self.assertRaisesRegex(BoundaryError, 'exit is unknown'):
-                self.run_container('6' * 64)
+                self.run_container('6' * 64, self.plan | {'inputs': self.plan['inputs'] | {'request': '7' * 64}})
             self.assertEqual(daemon.call_count, 3)
         prefix = self.operation / ('native-container-' + self.step_sha)
         self.assertEqual(json.loads(prefix.with_name(prefix.name + '-created.json').read_bytes()), {'container_id': self.cid})
@@ -119,8 +128,7 @@ class NativeRecoveryContainerTest(unittest.TestCase):
 
     def test_success_requires_inspected_terminal_identity_and_no_retry(self):
         name = 'native-container-' + self.step_sha
-        terminal = dict(Id=self.cid, Name='/' + name, Image=self.plan['image_id'], RestartCount=0,
-                        State=dict(Status='exited', Running=False, ExitCode=0, OOMKilled=False))
+        terminal = self.terminal(self.step_sha, self.cid, 0)
         with patch.object(runner, 'docker', side_effect=[self.cid, '', '0', json.dumps([terminal])]) as daemon:
             self.run_container()
             self.assertEqual(daemon.call_args_list[-1].args[0], ['container', 'inspect', self.cid])
@@ -128,4 +136,48 @@ class NativeRecoveryContainerTest(unittest.TestCase):
                 self.run_container()
             self.assertEqual(daemon.call_count, 4)
         result = json.loads((self.operation / (name + '-exit.json')).read_bytes())
-        self.assertEqual(result, dict(container_id=self.cid, exit_code=0, oom_killed=False))
+        self.assertEqual(result, dict(container_id=self.cid, exit_code=0, oom_killed=False,
+                                      started_at=terminal['State']['StartedAt'], finished_at=terminal['State']['FinishedAt']))
+
+    def test_unknown_exit_handoff_requires_new_request_and_independent_observation(self):
+        with patch.object(runner, 'docker', side_effect=[self.cid, '', subprocess.TimeoutExpired('wait', 1)]):
+            with self.assertRaises(subprocess.TimeoutExpired):
+                self.run_container()
+        old_name = 'native-container-' + self.step_sha
+        previous = json.dumps([self.terminal(self.step_sha, self.cid, 124)])
+        paths_before = sorted(self.operation.iterdir())
+        with patch.object(runner, 'docker', return_value=previous):
+            observation = runner.terminal_observation(self.fd, old_name)
+        self.assertEqual(sorted(self.operation.iterdir()), paths_before)
+        self.assertFalse(observation['execution_authorized'])
+        approval = {'step_plan_sha256': self.step_sha,
+                    'observation_sha256': hashlib.sha256(_encoded(observation)).hexdigest()}
+        new_step, new_cid = '6' * 64, '8' * 64
+        new_plan = self.plan | {'prior_terminal': approval}
+        with patch.object(runner, 'docker') as daemon:
+            with self.assertRaisesRegex(BoundaryError, 'new request'):
+                self.run_container(new_step, new_plan)
+            daemon.assert_not_called()
+        new_plan['inputs'] = self.plan['inputs'] | {'request': '7' * 64}
+        with patch.object(runner, 'docker', return_value=previous):
+            with self.assertRaisesRegex(BoundaryError, 'observation differs'):
+                self.run_container(new_step, new_plan | {'prior_terminal': approval | {'observation_sha256': '0' * 64}})
+        next_exit = json.dumps([self.terminal(new_step, new_cid, 0)])
+        with patch.object(runner, 'docker', side_effect=[previous, new_cid, '', '0', next_exit]):
+            self.run_container(new_step, new_plan)
+        self.assertFalse((self.operation / (old_name + '-exit.json')).exists())
+        self.assertEqual(json.loads((self.operation / (old_name + '-reconciled.json')).read_bytes()),
+                         {'terminal': observation['terminal'], 'observation_sha256': approval['observation_sha256'],
+                          'reviewed_by_step_plan_sha256': new_step})
+
+    def test_prior_observation_refuses_running_or_mismatched_container(self):
+        name = 'native-container-' + self.step_sha
+        for changed in (
+                {'Id': '6' * 64},
+                {'Config': {'Labels': {'native.recovery.step': '7' * 64}}},
+                {'NetworkSettings': {'Networks': {'wrong': {'NetworkID': '8' * 64}}}},
+                {'State': {'Status': 'running', 'Running': True}}):
+            with self.subTest(changed=changed), patch.object(runner, 'docker', return_value=json.dumps([
+                    self.terminal(self.step_sha, self.cid, 0) | changed])):
+                with self.assertRaisesRegex(BoundaryError, 'terminal state unknown'):
+                    runner.inspect_exit(self.cid, name, self.plan['image_id'], self.plan['network_id'])

@@ -28,4 +28,6 @@ M3 首发遇到原生超限：原库持久封对应 owner 新写、保留 Checke
 
 [容器入口草稿](../../scripts/rocketmq/native_recovery_container.py) 由 Linux 协调器的受审脚本调用，接收独立摘要绑定的 `m3-native-recovery-container/v1` 私有计划。计划固定操作目录、宿主、镜像 ID、镜像源码、专用网络 ID 和名称、协调绑定、步骤、唯一命令和逐件输入摘要。只接受 `recover`、`resolve-notice` 和 `verify-resolution`。默认仅核对计划和文件，实际发出容器还要求 `--execute`、UID/GID 3000、同机活动锁和原受审步骤。CLI 继续核验独立批准与原库和 Broker 身份。
 
-固定输入目录为操作目录的同级 `inputs`，内含五份私有 JSON 文件及 `java/tools.yml`、`java/tls/server.crt`。协调目录保留原 inode 和回执写入，协调权威文件与既有恢复回执单独只读挂载。容器内时限为 195 秒，随后最多给出 12 秒退出宽限。启动前记录步骤和容器 ID，只有 Docker 实读退出状态才记录终态。等待或创建结果未知时保持阻断，后续独立核对须使用已发出记录、完整容器身份和原库／RPC 事实。具名网络出口限制、异常后终态签收交接及同封装真实恢复仍待验证。
+固定输入目录为操作目录的同级 `inputs`，内含五份私有 JSON 文件及 `java/tools.yml`、`java/tls/server.crt`。协调目录保留原 inode 和回执写入，协调权威文件与既有恢复回执单独只读挂载。容器内时限为 195 秒，随后最多给出 12 秒退出宽限。启动前记录步骤和容器 ID，只有 Docker 实读退出状态才记录终态。
+
+等待或创建结果未知时，先用 `--observe-prior <原步骤计划 SHA256>` 在原 Linux 宿主和绑定目录生成只读观察。保存其标准输出原字节及摘要，核对完整容器 ID、镜像、步骤标签、网络、实际起止与退出状态，再独立核对 SDK、原库与 Broker 事实。容器仍在运行、查不到或身份不符时继续阻断。新的具名前向步骤可在计划中加入 `prior_terminal`，绑定 `step_plan_sha256` 和 `observation_sha256`。入口在活动锁内重新读取终态并比对摘要，将交接记入 `-reconciled.json`，保留原已发出记录。任何新 `recover` 都要使用未发出过的请求，具名解除仍绑定原恢复回执。实际 Linux 协调器、具名网络出口限制和同封装真实恢复仍待验证。
