@@ -25,3 +25,7 @@ M3 首发遇到原生超限：原库持久封对应 owner 新写、保留 Checke
 | 双阶段 | 恢复和具名解除分别要求当前独立批准。用原报文、审计、未选通知、进程退场和两地回执签收。新通知及未知结果继续保持原准入状态。 |
 
 公开 SDK 复验 [42689506222](https://github.com/FangcunMount/infra/actions/runs/42689506222) 曾在 Go 订阅关闭后读到 POP 责任重新出现。补存第二次确认的 offset buffer、checkpoint buffer、定时责任和样本摘要，保留原失败条件。此用例独立于受管恢复正向结果。
+
+[容器入口草稿](../../scripts/rocketmq/native_recovery_container.py) 由 Linux 协调器的受审脚本调用，接收独立摘要绑定的 `m3-native-recovery-container/v1` 私有计划。计划固定操作目录、宿主、镜像 ID、镜像源码、专用网络 ID 和名称、协调绑定、步骤、唯一命令和逐件输入摘要。只接受 `recover`、`resolve-notice` 和 `verify-resolution`。默认仅核对计划和文件，实际发出容器还要求 `--execute`、UID/GID 3000、同机活动锁和原受审步骤。CLI 继续核验独立批准与原库和 Broker 身份。
+
+固定输入目录为操作目录的同级 `inputs`，内含五份私有 JSON 文件及 `java/tools.yml`、`java/tls/server.crt`。协调目录保留原 inode 和回执写入，协调权威文件与既有恢复回执单独只读挂载。容器内时限为 195 秒，随后最多给出 12 秒退出宽限。启动前记录步骤和容器 ID，只有 Docker 实读退出状态才记录终态。等待或创建结果未知时保持阻断，后续独立核对须使用已发出记录、完整容器身份和原库／RPC 事实。具名网络出口限制、异常后终态签收交接及同封装真实恢复仍待验证。
