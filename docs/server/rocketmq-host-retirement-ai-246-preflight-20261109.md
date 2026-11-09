@@ -159,3 +159,11 @@ QS #483 的 `66c7f9d40c2bd5fda546f96aad5b5fc9778b1278` 新增 Mongo `--inventory
 QS MySQL #482 精确提交 `26f288d9f114a6ba188d4281418d76f963b3d91b` 的四个 PR 工作流均成功，检查共 29 项通过、1 项按条件跳过。主 CI 日志 ZIP 完整性通过。[QS #482](https://github.com/FangcunMount/qs-server/pull/482) · [主 CI](https://github.com/FangcunMount/qs-server/actions/runs/42656173725)
 
 本批 25 份 Mongo 调度、MySQL CI 及 W00 原件含增量 bundle，归档 1,717,496 字节，SHA256 `95721248100cb70b7a5dbd22c918050d84cfe262ed772dd74a332fc1fc056958`，MacBook 和 ServerA 逐成员读回并完成持久化校验。
+
+### 2026-11-10 F06 两种存档盘点联合验证
+
+联合草稿 QS #484 精确提交 `934b02472f0d445f184a95eb54a6050e0f580f9c` 处理了 #482 与 #483 在共享命令上的合并冲突。仍按原 owner 选择 MySQL 固定视图或 Mongo 固定集合，保持各自回执 schema。普通现库盘点要求对应物理对象。存档回执保持 `cutover_authorized=false`。分对象草稿和签收边界保留。[联合草稿 #484](https://github.com/FangcunMount/qs-server/pull/484)
+
+同一个 CLI 制品 SHA256 为 `83806e1061f54a99ab7be9855ac929cc5b17767498c4652e65eac0c473556f52`。MySQL 8.0.36、8.4.13 各通过 3 项，MongoDB 7.0.37 副本集通过 23 项，含原现库盘点、原交接与重试、两种显式存档读取和原物理对象缺席时拒绝。文档门禁与定向 lint 通过。生产账号、实际存档和物理退役仍按对象分别审查。Mongo 治理与重放仍待收口。
+
+同批 W00 集中采集和两轮直读均通过，六个 QS 实例及原 AI 容器身份与前次一致。34 份原件和源码增量 bundle 共 29,939 字节，归档 SHA256 `28878993beb42139b1e4d2fc222cbb8f3afdb34e0d2e11400ca6a2665caf3aee`，MacBook 与 ServerA 逐成员回读并完成持久化校验。实际窗口、账户权限接受和独立执行批准仍待签收。
