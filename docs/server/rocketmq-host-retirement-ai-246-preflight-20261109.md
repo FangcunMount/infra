@@ -149,3 +149,13 @@ QS #483 草稿精确提交 `5b1d720b546c6dce16976426afc1d7cbef2c604e`。v1 答�
 相同最终提交在自有 MongoDB 7.0.37 副本集和 MySQL 8.4.13 通过 22 个定向用例。隔离复制后以改名保留原集合，验证 v1 原报文和冻结证据、混合日完整摘要、反向 BSON 分页和孤儿冲突均一致。原集合在场时缺行不补读，存档缺行、报文篡改、集合同名 UUID 变化和原集合重新出现时拒绝。定向 lint 与文档门禁通过。两轮原件和增量 bundle 共 11 份，归档 28,670 字节，SHA256 `39683162a52fb7f67ec44a3ba41394a4c5b67328bbe0e79a4ef020d0d9292618`，MacBook 和 ServerA 逐成员读回并完成持久化校验。
 
 Mongo 生产存档仍需独立核对原 BSON 身份、报文字节、发布确认和现库两地保护。实际账号需复验数据库级 `listCollections` 及集合读权限。写者排除、治理重放、调度交接及物理集合退役另审。AI 发布冻结和 W00/W06 签收门槛继续生效。
+
+### 2026-11-10 F06 Mongo 调度存档盘点与 MySQL CI
+
+QS #483 的 `66c7f9d40c2bd5fda546f96aad5b5fc9778b1278` 新增 Mongo `--inventory --history`。使用固定存档、独立回执和 `cutover_authorized=false`。主节点在快照前后校验存档 UUID，同一快照核对原复合 BSON 身份、消息和目标冻结计划。未选择的 held 仍计为未核验。原物理集合缺席时普通盘点拒绝，存档存在时也不会借用；存档缺席时历史盘点同样拒绝。原写入、重放和调度交接保持原入口。[QS #483](https://github.com/FangcunMount/qs-server/pull/483) · [新提交 CI](https://github.com/FangcunMount/qs-server/actions/runs/42658884432)
+
+隔离 MongoDB 7.0.37 副本集及 MySQL 8.4.13 的 23 个定向用例通过。实际编译的维护 CLI SHA256 为 `1827ce3e0aec4408e4a3ee1603ea66cdccb6f0a16ac1284db9ddc672379f9525`。原集合在场和暂时改名两种情况下，真实命令均能按显式存档核对已审核的 held 计划，保留原 BSON 字节；伪造 held 标记或替换复合 BSON 身份时拒绝。文档门禁、定向 lint 及普通 Go 测试通过。现库实读、实际账号权限、生产存档和治理／重放仍待验。#482 与 #483 的共享 CLI 在合并预演中存在冲突，联合源码还需同时验证两种存档模式和原命令。
+
+QS MySQL #482 精确提交 `26f288d9f114a6ba188d4281418d76f963b3d91b` 的四个 PR 工作流均成功，检查共 29 项通过、1 项按条件跳过。主 CI 日志 ZIP 完整性通过。[QS #482](https://github.com/FangcunMount/qs-server/pull/482) · [主 CI](https://github.com/FangcunMount/qs-server/actions/runs/42656173725)
+
+本批 25 份 Mongo 调度、MySQL CI 及 W00 原件含增量 bundle，归档 1,717,496 字节，SHA256 `95721248100cb70b7a5dbd22c918050d84cfe262ed772dd74a332fc1fc056958`，MacBook 和 ServerA 逐成员读回并完成持久化校验。
