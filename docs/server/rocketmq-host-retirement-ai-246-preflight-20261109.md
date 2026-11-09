@@ -219,3 +219,15 @@ AI 源码 `c6359b441de48fde5b295529fe9c10f50e4c53f5` 和 Python SDK 0.5.0 在 My
 ### 2026-11-10 QS #484 精确源码检查
 
 草稿精确提交 `0af12d3b3b3cc902bd7a0a526f2c00c6158c2f14` 的 PR 检查合计 29 项通过、1 项按原条件跳过。其中主 CI 为 20 项通过、1 项跳过，其余来自 AI bridge MySQL、CodeQL、RocketMQ 原 MySQL 根和故障审计工作流。精确源码独立审查、生产只读派发和当前实际 Mongo 账户资格仍待签收。[QS #484](https://github.com/FangcunMount/qs-server/pull/484) · [主 CI](https://github.com/FangcunMount/qs-server/actions/runs/42663696969)
+
+### 2026-11-10 F07 AI 稳定 SDK 的真实超限阻断
+
+隔离夹具 `86982da80d4ecca23fd3d7667484c8826c32c293` 仅在 AI 精确提交 `c6359b441de48fde5b295529fe9c10f50e4c53f5` 的超限模式采用发布 Python SDK 0.5.0，校验 wheel SHA256 `6fe1fbf0635d3e2f8ba2f10c12474c39c939ee656f20df7784928f8bd92e88b8`。54 项本地夹具测试通过。首轮在 Python 3.13.15、MySQL 8.0.36 和 RocketMQ 5.5.1 隔离实跑，156 项报告检查通过，零失败、零跳过，含 55 个宿主测试和单独库的 4 个默认装配焦点测试。[首轮原生运行](https://github.com/FangcunMount/infra/actions/runs/42665917841)
+
+独立故障发生器用已发布 Go SDK tx.4 在自有库准备一个半消息，Broker 执行两次未知回查并产生一条 `TRANS_CHECK_MAX_TIME_TOPIC` 索引。只读导出未读取正文，SHA256 `230be2eeb5615eb7d4cb6fc20c8d10dae56d4761362f6abdb7ca3716d832c1e9`。AI 默认装配在其原主库幂等导入，当前和替换实例均拒绝打开准入，不产生新半消息。Checker 保持就绪，原事实及见证保持一致。故障发生器业务调用和最终确认调用均为零，原 Broker 参数、进程和隔离资源清理核对通过。发生器与 AI 业务根分属两个库，AI 同一原根的 Broker 超限、具名解除和应用重开继续单独验证。
+
+运行元数据、报告、日志 ZIP 及源码增量 bundle 等 8 份原件归档 71,488 字节，SHA256 `815fd6b40919619607610c8b9002105880d1947bed45a82d0b5d612d19d99b86`，MacBook 与 ServerA 逐成员读回并完成持久化校验。相同源码已派发完整兼容矩阵，结果待验。[完整矩阵](https://github.com/FangcunMount/infra/actions/runs/42668593248)
+
+### 2026-11-10 F07 恢复工具稳定 SDK 候选
+
+隔离候选 `4e3453fe6a47cfc3c33388e8fe7325dbf8d69112` 固定正式 CLI 的 Go SDK v0.6.1、模块摘要和无 replace 约束，保留干净源码、二进制摘要、原屏障及独立审批检查。Go 普通测试 279 项通过，三个 Python 夹具测试组共 16 项通过。关联 worktree 的本地构建缺 VCS 元数据，CLI 按约束拒绝。独立干净检出的 Darwin/arm64 二进制 SHA256 `f5cde44a75dcc3916d5918afe016fed6a76ed3aff42dbb1b4747fa7a2f30a6c9`，实际 `version` 读回精确源码、稳定 SDK 和二进制摘要。受管恢复的提交、回滚、治理故障，以及 IAM 真实原主库路径已分别派发隔离 CI，正式执行镜像、Java helper 和生产封装仍待签收。[受管恢复](https://github.com/FangcunMount/infra/actions/runs/42668066330) · [IAM 原库恢复](https://github.com/FangcunMount/infra/actions/runs/42668066222)
