@@ -33,3 +33,5 @@
 追加直读和 CI 原件归档为 15,542 字节、7 份原件及索引，SHA256 `3edd5744f0661998b3deff8dff069ca22e5fc0a96c3d8c4fc2549a9c12d91971`。两地逐成员读回和 fsync 完成。精确提交 `d9aae078e07602bb265bbf118331e10ce12345dc` 的合同 CI 25 项测试和编译通过，原始日志 ZIP CRC 通过。[合同 CI](https://github.com/FangcunMount/infra/actions/runs/42627299329)
 
 下次先处理集中采集或签收直读方案，完成账户范围及窗口授权签收，再进入 W02–W03。当前尚无真实排空、当次冻结保护、执行批准、消费或业务重开回执。事务凭证、历史、ACK、调度和 Broker 持久待办均在保留范围内。
+
+[集中采集诊断与固定直读方案](rocketmq-host-retirement-ai-246-observability-20261109.md)记录后续双向握手证据、具名端点实跑及独立签收栏。
