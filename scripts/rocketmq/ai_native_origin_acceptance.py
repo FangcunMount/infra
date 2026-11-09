@@ -31,7 +31,8 @@ def run_managed(managed, directory, broker, project, run, native, proof,
     from managed_recovery_acceptance import accept, install_java_helper
 
     repo = Path(__file__).resolve().parents[2]
-    java = install_java_helper(repo, directory, broker, project, run, proof)
+    image = managed['image']
+    java = None if image else install_java_helper(repo, directory, broker, project, run, proof)
     identity = half['key']
     original = dict(owner='ai.mysql', store_id=half['store_id'], writer_epoch='m3-1',
                     database=managed['schema'], user='root', operation_id=half['operation_id'],
@@ -52,7 +53,7 @@ def run_managed(managed, directory, broker, project, run, native, proof,
            grpc_port=managed['grpc_port'], mysql_port=managed['mysql_port'], password=managed['password'],
            ca=managed['ca'], java=java, identity=identity, index_path=evidence_path,
            index=index, sql=sql, run=run, consumer=OriginalConsumer(native, identity, original['wire_hash']),
-           passed=lambda name: cases.update({name: True}), proof=proof, original=original)
+           passed=lambda name: cases.update({name: True}), proof=proof, original=original, image=image)
     proof['stage'] = 'named_ai_reopen'
     native.send('verify')
     reopened = native.wait('reopened', timeout=60)

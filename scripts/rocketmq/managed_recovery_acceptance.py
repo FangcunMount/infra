@@ -131,21 +131,23 @@ def terminal_expectation(terminal):
 
 
 def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False,original=None,terminal="commit"):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False,original=None,terminal="commit",image=None):
     terminal_expectation(terminal)
     require(terminal=="commit" or (not governance_faults and original is None),"separate_rollback_sdk_fixture_required")
+    require(image is None or (original and original['owner']=='ai.mysql' and not governance_faults),
+            'execution_image_requires_owned_original_ai_profile')
     proxy=MySQLCommitProxy(mysql_port).start() if governance_faults else None
     try:
         return _accept(repo=repo,binary=binary,broker=broker,project=project,directory=directory,manifest=manifest,route=route,account=account,
             grpc_port=grpc_port,mysql_port=mysql_port,password=password,ca=ca,java=java,identity=identity,index_path=index_path,index=index,
-            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original,terminal=terminal)
+            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original,terminal=terminal,image=image)
     finally:
         if proxy is not None:
             proof['governance_wire_proxy_cleanup']=proxy.close()
 
 
 def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original,terminal):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original,terminal,image):
     expected=terminal_expectation(terminal)
     source=original or dict(owner="iam.mysql",store_id="sdk-disposable",writer_epoch="sdk-epoch-1",database="txprobe",user="txprobe",
         operation_id="op-"+identity,branch_id="branch-0",fence=1,business_count_sql="SELECT COUNT(*) FROM sdk_business",
@@ -155,9 +157,21 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         path=root/name
         write_private(path,value)
         return path,hashlib.sha256(path.read_bytes()).hexdigest()
+    cli = [str(binary)]
+    native_script = root/'owned-native-admin.sh'
+    if image:
+        from managed_recovery_image import image_command
+        cli, script = image_command(repo, image, broker, project, directory, root, index_path, ca, run, proof)
+        native_script.write_bytes(script)
+    else:
+        docker=shutil.which('docker');require(docker is not None,'explicit_local_docker_binary_required')
+        docker_config=root/'docker-config';docker_config.mkdir(mode=0o700)
+        command=[docker,'--host','unix:///var/run/docker.sock','--config',str(docker_config),'exec','-i',broker,*java[java.index('java'):],'NativeHalfManaged']
+        native_script.write_text('#!/bin/bash\nset -euo pipefail\nexec '+shlex.join(command)+' < "$1"\n')
+    native_script.chmod(0o600)
     def call(arguments,*,success=True):
         proof['managed_last_cli']=str(arguments[0])
-        result=run([str(binary),*map(str,arguments)],required=False,timeout=225)
+        result=run([*cli,*map(str,arguments)],required=False,timeout=225)
         require((result.returncode==0)==success,'compiled_managed_cli_outcome')
         if not success:return None
         value=json.loads(result.stdout)
@@ -176,22 +190,17 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     owner_manifest['accounts']={name:dict(owner='',publish=[],subscriptions=[]) for name in
         ('m3-iam','m3-qs-apiserver','m3-qs-worker','m3-qs-mongo','m3-ai')}
     manifest_file,manifest_sha=write('reviewed-fixture-manifest.json',owner_manifest)
-    docker=shutil.which('docker');require(docker is not None,'explicit_local_docker_binary_required')
-    docker_config=root/'docker-config';docker_config.mkdir(mode=0o700)
-    # CI only: broker is an exactly-owned disposable container. Production
-    # freezes a direct Java child in a separately bounded helper image/cgroup.
-    native_script=root/'owned-native-admin.sh'
-    # Remove the legacy isolated-probe environment variables; the new child
-    # receives only the private generated request from the reviewed Go wrapper.
-    command=[docker,'--host','unix:///var/run/docker.sock','--config',str(docker_config),'exec','-i',broker,*java[java.index('java'):],'NativeHalfManaged']
-    native_script.write_text('#!/bin/bash\nset -euo pipefail\nexec '+shlex.join(command)+' < "$1"\n');native_script.chmod(0o600)
+    database_endpoint = 'mysql:3306' if image else f'127.0.0.1:{proxy.port if proxy else mysql_port}'
     config=dict(schema='m3-native-recovery-config/v1',owner=source['owner'],store_id=source['store_id'],writer_epoch=source['writer_epoch'],
-        database_kind='mysql',database_uri=f"{source['user']}:{password}@tcp(127.0.0.1:{proxy.port if proxy else mysql_port})/{source['database']}",database_name=source['database'],database_ca_pem='',
+        database_kind='mysql',database_uri=f"{source['user']}:{password}@tcp({database_endpoint})/{source['database']}",database_name=source['database'],database_ca_pem='',
         endpoint=f'127.0.0.1:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
         native_admin_script=str(native_script),native_admin_script_sha256=hashlib.sha256(native_script.read_bytes()).hexdigest(),
         native_admin_nameserver='nameserver:9876',native_admin_broker='127.0.0.1:10911')
     config_path,config_sha=write('original-config.json',config)
-    source_bundle=hashlib.sha256(_encoded(dict(source=version['source_sha'],binary=version['binary_sha256'],config=config_sha,manifest=manifest_sha))).hexdigest()
+    source_inputs = dict(source=version['source_sha'], binary=version['binary_sha256'], config=config_sha, manifest=manifest_sha)
+    if image:
+        source_inputs['execution_image'] = proof['execution_image']
+    source_bundle=hashlib.sha256(_encoded(source_inputs)).hexdigest()
     op=root/'operation'
     binding=dict(schema='m3-start-boundary/v1',operation_id='managed-native-recovery',directory=str(op),scope_sha256=hashlib.sha256(b'owned-iam-sdk-fixture').hexdigest(),
         protection_sha256=hashlib.sha256(index_path.read_bytes()).hexdigest(),restore_receipt_sha256=hashlib.sha256(b'fixture-removal-not-production-restore').hexdigest(),
@@ -203,7 +212,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         script=root/(name+'.sh')
         # Actual coordinator-derived env avoids a self-referential script/plan
         # hash. Go revalidates the live binding/state/marker/reviewed plan.
-        args=shlex.join([str(binary),*map(str,arguments)])
+        args=shlex.join([*cli,*map(str,arguments)])
         script.write_text('#!/bin/bash\nset -euo pipefail\n'+args+' --directory "$M3_COORDINATOR_DIRECTORY" --binding-sha "$M3_COORDINATOR_BINDING_SHA256" --step "$M3_COORDINATOR_STEP" --step-plan-sha "$M3_COORDINATOR_STEP_PLAN_SHA256"\n');script.chmod(0o600)
         plan=dict(schema='m3-cutover-step/v1',directory=str(op),binding_sha256=binding_sha,host=socket.gethostname(),step=name,kind=kind,
             script=str(script),script_sha256=hashlib.sha256(script.read_bytes()).hexdigest(),cwd=str(root),timeout_seconds=240)
