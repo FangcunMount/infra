@@ -13,6 +13,8 @@
 
 14:20–14:28 UTC 复验时，ServerA 的 5 个目标和四个 owner 样本恢复。14:22 的受限发现直测，ServerA 返回 5 个目标，ServerD 超过 25 秒超时。随后 8 轮连续采样中，ServerA 每轮 5 个目标均为 up，四 owner 可用且新鲜，最旧样本 20.6 秒。ServerD 三个 Worker 在 6 轮全部 up；14:24:41 三个目标缺失，同轮 Broker 为 down；14:25:26 两个 Worker 尚无首个抓取结果。14:25:55 后四个具名 TCP 探针在 ServerD 22 和 5557 均完成双向握手，属于链路恢复时的证据。集中采集仍待签收，W00 保留独立直读方案。
 
+14:14:30–14:44:30 UTC 的 Prometheus 只读范围查询以 15 秒为步长。14:41:30 ServerA 应用和 Worker 同时出现抓取失败，四个 owner 样本同刻缺失。失败抓取耗时约 10 秒。Worker 在 121 个评估点中有 27 个未达到三实例新鲜就绪，Broker 有 11 个未达到目标，最后一次在 14:42:30。末点各目标恢复。评估点数量用于描述采集表现，故障根因仍需链路证据。
+
 ## W00 应用端直读候选
 
 [固定直读脚本](../../scripts/monitoring/m5_window_direct_observe.py)在 ServerA 已有 `qs-ai` 容器内以 UID 10001 执行，只对三个具名 Worker 的 `/readyz` 和 QS、AI、IAM 的固定 `/metrics` 发 GET。两轮间隔 15 秒，脚本预算 45 秒。拒绝跳转、代理和缺失、重复或异常 owner 样本。任一 Worker 非 200，或任一 owner 的 available/fresh 非 1、protected 非 0，结果失败。
