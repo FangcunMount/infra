@@ -26,6 +26,8 @@ ssh -o BatchMode=yes servera 'sudo -n docker exec -i --user 10001:10001 qs-ai /a
 
 2026-11-09 北京时间 21:50:58 和 21:51:13，两轮三个 Worker 均通过，四个 owner 均 available/fresh=1、protected=0。实际脚本 SHA256 为 `dc906e33d0f9e97271cb8dcc53c8e8a0bd8c6c7bdc3982a71db6d0e23024ede1`，回执 SHA256 为 `ebc3141991751aedd4c5f5c41eced92ec1e2696aea3eab06e8c8f09cb2373efc`。独立签收需明确直读的时点范围和集中采集待办，回执保留 `prometheus_scrape_verified=false`、`writer_exclusion_verified=false`、`execution_authorized=false`。
 
+北京时间 22:36:21 和 22:36:36，使用相同脚本再次通过两轮。前后六个 QS 实例和原 AI 容器的 ID、镜像、启动时间和重启次数一致。直读回执 SHA256 `3bcf24a48b3e6b85d0b2cb6d4383dc771f240717c4ac226fb31e70a9f8195cc1`。本次原件已两地保全，独立签收和实际窗口前新鲜回执仍待完成。
+
 固定脚本和源提交 `5541f831bfd74bfe7334ab94b40d3b9254317f5d` 的监控验证通过，部署步骤按条件跳过。15 份本轮原件及索引为 23,700 字节，SHA256 `fcdc336d28b378eefbbee57b0e8a94438c85db0428ac53ba5af5a70afde9a768`，MacBook／ServerA 两地逐成员回读与 fsync 通过。[监控 CI](https://github.com/FangcunMount/infra/actions/runs/42629579028)
 
 | 待签收项 | 记录 |

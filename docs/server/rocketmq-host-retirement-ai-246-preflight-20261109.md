@@ -38,7 +38,11 @@
 
 追加复验覆盖 ServerA/B/D 的实际 `deploy` 账户与同一固定清理器。A 的四条授权、B 的单条授权精确匹配，交叉服务和任意 Python 的列权检查均拒绝。D 的 Worker 专用规则存在，同时另有 `NOPASSWD: ALL`，有效权限仍允许交叉服务和任意 Python。B/D 以实际账户仅执行预览，候选分别为 0 和 1，运行及停止容器引用均在保留集，前后镜像、容器、卷、部署锁和清理状态文件相同。D 的账户收口和候选处置资格须单独审查。集中采集与清理器复验共 26 份原件，归档 17,391 字节，SHA256 `76a952c4da2860e3f0f4ff7c0896875692c3a94087afe089bef5a4ecc714859f`，MacBook 与 ServerA 逐成员读回并 fsync。
 
-M1 复验发现 `make check-infra` 仍经历史 `all` 检查访问 NSQ，导致无 NSQ 的 `make run-all` 和 `make quick-start` 在进程启动前失败。QS 草稿 `2ecee7169` 将标准入口指向 MySQL、Redis、MongoDB 数据预检，保留显式历史探测。定向回归覆盖缺 NSQ、三种数据依赖拒绝和历史入口，文档门禁已通过。完整开发启动还需在隔离环境验证 Proxy、TLS、路由、owner、真实进程和业务链路。[QS #481](https://github.com/FangcunMount/qs-server/pull/481)
+M1 复验发现 `make check-infra` 仍经历史 `all` 检查访问 NSQ，导致无 NSQ 的 `make run-all` 和 `make quick-start` 在进程启动前失败。QS #481 将标准入口指向 MySQL、Redis、MongoDB 数据预检，保留显式历史探测。随后用真实 Redis 复现认证失败仍因客户端零退出码被签为通过。草稿 `6154596d2384b8bc8b37a403453914ab94a1329b` 要求收到 `PONG`。四项回归和文档门禁通过。固定 MySQL 8.4.13、MongoDB 7.0.37 replica set 和 Redis 7.4.12 的隔离实跑共七项符合预期，覆盖成功、三类不可达、Redis 认证拒绝和两个历史探测。三个 QS 入口已构建。[QS #481](https://github.com/FangcunMount/qs-server/pull/481)
+
+隔离 RocketMQ 5.5.1 使用固定发布归档和 PGP 签名构建，ARM64 镜像 ID 为 `sha256:aea7d93f351a64aecf3648e66387401c96ec57abbc7e0d1d0e6e3cb43b76210e`。真实 NameServer、Broker 和 Proxy 启动后，回环端点成功协商 TLS 1.3 与 HTTP/2，错误证书身份被拒绝。两组夹具均按归属清理，既有容器、网络和卷清单前后一致。完整人工开发启动还需接入路由、owner 绑定、实际 IAM 和三个 QS 进程，并验证一条业务链路。全新 IAM clean 45 的两份待发送通知仍由 F05 验证实际交接。
+
+晚间 W00 直读与 M1 首次数据实跑共 23 份原件，归档 13,451 字节，SHA256 `1a9ce599565bafa2daea31ad13d2d8160c4b3804b0cd80b95924eb886d57affa`。Redis 拒绝修复前后、固定 Broker 构建和实际 TLS 原件共 20 份，归档 16,560 字节，SHA256 `da8274cefeab820536c383bf9e74eaaca6ef2b8a6d8598868f3d4d3a66816c1a`。两组均在 MacBook 与 ServerA 逐成员读回并 fsync。
 
 F02 已补两份源码草稿。QS 在同一个有界只读查询中单独报告观测到的事务锚点缺失或冲突数量，原业务回执阻断语义保留。MySQL 8.4.13 隔离用例实际覆盖完整锚点、缺档案、见证冲突及后续查询失败。对应面板以独立时序展示计数，缺样保持为空。QS 草稿精确提交 `f4706861ccf56d9b53c68559ce052586f1e11b0d` 共 29 项检查成功、1 项按条件跳过，含当前运行时 E2E。上线需分别签收和受控发布，51 条私有历史分类继续待数据责任人签收。[QS #480](https://github.com/FangcunMount/qs-server/pull/480) · [infra #426](https://github.com/FangcunMount/infra/pull/426)
 
