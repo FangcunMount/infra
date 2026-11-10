@@ -84,3 +84,9 @@ ssh -o BatchMode=yes servera 'sudo -n docker exec -i --user 10001:10001 qs-ai /a
 应用端沿用原脚本。另从 ServerD 本机运行 [Broker 直读脚本](../../scripts/monitoring/m5_window_broker_observe.py)，向原 5557 指标入口发固定 GET，核对唯一具名 Broker permission 样本。两轮分别在北京时间 06:12:53 和 06:13:08–09 发起，与应用轮次相差 0.437、0.486 秒。两轮三份 Worker 就绪和四个 owner 均通过，Broker 均为 HTTP 200 且报告预期值 6。原 Broker、六个 QS 实例和 AI 容器的完整身份前后相同。
 
 Broker 脚本 SHA256 为 `3de30551d6acaf4cb7824124dc55d6a0b37b455d19d50ae679c6d8016e312e96`，回执为 `15c88ac86679bebd85b9196d7583ce0f9269d8a54b49b5bfc6e46a83debc9c9f`。应用回执为 `e818d7fdd557cbdc67e94ea907698e85c54d9782540bb5f78522107234685749`。19 份原件归档 10,144 字节，SHA256 `690761e42b402af200097f927441014d72de999ef558b63a265ba9b573f6a823`，两地逐成员读回并完成持久化校验。Broker 回执只覆盖指标端点和本次观察，保留 `broker_pending_verified=false`。若独立审查采用本补件，临窗按相同端点、Broker 身份和两轮时间对应关系重采。W03 仍逐项签收在途 ACK 和持久待办。
+
+### 08:42 具名集中采集复验与 08:43 直读
+
+[集中采集核对脚本](../../scripts/monitoring/m5_window_central_observe.py)逐点绑定十个 job/instance 和四个 job/instance/owner，检查值、原样本时间、35 秒新鲜度及即时目标。先从两份现役具名 Collection 读地址和完整身份，以这两份地址运行 `--collection-ip`，采样后重新核对身份。默认使用 Mac mini 本机 Prometheus，也可用 `--tailnet` 从既有私网查询同一实例。两种路径只读，任一失败均保留原件。
+
+北京时间 08:12–08:42 的两份报告一致。08:35:45、08:41:15 和 08:41:30 有八个应用目标同时失败，四个 owner 样本均缺失。08:41:45 仍缺 IAM，Broker 及采集器自抓取四处均正常。即时目标恢复，连续观测仍有缺口。08:43:26 和 08:43:41 的应用及 Broker 具名直读通过，启动时差低于 0.25 秒，原容器身份保持一致。40 份原件已双端读回和持久化，归档 SHA256 为 `46c5d036fd5793c8326bc0d6ac97b0b1d928331221a5cae37ff26b0a738b8079`。集中路径尚未通过连续性验收，具名直读待独立签收。
