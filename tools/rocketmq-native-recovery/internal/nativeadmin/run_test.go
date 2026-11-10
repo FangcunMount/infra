@@ -82,6 +82,32 @@ func TestFrozenNativeRunnerUsesOriginalBytesAndPrivateBoundedChild(t *testing.T)
 	}
 }
 
+func TestRequestUsesOnlyTheFrozenBrokerCheckBudget(t *testing.T) {
+	runner, reviewed, _ := nativeFixture(t, fakeScript)
+	legacy, err := makeRequest(reviewed, [32]byte{1}, "inspect", runner.config)
+	if err != nil || legacy.Schema != "m3-managed-native-request/v2" ||
+		legacy.CheckIntervalMS != 5000 || legacy.CheckMax != 24 {
+		t.Fatal("legacy broker binding changed", err)
+	}
+	config := runner.config
+	budget := connection.NativeCheckBudget{IntervalMS: 30000, MaxChecks: 15}
+	config.AdminCheckBudget = &budget
+	observed, err := New(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	budget.MaxChecks = 24
+	if _, err := New(config); err == nil {
+		t.Fatal("accepted mixed broker budget")
+	}
+	for _, mode := range []string{"inspect", "resume"} {
+		request, err := makeRequest(reviewed, [32]byte{1}, mode, observed.config)
+		if err != nil || request.CheckIntervalMS != 30000 || request.CheckMax != 15 {
+			t.Fatal("observed broker binding changed", err)
+		}
+	}
+}
+
 func TestNativeRunnerRejectsOutputFloodMalformedResponseAndLingeringGroup(t *testing.T) {
 	for _, name := range []string{"raw-output", "unknown-field", "body-export", "wrong-identity", "flood", "lingering", "cancelled", "duplicate-frame", "unknown-enqueue-reply"} {
 		t.Run(name, func(t *testing.T) {

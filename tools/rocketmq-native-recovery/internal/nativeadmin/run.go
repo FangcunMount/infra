@@ -25,25 +25,27 @@ import (
 var ErrNative = errors.New("bounded exact physical native inspection/recheck incomplete")
 
 type Request struct {
-	Schema       string `json:"schema"`
-	Mode         string `json:"mode"`
-	RequestSHA   string `json:"request_sha256"`
-	Nonce        string `json:"invocation_nonce"`
-	SourceSHA    string `json:"source_sha"`
-	IndexSHA     string `json:"native_index_sha256"`
-	Nameserver   string `json:"nameserver"`
-	Broker       string `json:"broker"`
-	Topic        string `json:"source_topic"`
-	Offset       int64  `json:"commitlog_offset"`
-	QueueID      int64  `json:"queue_id"`
-	QueueOffset  int64  `json:"queue_offset"`
-	RealTopic    string `json:"expected_real_topic"`
-	Owner        string `json:"expected_owner"`
-	ReferenceSHA string `json:"expected_reference_sha256"`
-	WireSHA      string `json:"expected_wire_sha256"`
-	UniqueSHA    string `json:"expected_unique_id_sha256"`
-	Retention    int    `json:"expected_retention_hours"`
-	Revision     string `json:"expected_route_revision"`
+	Schema          string `json:"schema"`
+	Mode            string `json:"mode"`
+	RequestSHA      string `json:"request_sha256"`
+	Nonce           string `json:"invocation_nonce"`
+	SourceSHA       string `json:"source_sha"`
+	IndexSHA        string `json:"native_index_sha256"`
+	Nameserver      string `json:"nameserver"`
+	Broker          string `json:"broker"`
+	Topic           string `json:"source_topic"`
+	Offset          int64  `json:"commitlog_offset"`
+	QueueID         int64  `json:"queue_id"`
+	QueueOffset     int64  `json:"queue_offset"`
+	RealTopic       string `json:"expected_real_topic"`
+	Owner           string `json:"expected_owner"`
+	ReferenceSHA    string `json:"expected_reference_sha256"`
+	WireSHA         string `json:"expected_wire_sha256"`
+	UniqueSHA       string `json:"expected_unique_id_sha256"`
+	Retention       int    `json:"expected_retention_hours"`
+	CheckIntervalMS int    `json:"expected_check_interval_ms"`
+	CheckMax        int    `json:"expected_check_max"`
+	Revision        string `json:"expected_route_revision"`
 }
 type Report struct {
 	Schema       string    `json:"schema"`
@@ -83,6 +85,8 @@ func New(c connection.Config) (*Runner, error) {
 	if err != nil {
 		return nil, ErrNative
 	}
+	budget := c.NativeCheckBudget()
+	c.AdminCheckBudget = &budget
 	return &Runner{append([]byte(nil), raw...), c}, nil
 }
 func makeRequest(r review.Request, sha [32]byte, mode string, c connection.Config) (Request, error) {
@@ -91,7 +95,15 @@ func makeRequest(r review.Request, sha [32]byte, mode string, c connection.Confi
 		return Request{}, ErrNative
 	}
 	unique := sha256.Sum256([]byte(r.Index.BrokerMessageID))
-	return Request{Schema: "m3-managed-native-request/v1", Mode: mode, RequestSHA: review.Hex(sha), Nonce: r.Nonce, SourceSHA: r.SourceSHA, IndexSHA: r.Snapshot.Index, Nameserver: c.AdminNameserver, Broker: c.AdminBroker, Topic: r.Index.Topic, Offset: *r.Index.CommitlogOffset, QueueID: *r.Index.QueueID, QueueOffset: *r.Index.QueueOffset, RealTopic: s.Reference.PhysicalTopic, Owner: s.Binding.Owner, ReferenceSHA: review.Hex(review.ReferenceSHA(r)), WireSHA: review.Hex(s.Reference.WireHash), UniqueSHA: review.Hex(unique), Retention: 48, Revision: s.Reference.RouteRevision}, nil
+	budget := c.NativeCheckBudget()
+	return Request{
+		Schema: "m3-managed-native-request/v2", Mode: mode, RequestSHA: review.Hex(sha), Nonce: r.Nonce,
+		SourceSHA: r.SourceSHA, IndexSHA: r.Snapshot.Index, Nameserver: c.AdminNameserver, Broker: c.AdminBroker,
+		Topic: r.Index.Topic, Offset: *r.Index.CommitlogOffset, QueueID: *r.Index.QueueID, QueueOffset: *r.Index.QueueOffset,
+		RealTopic: s.Reference.PhysicalTopic, Owner: s.Binding.Owner, ReferenceSHA: review.Hex(review.ReferenceSHA(r)),
+		WireSHA: review.Hex(s.Reference.WireHash), UniqueSHA: review.Hex(unique), Retention: 48,
+		CheckIntervalMS: budget.IntervalMS, CheckMax: budget.MaxChecks, Revision: s.Reference.RouteRevision,
+	}, nil
 }
 
 func (p Report) Validate(r review.Request, sha [32]byte, mode string, started, ended time.Time) error {
