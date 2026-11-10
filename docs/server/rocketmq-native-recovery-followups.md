@@ -30,10 +30,12 @@ Linux 协调器的受审脚本调用容器入口，提交独立摘要绑定的�
 
 选址审查使用 `m3-native-recovery-container/v2` 作为专用网桥候选。该计划沿用 v1 字段，在创建前与启动前各从实际 Docker 读取同一网络 ID，要求本机 `bridge` 为内部网络，IPv4 网关模式为 `isolated`，并关闭 IPv6。启动前不符时保留已发出与已创建的身份回执，供后续独立核对。v1 继续用于现有隔离夹具。专用转发器、具名端点、实际 ACL/TLS 和生产执行账户须由独立证据签收。[Docker 网关模式](https://docs.docker.com/engine/network/port-publishing/#gateway-modes)
 
+具名网络成员审查使用 `m3-native-recovery-container/v3`。独立计划的 `network_members` 按完整容器 ID 列出允许接入专用桥的现有成员，每项固定 Docker 端点 ID 和带前缀长度的 IPv4 地址。容器创建前及启动前分别核对实际成员集合与地址。额外成员、成员缺失或同一容器重新连接导致的端点变化都会阻断。Docker 在实际启动前尚未将待执行容器计入活动成员。两次读取之间及运行期间的网络变更权限须在具名宿主单独控制。
+
 固定输入目录为操作目录的同级 `inputs`，内含五份私有 JSON 文件及 `java/tools.yml`、`java/tls/server.crt` 和 `java/native-admin.sh`。执行账户持有 0600 的管理员脚本，配置必须指向容器内只读挂载的 `/run/native-recovery/native-admin.sh`，且配置、计划和文件三个摘要一致。协调目录保留原 inode 和回执写入，协调权威文件与既有恢复回执单独只读挂载。容器内时限为 195 秒，随后最多给出 12 秒退出宽限。启动前记录步骤和容器 ID，只有 Docker 实读退出状态才记录终态。
 
 等待或创建结果未知时，先用 `--observe-prior <原步骤计划 SHA256>` 在原 Linux 宿主和绑定目录生成只读观察。保存其标准输出原字节及摘要，核对完整容器 ID、镜像、步骤标签、网络、实际起止与退出状态，再独立核对 SDK、原库与 Broker 事实。容器仍在运行、查不到或身份不符时继续阻断。新的具名前向步骤可在计划中加入 `prior_terminal`，绑定 `step_plan_sha256` 和 `observation_sha256`。入口在活动锁内重新读取终态并比对摘要，将交接记入 `-reconciled.json`，保留原已发出记录。任何新 `recover` 都要使用未发出过的请求，具名解除仍绑定原恢复回执。实际生产宿主的未知结果核对与具名网络出口须另行签收。
 
-原根工作流仅在手动启用 `coordinated_image` 时运行 v2 隔离场景。Broker 固定通告地址，断开两条夹具网络后按相同地址重接，保留原物理消息 ID 的地址语义。宿主探针使用一次性 runner 上的单端口回环转发，执行容器通过隔离桥直连 Broker。作业分别核对回环映射和夹具网络回收。
+原根工作流仅在手动启用 `coordinated_image` 时运行 v3 隔离场景。Broker 固定通告地址，断开两条夹具网络后按相同地址重接，保留原物理消息 ID 的地址语义。重接后固定 Broker、NameServer 和 MySQL 三个夹具成员的端点。恢复、具名解除和复核三步均绑定同一成员摘要。宿主探针使用一次性 runner 上的单端口回环转发，执行容器通过隔离桥直连 Broker。作业分别核对回环映射和夹具网络回收。
 
 Infra `e5ba8fa8190fe15f1dbe70f4113dc4b25cd94d5d` 与 AI `c6359b441de48fde5b295529fe9c10f50e4c53f5` 已通过 Python 3.11、3.13 与 MySQL 8.0.36、8.0.44、8.4.11 的六组完整隔离矩阵，共 66 项通过。每组用同一隔离桥内的 UID 3000 容器完成恢复、解除和复核，保留原首次审计和原报文 ACK，拒绝重复请求，具名重开无新 half。开发作业实际执行的 Linux amd64 镜像原件已逐层读回。生产专用出口、执行账户、原库与 Broker 端点仍须独立复验。[完整隔离矩阵](https://github.com/FangcunMount/infra/actions/runs/42787455864) · [开发作业与镜像原件](https://github.com/FangcunMount/infra/actions/runs/42786265415)

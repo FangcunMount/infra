@@ -136,6 +136,54 @@ class NativeRecoveryContainerTest(unittest.TestCase):
         self.assertEqual([call.args[0][0] for call in docker.call_args_list], ['image', 'network'])
         self.assertEqual(list(self.operation.iterdir()), [])
 
+    def member_fixture(self):
+        container_id, endpoint_id, address = '6' * 64, '7' * 64, '172.31.246.8/24'
+        plan = self.plan | {'schema': runner.REVIEWED_MEMBERS_PLAN,
+                            'network_members': {container_id: {'endpoint_id': endpoint_id, 'ipv4_address': address}}}
+        network = dict(Id=plan['network_id'], Name=plan['network_name'], Driver='bridge', Scope='local',
+                       Internal=True, EnableIPv4=True, EnableIPv6=False,
+                       Options={runner.IPV4_GATEWAY_MODE: 'isolated'},
+                       Containers={container_id: dict(EndpointID=endpoint_id, IPv4Address=address, IPv6Address='')})
+        return plan, network, container_id
+
+    def test_v3_requires_exact_member_plan_without_changing_container_arguments(self):
+        plan, _, cid = self.member_fixture()
+        self.assertEqual(runner.arguments(plan, self.env), runner.arguments(self.plan, self.env))
+        for invalid in ({}, {cid: {'endpoint_id': '7' * 64, 'ipv4_address': '172.31.246.8'}},
+                        {cid: {'endpoint_id': '7' * 64, 'ipv4_address': 'fd00::8/64'}},
+                        {'short': plan['network_members'][cid]}):
+            with self.subTest(invalid=invalid), self.assertRaises((BoundaryError, ValueError)):
+                runner.arguments(plan | {'network_members': invalid}, self.env)
+        with self.assertRaisesRegex(BoundaryError, 'exact reviewed container plan'):
+            runner.arguments(plan | {'schema': runner.ISOLATED_BRIDGE_PLAN}, self.env)
+
+    def test_v3_rejects_live_member_or_endpoint_drift(self):
+        plan, network, cid = self.member_fixture()
+        members = network['Containers']
+        with patch.object(runner, 'docker', return_value=json.dumps([network])):
+            runner.require_reviewed_network(plan)
+        for changed in (None, {}, members | {'8' * 64: members[cid]},
+                        {cid: members[cid] | {'EndpointID': '8' * 64}},
+                        {cid: members[cid] | {'IPv4Address': '172.31.246.9/24'}},
+                        {cid: members[cid] | {'IPv6Address': 'fd00::8/64'}}):
+            with self.subTest(changed=changed), patch.object(
+                    runner, 'docker', return_value=json.dumps([network | {'Containers': changed}])):
+                with self.assertRaisesRegex(BoundaryError, 'network member'):
+                    runner.require_reviewed_network(plan)
+
+    def test_v3_rechecks_members_before_start_and_keeps_created_identity_on_drift(self):
+        plan, network, _ = self.member_fixture()
+        docker_results = [self.cid, json.dumps([self.created(self.step_sha, self.cid)]),
+                          json.dumps([network | {'Containers': {}}])]
+        with patch.object(runner, 'docker', side_effect=docker_results) as docker:
+            with self.assertRaisesRegex(BoundaryError, 'network member inventory'):
+                self.run_container(plan=plan)
+        self.assertEqual([call.args[0][0] for call in docker.call_args_list], ['create', 'container', 'network'])
+        prefix = self.operation / ('native-container-' + self.step_sha)
+        self.assertTrue(prefix.with_name(prefix.name + '-issued.json').is_file())
+        self.assertEqual(json.loads(prefix.with_name(prefix.name + '-created.json').read_text()), {'container_id': self.cid})
+        self.assertFalse(prefix.with_name(prefix.name + '-exit.json').exists())
+
     def test_plan_refuses_mismatched_coordinator_extra_mount_material_and_digest(self):
         with self.assertRaises(BoundaryError):
             runner.arguments(self.plan, self.env | {'M3_COORDINATOR_STEP': 'other'})

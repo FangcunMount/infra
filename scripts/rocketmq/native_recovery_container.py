@@ -3,6 +3,7 @@
 import argparse
 import fcntl
 import hashlib
+import ipaddress
 import json
 import os
 from pathlib import Path
@@ -25,6 +26,8 @@ INPUTS = ('config', 'manifest', 'export', 'request', 'approval')
 PRIVATE_FILE_LIMIT = 65536
 LEGACY_PLAN = 'm3-native-recovery-container/v1'
 ISOLATED_BRIDGE_PLAN = 'm3-native-recovery-container/v2'
+REVIEWED_MEMBERS_PLAN = 'm3-native-recovery-container/v3'
+ISOLATED_PLANS = (ISOLATED_BRIDGE_PLAN, REVIEWED_MEMBERS_PLAN)
 IPV4_GATEWAY_MODE = 'com.docker.network.bridge.gateway_mode_ipv4'
 
 
@@ -44,11 +47,29 @@ def input_digest(path, expected):
         raise BoundaryError('reviewed native input differs')
 
 
+def require_member_plan(members):
+    if not isinstance(members, dict) or not 1 <= len(members) <= 16:
+        raise BoundaryError('reviewed network members required')
+    for container_id, member in members.items():
+        _digest(container_id)
+        if not isinstance(member, dict) or set(member) != {'endpoint_id', 'ipv4_address'}:
+            raise BoundaryError('exact reviewed network member required')
+        _digest(member['endpoint_id'])
+        address = member['ipv4_address']
+        if not isinstance(address, str) or str(ipaddress.IPv4Interface(address)) != address:
+            raise BoundaryError('canonical reviewed network member address required')
+
+
 def arguments(plan, env):
     fields = {'schema', 'command', 'directory', 'host', 'image_id', 'source_sha',
               'network_id', 'network_name', 'binding_sha256', 'step', 'inputs', 'java'}
-    if set(plan) - {'prior_terminal'} != fields or plan['schema'] not in (LEGACY_PLAN, ISOLATED_BRIDGE_PLAN):
+    schema = plan.get('schema')
+    if schema == REVIEWED_MEMBERS_PLAN:
+        fields.add('network_members')
+    if set(plan) - {'prior_terminal'} != fields or schema not in (LEGACY_PLAN, *ISOLATED_PLANS):
         raise BoundaryError('exact reviewed container plan required')
+    if schema == REVIEWED_MEMBERS_PLAN:
+        require_member_plan(plan['network_members'])
     prior = plan.get('prior_terminal')
     if 'prior_terminal' in plan:
         if not isinstance(prior, dict) or set(prior) != {'step_plan_sha256', 'observation_sha256'}:
@@ -140,11 +161,20 @@ def require_reviewed_network(plan):
     if (network['Id'], network['Name'], network['Driver'], network['Scope']) != (
             plan['network_id'], plan['network_name'], 'bridge', 'local'):
         raise BoundaryError('reviewed local network differs')
-    if plan['schema'] == ISOLATED_BRIDGE_PLAN and (
+    if plan['schema'] in ISOLATED_PLANS and (
             network.get('Internal') is not True or network.get('EnableIPv4') is not True or
             network.get('EnableIPv6') is not False or
             (network.get('Options') or {}).get(IPV4_GATEWAY_MODE) != 'isolated'):
         raise BoundaryError('reviewed isolated IPv4 bridge required')
+    if plan['schema'] == REVIEWED_MEMBERS_PLAN:
+        expected, members = plan['network_members'], network.get('Containers')
+        if not isinstance(members, dict) or members.keys() != expected.keys():
+            raise BoundaryError('reviewed network member inventory differs')
+        for container_id, member in expected.items():
+            actual = members[container_id]
+            if (actual['EndpointID'], actual['IPv4Address'], actual['IPv6Address']) != (
+                    member['endpoint_id'], member['ipv4_address'], ''):
+                raise BoundaryError('reviewed network member endpoint differs')
 
 
 def require_issued(fd, plan, directory, step_sha):
@@ -281,7 +311,7 @@ def run_container(fd, plan, directory, material, java, step_sha, cli, protected,
     cid = _digest(docker(create_args(plan, name, cli, mounts)))
     _publish(fd, name + '-created.json', {'container_id': cid})
     require_created(cid, name, plan, mounts)
-    if plan['schema'] == ISOLATED_BRIDGE_PLAN:
+    if plan['schema'] in ISOLATED_PLANS:
         require_reviewed_network(plan)
     if deadline - time.monotonic() < 214:
         raise BoundaryError('insufficient budget to start the exact recovery container')

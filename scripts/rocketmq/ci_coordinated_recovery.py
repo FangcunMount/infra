@@ -14,7 +14,7 @@ import subprocess
 import threading
 
 from final_image_candidate import ci_guard
-from native_recovery_container import INPUTS, IPV4_GATEWAY_MODE, ISOLATED_BRIDGE_PLAN
+from native_recovery_container import INPUTS, IPV4_GATEWAY_MODE, REVIEWED_MEMBERS_PLAN
 from start_boundary import _digest, _encoded
 
 
@@ -146,6 +146,18 @@ class CoordinatedRecovery:
         assert network['Internal'] is True and network['EnableIPv4'] is True and network['EnableIPv6'] is False
         assert network['Options'][IPV4_GATEWAY_MODE] == 'isolated'
         self.network, self.name = _digest(network['Id']), name
+        members = network['Containers']
+        assert len(members) == 3 and item['Id'] in members
+        attached = json.loads(run(['docker', 'container', 'inspect', *sorted(members)]).stdout)
+        labels = [container['Config']['Labels'] for container in attached]
+        assert {container['Id'] for container in attached} == set(members)
+        assert all(label['com.docker.compose.project'] == project for label in labels)
+        assert {label['com.docker.compose.service'] for label in labels} == {'broker', 'mysql', 'nameserver'}
+        self.network_members = {
+            cid: {'endpoint_id': member['EndpointID'], 'ipv4_address': member['IPv4Address']}
+            for cid, member in members.items()
+        }
+        self.network_members_sha256 = hashlib.sha256(_encoded(self.network_members)).hexdigest()
         self.source = run(['git', 'rev-parse', 'HEAD'], cwd=repo).stdout.strip()
         self.code = root / 'launcher'
         self.code.mkdir(mode=0o700)
@@ -186,9 +198,10 @@ class CoordinatedRecovery:
             receipt = Path(values['--receipt'])
             assert receipt.parent.parent == op and receipt.name == 'receipt.json'
             hashes['receipt'] = {'attempt': receipt.parent.name, 'sha256': values['--receipt-sha']}
-        plan = dict(schema=ISOLATED_BRIDGE_PLAN, command=arguments[0], directory=str(op),
+        plan = dict(schema=REVIEWED_MEMBERS_PLAN, command=arguments[0], directory=str(op),
                     host=host, image_id=self.image, source_sha=self.source, network_id=self.network,
-                    network_name=self.name, binding_sha256=binding, step=step, inputs=hashes, java=self.java)
+                    network_name=self.name, network_members=self.network_members,
+                    binding_sha256=binding, step=step, inputs=hashes, java=self.java)
         path = self.root / (step + '-container.json')
         raw = _encoded(plan)
         path.write_bytes(raw)
@@ -213,7 +226,8 @@ class CoordinatedRecovery:
             raise RuntimeError('owned Linux recovery launcher rejected or incomplete')
         self.proof.setdefault('coordinated_image_steps', []).append(
             dict(step_plan_sha256=digest, container_id=receipt['container_id'], exit_code=0, uid=3000,
-                 container_plan_schema=ISOLATED_BRIDGE_PLAN, network_id=self.network))
+                 container_plan_schema=REVIEWED_MEMBERS_PLAN, network_id=self.network,
+                 network_member_count=len(self.network_members), network_members_sha256=self.network_members_sha256))
 
     def cleanup(self):
         for issued in sorted((self.root / 'operation').glob('native-container-*-issued.json')):
