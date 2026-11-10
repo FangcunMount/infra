@@ -13,7 +13,7 @@ LOOPBACK = "http://127.0.0.1:19090"
 TAILNET = "http://100.126.200.55:19090"
 STEP = 15
 MAX_AGE = 35
-RANGE_SECONDS = 30 * 60
+RANGE_SECONDS = 120 * 60
 QS_RELEASE = "qs-m5-4620d11e2cff"
 OWNERS = {
     ("qs-apiserver", "qs-apiserver:8080", "qs.mysql"),
@@ -138,11 +138,15 @@ def observe(get, targets, end, clock=time.time):
                                       get("/api/v1/query_range", query=f"timestamp({selector})", **params),
                                       points, keys, expected, value)
     current = get("/api/v1/targets", state="active")
-    active = active_targets(current, targets, clock())
+    now = clock()
+    active = active_targets(current, targets, now)
+    end_age = now - end
     return dict(schema="ai246-central-prewindow/v1", start=utc(points[0]), end=utc(end),
-                points=len(points), expected_targets=sorted(targets), expected_owners=sorted(OWNERS),
+                points=len(points), range_seconds=RANGE_SECONDS, end_age_seconds=end_age,
+                expected_targets=sorted(targets), expected_owners=sorted(OWNERS),
                 max_age_seconds=MAX_AGE, checks=checks, active=active, read_only=True,
-                passed=not any(checks.values()) and not any(active.values()), execution_authorized=False)
+                passed=0 <= end_age <= MAX_AGE and not any(checks.values()) and not any(active.values()),
+                execution_authorized=False)
 
 
 def main():

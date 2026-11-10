@@ -87,7 +87,7 @@ Broker 脚本 SHA256 为 `3de30551d6acaf4cb7824124dc55d6a0b37b455d19d50ae679c6d8
 
 ### 08:42 具名集中采集复验与 08:43 直读
 
-[集中采集核对脚本](../../scripts/monitoring/m5_window_central_observe.py)逐点绑定十个 job/instance 和四个 job/instance/owner，检查值、原样本时间、35 秒新鲜度及即时目标。先从两份现役具名 Collection 读地址和完整身份，以这两份地址运行 `--collection-ip`，采样后重新核对身份。默认使用 Mac mini 本机 Prometheus，也可用 `--tailnet` 从既有私网查询同一实例。两种路径只读，任一失败均保留原件。
+[集中采集核对脚本](../../scripts/monitoring/m5_window_central_observe.py)在连续两小时内按 15 秒间隔检查 481 个评估点，逐点绑定十个 job/instance 和四个 job/instance/owner，检查值、原样本时间、35 秒新鲜度及即时目标。即时目标读回时，历史范围末点也必须在 35 秒内。先从两份现役具名 Collection 读地址和完整身份，以这两份地址运行 `--collection-ip`，采样后重新核对身份。默认使用 Mac mini 本机 Prometheus，也可用 `--tailnet` 从既有私网查询同一实例。两种路径只读，任一失败均保留原件。
 
 北京时间 08:12–08:42 的两份报告一致。08:35:45、08:41:15 和 08:41:30 有八个应用目标同时失败，四个 owner 样本均缺失。08:41:45 仍缺 IAM，Broker 及采集器自抓取四处均正常。即时目标恢复，连续观测仍有缺口。08:43:26 和 08:43:41 的应用及 Broker 具名直读通过，启动时差低于 0.25 秒，原容器身份保持一致。40 份原件已双端读回和持久化，归档 SHA256 为 `46c5d036fd5793c8326bc0d6ac97b0b1d928331221a5cae37ff26b0a738b8079`。集中路径尚未通过连续性验收，具名直读待独立签收。
 
