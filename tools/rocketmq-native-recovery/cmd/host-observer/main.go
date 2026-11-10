@@ -28,14 +28,24 @@ type config struct {
 
 func validate(c config, env func(string) string) error {
 	host, _, e := net.SplitHostPort(c.Endpoint)
-	if env("GITHUB_ACTIONS") != "true" || env("RUNNER_OS") != "Linux" || env("RUNNER_ENVIRONMENT") != "github-hosted" || env("GITHUB_REPOSITORY") != "FangcunMount/infra" || e != nil || !net.ParseIP(host).IsLoopback() || c.AccessKey == "" || c.SecretKey == "" || c.CA == "" || c.Subscription == "" || len(c.Inputs) != 1 {
+	if env("GITHUB_ACTIONS") != "true" || env("RUNNER_OS") != "Linux" || env("RUNNER_ENVIRONMENT") != "github-hosted" || env("GITHUB_REPOSITORY") != "FangcunMount/infra" || e != nil || !net.ParseIP(host).IsLoopback() || c.AccessKey == "" || c.SecretKey == "" || c.CA == "" || c.Subscription == "" || (len(c.Inputs) < 1 || len(c.Inputs) > 2) {
 		return errors.New("CI-owned original host observer required")
 	}
-	r := c.Inputs[0]
-	if r.Topic != "iam.authz.version.v2" || r.Subscription != c.Subscription || r.Owner != "iam.mysql" || r.RouteRevision != "m3-1" || r.MessageType != transport.TransactionMessageType {
-		return errors.New("explicit IAM original route required")
+	topic := c.Inputs[0].Topic
+	owners := map[string]bool{}
+	for _, r := range c.Inputs {
+		if r.Topic != topic || r.Subscription != c.Subscription || r.RouteRevision != "m3-1" || r.MessageType != transport.TransactionMessageType || owners[r.Owner] {
+			return errors.New("explicit original route required")
+		}
+		owners[r.Owner] = true
 	}
-	return nil
+	if topic == "iam.authz.version.v2" && len(owners) == 1 && owners["iam.mysql"] {
+		return nil
+	}
+	if topic == "qs.evaluation.lifecycle" && len(owners) == 2 && owners["qs.mysql"] && owners["qs.mongo"] {
+		return nil
+	}
+	return errors.New("explicit original host topic and full input set required")
 }
 func emit(event, id, decision string) {
 	raw, _ := json.Marshal(map[string]string{"event": event, "id": id, "decision": decision})

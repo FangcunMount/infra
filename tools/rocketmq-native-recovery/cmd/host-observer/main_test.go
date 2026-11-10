@@ -31,3 +31,23 @@ func TestObserverNeverStartsOnWorkstation(t *testing.T) {
 		t.Fatal("ordinary workstation admitted")
 	}
 }
+
+func TestDualQSInputsShareOneExplicitLogicalSubscription(t *testing.T) {
+	env := map[string]string{"GITHUB_ACTIONS": "true", "RUNNER_OS": "Linux", "RUNNER_ENVIRONMENT": "github-hosted", "GITHUB_REPOSITORY": "FangcunMount/infra"}
+	get := func(k string) string { return env[k] }
+	c := config{Endpoint: "127.0.0.1:8081", AccessKey: "fixture", SecretKey: "fixture", CA: "private-ca", Subscription: "qs-worker"}
+	for _, owner := range []string{"qs.mysql", "qs.mongo"} {
+		c.Inputs = append(c.Inputs, transport.RouteBinding{Topic: "qs.evaluation.lifecycle", Subscription: c.Subscription, Owner: owner, RouteRevision: "m3-1", MessageType: transport.TransactionMessageType})
+	}
+	if validate(c, get) != nil {
+		t.Fatal("explicit dual owner observer refused")
+	}
+	c.Inputs[1].Owner = "qs.mysql"
+	if validate(c, get) == nil {
+		t.Fatal("duplicate owner amplified the logical input set")
+	}
+	c.Inputs = c.Inputs[:1]
+	if validate(c, get) == nil {
+		t.Fatal("partial QS input inventory admitted")
+	}
+}
