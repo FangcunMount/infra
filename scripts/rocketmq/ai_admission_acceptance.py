@@ -218,7 +218,9 @@ def validate_host_runtime(runtime, profile, python):
         raise RuntimeError('released fixed SDK wheel and client required, no editable SDK')
 
 
-def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, *, fault_tools=None, native_runner=None, proxy_start=None, broker_fault=None, read_parameters=None):
+def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_port, password, ca, run, proof, *,
+                          fault_tools=None, native_runner=None, proxy_start=None, broker_fault=None, read_parameters=None,
+                          observed_native_budget=False):
     source = source.resolve()
     if not (source / 'pyproject.toml').is_file() or run(['git', 'status', '--porcelain'], cwd=source).stdout.strip():
         raise RuntimeError('exact clean AI host source required')
@@ -254,6 +256,9 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
             raise RuntimeError('exact stable AI native origin fixture required')
         evidence_path = directory / 'ai-native-origin-index.json'
         native_data = dict(native_origin_evidence=str(evidence_path), native_origin_managed=bool(managed_binary))
+        if observed_native_budget:
+            from ai_native_origin_acceptance import OBSERVED_INDEX_WAIT_SECONDS
+            native_data['native_origin_record_timeout'] = OBSERVED_INDEX_WAIT_SECONDS + 60
     elif profile['name'] == 'native_limit':
         if read_parameters is None or native_runner is None:
             raise RuntimeError('owned native limit supervisor and parameter parser required')
@@ -310,7 +315,7 @@ def run_ai_admission_host(source, directory, broker, project, grpc_port, mysql_p
                            password=password, ca=ca)
         proof['native_receipt'] = run_origin(source, directory, broker, project, command, env, run,
                                              native_runner, read_parameters, proof['original_native'],
-                                             evidence_path, managed=managed)
+                                             evidence_path, managed=managed, observed_budget=observed_native_budget)
         proof['source_clean_after'] = not run(['git', 'status', '--porcelain'], cwd=source).stdout.strip()
         if not proof['source_clean_after']:
             raise RuntimeError('AI source changed during native origin acceptance')

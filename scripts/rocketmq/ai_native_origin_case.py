@@ -179,7 +179,7 @@ async def test_original_ai_root_reaches_native_limit(broker, required_broker, tm
         assert stored is not None and stored.wire == branch.wire
         emit("closed", reference_sha256=hashlib.sha256(after["reference"]).hexdigest(),
              wire_sha256=branch.wire_hash.hex())
-        await receive("record")
+        await receive("record", timeout=required_broker.get("native_origin_record_timeout", 180))
         path = Path(required_broker["native_origin_evidence"])
         assert path.is_absolute() and path.stat().st_mode & 0o777 == 0o600
         raw = path.read_bytes()

@@ -31,6 +31,10 @@ on:
         description: Use the actual Linux coordinator and named bridge for recovery and resolution
         type: boolean
         default: false
+      observed_check_budget:
+        description: Exercise the observed 30 second / 15 check budget in the owned coordinated fixture
+        type: boolean
+        default: false
       profile:
         description: Development is one interpreter/MySQL; full is required for final gate
         type: choice
@@ -46,7 +50,7 @@ concurrency:
 jobs:
   original-worker-state:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: ${{ inputs.observed_check_budget == true && 45 || 30 }}
     strategy:
       fail-fast: false
       matrix:
@@ -82,6 +86,7 @@ jobs:
           test '${{ inputs.managed_original == true && inputs.native_origin != true }}' != true
           test '${{ inputs.execution_image == true && inputs.managed_original != true }}' != true
           test '${{ inputs.coordinated_image == true && inputs.execution_image != true }}' != true
+          test '${{ inputs.observed_check_budget == true && inputs.coordinated_image != true }}' != true
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
           test "$(git -C .ai-acceptance rev-parse HEAD)" = "$EXPECTED_AI_SHA"
           python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
@@ -143,6 +148,7 @@ jobs:
           QS_AI_COORDINATED_IMAGE: ${{ inputs.coordinated_image == true && 'true' || 'false' }}
           QS_AI_MANAGED_ORIGINAL: ${{ inputs.managed_original == true && 'true' || 'false' }}
           QS_AI_ACCEPTANCE_KIND: ${{ inputs.native_limit == true && 'native_limit' || inputs.protection == true && 'protection' || 'state' }}
+          QS_AI_OBSERVED_CHECK_BUDGET: ${{ inputs.observed_check_budget == true && 'true' || 'false' }}
         run: |
           set -euo pipefail
           if [[ "$QS_AI_MANAGED_ORIGINAL" == true ]]; then
@@ -152,9 +158,20 @@ jobs:
             QS_AI_NATIVE_RECOVERY_IMAGE="$(cat "$RUNNER_TEMP/recovery-image.id")"
             export QS_AI_NATIVE_RECOVERY_IMAGE
           fi
+          extra=()
+          if [[ "$QS_AI_OBSERVED_CHECK_BUDGET" == true ]]; then
+            extra+=(--ai-native-observed-budget)
+          fi
           QS_AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' python3 scripts/rocketmq/ci-transactions.py \
             --sdk "$PWD/.sdk-acceptance" --ai-admission-host "$PWD/.ai-acceptance" \
-            --image rocketmq-ai-state:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-state.json
+            --image rocketmq-ai-state:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-state.json "${extra[@]}"
+          if [[ "$QS_AI_OBSERVED_CHECK_BUDGET" == true ]]; then
+            jq -e '.proof.effective_broker_parameters ==
+              {"transactionTimeOut":6000,"transactionCheckInterval":30000,"transactionCheckMax":15,"fileReservedTime":48}
+              and (.proof.ai_state_host.original_native |
+                .check_budget_mode == "observed" and .index_wait_seconds == 600 and .broker_parameters_restored
+                and .broker_parameters_before_fault == .broker_parameters_during_fault and .native_index_records == 1)' rocketmq-ai-state.json
+          fi
           if [[ "$QS_AI_COORDINATED_IMAGE" == true ]]; then
             jq -e '.proof.coordinated_host_loopback ==
               {"broker_verified_tls_h2":true,"advertised_broker_verified_tls_h2":true,"mysql_protocol_greeting":true}

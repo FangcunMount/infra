@@ -1,6 +1,11 @@
 import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 import unittest
+from unittest.mock import Mock, call, patch
 
+import ai_native_origin_acceptance as native_origin
 from ai_admission_acceptance import acceptance_profile, host_failure_diagnostics, parse_admission_receipt, parse_host_receipt, validate_host_runtime, validate_host_sdk_lock
 from ai_state_acceptance import CASES, TESTS, RECOVERY_TESTS, DEFAULT_CASES, DEFAULT_TESTS, FOCUS_CASES, FOCUS_TESTS, state_manifest
 
@@ -356,6 +361,42 @@ class AIProtocolProtectionTest(unittest.TestCase):
 
 
 class AINativeLimitProfileTest(unittest.TestCase):
+    def test_observed_budget_keeps_broker_parameters_and_extends_the_native_wait(self):
+        parameters = dict(native_origin.OBSERVED_BROKER_PARAMETERS, fileReservedTime=48)
+        admin = Mock(return_value=parameters)
+
+        def native_runner(argv, *, timeout, **kwargs):
+            self.assertEqual(timeout, 1290)
+            junit = Path(argv[-1].removeprefix('--junitxml='))
+            junit.write_text('<testsuite><testcase name="test_original_ai_root_reaches_native_limit"/></testsuite>')
+            return SimpleNamespace(returncode=0)
+
+        with TemporaryDirectory() as directory, patch.dict(native_origin.os.environ, {'QS_AI_COORDINATED_IMAGE': 'true'}), \
+             patch.object(native_origin, 'Admin', return_value=admin), patch.object(native_origin, 'owned_broker_networks'):
+            directory = Path(directory)
+            proof = {}
+            native_origin.run_origin(directory, directory, 'owned-broker', 'rocketmq-m2-fixture', [], {},
+                                     Mock(), native_runner, lambda output: output, proof, directory / 'index.json',
+                                     managed={'image': 'fixture-image'}, observed_budget=True)
+        self.assertEqual(admin.call_args_list, [call('getBrokerConfig')] * 3)
+        self.assertEqual(proof['broker_parameters_during_fault'], parameters)
+        self.assertEqual(proof['index_wait_seconds'], 600)
+        self.assertTrue(proof['broker_parameters_restored'])
+
+    def test_observed_budget_rejects_drift_before_running_the_fixture(self):
+        parameters = dict(native_origin.OBSERVED_BROKER_PARAMETERS, fileReservedTime=48, transactionCheckMax=2)
+        admin = Mock(return_value=parameters)
+        runner = Mock()
+        with TemporaryDirectory() as directory, patch.dict(native_origin.os.environ, {'QS_AI_COORDINATED_IMAGE': 'true'}), \
+             patch.object(native_origin, 'Admin', return_value=admin), patch.object(native_origin, 'owned_broker_networks'):
+            directory = Path(directory)
+            with self.assertRaisesRegex(RuntimeError, 'exact coordinated Broker baseline'):
+                native_origin.run_origin(directory, directory, 'owned-broker', 'rocketmq-m2-fixture', [], {},
+                                         Mock(), runner, lambda output: output, {}, directory / 'index.json',
+                                         managed={'image': 'fixture-image'}, observed_budget=True)
+        runner.assert_not_called()
+        admin.assert_called_once_with('getBrokerConfig')
+
     def test_native_profile_requires_all_real_control_cases_and_fixed_sdk(self):
         from ai_admission_acceptance import NATIVE_LIMIT_CASES, PROTECTION_CASES
         profile = acceptance_profile('native_limit')

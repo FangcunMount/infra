@@ -230,6 +230,8 @@ def main():
     parser.add_argument("--qs-command-host", type=Path, help="exact QS checkout; original SQL command root and real Broker")
     parser.add_argument("--qs-event-host", type=Path, help="exact QS checkout; authenticated event Inbox/projection and original ACK SQL root")
     parser.add_argument("--ai-admission-host", type=Path, help="exact AI checkout; real published Python SDK and original admission roots/Broker")
+    parser.add_argument("--ai-native-observed-budget", action="store_true",
+                        help="reproduce the observed Broker check budget in the isolated coordinated AI origin fixture")
     parser.add_argument("--iam-host-faults", action="store_true", help="separate actual IAM role original-root COMMIT packet faults")
     parser.add_argument("--qs-answer-host-faults", action="store_true", help="separate actual AnswerSheet original Mongo COMMIT packet faults")
     parser.add_argument("--ai-host-database-faults", action="store_true", help="actual AI command original SQLAlchemy COMMIT packet faults")
@@ -399,6 +401,18 @@ def main():
         parser.error("packet faults require public SDK acceptance")
     if args.sdk_api_python and not args.sdk_api_go:
         parser.error("Python SDK acceptance requires the full public Go SDK matrix")
+    parameters = PARAMETERS
+    if args.ai_native_observed_budget:
+        from ai_native_origin_acceptance import OBSERVED_BROKER_PARAMETERS
+        from final_image_candidate import ci_guard
+
+        ci_guard(os.environ)
+        if (not args.ai_admission_host or args.ai_host_database_faults
+                or os.environ.get("QS_AI_ACCEPTANCE_KIND") != "native_limit"
+                or os.environ.get("QS_AI_NATIVE_ORIGIN") != "true"
+                or os.environ.get("QS_AI_COORDINATED_IMAGE") != "true"):
+            parser.error("observed Broker budget requires the isolated coordinated AI native origin")
+        parameters = OBSERVED_BROKER_PARAMETERS
     repo = Path(__file__).resolve().parents[2]
     sources = repo / "scripts/rocketmq/txprobe"
     sdk = args.sdk.resolve()
@@ -428,7 +442,7 @@ def main():
         broker_address = RECOVERY_BROKER_IP
     render(accounts, config, broker_address, repo / "components/rocketmq")
     with (config / "broker.conf").open("a") as stream:
-        stream.write("".join(f"{key}={value}\n" for key, value in PARAMETERS.items()))
+        stream.write("".join(f"{key}={value}\n" for key, value in parameters.items()))
     proxy = json.loads((config / "proxy.json").read_text())
     proxy["grpcServerPort"] = grpc_port
     (config / "proxy.json").write_text(json.dumps(proxy))
@@ -671,8 +685,8 @@ def main():
                         raise RuntimeError("owned host MySQL protocol greeting absent")
             loopback["mysql_protocol_greeting"] = True
         effective = broker_parameters(admin("getBrokerConfig"))
-        if any(effective[k] != v for k, v in PARAMETERS.items()):
-            raise RuntimeError("isolated accelerated Broker parameters not effective")
+        if any(effective[k] != v for k, v in parameters.items()):
+            raise RuntimeError("isolated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         proof["mysql_version"] = sql("SELECT VERSION();")
         if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.qs_runtime_host or args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host)):
@@ -744,7 +758,7 @@ def main():
             run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
                                   mysql_password, ca, run, proof[proof_name], fault_tools=fault_tools,
                                   native_runner=owned_native_run if kind in ('finalization', 'paired','paired_faults', 'native_limit') else None,
-                                  read_parameters=broker_parameters,
+                                  read_parameters=broker_parameters, observed_native_budget=args.ai_native_observed_budget,
                                   broker_fault=(OwnedBrokerFault(run,broker,project,
                                     lambda: broker_parameters(admin('getBrokerConfig')),effective)
                                     if kind == 'paired_faults' else None))
