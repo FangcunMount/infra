@@ -445,9 +445,11 @@
             "drawStyle": "line",
             "lineInterpolation": "linear",
             "lineWidth": 1,
-            "showPoints": "never"
+            "showPoints": "auto",
+            "spanNulls": false
           },
-          "unit": "bool",
+          "unit": "none",
+          "decimals": 0,
           "noValue": "不可用",
           "min": 0
         },
@@ -486,7 +488,7 @@
       ],
       "title": "QS commands with unverified transaction anchors",
       "type": "timeseries",
-      "description": "统计成功读取的非退役命令中缺失或冲突的事务锚点。缺样表示未取得证据。业务回执等待和历史责任分类各自独立。"
+      "description": "统计成功读取的非退役命令中缺失或冲突的事务锚点。0 表示当次实读未发现缺口，缺样表示未取得证据。此计数不区分历史集合或当前命令，历史分类和业务回执另行签收。"
     }
   ],
   "refresh": "30s",
