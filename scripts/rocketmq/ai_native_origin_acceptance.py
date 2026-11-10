@@ -115,14 +115,29 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
             raise RuntimeError('original durable witness and wire proof required')
         proof.update(reference_sha256=closed['reference_sha256'], wire_sha256=closed['wire_sha256'],
                      disconnected_root_commit_and_sender_drained=True, stage='original_sys_index')
-        deadline = time.monotonic() + 110
+        started = time.monotonic()
+        deadline = started + 110
         index = None
+        polls = []
+        proof['original_sys_index_polls'] = polls
         while time.monotonic() < deadline:
             try:
                 index = export(broker, project, half['key'], evidence_path)
-                break
-            except RuntimeError:
+            except RuntimeError as error:
+                category = {
+                    'native transaction limit index evidence absent': 'absent',
+                    'private read-only audit unavailable': 'transport_unavailable',
+                    'private read-only audit failed': 'command_failed',
+                    'unexpected pinned native limit index format': 'format_rejected',
+                    'Compose project mismatch': 'project_mismatch',
+                }.get(str(error), 'other_audit_error')
+                polls.append(dict(elapsed_ms=int((time.monotonic() - started) * 1000), outcome=category))
                 time.sleep(2)
+            else:
+                polls.append(dict(elapsed_ms=int((time.monotonic() - started) * 1000),
+                                  outcome='exported', records=len(index['records']),
+                                  truncated_possible=index['truncated_possible']))
+                break
         if not index or len(index['records']) != 1 or index['truncated_possible'] or not (
             index['read_only'] and not index['body_exported']
         ):
