@@ -25,6 +25,11 @@ on:
         type: string
         required: true
         default: 5c2e3cd155e67c0f766e93bf95238b16fc219b5f
+      pop_rebound_trace:
+        description: Retain bounded revive metadata on POP timeout or failed confirmation in public fixtures
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -83,6 +88,7 @@ jobs:
       - name: Real public Go/Python SDK with readable resources
         env:
           READABLE_PROFILE: ${{ matrix.profile }}
+          POP_REBOUND_TRACE: ${{ inputs.pop_rebound_trace || false }}
         run: |
           set -euo pipefail
           options=()
@@ -90,6 +96,7 @@ jobs:
             options=(--sdk-python-live-recovery)
           elif [[ "$READABLE_PROFILE" == public ]]; then
             options=(--sdk-pop-drain-controls)
+            if [[ "$POP_REBOUND_TRACE" == true ]]; then options+=(--sdk-pop-rebound-trace); fi
           else
             exit 1
           fi
