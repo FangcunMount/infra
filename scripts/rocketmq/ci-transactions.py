@@ -647,17 +647,23 @@ def main():
         cases[name] = True
         print("transaction acceptance passed: " + name, flush=True)
 
+    host_ingress = None
     try:
         run(compose + ["up", "-d", "--wait", "--wait-timeout", "180"], timeout=240)
         if coordinated_image:
+            from ci_coordinated_recovery import CoordinatedHostIngress
             loopback = proof["coordinated_host_loopback"] = {}
             tls = ssl.create_default_context(cafile=ca)
             tls.set_alpn_protocols(["h2"])
-            with socket.create_connection(("127.0.0.1", grpc_port), timeout=5) as conn:
-                with tls.wrap_socket(conn, server_hostname="127.0.0.1") as broker_stream:
-                    if broker_stream.selected_alpn_protocol() != "h2":
-                        raise RuntimeError("owned host Broker TLS did not negotiate HTTP/2")
-            loopback["broker_verified_tls_h2"] = True
+            host_ingress = CoordinatedHostIngress(project, run)
+            host_ingress.start(grpc_port)
+            for host, key in (("127.0.0.1", "broker_verified_tls_h2"),
+                              (RECOVERY_BROKER_IP, "advertised_broker_verified_tls_h2")):
+                with socket.create_connection((host, grpc_port), timeout=5) as conn:
+                    with tls.wrap_socket(conn, server_hostname=host) as broker_stream:
+                        if broker_stream.selected_alpn_protocol() != "h2":
+                            raise RuntimeError("owned host Broker TLS did not negotiate HTTP/2")
+                loopback[key] = True
             with socket.create_connection(("127.0.0.1", mysql_port), timeout=5) as conn:
                 with conn.makefile("rb") as mysql_stream:
                     greeting = mysql_stream.read(5)
@@ -1195,6 +1201,13 @@ def main():
                 probes_drained = p.close() and probes_drained
         if not probes_drained:
             failure = failure or "owned probe process group did not drain"
+        if host_ingress:
+            try:
+                host_ingress.close()
+                proof["coordinated_host_alias_removed"] = True
+            except (OSError, RuntimeError, ValueError):
+                proof["coordinated_host_alias_removed"] = False
+                failure = failure or "owned Broker host loopback cleanup failed"
         run(["docker", "unpause", mysql], required=False)
         run(compose + ["down", "--volumes", "--remove-orphans", "--timeout", "30"], timeout=120)
         remaining = run(["docker", "ps", "-aq", "--filter", "label=com.docker.compose.project=" + project]).stdout.strip()

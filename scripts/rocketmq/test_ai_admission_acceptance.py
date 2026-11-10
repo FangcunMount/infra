@@ -1,5 +1,7 @@
 import json
+import socket
 from subprocess import CompletedProcess
+import threading
 import unittest
 from unittest.mock import Mock
 
@@ -8,10 +10,40 @@ from ai_admission_acceptance import (
     admission_manifest, parse_admission_receipt, read_partial_receipt, validate_host_sdk_lock,
 )
 from ai_native_origin_acceptance import owned_broker_networks, sys_index_context
-from ci_coordinated_recovery import RECOVERY_BROKER_HOST, RECOVERY_BROKER_IP
+from ci_coordinated_recovery import HostBrokerRelay, RECOVERY_BROKER_HOST, RECOVERY_BROKER_IP
 
 
 class AIAdmissionAcceptanceTests(unittest.TestCase):
+    def test_owned_broker_relay_preserves_bytes_and_half_close(self):
+        with socket.socket() as backend:
+            backend.bind(('127.0.0.1', 0))
+            backend.listen()
+            backend.settimeout(3)
+            seen = []
+
+            def reply():
+                client, _ = backend.accept()
+                with client, client.makefile('rb') as stream:
+                    client.settimeout(3)
+                    seen.append(stream.read())
+                    client.sendall(b'broker-reply')
+
+            worker = threading.Thread(target=reply, daemon=True)
+            worker.start()
+            relay = HostBrokerRelay(('127.0.0.1', 0), backend.getsockname()[1])
+            relay.start()
+            try:
+                self.assertFalse(relay.verify_request(None, ('127.0.0.2', 0)))
+                with socket.create_connection(relay.server_address, timeout=3) as client:
+                    client.sendall(b'original\x00wire')
+                    client.shutdown(socket.SHUT_WR)
+                    with client.makefile('rb') as stream:
+                        self.assertEqual(stream.read(), b'broker-reply')
+                worker.join(3)
+                self.assertEqual(seen, [b'original\x00wire'])
+            finally:
+                relay.close()
+
     def test_original_fault_targets_both_owned_broker_networks(self):
         project = 'rocketmq-m2-fixture'
         control, recovery = project + '_rocketmq', project + '_recovery'

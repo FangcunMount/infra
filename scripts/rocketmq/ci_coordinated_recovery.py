@@ -3,10 +3,15 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
+import select
 import shlex
 import shutil
+import socket
+import socketserver
 import stat
 import subprocess
+import threading
 
 from final_image_candidate import ci_guard
 from native_recovery_container import INPUTS, IPV4_GATEWAY_MODE, ISOLATED_BRIDGE_PLAN
@@ -17,6 +22,99 @@ RECOVERY_BROKER_IP = '172.31.80.10'
 RECOVERY_BROKER_HOST = 'fixture-recovery-broker'
 RECOVERY_MYSQL_HOST = 'fixture-recovery-mysql'
 RECOVERY_NAMESERVER_HOST = 'fixture-recovery-nameserver'
+IP = '/usr/sbin/ip'
+
+
+class HostBrokerRelay(socketserver.ThreadingTCPServer):
+    """Connect the hosted fixture's advertised gRPC address to its published loopback port."""
+    daemon_threads = True
+
+    def __init__(self, address, port):
+        self.upstream = ('127.0.0.1', port)
+        super().__init__(address, BrokerRelayHandler)
+
+    def verify_request(self, request, client_address):
+        # A local route selects its own address as the source. Do not relay
+        # traffic arriving from another container or a non-loopback interface.
+        return client_address[0] == self.server_address[0]
+
+    def start(self):
+        self.stopping = threading.Event()
+        self.worker = threading.Thread(target=self.serve_forever, kwargs={'poll_interval': 0.1}, daemon=True)
+        self.worker.start()
+
+    def close(self):
+        self.stopping.set()
+        self.shutdown()
+        self.server_close()
+        self.worker.join()
+
+
+class BrokerRelayHandler(socketserver.BaseRequestHandler):
+    def handle(self):
+        try:
+            with socket.create_connection(self.server.upstream, timeout=3) as upstream:
+                self.request.settimeout(3)
+                peers = {self.request: upstream, upstream: self.request}
+                readers = set(peers)
+                while readers and not self.server.stopping.is_set():
+                    for source in select.select(readers, [], [], 0.5)[0]:
+                        data = source.recv(65536)
+                        if data:
+                            peers[source].sendall(data)
+                        else:
+                            readers.remove(source)
+                            peers[source].shutdown(socket.SHUT_WR)
+        except OSError:
+            # Disconnecting the fixture Broker is the intended fault.
+            return
+
+
+class CoordinatedHostIngress:
+    def __init__(self, project, run):
+        ci_guard(os.environ)
+        if not re.fullmatch(r'rocketmq-m2-[a-f0-9]{12}', project):
+            raise RuntimeError('exact owned host loopback fixture required')
+        self.run = run
+        self.label = 'lo:f07' + project[-6:]
+        self.address = [RECOVERY_BROKER_IP + '/32', 'dev', 'lo']
+        self.installed = False
+        self.relay = None
+
+    def entries(self):
+        interfaces = json.loads(self.run([IP, '-j', '-4', 'address', 'show']).stdout)
+        return [(row['ifname'], item['prefixlen'], item.get('label'))
+                for row in interfaces for item in row.get('addr_info', []) if item['local'] == RECOVERY_BROKER_IP]
+
+    def start(self, port):
+        if self.entries():
+            raise RuntimeError('owned Broker loopback address already in use')
+        self.run(['/usr/bin/sudo', '-n', IP, 'address', 'add', *self.address, 'label', self.label])
+        self.installed = True
+        route, = json.loads(self.run([IP, '-j', '-4', 'route', 'get', RECOVERY_BROKER_IP]).stdout)
+        if (self.entries() != [('lo', 32, self.label)] or route.get('type') != 'local'
+                or route.get('dev') != 'lo' or route.get('prefsrc') != RECOVERY_BROKER_IP):
+            raise RuntimeError('exact owned local Broker route required')
+        relay = HostBrokerRelay((RECOVERY_BROKER_IP, port), port)
+        try:
+            relay.start()
+        except RuntimeError:
+            relay.server_close()
+            raise
+        self.relay = relay
+
+    def close(self):
+        try:
+            if self.relay:
+                self.relay.close()
+        finally:
+            if self.installed:
+                if self.entries() != [('lo', 32, self.label)]:
+                    raise RuntimeError('owned Broker loopback address drifted')
+                self.run(['/usr/bin/sudo', '-n', IP, 'address', 'del', *self.address])
+                self.installed = False
+                if self.entries():
+                    raise RuntimeError('owned Broker loopback address remained')
 
 
 def add_recovery_bridge(spec):

@@ -156,8 +156,9 @@ jobs:
             --sdk "$PWD/.sdk-acceptance" --ai-admission-host "$PWD/.ai-acceptance" \
             --image rocketmq-ai-state:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-state.json
           if [[ "$QS_AI_COORDINATED_IMAGE" == true ]]; then
-            jq -e '.proof.coordinated_host_loopback == {"broker_verified_tls_h2":true,"mysql_protocol_greeting":true}
-              and .proof.coordinated_project_networks_removed and (.proof.ai_state_host.original_native |
+            jq -e '.proof.coordinated_host_loopback ==
+              {"broker_verified_tls_h2":true,"advertised_broker_verified_tls_h2":true,"mysql_protocol_greeting":true}
+              and .proof.coordinated_host_alias_removed and .proof.coordinated_project_networks_removed and (.proof.ai_state_host.original_native |
               .original_fault_broker_networks_disconnected == 2 and (.coordinated_image_steps | length) == 3 and
               all(.coordinated_image_steps[]; .container_plan_schema == "m3-native-recovery-container/v2" and
                 .exit_code == 0 and .uid == 3000 and (.network_id | test("^[0-9a-f]{64}$"))) and
