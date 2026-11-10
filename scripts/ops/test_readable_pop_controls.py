@@ -197,3 +197,27 @@ class ReadablePopControlsTest(unittest.TestCase):
                 self.assertEqual(proof['go']['closed'], settled)
                 self.assertEqual(proof['go']['closed_confirmation'], reappeared)
                 passed.assert_not_called()
+
+    def test_isolated_ack_wait_rejects_retry_topic_even_with_zero_metrics(self):
+        topic, group = 'fixture-topic', 'fixture-group'
+        manifest = {'routes': [dict(physical_topic=topic, consumer_group=group)]}
+        settled = snapshot(metrics(), timing_required=True)
+        for retry, expected_failure in (('', False), (f'%RETRY%{group}+{topic}', True)):
+            with self.subTest(retry=retry):
+                catalog = {name: {} for name in (topic, SYSTEM_TOPIC, retry) if name}
+                raw = json.dumps(dict(topicConfigTable=catalog, dataVersion={}))
+                run, passed = Mock(return_value=Mock(stdout=raw)), Mock()
+                proof = {'go': {'held': snapshot(metrics(timing='2'), timing_required=True)}}
+                control = OwnedPopControls(run, Mock(), 'broker', 'project', manifest, proof, passed,
+                                           isolated_ack_wait=True)
+                control.url = 'http://127.0.0.1:1234/metrics'
+                control.observed_timer = True
+                with patch.object(control, 'read', return_value=settled), patch('readable_pop_controls.time.sleep'):
+                    if expected_failure:
+                        with self.assertRaisesRegex(RuntimeError, 'fixture_retry_topic_present'):
+                            control('closed', 'sdk-go')
+                    else:
+                        control('closed', 'sdk-go')
+                receipt = proof['go']['closed_confirmation_retry_catalog']
+                self.assertEqual(len(receipt['present_sha256s']), int(expected_failure))
+                self.assertEqual(passed.call_count, int(not expected_failure))

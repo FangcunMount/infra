@@ -274,10 +274,12 @@ def physical_revive_records(read, committed, bounds, lag):
 
 
 class OwnedPopControls:
-    def __init__(self, run, admin, broker, project, manifest, proof, passed, *, trace_rebound=False):
+    def __init__(self, run, admin, broker, project, manifest, proof, passed, *, trace_rebound=False,
+                 isolated_ack_wait=False):
         self.run, self.admin, self.broker, self.project = run, admin, broker, project
         self.manifest, self.proof, self.passed = manifest, proof, passed
         self.trace_rebound = trace_rebound
+        self.isolated_ack_wait = isolated_ack_wait
         self.url = None
         self.observed_timer = False
 
@@ -302,6 +304,17 @@ class OwnedPopControls:
         if self.trace_rebound:
             require(properties.get('enablePopLog') == 'true', 'owned_pop_trace_config_required')
         self.url = 'http://127.0.0.1:' + bindings[0]['HostPort'] + '/metrics'
+
+    def verify_empty_fixture_retry_catalog(self, record, stage):
+        require(self.url is not None, 'owned_pop_retry_read_required')
+        routes = {(row['physical_topic'], row['consumer_group']) for row in self.manifest['routes']
+                  if row.get('physical_topic') and row.get('consumer_group')}
+        require(bool(routes), 'known_fixture_retry_routes_required')
+        result = self.run(['docker', 'exec', self.broker, 'head', '-c', str(POP_LOG_BYTES + 1), TOPIC_CATALOG],
+                          timeout=5)
+        evidence = retry_catalog(result.stdout, routes)
+        record[stage + '_retry_catalog'] = evidence
+        require(not evidence['present_sha256s'], 'fixture_retry_topic_present')
 
     def read(self, required):
         if self.url is None:
@@ -395,6 +408,8 @@ class OwnedPopControls:
         if stage == 'baseline':
             record[stage] = self.wait(lambda v: zero(v, timing_required=self.observed_timer),
                                       required=self.observed_timer, budget=90, record=record, stage=stage)
+            if self.isolated_ack_wait:
+                self.verify_empty_fixture_retry_catalog(record, stage)
         elif stage == 'subscribed':
             require('baseline' in record, 'pop_baseline_required')
             routes = [row for row in self.manifest['routes'] if row['subscription'] == 'sdk-shared-' + suffix]
@@ -418,4 +433,6 @@ class OwnedPopControls:
             if not settled:
                 self.retain_trace(record)
             require(settled, 'pop_responsibility_reappeared_after_sdk_close')
+            if self.isolated_ack_wait:
+                self.verify_empty_fixture_retry_catalog(record, 'closed_confirmation')
             self.passed('readable_pop_' + suffix + '_acked_and_closed_responsibility_zero')

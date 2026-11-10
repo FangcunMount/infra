@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import queue
+import re
 import secrets
 import signal
 import shutil
@@ -30,11 +31,11 @@ DISCARD_TOPIC = "TRANS_CHECK_MAX_TIME_TOPIC"  # TopicValidator in pinned Broker 
 
 PARAMETERS = {"transactionTimeOut": 6000, "transactionCheckInterval": 5000,
               "transactionCheckMax": 24}
+ISOLATED_ACK_WAIT = {"enableSkipLongAwaitingAck": "true", "reviveAckWaitMs": "60000"}
 
 
 def broker_parameters(output):
     """Only allowlisted runtime values may leave the private admin capture."""
-    import re
     result = {}
     for name in (*PARAMETERS, "fileReservedTime"):
         match = re.search(r"(?m)^\s*" + name + r"\s*=\s*(\d+)\s*$", output)
@@ -194,6 +195,7 @@ def main():
     parser.add_argument("--sdk", type=Path, required=True)
     parser.add_argument("--sdk-pop-drain-controls", action="store_true", help="owned readable public SDK held/future-CK/settled metrics controls; never production")
     parser.add_argument("--sdk-pop-rebound-trace", action="store_true", help="bounded revive metadata on POP timeout or failed confirmation in owned CI")
+    parser.add_argument("--sdk-pop-isolated-ack-wait", action="store_true", help="test the Broker ACK wait setting in the owned public fixture")
     parser.add_argument("--readable-routes", action="store_true", help="owned public SDK v3 naming fixture; never production")
     parser.add_argument("--m3-resources", action="store_true", help="isolated final M3 manifest/ACL/type/TLS proof only; no production changes")
     parser.add_argument("--native-dlq-audit", action="store_true", help="isolated native DLQ and index-only audit; no host/DB/business acceptance")
@@ -275,6 +277,8 @@ def main():
         parser.error("readable routes require the isolated public Go/Python SDK fixture")
     if args.sdk_pop_rebound_trace and not args.sdk_pop_drain_controls:
         parser.error('POP rebound trace requires the guarded POP drain controls')
+    if args.sdk_pop_isolated_ack_wait and not args.sdk_pop_rebound_trace:
+        parser.error('isolated ACK wait requires the guarded POP rebound trace')
     if args.sdk_pop_drain_controls:
         if not args.readable_routes or args.sdk_python_live_recovery or args.sdk_faults or args.sdk_limits:
             parser.error('POP drain controls require the standalone readable public SDK profile')
@@ -434,6 +438,8 @@ def main():
         stream.write("".join(f"{key}={value}\n" for key, value in PARAMETERS.items()))
         if args.sdk_pop_rebound_trace:
             stream.write("enablePopLog=true\n")
+        if args.sdk_pop_isolated_ack_wait:
+            stream.write("".join(f"{key}={value}\n" for key, value in ISOLATED_ACK_WAIT.items()))
     proxy = json.loads((config / "proxy.json").read_text())
     proxy["grpcServerPort"] = grpc_port
     (config / "proxy.json").write_text(json.dumps(proxy))
@@ -675,10 +681,17 @@ def main():
                     if len(greeting) != 5 or greeting[3:] != b"\x00\x0a":
                         raise RuntimeError("owned host MySQL protocol greeting absent")
             loopback["mysql_protocol_greeting"] = True
-        effective = broker_parameters(admin("getBrokerConfig"))
+        raw_config = admin("getBrokerConfig")
+        effective = broker_parameters(raw_config)
         if any(effective[k] != v for k, v in PARAMETERS.items()):
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
+        if args.sdk_pop_isolated_ack_wait:
+            observed = re.findall(r'^\s*(enableSkipLongAwaitingAck|reviveAckWaitMs)\s*=\s*(\S+)\s*$',
+                                  raw_config, re.MULTILINE)
+            if len(observed) != len(ISOLATED_ACK_WAIT) or dict(observed) != ISOLATED_ACK_WAIT:
+                raise RuntimeError('isolated ACK wait settings are not effective')
+            proof['isolated_pop_ack_wait'] = dict(observed)
         proof["mysql_version"] = sql("SELECT VERSION();")
         if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.qs_runtime_host or args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
@@ -963,7 +976,8 @@ def main():
                 proof['readable_pop_controls_source_sha256'] = hashlib.sha256((repo / 'scripts/ops/readable_pop_controls.py').read_bytes()).hexdigest()
                 proof['readable_pop_controls'] = {}
                 pop_observe = controls.OwnedPopControls(run, admin, broker, project, sdk_manifest,
-                    proof['readable_pop_controls'], passed, trace_rebound=args.sdk_pop_rebound_trace)
+                    proof['readable_pop_controls'], passed, trace_rebound=args.sdk_pop_rebound_trace,
+                    isolated_ack_wait=args.sdk_pop_isolated_ack_wait)
             shared_budget(start,passed,language="sdk-go",observe=pop_observe)
             if args.sdk_api_python:
                 shared_budget(start,passed,language="sdk-python",observe=pop_observe)

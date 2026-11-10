@@ -30,6 +30,11 @@ on:
         type: boolean
         required: false
         default: false
+      pop_isolated_ack_wait:
+        description: Test the Broker ACK wait setting and verify retry absence in the owned public fixtures
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -89,6 +94,7 @@ jobs:
         env:
           READABLE_PROFILE: ${{ matrix.profile }}
           POP_REBOUND_TRACE: ${{ inputs.pop_rebound_trace || false }}
+          POP_ISOLATED_ACK_WAIT: ${{ inputs.pop_isolated_ack_wait || false }}
         run: |
           set -euo pipefail
           options=()
@@ -97,6 +103,7 @@ jobs:
           elif [[ "$READABLE_PROFILE" == public ]]; then
             options=(--sdk-pop-drain-controls)
             if [[ "$POP_REBOUND_TRACE" == true ]]; then options+=(--sdk-pop-rebound-trace); fi
+            if [[ "$POP_ISOLATED_ACK_WAIT" == true ]]; then options+=(--sdk-pop-isolated-ack-wait); fi
           else
             exit 1
           fi
@@ -107,6 +114,7 @@ jobs:
         if: always()
         env:
           READABLE_PROFILE: ${{ matrix.profile }}
+          POP_ISOLATED_ACK_WAIT: ${{ inputs.pop_isolated_ack_wait || false }}
         run: |
           python3 - <<'PYPROOF'
           import json,os
@@ -119,8 +127,15 @@ jobs:
           if os.environ['READABLE_PROFILE']=='public':
               controls=x['proof']['readable_pop_controls']
               assert set(controls)=={'go','python'}
+              ack_wait=os.environ['POP_ISOLATED_ACK_WAIT']=='true'
+              if ack_wait:
+                  assert x['proof']['isolated_pop_ack_wait']==dict(enableSkipLongAwaitingAck='true',reviveAckWaitMs='60000')
               expected_lag = dict.fromkeys(map(str, range(8)), 0)
               for name,row in controls.items():
+                  if ack_wait:
+                      for stage in ('baseline', 'closed_confirmation'):
+                          evidence=row[stage+'_retry_catalog']
+                          assert evidence['checked']>0 and evidence['present_sha256s']==[]
                   assert row['held']['timing']>0 and row['held']['timer_series_present']
                   for stage in ('closed', 'closed_confirmation'):
                       sample = row[stage]
