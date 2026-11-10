@@ -13,6 +13,9 @@ import urllib.request
 
 SYSTEM_TOPIC = 'rmq_sys_REVIVE_LOG_FangcunMount'
 BUFFER_NAMES = ('rocketmq_pop_offset_buffer_size', 'rocketmq_pop_checkpoint_buffer_size')
+# The pinned 5.5.1 exporter adds the unit suffix, but this gauge counts messages.
+REVIVE_LAG_NAME = 'rocketmq_pop_revive_lag_milliseconds'
+REVIVE_QUEUE_IDS = {str(queue_id) for queue_id in range(8)}
 
 
 def require(ok, reason):
@@ -50,8 +53,13 @@ def snapshot(raw, *, timing_required):
         counts.append(values[0][1])
     timers = [count for labels, count in samples(raw, 'rocketmq_timing_messages') if labels.get('topic') == SYSTEM_TOPIC]
     require(len(timers) <= 1 and (not timing_required or len(timers) == 1), 'complete_unique_revive_timer_metric_required')
+    lag_samples = samples(raw, REVIVE_LAG_NAME)
+    revive_lag = {labels.get('queue_id'): count for labels, count in lag_samples}
+    require(len(lag_samples) == len(REVIVE_QUEUE_IDS) and revive_lag.keys() == REVIVE_QUEUE_IDS,
+            'complete_unique_revive_queue_lag_required')
     return dict(offset_buffer=counts[0], checkpoint_buffer=counts[1],
                 timing=timers[0] if timers else None, timer_series_present=bool(timers),
+                revive_lag=revive_lag,
                 raw_sha256=hashlib.sha256(raw.encode()).hexdigest())
 
 
@@ -59,7 +67,9 @@ def zero(value, *, timing_required):
     # Missing timer series is allowed ONLY before any timing record exists in
     # the controlled new CI project. A positive future CK must then materialize
     # that series, and the settled control requires its explicit zero.
+    # The timer decrements before the record is processed by the revive queue.
     return (value['offset_buffer'] == value['checkpoint_buffer'] == 0
+            and not any(value['revive_lag'].values())
             and (value['timing'] == 0 or (not timing_required and value['timing'] is None)))
 
 

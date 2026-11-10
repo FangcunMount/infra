@@ -15,6 +15,8 @@ on:
       - "!scripts/rocketmq/readable_cutover_receipt.py"
       - "!scripts/rocketmq/test_readable_cutover_materials.py"
       - "!scripts/rocketmq/test_readable_cutover_receipt.py"
+      - "scripts/ops/readable_pop_controls.py"
+      - "scripts/ops/test_readable_pop_controls.py"
       - ".github/workflows/rocketmq-readable-routes.yml"
   workflow_dispatch:
     inputs:
@@ -110,10 +112,13 @@ jobs:
           if os.environ['READABLE_PROFILE']=='public':
               controls=x['proof']['readable_pop_controls']
               assert set(controls)=={'go','python'}
+              expected_lag = dict.fromkeys(map(str, range(8)), 0)
               for name,row in controls.items():
                   assert row['held']['timing']>0 and row['held']['timer_series_present']
-                  assert row['closed']['offset_buffer']==row['closed']['checkpoint_buffer']==row['closed']['timing']==0
-                  assert row['closed']['timer_series_present']
+                  for stage in ('closed', 'closed_confirmation'):
+                      sample = row[stage]
+                      assert sample['offset_buffer']==sample['checkpoint_buffer']==sample['timing']==0
+                      assert sample['timer_series_present'] and sample['revive_lag']==expected_lag
                   for suffix in ('_held_future_checkpoint_blocks_drain','_acked_and_closed_responsibility_zero'):
                       assert x['cases']['readable_pop_'+name+suffix] is True
           PYPROOF
