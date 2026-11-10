@@ -1,9 +1,13 @@
+import json
+import struct
 import unittest
+import zlib
 from unittest.mock import Mock, patch
 
 from readable_pop_controls import (
     BUFFER_NAMES, REVIVE_LAG_NAME, REVIVE_OFFSET_KEY, SYSTEM_TOPIC, OwnedPopControls,
-    persisted_revive_offsets, revive_log_records, revive_queue_bounds, snapshot, zero,
+    decode_physical_revive, persisted_revive_offsets, physical_revive_records,
+    revive_log_records, revive_queue_bounds, snapshot, zero,
 )
 
 
@@ -116,6 +120,51 @@ class ReadablePopControlsTest(unittest.TestCase):
         self.assertEqual(rows[0]['merge_key_sha256'], rows[1]['merge_key_sha256'])
         self.assertEqual(rows[0]['offset_sha256s'], rows[1]['offset_sha256s'])
         self.assertNotIn('fixture-topic', repr(rows))
+
+    def test_physical_revive_matches_ck_ack_and_batch_ack(self):
+        routes = {('fixture-topic', 'fixture-group')}
+        core = dict(t='fixture-topic', c='fixture-group', q=0, so=1, pt=2, bn='broker')
+        topic = SYSTEM_TOPIC.encode()
+        rows = []
+        for offset, (tag, fields, topic_width) in enumerate([
+                (b'ck', dict(n=1, d=[0]), 1), (b'ack', dict(ao=1), 1), (b'bAck', dict(aol=[1]), 2)]):
+            body = json.dumps(dict(core, **fields)).encode()
+            properties = b'TAGS\x01' + tag + b'\x02'
+            tail = (b'\x00' * 44 + struct.pack('>i', len(body)) + body
+                    + len(topic).to_bytes(topic_width, 'big') + topic
+                    + struct.pack('>H', len(properties)) + properties)
+            magic = -626843481 if topic_width == 1 else -626843477
+            crc = zlib.crc32(body) & 0x7fffffff
+            raw = struct.pack('>iiiiiqqi', 40 + len(tail), magic, crc, 2, 0, offset, 100, 0) + tail
+            rows.append(decode_physical_revive(raw, 2, offset, 100, routes))
+        self.assertEqual([row['kind'] for row in rows], ['ck', 'ack', 'batch ack'])
+        self.assertEqual(len({row['merge_key_sha256'] for row in rows}), 1)
+        self.assertEqual(len({tuple(row['offset_sha256s']) for row in rows}), 1)
+        self.assertNotIn('fixture-topic', repr(rows))
+        with self.assertRaisesRegex(RuntimeError, 'physical_revive_record_identity_mismatch'):
+            decode_physical_revive(raw, 2, 1, 100, routes)
+        with self.assertRaisesRegex(RuntimeError, 'physical_revive_body_crc_mismatch'):
+            decode_physical_revive(raw[:88] + b'x' + raw[89:], 2, 2, 100, routes)
+        with self.assertRaisesRegex(RuntimeError, 'physical_revive_topic_mismatch'):
+            decode_physical_revive(raw.replace(topic, b'x' * len(topic)), 2, 2, 100, routes)
+
+    def test_physical_revive_bounds_reject_truncated_and_changing_indexes(self):
+        index = struct.pack('>qiq', 10, 90, 0) + struct.pack('>qiq', 100, 90, 0)
+        bounds = {'2': dict(minimum=0, exclusive_maximum=2)}
+        raw = b'x' * 90
+        read = Mock(side_effect=[index, raw, raw, index])
+        selected, queues = physical_revive_records(read, {'2': 0}, bounds, {'2': 1})
+        self.assertEqual(selected, [(raw, 2, 0, 10), (raw, 2, 1, 100)])
+        self.assertEqual(queues['2']['exclusive_maximum'], 2)
+        for samples in ([index[:20]], [index, raw, raw, index[::-1]]):
+            selected, queues = physical_revive_records(Mock(side_effect=samples), {'2': 0}, bounds, {'2': 1})
+            self.assertEqual(selected, [])
+            self.assertIn('error', queues['2'])
+        read = Mock()
+        selected, queues = physical_revive_records(read, {'2': 0}, bounds, {'2': 2})
+        self.assertEqual(selected, [])
+        self.assertIn('error', queues['2'])
+        read.assert_not_called()
 
     def test_timeout_trace_cannot_approve_drain(self):
         proof, passed = {}, Mock()
