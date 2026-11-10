@@ -13,6 +13,12 @@ on:
       - scripts/rocketmq/cutover_step.py
       - .github/workflows/rocketmq-managed-recovery.yml
   workflow_dispatch:
+    inputs:
+      qs_dual_original:
+        description: Exercise the isolated QS original MySQL and Mongo owners
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 env:
@@ -113,7 +119,9 @@ jobs:
           if-no-files-found: error
           retention-days: 14
   actual-qs-dual-original-primary-recovery:
-    if: github.ref_name == 'codex/f07-qs-shared-native-20261111' && github.event_name == 'workflow_dispatch'
+    if: >-
+      github.event_name == 'workflow_dispatch' && inputs.qs_dual_original &&
+      (github.ref_name == 'main' || github.ref_name == 'codex/f07-qs-shared-native-20261111')
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
