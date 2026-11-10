@@ -157,7 +157,7 @@ jobs:
             --image rocketmq-ai-state:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-state.json
           if [[ "$QS_AI_COORDINATED_IMAGE" == true ]]; then
             jq -e '.proof.coordinated_project_networks_removed and (.proof.ai_state_host.original_native |
-              (.coordinated_image_steps | length) == 3 and
+              .original_fault_broker_networks_disconnected == 2 and (.coordinated_image_steps | length) == 3 and
               all(.coordinated_image_steps[]; .container_plan_schema == "m3-native-recovery-container/v2" and
                 .exit_code == 0 and .uid == 3000 and (.network_id | test("^[0-9a-f]{64}$"))) and
               ([.coordinated_image_steps[].network_id] | unique | length) == 1 and .coordinated_image_cleanup and

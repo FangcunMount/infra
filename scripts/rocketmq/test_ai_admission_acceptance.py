@@ -7,10 +7,35 @@ from ai_admission_acceptance import (
     CASES, TESTS, STABLE_NATIVE_AI_SOURCE, STABLE_NATIVE_SDK_SHA256, acceptance_profile,
     admission_manifest, parse_admission_receipt, read_partial_receipt, validate_host_sdk_lock,
 )
-from ai_native_origin_acceptance import sys_index_context
+from ai_native_origin_acceptance import owned_broker_networks, sys_index_context
+from ci_coordinated_recovery import RECOVERY_BROKER_HOST, RECOVERY_BROKER_IP
 
 
 class AIAdmissionAcceptanceTests(unittest.TestCase):
+    def test_original_fault_targets_both_owned_broker_networks(self):
+        project = 'rocketmq-m2-fixture'
+        control, recovery = project + '_rocketmq', project + '_recovery'
+        labels = {'com.docker.compose.project': project}
+        endpoints = {control: {'NetworkID': 'control'}, recovery: {
+            'NetworkID': 'recovery', 'IPAddress': RECOVERY_BROKER_IP, 'Aliases': [RECOVERY_BROKER_HOST],
+        }}
+
+        def run(arguments):
+            if arguments[1] == 'container':
+                result = [{'Config': {'Labels': labels}, 'NetworkSettings': {'Networks': endpoints}}]
+            else:
+                result = [{'Id': endpoints[arguments[-1]]['NetworkID'], 'Labels': labels}]
+            return CompletedProcess(arguments, 0, json.dumps(result), '')
+
+        networks = owned_broker_networks(run, 'owned-broker', project, coordinated=True)
+        self.assertEqual(list(networks), [control, recovery])
+        self.assertEqual(networks[recovery][-4:], ['--alias', RECOVERY_BROKER_HOST, '--ip', RECOVERY_BROKER_IP])
+        with self.assertRaisesRegex(RuntimeError, 'exact owned Broker networks'):
+            owned_broker_networks(run, 'owned-broker', project, coordinated=False)
+        endpoints['third'] = {}
+        with self.assertRaisesRegex(RuntimeError, 'exact owned Broker networks'):
+            owned_broker_networks(run, 'owned-broker', project, coordinated=True)
+
     def test_native_index_context_keeps_storage_route_and_log_evidence_separate(self):
         key = 'private-fixture-key'
         log = f'Check transaction. real_topic=fixture,uniqKey={key}\n'

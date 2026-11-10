@@ -1,7 +1,6 @@
 """Drive the same AI SQLAlchemy root and native Broker limit in an owned stack."""
 import hashlib
 import json
-import json
 import os
 from pathlib import Path
 import re
@@ -123,25 +122,38 @@ def run_managed(managed, directory, broker, project, run, native, proof,
     return cases
 
 
+def owned_broker_networks(run, broker, project, coordinated):
+    item, = json.loads(run(['docker', 'container', 'inspect', broker]).stdout)
+    if item['Config']['Labels']['com.docker.compose.project'] != project:
+        raise RuntimeError('owned Broker required')
+    endpoints = item['NetworkSettings']['Networks']
+    control = project + '_rocketmq'
+    reconnect = {control: ['--alias', 'broker']}
+    if coordinated:
+        from ci_coordinated_recovery import RECOVERY_BROKER_HOST, RECOVERY_BROKER_IP
+        recovery = project + '_recovery'
+        endpoint = endpoints.get(recovery, {})
+        if endpoint.get('IPAddress') != RECOVERY_BROKER_IP or RECOVERY_BROKER_HOST not in (endpoint.get('Aliases') or ()):
+            raise RuntimeError('fixed original Broker recovery endpoint required')
+        reconnect[recovery] = ['--alias', 'broker', '--alias', RECOVERY_BROKER_HOST, '--ip', RECOVERY_BROKER_IP]
+    if set(endpoints) != set(reconnect):
+        raise RuntimeError('exact owned Broker networks required')
+    for network in reconnect:
+        actual, = json.loads(run(['docker', 'network', 'inspect', network]).stdout)
+        if (actual['Labels']['com.docker.compose.project'] != project
+                or actual['Id'] != endpoints[network]['NetworkID']):
+            raise RuntimeError('owned Broker network identity differs')
+    return reconnect
+
+
 def run_origin(source, directory, broker, project, command, env, run, native_runner,
                read_parameters, proof, evidence_path, *, managed=None):
     if not project.startswith('rocketmq-m2-') or directory.stat().st_mode & 0o077:
         raise RuntimeError('owned private AI origin fixture required')
     admin = Admin(broker)
     before = read_parameters(admin('getBrokerConfig'))
-    network = run(['docker', 'inspect', '--format',
-                   '{{range $name,$config := .NetworkSettings.Networks}}{{$name}}{{end}}', broker]).stdout.strip()
-    if not network.startswith(project + '_') or (
-        json.loads(run(['docker', 'network', 'inspect', network]).stdout)[0]['Labels']['com.docker.compose.project'] != project
-    ):
-        raise RuntimeError('owned Broker network required')
-    reconnect = ['docker', 'network', 'connect', '--alias', 'broker']
-    if os.environ.get('QS_AI_COORDINATED_IMAGE') == 'true':
-        address = run(['docker', 'inspect', '--format',
-                       '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}', broker]).stdout.strip()
-        if address != '172.31.80.10':
-            raise RuntimeError('fixed original Broker bridge address required')
-        reconnect += ['--ip', address]
+    coordinated = os.environ.get('QS_AI_COORDINATED_IMAGE') == 'true'
+    reconnect = owned_broker_networks(run, broker, project, coordinated)
     test_file = Path(__file__).with_name('ai_native_origin_case.py').resolve()
     proof['case_sha256'] = hashlib.sha256(test_file.read_bytes()).hexdigest()
     proof['stage'] = 'configuration'
@@ -161,18 +173,32 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
         ) or (managed and (type(half['fence']) is not int or not 0 < half['fence'] < 2**63)):
             raise RuntimeError('bounded original message identity required')
         proof['stage'] = 'commit_without_broker'
-        run(['docker', 'network', 'disconnect', network, broker])
+        disconnected = []
         try:
+            for network in reversed(reconnect):
+                run(['docker', 'network', 'disconnect', network, broker])
+                disconnected.append(network)
+            attachments = run(['docker', 'container', 'inspect', '--format',
+                               '{{len .NetworkSettings.Networks}}', broker]).stdout.strip()
+            if attachments != '0':
+                raise RuntimeError('owned Broker still attached during the isolated commit')
             native.send('commit')
             closed = native.wait('closed', timeout=85)
         finally:
-            run([*reconnect, network, broker])
+            restored = []
+            for network in reversed(disconnected):
+                result = run(['docker', 'network', 'connect', *reconnect[network], network, broker], required=False)
+                restored.append(result.returncode == 0)
+            if not all(restored):
+                raise RuntimeError('owned Broker network reconnect failed')
+        owned_broker_networks(run, broker, project, coordinated)
         if set(closed) != {'event', 'reference_sha256', 'wire_sha256'} or not all(
             re.fullmatch('[0-9a-f]{64}', closed[field]) for field in ('reference_sha256', 'wire_sha256')
         ):
             raise RuntimeError('original durable witness and wire proof required')
         proof.update(reference_sha256=closed['reference_sha256'], wire_sha256=closed['wire_sha256'],
-                     disconnected_root_commit_and_sender_drained=True, stage='original_sys_index')
+                     disconnected_root_commit_and_sender_drained=True,
+                     original_fault_broker_networks_disconnected=len(disconnected), stage='original_sys_index')
         started = time.monotonic()
         deadline = started + 110
         index = None
