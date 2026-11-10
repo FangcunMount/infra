@@ -13,6 +13,10 @@ import urllib.request
 
 SYSTEM_TOPIC = 'rmq_sys_REVIVE_LOG_FangcunMount'
 BUFFER_NAMES = ('rocketmq_pop_offset_buffer_size', 'rocketmq_pop_checkpoint_buffer_size')
+POP_LOG = '/home/rocketmq/logs/rocketmqlogs/pop.log'
+POP_LOG_BYTES = 256 * 1024
+REVIVE_LINE = re.compile(r'^.*?reviveQueueId=(\d+),\s*find (ck|ack|batch ack), offset:(\d+), raw : (\{.*\})\s*$')
+
 
 
 def require(ok, reason):
@@ -63,10 +67,71 @@ def zero(value, *, timing_required):
             and (value['timing'] == 0 or (not timing_required and value['timing'] is None)))
 
 
+def unique_fields(pairs):
+    result = {}
+    for key, value in pairs:
+        require(key not in result, 'duplicate_revive_field')
+        result[key] = value
+    return result
+
+
+def revive_log_records(raw, routes):
+    """Keep only fixed 5.5.1 records for the disposable subscriber routes."""
+    require(len(raw.encode()) <= POP_LOG_BYTES, 'bounded_revive_log_required')
+    records = {}
+    malformed = 0
+    for line in raw.splitlines():
+        match = REVIVE_LINE.fullmatch(line)
+        if not match:
+            continue
+        queue, kind, offset, body = match.groups()
+        try:
+            require(len(body) <= 16384, 'bounded_revive_metadata_required')
+            data = json.loads(body, object_pairs_hook=unique_fields)
+            require(isinstance(data, dict), 'invalid_revive_metadata')
+            if (data.get('t'), data.get('c')) not in routes:
+                continue
+            q, start, pop = (data[k] for k in ('q', 'so', 'pt'))
+            require(all(type(value) is int and value >= 0 for value in (q, start, pop)), 'invalid_revive_location')
+            broker = data.get('bn')
+            require(isinstance(broker, str) and 0 < len(broker) <= 128, 'invalid_revive_broker')
+            queue, offset = int(queue), int(offset)
+            require(0 <= queue < 8 and 0 <= offset < 2**63, 'invalid_revive_offset')
+            key = json.dumps([queue, data['t'], data['c'], q, start, pop, broker], separators=(',', ':'))
+            if kind == 'ck':
+                count = data['n']
+                require(type(count) is int and 0 <= count <= 127, 'invalid_ck_count')
+                differences = data.get('d')
+                if differences is None or differences == []:
+                    differences = range(count)
+                require(isinstance(differences, (list, range)) and len(differences) == count
+                        and all(type(value) is int and value >= 0 for value in differences), 'invalid_ck_offsets')
+                offsets = [start + value for value in differences]
+            elif kind == 'ack':
+                offsets = [data['ao']]
+            else:
+                offsets = data['aol']
+            require(isinstance(offsets, list) and len(offsets) <= 127 and (offsets or kind == 'ck')
+                    and all(type(value) is int and start <= value < 2**63 for value in offsets)
+                    and len(set(offsets)) == len(offsets), 'invalid_revive_message_offsets')
+        except (RuntimeError, KeyError, ValueError, TypeError, RecursionError):
+            malformed += 1
+            continue
+        digest = hashlib.sha256(body.encode()).hexdigest()
+        records[(queue, offset, digest)] = dict(
+            kind=kind, revive_queue=queue, revive_offset=offset, messages=len(offsets),
+            merge_key_sha256=hashlib.sha256(key.encode()).hexdigest(), metadata_sha256=digest,
+            offset_sha256s=[hashlib.sha256(f'{key}:{value}'.encode()).hexdigest() for value in sorted(offsets)])
+    ordered = sorted(records.values(), key=lambda row: (row['revive_queue'], row['revive_offset'], row['metadata_sha256']))
+    return dict(records=ordered[-64:], omitted_records=max(0, len(ordered)-64),
+                malformed_records=malformed, retained_bytes=len(raw.encode()), drain_proven=False)
+
+
 class OwnedPopControls:
-    def __init__(self, run, admin, broker, project, manifest, proof, passed):
+    def __init__(self, run, admin, broker, project, manifest, proof, passed, *, trace_rebound=False):
         self.run, self.admin, self.broker, self.project = run, admin, broker, project
         self.manifest, self.proof, self.passed = manifest, proof, passed
+        self.trace_rebound = trace_rebound
         self.url = None
         self.observed_timer = False
 
@@ -88,6 +153,8 @@ class OwnedPopControls:
         require(properties.get('brokerClusterName') == 'FangcunMount'
                 and properties.get('timerWheelEnable') == properties.get('enablePopMetrics') == 'true',
                 'pinned_native_pop_metrics_required')
+        if self.trace_rebound:
+            require(properties.get('enablePopLog') == 'true', 'owned_pop_trace_config_required')
         self.url = 'http://127.0.0.1:' + bindings[0]['HostPort'] + '/metrics'
 
     def read(self, required):
@@ -106,6 +173,25 @@ class OwnedPopControls:
                 return value
             time.sleep(.2)
         raise RuntimeError('native_pop_control_budget_exceeded')
+
+    def trace(self, suffix):
+        # Called only after a failed confirmation, after configure verified the fixture.
+        require(self.url is not None, 'owned_pop_trace_required')
+        routes = {(row['physical_topic'], row['consumer_group']) for row in self.manifest['routes']
+                  if row['subscription'] == 'sdk-shared-' + suffix}
+        require(bool(routes), 'known_trace_routes_required')
+        observed = []
+        for _ in range(6):
+            time.sleep(4)
+            try:
+                observed.append(dict(observed_unix_ms=time.time_ns() // 1000000, **self.read(True)))
+            except (RuntimeError, OSError, ValueError):
+                observed.append(dict(observed_unix_ms=time.time_ns() // 1000000, error='pop_sample_unavailable'))
+        result = self.run(['docker', 'exec', self.broker, 'tail', '-c', str(POP_LOG_BYTES), POP_LOG],
+                          timeout=5, required=False)
+        if result.returncode:
+            return dict(samples=observed, error='revive_log_unavailable', drain_proven=False)
+        return dict(samples=observed, **revive_log_records(result.stdout, routes))
 
     def __call__(self, stage, language):
         require(language in ('sdk-go', 'sdk-python') and stage in ('baseline', 'subscribed', 'held', 'closed'), 'fixed_pop_control_stage_required')
@@ -134,5 +220,11 @@ class OwnedPopControls:
             record[stage] = self.wait(lambda v: zero(v, timing_required=True), required=True, budget=90)
             time.sleep(1)
             record['closed_confirmation'] = self.read(True)
-            require(zero(record['closed_confirmation'], timing_required=True), 'pop_responsibility_reappeared_after_sdk_close')
+            settled = zero(record['closed_confirmation'], timing_required=True)
+            if not settled and self.trace_rebound:
+                try:
+                    record['rebound_trace'] = self.trace(suffix)
+                except (RuntimeError, OSError, ValueError):
+                    record['rebound_trace'] = dict(error='owned_pop_trace_unavailable', drain_proven=False)
+            require(settled, 'pop_responsibility_reappeared_after_sdk_close')
             self.passed('readable_pop_' + suffix + '_acked_and_closed_responsibility_zero')

@@ -1,7 +1,8 @@
+import json
 import unittest
 from unittest.mock import Mock, patch
 
-from readable_pop_controls import BUFFER_NAMES, SYSTEM_TOPIC, OwnedPopControls, snapshot, zero
+from readable_pop_controls import BUFFER_NAMES, SYSTEM_TOPIC, OwnedPopControls, revive_log_records, snapshot, zero
 
 
 def metrics(*, offset='0', checkpoint='0', timing='0', include_timer=True):
@@ -46,6 +47,44 @@ class ReadablePopControlsTest(unittest.TestCase):
         for stage,language in [('held','sdk-go'),('closed','sdk-go'),('baseline','unregistered'),('execute','sdk-python')]:
             with self.subTest(stage=stage),self.assertRaises(RuntimeError):control(stage,language)
         run.assert_not_called();admin.assert_not_called()
+
+    def test_revive_trace_matches_only_exact_fixture_routes_and_exports_digests(self):
+        route = dict(t='fixture-topic', c='fixture-group', q=2, so=100, pt=1000, bn='broker-a')
+
+        def row(kind, offset, data):
+            return f'INFO - reviveQueueId=1, find {kind}, offset:{offset}, raw : ' + json.dumps(data) + '\n'
+
+        ck = row('ck', 1, dict(route, n=2, d=[0, 3]))
+        ack = row('ack', 2, dict(route, ao=100))
+        batch = row('batch ack', 3, dict(route, aol=[103]))
+        outside = row('ck', 4, dict(route, c='unrelated-group', n=1))
+        malformed = row('batch ack', 5, dict(route, aol=[99]))
+        report = revive_log_records(ck + ck + ack + batch + outside + malformed,
+                                    {('fixture-topic', 'fixture-group')})
+        self.assertEqual(1, report['malformed_records'])
+        self.assertFalse(report['drain_proven'])
+        first, second, third = report['records']
+        self.assertEqual(['ck', 'ack', 'batch ack'], [row['kind'] for row in report['records']])
+        self.assertEqual({first['merge_key_sha256']}, {second['merge_key_sha256'], third['merge_key_sha256']})
+        self.assertEqual(first['offset_sha256s'], second['offset_sha256s'] + third['offset_sha256s'])
+        serialized = json.dumps(report)
+        for raw in ('fixture-topic', 'fixture-group', 'broker-a', 'unrelated-group'):
+            self.assertNotIn(raw, serialized)
+
+    def test_diagnostic_never_overrides_failed_confirmation(self):
+        settled = snapshot(metrics(), timing_required=True)
+        reappeared = snapshot(metrics(timing='2'), timing_required=True)
+        proof = {'go': {'held': reappeared}}
+        passed = Mock()
+        control = OwnedPopControls(Mock(), Mock(), 'unused', 'unused', {}, proof, passed, trace_rebound=True)
+        control.observed_timer = True
+        trace = {'samples': [settled], 'drain_proven': False}
+        with patch.object(control, 'read', side_effect=[settled, reappeared]), patch.object(control, 'trace', return_value=trace):
+            with patch('readable_pop_controls.time.sleep'):
+                with self.assertRaisesRegex(RuntimeError, 'pop_responsibility_reappeared_after_sdk_close'):
+                    control('closed', 'sdk-go')
+        self.assertEqual(trace, proof['go']['rebound_trace'])
+        passed.assert_not_called()
 
     def test_closed_confirmation_retains_reappearing_responsibility(self):
         settled = snapshot(metrics(), timing_required=True)
