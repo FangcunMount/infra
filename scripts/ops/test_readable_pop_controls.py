@@ -2,7 +2,7 @@ import json
 import unittest
 from unittest.mock import Mock, patch
 
-from readable_pop_controls import BUFFER_NAMES, SYSTEM_TOPIC, OwnedPopControls, revive_log_records, snapshot, zero
+from readable_pop_controls import BUFFER_NAMES, SYSTEM_TOPIC, OwnedPopControls, retry_catalog, revive_log_records, snapshot, zero
 
 
 def metrics(*, offset='0', checkpoint='0', timing='0', include_timer=True):
@@ -51,15 +51,15 @@ class ReadablePopControlsTest(unittest.TestCase):
     def test_revive_trace_matches_only_exact_fixture_routes_and_exports_digests(self):
         route = dict(t='fixture-topic', c='fixture-group', q=2, so=100, pt=1000, bn='broker-a')
 
-        def row(kind, offset, data):
-            return f'INFO - reviveQueueId=1, find {kind}, offset:{offset}, raw : ' + json.dumps(data) + '\n'
+        def row(kind, offset, data, seconds='00'):
+            return f'2026-11-10 09:00:{seconds} INFO - reviveQueueId=1, find {kind}, offset:{offset}, raw : ' + json.dumps(data) + '\n'
 
         ck = row('ck', 1, dict(route, n=2, d=[0, 3]))
         ack = row('ack', 2, dict(route, ao=100))
         batch = row('batch ack', 3, dict(route, aol=[103]))
         outside = row('ck', 4, dict(route, c='unrelated-group', n=1))
         malformed = row('batch ack', 5, dict(route, aol=[99]))
-        report = revive_log_records(ck + ck + ack + batch + outside + malformed,
+        report = revive_log_records(ck + row('ck', 1, dict(route, n=2, d=[0, 3]), '02') + ack + batch + outside + malformed,
                                     {('fixture-topic', 'fixture-group')})
         self.assertEqual(1, report['malformed_records'])
         self.assertFalse(report['drain_proven'])
@@ -67,9 +67,24 @@ class ReadablePopControlsTest(unittest.TestCase):
         self.assertEqual(['ck', 'ack', 'batch ack'], [row['kind'] for row in report['records']])
         self.assertEqual({first['merge_key_sha256']}, {second['merge_key_sha256'], third['merge_key_sha256']})
         self.assertEqual(first['offset_sha256s'], second['offset_sha256s'] + third['offset_sha256s'])
+        self.assertEqual(1794272400000, first['first_scan_unix_ms'])
+        self.assertEqual(2000, first['last_scan_unix_ms'] - first['first_scan_unix_ms'])
         serialized = json.dumps(report)
         for raw in ('fixture-topic', 'fixture-group', 'broker-a', 'unrelated-group'):
             self.assertNotIn(raw, serialized)
+
+    def test_retry_catalog_requires_positive_controls_and_checks_both_pop_formats(self):
+        routes = {('topic-a', 'group-a')}
+        raw = SYSTEM_TOPIC + '\ntopic-a\n'
+        self.assertEqual([], retry_catalog(raw, routes)['present_sha256s'])
+        full = raw + '%RETRY%group-a+topic-a\n%RETRY%group-a_topic-a\n%RETRY%group-a\n%DLQ%group-a\n'
+        report = retry_catalog(full, routes)
+        self.assertEqual(4, report['checked'])
+        self.assertEqual(4, len(report['present_sha256s']))
+        self.assertNotIn('group-a', json.dumps(report))
+        for bad in ('', 'topic-a\n', raw + 'topic-a\n', raw + 'private debug line\n'):
+            with self.subTest(raw=bad), self.assertRaises(RuntimeError):
+                retry_catalog(bad, routes)
 
     def test_diagnostic_never_overrides_failed_confirmation(self):
         settled = snapshot(metrics(), timing_required=True)
