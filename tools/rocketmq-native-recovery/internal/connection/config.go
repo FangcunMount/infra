@@ -25,23 +25,42 @@ import (
 
 var ErrConfig = errors.New("explicit reviewed original database and complete owner routes required")
 
+type NativeCheckBudget struct {
+	IntervalMS int `json:"interval_ms"`
+	MaxChecks  int `json:"max_checks"`
+}
+
+func (b NativeCheckBudget) valid() bool {
+	return b == (NativeCheckBudget{IntervalMS: 5000, MaxChecks: 24}) ||
+		b == (NativeCheckBudget{IntervalMS: 30000, MaxChecks: 15})
+}
+
 type Config struct {
-	Schema          string `json:"schema"`
-	Owner           string `json:"owner"`
-	StoreID         string `json:"store_id"`
-	WriterEpoch     string `json:"writer_epoch"`
-	DatabaseKind    string `json:"database_kind"`
-	DatabaseURI     string `json:"database_uri"`
-	DatabaseName    string `json:"database_name"`
-	DatabaseCA      string `json:"database_ca_pem"`
-	Endpoint        string `json:"endpoint"`
-	AccessKey       string `json:"access_key"`
-	SecretKey       string `json:"secret_key"`
-	RootCA          string `json:"root_ca_pem"`
-	AdminScript     string `json:"native_admin_script,omitempty"`
-	AdminScriptSHA  string `json:"native_admin_script_sha256,omitempty"`
-	AdminNameserver string `json:"native_admin_nameserver,omitempty"`
-	AdminBroker     string `json:"native_admin_broker,omitempty"`
+	Schema           string             `json:"schema"`
+	Owner            string             `json:"owner"`
+	StoreID          string             `json:"store_id"`
+	WriterEpoch      string             `json:"writer_epoch"`
+	DatabaseKind     string             `json:"database_kind"`
+	DatabaseURI      string             `json:"database_uri"`
+	DatabaseName     string             `json:"database_name"`
+	DatabaseCA       string             `json:"database_ca_pem"`
+	Endpoint         string             `json:"endpoint"`
+	AccessKey        string             `json:"access_key"`
+	SecretKey        string             `json:"secret_key"`
+	RootCA           string             `json:"root_ca_pem"`
+	AdminScript      string             `json:"native_admin_script,omitempty"`
+	AdminScriptSHA   string             `json:"native_admin_script_sha256,omitempty"`
+	AdminNameserver  string             `json:"native_admin_nameserver,omitempty"`
+	AdminBroker      string             `json:"native_admin_broker,omitempty"`
+	AdminCheckBudget *NativeCheckBudget `json:"native_admin_check_budget,omitempty"`
+}
+
+func (c Config) NativeCheckBudget() NativeCheckBudget {
+	if c.AdminCheckBudget != nil {
+		return *c.AdminCheckBudget
+	}
+	// Original reviewed fixtures retain their exact previous binding.
+	return NativeCheckBudget{IntervalMS: 5000, MaxChecks: 24}
 }
 
 func (c Config) Binding() transaction.Binding {
@@ -83,8 +102,11 @@ func (c Config) Validate() error {
 	if _, err = c.TLS(); err != nil {
 		return ErrConfig
 	}
-	if c.AdminScript != "" || c.AdminScriptSHA != "" || c.AdminNameserver != "" || c.AdminBroker != "" {
+	if c.AdminScript != "" || c.AdminScriptSHA != "" || c.AdminNameserver != "" || c.AdminBroker != "" || c.AdminCheckBudget != nil {
 		if c.AdminScript == "" || c.AdminNameserver == "" || c.AdminBroker == "" {
+			return ErrConfig
+		}
+		if !c.NativeCheckBudget().valid() {
 			return ErrConfig
 		}
 		if _, e := review.Digest(c.AdminScriptSHA); e != nil {

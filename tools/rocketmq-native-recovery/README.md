@@ -14,6 +14,8 @@
 
 可选私有配置`native_admin_script/native_admin_script_sha256/native_admin_nameserver/native_admin_broker`为执行所必需。脚本构造时复制已审原字节，以受控进程组执行，不重开路径；仅生成的私有请求路径进入argv，输出有64KiB上界且只保存在0600日志。多响应、超限、取消、遗留进程组、admin未关闭或身份/正文/保留窗口不符不能产生成功receipt。脚本必须为本次固定镜像/网络/凭据配置审查；生产使用单独受限helper cgroup内的直接Java子进程，不使用Docker socket或常驻代理。隔离CI为复用自有Broker暂运行Docker exec，容器归CI统一排空，不当作生产资源演练。
 
+受审配置中的 `native_admin_check_budget` 绑定 Broker 回查间隔和上限。既有配置省略时仍绑定 5000 毫秒和 24 次。实测的生产参数须显式审查并记录为 `{"interval_ms":30000,"max_checks":15}`。恢复请求通过配置摘要绑定这一组合。Java 在检查和重查前都实读核对回查组合、6000 毫秒事务超时和 48 小时保留期。
+
 协调器仅在已经审核并issued的脚本环境中传递`M3_COORDINATOR_DIRECTORY/BINDING_SHA256/STEP/STEP_PLAN_SHA256`（字段均带`M3_COORDINATOR_`前缀），避免脚本包含自身计划hash的循环。环境值本身不是批准，Go仍重读活动锁/原binding/state/marker/精确reviewed step。首个启动后旧备份恢复边界保持不变。
 
 构建必须来自精确、干净的infra提交：

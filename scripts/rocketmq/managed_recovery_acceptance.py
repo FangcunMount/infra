@@ -133,7 +133,8 @@ def terminal_expectation(terminal):
 
 
 def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False,original=None,terminal="commit",image=None):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False,original=None,terminal="commit",image=None,
+           check_budget=None):
     terminal_expectation(terminal)
     require(terminal=="commit" or (not governance_faults and original is None),"separate_rollback_sdk_fixture_required")
     require(image is None or (original and original['owner']=='ai.mysql' and not governance_faults),
@@ -150,7 +151,7 @@ def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_po
         return _accept(repo=repo,binary=binary,broker=broker,project=project,directory=directory,manifest=manifest,route=route,account=account,
             grpc_port=grpc_port,mysql_port=mysql_port,password=password,ca=ca,java=java,identity=identity,index_path=index_path,index=index,
             sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original,terminal=terminal,image=image,
-            coordinated=coordinated)
+            coordinated=coordinated,check_budget=check_budget)
     finally:
         try:
             if coordinated:
@@ -163,7 +164,7 @@ def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_po
 
 
 def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original,terminal,image,coordinated=None):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original,terminal,image,coordinated=None,check_budget=None):
     expected=terminal_expectation(terminal)
     source=original or dict(owner="iam.mysql",store_id="sdk-disposable",writer_epoch="sdk-epoch-1",database="txprobe",user="txprobe",
         operation_id="op-"+identity,branch_id="branch-0",fence=1,business_count_sql="SELECT COUNT(*) FROM sdk_business",
@@ -225,6 +226,10 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         endpoint=f'{broker_host}:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
         native_admin_script=ADMIN_SCRIPT if coordinated else str(native_script),native_admin_script_sha256=hashlib.sha256(native_script.read_bytes()).hexdigest(),
         native_admin_nameserver=nameserver,native_admin_broker=native_broker)
+    if check_budget is not None:
+        config['native_admin_check_budget'] = dict(interval_ms=check_budget['transactionCheckInterval'],
+                                                  max_checks=check_budget['transactionCheckMax'])
+        proof['native_admin_check_budget'] = config['native_admin_check_budget']
     config_path,config_sha=write('original-config.json',config)
     source_inputs = dict(source=version['source_sha'], binary=version['binary_sha256'], config=config_sha, manifest=manifest_sha)
     if image:

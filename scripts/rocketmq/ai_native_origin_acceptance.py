@@ -11,6 +11,14 @@ from audit_transaction_limit import TOPIC, export
 from provision_v2 import Admin
 
 
+OBSERVED_BROKER_PARAMETERS = {
+    'transactionTimeOut': 6000,
+    'transactionCheckInterval': 30000,
+    'transactionCheckMax': 15,
+}
+OBSERVED_INDEX_WAIT_SECONDS = 600
+
+
 def sys_index_context(run, broker, original_key):
     """Summarize owned Broker evidence without publishing keys, records or raw logs."""
     def observe(*command):
@@ -85,7 +93,7 @@ class OriginalConsumer:
 
 
 def run_managed(managed, directory, broker, project, run, native, proof,
-                half, closed, index, evidence_path):
+                half, closed, index, evidence_path, *, check_budget=None):
     from managed_recovery_acceptance import accept, install_java_helper
 
     repo = Path(__file__).resolve().parents[2]
@@ -111,7 +119,8 @@ def run_managed(managed, directory, broker, project, run, native, proof,
            grpc_port=managed['grpc_port'], mysql_port=managed['mysql_port'], password=managed['password'],
            ca=managed['ca'], java=java, identity=identity, index_path=evidence_path,
            index=index, sql=sql, run=run, consumer=OriginalConsumer(native, identity, original['wire_hash']),
-           passed=lambda name: cases.update({name: True}), proof=proof, original=original, image=image)
+           passed=lambda name: cases.update({name: True}), proof=proof, original=original, image=image,
+           check_budget=check_budget)
     proof['stage'] = 'named_ai_reopen'
     native.send('verify')
     reopened = native.wait('reopened', timeout=60)
@@ -147,13 +156,19 @@ def owned_broker_networks(run, broker, project, coordinated):
 
 
 def run_origin(source, directory, broker, project, command, env, run, native_runner,
-               read_parameters, proof, evidence_path, *, managed=None):
+               read_parameters, proof, evidence_path, *, managed=None, observed_budget=False):
     if not project.startswith('rocketmq-m2-') or directory.stat().st_mode & 0o077:
         raise RuntimeError('owned private AI origin fixture required')
     admin = Admin(broker)
     before = read_parameters(admin('getBrokerConfig'))
     coordinated = os.environ.get('QS_AI_COORDINATED_IMAGE') == 'true'
     reconnect = owned_broker_networks(run, broker, project, coordinated)
+    if observed_budget and (not coordinated or not managed or not managed['image']
+                            or before != dict(OBSERVED_BROKER_PARAMETERS, fileReservedTime=48)):
+        raise RuntimeError('observed check budget requires the exact coordinated Broker baseline')
+    index_wait_seconds = OBSERVED_INDEX_WAIT_SECONDS if observed_budget else 110
+    proof.update(check_budget_mode='observed' if observed_budget else 'accelerated',
+                 broker_parameters_before_fault=before, index_wait_seconds=index_wait_seconds)
     test_file = Path(__file__).with_name('ai_native_origin_case.py').resolve()
     proof['case_sha256'] = hashlib.sha256(test_file.read_bytes()).hexdigest()
     proof['stage'] = 'configuration'
@@ -200,7 +215,7 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
                      disconnected_root_commit_and_sender_drained=True,
                      original_fault_broker_networks_disconnected=len(disconnected), stage='original_sys_index')
         started = time.monotonic()
-        deadline = started + 110
+        deadline = started + index_wait_seconds
         index = None
         polls = []
         proof['original_sys_index_polls'] = polls
@@ -216,7 +231,7 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
                     'Compose project mismatch': 'project_mismatch',
                 }.get(str(error), 'other_audit_error')
                 polls.append(dict(elapsed_ms=int((time.monotonic() - started) * 1000), outcome=category))
-                time.sleep(2)
+                time.sleep(10 if observed_budget else 2)
             else:
                 polls.append(dict(elapsed_ms=int((time.monotonic() - started) * 1000),
                                   outcome='exported', records=len(index['records']),
@@ -236,11 +251,13 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
         if native.wait('blocked', timeout=35) != {'event': 'blocked', 'evidence_sha256': digest}:
             raise RuntimeError('exact original native notice required')
         if managed:
-            admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', str(before['transactionCheckMax']))
+            if not observed_budget:
+                admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', str(before['transactionCheckMax']))
             if read_parameters(admin('getBrokerConfig')) != before:
                 raise RuntimeError('original Broker budget required before recovery')
             cases.update(run_managed(managed, directory, broker, project, run, native,
-                                     proof, half, closed, index, evidence_path))
+                                     proof, half, closed, index, evidence_path,
+                                     check_budget=before if observed_budget else None))
 
     def supervise(native):
         try:
@@ -263,14 +280,18 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
             raise
 
     try:
-        admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', '2')
+        if not observed_budget:
+            admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', '2')
         effective = read_parameters(admin('getBrokerConfig'))
-        if effective != dict(before, transactionCheckMax=2):
+        expected = before if observed_budget else dict(before, transactionCheckMax=2)
+        if effective != expected:
             raise RuntimeError('isolated Broker check budget required')
+        proof['broker_parameters_during_fault'] = effective
         junit = directory / 'ai-native-origin-private.xml'
         result = native_runner([*command, 'python', '-m', 'pytest', '-q', '-s',
                                  '-c', str(source / 'pyproject.toml'), str(test_file), '--junitxml=' + str(junit)],
-                                cwd=source, env=env, timeout=800 if managed else 355,
+                                cwd=source, env=env,
+                                timeout=800 + (index_wait_seconds - 110) if managed else 355,
                                 prefix='AI_NATIVE_ORIGIN ', supervise=supervise)
         if result.returncode or not junit.is_file():
             raise RuntimeError('isolated original AI host acceptance failed')
@@ -279,7 +300,8 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
                 or any(test_cases[0].find(tag) is not None for tag in ('failure', 'error', 'skipped'))):
             raise RuntimeError('one actual AI original case must pass without skip')
     finally:
-        admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', str(before['transactionCheckMax']))
+        if not observed_budget:
+            admin('updateBrokerConfig', '-k', 'transactionCheckMax', '-v', str(before['transactionCheckMax']))
         proof['broker_parameters_restored'] = read_parameters(admin('getBrokerConfig')) == before
     if not proof['broker_parameters_restored']:
         raise RuntimeError('isolated Broker parameters were not restored')
