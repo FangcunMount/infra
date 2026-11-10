@@ -192,6 +192,7 @@ def main():
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--sdk", type=Path, required=True)
     parser.add_argument("--sdk-pop-drain-controls", action="store_true", help="owned readable public SDK held/future-CK/settled metrics controls; never production")
+    parser.add_argument("--sdk-pop-rebound-trace", action="store_true", help="bounded revive metadata after failed POP confirmation in owned CI")
     parser.add_argument("--readable-routes", action="store_true", help="owned public SDK v3 naming fixture; never production")
     parser.add_argument("--m3-resources", action="store_true", help="isolated final M3 manifest/ACL/type/TLS proof only; no production changes")
     parser.add_argument("--native-dlq-audit", action="store_true", help="isolated native DLQ and index-only audit; no host/DB/business acceptance")
@@ -271,6 +272,8 @@ def main():
             args.iam_host,args.qs_answer_host,args.qs_evaluation_host,args.qs_report_host,args.qs_task_host,
             args.qs_command_host,args.qs_event_host,args.ai_admission_host,args.sdk_recovery_audit))):
         parser.error("readable routes require the isolated public Go/Python SDK fixture")
+    if args.sdk_pop_rebound_trace and not args.sdk_pop_drain_controls:
+        parser.error('POP rebound trace requires the guarded POP drain controls')
     if args.sdk_pop_drain_controls:
         if not args.readable_routes or args.sdk_python_live_recovery or args.sdk_faults or args.sdk_limits:
             parser.error('POP drain controls require the standalone readable public SDK profile')
@@ -425,6 +428,8 @@ def main():
     render(accounts, config, broker_address, repo / "components/rocketmq")
     with (config / "broker.conf").open("a") as stream:
         stream.write("".join(f"{key}={value}\n" for key, value in PARAMETERS.items()))
+        if args.sdk_pop_rebound_trace:
+            stream.write("enablePopLog=true\n")
     proxy = json.loads((config / "proxy.json").read_text())
     proxy["grpcServerPort"] = grpc_port
     (config / "proxy.json").write_text(json.dumps(proxy))
@@ -934,7 +939,7 @@ def main():
                 proof['readable_pop_controls_source_sha256'] = hashlib.sha256((repo / 'scripts/ops/readable_pop_controls.py').read_bytes()).hexdigest()
                 proof['readable_pop_controls'] = {}
                 pop_observe = controls.OwnedPopControls(run, admin, broker, project, sdk_manifest,
-                    proof['readable_pop_controls'], passed)
+                    proof['readable_pop_controls'], passed, trace_rebound=args.sdk_pop_rebound_trace)
             shared_budget(start,passed,language="sdk-go",observe=pop_observe)
             if args.sdk_api_python:
                 shared_budget(start,passed,language="sdk-python",observe=pop_observe)
