@@ -23,13 +23,21 @@ on:
         description: Run stable Go recovery and named AI reopen on the same original root
         type: boolean
         default: false
+      execution_image:
+        description: Run the exact managed AI recovery through its isolated Linux execution image
+        type: boolean
+        default: false
+      coordinated_image:
+        description: Use the actual Linux coordinator and named bridge for recovery and resolution
+        type: boolean
+        default: false
       profile:
         description: Development is one interpreter/MySQL; full is required for final gate
         type: choice
         options: [full, development]
         default: full
   pull_request:
-    paths: ['scripts/rocketmq/native_limit_acceptance.py', 'scripts/rocketmq/test_native_limit_acceptance.py', 'scripts/rocketmq/probes/native-transaction-limit/**', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ai_native_origin_acceptance.py', 'scripts/rocketmq/ai_native_origin_case.py', 'scripts/rocketmq/ai_state_acceptance.py', 'scripts/rocketmq/test_ai_state_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-state.yml', 'Makefile']
+    paths: ['scripts/rocketmq/native_limit_acceptance.py', 'scripts/rocketmq/test_native_limit_acceptance.py', 'scripts/rocketmq/probes/native-transaction-limit/**', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ai_native_origin_acceptance.py', 'scripts/rocketmq/ai_native_origin_case.py', 'scripts/rocketmq/managed_recovery_image.py', 'scripts/rocketmq/ai_state_acceptance.py', 'scripts/rocketmq/test_ai_state_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-state.yml', 'Makefile']
 permissions:
   contents: read
 concurrency:
@@ -72,16 +80,20 @@ jobs:
           test '${{ inputs.protection == true && inputs.native_limit == true }}' != true
           test '${{ inputs.native_origin == true && inputs.native_limit != true }}' != true
           test '${{ inputs.managed_original == true && inputs.native_origin != true }}' != true
+          test '${{ inputs.execution_image == true && inputs.managed_original != true }}' != true
+          test '${{ inputs.coordinated_image == true && inputs.execution_image != true }}' != true
           [[ "$EXPECTED_AI_SHA" =~ ^[0-9a-f]{40}$ ]]
           test "$(git -C .ai-acceptance rev-parse HEAD)" = "$EXPECTED_AI_SHA"
           python3 -m unittest discover -s scripts/rocketmq -p 'test_*.py'
       - uses: actions/setup-java@v5
-        if: inputs.managed_original == true
+        if: inputs.managed_original == true && inputs.execution_image != true
         with:
           distribution: temurin
           java-version: '17'
       - name: Compile exact clean stable recovery CLI
         if: inputs.managed_original == true
+        env:
+          CGO_ENABLED: ${{ inputs.execution_image == true && '0' || '1' }}
         run: |
           set -euo pipefail
           umask 077
@@ -97,9 +109,38 @@ jobs:
           set -euo pipefail
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-ai-state:5.5.1 components/rocketmq
+      - name: Build the exact restricted Linux recovery image
+        if: inputs.execution_image == true
+        run: |
+          set -euo pipefail
+          umask 077
+          context="$RUNNER_TEMP/recovery-image-context"
+          mkdir "$context"
+          cp tools/rocketmq-native-recovery/image/{Dockerfile,managed-java.sh} "$context/"
+          cp scripts/rocketmq/probes/native-recheck/{NativeHalfIdentity.java,NativeHalfManaged.java} "$context/"
+          cp components/rocketmq/rocketmq.zip "$context/"
+          cp "$RUNNER_TEMP/native-recovery" "$context/"
+          digest="$(sha256sum "$context/native-recovery" | cut -d' ' -f1)"
+          tag="f07-recovery-fixture:$GITHUB_SHA"
+          docker build --platform linux/amd64 --network none -t "$tag" \
+            --build-arg SOURCE_SHA="$GITHUB_SHA" --build-arg CLI_SHA256="$digest" \
+            "$context"
+          docker image inspect "$tag" --format '{{.Id}}' > "$RUNNER_TEMP/recovery-image.id"
+      - name: Exercise the actual Linux coordinator and recovery container entrypoint
+        if: inputs.execution_image == true
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 scripts/rocketmq/ci-native-recovery-container.py \
+            --image "$(cat "$RUNNER_TEMP/recovery-image.id")" --source "$GITHUB_SHA" \
+            > "$RUNNER_TEMP/native-container-coordinator.json"
+          jq -e '.linux_coordinator and .failed_before_native_effect and .owned_fixture_cleaned' \
+            "$RUNNER_TEMP/native-container-coordinator.json"
       - name: Required worker, governance, SDK and original state roots
         env:
           QS_AI_NATIVE_ORIGIN: ${{ inputs.native_origin == true && 'true' || 'false' }}
+          QS_AI_EXECUTION_IMAGE: ${{ inputs.execution_image == true && 'true' || 'false' }}
+          QS_AI_COORDINATED_IMAGE: ${{ inputs.coordinated_image == true && 'true' || 'false' }}
           QS_AI_MANAGED_ORIGINAL: ${{ inputs.managed_original == true && 'true' || 'false' }}
           QS_AI_ACCEPTANCE_KIND: ${{ inputs.native_limit == true && 'native_limit' || inputs.protection == true && 'protection' || 'state' }}
         run: |
@@ -107,9 +148,40 @@ jobs:
           if [[ "$QS_AI_MANAGED_ORIGINAL" == true ]]; then
             export QS_AI_NATIVE_RECOVERY_BIN="$RUNNER_TEMP/native-recovery"
           fi
+          if [[ "$QS_AI_EXECUTION_IMAGE" == true ]]; then
+            QS_AI_NATIVE_RECOVERY_IMAGE="$(cat "$RUNNER_TEMP/recovery-image.id")"
+            export QS_AI_NATIVE_RECOVERY_IMAGE
+          fi
           QS_AI_ACCEPTANCE_PYTHON='${{ matrix.python }}' python3 scripts/rocketmq/ci-transactions.py \
             --sdk "$PWD/.sdk-acceptance" --ai-admission-host "$PWD/.ai-acceptance" \
             --image rocketmq-ai-state:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-state.json
+          if [[ "$QS_AI_COORDINATED_IMAGE" == true ]]; then
+            jq -e '.proof.ai_state_host.original_native |
+              (.coordinated_image_steps | length) == 3 and .coordinated_image_cleanup and
+              .ai_reopen.broker_ack and .ai_reopen.no_new_half' rocketmq-ai-state.json
+          fi
+      - name: Seal the exact exercised execution image
+        if: inputs.execution_image == true
+        run: |
+          set -euo pipefail
+          umask 077
+          image="$(cat "$RUNNER_TEMP/recovery-image.id")"
+          jq -e --arg image "$image" '.proof.ai_state_host.original_native.execution_image.image_id == $image' rocketmq-ai-state.json
+          docker image save --output "$RUNNER_TEMP/exercised-recovery-image.tar" "$image"
+          python3 tools/rocketmq-native-recovery/image/verify-archive.py "$RUNNER_TEMP/exercised-recovery-image.tar" \
+            --source "$GITHUB_SHA" --image "$image" > "$RUNNER_TEMP/exercised-recovery-image.json"
+          gzip -1 "$RUNNER_TEMP/exercised-recovery-image.tar"
+      - uses: actions/upload-artifact@v7
+        if: inputs.execution_image == true
+        with:
+          name: isolated-exercised-recovery-image-${{ strategy.job-index }}-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/exercised-recovery-image.tar.gz
+            ${{ runner.temp }}/exercised-recovery-image.json
+            ${{ runner.temp }}/native-container-coordinator.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
       - uses: actions/upload-artifact@v7
         if: always()
         with:

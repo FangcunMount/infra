@@ -1,6 +1,7 @@
 """Drive the same AI SQLAlchemy root and native Broker limit in an owned stack."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import time
@@ -31,7 +32,8 @@ def run_managed(managed, directory, broker, project, run, native, proof,
     from managed_recovery_acceptance import accept, install_java_helper
 
     repo = Path(__file__).resolve().parents[2]
-    java = install_java_helper(repo, directory, broker, project, run, proof)
+    image = managed['image']
+    java = None if image else install_java_helper(repo, directory, broker, project, run, proof)
     identity = half['key']
     original = dict(owner='ai.mysql', store_id=half['store_id'], writer_epoch='m3-1',
                     database=managed['schema'], user='root', operation_id=half['operation_id'],
@@ -52,7 +54,7 @@ def run_managed(managed, directory, broker, project, run, native, proof,
            grpc_port=managed['grpc_port'], mysql_port=managed['mysql_port'], password=managed['password'],
            ca=managed['ca'], java=java, identity=identity, index_path=evidence_path,
            index=index, sql=sql, run=run, consumer=OriginalConsumer(native, identity, original['wire_hash']),
-           passed=lambda name: cases.update({name: True}), proof=proof, original=original)
+           passed=lambda name: cases.update({name: True}), proof=proof, original=original, image=image)
     proof['stage'] = 'named_ai_reopen'
     native.send('verify')
     reopened = native.wait('reopened', timeout=60)
@@ -75,6 +77,13 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
         json.loads(run(['docker', 'network', 'inspect', network]).stdout)[0]['Labels']['com.docker.compose.project'] != project
     ):
         raise RuntimeError('owned Broker network required')
+    reconnect = ['docker', 'network', 'connect', '--alias', 'broker']
+    if os.environ.get('QS_AI_COORDINATED_IMAGE') == 'true':
+        address = run(['docker', 'inspect', '--format',
+                       '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}', broker]).stdout.strip()
+        if address != '172.31.80.10':
+            raise RuntimeError('fixed original Broker bridge address required')
+        reconnect += ['--ip', address]
     test_file = Path(__file__).with_name('ai_native_origin_case.py').resolve()
     proof['case_sha256'] = hashlib.sha256(test_file.read_bytes()).hexdigest()
     proof['stage'] = 'configuration'
@@ -99,7 +108,7 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
             native.send('commit')
             closed = native.wait('closed', timeout=85)
         finally:
-            run(['docker', 'network', 'connect', '--alias', 'broker', network, broker])
+            run([*reconnect, network, broker])
         if set(closed) != {'event', 'reference_sha256', 'wire_sha256'} or not all(
             re.fullmatch('[0-9a-f]{64}', closed[field]) for field in ('reference_sha256', 'wire_sha256')
         ):

@@ -133,5 +133,6 @@ class OwnedPopControls:
             require('held' in record and self.observed_timer, 'positive_future_checkpoint_control_required')
             record[stage] = self.wait(lambda v: zero(v, timing_required=True), required=True, budget=90)
             time.sleep(1)
-            require(zero(self.read(True), timing_required=True), 'pop_responsibility_reappeared_after_sdk_close')
+            record['closed_confirmation'] = self.read(True)
+            require(zero(record['closed_confirmation'], timing_required=True), 'pop_responsibility_reappeared_after_sdk_close')
             self.passed('readable_pop_' + suffix + '_acked_and_closed_responsibility_zero')

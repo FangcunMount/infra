@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from readable_pop_controls import BUFFER_NAMES, SYSTEM_TOPIC, OwnedPopControls, snapshot, zero
 
@@ -46,3 +46,19 @@ class ReadablePopControlsTest(unittest.TestCase):
         for stage,language in [('held','sdk-go'),('closed','sdk-go'),('baseline','unregistered'),('execute','sdk-python')]:
             with self.subTest(stage=stage),self.assertRaises(RuntimeError):control(stage,language)
         run.assert_not_called();admin.assert_not_called()
+
+    def test_closed_confirmation_retains_reappearing_responsibility(self):
+        settled = snapshot(metrics(), timing_required=True)
+        for field in ('offset', 'checkpoint', 'timing'):
+            with self.subTest(field=field):
+                reappeared = snapshot(metrics(**{field: '1'}), timing_required=True)
+                proof = {'go': {'held': snapshot(metrics(timing='2'), timing_required=True)}}
+                passed = Mock()
+                control = OwnedPopControls(Mock(), Mock(), 'unused', 'unused', {}, proof, passed)
+                control.observed_timer = True
+                with patch.object(control, 'read', side_effect=[settled, reappeared]), patch('readable_pop_controls.time.sleep'):
+                    with self.assertRaisesRegex(RuntimeError, 'pop_responsibility_reappeared_after_sdk_close'):
+                        control('closed', 'sdk-go')
+                self.assertEqual(proof['go']['closed'], settled)
+                self.assertEqual(proof['go']['closed_confirmation'], reappeared)
+                passed.assert_not_called()

@@ -5,6 +5,8 @@ on:
       - tools/rocketmq-native-recovery/**
       - scripts/rocketmq/ci-native-recheck.py
       - scripts/rocketmq/managed_recovery_acceptance.py
+      - scripts/rocketmq/native_recovery_container.py
+      - scripts/rocketmq/test_native_recovery_container.py
       - scripts/rocketmq/mysql_commit_proxy.py
       - scripts/rocketmq/test_mysql_commit_proxy.py
       - scripts/rocketmq/probes/native-recheck/**
@@ -59,6 +61,7 @@ jobs:
         run: |
           python3 -m unittest discover -s scripts/rocketmq -p test_native_recheck.py
           python3 -m unittest discover -s scripts/rocketmq -p test_mysql_commit_proxy.py
+          python3 -m unittest discover -s scripts/rocketmq -p test_native_recovery_container.py
       - name: Fixed Broker archive verification
         run: bash scripts/rocketmq/fetch-release.sh
       - name: Fresh fixed isolated Broker

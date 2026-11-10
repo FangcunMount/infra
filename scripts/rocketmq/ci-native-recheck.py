@@ -102,7 +102,9 @@ def main():
     proof, cases, probes = report['proof'], report['cases'], []
     proof['harness_sha256'] = {str(p.relative_to(repo)): hashlib.sha256(p.read_bytes()).hexdigest()
         for p in (Path(__file__).resolve(), repo/'scripts/rocketmq/probes/native-recheck/NativeHalfRecheck.java',
-                  repo/'scripts/rocketmq/probes/native-recheck/NativeHalfWindowTest.java')}
+                  repo/'scripts/rocketmq/probes/native-recheck/NativeHalfWindowTest.java',
+                  repo/'scripts/rocketmq/probes/native-recheck/NativeHalfIdentity.java',
+                  repo/'scripts/rocketmq/probes/native-recheck/NativeHalfManaged.java')}
     compose = None; image = None; broker = project+'-broker-1'; mysql = project+'-mysql-1'
     before = {}; stage = 'fixture_preflight'; before_parameters = None
     def passed(name):

@@ -415,14 +415,24 @@ def main():
     accounts = {name: {"username": "m2-" + name, "password": secrets.token_hex(32)}
                 for name in ("admin", "inner", "owner-a", "owner-b", "observer")}
     mysql_password = secrets.token_hex(32)
-    render(accounts, config, "127.0.0.1", repo / "components/rocketmq")
+    coordinated_image = os.environ.get("QS_AI_COORDINATED_IMAGE") == "true"
+    if coordinated_image:
+        from final_image_candidate import ci_guard
+        ci_guard(os.environ)
+        if not args.ai_admission_host or not os.environ.get("QS_AI_NATIVE_RECOVERY_IMAGE"):
+            raise RuntimeError("coordinated recovery requires the owned AI execution image")
+    broker_address = "172.31.80.10" if coordinated_image else "127.0.0.1"
+    render(accounts, config, broker_address, repo / "components/rocketmq")
     with (config / "broker.conf").open("a") as stream:
         stream.write("".join(f"{key}={value}\n" for key, value in PARAMETERS.items()))
     proxy = json.loads((config / "proxy.json").read_text())
     proxy["grpcServerPort"] = grpc_port
     (config / "proxy.json").write_text(json.dumps(proxy))
+    broker_san = "subjectAltName=IP:127.0.0.1,DNS:localhost,DNS:nameserver,DNS:broker"
+    if coordinated_image:
+        broker_san += ",IP:" + broker_address
     run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
-         "-subj", "/CN=rocketmq-m2-isolated", "-addext", "subjectAltName=IP:127.0.0.1,DNS:localhost,DNS:nameserver,DNS:broker",
+         "-subj", "/CN=rocketmq-m2-isolated", "-addext", broker_san,
          "-keyout", str(config / "tls/server.key"), "-out", str(config / "tls/server.crt")])
     ca = directory / "ca.crt"
     shutil.copyfile(config / "tls/server.crt", ca)
@@ -444,6 +454,9 @@ def main():
     for network in spec["networks"].values():
         network.pop("name", None)
     broker_spec = spec["services"]["broker"]
+    if coordinated_image:
+        spec["networks"]["rocketmq"]["ipam"] = {"config": [{"subnet": "172.31.80.0/24"}]}
+        broker_spec["networks"]["rocketmq"] = {"ipv4_address": broker_address}
     broker_spec["ports"][0]["target"] = grpc_port
     broker_spec["healthcheck"]["test"][-1] = f"exec 3<>/dev/tcp/127.0.0.1/{grpc_port}"
     for service in spec["services"].values():
