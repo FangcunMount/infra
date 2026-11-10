@@ -26,10 +26,14 @@ M3 首发遇到原生超限：原库持久封对应 owner 新写、保留 Checke
 
 公开 SDK 复验 [42689506222](https://github.com/FangcunMount/infra/actions/runs/42689506222) 曾在 Go 订阅关闭后读到 POP 责任重新出现。补存第二次确认的 offset buffer、checkpoint buffer、定时责任和样本摘要，保留原失败条件。此用例独立于受管恢复正向结果。
 
-[容器入口草稿](../../scripts/rocketmq/native_recovery_container.py) 由 Linux 协调器的受审脚本调用，接收独立摘要绑定的 `m3-native-recovery-container/v1` 私有计划。计划固定操作目录、宿主、镜像 ID、镜像源码、专用网络 ID 和名称、协调绑定、步骤、唯一命令和逐件输入摘要。只接受 `recover`、`resolve-notice` 和 `verify-resolution`。默认仅核对计划和文件，实际发出容器还要求 `--execute`、UID/GID 3000、同机活动锁和原受审步骤。CLI 继续核验独立批准与原库和 Broker 身份。
+Linux 协调器的受审脚本调用容器入口，提交独立摘要绑定的私有计划。计划固定操作目录、宿主、镜像 ID、镜像源码、专用网络 ID 和名称、协调绑定、步骤、唯一命令和逐件输入摘要。只接受 `recover`、`resolve-notice` 和 `verify-resolution`。默认仅核对计划和文件，实际发出容器还要求 `--execute`、UID/GID 3000、同机活动锁和原受审步骤。CLI 继续核验独立批准与原库和 Broker 身份。[容器入口](../../scripts/rocketmq/native_recovery_container.py)
+
+选址审查使用 `m3-native-recovery-container/v2` 作为专用网桥候选。该计划沿用 v1 字段，在创建前与启动前各从实际 Docker 读取同一网络 ID，要求本机 `bridge` 为内部网络，IPv4 网关模式为 `isolated`，并关闭 IPv6。启动前不符时保留已发出与已创建的身份回执，供后续独立核对。v1 继续用于现有隔离夹具。专用转发器、具名端点、实际 ACL/TLS 和生产执行账户须由独立证据签收。[Docker 网关模式](https://docs.docker.com/engine/network/port-publishing/#gateway-modes)
 
 固定输入目录为操作目录的同级 `inputs`，内含五份私有 JSON 文件及 `java/tools.yml`、`java/tls/server.crt` 和 `java/native-admin.sh`。执行账户持有 0600 的管理员脚本，配置必须指向容器内只读挂载的 `/run/native-recovery/native-admin.sh`，且配置、计划和文件三个摘要一致。协调目录保留原 inode 和回执写入，协调权威文件与既有恢复回执单独只读挂载。容器内时限为 195 秒，随后最多给出 12 秒退出宽限。启动前记录步骤和容器 ID，只有 Docker 实读退出状态才记录终态。
 
-等待或创建结果未知时，先用 `--observe-prior <原步骤计划 SHA256>` 在原 Linux 宿主和绑定目录生成只读观察。保存其标准输出原字节及摘要，核对完整容器 ID、镜像、步骤标签、网络、实际起止与退出状态，再独立核对 SDK、原库与 Broker 事实。容器仍在运行、查不到或身份不符时继续阻断。新的具名前向步骤可在计划中加入 `prior_terminal`，绑定 `step_plan_sha256` 和 `observation_sha256`。入口在活动锁内重新读取终态并比对摘要，将交接记入 `-reconciled.json`，保留原已发出记录。任何新 `recover` 都要使用未发出过的请求，具名解除仍绑定原恢复回执。实际 Linux 协调器、具名网络出口限制和同封装真实恢复仍待验证。
+等待或创建结果未知时，先用 `--observe-prior <原步骤计划 SHA256>` 在原 Linux 宿主和绑定目录生成只读观察。保存其标准输出原字节及摘要，核对完整容器 ID、镜像、步骤标签、网络、实际起止与退出状态，再独立核对 SDK、原库与 Broker 事实。容器仍在运行、查不到或身份不符时继续阻断。新的具名前向步骤可在计划中加入 `prior_terminal`，绑定 `step_plan_sha256` 和 `observation_sha256`。入口在活动锁内重新读取终态并比对摘要，将交接记入 `-reconciled.json`，保留原已发出记录。任何新 `recover` 都要使用未发出过的请求，具名解除仍绑定原恢复回执。实际生产宿主的未知结果核对与具名网络出口须另行签收。
 
-现有原根工作流的 `coordinated_image` 仅手动启用。它在隔离栈创建 Broker 时固定网桥地址，断连演练后按相同地址重接，保留原物理消息 ID 的地址语义。恢复、解除和复核都由 UID 3000 下的 Linux 协调器调用同一入口，分别保存退出回执。验收同时核对原 AI 原库、实际消费 ACK、原请求重用拒绝、具名重开及隔离资源清理。生产网络出口限制继续单独审查。
+原根工作流仅在手动启用 `coordinated_image` 时运行 v2 隔离场景。Broker 固定通告地址，断开两条夹具网络后按相同地址重接，保留原物理消息 ID 的地址语义。宿主探针使用一次性 runner 上的单端口回环转发，执行容器通过隔离桥直连 Broker。作业分别核对回环映射和夹具网络回收。
+
+Infra `e5ba8fa8190fe15f1dbe70f4113dc4b25cd94d5d` 与 AI `c6359b441de48fde5b295529fe9c10f50e4c53f5` 已通过 Python 3.11、3.13 与 MySQL 8.0.36、8.0.44、8.4.11 的六组完整隔离矩阵，共 66 项通过。每组用同一隔离桥内的 UID 3000 容器完成恢复、解除和复核，保留原首次审计和原报文 ACK，拒绝重复请求，具名重开无新 half。开发作业实际执行的 Linux amd64 镜像原件已逐层读回。生产专用出口、执行账户、原库与 Broker 端点仍须独立复验。[完整隔离矩阵](https://github.com/FangcunMount/infra/actions/runs/42787455864) · [开发作业与镜像原件](https://github.com/FangcunMount/infra/actions/runs/42786265415)

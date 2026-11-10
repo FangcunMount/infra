@@ -23,6 +23,9 @@ ADMIN_SCRIPT = '/run/native-recovery/native-admin.sh'
 COMMANDS = {'recover', 'resolve-notice', 'verify-resolution'}
 INPUTS = ('config', 'manifest', 'export', 'request', 'approval')
 PRIVATE_FILE_LIMIT = 65536
+LEGACY_PLAN = 'm3-native-recovery-container/v1'
+ISOLATED_BRIDGE_PLAN = 'm3-native-recovery-container/v2'
+IPV4_GATEWAY_MODE = 'com.docker.network.bridge.gateway_mode_ipv4'
 
 
 def private_directory(path):
@@ -44,7 +47,7 @@ def input_digest(path, expected):
 def arguments(plan, env):
     fields = {'schema', 'command', 'directory', 'host', 'image_id', 'source_sha',
               'network_id', 'network_name', 'binding_sha256', 'step', 'inputs', 'java'}
-    if set(plan) - {'prior_terminal'} != fields or plan['schema'] != 'm3-native-recovery-container/v1':
+    if set(plan) - {'prior_terminal'} != fields or plan['schema'] not in (LEGACY_PLAN, ISOLATED_BRIDGE_PLAN):
         raise BoundaryError('exact reviewed container plan required')
     prior = plan.get('prior_terminal')
     if 'prior_terminal' in plan:
@@ -130,6 +133,18 @@ def docker(args, *, timeout=5):
     result = subprocess.run([*DOCKER, *args], check=True, capture_output=True, text=True, timeout=timeout,
                             env={'PATH': '/usr/bin:/bin', 'LANG': 'C', 'HOME': '/nonexistent'})
     return result.stdout.strip()
+
+
+def require_reviewed_network(plan):
+    network, = json.loads(docker(['network', 'inspect', plan['network_id']]))
+    if (network['Id'], network['Name'], network['Driver'], network['Scope']) != (
+            plan['network_id'], plan['network_name'], 'bridge', 'local'):
+        raise BoundaryError('reviewed local network differs')
+    if plan['schema'] == ISOLATED_BRIDGE_PLAN and (
+            network.get('Internal') is not True or network.get('EnableIPv4') is not True or
+            network.get('EnableIPv6') is not False or
+            (network.get('Options') or {}).get(IPV4_GATEWAY_MODE) != 'isolated'):
+        raise BoundaryError('reviewed isolated IPv4 bridge required')
 
 
 def require_issued(fd, plan, directory, step_sha):
@@ -266,6 +281,8 @@ def run_container(fd, plan, directory, material, java, step_sha, cli, protected,
     cid = _digest(docker(create_args(plan, name, cli, mounts)))
     _publish(fd, name + '-created.json', {'container_id': cid})
     require_created(cid, name, plan, mounts)
+    if plan['schema'] == ISOLATED_BRIDGE_PLAN:
+        require_reviewed_network(plan)
     if deadline - time.monotonic() < 214:
         raise BoundaryError('insufficient budget to start the exact recovery container')
     docker(['start', cid])
@@ -287,14 +304,11 @@ def launch(plan, env):
     deadline = time.monotonic() + 228
     directory, material, java, step_sha, cli = arguments(plan, env)
     image, = json.loads(docker(['image', 'inspect', plan['image_id']]))
-    network, = json.loads(docker(['network', 'inspect', plan['network_id']]))
     if (image['Id'], image['Os'], image['Architecture'], image['Config']['User'],
             (image['Config']['Labels'] or {}).get('org.opencontainers.image.revision')) != (
             plan['image_id'], 'linux', 'amd64', '3000:3000', plan['source_sha']):
         raise BoundaryError('reviewed local image differs')
-    if (network['Id'], network['Name'], network['Driver'], network['Scope']) != (
-            plan['network_id'], plan['network_name'], 'bridge', 'local'):
-        raise BoundaryError('reviewed local network differs')
+    require_reviewed_network(plan)
     fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
         protected = require_issued(fd, plan, directory, step_sha)
