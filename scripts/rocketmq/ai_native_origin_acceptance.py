@@ -1,14 +1,72 @@
 """Drive the same AI SQLAlchemy root and native Broker limit in an owned stack."""
 import hashlib
 import json
+import json
 import os
 from pathlib import Path
 import re
 import time
 from xml.etree import ElementTree
 
-from audit_transaction_limit import export
+from audit_transaction_limit import TOPIC, export
 from provision_v2 import Admin
+
+
+def sys_index_context(run, broker, original_key):
+    """Summarize owned Broker evidence without publishing keys, records or raw logs."""
+    def observe(*command):
+        try:
+            return run(['docker', 'exec', broker, *command], required=False, timeout=12)
+        except RuntimeError:
+            return None
+
+    logs = observe('sh', '-ec',
+                   'set -- $(find /home/rocketmq/logs/rocketmqlogs -maxdepth 3 -type f -name transaction.log); '
+                   'test "$#" -eq 1; tail -c 524288 "$1"')
+    context = {'transaction_log': {'available': logs is not None and logs.returncode == 0}}
+    if context['transaction_log']['available']:
+        lines = logs.stdout.splitlines()
+        patterns = {
+            'checks': 'Check transaction. real_topic=',
+            'discarded': 'so discard it by moving it to system topic TRANS_CHECK_MAXTIME_TOPIC',
+            'stored': 'Put checked-too-many-time half message to TRANS_CHECK_MAXTIME_TOPIC OK.',
+            'store_failed': 'Put checked-too-many-time half message to TRANS_CHECK_MAXTIME_TOPIC failed',
+            'store_exception': 'Put checked-too-many-time message to TRANS_CHECK_MAXTIME_TOPIC error.',
+        }
+        key_pattern = re.compile(r'(?<![A-Za-z0-9_.:-])' + re.escape(original_key) + r'(?![A-Za-z0-9_.:-])')
+        context['transaction_log'].update(
+            bytes=len(logs.stdout.encode()),
+            counts={name: sum(marker in line for line in lines) for name, marker in patterns.items()},
+            original_key_counts={name: sum(marker in line and bool(key_pattern.search(line)) for line in lines)
+                                 for name, marker in patterns.items()},
+        )
+    catalog = observe('head', '-c', '1048577', '/home/rocketmq/store/config/topics.json')
+    context['local_topic_catalog'] = {'available': False}
+    if catalog is not None and catalog.returncode == 0 and len(catalog.stdout.encode()) <= 1048576:
+        try:
+            topics = json.loads(catalog.stdout)['topicConfigTable']
+            if isinstance(topics, dict):
+                context['local_topic_catalog'] = {'available': True, 'discard_present': TOPIC in topics}
+        except (KeyError, TypeError, ValueError):
+            pass
+    for kind, topic in (('half', 'RMQ_SYS_TRANS_HALF_TOPIC'), ('discard', TOPIC)):
+        result = observe('java', '-Xms32m', '-Xmx128m', '-cp', '/opt/rocketmq/conf:/opt/rocketmq/lib/*',
+                         'org.apache.rocketmq.tools.command.MQAdminStartup', 'topicStatus',
+                         '-n', 'nameserver:9876', '-t', topic)
+        if result is None:
+            context[kind + '_topic_status'] = {'available': False, 'transport_unavailable': True}
+            continue
+        raw = result.stdout + result.stderr
+        rows = [fields for line in result.stdout.splitlines() if len(fields := line.split()) >= 4
+                and all(re.fullmatch(r'[0-9]{1,18}', value) for value in fields[1:4])]
+        header = '#Min Offset' in result.stdout and '#Max Offset' in result.stdout
+        available = result.returncode == 0 and 'Exception' not in raw and header and len(rows) <= 8
+        context[kind + '_topic_status'] = {
+            'available': available, 'no_route_reported': 'No topic route' in raw,
+            'queues': [dict(queue=int(row[1]), min_offset=int(row[2]), max_offset=int(row[3]))
+                       for row in rows] if available else [],
+        }
+    return context
 
 
 class OriginalConsumer:
@@ -141,6 +199,10 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
         if not index or len(index['records']) != 1 or index['truncated_possible'] or not (
             index['read_only'] and not index['body_exported']
         ):
+            try:
+                proof['original_sys_index_context'] = sys_index_context(run, broker, half['key'])
+            except (OSError, ValueError, RuntimeError):
+                proof['original_sys_index_context'] = {'available': False}
             raise RuntimeError('one original native SYS index required')
         digest = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
         proof.update(native_index_sha256=digest, native_index_records=1, stage='original_notice')
