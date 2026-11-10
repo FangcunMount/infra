@@ -23,6 +23,7 @@ from routes import physical_topic_v2,consumer_group_v2
 from start_boundary import initialize, _encoded
 from cutover_step import execute, load_step
 from mysql_commit_proxy import MySQLCommitProxy
+from recovery_fixture_store import MongoFixtureStore, SQLFixtureStore
 from native_recovery_container import ADMIN_SCRIPT
 
 
@@ -169,6 +170,11 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     source=original or dict(owner="iam.mysql",store_id="sdk-disposable",writer_epoch="sdk-epoch-1",database="txprobe",user="txprobe",
         operation_id="op-"+identity,branch_id="branch-0",fence=1,business_count_sql="SELECT COUNT(*) FROM sdk_business",
         writer="fixed Go SDK source probe, not IAM business host",scope="one iam.mysql terminal "+terminal+", not the complete four-host/fault matrix")
+    mongo_store = source.get('adapter')
+    if mongo_store is not None:
+        require(isinstance(mongo_store, MongoFixtureStore) and source['owner'] == 'qs.mongo'
+                and not (proxy or image or coordinated), 'owned_qs_mongo_fixture_required')
+    store = mongo_store or SQLFixtureStore(sql, source['business_count_sql'])
     root = coordinated.root if coordinated else directory / 'managed-cli'
     if not coordinated:
         root.mkdir(mode=0o700)
@@ -222,7 +228,9 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         nameserver = f'{RECOVERY_NAMESERVER_HOST}:9876'
         native_broker = f'{RECOVERY_BROKER_IP}:10911'
     config=dict(schema='m3-native-recovery-config/v1',owner=source['owner'],store_id=source['store_id'],writer_epoch=source['writer_epoch'],
-        database_kind='mysql',database_uri=f"{source['user']}:{password}@tcp({database_endpoint})/{source['database']}",database_name=source['database'],database_ca_pem='',
+        database_kind='mongo' if mongo_store else 'mysql',
+        database_uri=source['database_uri'] if mongo_store else f"{source['user']}:{password}@tcp({database_endpoint})/{source['database']}",
+        database_name=source['database'],database_ca_pem='',
         endpoint=f'{broker_host}:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
         native_admin_script=ADMIN_SCRIPT if coordinated else str(native_script),native_admin_script_sha256=hashlib.sha256(native_script.read_bytes()).hexdigest(),
         native_admin_nameserver=nameserver,native_admin_broker=native_broker)
@@ -240,8 +248,6 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         protection_sha256=hashlib.sha256(index_path.read_bytes()).hexdigest(),restore_receipt_sha256=hashlib.sha256(b'fixture-removal-not-production-restore').hexdigest(),
         source_bundle_sha256=source_bundle,data_owner='synthetic-fixture-data-owner',recovery_owner='synthetic-fixture-recovery-owner')
     binding_sha=hashlib.sha256(_encoded(binding)).hexdigest();initialize(op,binding,binding_sha)
-    def governed():
-        return sql('SELECT HEX(notice_key),HEX(evidence_sha256),status,IFNULL(HEX(resolution_receipt_sha256),\'\') FROM messaging_native_limit_notices ORDER BY notice_key;')
     def step(arguments,name,kind):
         script=root/(name+'.sh')
         # Actual coordinator-derived env avoids a self-referential script/plan
@@ -272,14 +278,14 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     if original is None:
         sql(f"INSERT INTO messaging_native_limit_notices(notice_key,owner,store_id,writer_epoch,route_revision,native_index_sha256,evidence_sha256,status,schema_version,recorded_at) VALUES(UNHEX('{key.hex()}'),'iam.mysql','sdk-disposable','sdk-epoch-1','m3-1',UNHEX('{fingerprint.hex()}'),UNHEX('{index_sha}'),'blocked',1,UTC_TIMESTAMP(6));")
     else:
-        require(governed().split("\t")==[key.hex().upper(),index_sha.upper(),"blocked"],"actual_host_must_import_exact_original_index")
-    before=governed()
+        require(store.governance().split("\t")==[key.hex().upper(),index_sha.upper(),"blocked"],"actual_host_must_import_exact_original_index")
+    before=store.governance()
     selection_path,selection_sha=write('selection.json',dict(schema='m3-native-recovery-selection/v1',operation_id=source['operation_id'],branch_id=source['branch_id'],fence=source['fence'],
         native_index_sha256=fingerprint.hex(),source_bundle_sha256=source_bundle,data_owner=binding['data_owner'],recovery_owner=binding['recovery_owner']))
     request_path=root/'request.json'
     preview=call(['preview','--config',config_path,'--config-sha',config_sha,'--manifest',manifest_file,'--manifest-sha',manifest_sha,
         '--export',index_path,'--export-sha',index_sha,'--selection',selection_path,'--selection-sha',selection_sha,'--output',request_path])
-    require(preview['sdk_started'] is False and preview['governance_written'] is False and governed()==before,'preview_changed_original_governance')
+    require(preview['sdk_started'] is False and preview['governance_written'] is False and store.governance()==before,'preview_changed_original_governance')
     request=json.loads(request_path.read_text());request_sha=preview['request_sha256']
     require(request['snapshot']['local_decision']==expected['decision'] and (terminal=='rollback' or request['snapshot']['before_final']!='commit_confirmed'),'real_unconfirmed_original_root_required')
     passed('compiled_cli_preview_freezes_exact_original_primary_and_native_notice')
@@ -291,9 +297,9 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     # Before the first issued runtime boundary the same immutable request must
     # not create an attempt, start SDK or touch the native record.
     call(['recover',*common,'--directory',op,'--binding-sha',binding_sha,'--step','not-issued','--step-plan-sha','1'*64],success=False)
-    require(not list(op.glob('native-attempt-*')) and governed()==before,'prestart_gate_created_effects')
+    require(not list(op.glob('native-attempt-*')) and store.governance()==before,'prestart_gate_created_effects')
     passed('compiled_recovery_refuses_before_real_first_runtime_boundary')
-    prior_audit=sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;") if terminal=='rollback' else None
+    prior_audit=store.audit() if terminal=='rollback' else None
     step(['recover',*common],'recover-original','runtime-start')
     receipts=list(op.glob('native-attempt-*/receipt.json'));require(len(receipts)==1,'single_complete_current_rpc_receipt_required')
     receipt_path=receipts[0];raw=receipt_path.read_bytes();receipt_data=json.loads(raw);receipt_sha=hashlib.sha256(raw).hexdigest()
@@ -302,7 +308,7 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         and stats[expected['counter']]>=1 and stats['RecoveryAuditRecorded']==stats['RecoveryCommitConfirmed']+stats['RecoveryRollbackConfirmed']
         and stats['Stopped'] and stats['ActiveSends']==stats['RunningChecks']==stats['QueuedChecks']==0
         and stats['HalfPreparedResults']==stats['CompletedResults']==stats['LocalCommittedResults']==stats['Reconciled']==0,'genuine_checkonly_rpc_drain_required')
-    require(governed()==before,'broker_confirmation_auto_resolved_governance')
+    require(store.governance()==before,'broker_confirmation_auto_resolved_governance')
     passed('published_sdk_actual_native_recheck_current_rpc_private_receipt_and_true_drain')
     if terminal=='commit':
         consumer.wait('received',identity,decision=source['wire_hash'] if original else None,timeout=100)
@@ -311,9 +317,9 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         while time.monotonic()<deadline:
             consumer.drain();require(not any(e.get('event')=='received' for e in consumer.events),'rolled_back_native_copy_became_visible')
             time.sleep(.1)
-    require(sql('SELECT ('+source['business_count_sql']+'),(SELECT COUNT(*) FROM rm_tx_request),(SELECT COUNT(*) FROM rm_tx_execution),(SELECT COUNT(*) FROM rm_tx_witness);')==str(expected['business'])+'\t1\t1\t1','recovery_repeated_business_or_sent_new_half')
+    require(store.counts()==str(expected['business'])+'\t1\t1\t1','recovery_repeated_business_or_sent_new_half')
     passed('original_consumer_identity_and_one_original_business_root_preserved' if terminal=='commit' else 'aborted_original_stays_invisible_and_business_count_zero')
-    first_audit=sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;")
+    first_audit=store.audit()
     require(first_audit.startswith(expected['final']+'\t'),'positive_sdk_primary_audit_required')
     if prior_audit is not None:
         if prior_audit.startswith(expected['final']+'\t'):
@@ -338,22 +344,22 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
             else:raise RuntimeError('real_governance_commit_fault_was_not_reported_unknown')
         dropped('resolve-before-server-commit','before')
         require(proxy.events==[dict(mode='before',commit_forwarded=False,server_ok=False,reply_dropped=True)]
-                and governed()==before,'before_commit_not_sent_or_rolled_back_scope_required')
+                and store.governance()==before,'before_commit_not_sent_or_rolled_back_scope_required')
         passed('actual_governance_commit_before_forward_drop_stays_unknown_and_notice_blocked')
         dropped('resolve-after-server-commit','after')
         require(len(proxy.events)==2 and proxy.events[-1]==dict(mode='after',commit_forwarded=True,server_ok=True,reply_dropped=True),
                 'real_server_commit_ok_must_precede_dropped_reply')
         passed('actual_governance_server_commit_reply_drop_is_unknown_without_sdk_or_business_reexecution')
         proof['governance_wire_faults']=list(proxy.events)
-    resolved=governed();require("resolved" in resolved and receipt_sha.upper() in resolved,'approved_exact_governance_commit_required')
+    resolved=store.governance();require("resolved" in resolved and receipt_sha.upper() in resolved,'approved_exact_governance_commit_required')
     step(['verify-resolution',*common_resolve],'verify-original','forward-repair')
-    require(governed()==resolved and first_audit==sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;"),'verification_refreshed_first_evidence_or_sdk_audit')
+    require(store.governance()==resolved and first_audit==store.audit(),'verification_refreshed_first_evidence_or_sdk_audit')
     passed('independently_reviewed_actual_receipt_resolves_only_governance_and_fresh_verifies')
     # Same request is consumed, even in a newly issued forward-repair step.
     try:step(['recover',*common],'reject-reused-request','forward-repair')
     except Exception:pass
     else:raise RuntimeError('consumed_request_reexecuted')
-    require(len(list(op.glob('native-attempt-*')))==1 and governed()==resolved,'rejected_reuse_changed_responsibilities')
+    require(len(list(op.glob('native-attempt-*')))==1 and store.governance()==resolved,'rejected_reuse_changed_responsibilities')
     passed('new_issued_step_cannot_reexecute_a_consumed_recovery_request')
     after=export(broker,project,identity,root/'native-index-after.json')
     require(after['records']==index['records'] and hashlib.sha256(index_path.read_bytes()).hexdigest()==index_sha,'native_original_index_rewritten')
