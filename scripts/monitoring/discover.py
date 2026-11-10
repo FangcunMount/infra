@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Run on the Mac mini; discover every cloud replica through restricted SSH."""
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import ipaddress
 import json
 import os
@@ -41,28 +42,38 @@ def atomic_write(path, value):
     temp.replace(path)
 
 
+def refresh_source(config, source):
+    target = Path(config['output']) / (source['name'] + '.json')
+    try:
+        result = subprocess.run([
+            '/usr/bin/ssh', '-i', config['identity'], '-o', 'IdentitiesOnly=yes',
+            '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes',
+            '-o', 'UserKnownHostsFile=' + config['known_hosts'], '-o', 'ConnectTimeout=10',
+            '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=2',
+            'root@' + source['host'],
+        ], text=True, capture_output=True, timeout=35, check=True)
+        value = groups(json.loads(result.stdout), config['gateway'])
+        atomic_write(target, value)
+        print(source['name'], 'targets', len(value), flush=True)
+    except (subprocess.SubprocessError, ValueError, KeyError, OSError) as exc:
+        print(source['name'], type(exc).__name__, file=sys.stderr, flush=True)
+        # Expire old addresses rather than scrape a reused container IP indefinitely.
+        if target.exists() and time.time() - target.stat().st_mtime > 120:
+            atomic_write(target, [])
+        return False
+    return True
+
+
 def discover(config):
-    failed = False
-    for source in config['sources']:
-        target = Path(config['output']) / (source['name'] + '.json')
-        try:
-            result = subprocess.run([
-                '/usr/bin/ssh', '-i', config['identity'], '-o', 'IdentitiesOnly=yes',
-                '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes',
-                '-o', 'UserKnownHostsFile=' + config['known_hosts'], '-o', 'ConnectTimeout=10',
-                '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=2',
-                'root@' + source['host'],
-            ], text=True, capture_output=True, timeout=35, check=True)
-            value = groups(json.loads(result.stdout), config['gateway'])
-            atomic_write(target, value)
-            print(source['name'], 'targets', len(value), flush=True)
-        except (subprocess.SubprocessError, ValueError, KeyError, OSError) as exc:
-            failed = True
-            print(source['name'], type(exc).__name__, file=sys.stderr, flush=True)
-            # Expire old addresses rather than scrape a reused container IP indefinitely.
-            if target.exists() and time.time() - target.stat().st_mtime > 120:
-                atomic_write(target, [])
-    return 1 if failed else 0
+    sources = config['sources']
+    names = {source['name'].casefold() for source in sources}
+    if len(names) != len(sources):
+        raise ValueError('duplicate discovery source name')
+    # Each source publishes its own file as soon as SSH completes.
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        pending = [pool.submit(refresh_source, config, source) for source in sources]
+        results = [result.result() for result in pending]
+    return int(not all(results))
 
 
 if __name__ == '__main__':
