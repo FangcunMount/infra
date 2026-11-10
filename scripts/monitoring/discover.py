@@ -13,6 +13,8 @@ import time
 
 
 def groups(items, gateway):
+    if not isinstance(items, list):
+        raise ValueError('unexpected endpoint inventory')
     out = []
     seen = set()
     for item in items:
@@ -25,11 +27,16 @@ def groups(items, gateway):
             raise ValueError('unexpected job')
         if (job == 'iam') != (port == 9080) or (job == 'iam' and item['instance'] != 'iam-apiserver:9080'):
             raise ValueError('unexpected IAM monitoring identity')
-        key = (job, item['instance'])
+        instance = item['instance']
+        if not isinstance(instance, str) or not instance:
+            raise ValueError('unexpected instance label')
+        if 'component' in item and not isinstance(item['component'], str):
+            raise ValueError('unexpected component label')
+        key = (job, instance)
         if key in seen:
             raise ValueError('duplicate monitored instance')
         seen.add(key)
-        labels = {'job': job, 'instance': item['instance'], '__metrics_path__': f'/metrics/{ip}/{port}'}
+        labels = {'job': job, 'instance': instance, '__metrics_path__': f'/metrics/{ip}/{port}'}
         if 'component' in item:
             labels['component'] = item['component']
         out.append({'targets': [gateway], 'labels': labels})
@@ -61,7 +68,7 @@ def refresh_source(config, source):
         value = groups(json.loads(result.stdout), config['gateway'])
         atomic_write(target, value)
         log_source(source['name'], 'targets', len(value))
-    except (subprocess.SubprocessError, ValueError, KeyError, OSError) as exc:
+    except (subprocess.SubprocessError, ValueError, TypeError, KeyError, OSError) as exc:
         log_source(source['name'], type(exc).__name__, file=sys.stderr)
         # Expire old addresses rather than scrape a reused container IP indefinitely.
         if target.exists() and time.time() - target.stat().st_mtime > 120:

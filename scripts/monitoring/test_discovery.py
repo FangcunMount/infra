@@ -116,6 +116,32 @@ class DiscoveryTests(unittest.TestCase):
                 self.assertEqual(json.loads(d_file.read_text()), local.groups([fresh_worker], gateway))
                 self.assertEqual(json.loads(a_file.read_text()), expected_a)
 
+    def test_malformed_inventory_preserves_fresh_targets_and_expires_stale_targets(self):
+        fresh = {'ip': '172.20.0.21', 'port': 9092, 'job': 'qs-worker', 'instance': 'worker'}
+        for invalid in ({}, None, [None], [dict(fresh, port=None)], [dict(fresh, instance=None)],
+                        [dict(fresh, component=7)]):
+            for age, expected in ((119, ['previous']), (121, [])):
+                with self.subTest(payload=invalid, age=age), tempfile.TemporaryDirectory() as directory:
+                    a_file = Path(directory) / 'serverA.json'
+                    d_file = Path(directory) / 'serverD.json'
+                    a_file.write_text('["previous"]\n')
+                    now = time.time()
+                    os.utime(a_file, (now - age, now - age))
+                    config = {'sources': [{'name': 'serverA', 'host': 'a'}, {'name': 'serverD', 'host': 'd'}],
+                              'output': directory, 'gateway': 'gateway:443',
+                              'identity': 'identity', 'known_hosts': 'known_hosts'}
+
+                    def ssh(command, **options):
+                        payload = invalid if command[-1] == 'root@a' else [fresh]
+                        return subprocess.CompletedProcess(command, 0, stdout=json.dumps(payload))
+
+                    errors = io.StringIO()
+                    with patch.object(local.subprocess, 'run', side_effect=ssh), redirect_stderr(errors):
+                        self.assertEqual(local.discover(config), 1)
+                    self.assertRegex(errors.getvalue(), r' serverA (ValueError|TypeError)\n$')
+                    self.assertEqual(json.loads(a_file.read_text()), expected)
+                    self.assertEqual(json.loads(d_file.read_text()), local.groups([fresh], config['gateway']))
+
     def test_refresh_logs_utc_and_only_bounded_source_metadata(self):
         source = {'name': 'serverA', 'host': 'private-host'}
         completed = subprocess.CompletedProcess([], 0, stdout='[]')
