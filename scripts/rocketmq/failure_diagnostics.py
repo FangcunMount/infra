@@ -13,6 +13,8 @@ PATTERNS = {
     'settings': r'(?:sync|initial).{0,25}settings',
     'deadline': r'deadline|timed out|timeout',
     'connection_reset': r'connection reset|broken pipe',
+    'connection_refused': r'connection refused|ECONNREFUSED',
+    'network_unreachable': r'network is unreachable|no route to host',
     'tls_handshake': r'(?:TLS|SSL).{0,25}handshake|x509',
     'authentication': r'authentication|unauthenticated|permission denied',
     'executor_rejected': r'RejectedExecutionException|executor.{0,30}reject',
@@ -20,6 +22,9 @@ PATTERNS = {
     'resource_exhausted': r'RESOURCE_EXHAUSTED|too many open files',
     'grpc_internal': r'code\s*[=:]\s*Internal|INTERNAL:',
     'grpc_cancelled': r'code\s*[=:]\s*Canceled|CANCELLED:',
+    'grpc_unavailable': r'StatusCode\.UNAVAILABLE|code\s*[=:]\s*Unavailable',
+    'fixture_import': r'ModuleNotFoundError|ImportError while importing',
+    'fixture_assertion': r'\bAssertionError\b',
 }
 
 

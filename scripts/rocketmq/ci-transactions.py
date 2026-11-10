@@ -15,6 +15,7 @@ import secrets
 import signal
 import shutil
 import socket
+import ssl
 import subprocess
 import tempfile
 import threading
@@ -648,6 +649,21 @@ def main():
 
     try:
         run(compose + ["up", "-d", "--wait", "--wait-timeout", "180"], timeout=240)
+        if coordinated_image:
+            loopback = proof["coordinated_host_loopback"] = {}
+            tls = ssl.create_default_context(cafile=ca)
+            tls.set_alpn_protocols(["h2"])
+            with socket.create_connection(("127.0.0.1", grpc_port), timeout=5) as conn:
+                with tls.wrap_socket(conn, server_hostname="127.0.0.1") as broker_stream:
+                    if broker_stream.selected_alpn_protocol() != "h2":
+                        raise RuntimeError("owned host Broker TLS did not negotiate HTTP/2")
+            loopback["broker_verified_tls_h2"] = True
+            with socket.create_connection(("127.0.0.1", mysql_port), timeout=5) as conn:
+                with conn.makefile("rb") as mysql_stream:
+                    greeting = mysql_stream.read(5)
+                    if len(greeting) != 5 or greeting[3:] != b"\x00\x0a":
+                        raise RuntimeError("owned host MySQL protocol greeting absent")
+            loopback["mysql_protocol_greeting"] = True
         effective = broker_parameters(admin("getBrokerConfig"))
         if any(effective[k] != v for k, v in PARAMETERS.items()):
             raise RuntimeError("isolated accelerated Broker parameters not effective")
@@ -1161,6 +1177,15 @@ def main():
                     required=False, timeout=20)
                 failure_diagnostics = {'clients': client_diagnostics,
                                        'broker': summarize(broker_logs.stdout + broker_logs.stderr)}
+                origin = proof.get('ai_state_host', {}).get('original_native', {})
+                if coordinated_image and origin.get('stage') == 'original_half' and probes:
+                    native = probes[-1]
+                    native.reader.join(timeout=1)
+                    native.log.flush()
+                    with Path(native.log.name).open('rb') as stream:
+                        stream.seek(max(0, os.fstat(stream.fileno()).st_size - 1048576))
+                        raw_log = stream.read(1048576)
+                    failure_diagnostics['ai_original_before_half'] = summarize(raw_log)
             except Exception:
                 # Diagnostics must never prevent the actual owned cleanup.
                 failure_diagnostics = {'capture_failed': True}
