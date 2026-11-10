@@ -63,11 +63,24 @@ class NativeRecoveryContainerTest(unittest.TestCase):
                     State=dict(Status='exited', Running=False, ExitCode=code, OOMKilled=False,
                                StartedAt='2026-01-01T00:00:00Z', FinishedAt='2026-01-01T00:00:01Z'))
 
+    def created(self, step_sha, cid):
+        value = self.terminal(step_sha, cid, 0)
+        value['State']['Status'] = 'created'
+        value['Config']['User'] = '3000:3000'
+        value['NetworkSettings']['Networks'] = {self.plan['network_name']: {'NetworkID': ''}}
+        value['HostConfig'] = dict(NetworkMode=self.plan['network_id'], ReadonlyRootfs=True, Privileged=False,
+                                   CapAdd=None, CapDrop=['ALL'], SecurityOpt=['no-new-privileges'],
+                                   RestartPolicy={'Name': 'no'}, Memory=402653184, NanoCpus=10**9, PidsLimit=64)
+        value['Mounts'] = [dict(Type='bind', Source=source, Destination=target, RW=writable)
+                           for source, target, writable in runner.bind_mounts(self.operation, self.inputs, self.java, ())]
+        return value
+
     def test_plan_builds_only_fixed_command_and_mounts(self):
         directory, material, java, step_sha, cli = runner.arguments(self.plan, self.env)
         self.assertEqual(step_sha, self.step_sha)
         protected = (self.operation / 'state.json',)
-        cmd = runner.create_args(self.plan, directory, material, java, 'named', cli, protected)
+        mounts = runner.bind_mounts(directory, material, java, protected)
+        cmd = runner.create_args(self.plan, 'named', cli, mounts)
         self.assertEqual(cmd[cmd.index('--network') + 1], self.plan['network_id'])
         self.assertEqual(cmd[cmd.index('--user') + 1], '3000:3000')
         self.assertIn('--read-only', cmd)
@@ -118,16 +131,39 @@ class NativeRecoveryContainerTest(unittest.TestCase):
             runner.require_issued(self.fd, self.plan | {'prior_terminal': {}}, self.operation, step_sha)
 
     def test_timeout_retains_identity_and_refuses_a_second_launch(self):
-        with patch.object(runner, 'docker', side_effect=[self.cid, '', subprocess.TimeoutExpired('wait', 1)]) as daemon:
+        created = json.dumps([self.created(self.step_sha, self.cid)])
+        with patch.object(runner, 'docker', side_effect=[self.cid, created, '', subprocess.TimeoutExpired('wait', 1)]) as daemon:
             with self.assertRaises(subprocess.TimeoutExpired):
                 self.run_container()
-            self.assertEqual(daemon.call_args_list[1].args[0], ['start', self.cid])
+            self.assertEqual(daemon.call_args_list[2].args[0], ['start', self.cid])
             with self.assertRaisesRegex(BoundaryError, 'exit is unknown'):
                 self.run_container('6' * 64, self.plan | {'inputs': self.plan['inputs'] | {'request': '7' * 64}})
-            self.assertEqual(daemon.call_count, 3)
+            self.assertEqual(daemon.call_count, 4)
         prefix = self.operation / ('native-container-' + self.step_sha)
         self.assertEqual(json.loads(prefix.with_name(prefix.name + '-created.json').read_bytes()), {'container_id': self.cid})
         self.assertFalse(prefix.with_name(prefix.name + '-exit.json').exists())
+
+    def test_create_drift_is_refused_before_start(self):
+        for mismatch in ('network', 'mounts', 'sandbox'):
+            with self.subTest(mismatch=mismatch), tempfile.TemporaryDirectory() as tmp:
+                created = self.created(self.step_sha, self.cid)
+                if mismatch == 'network':
+                    created['HostConfig']['NetworkMode'] = 'host'
+                elif mismatch == 'mounts':
+                    created['Mounts'][1]['RW'] = True
+                else:
+                    created['HostConfig']['Privileged'] = True
+                fd = os.open(tmp, os.O_RDONLY | os.O_DIRECTORY)
+                try:
+                    with patch.object(runner, 'docker', side_effect=[self.cid, json.dumps([created])]) as daemon:
+                        with self.assertRaisesRegex(BoundaryError, mismatch + ' differ'):
+                            runner.run_container(fd, self.plan, self.operation, self.inputs, self.java,
+                                                 self.step_sha, ['recover'], (), time.monotonic() + 230)
+                        self.assertEqual(daemon.call_args_list[-1].args[0], ['container', 'inspect', self.cid])
+                        self.assertEqual(daemon.call_count, 2)
+                        self.assertTrue((Path(tmp) / ('native-container-' + self.step_sha + '-created.json')).is_file())
+                finally:
+                    os.close(fd)
 
     def test_insufficient_budget_refuses_before_issuing_container(self):
         with patch.object(runner, 'docker') as daemon:
@@ -140,18 +176,20 @@ class NativeRecoveryContainerTest(unittest.TestCase):
     def test_success_requires_inspected_terminal_identity_and_no_retry(self):
         name = 'native-container-' + self.step_sha
         terminal = self.terminal(self.step_sha, self.cid, 0)
-        with patch.object(runner, 'docker', side_effect=[self.cid, '', '0', json.dumps([terminal])]) as daemon:
+        created = json.dumps([self.created(self.step_sha, self.cid)])
+        with patch.object(runner, 'docker', side_effect=[self.cid, created, '', '0', json.dumps([terminal])]) as daemon:
             self.run_container()
             self.assertEqual(daemon.call_args_list[-1].args[0], ['container', 'inspect', self.cid])
             with self.assertRaises(FileExistsError):
                 self.run_container()
-            self.assertEqual(daemon.call_count, 4)
+            self.assertEqual(daemon.call_count, 5)
         result = json.loads((self.operation / (name + '-exit.json')).read_bytes())
         self.assertEqual(result, dict(container_id=self.cid, exit_code=0, oom_killed=False,
                                       started_at=terminal['State']['StartedAt'], finished_at=terminal['State']['FinishedAt']))
 
     def test_unknown_exit_handoff_requires_new_request_and_independent_observation(self):
-        with patch.object(runner, 'docker', side_effect=[self.cid, '', subprocess.TimeoutExpired('wait', 1)]):
+        created = json.dumps([self.created(self.step_sha, self.cid)])
+        with patch.object(runner, 'docker', side_effect=[self.cid, created, '', subprocess.TimeoutExpired('wait', 1)]):
             with self.assertRaises(subprocess.TimeoutExpired):
                 self.run_container()
         old_name = 'native-container-' + self.step_sha
@@ -174,7 +212,8 @@ class NativeRecoveryContainerTest(unittest.TestCase):
             with self.assertRaisesRegex(BoundaryError, 'observation differs'):
                 self.run_container(new_step, new_plan | {'prior_terminal': approval | {'observation_sha256': '0' * 64}})
         next_exit = json.dumps([self.terminal(new_step, new_cid, 0)])
-        with patch.object(runner, 'docker', side_effect=[previous, new_cid, '', '0', next_exit]):
+        next_created = json.dumps([self.created(new_step, new_cid)])
+        with patch.object(runner, 'docker', side_effect=[previous, new_cid, next_created, '', '0', next_exit]):
             self.run_container(new_step, new_plan)
         self.assertFalse((self.operation / (old_name + '-exit.json')).exists())
         self.assertEqual(json.loads((self.operation / (old_name + '-reconciled.json')).read_bytes()),

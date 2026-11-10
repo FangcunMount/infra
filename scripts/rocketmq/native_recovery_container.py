@@ -108,17 +108,20 @@ def arguments(plan, env):
     return directory, material, java, step_sha, cli
 
 
-def create_args(plan, directory, material, java, name, cli, protected):
+def bind_mounts(directory, material, java, protected):
+    return [(str(directory), str(directory), True), (str(material), str(material), False),
+            (str(java), '/run/native-recovery', False), *((str(path), str(path), False) for path in protected)]
+
+
+def create_args(plan, name, cli, mounts):
     return ['create', '--name', name, '--pull', 'never', '--platform', 'linux/amd64',
             '--label', 'native.recovery.step=' + name.removeprefix('native-container-'),
             '--hostname', plan['host'], '--network', plan['network_id'],
             '--read-only', '--user', '3000:3000', '--restart', 'no',
             '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges',
             '--pids-limit', '64', '--memory', '384m', '--cpus', '1',
-            '--mount', f'type=bind,src={directory},dst={directory}',
-            '--mount', f'type=bind,src={material},dst={material},readonly',
-            '--mount', f'type=bind,src={java},dst=/run/native-recovery,readonly',
-            *[arg for path in protected for arg in ('--mount', f'type=bind,src={path},dst={path},readonly')],
+            *[arg for source, destination, writable in mounts for arg in (
+                '--mount', f'type=bind,src={source},dst={destination}' + ('' if writable else ',readonly'))],
             '--entrypoint', '/usr/bin/timeout', plan['image_id'],
             '--signal=TERM', '--kill-after=12s', '195s', NATIVE, *cli]
 
@@ -170,6 +173,30 @@ def inspect_exit(target, name, image, network):
         raise BoundaryError('exact recovery container terminal state unknown')
     return {'container_id': cid, 'exit_code': state['ExitCode'], 'oom_killed': state['OOMKilled'],
             'started_at': state['StartedAt'], 'finished_at': state['FinishedAt']}
+
+
+def require_created(cid, name, plan, mounts):
+    container, = json.loads(docker(['container', 'inspect', cid]))
+    config, host, state = (container[field] for field in ('Config', 'HostConfig', 'State'))
+    networks = container['NetworkSettings']['Networks']
+    network = networks.get(plan['network_name'], {})
+    if (container['Id'], container['Name'], container['Image'], state['Status'], state['Running'],
+            config['User'], (config['Labels'] or {}).get('native.recovery.step')) != (
+            cid, '/' + name, plan['image_id'], 'created', False, '3000:3000', name.removeprefix('native-container-')):
+        raise BoundaryError('created recovery container identity differs')
+    # Docker can leave the endpoint ID blank until start. NetworkMode is bound at create.
+    if (set(networks) != {plan['network_name']} or host['NetworkMode'] != plan['network_id'] or
+            network['NetworkID'] not in {'', plan['network_id']}):
+        raise BoundaryError('created recovery container network differs')
+    if (not host['ReadonlyRootfs'] or host['Privileged'] or host['CapAdd'] or host['CapDrop'] != ['ALL'] or
+            host['SecurityOpt'] != ['no-new-privileges'] or host['RestartPolicy']['Name'] != 'no' or
+            (host['Memory'], host['NanoCpus'], host['PidsLimit']) != (384 * 1024**2, 10**9, 64) or
+            any(host.get(field) for field in ('Devices', 'DeviceRequests', 'PortBindings', 'PublishAllPorts',
+                                              'VolumesFrom', 'Binds'))):
+        raise BoundaryError('created recovery container sandbox differs')
+    actual = [(mount['Source'], mount['Destination'], mount['RW']) for mount in container['Mounts']]
+    if any(mount['Type'] != 'bind' for mount in container['Mounts']) or sorted(actual) != sorted(mounts):
+        raise BoundaryError('created recovery container mounts differ')
 
 
 def terminal_observation(fd, previous_name):
@@ -235,8 +262,10 @@ def run_container(fd, plan, directory, material, java, step_sha, cli, protected,
     _publish(fd, name + '-issued.json', {'name': name, 'image_id': plan['image_id'],
                                        'network_id': plan['network_id'], 'step_plan_sha256': step_sha,
                                        'request_sha256': plan['inputs']['request']})
-    cid = _digest(docker(create_args(plan, directory, material, java, name, cli, protected)))
+    mounts = bind_mounts(directory, material, java, protected)
+    cid = _digest(docker(create_args(plan, name, cli, mounts)))
     _publish(fd, name + '-created.json', {'container_id': cid})
+    require_created(cid, name, plan, mounts)
     if deadline - time.monotonic() < 214:
         raise BoundaryError('insufficient budget to start the exact recovery container')
     docker(['start', cid])
