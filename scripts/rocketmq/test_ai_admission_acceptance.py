@@ -1,13 +1,33 @@
 import json
+from subprocess import CompletedProcess
 import unittest
+from unittest.mock import Mock
 
 from ai_admission_acceptance import (
     CASES, TESTS, STABLE_NATIVE_AI_SOURCE, STABLE_NATIVE_SDK_SHA256, acceptance_profile,
     admission_manifest, parse_admission_receipt, read_partial_receipt, validate_host_sdk_lock,
 )
+from ai_native_origin_acceptance import sys_index_context
 
 
 class AIAdmissionAcceptanceTests(unittest.TestCase):
+    def test_native_index_context_keeps_storage_route_and_log_evidence_separate(self):
+        key = 'private-fixture-key'
+        log = f'Check transaction. real_topic=fixture,uniqKey={key}\n'
+        header = '#Broker Name #QID #Min Offset #Max Offset #Last Updated\n'
+        run = Mock(side_effect=[
+            CompletedProcess([], 0, log, ''),
+            CompletedProcess([], 0, '{"topicConfigTable":{"TRANS_CHECK_MAX_TIME_TOPIC":{}}}', ''),
+            CompletedProcess([], 0, header + 'fixture 0 0 2\n', ''),
+            CompletedProcess([], 0, '', 'No topic route info for this topic'),
+        ])
+        report = sys_index_context(run, 'owned-broker', key)
+        self.assertTrue(report['local_topic_catalog']['discard_present'])
+        self.assertEqual(report['transaction_log']['original_key_counts']['checks'], 1)
+        self.assertEqual(report['half_topic_status']['queues'], [dict(queue=0, min_offset=0, max_offset=2)])
+        self.assertTrue(report['discard_topic_status']['no_route_reported'])
+        self.assertNotIn(key, json.dumps(report))
+
     def receipt(self):
         return {'cases': {name: True for name in CASES}, 'passed': len(CASES), 'failed': 0, 'skipped': 0,
                 'root': 'original_mysql_sqlalchemy', 'sdk': '0.4.0a1', 'client': '5.1.2', 'python': '3.13.15',

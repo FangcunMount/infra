@@ -1,14 +1,72 @@
 """Drive the same AI SQLAlchemy root and native Broker limit in an owned stack."""
 import hashlib
 import json
+import json
 import os
 from pathlib import Path
 import re
 import time
 from xml.etree import ElementTree
 
-from audit_transaction_limit import export
+from audit_transaction_limit import TOPIC, export
 from provision_v2 import Admin
+
+
+def sys_index_context(run, broker, original_key):
+    """Summarize owned Broker evidence without publishing keys, records or raw logs."""
+    def observe(*command):
+        try:
+            return run(['docker', 'exec', broker, *command], required=False, timeout=12)
+        except RuntimeError:
+            return None
+
+    logs = observe('sh', '-ec',
+                   'set -- $(find /home/rocketmq/logs/rocketmqlogs -maxdepth 3 -type f -name transaction.log); '
+                   'test "$#" -eq 1; tail -c 524288 "$1"')
+    context = {'transaction_log': {'available': logs is not None and logs.returncode == 0}}
+    if context['transaction_log']['available']:
+        lines = logs.stdout.splitlines()
+        patterns = {
+            'checks': 'Check transaction. real_topic=',
+            'discarded': 'so discard it by moving it to system topic TRANS_CHECK_MAXTIME_TOPIC',
+            'stored': 'Put checked-too-many-time half message to TRANS_CHECK_MAXTIME_TOPIC OK.',
+            'store_failed': 'Put checked-too-many-time half message to TRANS_CHECK_MAXTIME_TOPIC failed',
+            'store_exception': 'Put checked-too-many-time message to TRANS_CHECK_MAXTIME_TOPIC error.',
+        }
+        key_pattern = re.compile(r'(?<![A-Za-z0-9_.:-])' + re.escape(original_key) + r'(?![A-Za-z0-9_.:-])')
+        context['transaction_log'].update(
+            bytes=len(logs.stdout.encode()),
+            counts={name: sum(marker in line for line in lines) for name, marker in patterns.items()},
+            original_key_counts={name: sum(marker in line and bool(key_pattern.search(line)) for line in lines)
+                                 for name, marker in patterns.items()},
+        )
+    catalog = observe('head', '-c', '1048577', '/home/rocketmq/store/config/topics.json')
+    context['local_topic_catalog'] = {'available': False}
+    if catalog is not None and catalog.returncode == 0 and len(catalog.stdout.encode()) <= 1048576:
+        try:
+            topics = json.loads(catalog.stdout)['topicConfigTable']
+            if isinstance(topics, dict):
+                context['local_topic_catalog'] = {'available': True, 'discard_present': TOPIC in topics}
+        except (KeyError, TypeError, ValueError):
+            pass
+    for kind, topic in (('half', 'RMQ_SYS_TRANS_HALF_TOPIC'), ('discard', TOPIC)):
+        result = observe('java', '-Xms32m', '-Xmx128m', '-cp', '/opt/rocketmq/conf:/opt/rocketmq/lib/*',
+                         'org.apache.rocketmq.tools.command.MQAdminStartup', 'topicStatus',
+                         '-n', 'nameserver:9876', '-t', topic)
+        if result is None:
+            context[kind + '_topic_status'] = {'available': False, 'transport_unavailable': True}
+            continue
+        raw = result.stdout + result.stderr
+        rows = [fields for line in result.stdout.splitlines() if len(fields := line.split()) >= 4
+                and all(re.fullmatch(r'[0-9]{1,18}', value) for value in fields[1:4])]
+        header = '#Min Offset' in result.stdout and '#Max Offset' in result.stdout
+        available = result.returncode == 0 and 'Exception' not in raw and header and len(rows) <= 8
+        context[kind + '_topic_status'] = {
+            'available': available, 'no_route_reported': 'No topic route' in raw,
+            'queues': [dict(queue=int(row[1]), min_offset=int(row[2]), max_offset=int(row[3]))
+                       for row in rows] if available else [],
+        }
+    return context
 
 
 class OriginalConsumer:
@@ -115,17 +173,36 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
             raise RuntimeError('original durable witness and wire proof required')
         proof.update(reference_sha256=closed['reference_sha256'], wire_sha256=closed['wire_sha256'],
                      disconnected_root_commit_and_sender_drained=True, stage='original_sys_index')
-        deadline = time.monotonic() + 110
+        started = time.monotonic()
+        deadline = started + 110
         index = None
+        polls = []
+        proof['original_sys_index_polls'] = polls
         while time.monotonic() < deadline:
             try:
                 index = export(broker, project, half['key'], evidence_path)
-                break
-            except RuntimeError:
+            except RuntimeError as error:
+                category = {
+                    'native transaction limit index evidence absent': 'absent',
+                    'private read-only audit unavailable': 'transport_unavailable',
+                    'private read-only audit failed': 'command_failed',
+                    'unexpected pinned native limit index format': 'format_rejected',
+                    'Compose project mismatch': 'project_mismatch',
+                }.get(str(error), 'other_audit_error')
+                polls.append(dict(elapsed_ms=int((time.monotonic() - started) * 1000), outcome=category))
                 time.sleep(2)
+            else:
+                polls.append(dict(elapsed_ms=int((time.monotonic() - started) * 1000),
+                                  outcome='exported', records=len(index['records']),
+                                  truncated_possible=index['truncated_possible']))
+                break
         if not index or len(index['records']) != 1 or index['truncated_possible'] or not (
             index['read_only'] and not index['body_exported']
         ):
+            try:
+                proof['original_sys_index_context'] = sys_index_context(run, broker, half['key'])
+            except (OSError, ValueError, RuntimeError):
+                proof['original_sys_index_context'] = {'available': False}
             raise RuntimeError('one original native SYS index required')
         digest = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
         proof.update(native_index_sha256=digest, native_index_records=1, stage='original_notice')

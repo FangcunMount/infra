@@ -13,6 +13,9 @@ import urllib.request
 
 SYSTEM_TOPIC = 'rmq_sys_REVIVE_LOG_FangcunMount'
 BUFFER_NAMES = ('rocketmq_pop_offset_buffer_size', 'rocketmq_pop_checkpoint_buffer_size')
+# The pinned 5.5.1 exporter adds the unit suffix, but this gauge counts messages.
+REVIVE_LAG_NAME = 'rocketmq_pop_revive_lag_milliseconds'
+REVIVE_QUEUE_IDS = {str(queue_id) for queue_id in range(8)}
 
 
 def require(ok, reason):
@@ -50,8 +53,13 @@ def snapshot(raw, *, timing_required):
         counts.append(values[0][1])
     timers = [count for labels, count in samples(raw, 'rocketmq_timing_messages') if labels.get('topic') == SYSTEM_TOPIC]
     require(len(timers) <= 1 and (not timing_required or len(timers) == 1), 'complete_unique_revive_timer_metric_required')
+    lag_samples = samples(raw, REVIVE_LAG_NAME)
+    revive_lag = {labels.get('queue_id'): count for labels, count in lag_samples}
+    require(len(lag_samples) == len(REVIVE_QUEUE_IDS) and revive_lag.keys() == REVIVE_QUEUE_IDS,
+            'complete_unique_revive_queue_lag_required')
     return dict(offset_buffer=counts[0], checkpoint_buffer=counts[1],
                 timing=timers[0] if timers else None, timer_series_present=bool(timers),
+                revive_lag=revive_lag,
                 raw_sha256=hashlib.sha256(raw.encode()).hexdigest())
 
 
@@ -59,7 +67,9 @@ def zero(value, *, timing_required):
     # Missing timer series is allowed ONLY before any timing record exists in
     # the controlled new CI project. A positive future CK must then materialize
     # that series, and the settled control requires its explicit zero.
+    # The timer decrements before the record is processed by the revive queue.
     return (value['offset_buffer'] == value['checkpoint_buffer'] == 0
+            and not any(value['revive_lag'].values())
             and (value['timing'] == 0 or (not timing_required and value['timing'] is None)))
 
 
@@ -98,13 +108,21 @@ class OwnedPopControls:
             raw = response.read(8 * 1024 * 1024 + 1)
         return snapshot(raw.decode(), timing_required=required)
 
-    def wait(self, predicate, *, required, budget):
+    def wait(self, predicate, *, required, budget, record, stage):
         deadline = time.monotonic() + budget
+        samples_read = 0
+        last_sample = None
+        last_sample_unix_ms = None
         while time.monotonic() < deadline:
             value = self.read(required)
             if predicate(value):
                 return value
+            samples_read += 1
+            last_sample = value
+            last_sample_unix_ms = time.time_ns() // 1_000_000
             time.sleep(.2)
+        record[stage + '_timeout'] = dict(budget_seconds=budget, samples_read=samples_read,
+                                         last_sample_unix_ms=last_sample_unix_ms, last_sample=last_sample)
         raise RuntimeError('native_pop_control_budget_exceeded')
 
     def __call__(self, stage, language):
@@ -114,7 +132,7 @@ class OwnedPopControls:
         require(stage not in record, 'duplicate_pop_control_stage')
         if stage == 'baseline':
             record[stage] = self.wait(lambda v: zero(v, timing_required=self.observed_timer),
-                                      required=self.observed_timer, budget=90)
+                                      required=self.observed_timer, budget=90, record=record, stage=stage)
         elif stage == 'subscribed':
             require('baseline' in record, 'pop_baseline_required')
             routes = [row for row in self.manifest['routes'] if row['subscription'] == 'sdk-shared-' + suffix]
@@ -126,12 +144,12 @@ class OwnedPopControls:
         elif stage == 'held':
             require('subscribed' in record, 'registered_pop_subscriber_required')
             record[stage] = self.wait(lambda v: v['timing'] is not None and v['timing'] > 0,
-                                      required=False, budget=25)
+                                      required=False, budget=25, record=record, stage=stage)
             self.observed_timer = True
             self.passed('readable_pop_' + suffix + '_held_future_checkpoint_blocks_drain')
         else:
             require('held' in record and self.observed_timer, 'positive_future_checkpoint_control_required')
-            record[stage] = self.wait(lambda v: zero(v, timing_required=True), required=True, budget=90)
+            record[stage] = self.wait(lambda v: zero(v, timing_required=True), required=True, budget=90, record=record, stage=stage)
             time.sleep(1)
             record['closed_confirmation'] = self.read(True)
             require(zero(record['closed_confirmation'], timing_required=True), 'pop_responsibility_reappeared_after_sdk_close')
