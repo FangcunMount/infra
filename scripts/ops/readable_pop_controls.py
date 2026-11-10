@@ -3,11 +3,13 @@
 No production entrypoint, mutation, consumer ACK, factory patch or raw export.
 The existing public SDK fixture owns and closes all actual clients and stores.
 """
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import hashlib
 import json
 import os
 import re
+import subprocess
 import time
 import urllib.request
 
@@ -16,6 +18,19 @@ BUFFER_NAMES = ('rocketmq_pop_offset_buffer_size', 'rocketmq_pop_checkpoint_buff
 # The pinned 5.5.1 exporter adds the unit suffix, but this gauge counts messages.
 REVIVE_LAG_NAME = 'rocketmq_pop_revive_lag_milliseconds'
 REVIVE_QUEUE_IDS = {str(queue_id) for queue_id in range(8)}
+
+
+POP_LOG = '/home/rocketmq/logs/rocketmqlogs/pop.log'
+TOPIC_CATALOG = '/home/rocketmq/store/config/topics.json'
+CONSUMER_OFFSETS = '/home/rocketmq/store/config/consumerOffset.json'
+REVIVE_OFFSET_KEY = SYSTEM_TOPIC + '@CID_RMQ_SYS_REVIVE_GROUP'
+POP_LOG_BYTES = 256 * 1024
+REVIVE_LINE = re.compile(
+    r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) .*?reviveQueueId=(\d+),\s*'
+    r'find (ck|ack|batch ack), offset:(\d+), raw : (\{.*\})\s*$')
+# The pinned Broker's pop.log encoder writes whole seconds in GMT+8.
+POP_LOG_TIMEZONE = timezone(timedelta(hours=8))
+
 
 
 def require(ok, reason):
@@ -73,10 +88,122 @@ def zero(value, *, timing_required):
             and (value['timing'] == 0 or (not timing_required and value['timing'] is None)))
 
 
+def unique_fields(pairs):
+    result = {}
+    for key, value in pairs:
+        require(key not in result, 'duplicate_revive_field')
+        result[key] = value
+    return result
+
+
+def revive_log_records(raw, routes):
+    """Keep only fixed 5.5.1 records for the disposable subscriber routes."""
+    require(len(raw.encode()) <= POP_LOG_BYTES, 'bounded_revive_log_required')
+    records = {}
+    malformed = 0
+    for line in raw.splitlines():
+        match = REVIVE_LINE.fullmatch(line)
+        if not match:
+            if re.search(r'reviveQueueId=.*find (?:ck|ack|batch ack), offset:', line):
+                malformed += 1
+            continue
+        clock, queue, kind, offset, body = match.groups()
+        try:
+            require(len(body) <= 16384, 'bounded_revive_metadata_required')
+            scanned = datetime.strptime(clock, '%Y-%m-%d %H:%M:%S').replace(tzinfo=POP_LOG_TIMEZONE)
+            scanned_ms = int(scanned.timestamp() * 1000)
+            data = json.loads(body, object_pairs_hook=unique_fields)
+            require(isinstance(data, dict), 'invalid_revive_metadata')
+            if (data.get('t'), data.get('c')) not in routes:
+                continue
+            q, start, pop = (data[k] for k in ('q', 'so', 'pt'))
+            require(all(type(value) is int and value >= 0 for value in (q, start, pop)), 'invalid_revive_location')
+            broker = data.get('bn')
+            require(isinstance(broker, str) and 0 < len(broker) <= 128, 'invalid_revive_broker')
+            queue, offset = int(queue), int(offset)
+            require(0 <= queue < 8 and 0 <= offset < 2**63, 'invalid_revive_offset')
+            key = json.dumps([queue, data['t'], data['c'], q, start, pop, broker], separators=(',', ':'))
+            if kind == 'ck':
+                count = data['n']
+                require(type(count) is int and 0 <= count <= 127, 'invalid_ck_count')
+                differences = data.get('d')
+                if differences is None or differences == []:
+                    differences = range(count)
+                require(isinstance(differences, (list, range)) and len(differences) == count
+                        and all(type(value) is int and value >= 0 for value in differences), 'invalid_ck_offsets')
+                offsets = [start + value for value in differences]
+            elif kind == 'ack':
+                offsets = [data['ao']]
+            else:
+                offsets = data['aol']
+            require(isinstance(offsets, list) and len(offsets) <= 127 and (offsets or kind == 'ck')
+                    and all(type(value) is int and start <= value < 2**63 for value in offsets)
+                    and len(set(offsets)) == len(offsets), 'invalid_revive_message_offsets')
+        except (RuntimeError, KeyError, ValueError, TypeError, RecursionError):
+            malformed += 1
+            continue
+        digest = hashlib.sha256(body.encode()).hexdigest()
+        record = records.setdefault((queue, offset, digest), dict(
+            kind=kind, revive_queue=queue, revive_offset=offset, messages=len(offsets),
+            route_sha256=hashlib.sha256(json.dumps([data['t'], data['c']], separators=(',', ':')).encode()).hexdigest(),
+            merge_key_sha256=hashlib.sha256(key.encode()).hexdigest(), metadata_sha256=digest,
+            first_scan_unix_ms=scanned_ms, last_scan_unix_ms=scanned_ms,
+            offset_sha256s=[hashlib.sha256(f'{key}:{value}'.encode()).hexdigest() for value in sorted(offsets)]))
+        record['first_scan_unix_ms'] = min(record['first_scan_unix_ms'], scanned_ms)
+        record['last_scan_unix_ms'] = max(record['last_scan_unix_ms'], scanned_ms)
+    ordered = sorted(records.values(), key=lambda row: (row['revive_queue'], row['revive_offset'], row['metadata_sha256']))
+    return dict(records=ordered[-64:], omitted_records=max(0, len(ordered)-64),
+                malformed_records=malformed, retained_bytes=len(raw.encode()), drain_proven=False)
+
+
+def retry_catalog(raw, routes):
+    require(len(raw.encode()) <= POP_LOG_BYTES, 'bounded_retry_catalog_required')
+    document = json.loads(raw, object_pairs_hook=unique_fields)
+    require(isinstance(document, dict) and isinstance(document.get('dataVersion'), dict)
+            and isinstance(document.get('topicConfigTable'), dict), 'invalid_retry_catalog')
+    topics = set(document['topicConfigTable'])
+    require({topic for topic, _ in routes} <= topics and SYSTEM_TOPIC in topics, 'incomplete_retry_catalog')
+    expected = {f'%RETRY%{group}{separator}{topic}' for topic, group in routes for separator in ('_', '+')}
+    expected.update(prefix+group for _, group in routes for prefix in ('%RETRY%', '%DLQ%'))
+    return dict(source='broker_persisted_topic_config', observed_unix_ms=time.time_ns() // 1000000, checked=len(expected),
+                present_sha256s=sorted(hashlib.sha256(topic.encode()).hexdigest() for topic in expected & topics),
+                catalog_sha256=hashlib.sha256(raw.encode()).hexdigest())
+
+
+def persisted_revive_offsets(raw):
+    require(len(raw.encode()) <= POP_LOG_BYTES, 'bounded_revive_offsets_required')
+    # Fastjson emits bare integer keys for queue IDs in the persisted map.
+    normalized = re.sub(r'(?m)^(\s*)([0-7])(\s*:)', r'\1"\2"\3', raw)
+    document = json.loads(normalized, object_pairs_hook=unique_fields)
+    offsets = document['offsetTable'].get(REVIVE_OFFSET_KEY, {})
+    require(isinstance(offsets, dict) and offsets.keys() <= REVIVE_QUEUE_IDS
+            and all(type(value) is int and 0 <= value < 2**63 for value in offsets.values()),
+            'invalid_revive_offsets')
+    return dict(source='broker_persisted_consumer_offsets', committed=offsets,
+                observed_unix_ms=time.time_ns() // 1_000_000, raw_sha256=hashlib.sha256(raw.encode()).hexdigest())
+
+
+def revive_queue_bounds(raw):
+    require(len(raw.encode()) <= POP_LOG_BYTES, 'bounded_revive_queue_bounds_required')
+    result = {}
+    for line in raw.splitlines():
+        if not line.startswith('serverd-rocketmq'):
+            continue
+        match = re.fullmatch(r'serverd-rocketmq\s+([0-7])\s+([0-9]+)\s+([0-9]+)(?:\s+.*)?', line)
+        require(match is not None and match[1] not in result, 'invalid_revive_queue_bounds')
+        minimum, exclusive_maximum = int(match[2]), int(match[3])
+        require(0 <= minimum <= exclusive_maximum < 2**63, 'invalid_revive_queue_bounds')
+        result[match[1]] = dict(minimum=minimum, exclusive_maximum=exclusive_maximum)
+    require(result.keys() == REVIVE_QUEUE_IDS, 'complete_revive_queue_bounds_required')
+    return dict(source='broker_topic_status', queues=result,
+                observed_unix_ms=time.time_ns() // 1_000_000, raw_sha256=hashlib.sha256(raw.encode()).hexdigest())
+
+
 class OwnedPopControls:
-    def __init__(self, run, admin, broker, project, manifest, proof, passed):
+    def __init__(self, run, admin, broker, project, manifest, proof, passed, *, trace_rebound=False):
         self.run, self.admin, self.broker, self.project = run, admin, broker, project
         self.manifest, self.proof, self.passed = manifest, proof, passed
+        self.trace_rebound = trace_rebound
         self.url = None
         self.observed_timer = False
 
@@ -98,6 +225,8 @@ class OwnedPopControls:
         require(properties.get('brokerClusterName') == 'FangcunMount'
                 and properties.get('timerWheelEnable') == properties.get('enablePopMetrics') == 'true',
                 'pinned_native_pop_metrics_required')
+        if self.trace_rebound:
+            require(properties.get('enablePopLog') == 'true', 'owned_pop_trace_config_required')
         self.url = 'http://127.0.0.1:' + bindings[0]['HostPort'] + '/metrics'
 
     def read(self, required):
@@ -107,6 +236,39 @@ class OwnedPopControls:
             require(response.status == 200, 'native_pop_scrape_failed')
             raw = response.read(8 * 1024 * 1024 + 1)
         return snapshot(raw.decode(), timing_required=required)
+
+    def trace(self):
+        require(self.url is not None, 'owned_pop_trace_required')
+        routes = {(row['physical_topic'], row['consumer_group']) for row in self.manifest['routes']
+                  if row.get('physical_topic') and row.get('consumer_group')}
+        require(bool(routes), 'known_trace_routes_required')
+
+        def capture(args, parse):
+            try:
+                result = self.run(['docker', 'exec', self.broker, *args], timeout=10, required=False)
+                require(result.returncode == 0, 'owned_pop_trace_read_failed')
+                return parse(result.stdout)
+            except (RuntimeError, OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError):
+                return dict(error='owned_pop_trace_read_unavailable')
+
+        def persisted_offsets():
+            return capture(['head', '-c', str(POP_LOG_BYTES + 1), CONSUMER_OFFSETS], persisted_revive_offsets)
+
+        before = persisted_offsets()
+        records = capture(['tail', '-c', str(POP_LOG_BYTES), POP_LOG], lambda raw: revive_log_records(raw, routes))
+        bounds = capture(['java', '-Xms32m', '-Xmx128m', '-cp', '/opt/rocketmq/conf:/opt/rocketmq/lib/*',
+                          'org.apache.rocketmq.tools.command.MQAdminStartup', 'topicStatus',
+                          '-n', 'nameserver:9876', '-t', SYSTEM_TOPIC], revive_queue_bounds)
+        retries = capture(['head', '-c', str(POP_LOG_BYTES + 1), TOPIC_CATALOG], lambda raw: retry_catalog(raw, routes))
+        return dict(offsets_before=before, offsets_after=persisted_offsets(), records=records,
+                    queue_bounds=bounds, retry_catalog=retries, drain_proven=False)
+
+    def retain_trace(self, record):
+        if self.trace_rebound:
+            try:
+                record['trace'] = self.trace()
+            except (RuntimeError, OSError, ValueError, TypeError, KeyError):
+                record['trace'] = dict(error='owned_pop_trace_unavailable', drain_proven=False)
 
     def wait(self, predicate, *, required, budget, record, stage):
         deadline = time.monotonic() + budget
@@ -121,8 +283,10 @@ class OwnedPopControls:
             last_sample = value
             last_sample_unix_ms = time.time_ns() // 1_000_000
             time.sleep(.2)
-        record[stage + '_timeout'] = dict(budget_seconds=budget, samples_read=samples_read,
-                                         last_sample_unix_ms=last_sample_unix_ms, last_sample=last_sample)
+        timeout = dict(budget_seconds=budget, samples_read=samples_read,
+                       last_sample_unix_ms=last_sample_unix_ms, last_sample=last_sample)
+        record[stage + '_timeout'] = timeout
+        self.retain_trace(timeout)
         raise RuntimeError('native_pop_control_budget_exceeded')
 
     def __call__(self, stage, language):
@@ -152,5 +316,8 @@ class OwnedPopControls:
             record[stage] = self.wait(lambda v: zero(v, timing_required=True), required=True, budget=90, record=record, stage=stage)
             time.sleep(1)
             record['closed_confirmation'] = self.read(True)
-            require(zero(record['closed_confirmation'], timing_required=True), 'pop_responsibility_reappeared_after_sdk_close')
+            settled = zero(record['closed_confirmation'], timing_required=True)
+            if not settled:
+                self.retain_trace(record)
+            require(settled, 'pop_responsibility_reappeared_after_sdk_close')
             self.passed('readable_pop_' + suffix + '_acked_and_closed_responsibility_zero')
