@@ -178,8 +178,10 @@ jobs:
               {"broker_verified_tls_h2":true,"advertised_broker_verified_tls_h2":true,"mysql_protocol_greeting":true}
               and .proof.coordinated_host_alias_removed and .proof.coordinated_project_networks_removed and (.proof.ai_state_host.original_native |
               .original_fault_broker_networks_disconnected == 2 and (.coordinated_image_steps | length) == 3 and
-              all(.coordinated_image_steps[]; .container_plan_schema == "m3-native-recovery-container/v2" and
-                .exit_code == 0 and .uid == 3000 and (.network_id | test("^[0-9a-f]{64}$"))) and
+              all(.coordinated_image_steps[]; .container_plan_schema == "m3-native-recovery-container/v3" and
+                .exit_code == 0 and .uid == 3000 and (.network_id | test("^[0-9a-f]{64}$")) and
+                .network_member_count == 3 and (.network_members_sha256 | test("^[0-9a-f]{64}$"))) and
+              ([.coordinated_image_steps[].network_members_sha256] | unique | length) == 1 and
               ([.coordinated_image_steps[].network_id] | unique | length) == 1 and .coordinated_image_cleanup and
               .ai_reopen.broker_ack and .ai_reopen.no_new_half)' rocketmq-ai-state.json
           fi
