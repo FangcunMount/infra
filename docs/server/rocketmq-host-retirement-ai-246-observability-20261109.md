@@ -77,6 +77,8 @@ ssh -o BatchMode=yes servera 'sudo -n docker exec -i --user 10001:10001 qs-ai /a
 
 北京时间 05:35:45–06:05:45 的本机 Prometheus 复验中，九项各 121 点通过，Broker 抓取有 1 点失败。05:48:00 Broker 抓取耗时 10.003 秒并报 down，四个 owner 样本齐全。05:48:15 下一点恢复。ServerD 原 Broker 仍运行，启动时刻为 10 月 27 日，重启计数为 0。同期 ServerD Tailscale 日志未提供可归因的传输记录。此样本走独立 Broker 入口，应用网关和 Broker 两个缺口分别保留。查询、Broker 身份和日志摘要已纳入双地归档，SHA256 `b099b68c4748dd8c0361df275b77c4207cda8c916f05523432400a3c37cff6be`。
 
+北京时间 05:13:45–08:13:45 的扩展复验中，十项各 721 点，仅保留同一处 Broker 超时。以日志末行和文件 mtime 核对时区后，ServerD 的 Broker 与 store 日志在 05:46–05:51 分别有 15 和 71 行，未匹配导出器、网络超时、资源或存储错误。采集器标准输出无同期记录，ServerD 的一般 relay 活动未能关联到单次超时。缺少该请求的分段时延与 exporter 请求日志，触发原因继续待查。44 份原件在 MacBook 与 ServerA 读回并完成持久化校验，归档 SHA256 为 `e5693e49ada031d6d2326c67273f25c897d1d6de1f1719bd3a4722a5062bb886`。
+
 ### 06:12–06:13 应用与 Broker 同轮直读补件
 
 应用端沿用原脚本。另从 ServerD 本机运行 [Broker 直读脚本](../../scripts/monitoring/m5_window_broker_observe.py)，向原 5557 指标入口发固定 GET，核对唯一具名 Broker permission 样本。两轮分别在北京时间 06:12:53 和 06:13:08–09 发起，与应用轮次相差 0.437、0.486 秒。两轮三份 Worker 就绪和四个 owner 均通过，Broker 均为 HTTP 200 且报告预期值 6。原 Broker、六个 QS 实例和 AI 容器的完整身份前后相同。
