@@ -25,7 +25,7 @@
 
 ## W00 应用端直读候选
 
-[固定直读脚本](../../scripts/monitoring/m5_window_direct_observe.py)在 ServerA 已有 `qs-ai` 容器内以 UID 10001 执行，只对三个具名 Worker 的 `/readyz` 和 QS、AI、IAM 的固定 `/metrics` 发 GET。两轮间隔 15 秒，脚本预算 45 秒。拒绝跳转、代理和缺失、重复或异常 owner 样本。任一 Worker 非 200，或任一 owner 的 available/fresh 非 1、protected 非 0，结果失败。
+[固定直读脚本](../../scripts/monitoring/m5_window_direct_observe.py)在 ServerA 已有 `qs-ai` 容器内以 UID 10001 执行，只对具名 API、两份 Collection、三份 Worker 的 `/readyz` 和 QS、AI、IAM 的固定 `/metrics` 发 GET。两轮间隔 15 秒，脚本预算 45 秒。拒绝跳转、代理和缺失、重复或异常 owner 样本。任一具名就绪端点非 200，或任一 owner 的 available/fresh 非 1、protected 非 0，结果失败。业务回执及模型指标单独记录，缺失值保留为 null，重复或格式异常时拒绝。业务指标是否满足窗口资格由独立审查签收，实际排空仍按 W03 核对。
 
 ```sh
 ssh -o BatchMode=yes servera 'sudo -n docker exec -i --user 10001:10001 qs-ai /app/.venv/bin/python -' \
@@ -90,3 +90,7 @@ Broker 脚本 SHA256 为 `3de30551d6acaf4cb7824124dc55d6a0b37b455d19d50ae679c6d8
 [集中采集核对脚本](../../scripts/monitoring/m5_window_central_observe.py)逐点绑定十个 job/instance 和四个 job/instance/owner，检查值、原样本时间、35 秒新鲜度及即时目标。先从两份现役具名 Collection 读地址和完整身份，以这两份地址运行 `--collection-ip`，采样后重新核对身份。默认使用 Mac mini 本机 Prometheus，也可用 `--tailnet` 从既有私网查询同一实例。两种路径只读，任一失败均保留原件。
 
 北京时间 08:12–08:42 的两份报告一致。08:35:45、08:41:15 和 08:41:30 有八个应用目标同时失败，四个 owner 样本均缺失。08:41:45 仍缺 IAM，Broker 及采集器自抓取四处均正常。即时目标恢复，连续观测仍有缺口。08:43:26 和 08:43:41 的应用及 Broker 具名直读通过，启动时差低于 0.25 秒，原容器身份保持一致。40 份原件已双端读回和持久化，归档 SHA256 为 `46c5d036fd5793c8326bc0d6ac97b0b1d928331221a5cae37ff26b0a738b8079`。集中路径尚未通过连续性验收，具名直读待独立签收。
+
+### 09:10 正式直读范围复验
+
+新脚本将六实例就绪、具名 owner 和业务指标合并采集。北京时间 09:10:20 和 09:10:36，两轮应用与原 Broker 直读均通过，两轮发起差小于 0.51 秒。AI、IAM、六个 QS 实例和 Broker 身份保持一致。AI 业务观测可用且已暴露的待 ACK 和未解决模型指标为零。QS 历史聚合为不可用，待命令回执保持 null。22 项监控单测通过。20 份原件已两地读回并持久化，归档 SHA256 为 `34ad8cf12fe8ee7748bc12628cb816b8297476639d0b0b61bdc0688895a6eb9f`。直读方案仍待独立签收，实际排空按 W03 验证。

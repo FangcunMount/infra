@@ -11,7 +11,16 @@ from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, ProxyHandler, build_opener
 
 
-WORKERS = {f'worker-{n}': f'http://qs-m5-4620d11e2cff-worker-{n}:9092/readyz' for n in (1, 2, 3)}
+READY = {
+    'api-ready': 'http://qs-m5-4620d11e2cff-apiserver-1:8080/readyz',
+    **{f'collection-{n}-ready': f'http://qs-m5-4620d11e2cff-collection-{n}:8080/readyz' for n in (1, 2)},
+    **{f'worker-{n}': f'http://qs-m5-4620d11e2cff-worker-{n}:9092/readyz' for n in (1, 2, 3)},
+}
+BUSINESS_GAUGES = {
+    'qs': ('qs_server_ai_mq_observation_available', 'qs_server_ai_mq_awaiting_command_receipts'),
+    'ai': ('qs_ai_mq_observation_available', 'qs_ai_mq_pending_interpretation_receipts',
+           'qs_ai_pending_results', 'qs_ai_unresolved_model_calls', 'qs_ai_expired_job_leases'),
+}
 METRICS = {
     'qs': ('http://qs-m5-4620d11e2cff-apiserver-1:8080/metrics', {'qs.mysql', 'qs.mongo'}),
     'ai': ('http://127.0.0.1:8000/metrics', {'ai.mysql'}),
@@ -48,7 +57,26 @@ def owner_samples(raw, expected_owners):
     return samples
 
 
-def query(url, owners):
+def business_samples(raw, expected):
+    # Missing samples remain null, including ACK aggregates unavailable by contract.
+    values = dict.fromkeys(expected)
+    for line in raw.splitlines():
+        fields = line.split()
+        if not fields:
+            continue
+        name = fields[0].partition('{')[0]
+        if name not in values:
+            continue
+        if len(fields) != 2 or fields[0] != name or values[name] is not None:
+            raise ValueError('duplicate_or_malformed_business_sample')
+        value = float(fields[1])
+        if not math.isfinite(value) or value < 0 or not value.is_integer():
+            raise ValueError('invalid_business_sample')
+        values[name] = int(value)
+    return values
+
+
+def query(url, owners, gauges=()):
     try:
         # Ignore inherited proxy configuration and redirects. Only fixed endpoints are read.
         opener = build_opener(ProxyHandler({}), NoRedirect())
@@ -58,9 +86,12 @@ def query(url, owners):
                 raw = response.read(MAX_METRICS_BYTES + 1)
                 if len(raw) > MAX_METRICS_BYTES:
                     raise ValueError('metrics_budget_exceeded')
-                samples = owner_samples(raw.decode(), owners)
+                decoded = raw.decode()
+                samples = owner_samples(decoded, owners)
                 result.update(owner_samples=samples,
                               passed=result['passed'] and all(values == EXPECTED for values in samples.values()))
+                if gauges:
+                    result['business_gauges'] = business_samples(decoded, gauges)
             return result
     except HTTPError as error:
         return {'passed': False, 'http_status': error.code}
@@ -70,7 +101,9 @@ def query(url, owners):
 
 def observe():
     rounds = []
-    endpoints = {name: (url, ()) for name, url in WORKERS.items()} | METRICS
+    endpoints = {name: (url, ()) for name, url in READY.items()}
+    endpoints.update({name: (url, owners, BUSINESS_GAUGES.get(name, ()))
+                      for name, (url, owners) in METRICS.items()})
     with ThreadPoolExecutor(max_workers=len(endpoints)) as pool:
         for number in range(2):
             if number:
