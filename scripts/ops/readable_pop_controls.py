@@ -3,6 +3,7 @@
 No production entrypoint, mutation, consumer ACK, factory patch or raw export.
 The existing public SDK fixture owns and closes all actual clients and stores.
 """
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import hashlib
 import json
@@ -15,7 +16,11 @@ SYSTEM_TOPIC = 'rmq_sys_REVIVE_LOG_FangcunMount'
 BUFFER_NAMES = ('rocketmq_pop_offset_buffer_size', 'rocketmq_pop_checkpoint_buffer_size')
 POP_LOG = '/home/rocketmq/logs/rocketmqlogs/pop.log'
 POP_LOG_BYTES = 256 * 1024
-REVIVE_LINE = re.compile(r'^.*?reviveQueueId=(\d+),\s*find (ck|ack|batch ack), offset:(\d+), raw : (\{.*\})\s*$')
+REVIVE_LINE = re.compile(
+    r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) .*?reviveQueueId=(\d+),\s*'
+    r'find (ck|ack|batch ack), offset:(\d+), raw : (\{.*\})\s*$')
+# The pinned Broker's pop.log encoder writes whole seconds in GMT+8.
+POP_LOG_TIMEZONE = timezone(timedelta(hours=8))
 
 
 
@@ -83,10 +88,14 @@ def revive_log_records(raw, routes):
     for line in raw.splitlines():
         match = REVIVE_LINE.fullmatch(line)
         if not match:
+            if re.search(r'reviveQueueId=.*find (?:ck|ack|batch ack), offset:', line):
+                malformed += 1
             continue
-        queue, kind, offset, body = match.groups()
+        clock, queue, kind, offset, body = match.groups()
         try:
             require(len(body) <= 16384, 'bounded_revive_metadata_required')
+            scanned = datetime.strptime(clock, '%Y-%m-%d %H:%M:%S').replace(tzinfo=POP_LOG_TIMEZONE)
+            scanned_ms = int(scanned.timestamp() * 1000)
             data = json.loads(body, object_pairs_hook=unique_fields)
             require(isinstance(data, dict), 'invalid_revive_metadata')
             if (data.get('t'), data.get('c')) not in routes:
@@ -118,13 +127,30 @@ def revive_log_records(raw, routes):
             malformed += 1
             continue
         digest = hashlib.sha256(body.encode()).hexdigest()
-        records[(queue, offset, digest)] = dict(
+        record = records.setdefault((queue, offset, digest), dict(
             kind=kind, revive_queue=queue, revive_offset=offset, messages=len(offsets),
             merge_key_sha256=hashlib.sha256(key.encode()).hexdigest(), metadata_sha256=digest,
-            offset_sha256s=[hashlib.sha256(f'{key}:{value}'.encode()).hexdigest() for value in sorted(offsets)])
+            first_scan_unix_ms=scanned_ms, last_scan_unix_ms=scanned_ms,
+            offset_sha256s=[hashlib.sha256(f'{key}:{value}'.encode()).hexdigest() for value in sorted(offsets)]))
+        record['first_scan_unix_ms'] = min(record['first_scan_unix_ms'], scanned_ms)
+        record['last_scan_unix_ms'] = max(record['last_scan_unix_ms'], scanned_ms)
     ordered = sorted(records.values(), key=lambda row: (row['revive_queue'], row['revive_offset'], row['metadata_sha256']))
     return dict(records=ordered[-64:], omitted_records=max(0, len(ordered)-64),
                 malformed_records=malformed, retained_bytes=len(raw.encode()), drain_proven=False)
+
+
+def retry_catalog(raw, routes):
+    require(len(raw.encode()) <= POP_LOG_BYTES, 'bounded_retry_catalog_required')
+    entries = raw.splitlines()
+    require(len(entries) == len(set(entries)) and all(re.fullmatch(r'[A-Za-z0-9_%+|.-]{1,255}', row) for row in entries),
+            'invalid_retry_catalog')
+    topics = set(entries)
+    require({topic for topic, _ in routes} <= topics and SYSTEM_TOPIC in topics, 'incomplete_retry_catalog')
+    expected = {f'%RETRY%{group}{separator}{topic}' for topic, group in routes for separator in ('_', '+')}
+    expected.update(prefix+group for _, group in routes for prefix in ('%RETRY%', '%DLQ%'))
+    return dict(observed_unix_ms=time.time_ns() // 1000000, checked=len(expected),
+                present_sha256s=sorted(hashlib.sha256(topic.encode()).hexdigest() for topic in expected & topics),
+                catalog_sha256=hashlib.sha256('\n'.join(sorted(topics)).encode()).hexdigest())
 
 
 class OwnedPopControls:
@@ -163,7 +189,7 @@ class OwnedPopControls:
         with urllib.request.urlopen(self.url, timeout=3) as response:
             require(response.status == 200, 'native_pop_scrape_failed')
             raw = response.read(8 * 1024 * 1024 + 1)
-        return snapshot(raw.decode(), timing_required=required)
+        return dict(observed_unix_ms=time.time_ns() // 1000000, **snapshot(raw.decode(), timing_required=required))
 
     def wait(self, predicate, *, required, budget):
         deadline = time.monotonic() + budget
@@ -174,24 +200,37 @@ class OwnedPopControls:
             time.sleep(.2)
         raise RuntimeError('native_pop_control_budget_exceeded')
 
+    def retry_snapshot(self, routes):
+        try:
+            result = self.run(['docker', 'exec', self.broker, 'java', '-Xms32m', '-Xmx128m',
+                               '-cp', '/opt/rocketmq/conf:/opt/rocketmq/lib/*',
+                               'org.apache.rocketmq.tools.command.MQAdminStartup', 'topicList',
+                               '-n', 'nameserver:9876'], timeout=8, required=False)
+            require(result.returncode == 0, 'retry_catalog_unavailable')
+            return retry_catalog(result.stdout, routes)
+        except (RuntimeError, OSError, ValueError):
+            return dict(error='retry_catalog_unavailable')
+
     def trace(self, suffix):
         # Called only after a failed confirmation, after configure verified the fixture.
         require(self.url is not None, 'owned_pop_trace_required')
         routes = {(row['physical_topic'], row['consumer_group']) for row in self.manifest['routes']
                   if row['subscription'] == 'sdk-shared-' + suffix}
         require(bool(routes), 'known_trace_routes_required')
+        retry_before = self.retry_snapshot(routes)
         observed = []
         for _ in range(6):
             time.sleep(4)
             try:
-                observed.append(dict(observed_unix_ms=time.time_ns() // 1000000, **self.read(True)))
+                observed.append(self.read(True))
             except (RuntimeError, OSError, ValueError):
                 observed.append(dict(observed_unix_ms=time.time_ns() // 1000000, error='pop_sample_unavailable'))
         result = self.run(['docker', 'exec', self.broker, 'tail', '-c', str(POP_LOG_BYTES), POP_LOG],
                           timeout=5, required=False)
+        evidence = dict(samples=observed, retry_before=retry_before, retry_after=self.retry_snapshot(routes))
         if result.returncode:
-            return dict(samples=observed, error='revive_log_unavailable', drain_proven=False)
-        return dict(samples=observed, **revive_log_records(result.stdout, routes))
+            return dict(**evidence, error='revive_log_unavailable', drain_proven=False)
+        return dict(**evidence, **revive_log_records(result.stdout, routes))
 
     def __call__(self, stage, language):
         require(language in ('sdk-go', 'sdk-python') and stage in ('baseline', 'subscribed', 'held', 'closed'), 'fixed_pop_control_stage_required')

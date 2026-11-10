@@ -158,8 +158,8 @@ def shared_budget(start, passed, *, language, observe=None):
     maxima=[int(e['decision']) for e in observer.events if e.get('event')=='max_inflight']
     if maxima!=[2]:
         raise RuntimeError('shared public SDK subscriber maximum was not exactly two')
-    observed={e['id'] for e in observer.events if e.get('event')=='received'}
-    if observed!=expected:
-        raise RuntimeError('unexpected original ID/wire across typed physical inputs')
+    observed=[e['id'] for e in observer.events if e.get('event')=='received']
+    if set(observed)!=expected or len(observed)!=len(expected):
+        raise RuntimeError('missing, unexpected or repeated original delivery across typed physical inputs')
     if observe is not None: observe('closed', language)
     passed('v2_'+language+'_three_physical_inputs_share_two_handler_budget')
