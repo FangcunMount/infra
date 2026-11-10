@@ -3,15 +3,18 @@
 No production entrypoint, mutation, consumer ACK, factory patch or raw export.
 The existing public SDK fixture owns and closes all actual clients and stores.
 """
+import base64
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import hashlib
 import json
 import os
 import re
+import struct
 import subprocess
 import time
 import urllib.request
+import zlib
 
 SYSTEM_TOPIC = 'rmq_sys_REVIVE_LOG_FangcunMount'
 BUFFER_NAMES = ('rocketmq_pop_offset_buffer_size', 'rocketmq_pop_checkpoint_buffer_size')
@@ -96,6 +99,41 @@ def unique_fields(pairs):
     return result
 
 
+def revive_record(body, kind, queue, offset, routes):
+    require(len(body) <= 16384, 'bounded_revive_metadata_required')
+    data = json.loads(body, object_pairs_hook=unique_fields)
+    require(isinstance(data, dict), 'invalid_revive_metadata')
+    if (data.get('t'), data.get('c')) not in routes:
+        return None
+    q, start, pop = (data[k] for k in ('q', 'so', 'pt'))
+    require(all(type(value) is int and value >= 0 for value in (q, start, pop)), 'invalid_revive_location')
+    broker = data.get('bn')
+    require(isinstance(broker, str) and 0 < len(broker) <= 128, 'invalid_revive_broker')
+    require(0 <= queue < 8 and 0 <= offset < 2**63, 'invalid_revive_offset')
+    key = json.dumps([queue, data['t'], data['c'], q, start, pop, broker], separators=(',', ':'))
+    if kind == 'ck':
+        count = data['n']
+        require(type(count) is int and 0 <= count <= 127, 'invalid_ck_count')
+        differences = data.get('d')
+        if differences is None or differences == []:
+            differences = range(count)
+        require(isinstance(differences, (list, range)) and len(differences) == count
+                and all(type(value) is int and value >= 0 for value in differences), 'invalid_ck_offsets')
+        offsets = [start + value for value in differences]
+    elif kind == 'ack':
+        offsets = [data['ao']]
+    else:
+        offsets = data['aol']
+    require(isinstance(offsets, list) and len(offsets) <= 127 and (offsets or kind == 'ck')
+            and all(type(value) is int and start <= value < 2**63 for value in offsets)
+            and len(set(offsets)) == len(offsets), 'invalid_revive_message_offsets')
+    return dict(kind=kind, revive_queue=queue, revive_offset=offset, messages=len(offsets),
+                route_sha256=hashlib.sha256(json.dumps([data['t'], data['c']], separators=(',', ':')).encode()).hexdigest(),
+                merge_key_sha256=hashlib.sha256(key.encode()).hexdigest(),
+                metadata_sha256=hashlib.sha256(body).hexdigest(),
+                offset_sha256s=[hashlib.sha256(f'{key}:{value}'.encode()).hexdigest() for value in sorted(offsets)])
+
+
 def revive_log_records(raw, routes):
     """Keep only fixed 5.5.1 records for the disposable subscriber routes."""
     require(len(raw.encode()) <= POP_LOG_BYTES, 'bounded_revive_log_required')
@@ -109,46 +147,16 @@ def revive_log_records(raw, routes):
             continue
         clock, queue, kind, offset, body = match.groups()
         try:
-            require(len(body) <= 16384, 'bounded_revive_metadata_required')
             scanned = datetime.strptime(clock, '%Y-%m-%d %H:%M:%S').replace(tzinfo=POP_LOG_TIMEZONE)
             scanned_ms = int(scanned.timestamp() * 1000)
-            data = json.loads(body, object_pairs_hook=unique_fields)
-            require(isinstance(data, dict), 'invalid_revive_metadata')
-            if (data.get('t'), data.get('c')) not in routes:
-                continue
-            q, start, pop = (data[k] for k in ('q', 'so', 'pt'))
-            require(all(type(value) is int and value >= 0 for value in (q, start, pop)), 'invalid_revive_location')
-            broker = data.get('bn')
-            require(isinstance(broker, str) and 0 < len(broker) <= 128, 'invalid_revive_broker')
-            queue, offset = int(queue), int(offset)
-            require(0 <= queue < 8 and 0 <= offset < 2**63, 'invalid_revive_offset')
-            key = json.dumps([queue, data['t'], data['c'], q, start, pop, broker], separators=(',', ':'))
-            if kind == 'ck':
-                count = data['n']
-                require(type(count) is int and 0 <= count <= 127, 'invalid_ck_count')
-                differences = data.get('d')
-                if differences is None or differences == []:
-                    differences = range(count)
-                require(isinstance(differences, (list, range)) and len(differences) == count
-                        and all(type(value) is int and value >= 0 for value in differences), 'invalid_ck_offsets')
-                offsets = [start + value for value in differences]
-            elif kind == 'ack':
-                offsets = [data['ao']]
-            else:
-                offsets = data['aol']
-            require(isinstance(offsets, list) and len(offsets) <= 127 and (offsets or kind == 'ck')
-                    and all(type(value) is int and start <= value < 2**63 for value in offsets)
-                    and len(set(offsets)) == len(offsets), 'invalid_revive_message_offsets')
+            item = revive_record(body.encode(), kind, int(queue), int(offset), routes)
         except (RuntimeError, KeyError, ValueError, TypeError, RecursionError):
             malformed += 1
             continue
-        digest = hashlib.sha256(body.encode()).hexdigest()
-        record = records.setdefault((queue, offset, digest), dict(
-            kind=kind, revive_queue=queue, revive_offset=offset, messages=len(offsets),
-            route_sha256=hashlib.sha256(json.dumps([data['t'], data['c']], separators=(',', ':')).encode()).hexdigest(),
-            merge_key_sha256=hashlib.sha256(key.encode()).hexdigest(), metadata_sha256=digest,
-            first_scan_unix_ms=scanned_ms, last_scan_unix_ms=scanned_ms,
-            offset_sha256s=[hashlib.sha256(f'{key}:{value}'.encode()).hexdigest() for value in sorted(offsets)]))
+        if item is None:
+            continue
+        identity = (item['revive_queue'], item['revive_offset'], item['metadata_sha256'])
+        record = records.setdefault(identity, dict(item, first_scan_unix_ms=scanned_ms, last_scan_unix_ms=scanned_ms))
         record['first_scan_unix_ms'] = min(record['first_scan_unix_ms'], scanned_ms)
         record['last_scan_unix_ms'] = max(record['last_scan_unix_ms'], scanned_ms)
     ordered = sorted(records.values(), key=lambda row: (row['revive_queue'], row['revive_offset'], row['metadata_sha256']))
@@ -199,6 +207,72 @@ def revive_queue_bounds(raw):
                 observed_unix_ms=time.time_ns() // 1_000_000, raw_sha256=hashlib.sha256(raw.encode()).hexdigest())
 
 
+def decode_physical_revive(raw, queue, logical, physical, routes):
+    # Pinned 5.5.1 MessageDecoder: only uncompressed IPv4 v1/v2 records.
+    require(90 <= len(raw) <= 32768, 'bounded_physical_revive_record_required')
+    size, magic, crc, recorded_queue, _, recorded_logical, recorded_physical, sysflag = struct.unpack_from(
+        '>iiiiiqqi', raw)
+    require(size == len(raw) and (recorded_queue, recorded_logical, recorded_physical) == (queue, logical, physical)
+            and not sysflag & 0x31, 'physical_revive_record_identity_mismatch')
+    topic_length_bytes = {-626843481: 1, -626843477: 2}.get(magic)
+    require(topic_length_bytes is not None, 'physical_revive_magic_unavailable')
+    body_length, = struct.unpack_from('>i', raw, 84)
+    body_end = 88 + body_length
+    require(0 < body_length <= 16384 and body_end + topic_length_bytes + 2 <= size,
+            'physical_revive_body_bounds')
+    body = raw[88:body_end]
+    # RocketMQ UtilAll.crc32 persists the low 31 bits.
+    require((zlib.crc32(body) & 0x7fffffff) == crc, 'physical_revive_body_crc_mismatch')
+    topic_start = body_end + topic_length_bytes
+    topic_length = int.from_bytes(raw[body_end:topic_start], 'big')
+    topic_end = topic_start + topic_length
+    require(topic_end + 2 <= size and raw[topic_start:topic_end] == SYSTEM_TOPIC.encode(),
+            'physical_revive_topic_mismatch')
+    properties_length, = struct.unpack_from('>H', raw, topic_end)
+    require(topic_end + 2 + properties_length == size, 'physical_revive_properties_bounds')
+    tags = [part[5:] for part in raw[topic_end+2:].split(b'\x02') if part.startswith(b'TAGS\x01')]
+    require(len(tags) == 1, 'physical_revive_tag_required')
+    kind = {b'ck': 'ck', b'ack': 'ack', b'bAck': 'batch ack'}.get(tags[0])
+    require(kind is not None, 'physical_revive_tag_unknown')
+    result = revive_record(body, kind, queue, logical, routes)
+    require(result is not None, 'physical_revive_route_unavailable')
+    return dict(result, physical_record_sha256=hashlib.sha256(raw).hexdigest())
+
+
+def physical_revive_records(read, committed, bounds, lag):
+    """Read only the first mapped files of this small disposable Broker."""
+    first_file = '00000000000000000000'
+    store = '/home/rocketmq/store'
+    deadline = time.monotonic() + 35
+    records, queues = [], {}
+    for key, count in sorted(lag.items()):
+        if count <= 0:
+            continue
+        queue = int(key)
+        try:
+            cursor = committed[key]
+            minimum, maximum = bounds[key]['minimum'], bounds[key]['exclusive_maximum']
+            require(0 <= minimum <= cursor < maximum <= 512 and maximum - cursor - 1 == count <= 8,
+                    'physical_revive_range_not_verified')
+            start = max(minimum, cursor - 8)
+            path = f'{store}/consumequeue/{SYSTEM_TOPIC}/{queue}/{first_file}'
+            index_size = (maximum - start) * 20
+            cq = read(path, start * 20, index_size, deadline)
+            require(len(cq) == index_size, 'physical_revive_index_incomplete')
+            selected = []
+            for offset, (physical, size, _) in enumerate(struct.iter_unpack('>qiq', cq), start):
+                require(0 <= physical < 134217728 and 90 <= size <= 32768 and physical+size <= 134217728,
+                        'physical_revive_index_outside_first_file')
+                raw = read(f'{store}/commitlog/{first_file}', physical, size, deadline)
+                selected.append((raw, queue, offset, physical))
+            require(read(path, start * 20, len(cq), deadline) == cq, 'physical_revive_index_changed')
+            records.extend(selected)
+            queues[key] = dict(start=start, exclusive_maximum=maximum, index_sha256=hashlib.sha256(cq).hexdigest())
+        except (RuntimeError, OSError, ValueError, TypeError, KeyError, struct.error, subprocess.SubprocessError):
+            queues[key] = dict(error='physical_revive_queue_unavailable')
+    return records, queues
+
+
 class OwnedPopControls:
     def __init__(self, run, admin, broker, project, manifest, proof, passed, *, trace_rebound=False):
         self.run, self.admin, self.broker, self.project = run, admin, broker, project
@@ -237,7 +311,7 @@ class OwnedPopControls:
             raw = response.read(8 * 1024 * 1024 + 1)
         return snapshot(raw.decode(), timing_required=required)
 
-    def trace(self):
+    def trace(self, sample):
         require(self.url is not None, 'owned_pop_trace_required')
         routes = {(row['physical_topic'], row['consumer_group']) for row in self.manifest['routes']
                   if row.get('physical_topic') and row.get('consumer_group')}
@@ -260,13 +334,37 @@ class OwnedPopControls:
                           'org.apache.rocketmq.tools.command.MQAdminStartup', 'topicStatus',
                           '-n', 'nameserver:9876', '-t', SYSTEM_TOPIC], revive_queue_bounds)
         retries = capture(['head', '-c', str(POP_LOG_BYTES + 1), TOPIC_CATALOG], lambda raw: retry_catalog(raw, routes))
+
+        def read_bytes(path, offset, count, deadline):
+            remaining = deadline - time.monotonic()
+            require(remaining > 0, 'physical_revive_trace_budget_exceeded')
+            result = self.run(['docker', 'exec', self.broker, 'sh', '-c',
+                'dd if="$1" bs=1 skip="$2" count="$3" status=none | base64', 'physical-revive',
+                path, str(offset), str(count)], timeout=min(remaining, 3), required=False)
+            require(result.returncode == 0 and len(result.stdout) <= count * 2 + 8,
+                    'physical_revive_read_unavailable')
+            raw = base64.b64decode(''.join(result.stdout.split()), validate=True)
+            require(len(raw) == count, 'physical_revive_read_incomplete')
+            return raw
+
+        selected, queues = physical_revive_records(read_bytes, before.get('committed', {}),
+                                                    bounds.get('queues', {}), sample.get('revive_lag', {}))
+        physical = []
+        unreadable = []
+        for raw, queue, logical, offset in selected:
+            try:
+                physical.append(decode_physical_revive(raw, queue, logical, offset, routes))
+            except (RuntimeError, KeyError, ValueError, TypeError, RecursionError, struct.error):
+                unreadable.append(dict(queue=queue, offset=logical))
         return dict(offsets_before=before, offsets_after=persisted_offsets(), records=records,
-                    queue_bounds=bounds, retry_catalog=retries, drain_proven=False)
+                    queue_bounds=bounds, retry_catalog=retries,
+                    physical_storage=dict(records=physical, queues=queues, unreadable=unreadable, drain_proven=False),
+                    drain_proven=False)
 
     def retain_trace(self, record):
         if self.trace_rebound:
             try:
-                record['trace'] = self.trace()
+                record['trace'] = self.trace(record.get('last_sample') or record.get('closed_confirmation') or {})
             except (RuntimeError, OSError, ValueError, TypeError, KeyError):
                 record['trace'] = dict(error='owned_pop_trace_unavailable', drain_proven=False)
 
