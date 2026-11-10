@@ -170,7 +170,8 @@ jobs:
               {"transactionTimeOut":6000,"transactionCheckInterval":30000,"transactionCheckMax":15,"fileReservedTime":48}
               and (.proof.ai_state_host.original_native |
                 .check_budget_mode == "observed" and .index_wait_seconds == 600 and .broker_parameters_restored
-                and .broker_parameters_before_fault == .broker_parameters_during_fault and .native_index_records == 1)' rocketmq-ai-state.json
+                and .broker_parameters_before_fault == .broker_parameters_during_fault and .native_index_records == 1
+                and .native_admin_check_budget == {"interval_ms":30000,"max_checks":15})' rocketmq-ai-state.json
           fi
           if [[ "$QS_AI_COORDINATED_IMAGE" == true ]]; then
             jq -e '.proof.coordinated_host_loopback ==

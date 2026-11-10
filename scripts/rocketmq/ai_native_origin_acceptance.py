@@ -93,7 +93,7 @@ class OriginalConsumer:
 
 
 def run_managed(managed, directory, broker, project, run, native, proof,
-                half, closed, index, evidence_path):
+                half, closed, index, evidence_path, *, check_budget=None):
     from managed_recovery_acceptance import accept, install_java_helper
 
     repo = Path(__file__).resolve().parents[2]
@@ -119,7 +119,8 @@ def run_managed(managed, directory, broker, project, run, native, proof,
            grpc_port=managed['grpc_port'], mysql_port=managed['mysql_port'], password=managed['password'],
            ca=managed['ca'], java=java, identity=identity, index_path=evidence_path,
            index=index, sql=sql, run=run, consumer=OriginalConsumer(native, identity, original['wire_hash']),
-           passed=lambda name: cases.update({name: True}), proof=proof, original=original, image=image)
+           passed=lambda name: cases.update({name: True}), proof=proof, original=original, image=image,
+           check_budget=check_budget)
     proof['stage'] = 'named_ai_reopen'
     native.send('verify')
     reopened = native.wait('reopened', timeout=60)
@@ -255,7 +256,8 @@ def run_origin(source, directory, broker, project, command, env, run, native_run
             if read_parameters(admin('getBrokerConfig')) != before:
                 raise RuntimeError('original Broker budget required before recovery')
             cases.update(run_managed(managed, directory, broker, project, run, native,
-                                     proof, half, closed, index, evidence_path))
+                                     proof, half, closed, index, evidence_path,
+                                     check_budget=before if observed_budget else None))
 
     def supervise(native):
         try:
