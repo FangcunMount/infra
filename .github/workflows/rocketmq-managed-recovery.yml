@@ -116,6 +116,7 @@ jobs:
           assert set(timings)=={'qs.mysql','qs.mongo'} and all(0<value<=600000 for value in timings.values())
           assert set(p['qs_owner_recoveries'])=={'qs.mysql','qs.mongo'}
           for owner,evidence in p['qs_owner_recoveries'].items():
+            assert evidence['native_admin_check_budget']==dict(interval_ms=30000,max_checks=15)
             assert evidence['managed_cli_build']['sdk_version']=='v0.6.1'
             assert evidence['managed_cli_build']['source_sha']==os.environ['GITHUB_SHA']
             r=evidence['managed_recovery']

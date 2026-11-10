@@ -15,6 +15,12 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 
 public final class NativeHalfManaged {
+    static void requireBrokerCheckBudget(Properties config, int expectedInterval, int expectedMax) {
+        NativeHalfRecheck.require(Long.parseLong(config.getProperty("transactionTimeOut")) == 6000
+            && Long.parseLong(config.getProperty("transactionCheckInterval")) == expectedInterval
+            && Integer.parseInt(config.getProperty("transactionCheckMax")) == expectedMax);
+    }
+
     public static void main(String[] args) {
         DefaultMQAdminExt admin = null;
         JSONObject result = new JSONObject();
@@ -29,9 +35,10 @@ public final class NativeHalfManaged {
             JSONObject request = JSON.parseObject(raw, JSONObject.class);
             Set<String> keys = Set.of("schema", "mode", "request_sha256", "invocation_nonce", "source_sha", "native_index_sha256",
                 "nameserver", "broker", "source_topic", "commitlog_offset", "queue_id", "queue_offset", "expected_real_topic", "expected_owner",
-                "expected_reference_sha256", "expected_wire_sha256", "expected_unique_id_sha256", "expected_retention_hours", "expected_route_revision");
+                "expected_reference_sha256", "expected_wire_sha256", "expected_unique_id_sha256", "expected_retention_hours",
+                "expected_check_interval_ms", "expected_check_max", "expected_route_revision");
             NativeHalfRecheck.require(request != null && request.keySet().equals(keys));
-            NativeHalfRecheck.require("m3-managed-native-request/v1".equals(request.getString("schema")));
+            NativeHalfRecheck.require("m3-managed-native-request/v2".equals(request.getString("schema")));
             String mode = NativeHalfRecheck.text(request, "mode");
             NativeHalfRecheck.require(mode.equals("inspect") || mode.equals("resume"));
             for (String key : Set.of("request_sha256", "invocation_nonce", "native_index_sha256", "expected_reference_sha256", "expected_wire_sha256", "expected_unique_id_sha256")) {
@@ -42,6 +49,12 @@ public final class NativeHalfManaged {
                 Object v = request.get(key);
                 NativeHalfRecheck.require((v instanceof Long || v instanceof Integer) && ((Number)v).longValue() >= 0);
             }
+            NativeHalfRecheck.require(request.get("expected_check_interval_ms") instanceof Integer
+                && request.get("expected_check_max") instanceof Integer);
+            int expectedInterval = request.getIntValue("expected_check_interval_ms");
+            int expectedMax = request.getIntValue("expected_check_max");
+            NativeHalfRecheck.require((expectedInterval == 5000 && expectedMax == 24)
+                || (expectedInterval == 30000 && expectedMax == 15));
             String topic = NativeHalfRecheck.text(request, "source_topic");
             NativeHalfRecheck.require(topic.equals("TRANS_CHECK_MAX_TIME_TOPIC"));
             String owner = NativeHalfRecheck.text(request, "expected_owner");
@@ -70,9 +83,7 @@ public final class NativeHalfManaged {
             Properties config = admin.getBrokerConfig(broker);
             int hours = Integer.parseInt(config.getProperty("fileReservedTime"));
             NativeHalfRecheck.require(request.get("expected_retention_hours") instanceof Integer && request.getIntValue("expected_retention_hours") == hours);
-            NativeHalfRecheck.require(Long.parseLong(config.getProperty("transactionTimeOut")) == 6000
-                && Long.parseLong(config.getProperty("transactionCheckInterval")) == 5000
-                && Integer.parseInt(config.getProperty("transactionCheckMax")) == 24);
+            requireBrokerCheckBudget(config, expectedInterval, expectedMax);
             long offset = request.getLongValue("commitlog_offset");
             NativeHalfRecheck.require(config.getProperty("brokerIP1") != null && !config.getProperty("brokerIP1").isBlank());
             InetAddress address = InetAddress.getByName(config.getProperty("brokerIP1"));

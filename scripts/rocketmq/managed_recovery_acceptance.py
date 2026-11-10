@@ -101,19 +101,21 @@ def notice_key(index,binding=None):
 
 
 def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False,original=None):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False,original=None,
+           check_budget=None):
     proxy=MySQLCommitProxy(mysql_port).start() if governance_faults else None
     try:
         return _accept(repo=repo,binary=binary,broker=broker,project=project,directory=directory,manifest=manifest,route=route,account=account,
             grpc_port=grpc_port,mysql_port=mysql_port,password=password,ca=ca,java=java,identity=identity,index_path=index_path,index=index,
-            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original)
+            sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original,
+            check_budget=check_budget)
     finally:
         if proxy is not None:
             proof['governance_wire_proxy_cleanup']=proxy.close()
 
 
 def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original,check_budget=None):
     source=original or dict(owner="iam.mysql",store_id="sdk-disposable",writer_epoch="sdk-epoch-1",database="txprobe",user="txprobe",
         operation_id="op-"+identity,branch_id="branch-0",fence=1,business_count_sql="SELECT COUNT(*) FROM sdk_business",
         writer="fixed Go SDK source probe, not IAM business host",scope="one iam.mysql terminal commit, not the complete four-host/fault matrix")
@@ -159,6 +161,10 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         endpoint=f'127.0.0.1:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
         native_admin_script=str(native_script),native_admin_script_sha256=hashlib.sha256(native_script.read_bytes()).hexdigest(),
         native_admin_nameserver='nameserver:9876',native_admin_broker='127.0.0.1:10911')
+    if check_budget is not None:
+        config['native_admin_check_budget'] = dict(interval_ms=check_budget['transactionCheckInterval'],
+                                                  max_checks=check_budget['transactionCheckMax'])
+        proof['native_admin_check_budget'] = config['native_admin_check_budget']
     config_path,config_sha=write('original-config.json',config)
     source_bundle=hashlib.sha256(_encoded(dict(source=version['source_sha'],binary=version['binary_sha256'],config=config_sha,manifest=manifest_sha))).hexdigest()
     op=root/'operation'
