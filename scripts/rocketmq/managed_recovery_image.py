@@ -9,7 +9,7 @@ import socket
 from managed_recovery_acceptance import require
 
 
-def image_command(repo, image, broker, project, directory, root, index_path, ca, run, proof):
+def image_command(repo, image, broker, project, directory, root, index_path, ca, run, proof, *, coordinated=False):
     require(os.environ.get('GITHUB_ACTIONS') == 'true' and os.environ.get('RUNNER_OS') == 'Linux'
             and os.environ.get('RUNNER_ENVIRONMENT') == 'github-hosted'
             and not os.environ.get('DOCKER_HOST') and not os.environ.get('DOCKER_CONTEXT'),
@@ -26,11 +26,15 @@ def image_command(repo, image, broker, project, directory, root, index_path, ca,
     require(broker_info['Config']['Labels']['com.docker.compose.project'] == project
             and broker_info['State']['Running'], 'exact_owned_broker_required')
     networks = broker_info['NetworkSettings']['Networks']
-    require(len(networks) == 1, 'one_owned_broker_network_required')
-    network, = networks
-    network_info, = json.loads(run([*docker, 'network', 'inspect', network]).stdout)
-    require(network_info['Labels']['com.docker.compose.project'] == project,
-            'exact_owned_broker_network_required')
+    expected_networks = {project + '_rocketmq'}
+    if coordinated:
+        expected_networks.add(project + '_recovery')
+    require(set(networks) == expected_networks, 'exact_owned_broker_networks_required')
+    network_info = json.loads(run([*docker, 'network', 'inspect', *sorted(networks)]).stdout)
+    require(len(network_info) == len(networks) and all(
+        item['Labels']['com.docker.compose.project'] == project
+        and networks[item['Name']]['NetworkID'] == item['Id'] for item in network_info),
+        'exact_owned_broker_network_required')
 
     image_info, = json.loads(run([*docker, 'image', 'inspect', image]).stdout)
     sha = run(['git', 'rev-parse', 'HEAD'], cwd=repo).stdout.strip()

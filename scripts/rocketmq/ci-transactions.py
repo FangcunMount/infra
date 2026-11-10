@@ -421,7 +421,10 @@ def main():
         ci_guard(os.environ)
         if not args.ai_admission_host or not os.environ.get("QS_AI_NATIVE_RECOVERY_IMAGE"):
             raise RuntimeError("coordinated recovery requires the owned AI execution image")
-    broker_address = "172.31.80.10" if coordinated_image else "127.0.0.1"
+    broker_address = "127.0.0.1"
+    if coordinated_image:
+        from ci_coordinated_recovery import add_recovery_bridge, RECOVERY_BROKER_HOST, RECOVERY_BROKER_IP
+        broker_address = RECOVERY_BROKER_IP
     render(accounts, config, broker_address, repo / "components/rocketmq")
     with (config / "broker.conf").open("a") as stream:
         stream.write("".join(f"{key}={value}\n" for key, value in PARAMETERS.items()))
@@ -430,7 +433,7 @@ def main():
     (config / "proxy.json").write_text(json.dumps(proxy))
     broker_san = "subjectAltName=IP:127.0.0.1,DNS:localhost,DNS:nameserver,DNS:broker"
     if coordinated_image:
-        broker_san += ",IP:" + broker_address
+        broker_san += f",IP:{broker_address},DNS:{RECOVERY_BROKER_HOST}"
     run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
          "-subj", "/CN=rocketmq-m2-isolated", "-addext", broker_san,
          "-keyout", str(config / "tls/server.key"), "-out", str(config / "tls/server.crt")])
@@ -454,9 +457,6 @@ def main():
     for network in spec["networks"].values():
         network.pop("name", None)
     broker_spec = spec["services"]["broker"]
-    if coordinated_image:
-        spec["networks"]["rocketmq"]["ipam"] = {"config": [{"subnet": "172.31.80.0/24"}]}
-        broker_spec["networks"]["rocketmq"] = {"ipv4_address": broker_address}
     broker_spec["ports"][0]["target"] = grpc_port
     broker_spec["healthcheck"]["test"][-1] = f"exec 3<>/dev/tcp/127.0.0.1/{grpc_port}"
     for service in spec["services"].values():
@@ -468,6 +468,8 @@ def main():
         "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
+    if coordinated_image:
+        add_recovery_bridge(spec)
     if args.qs_runtime_host or args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host:
         # Host profiles explicitly create/drop their OWN random schema.
         # This root login exists only in this private loopback Compose project.
@@ -1173,6 +1175,12 @@ def main():
         remaining = run(["docker", "ps", "-aq", "--filter", "label=com.docker.compose.project=" + project]).stdout.strip()
         if remaining:
             failure = failure or "owned Compose containers remain after cleanup"
+        if coordinated_image:
+            owned_networks = run(["docker", "network", "ls", "-q", "--filter",
+                                  "label=com.docker.compose.project=" + project]).stdout.strip()
+            proof["coordinated_project_networks_removed"] = not owned_networks
+            if owned_networks:
+                failure = failure or "owned recovery networks remain after cleanup"
         report = {"version": 1, "batch": ("M2-Go-Python-SDK" if args.sdk_api_python else "M2-Go-SDK") if args.sdk_api_go else "M2-0", "project": project, "image": image,
                   "mysql_image": mysql_image, "mongo_image": mongo_image, "clients": {"go": "5.1.4", "python": "5.1.2"},
                   "cases": cases, "passed": len(cases), "failed": int(failure is not None),

@@ -179,7 +179,8 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     native_script = root/'owned-native-admin.sh'
     if image:
         from managed_recovery_image import image_command
-        cli, script = image_command(repo, image, broker, project, directory, root, index_path, ca, run, proof)
+        cli, script = image_command(repo, image, broker, project, directory, root, index_path, ca, run, proof,
+                                    coordinated=coordinated is not None)
         native_script.write_bytes(script)
     else:
         docker=shutil.which('docker');require(docker is not None,'explicit_local_docker_binary_required')
@@ -211,11 +212,19 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         ('m3-iam','m3-qs-apiserver','m3-qs-worker','m3-qs-mongo','m3-ai')}
     manifest_file,manifest_sha=write('reviewed-fixture-manifest.json',owner_manifest)
     database_endpoint = 'mysql:3306' if image else f'127.0.0.1:{proxy.port if proxy else mysql_port}'
+    broker_host, nameserver, native_broker = '127.0.0.1', 'nameserver:9876', '127.0.0.1:10911'
+    if coordinated:
+        from ci_coordinated_recovery import (RECOVERY_BROKER_HOST, RECOVERY_BROKER_IP,
+                                             RECOVERY_MYSQL_HOST, RECOVERY_NAMESERVER_HOST)
+        database_endpoint = f'{RECOVERY_MYSQL_HOST}:3306'
+        broker_host = RECOVERY_BROKER_HOST
+        nameserver = f'{RECOVERY_NAMESERVER_HOST}:9876'
+        native_broker = f'{RECOVERY_BROKER_IP}:10911'
     config=dict(schema='m3-native-recovery-config/v1',owner=source['owner'],store_id=source['store_id'],writer_epoch=source['writer_epoch'],
         database_kind='mysql',database_uri=f"{source['user']}:{password}@tcp({database_endpoint})/{source['database']}",database_name=source['database'],database_ca_pem='',
-        endpoint=f'{"broker" if coordinated else "127.0.0.1"}:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
+        endpoint=f'{broker_host}:{grpc_port}',access_key=account['username'],secret_key=account['password'],root_ca_pem=ca.read_text(),
         native_admin_script=ADMIN_SCRIPT if coordinated else str(native_script),native_admin_script_sha256=hashlib.sha256(native_script.read_bytes()).hexdigest(),
-        native_admin_nameserver='nameserver:9876',native_admin_broker='172.31.80.10:10911' if coordinated else '127.0.0.1:10911')
+        native_admin_nameserver=nameserver,native_admin_broker=native_broker)
     config_path,config_sha=write('original-config.json',config)
     source_inputs = dict(source=version['source_sha'], binary=version['binary_sha256'], config=config_sha, manifest=manifest_sha)
     if image:

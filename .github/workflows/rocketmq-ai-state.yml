@@ -37,7 +37,7 @@ on:
         options: [full, development]
         default: full
   pull_request:
-    paths: ['scripts/rocketmq/native_limit_acceptance.py', 'scripts/rocketmq/test_native_limit_acceptance.py', 'scripts/rocketmq/probes/native-transaction-limit/**', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ai_native_origin_acceptance.py', 'scripts/rocketmq/ai_native_origin_case.py', 'scripts/rocketmq/managed_recovery_image.py', 'scripts/rocketmq/ai_state_acceptance.py', 'scripts/rocketmq/test_ai_state_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-state.yml', 'Makefile']
+    paths: ['scripts/rocketmq/native_limit_acceptance.py', 'scripts/rocketmq/test_native_limit_acceptance.py', 'scripts/rocketmq/probes/native-transaction-limit/**', 'scripts/rocketmq/ai_admission_acceptance.py', 'scripts/rocketmq/ai_native_origin_acceptance.py', 'scripts/rocketmq/ai_native_origin_case.py', 'scripts/rocketmq/managed_recovery_image.py', 'scripts/rocketmq/managed_recovery_acceptance.py', 'scripts/rocketmq/ci_coordinated_recovery.py', 'scripts/rocketmq/ai_state_acceptance.py', 'scripts/rocketmq/test_ai_state_acceptance.py', 'scripts/rocketmq/ci-transactions.py', '.github/workflows/rocketmq-ai-state.yml', 'Makefile']
 permissions:
   contents: read
 concurrency:
@@ -156,9 +156,12 @@ jobs:
             --sdk "$PWD/.sdk-acceptance" --ai-admission-host "$PWD/.ai-acceptance" \
             --image rocketmq-ai-state:5.5.1 --mysql-image '${{ matrix.mysql }}' --report rocketmq-ai-state.json
           if [[ "$QS_AI_COORDINATED_IMAGE" == true ]]; then
-            jq -e '.proof.ai_state_host.original_native |
-              (.coordinated_image_steps | length) == 3 and .coordinated_image_cleanup and
-              .ai_reopen.broker_ack and .ai_reopen.no_new_half' rocketmq-ai-state.json
+            jq -e '.proof.coordinated_project_networks_removed and (.proof.ai_state_host.original_native |
+              (.coordinated_image_steps | length) == 3 and
+              all(.coordinated_image_steps[]; .container_plan_schema == "m3-native-recovery-container/v2" and
+                .exit_code == 0 and .uid == 3000 and (.network_id | test("^[0-9a-f]{64}$"))) and
+              ([.coordinated_image_steps[].network_id] | unique | length) == 1 and .coordinated_image_cleanup and
+              .ai_reopen.broker_ack and .ai_reopen.no_new_half)' rocketmq-ai-state.json
           fi
       - name: Seal the exact exercised execution image
         if: inputs.execution_image == true
