@@ -15,6 +15,7 @@ import urllib.request
 SYSTEM_TOPIC = 'rmq_sys_REVIVE_LOG_FangcunMount'
 BUFFER_NAMES = ('rocketmq_pop_offset_buffer_size', 'rocketmq_pop_checkpoint_buffer_size')
 POP_LOG = '/home/rocketmq/logs/rocketmqlogs/pop.log'
+TOPIC_CATALOG = '/home/rocketmq/store/config/topics.json'
 POP_LOG_BYTES = 256 * 1024
 REVIVE_LINE = re.compile(
     r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) .*?reviveQueueId=(\d+),\s*'
@@ -141,16 +142,16 @@ def revive_log_records(raw, routes):
 
 def retry_catalog(raw, routes):
     require(len(raw.encode()) <= POP_LOG_BYTES, 'bounded_retry_catalog_required')
-    entries = raw.splitlines()
-    require(len(entries) == len(set(entries)) and all(re.fullmatch(r'[A-Za-z0-9_%+|.-]{1,255}', row) for row in entries),
-            'invalid_retry_catalog')
-    topics = set(entries)
+    document = json.loads(raw, object_pairs_hook=unique_fields)
+    require(isinstance(document, dict) and isinstance(document.get('dataVersion'), dict)
+            and isinstance(document.get('topicConfigTable'), dict), 'invalid_retry_catalog')
+    topics = set(document['topicConfigTable'])
     require({topic for topic, _ in routes} <= topics and SYSTEM_TOPIC in topics, 'incomplete_retry_catalog')
     expected = {f'%RETRY%{group}{separator}{topic}' for topic, group in routes for separator in ('_', '+')}
     expected.update(prefix+group for _, group in routes for prefix in ('%RETRY%', '%DLQ%'))
-    return dict(observed_unix_ms=time.time_ns() // 1000000, checked=len(expected),
+    return dict(source='broker_persisted_topic_config', observed_unix_ms=time.time_ns() // 1000000, checked=len(expected),
                 present_sha256s=sorted(hashlib.sha256(topic.encode()).hexdigest() for topic in expected & topics),
-                catalog_sha256=hashlib.sha256('\n'.join(sorted(topics)).encode()).hexdigest())
+                catalog_sha256=hashlib.sha256(raw.encode()).hexdigest())
 
 
 class OwnedPopControls:
@@ -202,10 +203,8 @@ class OwnedPopControls:
 
     def retry_snapshot(self, routes):
         try:
-            result = self.run(['docker', 'exec', self.broker, 'java', '-Xms32m', '-Xmx128m',
-                               '-cp', '/opt/rocketmq/conf:/opt/rocketmq/lib/*',
-                               'org.apache.rocketmq.tools.command.MQAdminStartup', 'topicList',
-                               '-n', 'nameserver:9876'], timeout=8, required=False)
+            result = self.run(['docker', 'exec', self.broker, 'head', '-c', str(POP_LOG_BYTES + 1),
+                               TOPIC_CATALOG], timeout=5, required=False)
             require(result.returncode == 0, 'retry_catalog_unavailable')
             return retry_catalog(result.stdout, routes)
         except (RuntimeError, OSError, ValueError):

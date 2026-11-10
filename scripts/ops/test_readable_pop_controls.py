@@ -75,14 +75,18 @@ class ReadablePopControlsTest(unittest.TestCase):
 
     def test_retry_catalog_requires_positive_controls_and_checks_both_pop_formats(self):
         routes = {('topic-a', 'group-a')}
-        raw = SYSTEM_TOPIC + '\ntopic-a\n'
+        def document(*topics):
+            return json.dumps(dict(dataVersion={'counter': 1}, topicConfigTable={topic: {} for topic in topics}))
+
+        raw = document(SYSTEM_TOPIC, 'topic-a')
         self.assertEqual([], retry_catalog(raw, routes)['present_sha256s'])
-        full = raw + '%RETRY%group-a+topic-a\n%RETRY%group-a_topic-a\n%RETRY%group-a\n%DLQ%group-a\n'
+        full = document(SYSTEM_TOPIC, 'topic-a', '%RETRY%group-a+topic-a', '%RETRY%group-a_topic-a',
+                        '%RETRY%group-a', '%DLQ%group-a')
         report = retry_catalog(full, routes)
         self.assertEqual(4, report['checked'])
         self.assertEqual(4, len(report['present_sha256s']))
         self.assertNotIn('group-a', json.dumps(report))
-        for bad in ('', 'topic-a\n', raw + 'topic-a\n', raw + 'private debug line\n'):
+        for bad in ('{}', document('topic-a'), '{"topicConfigTable":{},"topicConfigTable":{}}'):
             with self.subTest(raw=bad), self.assertRaises(RuntimeError):
                 retry_catalog(bad, routes)
 
