@@ -35,6 +35,11 @@ on:
         type: boolean
         required: false
         default: false
+      pop_same_image_control:
+        description: Compare default and opt-in POP settings in separate fixtures using the same built images
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -43,7 +48,7 @@ concurrency:
 jobs:
   readable:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: ${{ inputs.pop_same_image_control && matrix.profile == 'public' && 55 || 30 }}
     strategy:
       fail-fast: false
       matrix:
@@ -90,14 +95,37 @@ jobs:
         run: |
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-readable:5.5.1 components/rocketmq
+      - name: Run the default public control on the same isolated Broker image
+        if: inputs.pop_same_image_control && matrix.profile == 'public'
+        env:
+          POP_REBOUND_TRACE: ${{ inputs.pop_rebound_trace || false }}
+          POP_ISOLATED_ACK_WAIT: ${{ inputs.pop_isolated_ack_wait || false }}
+        run: |
+          set -euo pipefail
+          [[ "$POP_REBOUND_TRACE" == true && "$POP_ISOLATED_ACK_WAIT" == true ]]
+          image="$(docker image inspect rocketmq-readable:5.5.1 --format '{{.Id}}')"
+          [[ "$image" =~ ^sha256:[0-9a-f]{64}$ ]]
+          printf '%s\n' "$image" > same-image-control.image
+          status=0
+          python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python --readable-routes \
+            --sdk-pop-drain-controls --sdk-pop-rebound-trace --sdk "$PWD/.sdk-acceptance" \
+            --image "$image" --mysql-image '${{ matrix.mysql }}' --report same-image-control.json || status=$?
+          printf '%s\n' "$status" > same-image-control.exit
+          test -s same-image-control.json
       - name: Real public Go/Python SDK with readable resources
         env:
           READABLE_PROFILE: ${{ matrix.profile }}
+          POP_SAME_IMAGE_CONTROL: ${{ inputs.pop_same_image_control || false }}
           POP_REBOUND_TRACE: ${{ inputs.pop_rebound_trace || false }}
           POP_ISOLATED_ACK_WAIT: ${{ inputs.pop_isolated_ack_wait || false }}
         run: |
           set -euo pipefail
           options=()
+          image=rocketmq-readable:5.5.1
+          if [[ "$POP_SAME_IMAGE_CONTROL" == true && "$READABLE_PROFILE" == public ]]; then
+            read -r image < same-image-control.image
+            [[ "$image" =~ ^sha256:[0-9a-f]{64}$ ]]
+          fi
           if [[ "$READABLE_PROFILE" == live-recovery ]]; then
             options=(--sdk-python-live-recovery)
           elif [[ "$READABLE_PROFILE" == public ]]; then
@@ -108,7 +136,7 @@ jobs:
             exit 1
           fi
           python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python --readable-routes \
-            "${options[@]}" --sdk "$PWD/.sdk-acceptance" --image rocketmq-readable:5.5.1 \
+            "${options[@]}" --sdk "$PWD/.sdk-acceptance" --image "$image" \
             --mysql-image '${{ matrix.mysql }}' --report rocketmq-readable-sdk.json
       - name: Require complete original matrix and future-checkpoint controls
         if: always()
@@ -144,6 +172,46 @@ jobs:
                   for suffix in ('_held_future_checkpoint_blocks_drain','_acked_and_closed_responsibility_zero'):
                       assert x['cases']['readable_pop_'+name+suffix] is True
           PYPROOF
+      - name: Bind the default and opt-in reports to the same fixture image identities
+        if: inputs.pop_same_image_control && matrix.profile == 'public'
+        run: |
+          python3 - <<'PYPAIR'
+          import json
+          from pathlib import Path
+          default = json.loads(Path('same-image-control.json').read_bytes())
+          candidate = json.loads(Path('rocketmq-readable-sdk.json').read_bytes())
+          assert default['image'] == candidate['image'] == Path('same-image-control.image').read_text().strip()
+          for key in ('sdk_sha', 'mysql_image', 'mongo_image'):
+              assert default[key] == candidate[key]
+          assert default['proof']['mysql_version'] == candidate['proof']['mysql_version']
+          assert default['project'] != candidate['project']
+          assert default['cleanup'] == candidate['cleanup'] == dict(project_containers_remaining=False,
+              compose_down_succeeded=True, probe_process_groups_drained=True, private_fixture_directory_removed=True)
+          assert default['proof']['effective_broker_parameters'] == candidate['proof']['effective_broker_parameters']
+          assert 'isolated_pop_ack_wait' not in default['proof']
+          assert default['proof']['pop_ack_wait_effective'] == dict(enableSkipLongAwaitingAck='false', reviveAckWaitMs='180000')
+          assert candidate['proof']['pop_ack_wait_effective'] == candidate['proof']['isolated_pop_ack_wait']
+          assert candidate['proof']['isolated_pop_ack_wait'] == dict(enableSkipLongAwaitingAck='true', reviveAckWaitMs='60000')
+          status = int(Path('same-image-control.exit').read_text())
+          assert status in (0, 1)
+          assert (default['passed'], default['failed'], default['skipped']) == ((35, 0, 0) if status == 0 else (29, 1, 0))
+          if status == 1:
+              assert default['failure'] == 'RuntimeError: native_pop_control_budget_exceeded'
+              timeout = default['proof']['readable_pop_controls']['go']['baseline_timeout']
+              assert timeout['budget_seconds'] == 90 and any(timeout['last_sample']['revive_lag'].values())
+          else:
+              assert default['failure'] is None and all(default['cases'].values())
+          PYPAIR
+      - uses: actions/upload-artifact@v7
+        if: always() && inputs.pop_same_image_control && matrix.profile == 'public'
+        with:
+          name: rocketmq-readable-default-${{ strategy.job-index }}-${{ github.sha }}
+          path: |
+            same-image-control.json
+            same-image-control.exit
+            same-image-control.image
+          if-no-files-found: error
+          retention-days: 14
       - uses: actions/upload-artifact@v7
         if: always()
         with:

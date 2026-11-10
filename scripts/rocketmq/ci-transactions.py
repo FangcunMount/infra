@@ -686,12 +686,16 @@ def main():
         if any(effective[k] != v for k, v in PARAMETERS.items()):
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
-        if args.sdk_pop_isolated_ack_wait:
+        if args.sdk_pop_drain_controls:
             observed = re.findall(r'^\s*(enableSkipLongAwaitingAck|reviveAckWaitMs)\s*=\s*(\S+)\s*$',
                                   raw_config, re.MULTILINE)
-            if len(observed) != len(ISOLATED_ACK_WAIT) or dict(observed) != ISOLATED_ACK_WAIT:
+            if len(observed) != len(ISOLATED_ACK_WAIT) or set(dict(observed)) != set(ISOLATED_ACK_WAIT):
+                raise RuntimeError('complete isolated POP ACK wait readback required')
+            proof['pop_ack_wait_effective'] = dict(observed)
+        if args.sdk_pop_isolated_ack_wait:
+            if proof['pop_ack_wait_effective'] != ISOLATED_ACK_WAIT:
                 raise RuntimeError('isolated ACK wait settings are not effective')
-            proof['isolated_pop_ack_wait'] = dict(observed)
+            proof['isolated_pop_ack_wait'] = proof['pop_ack_wait_effective']
         proof["mysql_version"] = sql("SELECT VERSION();")
         if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.qs_runtime_host or args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
