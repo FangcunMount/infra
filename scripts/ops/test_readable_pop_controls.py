@@ -69,6 +69,31 @@ class ReadablePopControlsTest(unittest.TestCase):
             with self.subTest(stage=stage),self.assertRaises(RuntimeError):control(stage,language)
         run.assert_not_called();admin.assert_not_called()
 
+    def test_baseline_timeout_retains_only_last_failed_snapshot(self):
+        first = snapshot(metrics(timing='2'), timing_required=False)
+        last = snapshot(metrics(lag='1'), timing_required=False)
+        proof, passed = {}, Mock()
+        control = OwnedPopControls(Mock(), Mock(), 'unused', 'unused', {}, proof, passed)
+        with patch.object(control, 'read', side_effect=[first, last]), \
+                patch('readable_pop_controls.time.monotonic', side_effect=[0, 1, 2, 90]), \
+                patch('readable_pop_controls.time.time_ns', side_effect=[1_000_000, 2_000_000]), \
+                patch('readable_pop_controls.time.sleep'):
+            with self.assertRaisesRegex(RuntimeError, 'native_pop_control_budget_exceeded'):
+                control('baseline', 'sdk-go')
+        self.assertEqual(proof, {'go': {'baseline_timeout': dict(
+            budget_seconds=90, samples_read=2, last_sample_unix_ms=2, last_sample=last)}})
+        passed.assert_not_called()
+
+    def test_successful_wait_leaves_no_timeout_record(self):
+        first = snapshot(metrics(lag='1'), timing_required=False)
+        last = snapshot(metrics(), timing_required=False)
+        proof = {}
+        control = OwnedPopControls(Mock(), Mock(), 'unused', 'unused', {}, proof, Mock())
+        with patch.object(control, 'read', side_effect=[first, last]), \
+                patch('readable_pop_controls.time.sleep'):
+            control('baseline', 'sdk-go')
+        self.assertEqual(proof, {'go': {'baseline': last}})
+
     def test_closed_confirmation_retains_reappearing_responsibility(self):
         settled = snapshot(metrics(), timing_required=True)
         for field in ('offset', 'checkpoint', 'timing', 'lag'):

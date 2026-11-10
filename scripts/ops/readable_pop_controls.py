@@ -108,13 +108,21 @@ class OwnedPopControls:
             raw = response.read(8 * 1024 * 1024 + 1)
         return snapshot(raw.decode(), timing_required=required)
 
-    def wait(self, predicate, *, required, budget):
+    def wait(self, predicate, *, required, budget, record, stage):
         deadline = time.monotonic() + budget
+        samples_read = 0
+        last_sample = None
+        last_sample_unix_ms = None
         while time.monotonic() < deadline:
             value = self.read(required)
             if predicate(value):
                 return value
+            samples_read += 1
+            last_sample = value
+            last_sample_unix_ms = time.time_ns() // 1_000_000
             time.sleep(.2)
+        record[stage + '_timeout'] = dict(budget_seconds=budget, samples_read=samples_read,
+                                         last_sample_unix_ms=last_sample_unix_ms, last_sample=last_sample)
         raise RuntimeError('native_pop_control_budget_exceeded')
 
     def __call__(self, stage, language):
@@ -124,7 +132,7 @@ class OwnedPopControls:
         require(stage not in record, 'duplicate_pop_control_stage')
         if stage == 'baseline':
             record[stage] = self.wait(lambda v: zero(v, timing_required=self.observed_timer),
-                                      required=self.observed_timer, budget=90)
+                                      required=self.observed_timer, budget=90, record=record, stage=stage)
         elif stage == 'subscribed':
             require('baseline' in record, 'pop_baseline_required')
             routes = [row for row in self.manifest['routes'] if row['subscription'] == 'sdk-shared-' + suffix]
@@ -136,12 +144,12 @@ class OwnedPopControls:
         elif stage == 'held':
             require('subscribed' in record, 'registered_pop_subscriber_required')
             record[stage] = self.wait(lambda v: v['timing'] is not None and v['timing'] > 0,
-                                      required=False, budget=25)
+                                      required=False, budget=25, record=record, stage=stage)
             self.observed_timer = True
             self.passed('readable_pop_' + suffix + '_held_future_checkpoint_blocks_drain')
         else:
             require('held' in record and self.observed_timer, 'positive_future_checkpoint_control_required')
-            record[stage] = self.wait(lambda v: zero(v, timing_required=True), required=True, budget=90)
+            record[stage] = self.wait(lambda v: zero(v, timing_required=True), required=True, budget=90, record=record, stage=stage)
             time.sleep(1)
             record['closed_confirmation'] = self.read(True)
             require(zero(record['closed_confirmation'], timing_required=True), 'pop_responsibility_reappeared_after_sdk_close')
