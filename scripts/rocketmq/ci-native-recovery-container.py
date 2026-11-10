@@ -15,7 +15,7 @@ import tempfile
 import uuid
 
 from cutover_step import execute, load_step
-from native_recovery_container import ADMIN_SCRIPT
+from native_recovery_container import ADMIN_SCRIPT, IPV4_GATEWAY_MODE, ISOLATED_BRIDGE_PLAN
 from start_boundary import Boundary, BoundaryError, _digest, _encoded, initialize
 
 
@@ -47,7 +47,7 @@ def worker(root, image, source, network, name):
                    source_bundle_sha256=named, data_owner='fixture-data-owner', recovery_owner='fixture-recovery-owner')
     binding_sha = hashlib.sha256(_encoded(binding)).hexdigest()
     initialize(op, binding, binding_sha)
-    plan = dict(schema='m3-native-recovery-container/v1', command='recover', directory=str(op),
+    plan = dict(schema=ISOLATED_BRIDGE_PLAN, command='recover', directory=str(op),
                 host=socket.gethostname(), image_id=image, source_sha=source, network_id=network,
                 network_name=name, binding_sha256=binding_sha, step='fixture-refuses-invalid-review',
                 inputs=hashes, java={'admin_script': admin_sha, 'tools': write(java / 'tools.yml', b'{}\n'),
@@ -96,7 +96,8 @@ def fixture(image, source):
     assert stat.S_ISSOCK(daemon.st_mode) and daemon.st_gid != 0
     name = 'f07-linux-launcher-' + uuid.uuid4().hex[:16]
     docker = ['/usr/bin/docker', '--host', 'unix:///var/run/docker.sock']
-    network = _digest(run([*docker, 'network', 'create', '--internal', '--label', 'f07.fixture=' + name, name]))
+    network = _digest(run([*docker, 'network', 'create', '--internal', '--ipv6=false',
+                           '--opt', IPV4_GATEWAY_MODE + '=isolated', '--label', 'f07.fixture=' + name, name]))
     try:
         with tempfile.TemporaryDirectory(prefix=name + '-', dir='/tmp') as tmp:
             directory = Path(tmp)
@@ -130,7 +131,11 @@ def fixture(image, source):
                 result = next(json.loads(line) for line in run([*docker, 'logs', cid]).splitlines() if line.startswith('{'))
                 assert result['schema'] == 'm3-native-recovery-result/v1' and result['last_stage'] == 'review'
                 assert not result.get('receipt_sha256')
-                proof.update(image_id=image, source_sha=source, failed_before_native_effect=True, network_internal=True)
+                bridge, = json.loads(run([*docker, 'network', 'inspect', network]))
+                assert bridge['Internal'] and bridge['EnableIPv4'] and not bridge['EnableIPv6']
+                assert bridge['Options'][IPV4_GATEWAY_MODE] == 'isolated'
+                proof.update(image_id=image, source_sha=source, failed_before_native_effect=True, network_internal=True,
+                             network_ipv4_gateway_mode=bridge['Options'][IPV4_GATEWAY_MODE])
             finally:
                 # Only this fresh internal network can supply cleanup candidates.
                 members = json.loads(run([*docker, 'network', 'inspect', network]))[0]['Containers'] or {}

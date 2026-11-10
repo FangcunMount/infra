@@ -90,6 +90,52 @@ class NativeRecoveryContainerTest(unittest.TestCase):
         self.assertIn('195s', cmd)
         self.assertEqual(cli[0], 'recover')
 
+    def test_reviewed_bridge_requires_actual_ipv4_isolation_for_v2(self):
+        plan = self.plan | {'schema': runner.ISOLATED_BRIDGE_PLAN}
+        self.assertEqual(runner.arguments(plan, self.env), runner.arguments(self.plan, self.env))
+        network = dict(Id=plan['network_id'], Name=plan['network_name'], Driver='bridge', Scope='local',
+                       Internal=True, EnableIPv4=True, EnableIPv6=False,
+                       Options={runner.IPV4_GATEWAY_MODE: 'isolated'})
+        for override in (dict(Internal=False), dict(EnableIPv4=False), dict(EnableIPv6=True),
+                         dict(EnableIPv6=None), dict(Options={runner.IPV4_GATEWAY_MODE: 'nat'}), dict(Options=None)):
+            with self.subTest(override=override), patch.object(runner, 'docker', return_value=json.dumps([network | override])):
+                with self.assertRaisesRegex(BoundaryError, 'isolated IPv4 bridge'):
+                    runner.require_reviewed_network(plan)
+                runner.require_reviewed_network(self.plan)
+        with patch.object(runner, 'docker', return_value=json.dumps([network])) as docker:
+            runner.require_reviewed_network(plan)
+            docker.assert_called_once_with(['network', 'inspect', plan['network_id']])
+
+    def test_v2_network_mismatch_before_start_preserves_issued_identity(self):
+        plan = self.plan | {'schema': runner.ISOLATED_BRIDGE_PLAN}
+        docker_results = [self.cid, json.dumps([self.created(self.step_sha, self.cid)]),
+                          json.dumps([dict(Id=plan['network_id'], Name=plan['network_name'], Driver='bridge', Scope='local',
+                                           Internal=False, EnableIPv4=True, EnableIPv6=False)])]
+        with patch.object(runner, 'docker', side_effect=docker_results) as docker:
+            with self.assertRaisesRegex(BoundaryError, 'isolated IPv4 bridge'):
+                self.run_container(plan=plan)
+        self.assertEqual([call.args[0][0] for call in docker.call_args_list], ['create', 'container', 'network'])
+        prefix = self.operation / ('native-container-' + self.step_sha)
+        self.assertTrue(prefix.with_name(prefix.name + '-issued.json').is_file())
+        self.assertEqual(json.loads(prefix.with_name(prefix.name + '-created.json').read_text()), {'container_id': self.cid})
+        self.assertFalse(prefix.with_name(prefix.name + '-exit.json').exists())
+
+    def test_v2_rejects_a_nonisolated_bridge_before_issuing_any_container(self):
+        plan = self.plan | {'schema': runner.ISOLATED_BRIDGE_PLAN}
+        arguments = runner.arguments(plan, self.env)
+        image = dict(Id=plan['image_id'], Os='linux', Architecture='amd64',
+                     Config={'User': '3000:3000', 'Labels': {'org.opencontainers.image.revision': plan['source_sha']}})
+        network = dict(Id=plan['network_id'], Name=plan['network_name'], Driver='bridge', Scope='local',
+                       Internal=True, EnableIPv4=True, EnableIPv6=False, Options={runner.IPV4_GATEWAY_MODE: 'nat'})
+        with patch.object(runner.platform, 'system', return_value='Linux'), \
+                patch.object(runner.os, 'geteuid', return_value=3000), patch.object(runner.os, 'getegid', return_value=3000), \
+                patch.object(runner, 'arguments', return_value=arguments), \
+                patch.object(runner, 'docker', side_effect=[json.dumps([image]), json.dumps([network])]) as docker:
+            with self.assertRaisesRegex(BoundaryError, 'isolated IPv4 bridge'):
+                runner.launch(plan, self.env)
+        self.assertEqual([call.args[0][0] for call in docker.call_args_list], ['image', 'network'])
+        self.assertEqual(list(self.operation.iterdir()), [])
+
     def test_plan_refuses_mismatched_coordinator_extra_mount_material_and_digest(self):
         with self.assertRaises(BoundaryError):
             runner.arguments(self.plan, self.env | {'M3_COORDINATOR_STEP': 'other'})
