@@ -2,6 +2,7 @@
 """Run on the Mac mini; discover every cloud replica through restricted SSH."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 import ipaddress
 import json
 import os
@@ -42,6 +43,11 @@ def atomic_write(path, value):
     temp.replace(path)
 
 
+def log_source(name, *fields, file=None):
+    timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    print(timestamp, name, *fields, file=file, flush=True)
+
+
 def refresh_source(config, source):
     target = Path(config['output']) / (source['name'] + '.json')
     try:
@@ -54,9 +60,9 @@ def refresh_source(config, source):
         ], text=True, capture_output=True, timeout=35, check=True)
         value = groups(json.loads(result.stdout), config['gateway'])
         atomic_write(target, value)
-        print(source['name'], 'targets', len(value), flush=True)
+        log_source(source['name'], 'targets', len(value))
     except (subprocess.SubprocessError, ValueError, KeyError, OSError) as exc:
-        print(source['name'], type(exc).__name__, file=sys.stderr, flush=True)
+        log_source(source['name'], type(exc).__name__, file=sys.stderr)
         # Expire old addresses rather than scrape a reused container IP indefinitely.
         if target.exists() and time.time() - target.stat().st_mtime > 120:
             atomic_write(target, [])

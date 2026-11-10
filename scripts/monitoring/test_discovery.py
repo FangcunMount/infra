@@ -1,4 +1,6 @@
+from contextlib import redirect_stderr, redirect_stdout
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -113,6 +115,22 @@ class DiscoveryTests(unittest.TestCase):
                     self.assertEqual(local.discover(config), 1)
                 self.assertEqual(json.loads(d_file.read_text()), local.groups([fresh_worker], gateway))
                 self.assertEqual(json.loads(a_file.read_text()), expected_a)
+
+    def test_refresh_logs_utc_and_only_bounded_source_metadata(self):
+        source = {'name': 'serverA', 'host': 'private-host'}
+        completed = subprocess.CompletedProcess([], 0, stdout='[]')
+        failure = subprocess.CalledProcessError(255, ['private-command'], stderr='private-error')
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with tempfile.TemporaryDirectory() as output:
+            config = {'output': output, 'gateway': 'gateway:443', 'identity': 'private-identity',
+                      'known_hosts': 'private-known-hosts'}
+            with redirect_stdout(stdout), redirect_stderr(stderr), \
+                 patch.object(local.subprocess, 'run', side_effect=[completed, failure]):
+                self.assertTrue(local.refresh_source(config, source))
+                self.assertFalse(local.refresh_source(config, source))
+        timestamp = r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
+        self.assertRegex(stdout.getvalue(), rf'^{timestamp} serverA targets 0\n$')
+        self.assertRegex(stderr.getvalue(), rf'^{timestamp} serverA CalledProcessError\n$')
 
     def test_duplicate_source_names_cannot_publish_to_the_same_file(self):
         config = {'sources': [{'name': 'serverA'}, {'name': 'servera'}]}
