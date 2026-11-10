@@ -1,7 +1,10 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from readable_pop_controls import BUFFER_NAMES, REVIVE_LAG_NAME, SYSTEM_TOPIC, OwnedPopControls, snapshot, zero
+from readable_pop_controls import (
+    BUFFER_NAMES, REVIVE_LAG_NAME, REVIVE_OFFSET_KEY, SYSTEM_TOPIC, OwnedPopControls,
+    persisted_revive_offsets, revive_log_records, revive_queue_bounds, snapshot, zero,
+)
 
 
 def metrics(*, offset='0', checkpoint='0', timing='0', include_timer=True, lag='0'):
@@ -93,6 +96,41 @@ class ReadablePopControlsTest(unittest.TestCase):
                 patch('readable_pop_controls.time.sleep'):
             control('baseline', 'sdk-go')
         self.assertEqual(proof, {'go': {'baseline': last}})
+
+    def test_trace_binds_committed_offsets_and_exact_queue_bounds(self):
+        raw = '{"offsetTable":{"' + REVIVE_OFFSET_KEY + '":{\n2:0\n}}}'
+        self.assertEqual(persisted_revive_offsets(raw)['committed'], {'2': 0})
+        with self.assertRaisesRegex(RuntimeError, 'duplicate_revive_field'):
+            persisted_revive_offsets(raw.replace('2:0', '2:0,"2":1'))
+        bounds = '\n'.join(f'serverd-rocketmq {q} 0 {2 if q == 2 else 0}' for q in range(8))
+        self.assertEqual(revive_queue_bounds(bounds)['queues']['2'], {'minimum': 0, 'exclusive_maximum': 2})
+        with self.assertRaisesRegex(RuntimeError, 'complete_revive_queue_bounds_required'):
+            revive_queue_bounds(bounds.rsplit('\n', 1)[0])
+
+    def test_trace_keeps_hashes_and_matches_ck_ack_by_original_identity(self):
+        core = '"t":"fixture-topic","c":"fixture-group","q":0,"so":1,"pt":2,"bn":"broker"'
+        raw = ('2026-11-10 12:00:00 INFO reviveQueueId=2, find ck, offset:0, raw : {' + core + ',"n":1,"d":[0]}\n'
+               '2026-11-10 12:00:01 INFO reviveQueueId=2, find ack, offset:1, raw : {' + core + ',"ao":1}\n')
+        rows = revive_log_records(raw, {('fixture-topic', 'fixture-group')})['records']
+        self.assertEqual([row['revive_offset'] for row in rows], [0, 1])
+        self.assertEqual(rows[0]['merge_key_sha256'], rows[1]['merge_key_sha256'])
+        self.assertEqual(rows[0]['offset_sha256s'], rows[1]['offset_sha256s'])
+        self.assertNotIn('fixture-topic', repr(rows))
+
+    def test_timeout_trace_cannot_approve_drain(self):
+        proof, passed = {}, Mock()
+        control = OwnedPopControls(Mock(), Mock(), 'unused', 'unused', {}, proof, passed, trace_rebound=True)
+        value = snapshot(metrics(lag='1'), timing_required=False)
+        with patch.object(control, 'read', return_value=value), \
+                patch.object(control, 'trace', side_effect=RuntimeError('read unavailable')), \
+                patch('readable_pop_controls.time.monotonic', side_effect=[0, 1, 90]), \
+                patch('readable_pop_controls.time.sleep'):
+            with self.assertRaisesRegex(RuntimeError, 'native_pop_control_budget_exceeded'):
+                control('baseline', 'sdk-go')
+        timeout = proof['go']['baseline_timeout']
+        self.assertEqual(timeout['last_sample'], value)
+        self.assertFalse(timeout['trace']['drain_proven'])
+        passed.assert_not_called()
 
     def test_closed_confirmation_retains_reappearing_responsibility(self):
         settled = snapshot(metrics(), timing_required=True)
