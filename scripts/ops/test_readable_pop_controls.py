@@ -123,7 +123,7 @@ class ReadablePopControlsTest(unittest.TestCase):
 
     def test_physical_revive_matches_ck_ack_and_batch_ack(self):
         routes = {('fixture-topic', 'fixture-group')}
-        core = dict(t='fixture-topic', c='fixture-group', q=0, so=1, pt=2, bn='broker')
+        core = dict(t='fixture-topic', c='fixture-group', q=0, so=1, pt=2, bn='broker-a')
         topic = SYSTEM_TOPIC.encode()
         rows = []
         for offset, (tag, fields, topic_width) in enumerate([
@@ -141,6 +141,7 @@ class ReadablePopControlsTest(unittest.TestCase):
         self.assertEqual(len({row['merge_key_sha256'] for row in rows}), 1)
         self.assertEqual(len({tuple(row['offset_sha256s']) for row in rows}), 1)
         self.assertNotIn('fixture-topic', repr(rows))
+        self.assertGreaterEqual(zlib.crc32(body), 0x80000000)
         with self.assertRaisesRegex(RuntimeError, 'physical_revive_record_identity_mismatch'):
             decode_physical_revive(raw, 2, 1, 100, routes)
         with self.assertRaisesRegex(RuntimeError, 'physical_revive_body_crc_mismatch'):
