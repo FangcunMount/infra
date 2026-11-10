@@ -21,6 +21,7 @@ from managed_recovery_acceptance import accept as managed_accept, fixture_manife
 SDK_SHA = '04757bd3212ca961d8eaec22ecd3560101111e18'
 PARAMETERS = {'transactionTimeOut': 6000, 'transactionCheckInterval': 5000,
               'transactionCheckMax': 24, 'fileReservedTime': 48}
+OBSERVED_QS_PARAMETERS = dict(PARAMETERS, transactionCheckInterval=30000, transactionCheckMax=15)
 
 
 def require(value, stage):
@@ -73,11 +74,15 @@ def main():
     parser.add_argument('--iam-host',type=Path,help='actual fixed IAM original writer, owned fixture only')
     parser.add_argument('--host-observer',type=Path,help='CI-only actual-host consumer compiled against the same published SDK')
     parser.add_argument('--qs-host',type=Path,help='actual original QS dual owners/stores, isolated fixture only')
+    parser.add_argument('--qs-observed-check-budget', action='store_true',
+                        help='keep the observed check interval and count in the isolated original QS fixture')
     args = parser.parse_args()
     ci_guard(os.environ)  # Never construct a client or invoke Docker on a workstation.
     require(not args.governance_faults or args.managed_tool is not None,'managed_cli_required_for_governance_faults')
     require(not args.iam_host or (args.managed_tool and args.host_observer and not args.governance_faults),'separate_actual_iam_managed_profile_required')
     require(not args.qs_host or (args.managed_tool and args.host_observer and not args.iam_host and not args.governance_faults),'separate_actual_qs_managed_profile_required')
+    require(not args.qs_observed_check_budget or args.qs_host, 'observed_check_budget_requires_qs_host')
+    fixture_parameters = OBSERVED_QS_PARAMETERS if args.qs_observed_check_budget else PARAMETERS
     require(not args.report.exists() and not args.report.is_symlink(), 'report_already_exists')
     module = importlib.util.spec_from_file_location('_native_fixture', Path(__file__).with_name('ci-transactions.py'))
     common = importlib.util.module_from_spec(module)
@@ -150,7 +155,7 @@ def main():
         password = secrets.token_hex(32)
         render(accounts, config, '127.0.0.1', repo/'components/rocketmq')
         with (config/'broker.conf').open('a') as stream:
-            stream.write(''.join(f'{key}={value}\n' for key, value in PARAMETERS.items()))
+            stream.write(''.join(f'{key}={value}\n' for key, value in fixture_parameters.items()))
         proxy = json.loads((config/'proxy.json').read_text()); proxy['grpcServerPort'] = grpc_port
         (config/'proxy.json').write_text(json.dumps(proxy))
         run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '2', '-subj', '/CN=rocketmq-m2-isolated',
@@ -185,7 +190,7 @@ def main():
         stage = 'owned_dependencies_start'
         run(compose+['up', '-d', '--wait', '--wait-timeout', '180'], timeout=240)
         before_parameters = common.broker_parameters(admin('getBrokerConfig'))
-        require(before_parameters == PARAMETERS, 'actual_parameters_required')
+        require(before_parameters == fixture_parameters, 'actual_parameters_required')
         proof['parameters_before'] = before_parameters
         if args.qs_host:
             mongo('rs.initiate({_id:"sdk-proof",members:[{_id:0,host:"mongo:27017"}]})')
@@ -251,7 +256,8 @@ def main():
             stage='qs_original_dual_owner_managed_recovery'
             qs_accept(source=args.qs_host.resolve(),repo=repo,binary=args.managed_tool.resolve(),observer_binary=args.host_observer.resolve(),broker=broker,project=project,directory=directory,
                 manifest=manifest,grpc_port=grpc_port,mysql_port=mysql_port,mongo_port=mongo_port,password=password,ca=ca,accounts=accounts,java=java,mongo=mongo,sql_for=sql_for,run=run,common=common,probes=probes,admin=admin,
-                read_parameters=lambda:common.broker_parameters(admin('getBrokerConfig')),parameters=before_parameters,passed=passed,proof=proof)
+                read_parameters=lambda:common.broker_parameters(admin('getBrokerConfig')),parameters=before_parameters,
+                passed=passed,proof=proof,observed_check_budget=args.qs_observed_check_budget)
             require(report['passed']==23,'full_actual_qs_original_recovery_matrix_required')
             require(not run(['git','status','--porcelain','--untracked-files=no'],cwd=sdk).stdout,'sdk_source_changed')
             proof['sdk_tracked_sources_clean']=True
@@ -405,7 +411,8 @@ def main():
     finally:
         if before_parameters:
             try:
-                for key,value in before_parameters.items(): admin('updateBrokerConfig', '-k', key, '-v', str(value), success=True)
+                if not args.qs_observed_check_budget:
+                    for key,value in before_parameters.items(): admin('updateBrokerConfig', '-k', key, '-v', str(value), success=True)
                 report['cleanup']['broker_parameters_restored'] = common.broker_parameters(admin('getBrokerConfig'))==before_parameters
             except Exception: report['cleanup']['broker_parameters_restored'] = False
         drained = []

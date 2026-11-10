@@ -13,7 +13,7 @@ from managed_recovery_acceptance import accept as managed_accept
 from qs_runtime_acceptance import runtime_manifest
 from recovery_fixture_store import MongoFixtureStore
 
-SOURCE='50a4f890cf1f539aa18c8749e8cf7ab28aa8852f'
+SOURCE='6cc4cc9d10d71c878a148545614d6fe564080c58'
 MODULE = dict(Path='github.com/FangcunMount/reliable-messaging', Version='v0.6.1',
               Sum='h1:mHj1tReMGHu979OuC/XhFAk13dxsgqTDygZs2WdqVwY=',
               GoModSum='h1:GPiWG8ZsX4pvIZ6QyvLnBVO5iCqNhvsnKwFcg0ftC7I=')
@@ -43,7 +43,8 @@ def metadata(value):
 
 
 def accept(*,source,repo,binary,observer_binary,broker,project,directory,manifest,grpc_port,mysql_port,mongo_port,password,ca,
-           accounts,java,mongo,sql_for,run,common,probes,admin,read_parameters,parameters,passed,proof):
+           accounts,java,mongo,sql_for,run,common,probes,admin,read_parameters,parameters,passed,proof,
+           observed_check_budget=False):
     require(run(['git','rev-parse','HEAD'],cwd=source).stdout.strip()==SOURCE and not run(['git','status','--porcelain'],cwd=source).stdout,'fixed_clean_original_qs_source_required')
     env=dict(os.environ,GOWORK='off',GOTOOLCHAIN='local',GOFLAGS='-mod=readonly')
     module=json.loads(run(['go','list','-m','-json','github.com/FangcunMount/reliable-messaging'],cwd=source,env=env).stdout);validate_recovery_module(module)
@@ -59,13 +60,15 @@ def accept(*,source,repo,binary,observer_binary,broker,project,directory,manifes
     env.update(QS_M3_FIXTURE_PROJECT=project,QS_M3_HOST_BROKER=broker,QS_M3_HOST_DSN=f'root:{password}@tcp(127.0.0.1:{mysql_port})/?parseTime=true',QS_M3_HOST_MONGO_URI=uri,
         QS_M3_HOST_OPTIONS=str(options),QS_M3_HOST_OBSERVER_OPTIONS=str(observer_options),QS_M3_NATIVE_RECOVERY_DIRECTORY=str(root))
     env.pop('QS_M3_VERIFY_PROTOCOL_PROTECTION',None);env.pop('QS_M3_VERIFY_NATIVE_LIMIT',None)
+    env['QS_M3_OBSERVED_CHECK_BUDGET'] = 'true' if observed_check_budget else 'false'
     host_binary=directory/'qs-native-recovery-test'
     run(['go','test','-race','-tags=integration,m3_host_runtime','-c','-o',str(host_binary),'./internal/apiserver/container'],cwd=source,env=env,timeout=300)
     # Hold the original window through two local commits; the existing actual
     # host fixture kills/restarts only its owned Broker and releases to6000.
     admin('updateBrokerConfig','-k','transactionTimeOut','-v','600000',success=True)
     require(read_parameters()['transactionTimeOut']==600000,'owned_original_check_hold_required')
-    actor=common.Probe([str(host_binary),'-test.v','-test.timeout=12m','-test.run=^TestM3DefaultOwnerNativeRecovery$'],directory,env,prefix='M3_QS_NATIVE_RECOVERY ',cwd=source/'internal/apiserver/container');probes.append(actor)
+    timeout = '24m' if observed_check_budget else '12m'
+    actor=common.Probe([str(host_binary),'-test.v',f'-test.timeout={timeout}','-test.run=^TestM3DefaultOwnerNativeRecovery$'],directory,env,prefix='M3_QS_NATIVE_RECOVERY ',cwd=source/'internal/apiserver/container');probes.append(actor)
     proof['qs_original_host']=dict(source_sha=SOURCE,sdk_module={k:module[k] for k in ('Version','Sum','GoModSum')},binary_sha256=hashlib.sha256(host_binary.read_bytes()).hexdigest(),whole_api=False,domain_projection=False,system_acceptance=False)
     def diagnostic():
         if actor.process.poll() is not None:actor.reader.join(timeout=2)
@@ -83,16 +86,34 @@ def accept(*,source,repo,binary,observer_binary,broker,project,directory,manifes
     original=metadata(wait('original-roots.json'))
     proof['qs_original_roots_committed_and_stopped']=True
     passed('actual_qs_dual_original_roots_commit_and_stop_with_final_unknown_after_real_broker_sigkill')
-    admin('updateBrokerConfig','-k','transactionCheckMax','-v','2',success=True)
-    actual=read_parameters();require(actual==dict(parameters,transactionCheckMax=2),'bounded_qs_native_fault_parameters_required')
+    if not observed_check_budget:
+        admin('updateBrokerConfig','-k','transactionCheckMax','-v','2',success=True)
+    actual = read_parameters()
+    expected = parameters if observed_check_budget else dict(parameters, transactionCheckMax=2)
+    require(actual == expected, 'bounded_qs_native_fault_parameters_required')
+    proof['qs_check_budget'] = {
+        'mode': 'observed' if observed_check_budget else 'accelerated',
+        'during_fault': actual,
+        'index_elapsed_ms': {},
+    }
+    started = time.monotonic()
+    observed_deadline = started + 600
     indices={}
     for b in original['branches']:
-        path=root/('native-'+b['owner']+'.json');end=time.monotonic()+110
+        owner = b['owner']
+        path = root / ('native-' + owner + '.json')
+        end = observed_deadline if observed_check_budget else time.monotonic() + 110
         while time.monotonic()<end:
-            try:indices[b['owner']]=export(broker,project,b['message_id'],path);break
-            except RuntimeError:time.sleep(2)
-        require(b['owner'] in indices and len(indices[b['owner']]['records'])==1 and not indices[b['owner']]['truncated_possible'],'one_actual_native_index_per_qs_original_owner_required')
-    for key,value in parameters.items():admin('updateBrokerConfig','-k',key,'-v',str(value),success=True)
+            try:
+                indices[owner] = export(broker, project, b['message_id'], path)
+                break
+            except RuntimeError:
+                time.sleep(10 if observed_check_budget else 2)
+        require(owner in indices and len(indices[owner]['records']) == 1 and not indices[owner]['truncated_possible'],
+                'one_actual_native_index_per_qs_original_owner_required')
+        proof['qs_check_budget']['index_elapsed_ms'][owner] = int((time.monotonic() - started) * 1000)
+    if not observed_check_budget:
+        for key,value in parameters.items():admin('updateBrokerConfig','-k',key,'-v',str(value),success=True)
     require(read_parameters()==parameters,'original_qs_parameters_not_restored')
     passed('both_actual_original_qs_halves_reach_native_limit_without_new_producer')
     write('record-notices',dict(continue_owned_fixture=True));require(wait('notices.json',15)==dict(both_original_stores_recorded=True),'both_original_qs_native_notices_required')
