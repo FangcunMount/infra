@@ -105,6 +105,77 @@ class ReviewIntakeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'only W03 and W05'):
             self.result()
 
+    def test_bridge_acceptance_binds_both_operations_and_window_budget(self):
+        window = self.submitted['decisions']['window']
+        self.evidence['bridge_qualification_sha256'] = HASH
+        with self.assertRaisesRegex(ValueError, 'explicitly accepted'):
+            self.result()
+        window['bridge'] = dict(
+            qualification_sha256=HASH, operation_id='ai246-bridge-test',
+            database_operation_id='ai246-ddl-test', approved_actions=list(ai_review_intake.BRIDGE_SCOPE),
+            budget_seconds=300)
+        result = self.result()
+        self.assertEqual(result['bridge_operation_id'], 'ai246-bridge-test')
+        self.assertEqual(result['database_operation_id'], 'ai246-ddl-test')
+        self.assertEqual(result['before_abort_required_seconds'], 1185)
+        self.assertEqual(result['minimum_writer_interval_seconds'], 480)
+        self.assertFalse(result['execution_authorized'])
+        self.assertFalse(result['w06_issued'])
+        bridge = window['bridge']
+        with self.subTest('same ID'):
+            bridge['database_operation_id'] = bridge['operation_id']
+            with self.assertRaisesRegex(ValueError, 'distinct'):
+                self.result()
+            bridge['database_operation_id'] = 'ai246-ddl-test'
+        with self.subTest('insufficient time before abort'):
+            bridge['budget_seconds'] = 700
+            with self.assertRaisesRegex(ValueError, 'window budget'):
+                self.result()
+            bridge['budget_seconds'] = 300
+        with self.subTest('qualification drift'):
+            bridge['qualification_sha256'] = 'c'*64
+            with self.assertRaisesRegex(ValueError, 'explicitly accepted'):
+                self.result()
+            bridge['qualification_sha256'] = HASH
+        with self.subTest('undeclared scope'):
+            self.evidence.pop('bridge_qualification_sha256')
+            with self.assertRaisesRegex(ValueError, 'bound qualification'):
+                self.result()
+
+    def test_prepare_binds_bridge_original_and_rejects_drift(self):
+        with tempfile.TemporaryDirectory() as path:
+            root = Path(path)
+            source = root / 'source'
+            source.mkdir()
+            evidence = dict(self.evidence)
+            for name in ('timing', 'transport', 'comparison'):
+                raw = b'{}'
+                (source / (name + '.json')).write_bytes(raw)
+                evidence[name + '_sha256'] = sha256(raw).hexdigest()
+            (source / 'manifest.json').write_text(json.dumps(evidence))
+            qualification = root / 'qualification.json'
+            raw = json.dumps(dict(schema='ai246-schema43-bridge-qualification/v1',
+                                  source_sha='a'*40, original_image_id='sha256:'+'a'*64,
+                                  bridge_image_id='sha256:'+'b'*64, prepared_sha256='c'*64,
+                                  archive_sha256='d'*64)).encode()
+            qualification.write_bytes(raw)
+            output = root / 'bound'
+            prepare(source, output, 'c'*40, qualification)
+            bound, _ = ai_review_intake.checked_bundle(output)
+            form = decode((output / 'decision-TEMPLATE.json').read_bytes())
+            bridge = form['decisions']['window']['bridge']
+            self.assertEqual(bound['bridge_qualification_sha256'], sha256(raw).hexdigest())
+            self.assertEqual(bridge['qualification_sha256'], bound['bridge_qualification_sha256'])
+            self.assertIsNone(bridge['operation_id'])
+            self.assertIsNone(bridge['database_operation_id'])
+            self.assertEqual(bridge['approved_actions'], [])
+            proof = output / ai_review_intake.BRIDGE_EVIDENCE
+            self.assertEqual(proof.read_bytes(), raw)
+            self.assertEqual(proof.stat().st_mode & 0o777, 0o600)
+            proof.write_bytes(raw+b' ')
+            with self.assertRaisesRegex(ValueError, 'qualification changed'):
+                ai_review_intake.checked_bundle(output)
+
     def test_cli_rejects_timing_evidence_drift(self):
         for name in ('timing', 'transport', 'comparison'):
             with self.subTest(name=name):

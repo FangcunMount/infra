@@ -20,6 +20,8 @@ WRITER_BOUND_TOOL_SECONDS = 270  # W05 two captures and W07.
 WRITER_MAX_SECONDS = 3600
 GATES = ('w00', 'w04', 'window')
 EXTRA = ('admin_queue_and_receipt', 'two_site_preservation', 'self_review', 'reopen_observation', 'recovery_reserve')
+BRIDGE_SCOPE = ('switch_schema_43', 'recover_schema_43')
+BRIDGE_EVIDENCE = 'bridge-qualification.json'
 
 def fail(message):
     raise ValueError(message)
@@ -43,6 +45,42 @@ def filled(value, field):
     if not isinstance(value, str) or value.strip() != value or value.casefold() in ('', 'tbd', '待签', '____', 'placeholder'):
         fail(field + ' must identify an actual signer, operator or signed reference')
     return value
+
+def bridge_qualification(raw):
+    qualification = decode(raw)
+    identities = ('original_image_id', 'bridge_image_id')
+    digests = ('prepared_sha256', 'archive_sha256')
+    if (set(qualification) != {'schema', 'source_sha', *identities, *digests}
+            or qualification['schema'] != 'ai246-schema43-bridge-qualification/v1'
+            or not re.fullmatch('[0-9a-f]{40}', qualification['source_sha'])
+            or any(not re.fullmatch('sha256:[0-9a-f]{64}', qualification[key]) for key in identities)
+            or any(not re.fullmatch('[0-9a-f]{64}', qualification[key]) for key in digests)
+            or qualification['original_image_id'] == qualification['bridge_image_id']):
+        fail('invalid schema-43 bridge qualification')
+    return sha256(raw).hexdigest()
+
+def bridge_appointment(window, qualification_sha):
+    if qualification_sha is None:
+        if 'bridge' in window:
+            fail('schema-43 bridge scope requires bound qualification')
+        return {}
+    decision = window.get('bridge')
+    fields = ('qualification_sha256', 'operation_id', 'database_operation_id',
+              'approved_actions', 'budget_seconds')
+    if (not isinstance(decision, dict) or set(decision) != set(fields)
+            or decision['qualification_sha256'] != qualification_sha
+            or decision['approved_actions'] != list(BRIDGE_SCOPE)):
+        fail('schema-43 switch and recovery scope must be explicitly accepted')
+    operation, database_operation = (decision[key] for key in ('operation_id', 'database_operation_id'))
+    if (operation == database_operation or any(
+            not isinstance(value, str) or not re.fullmatch(r'ai246-[a-z0-9]+(?:-[a-z0-9]+)*', value)
+            for value in (operation, database_operation))):
+        fail('distinct bridge and database operation IDs required')
+    seconds = decision['budget_seconds']
+    if type(seconds) is not int or seconds <= 0:
+        fail('schema-43 switch requires a positive window budget')
+    return dict(bridge_operation_id=operation, database_operation_id=database_operation,
+                bridge_budget_seconds=seconds, bridge_qualification_sha256=qualification_sha)
 
 def validate(evidence, evidence_sha, submitted, now):
     policy_sha = policy_binding()
@@ -89,6 +127,7 @@ def validate(evidence, evidence_sha, submitted, now):
         fail('this exception permits only shujie to operate and self-review')
     if window['approved_preparation_actions'] != ['W03', 'W05']:
         fail('the proposed window must explicitly cover only W03 and W05 preparation')
+    bridge = bridge_appointment(window, evidence.get('bridge_qualification_sha256'))
     start, abort, end = (utc(window[key], key) for key in ('start','latest_abort','end'))
     if not start < abort < end or end <= now or max(signature_times.values()) > start:
         fail('appointment timestamps or signature order are invalid')
@@ -100,8 +139,9 @@ def validate(evidence, evidence_sha, submitted, now):
         fail('invalid W05 sample floor')
     if budgets['two_site_preservation'] < w05_sample_floor:
         fail('W05 preservation budget is below observed transfer and comparison time')
-    before_abort = BEFORE_ABORT_SECONDS + sum(budgets[name] for name in EXTRA[:3])
-    total = TOOL_SECONDS + sum(budgets.values())
+    bridge_seconds = bridge.get('bridge_budget_seconds', 0)
+    before_abort = BEFORE_ABORT_SECONDS + sum(budgets[name] for name in EXTRA[:3]) + bridge_seconds
+    total = TOOL_SECONDS + sum(budgets.values()) + bridge_seconds
     after_abort = AFTER_ABORT_VERIFY_SECONDS + budgets['reopen_observation'] + budgets['recovery_reserve']
     writer_interval = WRITER_BOUND_TOOL_SECONDS + budgets['two_site_preservation'] + budgets['self_review']
     if ((abort-start).total_seconds() < before_abort or (end-start).total_seconds() < total):
@@ -115,7 +155,7 @@ def validate(evidence, evidence_sha, submitted, now):
                 w05_sample_floor_seconds=w05_sample_floor, before_abort_required_seconds=before_abort, after_abort_required_seconds=after_abort,
                 minimum_writer_interval_seconds=writer_interval, total_required_seconds=total,
                 self_review_identity_verified=False, same_window_evidence_required=True,
-                execution_authorized=False, w06_issued=False)
+                execution_authorized=False, w06_issued=False, **bridge)
 
 
 def policy_binding():
@@ -151,6 +191,9 @@ def checked_bundle(root):
     if 'qualification_manifest_sha256' in evidence:
         if sha256((root / 'source-manifest.json').read_bytes()).hexdigest() != evidence['qualification_manifest_sha256']:
             fail('qualification manifest changed')
+    if 'bridge_qualification_sha256' in evidence:
+        if bridge_qualification((root / BRIDGE_EVIDENCE).read_bytes()) != evidence['bridge_qualification_sha256']:
+            fail('schema-43 bridge qualification changed')
     return evidence, sha256(manifest).hexdigest()
 
 
@@ -158,7 +201,7 @@ def blank_decision(evidence, evidence_sha):
     def gate():
         return dict(result=None, reviewer='shujie', signed_at=None, signed_reference=None,
                     evidence_sha256=evidence_sha)
-    return dict(schema='ai246-prewindow-self-review/TEMPLATE', review_mode=MODE,
+    form = dict(schema='ai246-prewindow-self-review/TEMPLATE', review_mode=MODE,
                 review_policy_id=POLICY_ID, review_policy_sha256=policy_binding(),
                 self_review_risk_acknowledged=None, infra_review_head=evidence['infra_review_head'],
                 evidence_sha256=evidence_sha, data_owner='shujie', recovery_owner='shujie',
@@ -167,6 +210,11 @@ def blank_decision(evidence, evidence_sha):
                                window=dict(gate(), operator='shujie', start=None, latest_abort=None, end=None,
                                            approved_preparation_actions=[],
                                            budgets_seconds=dict.fromkeys(EXTRA))))
+    if 'bridge_qualification_sha256' in evidence:
+        form['decisions']['window']['bridge'] = dict(
+            qualification_sha256=evidence['bridge_qualification_sha256'], operation_id=None,
+            database_operation_id=None, approved_actions=[], budget_seconds=None)
+    return form
 
 
 def write_private(path, raw):
@@ -175,12 +223,21 @@ def write_private(path, raw):
         stream.write(raw)
 
 
-def prepare(source, output, head):
+def prepare(source, output, head, bridge_evidence=None):
     if not re.fullmatch('[0-9a-f]{40}', head):
         fail('infra review head must be an exact commit')
     evidence, original_sha = checked_bundle(source)
     if evidence['data_owner'] != 'shujie' or evidence['recovery_owner'] != 'shujie':
         fail('responsibility binding changed')
+    old_bridge_sha = evidence.get('bridge_qualification_sha256')
+    if bridge_evidence is None and old_bridge_sha is not None:
+        bridge_evidence = source / BRIDGE_EVIDENCE
+    bridge_raw = bridge_evidence.read_bytes() if bridge_evidence is not None else None
+    if bridge_raw is not None:
+        bridge_sha = bridge_qualification(bridge_raw)
+        if old_bridge_sha is not None and old_bridge_sha != bridge_sha:
+            fail('schema-43 bridge qualification cannot be silently replaced')
+        evidence['bridge_qualification_sha256'] = bridge_sha
     output.mkdir(mode=0o700, parents=False, exist_ok=False)
     names = ['timing.json', 'transport.json', 'comparison.json']
     if evidence['reviewable_w00_route'] == 'central_continuity':
@@ -189,6 +246,8 @@ def prepare(source, output, head):
         shutil.copyfile(source / name, output / name)
         (output / name).chmod(0o600)
     write_private(output / 'source-manifest.json', (source / 'manifest.json').read_bytes())
+    if bridge_raw is not None:
+        write_private(output / BRIDGE_EVIDENCE, bridge_raw)
     evidence.update(schema='ai246-prewindow-review-manifest/v4',
                     qualification_manifest_sha256=original_sha,
                     qualification_infra_review_head=evidence['infra_review_head'],
@@ -211,13 +270,14 @@ def main():
     create.add_argument('--bundle', type=Path, required=True)
     create.add_argument('--output', type=Path, required=True)
     create.add_argument('--infra-review-head', required=True)
+    create.add_argument('--bridge-qualification', type=Path)
     check = sub.add_parser('check', help='Check a signed appointment form; identity remains separately verified')
     check.add_argument('--bundle', type=Path, required=True)
     check.add_argument('--decision', type=Path, required=True)
     args = parser.parse_args()
     try:
         if args.command == 'prepare':
-            report = prepare(args.bundle, args.output, args.infra_review_head)
+            report = prepare(args.bundle, args.output, args.infra_review_head, args.bridge_qualification)
         else:
             evidence, evidence_sha = checked_bundle(args.bundle)
             incoming = args.decision.read_bytes()
