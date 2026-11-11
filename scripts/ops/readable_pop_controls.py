@@ -280,6 +280,20 @@ class OwnedPopControls:
         self.trace_rebound = trace_rebound
         self.url = None
         self.observed_timer = False
+        self.trace_container = None
+        self.trace_configuration = None
+
+    def trace_identity(self, value):
+        labels = value['Config']['Labels']
+        state = value['State']
+        require(labels.get('com.docker.compose.project') == self.project
+                and labels.get('com.docker.compose.service') == 'broker'
+                and state['Running'] is True and state['StartedAt'],
+                'owned_pop_trace_identity_required')
+        require(re.fullmatch('[0-9a-f]{64}', value['Id'])
+                and re.fullmatch('sha256:[0-9a-f]{64}', value['Image']),
+                'immutable_pop_trace_identity_required')
+        return dict(container_id=value['Id'], image_id=value['Image'], started_at=state['StartedAt'])
 
     def configure(self):
         from final_image_candidate import ci_guard
@@ -301,6 +315,10 @@ class OwnedPopControls:
                 'pinned_native_pop_metrics_required')
         if self.trace_rebound:
             require(properties.get('enablePopLog') == 'true', 'owned_pop_trace_config_required')
+            self.trace_container = self.trace_identity(value)
+            self.trace_configuration = {
+                key: properties[key] for key in ('enableSkipLongAwaitingAck', 'reviveAckWaitMs', 'enablePopLog')
+            }
         self.url = 'http://127.0.0.1:' + bindings[0]['HostPort'] + '/metrics'
 
     def read(self, required):
@@ -312,14 +330,21 @@ class OwnedPopControls:
         return snapshot(raw.decode(), timing_required=required)
 
     def trace(self, sample):
-        require(self.url is not None, 'owned_pop_trace_required')
+        require(self.url is not None and self.trace_container is not None, 'owned_pop_trace_required')
         routes = {(row['physical_topic'], row['consumer_group']) for row in self.manifest['routes']
                   if row.get('physical_topic') and row.get('consumer_group')}
         require(bool(routes), 'known_trace_routes_required')
+        container = self.trace_container['container_id']
+
+        def verify_identity():
+            live, = json.loads(self.run(['docker', 'inspect', container], timeout=5).stdout)
+            require(self.trace_identity(live) == self.trace_container, 'owned_pop_trace_identity_drift')
+
+        verify_identity()
 
         def capture(args, parse):
             try:
-                result = self.run(['docker', 'exec', self.broker, *args], timeout=10, required=False)
+                result = self.run(['docker', 'exec', container, *args], timeout=10, required=False)
                 require(result.returncode == 0, 'owned_pop_trace_read_failed')
                 return parse(result.stdout)
             except (RuntimeError, OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError):
@@ -338,7 +363,7 @@ class OwnedPopControls:
         def read_bytes(path, offset, count, deadline):
             remaining = deadline - time.monotonic()
             require(remaining > 0, 'physical_revive_trace_budget_exceeded')
-            result = self.run(['docker', 'exec', self.broker, 'sh', '-c',
+            result = self.run(['docker', 'exec', container, 'sh', '-c',
                 'dd if="$1" bs=1 skip="$2" count="$3" status=none | base64', 'physical-revive',
                 path, str(offset), str(count)], timeout=min(remaining, 3), required=False)
             require(result.returncode == 0 and len(result.stdout) <= count * 2 + 8,
@@ -356,7 +381,10 @@ class OwnedPopControls:
                 physical.append(decode_physical_revive(raw, queue, logical, offset, routes))
             except (RuntimeError, KeyError, ValueError, TypeError, RecursionError, struct.error):
                 unreadable.append(dict(queue=queue, offset=logical))
-        return dict(offsets_before=before, offsets_after=persisted_offsets(), records=records,
+        after = persisted_offsets()
+        verify_identity()
+        return dict(offsets_before=before, offsets_after=after, records=records,
+                    broker_identity=self.trace_container, broker_configuration=self.trace_configuration,
                     queue_bounds=bounds, retry_catalog=retries,
                     physical_storage=dict(records=physical, queues=queues, unreadable=unreadable, drain_proven=False),
                     drain_proven=False)

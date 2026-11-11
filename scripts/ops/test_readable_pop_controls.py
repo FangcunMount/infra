@@ -167,6 +167,26 @@ class ReadablePopControlsTest(unittest.TestCase):
         self.assertIn('error', queues['2'])
         read.assert_not_called()
 
+    def test_trace_refuses_restarted_container_before_any_storage_read(self):
+        broker = {
+            'Id': 'a' * 64,
+            'Image': 'sha256:' + 'b' * 64,
+            'Config': {'Labels': {'com.docker.compose.project': 'owned',
+                                  'com.docker.compose.service': 'broker'}},
+            'State': {'Running': True, 'StartedAt': 'before'},
+        }
+        run = Mock()
+        control = OwnedPopControls(run, Mock(), 'fixture-broker', 'owned',
+                                   {'routes': [{'physical_topic': 'topic', 'consumer_group': 'group'}]},
+                                   {}, Mock(), trace_rebound=True)
+        control.url = 'http://127.0.0.1:5557/metrics'
+        control.trace_container = control.trace_identity(broker)
+        broker['State']['StartedAt'] = 'after'
+        run.return_value.stdout = json.dumps([broker])
+        with self.assertRaisesRegex(RuntimeError, 'owned_pop_trace_identity_drift'):
+            control.trace({})
+        run.assert_called_once_with(['docker', 'inspect', broker['Id']], timeout=5)
+
     def test_timeout_trace_cannot_approve_drain(self):
         proof, passed = {}, Mock()
         control = OwnedPopControls(Mock(), Mock(), 'unused', 'unused', {}, proof, passed, trace_rebound=True)
