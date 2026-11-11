@@ -6,6 +6,13 @@ on:
       - scripts/mysql/ai_backup_material.py
       - scripts/mysql/ai_execution_account.py
       - scripts/mysql/ai_window_material_check.py
+      - scripts/mysql/ai_review_intake.py
+      - scripts/mysql/test_ai_review_intake.py
+      - docs/evidence/2026-11-11-ai246-self-review-policy.json
+      - docs/server/rocketmq-host-retirement-ai-246-self-review-20261111.md
+      - docs/server/rocketmq-host-retirement-ai-246-self-review-checklist.html
+      - scripts/mysql/render_ai_review_checklist.py
+      - scripts/mysql/test_ai_review_checklist.js
       - scripts/mysql/test_ai_backup_material.py
       - scripts/mysql/test_ai_execution_account.py
       - scripts/mysql/test_ai_window_material_check.py
@@ -17,6 +24,13 @@ on:
       - scripts/mysql/ai_backup_material.py
       - scripts/mysql/ai_execution_account.py
       - scripts/mysql/ai_window_material_check.py
+      - scripts/mysql/ai_review_intake.py
+      - scripts/mysql/test_ai_review_intake.py
+      - docs/evidence/2026-11-11-ai246-self-review-policy.json
+      - docs/server/rocketmq-host-retirement-ai-246-self-review-20261111.md
+      - docs/server/rocketmq-host-retirement-ai-246-self-review-checklist.html
+      - scripts/mysql/render_ai_review_checklist.py
+      - scripts/mysql/test_ai_review_checklist.js
       - scripts/mysql/test_ai_backup_material.py
       - scripts/mysql/test_ai_execution_account.py
       - scripts/mysql/test_ai_window_material_check.py
@@ -29,4 +43,5 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: python3 -B -m unittest discover -s scripts/mysql -p 'test_ai_*.py'
-      - run: python3 -m py_compile scripts/mysql/ai_account_observe.py scripts/mysql/ai_backup_material.py scripts/mysql/ai_execution_account.py scripts/mysql/ai_window_material_check.py
+      - run: node scripts/mysql/test_ai_review_checklist.js
+      - run: python3 -m py_compile scripts/mysql/ai_account_observe.py scripts/mysql/ai_backup_material.py scripts/mysql/ai_execution_account.py scripts/mysql/ai_window_material_check.py scripts/mysql/ai_review_intake.py

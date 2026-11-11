@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; base-uri 'none'; form-action 'none'">
+<title>AI #424 · 舒杰逐项操作清单</title>
+<style>
+:root{color-scheme:light dark;font-family:system-ui,-apple-system,sans-serif;line-height:1.6;background:Canvas;color:CanvasText}
+body{max-width:1050px;margin:0 auto;padding:24px}h1{font-size:1.7rem}h2{margin-top:32px;font-size:1.2rem}
+p{overflow-wrap:anywhere}code{overflow-wrap:anywhere}input,textarea,button{font:inherit;color:inherit}
+input,textarea{box-sizing:border-box;width:100%;padding:9px;background:Field;border:1px solid GrayText;border-radius:5px}
+button{padding:8px 14px;background:ButtonFace;border:1px solid GrayText;border-radius:5px;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}.task{display:flex;align-items:flex-start;gap:10px}.task input{width:20px;height:20px;flex-shrink:0;margin-top:4px}
+article{padding:20px 0;border-bottom:1px solid color-mix(in srgb,CanvasText 20%,Canvas)}article p{margin:8px 0 12px}
+article[data-done="true"] strong{text-decoration:line-through}.record,.fields{display:grid;grid-template-columns:1fr 2fr;gap:12px}
+label{display:block}.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:end}#operation{min-width:260px}
+header{position:sticky;top:0;background:Canvas;padding:10px 0;z-index:1;border-bottom:1px solid GrayText}
+#status{margin:8px 0;font-weight:500}small{display:block}a{color:LinkText}details{margin-top:24px}.fields{margin-top:16px}
+@media(max-width:650px){body{padding:12px}.record,.fields{grid-template-columns:1fr}header{position:static}h1{font-size:1.35rem}}
+@media print{header{position:static}.toolbar{display:none}article{break-inside:avoid}input,textarea{border:0}}
+</style></head><body>
+<h1>AI #424 · 舒杰操作、自审清单</h1>
+<p>舒杰（shujie）同时操作与自审。模式变更已授权；新窗口、现场证据和 W06 尚待逐项完成。发布继续冻结。初始 29 项均未勾选。</p>
+<p>输入本次新操作 ID 后打开清单，每完成一部分再勾选，并填写时间、本人决定和原件引用。草稿保存在当前浏览器；请定期导出进度文件，换浏览器或清除缓存前务必导出。</p>
+<p><strong>此页不会停业务、连接数据库或签发批准。勾选全部完成也不等于执行授权。</strong></p>
+<header><div class="toolbar"><label>本次操作 ID<input id="operation" placeholder="ai246-YYYYMMDD-HHMM"></label>
+<button id="load" type="button">打开本次清单</button><button id="export" type="button" disabled>导出进度 JSON</button>
+<button id="import-button" type="button">导入进度 JSON</button><input id="import" type="file" accept="application/json,.json" hidden></div>
+<p id="status" role="status" aria-live="polite">尚未打开操作；0 / 29 项。</p>
+<small>仅在可信浏览器的私有本机环境填写；不输入凭据、数据库 URL、令牌或业务正文。</small></header>
+<div class="fields"><label>北京时间开始<input id="window-start" placeholder="YYYY-MM-DD HH:mm" disabled></label>
+<label>北京时间最晚中止<input id="window-abort" placeholder="YYYY-MM-DD HH:mm" disabled></label>
+<label>北京时间结束<input id="window-end" placeholder="YYYY-MM-DD HH:mm" disabled></label>
+<label>当次证据索引 SHA／签署引用<input id="evidence" placeholder="索引 SHA 和本人记录位置" disabled></label></div>
+<section><h2>第一部分 · 现在可以准备</h2>
+<article data-task="P01">
+<label class="task"><input type="checkbox" id="done-P01" disabled>
+<strong>P01 确认本次责任模式。</strong></label>
+<p>阅读规则原文，确认舒杰操作、自审并承担数据与恢复责任。规则变更已经得到用户授权，此项记录你已核对本次操作适用范围。</p>
+<div class="record"><label>完成 UTC<input id="time-P01" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-P01" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="P02">
+<label class="task"><input type="checkbox" id="done-P02" disabled>
+<strong>P02 核对唯一变更范围。</strong></label>
+<p>仅处理原空 <code>ai.messaging_outbox</code> 和原单行 ledger 的 43→44。事务凭证、全部历史、ACK、Inbox、调度、49 张其余表和 Broker 持久待办全部保留。</p>
+<div class="record"><label>完成 UTC<input id="time-P02" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-P02" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="P03">
+<label class="task"><input type="checkbox" id="done-P03" disabled>
+<strong>P03 固定源码、镜像和工具。</strong></label>
+<p>核对当前 #424 提交及 CI、AI 受核源码、不可变生产／前向恢复 44 镜像、归档和工具清单。原资格的 AI 源码为 <code>c6359b441de48fde5b295529fe9c10f50e4c53f5</code>，生产 digest 为 <code>sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e</code>；变化须重新取得资格，不自动沿用。</p>
+<div class="record"><label>完成 UTC<input id="time-P03" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-P03" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="P04">
+<label class="task"><input type="checkbox" id="done-P04" disabled>
+<strong>P04 核对完整备份与恢复路线。</strong></label>
+<p>阅读已有 51 表逻辑备份隔离恢复、原空表 DDL 恢复、F1 记账与 44 前向启动原件。云 PITR 尚未验收，本次采用已验证的完整逻辑备份路线。</p>
+<div class="record"><label>完成 UTC<input id="time-P04" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-P04" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="P05">
+<label class="task"><input type="checkbox" id="done-P05" disabled>
+<strong>P05 自审 W04 账户范围。</strong></label>
+<p>核对 principal、完整 GRANTS、角色与部分撤销、UID 10001、独立维护网络和公共 CA／VERIFY_IDENTITY。明确写“接受原较宽账户，仅用于本操作受核入口”，或改用另行复验的专用账户。需要全 AI SELECT、目标 DROP、LOCK TABLES 和 ledger UPDATE；不得用生产 DDL 探测权限。</p>
+<div class="record"><label>完成 UTC<input id="time-P05" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-P05" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="P06">
+<label class="task"><input type="checkbox" id="done-P06" disabled>
+<strong>P06 自审 W00 观察路线。</strong></label>
+<p>选择集中连续采集，或明确签收固定的具名应用／Broker 直读、两轮采样、容器清单和失效条件。分别记录当前事务、业务 ACK、51 条历史责任和采集缺失。旧通过回执不替代临窗采样。</p>
+<div class="record"><label>完成 UTC<input id="time-P06" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-P06" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="P07">
+<label class="task"><input type="checkbox" id="done-P07" disabled>
+<strong>P07 填写新窗口。</strong></label>
+<p>填好本页起止、最晚中止、恢复预留和新操作 ID，明确准许 W03 排空与 W05 保护／全备。W07 仍须现场 W06。该决定须有本人身份、真实签署时间、证据索引 SHA 和可留存签署引用。</p>
+<div class="record"><label>完成 UTC<input id="time-P07" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-P07" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="P08">
+<label class="task"><input type="checkbox" id="done-P08" disabled>
+<strong>P08 准备私有工作副本与协调端。</strong></label>
+<p>新目录使用 0700、文件 0600；两地路径可写且空间充足，协调端电源／网络和自身防休眠措施已检查。不得覆盖旧窗口、原备份或旧签收记录。</p>
+<div class="record"><label>完成 UTC<input id="time-P08" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-P08" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+</section>
+<section><h2>第二部分 · 临窗复验与进入窗口 W00–W02</h2>
+<article data-task="W00a">
+<label class="task"><input type="checkbox" id="done-W00a" disabled>
+<strong>W00a 复验冻结与运行身份。</strong></label>
+<p>实读 AI 自动发布关闭、QS 工作流禁用、无在途 AI 发布；核对 ServerA API、两份 Collection、AI 及 ServerD 三份 Worker 的完整身份、镜像和就绪，四个事务 owner 的状态符合受审路线。QS 111/44 与 AI 原库 43 分别确认，读不到的项不填通过。</p>
+<div class="record"><label>完成 UTC<input id="time-W00a" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W00a" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W00b">
+<label class="task"><input type="checkbox" id="done-W00b" disabled>
+<strong>W00b 取得当次新鲜观察。</strong></label>
+<p>按 P06 路线重新采样，保留原始开始／结束时间、全部端点与缺失。协调任务迟到超过受审 30 秒上限、过期、断链或身份漂移时重判，不沿用旧回执补空档。</p>
+<div class="record"><label>完成 UTC<input id="time-W00b" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W00b" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W01">
+<label class="task"><input type="checkbox" id="done-W01" disabled>
+<strong>W01 确认全部门槛和预算。</strong></label>
+<p>三项预约决定完整，原件、账户、镜像与现场一致，当前剩余时间足够。将历史资格和当次事实分开编号。</p>
+<div class="record"><label>完成 UTC<input id="time-W01" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W01" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W02">
+<label class="task"><input type="checkbox" id="done-W02" disabled>
+<strong>W02 建立锁与完整写者库存。</strong></label>
+<p>按受审顺序持续持有主机部署／镜像保留锁、AI 发布锁；记录会话、原容器完整 ID、全部应用／CI／人工／管理员／维护和其他主机旁路写者的停止机制。</p>
+<div class="record"><label>完成 UTC<input id="time-W02" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W02" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+</section>
+<section><h2>第三部分 · 实际停写与排空 W03</h2>
+<article data-task="W03a">
+<label class="task"><input type="checkbox" id="done-W03a" disabled>
+<strong>W03a 关闭所有新准入。</strong></label>
+<p>逐项关闭 HTTP／gRPC、generation／evaluation、命令和 ACK claim、调度新领取，以及 CI／人工／其他主机旁路；记录每个入口生效时间，保留持久待办。</p>
+<div class="record"><label>完成 UTC<input id="time-W03a" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W03a" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W03b">
+<label class="task"><input type="checkbox" id="done-W03b" disabled>
+<strong>W03b 等待原 owner 收口。</strong></label>
+<p>原 Checker／事务 owner 留至在途和 ACK 交接完成。活跃根、未完成模型调用、unknown、prepared 和未决事务均为零；Broker 持久积压与历史 blocked 单列保留。</p>
+<div class="record"><label>完成 UTC<input id="time-W03b" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W03b" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W03c">
+<label class="task"><input type="checkbox" id="done-W03c" disabled>
+<strong>W03c 正常停止原实例。</strong></label>
+<p>只对已核验完整容器 ID 正常停止，210 秒内退出；无强杀、OOM、新替代实例、排空超时或组件停止错误。保存全段日志、退出码及前后状态。不得以“容器退出”替代业务排空证明。</p>
+<div class="record"><label>完成 UTC<input id="time-W03c" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W03c" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+</section>
+<section><h2>第四部分 · 同窗账户复验、保护和全备 W04–W05</h2>
+<article data-task="W04a">
+<label class="task"><input type="checkbox" id="done-W04a" disabled>
+<strong>W04a 排空后管理员复验。</strong></label>
+<p>通过固定 QS Database Operations 的 <code>operation=ai-activity-admin</code>、<code>database=mysql</code>、对应受核 <code>governance_confirm</code>，<code>backup_name</code> 留空。保存 run／attempt 和 24 查询原件，核对 AI 身份、完整 43、原空表、事务／元数据锁和依赖观察。保留 <code>observations_atomic=false</code>、<code>freeze_verified=false</code> 原值。</p>
+<div class="record"><label>完成 UTC<input id="time-W04a" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W04a" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W04b">
+<label class="task"><input type="checkbox" id="done-W04b" disabled>
+<strong>W04b 排空后实际账户复验。</strong></label>
+<p>维护镜像、UID、网络、TLS、principal 和完整 GRANTS 与 P05 一致，连接／池释放。存在漂移时停止并复审。</p>
+<div class="record"><label>完成 UTC<input id="time-W04b" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W04b" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W04c">
+<label class="task"><input type="checkbox" id="done-W04c" disabled>
+<strong>W04c 签发当次写者凭证。</strong></label>
+<p>将完整库存、排空、持锁、管理员和账户证据绑定到 <code>writers.json</code>。确认写者／未完成工作均为零，全部范围已核对、待办保留、业务未重开。到期不超过一小时，并受窗口较早截止约束。</p>
+<div class="record"><label>完成 UTC<input id="time-W04c" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W04c" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W05a">
+<label class="task"><input type="checkbox" id="done-W05a" disabled>
+<strong>W05a 采集冻结保护。</strong></label>
+<p>以当次 writer 和 SHA 运行受核 <code>publisher_window capture</code>；核对 <code>frozen=true</code>、完整 43、原空表、原 ledger、49 表完整指纹及连接释放。持续停写和持锁。</p>
+<div class="record"><label>完成 UTC<input id="time-W05a" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W05a" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W05b">
+<label class="task"><input type="checkbox" id="done-W05b" disabled>
+<strong>W05b 采集新的 51 表完整逻辑备份。</strong></label>
+<p>同一有效停写区间内取得全部 DDL、有序列元数据、行数和原字段字节。检查结束记录、上限、退出码、连接释放、字节数和 SHA。全备原字段 <code>frozen=false</code> 保留，用外置同窗回执绑定真实排除区间。</p>
+<div class="record"><label>完成 UTC<input id="time-W05b" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W05b" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W05c">
+<label class="task"><input type="checkbox" id="done-W05c" disabled>
+<strong>W05c 逐表比对与两地保全。</strong></label>
+<p>使用 <code>ai_window_material_check.py</code> 重算 51 表，必须 <code>matched=true</code>。两地逐件读回保护、全备、writer 和采集原件，比较 SHA／归档成员并完成文件及目录 fsync；另存回执。超出原恢复资格范围时先隔离恢复验证。</p>
+<div class="record"><label>完成 UTC<input id="time-W05c" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W05c" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+</section>
+<section><h2>第五部分 · 本人现场自审与执行 W06–W08</h2>
+<article data-task="W06a">
+<label class="task"><input type="checkbox" id="done-W06a" disabled>
+<strong>W06a 暂停操作，单列自审结论。</strong></label>
+<p>重新阅读 W00–W05 原件，确认连续持锁、停写、完整库存、宽账户接受范围、当次两份保护、恢复资格、两地回执及剩余时间。逐项写“通过／阻断”，不能只勾选总表。</p>
+<div class="record"><label>完成 UTC<input id="time-W06a" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W06a" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W06b">
+<label class="task"><input type="checkbox" id="done-W06b" disabled>
+<strong>W06b 签发并核对精确 v2 批准。</strong></label>
+<p>现场通过后生成 <code>ai-empty-publisher-review/v2</code>，仅用源码允许字段；另列自审记录绑定规则 SHA、全备、两地、账户、管理员和库存 SHA。批准短于 writer／窗口截止且不超过一小时，剩余至少 90 秒；同一批准路径尚无 <code>.consumed</code> 和 <code>.business-reopen-issued</code>。</p>
+<div class="record"><label>完成 UTC<input id="time-W06b" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W06b" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W07">
+<label class="task"><input type="checkbox" id="done-W07" disabled>
+<strong>W07 单次受核执行。</strong></label>
+<p>按固定镜像和受审入口执行唯一目标及 43→44；先持久化 <code>.consumed</code>，目标锁等待上限 5 秒，外层 90 秒。保留命令、实际环境、退出码和原输出。超时／断连先只读分类，不重复消费、不直接 stamp、不手写 SQL 补状态。</p>
+<div class="record"><label>完成 UTC<input id="time-W07" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W07" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W08">
+<label class="task"><input type="checkbox" id="done-W08" disabled>
+<strong>W08 新连接严格验证。</strong></label>
+<p>必须 <code>state=44_complete</code>、目标缺席、保留定义和字节一致、事务／池释放。将结果及消费凭证做两地保全；43 完整或 43 缺表均不通过本项。</p>
+<div class="record"><label>完成 UTC<input id="time-W08" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W08" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+</section>
+<section><h2>第六部分 · 重开与验收 W09–W10</h2>
+<article data-task="W09a">
+<label class="task"><input type="checkbox" id="done-W09a" disabled>
+<strong>W09a 先记录首次业务重开。</strong></label>
+<p>在原批准路径独占持久写入 <code>.business-reopen-issued</code>，完成 fsync 和两地复制后才发启动命令；标记不得删除或重置。</p>
+<div class="record"><label>完成 UTC<input id="time-W09a" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W09a" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W09b">
+<label class="task"><input type="checkbox" id="done-W09b" disabled>
+<strong>W09b 启动一个受核 44 实例。</strong></label>
+<p>使用 <code>require-existing</code>、原 TLS／SDK 绑定和已验收不可变镜像，核对 readiness、运行身份及错误日志。启动结果未知时先查原实例，避免第二执行器。</p>
+<div class="record"><label>完成 UTC<input id="time-W09b" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W09b" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W10a">
+<label class="task"><input type="checkbox" id="done-W10a" disabled>
+<strong>W10a 观察业务与保留材料。</strong></label>
+<p>当前事务和应用 ACK、Broker ACK／积压、51 条历史责任分别记录；核对原凭证、业务／模型历史、Inbox、调度与待办保留。先观察自然流量；主动测试另有具名用例授权。</p>
+<div class="record"><label>完成 UTC<input id="time-W10a" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W10a" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+<article data-task="W10b">
+<label class="task"><input type="checkbox" id="done-W10b" disabled>
+<strong>W10b 归档并结案本批。</strong></label>
+<p>两地原件签收，记录源码／CI、实际运行、数据库和业务验收四层结论；保护至少 30 天、未结延期。AI 自动发布仍关闭、QS 工作流仍禁用，恢复自动发布另作决定。</p>
+<div class="record"><label>完成 UTC<input id="time-W10b" placeholder="勾选时记录，可据原件修正" disabled></label>
+<label>原件位置、SHA 或本人决定<textarea id="note-W10b" rows="2" placeholder="填写原件引用和结论；不填密码、令牌或业务正文" disabled></textarea></label></div>
+</article>
+</section>
+<details><summary>恢复与停止点</summary><ul>
+<li>完整 43 且原空表仍在：R0，废止批准，核对原 43 后按受审取消路线恢复。</li>
+<li>43 ledger、目标缺席：保持停写，另做 F1 自审并签新前向批准。</li>
+<li>完整 44：验证后使用受核 44；重开已发出或有新 44 事实，只走 44 前向修复。</li>
+<li>其他 head、目标非空、保留漂移或缺原件：停止本包，保全现场，另立故障决定。</li>
+<li>最晚中止到达仍未具备资格时，不开始新的变更，按现库实读收口；不强杀、不删凭证。</li>
+</ul></details>
+<p><a href="rocketmq-host-retirement-ai-246-self-review-20261111.md">完整文字指南、预算与本地校验命令</a> ·
+<a href="rocketmq-host-retirement-ai-246-window-signoff.md">正式窗口签收标准</a></p>
+<script>
+'use strict';
+const config = {"schema": "ai246-self-review-progress/v1", "policy_id": "AI246-20261111-SHUJIE-SELF-REVIEW", "guide_sha256": "d0f2795f9f3b0631b6ed1e4f39e484b4e49fba796c2777839f2e56ef9351f39a", "policy_sha256": "4b428f547469015a07c69ec08a903b20b277ff7d443ceae77b05fc8af6cbdba3", "task_ids": ["P01", "P02", "P03", "P04", "P05", "P06", "P07", "P08", "W00a", "W00b", "W01", "W02", "W03a", "W03b", "W03c", "W04a", "W04b", "W04c", "W05a", "W05b", "W05c", "W06a", "W06b", "W07", "W08", "W09a", "W09b", "W10a", "W10b"]};
+const fieldIds = ['window-start','window-abort','window-end','evidence'];
+let state = null;
+const byId = id => document.getElementById(id);
+const key = operation => config.schema + ':' + config.guide_sha256 + ':' + operation;
+function validOperation(value){return typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{3,95}$/.test(value);}
+function empty(operation){return {schema:config.schema,policy_id:config.policy_id,guide_sha256:config.guide_sha256,
+ policy_sha256:config.policy_sha256,operation_id:operation,actor:'shujie',review_mode:'owner_self_review',
+ execution_authorized:false,w06_issued:false,fields:{},tasks:{},updated_at:null};}
+function validateProgress(value){
+ if(!value || value.schema!==config.schema || value.policy_id!==config.policy_id || value.guide_sha256!==config.guide_sha256 ||
+ value.policy_sha256!==config.policy_sha256 || !validOperation(value.operation_id) || value.actor!=='shujie' ||
+ value.review_mode!=='owner_self_review' || value.execution_authorized!==false || value.w06_issued!==false ||
+ !value.tasks || typeof value.tasks!=='object' || Array.isArray(value.tasks) || !value.fields || typeof value.fields!=='object' || Array.isArray(value.fields)) throw Error('进度版本、操作身份或范围不匹配');
+ for(const [id,item] of Object.entries(value.tasks)){
+  if(!config.task_ids.includes(id) || !item || typeof item.done!=='boolean' || typeof item.time!=='string' || typeof item.note!=='string') throw Error('待办记录格式不匹配');
+ }
+ for(const [id,text] of Object.entries(value.fields)) if(!fieldIds.includes(id) || typeof text!=='string') throw Error('窗口字段不匹配');
+ return value;
+}
+function save(){
+ state.updated_at=new Date().toISOString();
+ let message='已保存本机草稿';
+ try{localStorage.setItem(key(state.operation_id),JSON.stringify(state));}catch(error){message='浏览器未能保存，请立即导出 JSON';}
+ const count=config.task_ids.filter(id=>state.tasks[id]?.done).length;
+ byId('status').textContent=state.operation_id+' · '+count+' / '+config.task_ids.length+' 项 · '+message+'；不代表生产授权';
+}
+function show(next){
+ state=next;byId('operation').value=state.operation_id;
+ byId('export').disabled=false;
+ for(const id of fieldIds){byId(id).disabled=false;byId(id).value=state.fields[id]||'';}
+ for(const id of config.task_ids){
+  const row=state.tasks[id]||{done:false,time:'',note:''};
+  for(const prefix of ['done','time','note']) byId(prefix+'-'+id).disabled=false;
+  byId('done-'+id).checked=row.done;byId('time-'+id).value=row.time;byId('note-'+id).value=row.note;
+  document.querySelector('[data-task="'+id+'"]').dataset.done=String(row.done);
+ }
+ save();
+}
+byId('load').addEventListener('click',()=>{
+ try{const operation=byId('operation').value.trim();if(!validOperation(operation))throw Error('操作 ID 须为 4–96 位字母、数字、下划线或短横线');
+ let raw=null;try{raw=localStorage.getItem(key(operation));}catch(error){}
+ show(raw?validateProgress(JSON.parse(raw)):empty(operation));
+ }catch(error){byId('status').textContent=error.message;}
+});
+for(const id of config.task_ids){
+ for(const prefix of ['done','time','note']) byId(prefix+'-'+id).addEventListener(prefix==='done'?'change':'input',()=>{
+  if(!state)return;
+  const done=byId('done-'+id).checked;
+  if(prefix==='done' && done && !byId('time-'+id).value)byId('time-'+id).value=new Date().toISOString();
+  state.tasks[id]={done,time:byId('time-'+id).value,note:byId('note-'+id).value};
+  document.querySelector('[data-task="'+id+'"]').dataset.done=String(done);save();
+ });
+}
+for(const id of fieldIds)byId(id).addEventListener('input',()=>{if(state){state.fields[id]=byId(id).value;save();}});
+byId('export').addEventListener('click',()=>{
+ if(!state)return;save();const blob=new Blob([JSON.stringify(state,null,2)+'\n'],{type:'application/json'});
+ const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=state.operation_id+'-progress.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+byId('import-button').addEventListener('click',()=>byId('import').click());
+byId('import').addEventListener('change',async()=>{
+ try{const file=byId('import').files[0];if(!file)return;if(file.size>1048576)throw Error('进度文件超出 1 MiB');
+ const next=validateProgress(JSON.parse(await file.text()));
+ if(confirm('导入 '+next.operation_id+' 的进度？将替换此操作当前的本机草稿。'))show(next);
+ }catch(error){byId('status').textContent='导入失败：'+error.message;}finally{byId('import').value='';}
+});
+</script></body></html>
