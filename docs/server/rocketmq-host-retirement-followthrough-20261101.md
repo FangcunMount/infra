@@ -2,6 +2,8 @@
 
 本轮按宿主工程退役M1～M5后续规划实际推进。最新结果见[结构化回执](../evidence/2026-11-01-host-retirement-followthrough.json)；首批生产发布仍以[M5回执](rocketmq-host-retirement-m5-production-release.md)为准，不能与更早RocketMQ同名里程碑计数混用。
 
+F04 于 2026-11-11 完成 AI 43→44 生产窗口、W10 和两地保护归档。其余四个候选对象和 F02、F07 各自继续签收。下文 F04 的 Draft、43 和待入窗状态记录的是早期快照。[AI 正式生产回执](rocketmq-host-retirement-ai-246-production-closeout-20261111.md)
+
 ## 分析目标
 
 排障：查明QS业务聚合观察不可用与51条原事务锚点缺失的证据路径，补齐可核验的历史来源；同时固化发布后基线、修复实际漏报的运行快照并准备一次具名生产业务验收。

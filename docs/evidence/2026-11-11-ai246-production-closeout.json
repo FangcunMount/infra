@@ -1,0 +1,77 @@
+{
+  "schema": "ai246-production-44-window-closeout/v1",
+  "operation": "ai246-20261111-144140-db",
+  "status": "production_released_W10_pass",
+  "data_owner": "shujie",
+  "recovery_owner": "shujie",
+  "delegate": "Codex",
+  "source": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+  "image": "sha256:e6afea10afbd5aca74d1eb67f5a3af417759cc0a754bcac668ccd5ed81d9470e",
+  "production_database_head": [
+    "0044_empty_publisher"
+  ],
+  "target_removed": "ai.messaging_outbox",
+  "target_was_empty": true,
+  "production_ddl": true,
+  "sql111_replayed": false,
+  "retained_tables": 49,
+  "retained_identical_at_W08": true,
+  "retained_identical_after_5_min": true,
+  "full_backup_tables": 51,
+  "full_backup_rows": 8445,
+  "backup_sha256": "12eebe67db0a41f415491d83ce33fb31a154a0417a52ee85560f793077327cba",
+  "review_sha256": "d7fcb323d44dc76a0e005d314c26c14fadf0608ab7195c7208a9ab003259c830",
+  "marker_sha256": "47ddc48ddb411b057244a7f4ffa363201d3fa822ecad3ffbbef02cfd11b9fcc3",
+  "admin_run": 42974630989,
+  "production_reopened_at": "2026-11-11T06:52:00.394393+00:00",
+  "final_observed_at": "2026-11-11T06:57:21.787672+00:00",
+  "closed_at": "2026-11-11T06:58:00.320304+00:00",
+  "runtime_healthy": true,
+  "runtime_restarts": 0,
+  "observation_seconds": 321.393,
+  "broker_original_pending_preserved": 8,
+  "ai_current_ack_pending": 0,
+  "qs_historical_ack_aggregate_available": false,
+  "additional_named_business_case_submitted": false,
+  "freeze": {
+    "ai_auto_deploy": false,
+    "qs_cd": "disabled_manually"
+  },
+  "minimum_retention_days": 30,
+  "extend_unresolved": true,
+  "automatic_cleanup": false,
+  "archive_receipt_required_for_batch_close": true,
+  "window_observation": {
+    "route": "named_direct",
+    "passed": true
+  },
+  "protection_archive": {
+    "archive_bytes": 26828633,
+    "archive_sha256": "3a14a4e651f77059136b5e44b8d9282003dce5594b8bde79e113f2cda4a7ee48",
+    "MacBook_readback_verified": true,
+    "servera_readback_verified": true,
+    "original_members_verified": 150,
+    "fsynced": true,
+    "recorded_at": "2026-11-11T06:58:11.452356+00:00"
+  },
+  "window_backup_isolated_recovery": {
+    "qualified": true,
+    "source_backup": "12eebe67db0a41f415491d83ce33fb31a154a0417a52ee85560f793077327cba",
+    "production": false,
+    "production_DDL": false,
+    "production_DML": false,
+    "restore": {
+      "head": "0043_native_transaction_limit",
+      "tables": 51,
+      "total_rows": 8445,
+      "all_definitions_columns_and_original_bytes_identical": true
+    },
+    "verify_new_connection": {
+      "head": "0043_native_transaction_limit",
+      "tables": 51,
+      "total_rows": 8445,
+      "all_definitions_columns_and_original_bytes_identical": true
+    }
+  },
+  "original_locks_released": true
+}

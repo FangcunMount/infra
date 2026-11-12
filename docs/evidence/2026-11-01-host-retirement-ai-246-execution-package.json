@@ -2590,5 +2590,17 @@
     "production_DDL": false,
     "business_DML": false,
     "production_approval_issued_or_consumed": false
+  },
+  "current_review_policy": {
+    "policy_id": "AI246-20261111-SHUJIE-SELF-REVIEW",
+    "record": "2026-11-11-ai246-self-review-policy.json",
+    "review_mode": "owner_self_review",
+    "operator": "shujie",
+    "reviewer": "shujie",
+    "supersedes": "two-person separation for this AI246 operation only; preserve original dated records",
+    "window_authorized": false,
+    "execution_authorized": false,
+    "w06_issued": false,
+    "current_guide": "../server/rocketmq-host-retirement-ai-246-self-review-20261111.md"
   }
 }
