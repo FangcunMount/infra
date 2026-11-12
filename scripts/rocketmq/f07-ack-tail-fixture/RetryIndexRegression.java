@@ -13,12 +13,14 @@ import org.apache.rocketmq.common.message.MessageDecoder;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.store.MessageStore;
 import org.apache.rocketmq.store.SelectMappedBufferResult;
+import org.apache.rocketmq.store.pop.PopCheckPoint;
 import org.apache.rocketmq.store.queue.ConsumeQueueInterface;
 import org.apache.rocketmq.store.queue.CqUnit;
 
 public final class RetryIndexRegression {
     private static final String TOPIC = "%RETRY%f07-fixture";
     private static final String WITNESS = "fixture-original-checkpoint";
+    private static final String SOURCE_WITNESS = "fixture-source-checkpoint";
     private static final byte[] BODY = "original synthetic body".getBytes(StandardCharsets.UTF_8);
     private static final InetSocketAddress HOST = new InetSocketAddress("127.0.0.1", 10911);
 
@@ -61,12 +63,55 @@ public final class RetryIndexRegression {
         Fixture racingRetention = new Fixture(4100, 4120);
         racingRetention.rotateDuringRead = true;
         reject(racingRetention, racingRetention.position(4110), "changed during the scan");
-        System.out.println("F07 retained retry index: 9 controls passed");
+        Fixture rewritten = new Fixture(4100, 4120);
+        rewritten.markers.add(4116L);
+        rewritten.stableMarkers.add(4116L);
+        rewritten.legacyKey = "earlier-batch-start";
+        require(rewritten.find(rewritten.position(4110), true) == rewritten.position(4116),
+            "rewritten batch member did not reuse its source witness");
+
+        Fixture ambiguousLegacy = new Fixture(4100, 4120);
+        ambiguousLegacy.markers.add(4116L);
+        ambiguousLegacy.legacyKey = "earlier-batch-start";
+        reject(ambiguousLegacy, ambiguousLegacy.position(4110), true, "cannot prove the retained legacy retry");
+
+        Fixture conflictingWitnesses = new Fixture(4100, 4120);
+        conflictingWitnesses.markers.add(4116L);
+        conflictingWitnesses.stableMarkers.add(4116L);
+        conflictingWitnesses.stableKey = "wrong-source";
+        reject(conflictingWitnesses, conflictingWitnesses.position(4110), "identities disagree");
+
+        MessageExt second = new MessageExt();
+        second.setQueueOffset(91);
+        second.setCommitLogOffset(47000);
+        PopCheckPoint batch = checkpoint(90, 2000);
+        PopCheckPoint split = checkpoint(91, 2000);
+        require(!PopReviveService.reviveWitness("broker", batch, second)
+            .equals(PopReviveService.reviveWitness("broker", split, second)), "legacy difference not exercised");
+        String original = PopReviveService.reviveSourceWitness("broker", batch, second);
+        require(original.equals(PopReviveService.reviveSourceWitness("broker", split, second)),
+            "source witness changed at split");
+        require(!original.equals(PopReviveService.reviveSourceWitness("broker", checkpoint(91, 2001), second)),
+            "separate POP time shared a witness");
+        System.out.println("F07 retained retry index: 13 controls passed");
+    }
+
+    private static PopCheckPoint checkpoint(long start, long pop) {
+        PopCheckPoint point = new PopCheckPoint();
+        point.setTopic("f07-fixture-source");
+        point.setCId("f07-fixture-group");
+        point.setStartOffset(start);
+        point.setPopTime(pop);
+        return point;
     }
 
     private static void reject(Fixture fixture, long source, String reason) throws Exception {
+        reject(fixture, source, false, reason);
+    }
+
+    private static void reject(Fixture fixture, long source, boolean rewritten, String reason) throws Exception {
         try {
-            fixture.find(source);
+            fixture.find(source, rewritten);
         } catch (IllegalStateException failure) {
             require(failure.getMessage().contains(reason), failure.toString());
             return;
@@ -90,6 +135,9 @@ public final class RetryIndexRegression {
         private int indexReads;
         private int recordReads;
         private final Set<Long> markers = new HashSet<>();
+        private final Set<Long> stableMarkers = new HashSet<>();
+        private String legacyKey = WITNESS;
+        private String stableKey = SOURCE_WITNESS;
 
         Fixture(long minimum, long exclusiveEnd) {
             this.minimum = minimum;
@@ -101,6 +149,10 @@ public final class RetryIndexRegression {
         }
 
         long find(long sourcePosition) throws Exception {
+            return find(sourcePosition, false);
+        }
+
+        long find(long sourcePosition, boolean rewritten) throws Exception {
             ConsumeQueueInterface index = (ConsumeQueueInterface) Proxy.newProxyInstance(
                 getClass().getClassLoader(), new Class<?>[]{ConsumeQueueInterface.class}, (self, method, args) -> {
                     switch (method.getName()) {
@@ -141,7 +193,7 @@ public final class RetryIndexRegression {
             source.setCommitLogOffset(sourcePosition);
             source.setBody(BODY);
             MessageAccessor.putProperty(source, MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX, "same-message");
-            return PopReviveService.findReviveWitness(store, TOPIC, 0, WITNESS, source);
+            return PopReviveService.findReviveWitness(store, TOPIC, 0, WITNESS, SOURCE_WITNESS, rewritten, source);
         }
 
         private byte[] record(long offset) throws Exception {
@@ -152,10 +204,14 @@ public final class RetryIndexRegression {
             message.setCommitLogOffset(position(offset));
             message.setBornHost(HOST);
             message.setStoreHost(HOST);
+            message.setReconsumeTimes(1);
             message.setBody(offset == badBodyOffset ? new byte[]{1} : BODY);
             MessageAccessor.putProperty(message, MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX, "same-message");
             if (markers.contains(offset)) {
-                MessageAccessor.putProperty(message, "F07_REVIVE_WITNESS", WITNESS);
+                MessageAccessor.putProperty(message, "F07_REVIVE_WITNESS", legacyKey);
+            }
+            if (stableMarkers.contains(offset)) {
+                MessageAccessor.putProperty(message, "F07_REVIVE_SOURCE_WITNESS", stableKey);
             }
             return MessageDecoder.encode(message, false);
         }
