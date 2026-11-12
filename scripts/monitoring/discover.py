@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run on the Mac mini; discover every cloud replica through restricted SSH."""
+"""Discover cloud replicas through the existing monitoring inventory helper."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
@@ -10,6 +10,11 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+
+
+LOCAL_INVENTORY = '/usr/local/sbin/infra-monitoring-discovery'
+DIRECT_PORTS = {'iam': 9080, 'qs-ai': 8000, 'qs-apiserver': 8080,
+                'qs-collection-server': 8080, 'qs-worker': 9092}
 
 
 def groups(items, gateway):
@@ -23,7 +28,7 @@ def groups(items, gateway):
         job = item['job']
         if ipaddress.ip_address(ip) not in ipaddress.ip_network('172.20.0.0/24') or port not in {8000, 8080, 9080, 9092}:
             raise ValueError('unexpected endpoint')
-        if job not in {'iam', 'qs-ai', 'qs-apiserver', 'qs-collection-server', 'qs-worker'}:
+        if job not in DIRECT_PORTS:
             raise ValueError('unexpected job')
         if (job == 'iam') != (port == 9080) or (job == 'iam' and item['instance'] != 'iam-apiserver:9080'):
             raise ValueError('unexpected IAM monitoring identity')
@@ -36,10 +41,17 @@ def groups(items, gateway):
         if key in seen:
             raise ValueError('duplicate monitored instance')
         seen.add(key)
-        labels = {'job': job, 'instance': instance, '__metrics_path__': f'/metrics/{ip}/{port}'}
+        labels = {'job': job, 'instance': instance}
         if 'component' in item:
             labels['component'] = item['component']
-        out.append({'targets': [gateway], 'labels': labels})
+        if gateway is None:
+            if port != DIRECT_PORTS[job]:
+                raise ValueError('unexpected direct scrape port')
+            address = f'{ip}:{port}'
+        else:
+            labels['__metrics_path__'] = f'/metrics/{ip}/{port}'
+            address = gateway
+        out.append({'targets': [address], 'labels': labels})
     return out
 
 
@@ -57,15 +69,20 @@ def log_source(name, *fields, file=None):
 
 def refresh_source(config, source):
     target = Path(config['output']) / (source['name'] + '.json')
+    direct = config.get('target_mode') == 'direct'
     try:
-        result = subprocess.run([
-            '/usr/bin/ssh', '-i', config['identity'], '-o', 'IdentitiesOnly=yes',
-            '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes',
-            '-o', 'UserKnownHostsFile=' + config['known_hosts'], '-o', 'ConnectTimeout=10',
-            '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=2',
-            'root@' + source['host'],
-        ], text=True, capture_output=True, timeout=35, check=True)
-        value = groups(json.loads(result.stdout), config['gateway'])
+        if direct and source.get('transport') == 'local':
+            command = [LOCAL_INVENTORY]
+        else:
+            command = [
+                '/usr/bin/ssh', '-i', config['identity'], '-o', 'IdentitiesOnly=yes',
+                '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes',
+                '-o', 'UserKnownHostsFile=' + config['known_hosts'], '-o', 'ConnectTimeout=10',
+                '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=2',
+                'root@' + source['host'],
+            ]
+        result = subprocess.run(command, text=True, capture_output=True, timeout=35, check=True)
+        value = groups(json.loads(result.stdout), None if direct else config['gateway'])
         atomic_write(target, value)
         log_source(source['name'], 'targets', len(value))
     except (subprocess.SubprocessError, ValueError, TypeError, KeyError, OSError) as exc:
@@ -82,6 +99,14 @@ def discover(config):
     names = {source['name'].casefold() for source in sources}
     if len(names) != len(sources):
         raise ValueError('duplicate discovery source name')
+    mode = config.get('target_mode', 'gateway')
+    if mode not in {'gateway', 'direct'}:
+        raise ValueError('unexpected discovery target mode')
+    transports = [source.get('transport', 'ssh') for source in sources]
+    if mode == 'direct' and sorted(transports) != ['local', 'ssh']:
+        raise ValueError('direct discovery requires one local and one SSH source')
+    if mode == 'gateway' and (any(transport != 'ssh' for transport in transports) or not config['gateway']):
+        raise ValueError('gateway discovery requires SSH sources and a gateway address')
     # Each source publishes its own file as soon as SSH completes.
     with ThreadPoolExecutor(max_workers=2) as pool:
         pending = [pool.submit(refresh_source, config, source) for source in sources]

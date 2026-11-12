@@ -165,6 +165,52 @@ class DiscoveryTests(unittest.TestCase):
                 local.discover(config)
             ssh.assert_not_called()
 
+    def test_direct_discovery_preserves_labels_and_follows_container_replacement(self):
+        first = remote.endpoints([container('qs-collection-1', '172.20.0.11', 'qs-collection-server')])
+        replacement = remote.endpoints([container('qs-collection-1', '172.20.0.15', 'qs-collection-server')])
+        worker = remote.endpoints([container('worker-1', '172.20.0.21', 'qs-worker', 9092)])
+        with tempfile.TemporaryDirectory() as output:
+            config = {'target_mode': 'direct', 'output': output, 'identity': 'dedicated-key',
+                      'known_hosts': 'pinned-hosts', 'sources': [
+                          {'name': 'serverA', 'transport': 'local'},
+                          {'name': 'serverD', 'host': 'serverd'}]}
+            source_a = Path(output) / 'serverA.json'
+            source_d = Path(output) / 'serverD.json'
+            local_inventories = iter((first, replacement))
+
+            def run(command, **options):
+                if command == [local.LOCAL_INVENTORY]:
+                    payload = next(local_inventories)
+                else:
+                    self.assertEqual(command[-1], 'root@serverd')
+                    self.assertIn('StrictHostKeyChecking=yes', command)
+                    self.assertIn('UserKnownHostsFile=pinned-hosts', command)
+                    payload = worker
+                return subprocess.CompletedProcess(command, 0, stdout=json.dumps(payload))
+
+            with patch.object(local.subprocess, 'run', side_effect=run):
+                self.assertEqual(local.discover(config), 0)
+                self.assertEqual(json.loads(source_a.read_text())[0]['targets'], ['172.20.0.11:8080'])
+                self.assertEqual(local.discover(config), 0)
+            self.assertEqual(json.loads(source_a.read_text()), [{
+                'targets': ['172.20.0.15:8080'],
+                'labels': {'job': 'qs-collection-server', 'instance': '172.20.0.15:8080'},
+            }])
+            self.assertEqual(json.loads(source_d.read_text()), [{
+                'targets': ['172.20.0.21:9092'],
+                'labels': {'job': 'qs-worker', 'instance': 'worker-1', 'component': 'qs-worker'},
+            }])
+
+    def test_direct_scrape_rejects_wrong_job_port_and_unknown_transports(self):
+        with self.assertRaisesRegex(ValueError, 'unexpected direct scrape port'):
+            local.groups([{'job': 'qs-worker', 'port': 8080, 'ip': '172.20.0.21', 'instance': 'worker'}], None)
+        config = {'target_mode': 'direct', 'sources': [
+            {'name': 'serverA', 'transport': 'local'}, {'name': 'serverD', 'transport': 'other'}]}
+        with patch.object(local.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, 'one local and one SSH source'):
+                local.discover(config)
+            run.assert_not_called()
+
 
 if __name__ == '__main__':
     unittest.main()
