@@ -19,7 +19,7 @@
 @@ -68,0 +81,2 @@
 +    private static final int ACK_TAIL_LOOKBACK = 128;
 +    private static final int ACK_TAIL_SCAN_LIMIT = 32;
-@@ -107,6 +121,9 @@
+@@ -107,6 +121,199 @@
 -    private boolean reviveRetry(PopCheckPoint popCheckPoint, MessageExt messageExt) {
 -        MessageExtBrokerInner msgInner = new MessageExtBrokerInner();
 -        if (!popCheckPoint.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
@@ -27,6 +27,7 @@
 -        } else {
 -            msgInner.setTopic(popCheckPoint.getTopic());
 +    private static final String REVIVE_WITNESS = "F07_REVIVE_WITNESS";
++    private static final String REVIVE_SOURCE_WITNESS = "F07_REVIVE_SOURCE_WITNESS";
 +    private static final Object[] REVIVE_APPEND_LOCKS = new Object[64];
 +    static {
 +        Arrays.setAll(REVIVE_APPEND_LOCKS, index -> new Object());
@@ -34,12 +35,14 @@
 +
 +    private boolean reviveRetry(PopCheckPoint checkpoint, MessageExt source) {
 +        if (!Boolean.getBoolean("fangcun.standaloneReviveAppendCandidate")) {
-+            return appendReviveRetry(checkpoint, source, null);
-@@ -113,0 +131,165 @@
++            return appendReviveRetry(checkpoint, source, null, null);
++        }
 +        requireStandaloneReviveStore();
 +        String retryTopic = retryTopic(checkpoint);
-+        String key = reviveWitness(checkpoint, source);
-+        Object lock = REVIVE_APPEND_LOCKS[key.hashCode() & (REVIVE_APPEND_LOCKS.length - 1)];
++        String sourceBroker = StringUtils.defaultIfBlank(checkpoint.getBrokerName(), brokerController.getBrokerConfig().getBrokerName());
++        String key = reviveWitness(sourceBroker, checkpoint, source);
++        String sourceKey = reviveSourceWitness(sourceBroker, checkpoint, source);
++        Object lock = REVIVE_APPEND_LOCKS[sourceKey.hashCode() & (REVIVE_APPEND_LOCKS.length - 1)];
 +        synchronized (lock) {
 +            addRetryTopicIfNotExist(retryTopic, checkpoint.getCId());
 +            int retryQueue = getRetryQueueId(retryTopic, source);
@@ -48,14 +51,15 @@
 +                if (brokerController.getMessageStoreByBrokerName(checkpoint.getBrokerName()) != store) {
 +                    throw new IllegalStateException("retry witness source must be in the same local CommitLog");
 +                }
-+                long existing = findReviveWitness(store, retryTopic, retryQueue, key, source);
++                long existing = findReviveWitness(store, retryTopic, retryQueue, key, sourceKey,
++                    checkpoint.parseRePutTimes() > 0, source);
 +                if (existing >= 0) {
 +                    System.err.println("F07_REVIVE_CANDIDATE event=reused key=" + key
 +                        + " ck_queue=" + queueId + " ck_offset=" + checkpoint.getReviveOffset()
 +                        + " commit_log=" + existing + " pop_time=" + checkpoint.getPopTime());
 +                    return true;
 +                }
-+                return appendReviveRetry(checkpoint, source, key);
++                return appendReviveRetry(checkpoint, source, key, sourceKey);
 +            } catch (RuntimeException failure) {
 +                POP_LOGGER.error("Cannot verify retained revive witness", failure);
 +                return false;
@@ -80,11 +84,22 @@
 +                brokerController.getBrokerConfig().isEnableRetryTopicV2());
 +    }
 +
-+    private String reviveWitness(PopCheckPoint checkpoint, MessageExt source) {
-+        String broker = StringUtils.defaultIfBlank(checkpoint.getBrokerName(), brokerController.getBrokerConfig().getBrokerName());
-+        String canonical = JSON.toJSONString(Arrays.asList(broker, checkpoint.getCId(), checkpoint.getTopic(),
++    static String reviveWitness(String broker, PopCheckPoint checkpoint, MessageExt source) {
++        return witnessDigest(Arrays.asList(broker, checkpoint.getCId(), checkpoint.getTopic(),
 +            checkpoint.getQueueId(), checkpoint.getStartOffset(), checkpoint.getPopTime(),
 +            source.getQueueOffset(), source.getCommitLogOffset(), source.getReconsumeTimes()));
++    }
++
++    static String reviveSourceWitness(String broker, PopCheckPoint checkpoint, MessageExt source) {
++        // A failed member of a batch gets its own start offset in rePutCK.
++        // The original POP time and physical source still identify the same work.
++        return witnessDigest(Arrays.asList("f07-revive-source-v1", broker, checkpoint.getCId(), checkpoint.getTopic(),
++            checkpoint.getQueueId(), checkpoint.getPopTime(), source.getQueueOffset(),
++            source.getCommitLogOffset(), source.getReconsumeTimes()));
++    }
++
++    private static String witnessDigest(List<?> identity) {
++        String canonical = JSON.toJSONString(identity);
 +        try {
 +            byte[] hash = MessageDigest.getInstance("SHA-256").digest(canonical.getBytes(StandardCharsets.UTF_8));
 +            StringBuilder hex = new StringBuilder(hash.length * 2);
@@ -98,7 +113,8 @@
 +        }
 +    }
 +
-+    static long findReviveWitness(MessageStore store, String topic, int queue, String key, MessageExt source) {
++    static long findReviveWitness(MessageStore store, String topic, int queue, String key, String sourceKey,
++        boolean rewritten, MessageExt source) {
 +        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(3);
 +        while (store.dispatchBehindBytes() != 0) {
 +            if (System.nanoTime() >= deadline) {
@@ -126,6 +142,8 @@
 +        // A retry was appended after its source, even across file rotation.
 +        long first = firstRetryAfterSource(index, lower, upper, sourcePosition);
 +        long found = -1;
++        boolean uncertainLegacy = false;
++        String sourceId = source.getProperty(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX);
 +        long previousPosition = sourcePosition;
 +        for (long offset = first; offset < upper; offset++) {
 +            CqUnit entry = requireRetryIndexEntry(index, offset);
@@ -144,14 +162,24 @@
 +                    || retained.getStoreSize() != entry.getSize()) {
 +                    throw new IllegalStateException("retry witness physical identity mismatch");
 +                }
-+                if (key.equals(retained.getProperty(REVIVE_WITNESS))) {
++                String storedKey = retained.getProperty(REVIVE_WITNESS);
++                String storedSourceKey = retained.getProperty(REVIVE_SOURCE_WITNESS);
++                boolean legacyMatch = key.equals(storedKey);
++                boolean sourceMatch = sourceKey.equals(storedSourceKey);
++                boolean sameMessage = java.util.Objects.equals(sourceId,
++                    retained.getProperty(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX))
++                    && retained.getReconsumeTimes() == source.getReconsumeTimes() + 1;
++                if (legacyMatch || sourceMatch) {
++                    if ((legacyMatch && storedSourceKey != null && !sourceMatch) || (sourceMatch && storedKey == null)) {
++                        throw new IllegalStateException("retry witness identities disagree");
++                    }
 +                    MessageExt match = MessageDecoder.decode(raw.getByteBuffer().duplicate(), true, true);
-+                    if (found >= 0 || match == null || !Arrays.equals(source.getBody(), match.getBody())
-+                        || !java.util.Objects.equals(source.getProperty(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX),
-+                            retained.getProperty(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX))) {
++                    if (found >= 0 || match == null || !sameMessage || !Arrays.equals(source.getBody(), match.getBody())) {
 +                        throw new IllegalStateException("retry witness is ambiguous or differs from the source");
 +                    }
 +                    found = entry.getPos();
++                } else if (rewritten && storedKey != null && storedSourceKey == null && sameMessage) {
++                    uncertainLegacy = true;
 +                }
 +            } finally {
 +                raw.release();
@@ -161,6 +189,9 @@
 +        if (store.getConsumeQueue(topic, queue) != index || index.getMinOffsetInQueue() != lower
 +            || index.getMaxOffsetInQueue() < upper) {
 +            throw new IllegalStateException("retry witness ConsumeQueue changed during the scan");
++        }
++        if (found < 0 && uncertainLegacy) {
++            throw new IllegalStateException("rewritten checkpoint cannot prove the retained legacy retry identity");
 +        }
 +        return found;
 +    }
@@ -194,43 +225,44 @@
 +        if (entry == null || entry.getQueueOffset() != offset || entry.getPos() < 0 || entry.getSize() <= 0
 +            || entry.getBatchNum() != 1) {
 +            throw new IllegalStateException("retry witness ConsumeQueue entry is unavailable");
-+        }
+@@ -113,0 +321,6 @@
 +        return entry;
 +    }
 +
-+    private boolean appendReviveRetry(PopCheckPoint popCheckPoint, MessageExt messageExt, String witness) {
++    private boolean appendReviveRetry(PopCheckPoint popCheckPoint, MessageExt messageExt, String witness, String sourceWitness) {
 +        MessageExtBrokerInner msgInner = new MessageExtBrokerInner();
 +        msgInner.setTopic(retryTopic(popCheckPoint));
-@@ -134,0 +317,3 @@
+@@ -134,0 +348,4 @@
 +        if (witness != null) {
 +            msgInner.getProperties().put(REVIVE_WITNESS, witness);
++            msgInner.getProperties().put(REVIVE_SOURCE_WITNESS, sourceWitness);
 +        }
-@@ -148,0 +334,6 @@
+@@ -148,0 +366,6 @@
 +        }
 +        if (witness != null) {
 +            System.err.println("F07_REVIVE_CANDIDATE event=appended key=" + witness
 +                + " ck_queue=" + queueId + " ck_offset=" + popCheckPoint.getReviveOffset()
 +                + " commit_log=" + putMessageResult.getAppendMessageResult().getWroteOffset()
 +                + " pop_time=" + popCheckPoint.getPopTime());
-@@ -338,0 +530,5 @@
+@@ -338,0 +562,5 @@
 +        Map<String, RetryAck> matchedRetryAcks = new HashMap<>();
 +        boolean reconcile = Boolean.getBoolean("fangcun.standaloneReviveAppendCandidate");
 +        if (reconcile) {
 +            requireStandaloneReviveStore();
 +        }
-@@ -423,0 +620,3 @@
+@@ -423,0 +652,3 @@
 +                            if (reconcile) {
 +                                rememberMatchedRetryAck(matchedRetryAcks, point, ackMsg.getAckOffset(), messageExt);
 +                            }
-@@ -452,0 +652,3 @@
+@@ -452,0 +684,3 @@
 +                                if (reconcile) {
 +                                    rememberMatchedRetryAck(matchedRetryAcks, point, ackOffset, messageExt);
 +                                }
-@@ -465,0 +668,3 @@
+@@ -465,0 +700,3 @@
 +        if (reconcile && !matchedRetryAcks.isEmpty()) {
 +            closeOlderRetryCheckpoints(map, matchedRetryAcks);
 +        }
-@@ -469,0 +675,74 @@
+@@ -469,0 +707,74 @@
 +    private String retryAckIdentity(PopCheckPoint checkpoint, long sourceOffset) {
 +        String broker = StringUtils.defaultIfBlank(checkpoint.getBrokerName(), brokerController.getBrokerConfig().getBrokerName());
 +        return JSON.toJSONString(Arrays.asList(broker, checkpoint.getCId(), checkpoint.getTopic(),
@@ -305,11 +337,11 @@
 +        }
 +    }
 +
-@@ -551,0 +831,3 @@
+@@ -551,0 +863,3 @@
 +        if (Boolean.getBoolean("fangcun.standaloneReviveAppendCandidate")) {
 +            newOffset = advanceVerifiedAckTail(newOffset);
 +        }
-@@ -555,0 +838,106 @@
+@@ -555,0 +870,106 @@
 +    private long advanceVerifiedAckTail(long committed) {
 +        if (committed < 0 || !shouldRunPopRevive || !inflightReviveRequestMap.isEmpty()) {
 +            return committed;
