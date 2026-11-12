@@ -80,6 +80,7 @@ jobs:
         run: |
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-readable:5.5.1 components/rocketmq
+          bash scripts/rocketmq/f07-ack-tail-fixture/build.sh
       - name: Real public Go/Python SDK with readable resources
         env:
           READABLE_PROFILE: ${{ matrix.profile }}
@@ -94,7 +95,7 @@ jobs:
             exit 1
           fi
           python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python --readable-routes \
-            "${options[@]}" --sdk "$PWD/.sdk-acceptance" --image rocketmq-readable:5.5.1 \
+            "${options[@]}" --sdk "$PWD/.sdk-acceptance" --image rocketmq-readable:f07-ack-tail \
             --mysql-image '${{ matrix.mysql }}' --report rocketmq-readable-sdk.json
       - name: Require complete original matrix and future-checkpoint controls
         if: always()
