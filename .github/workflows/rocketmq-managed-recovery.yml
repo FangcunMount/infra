@@ -25,6 +25,7 @@ env:
   GOTOOLCHAIN: local
 jobs:
   published-cli-original-mysql-native-recovery:
+    if: github.ref_name != 'codex/f07-qs-dual-exact-448-20261114'
     name: Managed recovery on the isolated Broker candidate (${{ matrix.mode }})
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -142,19 +143,21 @@ jobs:
   actual-qs-dual-original-primary-recovery:
     if: >-
       github.event_name == 'workflow_dispatch' && inputs.qs_dual_original &&
-      (github.ref_name == 'main' || github.ref_name == 'codex/f07-qs-shared-native-20261111')
+      (github.ref_name == 'main' || github.ref_name == 'codex/f07-qs-shared-native-20261111' ||
+       (github.repository == 'FangcunMount/infra' && github.ref_name == 'codex/f07-qs-dual-exact-448-20261114'))
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
+      INFRA_FIXTURE_SHA: ${{ github.ref_name == 'codex/f07-qs-dual-exact-448-20261114' && '1d67f7aca0d80871107b2a81f1c7fa6889e2c3ba' || github.sha }}
       QS_FIXTURE_SHA: 6cc4cc9d10d71c878a148545614d6fe564080c58
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ env.INFRA_FIXTURE_SHA }}
       - name: Validate exact fixture identity and Mongo cleanup query
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "$INFRA_FIXTURE_SHA"
           python3 - <<'PY'
           import ast
           from pathlib import Path
@@ -218,13 +221,24 @@ jobs:
       - name: Fixed Broker archive verification
         run: bash scripts/rocketmq/fetch-release.sh
       - name: Fresh fixed isolated Broker
-        run: docker build --no-cache -t rocketmq-managed-recovery:5.5.1 components/rocketmq
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_REF_NAME" = 'codex/f07-qs-dual-exact-448-20261114' ]; then
+            docker build --no-cache -t rocketmq-readable:5.5.1 components/rocketmq
+            bash scripts/rocketmq/f07-ack-tail-fixture/build.sh
+          else
+            docker build --no-cache -t rocketmq-managed-recovery:5.5.1 components/rocketmq
+          fi
       - name: Real exhausted half, compiled CLI, SDK RPC and separate governance approval
         run: |
           set -euo pipefail
           umask 077
+          image=rocketmq-managed-recovery:5.5.1
+          if [ "$GITHUB_REF_NAME" = 'codex/f07-qs-dual-exact-448-20261114' ]; then
+            image=rocketmq-readable:f07-ack-tail
+          fi
           python3 scripts/rocketmq/ci-native-recheck.py --sdk "$PWD/.sdk-acceptance" \
-            --image rocketmq-managed-recovery:5.5.1 --managed-tool "$RUNNER_TEMP/native-recovery" \
+            --image "$image" --managed-tool "$RUNNER_TEMP/native-recovery" \
             --qs-host "$PWD/.qs-acceptance" --host-observer "$RUNNER_TEMP/host-observer" \
             --qs-observed-check-budget --report qs-native-recovery.json
       - name: Nonempty exact dual owner recovery and cleanup
@@ -239,8 +253,8 @@ jobs:
           if not isinstance(stage,str) or not re.fullmatch(r'[a-zA-Z0-9_.:-]{1,120}',stage):
             stage=None
           cases={k:v for k,v in x.get('cases',{}).items() if re.fullmatch(r'[a-zA-Z0-9_.:-]{1,160}',k) and v in ('pass','fail','skip')}
-          print(json.dumps(dict(fixture_sha=os.environ['GITHUB_SHA'],passed=x.get('passed'),failed=x.get('failed'),skipped=x.get('skipped'),failure_stage=stage,cases=cases,cleanup=x.get('cleanup')),sort_keys=True),flush=True)
-          assert x['infra_sha']==os.environ['GITHUB_SHA'] and x['schema']=='m3-qs-managed-recovery/v1'
+          print(json.dumps(dict(fixture_sha=os.environ['INFRA_FIXTURE_SHA'],passed=x.get('passed'),failed=x.get('failed'),skipped=x.get('skipped'),failure_stage=stage,cases=cases,cleanup=x.get('cleanup')),sort_keys=True),flush=True)
+          assert x['infra_sha']==os.environ['INFRA_FIXTURE_SHA'] and x['schema']=='m3-qs-managed-recovery/v1'
           assert x['passed']==23 and x['failed']==x['skipped']==0
           p=x['proof']
           assert p['qs_original_host']['source_sha']==os.environ['QS_FIXTURE_SHA']
@@ -255,7 +269,7 @@ jobs:
           for owner,evidence in p['qs_owner_recoveries'].items():
             assert evidence['native_admin_check_budget']==dict(interval_ms=30000,max_checks=15)
             assert evidence['managed_cli_build']['sdk_version']=='v0.6.1'
-            assert evidence['managed_cli_build']['source_sha']==os.environ['GITHUB_SHA']
+            assert evidence['managed_cli_build']['source_sha']==os.environ['INFRA_FIXTURE_SHA']
             r=evidence['managed_recovery']
             assert r['approved_governance_resolved'] and r['actual_sdk_stats']['RecoveryCommitConfirmed']>0
             assert r['actual_sdk_stats']['Stopped'] and r['private_observations']>0
@@ -266,7 +280,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: qs-native-recovery-${{ github.event.pull_request.head.sha || github.sha }}-${{ github.run_attempt }}
+          name: qs-native-recovery-${{ env.INFRA_FIXTURE_SHA }}-${{ github.run_attempt }}
           path: qs-native-recovery.json
           if-no-files-found: error
           retention-days: 90
