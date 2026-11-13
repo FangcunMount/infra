@@ -42,12 +42,18 @@ esac
 exec 9>/run/lock/qlume-servera-monitoring-pilot.lock
 flock -x 9
 
-stop_pilot() {
-    local containers id state refresh_state refresh_stopped=true
-    if ! timeout --kill-after=2s 15s systemctl stop "$refresh.service"; then
-        refresh_state=$(timeout --kill-after=2s 5s systemctl show --property=LoadState --value "$refresh.service") || refresh_state=unknown
-        [[ "$refresh_state" == not-found ]] || refresh_stopped=false
+stop_unit() {
+    local unit=$1 load_state
+    if timeout --kill-after=2s 15s systemctl stop "$unit"; then
+        return 0
     fi
+    load_state=$(timeout --kill-after=2s 5s systemctl show --property=LoadState --value "$unit") || return 1
+    [[ "$load_state" == not-found ]]
+}
+
+stop_pilot() {
+    local containers id state refresh_stopped=true
+    stop_unit "$refresh.service" || refresh_stopped=false
     timeout --kill-after=2s 25s "${compose[@]}" stop -t 15 prometheus || return 1
     containers=$(timeout --kill-after=2s 5s "${compose[@]}" ps --all --quiet prometheus) || return 1
     if [[ -n "$containers" ]]; then
@@ -62,7 +68,7 @@ stop_pilot() {
 case "$operation" in
     stop)
         stop_pilot
-        systemctl stop "$expire.timer"
+        stop_unit "$expire.timer"
         ;;
     withdraw)
         stop_pilot

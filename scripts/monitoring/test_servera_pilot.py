@@ -50,9 +50,13 @@ class ServerAPilotTests(unittest.TestCase):
             case "$*" in
                 'is-active --quiet '*-expire.timer) [[ -f "$PILOT_STATE.timer" ]] ;;
                 'is-active --quiet '*) exit 1 ;;
-                'stop '*-expire.timer) rm -f "$PILOT_STATE.timer" ;;
+                'stop '*-expire.timer)
+                    [[ -f "$PILOT_STATE.timer" ]] || exit 1
+                    rm -f "$PILOT_STATE.timer"
+                    ;;
                 'stop '*-refresh.service) [[ "$PILOT_FAILURE" != service-stop ]] ;;
                 'show '*-refresh.service) echo loaded ;;
+                'show '*-expire.timer) echo not-found ;;
             esac
         ''')
         self.command("docker", '''
@@ -115,7 +119,9 @@ class ServerAPilotTests(unittest.TestCase):
         stop = self.run_pilot("stop", "offline")
         self.assertEqual(stop.returncode, 0, stop.stderr)
         self.assertFalse(self.state.with_suffix(".timer").exists())
-        self.assertEqual(self.log.read_text().count("offline.override.yml stop -t 15 prometheus"), 2)
+        repeated = self.run_pilot("stop", "offline")
+        self.assertEqual(repeated.returncode, 0, repeated.stderr)
+        self.assertEqual(self.log.read_text().count("offline.override.yml stop -t 15 prometheus"), 3)
 
     def test_unverified_refresh_stop_leaves_expiry_timer(self):
         self.state.write_text("running\n")

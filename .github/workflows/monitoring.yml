@@ -59,6 +59,9 @@ jobs:
             -v "$pilot/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
             -v /tmp/monitoring-targets:/etc/prometheus/targets:ro \
             "$image" check config /etc/prometheus/prometheus.yml
+      - name: Verify ServerA pilot expiry with real systemd
+        timeout-minutes: 5
+        run: sudo /bin/bash scripts/monitoring/check-servera-pilot-systemd.sh
   release-assets:
     if: github.event_name == 'workflow_dispatch' && inputs.operation != 'validate'
     runs-on:
