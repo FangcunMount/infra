@@ -1,7 +1,7 @@
 import unittest
 
 from m5_window_central_observe import (
-    OWNERS, active_targets, check_matrix, expected_targets, scrape_time, utc,
+    METRICS, OWNERS, active_targets, check_matrix, expected_targets, observe, scrape_time, utc,
 )
 
 
@@ -65,6 +65,54 @@ class CentralObserverTest(unittest.TestCase):
         self.assertEqual([removed], observed["missing"])
         self.assertEqual([wrong], observed["unexpected"])
         self.assertEqual([], observed["unhealthy_or_stale"])
+
+    def full_observation(self, *, missing_at=None, active_age=0):
+        targets = expected_targets(["172.20.0.114", "172.20.0.115"])
+        end = 9000
+        active_at = end + active_age
+
+        def get(path, **params):
+            if path == "/api/v1/targets":
+                return {"activeTargets": [
+                    dict(labels=dict(job=job, instance=instance), health="up",
+                         lastScrape=utc(active_at - 1).replace("+00:00", "Z"))
+                    for job, instance in sorted(targets)
+                ]}
+            self.assertEqual("/api/v1/query_range", path)
+            self.assertEqual((end - 7200, end, 15), (params["start"], params["end"], params["step"]))
+            selector = params["query"]
+            is_timestamp = selector.startswith("timestamp(")
+            metric = selector.removeprefix("timestamp(").split("{", 1)[0]
+            identities = targets if metric == "up" else OWNERS
+            points = range(params["start"], params["end"] + 1, params["step"])
+            return dict(resultType="matrix", result=[
+                dict(metric=dict(zip(KEYS, identity)), values=[
+                    [point, str(point - 1 if is_timestamp else METRICS[metric])]
+                    for point in points if not (metric == "up" and point == missing_at)
+                ]) for identity in sorted(identities)
+            ])
+
+        return observe(get, targets, end, clock=lambda: active_at)
+
+    def test_two_hours_pass_with_all_481_points_and_fresh_active_targets(self):
+        report = self.full_observation()
+        self.assertEqual(481, report["points"])
+        self.assertEqual(7200, report["range_seconds"])
+        self.assertTrue(report["passed"])
+        self.assertFalse(report["execution_authorized"])
+
+    def test_recovered_endpoint_does_not_hide_a_gap_older_than_30_minutes(self):
+        report = self.full_observation(missing_at=5400)
+        self.assertFalse(report["passed"])
+        self.assertEqual([utc(5400)], [failure["at"] for failure in report["checks"]["up"]])
+        self.assertFalse(any(report["active"].values()))
+
+    def test_fresh_targets_cannot_certify_an_old_range_end(self):
+        report = self.full_observation(active_age=36)
+        self.assertEqual(36, report["end_age_seconds"])
+        self.assertFalse(any(report["checks"].values()))
+        self.assertFalse(any(report["active"].values()))
+        self.assertFalse(report["passed"])
 
 
 if __name__ == "__main__":
