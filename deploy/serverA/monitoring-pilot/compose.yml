@@ -1,0 +1,54 @@
+name: qlume-servera-monitoring-pilot
+
+services:
+  prometheus:
+    image: docker.io/prom/prometheus@sha256:69961df6ffa67598048a31aa2822d61f3c93b91d7db24e44d9bb03f99d520da9
+    platform: linux/amd64
+    pull_policy: never
+    restart: 'no'
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512M
+    cpus: 0.5
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+      - --storage.tsdb.retention.size=512MB
+      - --web.listen-address=127.0.0.1:9090
+    healthcheck:
+      test: [CMD, wget, -qO-, 'http://127.0.0.1:9090/-/ready']
+      interval: 15s
+      timeout: 5s
+      retries: 4
+    logging:
+      driver: json-file
+      options: {max-size: '10m', max-file: '2'}
+    volumes:
+      - type: bind
+        source: ./prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /var/lib/infra-monitoring-pilot/targets
+        target: /etc/prometheus/targets
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: volume
+        source: data
+        target: /prometheus
+    networks: [backend]
+
+volumes:
+  data:
+    external: true
+    name: qlume-servera-monitoring-pilot-data
+
+networks:
+  backend:
+    external: true
+    name: infra-network
