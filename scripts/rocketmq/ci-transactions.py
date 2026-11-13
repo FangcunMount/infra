@@ -446,8 +446,6 @@ def main():
     render(accounts, config, broker_address, repo / "components/rocketmq")
     with (config / "broker.conf").open("a") as stream:
         stream.write("".join(f"{key}={value}\n" for key, value in parameters.items()))
-        if args.sdk_pop_rebound_trace:
-            stream.write("enablePopLog=true\n")
     proxy = json.loads((config / "proxy.json").read_text())
     proxy["grpcServerPort"] = grpc_port
     (config / "proxy.json").write_text(json.dumps(proxy))

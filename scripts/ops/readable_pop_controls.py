@@ -236,7 +236,8 @@ def decode_physical_revive(raw, queue, logical, physical, routes):
     require(kind is not None, 'physical_revive_tag_unknown')
     result = revive_record(body, kind, queue, logical, routes)
     require(result is not None, 'physical_revive_route_unavailable')
-    return dict(result, physical_record_sha256=hashlib.sha256(raw).hexdigest())
+    return dict(result, commitlog_offset=physical, commitlog_size=len(raw),
+                physical_record_sha256=hashlib.sha256(raw).hexdigest())
 
 
 def physical_revive_records(read, committed, bounds, lag):
@@ -314,7 +315,6 @@ class OwnedPopControls:
                 and properties.get('timerWheelEnable') == properties.get('enablePopMetrics') == 'true',
                 'pinned_native_pop_metrics_required')
         if self.trace_rebound:
-            require(properties.get('enablePopLog') == 'true', 'owned_pop_trace_config_required')
             self.trace_container = self.trace_identity(value)
             self.trace_configuration = {
                 key: properties[key] for key in ('enableSkipLongAwaitingAck', 'reviveAckWaitMs', 'enablePopLog')
@@ -354,7 +354,10 @@ class OwnedPopControls:
             return capture(['head', '-c', str(POP_LOG_BYTES + 1), CONSUMER_OFFSETS], persisted_revive_offsets)
 
         before = persisted_offsets()
-        records = capture(['tail', '-c', str(POP_LOG_BYTES), POP_LOG], lambda raw: revive_log_records(raw, routes))
+        records = dict(enabled=self.trace_configuration['enablePopLog'] == 'true')
+        if records['enabled']:
+            records.update(capture(['tail', '-c', str(POP_LOG_BYTES), POP_LOG],
+                                   lambda raw: revive_log_records(raw, routes)))
         bounds = capture(['java', '-Xms32m', '-Xmx128m', '-cp', '/opt/rocketmq/conf:/opt/rocketmq/lib/*',
                           'org.apache.rocketmq.tools.command.MQAdminStartup', 'topicStatus',
                           '-n', 'nameserver:9876', '-t', SYSTEM_TOPIC], revive_queue_bounds)
@@ -382,8 +385,10 @@ class OwnedPopControls:
             except (RuntimeError, KeyError, ValueError, TypeError, RecursionError, struct.error):
                 unreadable.append(dict(queue=queue, offset=logical))
         after = persisted_offsets()
+        confirmation = self.read(required=sample.get('timer_series_present', False))
         verify_identity()
         return dict(offsets_before=before, offsets_after=after, records=records,
+                    metrics_after_storage_read=confirmation,
                     broker_identity=self.trace_container, broker_configuration=self.trace_configuration,
                     queue_bounds=bounds, retry_catalog=retries,
                     physical_storage=dict(records=physical, queues=queues, unreadable=unreadable, drain_proven=False),
