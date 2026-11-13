@@ -59,3 +59,5 @@ done
 docker run --rm --network none --entrypoint /bin/promtool \
     -v "$formal:/candidate:ro" --workdir /candidate/tests "$promtool_image" \
     test rules coverage.test.yml history-reader.test.yml
+
+python3 -B "$root/scripts/monitoring/check-servera-history-overlap.py"
