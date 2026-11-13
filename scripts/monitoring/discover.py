@@ -75,7 +75,11 @@ def refresh_source(config, source):
             command = [LOCAL_INVENTORY]
         else:
             command = [
-                '/usr/bin/ssh', '-i', config['identity'], '-o', 'IdentitiesOnly=yes',
+                '/usr/bin/ssh',
+                # The pilot must authenticate every connection with its expiring key.
+                *(['-F', '/dev/null', '-o', 'GlobalKnownHostsFile=/dev/null',
+                   '-o', 'IdentityAgent=none', '-o', 'IdentityFile=none'] if direct else []),
+                '-i', config['identity'], '-o', 'IdentitiesOnly=yes',
                 '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes',
                 '-o', 'UserKnownHostsFile=' + config['known_hosts'], '-o', 'ConnectTimeout=10',
                 '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=2',

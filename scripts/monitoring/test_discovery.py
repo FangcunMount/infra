@@ -183,6 +183,10 @@ class DiscoveryTests(unittest.TestCase):
                     payload = next(local_inventories)
                 else:
                     self.assertEqual(command[-1], 'root@serverd')
+                    self.assertEqual(command[1:3], ['-F', '/dev/null'])
+                    self.assertIn('GlobalKnownHostsFile=/dev/null', command)
+                    self.assertIn('IdentityAgent=none', command)
+                    self.assertIn('IdentityFile=none', command)
                     self.assertIn('StrictHostKeyChecking=yes', command)
                     self.assertIn('UserKnownHostsFile=pinned-hosts', command)
                     payload = worker
