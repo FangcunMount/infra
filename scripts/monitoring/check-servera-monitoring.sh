@@ -17,23 +17,26 @@ jq -e --slurp '
     $base.services["servera-collector"] as $collector |
     $history.services["history-reader"] as $reader |
     $base.services["query-bridge"] as $bridge |
-    ($base.services | keys)==["query-bridge","servera-collector"] and
-    ($history.services | keys)==["history-reader","query-bridge","servera-collector"] and
-    $base.name=="qlume-servera-monitoring" and
-    ([ $history.services[] | select(.read_only==true and .pull_policy=="never" and
-          .platform=="linux/amd64" and (.ports // [] | length)==0) ] | length)==3 and
-    $base.networks.backend.external and $base.networks.backend.name=="infra-network" and
-    $base.networks.query.external and $base.networks.query.name=="qlume-servera-monitoring-query" and
-    $collector.networks.query.ipv4_address=="172.31.251.3" and
-    $bridge.network_mode=="service:servera-collector" and $reader.network_mode=="service:servera-collector" and
-    $route.services["prometheus-route"].networks.query.ipv4_address=="172.31.251.2" and
-    ($collector.command | index("--web.listen-address=127.0.0.1:9090"))!=null and
-    ($reader.command | index("--web.listen-address=127.0.0.1:19092"))!=null and
-    ($reader.command | index("--storage.tsdb.retention.time=30d"))!=null and
-    ([ $collector.volumes[] | select(.target=="/etc/prometheus/rules" or .target=="/etc/prometheus/servera-rules") |
-       select(.read_only==true and .bind.create_host_path==false) ] | length)==2 and
-    $history.volumes.data.external and $history.volumes["protected-history"].external and
-    $history.volumes.data.name!=$history.volumes["protected-history"].name
+    {
+      services: (($base.services | keys)==["query-bridge","servera-collector"] and
+                 ($history.services | keys)==["history-reader","query-bridge","servera-collector"]),
+      project: ($base.name=="qlume-servera-monitoring"),
+      service_security: ([ $history.services[] | select(.read_only==true and .pull_policy=="never" and
+          .platform=="linux/amd64" and (.ports // [] | length)==0) ] | length==3),
+      networks: ($base.networks.backend.external and $base.networks.backend.name=="infra-network" and
+          $base.networks.query.external and $base.networks.query.name=="qlume-servera-monitoring-query"),
+      query_addresses: ($collector.networks.query.ipv4_address=="172.31.251.3" and
+          $route.services["prometheus-route"].networks.query.ipv4_address=="172.31.251.2"),
+      shared_namespace: ($bridge.network_mode=="service:servera-collector" and $reader.network_mode=="service:servera-collector"),
+      listeners: (($collector.command | index("--web.listen-address=127.0.0.1:9090"))!=null and
+          ($reader.command | index("--web.listen-address=127.0.0.1:19092"))!=null),
+      history_retention: (($reader.command | index("--storage.tsdb.retention.time=30d"))!=null),
+      rules_mounts: ([ $collector.volumes[] | select(.target=="/etc/prometheus/rules" or .target=="/etc/prometheus/servera-rules") |
+          select(.read_only==true and .bind.create_host_path==false) ] | length==2),
+      distinct_volumes: ($history.volumes.data.external and $history.volumes["protected-history"].external and
+          $history.volumes.data.name!=$history.volumes["protected-history"].name)
+    } | with_entries(select(.value!=true)) |
+    if length==0 then true else error("Compose checks failed: " + (keys | join(", "))) end
 ' "$work/base.json" "$work/history.json" "$work/route.json"
 prom_image=$(jq -er '.services["servera-collector"].image' "$work/base.json")
 # The production reference is an offline archive alias and is rendered above.
