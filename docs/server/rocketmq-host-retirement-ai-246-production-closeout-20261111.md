@@ -14,3 +14,11 @@
 原事务凭证、业务历史、ACK、调度及八项 Broker 持久待办均保留。AI 自动发布维持关闭，QS 生产发布工作流维持禁用。四个候选对象和 F07 继续按各自的审查及执行边界处理。
 
 当窗批准、首次重开标记、全备及双地归档的 SHA-256 见结构化回执。原件存放于两地私有目录。正式窗口引用 [43 修复与 R0 记录](rocketmq-host-retirement-ai-246-window-20261111-r0.md) 和 [44 前向恢复资格](rocketmq-host-retirement-ai-246-execution-package-20261101.md)，用于保留前序故障和恢复决策。
+
+## 11 月 13 日只读复验
+
+北京时间 15:25 从原 AI 44 容器通过 `VERIFY_IDENTITY` 和一致性只读事务验证现库。容器、运行镜像和源码仍与 W10 一致，现役健康，重启计数 1 与 11 月 12 日已记录的重启一致。`0044_empty_publisher` 完整，目标表缺席，49 张保留表的定义和列序一致，48 张表的内容指纹与 W10 一致。
+
+`operations_runtime_milestones` 从 43 行变为 40 行。逐条比对 W05 原件与当前摘要，现存 40 行字节一致，缺席的三条均在 W10 后达到原 `expires_at`。该变化与已发布版本的诊断保留规则一致，实际删除进程无逐条审计证据。原事务凭证、业务历史、ACK 和调度所在保留表的指纹均一致。 [精确版本诊断保留实现](https://github.com/FangcunMount/qs-ai/blob/c6359b441de48fde5b295529fe9c10f50e4c53f5/src/qs_ai/infrastructure/persistence/mysql/runtime_milestones.py)
+
+MacBook 与 ServerA 重新读回结案包、W05 全备、生产镜像归档和离线 44 前向镜像归档，四份摘要及长度一致。结案包本地 150 个成员逐项校验。ServerA 现有前向镜像与生产镜像的源码、根层、启动命令、运行用户及平台一致。前向隔离资格仍引用原 13 项验收。本次为只读复验，AI 自动发布关闭，QS 生产发布工作流禁用。 [原 44 前向资格](https://github.com/FangcunMount/qs-ai/actions/runs/41311886021)

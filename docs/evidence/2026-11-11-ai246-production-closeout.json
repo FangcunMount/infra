@@ -73,5 +73,40 @@
       "all_definitions_columns_and_original_bytes_identical": true
     }
   },
-  "original_locks_released": true
+  "original_locks_released": true,
+  "post_window_readback": {
+    "observed_at": "2026-11-13T07:25:45.785354+00:00",
+    "production_source": "c6359b441de48fde5b295529fe9c10f50e4c53f5",
+    "same_container_as_W10": true,
+    "healthy": true,
+    "restart_count": 1,
+    "schema_head": "0044_empty_publisher",
+    "target_absent": true,
+    "retained_definition_count_matching_W10": 49,
+    "retained_content_count_matching_W10": 48,
+    "diagnostic_rows_expired_and_absent": 3,
+    "exact_delete_actor_proven": false,
+    "two_site_current_readback": {
+      "window": {
+        "bytes": 26828633,
+        "sha256": "3a14a4e651f77059136b5e44b8d9282003dce5594b8bde79e113f2cda4a7ee48"
+      },
+      "backup": {
+        "bytes": 26699900,
+        "sha256": "12eebe67db0a41f415491d83ce33fb31a154a0417a52ee85560f793077327cba"
+      },
+      "production": {
+        "bytes": 117694528,
+        "sha256": "9042ce559f7d3bcb6df19915972830d566b1c60e8eeb0abd1ba9050cf8434507"
+      },
+      "forward": {
+        "bytes": 131626551,
+        "sha256": "1256b4781619aa866b1c3a023a76c9b3db2280b935826049f934a50439d7a180"
+      }
+    },
+    "forward_engine_image_id": "sha256:b68cfe164b829a5b542dc2ebc0c5f9fad19ce88dc33dedd42528313ca6f81b97",
+    "forward_original_isolation_cases": 13,
+    "production_mutation": false,
+    "new_execution_approval": false
+  }
 }
