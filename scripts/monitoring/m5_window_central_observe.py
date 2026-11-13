@@ -14,7 +14,7 @@ TAILNET = "http://100.126.200.55:19090"
 STEP = 15
 MAX_AGE = 35
 RANGE_SECONDS = 30 * 60
-QS_RELEASE = "qs-m5-4620d11e2cff"
+DEFAULT_QS_SOURCE = "4620d11e2cffbc4b67b43965812cff3340f0be43"
 OWNERS = {
     ("qs-apiserver", "qs-apiserver:8080", "qs.mysql"),
     ("qs-apiserver", "qs-apiserver:8080", "qs.mongo"),
@@ -34,7 +34,10 @@ class NoRedirect(HTTPRedirectHandler):
         return None
 
 
-def expected_targets(collection_ips):
+def expected_targets(collection_ips, qs_source=DEFAULT_QS_SOURCE):
+    if re.fullmatch(r"[0-9a-f]{40}", qs_source) is None:
+        raise ValueError("a full lowercase QS source SHA is required")
+    qs_release = f"qs-m5-{qs_source[:12]}"
     ips = {ipaddress.IPv4Address(value) for value in collection_ips}
     if len(ips) != 2 or not all(ip in ipaddress.IPv4Network("172.20.0.0/24") for ip in ips):
         raise ValueError("two verified Collection addresses are required")
@@ -45,7 +48,7 @@ def expected_targets(collection_ips):
         ("rocketmq", "100.118.164.39:5557"),
         ("prometheus", "127.0.0.1:9090"),
         *(("qs-collection-server", f"{ip}:8080") for ip in ips),
-        *(("qs-worker", f"{QS_RELEASE}-worker-{n}") for n in range(1, 4)),
+        *(("qs-worker", f"{qs_release}-worker-{n}") for n in range(1, 4)),
     }
 
 
@@ -125,8 +128,8 @@ def active_targets(data, expected, now):
                 unhealthy_or_stale=sorted(key for key, healthy in rows.items() if not healthy))
 
 
-def observe(get, targets, end, clock=time.time):
-    points = list(range(end - RANGE_SECONDS, end + 1, STEP))
+def observe(get, targets, end, clock=time.time, *, range_seconds=RANGE_SECONDS):
+    points = list(range(end - range_seconds, end + 1, STEP))
     params = dict(start=points[0], end=end, step=STEP)
     checks = {}
     for metric, value in METRICS.items():
@@ -148,16 +151,22 @@ def observe(get, targets, end, clock=time.time):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--collection-ip", nargs=2, required=True, help="addresses from named running Collection containers")
+    parser.add_argument("--qs-source", default=DEFAULT_QS_SOURCE,
+                        help="full source SHA from the independently verified QS container inventory")
+    parser.add_argument("--window-minutes", type=int, choices=(30, 120), default=RANGE_SECONDS // 60,
+                        help="use 120 for the F07 two-hour gate")
     parser.add_argument("--tailnet", action="store_true", help="use the existing private Prometheus query path")
     args = parser.parse_args()
     transport = "tailnet" if args.tailnet else "collector-loopback"
     try:
         report = observe(api(TAILNET if args.tailnet else LOOPBACK),
-                         expected_targets(args.collection_ip), int(time.time()) // STEP * STEP)
+                         expected_targets(args.collection_ip, args.qs_source), int(time.time()) // STEP * STEP,
+                         range_seconds=args.window_minutes * 60)
     except (OSError, ValueError, KeyError, TypeError, OverflowError) as error:
         report = dict(schema="ai246-central-prewindow/v1", error=type(error).__name__,
                       passed=False, read_only=True, execution_authorized=False)
-    print(json.dumps({**report, "transport": transport}, allow_nan=False, sort_keys=True))
+    print(json.dumps({**report, "transport": transport, "qs_runtime_source": args.qs_source,
+                      "range_seconds": args.window_minutes * 60}, allow_nan=False, sort_keys=True))
     return 0 if report["passed"] else 1
 
 

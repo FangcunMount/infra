@@ -1,7 +1,7 @@
 import unittest
 
 from m5_window_central_observe import (
-    OWNERS, active_targets, check_matrix, expected_targets, scrape_time, utc,
+    OWNERS, active_targets, check_matrix, expected_targets, observe, scrape_time, utc,
 )
 
 
@@ -65,6 +65,31 @@ class CentralObserverTest(unittest.TestCase):
         self.assertEqual([removed], observed["missing"])
         self.assertEqual([wrong], observed["unexpected"])
         self.assertEqual([], observed["unhealthy_or_stale"])
+
+    def test_explicit_qs_source_retains_all_other_target_and_owner_identities(self):
+        addresses = ["172.20.0.114", "172.20.0.115"]
+        original = expected_targets(addresses)
+        candidate = expected_targets(addresses, "7014c24db0c6b57c130112752857b2bec0b9bc7d")
+        self.assertEqual({("qs-worker", f"qs-m5-7014c24db0c6-worker-{n}") for n in range(1, 4)},
+                         candidate - original)
+        self.assertEqual(3, len(original - candidate))
+        self.assertEqual(10, len(candidate))
+        with self.assertRaisesRegex(ValueError, "full lowercase QS source"):
+            expected_targets(addresses, "7014c24db0c6")
+
+    def test_two_hour_range_uses_481_points_and_rejects_missing_samples(self):
+        def no_samples(path, **params):
+            if path == "/api/v1/targets":
+                return {"activeTargets": []}
+            self.assertEqual((0, 7200, 15), tuple(params[key] for key in ("start", "end", "step")))
+            return {"resultType": "matrix", "result": []}
+
+        targets = expected_targets(["172.20.0.114", "172.20.0.115"])
+        receipt = observe(no_samples, targets, 7200, lambda: 7200, range_seconds=7200)
+        self.assertFalse(receipt["passed"])
+        self.assertFalse(receipt["execution_authorized"])
+        self.assertEqual(481, receipt["points"])
+        self.assertTrue(all(len(failures) == 481 for failures in receipt["checks"].values()))
 
 
 if __name__ == "__main__":

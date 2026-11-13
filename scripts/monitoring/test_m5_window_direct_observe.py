@@ -43,3 +43,18 @@ class OwnerSampleTests(unittest.TestCase):
                     'worker-1', 'worker-2', 'worker-3', 'qs', 'ai', 'iam'}
         for frame in result['rounds']:
             self.assertEqual(expected, set(frame['results']))
+
+    def test_explicit_source_changes_only_qs_endpoint_names(self):
+        candidate = '7014c24db0c6b57c130112752857b2bec0b9bc7d'
+        ok = Mock(return_value={'passed': True})
+        with patch('m5_window_direct_observe.query', ok), patch('m5_window_direct_observe.time.sleep'):
+            result = observe(candidate)
+        self.assertEqual(candidate, result['qs_runtime_source'])
+        urls = {call.args[0] for call in ok.call_args_list}
+        self.assertEqual(7, sum(url.startswith('http://qs-m5-7014c24db0c6-') for url in urls))
+        self.assertIn('http://127.0.0.1:8000/metrics', urls)
+        self.assertIn('http://iam-apiserver:9080/metrics', urls)
+        with patch('m5_window_direct_observe.query') as query:
+            with self.assertRaises(ValueError):
+                observe('https://example.invalid/')
+            query.assert_not_called()

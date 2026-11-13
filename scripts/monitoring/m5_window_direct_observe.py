@@ -2,6 +2,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+import argparse
 import json
 import math
 import re
@@ -11,20 +12,11 @@ from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, ProxyHandler, build_opener
 
 
-READY = {
-    'api-ready': 'http://qs-m5-4620d11e2cff-apiserver-1:8080/readyz',
-    **{f'collection-{n}-ready': f'http://qs-m5-4620d11e2cff-collection-{n}:8080/readyz' for n in (1, 2)},
-    **{f'worker-{n}': f'http://qs-m5-4620d11e2cff-worker-{n}:9092/readyz' for n in (1, 2, 3)},
-}
+DEFAULT_QS_SOURCE = '4620d11e2cffbc4b67b43965812cff3340f0be43'
 BUSINESS_GAUGES = {
     'qs': ('qs_server_ai_mq_observation_available', 'qs_server_ai_mq_awaiting_command_receipts'),
     'ai': ('qs_ai_mq_observation_available', 'qs_ai_mq_pending_interpretation_receipts',
            'qs_ai_pending_results', 'qs_ai_unresolved_model_calls', 'qs_ai_expired_job_leases'),
-}
-METRICS = {
-    'qs': ('http://qs-m5-4620d11e2cff-apiserver-1:8080/metrics', {'qs.mysql', 'qs.mongo'}),
-    'ai': ('http://127.0.0.1:8000/metrics', {'ai.mysql'}),
-    'iam': ('http://iam-apiserver:9080/metrics', {'iam.mysql'}),
 }
 EXPECTED = {'observation_available': 1, 'observation_fresh': 1, 'admission_protected': 0}
 PREFIX = 'reliable_messaging_transaction_'
@@ -99,11 +91,20 @@ def query(url, owners, gauges=()):
         return {'passed': False, 'error_type': type(error).__name__}
 
 
-def observe():
+def observe(qs_source=DEFAULT_QS_SOURCE):
+    if re.fullmatch(r'[0-9a-f]{40}', qs_source) is None:
+        raise ValueError('a full lowercase QS source SHA is required')
+    qs_release = f'qs-m5-{qs_source[:12]}'
+    api = f'http://{qs_release}-apiserver-1:8080'
+    endpoints = {
+        'api-ready': (f'{api}/readyz', ()),
+        **{f'collection-{n}-ready': (f'http://{qs_release}-collection-{n}:8080/readyz', ()) for n in (1, 2)},
+        **{f'worker-{n}': (f'http://{qs_release}-worker-{n}:9092/readyz', ()) for n in (1, 2, 3)},
+        'qs': (f'{api}/metrics', {'qs.mysql', 'qs.mongo'}, BUSINESS_GAUGES['qs']),
+        'ai': ('http://127.0.0.1:8000/metrics', {'ai.mysql'}, BUSINESS_GAUGES['ai']),
+        'iam': ('http://iam-apiserver:9080/metrics', {'iam.mysql'}),
+    }
     rounds = []
-    endpoints = {name: (url, ()) for name, url in READY.items()}
-    endpoints.update({name: (url, owners, BUSINESS_GAUGES.get(name, ()))
-                      for name, (url, owners) in METRICS.items()})
     with ThreadPoolExecutor(max_workers=len(endpoints)) as pool:
         for number in range(2):
             if number:
@@ -114,7 +115,7 @@ def observe():
     return {
         'schema': 'ai246-direct-prewindow-observation/v1',
         'read_only': True,
-        'qs_runtime_source': '4620d11e2cffbc4b67b43965812cff3340f0be43',
+        'qs_runtime_source': qs_source,
         'rounds': rounds,
         'passed': all(result['passed'] for frame in rounds for result in frame['results'].values()),
         'prometheus_scrape_verified': False,
@@ -124,7 +125,13 @@ def observe():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--qs-source', default=DEFAULT_QS_SOURCE,
+                        help='full source SHA from the independently verified QS container inventory')
+    args = parser.parse_args()
+    if re.fullmatch(r'[0-9a-f]{40}', args.qs_source) is None:
+        parser.error('--qs-source must be a full lowercase SHA')
     signal.alarm(45)
-    receipt = observe()
+    receipt = observe(args.qs_source)
     print(json.dumps(receipt, allow_nan=False, sort_keys=True))
     raise SystemExit(0 if receipt['passed'] else 1)
