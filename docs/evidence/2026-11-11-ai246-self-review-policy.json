@@ -1,0 +1,36 @@
+{
+  "schema": "ai246-review-policy/v1",
+  "policy_id": "AI246-20261111-SHUJIE-SELF-REVIEW",
+  "scope": "FangcunMount/infra#424; AI messaging_outbox 43-to-44 only",
+  "review_mode": "owner_self_review",
+  "actor_id": "shujie",
+  "actor_display_name": "舒杰",
+  "data_owner": "shujie",
+  "recovery_owner": "shujie",
+  "authorization": {
+    "source": "explicit user instruction in the current Codex conversation",
+    "date_beijing": "2026-11-11",
+    "verbatim": "决定有舒杰自己操作、自审，请更新规则，并整理一份 舒杰 需要操作的待办项和指南，让我没操作一部分即打勾完成",
+    "mode_change_authorized": true,
+    "independent_review_claimed": false
+  },
+  "window_authorized": false,
+  "execution_authorized": false,
+  "w06_issued": false,
+  "preserved_requirements": [
+    "AI auto deployment disabled; QS production workflow disabled",
+    "new named window, operation ID, abort time and recovery reserve",
+    "separate W00, W04 and window decisions with evidence hashes and signature references",
+    "fresh writer exclusion, continuous locks and 210-second normal drain",
+    "same-window frozen protection and new 51-table full logical backup",
+    "table-by-table comparison and two-site readback, SHA256 and fsync",
+    "fresh administrator and actual-account network, TLS and grant checks",
+    "separate onsite W06 self-review and exact bounded review/v2 approval",
+    "durable one-time consumption before DDL and readonly classification after unknown results",
+    "strict44 verification and durable two-site first-business-reopen marker",
+    "preserve transaction evidence, history, ACK, scheduling and Broker durable work",
+    "at least 30-day protection; extend for unresolved responsibilities"
+  ],
+  "exception_boundary": "Only the two-person separation requirement is replaced. Checkboxes, this policy and a complete appointment form never authorize production execution. Unexpected database states remain outside this package and require a separate incident decision.",
+  "historical_records": "Keep the earlier two-person templates, signatures, failed windows and sealed evidence unchanged. Do not represent self-review as independent approval."
+}

@@ -66,3 +66,8 @@ bootstrap.server.preflight / database_check → require_runtime_schema → _requ
 ## 原件保全
 
 源码、只读/分类、失败日志及原Nginx片段的v1归档SHA为`ce7f96e213e9f1a689b428dc1fb32e0b0df6ed88bf429a5a223d8ae1637a270e`，不包含后完成的完整CI；最终v2追加归档SHA为`5783bd0f3233995fef5262f35b65fd44f8f9e72612eae473fae137cf23f23323`，1025747字节，包含精确完整CI及最终生产只读复验。两份均在MacBook/ServerA回读、fsync一致，目录0700/文件0600，至少30天且未结责任延期，无自动清理。v2保全源码和审计原件，不能当作已停写备份、恢复合格证明或数据库执行批准。
+
+
+## 同日后续：具体执行包
+
+前文AI自动发布true及30b候选为原审查时点。2026-11-01后续已将AI AUTO_DEPLOY_ENABLED改false并回读，QS仍disabled_manually；业务未停、生产DDL未执行。AI246及AI248排空衔接修复已仅合并源码，补齐v2语义保护、49表完整指纹、原DDL隔离恢复和独立44ledger前向工具；AI专用管理员只读观察已实跑成功。源码/CI、不可变镜像实际资格及同窗口执行缺口统一见[具体执行审查包](rocketmq-host-retirement-ai-246-execution-package-20261101.md)。原43镜像不列为DDL后的恢复路线。原快照与历史CI不覆写为最新候选资格。

@@ -1,0 +1,53 @@
+{
+  "status": "TEMPLATE_ONLY_NOT_PRODUCTION_APPROVAL",
+  "migration": {
+    "schema": "ai-empty-publisher-review/TEMPLATE",
+    "source_sha": null,
+    "operation_id": null,
+    "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+    "table_ddl_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff",
+    "initial_head": "0043_native_transaction_limit",
+    "target_head": "0044_empty_publisher",
+    "writers_excluded": false,
+    "data_owner": "shujie",
+    "recovery_owner": "shujie",
+    "expires_at": null,
+    "protection_manifest": null,
+    "protection_sha256": null,
+    "restore_receipt": null,
+    "restore_sha256": null
+  },
+  "forward": {
+    "schema": "ai-publisher-forward-review/TEMPLATE",
+    "source_sha": null,
+    "operation_id": null,
+    "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+    "original_review": null,
+    "original_sha256": null,
+    "writer_receipt": null,
+    "writer_sha256": null,
+    "data_owner": "shujie",
+    "recovery_owner": "shujie",
+    "recorded_at": null,
+    "expires_at": null
+  },
+  "writer_exclusion": {
+    "schema": "ai-publisher-writer-exclusion/TEMPLATE",
+    "source_sha": null,
+    "operation_id": null,
+    "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+    "candidate_image_digest": null,
+    "stopped_container_ids": [],
+    "inventory_sha256": null,
+    "writers_excluded": false,
+    "all_writer_scopes_reviewed": false,
+    "broker_pending_preserved": true,
+    "business_reopened": null,
+    "running_writers": null,
+    "unfinished_work": null,
+    "data_owner": "shujie",
+    "recovery_owner": "shujie",
+    "recorded_at": null,
+    "expires_at": null
+  }
+}

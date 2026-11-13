@@ -1,0 +1,42 @@
+{
+  "ai_activity_only": true,
+  "complete": true,
+  "connection_released": true,
+  "database_released": true,
+  "error_category": "none",
+  "expected_target_hash": "83cd3186bd7de27e6a5b5aa0effbb3c5673274f65cd5d4635f36fed7304a5463",
+  "failure_stage": "none",
+  "format_version": 1,
+  "freeze_verified": false,
+  "measurements": {
+    "counts": {
+      "ai_active_threads": 0,
+      "ai_enabled_events": 0,
+      "ai_metadata_locks_granted": 0,
+      "ai_metadata_locks_pending": 0,
+      "ai_modifying_transactions": 0,
+      "ai_routines": 0,
+      "ai_threads": 4,
+      "ai_transactions": 0,
+      "ai_triggers": 0,
+      "ai_views": 0,
+      "global_metadata_locks_pending": 0,
+      "target_external_foreign_keys": 0,
+      "target_incoming_foreign_keys": 0,
+      "target_view_dependencies": 0
+    },
+    "global_metadata_grants_verified": true,
+    "sampled_at_epoch_microseconds": 1793540473260492,
+    "schema_head": "0043_native_transaction_limit",
+    "target_ddl_sha256": "a4e7e09941d249faa1a2a4c100eadbdd53c3be42181a148c74ba8c256cb508ff",
+    "target_present": true,
+    "target_rows": 0
+  },
+  "mysql_identity_sha256": "04f119402a8b7704f84df45bd3e3fb182eaf1ea05febe7fbad38f66c76740fc3",
+  "observations_atomic": false,
+  "query_count": 24,
+  "read_only": true,
+  "run_id": "41312407017-1",
+  "source_sha": "7899ffce168bac0097b733dd874ab97d87f10db0",
+  "source_target_hash": "83cd3186bd7de27e6a5b5aa0effbb3c5673274f65cd5d4635f36fed7304a5463"
+}
