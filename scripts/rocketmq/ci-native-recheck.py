@@ -71,6 +71,8 @@ def main():
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--managed-tool', type=Path, help='fixed published-module CLI; owned isolated fixture only')
     parser.add_argument('--governance-faults',action='store_true',help='actual MySQL COMMIT before/after reply loss for managed CLI only')
+    parser.add_argument('--audit-write-fault', action='store_true',
+                        help='reject the recovery audit update in the disposable MySQL fixture')
     parser.add_argument('--iam-host',type=Path,help='actual fixed IAM original writer, owned fixture only')
     parser.add_argument('--host-observer',type=Path,help='CI-only actual-host consumer compiled against the same published SDK')
     parser.add_argument('--terminal',choices=('commit','rollback'),default='commit',help='terminal SDK evidence; rollback uses durable abort fence, no business root')
@@ -80,6 +82,9 @@ def main():
     args = parser.parse_args()
     ci_guard(os.environ)  # Never construct a client or invoke Docker on a workstation.
     require(not args.governance_faults or args.managed_tool is not None,'managed_cli_required_for_governance_faults')
+    require(not args.audit_write_fault or (args.managed_tool and args.terminal == 'commit'
+            and not (args.governance_faults or args.iam_host or args.qs_host)),
+            'audit_fault_requires_disposable_mysql_commit_profile')
     require(not args.iam_host or (args.managed_tool and args.host_observer and not args.governance_faults),'separate_actual_iam_managed_profile_required')
     require(not args.qs_host or (args.managed_tool and args.host_observer and not args.iam_host
                                 and not args.governance_faults and args.terminal == 'commit'),
@@ -357,7 +362,9 @@ def main():
                 stage = 'compiled_managed_original_primary_recovery'
                 managed_accept(repo=repo,binary=args.managed_tool.resolve(),broker=broker,project=project,directory=directory,
                     manifest=manifest,route=route,account=accounts['owner-a'],grpc_port=grpc_port,mysql_port=mysql_port,password=password,
-                    ca=ca,java=java,identity=identity,index_path=index_path,index=index,sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,governance_faults=args.governance_faults,original=original,terminal=args.terminal)
+                    ca=ca,java=java,identity=identity,index_path=index_path,index=index,sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,
+                    governance_faults=args.governance_faults,original=original,terminal=args.terminal,
+                    audit_write_fault=args.audit_write_fault)
             else:
                 recovery = start('recover', identity); recovery.wait('ready', identity)
                 recovery.send('seal'); recovery.wait('sealed', '', 'admission_stopped_checker_alive')
