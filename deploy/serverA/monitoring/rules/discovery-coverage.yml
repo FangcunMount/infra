@@ -1,0 +1,33 @@
+groups:
+  - name: servera-collector-discovery
+    interval: 15s
+    rules:
+      - alert: ServerADiscoveryInventoryBelowExpected
+        expr: (count(up{job=~"iam|qs-ai|qs-apiserver|qs-collection-server"}) or vector(0)) < 5
+        for: 2m
+        labels:
+          severity: warning
+          subsystem: monitoring
+          discovery_source: serverA
+        annotations:
+          summary: ServerA discovery inventory below five targets
+          description: Check the ServerA inventory helper and active file discovery targets.
+      - alert: ServerADiscoveryInventoryBelowExpected
+        expr: (count(up{job="qs-worker"}) or vector(0)) < 3
+        for: 2m
+        labels:
+          severity: warning
+          subsystem: monitoring
+          discovery_source: serverD
+        annotations:
+          summary: ServerD discovery inventory below three targets
+          description: Check the ServerD discovery key, SSH path and active file discovery targets.
+      - alert: ServerACollectorTargetScrapeFailed
+        expr: up{job=~"iam|qs-ai|qs-apiserver|qs-collection-server|qs-worker"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          subsystem: monitoring
+        annotations:
+          summary: Application metrics target has consecutive scrape failures
+          description: Check the named target and its path from the ServerA collector.

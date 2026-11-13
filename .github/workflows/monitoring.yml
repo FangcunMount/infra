@@ -1,10 +1,10 @@
 name: Validate Mac mini monitoring
 on:
   pull_request:
-    paths: ['components/monitoring/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverA/monitoring-pilot/**', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
+    paths: ['components/monitoring/**', 'components/prometheus/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverA/monitoring-pilot/**', 'deploy/serverA/monitoring/**', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
   push:
     branches: [main]
-    paths: ['components/monitoring/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverA/monitoring-pilot/**', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
+    paths: ['components/monitoring/**', 'components/prometheus/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverA/monitoring-pilot/**', 'deploy/serverA/monitoring/**', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
   workflow_dispatch:
     inputs:
       operation:
@@ -62,6 +62,8 @@ jobs:
       - name: Verify ServerA pilot expiry with real systemd
         timeout-minutes: 5
         run: sudo /bin/bash scripts/monitoring/check-servera-pilot-systemd.sh
+      - name: Validate formal ServerA monitoring configuration
+        run: bash scripts/monitoring/check-servera-monitoring.sh
   release-assets:
     if: github.event_name == 'workflow_dispatch' && inputs.operation != 'validate'
     runs-on:

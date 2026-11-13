@@ -1,0 +1,99 @@
+name: qlume-servera-monitoring
+
+services:
+  servera-collector:
+    image: f07-offline-pilot/prometheus@sha256:07b4b7f1d12debaffb56d91b2a43dd851651cf51c9064cbba23a03c3989a5979
+    platform: linux/amd64
+    pull_policy: never
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512M
+    cpus: 0.5
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --storage.tsdb.retention.size=8GB
+      - --web.listen-address=127.0.0.1:9090
+    healthcheck:
+      test: [CMD, wget, -qO-, 'http://127.0.0.1:9090/-/ready']
+      interval: 15s
+      timeout: 5s
+      retries: 4
+    logging:
+      driver: json-file
+      options: {max-size: '10m', max-file: '2'}
+    volumes:
+      - type: bind
+        source: ./prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /run/infra-monitoring-servera/targets
+        target: /etc/prometheus/targets
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./rules
+        target: /etc/prometheus/servera-rules
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ../../../components/prometheus/rules
+        target: /etc/prometheus/rules
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: volume
+        source: data
+        target: /prometheus
+    networks:
+      backend:
+        gw_priority: 1
+      query:
+        ipv4_address: 172.31.251.3
+  query-bridge:
+    image: nginx@sha256:fafd5f55296511cd0f1c991efa0cb85f323449bf643f3b6d760c6542f020d6e5
+    platform: linux/amd64
+    pull_policy: never
+    restart: unless-stopped
+    network_mode: service:servera-collector
+    depends_on:
+      servera-collector:
+        condition: service_healthy
+        restart: true
+    user: '101:101'
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 32M
+    cpus: 0.1
+    entrypoint: [nginx, -g, 'daemon off;']
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,mode=1777
+    volumes:
+      - type: bind
+        source: ./query-bridge.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+        bind:
+          create_host_path: false
+
+volumes:
+  data:
+    external: true
+    name: qlume-servera-monitoring-data
+
+networks:
+  backend:
+    external: true
+    name: infra-network
+  query:
+    external: true
+    name: qlume-servera-monitoring-query

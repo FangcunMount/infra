@@ -1,0 +1,48 @@
+services:
+  servera-collector:
+    volumes:
+      - type: bind
+        source: ./history/prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        read_only: true
+        bind:
+          create_host_path: false
+  history-reader:
+    image: f07-offline-pilot/prometheus@sha256:07b4b7f1d12debaffb56d91b2a43dd851651cf51c9064cbba23a03c3989a5979
+    platform: linux/amd64
+    pull_policy: never
+    restart: unless-stopped
+    network_mode: service:servera-collector
+    depends_on:
+      servera-collector:
+        condition: service_healthy
+        restart: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512M
+    cpus: 0.5
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --web.listen-address=127.0.0.1:19092
+    healthcheck:
+      test: [CMD, wget, -qO-, 'http://127.0.0.1:19092/-/ready']
+      interval: 15s
+      timeout: 5s
+      retries: 4
+    volumes:
+      - type: bind
+        source: ./history/history-prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: volume
+        source: protected-history
+        target: /prometheus
+volumes:
+  protected-history:
+    external: true
+    name: qlume-servera-monitoring-history

@@ -1,0 +1,69 @@
+rule_files:
+  - ../rules/discovery-coverage.yml
+evaluation_interval: 15s
+tests:
+  - name: all targets present and healthy
+    interval: 15s
+    input_series:
+      - {series: 'up{job="iam",instance="iam"}', values: '1+0x12'}
+      - {series: 'up{job="qs-ai",instance="ai"}', values: '1+0x12'}
+      - {series: 'up{job="qs-apiserver",instance="api"}', values: '1+0x12'}
+      - {series: 'up{job="qs-collection-server",instance="c1"}', values: '1+0x12'}
+      - {series: 'up{job="qs-collection-server",instance="c2"}', values: '1+0x12'}
+      - {series: 'up{job="qs-worker",instance="w1"}', values: '1+0x12'}
+      - {series: 'up{job="qs-worker",instance="w2"}', values: '1+0x12'}
+      - {series: 'up{job="qs-worker",instance="w3"}', values: '1+0x12'}
+    alert_rule_test:
+      - {eval_time: 3m, alertname: ServerADiscoveryInventoryBelowExpected, exp_alerts: []}
+      - {eval_time: 3m, alertname: ServerACollectorTargetScrapeFailed, exp_alerts: []}
+
+  - name: serverA discovery disappears and recovers while Worker series remain down
+    interval: 15s
+    input_series:
+      - {series: 'up{job="iam",instance="iam"}', values: '1 stale _ _ _ _ _ _ _ _ 1+0x10'}
+      - {series: 'up{job="qs-ai",instance="ai"}', values: '1 stale _ _ _ _ _ _ _ _ 1+0x10'}
+      - {series: 'up{job="qs-apiserver",instance="api"}', values: '1 stale _ _ _ _ _ _ _ _ 1+0x10'}
+      - {series: 'up{job="qs-collection-server",instance="c1"}', values: '1 stale _ _ _ _ _ _ _ _ 1+0x10'}
+      - {series: 'up{job="qs-collection-server",instance="c2"}', values: '1 stale _ _ _ _ _ _ _ _ 1+0x10'}
+      - {series: 'up{job="qs-worker",instance="w1"}', values: '0+0x20'}
+      - {series: 'up{job="qs-worker",instance="w2"}', values: '0+0x20'}
+      - {series: 'up{job="qs-worker",instance="w3"}', values: '0+0x20'}
+    alert_rule_test:
+      - {eval_time: 2m, alertname: ServerADiscoveryInventoryBelowExpected, exp_alerts: []}
+      - eval_time: 2m15s
+        alertname: ServerADiscoveryInventoryBelowExpected
+        exp_alerts:
+          - exp_labels: {severity: warning, subsystem: monitoring, discovery_source: serverA}
+            exp_annotations:
+              summary: ServerA discovery inventory below five targets
+              description: Check the ServerA inventory helper and active file discovery targets.
+      - eval_time: 2m15s
+        alertname: ServerACollectorTargetScrapeFailed
+        exp_alerts:
+          - exp_labels: {severity: warning, subsystem: monitoring, job: qs-worker, instance: w1}
+            exp_annotations: {summary: Application metrics target has consecutive scrape failures, description: Check the named target and its path from the ServerA collector.}
+          - exp_labels: {severity: warning, subsystem: monitoring, job: qs-worker, instance: w2}
+            exp_annotations: {summary: Application metrics target has consecutive scrape failures, description: Check the named target and its path from the ServerA collector.}
+          - exp_labels: {severity: warning, subsystem: monitoring, job: qs-worker, instance: w3}
+            exp_annotations: {summary: Application metrics target has consecutive scrape failures, description: Check the named target and its path from the ServerA collector.}
+      - {eval_time: 2m30s, alertname: ServerADiscoveryInventoryBelowExpected, exp_alerts: []}
+
+  - name: one missing Worker fires even when other Worker scrapes succeed
+    interval: 15s
+    input_series:
+      - {series: 'up{job="iam",instance="iam"}', values: '1+0x12'}
+      - {series: 'up{job="qs-ai",instance="ai"}', values: '1+0x12'}
+      - {series: 'up{job="qs-apiserver",instance="api"}', values: '1+0x12'}
+      - {series: 'up{job="qs-collection-server",instance="c1"}', values: '1+0x12'}
+      - {series: 'up{job="qs-collection-server",instance="c2"}', values: '1+0x12'}
+      - {series: 'up{job="qs-worker",instance="w1"}', values: '1+0x12'}
+      - {series: 'up{job="qs-worker",instance="w2"}', values: '1+0x12'}
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: ServerADiscoveryInventoryBelowExpected
+        exp_alerts:
+          - exp_labels: {severity: warning, subsystem: monitoring, discovery_source: serverD}
+            exp_annotations:
+              summary: ServerD discovery inventory below three targets
+              description: Check the ServerD discovery key, SSH path and active file discovery targets.
+      - {eval_time: 2m, alertname: ServerACollectorTargetScrapeFailed, exp_alerts: []}

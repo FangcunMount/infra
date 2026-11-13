@@ -1,0 +1,9 @@
+services:
+  prometheus-route:
+    networks:
+      query:
+        ipv4_address: 172.31.251.2
+networks:
+  query:
+    external: true
+    name: qlume-servera-monitoring-query

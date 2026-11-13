@@ -1,0 +1,13 @@
+groups:
+  - name: servera-history-reader
+    interval: 15s
+    rules:
+      - alert: ServerAHistoryReaderUnavailable
+        expr: (up{job="servera-history-reader",instance="127.0.0.1:19092"} == 0) or absent(up{job="servera-history-reader",instance="127.0.0.1:19092"})
+        for: 2m
+        labels:
+          severity: warning
+          subsystem: monitoring
+        annotations:
+          summary: ServerA Prometheus history reader is unavailable
+          description: Verify the history reader and replay the cutover range before trusting queries spanning the old and new collectors.
