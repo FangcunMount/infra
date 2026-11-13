@@ -19,13 +19,8 @@
 @@ -68,0 +81,2 @@
 +    private static final int ACK_TAIL_LOOKBACK = 128;
 +    private static final int ACK_TAIL_SCAN_LIMIT = 32;
-@@ -107,6 +121,199 @@
+@@ -107 +121,204 @@
 -    private boolean reviveRetry(PopCheckPoint popCheckPoint, MessageExt messageExt) {
--        MessageExtBrokerInner msgInner = new MessageExtBrokerInner();
--        if (!popCheckPoint.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
--            msgInner.setTopic(KeyBuilder.buildPopRetryTopic(popCheckPoint.getTopic(), popCheckPoint.getCId(), brokerController.getBrokerConfig().isEnableRetryTopicV2()));
--        } else {
--            msgInner.setTopic(popCheckPoint.getTopic());
 +    private static final String REVIVE_WITNESS = "F07_REVIVE_WITNESS";
 +    private static final String REVIVE_SOURCE_WITNESS = "F07_REVIVE_SOURCE_WITNESS";
 +    private static final Object[] REVIVE_APPEND_LOCKS = new Object[64];
@@ -225,12 +220,17 @@
 +        if (entry == null || entry.getQueueOffset() != offset || entry.getPos() < 0 || entry.getSize() <= 0
 +            || entry.getBatchNum() != 1) {
 +            throw new IllegalStateException("retry witness ConsumeQueue entry is unavailable");
-@@ -113,0 +321,6 @@
++        }
 +        return entry;
 +    }
 +
 +    private boolean appendReviveRetry(PopCheckPoint popCheckPoint, MessageExt messageExt, String witness, String sourceWitness) {
-+        MessageExtBrokerInner msgInner = new MessageExtBrokerInner();
+@@ -109,5 +326 @@
+-        if (!popCheckPoint.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
+-            msgInner.setTopic(KeyBuilder.buildPopRetryTopic(popCheckPoint.getTopic(), popCheckPoint.getCId(), brokerController.getBrokerConfig().isEnableRetryTopicV2()));
+-        } else {
+-            msgInner.setTopic(popCheckPoint.getTopic());
+-        }
 +        msgInner.setTopic(retryTopic(popCheckPoint));
 @@ -134,0 +348,4 @@
 +        if (witness != null) {
@@ -262,7 +262,9 @@
 +        if (reconcile && !matchedRetryAcks.isEmpty()) {
 +            closeOlderRetryCheckpoints(map, matchedRetryAcks);
 +        }
-@@ -469,0 +707,74 @@
+@@ -467,0 +705,74 @@
++    }
++
 +    private String retryAckIdentity(PopCheckPoint checkpoint, long sourceOffset) {
 +        String broker = StringUtils.defaultIfBlank(checkpoint.getBrokerName(), brokerController.getBrokerConfig().getBrokerName());
 +        return JSON.toJSONString(Arrays.asList(broker, checkpoint.getCId(), checkpoint.getTopic(),
@@ -335,13 +337,13 @@
 +            this.offset = offset;
 +            this.commitLog = commitLog;
 +        }
-+    }
-+
 @@ -551,0 +863,3 @@
 +        if (Boolean.getBoolean("fangcun.standaloneReviveAppendCandidate")) {
 +            newOffset = advanceVerifiedAckTail(newOffset);
 +        }
-@@ -555,0 +870,106 @@
+@@ -553,0 +868,111 @@
++    }
++
 +    private long advanceVerifiedAckTail(long committed) {
 +        if (committed < 0 || !shouldRunPopRevive || !inflightReviveRequestMap.isEmpty()) {
 +            return committed;
@@ -370,7 +372,7 @@
 +                    if (PopAckConstants.CK_TAG.equals(checkpoint.getTags())) {
 +                        PopCheckPoint point = JSON.parseObject(checkpoint.getBody(), PopCheckPoint.class);
 +                        point.setReviveOffset(prior);
-+                        checkpoints.putIfAbsent(ackCheckpointIdentity(point.getTopic(), point.getCId(),
++                        rememberAckCheckpoint(checkpoints, ackCheckpointIdentity(point.getTopic(), point.getCId(),
 +                            point.getQueueId(), point.getStartOffset(), point.getPopTime(), point.getBrokerName()), point);
 +                    }
 +                }
@@ -397,7 +399,7 @@
 +
 +    private MessageExt readReviveRecord(ConsumeQueueInterface queue, long offset) {
 +        CqUnit entry = queue.get(offset);
-+        if (entry == null || entry.getQueueOffset() != offset) {
++        if (entry == null || entry.getQueueOffset() != offset || entry.getPos() < 0 || entry.getSize() <= 0) {
 +            return null;
 +        }
 +        SelectMappedBufferResult raw = brokerController.getMessageStore().selectOneMessageByOffset(entry.getPos(), entry.getSize());
@@ -407,7 +409,7 @@
 +        try {
 +            MessageExt record = MessageDecoder.decode(raw.getByteBuffer(), true, true, false, false, true);
 +            return record != null && reviveTopic.equals(record.getTopic()) && queueId == record.getQueueId()
-+                && record.getCommitLogOffset() == entry.getPos() ? record : null;
++                && record.getQueueOffset() == offset && record.getCommitLogOffset() == entry.getPos() ? record : null;
 +        } finally {
 +            raw.release();
 +        }
@@ -418,7 +420,12 @@
 +            StringUtils.defaultIfBlank(broker, brokerController.getBrokerConfig().getBrokerName())));
 +    }
 +
-+    private static boolean coversCheckpointOffset(AckMsg ack, PopCheckPoint point) {
++    static void rememberAckCheckpoint(Map<String, PopCheckPoint> checkpoints, String identity, PopCheckPoint point) {
++        // A second physical CK with this identity makes its ACK ambiguous.
++        checkpoints.put(identity, checkpoints.containsKey(identity) ? null : point);
++    }
++
++    static boolean coversCheckpointOffset(AckMsg ack, PopCheckPoint point) {
 +        if (point == null || StringUtils.isBlank(point.getTopic()) || StringUtils.isBlank(point.getCId())
 +            || point.getNum() <= 0 || point.getStartOffset() < 0 || ack.getPopTime() <= 0) {
 +            return false;
@@ -446,5 +453,3 @@
 +            return difference < point.getNum();
 +        }
 +        return difference <= Integer.MAX_VALUE && differences.contains((int) difference);
-+    }
-+

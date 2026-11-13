@@ -4,7 +4,10 @@ import java.lang.reflect.Proxy;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.apache.rocketmq.common.attribute.CQType;
 import org.apache.rocketmq.common.message.MessageAccessor;
@@ -13,6 +16,8 @@ import org.apache.rocketmq.common.message.MessageDecoder;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.store.MessageStore;
 import org.apache.rocketmq.store.SelectMappedBufferResult;
+import org.apache.rocketmq.store.pop.AckMsg;
+import org.apache.rocketmq.store.pop.BatchAckMsg;
 import org.apache.rocketmq.store.pop.PopCheckPoint;
 import org.apache.rocketmq.store.queue.ConsumeQueueInterface;
 import org.apache.rocketmq.store.queue.CqUnit;
@@ -93,7 +98,37 @@ public final class RetryIndexRegression {
             "source witness changed at split");
         require(!original.equals(PopReviveService.reviveSourceWitness("broker", checkpoint(91, 2001), second)),
             "separate POP time shared a witness");
-        System.out.println("F07 retained retry index: 13 controls passed");
+        verifyAckTailCheckpointIdentity();
+        System.out.println("F07 retained retry index: 13 controls passed; ACK-tail identity: 5 controls passed");
+    }
+
+    private static void verifyAckTailCheckpointIdentity() {
+        Map<String, PopCheckPoint> checkpoints = new HashMap<>();
+        PopCheckPoint original = checkpoint(90, 2000);
+        original.setNum((byte) 2);
+        original.setReviveOffset(4);
+        original.addDiff(0);
+        original.addDiff(2);
+        PopCheckPoint rewrite = checkpoint(90, 2000);
+        rewrite.setNum((byte) 1);
+        rewrite.setReviveOffset(6);
+        rewrite.addDiff(0);
+        AckMsg ack = new AckMsg();
+        ack.setPopTime(2000);
+        ack.setAckOffset(90);
+        BatchAckMsg batch = new BatchAckMsg();
+        batch.setPopTime(2000);
+        batch.setAckOffsetList(Arrays.asList(90L, 92L));
+        PopReviveService.rememberAckCheckpoint(checkpoints, "original", original);
+        require(PopReviveService.coversCheckpointOffset(ack, checkpoints.get("original")), "single ACK refused");
+        require(PopReviveService.coversCheckpointOffset(batch, checkpoints.get("original")), "sparse batch ACK refused");
+        ack.setAckOffset(91);
+        require(!PopReviveService.coversCheckpointOffset(ack, checkpoints.get("original")), "foreign offset accepted");
+        PopReviveService.rememberAckCheckpoint(checkpoints, "original", rewrite);
+        ack.setAckOffset(90);
+        require(!PopReviveService.coversCheckpointOffset(ack, checkpoints.get("original")), "same-key CK collision accepted");
+        PopReviveService.rememberAckCheckpoint(checkpoints, "original", original);
+        require(checkpoints.containsKey("original") && checkpoints.get("original") == null, "third CK erased ambiguity");
     }
 
     private static PopCheckPoint checkpoint(long start, long pop) {

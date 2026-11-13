@@ -32,7 +32,7 @@ HASH
 patch -f -F 0 -p1 < "$fixture/pop-revive.patch"
 patch -f -F 0 -p1 < "$fixture/timer-recovery.patch"
 shasum -a 256 -c <<'HASH'
-28f10855534e60accca8ef0dc775d05dca2aa5949444407595290954275849ef  PopReviveService.java
+6ba357e781e459fd3bcee80ec8f9b538012f473459e98030406ebc946f72f3ce  PopReviveService.java
 414bad09be629e6f0f1498aceabc010a287ba0d7c3708b302e5cb5351e2dd882  TimerMessageStore.java
 HASH
 
