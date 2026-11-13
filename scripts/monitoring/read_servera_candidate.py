@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import re
 import shlex
+import sys
 import subprocess
 import time
 
@@ -34,6 +35,8 @@ if datetime.fromisoformat(args.started_at).timestamp() > end.timestamp() - 7200:
 verifier_path = Path(__file__).with_name("m5_window_central_observe.py")
 verifier = verifier_path.read_text().partition('if __name__ == "__main__":')[0]
 probe = '''
+from hashlib import sha256
+
 requests = []
 get = api("http://127.0.0.1:9090")
 
@@ -42,8 +45,29 @@ def capture(path, **params):
     requests.append(dict(path=path, params=params, data=response))
     return response
 
+def local_configuration():
+    active = get("/api/v1/status/config")["yaml"]
+    if not isinstance(active, str) or not active.strip():
+        raise ValueError("candidate loaded scrape configuration is unavailable")
+    if re.search(r"(?m)^remote_read:", active):
+        raise ValueError("H05 requires the candidate configuration with remote read disabled")
+    if not re.search(r"(?m)^scrape_configs:", active):
+        raise ValueError("candidate loaded scrape configuration is unavailable")
+    runtime = get("/api/v1/status/runtimeinfo")
+    loaded_at = runtime["lastConfigTime"]
+    if runtime["reloadConfigSuccess"] is not True or not isinstance(loaded_at, str):
+        raise ValueError("candidate configuration reload is unverified")
+    if not 0 < scrape_time(loaded_at) < END - 7200:
+        raise ValueError("the candidate local-only configuration must cover the full two-hour interval")
+    return dict(sha256=sha256(active.encode()).hexdigest(), loaded_at=loaded_at)
+
+
+before = local_configuration()
 report = observe(capture, expected_targets(IPS, QS_SOURCE), END, range_seconds=7200)
-print(json.dumps(dict(report=report, requests=requests), separators=(",", ":"), allow_nan=False))
+if local_configuration() != before:
+    raise ValueError("candidate configuration changed during observation")
+print(json.dumps(dict(report=report, requests=requests, local_configuration=before),
+                 separators=(",", ":"), allow_nan=False))
 '''
 shell = '''
 set -eu
@@ -68,13 +92,27 @@ argv = ["ssh", "-T", "-o", "BatchMode=yes", "-o", "ConnectTimeout=7",
         "-o", "StrictHostKeyChecking=yes", "servera",
         shlex.join(["sudo", "-n", "/bin/sh", "-c", shell, "candidate-read",
                     args.container, args.image, args.started_at])]
-result = subprocess.run(argv, input=source.encode(), capture_output=True, timeout=42, check=True)
+result = subprocess.run(argv, input=source.encode(), capture_output=True, timeout=42)
+if result.returncode:
+    message = result.stderr.decode(errors="replace").splitlines()
+    safe = next((line.removeprefix("ValueError: ") for line in reversed(message)
+                 if line in {
+                     "ValueError: candidate loaded scrape configuration is unavailable",
+                     "ValueError: H05 requires the candidate configuration with remote read disabled",
+                     "ValueError: candidate configuration reload is unverified",
+                     "ValueError: the candidate local-only configuration must cover the full two-hour interval",
+                     "ValueError: candidate configuration changed during observation",
+                 }), None)
+    print(safe or "candidate observation failed before a complete read", file=sys.stderr)
+    raise SystemExit(1)
 if len(result.stdout) > 4_000_000:
     raise SystemExit("candidate response exceeded bound")
 document = json.loads(result.stdout)
 report = document["report"]
 assert report["read_only"] and not report["execution_authorized"]
 assert report["points"] == 481 and len(document["requests"]) == 9
+configuration = document["local_configuration"]
+assert re.fullmatch(r"[0-9a-f]{64}", configuration["sha256"]) and configuration["loaded_at"]
 assert len(report["expected_targets"]) == 10 and len(report["expected_owners"]) == 4
 document["binding"] = dict(container_id=args.container, image_id=args.image, started_at=args.started_at,
                            qs_runtime_source=args.qs_source,
