@@ -14,6 +14,8 @@ MONITORING = Path(__file__).resolve().parents[2] / "deploy/serverA/monitoring"
 IMAGE = os.environ.get("SERVERA_MONITORING_PROMTOOL_IMAGE", "prom/prometheus:v2.54.1")
 SERIES = 'handoff_sample{owner="qs.mysql"}'
 LABEL = "org.fangcunmount.monitoring.history-overlap"
+# The fixture writes to disposable bind mounts. Keep generated WAL files removable by the runner.
+FIXTURE_USER = f"{os.getuid()}:{os.getgid()}"
 
 
 def docker(*args, check=True):
@@ -22,7 +24,7 @@ def docker(*args, check=True):
 
 def start(name, label, network, store, config, port):
     return docker("run", "-d", "--name", name, "--label", label, "--pull", "never", "--network", network,
-                  "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges:true",
+                  "--user", FIXTURE_USER, "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges:true",
                   "-v", f"{store}:/prometheus", "-v", f"{config}:/etc/prometheus/prometheus.yml:ro", IMAGE,
                   "--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus",
                   "--storage.tsdb.retention.time=30d", f"--web.listen-address=127.0.0.1:{port}").stdout.strip()
@@ -49,14 +51,14 @@ def query(container, path, parameters):
 def write_block(work, role, samples):
     store = work / role
     store.mkdir()
-    store.chmod(0o777)
     file = work / f"{role}.om"
     file.write_text("# TYPE handoff_sample gauge\n" + "".join(
         f"{SERIES} {value} {stamp}\n" for stamp, value in samples.items()
     ) + "# EOF\n")
     file.chmod(0o644)
     args = ("/bin/promtool", IMAGE, "tsdb", "create-blocks-from", "openmetrics", f"/fixture/{file.name}", f"/fixture/{role}")
-    docker("run", "--rm", "--pull", "never", "--network", "none", "-v", f"{work}:/fixture", "--entrypoint", *args)
+    docker("run", "--rm", "--pull", "never", "--network", "none", "--user", FIXTURE_USER,
+           "-v", f"{work}:/fixture", "--entrypoint", *args)
     return store
 
 
