@@ -28,6 +28,7 @@ jobs:
         run: |
           python3 -m unittest discover -s scripts/monitoring -p 'test_*.py' -v
           bash -n scripts/monitoring/manage.sh
+          bash -n deploy/serverA/monitoring-pilot/pilot.sh
           make -n monitoring-up monitoring-status
       - name: Verify Prometheus config and rules
         run: |
