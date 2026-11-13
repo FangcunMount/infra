@@ -25,12 +25,13 @@ env:
   GOTOOLCHAIN: local
 jobs:
   published-cli-original-mysql-native-recovery:
+    name: Managed recovery on the isolated Broker candidate (${{ matrix.mode }})
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        mode: [basic, governance_faults, rollback]
+        mode: [basic, governance_faults, rollback, audit_write_fault, second_native_notice]
     steps:
       - uses: actions/checkout@v6
         with:
@@ -71,7 +72,10 @@ jobs:
       - name: Fixed Broker archive verification
         run: bash scripts/rocketmq/fetch-release.sh
       - name: Fresh fixed isolated Broker
-        run: docker build --no-cache -t rocketmq-managed-recovery:5.5.1 components/rocketmq
+        run: |
+          set -euo pipefail
+          docker build --no-cache -t rocketmq-readable:5.5.1 components/rocketmq
+          bash scripts/rocketmq/f07-ack-tail-fixture/build.sh
       - name: Real exhausted half, compiled CLI, SDK RPC and separate governance approval
         env:
           MATRIX_MODE: ${{ matrix.mode }}
@@ -81,8 +85,10 @@ jobs:
           flags=()
           if [ "$MATRIX_MODE" = governance_faults ]; then flags+=(--governance-faults); fi
           if [ "$MATRIX_MODE" = rollback ]; then flags+=(--terminal rollback); fi
+          if [ "$MATRIX_MODE" = audit_write_fault ]; then flags+=(--audit-write-fault); fi
+          if [ "$MATRIX_MODE" = second_native_notice ]; then flags+=(--second-native-notice); fi
           python3 scripts/rocketmq/ci-native-recheck.py --sdk "$PWD/.sdk-acceptance" \
-            --image rocketmq-managed-recovery:5.5.1 --managed-tool "$RUNNER_TEMP/native-recovery" "${flags[@]}" --report managed-recovery.json
+            --image rocketmq-readable:f07-ack-tail --managed-tool "$RUNNER_TEMP/native-recovery" "${flags[@]}" --report managed-recovery.json
       - name: Nonempty zero-skip actual recovery and cleanup
         if: always()
         env:
@@ -93,19 +99,34 @@ jobs:
           import json,os,pathlib
           p=pathlib.Path('managed-recovery.json')
           x=json.loads(p.read_text())
-          expected=16 if os.environ['MATRIX_MODE']=='governance_faults' else 15 if os.environ['MATRIX_MODE']=='rollback' else 14
+          mode=os.environ['MATRIX_MODE']
+          expected={'basic':14,'governance_faults':16,'rollback':15,'audit_write_fault':14,'second_native_notice':16}[mode]
           assert x['passed']==expected and x['failed']==x['skipped']==0
-          proof=x['proof']['managed_recovery']
-          assert proof['approved_governance_resolved'] and proof['same_request_reexecution_refused']
-          assert proof['actual_sdk_stats']['Stopped'] and proof['private_observations']>0
+          if mode=='audit_write_fault':
+            proof=x['proof']['audit_write_fault']
+            assert proof==dict(mysql_signal_observed=True,broker_original_acknowledged=True,receipt_emitted=False,
+                private_observation_emitted=False,notice_still_blocked=True,original_witness_audit_preserved=True,
+                original_counts=dict(business=1,requests=1,executions=1,witnesses=1),
+                native_index_preserved=True,replay_refused=True,production=False)
+          else:
+            proof=x['proof']['managed_recovery']
+            assert proof['approved_governance_resolved'] and proof['same_request_reexecution_refused']
+            assert proof['actual_sdk_stats']['Stopped'] and proof['private_observations']>0
           if expected==15:
             assert proof['original_counts']['business']==0
             assert proof['actual_sdk_stats']['RecoveryRollbackConfirmed']>0
             assert proof['actual_sdk_stats']['RecoveryCommitConfirmed']==0
-          if expected==16:
+          if mode=='governance_faults':
             assert len(x['proof']['governance_wire_faults'])==2
             assert x['proof']['governance_wire_proxy_cleanup']['threads_drained']
             assert x['proof']['governance_wire_proxy_cleanup']['active']==0
+          if mode=='second_native_notice':
+            physical=x['proof']['second_native_physical']
+            assert physical['index_records']==2 and physical['same_reference_wire_and_unique_id']
+            assert 0<=physical['first']<physical['second']
+            assert x['proof']['second_native_notice']==dict(original_resolved=True,second_still_blocked=True,
+                second_notice_bytes_preserved=True,original_audit_preserved=True,
+                original_counts=dict(business=1,requests=1,executions=1,witnesses=1),production=False)
           cleanup=x['cleanup']
           assert cleanup and all(v is True for k,v in cleanup.items() if not k.endswith('_remaining'))
           assert all(v is False for k,v in cleanup.items() if k.endswith('_remaining'))

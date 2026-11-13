@@ -12,6 +12,10 @@ class SQLFixtureStore:
     def governance(self):return self.sql("SELECT HEX(notice_key),HEX(evidence_sha256),status,IFNULL(HEX(resolution_receipt_sha256),'') FROM messaging_native_limit_notices ORDER BY notice_key;")
     def counts(self):return self.sql('SELECT ('+self.business_count_sql+'),(SELECT COUNT(*) FROM rm_tx_request),(SELECT COUNT(*) FROM rm_tx_execution),(SELECT COUNT(*) FROM rm_tx_witness);')
     def audit(self):return self.sql("SELECT final_outcome,DATE_FORMAT(final_recorded_at,'%Y-%m-%dT%H:%i:%s.%f') FROM rm_tx_witness;")
+    def notice(self, key):
+        return self.sql("SELECT HEX(native_index_sha256),HEX(evidence_sha256),status,recorded_at,"
+                        "IFNULL(resolved_at,''),IFNULL(HEX(resolution_receipt_sha256),'') "
+                        f"FROM messaging_native_limit_notices WHERE notice_key=UNHEX('{key.hex()}');")
 
 
 class MongoFixtureStore:

@@ -20,7 +20,7 @@ import time
 
 from audit_transaction_limit import export, write_private
 from routes import physical_topic_v2,consumer_group_v2
-from start_boundary import initialize, _encoded
+from start_boundary import BoundaryError, initialize, _encoded
 from cutover_step import execute, load_step
 from mysql_commit_proxy import MySQLCommitProxy
 from recovery_fixture_store import MongoFixtureStore, SQLFixtureStore
@@ -133,10 +133,74 @@ def terminal_expectation(terminal):
         counter='RecoveryCommitConfirmed' if terminal=='commit' else 'RecoveryRollbackConfirmed')
 
 
+def reject_mysql_audit_write(*, sql, store, before, operation, step, arguments, consumer,
+                             identity, broker, project, index_path, index, index_sha,
+                             request_sha, passed, proof):
+    require(sql('SELECT DATABASE();') == 'txprobe', 'owned_audit_fault_database_required')
+    original_audit = store.audit()
+    require(original_audit.split('\t')[0] in {'not_attempted', 'unknown'},
+            'original_unconfirmed_audit_required')
+    signal_count = """SELECT SUM_ERROR_RAISED
+        FROM performance_schema.events_errors_summary_global_by_error WHERE ERROR_NUMBER=1644;"""
+    before_signals = int(sql(signal_count))
+    sql("""CREATE TRIGGER f07_reject_recovery_audit BEFORE UPDATE ON rm_tx_witness
+           FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='isolated recovery audit rejected';""")
+    try:
+        try:
+            step(arguments, 'recover-with-audit-write-failure', 'runtime-start')
+        except BoundaryError:
+            diagnostics = safe_failure(operation)
+        else:
+            raise RuntimeError('audit_write_failure_sealed_success')
+        require(int(sql(signal_count)) > before_signals, 'mysql_did_not_reject_actual_audit_update')
+        require(any(row.get('last_stage') == 'sdk_drain'
+                    and row.get('native_recheck_outcome') == 'RecheckEnqueued'
+                    and row.get('broker_final_outcome') == 'unknown'
+                    and row.get('governance_outcome') == 'not_attempted' for row in diagnostics),
+                'failed_audit_did_not_keep_recovery_unresolved')
+        passed('mysql_rejects_real_sdk_audit_after_native_recheck')
+    finally:
+        sql('DROP TRIGGER f07_reject_recovery_audit;')
+
+    consumer.wait('received', identity, 'exact_wire_public_sdk_acknowledged', timeout=100)
+    passed('broker_delivers_and_acks_original_despite_local_audit_failure')
+    [attempt] = list(operation.glob('native-attempt-*'))
+    require(not (attempt / 'receipt.json').exists() and not list(attempt.glob('native-rpc-*/rpc-*.json')),
+            'failed_audit_emitted_receipt_or_positive_observation')
+    require(store.governance() == before and store.audit() == original_audit
+            and store.counts() == '1\t1\t1\t1', 'audit_failure_changed_original_responsibilities')
+    passed('no_receipt_or_governance_change_after_failed_audit')
+    claim = operation / f'native-recovery-claim-{request_sha}.json'
+    claim_bytes = claim.read_bytes()
+    try:
+        step(arguments, 'reject-audit-fault-replay', 'forward-repair')
+    except BoundaryError:
+        require(any(row.get('last_stage') == 'single_use_claim' for row in safe_failure(operation)),
+                'audit_fault_replay_did_not_reach_consumed_claim')
+    else:
+        raise RuntimeError('failed_audit_request_reexecuted')
+    require(claim.read_bytes() == claim_bytes and list(operation.glob('native-attempt-*')) == [attempt]
+            and store.governance() == before and store.audit() == original_audit
+            and store.counts() == '1\t1\t1\t1', 'audit_fault_replay_changed_original_responsibilities')
+    passed('failed_audit_request_stays_consumed_after_storage_restored')
+    after = export(broker, project, identity, operation.parent / 'native-index-after-audit-fault.json')
+    require(after['records'] == index['records'] and hashlib.sha256(index_path.read_bytes()).hexdigest() == index_sha,
+            'failed_audit_changed_original_native_index')
+    passed('audit_write_failure_preserves_original_physical_index')
+    proof['audit_write_fault'] = dict(mysql_signal_observed=True, broker_original_acknowledged=True,
+        receipt_emitted=False, private_observation_emitted=False, notice_still_blocked=True,
+        original_witness_audit_preserved=True, original_counts=dict(business=1, requests=1, executions=1, witnesses=1),
+        native_index_preserved=True, replay_refused=True, production=False)
+
+
 def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
            java,identity,index_path,index,sql,run,consumer,passed,proof,governance_faults=False,original=None,terminal="commit",image=None,
-           check_budget=None):
+           check_budget=None,audit_write_fault=False,second_index=None):
     terminal_expectation(terminal)
+    require(not audit_write_fault or (terminal == "commit" and not (governance_faults or original or image)),
+            'disposable_sdk_mysql_required_for_audit_fault')
+    require(not second_index or (terminal == "commit" and not (governance_faults or original or image or audit_write_fault)),
+            'disposable_sdk_mysql_required_for_second_notice')
     require(terminal=="commit" or (not governance_faults and original is None),"separate_rollback_sdk_fixture_required")
     require(image is None or (original and original['owner']=='ai.mysql' and not governance_faults),
             'execution_image_requires_owned_original_ai_profile')
@@ -152,7 +216,7 @@ def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_po
         return _accept(repo=repo,binary=binary,broker=broker,project=project,directory=directory,manifest=manifest,route=route,account=account,
             grpc_port=grpc_port,mysql_port=mysql_port,password=password,ca=ca,java=java,identity=identity,index_path=index_path,index=index,
             sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,proxy=proxy,original=original,terminal=terminal,image=image,
-            coordinated=coordinated,check_budget=check_budget)
+            coordinated=coordinated,check_budget=check_budget,audit_write_fault=audit_write_fault,second_index=second_index)
     finally:
         try:
             if coordinated:
@@ -165,7 +229,8 @@ def accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_po
 
 
 def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_port,mysql_port,password,ca,
-           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original,terminal,image,coordinated=None,check_budget=None):
+           java,identity,index_path,index,sql,run,consumer,passed,proof,proxy,original,terminal,image,
+           coordinated=None,check_budget=None,audit_write_fault=False,second_index=None):
     expected=terminal_expectation(terminal)
     source=original or dict(owner="iam.mysql",store_id="sdk-disposable",writer_epoch="sdk-epoch-1",database="txprobe",user="txprobe",
         operation_id="op-"+identity,branch_id="branch-0",fence=1,business_count_sql="SELECT COUNT(*) FROM sdk_business",
@@ -273,7 +338,13 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
         except Exception:
             proof['managed_failure_diagnostics']=safe_failure(op)
             raise
-    row=index['records'][0];fingerprint=physical_fingerprint(index,row);key=notice_key(fingerprint,source)
+    if second_index:
+        fingerprint, additional = second_index
+        require(fingerprint != additional and {physical_fingerprint(index, row) for row in index['records']}
+                == {fingerprint, additional}, 'both_physical_records_must_be_in_reviewed_index')
+    else:
+        fingerprint = physical_fingerprint(index, index['records'][0])
+    key=notice_key(fingerprint,source)
     index_sha=hashlib.sha256(index_path.read_bytes()).hexdigest()
     if original is None:
         sql(f"INSERT INTO messaging_native_limit_notices(notice_key,owner,store_id,writer_epoch,route_revision,native_index_sha256,evidence_sha256,status,schema_version,recorded_at) VALUES(UNHEX('{key.hex()}'),'iam.mysql','sdk-disposable','sdk-epoch-1','m3-1',UNHEX('{fingerprint.hex()}'),UNHEX('{index_sha}'),'blocked',1,UTC_TIMESTAMP(6));")
@@ -299,6 +370,12 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     call(['recover',*common,'--directory',op,'--binding-sha',binding_sha,'--step','not-issued','--step-plan-sha','1'*64],success=False)
     require(not list(op.glob('native-attempt-*')) and store.governance()==before,'prestart_gate_created_effects')
     passed('compiled_recovery_refuses_before_real_first_runtime_boundary')
+    if audit_write_fault:
+        reject_mysql_audit_write(sql=sql, store=store, before=before, operation=op, step=step,
+                                 arguments=['recover', *common], consumer=consumer, identity=identity,
+                                 broker=broker, project=project, index_path=index_path, index=index,
+                                 index_sha=index_sha, request_sha=request_sha, passed=passed, proof=proof)
+        return
     prior_audit=store.audit() if terminal=='rollback' else None
     step(['recover',*common],'recover-original','runtime-start')
     receipts=list(op.glob('native-attempt-*/receipt.json'));require(len(receipts)==1,'single_complete_current_rpc_receipt_required')
@@ -321,6 +398,17 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     passed('original_consumer_identity_and_one_original_business_root_preserved' if terminal=='commit' else 'aborted_original_stays_invisible_and_business_count_zero')
     first_audit=store.audit()
     require(first_audit.startswith(expected['final']+'\t'),'positive_sdk_primary_audit_required')
+    if second_index:
+        other_key = notice_key(additional, source)
+        require(not store.notice(other_key), 'second_notice_must_be_new_after_recovery')
+        sql(f"""INSERT INTO messaging_native_limit_notices
+            (notice_key,owner,store_id,writer_epoch,route_revision,native_index_sha256,evidence_sha256,status,schema_version,recorded_at)
+            SELECT UNHEX('{other_key.hex()}'),owner,store_id,writer_epoch,route_revision,UNHEX('{additional.hex()}'),
+            evidence_sha256,'blocked',1,UTC_TIMESTAMP(6) FROM messaging_native_limit_notices
+            WHERE notice_key=UNHEX('{key.hex()}') AND status='blocked';""")
+        other_before = store.notice(other_key)
+        require(other_before.split('\t')[:3] == [additional.hex().upper(), index_sha.upper(), 'blocked'],
+                'second_notice_must_bind_new_physical_record')
     if prior_audit is not None:
         if prior_audit.startswith(expected['final']+'\t'):
             require(first_audit==prior_audit,'native_recovery_refreshed_first_positive_rollback_audit')
@@ -361,8 +449,21 @@ def _accept(*,repo,binary,broker,project,directory,manifest,route,account,grpc_p
     else:raise RuntimeError('consumed_request_reexecuted')
     require(len(list(op.glob('native-attempt-*')))==1 and store.governance()==resolved,'rejected_reuse_changed_responsibilities')
     passed('new_issued_step_cannot_reexecute_a_consumed_recovery_request')
+    if second_index:
+        require(store.notice(other_key) == other_before and store.notice(key).split('\t')[2] == 'resolved'
+                and len(resolved.splitlines()) == 2
+                and store.audit() == first_audit and store.counts() == '1\t1\t1\t1',
+                'named_resolution_changed_new_physical_notice_or_original_facts')
+        passed('named_resolution_preserves_new_notice_for_same_frozen_identity')
+        proof['second_native_notice'] = dict(original_resolved=True, second_still_blocked=True,
+            second_notice_bytes_preserved=True, original_audit_preserved=True,
+            original_counts=dict(business=1, requests=1, executions=1, witnesses=1), production=False)
     after=export(broker,project,identity,root/'native-index-after.json')
-    require(after['records']==index['records'] and hashlib.sha256(index_path.read_bytes()).hexdigest()==index_sha,'native_original_index_rewritten')
+    def positions(document):
+        return sorted(physical_fingerprint(document, row) for row in document['records'])
+
+    require(positions(after) == positions(index) and hashlib.sha256(index_path.read_bytes()).hexdigest() == index_sha,
+            'native_original_index_rewritten')
     passed('actual_managed_recovery_keeps_original_physical_index_and_first_notice_evidence')
     proof['managed_recovery']=dict(request_sha256=request_sha,receipt_sha256=receipt_sha,native_index_sha256=fingerprint.hex(),
         actual_sdk_stats=stats,original_counts=dict(business=expected["business"],requests=1,executions=1,witnesses=1),first_primary_audit_preserved=True,

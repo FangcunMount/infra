@@ -1,0 +1,149 @@
+--- a/TimerMessageStore.java
++++ b/TimerMessageStore.java
+@@ -302,0 +303,5 @@
++        boolean reconcile = Boolean.getBoolean("fangcun.standaloneTimerRecoveryCandidate");
++        if (reconcile) {
++            requireStandaloneTimerStore();
++        }
++        long checkpointFlushPos = timerCheckpoint.getLastTimerLogFlushPos();
+@@ -328,0 +334,4 @@
++        if (reconcile && queueOffset >= currQueueOffset) {
++            currQueueOffset = verifyRetainedTimerSuffix(
++                cq, currQueueOffset, queueOffset + 1, checkpointFlushPos, processOffset);
++        }
+@@ -361,0 +371,3 @@
++        if (reconcile) {
++            rebuildPendingTimerMetrics(processOffset);
++        }
+@@ -367,0 +380,131 @@
++    private void requireStandaloneTimerStore() {
++        if (!(messageStore instanceof DefaultMessageStore)
++            || storeConfig.getBrokerRole() != BrokerRole.ASYNC_MASTER
++            || storeConfig.isEnableDLegerCommitLog()
++            || storeConfig.isDuplicationEnable()
++            || storeConfig.isEnableRocksDBStore()
++            || storeConfig.isTimerRocksDBEnable()) {
++            throw new IllegalStateException("unsupported store for standalone timer recovery candidate");
++        }
++        DefaultMessageStore store = (DefaultMessageStore) messageStore;
++        if (store.getBrokerConfig().getBrokerId() != 0 || store.getBrokerConfig().isEnableControllerMode()) {
++            throw new IllegalStateException("unsupported broker for standalone timer recovery candidate");
++        }
++    }
++
++    private long verifyRetainedTimerSuffix(ConsumeQueueInterface cq, long start, long end,
++        long fromTimerLog, long throughTimerLog) {
++        if (cq == null || start < cq.getMinOffsetInQueue() || end > cq.getMaxOffsetInQueue()
++            || fromTimerLog < 0 || fromTimerLog >= throughTimerLog) {
++            throw new IllegalStateException("unverifiable retained timer suffix");
++        }
++        long position = fromTimerLog;
++        for (long queue = start; queue < end; queue++) {
++            TimerUnit timer = readTimerUnit(position);
++            if (timer.magic == TimerLog.BLANK_MAGIC_CODE) {
++                position = Math.addExact(position, timer.size);
++                timer = readTimerUnit(position);
++            }
++            CqUnit entry = cq.get(queue);
++            if (!timer.valid() || entry == null || entry.getQueueOffset() != queue
++                || entry.getPos() != timer.commitLogOffset || entry.getSize() != timer.messageSize) {
++                throw new IllegalStateException("retained timer suffix does not match timer consume queue");
++            }
++            position = Math.addExact(position, TimerLog.UNIT_SIZE);
++        }
++        if (position != throughTimerLog) {
++            throw new IllegalStateException("retained timer suffix is not fully bound");
++        }
++        System.err.println("F07_RECOVERY_CANDIDATE event=verified_suffix queue_from=" + start
++            + " queue_to=" + end + " log_from=" + fromTimerLog + " log_to=" + throughTimerLog);
++        return end;
++    }
++
++    private void rebuildPendingTimerMetrics(long recoveredEnd) {
++        Map<String, Long> counts = new HashMap<>();
++        long pending = 0;
++        for (int index = 0; index < slotsTotal * 2; index++) {
++            Slot slot = timerWheel.getSlot(currReadTimeMs + (long) index * precisionMs);
++            for (long position = slot.lastPos; position != -1; ) {
++                if (position < 0 || position >= recoveredEnd) {
++                    throw new IllegalStateException("timer wheel references outside the recovered log");
++                }
++                TimerUnit timer = readTimerUnit(position);
++                if (!timer.valid() || timer.previous < -1 || timer.previous >= position
++                    || timer.due / precisionMs * precisionMs != slot.timeMs) {
++                    throw new IllegalStateException("invalid recovered timer wheel chain");
++                }
++                MessageExt message = getMessageByCommitOffset(timer.commitLogOffset, timer.messageSize);
++                if (message == null || !TIMER_TOPIC.equals(message.getTopic())) {
++                    throw new IllegalStateException("cannot bind recovered timer unit to its message");
++                }
++                String topic = message.getProperty(MessageConst.PROPERTY_REAL_TOPIC);
++                if (topic == null) {
++                    throw new IllegalStateException("recovered timer has no real topic");
++                }
++                if (NumberUtils.toLong(message.getProperty(TIMER_ENQUEUE_MS)) != Long.MAX_VALUE) {
++                    counts.merge(topic, needDelete(timer.magic) ? -1L : 1L, Math::addExact);
++                    pending++;
++                }
++                position = timer.previous;
++            }
++        }
++        for (String topic : timerMetrics.getTimingCount().keySet()) {
++            timerMetrics.getTopicPair(topic).getCount().set(counts.getOrDefault(topic, 0L));
++        }
++        for (Map.Entry<String, Long> count : counts.entrySet()) {
++            timerMetrics.getTopicPair(count.getKey()).getCount().set(count.getValue());
++        }
++        String revive = "rmq_sys_REVIVE_LOG_FangcunMount";
++        System.err.println("F07_RECOVERY_CANDIDATE event=recount pending=" + pending
++            + " topics=" + counts.size() + " revive=" + timerMetrics.getTimingCount(revive));
++    }
++
++    private TimerUnit readTimerUnit(long position) {
++        SelectMappedBufferResult selected = timerLog.getTimerMessage(position);
++        if (selected == null) {
++            throw new IllegalStateException("recovered timer unit is unavailable");
++        }
++        try {
++            ByteBuffer bytes = selected.getByteBuffer();
++            int size = bytes.getInt();
++            long previous = bytes.getLong();
++            int magic = bytes.getInt();
++            if (magic == TimerLog.BLANK_MAGIC_CODE) {
++                if (size < 16 || size != timerLogFileSize - position % timerLogFileSize) {
++                    throw new IllegalStateException("invalid timer log segment padding");
++                }
++                return new TimerUnit(size, previous, magic, 0, 0, 0);
++            }
++            long due = Math.addExact(bytes.getLong(), bytes.getInt());
++            long commitLogOffset = bytes.getLong();
++            int messageSize = bytes.getInt();
++            return new TimerUnit(size, previous, magic, due, commitLogOffset, messageSize);
++        } finally {
++            selected.release();
++        }
++    }
++
++    private static final class TimerUnit {
++        private final int size;
++        private final long previous;
++        private final int magic;
++        private final long due;
++        private final long commitLogOffset;
++        private final int messageSize;
++
++        private TimerUnit(int size, long previous, int magic, long due, long commitLogOffset, int messageSize) {
++            this.size = size;
++            this.previous = previous;
++            this.magic = magic;
++            this.due = due;
++            this.commitLogOffset = commitLogOffset;
++            this.messageSize = messageSize;
++        }
++
++        private boolean valid() {
++            return size == TimerLog.UNIT_SIZE && isMagicOK(magic)
++                && (magic & MAGIC_DEFAULT) != 0 && commitLogOffset >= 0 && messageSize > 0;
++        }
++    }
++

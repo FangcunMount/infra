@@ -1,0 +1,455 @@
+--- a/PopReviveService.java
++++ b/PopReviveService.java
+@@ -34,0 +35 @@
++import org.apache.rocketmq.common.attribute.CQType;
+@@ -45,0 +47,7 @@
++import org.apache.rocketmq.store.MessageStore;
++import org.apache.rocketmq.store.SelectMappedBufferResult;
++import org.apache.rocketmq.store.config.BrokerRole;
++import org.apache.rocketmq.store.config.FlushDiskType;
++import org.apache.rocketmq.store.config.MessageStoreConfig;
++import org.apache.rocketmq.store.queue.ConsumeQueueInterface;
++import org.apache.rocketmq.store.queue.CqUnit;
+@@ -52,0 +61,3 @@
++import java.security.MessageDigest;
++import java.security.NoSuchAlgorithmException;
++import java.util.Arrays;
+@@ -61,0 +73 @@
++import java.util.concurrent.TimeUnit;
+@@ -68,0 +81,2 @@
++    private static final int ACK_TAIL_LOOKBACK = 128;
++    private static final int ACK_TAIL_SCAN_LIMIT = 32;
+@@ -107 +121,204 @@
+-    private boolean reviveRetry(PopCheckPoint popCheckPoint, MessageExt messageExt) {
++    private static final String REVIVE_WITNESS = "F07_REVIVE_WITNESS";
++    private static final String REVIVE_SOURCE_WITNESS = "F07_REVIVE_SOURCE_WITNESS";
++    private static final Object[] REVIVE_APPEND_LOCKS = new Object[64];
++    static {
++        Arrays.setAll(REVIVE_APPEND_LOCKS, index -> new Object());
++    }
++
++    private boolean reviveRetry(PopCheckPoint checkpoint, MessageExt source) {
++        if (!Boolean.getBoolean("fangcun.standaloneReviveAppendCandidate")) {
++            return appendReviveRetry(checkpoint, source, null, null);
++        }
++        requireStandaloneReviveStore();
++        String retryTopic = retryTopic(checkpoint);
++        String sourceBroker = StringUtils.defaultIfBlank(checkpoint.getBrokerName(), brokerController.getBrokerConfig().getBrokerName());
++        String key = reviveWitness(sourceBroker, checkpoint, source);
++        String sourceKey = reviveSourceWitness(sourceBroker, checkpoint, source);
++        Object lock = REVIVE_APPEND_LOCKS[sourceKey.hashCode() & (REVIVE_APPEND_LOCKS.length - 1)];
++        synchronized (lock) {
++            addRetryTopicIfNotExist(retryTopic, checkpoint.getCId());
++            int retryQueue = getRetryQueueId(retryTopic, source);
++            try {
++                MessageStore store = brokerController.getMessageStore();
++                if (brokerController.getMessageStoreByBrokerName(checkpoint.getBrokerName()) != store) {
++                    throw new IllegalStateException("retry witness source must be in the same local CommitLog");
++                }
++                long existing = findReviveWitness(store, retryTopic, retryQueue, key, sourceKey,
++                    checkpoint.parseRePutTimes() > 0, source);
++                if (existing >= 0) {
++                    System.err.println("F07_REVIVE_CANDIDATE event=reused key=" + key
++                        + " ck_queue=" + queueId + " ck_offset=" + checkpoint.getReviveOffset()
++                        + " commit_log=" + existing + " pop_time=" + checkpoint.getPopTime());
++                    return true;
++                }
++                return appendReviveRetry(checkpoint, source, key, sourceKey);
++            } catch (RuntimeException failure) {
++                POP_LOGGER.error("Cannot verify retained revive witness", failure);
++                return false;
++            }
++        }
++    }
++
++    private void requireStandaloneReviveStore() {
++        MessageStoreConfig config = brokerController.getMessageStoreConfig();
++        if (config.getBrokerRole() != BrokerRole.ASYNC_MASTER || config.getFlushDiskType() != FlushDiskType.SYNC_FLUSH
++            || config.isEnableDLegerCommitLog() || config.isDuplicationEnable() || config.isEnableRocksDBStore()
++            || brokerController.getBrokerConfig().isEnableControllerMode()
++            || brokerController.getBrokerConfig().getBrokerId() != 0) {
++            throw new IllegalStateException("unsupported store for revive append candidate");
++        }
++    }
++
++    private String retryTopic(PopCheckPoint checkpoint) {
++        return checkpoint.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)
++            ? checkpoint.getTopic()
++            : KeyBuilder.buildPopRetryTopic(checkpoint.getTopic(), checkpoint.getCId(),
++                brokerController.getBrokerConfig().isEnableRetryTopicV2());
++    }
++
++    static String reviveWitness(String broker, PopCheckPoint checkpoint, MessageExt source) {
++        return witnessDigest(Arrays.asList(broker, checkpoint.getCId(), checkpoint.getTopic(),
++            checkpoint.getQueueId(), checkpoint.getStartOffset(), checkpoint.getPopTime(),
++            source.getQueueOffset(), source.getCommitLogOffset(), source.getReconsumeTimes()));
++    }
++
++    static String reviveSourceWitness(String broker, PopCheckPoint checkpoint, MessageExt source) {
++        // A failed member of a batch gets its own start offset in rePutCK.
++        // The original POP time and physical source still identify the same work.
++        return witnessDigest(Arrays.asList("f07-revive-source-v1", broker, checkpoint.getCId(), checkpoint.getTopic(),
++            checkpoint.getQueueId(), checkpoint.getPopTime(), source.getQueueOffset(),
++            source.getCommitLogOffset(), source.getReconsumeTimes()));
++    }
++
++    private static String witnessDigest(List<?> identity) {
++        String canonical = JSON.toJSONString(identity);
++        try {
++            byte[] hash = MessageDigest.getInstance("SHA-256").digest(canonical.getBytes(StandardCharsets.UTF_8));
++            StringBuilder hex = new StringBuilder(hash.length * 2);
++            for (byte value : hash) {
++                hex.append(Character.forDigit((value & 0xff) >>> 4, 16));
++                hex.append(Character.forDigit(value & 0xf, 16));
++            }
++            return hex.toString();
++        } catch (NoSuchAlgorithmException failure) {
++            throw new IllegalStateException(failure);
++        }
++    }
++
++    static long findReviveWitness(MessageStore store, String topic, int queue, String key, String sourceKey,
++        boolean rewritten, MessageExt source) {
++        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(3);
++        while (store.dispatchBehindBytes() != 0) {
++            if (System.nanoTime() >= deadline) {
++                throw new IllegalStateException("retry witness dispatch is incomplete");
++            }
++            try {
++                Thread.sleep(10);
++            } catch (InterruptedException failure) {
++                Thread.currentThread().interrupt();
++                throw new IllegalStateException("retry witness verification interrupted", failure);
++            }
++        }
++        long sourcePosition = source.getCommitLogOffset();
++        requireRetainedSource(store, sourcePosition);
++        ConsumeQueueInterface index = store.getConsumeQueue(topic, queue);
++        if (index == null) {
++            return -1;
++        }
++        long lower = index.getMinOffsetInQueue();
++        long upper = index.getMaxOffsetInQueue();
++        if (index.getCQType() != CQType.SimpleCQ || lower < 0 || upper < lower) {
++            throw new IllegalStateException("retry witness scan requires a valid simple ConsumeQueue");
++        }
++        // Ordinary ConsumeQueue entries are ordered by CommitLog position.
++        // A retry was appended after its source, even across file rotation.
++        long first = firstRetryAfterSource(index, lower, upper, sourcePosition);
++        long found = -1;
++        boolean uncertainLegacy = false;
++        String sourceId = source.getProperty(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX);
++        long previousPosition = sourcePosition;
++        for (long offset = first; offset < upper; offset++) {
++            CqUnit entry = requireRetryIndexEntry(index, offset);
++            if (entry.getPos() <= previousPosition) {
++                throw new IllegalStateException("retry witness physical positions are not ordered");
++            }
++            previousPosition = entry.getPos();
++            SelectMappedBufferResult raw = store.selectOneMessageByOffset(entry.getPos(), entry.getSize());
++            if (raw == null) {
++                throw new IllegalStateException("retry witness CommitLog entry is unavailable");
++            }
++            try {
++                MessageExt retained = MessageDecoder.decode(raw.getByteBuffer().duplicate(), false, false);
++                if (retained == null || !topic.equals(retained.getTopic()) || retained.getQueueId() != queue
++                    || retained.getQueueOffset() != offset || retained.getCommitLogOffset() != entry.getPos()
++                    || retained.getStoreSize() != entry.getSize()) {
++                    throw new IllegalStateException("retry witness physical identity mismatch");
++                }
++                String storedKey = retained.getProperty(REVIVE_WITNESS);
++                String storedSourceKey = retained.getProperty(REVIVE_SOURCE_WITNESS);
++                boolean legacyMatch = key.equals(storedKey);
++                boolean sourceMatch = sourceKey.equals(storedSourceKey);
++                boolean sameMessage = java.util.Objects.equals(sourceId,
++                    retained.getProperty(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX))
++                    && retained.getReconsumeTimes() == source.getReconsumeTimes() + 1;
++                if (legacyMatch || sourceMatch) {
++                    if ((legacyMatch && storedSourceKey != null && !sourceMatch) || (sourceMatch && storedKey == null)) {
++                        throw new IllegalStateException("retry witness identities disagree");
++                    }
++                    MessageExt match = MessageDecoder.decode(raw.getByteBuffer().duplicate(), true, true);
++                    if (found >= 0 || match == null || !sameMessage || !Arrays.equals(source.getBody(), match.getBody())) {
++                        throw new IllegalStateException("retry witness is ambiguous or differs from the source");
++                    }
++                    found = entry.getPos();
++                } else if (rewritten && storedKey != null && storedSourceKey == null && sameMessage) {
++                    uncertainLegacy = true;
++                }
++            } finally {
++                raw.release();
++            }
++        }
++        requireRetainedSource(store, sourcePosition);
++        if (store.getConsumeQueue(topic, queue) != index || index.getMinOffsetInQueue() != lower
++            || index.getMaxOffsetInQueue() < upper) {
++            throw new IllegalStateException("retry witness ConsumeQueue changed during the scan");
++        }
++        if (found < 0 && uncertainLegacy) {
++            throw new IllegalStateException("rewritten checkpoint cannot prove the retained legacy retry identity");
++        }
++        return found;
++    }
++
++    private static void requireRetainedSource(MessageStore store, long sourcePosition) {
++        if (sourcePosition < 0 || sourcePosition < store.getMinPhyOffset() || sourcePosition >= store.getMaxPhyOffset()) {
++            throw new IllegalStateException("retry witness source is outside the retained CommitLog");
++        }
++    }
++
++    private static long firstRetryAfterSource(ConsumeQueueInterface index, long lower, long upper, long sourcePosition) {
++        long left = lower;
++        long right = upper;
++        while (left < right) {
++            long mid = left + (right - left) / 2;
++            if (requireRetryIndexEntry(index, mid).getPos() <= sourcePosition) {
++                left = mid + 1;
++            } else {
++                right = mid;
++            }
++        }
++        if ((left > lower && requireRetryIndexEntry(index, left - 1).getPos() > sourcePosition)
++            || (left < upper && requireRetryIndexEntry(index, left).getPos() <= sourcePosition)) {
++            throw new IllegalStateException("retry witness search boundary is inconsistent");
++        }
++        return left;
++    }
++
++    private static CqUnit requireRetryIndexEntry(ConsumeQueueInterface index, long offset) {
++        CqUnit entry = index.get(offset);
++        if (entry == null || entry.getQueueOffset() != offset || entry.getPos() < 0 || entry.getSize() <= 0
++            || entry.getBatchNum() != 1) {
++            throw new IllegalStateException("retry witness ConsumeQueue entry is unavailable");
++        }
++        return entry;
++    }
++
++    private boolean appendReviveRetry(PopCheckPoint popCheckPoint, MessageExt messageExt, String witness, String sourceWitness) {
+@@ -109,5 +326 @@
+-        if (!popCheckPoint.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
+-            msgInner.setTopic(KeyBuilder.buildPopRetryTopic(popCheckPoint.getTopic(), popCheckPoint.getCId(), brokerController.getBrokerConfig().isEnableRetryTopicV2()));
+-        } else {
+-            msgInner.setTopic(popCheckPoint.getTopic());
+-        }
++        msgInner.setTopic(retryTopic(popCheckPoint));
+@@ -134,0 +348,4 @@
++        if (witness != null) {
++            msgInner.getProperties().put(REVIVE_WITNESS, witness);
++            msgInner.getProperties().put(REVIVE_SOURCE_WITNESS, sourceWitness);
++        }
+@@ -148,0 +366,6 @@
++        }
++        if (witness != null) {
++            System.err.println("F07_REVIVE_CANDIDATE event=appended key=" + witness
++                + " ck_queue=" + queueId + " ck_offset=" + popCheckPoint.getReviveOffset()
++                + " commit_log=" + putMessageResult.getAppendMessageResult().getWroteOffset()
++                + " pop_time=" + popCheckPoint.getPopTime());
+@@ -338,0 +562,5 @@
++        Map<String, RetryAck> matchedRetryAcks = new HashMap<>();
++        boolean reconcile = Boolean.getBoolean("fangcun.standaloneReviveAppendCandidate");
++        if (reconcile) {
++            requireStandaloneReviveStore();
++        }
+@@ -423,0 +652,3 @@
++                            if (reconcile) {
++                                rememberMatchedRetryAck(matchedRetryAcks, point, ackMsg.getAckOffset(), messageExt);
++                            }
+@@ -452,0 +684,3 @@
++                                if (reconcile) {
++                                    rememberMatchedRetryAck(matchedRetryAcks, point, ackOffset, messageExt);
++                                }
+@@ -465,0 +700,3 @@
++        if (reconcile && !matchedRetryAcks.isEmpty()) {
++            closeOlderRetryCheckpoints(map, matchedRetryAcks);
++        }
+@@ -467,0 +705,74 @@
++    }
++
++    private String retryAckIdentity(PopCheckPoint checkpoint, long sourceOffset) {
++        String broker = StringUtils.defaultIfBlank(checkpoint.getBrokerName(), brokerController.getBrokerConfig().getBrokerName());
++        return JSON.toJSONString(Arrays.asList(broker, checkpoint.getCId(), checkpoint.getTopic(),
++            checkpoint.getQueueId(), sourceOffset));
++    }
++
++    private void rememberMatchedRetryAck(Map<String, RetryAck> evidence, PopCheckPoint checkpoint,
++        long sourceOffset, MessageExt ack) {
++        if (!checkpoint.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
++            return;
++        }
++        String key = retryAckIdentity(checkpoint, sourceOffset);
++        RetryAck previous = evidence.get(key);
++        if (previous == null || previous.popTime < checkpoint.getPopTime()) {
++            evidence.put(key, new RetryAck(checkpoint.getPopTime(), ack.getQueueOffset(), ack.getCommitLogOffset()));
++        }
++    }
++
++    private void closeOlderRetryCheckpoints(Map<String, PopCheckPoint> pending, Map<String, RetryAck> evidence) {
++        MessageStore store = brokerController.getMessageStore();
++        for (PopCheckPoint older : pending.values()) {
++            if (!older.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
++                continue;
++            }
++            for (int index = 0; index < older.getNum(); index++) {
++                if (DataConverter.getBit(older.getBitMap(), index)) {
++                    continue;
++                }
++                long sourceOffset = older.ackOffsetByIndex((byte) index);
++                RetryAck ack = evidence.get(retryAckIdentity(older, sourceOffset));
++                if (ack == null || ack.popTime <= older.getPopTime()) {
++                    continue;
++                }
++                ConsumeQueueInterface queue = store.getConsumeQueue(older.getTopic(), older.getQueueId());
++                CqUnit entry = queue == null ? null : queue.get(sourceOffset);
++                if (entry == null || entry.getQueueOffset() != sourceOffset) {
++                    continue;
++                }
++                SelectMappedBufferResult raw = store.selectOneMessageByOffset(entry.getPos(), entry.getSize());
++                if (raw == null) {
++                    continue;
++                }
++                try {
++                    MessageExt source = MessageDecoder.decode(raw.getByteBuffer(), true, true);
++                    if (source == null || !older.getTopic().equals(source.getTopic())
++                        || source.getQueueId() != older.getQueueId() || source.getQueueOffset() != sourceOffset
++                        || source.getCommitLogOffset() != entry.getPos()) {
++                        continue;
++                    }
++                    older.setBitMap(DataConverter.setBit(older.getBitMap(), index, true));
++                    System.err.println("F07_REVIVE_CANDIDATE event=later_ack ck_queue=" + queueId
++                        + " ck_offset=" + older.getReviveOffset() + " ck_pop=" + older.getPopTime()
++                        + " ack_offset=" + ack.offset + " ack_log=" + ack.commitLog + " ack_pop=" + ack.popTime
++                        + " source_queue=" + older.getQueueId() + " source_offset=" + sourceOffset
++                        + " source_log=" + entry.getPos());
++                } finally {
++                    raw.release();
++                }
++            }
++        }
++    }
++
++    private static final class RetryAck {
++        private final long popTime;
++        private final long offset;
++        private final long commitLog;
++
++        private RetryAck(long popTime, long offset, long commitLog) {
++            this.popTime = popTime;
++            this.offset = offset;
++            this.commitLog = commitLog;
++        }
+@@ -551,0 +863,3 @@
++        if (Boolean.getBoolean("fangcun.standaloneReviveAppendCandidate")) {
++            newOffset = advanceVerifiedAckTail(newOffset);
++        }
+@@ -553,0 +868,111 @@
++    }
++
++    private long advanceVerifiedAckTail(long committed) {
++        if (committed < 0 || !shouldRunPopRevive || !inflightReviveRequestMap.isEmpty()) {
++            return committed;
++        }
++        MessageStore store = brokerController.getMessageStore();
++        ConsumeQueueInterface queue = store.getConsumeQueue(reviveTopic, queueId);
++        if (queue == null || queue.getMaxOffsetInQueue() <= committed + 1) {
++            return committed;
++        }
++        long oldest = Math.max(queue.getMinOffsetInQueue(), committed - ACK_TAIL_LOOKBACK + 1);
++        long end = Math.min(queue.getMaxOffsetInQueue(), committed + 1 + ACK_TAIL_SCAN_LIMIT);
++        Map<String, PopCheckPoint> checkpoints = new HashMap<>();
++        long verified = committed;
++        for (long offset = committed + 1; offset < end; offset++) {
++            MessageExt record = readReviveRecord(queue, offset);
++            if (record == null || !(PopAckConstants.ACK_TAG.equals(record.getTags())
++                || PopAckConstants.BATCH_ACK_TAG.equals(record.getTags()))) {
++                break;
++            }
++            if (offset == committed + 1) {
++                for (long prior = committed; prior >= oldest; prior--) {
++                    MessageExt checkpoint = readReviveRecord(queue, prior);
++                    if (checkpoint == null) {
++                        break;
++                    }
++                    if (PopAckConstants.CK_TAG.equals(checkpoint.getTags())) {
++                        PopCheckPoint point = JSON.parseObject(checkpoint.getBody(), PopCheckPoint.class);
++                        point.setReviveOffset(prior);
++                        rememberAckCheckpoint(checkpoints, ackCheckpointIdentity(point.getTopic(), point.getCId(),
++                            point.getQueueId(), point.getStartOffset(), point.getPopTime(), point.getBrokerName()), point);
++                    }
++                }
++            }
++            AckMsg ack = PopAckConstants.BATCH_ACK_TAG.equals(record.getTags())
++                ? JSON.parseObject(record.getBody(), BatchAckMsg.class) : JSON.parseObject(record.getBody(), AckMsg.class);
++            PopCheckPoint point = checkpoints.get(ackCheckpointIdentity(ack.getTopic(), ack.getConsumerGroup(),
++                ack.getQueueId(), ack.getStartOffset(), ack.getPopTime(), ack.getBrokerName()));
++            if (!coversCheckpointOffset(ack, point)) {
++                break;
++            }
++            System.err.println("F07_ACK_TAIL event=verified queue=" + queueId + " ck_offset=" + point.getReviveOffset()
++                + " ack_offset=" + offset + " ack_log=" + record.getCommitLogOffset() + " prior_commit=" + committed);
++            verified = offset;
++        }
++        if (verified == committed || !shouldRunPopRevive || !inflightReviveRequestMap.isEmpty()
++            || brokerController.getConsumerOffsetManager().queryOffset(PopAckConstants.REVIVE_GROUP, reviveTopic, queueId) != committed) {
++            return committed;
++        }
++        brokerController.getConsumerOffsetManager().commitOffset(PopAckConstants.LOCAL_HOST, PopAckConstants.REVIVE_GROUP,
++            reviveTopic, queueId, verified);
++        return verified;
++    }
++
++    private MessageExt readReviveRecord(ConsumeQueueInterface queue, long offset) {
++        CqUnit entry = queue.get(offset);
++        if (entry == null || entry.getQueueOffset() != offset || entry.getPos() < 0 || entry.getSize() <= 0) {
++            return null;
++        }
++        SelectMappedBufferResult raw = brokerController.getMessageStore().selectOneMessageByOffset(entry.getPos(), entry.getSize());
++        if (raw == null) {
++            return null;
++        }
++        try {
++            MessageExt record = MessageDecoder.decode(raw.getByteBuffer(), true, true, false, false, true);
++            return record != null && reviveTopic.equals(record.getTopic()) && queueId == record.getQueueId()
++                && record.getQueueOffset() == offset && record.getCommitLogOffset() == entry.getPos() ? record : null;
++        } finally {
++            raw.release();
++        }
++    }
++
++    private String ackCheckpointIdentity(String topic, String group, int sourceQueue, long start, long pop, String broker) {
++        return JSON.toJSONString(Arrays.asList(topic, group, sourceQueue, start, pop,
++            StringUtils.defaultIfBlank(broker, brokerController.getBrokerConfig().getBrokerName())));
++    }
++
++    static void rememberAckCheckpoint(Map<String, PopCheckPoint> checkpoints, String identity, PopCheckPoint point) {
++        // A second physical CK with this identity makes its ACK ambiguous.
++        checkpoints.put(identity, checkpoints.containsKey(identity) ? null : point);
++    }
++
++    static boolean coversCheckpointOffset(AckMsg ack, PopCheckPoint point) {
++        if (point == null || StringUtils.isBlank(point.getTopic()) || StringUtils.isBlank(point.getCId())
++            || point.getNum() <= 0 || point.getStartOffset() < 0 || ack.getPopTime() <= 0) {
++            return false;
++        }
++        List<Integer> differences = point.getQueueOffsetDiff();
++        if (differences != null && !differences.isEmpty() && differences.size() != point.getNum()) {
++            return false;
++        }
++        if (ack instanceof BatchAckMsg) {
++            List<Long> offsets = ((BatchAckMsg) ack).getAckOffsetList();
++            return offsets != null && !offsets.isEmpty() && offsets.size() <= point.getNum()
++                && offsets.stream().distinct().count() == offsets.size()
++                && offsets.stream().allMatch(offset -> offset != null && containsExactOffset(point, offset));
++        }
++        return containsExactOffset(point, ack.getAckOffset());
++    }
++
++    private static boolean containsExactOffset(PopCheckPoint point, long offset) {
++        if (offset < point.getStartOffset()) {
++            return false;
++        }
++        long difference = offset - point.getStartOffset();
++        List<Integer> differences = point.getQueueOffsetDiff();
++        if (differences == null || differences.isEmpty()) {
++            return difference < point.getNum();
++        }
++        return difference <= Integer.MAX_VALUE && differences.contains((int) difference);

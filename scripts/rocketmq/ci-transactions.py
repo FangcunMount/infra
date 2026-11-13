@@ -976,6 +976,11 @@ def main():
             shared_budget(start,passed,language="sdk-go",observe=pop_observe)
             if args.sdk_api_python:
                 shared_budget(start,passed,language="sdk-python",observe=pop_observe)
+            if args.sdk_pop_drain_controls and args.image == 'rocketmq-readable:f07-ack-tail':
+                from f07_ack_tail_evidence import collect
+                routes = {(row['physical_topic'], row['consumer_group']) for row in sdk_manifest['routes']
+                          if row.get('consumer_group')}
+                proof['f07_ack_tail_storage'] = collect(run, broker, project, image, routes, os.environ)
             if args.sdk_faults:
                 from sdk_faults import run_faults
                 run(["go", "build", "-o", str(directory / "fault-proxy"),
