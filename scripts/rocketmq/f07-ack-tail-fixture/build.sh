@@ -15,7 +15,7 @@ cd "$work"
 
 stock=rocketmq-readable:5.5.1
 container=$(docker create --network none "$stock")
-mkdir lib classes overlay checks
+mkdir lib classes overlay checks ack-tail-test-store
 docker cp "$container:/opt/rocketmq/lib/." lib/
 shasum -a 256 -c <<'HASH'
 21b53ce3b4c5d749f869456310462c8f1ea2b505dc54eb2d510febc78969aba1  lib/rocketmq-broker-5.5.1.jar
@@ -32,13 +32,15 @@ HASH
 patch -f -F 0 -p1 < "$fixture/pop-revive.patch"
 patch -f -F 0 -p1 < "$fixture/timer-recovery.patch"
 shasum -a 256 -c <<'HASH'
-6ba357e781e459fd3bcee80ec8f9b538012f473459e98030406ebc946f72f3ce  PopReviveService.java
+255b686e7d448f0775a768b3061700344084421ddc323bafbb22bf34090b5900  PopReviveService.java
 414bad09be629e6f0f1498aceabc010a287ba0d7c3708b302e5cb5351e2dd882  TimerMessageStore.java
 HASH
 
 javac --release 8 -cp 'lib/*' -d classes PopReviveService.java TimerMessageStore.java
 javac --release 8 -cp 'classes:lib/*' -d checks "$fixture/RetryIndexRegression.java"
 java -cp 'checks:classes:lib/*' org.apache.rocketmq.broker.processor.RetryIndexRegression
+javac --release 8 -cp 'classes:lib/*' -d checks "$fixture/AckTailStorageCheck.java"
+java -cp 'checks:classes:lib/*' org.apache.rocketmq.broker.processor.AckTailStorageCheck "$work/ack-tail-test-store"
 cp lib/rocketmq-{broker,store}-5.5.1.jar overlay/
 jar uf overlay/rocketmq-broker-5.5.1.jar -C classes org/apache/rocketmq/broker/processor
 jar uf overlay/rocketmq-store-5.5.1.jar -C classes org/apache/rocketmq/store/timer

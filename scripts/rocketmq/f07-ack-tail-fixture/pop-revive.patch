@@ -1,8 +1,10 @@
 --- a/PopReviveService.java
 +++ b/PopReviveService.java
-@@ -34,0 +35 @@
+@@ -19,0 +20 @@
++import com.alibaba.fastjson2.JSONException;
+@@ -34,0 +36 @@
 +import org.apache.rocketmq.common.attribute.CQType;
-@@ -45,0 +47,7 @@
+@@ -45,0 +48,7 @@
 +import org.apache.rocketmq.store.MessageStore;
 +import org.apache.rocketmq.store.SelectMappedBufferResult;
 +import org.apache.rocketmq.store.config.BrokerRole;
@@ -10,17 +12,22 @@
 +import org.apache.rocketmq.store.config.MessageStoreConfig;
 +import org.apache.rocketmq.store.queue.ConsumeQueueInterface;
 +import org.apache.rocketmq.store.queue.CqUnit;
-@@ -52,0 +61,3 @@
+@@ -52,0 +62,3 @@
 +import java.security.MessageDigest;
 +import java.security.NoSuchAlgorithmException;
 +import java.util.Arrays;
-@@ -61,0 +73 @@
+@@ -61,0 +74 @@
 +import java.util.concurrent.TimeUnit;
-@@ -68,0 +81,2 @@
+@@ -68,0 +82,2 @@
 +    private static final int ACK_TAIL_LOOKBACK = 128;
 +    private static final int ACK_TAIL_SCAN_LIMIT = 32;
-@@ -107 +121,204 @@
+@@ -107,6 +122,10 @@
 -    private boolean reviveRetry(PopCheckPoint popCheckPoint, MessageExt messageExt) {
+-        MessageExtBrokerInner msgInner = new MessageExtBrokerInner();
+-        if (!popCheckPoint.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
+-            msgInner.setTopic(KeyBuilder.buildPopRetryTopic(popCheckPoint.getTopic(), popCheckPoint.getCId(), brokerController.getBrokerConfig().isEnableRetryTopicV2()));
+-        } else {
+-            msgInner.setTopic(popCheckPoint.getTopic());
 +    private static final String REVIVE_WITNESS = "F07_REVIVE_WITNESS";
 +    private static final String REVIVE_SOURCE_WITNESS = "F07_REVIVE_SOURCE_WITNESS";
 +    private static final Object[] REVIVE_APPEND_LOCKS = new Object[64];
@@ -31,7 +38,7 @@
 +    private boolean reviveRetry(PopCheckPoint checkpoint, MessageExt source) {
 +        if (!Boolean.getBoolean("fangcun.standaloneReviveAppendCandidate")) {
 +            return appendReviveRetry(checkpoint, source, null, null);
-+        }
+@@ -113,0 +133,195 @@
 +        requireStandaloneReviveStore();
 +        String retryTopic = retryTopic(checkpoint);
 +        String sourceBroker = StringUtils.defaultIfBlank(checkpoint.getBrokerName(), brokerController.getBrokerConfig().getBrokerName());
@@ -225,52 +232,46 @@
 +    }
 +
 +    private boolean appendReviveRetry(PopCheckPoint popCheckPoint, MessageExt messageExt, String witness, String sourceWitness) {
-@@ -109,5 +326 @@
--        if (!popCheckPoint.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
--            msgInner.setTopic(KeyBuilder.buildPopRetryTopic(popCheckPoint.getTopic(), popCheckPoint.getCId(), brokerController.getBrokerConfig().isEnableRetryTopicV2()));
--        } else {
--            msgInner.setTopic(popCheckPoint.getTopic());
--        }
++        MessageExtBrokerInner msgInner = new MessageExtBrokerInner();
 +        msgInner.setTopic(retryTopic(popCheckPoint));
-@@ -134,0 +348,4 @@
+@@ -134,0 +349,4 @@
 +        if (witness != null) {
 +            msgInner.getProperties().put(REVIVE_WITNESS, witness);
 +            msgInner.getProperties().put(REVIVE_SOURCE_WITNESS, sourceWitness);
 +        }
-@@ -148,0 +366,6 @@
-+        }
+@@ -149,0 +368,6 @@
 +        if (witness != null) {
 +            System.err.println("F07_REVIVE_CANDIDATE event=appended key=" + witness
 +                + " ck_queue=" + queueId + " ck_offset=" + popCheckPoint.getReviveOffset()
 +                + " commit_log=" + putMessageResult.getAppendMessageResult().getWroteOffset()
 +                + " pop_time=" + popCheckPoint.getPopTime());
-@@ -338,0 +562,5 @@
++        }
+@@ -338,0 +563,5 @@
 +        Map<String, RetryAck> matchedRetryAcks = new HashMap<>();
 +        boolean reconcile = Boolean.getBoolean("fangcun.standaloneReviveAppendCandidate");
 +        if (reconcile) {
 +            requireStandaloneReviveStore();
 +        }
-@@ -423,0 +652,3 @@
+@@ -423,0 +653,3 @@
 +                            if (reconcile) {
 +                                rememberMatchedRetryAck(matchedRetryAcks, point, ackMsg.getAckOffset(), messageExt);
 +                            }
-@@ -452,0 +684,3 @@
+@@ -452,0 +685,3 @@
 +                                if (reconcile) {
 +                                    rememberMatchedRetryAck(matchedRetryAcks, point, ackOffset, messageExt);
 +                                }
-@@ -465,0 +700,3 @@
+@@ -465,0 +701,3 @@
 +        if (reconcile && !matchedRetryAcks.isEmpty()) {
 +            closeOlderRetryCheckpoints(map, matchedRetryAcks);
 +        }
-@@ -467,0 +705,74 @@
+@@ -467,0 +706,6 @@
 +    }
 +
 +    private String retryAckIdentity(PopCheckPoint checkpoint, long sourceOffset) {
 +        String broker = StringUtils.defaultIfBlank(checkpoint.getBrokerName(), brokerController.getBrokerConfig().getBrokerName());
 +        return JSON.toJSONString(Arrays.asList(broker, checkpoint.getCId(), checkpoint.getTopic(),
 +            checkpoint.getQueueId(), sourceOffset));
-+    }
-+
+@@ -469,0 +714,68 @@
 +    private void rememberMatchedRetryAck(Map<String, RetryAck> evidence, PopCheckPoint checkpoint,
 +        long sourceOffset, MessageExt ack) {
 +        if (!checkpoint.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
@@ -337,11 +338,13 @@
 +            this.offset = offset;
 +            this.commitLog = commitLog;
 +        }
-@@ -551,0 +863,3 @@
++    }
++
+@@ -551,0 +864,3 @@
 +        if (Boolean.getBoolean("fangcun.standaloneReviveAppendCandidate")) {
 +            newOffset = advanceVerifiedAckTail(newOffset);
 +        }
-@@ -553,0 +868,111 @@
+@@ -553,0 +869,60 @@
 +    }
 +
 +    private long advanceVerifiedAckTail(long committed) {
@@ -367,10 +370,14 @@
 +                for (long prior = committed; prior >= oldest; prior--) {
 +                    MessageExt checkpoint = readReviveRecord(queue, prior);
 +                    if (checkpoint == null) {
-+                        break;
++                        // An unreadable slot in the retained range can hide a second CK with the same key.
++                        return committed;
 +                    }
 +                    if (PopAckConstants.CK_TAG.equals(checkpoint.getTags())) {
-+                        PopCheckPoint point = JSON.parseObject(checkpoint.getBody(), PopCheckPoint.class);
++                        PopCheckPoint point = parseAckTailRecord(checkpoint, PopCheckPoint.class);
++                        if (point == null) {
++                            return committed;
++                        }
 +                        point.setReviveOffset(prior);
 +                        rememberAckCheckpoint(checkpoints, ackCheckpointIdentity(point.getTopic(), point.getCId(),
 +                            point.getQueueId(), point.getStartOffset(), point.getPopTime(), point.getBrokerName()), point);
@@ -378,7 +385,10 @@
 +                }
 +            }
 +            AckMsg ack = PopAckConstants.BATCH_ACK_TAG.equals(record.getTags())
-+                ? JSON.parseObject(record.getBody(), BatchAckMsg.class) : JSON.parseObject(record.getBody(), AckMsg.class);
++                ? parseAckTailRecord(record, BatchAckMsg.class) : parseAckTailRecord(record, AckMsg.class);
++            if (ack == null) {
++                break;
++            }
 +            PopCheckPoint point = checkpoints.get(ackCheckpointIdentity(ack.getTopic(), ack.getConsumerGroup(),
 +                ack.getQueueId(), ack.getStartOffset(), ack.getPopTime(), ack.getBrokerName()));
 +            if (!coversCheckpointOffset(ack, point)) {
@@ -395,6 +405,13 @@
 +        brokerController.getConsumerOffsetManager().commitOffset(PopAckConstants.LOCAL_HOST, PopAckConstants.REVIVE_GROUP,
 +            reviveTopic, queueId, verified);
 +        return verified;
+@@ -555,0 +931,66 @@
++    private static <T> T parseAckTailRecord(MessageExt record, Class<T> type) {
++        try {
++            return JSON.parseObject(record.getBody(), type);
++        } catch (JSONException malformed) {
++            return null;
++        }
 +    }
 +
 +    private MessageExt readReviveRecord(ConsumeQueueInterface queue, long offset) {
@@ -453,3 +470,5 @@
 +            return difference < point.getNum();
 +        }
 +        return difference <= Integer.MAX_VALUE && differences.contains((int) difference);
++    }
++
