@@ -16,7 +16,8 @@ from audit_transaction_limit import export, write_private
 from render import render
 from routes import consumer_group_v2
 from v2_acceptance import setup
-from managed_recovery_acceptance import accept as managed_accept, fixture_manifest as managed_manifest, install_java_helper
+from managed_recovery_acceptance import (accept as managed_accept, fixture_manifest as managed_manifest,
+                                         install_java_helper, physical_fingerprint)
 
 SDK_SHA = '04757bd3212ca961d8eaec22ecd3560101111e18'
 PARAMETERS = {'transactionTimeOut': 6000, 'transactionCheckInterval': 5000,
@@ -73,6 +74,8 @@ def main():
     parser.add_argument('--governance-faults',action='store_true',help='actual MySQL COMMIT before/after reply loss for managed CLI only')
     parser.add_argument('--audit-write-fault', action='store_true',
                         help='reject the recovery audit update in the disposable MySQL fixture')
+    parser.add_argument('--second-native-notice', action='store_true',
+                        help='exhaust the same frozen half twice and check exact notice resolution')
     parser.add_argument('--iam-host',type=Path,help='actual fixed IAM original writer, owned fixture only')
     parser.add_argument('--host-observer',type=Path,help='CI-only actual-host consumer compiled against the same published SDK')
     parser.add_argument('--terminal',choices=('commit','rollback'),default='commit',help='terminal SDK evidence; rollback uses durable abort fence, no business root')
@@ -83,8 +86,11 @@ def main():
     ci_guard(os.environ)  # Never construct a client or invoke Docker on a workstation.
     require(not args.governance_faults or args.managed_tool is not None,'managed_cli_required_for_governance_faults')
     require(not args.audit_write_fault or (args.managed_tool and args.terminal == 'commit'
-            and not (args.governance_faults or args.iam_host or args.qs_host)),
+            and not (args.governance_faults or args.second_native_notice or args.iam_host or args.qs_host)),
             'audit_fault_requires_disposable_mysql_commit_profile')
+    require(not args.second_native_notice or (args.managed_tool and args.terminal == 'commit'
+            and not (args.governance_faults or args.iam_host or args.qs_host)),
+            'second_notice_requires_disposable_mysql_commit_profile')
     require(not args.iam_host or (args.managed_tool and args.host_observer and not args.governance_faults),'separate_actual_iam_managed_profile_required')
     require(not args.qs_host or (args.managed_tool and args.host_observer and not args.iam_host
                                 and not args.governance_faults and args.terminal == 'commit'),
@@ -326,8 +332,51 @@ def main():
                 except RuntimeError: time.sleep(2)
             require(index is not None and len(index['records'])==1 and not index['truncated_possible'], 'exact_native_limit_index_required')
             require(stat.S_IMODE(index_path.stat().st_mode)==0o600, 'private_index_mode')
+            second_index = None
+            if args.second_native_notice:
+                stage = 'second_physical_native_limit_record'
+                first = index['records'][0]
+                request = dict(source_topic=index['topic'], expected_real_topic=route['physical_topic'],
+                    expected_owner='iam.mysql', expected_route_revision=revision, expected_retention_hours=48,
+                    expected_reference_sha256=prepared['reference_sha256'], expected_wire_sha256=prepared['wire_sha256'],
+                    expected_unique_id_sha256=prepared['unique_id_sha256'])
+
+                def exact_native(mode, row):
+                    physical = {key: row[key] for key in ('queue_id', 'queue_offset', 'commitlog_offset')}
+                    result = run(java+['NativeHalfRecheck'], stdin=json.dumps(dict(request, mode=mode, **physical)), timeout=45)
+                    detail = frame(result.stdout, 'M3_NATIVE_RECHECK ')
+                    require(detail['admin_shutdown_returned'] and not detail['body_exported'],
+                            'bounded_native_helper_required')
+                    return detail
+
+                require(exact_native('resume', first)['outcome'] == 'RecheckEnqueued', 'second_half_not_enqueued')
+                deadline = time.monotonic() + 110
+                poll = 0
+                while time.monotonic() < deadline:
+                    candidate_path = directory / f'second-native-index-{poll}.json'
+                    candidate = export(broker, project, identity, candidate_path)
+                    require(first in candidate['records'] and len(candidate['records']) in (1, 2),
+                            'unexpected_native_index_change')
+                    if len(candidate['records']) == 2:
+                        second, = [row for row in candidate['records'] if row != first]
+                        require(first['commitlog_offset'] != second['commitlog_offset'],
+                                'second_native_record_must_be_physically_distinct')
+                        checked = exact_native('inspect', second)
+                        require(checked['outcome'] == 'NotAttempted' and checked['wire_sha256'] == prepared['wire_sha256']
+                                and checked['reference_sha256'] == prepared['reference_sha256']
+                                and checked['unique_id_sha256'] == prepared['unique_id_sha256'],
+                                'second_native_record_identity_changed')
+                        index, index_path = candidate, candidate_path
+                        second_index = (physical_fingerprint(index, first), physical_fingerprint(index, second))
+                        break
+                    poll += 1
+                    time.sleep(2)
+                require(second_index and second_index[0] != second_index[1], 'second_native_record_not_found')
+                proof['second_native_physical'] = dict(first=first['commitlog_offset'], second=second['commitlog_offset'],
+                    same_reference_wire_and_unique_id=True, index_records=2)
+                passed('same_frozen_half_reaches_native_limit_at_two_physical_positions')
             proof['native_index_sha256'] = hashlib.sha256(index_path.read_bytes()).hexdigest()
-            proof['native_index_records'] = 1; passed('actual_iam_unconfirmed_original_commit_reaches_native_check_limit' if host else 'genuine_prepared_unknown_reaches_native_check_limit')
+            proof['native_index_records'] = len(index['records']); passed('actual_iam_unconfirmed_original_commit_reaches_native_check_limit' if host else 'genuine_prepared_unknown_reaches_native_check_limit')
             for key, value in before_parameters.items(): admin('updateBrokerConfig', '-k', key, '-v', str(value), success=True)
             proof['parameters_restored_before_recovery'] = common.broker_parameters(admin('getBrokerConfig'))
             require(proof['parameters_restored_before_recovery'] == before_parameters, 'parameters_not_restored')
@@ -364,7 +413,7 @@ def main():
                     manifest=manifest,route=route,account=accounts['owner-a'],grpc_port=grpc_port,mysql_port=mysql_port,password=password,
                     ca=ca,java=java,identity=identity,index_path=index_path,index=index,sql=sql,run=run,consumer=consumer,passed=passed,proof=proof,
                     governance_faults=args.governance_faults,original=original,terminal=args.terminal,
-                    audit_write_fault=args.audit_write_fault)
+                    audit_write_fault=args.audit_write_fault,second_index=second_index)
             else:
                 recovery = start('recover', identity); recovery.wait('ready', identity)
                 recovery.send('seal'); recovery.wait('sealed', '', 'admission_stopped_checker_alive')
@@ -422,7 +471,7 @@ def main():
                 proof['owned_iam_database_removed']=True
             require(not run(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=sdk).stdout, 'sdk_source_changed')
             proof['sdk_tracked_sources_clean'] = True
-            require(report['passed']==((15 if host or args.terminal=='rollback' else 16 if args.governance_faults else 14) if args.managed_tool else 17), 'complete_nonempty_native_matrix_required')
+            require(report['passed']==((15 if host or args.terminal=='rollback' else 16 if args.governance_faults or args.second_native_notice else 14) if args.managed_tool else 17), 'complete_nonempty_native_matrix_required')
     except Exception:
         report['failed'] = 1; report['failure'] = stage
     finally:
