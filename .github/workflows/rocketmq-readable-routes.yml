@@ -17,6 +17,8 @@ on:
       - "!scripts/rocketmq/test_readable_cutover_receipt.py"
       - "scripts/ops/readable_pop_controls.py"
       - "scripts/ops/test_readable_pop_controls.py"
+      - "scripts/ops/readable_pop_record.py"
+      - "scripts/ops/test_readable_pop_record.py"
       - ".github/workflows/rocketmq-readable-routes.yml"
   workflow_dispatch:
     inputs:
@@ -73,7 +75,9 @@ jobs:
           version: '0.12.13'
           python-version: ${{ matrix.python }}
       - name: POP metadata fail-closed contracts
-        run: python3 -m unittest discover -s scripts/ops -p test_readable_pop_controls.py
+        run: |
+          python3 -m unittest discover -s scripts/ops -p 'test_readable_pop*.py'
+          python3 -m unittest discover -s scripts/rocketmq -p test_f07_ack_tail_evidence.py
       - name: Naming contracts
         run: python3 -m unittest discover -s scripts/rocketmq -p 'test_routes*.py'
       - name: Build verified isolated Broker
@@ -111,6 +115,11 @@ jobs:
           assert x['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,
               probe_process_groups_drained=True,private_fixture_directory_removed=True)
           if os.environ['READABLE_PROFILE']=='public':
+              storage=x['proof']['f07_ack_tail_storage']
+              assert storage['read_only'] and not storage['production_access']
+              assert storage['broker']['image']==x['image'] and storage['records']
+              for record in storage['records']:
+                  assert storage['persisted_revive'][str(record['queue'])]>=record['ack']['queue_offset']
               controls=x['proof']['readable_pop_controls']
               assert set(controls)=={'go','python'}
               expected_lag = dict.fromkeys(map(str, range(8)), 0)
