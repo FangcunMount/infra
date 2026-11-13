@@ -12,6 +12,7 @@ docker compose -f "$formal/compose.yml" config --format json > "$work/base.json"
 docker compose -f "$formal/compose.yml" -f "$formal/history.override.yml" config --format json > "$work/history.json"
 docker compose -f "$root/deploy/serverA/monitoring-route.yml" -f "$formal/route-network.override.yml" \
     config --format json > "$work/route.json"
+# Compose 2.40 omits false create_host_path values from rendered bind objects.
 jq -e --slurp '
     .[0] as $base | .[1] as $history | .[2] as $route |
     $base.services["servera-collector"] as $collector |
@@ -32,7 +33,8 @@ jq -e --slurp '
           ($reader.command | index("--web.listen-address=127.0.0.1:19092"))!=null),
       history_retention: (($reader.command | index("--storage.tsdb.retention.time=30d"))!=null),
       rules_mounts: ([ $collector.volumes[] | select(.target=="/etc/prometheus/rules" or .target=="/etc/prometheus/servera-rules") |
-          select(.read_only==true and .bind.create_host_path==false) ] | length==2),
+          select(.type=="bind" and .read_only==true and (.bind | type)=="object" and
+                 (.bind.create_host_path // false)==false) ] | length==2),
       distinct_volumes: ($history.volumes.data.external and $history.volumes["protected-history"].external and
           $history.volumes.data.name!=$history.volumes["protected-history"].name)
     } | with_entries(select(.value!=true)) |
