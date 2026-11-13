@@ -64,6 +64,9 @@ jobs:
         run: sudo /bin/bash scripts/monitoring/check-servera-pilot-systemd.sh
       - name: Validate formal ServerA monitoring configuration
         run: bash scripts/monitoring/check-servera-monitoring.sh
+      - name: Verify the sealed query bridge loads offline on ServerA's Docker version
+        timeout-minutes: 7
+        run: bash scripts/monitoring/check-query-bridge-oci-load.sh
   release-assets:
     if: github.event_name == 'workflow_dispatch' && inputs.operation != 'validate'
     runs-on:
