@@ -16,7 +16,7 @@ import time
 from ai_image_start import KEY_PROGRAM, PYTHON, messaging, metrics
 from audit_transaction_limit import write_private
 from final_image_candidate import saved_config, sha256
-from image_sdk_profile import sdk_profile, verify_readable_python_lock
+from image_sdk_profile import verify_ai44_python_lock
 from image_start_fixture import OwnedImageFixture, require
 
 HEAD = '0044_empty_publisher'
@@ -37,7 +37,7 @@ def verify_registry_identity(inspected, reference, source):
     return reference.rsplit('@', 1)[1]
 
 
-def load_registry(fixture, reference, source, output):
+def load_registry(fixture, reference, source, output, expected):
     inspected = json.loads(fixture.run(['docker', 'image', 'inspect', reference]).stdout)[0]
     digest = verify_registry_identity(inspected, reference, source)
     fixture.image = 'ai44-qualified:'+source[:12]+'-'+secrets.token_hex(4)
@@ -47,7 +47,6 @@ def load_registry(fixture, reference, source, output):
             'source=os.environ["QS_AI_RELEASE_SHA"],direct_url=json.loads(d.read_text("direct_url.json")))))')
     raw = fixture.once(PYTHON, ['-c', code], network=False, environment={'HOME':'/tmp'})
     runtime = json.loads(raw)
-    expected = sdk_profile('readable-stable')
     # uv does not preserve wheel hashes in direct_url.json. Compare every actual
     # package file with the exact public wheel whose archive digest is locked.
     import io, urllib.request, zipfile
@@ -64,7 +63,7 @@ def load_registry(fixture, reference, source, output):
                  'print(json.dumps(dict(files=len(expected),matched=ok))); raise SystemExit(0 if ok else 1)')
     payload=json.loads(fixture.once(PYTHON,['-c',verify_code],network=False,environment={'HOME':'/tmp'}))
     require(payload['matched'] is True and payload['files']==len(inventory),'actual_installed_sdk_payload_required')
-    require(runtime['uid'] == 10001 and runtime['sdk'] == '0.5.0' and runtime['client'] == '5.1.2'
+    require(runtime['uid'] == 10001 and runtime['sdk'] == expected['python'] and runtime['client'] == '5.1.2'
             and runtime['source'] == source
             and runtime['direct_url']['url'] == expected['wheel_url']
             and payload['matched'] is True,
@@ -119,8 +118,8 @@ def main():
         require(run(['git','rev-parse','HEAD'],cwd=source).stdout.strip()==args.source_sha
                 and not run(['git','status','--porcelain','--untracked-files=no'],cwd=source).stdout,'fixed_clean_ai_source_required')
         report['infra_sha']=run(['git','rev-parse','HEAD'],cwd=repo).stdout.strip()
-        verify_readable_python_lock((source/'uv.lock').read_text(),'readable-stable')
-        load_registry(fixture,args.image,args.source_sha,output)
+        expected = verify_ai44_python_lock((source/'uv.lock').read_text())
+        load_registry(fixture,args.image,args.source_sha,output,expected)
         case('exact_registry_digest_source_config_and_installed_sdk')
         fixture.dependencies();database='ai44_image_'+secrets.token_hex(8)
         sql('CREATE DATABASE `'+database+'`;')
