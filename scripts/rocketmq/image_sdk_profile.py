@@ -22,6 +22,17 @@ PROFILES = {
     },
 }
 
+# AI44 can restart the original release or qualify the independently published
+# recovery fix. Keep these Python-only pins separate from the paired Go matrix.
+AI44_PYTHON_PROFILES = {
+    '0.5.0': PROFILES['readable-stable'],
+    '0.5.1': {
+        'python': '0.5.1',
+        'wheel_url': 'https://github.com/FangcunMount/reliable-messaging/releases/download/python/v0.5.1/fangcun_reliable_messaging-0.5.1-py3-none-any.whl',
+        'wheel_sha256': '8dc13c838fb90f3ed536849b7b33d1e25ce970b11829a1eddb5b989e7e1dceb0',
+    },
+}
+
 
 def sdk_profile(name):
     if not isinstance(name, str) or name not in PROFILES:
@@ -29,16 +40,34 @@ def sdk_profile(name):
     return dict(PROFILES[name])
 
 
-def verify_readable_python_lock(raw, name):
+def _python_packages(raw):
     import tomllib
-    expected = sdk_profile(name)
-    if 'wheel_url' not in expected:
-        raise ValueError('readable_prerelease_profile_required')
+
     document = tomllib.loads(raw)
-    packages = [p for p in document.get('package', []) if p.get('name') == 'fangcun-reliable-messaging']
+    return [package for package in document.get('package', []) if package.get('name') == 'fangcun-reliable-messaging']
+
+
+def _verify_published_python_lock(packages, expected):
     if (len(packages) != 1 or packages[0].get('version') != expected['python']
             or packages[0].get('source') != {'url': expected['wheel_url']}
             or packages[0].get('wheels') != [dict(url=expected['wheel_url'],
                 hash='sha256:' + expected['wheel_sha256'])]):
         raise ValueError('exact_published_readable_wheel_lock_required')
     return dict(version=expected['python'], wheel_sha256=expected['wheel_sha256'], editable=False)
+
+
+def verify_readable_python_lock(raw, name):
+    expected = sdk_profile(name)
+    if 'wheel_url' not in expected:
+        raise ValueError('readable_prerelease_profile_required')
+    return _verify_published_python_lock(_python_packages(raw), expected)
+
+
+def verify_ai44_python_lock(raw):
+    packages = _python_packages(raw)
+    version = packages[0].get('version') if len(packages) == 1 else None
+    if not isinstance(version, str) or version not in AI44_PYTHON_PROFILES:
+        raise ValueError('reviewed_ai44_python_wheel_required')
+    expected = AI44_PYTHON_PROFILES[version]
+    _verify_published_python_lock(packages, expected)
+    return {key: expected[key] for key in ('python', 'wheel_url', 'wheel_sha256')}
