@@ -40,3 +40,21 @@ H04 并行采集使用 `compose.yml` 和 `h04.override.yml`。两份候选的容
 H03 的同窗口备份、两地读回和隔离恢复已通过后，按 H06 签收的相同归档摘要准备独立历史卷。使用 `compose.yml` 与 `history.override.yml` 同时渲染三服务组合。历史读取器只监听共享命名空间的回环地址，候选保留当前采集，同时通过 Prometheus remote read 查询已保护的历史。
 
 专用查询网仅连接已签收的现役查询代理与候选。把 `route-network.override.yml` 与现役 `deploy/serverA/monitoring-route.yml` 合并渲染，实际路由地址与配置由 H06 签收。通过原调用方实读历史时间戳、值、Prometheus warnings 和 Grafana notices。若进入 H07，恢复已留存的原查询配置、Grafana 数据源与通知路线，重新读回原样本并保留全部卷与原件。
+
+### H03 / H06 原始样本复核
+
+使用 `scripts/monitoring/capture_servera_history.py` 对同一已结束的 UTC 区间取证。`--start` 与 `--end` 使用 Unix 秒，区间最长 900 秒。四条路线为 `macmini`、`candidate`、`history` 和 `merged`。各次传入相同的运行 QS 完整 SHA 及两份 Collection IP。每条路线的 `--binding` 独立记录完整容器 ID、镜像 ID 和原 Docker `started_at`。回执保留每个查询的原始 HTTP 正文、解析后的样本、读前后容器与卷身份，以及加载配置摘要和 TSDB 边界。
+
+在 B01 冷备前先用 `macmini` 与 `candidate` 回执确认两端原样本交叠。H06 在启用历史读取前保存同一区间的候选本地回执，恢复后采集 `history` 与 `merged`。使用第二副本实际恢复成功的 B05 回执，以及绑定相同归档和实读历史卷的导入回执。
+
+```sh
+python3 -B scripts/monitoring/capture_servera_history.py macmini \
+  --start "$START" --end "$END" --qs-source "$QS_SOURCE" \
+  --collection-ip "$IP1" "$IP2" --binding macmini-binding.json > macmini.json
+python3 -B scripts/monitoring/servera_history_seam.py overlap macmini.json candidate.json > overlap.json
+python3 -B scripts/monitoring/classify_servera_history.py macmini.json history.json candidate.json merged.json \
+  --local-boundary "$LOCAL_START_UTC" --b05 "$B05_RECEIPT" \
+  --history-volume-proof "$HISTORY_IMPORT_RECEIPT" > classification.json
+```
+
+归因按完整标签、毫秒时间戳和原值比较。只有原采集和恢复归档一致，且缺口在对应候选首样本前并落在原缺口内，才记录为既有缺口。原采集的失败值继续记录，包括在同时间戳按 Prometheus 本地优先规则覆盖的值。候选自身缺样、非健康值、合并新增缺口或查询注解须暂停 H06。保留原件并复核，已切换时按 H07 恢复。真实调用方、Grafana 和通知分别留现场或签收原件。
