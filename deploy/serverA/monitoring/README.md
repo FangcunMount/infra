@@ -10,6 +10,25 @@
 - 基础配置加载 `components/prometheus/rules` 的共享规则以及正式候选发现规则。保持只读规则挂载，按窗口决定实际通知路径。使用 `scripts/monitoring/check-servera-monitoring.sh` 验证 Compose、三份 Prometheus 配置和两组候选规则测试。
 - `scripts/monitoring/read_servera_candidate.py` 从候选私网命名空间读取。记录完整容器 ID、镜像、StartedAt、两份 Collection 地址、运行 QS 完整源码 SHA 和 UTC 对齐的观测终点。H05 使用基础 Compose 配置，候选进程须覆盖整段两小时，481 个点须满足原十目标、四事务 owner 判据。观察工具在查询前后核对已加载的配置摘要与加载时间，要求本次加载早于观测起点，并拒绝启用历史远程读取的配置。回执仅保存配置摘要和加载时间。
 
+## H04 启动与截止
+
+H04 并行采集使用 `compose.yml` 和 `h04.override.yml`。两份候选的容器重启策略为 `no`。现场按独立签收的 UTC 开窗、最晚启动、最晚中止及授权结束倒排发现、H05 两小时观察和恢复余量。候选若到期停止，保留候选 TSDB 与现役查询。后续进入 H06 使用具名签收的三服务和路由步骤。
+
+1. 用上述两份 Compose 文件执行 `create --no-build --pull never`。绑定每个已创建候选的完整容器 ID、镜像 ID 和 Compose 配置哈希，记录专用网络和 TSDB 卷。保持现役查询代理独立。
+2. 在 ServerA 建立 `/var/lib/qlume-monitoring-shadow-windows/<operation>`，由 root 持有、模式 `0700`。按已审查提交放入 `h04/stop-candidate.py` 和 `h04/render_cutoff.py`。将下列字段保存为目录内的 `stop-plan.json`，模式 `0600`，归档 SHA-256 与原具名批准。
+3. 在私有目录内运行 `/usr/bin/python3 -B "$STATE/render_cutoff.py" "$OPERATION" "$STATE/stop-plan.json" "$STATE/units"`。复核渲染的同名 service 与 timer，安装到 `/etc/systemd/system`，运行 `systemctl daemon-reload`，用 `systemctl enable --now` 启用具名 timer。实读其加载路径、下次 UTC 运行时间及开机启用状态。批准的最晚中止在计划中对应 `cutoff_utc`。
+4. 仅通过 `/usr/bin/python3 -B "$STATE/stop-candidate.py" "$STATE" "$PLAN_SHA256" start` 启动候选。入口持同一把截止锁，核对计划、已加载的 timer、启动期限和两份容器身份。采集器就绪后才启动查询桥。保全 `start-issued.json`、`started.json` 和首个采样回执。
+5. 主动中止时使用同一入口的 `stop` 操作。到期 timer 和主动中止均先持久化 `closed.json`，再停止发现、查询桥和采集器。保全 `cutoff-*.json`，读回两个候选、原代理、候选 TSDB 和发现授权撤回。服务端结果未知时先实读原 ID 和已落盘回执。重复执行 `stop` 可以复验同一收口，已关闭操作禁止重启。
+
+计划使用以下字段。三个时间均使用整秒 UTC，例如 `2026-11-14T12:00:00Z`，且依次递增。
+
+| 字段 | 内容 |
+| --- | --- |
+| `operation` | 目录名和本次具名操作 ID，以 `h04-` 开头 |
+| `window_start_utc`、`latest_start_utc`、`cutoff_utc` | 已签收的开窗、最晚启动和最晚中止 |
+| `data_volume`、`private_query_network` | `qlume-servera-monitoring-data` 和 `qlume-servera-monitoring-query` |
+| `containers` | `servera-collector`、`query-bridge` 各含 `id`、`image`、`compose_hash` |
+
 ## 采集交叠与历史备份
 
 1. 按具名批准执行 H04，启动基础配置的候选采集器。Mac mini 继续提供现役采集、查询及告警。记录候选容器、TSDB 卷、配置和发现文件的身份，并从候选回环 API 确认十个目标及四个事务 owner 已有真实采样。

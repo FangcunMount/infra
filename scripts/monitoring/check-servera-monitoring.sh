@@ -9,12 +9,13 @@ printf '[]\n' > "$work/targets/serverA.json"
 printf '[]\n' > "$work/targets/serverD.json"
 
 docker compose -f "$formal/compose.yml" config --format json > "$work/base.json"
+docker compose -f "$formal/compose.yml" -f "$formal/h04.override.yml" config --format json > "$work/h04.json"
 docker compose -f "$formal/compose.yml" -f "$formal/history.override.yml" config --format json > "$work/history.json"
 docker compose -f "$root/deploy/serverA/monitoring-route.yml" -f "$formal/route-network.override.yml" \
     config --format json > "$work/route.json"
 # Compose 2.40 omits false create_host_path values from rendered bind objects.
 jq -e --slurp '
-    .[0] as $base | .[1] as $history | .[2] as $route |
+    .[0] as $base | .[1] as $history | .[2] as $route | .[3] as $h04 |
     $base.services["servera-collector"] as $collector |
     $history.services["history-reader"] as $reader |
     $base.services["query-bridge"] as $bridge |
@@ -22,6 +23,9 @@ jq -e --slurp '
       services: (($base.services | keys)==["query-bridge","servera-collector"] and
                  ($history.services | keys)==["history-reader","query-bridge","servera-collector"]),
       project: ($base.name=="qlume-servera-monitoring"),
+      h04_restart_policy: (($h04.services | all(.restart=="no")) and
+        ($base.services | all(.restart=="unless-stopped")) and
+        (($h04.services | map_values(del(.restart))) == ($base.services | map_values(del(.restart))))),
       service_security: ([ $history.services[] | select(.read_only==true and .pull_policy=="never" and
           .platform=="linux/amd64" and (.ports // [] | length)==0) ] | length==3),
       networks: ($base.networks.backend.external and $base.networks.backend.name=="infra-network" and
@@ -39,7 +43,7 @@ jq -e --slurp '
           $history.volumes.data.name!=$history.volumes["protected-history"].name)
     } | with_entries(select(.value!=true)) |
     if length==0 then true else error("Compose checks failed: " + (keys | join(", "))) end
-' "$work/base.json" "$work/history.json" "$work/route.json"
+' "$work/base.json" "$work/history.json" "$work/route.json" "$work/h04.json"
 prom_image=$(jq -er '.services["servera-collector"].image' "$work/base.json")
 # The production reference is an offline archive alias and is rendered above.
 promtool_image=prom/prometheus:v2.54.1
