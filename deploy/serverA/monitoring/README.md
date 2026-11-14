@@ -39,6 +39,16 @@ H04 并行采集使用 `compose.yml` 和 `h04.override.yml`。两份候选的容
 
 H03 的同窗口备份、两地读回和隔离恢复已通过后，按 H06 签收的相同归档摘要准备独立历史卷。使用 `compose.yml` 与 `history.override.yml` 同时渲染三服务组合。历史读取器只监听共享命名空间的回环地址，候选保留当前采集，同时通过 Prometheus remote read 查询已保护的历史。
 
+在已签收的 H06 导入窗口，用 `history/import-approval.blank.json` 填写 H03/B05 与 H06 操作 ID、操作者、独立审查人、时限、归档及工具镜像摘要。通过既有保护入口读回 B04 归档，核对 B05 绑定。批准范围内，在 ServerA 准备一个本地空卷 `qlume-servera-monitoring-history`，用 `org.fangcunmount.monitoring.h06-operation` 标签绑定 H06 操作 ID。核对卷未被容器引用。
+
+```sh
+sudo -n /usr/bin/python3 -B scripts/monitoring/restore_history_volume.py "$B04_ARCHIVE" \
+  --b05 "$B05_RECEIPT" --approved-import "$HISTORY_IMPORT_APPROVAL" \
+  --max-bytes "$REVIEWED_BYTE_LIMIT" > "$HISTORY_IMPORT_RECEIPT"
+```
+
+入窗为导入、读回和恢复操作预留时间。导入入口使用固定 Linux amd64 镜像和生产本机 Docker，逐件验证内容，读回后绑定 B05 与导入批准的原始字节摘要。导入失败、中断或卷已有内容时保留原件与卷现状，交本次窗口复核。
+
 专用查询网仅连接已签收的现役查询代理与候选。把 `route-network.override.yml` 与现役 `deploy/serverA/monitoring-route.yml` 合并渲染，实际路由地址与配置由 H06 签收。通过原调用方实读历史时间戳、值、Prometheus warnings 和 Grafana notices。若进入 H07，恢复已留存的原查询配置、Grafana 数据源与通知路线，重新读回原样本并保留全部卷与原件。
 
 ### H03 / H06 原始样本复核
