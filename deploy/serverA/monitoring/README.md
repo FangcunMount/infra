@@ -47,6 +47,26 @@ H03 的同窗口备份、两地读回和隔离恢复已通过后，按 H06 签�
 
 在 B01 冷备前先用 `macmini` 与 `candidate` 回执确认两端原样本交叠。H06 在启用历史读取前保存同一区间的候选本地回执，恢复后采集 `history` 与 `merged`。现场保留 B05 实际恢复回执、具名导入批准和实际导入回执的原始字节。工具核对导入程序记录的两份原件 SHA-256、操作 ID、归档和实际读取器卷。导入回执须证明逐件读回及持久化，读回时间须落在批准窗口内。
 
+供 H06 使用的冷备，先在具名 H03 窗口用同一操作 ID 执行以下步骤。B01 并发读取两个采集器，分别保留原始 HTTP 正文、执行状态和错误，核对所有序列共享一段新鲜的健康采样区间。采集失败或样本超龄时保留原件并暂停签收。
+
+```sh
+python3 -B scripts/monitoring/capture_servera_b01.py \
+  --evidence-parent "$PRIVATE_PARENT" --operation-id "$H03_OPERATION" --qs-source "$QS_SOURCE" \
+  --collection-ip "$IP1" "$IP2" --macmini-binding macmini-binding.json --candidate-binding candidate-binding.json
+python3 -B scripts/monitoring/bind_servera_b01.py \
+  --operation-id "$H03_OPERATION" --source "$ORIGINAL_H03_SOURCE" \
+  --b01 "$B01_DIR/b01-receipt.json" --out "$H03_SOURCE"
+```
+
+B02 审批使用 `H03_SOURCE` 原件摘要。B04 第二副本保留同一来源、批准和启动凭证，B05 使用同一清单。H06 在历史卷导入后用 B01 的原时间区间从实际历史读取器取证，然后复算整条链。原 B01 区间与下一段交界分类可分别读取。
+
+```sh
+python3 -B scripts/monitoring/verify_b01_b05.py \
+  --b01 "$B01_DIR" --second-copy "$VERIFIED_SECOND_COPY" --b05 "$B05_RECEIPT" \
+  --import-proof "$HISTORY_IMPORT_RECEIPT" --import-approval "$HISTORY_IMPORT_APPROVAL" \
+  --history "$HISTORY_B01_CAPTURE"
+```
+
 ```sh
 python3 -B scripts/monitoring/capture_servera_history.py macmini \
   --start "$START" --end "$END" --qs-source "$QS_SOURCE" \
