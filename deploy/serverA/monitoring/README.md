@@ -91,3 +91,5 @@ python3 -B scripts/monitoring/verify_servera_route.py h07 macmini.json \
 ```
 
 任一 Prometheus warning、info、非 200 或原始样本差异都暂停签收。H06 现场另行核对实际 QS 查询和认证 Grafana 的数据源、数据帧、通知以及 warning notices。H07 具名恢复使用已保全的旧上游、Grafana 原数据源和通知路径，并保留候选与原数据卷。
+
+在具名 H06 窗口中，`grafana-listener.conf` 可作为现役代理 Nginx `http` 块的 include。先固定 ServerA 监听、源端访问限制、Grafana 的 TLS 服务端名称和相互认证材料，按窗口签收只读挂载证书与私钥，并用 `nginx -t` 核对最终加载配置。认证规则读取经过私有监听和候选查询桥两层白名单。现场分别复验 GET `/api/v1/rules`、现役 QS 兼容查询、告警通知及恢复。缺失客户端证书、错误 CA、规则 POST 及管理端点访问应被拒绝。实际证书、私钥及外部访问设置由当窗保全。
