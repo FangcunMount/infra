@@ -1,0 +1,44 @@
+rule_files:
+  - ../rules/history-reader.yml
+evaluation_interval: 15s
+tests:
+  - name: running history reader does not fire
+    interval: 15s
+    input_series:
+      - series: up{job="servera-history-reader",instance="127.0.0.1:19092"}
+        values: 1+0x12
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: ServerAHistoryReaderUnavailable
+        exp_alerts: []
+  - name: failing reader fires after two minutes then clears
+    interval: 15s
+    input_series:
+      - series: up{job="servera-history-reader",instance="127.0.0.1:19092"}
+        values: 0+0x8 1+0x4
+    alert_rule_test:
+      - eval_time: 1m45s
+        alertname: ServerAHistoryReaderUnavailable
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: ServerAHistoryReaderUnavailable
+        exp_alerts:
+          - exp_labels: &labels
+              job: servera-history-reader
+              instance: 127.0.0.1:19092
+              severity: warning
+              subsystem: monitoring
+            exp_annotations: &annotations
+              summary: ServerA Prometheus history reader is unavailable
+              description: Verify the history reader and replay the cutover range before trusting queries spanning the old and new collectors.
+      - eval_time: 2m30s
+        alertname: ServerAHistoryReaderUnavailable
+        exp_alerts: []
+  - name: missing reader series fires
+    interval: 15s
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: ServerAHistoryReaderUnavailable
+        exp_alerts:
+          - exp_labels: *labels
+            exp_annotations: *annotations

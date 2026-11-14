@@ -1,10 +1,10 @@
 name: Validate Mac mini monitoring
 on:
   pull_request:
-    paths: ['components/monitoring/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
+    paths: ['components/monitoring/**', 'components/prometheus/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverA/monitoring-pilot/**', 'deploy/serverA/monitoring/**', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
   push:
     branches: [main]
-    paths: ['components/monitoring/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
+    paths: ['components/monitoring/**', 'components/prometheus/**', 'scripts/monitoring/**', 'deploy/mac-mini/**', 'deploy/serverA/monitoring-route.yml', 'deploy/serverA/monitoring-pilot/**', 'deploy/serverA/monitoring/**', 'deploy/serverD/**', 'Makefile', '.github/workflows/monitoring.yml']
   workflow_dispatch:
     inputs:
       operation:
@@ -28,6 +28,7 @@ jobs:
         run: |
           python3 -m unittest discover -s scripts/monitoring -p 'test_*.py' -v
           bash -n scripts/monitoring/manage.sh
+          bash -n deploy/serverA/monitoring-pilot/pilot.sh
           make -n monitoring-up monitoring-status
       - name: Verify Prometheus config and rules
         run: |
@@ -37,6 +38,35 @@ jobs:
             -v "$PWD/components/prometheus/rules:/etc/prometheus/rules:ro" \
             -v /tmp/monitoring-targets:/etc/prometheus/targets:ro \
             prom/prometheus:v2.54.1 check config /etc/prometheus/prometheus.yml
+      - name: Verify ServerA pilot Compose and Prometheus config
+        run: |
+          pilot="$PWD/deploy/serverA/monitoring-pilot"
+          docker compose -f "$pilot/compose.yml" config --format json > /tmp/servera-monitoring-pilot.json
+          jq -e '
+            .services.prometheus as $prometheus |
+            $prometheus.platform == "linux/amd64" and $prometheus.pull_policy == "never" and
+            $prometheus.read_only == true and ($prometheus.ports // [] | length) == 0 and
+            ($prometheus.command | index("--web.listen-address=127.0.0.1:9090")) != null and
+            ([ $prometheus.volumes[] | select(.type == "bind" and .read_only == true) | .target ] | sort)
+              == ["/etc/prometheus/prometheus.yml", "/etc/prometheus/targets"] and
+            .volumes.data.external == true and .volumes.data.name == "qlume-servera-monitoring-pilot-data" and
+            .networks.backend.external == true and .networks.backend.name == "infra-network"
+          ' /tmp/servera-monitoring-pilot.json
+          image=$(jq -er '.services.prometheus.image | select(test("^docker.io/prom/prometheus@sha256:[0-9a-f]{64}$"))' /tmp/servera-monitoring-pilot.json)
+          printf '[]\n' > /tmp/monitoring-targets/serverA.json
+          printf '[]\n' > /tmp/monitoring-targets/serverD.json
+          docker run --rm --platform linux/amd64 --entrypoint /bin/promtool \
+            -v "$pilot/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
+            -v /tmp/monitoring-targets:/etc/prometheus/targets:ro \
+            "$image" check config /etc/prometheus/prometheus.yml
+      - name: Verify ServerA pilot expiry with real systemd
+        timeout-minutes: 5
+        run: sudo /bin/bash scripts/monitoring/check-servera-pilot-systemd.sh
+      - name: Validate formal ServerA monitoring configuration
+        run: bash scripts/monitoring/check-servera-monitoring.sh
+      - name: Verify the sealed query bridge loads offline on ServerA's Docker version
+        timeout-minutes: 7
+        run: bash scripts/monitoring/check-query-bridge-oci-load.sh
   release-assets:
     if: github.event_name == 'workflow_dispatch' && inputs.operation != 'validate'
     runs-on:

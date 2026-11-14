@@ -1,0 +1,6 @@
+# H04 candidate policy for the signed monitoring window.
+services:
+  servera-collector:
+    restart: "no"
+  query-bridge:
+    restart: "no"
