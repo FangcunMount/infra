@@ -78,3 +78,16 @@ python3 -B scripts/monitoring/classify_servera_history.py macmini.json history.j
 ```
 
 归因按完整标签、毫秒时间戳和原值比较。只有原采集和恢复归档一致，且缺口在对应候选首样本前并落在原缺口内，才记录为既有缺口。原采集的失败值继续记录，包括在同时间戳按 Prometheus 本地优先规则覆盖的值。候选自身缺样、非健康值、合并新增缺口或查询注解须暂停 H06。保留原件并复核，已切换时按 H07 恢复。真实调用方、Grafana 和通知分别留现场或签收原件。
+
+### H06 / H07 现役查询代理读回
+
+切换前保留 Mac mini 原始查询回执、ServerA 代理原配置及 Grafana 原数据源。每段读回使用各自审查的代理完整容器 ID、镜像 ID、原始 `started_at` 和容器内 `/etc/nginx/nginx.conf` 的 SHA-256。工具从 ServerA 现役代理网络命名空间查询 9090 兼容入口。H06 还核对实际代理在专用查询网的地址。输出的抓取文件包含原 HTTP 正文和状态，供复核差异。
+
+```sh
+python3 -B scripts/monitoring/verify_servera_route.py h06 merged.json \
+  --proxy h06-proxy-binding.json --capture h06-proxy-raw.json > h06-proxy-review.json
+python3 -B scripts/monitoring/verify_servera_route.py h07 macmini.json \
+  --proxy h07-proxy-binding.json --capture h07-proxy-raw.json > h07-proxy-review.json
+```
+
+任一 Prometheus warning、info、非 200 或原始样本差异都暂停签收。H06 现场另行核对实际 QS 查询和认证 Grafana 的数据源、数据帧、通知以及 warning notices。H07 具名恢复使用已保全的旧上游、Grafana 原数据源和通知路径，并保留候选与原数据卷。
