@@ -115,7 +115,7 @@ python3 -B scripts/monitoring/classify_servera_history.py macmini.json history.j
 
 ### H06 / H07 现役查询代理读回
 
-切换前保留 Mac mini 原始查询回执、ServerA 代理原配置及 Grafana 原数据源。每段读回使用各自审查的代理完整容器 ID、镜像 ID、原始 `started_at` 和容器内 `/etc/nginx/nginx.conf` 的 SHA-256。工具从 ServerA 现役代理网络命名空间查询 9090 兼容入口。H06 还核对实际代理在专用查询网的地址。输出的抓取文件包含原 HTTP 正文和状态，供复核差异。
+切换前保留 Mac mini 原始查询回执、ServerA 代理原配置及 Grafana 原数据源。每段读回使用各自审查的代理完整容器 ID、镜像 ID、原始 `started_at` 和容器内 `/etc/nginx/nginx.conf` 的 SHA-256。工具从 ServerA 现役代理网络命名空间查询 9090 兼容入口。H06 还核对实际代理在专用查询网的地址，并从精确候选的网络命名空间读取本机活动目标。十个目标必须完整、健康且最近抓取不超过 35 秒，候选镜像、启动时间和加载配置必须与 merged 回执相同。抓取文件保留历史 HTTP 正文、状态及候选活动目标读回。
 
 ```sh
 python3 -B scripts/monitoring/verify_servera_route.py h06 merged.json \

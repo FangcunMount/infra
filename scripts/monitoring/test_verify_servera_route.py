@@ -7,12 +7,14 @@ from io import StringIO
 import json
 from pathlib import Path
 import sys
+import time
 from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
 import test_servera_history_seam
 import verify_servera_route as route
+from m5_window_central_observe import utc
 
 
 class RouteTest(unittest.TestCase):
@@ -54,6 +56,36 @@ class RouteTest(unittest.TestCase):
             http_status=dict.fromkeys(responses, 200),
             errors={},
         )
+        if self.reference["route"] == "merged":
+            source = self.reference["binding_before"]
+            stamp = time.time()
+            body["live_candidate"] = dict(
+                before={
+                    key: source[key] for key in ("container", "image", "started_at")
+                },
+                after={
+                    key: source[key] for key in ("container", "image", "started_at")
+                },
+                configuration={
+                    key: source[key] for key in ("config_sha256", "loaded_at")
+                },
+                observed_at=stamp,
+                targets={
+                    "activeTargets": [
+                        dict(
+                            labels=dict(job=job, instance=instance),
+                            health="up",
+                            lastScrape=utc(stamp - 2).replace("+00:00", "Z"),
+                        )
+                        for job, instance in sorted(
+                            route.expected_targets(
+                                self.reference["collection_ips"],
+                                self.reference["qs_source"],
+                            )
+                        )
+                    ]
+                },
+            )
         if callback:
             callback(body)
         body["raw_http"] = self.wire(body["responses"])
@@ -96,14 +128,68 @@ class RouteTest(unittest.TestCase):
         )
         self.assertFalse(result["execution_authorized"])
 
-    def test_h06_rejects_proxy_outside_private_query_network(self):
+    def merged_reference(self):
         self.reference["route"] = "merged"
         for side in ("binding_before", "binding_after"):
-            self.reference[side]["remote_read"] = True
+            self.reference[side].update(
+                remote_read=True,
+                container="e" * 64,
+                image="sha256:" + "f" * 64,
+                started_at="2026-10-19T06:20:04Z",
+                config_sha256="d" * 64,
+                loaded_at="2026-10-19T06:20:05Z",
+            )
+
+    def test_h06_rejects_proxy_outside_private_query_network(self):
+        self.merged_reference()
         with self.assertRaisesRegex(
             ValueError, "outside the approved private query network"
         ):
             self.exercise()
+
+    def test_h06_checks_active_candidate_targets(self):
+        self.merged_reference()
+        self.proxy["private_query_ip"] = "172.31.251.2"
+        self.assertEqual(self.exercise()["live_candidate"]["active_targets"], 10)
+
+    def test_h06_rejects_missing_worker_despite_matching_historical_samples(self):
+        self.merged_reference()
+        self.proxy["private_query_ip"] = "172.31.251.2"
+
+        def remove_worker(body):
+            rows = body["live_candidate"]["targets"]["activeTargets"]
+            worker = next(row for row in rows if row["labels"]["job"] == "qs-worker")
+            rows.remove(worker)
+
+        with self.assertRaisesRegex(
+            ValueError, "active targets failed.*missing.*qs-worker"
+        ):
+            self.exercise(remove_worker)
+
+    def test_h06_rejects_stale_worker_despite_matching_historical_samples(self):
+        self.merged_reference()
+        self.proxy["private_query_ip"] = "172.31.251.2"
+
+        def expire_worker(body):
+            live = body["live_candidate"]
+            rows = live["targets"]["activeTargets"]
+            worker = next(row for row in rows if row["labels"]["job"] == "qs-worker")
+            worker["lastScrape"] = utc(live["observed_at"] - 36).replace("+00:00", "Z")
+
+        with self.assertRaisesRegex(ValueError, "unhealthy_or_stale.*qs-worker"):
+            self.exercise(expire_worker)
+
+    def test_h06_rejects_candidate_configuration_drift(self):
+        self.merged_reference()
+        self.proxy["private_query_ip"] = "172.31.251.2"
+
+        def change(body):
+            body["live_candidate"]["configuration"][
+                "loaded_at"
+            ] = "2026-10-19T06:20:06Z"
+
+        with self.assertRaisesRegex(ValueError, "live collector configuration changed"):
+            self.exercise(change)
 
     def test_preserves_partial_query_warning_and_rejects(self):
         def warning(body):
