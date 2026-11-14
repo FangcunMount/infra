@@ -72,7 +72,7 @@ def read_keys(path):
         )
         data = stream.read(1048577)
         require(
-            0 < len(data) <= 1048576 and data.endswith(b"\n"),
+            len(data) <= 1048576 and (not data or data.endswith(b"\n")),
             "invalid key file size or terminator",
         )
     return meta, data
@@ -202,13 +202,11 @@ def main():
         meta, before = read_keys(KEYS)
         lines = before.splitlines(keepends=True)
         old = plan["original_line_sha256"]
-        require(
-            sum(sha256(line).hexdigest() == old for line in lines) == 1,
-            "original discovery key differs",
-        )
+        original_line_count = sum(sha256(line).hexdigest() == old for line in lines)
         token = plan["key_blob"].encode()
         matching = [line for line in lines if token in line.split()]
         if action == "append":
+            require(original_line_count == 1, "original discovery key differs")
             require(
                 start <= datetime.now(timezone.utc) < latest,
                 "outside the approved append interval",
@@ -233,7 +231,8 @@ def main():
             plan_sha256=digest,
             changed=after != before,
             original_line_sha256=old,
-            original_line_preserved=True,
+            original_line_preserved=original_line_count == 1,
+            original_line_matches=original_line_count,
             pilot_line_sha256=sha256(row).hexdigest(),
             pilot_present=action == "append",
             public_fingerprint=plan["public_fingerprint"],
@@ -247,6 +246,7 @@ def main():
             )
         replace(receipt, (json.dumps(result, indent=2) + "\n").encode())
         print(json.dumps(result))
+        require(original_line_count == 1, "original discovery key differs after safe withdrawal")
 
 
 if __name__ == "__main__":

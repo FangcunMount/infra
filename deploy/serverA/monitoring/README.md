@@ -25,7 +25,7 @@ H04 并行采集使用 `compose.yml` 和 `h04.override.yml`。两份候选的容
 /usr/bin/python3 -B "$STATE/serverd-auth.py" append "$AUTH_PLAN_SHA256"
 ```
 
-先渲染并审查单元，在 ServerD 安装 `/etc/systemd/system` 下的服务和计时器，完成 `daemon-reload`、`enable --now` 和下次触发读回，再执行 append。入口按计划生成限源、限命令及到期授权，拒绝已有撤回记录和不匹配的 timer。到期由持久 timer 调用同一入口的 `withdraw`，主动中止也用 `withdraw` 和同一摘要。读回当窗授权缺席、原 Mac mini 授权行字节一致，并验证新的候选 SSH 认证被拒绝。保留授权和撤回回执。
+先渲染并审查单元，在 ServerD 安装 `/etc/systemd/system` 下的服务和计时器，完成 `daemon-reload`、`enable --now` 和下次触发读回，再执行 append。入口按计划生成限源、限命令及到期授权，拒绝已有撤回记录和不匹配的 timer。到期由持久 timer 调用同一入口的 `withdraw`，主动中止也用 `withdraw` 和同一摘要。读回当窗授权缺席、原 Mac mini 授权行字节一致，并验证新的候选 SSH 认证被拒绝。保留授权和撤回回执。若原行在当窗变化，撤回仍可删除唯一且精确匹配的当窗授权，并保留其他行。实际读回落盘后入口以失败退出，由当窗审查原行变化。候选公钥出现于非精确匹配的授权行时，入口拒绝改写并留待当窗查明。
 
 ### ServerA 并行采集
 
