@@ -301,12 +301,16 @@ def compare(history, candidate, merged, boundary_ms):
     )
 
 
-def bind_history(b05, volume, capture):
+def bind_history(b05_bytes, import_bytes, approval_bytes, capture):
+    b05, volume, approval = map(json.loads, (b05_bytes, import_bytes, approval_bytes))
+    b05_digest = sha256(b05_bytes).hexdigest()
+    approval_digest = sha256(approval_bytes).hexdigest()
     fail_if(
         b05["schema"] != "monitoring-h03-b05-restore/v1"
         or b05["rehearsal"] is not False
         or b05["restored_from_verified_second_copy"] is not True
-        or b05["isolated_restore_verified"] is not True,
+        or b05["isolated_restore_verified"] is not True
+        or b05["production_mutation"] is not False,
         "actual B05 second-copy restore is required",
     )
     archive = b05["h06_prometheus_archive_sha256"]
@@ -314,19 +318,63 @@ def bind_history(b05, volume, capture):
     restored = b05["prometheus"]
     fail_if(
         restored["archive_sha256"] != archive
-        or not restored["isolated"]
-        or not restored["wal_replay_complete"],
+        or restored["isolated"] is not True
+        or restored["wal_replay_complete"] is not True
+        or type(restored["archive_members_verified"]) is not int
+        or restored["archive_members_verified"] <= 0,
         "B05 restore is not bound to the same archive",
     )
     fail_if(
         volume["schema"] != "monitoring-h06-history-import/v1"
+        or volume["fixture"] is not False
         or volume["h03_operation_id"] != b05["operation_id"]
         or volume["archive_sha256"] != archive
+        or volume["b05_sha256"] != b05_digest
+        or volume["approval_sha256"] != approval_digest
         or volume["volume"] != capture["binding_before"]["volume"]
-        or not volume["restore_verified"],
+        or type(volume["archive_members"]) is not int
+        or volume["archive_members"] != restored["archive_members_verified"]
+        or volume["restore_verified"] is not True
+        or volume["fsynced"] is not True,
         "history volume import is not bound to the B05 archive and captured volume",
     )
-    return dict(archive_sha256=archive, volume_name=volume["volume"]["name"])
+    fail_if(
+        approval["schema"] != "monitoring-h06-history-import-approval/v1"
+        or approval["fixture"] is not False
+        or approval["archive_sha256"] != archive
+        or approval["b05_sha256"] != b05_digest
+        or approval["operation_id"] != volume["operation_id"]
+        or approval["h03_operation_id"] != b05["operation_id"]
+        or approval["volume"] != volume["volume"]["name"]
+        or approval["volume"] != "qlume-servera-monitoring-history"
+        or not approval["operator"].strip()
+        or not approval["reviewer"].strip()
+        or approval["operator"].strip() == approval["reviewer"].strip()
+        or not approval["decision_reference"].strip(),
+        "history import approval does not bind the same recovery and volume",
+    )
+    start, verified_at, expiry = (
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+        for value in (
+            approval["starts_at"],
+            volume["readback_verified_at"],
+            approval["expires_at"],
+        )
+    )
+    fail_if(
+        any(value.utcoffset() is None for value in (start, verified_at, expiry))
+        or not start <= verified_at < expiry,
+        "history import readback is outside the approved window",
+    )
+    return dict(
+        archive_sha256=archive,
+        volume_name=volume["volume"]["name"],
+        operation_id=volume["operation_id"],
+        h03_operation_id=b05["operation_id"],
+        b05_receipt_sha256=b05_digest,
+        approval_sha256=approval_digest,
+        import_receipt_sha256=sha256(import_bytes).hexdigest(),
+    )
 
 
 def main():
@@ -337,6 +385,9 @@ def main():
         "--local-boundary", help="first timestamp of candidate local TSDB, in UTC"
     )
     parser.add_argument("--b05", type=Path, help="verified second-copy restore receipt")
+    parser.add_argument(
+        "--import-approval", type=Path, help="approved H06 volume import original"
+    )
     parser.add_argument(
         "--history-volume-proof",
         type=Path,
@@ -350,7 +401,12 @@ def main():
     if (
         args.mode == "overlap"
         and len(parsed) == 2
-        and not (args.local_boundary or args.b05 or args.history_volume_proof)
+        and not (
+            args.local_boundary
+            or args.b05
+            or args.history_volume_proof
+            or args.import_approval
+        )
     ):
         result = overlap(*parsed)
     elif (
@@ -359,22 +415,18 @@ def main():
         and args.local_boundary
         and args.b05
         and args.history_volume_proof
+        and args.import_approval
     ):
         boundary = endpoint_time(args.local_boundary)
         result = compare(*parsed, boundary)
-        b05, volume = (
-            path.read_bytes() for path in (args.b05, args.history_volume_proof)
+        b05, volume, approval = (
+            path.read_bytes()
+            for path in (args.b05, args.history_volume_proof, args.import_approval)
         )
-        result["history_binding"] = bind_history(
-            json.loads(b05), json.loads(volume), parsed[0]
-        )
-        result["history_binding"].update(
-            b05_receipt_sha256=sha256(b05).hexdigest(),
-            import_receipt_sha256=sha256(volume).hexdigest(),
-        )
+        result["history_binding"] = bind_history(b05, volume, approval, parsed[0])
     else:
         parser.error(
-            "overlap needs two receipts; compare also needs --local-boundary, --b05 and --history-volume-proof"
+            "overlap needs two receipts; compare also needs --local-boundary, --b05, --history-volume-proof and --import-approval"
         )
     result["receipt_sha256"] = [sha256(data).hexdigest() for data in inputs]
     print(json.dumps(result, indent=2))

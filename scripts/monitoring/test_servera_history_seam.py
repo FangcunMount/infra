@@ -1,6 +1,7 @@
 from copy import deepcopy
 from base64 import b64encode
 import json
+from hashlib import sha256
 import unittest
 
 from servera_history_seam import (
@@ -139,32 +140,99 @@ class SeamTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "storage boundary changed"):
             self.verify()
 
-    def test_import_must_match_restored_archive_and_history_volume(self):
+    def test_import_binds_actual_receipt_fields_and_exact_originals(self):
+        def encoded(value):
+            return json.dumps(value).encode()
+
         archive = "a" * 64
         b05 = dict(
             schema="monitoring-h03-b05-restore/v1",
-            operation_id="test",
+            operation_id="h03-window",
             rehearsal=False,
             restored_from_verified_second_copy=True,
             isolated_restore_verified=True,
             h06_prometheus_archive_sha256=archive,
+            production_mutation=False,
             prometheus=dict(
-                archive_sha256=archive, isolated=True, wal_replay_complete=True
+                archive_sha256=archive,
+                isolated=True,
+                wal_replay_complete=True,
+                archive_members_verified=63,
             ),
         )
-        proof = dict(
-            schema="monitoring-h06-history-import/v1",
-            h03_operation_id="test",
+        b05_raw = encoded(b05)
+        b05_sha = sha256(b05_raw).hexdigest()
+        volume = dict(
+            name="qlume-servera-monitoring-history",
+            created_at="fixture",
+            mount_source="/fixture",
+        )
+        self.history["binding_before"]["volume"] = self.history["binding_after"][
+            "volume"
+        ] = volume
+        approval = dict(
+            schema="monitoring-h06-history-import-approval/v1",
+            operation_id="h06-window",
+            fixture=False,
+            h03_operation_id="h03-window",
             archive_sha256=archive,
-            volume=self.history["binding_before"]["volume"],
-            restore_verified=True,
+            b05_sha256=b05_sha,
+            volume=volume["name"],
+            operator="operator",
+            reviewer="reviewer",
+            decision_reference="approval-original",
+            starts_at="2026-11-14T10:00:00Z",
+            expires_at="2026-11-14T10:30:00Z",
         )
-        self.assertEqual(
-            bind_history(b05, proof, self.history)["archive_sha256"], archive
-        )
-        proof["archive_sha256"] = "b" * 64
+
+        def proof(values):
+            return dict(
+                schema="monitoring-h06-history-import/v1",
+                h03_operation_id="h03-window",
+                archive_sha256=archive,
+                volume=volume,
+                restore_verified=True,
+                fixture=False,
+                b05_sha256=b05_sha,
+                approval_sha256=sha256(encoded(values)).hexdigest(),
+                operation_id="h06-window",
+                archive_members=63,
+                fsynced=True,
+                readback_verified_at="2026-11-14T10:07:00+00:00",
+            )
+
+        original = proof(approval)
+        args = (b05_raw, encoded(original), encoded(approval), self.history)
+        result = bind_history(*args)
+        self.assertEqual(result["archive_sha256"], archive)
+        self.assertEqual(result["b05_receipt_sha256"], b05_sha)
         with self.assertRaisesRegex(ValueError, "not bound"):
-            bind_history(b05, proof, self.history)
+            bind_history(b05_raw + b"\n", *args[1:])
+        with self.assertRaisesRegex(ValueError, "not bound"):
+            bind_history(*args[:2], encoded(approval) + b"\n", self.history)
+
+        for field, value in (
+            ("archive_sha256", "b" * 64),
+            ("archive_members", 62),
+            ("fsynced", False),
+            ("fixture", True),
+            ("volume", dict(volume, created_at="replacement")),
+        ):
+            with self.subTest(field=field), self.assertRaisesRegex(
+                ValueError, "not bound"
+            ):
+                bind_history(
+                    b05_raw, encoded(dict(original, **{field: value})), *args[2:]
+                )
+        with self.assertRaisesRegex(ValueError, "outside the approved window"):
+            bind_history(
+                b05_raw,
+                encoded(dict(original, readback_verified_at=approval["expires_at"])),
+                *args[2:]
+            )
+        same = dict(approval, reviewer=" operator ")
+        with self.assertRaisesRegex(ValueError, "approval does not bind"):
+            bind_history(b05_raw, encoded(proof(same)), encoded(same), self.history)
 
     def test_wrong_volume_rejected(self):
         self.merged["binding_before"]["volume"] = {"name": "other"}

@@ -136,18 +136,22 @@ def main():
     parser.add_argument("--local-boundary", required=True)
     parser.add_argument("--b05", type=Path, required=True)
     parser.add_argument("--history-volume-proof", type=Path, required=True)
+    parser.add_argument("--import-approval", type=Path, required=True)
     args = parser.parse_args()
     raw = [path.read_bytes() for path in args.receipts]
     source, history, local, merged = map(json.loads, raw)
     for receipt in (source, history, local, merged):
         verify_http_bodies(receipt)
-    b05, volume = [path.read_bytes() for path in (args.b05, args.history_volume_proof)]
-    binding = bind_history(json.loads(b05), json.loads(volume), history)
+    b05, volume, approval = (
+        path.read_bytes()
+        for path in (args.b05, args.history_volume_proof, args.import_approval)
+    )
+    binding = bind_history(b05, volume, approval, history)
     result = classify(
         source, history, local, merged, endpoint_time(args.local_boundary)
     )
     result["input_sha256"] = [
-        sha256(value).hexdigest() for value in (*raw, b05, volume)
+        sha256(value).hexdigest() for value in (*raw, b05, volume, approval)
     ]
     result["history_binding"] = binding
     print(json.dumps(result, indent=2))

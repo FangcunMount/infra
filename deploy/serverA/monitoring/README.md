@@ -45,7 +45,7 @@ H03 的同窗口备份、两地读回和隔离恢复已通过后，按 H06 签�
 
 使用 `scripts/monitoring/capture_servera_history.py` 对同一已结束的 UTC 区间取证。`--start` 与 `--end` 使用 Unix 秒，区间最长 900 秒。四条路线为 `macmini`、`candidate`、`history` 和 `merged`。各次传入相同的运行 QS 完整 SHA 及两份 Collection IP。每条路线的 `--binding` 独立记录完整容器 ID、镜像 ID 和原 Docker `started_at`。回执保留每个查询的原始 HTTP 正文、解析后的样本、读前后容器与卷身份，以及加载配置摘要和 TSDB 边界。
 
-在 B01 冷备前先用 `macmini` 与 `candidate` 回执确认两端原样本交叠。H06 在启用历史读取前保存同一区间的候选本地回执，恢复后采集 `history` 与 `merged`。使用第二副本实际恢复成功的 B05 回执，以及绑定相同归档和实读历史卷的导入回执。
+在 B01 冷备前先用 `macmini` 与 `candidate` 回执确认两端原样本交叠。H06 在启用历史读取前保存同一区间的候选本地回执，恢复后采集 `history` 与 `merged`。现场保留 B05 实际恢复回执、具名导入批准和实际导入回执的原始字节。工具核对导入程序记录的两份原件 SHA-256、操作 ID、归档和实际读取器卷。导入回执须证明逐件读回及持久化，读回时间须落在批准窗口内。
 
 ```sh
 python3 -B scripts/monitoring/capture_servera_history.py macmini \
@@ -54,7 +54,7 @@ python3 -B scripts/monitoring/capture_servera_history.py macmini \
 python3 -B scripts/monitoring/servera_history_seam.py overlap macmini.json candidate.json > overlap.json
 python3 -B scripts/monitoring/classify_servera_history.py macmini.json history.json candidate.json merged.json \
   --local-boundary "$LOCAL_START_UTC" --b05 "$B05_RECEIPT" \
-  --history-volume-proof "$HISTORY_IMPORT_RECEIPT" > classification.json
+  --history-volume-proof "$HISTORY_IMPORT_RECEIPT" --import-approval "$HISTORY_IMPORT_APPROVAL" > classification.json
 ```
 
 归因按完整标签、毫秒时间戳和原值比较。只有原采集和恢复归档一致，且缺口在对应候选首样本前并落在原缺口内，才记录为既有缺口。原采集的失败值继续记录，包括在同时间戳按 Prometheus 本地优先规则覆盖的值。候选自身缺样、非健康值、合并新增缺口或查询注解须暂停 H06。保留原件并复核，已切换时按 H07 恢复。真实调用方、Grafana 和通知分别留现场或签收原件。
