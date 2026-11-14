@@ -1,0 +1,170 @@
+{
+  "uid": "ai-operational-logs",
+  "title": "AI 链路日志",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "run_id",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "request_id",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      },
+      {
+        "name": "correlation_id",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "All AI events",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=~\"qs-ai|qs-apiserver\"}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Run timeline",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=\"qs-ai\"} | json | run_id=\"$run_id\""
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Delivery retries",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=\"qs-ai\"} | json | event=\"delivery.retry_scheduled\""
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "RPC failures",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=\"qs-ai\"} | json | event=\"rpc.completed\" | status!=\"OK\""
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "业务请求链路",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=~\"qs-ai|qs-apiserver\"} | json | request_id=\"$request_id\""
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "跨服务调用关联",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "ai-logs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service=~\"qs-ai|qs-apiserver\"} | json | correlation_id=\"$correlation_id\""
+        }
+      ]
+    }
+  ]
+}
