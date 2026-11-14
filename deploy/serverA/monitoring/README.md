@@ -14,6 +14,21 @@
 
 H04 并行采集使用 `compose.yml` 和 `h04.override.yml`。两份候选的容器重启策略为 `no`。现场按独立签收的 UTC 开窗、最晚启动、最晚中止及授权结束倒排发现、H05 两小时观察和恢复余量。候选若到期停止，保留候选 TSDB 与现役查询。后续进入 H06 使用具名签收的三服务和路由步骤。
 
+### ServerD 发现授权和撤回
+
+在同一具名 H04 窗口，先核对 ServerD 主机公钥、OpenSSH 版本、时区、受限发现命令、ServerA Tailnet 来源及原 Mac mini 授权行摘要。ServerA 生成当窗专用 ED25519 密钥，ServerD 只接收公钥字段。以 root 在 ServerD 的 `/var/lib/qlume-monitoring-pilot-authorizations/<operation>` 准备私有目录（`0700`）、`auth-plan.json`（`0600`）及 `serverd-auth.py`、`render_deadline.py`、`render_withdrawal.py`。
+
+计划字段为 `operation_id`、`key_blob`、`public_fingerprint`、`original_line_sha256`、`starts_utc`、`latest_start_utc`、`cutoff_utc`。时间使用整秒 UTC `Z`，最晚加入授权早于截止。公钥 blob 是 `.pub` 文件的第二段，指纹使用 `ssh-keygen -lf` 的 SHA-256。计划摘要与具名批准、已核对的原 Mac mini 授权行摘要一起保全。
+
+```sh
+/usr/bin/python3 -B "$STATE/render_withdrawal.py" "$OPERATION" "$STATE/auth-plan.json" Asia/Shanghai "$STATE/units"
+/usr/bin/python3 -B "$STATE/serverd-auth.py" append "$AUTH_PLAN_SHA256"
+```
+
+先渲染并审查单元，在 ServerD 安装 `/etc/systemd/system` 下的服务和计时器，完成 `daemon-reload`、`enable --now` 和下次触发读回，再执行 append。入口按计划生成限源、限命令及到期授权，拒绝已有撤回记录和不匹配的 timer。到期由持久 timer 调用同一入口的 `withdraw`，主动中止也用 `withdraw` 和同一摘要。读回当窗授权缺席、原 Mac mini 授权行字节一致，并验证新的候选 SSH 认证被拒绝。保留授权和撤回回执。
+
+### ServerA 并行采集
+
 1. 用上述两份 Compose 文件执行 `create --no-build --pull never`。绑定每个已创建候选的完整容器 ID、镜像 ID 和 Compose 配置哈希，记录专用网络和 TSDB 卷。保持现役查询代理独立。
 2. 在 ServerA 建立 `/var/lib/qlume-monitoring-shadow-windows/<operation>`，由 root 持有、模式 `0700`。按已审查提交放入 `h04/stop-candidate.py` 和 `h04/render_cutoff.py`。将下列字段保存为目录内的 `stop-plan.json`，模式 `0600`，归档 SHA-256 与原具名批准。
 3. 在私有目录内运行 `/usr/bin/python3 -B "$STATE/render_cutoff.py" "$OPERATION" "$STATE/stop-plan.json" "$STATE/units"`。复核渲染的同名 service 与 timer，安装到 `/etc/systemd/system`，运行 `systemctl daemon-reload`，用 `systemctl enable --now` 启用具名 timer。实读其加载路径、下次 UTC 运行时间及开机启用状态。批准的最晚中止在计划中对应 `cutoff_utc`。
