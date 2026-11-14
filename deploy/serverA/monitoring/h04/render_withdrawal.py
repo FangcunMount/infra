@@ -8,18 +8,20 @@ import re
 from render_deadline import render
 
 ROOT = "/var/lib/qlume-monitoring-pilot-authorizations"
+OPERATION = r"h(?:04|06)-[a-z0-9][a-z0-9-]{4,38}"
 
 
 def units(operation, cutoff, zone, digest):
-    if re.fullmatch(r"h04-[a-z0-9][a-z0-9-]{4,38}", operation) is None:
-        raise ValueError("expected the operation-specific H04 ID")
+    if re.fullmatch(OPERATION, operation) is None:
+        raise ValueError("expected an operation-specific H04 or H06 ID")
     if re.fullmatch(r"[a-f0-9]{64}", digest) is None:
         raise ValueError("authorization plan SHA-256 required")
     deadline = render(cutoff, zone)
     name = f"qlume-monitoring-auth-withdraw-{operation}"
     state = f"{ROOT}/{operation}"
+    phase = operation.split("-", 1)[0].upper()
     service = f"""[Unit]
-Description=Withdraw the H04 ServerD discovery authorization
+Description=Withdraw the {phase} ServerD discovery authorization
 
 [Service]
 Type=oneshot
@@ -30,7 +32,7 @@ NoNewPrivileges=yes
 TimeoutStartSec=30s
 """
     timer = f"""[Unit]
-Description=Schedule withdrawal of the H04 ServerD discovery authorization
+Description=Schedule withdrawal of the {phase} ServerD discovery authorization
 
 [Timer]
 OnCalendar={deadline["withdrawal_calendar_utc"]}

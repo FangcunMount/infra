@@ -14,7 +14,7 @@ import sys
 import tempfile
 
 from render_deadline import render
-from render_withdrawal import ROOT, units
+from render_withdrawal import OPERATION, ROOT, units
 
 KEYS = Path("/root/.ssh/authorized_keys")
 SOURCE = "100.74.123.45"
@@ -162,7 +162,7 @@ def main():
         and root.parent == Path(ROOT)
         and root.stat().st_uid == 0
         and stat.S_IMODE(root.stat().st_mode) == 0o700,
-        "root on ServerD and private H04 operation directory required",
+        "root on ServerD and private monitoring operation directory required",
     )
     path = root / "auth-plan.json"
     info = path.lstat()
@@ -177,7 +177,7 @@ def main():
     plan = json.loads(raw)
     operation = root.name
     require(
-        re.fullmatch(r"h04-[a-z0-9][a-z0-9-]{4,38}", operation)
+        re.fullmatch(OPERATION, operation)
         and plan["operation_id"] == operation,
         "operation identity differs",
     )

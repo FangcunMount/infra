@@ -68,3 +68,16 @@ class H04AuthorizationTest(unittest.TestCase):
             auth.units(
                 "h04-qualified", self.plan["cutoff_utc"], "Asia/Shanghai", "other"
             )
+
+
+    def test_h06_has_independent_operation_units_and_exact_line(self):
+        cutoff = self.plan["cutoff_utc"]
+        old, *_ = auth.units("h04-qualified", cutoff, "Asia/Shanghai", "b" * 64)
+        name, service, timer, _ = auth.units("h06-qualified", cutoff, "Asia/Shanghai", "c" * 64)
+        self.assertNotEqual(old, name)
+        self.assertIn("/h06-qualified/serverd-auth.py withdraw " + "c" * 64, service)
+        self.assertIn(f"Unit={name}.service", timer)
+        row, _, _ = auth.auth_line("h06-qualified", self.plan)
+        self.assertTrue(row.endswith(b" h06-qualified\n"))
+        with self.assertRaisesRegex(ValueError, "H04 or H06"):
+            auth.units("h07-qualified", cutoff, "Asia/Shanghai", "c" * 64)
