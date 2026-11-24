@@ -22,7 +22,8 @@ import time
 
 from render import render
 from failure_diagnostics import (
-    DockerCommandError, compose_service_states, mysql_startup_status, startup_internal_description, summarize,
+    DockerCommandError, compose_service_states, docker_startup_state, mysql_startup_status,
+    startup_internal_description, summarize,
 )
 from published_runtime import interpreter_path
 
@@ -482,15 +483,14 @@ def main():
         spec["services"]["mongo"] = {
             "image": mongo_image, "command": ["mongod", "--replSet", "sdk-proof", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"],
             "ports": [f"127.0.0.1:{mongo_port}:27017"], "networks": ["rocketmq"],
-            "mem_limit": "512m", "cpus": 1, "tmpfs": ["/data/db", "/data/configdb"],
+            # The shell health check and WiredTiger/tmpfs share the memory limit.
+            "mem_limit": "1g", "cpus": 1, "tmpfs": ["/data/db", "/data/configdb"],
             "healthcheck": {"test": ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ping:1})"],
                             "interval": "3s", "timeout": "5s", "retries": 40}}
         if args.qs_answer_host or args.qs_report_host or args.qs_retry_dispatch_host:
             spec['services']['mongo']['command'] += ['--setParameter', 'enableTestCommands=1']
     redis_port = None
     if args.qs_recovery_host:
-        # mongosh health checks plus WiredTiger/tmpfs also exceeded512MiB.
-        spec["services"]["mongo"]["mem_limit"] = "1g"
         redis_port = port()
         redis_pin = "redis:7.4.2-alpine"
         run(["docker", "pull", redis_pin], timeout=300)
@@ -1199,6 +1199,15 @@ def main():
                     failure_diagnostics['mysql_startup'] = mysql_startup_status(state.stdout, logs.stdout + logs.stderr)
                 except Exception:
                     failure_diagnostics['mysql_startup_unavailable'] = True
+            if fixture_stage == 'compose_start' and any(
+                    entry['service'] == 'mongo' and
+                    (entry['state'] in ('dead', 'exited') or entry['health'] == 'unhealthy')
+                    for entry in failure_diagnostics.get('services', ())):
+                try:
+                    state = run(['docker', 'inspect', '--format', '{{json .State}}', project + '-mongo-1'], timeout=12)
+                    failure_diagnostics['mongo_startup'] = docker_startup_state(state.stdout)
+                except Exception:
+                    failure_diagnostics['mongo_startup_unavailable'] = True
         probes_drained = True
         for p in reversed(probes):
             if not p.log.closed:

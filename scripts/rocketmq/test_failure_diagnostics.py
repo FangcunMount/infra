@@ -6,7 +6,8 @@ import unittest
 from unittest.mock import patch
 
 from failure_diagnostics import (
-    DockerCommandError, compose_service_states, mysql_startup_status, startup_internal_description, summarize,
+    DockerCommandError, compose_service_states, docker_startup_state, mysql_startup_status,
+    startup_internal_description, summarize,
 )
 
 
@@ -96,3 +97,16 @@ class DiagnosticsTest(unittest.TestCase):
         self.assertEqual(result['logs']['error_codes'], ['MY-000067'])
         self.assertNotIn('private-', json.dumps(result))
         self.assertNotIn('secret-dsn', json.dumps(result))
+
+    def test_startup_state_keeps_recent_health_codes_without_probe_output(self):
+        state = {
+            'ExitCode': 0, 'OOMKilled': False,
+            'Health': {'Status': 'unhealthy', 'Log': [
+                {'ExitCode': code, 'Output': 'private-probe-output'}
+                for code in (99, 137, -1, 1, False, 'private-code')
+            ]},
+        }
+        self.assertEqual(docker_startup_state(json.dumps(state)), {
+            'exit_code': 0, 'oom_killed': False, 'health': 'unhealthy',
+            'health_exit_codes': [137, -1, 1],
+        })

@@ -137,22 +137,33 @@ MYSQL_STARTUP_SIGNALS = {
 }
 
 
+def docker_startup_state(state_raw):
+    """Keep Docker's startup status and recent health exit codes without probe output."""
+    state = json.loads(state_raw)
+    exit_code = state.get('ExitCode')
+    oom = state.get('OOMKilled')
+    health = state.get('Health') or {}
+    status = health.get('Status')
+    health_exits = [row.get('ExitCode') for row in (health.get('Log') or [])[-5:]]
+    return {
+        'exit_code': exit_code if type(exit_code) is int and 0 <= exit_code <= 255 else None,
+        'oom_killed': oom if type(oom) is bool else None,
+        'health': status if status in ('starting', 'healthy', 'unhealthy') else None,
+        'health_exit_codes': [code for code in health_exits if type(code) is int and -1 <= code <= 255],
+    }
+
+
 def mysql_startup_status(state_raw, log_raw):
     """Expose fixed MySQL startup signals and standard codes, never raw logs."""
-    state = json.loads(state_raw)
+    state = docker_startup_state(state_raw)
     if isinstance(log_raw, str):
         log_raw = log_raw.encode()
     tail = log_raw[-262144:]
     text = tail.decode(errors='replace')
-    exit_code = state.get('ExitCode')
-    oom = state.get('OOMKilled')
-    return {
-        'exit_code': exit_code if type(exit_code) is int and 0 <= exit_code <= 255 else None,
-        'oom_killed': oom if type(oom) is bool else None,
-        'logs': {
-            'bytes_examined': len(tail),
-            'sha256': hashlib.sha256(tail).hexdigest(),
-            'signals': [key for key, pattern in MYSQL_STARTUP_SIGNALS.items() if re.search(pattern, text, re.I)],
-            'error_codes': sorted(set(re.findall(r'\[(?:ERROR|FATAL)\][ \t]+\[(MY-\d{6})\]', text)))[:32],
-        },
+    state['logs'] = {
+        'bytes_examined': len(tail),
+        'sha256': hashlib.sha256(tail).hexdigest(),
+        'signals': [key for key, pattern in MYSQL_STARTUP_SIGNALS.items() if re.search(pattern, text, re.I)],
+        'error_codes': sorted(set(re.findall(r'\[(?:ERROR|FATAL)\][ \t]+\[(MY-\d{6})\]', text)))[:32],
     }
+    return state
