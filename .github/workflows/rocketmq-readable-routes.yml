@@ -15,6 +15,10 @@ on:
       - "!scripts/rocketmq/readable_cutover_receipt.py"
       - "!scripts/rocketmq/test_readable_cutover_materials.py"
       - "!scripts/rocketmq/test_readable_cutover_receipt.py"
+      - "scripts/ops/readable_pop_controls.py"
+      - "scripts/ops/test_readable_pop_controls.py"
+      - "scripts/ops/readable_pop_record.py"
+      - "scripts/ops/test_readable_pop_record.py"
       - ".github/workflows/rocketmq-readable-routes.yml"
   workflow_dispatch:
     inputs:
@@ -48,6 +52,14 @@ jobs:
             python: '3.13'
             mysql: 'mysql:8.4'
             profile: live-recovery
+          - go: '1.25.9'
+            python: '3.11'
+            mysql: 'mysql:8.0.36'
+            profile: f07-public
+          - go: '1.25.12'
+            python: '3.13'
+            mysql: 'mysql:8.4'
+            profile: f07-public
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
@@ -55,7 +67,7 @@ jobs:
           repository: FangcunMount/reliable-messaging
           ref: ${{ inputs.sdk_ref || '5c2e3cd155e67c0f766e93bf95238b16fc219b5f' }}
           path: .sdk-acceptance
-      - name: Bind all three profiles to the exact reviewed SDK candidate
+      - name: Bind all profiles to the exact reviewed SDK candidate
         env:
           SDK_REF: ${{ inputs.sdk_ref || '5c2e3cd155e67c0f766e93bf95238b16fc219b5f' }}
         run: |
@@ -72,27 +84,50 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: POP metadata fail-closed contracts
         run: python3 -m unittest discover -s scripts/ops -p test_readable_pop_controls.py
+      - name: Physical ACK-tail receipt contracts
+        if: matrix.profile == 'f07-public'
+        run: |
+          python3 -m unittest discover -s scripts/ops -p test_readable_pop_record.py
+          python3 -m unittest discover -s scripts/rocketmq -p test_f07_ack_tail_evidence.py
       - name: Naming contracts
-        run: python3 -m unittest discover -s scripts/rocketmq -p 'test_routes*.py'
+        run: |
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_routes*.py'
+          python3 -m unittest discover -s scripts/rocketmq -p test_failure_diagnostics.py
       - name: Build verified isolated Broker
         run: |
           bash scripts/rocketmq/fetch-release.sh
           docker build --no-cache -t rocketmq-readable:5.5.1 components/rocketmq
+      - uses: actions/setup-java@v5
+        if: matrix.profile == 'f07-public'
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Build patched Broker and verify its store
+        if: matrix.profile == 'f07-public'
+        run: bash scripts/rocketmq/f07-ack-tail-fixture/build.sh
       - name: Real public Go/Python SDK with readable resources
         env:
           READABLE_PROFILE: ${{ matrix.profile }}
         run: |
           set -euo pipefail
           options=()
+          broker_image=rocketmq-readable:5.5.1
           if [[ "$READABLE_PROFILE" == live-recovery ]]; then
             options=(--sdk-python-live-recovery)
-          elif [[ "$READABLE_PROFILE" == public ]]; then
+          elif [[ "$READABLE_PROFILE" == public || "$READABLE_PROFILE" == f07-public ]]; then
             options=(--sdk-pop-drain-controls)
           else
             exit 1
           fi
+          if [[ "$READABLE_PROFILE" == f07-public ]]; then
+            broker_image=rocketmq-readable:f07-ack-tail
+            candidate_id=$(docker image inspect "$broker_image" --format '{{.Id}}')
+            stock_id=$(docker image inspect rocketmq-readable:5.5.1 --format '{{.Id}}')
+            test "$candidate_id" != "$stock_id"
+            printf 'F07_BROKER_IMAGE_ID=%s\n' "$candidate_id" >> "$GITHUB_ENV"
+          fi
           python3 scripts/rocketmq/ci-transactions.py --sdk-api-go --sdk-api-python --readable-routes \
-            "${options[@]}" --sdk "$PWD/.sdk-acceptance" --image rocketmq-readable:5.5.1 \
+            "${options[@]}" --sdk "$PWD/.sdk-acceptance" --image "$broker_image" \
             --mysql-image '${{ matrix.mysql }}' --report rocketmq-readable-sdk.json
       - name: Require complete original matrix and future-checkpoint controls
         if: always()
@@ -107,7 +142,8 @@ jobs:
           assert all(x['cases'].values())
           assert x['cleanup']==dict(project_containers_remaining=False,compose_down_succeeded=True,
               probe_process_groups_drained=True,private_fixture_directory_removed=True)
-          if os.environ['READABLE_PROFILE']=='public':
+          profile=os.environ['READABLE_PROFILE']
+          if profile in ('public', 'f07-public'):
               controls=x['proof']['readable_pop_controls']
               assert set(controls)=={'go','python'}
               for name,row in controls.items():
@@ -116,6 +152,19 @@ jobs:
                   assert row['closed']['timer_series_present']
                   for suffix in ('_held_future_checkpoint_blocks_drain','_acked_and_closed_responsibility_zero'):
                       assert x['cases']['readable_pop_'+name+suffix] is True
+                  if profile == 'f07-public':
+                      for stage in ('closed', 'closed_confirmation'):
+                          sample=row[stage]
+                          assert sample['offset_buffer']==sample['checkpoint_buffer']==sample['timing']==0
+                          assert sample['timer_series_present']
+                          assert sample['revive_lag']==dict.fromkeys(map(str, range(8)), 0)
+          if profile == 'f07-public':
+              storage=x['proof']['f07_ack_tail_storage']
+              assert storage['read_only'] and not storage['production_access']
+              assert storage['broker']['image']==x['image']==os.environ['F07_BROKER_IMAGE_ID']
+              assert storage['records']
+              for record in storage['records']:
+                  assert storage['persisted_revive'][str(record['queue'])]>=record['ack']['queue_offset']
           PYPROOF
       - uses: actions/upload-artifact@v7
         if: always()

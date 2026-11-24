@@ -1,5 +1,6 @@
 """Bounded allowlisted transport diagnostics; never exports original log lines."""
 import hashlib
+import json
 import re
 
 
@@ -50,3 +51,119 @@ def startup_internal_description(raw, secrets):
     text = re.sub(r'(?i)((?:authorization|password|secret|token|credential)\s*[:=]\s*)[^,\s}\]]+',
                   r'\1<redacted>', text)
     return text[:512]
+
+
+DOCKER_SIGNALS = {
+    'compose_wait_timeout': r'wait timeout|wait.*timed out',
+    'health_check_failed': r'container [^\r\n]{1,180} (?:is unhealthy|exited)|dependency failed to start',
+    'port_in_use': r'port is already allocated|address already in use',
+    'network_setup': r'failed to set up container networking|network [^\r\n]{1,128} not found',
+    'daemon_unavailable': r'cannot connect to the docker daemon|error during connect',
+    'image_unavailable': r'pull access denied|manifest unknown|no such image|toomanyrequests',
+    'missing_container': r'no such container|container [^\r\n]{1,128} is not running',
+    'disk_full': r'no space left on device',
+    'permission_denied': r'permission denied|operation not permitted',
+    'broker_rpc_timeout': r'RemotingTimeoutException|wait response on the channel.*timeout',
+    'broker_rpc_connection': r'RemotingConnectException|connect to.*failed',
+    'database_connection': r"Can't connect to (?:local )?MySQL server|ECONNREFUSED",
+    'memory': r'OutOfMemoryError|unable to create native thread|oom-kill',
+}
+
+DOCKER_PHASES = {
+    'compose_start', 'broker_restart', 'broker_health', 'mysql_query', 'mongo_query',
+    'broker_get_config', 'broker_update_config', 'broker_update_topic',
+    'broker_update_group', 'broker_create_user', 'broker_create_acl', 'broker_admin_other',
+}
+
+DOCKER_VERBS = {
+    'compose', 'exec', 'inspect', 'pause', 'unpause', 'ps', 'run', 'pull',
+    'image', 'start', 'stop', 'kill', 'restart', 'logs',
+}
+
+
+class DockerCommandError(RuntimeError):
+    """Carry only fixed stage labels, exit metadata and bounded output fingerprints."""
+
+    def __init__(self, operation, kind, *, returncode=None, stderr=''):
+        super().__init__('Docker operation failed (private output withheld)')
+        if isinstance(stderr, str):
+            stderr = stderr.encode()
+        raw = (stderr or b'')[-262144:]
+        decoded = raw.decode(errors='replace')
+        self.evidence = {
+            'operation': operation if operation in DOCKER_PHASES or operation in DOCKER_VERBS else 'other',
+            'kind': kind,
+            'returncode': returncode,
+            'stderr_bytes_examined': len(raw),
+            'stderr_sha256': hashlib.sha256(raw).hexdigest(),
+            'stderr_signals': [name for name, pattern in DOCKER_SIGNALS.items()
+                               if re.search(pattern, decoded, re.I)],
+        }
+
+
+def compose_service_states(raw):
+    """Project-local status without exporting names, commands, paths or raw JSON."""
+    if len(raw) > 524288:
+        raise ValueError('Compose status exceeded the private capture limit')
+    lines = raw.strip()
+    if not lines:
+        return []
+    rows = json.loads(lines) if lines.startswith('[') else [json.loads(row) for row in lines.splitlines()]
+    evidence = []
+    for row in rows:
+        service, state, health = (row.get(key) for key in ('Service', 'State', 'Health'))
+        if service not in ('broker', 'nameserver', 'mysql', 'mongo', 'redis'):
+            continue
+        exit_code = row.get('ExitCode')
+        evidence.append({
+            'service': service,
+            'state': state if state in ('created', 'running', 'restarting', 'removing',
+                                       'paused', 'exited', 'dead') else 'unknown',
+            'health': health if health in ('starting', 'healthy', 'unhealthy') else None,
+            'exit_code': exit_code if type(exit_code) is int and 0 <= exit_code <= 255 else None,
+        })
+    return sorted(evidence, key=lambda item: item['service'])
+
+
+MYSQL_STARTUP_SIGNALS = {
+    'file_write_no_space': r'no space left on device|disk is full|Operating system error number 28',
+    'memory_allocation': r'cannot allocate memory|out of memory|allocation of [^\r\n]{1,60} failed',
+    'permission_denied': r'permission denied|operation not permitted|Operating system error number 13',
+    'invalid_option': r'unknown (?:option|variable)|invalid value for',
+    'innodb_startup': r'InnoDB[^\r\n]{0,160}(?:initialization aborted|plugin initialization|failed)|data dictionary initialization failed',
+    'unusable_data_directory': r'data directory[^\r\n]{0,120}(?:unusable|not usable|has files|not empty)',
+    'entrypoint_init_failed': r'database files initialization failed|unable to start server|unable to shut down server',
+    'socket_bind': r'address already in use|another mysqld server running',
+}
+
+
+def docker_startup_state(state_raw):
+    """Keep Docker's startup status and recent health exit codes without probe output."""
+    state = json.loads(state_raw)
+    exit_code = state.get('ExitCode')
+    oom = state.get('OOMKilled')
+    health = state.get('Health') or {}
+    status = health.get('Status')
+    health_exits = [row.get('ExitCode') for row in (health.get('Log') or [])[-5:]]
+    return {
+        'exit_code': exit_code if type(exit_code) is int and 0 <= exit_code <= 255 else None,
+        'oom_killed': oom if type(oom) is bool else None,
+        'health': status if status in ('starting', 'healthy', 'unhealthy') else None,
+        'health_exit_codes': [code for code in health_exits if type(code) is int and -1 <= code <= 255],
+    }
+
+
+def mysql_startup_status(state_raw, log_raw):
+    """Expose fixed MySQL startup signals and standard codes, never raw logs."""
+    state = docker_startup_state(state_raw)
+    if isinstance(log_raw, str):
+        log_raw = log_raw.encode()
+    tail = log_raw[-262144:]
+    text = tail.decode(errors='replace')
+    state['logs'] = {
+        'bytes_examined': len(tail),
+        'sha256': hashlib.sha256(tail).hexdigest(),
+        'signals': [key for key, pattern in MYSQL_STARTUP_SIGNALS.items() if re.search(pattern, text, re.I)],
+        'error_codes': sorted(set(re.findall(r'\[(?:ERROR|FATAL)\][ \t]+\[(MY-\d{6})\]', text)))[:32],
+    }
+    return state

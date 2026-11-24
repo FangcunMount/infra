@@ -25,7 +25,7 @@ def unique(pairs):
     return value
 
 
-def inspect_record(raw, *, queue, queue_offset, physical_offset):
+def decode_system_record(raw, *, queue, queue_offset, physical_offset):
     require(isinstance(raw, bytes) and 91 <= len(raw) <= 65536, 'bounded_system_record_required')
     require(all(type(n) is int and n >= 0 for n in (queue, queue_offset, physical_offset)) and queue < 8,
             'exact_frozen_revive_location_required')
@@ -70,9 +70,14 @@ def inspect_record(raw, *, queue, queue_offset, physical_offset):
     count = document.get('n') if tag == 'ck' else None
     if tag == 'ck':
         require(type(count) is int and 0 <= count <= 127, 'invalid_checkpoint_message_count')
-    # Deliberately no raw body, message ID, tenant, group, reference or wire.
     return dict(schema='readable-pop-system-record/v1', kind=tag,
                 checkpoint_messages=count, record_sha256=hashlib.sha256(raw).hexdigest(),
                 metadata_sha256=hashlib.sha256(body).hexdigest(), metadata_field_count=len(document),
                 queue=queue, queue_offset=queue_offset, physical_offset=physical_offset,
-                read_only=True, drain_proven=False)
+                read_only=True, drain_proven=False), document
+
+
+def inspect_record(raw, *, queue, queue_offset, physical_offset):
+    # Export only the metadata summary and hashes.
+    summary, _ = decode_system_record(raw, queue=queue, queue_offset=queue_offset, physical_offset=physical_offset)
+    return summary

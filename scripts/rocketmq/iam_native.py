@@ -18,6 +18,8 @@ import subprocess
 import tempfile
 import time
 
+from failure_diagnostics import mysql_startup_status
+
 
 REQUIRED = {
     'TestM3TransactionSchemaNative', 'TestM3PlannedPolicyNative',
@@ -134,7 +136,8 @@ def main():
         listener.bind(('127.0.0.1', 0)); port = listener.getsockname()[1]
     password = secrets.token_hex(32)
     spec = {'services': {'mysql': {
-        'image': image, 'restart': 'no', 'mem_limit': '512m', 'cpus': 1,
+        # InnoDB initialization and the tmpfs data directory share the limit.
+        'image': image, 'restart': 'no', 'mem_limit': '1g', 'cpus': 1,
         'command': ['--innodb-buffer-pool-size=128M', '--max-connections=80'],
         'environment': {'MYSQL_ROOT_PASSWORD': password, 'MYSQL_ROOT_HOST': '%'},
         'ports': [f'127.0.0.1:{port}:3306'], 'tmpfs': ['/var/lib/mysql'],
@@ -147,13 +150,16 @@ def main():
              'source_sha': sha, 'image': image, 'project': project, 'failed': 1,
              'source_clean_before': True, 'go_version': run(['go', 'version'])}
     failure = None
+    stage = 'compose_start'
     try:
         run(compose + ['up', '-d', '--wait', '--wait-timeout', '150'], timeout=180)
+        stage = 'database_version'
         version = run(compose + ['exec', '-T', 'mysql', 'sh', '-c',
                       'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -Nse "SELECT VERSION()"'])
         proof['mysql_version'] = version
         if not re.fullmatch(r'8\.(?:0\.(?:36|44)|4\.\d+)(?:[-+].*)?', version):
             raise RuntimeError('required fixed MySQL8.0/8.4 runtime absent')
+        stage = 'native_tests'
         dsn = f'root:{password}@tcp(127.0.0.1:{port})/?parseTime=true&multiStatements=true'
         env = dict(os.environ, GOWORK='off', GOFLAGS='-mod=readonly', IAM_M3_TEST_MYSQL_DSN=dsn)
         for prefix in ('ROLE_MODEL', 'SCOPE_MIGRATION', 'ACCOUNT_PROVISION', 'OPERATIONS_CATALOG'):
@@ -179,6 +185,16 @@ def main():
         # Only this harness's fixed messages go into the receipt.
         failure = type(error).__name__
         proof['failure_category'] = failure
+        proof['failure_stage'] = stage
+        if stage == 'compose_start':
+            try:
+                container = project + '-mysql-1'
+                state = run(['docker', 'inspect', '--format', '{{json .State}}', container], timeout=12)
+                logs = subprocess.run(['docker', 'logs', '--tail', '120', container],
+                                      capture_output=True, timeout=15, check=True)
+                proof['mysql_startup'] = mysql_startup_status(state, logs.stdout + logs.stderr)
+            except (RuntimeError, ValueError, OSError, subprocess.SubprocessError):
+                proof['mysql_startup_unavailable'] = True
     finally:
         try:
             run(compose + ['down', '--volumes', '--remove-orphans', '--timeout', '30'])

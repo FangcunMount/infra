@@ -21,7 +21,10 @@ import threading
 import time
 
 from render import render
-from failure_diagnostics import summarize, startup_internal_description
+from failure_diagnostics import (
+    DockerCommandError, compose_service_states, docker_startup_state, mysql_startup_status,
+    startup_internal_description, summarize,
+)
 from published_runtime import interpreter_path
 
 
@@ -47,15 +50,25 @@ def mysql_fixture_supported(version, *, sdk_api_go=False, iam_host=False):
     return version.startswith('8.0.') or ((sdk_api_go or iam_host) and version.startswith('8.4.'))
 
 
-def run(argv, *, timeout=120, env=None, cwd=None, required=True, stdin=None):
+def run(argv, *, timeout=120, env=None, cwd=None, required=True, stdin=None, docker_phase=None):
+    command = Path(str(argv[0])).name
+    operation = docker_phase or (argv[1] if len(argv) > 1 else 'other')
     try:
         result = subprocess.run(argv, input=stdin, capture_output=True, text=True,
                                 env=env, cwd=cwd, timeout=timeout)
-    except (subprocess.TimeoutExpired, OSError):
+    except subprocess.TimeoutExpired as exc:
+        if command == 'docker':
+            raise DockerCommandError(operation, 'timeout', stderr=exc.stderr) from None
+        raise RuntimeError("private acceptance operation timed out or unavailable") from None
+    except OSError:
+        if command == 'docker':
+            raise DockerCommandError(operation, 'unavailable') from None
         raise RuntimeError("private acceptance operation timed out or unavailable") from None
     if required and result.returncode:
         # Admin output and driver logs can contain private credentials/DSNs.
-        raise RuntimeError(Path(str(argv[0])).name + " operation failed (private output withheld)")
+        if command == 'docker':
+            raise DockerCommandError(operation, 'nonzero', returncode=result.returncode, stderr=result.stderr)
+        raise RuntimeError(command + " operation failed (private output withheld)")
     return result
 
 
@@ -448,11 +461,13 @@ def main():
     broker_spec["healthcheck"]["test"][-1] = f"exec 3<>/dev/tcp/127.0.0.1/{grpc_port}"
     for service in spec["services"].values():
         service["restart"] = "no"
+    # MySQL initialization and its tmpfs data both count toward the fixture memory limit.
+    # Hosted fixtures can hit 512 MiB before the first application case.
     spec["services"]["mysql"] = {
         "image": mysql_image, "environment": {"MYSQL_ROOT_PASSWORD": mysql_password,
         "MYSQL_DATABASE": "txprobe", "MYSQL_USER": "txprobe", "MYSQL_PASSWORD": mysql_password},
         "ports": [f"127.0.0.1:{mysql_port}:3306"], "networks": ["rocketmq"],
-        "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
+        "mem_limit": "1g", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
     if args.qs_runtime_host or args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host:
@@ -468,18 +483,14 @@ def main():
         spec["services"]["mongo"] = {
             "image": mongo_image, "command": ["mongod", "--replSet", "sdk-proof", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"],
             "ports": [f"127.0.0.1:{mongo_port}:27017"], "networks": ["rocketmq"],
-            "mem_limit": "512m", "cpus": 1, "tmpfs": ["/data/db", "/data/configdb"],
+            # The shell health check and WiredTiger/tmpfs share the memory limit.
+            "mem_limit": "1g", "cpus": 1, "tmpfs": ["/data/db", "/data/configdb"],
             "healthcheck": {"test": ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ping:1})"],
                             "interval": "3s", "timeout": "5s", "retries": 40}}
         if args.qs_answer_host or args.qs_report_host or args.qs_retry_dispatch_host:
             spec['services']['mongo']['command'] += ['--setParameter', 'enableTestCommands=1']
     redis_port = None
     if args.qs_recovery_host:
-        # Full application schema on tmpfs exceeds the protocol-only 512MiB
-        # startup budget in the managed executor (recorded native OOM).
-        spec["services"]["mysql"]["mem_limit"] = "1g"
-        # mongosh health checks plus WiredTiger/tmpfs also exceeded512MiB.
-        spec["services"]["mongo"]["mem_limit"] = "1g"
         redis_port = port()
         redis_pin = "redis:7.4.2-alpine"
         run(["docker", "pull", redis_pin], timeout=300)
@@ -495,22 +506,29 @@ def main():
     probes, cases, received, proof = [], {}, set(), {}
     failure = None
     sdk_manifest = None
+    fixture_stage = 'compose_start'
+    docker_failure = None
 
     def admin(operation, *params, success=False):
+        phase = {
+            'getBrokerConfig': 'broker_get_config', 'updateBrokerConfig': 'broker_update_config',
+            'updateTopic': 'broker_update_topic', 'updateSubGroup': 'broker_update_group',
+            'createUser': 'broker_create_user', 'createAcl': 'broker_create_acl',
+        }.get(operation, 'broker_admin_other')
         result = run(["docker", "exec", broker, "java", "-Xms32m", "-Xmx128m",
                       "-XX:MaxDirectMemorySize=32m", "-cp", "/opt/rocketmq/conf:/opt/rocketmq/lib/*",
                       "org.apache.rocketmq.tools.command.MQAdminStartup", operation,
-                      "-b", "127.0.0.1:10911", *params], timeout=45).stdout
+                      "-b", "127.0.0.1:10911", *params], timeout=45, docker_phase=phase).stdout
         if success and " success." not in result:
             raise RuntimeError("admin operation missing positive completion: " + operation)
         return result
 
     def sql(query):
         return run(["docker", "exec", "-i", mysql, "sh", "-c",
-                    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B txprobe'], stdin=query).stdout.strip()
+                    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B txprobe'], stdin=query, docker_phase='mysql_query').stdout.strip()
 
     def mongo_command(command):
-        return run(["docker", "exec", project + "-mongo-1", "mongosh", "--quiet", "--eval", command]).stdout.strip()
+        return run(["docker", "exec", project + "-mongo-1", "mongosh", "--quiet", "--eval", command], docker_phase="mongo_query").stdout.strip()
 
     def start(language, mode, identity="", owner="owner-a", topic=None, trust=None,
               storage="mysql", branches=1, revision="sdk-v2", subscription=None, principal=None,
@@ -608,10 +626,10 @@ def main():
         return proxy
 
     def restart_broker():
-        run(compose + ["restart", "broker"], timeout=90)
+        run(compose + ["restart", "broker"], timeout=90, docker_phase="broker_restart")
         deadline = time.monotonic() + 100
         while time.monotonic() < deadline:
-            health = run(["docker", "inspect", "--format", "{{.State.Health.Status}}", broker]).stdout.strip()
+            health = run(["docker", "inspect", "--format", "{{.State.Health.Status}}", broker], docker_phase="broker_health").stdout.strip()
             if health == "healthy":
                 return
             time.sleep(.5)
@@ -632,14 +650,17 @@ def main():
         print("transaction acceptance passed: " + name, flush=True)
 
     try:
-        run(compose + ["up", "-d", "--wait", "--wait-timeout", "180"], timeout=240)
+        run(compose + ["up", "-d", "--wait", "--wait-timeout", "180"], timeout=240, docker_phase="compose_start")
+        fixture_stage = 'broker_configuration'
         effective = broker_parameters(admin("getBrokerConfig"))
         if any(effective[k] != v for k, v in PARAMETERS.items()):
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
+        fixture_stage = 'database_version'
         proof["mysql_version"] = sql("SELECT VERSION();")
         if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.qs_runtime_host or args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
+        fixture_stage = 'acceptance_profile'
         if args.qs_deferred_consumer_host:
             proof['qs_deferred_consumer_host'] = {}
             if args.qs_deferred_kind == 'worker':
@@ -914,6 +935,7 @@ def main():
                 from sdk_acceptance import run_python_sdk
                 run_python_sdk(start, passed, sql, pause_mysql, wrong_ca)
             pop_observe = None
+            ack_tail_evidence = args.sdk_pop_drain_controls and args.image == 'rocketmq-readable:f07-ack-tail'
             if args.sdk_pop_drain_controls:
                 import importlib.util
                 specification = importlib.util.spec_from_file_location('owned_pop_controls', repo / 'scripts/ops/readable_pop_controls.py')
@@ -921,10 +943,15 @@ def main():
                 proof['readable_pop_controls_source_sha256'] = hashlib.sha256((repo / 'scripts/ops/readable_pop_controls.py').read_bytes()).hexdigest()
                 proof['readable_pop_controls'] = {}
                 pop_observe = controls.OwnedPopControls(run, admin, broker, project, sdk_manifest,
-                    proof['readable_pop_controls'], passed)
+                    proof['readable_pop_controls'], passed, revive_required=ack_tail_evidence)
             shared_budget(start,passed,language="sdk-go",observe=pop_observe)
             if args.sdk_api_python:
                 shared_budget(start,passed,language="sdk-python",observe=pop_observe)
+            if ack_tail_evidence:
+                from f07_ack_tail_evidence import collect
+                routes = {(row['physical_topic'], row['consumer_group']) for row in sdk_manifest['routes']
+                          if row.get('consumer_group')}
+                proof['f07_ack_tail_storage'] = collect(run, broker, project, image, routes, os.environ)
             if args.sdk_faults:
                 from sdk_faults import run_faults
                 run(["go", "build", "-o", str(directory / "fault-proxy"),
@@ -1114,6 +1141,8 @@ def main():
         passed("exact_committed_identity_set")
     except Exception as exc:
         failure = type(exc).__name__ + ": " + str(exc)
+        if isinstance(exc, DockerCommandError):
+            docker_failure = exc.evidence
         raise
     finally:
         failure_diagnostics = None
@@ -1149,6 +1178,36 @@ def main():
             except Exception:
                 # Diagnostics must never prevent the actual owned cleanup.
                 failure_diagnostics = {'capture_failed': True}
+            failure_diagnostics['fixture_stage'] = fixture_stage
+            if docker_failure is not None:
+                failure_diagnostics['docker'] = docker_failure
+            try:
+                status = run(compose + ['ps', '--all', '--format', 'json'], required=False, timeout=12)
+                if status.returncode == 0:
+                    failure_diagnostics['services'] = compose_service_states(status.stdout)
+                else:
+                    failure_diagnostics['service_status_unavailable'] = True
+            except Exception:
+                failure_diagnostics['service_status_unavailable'] = True
+            if fixture_stage == 'compose_start' and any(
+                    entry['service'] == 'mysql' and
+                    (entry['state'] in ('dead', 'exited') or entry['health'] == 'unhealthy')
+                    for entry in failure_diagnostics.get('services', ())):
+                try:
+                    state = run(['docker', 'inspect', '--format', '{{json .State}}', mysql], timeout=12)
+                    logs = run(['docker', 'logs', '--tail', '120', mysql], timeout=15)
+                    failure_diagnostics['mysql_startup'] = mysql_startup_status(state.stdout, logs.stdout + logs.stderr)
+                except Exception:
+                    failure_diagnostics['mysql_startup_unavailable'] = True
+            if fixture_stage == 'compose_start' and any(
+                    entry['service'] == 'mongo' and
+                    (entry['state'] in ('dead', 'exited') or entry['health'] == 'unhealthy')
+                    for entry in failure_diagnostics.get('services', ())):
+                try:
+                    state = run(['docker', 'inspect', '--format', '{{json .State}}', project + '-mongo-1'], timeout=12)
+                    failure_diagnostics['mongo_startup'] = docker_startup_state(state.stdout)
+                except Exception:
+                    failure_diagnostics['mongo_startup_unavailable'] = True
         probes_drained = True
         for p in reversed(probes):
             if not p.log.closed:

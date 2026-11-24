@@ -1,7 +1,7 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
-from readable_pop_controls import BUFFER_NAMES, SYSTEM_TOPIC, OwnedPopControls, snapshot, zero
+from readable_pop_controls import BUFFER_NAMES, REVIVE_LAG_NAME, SYSTEM_TOPIC, OwnedPopControls, snapshot, zero
 
 
 def metrics(*, offset='0', checkpoint='0', timing='0', include_timer=True):
@@ -20,6 +20,33 @@ class ReadablePopControlsTest(unittest.TestCase):
         for change in (dict(offset='1'), dict(checkpoint='1')):
             self.assertFalse(zero(snapshot(metrics(**change), timing_required=True), timing_required=True))
         self.assertTrue(zero(snapshot(metrics(), timing_required=True), timing_required=True))
+
+    def test_candidate_requires_all_eight_unique_revive_queues(self):
+        lines = [f'{REVIVE_LAG_NAME}{{queue_id="{queue}"}} 0\n' for queue in range(8)]
+        raw = metrics() + ''.join(lines)
+        self.assertTrue(zero(snapshot(raw, timing_required=True, revive_required=True), timing_required=True))
+        for altered in (lines[:-1], lines[:-1] + [lines[0]], lines[:-1] + [lines[-1].replace('"7"', '"8"')]):
+            with self.subTest(altered=altered), self.assertRaisesRegex(
+                    RuntimeError, 'complete_unique_revive_queue_lag_required'):
+                snapshot(metrics() + ''.join(altered), timing_required=True, revive_required=True)
+        self.assertNotIn('revive_lag', snapshot(metrics(), timing_required=True))
+
+    def test_candidate_wait_rejects_a_nonzero_revive_tail_when_timer_is_zero(self):
+        prefix = ''.join(f'{REVIVE_LAG_NAME}{{queue_id="{queue}"}} 0\n' for queue in range(7))
+        value = snapshot(metrics() + prefix + f'{REVIVE_LAG_NAME}{{queue_id="7"}} 1\n',
+                         timing_required=True, revive_required=True)
+        proof, passed = {}, Mock()
+        control = OwnedPopControls(Mock(), Mock(), 'unused', 'unused', {}, proof, passed, revive_required=True)
+        with patch.object(control, 'read', return_value=value), \
+                patch('readable_pop_controls.time.monotonic', side_effect=[0, 1, 90]), \
+                patch('readable_pop_controls.time.sleep'):
+            with self.assertRaisesRegex(RuntimeError, 'native_pop_control_budget_exceeded'):
+                control('baseline', 'sdk-go')
+        failure = proof['go']['baseline_timeout']
+        self.assertEqual(failure['budget_seconds'], 90)
+        self.assertEqual(failure['last_sample']['revive_lag']['7'], 1)
+        self.assertEqual(failure['last_sample']['timing'], 0)
+        passed.assert_not_called()
 
     def test_missing_timer_is_explicit_baseline_only_not_a_settled_zero(self):
         raw = metrics(include_timer=False)
