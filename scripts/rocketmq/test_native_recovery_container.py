@@ -1,0 +1,327 @@
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import socket
+import subprocess
+import tempfile
+import time
+import unittest
+from unittest.mock import patch
+
+import native_recovery_container as runner
+from start_boundary import BoundaryError, _encoded, _publish
+
+
+class NativeRecoveryContainerTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        root = Path(self.tmp.name).resolve()
+        self.operation = root / 'operation'
+        self.inputs = root / 'inputs'
+        self.java = self.inputs / 'java'
+        for path in (self.operation, self.inputs, self.java, self.java / 'tls'):
+            path.mkdir(mode=0o700)
+        self.fd = os.open(self.operation, os.O_RDONLY | os.O_DIRECTORY)
+        self.addCleanup(os.close, self.fd)
+        hashes = {key: self.write(self.inputs / (key + '.json')) for key in runner.INPUTS if key != 'config'}
+        admin_sha = self.write(self.java / 'native-admin.sh')
+        hashes['config'] = self.write(self.inputs / 'config.json', _encoded({
+            'native_admin_script': runner.ADMIN_SCRIPT, 'native_admin_script_sha256': admin_sha}))
+        self.plan = {
+            'schema': 'm3-native-recovery-container/v1', 'command': 'recover',
+            'directory': str(self.operation), 'host': socket.gethostname(),
+            'image_id': 'sha256:' + '1' * 64, 'source_sha': 'a' * 40,
+            'network_id': '2' * 64, 'network_name': 'owned-fixture', 'binding_sha256': '3' * 64,
+            'step': 'recover-original', 'inputs': hashes,
+            'java': {'admin_script': admin_sha, 'tools': self.write(self.java / 'tools.yml'),
+                     'ca': self.write(self.java / 'tls' / 'server.crt')},
+        }
+        self.step_sha = '4' * 64
+        self.cid = '5' * 64
+        self.env = {
+            'M3_COORDINATOR_DIRECTORY': str(self.operation),
+            'M3_COORDINATOR_BINDING_SHA256': self.plan['binding_sha256'],
+            'M3_COORDINATOR_STEP': self.plan['step'], 'M3_COORDINATOR_STEP_PLAN_SHA256': self.step_sha,
+        }
+
+    def write(self, path, raw=b'fixture\n'):
+        path.write_bytes(raw)
+        path.chmod(0o600)
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+
+    def run_container(self, step_sha=None, plan=None):
+        runner.run_container(self.fd, plan or self.plan, self.operation, self.inputs, self.java,
+                             step_sha or self.step_sha, ['recover'], (), time.monotonic() + 230)
+
+    def terminal(self, step_sha, cid, code):
+        return dict(Id=cid, Name='/native-container-' + step_sha, Image=self.plan['image_id'], RestartCount=0,
+                    Config={'Labels': {'native.recovery.step': step_sha}},
+                    NetworkSettings={'Networks': {'fixture': {'NetworkID': self.plan['network_id']}}},
+                    State=dict(Status='exited', Running=False, ExitCode=code, OOMKilled=False,
+                               StartedAt='2026-01-01T00:00:00Z', FinishedAt='2026-01-01T00:00:01Z'))
+
+    def created(self, step_sha, cid):
+        value = self.terminal(step_sha, cid, 0)
+        value['State']['Status'] = 'created'
+        value['Config']['User'] = '3000:3000'
+        value['NetworkSettings']['Networks'] = {self.plan['network_name']: {'NetworkID': ''}}
+        value['HostConfig'] = dict(NetworkMode=self.plan['network_id'], ReadonlyRootfs=True, Privileged=False,
+                                   CapAdd=None, CapDrop=['ALL'], SecurityOpt=['no-new-privileges'],
+                                   RestartPolicy={'Name': 'no'}, Memory=402653184, NanoCpus=10**9, PidsLimit=64)
+        value['Mounts'] = [dict(Type='bind', Source=source, Destination=target, RW=writable)
+                           for source, target, writable in runner.bind_mounts(self.operation, self.inputs, self.java, ())]
+        return value
+
+    def test_plan_builds_only_fixed_command_and_mounts(self):
+        directory, material, java, step_sha, cli = runner.arguments(self.plan, self.env)
+        self.assertEqual(step_sha, self.step_sha)
+        protected = (self.operation / 'state.json',)
+        mounts = runner.bind_mounts(directory, material, java, protected)
+        cmd = runner.create_args(self.plan, 'named', cli, mounts)
+        self.assertEqual(cmd[cmd.index('--network') + 1], self.plan['network_id'])
+        self.assertEqual(cmd[cmd.index('--user') + 1], '3000:3000')
+        self.assertIn('--read-only', cmd)
+        self.assertNotIn('--rm', cmd)
+        self.assertIn(f'type=bind,src={protected[0]},dst={protected[0]},readonly', cmd)
+        self.assertIn('/usr/bin/timeout', cmd)
+        self.assertIn('195s', cmd)
+        self.assertEqual(cli[0], 'recover')
+
+    def test_reviewed_bridge_requires_actual_ipv4_isolation_for_v2(self):
+        plan = self.plan | {'schema': runner.ISOLATED_BRIDGE_PLAN}
+        self.assertEqual(runner.arguments(plan, self.env), runner.arguments(self.plan, self.env))
+        network = dict(Id=plan['network_id'], Name=plan['network_name'], Driver='bridge', Scope='local',
+                       Internal=True, EnableIPv4=True, EnableIPv6=False,
+                       Options={runner.IPV4_GATEWAY_MODE: 'isolated'})
+        for override in (dict(Internal=False), dict(EnableIPv4=False), dict(EnableIPv6=True),
+                         dict(EnableIPv6=None), dict(Options={runner.IPV4_GATEWAY_MODE: 'nat'}), dict(Options=None)):
+            with self.subTest(override=override), patch.object(runner, 'docker', return_value=json.dumps([network | override])):
+                with self.assertRaisesRegex(BoundaryError, 'isolated IPv4 bridge'):
+                    runner.require_reviewed_network(plan)
+                runner.require_reviewed_network(self.plan)
+        with patch.object(runner, 'docker', return_value=json.dumps([network])) as docker:
+            runner.require_reviewed_network(plan)
+            docker.assert_called_once_with(['network', 'inspect', plan['network_id']])
+
+    def test_v2_network_mismatch_before_start_preserves_issued_identity(self):
+        plan = self.plan | {'schema': runner.ISOLATED_BRIDGE_PLAN}
+        docker_results = [self.cid, json.dumps([self.created(self.step_sha, self.cid)]),
+                          json.dumps([dict(Id=plan['network_id'], Name=plan['network_name'], Driver='bridge', Scope='local',
+                                           Internal=False, EnableIPv4=True, EnableIPv6=False)])]
+        with patch.object(runner, 'docker', side_effect=docker_results) as docker:
+            with self.assertRaisesRegex(BoundaryError, 'isolated IPv4 bridge'):
+                self.run_container(plan=plan)
+        self.assertEqual([call.args[0][0] for call in docker.call_args_list], ['create', 'container', 'network'])
+        prefix = self.operation / ('native-container-' + self.step_sha)
+        self.assertTrue(prefix.with_name(prefix.name + '-issued.json').is_file())
+        self.assertEqual(json.loads(prefix.with_name(prefix.name + '-created.json').read_text()), {'container_id': self.cid})
+        self.assertFalse(prefix.with_name(prefix.name + '-exit.json').exists())
+
+    def test_v2_rejects_a_nonisolated_bridge_before_issuing_any_container(self):
+        plan = self.plan | {'schema': runner.ISOLATED_BRIDGE_PLAN}
+        arguments = runner.arguments(plan, self.env)
+        image = dict(Id=plan['image_id'], Os='linux', Architecture='amd64',
+                     Config={'User': '3000:3000', 'Labels': {'org.opencontainers.image.revision': plan['source_sha']}})
+        network = dict(Id=plan['network_id'], Name=plan['network_name'], Driver='bridge', Scope='local',
+                       Internal=True, EnableIPv4=True, EnableIPv6=False, Options={runner.IPV4_GATEWAY_MODE: 'nat'})
+        with patch.object(runner.platform, 'system', return_value='Linux'), \
+                patch.object(runner.os, 'geteuid', return_value=3000), patch.object(runner.os, 'getegid', return_value=3000), \
+                patch.object(runner, 'arguments', return_value=arguments), \
+                patch.object(runner, 'docker', side_effect=[json.dumps([image]), json.dumps([network])]) as docker:
+            with self.assertRaisesRegex(BoundaryError, 'isolated IPv4 bridge'):
+                runner.launch(plan, self.env)
+        self.assertEqual([call.args[0][0] for call in docker.call_args_list], ['image', 'network'])
+        self.assertEqual(list(self.operation.iterdir()), [])
+
+    def member_fixture(self):
+        container_id, endpoint_id, address = '6' * 64, '7' * 64, '172.31.246.8/24'
+        plan = self.plan | {'schema': runner.REVIEWED_MEMBERS_PLAN,
+                            'network_members': {container_id: {'endpoint_id': endpoint_id, 'ipv4_address': address}}}
+        network = dict(Id=plan['network_id'], Name=plan['network_name'], Driver='bridge', Scope='local',
+                       Internal=True, EnableIPv4=True, EnableIPv6=False,
+                       Options={runner.IPV4_GATEWAY_MODE: 'isolated'},
+                       Containers={container_id: dict(EndpointID=endpoint_id, IPv4Address=address, IPv6Address='')})
+        return plan, network, container_id
+
+    def test_v3_requires_exact_member_plan_without_changing_container_arguments(self):
+        plan, _, cid = self.member_fixture()
+        self.assertEqual(runner.arguments(plan, self.env), runner.arguments(self.plan, self.env))
+        for invalid in ({}, {cid: {'endpoint_id': '7' * 64, 'ipv4_address': '172.31.246.8'}},
+                        {cid: {'endpoint_id': '7' * 64, 'ipv4_address': 'fd00::8/64'}},
+                        {'short': plan['network_members'][cid]}):
+            with self.subTest(invalid=invalid), self.assertRaises((BoundaryError, ValueError)):
+                runner.arguments(plan | {'network_members': invalid}, self.env)
+        with self.assertRaisesRegex(BoundaryError, 'exact reviewed container plan'):
+            runner.arguments(plan | {'schema': runner.ISOLATED_BRIDGE_PLAN}, self.env)
+
+    def test_v3_rejects_live_member_or_endpoint_drift(self):
+        plan, network, cid = self.member_fixture()
+        members = network['Containers']
+        with patch.object(runner, 'docker', return_value=json.dumps([network])):
+            runner.require_reviewed_network(plan)
+        for changed in (None, {}, members | {'8' * 64: members[cid]},
+                        {cid: members[cid] | {'EndpointID': '8' * 64}},
+                        {cid: members[cid] | {'IPv4Address': '172.31.246.9/24'}},
+                        {cid: members[cid] | {'IPv6Address': 'fd00::8/64'}}):
+            with self.subTest(changed=changed), patch.object(
+                    runner, 'docker', return_value=json.dumps([network | {'Containers': changed}])):
+                with self.assertRaisesRegex(BoundaryError, 'network member'):
+                    runner.require_reviewed_network(plan)
+
+    def test_v3_rechecks_members_before_start_and_keeps_created_identity_on_drift(self):
+        plan, network, _ = self.member_fixture()
+        docker_results = [self.cid, json.dumps([self.created(self.step_sha, self.cid)]),
+                          json.dumps([network | {'Containers': {}}])]
+        with patch.object(runner, 'docker', side_effect=docker_results) as docker:
+            with self.assertRaisesRegex(BoundaryError, 'network member inventory'):
+                self.run_container(plan=plan)
+        self.assertEqual([call.args[0][0] for call in docker.call_args_list], ['create', 'container', 'network'])
+        prefix = self.operation / ('native-container-' + self.step_sha)
+        self.assertTrue(prefix.with_name(prefix.name + '-issued.json').is_file())
+        self.assertEqual(json.loads(prefix.with_name(prefix.name + '-created.json').read_text()), {'container_id': self.cid})
+        self.assertFalse(prefix.with_name(prefix.name + '-exit.json').exists())
+
+    def test_plan_refuses_mismatched_coordinator_extra_mount_material_and_digest(self):
+        with self.assertRaises(BoundaryError):
+            runner.arguments(self.plan, self.env | {'M3_COORDINATOR_STEP': 'other'})
+        extra = self.java / 'extra'
+        self.write(extra)
+        with self.assertRaises(BoundaryError):
+            runner.arguments(self.plan, self.env)
+        extra.unlink()
+        (self.inputs / 'approval.json').write_text('changed')
+        with self.assertRaises(BoundaryError):
+            runner.arguments(self.plan, self.env)
+
+    def test_refuses_admin_script_outside_readonly_material_even_with_matching_digest(self):
+        self.plan['inputs']['config'] = self.write(self.inputs / 'config.json', _encoded({
+            'native_admin_script': str(self.operation / 'native-admin.sh'),
+            'native_admin_script_sha256': self.plan['java']['admin_script']}))
+        with self.assertRaisesRegex(BoundaryError, 'mounted native admin script'):
+            runner.arguments(self.plan, self.env)
+
+    def test_requires_live_lock_and_matching_reviewed_step(self):
+        binding = self.plan['binding_sha256']
+        step = dict(directory=str(self.operation), binding_sha256=binding, host=self.plan['host'],
+                    step=self.plan['step'], timeout_seconds=240, kind='runtime-start')
+        step_sha = hashlib.sha256(_encoded(step)).hexdigest()
+        _publish(self.fd, 'reviewed-step-' + step_sha + '.json', step)
+        _publish(self.fd, 'binding.json', {})
+        _publish(self.fd, 'first-runtime-start.json', {})
+        _publish(self.fd, 'state.json', dict(binding_sha256=binding, step=self.plan['step'], phase='runtime_start_issued'))
+        with self.assertRaises(BoundaryError):
+            runner.require_issued(self.fd, self.plan, self.operation, step_sha)
+        owner = os.open(self.operation, os.O_RDONLY | os.O_DIRECTORY)
+        self.addCleanup(os.close, owner)
+        fcntl.flock(owner, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        protected = runner.require_issued(self.fd, self.plan, self.operation, step_sha)
+        self.assertIn(self.operation / 'state.json', protected)
+        with self.assertRaises(BoundaryError):
+            runner.require_issued(self.fd, self.plan | {'step': 'different'}, self.operation, step_sha)
+        with self.assertRaises(BoundaryError):
+            runner.require_issued(self.fd, self.plan | {'prior_terminal': {}}, self.operation, step_sha)
+
+    def test_timeout_retains_identity_and_refuses_a_second_launch(self):
+        created = json.dumps([self.created(self.step_sha, self.cid)])
+        with patch.object(runner, 'docker', side_effect=[self.cid, created, '', subprocess.TimeoutExpired('wait', 1)]) as daemon:
+            with self.assertRaises(subprocess.TimeoutExpired):
+                self.run_container()
+            self.assertEqual(daemon.call_args_list[2].args[0], ['start', self.cid])
+            with self.assertRaisesRegex(BoundaryError, 'exit is unknown'):
+                self.run_container('6' * 64, self.plan | {'inputs': self.plan['inputs'] | {'request': '7' * 64}})
+            self.assertEqual(daemon.call_count, 4)
+        prefix = self.operation / ('native-container-' + self.step_sha)
+        self.assertEqual(json.loads(prefix.with_name(prefix.name + '-created.json').read_bytes()), {'container_id': self.cid})
+        self.assertFalse(prefix.with_name(prefix.name + '-exit.json').exists())
+
+    def test_create_drift_is_refused_before_start(self):
+        for mismatch in ('network', 'mounts', 'sandbox'):
+            with self.subTest(mismatch=mismatch), tempfile.TemporaryDirectory() as tmp:
+                created = self.created(self.step_sha, self.cid)
+                if mismatch == 'network':
+                    created['HostConfig']['NetworkMode'] = 'host'
+                elif mismatch == 'mounts':
+                    created['Mounts'][1]['RW'] = True
+                else:
+                    created['HostConfig']['Privileged'] = True
+                fd = os.open(tmp, os.O_RDONLY | os.O_DIRECTORY)
+                try:
+                    with patch.object(runner, 'docker', side_effect=[self.cid, json.dumps([created])]) as daemon:
+                        with self.assertRaisesRegex(BoundaryError, mismatch + ' differ'):
+                            runner.run_container(fd, self.plan, self.operation, self.inputs, self.java,
+                                                 self.step_sha, ['recover'], (), time.monotonic() + 230)
+                        self.assertEqual(daemon.call_args_list[-1].args[0], ['container', 'inspect', self.cid])
+                        self.assertEqual(daemon.call_count, 2)
+                        self.assertTrue((Path(tmp) / ('native-container-' + self.step_sha + '-created.json')).is_file())
+                finally:
+                    os.close(fd)
+
+    def test_insufficient_budget_refuses_before_issuing_container(self):
+        with patch.object(runner, 'docker') as daemon:
+            with self.assertRaisesRegex(BoundaryError, 'insufficient budget'):
+                runner.run_container(self.fd, self.plan, self.operation, self.inputs, self.java,
+                                     self.step_sha, ['recover'], (), time.monotonic() + 200)
+            daemon.assert_not_called()
+        self.assertEqual(list(self.operation.iterdir()), [])
+
+    def test_success_requires_inspected_terminal_identity_and_no_retry(self):
+        name = 'native-container-' + self.step_sha
+        terminal = self.terminal(self.step_sha, self.cid, 0)
+        created = json.dumps([self.created(self.step_sha, self.cid)])
+        with patch.object(runner, 'docker', side_effect=[self.cid, created, '', '0', json.dumps([terminal])]) as daemon:
+            self.run_container()
+            self.assertEqual(daemon.call_args_list[-1].args[0], ['container', 'inspect', self.cid])
+            with self.assertRaises(FileExistsError):
+                self.run_container()
+            self.assertEqual(daemon.call_count, 5)
+        result = json.loads((self.operation / (name + '-exit.json')).read_bytes())
+        self.assertEqual(result, dict(container_id=self.cid, exit_code=0, oom_killed=False,
+                                      started_at=terminal['State']['StartedAt'], finished_at=terminal['State']['FinishedAt']))
+
+    def test_unknown_exit_handoff_requires_new_request_and_independent_observation(self):
+        created = json.dumps([self.created(self.step_sha, self.cid)])
+        with patch.object(runner, 'docker', side_effect=[self.cid, created, '', subprocess.TimeoutExpired('wait', 1)]):
+            with self.assertRaises(subprocess.TimeoutExpired):
+                self.run_container()
+        old_name = 'native-container-' + self.step_sha
+        previous = json.dumps([self.terminal(self.step_sha, self.cid, 124)])
+        paths_before = sorted(self.operation.iterdir())
+        with patch.object(runner, 'docker', return_value=previous):
+            observation = runner.terminal_observation(self.fd, old_name)
+        self.assertEqual(sorted(self.operation.iterdir()), paths_before)
+        self.assertFalse(observation['execution_authorized'])
+        approval = {'step_plan_sha256': self.step_sha,
+                    'observation_sha256': hashlib.sha256(_encoded(observation)).hexdigest()}
+        new_step, new_cid = '6' * 64, '8' * 64
+        new_plan = self.plan | {'prior_terminal': approval}
+        with patch.object(runner, 'docker') as daemon:
+            with self.assertRaisesRegex(BoundaryError, 'new request'):
+                self.run_container(new_step, new_plan)
+            daemon.assert_not_called()
+        new_plan['inputs'] = self.plan['inputs'] | {'request': '7' * 64}
+        with patch.object(runner, 'docker', return_value=previous):
+            with self.assertRaisesRegex(BoundaryError, 'observation differs'):
+                self.run_container(new_step, new_plan | {'prior_terminal': approval | {'observation_sha256': '0' * 64}})
+        next_exit = json.dumps([self.terminal(new_step, new_cid, 0)])
+        next_created = json.dumps([self.created(new_step, new_cid)])
+        with patch.object(runner, 'docker', side_effect=[previous, new_cid, next_created, '', '0', next_exit]):
+            self.run_container(new_step, new_plan)
+        self.assertFalse((self.operation / (old_name + '-exit.json')).exists())
+        self.assertEqual(json.loads((self.operation / (old_name + '-reconciled.json')).read_bytes()),
+                         {'terminal': observation['terminal'], 'observation_sha256': approval['observation_sha256'],
+                          'reviewed_by_step_plan_sha256': new_step})
+
+    def test_prior_observation_refuses_running_or_mismatched_container(self):
+        name = 'native-container-' + self.step_sha
+        for changed in (
+                {'Id': '6' * 64},
+                {'Config': {'Labels': {'native.recovery.step': '7' * 64}}},
+                {'NetworkSettings': {'Networks': {'wrong': {'NetworkID': '8' * 64}}}},
+                {'State': {'Status': 'running', 'Running': True}}):
+            with self.subTest(changed=changed), patch.object(runner, 'docker', return_value=json.dumps([
+                    self.terminal(self.step_sha, self.cid, 0) | changed])):
+                with self.assertRaisesRegex(BoundaryError, 'terminal state unknown'):
+                    runner.inspect_exit(self.cid, name, self.plan['image_id'], self.plan['network_id'])
