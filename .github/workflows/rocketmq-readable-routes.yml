@@ -90,7 +90,9 @@ jobs:
           python3 -m unittest discover -s scripts/ops -p test_readable_pop_record.py
           python3 -m unittest discover -s scripts/rocketmq -p test_f07_ack_tail_evidence.py
       - name: Naming contracts
-        run: python3 -m unittest discover -s scripts/rocketmq -p 'test_routes*.py'
+        run: |
+          python3 -m unittest discover -s scripts/rocketmq -p 'test_routes*.py'
+          python3 -m unittest discover -s scripts/rocketmq -p test_failure_diagnostics.py
       - name: Build verified isolated Broker
         run: |
           bash scripts/rocketmq/fetch-release.sh

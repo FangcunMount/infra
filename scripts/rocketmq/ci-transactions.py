@@ -21,7 +21,7 @@ import threading
 import time
 
 from render import render
-from failure_diagnostics import summarize, startup_internal_description
+from failure_diagnostics import DockerCommandError, compose_service_states, summarize, startup_internal_description
 from published_runtime import interpreter_path
 
 
@@ -47,15 +47,25 @@ def mysql_fixture_supported(version, *, sdk_api_go=False, iam_host=False):
     return version.startswith('8.0.') or ((sdk_api_go or iam_host) and version.startswith('8.4.'))
 
 
-def run(argv, *, timeout=120, env=None, cwd=None, required=True, stdin=None):
+def run(argv, *, timeout=120, env=None, cwd=None, required=True, stdin=None, docker_phase=None):
+    command = Path(str(argv[0])).name
+    operation = docker_phase or (argv[1] if len(argv) > 1 else 'other')
     try:
         result = subprocess.run(argv, input=stdin, capture_output=True, text=True,
                                 env=env, cwd=cwd, timeout=timeout)
-    except (subprocess.TimeoutExpired, OSError):
+    except subprocess.TimeoutExpired as exc:
+        if command == 'docker':
+            raise DockerCommandError(operation, 'timeout', stderr=exc.stderr) from None
+        raise RuntimeError("private acceptance operation timed out or unavailable") from None
+    except OSError:
+        if command == 'docker':
+            raise DockerCommandError(operation, 'unavailable') from None
         raise RuntimeError("private acceptance operation timed out or unavailable") from None
     if required and result.returncode:
         # Admin output and driver logs can contain private credentials/DSNs.
-        raise RuntimeError(Path(str(argv[0])).name + " operation failed (private output withheld)")
+        if command == 'docker':
+            raise DockerCommandError(operation, 'nonzero', returncode=result.returncode, stderr=result.stderr)
+        raise RuntimeError(command + " operation failed (private output withheld)")
     return result
 
 
@@ -495,22 +505,29 @@ def main():
     probes, cases, received, proof = [], {}, set(), {}
     failure = None
     sdk_manifest = None
+    fixture_stage = 'compose_start'
+    docker_failure = None
 
     def admin(operation, *params, success=False):
+        phase = {
+            'getBrokerConfig': 'broker_get_config', 'updateBrokerConfig': 'broker_update_config',
+            'updateTopic': 'broker_update_topic', 'updateSubGroup': 'broker_update_group',
+            'createUser': 'broker_create_user', 'createAcl': 'broker_create_acl',
+        }.get(operation, 'broker_admin_other')
         result = run(["docker", "exec", broker, "java", "-Xms32m", "-Xmx128m",
                       "-XX:MaxDirectMemorySize=32m", "-cp", "/opt/rocketmq/conf:/opt/rocketmq/lib/*",
                       "org.apache.rocketmq.tools.command.MQAdminStartup", operation,
-                      "-b", "127.0.0.1:10911", *params], timeout=45).stdout
+                      "-b", "127.0.0.1:10911", *params], timeout=45, docker_phase=phase).stdout
         if success and " success." not in result:
             raise RuntimeError("admin operation missing positive completion: " + operation)
         return result
 
     def sql(query):
         return run(["docker", "exec", "-i", mysql, "sh", "-c",
-                    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B txprobe'], stdin=query).stdout.strip()
+                    'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -B txprobe'], stdin=query, docker_phase='mysql_query').stdout.strip()
 
     def mongo_command(command):
-        return run(["docker", "exec", project + "-mongo-1", "mongosh", "--quiet", "--eval", command]).stdout.strip()
+        return run(["docker", "exec", project + "-mongo-1", "mongosh", "--quiet", "--eval", command], docker_phase="mongo_query").stdout.strip()
 
     def start(language, mode, identity="", owner="owner-a", topic=None, trust=None,
               storage="mysql", branches=1, revision="sdk-v2", subscription=None, principal=None,
@@ -608,10 +625,10 @@ def main():
         return proxy
 
     def restart_broker():
-        run(compose + ["restart", "broker"], timeout=90)
+        run(compose + ["restart", "broker"], timeout=90, docker_phase="broker_restart")
         deadline = time.monotonic() + 100
         while time.monotonic() < deadline:
-            health = run(["docker", "inspect", "--format", "{{.State.Health.Status}}", broker]).stdout.strip()
+            health = run(["docker", "inspect", "--format", "{{.State.Health.Status}}", broker], docker_phase="broker_health").stdout.strip()
             if health == "healthy":
                 return
             time.sleep(.5)
@@ -632,14 +649,17 @@ def main():
         print("transaction acceptance passed: " + name, flush=True)
 
     try:
-        run(compose + ["up", "-d", "--wait", "--wait-timeout", "180"], timeout=240)
+        run(compose + ["up", "-d", "--wait", "--wait-timeout", "180"], timeout=240, docker_phase="compose_start")
+        fixture_stage = 'broker_configuration'
         effective = broker_parameters(admin("getBrokerConfig"))
         if any(effective[k] != v for k, v in PARAMETERS.items()):
             raise RuntimeError("isolated accelerated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
+        fixture_stage = 'database_version'
         proof["mysql_version"] = sql("SELECT VERSION();")
         if not mysql_fixture_supported(proof["mysql_version"], sdk_api_go=args.sdk_api_go, iam_host=bool(args.qs_runtime_host or args.iam_host or args.qs_answer_host or args.qs_evaluation_host or args.qs_report_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host)):
             raise RuntimeError("required MySQL 8.0 fixture absent")
+        fixture_stage = 'acceptance_profile'
         if args.qs_deferred_consumer_host:
             proof['qs_deferred_consumer_host'] = {}
             if args.qs_deferred_kind == 'worker':
@@ -1120,6 +1140,8 @@ def main():
         passed("exact_committed_identity_set")
     except Exception as exc:
         failure = type(exc).__name__ + ": " + str(exc)
+        if isinstance(exc, DockerCommandError):
+            docker_failure = exc.evidence
         raise
     finally:
         failure_diagnostics = None
@@ -1155,6 +1177,17 @@ def main():
             except Exception:
                 # Diagnostics must never prevent the actual owned cleanup.
                 failure_diagnostics = {'capture_failed': True}
+            failure_diagnostics['fixture_stage'] = fixture_stage
+            if docker_failure is not None:
+                failure_diagnostics['docker'] = docker_failure
+            try:
+                status = run(compose + ['ps', '--all', '--format', 'json'], required=False, timeout=12)
+                if status.returncode == 0:
+                    failure_diagnostics['services'] = compose_service_states(status.stdout)
+                else:
+                    failure_diagnostics['service_status_unavailable'] = True
+            except Exception:
+                failure_diagnostics['service_status_unavailable'] = True
         probes_drained = True
         for p in reversed(probes):
             if not p.log.closed:
