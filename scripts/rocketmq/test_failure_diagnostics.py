@@ -5,7 +5,9 @@ import subprocess
 import unittest
 from unittest.mock import patch
 
-from failure_diagnostics import DockerCommandError, compose_service_states, summarize, startup_internal_description
+from failure_diagnostics import (
+    DockerCommandError, compose_service_states, mysql_startup_status, startup_internal_description, summarize,
+)
 
 
 class DiagnosticsTest(unittest.TestCase):
@@ -82,3 +84,15 @@ class DiagnosticsTest(unittest.TestCase):
             self.assertEqual(caught.exception.evidence['kind'], 'timeout')
             self.assertEqual(caught.exception.evidence['stderr_signals'], ['broker_rpc_timeout'])
             self.assertNotIn('private-value', json.dumps(caught.exception.evidence))
+
+
+    def test_mysql_startup_keeps_standard_codes_but_no_dsn_or_state_error(self):
+        state = '{"ExitCode": 1, "OOMKilled": false, "Error": "private-state-error"}'
+        log = '[ERROR] [MY-000067] [Server] unknown variable private-option=secret-dsn'
+        result = mysql_startup_status(state, log)
+        self.assertEqual(result['exit_code'], 1)
+        self.assertFalse(result['oom_killed'])
+        self.assertEqual(result['logs']['signals'], ['invalid_option'])
+        self.assertEqual(result['logs']['error_codes'], ['MY-000067'])
+        self.assertNotIn('private-', json.dumps(result))
+        self.assertNotIn('secret-dsn', json.dumps(result))

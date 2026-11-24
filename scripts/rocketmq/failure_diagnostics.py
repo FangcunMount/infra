@@ -1,5 +1,6 @@
 """Bounded allowlisted transport diagnostics; never exports original log lines."""
 import hashlib
+import json
 import re
 
 
@@ -102,8 +103,6 @@ class DockerCommandError(RuntimeError):
 
 def compose_service_states(raw):
     """Project-local status without exporting names, commands, paths or raw JSON."""
-    import json
-
     if len(raw) > 524288:
         raise ValueError('Compose status exceeded the private capture limit')
     lines = raw.strip()
@@ -124,3 +123,36 @@ def compose_service_states(raw):
             'exit_code': exit_code if type(exit_code) is int and 0 <= exit_code <= 255 else None,
         })
     return sorted(evidence, key=lambda item: item['service'])
+
+
+MYSQL_STARTUP_SIGNALS = {
+    'file_write_no_space': r'no space left on device|disk is full|Operating system error number 28',
+    'memory_allocation': r'cannot allocate memory|out of memory|allocation of [^\r\n]{1,60} failed',
+    'permission_denied': r'permission denied|operation not permitted|Operating system error number 13',
+    'invalid_option': r'unknown (?:option|variable)|invalid value for',
+    'innodb_startup': r'InnoDB[^\r\n]{0,160}(?:initialization aborted|plugin initialization|failed)|data dictionary initialization failed',
+    'unusable_data_directory': r'data directory[^\r\n]{0,120}(?:unusable|not usable|has files|not empty)',
+    'entrypoint_init_failed': r'database files initialization failed|unable to start server|unable to shut down server',
+    'socket_bind': r'address already in use|another mysqld server running',
+}
+
+
+def mysql_startup_status(state_raw, log_raw):
+    """Expose fixed MySQL startup signals and standard codes, never raw logs."""
+    state = json.loads(state_raw)
+    if isinstance(log_raw, str):
+        log_raw = log_raw.encode()
+    tail = log_raw[-262144:]
+    text = tail.decode(errors='replace')
+    exit_code = state.get('ExitCode')
+    oom = state.get('OOMKilled')
+    return {
+        'exit_code': exit_code if type(exit_code) is int and 0 <= exit_code <= 255 else None,
+        'oom_killed': oom if type(oom) is bool else None,
+        'logs': {
+            'bytes_examined': len(tail),
+            'sha256': hashlib.sha256(tail).hexdigest(),
+            'signals': [key for key, pattern in MYSQL_STARTUP_SIGNALS.items() if re.search(pattern, text, re.I)],
+            'error_codes': sorted(set(re.findall(r'\[(?:ERROR|FATAL)\][ \t]+\[(MY-\d{6})\]', text)))[:32],
+        },
+    }

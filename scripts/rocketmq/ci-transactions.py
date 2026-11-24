@@ -21,7 +21,9 @@ import threading
 import time
 
 from render import render
-from failure_diagnostics import DockerCommandError, compose_service_states, summarize, startup_internal_description
+from failure_diagnostics import (
+    DockerCommandError, compose_service_states, mysql_startup_status, startup_internal_description, summarize,
+)
 from published_runtime import interpreter_path
 
 
@@ -1188,6 +1190,16 @@ def main():
                     failure_diagnostics['service_status_unavailable'] = True
             except Exception:
                 failure_diagnostics['service_status_unavailable'] = True
+            if fixture_stage == 'compose_start' and any(
+                    entry['service'] == 'mysql' and
+                    (entry['state'] in ('dead', 'exited') or entry['health'] == 'unhealthy')
+                    for entry in failure_diagnostics.get('services', ())):
+                try:
+                    state = run(['docker', 'inspect', '--format', '{{json .State}}', mysql], timeout=12)
+                    logs = run(['docker', 'logs', '--tail', '120', mysql], timeout=15)
+                    failure_diagnostics['mysql_startup'] = mysql_startup_status(state.stdout, logs.stdout + logs.stderr)
+                except Exception:
+                    failure_diagnostics['mysql_startup_unavailable'] = True
         probes_drained = True
         for p in reversed(probes):
             if not p.log.closed:
