@@ -914,6 +914,7 @@ def main():
                 from sdk_acceptance import run_python_sdk
                 run_python_sdk(start, passed, sql, pause_mysql, wrong_ca)
             pop_observe = None
+            ack_tail_evidence = args.sdk_pop_drain_controls and args.image == 'rocketmq-readable:f07-ack-tail'
             if args.sdk_pop_drain_controls:
                 import importlib.util
                 specification = importlib.util.spec_from_file_location('owned_pop_controls', repo / 'scripts/ops/readable_pop_controls.py')
@@ -921,10 +922,15 @@ def main():
                 proof['readable_pop_controls_source_sha256'] = hashlib.sha256((repo / 'scripts/ops/readable_pop_controls.py').read_bytes()).hexdigest()
                 proof['readable_pop_controls'] = {}
                 pop_observe = controls.OwnedPopControls(run, admin, broker, project, sdk_manifest,
-                    proof['readable_pop_controls'], passed)
+                    proof['readable_pop_controls'], passed, revive_required=ack_tail_evidence)
             shared_budget(start,passed,language="sdk-go",observe=pop_observe)
             if args.sdk_api_python:
                 shared_budget(start,passed,language="sdk-python",observe=pop_observe)
+            if ack_tail_evidence:
+                from f07_ack_tail_evidence import collect
+                routes = {(row['physical_topic'], row['consumer_group']) for row in sdk_manifest['routes']
+                          if row.get('consumer_group')}
+                proof['f07_ack_tail_storage'] = collect(run, broker, project, image, routes, os.environ)
             if args.sdk_faults:
                 from sdk_faults import run_faults
                 run(["go", "build", "-o", str(directory / "fault-proxy"),
