@@ -460,11 +460,13 @@ def main():
     broker_spec["healthcheck"]["test"][-1] = f"exec 3<>/dev/tcp/127.0.0.1/{grpc_port}"
     for service in spec["services"].values():
         service["restart"] = "no"
+    # MySQL initialization and its tmpfs data both count toward the fixture memory limit.
+    # Hosted fixtures can hit 512 MiB before the first application case.
     spec["services"]["mysql"] = {
         "image": mysql_image, "environment": {"MYSQL_ROOT_PASSWORD": mysql_password,
         "MYSQL_DATABASE": "txprobe", "MYSQL_USER": "txprobe", "MYSQL_PASSWORD": mysql_password},
         "ports": [f"127.0.0.1:{mysql_port}:3306"], "networks": ["rocketmq"],
-        "mem_limit": "512m", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
+        "mem_limit": "1g", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
     if args.qs_runtime_host or args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host:
@@ -487,9 +489,6 @@ def main():
             spec['services']['mongo']['command'] += ['--setParameter', 'enableTestCommands=1']
     redis_port = None
     if args.qs_recovery_host:
-        # Full application schema on tmpfs exceeds the protocol-only 512MiB
-        # startup budget in the managed executor (recorded native OOM).
-        spec["services"]["mysql"]["mem_limit"] = "1g"
         # mongosh health checks plus WiredTiger/tmpfs also exceeded512MiB.
         spec["services"]["mongo"]["mem_limit"] = "1g"
         redis_port = port()
