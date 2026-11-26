@@ -1,6 +1,15 @@
+from contextlib import redirect_stderr, redirect_stdout
 import importlib.util
+import io
+import json
+import os
 from pathlib import Path
+import subprocess
+import tempfile
+from threading import Event
+import time
 import unittest
+from unittest.mock import patch
 
 
 def load(name, file):
@@ -67,6 +76,94 @@ class DiscoveryTests(unittest.TestCase):
         item = {'ip': '172.20.0.2', 'port': 9092, 'job': 'qs-worker', 'instance': 'worker'}
         with self.assertRaises(ValueError):
             local.groups([item, item], '100.85.122.124:443')
+
+    def test_slow_source_does_not_block_other_target_file_and_still_expires(self):
+        fresh_worker = {'ip': '172.20.0.21', 'port': 9092, 'job': 'qs-worker', 'instance': 'worker'}
+        gateway = 'gateway:443'
+        for age, expected_a in ((119, ['previous']), (121, [])):
+            with self.subTest(age=age), tempfile.TemporaryDirectory() as directory:
+                a_file = Path(directory) / 'serverA.json'
+                d_file = Path(directory) / 'serverD.json'
+                a_file.write_text('["previous"]\n')
+                old = time.time() - age
+                os.utime(a_file, (old, old))
+                fixed_now = old + age
+                slow_started = Event()
+                healthy_published = Event()
+                replace = local.atomic_write
+
+                def ssh(command, **options):
+                    self.assertEqual(options['timeout'], 35)
+                    if command[-1] == 'root@a':
+                        slow_started.set()
+                        self.assertTrue(healthy_published.wait(timeout=5))
+                        raise subprocess.TimeoutExpired(command, 35)
+                    self.assertEqual(command[-1], 'root@d')
+                    self.assertTrue(slow_started.wait(timeout=5))
+                    return subprocess.CompletedProcess(command, 0, stdout=json.dumps([fresh_worker]))
+
+                def publish(target, groups):
+                    replace(target, groups)
+                    if target == d_file:
+                        healthy_published.set()
+
+                config = {'sources': [{'name': 'serverA', 'host': 'a'}, {'name': 'serverD', 'host': 'd'}],
+                          'output': directory, 'gateway': gateway, 'identity': 'identity', 'known_hosts': 'known_hosts'}
+                with patch.object(local.subprocess, 'run', side_effect=ssh), \
+                     patch.object(local, 'atomic_write', side_effect=publish), \
+                     patch.object(local.time, 'time', return_value=fixed_now):
+                    self.assertEqual(local.discover(config), 1)
+                self.assertEqual(json.loads(d_file.read_text()), local.groups([fresh_worker], gateway))
+                self.assertEqual(json.loads(a_file.read_text()), expected_a)
+
+    def test_malformed_inventory_preserves_fresh_targets_and_expires_stale_targets(self):
+        fresh = {'ip': '172.20.0.21', 'port': 9092, 'job': 'qs-worker', 'instance': 'worker'}
+        for invalid in ({}, None, [None], [dict(fresh, port=None)], [dict(fresh, instance=None)],
+                        [dict(fresh, component=7)]):
+            for age, expected in ((119, ['previous']), (121, [])):
+                with self.subTest(payload=invalid, age=age), tempfile.TemporaryDirectory() as directory:
+                    a_file = Path(directory) / 'serverA.json'
+                    d_file = Path(directory) / 'serverD.json'
+                    a_file.write_text('["previous"]\n')
+                    now = time.time()
+                    os.utime(a_file, (now - age, now - age))
+                    config = {'sources': [{'name': 'serverA', 'host': 'a'}, {'name': 'serverD', 'host': 'd'}],
+                              'output': directory, 'gateway': 'gateway:443',
+                              'identity': 'identity', 'known_hosts': 'known_hosts'}
+
+                    def ssh(command, **options):
+                        payload = invalid if command[-1] == 'root@a' else [fresh]
+                        return subprocess.CompletedProcess(command, 0, stdout=json.dumps(payload))
+
+                    errors = io.StringIO()
+                    with patch.object(local.subprocess, 'run', side_effect=ssh), redirect_stderr(errors):
+                        self.assertEqual(local.discover(config), 1)
+                    self.assertRegex(errors.getvalue(), r' serverA (ValueError|TypeError)\n$')
+                    self.assertEqual(json.loads(a_file.read_text()), expected)
+                    self.assertEqual(json.loads(d_file.read_text()), local.groups([fresh], config['gateway']))
+
+    def test_refresh_logs_utc_and_only_bounded_source_metadata(self):
+        source = {'name': 'serverA', 'host': 'private-host'}
+        completed = subprocess.CompletedProcess([], 0, stdout='[]')
+        failure = subprocess.CalledProcessError(255, ['private-command'], stderr='private-error')
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with tempfile.TemporaryDirectory() as output:
+            config = {'output': output, 'gateway': 'gateway:443', 'identity': 'private-identity',
+                      'known_hosts': 'private-known-hosts'}
+            with redirect_stdout(stdout), redirect_stderr(stderr), \
+                 patch.object(local.subprocess, 'run', side_effect=[completed, failure]):
+                self.assertTrue(local.refresh_source(config, source))
+                self.assertFalse(local.refresh_source(config, source))
+        timestamp = r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
+        self.assertRegex(stdout.getvalue(), rf'^{timestamp} serverA targets 0\n$')
+        self.assertRegex(stderr.getvalue(), rf'^{timestamp} serverA CalledProcessError\n$')
+
+    def test_duplicate_source_names_cannot_publish_to_the_same_file(self):
+        config = {'sources': [{'name': 'serverA'}, {'name': 'servera'}]}
+        with patch.object(local.subprocess, 'run') as ssh:
+            with self.assertRaisesRegex(ValueError, 'duplicate discovery source name'):
+                local.discover(config)
+            ssh.assert_not_called()
 
 
 if __name__ == '__main__':
