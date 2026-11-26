@@ -1,0 +1,11 @@
+[Unit]
+Description=Schedule Qlume ServerA Prometheus discovery
+
+[Timer]
+OnBootSec=10s
+OnCalendar=*-*-* *:*:00/15
+AccuracySec=1s
+Unit=qlume-servera-monitoring-discovery.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,17 @@
+{
+  "target_mode": "direct",
+  "output": "/run/infra-monitoring-servera/targets",
+  "identity": "/etc/infra-monitoring-servera/serverd.key",
+  "known_hosts": "/etc/infra-monitoring-servera/known_hosts",
+  "sources": [
+    {
+      "name": "serverA",
+      "transport": "local"
+    },
+    {
+      "name": "serverD",
+      "transport": "ssh",
+      "host": "100.118.164.39"
+    }
+  ]
+}

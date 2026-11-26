@@ -1,0 +1,16 @@
+[Unit]
+Description=Refresh Qlume ServerA Prometheus discovery targets
+Wants=docker.service tailscaled.service
+After=docker.service tailscaled.service
+ConditionPathIsDirectory=/run/infra-monitoring-servera/targets
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -B /opt/infra-monitoring-servera/discover.py --config /etc/infra-monitoring-servera/discovery.json
+TimeoutStartSec=45s
+UMask=0022
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+ReadWritePaths=/run/infra-monitoring-servera/targets

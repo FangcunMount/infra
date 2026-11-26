@@ -1,0 +1,15 @@
+{
+  "schema": "monitoring-h06-history-import-approval/v1",
+  "fixture": false,
+  "operation_id": null,
+  "h03_operation_id": null,
+  "operator": null,
+  "reviewer": null,
+  "decision_reference": null,
+  "starts_at": null,
+  "expires_at": null,
+  "b05_sha256": null,
+  "archive_sha256": null,
+  "volume": "qlume-servera-monitoring-history",
+  "helper": null
+}
