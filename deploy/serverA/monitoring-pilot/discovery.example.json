@@ -1,0 +1,10 @@
+{
+  "target_mode": "direct",
+  "output": "/var/lib/infra-monitoring-pilot/targets",
+  "identity": "/etc/infra-monitoring-pilot/serverd.key",
+  "known_hosts": "/etc/infra-monitoring-pilot/known_hosts",
+  "sources": [
+    {"name": "serverA", "transport": "local"},
+    {"name": "serverD", "transport": "ssh", "host": "100.118.164.39"}
+  ]
+}
