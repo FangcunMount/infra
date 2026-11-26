@@ -433,6 +433,62 @@
       "title": "AI business receipt observation available",
       "type": "timeseries",
       "description": "1 表示本次业务回执快照可用；0 表示读取失败。缺失样本不表示没有等待责任。"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "showPoints": "auto",
+            "spanNulls": false
+          },
+          "unit": "none",
+          "decimals": 0,
+          "noValue": "不可用",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "qs_server_ai_mq_unverified_transaction_anchors",
+          "legendFormat": "{{job}} / {{instance}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "QS commands with unverified transaction anchors",
+      "type": "timeseries",
+      "description": "统计成功读取的非退役命令中缺失或冲突的事务锚点。0 表示当次实读未发现缺口，缺样表示未取得证据。此计数不区分历史集合或当前命令，历史分类和业务回执另行签收。"
     }
   ],
   "refresh": "30s",
