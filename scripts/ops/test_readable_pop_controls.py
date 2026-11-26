@@ -12,6 +12,12 @@ def metrics(*, offset='0', checkpoint='0', timing='0', include_timer=True):
     return raw
 
 
+def metrics_with_revive_lag(lag='0', **values):
+    queues = ''.join(f'{REVIVE_LAG_NAME}{{queue_id="{queue}"}} {lag if queue == 2 else "0"}\n'
+                     for queue in range(8))
+    return metrics(**values) + queues
+
+
 class ReadablePopControlsTest(unittest.TestCase):
     def test_future_checkpoint_prevents_zero_even_with_no_buffer_or_ordinary_inflight(self):
         raw = metrics(timing='2') + 'rocketmq_consumer_inflight_messages{consumer_group="fake"} 0\n'
@@ -73,3 +79,44 @@ class ReadablePopControlsTest(unittest.TestCase):
         for stage,language in [('held','sdk-go'),('closed','sdk-go'),('baseline','unregistered'),('execute','sdk-python')]:
             with self.subTest(stage=stage),self.assertRaises(RuntimeError):control(stage,language)
         run.assert_not_called();admin.assert_not_called()
+
+    def test_baseline_timeout_retains_only_last_failed_snapshot(self):
+        first = snapshot(metrics_with_revive_lag(timing='2'), timing_required=False, revive_required=True)
+        last = snapshot(metrics_with_revive_lag('1'), timing_required=False, revive_required=True)
+        proof, passed = {}, Mock()
+        control = OwnedPopControls(Mock(), Mock(), 'unused', 'unused', {}, proof, passed, revive_required=True)
+        with patch.object(control, 'read', side_effect=[first, last]), \
+                patch('readable_pop_controls.time.monotonic', side_effect=[0, 1, 2, 90]), \
+                patch('readable_pop_controls.time.time_ns', side_effect=[1_000_000, 2_000_000]), \
+                patch('readable_pop_controls.time.sleep'):
+            with self.assertRaisesRegex(RuntimeError, 'native_pop_control_budget_exceeded'):
+                control('baseline', 'sdk-go')
+        self.assertEqual(proof, {'go': {'baseline_timeout': dict(
+            budget_seconds=90, samples_read=2, last_sample_unix_ms=2, last_sample=last)}})
+        passed.assert_not_called()
+
+    def test_successful_wait_leaves_no_timeout_record(self):
+        first = snapshot(metrics_with_revive_lag('1'), timing_required=False, revive_required=True)
+        last = snapshot(metrics_with_revive_lag(), timing_required=False, revive_required=True)
+        proof = {}
+        control = OwnedPopControls(Mock(), Mock(), 'unused', 'unused', {}, proof, Mock(), revive_required=True)
+        with patch.object(control, 'read', side_effect=[first, last]), \
+                patch('readable_pop_controls.time.sleep'):
+            control('baseline', 'sdk-go')
+        self.assertEqual(proof, {'go': {'baseline': last}})
+
+    def test_closed_confirmation_retains_reappearing_responsibility(self):
+        settled = snapshot(metrics_with_revive_lag(), timing_required=True, revive_required=True)
+        for field in ('offset', 'checkpoint', 'timing', 'lag'):
+            with self.subTest(field=field):
+                reappeared = snapshot(metrics_with_revive_lag(**{field: '1'}), timing_required=True, revive_required=True)
+                proof = {'go': {'held': snapshot(metrics_with_revive_lag(timing='2'), timing_required=True, revive_required=True)}}
+                passed = Mock()
+                control = OwnedPopControls(Mock(), Mock(), 'unused', 'unused', {}, proof, passed, revive_required=True)
+                control.observed_timer = True
+                with patch.object(control, 'read', side_effect=[settled, reappeared]), patch('readable_pop_controls.time.sleep'):
+                    with self.assertRaisesRegex(RuntimeError, 'pop_responsibility_reappeared_after_sdk_close'):
+                        control('closed', 'sdk-go')
+                self.assertEqual(proof['go']['closed'], settled)
+                self.assertEqual(proof['go']['closed_confirmation'], reappeared)
+                passed.assert_not_called()

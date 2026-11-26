@@ -3,7 +3,7 @@ module fangcunmount.infra/rocketmq-native-recovery
 go 1.25.9
 
 require (
-	github.com/FangcunMount/reliable-messaging v0.5.0-rocketmq-tx.4
+	github.com/FangcunMount/reliable-messaging v0.6.1
 	github.com/go-sql-driver/mysql v1.9.3
 	go.mongodb.org/mongo-driver v1.17.6
 )

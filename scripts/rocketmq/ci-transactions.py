@@ -15,6 +15,7 @@ import secrets
 import signal
 import shutil
 import socket
+import ssl
 import subprocess
 import tempfile
 import threading
@@ -242,6 +243,8 @@ def main():
     parser.add_argument("--qs-command-host", type=Path, help="exact QS checkout; original SQL command root and real Broker")
     parser.add_argument("--qs-event-host", type=Path, help="exact QS checkout; authenticated event Inbox/projection and original ACK SQL root")
     parser.add_argument("--ai-admission-host", type=Path, help="exact AI checkout; real published Python SDK and original admission roots/Broker")
+    parser.add_argument("--ai-native-observed-budget", action="store_true",
+                        help="reproduce the observed Broker check budget in the isolated coordinated AI origin fixture")
     parser.add_argument("--iam-host-faults", action="store_true", help="separate actual IAM role original-root COMMIT packet faults")
     parser.add_argument("--qs-answer-host-faults", action="store_true", help="separate actual AnswerSheet original Mongo COMMIT packet faults")
     parser.add_argument("--ai-host-database-faults", action="store_true", help="actual AI command original SQLAlchemy COMMIT packet faults")
@@ -411,6 +414,18 @@ def main():
         parser.error("packet faults require public SDK acceptance")
     if args.sdk_api_python and not args.sdk_api_go:
         parser.error("Python SDK acceptance requires the full public Go SDK matrix")
+    parameters = PARAMETERS
+    if args.ai_native_observed_budget:
+        from ai_native_origin_acceptance import OBSERVED_BROKER_PARAMETERS
+        from final_image_candidate import ci_guard
+
+        ci_guard(os.environ)
+        if (not args.ai_admission_host or args.ai_host_database_faults
+                or os.environ.get("QS_AI_ACCEPTANCE_KIND") != "native_limit"
+                or os.environ.get("QS_AI_NATIVE_ORIGIN") != "true"
+                or os.environ.get("QS_AI_COORDINATED_IMAGE") != "true"):
+            parser.error("observed Broker budget requires the isolated coordinated AI native origin")
+        parameters = OBSERVED_BROKER_PARAMETERS
     repo = Path(__file__).resolve().parents[2]
     sources = repo / "scripts/rocketmq/txprobe"
     sdk = args.sdk.resolve()
@@ -428,14 +443,27 @@ def main():
     accounts = {name: {"username": "m2-" + name, "password": secrets.token_hex(32)}
                 for name in ("admin", "inner", "owner-a", "owner-b", "observer")}
     mysql_password = secrets.token_hex(32)
-    render(accounts, config, "127.0.0.1", repo / "components/rocketmq")
+    coordinated_image = os.environ.get("QS_AI_COORDINATED_IMAGE") == "true"
+    if coordinated_image:
+        from final_image_candidate import ci_guard
+        ci_guard(os.environ)
+        if not args.ai_admission_host or not os.environ.get("QS_AI_NATIVE_RECOVERY_IMAGE"):
+            raise RuntimeError("coordinated recovery requires the owned AI execution image")
+    broker_address = "127.0.0.1"
+    if coordinated_image:
+        from ci_coordinated_recovery import add_recovery_bridge, RECOVERY_BROKER_HOST, RECOVERY_BROKER_IP
+        broker_address = RECOVERY_BROKER_IP
+    render(accounts, config, broker_address, repo / "components/rocketmq")
     with (config / "broker.conf").open("a") as stream:
-        stream.write("".join(f"{key}={value}\n" for key, value in PARAMETERS.items()))
+        stream.write("".join(f"{key}={value}\n" for key, value in parameters.items()))
     proxy = json.loads((config / "proxy.json").read_text())
     proxy["grpcServerPort"] = grpc_port
     (config / "proxy.json").write_text(json.dumps(proxy))
+    broker_san = "subjectAltName=IP:127.0.0.1,DNS:localhost,DNS:nameserver,DNS:broker"
+    if coordinated_image:
+        broker_san += f",IP:{broker_address},DNS:{RECOVERY_BROKER_HOST}"
     run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
-         "-subj", "/CN=rocketmq-m2-isolated", "-addext", "subjectAltName=IP:127.0.0.1,DNS:localhost,DNS:nameserver,DNS:broker",
+         "-subj", "/CN=rocketmq-m2-isolated", "-addext", broker_san,
          "-keyout", str(config / "tls/server.key"), "-out", str(config / "tls/server.crt")])
     ca = directory / "ca.crt"
     shutil.copyfile(config / "tls/server.crt", ca)
@@ -470,6 +498,8 @@ def main():
         "mem_limit": "1g", "cpus": 1, "tmpfs": ["/var/lib/mysql"],
         "healthcheck": {"test": ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1'"],
                         "interval": "3s", "timeout": "3s", "retries": 40}}
+    if coordinated_image:
+        add_recovery_bridge(spec)
     if args.qs_runtime_host or args.iam_host or args.qs_evaluation_host or args.qs_task_host or args.qs_retry_store_host or args.qs_retry_dispatch_host or args.qs_command_host or args.qs_event_host or args.ai_admission_host or args.qs_deferred_consumer_host:
         # Host profiles explicitly create/drop their OWN random schema.
         # This root login exists only in this private loopback Compose project.
@@ -649,12 +679,34 @@ def main():
         cases[name] = True
         print("transaction acceptance passed: " + name, flush=True)
 
+    host_ingress = None
     try:
         run(compose + ["up", "-d", "--wait", "--wait-timeout", "180"], timeout=240, docker_phase="compose_start")
+        if coordinated_image:
+            fixture_stage = 'coordinated_host_ingress'
+            from ci_coordinated_recovery import CoordinatedHostIngress
+            loopback = proof["coordinated_host_loopback"] = {}
+            tls = ssl.create_default_context(cafile=ca)
+            tls.set_alpn_protocols(["h2"])
+            host_ingress = CoordinatedHostIngress(project, run)
+            host_ingress.start(grpc_port)
+            for host, key in (("127.0.0.1", "broker_verified_tls_h2"),
+                              (RECOVERY_BROKER_IP, "advertised_broker_verified_tls_h2")):
+                with socket.create_connection((host, grpc_port), timeout=5) as conn:
+                    with tls.wrap_socket(conn, server_hostname=host) as broker_stream:
+                        if broker_stream.selected_alpn_protocol() != "h2":
+                            raise RuntimeError("owned host Broker TLS did not negotiate HTTP/2")
+                loopback[key] = True
+            with socket.create_connection(("127.0.0.1", mysql_port), timeout=5) as conn:
+                with conn.makefile("rb") as mysql_stream:
+                    greeting = mysql_stream.read(5)
+                    if len(greeting) != 5 or greeting[3:] != b"\x00\x0a":
+                        raise RuntimeError("owned host MySQL protocol greeting absent")
+            loopback["mysql_protocol_greeting"] = True
         fixture_stage = 'broker_configuration'
         effective = broker_parameters(admin("getBrokerConfig"))
-        if any(effective[k] != v for k, v in PARAMETERS.items()):
-            raise RuntimeError("isolated accelerated Broker parameters not effective")
+        if any(effective[k] != v for k, v in parameters.items()):
+            raise RuntimeError("isolated Broker parameters not effective")
         proof["effective_broker_parameters"] = effective
         fixture_stage = 'database_version'
         proof["mysql_version"] = sql("SELECT VERSION();")
@@ -728,7 +780,7 @@ def main():
             run_ai_admission_host(args.ai_admission_host, directory, broker, project, grpc_port, mysql_port,
                                   mysql_password, ca, run, proof[proof_name], fault_tools=fault_tools,
                                   native_runner=owned_native_run if kind in ('finalization', 'paired','paired_faults', 'native_limit') else None,
-                                  read_parameters=broker_parameters,
+                                  read_parameters=broker_parameters, observed_native_budget=args.ai_native_observed_budget,
                                   broker_fault=(OwnedBrokerFault(run,broker,project,
                                     lambda: broker_parameters(admin('getBrokerConfig')),effective)
                                     if kind == 'paired_faults' else None))
@@ -1175,6 +1227,15 @@ def main():
                     required=False, timeout=20)
                 failure_diagnostics = {'clients': client_diagnostics,
                                        'broker': summarize(broker_logs.stdout + broker_logs.stderr)}
+                origin = proof.get('ai_state_host', {}).get('original_native', {})
+                if coordinated_image and origin.get('stage') == 'original_half' and probes:
+                    native = probes[-1]
+                    native.reader.join(timeout=1)
+                    native.log.flush()
+                    with Path(native.log.name).open('rb') as stream:
+                        stream.seek(max(0, os.fstat(stream.fileno()).st_size - 1048576))
+                        raw_log = stream.read(1048576)
+                    failure_diagnostics['ai_original_before_half'] = summarize(raw_log)
             except Exception:
                 # Diagnostics must never prevent the actual owned cleanup.
                 failure_diagnostics = {'capture_failed': True}
@@ -1214,11 +1275,24 @@ def main():
                 probes_drained = p.close() and probes_drained
         if not probes_drained:
             failure = failure or "owned probe process group did not drain"
+        if host_ingress:
+            try:
+                host_ingress.close()
+                proof["coordinated_host_alias_removed"] = True
+            except (OSError, RuntimeError, ValueError):
+                proof["coordinated_host_alias_removed"] = False
+                failure = failure or "owned Broker host loopback cleanup failed"
         run(["docker", "unpause", mysql], required=False)
         run(compose + ["down", "--volumes", "--remove-orphans", "--timeout", "30"], timeout=120)
         remaining = run(["docker", "ps", "-aq", "--filter", "label=com.docker.compose.project=" + project]).stdout.strip()
         if remaining:
             failure = failure or "owned Compose containers remain after cleanup"
+        if coordinated_image:
+            owned_networks = run(["docker", "network", "ls", "-q", "--filter",
+                                  "label=com.docker.compose.project=" + project]).stdout.strip()
+            proof["coordinated_project_networks_removed"] = not owned_networks
+            if owned_networks:
+                failure = failure or "owned recovery networks remain after cleanup"
         report = {"version": 1, "batch": ("M2-Go-Python-SDK" if args.sdk_api_python else "M2-Go-SDK") if args.sdk_api_go else "M2-0", "project": project, "image": image,
                   "mysql_image": mysql_image, "mongo_image": mongo_image, "clients": {"go": "5.1.4", "python": "5.1.2"},
                   "cases": cases, "passed": len(cases), "failed": int(failure is not None),
