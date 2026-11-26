@@ -60,6 +60,7 @@ make serverD-up
 | 文档 | 说明 |
 | ------ | ------ |
 | [serverA 腾讯云迁移记录](docs/server/serverA-tencent-migration.md) | 已执行切换、运行证据和回退边界 |
+| [serverA 账户与权限维护](docs/server/serverA-access.md) | 新机账户现状、精确 sudoers、审计与安装入口 |
 | [架构设计](docs/server/architecture.md) | 四机拓扑、职责边界、服务依赖 |
 | [IAM 腾讯云迁移记录](docs/server/iam-tencent-servera-migration.md) | IAM 从 B 迁至新 A 的固定版本、验收和回退边界 |
 | [Mongo 迁移手册](docs/server/mongo-migration-to-serverC.md) | Mongo 迁到 `serverC` 的切换顺序、备份恢复与业务改造点 |

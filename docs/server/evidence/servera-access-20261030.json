@@ -1,0 +1,180 @@
+{
+  "applied_script_sha256": "ddcb26d9257aa24f897de6de5f21181cde75074aa1851cb60f45f007b5c7a741",
+  "audit_after": {
+    "accounts": {
+      "deploy": {
+        "gid": 2001,
+        "groups": [
+          "deploy"
+        ],
+        "home": "/home/deploy",
+        "password_status": "P",
+        "shell": "/bin/bash",
+        "uid": 1002
+      },
+      "root": {
+        "gid": 0,
+        "groups": [
+          "root"
+        ],
+        "home": "/root",
+        "password_status": "P",
+        "shell": "/bin/bash",
+        "uid": 0
+      },
+      "ubuntu": {
+        "gid": 1001,
+        "groups": [
+          "adm",
+          "audio",
+          "cdrom",
+          "dialout",
+          "dip",
+          "floppy",
+          "lxd",
+          "netdev",
+          "plugdev",
+          "sudo",
+          "ubuntu",
+          "video"
+        ],
+        "home": "/home/ubuntu",
+        "password_status": "P",
+        "shell": "/bin/bash",
+        "uid": 1000
+      },
+      "www": {
+        "gid": 2000,
+        "groups": [
+          "www"
+        ],
+        "home": "/var/www",
+        "password_status": "L",
+        "shell": "/usr/sbin/nologin",
+        "uid": 2000
+      }
+    },
+    "authorization": {
+      "ai": true,
+      "iam": true,
+      "qs-api": true
+    },
+    "changed": false,
+    "host": "serverA",
+    "negative_probes_denied": true,
+    "policy_installed": true,
+    "policy_path": "/etc/sudoers.d/fangcun-m4-readable-material-verify",
+    "policy_sha256": "f142208c5bd37bd59aea313ed2a8f12c43dfd9d753e5d09fde67aa67e81739a0",
+    "receipt_sha256": {
+      "ai": "7efcabf95daa4bbfca11167373bc94b6c62d5d24ef647ab886c6e376d741fb93",
+      "iam": "71eefbb19651195665d40fb656ce56ba2d28a392a6f54064f956042f2069e1ef",
+      "qs-api": "b765302a6631b528f743be20b38c4c54f7ce46b4a9677500231a74e15ab615a8"
+    },
+    "revision": "m4-readable-20261028-v1",
+    "status": "verified"
+  },
+  "ci_artifact_comparison": {
+    "after": {
+      "artifact_id": 12972885118,
+      "artifact_sha256": "c1c1078fd45d0e3e24ec21d34be031ce260937e60ab6451ae556a3c94017ccac",
+      "installed_materials": {
+        "ai": {
+          "host": "serverA",
+          "receipt_sha256": "7efcabf95daa4bbfca11167373bc94b6c62d5d24ef647ab886c6e376d741fb93",
+          "revision": "m4-readable-20261028-v1",
+          "role": "ai",
+          "verified": true
+        },
+        "iam": {
+          "host": "serverA",
+          "receipt_sha256": "71eefbb19651195665d40fb656ce56ba2d28a392a6f54064f956042f2069e1ef",
+          "revision": "m4-readable-20261028-v1",
+          "role": "iam",
+          "verified": true
+        },
+        "qs-api": {
+          "host": "serverA",
+          "receipt_sha256": "b765302a6631b528f743be20b38c4c54f7ce46b4a9677500231a74e15ab615a8",
+          "revision": "m4-readable-20261028-v1",
+          "role": "qs-api",
+          "verified": true
+        }
+      },
+      "read_only": true
+    },
+    "before": {
+      "artifact_id": 12971901170,
+      "artifact_sha256": "dd2ac79c9f04edbafff0c8140ec4d601d41133f234030547061df115dbeb9639",
+      "installed_materials": {
+        "ai": {
+          "error": "command_not_permitted",
+          "error_stage": "installed_verification",
+          "host": "serverA",
+          "returncode": 1,
+          "revision": "m4-readable-20261028-v1",
+          "role": "ai",
+          "verified": false
+        },
+        "iam": {
+          "error": "command_not_permitted",
+          "error_stage": "installed_verification",
+          "host": "serverA",
+          "returncode": 1,
+          "revision": "m4-readable-20261028-v1",
+          "role": "iam",
+          "verified": false
+        },
+        "qs-api": {
+          "error": "command_not_permitted",
+          "error_stage": "installed_verification",
+          "host": "serverA",
+          "returncode": 1,
+          "revision": "m4-readable-20261028-v1",
+          "role": "qs-api",
+          "verified": false
+        }
+      },
+      "read_only": true
+    }
+  },
+  "ci_installed_materials_verified": true,
+  "ci_rerun": true,
+  "ci_snapshot_result": "success",
+  "ci_snapshot_run": "https://github.com/FangcunMount/qs-server/actions/runs/41045469900",
+  "ci_snapshot_sha": "497ea75a3e8773a47efcc9b9d9b992244650fb97",
+  "container_count": 9,
+  "date": "2026-10-30",
+  "host": "serverA",
+  "idempotent_apply_containers_unchanged": true,
+  "idempotent_apply_protected_files_unchanged": true,
+  "initial_apply_added_only": "/etc/sudoers.d/fangcun-m4-readable-material-verify",
+  "initial_apply_lifecycle_events": [],
+  "initial_apply_protected_files_comparison_passed": true,
+  "initial_apply_window_utc": [
+    "2026-10-30T11:01:50Z",
+    "2026-10-30T11:02:40Z"
+  ],
+  "protected_file_count": 16,
+  "remote_bundle": "/root/infra-servera-access-20261030",
+  "repeat_apply_changed": false,
+  "reported_run": "https://github.com/FangcunMount/qs-server/actions/runs/41044118988",
+  "source_base": "bcb5a32",
+  "unordered_mount_differences": [
+    {
+      "field": "Mounts",
+      "id": "2d5d7f29526367943bb0e2d798b7d396702a0ce1d46e5f4778b2fb61206264ed"
+    },
+    {
+      "field": "Mounts",
+      "id": "4fe7da1909161660aaaf00fb45926ea38a78cec781035f0587670e10fc71d91a"
+    },
+    {
+      "field": "Mounts",
+      "id": "8d9f2f4d1a9cf85d4f51497897eff0b545676ff8eb479f595beee9d969b6d18e"
+    },
+    {
+      "field": "Mounts",
+      "id": "ee73c47ab8a750a18aee638cbaca67b15f477dce9ca94caacc871689deb351e8"
+    }
+  ]
+}

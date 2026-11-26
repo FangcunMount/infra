@@ -205,6 +205,8 @@ help: ## 显示帮助信息
 	@echo "   $(CYAN)server-init$(RESET)          交互式 Linux 初始化"
 	@echo "   $(CYAN)server-init-users$(RESET)    创建/维护用户账户 (root/yangshujie/deploy/www)"
 	@echo "   $(CYAN)server-init-user$(RESET)     独立新增用户 (USERNAME=alice INIT_USER_ARGS=--sudo)，别名 init-user"
+	@echo "   $(CYAN)serverA-access-audit$(RESET)  审计新 A 账户与精确材料验证授权（目标机管理员）"
+	@echo "   $(CYAN)serverA-access-apply$(RESET)  仅新增新 A 三条固定材料验证授权"
 	@echo "   $(CYAN)server-install-docker$(RESET) 安装 Docker 和 Compose"
 	@echo "   $(CYAN)perf-runner-init-remote$(RESET) 从本机一键初始化独立压测机"
 	@echo "   $(CYAN)perf-runner-check-remote$(RESET) 校验独立压测机"
@@ -317,7 +319,13 @@ help-all: ## 显示所有命令
 # ==============================================================================
 # 0. 服务器初始化
 # ==============================================================================
-.PHONY: server-init server-init-users server-init-user init-user server-install-docker server-setup-deploy-ssh server-tune
+.PHONY: server-init server-init-users server-init-user init-user server-install-docker server-setup-deploy-ssh server-tune serverA-access-audit serverA-access-apply
+
+serverA-access-audit: ## 在 ServerA 审计账户和固定材料验证授权；缺失时非零退出
+	@sudo /usr/bin/python3 -I $(SERVER_SCRIPTS)/servera-access.py
+
+serverA-access-apply: ## 在 ServerA 仅安装三个精确只读命令的 sudoers；不初始化账户
+	@sudo /usr/bin/python3 -I $(SERVER_SCRIPTS)/servera-access.py --apply
 .PHONY: perf-runner-init perf-runner-check perf-runner-init-remote perf-runner-check-remote perf-runner-sync
 .PHONY: perf-runner-sync-config-remote perf-runner-verify
 

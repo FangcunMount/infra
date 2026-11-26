@@ -1,0 +1,5 @@
+# Managed by infra: scripts/00-server/servera-access.py
+# Only the reviewed, installed tool and these three exact read-only commands.
+deploy ALL=(root) NOPASSWD: /usr/bin/python3 -I /opt/fangcun-m4/material-tools/36f3046ed453dfbf8beae684269c94d1a6db0abaa23de51e09d41e462c6a3d5c.py --verify-installed --host serverA --expect-role iam --expect-revision m4-readable-20261028-v1
+deploy ALL=(root) NOPASSWD: /usr/bin/python3 -I /opt/fangcun-m4/material-tools/36f3046ed453dfbf8beae684269c94d1a6db0abaa23de51e09d41e462c6a3d5c.py --verify-installed --host serverA --expect-role qs-api --expect-revision m4-readable-20261028-v1
+deploy ALL=(root) NOPASSWD: /usr/bin/python3 -I /opt/fangcun-m4/material-tools/36f3046ed453dfbf8beae684269c94d1a6db0abaa23de51e09d41e462c6a3d5c.py --verify-installed --host serverA --expect-role ai --expect-revision m4-readable-20261028-v1

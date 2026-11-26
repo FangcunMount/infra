@@ -1,0 +1,5 @@
+# Release-scoped QS MQ preflight. The current CD invocation does not pass -I.
+# Only the decimal PID in the upload path varies; all other arguments are fixed.
+Cmnd_Alias FANGCUN_QS_MQ_3B8A931 = /usr/bin/python3 ^/opt/qs-server/qs-apiserver/ai-mq-tools/ce8b2112bd2669efa14ae34880a6f6462e38d629a4a17ff9673936b70b359bb3[.]py --image ghcr[.]io/fangcunmount/qs-apiserver:3b8a931e2451e38602e8b26bc623bf8d37a69878 --base-config /tmp/qs-deploy-apiserver-[0-9]{1,7}/configs/apiserver[.]prod[.]yaml --uid 2000 --gid 2000$
+Defaults!FANGCUN_QS_MQ_3B8A931 env_reset, always_set_home, !setenv, env_delete += "PYTHON*", env_keep -= "PYTHONPATH PYTHONHOME PYTHONUSERBASE PYTHONINSPECT"
+deploy ALL=(root) CWD=/ NOPASSWD: NOSETENV: FANGCUN_QS_MQ_3B8A931
