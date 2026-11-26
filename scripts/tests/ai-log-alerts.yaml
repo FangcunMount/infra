@@ -1,0 +1,37 @@
+rule_files:
+  - /work/components/prometheus/rules/qs-ai-logging.yml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: qs_ai_logging_queued
+        values: '800x5'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: QSAILogQueueSaturated
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: QSAILogQueueSaturated
+        exp_alerts:
+          - exp_labels: {severity: warning}
+            exp_annotations: {summary: qs-ai diagnostic log queue is filling}
+  - interval: 1m
+    input_series:
+      - series: qs_ai_logging_dropped_total
+        values: '0 0 0 1 1 1'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: QSAILogDrops
+        exp_alerts:
+          - exp_labels: {severity: warning}
+            exp_annotations: {summary: qs-ai diagnostic logs were dropped}
+  - interval: 1m
+    input_series:
+      - series: qs_ai_logging_failed_total
+        values: '0 0 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: QSAILogWriteFailures
+        exp_alerts:
+          - exp_labels: {severity: warning}
+            exp_annotations: {summary: qs-ai diagnostic log output failed}

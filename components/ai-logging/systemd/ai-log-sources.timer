@@ -1,0 +1,11 @@
+[Unit]
+Description=Discover replacement AI containers for diagnostic logging
+
+[Timer]
+OnBootSec=10s
+OnUnitActiveSec=15s
+AccuracySec=1s
+Unit=ai-log-sources.service
+
+[Install]
+WantedBy=timers.target

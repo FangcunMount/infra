@@ -1,0 +1,12 @@
+[Unit]
+Description=Refresh approved AI Docker log file sources
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/ai-logging/current/scripts/prepare-ai-log-source.py --template /opt/ai-logging/current/components/ai-logging/vector.yaml --output /data/infra/ai-logging/config/vector.yaml
+User=root
+UMask=0022
+NoNewPrivileges=true
+PrivateTmp=true

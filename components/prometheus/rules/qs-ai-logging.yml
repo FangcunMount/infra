@@ -1,0 +1,22 @@
+groups:
+  - name: qs-ai-log-pipeline
+    rules:
+      - alert: QSAILogQueueSaturated
+        expr: qs_ai_logging_queued > 768
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: qs-ai diagnostic log queue is filling
+      - alert: QSAILogDrops
+        expr: increase(qs_ai_logging_dropped_total[5m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: qs-ai diagnostic logs were dropped
+      - alert: QSAILogWriteFailures
+        expr: increase(qs_ai_logging_failed_total[5m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: qs-ai diagnostic log output failed

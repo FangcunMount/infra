@@ -1,0 +1,12 @@
+# Substitute the ID of the restricted operations organization, never default org 1.
+apiVersion: 1
+datasources:
+  - name: AI operational logs
+    uid: ai-logs
+    orgId: ${LOGS_GRAFANA_ORG_ID}
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: false
+    jsonData:
+      maxLines: 1000
